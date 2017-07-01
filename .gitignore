@@ -1,0 +1,14 @@
+.vs
+*.vcxproj.filters
+*.vcxproj.user
+x64
+bin
+*.VC.opendb
+*.sdf
+*.vsp
+*.psess
+*.vspx
+*.org
+lib
+Debug
+Release
