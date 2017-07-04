@@ -44,8 +44,11 @@ public:
     void Write(int64_t x);
     void Write(float x);
     void Write(double x);
+    void Write(char x);
+    void Write(char16_t x);
     void Write(char32_t x);
     void Write(const std::string& s);
+    void Write(const std::u16string& s);
     void Write(const std::u32string& s);
     void WriteEncodedUInt(uint32_t x);
     uint32_t Pos() const { return pos; }

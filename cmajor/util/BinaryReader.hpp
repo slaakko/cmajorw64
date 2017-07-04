@@ -25,8 +25,11 @@ public:
     int64_t ReadLong();
     float ReadFloat();
     double ReadDouble();
-    char32_t ReadChar();
+    char ReadChar();
+    char16_t ReadWChar();
+    char32_t ReadUChar();
     std::string ReadUtf8String();
+    std::u16string ReadUtf16String();
     std::u32string ReadUtf32String();
     uint32_t ReadEncodedUInt();
     uint32_t Pos() const { return pos; }

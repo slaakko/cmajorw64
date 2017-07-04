@@ -3,9 +3,22 @@
 // Distributed under the MIT license
 // =================================
 
+#include <cmajor/ast/InitDone.hpp>
 #include <iostream>
 #include <string>
 #include <stdexcept>
+
+struct InitDone
+{
+    InitDone()
+    {
+        cmajor::ast::Init();
+    }
+    ~InitDone()
+    {
+        cmajor::ast::Done();
+    }
+};
 
 const char* version = "2.0.0";
 
@@ -18,6 +31,7 @@ int main(int argc, const char** argv)
 {
     try
     {
+        InitDone initDone;
         if (argc < 2)
         {
             PrintHelp();

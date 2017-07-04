@@ -110,6 +110,16 @@ void BinaryWriter::Write(double x)
     Write(*u);
 }
 
+void BinaryWriter::Write(char x)
+{
+    Write(static_cast<uint8_t>(x));
+}
+
+void BinaryWriter::Write(char16_t x)
+{
+    Write(static_cast<uint16_t>(x));
+}
+
 void BinaryWriter::Write(char32_t x)
 {
     Write(static_cast<uint32_t>(x));
@@ -123,6 +133,12 @@ void BinaryWriter::Write(const std::string& s)
         Write(x);
     }
     Write(static_cast<uint8_t>(0));
+}
+
+void BinaryWriter::Write(const std::u16string& s)
+{
+    std::string utf8_str = ToUtf8(s);
+    Write(utf8_str);
 }
 
 void BinaryWriter::Write(const std::u32string& s)

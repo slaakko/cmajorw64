@@ -1,0 +1,284 @@
+// =================================
+// Copyright (c) 2017 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+#include <cmajor/ast/Node.hpp>
+#include <cmajor/ast/AstWriter.hpp>
+#include <cmajor/ast/AstReader.hpp>
+#include <cmajor/ast/BasicType.hpp>
+#include <cmajor/ast/Literal.hpp>
+#include <cmajor/ast/CompileUnit.hpp>
+#include <cmajor/ast/Identifier.hpp>
+#include <cmajor/ast/Typedef.hpp>
+#include <cmajor/ast/Constant.hpp>
+#include <cmajor/ast/Enumeration.hpp>
+#include <cmajor/ast/TypeExpr.hpp>
+#include <cmajor/ast/Expression.hpp>
+#include <cmajor/ast/Parameter.hpp>
+#include <cmajor/ast/Template.hpp>
+#include <cmajor/ast/Delegate.hpp>
+#include <cmajor/ast/Statement.hpp>
+#include <cmajor/ast/Function.hpp>
+
+namespace cmajor { namespace ast {
+
+const char* nodeTypeStr[] = 
+{
+    "boolNode", "sbyteNode", "byteNode", "shortNode", "ushortNode", "intNode", "uintNode", "longNode", "ulongNode", "floatNode", "doubleNode", "charNode", "wcharNode", "ucharNode", "voidNode",
+    "booleanLiteralNode", "sbyteLiteralNode", "byteLiteralNode", "shortLiteralNode", "ushortLiteralNode", "intLiteralNode", "uintLiteralNode", "longLiteralNode", "ulongLiteralNode",
+    "floatLiteralNode", "doubleLiteralNode", "charLiteralNode", "wcharLiteralNode", "ucharLiteralNode", "stringLiteralNode", "wstringLiteralNode", "ustringLiteralNode", "nullLiteralNode",
+    "compileUnitNode", "namespaceNode", "aliasNode", "namespaceImportNode", "identifierNode", "templateIdNode", "functionNode",
+    "labelNode", "compoundStatementNode", "returnStatementNode", "ifStatementNode", "whileStatementNode", "doStatementNode", "forStatementNode", "breakStatementNode", "continueStatementNode",
+    "gotoStatementNode", "constructionStatementNode", "deleteStatementNode", "destroyStatementNode", "assignmentStatementNode", "expressionStatementNode", "emptyStatementNode", 
+    "incrementStatementNode", "decrementStatementNode", "rangeForStatementNode", "switchStatementNode", "caseStatementNode", "defaultStatementNode", "gotoCaseStatementNode", 
+    "gotoDefaultStatementNode", "throwStatementNode", "catchNode", "tryStatementNode",
+    "typedefNode", "constantNode", "enumTypeNode", "enumConstantNode", "parameterNode", "templateParameterNode",
+    "delegateNode", "classDelegateNode",
+    "constNode", "refNode", "arrayNode",
+    "dotNode", "arrowNode", "disjunctionNode", "conjunctionNode", "bitOrNode", "bitXorNode", "bitAndNode", "equalNode", "notEqualNode", "lessNode", "greaterNode", 
+    "lessOrEqualNode", "greaterOrEqualNode", "shiftLeftNode", "shiftRightNode", 
+    "addNode", "subNode", "mulNode", "divNode", "remNode", "notNode", "unaryPlusNode", "unaryMinusNode", "complementNode", "derefNode", "addrOfNode",
+    "isNode", "asNode", "indexingNode", "invokeNode", "sizeOfNode", "typeNameNode", "castNode", "constructNode", "newNode", "thisNode", "baseNode",
+    "maxNode"
+};
+
+std::string NodeTypeStr(NodeType nodeType)
+{
+    return nodeTypeStr[static_cast<size_t>(nodeType)];
+}
+
+Node::Node(NodeType nodeType_, const Span& span_) : nodeType(nodeType_), span(span_), parent(nullptr)
+{
+}
+
+Node::~Node()
+{
+}
+
+void Node::Write(AstWriter& writer)
+{
+}
+
+void Node::Read(AstReader& reader)
+{
+}
+
+BinaryNode::BinaryNode(NodeType nodeType, const Span& span_) : Node(nodeType, span_), left(), right()
+{
+}
+
+BinaryNode::BinaryNode(NodeType nodeType, const Span& span_, Node* left_, Node* right_) : Node(nodeType, span_), left(left_), right(right_)
+{
+    left->SetParent(this);
+    right->SetParent(this);
+}
+
+void BinaryNode::Write(AstWriter& writer)
+{
+    Node::Write(writer);
+    left->Write(writer);
+    right->Write(writer);
+}
+
+void BinaryNode::Read(AstReader& reader)
+{
+    Node::Read(reader);
+    left.reset(reader.ReadNode());
+    left->SetParent(this);
+    right.reset(reader.ReadNode());
+    right->SetParent(this);
+}
+
+NodeCreator::~NodeCreator()
+{
+}
+
+template<typename T>
+class ConcreteNodeCreator : public NodeCreator
+{
+public:
+    Node* CreateNode(const Span& span) override
+    {
+        return new T(span);
+    }
+};
+
+std::unique_ptr<NodeFactory> NodeFactory::instance;
+
+void NodeFactory::Init()
+{
+    instance.reset(new NodeFactory());
+}
+
+void NodeFactory::Done()
+{
+    instance.reset();
+}
+
+NodeFactory::NodeFactory()
+{
+    creators.resize(static_cast<size_t>(NodeType::maxNode));
+
+    Register(NodeType::boolNode, new ConcreteNodeCreator<BoolNode>());
+    Register(NodeType::sbyteNode, new ConcreteNodeCreator<SByteNode>());
+    Register(NodeType::byteNode, new ConcreteNodeCreator<ByteNode>());
+    Register(NodeType::shortNode, new ConcreteNodeCreator<ShortNode>());
+    Register(NodeType::ushortNode, new ConcreteNodeCreator<UShortNode>());
+    Register(NodeType::intNode, new ConcreteNodeCreator<IntNode>());
+    Register(NodeType::uintNode, new ConcreteNodeCreator<UIntNode>());
+    Register(NodeType::longNode, new ConcreteNodeCreator<LongNode>());
+    Register(NodeType::ulongNode, new ConcreteNodeCreator<ULongNode>());
+    Register(NodeType::floatNode, new ConcreteNodeCreator<FloatNode>());
+    Register(NodeType::doubleNode, new ConcreteNodeCreator<DoubleNode>());
+    Register(NodeType::charNode, new ConcreteNodeCreator<CharNode>());
+    Register(NodeType::wcharNode, new ConcreteNodeCreator<WCharNode>());
+    Register(NodeType::ucharNode, new ConcreteNodeCreator<UCharNode>());
+    Register(NodeType::voidNode, new ConcreteNodeCreator<VoidNode>());
+
+    Register(NodeType::booleanLiteralNode, new ConcreteNodeCreator<BooleanLiteralNode>());
+    Register(NodeType::sbyteLiteralNode, new ConcreteNodeCreator<SByteLiteralNode>());
+    Register(NodeType::byteLiteralNode, new ConcreteNodeCreator<ByteLiteralNode>());
+    Register(NodeType::shortLiteralNode, new ConcreteNodeCreator<ShortLiteralNode>());
+    Register(NodeType::ushortLiteralNode, new ConcreteNodeCreator<UShortLiteralNode>());
+    Register(NodeType::intLiteralNode, new ConcreteNodeCreator<IntLiteralNode>());
+    Register(NodeType::uintLiteralNode, new ConcreteNodeCreator<UIntLiteralNode>());
+    Register(NodeType::longLiteralNode, new ConcreteNodeCreator<LongLiteralNode>());
+    Register(NodeType::ulongLiteralNode, new ConcreteNodeCreator<ULongLiteralNode>());
+    Register(NodeType::floatLiteralNode, new ConcreteNodeCreator<FloatLiteralNode>());
+    Register(NodeType::doubleLiteralNode, new ConcreteNodeCreator<DoubleLiteralNode>());
+    Register(NodeType::charLiteralNode, new ConcreteNodeCreator<CharLiteralNode>());
+    Register(NodeType::wcharLiteralNode, new ConcreteNodeCreator<WCharLiteralNode>());
+    Register(NodeType::ucharLiteralNode, new ConcreteNodeCreator<UCharLiteralNode>());
+    Register(NodeType::stringLiteralNode, new ConcreteNodeCreator<StringLiteralNode>());
+    Register(NodeType::wstringLiteralNode, new ConcreteNodeCreator<WStringLiteralNode>());
+    Register(NodeType::ustringLiteralNode, new ConcreteNodeCreator<UStringLiteralNode>());
+    Register(NodeType::nullLiteralNode, new ConcreteNodeCreator<NullLiteralNode>());
+
+    Register(NodeType::compileUnitNode, new ConcreteNodeCreator<CompileUnitNode>());
+    Register(NodeType::namespaceNode, new ConcreteNodeCreator<NamespaceNode>());
+    Register(NodeType::aliasNode, new ConcreteNodeCreator<AliasNode>());
+    Register(NodeType::namespaceImportNode, new ConcreteNodeCreator<NamespaceImportNode>());
+    Register(NodeType::identifierNode, new ConcreteNodeCreator<IdentifierNode>());
+    Register(NodeType::templateIdNode, new ConcreteNodeCreator<TemplateIdNode>());
+    Register(NodeType::functionNode, new ConcreteNodeCreator<FunctionNode>());
+
+    Register(NodeType::labelNode, new ConcreteNodeCreator<LabelNode>());
+    Register(NodeType::compoundStatementNode, new ConcreteNodeCreator<CompoundStatementNode>());
+    Register(NodeType::returnStatementNode, new ConcreteNodeCreator<ReturnStatementNode>());
+    Register(NodeType::ifStatementNode, new ConcreteNodeCreator<IfStatementNode>()); 
+    Register(NodeType::whileStatementNode, new ConcreteNodeCreator<WhileStatementNode>());
+    Register(NodeType::doStatementNode, new ConcreteNodeCreator<DoStatementNode>());
+    Register(NodeType::forStatementNode, new ConcreteNodeCreator<ForStatementNode>());
+    Register(NodeType::breakStatementNode, new ConcreteNodeCreator<BreakStatementNode>());
+    Register(NodeType::continueStatementNode, new ConcreteNodeCreator<ContinueStatementNode>());
+    Register(NodeType::gotoStatementNode, new ConcreteNodeCreator<GotoStatementNode>());
+    Register(NodeType::constructionStatementNode, new ConcreteNodeCreator<ConstructionStatementNode>());
+    Register(NodeType::deleteStatementNode, new ConcreteNodeCreator<DeleteStatementNode>());
+    Register(NodeType::destroyStatementNode, new ConcreteNodeCreator<DestroyStatementNode>());
+    Register(NodeType::assignmentStatementNode, new ConcreteNodeCreator<AssignmentStatementNode>());
+    Register(NodeType::expressionStatementNode, new ConcreteNodeCreator<ExpressionStatementNode>());
+    Register(NodeType::emptyStatementNode, new ConcreteNodeCreator<EmptyStatementNode>());
+    Register(NodeType::incrementStatementNode, new ConcreteNodeCreator<IncrementStatementNode>());
+    Register(NodeType::decrementStatementNode, new ConcreteNodeCreator<DecrementStatementNode>());
+    Register(NodeType::rangeForStatementNode, new ConcreteNodeCreator<RangeForStatementNode>());
+    Register(NodeType::switchStatementNode, new ConcreteNodeCreator<SwitchStatementNode>());
+    Register(NodeType::caseStatementNode, new ConcreteNodeCreator<CaseStatementNode>());
+    Register(NodeType::defaultStatementNode, new ConcreteNodeCreator<DefaultStatementNode>());
+    Register(NodeType::gotoCaseStatementNode, new ConcreteNodeCreator<GotoCaseStatementNode>());
+    Register(NodeType::gotoDefaultStatementNode, new ConcreteNodeCreator<GotoDefaultStatementNode>());
+    Register(NodeType::throwStatementNode, new ConcreteNodeCreator<ThrowStatementNode>());
+    Register(NodeType::catchNode, new ConcreteNodeCreator<CatchNode>());
+    Register(NodeType::tryStatementNode, new ConcreteNodeCreator<TryStatementNode>());
+
+    Register(NodeType::typedefNode, new ConcreteNodeCreator<TypedefNode>());
+    Register(NodeType::constantNode, new ConcreteNodeCreator<ConstantNode>());
+    Register(NodeType::enumTypeNode, new ConcreteNodeCreator<EnumTypeNode>());
+    Register(NodeType::enumConstantNode, new ConcreteNodeCreator<EnumConstantNode>());
+    Register(NodeType::parameterNode, new ConcreteNodeCreator<ParameterNode>());
+    Register(NodeType::templateParameterNode, new ConcreteNodeCreator<TemplateParameterNode>());
+    Register(NodeType::delegateNode, new ConcreteNodeCreator<DelegateNode>());
+    Register(NodeType::classDelegateNode, new ConcreteNodeCreator<ClassDelegateNode>());
+
+    Register(NodeType::constNode, new ConcreteNodeCreator<ConstNode>());
+    Register(NodeType::lvalueRefNode, new ConcreteNodeCreator<LValueRefNode>());
+    Register(NodeType::rvalueRefNode, new ConcreteNodeCreator<RValueRefNode>());
+    Register(NodeType::pointerNode, new ConcreteNodeCreator<PointerNode>());
+    Register(NodeType::dotNode, new ConcreteNodeCreator<DotNode>());
+    Register(NodeType::arrowNode, new ConcreteNodeCreator<ArrowNode>());
+    Register(NodeType::arrayNode, new ConcreteNodeCreator<ArrayNode>());
+
+    Register(NodeType::disjunctionNode, new ConcreteNodeCreator<DisjunctionNode>());
+    Register(NodeType::conjunctionNode, new ConcreteNodeCreator<ConjunctionNode>());
+    Register(NodeType::bitOrNode, new ConcreteNodeCreator<BitOrNode>());
+    Register(NodeType::bitXorNode, new ConcreteNodeCreator<BitXorNode>());
+    Register(NodeType::bitAndNode, new ConcreteNodeCreator<BitAndNode>());
+    Register(NodeType::equalNode, new ConcreteNodeCreator<EqualNode>());
+    Register(NodeType::notEqualNode, new ConcreteNodeCreator<NotEqualNode>());
+    Register(NodeType::lessNode, new ConcreteNodeCreator<LessNode>());
+    Register(NodeType::greaterNode, new ConcreteNodeCreator<GreaterNode>());
+    Register(NodeType::lessOrEqualNode, new ConcreteNodeCreator<LessOrEqualNode>());
+    Register(NodeType::greaterOrEqualNode, new ConcreteNodeCreator<GreaterOrEqualNode>());
+    Register(NodeType::shiftLeftNode, new ConcreteNodeCreator<ShiftLeftNode>());
+    Register(NodeType::shiftRightNode, new ConcreteNodeCreator<ShiftRightNode>());
+    Register(NodeType::addNode, new ConcreteNodeCreator<AddNode>());
+    Register(NodeType::subNode, new ConcreteNodeCreator<SubNode>());
+    Register(NodeType::mulNode, new ConcreteNodeCreator<MulNode>());
+    Register(NodeType::divNode, new ConcreteNodeCreator<DivNode>());
+    Register(NodeType::remNode, new ConcreteNodeCreator<RemNode>());
+    Register(NodeType::notNode, new ConcreteNodeCreator<NotNode>());
+    Register(NodeType::unaryPlusNode, new ConcreteNodeCreator<UnaryPlusNode>());
+    Register(NodeType::unaryMinusNode, new ConcreteNodeCreator<UnaryMinusNode>());
+    Register(NodeType::complementNode, new ConcreteNodeCreator<ComplementNode>());
+    Register(NodeType::derefNode, new ConcreteNodeCreator<DerefNode>());
+    Register(NodeType::addrOfNode, new ConcreteNodeCreator<AddrOfNode>());
+    Register(NodeType::isNode, new ConcreteNodeCreator<IsNode>());
+    Register(NodeType::asNode, new ConcreteNodeCreator<AsNode>());
+    Register(NodeType::indexingNode, new ConcreteNodeCreator<IndexingNode>());
+    Register(NodeType::invokeNode, new ConcreteNodeCreator<InvokeNode>());
+    Register(NodeType::sizeOfNode, new ConcreteNodeCreator<SizeOfNode>());
+    Register(NodeType::typeNameNode, new ConcreteNodeCreator<TypeNameNode>());
+    Register(NodeType::castNode, new ConcreteNodeCreator<CastNode>());
+    Register(NodeType::constructNode, new ConcreteNodeCreator<ConstructNode>());
+    Register(NodeType::newNode, new ConcreteNodeCreator<NewNode>());
+    Register(NodeType::thisNode, new ConcreteNodeCreator<ThisNode>());
+    Register(NodeType::baseNode, new ConcreteNodeCreator<BaseNode>());
+}
+
+void NodeFactory::Register(NodeType nodeType, NodeCreator* creator)
+{
+    creators[static_cast<size_t>(nodeType)] = std::unique_ptr<NodeCreator>(creator);
+}
+
+Node* NodeFactory::CreateNode(NodeType nodeType, const Span& span)
+{
+    const std::unique_ptr<NodeCreator>& creator = creators[static_cast<size_t>(nodeType)];
+    if (creator)
+    {
+        Node* value = creator->CreateNode(span);
+        if (value)
+        {
+            return value;
+        }
+        else
+        {
+            throw std::runtime_error("could not create node");
+        }
+    }
+    else
+    {
+        throw std::runtime_error("no creator for node type '" + NodeTypeStr(nodeType) + "'");
+    }
+}
+
+void NodeInit()
+{
+    NodeFactory::Init();
+}
+
+void NodeDone()
+{
+    NodeFactory::Done();
+}
+
+} } // namespace cmajor::ast

@@ -1,0 +1,26 @@
+// =================================
+// Copyright (c) 2017 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+[hpp]#include <cmajor/ast/Identifier.hpp>
+[cpp]#include <cmajor/parser/Keyword.hpp>
+
+namespace cmajor.parser
+{
+    [hpp]using cmajor::ast::IdentifierNode;
+
+    grammar IdentifierGrammar
+    {
+        using stdlib.identifier;
+        using KeywordGrammar.Keyword;
+
+        Identifier : IdentifierNode*
+            ::= token(identifier - Keyword){ value = new IdentifierNode(span, identifier); }
+            ;
+
+        QualifiedId : IdentifierNode*
+            ::= token((identifier - Keyword) % '.'){ value = new IdentifierNode(span, std::u32string(matchBegin, matchEnd)); }
+            ;
+    }
+}

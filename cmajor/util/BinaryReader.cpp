@@ -99,9 +99,21 @@ double BinaryReader::ReadDouble()
     return *reinterpret_cast<double*>(&x);
 }
 
-char32_t BinaryReader::ReadChar()
+char BinaryReader::ReadChar()
 {
-    uint32_t x = ReadInt();
+    uint8_t x = ReadByte();
+    return static_cast<char>(x);
+}
+
+char16_t BinaryReader::ReadWChar()
+{
+    uint16_t x = ReadUShort();
+    return static_cast<char16_t>(x);
+}
+
+char32_t BinaryReader::ReadUChar()
+{
+    uint32_t x = ReadUInt();
     return static_cast<char32_t>(x);
 }
 
@@ -115,6 +127,12 @@ std::string BinaryReader::ReadUtf8String()
         x = ReadByte();
     }
     return s;
+}
+
+std::u16string BinaryReader::ReadUtf16String()
+{
+    std::string s = ReadUtf8String();
+    return ToUtf16(s);
 }
 
 std::u32string BinaryReader::ReadUtf32String()

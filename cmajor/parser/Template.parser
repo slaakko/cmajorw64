@@ -1,0 +1,37 @@
+// =================================
+// Copyright (c) 2017 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+[hpp]#include <cmajor/ast/Template.hpp>
+[hpp]#include <cmajor/parser/ParsingContext.hpp>
+[cpp]#include <cmajor/parser/Identifier.hpp>
+[cpp]#include <cmajor/parser/TypeExpr.hpp>
+
+namespace cmajor.parser
+{
+    [hpp]using namespace cmajor::ast;
+
+    grammar TemplateGrammar
+    {
+        using IdentifierGrammar.QualifiedId;
+        using IdentifierGrammar.Identifier;
+        using TypeExprGrammar.TypeExpr;
+
+        TemplateId(ParsingContext* ctx, var std::unique_ptr<TemplateIdNode> templateId) : Node*
+            ::= (QualifiedId:primary{ templateId.reset(new TemplateIdNode(span, primary)); }
+                '<' (TypeExpr(ctx):templateArg{ templateId->AddTemplateArgument(templateArg); } % ',') '>')
+            {
+                value = templateId.release();
+            }
+            ;
+
+        TemplateParameter(ParsingContext* ctx) : TemplateParameterNode*
+            ::= Identifier{ value = new TemplateParameterNode(span, Identifier); }
+            ;
+
+        TemplateParameterList(ParsingContext* ctx, Node* owner)
+            ::= '<' (TemplateParameter(ctx){ owner->AddTemplateParameter(TemplateParameter); } % ',') '>'!
+            ;
+    }
+}
