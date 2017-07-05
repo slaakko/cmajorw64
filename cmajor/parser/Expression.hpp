@@ -1,5 +1,5 @@
-#ifndef Expression_hpp_12079
-#define Expression_hpp_12079
+#ifndef Expression_hpp_31386
+#define Expression_hpp_31386
 
 #include <cmajor/parsing/Grammar.hpp>
 #include <cmajor/parsing/Keyword.hpp>
@@ -40,8 +40,9 @@ private:
     class NewExprRule;
     class ArgumentListRule;
     class ExpressionListRule;
+    class InvokeExprRule;
 };
 
 } } // namespace cmajor.parser
 
-#endif // Expression_hpp_12079
+#endif // Expression_hpp_31386

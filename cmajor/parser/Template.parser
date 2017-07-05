@@ -27,7 +27,7 @@ namespace cmajor.parser
             ;
 
         TemplateParameter(ParsingContext* ctx) : TemplateParameterNode*
-            ::= Identifier{ value = new TemplateParameterNode(span, Identifier); }
+            ::= (Identifier ('=' TypeExpr(ctx))?){ value = new TemplateParameterNode(span, Identifier, TypeExpr); } 
             ;
 
         TemplateParameterList(ParsingContext* ctx, Node* owner)

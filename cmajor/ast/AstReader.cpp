@@ -6,6 +6,7 @@
 #include <cmajor/ast/AstReader.hpp>
 #include <cmajor/ast/Identifier.hpp>
 #include <cmajor/ast/Statement.hpp>
+#include <cmajor/ast/Concept.hpp>
 
 namespace cmajor { namespace ast {
 
@@ -84,6 +85,32 @@ CompoundStatementNode* AstReader::ReadCompoundStatementNode()
     else
     {
         throw std::runtime_error("compound statement node expected");
+    }
+}
+
+ConstraintNode* AstReader::ReadConstraintNode()
+{
+    Node* node = ReadNode();
+    if (node->IsConstraintNode())
+    {
+        return static_cast<ConstraintNode*>(node);
+    }
+    else
+    {
+        throw std::runtime_error("constraint node expected");
+    }
+}
+
+ConceptIdNode* AstReader::ReadConceptIdNode()
+{
+    Node* node = ReadNode();
+    if (node->GetNodeType() == NodeType::conceptIdNode)
+    {
+        return static_cast<ConceptIdNode*>(node);
+    }
+    else
+    {
+        throw std::runtime_error("concept id node expected");
     }
 }
 

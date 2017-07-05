@@ -1,5 +1,5 @@
-#ifndef Constant_hpp_18975
-#define Constant_hpp_18975
+#ifndef Constant_hpp_31386
+#define Constant_hpp_31386
 
 #include <cmajor/parsing/Grammar.hpp>
 #include <cmajor/parsing/Keyword.hpp>
@@ -24,4 +24,4 @@ private:
 
 } } // namespace cmajor.parser
 
-#endif // Constant_hpp_18975
+#endif // Constant_hpp_31386

@@ -61,14 +61,24 @@ TemplateParameterNode::TemplateParameterNode(const Span& span_) : Node(NodeType:
 {
 }
 
-TemplateParameterNode::TemplateParameterNode(const Span& span_, IdentifierNode* id_) : Node(NodeType::templateParameterNode, span_), id(id_)
+TemplateParameterNode::TemplateParameterNode(const Span& span_, IdentifierNode* id_, Node* defaultTemplateArgument_) : 
+    Node(NodeType::templateParameterNode, span_), id(id_), defaultTemplateArgument(defaultTemplateArgument_)
 {
     id->SetParent(this);
+    if (defaultTemplateArgument)
+    {
+        defaultTemplateArgument->SetParent(this);
+    }
 }
 
 Node* TemplateParameterNode::Clone(CloneContext& cloneContext) const
 {
-    return new TemplateParameterNode(GetSpan(), static_cast<IdentifierNode*>(id->Clone(cloneContext)));
+    Node* clonedDefaultTemplateArgument = nullptr;
+    if (defaultTemplateArgument)
+    {
+        clonedDefaultTemplateArgument = defaultTemplateArgument->Clone(cloneContext);
+    }
+    return new TemplateParameterNode(GetSpan(), static_cast<IdentifierNode*>(id->Clone(cloneContext)), clonedDefaultTemplateArgument);
 }
 
 void TemplateParameterNode::Accept(Visitor& visitor)
@@ -80,6 +90,12 @@ void TemplateParameterNode::Write(AstWriter& writer)
 {
     Node::Write(writer);
     writer.Write(id.get());
+    bool hasDefaultTemplateArgument = defaultTemplateArgument != nullptr;
+    writer.GetBinaryWriter().Write(hasDefaultTemplateArgument);
+    if (hasDefaultTemplateArgument)
+    {
+        writer.Write(defaultTemplateArgument.get());
+    }
 }
 
 void TemplateParameterNode::Read(AstReader& reader)
@@ -87,6 +103,12 @@ void TemplateParameterNode::Read(AstReader& reader)
     Node::Read(reader);
     id.reset(reader.ReadIdentifierNode());
     id->SetParent(this);
+    bool hasDefaultTemplateArgument = reader.GetBinaryReader().ReadBool();
+    if (hasDefaultTemplateArgument)
+    {
+        defaultTemplateArgument.reset(reader.ReadNode()); 
+        defaultTemplateArgument->SetParent(this);
+    }
 }
 
 } } // namespace cmajor::ast

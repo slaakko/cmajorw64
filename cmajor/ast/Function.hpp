@@ -6,6 +6,8 @@
 #ifndef CMAJOR_AST_FUNCTION_INCLUDED
 #define CMAJOR_AST_FUNCTION_INCLUDED
 #include <cmajor/ast/Specifier.hpp>
+#include <cmajor/ast/Template.hpp>
+#include <cmajor/ast/Concept.hpp>
 #include <cmajor/ast/Parameter.hpp>
 #include <cmajor/ast/Statement.hpp>
 
@@ -20,12 +22,15 @@ public:
     void Accept(Visitor& visitor) override;
     void Write(AstWriter& writer) override;
     void Read(AstReader& reader) override;
+    void AddTemplateParameter(TemplateParameterNode* templateParameter) override;
     void AddParameter(ParameterNode* parameter) override;
     void SwitchToBody();
     Specifiers GetSpecifiers() const { return specifiers; }
     const Node* ReturnTypeExpr() const { return returnTypeExpr.get(); }
     const std::u32string& GroupId() const { return groupId; }
     const NodeList<ParameterNode>& Parameters() const { return parameters; }
+    const WhereConstraintNode* WhereConstraint() const { return whereConstraint.get(); }
+    void SetConstraint(WhereConstraintNode* whereConstraint_);
     const CompoundStatementNode* Body() const { return body.get(); }
     void SetBody(CompoundStatementNode* body_);
     const CompoundStatementNode* BodySource() const { return bodySource.get(); }
@@ -34,7 +39,9 @@ private:
     Specifiers specifiers;
     std::unique_ptr<Node> returnTypeExpr;
     std::u32string groupId;
+    NodeList<TemplateParameterNode> templateParameters;
     NodeList<ParameterNode> parameters;
+    std::unique_ptr<WhereConstraintNode> whereConstraint;
     std::unique_ptr<CompoundStatementNode> body;
     std::unique_ptr<CompoundStatementNode> bodySource;
 };

@@ -33,14 +33,16 @@ class TemplateParameterNode : public Node
 {
 public:
     TemplateParameterNode(const Span& span_);
-    TemplateParameterNode(const Span& span_, IdentifierNode* id_);
+    TemplateParameterNode(const Span& span_, IdentifierNode* id_, Node* defaultTemplateArgument_);
     Node* Clone(CloneContext& cloneContext) const override;
     void Accept(Visitor& visitor) override;
     void Write(AstWriter& writer) override;
     void Read(AstReader& reader) override;
-    IdentifierNode* Id() const { return id.get(); }
+    const IdentifierNode* Id() const { return id.get(); }
+    const Node* DefaultTemplateArgument() const { return defaultTemplateArgument.get(); }
 private:
     std::unique_ptr<IdentifierNode> id;
+    std::unique_ptr<Node> defaultTemplateArgument;
 };
 
 } } // namespace cmajor::ast

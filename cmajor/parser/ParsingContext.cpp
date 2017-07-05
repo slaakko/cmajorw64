@@ -7,7 +7,7 @@
 
 namespace cmajor { namespace parser {
 
-ParsingContext::ParsingContext() : parsingExpressionStatement(false), parsingLvalue(false), parsingArguments(false), parsingIsOrAs(false), parsingTypeExpr(false)
+ParsingContext::ParsingContext() : parsingExpressionStatement(false), parsingLvalue(false), parsingArguments(false), parsingIsOrAs(false), parsingTypeExpr(false), parsingConcept(false)
 {
 }
 
@@ -70,5 +70,18 @@ void ParsingContext::EndParsingTypeExpr()
     parsingTypeExpr = parsingTypeExprStack.top();
     parsingTypeExprStack.pop();
 }
+
+void ParsingContext::BeginParsingConcept()
+{
+    parsingConceptStack.push(parsingConcept);
+    parsingConcept = true;
+}
+
+void ParsingContext::EndParsingConcept()
+{
+    parsingConcept = parsingConceptStack.top();
+    parsingConceptStack.pop();
+}
+
 
 } } // namespace cmajor::parser

@@ -7,7 +7,9 @@
 [hpp]#include <cmajor/parser/ParsingContext.hpp>
 [cpp]#include <cmajor/parser/Specifier.hpp>
 [cpp]#include <cmajor/parser/TypeExpr.hpp>
+[cpp]#include <cmajor/parser/Concept.hpp>
 [cpp]#include <cmajor/parser/Identifier.hpp>
+[cpp]#include <cmajor/parser/Template.hpp>
 [cpp]#include <cmajor/parser/Parameter.hpp>
 [cpp]#include <cmajor/parser/Statement.hpp>
 
@@ -19,12 +21,17 @@ namespace cmajor.parser
     {
         using SpecifierGrammar.Specifiers;
         using TypeExprGrammar.TypeExpr;
+        using TemplateGrammar.TemplateParameterList;
+        using ConceptGrammar.WhereConstraint;
         using ParameterGrammar.ParameterList;
         using IdentifierGrammar.Identifier;
         using StatementGrammar.CompoundStatement;
         
         Function(ParsingContext* ctx, var std::unique_ptr<FunctionNode> fun, var Span s) : FunctionNode*
-            ::= (Specifiers TypeExpr(ctx) FunctionGroupId(ctx){ fun.reset(new FunctionNode(span, Specifiers, TypeExpr, FunctionGroupId)); } ParameterList(ctx, fun.get()){ s = span; }
+            ::= (Specifiers TypeExpr(ctx) FunctionGroupId(ctx){ fun.reset(new FunctionNode(span, Specifiers, TypeExpr, FunctionGroupId)); } 
+                TemplateParameterList(ctx, fun.get())?
+                ParameterList(ctx, fun.get()){ s = span; }
+                (WhereConstraint(ctx){ fun->SetConstraint(WhereConstraint); })?
                 (CompoundStatement(ctx){ fun->SetBody(CompoundStatement); fun->GetSpan().SetEnd(s.End()); } | ';')){ value = fun.release(); }
             ;
 

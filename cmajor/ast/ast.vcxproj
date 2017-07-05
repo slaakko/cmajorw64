@@ -24,6 +24,7 @@
     <ClInclude Include="BasicType.hpp" />
     <ClInclude Include="Clone.hpp" />
     <ClInclude Include="CompileUnit.hpp" />
+    <ClInclude Include="Concept.hpp" />
     <ClInclude Include="Constant.hpp" />
     <ClInclude Include="Delegate.hpp" />
     <ClInclude Include="Enumeration.hpp" />
@@ -49,6 +50,7 @@
     <ClCompile Include="BasicType.cpp" />
     <ClCompile Include="Clone.cpp" />
     <ClCompile Include="CompileUnit.cpp" />
+    <ClCompile Include="Concept.cpp" />
     <ClCompile Include="Constant.cpp" />
     <ClCompile Include="Delegate.cpp" />
     <ClCompile Include="Enumeration.cpp" />

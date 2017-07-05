@@ -51,6 +51,22 @@ class IdentifierNode;
 class TemplateIdNode;
 class FunctionNode;
 
+class DisjunctiveConstraintNode;
+class ConjunctiveConstraintNode;
+class WhereConstraintNode;
+class PredicateConstraintNode;
+class IsConstraintNode;
+class MultiParamConstraintNode;
+class TypeNameConstraintNode;
+class ConstructorConstraintNode;
+class DestructorConstraintNode;
+class MemberFunctionConstraintNode;
+class FunctionConstraintNode;
+class AxiomStatementNode;
+class AxiomNode;
+class ConceptIdNode;
+class ConceptNode;
+
 class LabelNode;
 class CompoundStatementNode;
 class ReturnStatementNode;
@@ -178,6 +194,22 @@ public:
     virtual void Visit(IdentifierNode& identififerNode) {}
     virtual void Visit(TemplateIdNode& templateIdNode) {}
     virtual void Visit(FunctionNode& functionNode) {}
+
+    virtual void Visit(DisjunctiveConstraintNode& disjunctiveConstraintNode) {}
+    virtual void Visit(ConjunctiveConstraintNode& conjunctiveConstraintNode) {}
+    virtual void Visit(WhereConstraintNode& whereConstraintNode) {}
+    virtual void Visit(PredicateConstraintNode& predicateConstraintNode) {}
+    virtual void Visit(IsConstraintNode& isConstraintNode) {}
+    virtual void Visit(MultiParamConstraintNode& multiParamConstraintNode) {}
+    virtual void Visit(TypeNameConstraintNode& typeNameConstraintNode) {}
+    virtual void Visit(ConstructorConstraintNode& constructorConstraintNode) {}
+    virtual void Visit(DestructorConstraintNode& destructorConstraintNode) {}
+    virtual void Visit(MemberFunctionConstraintNode& memberFunctionConstraintNode) {}
+    virtual void Visit(FunctionConstraintNode& functionConstraintNode) {}
+    virtual void Visit(AxiomStatementNode& axiomStatementNode) {}
+    virtual void Visit(AxiomNode& axiomNode) {}
+    virtual void Visit(ConceptIdNode& conceptIdNode) {}
+    virtual void Visit(ConceptNode& conceptNode) {}
 
     virtual void Visit(LabelNode& labelNode) {}
     virtual void Visit(CompoundStatementNode& compoundStatementNode) {}

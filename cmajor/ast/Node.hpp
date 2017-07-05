@@ -25,7 +25,10 @@ enum class NodeType : uint8_t
     boolNode, sbyteNode, byteNode, shortNode, ushortNode, intNode, uintNode, longNode, ulongNode, floatNode, doubleNode, charNode, wcharNode, ucharNode, voidNode,
     booleanLiteralNode, sbyteLiteralNode, byteLiteralNode, shortLiteralNode, ushortLiteralNode, intLiteralNode, uintLiteralNode, longLiteralNode, ulongLiteralNode, 
     floatLiteralNode, doubleLiteralNode, charLiteralNode, wcharLiteralNode, ucharLiteralNode, stringLiteralNode, wstringLiteralNode, ustringLiteralNode, nullLiteralNode,
-    compileUnitNode, namespaceNode, aliasNode, namespaceImportNode, identifierNode, templateIdNode, functionNode,
+    compileUnitNode, namespaceNode, aliasNode, namespaceImportNode, identifierNode, templateIdNode, functionNode, 
+    disjunctiveConstraintNode, conjunctiveConstraintNode, whereConstraintNode, predicateConstraintNode, isConstraintNode, multiParamConstraintNode, typeNameConstraintNode,
+    constructorConstraintNode, destructorConstraintNode, memberFunctionConstraintNode, functionConstraintNode, 
+    axiomStatementNode, axiomNode, conceptIdNode, conceptNode, 
     labelNode, compoundStatementNode, returnStatementNode, ifStatementNode, whileStatementNode, doStatementNode, forStatementNode, breakStatementNode, continueStatementNode,
     gotoStatementNode, constructionStatementNode, deleteStatementNode, destroyStatementNode, assignmentStatementNode, expressionStatementNode, emptyStatementNode, 
     incrementStatementNode, decrementStatementNode, rangeForStatementNode, switchStatementNode, caseStatementNode, defaultStatementNode, gotoCaseStatementNode, gotoDefaultStatementNode, 
@@ -56,6 +59,7 @@ public:
     virtual void AddTemplateParameter(TemplateParameterNode* templateParameter) { Assert(false, "AddTemplateParameter not overridden"); }
     virtual bool IsUnsignedTypeNode() const { return false; }
     virtual bool IsStatementNode() const { return false; }
+    virtual bool IsConstraintNode() const { return false; }
     const Span& GetSpan() const { return span; }
     Span& GetSpan() { return span; }
     const Node* Parent() const { return parent; }

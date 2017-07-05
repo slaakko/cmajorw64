@@ -306,5 +306,14 @@ namespace cmajor.parser
             ::= empty{ ctx->BeginParsingArguments(); } 
             (   (Expression(ctx):arg{ node->AddArgument(arg); }) % ','){ ctx->EndParsingArguments(); } / { ctx->EndParsingArguments(); }
             ;
+
+        InvokeExpr(ParsingContext* ctx, var std::unique_ptr<Node> expr, var Span s) : Node*
+            ::= ((TemplateId(ctx){ s = span; expr.reset(TemplateId); } | Identifier{ s = span; expr.reset(Identifier); })
+            (   '.' Identifier:dotMemberId!{ s.SetEnd(span.End()); expr.reset(new DotNode(s, expr.release(), dotMemberId)); }   )*
+            '('{ expr.reset(new InvokeNode(s, expr.release())); } ArgumentList(ctx, expr.get()) ')'!{ expr->GetSpan().SetEnd(span.End()); })
+            { 
+                value = expr.release();
+            }
+            ;
     }
 }

@@ -13,7 +13,7 @@ FunctionNode::FunctionNode(const Span& span_) : Node(NodeType::functionNode, spa
 }
 
 FunctionNode::FunctionNode(const Span& span_, Specifiers specifiers_, Node* returnTypeExpr_, const std::u32string& groupId_) :
-    Node(NodeType::functionNode, span_), specifiers(specifiers_), returnTypeExpr(returnTypeExpr_), groupId(groupId_), parameters(), body(), bodySource()
+    Node(NodeType::functionNode, span_), specifiers(specifiers_), returnTypeExpr(returnTypeExpr_), groupId(groupId_), templateParameters(), parameters(), body(), bodySource()
 {
     if (returnTypeExpr)
     {
@@ -29,8 +29,13 @@ Node* FunctionNode::Clone(CloneContext& cloneContext) const
         clonedReturnTypeExpr = returnTypeExpr->Clone(cloneContext);
     }
     FunctionNode* clone = new FunctionNode(GetSpan(), specifiers, clonedReturnTypeExpr, groupId);
-    int n = parameters.Count();
-    for (int i = 0; i < n; ++i)
+    int nt = templateParameters.Count();
+    for (int i = 0; i < nt; ++i)
+    {
+        clone->AddTemplateParameter(static_cast<TemplateParameterNode*>(templateParameters[i]->Clone(cloneContext)));
+    }
+    int np = parameters.Count();
+    for (int i = 0; i < np; ++i)
     {
         clone->AddParameter(static_cast<ParameterNode*>(parameters[i]->Clone(cloneContext)));
     }
@@ -57,6 +62,7 @@ void FunctionNode::Write(AstWriter& writer)
         writer.Write(returnTypeExpr.get());
     }
     writer.GetBinaryWriter().Write(groupId);
+    templateParameters.Write(writer);
     parameters.Write(writer);
     bool hasBody = body != nullptr;
     writer.GetBinaryWriter().Write(hasBody);
@@ -83,6 +89,8 @@ void FunctionNode::Read(AstReader& reader)
         returnTypeExpr->SetParent(this);
     }
     groupId = reader.GetBinaryReader().ReadUtf32String();
+    templateParameters.Read(reader);
+    templateParameters.SetParent(this);
     parameters.Read(reader);
     parameters.SetParent(this);
     bool hasBody = reader.GetBinaryReader().ReadBool();
@@ -99,6 +107,12 @@ void FunctionNode::Read(AstReader& reader)
     }
 }
 
+void FunctionNode::AddTemplateParameter(TemplateParameterNode* templateParameter)
+{
+    templateParameter->SetParent(this);
+    templateParameters.Add(templateParameter);
+}
+
 void FunctionNode::AddParameter(ParameterNode* parameter)
 {
     parameter->SetParent(this);
@@ -111,6 +125,12 @@ void FunctionNode::SwitchToBody()
     {
         SetBody(bodySource.release());
     }
+}
+
+void FunctionNode::SetConstraint(WhereConstraintNode* whereConstraint_)
+{
+    whereConstraint.reset(whereConstraint_);
+    whereConstraint->SetParent(this);
 }
 
 void FunctionNode::SetBody(CompoundStatementNode* body_)

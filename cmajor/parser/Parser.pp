@@ -1,6 +1,7 @@
 project Parser;
 reference <StdLib.pl>;
 source <BasicType.parser>;
+source <Concept.parser>;
 source <Constant.parser>;
 source <Delegate.parser>;
 source <Enumeration.parser>;

@@ -200,11 +200,14 @@ public:
         a0ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<TemplateParameterRule>(this, &TemplateParameterRule::A0Action));
         cmajor::parsing::NonterminalParser* identifierNonterminalParser = GetNonterminal(ToUtf32("Identifier"));
         identifierNonterminalParser->SetPostCall(new cmajor::parsing::MemberPostCall<TemplateParameterRule>(this, &TemplateParameterRule::PostIdentifier));
+        cmajor::parsing::NonterminalParser* typeExprNonterminalParser = GetNonterminal(ToUtf32("TypeExpr"));
+        typeExprNonterminalParser->SetPreCall(new cmajor::parsing::MemberPreCall<TemplateParameterRule>(this, &TemplateParameterRule::PreTypeExpr));
+        typeExprNonterminalParser->SetPostCall(new cmajor::parsing::MemberPostCall<TemplateParameterRule>(this, &TemplateParameterRule::PostTypeExpr));
     }
     void A0Action(const char32_t* matchBegin, const char32_t* matchEnd, const Span& span, const std::string& fileName, ParsingData* parsingData, bool& pass)
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
-        context->value = new TemplateParameterNode(span, context->fromIdentifier);
+        context->value = new TemplateParameterNode(span, context->fromIdentifier, context->fromTypeExpr);
     }
     void PostIdentifier(cmajor::parsing::ObjectStack& stack, ParsingData* parsingData, bool matched)
     {
@@ -216,13 +219,29 @@ public:
             stack.pop();
         }
     }
+    void PreTypeExpr(cmajor::parsing::ObjectStack& stack, ParsingData* parsingData)
+    {
+        Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
+        stack.push(std::unique_ptr<cmajor::parsing::Object>(new cmajor::parsing::ValueObject<ParsingContext*>(context->ctx)));
+    }
+    void PostTypeExpr(cmajor::parsing::ObjectStack& stack, ParsingData* parsingData, bool matched)
+    {
+        Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
+        if (matched)
+        {
+            std::unique_ptr<cmajor::parsing::Object> fromTypeExpr_value = std::move(stack.top());
+            context->fromTypeExpr = *static_cast<cmajor::parsing::ValueObject<Node*>*>(fromTypeExpr_value.get());
+            stack.pop();
+        }
+    }
 private:
     struct Context : cmajor::parsing::Context
     {
-        Context(): ctx(), value(), fromIdentifier() {}
+        Context(): ctx(), value(), fromIdentifier(), fromTypeExpr() {}
         ParsingContext* ctx;
         TemplateParameterNode* value;
         IdentifierNode* fromIdentifier;
+        Node* fromTypeExpr;
     };
 };
 
@@ -291,25 +310,25 @@ private:
 void TemplateGrammar::GetReferencedGrammars()
 {
     cmajor::parsing::ParsingDomain* pd = GetParsingDomain();
-    cmajor::parsing::Grammar* grammar0 = pd->GetGrammar(ToUtf32("cmajor.parser.IdentifierGrammar"));
+    cmajor::parsing::Grammar* grammar0 = pd->GetGrammar(ToUtf32("cmajor.parser.TypeExprGrammar"));
     if (!grammar0)
     {
-        grammar0 = cmajor::parser::IdentifierGrammar::Create(pd);
+        grammar0 = cmajor::parser::TypeExprGrammar::Create(pd);
     }
     AddGrammarReference(grammar0);
-    cmajor::parsing::Grammar* grammar1 = pd->GetGrammar(ToUtf32("cmajor.parser.TypeExprGrammar"));
+    cmajor::parsing::Grammar* grammar1 = pd->GetGrammar(ToUtf32("cmajor.parser.IdentifierGrammar"));
     if (!grammar1)
     {
-        grammar1 = cmajor::parser::TypeExprGrammar::Create(pd);
+        grammar1 = cmajor::parser::IdentifierGrammar::Create(pd);
     }
     AddGrammarReference(grammar1);
 }
 
 void TemplateGrammar::CreateRules()
 {
+    AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("TypeExpr"), this, ToUtf32("TypeExprGrammar.TypeExpr")));
     AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("QualifiedId"), this, ToUtf32("IdentifierGrammar.QualifiedId")));
     AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("Identifier"), this, ToUtf32("IdentifierGrammar.Identifier")));
-    AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("TypeExpr"), this, ToUtf32("TypeExprGrammar.TypeExpr")));
     AddRule(new TemplateIdRule(ToUtf32("TemplateId"), GetScope(), GetParsingDomain()->GetNextRuleId(),
         new cmajor::parsing::ActionParser(ToUtf32("A0"),
             new cmajor::parsing::SequenceParser(
@@ -325,7 +344,12 @@ void TemplateGrammar::CreateRules()
                 new cmajor::parsing::CharParser('>')))));
     AddRule(new TemplateParameterRule(ToUtf32("TemplateParameter"), GetScope(), GetParsingDomain()->GetNextRuleId(),
         new cmajor::parsing::ActionParser(ToUtf32("A0"),
-            new cmajor::parsing::NonterminalParser(ToUtf32("Identifier"), ToUtf32("Identifier"), 0))));
+            new cmajor::parsing::SequenceParser(
+                new cmajor::parsing::NonterminalParser(ToUtf32("Identifier"), ToUtf32("Identifier"), 0),
+                new cmajor::parsing::OptionalParser(
+                    new cmajor::parsing::SequenceParser(
+                        new cmajor::parsing::CharParser('='),
+                        new cmajor::parsing::NonterminalParser(ToUtf32("TypeExpr"), ToUtf32("TypeExpr"), 1)))))));
     AddRule(new TemplateParameterListRule(ToUtf32("TemplateParameterList"), GetScope(), GetParsingDomain()->GetNextRuleId(),
         new cmajor::parsing::SequenceParser(
             new cmajor::parsing::SequenceParser(

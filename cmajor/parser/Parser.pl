@@ -29,10 +29,38 @@ namespace cmajor.parser
         NewExpr(ParsingContext* ctx): Node*;
         ArgumentList(ParsingContext* ctx, Node* node);
         ExpressionList(ParsingContext* ctx, Node* node);
+        InvokeExpr(ParsingContext* ctx, var std::unique_ptr<Node> expr, var Span s): Node*;
     }
     grammar BasicTypeGrammar
     {
         BasicType: Node*;
+    }
+    grammar ConceptGrammar
+    {
+        Concept(ParsingContext* ctx): ConceptNode*;
+        Refinement: ConceptIdNode*;
+        ConceptBody(ParsingContext* ctx, ConceptNode* concept);
+        ConceptBodyConstraint(ParsingContext* ctx, ConceptNode* concept);
+        TypeNameConstraint(ParsingContext* ctx): ConstraintNode*;
+        SignatureConstraint(ParsingContext* ctx, IdentifierNode* firstTypeParameter): ConstraintNode*;
+        ConstructorConstraint(ParsingContext* ctx, IdentifierNode* firstTypeParameter, var std::unique_ptr<IdentifierNode> id, var std::unique_ptr<ConstraintNode> ctorConstraint): ConstraintNode*;
+        DestructorConstraint(ParsingContext* ctx, IdentifierNode* firstTypeParameter, var std::unique_ptr<IdentifierNode> id): ConstraintNode*;
+        MemberFunctionConstraint(ParsingContext* ctx, var std::unique_ptr<Node> returnType, var std::unique_ptr<IdentifierNode> typeParam): ConstraintNode*;
+        FunctionConstraint(ParsingContext* ctx): ConstraintNode*;
+        EmbeddedConstraint(ParsingContext* ctx): ConstraintNode*;
+        WhereConstraint(ParsingContext* ctx): WhereConstraintNode*;
+        ConstraintExpr(ParsingContext* ctx): ConstraintNode*;
+        DisjunctiveConstraintExpr(ParsingContext* ctx, var Span s): ConstraintNode*;
+        ConjunctiveConstraintExpr(ParsingContext* ctx, var Span s): ConstraintNode*;
+        PrimaryConstraintExpr(ParsingContext* ctx): ConstraintNode*;
+        AtomicConstraintExpr(ParsingContext* ctx): ConstraintNode*;
+        PredicateConstraint(ParsingContext* ctx): ConstraintNode*;
+        IsConstraint(ParsingContext* ctx, var std::unique_ptr<Node> typeExpr): ConstraintNode*;
+        ConceptOrTypeName(ParsingContext* ctx): Node*;
+        MultiParamConstraint(ParsingContext* ctx, var std::unique_ptr<MultiParamConstraintNode> constraint): ConstraintNode*;
+        Axiom(ParsingContext* ctx, ConceptNode* concept, var std::unique_ptr<AxiomNode> axiom);
+        AxiomBody(ParsingContext* ctx, AxiomNode* axiom);
+        AxiomStatement(ParsingContext* ctx): AxiomStatementNode*;
     }
     grammar ConstantGrammar
     {
@@ -53,6 +81,11 @@ namespace cmajor.parser
         UnderlyingType(ParsingContext* ctx): Node*;
         EnumConstants(ParsingContext* ctx, EnumTypeNode* enumType);
         EnumConstant(ParsingContext* ctx, EnumTypeNode* enumType, var Span s): EnumConstantNode*;
+    }
+    grammar IdentifierGrammar
+    {
+        Identifier: IdentifierNode*;
+        QualifiedId: IdentifierNode*;
     }
     grammar LiteralGrammar
     {
@@ -77,11 +110,6 @@ namespace cmajor.parser
         HexDigit8: uint32_t;
         OctalDigitSequence: uint64_t;
         Sign;
-    }
-    grammar IdentifierGrammar
-    {
-        Identifier: IdentifierNode*;
-        QualifiedId: IdentifierNode*;
     }
     grammar ParameterGrammar
     {

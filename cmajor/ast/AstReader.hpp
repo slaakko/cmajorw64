@@ -19,6 +19,8 @@ class LabelNode;
 class StatementNode;
 class DefaultStatementNode;
 class CompoundStatementNode;
+class ConstraintNode;
+class ConceptIdNode;
 
 class AstReader
 {
@@ -31,6 +33,8 @@ public:
     StatementNode* ReadStatementNode();
     DefaultStatementNode* ReadDefaultStatementNode();
     CompoundStatementNode* ReadCompoundStatementNode();
+    ConstraintNode* ReadConstraintNode();
+    ConceptIdNode* ReadConceptIdNode();
     Specifiers ReadSpecifiers();
     Span ReadSpan();
 private:

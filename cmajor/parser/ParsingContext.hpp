@@ -28,6 +28,9 @@ public:
     bool ParsingTypeExpr() const { return parsingTypeExpr; }
     void BeginParsingTypeExpr();
     void EndParsingTypeExpr();
+    bool ParsingConcept() const { return parsingConcept; }
+    void BeginParsingConcept();
+    void EndParsingConcept();
 private:
     bool parsingExpressionStatement;
     std::stack<bool> parsingExpressionStatementStack;
@@ -39,6 +42,8 @@ private:
     std::stack<bool> parsingIsOrAsStack;
     bool parsingTypeExpr;
     std::stack<bool> parsingTypeExprStack;
+    bool parsingConcept;
+    std::stack<bool> parsingConceptStack;
 };
 
 } } // namespace cmajor::parser
