@@ -1,5 +1,5 @@
-#ifndef Parameter_hpp_29588
-#define Parameter_hpp_29588
+#ifndef Parameter_hpp_28781
+#define Parameter_hpp_28781
 
 #include <cmajor/parsing/Grammar.hpp>
 #include <cmajor/parsing/Keyword.hpp>
@@ -25,4 +25,4 @@ private:
 
 } } // namespace cmajor.parser
 
-#endif // Parameter_hpp_29588
+#endif // Parameter_hpp_28781

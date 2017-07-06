@@ -50,6 +50,17 @@ class NamespaceImportNode;
 class IdentifierNode;
 class TemplateIdNode;
 class FunctionNode;
+class ClassNode;
+class ThisInitializerNode;
+class BaseInitializerNode;
+class MemberInitializerNode;
+class StaticConstructorNode;
+class ConstructorNode;
+class MemberFunctionNode;
+class MemberVariableNode;
+class InterfaceNode;
+class DelegateNode;
+class ClassDelegateNode;
 
 class DisjunctiveConstraintNode;
 class ConjunctiveConstraintNode;
@@ -101,8 +112,6 @@ class EnumConstantNode;
 class ParameterNode;
 class TemplateParameterNode;
 class TypedefNode;
-class DelegateNode;
-class ClassDelegateNode;
 
 class ConstNode;
 class LValueRefNode;
@@ -194,6 +203,17 @@ public:
     virtual void Visit(IdentifierNode& identififerNode) {}
     virtual void Visit(TemplateIdNode& templateIdNode) {}
     virtual void Visit(FunctionNode& functionNode) {}
+    virtual void Visit(ClassNode& classNode) {}
+    virtual void Visit(ThisInitializerNode& thisInitializerNode) {}
+    virtual void Visit(BaseInitializerNode& baseInitializerNode) {}
+    virtual void Visit(MemberInitializerNode& memberInitializerNode) {}
+    virtual void Visit(StaticConstructorNode& staticConstructorNode) {}
+    virtual void Visit(ConstructorNode& constructorNode) {}
+    virtual void Visit(MemberFunctionNode& memberFunctionNode) {}
+    virtual void Visit(MemberVariableNode& memberVariableNode) {}
+    virtual void Visit(InterfaceNode& interfacenode) {}
+    virtual void Visit(DelegateNode& delegateNode) {}
+    virtual void Visit(ClassDelegateNode& classDelegateNode) {}
 
     virtual void Visit(DisjunctiveConstraintNode& disjunctiveConstraintNode) {}
     virtual void Visit(ConjunctiveConstraintNode& conjunctiveConstraintNode) {}
@@ -245,8 +265,6 @@ public:
     virtual void Visit(EnumConstantNode& enumConstantNode) {}
     virtual void Visit(ParameterNode& parameterNode) {}
     virtual void Visit(TemplateParameterNode& templateParameterNode) {}
-    virtual void Visit(DelegateNode& delegateNode) {}
-    virtual void Visit(ClassDelegateNode& classDelegateNode) {}
 
     virtual void Visit(ConstNode& constNode) {}
     virtual void Visit(LValueRefNode& lvalueRefNode) {}

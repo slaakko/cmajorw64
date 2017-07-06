@@ -1,5 +1,5 @@
-#ifndef Identifier_hpp_18155
-#define Identifier_hpp_18155
+#ifndef Identifier_hpp_28781
+#define Identifier_hpp_28781
 
 #include <cmajor/parsing/Grammar.hpp>
 #include <cmajor/parsing/Keyword.hpp>
@@ -24,4 +24,4 @@ private:
 
 } } // namespace cmajor.parser
 
-#endif // Identifier_hpp_18155
+#endif // Identifier_hpp_28781

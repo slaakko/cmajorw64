@@ -1,5 +1,5 @@
-#ifndef Enumeration_hpp_9863
-#define Enumeration_hpp_9863
+#ifndef Enumeration_hpp_28778
+#define Enumeration_hpp_28778
 
 #include <cmajor/parsing/Grammar.hpp>
 #include <cmajor/parsing/Keyword.hpp>
@@ -27,4 +27,4 @@ private:
 
 } } // namespace cmajor.parser
 
-#endif // Enumeration_hpp_9863
+#endif // Enumeration_hpp_28778

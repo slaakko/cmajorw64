@@ -1,0 +1,114 @@
+// =================================
+// Copyright (c) 2017 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+[hpp]#include <cmajor/ast/Class.hpp>
+[hpp]#include <cmajor/parser/ParsingContext.hpp>
+[cpp]#include <cmajor/parser/Specifier.hpp>
+[cpp]#include <cmajor/parser/Identifier.hpp>
+[cpp]#include <cmajor/parser/TypeExpr.hpp>
+[cpp]#include <cmajor/parser/Expression.hpp>
+[cpp]#include <cmajor/parser/Statement.hpp>
+[cpp]#include <cmajor/parser/Parameter.hpp>
+[cpp]#include <cmajor/parser/Function.hpp>
+[cpp]#include <cmajor/parser/Template.hpp>
+[cpp]#include <cmajor/parser/Typedef.hpp>
+[cpp]#include <cmajor/parser/Enumeration.hpp>
+[cpp]#include <cmajor/parser/Constant.hpp>
+[cpp]#include <cmajor/parser/Delegate.hpp>
+
+namespace cmajor.parser
+{
+    [hpp]using namespace cmajor::ast;
+
+    grammar ClassGrammar
+    {
+        using SpecifierGrammar.Specifiers;
+        using IdentifierGrammar.Identifier;
+        using IdentifierGrammar.QualifiedId;
+        using TypeExprGrammar.TypeExpr;
+        using ExpressionGrammar.ArgumentList;
+        using StatementGrammar.CompoundStatement;
+        using ParameterGrammar.ParameterList;
+        using FunctionGrammar.FunctionGroupId;
+        using TemplateGrammar.TemplateParameterList;
+        using TypedefGrammar.Typedef;
+        using EnumerationGrammar.EnumType;
+        using ConstantGrammar.Constant;
+        using DelegateGrammar.Delegate;
+        using DelegateGrammar.ClassDelegate;
+
+        Class(ParsingContext* ctx) : ClassNode*
+            ::= Specifiers keyword("class") Identifier{ value = new ClassNode(span, Specifiers, Identifier); }
+                TemplateParameterList(ctx, value)?
+                InheritanceAndInterfaces(ctx, value)? '{'! ClassContent(ctx, value) '}'!
+            ;
+
+        InheritanceAndInterfaces(ParsingContext* ctx, ClassNode* classNode)
+            ::= ':' 
+            (   empty{ ctx->BeginParsingTypeExpr(); } 
+                BaseClassOrInterface(ctx){ classNode->AddBaseClassOrInterface(BaseClassOrInterface); ctx->EndParsingTypeExpr(); } / { ctx->EndParsingTypeExpr(); }
+            )  % ','
+            ;
+
+        BaseClassOrInterface(ParsingContext* ctx) : Node*
+            ::= QualifiedId{ value = QualifiedId; }
+            ;
+
+        ClassContent(ParsingContext* ctx, ClassNode* classNode)
+            ::= (ClassMember(ctx, classNode){ classNode->AddMember(ClassMember); })*
+            ;
+
+        ClassMember(ParsingContext* ctx, ClassNode* classNode) : Node*
+            ::= StaticConstructor(ctx, classNode){ value = StaticConstructor; }
+            |   Constructor(ctx, classNode){ value = Constructor; }
+            |   MemberFunction(ctx, classNode){ value= MemberFunction; }
+            |   MemberVariable(ctx){ value = MemberVariable; }
+            |   Typedef(ctx){ value = Typedef; }
+            |   Class(ctx){ value = Class; }
+            |   EnumType(ctx){ value = EnumType; }
+            |   Constant(ctx){ value = Constant; }
+            |   Delegate(ctx){ value = Delegate; }
+            |   ClassDelegate(ctx){ value = ClassDelegate; }
+            ;
+
+        StaticConstructor(ParsingContext* ctx, ClassNode* classNode, var std::unique_ptr<IdentifierNode> id) : StaticConstructorNode*
+            ::= (Specifiers:specifiers Identifier{ id.reset(Identifier); } '(' ')')
+                { 
+                    if (id->Str() != classNode->Id()->Str()) pass = false; else if (specifiers != Specifiers::static_) pass = false; 
+                    else { value = new StaticConstructorNode(span); }
+                }
+                (':' (Initializer(ctx){ value->AddInitializer(Initializer); } % ','))?
+                (CompoundStatement(ctx){ value->SetBody(CompoundStatement); } | ';' )
+            ;
+
+        Constructor(ParsingContext* ctx, ClassNode* classNode, var std::unique_ptr<IdentifierNode> id, var std::unique_ptr<ConstructorNode> ctor) : Node*
+            ::= (Specifiers Identifier{ id.reset(Identifier); })
+                { if (id->Str() != classNode->Id()->Str()) pass = false; else { ctor.reset(new ConstructorNode(span, Specifiers)); } }
+                ParameterList(ctx, ctor.get()) 
+                (':' (Initializer(ctx){ ctor->AddInitializer(Initializer); } % ','))?
+                (CompoundStatement(ctx){ ctor->SetBody(CompoundStatement); } | ';' ){ value = ctor.release(); }
+            ;
+
+        Initializer(ParsingContext* ctx) : InitializerNode*
+            ::= keyword("this"){ value = new ThisInitializerNode(span); } '('! ArgumentList(ctx, value):thisArgs! ')'!
+            |   keyword("base"){ value = new BaseInitializerNode(span); } '('! ArgumentList(ctx, value):baseArgs! ')'!
+            |   Identifier{ value = new MemberInitializerNode(span, Identifier); } '('! ArgumentList(ctx, value):memberArgs! ')'!
+            ;
+
+        MemberFunction(ParsingContext* ctx, ClassNode* classNode, var std::unique_ptr<MemberFunctionNode> memFun, var std::unique_ptr<IdentifierNode> qid) : Node*
+            ::= (Specifiers TypeExpr(ctx) FunctionGroupId(ctx))
+                { 
+                    memFun.reset(new MemberFunctionNode(span, Specifiers, TypeExpr, FunctionGroupId)); 
+                } 
+                ParameterList(ctx, memFun.get()) 
+                (CompoundStatement(ctx){ memFun->SetBody(CompoundStatement); } | ';' ){ value = memFun.release(); }
+            ;
+
+        MemberVariable(ParsingContext* ctx) : Node*
+            ::= (Specifiers TypeExpr(ctx) Identifier ';'){ value = new MemberVariableNode(span, Specifiers, TypeExpr, Identifier); }
+            ;
+
+    }
+}

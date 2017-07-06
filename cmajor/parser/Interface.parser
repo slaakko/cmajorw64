@@ -1,0 +1,42 @@
+// =================================
+// Copyright (c) 2017 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+[hpp]#include <cmajor/ast/Interface.hpp>
+[hpp]#include <cmajor/parser/ParsingContext.hpp>
+[cpp]#include <cmajor/parser/Specifier.hpp>
+[cpp]#include <cmajor/parser/Identifier.hpp>
+[cpp]#include <cmajor/parser/TypeExpr.hpp>
+[cpp]#include <cmajor/parser/Parameter.hpp>
+[cpp]#include <cmajor/ast/Class.hpp>
+
+namespace cmajor.parser
+{
+    [hpp]using namespace cmajor::ast;
+
+    grammar InterfaceGrammar
+    {
+        using SpecifierGrammar.Specifiers;
+        using IdentifierGrammar.Identifier;
+        using TypeExprGrammar.TypeExpr;
+        using ParameterGrammar.ParameterList;
+
+        Interface(ParsingContext* ctx) : InterfaceNode*
+            ::= (Specifiers keyword("interface") Identifier!){ value = new InterfaceNode(span, Specifiers, Identifier); } '{'! InterfaceContent(ctx, value) '}'!
+            ;
+
+        InterfaceContent(ParsingContext* ctx, InterfaceNode* intf)
+            ::= (InterfaceMemFun(ctx){ intf->AddMember(InterfaceMemFun); })*
+            ;
+
+        InterfaceMemFun(ParsingContext* ctx, var std::unique_ptr<MemberFunctionNode> memFun) : Node*
+            ::= (TypeExpr(ctx):returnTypeExpr InterfaceFunctionGroupId:groupId!{ memFun.reset(new MemberFunctionNode(span, Specifiers(), returnTypeExpr, groupId)); }
+                ParameterList(ctx, memFun.get())! ';'!){ value = memFun.release(); }
+            ;
+
+        InterfaceFunctionGroupId(var std::unique_ptr<IdentifierNode> id) : std::u32string
+            ::= Identifier{ id.reset(Identifier); value = id->Str(); }
+            ;
+    }
+}

@@ -1,5 +1,5 @@
-#ifndef TypeExpr_hpp_18661
-#define TypeExpr_hpp_18661
+#ifndef TypeExpr_hpp_28781
+#define TypeExpr_hpp_28781
 
 #include <cmajor/parsing/Grammar.hpp>
 #include <cmajor/parsing/Keyword.hpp>
@@ -27,4 +27,4 @@ private:
 
 } } // namespace cmajor.parser
 
-#endif // TypeExpr_hpp_18661
+#endif // TypeExpr_hpp_28781

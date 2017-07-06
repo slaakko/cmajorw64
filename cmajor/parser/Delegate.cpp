@@ -290,22 +290,22 @@ private:
 void DelegateGrammar::GetReferencedGrammars()
 {
     cmajor::parsing::ParsingDomain* pd = GetParsingDomain();
-    cmajor::parsing::Grammar* grammar0 = pd->GetGrammar(ToUtf32("cmajor.parser.SpecifierGrammar"));
+    cmajor::parsing::Grammar* grammar0 = pd->GetGrammar(ToUtf32("cmajor.parser.IdentifierGrammar"));
     if (!grammar0)
     {
-        grammar0 = cmajor::parser::SpecifierGrammar::Create(pd);
+        grammar0 = cmajor::parser::IdentifierGrammar::Create(pd);
     }
     AddGrammarReference(grammar0);
-    cmajor::parsing::Grammar* grammar1 = pd->GetGrammar(ToUtf32("cmajor.parser.TypeExprGrammar"));
+    cmajor::parsing::Grammar* grammar1 = pd->GetGrammar(ToUtf32("cmajor.parser.SpecifierGrammar"));
     if (!grammar1)
     {
-        grammar1 = cmajor::parser::TypeExprGrammar::Create(pd);
+        grammar1 = cmajor::parser::SpecifierGrammar::Create(pd);
     }
     AddGrammarReference(grammar1);
-    cmajor::parsing::Grammar* grammar2 = pd->GetGrammar(ToUtf32("cmajor.parser.IdentifierGrammar"));
+    cmajor::parsing::Grammar* grammar2 = pd->GetGrammar(ToUtf32("cmajor.parser.TypeExprGrammar"));
     if (!grammar2)
     {
-        grammar2 = cmajor::parser::IdentifierGrammar::Create(pd);
+        grammar2 = cmajor::parser::TypeExprGrammar::Create(pd);
     }
     AddGrammarReference(grammar2);
     cmajor::parsing::Grammar* grammar3 = pd->GetGrammar(ToUtf32("cmajor.parser.ParameterGrammar"));
@@ -320,8 +320,8 @@ void DelegateGrammar::CreateRules()
 {
     AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("Specifiers"), this, ToUtf32("SpecifierGrammar.Specifiers")));
     AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("TypeExpr"), this, ToUtf32("TypeExprGrammar.TypeExpr")));
-    AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("Identifier"), this, ToUtf32("IdentifierGrammar.Identifier")));
     AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("ParameterList"), this, ToUtf32("ParameterGrammar.ParameterList")));
+    AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("Identifier"), this, ToUtf32("IdentifierGrammar.Identifier")));
     AddRule(new DelegateRule(ToUtf32("Delegate"), GetScope(), GetParsingDomain()->GetNextRuleId(),
         new cmajor::parsing::SequenceParser(
             new cmajor::parsing::SequenceParser(

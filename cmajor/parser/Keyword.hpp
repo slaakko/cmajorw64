@@ -1,5 +1,5 @@
-#ifndef Keyword_hpp_2352
-#define Keyword_hpp_2352
+#ifndef Keyword_hpp_28781
+#define Keyword_hpp_28781
 
 #include <cmajor/parsing/Grammar.hpp>
 #include <cmajor/parsing/Keyword.hpp>
@@ -20,4 +20,4 @@ private:
 
 } } // namespace cmajor.parser
 
-#endif // Keyword_hpp_2352
+#endif // Keyword_hpp_28781

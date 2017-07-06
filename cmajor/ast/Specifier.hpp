@@ -31,7 +31,8 @@ enum class Specifiers : uint32_t
     nothrow_ = 1 << 15,
     throw_ = 1 << 16,
     new_ = 1 << 17,
-    unit_test_ = 1 << 18,
+    const_ = 1 << 18,
+    unit_test_ = 1 << 19,
     access_ = public_ | protected_ | private_ | internal_
 };
 

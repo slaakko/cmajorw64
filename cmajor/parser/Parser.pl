@@ -35,6 +35,49 @@ namespace cmajor.parser
     {
         BasicType: Node*;
     }
+    grammar ConstantGrammar
+    {
+        Constant(ParsingContext* ctx): Node*;
+    }
+    grammar ClassGrammar
+    {
+        Class(ParsingContext* ctx): ClassNode*;
+        InheritanceAndInterfaces(ParsingContext* ctx, ClassNode* classNode);
+        BaseClassOrInterface(ParsingContext* ctx): Node*;
+        ClassContent(ParsingContext* ctx, ClassNode* classNode);
+        ClassMember(ParsingContext* ctx, ClassNode* classNode): Node*;
+        StaticConstructor(ParsingContext* ctx, ClassNode* classNode, var std::unique_ptr<IdentifierNode> id): StaticConstructorNode*;
+        Constructor(ParsingContext* ctx, ClassNode* classNode, var std::unique_ptr<IdentifierNode> id, var std::unique_ptr<ConstructorNode> ctor): Node*;
+        Initializer(ParsingContext* ctx): InitializerNode*;
+        MemberFunction(ParsingContext* ctx, ClassNode* classNode, var std::unique_ptr<MemberFunctionNode> memFun, var std::unique_ptr<IdentifierNode> qid): Node*;
+        MemberVariable(ParsingContext* ctx): Node*;
+    }
+    grammar DelegateGrammar
+    {
+        Delegate(ParsingContext* ctx): DelegateNode*;
+        ClassDelegate(ParsingContext* ctx): ClassDelegateNode*;
+    }
+    grammar CompileUnitGrammar
+    {
+        CompileUnit(ParsingContext* ctx): CompileUnitNode*;
+        NamespaceContent(ParsingContext* ctx, NamespaceNode* ns);
+        UsingDirectives(ParsingContext* ctx, NamespaceNode* ns);
+        UsingDirective(ParsingContext* ctx, NamespaceNode* ns);
+        UsingAliasDirective(var std::unique_ptr<IdentifierNode> id): Node*;
+        UsingNamespaceDirective: Node*;
+        Definitions(ParsingContext* ctx, NamespaceNode* ns);
+        Definition(ParsingContext* ctx, NamespaceNode* ns): Node*;
+        NamespaceDefinition(ParsingContext* ctx, NamespaceNode* ns): NamespaceNode*;
+        TypedefDeclaration(ParsingContext* ctx): TypedefNode*;
+        ConceptDefinition(ParsingConcext* ctx): ConceptNode*;
+        FunctionDefinition(ParsingContext* ctx): FunctionNode*;
+        ClassDefinition(ParsingContext* ctx): ClassNode*;
+        InterfaceDefinition(ParsingContext* ctx): InterfaceNode*;
+        EnumTypeDefinition(ParsingContext* ctx): EnumTypeNode*;
+        ConstantDefinition(ParsingContext* ctx): ConstantNode*;
+        DelegateDefinition(ParsingContext* ctx): DelegateNode*;
+        ClassDelegateDefinition(ParsingContext* ctx): ClassDelegateNode*;
+    }
     grammar ConceptGrammar
     {
         Concept(ParsingContext* ctx): ConceptNode*;
@@ -62,19 +105,6 @@ namespace cmajor.parser
         AxiomBody(ParsingContext* ctx, AxiomNode* axiom);
         AxiomStatement(ParsingContext* ctx): AxiomStatementNode*;
     }
-    grammar ConstantGrammar
-    {
-        Constant(ParsingContext* ctx): Node*;
-    }
-    grammar DelegateGrammar
-    {
-        Delegate(ParsingContext* ctx): DelegateNode*;
-        ClassDelegate(ParsingContext* ctx): ClassDelegateNode*;
-    }
-    grammar KeywordGrammar
-    {
-        Keyword;
-    }
     grammar EnumerationGrammar
     {
         EnumType(ParsingContext* ctx): EnumTypeNode*;
@@ -86,6 +116,17 @@ namespace cmajor.parser
     {
         Identifier: IdentifierNode*;
         QualifiedId: IdentifierNode*;
+    }
+    grammar InterfaceGrammar
+    {
+        Interface(ParsingContext* ctx): InterfaceNode*;
+        InterfaceContent(ParsingContext* ctx, InterfaceNode* intf);
+        InterfaceMemFun(ParsingContext* ctx, var std::unique_ptr<MemberFunctionNode> memFun): Node*;
+        InterfaceFunctionGroupId(var std::unique_ptr<IdentifierNode> id): std::u32string;
+    }
+    grammar KeywordGrammar
+    {
+        Keyword;
     }
     grammar LiteralGrammar
     {

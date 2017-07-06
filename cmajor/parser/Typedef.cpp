@@ -169,22 +169,22 @@ private:
 void TypedefGrammar::GetReferencedGrammars()
 {
     cmajor::parsing::ParsingDomain* pd = GetParsingDomain();
-    cmajor::parsing::Grammar* grammar0 = pd->GetGrammar(ToUtf32("cmajor.parser.SpecifierGrammar"));
+    cmajor::parsing::Grammar* grammar0 = pd->GetGrammar(ToUtf32("cmajor.parser.IdentifierGrammar"));
     if (!grammar0)
     {
-        grammar0 = cmajor::parser::SpecifierGrammar::Create(pd);
+        grammar0 = cmajor::parser::IdentifierGrammar::Create(pd);
     }
     AddGrammarReference(grammar0);
-    cmajor::parsing::Grammar* grammar1 = pd->GetGrammar(ToUtf32("cmajor.parser.TypeExprGrammar"));
+    cmajor::parsing::Grammar* grammar1 = pd->GetGrammar(ToUtf32("cmajor.parser.SpecifierGrammar"));
     if (!grammar1)
     {
-        grammar1 = cmajor::parser::TypeExprGrammar::Create(pd);
+        grammar1 = cmajor::parser::SpecifierGrammar::Create(pd);
     }
     AddGrammarReference(grammar1);
-    cmajor::parsing::Grammar* grammar2 = pd->GetGrammar(ToUtf32("cmajor.parser.IdentifierGrammar"));
+    cmajor::parsing::Grammar* grammar2 = pd->GetGrammar(ToUtf32("cmajor.parser.TypeExprGrammar"));
     if (!grammar2)
     {
-        grammar2 = cmajor::parser::IdentifierGrammar::Create(pd);
+        grammar2 = cmajor::parser::TypeExprGrammar::Create(pd);
     }
     AddGrammarReference(grammar2);
 }

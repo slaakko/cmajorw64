@@ -1,5 +1,5 @@
-#ifndef Statement_hpp_12079
-#define Statement_hpp_12079
+#ifndef Statement_hpp_28781
+#define Statement_hpp_28781
 
 #include <cmajor/parsing/Grammar.hpp>
 #include <cmajor/parsing/Keyword.hpp>
@@ -59,4 +59,4 @@ private:
 
 } } // namespace cmajor.parser
 
-#endif // Statement_hpp_12079
+#endif // Statement_hpp_28781

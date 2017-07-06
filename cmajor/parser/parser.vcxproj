@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="BasicType.parser" />
+    <None Include="Class.parser" />
     <None Include="CompileUnit.parser" />
     <None Include="Concept.parser" />
     <None Include="Constant.parser" />
@@ -28,6 +29,7 @@
     <None Include="Expression.parser" />
     <None Include="Function.parser" />
     <None Include="Identifier.parser" />
+    <None Include="Interface.parser" />
     <None Include="Keyword.parser" />
     <None Include="Literal.parser" />
     <None Include="Parameter.parser" />
@@ -40,6 +42,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BasicType.cpp" />
+    <ClCompile Include="Class.cpp" />
     <ClCompile Include="Concept.cpp" />
     <ClCompile Include="Constant.cpp" />
     <ClCompile Include="Delegate.cpp" />
@@ -47,6 +50,7 @@
     <ClCompile Include="Expression.cpp" />
     <ClCompile Include="Function.cpp" />
     <ClCompile Include="Identifier.cpp" />
+    <ClCompile Include="Interface.cpp" />
     <ClCompile Include="Keyword.cpp" />
     <ClCompile Include="Literal.cpp" />
     <ClCompile Include="Parameter.cpp" />
@@ -59,6 +63,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BasicType.hpp" />
+    <ClInclude Include="Class.hpp" />
     <ClInclude Include="Concept.hpp" />
     <ClInclude Include="Constant.hpp" />
     <ClInclude Include="Delegate.hpp" />
@@ -66,6 +71,7 @@
     <ClInclude Include="Expression.hpp" />
     <ClInclude Include="Function.hpp" />
     <ClInclude Include="Identifier.hpp" />
+    <ClInclude Include="Interface.hpp" />
     <ClInclude Include="Keyword.hpp" />
     <ClInclude Include="Literal.hpp" />
     <ClInclude Include="Operator.hpp" />

@@ -22,6 +22,7 @@
     <ClInclude Include="AstReader.hpp" />
     <ClInclude Include="AstWriter.hpp" />
     <ClInclude Include="BasicType.hpp" />
+    <ClInclude Include="Class.hpp" />
     <ClInclude Include="Clone.hpp" />
     <ClInclude Include="CompileUnit.hpp" />
     <ClInclude Include="Concept.hpp" />
@@ -32,6 +33,7 @@
     <ClInclude Include="Function.hpp" />
     <ClInclude Include="Identifier.hpp" />
     <ClInclude Include="InitDone.hpp" />
+    <ClInclude Include="Interface.hpp" />
     <ClInclude Include="Literal.hpp" />
     <ClInclude Include="Namespace.hpp" />
     <ClInclude Include="Node.hpp" />
@@ -48,6 +50,7 @@
     <ClCompile Include="AstReader.cpp" />
     <ClCompile Include="AstWriter.cpp" />
     <ClCompile Include="BasicType.cpp" />
+    <ClCompile Include="Class.cpp" />
     <ClCompile Include="Clone.cpp" />
     <ClCompile Include="CompileUnit.cpp" />
     <ClCompile Include="Concept.cpp" />
@@ -58,6 +61,7 @@
     <ClCompile Include="Function.cpp" />
     <ClCompile Include="Identifier.cpp" />
     <ClCompile Include="InitDone.cpp" />
+    <ClCompile Include="Interface.cpp" />
     <ClCompile Include="Literal.cpp" />
     <ClCompile Include="Namespace.cpp" />
     <ClCompile Include="Node.cpp" />

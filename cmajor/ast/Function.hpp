@@ -17,8 +17,11 @@ class FunctionNode : public Node
 {
 public:
     FunctionNode(const Span& span_);
+    FunctionNode(NodeType nodeType_, const Span& span_);
     FunctionNode(const Span& span_, Specifiers specifiers_, Node* returnTypeExpr_, const std::u32string& groupId_);
+    FunctionNode(NodeType nodeType_, const Span& span_, Specifiers specifiers_, Node* returnTypeExpr_, const std::u32string& groupId_);
     Node* Clone(CloneContext& cloneContext) const override;
+    void CloneContent(FunctionNode* clone, CloneContext& cloneContext) const;
     void Accept(Visitor& visitor) override;
     void Write(AstWriter& writer) override;
     void Read(AstReader& reader) override;
@@ -29,7 +32,9 @@ public:
     const Node* ReturnTypeExpr() const { return returnTypeExpr.get(); }
     const std::u32string& GroupId() const { return groupId; }
     const NodeList<ParameterNode>& Parameters() const { return parameters; }
+    void SetReturnTypeExpr(Node* returnTypeExpr_);
     const WhereConstraintNode* WhereConstraint() const { return whereConstraint.get(); }
+    void SetSpecifiers(Specifiers specifiers_);
     void SetConstraint(WhereConstraintNode* whereConstraint_);
     const CompoundStatementNode* Body() const { return body.get(); }
     void SetBody(CompoundStatementNode* body_);

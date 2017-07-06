@@ -20,6 +20,9 @@
 #include <cmajor/ast/Delegate.hpp>
 #include <cmajor/ast/Statement.hpp>
 #include <cmajor/ast/Function.hpp>
+#include <cmajor/ast/Class.hpp>
+#include <cmajor/ast/Interface.hpp>
+#include <cmajor/ast/Concept.hpp>
 
 namespace cmajor { namespace ast {
 
@@ -28,7 +31,9 @@ const char* nodeTypeStr[] =
     "boolNode", "sbyteNode", "byteNode", "shortNode", "ushortNode", "intNode", "uintNode", "longNode", "ulongNode", "floatNode", "doubleNode", "charNode", "wcharNode", "ucharNode", "voidNode",
     "booleanLiteralNode", "sbyteLiteralNode", "byteLiteralNode", "shortLiteralNode", "ushortLiteralNode", "intLiteralNode", "uintLiteralNode", "longLiteralNode", "ulongLiteralNode",
     "floatLiteralNode", "doubleLiteralNode", "charLiteralNode", "wcharLiteralNode", "ucharLiteralNode", "stringLiteralNode", "wstringLiteralNode", "ustringLiteralNode", "nullLiteralNode",
-    "compileUnitNode", "namespaceNode", "aliasNode", "namespaceImportNode", "identifierNode", "templateIdNode", "functionNode",
+    "compileUnitNode", "namespaceNode", "aliasNode", "namespaceImportNode", "identifierNode", "templateIdNode", "functionNode", 
+    "classNode", "thisInitializerNode", "baseInitializerNode", "memberInitializerNode", "staticConstructorNode", "constructorNode", "memberFunctionNode", "memberVariableNode",
+    "interfaceNode", "delegateNode", "classDelegateNode",
     "disjunctiveConstraintNode", "conjunctiveConstraintNode", "whereConstraintNode", "predicateConstraintNode", "isConstraintNode", "multiParamConstraintNode", "typeNameConstraintNode",
     "constructorConstraintNode", "destructorConstraintNode", "memberFunctionConstraintNode", "functionConstraintNode",
     "axiomStatementNode", "axiomNode", "conceptIdNode", "conceptNode",
@@ -37,7 +42,6 @@ const char* nodeTypeStr[] =
     "incrementStatementNode", "decrementStatementNode", "rangeForStatementNode", "switchStatementNode", "caseStatementNode", "defaultStatementNode", "gotoCaseStatementNode", 
     "gotoDefaultStatementNode", "throwStatementNode", "catchNode", "tryStatementNode",
     "typedefNode", "constantNode", "enumTypeNode", "enumConstantNode", "parameterNode", "templateParameterNode",
-    "delegateNode", "classDelegateNode",
     "constNode", "refNode", "arrayNode",
     "dotNode", "arrowNode", "disjunctionNode", "conjunctionNode", "bitOrNode", "bitXorNode", "bitAndNode", "equalNode", "notEqualNode", "lessNode", "greaterNode", 
     "lessOrEqualNode", "greaterOrEqualNode", "shiftLeftNode", "shiftRightNode", 
@@ -61,10 +65,12 @@ Node::~Node()
 
 void Node::Write(AstWriter& writer)
 {
+    writer.Write(span);
 }
 
 void Node::Read(AstReader& reader)
 {
+    span = reader.ReadSpan();
 }
 
 BinaryNode::BinaryNode(NodeType nodeType, const Span& span_) : Node(nodeType, span_), left(), right()
@@ -165,6 +171,33 @@ NodeFactory::NodeFactory()
     Register(NodeType::identifierNode, new ConcreteNodeCreator<IdentifierNode>());
     Register(NodeType::templateIdNode, new ConcreteNodeCreator<TemplateIdNode>());
     Register(NodeType::functionNode, new ConcreteNodeCreator<FunctionNode>());
+    Register(NodeType::classNode, new ConcreteNodeCreator<ClassNode>());
+    Register(NodeType::thisInitializerNode, new ConcreteNodeCreator<ThisInitializerNode>());
+    Register(NodeType::baseInitializerNode, new ConcreteNodeCreator<BaseInitializerNode>());
+    Register(NodeType::memberInitializerNode, new ConcreteNodeCreator<MemberInitializerNode>());
+    Register(NodeType::staticConstructorNode, new ConcreteNodeCreator<StaticConstructorNode>());
+    Register(NodeType::constructorNode, new ConcreteNodeCreator<ConstructorNode>());
+    Register(NodeType::memberFunctionNode, new ConcreteNodeCreator<MemberFunctionNode>());
+    Register(NodeType::memberVariableNode, new ConcreteNodeCreator<MemberVariableNode>());
+    Register(NodeType::interfaceNode, new ConcreteNodeCreator<InterfaceNode>());
+    Register(NodeType::delegateNode, new ConcreteNodeCreator<DelegateNode>());
+    Register(NodeType::classDelegateNode, new ConcreteNodeCreator<ClassDelegateNode>());
+
+    Register(NodeType::disjunctiveConstraintNode, new ConcreteNodeCreator<DisjunctiveConstraintNode>());
+    Register(NodeType::conjunctiveConstraintNode, new ConcreteNodeCreator<ConjunctiveConstraintNode>());
+    Register(NodeType::whereConstraintNode, new ConcreteNodeCreator<WhereConstraintNode>());
+    Register(NodeType::predicateConstraintNode, new ConcreteNodeCreator<PredicateConstraintNode>());
+    Register(NodeType::isConstraintNode, new ConcreteNodeCreator<IsConstraintNode>());
+    Register(NodeType::multiParamConstraintNode, new ConcreteNodeCreator<MultiParamConstraintNode>());
+    Register(NodeType::typeNameConstraintNode, new ConcreteNodeCreator<TypeNameConstraintNode>());
+    Register(NodeType::constructorConstraintNode, new ConcreteNodeCreator<ConstructorConstraintNode>());
+    Register(NodeType::destructorConstraintNode, new ConcreteNodeCreator<DestructorConstraintNode>()); 
+    Register(NodeType::memberFunctionConstraintNode, new ConcreteNodeCreator<MemberFunctionConstraintNode>());
+    Register(NodeType::functionConstraintNode, new ConcreteNodeCreator<FunctionConstraintNode>());
+    Register(NodeType::axiomStatementNode, new ConcreteNodeCreator<AxiomStatementNode>());
+    Register(NodeType::axiomNode, new ConcreteNodeCreator<AxiomNode>());
+    Register(NodeType::conceptIdNode, new ConcreteNodeCreator<ConceptIdNode>());
+    Register(NodeType::conceptNode, new ConcreteNodeCreator<ConceptNode>());
 
     Register(NodeType::labelNode, new ConcreteNodeCreator<LabelNode>());
     Register(NodeType::compoundStatementNode, new ConcreteNodeCreator<CompoundStatementNode>());
@@ -200,8 +233,6 @@ NodeFactory::NodeFactory()
     Register(NodeType::enumConstantNode, new ConcreteNodeCreator<EnumConstantNode>());
     Register(NodeType::parameterNode, new ConcreteNodeCreator<ParameterNode>());
     Register(NodeType::templateParameterNode, new ConcreteNodeCreator<TemplateParameterNode>());
-    Register(NodeType::delegateNode, new ConcreteNodeCreator<DelegateNode>());
-    Register(NodeType::classDelegateNode, new ConcreteNodeCreator<ClassDelegateNode>());
 
     Register(NodeType::constNode, new ConcreteNodeCreator<ConstNode>());
     Register(NodeType::lvalueRefNode, new ConcreteNodeCreator<LValueRefNode>());

@@ -12,8 +12,21 @@ FunctionNode::FunctionNode(const Span& span_) : Node(NodeType::functionNode, spa
 {
 }
 
+FunctionNode::FunctionNode(NodeType nodeType_, const Span& span_) : Node(nodeType_, span_), specifiers(Specifiers::none), returnTypeExpr(), groupId(), parameters(), body(), bodySource()
+{
+}
+
 FunctionNode::FunctionNode(const Span& span_, Specifiers specifiers_, Node* returnTypeExpr_, const std::u32string& groupId_) :
     Node(NodeType::functionNode, span_), specifiers(specifiers_), returnTypeExpr(returnTypeExpr_), groupId(groupId_), templateParameters(), parameters(), body(), bodySource()
+{
+    if (returnTypeExpr)
+    {
+        returnTypeExpr->SetParent(this);
+    }
+}
+
+FunctionNode::FunctionNode(NodeType nodeType_, const Span& span_, Specifiers specifiers_, Node* returnTypeExpr_, const std::u32string& groupId_) : 
+    Node(nodeType_, span_), specifiers(specifiers_), returnTypeExpr(returnTypeExpr_), groupId(groupId_), templateParameters(), parameters(), body(), bodySource()
 {
     if (returnTypeExpr)
     {
@@ -44,6 +57,31 @@ Node* FunctionNode::Clone(CloneContext& cloneContext) const
         clone->SetBody(static_cast<CompoundStatementNode*>(body->Clone(cloneContext)));
     }
     return clone;
+}
+
+void FunctionNode::CloneContent(FunctionNode* clone, CloneContext& cloneContext) const
+{
+    clone->specifiers = specifiers;
+    Node* clonedReturnTypeExpr = nullptr;
+    if (returnTypeExpr)
+    {
+        clone->SetReturnTypeExpr(returnTypeExpr->Clone(cloneContext));
+    }
+    clone->groupId = groupId;
+    int nt = templateParameters.Count();
+    for (int i = 0; i < nt; ++i)
+    {
+        clone->AddTemplateParameter(static_cast<TemplateParameterNode*>(templateParameters[i]->Clone(cloneContext)));
+    }
+    int np = parameters.Count();
+    for (int i = 0; i < np; ++i)
+    {
+        clone->AddParameter(static_cast<ParameterNode*>(parameters[i]->Clone(cloneContext)));
+    }
+    if (body)
+    {
+        clone->SetBody(static_cast<CompoundStatementNode*>(body->Clone(cloneContext)));
+    }
 }
 
 void FunctionNode::Accept(Visitor& visitor)
@@ -125,6 +163,17 @@ void FunctionNode::SwitchToBody()
     {
         SetBody(bodySource.release());
     }
+}
+
+void FunctionNode::SetReturnTypeExpr(Node* returnTypeExpr_)
+{
+    returnTypeExpr.reset(returnTypeExpr_);
+    returnTypeExpr->SetParent(returnTypeExpr_);
+}
+
+void FunctionNode::SetSpecifiers(Specifiers specifiers_)
+{
+    specifiers = specifiers_;
 }
 
 void FunctionNode::SetConstraint(WhereConstraintNode* whereConstraint_)
