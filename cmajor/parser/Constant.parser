@@ -21,7 +21,7 @@ namespace cmajor.parser
         using IdentifierGrammar.Identifier;
         using ExpressionGrammar.Expression;
 
-        Constant(ParsingContext* ctx) : Node*
+        Constant(ParsingContext* ctx) : ConstantNode*
             ::= (Specifiers keyword("const") TypeExpr(ctx)! Identifier! '='! Expression(ctx)! ';'!){ value = new ConstantNode(span, Specifiers, TypeExpr, Identifier, Expression); }
             ;
     }

@@ -14,6 +14,8 @@ source <Interface.parser>;
 source <Keyword.parser>;
 source <Literal.parser>;
 source <Parameter.parser>;
+source <Project.parser>;
+source <Solution.parser>;
 source <Specifier.parser>;
 source <Statement.parser>;
 source <Template.parser>;

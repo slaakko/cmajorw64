@@ -1,5 +1,5 @@
-#ifndef Constant_hpp_28778
-#define Constant_hpp_28778
+#ifndef Constant_hpp_21397
+#define Constant_hpp_21397
 
 #include <cmajor/parsing/Grammar.hpp>
 #include <cmajor/parsing/Keyword.hpp>
@@ -14,7 +14,7 @@ class ConstantGrammar : public cmajor::parsing::Grammar
 public:
     static ConstantGrammar* Create();
     static ConstantGrammar* Create(cmajor::parsing::ParsingDomain* parsingDomain);
-    Node* Parse(const char32_t* start, const char32_t* end, int fileIndex, const std::string& fileName, ParsingContext* ctx);
+    ConstantNode* Parse(const char32_t* start, const char32_t* end, int fileIndex, const std::string& fileName, ParsingContext* ctx);
 private:
     ConstantGrammar(cmajor::parsing::ParsingDomain* parsingDomain_);
     virtual void CreateRules();
@@ -24,4 +24,4 @@ private:
 
 } } // namespace cmajor.parser
 
-#endif // Constant_hpp_28778
+#endif // Constant_hpp_21397

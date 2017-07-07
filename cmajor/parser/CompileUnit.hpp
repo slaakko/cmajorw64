@@ -1,5 +1,5 @@
-#ifndef CompileUnit_hpp_28778
-#define CompileUnit_hpp_28778
+#ifndef CompileUnit_hpp_21397
+#define CompileUnit_hpp_21397
 
 #include <cmajor/parsing/Grammar.hpp>
 #include <cmajor/parsing/Keyword.hpp>
@@ -41,4 +41,4 @@ private:
 
 } } // namespace cmajor.parser
 
-#endif // CompileUnit_hpp_28778
+#endif // CompileUnit_hpp_21397

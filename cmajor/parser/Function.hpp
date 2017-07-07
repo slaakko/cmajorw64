@@ -1,5 +1,5 @@
-#ifndef Function_hpp_28781
-#define Function_hpp_28781
+#ifndef Function_hpp_21397
+#define Function_hpp_21397
 
 #include <cmajor/parsing/Grammar.hpp>
 #include <cmajor/parsing/Keyword.hpp>
@@ -26,4 +26,4 @@ private:
 
 } } // namespace cmajor.parser
 
-#endif // Function_hpp_28781
+#endif // Function_hpp_21397

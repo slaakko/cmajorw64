@@ -1,5 +1,5 @@
-#ifndef Typedef_hpp_28781
-#define Typedef_hpp_28781
+#ifndef Typedef_hpp_21397
+#define Typedef_hpp_21397
 
 #include <cmajor/parsing/Grammar.hpp>
 #include <cmajor/parsing/Keyword.hpp>
@@ -24,4 +24,4 @@ private:
 
 } } // namespace cmajor.parser
 
-#endif // Typedef_hpp_28781
+#endif // Typedef_hpp_21397

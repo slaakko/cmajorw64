@@ -37,7 +37,7 @@ namespace cmajor.parser
     }
     grammar ConstantGrammar
     {
-        Constant(ParsingContext* ctx): Node*;
+        Constant(ParsingContext* ctx): ConstantNode*;
     }
     grammar ClassGrammar
     {
@@ -69,7 +69,7 @@ namespace cmajor.parser
         Definition(ParsingContext* ctx, NamespaceNode* ns): Node*;
         NamespaceDefinition(ParsingContext* ctx, NamespaceNode* ns): NamespaceNode*;
         TypedefDeclaration(ParsingContext* ctx): TypedefNode*;
-        ConceptDefinition(ParsingConcext* ctx): ConceptNode*;
+        ConceptDefinition(ParsingContext* ctx): ConceptNode*;
         FunctionDefinition(ParsingContext* ctx): FunctionNode*;
         ClassDefinition(ParsingContext* ctx): ClassNode*;
         InterfaceDefinition(ParsingContext* ctx): InterfaceNode*;
@@ -104,6 +104,13 @@ namespace cmajor.parser
         Axiom(ParsingContext* ctx, ConceptNode* concept, var std::unique_ptr<AxiomNode> axiom);
         AxiomBody(ParsingContext* ctx, AxiomNode* axiom);
         AxiomStatement(ParsingContext* ctx): AxiomStatementNode*;
+    }
+    grammar SolutionGrammar
+    {
+        Solution: Solution*;
+        Declaration: SolutionDeclaration*;
+        SolutionProjectDeclaration: SolutionDeclaration*;
+        FilePath: std::string;
     }
     grammar EnumerationGrammar
     {
@@ -156,6 +163,16 @@ namespace cmajor.parser
     {
         ParameterList(ParsingContext* ctx, Node* owner);
         Parameter(ParsingContext* ctx): ParameterNode*;
+    }
+    grammar ProjectGrammar
+    {
+        Project(std::string config): Project*;
+        Declaration: ProjectDeclaration*;
+        ReferenceDeclaration: ProjectDeclaration*;
+        SourceFileDeclaration: ProjectDeclaration*;
+        TargetDeclaration: ProjectDeclaration*;
+        Target: Target;
+        FilePath: std::string;
     }
     grammar SpecifierGrammar
     {

@@ -40,7 +40,7 @@ ConstantGrammar::ConstantGrammar(cmajor::parsing::ParsingDomain* parsingDomain_)
     SetOwner(0);
 }
 
-Node* ConstantGrammar::Parse(const char32_t* start, const char32_t* end, int fileIndex, const std::string& fileName, ParsingContext* ctx)
+ConstantNode* ConstantGrammar::Parse(const char32_t* start, const char32_t* end, int fileIndex, const std::string& fileName, ParsingContext* ctx)
 {
     cmajor::parsing::Scanner scanner(start, end, fileName, fileIndex, SkipRule());
     std::unique_ptr<cmajor::parsing::XmlLog> xmlLog;
@@ -72,7 +72,7 @@ Node* ConstantGrammar::Parse(const char32_t* start, const char32_t* end, int fil
         }
     }
     std::unique_ptr<cmajor::parsing::Object> value = std::move(stack.top());
-    Node* result = *static_cast<cmajor::parsing::ValueObject<Node*>*>(value.get());
+    ConstantNode* result = *static_cast<cmajor::parsing::ValueObject<ConstantNode*>*>(value.get());
     stack.pop();
     return result;
 }
@@ -84,7 +84,7 @@ public:
         cmajor::parsing::Rule(name_, enclosingScope_, id_, definition_)
     {
         AddInheritedAttribute(AttrOrVariable(ToUtf32("ParsingContext*"), ToUtf32("ctx")));
-        SetValueTypeName(ToUtf32("Node*"));
+        SetValueTypeName(ToUtf32("ConstantNode*"));
     }
     virtual void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData)
     {
@@ -99,7 +99,7 @@ public:
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
         if (matched)
         {
-            stack.push(std::unique_ptr<cmajor::parsing::Object>(new cmajor::parsing::ValueObject<Node*>(context->value)));
+            stack.push(std::unique_ptr<cmajor::parsing::Object>(new cmajor::parsing::ValueObject<ConstantNode*>(context->value)));
         }
         parsingData->PopContext(Id());
     }
@@ -178,7 +178,7 @@ private:
     {
         Context(): ctx(), value(), fromSpecifiers(), fromTypeExpr(), fromIdentifier(), fromExpression() {}
         ParsingContext* ctx;
-        Node* value;
+        ConstantNode* value;
         Specifiers fromSpecifiers;
         Node* fromTypeExpr;
         IdentifierNode* fromIdentifier;
@@ -189,10 +189,10 @@ private:
 void ConstantGrammar::GetReferencedGrammars()
 {
     cmajor::parsing::ParsingDomain* pd = GetParsingDomain();
-    cmajor::parsing::Grammar* grammar0 = pd->GetGrammar(ToUtf32("cmajor.parser.IdentifierGrammar"));
+    cmajor::parsing::Grammar* grammar0 = pd->GetGrammar(ToUtf32("cmajor.parser.TypeExprGrammar"));
     if (!grammar0)
     {
-        grammar0 = cmajor::parser::IdentifierGrammar::Create(pd);
+        grammar0 = cmajor::parser::TypeExprGrammar::Create(pd);
     }
     AddGrammarReference(grammar0);
     cmajor::parsing::Grammar* grammar1 = pd->GetGrammar(ToUtf32("cmajor.parser.SpecifierGrammar"));
@@ -201,10 +201,10 @@ void ConstantGrammar::GetReferencedGrammars()
         grammar1 = cmajor::parser::SpecifierGrammar::Create(pd);
     }
     AddGrammarReference(grammar1);
-    cmajor::parsing::Grammar* grammar2 = pd->GetGrammar(ToUtf32("cmajor.parser.TypeExprGrammar"));
+    cmajor::parsing::Grammar* grammar2 = pd->GetGrammar(ToUtf32("cmajor.parser.IdentifierGrammar"));
     if (!grammar2)
     {
-        grammar2 = cmajor::parser::TypeExprGrammar::Create(pd);
+        grammar2 = cmajor::parser::IdentifierGrammar::Create(pd);
     }
     AddGrammarReference(grammar2);
     cmajor::parsing::Grammar* grammar3 = pd->GetGrammar(ToUtf32("cmajor.parser.ExpressionGrammar"));

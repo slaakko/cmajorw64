@@ -21,7 +21,6 @@ namespace cmajor.parser
 
     grammar CompileUnitGrammar
     {
-        using stdlib.spaces_and_comments;
         using IdentifierGrammar.Identifier;
         using IdentifierGrammar.QualifiedId;
         using ConceptGrammar.Concept;
@@ -33,6 +32,7 @@ namespace cmajor.parser
         using ConstantGrammar.Constant;
         using DelegateGrammar.Delegate;
         using DelegateGrammar.ClassDelegate;
+        using stdlib.spaces_and_comments;
         skip spaces_and_comments;
         
         CompileUnit(ParsingContext* ctx) : CompileUnitNode*
@@ -87,7 +87,7 @@ namespace cmajor.parser
             ::= Typedef(ctx){ value = Typedef; }
             ;
 
-        ConceptDefinition(ParsingConcext* ctx) : ConceptNode*
+        ConceptDefinition(ParsingContext* ctx) : ConceptNode*
             ::= Concept(ctx){ value = Concept; }
             ;
 
