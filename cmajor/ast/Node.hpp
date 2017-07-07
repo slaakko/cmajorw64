@@ -34,7 +34,7 @@ enum class NodeType : uint8_t
     labelNode, compoundStatementNode, returnStatementNode, ifStatementNode, whileStatementNode, doStatementNode, forStatementNode, breakStatementNode, continueStatementNode,
     gotoStatementNode, constructionStatementNode, deleteStatementNode, destroyStatementNode, assignmentStatementNode, expressionStatementNode, emptyStatementNode, 
     incrementStatementNode, decrementStatementNode, rangeForStatementNode, switchStatementNode, caseStatementNode, defaultStatementNode, gotoCaseStatementNode, gotoDefaultStatementNode, 
-    throwStatementNode, catchNode, tryStatementNode,
+    throwStatementNode, catchNode, tryStatementNode, assertStatementNode,
     typedefNode, constantNode, enumTypeNode, enumConstantNode, parameterNode, templateParameterNode,
     constNode, lvalueRefNode, rvalueRefNode, pointerNode, arrayNode,
     dotNode, arrowNode, disjunctionNode, conjunctionNode, bitOrNode, bitXorNode, bitAndNode, equalNode, notEqualNode, lessNode, greaterNode, lessOrEqualNode, greaterOrEqualNode, shiftLeftNode, shiftRightNode,

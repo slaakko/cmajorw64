@@ -1258,10 +1258,10 @@ void CharacterInfo::Read(BinaryReader& reader)
 {
     binaryProperties = reader.ReadULong();
     generalCategory = static_cast<GeneralCategoryId>(reader.ReadUInt());
-    upper = reader.ReadChar();
-    lower = reader.ReadChar();
-    title = reader.ReadChar();
-    folding = reader.ReadChar();
+    upper = reader.ReadUChar();
+    lower = reader.ReadUChar();
+    title = reader.ReadUChar();
+    folding = reader.ReadUChar();
     block = static_cast<BlockId>(reader.ReadUShort());
     age = static_cast<AgeId>(reader.ReadByte());
     script = static_cast<ScriptId>(reader.ReadByte());
@@ -1635,22 +1635,22 @@ void ExtendedCharacterInfo::Read(BinaryReader& reader)
     uint8_t nu = reader.ReadByte();
     for (uint8_t i = 0; i < nu; ++i)
     {
-        fullUpper.append(1, reader.ReadChar());
+        fullUpper.append(1, reader.ReadUChar());
     }
     uint8_t nl = reader.ReadByte();
     for (uint8_t i = 0; i < nl; ++i)
     {
-        fullLower.append(1, reader.ReadChar());
+        fullLower.append(1, reader.ReadUChar());
     }
     uint8_t nt = reader.ReadByte();
     for (uint8_t i = 0; i < nt; ++i)
     {
-        fullTitle.append(1, reader.ReadChar());
+        fullTitle.append(1, reader.ReadUChar());
     }
     uint8_t nf = reader.ReadByte();
     for (uint8_t i = 0; i < nf; ++i)
     {
-        fullFolding.append(1, reader.ReadChar());
+        fullFolding.append(1, reader.ReadUChar());
     }
     bidiClass = static_cast<BidiClassId>(reader.ReadByte());
     numericType = static_cast<NumericTypeId>(reader.ReadByte());
@@ -1662,9 +1662,9 @@ void ExtendedCharacterInfo::Read(BinaryReader& reader)
         alias.Read(reader);
         aliases.push_back(alias);
     }
-    bidiMirroringGlyph = reader.ReadChar();
+    bidiMirroringGlyph = reader.ReadUChar();
     bidiPairedBracketType = static_cast<BidiPairedBracketTypeId>(reader.ReadByte());
-    bidiPairedBracket = reader.ReadChar();
+    bidiPairedBracket = reader.ReadUChar();
 }
 
 CharacterInfoPage::CharacterInfoPage()

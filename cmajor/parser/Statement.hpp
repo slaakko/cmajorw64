@@ -1,5 +1,5 @@
-#ifndef Statement_hpp_21397
-#define Statement_hpp_21397
+#ifndef Statement_hpp_3790
+#define Statement_hpp_3790
 
 #include <cmajor/parsing/Grammar.hpp>
 #include <cmajor/parsing/Keyword.hpp>
@@ -55,8 +55,9 @@ private:
     class ThrowStatementRule;
     class TryStatementRule;
     class CatchRule;
+    class AssertStatementRule;
 };
 
 } } // namespace cmajor.parser
 
-#endif // Statement_hpp_21397
+#endif // Statement_hpp_3790

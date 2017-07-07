@@ -15,7 +15,7 @@ std::string CmajorRootDir()
     char* e = getenv("CMAJOR_ROOT");
     if (e == nullptr || !*e)
     {
-        throw std::runtime_error("CMAJOR_ROOT environment variable not set");
+        throw std::runtime_error("please set 'CMAJOR_ROOT' environment variable to contain /path/to/cmajorw64/cmajor directory.");
     }
     return std::string(e);
 }
@@ -58,6 +58,13 @@ Project::Project(const std::u32string& name_, const std::string& filePath_, cons
     lfp /= fn;
     lfp.replace_extension(".cml");
     libraryFilePath = GetFullPath(lfp.generic_string());
+    boost::filesystem::path efp(filePath);
+    efp.remove_filename();
+    efp /= "bin";
+    efp /= config;
+    efp /= fn;
+    efp.replace_extension(".exe");
+    executableFilePath = GetFullPath(efp.generic_string());
 }
 
 void Project::AddDeclaration(ProjectDeclaration* declaration)

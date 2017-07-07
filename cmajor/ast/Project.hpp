@@ -59,6 +59,8 @@ public:
     const boost::filesystem::path& BasePath() const { return basePath; }
     void AddDeclaration(ProjectDeclaration* declaration);
     void ResolveDeclarations();
+    const std::string& LibraryFilePath() const { return libraryFilePath; }
+    const std::string& ExecutableFilePath() const { return executableFilePath; }
     const std::vector<std::string>& References() const { return references; }
     const std::vector<std::string>& SourceFilePaths() const { return sourceFilePaths; }
     Target GetTarget() const { return target; }
@@ -72,6 +74,7 @@ private:
     boost::filesystem::path systemLibDir;
     std::vector<std::unique_ptr<ProjectDeclaration>> declarations;
     std::string libraryFilePath;
+    std::string executableFilePath;
     std::vector<std::string> references;
     std::vector<std::string> sourceFilePaths;
 };

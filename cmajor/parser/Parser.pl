@@ -217,6 +217,7 @@ namespace cmajor.parser
         ThrowStatement(ParsingContext* ctx): StatementNode*;
         TryStatement(ParsingContext* ctx): TryStatementNode*;
         Catch(ParsingContext* ctx): CatchNode*;
+        AssertStatement(ParsingContext* ctx): StatementNode*;
     }
     grammar TemplateGrammar
     {

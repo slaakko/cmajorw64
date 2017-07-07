@@ -36,6 +36,7 @@ namespace cmajor.parser
             |   EmptyStatement(ctx){ value = EmptyStatement; }
             |   ThrowStatement(ctx){ value = ThrowStatement; }
             |   TryStatement(ctx){ value = TryStatement; }
+            |   AssertStatement(ctx){ value = AssertStatement; }
             ;
 
         LabelId : std::u32string
@@ -221,5 +222,10 @@ namespace cmajor.parser
         Catch(ParsingContext* ctx) : CatchNode*
             ::= (keyword("catch") '('! TypeExpr(ctx)! Identifier! ')'! CompoundStatement(ctx):catchBlock){ value = new CatchNode(span, TypeExpr, Identifier, catchBlock); }
             ;
-    }
+
+        AssertStatement(ParsingContext* ctx) : StatementNode*
+            ::= ('#' keyword("assert") Expression(ctx)! ';'!){ value = new AssertStatementNode(span, Expression); }
+            ;
+
+}
 }

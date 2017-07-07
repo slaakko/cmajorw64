@@ -456,6 +456,20 @@ private:
     NodeList<CatchNode> catches;
 };
 
+class AssertStatementNode : public StatementNode
+{
+public:
+    AssertStatementNode(const Span& span_);
+    AssertStatementNode(const Span& span_, Node* assertExpr_);
+    Node* Clone(CloneContext& cloneContext) const override;
+    void Accept(Visitor& visitor) override;
+    void Write(AstWriter& writer) override;
+    void Read(AstReader& reader) override;
+    const Node* AssertExpr() { return assertExpr.get(); }
+private:
+    std::unique_ptr<Node> assertExpr;
+};
+
 } } // namespace cmajor::ast
 
 #endif // CMAJOR_AST_STATEMENT_INCLUDED

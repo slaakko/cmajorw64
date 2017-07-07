@@ -19,10 +19,16 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="GlobalFlags.hpp" />
+    <ClInclude Include="InitDone.hpp" />
     <ClInclude Include="Symbol.hpp" />
+    <ClInclude Include="Warning.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="GlobalFlags.cpp" />
+    <ClCompile Include="InitDone.cpp" />
     <ClCompile Include="Symbol.cpp" />
+    <ClCompile Include="Warning.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>

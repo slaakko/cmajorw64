@@ -40,7 +40,7 @@ const char* nodeTypeStr[] =
     "labelNode", "compoundStatementNode", "returnStatementNode", "ifStatementNode", "whileStatementNode", "doStatementNode", "forStatementNode", "breakStatementNode", "continueStatementNode",
     "gotoStatementNode", "constructionStatementNode", "deleteStatementNode", "destroyStatementNode", "assignmentStatementNode", "expressionStatementNode", "emptyStatementNode", 
     "incrementStatementNode", "decrementStatementNode", "rangeForStatementNode", "switchStatementNode", "caseStatementNode", "defaultStatementNode", "gotoCaseStatementNode", 
-    "gotoDefaultStatementNode", "throwStatementNode", "catchNode", "tryStatementNode",
+    "gotoDefaultStatementNode", "throwStatementNode", "catchNode", "tryStatementNode", "assertStatementNode",
     "typedefNode", "constantNode", "enumTypeNode", "enumConstantNode", "parameterNode", "templateParameterNode",
     "constNode", "refNode", "arrayNode",
     "dotNode", "arrowNode", "disjunctionNode", "conjunctionNode", "bitOrNode", "bitXorNode", "bitAndNode", "equalNode", "notEqualNode", "lessNode", "greaterNode", 
@@ -226,6 +226,7 @@ NodeFactory::NodeFactory()
     Register(NodeType::throwStatementNode, new ConcreteNodeCreator<ThrowStatementNode>());
     Register(NodeType::catchNode, new ConcreteNodeCreator<CatchNode>());
     Register(NodeType::tryStatementNode, new ConcreteNodeCreator<TryStatementNode>());
+    Register(NodeType::assertStatementNode, new ConcreteNodeCreator<AssertStatementNode>());
 
     Register(NodeType::typedefNode, new ConcreteNodeCreator<TypedefNode>());
     Register(NodeType::constantNode, new ConcreteNodeCreator<ConstantNode>());

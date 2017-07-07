@@ -1,0 +1,4 @@
+project System.Base;
+target=library;
+source <Algorithm.cm>;
+source <Utility.cm>;

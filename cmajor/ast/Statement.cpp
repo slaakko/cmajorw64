@@ -1122,4 +1122,38 @@ void TryStatementNode::AddCatch(CatchNode* catch_)
     catches.Add(catch_);
 }
 
+AssertStatementNode::AssertStatementNode(const Span& span_) : StatementNode(NodeType::assertStatementNode, span_), assertExpr()
+{
+}
+
+AssertStatementNode::AssertStatementNode(const Span& span_, Node* assertExpr_) : StatementNode(NodeType::assertStatementNode, span_), assertExpr(assertExpr_)
+{
+    assertExpr->SetParent(this);
+}
+
+Node* AssertStatementNode::Clone(CloneContext& cloneContext) const 
+{
+    AssertStatementNode* clone = new AssertStatementNode(GetSpan(), assertExpr->Clone(cloneContext));
+    CloneLabelTo(clone, cloneContext);
+    return clone;
+}
+
+void AssertStatementNode::Accept(Visitor& visitor)
+{
+    visitor.Visit(*this);
+}
+
+void AssertStatementNode::Write(AstWriter& writer)
+{
+    StatementNode::Write(writer);
+    writer.Write(assertExpr.get());
+}
+
+void AssertStatementNode::Read(AstReader& reader)
+{
+    StatementNode::Read(reader);
+    assertExpr.reset(reader.ReadNode());
+    assertExpr->SetParent(this);
+}
+
 } } // namespace cmajor::ast
