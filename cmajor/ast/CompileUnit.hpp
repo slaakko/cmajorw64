@@ -17,7 +17,8 @@ public:
     Node* Clone(CloneContext& cloneContext) const override;
     void Accept(Visitor& visitor) override;
     const std::string& FilePath() const { return filePath; }
-    NamespaceNode* GlobalNs() const { return globalNs.get(); }
+    const NamespaceNode* GlobalNs() const { return globalNs.get(); }
+    NamespaceNode* GlobalNs() { return globalNs.get(); }
 private:
     std::string filePath;
     std::unique_ptr<NamespaceNode> globalNs;

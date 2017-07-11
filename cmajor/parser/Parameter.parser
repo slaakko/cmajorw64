@@ -22,7 +22,7 @@ namespace cmajor.parser
             ;
 
         Parameter(ParsingContext* ctx) : ParameterNode*
-            ::= (TypeExpr(ctx) Identifier){ value = new ParameterNode(span, TypeExpr, Identifier); }
+            ::= (TypeExpr(ctx) Identifier?){ value = new ParameterNode(span, TypeExpr, Identifier); }
             ;
     }
 }

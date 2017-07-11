@@ -1,5 +1,5 @@
-#ifndef Template_hpp_21397
-#define Template_hpp_21397
+#ifndef Template_hpp_25640
+#define Template_hpp_25640
 
 #include <cmajor/parsing/Grammar.hpp>
 #include <cmajor/parsing/Keyword.hpp>
@@ -26,4 +26,4 @@ private:
 
 } } // namespace cmajor.parser
 
-#endif // Template_hpp_21397
+#endif // Template_hpp_25640

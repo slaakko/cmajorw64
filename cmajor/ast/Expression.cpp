@@ -81,6 +81,42 @@ void ArrowNode::Read(AstReader& reader)
     memberId->SetParent(this);
 }
 
+EquivalenceNode::EquivalenceNode(const Span& span_) : BinaryNode(NodeType::equivalenceNode, span_)
+{
+}
+
+EquivalenceNode::EquivalenceNode(const Span& span_, Node* left_, Node* right_) : BinaryNode(NodeType::equivalenceNode, span_, left_, right_)
+{
+}
+
+Node* EquivalenceNode::Clone(CloneContext& cloneContext) const
+{
+    return new EquivalenceNode(GetSpan(), Left()->Clone(cloneContext), Right()->Clone(cloneContext));
+}
+
+void EquivalenceNode::Accept(Visitor& visitor)
+{
+    visitor.Visit(*this);
+}
+
+ImplicationNode::ImplicationNode(const Span& span_) : BinaryNode(NodeType::implicationNode, span_)
+{
+}
+
+ImplicationNode::ImplicationNode(const Span& span_, Node* left_, Node* right_) : BinaryNode(NodeType::implicationNode, span_, left_, right_)
+{
+}
+
+Node* ImplicationNode::Clone(CloneContext& cloneContext) const
+{
+    return new ImplicationNode(GetSpan(), Left()->Clone(cloneContext), Right()->Clone(cloneContext));
+}
+
+void ImplicationNode::Accept(Visitor& visitor)
+{
+    visitor.Visit(*this);
+}
+
 DisjunctionNode::DisjunctionNode(const Span& span_) : BinaryNode(NodeType::disjunctionNode, span_)
 {
 }
@@ -501,6 +537,70 @@ void UnaryMinusNode::Read(AstReader& reader)
     subject->SetParent(this);
 }
 
+PrefixIncrementNode::PrefixIncrementNode(const Span& span_) : Node(NodeType::prefixIncrementNode, span_), subject()
+{
+}
+
+PrefixIncrementNode::PrefixIncrementNode(const Span& span_, Node* subject_) : Node(NodeType::prefixIncrementNode, span_), subject(subject_)
+{
+    subject->SetParent(this);
+}
+
+Node* PrefixIncrementNode::Clone(CloneContext& cloneContext) const
+{
+    return new PrefixIncrementNode(GetSpan(), subject->Clone(cloneContext));
+}
+
+void PrefixIncrementNode::Accept(Visitor& visitor)
+{
+    visitor.Visit(*this);
+}
+
+void PrefixIncrementNode::Write(AstWriter& writer)
+{
+    Node::Write(writer);
+    writer.Write(subject.get());
+}
+
+void PrefixIncrementNode::Read(AstReader& reader)
+{
+    Node::Read(reader);
+    subject.reset(reader.ReadNode());
+    subject->SetParent(this);
+}
+
+PrefixDecrementNode::PrefixDecrementNode(const Span& span_) : Node(NodeType::prefixDecrementNode, span_), subject()
+{
+}
+
+PrefixDecrementNode::PrefixDecrementNode(const Span& span_, Node* subject_) : Node(NodeType::prefixDecrementNode, span_), subject(subject_)
+{
+    subject->SetParent(this);
+}
+
+Node* PrefixDecrementNode::Clone(CloneContext& cloneContext) const
+{
+    return new PrefixDecrementNode(GetSpan(), subject->Clone(cloneContext));
+}
+
+void PrefixDecrementNode::Accept(Visitor& visitor)
+{
+    visitor.Visit(*this);
+}
+
+void PrefixDecrementNode::Write(AstWriter& writer)
+{
+    Node::Write(writer);
+    writer.Write(subject.get());
+}
+
+void PrefixDecrementNode::Read(AstReader& reader)
+{
+    Node::Read(reader);
+    subject.reset(reader.ReadNode());
+    subject->SetParent(this);
+}
+
 ComplementNode::ComplementNode(const Span& span_) : Node(NodeType::complementNode, span_), subject()
 {
 }
@@ -751,6 +851,70 @@ void InvokeNode::AddArgument(Node* argument)
 {
     argument->SetParent(this);
     arguments.Add(argument);
+}
+
+PostfixIncrementNode::PostfixIncrementNode(const Span& span_) : Node(NodeType::postfixIncrementNode, span_), subject()
+{
+}
+
+PostfixIncrementNode::PostfixIncrementNode(const Span& span_, Node* subject_) : Node(NodeType::postfixIncrementNode, span_), subject(subject_)
+{
+    subject->SetParent(this);
+}
+
+Node* PostfixIncrementNode::Clone(CloneContext& cloneContext) const
+{
+    return new PostfixIncrementNode(GetSpan(), subject->Clone(cloneContext));
+}
+
+void PostfixIncrementNode::Accept(Visitor& visitor)
+{
+    visitor.Visit(*this);
+}
+
+void PostfixIncrementNode::Write(AstWriter& writer)
+{
+    Node::Write(writer);
+    writer.Write(subject.get());
+}
+
+void PostfixIncrementNode::Read(AstReader& reader)
+{
+    Node::Read(reader);
+    subject.reset(reader.ReadNode());
+    subject->SetParent(this);
+}
+
+PostfixDecrementNode::PostfixDecrementNode(const Span& span_) : Node(NodeType::postfixDecrementNode, span_), subject()
+{
+}
+
+PostfixDecrementNode::PostfixDecrementNode(const Span& span_, Node* subject_) : Node(NodeType::postfixDecrementNode, span_), subject(subject_)
+{
+    subject->SetParent(this);
+}
+
+Node* PostfixDecrementNode::Clone(CloneContext& cloneContext) const
+{
+    return new PostfixDecrementNode(GetSpan(), subject->Clone(cloneContext));
+}
+
+void PostfixDecrementNode::Accept(Visitor& visitor)
+{
+    visitor.Visit(*this);
+}
+
+void PostfixDecrementNode::Write(AstWriter& writer)
+{
+    Node::Write(writer);
+    writer.Write(subject.get());
+}
+
+void PostfixDecrementNode::Read(AstReader& reader)
+{
+    Node::Read(reader);
+    subject.reset(reader.ReadNode());
+    subject->SetParent(this);
 }
 
 SizeOfNode::SizeOfNode(const Span& span_) : Node(NodeType::sizeOfNode, span_), expression()

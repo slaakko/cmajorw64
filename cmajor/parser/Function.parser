@@ -48,6 +48,8 @@ namespace cmajor.parser
             |   '='{ value = ToUtf32("operator="); }
             |   '<'{ value = ToUtf32("operator<"); }
             |   "->"{ value = ToUtf32("operator->"); }
+            |   "++"{ value = ToUtf32("operator++"); }
+            |   "--"{ value = ToUtf32("operator--"); }
             |   '+'{ value = ToUtf32("operator+"); }
             |   '-'{ value = ToUtf32("operator-"); }
             |   '*'{ value = ToUtf32("operator*"); }

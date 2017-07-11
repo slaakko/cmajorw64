@@ -9,6 +9,8 @@ namespace cmajor.parser
     grammar ExpressionGrammar
     {
         Expression(ParsingContext* ctx): Node*;
+        Equivalence(ParsingContext* ctx, var std::unique_ptr<Node> expr, var Span s): Node*;
+        Implication(ParsingContext* ctx, var std::unique_ptr<Node> expr, var Span s): Node*;
         Disjunction(ParsingContext* ctx, var std::unique_ptr<Node> expr, var Span s): Node*;
         Conjunction(ParsingContext* ctx, var std::unique_ptr<Node> expr, var Span s): Node*;
         BitOr(ParsingContext* ctx, var std::unique_ptr<Node> expr, var Span s): Node*;
@@ -48,6 +50,7 @@ namespace cmajor.parser
         ClassMember(ParsingContext* ctx, ClassNode* classNode): Node*;
         StaticConstructor(ParsingContext* ctx, ClassNode* classNode, var std::unique_ptr<IdentifierNode> id): StaticConstructorNode*;
         Constructor(ParsingContext* ctx, ClassNode* classNode, var std::unique_ptr<IdentifierNode> id, var std::unique_ptr<ConstructorNode> ctor): Node*;
+        Destructor(ParsingContext* ctx, ClassNode* classNode, var std::unique_ptr<IdentifierNode> id, var std::unique_ptr<DestructorNode> dtor): Node*;
         Initializer(ParsingContext* ctx): InitializerNode*;
         MemberFunction(ParsingContext* ctx, ClassNode* classNode, var std::unique_ptr<MemberFunctionNode> memFun, var std::unique_ptr<IdentifierNode> qid): Node*;
         MemberVariable(ParsingContext* ctx): Node*;
@@ -208,10 +211,6 @@ namespace cmajor.parser
         ConstructionStatement(ParsingContext* ctx): ConstructionStatementNode*;
         DeleteStatement(ParsingContext* ctx): StatementNode*;
         DestroyStatement(ParsingContext* ctx): StatementNode*;
-        IncrementStatementExpr(ParsingContext* ctx, var std::unique_ptr<Node> expr): StatementNode*;
-        IncrementStatement(ParsingContext* ctx): StatementNode*;
-        DecrementStatementExpr(ParsingContext* ctx, var std::unique_ptr<Node> expr): StatementNode*;
-        DecrementStatement(ParsingContext* ctx): StatementNode*;
         ExpressionStatement(ParsingContext* ctx, var std::unique_ptr<Node> expr): StatementNode*;
         EmptyStatement(ParsingContext* ctx): StatementNode*;
         ThrowStatement(ParsingContext* ctx): StatementNode*;

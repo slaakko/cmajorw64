@@ -1,5 +1,5 @@
-#ifndef Class_hpp_21397
-#define Class_hpp_21397
+#ifndef Class_hpp_30082
+#define Class_hpp_30082
 
 #include <cmajor/parsing/Grammar.hpp>
 #include <cmajor/parsing/Keyword.hpp>
@@ -26,6 +26,7 @@ private:
     class ClassMemberRule;
     class StaticConstructorRule;
     class ConstructorRule;
+    class DestructorRule;
     class InitializerRule;
     class MemberFunctionRule;
     class MemberVariableRule;
@@ -33,4 +34,4 @@ private:
 
 } } // namespace cmajor.parser
 
-#endif // Class_hpp_21397
+#endif // Class_hpp_30082

@@ -23,6 +23,7 @@ public:
     void Read(AstReader& reader) override;
     Specifiers GetSpecifiers() const { return specifiers; }
     const Node* TypeExpr() const { return typeExpr.get(); }
+    Node* TypeExpr() { return typeExpr.get(); }
     const IdentifierNode* Id() const { return id.get(); }
     const Node* Value() const { return value.get(); }
 private:

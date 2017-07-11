@@ -85,7 +85,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <DisableSpecificWarnings>4267;4146;4996</DisableSpecificWarnings>
-      <AdditionalIncludeDirectories>../..;C:\Programming\boost_1_64_0</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../..;C:\Programming\boost_1_64_0;C:\Programming\llvm-4.0.0.src\include;C:\Programming\llvm-4.0.0.src\build\include</AdditionalIncludeDirectories>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Link>
@@ -100,7 +100,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <DisableSpecificWarnings>4267;4146;4996</DisableSpecificWarnings>
-      <AdditionalIncludeDirectories>../..;C:\Programming\boost_1_64_0</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../..;C:\Programming\boost_1_64_0;C:\Programming\llvm-4.0.0.src\include;C:\Programming\llvm-4.0.0.src\build\include</AdditionalIncludeDirectories>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Link>
@@ -117,7 +117,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <DisableSpecificWarnings>4267;4146;4996</DisableSpecificWarnings>
-      <AdditionalIncludeDirectories>../..;C:\Programming\boost_1_64_0</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../..;C:\Programming\boost_1_64_0;C:\Programming\llvm-4.0.0.src\include;C:\Programming\llvm-4.0.0.src\build\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -135,7 +135,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <DisableSpecificWarnings>4267;4146;4996</DisableSpecificWarnings>
-      <AdditionalIncludeDirectories>../..;C:\Programming\boost_1_64_0</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../..;C:\Programming\boost_1_64_0;C:\Programming\llvm-4.0.0.src\include;C:\Programming\llvm-4.0.0.src\build\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

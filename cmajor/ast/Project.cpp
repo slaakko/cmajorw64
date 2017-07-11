@@ -29,19 +29,23 @@ std::string GetSystemLibDir(const std::string& config)
     return GetFullPath(sad.generic_string());
 }
 
+ProjectDeclaration::ProjectDeclaration(ProjectDeclarationType declarationType_) : declarationType(declarationType_)
+{
+}
+
 ProjectDeclaration::~ProjectDeclaration()
 {
 }
 
-ReferenceDeclaration::ReferenceDeclaration(const std::string& filePath_) : filePath(filePath_)
+ReferenceDeclaration::ReferenceDeclaration(const std::string& filePath_) : ProjectDeclaration(ProjectDeclarationType::referenceDeclaration), filePath(filePath_)
 {
 }
 
-SourceFileDeclaration::SourceFileDeclaration(const std::string& filePath_) : filePath(filePath_)
+SourceFileDeclaration::SourceFileDeclaration(const std::string& filePath_) : ProjectDeclaration(ProjectDeclarationType::sourceFileDeclaration), filePath(filePath_)
 {
 }
 
-TargetDeclaration::TargetDeclaration(Target target_) : target(target_)
+TargetDeclaration::TargetDeclaration(Target target_) : ProjectDeclaration(ProjectDeclarationType::targetDeclaration), target(target_)
 {
 }
 
@@ -50,13 +54,16 @@ Project::Project(const std::u32string& name_, const std::string& filePath_, cons
 {
     basePath.remove_filename();
     systemLibDir = GetSystemLibDir(config);
-    boost::filesystem::path lfp(filePath);
-    boost::filesystem::path fn = lfp.filename();
-    lfp.remove_filename();
-    lfp /= "lib";
-    lfp /= config;
-    lfp /= fn;
-    lfp.replace_extension(".cml");
+    boost::filesystem::path mfp(filePath);
+    boost::filesystem::path fn = mfp.filename();
+    mfp.remove_filename();
+    mfp /= "lib";
+    mfp /= config;
+    mfp /= fn;
+    mfp.replace_extension(".cmm");
+    moduleFilePath = GetFullPath(mfp.generic_string());
+    boost::filesystem::path lfp(mfp);
+    lfp.replace_extension(".lib");
     libraryFilePath = GetFullPath(lfp.generic_string());
     boost::filesystem::path efp(filePath);
     efp.remove_filename();
@@ -76,85 +83,94 @@ void Project::ResolveDeclarations()
 {
     for (const std::unique_ptr<ProjectDeclaration>& declaration : declarations)
     {
-        if (ReferenceDeclaration* reference = dynamic_cast<ReferenceDeclaration*>(declaration.get()))
+        switch (declaration->GetDeclarationType())
         {
-            boost::filesystem::path rp(reference->FilePath());
-            boost::filesystem::path fn = rp.filename();
-            rp.remove_filename();
-            if (rp.is_relative())
+            case ProjectDeclarationType::referenceDeclaration:
             {
-                rp = systemLibDir / rp;
-            }
-            rp /= fn;
-            if (rp.extension() == ".cmp")
-            {
-                rp.replace_extension(".cml");
-            }
-            if (rp.extension() != ".cml")
-            {
-                throw std::runtime_error("invalid reference path extension '" + rp.generic_string() + "' (not .cmp or .cml)");
-            }
-            if (!boost::filesystem::exists(rp))
-            {
-                rp = reference->FilePath();
+                ReferenceDeclaration* reference = static_cast<ReferenceDeclaration*>(declaration.get());
+                boost::filesystem::path rp(reference->FilePath());
+                boost::filesystem::path fn = rp.filename();
                 rp.remove_filename();
                 if (rp.is_relative())
                 {
-                    rp = basePath / rp;
+                    rp = systemLibDir / rp;
                 }
-                rp /= "lib";
-                rp /= config;
                 rp /= fn;
                 if (rp.extension() == ".cmp")
                 {
-                    rp.replace_extension(".cml");
+                    rp.replace_extension(".cmm");
                 }
-                if (rp.extension() != ".cml")
+                if (rp.extension() != ".cmm")
                 {
-                    throw std::runtime_error("invalid reference path extension '" + rp.generic_string() + "' (not .cmp or .cml)");
+                    throw std::runtime_error("invalid reference path extension '" + rp.generic_string() + "' (not .cmp or .cmm)");
                 }
+                if (!boost::filesystem::exists(rp))
+                {
+                    rp = reference->FilePath();
+                    rp.remove_filename();
+                    if (rp.is_relative())
+                    {
+                        rp = basePath / rp;
+                    }
+                    rp /= "lib";
+                    rp /= config;
+                    rp /= fn;
+                    if (rp.extension() == ".cmp")
+                    {
+                        rp.replace_extension(".cmm");
+                    }
+                    if (rp.extension() != ".cmm")
+                    {
+                        throw std::runtime_error("invalid reference path extension '" + rp.generic_string() + "' (not .cmp or .cmm)");
+                    }
+                }
+                std::string referencePath = GetFullPath(rp.generic_string());
+                if (std::find(references.cbegin(), references.cend(), referencePath) == references.cend())
+                {
+                    references.push_back(referencePath);
+                }
+                break;
             }
-            std::string referencePath = GetFullPath(rp.generic_string());
-            if (std::find(references.cbegin(), references.cend(), referencePath) == references.cend())
+            case ProjectDeclarationType::sourceFileDeclaration:
             {
-                references.push_back(referencePath);
+                SourceFileDeclaration* sourceFileDeclaration = static_cast<SourceFileDeclaration*>(declaration.get());
+                boost::filesystem::path sfp(sourceFileDeclaration->FilePath());
+                if (sfp.is_relative())
+                {
+                    sfp = basePath / sfp;
+                }
+                if (sfp.extension() != ".cm")
+                {
+                    throw std::runtime_error("invalid source file extension '" + sfp.generic_string() + "' (not .cm)");
+                }
+                if (!boost::filesystem::exists(sfp))
+                {
+                    throw std::runtime_error("source file path '" + GetFullPath(sfp.generic_string()) + "' not found");
+                }
+                std::string sourceFilePath = GetFullPath(sfp.generic_string());
+                if (std::find(sourceFilePaths.cbegin(), sourceFilePaths.cend(), sourceFilePath) == sourceFilePaths.cend())
+                {
+                    sourceFilePaths.push_back(sourceFilePath);
+                }
+                break;
             }
-        }
-        else if (SourceFileDeclaration* sourceFileDeclaration = dynamic_cast<SourceFileDeclaration*>(declaration.get()))
-        {
-            boost::filesystem::path sfp(sourceFileDeclaration->FilePath());
-            if (sfp.is_relative())
+            case ProjectDeclarationType::targetDeclaration:
             {
-                sfp = basePath / sfp;
+                TargetDeclaration* targetDeclaration = static_cast<TargetDeclaration*>(declaration.get());
+                target = targetDeclaration->GetTarget();
+                break;
             }
-            if (sfp.extension() != ".cm")
+            default:
             {
-                throw std::runtime_error("invalid source file extension '" + sfp.generic_string() + "' (not .cm)");
+                throw std::runtime_error("unknown project declaration");
             }
-            if (!boost::filesystem::exists(sfp))
-            {
-                throw std::runtime_error("source file path '" + GetFullPath(sfp.generic_string()) + "' not found");
-            }
-            std::string sourceFilePath = GetFullPath(sfp.generic_string());
-            if (std::find(sourceFilePaths.cbegin(), sourceFilePaths.cend(), sourceFilePath) == sourceFilePaths.cend())
-            {
-                sourceFilePaths.push_back(sourceFilePath);
-            }
-        }
-        else if (TargetDeclaration* targetDeclaration = dynamic_cast<TargetDeclaration*>(declaration.get()))
-        {
-            target = targetDeclaration->GetTarget();
-        }
-        else
-        {
-            throw std::runtime_error("unknown project declaration");
         }
     }
 }
 
 bool Project::DependsOn(Project* that) const
 {
-    return std::find(references.cbegin(), references.cend(), that->libraryFilePath) != references.cend();
+    return std::find(references.cbegin(), references.cend(), that->moduleFilePath) != references.cend();
 }
 
 } } // namespace cmajor::ast

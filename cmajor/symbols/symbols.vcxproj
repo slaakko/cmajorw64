@@ -19,15 +19,57 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="BasicTypeSymbol.hpp" />
+    <ClInclude Include="ClassTypeSymbol.hpp" />
+    <ClInclude Include="ConstantSymbol.hpp" />
+    <ClInclude Include="ContainerSymbol.hpp" />
+    <ClInclude Include="DelegateSymbol.hpp" />
+    <ClInclude Include="DerivedTypeSymbol.hpp" />
+    <ClInclude Include="EnumSymbol.hpp" />
+    <ClInclude Include="Exception.hpp" />
+    <ClInclude Include="FunctionSymbol.hpp" />
     <ClInclude Include="GlobalFlags.hpp" />
     <ClInclude Include="InitDone.hpp" />
+    <ClInclude Include="InterfaceTypeSymbol.hpp" />
+    <ClInclude Include="Module.hpp" />
+    <ClInclude Include="NamespaceSymbol.hpp" />
+    <ClInclude Include="Scope.hpp" />
     <ClInclude Include="Symbol.hpp" />
+    <ClInclude Include="SymbolCreatorVisitor.hpp" />
+    <ClInclude Include="SymbolReader.hpp" />
+    <ClInclude Include="SymbolTable.hpp" />
+    <ClInclude Include="SymbolWriter.hpp" />
+    <ClInclude Include="TypedefSymbol.hpp" />
+    <ClInclude Include="TypeSymbol.hpp" />
+    <ClInclude Include="Value.hpp" />
+    <ClInclude Include="VariableSymbol.hpp" />
     <ClInclude Include="Warning.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="BasicTypeSymbol.cpp" />
+    <ClCompile Include="ClassTypeSymbol.cpp" />
+    <ClCompile Include="ConstantSymbol.cpp" />
+    <ClCompile Include="ContainerSymbol.cpp" />
+    <ClCompile Include="DelegateSymbol.cpp" />
+    <ClCompile Include="DerivedTypeSymbol.cpp" />
+    <ClCompile Include="EnumSymbol.cpp" />
+    <ClCompile Include="Exception.cpp" />
+    <ClCompile Include="FunctionSymbol.cpp" />
     <ClCompile Include="GlobalFlags.cpp" />
     <ClCompile Include="InitDone.cpp" />
+    <ClCompile Include="InterfaceTypeSymbol.cpp" />
+    <ClCompile Include="Module.cpp" />
+    <ClCompile Include="NamespaceSymbol.cpp" />
+    <ClCompile Include="Scope.cpp" />
     <ClCompile Include="Symbol.cpp" />
+    <ClCompile Include="SymbolCreatorVisitor.cpp" />
+    <ClCompile Include="SymbolReader.cpp" />
+    <ClCompile Include="SymbolTable.cpp" />
+    <ClCompile Include="SymbolWriter.cpp" />
+    <ClCompile Include="TypedefSymbol.cpp" />
+    <ClCompile Include="TypeSymbol.cpp" />
+    <ClCompile Include="Value.cpp" />
+    <ClCompile Include="VariableSymbol.cpp" />
     <ClCompile Include="Warning.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
@@ -90,8 +132,9 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>../..;C:\Programming\boost_1_64_0</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../..;C:\Programming\boost_1_64_0;C:\Programming\llvm-4.0.0.src\include;C:\Programming\llvm-4.0.0.src\build\include</AdditionalIncludeDirectories>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DisableSpecificWarnings>4267;4146;4996</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -104,8 +147,9 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>../..;C:\Programming\boost_1_64_0</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../..;C:\Programming\boost_1_64_0;C:\Programming\llvm-4.0.0.src\include;C:\Programming\llvm-4.0.0.src\build\include</AdditionalIncludeDirectories>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DisableSpecificWarnings>4267;4146;4996</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -120,7 +164,8 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>../..;C:\Programming\boost_1_64_0</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../..;C:\Programming\boost_1_64_0;C:\Programming\llvm-4.0.0.src\include;C:\Programming\llvm-4.0.0.src\build\include</AdditionalIncludeDirectories>
+      <DisableSpecificWarnings>4267;4146;4996</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -137,7 +182,8 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>../..;C:\Programming\boost_1_64_0</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../..;C:\Programming\boost_1_64_0;C:\Programming\llvm-4.0.0.src\include;C:\Programming\llvm-4.0.0.src\build\include</AdditionalIncludeDirectories>
+      <DisableSpecificWarnings>4267;4146;4996</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

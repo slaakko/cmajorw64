@@ -19,10 +19,17 @@ namespace cmajor.parser
         using TypeExprGrammar.TypeExpr;
 
         TemplateId(ParsingContext* ctx, var std::unique_ptr<TemplateIdNode> templateId) : Node*
-            ::= (QualifiedId:primary{ templateId.reset(new TemplateIdNode(span, primary)); }
+            ::= empty{ ctx->BeginParsingTemplateId(); }
+                (QualifiedId:primary{ templateId.reset(new TemplateIdNode(span, primary)); }
                 '<' (TypeExpr(ctx):templateArg{ templateId->AddTemplateArgument(templateArg); } % ',') '>')
             {
+                ctx->EndParsingTemplateId();
                 value = templateId.release();
+                value->GetSpan().SetEnd(span.End());
+            }
+            /
+            {
+                ctx->EndParsingTemplateId();
             }
             ;
 

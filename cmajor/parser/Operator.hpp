@@ -11,7 +11,7 @@ namespace cmajor { namespace parser {
 
 enum class Operator : uint8_t
 {
-    or_, and_, eq, neq, less, greater, lessOrEq, greaterOrEq, is, as, plus, minus, mul, div, rem, not_, bitOr, bitXor, bitAnd, shiftLeft, shiftRight, complement, deref, addrOf
+    or_, and_, eq, neq, less, greater, lessOrEq, greaterOrEq, is, as, plusplus, minusminus, plus, minus, mul, div, rem, not_, bitOr, bitXor, bitAnd, shiftLeft, shiftRight, complement, deref, addrOf
 };
 
 } } // namespace cmajor::parser

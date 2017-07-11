@@ -30,13 +30,16 @@ public:
     void SwitchToBody();
     Specifiers GetSpecifiers() const { return specifiers; }
     const Node* ReturnTypeExpr() const { return returnTypeExpr.get(); }
+    Node* ReturnTypeExpr() { return returnTypeExpr.get(); }
     const std::u32string& GroupId() const { return groupId; }
+    const NodeList<TemplateParameterNode>& TemplateParameters() const { return templateParameters; }
     const NodeList<ParameterNode>& Parameters() const { return parameters; }
     void SetReturnTypeExpr(Node* returnTypeExpr_);
     const WhereConstraintNode* WhereConstraint() const { return whereConstraint.get(); }
     void SetSpecifiers(Specifiers specifiers_);
     void SetConstraint(WhereConstraintNode* whereConstraint_);
     const CompoundStatementNode* Body() const { return body.get(); }
+    CompoundStatementNode* Body() { return body.get(); }
     void SetBody(CompoundStatementNode* body_);
     const CompoundStatementNode* BodySource() const { return bodySource.get(); }
     void SetBodySource(CompoundStatementNode* bodySource_);

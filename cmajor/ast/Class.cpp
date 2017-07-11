@@ -31,6 +31,10 @@ Node* ClassNode::Clone(CloneContext& cloneContext) const
     {
         clone->AddBaseClassOrInterface(baseClassOrInterfaces[i]->Clone(cloneContext));
     }
+    if (constraint)
+    {
+        clone->SetConstraint(static_cast<WhereConstraintNode*>(constraint->Clone(cloneContext)));
+    }
     int mn = members.Count();
     for (int i = 0; i < mn; ++i)
     {
@@ -78,6 +82,12 @@ void ClassNode::AddBaseClassOrInterface(Node* baseClassOrInterface)
 {
     baseClassOrInterface->SetParent(this);
     baseClassOrInterfaces.Add(baseClassOrInterface);
+}
+
+void ClassNode::SetConstraint(WhereConstraintNode* whereConstraint)
+{
+    constraint.reset(whereConstraint);
+    constraint->SetParent(this);
 }
 
 void ClassNode::AddMember(Node* member)
@@ -269,6 +279,26 @@ void ConstructorNode::AddInitializer(InitializerNode* initializer)
 {
     initializer->SetParent(this);
     initializers.Add(initializer);
+}
+
+DestructorNode::DestructorNode(const Span& span_) : FunctionNode(NodeType::destructorNode, span_)
+{
+}
+
+DestructorNode::DestructorNode(const Span& span_, Specifiers specifiers_) : FunctionNode(NodeType::destructorNode, span_, specifiers_, nullptr, U"@destructor")
+{
+}
+
+Node* DestructorNode::Clone(CloneContext& cloneContext) const
+{
+    DestructorNode* clone = new DestructorNode(GetSpan(), GetSpecifiers());
+    CloneContent(clone, cloneContext);
+    return clone;
+}
+
+void DestructorNode::Accept(Visitor& visitor)
+{
+    visitor.Visit(*this);
 }
 
 MemberFunctionNode::MemberFunctionNode(const Span& span_) : FunctionNode(NodeType::memberFunctionNode, span_)

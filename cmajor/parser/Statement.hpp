@@ -1,5 +1,5 @@
-#ifndef Statement_hpp_3790
-#define Statement_hpp_3790
+#ifndef Statement_hpp_17044
+#define Statement_hpp_17044
 
 #include <cmajor/parsing/Grammar.hpp>
 #include <cmajor/parsing/Keyword.hpp>
@@ -46,10 +46,6 @@ private:
     class ConstructionStatementRule;
     class DeleteStatementRule;
     class DestroyStatementRule;
-    class IncrementStatementExprRule;
-    class IncrementStatementRule;
-    class DecrementStatementExprRule;
-    class DecrementStatementRule;
     class ExpressionStatementRule;
     class EmptyStatementRule;
     class ThrowStatementRule;
@@ -60,4 +56,4 @@ private:
 
 } } // namespace cmajor.parser
 
-#endif // Statement_hpp_3790
+#endif // Statement_hpp_17044

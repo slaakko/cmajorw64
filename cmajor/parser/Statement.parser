@@ -26,8 +26,6 @@ namespace cmajor.parser
         Statement(ParsingContext* ctx) : StatementNode*
             ::= LabeledStatement(ctx){ value = LabeledStatement; }
             |   ControlStatement(ctx){ value = ControlStatement; }
-            |   IncrementStatement(ctx){ value = IncrementStatement; }
-            |   DecrementStatement(ctx){ value = DecrementStatement; }
             |   ExpressionStatement(ctx){ value = ExpressionStatement; }
             |   AssignmentStatement(ctx){ value = AssignmentStatement; }
             |   ConstructionStatement(ctx){ value = ConstructionStatement; }
@@ -104,9 +102,8 @@ namespace cmajor.parser
             ;
 
         ForLoopStatementExpr(ParsingContext* ctx) : StatementNode*
-            ::= IncrementStatementExpr(ctx){ value = IncrementStatementExpr; }
-            |   DecrementStatementExpr(ctx){ value = DecrementStatementExpr; }
-            |   AssignmentStatementExpr(ctx){ value = AssignmentStatementExpr; }
+            ::= AssignmentStatementExpr(ctx){ value = AssignmentStatementExpr; }
+            |   Expression(ctx){ value = new ExpressionStatementNode(span, Expression); }
             |   empty{ value = new EmptyStatementNode(span); }
             ;
 
@@ -180,28 +177,6 @@ namespace cmajor.parser
             ::= (keyword("destroy") Expression(ctx)! ';'!){ value = new DestroyStatementNode(span, Expression); }
             ;
 
-        IncrementStatementExpr(ParsingContext* ctx, var std::unique_ptr<Node> expr) : StatementNode*
-            ::= 
-            (   ("++" Expression(ctx):left!){ value = new IncrementStatementNode(span, left); } 
-            |   (Expression(ctx):right{ expr.reset(right); } "++"){ value = new IncrementStatementNode(span, expr.release()); }
-            ) 
-            ;
-
-        IncrementStatement(ParsingContext* ctx) : StatementNode*
-            ::= (IncrementStatementExpr(ctx) ';'!){ value = IncrementStatementExpr; value->GetSpan().SetEnd(span.End()); }
-            ;
-
-        DecrementStatementExpr(ParsingContext* ctx, var std::unique_ptr<Node> expr) : StatementNode*
-            ::= 
-            (   ("--" Expression(ctx):left!){ value = new DecrementStatementNode(span, left); } 
-            |   (Expression(ctx):right{ expr.reset(right); } "--"){ value = new DecrementStatementNode(span, expr.release()); }
-            ) 
-            ;
-
-        DecrementStatement(ParsingContext* ctx) : StatementNode*
-            ::= (DecrementStatementExpr(ctx) ';'!){ value = DecrementStatementExpr; value->GetSpan().SetEnd(span.End()); }
-            ;
-
         ExpressionStatement(ParsingContext* ctx, var std::unique_ptr<Node> expr) : StatementNode*
             ::= (Expression(ctx){ expr.reset(Expression); } ';'){ value = new ExpressionStatementNode(span, expr.release()); }
             ;
@@ -220,7 +195,7 @@ namespace cmajor.parser
             ;
 
         Catch(ParsingContext* ctx) : CatchNode*
-            ::= (keyword("catch") '('! TypeExpr(ctx)! Identifier! ')'! CompoundStatement(ctx):catchBlock){ value = new CatchNode(span, TypeExpr, Identifier, catchBlock); }
+            ::= (keyword("catch") '('! TypeExpr(ctx)! Identifier? ')'! CompoundStatement(ctx):catchBlock){ value = new CatchNode(span, TypeExpr, Identifier, catchBlock); }
             ;
 
         AssertStatement(ParsingContext* ctx) : StatementNode*

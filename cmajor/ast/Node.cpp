@@ -32,21 +32,21 @@ const char* nodeTypeStr[] =
     "booleanLiteralNode", "sbyteLiteralNode", "byteLiteralNode", "shortLiteralNode", "ushortLiteralNode", "intLiteralNode", "uintLiteralNode", "longLiteralNode", "ulongLiteralNode",
     "floatLiteralNode", "doubleLiteralNode", "charLiteralNode", "wcharLiteralNode", "ucharLiteralNode", "stringLiteralNode", "wstringLiteralNode", "ustringLiteralNode", "nullLiteralNode",
     "compileUnitNode", "namespaceNode", "aliasNode", "namespaceImportNode", "identifierNode", "templateIdNode", "functionNode", 
-    "classNode", "thisInitializerNode", "baseInitializerNode", "memberInitializerNode", "staticConstructorNode", "constructorNode", "memberFunctionNode", "memberVariableNode",
+    "classNode", "thisInitializerNode", "baseInitializerNode", "memberInitializerNode", "staticConstructorNode", "constructorNode", "destructorNode", "memberFunctionNode", "memberVariableNode",
     "interfaceNode", "delegateNode", "classDelegateNode",
     "disjunctiveConstraintNode", "conjunctiveConstraintNode", "whereConstraintNode", "predicateConstraintNode", "isConstraintNode", "multiParamConstraintNode", "typeNameConstraintNode",
     "constructorConstraintNode", "destructorConstraintNode", "memberFunctionConstraintNode", "functionConstraintNode",
     "axiomStatementNode", "axiomNode", "conceptIdNode", "conceptNode",
     "labelNode", "compoundStatementNode", "returnStatementNode", "ifStatementNode", "whileStatementNode", "doStatementNode", "forStatementNode", "breakStatementNode", "continueStatementNode",
     "gotoStatementNode", "constructionStatementNode", "deleteStatementNode", "destroyStatementNode", "assignmentStatementNode", "expressionStatementNode", "emptyStatementNode", 
-    "incrementStatementNode", "decrementStatementNode", "rangeForStatementNode", "switchStatementNode", "caseStatementNode", "defaultStatementNode", "gotoCaseStatementNode", 
+    "rangeForStatementNode", "switchStatementNode", "caseStatementNode", "defaultStatementNode", "gotoCaseStatementNode", 
     "gotoDefaultStatementNode", "throwStatementNode", "catchNode", "tryStatementNode", "assertStatementNode",
     "typedefNode", "constantNode", "enumTypeNode", "enumConstantNode", "parameterNode", "templateParameterNode",
     "constNode", "refNode", "arrayNode",
-    "dotNode", "arrowNode", "disjunctionNode", "conjunctionNode", "bitOrNode", "bitXorNode", "bitAndNode", "equalNode", "notEqualNode", "lessNode", "greaterNode", 
+    "dotNode", "arrowNode", "equivalenceNode", "implicationNode", "disjunctionNode", "conjunctionNode", "bitOrNode", "bitXorNode", "bitAndNode", "equalNode", "notEqualNode", "lessNode", "greaterNode",
     "lessOrEqualNode", "greaterOrEqualNode", "shiftLeftNode", "shiftRightNode", 
-    "addNode", "subNode", "mulNode", "divNode", "remNode", "notNode", "unaryPlusNode", "unaryMinusNode", "complementNode", "derefNode", "addrOfNode",
-    "isNode", "asNode", "indexingNode", "invokeNode", "sizeOfNode", "typeNameNode", "castNode", "constructNode", "newNode", "thisNode", "baseNode",
+    "addNode", "subNode", "mulNode", "divNode", "remNode", "notNode", "unaryPlusNode", "unaryMinusNode", "prefixIncrementNode", "prefixDecrementNode", "complementNode", "derefNode", "addrOfNode",
+    "isNode", "asNode", "indexingNode", "invokeNode", "postfixIncrementNode", "postfixDecrementNode", "sizeOfNode", "typeNameNode", "castNode", "constructNode", "newNode", "thisNode", "baseNode",
     "maxNode"
 };
 
@@ -65,12 +65,10 @@ Node::~Node()
 
 void Node::Write(AstWriter& writer)
 {
-    writer.Write(span);
 }
 
 void Node::Read(AstReader& reader)
 {
-    span = reader.ReadSpan();
 }
 
 BinaryNode::BinaryNode(NodeType nodeType, const Span& span_) : Node(nodeType, span_), left(), right()
@@ -177,6 +175,7 @@ NodeFactory::NodeFactory()
     Register(NodeType::memberInitializerNode, new ConcreteNodeCreator<MemberInitializerNode>());
     Register(NodeType::staticConstructorNode, new ConcreteNodeCreator<StaticConstructorNode>());
     Register(NodeType::constructorNode, new ConcreteNodeCreator<ConstructorNode>());
+    Register(NodeType::destructorNode, new ConcreteNodeCreator<DestructorNode>());
     Register(NodeType::memberFunctionNode, new ConcreteNodeCreator<MemberFunctionNode>());
     Register(NodeType::memberVariableNode, new ConcreteNodeCreator<MemberVariableNode>());
     Register(NodeType::interfaceNode, new ConcreteNodeCreator<InterfaceNode>());
@@ -215,8 +214,6 @@ NodeFactory::NodeFactory()
     Register(NodeType::assignmentStatementNode, new ConcreteNodeCreator<AssignmentStatementNode>());
     Register(NodeType::expressionStatementNode, new ConcreteNodeCreator<ExpressionStatementNode>());
     Register(NodeType::emptyStatementNode, new ConcreteNodeCreator<EmptyStatementNode>());
-    Register(NodeType::incrementStatementNode, new ConcreteNodeCreator<IncrementStatementNode>());
-    Register(NodeType::decrementStatementNode, new ConcreteNodeCreator<DecrementStatementNode>());
     Register(NodeType::rangeForStatementNode, new ConcreteNodeCreator<RangeForStatementNode>());
     Register(NodeType::switchStatementNode, new ConcreteNodeCreator<SwitchStatementNode>());
     Register(NodeType::caseStatementNode, new ConcreteNodeCreator<CaseStatementNode>());
@@ -243,6 +240,8 @@ NodeFactory::NodeFactory()
     Register(NodeType::arrowNode, new ConcreteNodeCreator<ArrowNode>());
     Register(NodeType::arrayNode, new ConcreteNodeCreator<ArrayNode>());
 
+    Register(NodeType::equivalenceNode, new ConcreteNodeCreator<EquivalenceNode>());
+    Register(NodeType::implicationNode, new ConcreteNodeCreator<ImplicationNode>());
     Register(NodeType::disjunctionNode, new ConcreteNodeCreator<DisjunctionNode>());
     Register(NodeType::conjunctionNode, new ConcreteNodeCreator<ConjunctionNode>());
     Register(NodeType::bitOrNode, new ConcreteNodeCreator<BitOrNode>());
@@ -264,6 +263,8 @@ NodeFactory::NodeFactory()
     Register(NodeType::notNode, new ConcreteNodeCreator<NotNode>());
     Register(NodeType::unaryPlusNode, new ConcreteNodeCreator<UnaryPlusNode>());
     Register(NodeType::unaryMinusNode, new ConcreteNodeCreator<UnaryMinusNode>());
+    Register(NodeType::prefixIncrementNode, new ConcreteNodeCreator<PrefixIncrementNode>());
+    Register(NodeType::prefixDecrementNode, new ConcreteNodeCreator<PrefixDecrementNode>());
     Register(NodeType::complementNode, new ConcreteNodeCreator<ComplementNode>());
     Register(NodeType::derefNode, new ConcreteNodeCreator<DerefNode>());
     Register(NodeType::addrOfNode, new ConcreteNodeCreator<AddrOfNode>());
@@ -271,6 +272,8 @@ NodeFactory::NodeFactory()
     Register(NodeType::asNode, new ConcreteNodeCreator<AsNode>());
     Register(NodeType::indexingNode, new ConcreteNodeCreator<IndexingNode>());
     Register(NodeType::invokeNode, new ConcreteNodeCreator<InvokeNode>());
+    Register(NodeType::postfixIncrementNode, new ConcreteNodeCreator<PostfixIncrementNode>());
+    Register(NodeType::postfixDecrementNode, new ConcreteNodeCreator<PostfixDecrementNode>());
     Register(NodeType::sizeOfNode, new ConcreteNodeCreator<SizeOfNode>());
     Register(NodeType::typeNameNode, new ConcreteNodeCreator<TypeNameNode>());
     Register(NodeType::castNode, new ConcreteNodeCreator<CastNode>());

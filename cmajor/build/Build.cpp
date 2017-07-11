@@ -8,8 +8,14 @@
 #include <cmajor/parser/Solution.hpp>
 #include <cmajor/parser/CompileUnit.hpp>
 #include <cmajor/parser/FileRegistry.hpp>
+#include <cmajor/binder/BoundCompileUnit.hpp>
+#include <cmajor/binder/TypeBinder.hpp>
 #include <cmajor/symbols/GlobalFlags.hpp>
 #include <cmajor/symbols/Warning.hpp>
+#include <cmajor/symbols/Module.hpp>
+#include <cmajor/symbols/SymbolWriter.hpp>
+#include <cmajor/symbols/SymbolReader.hpp>
+#include <cmajor/symbols/SymbolCreatorVisitor.hpp>
 #include <cmajor/util/Unicode.hpp>
 #include <iostream>
 #include <stdexcept>
@@ -18,6 +24,7 @@
 using namespace cmajor::parser;
 using namespace cmajor::ast;
 using namespace cmajor::symbols;
+using namespace cmajor::binder;
 using namespace cmajor::util;
 using namespace cmajor::unicode;
 
@@ -178,6 +185,28 @@ std::vector<std::unique_ptr<CompileUnitNode>> ParseSourcesConcurrently(const std
     return compileUnits;
 }
 
+void CreateSymbols(SymbolTable& symbolTable, const std::vector<std::unique_ptr<CompileUnitNode>>& compileUnits)
+{
+    SymbolCreatorVisitor symbolCreator(symbolTable);
+    for (const std::unique_ptr<CompileUnitNode>& compileUnit : compileUnits)
+    {
+        compileUnit->Accept(symbolCreator);
+    }
+}
+
+std::vector<std::unique_ptr<BoundCompileUnit>> BindTypes(Module& mod, const std::vector<std::unique_ptr<CompileUnitNode>>& compileUnits)
+{
+    std::vector<std::unique_ptr<BoundCompileUnit>> boundCompileUnits;
+    for (const std::unique_ptr<CompileUnitNode>& compileUnit : compileUnits)
+    {
+        std::unique_ptr<BoundCompileUnit> boundCompileUnit(new BoundCompileUnit(mod, compileUnit.get()));
+        TypeBinder typeBinder(*boundCompileUnit);
+        compileUnit->Accept(typeBinder);
+        boundCompileUnits.push_back(std::move(boundCompileUnit));
+    }
+    return boundCompileUnits;
+}
+
 void CleanProject(Project* project)
 {
     std::string config = GetConfig();
@@ -185,9 +214,9 @@ void CleanProject(Project* project)
     {
         std::cout << "Cleaning project '" << ToUtf8(project->Name()) << "' (" << project->FilePath() << ") using " << config << " configuration." << std::endl;
     }
-    boost::filesystem::path lfp = project->LibraryFilePath();
-    lfp.remove_filename();
-    boost::filesystem::remove_all(lfp);
+    boost::filesystem::path mfp = project->ModuleFilePath();
+    mfp.remove_filename();
+    boost::filesystem::remove_all(mfp);
     if (project->GetTarget() == Target::program)
     {
         boost::filesystem::path efp = project->ExecutableFilePath();
@@ -210,7 +239,7 @@ void BuildProject(Project* project)
     CompileWarningCollection::Instance().SetCurrentProjectName(project->Name());
     std::vector<std::unique_ptr<CompileUnitNode>> compileUnits;
     int numCores = std::thread::hardware_concurrency();
-    if (numCores == 0 || GetGlobalFlag(GlobalFlags::debugParsing))
+    if (numCores == 0 || project->SourceFilePaths().size() < numCores || GetGlobalFlag(GlobalFlags::debugParsing))
     {
         compileUnits = ParseSourcesInMainThread(project->SourceFilePaths());
     }
@@ -218,6 +247,21 @@ void BuildProject(Project* project)
     {
         compileUnits = ParseSourcesConcurrently(project->SourceFilePaths(), numCores);
     }
+    Module mod;
+    InitSymbolTable(mod.GetSymbolTable());
+    /*
+    if (project->Name() == U"System.Core")
+    {
+        InitSymbolTable(mod.GetSymbolTable());
+    }
+*/
+    CreateSymbols(mod.GetSymbolTable(), compileUnits);
+    BindTypes(mod, compileUnits);
+    boost::filesystem::path mfd = project->ModuleFilePath();
+    mfd.remove_filename();
+    boost::filesystem::create_directories(mfd);
+    SymbolWriter writer(project->ModuleFilePath());
+    mod.Write(writer);
 }
 
 ProjectGrammar* projectGrammar = nullptr;

@@ -83,5 +83,16 @@ void ParsingContext::EndParsingConcept()
     parsingConceptStack.pop();
 }
 
+void ParsingContext::BeginParsingTemplateId()
+{
+    parsingTemplateIdStack.push(parsingTemplateId);
+    parsingTemplateId = true;
+}
+
+void ParsingContext::EndParsingTemplateId()
+{
+    parsingTemplateId = parsingTemplateIdStack.top();
+    parsingTemplateIdStack.pop();
+}
 
 } } // namespace cmajor::parser

@@ -12,10 +12,19 @@
 
 namespace cmajor { namespace ast {
 
+enum class ProjectDeclarationType : uint8_t
+{
+    referenceDeclaration, sourceFileDeclaration, targetDeclaration
+};
+
 class ProjectDeclaration
 {
 public:
+    ProjectDeclaration(ProjectDeclarationType declarationType_);
     virtual ~ProjectDeclaration();
+    ProjectDeclarationType GetDeclarationType() const { return declarationType; }
+private:
+    ProjectDeclarationType declarationType;
 };
 
 class ReferenceDeclaration : public ProjectDeclaration
@@ -59,6 +68,7 @@ public:
     const boost::filesystem::path& BasePath() const { return basePath; }
     void AddDeclaration(ProjectDeclaration* declaration);
     void ResolveDeclarations();
+    const std::string& ModuleFilePath() const { return moduleFilePath; }
     const std::string& LibraryFilePath() const { return libraryFilePath; }
     const std::string& ExecutableFilePath() const { return executableFilePath; }
     const std::vector<std::string>& References() const { return references; }
@@ -73,6 +83,7 @@ private:
     boost::filesystem::path basePath;
     boost::filesystem::path systemLibDir;
     std::vector<std::unique_ptr<ProjectDeclaration>> declarations;
+    std::string moduleFilePath;
     std::string libraryFilePath;
     std::string executableFilePath;
     std::vector<std::string> references;

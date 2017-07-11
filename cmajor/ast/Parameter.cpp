@@ -18,12 +18,20 @@ ParameterNode::ParameterNode(const Span& span_) : Node(NodeType::parameterNode, 
 ParameterNode::ParameterNode(const Span& span_, Node* typeExpr_, IdentifierNode* id_) : Node(NodeType::parameterNode, span_), typeExpr(typeExpr_), id(id_)
 {
     typeExpr->SetParent(this);
-    id->SetParent(this);
+    if (id)
+    {
+        id->SetParent(this);
+    }
 }
 
 Node* ParameterNode::Clone(CloneContext& cloneContext) const
 {
-    return new ParameterNode(GetSpan(), typeExpr->Clone(cloneContext), static_cast<IdentifierNode*>(id->Clone(cloneContext)));
+    IdentifierNode* clonedId = nullptr;
+    if (id)
+    {
+        clonedId = static_cast<IdentifierNode*>(id->Clone(cloneContext));
+    }
+    return new ParameterNode(GetSpan(), typeExpr->Clone(cloneContext), clonedId);
 }
 
 void ParameterNode::Accept(Visitor& visitor)
@@ -35,7 +43,12 @@ void ParameterNode::Write(AstWriter& writer)
 {
     Node::Write(writer);
     writer.Write(typeExpr.get());
-    writer.Write(id.get());
+    bool hasId = id != nullptr;
+    writer.GetBinaryWriter().Write(hasId);
+    if (hasId)
+    {
+        writer.Write(id.get());
+    }
 }
 
 void ParameterNode::Read(AstReader& reader)
@@ -43,8 +56,12 @@ void ParameterNode::Read(AstReader& reader)
     Node::Read(reader);
     typeExpr.reset(reader.ReadNode());
     typeExpr->SetParent(this);
-    id.reset(reader.ReadIdentifierNode());
-    id->SetParent(this);
+    bool hasId = reader.GetBinaryReader().ReadBool();
+    if (hasId)
+    {
+        id.reset(reader.ReadIdentifierNode());
+        id->SetParent(this);
+    }
 }
 
 } } // namespace cmajor::ast

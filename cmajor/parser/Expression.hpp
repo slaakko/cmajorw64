@@ -1,5 +1,5 @@
-#ifndef Expression_hpp_21397
-#define Expression_hpp_21397
+#ifndef Expression_hpp_5386
+#define Expression_hpp_5386
 
 #include <cmajor/parsing/Grammar.hpp>
 #include <cmajor/parsing/Keyword.hpp>
@@ -20,6 +20,8 @@ private:
     virtual void CreateRules();
     virtual void GetReferencedGrammars();
     class ExpressionRule;
+    class EquivalenceRule;
+    class ImplicationRule;
     class DisjunctionRule;
     class ConjunctionRule;
     class BitOrRule;
@@ -45,4 +47,4 @@ private:
 
 } } // namespace cmajor.parser
 
-#endif // Expression_hpp_21397
+#endif // Expression_hpp_5386

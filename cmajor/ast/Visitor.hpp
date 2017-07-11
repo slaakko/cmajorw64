@@ -56,6 +56,7 @@ class BaseInitializerNode;
 class MemberInitializerNode;
 class StaticConstructorNode;
 class ConstructorNode;
+class DestructorNode;
 class MemberFunctionNode;
 class MemberVariableNode;
 class InterfaceNode;
@@ -94,8 +95,6 @@ class DestroyStatementNode;
 class AssignmentStatementNode;
 class ExpressionStatementNode;
 class EmptyStatementNode;
-class IncrementStatementNode;
-class DecrementStatementNode;
 class RangeForStatementNode;
 class SwitchStatementNode;
 class CaseStatementNode;
@@ -122,6 +121,8 @@ class ArrayNode;
 
 class DotNode;
 class ArrowNode;
+class EquivalenceNode;
+class ImplicationNode;
 class DisjunctionNode;
 class ConjunctionNode;
 class BitOrNode;
@@ -143,6 +144,8 @@ class RemNode;
 class NotNode;
 class UnaryPlusNode;
 class UnaryMinusNode;
+class PrefixIncrementNode;
+class PrefixDecrementNode;
 class DerefNode;
 class AddrOfNode;
 class ComplementNode;
@@ -150,6 +153,8 @@ class IsNode;
 class AsNode;
 class IndexingNode;
 class InvokeNode;
+class PostfixIncrementNode;
+class PostfixDecrementNode;
 class SizeOfNode;
 class TypeNameNode;
 class CastNode;
@@ -210,9 +215,10 @@ public:
     virtual void Visit(MemberInitializerNode& memberInitializerNode) {}
     virtual void Visit(StaticConstructorNode& staticConstructorNode) {}
     virtual void Visit(ConstructorNode& constructorNode) {}
+    virtual void Visit(DestructorNode& destructorNode) {}
     virtual void Visit(MemberFunctionNode& memberFunctionNode) {}
     virtual void Visit(MemberVariableNode& memberVariableNode) {}
-    virtual void Visit(InterfaceNode& interfacenode) {}
+    virtual void Visit(InterfaceNode& interfaceNode) {}
     virtual void Visit(DelegateNode& delegateNode) {}
     virtual void Visit(ClassDelegateNode& classDelegateNode) {}
 
@@ -248,8 +254,6 @@ public:
     virtual void Visit(AssignmentStatementNode& assignmentStatementNode) {}
     virtual void Visit(ExpressionStatementNode& expressionStatementNode) {}
     virtual void Visit(EmptyStatementNode& emptyStatementNode) {}
-    virtual void Visit(IncrementStatementNode& incrementStatementNode) {}
-    virtual void Visit(DecrementStatementNode& decrementStatementNode) {}
     virtual void Visit(RangeForStatementNode& rangeForStatementNode) {}
     virtual void Visit(SwitchStatementNode& switchStatementNode) {}
     virtual void Visit(CaseStatementNode& caseStatementNode) {}
@@ -276,6 +280,8 @@ public:
 
     virtual void Visit(DotNode& dotNode) {}
     virtual void Visit(ArrowNode& arrowNode) {}
+    virtual void Visit(EquivalenceNode& equivalenceNode) {}
+    virtual void Visit(ImplicationNode& implicationNode) {}
     virtual void Visit(DisjunctionNode& disjunctionNode) {}
     virtual void Visit(ConjunctionNode& conjunctionNode) {}
     virtual void Visit(BitOrNode& bitOrNode) {}
@@ -297,6 +303,8 @@ public:
     virtual void Visit(NotNode& notNode) {}
     virtual void Visit(UnaryPlusNode& unaryPlusNode) {}
     virtual void Visit(UnaryMinusNode& unaryMinusNode) {}
+    virtual void Visit(PrefixIncrementNode& prefixIncrementNode) {}
+    virtual void Visit(PrefixDecrementNode& prefixDecrementNode) {}
     virtual void Visit(DerefNode& derefNode) {}
     virtual void Visit(AddrOfNode& addrOfNode) {}
     virtual void Visit(ComplementNode& complementNode) {}
@@ -304,6 +312,8 @@ public:
     virtual void Visit(AsNode& asNode) {}
     virtual void Visit(IndexingNode& indexingNode) {}
     virtual void Visit(InvokeNode& invokeNode) {}
+    virtual void Visit(PostfixIncrementNode& postfixIncrementNode) {}
+    virtual void Visit(PostfixDecrementNode& postfixDecrementNode) {}
     virtual void Visit(SizeOfNode& sizeOfNode) {}
     virtual void Visit(TypeNameNode& typeNameNode) {}
     virtual void Visit(CastNode& castNode) {}

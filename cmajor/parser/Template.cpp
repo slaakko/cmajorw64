@@ -108,8 +108,11 @@ public:
         a0ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<TemplateIdRule>(this, &TemplateIdRule::A0Action));
         cmajor::parsing::ActionParser* a1ActionParser = GetAction(ToUtf32("A1"));
         a1ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<TemplateIdRule>(this, &TemplateIdRule::A1Action));
+        a1ActionParser->SetFailureAction(new cmajor::parsing::MemberFailureAction<TemplateIdRule>(this, &TemplateIdRule::A1ActionFail));
         cmajor::parsing::ActionParser* a2ActionParser = GetAction(ToUtf32("A2"));
         a2ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<TemplateIdRule>(this, &TemplateIdRule::A2Action));
+        cmajor::parsing::ActionParser* a3ActionParser = GetAction(ToUtf32("A3"));
+        a3ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<TemplateIdRule>(this, &TemplateIdRule::A3Action));
         cmajor::parsing::NonterminalParser* primaryNonterminalParser = GetNonterminal(ToUtf32("primary"));
         primaryNonterminalParser->SetPostCall(new cmajor::parsing::MemberPostCall<TemplateIdRule>(this, &TemplateIdRule::Postprimary));
         cmajor::parsing::NonterminalParser* templateArgNonterminalParser = GetNonterminal(ToUtf32("templateArg"));
@@ -119,14 +122,26 @@ public:
     void A0Action(const char32_t* matchBegin, const char32_t* matchEnd, const Span& span, const std::string& fileName, ParsingData* parsingData, bool& pass)
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
-        context->value = context->templateId.release();
+        context->ctx->BeginParsingTemplateId();
     }
     void A1Action(const char32_t* matchBegin, const char32_t* matchEnd, const Span& span, const std::string& fileName, ParsingData* parsingData, bool& pass)
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
-        context->templateId.reset(new TemplateIdNode(span, context->fromprimary));
+        context->ctx->EndParsingTemplateId();
+        context->value = context->templateId.release();
+        context->value->GetSpan().SetEnd(span.End());
+    }
+    void A1ActionFail(ParsingData* parsingData)
+    {
+        Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
+        context->ctx->EndParsingTemplateId();
     }
     void A2Action(const char32_t* matchBegin, const char32_t* matchEnd, const Span& span, const std::string& fileName, ParsingData* parsingData, bool& pass)
+    {
+        Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
+        context->templateId.reset(new TemplateIdNode(span, context->fromprimary));
+    }
+    void A3Action(const char32_t* matchBegin, const char32_t* matchEnd, const Span& span, const std::string& fileName, ParsingData* parsingData, bool& pass)
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
         context->templateId->AddTemplateArgument(context->fromtemplateArg);
@@ -326,22 +341,25 @@ void TemplateGrammar::GetReferencedGrammars()
 
 void TemplateGrammar::CreateRules()
 {
+    AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("Identifier"), this, ToUtf32("IdentifierGrammar.Identifier")));
     AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("QualifiedId"), this, ToUtf32("IdentifierGrammar.QualifiedId")));
     AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("TypeExpr"), this, ToUtf32("TypeExprGrammar.TypeExpr")));
-    AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("Identifier"), this, ToUtf32("IdentifierGrammar.Identifier")));
     AddRule(new TemplateIdRule(ToUtf32("TemplateId"), GetScope(), GetParsingDomain()->GetNextRuleId(),
-        new cmajor::parsing::ActionParser(ToUtf32("A0"),
-            new cmajor::parsing::SequenceParser(
+        new cmajor::parsing::SequenceParser(
+            new cmajor::parsing::ActionParser(ToUtf32("A0"),
+                new cmajor::parsing::EmptyParser()),
+            new cmajor::parsing::ActionParser(ToUtf32("A1"),
                 new cmajor::parsing::SequenceParser(
                     new cmajor::parsing::SequenceParser(
-                        new cmajor::parsing::ActionParser(ToUtf32("A1"),
-                            new cmajor::parsing::NonterminalParser(ToUtf32("primary"), ToUtf32("QualifiedId"), 0)),
-                        new cmajor::parsing::CharParser('<')),
-                    new cmajor::parsing::ListParser(
-                        new cmajor::parsing::ActionParser(ToUtf32("A2"),
-                            new cmajor::parsing::NonterminalParser(ToUtf32("templateArg"), ToUtf32("TypeExpr"), 1)),
-                        new cmajor::parsing::CharParser(','))),
-                new cmajor::parsing::CharParser('>')))));
+                        new cmajor::parsing::SequenceParser(
+                            new cmajor::parsing::ActionParser(ToUtf32("A2"),
+                                new cmajor::parsing::NonterminalParser(ToUtf32("primary"), ToUtf32("QualifiedId"), 0)),
+                            new cmajor::parsing::CharParser('<')),
+                        new cmajor::parsing::ListParser(
+                            new cmajor::parsing::ActionParser(ToUtf32("A3"),
+                                new cmajor::parsing::NonterminalParser(ToUtf32("templateArg"), ToUtf32("TypeExpr"), 1)),
+                            new cmajor::parsing::CharParser(','))),
+                    new cmajor::parsing::CharParser('>'))))));
     AddRule(new TemplateParameterRule(ToUtf32("TemplateParameter"), GetScope(), GetParsingDomain()->GetNextRuleId(),
         new cmajor::parsing::ActionParser(ToUtf32("A0"),
             new cmajor::parsing::SequenceParser(

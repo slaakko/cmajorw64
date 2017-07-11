@@ -8,6 +8,7 @@
 [cpp]#include <cmajor/parser/Specifier.hpp>
 [cpp]#include <cmajor/parser/Identifier.hpp>
 [cpp]#include <cmajor/parser/TypeExpr.hpp>
+[cpp]#include <cmajor/parser/Concept.hpp>
 [cpp]#include <cmajor/parser/Expression.hpp>
 [cpp]#include <cmajor/parser/Statement.hpp>
 [cpp]#include <cmajor/parser/Parameter.hpp>
@@ -28,10 +29,12 @@ namespace cmajor.parser
         using IdentifierGrammar.Identifier;
         using IdentifierGrammar.QualifiedId;
         using TypeExprGrammar.TypeExpr;
+        using ConceptGrammar.WhereConstraint;
         using ExpressionGrammar.ArgumentList;
         using StatementGrammar.CompoundStatement;
         using ParameterGrammar.ParameterList;
         using FunctionGrammar.FunctionGroupId;
+        using TemplateGrammar.TemplateId;
         using TemplateGrammar.TemplateParameterList;
         using TypedefGrammar.Typedef;
         using EnumerationGrammar.EnumType;
@@ -42,7 +45,9 @@ namespace cmajor.parser
         Class(ParsingContext* ctx) : ClassNode*
             ::= Specifiers keyword("class") Identifier{ value = new ClassNode(span, Specifiers, Identifier); }
                 TemplateParameterList(ctx, value)?
-                InheritanceAndInterfaces(ctx, value)? '{'! ClassContent(ctx, value) '}'!
+                InheritanceAndInterfaces(ctx, value)? 
+                (WhereConstraint(ctx){ value->SetConstraint(WhereConstraint); value->GetSpan().SetEnd(span.End()); })?
+                '{'! ClassContent(ctx, value) '}'!
             ;
 
         InheritanceAndInterfaces(ParsingContext* ctx, ClassNode* classNode)
@@ -53,7 +58,8 @@ namespace cmajor.parser
             ;
 
         BaseClassOrInterface(ParsingContext* ctx) : Node*
-            ::= QualifiedId{ value = QualifiedId; }
+            ::= TemplateId(ctx){ value = TemplateId; }
+            |   QualifiedId{ value = QualifiedId; }
             ;
 
         ClassContent(ParsingContext* ctx, ClassNode* classNode)
@@ -63,6 +69,7 @@ namespace cmajor.parser
         ClassMember(ParsingContext* ctx, ClassNode* classNode) : Node*
             ::= StaticConstructor(ctx, classNode){ value = StaticConstructor; }
             |   Constructor(ctx, classNode){ value = Constructor; }
+            |   Destructor(ctx, classNode){ value = Destructor; }
             |   MemberFunction(ctx, classNode){ value= MemberFunction; }
             |   MemberVariable(ctx){ value = MemberVariable; }
             |   Typedef(ctx){ value = Typedef; }
@@ -80,6 +87,7 @@ namespace cmajor.parser
                     else { value = new StaticConstructorNode(span); }
                 }
                 (':' (Initializer(ctx){ value->AddInitializer(Initializer); } % ','))?
+                (WhereConstraint(ctx){ value->SetConstraint(WhereConstraint); })?
                 (CompoundStatement(ctx){ value->SetBody(CompoundStatement); } | ';' )
             ;
 
@@ -88,7 +96,15 @@ namespace cmajor.parser
                 { if (id->Str() != classNode->Id()->Str()) pass = false; else { ctor.reset(new ConstructorNode(span, Specifiers)); } }
                 ParameterList(ctx, ctor.get()) 
                 (':' (Initializer(ctx){ ctor->AddInitializer(Initializer); } % ','))?
+                (WhereConstraint(ctx){ ctor->SetConstraint(WhereConstraint); })?
                 (CompoundStatement(ctx){ ctor->SetBody(CompoundStatement); } | ';' ){ value = ctor.release(); }
+            ;
+
+        Destructor(ParsingContext* ctx, ClassNode* classNode, var std::unique_ptr<IdentifierNode> id, var std::unique_ptr<DestructorNode> dtor) : Node*
+            ::= (Specifiers '~' Identifier{ id.reset(Identifier); } '(' ')')
+                { if (id->Str() != classNode->Id()->Str()) pass = false; else { dtor.reset(new DestructorNode(span, Specifiers)); } }
+                (WhereConstraint(ctx){ dtor->SetConstraint(WhereConstraint); })?
+                (CompoundStatement(ctx){ dtor->SetBody(CompoundStatement); } | ';' ){ value = dtor.release(); }
             ;
 
         Initializer(ParsingContext* ctx) : InitializerNode*
@@ -102,7 +118,8 @@ namespace cmajor.parser
                 { 
                     memFun.reset(new MemberFunctionNode(span, Specifiers, TypeExpr, FunctionGroupId)); 
                 } 
-                ParameterList(ctx, memFun.get()) 
+                ParameterList(ctx, memFun.get()) (keyword("const"){ memFun->SetConst(); })?
+                (WhereConstraint(ctx){ memFun->SetConstraint(WhereConstraint); })?
                 (CompoundStatement(ctx){ memFun->SetBody(CompoundStatement); } | ';' ){ value = memFun.release(); }
             ;
 

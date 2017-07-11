@@ -22,6 +22,8 @@ public:
     Specifiers GetSpecifiers() const { return specifiers; }
     IdentifierNode* Id() const { return id.get(); }
     void AddBaseClassOrInterface(Node* baseClassOrInterface);
+    const WhereConstraintNode* WhereConstraint() const { return constraint.get(); }
+    void SetConstraint(WhereConstraintNode* whereConstraint);
     void AddMember(Node* member);
     const NodeList<TemplateParameterNode>& TemplateParameters() const { return templateParameters; }
     const NodeList<Node>& BaseClassOrInterfaces() const { return baseClassOrInterfaces; }
@@ -31,6 +33,7 @@ private:
     std::unique_ptr<IdentifierNode> id;
     NodeList<TemplateParameterNode> templateParameters;
     NodeList<Node> baseClassOrInterfaces;
+    std::unique_ptr<WhereConstraintNode> constraint;
     NodeList<Node> members;
 };
 
@@ -103,6 +106,15 @@ public:
     const NodeList<InitializerNode>& Initializers() const { return initializers; }
 private:
     NodeList<InitializerNode> initializers;
+};
+
+class DestructorNode : public FunctionNode
+{
+public:
+    DestructorNode(const Span& span_);
+    DestructorNode(const Span& span_, Specifiers specifiers_);
+    Node* Clone(CloneContext& cloneContext) const override;
+    void Accept(Visitor& visitor) override;
 };
 
 class MemberFunctionNode : public FunctionNode

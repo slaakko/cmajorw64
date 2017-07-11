@@ -8,6 +8,7 @@
 #include <cmajor/util/InitDone.hpp>
 #include <cmajor/build/Build.hpp>
 #include <cmajor/parser/FileRegistry.hpp>
+#include <cmajor/symbols/Exception.hpp>
 #include <cmajor/symbols/InitDone.hpp>
 #include <cmajor/symbols/GlobalFlags.hpp>
 #include <cmajor/util/Util.hpp>
@@ -46,6 +47,16 @@ void PrintHelp()
 using namespace cmajor::util;
 using namespace cmajor::symbols;
 using namespace cmajor::build;
+
+class Alpha
+{
+
+};
+
+class Beta : public Alpha
+{
+
+};
 
 int main(int argc, const char** argv)
 {
@@ -157,6 +168,14 @@ int main(int argc, const char** argv)
                 }
             }
         }
+    }
+    catch (const Exception& ex)
+    {
+        if (!GetGlobalFlag(GlobalFlags::quiet))
+        {
+            std::cerr << ex.What() << std::endl;
+        }
+        return 1;
     }
     catch (const std::exception& ex)
     {
