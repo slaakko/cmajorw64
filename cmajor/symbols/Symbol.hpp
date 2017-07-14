@@ -32,7 +32,8 @@ enum class SymbolType : uint8_t
     derivedTypeSymbol,
     namespaceSymbol, functionSymbol, staticConstructorSymbol, constructorSymbol, destructorSymbol, memberFunctionSymbol, functionGroupSymbol, classTypeSymbol, interfaceTypeSymbol, 
     delegateTypeSymbol, classDelegateTypeSymbol, declarationBlock, typedefSymbol, constantSymbol, enumTypeSymbol, enumConstantSymbol,
-    templateParameterSymbol,  parameterSymbol, localVariableSymbol, memberVariableSymbol,
+    templateParameterSymbol, boundTemplateParameterSymbol, parameterSymbol, localVariableSymbol, memberVariableSymbol,
+    namespaceTypeSymbol,
     maxSymbol
 };
 
@@ -81,13 +82,19 @@ public:
     virtual bool IsExportSymbol() const { return IsProject(); }
     virtual bool IsContainerSymbol() const { return false; }
     virtual bool IsFunctionSymbol() const { return false; }
+    virtual bool IsTypeSymbol() const { return false; }
     virtual bool IsClassTypeSymbol() const { return false; }
+    virtual bool IsBoundTemplateParameterSymbol() const { return false; }
     virtual const ContainerScope* GetContainerScope() const { return nullptr; }
     virtual ContainerScope* GetContainerScope() { return nullptr; }
     virtual std::u32string FullName() const;
     virtual std::u32string FullNameWithSpecifiers() const;
+    virtual SymbolAccess DeclaredAccess() const { return Access(); }
+    virtual std::string TypeString() const { return "symbol";  }
+    SymbolAccess Access() const { return SymbolAccess(flags & SymbolFlags::access);  }
     void SetAccess(SymbolAccess access_) { flags = flags | SymbolFlags(access_); }
     void SetAccess(Specifiers accessSpecifiers);
+    bool IsSameParentOrAncestorOf(const Symbol* that) const;
     SymbolType GetSymbolType() const { return symbolType; }
     const Span& GetSpan() const { return span; }
     void SetSpan(const Span& span_) { span = span_; }
@@ -111,6 +118,8 @@ public:
     NamespaceSymbol* Ns();
     const ClassTypeSymbol* ClassNoThrow() const;
     ClassTypeSymbol* ClassNoThrow();
+    const ContainerSymbol* ClassOrNsNoThrow() const;
+    ContainerSymbol* ClassOrNsNoThrow() ;
     const ClassTypeSymbol* Class() const;
     ClassTypeSymbol* Class();
     const ClassTypeSymbol* ContainingClassNoThrow() const;
@@ -119,8 +128,14 @@ public:
     InterfaceTypeSymbol* InterfaceNoThrow();
     const InterfaceTypeSymbol* ContainingInterfaceNoThrow() const;
     InterfaceTypeSymbol* ContainingInterfaceNoThrow() ;
+    const FunctionSymbol* FunctionNoThrow() const;
+    FunctionSymbol* FunctionNoThrow();
     const FunctionSymbol* Function() const;
     FunctionSymbol* Function();
+    const FunctionSymbol* ContainingFunctionNoThrow() const;
+    FunctionSymbol* ContainingFunctionNoThrow() ;
+    const ContainerScope* ClassOrNsScope() const;
+    ContainerScope* ClassOrNsScope();
     const SymbolTable* GetSymbolTable() const { return symbolTable; }
     SymbolTable* GetSymbolTable() { return symbolTable; }
     void SetSymbolTable(SymbolTable* symbolTable_) { symbolTable = symbolTable_; }

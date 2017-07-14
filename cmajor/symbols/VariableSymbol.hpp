@@ -6,6 +6,7 @@
 #ifndef CMAJOR_SYMBOLS_VARIABLE_SYMBOL_INCLUDED
 #define CMAJOR_SYMBOLS_VARIABLE_SYMBOL_INCLUDED
 #include <cmajor/symbols/Symbol.hpp>
+#include <llvm/IR/Instructions.h>
 
 namespace cmajor { namespace symbols {
 
@@ -16,6 +17,7 @@ public:
     void Write(SymbolWriter& writer) override;
     void Read(SymbolReader& reader) override;
     const TypeSymbol* GetType() const { return typeSymbol; }
+    TypeSymbol* GetType() { return typeSymbol; }
     void SetType(TypeSymbol* typeSymbol_) { typeSymbol = typeSymbol_; }
     void EmplaceType(TypeSymbol* typeSymbol_, int index) override;
 private:
@@ -26,12 +28,18 @@ class ParameterSymbol : public VariableSymbol
 {
 public:    
     ParameterSymbol(const Span& span_, const std::u32string& name_);
+    SymbolAccess DeclaredAccess() const override { return SymbolAccess::public_; }
 };
 
 class LocalVariableSymbol : public VariableSymbol
 {
 public:     
     LocalVariableSymbol(const Span& span_, const std::u32string& name_);
+    SymbolAccess DeclaredAccess() const override { return SymbolAccess::public_; }
+    void SetStorage(llvm::AllocaInst* storage_) { storage = storage_; }
+    llvm::AllocaInst* Storage() { return storage; }
+private:
+    llvm::AllocaInst* storage;
 };
 
 class MemberVariableSymbol : public VariableSymbol

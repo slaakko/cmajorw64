@@ -80,7 +80,9 @@ public:
     void Write(AstWriter& writer) override;
     void Read(AstReader& reader) override;
     const Node* Left() const { return left.get(); }
+    Node* Left() { return left.get(); }
     const Node* Right() const { return right.get(); }
+    Node* Right() { return right.get(); }
 private:
     std::unique_ptr<Node> left;
     std::unique_ptr<Node> right;

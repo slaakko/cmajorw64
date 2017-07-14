@@ -22,6 +22,8 @@ class DerivedTypeSymbol : public TypeSymbol
 {
 public:
     DerivedTypeSymbol(const Span& span_, const std::u32string& name_);
+    std::string TypeString() const override { return "derived type"; }
+    llvm::Type* IrType(Emitter& emitter) const override { return nullptr; } // todo
 private:
     DerivationVec derivations;
     ArrayDimensionVec arrayDimensions;

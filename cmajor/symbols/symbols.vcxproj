@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="BasicTypeOperation.hpp" />
     <ClInclude Include="BasicTypeSymbol.hpp" />
     <ClInclude Include="ClassTypeSymbol.hpp" />
     <ClInclude Include="ConstantSymbol.hpp" />
@@ -33,6 +34,7 @@
     <ClInclude Include="InterfaceTypeSymbol.hpp" />
     <ClInclude Include="Module.hpp" />
     <ClInclude Include="NamespaceSymbol.hpp" />
+    <ClInclude Include="Operation.hpp" />
     <ClInclude Include="Scope.hpp" />
     <ClInclude Include="Symbol.hpp" />
     <ClInclude Include="SymbolCreatorVisitor.hpp" />
@@ -46,6 +48,7 @@
     <ClInclude Include="Warning.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="BasicTypeOperation.cpp" />
     <ClCompile Include="BasicTypeSymbol.cpp" />
     <ClCompile Include="ClassTypeSymbol.cpp" />
     <ClCompile Include="ConstantSymbol.cpp" />
@@ -60,6 +63,7 @@
     <ClCompile Include="InterfaceTypeSymbol.cpp" />
     <ClCompile Include="Module.cpp" />
     <ClCompile Include="NamespaceSymbol.cpp" />
+    <ClCompile Include="Operation.cpp" />
     <ClCompile Include="Scope.cpp" />
     <ClCompile Include="Symbol.cpp" />
     <ClCompile Include="SymbolCreatorVisitor.cpp" />
@@ -134,7 +138,7 @@
       <PreprocessorDefinitions>_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>../..;C:\Programming\boost_1_64_0;C:\Programming\llvm-4.0.0.src\include;C:\Programming\llvm-4.0.0.src\build\include</AdditionalIncludeDirectories>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <DisableSpecificWarnings>4267;4146;4996</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4141;4146;4244;4267;4291;4624;4996</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -149,7 +153,7 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>../..;C:\Programming\boost_1_64_0;C:\Programming\llvm-4.0.0.src\include;C:\Programming\llvm-4.0.0.src\build\include</AdditionalIncludeDirectories>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <DisableSpecificWarnings>4267;4146;4996</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4141;4146;4244;4267;4291;4624;4996</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -165,7 +169,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>../..;C:\Programming\boost_1_64_0;C:\Programming\llvm-4.0.0.src\include;C:\Programming\llvm-4.0.0.src\build\include</AdditionalIncludeDirectories>
-      <DisableSpecificWarnings>4267;4146;4996</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4141;4146;4244;4267;4291;4624;4996</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -183,7 +187,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>../..;C:\Programming\boost_1_64_0;C:\Programming\llvm-4.0.0.src\include;C:\Programming\llvm-4.0.0.src\build\include</AdditionalIncludeDirectories>
-      <DisableSpecificWarnings>4267;4146;4996</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4141;4146;4244;4267;4291;4624;4996</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

@@ -244,4 +244,9 @@ TemplateParameterSymbol::TemplateParameterSymbol(const Span& span_, const std::u
 {
 }
 
+BoundTemplateParameterSymbol::BoundTemplateParameterSymbol(const Span& span_, const std::u32string& name_) : Symbol(SymbolType::boundTemplateParameterSymbol, span_, name_)
+{
+
+}
+
 } } // namespace cmajor::symbols

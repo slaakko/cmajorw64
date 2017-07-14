@@ -45,6 +45,7 @@ public:
     void EmplaceType(TypeSymbol* typeSymbol_, int index) override;
     void AddMember(Symbol* member) override;
     bool IsClassTypeSymbol() const override { return true; }
+    std::string TypeString() const override { return "class type"; }
     const ClassTypeSymbol* BaseClass() const { return baseClass; }
     ClassTypeSymbol* BaseClass() { return baseClass; }
     void SetBaseClass(ClassTypeSymbol* baseClass_) { baseClass = baseClass_; }
@@ -63,6 +64,7 @@ public:
     ClassTypeSymbolFlags GetClassTypeSymbolFlags() const { return flags; }
     bool GetFlag(ClassTypeSymbolFlags flag) const { return (flags & flag) != ClassTypeSymbolFlags::none; }
     void SetFlag(ClassTypeSymbolFlags flag) { flags = flags | flag; }
+    llvm::Type* IrType(Emitter& emitter) const override { return nullptr; } // todo
 private:
     ClassTypeSymbol* baseClass;
     ClassTypeSymbolFlags flags;
@@ -81,6 +83,18 @@ class TemplateParameterSymbol : public TypeSymbol
 {
 public:
     TemplateParameterSymbol(const Span& span_, const std::u32string& name_);
+    llvm::Type* IrType(Emitter& emitter) const override { return nullptr; } 
+};
+
+class BoundTemplateParameterSymbol : public Symbol
+{
+public:
+    BoundTemplateParameterSymbol(const Span& span_, const std::u32string& name_);
+    bool IsBoundTemplateParameterSymbol() const override { return true; }
+    TypeSymbol* GetType() const { return type; }
+    void SetType(TypeSymbol* type_) { type = type_; }
+private:
+    TypeSymbol* type;
 };
 
 } } // namespace cmajor::symbols

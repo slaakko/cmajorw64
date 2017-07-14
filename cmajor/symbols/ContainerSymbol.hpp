@@ -19,6 +19,7 @@ public:
     void Write(SymbolWriter& writer) override;
     void Read(SymbolReader& reader) override;
     virtual void AddMember(Symbol* member);
+    std::string TypeString() const override { return "container symbol"; }
     bool IsContainerSymbol() const override { return true; }
     const ContainerScope* GetContainerScope() const override { return &containerScope; }
     ContainerScope* GetContainerScope() override { return &containerScope; }

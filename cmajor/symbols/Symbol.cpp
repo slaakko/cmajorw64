@@ -31,7 +31,8 @@ const char* symbolTypeStr[uint8_t(SymbolType::maxSymbol)] =
     "derivedTypeSymbol"
     "namespaceSymbol", "functionSymbol", "staticConstructorSymbol", "constructorSymbol", "destructorSymbol", "memberFunctionSymbol", "functionGroupSymbol", 
     "classTypeSymbol", "interfaceTypeSymbol", "delegateTypeSymbol", "classDelegateTypeSymbol", "declarationBlock", "typedefSymbol", "constantSymbol", "enumTypeSymbol", "enumConstantSymbol",
-    "templateParameterSymbol", "parameterSymbol", "localVariableSymbol", "memberVariableSymbol",
+    "templateParameterSymbol", "boundTemplateParameterSymbol", "parameterSymbol", "localVariableSymbol", "memberVariableSymbol",
+    "namespaceTypeSymbol"
 };
 
 std::string SymbolTypeStr(SymbolType symbolType)
@@ -166,6 +167,26 @@ void Symbol::SetAccess(Specifiers accessSpecifiers)
     SetAccess(access);
 }
 
+bool Symbol::IsSameParentOrAncestorOf(const Symbol* that) const
+{
+    if (!that)
+    {
+        return false;
+    }
+    else if (this == that)
+    {
+        return true;
+    }
+    else if (that->parent)
+    {
+        return IsSameParentOrAncestorOf(that->parent);
+    }
+    else
+    {
+        return false;
+    }
+}
+
 const NamespaceSymbol* Symbol::Ns() const
 {
     if (symbolType == SymbolType::namespaceSymbol)
@@ -234,6 +255,52 @@ ClassTypeSymbol* Symbol::ClassNoThrow()
         if (parent)
         {
             return parent->ClassNoThrow();
+        }
+        else
+        {
+            return nullptr;
+        }
+    }
+}
+
+const ContainerSymbol* Symbol::ClassOrNsNoThrow() const
+{
+    if (symbolType == SymbolType::namespaceSymbol)
+    {
+        return static_cast<const NamespaceSymbol*>(this);
+    }
+    else if (IsClassTypeSymbol())
+    {
+        return static_cast<const ClassTypeSymbol*>(this);
+    }
+    else
+    {
+        if (parent)
+        {
+            return parent->ClassOrNsNoThrow();
+        }
+        else
+        {
+            return nullptr;
+        }
+    }
+}
+
+ContainerSymbol* Symbol::ClassOrNsNoThrow()
+{
+    if (symbolType == SymbolType::namespaceSymbol)
+    {
+        return static_cast<NamespaceSymbol*>(this);
+    }
+    else if (IsClassTypeSymbol())
+    {
+        return static_cast<ClassTypeSymbol*>(this);
+    }
+    else
+    {
+        if (parent)
+        {
+            return parent->ClassOrNsNoThrow();
         }
         else
         {
@@ -354,7 +421,7 @@ InterfaceTypeSymbol* Symbol::ContainingInterfaceNoThrow()
     }
 }
 
-const FunctionSymbol* Symbol::Function() const
+const FunctionSymbol* Symbol::FunctionNoThrow() const
 {
     if (IsFunctionSymbol())
     {
@@ -364,16 +431,16 @@ const FunctionSymbol* Symbol::Function() const
     {
         if (parent)
         {
-            return parent->Function();
+            return parent->FunctionNoThrow();
         }
         else
         {
-            throw std::runtime_error("function symbol not found");
+            return nullptr;
         }
     }
 }
 
-FunctionSymbol* Symbol::Function()
+FunctionSymbol* Symbol::FunctionNoThrow()
 {
     if (IsFunctionSymbol())
     {
@@ -383,12 +450,88 @@ FunctionSymbol* Symbol::Function()
     {
         if (parent)
         {
-            return parent->Function();
+            return parent->FunctionNoThrow();
         }
         else
         {
-            throw std::runtime_error("function symbol not found");
+            return nullptr;
         }
+    }
+}
+
+const FunctionSymbol* Symbol::Function() const
+{
+    const FunctionSymbol* function = FunctionNoThrow();
+    if (function)
+    {
+        return function;
+    }
+    else
+    {
+        throw std::runtime_error("function symbol not found");
+    }
+}
+
+FunctionSymbol* Symbol::Function()
+{
+    FunctionSymbol* function = FunctionNoThrow();
+    if (function)
+    {
+        return function;
+    }
+    else
+    {
+        throw std::runtime_error("function symbol not found");
+    }
+}
+
+const FunctionSymbol* Symbol::ContainingFunctionNoThrow() const
+{
+    if (parent)
+    {
+        return parent->FunctionNoThrow();
+    }
+    else
+    {
+        return nullptr;
+    }
+}
+
+FunctionSymbol* Symbol::ContainingFunctionNoThrow()
+{
+    if (parent)
+    {
+        return parent->FunctionNoThrow();
+    }
+    else
+    {
+        return nullptr;
+    }
+}
+
+const ContainerScope* Symbol::ClassOrNsScope() const
+{
+    const ContainerSymbol* classOrNs = ClassOrNsNoThrow();
+    if (classOrNs)
+    {
+        return classOrNs->GetContainerScope();
+    }
+    else
+    {
+        throw std::runtime_error("class or namespace scope not found");
+    }
+}
+
+ContainerScope* Symbol::ClassOrNsScope()
+{
+    ContainerSymbol* classOrNs = ClassOrNsNoThrow();
+    if (classOrNs)
+    {
+        return classOrNs->GetContainerScope();
+    }
+    else
+    {
+        throw std::runtime_error("class or namespace scope not found");
     }
 }
 
@@ -450,6 +593,7 @@ SymbolFactory::SymbolFactory()
     Register(SymbolType::enumTypeSymbol, new ConcreteSymbolCreator<EnumTypeSymbol>());
     Register(SymbolType::enumConstantSymbol, new ConcreteSymbolCreator<EnumConstantSymbol>());
     Register(SymbolType::templateParameterSymbol, new ConcreteSymbolCreator<TemplateParameterSymbol>());
+    Register(SymbolType::boundTemplateParameterSymbol, new ConcreteSymbolCreator<BoundTemplateParameterSymbol>());
     Register(SymbolType::parameterSymbol, new ConcreteSymbolCreator<ParameterSymbol>());
     Register(SymbolType::localVariableSymbol, new ConcreteSymbolCreator<LocalVariableSymbol>());
     Register(SymbolType::memberVariableSymbol, new ConcreteSymbolCreator<MemberVariableSymbol>());

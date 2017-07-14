@@ -17,6 +17,7 @@ public:
     void Write(SymbolWriter& writer) override;
     void Read(SymbolReader& reader) override;
     void EmplaceType(TypeSymbol* typeSymbol_, int index) override;
+    std::string TypeString() const override { return "constant"; }
     void SetSpecifiers(Specifiers specifiers);
     const TypeSymbol* GetType() const { return typeSymbol; }
     void SetType(TypeSymbol* typeSymbol_) { typeSymbol = typeSymbol_; }

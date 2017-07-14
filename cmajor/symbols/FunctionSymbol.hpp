@@ -6,15 +6,19 @@
 #ifndef CMAJOR_SYMBOLS_FUNCTION_SYMBOL_INCLUDED
 #define CMAJOR_SYMBOLS_FUNCTION_SYMBOL_INCLUDED
 #include <cmajor/symbols/ContainerSymbol.hpp>
+#include <cmajor/ir/GenObject.hpp>
 #include <unordered_set>
 
 namespace cmajor {  namespace symbols {
+
+using namespace cmajor::ir;
 
 class FunctionGroupSymbol : public Symbol
 {
 public:
     FunctionGroupSymbol(const Span& span_, const std::u32string& name_);
     bool IsExportSymbol() const override { return false; }
+    std::string TypeString() const override { return "function group"; }
     void AddFunction(FunctionSymbol* function);
     void CollectViableFunctions(int arity, std::unordered_set<FunctionSymbol*>& viableFunctions);
 private:
@@ -65,9 +69,11 @@ public:
     void EmplaceType(TypeSymbol* typeSymbol_, int index) override;
     void AddMember(Symbol* member) override;
     bool IsFunctionSymbol() const override { return true; }
+    std::string TypeString() const override { return "function"; }
     virtual void ComputeName();
     std::u32string FullName() const override;
     std::u32string FullNameWithSpecifiers() const override;
+    virtual void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects);
     const std::u32string& GroupName() const { return groupName; }
     void SetGroupName(const std::u32string& groupName_);
     void SetSpecifiers(Specifiers specifiers);
@@ -118,6 +124,7 @@ class StaticConstructorSymbol : public FunctionSymbol
 {
 public:
     StaticConstructorSymbol(const Span& span_, const std::u32string& name_);
+    std::string TypeString() const override { return "static constructor"; }
     void SetSpecifiers(Specifiers specifiers);
 };
 
@@ -125,6 +132,7 @@ class ConstructorSymbol : public FunctionSymbol
 {
 public:
     ConstructorSymbol(const Span& span_, const std::u32string& name_);
+    std::string TypeString() const override { return "constructor"; }
     void SetSpecifiers(Specifiers specifiers);
 };
 
@@ -132,6 +140,7 @@ class DestructorSymbol : public FunctionSymbol
 {
 public:
     DestructorSymbol(const Span& span_, const std::u32string& name_);
+    std::string TypeString() const override { return "destructor"; }
     void SetSpecifiers(Specifiers specifiers);
 };
 
@@ -139,6 +148,7 @@ class MemberFunctionSymbol : public FunctionSymbol
 {
 public:
     MemberFunctionSymbol(const Span& span_, const std::u32string& name_);
+    std::string TypeString() const override { return "member function"; }
     void SetSpecifiers(Specifiers specifiers);
 };
 

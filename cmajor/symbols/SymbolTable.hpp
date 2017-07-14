@@ -74,6 +74,7 @@ public:
     void EndEnumType();
     void AddEnumConstant(EnumConstantNode& enumConstantNode);
     void AddTypeSymbolToGlobalScope(TypeSymbol* typeSymbol);
+    void AddFunctionSymbolToGlobalScope(FunctionSymbol* functionSymbol);
     void MapNode(Node* node, Symbol* symbol);
     Symbol* GetSymbolNoThrow(Node* node) const;
     Symbol* GetSymbol(Node* node) const;

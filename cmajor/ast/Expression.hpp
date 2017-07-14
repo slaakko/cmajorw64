@@ -20,6 +20,7 @@ public:
     void Write(AstWriter& writer) override;
     void Read(AstReader& reader) override;
     const Node* Subject() const { return subject.get(); }
+    Node* Subject() { return subject.get(); }
     const IdentifierNode* MemberId() const { return memberId.get(); }
 private:
     std::unique_ptr<Node> subject;

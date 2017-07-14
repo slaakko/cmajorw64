@@ -244,6 +244,11 @@ std::u32string FunctionSymbol::FullNameWithSpecifiers() const
     return fullNameWithSpecifiers;
 }
 
+void FunctionSymbol::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects)
+{
+    // todo
+}
+
 void FunctionSymbol::AddLocalVariable(LocalVariableSymbol* localVariable)
 {
     localVariables.push_back(localVariable);

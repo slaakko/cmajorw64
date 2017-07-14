@@ -21,6 +21,7 @@ public:
     CompileUnitNode* GetCompileUnitNode() const { return compileUnitNode; }
     void AddFileScope(FileScope* fileScope);
     FileScope* FirstFileScope() const { Assert(!fileScopes.empty(), "file scopes empty");  return fileScopes.front().get(); }
+    const std::vector<std::unique_ptr<FileScope>>& FileScopes() const { return fileScopes; }
 private:
     Module& mod;
     SymbolTable& symbolTable;

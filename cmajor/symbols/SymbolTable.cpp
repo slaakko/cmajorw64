@@ -7,6 +7,7 @@
 #include <cmajor/symbols/SymbolWriter.hpp>
 #include <cmajor/symbols/SymbolReader.hpp>
 #include <cmajor/symbols/BasicTypeSymbol.hpp>
+#include <cmajor/symbols/BasicTypeOperation.hpp>
 #include <cmajor/symbols/FunctionSymbol.hpp>
 #include <cmajor/symbols/ClassTypeSymbol.hpp>
 #include <cmajor/symbols/InterfaceTypeSymbol.hpp>
@@ -394,6 +395,12 @@ void SymbolTable::AddTypeSymbolToGlobalScope(TypeSymbol* typeSymbol)
     typeNameMap[typeSymbol->FullName()] = typeSymbol;
 }
 
+void SymbolTable::AddFunctionSymbolToGlobalScope(FunctionSymbol* functionSymbol)
+{
+    functionSymbol->SetSymbolTable(this);
+    globalNs.AddMember(functionSymbol);
+}
+
 void SymbolTable::MapNode(Node* node, Symbol* symbol)
 {
     nodeSymbolMap[node] = symbol;
@@ -524,21 +531,37 @@ TypeSymbol* SymbolTable::GetTypeByName(const std::u32string& typeName) const
 
 void InitSymbolTable(SymbolTable& symbolTable)
 {
-    symbolTable.AddTypeSymbolToGlobalScope(new BoolTypeSymbol(Span(), U"bool"));
-    symbolTable.AddTypeSymbolToGlobalScope(new SByteTypeSymbol(Span(), U"sbyte"));
-    symbolTable.AddTypeSymbolToGlobalScope(new ByteTypeSymbol(Span(), U"byte"));
-    symbolTable.AddTypeSymbolToGlobalScope(new ShortTypeSymbol(Span(), U"short"));
-    symbolTable.AddTypeSymbolToGlobalScope(new UShortTypeSymbol(Span(), U"ushort"));
-    symbolTable.AddTypeSymbolToGlobalScope(new IntTypeSymbol(Span(), U"int"));
-    symbolTable.AddTypeSymbolToGlobalScope(new UIntTypeSymbol(Span(), U"uint"));
-    symbolTable.AddTypeSymbolToGlobalScope(new LongTypeSymbol(Span(), U"long"));
-    symbolTable.AddTypeSymbolToGlobalScope(new ULongTypeSymbol(Span(), U"ulong"));
-    symbolTable.AddTypeSymbolToGlobalScope(new FloatTypeSymbol(Span(), U"float"));
-    symbolTable.AddTypeSymbolToGlobalScope(new DoubleTypeSymbol(Span(), U"double"));
-    symbolTable.AddTypeSymbolToGlobalScope(new CharTypeSymbol(Span(), U"char"));
-    symbolTable.AddTypeSymbolToGlobalScope(new WCharTypeSymbol(Span(), U"wchar"));
-    symbolTable.AddTypeSymbolToGlobalScope(new UCharTypeSymbol(Span(), U"uchar"));
-    symbolTable.AddTypeSymbolToGlobalScope(new VoidTypeSymbol(Span(), U"void"));
+    BoolTypeSymbol* boolType = new BoolTypeSymbol(Span(), U"bool");
+    SByteTypeSymbol* sbyteType = new SByteTypeSymbol(Span(), U"sbyte");
+    ByteTypeSymbol* byteType = new ByteTypeSymbol(Span(), U"byte");
+    ShortTypeSymbol* shortType = new ShortTypeSymbol(Span(), U"short");
+    UShortTypeSymbol* ushortType = new UShortTypeSymbol(Span(), U"ushort");
+    IntTypeSymbol* intType = new IntTypeSymbol(Span(), U"int");
+    UIntTypeSymbol* uintType = new UIntTypeSymbol(Span(), U"uint");
+    LongTypeSymbol* longType = new LongTypeSymbol(Span(), U"long");
+    ULongTypeSymbol* ulongType = new ULongTypeSymbol(Span(), U"ulong");
+    FloatTypeSymbol* floatType = new FloatTypeSymbol(Span(), U"float");
+    DoubleTypeSymbol* doubleType = new DoubleTypeSymbol(Span(), U"double");
+    CharTypeSymbol* charType = new CharTypeSymbol(Span(), U"char");
+    WCharTypeSymbol* wcharType = new WCharTypeSymbol(Span(), U"wchar");
+    UCharTypeSymbol* ucharType = new UCharTypeSymbol(Span(), U"uchar");
+    VoidTypeSymbol* voidType = new VoidTypeSymbol(Span(), U"void");
+    symbolTable.AddTypeSymbolToGlobalScope(boolType);
+    symbolTable.AddTypeSymbolToGlobalScope(sbyteType);
+    symbolTable.AddTypeSymbolToGlobalScope(byteType);
+    symbolTable.AddTypeSymbolToGlobalScope(shortType);
+    symbolTable.AddTypeSymbolToGlobalScope(ushortType);
+    symbolTable.AddTypeSymbolToGlobalScope(intType);
+    symbolTable.AddTypeSymbolToGlobalScope(uintType);
+    symbolTable.AddTypeSymbolToGlobalScope(longType);
+    symbolTable.AddTypeSymbolToGlobalScope(ulongType);
+    symbolTable.AddTypeSymbolToGlobalScope(floatType);
+    symbolTable.AddTypeSymbolToGlobalScope(doubleType);
+    symbolTable.AddTypeSymbolToGlobalScope(charType);
+    symbolTable.AddTypeSymbolToGlobalScope(wcharType);
+    symbolTable.AddTypeSymbolToGlobalScope(ucharType);
+    symbolTable.AddTypeSymbolToGlobalScope(voidType);
+    MakeBasicTypeOperations(symbolTable, boolType, sbyteType, byteType, shortType, ushortType, intType, uintType, longType, ulongType, floatType, doubleType, charType, wcharType, ucharType);
 }
 
 } } // namespace cmajor::symbols
