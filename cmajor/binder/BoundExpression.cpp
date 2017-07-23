@@ -4,38 +4,177 @@
 // =================================
 
 #include <cmajor/binder/BoundExpression.hpp>
+#include <cmajor/binder/TypeResolver.hpp>
+#include <cmajor/binder/BoundNodeVisitor.hpp>
 #include <cmajor/symbols/FunctionSymbol.hpp>
 #include <cmajor/symbols/Exception.hpp>
+#include <cmajor/symbols/EnumSymbol.hpp>
 #include <cmajor/ir/Emitter.hpp>
 
 namespace cmajor { namespace binder {
 
-BoundExpression::BoundExpression(const Span& span_, TypeSymbol* type_) : BoundNode(span_), type(type_)
+BoundExpression::BoundExpression(const Span& span_, BoundNodeType boundNodeType_, TypeSymbol* type_) : BoundNode(span_, boundNodeType_), type(type_), flags(BoundExpressionFlags::none)
 {
 }
 
-BoundLocalVariable::BoundLocalVariable(LocalVariableSymbol* localVariableSymbol_) : BoundExpression(localVariableSymbol_->GetSpan(), localVariableSymbol_->GetType()), localVariableSymbol(localVariableSymbol_)
+BoundParameter::BoundParameter(ParameterSymbol* parameterSymbol_) : BoundExpression(parameterSymbol_->GetSpan(), BoundNodeType::boundParameter, parameterSymbol_->GetType()), parameterSymbol(parameterSymbol_)
+{
+}
+
+void BoundParameter::Load(Emitter& emitter)
+{
+    if (GetFlag(BoundExpressionFlags::address))
+    {
+        emitter.Stack().Push(parameterSymbol->IrObject());
+    }
+    else if (GetFlag((BoundExpressionFlags::value)))
+    {
+        emitter.Stack().Push(emitter.Builder().CreateLoad(emitter.Builder().CreateLoad(parameterSymbol->IrObject())));
+    }
+    else
+    {
+        emitter.Stack().Push(emitter.Builder().CreateLoad(parameterSymbol->IrObject()));
+    }
+}
+
+void BoundParameter::Store(Emitter& emitter)
+{
+    llvm::Value* value = emitter.Stack().Pop();
+    emitter.Builder().CreateStore(value, parameterSymbol->IrObject()); // todo?
+}
+
+void BoundParameter::Accept(BoundNodeVisitor& visitor)
+{
+    visitor.Visit(*this);
+}
+
+BoundLocalVariable::BoundLocalVariable(LocalVariableSymbol* localVariableSymbol_) : 
+    BoundExpression(localVariableSymbol_->GetSpan(), BoundNodeType::boundLocalVariable, localVariableSymbol_->GetType()), localVariableSymbol(localVariableSymbol_)
 {
 }
 
 void BoundLocalVariable::Load(Emitter& emitter)
 {
-    emitter.Stack().Push(emitter.Builder().CreateLoad(localVariableSymbol->Storage()));
+    if (GetFlag(BoundExpressionFlags::address))
+    {
+        emitter.Stack().Push(localVariableSymbol->IrObject());
+    }
+    else if (GetFlag((BoundExpressionFlags::value)))
+    {
+        emitter.Stack().Push(emitter.Builder().CreateLoad(emitter.Builder().CreateLoad(localVariableSymbol->IrObject())));
+    }
+    else
+    {
+        emitter.Stack().Push(emitter.Builder().CreateLoad(localVariableSymbol->IrObject()));
+    }
 }
 
 void BoundLocalVariable::Store(Emitter& emitter)
 {
     llvm::Value* value = emitter.Stack().Pop();
-    emitter.Builder().CreateStore(value, localVariableSymbol->Storage());
+    emitter.Builder().CreateStore(value, localVariableSymbol->IrObject());
 }
 
-BoundFunctionCall::BoundFunctionCall(const Span& span_, FunctionSymbol* functionSymbol_) : BoundExpression(span_, functionSymbol_->ReturnType()), functionSymbol(functionSymbol_)
+void BoundLocalVariable::Accept(BoundNodeVisitor& visitor)
+{
+    visitor.Visit(*this);
+}
+
+BoundMemberVariable::BoundMemberVariable(MemberVariableSymbol* memberVariableSymbol_) :
+    BoundExpression(memberVariableSymbol_->GetSpan(), BoundNodeType::boundMemberVariable, memberVariableSymbol_->GetType()), memberVariableSymbol(memberVariableSymbol_), staticInitNeeded(false)
+{
+}
+
+void BoundMemberVariable::Load(Emitter& emitter)
+{
+    // todo
+}
+
+void BoundMemberVariable::Store(Emitter& emitter)
+{
+    // todo
+}
+
+void BoundMemberVariable::Accept(BoundNodeVisitor& visitor)
+{
+    visitor.Visit(*this);
+}
+
+void BoundMemberVariable::SetClassObject(std::unique_ptr<BoundExpression>&& classObject_)
+{
+    classObject = std::move(classObject_);
+}
+
+BoundConstant::BoundConstant(ConstantSymbol* constantSymbol_) : BoundExpression(constantSymbol_->GetSpan(), BoundNodeType::boundConstant, constantSymbol_->GetType()), constantSymbol(constantSymbol_)
+{
+}
+
+void BoundConstant::Load(Emitter& emitter)
+{
+    emitter.Stack().Push(constantSymbol->GetValue()->IrValue(emitter));
+}
+
+void BoundConstant::Store(Emitter& emitter)
+{
+    throw Exception("cannot store to constant", GetSpan());
+}
+
+void BoundConstant::Accept(BoundNodeVisitor& visitor)
+{
+    visitor.Visit(*this);
+}
+
+BoundEnumConstant::BoundEnumConstant(EnumConstantSymbol* enumConstantSymbol_) : BoundExpression(enumConstantSymbol_->GetSpan(), BoundNodeType::boundEnumConstant, enumConstantSymbol_->GetType()),
+    enumConstantSymbol(enumConstantSymbol_)
+{
+}
+
+void BoundEnumConstant::Load(Emitter& emitter)
+{
+    emitter.Stack().Push(enumConstantSymbol->GetValue()->IrValue(emitter));
+}
+
+void BoundEnumConstant::Store(Emitter& emitter)
+{
+    throw Exception("cannot store to enumeration constant", GetSpan());
+}
+
+void BoundEnumConstant::Accept(BoundNodeVisitor& visitor)
+{
+    visitor.Visit(*this);
+}
+
+BoundLiteral::BoundLiteral(std::unique_ptr<Value>&& value_, TypeSymbol* type_) : BoundExpression(value_->GetSpan(), BoundNodeType::boundLiteral, type_), value(std::move(value_))
+{
+}
+
+void BoundLiteral::Load(Emitter& emitter)
+{
+    emitter.Stack().Push(value->IrValue(emitter));
+}
+
+void BoundLiteral::Store(Emitter& emitter)
+{
+    throw Exception("cannot store to literal", GetSpan());
+}
+
+void BoundLiteral::Accept(BoundNodeVisitor& visitor)
+{
+    visitor.Visit(*this);
+}
+
+BoundFunctionCall::BoundFunctionCall(const Span& span_, FunctionSymbol* functionSymbol_) : BoundExpression(span_, BoundNodeType::boundFunctionCall, functionSymbol_->ReturnType()), functionSymbol(functionSymbol_)
 {
 }
 
 void BoundFunctionCall::AddArgument(std::unique_ptr<BoundExpression>&& argument)
 {
     arguments.push_back(std::move(argument));
+}
+
+void BoundFunctionCall::SetArguments(std::vector<std::unique_ptr<BoundExpression>>&& arguments_)
+{
+    arguments = std::move(arguments_);
 }
 
 void BoundFunctionCall::Load(Emitter& emitter)
@@ -51,6 +190,103 @@ void BoundFunctionCall::Load(Emitter& emitter)
 void BoundFunctionCall::Store(Emitter& emitter)
 {
     throw Exception("cannot store to function call", GetSpan(), functionSymbol->GetSpan());
+}
+
+void BoundFunctionCall::Accept(BoundNodeVisitor& visitor)
+{
+    visitor.Visit(*this);
+}
+
+bool BoundFunctionCall::HasValue() const
+{ 
+    return functionSymbol->ReturnType() && functionSymbol->ReturnType()->GetSymbolType() != SymbolType::voidTypeSymbol; 
+}
+
+BoundConversion::BoundConversion(std::unique_ptr<BoundExpression>&& sourceExpr_, FunctionSymbol* conversionFun_) :
+    BoundExpression(sourceExpr_->GetSpan(), BoundNodeType::boundConversion, sourceExpr_->GetType()), sourceExpr(std::move(sourceExpr_)), conversionFun(conversionFun_)
+{
+}
+
+void BoundConversion::Load(Emitter& emitter)
+{
+    sourceExpr->Load(emitter);
+    std::vector<GenObject*> emptyObjects;
+    conversionFun->GenerateCall(emitter, emptyObjects);
+}
+
+void BoundConversion::Store(Emitter& emitter)
+{
+    throw Exception("cannot store to conversion", GetSpan());
+}
+
+void BoundConversion::Accept(BoundNodeVisitor& visitor)
+{
+    visitor.Visit(*this);
+}
+
+BoundTypeExpression::BoundTypeExpression(const Span& span_, TypeSymbol* type_) : BoundExpression(span_, BoundNodeType::boundTypeExpression, type_)
+{
+}
+
+void BoundTypeExpression::Load(Emitter& emitter)
+{
+    throw Exception("cannot load from type", GetSpan());
+}
+
+void BoundTypeExpression::Store(Emitter& emitter)
+{
+    throw Exception("cannot store to type", GetSpan());
+}
+
+void BoundTypeExpression::Accept(BoundNodeVisitor& visitor)
+{
+    throw Exception("cannot visit type", GetSpan());
+}
+
+BoundNamespaceExpression::BoundNamespaceExpression(const Span& span_, NamespaceSymbol* ns_) : BoundExpression(span_, BoundNodeType::boundNamespaceExpression, new NamespaceTypeSymbol(ns_)), ns(ns_)
+{
+    nsType.reset(GetType());
+}
+
+void BoundNamespaceExpression::Load(Emitter& emitter)
+{
+    throw Exception("cannot load from namespace", GetSpan());
+}
+
+void BoundNamespaceExpression::Store(Emitter& emitter)
+{
+    throw Exception("cannot store to namespace", GetSpan());
+}
+
+void BoundNamespaceExpression::Accept(BoundNodeVisitor& visitor)
+{
+    throw Exception("cannot visit namespace", GetSpan());
+}
+
+BoundFunctionGroupExpression::BoundFunctionGroupExpression(const Span& span_, FunctionGroupSymbol* functionGroupSymbol_) : 
+    BoundExpression(span_, BoundNodeType::boundFunctionGroupExcpression, new FunctionGroupTypeSymbol(functionGroupSymbol_)), functionGroupSymbol(functionGroupSymbol_), scopeQualified(false), qualifiedScope(nullptr)
+{
+    functionGroupType.reset(GetType());
+}
+
+void BoundFunctionGroupExpression::Load(Emitter& emitter)
+{
+    // Fun2Dlg conversion does not need source value, so this implementation is intentionally left empty.
+}
+
+void BoundFunctionGroupExpression::Store(Emitter& emitter)
+{
+    throw Exception("cannot store to function group", GetSpan());
+}
+
+void BoundFunctionGroupExpression::Accept(BoundNodeVisitor& visitor)
+{
+    throw Exception("cannot visit function group", GetSpan());
+}
+
+void BoundFunctionGroupExpression::SetClassObject(std::unique_ptr<BoundExpression>&& classObject_)
+{
+    classObject = std::move(classObject_);
 }
 
 } } // namespace cmajor::binder

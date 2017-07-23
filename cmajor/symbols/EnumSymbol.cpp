@@ -108,4 +108,9 @@ EnumConstantSymbol::EnumConstantSymbol(const Span& span_, const std::u32string& 
 {
 }
 
+void EnumConstantSymbol::SetValue(Value* value_)
+{
+    value.reset(value_);
+}
+
 } } // namespace cmajor::symbols

@@ -36,10 +36,6 @@ class LocalVariableSymbol : public VariableSymbol
 public:     
     LocalVariableSymbol(const Span& span_, const std::u32string& name_);
     SymbolAccess DeclaredAccess() const override { return SymbolAccess::public_; }
-    void SetStorage(llvm::AllocaInst* storage_) { storage = storage_; }
-    llvm::AllocaInst* Storage() { return storage; }
-private:
-    llvm::AllocaInst* storage;
 };
 
 class MemberVariableSymbol : public VariableSymbol

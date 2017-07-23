@@ -72,6 +72,19 @@ private:
     Node* parent;
 };
 
+class UnaryNode : public Node
+{
+public:
+    UnaryNode(NodeType nodeType, const Span& span_);
+    UnaryNode(NodeType nodeType, const Span& span_, Node* subject_);
+    void Write(AstWriter& writer) override;
+    void Read(AstReader& reader) override;
+    const Node* Subject() const { return subject.get(); }
+    Node* Subject() { return subject.get(); }
+private:
+    std::unique_ptr<Node> subject;
+};
+
 class BinaryNode : public Node
 {
 public:

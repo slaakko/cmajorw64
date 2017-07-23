@@ -9,6 +9,7 @@
 #include <cmajor/ast/Identifier.hpp>
 #include <cmajor/ast/Expression.hpp>
 #include <cmajor/symbols/ClassTypeSymbol.hpp>
+#include <cmajor/symbols/DerivedTypeSymbol.hpp>
 #include <cmajor/symbols/Exception.hpp>
 #include <cmajor/util/Unicode.hpp>
 
@@ -16,23 +17,16 @@ namespace cmajor { namespace binder {
 
 using namespace cmajor::unicode;
 
-class NamespaceTypeSymbol : public TypeSymbol
+NamespaceTypeSymbol::NamespaceTypeSymbol(NamespaceSymbol* ns_) : TypeSymbol(SymbolType::namespaceTypeSymbol, ns_->GetSpan(), ns_->Name()), ns(ns_)
 {
-public:
-    NamespaceTypeSymbol(NamespaceSymbol* ns_) : TypeSymbol(SymbolType::namespaceTypeSymbol, ns_->GetSpan(), ns_->Name()), ns(ns_) {}
-    bool IsInComplete() const override { return true; }
-    const NamespaceSymbol* Ns() const { return ns; }
-    NamespaceSymbol* Ns() { return ns; }
-    llvm::Type* IrType(Emitter& emitter) const override { return nullptr; } 
-private:
-    NamespaceSymbol* ns;
-};
+}
 
 class TypeResolver : public Visitor
 {
 public:
     TypeResolver(BoundCompileUnit& boundCompileUnit_, ContainerScope* containerScope_);
     TypeSymbol* GetType() { return type; }
+    const TypeDerivationRec& DerivationRec() const { return derivationRec; }
     void Visit(BoolNode& boolNode) override;
     void Visit(SByteNode& sbyteNode) override;
     void Visit(ByteNode& byteNode) override;
@@ -48,93 +42,148 @@ public:
     void Visit(WCharNode& wcharNode) override;
     void Visit(UCharNode& ucharNode) override;
     void Visit(VoidNode& voidNode) override;
+    void Visit(ConstNode& constNode) override;
+    void Visit(LValueRefNode& lvalueRefNode) override;
+    void Visit(RValueRefNode& rvalueRefNode) override;
+    void Visit(PointerNode& pointerNode) override;
+    void Visit(ArrayNode& arrayNode) override;
     void Visit(IdentifierNode& identifierNode) override;
     void Visit(DotNode& dotNode) override;
 private:
     BoundCompileUnit& boundCompileUnit;
+    SymbolTable& symbolTable;
     ContainerScope* containerScope;
     TypeSymbol* type;
+    TypeDerivationRec derivationRec;
     std::unique_ptr<NamespaceTypeSymbol> nsTypeSymbol;
     void ResolveSymbol(Node& node, Symbol* symbol);
 };
 
-TypeResolver::TypeResolver(BoundCompileUnit& boundCompileUnit_, ContainerScope* containerScope_) : boundCompileUnit(boundCompileUnit_), containerScope(containerScope_), type(nullptr), nsTypeSymbol()
+TypeResolver::TypeResolver(BoundCompileUnit& boundCompileUnit_, ContainerScope* containerScope_) : 
+    boundCompileUnit(boundCompileUnit_), symbolTable(boundCompileUnit.GetSymbolTable()), containerScope(containerScope_), type(nullptr), derivationRec(), nsTypeSymbol()
 {
 }
 
 void TypeResolver::Visit(BoolNode& boolNode)
 {
-    type = boundCompileUnit.GetSymbolTable().GetTypeByName(U"bool");
+    type = symbolTable.GetTypeByName(U"bool");
 }
 
 void TypeResolver::Visit(SByteNode& sbyteNode)
 {
-    type = boundCompileUnit.GetSymbolTable().GetTypeByName(U"sbyte");
+    type = symbolTable.GetTypeByName(U"sbyte");
 }
 
 void TypeResolver::Visit(ByteNode& byteNode)
 {
-    type = boundCompileUnit.GetSymbolTable().GetTypeByName(U"byte");
+    type = symbolTable.GetTypeByName(U"byte");
 }
 
 void TypeResolver::Visit(ShortNode& shortNode)
 {
-    type = boundCompileUnit.GetSymbolTable().GetTypeByName(U"short");
+    type = symbolTable.GetTypeByName(U"short");
 }
 
 void TypeResolver::Visit(UShortNode& ushortNode)
 {
-    type = boundCompileUnit.GetSymbolTable().GetTypeByName(U"ushort");
+    type = symbolTable.GetTypeByName(U"ushort");
 }
 
 void TypeResolver::Visit(IntNode& intNode)
 {
-    type = boundCompileUnit.GetSymbolTable().GetTypeByName(U"int");
+    type = symbolTable.GetTypeByName(U"int");
 }
 
 void TypeResolver::Visit(UIntNode& uintNode)
 {
-    type = boundCompileUnit.GetSymbolTable().GetTypeByName(U"uint");
+    type = symbolTable.GetTypeByName(U"uint");
 }
 
 void TypeResolver::Visit(LongNode& longNode)
 {
-    type = boundCompileUnit.GetSymbolTable().GetTypeByName(U"long");
+    type = symbolTable.GetTypeByName(U"long");
 }
 
 void TypeResolver::Visit(ULongNode& ulongNode)
 {
-    type = boundCompileUnit.GetSymbolTable().GetTypeByName(U"ulong");
+    type = symbolTable.GetTypeByName(U"ulong");
 }
 
 void TypeResolver::Visit(FloatNode& floatNode)
 {
-    type = boundCompileUnit.GetSymbolTable().GetTypeByName(U"float");
+    type = symbolTable.GetTypeByName(U"float");
 }
 
 void TypeResolver::Visit(DoubleNode& doubleNode)
 {
-    type = boundCompileUnit.GetSymbolTable().GetTypeByName(U"double");
+    type = symbolTable.GetTypeByName(U"double");
 }
 
 void TypeResolver::Visit(CharNode& charNode)
 {
-    type = boundCompileUnit.GetSymbolTable().GetTypeByName(U"char");
+    type = symbolTable.GetTypeByName(U"char");
 }
 
 void TypeResolver::Visit(WCharNode& wcharNode)
 {
-    type = boundCompileUnit.GetSymbolTable().GetTypeByName(U"wchar");
+    type = symbolTable.GetTypeByName(U"wchar");
 }
 
 void TypeResolver::Visit(UCharNode& ucharNode)
 {
-    type = boundCompileUnit.GetSymbolTable().GetTypeByName(U"uchar");
+    type = symbolTable.GetTypeByName(U"uchar");
 }
 
 void TypeResolver::Visit(VoidNode& voidNode)
 {
-    type = boundCompileUnit.GetSymbolTable().GetTypeByName(U"void");
+    type = symbolTable.GetTypeByName(U"void");
+}
+
+void TypeResolver::Visit(ConstNode& constNode)
+{
+    derivationRec.derivations.push_back(Derivation::constDerivation);
+    constNode.Subject()->Accept(*this);
+}
+
+void TypeResolver::Visit(LValueRefNode& lvalueRefNode)
+{
+    if (HasReferenceDerivation(derivationRec.derivations))
+    {
+        throw Exception("cannot have reference to reference type", lvalueRefNode.GetSpan());
+    }
+    derivationRec.derivations.push_back(Derivation::lvalueRefDerivation);
+    lvalueRefNode.Subject()->Accept(*this);
+}
+
+void TypeResolver::Visit(RValueRefNode& rvalueRefNode)
+{
+    if (HasReferenceDerivation(derivationRec.derivations))
+    {
+        throw Exception("cannot have reference to reference type", rvalueRefNode.GetSpan());
+    }
+    derivationRec.derivations.push_back(Derivation::rvalueRefDerivation);
+    rvalueRefNode.Subject()->Accept(*this);
+}
+
+void TypeResolver::Visit(PointerNode& pointerNode)
+{
+    derivationRec.derivations.push_back(Derivation::pointerDerivation);
+    pointerNode.Subject()->Accept(*this);
+    if (HasReferenceDerivation(derivationRec.derivations))
+    {
+        throw Exception("cannot have pointer to reference type", pointerNode.GetSpan());
+    }
+}
+
+void TypeResolver::Visit(ArrayNode& arrayNode)
+{
+    if (HasReferenceDerivation(derivationRec.derivations))
+    {
+        throw Exception("cannot have array of reference type", arrayNode.GetSpan());
+    }
+    derivationRec.derivations.push_back(Derivation::arrayDerivation);
+    // todo evaluate size
+    arrayNode.Subject()->Accept(*this);
 }
 
 void TypeResolver::ResolveSymbol(Node& node, Symbol* symbol)
@@ -222,6 +271,11 @@ TypeSymbol* ResolveType(Node* typeExprNode, BoundCompileUnit& boundCompileUnit, 
     if (type->IsInComplete())
     {
         throw Exception("incomplete type expression", typeExprNode->GetSpan());
+    }
+    const TypeDerivationRec& derivationRec = typeResolver.DerivationRec();
+    if (!derivationRec.derivations.empty())
+    {
+        return boundCompileUnit.GetSymbolTable().MakeDerivedType(type, derivationRec);
     }
     return type;
 }

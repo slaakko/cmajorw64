@@ -13,6 +13,7 @@ class BinaryReader
 {
 public:
     BinaryReader(const std::string& fileName_);
+    const std::string& FileName() const { return fileName; }
     virtual ~BinaryReader();
     bool ReadBool();
     uint8_t ReadByte();

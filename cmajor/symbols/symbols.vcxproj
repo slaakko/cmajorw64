@@ -24,6 +24,7 @@
     <ClInclude Include="ClassTypeSymbol.hpp" />
     <ClInclude Include="ConstantSymbol.hpp" />
     <ClInclude Include="ContainerSymbol.hpp" />
+    <ClInclude Include="ConversionTable.hpp" />
     <ClInclude Include="DelegateSymbol.hpp" />
     <ClInclude Include="DerivedTypeSymbol.hpp" />
     <ClInclude Include="EnumSymbol.hpp" />
@@ -53,6 +54,7 @@
     <ClCompile Include="ClassTypeSymbol.cpp" />
     <ClCompile Include="ConstantSymbol.cpp" />
     <ClCompile Include="ContainerSymbol.cpp" />
+    <ClCompile Include="ConversionTable.cpp" />
     <ClCompile Include="DelegateSymbol.cpp" />
     <ClCompile Include="DerivedTypeSymbol.cpp" />
     <ClCompile Include="EnumSymbol.cpp" />

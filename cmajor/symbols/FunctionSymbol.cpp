@@ -12,10 +12,74 @@
 #include <cmajor/symbols/SymbolReader.hpp>
 #include <cmajor/symbols/Exception.hpp>
 #include <cmajor/util/Unicode.hpp>
+#include <cmajor/util/Sha1.hpp>
+#include <llvm/IR/Module.h>
 
 namespace cmajor { namespace symbols {
 
 using namespace cmajor::unicode;
+
+class OperatorMangleMap
+{
+public:
+    static OperatorMangleMap& Instance() { Assert(instance, "operator mangle map not initialized");  return *instance; }
+    static void Init();
+    static void Done();
+    std::u32string Mangle(const std::u32string& groupName);
+private:
+    static std::unique_ptr<OperatorMangleMap> instance;
+    std::unordered_map<std::u32string, std::u32string> mangleMap;
+    OperatorMangleMap();
+};
+
+std::unique_ptr<OperatorMangleMap> OperatorMangleMap::instance;
+
+void OperatorMangleMap::Init()
+{
+    instance.reset(new OperatorMangleMap());
+}
+
+void OperatorMangleMap::Done()
+{
+    instance.reset();
+}
+
+OperatorMangleMap::OperatorMangleMap()
+{
+    mangleMap[U"operator<<"] = U"op_shl";
+    mangleMap[U"operator>>"] = U"op_shr";
+    mangleMap[U"operator=="] = U"op_eq";
+    mangleMap[U"operator="] = U"op_assign";
+    mangleMap[U"operator<"] = U"op_less";
+    mangleMap[U"operator->"] = U"op_arrow";
+    mangleMap[U"operator++"] = U"op_plusplus";
+    mangleMap[U"operator--"] = U"op_minusminus";
+    mangleMap[U"operator+"] = U"op_plus";
+    mangleMap[U"operator-"] = U"op_minus";
+    mangleMap[U"operator*"] = U"op_mul";
+    mangleMap[U"operator/"] = U"op_div";
+    mangleMap[U"operator%"] = U"op_rem";
+    mangleMap[U"operator&"] = U"op_and";
+    mangleMap[U"operator|"] = U"op_or";
+    mangleMap[U"operator^"] = U"op_xor";
+    mangleMap[U"operator!"] = U"op_not";
+    mangleMap[U"operator~"] = U"op_cpl";
+    mangleMap[U"operator[]"] = U"op_index";
+    mangleMap[U"operator()"] = U"op_apply";
+}
+
+std::u32string OperatorMangleMap::Mangle(const std::u32string& groupName)
+{
+    auto it = mangleMap.find(groupName);
+    if (it != mangleMap.cend())
+    {
+        return it->second;
+    }
+    else
+    {
+        return U"operator";
+    }
+}
 
 FunctionGroupSymbol::FunctionGroupSymbol(const Span& span_, const std::u32string& name_) : Symbol(SymbolType::functionGroupSymbol, span_, name_)
 {
@@ -125,12 +189,12 @@ std::string FunctionSymbolFlagStr(FunctionSymbolFlags flags)
 }
 
 FunctionSymbol::FunctionSymbol(const Span& span_, const std::u32string& name_) : 
-    ContainerSymbol(SymbolType::functionSymbol, span_, name_), groupName(), parameters(), localVariables(), returnType(), flags(FunctionSymbolFlags::none)
+    ContainerSymbol(SymbolType::functionSymbol, span_, name_), groupName(), parameters(), localVariables(), returnType(), flags(FunctionSymbolFlags::none), irType(nullptr)
 {
 }
 
 FunctionSymbol::FunctionSymbol(SymbolType symbolType_, const Span& span_, const std::u32string& name_) : 
-    ContainerSymbol(symbolType_, span_, name_), groupName(), parameters(), localVariables(), returnType(), flags(FunctionSymbolFlags::none)
+    ContainerSymbol(symbolType_, span_, name_), groupName(), parameters(), localVariables(), returnType(), flags(FunctionSymbolFlags::none), irType(nullptr)
 {
 }
 
@@ -157,6 +221,10 @@ void FunctionSymbol::Read(SymbolReader& reader)
         GetSymbolTable()->EmplaceTypeRequest(this, returnTypeId, 0);
     }
     flags = static_cast<FunctionSymbolFlags>(reader.GetBinaryReader().ReadUShort());
+    if (IsConversion())
+    {
+        reader.AddConversion(this);
+    }
 }
 
 void FunctionSymbol::EmplaceType(TypeSymbol* typeSymbol_, int index)
@@ -197,7 +265,40 @@ void FunctionSymbol::ComputeName()
     }
     name.append(1, U')');
     SetName(name);
+    if (!IsBasicTypeOperation())
+    {
+        ComputeMangledName();
+    }
 }
+
+void FunctionSymbol::ComputeMangledName()
+{
+    if (GroupName() == U"main" || IsCDecl())
+    {
+        SetMangledName(GroupName());
+        return;
+    }
+    std::u32string mangledName = ToUtf32(TypeString());
+    if (groupName.find(U"operator") != std::u32string::npos)
+    {
+        mangledName.append(1, U'_').append(OperatorMangleMap::Instance().Mangle(GroupName()));
+    }
+    else if (groupName.find(U'@') == std::u32string::npos)
+    {
+        mangledName.append(1, U'_').append(GroupName());
+    }
+    SymbolType symbolType = GetSymbolType();
+    switch (symbolType)
+    {
+        case SymbolType::staticConstructorSymbol: case SymbolType::constructorSymbol: case SymbolType::memberFunctionSymbol:
+        {
+            Symbol* parentClass = Parent();
+            mangledName.append(1, U'_').append(parentClass->SimpleName());
+        }
+    }
+    mangledName.append(1, U'_').append(ToUtf32(GetSha1MessageDigest(ToUtf8(FullNameWithSpecifiers()))));
+    SetMangledName(mangledName);
+}    
 
 std::u32string FunctionSymbol::FullName() const
 {
@@ -246,7 +347,31 @@ std::u32string FunctionSymbol::FullNameWithSpecifiers() const
 
 void FunctionSymbol::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects)
 {
-    // todo
+    int na = genObjects.size();
+    int start = 0; // todo
+    for (int i = start; i < na; ++i)
+    {
+        GenObject* genObject = genObjects[i];
+        genObject->Load(emitter);
+    }
+    llvm::FunctionType* functionType = IrType(emitter);
+    llvm::Function* callee = llvm::cast<llvm::Function>(emitter.Module()->getOrInsertFunction(ToUtf8(MangledName()), functionType));
+    ArgVector args;
+    int n = parameters.size();
+    args.resize(n);
+    for (int i = 0; i < n; ++i)
+    {
+        llvm::Value* arg = emitter.Stack().Pop();
+        args[n - i - 1] = arg;
+    }
+    if (ReturnType()->GetSymbolType() != SymbolType::voidTypeSymbol)
+    {
+        emitter.Stack().Push(emitter.Builder().CreateCall(callee, args));
+    }
+    else
+    {
+        emitter.Builder().CreateCall(callee, args);
+    }
 }
 
 void FunctionSymbol::AddLocalVariable(LocalVariableSymbol* localVariable)
@@ -339,6 +464,27 @@ void FunctionSymbol::CloneUsingNodes(const std::vector<Node*>& usingNodes_)
     {
         usingNodes.Add(usingNode->Clone(cloneContext));
     }
+}
+
+llvm::FunctionType* FunctionSymbol::IrType(Emitter& emitter)
+{
+    if (!irType)
+    {
+        llvm::Type* retType = llvm::Type::getVoidTy(emitter.Context());
+        if (returnType && returnType->GetSymbolType() != SymbolType::voidTypeSymbol)
+        {
+            retType = returnType->IrType(emitter);
+        }
+        std::vector<llvm::Type*> paramTypes;
+        int np = parameters.size();
+        for (int i = 0; i < np; ++i)
+        {
+            ParameterSymbol* parameter = parameters[i];
+            paramTypes.push_back(parameter->GetType()->IrType(emitter));
+        }
+        irType = llvm::FunctionType::get(retType, paramTypes, false);
+    }
+    return irType;
 }
 
 StaticConstructorSymbol::StaticConstructorSymbol(const Span& span_, const std::u32string& name_) : FunctionSymbol(SymbolType::staticConstructorSymbol, span_, name_)
@@ -678,6 +824,20 @@ void MemberFunctionSymbol::SetSpecifiers(Specifiers specifiers)
     {
         throw Exception("member function cannot be unit_test", GetSpan());
     }
+}
+
+FunctionGroupTypeSymbol::FunctionGroupTypeSymbol(FunctionGroupSymbol* functionGroup_) : TypeSymbol(SymbolType::functionGroupTypeSymbol, Span(), functionGroup_->Name()), functionGroup(functionGroup_)
+{
+}
+
+void InitFunctionSymbol()
+{
+    OperatorMangleMap::Init();
+}
+
+void DoneFunctionSymbol()
+{
+    OperatorMangleMap::Done();
 }
 
 } } // namespace cmajor::symbols

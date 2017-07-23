@@ -6,6 +6,8 @@
 #ifndef CMAJOR_SYMBOLS_SYMBOL_TABLE_INCLUDED
 #define CMAJOR_SYMBOLS_SYMBOL_TABLE_INCLUDED
 #include <cmajor/symbols/NamespaceSymbol.hpp>
+#include <cmajor/symbols/DerivedTypeSymbol.hpp>
+#include <cmajor/symbols/ConversionTable.hpp>
 #include <cmajor/ast/Namespace.hpp>
 #include <cmajor/ast/Function.hpp>
 #include <cmajor/ast/Class.hpp>
@@ -30,14 +32,32 @@ struct TypeRequest
     int index;
 };
 
+class TypeIdCounter
+{
+public:
+    static void Init();
+    static void Done();
+    static TypeIdCounter& Instance() { Assert(instance, "type id counter not initialized"); return *instance; }
+    int GetNextTypeId() { return nextTypeId++;  }
+    void SetNextTypeId(int nextTypeId_) { nextTypeId = nextTypeId_; }
+private:
+    static std::unique_ptr<TypeIdCounter> instance;
+    TypeIdCounter();
+    int nextTypeId;
+};
+
 class SymbolTable
 {
 public:
     SymbolTable();
     void Write(SymbolWriter& writer);
     void Read(SymbolReader& reader);
+    void Import(SymbolTable& symbolTable);
+    void Clear();
     const NamespaceSymbol& GlobalNs() const { return globalNs; }
     NamespaceSymbol& GlobalNs() { return globalNs; }
+    const ContainerSymbol* Container() const { return container; }
+    ContainerSymbol* Container() { return container; }
     void BeginContainer(ContainerSymbol* container_);
     void EndContainer();
     void BeginNamespace(NamespaceNode& namespaceNode);
@@ -80,13 +100,16 @@ public:
     Symbol* GetSymbol(Node* node) const;
     Node* GetNodeNoThrow(Symbol* symbol) const;
     Node* GetNode(Symbol* symbol) const;
-    uint32_t GetNextTypeId() { return nextTypeId++; }
     void SetTypeIdFor(TypeSymbol* typeSymbol);
-    void AddTypeSymbolToTypeMap(TypeSymbol* typeSymbol);
+    void AddTypeSymbolToTypeIdMap(TypeSymbol* typeSymbol);
     void EmplaceTypeRequest(Symbol* forSymbol, uint32_t typeId, int index);
     void ProcessTypeRequests();
     TypeSymbol* GetTypeByNameNoThrow(const std::u32string& typeName) const;
     TypeSymbol* GetTypeByName(const std::u32string& typeName) const;
+    TypeSymbol* MakeDerivedType(TypeSymbol* baseType, const TypeDerivationRec& derivationRec);
+    const FunctionSymbol* MainFunctionSymbol() const { return mainFunctionSymbol; }
+    void AddConversion(FunctionSymbol* conversion);
+    FunctionSymbol* GetConversion(TypeSymbol* sourceType, TypeSymbol* targetType) const;
 private:
     NamespaceSymbol globalNs;
     ContainerSymbol* container;
@@ -95,13 +118,18 @@ private:
     int parameterIndex;
     std::unordered_map<Node*, Symbol*> nodeSymbolMap;
     std::unordered_map<Symbol*, Node*> symbolNodeMap;
-    uint32_t nextTypeId;
     std::unordered_map<uint32_t, TypeSymbol*> typeIdMap;
     std::unordered_map<std::u32string, TypeSymbol*> typeNameMap;
+    std::unordered_map<TypeSymbol*, std::vector<DerivedTypeSymbol*>> derivedTypeMap; 
+    std::vector<std::unique_ptr<DerivedTypeSymbol>> derivedTypes;
     std::vector<TypeRequest> typeRequests;
+    ConversionTable conversionTable;
 };
 
-void InitSymbolTable(SymbolTable& symbolTable);
+void InitCoreSymbolTable(SymbolTable& symbolTable);
+
+void InitSymbolTable();
+void DoneSymbolTable();
 
 } } // namespace cmajor::symbols
 

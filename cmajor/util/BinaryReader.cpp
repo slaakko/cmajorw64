@@ -11,7 +11,7 @@ namespace cmajor { namespace util {
 using namespace cmajor::unicode;
 
 BinaryReader::BinaryReader(const std::string& fileName_) : 
-    fileName(fileName_), file(fileName), begin(reinterpret_cast<const uint8_t*>(file.Begin())), end(reinterpret_cast<const uint8_t*>(file.End()))
+    fileName(fileName_), file(fileName), begin(reinterpret_cast<const uint8_t*>(file.Begin())), end(reinterpret_cast<const uint8_t*>(file.End())), pos(0)
 {
 }
 

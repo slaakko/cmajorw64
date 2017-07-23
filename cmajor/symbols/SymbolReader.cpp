@@ -4,7 +4,7 @@
 // =================================
 
 #include <cmajor/symbols/SymbolReader.hpp>
-#include <cmajor/symbols/Symbol.hpp>
+#include <cmajor/symbols/DerivedTypeSymbol.hpp>
 
 namespace cmajor { namespace symbols {
 
@@ -21,6 +21,24 @@ Symbol* SymbolReader::ReadSymbol()
     symbol->SetSymbolTable(symbolTable);
     symbol->Read(*this);
     return symbol;
+}
+
+DerivedTypeSymbol* SymbolReader::ReadDerivedTypeSymbol()
+{
+    Symbol* symbol = ReadSymbol();
+    if (symbol->GetSymbolType() == SymbolType::derivedTypeSymbol)
+    {
+        return static_cast<DerivedTypeSymbol*>(symbol);
+    }
+    else
+    {
+        throw std::runtime_error("derived type symbol expected");
+    }
+}
+
+void SymbolReader::AddConversion(FunctionSymbol* conversion)
+{
+    conversions.push_back(conversion);
 }
 
 } } // namespace cmajor::symbols

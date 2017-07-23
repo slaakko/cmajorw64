@@ -49,4 +49,10 @@ std::string GetConfig()
     return config;
 }
 
+int GetOptimizationLevel()
+{
+    // todo
+    return 0;
+}
+
 } } // namespace cmajor::symbols

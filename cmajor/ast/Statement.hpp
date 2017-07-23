@@ -78,6 +78,7 @@ public:
     bool IsCaseTerminatingNode() const override { return true; }
     bool IsDefaultTerminatingNode() const override { return true; }
     const Node* Expression() const { return expression.get(); }
+    Node* Expression() { return expression.get(); }
 private:
     std::unique_ptr<Node> expression;
 };
@@ -92,6 +93,7 @@ public:
     void Write(AstWriter& writer) override;
     void Read(AstReader& reader) override;
     const Node* Condition() const { return condition.get(); }
+    Node* Condition() { return condition.get(); }
     const StatementNode* ThenS() const { return thenS.get(); }
     StatementNode* ThenS() { return thenS.get(); }
     const StatementNode* ElseS() const { return elseS.get(); }
@@ -114,6 +116,7 @@ public:
     bool IsBreakEnclosingStatementNode() const override { return true; }
     bool IsContinueEnclosingStatementNode() const override { return true; }
     const Node* Condition() const { return condition.get(); }
+    Node* Condition() { return condition.get(); }
     const StatementNode* Statement() const { return statement.get(); }
     StatementNode* Statement() { return statement.get(); }
 private:
@@ -135,6 +138,7 @@ public:
     const StatementNode* Statement() const { return statement.get(); }
     StatementNode* Statement() { return statement.get(); }
     const Node* Condition() const { return condition.get(); }
+    Node* Condition() { return condition.get(); }
 private:
     std::unique_ptr<StatementNode> statement;
     std::unique_ptr<Node> condition;
@@ -154,6 +158,7 @@ public:
     const StatementNode* InitS() const { return initS.get(); }
     StatementNode* InitS() { return initS.get(); }
     const Node* Condition() const { return condition.get(); }
+    Node* Condition() { return condition.get(); }
     const StatementNode* LoopS() const { return loopS.get(); }
     StatementNode* LoopS() { return loopS.get(); }
     const StatementNode* ActionS() const { return actionS.get(); }
@@ -212,6 +217,7 @@ public:
     const Node* TypeExpr() const { return typeExpr.get(); }
     Node* TypeExpr() { return typeExpr.get(); }
     const IdentifierNode* Id() const { return id.get(); }
+    const NodeList<Node>& Arguments() const { return arguments; }
 private:
     std::unique_ptr<Node> typeExpr;
     std::unique_ptr<IdentifierNode> id;
@@ -256,7 +262,9 @@ public:
     void Write(AstWriter& writer) override;
     void Read(AstReader& reader) override;
     const Node* TargetExpr() const { return targetExpr.get(); }
+    Node* TargetExpr() { return targetExpr.get(); }
     const Node* SourceExpr() const { return sourceExpr.get(); }
+    Node* SourceExpr() { return sourceExpr.get(); }
 private:
     std::unique_ptr<Node> targetExpr;
     std::unique_ptr<Node> sourceExpr;
@@ -272,6 +280,7 @@ public:
     void Write(AstWriter& writer) override;
     void Read(AstReader& reader) override;
     const Node* Expression() const { return expression.get(); }
+    Node* Expression() { return expression.get(); }
 private:
     std::unique_ptr<Node> expression;
 };
@@ -293,6 +302,8 @@ public:
     void Accept(Visitor& visitor) override;
     void Write(AstWriter& writer) override;
     void Read(AstReader& reader) override;
+    bool IsBreakEnclosingStatementNode() const override { return true; }
+    bool IsContinueEnclosingStatementNode() const override { return true; }
     const Node* TypeExpr() const { return typeExpr.get(); }
     const IdentifierNode* Id() const { return id.get(); }
     const Node* Container() const { return container.get(); }

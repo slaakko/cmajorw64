@@ -24,8 +24,22 @@ void TypeSymbol::Write(SymbolWriter& writer)
 void TypeSymbol::Read(SymbolReader& reader)
 {
     ContainerSymbol::Read(reader);
-    uint32_t typeId = reader.GetBinaryReader().ReadEncodedUInt();
-    GetSymbolTable()->AddTypeSymbolToTypeMap(this);
+    typeId = reader.GetBinaryReader().ReadEncodedUInt();
+    GetSymbolTable()->AddTypeSymbolToTypeIdMap(this);
+}
+
+bool CompareTypesForEquality(const TypeSymbol* left, const TypeSymbol* right)
+{
+    if (left->GetSymbolType() == SymbolType::derivedTypeSymbol && right->GetSymbolType() == SymbolType::derivedTypeSymbol)
+    {
+        const DerivedTypeSymbol* derivedLeft = static_cast<const DerivedTypeSymbol*>(left);
+        const DerivedTypeSymbol* derivedRight = static_cast<const DerivedTypeSymbol*>(right);
+        if (TypesEqual(derivedLeft->BaseType(), derivedRight->BaseType()) && derivedLeft->DerivationRec() == derivedRight->DerivationRec())
+        {
+            return true;
+        }
+    }
+    return false;
 }
 
 } } // namespace cmajor::symbols

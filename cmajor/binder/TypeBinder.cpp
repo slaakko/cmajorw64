@@ -220,6 +220,7 @@ void TypeBinder::Visit(ConstructorNode& constructorNode)
         ParameterSymbol* parameterSymbol = static_cast<ParameterSymbol*>(symbol);
         parameterSymbol->SetType(parameterType);
     }
+    // todo add conversion to symbol table
     if (constructorNode.Body())
     {
         if (constructorSymbol->IsDefault() || constructorSymbol->IsSuppressed())
@@ -568,7 +569,10 @@ void TypeBinder::Visit(ConstantNode& constantNode)
     constantSymbol->SetSpecifiers(constantNode.GetSpecifiers());
     TypeSymbol* typeSymbol = ResolveType(constantNode.TypeExpr(), boundCompileUnit, containerScope);
     constantSymbol->SetType(typeSymbol);
+    constantSymbol->SetEvaluating();
     // todo: evaluate value
+    // constantSymbol->SetValue(value);
+    constantSymbol->ResetEvaluating();
 }
 
 void TypeBinder::Visit(EnumTypeNode& enumTypeNode)

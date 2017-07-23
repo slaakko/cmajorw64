@@ -60,9 +60,7 @@ namespace System
         {
             while (*from != '\0')
             {
-                *buf = *from;
-                ++buf;
-                ++from;
+                *buf++ = *from++;
             }
         }
         *buf = '\0';
@@ -75,9 +73,7 @@ namespace System
         {
             while (*from != '\0')
             {
-                *buf = *from;
-                ++buf;
-                ++from;
+                *buf++ = *from++;
             }
         }
         *buf = '\0';
@@ -90,9 +86,7 @@ namespace System
         {
             while (*from != '\0')
             {
-                *buf = *from;
-                ++buf;
-                ++from;
+                *buf++ = *from++;
             }
         }
         *buf = '\0';
@@ -110,9 +104,7 @@ namespace System
                 {
                     break;
                 }
-                *buf = *from;
-                ++buf;
-                ++from;
+                *buf++ = *from++;
                 ++resultLen;
             }
         }
@@ -132,9 +124,7 @@ namespace System
                 {
                     break;
                 }
-                *buf = *from;
-                ++buf;
-                ++from;
+                *buf++ = *from++;
                 ++resultLen;
             }
         }
@@ -154,9 +144,7 @@ namespace System
                 {
                     break;
                 }
-                *buf = *from;
-                ++buf;
-                ++from;
+                *buf++ = *from++;
                 ++resultLen;
             }
         }

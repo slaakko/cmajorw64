@@ -178,7 +178,15 @@ namespace cmajor.parser
             ;
 
         ExpressionStatement(ParsingContext* ctx, var std::unique_ptr<Node> expr) : StatementNode*
-            ::= (Expression(ctx){ expr.reset(Expression); } ';'){ value = new ExpressionStatementNode(span, expr.release()); }
+            ::= empty{ ctx->PushParsingExpressionStatement(true); } (Expression(ctx){ expr.reset(Expression); } ';')
+                { 
+                    ctx->PopParsingExpressionStatement(); 
+                    value = new ExpressionStatementNode(span, expr.release()); 
+                }
+                /
+                {
+                    ctx->PopParsingExpressionStatement(); 
+                }
             ;
 
         EmptyStatement(ParsingContext* ctx) : StatementNode*

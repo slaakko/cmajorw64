@@ -8,12 +8,25 @@
 #include <cmajor/ast/TypeExpr.hpp>
 #include <cmajor/symbols/TypeSymbol.hpp>
 
+
 namespace cmajor {  namespace binder {
 
 using namespace cmajor::ast;
 using namespace cmajor::symbols;
 
 class BoundCompileUnit;
+
+class NamespaceTypeSymbol : public TypeSymbol
+{
+public:
+    NamespaceTypeSymbol(NamespaceSymbol* ns_);
+    bool IsInComplete() const override { return true; }
+    const NamespaceSymbol* Ns() const { return ns; }
+    NamespaceSymbol* Ns() { return ns; }
+    llvm::Type* IrType(Emitter& emitter) const override { return nullptr; }
+private:
+    NamespaceSymbol* ns;
+};
 
 TypeSymbol* ResolveType(Node* typeExprNode, BoundCompileUnit& boundCompileUnit, ContainerScope* containerScope);
 

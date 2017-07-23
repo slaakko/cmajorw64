@@ -7,6 +7,7 @@
 #define CMAJOR_SYMBOLS_SYMBOL_INCLUDED
 #include <cmajor/ast/Specifier.hpp>
 #include <cmajor/parsing/Scanner.hpp>
+#include <llvm/IR/Value.h>
 #include <stdint.h>
 
 namespace cmajor { namespace symbols {
@@ -33,7 +34,14 @@ enum class SymbolType : uint8_t
     namespaceSymbol, functionSymbol, staticConstructorSymbol, constructorSymbol, destructorSymbol, memberFunctionSymbol, functionGroupSymbol, classTypeSymbol, interfaceTypeSymbol, 
     delegateTypeSymbol, classDelegateTypeSymbol, declarationBlock, typedefSymbol, constantSymbol, enumTypeSymbol, enumConstantSymbol,
     templateParameterSymbol, boundTemplateParameterSymbol, parameterSymbol, localVariableSymbol, memberVariableSymbol,
-    namespaceTypeSymbol,
+    basicTypeUnaryPlus, basicTypeIntUnaryMinus, basicTypeFloatUnaryMinus, basicTypeComplement, basicTypeAdd, basicTypeFAdd, basicTypeSub, basicTypeFSub, basicTypeMul, basicTypeFMul, 
+    basicTypeSDiv, basicTypeUDiv, basicTypeFDiv, basicTypeSRem, basicTypeURem, basicTypeAnd, basicTypeOr, basicTypeXor, basicTypeShl, basicTypeAShr, basicTypeLShr,
+    basicTypeNot, basicTypeIntegerEquality, basicTypeUnsignedIntegerLessThan, basicTypeSignedIntegerLessThan, basicTypeFloatingEquality, basicTypeFloatingLessThan,
+    defaultInt1, defaultInt8, defaultInt16, defaultInt32, defaultInt64, defaultFloat, defaultDouble, basicTypeCopyCtor, basicTypeCopyAssignment, basicTypeReturn,
+    basicTypeImplicitSignExtension, basicTypeImplicitZeroExtension, basicTypeExplicitSignExtension, basicTypeExplicitZeroExtension, basicTypeTruncation, basicTypeBitCast,
+    basicTypeImplicitUnsignedIntToFloating, basicTypeImplicitSignedIntToFloating, basicTypeExplicitUnsignedIntToFloating, basicTypeExplicitSignedIntToFloating, 
+    basicTypeFloatingToUnsignedInt, basicTypeFloatingToSignedInt, basicTypeFloatingExtension, basicTypeFloatingTruncation,
+    namespaceTypeSymbol, functionGroupTypeSymbol, valueSymbol,
     maxSymbol
 };
 
@@ -89,8 +97,12 @@ public:
     virtual ContainerScope* GetContainerScope() { return nullptr; }
     virtual std::u32string FullName() const;
     virtual std::u32string FullNameWithSpecifiers() const;
+    virtual std::u32string SimpleName() const { return Name(); }
     virtual SymbolAccess DeclaredAccess() const { return Access(); }
     virtual std::string TypeString() const { return "symbol";  }
+    virtual llvm::Value* IrObject() { return irObject; }
+    virtual void ComputeMangledName();
+    void SetMangledName(const std::u32string& mangledName_);
     SymbolAccess Access() const { return SymbolAccess(flags & SymbolFlags::access);  }
     void SetAccess(SymbolAccess access_) { flags = flags | SymbolFlags(access_); }
     void SetAccess(Specifiers accessSpecifiers);
@@ -113,6 +125,7 @@ public:
     void SetFlag(SymbolFlags flag) { flags = flags | flag; }
     void ResetFlag(SymbolFlags flag) { flags = flags & ~flag; }
     const Symbol* Parent() const { return parent; }
+    Symbol* Parent() { return parent; }
     void SetParent(Symbol* parent_) { parent = parent_; }
     const NamespaceSymbol* Ns() const;
     NamespaceSymbol* Ns();
@@ -120,6 +133,8 @@ public:
     ClassTypeSymbol* ClassNoThrow();
     const ContainerSymbol* ClassOrNsNoThrow() const;
     ContainerSymbol* ClassOrNsNoThrow() ;
+    const ContainerSymbol* ClassInterfaceOrNsNoThrow() const;
+    ContainerSymbol* ClassInterfaceOrNsNoThrow();
     const ClassTypeSymbol* Class() const;
     ClassTypeSymbol* Class();
     const ClassTypeSymbol* ContainingClassNoThrow() const;
@@ -136,16 +151,22 @@ public:
     FunctionSymbol* ContainingFunctionNoThrow() ;
     const ContainerScope* ClassOrNsScope() const;
     ContainerScope* ClassOrNsScope();
+    const ContainerScope* ClassInterfaceOrNsScope() const;
+    ContainerScope* ClassInterfaceOrNsScope() ;
     const SymbolTable* GetSymbolTable() const { return symbolTable; }
     SymbolTable* GetSymbolTable() { return symbolTable; }
     void SetSymbolTable(SymbolTable* symbolTable_) { symbolTable = symbolTable_; }
+    void SetIrObject(llvm::Value* irObject_) { irObject = irObject_; }
+    const std::u32string& MangledName() const { return mangledName; }
 private:
     SymbolType symbolType;
     Span span;
     std::u32string name;
     SymbolFlags flags;
+    std::u32string mangledName;
     Symbol* parent;
     SymbolTable* symbolTable;
+    llvm::Value* irObject;
 };
 
 class SymbolCreator

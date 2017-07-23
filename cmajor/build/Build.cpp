@@ -4,12 +4,15 @@
 // =================================
 
 #include <cmajor/build/Build.hpp>
+#include <cmajor/emitter/Emitter.hpp>
 #include <cmajor/parser/Project.hpp>
 #include <cmajor/parser/Solution.hpp>
 #include <cmajor/parser/CompileUnit.hpp>
 #include <cmajor/parser/FileRegistry.hpp>
 #include <cmajor/binder/BoundCompileUnit.hpp>
 #include <cmajor/binder/TypeBinder.hpp>
+#include <cmajor/binder/StatementBinder.hpp>
+#include <cmajor/binder/BoundStatement.hpp>
 #include <cmajor/symbols/GlobalFlags.hpp>
 #include <cmajor/symbols/Warning.hpp>
 #include <cmajor/symbols/Module.hpp>
@@ -17,10 +20,16 @@
 #include <cmajor/symbols/SymbolReader.hpp>
 #include <cmajor/symbols/SymbolCreatorVisitor.hpp>
 #include <cmajor/util/Unicode.hpp>
+#include <cmajor/util/Path.hpp>
+#include <cmajor/util/System.hpp>
+#include <cmajor/util/TextUtils.hpp>
 #include <iostream>
+#include <fstream>
 #include <stdexcept>
 #include <mutex>
+#include <chrono>
 
+using namespace cmajor::emitter;
 using namespace cmajor::parser;
 using namespace cmajor::ast;
 using namespace cmajor::symbols;
@@ -185,6 +194,19 @@ std::vector<std::unique_ptr<CompileUnitNode>> ParseSourcesConcurrently(const std
     return compileUnits;
 }
 
+std::vector<std::unique_ptr<CompileUnitNode>> ParseSources(const std::vector<std::string>& sourceFilePaths)
+{
+    int numCores = std::thread::hardware_concurrency();
+    if (numCores == 0 || sourceFilePaths.size() < numCores || GetGlobalFlag(GlobalFlags::debugParsing))
+    {
+        return ParseSourcesInMainThread(sourceFilePaths);
+    }
+    else
+    {
+        return ParseSourcesConcurrently(sourceFilePaths, numCores);
+    }
+}
+
 void CreateSymbols(SymbolTable& symbolTable, const std::vector<std::unique_ptr<CompileUnitNode>>& compileUnits)
 {
     SymbolCreatorVisitor symbolCreator(symbolTable);
@@ -194,17 +216,92 @@ void CreateSymbols(SymbolTable& symbolTable, const std::vector<std::unique_ptr<C
     }
 }
 
-std::vector<std::unique_ptr<BoundCompileUnit>> BindTypes(Module& mod, const std::vector<std::unique_ptr<CompileUnitNode>>& compileUnits)
+std::vector<std::unique_ptr<BoundCompileUnit>> BindTypes(Module& module, const std::vector<std::unique_ptr<CompileUnitNode>>& compileUnits)
 {
     std::vector<std::unique_ptr<BoundCompileUnit>> boundCompileUnits;
     for (const std::unique_ptr<CompileUnitNode>& compileUnit : compileUnits)
     {
-        std::unique_ptr<BoundCompileUnit> boundCompileUnit(new BoundCompileUnit(mod, compileUnit.get()));
+        std::unique_ptr<BoundCompileUnit> boundCompileUnit(new BoundCompileUnit(module, compileUnit.get()));
         TypeBinder typeBinder(*boundCompileUnit);
         compileUnit->Accept(typeBinder);
         boundCompileUnits.push_back(std::move(boundCompileUnit));
     }
     return boundCompileUnits;
+}
+
+void BindStatements(BoundCompileUnit& boundCompileUnit)
+{
+    StatementBinder statementBinder(boundCompileUnit);
+    boundCompileUnit.GetCompileUnitNode()->Accept(statementBinder);
+}
+
+void GenerateLibrary(const std::vector<std::string>& objectFilePaths, const std::string& libraryFilePath)
+{
+    std::vector<std::string> args;
+    args.push_back("/out:" + QuotedPath(libraryFilePath));
+    int n = objectFilePaths.size();
+    for (int i = 0; i < n; ++i)
+    {
+        args.push_back(QuotedPath(objectFilePaths[i]));
+    }
+    std::string libCommandLine = "llvm-lib";
+    for (const std::string& arg : args)
+    {
+        libCommandLine.append(1, ' ').append(arg);
+    }
+    std::string libErrorFilePath = Path::Combine(Path::GetDirectoryName(libraryFilePath), "llvm-lib.error");
+    int redirectHandle = 2; // stderr
+    try
+    {
+        System(libCommandLine, redirectHandle, libErrorFilePath);
+        boost::filesystem::remove(boost::filesystem::path(libErrorFilePath));
+    }
+    catch (const std::exception& ex)
+    {
+        std::string errors = ReadFile(libErrorFilePath);
+        throw std::runtime_error("generating library '" + libraryFilePath + "' failed: " + ex.what() + ":\nerrors:\n" + errors);
+    }
+}
+
+void Link(const std::string& executableFilePath, const std::vector<std::string>& libraryFilePaths)
+{
+    boost::filesystem::path bdp = executableFilePath;
+    bdp.remove_filename();
+    boost::filesystem::create_directories(bdp);
+    std::vector<std::string> args;
+    args.push_back("/machine:x64");
+    args.push_back("/entry:main");
+    args.push_back("/debug");
+    args.push_back("/out:" + QuotedPath(executableFilePath));
+    args.push_back("/stack:16777216");
+    std::string cmrtLibName = "cmrt200.lib";
+    if (GetGlobalFlag(GlobalFlags::linkWithDebugRuntime))
+    {
+        cmrtLibName = "cmrt200d.lib";
+    }
+    args.push_back(QuotedPath(Path::Combine(Path::Combine(CmajorRootDir(), "lib"), cmrtLibName)));
+    int n = libraryFilePaths.size();
+    for (int i = 0; i < n; ++i)
+    {
+        args.push_back(QuotedPath(libraryFilePaths[i]));
+    }
+    std::string linkCommandLine = "lld-link";
+    for (const std::string& arg : args)
+    {
+        linkCommandLine.append(1, ' ').append(arg);
+    }
+    std::string linkErrorFilePath = Path::Combine(Path::GetDirectoryName(executableFilePath), "lld-link.error");
+    int redirectHandle = 2; // stderr
+    try
+    {
+        System(linkCommandLine, redirectHandle, linkErrorFilePath);
+        boost::filesystem::remove(boost::filesystem::path(linkErrorFilePath));
+    }
+    catch (const std::exception& ex)
+    {
+        std::string errors = ReadFile(linkErrorFilePath);
+        throw std::runtime_error("linking executable '" + executableFilePath + "' failed: " + ex.what() + ":\nerrors:\n" + errors);
+    }
 }
 
 void CleanProject(Project* project)
@@ -229,6 +326,30 @@ void CleanProject(Project* project)
     }
 }
 
+void ReadTypeIdCounter(const std::string& config)
+{
+    boost::filesystem::path typeIdCounterFile = Path::Combine(Path::Combine(CmajorRootDir(), "counter"), "typeid." + config);
+    if (boost::filesystem::exists(typeIdCounterFile))
+    {
+        std::ifstream f(typeIdCounterFile.generic_string());
+        int nextTypeId = 1;
+        f >> nextTypeId;
+        TypeIdCounter::Instance().SetNextTypeId(nextTypeId);
+    }
+}
+
+void WriteTypeIdCounter(const std::string& config)
+{
+    boost::filesystem::path typeIdCounterFile = Path::Combine(Path::Combine(CmajorRootDir(), "counter"), "typeid." + config);
+    std::ofstream f(typeIdCounterFile.generic_string());
+    int nextTypeId = TypeIdCounter::Instance().GetNextTypeId();
+    f << nextTypeId << std::endl;
+    if (!f)
+    {
+        throw std::runtime_error("could not write to " + typeIdCounterFile.generic_string());
+    }
+}
+
 void BuildProject(Project* project)
 {
     std::string config = GetConfig();
@@ -236,32 +357,44 @@ void BuildProject(Project* project)
     {
         std::cout << "Building project '" << ToUtf8(project->Name()) << "' (" << project->FilePath() << ") using " << config << " configuration." << std::endl;
     }
+    ReadTypeIdCounter(config);
     CompileWarningCollection::Instance().SetCurrentProjectName(project->Name());
-    std::vector<std::unique_ptr<CompileUnitNode>> compileUnits;
-    int numCores = std::thread::hardware_concurrency();
-    if (numCores == 0 || project->SourceFilePaths().size() < numCores || GetGlobalFlag(GlobalFlags::debugParsing))
+    std::vector<std::unique_ptr<CompileUnitNode>> compileUnits = ParseSources(project->SourceFilePaths());
+    Module module(project->Name(), project->ModuleFilePath());
+    module.PrepareForCompilation(project->References(), project->SourceFilePaths());
+    CreateSymbols(module.GetSymbolTable(), compileUnits);
+    std::vector<std::unique_ptr<BoundCompileUnit>> boundCompileUnits = BindTypes(module, compileUnits);
+    EmittingContext emittingContext;
+    std::vector<std::string> objectFilePaths;
+    for (std::unique_ptr<BoundCompileUnit>& boundCompileUnit : boundCompileUnits)
     {
-        compileUnits = ParseSourcesInMainThread(project->SourceFilePaths());
+        BindStatements(*boundCompileUnit);
+        GenerateCode(emittingContext, *boundCompileUnit);
+        objectFilePaths.push_back(boundCompileUnit->ObjectFilePath());
+        boundCompileUnit.reset();
     }
-    else
+    GenerateLibrary(objectFilePaths, project->LibraryFilePath());
+    if (project->GetTarget() == Target::program)
     {
-        compileUnits = ParseSourcesConcurrently(project->SourceFilePaths(), numCores);
+        if (!module.GetSymbolTable().MainFunctionSymbol())
+        {
+            throw std::runtime_error("program has no main function");
+        }
+        Link(project->ExecutableFilePath(), module.LibraryFilePaths());
     }
-    Module mod;
-    InitSymbolTable(mod.GetSymbolTable());
-    /*
-    if (project->Name() == U"System.Core")
-    {
-        InitSymbolTable(mod.GetSymbolTable());
-    }
-*/
-    CreateSymbols(mod.GetSymbolTable(), compileUnits);
-    BindTypes(mod, compileUnits);
-    boost::filesystem::path mfd = project->ModuleFilePath();
-    mfd.remove_filename();
-    boost::filesystem::create_directories(mfd);
     SymbolWriter writer(project->ModuleFilePath());
-    mod.Write(writer);
+    module.Write(writer);
+    WriteTypeIdCounter(config);
+    if (GetGlobalFlag(GlobalFlags::verbose))
+    {
+        std::cout << "Project '" << ToUtf8(project->Name()) << "' built successfully." << std::endl;
+    }
+    project->SetModuleFilePath(module.OriginalFilePath());
+    project->SetLibraryFilePath(module.LibraryFilePath());
+    if (module.IsSystemModule())
+    {
+        project->SetSystemProject();
+    }
 }
 
 ProjectGrammar* projectGrammar = nullptr;
@@ -286,6 +419,33 @@ void BuildProject(const std::string& projectFilePath)
         BuildProject(project.get());
     }
 }
+
+void CopySystemFiles(std::vector<Project*>& projects)
+{
+    boost::filesystem::path systemLibDir = CmajorSystemLibDir(GetConfig());
+    boost::filesystem::create_directories(systemLibDir);
+    for (Project* project : projects)
+    {
+        boost::filesystem::path from = project->ModuleFilePath();
+        boost::filesystem::path to = systemLibDir / from.filename();
+        if (boost::filesystem::exists(to))
+        {
+            boost::filesystem::remove(to);
+        }
+        boost::filesystem::copy(from, to);
+        if (!project->LibraryFilePath().empty())
+        {
+            from = project->LibraryFilePath();
+            to = systemLibDir / from.filename();
+            if (boost::filesystem::exists(to))
+            {
+                boost::filesystem::remove(to);
+            }
+            boost::filesystem::copy(from, to);
+        }
+    }
+}
+
 
 SolutionGrammar* solutionGrammar = nullptr;
 
@@ -324,6 +484,7 @@ void BuildSolution(const std::string& solutionFilePath)
         solution->AddProject(std::move(project));
     }
     std::vector<Project*> buildOrder = solution->CreateBuildOrder();
+    bool isSystemSolution = false;
     for (Project* project : buildOrder)
     {
         if (GetGlobalFlag(GlobalFlags::clean))
@@ -333,6 +494,25 @@ void BuildSolution(const std::string& solutionFilePath)
         else
         {
             BuildProject(project);
+            if (project->IsSystemProject())
+            {
+                isSystemSolution = true;
+            }
+        }
+    }
+    if (isSystemSolution)
+    {
+        CopySystemFiles(buildOrder);
+    }
+    if (GetGlobalFlag(GlobalFlags::verbose))
+    {
+        if (GetGlobalFlag(GlobalFlags::clean))
+        {
+            std::cout << "Solution '" << ToUtf8(solution->Name()) << "' cleaned successfully." << std::endl;
+        }
+        else
+        {
+            std::cout << "Solution '" << ToUtf8(solution->Name()) << "' built successfully." << std::endl;
         }
     }
 }

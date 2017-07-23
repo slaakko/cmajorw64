@@ -48,16 +48,6 @@ using namespace cmajor::util;
 using namespace cmajor::symbols;
 using namespace cmajor::build;
 
-class Alpha
-{
-
-};
-
-class Beta : public Alpha
-{
-
-};
-
 int main(int argc, const char** argv)
 {
     try
@@ -95,6 +85,18 @@ int main(int argc, const char** argv)
                     else if (arg == "--debug-parse" || arg == "-p")
                     {
                         SetGlobalFlag(GlobalFlags::debugParsing);
+                    }
+                    else if (arg == "--emit-llvm" || arg == "-l")
+                    {
+                        SetGlobalFlag(GlobalFlags::emitLlvm);
+                    }
+                    else if (arg == "--emit-opt-llvm" || arg == "-o")
+                    {
+                        SetGlobalFlag(GlobalFlags::emitOptLlvm);
+                    }
+                    else if (arg == "--link-with-debug-runtime" || arg == "-d")
+                    {
+                        SetGlobalFlag(GlobalFlags::linkWithDebugRuntime);
                     }
                     else if (arg.find('=') != std::string::npos)
                     {

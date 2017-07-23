@@ -255,6 +255,11 @@ NamespaceSymbol* ContainerScope::Ns()
     return container->Ns();
 }
 
+void ContainerScope::Clear()
+{
+    symbolMap.clear();
+}
+
 NamespaceSymbol* ContainerScope::CreateNamespace(const std::u32string& qualifiedNsName, const Span& span)
 {
     ContainerScope* scope = this;

@@ -17,7 +17,10 @@ enum class GlobalFlags : uint8_t
     quiet = 1 << 1,
     release = 1 << 2,
     clean = 1 << 3,
-    debugParsing = 1 << 4
+    debugParsing = 1 << 4,
+    emitLlvm = 1 << 5,
+    emitOptLlvm = 1 << 6,
+    linkWithDebugRuntime = 1 << 7
 };
 
 void SetGlobalFlag(GlobalFlags flag);
@@ -25,6 +28,7 @@ void ResetGlobalFlag(GlobalFlags flag);
 bool GetGlobalFlag(GlobalFlags flag);
 
 std::string GetConfig();
+int GetOptimizationLevel();
 
 } } // namespace cmajor::symbols
 

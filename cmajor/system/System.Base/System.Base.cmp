@@ -1,4 +1,5 @@
 project System.Base;
 target=library;
+reference <../System.Runtime/System.Runtime.cmp>;
 source <Algorithm.cm>;
 source <Utility.cm>;

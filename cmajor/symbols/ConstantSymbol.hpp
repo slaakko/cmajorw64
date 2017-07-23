@@ -19,11 +19,19 @@ public:
     void EmplaceType(TypeSymbol* typeSymbol_, int index) override;
     std::string TypeString() const override { return "constant"; }
     void SetSpecifiers(Specifiers specifiers);
+    bool Evaluating() const { return evaluating; }
+    void SetEvaluating() { evaluating = true; }
+    void ResetEvaluating() { evaluating = false; }
     const TypeSymbol* GetType() const { return typeSymbol; }
+    TypeSymbol* GetType() { return typeSymbol; }
     void SetType(TypeSymbol* typeSymbol_) { typeSymbol = typeSymbol_; }
+    void SetValue(Value* value_);
+    const Value* GetValue() const { return value.get(); }
+    Value* GetValue() { return value.get(); }
 private:
     TypeSymbol* typeSymbol;
-    std::unique_ptr<Value> value;
+     std::unique_ptr<Value> value;
+     bool evaluating;
 };
 
 } } // namespace cmajor::symbols

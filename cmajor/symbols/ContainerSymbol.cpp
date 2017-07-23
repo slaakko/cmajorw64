@@ -6,6 +6,7 @@
 #include <cmajor/symbols/ContainerSymbol.hpp>
 #include <cmajor/symbols/FunctionSymbol.hpp>
 #include <cmajor/symbols/VariableSymbol.hpp>
+#include <cmajor/symbols/SymbolTable.hpp>
 #include <cmajor/symbols/SymbolWriter.hpp>
 #include <cmajor/symbols/SymbolReader.hpp>
 #include <cmajor/symbols/Exception.hpp>
@@ -51,28 +52,26 @@ void ContainerSymbol::Read(SymbolReader& reader)
 
 void ContainerSymbol::AddMember(Symbol* member)
 {
+    member->SetSymbolTable(GetSymbolTable());
     member->SetParent(this);
     members.push_back(std::unique_ptr<Symbol>(member));
-    switch (member->GetSymbolType())
+    if (member->IsFunctionSymbol())
     {
-        case SymbolType::functionSymbol:
-        case SymbolType::staticConstructorSymbol:
-        case SymbolType::constructorSymbol:
-        case SymbolType::destructorSymbol:
-        case SymbolType::memberFunctionSymbol:
-        {
-            FunctionSymbol* functionSymbol = static_cast<FunctionSymbol*>(member);
-            FunctionGroupSymbol* functionGroupSymbol = MakeFunctionGroupSymbol(functionSymbol->GroupName(), functionSymbol->GetSpan());
-            functionGroupSymbol->AddFunction(functionSymbol);
-            functionSymbol->GetContainerScope()->SetParent(GetContainerScope());
-            break;
-        }
-        default: 
-        {
-            containerScope.Install(member);
-            break;
-        }
+        FunctionSymbol* functionSymbol = static_cast<FunctionSymbol*>(member);
+        FunctionGroupSymbol* functionGroupSymbol = MakeFunctionGroupSymbol(functionSymbol->GroupName(), functionSymbol->GetSpan());
+        functionGroupSymbol->AddFunction(functionSymbol);
+        functionSymbol->GetContainerScope()->SetParent(GetContainerScope());
     }
+    else
+    {
+        containerScope.Install(member);
+    }
+}
+
+void ContainerSymbol::Clear()
+{
+    containerScope.Clear();
+    members.clear();
 }
 
 FunctionGroupSymbol* ContainerSymbol::MakeFunctionGroupSymbol(const std::u32string& groupName, const Span& span)

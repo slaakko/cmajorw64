@@ -12,14 +12,25 @@ namespace cmajor { namespace binder {
 
 using namespace cmajor::symbols;
 
+class BoundCompoundStatement;
+
 class BoundFunction : public BoundNode
 {
 public:
     BoundFunction(FunctionSymbol* functionSymbol_);
+    void Load(Emitter& emitter) override;
+    void Store(Emitter& emitter) override;
+    void Accept(BoundNodeVisitor& visitor) override;
     const FunctionSymbol* GetFunctionSymbol() const { return functionSymbol; }
     FunctionSymbol* GetFunctionSymbol() { return functionSymbol; }
+    void SetBody(std::unique_ptr<BoundCompoundStatement>&& body_);
+    BoundCompoundStatement* Body() const { return body.get(); }
+    void SetHasGotos() { hasGotos = true; }
+    bool HasGotos() const { return hasGotos; }
 private:
     FunctionSymbol* functionSymbol;
+    std::unique_ptr<BoundCompoundStatement> body;
+    bool hasGotos;
 };
 
 } } // namespace cmajor::binder

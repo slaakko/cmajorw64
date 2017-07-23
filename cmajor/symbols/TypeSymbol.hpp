@@ -21,13 +21,26 @@ public:
     void Read(SymbolReader& reader) override;
     bool IsTypeSymbol() const override { return true; }
     virtual bool IsInComplete() const { return false; }
+    virtual bool IsUnsignedType() const { return false; }
     std::string TypeString() const override { return "type"; }
+    virtual const TypeSymbol* BaseType() const { return this; }
+    virtual TypeSymbol* BaseType() { return this; }
+    virtual TypeSymbol* PlainType() { return this; }
+    virtual llvm::Type* IrType(Emitter& emitter) const = 0;
+    virtual bool IsReferenceType() const { return false; }
     void SetTypeId(uint32_t typeId_) { typeId = typeId_; }
     uint32_t TypeId() const { Assert(typeId != 0, "type id not initialized");  return typeId; }
-    virtual llvm::Type* IrType(Emitter& emitter) const = 0;
 private:
     uint32_t typeId;
 };
+
+bool CompareTypesForEquality(const TypeSymbol* left, const TypeSymbol* right);
+
+inline bool TypesEqual(const TypeSymbol* left, const TypeSymbol* right)
+{
+    if (left == right) return true;
+    return CompareTypesForEquality(left, right);
+}
 
 } } // namespace cmajor::symbols
 

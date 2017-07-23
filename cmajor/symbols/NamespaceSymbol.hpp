@@ -14,6 +14,7 @@ class NamespaceSymbol : public ContainerSymbol
 public:   
     NamespaceSymbol(const Span& span_, const std::u32string& name_);
     std::string TypeString() const override { return "namespace"; }
+    void Import(NamespaceSymbol* that, SymbolTable& symbolTable);
 };
 
 } } // namespace cmajor::symbols

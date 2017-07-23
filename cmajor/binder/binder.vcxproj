@@ -20,25 +20,33 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Access.hpp" />
+    <ClInclude Include="BoundClass.hpp" />
     <ClInclude Include="BoundCompileUnit.hpp" />
     <ClInclude Include="BoundExpression.hpp" />
     <ClInclude Include="BoundFunction.hpp" />
     <ClInclude Include="BoundNode.hpp" />
+    <ClInclude Include="BoundNodeVisitor.hpp" />
+    <ClInclude Include="BoundStatement.hpp" />
     <ClInclude Include="ExpressionBinder.hpp" />
     <ClInclude Include="OperationRepository.hpp" />
     <ClInclude Include="OverloadResolution.hpp" />
+    <ClInclude Include="StatementBinder.hpp" />
     <ClInclude Include="TypeBinder.hpp" />
     <ClInclude Include="TypeResolver.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Access.cpp" />
+    <ClCompile Include="BoundClass.cpp" />
     <ClCompile Include="BoundCompileUnit.cpp" />
     <ClCompile Include="BoundExpression.cpp" />
     <ClCompile Include="BoundFunction.cpp" />
     <ClCompile Include="BoundNode.cpp" />
+    <ClCompile Include="BoundNodeVisitor.cpp" />
+    <ClCompile Include="BoundStatement.cpp" />
     <ClCompile Include="ExpressionBinder.cpp" />
     <ClCompile Include="OperationRepository.cpp" />
     <ClCompile Include="OverloadResolution.cpp" />
+    <ClCompile Include="StatementBinder.cpp" />
     <ClCompile Include="TypeBinder.cpp" />
     <ClCompile Include="TypeResolver.cpp" />
   </ItemGroup>
@@ -119,7 +127,7 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>../..;C:\Programming\boost_1_64_0;C:\Programming\llvm-4.0.0.src\include;C:\Programming\llvm-4.0.0.src\build\include</AdditionalIncludeDirectories>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <DisableSpecificWarnings>4267;4146;4996</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4141;4146;4244;4267;4291;4624;4996</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -135,7 +143,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>../..;C:\Programming\boost_1_64_0;C:\Programming\llvm-4.0.0.src\include;C:\Programming\llvm-4.0.0.src\build\include</AdditionalIncludeDirectories>
-      <DisableSpecificWarnings>4267;4146;4996</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4141;4146;4244;4267;4291;4624;4996</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

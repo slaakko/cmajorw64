@@ -12,7 +12,7 @@
 
 namespace cmajor { namespace symbols {
 
-ConstantSymbol::ConstantSymbol(const Span& span_, const std::u32string& name_) : Symbol(SymbolType::constantSymbol, span_, name_), typeSymbol()
+ConstantSymbol::ConstantSymbol(const Span& span_, const std::u32string& name_) : Symbol(SymbolType::constantSymbol, span_, name_), typeSymbol(), evaluating(false)
 {
 }
 
@@ -103,6 +103,11 @@ void ConstantSymbol::SetSpecifiers(Specifiers specifiers)
     {
         throw Exception("constant cannot be unit_test", GetSpan());
     }
+}
+
+void ConstantSymbol::SetValue(Value* value_)
+{
+    value.reset(value_);
 }
 
 } } // namespace cmajor::symbols

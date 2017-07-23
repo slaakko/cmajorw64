@@ -45,7 +45,7 @@ public:
     void EmplaceType(TypeSymbol* typeSymbol_, int index) override;
     void AddMember(Symbol* member) override;
     bool IsClassTypeSymbol() const override { return true; }
-    std::string TypeString() const override { return "class type"; }
+    std::string TypeString() const override { return "class"; }
     const ClassTypeSymbol* BaseClass() const { return baseClass; }
     ClassTypeSymbol* BaseClass() { return baseClass; }
     void SetBaseClass(ClassTypeSymbol* baseClass_) { baseClass = baseClass_; }

@@ -39,7 +39,7 @@ ParameterSymbol::ParameterSymbol(const Span& span_, const std::u32string& name_)
 {
 }
 
-LocalVariableSymbol::LocalVariableSymbol(const Span& span_, const std::u32string& name_) : VariableSymbol(SymbolType::localVariableSymbol, span_, name_), storage(nullptr)
+LocalVariableSymbol::LocalVariableSymbol(const Span& span_, const std::u32string& name_) : VariableSymbol(SymbolType::localVariableSymbol, span_, name_)
 {
 }
 

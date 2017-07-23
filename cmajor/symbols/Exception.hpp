@@ -35,6 +35,14 @@ private:
     std::vector<Span> references;
 };
 
+class CastOverloadException : public Exception
+{
+public:
+    CastOverloadException(const std::string& message_, const Span& defined_);
+    CastOverloadException(const std::string& message_, const Span& defined_, const Span& referenced_);
+    CastOverloadException(const std::string& message_, const Span& defined_, const std::vector<Span>& references_);
+};
+
 } } // namespace cmajor::symbols
 
 #endif // CMAJOR_SYMBOLS_EXCEPTION_INCLUDED

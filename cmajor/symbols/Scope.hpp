@@ -66,6 +66,7 @@ public:
     Symbol* LookupQualified(const std::vector<std::u32string>& components, ScopeLookup lookup) const;
     const NamespaceSymbol* Ns() const;
     NamespaceSymbol* Ns();
+    void Clear();
     NamespaceSymbol* CreateNamespace(const std::u32string& qualifiedNsName, const Span& span);
     void CollectViableFunctions(int arity, const std::u32string& groupName, std::unordered_set<ContainerScope*>& scopesLookedUp, ScopeLookup scopeLookup, std::unordered_set<FunctionSymbol*>& viableFunctions);
 private:

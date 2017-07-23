@@ -37,7 +37,7 @@ public:
     void Read(SymbolReader& reader) override;
     void EmplaceType(TypeSymbol* typeSymbol_, int index) override;
     void AddMember(Symbol* member) override;
-    std::string TypeString() const override { return "class delegate"; }
+    std::string TypeString() const override { return "class_delegate"; }
     void SetSpecifiers(Specifiers specifiers);
     const TypeSymbol* ReturnType() const { return returnType; }
     void SetReturnType(TypeSymbol* returnType_) { returnType = returnType_; }

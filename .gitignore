@@ -9,6 +9,7 @@ bin
 *.psess
 *.vspx
 *.org
+*.obj
 lib
 Debug
 Release

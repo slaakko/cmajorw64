@@ -71,6 +71,27 @@ void Node::Read(AstReader& reader)
 {
 }
 
+UnaryNode::UnaryNode(NodeType nodeType_, const Span& span_) : Node(nodeType_, span_), subject()
+{
+}
+
+UnaryNode::UnaryNode(NodeType nodeType_, const Span& span_, Node* subject_) : Node(nodeType_, span_), subject(subject_)
+{
+}
+
+void UnaryNode::Write(AstWriter& writer)
+{
+    Node::Write(writer);
+    subject->Write(writer);
+}
+
+void UnaryNode::Read(AstReader& reader)
+{
+    Node::Read(reader);
+    subject.reset(reader.ReadNode());
+    subject->SetParent(this);
+}
+
 BinaryNode::BinaryNode(NodeType nodeType, const Span& span_) : Node(nodeType, span_), left(), right()
 {
 }

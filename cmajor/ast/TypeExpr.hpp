@@ -19,6 +19,7 @@ public:
     void Write(AstWriter& writer) override;
     void Read(AstReader& reader) override;
     const Node* Subject() const { return subject.get(); }
+    Node* Subject() { return subject.get(); }
 private:
     std::unique_ptr<Node> subject;
 };
@@ -33,6 +34,7 @@ public:
     void Write(AstWriter& writer) override;
     void Read(AstReader& reader) override;
     const Node* Subject() const { return subject.get(); }
+    Node* Subject() { return subject.get(); }
 private:
     std::unique_ptr<Node> subject;
 };
@@ -47,6 +49,7 @@ public:
     void Write(AstWriter& writer) override;
     void Read(AstReader& reader) override;
     const Node* Subject() const { return subject.get(); }
+    Node* Subject() { return subject.get(); }
 private:
     std::unique_ptr<Node> subject;
 };
@@ -61,6 +64,7 @@ public:
     void Write(AstWriter& writer) override;
     void Read(AstReader& reader) override;
     const Node* Subject() const { return subject.get(); }
+    Node* Subject() { return subject.get(); }
 private:
     std::unique_ptr<Node> subject;
 };
@@ -75,7 +79,9 @@ public:
     void Write(AstWriter& writer) override;
     void Read(AstReader& reader) override;
     const Node* Subject() const { return subject.get(); }
+    Node* Subject() { return subject.get(); }
     const Node* Size() const { return size.get(); }
+    Node* Size() { return size.get(); }
 private:
     std::unique_ptr<Node> subject;
     std::unique_ptr<Node> size;

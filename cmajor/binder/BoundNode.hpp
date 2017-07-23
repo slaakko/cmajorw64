@@ -13,13 +13,28 @@ namespace cmajor { namespace binder {
 using cmajor::parsing::Span;
 using namespace cmajor::ir;
 
+enum class BoundNodeType : uint8_t
+{
+    boundCompileUnit, boundClass, boundFunction, 
+    boundSequenceStatement, boundCompoundStatement, boundReturnStatement, boundIfStatement, boundWhileStatement, boundDoStatement, boundForStatement, boundBreakStatement, boundContinueStatement,
+    boundGotoStatement, boundConstructionStatement, boundAssignmentStatement, boundExpressionStatement, boundEmptyStatement,
+    boundParameter, boundLocalVariable, boundMemberVariable, boundConstant, boundEnumConstant, boundLiteral,
+    boundFunctionCall, boundConversion,
+    boundTypeExpression, boundNamespaceExpression, boundFunctionGroupExcpression, boundMemberExpression
+};
+
+class BoundNodeVisitor;
+
 class BoundNode : public GenObject
 {
 public:
-    BoundNode(const Span& span_);
+    BoundNode(const Span& span_, BoundNodeType boundNodeType_);
+    virtual void Accept(BoundNodeVisitor& visitor) = 0;
     const Span& GetSpan() const { return span; }
+    BoundNodeType GetBoundNodeType() const { return boundNodeType; }
 private:
     Span span;
+    BoundNodeType boundNodeType;
 };
 
 } } // namespace cmajor::binder

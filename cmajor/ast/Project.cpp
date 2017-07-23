@@ -20,13 +20,20 @@ std::string CmajorRootDir()
     return std::string(e);
 }
 
-std::string GetSystemLibDir(const std::string& config)
+std::string CmajorSystemLibDir(const std::string& config)
 {
-    boost::filesystem::path sad(CmajorRootDir());
-    sad /= "system";
-    sad /= "lib";
-    sad /= config;
-    return GetFullPath(sad.generic_string());
+    boost::filesystem::path sld(CmajorRootDir());
+    sld /= "system";
+    sld /= "lib";
+    sld /= config;
+    return GetFullPath(sld.generic_string());
+}
+
+std::string CmajorSystemModuleFilePath(const std::string& config)
+{
+    boost::filesystem::path smfp(CmajorSystemLibDir(config));
+    smfp /= "System.cmm";
+    return GetFullPath(smfp.generic_string());
 }
 
 ProjectDeclaration::ProjectDeclaration(ProjectDeclarationType declarationType_) : declarationType(declarationType_)
@@ -50,10 +57,10 @@ TargetDeclaration::TargetDeclaration(Target target_) : ProjectDeclaration(Projec
 }
 
 Project::Project(const std::u32string& name_, const std::string& filePath_, const std::string& config_) :
-    name(name_), filePath(filePath_), config(config_), target(Target::program), basePath(filePath)
+    name(name_), filePath(filePath_), config(config_), target(Target::program), basePath(filePath), isSystemProject(false)
 {
     basePath.remove_filename();
-    systemLibDir = GetSystemLibDir(config);
+    systemLibDir = CmajorSystemLibDir(config);
     boost::filesystem::path mfp(filePath);
     boost::filesystem::path fn = mfp.filename();
     mfp.remove_filename();
@@ -171,6 +178,16 @@ void Project::ResolveDeclarations()
 bool Project::DependsOn(Project* that) const
 {
     return std::find(references.cbegin(), references.cend(), that->moduleFilePath) != references.cend();
+}
+
+void Project::SetModuleFilePath(const std::string& moduleFilePath_)
+{
+    moduleFilePath = moduleFilePath_;
+}
+
+void Project::SetLibraryFilePath(const std::string& libraryFilePath_)
+{
+    libraryFilePath = libraryFilePath_;
 }
 
 } } // namespace cmajor::ast

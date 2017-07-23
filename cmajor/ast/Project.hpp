@@ -12,6 +12,10 @@
 
 namespace cmajor { namespace ast {
 
+std::string CmajorRootDir();
+std::string CmajorSystemLibDir(const std::string& config);
+std::string CmajorSystemModuleFilePath(const std::string& config);
+
 enum class ProjectDeclarationType : uint8_t
 {
     referenceDeclaration, sourceFileDeclaration, targetDeclaration
@@ -75,6 +79,10 @@ public:
     const std::vector<std::string>& SourceFilePaths() const { return sourceFilePaths; }
     Target GetTarget() const { return target; }
     bool DependsOn(Project* that) const;
+    bool IsSystemProject() const { return isSystemProject; }
+    void SetSystemProject() { isSystemProject = true; }
+    void SetModuleFilePath(const std::string& moduleFilePath_);
+    void SetLibraryFilePath(const std::string& libraryFilePath_);
 private:
     std::u32string name;
     std::string filePath;
@@ -88,6 +96,7 @@ private:
     std::string executableFilePath;
     std::vector<std::string> references;
     std::vector<std::string> sourceFilePaths;
+    bool isSystemProject;
 };
 
 } } // namespace cmajor::ast

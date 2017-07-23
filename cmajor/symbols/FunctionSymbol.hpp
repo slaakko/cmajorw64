@@ -5,7 +5,7 @@
 
 #ifndef CMAJOR_SYMBOLS_FUNCTION_SYMBOL_INCLUDED
 #define CMAJOR_SYMBOLS_FUNCTION_SYMBOL_INCLUDED
-#include <cmajor/symbols/ContainerSymbol.hpp>
+#include <cmajor/symbols/TypeSymbol.hpp>
 #include <cmajor/ir/GenObject.hpp>
 #include <unordered_set>
 
@@ -18,11 +18,16 @@ class FunctionGroupSymbol : public Symbol
 public:
     FunctionGroupSymbol(const Span& span_, const std::u32string& name_);
     bool IsExportSymbol() const override { return false; }
-    std::string TypeString() const override { return "function group"; }
+    std::string TypeString() const override { return "function_group"; }
     void AddFunction(FunctionSymbol* function);
     void CollectViableFunctions(int arity, std::unordered_set<FunctionSymbol*>& viableFunctions);
 private:
     std::unordered_map<int, std::vector<FunctionSymbol*>> arityFunctionListMap;
+};
+
+enum class ConversionType : uint8_t
+{
+    implicit_, explicit_
 };
 
 enum class FunctionSymbolFlags : uint16_t
@@ -39,7 +44,8 @@ enum class FunctionSymbolFlags : uint16_t
     override_ = 1 << 8,
     abstract_ = 1 << 9,
     new_ = 1 << 10,
-    const_ = 1 << 11
+    const_ = 1 << 11,
+    conversion = 1 << 12
 };
 
 inline FunctionSymbolFlags operator|(FunctionSymbolFlags left, FunctionSymbolFlags right)
@@ -73,7 +79,13 @@ public:
     virtual void ComputeName();
     std::u32string FullName() const override;
     std::u32string FullNameWithSpecifiers() const override;
+    virtual ConversionType GetConversionType() const { return ConversionType::implicit_; }
+    virtual int ConversionDistance() const { return 0; }
+    virtual TypeSymbol* ConversionSourceType() const { return nullptr; }
+    virtual TypeSymbol* ConversionTargetType() const { return nullptr; }
+    virtual bool IsBasicTypeOperation() const { return false; }
     virtual void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects);
+    virtual ParameterSymbol* GetThisParam() const { return nullptr; }
     const std::u32string& GroupName() const { return groupName; }
     void SetGroupName(const std::u32string& groupName_);
     void SetSpecifiers(Specifiers specifiers);
@@ -101,15 +113,21 @@ public:
     void SetNew() { SetFlag(FunctionSymbolFlags::new_); }
     bool IsConst() const { return GetFlag(FunctionSymbolFlags::const_); }
     void SetConst() { SetFlag(FunctionSymbolFlags::const_); }
+    bool IsConversion() const { return GetFlag(FunctionSymbolFlags::conversion); }
+    void SetConversion() { SetFlag(FunctionSymbolFlags::conversion); }
     FunctionSymbolFlags GetFunctionSymbolFlags() const { return flags; }
     bool GetFlag(FunctionSymbolFlags flag) const { return (flags & flag) != FunctionSymbolFlags::none; }
     void SetFlag(FunctionSymbolFlags flag) { flags = flags | flag; }
+    void ComputeMangledName();
     int Arity() const { return parameters.size(); }
+    const std::vector<ParameterSymbol*>& Parameters() const { return parameters; }
     void AddLocalVariable(LocalVariableSymbol* localVariable);
+    const std::vector<LocalVariableSymbol*>& LocalVariables() const { return localVariables; }
     void SetReturnType(TypeSymbol* returnType_) { returnType = returnType_; }
     TypeSymbol* ReturnType() const { return returnType; }
     bool IsFunctionTemplate() const { return !templateParameters.empty(); }
     void CloneUsingNodes(const std::vector<Node*>& usingNodes_);
+    llvm::FunctionType* IrType(Emitter& emitter);
 private:
     std::u32string groupName;
     std::vector<TemplateParameterSymbol*> templateParameters;
@@ -118,13 +136,14 @@ private:
     TypeSymbol* returnType;
     FunctionSymbolFlags flags;
     NodeList<Node> usingNodes;
+    llvm::FunctionType* irType;
 };
 
 class StaticConstructorSymbol : public FunctionSymbol
 {
 public:
     StaticConstructorSymbol(const Span& span_, const std::u32string& name_);
-    std::string TypeString() const override { return "static constructor"; }
+    std::string TypeString() const override { return "static_constructor"; }
     void SetSpecifiers(Specifiers specifiers);
 };
 
@@ -133,6 +152,7 @@ class ConstructorSymbol : public FunctionSymbol
 public:
     ConstructorSymbol(const Span& span_, const std::u32string& name_);
     std::string TypeString() const override { return "constructor"; }
+    ParameterSymbol* GetThisParam() const override { return Parameters()[0]; }
     void SetSpecifiers(Specifiers specifiers);
 };
 
@@ -141,6 +161,7 @@ class DestructorSymbol : public FunctionSymbol
 public:
     DestructorSymbol(const Span& span_, const std::u32string& name_);
     std::string TypeString() const override { return "destructor"; }
+    ParameterSymbol* GetThisParam() const override { return Parameters()[0]; }
     void SetSpecifiers(Specifiers specifiers);
 };
 
@@ -148,9 +169,23 @@ class MemberFunctionSymbol : public FunctionSymbol
 {
 public:
     MemberFunctionSymbol(const Span& span_, const std::u32string& name_);
-    std::string TypeString() const override { return "member function"; }
+    std::string TypeString() const override { return "member_function"; }
+    ParameterSymbol* GetThisParam() const override { if (IsStatic()) return nullptr; else return Parameters()[0]; }
     void SetSpecifiers(Specifiers specifiers);
 };
+
+class FunctionGroupTypeSymbol : public TypeSymbol
+{
+public:
+    FunctionGroupTypeSymbol(FunctionGroupSymbol* functionGroup_);
+    const FunctionGroupSymbol* FunctionGroup() const { return functionGroup; }
+    llvm::Type* IrType(Emitter& emitter) const override { return nullptr; } 
+private:
+    FunctionGroupSymbol* functionGroup;
+};
+
+void InitFunctionSymbol();
+void DoneFunctionSymbol();
 
 } } // namespace cmajor::symbols
 

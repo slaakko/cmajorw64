@@ -10,7 +10,7 @@
 
 namespace cmajor { namespace ast {
 
-class DotNode : public Node
+class DotNode : public UnaryNode
 {
 public:
     DotNode(const Span& span_);
@@ -19,15 +19,12 @@ public:
     void Accept(Visitor& visitor) override;
     void Write(AstWriter& writer) override;
     void Read(AstReader& reader) override;
-    const Node* Subject() const { return subject.get(); }
-    Node* Subject() { return subject.get(); }
     const IdentifierNode* MemberId() const { return memberId.get(); }
 private:
-    std::unique_ptr<Node> subject;
     std::unique_ptr<IdentifierNode> memberId;
 };
 
-class ArrowNode : public Node
+class ArrowNode : public UnaryNode
 {
 public:
     ArrowNode(const Span& span_);
@@ -36,10 +33,8 @@ public:
     void Accept(Visitor& visitor) override;
     void Write(AstWriter& writer) override;
     void Read(AstReader& reader) override;
-    const Node* Subject() const { return subject.get(); }
     const IdentifierNode* MemberId() const { return memberId.get(); }
 private:
-    std::unique_ptr<Node> subject;
     std::unique_ptr<IdentifierNode> memberId;
 };
 
@@ -223,116 +218,76 @@ public:
     void Accept(Visitor& visitor) override;
 };
 
-class NotNode : public Node
+class NotNode : public UnaryNode
 {
 public:
     NotNode(const Span& span_);
     NotNode(const Span& span_, Node* subject_);
     Node* Clone(CloneContext& cloneContext) const override;
     void Accept(Visitor& visitor) override;
-    void Write(AstWriter& writer) override;
-    void Read(AstReader& reader) override;
-    const Node* Subject() const { return subject.get(); }
-private:
-    std::unique_ptr<Node> subject;
 };
 
-class UnaryPlusNode : public Node
+class UnaryPlusNode : public UnaryNode
 {
 public:
     UnaryPlusNode(const Span& span_);
     UnaryPlusNode(const Span& span_, Node* subject_);
     Node* Clone(CloneContext& cloneContext) const override;
     void Accept(Visitor& visitor) override;
-    void Write(AstWriter& writer) override;
-    void Read(AstReader& reader) override;
-    const Node* Subject() const { return subject.get(); }
-private:
-    std::unique_ptr<Node> subject;
 };
 
-class UnaryMinusNode : public Node
+class UnaryMinusNode : public UnaryNode
 {
 public:
     UnaryMinusNode(const Span& span_);
     UnaryMinusNode(const Span& span_, Node* subject_);
     Node* Clone(CloneContext& cloneContext) const override;
     void Accept(Visitor& visitor) override;
-    void Write(AstWriter& writer) override;
-    void Read(AstReader& reader) override;
-    const Node* Subject() const { return subject.get(); }
-private:
-    std::unique_ptr<Node> subject;
 };
 
-class PrefixIncrementNode : public Node
+class PrefixIncrementNode : public UnaryNode
 {
 public:
     PrefixIncrementNode(const Span& span_);
     PrefixIncrementNode(const Span& span_, Node* subject_);
     Node* Clone(CloneContext& cloneContext) const override;
     void Accept(Visitor& visitor) override;
-    void Write(AstWriter& writer) override;
-    void Read(AstReader& reader) override;
-    const Node* Subject() const { return subject.get(); }
-private:
-    std::unique_ptr<Node> subject;
 };
 
-class PrefixDecrementNode : public Node
+class PrefixDecrementNode : public UnaryNode
 {
 public:
     PrefixDecrementNode(const Span& span_);
     PrefixDecrementNode(const Span& span_, Node* subject_);
     Node* Clone(CloneContext& cloneContext) const override;
     void Accept(Visitor& visitor) override;
-    void Write(AstWriter& writer) override;
-    void Read(AstReader& reader) override;
-    const Node* Subject() const { return subject.get(); }
-private:
-    std::unique_ptr<Node> subject;
 };
 
-class ComplementNode : public Node
+class ComplementNode : public UnaryNode
 {
 public:
     ComplementNode(const Span& span_);
     ComplementNode(const Span& span_, Node* subject_);
     Node* Clone(CloneContext& cloneContext) const override;
     void Accept(Visitor& visitor) override;
-    void Write(AstWriter& writer) override;
-    void Read(AstReader& reader) override;
-    const Node* Subject() const { return subject.get(); }
-private:
-    std::unique_ptr<Node> subject;
 };
 
-class DerefNode : public Node
+class DerefNode : public UnaryNode
 {
 public:
     DerefNode(const Span& span_);
     DerefNode(const Span& span_, Node* subject_);
     Node* Clone(CloneContext& cloneContext) const override;
     void Accept(Visitor& visitor) override;
-    void Write(AstWriter& writer) override;
-    void Read(AstReader& reader) override;
-    const Node* Subject() const { return subject.get(); }
-private:
-    std::unique_ptr<Node> subject;
 };
 
-class AddrOfNode : public Node
+class AddrOfNode : public UnaryNode
 {
 public:
     AddrOfNode(const Span& span_);
     AddrOfNode(const Span& span_, Node* subject_);
     Node* Clone(CloneContext& cloneContext) const override;
     void Accept(Visitor& visitor) override;
-    void Write(AstWriter& writer) override;
-    void Read(AstReader& reader) override;
-    const Node* Subject() const { return subject.get(); }
-private:
-    std::unique_ptr<Node> subject;
 };
 
 class IsNode : public Node
@@ -394,40 +349,30 @@ public:
     void Read(AstReader& reader) override;
     void AddArgument(Node* argument) override;
     const Node* Subject() const { return subject.get(); }
+    Node* Subject() { return subject.get(); }
     const NodeList<Node>& Arguments() const { return arguments; }
 private:
     std::unique_ptr<Node> subject;
     NodeList<Node> arguments;
 };
 
-class PostfixIncrementNode : public Node
+class PostfixIncrementNode : public UnaryNode
 {
 public:
     PostfixIncrementNode(const Span& span_);
     PostfixIncrementNode(const Span& span_, Node* subject_);
     Node* Clone(CloneContext& cloneContext) const override;
     void Accept(Visitor& visitor) override;
-    void Write(AstWriter& writer) override;
-    void Read(AstReader& reader) override;
-    const Node* Subject() const { return subject.get(); }
-private:
-    std::unique_ptr<Node> subject;
 };
 
-class PostfixDecrementNode : public Node
+class PostfixDecrementNode : public UnaryNode
 {
 public:
     PostfixDecrementNode(const Span& span_);
     PostfixDecrementNode(const Span& span_, Node* subject_);
     Node* Clone(CloneContext& cloneContext) const override;
     void Accept(Visitor& visitor) override;
-    void Write(AstWriter& writer) override;
-    void Read(AstReader& reader) override;
-    const Node* Subject() const { return subject.get(); }
-private:
-    std::unique_ptr<Node> subject;
 };
-
 
 class SizeOfNode : public Node
 {

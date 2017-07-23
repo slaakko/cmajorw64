@@ -24,7 +24,23 @@ namespace cmajor { namespace symbols {
 
 using namespace cmajor::unicode;
 
-SymbolTable::SymbolTable() : globalNs(Span(), std::u32string()), container(&globalNs), mainFunctionSymbol(nullptr), parameterIndex(0), nextTypeId(1)
+void TypeIdCounter::Init()
+{
+    instance.reset(new TypeIdCounter());
+}
+
+void TypeIdCounter::Done()
+{
+    instance.reset();
+}
+
+std::unique_ptr<TypeIdCounter> TypeIdCounter::instance;
+
+TypeIdCounter::TypeIdCounter() : nextTypeId(1)
+{
+}
+
+SymbolTable::SymbolTable() : globalNs(Span(), std::u32string()), container(&globalNs), mainFunctionSymbol(nullptr), parameterIndex(0)
 {
     globalNs.SetSymbolTable(this);
 }
@@ -32,13 +48,76 @@ SymbolTable::SymbolTable() : globalNs(Span(), std::u32string()), container(&glob
 void SymbolTable::Write(SymbolWriter& writer)
 {
     globalNs.Write(writer);
+    uint32_t n = derivedTypes.size();
+    writer.GetBinaryWriter().WriteEncodedUInt(n);
+    for (const auto& derivedType : derivedTypes)
+    {
+        writer.Write(derivedType.get());
+    }
 }
 
 void SymbolTable::Read(SymbolReader& reader)
 {
     reader.SetSymbolTable(this);
     globalNs.Read(reader);
+    uint32_t n = reader.GetBinaryReader().ReadEncodedUInt();
+    for (uint32_t i = 0; i < n; ++i)
+    {
+        DerivedTypeSymbol* derivedTypeSymbol = reader.ReadDerivedTypeSymbol();
+        derivedTypes.push_back(std::unique_ptr<DerivedTypeSymbol>(derivedTypeSymbol));
+    }
     ProcessTypeRequests();
+    for (FunctionSymbol* conversion : reader.Conversions())
+    {
+        AddConversion(conversion);
+    }
+}
+
+void SymbolTable::Import(SymbolTable& symbolTable)
+{
+    globalNs.Import(&symbolTable.globalNs, *this);
+    for (const auto& pair : symbolTable.typeIdMap)
+    {
+        TypeSymbol* type = pair.second;
+        typeIdMap[type->TypeId()] = type;
+        typeNameMap[type->FullName()] = type;
+    }
+    for (auto& derivedType : symbolTable.derivedTypes)
+    {
+        derivedType->SetSymbolTable(this);
+        derivedTypes.push_back(std::unique_ptr<DerivedTypeSymbol>(derivedType.release()));
+    }
+    int nd = derivedTypes.size();
+    for (int i = 0; i < nd; ++i)
+    {
+        DerivedTypeSymbol* derivedTypeSymbol = derivedTypes[i].get();
+        std::vector<DerivedTypeSymbol*>& derivedTypeVec = derivedTypeMap[derivedTypeSymbol->BaseType()];
+        int n = derivedTypeVec.size();
+        bool found = false;
+        for (int i = 0; i < n; ++i)
+        {
+            DerivedTypeSymbol* prevDerivedTypeSymbol = derivedTypeVec[i];
+            if (prevDerivedTypeSymbol->DerivationRec() == derivedTypeSymbol->DerivationRec())
+            {
+                found = true;
+                break;
+            }
+        }
+        if (!found)
+        {
+            derivedTypeVec.push_back(derivedTypeSymbol);
+        }
+    }
+    Assert(conversionTable.IsEmpty(), "empty conversion table expected");
+    conversionTable = std::move(symbolTable.conversionTable);
+    symbolTable.Clear();
+}
+
+void SymbolTable::Clear()
+{
+    globalNs.Clear();
+    typeIdMap.clear();
+    typeNameMap.clear();
 }
 
 void SymbolTable::BeginContainer(ContainerSymbol* container_)
@@ -399,6 +478,10 @@ void SymbolTable::AddFunctionSymbolToGlobalScope(FunctionSymbol* functionSymbol)
 {
     functionSymbol->SetSymbolTable(this);
     globalNs.AddMember(functionSymbol);
+    if (functionSymbol->IsConversion())
+    {
+        conversionTable.AddConversion(functionSymbol);
+    }
 }
 
 void SymbolTable::MapNode(Node* node, Symbol* symbol)
@@ -459,14 +542,14 @@ Node* SymbolTable::GetNode(Symbol* symbol) const
     }
 }
 
-void SymbolTable::AddTypeSymbolToTypeMap(TypeSymbol* typeSymbol)
+void SymbolTable::AddTypeSymbolToTypeIdMap(TypeSymbol* typeSymbol)
 {
     typeIdMap[typeSymbol->TypeId()] = typeSymbol;
 }
 
 void SymbolTable::SetTypeIdFor(TypeSymbol* typeSymbol)
 {
-    typeSymbol->SetTypeId(GetNextTypeId());
+    typeSymbol->SetTypeId(TypeIdCounter::Instance().GetNextTypeId());
 }
 
 void SymbolTable::EmplaceTypeRequest(Symbol* forSymbol, uint32_t typeId, int index)
@@ -529,7 +612,40 @@ TypeSymbol* SymbolTable::GetTypeByName(const std::u32string& typeName) const
     }
 }
 
-void InitSymbolTable(SymbolTable& symbolTable)
+TypeSymbol* SymbolTable::MakeDerivedType(TypeSymbol* baseType, const TypeDerivationRec& derivationRec)
+{
+    if (derivationRec.IsEmpty())
+    {
+        return baseType;
+    }
+    std::vector<DerivedTypeSymbol*>& prevDerivedTypes = derivedTypeMap[baseType];
+    int n = derivedTypes.size();
+    for (int i = 0; i < n; ++i)
+    {
+        DerivedTypeSymbol* derivedType = prevDerivedTypes[i];
+        if (derivedType->DerivationRec() == derivationRec)
+        {
+            return derivedType;
+        }
+    }
+    DerivedTypeSymbol* derivedType = new DerivedTypeSymbol(baseType->GetSpan(), MakeDerivedTypeName(baseType, derivationRec), baseType, derivationRec);
+    derivedType->SetSymbolTable(this);
+    SetTypeIdFor(derivedType);
+    derivedTypes.push_back(std::unique_ptr<DerivedTypeSymbol>(derivedType));
+    return derivedType;
+}
+
+void SymbolTable::AddConversion(FunctionSymbol* conversion)
+{
+    conversionTable.AddConversion(conversion);
+}
+
+FunctionSymbol* SymbolTable::GetConversion(TypeSymbol* sourceType, TypeSymbol* targetType) const
+{
+    return conversionTable.GetConversion(sourceType, targetType);
+}
+
+void InitCoreSymbolTable(SymbolTable& symbolTable)
 {
     BoolTypeSymbol* boolType = new BoolTypeSymbol(Span(), U"bool");
     SByteTypeSymbol* sbyteType = new SByteTypeSymbol(Span(), U"sbyte");
@@ -561,7 +677,17 @@ void InitSymbolTable(SymbolTable& symbolTable)
     symbolTable.AddTypeSymbolToGlobalScope(wcharType);
     symbolTable.AddTypeSymbolToGlobalScope(ucharType);
     symbolTable.AddTypeSymbolToGlobalScope(voidType);
-    MakeBasicTypeOperations(symbolTable, boolType, sbyteType, byteType, shortType, ushortType, intType, uintType, longType, ulongType, floatType, doubleType, charType, wcharType, ucharType);
+    MakeBasicTypeOperations(symbolTable, boolType, sbyteType, byteType, shortType, ushortType, intType, uintType, longType, ulongType, floatType, doubleType, charType, wcharType, ucharType, voidType);
+}
+
+void InitSymbolTable()
+{
+    TypeIdCounter::Init();
+}
+
+void DoneSymbolTable()
+{
+    TypeIdCounter::Done();
 }
 
 } } // namespace cmajor::symbols

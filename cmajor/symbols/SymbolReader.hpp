@@ -12,7 +12,9 @@ namespace cmajor { namespace symbols {
 using namespace cmajor::ast;
 
 class Symbol;
+class DerivedTypeSymbol;
 class SymbolTable;
+class FunctionSymbol;
 
 class SymbolReader
 {
@@ -21,10 +23,14 @@ public:
     AstReader& GetAstReader() { return astReader; }
     BinaryReader& GetBinaryReader() { return astReader.GetBinaryReader(); }
     Symbol* ReadSymbol();
+    DerivedTypeSymbol* ReadDerivedTypeSymbol();
     void SetSymbolTable(SymbolTable* symbolTable_) { symbolTable = symbolTable_; }
+    void AddConversion(FunctionSymbol* conversion);
+    const std::vector<FunctionSymbol*>& Conversions() const { return conversions; }
 private:
     AstReader astReader;
     SymbolTable* symbolTable;
+    std::vector<FunctionSymbol*> conversions;
 };
 
 } } // namespace cmajor::symbols

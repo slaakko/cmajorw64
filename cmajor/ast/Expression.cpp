@@ -9,19 +9,18 @@
 
 namespace cmajor { namespace ast {
 
-DotNode::DotNode(const Span& span_) : Node(NodeType::dotNode, span_), subject(), memberId()
+DotNode::DotNode(const Span& span_) : UnaryNode(NodeType::dotNode, span_), memberId()
 {
 }
 
-DotNode::DotNode(const Span& span_, Node* subject_, IdentifierNode* memberId_) : Node(NodeType::dotNode, span_), subject(subject_), memberId(memberId_)
+DotNode::DotNode(const Span& span_, Node* subject_, IdentifierNode* memberId_) : UnaryNode(NodeType::dotNode, span_, subject_), memberId(memberId_)
 {
-    subject->SetParent(this);
     memberId->SetParent(this);
 }
 
 Node* DotNode::Clone(CloneContext& cloneContext) const
 {
-    return new DotNode(GetSpan(), subject->Clone(cloneContext), static_cast<IdentifierNode*>(memberId->Clone(cloneContext)));
+    return new DotNode(GetSpan(), Subject()->Clone(cloneContext), static_cast<IdentifierNode*>(memberId->Clone(cloneContext)));
 }
 
 void DotNode::Accept(Visitor& visitor)
@@ -31,33 +30,29 @@ void DotNode::Accept(Visitor& visitor)
 
 void DotNode::Write(AstWriter& writer)
 {
-    Node::Write(writer);
-    writer.Write(subject.get());
+    UnaryNode::Write(writer);
     writer.Write(memberId.get());
 }
 
 void DotNode::Read(AstReader& reader)
 {
-    Node::Read(reader);
-    subject.reset(reader.ReadNode());
-    subject->SetParent(this);
+    UnaryNode::Read(reader);
     memberId.reset(reader.ReadIdentifierNode());
     memberId->SetParent(this);
 }
 
-ArrowNode::ArrowNode(const Span& span_) : Node(NodeType::arrowNode, span_), subject(), memberId()
+ArrowNode::ArrowNode(const Span& span_) : UnaryNode(NodeType::arrowNode, span_), memberId()
 {
 }
 
-ArrowNode::ArrowNode(const Span& span_, Node* subject_, IdentifierNode* memberId_) : Node(NodeType::arrowNode, span_), subject(subject_), memberId(memberId_)
+ArrowNode::ArrowNode(const Span& span_, Node* subject_, IdentifierNode* memberId_) : UnaryNode(NodeType::arrowNode, span_, subject_), memberId(memberId_)
 {
-    subject->SetParent(this);
     memberId->SetParent(this);
 }
 
 Node* ArrowNode::Clone(CloneContext& cloneContext) const
 {
-    return new ArrowNode(GetSpan(), subject->Clone(cloneContext), static_cast<IdentifierNode*>(memberId->Clone(cloneContext)));
+    return new ArrowNode(GetSpan(), Subject()->Clone(cloneContext), static_cast<IdentifierNode*>(memberId->Clone(cloneContext)));
 }
 
 void ArrowNode::Accept(Visitor& visitor)
@@ -67,16 +62,13 @@ void ArrowNode::Accept(Visitor& visitor)
 
 void ArrowNode::Write(AstWriter& writer)
 {
-    Node::Write(writer);
-    writer.Write(subject.get());
+    UnaryNode::Write(writer);
     writer.Write(memberId.get());
 }
 
 void ArrowNode::Read(AstReader& reader)
 {
-    Node::Read(reader);
-    subject.reset(reader.ReadNode());
-    subject->SetParent(this);
+    UnaryNode::Read(reader);
     memberId.reset(reader.ReadIdentifierNode());
     memberId->SetParent(this);
 }
@@ -441,18 +433,17 @@ void RemNode::Accept(Visitor& visitor)
     visitor.Visit(*this);
 }
 
-NotNode::NotNode(const Span& span_) : Node(NodeType::notNode, span_), subject()
+NotNode::NotNode(const Span& span_) : UnaryNode(NodeType::notNode, span_)
 {
 }
 
-NotNode::NotNode(const Span& span_, Node* subject_) : Node(NodeType::notNode, span_), subject(subject_)
+NotNode::NotNode(const Span& span_, Node* subject_) : UnaryNode(NodeType::notNode, span_, subject_)
 {
-    subject->SetParent(this);
 }
 
 Node* NotNode::Clone(CloneContext& cloneContext) const
 {
-    return new NotNode(GetSpan(), subject->Clone(cloneContext));
+    return new NotNode(GetSpan(), Subject()->Clone(cloneContext));
 }
 
 void NotNode::Accept(Visitor& visitor)
@@ -460,31 +451,17 @@ void NotNode::Accept(Visitor& visitor)
     visitor.Visit(*this);
 }
 
-void NotNode::Write(AstWriter& writer)
-{
-    Node::Write(writer);
-    writer.Write(subject.get());
-}
-
-void NotNode::Read(AstReader& reader)
-{
-    Node::Read(reader);
-    subject.reset(reader.ReadNode());
-    subject->SetParent(this);
-}
-
-UnaryPlusNode::UnaryPlusNode(const Span& span_) : Node(NodeType::unaryPlusNode, span_), subject()
+UnaryPlusNode::UnaryPlusNode(const Span& span_) : UnaryNode(NodeType::unaryPlusNode, span_)
 {
 }
 
-UnaryPlusNode::UnaryPlusNode(const Span& span_, Node* subject_) : Node(NodeType::unaryPlusNode, span_), subject(subject_)
+UnaryPlusNode::UnaryPlusNode(const Span& span_, Node* subject_) : UnaryNode(NodeType::unaryPlusNode, span_, subject_)
 {
-    subject->SetParent(this);
 }
 
 Node* UnaryPlusNode::Clone(CloneContext& cloneContext) const
 {
-    return new UnaryPlusNode(GetSpan(), subject->Clone(cloneContext));
+    return new UnaryPlusNode(GetSpan(), Subject()->Clone(cloneContext));
 }
 
 void UnaryPlusNode::Accept(Visitor& visitor)
@@ -492,31 +469,17 @@ void UnaryPlusNode::Accept(Visitor& visitor)
     visitor.Visit(*this);
 }
 
-void UnaryPlusNode::Write(AstWriter& writer)
-{
-    Node::Write(writer);
-    writer.Write(subject.get());
-}
-
-void UnaryPlusNode::Read(AstReader& reader)
-{
-    Node::Read(reader);
-    subject.reset(reader.ReadNode());
-    subject->SetParent(this);
-}
-
-UnaryMinusNode::UnaryMinusNode(const Span& span_) : Node(NodeType::unaryMinusNode, span_), subject()
+UnaryMinusNode::UnaryMinusNode(const Span& span_) : UnaryNode(NodeType::unaryMinusNode, span_)
 {
 }
 
-UnaryMinusNode::UnaryMinusNode(const Span& span_, Node* subject_) : Node(NodeType::unaryMinusNode, span_), subject(subject_)
+UnaryMinusNode::UnaryMinusNode(const Span& span_, Node* subject_) : UnaryNode(NodeType::unaryMinusNode, span_, subject_)
 {
-    subject->SetParent(this);
 }
 
 Node* UnaryMinusNode::Clone(CloneContext& cloneContext) const
 {
-    return new UnaryMinusNode(GetSpan(), subject->Clone(cloneContext));
+    return new UnaryMinusNode(GetSpan(), Subject()->Clone(cloneContext));
 }
 
 void UnaryMinusNode::Accept(Visitor& visitor)
@@ -524,31 +487,17 @@ void UnaryMinusNode::Accept(Visitor& visitor)
     visitor.Visit(*this);
 }
 
-void UnaryMinusNode::Write(AstWriter& writer)
-{
-    Node::Write(writer);
-    writer.Write(subject.get());
-}
-
-void UnaryMinusNode::Read(AstReader& reader)
-{
-    Node::Read(reader);
-    subject.reset(reader.ReadNode());
-    subject->SetParent(this);
-}
-
-PrefixIncrementNode::PrefixIncrementNode(const Span& span_) : Node(NodeType::prefixIncrementNode, span_), subject()
+PrefixIncrementNode::PrefixIncrementNode(const Span& span_) : UnaryNode(NodeType::prefixIncrementNode, span_)
 {
 }
 
-PrefixIncrementNode::PrefixIncrementNode(const Span& span_, Node* subject_) : Node(NodeType::prefixIncrementNode, span_), subject(subject_)
+PrefixIncrementNode::PrefixIncrementNode(const Span& span_, Node* subject_) : UnaryNode(NodeType::prefixIncrementNode, span_, subject_)
 {
-    subject->SetParent(this);
 }
 
 Node* PrefixIncrementNode::Clone(CloneContext& cloneContext) const
 {
-    return new PrefixIncrementNode(GetSpan(), subject->Clone(cloneContext));
+    return new PrefixIncrementNode(GetSpan(), Subject()->Clone(cloneContext));
 }
 
 void PrefixIncrementNode::Accept(Visitor& visitor)
@@ -556,31 +505,17 @@ void PrefixIncrementNode::Accept(Visitor& visitor)
     visitor.Visit(*this);
 }
 
-void PrefixIncrementNode::Write(AstWriter& writer)
-{
-    Node::Write(writer);
-    writer.Write(subject.get());
-}
-
-void PrefixIncrementNode::Read(AstReader& reader)
-{
-    Node::Read(reader);
-    subject.reset(reader.ReadNode());
-    subject->SetParent(this);
-}
-
-PrefixDecrementNode::PrefixDecrementNode(const Span& span_) : Node(NodeType::prefixDecrementNode, span_), subject()
+PrefixDecrementNode::PrefixDecrementNode(const Span& span_) : UnaryNode(NodeType::prefixDecrementNode, span_)
 {
 }
 
-PrefixDecrementNode::PrefixDecrementNode(const Span& span_, Node* subject_) : Node(NodeType::prefixDecrementNode, span_), subject(subject_)
+PrefixDecrementNode::PrefixDecrementNode(const Span& span_, Node* subject_) : UnaryNode(NodeType::prefixDecrementNode, span_, subject_)
 {
-    subject->SetParent(this);
 }
 
 Node* PrefixDecrementNode::Clone(CloneContext& cloneContext) const
 {
-    return new PrefixDecrementNode(GetSpan(), subject->Clone(cloneContext));
+    return new PrefixDecrementNode(GetSpan(), Subject()->Clone(cloneContext));
 }
 
 void PrefixDecrementNode::Accept(Visitor& visitor)
@@ -588,31 +523,17 @@ void PrefixDecrementNode::Accept(Visitor& visitor)
     visitor.Visit(*this);
 }
 
-void PrefixDecrementNode::Write(AstWriter& writer)
-{
-    Node::Write(writer);
-    writer.Write(subject.get());
-}
-
-void PrefixDecrementNode::Read(AstReader& reader)
-{
-    Node::Read(reader);
-    subject.reset(reader.ReadNode());
-    subject->SetParent(this);
-}
-
-ComplementNode::ComplementNode(const Span& span_) : Node(NodeType::complementNode, span_), subject()
+ComplementNode::ComplementNode(const Span& span_) : UnaryNode(NodeType::complementNode, span_)
 {
 }
 
-ComplementNode::ComplementNode(const Span& span_, Node* subject_) : Node(NodeType::complementNode, span_), subject(subject_)
+ComplementNode::ComplementNode(const Span& span_, Node* subject_) : UnaryNode(NodeType::complementNode, span_, subject_)
 {
-    subject->SetParent(this);
 }
 
 Node* ComplementNode::Clone(CloneContext& cloneContext) const
 {
-    return new ComplementNode(GetSpan(), subject->Clone(cloneContext));
+    return new ComplementNode(GetSpan(), Subject()->Clone(cloneContext));
 }
 
 void ComplementNode::Accept(Visitor& visitor)
@@ -620,31 +541,17 @@ void ComplementNode::Accept(Visitor& visitor)
     visitor.Visit(*this);
 }
 
-void ComplementNode::Write(AstWriter& writer)
-{
-    Node::Write(writer);
-    writer.Write(subject.get());
-}
-
-void ComplementNode::Read(AstReader& reader)
-{
-    Node::Read(reader);
-    subject.reset(reader.ReadNode());
-    subject->SetParent(this);
-}
-
-DerefNode::DerefNode(const Span& span_) : Node(NodeType::derefNode, span_), subject()
+DerefNode::DerefNode(const Span& span_) : UnaryNode(NodeType::derefNode, span_)
 {
 }
 
-DerefNode::DerefNode(const Span& span_, Node* subject_) : Node(NodeType::derefNode, span_), subject(subject_)
+DerefNode::DerefNode(const Span& span_, Node* subject_) : UnaryNode(NodeType::derefNode, span_, subject_)
 {
-    subject->SetParent(this);
 }
 
 Node* DerefNode::Clone(CloneContext& cloneContext) const
 {
-    return new DerefNode(GetSpan(), subject->Clone(cloneContext));
+    return new DerefNode(GetSpan(), Subject()->Clone(cloneContext));
 }
 
 void DerefNode::Accept(Visitor& visitor)
@@ -652,49 +559,22 @@ void DerefNode::Accept(Visitor& visitor)
     visitor.Visit(*this);
 }
 
-void DerefNode::Write(AstWriter& writer)
-{
-    Node::Write(writer);
-    writer.Write(subject.get());
-}
-
-void DerefNode::Read(AstReader& reader)
-{
-    Node::Read(reader);
-    subject.reset(reader.ReadNode());
-    subject->SetParent(this);
-}
-
-AddrOfNode::AddrOfNode(const Span& span_) : Node(NodeType::addrOfNode, span_), subject()
+AddrOfNode::AddrOfNode(const Span& span_) : UnaryNode(NodeType::addrOfNode, span_)
 {
 }
 
-AddrOfNode::AddrOfNode(const Span& span_, Node* subject_) : Node(NodeType::addrOfNode , span_), subject(subject_)
+AddrOfNode::AddrOfNode(const Span& span_, Node* subject_) : UnaryNode(NodeType::addrOfNode , span_, subject_)
 {
-    subject->SetParent(this);
 }
 
 Node* AddrOfNode::Clone(CloneContext& cloneContext) const
 {
-    return new AddrOfNode(GetSpan(), subject->Clone(cloneContext));
+    return new AddrOfNode(GetSpan(), Subject()->Clone(cloneContext));
 }
 
 void AddrOfNode::Accept(Visitor& visitor)
 {
     visitor.Visit(*this);
-}
-
-void AddrOfNode::Write(AstWriter& writer)
-{
-    Node::Write(writer);
-    writer.Write(subject.get());
-}
-
-void AddrOfNode::Read(AstReader& reader)
-{
-    Node::Read(reader);
-    subject.reset(reader.ReadNode());
-    subject->SetParent(this);
 }
 
 IsNode::IsNode(const Span& span_) : Node(NodeType::isNode, span_), expr(), targetTypeExpr()
@@ -853,18 +733,17 @@ void InvokeNode::AddArgument(Node* argument)
     arguments.Add(argument);
 }
 
-PostfixIncrementNode::PostfixIncrementNode(const Span& span_) : Node(NodeType::postfixIncrementNode, span_), subject()
+PostfixIncrementNode::PostfixIncrementNode(const Span& span_) : UnaryNode(NodeType::postfixIncrementNode, span_)
 {
 }
 
-PostfixIncrementNode::PostfixIncrementNode(const Span& span_, Node* subject_) : Node(NodeType::postfixIncrementNode, span_), subject(subject_)
+PostfixIncrementNode::PostfixIncrementNode(const Span& span_, Node* subject_) : UnaryNode(NodeType::postfixIncrementNode, span_, subject_)
 {
-    subject->SetParent(this);
 }
 
 Node* PostfixIncrementNode::Clone(CloneContext& cloneContext) const
 {
-    return new PostfixIncrementNode(GetSpan(), subject->Clone(cloneContext));
+    return new PostfixIncrementNode(GetSpan(), Subject()->Clone(cloneContext));
 }
 
 void PostfixIncrementNode::Accept(Visitor& visitor)
@@ -872,49 +751,22 @@ void PostfixIncrementNode::Accept(Visitor& visitor)
     visitor.Visit(*this);
 }
 
-void PostfixIncrementNode::Write(AstWriter& writer)
-{
-    Node::Write(writer);
-    writer.Write(subject.get());
-}
-
-void PostfixIncrementNode::Read(AstReader& reader)
-{
-    Node::Read(reader);
-    subject.reset(reader.ReadNode());
-    subject->SetParent(this);
-}
-
-PostfixDecrementNode::PostfixDecrementNode(const Span& span_) : Node(NodeType::postfixDecrementNode, span_), subject()
+PostfixDecrementNode::PostfixDecrementNode(const Span& span_) : UnaryNode(NodeType::postfixDecrementNode, span_)
 {
 }
 
-PostfixDecrementNode::PostfixDecrementNode(const Span& span_, Node* subject_) : Node(NodeType::postfixDecrementNode, span_), subject(subject_)
+PostfixDecrementNode::PostfixDecrementNode(const Span& span_, Node* subject_) : UnaryNode(NodeType::postfixDecrementNode, span_, subject_)
 {
-    subject->SetParent(this);
 }
 
 Node* PostfixDecrementNode::Clone(CloneContext& cloneContext) const
 {
-    return new PostfixDecrementNode(GetSpan(), subject->Clone(cloneContext));
+    return new PostfixDecrementNode(GetSpan(), Subject()->Clone(cloneContext));
 }
 
 void PostfixDecrementNode::Accept(Visitor& visitor)
 {
     visitor.Visit(*this);
-}
-
-void PostfixDecrementNode::Write(AstWriter& writer)
-{
-    Node::Write(writer);
-    writer.Write(subject.get());
-}
-
-void PostfixDecrementNode::Read(AstReader& reader)
-{
-    Node::Read(reader);
-    subject.reset(reader.ReadNode());
-    subject->SetParent(this);
 }
 
 SizeOfNode::SizeOfNode(const Span& span_) : Node(NodeType::sizeOfNode, span_), expression()

@@ -13,14 +13,14 @@ class BasicTypeSymbol : public TypeSymbol
 {
 public:
     BasicTypeSymbol(SymbolType symbolType_, const Span& span_, const std::u32string& name_);
-    std::string TypeString() const override { return "basic type"; }
+    std::string TypeString() const override { return "basic_type"; }
 };
 
 class BoolTypeSymbol : public BasicTypeSymbol
 {
 public:
     BoolTypeSymbol(const Span& span_, const std::u32string& name_);
-    std::string TypeString() const override { return "bool type"; }
+    std::string TypeString() const override { return "bool"; }
     llvm::Type* IrType(Emitter& emitter) const override { return llvm::Type::getInt1Ty(emitter.Context()); }
 };
 
@@ -28,7 +28,7 @@ class SByteTypeSymbol : public BasicTypeSymbol
 {
 public:
     SByteTypeSymbol(const Span& span_, const std::u32string& name_);
-    std::string TypeString() const override { return "sbyte type"; }
+    std::string TypeString() const override { return "sbyte"; }
     llvm::Type* IrType(Emitter& emitter) const override { return llvm::Type::getInt8Ty(emitter.Context()); }
 };
 
@@ -36,15 +36,16 @@ class ByteTypeSymbol : public BasicTypeSymbol
 {
 public:
     ByteTypeSymbol(const Span& span_, const std::u32string& name_);
-    std::string TypeString() const override { return "byte type"; }
+    std::string TypeString() const override { return "byte"; }
     llvm::Type* IrType(Emitter& emitter) const override { return llvm::Type::getInt8Ty(emitter.Context()); }
+    bool IsUnsignedType() const override { return true; }
 };
 
 class ShortTypeSymbol : public BasicTypeSymbol
 {
 public:
     ShortTypeSymbol(const Span& span_, const std::u32string& name_);
-    std::string TypeString() const override { return "short type"; }
+    std::string TypeString() const override { return "short"; }
     llvm::Type* IrType(Emitter& emitter) const override { return llvm::Type::getInt16Ty(emitter.Context()); }
 };
 
@@ -52,15 +53,16 @@ class UShortTypeSymbol : public BasicTypeSymbol
 {
 public:
     UShortTypeSymbol(const Span& span_, const std::u32string& name_);
-    std::string TypeString() const override { return "ushort type"; }
+    std::string TypeString() const override { return "ushort"; }
     llvm::Type* IrType(Emitter& emitter) const override { return llvm::Type::getInt16Ty(emitter.Context()); }
+    bool IsUnsignedType() const override { return true; }
 };
 
 class IntTypeSymbol : public BasicTypeSymbol
 {
 public:
     IntTypeSymbol(const Span& span_, const std::u32string& name_);
-    std::string TypeString() const override { return "int type"; }
+    std::string TypeString() const override { return "int"; }
     llvm::Type* IrType(Emitter& emitter) const override { return llvm::Type::getInt32Ty(emitter.Context()); }
 };
 
@@ -68,15 +70,16 @@ class UIntTypeSymbol : public BasicTypeSymbol
 {
 public:
     UIntTypeSymbol(const Span& span_, const std::u32string& name_);
-    std::string TypeString() const override { return "uint type"; }
+    std::string TypeString() const override { return "uint"; }
     llvm::Type* IrType(Emitter& emitter) const override { return llvm::Type::getInt32Ty(emitter.Context()); }
+    bool IsUnsignedType() const override { return true; }
 };
 
 class LongTypeSymbol : public BasicTypeSymbol
 {
 public:
     LongTypeSymbol(const Span& span_, const std::u32string& name_);
-    std::string TypeString() const override { return "long type"; }
+    std::string TypeString() const override { return "long"; }
     llvm::Type* IrType(Emitter& emitter) const override { return llvm::Type::getInt64Ty(emitter.Context()); }
 };
 
@@ -84,15 +87,16 @@ class ULongTypeSymbol : public BasicTypeSymbol
 {
 public:
     ULongTypeSymbol(const Span& span_, const std::u32string& name_);
-    std::string TypeString() const override { return "ulong type"; }
+    std::string TypeString() const override { return "ulong"; }
     llvm::Type* IrType(Emitter& emitter) const override { return llvm::Type::getInt64Ty(emitter.Context()); }
+    bool IsUnsignedType() const override { return true; }
 };
 
 class FloatTypeSymbol : public BasicTypeSymbol
 {
 public:
     FloatTypeSymbol(const Span& span_, const std::u32string& name_);
-    std::string TypeString() const override { return "float type"; }
+    std::string TypeString() const override { return "float"; }
     llvm::Type* IrType(Emitter& emitter) const override { return llvm::Type::getFloatTy(emitter.Context()); }
 };
 
@@ -100,7 +104,7 @@ class DoubleTypeSymbol : public BasicTypeSymbol
 {
 public:
     DoubleTypeSymbol(const Span& span_, const std::u32string& name_);
-    std::string TypeString() const override { return "double type"; }
+    std::string TypeString() const override { return "double"; }
     llvm::Type* IrType(Emitter& emitter) const override { return llvm::Type::getDoubleTy(emitter.Context()); }
 };
 
@@ -108,7 +112,7 @@ class CharTypeSymbol : public BasicTypeSymbol
 {
 public:
     CharTypeSymbol(const Span& span_, const std::u32string& name_);
-    std::string TypeString() const override { return "char type"; }
+    std::string TypeString() const override { return "char"; }
     llvm::Type* IrType(Emitter& emitter) const override { return llvm::Type::getInt8Ty(emitter.Context()); }
 };
 
@@ -116,7 +120,7 @@ class WCharTypeSymbol : public BasicTypeSymbol
 {
 public:
     WCharTypeSymbol(const Span& span_, const std::u32string& name_);
-    std::string TypeString() const override { return "wchar type"; }
+    std::string TypeString() const override { return "wchar"; }
     llvm::Type* IrType(Emitter& emitter) const override { return llvm::Type::getInt16Ty(emitter.Context()); }
 };
 
@@ -124,7 +128,7 @@ class UCharTypeSymbol : public BasicTypeSymbol
 {
 public:
     UCharTypeSymbol(const Span& span_, const std::u32string& name_);
-    std::string TypeString() const override { return "uchar type"; }
+    std::string TypeString() const override { return "uchar"; }
     llvm::Type* IrType(Emitter& emitter) const override { return llvm::Type::getInt32Ty(emitter.Context()); }
 };
 
@@ -132,8 +136,8 @@ class VoidTypeSymbol : public BasicTypeSymbol
 {
 public:
     VoidTypeSymbol(const Span& span_, const std::u32string& name_);
-    std::string TypeString() const override { return "void type"; }
-    llvm::Type* IrType(Emitter& emitter) const override { return nullptr; }
+    std::string TypeString() const override { return "void"; }
+    llvm::Type* IrType(Emitter& emitter) const override { return llvm::Type::getVoidTy(emitter.Context()); }
 };
 
 } } // namespace cmajor::symbols

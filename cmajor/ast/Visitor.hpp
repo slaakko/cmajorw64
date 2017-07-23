@@ -206,7 +206,7 @@ public:
     virtual void Visit(NamespaceNode& namespaceNode) {}
     virtual void Visit(AliasNode& aliasNode) {}
     virtual void Visit(NamespaceImportNode& namespaceImportNode) {}
-    virtual void Visit(IdentifierNode& identififerNode) {}
+    virtual void Visit(IdentifierNode& identifierNode) {}
     virtual void Visit(TemplateIdNode& templateIdNode) {}
     virtual void Visit(FunctionNode& functionNode) {}
     virtual void Visit(ClassNode& classNode) {}
