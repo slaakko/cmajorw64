@@ -10,6 +10,8 @@ bin
 *.vspx
 *.org
 *.obj
+*.debug
+*.release
 lib
 Debug
 Release
