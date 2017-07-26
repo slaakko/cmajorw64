@@ -159,6 +159,7 @@
   <ItemGroup>
     <ClInclude Include="Exception.hpp" />
     <ClInclude Include="InitDone.hpp" />
+    <ClInclude Include="Memory.hpp" />
     <ClInclude Include="RtApi.hpp" />
     <ClInclude Include="Io.hpp" />
   </ItemGroup>
@@ -166,6 +167,7 @@
     <ClCompile Include="Exception.cpp" />
     <ClCompile Include="InitDone.cpp" />
     <ClCompile Include="Io.cpp" />
+    <ClCompile Include="Memory.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -8,7 +8,7 @@
 
 namespace cmajor { namespace symbols {
 
-SymbolReader::SymbolReader(const std::string& fileName_) : astReader(fileName_), symbolTable(nullptr)
+SymbolReader::SymbolReader(const std::string& fileName_) : astReader(fileName_), symbolTable(nullptr), module(nullptr)
 {
 }
 
@@ -19,6 +19,7 @@ Symbol* SymbolReader::ReadSymbol()
     std::u32string name = astReader.GetBinaryReader().ReadUtf32String();
     Symbol* symbol = SymbolFactory::Instance().CreateSymbol(symbolType, span, name);
     symbol->SetSymbolTable(symbolTable);
+    symbol->SetModule(module);
     symbol->Read(*this);
     return symbol;
 }

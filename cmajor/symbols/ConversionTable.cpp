@@ -14,15 +14,22 @@ void ConversionTable::AddConversion(FunctionSymbol* conversion)
     conversionMap.insert(std::make_pair(entry, conversion));
 }
 
-FunctionSymbol* ConversionTable::GetConversion(TypeSymbol* sourceType, TypeSymbol* targetType) const
+FunctionSymbol* ConversionTable::GetConversion(TypeSymbol* sourceType, TypeSymbol* targetType, const Span& span) const
 {
-    ConversionTableEntry entry(sourceType, targetType);
+    TypeSymbol* sourcePlainType = sourceType->PlainType(span);
+    TypeSymbol* targetPlainType = targetType->PlainType(span);
+    ConversionTableEntry entry(sourcePlainType, targetPlainType);
     auto it = conversionMap.find(entry);
     if (it != conversionMap.cend())
     {
         return it->second;
     }
     return nullptr;
+}
+
+void ConversionTable::AddGeneratedConversion(std::unique_ptr<FunctionSymbol>&& generatedConversion)
+{
+    generatedConversions.push_back(std::move(generatedConversion));
 }
 
 } } // namespace cmajor::symbols

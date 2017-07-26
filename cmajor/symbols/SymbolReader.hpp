@@ -14,6 +14,7 @@ using namespace cmajor::ast;
 class Symbol;
 class DerivedTypeSymbol;
 class SymbolTable;
+class Module;
 class FunctionSymbol;
 
 class SymbolReader
@@ -25,11 +26,13 @@ public:
     Symbol* ReadSymbol();
     DerivedTypeSymbol* ReadDerivedTypeSymbol();
     void SetSymbolTable(SymbolTable* symbolTable_) { symbolTable = symbolTable_; }
+    void SetModule(Module* module_) { module = module_; }
     void AddConversion(FunctionSymbol* conversion);
     const std::vector<FunctionSymbol*>& Conversions() const { return conversions; }
 private:
     AstReader astReader;
     SymbolTable* symbolTable;
+    Module* module;
     std::vector<FunctionSymbol*> conversions;
 };
 

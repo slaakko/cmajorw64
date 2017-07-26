@@ -48,7 +48,7 @@ void CheckAccess(FunctionSymbol* fromFunction, Symbol* toSymbol)
         }
         case SymbolAccess::internal_:
         {
-            if (fromFunction->GetSymbolTable() == toSymbol->GetSymbolTable())
+            if (fromFunction->GetModule() == toSymbol->GetModule())
             {
                 return;
             }

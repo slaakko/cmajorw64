@@ -132,10 +132,15 @@ public:
     void Visit(BoundConstant& boundConstant) override;
     void Visit(BoundEnumConstant& boundEnumConstant) override;
     void Visit(BoundLiteral& boundLiteral) override;
+    void Visit(BoundTemporary& boundTemporary) override;
+    void Visit(BoundSizeOfExpression& boundSizeOfExpression) override;
+    void Visit(BoundAddressOfExpression& boundAddressOfExpression) override;
+    void Visit(BoundDereferenceExpression& boundDereferenceExpression) override;
     void Visit(BoundFunctionCall& boundFunctionCall) override;
     void Visit(BoundConversion& boundConversion) override;
 private:
     EmittingContext& emittingContext;
+    SymbolTable* symbolTable;
     std::unique_ptr<llvm::Module> compileUnitModule;
     llvm::IRBuilder<>& builder;
     cmajor::ir::ValueStack& stack;
@@ -146,7 +151,7 @@ private:
 };
 
 Emitter::Emitter(EmittingContext& emittingContext_, const std::string& compileUnitModuleName_) :
-    cmajor::ir::Emitter(emittingContext_.GetEmittingContextImpl()->Context()), emittingContext(emittingContext_),
+    cmajor::ir::Emitter(emittingContext_.GetEmittingContextImpl()->Context()), emittingContext(emittingContext_), symbolTable(nullptr),
     compileUnitModule(new llvm::Module(compileUnitModuleName_, emittingContext.GetEmittingContextImpl()->Context())), builder(Builder()), stack(Stack()), context(emittingContext.GetEmittingContextImpl()->Context()),
     function(nullptr), trueBlock(nullptr), falseBlock(nullptr)
 {
@@ -158,23 +163,24 @@ Emitter::Emitter(EmittingContext& emittingContext_, const std::string& compileUn
 
 void Emitter::Visit(BoundCompileUnit& boundCompileUnit)
 {
+    symbolTable = &boundCompileUnit.GetSymbolTable();
     int n = boundCompileUnit.BoundNodes().size();
     for (int i = 0; i < n; ++i)
     {
         BoundNode* boundNode = boundCompileUnit.BoundNodes()[i].get();
         boundNode->Accept(*this);
     }
-    std::string errorMessageStore;
-    llvm::raw_string_ostream errorMessage(errorMessageStore);
-    if (verifyModule(*compileUnitModule, &errorMessage))
-    {
-        throw std::runtime_error("Emitter: verification of module '" + compileUnitModule->getSourceFileName() +"' failed. " + errorMessage.str());
-    }
     if (GetGlobalFlag(GlobalFlags::emitLlvm))
     {
         std::ofstream llFile(boundCompileUnit.LLFilePath());
         llvm::raw_os_ostream llOs(llFile);
         compileUnitModule->print(llOs, nullptr);
+    }
+    std::string errorMessageStore;
+    llvm::raw_string_ostream errorMessage(errorMessageStore);
+    if (verifyModule(*compileUnitModule, &errorMessage))
+    {
+        throw std::runtime_error("Emitter: verification of module '" + compileUnitModule->getSourceFileName() +"' failed. " + errorMessage.str());
     }
     llvm::legacy::PassManager passManager;
     std::error_code errorCode;
@@ -285,8 +291,15 @@ void Emitter::Visit(BoundIfStatement& boundIfStatement)
     llvm::BasicBlock* prevTrueBlock = trueBlock;
     llvm::BasicBlock* prevFalseBlock = falseBlock;
     trueBlock = llvm::BasicBlock::Create(context, "true", function);
-    falseBlock = llvm::BasicBlock::Create(context, "false", function);
     llvm::BasicBlock* nextBlock = llvm::BasicBlock::Create(context, "next", function);
+    if (boundIfStatement.ElseS())
+    {
+        falseBlock = llvm::BasicBlock::Create(context, "false", function);
+    }
+    else
+    {
+        falseBlock = nextBlock;
+    }
     boundIfStatement.Condition()->Accept(*this);
     llvm::Value* cond = stack.Pop();
     builder.CreateCondBr(cond, trueBlock, falseBlock);
@@ -295,6 +308,7 @@ void Emitter::Visit(BoundIfStatement& boundIfStatement)
     builder.CreateBr(nextBlock);
     if (boundIfStatement.ElseS())
     {
+        builder.SetInsertPoint(falseBlock);
         boundIfStatement.ElseS()->Accept(*this);
         builder.CreateBr(nextBlock);
     }
@@ -434,6 +448,26 @@ void Emitter::Visit(BoundEnumConstant& boundEnumConstant)
 void Emitter::Visit(BoundLiteral& boundLiteral)
 {
     boundLiteral.Load(*this);
+}
+
+void Emitter::Visit(BoundTemporary& boundTemporary)
+{
+    boundTemporary.Load(*this);
+}
+
+void Emitter::Visit(BoundSizeOfExpression& boundSizeOfExpression)
+{
+    boundSizeOfExpression.Load(*this);
+}
+
+void Emitter::Visit(BoundAddressOfExpression& boundAddressOfExpression)
+{
+    boundAddressOfExpression.Load(*this);
+}
+
+void Emitter::Visit(BoundDereferenceExpression& boundDereferenceExpression)
+{
+    boundDereferenceExpression.Load(*this);
 }
 
 void Emitter::Visit(BoundFunctionCall& boundFunctionCall)

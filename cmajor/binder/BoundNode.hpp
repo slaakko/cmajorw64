@@ -18,8 +18,8 @@ enum class BoundNodeType : uint8_t
     boundCompileUnit, boundClass, boundFunction, 
     boundSequenceStatement, boundCompoundStatement, boundReturnStatement, boundIfStatement, boundWhileStatement, boundDoStatement, boundForStatement, boundBreakStatement, boundContinueStatement,
     boundGotoStatement, boundConstructionStatement, boundAssignmentStatement, boundExpressionStatement, boundEmptyStatement,
-    boundParameter, boundLocalVariable, boundMemberVariable, boundConstant, boundEnumConstant, boundLiteral,
-    boundFunctionCall, boundConversion,
+    boundParameter, boundLocalVariable, boundMemberVariable, boundConstant, boundEnumConstant, boundLiteral, boundTemporary,
+    boundFunctionCall, boundConversion, boundSizeOfExpression, boundAddressOfExpression, boundDereferenceExpression,
     boundTypeExpression, boundNamespaceExpression, boundFunctionGroupExcpression, boundMemberExpression
 };
 

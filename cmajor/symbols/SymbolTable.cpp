@@ -40,7 +40,7 @@ TypeIdCounter::TypeIdCounter() : nextTypeId(1)
 {
 }
 
-SymbolTable::SymbolTable() : globalNs(Span(), std::u32string()), container(&globalNs), mainFunctionSymbol(nullptr), parameterIndex(0)
+SymbolTable::SymbolTable() : globalNs(Span(), std::u32string()), container(&globalNs), mainFunctionSymbol(nullptr), parameterIndex(0), declarationBlockIndex(0)
 {
     globalNs.SetSymbolTable(this);
 }
@@ -64,6 +64,7 @@ void SymbolTable::Read(SymbolReader& reader)
     for (uint32_t i = 0; i < n; ++i)
     {
         DerivedTypeSymbol* derivedTypeSymbol = reader.ReadDerivedTypeSymbol();
+        derivedTypeSymbol->SetParent(&globalNs);
         derivedTypes.push_back(std::unique_ptr<DerivedTypeSymbol>(derivedTypeSymbol));
     }
     ProcessTypeRequests();
@@ -85,6 +86,7 @@ void SymbolTable::Import(SymbolTable& symbolTable)
     for (auto& derivedType : symbolTable.derivedTypes)
     {
         derivedType->SetSymbolTable(this);
+        derivedType->SetParent(&globalNs);
         derivedTypes.push_back(std::unique_ptr<DerivedTypeSymbol>(derivedType.release()));
     }
     int nd = derivedTypes.size();
@@ -199,6 +201,7 @@ void SymbolTable::BeginFunction(FunctionNode& functionNode)
     functionScope->SetParent(containerScope);
     BeginContainer(functionSymbol);
     parameterIndex = 0;
+    ResetDeclarationBlockIndex();
 }
 
 void SymbolTable::EndFunction()
@@ -276,6 +279,7 @@ void SymbolTable::BeginStaticConstructor(StaticConstructorNode& staticConstructo
     staticConstructorScope->SetParent(containerScope);
     container->AddMember(staticConstructorSymbol);
     BeginContainer(staticConstructorSymbol);
+    ResetDeclarationBlockIndex();
 }
 
 void SymbolTable::EndStaticConstructor()
@@ -295,6 +299,7 @@ void SymbolTable::BeginConstructor(ConstructorNode& constructorNode)
     constructorScope->SetParent(containerScope);
     BeginContainer(constructorSymbol);
     parameterIndex = 0;
+    ResetDeclarationBlockIndex();
 }
 
 void SymbolTable::EndConstructor()
@@ -313,6 +318,7 @@ void SymbolTable::BeginDestructor(DestructorNode& destructorNode)
     ContainerScope* containerScope = container->GetContainerScope();
     destructorScope->SetParent(containerScope);
     BeginContainer(destructorSymbol);
+    ResetDeclarationBlockIndex();
 }
 
 void SymbolTable::EndDestructor()
@@ -333,6 +339,7 @@ void SymbolTable::BeginMemberFunction(MemberFunctionNode& memberFunctionNode)
     memberFunctionScope->SetParent(containerScope);
     BeginContainer(memberFunctionSymbol);
     parameterIndex = 0;
+    ResetDeclarationBlockIndex();
 }
 
 void SymbolTable::EndMemberFunction()
@@ -394,7 +401,7 @@ void SymbolTable::EndClassDelegate()
 
 void SymbolTable::BeginDeclarationBlock(Node& node)
 {
-    DeclarationBlock* declarationBlock = new DeclarationBlock(node.GetSpan(), U"@locals");
+    DeclarationBlock* declarationBlock = new DeclarationBlock(node.GetSpan(), U"@locals" + ToUtf32(std::to_string(GetNextDeclarationBlockIndex())));
     declarationBlock->SetSymbolTable(this);
     MapNode(&node, declarationBlock);
     ContainerScope* declarationBlockScope = declarationBlock->GetContainerScope();
@@ -612,27 +619,67 @@ TypeSymbol* SymbolTable::GetTypeByName(const std::u32string& typeName) const
     }
 }
 
-TypeSymbol* SymbolTable::MakeDerivedType(TypeSymbol* baseType, const TypeDerivationRec& derivationRec)
+TypeSymbol* SymbolTable::MakeDerivedType(TypeSymbol* baseType, const TypeDerivationRec& derivationRec, const Span& span)
 {
     if (derivationRec.IsEmpty())
     {
         return baseType;
     }
-    std::vector<DerivedTypeSymbol*>& prevDerivedTypes = derivedTypeMap[baseType];
-    int n = derivedTypes.size();
+    if (baseType->IsVoidType() && HasReferenceDerivation(derivationRec.derivations) && !HasPointerDerivation(derivationRec.derivations))
+    {
+        throw Exception("cannot have reference to void type", span);
+    }
+    std::vector<DerivedTypeSymbol*>& mappedDerivedTypes = derivedTypeMap[baseType];
+    int n = mappedDerivedTypes.size();
     for (int i = 0; i < n; ++i)
     {
-        DerivedTypeSymbol* derivedType = prevDerivedTypes[i];
+        DerivedTypeSymbol* derivedType = mappedDerivedTypes[i];
         if (derivedType->DerivationRec() == derivationRec)
         {
             return derivedType;
         }
     }
     DerivedTypeSymbol* derivedType = new DerivedTypeSymbol(baseType->GetSpan(), MakeDerivedTypeName(baseType, derivationRec), baseType, derivationRec);
+    derivedType->SetParent(&globalNs);
     derivedType->SetSymbolTable(this);
     SetTypeIdFor(derivedType);
+    mappedDerivedTypes.push_back(derivedType);
     derivedTypes.push_back(std::unique_ptr<DerivedTypeSymbol>(derivedType));
     return derivedType;
+}
+
+TypeSymbol* SymbolTable::MakePointerType(TypeSymbol* type, const Span& span)
+{
+    if (type->GetSymbolType() == SymbolType::derivedTypeSymbol)
+    {
+        DerivedTypeSymbol* derivedType = static_cast<DerivedTypeSymbol*>(type);
+        TypeDerivationRec referenceRemovedDerivationRec = RemoveReferenceDerivation(derivedType->DerivationRec());
+        referenceRemovedDerivationRec.derivations.push_back(Derivation::pointerDerivation);
+        return MakeDerivedType(type, referenceRemovedDerivationRec, span);
+    }
+    else
+    {
+        TypeDerivationRec derivationRec;
+        derivationRec.derivations.push_back(Derivation::pointerDerivation);
+        return MakeDerivedType(type, derivationRec, span);
+    }
+}
+
+TypeSymbol* SymbolTable::MakeLvalueReferenceType(TypeSymbol* type, const Span& span)
+{
+    if (type->GetSymbolType() == SymbolType::derivedTypeSymbol)
+    {
+        DerivedTypeSymbol* derivedType = static_cast<DerivedTypeSymbol*>(type);
+        TypeDerivationRec referenceRemovedDerivationRec = RemoveReferenceDerivation(derivedType->DerivationRec());
+        referenceRemovedDerivationRec.derivations.push_back(Derivation::lvalueRefDerivation);
+        return MakeDerivedType(type, referenceRemovedDerivationRec, span);
+    }
+    else
+    {
+        TypeDerivationRec derivationRec;
+        derivationRec.derivations.push_back(Derivation::lvalueRefDerivation);
+        return MakeDerivedType(type, derivationRec, span);
+    }
 }
 
 void SymbolTable::AddConversion(FunctionSymbol* conversion)
@@ -640,9 +687,9 @@ void SymbolTable::AddConversion(FunctionSymbol* conversion)
     conversionTable.AddConversion(conversion);
 }
 
-FunctionSymbol* SymbolTable::GetConversion(TypeSymbol* sourceType, TypeSymbol* targetType) const
+FunctionSymbol* SymbolTable::GetConversion(TypeSymbol* sourceType, TypeSymbol* targetType, const Span& span) const
 {
-    return conversionTable.GetConversion(sourceType, targetType);
+    return conversionTable.GetConversion(sourceType, targetType, span);
 }
 
 void InitCoreSymbolTable(SymbolTable& symbolTable)
@@ -677,6 +724,7 @@ void InitCoreSymbolTable(SymbolTable& symbolTable)
     symbolTable.AddTypeSymbolToGlobalScope(wcharType);
     symbolTable.AddTypeSymbolToGlobalScope(ucharType);
     symbolTable.AddTypeSymbolToGlobalScope(voidType);
+    symbolTable.AddTypeSymbolToGlobalScope(new NullPtrType(Span(), U"@nullptr_type"));
     MakeBasicTypeOperations(symbolTable, boolType, sbyteType, byteType, shortType, ushortType, intType, uintType, longType, ulongType, floatType, doubleType, charType, wcharType, ucharType, voidType);
 }
 

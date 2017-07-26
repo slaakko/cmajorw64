@@ -594,7 +594,7 @@ public:
     void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects) override;
     bool IsBasicTypeOperation() const override { return true; }
     ConversionType GetConversionType() const override { return conversionType; }
-    int ConversionDistance() const override { return conversionDistance; }
+    uint8_t ConversionDistance() const override { return conversionDistance; }
     TypeSymbol* ConversionSourceType() const override { return sourceType; }
     TypeSymbol* ConversionTargetType() const override { return targetType; }
 private:

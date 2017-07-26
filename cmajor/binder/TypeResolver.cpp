@@ -167,23 +167,23 @@ void TypeResolver::Visit(RValueRefNode& rvalueRefNode)
 
 void TypeResolver::Visit(PointerNode& pointerNode)
 {
-    derivationRec.derivations.push_back(Derivation::pointerDerivation);
     pointerNode.Subject()->Accept(*this);
     if (HasReferenceDerivation(derivationRec.derivations))
     {
         throw Exception("cannot have pointer to reference type", pointerNode.GetSpan());
     }
+    derivationRec.derivations.push_back(Derivation::pointerDerivation);
 }
 
 void TypeResolver::Visit(ArrayNode& arrayNode)
 {
+    arrayNode.Subject()->Accept(*this);
     if (HasReferenceDerivation(derivationRec.derivations))
     {
         throw Exception("cannot have array of reference type", arrayNode.GetSpan());
     }
+    // todo: evaluate size
     derivationRec.derivations.push_back(Derivation::arrayDerivation);
-    // todo evaluate size
-    arrayNode.Subject()->Accept(*this);
 }
 
 void TypeResolver::ResolveSymbol(Node& node, Symbol* symbol)
@@ -275,7 +275,7 @@ TypeSymbol* ResolveType(Node* typeExprNode, BoundCompileUnit& boundCompileUnit, 
     const TypeDerivationRec& derivationRec = typeResolver.DerivationRec();
     if (!derivationRec.derivations.empty())
     {
-        return boundCompileUnit.GetSymbolTable().MakeDerivedType(type, derivationRec);
+        return boundCompileUnit.GetSymbolTable().MakeDerivedType(type, derivationRec, typeExprNode->GetSpan());
     }
     return type;
 }

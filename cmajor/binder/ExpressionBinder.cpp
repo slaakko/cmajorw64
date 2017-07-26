@@ -9,10 +9,12 @@
 #include <cmajor/binder/BoundExpression.hpp>
 #include <cmajor/binder/OverloadResolution.hpp>
 #include <cmajor/binder/StatementBinder.hpp>
+#include <cmajor/binder/TypeResolver.hpp>
 #include <cmajor/binder/Access.hpp>
 #include <cmajor/symbols/ClassTypeSymbol.hpp>
 #include <cmajor/symbols/ConstantSymbol.hpp>
 #include <cmajor/symbols/EnumSymbol.hpp>
+#include <cmajor/ast/BasicType.hpp>
 #include <cmajor/ast/Literal.hpp>
 #include <cmajor/ast/Expression.hpp>
 #include <cmajor/ast/Identifier.hpp>
@@ -29,6 +31,22 @@ class ExpressionBinder : public cmajor::ast::Visitor
 public:
     ExpressionBinder(const Span& span_, BoundCompileUnit& boundCompileUnit_, BoundFunction* boundFunction_, ContainerScope* containerScope_, StatementBinder* statementBinder_, bool lvalue_);
     std::unique_ptr<BoundExpression> GetExpression() { return std::move(expression); }
+
+    void Visit(BoolNode& boolNode) override;
+    void Visit(SByteNode& sbyteNode) override;
+    void Visit(ByteNode& byteNode) override;
+    void Visit(ShortNode& shortNode) override;
+    void Visit(UShortNode& ushortNode) override;
+    void Visit(IntNode& intNode) override;
+    void Visit(UIntNode& uintNode) override;
+    void Visit(LongNode& longNode) override;
+    void Visit(ULongNode& ulongNode) override;
+    void Visit(FloatNode& floatNode) override;
+    void Visit(DoubleNode& doubleNode) override;
+    void Visit(CharNode& charNode) override;
+    void Visit(WCharNode& wcharNode) override;
+    void Visit(UCharNode& ucharNode) override;
+    void Visit(VoidNode& voidNode) override;
 
     void Visit(BooleanLiteralNode& booleanLiteralNode) override;
     void Visit(SByteLiteralNode& sbyteLiteralBode) override;
@@ -122,7 +140,7 @@ void ExpressionBinder::BindUnaryOp(BoundExpression* operand, Node& node, const s
     functionScopeLookups.push_back(FunctionScopeLookup(ScopeLookup::this_and_base_and_parent, containerScope));
     functionScopeLookups.push_back(FunctionScopeLookup(ScopeLookup::this_, operand->GetType()->ClassOrNsScope()));
     functionScopeLookups.push_back(FunctionScopeLookup(ScopeLookup::fileScopes, nullptr));
-    std::unique_ptr<BoundFunctionCall> operatorFunCall = ResolveOverload(groupName, functionScopeLookups, arguments, boundCompileUnit, node.GetSpan());
+    std::unique_ptr<BoundFunctionCall> operatorFunCall = ResolveOverload(groupName, functionScopeLookups, arguments, boundCompileUnit, boundFunction, node.GetSpan());
     CheckAccess(boundFunction->GetFunctionSymbol(), operatorFunCall->GetFunctionSymbol());
     expression.reset(operatorFunCall.release());
 }
@@ -153,7 +171,7 @@ void ExpressionBinder::BindBinaryOp(BoundExpression* left, BoundExpression* righ
     functionScopeLookups.push_back(FunctionScopeLookup(ScopeLookup::this_, left->GetType()->ClassOrNsScope()));
     functionScopeLookups.push_back(FunctionScopeLookup(ScopeLookup::this_, right->GetType()->ClassOrNsScope()));
     functionScopeLookups.push_back(FunctionScopeLookup(ScopeLookup::fileScopes, nullptr));
-    std::unique_ptr<BoundFunctionCall> operatorFunCall = ResolveOverload(groupName, functionScopeLookups, arguments, boundCompileUnit, node.GetSpan());
+    std::unique_ptr<BoundFunctionCall> operatorFunCall = ResolveOverload(groupName, functionScopeLookups, arguments, boundCompileUnit, boundFunction, node.GetSpan());
     CheckAccess(boundFunction->GetFunctionSymbol(), operatorFunCall->GetFunctionSymbol());
     expression.reset(operatorFunCall.release());
 }
@@ -263,6 +281,81 @@ void ExpressionBinder::BindSymbol(Symbol* symbol)
     }
 }
 
+void ExpressionBinder::Visit(BoolNode& boolNode)
+{
+    expression.reset(new BoundTypeExpression(boolNode.GetSpan(), symbolTable.GetTypeByName(U"bool")));
+}
+
+void ExpressionBinder::Visit(SByteNode& sbyteNode)
+{
+    expression.reset(new BoundTypeExpression(sbyteNode.GetSpan(), symbolTable.GetTypeByName(U"sbyte")));
+}
+
+void ExpressionBinder::Visit(ByteNode& byteNode)
+{
+    expression.reset(new BoundTypeExpression(byteNode.GetSpan(), symbolTable.GetTypeByName(U"byte")));
+}
+
+void ExpressionBinder::Visit(ShortNode& shortNode)
+{
+    expression.reset(new BoundTypeExpression(shortNode.GetSpan(), symbolTable.GetTypeByName(U"short")));
+}
+
+void ExpressionBinder::Visit(UShortNode& ushortNode)
+{
+    expression.reset(new BoundTypeExpression(ushortNode.GetSpan(), symbolTable.GetTypeByName(U"ushort")));
+}
+
+void ExpressionBinder::Visit(IntNode& intNode)
+{
+    expression.reset(new BoundTypeExpression(intNode.GetSpan(), symbolTable.GetTypeByName(U"int")));
+}
+
+void ExpressionBinder::Visit(UIntNode& uintNode)
+{
+    expression.reset(new BoundTypeExpression(uintNode.GetSpan(), symbolTable.GetTypeByName(U"uint")));
+}
+
+void ExpressionBinder::Visit(LongNode& longNode)
+{
+    expression.reset(new BoundTypeExpression(longNode.GetSpan(), symbolTable.GetTypeByName(U"long")));
+}
+
+void ExpressionBinder::Visit(ULongNode& ulongNode)
+{
+    expression.reset(new BoundTypeExpression(ulongNode.GetSpan(), symbolTable.GetTypeByName(U"ulong")));
+}
+
+void ExpressionBinder::Visit(FloatNode& floatNode)
+{
+    expression.reset(new BoundTypeExpression(floatNode.GetSpan(), symbolTable.GetTypeByName(U"float")));
+}
+
+void ExpressionBinder::Visit(DoubleNode& doubleNode)
+{
+    expression.reset(new BoundTypeExpression(doubleNode.GetSpan(), symbolTable.GetTypeByName(U"double")));
+}
+
+void ExpressionBinder::Visit(CharNode& charNode)
+{
+    expression.reset(new BoundTypeExpression(charNode.GetSpan(), symbolTable.GetTypeByName(U"char")));
+}
+
+void ExpressionBinder::Visit(WCharNode& wcharNode)
+{
+    expression.reset(new BoundTypeExpression(wcharNode.GetSpan(), symbolTable.GetTypeByName(U"wchar")));
+}
+
+void ExpressionBinder::Visit(UCharNode& ucharNode)
+{
+    expression.reset(new BoundTypeExpression(ucharNode.GetSpan(), symbolTable.GetTypeByName(U"uchar")));
+}
+
+void ExpressionBinder::Visit(VoidNode& voidNode)
+{
+    expression.reset(new BoundTypeExpression(voidNode.GetSpan(), symbolTable.GetTypeByName(U"void")));
+}
+
 void ExpressionBinder::Visit(BooleanLiteralNode& booleanLiteralNode)
 {
     expression.reset(new BoundLiteral(std::unique_ptr<Value>(new BoolValue(booleanLiteralNode.GetSpan(), booleanLiteralNode.Value())), symbolTable.GetTypeByName(U"bool")));
@@ -335,22 +428,26 @@ void ExpressionBinder::Visit(UCharLiteralNode& ucharLiteralNode)
 
 void ExpressionBinder::Visit(StringLiteralNode& stringLiteralNode)
 {
-    // todo
+    expression.reset(new BoundLiteral(std::unique_ptr<Value>(new StringValue(stringLiteralNode.GetSpan(), stringLiteralNode.Value())), 
+        symbolTable.MakePointerType(symbolTable.GetTypeByName(U"char"), stringLiteralNode.GetSpan())));
 }
 
 void ExpressionBinder::Visit(WStringLiteralNode& wstringLiteralNode)
 {
-    // todo
+    expression.reset(new BoundLiteral(std::unique_ptr<Value>(new StringValue(wstringLiteralNode.GetSpan(), ToUtf8(wstringLiteralNode.Value()))),
+        symbolTable.MakePointerType(symbolTable.GetTypeByName(U"char"), wstringLiteralNode.GetSpan())));
 }
 
 void ExpressionBinder::Visit(UStringLiteralNode& ustringLiteralNode)
 {
-    // todo
+    expression.reset(new BoundLiteral(std::unique_ptr<Value>(new StringValue(ustringLiteralNode.GetSpan(), ToUtf8(ustringLiteralNode.Value()))),
+        symbolTable.MakePointerType(symbolTable.GetTypeByName(U"char"), ustringLiteralNode.GetSpan())));
 }
 
 void ExpressionBinder::Visit(NullLiteralNode& nullLiteralNode) 
 {
-    // todo
+    TypeSymbol* nullPtrType = symbolTable.GetTypeByName(U"@nullptr_type");
+    expression.reset(new BoundLiteral(std::unique_ptr<Value>(new NullValue(nullLiteralNode.GetSpan(), nullPtrType)), nullPtrType));
 }
 
 void ExpressionBinder::Visit(IdentifierNode& identifierNode)
@@ -507,63 +604,125 @@ void ExpressionBinder::Visit(UnaryMinusNode& unaryMinusNode)
 void ExpressionBinder::Visit(PrefixIncrementNode& prefixIncrementNode) 
 {
     prefixIncrementNode.Subject()->Accept(*this);
-    if (!inhibitCompile)
+    if (expression->GetType()->PlainType(prefixIncrementNode.GetSpan())->IsClassTypeSymbol())
     {
-        if (expression->GetType()->IsUnsignedType())
-        {
-            CloneContext cloneContext;
-            AssignmentStatementNode assignmentStatement(prefixIncrementNode.GetSpan(), prefixIncrementNode.Subject()->Clone(cloneContext),
-                new AddNode(prefixIncrementNode.GetSpan(), prefixIncrementNode.Subject()->Clone(cloneContext), new ByteLiteralNode(prefixIncrementNode.GetSpan(), 1u)));
-            statementBinder->CompileStatement(&assignmentStatement, false);
-        }
-        else
-        {
-            CloneContext cloneContext;
-            AssignmentStatementNode assignmentStatement(prefixIncrementNode.GetSpan(), prefixIncrementNode.Subject()->Clone(cloneContext),
-                new AddNode(prefixIncrementNode.GetSpan(), prefixIncrementNode.Subject()->Clone(cloneContext), new SByteLiteralNode(prefixIncrementNode.GetSpan(), 1)));
-            statementBinder->CompileStatement(&assignmentStatement, false);
-        }
+        BindUnaryOp(prefixIncrementNode, U"operator++");
     }
-    bool prevInhibitCompile = inhibitCompile;
-    inhibitCompile = true;
-    prefixIncrementNode.Subject()->Accept(*this);
-    inhibitCompile = prevInhibitCompile;
+    else
+    {
+        if (!inhibitCompile)
+        {
+            if (expression->GetType()->IsUnsignedType())
+            {
+                CloneContext cloneContext;
+                AssignmentStatementNode assignmentStatement(prefixIncrementNode.GetSpan(), prefixIncrementNode.Subject()->Clone(cloneContext),
+                    new AddNode(prefixIncrementNode.GetSpan(), prefixIncrementNode.Subject()->Clone(cloneContext), new ByteLiteralNode(prefixIncrementNode.GetSpan(), 1u)));
+                statementBinder->CompileStatement(&assignmentStatement, false);
+            }
+            else
+            {
+                CloneContext cloneContext;
+                AssignmentStatementNode assignmentStatement(prefixIncrementNode.GetSpan(), prefixIncrementNode.Subject()->Clone(cloneContext),
+                    new AddNode(prefixIncrementNode.GetSpan(), prefixIncrementNode.Subject()->Clone(cloneContext), new SByteLiteralNode(prefixIncrementNode.GetSpan(), 1)));
+                statementBinder->CompileStatement(&assignmentStatement, false);
+            }
+        }
+        bool prevInhibitCompile = inhibitCompile;
+        inhibitCompile = true;
+        prefixIncrementNode.Subject()->Accept(*this);
+        inhibitCompile = prevInhibitCompile;
+    }
 }
 
 void ExpressionBinder::Visit(PrefixDecrementNode& prefixDecrementNode) 
 {
     prefixDecrementNode.Subject()->Accept(*this);
-    if (!inhibitCompile)
+    if (expression->GetType()->PlainType(prefixDecrementNode.GetSpan())->IsClassTypeSymbol())
     {
-        if (expression->GetType()->IsUnsignedType())
-        {
-            CloneContext cloneContext;
-            AssignmentStatementNode assignmentStatement(prefixDecrementNode.GetSpan(), prefixDecrementNode.Subject()->Clone(cloneContext),
-                new SubNode(prefixDecrementNode.GetSpan(), prefixDecrementNode.Subject()->Clone(cloneContext), new ByteLiteralNode(prefixDecrementNode.GetSpan(), 1u)));
-            statementBinder->CompileStatement(&assignmentStatement, false);
-        }
-        else
-        {
-            CloneContext cloneContext;
-            AssignmentStatementNode assignmentStatement(prefixDecrementNode.GetSpan(), prefixDecrementNode.Subject()->Clone(cloneContext),
-                new SubNode(prefixDecrementNode.GetSpan(), prefixDecrementNode.Subject()->Clone(cloneContext), new SByteLiteralNode(prefixDecrementNode.GetSpan(), 1)));
-            statementBinder->CompileStatement(&assignmentStatement, false);
-        }
+        BindUnaryOp(prefixDecrementNode, U"operator--");
     }
-    bool prevInhibitCompile = inhibitCompile;
-    inhibitCompile = true;
-    prefixDecrementNode.Subject()->Accept(*this);
-    inhibitCompile = prevInhibitCompile;
+    else
+    {
+        if (!inhibitCompile)
+        {
+            if (expression->GetType()->IsUnsignedType())
+            {
+                CloneContext cloneContext;
+                AssignmentStatementNode assignmentStatement(prefixDecrementNode.GetSpan(), prefixDecrementNode.Subject()->Clone(cloneContext),
+                    new SubNode(prefixDecrementNode.GetSpan(), prefixDecrementNode.Subject()->Clone(cloneContext), new ByteLiteralNode(prefixDecrementNode.GetSpan(), 1u)));
+                statementBinder->CompileStatement(&assignmentStatement, false);
+            }
+            else
+            {
+                CloneContext cloneContext;
+                AssignmentStatementNode assignmentStatement(prefixDecrementNode.GetSpan(), prefixDecrementNode.Subject()->Clone(cloneContext),
+                    new SubNode(prefixDecrementNode.GetSpan(), prefixDecrementNode.Subject()->Clone(cloneContext), new SByteLiteralNode(prefixDecrementNode.GetSpan(), 1)));
+                statementBinder->CompileStatement(&assignmentStatement, false);
+            }
+        }
+        bool prevInhibitCompile = inhibitCompile;
+        inhibitCompile = true;
+        prefixDecrementNode.Subject()->Accept(*this);
+        inhibitCompile = prevInhibitCompile;
+    }
 }
 
 void ExpressionBinder::Visit(DerefNode& derefNode) 
 {
-    // todo
+    derefNode.Subject()->Accept(*this);
+    if (expression->GetType()->IsPointerType())
+    {
+        switch (expression->GetBoundNodeType())
+        {
+            case BoundNodeType::boundLocalVariable:
+            case BoundNodeType::boundMemberVariable:
+            {
+                TypeSymbol* type = expression->GetType();
+                if (lvalue)
+                {
+                    expression->SetFlag(BoundExpressionFlags::load);
+                }
+                else
+                {
+                    expression->SetFlag(BoundExpressionFlags::deref);
+                    type = type->RemovePointer(derefNode.GetSpan());
+                }
+                expression.reset(new BoundDereferenceExpression(std::unique_ptr<BoundExpression>(expression.release()), type));
+                break;
+            }
+            default:
+            {
+                throw Exception("cannot dereference " + expression->TypeString(), derefNode.GetSpan());
+            }
+        }
+    }
+    else
+    {
+        throw Exception("dereference needs pointer argument", derefNode.Subject()->GetSpan());
+    }
 }
 
 void ExpressionBinder::Visit(AddrOfNode& addrOfNode) 
 {
-    // todo
+    addrOfNode.Subject()->Accept(*this);
+    switch (expression->GetBoundNodeType())
+    {
+        case BoundNodeType::boundLocalVariable:
+        case BoundNodeType::boundMemberVariable:
+        {
+            if (!expression->GetType()->IsReferenceType())
+            {
+                expression->SetFlag(BoundExpressionFlags::addr);
+            }
+            TypeSymbol* type = symbolTable.MakePointerType(expression->GetType(), addrOfNode.GetSpan());
+            expression.reset(new BoundAddressOfExpression(std::unique_ptr<BoundExpression>(expression.release()), type));
+            break;
+        }
+        default:
+        {
+            throw Exception("cannot take address of " + expression->TypeString(), addrOfNode.GetSpan());
+        }
+    }
 }
 
 void ExpressionBinder::Visit(ComplementNode& complementNode) 
@@ -627,7 +786,7 @@ void ExpressionBinder::Visit(InvokeNode& invokeNode)
     std::unique_ptr<Exception> exception;
     std::unique_ptr<Exception> thisEx;
     std::unique_ptr<Exception> nsEx;
-    std::unique_ptr<BoundFunctionCall> functionCall = ResolveOverload(functionGroupSymbol->Name(), functionScopeLookups, arguments, boundCompileUnit, invokeNode.GetSpan(),
+    std::unique_ptr<BoundFunctionCall> functionCall = ResolveOverload(functionGroupSymbol->Name(), functionScopeLookups, arguments, boundCompileUnit, boundFunction, invokeNode.GetSpan(),
         OverloadResolutionFlags::dontThrow, exception);
     if (!functionCall)
     {
@@ -639,7 +798,7 @@ void ExpressionBinder::Visit(InvokeNode& invokeNode)
             arguments.insert(arguments.begin(), std::unique_ptr<BoundExpression>(boundThisParam));
             thisParamInserted = true;
             functionScopeLookups.push_back(FunctionScopeLookup(ScopeLookup::this_and_base, thisParam->GetType()->ClassInterfaceOrNsScope()));
-            functionCall = std::move(ResolveOverload(functionGroupSymbol->Name(), functionScopeLookups, arguments, boundCompileUnit, invokeNode.GetSpan(),
+            functionCall = std::move(ResolveOverload(functionGroupSymbol->Name(), functionScopeLookups, arguments, boundCompileUnit, boundFunction, invokeNode.GetSpan(),
                 OverloadResolutionFlags::dontThrow, thisEx));
         }
         if (!functionCall)
@@ -652,7 +811,7 @@ void ExpressionBinder::Visit(InvokeNode& invokeNode)
             {
                 arguments.erase(arguments.begin());
             }
-            functionCall = std::move(ResolveOverload(functionGroupSymbol->Name(), functionScopeLookups, arguments, boundCompileUnit, invokeNode.GetSpan(),
+            functionCall = std::move(ResolveOverload(functionGroupSymbol->Name(), functionScopeLookups, arguments, boundCompileUnit, boundFunction, invokeNode.GetSpan(),
                 OverloadResolutionFlags::dontThrow, nsEx));
         }
     }
@@ -667,6 +826,30 @@ void ExpressionBinder::Visit(InvokeNode& invokeNode)
             throw *thisEx;
         }
         if (CastOverloadException* castException = dynamic_cast<CastOverloadException*>(nsEx.get()))
+        {
+            throw *nsEx;
+        }
+        if (CannotBindConstToNonconstOverloadException* bindException = dynamic_cast<CannotBindConstToNonconstOverloadException*>(exception.get()))
+        {
+            throw *exception;
+        }
+        if (CannotBindConstToNonconstOverloadException* bindException = dynamic_cast<CannotBindConstToNonconstOverloadException*>(thisEx.get()))
+        {
+            throw *thisEx;
+        }
+        if (CannotBindConstToNonconstOverloadException* bindException = dynamic_cast<CannotBindConstToNonconstOverloadException*>(nsEx.get()))
+        {
+            throw *nsEx;
+        }
+        if (CannotAssignToConstOverloadException* assignmentException = dynamic_cast<CannotAssignToConstOverloadException*>(exception.get()))
+        {
+            throw *exception;
+        }
+        if (CannotAssignToConstOverloadException* assignmentException = dynamic_cast<CannotAssignToConstOverloadException*>(thisEx.get()))
+        {
+            throw *thisEx;
+        }
+        if (CannotAssignToConstOverloadException* assignmentException = dynamic_cast<CannotAssignToConstOverloadException*>(nsEx.get()))
         {
             throw *nsEx;
         }
@@ -691,7 +874,7 @@ void ExpressionBinder::Visit(InvokeNode& invokeNode)
     expression.reset(functionCall.release());
 }
 
-void ExpressionBinder::Visit(PostfixIncrementNode& postfixIncrementNode) 
+void ExpressionBinder::Visit(PostfixIncrementNode& postfixIncrementNode)
 {
     bool prevInhibitCompile = inhibitCompile;
     inhibitCompile = true;
@@ -699,25 +882,35 @@ void ExpressionBinder::Visit(PostfixIncrementNode& postfixIncrementNode)
     inhibitCompile = prevInhibitCompile;
     if (!inhibitCompile)
     {
-        if (expression->GetType()->IsUnsignedType())
+        if (expression->GetType()->PlainType(postfixIncrementNode.GetSpan())->IsClassTypeSymbol())
         {
             CloneContext cloneContext;
-            AssignmentStatementNode assignmentStatement(postfixIncrementNode.GetSpan(), postfixIncrementNode.Subject()->Clone(cloneContext),
-                new AddNode(postfixIncrementNode.GetSpan(), postfixIncrementNode.Subject()->Clone(cloneContext), new ByteLiteralNode(postfixIncrementNode.GetSpan(), 1u)));
-            statementBinder->CompileStatement(&assignmentStatement, true);
+            ExpressionStatementNode prefixIncrementExpression(postfixIncrementNode.GetSpan(), new PrefixIncrementNode(postfixIncrementNode.GetSpan(), 
+                postfixIncrementNode.Subject()->Clone(cloneContext)));
+            statementBinder->CompileStatement(&prefixIncrementExpression, true);
         }
         else
         {
-            CloneContext cloneContext;
-            AssignmentStatementNode assignmentStatement(postfixIncrementNode.GetSpan(), postfixIncrementNode.Subject()->Clone(cloneContext),
-                new AddNode(postfixIncrementNode.GetSpan(), postfixIncrementNode.Subject()->Clone(cloneContext), new SByteLiteralNode(postfixIncrementNode.GetSpan(), 1)));
-            statementBinder->CompileStatement(&assignmentStatement, true);
+            if (expression->GetType()->IsUnsignedType())
+            {
+                CloneContext cloneContext;
+                AssignmentStatementNode assignmentStatement(postfixIncrementNode.GetSpan(), postfixIncrementNode.Subject()->Clone(cloneContext),
+                    new AddNode(postfixIncrementNode.GetSpan(), postfixIncrementNode.Subject()->Clone(cloneContext), new ByteLiteralNode(postfixIncrementNode.GetSpan(), 1u)));
+                statementBinder->CompileStatement(&assignmentStatement, true);
+            }
+            else
+            {
+                CloneContext cloneContext;
+                AssignmentStatementNode assignmentStatement(postfixIncrementNode.GetSpan(), postfixIncrementNode.Subject()->Clone(cloneContext),
+                    new AddNode(postfixIncrementNode.GetSpan(), postfixIncrementNode.Subject()->Clone(cloneContext), new SByteLiteralNode(postfixIncrementNode.GetSpan(), 1)));
+                statementBinder->CompileStatement(&assignmentStatement, true);
+            }
         }
     }
     postfixIncrementNode.Subject()->Accept(*this);
 }
 
-void ExpressionBinder::Visit(PostfixDecrementNode& postfixDecrementNode) 
+void ExpressionBinder::Visit(PostfixDecrementNode& postfixDecrementNode)
 {
     bool prevInhibitCompile = inhibitCompile;
     inhibitCompile = true;
@@ -725,19 +918,29 @@ void ExpressionBinder::Visit(PostfixDecrementNode& postfixDecrementNode)
     inhibitCompile = prevInhibitCompile;
     if (!inhibitCompile)
     {
-        if (expression->GetType()->IsUnsignedType())
+        if (expression->GetType()->PlainType(postfixDecrementNode.GetSpan())->IsClassTypeSymbol())
         {
             CloneContext cloneContext;
-            AssignmentStatementNode assignmentStatement(postfixDecrementNode.GetSpan(), postfixDecrementNode.Subject()->Clone(cloneContext),
-                new AddNode(postfixDecrementNode.GetSpan(), postfixDecrementNode.Subject()->Clone(cloneContext), new ByteLiteralNode(postfixDecrementNode.GetSpan(), 1u)));
-            statementBinder->CompileStatement(&assignmentStatement, true);
+            ExpressionStatementNode prefixDecrementExpression(postfixDecrementNode.GetSpan(), new PrefixDecrementNode(postfixDecrementNode.GetSpan(),
+                postfixDecrementNode.Subject()->Clone(cloneContext)));
+            statementBinder->CompileStatement(&prefixDecrementExpression, true);
         }
         else
         {
-            CloneContext cloneContext;
-            AssignmentStatementNode assignmentStatement(postfixDecrementNode.GetSpan(), postfixDecrementNode.Subject()->Clone(cloneContext),
-                new AddNode(postfixDecrementNode.GetSpan(), postfixDecrementNode.Subject()->Clone(cloneContext), new SByteLiteralNode(postfixDecrementNode.GetSpan(), 1)));
-            statementBinder->CompileStatement(&assignmentStatement, true);
+            if (expression->GetType()->IsUnsignedType())
+            {
+                CloneContext cloneContext;
+                AssignmentStatementNode assignmentStatement(postfixDecrementNode.GetSpan(), postfixDecrementNode.Subject()->Clone(cloneContext),
+                    new AddNode(postfixDecrementNode.GetSpan(), postfixDecrementNode.Subject()->Clone(cloneContext), new ByteLiteralNode(postfixDecrementNode.GetSpan(), 1u)));
+                statementBinder->CompileStatement(&assignmentStatement, true);
+            }
+            else
+            {
+                CloneContext cloneContext;
+                AssignmentStatementNode assignmentStatement(postfixDecrementNode.GetSpan(), postfixDecrementNode.Subject()->Clone(cloneContext),
+                    new AddNode(postfixDecrementNode.GetSpan(), postfixDecrementNode.Subject()->Clone(cloneContext), new SByteLiteralNode(postfixDecrementNode.GetSpan(), 1)));
+                statementBinder->CompileStatement(&assignmentStatement, true);
+            }
         }
     }
     postfixDecrementNode.Subject()->Accept(*this);
@@ -745,7 +948,8 @@ void ExpressionBinder::Visit(PostfixDecrementNode& postfixDecrementNode)
 
 void ExpressionBinder::Visit(SizeOfNode& sizeOfNode) 
 {
-    // todo
+    sizeOfNode.Expression()->Accept(*this);
+    expression.reset(new BoundSizeOfExpression(sizeOfNode.GetSpan(), symbolTable.GetTypeByName(U"long"), symbolTable.MakePointerType(expression->GetType(), sizeOfNode.GetSpan())));
 }
 
 void ExpressionBinder::Visit(TypeNameNode& typeNameNode) 
@@ -755,7 +959,39 @@ void ExpressionBinder::Visit(TypeNameNode& typeNameNode)
 
 void ExpressionBinder::Visit(CastNode& castNode) 
 {
-    // todo
+    TypeSymbol* targetType = ResolveType(castNode.TargetTypeExpr(), boundCompileUnit, containerScope);
+    castNode.SourceExpr()->Accept(*this);
+    if (targetType != expression->GetType())
+    {
+        std::vector<std::unique_ptr<BoundExpression>> targetExprArgs;
+        targetExprArgs.push_back(std::unique_ptr<BoundExpression>(new BoundTypeExpression(castNode.GetSpan(), targetType)));
+        std::vector<FunctionScopeLookup> functionScopeLookups;
+        functionScopeLookups.push_back(FunctionScopeLookup(ScopeLookup::this_and_base_and_parent, containerScope));
+        functionScopeLookups.push_back(FunctionScopeLookup(ScopeLookup::this_, targetType->ClassInterfaceOrNsScope()));
+        functionScopeLookups.push_back(FunctionScopeLookup(ScopeLookup::fileScopes, nullptr));
+        std::unique_ptr<BoundFunctionCall> castFunctionCall = ResolveOverload(U"@return", functionScopeLookups, targetExprArgs, boundCompileUnit, boundFunction, castNode.GetSpan());
+        std::vector<std::unique_ptr<BoundExpression>> castArguments;
+        castArguments.push_back(std::move(expression));
+        FunctionMatch functionMatch(castFunctionCall->GetFunctionSymbol());
+        bool conversionFound = FindConversions(boundCompileUnit, castFunctionCall->GetFunctionSymbol(), castArguments, functionMatch, ConversionType::explicit_, castNode.GetSpan());
+        if (conversionFound)
+        {
+            Assert(!functionMatch.argumentMatches.empty(), "argument match expected");
+            FunctionSymbol* conversionFun = functionMatch.argumentMatches[0].conversionFun;
+            if (conversionFun)
+            {
+                castArguments[0].reset(new BoundConversion(std::unique_ptr<BoundExpression>(castArguments[0].release()), conversionFun));
+            }
+            castFunctionCall->SetArguments(std::move(castArguments));
+        }
+        else
+        {
+            throw Exception("no explicit conversion from '" + ToUtf8(castArguments[0]->GetType()->FullName()) + "' to '" + ToUtf8(targetType->FullName()) + "' exists",
+                castNode.GetSpan(), boundFunction->GetFunctionSymbol()->GetSpan());
+        }
+        CheckAccess(boundFunction->GetFunctionSymbol(), castFunctionCall->GetFunctionSymbol());
+        expression.reset(castFunctionCall.release());
+    }
 }
 
 void ExpressionBinder::Visit(ConstructNode& constructNode) 

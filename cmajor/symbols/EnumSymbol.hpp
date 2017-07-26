@@ -22,7 +22,7 @@ public:
     const TypeSymbol* UnderlyingType() const { return underlyingType; }
     TypeSymbol* UnderlyingType() { return underlyingType; }
     void SetUnderlyingType(TypeSymbol* underlyingType_) { underlyingType = underlyingType_; }
-    llvm::Type* IrType(Emitter& emitter) const override { return underlyingType->IrType(emitter); }
+    llvm::Type* IrType(Emitter& emitter) override { return underlyingType->IrType(emitter); }
 private:
     TypeSymbol* underlyingType;
 };

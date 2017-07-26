@@ -284,6 +284,7 @@ void Module::FinishReads(const Module* rootModule, std::vector<Module*>& finishR
     if (this != rootModule)
     {
         SymbolReader reader(filePathReadFrom);
+        reader.SetModule(this);
         reader.GetBinaryReader().Skip(symbolTablePos);
         symbolTable.Read(reader);
     }

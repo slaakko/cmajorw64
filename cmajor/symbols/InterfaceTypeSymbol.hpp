@@ -15,7 +15,7 @@ public:
     InterfaceTypeSymbol(const Span& span_, const std::u32string& name_);
     std::string TypeString() const override { return "interface type"; }
     void SetSpecifiers(Specifiers specifiers);
-    llvm::Type* IrType(Emitter& emitter) const override { return nullptr; } // todo
+    llvm::Type* IrType(Emitter& emitter) override { return nullptr; } // todo
 };
 
 } } // namespace cmajor::symbols

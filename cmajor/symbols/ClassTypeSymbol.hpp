@@ -50,6 +50,7 @@ public:
     ClassTypeSymbol* BaseClass() { return baseClass; }
     void SetBaseClass(ClassTypeSymbol* baseClass_) { baseClass = baseClass_; }
     bool HasBaseClass(ClassTypeSymbol* cls) const;
+    bool HasBaseClass(ClassTypeSymbol* cls, uint8_t& distance) const;
     const std::vector<InterfaceTypeSymbol*>& ImplementedInterfaces() const { return implementedInterfaces; }
     void AddImplementedInterface(InterfaceTypeSymbol* interfaceTypeSymbol);
     bool IsClassTemplate() const { return !templateParameters.empty(); }
@@ -64,7 +65,7 @@ public:
     ClassTypeSymbolFlags GetClassTypeSymbolFlags() const { return flags; }
     bool GetFlag(ClassTypeSymbolFlags flag) const { return (flags & flag) != ClassTypeSymbolFlags::none; }
     void SetFlag(ClassTypeSymbolFlags flag) { flags = flags | flag; }
-    llvm::Type* IrType(Emitter& emitter) const override { return nullptr; } // todo
+    llvm::Type* IrType(Emitter& emitter) override { return nullptr; } // todo
 private:
     ClassTypeSymbol* baseClass;
     ClassTypeSymbolFlags flags;
@@ -83,7 +84,7 @@ class TemplateParameterSymbol : public TypeSymbol
 {
 public:
     TemplateParameterSymbol(const Span& span_, const std::u32string& name_);
-    llvm::Type* IrType(Emitter& emitter) const override { return nullptr; } 
+    llvm::Type* IrType(Emitter& emitter) override { return nullptr; } 
 };
 
 class BoundTemplateParameterSymbol : public Symbol

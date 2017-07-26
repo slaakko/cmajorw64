@@ -31,6 +31,10 @@ class BoundMemberVariable;
 class BoundConstant;
 class BoundEnumConstant;
 class BoundLiteral;
+class BoundTemporary;
+class BoundSizeOfExpression;
+class BoundAddressOfExpression;
+class BoundDereferenceExpression;
 class BoundFunctionCall;
 class BoundConversion;
 
@@ -61,6 +65,10 @@ public:
     virtual void Visit(BoundConstant& boundConstant) {}
     virtual void Visit(BoundEnumConstant& boundEnumConstant) {}
     virtual void Visit(BoundLiteral& boundLiteral) {}
+    virtual void Visit(BoundTemporary& boundTemporary) {}
+    virtual void Visit(BoundSizeOfExpression& boundSizeOfExpression) {}
+    virtual void Visit(BoundAddressOfExpression& boundAddressOfExpression) {}
+    virtual void Visit(BoundDereferenceExpression& boundDereferenceExpression) {}
     virtual void Visit(BoundFunctionCall& boundFunctionCall) {}
     virtual void Visit(BoundConversion& boundConversion) {}
 };

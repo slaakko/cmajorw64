@@ -189,12 +189,12 @@ std::string FunctionSymbolFlagStr(FunctionSymbolFlags flags)
 }
 
 FunctionSymbol::FunctionSymbol(const Span& span_, const std::u32string& name_) : 
-    ContainerSymbol(SymbolType::functionSymbol, span_, name_), groupName(), parameters(), localVariables(), returnType(), flags(FunctionSymbolFlags::none), irType(nullptr)
+    ContainerSymbol(SymbolType::functionSymbol, span_, name_), groupName(), parameters(), localVariables(), returnType(), flags(FunctionSymbolFlags::none), irType(nullptr), nextTemporaryIndex(0)
 {
 }
 
 FunctionSymbol::FunctionSymbol(SymbolType symbolType_, const Span& span_, const std::u32string& name_) : 
-    ContainerSymbol(symbolType_, span_, name_), groupName(), parameters(), localVariables(), returnType(), flags(FunctionSymbolFlags::none), irType(nullptr)
+    ContainerSymbol(symbolType_, span_, name_), groupName(), parameters(), localVariables(), returnType(), flags(FunctionSymbolFlags::none), irType(nullptr), nextTemporaryIndex(0)
 {
 }
 
@@ -464,6 +464,15 @@ void FunctionSymbol::CloneUsingNodes(const std::vector<Node*>& usingNodes_)
     {
         usingNodes.Add(usingNode->Clone(cloneContext));
     }
+}
+
+LocalVariableSymbol* FunctionSymbol::CreateTemporary(TypeSymbol* type, const Span& span)
+{
+    LocalVariableSymbol* temporary = new LocalVariableSymbol(span, U"@t" + ToUtf32(std::to_string(nextTemporaryIndex++)));
+    temporary->SetType(type);
+    AddMember(temporary);
+    AddLocalVariable(temporary);
+    return temporary;
 }
 
 llvm::FunctionType* FunctionSymbol::IrType(Emitter& emitter)

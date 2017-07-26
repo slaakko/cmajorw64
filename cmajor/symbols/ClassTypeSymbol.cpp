@@ -146,6 +146,14 @@ bool ClassTypeSymbol::HasBaseClass(ClassTypeSymbol* cls) const
     return false;
 }
 
+bool ClassTypeSymbol::HasBaseClass(ClassTypeSymbol* cls, uint8_t& distance) const
+{
+    if (!baseClass) return false;
+    ++distance;
+    if (baseClass == cls) return true;
+    return baseClass->HasBaseClass(cls, distance);
+}
+
 void ClassTypeSymbol::AddImplementedInterface(InterfaceTypeSymbol* interfaceTypeSymbol)
 {
     int n = implementedInterfaces.size();

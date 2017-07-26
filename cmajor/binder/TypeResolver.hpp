@@ -23,7 +23,7 @@ public:
     bool IsInComplete() const override { return true; }
     const NamespaceSymbol* Ns() const { return ns; }
     NamespaceSymbol* Ns() { return ns; }
-    llvm::Type* IrType(Emitter& emitter) const override { return nullptr; }
+    llvm::Type* IrType(Emitter& emitter) override { return nullptr; }
 private:
     NamespaceSymbol* ns;
 };

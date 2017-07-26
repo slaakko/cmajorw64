@@ -43,6 +43,22 @@ public:
     CastOverloadException(const std::string& message_, const Span& defined_, const std::vector<Span>& references_);
 };
 
+class CannotBindConstToNonconstOverloadException : public Exception
+{
+public:
+    CannotBindConstToNonconstOverloadException(const std::string& message_, const Span& defined_);
+    CannotBindConstToNonconstOverloadException(const std::string& message_, const Span& defined_, const Span& referenced_);
+    CannotBindConstToNonconstOverloadException(const std::string& message_, const Span& defined_, const std::vector<Span>& references_);
+};
+
+class CannotAssignToConstOverloadException : public Exception
+{
+public:
+    CannotAssignToConstOverloadException(const std::string& message_, const Span& defined_);
+    CannotAssignToConstOverloadException(const std::string& message_, const Span& defined_, const Span& referenced_);
+    CannotAssignToConstOverloadException(const std::string& message_, const Span& defined_, const std::vector<Span>& references_);
+};
+
 } } // namespace cmajor::symbols
 
 #endif // CMAJOR_SYMBOLS_EXCEPTION_INCLUDED

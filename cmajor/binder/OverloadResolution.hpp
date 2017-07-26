@@ -15,6 +15,7 @@ namespace cmajor { namespace binder {
 class BoundExpression;
 class BoundFunctionCall;
 class BoundCompileUnit;
+class BoundFunction;
 
 using namespace cmajor::symbols;
 
@@ -44,10 +45,11 @@ struct FunctionScopeLookup
 
 struct ArgumentMatch
 {
-    ArgumentMatch() : conversionFun(nullptr), conversionDistance(0) {}
-    ArgumentMatch(FunctionSymbol* conversionFun_) : conversionFun(conversionFun_), conversionDistance(0) {}
-    ArgumentMatch(FunctionSymbol* conversionFun_, int conversionDistance_) : conversionFun(conversionFun_), conversionDistance(conversionDistance_) {}
+    ArgumentMatch() : conversionFun(nullptr), referenceConversionFlags(BoundExpressionFlags::none), conversionDistance(0) {}
+    ArgumentMatch(FunctionSymbol* conversionFun_, BoundExpressionFlags referenceConversionFlags_, int conversionDistance_) :
+        conversionFun(conversionFun_), referenceConversionFlags(referenceConversionFlags_), conversionDistance(conversionDistance_) {}
     FunctionSymbol* conversionFun;
+    BoundExpressionFlags referenceConversionFlags;
     int conversionDistance;
 };
 
@@ -55,19 +57,25 @@ inline bool BetterArgumentMatch(const ArgumentMatch& left, const ArgumentMatch& 
 {
     if (left.conversionFun == nullptr && right.conversionFun != nullptr) return true;
     if (right.conversionFun == nullptr && left.conversionFun != nullptr) return false;
+    if (left.referenceConversionFlags == BoundExpressionFlags::none && right.referenceConversionFlags != BoundExpressionFlags::none) return true;
+    if (left.referenceConversionFlags != BoundExpressionFlags::none && right.referenceConversionFlags == BoundExpressionFlags::none) return false;
     if (left.conversionDistance < right.conversionDistance) return true;
+    if (left.conversionDistance > right.conversionDistance) return false;
     return false;
 }
 
 struct FunctionMatch
 {
-    FunctionMatch(FunctionSymbol* fun_) : fun(fun_), numConversions(0), castRequired(false), castSourceType(nullptr), castTargetType(nullptr) {}
+    FunctionMatch(FunctionSymbol* fun_) : fun(fun_), numConversions(0), castRequired(false), cannotBindConstArgToNonConstParam(false), cannotAssignToConstObject(false), 
+        sourceType(nullptr), targetType(nullptr) {}
     FunctionSymbol* fun;
     std::vector<ArgumentMatch> argumentMatches;
     int numConversions;
     bool castRequired;
-    TypeSymbol* castSourceType;
-    TypeSymbol* castTargetType;
+    bool cannotBindConstArgToNonConstParam;
+    bool cannotAssignToConstObject;
+    TypeSymbol* sourceType;
+    TypeSymbol* targetType;
 };
 
 struct BetterFunctionMatch
@@ -75,14 +83,15 @@ struct BetterFunctionMatch
     bool operator()(const FunctionMatch& left, const FunctionMatch& right) const;
 };
 
-bool FindConversions(BoundCompileUnit& boundCompileUnit, FunctionSymbol* function, const std::vector<std::unique_ptr<BoundExpression>>& arguments, FunctionMatch& functionMatch,
-    ConversionType conversionType);
+bool FindConversions(BoundCompileUnit& boundCompileUnit, FunctionSymbol* function, std::vector<std::unique_ptr<BoundExpression>>& arguments, FunctionMatch& functionMatch,
+    ConversionType conversionType, const Span& span);
 
-std::unique_ptr<BoundFunctionCall> ResolveOverload(const std::u32string& groupName, const std::vector<FunctionScopeLookup>& functionScopeLookups, std::vector<std::unique_ptr<BoundExpression>>& arguments,
-    BoundCompileUnit& boundCompileUnit, const Span& span);
+std::unique_ptr<BoundFunctionCall> ResolveOverload(const std::u32string& groupName, const std::vector<FunctionScopeLookup>& functionScopeLookups, 
+    std::vector<std::unique_ptr<BoundExpression>>& arguments, BoundCompileUnit& boundCompileUnit, BoundFunction* currentFunction, const Span& span);
 
-std::unique_ptr<BoundFunctionCall> ResolveOverload(const std::u32string& groupName, const std::vector<FunctionScopeLookup>& functionScopeLookups, std::vector<std::unique_ptr<BoundExpression>>& arguments,
-    BoundCompileUnit& boundCompileUnit, const Span& span, OverloadResolutionFlags flags, std::unique_ptr<Exception>& exception);
+std::unique_ptr<BoundFunctionCall> ResolveOverload(const std::u32string& groupName, const std::vector<FunctionScopeLookup>& functionScopeLookups, 
+    std::vector<std::unique_ptr<BoundExpression>>& arguments, BoundCompileUnit& boundCompileUnit, BoundFunction* currentFunction, const Span& span, 
+    OverloadResolutionFlags flags, std::unique_ptr<Exception>& exception);
 
 } } // namespace cmajor::binder
 

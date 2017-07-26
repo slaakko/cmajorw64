@@ -106,16 +106,19 @@ public:
     void ProcessTypeRequests();
     TypeSymbol* GetTypeByNameNoThrow(const std::u32string& typeName) const;
     TypeSymbol* GetTypeByName(const std::u32string& typeName) const;
-    TypeSymbol* MakeDerivedType(TypeSymbol* baseType, const TypeDerivationRec& derivationRec);
+    TypeSymbol* MakeDerivedType(TypeSymbol* baseType, const TypeDerivationRec& derivationRec, const Span& span);
+    TypeSymbol* MakePointerType(TypeSymbol* type, const Span& span);
+    TypeSymbol* MakeLvalueReferenceType(TypeSymbol* type, const Span& span);
     const FunctionSymbol* MainFunctionSymbol() const { return mainFunctionSymbol; }
     void AddConversion(FunctionSymbol* conversion);
-    FunctionSymbol* GetConversion(TypeSymbol* sourceType, TypeSymbol* targetType) const;
+    FunctionSymbol* GetConversion(TypeSymbol* sourceType, TypeSymbol* targetType, const Span& span) const;
 private:
     NamespaceSymbol globalNs;
     ContainerSymbol* container;
     std::stack<ContainerSymbol*> containerStack;
     FunctionSymbol* mainFunctionSymbol;
     int parameterIndex;
+    int declarationBlockIndex;
     std::unordered_map<Node*, Symbol*> nodeSymbolMap;
     std::unordered_map<Symbol*, Node*> symbolNodeMap;
     std::unordered_map<uint32_t, TypeSymbol*> typeIdMap;
@@ -124,6 +127,8 @@ private:
     std::vector<std::unique_ptr<DerivedTypeSymbol>> derivedTypes;
     std::vector<TypeRequest> typeRequests;
     ConversionTable conversionTable;
+    int GetNextDeclarationBlockIndex() { return declarationBlockIndex++; }
+    void ResetDeclarationBlockIndex() { declarationBlockIndex = 0; }
 };
 
 void InitCoreSymbolTable(SymbolTable& symbolTable);

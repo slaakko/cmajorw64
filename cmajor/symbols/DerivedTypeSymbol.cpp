@@ -37,6 +37,42 @@ bool HasReferenceDerivation(const DerivationVec& derivations)
     return false;
 }
 
+bool HasLvalueReferenceDerivation(const DerivationVec& derivations) 
+{
+    for (Derivation derivation : derivations)
+    {
+        if (derivation == Derivation::lvalueRefDerivation)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool HasRvalueReferenceDerivation(const DerivationVec& derivations)
+{
+    for (Derivation derivation : derivations)
+    {
+        if (derivation == Derivation::rvalueRefDerivation)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool HasArrayDerivation(const DerivationVec& derivations)
+{
+    for (Derivation derivation : derivations)
+    {
+        if (derivation == Derivation::arrayDerivation)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
 bool HasReferenceOrConstDerivation(const DerivationVec& derivations)
 {
     for (Derivation derivation : derivations)
@@ -47,6 +83,28 @@ bool HasReferenceOrConstDerivation(const DerivationVec& derivations)
         }
     }
     return false;
+}
+
+bool HasPointerDerivation(const DerivationVec& derivations)
+{
+    for (Derivation derivation : derivations)
+    {
+        if (derivation == Derivation::pointerDerivation) return true;
+    }
+    return false;
+}
+
+int CountPointerDerivations(const DerivationVec& derivations)
+{
+    int numPointers = 0;
+    for (Derivation derivation : derivations)
+    {
+        if (derivation == Derivation::pointerDerivation)
+        {
+            ++numPointers;
+        }
+    }
+    return numPointers;
 }
 
 TypeDerivationRec MakePlainDerivationRec(const TypeDerivationRec& typeDerivationRec)
@@ -61,6 +119,64 @@ TypeDerivationRec MakePlainDerivationRec(const TypeDerivationRec& typeDerivation
         }
     }
     return plainDerivationRec;
+}
+
+TypeDerivationRec RemoveReferenceDerivation(const TypeDerivationRec& typeDerivationRec)
+{
+    TypeDerivationRec referenceRemovedDerivationRec;
+    referenceRemovedDerivationRec.arrayDimensions = typeDerivationRec.arrayDimensions;
+    for (Derivation derivation : typeDerivationRec.derivations)
+    {
+        if (derivation == Derivation::constDerivation || derivation == Derivation::pointerDerivation || derivation == Derivation::arrayDerivation)
+        {
+            referenceRemovedDerivationRec.derivations.push_back(derivation);
+        }
+    }
+    return referenceRemovedDerivationRec;
+}
+
+TypeDerivationRec RemovePointerDerivation(const TypeDerivationRec& typeDerivationRec)
+{
+    TypeDerivationRec pointerRemovedDerivationRec;
+    pointerRemovedDerivationRec.arrayDimensions = typeDerivationRec.arrayDimensions;
+    int numPointers = CountPointerDerivations(typeDerivationRec.derivations);
+    if (numPointers > 0)
+    {
+        --numPointers;
+    }
+    int ip = 0;
+    int n = typeDerivationRec.derivations.size();
+    for (int i = 0; i < n; ++i)
+    {
+        Derivation derivation = typeDerivationRec.derivations[i];
+        if (derivation == Derivation::pointerDerivation)
+        {
+            if (ip < numPointers)
+            {
+                pointerRemovedDerivationRec.derivations.push_back(derivation);
+                ++ip;
+            }
+        }
+        else
+        {
+            pointerRemovedDerivationRec.derivations.push_back(derivation);
+        }
+    }
+    return pointerRemovedDerivationRec;
+}
+
+TypeDerivationRec RemoveConstDerivation(const TypeDerivationRec& typeDerivationRec)
+{
+    TypeDerivationRec constRemovedDerivationRec;
+    constRemovedDerivationRec.arrayDimensions = typeDerivationRec.arrayDimensions;
+    for (Derivation derivation : typeDerivationRec.derivations)
+    {
+        if (derivation != Derivation::constDerivation)
+        {
+            constRemovedDerivationRec.derivations.push_back(derivation);
+        }
+    }
+    return constRemovedDerivationRec;
 }
 
 std::u32string MakeDerivedTypeName(TypeSymbol* baseType, const TypeDerivationRec& derivationRec)
@@ -130,12 +246,12 @@ std::u32string MakeDerivedTypeName(TypeSymbol* baseType, const TypeDerivationRec
     return derivedTypeName;
 }
 
-DerivedTypeSymbol::DerivedTypeSymbol(const Span& span_, const std::u32string& name_) : TypeSymbol(SymbolType::derivedTypeSymbol, span_, name_), baseType(), derivationRec()
+DerivedTypeSymbol::DerivedTypeSymbol(const Span& span_, const std::u32string& name_) : TypeSymbol(SymbolType::derivedTypeSymbol, span_, name_), baseType(), derivationRec(), irType(nullptr)
 {
 }
 
 DerivedTypeSymbol::DerivedTypeSymbol(const Span& span_, const std::u32string& name_, TypeSymbol* baseType_, const TypeDerivationRec& derivationRec_) : 
-    TypeSymbol(SymbolType::derivedTypeSymbol, span_, name_), baseType(baseType_), derivationRec(derivationRec_)
+    TypeSymbol(SymbolType::derivedTypeSymbol, span_, name_), baseType(baseType_), derivationRec(derivationRec_), irType(nullptr)
 {
 }
 
@@ -180,14 +296,107 @@ void DerivedTypeSymbol::EmplaceType(TypeSymbol* typeSymbol_, int index)
     baseType = typeSymbol_;
 }
 
+bool DerivedTypeSymbol::IsConstType() const
+{
+    return HasFrontConstDerivation(derivationRec.derivations);
+}
+
 bool DerivedTypeSymbol::IsReferenceType() const 
 {
     return HasReferenceDerivation(derivationRec.derivations);
 }
 
-TypeSymbol* DerivedTypeSymbol::PlainType() 
+bool DerivedTypeSymbol::IsLvalueReferenceType() const
 {
-    return GetSymbolTable()->MakeDerivedType(baseType, MakePlainDerivationRec(derivationRec));
+    return HasLvalueReferenceDerivation(derivationRec.derivations);
+}
+
+bool DerivedTypeSymbol::IsRvalueReferenceType() const
+{
+    return HasRvalueReferenceDerivation(derivationRec.derivations);
+}
+
+bool DerivedTypeSymbol::IsArrayType() const
+{
+    return HasArrayDerivation(derivationRec.derivations);
+}
+
+bool DerivedTypeSymbol::IsPointerType() const 
+{
+    return HasPointerDerivation(derivationRec.derivations);
+}
+
+bool DerivedTypeSymbol::IsVoidPtrType() const 
+{
+    return baseType->IsVoidType() && derivationRec.derivations.size() == 1 && derivationRec.derivations.front() == Derivation::pointerDerivation;
+}
+
+int DerivedTypeSymbol::PointerCount() const
+{
+    return CountPointerDerivations(derivationRec.derivations);
+}
+
+TypeSymbol* DerivedTypeSymbol::PlainType(const Span& span) 
+{
+    return GetSymbolTable()->MakeDerivedType(baseType, MakePlainDerivationRec(derivationRec), span);
+}
+
+TypeSymbol* DerivedTypeSymbol::RemoveReference(const Span& span)
+{
+    return GetSymbolTable()->MakeDerivedType(baseType, RemoveReferenceDerivation(derivationRec), span);
+}
+
+TypeSymbol* DerivedTypeSymbol::RemovePointer(const Span& span)
+{
+    return GetSymbolTable()->MakeDerivedType(baseType, RemovePointerDerivation(derivationRec), span);
+}
+
+TypeSymbol* DerivedTypeSymbol::RemoveConst(const Span& span) 
+{
+    return GetSymbolTable()->MakeDerivedType(baseType, RemoveConstDerivation(derivationRec), span);
+}
+
+llvm::Type* DerivedTypeSymbol::IrType(Emitter& emitter) 
+{
+    if (!irType)
+    { 
+        if (baseType->IsVoidType())
+        {
+            irType = emitter.Builder().getInt8Ty();
+        }
+        else
+        {
+            irType = baseType->IrType(emitter);
+        }
+        for (Derivation derivation : derivationRec.derivations)
+        {
+            switch (derivation)
+            {
+                case Derivation::lvalueRefDerivation:
+                case Derivation::rvalueRefDerivation:
+                case Derivation::pointerDerivation:
+                {
+                    irType = llvm::PointerType::get(irType, 0);
+                    break;
+                }
+                default:
+                {
+                    // todo
+                    break;
+                }
+            }
+        }
+    }
+    return irType;
+}
+
+NullPtrType::NullPtrType(const Span& span_, const std::u32string& name_) : TypeSymbol(SymbolType::nullPtrTypeSymbol, span_, name_)
+{
+}
+
+llvm::Type* NullPtrType::IrType(Emitter& emitter)
+{
+    return emitter.Builder().getInt8PtrTy();
 }
 
 } } // namespace cmajor::symbols

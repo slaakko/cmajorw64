@@ -226,13 +226,15 @@ void StatementBinder::Visit(ReturnStatementNode& returnStatementNode)
             functionScopeLookups.push_back(FunctionScopeLookup(ScopeLookup::this_and_base_and_parent, containerScope));
             functionScopeLookups.push_back(FunctionScopeLookup(ScopeLookup::this_, returnType->ClassInterfaceOrNsScope()));
             functionScopeLookups.push_back(FunctionScopeLookup(ScopeLookup::fileScopes, nullptr));
-            std::unique_ptr<BoundFunctionCall> returnFunctionCall = ResolveOverload(U"@return", functionScopeLookups, returnTypeArgs, boundCompileUnit, returnStatementNode.GetSpan());
+            std::unique_ptr<BoundFunctionCall> returnFunctionCall = ResolveOverload(U"@return", functionScopeLookups, returnTypeArgs, boundCompileUnit, currentFunction, 
+                returnStatementNode.GetSpan());
             std::unique_ptr<BoundExpression> expression = BindExpression(returnStatementNode.Expression(), boundCompileUnit, currentFunction, containerScope, this, false,
                 returnDelegateType || returnClassDelegateType, returnClassDelegateType);
             std::vector<std::unique_ptr<BoundExpression>> returnValueArguments;
             returnValueArguments.push_back(std::move(expression));
             FunctionMatch functionMatch(returnFunctionCall->GetFunctionSymbol());
-            bool conversionFound = FindConversions(boundCompileUnit, returnFunctionCall->GetFunctionSymbol(), returnValueArguments, functionMatch, ConversionType::implicit_);
+            bool conversionFound = FindConversions(boundCompileUnit, returnFunctionCall->GetFunctionSymbol(), returnValueArguments, functionMatch, ConversionType::implicit_, 
+                returnStatementNode.GetSpan());
             if (conversionFound)
             {
                 Assert(!functionMatch.argumentMatches.empty(), "argument match expected");
@@ -286,7 +288,7 @@ void StatementBinder::Visit(ReturnStatementNode& returnStatementNode)
 void StatementBinder::Visit(IfStatementNode& ifStatementNode)
 {
     std::unique_ptr<BoundExpression> condition = BindExpression(ifStatementNode.Condition(), boundCompileUnit, currentFunction, containerScope, this);
-    if (!TypesEqual(symbolTable.GetTypeByName(U"bool"), condition->GetType()->PlainType()))
+    if (!TypesEqual(symbolTable.GetTypeByName(U"bool"), condition->GetType()->PlainType(ifStatementNode.GetSpan())))
     {
         throw Exception("condition of an if statement must be a Boolean expression", ifStatementNode.Condition()->GetSpan());
     }
@@ -308,7 +310,7 @@ void StatementBinder::Visit(IfStatementNode& ifStatementNode)
 void StatementBinder::Visit(WhileStatementNode& whileStatementNode)
 {
     std::unique_ptr<BoundExpression> condition = BindExpression(whileStatementNode.Condition(), boundCompileUnit, currentFunction, containerScope, this);
-    if (!TypesEqual(symbolTable.GetTypeByName(U"bool"), condition->GetType()->PlainType()))
+    if (!TypesEqual(symbolTable.GetTypeByName(U"bool"), condition->GetType()->PlainType(whileStatementNode.GetSpan())))
     {
         throw Exception("condition of a while statement must be a Boolean expression", whileStatementNode.Condition()->GetSpan());
     }
@@ -323,7 +325,7 @@ void StatementBinder::Visit(WhileStatementNode& whileStatementNode)
 void StatementBinder::Visit(DoStatementNode& doStatementNode)
 {
     std::unique_ptr<BoundExpression> condition = BindExpression(doStatementNode.Condition(), boundCompileUnit, currentFunction, containerScope, this);
-    if (!TypesEqual(symbolTable.GetTypeByName(U"bool"), condition->GetType()->PlainType()))
+    if (!TypesEqual(symbolTable.GetTypeByName(U"bool"), condition->GetType()->PlainType(doStatementNode.GetSpan())))
     {
         throw Exception("condition of a do statement must be a Boolean expression", doStatementNode.Condition()->GetSpan());
     }
@@ -352,7 +354,7 @@ void StatementBinder::Visit(ForStatementNode& forStatementNode)
         BooleanLiteralNode trueNode(forStatementNode.GetSpan(), true);
         condition = BindExpression(&trueNode, boundCompileUnit, currentFunction, containerScope, this);
     }
-    if (!TypesEqual(symbolTable.GetTypeByName(U"bool"), condition->GetType()->PlainType()))
+    if (!TypesEqual(symbolTable.GetTypeByName(U"bool"), condition->GetType()->PlainType(forStatementNode.GetSpan())))
     {
         throw Exception("condition of a for statement must be a Boolean expression", forStatementNode.Condition()->GetSpan());
     }
@@ -466,7 +468,7 @@ void StatementBinder::Visit(ConstructionStatementNode& constructionStatementNode
             constructClassDelegateType);
         arguments.push_back(std::move(argument));
     }
-    std::unique_ptr<BoundFunctionCall> constructorCall = ResolveOverload(U"@constructor", functionScopeLookups, arguments, boundCompileUnit, constructionStatementNode.GetSpan());
+    std::unique_ptr<BoundFunctionCall> constructorCall = ResolveOverload(U"@constructor", functionScopeLookups, arguments, boundCompileUnit, currentFunction, constructionStatementNode.GetSpan());
     CheckAccess(currentFunction->GetFunctionSymbol(), constructorCall->GetFunctionSymbol());
     AddStatement(new BoundConstructionStatement(std::move(constructorCall)));
     if (constructionStatementNode.Label())
@@ -500,7 +502,7 @@ void StatementBinder::Visit(AssignmentStatementNode& assignmentStatementNode)
     functionScopeLookups.push_back(FunctionScopeLookup(ScopeLookup::this_, targetType->ClassInterfaceOrNsScope()));
     functionScopeLookups.push_back(FunctionScopeLookup(ScopeLookup::this_and_base_and_parent, containerScope));
     functionScopeLookups.push_back(FunctionScopeLookup(ScopeLookup::fileScopes, nullptr));
-    std::unique_ptr<BoundFunctionCall> assignmentCall = ResolveOverload(U"operator=", functionScopeLookups, arguments, boundCompileUnit, assignmentStatementNode.GetSpan());
+    std::unique_ptr<BoundFunctionCall> assignmentCall = ResolveOverload(U"operator=", functionScopeLookups, arguments, boundCompileUnit, currentFunction, assignmentStatementNode.GetSpan());
     CheckAccess(currentFunction->GetFunctionSymbol(), assignmentCall->GetFunctionSymbol());
     AddStatement(new BoundAssignmentStatement(std::move(assignmentCall)));
     if (assignmentStatementNode.Label())

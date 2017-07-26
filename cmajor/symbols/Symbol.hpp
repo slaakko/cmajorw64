@@ -25,11 +25,12 @@ class InterfaceTypeSymbol;
 class NamespaceSymbol;
 class FunctionSymbol;
 class SymbolTable;
+class Module;
 
 enum class SymbolType : uint8_t
 {
     boolTypeSymbol, sbyteTypeSymbol, byteTypeSymbol, shortTypeSymbol, ushortTypeSymbol, intTypeSymbol, uintTypeSymbol, longTypeSymbol, ulongTypeSymbol, floatTypeSymbol, doubleTypeSymbol, 
-    charTypeSymbol, wcharTypeSymbol, ucharTypeSymbol, voidTypeSymbol,
+    charTypeSymbol, wcharTypeSymbol, ucharTypeSymbol, voidTypeSymbol, nullPtrTypeSymbol,
     derivedTypeSymbol,
     namespaceSymbol, functionSymbol, staticConstructorSymbol, constructorSymbol, destructorSymbol, memberFunctionSymbol, functionGroupSymbol, classTypeSymbol, interfaceTypeSymbol, 
     delegateTypeSymbol, classDelegateTypeSymbol, declarationBlock, typedefSymbol, constantSymbol, enumTypeSymbol, enumConstantSymbol,
@@ -156,6 +157,9 @@ public:
     const SymbolTable* GetSymbolTable() const { return symbolTable; }
     SymbolTable* GetSymbolTable() { return symbolTable; }
     void SetSymbolTable(SymbolTable* symbolTable_) { symbolTable = symbolTable_; }
+    const Module* GetModule() const { return module; }
+    Module* GetModule() { return module; }
+    void SetModule(Module* module_) { module = module_; }
     void SetIrObject(llvm::Value* irObject_) { irObject = irObject_; }
     const std::u32string& MangledName() const { return mangledName; }
 private:
@@ -166,6 +170,7 @@ private:
     std::u32string mangledName;
     Symbol* parent;
     SymbolTable* symbolTable;
+    Module* module;
     llvm::Value* irObject;
 };
 

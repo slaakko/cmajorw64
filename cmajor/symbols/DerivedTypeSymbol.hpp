@@ -37,7 +37,19 @@ inline bool operator!=(const TypeDerivationRec& left, const TypeDerivationRec& r
 
 std::u32string MakeDerivedTypeName(TypeSymbol* baseType, const TypeDerivationRec& derivationRec);
 
+bool HasFrontConstDerivation(const DerivationVec& derivations);
 bool HasReferenceDerivation(const DerivationVec& derivations);
+bool HasLvalueReferenceDerivation(const DerivationVec& derivations);
+bool HasRvalueReferenceDerivation(const DerivationVec& derivations);
+bool HasArrayDerivation(const DerivationVec& derivations);
+bool HasReferenceOrConstDerivation(const DerivationVec& derivations);
+bool HasPointerDerivation(const DerivationVec& derivations);
+int CountPointerDerivations(const DerivationVec& derivations);
+
+TypeDerivationRec MakePlainDerivationRec(const TypeDerivationRec& typeDerivationRec);
+TypeDerivationRec RemoveReferenceDerivation(const TypeDerivationRec& typeDerivationRec);
+TypeDerivationRec RemovePointerDerivation(const TypeDerivationRec& typeDerivationRec);
+TypeDerivationRec RemoveConstDerivation(const TypeDerivationRec& typeDerivationRec);
 
 class DerivedTypeSymbol : public TypeSymbol
 {
@@ -50,13 +62,34 @@ public:
     void EmplaceType(TypeSymbol* typeSymbol_, int index) override;
     const TypeSymbol* BaseType() const override { return baseType; }
     TypeSymbol* BaseType() override { return baseType; }
-    TypeSymbol* PlainType() override;
-    llvm::Type* IrType(Emitter& emitter) const override { return nullptr; } // todo
+    TypeSymbol* PlainType(const Span& span) override;
+    TypeSymbol* RemoveReference(const Span& span) override;
+    TypeSymbol* RemovePointer(const Span& span) override;
+    TypeSymbol* RemoveConst(const Span& span) override;
+    llvm::Type* IrType(Emitter& emitter) override;
+    bool IsConstType() const override;
     bool IsReferenceType() const override;
+    bool IsLvalueReferenceType() const override;
+    bool IsRvalueReferenceType() const override;
+    bool IsArrayType() const override;
+    bool IsPointerType() const override;
+    bool IsVoidPtrType() const override;
+    int PointerCount() const override;
     const TypeDerivationRec& DerivationRec() const { return derivationRec; }
 private:
     TypeSymbol* baseType;
     TypeDerivationRec derivationRec;
+    llvm::Type* irType;
+};
+
+class NullPtrType : public TypeSymbol
+{
+public:
+    NullPtrType(const Span& span_, const std::u32string& name_);
+    std::string TypeString() const override { return "nullptr_type"; }
+    bool IsPointerType() const override { return true; }
+    bool IsNullPtrType() const override { return true; }
+    llvm::Type* IrType(Emitter& emitter) override;
 };
 
 } } // namespace cmajor::symbols

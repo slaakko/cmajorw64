@@ -80,7 +80,7 @@ public:
     std::u32string FullName() const override;
     std::u32string FullNameWithSpecifiers() const override;
     virtual ConversionType GetConversionType() const { return ConversionType::implicit_; }
-    virtual int ConversionDistance() const { return 0; }
+    virtual uint8_t ConversionDistance() const { return 0; }
     virtual TypeSymbol* ConversionSourceType() const { return nullptr; }
     virtual TypeSymbol* ConversionTargetType() const { return nullptr; }
     virtual bool IsBasicTypeOperation() const { return false; }
@@ -127,6 +127,7 @@ public:
     TypeSymbol* ReturnType() const { return returnType; }
     bool IsFunctionTemplate() const { return !templateParameters.empty(); }
     void CloneUsingNodes(const std::vector<Node*>& usingNodes_);
+    LocalVariableSymbol* CreateTemporary(TypeSymbol* type, const Span& span);
     llvm::FunctionType* IrType(Emitter& emitter);
 private:
     std::u32string groupName;
@@ -137,6 +138,7 @@ private:
     FunctionSymbolFlags flags;
     NodeList<Node> usingNodes;
     llvm::FunctionType* irType;
+    int nextTemporaryIndex;
 };
 
 class StaticConstructorSymbol : public FunctionSymbol
@@ -179,7 +181,7 @@ class FunctionGroupTypeSymbol : public TypeSymbol
 public:
     FunctionGroupTypeSymbol(FunctionGroupSymbol* functionGroup_);
     const FunctionGroupSymbol* FunctionGroup() const { return functionGroup; }
-    llvm::Type* IrType(Emitter& emitter) const override { return nullptr; } 
+    llvm::Type* IrType(Emitter& emitter) override { return nullptr; } 
 private:
     FunctionGroupSymbol* functionGroup;
 };

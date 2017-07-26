@@ -6,6 +6,7 @@
 #ifndef CMAJOR_SYMBOLS_CONVERSION_TABLE_INCLUDED
 #define CMAJOR_SYMBOLS_CONVERSION_TABLE_INCLUDED
 #include <cmajor/symbols/TypeSymbol.hpp>
+#include <cmajor/symbols/FunctionSymbol.hpp>
 
 namespace cmajor { namespace symbols {
 
@@ -31,9 +32,11 @@ class ConversionTable
 public:
     bool IsEmpty() const { return conversionMap.empty(); }
     void AddConversion(FunctionSymbol* conversion);
-    FunctionSymbol* GetConversion(TypeSymbol* sourceType, TypeSymbol* targetType) const;
+    FunctionSymbol* GetConversion(TypeSymbol* sourceType, TypeSymbol* targetType, const Span& span) const;
+    void AddGeneratedConversion(std::unique_ptr<FunctionSymbol>&& generatedConversion);
 private:
     std::unordered_map<ConversionTableEntry, FunctionSymbol*, ConversionTableEntryHash> conversionMap;
+    std::vector<std::unique_ptr<FunctionSymbol>> generatedConversions;
 };
 
 } } // namespace cmajor::symbols

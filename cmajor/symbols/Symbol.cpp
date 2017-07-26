@@ -29,7 +29,7 @@ using namespace cmajor::unicode;
 const char* symbolTypeStr[uint8_t(SymbolType::maxSymbol)] =
 {
     "boolTypeSymbol", "sbyteTypeSymbol", "byteTypeSymbol", "shortTypeSymbol", "ushortTypeSymbol", "intTypeSymbol", "uintTypeSymbol", "longTypeSymbol", "ulongTypeSymbol", "floatTypeSymbol", "doubleTypeSymbol",
-    "charTypeSymbol", "wcharTypeSymbol", "ucharTypeSymbol", "voidTypeSymbol",
+    "charTypeSymbol", "wcharTypeSymbol", "ucharTypeSymbol", "voidTypeSymbol", "nullPtrTypeSymbol",
     "derivedTypeSymbol"
     "namespaceSymbol", "functionSymbol", "staticConstructorSymbol", "constructorSymbol", "destructorSymbol", "memberFunctionSymbol", "functionGroupSymbol", "classTypeSymbol", "interfaceTypeSymbol",
     "delegateTypeSymbol", "classDelegateTypeSymbol", "declarationBlock", "typedefSymbol", "constantSymbol", "enumTypeSymbol", "enumConstantSymbol",
@@ -81,7 +81,7 @@ std::string SymbolFlagStr(SymbolFlags symbolFlags)
 
 
 Symbol::Symbol(SymbolType symbolType_, const Span& span_, const std::u32string& name_) : 
-    symbolType(symbolType_), span(span_), name(name_), flags(SymbolFlags::project), parent(nullptr), symbolTable(nullptr), irObject(nullptr)
+    symbolType(symbolType_), span(span_), name(name_), flags(SymbolFlags::project), parent(nullptr), symbolTable(nullptr), module(nullptr), irObject(nullptr)
 {
 }
 
@@ -685,6 +685,7 @@ SymbolFactory::SymbolFactory()
     Register(SymbolType::wcharTypeSymbol, new ConcreteSymbolCreator<WCharTypeSymbol>());
     Register(SymbolType::ucharTypeSymbol, new ConcreteSymbolCreator<UCharTypeSymbol>());
     Register(SymbolType::voidTypeSymbol, new ConcreteSymbolCreator<VoidTypeSymbol>());
+    Register(SymbolType::nullPtrTypeSymbol, new ConcreteSymbolCreator<NullPtrType>());
     Register(SymbolType::derivedTypeSymbol, new ConcreteSymbolCreator<DerivedTypeSymbol>());
     Register(SymbolType::namespaceSymbol, new ConcreteSymbolCreator<NamespaceSymbol>());
     Register(SymbolType::functionSymbol, new ConcreteSymbolCreator<FunctionSymbol>());

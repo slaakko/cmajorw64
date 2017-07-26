@@ -23,7 +23,7 @@ public:
     void SetSpecifiers(Specifiers specifiers);
     const TypeSymbol* ReturnType() const { return returnType; }
     void SetReturnType(TypeSymbol* returnType_) { returnType = returnType_; }
-    llvm::Type* IrType(Emitter& emitter) const override { return nullptr; } // todo
+    llvm::Type* IrType(Emitter& emitter) override { return nullptr; } // todo
 private:
     TypeSymbol* returnType;
     std::vector<ParameterSymbol*> parameters;
@@ -38,10 +38,11 @@ public:
     void EmplaceType(TypeSymbol* typeSymbol_, int index) override;
     void AddMember(Symbol* member) override;
     std::string TypeString() const override { return "class_delegate"; }
+    bool IsClassTypeSymbol() const override { return false; }
     void SetSpecifiers(Specifiers specifiers);
     const TypeSymbol* ReturnType() const { return returnType; }
     void SetReturnType(TypeSymbol* returnType_) { returnType = returnType_; }
-    llvm::Type* IrType(Emitter& emitter) const override { return nullptr; } // todo
+    llvm::Type* IrType(Emitter& emitter) override { return nullptr; } // todo
 private:
     TypeSymbol* returnType;
     std::vector<ParameterSymbol*> parameters;

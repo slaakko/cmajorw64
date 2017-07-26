@@ -9,23 +9,29 @@
 
 namespace cmajor { namespace binder {
 
+class BoundCompileUnit;
+
 class Operation
 {
 public:
-    Operation(std::u32string groupName_, int arity_);
-    void CollectViableFunctions(const std::vector<std::unique_ptr<BoundExpression>>& arguments, std::unordered_set<FunctionSymbol*> viableFunctions);
+    Operation(const std::u32string& groupName_, int arity_, BoundCompileUnit& boundCompileUnit_);
+    virtual ~Operation();
+    virtual void CollectViableFunctions(const std::vector<std::unique_ptr<BoundExpression>>& arguments, std::unordered_set<FunctionSymbol*>& viableFunctions) = 0;
     const std::u32string& GroupName() const { return groupName; }
     int Arity() const { return arity; }
+    SymbolTable* GetSymbolTable();
+    BoundCompileUnit& GetBoundCompileUnit();
 private:
     std::u32string groupName;
     int arity;
+    BoundCompileUnit& boundCompileUnit;
 };
 
 class ArityOperation
 {
 public:
     void Add(Operation* operation);
-    void CollectViableFunctions(const std::vector<std::unique_ptr<BoundExpression>>& arguments, std::unordered_set<FunctionSymbol*> viableFunctions);
+    void CollectViableFunctions(const std::vector<std::unique_ptr<BoundExpression>>& arguments, std::unordered_set<FunctionSymbol*>& viableFunctions);
 private:
     std::vector<Operation*> operations;
 };
@@ -34,7 +40,7 @@ class OperationGroup
 {
 public:
     void Add(Operation* operation);
-    void CollectViableFunctions(const std::vector<std::unique_ptr<BoundExpression>>& arguments, std::unordered_set<FunctionSymbol*> viableFunctions);
+    void CollectViableFunctions(const std::vector<std::unique_ptr<BoundExpression>>& arguments, std::unordered_set<FunctionSymbol*>& viableFunctions);
 private:
     std::vector<std::unique_ptr<ArityOperation>> arityOperations;
 };
@@ -42,9 +48,9 @@ private:
 class OperationRepository
 {
 public:
-    OperationRepository();
+    OperationRepository(BoundCompileUnit& boundCompileUnit_);
     void Add(Operation* operation);
-    void CollectViableFunctions(const std::u32string& groupName, const std::vector<std::unique_ptr<BoundExpression>>& arguments, std::unordered_set<FunctionSymbol*> viableFunctions);
+    void CollectViableFunctions(const std::u32string& groupName, const std::vector<std::unique_ptr<BoundExpression>>& arguments, std::unordered_set<FunctionSymbol*>& viableFunctions);
 private:
     std::unordered_map<std::u32string, OperationGroup*> operationGroupMap;
     std::vector<std::unique_ptr<OperationGroup>> operationGroups;

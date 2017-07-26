@@ -13,9 +13,11 @@ namespace cmajor { namespace symbols {
 using cmajor::parsing::Span;
 using namespace cmajor::ir;
 
+class TypeSymbol;
+
 enum class ValueType : uint8_t
 {
-    boolValue, sbyteValue, byteValue, shortValue, ushortValue, intValue, uintValue, longValue, ulongValue, floatValue, doubleValue, charValue, wcharValue, ucharValue, 
+    boolValue, sbyteValue, byteValue, shortValue, ushortValue, intValue, uintValue, longValue, ulongValue, floatValue, doubleValue, charValue, wcharValue, ucharValue, stringValue, nullValue,
     maxValue
 };
 
@@ -156,6 +158,24 @@ public:
     llvm::Value* IrValue(Emitter& emitter) override;
 private:
     char32_t value;
+};
+
+class StringValue : public Value
+{
+public:
+    StringValue(const Span& span_, const std::string& value_);
+    llvm::Value* IrValue(Emitter& emitter) override;
+private:
+    std::string value;
+};
+
+class NullValue : public Value
+{
+public:
+    NullValue(const Span& span_, TypeSymbol* nullPtrType_);
+    llvm::Value* IrValue(Emitter& emitter) override;
+private:
+    TypeSymbol* nullPtrType;
 };
 
 } } // namespace cmajor::symbols

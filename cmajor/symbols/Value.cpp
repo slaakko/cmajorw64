@@ -4,6 +4,7 @@
 // =================================
 
 #include <cmajor/symbols/Value.hpp>
+#include <cmajor/symbols/TypeSymbol.hpp>
 
 namespace cmajor { namespace symbols {
 
@@ -139,6 +140,26 @@ UCharValue::UCharValue(const Span& span_, char32_t value_) : Value(span_, ValueT
 llvm::Value* UCharValue::IrValue(Emitter& emitter)
 {
     return emitter.Builder().getInt32(static_cast<uint32_t>(value));
+}
+
+StringValue::StringValue(const Span& span_, const std::string& value_) : Value(span_, ValueType::stringValue), value(value_)
+{
+}
+
+llvm::Value* StringValue::IrValue(Emitter& emitter)
+{
+    llvm::GlobalValue* stringValue = emitter.Builder().CreateGlobalString(value);
+    stringValue->setLinkage(llvm::GlobalValue::LinkageTypes::LinkOnceODRLinkage);
+    return stringValue;
+}
+
+NullValue::NullValue(const Span& span_, TypeSymbol* nullPtrType_) : Value(span_, ValueType::nullValue), nullPtrType(nullPtrType_)
+{
+}
+
+llvm::Value* NullValue::IrValue(Emitter& emitter)
+{
+    return llvm::Constant::getNullValue(nullPtrType->IrType(emitter));
 }
 
 } } // namespace cmajor::symbols

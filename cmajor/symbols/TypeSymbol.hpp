@@ -22,12 +22,24 @@ public:
     bool IsTypeSymbol() const override { return true; }
     virtual bool IsInComplete() const { return false; }
     virtual bool IsUnsignedType() const { return false; }
+    virtual bool IsVoidType() const { return false; }
     std::string TypeString() const override { return "type"; }
     virtual const TypeSymbol* BaseType() const { return this; }
     virtual TypeSymbol* BaseType() { return this; }
-    virtual TypeSymbol* PlainType() { return this; }
-    virtual llvm::Type* IrType(Emitter& emitter) const = 0;
+    virtual TypeSymbol* PlainType(const Span& span) { return this; }
+    virtual TypeSymbol* RemoveReference(const Span& span) { return this; }
+    virtual TypeSymbol* RemovePointer(const Span& span) { return this; }
+    virtual TypeSymbol* RemoveConst(const Span& span) { return this; }
+    virtual llvm::Type* IrType(Emitter& emitter) = 0;
+    virtual bool IsConstType() const { return false; }
     virtual bool IsReferenceType() const { return false; }
+    virtual bool IsLvalueReferenceType() const { return false; }
+    virtual bool IsRvalueReferenceType() const { return false; }
+    virtual bool IsArrayType() const { return false; }
+    virtual bool IsPointerType() const { return false; }
+    virtual bool IsNullPtrType() const { return false; }
+    virtual bool IsVoidPtrType() const { return false; }
+    virtual int PointerCount() const { return 0; }
     void SetTypeId(uint32_t typeId_) { typeId = typeId_; }
     uint32_t TypeId() const { Assert(typeId != 0, "type id not initialized");  return typeId; }
 private:
