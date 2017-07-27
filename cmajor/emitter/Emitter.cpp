@@ -422,62 +422,62 @@ void Emitter::Visit(BoundEmptyStatement& boundEmptyStatement)
 
 void Emitter::Visit(BoundParameter& boundParameter)
 {
-    boundParameter.Load(*this);
+    boundParameter.Load(*this, OperationFlags::none);
 }
 
 void Emitter::Visit(BoundLocalVariable& boundLocalVariable)
 {
-    boundLocalVariable.Load(*this);
+    boundLocalVariable.Load(*this, OperationFlags::none);
 }
 
 void Emitter::Visit(BoundMemberVariable& boundMemberVariable)
 {
-    boundMemberVariable.Load(*this);
+    boundMemberVariable.Load(*this, OperationFlags::none);
 }
 
 void Emitter::Visit(BoundConstant& boundConstant)
 {
-    boundConstant.Load(*this);
+    boundConstant.Load(*this, OperationFlags::none);
 }
 
 void Emitter::Visit(BoundEnumConstant& boundEnumConstant)
 {
-    boundEnumConstant.Load(*this);
+    boundEnumConstant.Load(*this, OperationFlags::none);
 }
 
 void Emitter::Visit(BoundLiteral& boundLiteral)
 {
-    boundLiteral.Load(*this);
+    boundLiteral.Load(*this, OperationFlags::none);
 }
 
 void Emitter::Visit(BoundTemporary& boundTemporary)
 {
-    boundTemporary.Load(*this);
+    boundTemporary.Load(*this, OperationFlags::none);
 }
 
 void Emitter::Visit(BoundSizeOfExpression& boundSizeOfExpression)
 {
-    boundSizeOfExpression.Load(*this);
+    boundSizeOfExpression.Load(*this, OperationFlags::none);
 }
 
 void Emitter::Visit(BoundAddressOfExpression& boundAddressOfExpression)
 {
-    boundAddressOfExpression.Load(*this);
+    boundAddressOfExpression.Load(*this, OperationFlags::none);
 }
 
 void Emitter::Visit(BoundDereferenceExpression& boundDereferenceExpression)
 {
-    boundDereferenceExpression.Load(*this);
+    boundDereferenceExpression.Load(*this, OperationFlags::none);
 }
 
 void Emitter::Visit(BoundFunctionCall& boundFunctionCall)
 {
-    boundFunctionCall.Load(*this);
+    boundFunctionCall.Load(*this, OperationFlags::none);
 }
 
 void Emitter::Visit(BoundConversion& boundConversion)
 {
-    boundConversion.Load(*this);
+    boundConversion.Load(*this, OperationFlags::none);
 }
 
 void GenerateCode(EmittingContext& emittingContext, BoundCompileUnit& boundCompileUnit)

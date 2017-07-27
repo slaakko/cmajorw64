@@ -107,8 +107,6 @@ public:
     TypeSymbol* GetTypeByNameNoThrow(const std::u32string& typeName) const;
     TypeSymbol* GetTypeByName(const std::u32string& typeName) const;
     TypeSymbol* MakeDerivedType(TypeSymbol* baseType, const TypeDerivationRec& derivationRec, const Span& span);
-    TypeSymbol* MakePointerType(TypeSymbol* type, const Span& span);
-    TypeSymbol* MakeLvalueReferenceType(TypeSymbol* type, const Span& span);
     const FunctionSymbol* MainFunctionSymbol() const { return mainFunctionSymbol; }
     void AddConversion(FunctionSymbol* conversion);
     FunctionSymbol* GetConversion(TypeSymbol* sourceType, TypeSymbol* targetType, const Span& span) const;

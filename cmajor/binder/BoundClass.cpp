@@ -18,12 +18,12 @@ void BoundClass::Accept(BoundNodeVisitor& visitor)
     visitor.Visit(*this);
 }
 
-void BoundClass::Load(Emitter& emitter)
+void BoundClass::Load(Emitter& emitter, OperationFlags flags)
 {
     throw Exception("cannot load from class", GetSpan());
 }
 
-void BoundClass::Store(Emitter& emitter)
+void BoundClass::Store(Emitter& emitter, OperationFlags flags)
 {
     throw Exception("cannot store to class", GetSpan());
 }

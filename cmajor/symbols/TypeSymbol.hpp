@@ -24,12 +24,16 @@ public:
     virtual bool IsUnsignedType() const { return false; }
     virtual bool IsVoidType() const { return false; }
     std::string TypeString() const override { return "type"; }
+    virtual bool IsBasicTypeSymbol() const { return false; }
     virtual const TypeSymbol* BaseType() const { return this; }
     virtual TypeSymbol* BaseType() { return this; }
     virtual TypeSymbol* PlainType(const Span& span) { return this; }
+    virtual TypeSymbol* RemoveConst(const Span& span) { return this; }
     virtual TypeSymbol* RemoveReference(const Span& span) { return this; }
     virtual TypeSymbol* RemovePointer(const Span& span) { return this; }
-    virtual TypeSymbol* RemoveConst(const Span& span) { return this; }
+    virtual TypeSymbol* AddConst(const Span& span);
+    virtual TypeSymbol* AddLvalueReference(const Span& span);
+    virtual TypeSymbol* AddPointer(const Span& span);
     virtual llvm::Type* IrType(Emitter& emitter) = 0;
     virtual bool IsConstType() const { return false; }
     virtual bool IsReferenceType() const { return false; }

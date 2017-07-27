@@ -143,8 +143,8 @@ BasicTypeCopyCtor::BasicTypeCopyCtor(const Span& span_, const std::u32string& na
 void BasicTypeCopyCtor::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects)
 {
     Assert(genObjects.size() == 2, "copy constructor needs two objects");
-    genObjects[1]->Load(emitter);
-    genObjects[0]->Store(emitter);
+    genObjects[1]->Load(emitter, OperationFlags::none);
+    genObjects[0]->Store(emitter, OperationFlags::none);
 }
 
 BasicTypeCopyAssignment::BasicTypeCopyAssignment(TypeSymbol* type, TypeSymbol* voidType) : FunctionSymbol(SymbolType::basicTypeCopyAssignment, Span(), U"operator=")
@@ -168,8 +168,8 @@ BasicTypeCopyAssignment::BasicTypeCopyAssignment(const Span& span_, const std::u
 void BasicTypeCopyAssignment::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects)
 {
     Assert(genObjects.size() == 2, "assignment needs two objects");
-    genObjects[1]->Load(emitter);
-    genObjects[0]->Store(emitter);
+    genObjects[1]->Load(emitter, OperationFlags::none);
+    genObjects[0]->Store(emitter, OperationFlags::none);
 }
 
 BasicTypeReturn::BasicTypeReturn(TypeSymbol* type) : FunctionSymbol(SymbolType::basicTypeReturn, Span(), U"@return")
@@ -190,7 +190,7 @@ BasicTypeReturn::BasicTypeReturn(const Span& span_, const std::u32string& name_)
 void BasicTypeReturn::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects)
 {
     Assert(genObjects.size() == 1, "return needs one object");
-    genObjects[0]->Load(emitter);
+    genObjects[0]->Load(emitter, OperationFlags::none);
 }
 
 BasicTypeIntegerEqualityOperation::BasicTypeIntegerEqualityOperation(const Span& span_, const std::u32string& name_) : BasicTypeComparisonOperation<BasicTypeIntegerEquality>(SymbolType::basicTypeIntegerEquality)

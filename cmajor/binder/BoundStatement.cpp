@@ -23,12 +23,12 @@ BoundCompoundStatement* BoundStatement::Block()
     return parent->Block();
 }
 
-void BoundStatement::Load(Emitter& emitter)
+void BoundStatement::Load(Emitter& emitter, OperationFlags flags)
 {
     throw Exception("cannot load from statement", GetSpan());
 }
 
-void BoundStatement::Store(Emitter& emitter)
+void BoundStatement::Store(Emitter& emitter, OperationFlags flags)
 {
     throw Exception("cannot store to statement", GetSpan());
 }

@@ -238,11 +238,21 @@ void StatementBinder::Visit(ReturnStatementNode& returnStatementNode)
             if (conversionFound)
             {
                 Assert(!functionMatch.argumentMatches.empty(), "argument match expected");
-                FunctionSymbol* conversionFun = functionMatch.argumentMatches[0].conversionFun;
+                ArgumentMatch argumentMatch = functionMatch.argumentMatches[0];
+                FunctionSymbol* conversionFun = argumentMatch.conversionFun;
                 if (conversionFun)
                 {
                     BoundConversion* boundConversion = new BoundConversion(std::unique_ptr<BoundExpression>(returnValueArguments[0].release()), conversionFun);
                     returnValueArguments[0].reset(boundConversion);
+                }
+                if (argumentMatch.referenceConversionFlags != OperationFlags::none)
+                {
+                    if (argumentMatch.referenceConversionFlags == OperationFlags::addr)
+                    {
+                        TypeSymbol* type = returnValueArguments[0]->GetType()->AddLvalueReference(returnStatementNode.GetSpan());
+                        BoundAddressOfExpression* addressOfExpression = new BoundAddressOfExpression(std::move(returnValueArguments[0]), type);
+                        returnValueArguments[0].reset(addressOfExpression);
+                    }
                 }
                 returnFunctionCall->SetArguments(std::move(returnValueArguments));
             }

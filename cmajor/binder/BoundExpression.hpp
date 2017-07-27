@@ -15,24 +15,6 @@ namespace cmajor { namespace binder {
 
 using namespace cmajor::symbols;
 
-enum class BoundExpressionFlags : uint8_t
-{
-    none = 0, 
-    addr = 1 << 0, 
-    deref = 1 << 1, 
-    load = 1 << 2
-};
-
-inline BoundExpressionFlags operator|(BoundExpressionFlags left, BoundExpressionFlags right)
-{
-    return BoundExpressionFlags(uint8_t(left) | uint8_t(right));
-}
-
-inline BoundExpressionFlags operator&(BoundExpressionFlags left, BoundExpressionFlags right)
-{
-    return BoundExpressionFlags(uint8_t(left) & uint8_t(right));
-}
-
 class BoundExpression : public BoundNode
 {
 public:
@@ -43,19 +25,16 @@ public:
     virtual std::string TypeString() const { return "expression"; }
     const TypeSymbol* GetType() const { return type; }
     TypeSymbol* GetType() { return type; }
-    bool GetFlag(BoundExpressionFlags flag) const { return (flags & flag) != BoundExpressionFlags::none; }
-    void SetFlag(BoundExpressionFlags flag) { flags = flags | flag; }
 private:
     TypeSymbol* type;
-    BoundExpressionFlags flags;
 };
 
 class BoundParameter : public BoundExpression
 {
 public:
     BoundParameter(ParameterSymbol* parameterSymbol_);
-    void Load(Emitter& emitter) override;
-    void Store(Emitter& emitter) override;
+    void Load(Emitter& emitter, OperationFlags flags) override;
+    void Store(Emitter& emitter, OperationFlags flags) override;
     void Accept(BoundNodeVisitor& visitor) override;
     bool HasValue() const override { return true; }
     bool IsLvalueExpression() const override { return true; }
@@ -68,8 +47,8 @@ class BoundLocalVariable : public BoundExpression
 {
 public:
     BoundLocalVariable(LocalVariableSymbol* localVariableSymbol_);
-    void Load(Emitter& emitter) override;
-    void Store(Emitter& emitter) override;
+    void Load(Emitter& emitter, OperationFlags flags) override;
+    void Store(Emitter& emitter, OperationFlags flags) override;
     void Accept(BoundNodeVisitor& visitor) override;
     bool HasValue() const override { return true; }
     bool IsLvalueExpression() const override { return true; }
@@ -82,8 +61,8 @@ class BoundMemberVariable : public BoundExpression
 {
 public:
     BoundMemberVariable(MemberVariableSymbol* memberVariableSymbol_);
-    void Load(Emitter& emitter) override;
-    void Store(Emitter& emitter) override;
+    void Load(Emitter& emitter, OperationFlags flags) override;
+    void Store(Emitter& emitter, OperationFlags flags) override;
     void Accept(BoundNodeVisitor& visitor) override;
     bool HasValue() const override { return true; }
     bool IsLvalueExpression() const override { return true; }
@@ -100,8 +79,8 @@ class BoundConstant : public BoundExpression
 {
 public:
     BoundConstant(ConstantSymbol* constantSymbol_);
-    void Load(Emitter& emitter) override;
-    void Store(Emitter& emitter) override;
+    void Load(Emitter& emitter, OperationFlags flags) override;
+    void Store(Emitter& emitter, OperationFlags flags) override;
     void Accept(BoundNodeVisitor& visitor) override;
     bool HasValue() const override { return true; }
     std::string TypeString() const override { return "constant"; }
@@ -113,8 +92,8 @@ class BoundEnumConstant : public BoundExpression
 {
 public:
     BoundEnumConstant(EnumConstantSymbol* enumConstantSymbol_);
-    void Load(Emitter& emitter) override;
-    void Store(Emitter& emitter) override;
+    void Load(Emitter& emitter, OperationFlags flags) override;
+    void Store(Emitter& emitter, OperationFlags flags) override;
     void Accept(BoundNodeVisitor& visitor) override;
     bool HasValue() const override { return true; }
     std::string TypeString() const override { return "enumeration constant"; }
@@ -126,8 +105,8 @@ class BoundLiteral : public BoundExpression
 {
 public:
     BoundLiteral(std::unique_ptr<Value>&& value_, TypeSymbol* type_);
-    void Load(Emitter& emitter) override;
-    void Store(Emitter& emitter) override;
+    void Load(Emitter& emitter, OperationFlags flags) override;
+    void Store(Emitter& emitter, OperationFlags flags) override;
     void Accept(BoundNodeVisitor& visitor) override;
     std::string TypeString() const override { return "literal"; }
     bool HasValue() const override { return true; }
@@ -139,8 +118,8 @@ class BoundTemporary : public BoundExpression
 {
 public:
     BoundTemporary(std::unique_ptr<BoundExpression>&& rvalueExpr_, std::unique_ptr<BoundLocalVariable>&& backingStore_);
-    void Load(Emitter& emitter) override;
-    void Store(Emitter& emitter) override;
+    void Load(Emitter& emitter, OperationFlags flags) override;
+    void Store(Emitter& emitter, OperationFlags flags) override;
     void Accept(BoundNodeVisitor& visitor) override;
     bool HasValue() const override { return true; }
     bool IsLvalueExpression() const override { return true; }
@@ -154,8 +133,8 @@ class BoundSizeOfExpression : public BoundExpression
 {
 public:
     BoundSizeOfExpression(const Span& span_, TypeSymbol* type_, TypeSymbol* pointerType_);
-    void Load(Emitter& emitter) override;
-    void Store(Emitter& emitter) override;
+    void Load(Emitter& emitter, OperationFlags flags) override;
+    void Store(Emitter& emitter, OperationFlags flags) override;
     void Accept(BoundNodeVisitor& visitor) override;
     std::string TypeString() const override { return "sizeof"; }
 private:
@@ -166,8 +145,8 @@ class BoundAddressOfExpression : public BoundExpression
 {
 public:
     BoundAddressOfExpression(std::unique_ptr<BoundExpression>&& subject_, TypeSymbol* type_);
-    void Load(Emitter& emitter) override;
-    void Store(Emitter& emitter) override;
+    void Load(Emitter& emitter, OperationFlags flags) override;
+    void Store(Emitter& emitter, OperationFlags flags) override;
     void Accept(BoundNodeVisitor& visitor) override;
     std::string TypeString() const override { return "address of expression"; }
 private:
@@ -178,10 +157,12 @@ class BoundDereferenceExpression : public BoundExpression
 {
 public:
     BoundDereferenceExpression(std::unique_ptr<BoundExpression>&& subject_, TypeSymbol* type_);
-    void Load(Emitter& emitter) override;
-    void Store(Emitter& emitter) override;
+    void Load(Emitter& emitter, OperationFlags flags) override;
+    void Store(Emitter& emitter, OperationFlags flags) override;
     void Accept(BoundNodeVisitor& visitor) override;
     std::string TypeString() const override { return "deference expression"; }
+    bool IsLvalueExpression() const override { return true; }
+    BoundExpression* Subject() { return subject.get(); }
 private:
     std::unique_ptr<BoundExpression> subject;
 };
@@ -190,11 +171,12 @@ class BoundFunctionCall : public BoundExpression
 {
 public:
     BoundFunctionCall(const Span& span_, FunctionSymbol* functionSymbol_);
-    void Load(Emitter& emitter) override;
-    void Store(Emitter& emitter) override;
+    void Load(Emitter& emitter, OperationFlags flags) override;
+    void Store(Emitter& emitter, OperationFlags flags) override;
     void Accept(BoundNodeVisitor& visitor) override;
     bool HasValue() const override;
     std::string TypeString() const override { return "function call"; }
+    bool IsLvalueExpression() const override;
     const FunctionSymbol* GetFunctionSymbol() const { return functionSymbol; }
     FunctionSymbol* GetFunctionSymbol() { return functionSymbol; }
     void AddArgument(std::unique_ptr<BoundExpression>&& argument);
@@ -208,8 +190,8 @@ class BoundConversion : public BoundExpression
 {
 public:
     BoundConversion(std::unique_ptr<BoundExpression>&& sourceExpr_, FunctionSymbol* conversionFun_);
-    void Load(Emitter& emitter) override;
-    void Store(Emitter& emitter) override;
+    void Load(Emitter& emitter, OperationFlags flags) override;
+    void Store(Emitter& emitter, OperationFlags flags) override;
     void Accept(BoundNodeVisitor& visitor) override;
     bool HasValue() const override { return true; }
     std::string TypeString() const override { return "conversion"; }
@@ -223,8 +205,8 @@ class BoundTypeExpression : public BoundExpression
 public:
     BoundTypeExpression(const Span& span_, TypeSymbol* type_);
     bool IsComplete() const override { return false; }
-    void Load(Emitter& emitter) override;
-    void Store(Emitter& emitter) override;
+    void Load(Emitter& emitter, OperationFlags flags) override;
+    void Store(Emitter& emitter, OperationFlags flags) override;
     void Accept(BoundNodeVisitor& visitor) override;
     std::string TypeString() const override { return "type expression"; }
 };
@@ -234,8 +216,8 @@ class BoundNamespaceExpression : public BoundExpression
 public:
     BoundNamespaceExpression(const Span& span_, NamespaceSymbol* ns_);
     bool IsComplete() const override { return false; }
-    void Load(Emitter& emitter) override;
-    void Store(Emitter& emitter) override;
+    void Load(Emitter& emitter, OperationFlags flags) override;
+    void Store(Emitter& emitter, OperationFlags flags) override;
     void Accept(BoundNodeVisitor& visitor) override;
     std::string TypeString() const override { return "namespace expression"; }
 private:
@@ -248,8 +230,8 @@ class BoundFunctionGroupExpression : public BoundExpression
 public:
     BoundFunctionGroupExpression(const Span& span_, FunctionGroupSymbol* functionGroupSymbol_);
     bool IsComplete() const override { return false; }
-    void Load(Emitter& emitter) override;
-    void Store(Emitter& emitter) override;
+    void Load(Emitter& emitter, OperationFlags flags) override;
+    void Store(Emitter& emitter, OperationFlags flags) override;
     void Accept(BoundNodeVisitor& visitor) override;
     std::string TypeString() const override { return "function group expression"; }
     const FunctionGroupSymbol* FunctionGroup() const { return functionGroupSymbol; }

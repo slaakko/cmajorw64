@@ -41,7 +41,7 @@ void PointerDefaultCtor::GenerateCall(Emitter& emitter, std::vector<GenObject*>&
         nullValue = llvm::Constant::getNullValue(type->IrType(emitter));
     }
     emitter.Stack().Push(nullValue);
-    genObjects[0]->Store(emitter);
+    genObjects[0]->Store(emitter, OperationFlags::none);
 }
 
 class PointerDefaultConstructorOperation : public Operation
@@ -101,8 +101,8 @@ PointerCopyCtor::PointerCopyCtor(TypeSymbol* type_) : FunctionSymbol(Span(), U"@
 void PointerCopyCtor::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects)
 {
     Assert(genObjects.size() == 2, "copy constructor needs two objects");
-    genObjects[1]->Load(emitter);
-    genObjects[0]->Store(emitter);
+    genObjects[1]->Load(emitter, OperationFlags::none);
+    genObjects[0]->Store(emitter, OperationFlags::none);
 }
 
 class PointerCopyConstructorOperation : public Operation
@@ -163,8 +163,8 @@ PointerCopyAssignment::PointerCopyAssignment(TypeSymbol* type_, TypeSymbol* void
 void PointerCopyAssignment::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects)
 {
     Assert(genObjects.size() == 2, "copy assignment needs two objects");
-    genObjects[1]->Load(emitter);
-    genObjects[0]->Store(emitter);
+    genObjects[1]->Load(emitter, OperationFlags::none);
+    genObjects[0]->Store(emitter, OperationFlags::none);
 }
 
 class PointerCopyAssignmentOperation : public Operation
@@ -222,7 +222,7 @@ PointerReturn::PointerReturn(TypeSymbol* type_) : FunctionSymbol(Span(), U"@retu
 void PointerReturn::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects)
 {
     Assert(genObjects.size() == 1, "return needs one object");
-    genObjects[0]->Load(emitter);
+    genObjects[0]->Load(emitter, OperationFlags::none);
 }
 
 class PointerReturnOperation : public Operation
@@ -281,9 +281,9 @@ PointerPlusOffset::PointerPlusOffset(TypeSymbol* pointerType_, TypeSymbol* longT
 void PointerPlusOffset::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects)
 {
     Assert(genObjects.size() == 2, "operator+ needs two objects");
-    genObjects[0]->Load(emitter);
+    genObjects[0]->Load(emitter, OperationFlags::none);
     llvm::Value* left = emitter.Stack().Pop();
-    genObjects[1]->Load(emitter);
+    genObjects[1]->Load(emitter, OperationFlags::none);
     llvm::Value* right = emitter.Stack().Pop();
     emitter.Stack().Push(emitter.Builder().CreateGEP(left, right));
 }
@@ -344,9 +344,9 @@ OffsetPlusPointer::OffsetPlusPointer(TypeSymbol* longType_, TypeSymbol* pointerT
 void OffsetPlusPointer::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects)
 {
     Assert(genObjects.size() == 2, "operator+ needs two objects");
-    genObjects[0]->Load(emitter);
+    genObjects[0]->Load(emitter, OperationFlags::none);
     llvm::Value* left = emitter.Stack().Pop();
-    genObjects[1]->Load(emitter);
+    genObjects[1]->Load(emitter, OperationFlags::none);
     llvm::Value* right = emitter.Stack().Pop();
     emitter.Stack().Push(emitter.Builder().CreateGEP(right, left));
 }
@@ -408,9 +408,9 @@ PointerMinusOffset::PointerMinusOffset(TypeSymbol* pointerType_, TypeSymbol* lon
 void PointerMinusOffset::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects)
 {
     Assert(genObjects.size() == 2, "operator- needs two objects");
-    genObjects[0]->Load(emitter);
+    genObjects[0]->Load(emitter, OperationFlags::none);
     llvm::Value* left = emitter.Stack().Pop();
-    genObjects[1]->Load(emitter);
+    genObjects[1]->Load(emitter, OperationFlags::none);
     llvm::Value* right = emitter.Stack().Pop();
     llvm::Value* offset = emitter.Builder().CreateNeg(right);
     emitter.Stack().Push(emitter.Builder().CreateGEP(left, offset));
@@ -472,9 +472,9 @@ PointerMinusPointer::PointerMinusPointer(TypeSymbol* pointerType_, TypeSymbol* l
 void PointerMinusPointer::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects)
 {
     Assert(genObjects.size() == 2, "operator- needs two objects");
-    genObjects[0]->Load(emitter);
+    genObjects[0]->Load(emitter, OperationFlags::none);
     llvm::Value* left = emitter.Stack().Pop();
-    genObjects[1]->Load(emitter);
+    genObjects[1]->Load(emitter, OperationFlags::none);
     llvm::Value* right = emitter.Stack().Pop();
     emitter.Stack().Push(emitter.Builder().CreatePtrDiff(left, right));
 }
@@ -537,9 +537,9 @@ PointerEqual::PointerEqual(TypeSymbol* pointerType_, TypeSymbol* boolType_) : Fu
 void PointerEqual::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects)
 {
     Assert(genObjects.size() == 2, "operator== needs two objects");
-    genObjects[0]->Load(emitter);
+    genObjects[0]->Load(emitter, OperationFlags::none);
     llvm::Value* left = emitter.Stack().Pop();
-    genObjects[1]->Load(emitter);
+    genObjects[1]->Load(emitter, OperationFlags::none);
     llvm::Value* right = emitter.Stack().Pop();
     emitter.Stack().Push(emitter.Builder().CreateICmpEQ(left, right));
 }
@@ -602,9 +602,9 @@ PointerLess::PointerLess(TypeSymbol* pointerType_, TypeSymbol* boolType_) : Func
 void PointerLess::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects)
 {
     Assert(genObjects.size() == 2, "operator< needs two objects");
-    genObjects[0]->Load(emitter);
+    genObjects[0]->Load(emitter, OperationFlags::none);
     llvm::Value* left = emitter.Stack().Pop();
-    genObjects[1]->Load(emitter);
+    genObjects[1]->Load(emitter, OperationFlags::none);
     llvm::Value* right = emitter.Stack().Pop();
     emitter.Stack().Push(emitter.Builder().CreateICmpULT(left, right));
 }
@@ -668,8 +668,8 @@ LvalueRefefenceCopyCtor::LvalueRefefenceCopyCtor(TypeSymbol* type_) : FunctionSy
 void LvalueRefefenceCopyCtor::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects)
 {
     Assert(genObjects.size() == 2, "reference constructor needs two objects");
-    genObjects[1]->Load(emitter);
-    genObjects[0]->Store(emitter);
+    genObjects[1]->Load(emitter, OperationFlags::none);
+    genObjects[0]->Store(emitter, OperationFlags::none);
 }
 
 class LvalueReferenceCopyConstructorOperation : public Operation
@@ -730,8 +730,8 @@ LvalueReferenceCopyAssignment::LvalueReferenceCopyAssignment(TypeSymbol* type_, 
 void LvalueReferenceCopyAssignment::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects)
 {
     Assert(genObjects.size() == 2, "copy assignment needs two objects");
-    genObjects[1]->Load(emitter);
-    genObjects[0]->Store(emitter);
+    genObjects[1]->Load(emitter, OperationFlags::none);
+    genObjects[0]->Store(emitter, OperationFlags::none);
 }
 
 class LvalueReferenceCopyAssignmentOperation : public Operation
@@ -789,7 +789,7 @@ LvalueReferenceReturn::LvalueReferenceReturn(TypeSymbol* type_) : FunctionSymbol
 void LvalueReferenceReturn::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects)
 {
     Assert(genObjects.size() == 1, "return needs one object");
-    genObjects[0]->Load(emitter);
+    genObjects[0]->Load(emitter, OperationFlags::none);
 }
 
 class LvalueReferenceReturnOperation : public Operation

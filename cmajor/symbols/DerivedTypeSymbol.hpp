@@ -50,6 +50,9 @@ TypeDerivationRec MakePlainDerivationRec(const TypeDerivationRec& typeDerivation
 TypeDerivationRec RemoveReferenceDerivation(const TypeDerivationRec& typeDerivationRec);
 TypeDerivationRec RemovePointerDerivation(const TypeDerivationRec& typeDerivationRec);
 TypeDerivationRec RemoveConstDerivation(const TypeDerivationRec& typeDerivationRec);
+TypeDerivationRec AddConstDerivation(const TypeDerivationRec& typeDerivationRec);
+TypeDerivationRec AddLvalueReferenceDerivation(const TypeDerivationRec& typeDerivationRec);
+TypeDerivationRec AddPointerDerivation(const TypeDerivationRec& typeDerivationRec);
 
 class DerivedTypeSymbol : public TypeSymbol
 {
@@ -66,6 +69,9 @@ public:
     TypeSymbol* RemoveReference(const Span& span) override;
     TypeSymbol* RemovePointer(const Span& span) override;
     TypeSymbol* RemoveConst(const Span& span) override;
+    TypeSymbol* AddConst(const Span& span);
+    TypeSymbol* AddLvalueReference(const Span& span);
+    TypeSymbol* AddPointer(const Span& span);
     llvm::Type* IrType(Emitter& emitter) override;
     bool IsConstType() const override;
     bool IsReferenceType() const override;

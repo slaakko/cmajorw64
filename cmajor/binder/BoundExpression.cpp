@@ -13,40 +13,55 @@
 
 namespace cmajor { namespace binder {
 
-BoundExpression::BoundExpression(const Span& span_, BoundNodeType boundNodeType_, TypeSymbol* type_) : BoundNode(span_, boundNodeType_), type(type_), flags(BoundExpressionFlags::none)
+BoundExpression::BoundExpression(const Span& span_, BoundNodeType boundNodeType_, TypeSymbol* type_) : BoundNode(span_, boundNodeType_), type(type_)
 {
 }
 
-BoundParameter::BoundParameter(ParameterSymbol* parameterSymbol_) : BoundExpression(parameterSymbol_->GetSpan(), BoundNodeType::boundParameter, parameterSymbol_->GetType()), parameterSymbol(parameterSymbol_)
+BoundParameter::BoundParameter(ParameterSymbol* parameterSymbol_) : 
+    BoundExpression(parameterSymbol_->GetSpan(), BoundNodeType::boundParameter, parameterSymbol_->GetType()), parameterSymbol(parameterSymbol_)
 {
 }
 
-void BoundParameter::Load(Emitter& emitter)
+void BoundParameter::Load(Emitter& emitter, OperationFlags flags)
 {
-    if (GetFlag(BoundExpressionFlags::addr))
+    switch (flags)
     {
-        throw Exception("cannot take address of a parameter", GetSpan());
-    }
-    else if (GetFlag((BoundExpressionFlags::deref)))
-    {
-        emitter.Stack().Push(emitter.Builder().CreateLoad(emitter.Builder().CreateLoad(parameterSymbol->IrObject())));
-    }
-    else
-    {
-        emitter.Stack().Push(emitter.Builder().CreateLoad(parameterSymbol->IrObject()));
+        case OperationFlags::addr: 
+        {
+            throw Exception("cannot take address of a parameter", GetSpan());
+        }
+        case OperationFlags::deref:
+        {
+            emitter.Stack().Push(emitter.Builder().CreateLoad(emitter.Builder().CreateLoad(parameterSymbol->IrObject())));
+            break;
+        }
+        default:
+        {
+            emitter.Stack().Push(emitter.Builder().CreateLoad(parameterSymbol->IrObject()));
+            break;
+        }
     }
 }
 
-void BoundParameter::Store(Emitter& emitter)
+void BoundParameter::Store(Emitter& emitter, OperationFlags flags)
 {
     llvm::Value* value = emitter.Stack().Pop();
-    if (GetFlag((BoundExpressionFlags::load)))
+    switch (flags)
     {
-        emitter.Builder().CreateStore(value, emitter.Builder().CreateLoad(parameterSymbol->IrObject()));
-    }
-    else
-    {
-        emitter.Builder().CreateStore(value, parameterSymbol->IrObject());
+        case OperationFlags::addr:
+        {
+            throw Exception("cannot take address of a parameter", GetSpan());
+        }
+        case OperationFlags::deref:
+        {
+            emitter.Builder().CreateStore(value, emitter.Builder().CreateLoad(parameterSymbol->IrObject()));
+            break;
+        }
+        default:
+        {
+            emitter.Builder().CreateStore(value, parameterSymbol->IrObject());
+            break;
+        }
     }
 }
 
@@ -60,32 +75,47 @@ BoundLocalVariable::BoundLocalVariable(LocalVariableSymbol* localVariableSymbol_
 {
 }
 
-void BoundLocalVariable::Load(Emitter& emitter)
+void BoundLocalVariable::Load(Emitter& emitter, OperationFlags flags)
 {
-    if (GetFlag(BoundExpressionFlags::addr))
+    switch (flags)
     {
-        emitter.Stack().Push(localVariableSymbol->IrObject());
-    }
-    else if (GetFlag((BoundExpressionFlags::deref)))
-    {
-        emitter.Stack().Push(emitter.Builder().CreateLoad(emitter.Builder().CreateLoad(localVariableSymbol->IrObject())));
-    }
-    else
-    {
-        emitter.Stack().Push(emitter.Builder().CreateLoad(localVariableSymbol->IrObject()));
+        case OperationFlags::addr:
+        {
+            emitter.Stack().Push(localVariableSymbol->IrObject());
+            break;
+        }
+        case OperationFlags::deref:
+        {
+            emitter.Stack().Push(emitter.Builder().CreateLoad(emitter.Builder().CreateLoad(localVariableSymbol->IrObject())));
+            break;
+        }
+        default:
+        {
+            emitter.Stack().Push(emitter.Builder().CreateLoad(localVariableSymbol->IrObject()));
+            break;
+        }
     }
 }
 
-void BoundLocalVariable::Store(Emitter& emitter)
+void BoundLocalVariable::Store(Emitter& emitter, OperationFlags flags)
 {
     llvm::Value* value = emitter.Stack().Pop();
-    if (GetFlag((BoundExpressionFlags::load)))
+    switch (flags)
     {
-        emitter.Builder().CreateStore(value, emitter.Builder().CreateLoad(localVariableSymbol->IrObject()));
-    }
-    else
-    {
-        emitter.Builder().CreateStore(value, localVariableSymbol->IrObject());
+        case OperationFlags::addr:
+        {
+            throw Exception("cannot store to address of a local variable", GetSpan());
+        }
+        case OperationFlags::deref:
+        {
+            emitter.Builder().CreateStore(value, emitter.Builder().CreateLoad(localVariableSymbol->IrObject()));
+            break;
+        }
+        default:
+        {
+            emitter.Builder().CreateStore(value, localVariableSymbol->IrObject());
+            break;
+        }
     }
 }
 
@@ -99,12 +129,12 @@ BoundMemberVariable::BoundMemberVariable(MemberVariableSymbol* memberVariableSym
 {
 }
 
-void BoundMemberVariable::Load(Emitter& emitter)
+void BoundMemberVariable::Load(Emitter& emitter, OperationFlags flags)
 {
     // todo
 }
 
-void BoundMemberVariable::Store(Emitter& emitter)
+void BoundMemberVariable::Store(Emitter& emitter, OperationFlags flags)
 {
     // todo
 }
@@ -123,25 +153,29 @@ BoundConstant::BoundConstant(ConstantSymbol* constantSymbol_) : BoundExpression(
 {
 }
 
-void BoundConstant::Load(Emitter& emitter)
+void BoundConstant::Load(Emitter& emitter, OperationFlags flags)
 {
-    if (GetFlag(BoundExpressionFlags::addr))
+    switch (flags)
     {
-        throw Exception("cannot take address of a constant", GetSpan());
-    }
-    else if (GetFlag(BoundExpressionFlags::deref))
-    {
-        throw Exception("cannot dereference a constant", GetSpan());
-    }
-    else
-    {
-        emitter.Stack().Push(constantSymbol->GetValue()->IrValue(emitter));
+        case OperationFlags::addr:
+        {
+            throw Exception("cannot take address of a constant", GetSpan());
+        }
+        case OperationFlags::deref:
+        {
+            throw Exception("cannot dereference a constant", GetSpan());
+        }
+        default:
+        {
+            emitter.Stack().Push(constantSymbol->GetValue()->IrValue(emitter));
+            break;
+        }
     }
 }
 
-void BoundConstant::Store(Emitter& emitter)
+void BoundConstant::Store(Emitter& emitter, OperationFlags flags)
 {
-    throw Exception("cannot store to constant", GetSpan());
+    throw Exception("cannot store to a constant", GetSpan());
 }
 
 void BoundConstant::Accept(BoundNodeVisitor& visitor)
@@ -154,25 +188,29 @@ BoundEnumConstant::BoundEnumConstant(EnumConstantSymbol* enumConstantSymbol_) : 
 {
 }
 
-void BoundEnumConstant::Load(Emitter& emitter)
+void BoundEnumConstant::Load(Emitter& emitter, OperationFlags flags)
 {
-    if (GetFlag(BoundExpressionFlags::addr))
+    switch (flags)
     {
-        throw Exception("cannot take address of an enumeration constant", GetSpan());
-    }
-    else if (GetFlag(BoundExpressionFlags::deref))
-    {
-        throw Exception("cannot dereference an enumeration constant", GetSpan());
-    }
-    else
-    {
-        emitter.Stack().Push(enumConstantSymbol->GetValue()->IrValue(emitter));
+        case OperationFlags::addr:
+        {
+            throw Exception("cannot take address of an enumeration constant", GetSpan());
+        }
+        case OperationFlags::deref:
+        {
+            throw Exception("cannot dereference an enumeration constant", GetSpan());
+        }
+        default:
+        {
+            emitter.Stack().Push(enumConstantSymbol->GetValue()->IrValue(emitter));
+            break;
+        }
     }
 }
 
-void BoundEnumConstant::Store(Emitter& emitter)
+void BoundEnumConstant::Store(Emitter& emitter, OperationFlags flags)
 {
-    throw Exception("cannot store to enumeration constant", GetSpan());
+    throw Exception("cannot store to an enumeration constant", GetSpan());
 }
 
 void BoundEnumConstant::Accept(BoundNodeVisitor& visitor)
@@ -184,25 +222,29 @@ BoundLiteral::BoundLiteral(std::unique_ptr<Value>&& value_, TypeSymbol* type_) :
 {
 }
 
-void BoundLiteral::Load(Emitter& emitter)
+void BoundLiteral::Load(Emitter& emitter, OperationFlags flags)
 {
-    if (GetFlag(BoundExpressionFlags::addr))
+    switch (flags)
     {
-        throw Exception("cannot take address of a literal", GetSpan());
-    }
-    else if (GetFlag(BoundExpressionFlags::deref))
-    {
-        throw Exception("cannot dereference a literal", GetSpan());
-    }
-    else
-    {
-        emitter.Stack().Push(value->IrValue(emitter));
+        case OperationFlags::addr:
+        {
+            throw Exception("cannot take address of a literal", GetSpan());
+        }
+        case OperationFlags::deref:
+        {
+            throw Exception("cannot dereference a literal", GetSpan());
+        }
+        default:
+        {
+            emitter.Stack().Push(value->IrValue(emitter));
+            break;
+        }
     }
 }
 
-void BoundLiteral::Store(Emitter& emitter)
+void BoundLiteral::Store(Emitter& emitter, OperationFlags flags)
 {
-    throw Exception("cannot store to literal", GetSpan());
+    throw Exception("cannot store to a literal", GetSpan());
 }
 
 void BoundLiteral::Accept(BoundNodeVisitor& visitor)
@@ -215,16 +257,33 @@ BoundTemporary::BoundTemporary(std::unique_ptr<BoundExpression>&& rvalueExpr_, s
 {
 }
 
-void BoundTemporary::Load(Emitter& emitter)
+void BoundTemporary::Load(Emitter& emitter, OperationFlags flags)
 {
-    rvalueExpr->Load(emitter);
-    backingStore->Store(emitter);
-    backingStore->Load(emitter);
+    rvalueExpr->Load(emitter, OperationFlags::none);
+    backingStore->Store(emitter, OperationFlags::none);
+    switch (flags)
+    {
+        case OperationFlags::addr:
+        {
+            backingStore->Load(emitter, OperationFlags::addr);
+            break;
+        }
+        case OperationFlags::deref:
+        {
+            backingStore->Load(emitter, OperationFlags::deref);
+            break;
+        }
+        default:
+        {
+            backingStore->Load(emitter, OperationFlags::none);
+            break;
+        }
+    }
 }
 
-void BoundTemporary::Store(Emitter& emitter)
+void BoundTemporary::Store(Emitter& emitter, OperationFlags flags)
 {
-    throw Exception("cannot store to temporary", GetSpan());
+    throw Exception("cannot store to a temporary", GetSpan());
 }
 
 void BoundTemporary::Accept(BoundNodeVisitor& visitor)
@@ -237,17 +296,32 @@ BoundSizeOfExpression::BoundSizeOfExpression(const Span& span_, TypeSymbol* type
 {
 }
 
-void BoundSizeOfExpression::Load(Emitter& emitter)
+void BoundSizeOfExpression::Load(Emitter& emitter, OperationFlags flags)
 {
-    llvm::Value* nullPtr = llvm::Constant::getNullValue(pointerType->IrType(emitter));
-    llvm::Value* gep = emitter.Builder().CreateGEP(nullPtr, emitter.Builder().getInt64(1));
-    llvm::Value* size = emitter.Builder().CreatePtrToInt(gep, emitter.Builder().getInt64Ty());
-    emitter.Stack().Push(size);
+    switch (flags)
+    {
+        case OperationFlags::addr:
+        {
+            throw Exception("cannot take address of a sizeof expression", GetSpan());
+        }
+        case OperationFlags::deref:
+        {
+            throw Exception("cannot dereference a sizeof expression", GetSpan());
+        }
+        default:
+        {
+            llvm::Value* nullPtr = llvm::Constant::getNullValue(pointerType->IrType(emitter));
+            llvm::Value* gep = emitter.Builder().CreateGEP(nullPtr, emitter.Builder().getInt64(1));
+            llvm::Value* size = emitter.Builder().CreatePtrToInt(gep, emitter.Builder().getInt64Ty());
+            emitter.Stack().Push(size);
+            break;
+        }
+    }
 }
 
-void BoundSizeOfExpression::Store(Emitter& emitter)
+void BoundSizeOfExpression::Store(Emitter& emitter, OperationFlags flags)
 {
-    throw Exception("cannot store to sizeof", GetSpan());
+    throw Exception("cannot store to a sizeof expression", GetSpan());
 }
 
 void BoundSizeOfExpression::Accept(BoundNodeVisitor& visitor)
@@ -260,12 +334,20 @@ BoundAddressOfExpression::BoundAddressOfExpression(std::unique_ptr<BoundExpressi
 {
 }
 
-void BoundAddressOfExpression::Load(Emitter& emitter)
+void BoundAddressOfExpression::Load(Emitter& emitter, OperationFlags flags)
 {
-    subject->Load(emitter);
+    if (subject->GetBoundNodeType() != BoundNodeType::boundDereferenceExpression)
+    {
+        subject->Load(emitter, OperationFlags::addr);
+    }
+    else
+    {
+        BoundDereferenceExpression* derefExpr = static_cast<BoundDereferenceExpression*>(subject.get());
+        derefExpr->Subject()->Load(emitter, OperationFlags::none);
+    }
 }
 
-void BoundAddressOfExpression::Store(Emitter& emitter)
+void BoundAddressOfExpression::Store(Emitter& emitter, OperationFlags flags)
 {
     throw Exception("cannot store to address of expression", GetSpan());
 }
@@ -280,14 +362,14 @@ BoundDereferenceExpression::BoundDereferenceExpression(std::unique_ptr<BoundExpr
 {
 }
 
-void BoundDereferenceExpression::Load(Emitter& emitter)
+void BoundDereferenceExpression::Load(Emitter& emitter, OperationFlags flags)
 {
-    subject->Load(emitter);
+    subject->Load(emitter, OperationFlags::deref);
 }
 
-void BoundDereferenceExpression::Store(Emitter& emitter)
+void BoundDereferenceExpression::Store(Emitter& emitter, OperationFlags flags)
 {
-    subject->Store(emitter);
+    subject->Store(emitter, OperationFlags::deref);
 }
 
 void BoundDereferenceExpression::Accept(BoundNodeVisitor& visitor)
@@ -309,19 +391,73 @@ void BoundFunctionCall::SetArguments(std::vector<std::unique_ptr<BoundExpression
     arguments = std::move(arguments_);
 }
 
-void BoundFunctionCall::Load(Emitter& emitter)
+void BoundFunctionCall::Load(Emitter& emitter, OperationFlags flags)
 {
-    std::vector<GenObject*> genObjects;
-    for (const std::unique_ptr<BoundExpression>& argument : arguments)
+    switch (flags)
     {
-        genObjects.push_back(argument.get());
+        case OperationFlags::addr:
+        {
+            throw Exception("cannot take address of a function call", GetSpan());
+        }
+        case OperationFlags::deref:
+        {
+            std::vector<GenObject*> genObjects;
+            for (const std::unique_ptr<BoundExpression>& argument : arguments)
+            {
+                genObjects.push_back(argument.get());
+            }
+            functionSymbol->GenerateCall(emitter, genObjects);
+            emitter.Stack().Push(emitter.Builder().CreateLoad(emitter.Stack().Pop()));
+            break;
+        }
+        default:
+        {
+            std::vector<GenObject*> genObjects;
+            for (const std::unique_ptr<BoundExpression>& argument : arguments)
+            {
+                genObjects.push_back(argument.get());
+            }
+            functionSymbol->GenerateCall(emitter, genObjects);
+            break;
+        }
     }
-    functionSymbol->GenerateCall(emitter, genObjects);
 }
 
-void BoundFunctionCall::Store(Emitter& emitter)
+void BoundFunctionCall::Store(Emitter& emitter, OperationFlags flags)
 {
-    throw Exception("cannot store to function call", GetSpan(), functionSymbol->GetSpan());
+    switch (flags)
+    {
+        case OperationFlags::addr:
+        {
+            throw Exception("cannot take address of a function call", GetSpan());
+        }
+        case OperationFlags::deref:
+        {
+            llvm::Value* value = emitter.Stack().Pop();
+            std::vector<GenObject*> genObjects;
+            for (const std::unique_ptr<BoundExpression>& argument : arguments)
+            {
+                genObjects.push_back(argument.get());
+            }
+            functionSymbol->GenerateCall(emitter, genObjects);
+            llvm::Value* ptr = emitter.Stack().Pop();
+            emitter.Builder().CreateStore(value, ptr);
+            break;
+        }
+        default:
+        {
+            llvm::Value* value = emitter.Stack().Pop();
+            std::vector<GenObject*> genObjects;
+            for (const std::unique_ptr<BoundExpression>& argument : arguments)
+            {
+                genObjects.push_back(argument.get());
+            }
+            functionSymbol->GenerateCall(emitter, genObjects);
+            llvm::Value* ptr = emitter.Stack().Pop();
+            emitter.Builder().CreateStore(emitter.Builder().CreateLoad(value), ptr);
+            break;
+        }
+    }
 }
 
 void BoundFunctionCall::Accept(BoundNodeVisitor& visitor)
@@ -334,21 +470,31 @@ bool BoundFunctionCall::HasValue() const
     return functionSymbol->ReturnType() && functionSymbol->ReturnType()->GetSymbolType() != SymbolType::voidTypeSymbol; 
 }
 
+bool BoundFunctionCall::IsLvalueExpression() const
+{
+    TypeSymbol* returnType = functionSymbol->ReturnType();
+    if (returnType && returnType->GetSymbolType() != SymbolType::voidTypeSymbol)
+    {
+        return !returnType->IsConstType() && returnType->IsLvalueReferenceType();
+    }
+    return false;
+}
+
 BoundConversion::BoundConversion(std::unique_ptr<BoundExpression>&& sourceExpr_, FunctionSymbol* conversionFun_) :
     BoundExpression(sourceExpr_->GetSpan(), BoundNodeType::boundConversion, conversionFun_->ConversionTargetType()), sourceExpr(std::move(sourceExpr_)), conversionFun(conversionFun_)
 {
 }
 
-void BoundConversion::Load(Emitter& emitter)
+void BoundConversion::Load(Emitter& emitter, OperationFlags flags)
 {
-    sourceExpr->Load(emitter);
+    sourceExpr->Load(emitter, flags);
     std::vector<GenObject*> emptyObjects;
     conversionFun->GenerateCall(emitter, emptyObjects);
 }
 
-void BoundConversion::Store(Emitter& emitter)
+void BoundConversion::Store(Emitter& emitter, OperationFlags flags)
 {
-    throw Exception("cannot store to conversion", GetSpan());
+    throw Exception("cannot store to a conversion", GetSpan());
 }
 
 void BoundConversion::Accept(BoundNodeVisitor& visitor)
@@ -360,19 +506,19 @@ BoundTypeExpression::BoundTypeExpression(const Span& span_, TypeSymbol* type_) :
 {
 }
 
-void BoundTypeExpression::Load(Emitter& emitter)
+void BoundTypeExpression::Load(Emitter& emitter, OperationFlags flags)
 {
-    throw Exception("cannot load from type", GetSpan());
+    throw Exception("cannot load from a type", GetSpan());
 }
 
-void BoundTypeExpression::Store(Emitter& emitter)
+void BoundTypeExpression::Store(Emitter& emitter, OperationFlags flags)
 {
-    throw Exception("cannot store to type", GetSpan());
+    throw Exception("cannot store to a type", GetSpan());
 }
 
 void BoundTypeExpression::Accept(BoundNodeVisitor& visitor)
 {
-    throw Exception("cannot visit type", GetSpan());
+    throw Exception("cannot visit a type", GetSpan());
 }
 
 BoundNamespaceExpression::BoundNamespaceExpression(const Span& span_, NamespaceSymbol* ns_) : BoundExpression(span_, BoundNodeType::boundNamespaceExpression, new NamespaceTypeSymbol(ns_)), ns(ns_)
@@ -380,19 +526,19 @@ BoundNamespaceExpression::BoundNamespaceExpression(const Span& span_, NamespaceS
     nsType.reset(GetType());
 }
 
-void BoundNamespaceExpression::Load(Emitter& emitter)
+void BoundNamespaceExpression::Load(Emitter& emitter, OperationFlags flags)
 {
-    throw Exception("cannot load from namespace", GetSpan());
+    throw Exception("cannot load from a namespace", GetSpan());
 }
 
-void BoundNamespaceExpression::Store(Emitter& emitter)
+void BoundNamespaceExpression::Store(Emitter& emitter, OperationFlags flags)
 {
-    throw Exception("cannot store to namespace", GetSpan());
+    throw Exception("cannot store to a namespace", GetSpan());
 }
 
 void BoundNamespaceExpression::Accept(BoundNodeVisitor& visitor)
 {
-    throw Exception("cannot visit namespace", GetSpan());
+    throw Exception("cannot visit a namespace", GetSpan());
 }
 
 BoundFunctionGroupExpression::BoundFunctionGroupExpression(const Span& span_, FunctionGroupSymbol* functionGroupSymbol_) : 
@@ -401,19 +547,19 @@ BoundFunctionGroupExpression::BoundFunctionGroupExpression(const Span& span_, Fu
     functionGroupType.reset(GetType());
 }
 
-void BoundFunctionGroupExpression::Load(Emitter& emitter)
+void BoundFunctionGroupExpression::Load(Emitter& emitter, OperationFlags flags)
 {
     // Fun2Dlg conversion does not need source value, so this implementation is intentionally left empty.
 }
 
-void BoundFunctionGroupExpression::Store(Emitter& emitter)
+void BoundFunctionGroupExpression::Store(Emitter& emitter, OperationFlags flags)
 {
-    throw Exception("cannot store to function group", GetSpan());
+    throw Exception("cannot store to a function group", GetSpan());
 }
 
 void BoundFunctionGroupExpression::Accept(BoundNodeVisitor& visitor)
 {
-    throw Exception("cannot visit function group", GetSpan());
+    throw Exception("cannot visit a function group", GetSpan());
 }
 
 void BoundFunctionGroupExpression::SetClassObject(std::unique_ptr<BoundExpression>&& classObject_)

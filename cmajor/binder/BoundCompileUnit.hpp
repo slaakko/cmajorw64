@@ -21,8 +21,8 @@ class BoundCompileUnit : public BoundNode
 {
 public:
     BoundCompileUnit(Module& module_, CompileUnitNode* compileUnitNode_);
-    void Load(Emitter& emitter) override;
-    void Store(Emitter& emitter) override;
+    void Load(Emitter& emitter, OperationFlags flags) override;
+    void Store(Emitter& emitter, OperationFlags flags) override;
     void Accept(BoundNodeVisitor& visitor) override;
     Module& GetModule() { return module; }
     SymbolTable& GetSymbolTable() { return symbolTable; }

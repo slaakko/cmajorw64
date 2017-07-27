@@ -348,11 +348,10 @@ std::u32string FunctionSymbol::FullNameWithSpecifiers() const
 void FunctionSymbol::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects)
 {
     int na = genObjects.size();
-    int start = 0; // todo
-    for (int i = start; i < na; ++i)
+    for (int i = 0; i < na; ++i)
     {
         GenObject* genObject = genObjects[i];
-        genObject->Load(emitter);
+        genObject->Load(emitter, OperationFlags::none);
     }
     llvm::FunctionType* functionType = IrType(emitter);
     llvm::Function* callee = llvm::cast<llvm::Function>(emitter.Module()->getOrInsertFunction(ToUtf8(MangledName()), functionType));

@@ -123,6 +123,7 @@ private:
     void BindUnaryOp(UnaryNode& unaryNode, const std::u32string& groupName);
     void BindBinaryOp(BinaryNode& binaryNode, const std::u32string& groupName);
     void BindBinaryOp(BoundExpression* left, BoundExpression* right, Node& node, const std::u32string& groupName);
+    void BindDerefExpr(Node& node);
     void BindSymbol(Symbol* symbol);
 };
 
@@ -428,20 +429,20 @@ void ExpressionBinder::Visit(UCharLiteralNode& ucharLiteralNode)
 
 void ExpressionBinder::Visit(StringLiteralNode& stringLiteralNode)
 {
-    expression.reset(new BoundLiteral(std::unique_ptr<Value>(new StringValue(stringLiteralNode.GetSpan(), stringLiteralNode.Value())), 
-        symbolTable.MakePointerType(symbolTable.GetTypeByName(U"char"), stringLiteralNode.GetSpan())));
+    expression.reset(new BoundLiteral(std::unique_ptr<Value>(new StringValue(stringLiteralNode.GetSpan(), stringLiteralNode.Value())),
+        symbolTable.GetTypeByName(U"char")->AddConst(stringLiteralNode.GetSpan())->AddPointer(stringLiteralNode.GetSpan())));
 }
 
 void ExpressionBinder::Visit(WStringLiteralNode& wstringLiteralNode)
 {
     expression.reset(new BoundLiteral(std::unique_ptr<Value>(new StringValue(wstringLiteralNode.GetSpan(), ToUtf8(wstringLiteralNode.Value()))),
-        symbolTable.MakePointerType(symbolTable.GetTypeByName(U"char"), wstringLiteralNode.GetSpan())));
+        symbolTable.GetTypeByName(U"char")->AddConst(wstringLiteralNode.GetSpan())->AddPointer(wstringLiteralNode.GetSpan())));
 }
 
 void ExpressionBinder::Visit(UStringLiteralNode& ustringLiteralNode)
 {
     expression.reset(new BoundLiteral(std::unique_ptr<Value>(new StringValue(ustringLiteralNode.GetSpan(), ToUtf8(ustringLiteralNode.Value()))),
-        symbolTable.MakePointerType(symbolTable.GetTypeByName(U"char"), ustringLiteralNode.GetSpan())));
+        symbolTable.GetTypeByName(U"char")->AddConst(ustringLiteralNode.GetSpan())->AddPointer(ustringLiteralNode.GetSpan())));
 }
 
 void ExpressionBinder::Visit(NullLiteralNode& nullLiteralNode) 
@@ -667,61 +668,44 @@ void ExpressionBinder::Visit(PrefixDecrementNode& prefixDecrementNode)
     }
 }
 
+void ExpressionBinder::BindDerefExpr(Node& node)
+{
+    if (expression->GetType()->IsPointerType())
+    {
+        TypeSymbol* type = expression->GetType()->RemovePointer(node.GetSpan());
+        expression.reset(new BoundDereferenceExpression(std::unique_ptr<BoundExpression>(expression.release()), type));
+    }
+    else 
+    {
+        TypeSymbol* plainSubjectType = expression->GetType()->PlainType(node.GetSpan());
+        if (plainSubjectType->IsClassTypeSymbol())
+        {
+            BindUnaryOp(expression.release(), node, U"operator*");
+        }
+        else
+        {
+            throw Exception("dereference needs pointer or class type argument", node.GetSpan());
+        }
+    }
+}
+
 void ExpressionBinder::Visit(DerefNode& derefNode) 
 {
     derefNode.Subject()->Accept(*this);
-    if (expression->GetType()->IsPointerType())
-    {
-        switch (expression->GetBoundNodeType())
-        {
-            case BoundNodeType::boundLocalVariable:
-            case BoundNodeType::boundMemberVariable:
-            {
-                TypeSymbol* type = expression->GetType();
-                if (lvalue)
-                {
-                    expression->SetFlag(BoundExpressionFlags::load);
-                }
-                else
-                {
-                    expression->SetFlag(BoundExpressionFlags::deref);
-                    type = type->RemovePointer(derefNode.GetSpan());
-                }
-                expression.reset(new BoundDereferenceExpression(std::unique_ptr<BoundExpression>(expression.release()), type));
-                break;
-            }
-            default:
-            {
-                throw Exception("cannot dereference " + expression->TypeString(), derefNode.GetSpan());
-            }
-        }
-    }
-    else
-    {
-        throw Exception("dereference needs pointer argument", derefNode.Subject()->GetSpan());
-    }
+    BindDerefExpr(derefNode);
 }
 
 void ExpressionBinder::Visit(AddrOfNode& addrOfNode) 
 {
     addrOfNode.Subject()->Accept(*this);
-    switch (expression->GetBoundNodeType())
+    if (expression->IsLvalueExpression())
     {
-        case BoundNodeType::boundLocalVariable:
-        case BoundNodeType::boundMemberVariable:
-        {
-            if (!expression->GetType()->IsReferenceType())
-            {
-                expression->SetFlag(BoundExpressionFlags::addr);
-            }
-            TypeSymbol* type = symbolTable.MakePointerType(expression->GetType(), addrOfNode.GetSpan());
-            expression.reset(new BoundAddressOfExpression(std::unique_ptr<BoundExpression>(expression.release()), type));
-            break;
-        }
-        default:
-        {
-            throw Exception("cannot take address of " + expression->TypeString(), addrOfNode.GetSpan());
-        }
+        TypeSymbol* type = expression->GetType()->AddPointer(addrOfNode.GetSpan());
+        expression.reset(new BoundAddressOfExpression(std::unique_ptr<BoundExpression>(expression.release()), type));
+    }
+    else
+    {
+        throw Exception("cannot take address of " + expression->TypeString(), addrOfNode.GetSpan());
     }
 }
 
@@ -742,7 +726,28 @@ void ExpressionBinder::Visit(AsNode& asNode)
 
 void ExpressionBinder::Visit(IndexingNode& indexingNode) 
 {
-    // todo
+    indexingNode.Subject()->Accept(*this);
+    std::unique_ptr<BoundExpression> subject = std::move(expression);
+    indexingNode.Index()->Accept(*this);
+    std::unique_ptr<BoundExpression> index = std::move(expression);
+    TypeSymbol* plainSubjectType = subject->GetType()->PlainType(indexingNode.GetSpan());
+    if (plainSubjectType->IsClassTypeSymbol())
+    {
+        BindBinaryOp(subject.release(), index.release(), indexingNode, U"operator[]");
+    }
+    else  if (plainSubjectType->IsPointerType())
+    {
+        BindBinaryOp(subject.release(), index.release(), indexingNode, U"operator+");
+        BindDerefExpr(indexingNode);
+    }
+    else if (plainSubjectType->IsArrayType())
+    {
+        // todo
+    }
+    else
+    {
+        throw Exception("subscript operator can be applied only to pointer, array or class type subject", indexingNode.GetSpan());
+    }
 }
 
 void ExpressionBinder::Visit(InvokeNode& invokeNode) 
@@ -949,7 +954,7 @@ void ExpressionBinder::Visit(PostfixDecrementNode& postfixDecrementNode)
 void ExpressionBinder::Visit(SizeOfNode& sizeOfNode) 
 {
     sizeOfNode.Expression()->Accept(*this);
-    expression.reset(new BoundSizeOfExpression(sizeOfNode.GetSpan(), symbolTable.GetTypeByName(U"long"), symbolTable.MakePointerType(expression->GetType(), sizeOfNode.GetSpan())));
+    expression.reset(new BoundSizeOfExpression(sizeOfNode.GetSpan(), symbolTable.GetTypeByName(U"long"), expression->GetType()->AddPointer(sizeOfNode.GetSpan())));
 }
 
 void ExpressionBinder::Visit(TypeNameNode& typeNameNode) 

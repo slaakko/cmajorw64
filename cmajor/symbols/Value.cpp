@@ -148,8 +148,7 @@ StringValue::StringValue(const Span& span_, const std::string& value_) : Value(s
 
 llvm::Value* StringValue::IrValue(Emitter& emitter)
 {
-    llvm::GlobalValue* stringValue = emitter.Builder().CreateGlobalString(value);
-    stringValue->setLinkage(llvm::GlobalValue::LinkageTypes::LinkOnceODRLinkage);
+    llvm::Value* stringValue = emitter.Builder().CreateGlobalStringPtr(value);
     return stringValue;
 }
 

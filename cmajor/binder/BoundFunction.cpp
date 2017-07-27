@@ -14,12 +14,12 @@ BoundFunction::BoundFunction(FunctionSymbol* functionSymbol_) : BoundNode(functi
 {
 }
 
-void BoundFunction::Load(Emitter& emitter)
+void BoundFunction::Load(Emitter& emitter, OperationFlags flags)
 {
     throw Exception("cannot load from function", GetSpan());
 }
 
-void BoundFunction::Store(Emitter& emitter)
+void BoundFunction::Store(Emitter& emitter, OperationFlags flags)
 {
     throw Exception("cannot store to function", GetSpan());
 }

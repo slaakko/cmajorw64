@@ -53,43 +53,7 @@ bool BetterFunctionMatch::operator()(const FunctionMatch& left, const FunctionMa
     return false;
 }
 
-bool FindAssignmentConversion(int argumentIndex, TypeSymbol* sourceType, TypeSymbol* targetType, FunctionMatch& functionMatch, const Span& span)
-{
-    if (argumentIndex == 0)
-    {
-        if (targetType->IsConstType())
-        {
-            functionMatch.cannotAssignToConstObject = true;
-            return false;
-        }
-        else if (sourceType->IsReferenceType())
-        {
-            functionMatch.argumentMatches.push_back(ArgumentMatch(nullptr, BoundExpressionFlags::load, 1));
-            ++functionMatch.numConversions;
-            return true;
-        }
-    }
-    else if (argumentIndex == 1)
-    {
-        if (TypesEqual(sourceType->PlainType(span), targetType->PlainType(span)))
-        {
-            if (sourceType->IsReferenceType())
-            {
-                functionMatch.argumentMatches.push_back(ArgumentMatch(nullptr, BoundExpressionFlags::deref, 1));
-                ++functionMatch.numConversions;
-                return true;
-            }
-            else
-            {
-                functionMatch.argumentMatches.push_back(ArgumentMatch());
-                return true;
-            }
-        }
-    }
-    return false;
-}
-
-bool FindQualificationConversion(TypeSymbol* sourceType, TypeSymbol* targetType, ConversionType conversionType, FunctionSymbol* conversionFun, FunctionMatch& functionMatch, const Span& span)
+bool FindQualificationConversion(TypeSymbol* sourceType, TypeSymbol* targetType, bool argumentIsLvalueExpr, ConversionType conversionType, FunctionSymbol* conversionFun, FunctionMatch& functionMatch, const Span& span)
 {
     int distance = 0;
     if (conversionFun)
@@ -98,7 +62,7 @@ bool FindQualificationConversion(TypeSymbol* sourceType, TypeSymbol* targetType,
     }
     if (sourceType->IsConstType())
     {
-        if (targetType->IsConstType())
+        if (targetType->IsConstType() || !targetType->IsReferenceType())
         {
             ++distance;
         }
@@ -127,19 +91,25 @@ bool FindQualificationConversion(TypeSymbol* sourceType, TypeSymbol* targetType,
     }
     if (sourceType->IsReferenceType() && !targetType->IsReferenceType())
     {
-        functionMatch.argumentMatches.push_back(ArgumentMatch(conversionFun, BoundExpressionFlags::deref, distance));
+        functionMatch.argumentMatches.push_back(ArgumentMatch(conversionFun, OperationFlags::deref, distance));
         ++functionMatch.numConversions;
         return true;
     }
-    else if (!sourceType->IsReferenceType() && targetType->IsReferenceType())
+    else if (!sourceType->IsReferenceType() && (targetType->IsReferenceType() || targetType->IsClassTypeSymbol()))
     {
-        if (targetType->IsConstType())
+        if (targetType->IsConstType() || targetType->IsClassTypeSymbol())
         {
-            functionMatch.argumentMatches.push_back(ArgumentMatch(conversionFun, BoundExpressionFlags::addr, distance));
+            functionMatch.argumentMatches.push_back(ArgumentMatch(conversionFun, OperationFlags::addr, distance));
             ++functionMatch.numConversions;
             return true;
         }
-        else
+        else if (!sourceType->IsConstType() && argumentIsLvalueExpr)
+        {
+            functionMatch.argumentMatches.push_back(ArgumentMatch(conversionFun, OperationFlags::addr, distance));
+            ++functionMatch.numConversions;
+            return true;
+        }
+        else 
         {
             functionMatch.cannotBindConstArgToNonConstParam = true;
             functionMatch.sourceType = sourceType;
@@ -148,19 +118,19 @@ bool FindQualificationConversion(TypeSymbol* sourceType, TypeSymbol* targetType,
     }
     else if (sourceType->IsConstType() && !targetType->IsConstType())
     {
-        functionMatch.argumentMatches.push_back(ArgumentMatch(conversionFun, BoundExpressionFlags::none, distance));
+        functionMatch.argumentMatches.push_back(ArgumentMatch(conversionFun, OperationFlags::none, distance));
         ++functionMatch.numConversions;
         return true;
     }
     else if (!sourceType->IsConstType() && targetType->IsConstType())
     {
-        functionMatch.argumentMatches.push_back(ArgumentMatch(conversionFun, BoundExpressionFlags::none, distance));
+        functionMatch.argumentMatches.push_back(ArgumentMatch(conversionFun, OperationFlags::none, distance));
         ++functionMatch.numConversions;
         return true;
     }
     else if (conversionFun)
     {
-        functionMatch.argumentMatches.push_back(ArgumentMatch(conversionFun, BoundExpressionFlags::none, distance));
+        functionMatch.argumentMatches.push_back(ArgumentMatch(conversionFun, OperationFlags::none, distance));
         return true;
     }
     return false;
@@ -170,6 +140,11 @@ bool FindConversions(BoundCompileUnit& boundCompileUnit, FunctionSymbol* functio
     ConversionType conversionType, const Span& span)
 {
     int arity = arguments.size();
+    if (arity == 1 && function->GroupName() == U"@constructor" && arguments[0]->GetType()->IsReferenceType())
+    {
+        functionMatch.referenceMustBeInitialized = true;
+        return false;
+    }
     Assert(arity == function->Arity(), "wrong arity");
     for (int i = 0; i < arity; ++i)
     {
@@ -177,18 +152,15 @@ bool FindConversions(BoundCompileUnit& boundCompileUnit, FunctionSymbol* functio
         TypeSymbol* sourceType = argument->GetType();
         ParameterSymbol* parameter = function->Parameters()[i];
         TypeSymbol* targetType = parameter->GetType();
-        if (arity == 2 && function->GroupName() == U"operator=")
+        if (arity == 2 && i == 0 && function->GroupName() == U"operator=")
         {
-            if (FindAssignmentConversion(i, sourceType, targetType, functionMatch, span))
+            if (targetType->IsConstType())
             {
-                continue;
-            }
-            else
-            {
+                functionMatch.cannotAssignToConstObject = true;
                 return false;
             }
         }
-        else if (TypesEqual(sourceType, targetType))    // exact match
+        if (TypesEqual(sourceType, targetType))    // exact match
         {
             functionMatch.argumentMatches.push_back(ArgumentMatch());
         }
@@ -204,7 +176,7 @@ bool FindConversions(BoundCompileUnit& boundCompileUnit, FunctionSymbol* functio
             bool qualificationConversionMatch = false;
             if (TypesEqual(sourceType->PlainType(span), targetType->PlainType(span)))
             {
-                qualificationConversionMatch = FindQualificationConversion(sourceType, targetType, conversionType, nullptr, functionMatch, span);
+                qualificationConversionMatch = FindQualificationConversion(sourceType, targetType, argument->IsLvalueExpression(), conversionType, nullptr, functionMatch, span);
             }
             if (!qualificationConversionMatch)
             {
@@ -214,7 +186,7 @@ bool FindConversions(BoundCompileUnit& boundCompileUnit, FunctionSymbol* functio
                     if (conversionFun->GetConversionType() == conversionType || conversionFun->GetConversionType() == ConversionType::implicit_)
                     {
                         ++functionMatch.numConversions;
-                        if (FindQualificationConversion(sourceType, targetType, conversionType, conversionFun, functionMatch, span))
+                        if (FindQualificationConversion(sourceType, targetType, argument->IsLvalueExpression(), conversionType, conversionFun, functionMatch, span))
                         {
                             continue;
                         }
@@ -302,6 +274,7 @@ std::unique_ptr<BoundFunctionCall> FailWithOverloadNotFound(const std::unordered
     const std::vector<FunctionMatch>& failedFunctionMatches, const Span& span, OverloadResolutionFlags flags, std::unique_ptr<Exception>& exception)
 {
     std::string overloadName = MakeOverloadName(groupName, arguments);
+    bool referenceMustBeInitialized = false;
     bool castRequired = false;
     bool cannotBindConstArgToNonConstParam = false;
     bool cannotAssignToConstObject = false;
@@ -313,13 +286,24 @@ std::unique_ptr<BoundFunctionCall> FailWithOverloadNotFound(const std::unordered
         int n = int(failedFunctionMatches.size());
         for (int i = 0; i < n; ++i)
         {
-            if (failedFunctionMatches[i].castRequired)
+            if (failedFunctionMatches[i].referenceMustBeInitialized)
             {
-                castRequired = true;
-                sourceType = failedFunctionMatches[i].sourceType;
-                targetType = failedFunctionMatches[i].targetType;
-                references.push_back(failedFunctionMatches[i].fun->GetSpan());
+                referenceMustBeInitialized = true;
                 break;
+            }
+        }
+        if (!referenceMustBeInitialized)
+        {
+            for (int i = 0; i < n; ++i)
+            {
+                if (failedFunctionMatches[i].castRequired)
+                {
+                    castRequired = true;
+                    sourceType = failedFunctionMatches[i].sourceType;
+                    targetType = failedFunctionMatches[i].targetType;
+                    references.push_back(failedFunctionMatches[i].fun->GetSpan());
+                    break;
+                }
             }
         }
         if (!castRequired)
@@ -349,7 +333,7 @@ std::unique_ptr<BoundFunctionCall> FailWithOverloadNotFound(const std::unordered
             }
         }
     }
-    if (groupName == U"@constructor" && arguments.size() == 1 && arguments[0]->GetType()->IsReferenceType())
+    if (referenceMustBeInitialized || groupName == U"@constructor" && arguments.size() == 1 && arguments[0]->GetType()->IsReferenceType())
     {
         if ((flags & OverloadResolutionFlags::dontThrow) != OverloadResolutionFlags::none)
         {
@@ -387,15 +371,15 @@ std::unique_ptr<BoundFunctionCall> FailWithOverloadNotFound(const std::unordered
         {
             exception.reset(new CannotBindConstToNonconstOverloadException("overload resolution failed: '" + overloadName + 
                 "' not found, or there are no acceptable conversions for all argument types. " +
-                std::to_string(viableFunctions.size()) + " viable functions examined. Note: cannot bind constant argument type '" + ToUtf8(sourceType->FullName()) + 
-                "' to nonconstant parameter type '" + ToUtf8(targetType->FullName()) + "'", span, references));
+                std::to_string(viableFunctions.size()) + " viable functions examined. Note: cannot bind constant '" + ToUtf8(sourceType->FullName()) + "' argument " 
+                "' to nonconstant '" + ToUtf8(targetType->FullName()) +"' parameter", span, references));
             return std::unique_ptr<BoundFunctionCall>();
         }
         else
         {
             throw CannotBindConstToNonconstOverloadException("overload resolution failed: '" + overloadName + "' not found, or there are no acceptable conversions for all argument types. " +
-                std::to_string(viableFunctions.size()) + " viable functions examined. Note: cannot bind constant argument type '" + ToUtf8(sourceType->FullName()) +
-                "' to nonconstant parameter type '" + ToUtf8(targetType->FullName()) + "'", span, references);
+                std::to_string(viableFunctions.size()) + " viable functions examined. Note: cannot bind constant '" + ToUtf8(sourceType->FullName()) + "' argument "
+                "' to nonconstant '" + ToUtf8(targetType->FullName()) + "' parameter", span, references);
         }
     }
     else if (cannotAssignToConstObject)
@@ -486,31 +470,22 @@ std::unique_ptr<BoundFunctionCall> CreateBoundFunctionCall(FunctionSymbol* bestF
             BoundConversion* conversion = new BoundConversion(std::move(argument), argumentMatch.conversionFun);
             argument.reset(conversion);
         }
-        if (argumentMatch.referenceConversionFlags != BoundExpressionFlags::none)
+        if (argumentMatch.referenceConversionFlags != OperationFlags::none)
         {
-            if (argumentMatch.referenceConversionFlags == BoundExpressionFlags::addr)
+            if (argumentMatch.referenceConversionFlags == OperationFlags::addr)
             {
                 if (!argument->IsLvalueExpression())
                 {
                     BoundLocalVariable* backingStore = new BoundLocalVariable(boundFunction->GetFunctionSymbol()->CreateTemporary(argument->GetType(), span));
-                    backingStore->SetFlag(BoundExpressionFlags::addr);
                     argument.reset(new BoundTemporary(std::move(argument), std::unique_ptr<BoundLocalVariable>(backingStore)));
                 }
-                argument->SetFlag(BoundExpressionFlags::addr);
-                TypeSymbol* type = boundCompileUnit.GetSymbolTable().MakeLvalueReferenceType(argument->GetType(), span);
+                TypeSymbol* type = argument->GetType()->AddLvalueReference(span);
                 BoundAddressOfExpression* addressOfExpression = new BoundAddressOfExpression(std::move(argument), type);
                 argument.reset(addressOfExpression);
             }
-            else if (argumentMatch.referenceConversionFlags == BoundExpressionFlags::deref)
+            else if (argumentMatch.referenceConversionFlags == OperationFlags::deref)
             {
-                argument->SetFlag(BoundExpressionFlags::deref);
                 TypeSymbol* type = argument->GetType()->RemoveReference(span);
-                BoundDereferenceExpression* dereferenceExpression = new BoundDereferenceExpression(std::move(argument), type);
-                argument.reset(dereferenceExpression);
-            }
-            else if (argumentMatch.referenceConversionFlags == BoundExpressionFlags::load)
-            {
-                TypeSymbol* type = argument->GetType();
                 BoundDereferenceExpression* dereferenceExpression = new BoundDereferenceExpression(std::move(argument), type);
                 argument.reset(dereferenceExpression);
             }

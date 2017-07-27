@@ -147,22 +147,22 @@ void TypeResolver::Visit(ConstNode& constNode)
 
 void TypeResolver::Visit(LValueRefNode& lvalueRefNode)
 {
+    lvalueRefNode.Subject()->Accept(*this);
     if (HasReferenceDerivation(derivationRec.derivations))
     {
         throw Exception("cannot have reference to reference type", lvalueRefNode.GetSpan());
     }
     derivationRec.derivations.push_back(Derivation::lvalueRefDerivation);
-    lvalueRefNode.Subject()->Accept(*this);
 }
 
 void TypeResolver::Visit(RValueRefNode& rvalueRefNode)
 {
+    rvalueRefNode.Subject()->Accept(*this);
     if (HasReferenceDerivation(derivationRec.derivations))
     {
         throw Exception("cannot have reference to reference type", rvalueRefNode.GetSpan());
     }
-    derivationRec.derivations.push_back(Derivation::rvalueRefDerivation);
-    rvalueRefNode.Subject()->Accept(*this);
+    derivationRec.derivations.push_back(Derivation::lvalueRefDerivation);
 }
 
 void TypeResolver::Visit(PointerNode& pointerNode)

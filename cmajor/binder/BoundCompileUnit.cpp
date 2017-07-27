@@ -143,12 +143,12 @@ BoundCompileUnit::BoundCompileUnit(Module& module_, CompileUnitNode* compileUnit
     objectFilePath = GetFullPath(objfp.generic_string());
 }
 
-void BoundCompileUnit::Load(Emitter& emitter)
+void BoundCompileUnit::Load(Emitter& emitter, OperationFlags flags)
 {
     throw Exception("cannot load from compile unit", GetSpan());
 }
 
-void BoundCompileUnit::Store(Emitter& emitter)
+void BoundCompileUnit::Store(Emitter& emitter, OperationFlags flags)
 {
     throw Exception("cannot store to compile unit", GetSpan());
 }
@@ -186,7 +186,7 @@ FunctionSymbol* BoundCompileUnit::GetConversion(TypeSymbol* sourceType, TypeSymb
             }
             else if (sourceType->IsVoidPtrType() && targetType->IsPointerType())
             {
-                std::unique_ptr<FunctionSymbol> voidPtrToPtrConversion(new VoidPtrToPtrConversion(symbolTable.MakePointerType(symbolTable.GetTypeByName(U"void"), span), targetType));
+                std::unique_ptr<FunctionSymbol> voidPtrToPtrConversion(new VoidPtrToPtrConversion(symbolTable.GetTypeByName(U"void")->AddPointer(span), targetType));
                 conversion = voidPtrToPtrConversion.get();
                 conversionTable.AddConversion(conversion);
                 conversionTable.AddGeneratedConversion(std::move(voidPtrToPtrConversion));
@@ -194,10 +194,11 @@ FunctionSymbol* BoundCompileUnit::GetConversion(TypeSymbol* sourceType, TypeSymb
             }
             else if (sourceType->IsPointerType() && targetType->RemoveConst(span)->IsVoidPtrType())
             {
-                std::unique_ptr<FunctionSymbol> ptrToVoidPtrConversion(new PtrToVoidPtrConversion(sourceType, symbolTable.MakePointerType(symbolTable.GetTypeByName(U"void"), span)));
+                std::unique_ptr<FunctionSymbol> ptrToVoidPtrConversion(new PtrToVoidPtrConversion(sourceType, symbolTable.GetTypeByName(U"void")->AddPointer(span)));
                 conversion = ptrToVoidPtrConversion.get();
                 conversionTable.AddConversion(conversion);
                 conversionTable.AddGeneratedConversion(std::move(ptrToVoidPtrConversion));
+                return conversion;
             }
             else if (sourceType->BaseType()->IsClassTypeSymbol() && targetType->BaseType()->IsClassTypeSymbol())
             {

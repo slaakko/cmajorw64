@@ -22,8 +22,8 @@ class BoundStatement : public BoundNode
 {
 public:
     BoundStatement(const Span& span_, BoundNodeType boundNodeType_);
-    void Load(Emitter& emitter) override;
-    void Store(Emitter& emitter) override;
+    void Load(Emitter& emitter, OperationFlags flags) override;
+    void Store(Emitter& emitter, OperationFlags flags) override;
     BoundStatement* Parent() { return parent; }
     void SetParent(BoundStatement* parent_) { parent = parent_; }
     BoundCompoundStatement* Block();

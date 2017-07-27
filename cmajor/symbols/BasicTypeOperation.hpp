@@ -295,7 +295,7 @@ template<typename UnOp>
 void BasicTypeUnaryOperation<UnOp>::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects)
 {
     Assert(genObjects.size() == 1, "unary operation needs one object");
-    genObjects[0]->Load(emitter);
+    genObjects[0]->Load(emitter, OperationFlags::none);
     llvm::Value* arg = emitter.Stack().Pop();
     emitter.Stack().Push(UnOp::Generate(emitter.Builder(), arg));
 }
@@ -365,9 +365,9 @@ template<typename BinOp>
 void BasicTypeBinaryOperation<BinOp>::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects)
 {
     Assert(genObjects.size() == 2, "binary operation needs two objects");
-    genObjects[0]->Load(emitter);
+    genObjects[0]->Load(emitter, OperationFlags::none);
     llvm::Value* left = emitter.Stack().Pop();
-    genObjects[1]->Load(emitter);
+    genObjects[1]->Load(emitter, OperationFlags::none);
     llvm::Value* right = emitter.Stack().Pop();
     emitter.Stack().Push(BinOp::Generate(emitter.Builder(), left, right));
 }
@@ -506,7 +506,7 @@ void BasicTypeDefaultCtor<DefaultOp>::GenerateCall(Emitter& emitter, std::vector
 {
     Assert(genObjects.size() == 1, "default constructor needs one object");
     emitter.Stack().Push(DefaultOp::Generate(emitter.Builder()));
-    genObjects[0]->Store(emitter);
+    genObjects[0]->Store(emitter, OperationFlags::none);
 }
 
 class BasicTypeDefaultInt1Operation : public BasicTypeDefaultCtor<DefaultInt1>
@@ -823,9 +823,9 @@ template<typename ComparisonOp>
 void BasicTypeComparisonOperation<ComparisonOp>::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects)
 {
     Assert(genObjects.size() == 2, "comparison operation needs two objects");
-    genObjects[0]->Load(emitter);
+    genObjects[0]->Load(emitter, OperationFlags::none);
     llvm::Value* left = emitter.Stack().Pop();
-    genObjects[1]->Load(emitter);
+    genObjects[1]->Load(emitter, OperationFlags::none);
     llvm::Value* right = emitter.Stack().Pop();
     emitter.Stack().Push(ComparisonOp::Generate(emitter.Builder(), left, right));
 }

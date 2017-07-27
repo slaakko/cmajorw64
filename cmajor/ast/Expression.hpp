@@ -332,7 +332,9 @@ public:
     void Write(AstWriter& writer) override;
     void Read(AstReader& reader) override;
     const Node* Subject() const { return subject.get(); }
+    Node* Subject() { return subject.get(); }
     const Node* Index() const { return index.get(); }
+    Node* Index() { return index.get(); }
 private:
     std::unique_ptr<Node> subject;
     std::unique_ptr<Node> index;

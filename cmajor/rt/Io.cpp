@@ -107,6 +107,10 @@ void FileTable::WriteFile(int32_t fileHandle, const uint8_t* buffer, int32_t cou
             throw FileSystemError("invalid file handle " + std::to_string(fileHandle));
         }
     }
+    if (!file)
+    {
+        throw FileSystemError("invalid file handle " + std::to_string(fileHandle));
+    }
     int32_t result = 0;
     if (fileHandle == 1 && stdoutInUtf16Mode || fileHandle == 2 && stderrInUtf16Mode)
     {
@@ -161,4 +165,3 @@ extern "C" RT_API void RtWrite(int32_t fileHandle, const uint8_t* buffer, int32_
         // todo
     }
 }
-

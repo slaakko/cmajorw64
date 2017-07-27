@@ -648,40 +648,6 @@ TypeSymbol* SymbolTable::MakeDerivedType(TypeSymbol* baseType, const TypeDerivat
     return derivedType;
 }
 
-TypeSymbol* SymbolTable::MakePointerType(TypeSymbol* type, const Span& span)
-{
-    if (type->GetSymbolType() == SymbolType::derivedTypeSymbol)
-    {
-        DerivedTypeSymbol* derivedType = static_cast<DerivedTypeSymbol*>(type);
-        TypeDerivationRec referenceRemovedDerivationRec = RemoveReferenceDerivation(derivedType->DerivationRec());
-        referenceRemovedDerivationRec.derivations.push_back(Derivation::pointerDerivation);
-        return MakeDerivedType(type, referenceRemovedDerivationRec, span);
-    }
-    else
-    {
-        TypeDerivationRec derivationRec;
-        derivationRec.derivations.push_back(Derivation::pointerDerivation);
-        return MakeDerivedType(type, derivationRec, span);
-    }
-}
-
-TypeSymbol* SymbolTable::MakeLvalueReferenceType(TypeSymbol* type, const Span& span)
-{
-    if (type->GetSymbolType() == SymbolType::derivedTypeSymbol)
-    {
-        DerivedTypeSymbol* derivedType = static_cast<DerivedTypeSymbol*>(type);
-        TypeDerivationRec referenceRemovedDerivationRec = RemoveReferenceDerivation(derivedType->DerivationRec());
-        referenceRemovedDerivationRec.derivations.push_back(Derivation::lvalueRefDerivation);
-        return MakeDerivedType(type, referenceRemovedDerivationRec, span);
-    }
-    else
-    {
-        TypeDerivationRec derivationRec;
-        derivationRec.derivations.push_back(Derivation::lvalueRefDerivation);
-        return MakeDerivedType(type, derivationRec, span);
-    }
-}
-
 void SymbolTable::AddConversion(FunctionSymbol* conversion)
 {
     conversionTable.AddConversion(conversion);

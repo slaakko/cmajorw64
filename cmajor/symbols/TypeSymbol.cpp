@@ -28,6 +28,27 @@ void TypeSymbol::Read(SymbolReader& reader)
     GetSymbolTable()->AddTypeSymbolToTypeIdMap(this);
 }
 
+TypeSymbol* TypeSymbol::AddConst(const Span& span)
+{
+    TypeDerivationRec typeDerivationRec;
+    typeDerivationRec.derivations.push_back(Derivation::constDerivation);
+    return GetSymbolTable()->MakeDerivedType(this, typeDerivationRec, span);
+}
+
+TypeSymbol* TypeSymbol::AddLvalueReference(const Span& span)
+{
+    TypeDerivationRec typeDerivationRec;
+    typeDerivationRec.derivations.push_back(Derivation::lvalueRefDerivation);
+    return GetSymbolTable()->MakeDerivedType(this, typeDerivationRec, span);
+}
+
+TypeSymbol* TypeSymbol::AddPointer(const Span& span)
+{
+    TypeDerivationRec typeDerivationRec;
+    typeDerivationRec.derivations.push_back(Derivation::pointerDerivation);
+    return GetSymbolTable()->MakeDerivedType(this, typeDerivationRec, span);
+}
+
 bool CompareTypesForEquality(const TypeSymbol* left, const TypeSymbol* right)
 {
     if (left->GetSymbolType() == SymbolType::derivedTypeSymbol && right->GetSymbolType() == SymbolType::derivedTypeSymbol)

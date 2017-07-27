@@ -17,8 +17,8 @@ class BoundClass : public BoundNode
 public:
     BoundClass(ClassTypeSymbol* classTypeSymbol_);
     void Accept(BoundNodeVisitor& visitor) override;
-    void Load(Emitter& emitter) override;
-    void Store(Emitter& emitter) override;
+    void Load(Emitter& emitter, OperationFlags flags) override;
+    void Store(Emitter& emitter, OperationFlags flags) override;
     void AddMember(std::unique_ptr<BoundNode>&& member);
     const std::vector<std::unique_ptr<BoundNode>>& Members() const { return members; }
 private:

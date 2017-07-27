@@ -18,8 +18,8 @@ class BoundFunction : public BoundNode
 {
 public:
     BoundFunction(FunctionSymbol* functionSymbol_);
-    void Load(Emitter& emitter) override;
-    void Store(Emitter& emitter) override;
+    void Load(Emitter& emitter, OperationFlags flags) override;
+    void Store(Emitter& emitter, OperationFlags flags) override;
     void Accept(BoundNodeVisitor& visitor) override;
     const FunctionSymbol* GetFunctionSymbol() const { return functionSymbol; }
     FunctionSymbol* GetFunctionSymbol() { return functionSymbol; }
