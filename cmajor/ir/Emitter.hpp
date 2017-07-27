@@ -22,11 +22,15 @@ public:
     llvm::Module* Module() { return module; }
     ValueStack& Stack() { return stack; }
     void SetModule(llvm::Module* module_) { module = module_; }
+    void SaveObjectPointer(llvm::Value* objectPointer_);
+    void ResetObjectPointer() { objectPointer = nullptr; }
+    llvm::Value* GetObjectPointer() { return objectPointer; }
 private:
     llvm::LLVMContext& context;
     llvm::IRBuilder<> builder;
     llvm::Module* module;
     ValueStack stack;
+    llvm::Value* objectPointer;
 };
 
 } } // namespace cmajor::ir

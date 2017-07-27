@@ -1001,22 +1001,119 @@ void ExpressionBinder::Visit(CastNode& castNode)
 
 void ExpressionBinder::Visit(ConstructNode& constructNode) 
 {
-    // todo
+    TypeSymbol* resultType = nullptr;
+    int n = constructNode.Arguments().Count();
+    if (n == 0)
+    {
+        throw Exception("must supply at least one argument to construct expression", constructNode.GetSpan());
+    }
+    std::vector<std::unique_ptr<BoundExpression>> arguments;
+    for (int i = 0; i < n; ++i)
+    {
+        Node* argumentNode = constructNode.Arguments()[i];
+        if (i == 0)
+        {
+            CloneContext cloneContext;
+            CastNode castNode(constructNode.GetSpan(), new PointerNode(constructNode.GetSpan(), constructNode.TypeExpr()->Clone(cloneContext)), argumentNode);
+            castNode.Accept(*this);
+            resultType = expression->GetType();
+            if (!resultType->IsPointerType())
+            {
+                throw Exception("first argument of a construct expression must be of a pointer type", argumentNode->GetSpan());
+            }
+        }
+        else
+        {
+            argumentNode->Accept(*this);
+        }
+        arguments.push_back(std::move(expression));
+    }
+    std::vector<FunctionScopeLookup> functionScopeLookups;
+    functionScopeLookups.push_back(FunctionScopeLookup(ScopeLookup::this_and_base_and_parent, containerScope));
+    functionScopeLookups.push_back(FunctionScopeLookup(ScopeLookup::this_, resultType->RemovePointer(constructNode.GetSpan())->ClassInterfaceOrNsScope()));
+    functionScopeLookups.push_back(FunctionScopeLookup(ScopeLookup::fileScopes, nullptr));
+    expression = ResolveOverload(U"@constructor", functionScopeLookups, arguments, boundCompileUnit, boundFunction, constructNode.GetSpan());
+    expression.reset(new BoundConstructExpression(std::move(expression), resultType));
 }
 
-void ExpressionBinder::Visit(NewNode& newNode) 
+void ExpressionBinder::Visit(NewNode& newNode)
 {
-    // todo
+    CloneContext cloneContext;
+    InvokeNode* invokeMemAlloc = new InvokeNode(newNode.GetSpan(), new IdentifierNode(newNode.GetSpan(), U"RtMemAlloc"));
+    invokeMemAlloc->AddArgument(new SizeOfNode(newNode.GetSpan(), newNode.TypeExpr()->Clone(cloneContext)));
+    CastNode castNode(newNode.GetSpan(), new PointerNode(newNode.GetSpan(), newNode.TypeExpr()->Clone(cloneContext)), invokeMemAlloc);
+    castNode.Accept(*this);
+    std::vector<std::unique_ptr<BoundExpression>> arguments;
+    TypeSymbol* resultType = expression->GetType();
+    BindDerefExpr(newNode);
+    arguments.push_back(std::move(expression));
+    int n = newNode.Arguments().Count();
+    for (int i = 0; i < n; ++i)
+    {
+        newNode.Arguments()[i]->Accept(*this);
+        arguments.push_back(std::move(expression));
+    }
+    std::vector<FunctionScopeLookup> functionScopeLookups;
+    functionScopeLookups.push_back(FunctionScopeLookup(ScopeLookup::this_and_base_and_parent, containerScope));
+    functionScopeLookups.push_back(FunctionScopeLookup(ScopeLookup::this_, resultType->RemovePointer(newNode.GetSpan())->ClassInterfaceOrNsScope()));
+    functionScopeLookups.push_back(FunctionScopeLookup(ScopeLookup::fileScopes, nullptr));
+    expression = ResolveOverload(U"@constructor", functionScopeLookups, arguments, boundCompileUnit, boundFunction, newNode.GetSpan());
+    expression.reset(new BoundConstructExpression(std::move(expression), resultType));
 }
 
 void ExpressionBinder::Visit(ThisNode& thisNode) 
 {
-    // todo
+    ParameterSymbol* thisParam = boundFunction->GetFunctionSymbol()->GetThisParam();
+    if (thisParam)
+    {
+        expression.reset(new BoundParameter(thisParam));
+    }
+    else
+    {
+        throw Exception("'this' can only be used in member function context", thisNode.GetSpan());
+    }
 }
 
 void ExpressionBinder::Visit(BaseNode& baseNode) 
 {
-    // todo
+    ParameterSymbol* thisParam = boundFunction->GetFunctionSymbol()->GetThisParam();
+    if (thisParam)
+    {
+        TypeSymbol* thisType = thisParam->GetType()->BaseType();
+        if (thisType->IsClassTypeSymbol())
+        {
+            ClassTypeSymbol* thisClassType = static_cast<ClassTypeSymbol*>(thisType);
+            if (thisClassType->BaseClass())
+            {
+                TypeSymbol* basePointerType = thisClassType->BaseClass()->AddPointer(baseNode.GetSpan());
+                if (thisParam->GetType()->IsConstType())
+                {
+                    basePointerType = basePointerType->AddConst(baseNode.GetSpan());
+                }
+                FunctionSymbol* thisAsBaseConversionFunction = boundCompileUnit.GetConversion(thisParam->GetType(), basePointerType, baseNode.GetSpan());
+                if (thisAsBaseConversionFunction)
+                {
+                    expression.reset(new BoundConversion(std::unique_ptr<BoundExpression>(new BoundParameter(thisParam)), thisAsBaseConversionFunction));
+                }
+                else
+                {
+                    throw Exception("cannot convert from '" + ToUtf8(thisParam->GetType()->FullName()) + "' to '" + ToUtf8(basePointerType->FullName()) + "'", baseNode.GetSpan());
+                }
+            }
+            else
+            {
+                throw Exception("class '" + ToUtf8(thisClassType->FullName()) + "' does not have a base class", baseNode.GetSpan());
+            }
+        }
+        else
+        {
+            throw Exception("'base' can only be used in member function context", baseNode.GetSpan());
+        }
+    }
+    else
+    {
+        throw Exception("'base' can only be used in member function context", baseNode.GetSpan());
+    }
 }
 
 std::unique_ptr<BoundExpression> BindExpression(Node* node, BoundCompileUnit& boundCompileUnit, BoundFunction* boundFunction, ContainerScope* containerScope, StatementBinder* statementBinder)

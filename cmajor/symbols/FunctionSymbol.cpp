@@ -345,7 +345,7 @@ std::u32string FunctionSymbol::FullNameWithSpecifiers() const
     return fullNameWithSpecifiers;
 }
 
-void FunctionSymbol::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects)
+void FunctionSymbol::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags)
 {
     int na = genObjects.size();
     for (int i = 0; i < na; ++i)

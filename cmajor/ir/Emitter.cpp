@@ -7,12 +7,20 @@
 
 namespace cmajor { namespace ir {
 
-Emitter::Emitter(llvm::LLVMContext& context_) : context(context_), builder(context), module(nullptr), stack()
+Emitter::Emitter(llvm::LLVMContext& context_) : context(context_), builder(context), module(nullptr), stack(), objectPointer(nullptr)
 {
 }
 
 Emitter::~Emitter()
 {
+}
+
+void Emitter::SaveObjectPointer(llvm::Value* objectPointer_)
+{
+    if (objectPointer == nullptr)
+    {
+        objectPointer = objectPointer_;
+    }
 }
 
 } } // namespace cmajor::ir

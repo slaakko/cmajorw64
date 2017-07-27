@@ -24,44 +24,34 @@ BoundParameter::BoundParameter(ParameterSymbol* parameterSymbol_) :
 
 void BoundParameter::Load(Emitter& emitter, OperationFlags flags)
 {
-    switch (flags)
+    if ((flags & OperationFlags::addr) != OperationFlags::none)
     {
-        case OperationFlags::addr: 
-        {
-            throw Exception("cannot take address of a parameter", GetSpan());
-        }
-        case OperationFlags::deref:
-        {
-            emitter.Stack().Push(emitter.Builder().CreateLoad(emitter.Builder().CreateLoad(parameterSymbol->IrObject())));
-            break;
-        }
-        default:
-        {
-            emitter.Stack().Push(emitter.Builder().CreateLoad(parameterSymbol->IrObject()));
-            break;
-        }
+        throw Exception("cannot take address of a parameter", GetSpan());
+    }
+    else if ((flags & OperationFlags::deref) != OperationFlags::none)
+    {
+        emitter.Stack().Push(emitter.Builder().CreateLoad(emitter.Builder().CreateLoad(parameterSymbol->IrObject())));
+    }
+    else
+    {
+        emitter.Stack().Push(emitter.Builder().CreateLoad(parameterSymbol->IrObject()));
     }
 }
 
 void BoundParameter::Store(Emitter& emitter, OperationFlags flags)
 {
     llvm::Value* value = emitter.Stack().Pop();
-    switch (flags)
+    if ((flags & OperationFlags::addr) != OperationFlags::none)
     {
-        case OperationFlags::addr:
-        {
-            throw Exception("cannot take address of a parameter", GetSpan());
-        }
-        case OperationFlags::deref:
-        {
-            emitter.Builder().CreateStore(value, emitter.Builder().CreateLoad(parameterSymbol->IrObject()));
-            break;
-        }
-        default:
-        {
-            emitter.Builder().CreateStore(value, parameterSymbol->IrObject());
-            break;
-        }
+        throw Exception("cannot take address of a parameter", GetSpan());
+    }
+    else if ((flags & OperationFlags::deref) != OperationFlags::none)
+    {
+        emitter.Builder().CreateStore(value, emitter.Builder().CreateLoad(parameterSymbol->IrObject()));
+    }
+    else
+    {
+        emitter.Builder().CreateStore(value, parameterSymbol->IrObject());
     }
 }
 
@@ -77,45 +67,34 @@ BoundLocalVariable::BoundLocalVariable(LocalVariableSymbol* localVariableSymbol_
 
 void BoundLocalVariable::Load(Emitter& emitter, OperationFlags flags)
 {
-    switch (flags)
+    if ((flags & OperationFlags::addr) != OperationFlags::none)
     {
-        case OperationFlags::addr:
-        {
-            emitter.Stack().Push(localVariableSymbol->IrObject());
-            break;
-        }
-        case OperationFlags::deref:
-        {
-            emitter.Stack().Push(emitter.Builder().CreateLoad(emitter.Builder().CreateLoad(localVariableSymbol->IrObject())));
-            break;
-        }
-        default:
-        {
-            emitter.Stack().Push(emitter.Builder().CreateLoad(localVariableSymbol->IrObject()));
-            break;
-        }
+        emitter.Stack().Push(localVariableSymbol->IrObject());
+    }
+    else if ((flags & OperationFlags::deref) != OperationFlags::none)
+    {
+        emitter.Stack().Push(emitter.Builder().CreateLoad(emitter.Builder().CreateLoad(localVariableSymbol->IrObject())));
+    }
+    else
+    {
+        emitter.Stack().Push(emitter.Builder().CreateLoad(localVariableSymbol->IrObject()));
     }
 }
 
 void BoundLocalVariable::Store(Emitter& emitter, OperationFlags flags)
 {
     llvm::Value* value = emitter.Stack().Pop();
-    switch (flags)
+    if ((flags & OperationFlags::addr) != OperationFlags::none)
     {
-        case OperationFlags::addr:
-        {
-            throw Exception("cannot store to address of a local variable", GetSpan());
-        }
-        case OperationFlags::deref:
-        {
-            emitter.Builder().CreateStore(value, emitter.Builder().CreateLoad(localVariableSymbol->IrObject()));
-            break;
-        }
-        default:
-        {
-            emitter.Builder().CreateStore(value, localVariableSymbol->IrObject());
-            break;
-        }
+        throw Exception("cannot store to address of a local variable", GetSpan());
+    }
+    else if ((flags & OperationFlags::deref) != OperationFlags::none)
+    {
+        emitter.Builder().CreateStore(value, emitter.Builder().CreateLoad(localVariableSymbol->IrObject()));
+    }
+    else
+    {
+        emitter.Builder().CreateStore(value, localVariableSymbol->IrObject());
     }
 }
 
@@ -155,21 +134,17 @@ BoundConstant::BoundConstant(ConstantSymbol* constantSymbol_) : BoundExpression(
 
 void BoundConstant::Load(Emitter& emitter, OperationFlags flags)
 {
-    switch (flags)
+    if ((flags & OperationFlags::addr) != OperationFlags::none)
     {
-        case OperationFlags::addr:
-        {
-            throw Exception("cannot take address of a constant", GetSpan());
-        }
-        case OperationFlags::deref:
-        {
-            throw Exception("cannot dereference a constant", GetSpan());
-        }
-        default:
-        {
-            emitter.Stack().Push(constantSymbol->GetValue()->IrValue(emitter));
-            break;
-        }
+        throw Exception("cannot take address of a constant", GetSpan());
+    }
+    else if ((flags & OperationFlags::deref) != OperationFlags::none)
+    {
+        throw Exception("cannot dereference a constant", GetSpan());
+    }
+    else
+    {
+        emitter.Stack().Push(constantSymbol->GetValue()->IrValue(emitter));
     }
 }
 
@@ -190,21 +165,17 @@ BoundEnumConstant::BoundEnumConstant(EnumConstantSymbol* enumConstantSymbol_) : 
 
 void BoundEnumConstant::Load(Emitter& emitter, OperationFlags flags)
 {
-    switch (flags)
+    if ((flags & OperationFlags::addr) != OperationFlags::none)
     {
-        case OperationFlags::addr:
-        {
-            throw Exception("cannot take address of an enumeration constant", GetSpan());
-        }
-        case OperationFlags::deref:
-        {
-            throw Exception("cannot dereference an enumeration constant", GetSpan());
-        }
-        default:
-        {
-            emitter.Stack().Push(enumConstantSymbol->GetValue()->IrValue(emitter));
-            break;
-        }
+        throw Exception("cannot take address of an enumeration constant", GetSpan());
+    }
+    else if ((flags & OperationFlags::deref) != OperationFlags::none)
+    {
+        throw Exception("cannot dereference an enumeration constant", GetSpan());
+    }
+    else
+    {
+        emitter.Stack().Push(enumConstantSymbol->GetValue()->IrValue(emitter));
     }
 }
 
@@ -224,21 +195,17 @@ BoundLiteral::BoundLiteral(std::unique_ptr<Value>&& value_, TypeSymbol* type_) :
 
 void BoundLiteral::Load(Emitter& emitter, OperationFlags flags)
 {
-    switch (flags)
+    if ((flags & OperationFlags::addr) != OperationFlags::none)
     {
-        case OperationFlags::addr:
-        {
-            throw Exception("cannot take address of a literal", GetSpan());
-        }
-        case OperationFlags::deref:
-        {
-            throw Exception("cannot dereference a literal", GetSpan());
-        }
-        default:
-        {
-            emitter.Stack().Push(value->IrValue(emitter));
-            break;
-        }
+        throw Exception("cannot take address of a literal", GetSpan());
+    }
+    else if ((flags & OperationFlags::deref) != OperationFlags::none)
+    {
+        throw Exception("cannot dereference a literal", GetSpan());
+    }
+    else
+    {
+        emitter.Stack().Push(value->IrValue(emitter));
     }
 }
 
@@ -261,23 +228,17 @@ void BoundTemporary::Load(Emitter& emitter, OperationFlags flags)
 {
     rvalueExpr->Load(emitter, OperationFlags::none);
     backingStore->Store(emitter, OperationFlags::none);
-    switch (flags)
+    if ((flags & OperationFlags::addr) != OperationFlags::none)
     {
-        case OperationFlags::addr:
-        {
-            backingStore->Load(emitter, OperationFlags::addr);
-            break;
-        }
-        case OperationFlags::deref:
-        {
-            backingStore->Load(emitter, OperationFlags::deref);
-            break;
-        }
-        default:
-        {
-            backingStore->Load(emitter, OperationFlags::none);
-            break;
-        }
+        backingStore->Load(emitter, OperationFlags::addr);
+    }
+    else if ((flags & OperationFlags::deref) != OperationFlags::none)
+    {
+        backingStore->Load(emitter, OperationFlags::deref);
+    }
+    else
+    {
+        backingStore->Load(emitter, OperationFlags::none);
     }
 }
 
@@ -298,24 +259,20 @@ BoundSizeOfExpression::BoundSizeOfExpression(const Span& span_, TypeSymbol* type
 
 void BoundSizeOfExpression::Load(Emitter& emitter, OperationFlags flags)
 {
-    switch (flags)
+    if ((flags & OperationFlags::addr) != OperationFlags::none)
     {
-        case OperationFlags::addr:
-        {
-            throw Exception("cannot take address of a sizeof expression", GetSpan());
-        }
-        case OperationFlags::deref:
-        {
-            throw Exception("cannot dereference a sizeof expression", GetSpan());
-        }
-        default:
-        {
-            llvm::Value* nullPtr = llvm::Constant::getNullValue(pointerType->IrType(emitter));
-            llvm::Value* gep = emitter.Builder().CreateGEP(nullPtr, emitter.Builder().getInt64(1));
-            llvm::Value* size = emitter.Builder().CreatePtrToInt(gep, emitter.Builder().getInt64Ty());
-            emitter.Stack().Push(size);
-            break;
-        }
+        throw Exception("cannot take address of a sizeof expression", GetSpan());
+    }
+    else if ((flags & OperationFlags::deref) != OperationFlags::none)
+    {
+        throw Exception("cannot dereference a sizeof expression", GetSpan());
+    }
+    else
+    {
+        llvm::Value* nullPtr = llvm::Constant::getNullValue(pointerType->IrType(emitter));
+        llvm::Value* gep = emitter.Builder().CreateGEP(nullPtr, emitter.Builder().getInt64(1));
+        llvm::Value* size = emitter.Builder().CreatePtrToInt(gep, emitter.Builder().getInt64Ty());
+        emitter.Stack().Push(size);
     }
 }
 
@@ -369,7 +326,7 @@ void BoundDereferenceExpression::Load(Emitter& emitter, OperationFlags flags)
 
 void BoundDereferenceExpression::Store(Emitter& emitter, OperationFlags flags)
 {
-    subject->Store(emitter, OperationFlags::deref);
+    subject->Store(emitter, OperationFlags::deref | (flags & OperationFlags::functionCallFlags));
 }
 
 void BoundDereferenceExpression::Accept(BoundNodeVisitor& visitor)
@@ -393,69 +350,52 @@ void BoundFunctionCall::SetArguments(std::vector<std::unique_ptr<BoundExpression
 
 void BoundFunctionCall::Load(Emitter& emitter, OperationFlags flags)
 {
-    switch (flags)
+    if ((flags & OperationFlags::addr) != OperationFlags::none)
     {
-        case OperationFlags::addr:
+        throw Exception("cannot take address of a function call", GetSpan());
+    }
+    else
+    {
+        std::vector<GenObject*> genObjects;
+        for (const std::unique_ptr<BoundExpression>& argument : arguments)
         {
-            throw Exception("cannot take address of a function call", GetSpan());
+            genObjects.push_back(argument.get());
         }
-        case OperationFlags::deref:
+        functionSymbol->GenerateCall(emitter, genObjects, flags & OperationFlags::functionCallFlags);
+        if ((flags & OperationFlags::deref) != OperationFlags::none)
         {
-            std::vector<GenObject*> genObjects;
-            for (const std::unique_ptr<BoundExpression>& argument : arguments)
-            {
-                genObjects.push_back(argument.get());
-            }
-            functionSymbol->GenerateCall(emitter, genObjects);
             emitter.Stack().Push(emitter.Builder().CreateLoad(emitter.Stack().Pop()));
-            break;
-        }
-        default:
-        {
-            std::vector<GenObject*> genObjects;
-            for (const std::unique_ptr<BoundExpression>& argument : arguments)
-            {
-                genObjects.push_back(argument.get());
-            }
-            functionSymbol->GenerateCall(emitter, genObjects);
-            break;
         }
     }
 }
 
 void BoundFunctionCall::Store(Emitter& emitter, OperationFlags flags)
 {
-    switch (flags)
+    if ((flags & OperationFlags::addr) != OperationFlags::none)
     {
-        case OperationFlags::addr:
+        throw Exception("cannot take address of a function call", GetSpan());
+    }
+    else
+    {
+        llvm::Value* value = emitter.Stack().Pop();
+        std::vector<GenObject*> genObjects;
+        for (const std::unique_ptr<BoundExpression>& argument : arguments)
         {
-            throw Exception("cannot take address of a function call", GetSpan());
+            genObjects.push_back(argument.get());
         }
-        case OperationFlags::deref:
+        functionSymbol->GenerateCall(emitter, genObjects, OperationFlags::none);
+        llvm::Value* ptr = emitter.Stack().Pop();
+        if ((flags & OperationFlags::leaveFirstArg) != OperationFlags::none)
         {
-            llvm::Value* value = emitter.Stack().Pop();
-            std::vector<GenObject*> genObjects;
-            for (const std::unique_ptr<BoundExpression>& argument : arguments)
-            {
-                genObjects.push_back(argument.get());
-            }
-            functionSymbol->GenerateCall(emitter, genObjects);
-            llvm::Value* ptr = emitter.Stack().Pop();
+            emitter.SaveObjectPointer(ptr);
+        }
+        if ((flags & OperationFlags::deref) != OperationFlags::none)
+        {
             emitter.Builder().CreateStore(value, ptr);
-            break;
         }
-        default:
+        else
         {
-            llvm::Value* value = emitter.Stack().Pop();
-            std::vector<GenObject*> genObjects;
-            for (const std::unique_ptr<BoundExpression>& argument : arguments)
-            {
-                genObjects.push_back(argument.get());
-            }
-            functionSymbol->GenerateCall(emitter, genObjects);
-            llvm::Value* ptr = emitter.Stack().Pop();
             emitter.Builder().CreateStore(emitter.Builder().CreateLoad(value), ptr);
-            break;
         }
     }
 }
@@ -480,6 +420,43 @@ bool BoundFunctionCall::IsLvalueExpression() const
     return false;
 }
 
+BoundConstructExpression::BoundConstructExpression(std::unique_ptr<BoundExpression>&& constructorCall_, TypeSymbol* resultType_) :
+    BoundExpression(constructorCall_->GetSpan(), BoundNodeType::boundConstructExpression, resultType_), constructorCall(std::move(constructorCall_))
+{
+}
+
+void BoundConstructExpression::Load(Emitter& emitter, OperationFlags flags)
+{
+    if ((flags & OperationFlags::addr) != OperationFlags::none)
+    {
+        throw Exception("cannot take address of a construct expression", GetSpan());
+    }
+    else
+    {
+        constructorCall->Load(emitter, OperationFlags::leaveFirstArg);
+        llvm::Value* objectPointer = emitter.GetObjectPointer();
+        if (!objectPointer)
+        {
+            throw Exception("does not have object pointer", GetSpan());
+        }
+        else
+        {
+            emitter.Stack().Push(objectPointer);
+            emitter.ResetObjectPointer();
+        }
+    }
+}
+
+void BoundConstructExpression::Store(Emitter& emitter, OperationFlags flags)
+{
+    throw Exception("cannot store to construct expression", GetSpan());
+}
+
+void BoundConstructExpression::Accept(BoundNodeVisitor& visitor)
+{
+    visitor.Visit(*this);
+}
+
 BoundConversion::BoundConversion(std::unique_ptr<BoundExpression>&& sourceExpr_, FunctionSymbol* conversionFun_) :
     BoundExpression(sourceExpr_->GetSpan(), BoundNodeType::boundConversion, conversionFun_->ConversionTargetType()), sourceExpr(std::move(sourceExpr_)), conversionFun(conversionFun_)
 {
@@ -489,7 +466,7 @@ void BoundConversion::Load(Emitter& emitter, OperationFlags flags)
 {
     sourceExpr->Load(emitter, flags);
     std::vector<GenObject*> emptyObjects;
-    conversionFun->GenerateCall(emitter, emptyObjects);
+    conversionFun->GenerateCall(emitter, emptyObjects, OperationFlags::none);
 }
 
 void BoundConversion::Store(Emitter& emitter, OperationFlags flags)

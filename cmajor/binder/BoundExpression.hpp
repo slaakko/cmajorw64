@@ -186,6 +186,19 @@ private:
     std::vector<std::unique_ptr<BoundExpression>> arguments;
 };
 
+class BoundConstructExpression : public BoundExpression
+{
+public:
+    BoundConstructExpression(std::unique_ptr<BoundExpression>&& constructorCall_, TypeSymbol* resultType_);
+    void Load(Emitter& emitter, OperationFlags flags) override;
+    void Store(Emitter& emitter, OperationFlags flags) override;
+    void Accept(BoundNodeVisitor& visitor) override;
+    bool HasValue() const override { return true; }
+    std::string TypeString() const override { return "construct expression"; }
+private:
+    std::unique_ptr<BoundExpression> constructorCall;
+};
+
 class BoundConversion : public BoundExpression
 {
 public:

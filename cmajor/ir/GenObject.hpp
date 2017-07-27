@@ -15,7 +15,9 @@ enum class OperationFlags : uint8_t
 {
     none = 0,
     addr = 1 << 0,
-    deref = 1 << 1
+    deref = 1 << 1,
+    leaveFirstArg = 1 << 2,
+    functionCallFlags = leaveFirstArg
 };
 
 inline OperationFlags operator|(OperationFlags left, OperationFlags right)

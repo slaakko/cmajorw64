@@ -451,6 +451,7 @@ public:
     void Read(AstReader& reader) override;
     void AddArgument(Node* argument) override;
     const Node* TypeExpr() const { return typeExpr.get(); }
+    Node* TypeExpr() { return typeExpr.get(); }
     const NodeList<Node>& Arguments() const { return arguments; }
 private:
     std::unique_ptr<Node> typeExpr;

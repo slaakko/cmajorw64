@@ -270,7 +270,7 @@ public:
     BasicTypeUnaryOperation(SymbolType symbolType);
     BasicTypeUnaryOperation(SymbolType symbolType, TypeSymbol* type);
     SymbolAccess DeclaredAccess() const override { return SymbolAccess::public_; }
-    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects) override;
+    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags) override;
     bool IsBasicTypeOperation() const override { return true; }
 };
 
@@ -292,7 +292,7 @@ BasicTypeUnaryOperation<UnOp>::BasicTypeUnaryOperation(SymbolType symbolType, Ty
 }
 
 template<typename UnOp>
-void BasicTypeUnaryOperation<UnOp>::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects)
+void BasicTypeUnaryOperation<UnOp>::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags)
 {
     Assert(genObjects.size() == 1, "unary operation needs one object");
     genObjects[0]->Load(emitter, OperationFlags::none);
@@ -337,7 +337,7 @@ public:
     BasicTypeBinaryOperation(SymbolType symbolType);
     BasicTypeBinaryOperation(SymbolType symbolType, TypeSymbol* type);
     SymbolAccess DeclaredAccess() const override { return SymbolAccess::public_; }
-    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects) override;
+    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags) override;
     bool IsBasicTypeOperation() const override { return true; }
 };
 
@@ -362,7 +362,7 @@ BasicTypeBinaryOperation<BinOp>::BasicTypeBinaryOperation(SymbolType symbolType,
 }
 
 template<typename BinOp>
-void BasicTypeBinaryOperation<BinOp>::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects)
+void BasicTypeBinaryOperation<BinOp>::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags)
 {
     Assert(genObjects.size() == 2, "binary operation needs two objects");
     genObjects[0]->Load(emitter, OperationFlags::none);
@@ -481,7 +481,7 @@ public:
     BasicTypeDefaultCtor(SymbolType symbolType);
     BasicTypeDefaultCtor(SymbolType symbolType, TypeSymbol* type);
     SymbolAccess DeclaredAccess() const override { return SymbolAccess::public_; }
-    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects) override;
+    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags) override;
     bool IsBasicTypeOperation() const override { return true; }
 };
 
@@ -502,7 +502,7 @@ BasicTypeDefaultCtor<DefaultOp>::BasicTypeDefaultCtor(SymbolType symbolType, Typ
 }
 
 template<typename DefaultOp>
-void BasicTypeDefaultCtor<DefaultOp>::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects)
+void BasicTypeDefaultCtor<DefaultOp>::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags)
 {
     Assert(genObjects.size() == 1, "default constructor needs one object");
     emitter.Stack().Push(DefaultOp::Generate(emitter.Builder()));
@@ -557,7 +557,7 @@ public:
     BasicTypeCopyCtor(TypeSymbol* type);
     BasicTypeCopyCtor(const Span& span_, const std::u32string& name_);
     SymbolAccess DeclaredAccess() const override { return SymbolAccess::public_; }
-    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects) override;
+    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags) override;
     bool IsBasicTypeOperation() const override { return true; }
 };
 
@@ -567,7 +567,7 @@ public:
     BasicTypeCopyAssignment(TypeSymbol* type, TypeSymbol* voidType);
     BasicTypeCopyAssignment(const Span& span_, const std::u32string& name_);
     SymbolAccess DeclaredAccess() const override { return SymbolAccess::public_; }
-    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects) override;
+    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags) override;
     bool IsBasicTypeOperation() const override { return true; }
 };
 
@@ -577,7 +577,7 @@ public:
     BasicTypeReturn(TypeSymbol* type);
     BasicTypeReturn(const Span& span_, const std::u32string& name_);
     SymbolAccess DeclaredAccess() const override { return SymbolAccess::public_; }
-    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects) override;
+    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags) override;
     bool IsBasicTypeOperation() const override { return true; }
 };
 
@@ -591,7 +591,7 @@ public:
     void Read(SymbolReader& reader) override;
     void EmplaceType(TypeSymbol* typeSymbol_, int index) override;
     SymbolAccess DeclaredAccess() const override { return SymbolAccess::public_; }
-    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects) override;
+    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags) override;
     bool IsBasicTypeOperation() const override { return true; }
     ConversionType GetConversionType() const override { return conversionType; }
     uint8_t ConversionDistance() const override { return conversionDistance; }
@@ -660,7 +660,7 @@ void BasicTypeConversion<ConversionOp>::EmplaceType(TypeSymbol* typeSymbol_, int
 }
 
 template <typename ConversionOp>
-void BasicTypeConversion<ConversionOp>::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects)
+void BasicTypeConversion<ConversionOp>::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags)
 {
     llvm::Value* value = emitter.Stack().Pop();
     emitter.Stack().Push(ConversionOp::Generate(emitter.Builder(), value, targetType->IrType(emitter)));
@@ -795,7 +795,7 @@ public:
     BasicTypeComparisonOperation(SymbolType symbolType);
     BasicTypeComparisonOperation(SymbolType symbolType, TypeSymbol* type, TypeSymbol* boolType);
     SymbolAccess DeclaredAccess() const override { return SymbolAccess::public_; }
-    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects) override;
+    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags) override;
     bool IsBasicTypeOperation() const override { return true; }
 };
 
@@ -820,7 +820,7 @@ BasicTypeComparisonOperation<ComparisonOp>::BasicTypeComparisonOperation(SymbolT
 }
 
 template<typename ComparisonOp>
-void BasicTypeComparisonOperation<ComparisonOp>::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects)
+void BasicTypeComparisonOperation<ComparisonOp>::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags)
 {
     Assert(genObjects.size() == 2, "comparison operation needs two objects");
     genObjects[0]->Load(emitter, OperationFlags::none);

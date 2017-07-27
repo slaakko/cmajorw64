@@ -16,7 +16,7 @@ class PointerDefaultCtor : public FunctionSymbol
 public:
     PointerDefaultCtor(TypeSymbol* type_);
     SymbolAccess DeclaredAccess() const override { return SymbolAccess::public_; }
-    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects) override;
+    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags) override;
     bool IsBasicTypeOperation() const override { return true; }
 private:
     TypeSymbol* type;
@@ -33,7 +33,7 @@ PointerDefaultCtor::PointerDefaultCtor(TypeSymbol* type_) : FunctionSymbol(Span(
     ComputeName();
 }
 
-void PointerDefaultCtor::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects)
+void PointerDefaultCtor::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags)
 {
     Assert(genObjects.size() == 1, "default constructor needs one object");
     if (!nullValue)
@@ -79,7 +79,7 @@ class PointerCopyCtor : public FunctionSymbol
 public:
     PointerCopyCtor(TypeSymbol* type_);
     SymbolAccess DeclaredAccess() const override { return SymbolAccess::public_; }
-    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects) override;
+    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags) override;
     bool IsBasicTypeOperation() const override { return true; }
 private:
     TypeSymbol* type;
@@ -98,7 +98,7 @@ PointerCopyCtor::PointerCopyCtor(TypeSymbol* type_) : FunctionSymbol(Span(), U"@
     ComputeName();
 }
 
-void PointerCopyCtor::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects)
+void PointerCopyCtor::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags)
 {
     Assert(genObjects.size() == 2, "copy constructor needs two objects");
     genObjects[1]->Load(emitter, OperationFlags::none);
@@ -140,7 +140,7 @@ class PointerCopyAssignment : public FunctionSymbol
 public:
     PointerCopyAssignment(TypeSymbol* type_, TypeSymbol* voidType_);
     SymbolAccess DeclaredAccess() const override { return SymbolAccess::public_; }
-    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects) override;
+    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags) override;
     bool IsBasicTypeOperation() const override { return true; }
 private:
     TypeSymbol* type;
@@ -160,7 +160,7 @@ PointerCopyAssignment::PointerCopyAssignment(TypeSymbol* type_, TypeSymbol* void
     ComputeName();
 }
 
-void PointerCopyAssignment::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects)
+void PointerCopyAssignment::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags)
 {
     Assert(genObjects.size() == 2, "copy assignment needs two objects");
     genObjects[1]->Load(emitter, OperationFlags::none);
@@ -202,7 +202,7 @@ class PointerReturn : public FunctionSymbol
 public:
     PointerReturn(TypeSymbol* type_);
     SymbolAccess DeclaredAccess() const override { return SymbolAccess::public_; }
-    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects) override;
+    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags) override;
     bool IsBasicTypeOperation() const override { return true; }
 private:
     TypeSymbol* type;
@@ -219,7 +219,7 @@ PointerReturn::PointerReturn(TypeSymbol* type_) : FunctionSymbol(Span(), U"@retu
     ComputeName();
 }
 
-void PointerReturn::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects)
+void PointerReturn::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags)
 {
     Assert(genObjects.size() == 1, "return needs one object");
     genObjects[0]->Load(emitter, OperationFlags::none);
@@ -260,7 +260,7 @@ class PointerPlusOffset : public FunctionSymbol
 public:
     PointerPlusOffset(TypeSymbol* pointerType_, TypeSymbol* longType_);
     SymbolAccess DeclaredAccess() const override { return SymbolAccess::public_; }
-    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects) override;
+    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags) override;
     bool IsBasicTypeOperation() const override { return true; }
 };
 
@@ -278,7 +278,7 @@ PointerPlusOffset::PointerPlusOffset(TypeSymbol* pointerType_, TypeSymbol* longT
     ComputeName();
 }
 
-void PointerPlusOffset::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects)
+void PointerPlusOffset::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags)
 {
     Assert(genObjects.size() == 2, "operator+ needs two objects");
     genObjects[0]->Load(emitter, OperationFlags::none);
@@ -323,7 +323,7 @@ class OffsetPlusPointer : public FunctionSymbol
 public:
     OffsetPlusPointer(TypeSymbol* longType_, TypeSymbol* pointerType_);
     SymbolAccess DeclaredAccess() const override { return SymbolAccess::public_; }
-    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects) override;
+    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags) override;
     bool IsBasicTypeOperation() const override { return true; }
 };
 
@@ -341,7 +341,7 @@ OffsetPlusPointer::OffsetPlusPointer(TypeSymbol* longType_, TypeSymbol* pointerT
     ComputeName();
 }
 
-void OffsetPlusPointer::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects)
+void OffsetPlusPointer::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags)
 {
     Assert(genObjects.size() == 2, "operator+ needs two objects");
     genObjects[0]->Load(emitter, OperationFlags::none);
@@ -387,7 +387,7 @@ class PointerMinusOffset : public FunctionSymbol
 public:
     PointerMinusOffset(TypeSymbol* pointerType_, TypeSymbol* longType_);
     SymbolAccess DeclaredAccess() const override { return SymbolAccess::public_; }
-    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects) override;
+    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags) override;
     bool IsBasicTypeOperation() const override { return true; }
 };
 
@@ -405,7 +405,7 @@ PointerMinusOffset::PointerMinusOffset(TypeSymbol* pointerType_, TypeSymbol* lon
     ComputeName();
 }
 
-void PointerMinusOffset::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects)
+void PointerMinusOffset::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags)
 {
     Assert(genObjects.size() == 2, "operator- needs two objects");
     genObjects[0]->Load(emitter, OperationFlags::none);
@@ -451,7 +451,7 @@ class PointerMinusPointer : public FunctionSymbol
 public:
     PointerMinusPointer(TypeSymbol* pointerType_, TypeSymbol* longType_);
     SymbolAccess DeclaredAccess() const override { return SymbolAccess::public_; }
-    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects) override;
+    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags) override;
     bool IsBasicTypeOperation() const override { return true; }
 };
 
@@ -469,7 +469,7 @@ PointerMinusPointer::PointerMinusPointer(TypeSymbol* pointerType_, TypeSymbol* l
     ComputeName();
 }
 
-void PointerMinusPointer::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects)
+void PointerMinusPointer::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags)
 {
     Assert(genObjects.size() == 2, "operator- needs two objects");
     genObjects[0]->Load(emitter, OperationFlags::none);
@@ -516,7 +516,7 @@ class PointerEqual : public FunctionSymbol
 public:
     PointerEqual(TypeSymbol* pointerType_, TypeSymbol* boolType_);
     SymbolAccess DeclaredAccess() const override { return SymbolAccess::public_; }
-    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects) override;
+    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags) override;
     bool IsBasicTypeOperation() const override { return true; }
 };
 
@@ -534,7 +534,7 @@ PointerEqual::PointerEqual(TypeSymbol* pointerType_, TypeSymbol* boolType_) : Fu
     ComputeName();
 }
 
-void PointerEqual::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects)
+void PointerEqual::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags)
 {
     Assert(genObjects.size() == 2, "operator== needs two objects");
     genObjects[0]->Load(emitter, OperationFlags::none);
@@ -581,7 +581,7 @@ class PointerLess : public FunctionSymbol
 public:
     PointerLess(TypeSymbol* pointerType_, TypeSymbol* boolType_);
     SymbolAccess DeclaredAccess() const override { return SymbolAccess::public_; }
-    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects) override;
+    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags) override;
     bool IsBasicTypeOperation() const override { return true; }
 };
 
@@ -599,7 +599,7 @@ PointerLess::PointerLess(TypeSymbol* pointerType_, TypeSymbol* boolType_) : Func
     ComputeName();
 }
 
-void PointerLess::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects)
+void PointerLess::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags)
 {
     Assert(genObjects.size() == 2, "operator< needs two objects");
     genObjects[0]->Load(emitter, OperationFlags::none);
@@ -646,7 +646,7 @@ class LvalueRefefenceCopyCtor : public FunctionSymbol
 public:
     LvalueRefefenceCopyCtor(TypeSymbol* type_);
     SymbolAccess DeclaredAccess() const override { return SymbolAccess::public_; }
-    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects) override;
+    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags) override;
     bool IsBasicTypeOperation() const override { return true; }
 private:
     TypeSymbol* type;
@@ -665,7 +665,7 @@ LvalueRefefenceCopyCtor::LvalueRefefenceCopyCtor(TypeSymbol* type_) : FunctionSy
     ComputeName();
 }
 
-void LvalueRefefenceCopyCtor::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects)
+void LvalueRefefenceCopyCtor::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags)
 {
     Assert(genObjects.size() == 2, "reference constructor needs two objects");
     genObjects[1]->Load(emitter, OperationFlags::none);
@@ -707,7 +707,7 @@ class LvalueReferenceCopyAssignment : public FunctionSymbol
 public:
     LvalueReferenceCopyAssignment(TypeSymbol* type_, TypeSymbol* voidType_);
     SymbolAccess DeclaredAccess() const override { return SymbolAccess::public_; }
-    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects) override;
+    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags) override;
     bool IsBasicTypeOperation() const override { return true; }
 private:
     TypeSymbol* type;
@@ -727,7 +727,7 @@ LvalueReferenceCopyAssignment::LvalueReferenceCopyAssignment(TypeSymbol* type_, 
     ComputeName();
 }
 
-void LvalueReferenceCopyAssignment::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects)
+void LvalueReferenceCopyAssignment::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags)
 {
     Assert(genObjects.size() == 2, "copy assignment needs two objects");
     genObjects[1]->Load(emitter, OperationFlags::none);
@@ -769,7 +769,7 @@ class LvalueReferenceReturn : public FunctionSymbol
 public:
     LvalueReferenceReturn(TypeSymbol* type_);
     SymbolAccess DeclaredAccess() const override { return SymbolAccess::public_; }
-    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects) override;
+    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags) override;
     bool IsBasicTypeOperation() const override { return true; }
 private:
     TypeSymbol* type;
@@ -786,7 +786,7 @@ LvalueReferenceReturn::LvalueReferenceReturn(TypeSymbol* type_) : FunctionSymbol
     ComputeName();
 }
 
-void LvalueReferenceReturn::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects)
+void LvalueReferenceReturn::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags)
 {
     Assert(genObjects.size() == 1, "return needs one object");
     genObjects[0]->Load(emitter, OperationFlags::none);

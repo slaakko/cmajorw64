@@ -24,7 +24,7 @@ public:
     TypeSymbol* ConversionSourceType() const { return sourceType; }
     TypeSymbol* ConversionTargetType() const { return targetType; }
     bool IsBasicTypeOperation() const override { return true; }
-    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects) override;
+    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags) override;
 private:
     ConversionType conversionType;
     uint8_t conversionDistance;
@@ -39,7 +39,7 @@ ClassTypeConversion::ClassTypeConversion(const std::u32string& name_, Conversion
     SetGroupName(U"@conversion");
 }
 
-void ClassTypeConversion::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects)
+void ClassTypeConversion::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags)
 {
     llvm::Value* value = emitter.Stack().Pop();
     emitter.Stack().Push(emitter.Builder().CreateBitCast(value, targetType->IrType(emitter)));
@@ -54,7 +54,7 @@ public:
     TypeSymbol* ConversionSourceType() const { return nullPtrType; }
     TypeSymbol* ConversionTargetType() const { return targetPointerType; }
     bool IsBasicTypeOperation() const override { return true; }
-    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects) override;
+    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags) override;
 private:
     TypeSymbol* nullPtrType;
     TypeSymbol* targetPointerType;;
@@ -67,7 +67,7 @@ NullPtrToPtrConversion::NullPtrToPtrConversion(TypeSymbol* nullPtrType_, TypeSym
     SetGroupName(U"@conversion");
 }
 
-void NullPtrToPtrConversion::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects)
+void NullPtrToPtrConversion::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags)
 {
     llvm::Value* value = emitter.Stack().Pop();
     emitter.Stack().Push(emitter.Builder().CreateBitCast(value, targetPointerType->IrType(emitter)));
@@ -82,7 +82,7 @@ public:
     TypeSymbol* ConversionSourceType() const { return voidPtrType; }
     TypeSymbol* ConversionTargetType() const { return targetPointerType; }
     bool IsBasicTypeOperation() const override { return true; }
-    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects) override;
+    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags) override;
 private:
     TypeSymbol* voidPtrType;
     TypeSymbol* targetPointerType;;
@@ -95,7 +95,7 @@ VoidPtrToPtrConversion::VoidPtrToPtrConversion(TypeSymbol* voidPtrType_, TypeSym
     SetGroupName(U"@conversion");
 }
 
-void VoidPtrToPtrConversion::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects)
+void VoidPtrToPtrConversion::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags)
 {
     llvm::Value* value = emitter.Stack().Pop();
     emitter.Stack().Push(emitter.Builder().CreateBitCast(value, targetPointerType->IrType(emitter)));
@@ -110,7 +110,7 @@ public:
     TypeSymbol* ConversionSourceType() const { return sourcePtrType; }
     TypeSymbol* ConversionTargetType() const { return voidPtrType; }
     bool IsBasicTypeOperation() const override { return true; }
-    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects) override;
+    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags) override;
 private:
     TypeSymbol* sourcePtrType;
     TypeSymbol* voidPtrType;
@@ -123,7 +123,7 @@ PtrToVoidPtrConversion::PtrToVoidPtrConversion(TypeSymbol* sourcePtrType_, TypeS
     SetGroupName(U"@conversion");
 }
 
-void PtrToVoidPtrConversion::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects)
+void PtrToVoidPtrConversion::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags)
 {
     llvm::Value* value = emitter.Stack().Pop();
     emitter.Stack().Push(emitter.Builder().CreateBitCast(value, voidPtrType->IrType(emitter)));

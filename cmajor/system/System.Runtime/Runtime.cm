@@ -6,5 +6,5 @@
 public extern cdecl void RtInit();
 public extern cdecl void RtDone();
 public extern cdecl void RtWrite(int handle, const void* buffer, int count);
-public extern cdecl void* RtMemAlloc(ulong size);
+public extern cdecl void* RtMemAlloc(long size);
 public extern cdecl void RtMemFree(void* ptr);

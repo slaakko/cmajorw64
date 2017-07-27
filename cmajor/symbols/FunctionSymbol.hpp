@@ -84,7 +84,7 @@ public:
     virtual TypeSymbol* ConversionSourceType() const { return nullptr; }
     virtual TypeSymbol* ConversionTargetType() const { return nullptr; }
     virtual bool IsBasicTypeOperation() const { return false; }
-    virtual void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects);
+    virtual void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags);
     virtual ParameterSymbol* GetThisParam() const { return nullptr; }
     const std::u32string& GroupName() const { return groupName; }
     void SetGroupName(const std::u32string& groupName_);

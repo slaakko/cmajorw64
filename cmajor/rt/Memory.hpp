@@ -10,7 +10,7 @@
 
 namespace cmajor { namespace rt {
 
-extern "C" RT_API void* RtMemAlloc(uint64_t size);
+extern "C" RT_API void* RtMemAlloc(int64_t size);
 extern "C" RT_API void RtMemFree(void* ptr);
 
 } }  // namespace cmajor::rt

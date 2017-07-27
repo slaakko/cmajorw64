@@ -37,6 +37,7 @@ class BoundAddressOfExpression;
 class BoundDereferenceExpression;
 class BoundFunctionCall;
 class BoundConversion;
+class BoundConstructExpression;
 
 class BoundNodeVisitor
 {
@@ -71,6 +72,7 @@ public:
     virtual void Visit(BoundDereferenceExpression& boundDereferenceExpression) {}
     virtual void Visit(BoundFunctionCall& boundFunctionCall) {}
     virtual void Visit(BoundConversion& boundConversion) {}
+    virtual void Visit(BoundConstructExpression& boundConstructExpression) {}
 };
 
 } } // namespace cmajor::binder

@@ -253,6 +253,12 @@ void StatementBinder::Visit(ReturnStatementNode& returnStatementNode)
                         BoundAddressOfExpression* addressOfExpression = new BoundAddressOfExpression(std::move(returnValueArguments[0]), type);
                         returnValueArguments[0].reset(addressOfExpression);
                     }
+                    else if (argumentMatch.referenceConversionFlags == OperationFlags::deref)
+                    {
+                        TypeSymbol* type = returnValueArguments[0]->GetType()->RemoveReference(returnStatementNode.GetSpan());
+                        BoundDereferenceExpression* dereferenceExpression = new BoundDereferenceExpression(std::move(returnValueArguments[0]), type);
+                        returnValueArguments[0].reset(dereferenceExpression);
+                    }
                 }
                 returnFunctionCall->SetArguments(std::move(returnValueArguments));
             }

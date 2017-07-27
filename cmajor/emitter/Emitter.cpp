@@ -138,6 +138,7 @@ public:
     void Visit(BoundDereferenceExpression& boundDereferenceExpression) override;
     void Visit(BoundFunctionCall& boundFunctionCall) override;
     void Visit(BoundConversion& boundConversion) override;
+    void Visit(BoundConstructExpression& boundConstructExpression) override;
 private:
     EmittingContext& emittingContext;
     SymbolTable* symbolTable;
@@ -478,6 +479,11 @@ void Emitter::Visit(BoundFunctionCall& boundFunctionCall)
 void Emitter::Visit(BoundConversion& boundConversion)
 {
     boundConversion.Load(*this, OperationFlags::none);
+}
+
+void Emitter::Visit(BoundConstructExpression& boundConstructExpression)
+{
+    boundConstructExpression.Load(*this, OperationFlags::none);
 }
 
 void GenerateCode(EmittingContext& emittingContext, BoundCompileUnit& boundCompileUnit)
