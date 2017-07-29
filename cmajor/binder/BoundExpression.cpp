@@ -13,7 +13,7 @@
 
 namespace cmajor { namespace binder {
 
-BoundExpression::BoundExpression(const Span& span_, BoundNodeType boundNodeType_, TypeSymbol* type_) : BoundNode(span_, boundNodeType_), type(type_)
+BoundExpression::BoundExpression(const Span& span_, BoundNodeType boundNodeType_, TypeSymbol* type_) : BoundNode(span_, boundNodeType_), type(type_), flags(BoundExpressionFlags::none)
 {
 }
 
@@ -603,9 +603,30 @@ void BoundFunctionGroupExpression::Accept(BoundNodeVisitor& visitor)
     throw Exception("cannot visit a function group", GetSpan());
 }
 
-void BoundFunctionGroupExpression::SetClassObject(std::unique_ptr<BoundExpression>&& classObject_)
+void BoundFunctionGroupExpression::SetClassPtr(std::unique_ptr<BoundExpression>&& classPtr_)
 {
-    classObject = std::move(classObject_);
+    classPtr = std::move(classPtr_);
+}
+
+BoundMemberExpression::BoundMemberExpression(const Span& span_, std::unique_ptr<BoundExpression>&& classPtr_, std::unique_ptr<BoundExpression>&& member_) :
+    BoundExpression(span_, BoundNodeType::boundMemberExpression, new MemberExpressionTypeSymbol(span_, member_->GetType()->Name(), this)), classPtr(std::move(classPtr_)), member(std::move(member_))
+{
+    memberExpressionType.reset(GetType());
+}
+
+void BoundMemberExpression::Load(Emitter& emitter, OperationFlags flags)
+{
+    throw Exception("cannot load from a member expression", GetSpan());
+}
+
+void BoundMemberExpression::Store(Emitter& emitter, OperationFlags flags)
+{
+    throw Exception("cannot store to a member expression", GetSpan());
+}
+
+void BoundMemberExpression::Accept(BoundNodeVisitor& visitor)
+{
+    throw Exception("cannot visit a member expression", GetSpan());
 }
 
 } } // namespace cmajor::binder

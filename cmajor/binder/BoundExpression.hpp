@@ -15,6 +15,22 @@ namespace cmajor { namespace binder {
 
 using namespace cmajor::symbols;
 
+enum class BoundExpressionFlags : uint8_t
+{
+    none = 0, 
+    argIsExplicitThisOrBasePtr = 1 << 0
+};
+
+inline BoundExpressionFlags operator|(BoundExpressionFlags left, BoundExpressionFlags right)
+{
+    return BoundExpressionFlags(uint8_t(left) | uint8_t(right));
+}
+
+inline BoundExpressionFlags operator&(BoundExpressionFlags left, BoundExpressionFlags right)
+{
+    return BoundExpressionFlags(uint8_t(left) & uint8_t(right));
+}
+
 class BoundExpression : public BoundNode
 {
 public:
@@ -25,8 +41,11 @@ public:
     virtual std::string TypeString() const { return "expression"; }
     const TypeSymbol* GetType() const { return type; }
     TypeSymbol* GetType() { return type; }
+    bool GetFlag(BoundExpressionFlags flag) const { return (flags & flag) != BoundExpressionFlags::none;  }
+    void SetFlag(BoundExpressionFlags flag) { flags = flags | flag; }
 private:
     TypeSymbol* type;
+    BoundExpressionFlags flags;
 };
 
 class BoundParameter : public BoundExpression
@@ -69,6 +88,7 @@ public:
     void SetClassPtr(std::unique_ptr<BoundExpression>&& classPtr_);
     void SetStaticInitNeeded() { staticInitNeeded = true; }
     std::string TypeString() const override { return "member variable"; }
+    MemberVariableSymbol* GetMemberVariableSymbol() { return memberVariableSymbol; }
 private:
     MemberVariableSymbol* memberVariableSymbol;
     std::unique_ptr<BoundExpression> classPtr;
@@ -234,6 +254,7 @@ public:
     void Store(Emitter& emitter, OperationFlags flags) override;
     void Accept(BoundNodeVisitor& visitor) override;
     std::string TypeString() const override { return "namespace expression"; }
+    NamespaceSymbol* Ns() { return ns; }
 private:
     NamespaceSymbol* ns;
     std::unique_ptr<TypeSymbol> nsType;
@@ -250,7 +271,7 @@ public:
     std::string TypeString() const override { return "function group expression"; }
     const FunctionGroupSymbol* FunctionGroup() const { return functionGroupSymbol; }
     FunctionGroupSymbol* FunctionGroup() { return functionGroupSymbol; }
-    void SetClassObject(std::unique_ptr<BoundExpression>&& classObject_);
+    void SetClassPtr(std::unique_ptr<BoundExpression>&& classPtr_);
     bool IsScopeQualified() const { return scopeQualified; }
     void SetScopeQualified() { scopeQualified = true; }
     ContainerScope* QualifiedScope() const { return qualifiedScope; }
@@ -258,9 +279,27 @@ public:
 private:
     FunctionGroupSymbol* functionGroupSymbol;
     std::unique_ptr<TypeSymbol> functionGroupType;
-    std::unique_ptr<BoundExpression> classObject;
+    std::unique_ptr<BoundExpression> classPtr;
     bool scopeQualified;
     ContainerScope* qualifiedScope;
+};
+
+class BoundMemberExpression : public BoundExpression
+{
+public:
+    BoundMemberExpression(const Span& span_, std::unique_ptr<BoundExpression>&& classPtr_, std::unique_ptr<BoundExpression>&& member_);
+    bool IsComplete() const override { return false; }
+    void Load(Emitter& emitter, OperationFlags flags) override;
+    void Store(Emitter& emitter, OperationFlags flags) override;
+    void Accept(BoundNodeVisitor& visitor) override;
+    std::string TypeString() const override { return "member expression"; }
+    BoundExpression* ClassPtr() { return classPtr.get(); }
+    BoundExpression* ReleaseClassPtr() { return classPtr.release(); }
+    BoundExpression* Member() { return member.get(); }
+private:
+    std::unique_ptr<BoundExpression> classPtr;
+    std::unique_ptr<BoundExpression> member;
+    std::unique_ptr<TypeSymbol> memberExpressionType;
 };
 
 } } // namespace cmajor::binder

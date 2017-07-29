@@ -86,6 +86,7 @@ public:
     virtual bool IsBasicTypeOperation() const { return false; }
     virtual void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags);
     virtual ParameterSymbol* GetThisParam() const { return nullptr; }
+    virtual bool IsConstructorDestructorOrNonstaticMemberFunction() const { return false; }
     const std::u32string& GroupName() const { return groupName; }
     void SetGroupName(const std::u32string& groupName_);
     void SetSpecifiers(Specifiers specifiers);
@@ -163,6 +164,7 @@ public:
     ConstructorSymbol(const Span& span_, const std::u32string& name_);
     std::string TypeString() const override { return "constructor"; }
     ParameterSymbol* GetThisParam() const override { return Parameters()[0]; }
+    bool IsConstructorDestructorOrNonstaticMemberFunction() const override { return true; }
     void SetSpecifiers(Specifiers specifiers);
 };
 
@@ -172,6 +174,7 @@ public:
     DestructorSymbol(const Span& span_, const std::u32string& name_);
     std::string TypeString() const override { return "destructor"; }
     ParameterSymbol* GetThisParam() const override { return Parameters()[0]; }
+    bool IsConstructorDestructorOrNonstaticMemberFunction() const override { return true; }
     bool DontThrow() const override { return true; }
     void SetSpecifiers(Specifiers specifiers);
 };
@@ -182,6 +185,7 @@ public:
     MemberFunctionSymbol(const Span& span_, const std::u32string& name_);
     std::string TypeString() const override { return "member_function"; }
     ParameterSymbol* GetThisParam() const override { if (IsStatic()) return nullptr; else return Parameters()[0]; }
+    bool IsConstructorDestructorOrNonstaticMemberFunction() const override { return !IsStatic(); }
     void SetSpecifiers(Specifiers specifiers);
 };
 
@@ -189,10 +193,23 @@ class FunctionGroupTypeSymbol : public TypeSymbol
 {
 public:
     FunctionGroupTypeSymbol(FunctionGroupSymbol* functionGroup_);
+    bool IsExportSymbol() const override { return false; }
+    llvm::Type* IrType(Emitter& emitter) override { return nullptr; }
     const FunctionGroupSymbol* FunctionGroup() const { return functionGroup; }
-    llvm::Type* IrType(Emitter& emitter) override { return nullptr; } 
 private:
     FunctionGroupSymbol* functionGroup;
+};
+
+class MemberExpressionTypeSymbol : public TypeSymbol
+{
+public:
+    MemberExpressionTypeSymbol(const Span& span_, const std::u32string& name_, void* boundMemberExpression_);
+    bool IsExportSymbol() const override { return false; }
+    llvm::Type* IrType(Emitter& emitter) override { return nullptr; }
+    std::string TypeString() const override { return "member_expression_type"; }
+    void* BoundMemberExpression() const { return boundMemberExpression; }
+private:
+    void* boundMemberExpression;
 };
 
 void InitFunctionSymbol();

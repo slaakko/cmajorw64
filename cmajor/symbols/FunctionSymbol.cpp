@@ -265,7 +265,7 @@ void FunctionSymbol::ComputeName()
             name.append(U", ");
         }
         ParameterSymbol* parameter = parameters[i];
-        if (i == 0 && (groupName == U"@constructor" || groupName == U"operator="))
+        if (i == 0 && (groupName == U"@constructor" || groupName == U"operator=" || IsConstructorDestructorOrNonstaticMemberFunction()))
         {
             name.append(parameter->GetType()->RemovePointer(GetSpan())->FullName());
         }
@@ -303,7 +303,7 @@ void FunctionSymbol::ComputeMangledName()
     SymbolType symbolType = GetSymbolType();
     switch (symbolType)
     {
-        case SymbolType::staticConstructorSymbol: case SymbolType::constructorSymbol: case SymbolType::memberFunctionSymbol:
+        case SymbolType::staticConstructorSymbol: case SymbolType::constructorSymbol: case SymbolType::destructorSymbol: case SymbolType::memberFunctionSymbol:
         {
             Symbol* parentClass = Parent();
             mangledName.append(1, U'_').append(parentClass->SimpleName());
@@ -332,7 +332,7 @@ std::u32string FunctionSymbol::FullName() const
             fullName.append(U", ");
         }
         ParameterSymbol* parameter = parameters[i];
-        if (i == 0 && (groupName == U"@constructor" || groupName == U"operator="))
+        if (i == 0 && (groupName == U"@constructor" || groupName == U"operator=" || IsConstructorDestructorOrNonstaticMemberFunction()))
         {
             fullName.append(parameter->GetType()->RemovePointer(GetSpan())->FullName());
         }
@@ -761,7 +761,7 @@ void MemberFunctionSymbol::SetSpecifiers(Specifiers specifiers)
     SetAccess(accessSpecifiers);
     if ((specifiers & Specifiers::static_) != Specifiers::none)
     {
-        SetStatic();
+    SetStatic();
     }
     if ((specifiers & Specifiers::virtual_) != Specifiers::none)
     {
@@ -855,6 +855,11 @@ void MemberFunctionSymbol::SetSpecifiers(Specifiers specifiers)
 }
 
 FunctionGroupTypeSymbol::FunctionGroupTypeSymbol(FunctionGroupSymbol* functionGroup_) : TypeSymbol(SymbolType::functionGroupTypeSymbol, Span(), functionGroup_->Name()), functionGroup(functionGroup_)
+{
+}
+
+MemberExpressionTypeSymbol::MemberExpressionTypeSymbol(const Span& span_, const std::u32string& name_, void* boundMemberExpression_) :
+    TypeSymbol(SymbolType::memberExpressionTypeSymbol, span_, name_), boundMemberExpression(boundMemberExpression_)
 {
 }
 
