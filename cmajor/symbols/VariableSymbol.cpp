@@ -43,8 +43,20 @@ LocalVariableSymbol::LocalVariableSymbol(const Span& span_, const std::u32string
 {
 }
 
-MemberVariableSymbol::MemberVariableSymbol(const Span& span_, const std::u32string& name_) : VariableSymbol(SymbolType::memberVariableSymbol, span_, name_)
+MemberVariableSymbol::MemberVariableSymbol(const Span& span_, const std::u32string& name_) : VariableSymbol(SymbolType::memberVariableSymbol, span_, name_), layoutIndex(-1)
 {
+}
+
+void MemberVariableSymbol::Write(SymbolWriter& writer)
+{
+    VariableSymbol::Write(writer);
+    writer.GetBinaryWriter().Write(layoutIndex);
+}
+
+void MemberVariableSymbol::Read(SymbolReader& reader)
+{
+    VariableSymbol::Read(reader);
+    layoutIndex = reader.GetBinaryReader().ReadInt();
 }
 
 void MemberVariableSymbol::SetSpecifiers(Specifiers specifiers)

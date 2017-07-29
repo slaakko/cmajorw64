@@ -141,7 +141,7 @@ void ExpressionBinder::BindUnaryOp(BoundExpression* operand, Node& node, const s
     functionScopeLookups.push_back(FunctionScopeLookup(ScopeLookup::this_and_base_and_parent, containerScope));
     functionScopeLookups.push_back(FunctionScopeLookup(ScopeLookup::this_, operand->GetType()->ClassOrNsScope()));
     functionScopeLookups.push_back(FunctionScopeLookup(ScopeLookup::fileScopes, nullptr));
-    std::unique_ptr<BoundFunctionCall> operatorFunCall = ResolveOverload(groupName, functionScopeLookups, arguments, boundCompileUnit, boundFunction, node.GetSpan());
+    std::unique_ptr<BoundFunctionCall> operatorFunCall = ResolveOverload(groupName, containerScope, functionScopeLookups, arguments, boundCompileUnit, boundFunction, node.GetSpan());
     CheckAccess(boundFunction->GetFunctionSymbol(), operatorFunCall->GetFunctionSymbol());
     expression.reset(operatorFunCall.release());
 }
@@ -172,7 +172,7 @@ void ExpressionBinder::BindBinaryOp(BoundExpression* left, BoundExpression* righ
     functionScopeLookups.push_back(FunctionScopeLookup(ScopeLookup::this_, left->GetType()->ClassOrNsScope()));
     functionScopeLookups.push_back(FunctionScopeLookup(ScopeLookup::this_, right->GetType()->ClassOrNsScope()));
     functionScopeLookups.push_back(FunctionScopeLookup(ScopeLookup::fileScopes, nullptr));
-    std::unique_ptr<BoundFunctionCall> operatorFunCall = ResolveOverload(groupName, functionScopeLookups, arguments, boundCompileUnit, boundFunction, node.GetSpan());
+    std::unique_ptr<BoundFunctionCall> operatorFunCall = ResolveOverload(groupName, containerScope, functionScopeLookups, arguments, boundCompileUnit, boundFunction, node.GetSpan());
     CheckAccess(boundFunction->GetFunctionSymbol(), operatorFunCall->GetFunctionSymbol());
     expression.reset(operatorFunCall.release());
 }
@@ -219,20 +219,20 @@ void ExpressionBinder::BindSymbol(Symbol* symbol)
             MemberVariableSymbol* memberVariableSymbol = static_cast<MemberVariableSymbol*>(symbol);
             CheckAccess(boundFunction->GetFunctionSymbol(), memberVariableSymbol);
             BoundMemberVariable* bmv = new BoundMemberVariable(memberVariableSymbol);
+            bool accessFromOwnScope = false;
+            Symbol* currentFuctionSymbol = boundFunction->GetFunctionSymbol();
+            ClassTypeSymbol* currentClass = currentFuctionSymbol->ContainingClassNoThrow();
+            if (currentClass)
+            {
+                ClassTypeSymbol* cp = memberVariableSymbol->ContainingClassNoThrow();
+                Assert(cp, "class type symbol expected");
+                if (cp == currentClass)
+                {
+                    accessFromOwnScope = true;
+                }
+            }
             if (memberVariableSymbol->IsStatic())
             {
-                bool accessFromOwnScope = false;
-                Symbol* s = boundFunction->GetFunctionSymbol();
-                ClassTypeSymbol* c = s->ContainingClassNoThrow();
-                if (c)
-                {
-                    ClassTypeSymbol* cp = memberVariableSymbol->ContainingClassNoThrow();
-                    Assert(cp, "class type symbol expected");
-                    if (cp == c)
-                    {
-                        accessFromOwnScope = true;
-                    }
-                }
                 if (!accessFromOwnScope)
                 {
                     bmv->SetStaticInitNeeded();
@@ -241,9 +241,42 @@ void ExpressionBinder::BindSymbol(Symbol* symbol)
             else
             {
                 ParameterSymbol* thisParam = boundFunction->GetFunctionSymbol()->GetThisParam();
-                if (thisParam)
+                if (accessFromOwnScope)
                 {
-                    bmv->SetClassObject(std::unique_ptr<BoundExpression>(new BoundParameter(thisParam)));
+                    if (thisParam)
+                    {
+                        TypeSymbol* thisPointerType = thisParam->GetType()->BaseType()->AddPointer(span);
+                        if (thisParam->GetType()->IsConstType())
+                        {
+                            thisPointerType = thisPointerType->AddConst(span);
+                        }
+                        bmv->SetClassPtr(std::unique_ptr<BoundExpression>(new BoundParameter(thisParam)));
+                            
+                    }
+                    else
+                    {
+                        Assert(false, "this param expected");
+                    }
+                }
+                else if (thisParam)
+                {
+                    ClassTypeSymbol* containingClass = memberVariableSymbol->ContainingClassNoThrow();
+                    TypeSymbol* containingClassPointerType = containingClass->AddPointer(span);
+                    TypeSymbol* thisPointerType = thisParam->GetType()->AddPointer(span);
+                    if (thisParam->GetType()->IsConstType())
+                    {
+                        thisPointerType = thisPointerType->AddConst(span);
+                        containingClassPointerType->AddConst(span);
+                    }
+                    FunctionSymbol* conversionFun = boundCompileUnit.GetConversion(thisPointerType, containingClassPointerType, span);
+                    if (conversionFun)
+                    {
+                        bmv->SetClassPtr(std::unique_ptr<BoundExpression>(new BoundConversion(std::unique_ptr<BoundExpression>(new BoundParameter(thisParam)), conversionFun)));
+                    }
+                    else
+                    {
+                        throw Exception("cannot convert from '" + ToUtf8(thisParam->GetType()->FullName()) + "' to '" + ToUtf8(containingClassPointerType->FullName()) + "'", span);
+                    }
                 }
             }
             expression.reset(bmv);
@@ -791,8 +824,8 @@ void ExpressionBinder::Visit(InvokeNode& invokeNode)
     std::unique_ptr<Exception> exception;
     std::unique_ptr<Exception> thisEx;
     std::unique_ptr<Exception> nsEx;
-    std::unique_ptr<BoundFunctionCall> functionCall = ResolveOverload(functionGroupSymbol->Name(), functionScopeLookups, arguments, boundCompileUnit, boundFunction, invokeNode.GetSpan(),
-        OverloadResolutionFlags::dontThrow, exception);
+    std::unique_ptr<BoundFunctionCall> functionCall = ResolveOverload(functionGroupSymbol->Name(), containerScope, functionScopeLookups, arguments, boundCompileUnit, boundFunction, 
+        invokeNode.GetSpan(), OverloadResolutionFlags::dontThrow, exception);
     if (!functionCall)
     {
         ParameterSymbol* thisParam = boundFunction->GetFunctionSymbol()->GetThisParam();
@@ -803,7 +836,7 @@ void ExpressionBinder::Visit(InvokeNode& invokeNode)
             arguments.insert(arguments.begin(), std::unique_ptr<BoundExpression>(boundThisParam));
             thisParamInserted = true;
             functionScopeLookups.push_back(FunctionScopeLookup(ScopeLookup::this_and_base, thisParam->GetType()->ClassInterfaceOrNsScope()));
-            functionCall = std::move(ResolveOverload(functionGroupSymbol->Name(), functionScopeLookups, arguments, boundCompileUnit, boundFunction, invokeNode.GetSpan(),
+            functionCall = std::move(ResolveOverload(functionGroupSymbol->Name(), containerScope, functionScopeLookups, arguments, boundCompileUnit, boundFunction, invokeNode.GetSpan(),
                 OverloadResolutionFlags::dontThrow, thisEx));
         }
         if (!functionCall)
@@ -816,7 +849,7 @@ void ExpressionBinder::Visit(InvokeNode& invokeNode)
             {
                 arguments.erase(arguments.begin());
             }
-            functionCall = std::move(ResolveOverload(functionGroupSymbol->Name(), functionScopeLookups, arguments, boundCompileUnit, boundFunction, invokeNode.GetSpan(),
+            functionCall = std::move(ResolveOverload(functionGroupSymbol->Name(), containerScope, functionScopeLookups, arguments, boundCompileUnit, boundFunction, invokeNode.GetSpan(),
                 OverloadResolutionFlags::dontThrow, nsEx));
         }
     }
@@ -974,7 +1007,7 @@ void ExpressionBinder::Visit(CastNode& castNode)
         functionScopeLookups.push_back(FunctionScopeLookup(ScopeLookup::this_and_base_and_parent, containerScope));
         functionScopeLookups.push_back(FunctionScopeLookup(ScopeLookup::this_, targetType->ClassInterfaceOrNsScope()));
         functionScopeLookups.push_back(FunctionScopeLookup(ScopeLookup::fileScopes, nullptr));
-        std::unique_ptr<BoundFunctionCall> castFunctionCall = ResolveOverload(U"@return", functionScopeLookups, targetExprArgs, boundCompileUnit, boundFunction, castNode.GetSpan());
+        std::unique_ptr<BoundFunctionCall> castFunctionCall = ResolveOverload(U"@return", containerScope, functionScopeLookups, targetExprArgs, boundCompileUnit, boundFunction, castNode.GetSpan());
         std::vector<std::unique_ptr<BoundExpression>> castArguments;
         castArguments.push_back(std::move(expression));
         FunctionMatch functionMatch(castFunctionCall->GetFunctionSymbol());
@@ -986,6 +1019,22 @@ void ExpressionBinder::Visit(CastNode& castNode)
             if (conversionFun)
             {
                 castArguments[0].reset(new BoundConversion(std::unique_ptr<BoundExpression>(castArguments[0].release()), conversionFun));
+            }
+            ArgumentMatch& argumentMatch = functionMatch.argumentMatches[0];
+            if (argumentMatch.referenceConversionFlags != OperationFlags::none)
+            {
+                if (argumentMatch.referenceConversionFlags == OperationFlags::addr)
+                {
+                    TypeSymbol* type = castArguments[0]->GetType()->AddLvalueReference(span);
+                    BoundAddressOfExpression* addressOfExpression = new BoundAddressOfExpression(std::move(castArguments[0]), type);
+                    castArguments[0].reset(addressOfExpression);
+                }
+                else if (argumentMatch.referenceConversionFlags == OperationFlags::deref)
+                {
+                    TypeSymbol* type = castArguments[0]->GetType()->RemoveReference(span);
+                    BoundDereferenceExpression* dereferenceExpression = new BoundDereferenceExpression(std::move(castArguments[0]), type);
+                    castArguments[0].reset(dereferenceExpression);
+                }
             }
             castFunctionCall->SetArguments(std::move(castArguments));
         }
@@ -1014,9 +1063,10 @@ void ExpressionBinder::Visit(ConstructNode& constructNode)
         if (i == 0)
         {
             CloneContext cloneContext;
-            CastNode castNode(constructNode.GetSpan(), new PointerNode(constructNode.GetSpan(), constructNode.TypeExpr()->Clone(cloneContext)), argumentNode);
+            CastNode castNode(constructNode.GetSpan(), new PointerNode(constructNode.GetSpan(), constructNode.TypeExpr()->Clone(cloneContext)), argumentNode->Clone(cloneContext));
             castNode.Accept(*this);
             resultType = expression->GetType();
+            BindDerefExpr(constructNode);
             if (!resultType->IsPointerType())
             {
                 throw Exception("first argument of a construct expression must be of a pointer type", argumentNode->GetSpan());
@@ -1032,7 +1082,7 @@ void ExpressionBinder::Visit(ConstructNode& constructNode)
     functionScopeLookups.push_back(FunctionScopeLookup(ScopeLookup::this_and_base_and_parent, containerScope));
     functionScopeLookups.push_back(FunctionScopeLookup(ScopeLookup::this_, resultType->RemovePointer(constructNode.GetSpan())->ClassInterfaceOrNsScope()));
     functionScopeLookups.push_back(FunctionScopeLookup(ScopeLookup::fileScopes, nullptr));
-    expression = ResolveOverload(U"@constructor", functionScopeLookups, arguments, boundCompileUnit, boundFunction, constructNode.GetSpan());
+    expression = ResolveOverload(U"@constructor", containerScope, functionScopeLookups, arguments, boundCompileUnit, boundFunction, constructNode.GetSpan());
     expression.reset(new BoundConstructExpression(std::move(expression), resultType));
 }
 
@@ -1057,7 +1107,7 @@ void ExpressionBinder::Visit(NewNode& newNode)
     functionScopeLookups.push_back(FunctionScopeLookup(ScopeLookup::this_and_base_and_parent, containerScope));
     functionScopeLookups.push_back(FunctionScopeLookup(ScopeLookup::this_, resultType->RemovePointer(newNode.GetSpan())->ClassInterfaceOrNsScope()));
     functionScopeLookups.push_back(FunctionScopeLookup(ScopeLookup::fileScopes, nullptr));
-    expression = ResolveOverload(U"@constructor", functionScopeLookups, arguments, boundCompileUnit, boundFunction, newNode.GetSpan());
+    expression = ResolveOverload(U"@constructor", containerScope, functionScopeLookups, arguments, boundCompileUnit, boundFunction, newNode.GetSpan());
     expression.reset(new BoundConstructExpression(std::move(expression), resultType));
 }
 

@@ -44,6 +44,7 @@ public:
     virtual bool IsNullPtrType() const { return false; }
     virtual bool IsVoidPtrType() const { return false; }
     virtual int PointerCount() const { return 0; }
+    virtual bool HasNontrivialDestructor() const { return false; }
     void SetTypeId(uint32_t typeId_) { typeId = typeId_; }
     uint32_t TypeId() const { Assert(typeId != 0, "type id not initialized");  return typeId; }
 private:

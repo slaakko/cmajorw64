@@ -4,12 +4,24 @@
 // =================================
 
 #include <cmajor/symbols/InterfaceTypeSymbol.hpp>
+#include <cmajor/symbols/FunctionSymbol.hpp>
 #include <cmajor/symbols/Exception.hpp>
 
 namespace cmajor { namespace symbols {
 
 InterfaceTypeSymbol::InterfaceTypeSymbol(const Span& span_, const std::u32string& name_) : TypeSymbol(SymbolType::interfaceTypeSymbol, span_, name_)
 {
+}
+
+void InterfaceTypeSymbol::AddMember(Symbol* member)
+{
+    TypeSymbol::AddMember(member);
+    if (member->GetSymbolType() == SymbolType::memberFunctionSymbol)
+    {
+        MemberFunctionSymbol* memberFunction = static_cast<MemberFunctionSymbol*>(member);
+        memberFunction->SetImtIndex(memberFunctions.size());
+        memberFunctions.push_back(memberFunction);
+    }
 }
 
 void InterfaceTypeSymbol::SetSpecifiers(Specifiers specifiers)

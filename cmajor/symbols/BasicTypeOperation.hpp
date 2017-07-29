@@ -496,7 +496,7 @@ BasicTypeDefaultCtor<DefaultOp>::BasicTypeDefaultCtor(SymbolType symbolType, Typ
     SetGroupName(U"@constructor");
     SetAccess(SymbolAccess::public_);
     ParameterSymbol* thisParam = new ParameterSymbol(Span(), U"this");
-    thisParam->SetType(type);
+    thisParam->SetType(type->AddPointer(Span()));
     AddMember(thisParam);
     ComputeName();
 }

@@ -42,7 +42,13 @@ class MemberVariableSymbol : public VariableSymbol
 {
 public:
     MemberVariableSymbol(const Span& span_, const std::u32string& name_);
+    void Write(SymbolWriter& writer) override;
+    void Read(SymbolReader& reader) override;
     void SetSpecifiers(Specifiers specifiers);
+    int32_t LayoutIndex() const { return layoutIndex; }
+    void SetLayoutIndex(int32_t layoutIndex_) { layoutIndex = layoutIndex_; }
+private:
+    int32_t layoutIndex;
 };
 
 } } // namespace cmajor::symbols

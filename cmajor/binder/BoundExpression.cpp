@@ -110,12 +110,52 @@ BoundMemberVariable::BoundMemberVariable(MemberVariableSymbol* memberVariableSym
 
 void BoundMemberVariable::Load(Emitter& emitter, OperationFlags flags)
 {
-    // todo
+    Assert(memberVariableSymbol->LayoutIndex() != -1, "layout index of the member variable not set");
+    classPtr->Load(emitter, OperationFlags::none);
+    llvm::Value* ptr = emitter.Stack().Pop();
+    ArgVector indeces;
+    indeces.push_back(emitter.Builder().getInt32(0));
+    indeces.push_back(emitter.Builder().getInt32(memberVariableSymbol->LayoutIndex()));
+    llvm::Value* memberVariablePtr = emitter.Builder().CreateGEP(ptr, indeces);
+    if ((flags & OperationFlags::addr) != OperationFlags::none)
+    {
+        emitter.Stack().Push(memberVariablePtr);
+    }
+    else if ((flags & OperationFlags::deref) != OperationFlags::none)
+    {
+        emitter.Stack().Push(emitter.Builder().CreateLoad(emitter.Builder().CreateLoad(memberVariablePtr)));
+    }
+    else
+    {
+        emitter.Stack().Push(emitter.Builder().CreateLoad(memberVariablePtr));
+    }
 }
 
 void BoundMemberVariable::Store(Emitter& emitter, OperationFlags flags)
 {
-    // todo
+    Assert(memberVariableSymbol->LayoutIndex() != -1, "layout index of the member variable not set");
+    llvm::Value* value = emitter.Stack().Pop();
+    if ((flags & OperationFlags::addr) != OperationFlags::none)
+    {
+        throw Exception("cannot store to the address of a member variable", GetSpan());
+    }
+    else 
+    {
+        classPtr->Load(emitter, OperationFlags::none);
+        llvm::Value* ptr = emitter.Stack().Pop();
+        ArgVector indeces;
+        indeces.push_back(emitter.Builder().getInt32(0));
+        indeces.push_back(emitter.Builder().getInt32(memberVariableSymbol->LayoutIndex()));
+        llvm::Value* memberVariablePtr = emitter.Builder().CreateGEP(ptr, indeces);
+        if ((flags & OperationFlags::deref) != OperationFlags::none)
+        {
+            emitter.Builder().CreateStore(value, emitter.Builder().CreateLoad(memberVariablePtr));
+        }
+        else
+        {
+            emitter.Builder().CreateStore(value, memberVariablePtr);
+        }
+    }
 }
 
 void BoundMemberVariable::Accept(BoundNodeVisitor& visitor)
@@ -123,9 +163,9 @@ void BoundMemberVariable::Accept(BoundNodeVisitor& visitor)
     visitor.Visit(*this);
 }
 
-void BoundMemberVariable::SetClassObject(std::unique_ptr<BoundExpression>&& classObject_)
+void BoundMemberVariable::SetClassPtr(std::unique_ptr<BoundExpression>&& classPtr_)
 {
-    classObject = std::move(classObject_);
+    classPtr = std::move(classPtr_);
 }
 
 BoundConstant::BoundConstant(ConstantSymbol* constantSymbol_) : BoundExpression(constantSymbol_->GetSpan(), BoundNodeType::boundConstant, constantSymbol_->GetType()), constantSymbol(constantSymbol_)
@@ -300,13 +340,21 @@ void BoundAddressOfExpression::Load(Emitter& emitter, OperationFlags flags)
     else
     {
         BoundDereferenceExpression* derefExpr = static_cast<BoundDereferenceExpression*>(subject.get());
-        derefExpr->Subject()->Load(emitter, OperationFlags::none);
+        derefExpr->Subject()->Load(emitter, flags);
     }
 }
 
 void BoundAddressOfExpression::Store(Emitter& emitter, OperationFlags flags)
 {
-    throw Exception("cannot store to address of expression", GetSpan());
+    if (subject->GetBoundNodeType() != BoundNodeType::boundDereferenceExpression)
+    {
+        subject->Store(emitter, flags);
+    }
+    else
+    {
+        BoundDereferenceExpression* derefExpr = static_cast<BoundDereferenceExpression*>(subject.get());
+        derefExpr->Subject()->Store(emitter, flags);
+    }
 }
 
 void BoundAddressOfExpression::Accept(BoundNodeVisitor& visitor)
@@ -321,12 +369,28 @@ BoundDereferenceExpression::BoundDereferenceExpression(std::unique_ptr<BoundExpr
 
 void BoundDereferenceExpression::Load(Emitter& emitter, OperationFlags flags)
 {
-    subject->Load(emitter, OperationFlags::deref);
+    if (subject->GetBoundNodeType() != BoundNodeType::boundAddressOfExpression)
+    {
+        subject->Load(emitter, OperationFlags::deref);
+    }
+    else
+    {
+        BoundAddressOfExpression* addressOfExpr = static_cast<BoundAddressOfExpression*>(subject.get());
+        addressOfExpr->Subject()->Load(emitter, flags);
+    }
 }
 
 void BoundDereferenceExpression::Store(Emitter& emitter, OperationFlags flags)
 {
-    subject->Store(emitter, OperationFlags::deref | (flags & OperationFlags::functionCallFlags));
+    if (subject->GetBoundNodeType() != BoundNodeType::boundAddressOfExpression)
+    {
+        subject->Store(emitter, OperationFlags::deref | (flags & OperationFlags::functionCallFlags));
+    }
+    else
+    {
+        BoundAddressOfExpression* addressOfExpr = static_cast<BoundAddressOfExpression*>(subject.get());
+        addressOfExpr->Subject()->Store(emitter, flags | (flags & OperationFlags::functionCallFlags));
+    }
 }
 
 void BoundDereferenceExpression::Accept(BoundNodeVisitor& visitor)

@@ -9,7 +9,7 @@
 
 namespace cmajor { namespace binder {
 
-BoundClass::BoundClass(ClassTypeSymbol* classTypeSymbol_) : BoundNode(classTypeSymbol->GetSpan(), BoundNodeType::boundClass), classTypeSymbol(classTypeSymbol_)
+BoundClass::BoundClass(ClassTypeSymbol* classTypeSymbol_) : BoundNode(classTypeSymbol_->GetSpan(), BoundNodeType::boundClass), classTypeSymbol(classTypeSymbol_)
 {
 }
 

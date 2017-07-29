@@ -66,12 +66,12 @@ public:
     void Accept(BoundNodeVisitor& visitor) override;
     bool HasValue() const override { return true; }
     bool IsLvalueExpression() const override { return true; }
-    void SetClassObject(std::unique_ptr<BoundExpression>&& classObject_);
+    void SetClassPtr(std::unique_ptr<BoundExpression>&& classPtr_);
     void SetStaticInitNeeded() { staticInitNeeded = true; }
     std::string TypeString() const override { return "member variable"; }
 private:
     MemberVariableSymbol* memberVariableSymbol;
-    std::unique_ptr<BoundExpression> classObject;
+    std::unique_ptr<BoundExpression> classPtr;
     bool staticInitNeeded;
 };
 
@@ -149,6 +149,7 @@ public:
     void Store(Emitter& emitter, OperationFlags flags) override;
     void Accept(BoundNodeVisitor& visitor) override;
     std::string TypeString() const override { return "address of expression"; }
+    std::unique_ptr<BoundExpression>& Subject() { return subject; }
 private:
     std::unique_ptr<BoundExpression> subject;
 };

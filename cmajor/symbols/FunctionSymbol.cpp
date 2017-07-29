@@ -189,12 +189,14 @@ std::string FunctionSymbolFlagStr(FunctionSymbolFlags flags)
 }
 
 FunctionSymbol::FunctionSymbol(const Span& span_, const std::u32string& name_) : 
-    ContainerSymbol(SymbolType::functionSymbol, span_, name_), groupName(), parameters(), localVariables(), returnType(), flags(FunctionSymbolFlags::none), irType(nullptr), nextTemporaryIndex(0)
+    ContainerSymbol(SymbolType::functionSymbol, span_, name_), groupName(), parameters(), localVariables(), returnType(), flags(FunctionSymbolFlags::none), vmtIndex(-1), imtIndex(-1), 
+    irType(nullptr), nextTemporaryIndex(0)
 {
 }
 
 FunctionSymbol::FunctionSymbol(SymbolType symbolType_, const Span& span_, const std::u32string& name_) : 
-    ContainerSymbol(symbolType_, span_, name_), groupName(), parameters(), localVariables(), returnType(), flags(FunctionSymbolFlags::none), irType(nullptr), nextTemporaryIndex(0)
+    ContainerSymbol(symbolType_, span_, name_), groupName(), parameters(), localVariables(), returnType(), flags(FunctionSymbolFlags::none), vmtIndex(-1), imtIndex(-1), 
+    irType(nullptr), nextTemporaryIndex(0)
 {
 }
 
@@ -209,6 +211,8 @@ void FunctionSymbol::Write(SymbolWriter& writer)
     }
     writer.GetBinaryWriter().WriteEncodedUInt(returnTypeId);
     writer.GetBinaryWriter().Write(static_cast<uint16_t>(flags));
+    writer.GetBinaryWriter().Write(vmtIndex);
+    writer.GetBinaryWriter().Write(imtIndex);
 }
 
 void FunctionSymbol::Read(SymbolReader& reader)
@@ -221,6 +225,8 @@ void FunctionSymbol::Read(SymbolReader& reader)
         GetSymbolTable()->EmplaceTypeRequest(this, returnTypeId, 0);
     }
     flags = static_cast<FunctionSymbolFlags>(reader.GetBinaryReader().ReadUShort());
+    vmtIndex = reader.GetBinaryReader().ReadInt();
+    imtIndex = reader.GetBinaryReader().ReadInt();
     if (IsConversion())
     {
         reader.AddConversion(this);
@@ -249,7 +255,7 @@ void FunctionSymbol::AddMember(Symbol* member)
 void FunctionSymbol::ComputeName()
 {
     std::u32string name;
-    name.append(GroupName());
+    name.append(groupName);
     name.append(1, U'(');
     int n = parameters.size();
     for (int i = 0; i < n; ++i)
@@ -259,7 +265,14 @@ void FunctionSymbol::ComputeName()
             name.append(U", ");
         }
         ParameterSymbol* parameter = parameters[i];
-        name.append(parameter->GetType()->FullName());
+        if (i == 0 && (groupName == U"@constructor" || groupName == U"operator="))
+        {
+            name.append(parameter->GetType()->RemovePointer(GetSpan())->FullName());
+        }
+        else
+        {
+            name.append(parameter->GetType()->FullName());
+        }
         name.append(1, U' ');
         name.append(std::u32string(parameter->Name()));
     }
@@ -309,7 +322,7 @@ std::u32string FunctionSymbol::FullName() const
     {
         fullName.append(1, U'.');
     }
-    fullName.append(GroupName());
+    fullName.append(groupName);
     fullName.append(1, U'(');
     int n = parameters.size();
     for (int i = 0; i < n; ++i)
@@ -319,7 +332,14 @@ std::u32string FunctionSymbol::FullName() const
             fullName.append(U", ");
         }
         ParameterSymbol* parameter = parameters[i];
-        fullName.append(parameter->GetType()->FullName());
+        if (i == 0 && (groupName == U"@constructor" || groupName == U"operator="))
+        {
+            fullName.append(parameter->GetType()->RemovePointer(GetSpan())->FullName());
+        }
+        else
+        {
+            fullName.append(parameter->GetType()->FullName());
+        }
     }
     fullName.append(1, U')');
     return fullName;
@@ -363,7 +383,7 @@ void FunctionSymbol::GenerateCall(Emitter& emitter, std::vector<GenObject*>& gen
         llvm::Value* arg = emitter.Stack().Pop();
         args[n - i - 1] = arg;
     }
-    if (ReturnType()->GetSymbolType() != SymbolType::voidTypeSymbol)
+    if (ReturnType() && ReturnType()->GetSymbolType() != SymbolType::voidTypeSymbol)
     {
         emitter.Stack().Push(emitter.Builder().CreateCall(callee, args));
     }

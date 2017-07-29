@@ -23,6 +23,10 @@ public:
     void Visit(NamespaceNode& namespaceNode) override;
     void Visit(ClassNode& classNode) override;
     void Visit(FunctionNode& functionNode) override;
+    void Visit(StaticConstructorNode& staticConstructorNode) override;
+    void Visit(ConstructorNode& constructorNode) override;
+    void Visit(DestructorNode& destructorNode) override;
+    void Visit(MemberFunctionNode& memberFunctionNode) override;
     void Visit(CompoundStatementNode& compoundStatementNode) override;
     void Visit(ReturnStatementNode& returnStatementNode) override;
     void Visit(IfStatementNode& ifStatementNode) override;

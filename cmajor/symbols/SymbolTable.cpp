@@ -40,7 +40,8 @@ TypeIdCounter::TypeIdCounter() : nextTypeId(1)
 {
 }
 
-SymbolTable::SymbolTable() : globalNs(Span(), std::u32string()), container(&globalNs), mainFunctionSymbol(nullptr), parameterIndex(0), declarationBlockIndex(0)
+SymbolTable::SymbolTable() : 
+    globalNs(Span(), std::u32string()), container(&globalNs), currentClass(nullptr), currentInterface(nullptr), mainFunctionSymbol(nullptr), parameterIndex(0), declarationBlockIndex(0)
 {
     globalNs.SetSymbolTable(this);
 }
@@ -228,6 +229,8 @@ void SymbolTable::AddParameter(ParameterNode& parameterNode)
 void SymbolTable::BeginClass(ClassNode& classNode)
 {
     ClassTypeSymbol* classTypeSymbol = new ClassTypeSymbol(classNode.GetSpan(), classNode.Id()->Str());
+    currentClassStack.push(currentClass);
+    currentClass = classTypeSymbol;
     classTypeSymbol->SetSymbolTable(this);
     MapNode(&classNode, classTypeSymbol);
     SetTypeIdFor(classTypeSymbol);
@@ -240,6 +243,8 @@ void SymbolTable::BeginClass(ClassNode& classNode)
 
 void SymbolTable::EndClass()
 {
+    currentClass = currentClassStack.top();
+    currentClassStack.pop();
     EndContainer();
 }
 
@@ -254,6 +259,8 @@ void SymbolTable::AddTemplateParameter(TemplateParameterNode& templateParameterN
 void SymbolTable::BeginInterface(InterfaceNode& interfaceNode)
 {
     InterfaceTypeSymbol* interfaceTypeSymbol = new InterfaceTypeSymbol(interfaceNode.GetSpan(), interfaceNode.Id()->Str());
+    currentInterfaceStack.push(currentInterface);
+    currentInterface = interfaceTypeSymbol;
     interfaceTypeSymbol->SetSymbolTable(this);
     MapNode(&interfaceNode, interfaceTypeSymbol);
     SetTypeIdFor(interfaceTypeSymbol);
@@ -266,6 +273,8 @@ void SymbolTable::BeginInterface(InterfaceNode& interfaceNode)
 
 void SymbolTable::EndInterface()
 {
+    currentInterface = currentInterfaceStack.top();
+    currentInterfaceStack.pop();
     EndContainer();
 }
 
@@ -300,6 +309,20 @@ void SymbolTable::BeginConstructor(ConstructorNode& constructorNode)
     BeginContainer(constructorSymbol);
     parameterIndex = 0;
     ResetDeclarationBlockIndex();
+    ParameterSymbol* thisParam = new ParameterSymbol(constructorNode.GetSpan(), U"this");
+    thisParam->SetSymbolTable(this);
+    TypeSymbol* thisParamType = nullptr;
+    if (currentClass)
+    {
+        thisParamType = currentClass->AddPointer(constructorNode.GetSpan());
+        thisParam->SetType(thisParamType);
+        thisParam->SetBound();
+        constructorSymbol->AddMember(thisParam);
+    }
+    else if (currentInterface)
+    {
+        throw Exception("interface type cannot have a constructor", constructorNode.GetSpan());
+    }
 }
 
 void SymbolTable::EndConstructor()
@@ -319,6 +342,20 @@ void SymbolTable::BeginDestructor(DestructorNode& destructorNode)
     destructorScope->SetParent(containerScope);
     BeginContainer(destructorSymbol);
     ResetDeclarationBlockIndex();
+    ParameterSymbol* thisParam = new ParameterSymbol(destructorNode.GetSpan(), U"this");
+    thisParam->SetSymbolTable(this);
+    TypeSymbol* thisParamType = nullptr;
+    if (currentClass)
+    {
+        thisParamType = currentClass->AddPointer(destructorNode.GetSpan());
+        thisParam->SetType(thisParamType);
+        thisParam->SetBound();
+        destructorSymbol->AddMember(thisParam);
+    }
+    else if (currentInterface)
+    {
+        throw Exception("interface type cannot have a destructor", destructorNode.GetSpan());
+    }
 }
 
 void SymbolTable::EndDestructor()
@@ -340,6 +377,34 @@ void SymbolTable::BeginMemberFunction(MemberFunctionNode& memberFunctionNode)
     BeginContainer(memberFunctionSymbol);
     parameterIndex = 0;
     ResetDeclarationBlockIndex();
+    if ((memberFunctionNode.GetSpecifiers() & Specifiers::static_) == Specifiers::none)
+    {
+        ParameterSymbol* thisParam = new ParameterSymbol(memberFunctionNode.GetSpan(), U"this");
+        thisParam->SetSymbolTable(this);
+        TypeSymbol* thisParamType = nullptr;
+        if (currentClass)
+        {
+            if (memberFunctionNode.IsConst())
+            {
+                thisParamType = currentClass->AddConst(memberFunctionNode.GetSpan())->AddPointer(memberFunctionNode.GetSpan());
+            }
+            else
+            {
+                thisParamType = currentClass->AddPointer(memberFunctionNode.GetSpan());
+            }
+        }
+        else if (currentInterface)
+        {
+            thisParamType = currentInterface->AddPointer(memberFunctionNode.GetSpan());
+        }
+        else
+        {
+            Assert(false, "class or interface expected");
+        }
+        thisParam->SetType(thisParamType);
+        thisParam->SetBound();
+        memberFunctionSymbol->AddMember(thisParam);
+    }
 }
 
 void SymbolTable::EndMemberFunction()

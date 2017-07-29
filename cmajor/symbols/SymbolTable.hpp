@@ -113,6 +113,10 @@ public:
 private:
     NamespaceSymbol globalNs;
     ContainerSymbol* container;
+    ClassTypeSymbol* currentClass;
+    std::stack<ClassTypeSymbol*> currentClassStack;
+    InterfaceTypeSymbol* currentInterface;
+    std::stack<InterfaceTypeSymbol*> currentInterfaceStack;
     std::stack<ContainerSymbol*> containerStack;
     FunctionSymbol* mainFunctionSymbol;
     int parameterIndex;

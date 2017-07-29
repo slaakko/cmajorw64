@@ -152,12 +152,24 @@ bool FindConversions(BoundCompileUnit& boundCompileUnit, FunctionSymbol* functio
         TypeSymbol* sourceType = argument->GetType();
         ParameterSymbol* parameter = function->Parameters()[i];
         TypeSymbol* targetType = parameter->GetType();
-        if (arity == 2 && i == 0 && function->GroupName() == U"operator=")
+        if (arity == 2 && function->GroupName() == U"operator=")
         {
-            if (targetType->IsConstType())
+            if (i == 0)
             {
-                functionMatch.cannotAssignToConstObject = true;
-                return false;
+                if (targetType->IsConstType())
+                {
+                    functionMatch.cannotAssignToConstObject = true;
+                    return false;
+                }
+            }
+            if (TypesEqual(sourceType, targetType))    // exact match
+            {
+                if (sourceType->IsReferenceType())
+                {
+                    functionMatch.argumentMatches.push_back(ArgumentMatch(nullptr, OperationFlags::deref, 1));
+                    ++functionMatch.numConversions;
+                    continue;
+                }
             }
         }
         if (TypesEqual(sourceType, targetType))    // exact match
@@ -216,13 +228,14 @@ bool FindConversions(BoundCompileUnit& boundCompileUnit, FunctionSymbol* functio
     return true;
 }
 
-std::string MakeOverloadName(const std::u32string& groupName, const std::vector<std::unique_ptr<BoundExpression>>& arguments)
+std::string MakeOverloadName(const std::u32string& groupName, const std::vector<std::unique_ptr<BoundExpression>>& arguments, const Span& span)
 {
     std::string overloadName = ToUtf8(groupName);
     overloadName.append(1, '(');
     bool first = true;
     for (const std::unique_ptr<BoundExpression>& argument : arguments)
     {
+        bool wasFirst = first;
         if (first)
         {
             first = false;
@@ -231,49 +244,62 @@ std::string MakeOverloadName(const std::u32string& groupName, const std::vector<
         {
             overloadName.append(", ");
         }
-        overloadName.append(ToUtf8(argument->GetType()->FullName()));
+        if (wasFirst && (groupName == U"@constructor" || groupName == U"operator="))
+        {
+            overloadName.append(ToUtf8(argument->GetType()->RemovePointer(span)->FullName()));
+        }
+        else
+        {
+            overloadName.append(ToUtf8(argument->GetType()->FullName()));
+        }
     }
     overloadName.append(1, ')');
     return overloadName;
 }
 
-std::unique_ptr<BoundFunctionCall> FailWithNoViableFunction(const std::u32string& groupName, const std::vector<std::unique_ptr<BoundExpression>>& arguments, const Span& span, OverloadResolutionFlags flags, 
-    std::unique_ptr<Exception>& exception)
+std::unique_ptr<BoundFunctionCall> FailWithNoViableFunction(const std::u32string& groupName, const std::vector<std::unique_ptr<BoundExpression>>& arguments, 
+    const Span& span, OverloadResolutionFlags flags, std::unique_ptr<Exception>& exception)
 {
-    std::string overloadName = MakeOverloadName(groupName, arguments);
+    std::string overloadName = MakeOverloadName(groupName, arguments, span);
     int arity = arguments.size();
     if (groupName == U"@constructor" && arity == 1 && arguments[0]->GetType()->IsReferenceType())
     {
         if ((flags & OverloadResolutionFlags::dontThrow) != OverloadResolutionFlags::none)
         {
-            exception.reset(new Exception("overload resolution failed: '" + overloadName + "' not found. Note: reference must be initialized.", span));
+            exception.reset(new Exception("overload resolution failed: '" + overloadName + "' not found. Note: reference must be initialized.", span, arguments[0]->GetSpan()));
             return std::unique_ptr<BoundFunctionCall>();
         }
         else
         {
-            throw Exception("overload resolution failed: '" + overloadName + "' not found. Note: reference must be initialized.", span);
+            throw Exception("overload resolution failed: '" + overloadName + "' not found. Note: reference must be initialized.", span, arguments[0]->GetSpan());
         }
     }
     else
     {
+        std::string note;
+        if (exception)
+        {
+            note.append(": Note: ").append(exception->What());
+        }
         if ((flags & OverloadResolutionFlags::dontThrow) != OverloadResolutionFlags::none)
         {
             exception.reset(new Exception("overload resolution failed: '" + overloadName + "' not found. " +
-                "No viable functions taking " + std::to_string(arity) + " arguments found in function group '" + ToUtf8(groupName) + "'", span));
+                "No viable functions taking " + std::to_string(arity) + " arguments found in function group '" + ToUtf8(groupName) + "'" + note, span));
             return std::unique_ptr<BoundFunctionCall>();
         }
         else
         {
             throw Exception("overload resolution failed: '" + overloadName + "' not found. " +
-                "No viable functions taking " + std::to_string(arity) + " arguments found in function group '" + ToUtf8(groupName) + "'", span);
+                "No viable functions taking " + std::to_string(arity) + " arguments found in function group '" + ToUtf8(groupName) + "'" + note, span);
         }
     }
 }
 
-std::unique_ptr<BoundFunctionCall> FailWithOverloadNotFound(const std::unordered_set<FunctionSymbol*>& viableFunctions, const std::u32string& groupName, const std::vector<std::unique_ptr<BoundExpression>>& arguments,
-    const std::vector<FunctionMatch>& failedFunctionMatches, const Span& span, OverloadResolutionFlags flags, std::unique_ptr<Exception>& exception)
+std::unique_ptr<BoundFunctionCall> FailWithOverloadNotFound(const std::unordered_set<FunctionSymbol*>& viableFunctions, const std::u32string& groupName, 
+    const std::vector<std::unique_ptr<BoundExpression>>& arguments, const std::vector<FunctionMatch>& failedFunctionMatches, const Span& span, 
+    OverloadResolutionFlags flags, std::unique_ptr<Exception>& exception)
 {
-    std::string overloadName = MakeOverloadName(groupName, arguments);
+    std::string overloadName = MakeOverloadName(groupName, arguments, span);
     bool referenceMustBeInitialized = false;
     bool castRequired = false;
     bool cannotBindConstArgToNonConstParam = false;
@@ -281,6 +307,11 @@ std::unique_ptr<BoundFunctionCall> FailWithOverloadNotFound(const std::unordered
     TypeSymbol* sourceType = nullptr;
     TypeSymbol* targetType = nullptr;
     std::vector<Span> references;
+    std::string note;
+    if (exception)
+    {
+        note.append(": Note: ").append(exception->What());
+    }
     if (!failedFunctionMatches.empty())
     {
         int n = int(failedFunctionMatches.size());
@@ -337,11 +368,13 @@ std::unique_ptr<BoundFunctionCall> FailWithOverloadNotFound(const std::unordered
     {
         if ((flags & OverloadResolutionFlags::dontThrow) != OverloadResolutionFlags::none)
         {
+            references.push_back(arguments[0]->GetSpan());
             exception.reset(new Exception("overload resolution failed: '" + overloadName + "' not found. Note: reference must be initialized.", span, references));
             return std::unique_ptr<BoundFunctionCall>();
         }
         else
         {
+            references.push_back(arguments[0]->GetSpan());
             throw Exception("overload resolution failed: '" + overloadName + "' not found. Note: reference must be initialized.", span, references);
         }
     }
@@ -402,21 +435,21 @@ std::unique_ptr<BoundFunctionCall> FailWithOverloadNotFound(const std::unordered
         if ((flags & OverloadResolutionFlags::dontThrow) != OverloadResolutionFlags::none)
         {
             exception.reset(new Exception("overload resolution failed: '" + overloadName + "' not found, or there are no acceptable conversions for all argument types. " +
-                std::to_string(viableFunctions.size()) + " viable functions examined.", span, references));
+                std::to_string(viableFunctions.size()) + " viable functions examined." + note, span, references));
             return std::unique_ptr<BoundFunctionCall>();
         }
         else
         {
             throw Exception("overload resolution failed: '" + overloadName + "' not found, or there are no acceptable conversions for all argument types. " +
-                std::to_string(viableFunctions.size()) + " viable functions examined.", span, references);
+                std::to_string(viableFunctions.size()) + " viable functions examined." + note, span, references);
         }
     }
 }
 
-std::unique_ptr<BoundFunctionCall> FailWithAmbiguousOverload(const std::u32string& groupName, std::vector<std::unique_ptr<BoundExpression>>& arguments, const std::vector<FunctionMatch>& functionMatches, 
-    const Span& span, OverloadResolutionFlags flags, std::unique_ptr<Exception>& exception)
+std::unique_ptr<BoundFunctionCall> FailWithAmbiguousOverload(const std::u32string& groupName, std::vector<std::unique_ptr<BoundExpression>>& arguments, 
+    const std::vector<FunctionMatch>& functionMatches, const Span& span, OverloadResolutionFlags flags, std::unique_ptr<Exception>& exception)
 {
-    std::string overloadName = MakeOverloadName(groupName, arguments);
+    std::string overloadName = MakeOverloadName(groupName, arguments, span);
     std::string matchedFunctionNames;
     bool first = true;
     FunctionMatch equalMatch = std::move(functionMatches[0]);
@@ -464,6 +497,12 @@ std::unique_ptr<BoundFunctionCall> CreateBoundFunctionCall(FunctionSymbol* bestF
     for (int i = 0; i < arity; ++i)
     {
         std::unique_ptr<BoundExpression>& argument = arguments[i];
+        if (i == 0 && (bestFun->GroupName() == U"@constructor" || bestFun->GroupName() == U"operator=") && argument->GetBoundNodeType() == BoundNodeType::boundAddressOfExpression)
+        {
+            BoundAddressOfExpression* addrOf = static_cast<BoundAddressOfExpression*>(argument.get());
+            std::unique_ptr<BoundExpression> subject(std::move(addrOf->Subject()));
+            argument.reset(subject.release());
+        }
         const ArgumentMatch& argumentMatch = bestMatch.argumentMatches[i];
         if (argumentMatch.conversionFun)
         {
@@ -561,20 +600,20 @@ void CollectViableFunctionsFromSymbolTable(int arity, const std::u32string& grou
     }
 }
 
-std::unique_ptr<BoundFunctionCall> ResolveOverload(const std::u32string& groupName, const std::vector<FunctionScopeLookup>& functionScopeLookups, 
+std::unique_ptr<BoundFunctionCall> ResolveOverload(const std::u32string& groupName, ContainerScope* containerScope, const std::vector<FunctionScopeLookup>& functionScopeLookups,
     std::vector<std::unique_ptr<BoundExpression>>& arguments, BoundCompileUnit& boundCompileUnit, BoundFunction* currentFunction, const Span& span)
 {
     std::unique_ptr<Exception> exception;
-    return ResolveOverload(groupName, functionScopeLookups, arguments, boundCompileUnit, currentFunction, span, OverloadResolutionFlags::none, exception);
+    return ResolveOverload(groupName, containerScope, functionScopeLookups, arguments, boundCompileUnit, currentFunction, span, OverloadResolutionFlags::none, exception);
 }
 
-std::unique_ptr<BoundFunctionCall> ResolveOverload(const std::u32string& groupName, const std::vector<FunctionScopeLookup>& functionScopeLookups, 
+std::unique_ptr<BoundFunctionCall> ResolveOverload(const std::u32string& groupName, ContainerScope* containerScope, const std::vector<FunctionScopeLookup>& functionScopeLookups, 
     std::vector<std::unique_ptr<BoundExpression>>& arguments, BoundCompileUnit& boundCompileUnit, BoundFunction* currentFunction, const Span& span, 
     OverloadResolutionFlags flags, std::unique_ptr<Exception>& exception)
 {
     int arity = arguments.size();
     std::unordered_set<FunctionSymbol*> viableFunctions;
-    boundCompileUnit.CollectViableFunctions(groupName, arguments, viableFunctions);
+    boundCompileUnit.CollectViableFunctions(groupName, containerScope, arguments, viableFunctions, exception, span);
     if (viableFunctions.empty())
     {
         CollectViableFunctionsFromSymbolTable(arity, groupName, functionScopeLookups, boundCompileUnit, viableFunctions);

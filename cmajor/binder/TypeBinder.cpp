@@ -172,7 +172,9 @@ void TypeBinder::BindClass(ClassTypeSymbol* classTypeSymbol, ClassNode* classNod
     {
         classTypeSymbol->GetContainerScope()->SetBase(classTypeSymbol->BaseClass()->GetContainerScope());
     }
-    // todo: InitVmt, InitImts, create object layout
+    classTypeSymbol->InitVmt();
+    classTypeSymbol->InitImts();
+    classTypeSymbol->CreateObjectLayout();
     containerScope = prevContainerScope;
 }
 

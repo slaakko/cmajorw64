@@ -128,7 +128,7 @@ BasicTypeCopyCtor::BasicTypeCopyCtor(TypeSymbol* type) : FunctionSymbol(SymbolTy
     SetGroupName(U"@constructor");
     SetAccess(SymbolAccess::public_);
     ParameterSymbol* thisParam = new ParameterSymbol(Span(), U"this");
-    thisParam->SetType(type);
+    thisParam->SetType(type->AddPointer(Span()));
     AddMember(thisParam);
     ParameterSymbol* thatParam = new ParameterSymbol(Span(), U"that");
     thatParam->SetType(type);
@@ -152,7 +152,7 @@ BasicTypeCopyAssignment::BasicTypeCopyAssignment(TypeSymbol* type, TypeSymbol* v
     SetGroupName(U"operator=");
     SetAccess(SymbolAccess::public_);
     ParameterSymbol* thisParam = new ParameterSymbol(Span(), U"this");
-    thisParam->SetType(type);
+    thisParam->SetType(type->AddPointer(Span()));
     AddMember(thisParam);
     ParameterSymbol* thatParam = new ParameterSymbol(Span(), U"that");
     thatParam->SetType(type);

@@ -109,12 +109,14 @@ public:
     void SetOverride() { SetFlag(FunctionSymbolFlags::override_); }
     bool IsAbstract() const { return GetFlag(FunctionSymbolFlags::abstract_); }
     void SetAbstract() { SetFlag(FunctionSymbolFlags::abstract_); }
+    bool IsVirtualAbstractOrOverride() const { return GetFlag(FunctionSymbolFlags::virtual_ | FunctionSymbolFlags::abstract_ | FunctionSymbolFlags::override_); }
     bool IsNew() const { return GetFlag(FunctionSymbolFlags::new_); }
     void SetNew() { SetFlag(FunctionSymbolFlags::new_); }
     bool IsConst() const { return GetFlag(FunctionSymbolFlags::const_); }
     void SetConst() { SetFlag(FunctionSymbolFlags::const_); }
     bool IsConversion() const { return GetFlag(FunctionSymbolFlags::conversion); }
     void SetConversion() { SetFlag(FunctionSymbolFlags::conversion); }
+    virtual bool DontThrow() const { return IsNothrow(); }
     FunctionSymbolFlags GetFunctionSymbolFlags() const { return flags; }
     bool GetFlag(FunctionSymbolFlags flag) const { return (flags & flag) != FunctionSymbolFlags::none; }
     void SetFlag(FunctionSymbolFlags flag) { flags = flags | flag; }
@@ -129,6 +131,10 @@ public:
     void CloneUsingNodes(const std::vector<Node*>& usingNodes_);
     LocalVariableSymbol* CreateTemporary(TypeSymbol* type, const Span& span);
     llvm::FunctionType* IrType(Emitter& emitter);
+    int32_t VmtIndex() const { return vmtIndex; }
+    void SetVmtIndex(int32_t vmtIndex_) { vmtIndex = vmtIndex_; }
+    int32_t ImtIndex() const { return imtIndex; }
+    void SetImtIndex(int32_t imtIndex_) { imtIndex = imtIndex_; }
 private:
     std::u32string groupName;
     std::vector<TemplateParameterSymbol*> templateParameters;
@@ -136,6 +142,8 @@ private:
     std::vector<LocalVariableSymbol*> localVariables;
     TypeSymbol* returnType;
     FunctionSymbolFlags flags;
+    int32_t vmtIndex;
+    int32_t imtIndex;
     NodeList<Node> usingNodes;
     llvm::FunctionType* irType;
     int nextTemporaryIndex;
@@ -164,6 +172,7 @@ public:
     DestructorSymbol(const Span& span_, const std::u32string& name_);
     std::string TypeString() const override { return "destructor"; }
     ParameterSymbol* GetThisParam() const override { return Parameters()[0]; }
+    bool DontThrow() const override { return true; }
     void SetSpecifiers(Specifiers specifiers);
 };
 

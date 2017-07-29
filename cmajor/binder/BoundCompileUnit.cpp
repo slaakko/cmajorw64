@@ -238,9 +238,10 @@ FunctionSymbol* BoundCompileUnit::GetConversion(TypeSymbol* sourceType, TypeSymb
     return conversion;
 }
 
-void BoundCompileUnit::CollectViableFunctions(const std::u32string& groupName, std::vector<std::unique_ptr<BoundExpression>>& arguments, std::unordered_set<FunctionSymbol*>& viableFunctions)
+void BoundCompileUnit::CollectViableFunctions(const std::u32string& groupName, ContainerScope* containerScope, std::vector<std::unique_ptr<BoundExpression>>& arguments, 
+    std::unordered_set<FunctionSymbol*>& viableFunctions,  std::unique_ptr<Exception>& exception, const Span& span)
 {
-    operationRepository.CollectViableFunctions(groupName, arguments, viableFunctions);
+    operationRepository.CollectViableFunctions(groupName, containerScope, arguments, viableFunctions, exception, span);
 }
 
 } } // namespace cmajor::binder
