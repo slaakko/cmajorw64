@@ -402,13 +402,13 @@ void FunctionSymbol::GenerateVirtualCall(Emitter& emitter, std::vector<GenObject
 {
     int na = genObjects.size();
     Assert(na > 0, "nonempty argument list expected");
+    Assert(VmtIndex() != -1, "member function has invalid vmt index");
     GenObject* classPtrArg = genObjects[0];
     TypeSymbol* type = static_cast<TypeSymbol*>(classPtrArg->GetType());
     Assert(type, "type expected");
     Assert(type->BaseType()->IsClassTypeSymbol(), "class type pointer expected");
     ClassTypeSymbol* classType = static_cast<ClassTypeSymbol*>(type->BaseType());
-    Assert(classType->VmtPtrIndex() != -1, "class holds no vmt pointer");
-    Assert(VmtIndex() != -1, "member function has invalid vmt index");
+    ClassTypeSymbol* vmtPtrHolderClass = classType->VmtPtrHolderClass();
     llvm::Value* callee = nullptr;
     for (int i = 0; i < na; ++i)
     {
@@ -418,9 +418,13 @@ void FunctionSymbol::GenerateVirtualCall(Emitter& emitter, std::vector<GenObject
         {
             emitter.Stack().Dup();
             llvm::Value* thisPtr = emitter.Stack().Pop();
+            if (classType != vmtPtrHolderClass)
+            {
+                thisPtr = emitter.Builder().CreateBitCast(thisPtr, vmtPtrHolderClass->AddPointer(GetSpan())->IrType(emitter));
+            }
             ArgVector vmtPtrIndeces;
             vmtPtrIndeces.push_back(emitter.Builder().getInt32(0));
-            vmtPtrIndeces.push_back(emitter.Builder().getInt32(classType->VmtPtrIndex()));
+            vmtPtrIndeces.push_back(emitter.Builder().getInt32(vmtPtrHolderClass->VmtPtrIndex()));
             llvm::Value* vmtPtrPtr = emitter.Builder().CreateGEP(thisPtr, vmtPtrIndeces);
             llvm::Value* vmtPtr = emitter.Builder().CreateBitCast(emitter.Builder().CreateLoad(vmtPtrPtr), classType->VmtPtrType(emitter));
             ArgVector funPtrIndeces;

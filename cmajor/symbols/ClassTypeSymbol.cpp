@@ -198,6 +198,9 @@ void ClassTypeSymbol::CreateDestructorSymbol()
     {
         AddMember(new DestructorSymbol(GetSpan(), U"@destructor"));
         Assert(destructor, "destructor expected");
+        ParameterSymbol* thisParam = new ParameterSymbol(GetSpan(), U"this");
+        thisParam->SetType(AddPointer(GetSpan()));
+        destructor->AddMember(thisParam);
         destructor->ComputeName();
     }
 }
