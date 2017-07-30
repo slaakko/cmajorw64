@@ -12,6 +12,8 @@
 #include <cmajor/symbols/SymbolReader.hpp>
 #include <cmajor/symbols/Exception.hpp>
 #include <cmajor/util/Unicode.hpp>
+#include <cmajor/util/Sha1.hpp>
+#include <llvm/IR/Module.h>
 
 namespace cmajor { namespace symbols {
 
@@ -20,14 +22,14 @@ using namespace cmajor::unicode;
 ClassTypeSymbol::ClassTypeSymbol(const Span& span_, const std::u32string& name_) : 
     TypeSymbol(SymbolType::classTypeSymbol, span_, name_), 
     baseClass(), flags(ClassTypeSymbolFlags::none), implementedInterfaces(), templateParameters(), memberVariables(), staticMemberVariables(), 
-    staticConstructor(), defaultConstructor(), constructors(), destructor(), memberFunctions(), vptrIndex(-1), irType(nullptr)
+    staticConstructor(), defaultConstructor(), constructors(), destructor(), memberFunctions(), vmtPtrIndex(-1), irType(nullptr), vmtObjectType(nullptr)
 {
 }
 
 ClassTypeSymbol::ClassTypeSymbol(SymbolType symbolType_, const Span& span_, const std::u32string& name_) :
     TypeSymbol(symbolType_, span_, name_),
     baseClass(), flags(ClassTypeSymbolFlags::none), implementedInterfaces(), templateParameters(), memberVariables(), staticMemberVariables(), 
-    staticConstructor(), defaultConstructor(), constructors(), destructor(), memberFunctions(), vptrIndex(-1), irType(nullptr)
+    staticConstructor(), defaultConstructor(), constructors(), destructor(), memberFunctions(), vmtPtrIndex(-1), irType(nullptr), vmtObjectType(nullptr)
 {
 }
 
@@ -51,7 +53,7 @@ void ClassTypeSymbol::Write(SymbolWriter& writer)
     }
     uint32_t vmtSize = vmt.size();
     writer.GetBinaryWriter().WriteEncodedUInt(vmtSize);
-    writer.GetBinaryWriter().Write(vptrIndex);
+    writer.GetBinaryWriter().Write(vmtPtrIndex);
 }
 
 void ClassTypeSymbol::Read(SymbolReader& reader)
@@ -72,7 +74,7 @@ void ClassTypeSymbol::Read(SymbolReader& reader)
     }
     uint32_t vmtSize = reader.GetBinaryReader().ReadEncodedUInt();
     vmt.resize(vmtSize);
-    vptrIndex = reader.GetBinaryReader().ReadInt();
+    vmtPtrIndex = reader.GetBinaryReader().ReadInt();
     if (destructor)
     {
         if (destructor->VmtIndex() != -1)
@@ -88,6 +90,10 @@ void ClassTypeSymbol::Read(SymbolReader& reader)
             Assert(memberFunction->VmtIndex() < vmt.size(), "invalid member function vmt index");
             vmt[memberFunction->VmtIndex()] = memberFunction;
         }
+    }
+    if (IsPolymorphic())
+    {
+        GetSymbolTable()->AddPolymorphicClass(this);
     }
 }
 
@@ -317,6 +323,10 @@ void ClassTypeSymbol::InitVmt()
             SetPolymorphic();
         }
     }
+    if (destructor && (destructor->IsVirtual() || destructor->IsOverride()))
+    {
+        SetPolymorphic();
+    }
     for (MemberFunctionSymbol* memberFunction : memberFunctions)
     {
         if (memberFunction->IsVirtualAbstractOrOverride())
@@ -346,11 +356,11 @@ void ClassTypeSymbol::InitVmt()
         {
             if (baseClass)
             {
-                vptrIndex = 1;
+                vmtPtrIndex = 1;
             }
             else
             {
-                vptrIndex = 0;
+                vmtPtrIndex = 0;
             }
         }
         InitVmt(vmt);
@@ -524,7 +534,7 @@ void ClassTypeSymbol::CreateObjectLayout()
     {
         if (IsPolymorphic())
         {
-            vptrIndex = objectLayout.size();
+            vmtPtrIndex = objectLayout.size();
             objectLayout.push_back(GetSymbolTable()->GetTypeByName(U"void")->AddPointer(GetSpan()));
         }
         else if (memberVariables.empty())
@@ -555,6 +565,80 @@ llvm::Type* ClassTypeSymbol::IrType(Emitter& emitter)
         irType = llvm::StructType::get(emitter.Context(), elementTypes);
     }
     return irType;
+}
+
+const std::string& ClassTypeSymbol::VmtObjectName()
+{
+    if (vmtObjectName.empty())
+    {
+        vmtObjectName = "vmt_" + ToUtf8(SimpleName()) + "_" + GetSha1MessageDigest(ToUtf8(FullNameWithSpecifiers()));
+    }
+    return vmtObjectName;
+}
+
+ClassTypeSymbol* ClassTypeSymbol::VmtPtrHolderClass() 
+{
+    if (!IsPolymorphic())
+    {
+        throw Exception("nonpolymorphic class does not contain a vmt ptr", GetSpan());
+    }
+    if (vmtPtrIndex != -1)
+    {
+        return this;
+    }
+    else
+    {
+        if (baseClass)
+        {
+            return baseClass->VmtPtrHolderClass();
+        }
+        else
+        {
+            throw Exception("vmt ptr holder class not found", GetSpan());
+        }
+    }
+}
+
+llvm::Type* ClassTypeSymbol::VmtPtrType(Emitter& emitter)
+{
+    return llvm::PointerType::get(llvm::ArrayType::get(emitter.Builder().getInt8PtrTy(), vmt.size() + functionVmtIndexOffset), 0);
+}
+
+llvm::Value* ClassTypeSymbol::VmtObject(Emitter& emitter, bool create)
+{
+    if (!IsPolymorphic()) return nullptr;
+    if (!vmtObjectType)
+    {
+        vmtObjectType = llvm::ArrayType::get(emitter.Builder().getInt8PtrTy(), vmt.size() + functionVmtIndexOffset);
+    }
+    llvm::Constant* vmtObject = emitter.Module()->getOrInsertGlobal(VmtObjectName(), vmtObjectType);
+    if (!IsVmtObjectCreated() && create)
+    {
+        SetVmtObjectCreated();
+        llvm::GlobalVariable* vmtObjectGlobal = llvm::cast<llvm::GlobalVariable>(vmtObject);
+        vmtObjectGlobal->setDLLStorageClass(llvm::GlobalValue::DLLExportStorageClass);
+        std::vector<llvm::Constant*> vmtArray;
+        vmtArray.push_back(llvm::Constant::getNullValue(emitter.Builder().getInt8PtrTy()));
+        llvm::Value* className = emitter.Builder().CreateGlobalStringPtr(ToUtf8(FullName()));
+        vmtArray.push_back(llvm::cast<llvm::Constant>(emitter.Builder().CreateBitCast(className, emitter.Builder().getInt8PtrTy())));
+        vmtArray.push_back(llvm::Constant::getNullValue(emitter.Builder().getInt8PtrTy()));
+        int n = vmt.size();
+        for (int i = 0; i < n; ++i)
+        {
+            FunctionSymbol* virtualFunction = vmt[i];
+            if (!virtualFunction)
+            {
+                vmtArray.push_back(llvm::Constant::getNullValue(emitter.Builder().getInt8PtrTy()));
+            }
+            else
+            {
+                llvm::Function* functionObject = llvm::cast<llvm::Function>(emitter.Module()->getOrInsertFunction(ToUtf8(virtualFunction->MangledName()), virtualFunction->IrType(emitter)));
+                vmtArray.push_back(llvm::cast<llvm::Constant>(emitter.Builder().CreateBitCast(functionObject, emitter.Builder().getInt8PtrTy())));
+            }
+        }
+        vmtObjectGlobal->setInitializer(llvm::ConstantArray::get(vmtObjectType, vmtArray));
+    }
+    return vmtObject;
 }
 
 TemplateParameterSymbol::TemplateParameterSymbol(const Span& span_, const std::u32string& name_) : TypeSymbol(SymbolType::templateParameterSymbol, span_, name_)

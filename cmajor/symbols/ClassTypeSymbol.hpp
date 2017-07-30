@@ -25,7 +25,8 @@ enum class ClassTypeSymbolFlags : uint8_t
     vmtInitialized = 1 << 2,
     imtsInitialized = 1 << 3,
     classObjectLayoutComputed = 1 << 4,
-    dontCreateDefaultConstructor = 1 << 5
+    vmtObjectCreated = 1 << 5,
+    dontCreateDefaultConstructor = 1 << 6
 };
 
 inline ClassTypeSymbolFlags operator|(ClassTypeSymbolFlags left, ClassTypeSymbolFlags right)
@@ -37,6 +38,11 @@ inline ClassTypeSymbolFlags operator&(ClassTypeSymbolFlags left, ClassTypeSymbol
 {
     return ClassTypeSymbolFlags(uint8_t(left) & uint8_t(right));
 }
+
+const int32_t classIdVmtIndexOffset = 0;
+const int32_t classNameVmtIndexOffset = 1;
+const int32_t imtsVmtIndexOffset = 2;
+const int32_t functionVmtIndexOffset = 3;
 
 class ClassTypeSymbol : public TypeSymbol
 {
@@ -76,6 +82,8 @@ public:
     void SetImtsInitialized() { SetFlag(ClassTypeSymbolFlags::imtsInitialized); }
     bool IsClassObjectLayoutComputed() const { return GetFlag(ClassTypeSymbolFlags::classObjectLayoutComputed); }
     void SetClassObjectLayoutComputed() { SetFlag(ClassTypeSymbolFlags::classObjectLayoutComputed); }
+    bool IsVmtObjectCreated() const { return GetFlag(ClassTypeSymbolFlags::vmtObjectCreated); }
+    void SetVmtObjectCreated() { SetFlag(ClassTypeSymbolFlags::vmtObjectCreated); }
     bool DontCreateDefaultConstructor() const { return GetFlag(ClassTypeSymbolFlags::dontCreateDefaultConstructor); }
     void SetDontCreateDefaultConstructor() { SetFlag(ClassTypeSymbolFlags::dontCreateDefaultConstructor); }
     ClassTypeSymbolFlags GetClassTypeSymbolFlags() const { return flags; }
@@ -85,6 +93,11 @@ public:
     void InitImts();
     void CreateObjectLayout();
     llvm::Type* IrType(Emitter& emitter) override;
+    llvm::Value* VmtObject(Emitter& emitter, bool create);
+    llvm::Type* VmtPtrType(Emitter& emitter);
+    const std::string& VmtObjectName();
+    int32_t VmtPtrIndex() const { return vmtPtrIndex; }
+    ClassTypeSymbol* VmtPtrHolderClass();
 private:
     ClassTypeSymbol* baseClass;
     ClassTypeSymbolFlags flags;
@@ -101,8 +114,10 @@ private:
     std::vector<std::vector<FunctionSymbol*>> imts;
     std::vector<TypeSymbol*> objectLayout;
     llvm::Type* irType;
-    int32_t vptrIndex;
+    llvm::ArrayType* vmtObjectType;
+    int32_t vmtPtrIndex;
     NodeList<Node> usingNodes;
+    std::string vmtObjectName;
     void InitVmt(std::vector<FunctionSymbol*>& vmtToInit);
 };
 

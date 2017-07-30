@@ -16,7 +16,8 @@ enum class OperationFlags : uint8_t
     none = 0,
     addr = 1 << 0,
     deref = 1 << 1,
-    leaveFirstArg = 1 << 2,
+    virtualCall = 1 << 2,
+    leaveFirstArg = 1 << 3,
     functionCallFlags = leaveFirstArg
 };
 
@@ -33,10 +34,14 @@ inline OperationFlags operator&(OperationFlags left, OperationFlags right)
 class GenObject
 {
 public:
+    GenObject();
     virtual ~GenObject();
-    virtual void Init(Emitter& emitter) {};
     virtual void Load(Emitter& emitter, OperationFlags flags) = 0;
     virtual void Store(Emitter& emitter, OperationFlags flags) = 0;
+    void SetType(void* type_) { type = type_; }
+    void* GetType() { return type; }
+private:
+    void* type;
 };
 
 } } // namespace cmajor::ir

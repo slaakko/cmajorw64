@@ -381,6 +381,7 @@ void BuildProject(Project* project)
             throw std::runtime_error("program has no main function");
         }
         Link(project->ExecutableFilePath(), module.LibraryFilePaths());
+        CreateClassFile(project->ExecutableFilePath(), module.GetSymbolTable());
     }
     SymbolWriter writer(project->ModuleFilePath());
     module.Write(writer);

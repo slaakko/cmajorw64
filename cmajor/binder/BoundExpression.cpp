@@ -398,6 +398,26 @@ void BoundDereferenceExpression::Accept(BoundNodeVisitor& visitor)
     visitor.Visit(*this);
 }
 
+BoundReferenceToPointerExpression::BoundReferenceToPointerExpression(std::unique_ptr<BoundExpression>&& subject_, TypeSymbol* type_) :
+    BoundExpression(subject_->GetSpan(), BoundNodeType::boundReferenceToPointerExpression, type_), subject(std::move(subject_))
+{
+}
+
+void BoundReferenceToPointerExpression::Load(Emitter& emitter, OperationFlags flags)
+{
+    subject->Load(emitter, flags);
+}
+
+void BoundReferenceToPointerExpression::Store(Emitter& emitter, OperationFlags flags)
+{
+    subject->Store(emitter, flags);
+}
+
+void BoundReferenceToPointerExpression::Accept(BoundNodeVisitor& visitor)
+{
+    visitor.Visit(*this);
+}
+
 BoundFunctionCall::BoundFunctionCall(const Span& span_, FunctionSymbol* functionSymbol_) : BoundExpression(span_, BoundNodeType::boundFunctionCall, functionSymbol_->ReturnType()), functionSymbol(functionSymbol_)
 {
 }
@@ -425,7 +445,14 @@ void BoundFunctionCall::Load(Emitter& emitter, OperationFlags flags)
         {
             genObjects.push_back(argument.get());
         }
-        functionSymbol->GenerateCall(emitter, genObjects, flags & OperationFlags::functionCallFlags);
+        OperationFlags callFlags = OperationFlags::functionCallFlags;
+        if (GetFlag(BoundExpressionFlags::virtualCall))
+        {
+            Assert(!arguments.empty(), "nonempty argument list expected");
+            genObjects[0]->SetType(arguments[0]->GetType());
+            callFlags = callFlags | OperationFlags::virtualCall;
+        }
+        functionSymbol->GenerateCall(emitter, genObjects, callFlags);
         if ((flags & OperationFlags::deref) != OperationFlags::none)
         {
             emitter.Stack().Push(emitter.Builder().CreateLoad(emitter.Stack().Pop()));
@@ -447,7 +474,12 @@ void BoundFunctionCall::Store(Emitter& emitter, OperationFlags flags)
         {
             genObjects.push_back(argument.get());
         }
-        functionSymbol->GenerateCall(emitter, genObjects, OperationFlags::none);
+        OperationFlags callFlags = OperationFlags::none;
+        if (GetFlag(BoundExpressionFlags::virtualCall))
+        {
+            callFlags = callFlags | OperationFlags::virtualCall;
+        }
+        functionSymbol->GenerateCall(emitter, genObjects, callFlags);
         llvm::Value* ptr = emitter.Stack().Pop();
         if ((flags & OperationFlags::leaveFirstArg) != OperationFlags::none)
         {

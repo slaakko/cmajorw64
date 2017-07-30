@@ -117,7 +117,7 @@ void CheckFunctionReturnPaths(FunctionSymbol* functionSymbol, CompoundStatementN
 }
 
 StatementBinder::StatementBinder(BoundCompileUnit& boundCompileUnit_) :  
-    boundCompileUnit(boundCompileUnit_), symbolTable(boundCompileUnit.GetSymbolTable()), containerScope(nullptr), statement(), currentFunction(nullptr), postfix(false)
+    boundCompileUnit(boundCompileUnit_), symbolTable(boundCompileUnit.GetSymbolTable()), containerScope(nullptr), statement(), currentClass(nullptr), currentFunction(nullptr), postfix(false)
 {
 }
 
@@ -144,10 +144,11 @@ void StatementBinder::Visit(ClassNode& classNode)
 {
     ContainerScope* prevContainerScope = containerScope;
     Symbol* symbol = boundCompileUnit.GetSymbolTable().GetSymbol(&classNode);
-    Assert(symbol->GetSymbolType() == SymbolType::classTypeSymbol, "class type symbol expected");
+    Assert(symbol->GetSymbolType() == SymbolType::classTypeSymbol || symbol->GetSymbolType() == SymbolType::classTemplateSpecializationSymbol, "class type symbol expected");
     ClassTypeSymbol* classTypeSymbol = static_cast<ClassTypeSymbol*>(symbol);
     containerScope = symbol->GetContainerScope();
     std::unique_ptr<BoundClass> boundClass(new BoundClass(classTypeSymbol));
+    currentClass = boundClass.get();
     int n = classNode.Members().Count();
     for (int i = 0; i < n; ++i)
     {
@@ -214,7 +215,7 @@ void StatementBinder::Visit(StaticConstructorNode& staticConstructorNode)
         boundFunction->SetBody(std::unique_ptr<BoundCompoundStatement>(compoundStatement));
     }
     CheckFunctionReturnPaths(staticConstructorSymbol, staticConstructorNode, containerScope, boundCompileUnit);
-    boundCompileUnit.AddBoundNode(std::move(boundFunction));
+    currentClass->AddMember(std::move(boundFunction));
     currentFunction = prevFunction;
     containerScope = prevContainerScope;
 }
@@ -238,7 +239,7 @@ void StatementBinder::Visit(ConstructorNode& constructorNode)
         boundFunction->SetBody(std::unique_ptr<BoundCompoundStatement>(compoundStatement));
     }
     CheckFunctionReturnPaths(constructorSymbol, constructorNode, containerScope, boundCompileUnit);
-    boundCompileUnit.AddBoundNode(std::move(boundFunction));
+    currentClass->AddMember(std::move(boundFunction));
     currentFunction = prevFunction;
     containerScope = prevContainerScope;
 }
@@ -262,7 +263,7 @@ void StatementBinder::Visit(DestructorNode& destructorNode)
         boundFunction->SetBody(std::unique_ptr<BoundCompoundStatement>(compoundStatement));
     }
     CheckFunctionReturnPaths(destructorSymbol, destructorNode, containerScope, boundCompileUnit);
-    boundCompileUnit.AddBoundNode(std::move(boundFunction));
+    currentClass->AddMember(std::move(boundFunction));
     currentFunction = prevFunction;
     containerScope = prevContainerScope;
 }
@@ -286,7 +287,7 @@ void StatementBinder::Visit(MemberFunctionNode& memberFunctionNode)
         boundFunction->SetBody(std::unique_ptr<BoundCompoundStatement>(compoundStatement));
     }
     CheckFunctionReturnPaths(memberFunctionSymbol, memberFunctionNode, containerScope, boundCompileUnit);
-    boundCompileUnit.AddBoundNode(std::move(boundFunction));
+    currentClass->AddMember(std::move(boundFunction));
     currentFunction = prevFunction;
     containerScope = prevContainerScope;
 }

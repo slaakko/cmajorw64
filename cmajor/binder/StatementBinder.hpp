@@ -13,6 +13,7 @@ namespace cmajor { namespace binder {
 using namespace cmajor::ast;
 
 class BoundStatement;
+class BoundClass;
 class BoundFunction;
 
 class StatementBinder : public Visitor
@@ -58,6 +59,7 @@ private:
     SymbolTable& symbolTable;
     ContainerScope* containerScope;
     std::unique_ptr<BoundStatement> statement;
+    BoundClass* currentClass;
     BoundFunction* currentFunction;
     bool postfix;
     void AddStatement(BoundStatement* boundStatement);

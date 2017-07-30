@@ -25,6 +25,7 @@ class BoundConstructionStatement;
 class BoundAssignmentStatement;
 class BoundExpressionStatement;
 class BoundEmptyStatement;
+class BoundSetVmtPtrStatement;
 class BoundParameter;
 class BoundLocalVariable;
 class BoundMemberVariable;
@@ -35,6 +36,7 @@ class BoundTemporary;
 class BoundSizeOfExpression;
 class BoundAddressOfExpression;
 class BoundDereferenceExpression;
+class BoundReferenceToPointerExpression;
 class BoundFunctionCall;
 class BoundConversion;
 class BoundConstructExpression;
@@ -60,6 +62,7 @@ public:
     virtual void Visit(BoundAssignmentStatement& boundAssignmentStatement) {}
     virtual void Visit(BoundExpressionStatement& boundExpressionStatement) {}
     virtual void Visit(BoundEmptyStatement& boundEmptyStatement) {}
+    virtual void Visit(BoundSetVmtPtrStatement& boundSetVmtPtrStatement) {}
     virtual void Visit(BoundParameter& boundParameter) {}
     virtual void Visit(BoundLocalVariable& boundLocalVariable) {}
     virtual void Visit(BoundMemberVariable& boundMemberVariable) {}
@@ -70,6 +73,7 @@ public:
     virtual void Visit(BoundSizeOfExpression& boundSizeOfExpression) {}
     virtual void Visit(BoundAddressOfExpression& boundAddressOfExpression) {}
     virtual void Visit(BoundDereferenceExpression& boundDereferenceExpression) {}
+    virtual void Visit(BoundReferenceToPointerExpression& boundReferenceToPointerExpression) {}
     virtual void Visit(BoundFunctionCall& boundFunctionCall) {}
     virtual void Visit(BoundConversion& boundConversion) {}
     virtual void Visit(BoundConstructExpression& boundConstructExpression) {}

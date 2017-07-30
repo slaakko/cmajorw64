@@ -193,7 +193,7 @@ void ExpressionBinder::BindSymbol(Symbol* symbol)
             expression.reset(boundFunctionGroupExpression);
             break;
         }
-        case SymbolType::classTypeSymbol:
+        case SymbolType::classTypeSymbol: case SymbolType::classTemplateSpecializationSymbol:
         {
             ClassTypeSymbol* classTypeSymbol = static_cast<ClassTypeSymbol*>(symbol);
             CheckAccess(boundFunction->GetFunctionSymbol(), classTypeSymbol);
@@ -537,7 +537,7 @@ void ExpressionBinder::Visit(DotNode& dotNode)
     else
     {
         TypeSymbol* type = expression->GetType();
-        if (type->GetSymbolType() == SymbolType::classTypeSymbol)
+        if (type->IsClassTypeSymbol())
         {
             ClassTypeSymbol* classType = static_cast<ClassTypeSymbol*>(type);
             ContainerScope* scope = classType->GetContainerScope();
@@ -561,7 +561,7 @@ void ExpressionBinder::Visit(DotNode& dotNode)
                     if (!classPtr->GetFlag(BoundExpressionFlags::argIsExplicitThisOrBasePtr))
                     {
                         Symbol* parent = symbol->Parent();
-                        Assert(parent->GetSymbolType() == SymbolType::classTypeSymbol, "class type expected");
+                        Assert(parent->GetSymbolType() == SymbolType::classTypeSymbol || parent->GetSymbolType() == SymbolType::classTemplateSpecializationSymbol, "class type expected");
                         ClassTypeSymbol* owner = static_cast<ClassTypeSymbol*>(parent);
                         if (classType->HasBaseClass(owner))
                         {
@@ -583,7 +583,7 @@ void ExpressionBinder::Visit(DotNode& dotNode)
                     if (!bmv->GetMemberVariableSymbol()->IsStatic())
                     {
                         Symbol* parent = symbol->Parent();
-                        Assert(parent->GetSymbolType() == SymbolType::classTypeSymbol, "class type expected");
+                        Assert(parent->GetSymbolType() == SymbolType::classTypeSymbol || parent->GetSymbolType() == SymbolType::classTemplateSpecializationSymbol, "class type expected");
                         ClassTypeSymbol* owner = static_cast<ClassTypeSymbol*>(parent);
                         if (classType->HasBaseClass(owner))
                         {
@@ -829,8 +829,16 @@ void ExpressionBinder::Visit(AddrOfNode& addrOfNode)
     addrOfNode.Subject()->Accept(*this);
     if (expression->IsLvalueExpression())
     {
-        TypeSymbol* type = expression->GetType()->AddPointer(addrOfNode.GetSpan());
-        expression.reset(new BoundAddressOfExpression(std::unique_ptr<BoundExpression>(expression.release()), type));
+        if (expression->GetType()->IsReferenceType())
+        {
+            TypeSymbol* type = expression->GetType()->RemoveReference(addrOfNode.GetSpan())->AddPointer(addrOfNode.GetSpan());
+            expression.reset(new BoundReferenceToPointerExpression(std::unique_ptr<BoundExpression>(expression.release()), type));
+        }
+        else
+        {
+            TypeSymbol* type = expression->GetType()->AddPointer(addrOfNode.GetSpan());
+            expression.reset(new BoundAddressOfExpression(std::unique_ptr<BoundExpression>(expression.release()), type));
+        }
     }
     else
     {
@@ -1029,6 +1037,15 @@ void ExpressionBinder::Visit(InvokeNode& invokeNode)
         }
     }
     CheckAccess(boundFunction->GetFunctionSymbol(), functionCall->GetFunctionSymbol());
+    FunctionSymbol* functionSymbol = functionCall->GetFunctionSymbol();
+    if (functionSymbol->GetSymbolType() == SymbolType::memberFunctionSymbol && !functionSymbol->IsStatic() && functionSymbol->IsVirtualAbstractOrOverride())
+    {
+        Assert(!functionCall->Arguments().empty(), "nonempty argument list expected");
+        if (!functionCall->Arguments()[0]->GetFlag(BoundExpressionFlags::argIsExplicitThisOrBasePtr))
+        {
+            functionCall->SetFlag(BoundExpressionFlags::virtualCall);
+        }
+    }
     expression.reset(functionCall.release());
 }
 

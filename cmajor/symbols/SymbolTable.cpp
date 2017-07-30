@@ -19,6 +19,7 @@
 #include <cmajor/symbols/Exception.hpp>
 #include <cmajor/ast/Identifier.hpp>
 #include <cmajor/util/Unicode.hpp>
+#include <boost/filesystem.hpp>
 
 namespace cmajor { namespace symbols {
 
@@ -113,6 +114,10 @@ void SymbolTable::Import(SymbolTable& symbolTable)
     }
     Assert(conversionTable.IsEmpty(), "empty conversion table expected");
     conversionTable = std::move(symbolTable.conversionTable);
+    for (ClassTypeSymbol* polymorphicClass : symbolTable.PolymorphicClasses())
+    {
+        AddPolymorphicClass(polymorphicClass);
+    }
     symbolTable.Clear();
 }
 
@@ -723,6 +728,15 @@ FunctionSymbol* SymbolTable::GetConversion(TypeSymbol* sourceType, TypeSymbol* t
     return conversionTable.GetConversion(sourceType, targetType, span);
 }
 
+void SymbolTable::AddPolymorphicClass(ClassTypeSymbol* polymorphicClass)
+{
+    if (!polymorphicClass->IsPolymorphic())
+    {
+        throw Exception("not a polymorphic class", polymorphicClass->GetSpan());
+    }
+    polymorphicClasses.insert(polymorphicClass);
+}
+
 void InitCoreSymbolTable(SymbolTable& symbolTable)
 {
     BoolTypeSymbol* boolType = new BoolTypeSymbol(Span(), U"bool");
@@ -757,6 +771,28 @@ void InitCoreSymbolTable(SymbolTable& symbolTable)
     symbolTable.AddTypeSymbolToGlobalScope(voidType);
     symbolTable.AddTypeSymbolToGlobalScope(new NullPtrType(Span(), U"@nullptr_type"));
     MakeBasicTypeOperations(symbolTable, boolType, sbyteType, byteType, shortType, ushortType, intType, uintType, longType, ulongType, floatType, doubleType, charType, wcharType, ucharType, voidType);
+}
+
+void CreateClassFile(const std::string& executableFilePath, const SymbolTable& symbolTable)
+{
+    std::string classFilePath = boost::filesystem::path(executableFilePath).replace_extension(".cls").generic_string();
+    const std::unordered_set<ClassTypeSymbol*>& polymorphicClasses = symbolTable.PolymorphicClasses();
+    uint32_t n = polymorphicClasses.size();
+    BinaryWriter writer(classFilePath);
+    writer.WriteEncodedUInt(n);
+    for (ClassTypeSymbol* polymorphicClass : polymorphicClasses)
+    {
+        uint32_t typeId = polymorphicClass->TypeId();
+        const std::string& vmtObjectName = polymorphicClass->VmtObjectName();
+        uint32_t baseClassTypeId = 0;
+        if (polymorphicClass->BaseClass())
+        {
+            baseClassTypeId = polymorphicClass->BaseClass()->TypeId();
+        }
+        writer.WriteEncodedUInt(typeId);
+        writer.Write(vmtObjectName);
+        writer.WriteEncodedUInt(baseClassTypeId);
+    }
 }
 
 void InitSymbolTable()

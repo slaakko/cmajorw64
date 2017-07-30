@@ -185,6 +185,18 @@ public:
     void Accept(BoundNodeVisitor& visitor) override;
 };
 
+class BoundSetVmtPtrStatement : public BoundStatement
+{
+public:
+    BoundSetVmtPtrStatement(std::unique_ptr<BoundExpression>&& classPtr_, ClassTypeSymbol* classType_);
+    void Accept(BoundNodeVisitor& visitor) override;
+    BoundExpression* ClassPtr() { return classPtr.get(); }
+    ClassTypeSymbol* ClassType() { return classType; }
+private:
+    std::unique_ptr<BoundExpression> classPtr;
+    ClassTypeSymbol* classType;
+};
+
 } } // namespace cmajor::binder
 
 #endif // CMAJOR_BINDER_BOUND_STATEMENT_INCLUDED

@@ -367,6 +367,11 @@ std::u32string FunctionSymbol::FullNameWithSpecifiers() const
 
 void FunctionSymbol::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags)
 {
+    if ((flags & OperationFlags::virtualCall) != OperationFlags::none)
+    {
+        GenerateVirtualCall(emitter, genObjects, flags);
+        return;
+    }
     int na = genObjects.size();
     for (int i = 0; i < na; ++i)
     {
@@ -390,6 +395,57 @@ void FunctionSymbol::GenerateCall(Emitter& emitter, std::vector<GenObject*>& gen
     else
     {
         emitter.Builder().CreateCall(callee, args);
+    }
+}
+
+void FunctionSymbol::GenerateVirtualCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags)
+{
+    int na = genObjects.size();
+    Assert(na > 0, "nonempty argument list expected");
+    GenObject* classPtrArg = genObjects[0];
+    TypeSymbol* type = static_cast<TypeSymbol*>(classPtrArg->GetType());
+    Assert(type, "type expected");
+    Assert(type->BaseType()->IsClassTypeSymbol(), "class type pointer expected");
+    ClassTypeSymbol* classType = static_cast<ClassTypeSymbol*>(type->BaseType());
+    Assert(classType->VmtPtrIndex() != -1, "class holds no vmt pointer");
+    Assert(VmtIndex() != -1, "member function has invalid vmt index");
+    llvm::Value* callee = nullptr;
+    for (int i = 0; i < na; ++i)
+    {
+        GenObject* genObject = genObjects[i];
+        genObject->Load(emitter, OperationFlags::none);
+        if (i == 0)
+        {
+            emitter.Stack().Dup();
+            llvm::Value* thisPtr = emitter.Stack().Pop();
+            ArgVector vmtPtrIndeces;
+            vmtPtrIndeces.push_back(emitter.Builder().getInt32(0));
+            vmtPtrIndeces.push_back(emitter.Builder().getInt32(classType->VmtPtrIndex()));
+            llvm::Value* vmtPtrPtr = emitter.Builder().CreateGEP(thisPtr, vmtPtrIndeces);
+            llvm::Value* vmtPtr = emitter.Builder().CreateBitCast(emitter.Builder().CreateLoad(vmtPtrPtr), classType->VmtPtrType(emitter));
+            ArgVector funPtrIndeces;
+            funPtrIndeces.push_back(emitter.Builder().getInt32(0));
+            funPtrIndeces.push_back(emitter.Builder().getInt32(VmtIndex() + functionVmtIndexOffset));
+            llvm::Value* funPtrPtr = emitter.Builder().CreateGEP(vmtPtr, funPtrIndeces);
+            llvm::Value* funAsVoidPtr = emitter.Builder().CreateLoad(funPtrPtr);
+            callee = emitter.Builder().CreateBitCast(funAsVoidPtr, llvm::PointerType::get(IrType(emitter), 0));
+        }
+    }
+    ArgVector args;
+    int n = Parameters().size();
+    args.resize(n);
+    for (int i = 0; i < n; ++i)
+    {
+        llvm::Value* arg = emitter.Stack().Pop();
+        args[n - i - 1] = arg;
+    }
+    if (ReturnType() && !ReturnType()->IsVoidType())
+    {
+        emitter.Stack().Push(emitter.Builder().CreateCall(IrType(emitter), callee, args));
+    }
+    else
+    {
+        emitter.Builder().CreateCall(IrType(emitter), callee, args);
     }
 }
 
@@ -680,6 +736,10 @@ DestructorSymbol::DestructorSymbol(const Span& span_, const std::u32string& name
 void DestructorSymbol::SetSpecifiers(Specifiers specifiers)
 {
     Specifiers accessSpecifiers = specifiers & Specifiers::access_;
+    if (accessSpecifiers != Specifiers::public_)
+    {
+        throw Exception("destructor must be public", GetSpan());
+    }
     SetAccess(accessSpecifiers);
     if ((specifiers & Specifiers::static_) != Specifiers::none)
     {

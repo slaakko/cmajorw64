@@ -173,7 +173,8 @@ void BoundAssignmentStatement::Accept(BoundNodeVisitor& visitor)
     visitor.Visit(*this);
 }
 
-BoundExpressionStatement::BoundExpressionStatement(std::unique_ptr<BoundExpression>&& expression_) : BoundStatement(expression_->GetSpan(), BoundNodeType::boundExpressionStatement), expression(std::move(expression_))
+BoundExpressionStatement::BoundExpressionStatement(std::unique_ptr<BoundExpression>&& expression_) : 
+    BoundStatement(expression_->GetSpan(), BoundNodeType::boundExpressionStatement), expression(std::move(expression_))
 { 
 }
 
@@ -187,6 +188,16 @@ BoundEmptyStatement::BoundEmptyStatement(const Span& span_) : BoundStatement(spa
 }
 
 void BoundEmptyStatement::Accept(BoundNodeVisitor& visitor)
+{
+    visitor.Visit(*this);
+}
+
+BoundSetVmtPtrStatement::BoundSetVmtPtrStatement(std::unique_ptr<BoundExpression>&& classPtr_, ClassTypeSymbol* classType_) :
+    BoundStatement(classPtr_->GetSpan(), BoundNodeType::boundSetVmtPtrStatement), classPtr(std::move(classPtr_)), classType(classType_)
+{
+}
+
+void BoundSetVmtPtrStatement::Accept(BoundNodeVisitor& visitor)
 {
     visitor.Visit(*this);
 }

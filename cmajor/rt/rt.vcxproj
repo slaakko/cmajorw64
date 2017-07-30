@@ -157,6 +157,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Classes.hpp" />
     <ClInclude Include="Exception.hpp" />
     <ClInclude Include="InitDone.hpp" />
     <ClInclude Include="Memory.hpp" />
@@ -164,6 +165,7 @@
     <ClInclude Include="Io.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Classes.cpp" />
     <ClCompile Include="Exception.cpp" />
     <ClCompile Include="InitDone.cpp" />
     <ClCompile Include="Io.cpp" />

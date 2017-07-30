@@ -100,7 +100,7 @@ void TypeBinder::Visit(FunctionNode& functionNode)
 void TypeBinder::Visit(ClassNode& classNode)
 {
     Symbol* symbol = symbolTable.GetSymbol(&classNode);
-    Assert(symbol->GetSymbolType() == SymbolType::classTypeSymbol, "class type symbol expected");
+    Assert(symbol->GetSymbolType() == SymbolType::classTypeSymbol || symbol->GetSymbolType() == SymbolType::classTemplateSpecializationSymbol, "class type symbol expected");
     ClassTypeSymbol* classTypeSymbol = static_cast<ClassTypeSymbol*>(symbol);
     BindClass(classTypeSymbol, &classNode);
 }
@@ -175,6 +175,10 @@ void TypeBinder::BindClass(ClassTypeSymbol* classTypeSymbol, ClassNode* classNod
     classTypeSymbol->InitVmt();
     classTypeSymbol->InitImts();
     classTypeSymbol->CreateObjectLayout();
+    if (classTypeSymbol->IsPolymorphic())
+    {
+        symbolTable.AddPolymorphicClass(classTypeSymbol);
+    }
     containerScope = prevContainerScope;
 }
 

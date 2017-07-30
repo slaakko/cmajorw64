@@ -13,6 +13,7 @@
 #include <process.h>
 #include <windows.h>
 #include <io.h>
+#include <Psapi.h>
 #elif defined(__linux) || defined(__posix) || defined(__unix)
 #include <unistd.h>
 #include <sys/types.h>
@@ -392,6 +393,32 @@ void RestoreStdHandles(const std::vector<int>& oldHandles)
     {
         throw std::runtime_error("RestoreStdHandles: dup2 2, old2 failed");
     }
+}
+
+std::string GetPathToExecutable()
+{
+    char buf[4096];
+#ifdef _WIN32
+    DWORD result = GetModuleFileName(NULL, buf, sizeof(buf));
+    if (result == 0)
+    {
+        throw std::runtime_error("could not get path to current executable: GetModuleFileName failed");
+    }
+    return std::string(buf);
+
+#elif defined(__linux) || defined(__unix) || defined(__posix)
+
+    int result = readlink("/proc/self/exe", buf, bufSize);
+    if (result == -1)
+    {
+        throw std::runtime_error("could not get path to current executable: " + strerror(errno));
+    }
+    return std::string(buf);
+#else
+
+#error unknown platform
+
+#endif
 }
 
 } } // namespace cmajor::util

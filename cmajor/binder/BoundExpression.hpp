@@ -18,7 +18,8 @@ using namespace cmajor::symbols;
 enum class BoundExpressionFlags : uint8_t
 {
     none = 0, 
-    argIsExplicitThisOrBasePtr = 1 << 0
+    argIsExplicitThisOrBasePtr = 1 << 0,
+    virtualCall = 1 << 1
 };
 
 inline BoundExpressionFlags operator|(BoundExpressionFlags left, BoundExpressionFlags right)
@@ -188,6 +189,18 @@ private:
     std::unique_ptr<BoundExpression> subject;
 };
 
+class BoundReferenceToPointerExpression : public BoundExpression
+{
+public:
+    BoundReferenceToPointerExpression(std::unique_ptr<BoundExpression>&& subject_, TypeSymbol* type_);
+    void Load(Emitter& emitter, OperationFlags flags) override;
+    void Store(Emitter& emitter, OperationFlags flags) override;
+    void Accept(BoundNodeVisitor& visitor) override;
+    std::string TypeString() const override { return "reference to pointer expression"; }
+private:
+    std::unique_ptr<BoundExpression> subject;
+};
+
 class BoundFunctionCall : public BoundExpression
 {
 public:
@@ -202,6 +215,7 @@ public:
     FunctionSymbol* GetFunctionSymbol() { return functionSymbol; }
     void AddArgument(std::unique_ptr<BoundExpression>&& argument);
     void SetArguments(std::vector<std::unique_ptr<BoundExpression>>&& arguments_);
+    const std::vector<std::unique_ptr<BoundExpression>>& Arguments() const { return arguments; }
 private:
     FunctionSymbol* functionSymbol;
     std::vector<std::unique_ptr<BoundExpression>> arguments;

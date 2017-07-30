@@ -32,6 +32,7 @@ int ReadFromPipe(int pipeHandle, void* buffer, unsigned int count);
 int WriteToPipe(int pipeHandle, void* buffer, unsigned int count);
 void RedirectStdHandlesToPipes(std::vector<int>& oldHandles, std::vector<int>& pipeHandles);
 void RestoreStdHandles(const std::vector<int>& oldHandles);
+std::string GetPathToExecutable();
 
 } } // namespace cmajor::util
 

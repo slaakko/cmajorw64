@@ -110,6 +110,8 @@ public:
     const FunctionSymbol* MainFunctionSymbol() const { return mainFunctionSymbol; }
     void AddConversion(FunctionSymbol* conversion);
     FunctionSymbol* GetConversion(TypeSymbol* sourceType, TypeSymbol* targetType, const Span& span) const;
+    void AddPolymorphicClass(ClassTypeSymbol* polymorphicClass);
+    const std::unordered_set<ClassTypeSymbol*>& PolymorphicClasses() const { return polymorphicClasses; }
 private:
     NamespaceSymbol globalNs;
     ContainerSymbol* container;
@@ -129,11 +131,14 @@ private:
     std::vector<std::unique_ptr<DerivedTypeSymbol>> derivedTypes;
     std::vector<TypeRequest> typeRequests;
     ConversionTable conversionTable;
+    std::unordered_set<ClassTypeSymbol*> polymorphicClasses;
     int GetNextDeclarationBlockIndex() { return declarationBlockIndex++; }
     void ResetDeclarationBlockIndex() { declarationBlockIndex = 0; }
 };
 
 void InitCoreSymbolTable(SymbolTable& symbolTable);
+
+void CreateClassFile(const std::string& executableFilePath, const SymbolTable& symbolTable);
 
 void InitSymbolTable();
 void DoneSymbolTable();

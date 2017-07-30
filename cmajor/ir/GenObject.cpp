@@ -7,6 +7,10 @@
 
 namespace cmajor { namespace ir {
 
+GenObject::GenObject() : type(nullptr)
+{
+}
+
 GenObject::~GenObject()
 {
 }

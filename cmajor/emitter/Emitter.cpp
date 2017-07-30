@@ -126,6 +126,7 @@ public:
     void Visit(BoundAssignmentStatement& boundAssignmentStatement) override;
     void Visit(BoundExpressionStatement& boundExpressionStatement) override;
     void Visit(BoundEmptyStatement& boundEmptyStatement) override;
+    void Visit(BoundSetVmtPtrStatement& boundSetVmtPtrStatement) override;
     void Visit(BoundParameter& boundParameter) override;
     void Visit(BoundLocalVariable& boundLocalVariable) override;
     void Visit(BoundMemberVariable& boundMemberVariable) override;
@@ -136,6 +137,7 @@ public:
     void Visit(BoundSizeOfExpression& boundSizeOfExpression) override;
     void Visit(BoundAddressOfExpression& boundAddressOfExpression) override;
     void Visit(BoundDereferenceExpression& boundDereferenceExpression) override;
+    void Visit(BoundReferenceToPointerExpression& boundReferenceToPointerExpression) override;
     void Visit(BoundFunctionCall& boundFunctionCall) override;
     void Visit(BoundConversion& boundConversion) override;
     void Visit(BoundConstructExpression& boundConstructExpression) override;
@@ -149,12 +151,14 @@ private:
     llvm::Function* function;
     llvm::BasicBlock* trueBlock;
     llvm::BasicBlock* falseBlock;
+    BoundClass* currentClass;
+    std::stack<BoundClass*> classStack;
 };
 
 Emitter::Emitter(EmittingContext& emittingContext_, const std::string& compileUnitModuleName_) :
     cmajor::ir::Emitter(emittingContext_.GetEmittingContextImpl()->Context()), emittingContext(emittingContext_), symbolTable(nullptr),
     compileUnitModule(new llvm::Module(compileUnitModuleName_, emittingContext.GetEmittingContextImpl()->Context())), builder(Builder()), stack(Stack()), context(emittingContext.GetEmittingContextImpl()->Context()),
-    function(nullptr), trueBlock(nullptr), falseBlock(nullptr)
+    function(nullptr), trueBlock(nullptr), falseBlock(nullptr), currentClass(nullptr)
 {
     compileUnitModule->setTargetTriple(emittingContext.GetEmittingContextImpl()->TargetTriple());
     compileUnitModule->setDataLayout(emittingContext.GetEmittingContextImpl()->DataLayout());
@@ -206,12 +210,16 @@ void Emitter::Visit(BoundCompileUnit& boundCompileUnit)
 
 void Emitter::Visit(BoundClass& boundClass)
 {
+    classStack.push(currentClass);
+    currentClass = &boundClass;
     int n = boundClass.Members().size();
     for (int i = 0; i < n; ++i)
     {
         BoundNode* boundNode = boundClass.Members()[i].get();
         boundNode->Accept(*this);
     }
+    currentClass = classStack.top();
+    classStack.pop();
 }
 
 void Emitter::Visit(BoundFunction& boundFunction)
@@ -222,6 +230,14 @@ void Emitter::Visit(BoundFunction& boundFunction)
     function = llvm::cast<llvm::Function>(compileUnitModule->getOrInsertFunction(ToUtf8(functionSymbol->MangledName()), functionType));
     llvm::BasicBlock* entryBlock = llvm::BasicBlock::Create(context, "entry", function);
     builder.SetInsertPoint(entryBlock);
+    if (currentClass)
+    {
+        ClassTypeSymbol* classTypeSymbol = currentClass->GetClassTypeSymbol();
+        if (!classTypeSymbol->IsVmtObjectCreated())
+        {
+            classTypeSymbol->VmtObject(*this, true);
+        }
+    }
     int np = functionSymbol->Parameters().size();
     for (int i = 0; i < np; ++i)
     {
@@ -421,6 +437,24 @@ void Emitter::Visit(BoundEmptyStatement& boundEmptyStatement)
     builder.CreateCall(doNothingFunType, doNothingFun, args);
 }
 
+void Emitter::Visit(BoundSetVmtPtrStatement& boundSetVmtPtrStatement)
+{
+    BoundExpression* classPtr = boundSetVmtPtrStatement.ClassPtr();
+    TypeSymbol* type = classPtr->GetType()->BaseType();
+    Assert(type->IsClassTypeSymbol(), "class type expected");
+    ClassTypeSymbol* classType = static_cast<ClassTypeSymbol*>(type);
+    int32_t vmtPtrIndex = classType->VmtPtrIndex();
+    Assert(vmtPtrIndex != -1, "invalid vmt ptr index");
+    classPtr->Accept(*this);
+    llvm::Value* classPtrValue = stack.Pop();
+    ArgVector indeces;
+    indeces.push_back(builder.getInt32(0));
+    indeces.push_back(builder.getInt32(vmtPtrIndex));
+    llvm::Value* ptr = builder.CreateGEP(classPtrValue, indeces);
+    llvm::Value* vmtPtr = builder.CreateBitCast(boundSetVmtPtrStatement.ClassType()->VmtObject(*this, false), builder.getInt8PtrTy());
+    builder.CreateStore(vmtPtr, ptr);
+}
+
 void Emitter::Visit(BoundParameter& boundParameter)
 {
     boundParameter.Load(*this, OperationFlags::none);
@@ -469,6 +503,11 @@ void Emitter::Visit(BoundAddressOfExpression& boundAddressOfExpression)
 void Emitter::Visit(BoundDereferenceExpression& boundDereferenceExpression)
 {
     boundDereferenceExpression.Load(*this, OperationFlags::none);
+}
+
+void Emitter::Visit(BoundReferenceToPointerExpression& boundReferenceToPointerExpression)
+{
+    boundReferenceToPointerExpression.Load(*this, OperationFlags::none);
 }
 
 void Emitter::Visit(BoundFunctionCall& boundFunctionCall)

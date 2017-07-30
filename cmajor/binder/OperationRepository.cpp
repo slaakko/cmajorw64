@@ -958,6 +958,26 @@ void ClassDefaultConstructorOperation::GenerateImplementation(ClassDefaultConstr
                 boundFunction.get(), span);
             boundFunction->Body()->AddStatement(std::unique_ptr<BoundStatement>(new BoundExpressionStatement(std::move(baseConstructorCall))));
         }
+        if (classType->IsPolymorphic())
+        {
+            ParameterSymbol* thisParam = defaultConstructor->Parameters()[0];
+            BoundExpression* classPtr = nullptr;
+            ClassTypeSymbol* vmtPtrHolderClass = classType->VmtPtrHolderClass();
+            if (vmtPtrHolderClass == classType)
+            {
+                classPtr = new BoundParameter(thisParam);
+            }
+            else
+            {
+                FunctionSymbol* thisToHolderConversion = GetBoundCompileUnit().GetConversion(thisParam->GetType(), vmtPtrHolderClass->AddPointer(span), span);
+                if (!thisToHolderConversion)
+                {
+                    throw Exception("base class conversion not found", span, classType->GetSpan());
+                }
+                classPtr = new BoundConversion(std::unique_ptr<BoundExpression>(new BoundParameter(thisParam)), thisToHolderConversion);
+            }
+            boundFunction->Body()->AddStatement(std::unique_ptr<BoundStatement>(new BoundSetVmtPtrStatement(std::unique_ptr<BoundExpression>(classPtr), classType)));
+        }
         int n = classType->MemberVariables().size();
         for (int i = 0; i < n; ++i)
         {
