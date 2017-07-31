@@ -318,16 +318,16 @@ void StatementBinder::Visit(CompoundStatementNode& compoundStatementNode)
     {
         GenerateClassInitialization(currentConstructorSymbol, currentConstructorNode, boundCompoundStatement.get(), currentFunction, boundCompileUnit, containerScope, this);
     }
-    else if (currentDestructorSymbol && currentDestructorNode)
-    {
-        GenerateClassTermination(currentDestructorSymbol, currentDestructorNode, boundCompoundStatement.get(), currentFunction, boundCompileUnit, containerScope, this);
-    }
     int n = compoundStatementNode.Statements().Count();
     for (int i = 0; i < n; ++i)
     {
         StatementNode* statementNode = compoundStatementNode.Statements()[i];
         statementNode->Accept(*this);
         boundCompoundStatement->AddStatement(std::move(statement));
+    }
+    if (currentDestructorSymbol && currentDestructorNode)
+    {
+        GenerateClassTermination(currentDestructorSymbol, currentDestructorNode, boundCompoundStatement.get(), currentFunction, boundCompileUnit, containerScope, this);
     }
     AddStatement(boundCompoundStatement.release());
     if (compoundStatementNode.Label())
