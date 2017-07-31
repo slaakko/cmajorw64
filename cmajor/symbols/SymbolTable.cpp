@@ -224,6 +224,10 @@ void SymbolTable::AddParameter(ParameterNode& parameterNode)
     {
         parameterName = parameterNode.Id()->Str();
     }
+    else
+    {
+        parameterNode.SetId(new IdentifierNode(parameterNode.GetSpan(), parameterName));
+    }
     ParameterSymbol* parameterSymbol = new ParameterSymbol(parameterNode.GetSpan(), parameterName);
     parameterSymbol->SetSymbolTable(this);
     MapNode(&parameterNode, parameterSymbol);

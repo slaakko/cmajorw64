@@ -68,8 +68,10 @@ public:
     void Visit(NullLiteralNode& nullLiteralNode) override;
 
     void Visit(IdentifierNode& identifierNode) override;
+    void Visit(ParameterNode& parameterNode) override;
     void Visit(DotNode& dotNode) override;
     void Visit(ArrowNode& arrowNode) override;
+    void BindArrow(Node& node, const std::u32string& name);
     void Visit(DisjunctionNode& disjunctionNode) override;
     void Visit(ConjunctionNode& conjunctionNode) override;
     void Visit(BitOrNode& bitOrNode) override;
@@ -139,7 +141,7 @@ void ExpressionBinder::BindUnaryOp(BoundExpression* operand, Node& node, const s
     arguments.push_back(std::unique_ptr<BoundExpression>(operand));
     std::vector<FunctionScopeLookup> functionScopeLookups;
     functionScopeLookups.push_back(FunctionScopeLookup(ScopeLookup::this_and_base_and_parent, containerScope));
-    functionScopeLookups.push_back(FunctionScopeLookup(ScopeLookup::this_, operand->GetType()->ClassOrNsScope()));
+    functionScopeLookups.push_back(FunctionScopeLookup(ScopeLookup::this_, operand->GetType()->BaseType()->ClassOrNsScope()));
     functionScopeLookups.push_back(FunctionScopeLookup(ScopeLookup::fileScopes, nullptr));
     std::unique_ptr<BoundFunctionCall> operatorFunCall = ResolveOverload(groupName, containerScope, functionScopeLookups, arguments, boundCompileUnit, boundFunction, node.GetSpan());
     CheckAccess(boundFunction->GetFunctionSymbol(), operatorFunCall->GetFunctionSymbol());
@@ -509,6 +511,43 @@ void ExpressionBinder::Visit(IdentifierNode& identifierNode)
     }
 }
 
+void ExpressionBinder::Visit(ParameterNode& parameterNode)
+{
+    if (!parameterNode.Id())
+    {
+        throw Exception("parameter not named", parameterNode.GetSpan());
+    }
+    std::u32string name = parameterNode.Id()->Str();
+    Symbol* symbol = containerScope->Lookup(name, ScopeLookup::this_and_base_and_parent);
+    if (!symbol)
+    {
+        for (const std::unique_ptr<FileScope>& fileScope : boundCompileUnit.FileScopes())
+        {
+            symbol = fileScope->Lookup(name);
+            if (symbol)
+            {
+                break;
+            }
+        }
+    }
+    if (symbol)
+    {
+        if (symbol->GetSymbolType() == SymbolType::parameterSymbol)
+        {
+            ParameterSymbol* parameterSymbol = static_cast<ParameterSymbol*>(symbol);
+            expression.reset(new BoundParameter(parameterSymbol));
+        }
+        else
+        {
+            throw Exception("symbol '" + ToUtf8(name) + "' does not denote a parameter", parameterNode.GetSpan());
+        }
+    }
+    else
+    {
+        throw Exception("parameter symbol '" + ToUtf8(name) + "' not found", parameterNode.GetSpan());
+    }
+}
+
 void ExpressionBinder::Visit(DotNode& dotNode)
 {
     ContainerScope* prevContainerScope = containerScope;
@@ -536,10 +575,10 @@ void ExpressionBinder::Visit(DotNode& dotNode)
     }
     else
     {
-        TypeSymbol* type = expression->GetType();
+        TypeSymbol* type = expression->GetType()->PlainType(dotNode.GetSpan());
         if (type->IsClassTypeSymbol())
         {
-            ClassTypeSymbol* classType = static_cast<ClassTypeSymbol*>(type);
+            ClassTypeSymbol* classType = static_cast<ClassTypeSymbol*>(type->BaseType());
             ContainerScope* scope = classType->GetContainerScope();
             std::u32string name = dotNode.MemberId()->Str();
             Symbol* symbol = scope->Lookup(name, ScopeLookup::this_and_base);
@@ -549,6 +588,11 @@ void ExpressionBinder::Visit(DotNode& dotNode)
                 if (expression->GetType()->IsClassTypeSymbol())
                 {
                     classPtr.reset(new BoundAddressOfExpression(std::unique_ptr<BoundExpression>(expression.release()), expression->GetType()->AddPointer(dotNode.GetSpan())));
+                }
+                else if (expression->GetType()->IsReferenceType())
+                {
+                    TypeSymbol* type = expression->GetType()->RemoveReference(dotNode.GetSpan())->AddPointer(dotNode.GetSpan());
+                    classPtr.reset(new BoundReferenceToPointerExpression(std::unique_ptr<BoundExpression>(expression.release()), type));
                 }
                 else
                 {
@@ -610,9 +654,78 @@ void ExpressionBinder::Visit(DotNode& dotNode)
     containerScope = prevContainerScope;
 }
 
+void ExpressionBinder::BindArrow(Node& node, const std::u32string& name)
+{
+    if (expression->GetType()->IsPointerType())
+    {
+        std::unique_ptr<BoundExpression> classPtr(std::move(expression));
+        if (classPtr->GetType()->BaseType()->IsClassTypeSymbol())
+        {
+            ClassTypeSymbol* classType = static_cast<ClassTypeSymbol*>(classPtr->GetType()->BaseType());
+            ContainerScope* scope = classType->GetContainerScope();
+            Symbol* symbol = scope->Lookup(name, ScopeLookup::this_and_base);
+            if (symbol)
+            {
+                BindSymbol(symbol);
+                if (expression->GetBoundNodeType() == BoundNodeType::boundFunctionGroupExcpression)
+                {
+                    BoundFunctionGroupExpression* bfg = static_cast<BoundFunctionGroupExpression*>(expression.get());
+                    if (!classPtr->GetFlag(BoundExpressionFlags::argIsExplicitThisOrBasePtr))
+                    {
+                        Symbol* parent = symbol->Parent();
+                        Assert(parent->GetSymbolType() == SymbolType::classTypeSymbol || parent->GetSymbolType() == SymbolType::classTemplateSpecializationSymbol, "class type expected");
+                        ClassTypeSymbol* owner = static_cast<ClassTypeSymbol*>(parent);
+                        if (classType->HasBaseClass(owner))
+                        {
+                            classPtr.reset(new BoundConversion(std::unique_ptr<BoundExpression>(classPtr.release()), boundCompileUnit.GetConversion(classType, owner, node.GetSpan())));
+                        }
+                    }
+                    BoundMemberExpression* bme = new BoundMemberExpression(node.GetSpan(), std::unique_ptr<BoundExpression>(classPtr.release()), std::move(expression));
+                    expression.reset(bme);
+                }
+                else if (expression->GetBoundNodeType() == BoundNodeType::boundMemberVariable)
+                {
+                    BoundMemberVariable* bmv = static_cast<BoundMemberVariable*>(expression.get());
+                    if (!bmv->GetMemberVariableSymbol()->IsStatic())
+                    {
+                        Symbol* parent = symbol->Parent();
+                        Assert(parent->GetSymbolType() == SymbolType::classTypeSymbol || parent->GetSymbolType() == SymbolType::classTemplateSpecializationSymbol, "class type expected");
+                        ClassTypeSymbol* owner = static_cast<ClassTypeSymbol*>(parent);
+                        if (classType->HasBaseClass(owner))
+                        {
+                            classPtr.reset(new BoundConversion(std::unique_ptr<BoundExpression>(classPtr.release()), boundCompileUnit.GetConversion(classType, owner, node.GetSpan())));
+                        }
+                        bmv->SetClassPtr(std::unique_ptr<BoundExpression>(classPtr.release()));
+                    }
+                }
+                else
+                {
+                    throw Exception("symbol '" + ToUtf8(name) + "' does not denote a function group or a member variable", node.GetSpan());
+                }
+            }
+            else
+            {
+                throw Exception("symbol '" + ToUtf8(name) + "' not found from class '" + ToUtf8(classType->FullName()) + "'", node.GetSpan());
+            }
+        }
+        else
+        {
+            throw Exception("type of arrow expression subject must be pointer to class type", node.GetSpan());
+
+        }
+    }
+    else if (expression->GetType()->IsClassTypeSymbol())
+    {
+
+    }
+}
+
 void ExpressionBinder::Visit(ArrowNode& arrowNode) 
 {
-    // todo
+    arrowNode.Subject()->Accept(*this);
+    expression.reset(new BoundAddressOfExpression(std::move(expression), expression->GetType()->AddPointer(arrowNode.GetSpan())));
+    BindUnaryOp(expression.release(), arrowNode, U"operator->");
+    BindArrow(arrowNode, arrowNode.MemberId()->Str());
 }
 
 void ExpressionBinder::Visit(DisjunctionNode& disjunctionNode) 
@@ -1203,7 +1316,6 @@ void ExpressionBinder::Visit(ConstructNode& constructNode)
             CastNode castNode(constructNode.GetSpan(), new PointerNode(constructNode.GetSpan(), constructNode.TypeExpr()->Clone(cloneContext)), argumentNode->Clone(cloneContext));
             castNode.Accept(*this);
             resultType = expression->GetType();
-            BindDerefExpr(constructNode);
             if (!resultType->IsPointerType())
             {
                 throw Exception("first argument of a construct expression must be of a pointer type", argumentNode->GetSpan());
@@ -1232,7 +1344,6 @@ void ExpressionBinder::Visit(NewNode& newNode)
     castNode.Accept(*this);
     std::vector<std::unique_ptr<BoundExpression>> arguments;
     TypeSymbol* resultType = expression->GetType();
-    BindDerefExpr(newNode);
     arguments.push_back(std::move(expression));
     int n = newNode.Arguments().Count();
     for (int i = 0; i < n; ++i)
@@ -1327,6 +1438,10 @@ std::unique_ptr<BoundExpression> BindExpression(Node* node, BoundCompileUnit& bo
     ExpressionBinder expressionBinder(node->GetSpan(), boundCompileUnit, boundFunction, containerScope, statementBinder, lvalue);
     node->Accept(expressionBinder);
     std::unique_ptr<BoundExpression> expression = expressionBinder.GetExpression();
+    if (!expression)
+    {
+        throw Exception("cound not bind expression", node->GetSpan());
+    }
     if (acceptFunctionGroup && expression->GetBoundNodeType() == BoundNodeType::boundFunctionGroupExcpression)
     { 
         return expression;

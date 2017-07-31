@@ -376,7 +376,7 @@ void FunctionSymbol::GenerateCall(Emitter& emitter, std::vector<GenObject*>& gen
     for (int i = 0; i < na; ++i)
     {
         GenObject* genObject = genObjects[i];
-        genObject->Load(emitter, OperationFlags::none);
+        genObject->Load(emitter, flags & OperationFlags::functionCallFlags);
     }
     llvm::FunctionType* functionType = IrType(emitter);
     llvm::Function* callee = llvm::cast<llvm::Function>(emitter.Module()->getOrInsertFunction(ToUtf8(MangledName()), functionType));

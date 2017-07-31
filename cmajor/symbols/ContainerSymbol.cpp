@@ -18,6 +18,7 @@ using namespace cmajor::unicode;
 
 ContainerSymbol::ContainerSymbol(SymbolType symbolType_, const Span& span_, const std::u32string& name_) : Symbol(symbolType_, span_, name_)
 {
+    containerScope.SetContainer(this);
 }
 
 void ContainerSymbol::Write(SymbolWriter& writer)

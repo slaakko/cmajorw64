@@ -498,7 +498,7 @@ std::unique_ptr<BoundFunctionCall> CreateBoundFunctionCall(FunctionSymbol* bestF
     {
         std::unique_ptr<BoundExpression>& argument = arguments[i];
         if (i == 0 && !bestFun->IsConstructorDestructorOrNonstaticMemberFunction() && 
-            (bestFun->GroupName() == U"@constructor" || bestFun->GroupName() == U"operator=") && 
+            (bestFun->GroupName() == U"@constructor" || bestFun->GroupName() == U"operator=" || bestFun->GroupName() == U"operator->") && 
             argument->GetBoundNodeType() == BoundNodeType::boundAddressOfExpression)
         {
             BoundAddressOfExpression* addrOf = static_cast<BoundAddressOfExpression*>(argument.get());

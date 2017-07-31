@@ -22,6 +22,7 @@ public:
     void Read(AstReader& reader) override;
     Node* TypeExpr() const { return typeExpr.get(); }
     IdentifierNode* Id() const { return id.get(); }
+    void SetId(IdentifierNode* id_);
 private:
     std::unique_ptr<Node> typeExpr;
     std::unique_ptr<IdentifierNode> id;

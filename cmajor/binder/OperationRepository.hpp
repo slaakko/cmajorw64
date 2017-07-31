@@ -7,12 +7,19 @@
 #define CMAJOR_BINDER_OPERATION_REPOSITORY_INCLUDED
 #include <cmajor/binder/BoundExpression.hpp>
 #include <cmajor/symbols/Exception.hpp>
+#include <cmajor/symbols/FunctionSymbol.hpp>
+#include <cmajor/ast/Class.hpp>
 
 namespace cmajor { namespace binder {
 
 using namespace cmajor::symbols;
+using namespace cmajor::ast;
 
 class BoundCompileUnit;
+class BoundClass;
+class BoundFunction;
+class BoundCompoundStatement;
+class StatementBinder;
 
 class Operation
 {
@@ -64,6 +71,11 @@ private:
     std::vector<std::unique_ptr<Operation>> operations;
 };
 
+void GenerateDestructorImplementation(BoundClass* boundClass, DestructorSymbol* destructorSymbol, BoundCompileUnit& boundCompileUnit, ContainerScope* containerScope, const Span& span);
+void GenerateClassInitialization(ConstructorSymbol* constructorSymbol, ConstructorNode* constructorNode, BoundCompoundStatement* boundCompoundStatement, BoundFunction* boundFunction, 
+    BoundCompileUnit& boundCompileUnit, ContainerScope* containerScope, StatementBinder* statementBinder);
+void GenerateClassTermination(DestructorSymbol* destructorSymbol, DestructorNode* destructorNode, BoundCompoundStatement* boundCompoundStatement, BoundFunction* boundFunction,
+    BoundCompileUnit& boundCompileUnit, ContainerScope* containerScope, StatementBinder* statementBinder);
 } } // namespace cmajor::binder
 
 #endif // CMAJOR_BINDER_OPERATION_REPOSITORY_INCLUDED

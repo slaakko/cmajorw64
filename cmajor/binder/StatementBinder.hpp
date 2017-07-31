@@ -61,6 +61,10 @@ private:
     std::unique_ptr<BoundStatement> statement;
     BoundClass* currentClass;
     BoundFunction* currentFunction;
+    ConstructorSymbol* currentConstructorSymbol;
+    ConstructorNode* currentConstructorNode;
+    DestructorSymbol* currentDestructorSymbol;
+    DestructorNode* currentDestructorNode;
     bool postfix;
     void AddStatement(BoundStatement* boundStatement);
 };

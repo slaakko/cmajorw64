@@ -11,6 +11,7 @@
 #include <cmajor/binder/OverloadResolution.hpp>
 #include <cmajor/binder/ExpressionBinder.hpp>
 #include <cmajor/binder/Access.hpp>
+#include <cmajor/binder/OperationRepository.hpp>
 #include <cmajor/symbols/FunctionSymbol.hpp>
 #include <cmajor/symbols/Exception.hpp>
 #include <cmajor/ast/Literal.hpp>
@@ -117,7 +118,8 @@ void CheckFunctionReturnPaths(FunctionSymbol* functionSymbol, CompoundStatementN
 }
 
 StatementBinder::StatementBinder(BoundCompileUnit& boundCompileUnit_) :  
-    boundCompileUnit(boundCompileUnit_), symbolTable(boundCompileUnit.GetSymbolTable()), containerScope(nullptr), statement(), currentClass(nullptr), currentFunction(nullptr), postfix(false)
+    boundCompileUnit(boundCompileUnit_), symbolTable(boundCompileUnit.GetSymbolTable()), containerScope(nullptr), statement(), currentClass(nullptr), currentFunction(nullptr), 
+    currentConstructorSymbol(nullptr), currentConstructorNode(nullptr), currentDestructorSymbol(nullptr), currentDestructorNode(nullptr), postfix(false)
 {
 }
 
@@ -156,7 +158,6 @@ void StatementBinder::Visit(ClassNode& classNode)
         classMember->Accept(*this);
     }
     boundCompileUnit.AddBoundNode(std::move(boundClass));
-    containerScope = prevContainerScope;
     if (classTypeSymbol->HasNontrivialDestructor())
     {
         classTypeSymbol->CreateDestructorSymbol();
@@ -167,9 +168,10 @@ void StatementBinder::Visit(ClassNode& classNode)
         Node* node = symbolTable.GetNodeNoThrow(destructorSymbol);
         if (!node)
         {
-            // todo: implement destructor
+            GenerateDestructorImplementation(currentClass, destructorSymbol, boundCompileUnit, containerScope, classNode.GetSpan());
         }
     }
+    containerScope = prevContainerScope;
 }
 
 void StatementBinder::Visit(FunctionNode& functionNode)
@@ -226,13 +228,18 @@ void StatementBinder::Visit(ConstructorNode& constructorNode)
     Symbol* symbol = boundCompileUnit.GetSymbolTable().GetSymbol(&constructorNode);
     Assert(symbol->GetSymbolType() == SymbolType::constructorSymbol, "constructor symbol expected");
     ConstructorSymbol* constructorSymbol = static_cast<ConstructorSymbol*>(symbol);
+    ConstructorSymbol* prevConstructorSymbol = currentConstructorSymbol;
+    currentConstructorSymbol = constructorSymbol;
     containerScope = symbol->GetContainerScope();
     std::unique_ptr<BoundFunction> boundFunction(new BoundFunction(constructorSymbol));
     BoundFunction* prevFunction = currentFunction;
     currentFunction = boundFunction.get();
     if (constructorNode.Body())
     {
+        ConstructorNode* prevConstructorNode = currentConstructorNode;
+        currentConstructorNode = &constructorNode;
         constructorNode.Body()->Accept(*this);
+        currentConstructorNode = prevConstructorNode;
         BoundStatement* boundStatement = statement.release();
         Assert(boundStatement->GetBoundNodeType() == BoundNodeType::boundCompoundStatement, "bound compound statement expected");
         BoundCompoundStatement* compoundStatement = static_cast<BoundCompoundStatement*>(boundStatement);
@@ -242,6 +249,7 @@ void StatementBinder::Visit(ConstructorNode& constructorNode)
     currentClass->AddMember(std::move(boundFunction));
     currentFunction = prevFunction;
     containerScope = prevContainerScope;
+    currentConstructorSymbol = prevConstructorSymbol;
 }
 
 void StatementBinder::Visit(DestructorNode& destructorNode)
@@ -250,13 +258,18 @@ void StatementBinder::Visit(DestructorNode& destructorNode)
     Symbol* symbol = boundCompileUnit.GetSymbolTable().GetSymbol(&destructorNode);
     Assert(symbol->GetSymbolType() == SymbolType::destructorSymbol, "destructor symbol expected");
     DestructorSymbol* destructorSymbol = static_cast<DestructorSymbol*>(symbol);
+    DestructorSymbol* prevDestructorSymbol = currentDestructorSymbol;
+    currentDestructorSymbol = destructorSymbol;
     containerScope = symbol->GetContainerScope();
     std::unique_ptr<BoundFunction> boundFunction(new BoundFunction(destructorSymbol));
     BoundFunction* prevFunction = currentFunction;
     currentFunction = boundFunction.get();
     if (destructorNode.Body())
     {
+        DestructorNode* prevDestructorNode = currentDestructorNode;
+        currentDestructorNode = &destructorNode;
         destructorNode.Body()->Accept(*this);
+        currentDestructorNode = prevDestructorNode;
         BoundStatement* boundStatement = statement.release();
         Assert(boundStatement->GetBoundNodeType() == BoundNodeType::boundCompoundStatement, "bound compound statement expected");
         BoundCompoundStatement* compoundStatement = static_cast<BoundCompoundStatement*>(boundStatement);
@@ -266,6 +279,7 @@ void StatementBinder::Visit(DestructorNode& destructorNode)
     currentClass->AddMember(std::move(boundFunction));
     currentFunction = prevFunction;
     containerScope = prevContainerScope;
+    currentDestructorSymbol = prevDestructorSymbol;
 }
 
 void StatementBinder::Visit(MemberFunctionNode& memberFunctionNode)
@@ -300,6 +314,14 @@ void StatementBinder::Visit(CompoundStatementNode& compoundStatementNode)
     DeclarationBlock* declarationBlock = static_cast<DeclarationBlock*>(symbol);
     containerScope = declarationBlock->GetContainerScope();
     std::unique_ptr<BoundCompoundStatement> boundCompoundStatement(new BoundCompoundStatement(compoundStatementNode.GetSpan()));
+    if (currentConstructorSymbol && currentConstructorNode)
+    {
+        GenerateClassInitialization(currentConstructorSymbol, currentConstructorNode, boundCompoundStatement.get(), currentFunction, boundCompileUnit, containerScope, this);
+    }
+    else if (currentDestructorSymbol && currentDestructorNode)
+    {
+        GenerateClassTermination(currentDestructorSymbol, currentDestructorNode, boundCompoundStatement.get(), currentFunction, boundCompileUnit, containerScope, this);
+    }
     int n = compoundStatementNode.Statements().Count();
     for (int i = 0; i < n; ++i)
     {

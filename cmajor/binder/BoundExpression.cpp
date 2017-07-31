@@ -445,7 +445,7 @@ void BoundFunctionCall::Load(Emitter& emitter, OperationFlags flags)
         {
             genObjects.push_back(argument.get());
         }
-        OperationFlags callFlags = OperationFlags::functionCallFlags;
+        OperationFlags callFlags = flags & OperationFlags::functionCallFlags;
         if (GetFlag(BoundExpressionFlags::virtualCall))
         {
             Assert(!arguments.empty(), "nonempty argument list expected");

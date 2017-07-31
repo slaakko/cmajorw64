@@ -210,7 +210,6 @@ void TypeBinder::Visit(ConstructorNode& constructorNode)
     ContainerScope* prevContainerScope = containerScope;
     containerScope = constructorSymbol->GetContainerScope();
     constructorSymbol->SetSpecifiers(constructorNode.GetSpecifiers());
-    constructorSymbol->ComputeName();
     const Symbol* parent = constructorSymbol->Parent();
     if (parent->IsStatic())
     {
@@ -226,7 +225,7 @@ void TypeBinder::Visit(ConstructorNode& constructorNode)
         ParameterSymbol* parameterSymbol = static_cast<ParameterSymbol*>(symbol);
         parameterSymbol->SetType(parameterType);
     }
-    // todo add conversion to symbol table
+    constructorSymbol->ComputeName();
     if (constructorNode.Body())
     {
         if (constructorSymbol->IsDefault() || constructorSymbol->IsSuppressed())
@@ -257,12 +256,12 @@ void TypeBinder::Visit(DestructorNode& destructorNode)
     ContainerScope* prevContainerScope = containerScope;
     containerScope = destructorSymbol->GetContainerScope();
     destructorSymbol->SetSpecifiers(destructorNode.GetSpecifiers());
-    destructorSymbol->ComputeName();
     const Symbol* parent = destructorSymbol->Parent();
     if (parent->IsStatic())
     {
         throw Exception("static class cannot contain a destructor", destructorSymbol->GetSpan(), parent->GetSpan());
     }
+    destructorSymbol->ComputeName();
     if (destructorNode.Body())
     {
         if (destructorSymbol->IsDefault())
@@ -293,7 +292,6 @@ void TypeBinder::Visit(MemberFunctionNode& memberFunctionNode)
     ContainerScope* prevContainerScope = containerScope;
     containerScope = memberFunctionSymbol->GetContainerScope();
     memberFunctionSymbol->SetSpecifiers(memberFunctionNode.GetSpecifiers());
-    memberFunctionSymbol->ComputeName();
     const Symbol* parent = memberFunctionSymbol->Parent();
     if (parent->IsStatic() && !memberFunctionSymbol->IsStatic())
     {
@@ -311,6 +309,7 @@ void TypeBinder::Visit(MemberFunctionNode& memberFunctionNode)
     }
     TypeSymbol* returnType = ResolveType(memberFunctionNode.ReturnTypeExpr(), boundCompileUnit, containerScope);
     memberFunctionSymbol->SetReturnType(returnType);
+    memberFunctionSymbol->ComputeName();
     if (memberFunctionNode.Body())
     {
         if (memberFunctionSymbol->IsDefault() || memberFunctionSymbol->IsSuppressed())

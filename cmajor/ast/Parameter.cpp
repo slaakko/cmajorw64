@@ -64,4 +64,10 @@ void ParameterNode::Read(AstReader& reader)
     }
 }
 
+void ParameterNode::SetId(IdentifierNode* id_)
+{
+    id.reset(id_);
+    id->SetParent(this);
+}
+
 } } // namespace cmajor::ast
