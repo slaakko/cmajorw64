@@ -65,6 +65,8 @@ private:
     ConstructorNode* currentConstructorNode;
     DestructorSymbol* currentDestructorSymbol;
     DestructorNode* currentDestructorNode;
+    MemberFunctionSymbol* currentMemberFunctionSymbol;
+    MemberFunctionNode* currentMemberFunctionNode;
     bool postfix;
     void AddStatement(BoundStatement* boundStatement);
 };

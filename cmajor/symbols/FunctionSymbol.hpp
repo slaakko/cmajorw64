@@ -45,7 +45,8 @@ enum class FunctionSymbolFlags : uint16_t
     abstract_ = 1 << 9,
     new_ = 1 << 10,
     const_ = 1 << 11,
-    conversion = 1 << 12
+    conversion = 1 << 12,
+    weakOdrLinkage = 1 << 13
 };
 
 inline FunctionSymbolFlags operator|(FunctionSymbolFlags left, FunctionSymbolFlags right)
@@ -88,6 +89,11 @@ public:
     void GenerateVirtualCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags);
     virtual ParameterSymbol* GetThisParam() const { return nullptr; }
     virtual bool IsConstructorDestructorOrNonstaticMemberFunction() const { return false; }
+    bool IsDefaultConstructor() const;
+    bool IsCopyConstructor() const;
+    bool IsMoveConstructor() const;
+    bool IsCopyAssignment() const;
+    bool IsMoveAssignment() const;
     const std::u32string& GroupName() const { return groupName; }
     void SetGroupName(const std::u32string& groupName_);
     void SetSpecifiers(Specifiers specifiers);
@@ -163,7 +169,7 @@ class ConstructorSymbol : public FunctionSymbol
 {
 public:
     ConstructorSymbol(const Span& span_, const std::u32string& name_);
-    std::string TypeString() const override { return "constructor"; }
+    std::string TypeString() const override;
     ParameterSymbol* GetThisParam() const override { return Parameters()[0]; }
     bool IsConstructorDestructorOrNonstaticMemberFunction() const override { return true; }
     void SetSpecifiers(Specifiers specifiers);
@@ -184,7 +190,7 @@ class MemberFunctionSymbol : public FunctionSymbol
 {
 public:
     MemberFunctionSymbol(const Span& span_, const std::u32string& name_);
-    std::string TypeString() const override { return "member_function"; }
+    std::string TypeString() const override;
     ParameterSymbol* GetThisParam() const override { if (IsStatic()) return nullptr; else return Parameters()[0]; }
     bool IsConstructorDestructorOrNonstaticMemberFunction() const override { return !IsStatic(); }
     void SetSpecifiers(Specifiers specifiers);

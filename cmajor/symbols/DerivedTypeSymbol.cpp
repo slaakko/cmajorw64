@@ -209,6 +209,21 @@ TypeDerivationRec AddLvalueReferenceDerivation(const TypeDerivationRec& typeDeri
     return lvalueReferenceAddedDerivationRec;
 }
 
+TypeDerivationRec AddRvalueReferenceDerivation(const TypeDerivationRec& typeDerivationRec)
+{
+    TypeDerivationRec rvalueReferenceAddedDerivationRec;
+    rvalueReferenceAddedDerivationRec.arrayDimensions = typeDerivationRec.arrayDimensions;
+    for (Derivation derivation : typeDerivationRec.derivations)
+    {
+        if (derivation != Derivation::lvalueRefDerivation && derivation != Derivation::rvalueRefDerivation)
+        {
+            rvalueReferenceAddedDerivationRec.derivations.push_back(derivation);
+        }
+    }
+    rvalueReferenceAddedDerivationRec.derivations.push_back(Derivation::rvalueRefDerivation);
+    return rvalueReferenceAddedDerivationRec;
+}
+
 TypeDerivationRec AddPointerDerivation(const TypeDerivationRec& typeDerivationRec)
 {
     TypeDerivationRec pointerAddedDerivationRec;
@@ -429,6 +444,18 @@ TypeSymbol* DerivedTypeSymbol::AddLvalueReference(const Span& span)
     else
     {
         return GetSymbolTable()->MakeDerivedType(baseType, AddLvalueReferenceDerivation(derivationRec), span);
+    }
+}
+
+TypeSymbol* DerivedTypeSymbol::AddRvalueReference(const Span& span)
+{
+    if (IsRvalueReferenceType())
+    {
+        return this;
+    }
+    else
+    {
+        return GetSymbolTable()->MakeDerivedType(baseType, AddRvalueReferenceDerivation(derivationRec), span);
     }
 }
 

@@ -33,6 +33,7 @@ public:
     virtual TypeSymbol* RemovePointer(const Span& span) { return this; }
     virtual TypeSymbol* AddConst(const Span& span);
     virtual TypeSymbol* AddLvalueReference(const Span& span);
+    virtual TypeSymbol* AddRvalueReference(const Span& span);
     virtual TypeSymbol* AddPointer(const Span& span);
     virtual llvm::Type* IrType(Emitter& emitter) = 0;
     virtual bool IsConstType() const { return false; }

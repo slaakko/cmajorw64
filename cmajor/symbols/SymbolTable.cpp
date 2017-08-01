@@ -74,6 +74,10 @@ void SymbolTable::Read(SymbolReader& reader)
     {
         AddConversion(conversion);
     }
+    for (ClassTypeSymbol* classType : reader.ClassTypes())
+    {
+        classType->SetSpecialMemberFunctions();
+    }
 }
 
 void SymbolTable::Import(SymbolTable& symbolTable)

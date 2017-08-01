@@ -164,7 +164,7 @@ bool FindConversions(BoundCompileUnit& boundCompileUnit, FunctionSymbol* functio
             }
             if (TypesEqual(sourceType, targetType))    // exact match
             {
-                if (sourceType->IsReferenceType())
+                if (sourceType->IsReferenceType() && !function->IsConstructorDestructorOrNonstaticMemberFunction())
                 {
                     functionMatch.argumentMatches.push_back(ArgumentMatch(nullptr, OperationFlags::deref, 1));
                     ++functionMatch.numConversions;
@@ -565,6 +565,17 @@ std::unique_ptr<BoundFunctionCall> SelectViableFunction(const std::unordered_set
         {
             const FunctionMatch& bestMatch = functionMatches[0];
             FunctionSymbol* bestFun = bestMatch.fun;
+            if (bestFun->IsSuppressed())
+            {
+                if ((flags & OverloadResolutionFlags::dontThrow) != OverloadResolutionFlags::none)
+                {
+                    exception.reset(new Exception("cannot call a suppressed member function", span, bestFun->GetSpan()));
+                }
+                else
+                {
+                    throw Exception("cannot call a suppressed member function", span, bestFun->GetSpan());
+                }
+            }
             return CreateBoundFunctionCall(bestFun, arguments, boundCompileUnit, boundFunction, bestMatch, span);
         }
         else
@@ -576,6 +587,17 @@ std::unique_ptr<BoundFunctionCall> SelectViableFunction(const std::unordered_set
     {
         const FunctionMatch& bestMatch = functionMatches[0];
         FunctionSymbol* singleBest = bestMatch.fun;
+        if (singleBest->IsSuppressed())
+        {
+            if ((flags & OverloadResolutionFlags::dontThrow) != OverloadResolutionFlags::none)
+            {
+                exception.reset(new Exception("cannot call a suppressed member function", span, singleBest->GetSpan()));
+            }
+            else
+            {
+                throw Exception("cannot call a suppressed member function", span, singleBest->GetSpan());
+            }
+        }
         return CreateBoundFunctionCall(singleBest, arguments, boundCompileUnit, boundFunction, bestMatch, span);
     }
 }

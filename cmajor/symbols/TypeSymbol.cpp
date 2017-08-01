@@ -42,6 +42,13 @@ TypeSymbol* TypeSymbol::AddLvalueReference(const Span& span)
     return GetSymbolTable()->MakeDerivedType(this, typeDerivationRec, span);
 }
 
+TypeSymbol* TypeSymbol::AddRvalueReference(const Span& span)
+{
+    TypeDerivationRec typeDerivationRec;
+    typeDerivationRec.derivations.push_back(Derivation::rvalueRefDerivation);
+    return GetSymbolTable()->MakeDerivedType(this, typeDerivationRec, span);
+}
+
 TypeSymbol* TypeSymbol::AddPointer(const Span& span)
 {
     TypeDerivationRec typeDerivationRec;

@@ -453,6 +453,43 @@ void FunctionSymbol::GenerateVirtualCall(Emitter& emitter, std::vector<GenObject
     }
 }
 
+bool FunctionSymbol::IsDefaultConstructor() const
+{
+    return parameters.size() == 1 && groupName == U"@constructor" && parameters[0]->GetType()->PointerCount() == 1 && parameters[0]->GetType()->RemovePointer(GetSpan())->IsClassTypeSymbol();
+}
+
+bool FunctionSymbol::IsCopyConstructor() const
+{
+    return parameters.size() == 2 && groupName == U"@constructor" &&
+        parameters[0]->GetType()->PointerCount() == 1 &&
+        parameters[0]->GetType()->RemovePointer(GetSpan())->IsClassTypeSymbol() &&
+        TypesEqual(parameters[0]->GetType()->BaseType()->AddConst(GetSpan())->AddLvalueReference(GetSpan()), parameters[1]->GetType());
+}
+
+bool FunctionSymbol::IsMoveConstructor() const
+{
+    return parameters.size() == 2 && groupName == U"@constructor" &&
+        parameters[0]->GetType()->PointerCount() == 1 &&
+        parameters[0]->GetType()->RemovePointer(GetSpan())->IsClassTypeSymbol() &&
+        TypesEqual(parameters[0]->GetType()->BaseType()->AddRvalueReference(GetSpan()), parameters[1]->GetType());
+}
+
+bool FunctionSymbol::IsCopyAssignment() const
+{
+    return parameters.size() == 2 && groupName == U"operator=" &&
+        parameters[0]->GetType()->PointerCount() == 1 &&
+        parameters[0]->GetType()->RemovePointer(GetSpan())->IsClassTypeSymbol() &&
+        TypesEqual(parameters[0]->GetType()->BaseType()->AddConst(GetSpan())->AddLvalueReference(GetSpan()), parameters[1]->GetType());
+}
+
+bool FunctionSymbol::IsMoveAssignment() const
+{
+    return parameters.size() == 2 && groupName == U"operator=" &&
+        parameters[0]->GetType()->PointerCount() == 1 &&
+        parameters[0]->GetType()->RemovePointer(GetSpan())->IsClassTypeSymbol() &&
+        TypesEqual(parameters[0]->GetType()->BaseType()->AddRvalueReference(GetSpan()), parameters[1]->GetType());
+}
+
 void FunctionSymbol::AddLocalVariable(LocalVariableSymbol* localVariable)
 {
     localVariables.push_back(localVariable);
@@ -655,6 +692,26 @@ ConstructorSymbol::ConstructorSymbol(const Span& span_, const std::u32string& na
     SetGroupName(U"@constructor");
 }
 
+std::string ConstructorSymbol::TypeString() const 
+{
+    if (IsDefaultConstructor())
+    {
+        return "default_constructor";
+    }
+    else if (IsCopyConstructor())
+    {
+        return "copy_constructor";
+    }
+    else if (IsMoveConstructor())
+    {
+        return "move_constructor";
+    }
+    else
+    {
+        return "constructor";
+    }
+}
+
 void ConstructorSymbol::SetSpecifiers(Specifiers specifiers)
 {
     Specifiers accessSpecifiers = specifiers & Specifiers::access_;
@@ -817,6 +874,22 @@ void DestructorSymbol::SetSpecifiers(Specifiers specifiers)
 
 MemberFunctionSymbol::MemberFunctionSymbol(const Span& span_, const std::u32string& name_) : FunctionSymbol(SymbolType::memberFunctionSymbol, span_, name_)
 {
+}
+
+std::string MemberFunctionSymbol::TypeString() const 
+{ 
+    if (IsCopyAssignment())
+    {
+        return "copy_assignment";
+    }
+    else if (IsMoveAssignment())
+    {
+        return "move_assignment";
+    }
+    else
+    {
+        return "member_function";
+    }
 }
 
 void MemberFunctionSymbol::SetSpecifiers(Specifiers specifiers)

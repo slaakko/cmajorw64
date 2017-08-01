@@ -119,7 +119,8 @@ void CheckFunctionReturnPaths(FunctionSymbol* functionSymbol, CompoundStatementN
 
 StatementBinder::StatementBinder(BoundCompileUnit& boundCompileUnit_) :  
     boundCompileUnit(boundCompileUnit_), symbolTable(boundCompileUnit.GetSymbolTable()), containerScope(nullptr), statement(), currentClass(nullptr), currentFunction(nullptr), 
-    currentConstructorSymbol(nullptr), currentConstructorNode(nullptr), currentDestructorSymbol(nullptr), currentDestructorNode(nullptr), postfix(false)
+    currentConstructorSymbol(nullptr), currentConstructorNode(nullptr), currentDestructorSymbol(nullptr), currentDestructorNode(nullptr), currentMemberFunctionSymbol(nullptr), 
+    currentMemberFunctionNode(nullptr), postfix(false)
 {
 }
 
@@ -245,6 +246,15 @@ void StatementBinder::Visit(ConstructorNode& constructorNode)
         BoundCompoundStatement* compoundStatement = static_cast<BoundCompoundStatement*>(boundStatement);
         boundFunction->SetBody(std::unique_ptr<BoundCompoundStatement>(compoundStatement));
     }
+    else if (constructorSymbol->IsDefault())
+    {
+        ConstructorNode* prevConstructorNode = currentConstructorNode;
+        currentConstructorNode = &constructorNode;
+        std::unique_ptr<BoundCompoundStatement> boundCompoundStatement(new BoundCompoundStatement(constructorNode.GetSpan()));
+        GenerateClassInitialization(currentConstructorSymbol, currentConstructorNode, boundCompoundStatement.get(), currentFunction, boundCompileUnit, containerScope, this, true);
+        currentConstructorNode = prevConstructorNode;
+        boundFunction->SetBody(std::move(boundCompoundStatement));
+    }
     CheckFunctionReturnPaths(constructorSymbol, constructorNode, containerScope, boundCompileUnit);
     currentClass->AddMember(std::move(boundFunction));
     currentFunction = prevFunction;
@@ -275,6 +285,15 @@ void StatementBinder::Visit(DestructorNode& destructorNode)
         BoundCompoundStatement* compoundStatement = static_cast<BoundCompoundStatement*>(boundStatement);
         boundFunction->SetBody(std::unique_ptr<BoundCompoundStatement>(compoundStatement));
     }
+    else if (destructorSymbol->IsDefault())
+    {
+        DestructorNode* prevDestructorNode = currentDestructorNode;
+        currentDestructorNode = &destructorNode;
+        std::unique_ptr<BoundCompoundStatement> boundCompoundStatement(new BoundCompoundStatement(destructorNode.GetSpan()));
+        GenerateClassTermination(currentDestructorSymbol, currentDestructorNode, boundCompoundStatement.get(), currentFunction, boundCompileUnit, containerScope, this);
+        currentDestructorNode = prevDestructorNode;
+        boundFunction->SetBody(std::move(boundCompoundStatement));
+    }
     CheckFunctionReturnPaths(destructorSymbol, destructorNode, containerScope, boundCompileUnit);
     currentClass->AddMember(std::move(boundFunction));
     currentFunction = prevFunction;
@@ -288,22 +307,38 @@ void StatementBinder::Visit(MemberFunctionNode& memberFunctionNode)
     Symbol* symbol = boundCompileUnit.GetSymbolTable().GetSymbol(&memberFunctionNode);
     Assert(symbol->GetSymbolType() == SymbolType::memberFunctionSymbol, "member function symbol expected");
     MemberFunctionSymbol* memberFunctionSymbol = static_cast<MemberFunctionSymbol*>(symbol);
+    MemberFunctionSymbol* prevMemberFunctionSymbol = memberFunctionSymbol;
+    currentMemberFunctionSymbol = memberFunctionSymbol;
     containerScope = symbol->GetContainerScope();
     std::unique_ptr<BoundFunction> boundFunction(new BoundFunction(memberFunctionSymbol));
     BoundFunction* prevFunction = currentFunction;
     currentFunction = boundFunction.get();
     if (memberFunctionNode.Body())
     {
+        MemberFunctionNode* prevMemberFunctionNode = currentMemberFunctionNode;
+        currentMemberFunctionNode = &memberFunctionNode;
         memberFunctionNode.Body()->Accept(*this);
+        currentMemberFunctionNode = prevMemberFunctionNode;
         BoundStatement* boundStatement = statement.release();
         Assert(boundStatement->GetBoundNodeType() == BoundNodeType::boundCompoundStatement, "bound compound statement expected");
         BoundCompoundStatement* compoundStatement = static_cast<BoundCompoundStatement*>(boundStatement);
         boundFunction->SetBody(std::unique_ptr<BoundCompoundStatement>(compoundStatement));
     }
+    else if (memberFunctionSymbol->IsDefault())
+    {
+        Assert(memberFunctionSymbol->GroupName() == U"operator=", "operator= expected");
+        MemberFunctionNode* prevMemberFunctionNode = currentMemberFunctionNode;
+        currentMemberFunctionNode = &memberFunctionNode;
+        std::unique_ptr<BoundCompoundStatement> boundCompoundStatement(new BoundCompoundStatement(memberFunctionNode.GetSpan()));
+        GenerateClassAssignment(currentMemberFunctionSymbol, currentMemberFunctionNode, boundCompoundStatement.get(), currentFunction, boundCompileUnit, containerScope, this, true);
+        currentMemberFunctionNode = prevMemberFunctionNode;
+        boundFunction->SetBody(std::move(boundCompoundStatement));
+    }
     CheckFunctionReturnPaths(memberFunctionSymbol, memberFunctionNode, containerScope, boundCompileUnit);
     currentClass->AddMember(std::move(boundFunction));
     currentFunction = prevFunction;
     containerScope = prevContainerScope;
+    currentMemberFunctionSymbol = prevMemberFunctionSymbol;
 }
 
 void StatementBinder::Visit(CompoundStatementNode& compoundStatementNode)
@@ -316,7 +351,11 @@ void StatementBinder::Visit(CompoundStatementNode& compoundStatementNode)
     std::unique_ptr<BoundCompoundStatement> boundCompoundStatement(new BoundCompoundStatement(compoundStatementNode.GetSpan()));
     if (currentConstructorSymbol && currentConstructorNode)
     {
-        GenerateClassInitialization(currentConstructorSymbol, currentConstructorNode, boundCompoundStatement.get(), currentFunction, boundCompileUnit, containerScope, this);
+        GenerateClassInitialization(currentConstructorSymbol, currentConstructorNode, boundCompoundStatement.get(), currentFunction, boundCompileUnit, containerScope, this, false);
+    }
+    else if (currentMemberFunctionSymbol && currentMemberFunctionSymbol->GroupName() == U"operator=" && currentMemberFunctionNode)
+    {
+        GenerateClassAssignment(currentMemberFunctionSymbol, currentMemberFunctionNode, boundCompoundStatement.get(), currentFunction, boundCompileUnit, containerScope, this, false);
     }
     int n = compoundStatementNode.Statements().Count();
     for (int i = 0; i < n; ++i)

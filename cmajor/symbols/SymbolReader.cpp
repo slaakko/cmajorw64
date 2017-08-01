@@ -42,4 +42,9 @@ void SymbolReader::AddConversion(FunctionSymbol* conversion)
     conversions.push_back(conversion);
 }
 
+void SymbolReader::AddClassType(ClassTypeSymbol* classType)
+{
+    classTypes.push_back(classType);
+}
+
 } } // namespace cmajor::symbols

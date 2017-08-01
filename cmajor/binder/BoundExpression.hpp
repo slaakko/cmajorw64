@@ -19,7 +19,8 @@ enum class BoundExpressionFlags : uint8_t
 {
     none = 0, 
     argIsExplicitThisOrBasePtr = 1 << 0,
-    virtualCall = 1 << 1
+    bindToRvalueReference = 1 << 1,
+    virtualCall = 1 << 2
 };
 
 inline BoundExpressionFlags operator|(BoundExpressionFlags left, BoundExpressionFlags right)

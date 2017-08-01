@@ -210,11 +210,13 @@ void TypeBinder::Visit(ConstructorNode& constructorNode)
     ContainerScope* prevContainerScope = containerScope;
     containerScope = constructorSymbol->GetContainerScope();
     constructorSymbol->SetSpecifiers(constructorNode.GetSpecifiers());
-    const Symbol* parent = constructorSymbol->Parent();
+    Symbol* parent = constructorSymbol->Parent();
     if (parent->IsStatic())
     {
         throw Exception("static class cannot contain instance constructors", constructorSymbol->GetSpan(), parent->GetSpan());
     }
+    Assert(parent->IsClassTypeSymbol(), "class type symbol expected");
+    ClassTypeSymbol* classType = static_cast<ClassTypeSymbol*>(parent);
     int n = constructorNode.Parameters().Count();
     for (int i = 0; i < n; ++i)
     {
@@ -226,6 +228,18 @@ void TypeBinder::Visit(ConstructorNode& constructorNode)
         parameterSymbol->SetType(parameterType);
     }
     constructorSymbol->ComputeName();
+    if (constructorSymbol->IsDefaultConstructor())
+    {
+        classType->SetDefaultConstructor(constructorSymbol);
+    }
+    else if (constructorSymbol->IsCopyConstructor())
+    {
+        classType->SetCopyConstructor(constructorSymbol);
+    }
+    else if (constructorSymbol->IsMoveConstructor())
+    {
+        classType->SetMoveConstructor(constructorSymbol);
+    }
     if (constructorNode.Body())
     {
         if (constructorSymbol->IsDefault() || constructorSymbol->IsSuppressed())
@@ -236,11 +250,7 @@ void TypeBinder::Visit(ConstructorNode& constructorNode)
     }
     else
     {
-        if (constructorSymbol->IsDefault() || constructorSymbol->IsSuppressed())
-        {
-            // todo
-        }
-        else
+        if (!constructorSymbol->IsDefault() && !constructorSymbol->IsSuppressed())
         {
             throw Exception("constructor has no body", constructorSymbol->GetSpan());
         }
@@ -272,11 +282,7 @@ void TypeBinder::Visit(DestructorNode& destructorNode)
     }
     else
     {
-        if (destructorSymbol->IsDefault())
-        {
-            // todo
-        }
-        else
+        if (!destructorSymbol->IsDefault())
         {
             throw Exception("destructor has no body", destructorSymbol->GetSpan());
         }
@@ -320,11 +326,7 @@ void TypeBinder::Visit(MemberFunctionNode& memberFunctionNode)
     }
     else
     {
-        if (memberFunctionSymbol->IsDefault() || memberFunctionSymbol->IsSuppressed())
-        {
-            // todo
-        }
-        else
+        if (!memberFunctionSymbol->IsDefault() && !memberFunctionSymbol->IsSuppressed())
         {
             throw Exception("member function has no body", memberFunctionSymbol->GetSpan());
         }

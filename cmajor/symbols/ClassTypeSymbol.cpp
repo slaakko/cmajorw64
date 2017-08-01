@@ -22,14 +22,16 @@ using namespace cmajor::unicode;
 ClassTypeSymbol::ClassTypeSymbol(const Span& span_, const std::u32string& name_) : 
     TypeSymbol(SymbolType::classTypeSymbol, span_, name_), 
     baseClass(), flags(ClassTypeSymbolFlags::none), implementedInterfaces(), templateParameters(), memberVariables(), staticMemberVariables(), 
-    staticConstructor(), defaultConstructor(), constructors(), destructor(), memberFunctions(), vmtPtrIndex(-1), irType(nullptr), vmtObjectType(nullptr)
+    staticConstructor(nullptr), defaultConstructor(nullptr), copyConstructor(nullptr), moveConstructor(nullptr), copyAssignment(nullptr), moveAssignment(nullptr), 
+    constructors(), destructor(nullptr), memberFunctions(), vmtPtrIndex(-1), irType(nullptr), vmtObjectType(nullptr)
 {
 }
 
 ClassTypeSymbol::ClassTypeSymbol(SymbolType symbolType_, const Span& span_, const std::u32string& name_) :
     TypeSymbol(symbolType_, span_, name_),
     baseClass(), flags(ClassTypeSymbolFlags::none), implementedInterfaces(), templateParameters(), memberVariables(), staticMemberVariables(), 
-    staticConstructor(), defaultConstructor(), constructors(), destructor(), memberFunctions(), vmtPtrIndex(-1), irType(nullptr), vmtObjectType(nullptr)
+    staticConstructor(nullptr), defaultConstructor(nullptr), copyConstructor(nullptr), moveConstructor(nullptr), copyAssignment(nullptr), moveAssignment(nullptr), 
+    constructors(), destructor(nullptr), memberFunctions(), vmtPtrIndex(-1), irType(nullptr), vmtObjectType(nullptr)
 {
 }
 
@@ -95,6 +97,7 @@ void ClassTypeSymbol::Read(SymbolReader& reader)
     {
         GetSymbolTable()->AddPolymorphicClass(this);
     }
+    reader.AddClassType(this);
 }
 
 void ClassTypeSymbol::EmplaceType(TypeSymbol* typeSymbol_, int index)
@@ -150,10 +153,6 @@ void ClassTypeSymbol::AddMember(Symbol* member)
         case SymbolType::constructorSymbol:
         {
             ConstructorSymbol* constructor = static_cast<ConstructorSymbol*>(member);
-            if (constructor->Arity() == 1)
-            {
-                defaultConstructor = constructor;
-            }
             constructors.push_back(constructor);
             break;
         }
@@ -311,6 +310,40 @@ void ClassTypeSymbol::SetSpecifiers(Specifiers specifiers)
     if ((specifiers & Specifiers::unit_test_) != Specifiers::none)
     {
         throw Exception("class type symbol cannot be unit_test", GetSpan());
+    }
+}
+
+void ClassTypeSymbol::SetSpecialMemberFunctions()
+{
+    int nc = constructors.size();
+    for (int i = 0; i < nc; ++i)
+    {
+        ConstructorSymbol* constructor = constructors[i];
+        if (constructor->IsDefaultConstructor())
+        {
+            defaultConstructor = constructor;
+        }
+        else if (constructor->IsCopyConstructor())
+        {
+            copyConstructor = constructor;
+        }
+        else if (constructor->IsMoveConstructor())
+        {
+            moveConstructor = constructor;
+        }
+    }
+    int nm = memberFunctions.size();
+    for (int i = 0; i < nm; ++i)
+    {
+        MemberFunctionSymbol* memberFunction = memberFunctions[i];
+        if (memberFunction->IsCopyAssignment())
+        {
+            copyAssignment = memberFunction;
+        }
+        else if (memberFunction->IsMoveAssignment())
+        {
+            moveAssignment = memberFunction;
+        }
     }
 }
 

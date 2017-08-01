@@ -70,7 +70,14 @@ public:
     StaticConstructorSymbol* StaticConstructor() { return staticConstructor; }
     ConstructorSymbol* DefaultConstructor() { return defaultConstructor; }
     void SetDefaultConstructor(ConstructorSymbol* defaultConstructor_) { defaultConstructor = defaultConstructor_; }
+    ConstructorSymbol* CopyConstructor() { return copyConstructor; }
+    void SetCopyConstructor(ConstructorSymbol* copyConstructor_) { copyConstructor = copyConstructor_; }
+    ConstructorSymbol* MoveConstructor() { return moveConstructor; }
+    void SetMoveConstructor(ConstructorSymbol* moveConstructor_) { moveConstructor = moveConstructor_; }
     DestructorSymbol* Destructor() { return destructor; }
+    MemberFunctionSymbol* CopyAssignment() { return copyAssignment; }
+    void SetCopyAssignment(MemberFunctionSymbol* copyAssignment_) { copyAssignment = copyAssignment_; }
+    void SetSpecialMemberFunctions();
     const std::vector<MemberVariableSymbol*>& MemberVariables() const { return memberVariables; }
     bool IsAbstract() const { return GetFlag(ClassTypeSymbolFlags::abstract_); }
     void SetAbstract() { SetFlag(ClassTypeSymbolFlags::abstract_); }
@@ -108,7 +115,11 @@ private:
     StaticConstructorSymbol* staticConstructor;
     std::vector<ConstructorSymbol*> constructors;
     ConstructorSymbol* defaultConstructor;
+    ConstructorSymbol* copyConstructor;
+    ConstructorSymbol* moveConstructor;
     DestructorSymbol* destructor;
+    MemberFunctionSymbol* copyAssignment;
+    MemberFunctionSymbol* moveAssignment;
     std::vector<MemberFunctionSymbol*> memberFunctions;
     std::vector<FunctionSymbol*> vmt;
     std::vector<std::vector<FunctionSymbol*>> imts;
