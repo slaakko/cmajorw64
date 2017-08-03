@@ -1771,7 +1771,7 @@ bool ClassMoveConstructorOperation::GenerateImplementation(ClassMoveConstructor*
             rvalueLookups.push_back(FunctionScopeLookup(ScopeLookup::this_and_base_and_parent, containerScope));
             std::vector<std::unique_ptr<BoundExpression>> rvalueArguments;
             rvalueArguments.push_back(std::move(thatBoundMemberVariable));
-            std::unique_ptr<BoundFunctionCall> rvalueMemberCall = ResolveOverload(U"Rvalue", containerScope, rvalueLookups, rvalueArguments, GetBoundCompileUnit(), boundFunction.get(), span);
+            std::unique_ptr<BoundFunctionCall> rvalueMemberCall = ResolveOverload(U"System.Rvalue", containerScope, rvalueLookups, rvalueArguments, GetBoundCompileUnit(), boundFunction.get(), span);
             memberConstructorCallArguments.push_back(std::move(rvalueMemberCall));
             std::unique_ptr<BoundFunctionCall> memberConstructorCall = ResolveOverload(U"@constructor", containerScope, memberConstructorCallLookups, memberConstructorCallArguments,
                 GetBoundCompileUnit(), boundFunction.get(), span);
@@ -2059,7 +2059,7 @@ bool ClassMoveAssignmentOperation::GenerateImplementation(ClassMoveAssignment* m
             std::vector<std::unique_ptr<BoundExpression>> swapArguments;
             swapArguments.push_back(std::move(boundMemberVariable));
             swapArguments.push_back(std::move(thatBoundMemberVariable));
-            std::unique_ptr<BoundFunctionCall> swapMemberCall = ResolveOverload(U"Swap", containerScope, swapLookups, swapArguments, GetBoundCompileUnit(), boundFunction.get(), span);
+            std::unique_ptr<BoundFunctionCall> swapMemberCall = ResolveOverload(U"System.Swap", containerScope, swapLookups, swapArguments, GetBoundCompileUnit(), boundFunction.get(), span);
             boundFunction->Body()->AddStatement(std::unique_ptr<BoundStatement>(new BoundExpressionStatement(std::move(swapMemberCall))));
         }
         GetBoundCompileUnit().AddBoundNode(std::move(boundFunction));
