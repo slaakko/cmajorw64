@@ -228,6 +228,10 @@ void Emitter::Visit(BoundFunction& boundFunction)
     FunctionSymbol* functionSymbol = boundFunction.GetFunctionSymbol();
     llvm::FunctionType* functionType = functionSymbol->IrType(*this);
     function = llvm::cast<llvm::Function>(compileUnitModule->getOrInsertFunction(ToUtf8(functionSymbol->MangledName()), functionType));
+    if (functionSymbol->HasWeakOdrLinkage())
+    {
+        function->setLinkage(llvm::GlobalValue::LinkageTypes::WeakODRLinkage);
+    }
     llvm::BasicBlock* entryBlock = llvm::BasicBlock::Create(context, "entry", function);
     builder.SetInsertPoint(entryBlock);
     if (currentClass)

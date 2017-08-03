@@ -28,7 +28,7 @@ ContainerScope::ContainerScope() : base(), parent(), container(), symbolMap()
 void ContainerScope::Install(Symbol* symbol)
 {
     auto it = symbolMap.find(symbol->Name());
-    if (it != symbolMap.cend())
+    if (symbol->GetSymbolType() != SymbolType::namespaceSymbol && it != symbolMap.cend())
     {
         Symbol* prev = it->second;
         if (prev != symbol)

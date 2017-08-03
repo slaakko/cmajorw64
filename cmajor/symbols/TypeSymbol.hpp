@@ -13,6 +13,8 @@ namespace cmajor { namespace symbols {
 
 using namespace cmajor::ir;
 
+struct TypeDerivationRec;
+
 class TypeSymbol : public ContainerSymbol
 {
 public:
@@ -48,6 +50,9 @@ public:
     virtual bool HasNontrivialDestructor() const { return false; }
     void SetTypeId(uint32_t typeId_) { typeId = typeId_; }
     uint32_t TypeId() const { Assert(typeId != 0, "type id not initialized");  return typeId; }
+    virtual const TypeDerivationRec& DerivationRec() const;
+    virtual TypeSymbol* RemoveDerivations(const TypeDerivationRec& sourceDerivationRec, const Span& span);
+    virtual TypeSymbol* Unify(TypeSymbol* that, const Span& span) { return nullptr; }
 private:
     uint32_t typeId;
 };

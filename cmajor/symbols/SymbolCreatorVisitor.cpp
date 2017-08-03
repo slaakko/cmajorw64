@@ -41,14 +41,14 @@ void SymbolCreatorVisitor::Visit(FunctionNode& functionNode)
     {
         symbolTable.AddTemplateParameter(*functionNode.TemplateParameters()[i]);
     }
+    int n = functionNode.Parameters().Count();
+    for (int i = 0; i < n; ++i)
+    {
+        ParameterNode* parameterNode = functionNode.Parameters()[i];
+        parameterNode->Accept(*this);
+    }
     if (nt == 0)
     {
-        int n = functionNode.Parameters().Count();
-        for (int i = 0; i < n; ++i)
-        {
-            ParameterNode* parameterNode = functionNode.Parameters()[i];
-            parameterNode->Accept(*this);
-        }
         if (functionNode.Body())
         {
             functionNode.Body()->Accept(*this);

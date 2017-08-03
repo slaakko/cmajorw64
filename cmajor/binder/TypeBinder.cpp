@@ -14,6 +14,7 @@
 #include <cmajor/symbols/TypedefSymbol.hpp>
 #include <cmajor/symbols/ConstantSymbol.hpp>
 #include <cmajor/symbols/Exception.hpp>
+#include <cmajor/symbols/TemplateSymbol.hpp>
 #include <cmajor/util/Unicode.hpp>
 
 namespace cmajor { namespace binder {
@@ -64,8 +65,11 @@ void TypeBinder::Visit(FunctionNode& functionNode)
     FunctionSymbol* functionSymbol = static_cast<FunctionSymbol*>(symbol);
     if (functionSymbol->IsFunctionTemplate())
     {
+        for (TemplateParameterSymbol* templateParameterSymbol : functionSymbol->TemplateParameters())
+        {
+            symbolTable.SetTypeIdFor(templateParameterSymbol);
+        }
         functionSymbol->CloneUsingNodes(usingNodes);
-        return;
     }
     containerScope = functionSymbol->GetContainerScope();
     Specifiers specifiers = functionNode.GetSpecifiers();
@@ -83,13 +87,13 @@ void TypeBinder::Visit(FunctionNode& functionNode)
     TypeSymbol* returnType = ResolveType(functionNode.ReturnTypeExpr(), boundCompileUnit, containerScope);
     functionSymbol->SetReturnType(returnType);
     functionSymbol->ComputeName();
-    if (functionNode.Body())
+    if (functionNode.Body() && !functionSymbol->IsFunctionTemplate())
     {
         functionNode.Body()->Accept(*this);
     }
     else
     {
-        if (!functionSymbol->IsExternal())
+        if (!functionSymbol->IsExternal() && !functionSymbol->IsFunctionTemplate())
         {
             throw Exception("function has no body", functionSymbol->GetSpan());
         }
@@ -111,6 +115,10 @@ void TypeBinder::BindClass(ClassTypeSymbol* classTypeSymbol, ClassNode* classNod
     classTypeSymbol->SetBound();
     if (classTypeSymbol->IsClassTemplate())
     {
+        for (TemplateParameterSymbol* templateParameterSymbol : classTypeSymbol->TemplateParameters())
+        {
+            symbolTable.SetTypeIdFor(templateParameterSymbol);
+        }
         classTypeSymbol->CloneUsingNodes(usingNodes);
         return;
     }

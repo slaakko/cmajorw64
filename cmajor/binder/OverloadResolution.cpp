@@ -6,6 +6,7 @@
 #include <cmajor/binder/OverloadResolution.hpp>
 #include <cmajor/binder/BoundCompileUnit.hpp>
 #include <cmajor/binder/BoundFunction.hpp>
+#include <cmajor/symbols/TemplateSymbol.hpp>
 #include <cmajor/util/Unicode.hpp>
 
 namespace cmajor { namespace binder {
@@ -50,10 +51,18 @@ bool BetterFunctionMatch::operator()(const FunctionMatch& left, const FunctionMa
     {
         return true;
     }
+    if (!left.fun->IsFunctionTemplate() && right.fun->IsFunctionTemplate())
+    {
+        return true;
+    }
+    if (left.fun->IsFunctionTemplate() && !right.fun->IsFunctionTemplate())
+    {
+        return false;
+    }
     return false;
 }
 
-bool FindQualificationConversion(TypeSymbol* sourceType, TypeSymbol* targetType, bool argumentIsLvalueExpr, ConversionType conversionType, FunctionSymbol* conversionFun, FunctionMatch& functionMatch, const Span& span)
+bool FindQualificationConversion(TypeSymbol* sourceType, TypeSymbol* targetType, BoundExpression* argument, ConversionType conversionType, FunctionSymbol* conversionFun, FunctionMatch& functionMatch, const Span& span)
 {
     int distance = 0;
     if (conversionFun)
@@ -103,8 +112,12 @@ bool FindQualificationConversion(TypeSymbol* sourceType, TypeSymbol* targetType,
             ++functionMatch.numConversions;
             return true;
         }
-        else if (!sourceType->IsConstType() && argumentIsLvalueExpr)
+        else if (!sourceType->IsConstType() && argument->IsLvalueExpression())
         {
+            if (targetType->IsRvalueReferenceType() && !sourceType->IsRvalueReferenceType() && !argument->GetFlag(BoundExpressionFlags::bindToRvalueReference))
+            {
+                distance += 10;
+            }
             functionMatch.argumentMatches.push_back(ArgumentMatch(conversionFun, OperationFlags::addr, distance));
             ++functionMatch.numConversions;
             return true;
@@ -128,10 +141,92 @@ bool FindQualificationConversion(TypeSymbol* sourceType, TypeSymbol* targetType,
         ++functionMatch.numConversions;
         return true;
     }
+    else if (sourceType->IsLvalueReferenceType() && targetType->IsRvalueReferenceType())
+    {
+        distance += 10;
+        functionMatch.argumentMatches.push_back(ArgumentMatch(conversionFun, OperationFlags::none, distance));
+        ++functionMatch.numConversions;
+        return true;
+    }
     else if (conversionFun)
     {
         functionMatch.argumentMatches.push_back(ArgumentMatch(conversionFun, OperationFlags::none, distance));
         return true;
+    }
+    return false;
+}
+
+bool FindTemplateParameterMatch(TypeSymbol* sourceType, TypeSymbol* targetType, ConversionType conversionType, BoundExpression* argument,
+    BoundCompileUnit& boundCompileUnit, FunctionMatch& functionMatch, const Span& span)
+{
+    if (targetType->BaseType()->GetSymbolType() != SymbolType::templateParameterSymbol) return false;
+    TemplateParameterSymbol* templateParameter = static_cast<TemplateParameterSymbol*>(targetType->BaseType());
+    TypeSymbol* templateArgumentType = nullptr;
+    auto it = functionMatch.templateParameterMap.find(templateParameter);
+    if (it == functionMatch.templateParameterMap.cend())
+    {
+        templateArgumentType = sourceType->RemoveDerivations(targetType->DerivationRec(), span);
+        if (templateArgumentType)
+        {
+            functionMatch.templateParameterMap[templateParameter] = templateArgumentType;
+        }
+        else
+        {
+            return false;
+        }
+    }
+    else
+    {
+        templateArgumentType = it->second;
+    }
+    targetType = targetType->Unify(templateArgumentType, span);
+    if (!targetType)
+    {
+        return false;
+    }
+    if (TypesEqual(sourceType, targetType))
+    {
+        functionMatch.argumentMatches.push_back(ArgumentMatch());
+        return true;
+    }
+    else
+    {
+        bool qualificationConversionMatch = false;
+        if (TypesEqual(sourceType->PlainType(span), targetType->PlainType(span)))
+        {
+            qualificationConversionMatch = FindQualificationConversion(sourceType, targetType, argument, conversionType, nullptr, functionMatch, span);
+        }
+        if (qualificationConversionMatch)
+        {
+            return true;
+        }
+        else
+        {
+            FunctionSymbol* conversionFun = boundCompileUnit.GetConversion(sourceType, targetType, span);
+            if (conversionFun)
+            {
+                if (conversionFun->GetConversionType() == conversionType || conversionFun->GetConversionType() == ConversionType::implicit_)
+                {
+                    ++functionMatch.numConversions;
+                    if (FindQualificationConversion(sourceType, targetType, argument, conversionType, conversionFun, functionMatch, span))
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                return false;
+            }
+        }
     }
     return false;
 }
@@ -188,7 +283,7 @@ bool FindConversions(BoundCompileUnit& boundCompileUnit, FunctionSymbol* functio
             bool qualificationConversionMatch = false;
             if (TypesEqual(sourceType->PlainType(span), targetType->PlainType(span)))
             {
-                qualificationConversionMatch = FindQualificationConversion(sourceType, targetType, argument->IsLvalueExpression(), conversionType, nullptr, functionMatch, span);
+                qualificationConversionMatch = FindQualificationConversion(sourceType, targetType, argument, conversionType, nullptr, functionMatch, span);
             }
             if (!qualificationConversionMatch)
             {
@@ -198,7 +293,7 @@ bool FindConversions(BoundCompileUnit& boundCompileUnit, FunctionSymbol* functio
                     if (conversionFun->GetConversionType() == conversionType || conversionFun->GetConversionType() == ConversionType::implicit_)
                     {
                         ++functionMatch.numConversions;
-                        if (FindQualificationConversion(sourceType, targetType, argument->IsLvalueExpression(), conversionType, conversionFun, functionMatch, span))
+                        if (FindQualificationConversion(sourceType, targetType, argument, conversionType, conversionFun, functionMatch, span))
                         {
                             continue;
                         }
@@ -220,6 +315,13 @@ bool FindConversions(BoundCompileUnit& boundCompileUnit, FunctionSymbol* functio
                 }
                 else
                 {
+                    if (function->IsFunctionTemplate())
+                    {
+                        if (FindTemplateParameterMatch(sourceType, targetType, conversionType, argument, boundCompileUnit, functionMatch, span))
+                        {
+                            continue;
+                        }
+                    }
                     return false;
                 }
             }
@@ -405,14 +507,14 @@ std::unique_ptr<BoundFunctionCall> FailWithOverloadNotFound(const std::unordered
             exception.reset(new CannotBindConstToNonconstOverloadException("overload resolution failed: '" + overloadName + 
                 "' not found, or there are no acceptable conversions for all argument types. " +
                 std::to_string(viableFunctions.size()) + " viable functions examined. Note: cannot bind constant '" + ToUtf8(sourceType->FullName()) + "' argument " 
-                "' to nonconstant '" + ToUtf8(targetType->FullName()) +"' parameter", span, references));
+                " to nonconstant '" + ToUtf8(targetType->FullName()) +"' parameter", span, references));
             return std::unique_ptr<BoundFunctionCall>();
         }
         else
         {
             throw CannotBindConstToNonconstOverloadException("overload resolution failed: '" + overloadName + "' not found, or there are no acceptable conversions for all argument types. " +
                 std::to_string(viableFunctions.size()) + " viable functions examined. Note: cannot bind constant '" + ToUtf8(sourceType->FullName()) + "' argument "
-                "' to nonconstant '" + ToUtf8(targetType->FullName()) + "' parameter", span, references);
+                " to nonconstant '" + ToUtf8(targetType->FullName()) + "' parameter", span, references);
         }
     }
     else if (cannotAssignToConstObject)
@@ -537,7 +639,7 @@ std::unique_ptr<BoundFunctionCall> CreateBoundFunctionCall(FunctionSymbol* bestF
 }
 
 std::unique_ptr<BoundFunctionCall> SelectViableFunction(const std::unordered_set<FunctionSymbol*>& viableFunctions, const std::u32string& groupName, 
-    std::vector<std::unique_ptr<BoundExpression>>& arguments, BoundCompileUnit& boundCompileUnit, BoundFunction* boundFunction, const Span& span, 
+    std::vector<std::unique_ptr<BoundExpression>>& arguments, ContainerScope* containerScope, BoundCompileUnit& boundCompileUnit, BoundFunction* boundFunction, const Span& span,
     OverloadResolutionFlags flags, std::unique_ptr<Exception>& exception)
 {
     std::vector<FunctionMatch> functionMatches;
@@ -576,6 +678,10 @@ std::unique_ptr<BoundFunctionCall> SelectViableFunction(const std::unordered_set
                     throw Exception("cannot call a suppressed member function", span, bestFun->GetSpan());
                 }
             }
+            if (bestFun->IsFunctionTemplate())
+            {
+                bestFun = boundCompileUnit.Instantiate(bestFun, bestMatch.templateParameterMap, span);
+            }
             return CreateBoundFunctionCall(bestFun, arguments, boundCompileUnit, boundFunction, bestMatch, span);
         }
         else
@@ -597,6 +703,10 @@ std::unique_ptr<BoundFunctionCall> SelectViableFunction(const std::unordered_set
             {
                 throw Exception("cannot call a suppressed member function", span, singleBest->GetSpan());
             }
+        }
+        if (singleBest->IsFunctionTemplate())
+        {
+            singleBest = boundCompileUnit.Instantiate(singleBest, bestMatch.templateParameterMap, span);
         }
         return CreateBoundFunctionCall(singleBest, arguments, boundCompileUnit, boundFunction, bestMatch, span);
     }
@@ -648,7 +758,7 @@ std::unique_ptr<BoundFunctionCall> ResolveOverload(const std::u32string& groupNa
     }
     else
     {
-        return SelectViableFunction(viableFunctions, groupName, arguments, boundCompileUnit, currentFunction, span, flags, exception);
+        return SelectViableFunction(viableFunctions, groupName, arguments, containerScope, boundCompileUnit, currentFunction, span, flags, exception);
     }
 }
 

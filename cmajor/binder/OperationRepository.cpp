@@ -152,6 +152,70 @@ void PointerCopyConstructorOperation::CollectViableFunctions(ContainerScope* con
     viableFunctions.insert(function);
 }
 
+class PointerMoveCtor : public FunctionSymbol
+{
+public:
+    PointerMoveCtor(TypeSymbol* type_, const Span& span);
+    SymbolAccess DeclaredAccess() const override { return SymbolAccess::public_; }
+    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags) override;
+    bool IsBasicTypeOperation() const override { return true; }
+private:
+    TypeSymbol* type;
+};
+
+PointerMoveCtor::PointerMoveCtor(TypeSymbol* type_, const Span& span) : FunctionSymbol(span, U"@constructor"), type(type_)
+{
+    SetGroupName(U"@constructor");
+    SetAccess(SymbolAccess::public_);
+    ParameterSymbol* thisParam = new ParameterSymbol(span, U"this");
+    thisParam->SetType(type->AddPointer(span));
+    AddMember(thisParam);
+    ParameterSymbol* thatParam = new ParameterSymbol(span, U"that");
+    thatParam->SetType(type->AddRvalueReference(span));
+    AddMember(thatParam);
+    ComputeName();
+}
+
+void PointerMoveCtor::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags)
+{
+    Assert(genObjects.size() == 2, "move constructor needs two objects");
+    genObjects[1]->Load(emitter, OperationFlags::none);
+    genObjects[0]->Store(emitter, OperationFlags::none);
+}
+
+class PointerMoveConstructorOperation : public Operation
+{
+public:
+    PointerMoveConstructorOperation(BoundCompileUnit& boundCompileUnit_);
+    void CollectViableFunctions(ContainerScope* containerScope, const std::vector<std::unique_ptr<BoundExpression>>& arguments, std::unordered_set<FunctionSymbol*>& viableFunctions,
+        std::unique_ptr<Exception>& exception, const Span& span) override;
+private:
+    std::unordered_map<TypeSymbol*, FunctionSymbol*> functionMap;
+    std::vector<std::unique_ptr<FunctionSymbol>> functions;
+};
+
+PointerMoveConstructorOperation::PointerMoveConstructorOperation(BoundCompileUnit& boundCompileUnit_) : Operation(U"@constructor", 2, boundCompileUnit_)
+{
+}
+
+void PointerMoveConstructorOperation::CollectViableFunctions(ContainerScope* containerScope, const std::vector<std::unique_ptr<BoundExpression>>& arguments,
+    std::unordered_set<FunctionSymbol*>& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span)
+{
+    TypeSymbol* type = arguments[0]->GetType();
+    if (type->PointerCount() <= 1) return;
+    TypeSymbol* pointerType = type->RemovePointer(span);
+    FunctionSymbol* function = functionMap[pointerType];
+    if (!function)
+    {
+        function = new PointerMoveCtor(pointerType, span);
+        function->SetSymbolTable(GetSymbolTable());
+        function->SetParent(&GetSymbolTable()->GlobalNs());
+        functionMap[type] = function;
+        functions.push_back(std::unique_ptr<FunctionSymbol>(function));
+    }
+    viableFunctions.insert(function);
+}
+
 class PointerCopyAssignment : public FunctionSymbol
 {
 public:
@@ -209,6 +273,71 @@ void PointerCopyAssignmentOperation::CollectViableFunctions(ContainerScope* cont
     if (!function)
     {
         function = new PointerCopyAssignment(pointerType, GetSymbolTable()->GetTypeByName(U"void"), span);
+        function->SetSymbolTable(GetSymbolTable());
+        function->SetParent(&GetSymbolTable()->GlobalNs());
+        functionMap[type] = function;
+        functions.push_back(std::unique_ptr<FunctionSymbol>(function));
+    }
+    viableFunctions.insert(function);
+}
+
+class PointerMoveAssignment : public FunctionSymbol
+{
+public:
+    PointerMoveAssignment(TypeSymbol* type_, TypeSymbol* voidType_, const Span& span);
+    SymbolAccess DeclaredAccess() const override { return SymbolAccess::public_; }
+    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags) override;
+    bool IsBasicTypeOperation() const override { return true; }
+private:
+    TypeSymbol* type;
+};
+
+PointerMoveAssignment::PointerMoveAssignment(TypeSymbol* type_, TypeSymbol* voidType_, const Span& span) : FunctionSymbol(span, U"operator="), type(type_)
+{
+    SetGroupName(U"operator=");
+    SetAccess(SymbolAccess::public_);
+    ParameterSymbol* thisParam = new ParameterSymbol(span, U"this");
+    thisParam->SetType(type->AddPointer(span));
+    AddMember(thisParam);
+    ParameterSymbol* thatParam = new ParameterSymbol(span, U"that");
+    thatParam->SetType(type->AddRvalueReference(span));
+    AddMember(thatParam);
+    SetReturnType(voidType_);
+    ComputeName();
+}
+
+void PointerMoveAssignment::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags)
+{
+    Assert(genObjects.size() == 2, "copy assignment needs two objects");
+    genObjects[1]->Load(emitter, OperationFlags::none);
+    genObjects[0]->Store(emitter, OperationFlags::none);
+}
+
+class PointerMoveAssignmentOperation : public Operation
+{
+public:
+    PointerMoveAssignmentOperation(BoundCompileUnit& boundCompileUnit_);
+    void CollectViableFunctions(ContainerScope* containerScope, const std::vector<std::unique_ptr<BoundExpression>>& arguments, std::unordered_set<FunctionSymbol*>& viableFunctions,
+        std::unique_ptr<Exception>& exception, const Span& span) override;
+private:
+    std::unordered_map<TypeSymbol*, FunctionSymbol*> functionMap;
+    std::vector<std::unique_ptr<FunctionSymbol>> functions;
+};
+
+PointerMoveAssignmentOperation::PointerMoveAssignmentOperation(BoundCompileUnit& boundCompileUnit_) : Operation(U"operator=", 2, boundCompileUnit_)
+{
+}
+
+void PointerMoveAssignmentOperation::CollectViableFunctions(ContainerScope* containerScope, const std::vector<std::unique_ptr<BoundExpression>>& arguments,
+    std::unordered_set<FunctionSymbol*>& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span)
+{
+    TypeSymbol* type = arguments[0]->GetType();
+    if (type->PointerCount() <= 1) return;
+    TypeSymbol* pointerType = type->RemovePointer(span);
+    FunctionSymbol* function = functionMap[pointerType];
+    if (!function)
+    {
+        function = new PointerMoveAssignment(pointerType, GetSymbolTable()->GetTypeByName(U"void"), span);
         function->SetSymbolTable(GetSymbolTable());
         function->SetParent(&GetSymbolTable()->GlobalNs());
         functionMap[type] = function;
@@ -768,7 +897,7 @@ LvalueRefefenceCopyCtor::LvalueRefefenceCopyCtor(TypeSymbol* type_, const Span& 
 
 void LvalueRefefenceCopyCtor::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags)
 {
-    Assert(genObjects.size() == 2, "reference constructor needs two objects");
+    Assert(genObjects.size() == 2, "reference copy constructor needs two objects");
     genObjects[1]->Load(emitter, OperationFlags::none);
     genObjects[0]->Store(emitter, OperationFlags::none);
 }
@@ -871,6 +1000,71 @@ void LvalueReferenceCopyAssignmentOperation::CollectViableFunctions(ContainerSco
     viableFunctions.insert(function);
 }
 
+class LvalueReferenceMoveAssignment : public FunctionSymbol
+{
+public:
+    LvalueReferenceMoveAssignment(TypeSymbol* type_, TypeSymbol* voidType_, const Span& span);
+    SymbolAccess DeclaredAccess() const override { return SymbolAccess::public_; }
+    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags) override;
+    bool IsBasicTypeOperation() const override { return true; }
+private:
+    TypeSymbol* type;
+};
+
+LvalueReferenceMoveAssignment::LvalueReferenceMoveAssignment(TypeSymbol* type_, TypeSymbol* voidType_, const Span& span) : FunctionSymbol(span, U"operator="), type(type_)
+{
+    SetGroupName(U"operator=");
+    SetAccess(SymbolAccess::public_);
+    ParameterSymbol* thisParam = new ParameterSymbol(span, U"this");
+    thisParam->SetType(type->AddPointer(span));
+    AddMember(thisParam);
+    ParameterSymbol* thatParam = new ParameterSymbol(span, U"that");
+    thatParam->SetType(type->RemoveReference(span)->AddRvalueReference(span));
+    AddMember(thatParam);
+    SetReturnType(voidType_);
+    ComputeName();
+}
+
+void LvalueReferenceMoveAssignment::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags)
+{
+    Assert(genObjects.size() == 2, "copy assignment needs two objects");
+    genObjects[1]->Load(emitter, OperationFlags::none);
+    genObjects[0]->Store(emitter, OperationFlags::none);
+}
+
+class LvalueReferenceMoveAssignmentOperation : public Operation
+{
+public:
+    LvalueReferenceMoveAssignmentOperation(BoundCompileUnit& boundCompileUnit_);
+    void CollectViableFunctions(ContainerScope* containerScope, const std::vector<std::unique_ptr<BoundExpression>>& arguments, std::unordered_set<FunctionSymbol*>& viableFunctions,
+        std::unique_ptr<Exception>& exception, const Span& span) override;
+private:
+    std::unordered_map<TypeSymbol*, FunctionSymbol*> functionMap;
+    std::vector<std::unique_ptr<FunctionSymbol>> functions;
+};
+
+LvalueReferenceMoveAssignmentOperation::LvalueReferenceMoveAssignmentOperation(BoundCompileUnit& boundCompileUnit_) : Operation(U"operator=", 2, boundCompileUnit_)
+{
+}
+
+void LvalueReferenceMoveAssignmentOperation::CollectViableFunctions(ContainerScope* containerScope, const std::vector<std::unique_ptr<BoundExpression>>& arguments,
+    std::unordered_set<FunctionSymbol*>& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span)
+{
+    TypeSymbol* type = arguments[0]->GetType();
+    if (type->PointerCount() < 1 || !type->IsLvalueReferenceType()) return;
+    TypeSymbol* lvalueRefType = type->RemovePointer(span);
+    FunctionSymbol* function = functionMap[lvalueRefType];
+    if (!function)
+    {
+        function = new LvalueReferenceMoveAssignment(lvalueRefType, GetSymbolTable()->GetTypeByName(U"void"), span);
+        function->SetSymbolTable(GetSymbolTable());
+        function->SetParent(&GetSymbolTable()->GlobalNs());
+        functionMap[lvalueRefType] = function;
+        functions.push_back(std::unique_ptr<FunctionSymbol>(function));
+    }
+    viableFunctions.insert(function);
+}
+
 class LvalueReferenceReturn : public FunctionSymbol
 {
 public:
@@ -923,6 +1117,195 @@ void LvalueReferenceReturnOperation::CollectViableFunctions(ContainerScope* cont
     if (!function)
     {
         function = new LvalueReferenceReturn(type, span);
+        function->SetSymbolTable(GetSymbolTable());
+        function->SetParent(&GetSymbolTable()->GlobalNs());
+        functionMap[type] = function;
+        functions.push_back(std::unique_ptr<FunctionSymbol>(function));
+    }
+    viableFunctions.insert(function);
+}
+
+class RvalueRefefenceCopyCtor : public FunctionSymbol
+{
+public:
+    RvalueRefefenceCopyCtor(TypeSymbol* type_, const Span& span);
+    SymbolAccess DeclaredAccess() const override { return SymbolAccess::public_; }
+    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags) override;
+    bool IsBasicTypeOperation() const override { return true; }
+private:
+    TypeSymbol* type;
+};
+
+RvalueRefefenceCopyCtor::RvalueRefefenceCopyCtor(TypeSymbol* type_, const Span& span) : FunctionSymbol(span, U"@constructor"), type(type_)
+{
+    SetGroupName(U"@constructor");
+    SetAccess(SymbolAccess::public_);
+    ParameterSymbol* thisParam = new ParameterSymbol(span, U"this");
+    thisParam->SetType(type->AddPointer(span));
+    AddMember(thisParam);
+    ParameterSymbol* thatParam = new ParameterSymbol(span, U"that");
+    thatParam->SetType(type);
+    AddMember(thatParam);
+    ComputeName();
+}
+
+void RvalueRefefenceCopyCtor::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags)
+{
+    Assert(genObjects.size() == 2, "reference copy constructor needs two objects");
+    genObjects[1]->Load(emitter, OperationFlags::none);
+    genObjects[0]->Store(emitter, OperationFlags::none);
+}
+
+class RvalueReferenceCopyConstructorOperation : public Operation
+{
+public:
+    RvalueReferenceCopyConstructorOperation(BoundCompileUnit& boundCompileUnit_);
+    void CollectViableFunctions(ContainerScope* containerScope, const std::vector<std::unique_ptr<BoundExpression>>& arguments, std::unordered_set<FunctionSymbol*>& viableFunctions,
+        std::unique_ptr<Exception>& exception, const Span& span) override;
+private:
+    std::unordered_map<TypeSymbol*, FunctionSymbol*> functionMap;
+    std::vector<std::unique_ptr<FunctionSymbol>> functions;
+};
+
+RvalueReferenceCopyConstructorOperation::RvalueReferenceCopyConstructorOperation(BoundCompileUnit& boundCompileUnit_) : Operation(U"@constructor", 2, boundCompileUnit_)
+{
+}
+
+void RvalueReferenceCopyConstructorOperation::CollectViableFunctions(ContainerScope* containerScope, const std::vector<std::unique_ptr<BoundExpression>>& arguments,
+    std::unordered_set<FunctionSymbol*>& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span)
+{
+    TypeSymbol* type = arguments[0]->GetType();
+    if (type->PointerCount() < 1 || !type->IsRvalueReferenceType()) return;
+    TypeSymbol* rvalueRefType = type->RemovePointer(span);
+    FunctionSymbol* function = functionMap[rvalueRefType];
+    if (!function)
+    {
+        function = new RvalueRefefenceCopyCtor(rvalueRefType, span);
+        function->SetSymbolTable(GetSymbolTable());
+        function->SetParent(&GetSymbolTable()->GlobalNs());
+        functionMap[rvalueRefType] = function;
+        functions.push_back(std::unique_ptr<FunctionSymbol>(function));
+    }
+    viableFunctions.insert(function);
+}
+
+class RvalueReferenceCopyAssignment : public FunctionSymbol
+{
+public:
+    RvalueReferenceCopyAssignment(TypeSymbol* type_, TypeSymbol* voidType_, const Span& span);
+    SymbolAccess DeclaredAccess() const override { return SymbolAccess::public_; }
+    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags) override;
+    bool IsBasicTypeOperation() const override { return true; }
+private:
+    TypeSymbol* type;
+};
+
+RvalueReferenceCopyAssignment::RvalueReferenceCopyAssignment(TypeSymbol* type_, TypeSymbol* voidType_, const Span& span) : FunctionSymbol(span, U"operator="), type(type_)
+{
+    SetGroupName(U"operator=");
+    SetAccess(SymbolAccess::public_);
+    ParameterSymbol* thisParam = new ParameterSymbol(span, U"this");
+    thisParam->SetType(type->AddPointer(span));
+    AddMember(thisParam);
+    ParameterSymbol* thatParam = new ParameterSymbol(span, U"that");
+    thatParam->SetType(type);
+    AddMember(thatParam);
+    SetReturnType(voidType_);
+    ComputeName();
+}
+
+void RvalueReferenceCopyAssignment::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags)
+{
+    Assert(genObjects.size() == 2, "copy assignment needs two objects");
+    genObjects[1]->Load(emitter, OperationFlags::none);
+    genObjects[0]->Store(emitter, OperationFlags::none);
+}
+
+class RvalueReferenceCopyAssignmentOperation : public Operation
+{
+public:
+    RvalueReferenceCopyAssignmentOperation(BoundCompileUnit& boundCompileUnit_);
+    void CollectViableFunctions(ContainerScope* containerScope, const std::vector<std::unique_ptr<BoundExpression>>& arguments, std::unordered_set<FunctionSymbol*>& viableFunctions,
+        std::unique_ptr<Exception>& exception, const Span& span) override;
+private:
+    std::unordered_map<TypeSymbol*, FunctionSymbol*> functionMap;
+    std::vector<std::unique_ptr<FunctionSymbol>> functions;
+};
+
+RvalueReferenceCopyAssignmentOperation::RvalueReferenceCopyAssignmentOperation(BoundCompileUnit& boundCompileUnit_) : Operation(U"operator=", 2, boundCompileUnit_)
+{
+}
+
+void RvalueReferenceCopyAssignmentOperation::CollectViableFunctions(ContainerScope* containerScope, const std::vector<std::unique_ptr<BoundExpression>>& arguments,
+    std::unordered_set<FunctionSymbol*>& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span)
+{
+    TypeSymbol* type = arguments[0]->GetType();
+    if (type->PointerCount() < 1 || !type->IsRvalueReferenceType()) return;
+    TypeSymbol* rvalueRefType = type->RemovePointer(span);
+    FunctionSymbol* function = functionMap[rvalueRefType];
+    if (!function)
+    {
+        function = new RvalueReferenceCopyAssignment(rvalueRefType, GetSymbolTable()->GetTypeByName(U"void"), span);
+        function->SetSymbolTable(GetSymbolTable());
+        function->SetParent(&GetSymbolTable()->GlobalNs());
+        functionMap[rvalueRefType] = function;
+        functions.push_back(std::unique_ptr<FunctionSymbol>(function));
+    }
+    viableFunctions.insert(function);
+}
+
+class RvalueReferenceReturn : public FunctionSymbol
+{
+public:
+    RvalueReferenceReturn(TypeSymbol* type_, const Span& span);
+    SymbolAccess DeclaredAccess() const override { return SymbolAccess::public_; }
+    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags) override;
+    bool IsBasicTypeOperation() const override { return true; }
+private:
+    TypeSymbol* type;
+};
+
+RvalueReferenceReturn::RvalueReferenceReturn(TypeSymbol* type_, const Span& span) : FunctionSymbol(span, U"@return"), type(type_)
+{
+    SetGroupName(U"@return");
+    SetAccess(SymbolAccess::public_);
+    ParameterSymbol* valueParam = new ParameterSymbol(span, U"value");
+    valueParam->SetType(type);
+    AddMember(valueParam);
+    SetReturnType(type);
+    ComputeName();
+}
+
+void RvalueReferenceReturn::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags)
+{
+    Assert(genObjects.size() == 1, "return needs one object");
+    genObjects[0]->Load(emitter, OperationFlags::none);
+}
+
+class RvalueReferenceReturnOperation : public Operation
+{
+public:
+    RvalueReferenceReturnOperation(BoundCompileUnit& boundCompileUnit_);
+    void CollectViableFunctions(ContainerScope* containerScope, const std::vector<std::unique_ptr<BoundExpression>>& arguments, std::unordered_set<FunctionSymbol*>& viableFunctions,
+        std::unique_ptr<Exception>& exception, const Span& span) override;
+private:
+    std::unordered_map<TypeSymbol*, FunctionSymbol*> functionMap;
+    std::vector<std::unique_ptr<FunctionSymbol>> functions;
+};
+
+RvalueReferenceReturnOperation::RvalueReferenceReturnOperation(BoundCompileUnit& boundCompileUnit_) : Operation(U"@return", 1, boundCompileUnit_)
+{
+}
+
+void RvalueReferenceReturnOperation::CollectViableFunctions(ContainerScope* containerScope, const std::vector<std::unique_ptr<BoundExpression>>& arguments,
+    std::unordered_set<FunctionSymbol*>& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span)
+{
+    TypeSymbol* type = arguments[0]->GetType();
+    if (!type->IsRvalueReferenceType()) return;
+    FunctionSymbol* function = functionMap[type];
+    if (!function)
+    {
+        function = new RvalueReferenceReturn(type, span);
         function->SetSymbolTable(GetSymbolTable());
         function->SetParent(&GetSymbolTable()->GlobalNs());
         functionMap[type] = function;
@@ -1924,10 +2307,16 @@ OperationRepository::OperationRepository(BoundCompileUnit& boundCompileUnit_)
 {
     Add(new LvalueReferenceCopyConstructorOperation(boundCompileUnit_));
     Add(new LvalueReferenceCopyAssignmentOperation(boundCompileUnit_));
+    Add(new LvalueReferenceMoveAssignmentOperation(boundCompileUnit_));
     Add(new LvalueReferenceReturnOperation(boundCompileUnit_));
+    Add(new RvalueReferenceCopyConstructorOperation(boundCompileUnit_));
+    Add(new RvalueReferenceCopyAssignmentOperation(boundCompileUnit_));
+    Add(new RvalueReferenceReturnOperation(boundCompileUnit_));
     Add(new PointerDefaultConstructorOperation(boundCompileUnit_));
     Add(new PointerCopyConstructorOperation(boundCompileUnit_));
+    Add(new PointerMoveConstructorOperation(boundCompileUnit_));
     Add(new PointerCopyAssignmentOperation(boundCompileUnit_));
+    Add(new PointerMoveAssignmentOperation(boundCompileUnit_));
     Add(new PointerReturnOperation(boundCompileUnit_));
     Add(new PointerPlusOffsetOperation(boundCompileUnit_));
     Add(new OffsetPlusPointerOperation(boundCompileUnit_));

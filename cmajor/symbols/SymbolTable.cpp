@@ -17,6 +17,7 @@
 #include <cmajor/symbols/ConstantSymbol.hpp>
 #include <cmajor/symbols/EnumSymbol.hpp>
 #include <cmajor/symbols/Exception.hpp>
+#include <cmajor/symbols/TemplateSymbol.hpp>
 #include <cmajor/ast/Identifier.hpp>
 #include <cmajor/util/Unicode.hpp>
 #include <boost/filesystem.hpp>

@@ -12,14 +12,14 @@
 
 namespace cmajor { namespace symbols {
 
-ConstantSymbol::ConstantSymbol(const Span& span_, const std::u32string& name_) : Symbol(SymbolType::constantSymbol, span_, name_), typeSymbol(), evaluating(false)
+ConstantSymbol::ConstantSymbol(const Span& span_, const std::u32string& name_) : Symbol(SymbolType::constantSymbol, span_, name_), type(), evaluating(false)
 {
 }
 
 void ConstantSymbol::Write(SymbolWriter& writer)
 {
     Symbol::Write(writer);
-    writer.GetBinaryWriter().WriteEncodedUInt(typeSymbol->TypeId());
+    writer.GetBinaryWriter().WriteEncodedUInt(type->TypeId());
 }
 
 void ConstantSymbol::Read(SymbolReader& reader)
@@ -29,10 +29,10 @@ void ConstantSymbol::Read(SymbolReader& reader)
     GetSymbolTable()->EmplaceTypeRequest(this, typeId, 0);
 }
 
-void ConstantSymbol::EmplaceType(TypeSymbol* typeSymbol_, int index)
+void ConstantSymbol::EmplaceType(TypeSymbol* typeSymbol, int index)
 {
     Assert(index == 0, "invalid emplace type index");
-    typeSymbol = typeSymbol_;
+    type = typeSymbol;
 }
 
 void ConstantSymbol::SetSpecifiers(Specifiers specifiers)

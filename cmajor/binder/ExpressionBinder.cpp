@@ -1249,53 +1249,50 @@ void ExpressionBinder::Visit(CastNode& castNode)
 {
     TypeSymbol* targetType = ResolveType(castNode.TargetTypeExpr(), boundCompileUnit, containerScope);
     castNode.SourceExpr()->Accept(*this);
-    if (targetType != expression->GetType())
+    std::vector<std::unique_ptr<BoundExpression>> targetExprArgs;
+    targetExprArgs.push_back(std::unique_ptr<BoundExpression>(new BoundTypeExpression(castNode.GetSpan(), targetType)));
+    std::vector<FunctionScopeLookup> functionScopeLookups;
+    functionScopeLookups.push_back(FunctionScopeLookup(ScopeLookup::this_and_base_and_parent, containerScope));
+    functionScopeLookups.push_back(FunctionScopeLookup(ScopeLookup::this_, targetType->ClassInterfaceOrNsScope()));
+    functionScopeLookups.push_back(FunctionScopeLookup(ScopeLookup::fileScopes, nullptr));
+    std::unique_ptr<BoundFunctionCall> castFunctionCall = ResolveOverload(U"@return", containerScope, functionScopeLookups, targetExprArgs, boundCompileUnit, boundFunction, castNode.GetSpan());
+    std::vector<std::unique_ptr<BoundExpression>> castArguments;
+    castArguments.push_back(std::move(expression));
+    FunctionMatch functionMatch(castFunctionCall->GetFunctionSymbol());
+    bool conversionFound = FindConversions(boundCompileUnit, castFunctionCall->GetFunctionSymbol(), castArguments, functionMatch, ConversionType::explicit_, castNode.GetSpan());
+    if (conversionFound)
     {
-        std::vector<std::unique_ptr<BoundExpression>> targetExprArgs;
-        targetExprArgs.push_back(std::unique_ptr<BoundExpression>(new BoundTypeExpression(castNode.GetSpan(), targetType)));
-        std::vector<FunctionScopeLookup> functionScopeLookups;
-        functionScopeLookups.push_back(FunctionScopeLookup(ScopeLookup::this_and_base_and_parent, containerScope));
-        functionScopeLookups.push_back(FunctionScopeLookup(ScopeLookup::this_, targetType->ClassInterfaceOrNsScope()));
-        functionScopeLookups.push_back(FunctionScopeLookup(ScopeLookup::fileScopes, nullptr));
-        std::unique_ptr<BoundFunctionCall> castFunctionCall = ResolveOverload(U"@return", containerScope, functionScopeLookups, targetExprArgs, boundCompileUnit, boundFunction, castNode.GetSpan());
-        std::vector<std::unique_ptr<BoundExpression>> castArguments;
-        castArguments.push_back(std::move(expression));
-        FunctionMatch functionMatch(castFunctionCall->GetFunctionSymbol());
-        bool conversionFound = FindConversions(boundCompileUnit, castFunctionCall->GetFunctionSymbol(), castArguments, functionMatch, ConversionType::explicit_, castNode.GetSpan());
-        if (conversionFound)
+        Assert(!functionMatch.argumentMatches.empty(), "argument match expected");
+        FunctionSymbol* conversionFun = functionMatch.argumentMatches[0].conversionFun;
+        if (conversionFun)
         {
-            Assert(!functionMatch.argumentMatches.empty(), "argument match expected");
-            FunctionSymbol* conversionFun = functionMatch.argumentMatches[0].conversionFun;
-            if (conversionFun)
-            {
-                castArguments[0].reset(new BoundConversion(std::unique_ptr<BoundExpression>(castArguments[0].release()), conversionFun));
-            }
-            ArgumentMatch& argumentMatch = functionMatch.argumentMatches[0];
-            if (argumentMatch.referenceConversionFlags != OperationFlags::none)
-            {
-                if (argumentMatch.referenceConversionFlags == OperationFlags::addr)
-                {
-                    TypeSymbol* type = castArguments[0]->GetType()->AddLvalueReference(span);
-                    BoundAddressOfExpression* addressOfExpression = new BoundAddressOfExpression(std::move(castArguments[0]), type);
-                    castArguments[0].reset(addressOfExpression);
-                }
-                else if (argumentMatch.referenceConversionFlags == OperationFlags::deref)
-                {
-                    TypeSymbol* type = castArguments[0]->GetType()->RemoveReference(span);
-                    BoundDereferenceExpression* dereferenceExpression = new BoundDereferenceExpression(std::move(castArguments[0]), type);
-                    castArguments[0].reset(dereferenceExpression);
-                }
-            }
-            castFunctionCall->SetArguments(std::move(castArguments));
+            castArguments[0].reset(new BoundConversion(std::unique_ptr<BoundExpression>(castArguments[0].release()), conversionFun));
         }
-        else
+        ArgumentMatch& argumentMatch = functionMatch.argumentMatches[0];
+        if (argumentMatch.referenceConversionFlags != OperationFlags::none)
         {
-            throw Exception("no explicit conversion from '" + ToUtf8(castArguments[0]->GetType()->FullName()) + "' to '" + ToUtf8(targetType->FullName()) + "' exists",
-                castNode.GetSpan(), boundFunction->GetFunctionSymbol()->GetSpan());
+            if (argumentMatch.referenceConversionFlags == OperationFlags::addr)
+            {
+                TypeSymbol* type = castArguments[0]->GetType()->AddLvalueReference(span);
+                BoundAddressOfExpression* addressOfExpression = new BoundAddressOfExpression(std::move(castArguments[0]), type);
+                castArguments[0].reset(addressOfExpression);
+            }
+            else if (argumentMatch.referenceConversionFlags == OperationFlags::deref)
+            {
+                TypeSymbol* type = castArguments[0]->GetType()->RemoveReference(span);
+                BoundDereferenceExpression* dereferenceExpression = new BoundDereferenceExpression(std::move(castArguments[0]), type);
+                castArguments[0].reset(dereferenceExpression);
+            }
         }
-        CheckAccess(boundFunction->GetFunctionSymbol(), castFunctionCall->GetFunctionSymbol());
-        expression.reset(castFunctionCall.release());
+        castFunctionCall->SetArguments(std::move(castArguments));
     }
+    else
+    {
+        throw Exception("no explicit conversion from '" + ToUtf8(castArguments[0]->GetType()->FullName()) + "' to '" + ToUtf8(targetType->FullName()) + "' exists",
+            castNode.GetSpan(), boundFunction->GetFunctionSymbol()->GetSpan());
+    }
+    CheckAccess(boundFunction->GetFunctionSymbol(), castFunctionCall->GetFunctionSymbol());
+    expression.reset(castFunctionCall.release());
 }
 
 void ExpressionBinder::Visit(ConstructNode& constructNode) 

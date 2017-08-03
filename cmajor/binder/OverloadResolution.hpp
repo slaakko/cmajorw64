@@ -67,7 +67,7 @@ inline bool BetterArgumentMatch(const ArgumentMatch& left, const ArgumentMatch& 
 struct FunctionMatch
 {
     FunctionMatch(FunctionSymbol* fun_) : fun(fun_), numConversions(0), referenceMustBeInitialized(false), castRequired(false), cannotBindConstArgToNonConstParam(false), cannotAssignToConstObject(false),
-        sourceType(nullptr), targetType(nullptr) {}
+        sourceType(nullptr), targetType(nullptr), boundTemplateParameters(nullptr) {}
     FunctionSymbol* fun;
     std::vector<ArgumentMatch> argumentMatches;
     int numConversions;
@@ -77,6 +77,8 @@ struct FunctionMatch
     bool cannotAssignToConstObject;
     TypeSymbol* sourceType;
     TypeSymbol* targetType;
+    std::unordered_map<TemplateParameterSymbol*, TypeSymbol*> templateParameterMap;
+    std::vector<std::unique_ptr<BoundTemplateParameterSymbol>>* boundTemplateParameters;
 };
 
 struct BetterFunctionMatch

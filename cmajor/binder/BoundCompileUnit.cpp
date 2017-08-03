@@ -131,7 +131,7 @@ void PtrToVoidPtrConversion::GenerateCall(Emitter& emitter, std::vector<GenObjec
 
 BoundCompileUnit::BoundCompileUnit(Module& module_, CompileUnitNode* compileUnitNode_) : 
     BoundNode(Span(), BoundNodeType::boundCompileUnit), module(module_), symbolTable(module.GetSymbolTable()), compileUnitNode(compileUnitNode_), hasGotos(false), 
-    operationRepository(*this)
+    operationRepository(*this), functionTemplateRepository(*this)
 {
     boost::filesystem::path fileName = boost::filesystem::path(compileUnitNode->FilePath()).filename();
     boost::filesystem::path directory = module.DirectoryPath();
@@ -242,6 +242,11 @@ void BoundCompileUnit::CollectViableFunctions(const std::u32string& groupName, C
     std::unordered_set<FunctionSymbol*>& viableFunctions,  std::unique_ptr<Exception>& exception, const Span& span)
 {
     operationRepository.CollectViableFunctions(groupName, containerScope, arguments, viableFunctions, exception, span);
+}
+
+FunctionSymbol* BoundCompileUnit::Instantiate(FunctionSymbol* functionTemplate, const std::unordered_map<TemplateParameterSymbol*, TypeSymbol*>& templateParameterMapping, const Span& span)
+{
+    return functionTemplateRepository.Instantiate(functionTemplate, templateParameterMapping, span);
 }
 
 } } // namespace cmajor::binder

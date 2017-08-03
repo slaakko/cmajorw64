@@ -54,6 +54,7 @@ TypeDerivationRec AddConstDerivation(const TypeDerivationRec& typeDerivationRec)
 TypeDerivationRec AddLvalueReferenceDerivation(const TypeDerivationRec& typeDerivationRec);
 TypeDerivationRec AddRvalueReferenceDerivation(const TypeDerivationRec& typeDerivationRec);
 TypeDerivationRec AddPointerDerivation(const TypeDerivationRec& typeDerivationRec);
+TypeDerivationRec UnifyDerivations(const TypeDerivationRec& left, const TypeDerivationRec& right);
 
 class DerivedTypeSymbol : public TypeSymbol
 {
@@ -83,7 +84,9 @@ public:
     bool IsPointerType() const override;
     bool IsVoidPtrType() const override;
     int PointerCount() const override;
-    const TypeDerivationRec& DerivationRec() const { return derivationRec; }
+    const TypeDerivationRec& DerivationRec() const override { return derivationRec; }
+    TypeSymbol* RemoveDerivations(const TypeDerivationRec& sourceDerivationRec, const Span& span) override;
+    TypeSymbol* Unify(TypeSymbol* sourceType, const Span& span) override;
 private:
     TypeSymbol* baseType;
     TypeDerivationRec derivationRec;

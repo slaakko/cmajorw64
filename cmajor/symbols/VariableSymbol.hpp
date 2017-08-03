@@ -16,12 +16,12 @@ public:
     VariableSymbol(SymbolType symbolType_, const Span& span_, const std::u32string& name_);
     void Write(SymbolWriter& writer) override;
     void Read(SymbolReader& reader) override;
-    const TypeSymbol* GetType() const { return typeSymbol; }
-    TypeSymbol* GetType() { return typeSymbol; }
-    void SetType(TypeSymbol* typeSymbol_) { typeSymbol = typeSymbol_; }
-    void EmplaceType(TypeSymbol* typeSymbol_, int index) override;
+    const TypeSymbol* GetType() const { return type; }
+    TypeSymbol* GetType() { return type; }
+    void SetType(TypeSymbol* typeSymbol) { type = typeSymbol; }
+    void EmplaceType(TypeSymbol* typeSymbol, int index) override;
 private:
-    TypeSymbol* typeSymbol;
+    TypeSymbol* type;
 };
 
 class ParameterSymbol : public VariableSymbol

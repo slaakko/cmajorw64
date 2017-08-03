@@ -7,6 +7,7 @@
 #define CMAJOR_BINDER_BOUND_COMPILE_UNIT_INCLUDED
 #include <cmajor/binder/BoundNode.hpp>
 #include <cmajor/binder/OperationRepository.hpp>
+#include <cmajor/binder/FunctionTemplateRepository.hpp>
 #include <cmajor/symbols/Module.hpp>
 #include <cmajor/symbols/ConversionTable.hpp>
 #include <cmajor/ast/CompileUnit.hpp>
@@ -35,6 +36,7 @@ public:
     FunctionSymbol* GetConversion(TypeSymbol* sourceType, TypeSymbol* targetType, const Span& span);
     void CollectViableFunctions(const std::u32string& groupName, ContainerScope* containerScope, std::vector<std::unique_ptr<BoundExpression>>& arguments, 
         std::unordered_set<FunctionSymbol*>& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span);
+    FunctionSymbol* Instantiate(FunctionSymbol* functionTemplate, const std::unordered_map<TemplateParameterSymbol*, TypeSymbol*>& templateParameterMapping, const Span& span);
     const std::string& LLFilePath() const { return llFilePath; }
     const std::string& OptLLFilePath() const { return optLLFilePath; }
     const std::string& ObjectFilePath() const { return objectFilePath; }
@@ -51,6 +53,7 @@ private:
     std::vector<std::unique_ptr<BoundNode>> boundNodes;
     bool hasGotos;
     OperationRepository operationRepository;
+    FunctionTemplateRepository functionTemplateRepository;
     ConversionTable conversionTable;
 };
 

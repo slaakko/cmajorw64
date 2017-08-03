@@ -18,10 +18,10 @@ public:
     void EmplaceType(TypeSymbol* typeSymbol_, int index) override;
     std::string TypeString() const override { return "typedef"; }
     void SetSpecifiers(Specifiers specifiers);
-    const TypeSymbol* GetType() const { return typeSymbol; }
-    void SetType(TypeSymbol* typeSymbol_) { typeSymbol = typeSymbol_; }
+    const TypeSymbol* GetType() const { return type; }
+    void SetType(TypeSymbol* typeSymbol) { type = typeSymbol; }
 private:
-    TypeSymbol* typeSymbol;
+    TypeSymbol* type;
 };
 
 } } // namespace cmajor::symbols

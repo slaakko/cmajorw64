@@ -6,6 +6,7 @@
 #ifndef CMAJOR_SYMBOLS_CLASS_TYPE_SYMBOL_INCLUDED
 #define CMAJOR_SYMBOLS_CLASS_TYPE_SYMBOL_INCLUDED
 #include <cmajor/symbols/TypeSymbol.hpp>
+#include <cmajor/ast/Class.hpp>
 
 namespace cmajor { namespace symbols {
 
@@ -51,6 +52,8 @@ public:
     ClassTypeSymbol(SymbolType symbolType_, const Span& span_, const std::u32string& name_);
     void Write(SymbolWriter& writer) override;
     void Read(SymbolReader& reader) override;
+    void ReadAstNodes();
+    ClassNode* GetFunctionNode() { return classNode.get(); }
     void EmplaceType(TypeSymbol* typeSymbol_, int index) override;
     void AddMember(Symbol* member) override;
     bool IsClassTypeSymbol() const override { return true; }
@@ -64,6 +67,7 @@ public:
     bool HasBaseClass(ClassTypeSymbol* cls, uint8_t& distance) const;
     const std::vector<InterfaceTypeSymbol*>& ImplementedInterfaces() const { return implementedInterfaces; }
     void AddImplementedInterface(InterfaceTypeSymbol* interfaceTypeSymbol);
+    const std::vector<TemplateParameterSymbol*>& TemplateParameters() const { return templateParameters; }
     bool IsClassTemplate() const { return !templateParameters.empty(); }
     void CloneUsingNodes(const std::vector<Node*>& usingNodes_);
     void SetSpecifiers(Specifiers specifiers);
@@ -128,26 +132,12 @@ private:
     llvm::ArrayType* vmtObjectType;
     int32_t vmtPtrIndex;
     NodeList<Node> usingNodes;
+    std::unique_ptr<ClassNode> classNode;
+    uint32_t sizeOfAstNodes;
+    uint32_t astNodesPos;
+    std::string filePathReadFrom;
     std::string vmtObjectName;
     void InitVmt(std::vector<FunctionSymbol*>& vmtToInit);
-};
-
-class TemplateParameterSymbol : public TypeSymbol
-{
-public:
-    TemplateParameterSymbol(const Span& span_, const std::u32string& name_);
-    llvm::Type* IrType(Emitter& emitter) override { return nullptr; } 
-};
-
-class BoundTemplateParameterSymbol : public Symbol
-{
-public:
-    BoundTemplateParameterSymbol(const Span& span_, const std::u32string& name_);
-    bool IsBoundTemplateParameterSymbol() const override { return true; }
-    TypeSymbol* GetType() const { return type; }
-    void SetType(TypeSymbol* type_) { type = type_; }
-private:
-    TypeSymbol* type;
 };
 
 } } // namespace cmajor::symbols

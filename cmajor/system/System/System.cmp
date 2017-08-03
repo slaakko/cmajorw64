@@ -1,3 +1,3 @@
 project System;
 target=library;
-reference <../System.Runtime/System.Runtime.cmp>;
+reference <../System.Base/System.Base.cmp>;

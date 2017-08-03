@@ -147,6 +147,32 @@ void BasicTypeCopyCtor::GenerateCall(Emitter& emitter, std::vector<GenObject*>& 
     genObjects[0]->Store(emitter, flags & OperationFlags::functionCallFlags);
 }
 
+BasicTypeMoveCtor::BasicTypeMoveCtor(TypeSymbol* type) : FunctionSymbol(SymbolType::basicTypeMoveCtor, Span(), U"@constructor")
+{
+    SetGroupName(U"@constructor");
+    SetAccess(SymbolAccess::public_);
+    ParameterSymbol* thisParam = new ParameterSymbol(Span(), U"this");
+    thisParam->SetType(type->AddPointer(Span()));
+    AddMember(thisParam);
+    ParameterSymbol* thatParam = new ParameterSymbol(Span(), U"that");
+    thatParam->SetType(type->AddRvalueReference(Span()));
+    AddMember(thatParam);
+    ComputeName();
+}
+
+BasicTypeMoveCtor::BasicTypeMoveCtor(const Span& span_, const std::u32string& name_) : FunctionSymbol(SymbolType::basicTypeMoveCtor, span_, name_)
+{
+}
+
+void BasicTypeMoveCtor::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags)
+{
+    Assert(genObjects.size() == 2, "move constructor needs two objects");
+    genObjects[1]->Load(emitter, OperationFlags::none);
+    llvm::Value* rvalueRefValue = emitter.Stack().Pop();
+    emitter.Stack().Push(emitter.Builder().CreateLoad(rvalueRefValue));
+    genObjects[0]->Store(emitter, flags & OperationFlags::functionCallFlags);
+}
+
 BasicTypeCopyAssignment::BasicTypeCopyAssignment(TypeSymbol* type, TypeSymbol* voidType) : FunctionSymbol(SymbolType::basicTypeCopyAssignment, Span(), U"operator=")
 {
     SetGroupName(U"operator=");
@@ -167,8 +193,35 @@ BasicTypeCopyAssignment::BasicTypeCopyAssignment(const Span& span_, const std::u
 
 void BasicTypeCopyAssignment::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags)
 {
-    Assert(genObjects.size() == 2, "assignment needs two objects");
+    Assert(genObjects.size() == 2, "copy assignment needs two objects");
     genObjects[1]->Load(emitter, OperationFlags::none);
+    genObjects[0]->Store(emitter, OperationFlags::none);
+}
+
+BasicTypeMoveAssignment::BasicTypeMoveAssignment(TypeSymbol* type, TypeSymbol* voidType) : FunctionSymbol(SymbolType::basicTypeMoveAssignment, Span(), U"operator=")
+{
+    SetGroupName(U"operator=");
+    SetAccess(SymbolAccess::public_);
+    ParameterSymbol* thisParam = new ParameterSymbol(Span(), U"this");
+    thisParam->SetType(type->AddPointer(Span()));
+    AddMember(thisParam);
+    ParameterSymbol* thatParam = new ParameterSymbol(Span(), U"that");
+    thatParam->SetType(type->AddRvalueReference(Span()));
+    AddMember(thatParam);
+    SetReturnType(voidType);
+    ComputeName();
+}
+
+BasicTypeMoveAssignment::BasicTypeMoveAssignment(const Span& span_, const std::u32string& name_) : FunctionSymbol(SymbolType::basicTypeMoveAssignment, span_, name_)
+{
+}
+
+void BasicTypeMoveAssignment::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags)
+{
+    Assert(genObjects.size() == 2, "move assignment needs two objects");
+    genObjects[1]->Load(emitter, OperationFlags::none);
+    llvm::Value* rvalueRefValue = emitter.Stack().Pop();
+    emitter.Stack().Push(emitter.Builder().CreateLoad(rvalueRefValue));
     genObjects[0]->Store(emitter, OperationFlags::none);
 }
 
@@ -537,14 +590,18 @@ void MakeBasicTypeOperations(SymbolTable& symbolTable,
 {
     symbolTable.AddFunctionSymbolToGlobalScope(new BasicTypeDefaultCtor<DefaultInt1>(SymbolType::defaultInt1, boolType));
     symbolTable.AddFunctionSymbolToGlobalScope(new BasicTypeCopyCtor(boolType));
+    symbolTable.AddFunctionSymbolToGlobalScope(new BasicTypeMoveCtor(boolType));
     symbolTable.AddFunctionSymbolToGlobalScope(new BasicTypeCopyAssignment(boolType, voidType));
+    symbolTable.AddFunctionSymbolToGlobalScope(new BasicTypeMoveAssignment(boolType, voidType));
     symbolTable.AddFunctionSymbolToGlobalScope(new BasicTypeReturn(boolType));
     symbolTable.AddFunctionSymbolToGlobalScope(new BasicTypeComparisonOperation<BasicTypeIntegerEquality>(SymbolType::basicTypeIntegerEquality, boolType, boolType));
     symbolTable.AddFunctionSymbolToGlobalScope(new BasicTypeUnaryOperation<BasicTypeNot>(SymbolType::basicTypeNot, boolType));
 
     symbolTable.AddFunctionSymbolToGlobalScope(new BasicTypeDefaultCtor<DefaultInt8>(SymbolType::defaultInt8, sbyteType));
     symbolTable.AddFunctionSymbolToGlobalScope(new BasicTypeCopyCtor(sbyteType));
+    symbolTable.AddFunctionSymbolToGlobalScope(new BasicTypeMoveCtor(sbyteType));
     symbolTable.AddFunctionSymbolToGlobalScope(new BasicTypeCopyAssignment(sbyteType, voidType));
+    symbolTable.AddFunctionSymbolToGlobalScope(new BasicTypeMoveAssignment(sbyteType, voidType));
     symbolTable.AddFunctionSymbolToGlobalScope(new BasicTypeReturn(sbyteType));
     MakeSignedIntegerTypeOperations(symbolTable, sbyteType);
     symbolTable.AddFunctionSymbolToGlobalScope(new BasicTypeComparisonOperation<BasicTypeIntegerEquality>(SymbolType::basicTypeIntegerEquality, sbyteType, boolType));
@@ -552,7 +609,9 @@ void MakeBasicTypeOperations(SymbolTable& symbolTable,
 
     symbolTable.AddFunctionSymbolToGlobalScope(new BasicTypeDefaultCtor<DefaultInt8>(SymbolType::defaultInt8, byteType));
     symbolTable.AddFunctionSymbolToGlobalScope(new BasicTypeCopyCtor(byteType));
+    symbolTable.AddFunctionSymbolToGlobalScope(new BasicTypeMoveCtor(byteType));
     symbolTable.AddFunctionSymbolToGlobalScope(new BasicTypeCopyAssignment(byteType, voidType));
+    symbolTable.AddFunctionSymbolToGlobalScope(new BasicTypeMoveAssignment(byteType, voidType));
     symbolTable.AddFunctionSymbolToGlobalScope(new BasicTypeReturn(byteType));
     MakeUnsignedIntegerTypeOperations(symbolTable, byteType);
     symbolTable.AddFunctionSymbolToGlobalScope(new BasicTypeComparisonOperation<BasicTypeIntegerEquality>(SymbolType::basicTypeIntegerEquality, byteType, boolType));
@@ -560,7 +619,9 @@ void MakeBasicTypeOperations(SymbolTable& symbolTable,
 
     symbolTable.AddFunctionSymbolToGlobalScope(new BasicTypeDefaultCtor<DefaultInt16>(SymbolType::defaultInt16, shortType));
     symbolTable.AddFunctionSymbolToGlobalScope(new BasicTypeCopyCtor(shortType));
+    symbolTable.AddFunctionSymbolToGlobalScope(new BasicTypeMoveCtor(shortType));
     symbolTable.AddFunctionSymbolToGlobalScope(new BasicTypeCopyAssignment(shortType, voidType));
+    symbolTable.AddFunctionSymbolToGlobalScope(new BasicTypeMoveAssignment(shortType, voidType));
     symbolTable.AddFunctionSymbolToGlobalScope(new BasicTypeReturn(shortType));
     MakeSignedIntegerTypeOperations(symbolTable, shortType);
     symbolTable.AddFunctionSymbolToGlobalScope(new BasicTypeComparisonOperation<BasicTypeIntegerEquality>(SymbolType::basicTypeIntegerEquality, shortType, boolType));
@@ -568,7 +629,9 @@ void MakeBasicTypeOperations(SymbolTable& symbolTable,
 
     symbolTable.AddFunctionSymbolToGlobalScope(new BasicTypeDefaultCtor<DefaultInt16>(SymbolType::defaultInt16, ushortType));
     symbolTable.AddFunctionSymbolToGlobalScope(new BasicTypeCopyCtor(ushortType));
+    symbolTable.AddFunctionSymbolToGlobalScope(new BasicTypeMoveCtor(ushortType));
     symbolTable.AddFunctionSymbolToGlobalScope(new BasicTypeCopyAssignment(ushortType, voidType));
+    symbolTable.AddFunctionSymbolToGlobalScope(new BasicTypeMoveAssignment(ushortType, voidType));
     symbolTable.AddFunctionSymbolToGlobalScope(new BasicTypeReturn(ushortType));
     MakeUnsignedIntegerTypeOperations(symbolTable, ushortType);
     symbolTable.AddFunctionSymbolToGlobalScope(new BasicTypeComparisonOperation<BasicTypeIntegerEquality>(SymbolType::basicTypeIntegerEquality, ushortType, boolType));
@@ -576,7 +639,9 @@ void MakeBasicTypeOperations(SymbolTable& symbolTable,
 
     symbolTable.AddFunctionSymbolToGlobalScope(new BasicTypeDefaultCtor<DefaultInt32>(SymbolType::defaultInt32, intType));
     symbolTable.AddFunctionSymbolToGlobalScope(new BasicTypeCopyCtor(intType));
+    symbolTable.AddFunctionSymbolToGlobalScope(new BasicTypeMoveCtor(intType));
     symbolTable.AddFunctionSymbolToGlobalScope(new BasicTypeCopyAssignment(intType, voidType));
+    symbolTable.AddFunctionSymbolToGlobalScope(new BasicTypeMoveAssignment(intType, voidType));
     symbolTable.AddFunctionSymbolToGlobalScope(new BasicTypeReturn(intType));
     MakeSignedIntegerTypeOperations(symbolTable, intType);
     symbolTable.AddFunctionSymbolToGlobalScope(new BasicTypeComparisonOperation<BasicTypeIntegerEquality>(SymbolType::basicTypeIntegerEquality, intType, boolType));
@@ -584,7 +649,9 @@ void MakeBasicTypeOperations(SymbolTable& symbolTable,
 
     symbolTable.AddFunctionSymbolToGlobalScope(new BasicTypeDefaultCtor<DefaultInt32>(SymbolType::defaultInt32, uintType));
     symbolTable.AddFunctionSymbolToGlobalScope(new BasicTypeCopyCtor(uintType));
+    symbolTable.AddFunctionSymbolToGlobalScope(new BasicTypeMoveCtor(uintType));
     symbolTable.AddFunctionSymbolToGlobalScope(new BasicTypeCopyAssignment(uintType, voidType));
+    symbolTable.AddFunctionSymbolToGlobalScope(new BasicTypeMoveAssignment(uintType, voidType));
     symbolTable.AddFunctionSymbolToGlobalScope(new BasicTypeReturn(uintType));
     MakeUnsignedIntegerTypeOperations(symbolTable, uintType);
     symbolTable.AddFunctionSymbolToGlobalScope(new BasicTypeComparisonOperation<BasicTypeIntegerEquality>(SymbolType::basicTypeIntegerEquality, uintType, boolType));
@@ -592,7 +659,9 @@ void MakeBasicTypeOperations(SymbolTable& symbolTable,
 
     symbolTable.AddFunctionSymbolToGlobalScope(new BasicTypeDefaultCtor<DefaultInt64>(SymbolType::defaultInt64, longType));
     symbolTable.AddFunctionSymbolToGlobalScope(new BasicTypeCopyCtor(longType));
+    symbolTable.AddFunctionSymbolToGlobalScope(new BasicTypeMoveCtor(longType));
     symbolTable.AddFunctionSymbolToGlobalScope(new BasicTypeCopyAssignment(longType, voidType));
+    symbolTable.AddFunctionSymbolToGlobalScope(new BasicTypeMoveAssignment(longType, voidType));
     symbolTable.AddFunctionSymbolToGlobalScope(new BasicTypeReturn(longType));
     MakeSignedIntegerTypeOperations(symbolTable, longType);
     symbolTable.AddFunctionSymbolToGlobalScope(new BasicTypeComparisonOperation<BasicTypeIntegerEquality>(SymbolType::basicTypeIntegerEquality, longType, boolType));
@@ -600,7 +669,9 @@ void MakeBasicTypeOperations(SymbolTable& symbolTable,
 
     symbolTable.AddFunctionSymbolToGlobalScope(new BasicTypeDefaultCtor<DefaultInt64>(SymbolType::defaultInt64, ulongType));
     symbolTable.AddFunctionSymbolToGlobalScope(new BasicTypeCopyCtor(ulongType));
+    symbolTable.AddFunctionSymbolToGlobalScope(new BasicTypeMoveCtor(ulongType));
     symbolTable.AddFunctionSymbolToGlobalScope(new BasicTypeCopyAssignment(ulongType, voidType));
+    symbolTable.AddFunctionSymbolToGlobalScope(new BasicTypeMoveAssignment(ulongType, voidType));
     symbolTable.AddFunctionSymbolToGlobalScope(new BasicTypeReturn(ulongType));
     MakeUnsignedIntegerTypeOperations(symbolTable, ulongType);
     symbolTable.AddFunctionSymbolToGlobalScope(new BasicTypeComparisonOperation<BasicTypeIntegerEquality>(SymbolType::basicTypeIntegerEquality, ulongType, boolType));
@@ -608,7 +679,9 @@ void MakeBasicTypeOperations(SymbolTable& symbolTable,
 
     symbolTable.AddFunctionSymbolToGlobalScope(new BasicTypeDefaultCtor<DefaultFloat>(SymbolType::defaultFloat, floatType));
     symbolTable.AddFunctionSymbolToGlobalScope(new BasicTypeCopyCtor(floatType));
+    symbolTable.AddFunctionSymbolToGlobalScope(new BasicTypeMoveCtor(floatType));
     symbolTable.AddFunctionSymbolToGlobalScope(new BasicTypeCopyAssignment(floatType, voidType));
+    symbolTable.AddFunctionSymbolToGlobalScope(new BasicTypeMoveAssignment(floatType, voidType));
     symbolTable.AddFunctionSymbolToGlobalScope(new BasicTypeReturn(floatType));
     MakeFloatingPointTypeOperations(symbolTable, floatType);
     symbolTable.AddFunctionSymbolToGlobalScope(new BasicTypeComparisonOperation<BasicTypeFloatingEquality>(SymbolType::basicTypeFloatingEquality, floatType, boolType));
@@ -616,7 +689,9 @@ void MakeBasicTypeOperations(SymbolTable& symbolTable,
 
     symbolTable.AddFunctionSymbolToGlobalScope(new BasicTypeDefaultCtor<DefaultDouble>(SymbolType::defaultDouble, doubleType));
     symbolTable.AddFunctionSymbolToGlobalScope(new BasicTypeCopyCtor(doubleType));
+    symbolTable.AddFunctionSymbolToGlobalScope(new BasicTypeMoveCtor(doubleType));
     symbolTable.AddFunctionSymbolToGlobalScope(new BasicTypeCopyAssignment(doubleType, voidType));
+    symbolTable.AddFunctionSymbolToGlobalScope(new BasicTypeMoveAssignment(doubleType, voidType));
     symbolTable.AddFunctionSymbolToGlobalScope(new BasicTypeReturn(doubleType));
     MakeFloatingPointTypeOperations(symbolTable, doubleType);
     symbolTable.AddFunctionSymbolToGlobalScope(new BasicTypeComparisonOperation<BasicTypeFloatingEquality>(SymbolType::basicTypeFloatingEquality, doubleType, boolType));
@@ -624,21 +699,27 @@ void MakeBasicTypeOperations(SymbolTable& symbolTable,
 
     symbolTable.AddFunctionSymbolToGlobalScope(new BasicTypeDefaultCtor<DefaultInt8>(SymbolType::defaultInt8, charType));
     symbolTable.AddFunctionSymbolToGlobalScope(new BasicTypeCopyCtor(charType));
+    symbolTable.AddFunctionSymbolToGlobalScope(new BasicTypeMoveCtor(charType));
     symbolTable.AddFunctionSymbolToGlobalScope(new BasicTypeCopyAssignment(charType, voidType));
+    symbolTable.AddFunctionSymbolToGlobalScope(new BasicTypeMoveAssignment(charType, voidType));
     symbolTable.AddFunctionSymbolToGlobalScope(new BasicTypeReturn(charType));
     symbolTable.AddFunctionSymbolToGlobalScope(new BasicTypeComparisonOperation<BasicTypeIntegerEquality>(SymbolType::basicTypeIntegerEquality, charType, boolType));
     symbolTable.AddFunctionSymbolToGlobalScope(new BasicTypeComparisonOperation<BasicTypeUnsignedIntegerLessThan>(SymbolType::basicTypeUnsignedIntegerLessThan, charType, boolType));
 
     symbolTable.AddFunctionSymbolToGlobalScope(new BasicTypeDefaultCtor<DefaultInt16>(SymbolType::defaultInt16, wcharType));
     symbolTable.AddFunctionSymbolToGlobalScope(new BasicTypeCopyCtor(wcharType));
+    symbolTable.AddFunctionSymbolToGlobalScope(new BasicTypeMoveCtor(wcharType));
     symbolTable.AddFunctionSymbolToGlobalScope(new BasicTypeCopyAssignment(wcharType, voidType));
+    symbolTable.AddFunctionSymbolToGlobalScope(new BasicTypeMoveAssignment(wcharType, voidType));
     symbolTable.AddFunctionSymbolToGlobalScope(new BasicTypeReturn(wcharType));
     symbolTable.AddFunctionSymbolToGlobalScope(new BasicTypeComparisonOperation<BasicTypeIntegerEquality>(SymbolType::basicTypeIntegerEquality, wcharType, boolType));
     symbolTable.AddFunctionSymbolToGlobalScope(new BasicTypeComparisonOperation<BasicTypeUnsignedIntegerLessThan>(SymbolType::basicTypeUnsignedIntegerLessThan, wcharType, boolType));
 
     symbolTable.AddFunctionSymbolToGlobalScope(new BasicTypeDefaultCtor<DefaultInt32>(SymbolType::defaultInt32, ucharType));
     symbolTable.AddFunctionSymbolToGlobalScope(new BasicTypeCopyCtor(ucharType));
+    symbolTable.AddFunctionSymbolToGlobalScope(new BasicTypeMoveCtor(ucharType));
     symbolTable.AddFunctionSymbolToGlobalScope(new BasicTypeCopyAssignment(ucharType, voidType));
+    symbolTable.AddFunctionSymbolToGlobalScope(new BasicTypeMoveAssignment(ucharType, voidType));
     symbolTable.AddFunctionSymbolToGlobalScope(new BasicTypeReturn(ucharType));
     symbolTable.AddFunctionSymbolToGlobalScope(new BasicTypeComparisonOperation<BasicTypeIntegerEquality>(SymbolType::basicTypeIntegerEquality, ucharType, boolType));
     symbolTable.AddFunctionSymbolToGlobalScope(new BasicTypeComparisonOperation<BasicTypeUnsignedIntegerLessThan>(SymbolType::basicTypeUnsignedIntegerLessThan, ucharType, boolType));

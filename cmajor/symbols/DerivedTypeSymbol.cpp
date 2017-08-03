@@ -246,6 +246,41 @@ TypeDerivationRec AddPointerDerivation(const TypeDerivationRec& typeDerivationRe
     return pointerAddedDerivationRec;
 }
 
+TypeDerivationRec UnifyDerivations(const TypeDerivationRec& left, const TypeDerivationRec& right)
+{
+    if (HasArrayDerivation(left.derivations) || HasArrayDerivation(right.derivations))
+    {
+        throw std::runtime_error("arrays not supported yet");
+    }
+    TypeDerivationRec result;
+    if (HasFrontConstDerivation(left.derivations) || HasFrontConstDerivation(right.derivations))
+    {
+        result.derivations.push_back(Derivation::constDerivation);
+    }
+    int pointerCount = CountPointerDerivations(left.derivations) + CountPointerDerivations(right.derivations);
+    for (int i = 0; i < pointerCount; ++i)
+    {
+        result.derivations.push_back(Derivation::pointerDerivation);
+    }
+    if (HasLvalueReferenceDerivation(left.derivations))
+    {
+        result.derivations.push_back(Derivation::lvalueRefDerivation);
+    }
+    else if (HasRvalueReferenceDerivation(left.derivations))
+    {
+        result.derivations.push_back(Derivation::rvalueRefDerivation);
+    }
+    else if (HasLvalueReferenceDerivation(right.derivations))
+    {
+        result.derivations.push_back(Derivation::lvalueRefDerivation);
+    }
+    else if (HasRvalueReferenceDerivation(right.derivations))
+    {
+        result.derivations.push_back(Derivation::rvalueRefDerivation);
+    }
+    return result;
+}
+
 std::u32string MakeDerivedTypeName(TypeSymbol* baseType, const TypeDerivationRec& derivationRec)
 {
     std::u32string derivedTypeName;
@@ -462,6 +497,43 @@ TypeSymbol* DerivedTypeSymbol::AddRvalueReference(const Span& span)
 TypeSymbol* DerivedTypeSymbol::AddPointer(const Span& span)
 {
     return GetSymbolTable()->MakeDerivedType(baseType, AddPointerDerivation(derivationRec), span);
+}
+
+TypeSymbol* DerivedTypeSymbol::RemoveDerivations(const TypeDerivationRec& sourceDerivationRec, const Span& span)
+{
+    TypeDerivationRec result;
+    if (HasArrayDerivation(derivationRec.derivations) || HasArrayDerivation(sourceDerivationRec.derivations))
+    {
+        throw std::runtime_error("arrays not supported yet");
+    }
+    const DerivationVec& sourceDerivations = sourceDerivationRec.derivations;
+    if (!HasFrontConstDerivation(sourceDerivations) && HasFrontConstDerivation(derivationRec.derivations))
+    {
+        result.derivations.push_back(Derivation::constDerivation);
+    }
+    int pointerDiff = CountPointerDerivations(derivationRec.derivations) - CountPointerDerivations(sourceDerivations);
+    if (pointerDiff != 0)
+    {
+        for (int i = 0; i < pointerDiff; ++i)
+        {
+            result.derivations.push_back(Derivation::pointerDerivation);
+        }
+    }
+    if (!HasLvalueReferenceDerivation(sourceDerivations) && HasLvalueReferenceDerivation(derivationRec.derivations))
+    {
+        result.derivations.push_back(Derivation::lvalueRefDerivation);
+    }
+    else if (!HasRvalueReferenceDerivation(sourceDerivations) && HasRvalueReferenceDerivation(derivationRec.derivations))
+    {
+        result.derivations.push_back(Derivation::rvalueRefDerivation);
+    }
+    return GetSymbolTable()->MakeDerivedType(baseType, result, span);
+}
+
+TypeSymbol* DerivedTypeSymbol::Unify(TypeSymbol* sourceType, const Span& span) 
+{
+    TypeSymbol* newBaseType = baseType->Unify(sourceType->BaseType(), span);
+    return GetSymbolTable()->MakeDerivedType(newBaseType, UnifyDerivations(derivationRec, sourceType->DerivationRec()), span); // todo unify derivations
 }
 
 llvm::Type* DerivedTypeSymbol::IrType(Emitter& emitter) 

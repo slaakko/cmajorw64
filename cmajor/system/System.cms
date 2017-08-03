@@ -1,4 +1,5 @@
 solution System;
 project <System.Core/System.Core.cmp>;
 project <System.Runtime/System.Runtime.cmp>;
+project <System.Base/System.Base.cmp>;
 project <System/System.cmp>;

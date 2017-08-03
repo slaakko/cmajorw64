@@ -19,6 +19,7 @@
 #include <cmajor/symbols/ConstantSymbol.hpp>
 #include <cmajor/symbols/EnumSymbol.hpp>
 #include <cmajor/symbols/Exception.hpp>
+#include <cmajor/symbols/TemplateSymbol.hpp>
 #include <cmajor/util/Unicode.hpp>
 #include <cmajor/util/Sha1.hpp>
 
@@ -37,7 +38,8 @@ const char* symbolTypeStr[uint8_t(SymbolType::maxSymbol)] =
     "basicTypeUnaryPlus", "basicTypeIntUnaryMinus", "basicTypeFloatUnaryMinus", "basicTypeComplement", "basicTypeAdd", "basicTypeFAdd", "basicTypeSub", "basicTypeFSub", "basicTypeMul", "basicTypeFMul",
     "basicTypeSDiv", "basicTypeUDiv", "basicTypeFDiv", "basicTypeSRem", "basicTypeURem", "basicTypeAnd", "basicTypeOr", "basicTypeXor", "basicTypeShl", "basicTypeAShr", "basicTypeLShr",
     "basicTypeNot", "basicTypeIntegerEquality", "basicTypeUnsignedIntegerLessThan", "basicTypeSignedIntegerLessThan", "basicTypeFloatingEquality"", basicTypeFloatingLessThan",
-    "defaultInt1", "defaultInt8", "defaultInt16", "defaultInt32", "defaultInt64", "defaultFloat", "defaultDouble", "basicTypeCopyCtor", "basicTypeCopyAssignment", "basicTypeReturn",
+    "defaultInt1", "defaultInt8", "defaultInt16", "defaultInt32", "defaultInt64", "defaultFloat", "defaultDouble", "basicTypeCopyCtor", "basicTypeMoveCtor", 
+    "basicTypeCopyAssignment", "basicTypeMoveAssignment", "basicTypeReturn",
     "basicTypeImplicitSignExtension", "basicTypeImplicitZeroExtension", "basicTypeExplicitSignExtension", "basicTypeExplicitZeroExtension", "basicTypeTruncation", "basicTypeBitCast",
     "basicTypeImplicitUnsignedIntToFloating", "basicTypeImplicitSignedIntToFloating", "basicTypeExplicitUnsignedIntToFloating", "basicTypeExplicitSignedIntToFloating",
     "basicTypeFloatingToUnsignedInt", "basicTypeFloatingToSignedInt", "basicTypeFloatingExtension", "basicTypeFloatingTruncation",
@@ -743,7 +745,9 @@ SymbolFactory::SymbolFactory()
     Register(SymbolType::defaultFloat, new ConcreteSymbolCreator<BasicTypeDefaultFloatOperation>());
     Register(SymbolType::defaultDouble, new ConcreteSymbolCreator<BasicTypeDefaultDoubleOperation>());
     Register(SymbolType::basicTypeCopyCtor, new ConcreteSymbolCreator<BasicTypeCopyCtor>());
+    Register(SymbolType::basicTypeMoveCtor, new ConcreteSymbolCreator<BasicTypeMoveCtor>());
     Register(SymbolType::basicTypeCopyAssignment, new ConcreteSymbolCreator<BasicTypeCopyAssignment>());
+    Register(SymbolType::basicTypeMoveAssignment, new ConcreteSymbolCreator<BasicTypeMoveAssignment>());
     Register(SymbolType::basicTypeReturn, new ConcreteSymbolCreator<BasicTypeReturn>());
     Register(SymbolType::basicTypeImplicitSignExtension, new ConcreteSymbolCreator<BasicTypeImplicitSignExtensionOperation>());
     Register(SymbolType::basicTypeImplicitZeroExtension, new ConcreteSymbolCreator<BasicTypeImplicitZeroExtensionOperation>());

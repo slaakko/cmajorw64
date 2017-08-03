@@ -6,6 +6,7 @@
 #ifndef CMAJOR_SYMBOLS_FUNCTION_SYMBOL_INCLUDED
 #define CMAJOR_SYMBOLS_FUNCTION_SYMBOL_INCLUDED
 #include <cmajor/symbols/TypeSymbol.hpp>
+#include <cmajor/ast/Function.hpp>
 #include <cmajor/ir/GenObject.hpp>
 #include <unordered_set>
 
@@ -65,6 +66,7 @@ class ParameterSymbol;
 class LocalVariableSymbol;
 class TypeSymbol;
 class TemplateParameterSymbol;
+class BoundTemplateParameterSymbol;
 
 class FunctionSymbol : public ContainerSymbol
 {
@@ -73,6 +75,9 @@ public:
     FunctionSymbol(SymbolType symbolType_, const Span& span_, const std::u32string& name_);
     void Write(SymbolWriter& writer) override;
     void Read(SymbolReader& reader) override;
+    void ReadAstNodes();
+    const NodeList<Node>& UsingNodes() const { return usingNodes; }
+    FunctionNode* GetFunctionNode() { return functionNode.get(); }
     void EmplaceType(TypeSymbol* typeSymbol_, int index) override;
     void AddMember(Symbol* member) override;
     bool IsFunctionSymbol() const override { return true; }
@@ -96,6 +101,7 @@ public:
     bool IsMoveAssignment() const;
     const std::u32string& GroupName() const { return groupName; }
     void SetGroupName(const std::u32string& groupName_);
+    const std::vector<TemplateParameterSymbol*>& TemplateParameters() const { return templateParameters; }
     void SetSpecifiers(Specifiers specifiers);
     bool IsInline() const { return GetFlag(FunctionSymbolFlags::inline_); }
     void SetInline() { SetFlag(FunctionSymbolFlags::inline_); }
@@ -125,6 +131,8 @@ public:
     bool IsConversion() const { return GetFlag(FunctionSymbolFlags::conversion); }
     void SetConversion() { SetFlag(FunctionSymbolFlags::conversion); }
     virtual bool DontThrow() const { return IsNothrow(); }
+    bool HasWeakOdrLinkage() const { return GetFlag(FunctionSymbolFlags::weakOdrLinkage);  }
+    void SetWeakOdrLinkage() { SetFlag(FunctionSymbolFlags::weakOdrLinkage); }
     FunctionSymbolFlags GetFunctionSymbolFlags() const { return flags; }
     bool GetFlag(FunctionSymbolFlags flag) const { return (flags & flag) != FunctionSymbolFlags::none; }
     void SetFlag(FunctionSymbolFlags flag) { flags = flags | flag; }
@@ -153,8 +161,12 @@ private:
     int32_t vmtIndex;
     int32_t imtIndex;
     NodeList<Node> usingNodes;
+    std::unique_ptr<FunctionNode> functionNode;
     llvm::FunctionType* irType;
     int nextTemporaryIndex;
+    uint32_t sizeOfAstNodes;
+    uint32_t astNodesPos;
+    std::string filePathReadFrom;
 };
 
 class StaticConstructorSymbol : public FunctionSymbol

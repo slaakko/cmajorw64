@@ -561,11 +561,31 @@ public:
     bool IsBasicTypeOperation() const override { return true; }
 };
 
+class BasicTypeMoveCtor : public FunctionSymbol
+{
+public:
+    BasicTypeMoveCtor(TypeSymbol* type);
+    BasicTypeMoveCtor(const Span& span_, const std::u32string& name_);
+    SymbolAccess DeclaredAccess() const override { return SymbolAccess::public_; }
+    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags) override;
+    bool IsBasicTypeOperation() const override { return true; }
+};
+
 class BasicTypeCopyAssignment : public FunctionSymbol
 {
 public:
     BasicTypeCopyAssignment(TypeSymbol* type, TypeSymbol* voidType);
     BasicTypeCopyAssignment(const Span& span_, const std::u32string& name_);
+    SymbolAccess DeclaredAccess() const override { return SymbolAccess::public_; }
+    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags) override;
+    bool IsBasicTypeOperation() const override { return true; }
+};
+
+class BasicTypeMoveAssignment : public FunctionSymbol
+{
+public:
+    BasicTypeMoveAssignment(TypeSymbol* type, TypeSymbol* voidType);
+    BasicTypeMoveAssignment(const Span& span_, const std::u32string& name_);
     SymbolAccess DeclaredAccess() const override { return SymbolAccess::public_; }
     void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags) override;
     bool IsBasicTypeOperation() const override { return true; }

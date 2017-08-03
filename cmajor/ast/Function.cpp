@@ -42,10 +42,13 @@ Node* FunctionNode::Clone(CloneContext& cloneContext) const
         clonedReturnTypeExpr = returnTypeExpr->Clone(cloneContext);
     }
     FunctionNode* clone = new FunctionNode(GetSpan(), specifiers, clonedReturnTypeExpr, groupId);
-    int nt = templateParameters.Count();
-    for (int i = 0; i < nt; ++i)
+    if (!cloneContext.InstantiateFunctionNode())
     {
-        clone->AddTemplateParameter(static_cast<TemplateParameterNode*>(templateParameters[i]->Clone(cloneContext)));
+        int nt = templateParameters.Count();
+        for (int i = 0; i < nt; ++i)
+        {
+            clone->AddTemplateParameter(static_cast<TemplateParameterNode*>(templateParameters[i]->Clone(cloneContext)));
+        }
     }
     int np = parameters.Count();
     for (int i = 0; i < np; ++i)

@@ -11,6 +11,7 @@
 #include <cmajor/symbols/ClassTypeSymbol.hpp>
 #include <cmajor/symbols/DerivedTypeSymbol.hpp>
 #include <cmajor/symbols/Exception.hpp>
+#include <cmajor/symbols/TemplateSymbol.hpp>
 #include <cmajor/util/Unicode.hpp>
 
 namespace cmajor { namespace binder {
@@ -162,7 +163,7 @@ void TypeResolver::Visit(RValueRefNode& rvalueRefNode)
     {
         throw Exception("cannot have reference to reference type", rvalueRefNode.GetSpan());
     }
-    derivationRec.derivations.push_back(Derivation::lvalueRefDerivation);
+    derivationRec.derivations.push_back(Derivation::rvalueRefDerivation);
 }
 
 void TypeResolver::Visit(PointerNode& pointerNode)
@@ -272,10 +273,10 @@ TypeSymbol* ResolveType(Node* typeExprNode, BoundCompileUnit& boundCompileUnit, 
     {
         throw Exception("incomplete type expression", typeExprNode->GetSpan());
     }
-    const TypeDerivationRec& derivationRec = typeResolver.DerivationRec();
+    TypeDerivationRec derivationRec = UnifyDerivations(typeResolver.DerivationRec(), type->DerivationRec());
     if (!derivationRec.derivations.empty())
     {
-        return boundCompileUnit.GetSymbolTable().MakeDerivedType(type, derivationRec, typeExprNode->GetSpan());
+        return boundCompileUnit.GetSymbolTable().MakeDerivedType(type->BaseType(), derivationRec, typeExprNode->GetSpan());
     }
     return type;
 }

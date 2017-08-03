@@ -56,6 +56,19 @@ TypeSymbol* TypeSymbol::AddPointer(const Span& span)
     return GetSymbolTable()->MakeDerivedType(this, typeDerivationRec, span);
 }
 
+const TypeDerivationRec& TypeSymbol::DerivationRec() const
+{
+    static TypeDerivationRec emptyDerivationRec;
+    return emptyDerivationRec;
+}
+
+TypeSymbol* TypeSymbol::RemoveDerivations(const TypeDerivationRec& sourceDerivationRec, const Span& span)
+{
+    if (HasArrayDerivation(sourceDerivationRec.derivations)) return nullptr;
+    if (HasPointerDerivation(sourceDerivationRec.derivations)) return nullptr;
+    return this;
+}
+
 bool CompareTypesForEquality(const TypeSymbol* left, const TypeSymbol* right)
 {
     if (left->GetSymbolType() == SymbolType::derivedTypeSymbol && right->GetSymbolType() == SymbolType::derivedTypeSymbol)

@@ -149,6 +149,10 @@ void StatementBinder::Visit(ClassNode& classNode)
     Symbol* symbol = boundCompileUnit.GetSymbolTable().GetSymbol(&classNode);
     Assert(symbol->GetSymbolType() == SymbolType::classTypeSymbol || symbol->GetSymbolType() == SymbolType::classTemplateSpecializationSymbol, "class type symbol expected");
     ClassTypeSymbol* classTypeSymbol = static_cast<ClassTypeSymbol*>(symbol);
+    if (classTypeSymbol->IsClassTemplate())
+    {
+        return;
+    }
     containerScope = symbol->GetContainerScope();
     std::unique_ptr<BoundClass> boundClass(new BoundClass(classTypeSymbol));
     currentClass = boundClass.get();
@@ -181,6 +185,10 @@ void StatementBinder::Visit(FunctionNode& functionNode)
     Symbol* symbol = boundCompileUnit.GetSymbolTable().GetSymbol(&functionNode);
     Assert(symbol->GetSymbolType() == SymbolType::functionSymbol, "function symbol expected");
     FunctionSymbol* functionSymbol = static_cast<FunctionSymbol*>(symbol);
+    if (functionSymbol->IsFunctionTemplate())
+    {
+        return;
+    }
     containerScope = symbol->GetContainerScope();
     std::unique_ptr<BoundFunction> boundFunction(new BoundFunction(functionSymbol));
     BoundFunction* prevFunction = currentFunction;

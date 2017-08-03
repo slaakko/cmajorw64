@@ -11,6 +11,7 @@
 #include <cmajor/symbols/SymbolWriter.hpp>
 #include <cmajor/symbols/SymbolReader.hpp>
 #include <cmajor/symbols/Exception.hpp>
+#include <cmajor/symbols/TemplateSymbol.hpp>
 #include <cmajor/util/Unicode.hpp>
 #include <cmajor/util/Sha1.hpp>
 #include <llvm/IR/Module.h>
@@ -196,7 +197,7 @@ FunctionSymbol::FunctionSymbol(const Span& span_, const std::u32string& name_) :
 
 FunctionSymbol::FunctionSymbol(SymbolType symbolType_, const Span& span_, const std::u32string& name_) : 
     ContainerSymbol(symbolType_, span_, name_), groupName(), parameters(), localVariables(), returnType(), flags(FunctionSymbolFlags::none), vmtIndex(-1), imtIndex(-1), 
-    irType(nullptr), nextTemporaryIndex(0)
+    irType(nullptr), nextTemporaryIndex(0), sizeOfAstNodes(0), astNodesPos(0)
 {
 }
 
@@ -204,6 +205,21 @@ void FunctionSymbol::Write(SymbolWriter& writer)
 {
     ContainerSymbol::Write(writer);
     writer.GetBinaryWriter().Write(groupName);
+    if (IsFunctionTemplate())
+    {
+        uint32_t sizePos = writer.GetBinaryWriter().Pos();
+        uint32_t sizeOfAstNodes = 0;
+        writer.GetBinaryWriter().Write(sizeOfAstNodes);
+        uint32_t startPos = writer.GetBinaryWriter().Pos();
+        usingNodes.Write(writer.GetAstWriter());
+        Node* node = GetSymbolTable()->GetNode(this);
+        writer.GetAstWriter().Write(node);
+        uint32_t endPos = writer.GetBinaryWriter().Pos();
+        sizeOfAstNodes = endPos - startPos;
+        writer.GetBinaryWriter().Seek(sizePos);
+        writer.GetBinaryWriter().Write(sizeOfAstNodes);
+        writer.GetBinaryWriter().Seek(endPos);
+    }
     uint32_t returnTypeId = 0;
     if (returnType)
     {
@@ -219,6 +235,13 @@ void FunctionSymbol::Read(SymbolReader& reader)
 {
     ContainerSymbol::Read(reader);
     groupName = reader.GetBinaryReader().ReadUtf32String();
+    if (IsFunctionTemplate())
+    {
+        sizeOfAstNodes = reader.GetBinaryReader().ReadUInt();
+        astNodesPos = reader.GetBinaryReader().Pos();
+        reader.GetBinaryReader().Skip(sizeOfAstNodes);
+        filePathReadFrom = reader.GetBinaryReader().FileName();
+    }
     uint32_t returnTypeId = reader.GetBinaryReader().ReadEncodedUInt();
     if (returnTypeId != 0)
     {
@@ -231,6 +254,18 @@ void FunctionSymbol::Read(SymbolReader& reader)
     {
         reader.AddConversion(this);
     }
+}
+
+void FunctionSymbol::ReadAstNodes()
+{
+    AstReader reader(filePathReadFrom);
+    reader.GetBinaryReader().Skip(astNodesPos);
+    usingNodes.Read(reader);
+    Node* node = reader.ReadNode();
+    Assert(node->GetNodeType() == NodeType::functionNode, "function node expected");
+    FunctionNode* funNode = static_cast<FunctionNode*>(node);
+    functionNode.reset(funNode);
+    GetSymbolTable()->MapNode(funNode, this);
 }
 
 void FunctionSymbol::EmplaceType(TypeSymbol* typeSymbol_, int index)
@@ -278,7 +313,7 @@ void FunctionSymbol::ComputeName()
     }
     name.append(1, U')');
     SetName(name);
-    if (!IsBasicTypeOperation())
+    if (!IsBasicTypeOperation() && !IsFunctionTemplate())
     {
         ComputeMangledName();
     }

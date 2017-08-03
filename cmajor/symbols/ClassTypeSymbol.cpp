@@ -11,6 +11,7 @@
 #include <cmajor/symbols/SymbolWriter.hpp>
 #include <cmajor/symbols/SymbolReader.hpp>
 #include <cmajor/symbols/Exception.hpp>
+#include <cmajor/symbols/TemplateSymbol.hpp>
 #include <cmajor/util/Unicode.hpp>
 #include <cmajor/util/Sha1.hpp>
 #include <llvm/IR/Module.h>
@@ -39,65 +40,105 @@ void ClassTypeSymbol::Write(SymbolWriter& writer)
 {
     TypeSymbol::Write(writer);
     writer.GetBinaryWriter().Write(static_cast<uint8_t>(flags));
-    uint32_t baseClassId = 0;
-    if (baseClass)
+    if (IsClassTemplate())
     {
-        baseClassId = baseClass->TypeId();
+        uint32_t sizePos = writer.GetBinaryWriter().Pos();
+        uint32_t sizeOfAstNodes = 0;
+        writer.GetBinaryWriter().Write(sizeOfAstNodes);
+        uint32_t startPos = writer.GetBinaryWriter().Pos();
+        usingNodes.Write(writer.GetAstWriter());
+        Node* node = GetSymbolTable()->GetNode(this);
+        writer.GetAstWriter().Write(node);
+        uint32_t endPos = writer.GetBinaryWriter().Pos();
+        sizeOfAstNodes = endPos - startPos;
+        writer.GetBinaryWriter().Seek(sizePos);
+        writer.GetBinaryWriter().Write(sizeOfAstNodes);
+        writer.GetBinaryWriter().Seek(endPos);
     }
-    writer.GetBinaryWriter().WriteEncodedUInt(baseClassId);
-    uint32_t n = uint32_t(implementedInterfaces.size());
-    writer.GetBinaryWriter().WriteEncodedUInt(n);
-    for (uint32_t i = 0; i < n; ++i)
+    else
     {
-        InterfaceTypeSymbol* intf = implementedInterfaces[i];
-        uint32_t intfTypeId = intf->TypeId();
-        writer.GetBinaryWriter().WriteEncodedUInt(intfTypeId);
+        uint32_t baseClassId = 0;
+        if (baseClass)
+        {
+            baseClassId = baseClass->TypeId();
+        }
+        writer.GetBinaryWriter().WriteEncodedUInt(baseClassId);
+        uint32_t n = uint32_t(implementedInterfaces.size());
+        writer.GetBinaryWriter().WriteEncodedUInt(n);
+        for (uint32_t i = 0; i < n; ++i)
+        {
+            InterfaceTypeSymbol* intf = implementedInterfaces[i];
+            uint32_t intfTypeId = intf->TypeId();
+            writer.GetBinaryWriter().WriteEncodedUInt(intfTypeId);
+        }
+        uint32_t vmtSize = vmt.size();
+        writer.GetBinaryWriter().WriteEncodedUInt(vmtSize);
+        writer.GetBinaryWriter().Write(vmtPtrIndex);
     }
-    uint32_t vmtSize = vmt.size();
-    writer.GetBinaryWriter().WriteEncodedUInt(vmtSize);
-    writer.GetBinaryWriter().Write(vmtPtrIndex);
 }
 
 void ClassTypeSymbol::Read(SymbolReader& reader)
 {
     TypeSymbol::Read(reader);
     flags = static_cast<ClassTypeSymbolFlags>(reader.GetBinaryReader().ReadByte());
-    uint32_t baseClassId = reader.GetBinaryReader().ReadEncodedUInt();
-    if (baseClassId != 0)
+    if (IsClassTemplate())
     {
-        GetSymbolTable()->EmplaceTypeRequest(this, baseClassId, 0);
+        sizeOfAstNodes = reader.GetBinaryReader().ReadUInt();
+        astNodesPos = reader.GetBinaryReader().Pos();
+        reader.GetBinaryReader().Skip(sizeOfAstNodes);
+        filePathReadFrom = reader.GetBinaryReader().FileName();
     }
-    uint32_t n = reader.GetBinaryReader().ReadEncodedUInt();
-    implementedInterfaces.resize(n);
-    for (uint32_t i = 0; i < n; ++i)
+    else
     {
-        uint32_t intfTypeId = reader.GetBinaryReader().ReadEncodedUInt();
-        GetSymbolTable()->EmplaceTypeRequest(this, intfTypeId, 1 + i);
-    }
-    uint32_t vmtSize = reader.GetBinaryReader().ReadEncodedUInt();
-    vmt.resize(vmtSize);
-    vmtPtrIndex = reader.GetBinaryReader().ReadInt();
-    if (destructor)
-    {
-        if (destructor->VmtIndex() != -1)
+        uint32_t baseClassId = reader.GetBinaryReader().ReadEncodedUInt();
+        if (baseClassId != 0)
         {
-            Assert(destructor->VmtIndex() < vmt.size(), "invalid destructor vmt index");
-            vmt[destructor->VmtIndex()] = destructor;
+            GetSymbolTable()->EmplaceTypeRequest(this, baseClassId, 0);
         }
-    }
-    for (FunctionSymbol* memberFunction : memberFunctions)
-    {
-        if (memberFunction->VmtIndex() != -1)
+        uint32_t n = reader.GetBinaryReader().ReadEncodedUInt();
+        implementedInterfaces.resize(n);
+        for (uint32_t i = 0; i < n; ++i)
         {
-            Assert(memberFunction->VmtIndex() < vmt.size(), "invalid member function vmt index");
-            vmt[memberFunction->VmtIndex()] = memberFunction;
+            uint32_t intfTypeId = reader.GetBinaryReader().ReadEncodedUInt();
+            GetSymbolTable()->EmplaceTypeRequest(this, intfTypeId, 1 + i);
         }
+        uint32_t vmtSize = reader.GetBinaryReader().ReadEncodedUInt();
+        vmt.resize(vmtSize);
+        vmtPtrIndex = reader.GetBinaryReader().ReadInt();
+        if (destructor)
+        {
+            if (destructor->VmtIndex() != -1)
+            {
+                Assert(destructor->VmtIndex() < vmt.size(), "invalid destructor vmt index");
+                vmt[destructor->VmtIndex()] = destructor;
+            }
+        }
+        for (FunctionSymbol* memberFunction : memberFunctions)
+        {
+            if (memberFunction->VmtIndex() != -1)
+            {
+                Assert(memberFunction->VmtIndex() < vmt.size(), "invalid member function vmt index");
+                vmt[memberFunction->VmtIndex()] = memberFunction;
+            }
+        }
+        if (IsPolymorphic())
+        {
+            GetSymbolTable()->AddPolymorphicClass(this);
+        }
+        reader.AddClassType(this);
     }
-    if (IsPolymorphic())
-    {
-        GetSymbolTable()->AddPolymorphicClass(this);
-    }
-    reader.AddClassType(this);
+}
+
+void ClassTypeSymbol::ReadAstNodes()
+{
+    AstReader reader(filePathReadFrom);
+    reader.GetBinaryReader().Skip(astNodesPos);
+    usingNodes.Read(reader);
+    Node* node = reader.ReadNode();
+    Assert(node->GetNodeType() == NodeType::classNode, "class node expected");
+    ClassNode* clsNode = static_cast<ClassNode*>(node);
+    classNode.reset(clsNode);
+    GetSymbolTable()->MapNode(clsNode, this);
 }
 
 void ClassTypeSymbol::EmplaceType(TypeSymbol* typeSymbol_, int index)
@@ -675,14 +716,6 @@ llvm::Value* ClassTypeSymbol::VmtObject(Emitter& emitter, bool create)
         vmtObjectGlobal->setInitializer(llvm::ConstantArray::get(vmtObjectType, vmtArray));
     }
     return vmtObject;
-}
-
-TemplateParameterSymbol::TemplateParameterSymbol(const Span& span_, const std::u32string& name_) : TypeSymbol(SymbolType::templateParameterSymbol, span_, name_)
-{
-}
-
-BoundTemplateParameterSymbol::BoundTemplateParameterSymbol(const Span& span_, const std::u32string& name_) : Symbol(SymbolType::boundTemplateParameterSymbol, span_, name_)
-{
 }
 
 } } // namespace cmajor::symbols
