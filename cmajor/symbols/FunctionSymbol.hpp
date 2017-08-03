@@ -47,7 +47,8 @@ enum class FunctionSymbolFlags : uint16_t
     new_ = 1 << 10,
     const_ = 1 << 11,
     conversion = 1 << 12,
-    weakOdrLinkage = 1 << 13
+    weakOdrLinkage = 1 << 13,
+    templateSpecialization = 1 << 14
 };
 
 inline FunctionSymbolFlags operator|(FunctionSymbolFlags left, FunctionSymbolFlags right)
@@ -82,6 +83,7 @@ public:
     void AddMember(Symbol* member) override;
     bool IsFunctionSymbol() const override { return true; }
     std::string TypeString() const override { return "function"; }
+    bool IsExportSymbol() const override;
     virtual void ComputeName();
     std::u32string FullName() const override;
     std::u32string FullNameWithSpecifiers() const override;
@@ -130,9 +132,11 @@ public:
     void SetConst() { SetFlag(FunctionSymbolFlags::const_); }
     bool IsConversion() const { return GetFlag(FunctionSymbolFlags::conversion); }
     void SetConversion() { SetFlag(FunctionSymbolFlags::conversion); }
-    virtual bool DontThrow() const { return IsNothrow(); }
     bool HasWeakOdrLinkage() const { return GetFlag(FunctionSymbolFlags::weakOdrLinkage);  }
     void SetWeakOdrLinkage() { SetFlag(FunctionSymbolFlags::weakOdrLinkage); }
+    bool IsTemplateSpecialization() const { return GetFlag(FunctionSymbolFlags::templateSpecialization); }
+    void SetTemplateSpecialization() { SetFlag(FunctionSymbolFlags::templateSpecialization); }
+    virtual bool DontThrow() const { return IsNothrow(); }
     FunctionSymbolFlags GetFunctionSymbolFlags() const { return flags; }
     bool GetFlag(FunctionSymbolFlags flag) const { return (flags & flag) != FunctionSymbolFlags::none; }
     void SetFlag(FunctionSymbolFlags flag) { flags = flags | flag; }

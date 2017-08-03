@@ -81,6 +81,8 @@ public:
     DestructorSymbol* Destructor() { return destructor; }
     MemberFunctionSymbol* CopyAssignment() { return copyAssignment; }
     void SetCopyAssignment(MemberFunctionSymbol* copyAssignment_) { copyAssignment = copyAssignment_; }
+    MemberFunctionSymbol* MoveAssignment() { return moveAssignment; }
+    void SetMoveAssignment(MemberFunctionSymbol* moveAssignment_) { moveAssignment = moveAssignment_; }
     void SetSpecialMemberFunctions();
     const std::vector<MemberVariableSymbol*>& MemberVariables() const { return memberVariables; }
     bool IsAbstract() const { return GetFlag(ClassTypeSymbolFlags::abstract_); }

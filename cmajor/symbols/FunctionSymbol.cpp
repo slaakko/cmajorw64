@@ -287,6 +287,12 @@ void FunctionSymbol::AddMember(Symbol* member)
     }
 }
 
+bool FunctionSymbol::IsExportSymbol() const
+{
+    if (IsTemplateSpecialization()) return false;
+    return ContainerSymbol::IsExportSymbol();
+}
+
 void FunctionSymbol::ComputeName()
 {
     std::u32string name;

@@ -100,6 +100,7 @@ FunctionSymbol* FunctionTemplateRepository::Instantiate(FunctionSymbol* function
     Assert(symbol->GetSymbolType() == SymbolType::functionSymbol, "function symbol expected");
     FunctionSymbol* functionSymbol = static_cast<FunctionSymbol*>(symbol);
     functionSymbol->SetWeakOdrLinkage();
+    functionSymbol->SetTemplateSpecialization();
     functionTemplateMap[key] = functionSymbol;
     for (TemplateParameterSymbol* templateParameter : functionTemplate->TemplateParameters())
     {
