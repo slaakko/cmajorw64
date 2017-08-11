@@ -142,14 +142,13 @@ llvm::Value* UCharValue::IrValue(Emitter& emitter)
     return emitter.Builder().getInt32(static_cast<uint32_t>(value));
 }
 
-StringValue::StringValue(const Span& span_, const std::string& value_) : Value(span_, ValueType::stringValue), value(value_)
+StringValue::StringValue(const Span& span_, int stringId_) : Value(span_, ValueType::stringValue), stringId(stringId_)
 {
 }
 
 llvm::Value* StringValue::IrValue(Emitter& emitter)
 {
-    llvm::Value* stringValue = emitter.Builder().CreateGlobalStringPtr(value);
-    return stringValue;
+    return emitter.GetGlobalStringPtr(stringId);
 }
 
 NullValue::NullValue(const Span& span_, TypeSymbol* nullPtrType_) : Value(span_, ValueType::nullValue), nullPtrType(nullPtrType_)

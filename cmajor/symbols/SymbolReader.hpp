@@ -13,6 +13,7 @@ using namespace cmajor::ast;
 
 class Symbol;
 class DerivedTypeSymbol;
+class ClassTemplateSpecializationSymbol;
 class SymbolTable;
 class Module;
 class FunctionSymbol;
@@ -24,8 +25,9 @@ public:
     SymbolReader(const std::string& fileName_);
     AstReader& GetAstReader() { return astReader; }
     BinaryReader& GetBinaryReader() { return astReader.GetBinaryReader(); }
-    Symbol* ReadSymbol();
-    DerivedTypeSymbol* ReadDerivedTypeSymbol();
+    Symbol* ReadSymbol(Symbol* parent);
+    DerivedTypeSymbol* ReadDerivedTypeSymbol(Symbol* parent);
+    ClassTemplateSpecializationSymbol* ReadClassTemplateSpecializationSymbol(Symbol* parent);
     void SetSymbolTable(SymbolTable* symbolTable_) { symbolTable = symbolTable_; }
     void SetModule(Module* module_) { module = module_; }
     void AddConversion(FunctionSymbol* conversion);

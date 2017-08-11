@@ -210,5 +210,5 @@ namespace cmajor.parser
             ::= ('#' keyword("assert") Expression(ctx)! ';'!){ value = new AssertStatementNode(span, Expression); }
             ;
 
-}
+    }
 }

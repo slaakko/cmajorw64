@@ -83,8 +83,8 @@ namespace cmajor.parser
         StaticConstructor(ParsingContext* ctx, ClassNode* classNode, var std::unique_ptr<IdentifierNode> id) : StaticConstructorNode*
             ::= (Specifiers:specifiers Identifier{ id.reset(Identifier); } '(' ')')
                 { 
-                    if (id->Str() != classNode->Id()->Str()) pass = false; else if (specifiers != Specifiers::static_) pass = false; 
-                    else { value = new StaticConstructorNode(span); }
+                    if (id->Str() != classNode->Id()->Str()) pass = false; else if (!StaticConstructorSpecifiers(specifiers)) pass = false; 
+                    else { value = new StaticConstructorNode(span, specifiers); }
                 }
                 (':' (Initializer(ctx){ value->AddInitializer(Initializer); } % ','))?
                 (WhereConstraint(ctx){ value->SetConstraint(WhereConstraint); })?

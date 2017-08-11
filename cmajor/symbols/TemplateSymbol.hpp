@@ -14,8 +14,10 @@ class TemplateParameterSymbol : public TypeSymbol
 public:
     TemplateParameterSymbol(const Span& span_, const std::u32string& name_);
     std::u32string FullName() const override { return Name(); }
-    llvm::Type* IrType(Emitter& emitter) override { return nullptr; }
+    llvm::Type* IrType(Emitter& emitter) override { Assert(false, "tried to get ir type of template parameter"); return nullptr; }
+    llvm::Constant* CreateDefaultIrValue(Emitter& emitter) override { Assert(false, "tried to create defualt ir value of template parameter"); return nullptr; }
     TypeSymbol* Unify(TypeSymbol* type, const Span& span) override;
+    bool ContainsTemplateParameter() const override { return true; }
 };
 
 class BoundTemplateParameterSymbol : public Symbol
@@ -23,7 +25,6 @@ class BoundTemplateParameterSymbol : public Symbol
 public:
     BoundTemplateParameterSymbol(const Span& span_, const std::u32string& name_);
     std::u32string FullName() const override { return Name(); }
-    bool IsBoundTemplateParameterSymbol() const override { return true; }
     TypeSymbol* GetType() const { return type; }
     void SetType(TypeSymbol* type_) { type = type_; }
 private:

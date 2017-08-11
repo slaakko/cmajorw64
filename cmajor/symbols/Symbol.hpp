@@ -62,7 +62,8 @@ enum class SymbolFlags : uint8_t
     static_ = 1 << 2,
     nothrow_ = 1 << 3,
     project = 1 << 4,
-    bound = 1 << 5
+    bound = 1 << 5,
+    export_ = 1 << 6
 };
 
 inline SymbolFlags operator&(SymbolFlags left, SymbolFlags right)
@@ -95,7 +96,6 @@ public:
     virtual bool IsFunctionSymbol() const { return false; }
     virtual bool IsTypeSymbol() const { return false; }
     virtual bool IsClassTypeSymbol() const { return false; }
-    virtual bool IsBoundTemplateParameterSymbol() const { return false; }
     virtual const ContainerScope* GetContainerScope() const { return nullptr; }
     virtual ContainerScope* GetContainerScope() { return nullptr; }
     virtual std::u32string FullName() const;
@@ -124,6 +124,8 @@ public:
     void SetProject() { SetFlag(SymbolFlags::project); }
     bool IsBound() const { return GetFlag(SymbolFlags::bound); }
     void SetBound() { SetFlag(SymbolFlags::bound); }
+    bool MarkedExport() const { return GetFlag(SymbolFlags::export_); }
+    void MarkExport() { SetFlag(SymbolFlags::export_); }
     bool GetFlag(SymbolFlags flag) const { return (flags & flag) != SymbolFlags::none; }
     void SetFlag(SymbolFlags flag) { flags = flags | flag; }
     void ResetFlag(SymbolFlags flag) { flags = flags & ~flag; }

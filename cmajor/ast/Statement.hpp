@@ -234,6 +234,7 @@ public:
     void Write(AstWriter& writer) override;
     void Read(AstReader& reader) override;
     const Node* Expression() const { return expression.get(); }
+    Node* Expression() { return expression.get(); }
 private:
     std::unique_ptr<Node> expression;
 };
@@ -248,6 +249,7 @@ public:
     void Write(AstWriter& writer) override;
     void Read(AstReader& reader) override;
     const Node* Expression() const { return expression.get(); }
+    Node* Expression() { return expression.get(); }
 private:
     std::unique_ptr<Node> expression;
 };

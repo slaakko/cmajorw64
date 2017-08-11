@@ -5,6 +5,7 @@
 
 #include <cmajor/symbols/SymbolReader.hpp>
 #include <cmajor/symbols/DerivedTypeSymbol.hpp>
+#include <cmajor/symbols/ClassTemplateSpecializationSymbol.hpp>
 
 namespace cmajor { namespace symbols {
 
@@ -12,7 +13,7 @@ SymbolReader::SymbolReader(const std::string& fileName_) : astReader(fileName_),
 {
 }
 
-Symbol* SymbolReader::ReadSymbol()
+Symbol* SymbolReader::ReadSymbol(Symbol* parent)
 {
     SymbolType symbolType = static_cast<SymbolType>(astReader.GetBinaryReader().ReadByte());
     Span span = astReader.ReadSpan();
@@ -20,13 +21,14 @@ Symbol* SymbolReader::ReadSymbol()
     Symbol* symbol = SymbolFactory::Instance().CreateSymbol(symbolType, span, name);
     symbol->SetSymbolTable(symbolTable);
     symbol->SetModule(module);
+    symbol->SetParent(parent);
     symbol->Read(*this);
     return symbol;
 }
 
-DerivedTypeSymbol* SymbolReader::ReadDerivedTypeSymbol()
+DerivedTypeSymbol* SymbolReader::ReadDerivedTypeSymbol(Symbol* parent)
 {
-    Symbol* symbol = ReadSymbol();
+    Symbol* symbol = ReadSymbol(parent);
     if (symbol->GetSymbolType() == SymbolType::derivedTypeSymbol)
     {
         return static_cast<DerivedTypeSymbol*>(symbol);
@@ -34,6 +36,19 @@ DerivedTypeSymbol* SymbolReader::ReadDerivedTypeSymbol()
     else
     {
         throw std::runtime_error("derived type symbol expected");
+    }
+}
+
+ClassTemplateSpecializationSymbol* SymbolReader::ReadClassTemplateSpecializationSymbol(Symbol* parent)
+{
+    Symbol* symbol = ReadSymbol(parent);
+    if (symbol->GetSymbolType() == SymbolType::classTemplateSpecializationSymbol)
+    {
+        return static_cast<ClassTemplateSpecializationSymbol*>(symbol);
+    }
+    else
+    {
+        throw std::runtime_error("class template specialization symbol expected");
     }
 }
 

@@ -19,6 +19,7 @@ public:
     std::string TypeString() const override { return "typedef"; }
     void SetSpecifiers(Specifiers specifiers);
     const TypeSymbol* GetType() const { return type; }
+    TypeSymbol* GetType() { return type; }
     void SetType(TypeSymbol* typeSymbol) { type = typeSymbol; }
 private:
     TypeSymbol* type;

@@ -10,7 +10,9 @@
 #include <cmajor/parser/CompileUnit.hpp>
 #include <cmajor/parser/FileRegistry.hpp>
 #include <cmajor/binder/BoundCompileUnit.hpp>
+#include <cmajor/binder/BoundFunction.hpp>
 #include <cmajor/binder/TypeBinder.hpp>
+#include <cmajor/binder/OverloadResolution.hpp>
 #include <cmajor/binder/StatementBinder.hpp>
 #include <cmajor/binder/BoundStatement.hpp>
 #include <cmajor/symbols/GlobalFlags.hpp>
@@ -350,6 +352,39 @@ void WriteTypeIdCounter(const std::string& config)
     }
 }
 
+void CreateMainUnit(std::vector<std::string>& objectFilePaths, Module& module, EmittingContext& emittingContext)
+{
+    CompileUnitNode mainCompileUnit(Span(), boost::filesystem::path(module.OriginalFilePath()).parent_path().append("__main__.cm").generic_string());
+    BoundCompileUnit mainUnit(module, &mainCompileUnit);
+    FunctionSymbol mainFunctionSymbol(Span(), U"main");
+    mainFunctionSymbol.SetGroupName(U"main");
+    mainFunctionSymbol.SetMangledName(U"main");
+    mainFunctionSymbol.SetNothrow();
+    std::unique_ptr<BoundFunction> mainFunction(new BoundFunction(&mainFunctionSymbol));
+    std::unique_ptr<BoundCompoundStatement> body(new BoundCompoundStatement(Span()));
+    std::vector<FunctionScopeLookup> lookups;
+    lookups.push_back(FunctionScopeLookup(ScopeLookup::this_, module.GetSymbolTable().GlobalNs().GetContainerScope()));
+    std::vector<std::unique_ptr<BoundExpression>> initArguments;
+    std::unique_ptr<BoundStatement> initStatement(new BoundExpressionStatement(
+        ResolveOverload(U"RtInit", module.GetSymbolTable().GlobalNs().GetContainerScope(), lookups, initArguments, mainUnit, mainFunction.get(), Span())));
+    body->AddStatement(std::move(initStatement));
+    std::unique_ptr<BoundStatement> mainStatement(new BoundExpressionStatement(std::unique_ptr<BoundExpression>(new BoundFunctionCall(Span(), module.GetSymbolTable().MainFunctionSymbol()))));
+    body->AddStatement(std::move(mainStatement));
+    std::vector<std::unique_ptr<BoundExpression>> doneArguments;
+    std::unique_ptr<BoundStatement> doneStatement(new BoundExpressionStatement(
+        ResolveOverload(U"RtDone", module.GetSymbolTable().GlobalNs().GetContainerScope(), lookups, doneArguments, mainUnit, mainFunction.get(), Span())));
+    body->AddStatement(std::move(doneStatement));
+    std::vector<std::unique_ptr<BoundExpression>> exitArguments;
+    exitArguments.push_back(std::unique_ptr<BoundExpression>(new BoundLiteral(std::unique_ptr<Value>(new IntValue(Span(), 0)), module.GetSymbolTable().GetTypeByName(U"int"))));
+    std::unique_ptr<BoundStatement> exitStatement(new BoundExpressionStatement(
+        ResolveOverload(U"RtExit", module.GetSymbolTable().GlobalNs().GetContainerScope(), lookups, exitArguments, mainUnit, mainFunction.get(), Span())));
+    body->AddStatement(std::move(exitStatement));
+    mainFunction->SetBody(std::move(body));
+    mainUnit.AddBoundNode(std::move(mainFunction));
+    GenerateCode(emittingContext, mainUnit);
+    objectFilePaths.push_back(mainUnit.ObjectFilePath());
+}
+
 void BuildProject(Project* project)
 {
     std::string config = GetConfig();
@@ -373,13 +408,17 @@ void BuildProject(Project* project)
         objectFilePaths.push_back(boundCompileUnit->ObjectFilePath());
         boundCompileUnit.reset();
     }
-    GenerateLibrary(objectFilePaths, project->LibraryFilePath());
     if (project->GetTarget() == Target::program)
     {
         if (!module.GetSymbolTable().MainFunctionSymbol())
         {
             throw std::runtime_error("program has no main function");
         }
+        CreateMainUnit(objectFilePaths, module, emittingContext);
+    }
+    GenerateLibrary(objectFilePaths, project->LibraryFilePath());
+    if (project->GetTarget() == Target::program)
+    {
         Link(project->ExecutableFilePath(), module.LibraryFilePaths());
         CreateClassFile(project->ExecutableFilePath(), module.GetSymbolTable());
     }

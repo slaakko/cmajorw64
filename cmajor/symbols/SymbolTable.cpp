@@ -42,6 +42,23 @@ TypeIdCounter::TypeIdCounter() : nextTypeId(1)
 {
 }
 
+bool operator==(const ClassTemplateSpecializationKey& left, const ClassTemplateSpecializationKey& right)
+{
+    if (!TypesEqual(left.classTemplate, right.classTemplate)) return false;
+    int n = left.templateArgumentTypes.size();
+    if (n != right.templateArgumentTypes.size()) return false;
+    for (int i = 0; i < n; ++i)
+    {
+        if (!TypesEqual(left.templateArgumentTypes[i], right.templateArgumentTypes[i])) return false;
+    }
+    return true;
+}
+
+bool operator!=(const ClassTemplateSpecializationKey& left, const ClassTemplateSpecializationKey& right)
+{
+    return !(left == right);
+}
+
 SymbolTable::SymbolTable() : 
     globalNs(Span(), std::u32string()), container(&globalNs), currentClass(nullptr), currentInterface(nullptr), mainFunctionSymbol(nullptr), parameterIndex(0), declarationBlockIndex(0)
 {
@@ -51,11 +68,33 @@ SymbolTable::SymbolTable() :
 void SymbolTable::Write(SymbolWriter& writer)
 {
     globalNs.Write(writer);
-    uint32_t n = derivedTypes.size();
-    writer.GetBinaryWriter().WriteEncodedUInt(n);
+    std::vector<TypeSymbol*> exportedDerivedTypes;
     for (const auto& derivedType : derivedTypes)
     {
-        writer.Write(derivedType.get());
+        if (derivedType->MarkedExport())
+        {
+            exportedDerivedTypes.push_back(derivedType.get());
+        }
+    }
+    uint32_t ned = exportedDerivedTypes.size();
+    writer.GetBinaryWriter().WriteEncodedUInt(ned);
+    for (TypeSymbol* exportedDerivedType : exportedDerivedTypes)
+    {
+        writer.Write(exportedDerivedType);
+    }
+    std::vector<TypeSymbol*> exportedClassTemplateSpecializations;
+    for (const auto& classTemplateSpecialization : classTemplateSpecializations)
+    {
+        if (classTemplateSpecialization->MarkedExport())
+        {
+            exportedClassTemplateSpecializations.push_back(classTemplateSpecialization.get());
+        }
+    }
+    uint32_t nec = exportedClassTemplateSpecializations.size();
+    writer.GetBinaryWriter().WriteEncodedUInt(nec);
+    for (TypeSymbol* classTemplateSpecialization : exportedClassTemplateSpecializations)
+    {
+        writer.Write(classTemplateSpecialization);
     }
 }
 
@@ -63,12 +102,17 @@ void SymbolTable::Read(SymbolReader& reader)
 {
     reader.SetSymbolTable(this);
     globalNs.Read(reader);
-    uint32_t n = reader.GetBinaryReader().ReadEncodedUInt();
-    for (uint32_t i = 0; i < n; ++i)
+    uint32_t nd = reader.GetBinaryReader().ReadEncodedUInt();
+    for (uint32_t i = 0; i < nd; ++i)
     {
-        DerivedTypeSymbol* derivedTypeSymbol = reader.ReadDerivedTypeSymbol();
-        derivedTypeSymbol->SetParent(&globalNs);
+        DerivedTypeSymbol* derivedTypeSymbol = reader.ReadDerivedTypeSymbol(&globalNs);
         derivedTypes.push_back(std::unique_ptr<DerivedTypeSymbol>(derivedTypeSymbol));
+    }
+    uint32_t nc = reader.GetBinaryReader().ReadEncodedUInt();
+    for (uint32_t i = 0; i < nc; ++i)
+    {
+        ClassTemplateSpecializationSymbol* classTemplateSpecialization = reader.ReadClassTemplateSpecializationSymbol(&globalNs);
+        classTemplateSpecializations.push_back(std::unique_ptr<ClassTemplateSpecializationSymbol>(classTemplateSpecialization));
     }
     ProcessTypeRequests();
     for (FunctionSymbol* conversion : reader.Conversions())
@@ -78,6 +122,7 @@ void SymbolTable::Read(SymbolReader& reader)
     for (ClassTypeSymbol* classType : reader.ClassTypes())
     {
         classType->SetSpecialMemberFunctions();
+        classType->CreateLayouts();
     }
 }
 
@@ -117,11 +162,26 @@ void SymbolTable::Import(SymbolTable& symbolTable)
             derivedTypeVec.push_back(derivedTypeSymbol);
         }
     }
+    int nc = classTemplateSpecializations.size();
+    for (int i = 0; i < nc; ++i)
+    {
+        ClassTemplateSpecializationSymbol* classTemplateSpecialization = classTemplateSpecializations[i].get();
+        ClassTemplateSpecializationKey key(classTemplateSpecialization->GetClassTemplate(), classTemplateSpecialization->TemplateArgumentTypes());
+        auto it = classTemplateSpecializationMap.find(key);
+        if (it == classTemplateSpecializationMap.cend())
+        {
+            classTemplateSpecializationMap[key] = classTemplateSpecialization;
+        }
+    }
     Assert(conversionTable.IsEmpty(), "empty conversion table expected");
     conversionTable = std::move(symbolTable.conversionTable);
     for (ClassTypeSymbol* polymorphicClass : symbolTable.PolymorphicClasses())
     {
         AddPolymorphicClass(polymorphicClass);
+    }
+    for (ClassTypeSymbol* classHavingStaticConstructor : symbolTable.ClassesHavingStaticConstructor())
+    {
+        AddClassHavingStaticConstructor(classHavingStaticConstructor);
     }
     symbolTable.Clear();
 }
@@ -262,6 +322,25 @@ void SymbolTable::EndClass()
     EndContainer();
 }
 
+void SymbolTable::BeginClassTemplateSpecialization(ClassNode& classInstanceNode, ClassTemplateSpecializationSymbol* classTemplateSpecialization)
+{
+    currentClassStack.push(currentClass);
+    currentClass = classTemplateSpecialization;
+    MapNode(&classInstanceNode, classTemplateSpecialization);
+    SetTypeIdFor(classTemplateSpecialization);
+    ContainerScope* containerScope = container->GetContainerScope();
+    ContainerScope* classScope = classTemplateSpecialization->GetContainerScope();
+    classScope->SetParent(containerScope);
+    BeginContainer(classTemplateSpecialization);
+}
+
+void SymbolTable::EndClassTemplateSpecialization()
+{
+    EndContainer();
+    currentClass = currentClassStack.top();
+    currentClassStack.pop();
+}
+
 void SymbolTable::AddTemplateParameter(TemplateParameterNode& templateParameterNode)
 {
     TemplateParameterSymbol* templateParameterSymbol = new TemplateParameterSymbol(templateParameterNode.GetSpan(), templateParameterNode.Id()->Str());
@@ -300,7 +379,6 @@ void SymbolTable::BeginStaticConstructor(StaticConstructorNode& staticConstructo
     ContainerScope* staticConstructorScope = staticConstructorSymbol->GetContainerScope();
     ContainerScope* containerScope = container->GetContainerScope();
     staticConstructorScope->SetParent(containerScope);
-    container->AddMember(staticConstructorSymbol);
     BeginContainer(staticConstructorSymbol);
     ResetDeclarationBlockIndex();
 }
@@ -698,7 +776,7 @@ TypeSymbol* SymbolTable::GetTypeByName(const std::u32string& typeName) const
     }
 }
 
-TypeSymbol* SymbolTable::MakeDerivedType(TypeSymbol* baseType, const TypeDerivationRec& derivationRec, const Span& span)
+TypeSymbol* SymbolTable::MakeDerivedType(TypeSymbol* baseType, const TypeDerivationRec& derivationRec, const Span& span, bool markExport)
 {
     if (derivationRec.IsEmpty())
     {
@@ -715,6 +793,10 @@ TypeSymbol* SymbolTable::MakeDerivedType(TypeSymbol* baseType, const TypeDerivat
         DerivedTypeSymbol* derivedType = mappedDerivedTypes[i];
         if (derivedType->DerivationRec() == derivationRec)
         {
+            if (markExport)
+            {
+                derivedType->MarkExport();
+            }
             return derivedType;
         }
     }
@@ -722,9 +804,42 @@ TypeSymbol* SymbolTable::MakeDerivedType(TypeSymbol* baseType, const TypeDerivat
     derivedType->SetParent(&globalNs);
     derivedType->SetSymbolTable(this);
     SetTypeIdFor(derivedType);
+    if (markExport)
+    {
+        derivedType->MarkExport();
+    }
     mappedDerivedTypes.push_back(derivedType);
     derivedTypes.push_back(std::unique_ptr<DerivedTypeSymbol>(derivedType));
     return derivedType;
+}
+
+ClassTemplateSpecializationSymbol* SymbolTable::MakeClassTemplateSpecialization(ClassTypeSymbol* classTemplate, const std::vector<TypeSymbol*>& templateArgumentTypes, const Span& span,
+    bool markExport)
+{
+    ClassTemplateSpecializationKey key(classTemplate, templateArgumentTypes);
+    auto it = classTemplateSpecializationMap.find(key);
+    if (it != classTemplateSpecializationMap.cend())
+    {
+        ClassTemplateSpecializationSymbol* classTemplateSpecialization = it->second;
+        if (markExport)
+        {
+            classTemplateSpecialization->MarkExport();
+        }
+        return classTemplateSpecialization;
+    }
+    else
+    {
+        ClassTemplateSpecializationSymbol* classTemplateSpecialization = new ClassTemplateSpecializationSymbol(span,
+            MakeClassTemplateSpecializationName(classTemplate, templateArgumentTypes), classTemplate, templateArgumentTypes);
+        classTemplateSpecializationMap[key] = classTemplateSpecialization;
+        classTemplateSpecialization->SetSymbolTable(this);
+        if (markExport)
+        {
+            classTemplateSpecialization->MarkExport();
+        }
+        classTemplateSpecializations.push_back(std::unique_ptr<ClassTemplateSpecializationSymbol>(classTemplateSpecialization));
+        return classTemplateSpecialization;
+    }
 }
 
 void SymbolTable::AddConversion(FunctionSymbol* conversion)
@@ -744,6 +859,15 @@ void SymbolTable::AddPolymorphicClass(ClassTypeSymbol* polymorphicClass)
         throw Exception("not a polymorphic class", polymorphicClass->GetSpan());
     }
     polymorphicClasses.insert(polymorphicClass);
+}
+
+void SymbolTable::AddClassHavingStaticConstructor(ClassTypeSymbol* classHavingStaticConstructor)
+{
+    if (!classHavingStaticConstructor->StaticConstructor())
+    {
+        throw Exception("not having static constructor", classHavingStaticConstructor->GetSpan());
+    }
+    classesHavingStaticConstructor.insert(classHavingStaticConstructor);
 }
 
 void InitCoreSymbolTable(SymbolTable& symbolTable)
@@ -801,6 +925,14 @@ void CreateClassFile(const std::string& executableFilePath, const SymbolTable& s
         writer.WriteEncodedUInt(typeId);
         writer.Write(vmtObjectName);
         writer.WriteEncodedUInt(baseClassTypeId);
+    }
+    const std::unordered_set<ClassTypeSymbol*>& classesHavingStaticConstructor = symbolTable.ClassesHavingStaticConstructor();
+    uint32_t ns = classesHavingStaticConstructor.size();
+    writer.WriteEncodedUInt(ns);
+    for (ClassTypeSymbol* classHavingStaticConstructor : classesHavingStaticConstructor)
+    {
+        uint32_t typeId = classHavingStaticConstructor->TypeId();
+        writer.WriteEncodedUInt(typeId);
     }
 }
 

@@ -24,6 +24,7 @@ public:
     const TypeSymbol* ReturnType() const { return returnType; }
     void SetReturnType(TypeSymbol* returnType_) { returnType = returnType_; }
     llvm::Type* IrType(Emitter& emitter) override { return nullptr; } // todo
+    llvm::Constant* CreateDefaultIrValue(Emitter& emitter) override { return nullptr; } // todo
 private:
     TypeSymbol* returnType;
     std::vector<ParameterSymbol*> parameters;
@@ -43,6 +44,7 @@ public:
     const TypeSymbol* ReturnType() const { return returnType; }
     void SetReturnType(TypeSymbol* returnType_) { returnType = returnType_; }
     llvm::Type* IrType(Emitter& emitter) override { return nullptr; } // todo
+    llvm::Constant* CreateDefaultIrValue(Emitter& emitter) override { return nullptr; } // todo
 private:
     TypeSymbol* returnType;
     std::vector<ParameterSymbol*> parameters;

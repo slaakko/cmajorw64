@@ -300,7 +300,9 @@ public:
     void Write(AstWriter& writer) override;
     void Read(AstReader& reader) override;
     const Node* Expr() const { return expr.get(); }
+    Node* Expr() { return expr.get(); }
     const Node* TargetTypeExpr() const { return targetTypeExpr.get();  }
+    Node* TargetTypeExpr() { return targetTypeExpr.get(); }
 private:
     std::unique_ptr<Node> expr;
     std::unique_ptr<Node> targetTypeExpr;
@@ -316,7 +318,9 @@ public:
     void Write(AstWriter& writer) override;
     void Read(AstReader& reader) override;
     const Node* Expr() const { return expr.get(); }
+    Node* Expr() { return expr.get(); }
     const Node* TargetTypeExpr() const { return targetTypeExpr.get(); }
+    Node* TargetTypeExpr() { return targetTypeExpr.get(); }
 private:
     std::unique_ptr<Node> expr;
     std::unique_ptr<Node> targetTypeExpr;
@@ -401,6 +405,7 @@ public:
     void Write(AstWriter& writer) override;
     void Read(AstReader& reader) override;
     const Node* Expression() const { return expression.get(); }
+    Node* Expression() { return expression.get(); }
 private:
     std::unique_ptr<Node> expression;
 };

@@ -7,6 +7,7 @@
 #define CMAJOR_SYMBOLS_SYMBOL_TABLE_INCLUDED
 #include <cmajor/symbols/NamespaceSymbol.hpp>
 #include <cmajor/symbols/DerivedTypeSymbol.hpp>
+#include <cmajor/symbols/ClassTemplateSpecializationSymbol.hpp>
 #include <cmajor/symbols/ConversionTable.hpp>
 #include <cmajor/ast/Namespace.hpp>
 #include <cmajor/ast/Function.hpp>
@@ -46,6 +47,33 @@ private:
     int nextTypeId;
 };
 
+struct ClassTemplateSpecializationKey
+{
+    ClassTemplateSpecializationKey(ClassTypeSymbol* classTemplate_, const std::vector<TypeSymbol*>& templateArgumentTypes_) : 
+        classTemplate(classTemplate_), templateArgumentTypes(templateArgumentTypes_)
+    {
+    }
+    ClassTypeSymbol* classTemplate;
+    std::vector<TypeSymbol*> templateArgumentTypes;
+};
+
+struct ClassTemplateSpecializationKeyHash
+{
+    size_t operator()(const ClassTemplateSpecializationKey& key) const
+    {
+        size_t x = std::hash<ClassTypeSymbol*>()(key.classTemplate);
+        int n = key.templateArgumentTypes.size();
+        for (int i = 0; i < n; ++i)
+        {
+            x = x ^ std::hash<TypeSymbol*>()(key.templateArgumentTypes[i]);
+        }
+        return x;
+    }
+};
+
+bool operator==(const ClassTemplateSpecializationKey& left, const ClassTemplateSpecializationKey& right);
+bool operator!=(const ClassTemplateSpecializationKey& left, const ClassTemplateSpecializationKey& right);
+
 class SymbolTable
 {
 public:
@@ -68,6 +96,8 @@ public:
     void AddParameter(ParameterNode& parameterNode);
     void BeginClass(ClassNode& classNode);
     void EndClass();
+    void BeginClassTemplateSpecialization(ClassNode& classInstanceNode, ClassTemplateSpecializationSymbol* classTemplateSpecialization);
+    void EndClassTemplateSpecialization();
     void AddTemplateParameter(TemplateParameterNode& templateParameterNode);
     void BeginInterface(InterfaceNode& interfaceNode);
     void EndInterface();
@@ -106,12 +136,16 @@ public:
     void ProcessTypeRequests();
     TypeSymbol* GetTypeByNameNoThrow(const std::u32string& typeName) const;
     TypeSymbol* GetTypeByName(const std::u32string& typeName) const;
-    TypeSymbol* MakeDerivedType(TypeSymbol* baseType, const TypeDerivationRec& derivationRec, const Span& span);
+    TypeSymbol* MakeDerivedType(TypeSymbol* baseType, const TypeDerivationRec& derivationRec, const Span& span, bool markExport);
+    ClassTemplateSpecializationSymbol* MakeClassTemplateSpecialization(ClassTypeSymbol* classTemplate, const std::vector<TypeSymbol*>& templateArgumentTypes, const Span& span, bool markExport);
     const FunctionSymbol* MainFunctionSymbol() const { return mainFunctionSymbol; }
+    FunctionSymbol* MainFunctionSymbol() { return mainFunctionSymbol; }
     void AddConversion(FunctionSymbol* conversion);
     FunctionSymbol* GetConversion(TypeSymbol* sourceType, TypeSymbol* targetType, const Span& span) const;
     void AddPolymorphicClass(ClassTypeSymbol* polymorphicClass);
     const std::unordered_set<ClassTypeSymbol*>& PolymorphicClasses() const { return polymorphicClasses; }
+    void AddClassHavingStaticConstructor(ClassTypeSymbol* classHavingStaticConstructor);
+    const std::unordered_set<ClassTypeSymbol*>& ClassesHavingStaticConstructor() const { return classesHavingStaticConstructor; }
 private:
     NamespaceSymbol globalNs;
     ContainerSymbol* container;
@@ -129,9 +163,12 @@ private:
     std::unordered_map<std::u32string, TypeSymbol*> typeNameMap;
     std::unordered_map<TypeSymbol*, std::vector<DerivedTypeSymbol*>> derivedTypeMap; 
     std::vector<std::unique_ptr<DerivedTypeSymbol>> derivedTypes;
+    std::unordered_map<ClassTemplateSpecializationKey, ClassTemplateSpecializationSymbol*, ClassTemplateSpecializationKeyHash> classTemplateSpecializationMap;
+    std::vector<std::unique_ptr<ClassTemplateSpecializationSymbol>> classTemplateSpecializations;
     std::vector<TypeRequest> typeRequests;
     ConversionTable conversionTable;
     std::unordered_set<ClassTypeSymbol*> polymorphicClasses;
+    std::unordered_set<ClassTypeSymbol*> classesHavingStaticConstructor;
     int GetNextDeclarationBlockIndex() { return declarationBlockIndex++; }
     void ResetDeclarationBlockIndex() { declarationBlockIndex = 0; }
 };

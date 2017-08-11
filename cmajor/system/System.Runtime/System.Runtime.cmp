@@ -2,3 +2,4 @@ project System.Runtime;
 target=library;
 reference <../System.Core/System.Core.cmp>;
 source <Runtime.cm>;
+source <StaticInitCriticalSection.cm>;

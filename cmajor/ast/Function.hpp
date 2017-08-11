@@ -21,6 +21,7 @@ public:
     FunctionNode(const Span& span_, Specifiers specifiers_, Node* returnTypeExpr_, const std::u32string& groupId_);
     FunctionNode(NodeType nodeType_, const Span& span_, Specifiers specifiers_, Node* returnTypeExpr_, const std::u32string& groupId_);
     Node* Clone(CloneContext& cloneContext) const override;
+    bool IsFunctionNode() const override { return true; }
     void CloneContent(FunctionNode* clone, CloneContext& cloneContext) const;
     void Accept(Visitor& visitor) override;
     void Write(AstWriter& writer) override;

@@ -6,6 +6,7 @@
 #ifndef CMAJOR_SYMBOLS_CLASS_TYPE_SYMBOL_INCLUDED
 #define CMAJOR_SYMBOLS_CLASS_TYPE_SYMBOL_INCLUDED
 #include <cmajor/symbols/TypeSymbol.hpp>
+#include <cmajor/symbols/VariableSymbol.hpp>
 #include <cmajor/ast/Class.hpp>
 
 namespace cmajor { namespace symbols {
@@ -25,9 +26,10 @@ enum class ClassTypeSymbolFlags : uint8_t
     polymorphic = 1 << 1,
     vmtInitialized = 1 << 2,
     imtsInitialized = 1 << 3,
-    classObjectLayoutComputed = 1 << 4,
+    layoutsComputed = 1 << 4,
     vmtObjectCreated = 1 << 5,
-    dontCreateDefaultConstructor = 1 << 6
+    staticObjectCreated = 1 << 6,
+    dontCreateDefaultConstructor = 1 << 7
 };
 
 inline ClassTypeSymbolFlags operator|(ClassTypeSymbolFlags left, ClassTypeSymbolFlags right)
@@ -38,6 +40,11 @@ inline ClassTypeSymbolFlags operator|(ClassTypeSymbolFlags left, ClassTypeSymbol
 inline ClassTypeSymbolFlags operator&(ClassTypeSymbolFlags left, ClassTypeSymbolFlags right)
 {
     return ClassTypeSymbolFlags(uint8_t(left) & uint8_t(right));
+}
+
+inline ClassTypeSymbolFlags operator~(ClassTypeSymbolFlags operand)
+{
+    return ClassTypeSymbolFlags(~uint8_t(operand));
 }
 
 const int32_t classIdVmtIndexOffset = 0;
@@ -53,8 +60,9 @@ public:
     void Write(SymbolWriter& writer) override;
     void Read(SymbolReader& reader) override;
     void ReadAstNodes();
-    ClassNode* GetFunctionNode() { return classNode.get(); }
-    void EmplaceType(TypeSymbol* typeSymbol_, int index) override;
+    const NodeList<Node>& UsingNodes() const { return usingNodes; }
+    ClassNode* GetClassNode() { return classNode.get(); }
+    void EmplaceType(TypeSymbol* typeSymbol, int index) override;
     void AddMember(Symbol* member) override;
     bool IsClassTypeSymbol() const override { return true; }
     std::string TypeString() const override { return "class"; }
@@ -85,6 +93,9 @@ public:
     void SetMoveAssignment(MemberFunctionSymbol* moveAssignment_) { moveAssignment = moveAssignment_; }
     void SetSpecialMemberFunctions();
     const std::vector<MemberVariableSymbol*>& MemberVariables() const { return memberVariables; }
+    const std::vector<MemberVariableSymbol*>& StaticMemberVariables() const { return staticMemberVariables; }
+    MemberVariableSymbol* InitializedVar() { return initializedVar.get(); }
+    void SetInitializedVar(MemberVariableSymbol* initializedVar_);
     bool IsAbstract() const { return GetFlag(ClassTypeSymbolFlags::abstract_); }
     void SetAbstract() { SetFlag(ClassTypeSymbolFlags::abstract_); }
     bool IsPolymorphic() const { return GetFlag(ClassTypeSymbolFlags::polymorphic); }
@@ -93,10 +104,12 @@ public:
     void SetVmtInitialized() { SetFlag(ClassTypeSymbolFlags::vmtInitialized); }
     bool IsImtsInitialized() const { return GetFlag(ClassTypeSymbolFlags::imtsInitialized); }
     void SetImtsInitialized() { SetFlag(ClassTypeSymbolFlags::imtsInitialized); }
-    bool IsClassObjectLayoutComputed() const { return GetFlag(ClassTypeSymbolFlags::classObjectLayoutComputed); }
-    void SetClassObjectLayoutComputed() { SetFlag(ClassTypeSymbolFlags::classObjectLayoutComputed); }
+    bool IsLayoutsComputed() const { return GetFlag(ClassTypeSymbolFlags::layoutsComputed); }
+    void SetLayoutsComputed() { SetFlag(ClassTypeSymbolFlags::layoutsComputed); }
     bool IsVmtObjectCreated() const { return GetFlag(ClassTypeSymbolFlags::vmtObjectCreated); }
     void SetVmtObjectCreated() { SetFlag(ClassTypeSymbolFlags::vmtObjectCreated); }
+    bool IsStaticObjectCreated() const { return GetFlag(ClassTypeSymbolFlags::staticObjectCreated); }
+    void SetStaticObjectCreated() { SetFlag(ClassTypeSymbolFlags::staticObjectCreated); }
     bool DontCreateDefaultConstructor() const { return GetFlag(ClassTypeSymbolFlags::dontCreateDefaultConstructor); }
     void SetDontCreateDefaultConstructor() { SetFlag(ClassTypeSymbolFlags::dontCreateDefaultConstructor); }
     ClassTypeSymbolFlags GetClassTypeSymbolFlags() const { return flags; }
@@ -104,13 +117,18 @@ public:
     void SetFlag(ClassTypeSymbolFlags flag) { flags = flags | flag; }
     void InitVmt();
     void InitImts();
-    void CreateObjectLayout();
+    void CreateLayouts();
+    const std::vector<FunctionSymbol*>& Vmt() const { return vmt; }
     llvm::Type* IrType(Emitter& emitter) override;
+    llvm::Constant* CreateDefaultIrValue(Emitter& emitter) override;
     llvm::Value* VmtObject(Emitter& emitter, bool create);
     llvm::Type* VmtPtrType(Emitter& emitter);
     const std::string& VmtObjectName();
     int32_t VmtPtrIndex() const { return vmtPtrIndex; }
     ClassTypeSymbol* VmtPtrHolderClass();
+    llvm::Value* StaticObject(Emitter& emitter, bool create);
+    llvm::StructType* StaticObjectType(Emitter& emitter);
+    const std::string& StaticObjectName();
 private:
     ClassTypeSymbol* baseClass;
     ClassTypeSymbolFlags flags;
@@ -118,6 +136,7 @@ private:
     std::vector<TemplateParameterSymbol*> templateParameters;
     std::vector<MemberVariableSymbol*> memberVariables;
     std::vector<MemberVariableSymbol*> staticMemberVariables;
+    std::unique_ptr<MemberVariableSymbol> initializedVar;
     StaticConstructorSymbol* staticConstructor;
     std::vector<ConstructorSymbol*> constructors;
     ConstructorSymbol* defaultConstructor;
@@ -130,6 +149,7 @@ private:
     std::vector<FunctionSymbol*> vmt;
     std::vector<std::vector<FunctionSymbol*>> imts;
     std::vector<TypeSymbol*> objectLayout;
+    std::vector<TypeSymbol*> staticLayout;
     llvm::Type* irType;
     llvm::ArrayType* vmtObjectType;
     int32_t vmtPtrIndex;
@@ -139,6 +159,8 @@ private:
     uint32_t astNodesPos;
     std::string filePathReadFrom;
     std::string vmtObjectName;
+    llvm::StructType* staticObjectType;
+    std::string staticObjectName;
     void InitVmt(std::vector<FunctionSymbol*>& vmtToInit);
 };
 

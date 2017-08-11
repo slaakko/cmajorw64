@@ -19,6 +19,7 @@ public:
     void AddMember(Symbol* member) override;
     void SetSpecifiers(Specifiers specifiers);
     llvm::Type* IrType(Emitter& emitter) override { return nullptr; } // todo
+    llvm::Constant* CreateDefaultIrValue(Emitter& emitter) override { return nullptr; } // todo
     const std::vector<MemberFunctionSymbol*>& MemberFunctions() const { return memberFunctions; }
 private:
     std::vector<MemberFunctionSymbol*> memberFunctions;

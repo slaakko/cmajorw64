@@ -38,6 +38,7 @@ public:
     virtual TypeSymbol* AddRvalueReference(const Span& span);
     virtual TypeSymbol* AddPointer(const Span& span);
     virtual llvm::Type* IrType(Emitter& emitter) = 0;
+    virtual llvm::Constant* CreateDefaultIrValue(Emitter& emitter) = 0;
     virtual bool IsConstType() const { return false; }
     virtual bool IsReferenceType() const { return false; }
     virtual bool IsLvalueReferenceType() const { return false; }
@@ -48,6 +49,7 @@ public:
     virtual bool IsVoidPtrType() const { return false; }
     virtual int PointerCount() const { return 0; }
     virtual bool HasNontrivialDestructor() const { return false; }
+    virtual bool ContainsTemplateParameter() const { return false; }
     void SetTypeId(uint32_t typeId_) { typeId = typeId_; }
     uint32_t TypeId() const { Assert(typeId != 0, "type id not initialized");  return typeId; }
     virtual const TypeDerivationRec& DerivationRec() const;

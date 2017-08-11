@@ -12,11 +12,14 @@ namespace cmajor { namespace symbols {
 using namespace cmajor::ast;
 
 class SymbolTable;
+class ClassTemplateSpecializationSymbol;
 
 class SymbolCreatorVisitor : public Visitor
 {
 public:
     SymbolCreatorVisitor(SymbolTable& symbolTable_);
+    void SetClassInstanceNode(ClassNode* classInstanceNode_);
+    void SetClassTemplateSpecialization(ClassTemplateSpecializationSymbol* classTemplateSpecialization_);
     void Visit(CompileUnitNode& compileUnitNode) override;
     void Visit(NamespaceNode& namespaceNode) override;
     void Visit(FunctionNode& functionNode) override;
@@ -47,6 +50,8 @@ public:
     void Visit(EnumConstantNode& enumConstantNode) override;
 private:
     SymbolTable& symbolTable;
+    ClassNode* classInstanceNode;
+    ClassTemplateSpecializationSymbol* classTemplateSpecialization;
 };
 
 } } // namespace cmajor::symbols

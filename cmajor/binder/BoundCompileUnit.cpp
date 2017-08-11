@@ -131,7 +131,7 @@ void PtrToVoidPtrConversion::GenerateCall(Emitter& emitter, std::vector<GenObjec
 
 BoundCompileUnit::BoundCompileUnit(Module& module_, CompileUnitNode* compileUnitNode_) : 
     BoundNode(Span(), BoundNodeType::boundCompileUnit), module(module_), symbolTable(module.GetSymbolTable()), compileUnitNode(compileUnitNode_), hasGotos(false), 
-    operationRepository(*this), functionTemplateRepository(*this)
+    operationRepository(*this), functionTemplateRepository(*this), classTemplateRepository(*this)
 {
     boost::filesystem::path fileName = boost::filesystem::path(compileUnitNode->FilePath()).filename();
     boost::filesystem::path directory = module.DirectoryPath();
@@ -161,6 +161,15 @@ void BoundCompileUnit::Accept(BoundNodeVisitor& visitor)
 void BoundCompileUnit::AddFileScope(FileScope* fileScope)
 {
     fileScopes.push_back(std::unique_ptr<FileScope>(fileScope));
+}
+
+void BoundCompileUnit::RemoveLastFileScope()
+{
+    if (fileScopes.empty())
+    {
+        throw Exception("cannot remove last file scope from empty list of file scopes", GetSpan());
+    }
+    fileScopes.erase(fileScopes.end() - 1);
 }
 
 void BoundCompileUnit::AddBoundNode(std::unique_ptr<BoundNode>&& boundNode)
@@ -247,6 +256,21 @@ void BoundCompileUnit::CollectViableFunctions(const std::u32string& groupName, C
 FunctionSymbol* BoundCompileUnit::Instantiate(FunctionSymbol* functionTemplate, const std::unordered_map<TemplateParameterSymbol*, TypeSymbol*>& templateParameterMapping, const Span& span)
 {
     return functionTemplateRepository.Instantiate(functionTemplate, templateParameterMapping, span);
+}
+
+void BoundCompileUnit::Instantiate(FunctionSymbol* memberFunction, ContainerScope* containerScope, const Span& span)
+{
+    classTemplateRepository.Instantiate(memberFunction, containerScope, span);
+}
+
+int BoundCompileUnit::Install(const std::string& str)
+{
+    return stringRepository.Install(str);
+}
+
+const std::string& BoundCompileUnit::GetString(int stringId) const
+{
+    return stringRepository.GetString(stringId);
 }
 
 } } // namespace cmajor::binder

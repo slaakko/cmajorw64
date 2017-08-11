@@ -23,12 +23,13 @@ public:
     bool IsInComplete() const override { return true; }
     const NamespaceSymbol* Ns() const { return ns; }
     NamespaceSymbol* Ns() { return ns; }
-    llvm::Type* IrType(Emitter& emitter) override { return nullptr; }
+    llvm::Type* IrType(Emitter& emitter) override { Assert(false, "tried to get ir type of namespace type"); return nullptr; }
+    llvm::Constant* CreateDefaultIrValue(Emitter& emitter) override { Assert(false, "tried to create default ir value of namespace type"); return nullptr; }
 private:
     NamespaceSymbol* ns;
 };
 
-TypeSymbol* ResolveType(Node* typeExprNode, BoundCompileUnit& boundCompileUnit, ContainerScope* containerScope);
+TypeSymbol* ResolveType(Node* typeExprNode, BoundCompileUnit& boundCompileUnit, ContainerScope* containerScope, bool markExport);
 
 } } // namespace cmajor::binder
 

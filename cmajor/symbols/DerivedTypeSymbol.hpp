@@ -76,6 +76,7 @@ public:
     TypeSymbol* AddRvalueReference(const Span& span);
     TypeSymbol* AddPointer(const Span& span);
     llvm::Type* IrType(Emitter& emitter) override;
+    llvm::Constant* CreateDefaultIrValue(Emitter& emitter) override;
     bool IsConstType() const override;
     bool IsReferenceType() const override;
     bool IsLvalueReferenceType() const override;
@@ -84,6 +85,7 @@ public:
     bool IsPointerType() const override;
     bool IsVoidPtrType() const override;
     int PointerCount() const override;
+    bool ContainsTemplateParameter() const override { return baseType->ContainsTemplateParameter(); }
     const TypeDerivationRec& DerivationRec() const override { return derivationRec; }
     TypeSymbol* RemoveDerivations(const TypeDerivationRec& sourceDerivationRec, const Span& span) override;
     TypeSymbol* Unify(TypeSymbol* sourceType, const Span& span) override;
@@ -101,6 +103,7 @@ public:
     bool IsPointerType() const override { return true; }
     bool IsNullPtrType() const override { return true; }
     llvm::Type* IrType(Emitter& emitter) override;
+    llvm::Constant* CreateDefaultIrValue(Emitter& emitter) override;
 };
 
 } } // namespace cmajor::symbols

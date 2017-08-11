@@ -82,7 +82,7 @@ UnaryNode::UnaryNode(NodeType nodeType_, const Span& span_, Node* subject_) : No
 void UnaryNode::Write(AstWriter& writer)
 {
     Node::Write(writer);
-    subject->Write(writer);
+    writer.Write(subject.get());
 }
 
 void UnaryNode::Read(AstReader& reader)
@@ -105,8 +105,8 @@ BinaryNode::BinaryNode(NodeType nodeType, const Span& span_, Node* left_, Node* 
 void BinaryNode::Write(AstWriter& writer)
 {
     Node::Write(writer);
-    left->Write(writer);
-    right->Write(writer);
+    writer.Write(left.get());
+    writer.Write(right.get());
 }
 
 void BinaryNode::Read(AstReader& reader)

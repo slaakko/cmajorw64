@@ -9,9 +9,14 @@
 #include <cmajor/symbols/FunctionSymbol.hpp>
 #include <cmajor/symbols/Exception.hpp>
 #include <cmajor/symbols/EnumSymbol.hpp>
+#include <cmajor/symbols/ClassTypeSymbol.hpp>
 #include <cmajor/ir/Emitter.hpp>
+#include <cmajor/util/Unicode.hpp>
+#include <llvm/IR/Module.h>
 
 namespace cmajor { namespace binder {
+
+using namespace cmajor::unicode;
 
 BoundExpression::BoundExpression(const Span& span_, BoundNodeType boundNodeType_, TypeSymbol* type_) : BoundNode(span_, boundNodeType_), type(type_), flags(BoundExpressionFlags::none)
 {
@@ -20,6 +25,11 @@ BoundExpression::BoundExpression(const Span& span_, BoundNodeType boundNodeType_
 BoundParameter::BoundParameter(ParameterSymbol* parameterSymbol_) : 
     BoundExpression(parameterSymbol_->GetSpan(), BoundNodeType::boundParameter, parameterSymbol_->GetType()), parameterSymbol(parameterSymbol_)
 {
+}
+
+BoundExpression* BoundParameter::Clone()
+{
+    return new BoundParameter(parameterSymbol);
 }
 
 void BoundParameter::Load(Emitter& emitter, OperationFlags flags)
@@ -65,6 +75,11 @@ BoundLocalVariable::BoundLocalVariable(LocalVariableSymbol* localVariableSymbol_
 {
 }
 
+BoundExpression* BoundLocalVariable::Clone()
+{
+    return new BoundLocalVariable(localVariableSymbol);
+}
+
 void BoundLocalVariable::Load(Emitter& emitter, OperationFlags flags)
 {
     if ((flags & OperationFlags::addr) != OperationFlags::none)
@@ -108,10 +123,40 @@ BoundMemberVariable::BoundMemberVariable(MemberVariableSymbol* memberVariableSym
 {
 }
 
+BoundExpression* BoundMemberVariable::Clone()
+{
+    BoundMemberVariable* clone = new BoundMemberVariable(memberVariableSymbol);
+    if (classPtr)
+    {
+        clone->classPtr.reset(classPtr->Clone());
+    }
+    if (staticInitNeeded)
+    {
+        clone->staticInitNeeded = true;
+    }
+    return clone;
+}
+
 void BoundMemberVariable::Load(Emitter& emitter, OperationFlags flags)
 {
     Assert(memberVariableSymbol->LayoutIndex() != -1, "layout index of the member variable not set");
-    classPtr->Load(emitter, OperationFlags::none);
+    if (memberVariableSymbol->IsStatic())
+    {
+        ClassTypeSymbol* classType = static_cast<ClassTypeSymbol*>(memberVariableSymbol->Parent());
+        if (staticInitNeeded)
+        {
+            if (classType->StaticConstructor())
+            {
+                BoundFunctionCall staticConstructorCall(GetSpan(), classType->StaticConstructor());
+                staticConstructorCall.Load(emitter, OperationFlags::none);
+            }
+        }
+        emitter.Stack().Push(classType->StaticObject(emitter, false));
+    }
+    else
+    {
+        classPtr->Load(emitter, OperationFlags::none);
+    }
     llvm::Value* ptr = emitter.Stack().Pop();
     ArgVector indeces;
     indeces.push_back(emitter.Builder().getInt32(0));
@@ -141,7 +186,23 @@ void BoundMemberVariable::Store(Emitter& emitter, OperationFlags flags)
     }
     else 
     {
-        classPtr->Load(emitter, OperationFlags::none);
+        if (memberVariableSymbol->IsStatic())
+        {
+            ClassTypeSymbol* classType = static_cast<ClassTypeSymbol*>(memberVariableSymbol->Parent());
+            if (staticInitNeeded)
+            {
+                if (classType->StaticConstructor())
+                {
+                    BoundFunctionCall staticConstructorCall(GetSpan(), classType->StaticConstructor());
+                    staticConstructorCall.Load(emitter, OperationFlags::none);
+                }
+            }
+            emitter.Stack().Push(classType->StaticObject(emitter, false));
+        }
+        else
+        {
+            classPtr->Load(emitter, OperationFlags::none);
+        }
         llvm::Value* ptr = emitter.Stack().Pop();
         ArgVector indeces;
         indeces.push_back(emitter.Builder().getInt32(0));
@@ -170,6 +231,11 @@ void BoundMemberVariable::SetClassPtr(std::unique_ptr<BoundExpression>&& classPt
 
 BoundConstant::BoundConstant(ConstantSymbol* constantSymbol_) : BoundExpression(constantSymbol_->GetSpan(), BoundNodeType::boundConstant, constantSymbol_->GetType()), constantSymbol(constantSymbol_)
 {
+}
+
+BoundExpression* BoundConstant::Clone()
+{
+    return new BoundConstant(constantSymbol);
 }
 
 void BoundConstant::Load(Emitter& emitter, OperationFlags flags)
@@ -203,6 +269,11 @@ BoundEnumConstant::BoundEnumConstant(EnumConstantSymbol* enumConstantSymbol_) : 
 {
 }
 
+BoundExpression* BoundEnumConstant::Clone()
+{
+    return new BoundEnumConstant(enumConstantSymbol);
+}
+
 void BoundEnumConstant::Load(Emitter& emitter, OperationFlags flags)
 {
     if ((flags & OperationFlags::addr) != OperationFlags::none)
@@ -231,6 +302,13 @@ void BoundEnumConstant::Accept(BoundNodeVisitor& visitor)
 
 BoundLiteral::BoundLiteral(std::unique_ptr<Value>&& value_, TypeSymbol* type_) : BoundExpression(value_->GetSpan(), BoundNodeType::boundLiteral, type_), value(std::move(value_))
 {
+}
+
+BoundExpression* BoundLiteral::Clone()
+{
+    std::unique_ptr<Value> clonedValue;
+    clonedValue.reset(value->Clone());
+    return new BoundLiteral(std::move(clonedValue), GetType());
 }
 
 void BoundLiteral::Load(Emitter& emitter, OperationFlags flags)
@@ -262,6 +340,15 @@ void BoundLiteral::Accept(BoundNodeVisitor& visitor)
 BoundTemporary::BoundTemporary(std::unique_ptr<BoundExpression>&& rvalueExpr_, std::unique_ptr<BoundLocalVariable>&& backingStore_) :
     BoundExpression(rvalueExpr_->GetSpan(), BoundNodeType::boundTemporary, rvalueExpr_->GetType()), rvalueExpr(std::move(rvalueExpr_)), backingStore(std::move(backingStore_))
 {
+}
+
+BoundExpression* BoundTemporary::Clone()
+{
+    std::unique_ptr<BoundExpression> clonedRvalueExpr;
+    clonedRvalueExpr.reset(rvalueExpr->Clone());
+    std::unique_ptr<BoundLocalVariable> clonedBackingStore;
+    clonedBackingStore.reset(static_cast<BoundLocalVariable*>(backingStore->Clone()));
+    return new BoundTemporary(std::move(clonedRvalueExpr), std::move(clonedBackingStore));
 }
 
 void BoundTemporary::Load(Emitter& emitter, OperationFlags flags)
@@ -297,6 +384,11 @@ BoundSizeOfExpression::BoundSizeOfExpression(const Span& span_, TypeSymbol* type
 {
 }
 
+BoundExpression* BoundSizeOfExpression::Clone()
+{
+    return new BoundSizeOfExpression(GetSpan(), GetType(), pointerType);
+}
+
 void BoundSizeOfExpression::Load(Emitter& emitter, OperationFlags flags)
 {
     if ((flags & OperationFlags::addr) != OperationFlags::none)
@@ -329,6 +421,13 @@ void BoundSizeOfExpression::Accept(BoundNodeVisitor& visitor)
 BoundAddressOfExpression::BoundAddressOfExpression(std::unique_ptr<BoundExpression>&& subject_, TypeSymbol* type_)  : 
     BoundExpression(subject_->GetSpan(), BoundNodeType::boundAddressOfExpression, type_), subject(std::move(subject_))
 {
+}
+
+BoundExpression* BoundAddressOfExpression::Clone()
+{
+    std::unique_ptr<BoundExpression> clonedSubject;
+    clonedSubject.reset(subject->Clone());
+    return new BoundAddressOfExpression(std::move(clonedSubject), GetType());
 }
 
 void BoundAddressOfExpression::Load(Emitter& emitter, OperationFlags flags)
@@ -367,6 +466,13 @@ BoundDereferenceExpression::BoundDereferenceExpression(std::unique_ptr<BoundExpr
 {
 }
 
+BoundExpression* BoundDereferenceExpression::Clone()
+{
+    std::unique_ptr<BoundExpression> clonedSubject;
+    clonedSubject.reset(subject->Clone());
+    return new BoundDereferenceExpression(std::move(clonedSubject), GetType());
+}
+
 void BoundDereferenceExpression::Load(Emitter& emitter, OperationFlags flags)
 {
     if (subject->GetBoundNodeType() != BoundNodeType::boundAddressOfExpression)
@@ -403,6 +509,13 @@ BoundReferenceToPointerExpression::BoundReferenceToPointerExpression(std::unique
 {
 }
 
+BoundExpression* BoundReferenceToPointerExpression::Clone()
+{
+    std::unique_ptr<BoundExpression> clonedSubject;
+    clonedSubject.reset(subject->Clone());
+    return new BoundReferenceToPointerExpression(std::move(clonedSubject), GetType());
+}
+
 void BoundReferenceToPointerExpression::Load(Emitter& emitter, OperationFlags flags)
 {
     subject->Load(emitter, flags);
@@ -420,6 +533,16 @@ void BoundReferenceToPointerExpression::Accept(BoundNodeVisitor& visitor)
 
 BoundFunctionCall::BoundFunctionCall(const Span& span_, FunctionSymbol* functionSymbol_) : BoundExpression(span_, BoundNodeType::boundFunctionCall, functionSymbol_->ReturnType()), functionSymbol(functionSymbol_)
 {
+}
+
+BoundExpression* BoundFunctionCall::Clone()
+{
+    BoundFunctionCall* clone = new BoundFunctionCall(GetSpan(), functionSymbol);
+    for (std::unique_ptr<BoundExpression>& argument : arguments)
+    {
+        clone->AddArgument(std::unique_ptr<BoundExpression>(argument->Clone()));
+    }
+    return clone;
 }
 
 void BoundFunctionCall::AddArgument(std::unique_ptr<BoundExpression>&& argument)
@@ -452,6 +575,10 @@ void BoundFunctionCall::Load(Emitter& emitter, OperationFlags flags)
             genObjects[0]->SetType(arguments[0]->GetType());
             callFlags = callFlags | OperationFlags::virtualCall;
         }
+        if (!functionSymbol->DontThrow())
+        {
+            emitter.SetLineNumber(GetSpan().LineNumber());
+        }
         functionSymbol->GenerateCall(emitter, genObjects, callFlags);
         if ((flags & OperationFlags::deref) != OperationFlags::none)
         {
@@ -479,13 +606,17 @@ void BoundFunctionCall::Store(Emitter& emitter, OperationFlags flags)
         {
             callFlags = callFlags | OperationFlags::virtualCall;
         }
+        if (!functionSymbol->DontThrow())
+        {
+            emitter.SetLineNumber(GetSpan().LineNumber());
+        }
         functionSymbol->GenerateCall(emitter, genObjects, callFlags);
         llvm::Value* ptr = emitter.Stack().Pop();
         if ((flags & OperationFlags::leaveFirstArg) != OperationFlags::none)
         {
             emitter.SaveObjectPointer(ptr);
         }
-        if ((flags & OperationFlags::deref) != OperationFlags::none)
+        if ((flags & OperationFlags::deref) != OperationFlags::none || GetFlag(BoundExpressionFlags::deref))
         {
             emitter.Builder().CreateStore(value, ptr);
         }
@@ -519,6 +650,13 @@ bool BoundFunctionCall::IsLvalueExpression() const
 BoundConstructExpression::BoundConstructExpression(std::unique_ptr<BoundExpression>&& constructorCall_, TypeSymbol* resultType_) :
     BoundExpression(constructorCall_->GetSpan(), BoundNodeType::boundConstructExpression, resultType_), constructorCall(std::move(constructorCall_))
 {
+}
+
+BoundExpression* BoundConstructExpression::Clone()
+{
+    std::unique_ptr<BoundExpression> clonedConstructorCall;
+    clonedConstructorCall.reset(constructorCall->Clone());
+    return new BoundConstructExpression(std::move(clonedConstructorCall), GetType());
 }
 
 void BoundConstructExpression::Load(Emitter& emitter, OperationFlags flags)
@@ -558,6 +696,13 @@ BoundConversion::BoundConversion(std::unique_ptr<BoundExpression>&& sourceExpr_,
 {
 }
 
+BoundExpression* BoundConversion::Clone()
+{
+    std::unique_ptr<BoundExpression> clonedSourceExpr;
+    clonedSourceExpr.reset(sourceExpr->Clone());
+    return new BoundConversion(std::move(clonedSourceExpr), conversionFun);
+}
+
 void BoundConversion::Load(Emitter& emitter, OperationFlags flags)
 {
     sourceExpr->Load(emitter, flags);
@@ -575,8 +720,238 @@ void BoundConversion::Accept(BoundNodeVisitor& visitor)
     visitor.Visit(*this);
 }
 
+BoundIsExpression::BoundIsExpression(std::unique_ptr<BoundExpression>&& expr_, ClassTypeSymbol* rightClassType_, TypeSymbol* boolType_) :
+    BoundExpression(expr_->GetSpan(), BoundNodeType::boundIsExpression, boolType_), expr(std::move(expr_)), rightClassType(rightClassType_)
+{
+}
+
+BoundExpression* BoundIsExpression::Clone()
+{
+    std::unique_ptr<BoundExpression> clonedExpr;
+    clonedExpr.reset(expr->Clone());
+    return new BoundIsExpression(std::move(clonedExpr), rightClassType, GetType());
+}
+
+void BoundIsExpression::Load(Emitter& emitter, OperationFlags flags)
+{
+    expr->Load(emitter, OperationFlags::none);
+    llvm::Value* thisPtr = emitter.Stack().Pop();
+    TypeSymbol* exprType = static_cast<TypeSymbol*>(expr->GetType());
+    Assert(exprType->IsPointerType(), "pointer type expected");
+    TypeSymbol* leftType = exprType->RemovePointer(GetSpan());
+    Assert(leftType->IsClassTypeSymbol(), "class type expected");
+    ClassTypeSymbol* leftClassType = static_cast<ClassTypeSymbol*>(leftType);
+    ClassTypeSymbol* leftVmtPtrHolderClass = leftClassType->VmtPtrHolderClass();
+    if (leftClassType != leftVmtPtrHolderClass)
+    {
+        thisPtr = emitter.Builder().CreateBitCast(thisPtr, leftVmtPtrHolderClass->AddPointer(GetSpan())->IrType(emitter));
+    }
+    ArgVector vmtPtrIndeces;
+    vmtPtrIndeces.push_back(emitter.Builder().getInt32(0));
+    vmtPtrIndeces.push_back(emitter.Builder().getInt32(leftVmtPtrHolderClass->VmtPtrIndex()));
+    llvm::Value* vmtPtrPtr = emitter.Builder().CreateGEP(thisPtr, vmtPtrIndeces);
+    llvm::Value* vmtPtr = emitter.Builder().CreateBitCast(emitter.Builder().CreateLoad(vmtPtrPtr), leftClassType->VmtPtrType(emitter));
+    ArgVector indeces;
+    indeces.push_back(emitter.Builder().getInt32(0));
+    indeces.push_back(emitter.Builder().getInt32(0));
+    llvm::Value* leftClassIdPtr = emitter.Builder().CreateGEP(vmtPtr, indeces);
+    llvm::Value* leftClassId = emitter.Builder().CreatePtrToInt(emitter.Builder().CreateLoad(leftClassIdPtr), emitter.Builder().getInt64Ty());
+    llvm::Value* rightClassTypeVmtObject = rightClassType->VmtObject(emitter, false);
+    llvm::Value* rightClassIdPtr = emitter.Builder().CreateGEP(rightClassTypeVmtObject, indeces);
+    llvm::Value* rightClassId = emitter.Builder().CreatePtrToInt(emitter.Builder().CreateLoad(rightClassIdPtr), emitter.Builder().getInt64Ty());
+    llvm::Value* remainder = emitter.Builder().CreateURem(leftClassId, rightClassId);
+    llvm::Value* remainderIsZero = emitter.Builder().CreateICmpEQ(remainder, emitter.Builder().getInt64(0));
+    emitter.Stack().Push(remainderIsZero);
+}
+
+void BoundIsExpression::Store(Emitter& emitter, OperationFlags flags)
+{
+    throw Exception("cannot store to a 'is' expression", GetSpan());
+}
+
+void BoundIsExpression::Accept(BoundNodeVisitor& visitor)
+{
+    visitor.Visit(*this);
+}
+
+BoundAsExpression::BoundAsExpression(std::unique_ptr<BoundExpression>&& expr_, ClassTypeSymbol* rightClassType_, std::unique_ptr<BoundLocalVariable>&& variable_) :
+    BoundExpression(expr_->GetSpan(), BoundNodeType::boundAsExpression, rightClassType_->AddPointer(expr_->GetSpan())), 
+    expr(std::move(expr_)), rightClassType(rightClassType_), variable(std::move(variable_))
+{
+}
+
+BoundExpression* BoundAsExpression::Clone()
+{
+    std::unique_ptr<BoundExpression> clonedExpr;
+    clonedExpr.reset(expr->Clone());
+    std::unique_ptr<BoundLocalVariable> clonedVariable;
+    clonedVariable.reset(static_cast<BoundLocalVariable*>(variable->Clone()));
+    return new BoundAsExpression(std::move(clonedExpr), rightClassType, std::move(clonedVariable));
+}
+
+void BoundAsExpression::Load(Emitter& emitter, OperationFlags flags)
+{
+    expr->Load(emitter, OperationFlags::none);
+    llvm::Value* thisPtr = emitter.Stack().Pop();
+    TypeSymbol* exprType = static_cast<TypeSymbol*>(expr->GetType());
+    Assert(exprType->IsPointerType(), "pointer type expected");
+    TypeSymbol* leftType = exprType->RemovePointer(GetSpan());
+    Assert(leftType->IsClassTypeSymbol(), "class type expected");
+    ClassTypeSymbol* leftClassType = static_cast<ClassTypeSymbol*>(leftType);
+    ClassTypeSymbol* leftVmtPtrHolderClass = leftClassType->VmtPtrHolderClass();
+    if (leftClassType != leftVmtPtrHolderClass)
+    {
+        thisPtr = emitter.Builder().CreateBitCast(thisPtr, leftVmtPtrHolderClass->AddPointer(GetSpan())->IrType(emitter));
+    }
+    ArgVector vmtPtrIndeces;
+    vmtPtrIndeces.push_back(emitter.Builder().getInt32(0));
+    vmtPtrIndeces.push_back(emitter.Builder().getInt32(leftVmtPtrHolderClass->VmtPtrIndex()));
+    llvm::Value* vmtPtrPtr = emitter.Builder().CreateGEP(thisPtr, vmtPtrIndeces);
+    llvm::Value* vmtPtr = emitter.Builder().CreateBitCast(emitter.Builder().CreateLoad(vmtPtrPtr), leftClassType->VmtPtrType(emitter));
+    ArgVector indeces;
+    indeces.push_back(emitter.Builder().getInt32(0));
+    indeces.push_back(emitter.Builder().getInt32(0));
+    llvm::Value* leftClassIdPtr = emitter.Builder().CreateGEP(vmtPtr, indeces);
+    llvm::Value* leftClassId = emitter.Builder().CreatePtrToInt(emitter.Builder().CreateLoad(leftClassIdPtr), emitter.Builder().getInt64Ty());
+    llvm::Value* rightClassTypeVmtObject = rightClassType->VmtObject(emitter, false);
+    llvm::Value* rightClassIdPtr = emitter.Builder().CreateGEP(rightClassTypeVmtObject, indeces);
+    llvm::Value* rightClassId = emitter.Builder().CreatePtrToInt(emitter.Builder().CreateLoad(rightClassIdPtr), emitter.Builder().getInt64Ty());
+    llvm::Value* remainder = emitter.Builder().CreateURem(leftClassId, rightClassId);
+    llvm::Value* remainderIsZero = emitter.Builder().CreateICmpEQ(remainder, emitter.Builder().getInt64(0));
+    llvm::BasicBlock* trueBlock = llvm::BasicBlock::Create(emitter.Context(), "true", emitter.Function());
+    llvm::BasicBlock* falseBlock = llvm::BasicBlock::Create(emitter.Context(), "false", emitter.Function());
+    llvm::BasicBlock* continueBlock = llvm::BasicBlock::Create(emitter.Context(), "continue", emitter.Function());
+    emitter.Builder().CreateCondBr(remainderIsZero, trueBlock, falseBlock);
+    emitter.Builder().SetInsertPoint(trueBlock);
+    emitter.Stack().Push(emitter.Builder().CreateBitCast(thisPtr, rightClassType->AddPointer(GetSpan())->IrType(emitter)));
+    variable->Store(emitter, OperationFlags::none);
+    emitter.Builder().CreateBr(continueBlock);
+    emitter.Builder().SetInsertPoint(falseBlock);
+    emitter.Stack().Push(llvm::Constant::getNullValue(rightClassType->AddPointer(GetSpan())->IrType(emitter)));
+    variable->Store(emitter, OperationFlags::none);
+    emitter.Builder().CreateBr(continueBlock);
+    emitter.Builder().SetInsertPoint(continueBlock);
+    variable->Load(emitter, OperationFlags::none);
+}
+
+void BoundAsExpression::Store(Emitter& emitter, OperationFlags flags)
+{
+    throw Exception("cannot store to an 'as' expression", GetSpan());
+}
+
+void BoundAsExpression::Accept(BoundNodeVisitor& visitor)
+{
+    visitor.Visit(*this);
+}
+
+BoundTypeNameExpression::BoundTypeNameExpression(std::unique_ptr<BoundExpression>&& classPtr_, TypeSymbol* constCharPtrType_) :
+    BoundExpression(classPtr_->GetSpan(), BoundNodeType::boundTypeNameExpression, constCharPtrType_), classPtr(std::move(classPtr_))
+{
+}
+
+BoundExpression* BoundTypeNameExpression::Clone()
+{
+    std::unique_ptr<BoundExpression> clonedClassPtr;
+    clonedClassPtr.reset(classPtr->Clone());
+    return new BoundTypeNameExpression(std::move(clonedClassPtr), GetType());
+}
+
+void BoundTypeNameExpression::Load(Emitter& emitter, OperationFlags flags)
+{
+    classPtr->Load(emitter, OperationFlags::none);
+    llvm::Value* thisPtr = emitter.Stack().Pop();
+    TypeSymbol* classPtrType = static_cast<TypeSymbol*>(classPtr->GetType());
+    Assert(classPtrType->IsPointerType(), "pointer type expected");
+    TypeSymbol* type = classPtrType->BaseType();
+    Assert(type->IsClassTypeSymbol(), "class type expected");
+    ClassTypeSymbol* classType = static_cast<ClassTypeSymbol*>(type);
+    ClassTypeSymbol* vmtPtrHolderClass = classType->VmtPtrHolderClass();
+    if (classType != vmtPtrHolderClass)
+    {
+        thisPtr = emitter.Builder().CreateBitCast(thisPtr, vmtPtrHolderClass->AddPointer(GetSpan())->IrType(emitter));
+    }
+    ArgVector vmtPtrIndeces;
+    vmtPtrIndeces.push_back(emitter.Builder().getInt32(0));
+    vmtPtrIndeces.push_back(emitter.Builder().getInt32(vmtPtrHolderClass->VmtPtrIndex()));
+    llvm::Value* vmtPtrPtr = emitter.Builder().CreateGEP(thisPtr, vmtPtrIndeces);
+    llvm::Value* vmtPtr = emitter.Builder().CreateBitCast(emitter.Builder().CreateLoad(vmtPtrPtr), classType->VmtPtrType(emitter));
+    ArgVector indeces;
+    indeces.push_back(emitter.Builder().getInt32(0));
+    indeces.push_back(emitter.Builder().getInt32(1));
+    llvm::Value* classNamePtr = emitter.Builder().CreateGEP(vmtPtr, indeces);
+    llvm::Value* className = emitter.Builder().CreateLoad(classNamePtr);
+    emitter.Stack().Push(className);
+}
+
+void BoundTypeNameExpression::Store(Emitter& emitter, OperationFlags flags)
+{
+    throw Exception("cannot store to typename expression", GetSpan());
+}
+
+void BoundTypeNameExpression::Accept(BoundNodeVisitor& visitor)
+{
+    visitor.Visit(*this);
+}
+
+BoundBitCast::BoundBitCast(std::unique_ptr<BoundExpression>&& expr_, TypeSymbol* type_) : BoundExpression(expr_->GetSpan(), BoundNodeType::boundBitCast, type_), expr(std::move(expr_))
+{
+}
+
+BoundExpression* BoundBitCast::Clone()
+{
+    return new BoundBitCast(std::unique_ptr<BoundExpression>(expr->Clone()), GetType());
+}
+
+void BoundBitCast::Load(Emitter& emitter, OperationFlags flags)
+{
+    expr->Load(emitter, OperationFlags::none);
+    llvm::Value* value = emitter.Stack().Pop();
+    llvm::Value* casted = emitter.Builder().CreateBitCast(value, GetType()->IrType(emitter));
+    emitter.Stack().Push(casted);
+}
+
+void BoundBitCast::Store(Emitter& emitter, OperationFlags flags)
+{
+    throw Exception("cannot store to bit cast", GetSpan());
+}
+
+void BoundBitCast::Accept(BoundNodeVisitor& visitor)
+{
+    visitor.Visit(*this);
+}
+
+BoundFunctionPtr::BoundFunctionPtr(const Span& span_, FunctionSymbol* function_, TypeSymbol* type_) : BoundExpression(span_, BoundNodeType::boundFunctionPtr, type_), function(function_)
+{
+}
+
+BoundExpression* BoundFunctionPtr::Clone()
+{
+    return new BoundFunctionPtr(GetSpan(), function, GetType());
+}
+
+void BoundFunctionPtr::Load(Emitter& emitter, OperationFlags flags)
+{
+    llvm::Value* irObject = emitter.Module()->getOrInsertFunction(ToUtf8(function->MangledName()), function->IrType(emitter));
+    emitter.Stack().Push(irObject);
+}
+
+void BoundFunctionPtr::Store(Emitter& emitter, OperationFlags flags)
+{
+    throw Exception("cannot store to function ptr expression", GetSpan());
+}
+
+void BoundFunctionPtr::Accept(BoundNodeVisitor& visitor)
+{
+    visitor.Visit(*this);
+}
+
 BoundTypeExpression::BoundTypeExpression(const Span& span_, TypeSymbol* type_) : BoundExpression(span_, BoundNodeType::boundTypeExpression, type_)
 {
+}
+
+BoundExpression* BoundTypeExpression::Clone()
+{
+    return new BoundTypeExpression(GetSpan(), GetType());
 }
 
 void BoundTypeExpression::Load(Emitter& emitter, OperationFlags flags)
@@ -599,6 +974,11 @@ BoundNamespaceExpression::BoundNamespaceExpression(const Span& span_, NamespaceS
     nsType.reset(GetType());
 }
 
+BoundExpression* BoundNamespaceExpression::Clone()
+{
+    return new BoundNamespaceExpression(GetSpan(), ns);
+}
+
 void BoundNamespaceExpression::Load(Emitter& emitter, OperationFlags flags)
 {
     throw Exception("cannot load from a namespace", GetSpan());
@@ -618,6 +998,18 @@ BoundFunctionGroupExpression::BoundFunctionGroupExpression(const Span& span_, Fu
     BoundExpression(span_, BoundNodeType::boundFunctionGroupExcpression, new FunctionGroupTypeSymbol(functionGroupSymbol_)), functionGroupSymbol(functionGroupSymbol_), scopeQualified(false), qualifiedScope(nullptr)
 {
     functionGroupType.reset(GetType());
+}
+
+BoundExpression* BoundFunctionGroupExpression::Clone()
+{
+    BoundFunctionGroupExpression* clone = new BoundFunctionGroupExpression(GetSpan(), functionGroupSymbol);
+    if (classPtr)
+    {
+        clone->classPtr.reset(classPtr->Clone());
+    }
+    clone->scopeQualified = scopeQualified;
+    clone->qualifiedScope = qualifiedScope;
+    return clone;
 }
 
 void BoundFunctionGroupExpression::Load(Emitter& emitter, OperationFlags flags)
@@ -644,6 +1036,11 @@ BoundMemberExpression::BoundMemberExpression(const Span& span_, std::unique_ptr<
     BoundExpression(span_, BoundNodeType::boundMemberExpression, new MemberExpressionTypeSymbol(span_, member_->GetType()->Name(), this)), classPtr(std::move(classPtr_)), member(std::move(member_))
 {
     memberExpressionType.reset(GetType());
+}
+
+BoundExpression* BoundMemberExpression::Clone()
+{
+    return new BoundMemberExpression(GetSpan(), std::unique_ptr<BoundExpression>(classPtr->Clone()), std::unique_ptr<BoundExpression>(member->Clone()));
 }
 
 void BoundMemberExpression::Load(Emitter& emitter, OperationFlags flags)

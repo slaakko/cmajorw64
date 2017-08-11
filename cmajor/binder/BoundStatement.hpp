@@ -63,7 +63,7 @@ private:
 class BoundReturnStatement : public BoundStatement
 {
 public:
-    BoundReturnStatement(std::unique_ptr<BoundFunctionCall>&& returnFunctionCall_);
+    BoundReturnStatement(std::unique_ptr<BoundFunctionCall>&& returnFunctionCall_, const Span& span_);
     void Accept(BoundNodeVisitor& visitor) override;
     BoundFunctionCall* ReturnFunctionCall() { return returnFunctionCall.get(); }
 private:

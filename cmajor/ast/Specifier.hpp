@@ -46,6 +46,13 @@ inline Specifiers operator&(Specifiers left, Specifiers right)
     return Specifiers(uint32_t(left) & uint32_t(right));
 }
 
+inline Specifiers operator~(Specifiers operand)
+{
+    return Specifiers(~uint32_t(operand));
+}
+
+bool StaticConstructorSpecifiers(Specifiers specifiers);
+
 std::string SpecifierStr(Specifiers specifiers);
 
 } } // namespace cmajor::ast

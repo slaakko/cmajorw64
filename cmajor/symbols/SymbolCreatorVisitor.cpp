@@ -11,8 +11,18 @@
 
 namespace cmajor { namespace symbols {
 
-SymbolCreatorVisitor::SymbolCreatorVisitor(SymbolTable& symbolTable_) : symbolTable(symbolTable_)
+SymbolCreatorVisitor::SymbolCreatorVisitor(SymbolTable& symbolTable_) : symbolTable(symbolTable_), classInstanceNode(nullptr), classTemplateSpecialization(nullptr)
 {
+}
+
+void SymbolCreatorVisitor::SetClassInstanceNode(ClassNode* classInstanceNode_)
+{
+    classInstanceNode = classInstanceNode_;
+}
+
+void SymbolCreatorVisitor::SetClassTemplateSpecialization(ClassTemplateSpecializationSymbol* classTemplateSpecialization_)
+{
+    classTemplateSpecialization = classTemplateSpecialization_;
 }
 
 void SymbolCreatorVisitor::Visit(CompileUnitNode& compileUnitNode)
@@ -64,7 +74,14 @@ void SymbolCreatorVisitor::Visit(ParameterNode& parameterNode)
 
 void SymbolCreatorVisitor::Visit(ClassNode& classNode)
 {
-    symbolTable.BeginClass(classNode);
+    if (&classNode == classInstanceNode)
+    {
+        symbolTable.BeginClassTemplateSpecialization(*classInstanceNode, classTemplateSpecialization);
+    }
+    else
+    {
+        symbolTable.BeginClass(classNode);
+    }
     int nt = classNode.TemplateParameters().Count();
     for (int i = 0; i < nt; ++i)
     {
@@ -79,7 +96,14 @@ void SymbolCreatorVisitor::Visit(ClassNode& classNode)
             member->Accept(*this);
         }
     }
-    symbolTable.EndClass();
+    if (&classNode == classInstanceNode)
+    {
+        symbolTable.EndClassTemplateSpecialization();
+    }
+    else
+    {
+        symbolTable.EndClass();
+    }
 }
 
 void SymbolCreatorVisitor::Visit(StaticConstructorNode& staticConstructorNode)

@@ -57,7 +57,7 @@ OperatorMangleMap::OperatorMangleMap()
     mangleMap[U"operator--"] = U"op_minusminus";
     mangleMap[U"operator+"] = U"op_plus";
     mangleMap[U"operator-"] = U"op_minus";
-    mangleMap[U"operator*"] = U"op_mul";
+    mangleMap[U"operator*"] = U"op_star";
     mangleMap[U"operator/"] = U"op_div";
     mangleMap[U"operator%"] = U"op_rem";
     mangleMap[U"operator&"] = U"op_and";
@@ -327,7 +327,7 @@ void FunctionSymbol::ComputeName()
 
 void FunctionSymbol::ComputeMangledName()
 {
-    if (GroupName() == U"main" || IsCDecl())
+    if (IsCDecl())
     {
         SetMangledName(GroupName());
         return;

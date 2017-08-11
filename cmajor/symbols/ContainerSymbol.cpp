@@ -46,7 +46,7 @@ void ContainerSymbol::Read(SymbolReader& reader)
     uint32_t n = reader.GetBinaryReader().ReadEncodedUInt();
     for (uint32_t i = 0; i < n; ++i)
     {
-        Symbol* symbol = reader.ReadSymbol();
+        Symbol* symbol = reader.ReadSymbol(this);
         AddMember(symbol);
     }
 }

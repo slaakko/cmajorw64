@@ -24,7 +24,7 @@ ClassTypeSymbol::ClassTypeSymbol(const Span& span_, const std::u32string& name_)
     TypeSymbol(SymbolType::classTypeSymbol, span_, name_), 
     baseClass(), flags(ClassTypeSymbolFlags::none), implementedInterfaces(), templateParameters(), memberVariables(), staticMemberVariables(), 
     staticConstructor(nullptr), defaultConstructor(nullptr), copyConstructor(nullptr), moveConstructor(nullptr), copyAssignment(nullptr), moveAssignment(nullptr), 
-    constructors(), destructor(nullptr), memberFunctions(), vmtPtrIndex(-1), irType(nullptr), vmtObjectType(nullptr)
+    constructors(), destructor(nullptr), memberFunctions(), vmtPtrIndex(-1), irType(nullptr), vmtObjectType(nullptr), staticObjectType(nullptr)
 {
 }
 
@@ -32,14 +32,14 @@ ClassTypeSymbol::ClassTypeSymbol(SymbolType symbolType_, const Span& span_, cons
     TypeSymbol(symbolType_, span_, name_),
     baseClass(), flags(ClassTypeSymbolFlags::none), implementedInterfaces(), templateParameters(), memberVariables(), staticMemberVariables(), 
     staticConstructor(nullptr), defaultConstructor(nullptr), copyConstructor(nullptr), moveConstructor(nullptr), copyAssignment(nullptr), moveAssignment(nullptr), 
-    constructors(), destructor(nullptr), memberFunctions(), vmtPtrIndex(-1), irType(nullptr), vmtObjectType(nullptr)
+    constructors(), destructor(nullptr), memberFunctions(), vmtPtrIndex(-1), irType(nullptr), vmtObjectType(nullptr), staticObjectType(nullptr)
 {
 }
 
 void ClassTypeSymbol::Write(SymbolWriter& writer)
 {
     TypeSymbol::Write(writer);
-    writer.GetBinaryWriter().Write(static_cast<uint8_t>(flags));
+    writer.GetBinaryWriter().Write(static_cast<uint8_t>(flags & ~ClassTypeSymbolFlags::layoutsComputed));
     if (IsClassTemplate())
     {
         uint32_t sizePos = writer.GetBinaryWriter().Pos();
@@ -125,6 +125,10 @@ void ClassTypeSymbol::Read(SymbolReader& reader)
         {
             GetSymbolTable()->AddPolymorphicClass(this);
         }
+        if (StaticConstructor())
+        {
+            GetSymbolTable()->AddClassHavingStaticConstructor(this);
+        }
         reader.AddClassType(this);
     }
 }
@@ -141,18 +145,17 @@ void ClassTypeSymbol::ReadAstNodes()
     GetSymbolTable()->MapNode(clsNode, this);
 }
 
-void ClassTypeSymbol::EmplaceType(TypeSymbol* typeSymbol_, int index)
+void ClassTypeSymbol::EmplaceType(TypeSymbol* typeSymbol, int index)
 {
     if (index == 0)
     {
-        Assert(typeSymbol_->GetSymbolType() == SymbolType::classTypeSymbol, "class type symbol expected");
-        baseClass = static_cast<ClassTypeSymbol*>(typeSymbol_);
+        Assert(typeSymbol->GetSymbolType() == SymbolType::classTypeSymbol, "class type symbol expected");
+        baseClass = static_cast<ClassTypeSymbol*>(typeSymbol);
     }
-    else 
+    else if (index >= 1)
     {
-        Assert(index >= 1 && index < implementedInterfaces.size(), "invalid interface type index");
-        Assert(typeSymbol_->GetSymbolType() == SymbolType::interfaceTypeSymbol, "interface type symbol expected");
-        InterfaceTypeSymbol* interfaceTypeSymbol = static_cast<InterfaceTypeSymbol*>(typeSymbol_);
+        Assert(typeSymbol->GetSymbolType() == SymbolType::interfaceTypeSymbol, "interface type symbol expected");
+        InterfaceTypeSymbol* interfaceTypeSymbol = static_cast<InterfaceTypeSymbol*>(typeSymbol);
         implementedInterfaces[index - 1] = interfaceTypeSymbol;
     }
 }
@@ -388,6 +391,11 @@ void ClassTypeSymbol::SetSpecialMemberFunctions()
     }
 }
 
+void ClassTypeSymbol::SetInitializedVar(MemberVariableSymbol* initializedVar_) 
+{ 
+    initializedVar.reset(initializedVar_); 
+}
+
 void ClassTypeSymbol::InitVmt()
 {
     if (IsVmtInitialized()) return;
@@ -599,10 +607,10 @@ void ClassTypeSymbol::InitImts()
     }
 }
 
-void ClassTypeSymbol::CreateObjectLayout()
+void ClassTypeSymbol::CreateLayouts()
 {
-    if (IsClassObjectLayoutComputed()) return;
-    SetClassObjectLayoutComputed();
+    if (IsLayoutsComputed()) return;
+    SetLayoutsComputed();
     if (baseClass)
     {
         objectLayout.push_back(baseClass);
@@ -626,6 +634,23 @@ void ClassTypeSymbol::CreateObjectLayout()
         memberVariable->SetLayoutIndex(objectLayout.size());
         objectLayout.push_back(memberVariable->GetType());
     }
+    if (!staticMemberVariables.empty() || StaticConstructor())
+    {
+        MemberVariableSymbol* initVar = new MemberVariableSymbol(GetSpan(), U"@initialized");
+        initVar->SetParent(this);
+        initVar->SetStatic();
+        initVar->SetType(GetSymbolTable()->GetTypeByName(U"bool"));
+        initVar->SetLayoutIndex(0);
+        SetInitializedVar(initVar);
+        staticLayout.push_back(GetSymbolTable()->GetTypeByName(U"bool"));
+        int ns = staticMemberVariables.size();
+        for (int i = 0; i < ns; ++i)
+        {
+            MemberVariableSymbol* staticMemberVariable = staticMemberVariables[i];
+            staticMemberVariable->SetLayoutIndex(staticLayout.size());
+            staticLayout.push_back(staticMemberVariable->GetType());
+        }
+    }
 }
 
 llvm::Type* ClassTypeSymbol::IrType(Emitter& emitter)
@@ -642,6 +667,17 @@ llvm::Type* ClassTypeSymbol::IrType(Emitter& emitter)
         irType = llvm::StructType::get(emitter.Context(), elementTypes);
     }
     return irType;
+}
+
+llvm::Constant* ClassTypeSymbol::CreateDefaultIrValue(Emitter& emitter)
+{
+    llvm::Type* irType = IrType(emitter);
+    std::vector<llvm::Constant*> arrayOfDefaults;
+    for (TypeSymbol* type : objectLayout)
+    {
+        arrayOfDefaults.push_back(type->CreateDefaultIrValue(emitter));
+    }
+    return llvm::ConstantStruct::get(llvm::cast<llvm::StructType>(irType), arrayOfDefaults);
 }
 
 const std::string& ClassTypeSymbol::VmtObjectName()
@@ -716,6 +752,49 @@ llvm::Value* ClassTypeSymbol::VmtObject(Emitter& emitter, bool create)
         vmtObjectGlobal->setInitializer(llvm::ConstantArray::get(vmtObjectType, vmtArray));
     }
     return vmtObject;
+}
+
+llvm::Value* ClassTypeSymbol::StaticObject(Emitter& emitter, bool create)
+{
+    if (staticLayout.empty()) return nullptr;
+    llvm::Constant* staticObject = emitter.Module()->getOrInsertGlobal(StaticObjectName(), StaticObjectType(emitter));
+    if (!IsStaticObjectCreated() && create)
+    {
+        SetStaticObjectCreated();
+        llvm::GlobalVariable* staticObjectGlobal = llvm::cast<llvm::GlobalVariable>(staticObject);
+        std::vector<llvm::Constant*> arrayOfStatics;
+        for (TypeSymbol* type : staticLayout)
+        {
+            arrayOfStatics.push_back(type->CreateDefaultIrValue(emitter));
+        }
+        staticObjectGlobal->setInitializer(llvm::ConstantStruct::get(StaticObjectType(emitter), arrayOfStatics));
+    }
+    return staticObject;
+}
+
+llvm::StructType* ClassTypeSymbol::StaticObjectType(Emitter& emitter)
+{
+    if (!staticObjectType)
+    {
+        std::vector<llvm::Type*> elementTypes;
+        int n = staticLayout.size();
+        for (int i = 0; i < n; ++i)
+        {
+            llvm::Type* elementType = staticLayout[i]->IrType(emitter);
+            elementTypes.push_back(elementType);
+        }
+        staticObjectType = llvm::StructType::get(emitter.Context(), elementTypes);
+    }
+    return staticObjectType;
+}
+
+const std::string& ClassTypeSymbol::StaticObjectName()
+{
+    if (staticObjectName.empty())
+    {
+        staticObjectName = "statics_" + ToUtf8(SimpleName()) + "_" + GetSha1MessageDigest(ToUtf8(FullNameWithSpecifiers()));
+    }
+    return staticObjectName;
 }
 
 } } // namespace cmajor::symbols

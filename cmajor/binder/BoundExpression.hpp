@@ -20,7 +20,8 @@ enum class BoundExpressionFlags : uint8_t
     none = 0, 
     argIsExplicitThisOrBasePtr = 1 << 0,
     bindToRvalueReference = 1 << 1,
-    virtualCall = 1 << 2
+    virtualCall = 1 << 2,
+    deref = 1 << 3
 };
 
 inline BoundExpressionFlags operator|(BoundExpressionFlags left, BoundExpressionFlags right)
@@ -37,6 +38,7 @@ class BoundExpression : public BoundNode
 {
 public:
     BoundExpression(const Span& span_, BoundNodeType boundNodeType_, TypeSymbol* type_);
+    virtual BoundExpression* Clone() = 0;
     virtual bool IsComplete() const { return true; }
     virtual bool IsLvalueExpression() const { return false; }
     virtual bool HasValue() const { return false; }
@@ -54,6 +56,7 @@ class BoundParameter : public BoundExpression
 {
 public:
     BoundParameter(ParameterSymbol* parameterSymbol_);
+    BoundExpression* Clone() override;
     void Load(Emitter& emitter, OperationFlags flags) override;
     void Store(Emitter& emitter, OperationFlags flags) override;
     void Accept(BoundNodeVisitor& visitor) override;
@@ -68,6 +71,7 @@ class BoundLocalVariable : public BoundExpression
 {
 public:
     BoundLocalVariable(LocalVariableSymbol* localVariableSymbol_);
+    BoundExpression* Clone() override;
     void Load(Emitter& emitter, OperationFlags flags) override;
     void Store(Emitter& emitter, OperationFlags flags) override;
     void Accept(BoundNodeVisitor& visitor) override;
@@ -82,6 +86,7 @@ class BoundMemberVariable : public BoundExpression
 {
 public:
     BoundMemberVariable(MemberVariableSymbol* memberVariableSymbol_);
+    BoundExpression* Clone() override;
     void Load(Emitter& emitter, OperationFlags flags) override;
     void Store(Emitter& emitter, OperationFlags flags) override;
     void Accept(BoundNodeVisitor& visitor) override;
@@ -101,6 +106,7 @@ class BoundConstant : public BoundExpression
 {
 public:
     BoundConstant(ConstantSymbol* constantSymbol_);
+    BoundExpression* Clone() override;
     void Load(Emitter& emitter, OperationFlags flags) override;
     void Store(Emitter& emitter, OperationFlags flags) override;
     void Accept(BoundNodeVisitor& visitor) override;
@@ -114,6 +120,7 @@ class BoundEnumConstant : public BoundExpression
 {
 public:
     BoundEnumConstant(EnumConstantSymbol* enumConstantSymbol_);
+    BoundExpression* Clone() override;
     void Load(Emitter& emitter, OperationFlags flags) override;
     void Store(Emitter& emitter, OperationFlags flags) override;
     void Accept(BoundNodeVisitor& visitor) override;
@@ -127,6 +134,7 @@ class BoundLiteral : public BoundExpression
 {
 public:
     BoundLiteral(std::unique_ptr<Value>&& value_, TypeSymbol* type_);
+    BoundExpression* Clone() override;
     void Load(Emitter& emitter, OperationFlags flags) override;
     void Store(Emitter& emitter, OperationFlags flags) override;
     void Accept(BoundNodeVisitor& visitor) override;
@@ -140,6 +148,7 @@ class BoundTemporary : public BoundExpression
 {
 public:
     BoundTemporary(std::unique_ptr<BoundExpression>&& rvalueExpr_, std::unique_ptr<BoundLocalVariable>&& backingStore_);
+    BoundExpression* Clone() override;
     void Load(Emitter& emitter, OperationFlags flags) override;
     void Store(Emitter& emitter, OperationFlags flags) override;
     void Accept(BoundNodeVisitor& visitor) override;
@@ -155,6 +164,7 @@ class BoundSizeOfExpression : public BoundExpression
 {
 public:
     BoundSizeOfExpression(const Span& span_, TypeSymbol* type_, TypeSymbol* pointerType_);
+    BoundExpression* Clone() override;
     void Load(Emitter& emitter, OperationFlags flags) override;
     void Store(Emitter& emitter, OperationFlags flags) override;
     void Accept(BoundNodeVisitor& visitor) override;
@@ -167,6 +177,7 @@ class BoundAddressOfExpression : public BoundExpression
 {
 public:
     BoundAddressOfExpression(std::unique_ptr<BoundExpression>&& subject_, TypeSymbol* type_);
+    BoundExpression* Clone() override;
     void Load(Emitter& emitter, OperationFlags flags) override;
     void Store(Emitter& emitter, OperationFlags flags) override;
     void Accept(BoundNodeVisitor& visitor) override;
@@ -180,12 +191,13 @@ class BoundDereferenceExpression : public BoundExpression
 {
 public:
     BoundDereferenceExpression(std::unique_ptr<BoundExpression>&& subject_, TypeSymbol* type_);
+    BoundExpression* Clone() override;
     void Load(Emitter& emitter, OperationFlags flags) override;
     void Store(Emitter& emitter, OperationFlags flags) override;
     void Accept(BoundNodeVisitor& visitor) override;
     std::string TypeString() const override { return "deference expression"; }
     bool IsLvalueExpression() const override { return true; }
-    BoundExpression* Subject() { return subject.get(); }
+    std::unique_ptr<BoundExpression>& Subject() { return subject; }
 private:
     std::unique_ptr<BoundExpression> subject;
 };
@@ -194,6 +206,7 @@ class BoundReferenceToPointerExpression : public BoundExpression
 {
 public:
     BoundReferenceToPointerExpression(std::unique_ptr<BoundExpression>&& subject_, TypeSymbol* type_);
+    BoundExpression* Clone() override;
     void Load(Emitter& emitter, OperationFlags flags) override;
     void Store(Emitter& emitter, OperationFlags flags) override;
     void Accept(BoundNodeVisitor& visitor) override;
@@ -206,6 +219,7 @@ class BoundFunctionCall : public BoundExpression
 {
 public:
     BoundFunctionCall(const Span& span_, FunctionSymbol* functionSymbol_);
+    BoundExpression* Clone() override;
     void Load(Emitter& emitter, OperationFlags flags) override;
     void Store(Emitter& emitter, OperationFlags flags) override;
     void Accept(BoundNodeVisitor& visitor) override;
@@ -226,6 +240,7 @@ class BoundConstructExpression : public BoundExpression
 {
 public:
     BoundConstructExpression(std::unique_ptr<BoundExpression>&& constructorCall_, TypeSymbol* resultType_);
+    BoundExpression* Clone() override;
     void Load(Emitter& emitter, OperationFlags flags) override;
     void Store(Emitter& emitter, OperationFlags flags) override;
     void Accept(BoundNodeVisitor& visitor) override;
@@ -239,6 +254,7 @@ class BoundConversion : public BoundExpression
 {
 public:
     BoundConversion(std::unique_ptr<BoundExpression>&& sourceExpr_, FunctionSymbol* conversionFun_);
+    BoundExpression* Clone() override;
     void Load(Emitter& emitter, OperationFlags flags) override;
     void Store(Emitter& emitter, OperationFlags flags) override;
     void Accept(BoundNodeVisitor& visitor) override;
@@ -249,10 +265,81 @@ private:
     FunctionSymbol* conversionFun;
 };
 
+class BoundIsExpression : public BoundExpression
+{
+public:
+    BoundIsExpression(std::unique_ptr<BoundExpression>&& expr_, ClassTypeSymbol* rightClassType_, TypeSymbol* boolType_);
+    BoundExpression* Clone() override;
+    void Load(Emitter& emitter, OperationFlags flags) override;
+    void Store(Emitter& emitter, OperationFlags flags) override;
+    void Accept(BoundNodeVisitor& visitor) override;
+    bool HasValue() const override { return true; }
+    std::string TypeString() const override { return "is expression"; }
+private:
+    std::unique_ptr<BoundExpression> expr;
+    ClassTypeSymbol* rightClassType;
+};
+
+class BoundAsExpression : public BoundExpression
+{
+public:
+    BoundAsExpression(std::unique_ptr<BoundExpression>&& expr_, ClassTypeSymbol* rightClassType_, std::unique_ptr<BoundLocalVariable>&& variable_);
+    BoundExpression* Clone() override;
+    void Load(Emitter& emitter, OperationFlags flags) override;
+    void Store(Emitter& emitter, OperationFlags flags) override;
+    void Accept(BoundNodeVisitor& visitor) override;
+    bool HasValue() const override { return true; }
+    std::string TypeString() const override { return "as expression"; }
+private:
+    std::unique_ptr<BoundExpression> expr;
+    ClassTypeSymbol* rightClassType;
+    std::unique_ptr<BoundLocalVariable> variable;
+};
+
+class BoundTypeNameExpression : public BoundExpression
+{
+public:
+    BoundTypeNameExpression(std::unique_ptr<BoundExpression>&& classPtr_, TypeSymbol* constCharPtrType_);
+    BoundExpression* Clone() override;
+    void Load(Emitter& emitter, OperationFlags flags) override;
+    void Store(Emitter& emitter, OperationFlags flags) override;
+    void Accept(BoundNodeVisitor& visitor) override;
+    bool HasValue() const override { return true; }
+private:
+    std::unique_ptr<BoundExpression> classPtr;
+};
+
+class BoundBitCast : public BoundExpression
+{
+public:
+    BoundBitCast(std::unique_ptr<BoundExpression>&& expr_, TypeSymbol* type_);
+    BoundExpression* Clone() override;
+    void Load(Emitter& emitter, OperationFlags flags) override;
+    void Store(Emitter& emitter, OperationFlags flags) override;
+    void Accept(BoundNodeVisitor& visitor) override;
+    bool HasValue() const override { return true; }
+private:
+    std::unique_ptr<BoundExpression> expr;
+};
+
+class BoundFunctionPtr : public BoundExpression
+{
+public:
+    BoundFunctionPtr(const Span& span_, FunctionSymbol* function_, TypeSymbol* type_);
+    BoundExpression* Clone() override;
+    void Load(Emitter& emitter, OperationFlags flags) override;
+    void Store(Emitter& emitter, OperationFlags flags) override;
+    void Accept(BoundNodeVisitor& visitor) override;
+    bool HasValue() const override { return true; }
+private:
+    FunctionSymbol* function;
+};
+
 class BoundTypeExpression : public BoundExpression
 {
 public:
     BoundTypeExpression(const Span& span_, TypeSymbol* type_);
+    BoundExpression* Clone() override;
     bool IsComplete() const override { return false; }
     void Load(Emitter& emitter, OperationFlags flags) override;
     void Store(Emitter& emitter, OperationFlags flags) override;
@@ -264,6 +351,7 @@ class BoundNamespaceExpression : public BoundExpression
 {
 public:
     BoundNamespaceExpression(const Span& span_, NamespaceSymbol* ns_);
+    BoundExpression* Clone() override;
     bool IsComplete() const override { return false; }
     void Load(Emitter& emitter, OperationFlags flags) override;
     void Store(Emitter& emitter, OperationFlags flags) override;
@@ -279,6 +367,7 @@ class BoundFunctionGroupExpression : public BoundExpression
 {
 public:
     BoundFunctionGroupExpression(const Span& span_, FunctionGroupSymbol* functionGroupSymbol_);
+    BoundExpression* Clone() override;
     bool IsComplete() const override { return false; }
     void Load(Emitter& emitter, OperationFlags flags) override;
     void Store(Emitter& emitter, OperationFlags flags) override;
@@ -303,6 +392,7 @@ class BoundMemberExpression : public BoundExpression
 {
 public:
     BoundMemberExpression(const Span& span_, std::unique_ptr<BoundExpression>&& classPtr_, std::unique_ptr<BoundExpression>&& member_);
+    BoundExpression* Clone() override;
     bool IsComplete() const override { return false; }
     void Load(Emitter& emitter, OperationFlags flags) override;
     void Store(Emitter& emitter, OperationFlags flags) override;

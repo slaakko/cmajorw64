@@ -65,8 +65,8 @@ void BoundCompoundStatement::AddStatement(std::unique_ptr<BoundStatement>&& stat
     statements.push_back(std::move(statement));
 }
 
-BoundReturnStatement::BoundReturnStatement(std::unique_ptr<BoundFunctionCall>&& returnFunctionCall_) : 
-    BoundStatement(returnFunctionCall_->GetSpan(), BoundNodeType::boundReturnStatement), returnFunctionCall(std::move(returnFunctionCall_))
+BoundReturnStatement::BoundReturnStatement(std::unique_ptr<BoundFunctionCall>&& returnFunctionCall_, const Span& span_) : 
+    BoundStatement(span_, BoundNodeType::boundReturnStatement), returnFunctionCall(std::move(returnFunctionCall_))
 {
 }
 

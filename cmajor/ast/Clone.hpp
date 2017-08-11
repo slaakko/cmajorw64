@@ -14,8 +14,11 @@ public:
     CloneContext();
     void SetInstantiateFunctionNode() { instantiateFunctionNode = true; }
     bool InstantiateFunctionNode() const { return instantiateFunctionNode; }
+    void SetInstantiateClassNode() { instantiateClassNode = true; }
+    bool InstantiateClassNode() const { return instantiateClassNode; }
 private:
     bool instantiateFunctionNode;
+    bool instantiateClassNode;
 };
 
 } } // namespace cmajor::ast

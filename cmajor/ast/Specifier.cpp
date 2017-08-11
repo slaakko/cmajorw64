@@ -161,4 +161,10 @@ std::string SpecifierStr(Specifiers specifiers)
     return s;
 }
 
+bool StaticConstructorSpecifiers(Specifiers specifiers)
+{
+    if ((specifiers & Specifiers::static_) == Specifiers::none) return false;
+    return true;
+}
+
 } } // namespace cmajor::ast

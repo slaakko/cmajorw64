@@ -12,6 +12,7 @@
 #include <cmajor/symbols/DerivedTypeSymbol.hpp>
 #include <cmajor/symbols/Exception.hpp>
 #include <cmajor/symbols/TemplateSymbol.hpp>
+#include <cmajor/symbols/TypedefSymbol.hpp>
 #include <cmajor/util/Unicode.hpp>
 
 namespace cmajor { namespace binder {
@@ -25,7 +26,7 @@ NamespaceTypeSymbol::NamespaceTypeSymbol(NamespaceSymbol* ns_) : TypeSymbol(Symb
 class TypeResolver : public Visitor
 {
 public:
-    TypeResolver(BoundCompileUnit& boundCompileUnit_, ContainerScope* containerScope_);
+    TypeResolver(BoundCompileUnit& boundCompileUnit_, ContainerScope* containerScope_, bool markExport_);
     TypeSymbol* GetType() { return type; }
     const TypeDerivationRec& DerivationRec() const { return derivationRec; }
     void Visit(BoolNode& boolNode) override;
@@ -49,19 +50,23 @@ public:
     void Visit(PointerNode& pointerNode) override;
     void Visit(ArrayNode& arrayNode) override;
     void Visit(IdentifierNode& identifierNode) override;
+    void Visit(TemplateIdNode& templateIdNode) override;
     void Visit(DotNode& dotNode) override;
 private:
     BoundCompileUnit& boundCompileUnit;
     SymbolTable& symbolTable;
     ContainerScope* containerScope;
+    ClassTemplateRepository& classTemplateRepository;
     TypeSymbol* type;
     TypeDerivationRec derivationRec;
     std::unique_ptr<NamespaceTypeSymbol> nsTypeSymbol;
+    bool markExport;
     void ResolveSymbol(Node& node, Symbol* symbol);
 };
 
-TypeResolver::TypeResolver(BoundCompileUnit& boundCompileUnit_, ContainerScope* containerScope_) : 
-    boundCompileUnit(boundCompileUnit_), symbolTable(boundCompileUnit.GetSymbolTable()), containerScope(containerScope_), type(nullptr), derivationRec(), nsTypeSymbol()
+TypeResolver::TypeResolver(BoundCompileUnit& boundCompileUnit_, ContainerScope* containerScope_, bool markExport_) : 
+    boundCompileUnit(boundCompileUnit_), symbolTable(boundCompileUnit.GetSymbolTable()), classTemplateRepository(boundCompileUnit.GetClassTemplateRepository()), containerScope(containerScope_), 
+    type(nullptr), derivationRec(), nsTypeSymbol(), markExport(markExport_)
 {
 }
 
@@ -193,20 +198,34 @@ void TypeResolver::ResolveSymbol(Node& node, Symbol* symbol)
     {
         type = static_cast<TypeSymbol*>(symbol);
     }
-    else if (symbol->IsBoundTemplateParameterSymbol())
-    {
-        BoundTemplateParameterSymbol* boundTemplateParameterSymbol = static_cast<BoundTemplateParameterSymbol*>(symbol);
-        type = boundTemplateParameterSymbol->GetType();
-    }
-    else if (symbol->GetSymbolType() == SymbolType::namespaceSymbol)
-    {
-        NamespaceSymbol* ns = static_cast<NamespaceSymbol*>(symbol);
-        nsTypeSymbol.reset(new NamespaceTypeSymbol(ns));
-        type = nsTypeSymbol.get();
-    }
     else
     {
-        throw Exception("symbol '" + ToUtf8(symbol->FullName()) + "' does not denote a type", node.GetSpan(), symbol->GetSpan());
+        switch (symbol->GetSymbolType())
+        {
+            case SymbolType::typedefSymbol:
+            {
+                TypedefSymbol* typedefSymbol = static_cast<TypedefSymbol*>(symbol);
+                type = typedefSymbol->GetType();
+                break;
+            }
+            case SymbolType::boundTemplateParameterSymbol:
+            {
+                BoundTemplateParameterSymbol* boundTemplateParameterSymbol = static_cast<BoundTemplateParameterSymbol*>(symbol);
+                type = boundTemplateParameterSymbol->GetType();
+                break;
+            }
+            case SymbolType::namespaceSymbol:
+            {
+                NamespaceSymbol* ns = static_cast<NamespaceSymbol*>(symbol);
+                nsTypeSymbol.reset(new NamespaceTypeSymbol(ns));
+                type = nsTypeSymbol.get();
+                break;
+            }
+            default:
+            {
+                throw Exception("symbol '" + ToUtf8(symbol->FullName()) + "' does not denote a type", node.GetSpan(), symbol->GetSpan());
+            }
+        }
     }
 }
 
@@ -233,6 +252,38 @@ void TypeResolver::Visit(IdentifierNode& identifierNode)
     {
         throw Exception("type symbol '" + ToUtf8(name) + "' not found", identifierNode.GetSpan());
     }
+}
+
+void TypeResolver::Visit(TemplateIdNode& templateIdNode)
+{
+    TypeSymbol* primaryTemplateType = ResolveType(templateIdNode.Primary(), boundCompileUnit, containerScope, markExport);
+    if (!primaryTemplateType->IsClassTypeSymbol())
+    {
+        throw Exception("class type symbol expected", templateIdNode.Primary()->GetSpan());
+    }
+    ClassTypeSymbol* classTemplate = static_cast<ClassTypeSymbol*>(primaryTemplateType);
+    if (!classTemplate->IsClassTemplate())
+    {
+        throw Exception("class template expected", templateIdNode.Primary()->GetSpan());
+    }
+    std::vector<TypeSymbol*> templateArgumentTypes;
+    int n = templateIdNode.TemplateArguments().Count();
+    for (int i = 0; i < n; ++i)
+    {
+        TypeSymbol* templateArgumentType = ResolveType(templateIdNode.TemplateArguments()[i], boundCompileUnit, containerScope, markExport);
+        templateArgumentTypes.push_back(templateArgumentType);
+    }
+    int m = classTemplate->TemplateParameters().size();
+    if (n < m)
+    {
+        classTemplateRepository.ResolveDefaultTemplateArguments(templateArgumentTypes, classTemplate, containerScope, templateIdNode.GetSpan());
+    }
+    ClassTemplateSpecializationSymbol* classTemplateSpecialization = symbolTable.MakeClassTemplateSpecialization(classTemplate, templateArgumentTypes, templateIdNode.GetSpan(), markExport);
+    if (!classTemplateSpecialization->IsBound())
+    {
+        classTemplateRepository.BindClassTemplateSpecialization(classTemplateSpecialization, containerScope, templateIdNode.GetSpan());
+    }
+    type = classTemplateSpecialization;
 }
 
 void TypeResolver::Visit(DotNode& dotNode)
@@ -264,9 +315,9 @@ void TypeResolver::Visit(DotNode& dotNode)
     }
 }
 
-TypeSymbol* ResolveType(Node* typeExprNode, BoundCompileUnit& boundCompileUnit, ContainerScope* containerScope)
+TypeSymbol* ResolveType(Node* typeExprNode, BoundCompileUnit& boundCompileUnit, ContainerScope* containerScope, bool markExport)
 {
-    TypeResolver typeResolver(boundCompileUnit, containerScope);
+    TypeResolver typeResolver(boundCompileUnit, containerScope, markExport);
     typeExprNode->Accept(typeResolver);
     TypeSymbol* type = typeResolver.GetType();
     if (type->IsInComplete())
@@ -276,7 +327,7 @@ TypeSymbol* ResolveType(Node* typeExprNode, BoundCompileUnit& boundCompileUnit, 
     TypeDerivationRec derivationRec = UnifyDerivations(typeResolver.DerivationRec(), type->DerivationRec());
     if (!derivationRec.derivations.empty())
     {
-        return boundCompileUnit.GetSymbolTable().MakeDerivedType(type->BaseType(), derivationRec, typeExprNode->GetSpan());
+        return boundCompileUnit.GetSymbolTable().MakeDerivedType(type->BaseType(), derivationRec, typeExprNode->GetSpan(), markExport);
     }
     return type;
 }

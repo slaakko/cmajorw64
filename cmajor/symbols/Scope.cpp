@@ -344,6 +344,14 @@ void FileScope::InstallAlias(ContainerScope* containerScope, AliasNode* aliasNod
     }
 }
 
+void FileScope::AddContainerScope(ContainerScope* containerScope)
+{
+    if (std::find(containerScopes.cbegin(), containerScopes.cend(), containerScope) == containerScopes.cend())
+    {
+        containerScopes.push_back(containerScope);
+    }
+}
+
 void FileScope::InstallNamespaceImport(ContainerScope* containerScope, NamespaceImportNode* namespaceImportNode)
 {
     Assert(containerScope, "container scope is null");

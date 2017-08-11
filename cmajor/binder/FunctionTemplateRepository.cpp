@@ -81,9 +81,14 @@ FunctionSymbol* FunctionTemplateRepository::Instantiate(FunctionSymbol* function
         Node* usingNode = functionTemplate->UsingNodes()[i];
         globalNs->AddMember(usingNode->Clone(cloneContext));
     }
-    std::u32string fullNsName = functionTemplate->Ns()->FullName();
-    if (!fullNsName.empty())
+    bool fileScopeAdded = false;
+    if (!functionTemplate->Ns()->IsGlobalNamespace())
     {
+        FileScope* primaryFileScope = new FileScope();
+        primaryFileScope->AddContainerScope(functionTemplate->Ns()->GetContainerScope());
+        boundCompileUnit.AddFileScope(primaryFileScope);
+        fileScopeAdded = true;
+        std::u32string fullNsName = functionTemplate->Ns()->FullName();
         std::vector<std::u32string> nsComponents = Split(fullNsName, '.');
         for (const std::u32string& nsComponent : nsComponents)
         {
@@ -121,6 +126,10 @@ FunctionSymbol* FunctionTemplateRepository::Instantiate(FunctionSymbol* function
     globalNs->Accept(typeBinder);
     StatementBinder statementBinder(boundCompileUnit);
     globalNs->Accept(statementBinder);
+    if (fileScopeAdded)
+    {
+        boundCompileUnit.RemoveLastFileScope();
+    }
     return functionSymbol;
 }
 

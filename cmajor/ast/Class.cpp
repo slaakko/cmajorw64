@@ -21,10 +21,13 @@ ClassNode::ClassNode(const Span& span_, Specifiers specifiers_, IdentifierNode* 
 Node* ClassNode::Clone(CloneContext& cloneContext) const
 {
     ClassNode* clone = new ClassNode(GetSpan(), specifiers, static_cast<IdentifierNode*>(id->Clone(cloneContext)));
-    int tn = templateParameters.Count();
-    for (int i = 0; i < tn; ++i)
+    if (!cloneContext.InstantiateClassNode())
     {
-        clone->AddTemplateParameter(static_cast<TemplateParameterNode*>(templateParameters[i]->Clone(cloneContext)));
+        int tn = templateParameters.Count();
+        for (int i = 0; i < tn; ++i)
+        {
+            clone->AddTemplateParameter(static_cast<TemplateParameterNode*>(templateParameters[i]->Clone(cloneContext)));
+        }
     }
     int bn = baseClassOrInterfaces.Count();
     for (int i = 0; i < bn; ++i)
@@ -198,6 +201,11 @@ void MemberInitializerNode::Read(AstReader& reader)
 }
 
 StaticConstructorNode::StaticConstructorNode(const Span& span_) : FunctionNode(NodeType::staticConstructorNode, span_, Specifiers::none, nullptr, U"@static_constructor"), initializers()
+{
+}
+
+StaticConstructorNode::StaticConstructorNode(const Span& span_, Specifiers specifiers_) : 
+    FunctionNode(NodeType::staticConstructorNode, span_, specifiers_, nullptr, U"@static_constructor"), initializers()
 {
 }
 

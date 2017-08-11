@@ -21,6 +21,7 @@
   <ItemGroup>
     <ClInclude Include="BasicTypeOperation.hpp" />
     <ClInclude Include="BasicTypeSymbol.hpp" />
+    <ClInclude Include="ClassTemplateSpecializationSymbol.hpp" />
     <ClInclude Include="ClassTypeSymbol.hpp" />
     <ClInclude Include="ConstantSymbol.hpp" />
     <ClInclude Include="ContainerSymbol.hpp" />
@@ -52,6 +53,7 @@
   <ItemGroup>
     <ClCompile Include="BasicTypeOperation.cpp" />
     <ClCompile Include="BasicTypeSymbol.cpp" />
+    <ClCompile Include="ClassTemplateSpecializationSymbol.cpp" />
     <ClCompile Include="ClassTypeSymbol.cpp" />
     <ClCompile Include="ConstantSymbol.cpp" />
     <ClCompile Include="ContainerSymbol.cpp" />

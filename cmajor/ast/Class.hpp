@@ -83,6 +83,7 @@ class StaticConstructorNode : public FunctionNode
 {
 public:
     StaticConstructorNode(const Span& span_);
+    StaticConstructorNode(const Span& span_, Specifiers specifiers_);
     Node* Clone(CloneContext& cloneContext) const override;
     void Accept(Visitor& visitor) override;
     void Write(AstWriter& writer) override;

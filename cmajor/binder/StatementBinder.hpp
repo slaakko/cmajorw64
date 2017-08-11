@@ -54,6 +54,13 @@ public:
     void Visit(TryStatementNode& tryStatementNode) override;
     void Visit(AssertStatementNode& assertStatementNode) override;
     void CompileStatement(Node* statementNode, bool setPostfix);
+    void SetCurrentClass(BoundClass* currentClass_) { currentClass = currentClass_; }
+    void SetCurrentFunction(BoundFunction* currentFunction_) { currentFunction = currentFunction_; }
+    void SetCurrentConstructor(ConstructorSymbol* currentConstructorSymbol_, ConstructorNode* currentConstructorNode_);
+    void SetCurrentDestructor(DestructorSymbol* currentDestructorSymbol_, DestructorNode* currentDestructorNode_);
+    void SetCurrentMemberFunction(MemberFunctionSymbol* currentMemberFunctionSymbol_, MemberFunctionNode* currentMemberFunctionNode_);
+    void SetContainerScope(ContainerScope* containerScope_) { containerScope = containerScope_; }
+    BoundStatement* ReleaseStatement() { return statement.release(); }
 private:
     BoundCompileUnit& boundCompileUnit;
     SymbolTable& symbolTable;
@@ -61,6 +68,8 @@ private:
     std::unique_ptr<BoundStatement> statement;
     BoundClass* currentClass;
     BoundFunction* currentFunction;
+    StaticConstructorSymbol* currentStaticConstructorSymbol;
+    StaticConstructorNode* currentStaticConstructorNode;
     ConstructorSymbol* currentConstructorSymbol;
     ConstructorNode* currentConstructorNode;
     DestructorSymbol* currentDestructorSymbol;

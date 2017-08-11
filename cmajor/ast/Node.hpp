@@ -62,6 +62,7 @@ public:
     virtual bool IsUnsignedTypeNode() const { return false; }
     virtual bool IsStatementNode() const { return false; }
     virtual bool IsConstraintNode() const { return false; }
+    virtual bool IsFunctionNode() const { return false; }
     const Span& GetSpan() const { return span; }
     Span& GetSpan() { return span; }
     const Node* Parent() const { return parent; }

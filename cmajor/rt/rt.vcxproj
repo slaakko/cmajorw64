@@ -157,19 +157,24 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="CallStack.hpp" />
     <ClInclude Include="Classes.hpp" />
     <ClInclude Include="Exception.hpp" />
     <ClInclude Include="InitDone.hpp" />
     <ClInclude Include="Memory.hpp" />
     <ClInclude Include="RtApi.hpp" />
     <ClInclude Include="Io.hpp" />
+    <ClInclude Include="Statics.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="CallStack.cpp" />
     <ClCompile Include="Classes.cpp" />
+    <ClCompile Include="DllMain.cpp" />
     <ClCompile Include="Exception.cpp" />
     <ClCompile Include="InitDone.cpp" />
     <ClCompile Include="Io.cpp" />
     <ClCompile Include="Memory.cpp" />
+    <ClCompile Include="Statics.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

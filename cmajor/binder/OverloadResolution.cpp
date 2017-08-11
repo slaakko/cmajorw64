@@ -251,7 +251,7 @@ bool FindConversions(BoundCompileUnit& boundCompileUnit, FunctionSymbol* functio
         {
             if (i == 0)
             {
-                if (targetType->IsConstType())
+                if (targetType->IsConstType() && targetType->PointerCount() <= 1)
                 {
                     functionMatch.cannotAssignToConstObject = true;
                     return false;
@@ -682,6 +682,10 @@ std::unique_ptr<BoundFunctionCall> SelectViableFunction(const std::unordered_set
             {
                 bestFun = boundCompileUnit.Instantiate(bestFun, bestMatch.templateParameterMap, span);
             }
+            else if (bestFun->Parent()->GetSymbolType() == SymbolType::classTemplateSpecializationSymbol)
+            {
+                boundCompileUnit.Instantiate(bestFun, containerScope, span);
+            }
             return CreateBoundFunctionCall(bestFun, arguments, boundCompileUnit, boundFunction, bestMatch, span);
         }
         else
@@ -707,6 +711,10 @@ std::unique_ptr<BoundFunctionCall> SelectViableFunction(const std::unordered_set
         if (singleBest->IsFunctionTemplate())
         {
             singleBest = boundCompileUnit.Instantiate(singleBest, bestMatch.templateParameterMap, span);
+        }
+        else if (singleBest->Parent()->GetSymbolType() == SymbolType::classTemplateSpecializationSymbol)
+        {
+            boundCompileUnit.Instantiate(singleBest, containerScope, span);
         }
         return CreateBoundFunctionCall(singleBest, arguments, boundCompileUnit, boundFunction, bestMatch, span);
     }

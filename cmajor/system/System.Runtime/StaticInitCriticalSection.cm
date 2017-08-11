@@ -1,0 +1,20 @@
+// =================================
+// Copyright (c) 2017 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+namespace System.Runtime
+{
+    public class StaticInitCriticalSection
+    {
+        public nothrow StaticInitCriticalSection(uint staticClassId_) : staticClassId(staticClassId_)
+        {
+            RtBeginStaticInitCriticalSection(staticClassId);
+        }
+        public ~StaticInitCriticalSection()
+        {
+            RtEndStaticInitCriticalSection(staticClassId);
+        }
+        private uint staticClassId;
+    }
+}

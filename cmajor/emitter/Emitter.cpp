@@ -141,6 +141,12 @@ public:
     void Visit(BoundFunctionCall& boundFunctionCall) override;
     void Visit(BoundConversion& boundConversion) override;
     void Visit(BoundConstructExpression& boundConstructExpression) override;
+    void Visit(BoundIsExpression& boundIsExpression) override;
+    void Visit(BoundAsExpression& boundAsExpression) override;
+    void Visit(BoundTypeNameExpression& boundTypeNameExpression) override;
+    void Visit(BoundBitCast& boundBitCast) override;
+    void Visit(BoundFunctionPtr& boundFunctionPtr) override;
+    llvm::Value* GetGlobalStringPtr(int stringId) override;
 private:
     EmittingContext& emittingContext;
     SymbolTable* symbolTable;
@@ -151,14 +157,25 @@ private:
     llvm::Function* function;
     llvm::BasicBlock* trueBlock;
     llvm::BasicBlock* falseBlock;
+    BoundCompileUnit* compileUnit;
     BoundClass* currentClass;
+    BoundFunction* currentFunction;
+    BoundCompoundStatement* currentBlock;
     std::stack<BoundClass*> classStack;
+    std::vector<BoundCompoundStatement*> blocks;
+    std::unordered_map<BoundCompoundStatement*, std::vector<std::unique_ptr<BoundFunctionCall>>> blockDestructionMap;
+    std::unordered_map<int, llvm::Value*> stringMap;
+    int prevLineNumber;
+    void ExitBlocks(BoundCompoundStatement* targetBlock);
+    void CreateExitFunctionCall();
+    void SetLineNumber(int32_t lineNumber) override;
 };
 
 Emitter::Emitter(EmittingContext& emittingContext_, const std::string& compileUnitModuleName_) :
     cmajor::ir::Emitter(emittingContext_.GetEmittingContextImpl()->Context()), emittingContext(emittingContext_), symbolTable(nullptr),
-    compileUnitModule(new llvm::Module(compileUnitModuleName_, emittingContext.GetEmittingContextImpl()->Context())), builder(Builder()), stack(Stack()), context(emittingContext.GetEmittingContextImpl()->Context()),
-    function(nullptr), trueBlock(nullptr), falseBlock(nullptr), currentClass(nullptr)
+    compileUnitModule(new llvm::Module(compileUnitModuleName_, emittingContext.GetEmittingContextImpl()->Context())), builder(Builder()), stack(Stack()), 
+    context(emittingContext.GetEmittingContextImpl()->Context()), compileUnit(nullptr), function(nullptr), trueBlock(nullptr), falseBlock(nullptr), 
+    currentClass(nullptr), currentFunction(nullptr), currentBlock(nullptr), prevLineNumber(0)
 {
     compileUnitModule->setTargetTriple(emittingContext.GetEmittingContextImpl()->TargetTriple());
     compileUnitModule->setDataLayout(emittingContext.GetEmittingContextImpl()->DataLayout());
@@ -168,6 +185,7 @@ Emitter::Emitter(EmittingContext& emittingContext_, const std::string& compileUn
 
 void Emitter::Visit(BoundCompileUnit& boundCompileUnit)
 {
+    compileUnit = &boundCompileUnit;
     symbolTable = &boundCompileUnit.GetSymbolTable();
     int n = boundCompileUnit.BoundNodes().size();
     for (int i = 0; i < n; ++i)
@@ -225,6 +243,8 @@ void Emitter::Visit(BoundClass& boundClass)
 void Emitter::Visit(BoundFunction& boundFunction)
 {
     if (!boundFunction.Body()) return;
+    currentFunction = &boundFunction;
+    prevLineNumber = 0;
     FunctionSymbol* functionSymbol = boundFunction.GetFunctionSymbol();
     llvm::FunctionType* functionType = functionSymbol->IrType(*this);
     function = llvm::cast<llvm::Function>(compileUnitModule->getOrInsertFunction(ToUtf8(functionSymbol->MangledName()), functionType));
@@ -232,6 +252,15 @@ void Emitter::Visit(BoundFunction& boundFunction)
     {
         function->setLinkage(llvm::GlobalValue::LinkageTypes::WeakODRLinkage);
     }
+    if (functionSymbol->DontThrow())
+    {
+        function->addFnAttr(llvm::Attribute::NoUnwind);
+    }
+    else
+    {
+        function->addFnAttr(llvm::Attribute::UWTable);
+    }
+    SetFunction(function);
     llvm::BasicBlock* entryBlock = llvm::BasicBlock::Create(context, "entry", function);
     builder.SetInsertPoint(entryBlock);
     if (currentClass)
@@ -240,6 +269,10 @@ void Emitter::Visit(BoundFunction& boundFunction)
         if (!classTypeSymbol->IsVmtObjectCreated())
         {
             classTypeSymbol->VmtObject(*this, true);
+        }
+        if (!classTypeSymbol->IsStaticObjectCreated())
+        {
+            classTypeSymbol->StaticObject(*this, true);
         }
     }
     int np = functionSymbol->Parameters().size();
@@ -255,6 +288,22 @@ void Emitter::Visit(BoundFunction& boundFunction)
         LocalVariableSymbol* localVariable = functionSymbol->LocalVariables()[i];
         llvm::AllocaInst* allocaInst = builder.CreateAlloca(localVariable->GetType()->IrType(*this));
         localVariable->SetIrObject(allocaInst);
+    }
+    if (!functionSymbol->DontThrow())
+    {
+        int funId = compileUnit->Install(ToUtf8(functionSymbol->FullName()));
+        int sfpId = compileUnit->Install(compileUnit->SourceFilePath());
+        llvm::Value* funValue = GetGlobalStringPtr(funId);
+        llvm::Value* sfpValue = GetGlobalStringPtr(sfpId);
+        std::vector<llvm::Type*> enterFunctionParamTypes;
+        enterFunctionParamTypes.push_back(builder.getInt8PtrTy());
+        enterFunctionParamTypes.push_back(builder.getInt8PtrTy());
+        llvm::FunctionType* enterFunctionType = llvm::FunctionType::get(builder.getVoidTy(), enterFunctionParamTypes, false);
+        llvm::Function* enterFunction = llvm::cast<llvm::Function>(compileUnitModule->getOrInsertFunction("RtEnterFunction", enterFunctionType));
+        ArgVector enterFunctionArgs;
+        enterFunctionArgs.push_back(funValue);
+        enterFunctionArgs.push_back(sfpValue);
+        builder.CreateCall(enterFunction, enterFunctionArgs);
     }
     auto it = function->args().begin();
     for (int i = 0; i < np; ++i)
@@ -272,7 +321,16 @@ void Emitter::Visit(BoundFunction& boundFunction)
     }
     if (!lastStatement || lastStatement->GetBoundNodeType() != BoundNodeType::boundReturnStatement)
     {
-        builder.CreateRetVoid();
+        CreateExitFunctionCall();
+        if (functionSymbol->ReturnType() && functionSymbol->ReturnType()->GetSymbolType() != SymbolType::voidTypeSymbol)
+        {
+            llvm::Value* defaultValue = functionSymbol->ReturnType()->CreateDefaultIrValue(*this);
+            builder.CreateRet(defaultValue);
+        }
+        else
+        {
+            builder.CreateRetVoid();
+        }
     }
 }
 
@@ -282,18 +340,55 @@ void Emitter::Visit(BoundSequenceStatement& boundSequenceStatement)
     boundSequenceStatement.Second()->Accept(*this);
 }
 
+void Emitter::ExitBlocks(BoundCompoundStatement* targetBlock)
+{
+    int n = blocks.size();
+    for (int i = n - 1; i >= 0; --i)
+    {
+        BoundCompoundStatement* block = blocks[i];
+        if (block == targetBlock)
+        {
+            break;
+        }
+        auto it = blockDestructionMap.find(block);
+        if (it != blockDestructionMap.cend())
+        {
+            std::vector<std::unique_ptr<BoundFunctionCall>>& destructorCallVec = it->second;
+            int nd = destructorCallVec.size();
+            for (int i = nd - 1; i >= 0; --i)
+            {
+                std::unique_ptr<BoundFunctionCall>& destructorCall = destructorCallVec[i];
+                if (destructorCall)
+                {
+                    destructorCall->Accept(*this);
+                }
+            }
+        }
+    }
+}
+
 void Emitter::Visit(BoundCompoundStatement& boundCompoundStatement)
 {
+    BoundCompoundStatement* prevBlock = currentBlock;
+    currentBlock = &boundCompoundStatement;
+    blockDestructionMap[currentBlock] = std::vector<std::unique_ptr<BoundFunctionCall>>();
+    blocks.push_back(currentBlock);
+    SetLineNumber(boundCompoundStatement.GetSpan().LineNumber());
     int n = boundCompoundStatement.Statements().size();
     for (int i = 0; i < n; ++i)
     {
         BoundStatement* boundStatement = boundCompoundStatement.Statements()[i].get();
         boundStatement->Accept(*this);
     }
+    ExitBlocks(prevBlock);
+    blocks.pop_back();
+    currentBlock = prevBlock;
 }
 
 void Emitter::Visit(BoundReturnStatement& boundReturnStatement)
 {
+    ExitBlocks(nullptr);
+    CreateExitFunctionCall();
     BoundFunctionCall* returnFunctionCall = boundReturnStatement.ReturnFunctionCall();
     if (returnFunctionCall)
     {
@@ -304,6 +399,17 @@ void Emitter::Visit(BoundReturnStatement& boundReturnStatement)
     else
     {
         builder.CreateRetVoid();
+    }
+    BoundCompoundStatement* body = currentFunction->Body();
+    BoundStatement* lastStatement = nullptr;
+    if (!body->Statements().empty())
+    {
+        lastStatement = body->Statements().back().get();
+    }
+    if (lastStatement && lastStatement != &boundReturnStatement)
+    {
+        llvm::BasicBlock* continueBlock = llvm::BasicBlock::Create(context, "continue", function);
+        builder.SetInsertPoint(continueBlock);
     }
 }
 
@@ -415,6 +521,36 @@ void Emitter::Visit(BoundGotoStatement& boundGotoStatement)
 void Emitter::Visit(BoundConstructionStatement& boundConstructionStatement)
 {
     boundConstructionStatement.ConstructorCall()->Accept(*this);
+    int n = boundConstructionStatement.ConstructorCall()->Arguments().size();
+    if (n > 0)
+    {
+        const std::unique_ptr<BoundExpression>& firstArgument = boundConstructionStatement.ConstructorCall()->Arguments()[0];
+        TypeSymbol* firstArgumentBaseType = firstArgument->GetType()->BaseType();
+        if (firstArgumentBaseType->IsClassTypeSymbol())
+        {
+            if (firstArgument->GetType()->IsPointerType() && firstArgument->GetType()->RemovePointer(boundConstructionStatement.GetSpan())->IsClassTypeSymbol())
+            {
+                ClassTypeSymbol* classType = static_cast<ClassTypeSymbol*>(firstArgumentBaseType);
+                if (classType->Destructor())
+                {
+                    std::unique_ptr<BoundExpression> classPtrArgument(firstArgument->Clone());
+                    std::unique_ptr<BoundFunctionCall> destructorCall(new BoundFunctionCall(boundConstructionStatement.GetSpan(), classType->Destructor()));
+                    destructorCall->AddArgument(std::move(classPtrArgument));
+                    Assert(currentBlock, "current block not set");
+                    auto it = blockDestructionMap.find(currentBlock);
+                    if (it != blockDestructionMap.cend())
+                    {
+                        std::vector<std::unique_ptr<BoundFunctionCall>>& destructorCallVec = it->second;
+                        destructorCallVec.push_back(std::move(destructorCall));
+                    }
+                    else
+                    {
+                        Assert(false, "block destruction not found");
+                    }
+                }
+            }
+        }
+    }
 }
 
 void Emitter::Visit(BoundAssignmentStatement& boundAssignmentStatement)
@@ -527,6 +663,70 @@ void Emitter::Visit(BoundConversion& boundConversion)
 void Emitter::Visit(BoundConstructExpression& boundConstructExpression)
 {
     boundConstructExpression.Load(*this, OperationFlags::none);
+}
+
+void Emitter::Visit(BoundIsExpression& boundIsExpression)
+{
+    boundIsExpression.Load(*this, OperationFlags::none);
+}
+
+void Emitter::Visit(BoundAsExpression& boundAsExpression)
+{
+    boundAsExpression.Load(*this, OperationFlags::none);
+}
+
+void Emitter::Visit(BoundTypeNameExpression& boundTypeNameExpression)
+{
+    boundTypeNameExpression.Load(*this, OperationFlags::none);
+}
+
+void Emitter::Visit(BoundBitCast& boundBitCast)
+{
+    boundBitCast.Load(*this, OperationFlags::none);
+}
+
+void Emitter::Visit(BoundFunctionPtr& boundFunctionPtr)
+{
+    boundFunctionPtr.Load(*this, OperationFlags::none);
+}
+
+llvm::Value* Emitter::GetGlobalStringPtr(int stringId)
+{
+    auto it = stringMap.find(stringId);
+    if (it != stringMap.cend())
+    {
+        return it->second;
+    }
+    else
+    {
+        llvm::Value* stringValue = builder.CreateGlobalStringPtr(compileUnit->GetString(stringId));
+        stringMap[stringId] = stringValue;
+        return stringValue;
+    }
+}
+
+void Emitter::CreateExitFunctionCall()
+{
+    if (currentFunction->GetFunctionSymbol()->DontThrow()) return;
+    std::vector<llvm::Type*> exitFunctionParamTypes;
+    llvm::FunctionType* exitFunctionType = llvm::FunctionType::get(builder.getVoidTy(), exitFunctionParamTypes, false);
+    llvm::Function* exitFunction = llvm::cast<llvm::Function>(compileUnitModule->getOrInsertFunction("RtExitFunction", exitFunctionType));
+    ArgVector exitFunctionArgs;
+    builder.CreateCall(exitFunction, exitFunctionArgs);
+}
+
+void Emitter::SetLineNumber(int32_t lineNumber)
+{
+    if (currentFunction->GetFunctionSymbol()->DontThrow()) return;
+    if (prevLineNumber == lineNumber) return;
+    prevLineNumber = lineNumber;
+    std::vector<llvm::Type*> setLineNumberFunctionParamTypes;
+    setLineNumberFunctionParamTypes.push_back(builder.getInt32Ty());
+    llvm::FunctionType* setLineNumberFunctionType = llvm::FunctionType::get(builder.getVoidTy(), setLineNumberFunctionParamTypes, false);
+    llvm::Function* setLineNumberFunction = llvm::cast<llvm::Function>(compileUnitModule->getOrInsertFunction("RtSetLineNumber", setLineNumberFunctionType));
+    ArgVector setLineNumberFunctionArgs;
+    setLineNumberFunctionArgs.push_back(builder.getInt32(lineNumber));
+    builder.CreateCall(setLineNumberFunction, setLineNumberFunctionArgs);
 }
 
 void GenerateCode(EmittingContext& emittingContext, BoundCompileUnit& boundCompileUnit)

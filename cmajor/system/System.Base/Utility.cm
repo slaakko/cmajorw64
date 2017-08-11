@@ -1,0 +1,178 @@
+﻿// =================================
+// Copyright (c) 2017 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+namespace System
+{
+    public nothrow inline ulong Align(ulong n, ulong alignment)
+    {
+        #assert(alignment > 0u);
+        return (n + alignment - 1u) & -alignment;
+    }
+
+    public nothrow int StrLen(const char* s)
+    {
+        int len = 0;
+        if (s != null)
+        {
+            while (*s != '\0')
+            {
+                ++len;
+                ++s;
+            }
+        }
+        return len;
+    }
+    
+    public nothrow int StrLen(const wchar* s)
+    {
+        int len = 0;
+        if (s != null)
+        {
+            while (*s != '\0')
+            {
+                ++len;
+                ++s;
+            }
+        }
+        return len;
+    }
+    
+    public nothrow int StrLen(const uchar* s)
+    {
+        int len = 0;
+        if (s != null)
+        {
+            while (*s != '\0')
+            {
+                ++len;
+                ++s;
+            }
+        }
+        return len;
+    }
+
+    public nothrow void StrCopy(char* buf, const char* from)
+    {
+        #assert(buf != null);
+        if (from != null)
+        {
+            while (*from != '\0')
+            {
+                *buf++ = *from++;
+            }
+        }
+        *buf = '\0';
+    }
+    
+    public nothrow void StrCopy(wchar* buf, const wchar* from)
+    {
+        #assert(buf != null);
+        if (from != null)
+        {
+            while (*from != '\0')
+            {
+                *buf++ = *from++;
+            }
+        }
+        *buf = '\0';
+    }
+    
+    public nothrow void StrCopy(uchar* buf, const uchar* from)
+    {
+        #assert(buf != null);
+        if (from != null)
+        {
+            while (*from != '\0')
+            {
+                *buf++ = *from++;
+            }
+        }
+        *buf = '\0';
+    }
+
+    public nothrow int StrCopy(char* buf, const char* from, int length)
+    {
+        int resultLen = 0;
+        #assert(buf != null);
+        if (from != null)
+        {
+            while (resultLen < length)
+            {
+                if (*from == '\0')
+                {
+                    break;
+                }
+                *buf++ = *from++;
+                ++resultLen;
+            }
+        }
+        *buf = '\0';
+        return resultLen;
+    }
+
+    public nothrow int StrCopy(wchar* buf, const wchar* from, int length)
+    {
+        int resultLen = 0;
+        #assert(buf != null);
+        if (from != null)
+        {
+            while (resultLen < length)
+            {
+                if (*from == '\0')
+                {
+                    break;
+                }
+                *buf++ = *from++;
+                ++resultLen;
+            }
+        }
+        *buf = '\0';
+        return resultLen;
+    }
+
+    public nothrow int StrCopy(uchar* buf, const uchar* from, int length)
+    {
+        int resultLen = 0;
+        #assert(buf != null);
+        if (from != null)
+        {
+            while (resultLen < length)
+            {
+                if (*from == '\0')
+                {
+                    break;
+                }
+                *buf++ = *from++;
+                ++resultLen;
+            }
+        }
+        *buf = '\0';
+        return resultLen;
+    }
+
+    public nothrow ulong MemGrow(ulong size)
+    {
+        if (size < 8u)
+        {
+            return 8u;
+        }
+        else if (size < 64u)
+        {
+            return 64u;
+        }
+        else if (size < 512u)
+        {
+            return 512u;
+        }
+        else if (size < 4096u)
+        {
+            return 4096u;
+        }
+        else
+        {
+            return 2u * Align(size, 4096u);
+        }
+    }
+}

@@ -57,7 +57,15 @@ Node* FunctionNode::Clone(CloneContext& cloneContext) const
     }
     if (body)
     {
-        clone->SetBody(static_cast<CompoundStatementNode*>(body->Clone(cloneContext)));
+        if (cloneContext.InstantiateClassNode())
+        {
+            CloneContext bodyCloneContext;
+            clone->SetBodySource(static_cast<CompoundStatementNode*>(body->Clone(bodyCloneContext)));
+        }
+        else
+        {
+            clone->SetBody(static_cast<CompoundStatementNode*>(body->Clone(cloneContext)));
+        }
     }
     return clone;
 }
@@ -83,7 +91,15 @@ void FunctionNode::CloneContent(FunctionNode* clone, CloneContext& cloneContext)
     }
     if (body)
     {
-        clone->SetBody(static_cast<CompoundStatementNode*>(body->Clone(cloneContext)));
+        if (cloneContext.InstantiateClassNode())
+        {
+            CloneContext bodyCloneContext;
+            clone->SetBodySource(static_cast<CompoundStatementNode*>(body->Clone(bodyCloneContext)));
+        }
+        else
+        {
+            clone->SetBody(static_cast<CompoundStatementNode*>(body->Clone(cloneContext)));
+        }
     }
 }
 

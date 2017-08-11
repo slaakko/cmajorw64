@@ -136,7 +136,7 @@ public:
     void SetWeakOdrLinkage() { SetFlag(FunctionSymbolFlags::weakOdrLinkage); }
     bool IsTemplateSpecialization() const { return GetFlag(FunctionSymbolFlags::templateSpecialization); }
     void SetTemplateSpecialization() { SetFlag(FunctionSymbolFlags::templateSpecialization); }
-    virtual bool DontThrow() const { return IsNothrow(); }
+    virtual bool DontThrow() const { return IsNothrow() || IsBasicTypeOperation(); }
     FunctionSymbolFlags GetFunctionSymbolFlags() const { return flags; }
     bool GetFlag(FunctionSymbolFlags flag) const { return (flags & flag) != FunctionSymbolFlags::none; }
     void SetFlag(FunctionSymbolFlags flag) { flags = flags | flag; }
@@ -217,7 +217,8 @@ class FunctionGroupTypeSymbol : public TypeSymbol
 public:
     FunctionGroupTypeSymbol(FunctionGroupSymbol* functionGroup_);
     bool IsExportSymbol() const override { return false; }
-    llvm::Type* IrType(Emitter& emitter) override { return nullptr; }
+    llvm::Type* IrType(Emitter& emitter) override { Assert(false, "tried to get ir type of function group type"); return nullptr; }
+    llvm::Constant* CreateDefaultIrValue(Emitter& emitter) override { Assert(false, "tried to get default ir value of function group type"); return nullptr; }
     const FunctionGroupSymbol* FunctionGroup() const { return functionGroup; }
 private:
     FunctionGroupSymbol* functionGroup;
@@ -228,7 +229,8 @@ class MemberExpressionTypeSymbol : public TypeSymbol
 public:
     MemberExpressionTypeSymbol(const Span& span_, const std::u32string& name_, void* boundMemberExpression_);
     bool IsExportSymbol() const override { return false; }
-    llvm::Type* IrType(Emitter& emitter) override { return nullptr; }
+    llvm::Type* IrType(Emitter& emitter) override { Assert(false, "tried to get ir type of member expression type");  return nullptr; }
+    llvm::Constant* CreateDefaultIrValue(Emitter& emitter) override { Assert(false, "tried to get default ir value of member expression type"); return nullptr; }
     std::string TypeString() const override { return "member_expression_type"; }
     void* BoundMemberExpression() const { return boundMemberExpression; }
 private:

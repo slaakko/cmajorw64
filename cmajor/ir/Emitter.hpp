@@ -25,12 +25,17 @@ public:
     void SaveObjectPointer(llvm::Value* objectPointer_);
     void ResetObjectPointer() { objectPointer = nullptr; }
     llvm::Value* GetObjectPointer() { return objectPointer; }
+    void SetFunction(llvm::Function* function_) { function = function_;  }
+    llvm::Function* Function() { return function; }
+    virtual llvm::Value* GetGlobalStringPtr(int stringId) = 0;
+    virtual void SetLineNumber(int32_t lineNumber) = 0;
 private:
     llvm::LLVMContext& context;
     llvm::IRBuilder<> builder;
     llvm::Module* module;
     ValueStack stack;
     llvm::Value* objectPointer;
+    llvm::Function* function;
 };
 
 } } // namespace cmajor::ir

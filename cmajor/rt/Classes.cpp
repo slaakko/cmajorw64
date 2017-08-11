@@ -4,6 +4,7 @@
 // =================================
 
 #include <cmajor/rt/Classes.hpp>
+#include <cmajor/rt/Statics.hpp>
 #include <cmajor/util/System.hpp>
 #include <cmajor/util/BinaryReader.hpp>
 #include <cmajor/util/Path.hpp>
@@ -34,9 +35,8 @@ struct ClassInfo
     uint64_t id;
 };
 
-std::vector<std::unique_ptr<ClassInfo>> ReadClasses(const std::string& classFilePath)
+void ReadClasses(const std::string& classFilePath, std::vector<std::unique_ptr<ClassInfo>>& classInfos, std::vector<uint32_t>& staticClassIds)
 {
-    std::vector<std::unique_ptr<ClassInfo>> classes;
     BinaryReader reader(classFilePath);
     uint32_t n = reader.ReadEncodedUInt();
     for (uint32_t i = 0; i < n; ++i)
@@ -44,9 +44,14 @@ std::vector<std::unique_ptr<ClassInfo>> ReadClasses(const std::string& classFile
         uint32_t typeId = reader.ReadEncodedUInt();
         std::string vmtObjectName = reader.ReadUtf8String();
         uint32_t baseTypeId = reader.ReadEncodedUInt();
-        classes.push_back(std::unique_ptr<ClassInfo>(new ClassInfo(typeId, vmtObjectName, baseTypeId)));
+        classInfos.push_back(std::unique_ptr<ClassInfo>(new ClassInfo(typeId, vmtObjectName, baseTypeId)));
     }
-    return classes;
+    uint32_t ns = reader.ReadEncodedUInt();
+    for (uint32_t i = 0; i < ns; ++i)
+    {
+        uint32_t typeId = reader.ReadEncodedUInt();
+        staticClassIds.push_back(typeId);
+    }
 }
 
 void ResolveBaseClasses(const std::vector<std::unique_ptr<ClassInfo>>& classes)
@@ -201,13 +206,16 @@ void InitClasses()
     {
         throw std::runtime_error("error assigning class id's: class file '" + GetFullPath(classFilePath.generic_string()) + "' does not exist");
     }
-    std::vector<std::unique_ptr<ClassInfo>> classes = ReadClasses(GetFullPath(classFilePath.generic_string()));
-    ResolveBaseClasses(classes);
-    AssignLevels(classes);
-    std::vector<ClassInfo*> classesByPriority = GetClassesByPriority(classes);
+    std::vector<std::unique_ptr<ClassInfo>> polyMorphicClasses;
+    std::vector<uint32_t> staticClassIds;
+    ReadClasses(GetFullPath(classFilePath.generic_string()), polyMorphicClasses, staticClassIds);
+    ResolveBaseClasses(polyMorphicClasses);
+    AssignLevels(polyMorphicClasses);
+    std::vector<ClassInfo*> classesByPriority = GetClassesByPriority(polyMorphicClasses);
     AssignKeys(classesByPriority);
     AssignClassIds(classesByPriority);
     SetClassIdsToVmts(classesByPriority);
+    AllocateMutexes(staticClassIds);
 }
 
 void DoneClasses()

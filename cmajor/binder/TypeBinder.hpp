@@ -55,12 +55,15 @@ public:
     void Visit(ConstantNode& constantNode) override;
     void Visit(EnumTypeNode& enumTypeNode) override;
     void Visit(EnumConstantNode& enumConstantNode) override;
+
+    void SetContainerScope(ContainerScope* containerScope_) { containerScope = containerScope_; }
 private:
     BoundCompileUnit& boundCompileUnit;
     SymbolTable& symbolTable;
     ContainerScope* containerScope;
     std::vector<Node*> usingNodes;
     EnumTypeSymbol* enumType;
+    bool markExport;
 };
 
 } } // namespace cmajor::binder

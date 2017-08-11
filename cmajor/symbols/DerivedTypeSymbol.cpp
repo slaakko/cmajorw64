@@ -440,22 +440,22 @@ int DerivedTypeSymbol::PointerCount() const
 
 TypeSymbol* DerivedTypeSymbol::PlainType(const Span& span) 
 {
-    return GetSymbolTable()->MakeDerivedType(baseType, MakePlainDerivationRec(derivationRec), span);
+    return GetSymbolTable()->MakeDerivedType(baseType, MakePlainDerivationRec(derivationRec), span, false);
 }
 
 TypeSymbol* DerivedTypeSymbol::RemoveReference(const Span& span)
 {
-    return GetSymbolTable()->MakeDerivedType(baseType, RemoveReferenceDerivation(derivationRec), span);
+    return GetSymbolTable()->MakeDerivedType(baseType, RemoveReferenceDerivation(derivationRec), span, false);
 }
 
 TypeSymbol* DerivedTypeSymbol::RemovePointer(const Span& span)
 {
-    return GetSymbolTable()->MakeDerivedType(baseType, RemovePointerDerivation(derivationRec), span);
+    return GetSymbolTable()->MakeDerivedType(baseType, RemovePointerDerivation(derivationRec), span, false);
 }
 
 TypeSymbol* DerivedTypeSymbol::RemoveConst(const Span& span) 
 {
-    return GetSymbolTable()->MakeDerivedType(baseType, RemoveConstDerivation(derivationRec), span);
+    return GetSymbolTable()->MakeDerivedType(baseType, RemoveConstDerivation(derivationRec), span, false);
 }
 
 TypeSymbol* DerivedTypeSymbol::AddConst(const Span& span)
@@ -466,7 +466,7 @@ TypeSymbol* DerivedTypeSymbol::AddConst(const Span& span)
     }
     else
     {
-        return GetSymbolTable()->MakeDerivedType(baseType, AddConstDerivation(derivationRec), span);
+        return GetSymbolTable()->MakeDerivedType(baseType, AddConstDerivation(derivationRec), span, false);
     }
 }
 
@@ -478,7 +478,7 @@ TypeSymbol* DerivedTypeSymbol::AddLvalueReference(const Span& span)
     }
     else
     {
-        return GetSymbolTable()->MakeDerivedType(baseType, AddLvalueReferenceDerivation(derivationRec), span);
+        return GetSymbolTable()->MakeDerivedType(baseType, AddLvalueReferenceDerivation(derivationRec), span, false);
     }
 }
 
@@ -490,13 +490,13 @@ TypeSymbol* DerivedTypeSymbol::AddRvalueReference(const Span& span)
     }
     else
     {
-        return GetSymbolTable()->MakeDerivedType(baseType, AddRvalueReferenceDerivation(derivationRec), span);
+        return GetSymbolTable()->MakeDerivedType(baseType, AddRvalueReferenceDerivation(derivationRec), span, false);
     }
 }
 
 TypeSymbol* DerivedTypeSymbol::AddPointer(const Span& span)
 {
-    return GetSymbolTable()->MakeDerivedType(baseType, AddPointerDerivation(derivationRec), span);
+    return GetSymbolTable()->MakeDerivedType(baseType, AddPointerDerivation(derivationRec), span, false);
 }
 
 TypeSymbol* DerivedTypeSymbol::RemoveDerivations(const TypeDerivationRec& sourceDerivationRec, const Span& span)
@@ -527,13 +527,13 @@ TypeSymbol* DerivedTypeSymbol::RemoveDerivations(const TypeDerivationRec& source
     {
         result.derivations.push_back(Derivation::rvalueRefDerivation);
     }
-    return GetSymbolTable()->MakeDerivedType(baseType, result, span);
+    return GetSymbolTable()->MakeDerivedType(baseType, result, span, false);
 }
 
 TypeSymbol* DerivedTypeSymbol::Unify(TypeSymbol* sourceType, const Span& span) 
 {
     TypeSymbol* newBaseType = baseType->Unify(sourceType->BaseType(), span);
-    return GetSymbolTable()->MakeDerivedType(newBaseType, UnifyDerivations(derivationRec, sourceType->DerivationRec()), span); // todo unify derivations
+    return GetSymbolTable()->MakeDerivedType(newBaseType, UnifyDerivations(derivationRec, sourceType->DerivationRec()), span, false);
 }
 
 llvm::Type* DerivedTypeSymbol::IrType(Emitter& emitter) 
@@ -570,6 +570,18 @@ llvm::Type* DerivedTypeSymbol::IrType(Emitter& emitter)
     return irType;
 }
 
+llvm::Constant* DerivedTypeSymbol::CreateDefaultIrValue(Emitter& emitter)
+{
+    if (HasFrontConstDerivation(derivationRec.derivations) && !HasPointerDerivation(derivationRec.derivations) && !HasReferenceDerivation(derivationRec.derivations))
+    {
+        return baseType->CreateDefaultIrValue(emitter);
+    }
+    else
+    {
+        return llvm::Constant::getNullValue(IrType(emitter));
+    }
+}
+
 NullPtrType::NullPtrType(const Span& span_, const std::u32string& name_) : TypeSymbol(SymbolType::nullPtrTypeSymbol, span_, name_)
 {
 }
@@ -577,6 +589,11 @@ NullPtrType::NullPtrType(const Span& span_, const std::u32string& name_) : TypeS
 llvm::Type* NullPtrType::IrType(Emitter& emitter)
 {
     return emitter.Builder().getInt8PtrTy();
+}
+
+llvm::Constant* NullPtrType::CreateDefaultIrValue(Emitter& emitter)
+{
+    return llvm::Constant::getNullValue(IrType(emitter));
 }
 
 } } // namespace cmajor::symbols

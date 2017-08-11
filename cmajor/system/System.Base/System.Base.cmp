@@ -2,3 +2,5 @@ project System.Base;
 target=library;
 reference <../System.Runtime/System.Runtime.cmp>;
 source <Rvalue.cm>;
+source <UniquePtr.cm>;
+source <Utility.cm>;

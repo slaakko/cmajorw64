@@ -80,6 +80,7 @@ class FileScope : public Scope
 {
 public:
     void InstallAlias(ContainerScope* containerScope, AliasNode* aliasNode);
+    void AddContainerScope(ContainerScope* containerScope);
     void InstallNamespaceImport(ContainerScope* containerScope, NamespaceImportNode* namespaceImportNode);
     Symbol* Lookup(const std::u32string& name) const override;
     Symbol* Lookup(const std::u32string& name, ScopeLookup lookup) const override;

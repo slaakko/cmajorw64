@@ -23,6 +23,7 @@ public:
     TypeSymbol* UnderlyingType() { return underlyingType; }
     void SetUnderlyingType(TypeSymbol* underlyingType_) { underlyingType = underlyingType_; }
     llvm::Type* IrType(Emitter& emitter) override { return underlyingType->IrType(emitter); }
+    llvm::Constant* CreateDefaultIrValue(Emitter& emitter) override { return underlyingType->CreateDefaultIrValue(emitter); }
 private:
     TypeSymbol* underlyingType;
 };

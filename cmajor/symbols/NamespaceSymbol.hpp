@@ -15,6 +15,7 @@ public:
     NamespaceSymbol(const Span& span_, const std::u32string& name_);
     std::string TypeString() const override { return "namespace"; }
     void Import(NamespaceSymbol* that, SymbolTable& symbolTable);
+    bool IsGlobalNamespace() const { return Name().empty(); }
 };
 
 } } // namespace cmajor::symbols

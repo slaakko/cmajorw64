@@ -40,6 +40,11 @@ class BoundReferenceToPointerExpression;
 class BoundFunctionCall;
 class BoundConversion;
 class BoundConstructExpression;
+class BoundIsExpression;
+class BoundAsExpression;
+class BoundTypeNameExpression;
+class BoundBitCast;
+class BoundFunctionPtr;
 
 class BoundNodeVisitor
 {
@@ -77,6 +82,11 @@ public:
     virtual void Visit(BoundFunctionCall& boundFunctionCall) {}
     virtual void Visit(BoundConversion& boundConversion) {}
     virtual void Visit(BoundConstructExpression& boundConstructExpression) {}
+    virtual void Visit(BoundIsExpression& boundIsExpression) {}
+    virtual void Visit(BoundAsExpression& boundAsExpression) {}
+    virtual void Visit(BoundTypeNameExpression& boundTypeNameExpression) {}
+    virtual void Visit(BoundBitCast& boundBitCast) {}
+    virtual void Visit(BoundFunctionPtr& boundFunctionPtr) {}
 };
 
 } } // namespace cmajor::binder

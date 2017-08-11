@@ -21,7 +21,7 @@ public:
     void Accept(Visitor& visitor) override;
     void Write(AstWriter& writer) override;
     void Read(AstReader& reader) override;
-    Node* Primary() const { return primary.get(); }
+    Node* Primary() { return primary.get(); }
     void AddTemplateArgument(Node* templateArgument);
     const NodeList<Node>& TemplateArguments() const { return templateArguments; }
 private:
@@ -40,6 +40,7 @@ public:
     void Read(AstReader& reader) override;
     const IdentifierNode* Id() const { return id.get(); }
     const Node* DefaultTemplateArgument() const { return defaultTemplateArgument.get(); }
+    Node* DefaultTemplateArgument() { return defaultTemplateArgument.get(); }
 private:
     std::unique_ptr<IdentifierNode> id;
     std::unique_ptr<Node> defaultTemplateArgument;

@@ -24,6 +24,8 @@ std::unique_ptr<BoundExpression> BindExpression(Node* node, BoundCompileUnit& bo
     bool acceptFunctionGroup, bool acceptMemberExpression);
 std::unique_ptr<BoundExpression> BindExpression(Node* node, BoundCompileUnit& boundCompileUnit, BoundFunction* boundFunction, ContainerScope* containerScope, StatementBinder* statementBinder, bool lvalue,
     bool acceptFunctionGroup, bool acceptMemberExpression, bool acceptIncomplete);
+std::unique_ptr<BoundExpression> BindUnaryOp(BoundExpression* operand, Node& node, const std::u32string& groupName,
+    BoundCompileUnit& boundCompileUnit, BoundFunction* boundFunction, ContainerScope* containerScope, StatementBinder* statementBinder);
 
 } } // namespace cmajor::binder
 

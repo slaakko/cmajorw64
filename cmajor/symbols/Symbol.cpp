@@ -93,7 +93,7 @@ Symbol::~Symbol()
 
 void Symbol::Write(SymbolWriter& writer)
 {
-    SymbolFlags f = flags & ~(SymbolFlags::project | SymbolFlags::bound);
+    SymbolFlags f = flags & ~(SymbolFlags::project | SymbolFlags::bound | SymbolFlags::export_);
     writer.GetBinaryWriter().Write(static_cast<uint8_t>(f));
     writer.GetBinaryWriter().Write(mangledName);
 }
@@ -697,6 +697,7 @@ SymbolFactory::SymbolFactory()
     Register(SymbolType::memberFunctionSymbol, new ConcreteSymbolCreator<MemberFunctionSymbol>());
     Register(SymbolType::functionGroupSymbol, new ConcreteSymbolCreator<FunctionGroupSymbol>());
     Register(SymbolType::classTypeSymbol, new ConcreteSymbolCreator<ClassTypeSymbol>());
+    Register(SymbolType::classTemplateSpecializationSymbol, new ConcreteSymbolCreator<ClassTemplateSpecializationSymbol>());
     Register(SymbolType::interfaceTypeSymbol, new ConcreteSymbolCreator<InterfaceTypeSymbol>());
     Register(SymbolType::delegateTypeSymbol, new ConcreteSymbolCreator<DelegateTypeSymbol>());
     Register(SymbolType::classDelegateTypeSymbol, new ConcreteSymbolCreator<ClassDelegateTypeSymbol>());

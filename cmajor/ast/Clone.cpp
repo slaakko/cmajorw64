@@ -7,7 +7,7 @@
 
 namespace cmajor { namespace ast {
 
-CloneContext::CloneContext() : instantiateFunctionNode(false)
+CloneContext::CloneContext() : instantiateFunctionNode(false), instantiateClassNode(false)
 {
 }
 

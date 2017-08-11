@@ -8,6 +8,8 @@
 #include <cmajor/binder/BoundNode.hpp>
 #include <cmajor/binder/OperationRepository.hpp>
 #include <cmajor/binder/FunctionTemplateRepository.hpp>
+#include <cmajor/binder/ClassTemplateRepository.hpp>
+#include <cmajor/binder/StringRepository.hpp>
 #include <cmajor/symbols/Module.hpp>
 #include <cmajor/symbols/ConversionTable.hpp>
 #include <cmajor/ast/CompileUnit.hpp>
@@ -29,6 +31,7 @@ public:
     SymbolTable& GetSymbolTable() { return symbolTable; }
     CompileUnitNode* GetCompileUnitNode() const { return compileUnitNode; }
     void AddFileScope(FileScope* fileScope);
+    void RemoveLastFileScope();
     FileScope* FirstFileScope() const { Assert(!fileScopes.empty(), "file scopes empty");  return fileScopes.front().get(); }
     const std::vector<std::unique_ptr<FileScope>>& FileScopes() const { return fileScopes; }
     void AddBoundNode(std::unique_ptr<BoundNode>&& boundNode);
@@ -37,11 +40,16 @@ public:
     void CollectViableFunctions(const std::u32string& groupName, ContainerScope* containerScope, std::vector<std::unique_ptr<BoundExpression>>& arguments, 
         std::unordered_set<FunctionSymbol*>& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span);
     FunctionSymbol* Instantiate(FunctionSymbol* functionTemplate, const std::unordered_map<TemplateParameterSymbol*, TypeSymbol*>& templateParameterMapping, const Span& span);
+    void Instantiate(FunctionSymbol* memberFunction, ContainerScope* containerScope, const Span& span);
+    int Install(const std::string& str);
+    const std::string& GetString(int stringId) const;
+    const std::string& SourceFilePath() const { return compileUnitNode->FilePath(); }
     const std::string& LLFilePath() const { return llFilePath; }
     const std::string& OptLLFilePath() const { return optLLFilePath; }
     const std::string& ObjectFilePath() const { return objectFilePath; }
     void SetHasGotos() { hasGotos = true; }
     bool HasGotos() const { return hasGotos; }
+    ClassTemplateRepository& GetClassTemplateRepository() { return classTemplateRepository; }
 private:
     Module& module;
     SymbolTable& symbolTable;
@@ -54,6 +62,8 @@ private:
     bool hasGotos;
     OperationRepository operationRepository;
     FunctionTemplateRepository functionTemplateRepository;
+    ClassTemplateRepository classTemplateRepository;
+    StringRepository stringRepository;
     ConversionTable conversionTable;
 };
 
