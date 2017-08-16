@@ -12,8 +12,10 @@
 #include <cmajor/binder/ExpressionBinder.hpp>
 #include <cmajor/binder/Access.hpp>
 #include <cmajor/binder/OperationRepository.hpp>
+#include <cmajor/binder/Evaluator.hpp>
 #include <cmajor/symbols/FunctionSymbol.hpp>
 #include <cmajor/symbols/Exception.hpp>
+#include <cmajor/symbols/GlobalFlags.hpp>
 #include <cmajor/ast/Literal.hpp>
 #include <cmajor/util/Unicode.hpp>
 
@@ -21,9 +23,17 @@ namespace cmajor { namespace binder {
 
 using namespace cmajor::unicode;
 
-bool IsAlwaysTrue(const Node* node, BoundCompileUnit& boundCompileUnit, ContainerScope* containerScope)
+bool IsAlwaysTrue(Node* node, BoundCompileUnit& boundCompileUnit, ContainerScope* containerScope)
 {
-    // todo
+    std::unique_ptr<Value> value = Evaluate(node, ValueType::boolValue, containerScope, boundCompileUnit, true);
+    if (value)
+    {
+        if (value->GetValueType() == ValueType::boolValue)
+        {
+            BoolValue* boolValue = static_cast<BoolValue*>(value.get());
+            return boolValue->GetValue() == true;
+        }
+    }
     return false;
 }
 
@@ -94,6 +104,72 @@ bool TerminatesFunction(StatementNode* statement, bool inForEverLoop, ContainerS
     return false;
 }
 
+bool TerminatesCase(StatementNode* statementNode)
+{
+    if (statementNode->GetNodeType() == NodeType::ifStatementNode)
+    {
+        IfStatementNode* ifStatementNode = static_cast<IfStatementNode*>(statementNode);
+        if (ifStatementNode->ElseS())
+        {
+            if (TerminatesCase(ifStatementNode->ThenS()) && TerminatesCase(ifStatementNode->ElseS()))
+            {
+                return true;
+            }
+        }
+    }
+    else if (statementNode->GetNodeType() == NodeType::compoundStatementNode)
+    {
+        CompoundStatementNode* compoundStatement = static_cast<CompoundStatementNode*>(statementNode);
+        int n = compoundStatement->Statements().Count();
+        for (int i = 0; i < n; ++i)
+        {
+            StatementNode* statementNode = compoundStatement->Statements()[i];
+            if (TerminatesCase(statementNode))
+            {
+                return true;
+            }
+        }
+    }
+    else
+    {
+        return statementNode->IsCaseTerminatingNode();
+    }
+    return false;
+}
+
+bool TerminatesDefault(StatementNode* statementNode)
+{
+    if (statementNode->GetNodeType() == NodeType::ifStatementNode)
+    {
+        IfStatementNode* ifStatementNode = static_cast<IfStatementNode*>(statementNode);
+        if (ifStatementNode->ElseS())
+        {
+            if (TerminatesDefault(ifStatementNode->ThenS()) && TerminatesDefault(ifStatementNode->ElseS()))
+            {
+                return true;
+            }
+        }
+    }
+    else if (statementNode->GetNodeType() == NodeType::compoundStatementNode)
+    {
+        CompoundStatementNode* compoundStatement = static_cast<CompoundStatementNode*>(statementNode);
+        int n = compoundStatement->Statements().Count();
+        for (int i = 0; i < n; ++i)
+        {
+            StatementNode* statementNode = compoundStatement->Statements()[i];
+            if (TerminatesDefault(statementNode))
+            {
+                return true;
+            }
+        }
+    }
+    else
+    {
+        return statementNode->IsDefaultTerminatingNode();
+    }
+    return false;
+}
+
 void CheckFunctionReturnPaths(FunctionSymbol* functionSymbol, CompoundStatementNode* bodyNode, const Span& span, ContainerScope* containerScope, BoundCompileUnit& boundCompileUnit);
 
 void CheckFunctionReturnPaths(FunctionSymbol* functionSymbol, FunctionNode& functionNode, ContainerScope* containerScope, BoundCompileUnit& boundCompileUnit)
@@ -123,7 +199,8 @@ void CheckFunctionReturnPaths(FunctionSymbol* functionSymbol, CompoundStatementN
 StatementBinder::StatementBinder(BoundCompileUnit& boundCompileUnit_) :  
     boundCompileUnit(boundCompileUnit_), symbolTable(boundCompileUnit.GetSymbolTable()), containerScope(nullptr), statement(), currentClass(nullptr), currentFunction(nullptr), 
     currentStaticConstructorSymbol(nullptr), currentStaticConstructorNode(nullptr), currentConstructorSymbol(nullptr), currentConstructorNode(nullptr), 
-    currentDestructorSymbol(nullptr), currentDestructorNode(nullptr), currentMemberFunctionSymbol(nullptr), currentMemberFunctionNode(nullptr), postfix(false)
+    currentDestructorSymbol(nullptr), currentDestructorNode(nullptr), currentMemberFunctionSymbol(nullptr), currentMemberFunctionNode(nullptr), switchConditionType(nullptr), 
+    currentCaseValueMap(nullptr), currentGotoCaseStatements(nullptr), currentGotoDefaultStatements(nullptr), postfix(false)
 {
 }
 
@@ -418,76 +495,101 @@ void StatementBinder::Visit(ReturnStatementNode& returnStatementNode)
 {
     if (returnStatementNode.Expression())
     {
-        TypeSymbol* returnType = currentFunction->GetFunctionSymbol()->ReturnType();
-        bool returnDelegateType = false;
-        bool returnClassDelegateType = false;
-        if (returnType)
+        if (currentFunction->GetFunctionSymbol()->ReturnsClassByValue())
         {
-            returnDelegateType = returnType->GetSymbolType() == SymbolType::delegateTypeSymbol;
-            returnClassDelegateType = returnType->GetSymbolType() == SymbolType::classDelegateTypeSymbol;
-        }
-        if (returnType && returnType->GetSymbolType() != SymbolType::voidTypeSymbol)
-        {
-            std::vector<std::unique_ptr<BoundExpression>> returnTypeArgs;
-            BoundTypeExpression* boundTypeExpression = new BoundTypeExpression(returnStatementNode.GetSpan(), returnType);
-            returnTypeArgs.push_back(std::unique_ptr<BoundTypeExpression>(boundTypeExpression));
-            std::vector<FunctionScopeLookup> functionScopeLookups;
-            functionScopeLookups.push_back(FunctionScopeLookup(ScopeLookup::this_and_base_and_parent, containerScope));
-            functionScopeLookups.push_back(FunctionScopeLookup(ScopeLookup::this_, returnType->ClassInterfaceOrNsScope()));
-            functionScopeLookups.push_back(FunctionScopeLookup(ScopeLookup::fileScopes, nullptr));
-            std::unique_ptr<BoundFunctionCall> returnFunctionCall = ResolveOverload(U"@return", containerScope, functionScopeLookups, returnTypeArgs, boundCompileUnit, currentFunction, 
+            std::vector<FunctionScopeLookup> classReturnLookups;
+            classReturnLookups.push_back(FunctionScopeLookup(ScopeLookup::this_and_base_and_parent, containerScope));
+            classReturnLookups.push_back(FunctionScopeLookup(ScopeLookup::this_, currentFunction->GetFunctionSymbol()->ReturnType()->ClassInterfaceOrNsScope()));
+            classReturnLookups.push_back(FunctionScopeLookup(ScopeLookup::fileScopes, nullptr));
+            std::vector<std::unique_ptr<BoundExpression>> classReturnArgs;
+            classReturnArgs.push_back(std::unique_ptr<BoundExpression>(new BoundParameter(currentFunction->GetFunctionSymbol()->ReturnParam())));
+            std::unique_ptr<BoundExpression> expression = BindExpression(returnStatementNode.Expression(), boundCompileUnit, currentFunction, containerScope, this, false, false, false);
+            std::vector<FunctionScopeLookup> rvalueLookups;
+            rvalueLookups.push_back(FunctionScopeLookup(ScopeLookup::this_and_base_and_parent, containerScope));
+            rvalueLookups.push_back(FunctionScopeLookup(ScopeLookup::fileScopes, nullptr));
+            std::vector<std::unique_ptr<BoundExpression>> rvalueArguments;
+            rvalueArguments.push_back(std::move(expression));
+            std::unique_ptr<BoundExpression> rvalueExpr = ResolveOverload(U"System.Rvalue", containerScope, rvalueLookups, rvalueArguments, boundCompileUnit, currentFunction,
                 returnStatementNode.GetSpan());
-            std::unique_ptr<BoundExpression> expression = BindExpression(returnStatementNode.Expression(), boundCompileUnit, currentFunction, containerScope, this, false,
-                returnDelegateType || returnClassDelegateType, returnClassDelegateType);
-            std::vector<std::unique_ptr<BoundExpression>> returnValueArguments;
-            returnValueArguments.push_back(std::move(expression));
-            FunctionMatch functionMatch(returnFunctionCall->GetFunctionSymbol());
-            bool conversionFound = FindConversions(boundCompileUnit, returnFunctionCall->GetFunctionSymbol(), returnValueArguments, functionMatch, ConversionType::implicit_, 
+            classReturnArgs.push_back(std::move(rvalueExpr));
+            std::unique_ptr<BoundFunctionCall> constructorCall = ResolveOverload(U"@constructor", containerScope, classReturnLookups, classReturnArgs, boundCompileUnit, currentFunction,
                 returnStatementNode.GetSpan());
-            if (conversionFound)
-            {
-                Assert(!functionMatch.argumentMatches.empty(), "argument match expected");
-                ArgumentMatch argumentMatch = functionMatch.argumentMatches[0];
-                FunctionSymbol* conversionFun = argumentMatch.conversionFun;
-                if (conversionFun)
-                {
-                    BoundConversion* boundConversion = new BoundConversion(std::unique_ptr<BoundExpression>(returnValueArguments[0].release()), conversionFun);
-                    returnValueArguments[0].reset(boundConversion);
-                }
-                if (argumentMatch.referenceConversionFlags != OperationFlags::none)
-                {
-                    if (argumentMatch.referenceConversionFlags == OperationFlags::addr)
-                    {
-                        TypeSymbol* type = returnValueArguments[0]->GetType()->AddLvalueReference(returnStatementNode.GetSpan());
-                        BoundAddressOfExpression* addressOfExpression = new BoundAddressOfExpression(std::move(returnValueArguments[0]), type);
-                        returnValueArguments[0].reset(addressOfExpression);
-                    }
-                    else if (argumentMatch.referenceConversionFlags == OperationFlags::deref)
-                    {
-                        TypeSymbol* type = returnValueArguments[0]->GetType()->RemoveReference(returnStatementNode.GetSpan());
-                        BoundDereferenceExpression* dereferenceExpression = new BoundDereferenceExpression(std::move(returnValueArguments[0]), type);
-                        returnValueArguments[0].reset(dereferenceExpression);
-                    }
-                }
-                returnFunctionCall->SetArguments(std::move(returnValueArguments));
-            }
-            else
-            {
-                throw Exception("no implicit conversion from '" + ToUtf8(returnValueArguments[0]->GetType()->FullName()) + "' to '" + ToUtf8(returnType->FullName()) + "' exists",
-                    returnStatementNode.GetSpan(), currentFunction->GetFunctionSymbol()->GetSpan());
-            }
-            CheckAccess(currentFunction->GetFunctionSymbol(), returnFunctionCall->GetFunctionSymbol());
-            AddStatement(new BoundReturnStatement(std::move(returnFunctionCall), returnStatementNode.GetSpan()));
+            std::unique_ptr<BoundStatement> returnStatement(new BoundExpressionStatement(std::move(constructorCall)));
+            AddStatement(returnStatement.release());
         }
         else
         {
+            TypeSymbol* returnType = currentFunction->GetFunctionSymbol()->ReturnType();
+            bool returnDelegateType = false;
+            bool returnClassDelegateType = false;
             if (returnType)
             {
-                throw Exception("void function cannot return a value", returnStatementNode.Expression()->GetSpan(), currentFunction->GetFunctionSymbol()->GetSpan());
+                returnDelegateType = returnType->GetSymbolType() == SymbolType::delegateTypeSymbol;
+                returnClassDelegateType = returnType->GetSymbolType() == SymbolType::classDelegateTypeSymbol;
+            }
+            if (returnType && returnType->GetSymbolType() != SymbolType::voidTypeSymbol)
+            {
+                std::vector<std::unique_ptr<BoundExpression>> returnTypeArgs;
+                BoundTypeExpression* boundTypeExpression = new BoundTypeExpression(returnStatementNode.GetSpan(), returnType);
+                returnTypeArgs.push_back(std::unique_ptr<BoundTypeExpression>(boundTypeExpression));
+                std::vector<FunctionScopeLookup> functionScopeLookups;
+                functionScopeLookups.push_back(FunctionScopeLookup(ScopeLookup::this_and_base_and_parent, containerScope));
+                functionScopeLookups.push_back(FunctionScopeLookup(ScopeLookup::this_, returnType->ClassInterfaceOrNsScope()));
+                functionScopeLookups.push_back(FunctionScopeLookup(ScopeLookup::fileScopes, nullptr));
+                std::unique_ptr<BoundFunctionCall> returnFunctionCall = ResolveOverload(U"@return", containerScope, functionScopeLookups, returnTypeArgs, boundCompileUnit, currentFunction,
+                    returnStatementNode.GetSpan());
+                std::unique_ptr<BoundExpression> expression = BindExpression(returnStatementNode.Expression(), boundCompileUnit, currentFunction, containerScope, this, false,
+                    returnDelegateType || returnClassDelegateType, returnClassDelegateType);
+                std::vector<std::unique_ptr<BoundExpression>> returnValueArguments;
+                returnValueArguments.push_back(std::move(expression));
+                FunctionMatch functionMatch(returnFunctionCall->GetFunctionSymbol());
+                bool conversionFound = FindConversions(boundCompileUnit, returnFunctionCall->GetFunctionSymbol(), returnValueArguments, functionMatch, ConversionType::implicit_,
+                    returnStatementNode.GetSpan());
+                if (conversionFound)
+                {
+                    Assert(!functionMatch.argumentMatches.empty(), "argument match expected");
+                    ArgumentMatch argumentMatch = functionMatch.argumentMatches[0];
+                    FunctionSymbol* conversionFun = argumentMatch.conversionFun;
+                    if (conversionFun)
+                    {
+                        BoundConversion* boundConversion = new BoundConversion(std::unique_ptr<BoundExpression>(returnValueArguments[0].release()), conversionFun);
+                        returnValueArguments[0].reset(boundConversion);
+                    }
+                    if (argumentMatch.referenceConversionFlags != OperationFlags::none)
+                    {
+                        if (argumentMatch.referenceConversionFlags == OperationFlags::addr)
+                        {
+                            TypeSymbol* type = returnValueArguments[0]->GetType()->AddLvalueReference(returnStatementNode.GetSpan());
+                            BoundAddressOfExpression* addressOfExpression = new BoundAddressOfExpression(std::move(returnValueArguments[0]), type);
+                            returnValueArguments[0].reset(addressOfExpression);
+                        }
+                        else if (argumentMatch.referenceConversionFlags == OperationFlags::deref)
+                        {
+                            TypeSymbol* type = returnValueArguments[0]->GetType()->RemoveReference(returnStatementNode.GetSpan());
+                            BoundDereferenceExpression* dereferenceExpression = new BoundDereferenceExpression(std::move(returnValueArguments[0]), type);
+                            returnValueArguments[0].reset(dereferenceExpression);
+                        }
+                    }
+                    returnFunctionCall->SetArguments(std::move(returnValueArguments));
+                }
+                else
+                {
+                    throw Exception("no implicit conversion from '" + ToUtf8(returnValueArguments[0]->GetType()->FullName()) + "' to '" + ToUtf8(returnType->FullName()) + "' exists",
+                        returnStatementNode.GetSpan(), currentFunction->GetFunctionSymbol()->GetSpan());
+                }
+                CheckAccess(currentFunction->GetFunctionSymbol(), returnFunctionCall->GetFunctionSymbol());
+                AddStatement(new BoundReturnStatement(std::move(returnFunctionCall), returnStatementNode.GetSpan()));
             }
             else
             {
-                throw Exception("constructor or assignment function cannot return a value", returnStatementNode.Expression()->GetSpan(), currentFunction->GetFunctionSymbol()->GetSpan());
+                if (returnType)
+                {
+                    throw Exception("void function cannot return a value", returnStatementNode.Expression()->GetSpan(), currentFunction->GetFunctionSymbol()->GetSpan());
+                }
+                else
+                {
+                    throw Exception("constructor or assignment function cannot return a value", returnStatementNode.Expression()->GetSpan(), currentFunction->GetFunctionSymbol()->GetSpan());
+                }
             }
         }
     }
@@ -821,52 +923,230 @@ void StatementBinder::Visit(EmptyStatementNode& emptyStatementNode)
 
 void StatementBinder::Visit(RangeForStatementNode& rangeForStatementNode)
 {
-
+    throw std::runtime_error("not implemented yet");
 }
 
 void StatementBinder::Visit(SwitchStatementNode& switchStatementNode)
 {
-
+    std::unique_ptr<BoundExpression> condition = BindExpression(switchStatementNode.Condition(), boundCompileUnit, currentFunction, containerScope, this);
+    TypeSymbol* conditionType = condition->GetType();
+    if (conditionType->IsSwitchConditionType())
+    {
+        if (conditionType->GetSymbolType() == SymbolType::enumTypeSymbol)
+        {
+            EnumTypeSymbol* enumType = static_cast<EnumTypeSymbol*>(conditionType);
+            conditionType = enumType->UnderlyingType();
+        }
+        TypeSymbol* prevSwitchConditionType = switchConditionType;
+        switchConditionType = conditionType;
+        std::unordered_map<IntegralValue, CaseStatementNode*, IntegralValueHash>* prevCaseValueMap = currentCaseValueMap;
+        std::unordered_map<IntegralValue, CaseStatementNode*, IntegralValueHash> caseValueMap;
+        currentCaseValueMap = &caseValueMap;
+        std::vector<std::pair<BoundGotoCaseStatement*, IntegralValue>>* prevGotoCaseStatements = currentGotoCaseStatements;
+        std::vector<std::pair<BoundGotoCaseStatement*, IntegralValue>> gotoCaseStatements;
+        currentGotoCaseStatements = &gotoCaseStatements;
+        std::vector<BoundGotoDefaultStatement*>* prevGotoDefaultStatements = currentGotoDefaultStatements;
+        std::vector<BoundGotoDefaultStatement*> gotoDefaultStatements;
+        currentGotoDefaultStatements = &gotoDefaultStatements;
+        std::unique_ptr<BoundSwitchStatement> boundSwitchStatement(new BoundSwitchStatement(switchStatementNode.GetSpan(), std::move(condition)));
+        int n = switchStatementNode.Cases().Count();
+        for (int i = 0; i < n; ++i)
+        {
+            CaseStatementNode* caseS = switchStatementNode.Cases()[i];
+            caseS->Accept(*this);
+            Assert(statement->GetBoundNodeType() == BoundNodeType::boundCaseStatement, "case statement expected");
+            boundSwitchStatement->AddCaseStatement(std::unique_ptr<BoundCaseStatement>(static_cast<BoundCaseStatement*>(statement.release())));
+        }
+        if (switchStatementNode.Default())
+        {
+            switchStatementNode.Default()->Accept(*this);
+            Assert(statement->GetBoundNodeType() == BoundNodeType::boundDefaultStatement, "default statement expected");
+            boundSwitchStatement->SetDefaultStatement(std::unique_ptr<BoundDefaultStatement>(static_cast<BoundDefaultStatement*>(statement.release())));
+        }
+        for (const std::pair<BoundGotoCaseStatement*, IntegralValue>& p : gotoCaseStatements)
+        {
+            BoundGotoCaseStatement* gotoCaseStatement = p.first;
+            IntegralValue integralCaseValue = p.second;
+            auto it = caseValueMap.find(integralCaseValue);
+            if (it == caseValueMap.cend())
+            {
+                throw Exception("case not found", gotoCaseStatement->GetSpan());
+            }
+        }
+        if (!gotoDefaultStatements.empty() && !switchStatementNode.Default())
+        {
+            throw Exception("switch does not have a default statement", gotoDefaultStatements.front()->GetSpan());
+        }
+        currentGotoCaseStatements = prevGotoCaseStatements;
+        currentGotoDefaultStatements = prevGotoDefaultStatements;
+        currentCaseValueMap = prevCaseValueMap;
+        AddStatement(boundSwitchStatement.release());
+        if (switchStatementNode.Label())
+        {
+            statement->SetLabel(switchStatementNode.Label()->Label());
+        }
+        switchConditionType = prevSwitchConditionType;
+    }
+    else
+    {
+        throw Exception("switch statement condition must be of integer, character, enumerated or Boolean type", switchStatementNode.Condition()->GetSpan());
+    }
 }
 
 void StatementBinder::Visit(CaseStatementNode& caseStatementNode)
 {
-
+    std::unique_ptr<BoundCaseStatement> boundCaseStatement(new BoundCaseStatement(caseStatementNode.GetSpan()));
+    bool terminated = false;
+    int n = caseStatementNode.Statements().Count();
+    for (int i = 0; i < n; ++i)
+    {
+        StatementNode* statementNode = caseStatementNode.Statements()[i];
+        if (TerminatesCase(statementNode))
+        {
+            terminated = true;
+        }
+        statementNode->Accept(*this);
+        boundCaseStatement->AddStatement(std::move(statement));
+    }
+    if (!terminated)
+    {
+        throw Exception("case must end in break, continue, return, throw, goto, goto case or goto default statement", caseStatementNode.GetSpan());
+    }
+    int ne = caseStatementNode.CaseExprs().Count();
+    for (int i = 0; i < ne; ++i)
+    {
+        Node* caseExprNode = caseStatementNode.CaseExprs()[i];
+        std::unique_ptr<Value> caseValue = Evaluate(caseExprNode, GetValueTypeFor(switchConditionType->GetSymbolType()), containerScope, boundCompileUnit, false);
+        IntegralValue integralCaseValue(caseValue.get());
+        Assert(currentCaseValueMap, "current case value map not set");
+        auto it = currentCaseValueMap->find(integralCaseValue);
+        if (it != currentCaseValueMap->cend())
+        {
+            throw Exception("case value already used", caseExprNode->GetSpan());
+        }
+        (*currentCaseValueMap)[integralCaseValue] = &caseStatementNode;
+        boundCaseStatement->AddCaseValue(std::move(caseValue));
+    }
+    AddStatement(boundCaseStatement.release());
+    if (caseStatementNode.Label())
+    {
+        statement->SetLabel(caseStatementNode.Label()->Label());
+    }
 }
 
 void StatementBinder::Visit(DefaultStatementNode& defaultStatementNode)
 {
-
+    std::unique_ptr<BoundDefaultStatement> boundDefaultStatement(new BoundDefaultStatement(defaultStatementNode.GetSpan()));
+    bool terminated = false;
+    int n = defaultStatementNode.Statements().Count();
+    for (int i = 0; i < n; ++i)
+    {
+        StatementNode* statementNode = defaultStatementNode.Statements()[i];
+        if (TerminatesDefault(statementNode))
+        {
+            terminated = true;
+        }
+        statementNode->Accept(*this);
+        boundDefaultStatement->AddStatement(std::move(statement));
+    }
+    if (!terminated)
+    {
+        throw Exception("default must end in break, continue, return, throw, goto, or goto case statement", defaultStatementNode.GetSpan());
+    }
+    AddStatement(boundDefaultStatement.release());
+    if (defaultStatementNode.Label())
+    {
+        statement->SetLabel(defaultStatementNode.Label()->Label());
+    }
 }
 
 void StatementBinder::Visit(GotoCaseStatementNode& gotoCaseStatementNode)
 {
-
+    const Node* parent = gotoCaseStatementNode.Parent();
+    while (parent && parent->GetNodeType() != NodeType::caseStatementNode && parent->GetNodeType() != NodeType::defaultStatementNode)
+    {
+        parent = parent->Parent();
+    }
+    if (!parent)
+    {
+        throw Exception("goto case statement must be enclosed in a case or default statement", gotoCaseStatementNode.GetSpan());
+    }
+    Node* caseExprNode = gotoCaseStatementNode.CaseExpr();
+    std::unique_ptr<Value> caseValue = Evaluate(caseExprNode, GetValueTypeFor(switchConditionType->GetSymbolType()), containerScope, boundCompileUnit, false);
+    Value* caseValuePtr = caseValue.get();
+    BoundGotoCaseStatement* boundGotoCaseStatement = new BoundGotoCaseStatement(gotoCaseStatementNode.GetSpan(), std::move(caseValue));
+    Assert(currentGotoCaseStatements, "current goto case statement vector not set");
+    currentGotoCaseStatements->push_back(std::make_pair(boundGotoCaseStatement, IntegralValue(caseValuePtr)));
+    AddStatement(boundGotoCaseStatement);
+    if (gotoCaseStatementNode.Label())
+    {
+        statement->SetLabel(gotoCaseStatementNode.Label()->Label());
+    }
 }
 
 void StatementBinder::Visit(GotoDefaultStatementNode& gotoDefaultStatementNode)
 {
-
+    const Node* parent = gotoDefaultStatementNode.Parent();
+    while (parent && parent->GetNodeType() != NodeType::caseStatementNode)
+    {
+        parent = parent->Parent();
+    }
+    if (!parent)
+    {
+        throw Exception("goto default statement must be enclosed in a case statement", gotoDefaultStatementNode.GetSpan());
+    }
+    BoundGotoDefaultStatement* boundGotoDefaultStatement = new BoundGotoDefaultStatement(gotoDefaultStatementNode.GetSpan());
+    Assert(currentGotoDefaultStatements, "current goto default statement vector not set");
+    currentGotoDefaultStatements->push_back(boundGotoDefaultStatement);
+    AddStatement(boundGotoDefaultStatement);
+    if (gotoDefaultStatementNode.Label())
+    {
+        statement->SetLabel(gotoDefaultStatementNode.Label()->Label());
+    }
 }
 
 void StatementBinder::Visit(ThrowStatementNode& throwStatementNode)
 {
-
+    throw std::runtime_error("not implemented yet");
 }
 
 void StatementBinder::Visit(CatchNode& catchNode)
 {
-
+    throw std::runtime_error("not implemented yet");
 }
 
 void StatementBinder::Visit(TryStatementNode& tryStatementNode)
 {
-
+    throw std::runtime_error("not implemented yet");
 }
 
 void StatementBinder::Visit(AssertStatementNode& assertStatementNode)
 {
-    statement.reset(new BoundEmptyStatement(assertStatementNode.GetSpan()));
+    if (GetGlobalFlag(GlobalFlags::release))
+    {
+        statement.reset(new BoundEmptyStatement(assertStatementNode.GetSpan()));
+    }
+    else
+    {
+        std::vector<FunctionScopeLookup> lookups;
+        lookups.push_back(FunctionScopeLookup(ScopeLookup::this_, symbolTable.GlobalNs().GetContainerScope()));
+        std::vector<std::unique_ptr<BoundExpression>> arguments;
+        TypeSymbol* constCharPtrType = symbolTable.GetTypeByName(U"char")->AddConst(assertStatementNode.GetSpan())->AddPointer(assertStatementNode.GetSpan());
+        arguments.push_back(std::unique_ptr<BoundExpression>(new BoundLiteral(std::unique_ptr<Value>(new StringValue(assertStatementNode.GetSpan(),
+            boundCompileUnit.Install(assertStatementNode.AssertExpr()->ToString()))), constCharPtrType)));
+        arguments.push_back(std::unique_ptr<BoundExpression>(new BoundLiteral(std::unique_ptr<Value>(new StringValue(assertStatementNode.GetSpan(),
+            boundCompileUnit.Install(ToUtf8(currentFunction->GetFunctionSymbol()->FullName())))), constCharPtrType)));
+        arguments.push_back(std::unique_ptr<BoundExpression>(new BoundLiteral(std::unique_ptr<Value>(new StringValue(assertStatementNode.GetSpan(),
+            boundCompileUnit.Install(boundCompileUnit.GetCompileUnitNode()->FilePath()))), constCharPtrType)));
+        arguments.push_back(std::unique_ptr<BoundExpression>(new BoundLiteral(std::unique_ptr<Value>(new IntValue(assertStatementNode.GetSpan(), 
+            assertStatementNode.GetSpan().LineNumber())), symbolTable.GetTypeByName(U"int"))));
+        std::unique_ptr<BoundExpression> assertExpression = BindExpression(assertStatementNode.AssertExpr(), boundCompileUnit, currentFunction, containerScope, this);
+        std::unique_ptr<BoundStatement> ifStatement(new BoundIfStatement(assertStatementNode.GetSpan(), std::move(assertExpression),
+            std::unique_ptr<BoundStatement>(new BoundEmptyStatement(assertStatementNode.GetSpan())),
+            std::unique_ptr<BoundStatement>(new BoundExpressionStatement(ResolveOverload(U"RtFailAssertion", containerScope, lookups, arguments, boundCompileUnit, currentFunction,
+                assertStatementNode.GetSpan())))));
+        statement.reset(ifStatement.release());
+    }
 }
 
 void StatementBinder::CompileStatement(Node* statementNode, bool setPostfix)

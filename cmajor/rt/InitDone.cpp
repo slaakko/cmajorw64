@@ -28,18 +28,18 @@ namespace cmajor { namespace rt {
 
 void Init()
 {
+    cmajor::util::Init();
     InitIo();
     InitStatics();
     InitClasses();
-    cmajor::util::Init();
 }
 
 void Done()
 {
-    cmajor::util::Done();
     DoneClasses();
     DoneStatics();
     DoneIo();
+    cmajor::util::Done();
 }
 
 } } // namespace cmajor::rt

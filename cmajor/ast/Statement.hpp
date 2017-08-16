@@ -331,6 +331,7 @@ public:
     void Read(AstReader& reader) override;
     bool IsBreakEnclosingStatementNode() const override { return true; }
     const Node* Condition() const { return condition.get(); }
+    Node* Condition() { return condition.get(); }
     void AddCase(CaseStatementNode* caseS);
     const NodeList<CaseStatementNode>& Cases() const { return cases; }
     void SetDefault(DefaultStatementNode* defaultS_);
@@ -385,6 +386,7 @@ public:
     bool IsCaseTerminatingNode() const override { return true; }
     bool IsDefaultTerminatingNode() const override { return true; }
     const Node* CaseExpr() const { return caseExpr.get(); }
+    Node* CaseExpr() { return caseExpr.get(); }
 private:
     std::unique_ptr<Node> caseExpr;
 };
@@ -463,7 +465,8 @@ public:
     void Accept(Visitor& visitor) override;
     void Write(AstWriter& writer) override;
     void Read(AstReader& reader) override;
-    const Node* AssertExpr() { return assertExpr.get(); }
+    const Node* AssertExpr() const { return assertExpr.get(); }
+    Node* AssertExpr() { return assertExpr.get(); }
 private:
     std::unique_ptr<Node> assertExpr;
 };

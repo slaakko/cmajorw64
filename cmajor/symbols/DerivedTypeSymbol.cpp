@@ -13,6 +13,19 @@ namespace cmajor { namespace symbols {
 
 using namespace cmajor::unicode;
 
+std::u32string DerivationStr(Derivation derivation)
+{
+    switch (derivation)
+    {
+        case Derivation::constDerivation: return U"C";
+        case Derivation::lvalueRefDerivation: return U"R";
+        case Derivation::rvalueRefDerivation: return U"RR";
+        case Derivation::pointerDerivation: return U"P";
+        case Derivation::arrayDerivation: return U"A";
+        default: return std::u32string();
+    }
+}
+
 bool HasFrontConstDerivation(const DerivationVec& derivations)
 {
     if (!derivations.empty())
@@ -355,6 +368,16 @@ DerivedTypeSymbol::DerivedTypeSymbol(const Span& span_, const std::u32string& na
 DerivedTypeSymbol::DerivedTypeSymbol(const Span& span_, const std::u32string& name_, TypeSymbol* baseType_, const TypeDerivationRec& derivationRec_) : 
     TypeSymbol(SymbolType::derivedTypeSymbol, span_, name_), baseType(baseType_), derivationRec(derivationRec_), irType(nullptr)
 {
+}
+
+std::u32string DerivedTypeSymbol::SimpleName() const
+{
+    std::u32string simpleName = baseType->SimpleName();
+    for (Derivation derivation : derivationRec.derivations)
+    {
+        simpleName.append(U"_").append(DerivationStr(derivation));
+    }
+    return simpleName;
 }
 
 void DerivedTypeSymbol::Write(SymbolWriter& writer)

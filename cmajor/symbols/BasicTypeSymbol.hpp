@@ -24,6 +24,7 @@ public:
     std::string TypeString() const override { return "bool"; }
     llvm::Type* IrType(Emitter& emitter) override { return llvm::Type::getInt1Ty(emitter.Context()); }
     llvm::Constant* CreateDefaultIrValue(Emitter& emitter) override { return emitter.Builder().getInt1(false); }
+    bool IsSwitchConditionType() const override { return true; }
 };
 
 class SByteTypeSymbol : public BasicTypeSymbol
@@ -33,6 +34,7 @@ public:
     std::string TypeString() const override { return "sbyte"; }
     llvm::Type* IrType(Emitter& emitter) override { return llvm::Type::getInt8Ty(emitter.Context()); }
     llvm::Constant* CreateDefaultIrValue(Emitter& emitter) override { return emitter.Builder().getInt8(0); }
+    bool IsSwitchConditionType() const override { return true; }
 };
 
 class ByteTypeSymbol : public BasicTypeSymbol
@@ -43,6 +45,7 @@ public:
     llvm::Type* IrType(Emitter& emitter) override { return llvm::Type::getInt8Ty(emitter.Context()); }
     llvm::Constant* CreateDefaultIrValue(Emitter& emitter) override { return emitter.Builder().getInt8(0); }
     bool IsUnsignedType() const override { return true; }
+    bool IsSwitchConditionType() const override { return true; }
 };
 
 class ShortTypeSymbol : public BasicTypeSymbol
@@ -52,6 +55,7 @@ public:
     std::string TypeString() const override { return "short"; }
     llvm::Type* IrType(Emitter& emitter) override { return llvm::Type::getInt16Ty(emitter.Context()); }
     llvm::Constant* CreateDefaultIrValue(Emitter& emitter) override { return emitter.Builder().getInt16(0); }
+    bool IsSwitchConditionType() const override { return true; }
 };
 
 class UShortTypeSymbol : public BasicTypeSymbol
@@ -62,6 +66,7 @@ public:
     llvm::Type* IrType(Emitter& emitter) override { return llvm::Type::getInt16Ty(emitter.Context()); }
     llvm::Constant* CreateDefaultIrValue(Emitter& emitter) override { return emitter.Builder().getInt16(0); }
     bool IsUnsignedType() const override { return true; }
+    bool IsSwitchConditionType() const override { return true; }
 };
 
 class IntTypeSymbol : public BasicTypeSymbol
@@ -71,6 +76,7 @@ public:
     std::string TypeString() const override { return "int"; }
     llvm::Type* IrType(Emitter& emitter) override { return llvm::Type::getInt32Ty(emitter.Context()); }
     llvm::Constant* CreateDefaultIrValue(Emitter& emitter) override { return emitter.Builder().getInt32(0); }
+    bool IsSwitchConditionType() const override { return true; }
 };
 
 class UIntTypeSymbol : public BasicTypeSymbol
@@ -81,6 +87,7 @@ public:
     llvm::Type* IrType(Emitter& emitter) override { return llvm::Type::getInt32Ty(emitter.Context()); }
     llvm::Constant* CreateDefaultIrValue(Emitter& emitter) override { return emitter.Builder().getInt32(0); }
     bool IsUnsignedType() const override { return true; }
+    bool IsSwitchConditionType() const override { return true; }
 };
 
 class LongTypeSymbol : public BasicTypeSymbol
@@ -90,6 +97,7 @@ public:
     std::string TypeString() const override { return "long"; }
     llvm::Type* IrType(Emitter& emitter) override { return llvm::Type::getInt64Ty(emitter.Context()); }
     llvm::Constant* CreateDefaultIrValue(Emitter& emitter) override { return emitter.Builder().getInt64(0); }
+    bool IsSwitchConditionType() const override { return true; }
 };
 
 class ULongTypeSymbol : public BasicTypeSymbol
@@ -100,6 +108,7 @@ public:
     llvm::Type* IrType(Emitter& emitter) override { return llvm::Type::getInt64Ty(emitter.Context()); }
     llvm::Constant* CreateDefaultIrValue(Emitter& emitter) override { return emitter.Builder().getInt64(0); }
     bool IsUnsignedType() const override { return true; }
+    bool IsSwitchConditionType() const override { return true; }
 };
 
 class FloatTypeSymbol : public BasicTypeSymbol
@@ -127,6 +136,7 @@ public:
     std::string TypeString() const override { return "char"; }
     llvm::Type* IrType(Emitter& emitter) override { return llvm::Type::getInt8Ty(emitter.Context()); }
     llvm::Constant* CreateDefaultIrValue(Emitter& emitter) override { return emitter.Builder().getInt8(0); }
+    bool IsSwitchConditionType() const override { return true; }
 };
 
 class WCharTypeSymbol : public BasicTypeSymbol
@@ -136,6 +146,7 @@ public:
     std::string TypeString() const override { return "wchar"; }
     llvm::Type* IrType(Emitter& emitter) override { return llvm::Type::getInt16Ty(emitter.Context()); }
     llvm::Constant* CreateDefaultIrValue(Emitter& emitter) override { return emitter.Builder().getInt16(0); }
+    bool IsSwitchConditionType() const override { return true; }
 };
 
 class UCharTypeSymbol : public BasicTypeSymbol
@@ -145,6 +156,7 @@ public:
     std::string TypeString() const override { return "uchar"; }
     llvm::Type* IrType(Emitter& emitter) override { return llvm::Type::getInt32Ty(emitter.Context()); }
     llvm::Constant* CreateDefaultIrValue(Emitter& emitter) override { return emitter.Builder().getInt32(0); }
+    bool IsSwitchConditionType() const override { return true; }
 };
 
 class VoidTypeSymbol : public BasicTypeSymbol

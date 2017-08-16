@@ -52,6 +52,19 @@ ClassTemplateSpecializationSymbol* SymbolReader::ReadClassTemplateSpecialization
     }
 }
 
+ParameterSymbol* SymbolReader::ReadParameterSymbol(Symbol* parent)
+{
+    Symbol* symbol = ReadSymbol(parent);
+    if (symbol->GetSymbolType() == SymbolType::parameterSymbol)
+    {
+        return static_cast<ParameterSymbol*>(symbol);
+    }
+    else
+    {
+        throw std::runtime_error("parameter symbol expected");
+    }
+}
+
 void SymbolReader::AddConversion(FunctionSymbol* conversion)
 {
     conversions.push_back(conversion);

@@ -7,8 +7,11 @@
 #include <cmajor/ast/Visitor.hpp>
 #include <cmajor/ast/AstWriter.hpp>
 #include <cmajor/ast/AstReader.hpp>
+#include <cmajor/util/Unicode.hpp>
 
 namespace cmajor { namespace ast {
+
+using namespace cmajor::unicode;
 
 IdentifierNode::IdentifierNode(const Span& span_) : Node(NodeType::identifierNode, span_), identifier()
 {
@@ -38,6 +41,11 @@ void IdentifierNode::Read(AstReader& reader)
 {
     Node::Read(reader);
     identifier = reader.GetBinaryReader().ReadUtf32String();
+}
+
+std::string IdentifierNode::ToString() const
+{
+    return ToUtf8(identifier);
 }
 
 } } // namespace cmajor::ast

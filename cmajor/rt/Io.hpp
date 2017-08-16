@@ -9,6 +9,9 @@
 #include <stdexcept>
 #include <stdint.h>
 
+const int stdOutFileHandle = 1;
+const int stdErrFileHandle = 2;
+
 extern "C" RT_API void RtWrite(int32_t fileHandle, const uint8_t* buffer, int32_t count);
 
 namespace cmajor { namespace rt {

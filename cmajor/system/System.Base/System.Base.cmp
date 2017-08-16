@@ -1,6 +1,11 @@
 project System.Base;
 target=library;
 reference <../System.Runtime/System.Runtime.cmp>;
+source <Algorithm.cm>;
+source <Functional.cm>;
+source <List.cm>;
+source <Pair.cm>;
+source <RandomAccessIterator.cm>;
 source <Rvalue.cm>;
 source <UniquePtr.cm>;
 source <Utility.cm>;

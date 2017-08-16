@@ -21,6 +21,7 @@ public:
     void Accept(Visitor& visitor) override;
     void Write(AstWriter& writer) override;
     void Read(AstReader& reader) override;
+    std::string ToString() const override;
     Node* Primary() { return primary.get(); }
     void AddTemplateArgument(Node* templateArgument);
     const NodeList<Node>& TemplateArguments() const { return templateArguments; }

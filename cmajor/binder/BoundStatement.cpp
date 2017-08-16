@@ -126,6 +126,80 @@ void BoundForStatement::Accept(BoundNodeVisitor& visitor)
     visitor.Visit(*this);
 }
 
+BoundSwitchStatement::BoundSwitchStatement(const Span& span_, std::unique_ptr<BoundExpression>&& condition_) : 
+    BoundStatement(span_, BoundNodeType::boundSwitchStatement), condition(std::move(condition_))
+{
+}
+
+void BoundSwitchStatement::AddCaseStatement(std::unique_ptr<BoundCaseStatement>&& caseStatement)
+{
+    caseStatement->SetParent(this);
+    caseStatements.push_back(std::move(caseStatement));
+}
+
+void BoundSwitchStatement::SetDefaultStatement(std::unique_ptr<BoundDefaultStatement>&& defaultStatement_)
+{
+    defaultStatement = std::move(defaultStatement_);
+    defaultStatement->SetParent(this);
+}
+
+void BoundSwitchStatement::Accept(BoundNodeVisitor& visitor)
+{
+    visitor.Visit(*this);
+}
+
+BoundCaseStatement::BoundCaseStatement(const Span& span_) : BoundStatement(span_, BoundNodeType::boundCaseStatement), compoundStatement(span_)
+{
+}
+
+void BoundCaseStatement::AddCaseValue(std::unique_ptr<Value>&& caseValue)
+{
+    caseValues.push_back(std::move(caseValue));
+}
+
+void BoundCaseStatement::AddStatement(std::unique_ptr<BoundStatement>&& statement)
+{
+    compoundStatement.AddStatement(std::move(statement));
+}
+
+void BoundCaseStatement::Accept(BoundNodeVisitor& visitor)
+{
+    visitor.Visit(*this);
+}
+
+BoundDefaultStatement::BoundDefaultStatement(const Span& span_) : BoundStatement(span_, BoundNodeType::boundDefaultStatement), compoundStatement(span_)
+{
+}
+
+void BoundDefaultStatement::AddStatement(std::unique_ptr<BoundStatement>&& statement)
+{
+    compoundStatement.AddStatement(std::move(statement));
+}
+
+void BoundDefaultStatement::Accept(BoundNodeVisitor& visitor)
+{
+    visitor.Visit(*this);
+}
+
+BoundGotoCaseStatement::BoundGotoCaseStatement(const Span& span_, std::unique_ptr<Value>&& caseValue_) : 
+    BoundStatement(span_, BoundNodeType::boundGotoCaseStatement), caseValue(std::move(caseValue_))
+{
+}
+
+void BoundGotoCaseStatement::Accept(BoundNodeVisitor& visitor)
+{
+    visitor.Visit(*this);
+}
+
+BoundGotoDefaultStatement::BoundGotoDefaultStatement(const Span& span_) : BoundStatement(span_, BoundNodeType::boundGotoDefaultStatement)
+{
+}
+
+void BoundGotoDefaultStatement::Accept(BoundNodeVisitor& visitor)
+{
+    visitor.Visit(*this);
+}
+
 BoundBreakStatement::BoundBreakStatement(const Span& span_) : BoundStatement(span_, BoundNodeType::boundBreakStatement)
 {
 }

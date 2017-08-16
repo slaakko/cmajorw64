@@ -691,6 +691,33 @@ void BoundConstructExpression::Accept(BoundNodeVisitor& visitor)
     visitor.Visit(*this);
 }
 
+BoundConstructAndReturnTemporaryExpression::BoundConstructAndReturnTemporaryExpression(std::unique_ptr<BoundExpression>&& constructorCall_, std::unique_ptr<BoundExpression>&& boundTemporary_) : 
+    BoundExpression(constructorCall_->GetSpan(), BoundNodeType::boundConstructAndReturnTemporary, boundTemporary_->GetType()), constructorCall(std::move(constructorCall_)), 
+    boundTemporary(std::move(boundTemporary_))
+{
+}
+
+BoundExpression* BoundConstructAndReturnTemporaryExpression::Clone()
+{
+    return new BoundConstructAndReturnTemporaryExpression(std::unique_ptr<BoundExpression>(constructorCall->Clone()), std::unique_ptr<BoundExpression>(boundTemporary->Clone()));
+}
+
+void BoundConstructAndReturnTemporaryExpression::Load(Emitter& emitter, OperationFlags flags)
+{
+    constructorCall->Load(emitter, OperationFlags::none);
+    boundTemporary->Load(emitter, flags);
+}
+
+void BoundConstructAndReturnTemporaryExpression::Store(Emitter& emitter, OperationFlags flags)
+{
+    throw Exception("cannot store to construct and return temporary expression", GetSpan());
+}
+
+void BoundConstructAndReturnTemporaryExpression::Accept(BoundNodeVisitor& visitor)
+{
+    visitor.Visit(*this);
+}
+
 BoundConversion::BoundConversion(std::unique_ptr<BoundExpression>&& sourceExpr_, FunctionSymbol* conversionFun_) :
     BoundExpression(sourceExpr_->GetSpan(), BoundNodeType::boundConversion, conversionFun_->ConversionTargetType()), sourceExpr(std::move(sourceExpr_)), conversionFun(conversionFun_)
 {
@@ -943,6 +970,108 @@ void BoundFunctionPtr::Store(Emitter& emitter, OperationFlags flags)
 void BoundFunctionPtr::Accept(BoundNodeVisitor& visitor)
 {
     visitor.Visit(*this);
+}
+
+BoundDisjunction::BoundDisjunction(const Span& span_, std::unique_ptr<BoundExpression>&& left_, std::unique_ptr<BoundExpression>&& right_, TypeSymbol* boolType_) :
+    BoundExpression(span_, BoundNodeType::boundDisjunction, boolType_), left(std::move(left_)), right(std::move(right_))
+{
+}
+
+BoundExpression* BoundDisjunction::Clone()
+{
+    return new BoundDisjunction(GetSpan(), std::unique_ptr<BoundExpression>(left->Clone()), std::unique_ptr<BoundExpression>(right->Clone()), GetType());
+}
+
+void BoundDisjunction::Load(Emitter& emitter, OperationFlags flags)
+{
+    temporary->Load(emitter, OperationFlags::addr);
+    llvm::Value* temp = emitter.Stack().Pop();
+    left->Load(emitter, OperationFlags::none);
+    llvm::Value* leftValue = emitter.Stack().Pop();
+    llvm::BasicBlock* trueBlock = llvm::BasicBlock::Create(emitter.Context(), "true", emitter.Function());
+    llvm::BasicBlock* rightBlock = llvm::BasicBlock::Create(emitter.Context(), "right", emitter.Function());
+    llvm::BasicBlock* falseBlock = llvm::BasicBlock::Create(emitter.Context(), "false", emitter.Function());
+    llvm::BasicBlock* nextBlock = llvm::BasicBlock::Create(emitter.Context(), "next", emitter.Function());
+    emitter.Builder().CreateCondBr(leftValue, trueBlock, rightBlock);
+    emitter.Builder().SetInsertPoint(rightBlock);
+    right->Load(emitter, OperationFlags::none);
+    llvm::Value* rightValue = emitter.Stack().Pop();
+    emitter.Builder().CreateCondBr(rightValue, trueBlock, falseBlock);
+    emitter.Builder().SetInsertPoint(trueBlock);
+    emitter.Builder().CreateStore(emitter.Builder().getInt1(true), temp);
+    emitter.Builder().CreateBr(nextBlock);
+    emitter.Builder().SetInsertPoint(falseBlock);
+    emitter.Builder().CreateStore(emitter.Builder().getInt1(false), temp);
+    emitter.Builder().CreateBr(nextBlock);
+    emitter.Builder().SetInsertPoint(nextBlock);
+    llvm::Value* value = emitter.Builder().CreateLoad(temp);
+    emitter.Stack().Push(value);
+}
+
+void BoundDisjunction::Store(Emitter& emitter, OperationFlags flags)
+{
+    throw Exception("cannot store to disjunction", GetSpan());
+}
+
+void BoundDisjunction::Accept(BoundNodeVisitor& visitor)
+{
+    visitor.Visit(*this);
+}
+
+void BoundDisjunction::SetTemporary(BoundLocalVariable* temporary_)
+{
+    temporary.reset(temporary_);
+}
+
+BoundConjunction::BoundConjunction(const Span& span_, std::unique_ptr<BoundExpression>&& left_, std::unique_ptr<BoundExpression>&& right_, TypeSymbol* boolType_) :
+    BoundExpression(span_, BoundNodeType::boundConjunction, boolType_), left(std::move(left_)), right(std::move(right_))
+{
+}
+
+BoundExpression* BoundConjunction::Clone()
+{
+    return new BoundConjunction(GetSpan(), std::unique_ptr<BoundExpression>(left->Clone()), std::unique_ptr<BoundExpression>(right->Clone()), GetType());
+}
+
+void BoundConjunction::Load(Emitter& emitter, OperationFlags flags)
+{
+    temporary->Load(emitter, OperationFlags::addr);
+    llvm::Value* temp = emitter.Stack().Pop();
+    left->Load(emitter, OperationFlags::none);
+    llvm::Value* leftValue = emitter.Stack().Pop();
+    llvm::BasicBlock* trueBlock = llvm::BasicBlock::Create(emitter.Context(), "true", emitter.Function());
+    llvm::BasicBlock* rightBlock = llvm::BasicBlock::Create(emitter.Context(), "right", emitter.Function());
+    llvm::BasicBlock* falseBlock = llvm::BasicBlock::Create(emitter.Context(), "false", emitter.Function());
+    llvm::BasicBlock* nextBlock = llvm::BasicBlock::Create(emitter.Context(), "next", emitter.Function());
+    emitter.Builder().CreateCondBr(leftValue, rightBlock, falseBlock);
+    emitter.Builder().SetInsertPoint(rightBlock);
+    right->Load(emitter, OperationFlags::none);
+    llvm::Value* rightValue = emitter.Stack().Pop();
+    emitter.Builder().CreateCondBr(rightValue, trueBlock, falseBlock);
+    emitter.Builder().SetInsertPoint(trueBlock);
+    emitter.Builder().CreateStore(emitter.Builder().getInt1(true), temp);
+    emitter.Builder().CreateBr(nextBlock);
+    emitter.Builder().SetInsertPoint(falseBlock);
+    emitter.Builder().CreateStore(emitter.Builder().getInt1(false), temp);
+    emitter.Builder().CreateBr(nextBlock);
+    emitter.Builder().SetInsertPoint(nextBlock);
+    llvm::Value* value = emitter.Builder().CreateLoad(temp);
+    emitter.Stack().Push(value);
+}
+
+void BoundConjunction::Store(Emitter& emitter, OperationFlags flags)
+{
+    throw Exception("cannot store to conjunction", GetSpan());
+}
+
+void BoundConjunction::Accept(BoundNodeVisitor& visitor)
+{
+    visitor.Visit(*this);
+}
+
+void BoundConjunction::SetTemporary(BoundLocalVariable* temporary_)
+{
+    temporary.reset(temporary_);
 }
 
 BoundTypeExpression::BoundTypeExpression(const Span& span_, TypeSymbol* type_) : BoundExpression(span_, BoundNodeType::boundTypeExpression, type_)

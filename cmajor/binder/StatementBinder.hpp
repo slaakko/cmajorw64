@@ -13,6 +13,8 @@ namespace cmajor { namespace binder {
 using namespace cmajor::ast;
 
 class BoundStatement;
+class BoundGotoCaseStatement;
+class BoundGotoDefaultStatement;
 class BoundClass;
 class BoundFunction;
 
@@ -76,6 +78,10 @@ private:
     DestructorNode* currentDestructorNode;
     MemberFunctionSymbol* currentMemberFunctionSymbol;
     MemberFunctionNode* currentMemberFunctionNode;
+    TypeSymbol* switchConditionType;
+    std::unordered_map<IntegralValue, CaseStatementNode*, IntegralValueHash>* currentCaseValueMap;
+    std::vector<std::pair<BoundGotoCaseStatement*, IntegralValue>>* currentGotoCaseStatements;
+    std::vector<BoundGotoDefaultStatement*>* currentGotoDefaultStatements;
     bool postfix;
     void AddStatement(BoundStatement* boundStatement);
 };

@@ -18,6 +18,7 @@ enum class OperationFlags : uint8_t
     deref = 1 << 1,
     virtualCall = 1 << 2,
     leaveFirstArg = 1 << 3,
+    copyFirst = 1 << 4,
     functionCallFlags = leaveFirstArg
 };
 

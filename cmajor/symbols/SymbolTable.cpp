@@ -610,6 +610,7 @@ void SymbolTable::BeginEnumType(EnumTypeNode& enumTypeNode)
     EnumTypeSymbol* enumTypeSymbol = new EnumTypeSymbol(enumTypeNode.GetSpan(), enumTypeNode.Id()->Str());
     enumTypeSymbol->SetSymbolTable(this);
     MapNode(&enumTypeNode, enumTypeSymbol);
+    SetTypeIdFor(enumTypeSymbol);
     ContainerScope* enumTypeScope = enumTypeSymbol->GetContainerScope();
     ContainerScope* containerScope = container->GetContainerScope();
     enumTypeScope->SetParent(containerScope);

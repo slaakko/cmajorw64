@@ -16,11 +16,12 @@ using namespace cmajor::ir;
 enum class BoundNodeType : uint8_t
 {
     boundCompileUnit, boundClass, boundFunction, 
-    boundSequenceStatement, boundCompoundStatement, boundReturnStatement, boundIfStatement, boundWhileStatement, boundDoStatement, boundForStatement, boundBreakStatement, boundContinueStatement,
+    boundSequenceStatement, boundCompoundStatement, boundReturnStatement, boundIfStatement, boundWhileStatement, boundDoStatement, boundForStatement, 
+    boundSwitchStatement, boundCaseStatement, boundDefaultStatement, boundGotoCaseStatement, boundGotoDefaultStatement, boundBreakStatement, boundContinueStatement,
     boundGotoStatement, boundConstructionStatement, boundAssignmentStatement, boundExpressionStatement, boundEmptyStatement, boundSetVmtPtrStatement,
-    boundParameter, boundLocalVariable, boundMemberVariable, boundConstant, boundEnumConstant, boundLiteral, boundTemporary, boundBitCast, boundFunctionPtr,
+    boundParameter, boundLocalVariable, boundMemberVariable, boundConstant, boundEnumConstant, boundLiteral, boundTemporary, boundBitCast, boundFunctionPtr, boundConstructAndReturnTemporary,
     boundFunctionCall, boundConversion, boundSizeOfExpression, boundAddressOfExpression, boundDereferenceExpression, boundReferenceToPointerExpression, boundConstructExpression,
-    boundIsExpression, boundAsExpression, boundTypeNameExpression,
+    boundIsExpression, boundAsExpression, boundTypeNameExpression, boundDisjunction, boundConjunction,
     boundTypeExpression, boundNamespaceExpression, boundFunctionGroupExcpression, boundMemberExpression
 };
 

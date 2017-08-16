@@ -5,10 +5,10 @@
 
 namespace System
 {
-    public nothrow inline ulong Align(ulong n, ulong alignment)
+    public nothrow inline long Align(long n, long alignment)
     {
-        #assert(alignment > 0u);
-        return (n + alignment - 1u) & -alignment;
+        #assert(alignment > 0);
+        return (n + alignment - 1) & -alignment;
     }
 
     public nothrow int StrLen(const char* s)
@@ -152,27 +152,27 @@ namespace System
         return resultLen;
     }
 
-    public nothrow ulong MemGrow(ulong size)
+    public nothrow long MemGrow(long size)
     {
-        if (size < 8u)
+        if (size < 8)
         {
-            return 8u;
+            return 8;
         }
-        else if (size < 64u)
+        else if (size < 64)
         {
-            return 64u;
+            return 64;
         }
-        else if (size < 512u)
+        else if (size < 512)
         {
-            return 512u;
+            return 512;
         }
-        else if (size < 4096u)
+        else if (size < 4096)
         {
-            return 4096u;
+            return 4096;
         }
         else
         {
-            return 2u * Align(size, 4096u);
+            return 2 * Align(size, 4096);
         }
     }
 }

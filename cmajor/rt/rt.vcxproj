@@ -157,6 +157,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Error.hpp" />
     <ClInclude Include="CallStack.hpp" />
     <ClInclude Include="Classes.hpp" />
     <ClInclude Include="Exception.hpp" />
@@ -167,6 +168,7 @@
     <ClInclude Include="Statics.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Error.cpp" />
     <ClCompile Include="CallStack.cpp" />
     <ClCompile Include="Classes.cpp" />
     <ClCompile Include="DllMain.cpp" />

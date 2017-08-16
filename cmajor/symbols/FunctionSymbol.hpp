@@ -147,6 +147,9 @@ public:
     const std::vector<LocalVariableSymbol*>& LocalVariables() const { return localVariables; }
     void SetReturnType(TypeSymbol* returnType_) { returnType = returnType_; }
     TypeSymbol* ReturnType() const { return returnType; }
+    ParameterSymbol* ReturnParam() { return returnParam.get(); }
+    void SetReturnParam(ParameterSymbol* returnParam_);
+    bool ReturnsClassByValue() const;
     bool IsFunctionTemplate() const { return !templateParameters.empty(); }
     void CloneUsingNodes(const std::vector<Node*>& usingNodes_);
     LocalVariableSymbol* CreateTemporary(TypeSymbol* type, const Span& span);
@@ -159,6 +162,7 @@ private:
     std::u32string groupName;
     std::vector<TemplateParameterSymbol*> templateParameters;
     std::vector<ParameterSymbol*> parameters;
+    std::unique_ptr<ParameterSymbol> returnParam;
     std::vector<LocalVariableSymbol*> localVariables;
     TypeSymbol* returnType;
     FunctionSymbolFlags flags;

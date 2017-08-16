@@ -7,8 +7,12 @@
 #include <cmajor/ast/Visitor.hpp>
 #include <cmajor/ast/AstWriter.hpp>
 #include <cmajor/ast/AstReader.hpp>
+#include <cmajor/util/TextUtils.hpp>
+#include <cmajor/util/Unicode.hpp>
 
 namespace cmajor { namespace ast {
+
+using namespace cmajor::unicode;
 
 Node* CreateIntegerLiteralNode(const Span& span, uint64_t value, bool unsignedSuffix)
 {
@@ -76,6 +80,11 @@ void BooleanLiteralNode::Read(AstReader& reader)
     value = reader.GetBinaryReader().ReadBool();
 }
 
+std::string BooleanLiteralNode::ToString() const
+{
+    if (value) return "true"; else return "false";
+}
+
 SByteLiteralNode::SByteLiteralNode(const Span& span_) : Node(NodeType::sbyteLiteralNode, span_), value(0)
 {
 }
@@ -104,6 +113,11 @@ void SByteLiteralNode::Read(AstReader& reader)
 {
     Node::Read(reader);
     value = reader.GetBinaryReader().ReadSByte();
+}
+
+std::string SByteLiteralNode::ToString() const
+{
+    return std::to_string(value);
 }
 
 ByteLiteralNode::ByteLiteralNode(const Span& span_) : Node(NodeType::byteLiteralNode, span_), value(0)
@@ -136,6 +150,11 @@ void ByteLiteralNode::Read(AstReader& reader)
     value = reader.GetBinaryReader().ReadByte();
 }
 
+std::string ByteLiteralNode::ToString() const
+{
+    return std::to_string(value) + "u";
+}
+
 ShortLiteralNode::ShortLiteralNode(const Span& span_) : Node(NodeType::shortLiteralNode, span_), value(0)
 {
 }
@@ -164,6 +183,11 @@ void ShortLiteralNode::Read(AstReader& reader)
 {
     Node::Read(reader);
     value = reader.GetBinaryReader().ReadShort();
+}
+
+std::string ShortLiteralNode::ToString() const
+{
+    return std::to_string(value);
 }
 
 UShortLiteralNode::UShortLiteralNode(const Span& span_) : Node(NodeType::ushortLiteralNode, span_), value(0)
@@ -196,6 +220,11 @@ void UShortLiteralNode::Read(AstReader& reader)
     value = reader.GetBinaryReader().ReadUShort();
 }
 
+std::string UShortLiteralNode::ToString() const
+{
+    return std::to_string(value) + "u";
+}
+
 IntLiteralNode::IntLiteralNode(const Span& span_) : Node(NodeType::intLiteralNode, span_), value(0)
 {
 }
@@ -224,6 +253,11 @@ void IntLiteralNode::Read(AstReader& reader)
 {
     Node::Read(reader);
     value = reader.GetBinaryReader().ReadInt();
+}
+
+std::string IntLiteralNode::ToString() const
+{
+    return std::to_string(value);
 }
 
 UIntLiteralNode::UIntLiteralNode(const Span& span_) : Node(NodeType::uintLiteralNode, span_), value(0)
@@ -256,6 +290,11 @@ void UIntLiteralNode::Read(AstReader& reader)
     value = reader.GetBinaryReader().ReadUInt();
 }
 
+std::string UIntLiteralNode::ToString() const
+{
+    return std::to_string(value) + "u";
+}
+
 LongLiteralNode::LongLiteralNode(const Span& span_) : Node(NodeType::longLiteralNode, span_), value(0)
 {
 }
@@ -284,6 +323,11 @@ void LongLiteralNode::Read(AstReader& reader)
 {
     Node::Read(reader);
     value = reader.GetBinaryReader().ReadLong();
+}
+
+std::string LongLiteralNode::ToString() const
+{
+    return std::to_string(value);
 }
 
 ULongLiteralNode::ULongLiteralNode(const Span& span_) : Node(NodeType::ulongLiteralNode, span_), value(0)
@@ -316,6 +360,11 @@ void ULongLiteralNode::Read(AstReader& reader)
     value = reader.GetBinaryReader().ReadULong();
 }
 
+std::string ULongLiteralNode::ToString() const
+{
+    return std::to_string(value) + "u";
+}
+
 FloatLiteralNode::FloatLiteralNode(const Span& span_) : Node(NodeType::floatLiteralNode, span_), value(0)
 {
 }
@@ -344,6 +393,11 @@ void FloatLiteralNode::Read(AstReader& reader)
 {
     Node::Read(reader);
     value = reader.GetBinaryReader().ReadFloat();
+}
+
+std::string FloatLiteralNode::ToString() const
+{
+    return std::to_string(value) + "f";
 }
 
 DoubleLiteralNode::DoubleLiteralNode(const Span& span_) : Node(NodeType::doubleLiteralNode, span_), value(0)
@@ -376,6 +430,11 @@ void DoubleLiteralNode::Read(AstReader& reader)
     value = reader.GetBinaryReader().ReadDouble();
 }
 
+std::string DoubleLiteralNode::ToString() const
+{
+    return std::to_string(value);
+}
+
 CharLiteralNode::CharLiteralNode(const Span& span_) : Node(NodeType::charLiteralNode, span_), value('\0')
 {
 }
@@ -404,6 +463,11 @@ void CharLiteralNode::Read(AstReader& reader)
 {
     Node::Read(reader);
     value = reader.GetBinaryReader().ReadChar();
+}
+
+std::string CharLiteralNode::ToString() const
+{
+    return "'" + CharStr(value) + "'";
 }
 
 WCharLiteralNode::WCharLiteralNode(const Span& span_) : Node(NodeType::wcharLiteralNode, span_), value('\0')
@@ -436,6 +500,11 @@ void WCharLiteralNode::Read(AstReader& reader)
     value = reader.GetBinaryReader().ReadWChar();
 }
 
+std::string WCharLiteralNode::ToString() const
+{
+    return "w'" + ToUtf8(CharStr(char32_t(value))) + "'";
+}
+
 UCharLiteralNode::UCharLiteralNode(const Span& span_) : Node(NodeType::ucharLiteralNode, span_), value('\0')
 {
 }
@@ -464,6 +533,11 @@ void UCharLiteralNode::Read(AstReader& reader)
 {
     Node::Read(reader);
     value = reader.GetBinaryReader().ReadUChar();
+}
+
+std::string UCharLiteralNode::ToString() const
+{
+    return "u'" + ToUtf8(CharStr(value)) + "'";
 }
 
 StringLiteralNode::StringLiteralNode(const Span& span_) : Node(NodeType::stringLiteralNode, span_), value()
@@ -496,6 +570,11 @@ void StringLiteralNode::Read(AstReader& reader)
     value = reader.GetBinaryReader().ReadUtf8String();
 }
 
+std::string StringLiteralNode::ToString() const
+{
+    return "\"" + StringStr(value) + "\"";
+}
+
 WStringLiteralNode::WStringLiteralNode(const Span& span_) : Node(NodeType::wstringLiteralNode, span_), value()
 {
 }
@@ -526,6 +605,11 @@ void WStringLiteralNode::Read(AstReader& reader)
     value = reader.GetBinaryReader().ReadUtf16String();
 }
 
+std::string WStringLiteralNode::ToString() const
+{
+    return "\"" + StringStr(ToUtf8(value)) + "\"";
+}
+
 UStringLiteralNode::UStringLiteralNode(const Span& span_) : Node(NodeType::ustringLiteralNode, span_), value()
 {
 }
@@ -554,6 +638,11 @@ void UStringLiteralNode::Read(AstReader& reader)
 {
     Node::Read(reader);
     value = reader.GetBinaryReader().ReadUtf32String();
+}
+
+std::string UStringLiteralNode::ToString() const
+{
+    return "\"" + StringStr(ToUtf8(value)) + "\"";
 }
 
 NullLiteralNode::NullLiteralNode(const Span& span_) : Node(NodeType::nullLiteralNode, span_)

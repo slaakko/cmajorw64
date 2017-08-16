@@ -4,20 +4,23 @@
 // =================================
 
 #include <cmajor/rt/CallStack.hpp>
+#include <cmajor/rt/Error.hpp>
+#include <cmajor/rt/Io.hpp>
 #include <cmajor/util/Error.hpp>
 #include <vector>
+#include <sstream>
 
 namespace cmajor { namespace rt {
 
-struct FunctionInfo
+struct SourceLocation
 {
-    FunctionInfo(const char* functionName_, const char* sourceFilePath_);
+    SourceLocation(const char* functionName_, const char* sourceFilePath_);
     const char* functionName;
     const char* sourceFilePath;
     int32_t lineNumber;
 };
 
-FunctionInfo::FunctionInfo(const char* functionName_, const char* sourceFilePath_) : functionName(functionName_), sourceFilePath(sourceFilePath_), lineNumber(0)
+SourceLocation::SourceLocation(const char* functionName_, const char* sourceFilePath_) : functionName(functionName_), sourceFilePath(sourceFilePath_), lineNumber(0)
 {
 }
 
@@ -25,9 +28,9 @@ class CallStack
 {
 public:
     CallStack();
-    std::vector<FunctionInfo>& Calls() { return calls; }
+    std::vector<SourceLocation>& Locations() { return locations; }
 private:
-    std::vector<FunctionInfo> calls;
+    std::vector<SourceLocation> locations;
 };
 
 CallStack::CallStack()
@@ -54,7 +57,7 @@ extern "C" RT_API void RtEnterFunction(const char* functionName, const char* sou
         callStack = new cmajor::rt::CallStack();
         cmajor::rt::callStack = callStack;
     }
-    callStack->Calls().push_back(cmajor::rt::FunctionInfo(functionName, sourceFilePath));
+    callStack->Locations().push_back(cmajor::rt::SourceLocation(functionName, sourceFilePath));
 }
 
 extern "C" RT_API void RtSetLineNumber(int32_t lineNumber)
@@ -62,13 +65,16 @@ extern "C" RT_API void RtSetLineNumber(int32_t lineNumber)
     try
     {
         cmajor::rt::CallStack* callStack = cmajor::rt::callStack;
-        Assert(callStack && !callStack->Calls().empty(), "call stack is empty");
-        callStack->Calls().back().lineNumber = lineNumber;
+        Assert(callStack && !callStack->Locations().empty(), "call stack is empty");
+        callStack->Locations().back().lineNumber = lineNumber;
     }
     catch (const std::exception& ex)
     {
-        int x = 0;
-        // todo
+        std::stringstream s;
+        s << "internal error: " << ex.what() << "\n";
+        std::string str = s.str();
+        RtWrite(stdErrFileHandle, reinterpret_cast<const uint8_t*>(str.c_str()), str.length());
+        exit(exitCodeInternalError);
     }
 }
 
@@ -77,12 +83,30 @@ extern "C" RT_API void RtExitFunction()
     try
     {
         cmajor::rt::CallStack* callStack = cmajor::rt::callStack;
-        Assert(callStack && !callStack->Calls().empty(), "call stack is empty");
-        callStack->Calls().pop_back();
+        Assert(callStack && !callStack->Locations().empty(), "call stack is empty");
+        callStack->Locations().pop_back();
     }
     catch (const std::exception& ex)
     {
-        int x = 0;
-        // todo
+        std::stringstream s;
+        s << "internal error: " << ex.what() << "\n";
+        std::string str = s.str();
+        RtWrite(stdErrFileHandle, reinterpret_cast<const uint8_t*>(str.c_str()), str.length());
+        exit(exitCodeInternalError);
     }
+}
+
+extern "C" RT_API void RtPrintCallStack(int fileHandle)
+{
+    std::stringstream s;
+    cmajor::rt::CallStack* callStack = cmajor::rt::callStack;
+    s << "CALL STACK:\n";
+    int n = callStack->Locations().size();
+    for (int i = n - 1; i >= 0; --i)
+    {
+        const cmajor::rt::SourceLocation& location = callStack->Locations()[i];
+        s << location.functionName << " " << location.sourceFilePath << ":" << location.lineNumber << "\n";
+    }
+    std::string str = s.str();
+    RtWrite(stdErrFileHandle, reinterpret_cast<const uint8_t*>(str.c_str()), str.length());
 }

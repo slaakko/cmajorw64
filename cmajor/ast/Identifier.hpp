@@ -19,6 +19,7 @@ public:
     void Write(AstWriter& writer) override;
     void Read(AstReader& reader) override;
     const std::u32string& Str() const { return identifier; }
+    std::string ToString() const override;
 private:
     std::u32string identifier;
 };

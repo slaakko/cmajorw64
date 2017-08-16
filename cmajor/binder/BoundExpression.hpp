@@ -250,6 +250,22 @@ private:
     std::unique_ptr<BoundExpression> constructorCall;
 };
 
+class BoundConstructAndReturnTemporaryExpression : public BoundExpression
+{
+public:
+    BoundConstructAndReturnTemporaryExpression(std::unique_ptr<BoundExpression>&& constructorCall_, std::unique_ptr<BoundExpression>&& boundTemporary_);
+    BoundExpression* Clone() override;
+    void Load(Emitter& emitter, OperationFlags flags) override;
+    void Store(Emitter& emitter, OperationFlags flags) override;
+    void Accept(BoundNodeVisitor& visitor) override;
+    bool HasValue() const override { return true; }
+    bool IsLvalueExpression() const override { return true; }
+    std::string TypeString() const override { return "construct and return temporary expression"; }
+private:
+    std::unique_ptr<BoundExpression> constructorCall;
+    std::unique_ptr<BoundExpression> boundTemporary;
+};
+
 class BoundConversion : public BoundExpression
 {
 public:
@@ -333,6 +349,42 @@ public:
     bool HasValue() const override { return true; }
 private:
     FunctionSymbol* function;
+};
+
+class BoundDisjunction : public BoundExpression
+{
+public:
+    BoundDisjunction(const Span& span_, std::unique_ptr<BoundExpression>&& left_, std::unique_ptr<BoundExpression>&& right_, TypeSymbol* boolType_);
+    BoundExpression* Clone() override;
+    void Load(Emitter& emitter, OperationFlags flags) override;
+    void Store(Emitter& emitter, OperationFlags flags) override;
+    void Accept(BoundNodeVisitor& visitor) override;
+    bool HasValue() const override { return true; }
+    BoundExpression* Left() { return left.get(); }
+    BoundExpression* Right() { return right.get(); }
+    void SetTemporary(BoundLocalVariable* temporary_);
+private:
+    std::unique_ptr<BoundExpression> left;
+    std::unique_ptr<BoundExpression> right;
+    std::unique_ptr<BoundLocalVariable> temporary;
+};
+
+class BoundConjunction : public BoundExpression
+{
+public:
+    BoundConjunction(const Span& span_, std::unique_ptr<BoundExpression>&& left_, std::unique_ptr<BoundExpression>&& right_, TypeSymbol* boolType_);
+    BoundExpression* Clone() override;
+    void Load(Emitter& emitter, OperationFlags flags) override;
+    void Store(Emitter& emitter, OperationFlags flags) override;
+    void Accept(BoundNodeVisitor& visitor) override;
+    bool HasValue() const override { return true; }
+    BoundExpression* Left() { return left.get(); }
+    BoundExpression* Right() { return right.get(); }
+    void SetTemporary(BoundLocalVariable* temporary_);
+private:
+    std::unique_ptr<BoundExpression> left;
+    std::unique_ptr<BoundExpression> right;
+    std::unique_ptr<BoundLocalVariable> temporary;
 };
 
 class BoundTypeExpression : public BoundExpression

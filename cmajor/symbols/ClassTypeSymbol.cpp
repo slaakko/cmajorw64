@@ -149,7 +149,7 @@ void ClassTypeSymbol::EmplaceType(TypeSymbol* typeSymbol, int index)
 {
     if (index == 0)
     {
-        Assert(typeSymbol->GetSymbolType() == SymbolType::classTypeSymbol, "class type symbol expected");
+        Assert(typeSymbol->GetSymbolType() == SymbolType::classTypeSymbol || typeSymbol->GetSymbolType() == SymbolType::classTemplateSpecializationSymbol, "class type symbol expected");
         baseClass = static_cast<ClassTypeSymbol*>(typeSymbol);
     }
     else if (index >= 1)

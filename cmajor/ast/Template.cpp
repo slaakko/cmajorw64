@@ -51,6 +51,23 @@ void TemplateIdNode::Read(AstReader& reader)
     templateArguments.SetParent(this);
 }
 
+std::string TemplateIdNode::ToString() const
+{
+    std::string s = primary->ToString();
+    s.append("<");
+    int n = templateArguments.Count();
+    for (int i = 0; i < n; ++i)
+    {
+        if (i > 0)
+        {
+            s.append(", ");
+        }
+        s.append(templateArguments[i]->ToString());
+    }
+    s.append(">");
+    return s;
+}
+
 void TemplateIdNode::AddTemplateArgument(Node* templateArgument)
 {
     templateArgument->SetParent(this);

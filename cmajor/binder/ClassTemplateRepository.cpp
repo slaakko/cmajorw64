@@ -151,11 +151,16 @@ void ClassTemplateRepository::BindClassTemplateSpecialization(ClassTemplateSpeci
         throw Exception("wrong number of template arguments", span);
     }
     bool markedExport = classTemplateSpecialization->MarkedExport();
+    bool templateParameterBinding = false;
     for (int i = 0; i < n; ++i)
     {
         TemplateParameterSymbol* templateParameter = classTemplate->TemplateParameters()[i];
         BoundTemplateParameterSymbol* boundTemplateParameter = new BoundTemplateParameterSymbol(span, templateParameter->Name());
         TypeSymbol* templateArgumentType = classTemplateSpecialization->TemplateArgumentTypes()[i];
+        if (templateArgumentType->GetSymbolType() == SymbolType::templateParameterSymbol)
+        {
+            templateParameterBinding = true;
+        }
         if (markedExport)
         {
             templateArgumentType->MarkExport();
@@ -169,26 +174,23 @@ void ClassTemplateRepository::BindClassTemplateSpecialization(ClassTemplateSpeci
     globalNs->Accept(symbolCreatorVisitor);
     TypeBinder typeBinder(boundCompileUnit);
     globalNs->Accept(typeBinder);
-    StatementBinder statementBinder(boundCompileUnit);
-    globalNs->Accept(statementBinder);
-    classTemplateSpecialization->SetGlobalNs(std::move(globalNs));
-    if (fileScopeAdded)
+    if (templateParameterBinding)
     {
-        boundCompileUnit.RemoveLastFileScope();
-    }
-    bool templateArgumentsContainTemplateParameter = false;
-    int ntp = classTemplateSpecialization->TemplateArgumentTypes().size();
-    for (int i = 0; i < ntp; ++i)
-    {
-        TypeSymbol* templateTypeArgument = classTemplateSpecialization->TemplateArgumentTypes()[i];
-        if (templateTypeArgument->ContainsTemplateParameter())
+        classTemplateSpecialization->SetGlobalNs(std::move(globalNs));
+        if (fileScopeAdded)
         {
-            templateArgumentsContainTemplateParameter = true;
-            break;
+            boundCompileUnit.RemoveLastFileScope();
         }
     }
-    if (!templateArgumentsContainTemplateParameter)
+    else
     {
+        StatementBinder statementBinder(boundCompileUnit);
+        globalNs->Accept(statementBinder);
+        classTemplateSpecialization->SetGlobalNs(std::move(globalNs));
+        if (fileScopeAdded)
+        {
+            boundCompileUnit.RemoveLastFileScope();
+        }
         for (FunctionSymbol* virtualMemberFunction : classTemplateSpecialization->Vmt())
         {
             Instantiate(virtualMemberFunction, containerScope, span);

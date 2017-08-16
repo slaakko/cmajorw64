@@ -5,13 +5,6 @@
 
 namespace System
 {
-    public nothrow inline void Swap<T>(T& left, T& right)
-    {
-        T temp(Rvalue(left));
-        left = Rvalue(right);
-        right = Rvalue(temp);
-    }
-
     public nothrow inline T&& Rvalue<T>(T&& x)
     {
         return cast<T&&>(x);

@@ -14,6 +14,7 @@
 #include <cmajor/symbols/ClassTypeSymbol.hpp>
 #include <cmajor/symbols/ConstantSymbol.hpp>
 #include <cmajor/symbols/EnumSymbol.hpp>
+#include <cmajor/symbols/TypedefSymbol.hpp>
 #include <cmajor/ast/BasicType.hpp>
 #include <cmajor/ast/Literal.hpp>
 #include <cmajor/ast/Expression.hpp>
@@ -202,6 +203,13 @@ void ExpressionBinder::BindSymbol(Symbol* symbol)
             expression.reset(new BoundTypeExpression(span, classTypeSymbol));
             break;
         }
+        case SymbolType::typedefSymbol:
+        {
+            TypedefSymbol* typedefSymbol = static_cast<TypedefSymbol*>(symbol);
+            CheckAccess(boundFunction->GetFunctionSymbol(), typedefSymbol);
+            expression.reset(new BoundTypeExpression(span, typedefSymbol->GetType()));
+            break;
+        }
         case SymbolType::parameterSymbol:
         {
             ParameterSymbol* parameterSymbol = static_cast<ParameterSymbol*>(symbol);
@@ -253,7 +261,6 @@ void ExpressionBinder::BindSymbol(Symbol* symbol)
                             thisPointerType = thisPointerType->AddConst(span);
                         }
                         bmv->SetClassPtr(std::unique_ptr<BoundExpression>(new BoundParameter(thisParam)));
-                            
                     }
                     else
                     {
@@ -647,6 +654,25 @@ void ExpressionBinder::Visit(DotNode& dotNode)
                 throw Exception("symbol '" + ToUtf8(name) + "' not found from class '" + ToUtf8(classType->FullName()) + "'", dotNode.MemberId()->GetSpan());
             }
         }
+        else if (type->GetSymbolType() == SymbolType::interfaceTypeSymbol)
+        {
+            throw std::runtime_error("not implemented yet");
+        }
+        else if (type->GetSymbolType() == SymbolType::enumTypeSymbol)
+        {
+            EnumTypeSymbol* enumType = static_cast<EnumTypeSymbol*>(type);
+            ContainerScope* scope = enumType->GetContainerScope();
+            std::u32string name = dotNode.MemberId()->Str();
+            Symbol* symbol = scope->Lookup(name);
+            if (symbol)
+            {
+                BindSymbol(symbol);
+            }
+            else
+            {
+                throw Exception("symbol '" + ToUtf8(name) + "' not found from enumerated type '" + ToUtf8(enumType->FullName()) + "'", dotNode.MemberId()->GetSpan());
+            }
+        }
         else
         {
             throw Exception("expression must denote a namespace, class type, interface type, or an enumerated type type object", dotNode.Subject()->GetSpan());
@@ -732,12 +758,22 @@ void ExpressionBinder::Visit(ArrowNode& arrowNode)
 
 void ExpressionBinder::Visit(DisjunctionNode& disjunctionNode) 
 {
-    // todo
+    std::unique_ptr<BoundExpression> left = BindExpression(disjunctionNode.Left(), boundCompileUnit, boundFunction, containerScope, statementBinder);
+    std::unique_ptr<BoundExpression> right = BindExpression(disjunctionNode.Right(), boundCompileUnit, boundFunction, containerScope, statementBinder);
+    BoundDisjunction* boundDisjunction = new BoundDisjunction(disjunctionNode.GetSpan(), std::move(left), std::move(right), symbolTable.GetTypeByName(U"bool"));
+    LocalVariableSymbol* temporary = boundFunction->GetFunctionSymbol()->CreateTemporary(symbolTable.GetTypeByName(U"bool"), disjunctionNode.GetSpan());
+    boundDisjunction->SetTemporary(new BoundLocalVariable(temporary));
+    expression.reset(boundDisjunction);
 }
 
 void ExpressionBinder::Visit(ConjunctionNode& conjunctionNode) 
 {
-    // todo
+    std::unique_ptr<BoundExpression> left = BindExpression(conjunctionNode.Left(), boundCompileUnit, boundFunction, containerScope, statementBinder);
+    std::unique_ptr<BoundExpression> right = BindExpression(conjunctionNode.Right(), boundCompileUnit, boundFunction, containerScope, statementBinder);
+    BoundConjunction* boundConjunction = new BoundConjunction(conjunctionNode.GetSpan(), std::move(left), std::move(right), symbolTable.GetTypeByName(U"bool"));
+    LocalVariableSymbol* temporary = boundFunction->GetFunctionSymbol()->CreateTemporary(symbolTable.GetTypeByName(U"bool"), conjunctionNode.GetSpan());
+    boundConjunction->SetTemporary(new BoundLocalVariable(temporary));
+    expression.reset(boundConjunction);
 }
 
 void ExpressionBinder::Visit(BitOrNode& bitOrNode) 
@@ -1114,11 +1150,14 @@ void ExpressionBinder::Visit(InvokeNode& invokeNode)
     std::vector<FunctionScopeLookup> functionScopeLookups;
     functionScopeLookups.push_back(FunctionScopeLookup(ScopeLookup::this_and_base_and_parent, containerScope));
     FunctionGroupSymbol* functionGroupSymbol = nullptr;
+    std::u32string groupName;
     bool scopeQualified = false;
+    LocalVariableSymbol* temporary = nullptr;
     if (expression->GetBoundNodeType() == BoundNodeType::boundFunctionGroupExcpression)
     {
         BoundFunctionGroupExpression* bfge = static_cast<BoundFunctionGroupExpression*>(expression.get());
         functionGroupSymbol = bfge->FunctionGroup();
+        groupName = functionGroupSymbol->Name();
         if (bfge->IsScopeQualified())
         {
             functionScopeLookups.clear();
@@ -1133,6 +1172,7 @@ void ExpressionBinder::Visit(InvokeNode& invokeNode)
         {
             BoundFunctionGroupExpression* bfge = static_cast<BoundFunctionGroupExpression*>(bme->Member());
             functionGroupSymbol = bfge->FunctionGroup();
+            groupName = functionGroupSymbol->Name();
             if (bfge->IsScopeQualified())
             {
                 functionScopeLookups.clear();
@@ -1141,7 +1181,7 @@ void ExpressionBinder::Visit(InvokeNode& invokeNode)
             }
             if (!scopeQualified)
             {
-                functionScopeLookups.push_back(FunctionScopeLookup(ScopeLookup::this_and_base, bme->ClassPtr()->GetType()->RemovePointer(invokeNode.GetSpan())->ClassInterfaceOrNsScope()));
+                functionScopeLookups.push_back(FunctionScopeLookup(ScopeLookup::this_and_base, bme->ClassPtr()->GetType()->BaseType()->ClassInterfaceOrNsScope()));
             }
             arguments.push_back(std::unique_ptr<BoundExpression>(bme->ReleaseClassPtr()));
         }
@@ -1149,6 +1189,14 @@ void ExpressionBinder::Visit(InvokeNode& invokeNode)
         {
             throw Exception("invoke cannot be applied to this type of expression", invokeNode.Subject()->GetSpan());
         }
+    }
+    else if (expression->GetBoundNodeType() == BoundNodeType::boundTypeExpression)
+    {
+        TypeSymbol* type = expression->GetType();
+        temporary = boundFunction->GetFunctionSymbol()->CreateTemporary(type, invokeNode.GetSpan());
+        std::unique_ptr<BoundExpression> addrOfTemporary(new BoundAddressOfExpression(std::unique_ptr<BoundExpression>(new BoundLocalVariable(temporary)), type->AddPointer(invokeNode.GetSpan())));
+        arguments.push_back(std::move(addrOfTemporary));
+        groupName = U"@constructor";
     }
     else
     {
@@ -1172,7 +1220,7 @@ void ExpressionBinder::Visit(InvokeNode& invokeNode)
     std::unique_ptr<Exception> exception;
     std::unique_ptr<Exception> thisEx;
     std::unique_ptr<Exception> nsEx;
-    std::unique_ptr<BoundFunctionCall> functionCall = ResolveOverload(functionGroupSymbol->Name(), containerScope, functionScopeLookups, arguments, boundCompileUnit, boundFunction, 
+    std::unique_ptr<BoundFunctionCall> functionCall = ResolveOverload(groupName, containerScope, functionScopeLookups, arguments, boundCompileUnit, boundFunction, 
         invokeNode.GetSpan(), OverloadResolutionFlags::dontThrow, exception);
     if (!functionCall)
     {
@@ -1184,7 +1232,7 @@ void ExpressionBinder::Visit(InvokeNode& invokeNode)
             arguments.insert(arguments.begin(), std::unique_ptr<BoundExpression>(boundThisParam));
             thisParamInserted = true;
             functionScopeLookups.push_back(FunctionScopeLookup(ScopeLookup::this_and_base, thisParam->GetType()->ClassInterfaceOrNsScope()));
-            functionCall = std::move(ResolveOverload(functionGroupSymbol->Name(), containerScope, functionScopeLookups, arguments, boundCompileUnit, boundFunction, invokeNode.GetSpan(),
+            functionCall = std::move(ResolveOverload(groupName, containerScope, functionScopeLookups, arguments, boundCompileUnit, boundFunction, invokeNode.GetSpan(),
                 OverloadResolutionFlags::dontThrow, thisEx));
         }
         if (!functionCall)
@@ -1197,7 +1245,7 @@ void ExpressionBinder::Visit(InvokeNode& invokeNode)
             {
                 arguments.erase(arguments.begin());
             }
-            functionCall = std::move(ResolveOverload(functionGroupSymbol->Name(), containerScope, functionScopeLookups, arguments, boundCompileUnit, boundFunction, invokeNode.GetSpan(),
+            functionCall = std::move(ResolveOverload(groupName, containerScope, functionScopeLookups, arguments, boundCompileUnit, boundFunction, invokeNode.GetSpan(),
                 OverloadResolutionFlags::dontThrow, nsEx));
         }
     }
@@ -1266,7 +1314,19 @@ void ExpressionBinder::Visit(InvokeNode& invokeNode)
             functionCall->SetFlag(BoundExpressionFlags::virtualCall);
         }
     }
+    if (functionSymbol->ReturnsClassByValue())
+    {
+        TypeSymbol* type = functionSymbol->ReturnType();
+        temporary = boundFunction->GetFunctionSymbol()->CreateTemporary(type, invokeNode.GetSpan());
+        functionCall->AddArgument(std::unique_ptr<BoundExpression>(new BoundAddressOfExpression(std::unique_ptr<BoundExpression>(new BoundLocalVariable(temporary)), 
+            type->AddPointer(invokeNode.GetSpan()))));
+    }
     expression.reset(functionCall.release());
+    if (temporary)
+    {
+        expression.reset(new BoundConstructAndReturnTemporaryExpression(std::move(expression), std::unique_ptr<BoundExpression>(new BoundLocalVariable(temporary))));
+        expression->SetFlag(BoundExpressionFlags::bindToRvalueReference);
+    }
 }
 
 void ExpressionBinder::Visit(PostfixIncrementNode& postfixIncrementNode)

@@ -18,6 +18,7 @@ public:
     void Accept(Visitor& visitor) override;
     void Write(AstWriter& writer) override;
     void Read(AstReader& reader) override;
+    std::string ToString() const override;
     const Node* Subject() const { return subject.get(); }
     Node* Subject() { return subject.get(); }
 private:
@@ -33,6 +34,7 @@ public:
     void Accept(Visitor& visitor) override;
     void Write(AstWriter& writer) override;
     void Read(AstReader& reader) override;
+    std::string ToString() const override;
     const Node* Subject() const { return subject.get(); }
     Node* Subject() { return subject.get(); }
 private:
@@ -48,6 +50,7 @@ public:
     void Accept(Visitor& visitor) override;
     void Write(AstWriter& writer) override;
     void Read(AstReader& reader) override;
+    std::string ToString() const override;
     const Node* Subject() const { return subject.get(); }
     Node* Subject() { return subject.get(); }
 private:
@@ -63,6 +66,7 @@ public:
     void Accept(Visitor& visitor) override;
     void Write(AstWriter& writer) override;
     void Read(AstReader& reader) override;
+    std::string ToString() const override;
     const Node* Subject() const { return subject.get(); }
     Node* Subject() { return subject.get(); }
 private:
@@ -78,6 +82,7 @@ public:
     void Accept(Visitor& visitor) override;
     void Write(AstWriter& writer) override;
     void Read(AstReader& reader) override;
+    std::string ToString() const override;
     const Node* Subject() const { return subject.get(); }
     Node* Subject() { return subject.get(); }
     const Node* Size() const { return size.get(); }

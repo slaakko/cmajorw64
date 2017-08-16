@@ -11,5 +11,6 @@
 extern "C" RT_API void RtEnterFunction(const char* functionName, const char* sourceFilePath);
 extern "C" RT_API void RtSetLineNumber(int32_t lineNumber);
 extern "C" RT_API void RtExitFunction();
+extern "C" RT_API void RtPrintCallStack(int fileHandle);
 
 #endif // CMAJOR_RT_CALL_STACK_INCLUDED

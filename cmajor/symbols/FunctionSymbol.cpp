@@ -229,6 +229,12 @@ void FunctionSymbol::Write(SymbolWriter& writer)
     writer.GetBinaryWriter().Write(static_cast<uint16_t>(flags));
     writer.GetBinaryWriter().Write(vmtIndex);
     writer.GetBinaryWriter().Write(imtIndex);
+    bool hasReturnParam = returnParam != nullptr;
+    writer.GetBinaryWriter().Write(hasReturnParam);
+    if (hasReturnParam)
+    {
+        writer.Write(returnParam.get());
+    }
 }
 
 void FunctionSymbol::Read(SymbolReader& reader)
@@ -253,6 +259,11 @@ void FunctionSymbol::Read(SymbolReader& reader)
     if (IsConversion())
     {
         reader.AddConversion(this);
+    }
+    bool hasReturnParam = reader.GetBinaryReader().ReadBool();
+    if (hasReturnParam)
+    {
+        returnParam.reset(reader.ReadParameterSymbol(this));
     }
 }
 
@@ -423,13 +434,17 @@ void FunctionSymbol::GenerateCall(Emitter& emitter, std::vector<GenObject*>& gen
     llvm::Function* callee = llvm::cast<llvm::Function>(emitter.Module()->getOrInsertFunction(ToUtf8(MangledName()), functionType));
     ArgVector args;
     int n = parameters.size();
+    if (ReturnsClassByValue())
+    {
+        ++n;
+    }
     args.resize(n);
     for (int i = 0; i < n; ++i)
     {
         llvm::Value* arg = emitter.Stack().Pop();
         args[n - i - 1] = arg;
     }
-    if (ReturnType() && ReturnType()->GetSymbolType() != SymbolType::voidTypeSymbol)
+    if (ReturnType() && ReturnType()->GetSymbolType() != SymbolType::voidTypeSymbol && !ReturnsClassByValue())
     {
         emitter.Stack().Push(emitter.Builder().CreateCall(callee, args));
     }
@@ -484,7 +499,7 @@ void FunctionSymbol::GenerateVirtualCall(Emitter& emitter, std::vector<GenObject
         llvm::Value* arg = emitter.Stack().Pop();
         args[n - i - 1] = arg;
     }
-    if (ReturnType() && !ReturnType()->IsVoidType())
+    if (ReturnType() && !ReturnType()->IsVoidType() && !ReturnsClassByValue())
     {
         emitter.Stack().Push(emitter.Builder().CreateCall(IrType(emitter), callee, args));
     }
@@ -534,6 +549,16 @@ bool FunctionSymbol::IsMoveAssignment() const
 void FunctionSymbol::AddLocalVariable(LocalVariableSymbol* localVariable)
 {
     localVariables.push_back(localVariable);
+}
+
+bool FunctionSymbol::ReturnsClassByValue() const
+{
+    return returnType && returnType->IsClassTypeSymbol();
+}
+
+void FunctionSymbol::SetReturnParam(ParameterSymbol* returnParam_)
+{
+    returnParam.reset(returnParam_);
 }
 
 void FunctionSymbol::SetGroupName(const std::u32string& groupName_)
@@ -637,7 +662,7 @@ llvm::FunctionType* FunctionSymbol::IrType(Emitter& emitter)
     if (!irType)
     {
         llvm::Type* retType = llvm::Type::getVoidTy(emitter.Context());
-        if (returnType && returnType->GetSymbolType() != SymbolType::voidTypeSymbol)
+        if (returnType && returnType->GetSymbolType() != SymbolType::voidTypeSymbol && !ReturnsClassByValue())
         {
             retType = returnType->IrType(emitter);
         }
@@ -647,6 +672,10 @@ llvm::FunctionType* FunctionSymbol::IrType(Emitter& emitter)
         {
             ParameterSymbol* parameter = parameters[i];
             paramTypes.push_back(parameter->GetType()->IrType(emitter));
+        }
+        if (returnParam)
+        {
+            paramTypes.push_back(returnParam->GetType()->IrType(emitter));
         }
         irType = llvm::FunctionType::get(retType, paramTypes, false);
     }

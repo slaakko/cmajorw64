@@ -5,12 +5,15 @@
 
 #include <cmajor/rt/Classes.hpp>
 #include <cmajor/rt/Statics.hpp>
+#include <cmajor/rt/Error.hpp>
+#include <cmajor/rt/Io.hpp>
 #include <cmajor/util/System.hpp>
 #include <cmajor/util/BinaryReader.hpp>
 #include <cmajor/util/Path.hpp>
 #include <cmajor/util/Prime.hpp>
 #include <boost/filesystem.hpp>
 #include <unordered_map>
+#include <sstream>
 #ifdef _WIN32
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
@@ -200,22 +203,33 @@ void SetClassIdsToVmts(const std::vector<ClassInfo*>& classesByPriority)
 
 void InitClasses()
 {
-    std::string executablePath = GetPathToExecutable();
-    boost::filesystem::path classFilePath = boost::filesystem::path(executablePath).replace_extension(".cls");
-    if (!exists(classFilePath))
+    try
     {
-        throw std::runtime_error("error assigning class id's: class file '" + GetFullPath(classFilePath.generic_string()) + "' does not exist");
+        std::string executablePath = GetPathToExecutable();
+        boost::filesystem::path classFilePath = boost::filesystem::path(executablePath).replace_extension(".cls");
+        if (!exists(classFilePath))
+        {
+            throw std::runtime_error("error assigning class id's: class file '" + GetFullPath(classFilePath.generic_string()) + "' does not exist");
+        }
+        std::vector<std::unique_ptr<ClassInfo>> polyMorphicClasses;
+        std::vector<uint32_t> staticClassIds;
+        ReadClasses(GetFullPath(classFilePath.generic_string()), polyMorphicClasses, staticClassIds);
+        ResolveBaseClasses(polyMorphicClasses);
+        AssignLevels(polyMorphicClasses);
+        std::vector<ClassInfo*> classesByPriority = GetClassesByPriority(polyMorphicClasses);
+        AssignKeys(classesByPriority);
+        AssignClassIds(classesByPriority);
+        SetClassIdsToVmts(classesByPriority);
+        AllocateMutexes(staticClassIds);
     }
-    std::vector<std::unique_ptr<ClassInfo>> polyMorphicClasses;
-    std::vector<uint32_t> staticClassIds;
-    ReadClasses(GetFullPath(classFilePath.generic_string()), polyMorphicClasses, staticClassIds);
-    ResolveBaseClasses(polyMorphicClasses);
-    AssignLevels(polyMorphicClasses);
-    std::vector<ClassInfo*> classesByPriority = GetClassesByPriority(polyMorphicClasses);
-    AssignKeys(classesByPriority);
-    AssignClassIds(classesByPriority);
-    SetClassIdsToVmts(classesByPriority);
-    AllocateMutexes(staticClassIds);
+    catch (const std::exception& ex)
+    {
+        std::stringstream s;
+        s << "internal error in program initialization: " << ex.what() << "\n";
+        std::string str = s.str();
+        RtWrite(stdErrFileHandle, reinterpret_cast<const uint8_t*>(str.c_str()), str.length());
+        exit(exitCodeInternalError);
+    }
 }
 
 void DoneClasses()

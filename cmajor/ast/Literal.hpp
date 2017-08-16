@@ -21,6 +21,7 @@ public:
     void Accept(Visitor& visitor) override;
     void Write(AstWriter& writer) override;
     void Read(AstReader& reader) override;
+    std::string ToString() const override;
     bool Value() const { return value; }
 private:
     bool value;
@@ -35,6 +36,7 @@ public:
     void Accept(Visitor& visitor) override;
     void Write(AstWriter& writer) override;
     void Read(AstReader& reader) override;
+    std::string ToString() const override;
     int8_t Value() const { return value; }
 private:
     int8_t value;
@@ -49,6 +51,7 @@ public:
     void Accept(Visitor& visitor) override;
     void Write(AstWriter& writer) override;
     void Read(AstReader& reader) override;
+    std::string ToString() const override;
     uint8_t Value() const { return value; }
 private:
     uint8_t value;
@@ -63,6 +66,7 @@ public:
     void Accept(Visitor& visitor) override;
     void Write(AstWriter& writer) override;
     void Read(AstReader& reader) override;
+    std::string ToString() const override;
     int16_t Value() const { return value; }
 private:
     int16_t value;
@@ -77,6 +81,7 @@ public:
     void Accept(Visitor& visitor) override;
     void Write(AstWriter& writer) override;
     void Read(AstReader& reader) override;
+    std::string ToString() const override;
     uint16_t Value() const { return value; }
 private:
     uint16_t value;
@@ -91,6 +96,7 @@ public:
     void Accept(Visitor& visitor) override;
     void Write(AstWriter& writer) override;
     void Read(AstReader& reader) override;
+    std::string ToString() const override;
     int32_t Value() const { return value; }
 private:
     int32_t value;
@@ -105,6 +111,7 @@ public:
     void Accept(Visitor& visitor) override;
     void Write(AstWriter& writer) override;
     void Read(AstReader& reader) override;
+    std::string ToString() const override;
     uint32_t Value() const { return value; }
 private:
     uint32_t value;
@@ -119,6 +126,7 @@ public:
     void Accept(Visitor& visitor) override;
     void Write(AstWriter& writer) override;
     void Read(AstReader& reader) override;
+    std::string ToString() const override;
     int64_t Value() const { return value; }
 private:
     int64_t value;
@@ -133,6 +141,7 @@ public:
     void Accept(Visitor& visitor) override;
     void Write(AstWriter& writer) override;
     void Read(AstReader& reader) override;
+    std::string ToString() const override;
     uint64_t Value() const { return value; }
 private:
     uint64_t value;
@@ -147,6 +156,7 @@ public:
     void Accept(Visitor& visitor) override;
     void Write(AstWriter& writer) override;
     void Read(AstReader& reader) override;
+    std::string ToString() const override;
     float Value() const { return value; }
 private:
     float value;
@@ -161,6 +171,7 @@ public:
     void Accept(Visitor& visitor) override;
     void Write(AstWriter& writer) override;
     void Read(AstReader& reader) override;
+    std::string ToString() const override;
     double Value() const { return value; }
 private:
     double value;
@@ -175,6 +186,7 @@ public:
     void Accept(Visitor& visitor) override;
     void Write(AstWriter& writer) override;
     void Read(AstReader& reader) override;
+    std::string ToString() const override;
     char Value() const { return value; }
 private:
     char value;
@@ -189,6 +201,7 @@ public:
     void Accept(Visitor& visitor) override;
     void Write(AstWriter& writer) override;
     void Read(AstReader& reader) override;
+    std::string ToString() const override;
     char16_t Value() const { return value; }
 private:
     char16_t value;
@@ -203,6 +216,7 @@ public:
     void Accept(Visitor& visitor) override;
     void Write(AstWriter& writer) override;
     void Read(AstReader& reader) override;
+    std::string ToString() const override;
     char32_t Value() const { return value; }
 private:
     char32_t value;
@@ -217,6 +231,7 @@ public:
     void Accept(Visitor& visitor) override;
     void Write(AstWriter& writer) override;
     void Read(AstReader& reader) override;
+    std::string ToString() const override;
     const std::string& Value() const { return value; }
 private:
     std::string value;
@@ -231,6 +246,7 @@ public:
     void Accept(Visitor& visitor) override;
     void Write(AstWriter& writer) override;
     void Read(AstReader& reader) override;
+    std::string ToString() const override;
     const std::u16string& Value() const { return value; }
 private:
     std::u16string value;
@@ -245,6 +261,7 @@ public:
     void Accept(Visitor& visitor) override;
     void Write(AstWriter& writer) override;
     void Read(AstReader& reader) override;
+    std::string ToString() const override;
     const std::u32string& Value() const { return value; }
 private:
     std::u32string value;
@@ -256,6 +273,7 @@ public:
     NullLiteralNode(const Span& span_);
     Node* Clone(CloneContext& cloneContext) const override;
     void Accept(Visitor& visitor) override;
+    std::string ToString() const override { return "null"; }
 };
 
 } } // namespace cmajor::ast

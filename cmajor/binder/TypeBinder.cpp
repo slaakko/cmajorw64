@@ -6,6 +6,7 @@
 #include <cmajor/binder/TypeBinder.hpp>
 #include <cmajor/binder/BoundCompileUnit.hpp>
 #include <cmajor/binder/TypeResolver.hpp>
+#include <cmajor/binder/Evaluator.hpp>
 #include <cmajor/ast/CompileUnit.hpp>
 #include <cmajor/ast/Identifier.hpp>
 #include <cmajor/symbols/FunctionSymbol.hpp>
@@ -93,6 +94,13 @@ void TypeBinder::Visit(FunctionNode& functionNode)
     TypeSymbol* returnType = ResolveType(functionNode.ReturnTypeExpr(), boundCompileUnit, containerScope, markExport);
     functionSymbol->SetReturnType(returnType);
     functionSymbol->ComputeName();
+    if (functionSymbol->ReturnsClassByValue())
+    {
+        ParameterSymbol* returnParam = new ParameterSymbol(functionNode.ReturnTypeExpr()->GetSpan(), U"@return");
+        returnParam->SetParent(functionSymbol);
+        returnParam->SetType(returnType->AddPointer(functionNode.GetSpan()));
+        functionSymbol->SetReturnParam(returnParam);
+    }
     if (functionNode.Body() && !functionSymbol->IsFunctionTemplate())
     {
         functionNode.Body()->Accept(*this);
@@ -370,6 +378,13 @@ void TypeBinder::Visit(MemberFunctionNode& memberFunctionNode)
     TypeSymbol* returnType = ResolveType(memberFunctionNode.ReturnTypeExpr(), boundCompileUnit, containerScope, markExport);
     memberFunctionSymbol->SetReturnType(returnType);
     memberFunctionSymbol->ComputeName();
+    if (memberFunctionSymbol->ReturnsClassByValue())
+    {
+        ParameterSymbol* returnParam = new ParameterSymbol(memberFunctionNode.ReturnTypeExpr()->GetSpan(), U"@return");
+        returnParam->SetParent(memberFunctionSymbol);
+        returnParam->SetType(returnType->AddPointer(memberFunctionNode.GetSpan()));
+        memberFunctionSymbol->SetReturnParam(returnParam);
+    }
     if (memberFunctionNode.Body())
     {
         if (memberFunctionSymbol->IsDefault() || memberFunctionSymbol->IsSuppressed())
@@ -631,8 +646,8 @@ void TypeBinder::Visit(ConstantNode& constantNode)
     TypeSymbol* typeSymbol = ResolveType(constantNode.TypeExpr(), boundCompileUnit, containerScope, markExport);
     constantSymbol->SetType(typeSymbol);
     constantSymbol->SetEvaluating();
-    // todo: evaluate value
-    // constantSymbol->SetValue(value);
+    std::unique_ptr<Value> value = Evaluate(constantNode.Value(), GetValueTypeFor(typeSymbol->GetSymbolType()), containerScope, boundCompileUnit, false);
+    constantSymbol->SetValue(value.release());
     constantSymbol->ResetEvaluating();
 }
 
@@ -670,8 +685,8 @@ void TypeBinder::Visit(EnumConstantNode& enumConstantNode)
     Assert(symbol->GetSymbolType() == SymbolType::enumConstantSymbol, "enumeration constant symbol expected");
     EnumConstantSymbol* enumConstantSymbol = static_cast<EnumConstantSymbol*>(symbol);
     enumConstantSymbol->SetEvaluating();
-    // todo: evaluate value
-    // enumConstantSymbol->SetValue(value);
+    std::unique_ptr<Value> value = Evaluate(enumConstantNode.GetValue(), GetValueTypeFor(enumType->UnderlyingType()->GetSymbolType()), containerScope, boundCompileUnit, false);
+    enumConstantSymbol->SetValue(value.release());
     enumConstantSymbol->ResetEvaluating();
 }
 

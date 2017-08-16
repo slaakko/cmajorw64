@@ -42,6 +42,11 @@ void ConstNode::Read(AstReader& reader)
     subject->SetParent(this);
 }
 
+std::string ConstNode::ToString() const
+{
+    return "const " + subject->ToString();
+}
+
 LValueRefNode::LValueRefNode(const Span& span_) : Node(NodeType::lvalueRefNode, span_)
 {
 }
@@ -72,6 +77,11 @@ void LValueRefNode::Read(AstReader& reader)
     Node::Read(reader);
     subject.reset(reader.ReadNode());
     subject->SetParent(this);
+}
+
+std::string LValueRefNode::ToString() const
+{
+    return subject->ToString() + "&";
 }
 
 RValueRefNode::RValueRefNode(const Span& span_) : Node(NodeType::rvalueRefNode, span_)
@@ -106,6 +116,11 @@ void RValueRefNode::Read(AstReader& reader)
     subject->SetParent(this);
 }
 
+std::string RValueRefNode::ToString() const
+{
+    return subject->ToString() + "&&";
+}
+
 PointerNode::PointerNode(const Span& span_) : Node(NodeType::pointerNode, span_)
 {
 }
@@ -136,6 +151,11 @@ void PointerNode::Read(AstReader& reader)
     Node::Read(reader);
     subject.reset(reader.ReadNode());
     subject->SetParent(this);
+}
+
+std::string PointerNode::ToString() const
+{
+    return subject->ToString() + "*";
 }
 
 ArrayNode::ArrayNode(const Span& span_) : Node(NodeType::arrayNode, span_), subject(), size()
@@ -189,6 +209,18 @@ void ArrayNode::Read(AstReader& reader)
         size.reset(reader.ReadNode());
         size->SetParent(this);
     }
+}
+
+std::string ArrayNode::ToString() const
+{
+    std::string s = subject->ToString();
+    s.append("[");
+    if (size)
+    {
+        s.append(size->ToString());
+    }
+    s.append("]");
+    return s;
 }
 
 } } // namespace cmajor::ast

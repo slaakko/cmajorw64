@@ -18,6 +18,7 @@ class SymbolTable;
 class Module;
 class FunctionSymbol;
 class ClassTypeSymbol;
+class ParameterSymbol;
 
 class SymbolReader
 {
@@ -28,6 +29,7 @@ public:
     Symbol* ReadSymbol(Symbol* parent);
     DerivedTypeSymbol* ReadDerivedTypeSymbol(Symbol* parent);
     ClassTemplateSpecializationSymbol* ReadClassTemplateSpecializationSymbol(Symbol* parent);
+    ParameterSymbol* ReadParameterSymbol(Symbol* parent);
     void SetSymbolTable(SymbolTable* symbolTable_) { symbolTable = symbolTable_; }
     void SetModule(Module* module_) { module = module_; }
     void AddConversion(FunctionSymbol* conversion);

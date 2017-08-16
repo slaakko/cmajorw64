@@ -41,6 +41,11 @@ void DotNode::Read(AstReader& reader)
     memberId->SetParent(this);
 }
 
+std::string DotNode::ToString() const
+{
+    return Subject()->ToString() + "." + memberId->ToString();
+}
+
 ArrowNode::ArrowNode(const Span& span_) : UnaryNode(NodeType::arrowNode, span_), memberId()
 {
 }
@@ -73,6 +78,11 @@ void ArrowNode::Read(AstReader& reader)
     memberId->SetParent(this);
 }
 
+std::string ArrowNode::ToString() const
+{
+    return Subject()->ToString() + "->" + memberId->ToString();
+}
+
 EquivalenceNode::EquivalenceNode(const Span& span_) : BinaryNode(NodeType::equivalenceNode, span_)
 {
 }
@@ -89,6 +99,11 @@ Node* EquivalenceNode::Clone(CloneContext& cloneContext) const
 void EquivalenceNode::Accept(Visitor& visitor)
 {
     visitor.Visit(*this);
+}
+
+std::string EquivalenceNode::ToString() const
+{
+    return Left()->ToString() + "<=>" + Right()->ToString();
 }
 
 ImplicationNode::ImplicationNode(const Span& span_) : BinaryNode(NodeType::implicationNode, span_)
@@ -109,6 +124,11 @@ void ImplicationNode::Accept(Visitor& visitor)
     visitor.Visit(*this);
 }
 
+std::string ImplicationNode::ToString() const
+{
+    return Left()->ToString() + "=>" + Right()->ToString();
+}
+
 DisjunctionNode::DisjunctionNode(const Span& span_) : BinaryNode(NodeType::disjunctionNode, span_)
 {
 }
@@ -125,6 +145,11 @@ Node* DisjunctionNode::Clone(CloneContext& cloneContext) const
 void DisjunctionNode::Accept(Visitor& visitor)
 {
     visitor.Visit(*this);
+}
+
+std::string DisjunctionNode::ToString() const
+{
+    return Left()->ToString() + " || " + Right()->ToString();
 }
 
 ConjunctionNode::ConjunctionNode(const Span& span_) : BinaryNode(NodeType::conjunctionNode, span_)
@@ -145,6 +170,11 @@ void ConjunctionNode::Accept(Visitor& visitor)
     visitor.Visit(*this);
 }
 
+std::string ConjunctionNode::ToString() const
+{
+    return Left()->ToString() + " && " + Right()->ToString();
+}
+
 BitOrNode::BitOrNode(const Span& span_) : BinaryNode(NodeType::bitOrNode, span_)
 {
 }
@@ -161,6 +191,11 @@ Node* BitOrNode::Clone(CloneContext& cloneContext) const
 void BitOrNode::Accept(Visitor& visitor)
 {
     visitor.Visit(*this);
+}
+
+std::string BitOrNode::ToString() const
+{
+    return Left()->ToString() + " | " + Right()->ToString();
 }
 
 BitXorNode::BitXorNode(const Span& span_) : BinaryNode(NodeType::bitXorNode, span_)
@@ -181,6 +216,11 @@ void BitXorNode::Accept(Visitor& visitor)
     visitor.Visit(*this);
 }
 
+std::string BitXorNode::ToString() const
+{
+    return Left()->ToString() + " ^ " + Right()->ToString();
+}
+
 BitAndNode::BitAndNode(const Span& span_) : BinaryNode(NodeType::bitAndNode, span_)
 {
 }
@@ -197,6 +237,11 @@ Node* BitAndNode::Clone(CloneContext& cloneContext) const
 void BitAndNode::Accept(Visitor& visitor)
 {
     visitor.Visit(*this);
+}
+
+std::string BitAndNode::ToString() const
+{
+    return Left()->ToString() + " & " + Right()->ToString();
 }
 
 EqualNode::EqualNode(const Span& span_) : BinaryNode(NodeType::equalNode, span_)
@@ -217,6 +262,11 @@ void EqualNode::Accept(Visitor& visitor)
     visitor.Visit(*this);
 }
 
+std::string EqualNode::ToString() const
+{
+    return Left()->ToString() + " == " + Right()->ToString();
+}
+
 NotEqualNode::NotEqualNode(const Span& span_) : BinaryNode(NodeType::notEqualNode, span_)
 {
 }
@@ -233,6 +283,11 @@ Node* NotEqualNode::Clone(CloneContext& cloneContext) const
 void NotEqualNode::Accept(Visitor& visitor)
 {
     visitor.Visit(*this);
+}
+
+std::string NotEqualNode::ToString() const
+{
+    return Left()->ToString() + " != " + Right()->ToString();
 }
 
 LessNode::LessNode(const Span& span_) : BinaryNode(NodeType::lessNode, span_)
@@ -253,6 +308,11 @@ void LessNode::Accept(Visitor& visitor)
     visitor.Visit(*this);
 }
 
+std::string LessNode::ToString() const
+{
+    return Left()->ToString() + " < " + Right()->ToString();
+}
+
 GreaterNode::GreaterNode(const Span& span_) : BinaryNode(NodeType::greaterNode, span_)
 {
 }
@@ -269,6 +329,11 @@ Node* GreaterNode::Clone(CloneContext& cloneContext) const
 void GreaterNode::Accept(Visitor& visitor)
 {
     visitor.Visit(*this);
+}
+
+std::string GreaterNode::ToString() const
+{
+    return Left()->ToString() + " > " + Right()->ToString();
 }
 
 LessOrEqualNode::LessOrEqualNode(const Span& span_) : BinaryNode(NodeType::lessOrEqualNode, span_)
@@ -289,6 +354,11 @@ void LessOrEqualNode::Accept(Visitor& visitor)
     visitor.Visit(*this);
 }
 
+std::string LessOrEqualNode::ToString() const
+{
+    return Left()->ToString() + " <= " + Right()->ToString();
+}
+
 GreaterOrEqualNode::GreaterOrEqualNode(const Span& span_) : BinaryNode(NodeType::greaterOrEqualNode, span_)
 {
 }
@@ -305,6 +375,11 @@ Node* GreaterOrEqualNode::Clone(CloneContext& cloneContext) const
 void GreaterOrEqualNode::Accept(Visitor& visitor)
 {
     visitor.Visit(*this);
+}
+
+std::string GreaterOrEqualNode::ToString() const
+{
+    return Left()->ToString() + " >= " + Right()->ToString();
 }
 
 ShiftLeftNode::ShiftLeftNode(const Span& span_) : BinaryNode(NodeType::shiftLeftNode, span_)
@@ -325,6 +400,11 @@ void ShiftLeftNode::Accept(Visitor& visitor)
     visitor.Visit(*this);
 }
 
+std::string ShiftLeftNode::ToString() const
+{
+    return Left()->ToString() + " << " + Right()->ToString();
+}
+
 ShiftRightNode::ShiftRightNode(const Span& span_) : BinaryNode(NodeType::shiftRightNode, span_)
 {
 }
@@ -341,6 +421,11 @@ Node* ShiftRightNode::Clone(CloneContext& cloneContext) const
 void ShiftRightNode::Accept(Visitor& visitor)
 {
     visitor.Visit(*this);
+}
+
+std::string ShiftRightNode::ToString() const
+{
+    return Left()->ToString() + " >> " + Right()->ToString();
 }
 
 AddNode::AddNode(const Span& span_) : BinaryNode(NodeType::addNode, span_)
@@ -361,6 +446,11 @@ void AddNode::Accept(Visitor& visitor)
     visitor.Visit(*this);
 }
 
+std::string AddNode::ToString() const
+{
+    return Left()->ToString() + " + " + Right()->ToString();
+}
+
 SubNode::SubNode(const Span& span_) : BinaryNode(NodeType::subNode, span_)
 {
 }
@@ -377,6 +467,11 @@ Node* SubNode::Clone(CloneContext& cloneContext) const
 void SubNode::Accept(Visitor& visitor)
 {
     visitor.Visit(*this);
+}
+
+std::string SubNode::ToString() const
+{
+    return Left()->ToString() + " - " + Right()->ToString();
 }
 
 MulNode::MulNode(const Span& span_) : BinaryNode(NodeType::mulNode, span_)
@@ -397,6 +492,11 @@ void MulNode::Accept(Visitor& visitor)
     visitor.Visit(*this);
 }
 
+std::string MulNode::ToString() const
+{
+    return Left()->ToString() + " * " + Right()->ToString();
+}
+
 DivNode::DivNode(const Span& span_) : BinaryNode(NodeType::divNode, span_)
 {
 }
@@ -413,6 +513,11 @@ Node* DivNode::Clone(CloneContext& cloneContext) const
 void DivNode::Accept(Visitor& visitor)
 {
     visitor.Visit(*this);
+}
+
+std::string DivNode::ToString() const
+{
+    return Left()->ToString() + " / " + Right()->ToString();
 }
 
 RemNode::RemNode(const Span& span_) : BinaryNode(NodeType::remNode, span_)
@@ -433,6 +538,11 @@ void RemNode::Accept(Visitor& visitor)
     visitor.Visit(*this);
 }
 
+std::string RemNode::ToString() const
+{
+    return Left()->ToString() + " % " + Right()->ToString();
+}
+
 NotNode::NotNode(const Span& span_) : UnaryNode(NodeType::notNode, span_)
 {
 }
@@ -449,6 +559,11 @@ Node* NotNode::Clone(CloneContext& cloneContext) const
 void NotNode::Accept(Visitor& visitor)
 {
     visitor.Visit(*this);
+}
+
+std::string NotNode::ToString() const
+{
+    return "!" + Subject()->ToString();
 }
 
 UnaryPlusNode::UnaryPlusNode(const Span& span_) : UnaryNode(NodeType::unaryPlusNode, span_)
@@ -469,6 +584,11 @@ void UnaryPlusNode::Accept(Visitor& visitor)
     visitor.Visit(*this);
 }
 
+std::string UnaryPlusNode::ToString() const
+{
+    return "+" + Subject()->ToString();
+}
+
 UnaryMinusNode::UnaryMinusNode(const Span& span_) : UnaryNode(NodeType::unaryMinusNode, span_)
 {
 }
@@ -485,6 +605,11 @@ Node* UnaryMinusNode::Clone(CloneContext& cloneContext) const
 void UnaryMinusNode::Accept(Visitor& visitor)
 {
     visitor.Visit(*this);
+}
+
+std::string UnaryMinusNode::ToString() const
+{
+    return "-" + Subject()->ToString();
 }
 
 PrefixIncrementNode::PrefixIncrementNode(const Span& span_) : UnaryNode(NodeType::prefixIncrementNode, span_)
@@ -505,6 +630,11 @@ void PrefixIncrementNode::Accept(Visitor& visitor)
     visitor.Visit(*this);
 }
 
+std::string PrefixIncrementNode::ToString() const
+{
+    return "++" + Subject()->ToString();
+}
+
 PrefixDecrementNode::PrefixDecrementNode(const Span& span_) : UnaryNode(NodeType::prefixDecrementNode, span_)
 {
 }
@@ -521,6 +651,11 @@ Node* PrefixDecrementNode::Clone(CloneContext& cloneContext) const
 void PrefixDecrementNode::Accept(Visitor& visitor)
 {
     visitor.Visit(*this);
+}
+
+std::string PrefixDecrementNode::ToString() const
+{
+    return "--" + Subject()->ToString();
 }
 
 ComplementNode::ComplementNode(const Span& span_) : UnaryNode(NodeType::complementNode, span_)
@@ -541,6 +676,11 @@ void ComplementNode::Accept(Visitor& visitor)
     visitor.Visit(*this);
 }
 
+std::string ComplementNode::ToString() const
+{
+    return "~" + Subject()->ToString();
+}
+
 DerefNode::DerefNode(const Span& span_) : UnaryNode(NodeType::derefNode, span_)
 {
 }
@@ -559,6 +699,11 @@ void DerefNode::Accept(Visitor& visitor)
     visitor.Visit(*this);
 }
 
+std::string DerefNode::ToString() const
+{
+    return "*" + Subject()->ToString();
+}
+
 AddrOfNode::AddrOfNode(const Span& span_) : UnaryNode(NodeType::addrOfNode, span_)
 {
 }
@@ -575,6 +720,11 @@ Node* AddrOfNode::Clone(CloneContext& cloneContext) const
 void AddrOfNode::Accept(Visitor& visitor)
 {
     visitor.Visit(*this);
+}
+
+std::string AddrOfNode::ToString() const
+{
+    return "&" + Subject()->ToString();
 }
 
 IsNode::IsNode(const Span& span_) : Node(NodeType::isNode, span_), expr(), targetTypeExpr()
@@ -613,6 +763,11 @@ void IsNode::Read(AstReader& reader)
     targetTypeExpr->SetParent(this);
 }
 
+std::string IsNode::ToString() const
+{
+    return expr->ToString() + " is " + targetTypeExpr->ToString();
+}
+
 AsNode::AsNode(const Span& span_) : Node(NodeType::asNode, span_), expr(), targetTypeExpr()
 {
 }
@@ -649,6 +804,11 @@ void AsNode::Read(AstReader& reader)
     targetTypeExpr->SetParent(this);
 }
 
+std::string AsNode::ToString() const
+{
+    return expr->ToString() + " as " + targetTypeExpr->ToString();
+}
+
 IndexingNode::IndexingNode(const Span& span_) : Node(NodeType::indexingNode, span_), subject(), index()
 {
 }
@@ -683,6 +843,11 @@ void IndexingNode::Read(AstReader& reader)
     subject->SetParent(this);
     index.reset(reader.ReadNode());
     index->SetParent(this);
+}
+
+std::string IndexingNode::ToString() const
+{
+    return subject->ToString() + "[" + index->ToString() + "]";
 }
 
 InvokeNode::InvokeNode(const Span& span_) : Node(NodeType::invokeNode, span_), subject(), arguments()
@@ -733,6 +898,23 @@ void InvokeNode::AddArgument(Node* argument)
     arguments.Add(argument);
 }
 
+std::string InvokeNode::ToString() const
+{
+    std::string s = subject->ToString();
+    s.append("(");
+    int n = arguments.Count();
+    for (int i = 0; i < n; ++i)
+    {
+        if (i > 0)
+        {
+            s.append(", ");
+        }
+        s.append(arguments[i]->ToString());
+    }
+    s.append(")");
+    return s;
+}
+
 PostfixIncrementNode::PostfixIncrementNode(const Span& span_) : UnaryNode(NodeType::postfixIncrementNode, span_)
 {
 }
@@ -751,6 +933,11 @@ void PostfixIncrementNode::Accept(Visitor& visitor)
     visitor.Visit(*this);
 }
 
+std::string PostfixIncrementNode::ToString() const
+{
+    return Subject()->ToString() + "++";
+}
+
 PostfixDecrementNode::PostfixDecrementNode(const Span& span_) : UnaryNode(NodeType::postfixDecrementNode, span_)
 {
 }
@@ -767,6 +954,11 @@ Node* PostfixDecrementNode::Clone(CloneContext& cloneContext) const
 void PostfixDecrementNode::Accept(Visitor& visitor)
 {
     visitor.Visit(*this);
+}
+
+std::string PostfixDecrementNode::ToString() const
+{
+    return Subject()->ToString() + "--";
 }
 
 SizeOfNode::SizeOfNode(const Span& span_) : Node(NodeType::sizeOfNode, span_), expression()
@@ -801,6 +993,11 @@ void SizeOfNode::Read(AstReader& reader)
     expression->SetParent(this);
 }
 
+std::string SizeOfNode::ToString() const
+{
+    return "sizeof(" + expression->ToString() + ")";
+}
+
 TypeNameNode::TypeNameNode(const Span& span_) : Node(NodeType::typeNameNode, span_), expression()
 {
 }
@@ -831,6 +1028,11 @@ void TypeNameNode::Read(AstReader& reader)
     Node::Read(reader);
     expression.reset(reader.ReadNode());
     expression->SetParent(this);
+}
+
+std::string TypeNameNode::ToString() const
+{
+    return "typename(" + expression->ToString() + ")";
 }
 
 CastNode::CastNode(const Span& span_) : Node(NodeType::castNode, span_), targetTypeExpr(), sourceExpr()
@@ -867,6 +1069,11 @@ void CastNode::Read(AstReader& reader)
     targetTypeExpr->SetParent(this);
     sourceExpr.reset(reader.ReadNode());
     sourceExpr->SetParent(this);
+}
+
+std::string CastNode::ToString() const
+{
+    return "cast<" + targetTypeExpr->ToString() + ">(" + sourceExpr->ToString() + ")";
 }
 
 ConstructNode::ConstructNode(const Span& span_) : Node(NodeType::constructNode, span_), typeExpr(), arguments()
@@ -917,6 +1124,22 @@ void ConstructNode::AddArgument(Node* argument)
     arguments.Add(argument);
 }
 
+std::string ConstructNode::ToString() const
+{
+    std::string s = "construct<" + typeExpr->ToString() + ">(";
+    int n = arguments.Count();
+    for (int i = 0; i < n; ++i)
+    {
+        if (i > 0)
+        {
+            s.append(", ");
+        }
+        s.append(arguments[i]->ToString());
+    }
+    s.append(")");
+    return s;
+}
+
 NewNode::NewNode(const Span& span_) : Node(NodeType::newNode, span_), typeExpr(), arguments()
 {
 }
@@ -965,6 +1188,23 @@ void NewNode::AddArgument(Node* argument)
     arguments.Add(argument);
 }
 
+std::string NewNode::ToString() const
+{
+    std::string s = "new ";
+    s.append(typeExpr->ToString()).append("(");
+    int n = arguments.Count();
+    for (int i = 0; i < n; ++i)
+    {
+        if (i > 0)
+        {
+            s.append(", ");
+        }
+        s.append(arguments[i]->ToString());
+    }
+    s.append(")");
+    return s;
+}
+
 ThisNode::ThisNode(const Span& span_) : Node(NodeType::thisNode, span_)
 {
 }
@@ -979,6 +1219,11 @@ void ThisNode::Accept(Visitor& visitor)
     visitor.Visit(*this);
 }
 
+std::string ThisNode::ToString() const
+{
+    return "this";
+}
+
 BaseNode::BaseNode(const Span& span_) : Node(NodeType::baseNode, span_)
 {
 }
@@ -991,6 +1236,11 @@ Node* BaseNode::Clone(CloneContext& cloneContext) const
 void BaseNode::Accept(Visitor& visitor)
 {
     visitor.Visit(*this);
+}
+
+std::string BaseNode::ToString() const
+{
+    return "base";
 }
 
 } } // namespace cmajor::ast

@@ -18,6 +18,11 @@ class BoundIfStatement;
 class BoundWhileStatement;
 class BoundDoStatement;
 class BoundForStatement;
+class BoundSwitchStatement;
+class BoundCaseStatement;
+class BoundGotoCaseStatement;
+class BoundGotoDefaultStatement;
+class BoundDefaultStatement;
 class BoundBreakStatement;
 class BoundContinueStatement;
 class BoundGotoStatement;
@@ -40,11 +45,14 @@ class BoundReferenceToPointerExpression;
 class BoundFunctionCall;
 class BoundConversion;
 class BoundConstructExpression;
+class BoundConstructAndReturnTemporaryExpression;
 class BoundIsExpression;
 class BoundAsExpression;
 class BoundTypeNameExpression;
 class BoundBitCast;
 class BoundFunctionPtr;
+class BoundDisjunction;
+class BoundConjunction;
 
 class BoundNodeVisitor
 {
@@ -60,6 +68,11 @@ public:
     virtual void Visit(BoundWhileStatement& boundWhileStatement) {}
     virtual void Visit(BoundDoStatement& boundDoStatement) {}
     virtual void Visit(BoundForStatement& boundForStatement) {}
+    virtual void Visit(BoundSwitchStatement& boundSwitchStatement) {}
+    virtual void Visit(BoundCaseStatement& boundCaseStatement) {}
+    virtual void Visit(BoundDefaultStatement& boundDefaultStatement) {}
+    virtual void Visit(BoundGotoCaseStatement& boundGotoCaseStatement) {}
+    virtual void Visit(BoundGotoDefaultStatement& boundGotoDefaultStatement) {}
     virtual void Visit(BoundBreakStatement& boundBreakStatement) {}
     virtual void Visit(BoundContinueStatement& boundContinueStatement) {}
     virtual void Visit(BoundGotoStatement& boundGotoStatement) {}
@@ -82,11 +95,14 @@ public:
     virtual void Visit(BoundFunctionCall& boundFunctionCall) {}
     virtual void Visit(BoundConversion& boundConversion) {}
     virtual void Visit(BoundConstructExpression& boundConstructExpression) {}
+    virtual void Visit(BoundConstructAndReturnTemporaryExpression& boundConstructAndReturnTemporaryExpression) {}
     virtual void Visit(BoundIsExpression& boundIsExpression) {}
     virtual void Visit(BoundAsExpression& boundAsExpression) {}
     virtual void Visit(BoundTypeNameExpression& boundTypeNameExpression) {}
     virtual void Visit(BoundBitCast& boundBitCast) {}
     virtual void Visit(BoundFunctionPtr& boundFunctionPtr) {}
+    virtual void Visit(BoundDisjunction& boundDisjunction) {}
+    virtual void Visit(BoundConjunction& boundConjunction) {}
 };
 
 } } // namespace cmajor::binder

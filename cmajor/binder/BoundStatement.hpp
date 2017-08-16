@@ -7,6 +7,7 @@
 #define CMAJOR_BINDER_BOUND_STATEMENT_INCLUDED
 #include <cmajor/binder/BoundNode.hpp>
 #include <cmajor/symbols/VariableSymbol.hpp>
+#include <cmajor/symbols/Value.hpp>
 #include <cmajor/ast/Statement.hpp>
 
 namespace cmajor { namespace binder {
@@ -122,6 +123,67 @@ private:
     std::unique_ptr<BoundExpression> condition;
     std::unique_ptr<BoundStatement> loopS;
     std::unique_ptr<BoundStatement> actionS;
+};
+
+class BoundCaseStatement;
+class BoundDefaultStatement;
+
+class BoundSwitchStatement : public BoundStatement
+{
+public:
+    BoundSwitchStatement(const Span& span_, std::unique_ptr<BoundExpression>&& condition_);
+    BoundExpression* Condition() { return condition.get(); }
+    const std::vector<std::unique_ptr<BoundCaseStatement>>& CaseStatements() { return caseStatements; }
+    void AddCaseStatement(std::unique_ptr<BoundCaseStatement>&& caseStatement);
+    BoundDefaultStatement* DefaultStatement() { return defaultStatement.get(); }
+    void SetDefaultStatement(std::unique_ptr<BoundDefaultStatement>&& defaultStatement_);
+    void Accept(BoundNodeVisitor& visitor) override;
+private:
+    std::unique_ptr<BoundExpression> condition;
+    std::vector<std::unique_ptr<BoundCaseStatement>> caseStatements;
+    std::unique_ptr<BoundDefaultStatement> defaultStatement;
+};
+
+class BoundCaseStatement : public BoundStatement
+{
+public:
+    BoundCaseStatement(const Span& span_);
+    void AddCaseValue(std::unique_ptr<Value>&& caseValue_);
+    const std::vector<std::unique_ptr<Value>>& CaseValues() const { return caseValues; }
+    void AddStatement(std::unique_ptr<BoundStatement>&& statement);
+    BoundCompoundStatement* CompoundStatement() { return &compoundStatement; }
+    void Accept(BoundNodeVisitor& visitor) override;
+private:
+    std::vector<std::unique_ptr<Value>> caseValues;
+    BoundCompoundStatement compoundStatement;
+};
+
+class BoundDefaultStatement : public BoundStatement
+{
+public:
+    BoundDefaultStatement(const Span& span_);
+    void AddStatement(std::unique_ptr<BoundStatement>&& statement);
+    BoundCompoundStatement* CompoundStatement() { return &compoundStatement; }
+    void Accept(BoundNodeVisitor& visitor) override;
+private:
+    BoundCompoundStatement compoundStatement;
+};
+
+class BoundGotoCaseStatement : public BoundStatement
+{
+public:
+    BoundGotoCaseStatement(const Span& span_, std::unique_ptr<Value>&& caseValue_);
+    void Accept(BoundNodeVisitor& visitor) override;
+    Value* CaseValue() { return caseValue.get(); }
+private:
+    std::unique_ptr<Value> caseValue;
+};
+
+class BoundGotoDefaultStatement : public BoundStatement
+{
+public:
+    BoundGotoDefaultStatement(const Span& span_);
+    void Accept(BoundNodeVisitor& visitor) override;
 };
 
 class BoundBreakStatement : public BoundStatement

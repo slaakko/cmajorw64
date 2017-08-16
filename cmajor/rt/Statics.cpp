@@ -4,9 +4,13 @@
 // =================================
 
 #include <cmajor/rt/Statics.hpp>
+#include <cmajor/rt/Error.hpp>
+#include <cmajor/rt/Io.hpp>
 #include <cmajor/util/Error.hpp>
 #include <memory>
 #include <mutex>
+#include <stdexcept>
+#include <sstream>
 #include <unordered_map>
 
 namespace cmajor {namespace rt {
@@ -127,18 +131,40 @@ void DoneStatics()
 
 extern "C" RT_API void RtBeginStaticInitCriticalSection(uint32_t staticClassId)
 {
-    cmajor::rt::StaticInitTable::Instance().BeginCriticalSection(staticClassId);
+    try
+    {
+        cmajor::rt::StaticInitTable::Instance().BeginCriticalSection(staticClassId);
+    }
+    catch (const std::exception& ex)
+    {
+        std::stringstream s;
+        s << "internal error: " << ex.what() << "\n";
+        std::string str = s.str();
+        RtWrite(stdErrFileHandle, reinterpret_cast<const uint8_t*>(str.c_str()), str.length());
+        exit(exitCodeInternalError);
+    }
 }
 
 extern "C" RT_API void RtEndStaticInitCriticalSection(uint32_t staticClassId)
 {
-    cmajor::rt::StaticInitTable::Instance().EndCriticalSection(staticClassId);
+    try
+    {
+        cmajor::rt::StaticInitTable::Instance().EndCriticalSection(staticClassId);
+    }
+    catch (const std::exception& ex)
+    {
+        std::stringstream s;
+        s << "internal error: " << ex.what() << "\n";
+        std::string str = s.str();
+        RtWrite(stdErrFileHandle, reinterpret_cast<const uint8_t*>(str.c_str()), str.length());
+        exit(exitCodeInternalError);
+    }
 }
 
-std::mutex destructionMutex;
+std::mutex destructionListMutex;
  
 extern "C" RT_API void RtEnqueueDestruction(void* destructor, void* arg)
 {
-    std::lock_guard<std::mutex> lock(destructionMutex);
+    std::lock_guard<std::mutex> lock(destructionListMutex);
     cmajor::rt::destructionList = new cmajor::rt::Destruction(static_cast<cmajor::rt::destructor_ptr>(destructor), arg, cmajor::rt::destructionList);
 }

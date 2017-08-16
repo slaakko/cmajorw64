@@ -26,6 +26,7 @@ public:
     Node* TypeExpr() { return typeExpr.get(); }
     const IdentifierNode* Id() const { return id.get(); }
     const Node* Value() const { return value.get(); }
+    Node* Value() { return value.get(); }
 private:
     Specifiers specifiers;
     std::unique_ptr<Node> typeExpr;

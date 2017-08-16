@@ -56,6 +56,7 @@ public:
     virtual void Accept(Visitor& visitor) = 0;
     virtual void Write(AstWriter& writer);
     virtual void Read(AstReader& reader);
+    virtual std::string ToString() const { return std::string(); }
     virtual void AddArgument(Node* argument) { Assert(false, "AddArgument not overridden");  }
     virtual void AddParameter(ParameterNode* parameter) { Assert(false, "AddParameter not overridden"); }
     virtual void AddTemplateParameter(TemplateParameterNode* templateParameter) { Assert(false, "AddTemplateParameter not overridden"); }

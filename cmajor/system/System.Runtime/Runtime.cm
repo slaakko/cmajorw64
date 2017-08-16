@@ -5,10 +5,11 @@
 
 public extern cdecl nothrow void RtInit();
 public extern cdecl nothrow void RtDone();
-public extern cdecl void RtWrite(int handle, const void* buffer, int count);
+public extern cdecl nothrow void RtExit(int exitCode);
 public extern cdecl nothrow void* RtMemAlloc(long size);
 public extern cdecl nothrow void RtMemFree(void* ptr);
 public extern cdecl nothrow void RtBeginStaticInitCriticalSection(uint staticClassId);
 public extern cdecl nothrow void RtEndStaticInitCriticalSection(uint staticClassId);
 public extern cdecl nothrow void RtEnqueueDestruction(void* destructor, void* arg);
-public extern cdecl nothrow void RtExit(int exitCode);
+public extern cdecl nothrow void RtFailAssertion(const char* assertion, const char* function, const char* sourceFilePath, int lineNumber);
+public extern cdecl void RtWrite(int handle, const void* buffer, int count);

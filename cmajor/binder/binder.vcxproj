@@ -28,6 +28,7 @@
     <ClInclude Include="BoundNodeVisitor.hpp" />
     <ClInclude Include="BoundStatement.hpp" />
     <ClInclude Include="ClassTemplateRepository.hpp" />
+    <ClInclude Include="Evaluator.hpp" />
     <ClInclude Include="ExpressionBinder.hpp" />
     <ClInclude Include="FunctionTemplateRepository.hpp" />
     <ClInclude Include="OperationRepository.hpp" />
@@ -47,6 +48,7 @@
     <ClCompile Include="BoundNodeVisitor.cpp" />
     <ClCompile Include="BoundStatement.cpp" />
     <ClCompile Include="ClassTemplateRepository.cpp" />
+    <ClCompile Include="Evaluator.cpp" />
     <ClCompile Include="ExpressionBinder.cpp" />
     <ClCompile Include="FunctionTemplateRepository.cpp" />
     <ClCompile Include="OperationRepository.cpp" />

@@ -47,6 +47,7 @@ public:
     virtual bool IsPointerType() const { return false; }
     virtual bool IsNullPtrType() const { return false; }
     virtual bool IsVoidPtrType() const { return false; }
+    virtual bool IsSwitchConditionType() const { return false; }
     virtual int PointerCount() const { return 0; }
     virtual bool HasNontrivialDestructor() const { return false; }
     virtual bool ContainsTemplateParameter() const { return false; }
