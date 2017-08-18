@@ -68,6 +68,7 @@ public:
     void Write(SymbolWriter& writer) override;
     void Read(SymbolReader& reader) override;
     void EmplaceType(TypeSymbol* typeSymbol_, int index) override;
+    void ComputeExportClosure() override;
     const TypeSymbol* BaseType() const override { return baseType; }
     TypeSymbol* BaseType() override { return baseType; }
     TypeSymbol* PlainType(const Span& span) override;

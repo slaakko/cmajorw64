@@ -83,7 +83,7 @@ std::string SymbolFlagStr(SymbolFlags symbolFlags)
 
 
 Symbol::Symbol(SymbolType symbolType_, const Span& span_, const std::u32string& name_) : 
-    symbolType(symbolType_), span(span_), name(name_), flags(SymbolFlags::project), parent(nullptr), symbolTable(nullptr), module(nullptr), irObject(nullptr)
+    symbolType(symbolType_), span(span_), name(name_), flags(SymbolFlags::project), parent(nullptr), symbolTable(nullptr), module(nullptr), compileUnit(nullptr), irObject(nullptr)
 {
 }
 
@@ -93,7 +93,7 @@ Symbol::~Symbol()
 
 void Symbol::Write(SymbolWriter& writer)
 {
-    SymbolFlags f = flags & ~(SymbolFlags::project | SymbolFlags::bound | SymbolFlags::export_);
+    SymbolFlags f = flags & ~(SymbolFlags::project | SymbolFlags::bound | SymbolFlags::export_ | SymbolFlags::exportComputed);
     writer.GetBinaryWriter().Write(static_cast<uint8_t>(f));
     writer.GetBinaryWriter().Write(mangledName);
 }
@@ -135,6 +135,10 @@ void Symbol::ComputeMangledName()
     mangledName = ToUtf32(TypeString());
     mangledName.append(1, U'_').append(SimpleName());
     mangledName.append(1, U'_').append(ToUtf32(GetSha1MessageDigest(ToUtf8(FullNameWithSpecifiers()))));
+}
+
+void Symbol::ComputeExportClosure()
+{
 }
 
 void Symbol::SetMangledName(const std::u32string& mangledName_)

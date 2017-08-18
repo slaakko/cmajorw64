@@ -14,6 +14,7 @@
 #include <cmajor/util/Util.hpp>
 #include <cmajor/util/Path.hpp>
 #include <boost/filesystem.hpp>
+#include <boost/lexical_cast.hpp>
 #include <iostream>
 #include <string>
 #include <stdexcept>
@@ -92,6 +93,7 @@ int main(int argc, const char** argv)
                     }
                     else if (arg == "--emit-opt-llvm" || arg == "-o")
                     {
+                        SetGlobalFlag(GlobalFlags::emitLlvm);
                         SetGlobalFlag(GlobalFlags::emitOptLlvm);
                     }
                     else if (arg == "--link-with-debug-runtime" || arg == "-d")
@@ -112,6 +114,18 @@ int main(int argc, const char** argv)
                                 else if (components[1] != "debug")
                                 {
                                     throw std::runtime_error("unknown configuration '" + components[1] + "'");
+                                }
+                            }
+                            else if (components[0] == "--optimization-level" || components[0] == "-O")
+                            {
+                                int optimizationLevel = boost::lexical_cast<int>(components[1]);
+                                if (optimizationLevel >= 0 && optimizationLevel <= 3)
+                                {
+                                    SetOptimizationLevel(optimizationLevel);
+                                }
+                                else
+                                {
+                                    throw std::runtime_error("unknown optimization level '" + components[1] + "'");
                                 }
                             }
                             else

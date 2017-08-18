@@ -20,6 +20,7 @@ public:
     void Write(SymbolWriter& writer) override;
     void Read(SymbolReader& reader) override;
     void EmplaceType(TypeSymbol* typeSymbol, int index) override;
+    void ComputeExportClosure() override;
     ClassTypeSymbol* GetClassTemplate() { return classTemplate; }
     void SetGlobalNs(std::unique_ptr<Node>&& globalNs_);
     const std::vector<TypeSymbol*>& TemplateArgumentTypes() const { return templateArgumentTypes; }

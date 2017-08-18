@@ -76,6 +76,7 @@ public:
     FunctionSymbol(SymbolType symbolType_, const Span& span_, const std::u32string& name_);
     void Write(SymbolWriter& writer) override;
     void Read(SymbolReader& reader) override;
+    void ComputeExportClosure() override;
     void ReadAstNodes();
     const NodeList<Node>& UsingNodes() const { return usingNodes; }
     FunctionNode* GetFunctionNode() { return functionNode.get(); }
@@ -92,6 +93,7 @@ public:
     virtual TypeSymbol* ConversionSourceType() const { return nullptr; }
     virtual TypeSymbol* ConversionTargetType() const { return nullptr; }
     virtual bool IsBasicTypeOperation() const { return false; }
+    virtual bool IsGeneratedFunction() const { return false; }
     virtual void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags);
     void GenerateVirtualCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags);
     virtual ParameterSymbol* GetThisParam() const { return nullptr; }

@@ -152,6 +152,11 @@ void ExpressionBinder::BindUnaryOp(BoundExpression* operand, Node& node, const s
 void ExpressionBinder::BindUnaryOp(UnaryNode& unaryNode, const std::u32string& groupName)
 {
     unaryNode.Subject()->Accept(*this);
+    if (expression->GetType()->IsClassTypeSymbol())
+    {
+        TypeSymbol* type = expression->GetType()->AddPointer(unaryNode.GetSpan());
+        expression.reset(new BoundAddressOfExpression(std::move(expression), type));
+    }
     BoundExpression* operand = expression.release();
     BindUnaryOp(operand, unaryNode, groupName);
 }
@@ -477,14 +482,14 @@ void ExpressionBinder::Visit(StringLiteralNode& stringLiteralNode)
 
 void ExpressionBinder::Visit(WStringLiteralNode& wstringLiteralNode)
 {
-    expression.reset(new BoundLiteral(std::unique_ptr<Value>(new StringValue(wstringLiteralNode.GetSpan(), boundCompileUnit.Install(ToUtf8(wstringLiteralNode.Value())))),
-        symbolTable.GetTypeByName(U"char")->AddConst(wstringLiteralNode.GetSpan())->AddPointer(wstringLiteralNode.GetSpan())));
+    expression.reset(new BoundLiteral(std::unique_ptr<Value>(new WStringValue(wstringLiteralNode.GetSpan(), boundCompileUnit.Install(wstringLiteralNode.Value()))),
+        symbolTable.GetTypeByName(U"wchar")->AddConst(wstringLiteralNode.GetSpan())->AddPointer(wstringLiteralNode.GetSpan())));
 }
 
 void ExpressionBinder::Visit(UStringLiteralNode& ustringLiteralNode)
 {
-    expression.reset(new BoundLiteral(std::unique_ptr<Value>(new StringValue(ustringLiteralNode.GetSpan(), boundCompileUnit.Install(ToUtf8(ustringLiteralNode.Value())))),
-        symbolTable.GetTypeByName(U"char")->AddConst(ustringLiteralNode.GetSpan())->AddPointer(ustringLiteralNode.GetSpan())));
+    expression.reset(new BoundLiteral(std::unique_ptr<Value>(new UStringValue(ustringLiteralNode.GetSpan(), boundCompileUnit.Install(ustringLiteralNode.Value()))),
+        symbolTable.GetTypeByName(U"uchar")->AddConst(ustringLiteralNode.GetSpan())->AddPointer(ustringLiteralNode.GetSpan())));
 }
 
 void ExpressionBinder::Visit(NullLiteralNode& nullLiteralNode) 
@@ -1009,7 +1014,7 @@ void ExpressionBinder::Visit(ComplementNode& complementNode)
 
 void ExpressionBinder::Visit(IsNode& isNode) 
 {
-    TypeSymbol* rightType = ResolveType(isNode.TargetTypeExpr(), boundCompileUnit, containerScope, true);
+    TypeSymbol* rightType = ResolveType(isNode.TargetTypeExpr(), boundCompileUnit, containerScope);
     if (rightType->IsPointerType())
     {
         TypeSymbol* rightBaseType = rightType->RemovePointer(span);
@@ -1063,7 +1068,7 @@ void ExpressionBinder::Visit(IsNode& isNode)
 
 void ExpressionBinder::Visit(AsNode& asNode) 
 {
-    TypeSymbol* rightType = ResolveType(asNode.TargetTypeExpr(), boundCompileUnit, containerScope, true);
+    TypeSymbol* rightType = ResolveType(asNode.TargetTypeExpr(), boundCompileUnit, containerScope);
     if (rightType->IsPointerType())
     {
         TypeSymbol* rightBaseType = rightType->RemovePointer(span);
@@ -1193,6 +1198,10 @@ void ExpressionBinder::Visit(InvokeNode& invokeNode)
     else if (expression->GetBoundNodeType() == BoundNodeType::boundTypeExpression)
     {
         TypeSymbol* type = expression->GetType();
+        if (!scopeQualified)
+        {
+            functionScopeLookups.push_back(FunctionScopeLookup(ScopeLookup::this_and_base, type->BaseType()->ClassInterfaceOrNsScope()));
+        }
         temporary = boundFunction->GetFunctionSymbol()->CreateTemporary(type, invokeNode.GetSpan());
         std::unique_ptr<BoundExpression> addrOfTemporary(new BoundAddressOfExpression(std::unique_ptr<BoundExpression>(new BoundLocalVariable(temporary)), type->AddPointer(invokeNode.GetSpan())));
         arguments.push_back(std::move(addrOfTemporary));
@@ -1209,7 +1218,7 @@ void ExpressionBinder::Visit(InvokeNode& invokeNode)
         argument->Accept(*this);
         if (expression->GetType()->GetSymbolType() != SymbolType::functionGroupTypeSymbol && !scopeQualified)
         {
-            functionScopeLookups.push_back(FunctionScopeLookup(ScopeLookup::this_, expression->GetType()->ClassInterfaceOrNsScope()));
+            functionScopeLookups.push_back(FunctionScopeLookup(ScopeLookup::this_, expression->GetType()->BaseType()->ClassInterfaceOrNsScope()));
         }
         arguments.push_back(std::unique_ptr<BoundExpression>(expression.release()));
     }
@@ -1231,7 +1240,7 @@ void ExpressionBinder::Visit(InvokeNode& invokeNode)
             BoundParameter* boundThisParam = new BoundParameter(thisParam);
             arguments.insert(arguments.begin(), std::unique_ptr<BoundExpression>(boundThisParam));
             thisParamInserted = true;
-            functionScopeLookups.push_back(FunctionScopeLookup(ScopeLookup::this_and_base, thisParam->GetType()->ClassInterfaceOrNsScope()));
+            functionScopeLookups.push_back(FunctionScopeLookup(ScopeLookup::this_and_base, thisParam->GetType()->BaseType()->ClassInterfaceOrNsScope()));
             functionCall = std::move(ResolveOverload(groupName, containerScope, functionScopeLookups, arguments, boundCompileUnit, boundFunction, invokeNode.GetSpan(),
                 OverloadResolutionFlags::dontThrow, thisEx));
         }
@@ -1442,13 +1451,13 @@ void ExpressionBinder::Visit(TypeNameNode& typeNameNode)
 
 void ExpressionBinder::Visit(CastNode& castNode) 
 {
-    TypeSymbol* targetType = ResolveType(castNode.TargetTypeExpr(), boundCompileUnit, containerScope, false);
+    TypeSymbol* targetType = ResolveType(castNode.TargetTypeExpr(), boundCompileUnit, containerScope);
     castNode.SourceExpr()->Accept(*this);
     std::vector<std::unique_ptr<BoundExpression>> targetExprArgs;
     targetExprArgs.push_back(std::unique_ptr<BoundExpression>(new BoundTypeExpression(castNode.GetSpan(), targetType)));
     std::vector<FunctionScopeLookup> functionScopeLookups;
     functionScopeLookups.push_back(FunctionScopeLookup(ScopeLookup::this_and_base_and_parent, containerScope));
-    functionScopeLookups.push_back(FunctionScopeLookup(ScopeLookup::this_, targetType->ClassInterfaceOrNsScope()));
+    functionScopeLookups.push_back(FunctionScopeLookup(ScopeLookup::this_, targetType->BaseType()->ClassInterfaceOrNsScope()));
     functionScopeLookups.push_back(FunctionScopeLookup(ScopeLookup::fileScopes, nullptr));
     std::unique_ptr<BoundFunctionCall> castFunctionCall = ResolveOverload(U"@return", containerScope, functionScopeLookups, targetExprArgs, boundCompileUnit, boundFunction, castNode.GetSpan());
     std::vector<std::unique_ptr<BoundExpression>> castArguments;

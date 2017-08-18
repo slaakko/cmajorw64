@@ -11,7 +11,7 @@ namespace cmajor { namespace symbols {
 
 const char* valueTypeStr[]
 {
-    "none", "bool", "sbyte", "byte", "short", "ushort", "int", "uint", "long", "ulong", "float", "double", "char", "wchar", "uchar", "string", "null"
+    "none", "bool", "sbyte", "byte", "short", "ushort", "int", "uint", "long", "ulong", "float", "double", "char", "wchar", "uchar", "string", "wstring", "ustring", "null"
 };
 
 std::string ValueTypeStr(ValueType valueType)
@@ -24,103 +24,134 @@ ValueType commonType[uint8_t(ValueType::maxValue)][uint8_t(ValueType::maxValue)]
     // ValueType::none
     {   
         ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none, 
-        ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none
+        ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none, 
+        ValueType::none, ValueType::none, ValueType::none, ValueType::none
     },
 
     // ValueType::boolValue
     {   
         ValueType::none, ValueType::boolValue, ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none,
-        ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none
+        ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none, 
+        ValueType::none, ValueType::none, ValueType::none, ValueType::none
     },
     
     // ValueType::sbyteValue
     {   
         ValueType::none, ValueType::none, ValueType::sbyteValue, ValueType::shortValue, ValueType::shortValue, ValueType::intValue, ValueType::intValue, ValueType::longValue,
-        ValueType::longValue, ValueType::none, ValueType::floatValue, ValueType::doubleValue, ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none
+        ValueType::longValue, ValueType::none, ValueType::floatValue, ValueType::doubleValue, ValueType::none, ValueType::none, ValueType::none, 
+        ValueType::none, ValueType::none, ValueType::none, ValueType::none
     },
 
     // ValueType::byteValue
     {
         ValueType::none, ValueType::none, ValueType::shortValue, ValueType::byteValue, ValueType::shortValue, ValueType::ushortValue, ValueType::intValue, ValueType::uintValue,
-        ValueType::longValue, ValueType::ulongValue, ValueType::floatValue, ValueType::doubleValue, ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none
+        ValueType::longValue, ValueType::ulongValue, ValueType::floatValue, ValueType::doubleValue, ValueType::none, ValueType::none, ValueType::none, 
+        ValueType::none, ValueType::none, ValueType::none, ValueType::none
     },
 
     // ValueType::shortValue
     {
         ValueType::none, ValueType::none, ValueType::shortValue, ValueType::shortValue, ValueType::shortValue, ValueType::intValue, ValueType::intValue, ValueType::longValue,
-        ValueType::longValue, ValueType::none, ValueType::floatValue, ValueType::doubleValue, ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none
+        ValueType::longValue, ValueType::none, ValueType::floatValue, ValueType::doubleValue, ValueType::none, ValueType::none, ValueType::none,
+        ValueType::none, ValueType::none, ValueType::none, ValueType::none
     },
 
     // ValueType::ushortValue
     {
         ValueType::none, ValueType::none, ValueType::intValue, ValueType::ushortValue, ValueType::intValue, ValueType::ushortValue, ValueType::intValue, ValueType::uintValue,
-        ValueType::longValue, ValueType::ulongValue, ValueType::floatValue, ValueType::doubleValue, ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none
+        ValueType::longValue, ValueType::ulongValue, ValueType::floatValue, ValueType::doubleValue, ValueType::none, ValueType::none, ValueType::none, 
+        ValueType::none, ValueType::none, ValueType::none, ValueType::none
     },
 
     // ValueType::intValue
     {
         ValueType::none, ValueType::none, ValueType::intValue, ValueType::intValue, ValueType::intValue, ValueType::intValue, ValueType::intValue, ValueType::longValue,
-        ValueType::longValue, ValueType::none, ValueType::floatValue, ValueType::doubleValue, ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none
+        ValueType::longValue, ValueType::none, ValueType::floatValue, ValueType::doubleValue, ValueType::none, ValueType::none, ValueType::none, 
+        ValueType::none, ValueType::none, ValueType::none, ValueType::none
     },
 
     // ValueType::uintValue
     {
         ValueType::none, ValueType::none, ValueType::longValue, ValueType::uintValue, ValueType::longValue, ValueType::uintValue, ValueType::longValue, ValueType::uintValue,
-        ValueType::longValue, ValueType::ulongValue, ValueType::floatValue, ValueType::doubleValue, ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none
+        ValueType::longValue, ValueType::ulongValue, ValueType::floatValue, ValueType::doubleValue, ValueType::none, ValueType::none, ValueType::none, 
+        ValueType::none, ValueType::none, ValueType::none, ValueType::none
     },
 
     // ValueType::longValue
     {
         ValueType::none, ValueType::none, ValueType::longValue, ValueType::longValue, ValueType::longValue, ValueType::longValue, ValueType::longValue, ValueType::longValue,
-        ValueType::longValue, ValueType::none, ValueType::floatValue, ValueType::doubleValue, ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none
+        ValueType::longValue, ValueType::none, ValueType::floatValue, ValueType::doubleValue, ValueType::none, ValueType::none, ValueType::none, 
+        ValueType::none, ValueType::none, ValueType::none, ValueType::none
     },
 
     // ValueType::ulongValue
     {
         ValueType::none, ValueType::none, ValueType::none, ValueType::ulongValue, ValueType::none, ValueType::ulongValue, ValueType::none, ValueType::ulongValue,
-        ValueType::none, ValueType::ulongValue, ValueType::floatValue, ValueType::doubleValue, ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none
+        ValueType::none, ValueType::ulongValue, ValueType::floatValue, ValueType::doubleValue, ValueType::none, ValueType::none, ValueType::none, 
+        ValueType::none, ValueType::none, ValueType::none, ValueType::none
     },
 
     // ValueType::floatValue
     {
         ValueType::none, ValueType::none, ValueType::floatValue, ValueType::floatValue, ValueType::floatValue, ValueType::floatValue, ValueType::floatValue, ValueType::floatValue,
-        ValueType::floatValue, ValueType::floatValue, ValueType::floatValue, ValueType::doubleValue, ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none
+        ValueType::floatValue, ValueType::floatValue, ValueType::floatValue, ValueType::doubleValue, ValueType::none, ValueType::none, ValueType::none, 
+        ValueType::none, ValueType::none, ValueType::none, ValueType::none
     },
 
     // ValueType::doubleValue
     {
         ValueType::none, ValueType::none, ValueType::doubleValue, ValueType::doubleValue, ValueType::doubleValue, ValueType::doubleValue, ValueType::doubleValue, ValueType::doubleValue,
-        ValueType::doubleValue, ValueType::doubleValue, ValueType::doubleValue, ValueType::doubleValue, ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none
+        ValueType::doubleValue, ValueType::doubleValue, ValueType::doubleValue, ValueType::doubleValue, ValueType::none, ValueType::none, ValueType::none, 
+        ValueType::none, ValueType::none, ValueType::none, ValueType::none
     },
 
     // ValueType::charValue
     {
         ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none, 
-        ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::charValue, ValueType::wcharValue, ValueType::ucharValue, ValueType::none, ValueType::none
+        ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::charValue, ValueType::wcharValue, ValueType::ucharValue, 
+        ValueType::none, ValueType::none, ValueType::none, ValueType::none
     },
 
     // ValueType::wcharValue
     {
         ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none,
-        ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::wcharValue, ValueType::wcharValue, ValueType::ucharValue, ValueType::none, ValueType::none
+        ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::wcharValue, ValueType::wcharValue, ValueType::ucharValue, 
+        ValueType::none, ValueType::none, ValueType::none, ValueType::none
     },
 
     // ValueType::ucharValue
     {
         ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none,
-        ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::ucharValue, ValueType::ucharValue, ValueType::ucharValue, ValueType::none, ValueType::none
+        ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::ucharValue, ValueType::ucharValue, ValueType::ucharValue, 
+        ValueType::none, ValueType::none, ValueType::none, ValueType::none
     },
 
     // ValueType::stringValue
     {
         ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none,
-        ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::stringValue, ValueType::none
+        ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none, 
+        ValueType::stringValue, ValueType::none, ValueType::none, ValueType::none
     },
 
+    // ValueType::wstringValue
+    {
+        ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none,
+        ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none,
+        ValueType::none, ValueType::wstringValue, ValueType::none, ValueType::none
+    },
+
+    // ValueType::ustringValue
+    {
+        ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none,
+        ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none,
+        ValueType::none, ValueType::none, ValueType::ustringValue, ValueType::none
+    },
+        
     // ValueType::nullValue
     {
         ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none,
-        ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::nullValue
+        ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none, 
+        ValueType::none, ValueType::none, ValueType::none, ValueType::nullValue
     }
 };
 
@@ -3353,6 +3384,76 @@ Value* StringValue::As(ValueType targetType, bool cast, const Span& span, bool d
         case ValueType::stringValue:
         {
             return new StringValue(span, stringId);
+        }
+        default:
+        {
+            if (dontThrow)
+            {
+                return nullptr;
+            }
+            else
+            {
+                throw Exception("conversion from " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " is not valid", span);
+            }
+        }
+    }
+}
+
+WStringValue::WStringValue(const Span& span_, int stringId_) : Value(span_, ValueType::wstringValue), stringId(stringId_)
+{
+}
+
+llvm::Value* WStringValue::IrValue(Emitter& emitter)
+{ 
+    llvm::Value* wstringConstant = emitter.GetGlobalWStringConstant(stringId);
+    ArgVector indeces;
+    indeces.push_back(emitter.Builder().getInt32(0));
+    indeces.push_back(emitter.Builder().getInt32(0));
+    return emitter.Builder().CreateGEP(wstringConstant, indeces);
+}
+
+Value* WStringValue::As(ValueType targetType, bool cast, const Span& span, bool dontThrow) const
+{
+    switch (targetType)
+    {
+        case ValueType::wstringValue:
+        {
+            return new WStringValue(span, stringId);
+        }
+        default:
+        {
+            if (dontThrow)
+            {
+                return nullptr;
+            }
+            else
+            {
+                throw Exception("conversion from " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " is not valid", span);
+            }
+        }
+    }
+}
+
+UStringValue::UStringValue(const Span& span_, int stringId_) : Value(span_, ValueType::ustringValue), stringId(stringId_)
+{
+}
+
+llvm::Value* UStringValue::IrValue(Emitter& emitter)
+{
+    llvm::Value* ustringConstant = emitter.GetGlobalUStringConstant(stringId);
+    ArgVector indeces;
+    indeces.push_back(emitter.Builder().getInt32(0));
+    indeces.push_back(emitter.Builder().getInt32(0));
+    return emitter.Builder().CreateGEP(ustringConstant, indeces);
+}
+
+Value* UStringValue::As(ValueType targetType, bool cast, const Span& span, bool dontThrow) const
+{
+    switch (targetType)
+    {
+        case ValueType::ustringValue:
+        {
+            return new UStringValue(span, stringId);
         }
         default:
         {

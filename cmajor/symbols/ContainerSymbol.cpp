@@ -69,6 +69,21 @@ void ContainerSymbol::AddMember(Symbol* member)
     }
 }
 
+void ContainerSymbol::ComputeExportClosure()
+{
+    if (IsProject())
+    {
+        for (std::unique_ptr<Symbol>& member : members)
+        {
+            if (!member->ExportComputed())
+            {
+                member->SetExportComputed();
+                member->ComputeExportClosure();
+            }
+        }
+    }
+}
+
 void ContainerSymbol::Clear()
 {
     containerScope.Clear();
@@ -111,6 +126,5 @@ void DeclarationBlock::AddMember(Symbol* member)
         }
     }
 }
-
 
 } } // namespace cmajor::symbols

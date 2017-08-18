@@ -60,7 +60,8 @@ bool operator!=(const ClassTemplateSpecializationKey& left, const ClassTemplateS
 }
 
 SymbolTable::SymbolTable() : 
-    globalNs(Span(), std::u32string()), container(&globalNs), currentClass(nullptr), currentInterface(nullptr), mainFunctionSymbol(nullptr), parameterIndex(0), declarationBlockIndex(0)
+    globalNs(Span(), std::u32string()), currentCompileUnit(nullptr), container(&globalNs), currentClass(nullptr), currentInterface(nullptr), mainFunctionSymbol(nullptr), 
+    parameterIndex(0), declarationBlockIndex(0)
 {
     globalNs.SetSymbolTable(this);
 }
@@ -68,6 +69,7 @@ SymbolTable::SymbolTable() :
 void SymbolTable::Write(SymbolWriter& writer)
 {
     globalNs.Write(writer);
+    globalNs.ComputeExportClosure();
     std::vector<TypeSymbol*> exportedDerivedTypes;
     for (const auto& derivedType : derivedTypes)
     {
@@ -253,6 +255,7 @@ void SymbolTable::EndNamespace()
 void SymbolTable::BeginFunction(FunctionNode& functionNode)
 {
     FunctionSymbol* functionSymbol = new FunctionSymbol(functionNode.GetSpan(), functionNode.GroupId());
+    functionSymbol->SetCompileUnit(currentCompileUnit);
     functionSymbol->SetSymbolTable(this);
     functionSymbol->SetGroupName(functionNode.GroupId());
     if (functionSymbol->GroupName() == U"main")
@@ -294,6 +297,7 @@ void SymbolTable::AddParameter(ParameterNode& parameterNode)
         parameterNode.SetId(new IdentifierNode(parameterNode.GetSpan(), parameterName));
     }
     ParameterSymbol* parameterSymbol = new ParameterSymbol(parameterNode.GetSpan(), parameterName);
+    parameterSymbol->SetCompileUnit(currentCompileUnit);
     parameterSymbol->SetSymbolTable(this);
     MapNode(&parameterNode, parameterSymbol);
     container->AddMember(parameterSymbol);
@@ -305,6 +309,7 @@ void SymbolTable::BeginClass(ClassNode& classNode)
     ClassTypeSymbol* classTypeSymbol = new ClassTypeSymbol(classNode.GetSpan(), classNode.Id()->Str());
     currentClassStack.push(currentClass);
     currentClass = classTypeSymbol;
+    classTypeSymbol->SetCompileUnit(currentCompileUnit);
     classTypeSymbol->SetSymbolTable(this);
     MapNode(&classNode, classTypeSymbol);
     SetTypeIdFor(classTypeSymbol);
@@ -344,6 +349,7 @@ void SymbolTable::EndClassTemplateSpecialization()
 void SymbolTable::AddTemplateParameter(TemplateParameterNode& templateParameterNode)
 {
     TemplateParameterSymbol* templateParameterSymbol = new TemplateParameterSymbol(templateParameterNode.GetSpan(), templateParameterNode.Id()->Str());
+    templateParameterSymbol->SetCompileUnit(currentCompileUnit);
     templateParameterSymbol->SetSymbolTable(this);
     MapNode(&templateParameterNode, templateParameterSymbol);
     container->AddMember(templateParameterSymbol);
@@ -354,6 +360,7 @@ void SymbolTable::BeginInterface(InterfaceNode& interfaceNode)
     InterfaceTypeSymbol* interfaceTypeSymbol = new InterfaceTypeSymbol(interfaceNode.GetSpan(), interfaceNode.Id()->Str());
     currentInterfaceStack.push(currentInterface);
     currentInterface = interfaceTypeSymbol;
+    interfaceTypeSymbol->SetCompileUnit(currentCompileUnit);
     interfaceTypeSymbol->SetSymbolTable(this);
     MapNode(&interfaceNode, interfaceTypeSymbol);
     SetTypeIdFor(interfaceTypeSymbol);
@@ -374,6 +381,7 @@ void SymbolTable::EndInterface()
 void SymbolTable::BeginStaticConstructor(StaticConstructorNode& staticConstructorNode)
 {
     StaticConstructorSymbol* staticConstructorSymbol = new StaticConstructorSymbol(staticConstructorNode.GetSpan(), U"@static_constructor");
+    staticConstructorSymbol->SetCompileUnit(currentCompileUnit);
     staticConstructorSymbol->SetSymbolTable(this);
     MapNode(&staticConstructorNode, staticConstructorSymbol);
     ContainerScope* staticConstructorScope = staticConstructorSymbol->GetContainerScope();
@@ -393,6 +401,7 @@ void SymbolTable::EndStaticConstructor()
 void SymbolTable::BeginConstructor(ConstructorNode& constructorNode)
 {
     ConstructorSymbol* constructorSymbol = new ConstructorSymbol(constructorNode.GetSpan(), U"@constructor");
+    constructorSymbol->SetCompileUnit(currentCompileUnit);
     constructorSymbol->SetSymbolTable(this);
     MapNode(&constructorNode, constructorSymbol);
     ContainerScope* constructorScope = constructorSymbol->GetContainerScope();
@@ -427,6 +436,7 @@ void SymbolTable::EndConstructor()
 void SymbolTable::BeginDestructor(DestructorNode& destructorNode)
 {
     DestructorSymbol* destructorSymbol = new DestructorSymbol(destructorNode.GetSpan(), U"@destructor");
+    destructorSymbol->SetCompileUnit(currentCompileUnit);
     destructorSymbol->SetSymbolTable(this);
     MapNode(&destructorNode, destructorSymbol);
     ContainerScope* destructorScope = destructorSymbol->GetContainerScope();
@@ -460,6 +470,7 @@ void SymbolTable::EndDestructor()
 void SymbolTable::BeginMemberFunction(MemberFunctionNode& memberFunctionNode)
 {
     MemberFunctionSymbol* memberFunctionSymbol = new MemberFunctionSymbol(memberFunctionNode.GetSpan(), memberFunctionNode.GroupId());
+    memberFunctionSymbol->SetCompileUnit(currentCompileUnit);
     memberFunctionSymbol->SetSymbolTable(this);
     memberFunctionSymbol->SetGroupName(memberFunctionNode.GroupId());
     MapNode(&memberFunctionNode, memberFunctionSymbol);
@@ -513,6 +524,7 @@ void SymbolTable::AddMemberVariable(MemberVariableNode& memberVariableNode)
     {
         memberVariableSymbol->SetStatic();
     }
+    memberVariableSymbol->SetCompileUnit(currentCompileUnit);
     memberVariableSymbol->SetSymbolTable(this);
     MapNode(&memberVariableNode, memberVariableSymbol);
     container->AddMember(memberVariableSymbol);
@@ -521,6 +533,7 @@ void SymbolTable::AddMemberVariable(MemberVariableNode& memberVariableNode)
 void SymbolTable::BeginDelegate(DelegateNode& delegateNode)
 {
     DelegateTypeSymbol* delegateTypeSymbol = new DelegateTypeSymbol(delegateNode.GetSpan(), delegateNode.Id()->Str());
+    delegateTypeSymbol->SetCompileUnit(currentCompileUnit);
     delegateTypeSymbol->SetSymbolTable(this);
     MapNode(&delegateNode, delegateTypeSymbol);
     SetTypeIdFor(delegateTypeSymbol);
@@ -540,6 +553,7 @@ void SymbolTable::EndDelegate()
 void SymbolTable::BeginClassDelegate(ClassDelegateNode& classDelegateNode)
 {
     ClassDelegateTypeSymbol* classDelegateTypeSymbol = new ClassDelegateTypeSymbol(classDelegateNode.GetSpan(), classDelegateNode.Id()->Str());
+    classDelegateTypeSymbol->SetCompileUnit(currentCompileUnit);
     classDelegateTypeSymbol->SetSymbolTable(this);
     MapNode(&classDelegateNode, classDelegateTypeSymbol);
     SetTypeIdFor(classDelegateTypeSymbol);
@@ -559,6 +573,7 @@ void SymbolTable::EndClassDelegate()
 void SymbolTable::BeginDeclarationBlock(Node& node)
 {
     DeclarationBlock* declarationBlock = new DeclarationBlock(node.GetSpan(), U"@locals" + ToUtf32(std::to_string(GetNextDeclarationBlockIndex())));
+    declarationBlock->SetCompileUnit(currentCompileUnit);
     declarationBlock->SetSymbolTable(this);
     MapNode(&node, declarationBlock);
     ContainerScope* declarationBlockScope = declarationBlock->GetContainerScope();
@@ -576,6 +591,7 @@ void SymbolTable::EndDeclarationBlock()
 void SymbolTable::AddLocalVariable(ConstructionStatementNode& constructionStatementNode)
 {
     LocalVariableSymbol* localVariableSymbol = new LocalVariableSymbol(constructionStatementNode.GetSpan(), constructionStatementNode.Id()->Str());
+    localVariableSymbol->SetCompileUnit(currentCompileUnit);
     localVariableSymbol->SetSymbolTable(this);
     MapNode(&constructionStatementNode, localVariableSymbol);
     container->AddMember(localVariableSymbol);
@@ -584,6 +600,7 @@ void SymbolTable::AddLocalVariable(ConstructionStatementNode& constructionStatem
 void SymbolTable::AddLocalVariable(IdentifierNode& identifierNode)
 {
     LocalVariableSymbol* localVariableSymbol = new LocalVariableSymbol(identifierNode.GetSpan(), identifierNode.Str());
+    localVariableSymbol->SetCompileUnit(currentCompileUnit);
     localVariableSymbol->SetSymbolTable(this);
     MapNode(&identifierNode, localVariableSymbol);
     container->AddMember(localVariableSymbol);
@@ -592,6 +609,7 @@ void SymbolTable::AddLocalVariable(IdentifierNode& identifierNode)
 void SymbolTable::AddTypedef(TypedefNode& typedefNode)
 {
     TypedefSymbol* typedefSymbol = new TypedefSymbol(typedefNode.GetSpan(), typedefNode.Id()->Str());
+    typedefSymbol->SetCompileUnit(currentCompileUnit);
     typedefSymbol->SetSymbolTable(this);
     MapNode(&typedefNode, typedefSymbol);
     container->AddMember(typedefSymbol);
@@ -600,6 +618,7 @@ void SymbolTable::AddTypedef(TypedefNode& typedefNode)
 void SymbolTable::AddConstant(ConstantNode& constantNode)
 {
     ConstantSymbol* constantSymbol = new ConstantSymbol(constantNode.GetSpan(), constantNode.Id()->Str());
+    constantSymbol->SetCompileUnit(currentCompileUnit);
     constantSymbol->SetSymbolTable(this);
     MapNode(&constantNode, constantSymbol);
     container->AddMember(constantSymbol);
@@ -608,6 +627,7 @@ void SymbolTable::AddConstant(ConstantNode& constantNode)
 void SymbolTable::BeginEnumType(EnumTypeNode& enumTypeNode)
 {
     EnumTypeSymbol* enumTypeSymbol = new EnumTypeSymbol(enumTypeNode.GetSpan(), enumTypeNode.Id()->Str());
+    enumTypeSymbol->SetCompileUnit(currentCompileUnit);
     enumTypeSymbol->SetSymbolTable(this);
     MapNode(&enumTypeNode, enumTypeSymbol);
     SetTypeIdFor(enumTypeSymbol);
@@ -626,6 +646,7 @@ void SymbolTable::EndEnumType()
 void SymbolTable::AddEnumConstant(EnumConstantNode& enumConstantNode)
 {
     EnumConstantSymbol* enumConstantSymbol = new EnumConstantSymbol(enumConstantNode.GetSpan(), enumConstantNode.Id()->Str());
+    enumConstantSymbol->SetCompileUnit(currentCompileUnit);
     enumConstantSymbol->SetSymbolTable(this);
     MapNode(&enumConstantNode, enumConstantSymbol);
     container->AddMember(enumConstantSymbol);
@@ -777,7 +798,7 @@ TypeSymbol* SymbolTable::GetTypeByName(const std::u32string& typeName) const
     }
 }
 
-TypeSymbol* SymbolTable::MakeDerivedType(TypeSymbol* baseType, const TypeDerivationRec& derivationRec, const Span& span, bool markExport)
+TypeSymbol* SymbolTable::MakeDerivedType(TypeSymbol* baseType, const TypeDerivationRec& derivationRec, const Span& span)
 {
     if (derivationRec.IsEmpty())
     {
@@ -794,10 +815,6 @@ TypeSymbol* SymbolTable::MakeDerivedType(TypeSymbol* baseType, const TypeDerivat
         DerivedTypeSymbol* derivedType = mappedDerivedTypes[i];
         if (derivedType->DerivationRec() == derivationRec)
         {
-            if (markExport)
-            {
-                derivedType->MarkExport();
-            }
             return derivedType;
         }
     }
@@ -805,27 +822,18 @@ TypeSymbol* SymbolTable::MakeDerivedType(TypeSymbol* baseType, const TypeDerivat
     derivedType->SetParent(&globalNs);
     derivedType->SetSymbolTable(this);
     SetTypeIdFor(derivedType);
-    if (markExport)
-    {
-        derivedType->MarkExport();
-    }
     mappedDerivedTypes.push_back(derivedType);
     derivedTypes.push_back(std::unique_ptr<DerivedTypeSymbol>(derivedType));
     return derivedType;
 }
 
-ClassTemplateSpecializationSymbol* SymbolTable::MakeClassTemplateSpecialization(ClassTypeSymbol* classTemplate, const std::vector<TypeSymbol*>& templateArgumentTypes, const Span& span,
-    bool markExport)
+ClassTemplateSpecializationSymbol* SymbolTable::MakeClassTemplateSpecialization(ClassTypeSymbol* classTemplate, const std::vector<TypeSymbol*>& templateArgumentTypes, const Span& span)
 {
     ClassTemplateSpecializationKey key(classTemplate, templateArgumentTypes);
     auto it = classTemplateSpecializationMap.find(key);
     if (it != classTemplateSpecializationMap.cend())
     {
         ClassTemplateSpecializationSymbol* classTemplateSpecialization = it->second;
-        if (markExport)
-        {
-            classTemplateSpecialization->MarkExport();
-        }
         return classTemplateSpecialization;
     }
     else
@@ -834,10 +842,6 @@ ClassTemplateSpecializationSymbol* SymbolTable::MakeClassTemplateSpecialization(
             MakeClassTemplateSpecializationName(classTemplate, templateArgumentTypes), classTemplate, templateArgumentTypes);
         classTemplateSpecializationMap[key] = classTemplateSpecialization;
         classTemplateSpecialization->SetSymbolTable(this);
-        if (markExport)
-        {
-            classTemplateSpecialization->MarkExport();
-        }
         classTemplateSpecializations.push_back(std::unique_ptr<ClassTemplateSpecializationSymbol>(classTemplateSpecialization));
         return classTemplateSpecialization;
     }

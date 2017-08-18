@@ -8,6 +8,7 @@
 namespace cmajor { namespace symbols {
 
 GlobalFlags globalFlags;
+int optimizationLevel = -1;
 
 inline GlobalFlags operator|(GlobalFlags flags, GlobalFlags flag)
 {
@@ -51,8 +52,26 @@ std::string GetConfig()
 
 int GetOptimizationLevel()
 {
-    // todo
-    return 0;
+    if (optimizationLevel == -1)
+    {
+        if (GetGlobalFlag(GlobalFlags::release))
+        {
+            return 3;
+        }
+        else
+        {
+            return 0;
+        }
+    }
+    else
+    {
+        return optimizationLevel;
+    }
+}
+
+void SetOptimizationLevel(int optimizationLevel_)
+{
+    optimizationLevel = optimizationLevel_;
 }
 
 } } // namespace cmajor::symbols

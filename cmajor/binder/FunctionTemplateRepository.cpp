@@ -99,6 +99,7 @@ FunctionSymbol* FunctionTemplateRepository::Instantiate(FunctionSymbol* function
     }
     FunctionNode* functionInstanceNode = static_cast<FunctionNode*>(functionNode->Clone(cloneContext));
     currentNs->AddMember(functionInstanceNode);
+    symbolTable.SetCurrentCompileUnit(boundCompileUnit.GetCompileUnitNode());
     SymbolCreatorVisitor symbolCreatorVisitor(symbolTable);
     globalNs->Accept(symbolCreatorVisitor);
     Symbol* symbol = symbolTable.GetSymbol(functionInstanceNode);

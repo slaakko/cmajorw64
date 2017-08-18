@@ -12,6 +12,8 @@
 #include <cmajor/ir/Emitter.hpp>
 #include <cmajor/symbols/GlobalFlags.hpp>
 #include <cmajor/util/Unicode.hpp>
+#include <cmajor/util/System.hpp>
+#include <cmajor/util/TextUtils.hpp>
 #include <llvm/Support/TargetSelect.h>
 #include <llvm/Support/TargetRegistry.h>
 #include <llvm/Support/FileSystem.h>
@@ -155,6 +157,8 @@ public:
     void Visit(BoundDisjunction& boundDisjunction) override;
     void Visit(BoundConjunction& boundConjunction) override;
     llvm::Value* GetGlobalStringPtr(int stringId) override;
+    llvm::Value* GetGlobalWStringConstant(int stringId) override;
+    llvm::Value* GetGlobalUStringConstant(int stringId) override;
 private:
     EmittingContext& emittingContext;
     SymbolTable* symbolTable;
@@ -179,7 +183,9 @@ private:
     std::stack<BoundClass*> classStack;
     std::vector<BoundCompoundStatement*> blocks;
     std::unordered_map<BoundCompoundStatement*, std::vector<std::unique_ptr<BoundFunctionCall>>> blockDestructionMap;
-    std::unordered_map<int, llvm::Value*> stringMap;
+    std::unordered_map<int, llvm::Value*> utf8stringMap;
+    std::unordered_map<int, llvm::Value*> utf16stringMap;
+    std::unordered_map<int, llvm::Value*> utf32stringMap;
     int prevLineNumber;
     void GenJumpingBoolCode();
     void ExitBlocks(BoundCompoundStatement* targetBlock);
@@ -246,9 +252,10 @@ void Emitter::Visit(BoundCompileUnit& boundCompileUnit)
     }
     if (GetGlobalFlag(GlobalFlags::emitOptLlvm))
     {
-        std::ofstream optLlFile(boundCompileUnit.OptLLFilePath());
-        llvm::raw_os_ostream optLlOs(optLlFile);
-        compileUnitModule->print(optLlOs, nullptr);
+        std::string optCommandLine;
+        optCommandLine.append("opt -O").append(std::to_string(GetOptimizationLevel())).append(" ").append(QuotedPath(boundCompileUnit.LLFilePath())).append(" -S -o ");
+        optCommandLine.append(QuotedPath(boundCompileUnit.OptLLFilePath()));
+        System(optCommandLine);
     }
 }
 
@@ -285,6 +292,10 @@ void Emitter::Visit(BoundFunction& boundFunction)
     else
     {
         function->addFnAttr(llvm::Attribute::UWTable);
+    }
+    if (GetGlobalFlag(GlobalFlags::release) && functionSymbol->IsInline())
+    {
+        function->addFnAttr(llvm::Attribute::InlineHint);
     }
     SetFunction(function);
     llvm::BasicBlock* entryBlock = llvm::BasicBlock::Create(context, "entry", function);
@@ -951,15 +962,71 @@ void Emitter::Visit(BoundConjunction& boundConjunction)
 
 llvm::Value* Emitter::GetGlobalStringPtr(int stringId)
 {
-    auto it = stringMap.find(stringId);
-    if (it != stringMap.cend())
+    auto it = utf8stringMap.find(stringId);
+    if (it != utf8stringMap.cend())
     {
         return it->second;
     }
     else
     {
-        llvm::Value* stringValue = builder.CreateGlobalStringPtr(compileUnit->GetString(stringId));
-        stringMap[stringId] = stringValue;
+        llvm::Value* stringValue = builder.CreateGlobalStringPtr(compileUnit->GetUtf8String(stringId));
+        utf8stringMap[stringId] = stringValue;
+        return stringValue;
+    }
+}
+
+llvm::Value* Emitter::GetGlobalWStringConstant(int stringId)
+{
+    auto it = utf16stringMap.find(stringId);
+    if (it != utf16stringMap.cend())
+    {
+        return it->second;
+    }
+    else
+    {
+        const std::u16string& str = compileUnit->GetUtf16String(stringId);
+        uint64_t length = str.length();
+        std::vector<llvm::Constant*> wcharConstants;
+        for (char16_t c : str)
+        {
+            wcharConstants.push_back(builder.getInt16(static_cast<uint16_t>(c)));
+        }
+        wcharConstants.push_back(builder.getInt16(static_cast<uint32_t>(0)));
+        llvm::Constant* stringObject = compileUnitModule->getOrInsertGlobal("wstring" + std::to_string(stringId), llvm::ArrayType::get(builder.getInt16Ty(), length + 1));
+        llvm::GlobalVariable* stringGlobal = llvm::cast<llvm::GlobalVariable>(stringObject);
+        stringGlobal->setLinkage(llvm::GlobalValue::PrivateLinkage);
+        llvm::Constant* constant = llvm::ConstantArray::get(llvm::ArrayType::get(builder.getInt16Ty(), length + 1), wcharConstants);
+        stringGlobal->setInitializer(constant);
+        llvm::Value* stringValue = stringGlobal;
+        utf16stringMap[stringId] = stringValue;
+        return stringValue;
+    }
+}
+
+llvm::Value* Emitter::GetGlobalUStringConstant(int stringId)
+{
+    auto it = utf32stringMap.find(stringId);
+    if (it != utf32stringMap.cend())
+    {
+        return it->second;
+    }
+    else
+    {
+        const std::u32string& str = compileUnit->GetUtf32String(stringId);
+        uint64_t length = str.length();
+        std::vector<llvm::Constant*> ucharConstants;
+        for (char32_t c : str)
+        {
+            ucharConstants.push_back(builder.getInt32(static_cast<uint32_t>(c)));
+        }
+        ucharConstants.push_back(builder.getInt32(static_cast<uint32_t>(0)));
+        llvm::Constant* stringObject = compileUnitModule->getOrInsertGlobal("ustring" + std::to_string(stringId), llvm::ArrayType::get(builder.getInt32Ty(), length + 1));
+        llvm::GlobalVariable* stringGlobal = llvm::cast<llvm::GlobalVariable>(stringObject);
+        stringGlobal->setLinkage(llvm::GlobalValue::PrivateLinkage);
+        llvm::Constant* constant = llvm::ConstantArray::get(llvm::ArrayType::get(builder.getInt32Ty(), length + 1), ucharConstants);
+        stringGlobal->setInitializer(constant);
+        llvm::Value* stringValue = stringGlobal;
+        utf32stringMap[stringId] = stringValue;
         return stringValue;
     }
 }

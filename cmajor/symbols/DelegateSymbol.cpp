@@ -36,6 +36,26 @@ void DelegateTypeSymbol::EmplaceType(TypeSymbol* typeSymbol_, int index)
     returnType = typeSymbol_;
 }
 
+void DelegateTypeSymbol::ComputeExportClosure()
+{
+    if (IsProject())
+    {
+        for (ParameterSymbol* param : parameters)
+        {
+            if (!param->ExportComputed())
+            {
+                param->SetExportComputed();
+                param->ComputeExportClosure();
+            }
+        }
+        if (!returnType->ExportComputed())
+        {
+            returnType->SetExportComputed();
+            returnType->ComputeExportClosure();
+        }
+    }
+}
+
 void DelegateTypeSymbol::AddMember(Symbol* member)
 {
     TypeSymbol::AddMember(member);
@@ -145,6 +165,26 @@ void ClassDelegateTypeSymbol::EmplaceType(TypeSymbol* typeSymbol_, int index)
     else
     {
         ClassTypeSymbol::EmplaceType(typeSymbol_, index);
+    }
+}
+
+void ClassDelegateTypeSymbol::ComputeExportClosure()
+{
+    if (IsProject())
+    {
+        for (ParameterSymbol* param : parameters)
+        {
+            if (!param->ExportComputed())
+            {
+                param->SetExportComputed();
+                param->ComputeExportClosure();
+            }
+        }
+        if (!returnType->ExportComputed())
+        {
+            returnType->SetExportComputed();
+            returnType->ComputeExportClosure();
+        }
     }
 }
 

@@ -19,7 +19,8 @@ class TypeSymbol;
 enum class ValueType : uint8_t
 {
     none, boolValue, sbyteValue, byteValue, shortValue, ushortValue, intValue, uintValue, 
-    longValue, ulongValue, floatValue, doubleValue, charValue, wcharValue, ucharValue, stringValue, nullValue,
+    longValue, ulongValue, floatValue, doubleValue, charValue, wcharValue, ucharValue, 
+    stringValue, wstringValue, ustringValue, nullValue,
     maxValue
 };
 
@@ -233,6 +234,28 @@ class StringValue : public Value
 public:
     StringValue(const Span& span_, int stringId_);
     Value* Clone() override { return new StringValue(GetSpan(), stringId); }
+    llvm::Value* IrValue(Emitter& emitter) override;
+    Value* As(ValueType targetType, bool cast, const Span& span, bool dontThrow) const override;
+private:
+    int stringId;
+};
+
+class WStringValue : public Value
+{
+public:
+    WStringValue(const Span& span_, int stringId_);
+    Value* Clone() override { return new WStringValue(GetSpan(), stringId); }
+    llvm::Value* IrValue(Emitter& emitter) override;
+    Value* As(ValueType targetType, bool cast, const Span& span, bool dontThrow) const override;
+private:
+    int stringId;
+};
+
+class UStringValue : public Value
+{
+public:
+    UStringValue(const Span& span_, int stringId_);
+    Value* Clone() override { return new UStringValue(GetSpan(), stringId); }
     llvm::Value* IrValue(Emitter& emitter) override;
     Value* As(ValueType targetType, bool cast, const Span& span, bool dontThrow) const override;
 private:

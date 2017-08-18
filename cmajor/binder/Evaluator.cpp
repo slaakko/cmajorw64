@@ -96,7 +96,8 @@ Value* Disjunction(Value* left, Value* right, const Span& span, bool dontThrow)
 BinaryOperatorFun disjunction[uint8_t(ValueType::maxValue)] =
 {
     NotSupported, Disjunction<BoolValue>, NotSupported, NotSupported, NotSupported, NotSupported, NotSupported, NotSupported, 
-    NotSupported, NotSupported, NotSupported, NotSupported, NotSupported, NotSupported, NotSupported, NotSupported, NotSupported
+    NotSupported, NotSupported, NotSupported, NotSupported, NotSupported, NotSupported, NotSupported, 
+    NotSupported, NotSupported, NotSupported, NotSupported
 };
 
 template<typename ValueT>
@@ -108,7 +109,8 @@ Value* Conjunction(Value* left, Value* right, const Span& span, bool dontThrow)
 BinaryOperatorFun conjunction[uint8_t(ValueType::maxValue)] =
 {
     NotSupported, Conjunction<BoolValue>, NotSupported, NotSupported, NotSupported, NotSupported, NotSupported, NotSupported,
-    NotSupported, NotSupported, NotSupported, NotSupported, NotSupported, NotSupported, NotSupported, NotSupported, NotSupported
+    NotSupported, NotSupported, NotSupported, NotSupported, NotSupported, NotSupported, NotSupported, 
+    NotSupported, NotSupported, NotSupported, NotSupported
 };
 
 template<typename ValueT>
@@ -120,7 +122,8 @@ Value* BitOr(Value* left, Value* right, const Span& span, bool dontThrow)
 BinaryOperatorFun bitOr[uint8_t(ValueType::maxValue)] =
 {
     NotSupported, NotSupported, BitOr<SByteValue>, BitOr<ByteValue>, BitOr<ShortValue>, BitOr<UShortValue>, BitOr<IntValue>, BitOr<UIntValue>,
-    BitOr<LongValue>, BitOr<ULongValue>, NotSupported, NotSupported, NotSupported, NotSupported, NotSupported, NotSupported, NotSupported
+    BitOr<LongValue>, BitOr<ULongValue>, NotSupported, NotSupported, NotSupported, NotSupported, NotSupported, 
+    NotSupported, NotSupported, NotSupported, NotSupported
 };
 
 template<typename ValueT>
@@ -132,7 +135,8 @@ Value* BitXor(Value* left, Value* right, const Span& span, bool dontThrow)
 BinaryOperatorFun bitXor[uint8_t(ValueType::maxValue)] =
 {
     NotSupported, NotSupported, BitXor<SByteValue>, BitXor<ByteValue>, BitXor<ShortValue>, BitXor<UShortValue>, BitXor<IntValue>, BitXor<UIntValue>,
-    BitXor<LongValue>, BitXor<ULongValue>, NotSupported, NotSupported, NotSupported, NotSupported, NotSupported, NotSupported, NotSupported
+    BitXor<LongValue>, BitXor<ULongValue>, NotSupported, NotSupported, NotSupported, NotSupported, NotSupported, 
+    NotSupported, NotSupported, NotSupported, NotSupported
 };
 
 template<typename ValueT>
@@ -144,7 +148,8 @@ Value* BitAnd(Value* left, Value* right, const Span& span, bool dontThrow)
 BinaryOperatorFun bitAnd[uint8_t(ValueType::maxValue)] =
 {
     NotSupported, NotSupported, BitAnd<SByteValue>, BitAnd<ByteValue>, BitAnd<ShortValue>, BitAnd<UShortValue>, BitAnd<IntValue>, BitAnd<UIntValue>,
-    BitAnd<LongValue>, BitAnd<ULongValue>, NotSupported, NotSupported, NotSupported, NotSupported, NotSupported, NotSupported, NotSupported
+    BitAnd<LongValue>, BitAnd<ULongValue>, NotSupported, NotSupported, NotSupported, NotSupported, NotSupported, 
+    NotSupported, NotSupported, NotSupported, NotSupported
 };
 
 template<typename ValueT>
@@ -156,7 +161,8 @@ Value* Equal(Value* left, Value* right, const Span& span, bool dontThrow)
 BinaryOperatorFun equal[uint8_t(ValueType::maxValue)] =
 {
     NotSupported, Equal<BoolValue>, Equal<SByteValue>, Equal<ByteValue>, Equal<ShortValue>, Equal<UShortValue>, Equal<IntValue>, Equal<UIntValue>,
-    Equal<LongValue>, Equal<ULongValue>, Equal<FloatValue>, Equal<DoubleValue>, Equal<CharValue>, Equal<WCharValue>, Equal<UCharValue>, NotSupported, NotSupported
+    Equal<LongValue>, Equal<ULongValue>, Equal<FloatValue>, Equal<DoubleValue>, Equal<CharValue>, Equal<WCharValue>, Equal<UCharValue>, 
+    NotSupported, NotSupported, NotSupported, NotSupported
 };
 
 template<typename ValueT>
@@ -168,7 +174,8 @@ Value* NotEqual(Value* left, Value* right, const Span& span, bool dontThrow)
 BinaryOperatorFun notEqual[uint8_t(ValueType::maxValue)] =
 {
     NotSupported, NotEqual<BoolValue>, NotEqual<SByteValue>, NotEqual<ByteValue>, NotEqual<ShortValue>, NotEqual<UShortValue>, NotEqual<IntValue>, NotEqual<UIntValue>,
-    NotEqual<LongValue>, NotEqual<ULongValue>, NotEqual<FloatValue>, NotEqual<DoubleValue>, NotEqual<CharValue>, NotEqual<WCharValue>, NotEqual<UCharValue>, NotSupported, NotSupported
+    NotEqual<LongValue>, NotEqual<ULongValue>, NotEqual<FloatValue>, NotEqual<DoubleValue>, NotEqual<CharValue>, NotEqual<WCharValue>, NotEqual<UCharValue>, 
+    NotSupported, NotSupported, NotSupported, NotSupported
 };
 
 template<typename ValueT>
@@ -180,7 +187,8 @@ Value* Less(Value* left, Value* right, const Span& span, bool dontThrow)
 BinaryOperatorFun less[uint8_t(ValueType::maxValue)] =
 {
     NotSupported, NotSupported, Less<SByteValue>, Less<ByteValue>, Less<ShortValue>, Less<UShortValue>, Less<IntValue>, Less<UIntValue>,
-    Less<LongValue>, Less<ULongValue>, Less<FloatValue>, Less<DoubleValue>, Less<CharValue>, Less<WCharValue>, Less<UCharValue>, NotSupported, NotSupported
+    Less<LongValue>, Less<ULongValue>, Less<FloatValue>, Less<DoubleValue>, Less<CharValue>, Less<WCharValue>, Less<UCharValue>, 
+    NotSupported, NotSupported, NotSupported, NotSupported
 };
 
 template<typename ValueT>
@@ -192,7 +200,8 @@ Value* Greater(Value* left, Value* right, const Span& span, bool dontThrow)
 BinaryOperatorFun greater[uint8_t(ValueType::maxValue)] =
 {
     NotSupported, NotSupported, Greater<SByteValue>, Greater<ByteValue>, Greater<ShortValue>, Greater<UShortValue>, Greater<IntValue>, Greater<UIntValue>,
-    Greater<LongValue>, Greater<ULongValue>, Greater<FloatValue>, Greater<DoubleValue>, Greater<CharValue>, Greater<WCharValue>, Greater<UCharValue>, NotSupported, NotSupported
+    Greater<LongValue>, Greater<ULongValue>, Greater<FloatValue>, Greater<DoubleValue>, Greater<CharValue>, Greater<WCharValue>, Greater<UCharValue>, 
+    NotSupported, NotSupported, NotSupported, NotSupported
 };
 
 template<typename ValueT>
@@ -204,7 +213,8 @@ Value* LessEqual(Value* left, Value* right, const Span& span, bool dontThrow)
 BinaryOperatorFun lessEqual[uint8_t(ValueType::maxValue)] =
 {
     NotSupported, NotSupported, LessEqual<SByteValue>, LessEqual<ByteValue>, LessEqual<ShortValue>, LessEqual<UShortValue>, LessEqual<IntValue>, LessEqual<UIntValue>,
-    LessEqual<LongValue>, LessEqual<ULongValue>, LessEqual<FloatValue>, LessEqual<DoubleValue>, LessEqual<CharValue>, LessEqual<WCharValue>, LessEqual<UCharValue>, NotSupported, NotSupported
+    LessEqual<LongValue>, LessEqual<ULongValue>, LessEqual<FloatValue>, LessEqual<DoubleValue>, LessEqual<CharValue>, LessEqual<WCharValue>, LessEqual<UCharValue>, 
+    NotSupported, NotSupported, NotSupported, NotSupported
 };
 
 template<typename ValueT>
@@ -216,7 +226,8 @@ Value* GreaterEqual(Value* left, Value* right, const Span& span, bool dontThrow)
 BinaryOperatorFun greaterEqual[uint8_t(ValueType::maxValue)] =
 {
     NotSupported, NotSupported, GreaterEqual<SByteValue>, GreaterEqual<ByteValue>, GreaterEqual<ShortValue>, GreaterEqual<UShortValue>, GreaterEqual<IntValue>, GreaterEqual<UIntValue>,
-    GreaterEqual<LongValue>, GreaterEqual<ULongValue>, GreaterEqual<FloatValue>, GreaterEqual<DoubleValue>, GreaterEqual<CharValue>, GreaterEqual<WCharValue>, GreaterEqual<UCharValue>, NotSupported, NotSupported
+    GreaterEqual<LongValue>, GreaterEqual<ULongValue>, GreaterEqual<FloatValue>, GreaterEqual<DoubleValue>, GreaterEqual<CharValue>, GreaterEqual<WCharValue>, GreaterEqual<UCharValue>, 
+    NotSupported, NotSupported, NotSupported, NotSupported
 };
 
 template<typename T>
@@ -237,7 +248,8 @@ Value* ShiftLeft(Value* left, Value* right, const Span& span, bool dontThrow)
 BinaryOperatorFun shiftLeft[uint8_t(ValueType::maxValue)] =
 {
     NotSupported, NotSupported, ShiftLeft<SByteValue>, ShiftLeft<ByteValue>, ShiftLeft<ShortValue>, ShiftLeft<UShortValue>, ShiftLeft<IntValue>, ShiftLeft<UIntValue>,
-    ShiftLeft<LongValue>, ShiftLeft<ULongValue>, NotSupported, NotSupported, NotSupported, NotSupported, NotSupported, NotSupported, NotSupported
+    ShiftLeft<LongValue>, ShiftLeft<ULongValue>, NotSupported, NotSupported, NotSupported, NotSupported, NotSupported, 
+    NotSupported, NotSupported, NotSupported, NotSupported
 };
 
 template<typename T>
@@ -258,7 +270,8 @@ Value* ShiftRight(Value* left, Value* right, const Span& span, bool dontThrow)
 BinaryOperatorFun shiftRight[uint8_t(ValueType::maxValue)] =
 {
     NotSupported, NotSupported, ShiftRight<SByteValue>, ShiftRight<ByteValue>, ShiftRight<ShortValue>, ShiftRight<UShortValue>, ShiftRight<IntValue>, ShiftRight<UIntValue>,
-    ShiftRight<LongValue>, ShiftRight<ULongValue>, NotSupported, NotSupported, NotSupported, NotSupported, NotSupported, NotSupported, NotSupported
+    ShiftRight<LongValue>, ShiftRight<ULongValue>, NotSupported, NotSupported, NotSupported, NotSupported, NotSupported, 
+    NotSupported, NotSupported, NotSupported, NotSupported
 };
 
 template<typename ValueT>
@@ -270,7 +283,8 @@ Value* Add(Value* left, Value* right, const Span& span, bool dontThrow)
 BinaryOperatorFun add[uint8_t(ValueType::maxValue)] =
 {
     NotSupported, NotSupported, Add<SByteValue>, Add<ByteValue>, Add<ShortValue>, Add<UShortValue>, Add<IntValue>, Add<UIntValue>,
-    Add<LongValue>, Add<ULongValue>, Add<FloatValue>, Add<DoubleValue>, NotSupported, NotSupported, NotSupported, NotSupported, NotSupported
+    Add<LongValue>, Add<ULongValue>, Add<FloatValue>, Add<DoubleValue>, NotSupported, NotSupported, NotSupported, 
+    NotSupported, NotSupported, NotSupported, NotSupported
 };
 
 template<typename ValueT>
@@ -282,7 +296,8 @@ Value* Sub(Value* left, Value* right, const Span& span, bool dontThrow)
 BinaryOperatorFun sub[uint8_t(ValueType::maxValue)] =
 {
     NotSupported, NotSupported, Sub<SByteValue>, Sub<ByteValue>, Sub<ShortValue>, Sub<UShortValue>, Sub<IntValue>, Sub<UIntValue>,
-    Sub<LongValue>, Sub<ULongValue>, Sub<FloatValue>, Sub<DoubleValue>, NotSupported, NotSupported, NotSupported, NotSupported, NotSupported
+    Sub<LongValue>, Sub<ULongValue>, Sub<FloatValue>, Sub<DoubleValue>, NotSupported, NotSupported, NotSupported, 
+    NotSupported, NotSupported, NotSupported, NotSupported
 };
 
 template<typename ValueT>
@@ -294,7 +309,8 @@ Value* Mul(Value* left, Value* right, const Span& span, bool dontThrow)
 BinaryOperatorFun mul[uint8_t(ValueType::maxValue)] =
 {
     NotSupported, NotSupported, Mul<SByteValue>, Mul<ByteValue>, Mul<ShortValue>, Mul<UShortValue>, Mul<IntValue>, Mul<UIntValue>,
-    Mul<LongValue>, Mul<ULongValue>, Mul<FloatValue>, Mul<DoubleValue>, NotSupported, NotSupported, NotSupported, NotSupported, NotSupported
+    Mul<LongValue>, Mul<ULongValue>, Mul<FloatValue>, Mul<DoubleValue>, NotSupported, NotSupported, NotSupported, 
+    NotSupported, NotSupported, NotSupported, NotSupported
 };
 
 template<typename ValueT>
@@ -306,7 +322,8 @@ Value* Div(Value* left, Value* right, const Span& span, bool dontThrow)
 BinaryOperatorFun div[uint8_t(ValueType::maxValue)] =
 {
     NotSupported, NotSupported, Div<SByteValue>, Div<ByteValue>, Div<ShortValue>, Div<UShortValue>, Div<IntValue>, Div<UIntValue>,
-    Div<LongValue>, Div<ULongValue>, Div<FloatValue>, Div<DoubleValue>, NotSupported, NotSupported, NotSupported, NotSupported, NotSupported
+    Div<LongValue>, Div<ULongValue>, Div<FloatValue>, Div<DoubleValue>, NotSupported, NotSupported, NotSupported, 
+    NotSupported, NotSupported, NotSupported, NotSupported
 };
 
 template<typename ValueT>
@@ -318,7 +335,8 @@ Value* Rem(Value* left, Value* right, const Span& span, bool dontThrow)
 BinaryOperatorFun rem[uint8_t(ValueType::maxValue)] =
 {
     NotSupported, NotSupported, Rem<SByteValue>, Rem<ByteValue>, Rem<ShortValue>, Rem<UShortValue>, Rem<IntValue>, Rem<UIntValue>,
-    Rem<LongValue>, Rem<ULongValue>, NotSupported, NotSupported, NotSupported, NotSupported, NotSupported, NotSupported, NotSupported
+    Rem<LongValue>, Rem<ULongValue>, NotSupported, NotSupported, NotSupported, NotSupported, NotSupported, 
+    NotSupported, NotSupported, NotSupported, NotSupported
 };
 
 template<typename ValueT>
@@ -330,7 +348,8 @@ Value* Not(Value* subject, const Span& span, bool dontThrow)
 UnaryOperatorFun logicalNot[uint8_t(ValueType::maxValue)] =
 {
     NotSupported, Not<BoolValue>, NotSupported, NotSupported, NotSupported, NotSupported, NotSupported, NotSupported,
-    NotSupported, NotSupported, NotSupported, NotSupported, NotSupported, NotSupported, NotSupported, NotSupported, NotSupported
+    NotSupported, NotSupported, NotSupported, NotSupported, NotSupported, NotSupported, NotSupported, 
+    NotSupported, NotSupported, NotSupported, NotSupported
 };
 
 template<typename ValueT>
@@ -342,7 +361,8 @@ Value* UnaryPlus(Value* subject, const Span& span, bool dontThrow)
 UnaryOperatorFun unaryPlus[uint8_t(ValueType::maxValue)] =
 {
     NotSupported, NotSupported, UnaryPlus<SByteValue>, UnaryPlus<ByteValue>, UnaryPlus<ShortValue>, UnaryPlus<UShortValue>, UnaryPlus<IntValue>, UnaryPlus<UIntValue>,
-    UnaryPlus<LongValue>, UnaryPlus<ULongValue>, UnaryPlus<FloatValue>, UnaryPlus<DoubleValue>, NotSupported, NotSupported, NotSupported, NotSupported, NotSupported
+    UnaryPlus<LongValue>, UnaryPlus<ULongValue>, UnaryPlus<FloatValue>, UnaryPlus<DoubleValue>, NotSupported, NotSupported, NotSupported, 
+    NotSupported, NotSupported, NotSupported, NotSupported
 };
 
 template<typename ValueT>
@@ -354,7 +374,8 @@ Value* UnaryMinus(Value* subject, const Span& span, bool dontThrow)
 UnaryOperatorFun unaryMinus[uint8_t(ValueType::maxValue)] =
 {
     NotSupported, NotSupported, UnaryMinus<SByteValue>, UnaryMinus<ByteValue>, UnaryMinus<ShortValue>, UnaryMinus<UShortValue>, UnaryMinus<IntValue>, UnaryMinus<UIntValue>,
-    UnaryMinus<LongValue>, UnaryMinus<ULongValue>, UnaryMinus<FloatValue>, UnaryMinus<DoubleValue>, NotSupported, NotSupported, NotSupported, NotSupported, NotSupported
+    UnaryMinus<LongValue>, UnaryMinus<ULongValue>, UnaryMinus<FloatValue>, UnaryMinus<DoubleValue>, NotSupported, NotSupported, NotSupported, 
+    NotSupported, NotSupported, NotSupported, NotSupported
 };
 
 template<typename ValueT>
@@ -366,7 +387,8 @@ Value* Complement(Value* subject, const Span& span, bool dontThrow)
 UnaryOperatorFun complement[uint8_t(ValueType::maxValue)] =
 {
     NotSupported, NotSupported, Complement<SByteValue>, Complement<ByteValue>, Complement<ShortValue>, Complement<UShortValue>, Complement<IntValue>, Complement<UIntValue>,
-    Complement<LongValue>, Complement<ULongValue>, NotSupported, NotSupported, NotSupported, NotSupported, NotSupported, NotSupported, NotSupported
+    Complement<LongValue>, Complement<ULongValue>, NotSupported, NotSupported, NotSupported, NotSupported, NotSupported, 
+    NotSupported, NotSupported, NotSupported, NotSupported
 };
 
 class Evaluator : public Visitor
@@ -804,12 +826,12 @@ void Evaluator::Visit(StringLiteralNode& stringLiteralNode)
 
 void Evaluator::Visit(WStringLiteralNode& wstringLiteralNode)
 {
-    value.reset(new StringValue(wstringLiteralNode.GetSpan(), boundCompileUnit.Install(ToUtf8(wstringLiteralNode.Value()))));
+    value.reset(new WStringValue(wstringLiteralNode.GetSpan(), boundCompileUnit.Install(wstringLiteralNode.Value())));
 }
 
 void Evaluator::Visit(UStringLiteralNode& ustringLiteralNode)
 {
-    value.reset(new StringValue(ustringLiteralNode.GetSpan(), boundCompileUnit.Install(ToUtf8(ustringLiteralNode.Value()))));
+    value.reset(new UStringValue(ustringLiteralNode.GetSpan(), boundCompileUnit.Install(ustringLiteralNode.Value())));
 }
 
 void Evaluator::Visit(NullLiteralNode& nullLiteralNode)
@@ -1296,7 +1318,7 @@ void Evaluator::Visit(TypeNameNode& typeNameNode)
 
 void Evaluator::Visit(CastNode& castNode)
 {
-    TypeSymbol* type = ResolveType(castNode.TargetTypeExpr(), boundCompileUnit, containerScope, false);
+    TypeSymbol* type = ResolveType(castNode.TargetTypeExpr(), boundCompileUnit, containerScope);
     SymbolType symbolType = type->GetSymbolType();
     ValueType valueType = GetValueTypeFor(symbolType);
     castNode.SourceExpr()->Accept(*this);

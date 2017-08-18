@@ -23,6 +23,7 @@ public:
 private:
     BoundCompileUnit& boundCompileUnit;
     std::unordered_set<FunctionSymbol*> instantiatedMemberFunctions;
+    void InstantiateDestructorAndVirtualFunctions(ClassTemplateSpecializationSymbol* classTemplateSpecialization, ContainerScope* containerScope, const Span& span);
 };
 
 } } // namespace cmajor::binder

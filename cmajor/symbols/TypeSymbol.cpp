@@ -32,28 +32,28 @@ TypeSymbol* TypeSymbol::AddConst(const Span& span)
 {
     TypeDerivationRec typeDerivationRec;
     typeDerivationRec.derivations.push_back(Derivation::constDerivation);
-    return GetSymbolTable()->MakeDerivedType(this, typeDerivationRec, span, false);
+    return GetSymbolTable()->MakeDerivedType(this, typeDerivationRec, span);
 }
 
 TypeSymbol* TypeSymbol::AddLvalueReference(const Span& span)
 {
     TypeDerivationRec typeDerivationRec;
     typeDerivationRec.derivations.push_back(Derivation::lvalueRefDerivation);
-    return GetSymbolTable()->MakeDerivedType(this, typeDerivationRec, span, false);
+    return GetSymbolTable()->MakeDerivedType(this, typeDerivationRec, span);
 }
 
 TypeSymbol* TypeSymbol::AddRvalueReference(const Span& span)
 {
     TypeDerivationRec typeDerivationRec;
     typeDerivationRec.derivations.push_back(Derivation::rvalueRefDerivation);
-    return GetSymbolTable()->MakeDerivedType(this, typeDerivationRec, span, false);
+    return GetSymbolTable()->MakeDerivedType(this, typeDerivationRec, span);
 }
 
 TypeSymbol* TypeSymbol::AddPointer(const Span& span)
 {
     TypeDerivationRec typeDerivationRec;
     typeDerivationRec.derivations.push_back(Derivation::pointerDerivation);
-    return GetSymbolTable()->MakeDerivedType(this, typeDerivationRec, span, false);
+    return GetSymbolTable()->MakeDerivedType(this, typeDerivationRec, span);
 }
 
 const TypeDerivationRec& TypeSymbol::DerivationRec() const

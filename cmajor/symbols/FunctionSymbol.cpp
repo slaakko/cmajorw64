@@ -12,6 +12,7 @@
 #include <cmajor/symbols/SymbolReader.hpp>
 #include <cmajor/symbols/Exception.hpp>
 #include <cmajor/symbols/TemplateSymbol.hpp>
+#include <cmajor/symbols/GlobalFlags.hpp>
 #include <cmajor/util/Unicode.hpp>
 #include <cmajor/util/Sha1.hpp>
 #include <llvm/IR/Module.h>
@@ -205,7 +206,12 @@ void FunctionSymbol::Write(SymbolWriter& writer)
 {
     ContainerSymbol::Write(writer);
     writer.GetBinaryWriter().Write(groupName);
-    if (IsFunctionTemplate())
+    writer.GetBinaryWriter().Write(static_cast<uint16_t>(flags));
+    if (groupName == U"Align")
+    {
+        int x = 0;
+    }
+    if (IsFunctionTemplate() || (GetGlobalFlag(GlobalFlags::release) && IsInline()))
     {
         uint32_t sizePos = writer.GetBinaryWriter().Pos();
         uint32_t sizeOfAstNodes = 0;
@@ -226,7 +232,6 @@ void FunctionSymbol::Write(SymbolWriter& writer)
         returnTypeId = returnType->TypeId();
     }
     writer.GetBinaryWriter().WriteEncodedUInt(returnTypeId);
-    writer.GetBinaryWriter().Write(static_cast<uint16_t>(flags));
     writer.GetBinaryWriter().Write(vmtIndex);
     writer.GetBinaryWriter().Write(imtIndex);
     bool hasReturnParam = returnParam != nullptr;
@@ -241,7 +246,12 @@ void FunctionSymbol::Read(SymbolReader& reader)
 {
     ContainerSymbol::Read(reader);
     groupName = reader.GetBinaryReader().ReadUtf32String();
-    if (IsFunctionTemplate())
+    flags = static_cast<FunctionSymbolFlags>(reader.GetBinaryReader().ReadUShort());
+    if (groupName == U"Align")
+    {
+        int x = 0;
+    }
+    if (IsFunctionTemplate() || (GetGlobalFlag(GlobalFlags::release) && IsInline()))
     {
         sizeOfAstNodes = reader.GetBinaryReader().ReadUInt();
         astNodesPos = reader.GetBinaryReader().Pos();
@@ -253,17 +263,47 @@ void FunctionSymbol::Read(SymbolReader& reader)
     {
         GetSymbolTable()->EmplaceTypeRequest(this, returnTypeId, 0);
     }
-    flags = static_cast<FunctionSymbolFlags>(reader.GetBinaryReader().ReadUShort());
     vmtIndex = reader.GetBinaryReader().ReadInt();
     imtIndex = reader.GetBinaryReader().ReadInt();
-    if (IsConversion())
-    {
-        reader.AddConversion(this);
-    }
     bool hasReturnParam = reader.GetBinaryReader().ReadBool();
     if (hasReturnParam)
     {
         returnParam.reset(reader.ReadParameterSymbol(this));
+    }
+    if (IsConversion())
+    {
+        reader.AddConversion(this);
+    }
+}
+
+void FunctionSymbol::ComputeExportClosure()
+{
+    if (IsProject())
+    {
+        for (ParameterSymbol* parameter : parameters)
+        {
+            if (!parameter->ExportComputed())
+            {
+                parameter->SetExportComputed();
+                parameter->ComputeExportClosure();
+            }
+        }
+        if (returnParam)
+        {
+            if (!returnParam->ExportComputed())
+            {
+                returnParam->SetExportComputed();
+                returnParam->ComputeExportClosure();
+            }
+        }
+        if (returnType)
+        {
+            if (!returnType->ExportComputed())
+            {
+                returnType->SetExportComputed();
+                returnType->ComputeExportClosure();
+            }
+        }
     }
 }
 
@@ -301,6 +341,7 @@ void FunctionSymbol::AddMember(Symbol* member)
 bool FunctionSymbol::IsExportSymbol() const
 {
     if (IsTemplateSpecialization()) return false;
+    if (IsGeneratedFunction()) return false;
     return ContainerSymbol::IsExportSymbol();
 }
 
@@ -894,7 +935,7 @@ void DestructorSymbol::SetSpecifiers(Specifiers specifiers)
     }
     if ((specifiers & Specifiers::inline_) != Specifiers::none)
     {
-        SetInline();
+        throw Exception("destructor cannot be inline", GetSpan());
     }
     if ((specifiers & Specifiers::explicit_) != Specifiers::none)
     {

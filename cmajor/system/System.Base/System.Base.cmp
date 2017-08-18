@@ -7,5 +7,6 @@ source <List.cm>;
 source <Pair.cm>;
 source <RandomAccessIterator.cm>;
 source <Rvalue.cm>;
+source <String.cm>;
 source <UniquePtr.cm>;
 source <Utility.cm>;

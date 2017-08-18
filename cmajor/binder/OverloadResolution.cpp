@@ -7,6 +7,7 @@
 #include <cmajor/binder/BoundCompileUnit.hpp>
 #include <cmajor/binder/BoundFunction.hpp>
 #include <cmajor/symbols/TemplateSymbol.hpp>
+#include <cmajor/symbols/GlobalFlags.hpp>
 #include <cmajor/util/Unicode.hpp>
 
 namespace cmajor { namespace binder {
@@ -278,8 +279,8 @@ bool FindClassTemplateSpecializationMatch(TypeSymbol* sourceType, TypeSymbol* ta
             return false;
         }
     }
-    TypeSymbol* plainTargetType = boundCompileUnit.GetSymbolTable().MakeClassTemplateSpecialization(targetClassTemplateSpecialization->GetClassTemplate(), targetTemplateArguments, span, false);
-    targetType = boundCompileUnit.GetSymbolTable().MakeDerivedType(plainTargetType, targetType->DerivationRec(), span, true);
+    TypeSymbol* plainTargetType = boundCompileUnit.GetSymbolTable().MakeClassTemplateSpecialization(targetClassTemplateSpecialization->GetClassTemplate(), targetTemplateArguments, span);
+    targetType = boundCompileUnit.GetSymbolTable().MakeDerivedType(plainTargetType, targetType->DerivationRec(), span);
     if (TypesEqual(sourceType, targetType))
     {
         functionMatch.argumentMatches.push_back(ArgumentMatch());
@@ -788,11 +789,15 @@ std::unique_ptr<BoundFunctionCall> SelectViableFunction(const std::unordered_set
             }
             if (bestFun->IsFunctionTemplate())
             {
-                bestFun = boundCompileUnit.Instantiate(bestFun, bestMatch.templateParameterMap, span);
+                bestFun = boundCompileUnit.InstantiateFunctionTemplate(bestFun, bestMatch.templateParameterMap, span);
             }
-            else if (bestFun->Parent()->GetSymbolType() == SymbolType::classTemplateSpecializationSymbol)
+            else if (!bestFun->IsGeneratedFunction() && bestFun->Parent()->GetSymbolType() == SymbolType::classTemplateSpecializationSymbol)
             {
-                boundCompileUnit.Instantiate(bestFun, containerScope, span);
+                boundCompileUnit.InstantiateClassTemplateMemberFunction(bestFun, containerScope, span);
+            }
+            else if (GetGlobalFlag(GlobalFlags::release) && bestFun->IsInline())
+            {
+                boundCompileUnit.InstantiateInlineFunction(bestFun, containerScope, span);
             }
             return CreateBoundFunctionCall(bestFun, arguments, boundCompileUnit, boundFunction, bestMatch, span);
         }
@@ -818,11 +823,15 @@ std::unique_ptr<BoundFunctionCall> SelectViableFunction(const std::unordered_set
         }
         if (singleBest->IsFunctionTemplate())
         {
-            singleBest = boundCompileUnit.Instantiate(singleBest, bestMatch.templateParameterMap, span);
+            singleBest = boundCompileUnit.InstantiateFunctionTemplate(singleBest, bestMatch.templateParameterMap, span);
         }
-        else if (singleBest->Parent()->GetSymbolType() == SymbolType::classTemplateSpecializationSymbol)
+        else if (!singleBest->IsGeneratedFunction() && singleBest->Parent()->GetSymbolType() == SymbolType::classTemplateSpecializationSymbol)
         {
-            boundCompileUnit.Instantiate(singleBest, containerScope, span);
+            boundCompileUnit.InstantiateClassTemplateMemberFunction(singleBest, containerScope, span);
+        }
+        else if (GetGlobalFlag(GlobalFlags::release) && singleBest->IsInline())
+        {
+            boundCompileUnit.InstantiateInlineFunction(singleBest, containerScope, span);
         }
         return CreateBoundFunctionCall(singleBest, arguments, boundCompileUnit, boundFunction, bestMatch, span);
     }

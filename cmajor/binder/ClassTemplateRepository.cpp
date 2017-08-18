@@ -92,7 +92,7 @@ void ClassTemplateRepository::ResolveDefaultTemplateArguments(std::vector<TypeSy
             {
                 throw Exception("too few template arguments", span);
             }
-            TypeSymbol* templateArgumentType = ResolveType(defaultTemplateArgumentNode, boundCompileUnit, &resolveScope, false);
+            TypeSymbol* templateArgumentType = ResolveType(defaultTemplateArgumentNode, boundCompileUnit, &resolveScope);
             templateArgumentTypes.push_back(templateArgumentType);
         }
     }
@@ -161,13 +161,10 @@ void ClassTemplateRepository::BindClassTemplateSpecialization(ClassTemplateSpeci
         {
             templateParameterBinding = true;
         }
-        if (markedExport)
-        {
-            templateArgumentType->MarkExport();
-        }
         boundTemplateParameter->SetType(templateArgumentType);
         classTemplateSpecialization->AddMember(boundTemplateParameter);
     }
+    symbolTable.SetCurrentCompileUnit(boundCompileUnit.GetCompileUnitNode());
     SymbolCreatorVisitor symbolCreatorVisitor(symbolTable);
     symbolCreatorVisitor.SetClassInstanceNode(classInstanceNode);
     symbolCreatorVisitor.SetClassTemplateSpecialization(classTemplateSpecialization);
@@ -190,14 +187,6 @@ void ClassTemplateRepository::BindClassTemplateSpecialization(ClassTemplateSpeci
         if (fileScopeAdded)
         {
             boundCompileUnit.RemoveLastFileScope();
-        }
-        for (FunctionSymbol* virtualMemberFunction : classTemplateSpecialization->Vmt())
-        {
-            Instantiate(virtualMemberFunction, containerScope, span);
-        }
-        if (classTemplateSpecialization->Destructor())
-        {
-            Instantiate(classTemplateSpecialization->Destructor(), containerScope, span);
         }
     }
 }
@@ -238,6 +227,7 @@ void ClassTemplateRepository::Instantiate(FunctionSymbol* memberFunction, Contai
     Assert(functionInstanceNode->BodySource(), "body source expected");
     CloneContext cloneContext;
     functionInstanceNode->SetBody(static_cast<CompoundStatementNode*>(functionInstanceNode->BodySource()->Clone(cloneContext)));
+    symbolTable.SetCurrentCompileUnit(boundCompileUnit.GetCompileUnitNode());
     SymbolCreatorVisitor symbolCreatorVisitor(symbolTable);
     symbolTable.BeginContainer(memberFunction);
     functionInstanceNode->Body()->Accept(symbolCreatorVisitor);
@@ -283,6 +273,19 @@ void ClassTemplateRepository::Instantiate(FunctionSymbol* memberFunction, Contai
     boundClass->AddMember(std::move(boundFunction));
     boundCompileUnit.AddBoundNode(std::move(boundClass));
     boundCompileUnit.RemoveLastFileScope();
+    InstantiateDestructorAndVirtualFunctions(classTemplateSpecialization, containerScope, span);
+}
+
+void ClassTemplateRepository::InstantiateDestructorAndVirtualFunctions(ClassTemplateSpecializationSymbol* classTemplateSpecialization, ContainerScope* containerScope, const Span& span)
+{
+    for (FunctionSymbol* virtualMemberFunction : classTemplateSpecialization->Vmt())
+    {
+        Instantiate(virtualMemberFunction, containerScope, span);
+    }
+    if (classTemplateSpecialization->Destructor())
+    {
+        Instantiate(classTemplateSpecialization->Destructor(), containerScope, span);
+    }
 }
 
 } } // namespace cmajor::binder

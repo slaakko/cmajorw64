@@ -18,6 +18,7 @@ public:
     void Write(SymbolWriter& writer) override;
     void Read(SymbolReader& reader) override;
     void EmplaceType(TypeSymbol* typeSymbol_, int index) override;
+    void ComputeExportClosure() override;
     void AddMember(Symbol* member) override;
     std::string TypeString() const override { return "delegate"; }
     void SetSpecifiers(Specifiers specifiers);
@@ -37,6 +38,7 @@ public:
     void Write(SymbolWriter& writer) override;
     void Read(SymbolReader& reader) override;
     void EmplaceType(TypeSymbol* typeSymbol_, int index) override;
+    void ComputeExportClosure() override;
     void AddMember(Symbol* member) override;
     std::string TypeString() const override { return "class_delegate"; }
     bool IsClassTypeSymbol() const override { return false; }

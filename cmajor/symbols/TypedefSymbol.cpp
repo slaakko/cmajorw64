@@ -35,6 +35,18 @@ void TypedefSymbol::EmplaceType(TypeSymbol* typeSymbol, int index)
     type = typeSymbol;
 }
 
+void TypedefSymbol::ComputeExportClosure()
+{
+    if (IsProject())
+    {
+        if (!type->ExportComputed())
+        {
+            type->SetExportComputed();
+            type->ComputeExportClosure();
+        }
+    }
+}
+
 void TypedefSymbol::SetSpecifiers(Specifiers specifiers)
 {
     Specifiers accessSpecifiers = specifiers & Specifiers::access_;

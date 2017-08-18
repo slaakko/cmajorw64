@@ -29,7 +29,7 @@ private:
     NamespaceSymbol* ns;
 };
 
-TypeSymbol* ResolveType(Node* typeExprNode, BoundCompileUnit& boundCompileUnit, ContainerScope* containerScope, bool markExport);
+TypeSymbol* ResolveType(Node* typeExprNode, BoundCompileUnit& boundCompileUnit, ContainerScope* containerScope);
 
 } } // namespace cmajor::binder
 

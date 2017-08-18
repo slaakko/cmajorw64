@@ -9,6 +9,7 @@
 #include <cmajor/binder/OperationRepository.hpp>
 #include <cmajor/binder/FunctionTemplateRepository.hpp>
 #include <cmajor/binder/ClassTemplateRepository.hpp>
+#include <cmajor/binder/InlineFunctionRepository.hpp>
 #include <cmajor/binder/StringRepository.hpp>
 #include <cmajor/symbols/Module.hpp>
 #include <cmajor/symbols/ConversionTable.hpp>
@@ -39,10 +40,15 @@ public:
     FunctionSymbol* GetConversion(TypeSymbol* sourceType, TypeSymbol* targetType, const Span& span);
     void CollectViableFunctions(const std::u32string& groupName, ContainerScope* containerScope, std::vector<std::unique_ptr<BoundExpression>>& arguments, BoundFunction* currentFunction,
         std::unordered_set<FunctionSymbol*>& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span);
-    FunctionSymbol* Instantiate(FunctionSymbol* functionTemplate, const std::unordered_map<TemplateParameterSymbol*, TypeSymbol*>& templateParameterMapping, const Span& span);
-    void Instantiate(FunctionSymbol* memberFunction, ContainerScope* containerScope, const Span& span);
+    FunctionSymbol* InstantiateFunctionTemplate(FunctionSymbol* functionTemplate, const std::unordered_map<TemplateParameterSymbol*, TypeSymbol*>& templateParameterMapping, const Span& span);
+    void InstantiateClassTemplateMemberFunction(FunctionSymbol* memberFunction, ContainerScope* containerScope, const Span& span);
+    void InstantiateInlineFunction(FunctionSymbol* inlineFunction, ContainerScope* containerScope, const Span& span);
     int Install(const std::string& str);
-    const std::string& GetString(int stringId) const;
+    int Install(const std::u16string& str);
+    int Install(const std::u32string& str);
+    const std::string& GetUtf8String(int stringId) const;
+    const std::u16string& GetUtf16String(int stringId) const;
+    const std::u32string& GetUtf32String(int stringId) const;
     const std::string& SourceFilePath() const { return compileUnitNode->FilePath(); }
     const std::string& LLFilePath() const { return llFilePath; }
     const std::string& OptLLFilePath() const { return optLLFilePath; }
@@ -63,7 +69,10 @@ private:
     OperationRepository operationRepository;
     FunctionTemplateRepository functionTemplateRepository;
     ClassTemplateRepository classTemplateRepository;
-    StringRepository stringRepository;
+    InlineFunctionRepository inlineFunctionRepository;
+    StringRepository<std::string> utf8StringRepository;
+    StringRepository<std::u16string> utf16StringRepository;
+    StringRepository<std::u32string> utf32StringRepository;
     ConversionTable conversionTable;
 };
 

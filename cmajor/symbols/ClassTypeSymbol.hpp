@@ -59,6 +59,7 @@ public:
     ClassTypeSymbol(SymbolType symbolType_, const Span& span_, const std::u32string& name_);
     void Write(SymbolWriter& writer) override;
     void Read(SymbolReader& reader) override;
+    void ComputeExportClosure() override;
     void ReadAstNodes();
     const NodeList<Node>& UsingNodes() const { return usingNodes; }
     ClassNode* GetClassNode() { return classNode.get(); }

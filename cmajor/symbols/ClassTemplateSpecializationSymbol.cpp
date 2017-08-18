@@ -102,6 +102,28 @@ void ClassTemplateSpecializationSymbol::EmplaceType(TypeSymbol* typeSymbol, int 
     }
 }
 
+void ClassTemplateSpecializationSymbol::ComputeExportClosure()
+{
+    if (IsProject())
+    {
+        ClassTypeSymbol::ComputeExportClosure();
+        if (!classTemplate->ExportComputed())
+        {
+            classTemplate->SetExportComputed();
+            classTemplate->ComputeExportClosure();
+        }
+        for (TypeSymbol* templateArgumentType : templateArgumentTypes)
+        {
+            if (!templateArgumentType->ExportComputed())
+            {
+                templateArgumentType->SetExportComputed();
+                templateArgumentType->ComputeExportClosure();
+            }
+        }
+        MarkExport();
+    }
+}
+
 void ClassTemplateSpecializationSymbol::SetGlobalNs(std::unique_ptr<Node>&& globalNs_)
 {
     globalNs = std::move(globalNs_);

@@ -39,6 +39,18 @@ ParameterSymbol::ParameterSymbol(const Span& span_, const std::u32string& name_)
 {
 }
 
+void ParameterSymbol::ComputeExportClosure()
+{
+    if (IsProject())
+    {
+        if (!GetType()->ExportComputed())
+        {
+            GetType()->SetExportComputed();
+            GetType()->ComputeExportClosure();
+        }
+    }
+}
+
 LocalVariableSymbol::LocalVariableSymbol(const Span& span_, const std::u32string& name_) : VariableSymbol(SymbolType::localVariableSymbol, span_, name_)
 {
 }
@@ -57,6 +69,18 @@ void MemberVariableSymbol::Read(SymbolReader& reader)
 {
     VariableSymbol::Read(reader);
     layoutIndex = reader.GetBinaryReader().ReadInt();
+}
+
+void MemberVariableSymbol::ComputeExportClosure()
+{
+    if (IsProject())
+    {
+        if (!GetType()->ExportComputed())
+        {
+            GetType()->SetExportComputed();
+            GetType()->ComputeExportClosure();
+        }
+    }
 }
 
 void MemberVariableSymbol::SetSpecifiers(Specifiers specifiers)

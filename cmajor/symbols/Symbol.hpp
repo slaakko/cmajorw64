@@ -6,8 +6,10 @@
 #ifndef CMAJOR_SYMBOLS_SYMBOL_INCLUDED
 #define CMAJOR_SYMBOLS_SYMBOL_INCLUDED
 #include <cmajor/ast/Specifier.hpp>
+#include <cmajor/ast/CompileUnit.hpp>
 #include <cmajor/parsing/Scanner.hpp>
 #include <llvm/IR/Value.h>
+#include <unordered_set>
 #include <stdint.h>
 
 namespace cmajor { namespace symbols {
@@ -63,7 +65,8 @@ enum class SymbolFlags : uint8_t
     nothrow_ = 1 << 3,
     project = 1 << 4,
     bound = 1 << 5,
-    export_ = 1 << 6
+    export_ = 1 << 6,
+    exportComputed = 1 << 7
 };
 
 inline SymbolFlags operator&(SymbolFlags left, SymbolFlags right)
@@ -105,6 +108,7 @@ public:
     virtual std::string TypeString() const { return "symbol";  }
     virtual llvm::Value* IrObject() { return irObject; }
     virtual void ComputeMangledName();
+    virtual void ComputeExportClosure();
     void SetMangledName(const std::u32string& mangledName_);
     SymbolAccess Access() const { return SymbolAccess(flags & SymbolFlags::access);  }
     void SetAccess(SymbolAccess access_) { flags = flags | SymbolFlags(access_); }
@@ -126,6 +130,8 @@ public:
     void SetBound() { SetFlag(SymbolFlags::bound); }
     bool MarkedExport() const { return GetFlag(SymbolFlags::export_); }
     void MarkExport() { SetFlag(SymbolFlags::export_); }
+    bool ExportComputed() const { return GetFlag(SymbolFlags::exportComputed); }
+    void SetExportComputed() { SetFlag(SymbolFlags::exportComputed); }
     bool GetFlag(SymbolFlags flag) const { return (flags & flag) != SymbolFlags::none; }
     void SetFlag(SymbolFlags flag) { flags = flags | flag; }
     void ResetFlag(SymbolFlags flag) { flags = flags & ~flag; }
@@ -164,6 +170,8 @@ public:
     const Module* GetModule() const { return module; }
     Module* GetModule() { return module; }
     void SetModule(Module* module_) { module = module_; }
+    const CompileUnitNode* GetCompileUnit() const { return compileUnit; }
+    void SetCompileUnit(CompileUnitNode* compileUnit_) { compileUnit = compileUnit_; }
     void SetIrObject(llvm::Value* irObject_) { irObject = irObject_; }
     const std::u32string& MangledName() const { return mangledName; }
 private:
@@ -175,6 +183,7 @@ private:
     Symbol* parent;
     SymbolTable* symbolTable;
     Module* module;
+    CompileUnitNode* compileUnit;
     llvm::Value* irObject;
 };
 

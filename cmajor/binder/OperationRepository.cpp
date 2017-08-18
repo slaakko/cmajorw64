@@ -1330,6 +1330,7 @@ class ClassDefaultConstructor : public ConstructorSymbol
 public:
     ClassDefaultConstructor(ClassTypeSymbol* classType_, const Span& span_);
     SymbolAccess DeclaredAccess() const override { return SymbolAccess::public_; }
+    bool IsGeneratedFunction() const override { return true; }
     ClassTypeSymbol* ClassType() { return classType; }
 private:
     ClassTypeSymbol* classType;
@@ -1382,12 +1383,16 @@ void ClassDefaultConstructorOperation::CollectViableFunctions(ContainerScope* co
     if (!function)
     {
         std::unique_ptr<ClassDefaultConstructor> defaultConstructor(new ClassDefaultConstructor(classType, span));
+        defaultConstructor->SetCompileUnit(GetBoundCompileUnit().GetCompileUnitNode());
+        defaultConstructor->SetSymbolTable(&GetBoundCompileUnit().GetSymbolTable());
         if (GenerateImplementation(defaultConstructor.get(), containerScope, exception, span))
         {
             classType->SetDefaultConstructor(defaultConstructor.get());
             function = defaultConstructor.get();
             function->SetSymbolTable(GetSymbolTable());
             function->SetParent(classType);
+            function->SetWeakOdrLinkage();
+            function->SetInline();
             functionMap[classType] = function;
             classType->AddMember(defaultConstructor.release());
         }
@@ -1486,6 +1491,7 @@ class ClassCopyConstructor : public ConstructorSymbol
 public:
     ClassCopyConstructor(ClassTypeSymbol* classType_, const Span& span_);
     SymbolAccess DeclaredAccess() const override { return SymbolAccess::public_; }
+    bool IsGeneratedFunction() const override { return true; }
     ClassTypeSymbol* ClassType() { return classType; }
 private:
     ClassTypeSymbol* classType;
@@ -1544,12 +1550,16 @@ void ClassCopyConstructorOperation::CollectViableFunctions(ContainerScope* conta
         if (!function)
         {
             std::unique_ptr<ClassCopyConstructor> copyConstructor(new ClassCopyConstructor(classType, span));
+            copyConstructor->SetCompileUnit(GetBoundCompileUnit().GetCompileUnitNode());
+            copyConstructor->SetSymbolTable(&GetBoundCompileUnit().GetSymbolTable());
             if (GenerateImplementation(copyConstructor.get(), containerScope, exception, span))
             {
                 classType->SetCopyConstructor(copyConstructor.get());
                 function = copyConstructor.get();
                 function->SetSymbolTable(GetSymbolTable());
                 function->SetParent(classType);
+                function->SetWeakOdrLinkage();
+                function->SetInline();
                 functionMap[classType] = function;
                 classType->AddMember(copyConstructor.release());
             }
@@ -1662,6 +1672,7 @@ class ClassMoveConstructor : public ConstructorSymbol
 public:
     ClassMoveConstructor(ClassTypeSymbol* classType_, const Span& span_);
     SymbolAccess DeclaredAccess() const override { return SymbolAccess::public_; }
+    bool IsGeneratedFunction() const override { return true; }
     ClassTypeSymbol* ClassType() { return classType; }
 private:
     ClassTypeSymbol* classType;
@@ -1719,12 +1730,16 @@ void ClassMoveConstructorOperation::CollectViableFunctions(ContainerScope* conta
         if (!function)
         {
             std::unique_ptr<ClassMoveConstructor> moveConstructor(new ClassMoveConstructor(classType, span));
+            moveConstructor->SetCompileUnit(GetBoundCompileUnit().GetCompileUnitNode());
+            moveConstructor->SetSymbolTable(&GetBoundCompileUnit().GetSymbolTable());
             if (GenerateImplementation(moveConstructor.get(), containerScope, exception, span))
             {
                 classType->SetMoveConstructor(moveConstructor.get());
                 function = moveConstructor.get();
                 function->SetSymbolTable(GetSymbolTable());
                 function->SetParent(classType);
+                function->SetWeakOdrLinkage();
+                function->SetInline();
                 functionMap[classType] = function;
                 classType->AddMember(moveConstructor.release());
             }
@@ -1843,6 +1858,7 @@ class ClassCopyAssignment : public MemberFunctionSymbol
 public:
     ClassCopyAssignment(ClassTypeSymbol* classType_, TypeSymbol* voidType_, const Span& span_);
     SymbolAccess DeclaredAccess() const override { return SymbolAccess::public_; }
+    bool IsGeneratedFunction() const override { return true; }
     ClassTypeSymbol* ClassType() { return classType; }
 private:
     ClassTypeSymbol* classType;
@@ -1902,12 +1918,16 @@ void ClassCopyAssignmentOperation::CollectViableFunctions(ContainerScope* contai
         if (!function)
         {
             std::unique_ptr<ClassCopyAssignment> copyAssignment(new ClassCopyAssignment(classType, GetBoundCompileUnit().GetSymbolTable().GetTypeByName(U"void"), span));
+            copyAssignment->SetCompileUnit(GetBoundCompileUnit().GetCompileUnitNode());
+            copyAssignment->SetSymbolTable(&GetBoundCompileUnit().GetSymbolTable());
             if (GenerateImplementation(copyAssignment.get(), containerScope, exception, span))
             {
                 classType->SetCopyAssignment(copyAssignment.get());
                 function = copyAssignment.get();
                 function->SetSymbolTable(GetSymbolTable());
                 function->SetParent(classType);
+                function->SetWeakOdrLinkage();
+                function->SetInline();
                 functionMap[classType] = function;
                 classType->AddMember(copyAssignment.release());
             }
@@ -1994,6 +2014,7 @@ class ClassMoveAssignment : public MemberFunctionSymbol
 public:
     ClassMoveAssignment(ClassTypeSymbol* classType_, TypeSymbol* voidType_, const Span& span_);
     SymbolAccess DeclaredAccess() const override { return SymbolAccess::public_; }
+    bool IsGeneratedFunction() const override { return true; }
     ClassTypeSymbol* ClassType() { return classType; }
 private:
     ClassTypeSymbol* classType;
@@ -2053,12 +2074,16 @@ void ClassMoveAssignmentOperation::CollectViableFunctions(ContainerScope* contai
         if (!function)
         {
             std::unique_ptr<ClassMoveAssignment> moveAssignment(new ClassMoveAssignment(classType, GetBoundCompileUnit().GetSymbolTable().GetTypeByName(U"void"), span));
+            moveAssignment->SetCompileUnit(GetBoundCompileUnit().GetCompileUnitNode());
+            moveAssignment->SetSymbolTable(&GetBoundCompileUnit().GetSymbolTable());
             if (GenerateImplementation(moveAssignment.get(), containerScope, exception, span))
             {
                 classType->SetMoveAssignment(moveAssignment.get());
                 function = moveAssignment.get();
                 function->SetSymbolTable(GetSymbolTable());
                 function->SetParent(classType);
+                function->SetWeakOdrLinkage();
+                function->SetInline();
                 functionMap[classType] = function;
                 classType->AddMember(moveAssignment.release());
             }
@@ -2136,7 +2161,6 @@ bool ClassMoveAssignmentOperation::GenerateImplementation(ClassMoveAssignment* m
     }
     return true;
 }
-
 
 void GenerateDestructorImplementation(BoundClass* boundClass, DestructorSymbol* destructorSymbol, BoundCompileUnit& boundCompileUnit, ContainerScope* containerScope, const Span& span)
 {
@@ -2225,7 +2249,7 @@ void GenerateStaticClassInitialization(StaticConstructorSymbol* staticConstructo
             std::unique_ptr<BoundStatement>(new BoundReturnStatement(std::unique_ptr<BoundFunctionCall>(nullptr), staticConstructorNode->GetSpan())), std::unique_ptr<BoundStatement>(nullptr)));
         boundCompoundStatement->AddStatement(std::move(ifStatement));
         IdentifierNode staticInitCriticalSection(staticConstructorNode->GetSpan(), U"System.Runtime.StaticInitCriticalSection");
-        TypeSymbol* staticInitCriticalSectionClassType = ResolveType(&staticInitCriticalSection, boundCompileUnit, containerScope, false);
+        TypeSymbol* staticInitCriticalSectionClassType = ResolveType(&staticInitCriticalSection, boundCompileUnit, containerScope);
         std::vector<FunctionScopeLookup> constructorLookups;
         constructorLookups.push_back(FunctionScopeLookup(ScopeLookup::this_and_base_and_parent, containerScope));
         constructorLookups.push_back(FunctionScopeLookup(ScopeLookup::this_, staticInitCriticalSectionClassType->ClassInterfaceOrNsScope()));

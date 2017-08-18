@@ -19,6 +19,7 @@ public:
     void Write(SymbolWriter& writer) override;
     void Read(SymbolReader& reader) override;
     virtual void AddMember(Symbol* member);
+    void ComputeExportClosure() override;
     void Clear();
     std::string TypeString() const override { return "container"; }
     bool IsContainerSymbol() const override { return true; }

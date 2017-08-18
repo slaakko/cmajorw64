@@ -11,7 +11,7 @@ namespace System
         return (n + alignment - 1) & -alignment;
     }
 
-    public nothrow int StrLen(const char* s)
+    public nothrow inline int StrLen(const char* s)
     {
         int len = 0;
         if (s != null)
@@ -25,7 +25,7 @@ namespace System
         return len;
     }
     
-    public nothrow int StrLen(const wchar* s)
+    public nothrow inline int StrLen(const wchar* s)
     {
         int len = 0;
         if (s != null)
@@ -39,7 +39,7 @@ namespace System
         return len;
     }
     
-    public nothrow int StrLen(const uchar* s)
+    public nothrow inline int StrLen(const uchar* s)
     {
         int len = 0;
         if (s != null)
@@ -53,7 +53,7 @@ namespace System
         return len;
     }
 
-    public nothrow void StrCopy(char* buf, const char* from)
+    public nothrow inline void StrCopy(char* buf, const char* from)
     {
         #assert(buf != null);
         if (from != null)
@@ -66,7 +66,7 @@ namespace System
         *buf = '\0';
     }
     
-    public nothrow void StrCopy(wchar* buf, const wchar* from)
+    public nothrow inline void StrCopy(wchar* buf, const wchar* from)
     {
         #assert(buf != null);
         if (from != null)
@@ -79,7 +79,7 @@ namespace System
         *buf = '\0';
     }
     
-    public nothrow void StrCopy(uchar* buf, const uchar* from)
+    public nothrow inline void StrCopy(uchar* buf, const uchar* from)
     {
         #assert(buf != null);
         if (from != null)
@@ -92,7 +92,7 @@ namespace System
         *buf = '\0';
     }
 
-    public nothrow int StrCopy(char* buf, const char* from, int length)
+    public nothrow inline int StrCopy(char* buf, const char* from, int length)
     {
         int resultLen = 0;
         #assert(buf != null);
@@ -112,7 +112,7 @@ namespace System
         return resultLen;
     }
 
-    public nothrow int StrCopy(wchar* buf, const wchar* from, int length)
+    public nothrow inline int StrCopy(wchar* buf, const wchar* from, int length)
     {
         int resultLen = 0;
         #assert(buf != null);
@@ -132,7 +132,7 @@ namespace System
         return resultLen;
     }
 
-    public nothrow int StrCopy(uchar* buf, const uchar* from, int length)
+    public nothrow inline int StrCopy(uchar* buf, const uchar* from, int length)
     {
         int resultLen = 0;
         #assert(buf != null);
@@ -152,7 +152,7 @@ namespace System
         return resultLen;
     }
 
-    public nothrow long MemGrow(long size)
+    public nothrow inline long MemGrow(long size)
     {
         if (size < 8)
         {

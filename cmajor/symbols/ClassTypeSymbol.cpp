@@ -133,6 +133,22 @@ void ClassTypeSymbol::Read(SymbolReader& reader)
     }
 }
 
+void ClassTypeSymbol::ComputeExportClosure()
+{
+    if (IsProject())
+    {
+        ContainerSymbol::ComputeExportClosure();
+        if (baseClass)
+        {
+            if (!baseClass->ExportComputed())
+            {
+                baseClass->SetExportComputed();
+                baseClass->ComputeExportClosure();
+            }
+        }
+    }
+}
+
 void ClassTypeSymbol::ReadAstNodes()
 {
     AstReader reader(filePathReadFrom);

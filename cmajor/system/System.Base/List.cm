@@ -48,12 +48,17 @@ namespace System.Collections
             Reserve(count);
             ConstructiveCopy(items, that.items, count);
         }
-        public default nothrow void operator=(Self&& that) where T is Movable;
+        public nothrow void operator=(Self&& that) where T is Movable
+        {
+            Swap(items, that.items);
+            Swap(count, that.count);
+            Swap(res, that.res);
+        }
         public ~List()
         {
             Destroy();
         }
-        public void Reserve(int minRes)
+        public void Reserve(long minRes)
         {
             if (minRes > res)
             {

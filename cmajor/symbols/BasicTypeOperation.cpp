@@ -129,7 +129,6 @@ BasicTypeCopyCtor::BasicTypeCopyCtor(TypeSymbol* type) : FunctionSymbol(SymbolTy
     SetAccess(SymbolAccess::public_);
     ParameterSymbol* thisParam = new ParameterSymbol(Span(), U"this");
     thisParam->SetType(type->AddPointer(Span()));
-    thisParam->GetType()->MarkExport();
     AddMember(thisParam);
     ParameterSymbol* thatParam = new ParameterSymbol(Span(), U"that");
     thatParam->SetType(type);
@@ -154,11 +153,9 @@ BasicTypeMoveCtor::BasicTypeMoveCtor(TypeSymbol* type) : FunctionSymbol(SymbolTy
     SetAccess(SymbolAccess::public_);
     ParameterSymbol* thisParam = new ParameterSymbol(Span(), U"this");
     thisParam->SetType(type->AddPointer(Span()));
-    thisParam->GetType()->MarkExport();
     AddMember(thisParam);
     ParameterSymbol* thatParam = new ParameterSymbol(Span(), U"that");
     thatParam->SetType(type->AddRvalueReference(Span()));
-    thatParam->GetType()->MarkExport();
     AddMember(thatParam);
     ComputeName();
 }
@@ -182,7 +179,6 @@ BasicTypeCopyAssignment::BasicTypeCopyAssignment(TypeSymbol* type, TypeSymbol* v
     SetAccess(SymbolAccess::public_);
     ParameterSymbol* thisParam = new ParameterSymbol(Span(), U"this");
     thisParam->SetType(type->AddPointer(Span()));
-    thisParam->GetType()->MarkExport();
     AddMember(thisParam);
     ParameterSymbol* thatParam = new ParameterSymbol(Span(), U"that");
     thatParam->SetType(type);
@@ -208,11 +204,9 @@ BasicTypeMoveAssignment::BasicTypeMoveAssignment(TypeSymbol* type, TypeSymbol* v
     SetAccess(SymbolAccess::public_);
     ParameterSymbol* thisParam = new ParameterSymbol(Span(), U"this");
     thisParam->SetType(type->AddPointer(Span()));
-    thisParam->GetType()->MarkExport();
     AddMember(thisParam);
     ParameterSymbol* thatParam = new ParameterSymbol(Span(), U"that");
     thatParam->SetType(type->AddRvalueReference(Span()));
-    thatParam->GetType()->MarkExport();
     AddMember(thatParam);
     SetReturnType(voidType);
     ComputeName();

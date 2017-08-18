@@ -29,6 +29,7 @@ bool GetGlobalFlag(GlobalFlags flag);
 
 std::string GetConfig();
 int GetOptimizationLevel();
+void SetOptimizationLevel(int optimizationLevel_);
 
 } } // namespace cmajor::symbols
 

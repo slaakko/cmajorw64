@@ -63,7 +63,6 @@ private:
     ContainerScope* containerScope;
     std::vector<Node*> usingNodes;
     EnumTypeSymbol* enumType;
-    bool markExport;
 };
 
 } } // namespace cmajor::binder

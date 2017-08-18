@@ -214,6 +214,7 @@ void CreateSymbols(SymbolTable& symbolTable, const std::vector<std::unique_ptr<C
     SymbolCreatorVisitor symbolCreator(symbolTable);
     for (const std::unique_ptr<CompileUnitNode>& compileUnit : compileUnits)
     {
+        symbolTable.SetCurrentCompileUnit(compileUnit.get());
         compileUnit->Accept(symbolCreator);
     }
 }

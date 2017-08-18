@@ -26,7 +26,7 @@ NamespaceTypeSymbol::NamespaceTypeSymbol(NamespaceSymbol* ns_) : TypeSymbol(Symb
 class TypeResolver : public Visitor
 {
 public:
-    TypeResolver(BoundCompileUnit& boundCompileUnit_, ContainerScope* containerScope_, bool markExport_);
+    TypeResolver(BoundCompileUnit& boundCompileUnit_, ContainerScope* containerScope_);
     TypeSymbol* GetType() { return type; }
     const TypeDerivationRec& DerivationRec() const { return derivationRec; }
     void Visit(BoolNode& boolNode) override;
@@ -60,13 +60,12 @@ private:
     TypeSymbol* type;
     TypeDerivationRec derivationRec;
     std::unique_ptr<NamespaceTypeSymbol> nsTypeSymbol;
-    bool markExport;
     void ResolveSymbol(Node& node, Symbol* symbol);
 };
 
-TypeResolver::TypeResolver(BoundCompileUnit& boundCompileUnit_, ContainerScope* containerScope_, bool markExport_) : 
+TypeResolver::TypeResolver(BoundCompileUnit& boundCompileUnit_, ContainerScope* containerScope_) : 
     boundCompileUnit(boundCompileUnit_), symbolTable(boundCompileUnit.GetSymbolTable()), classTemplateRepository(boundCompileUnit.GetClassTemplateRepository()), containerScope(containerScope_), 
-    type(nullptr), derivationRec(), nsTypeSymbol(), markExport(markExport_)
+    type(nullptr), derivationRec(), nsTypeSymbol()
 {
 }
 
@@ -256,7 +255,7 @@ void TypeResolver::Visit(IdentifierNode& identifierNode)
 
 void TypeResolver::Visit(TemplateIdNode& templateIdNode)
 {
-    TypeSymbol* primaryTemplateType = ResolveType(templateIdNode.Primary(), boundCompileUnit, containerScope, markExport);
+    TypeSymbol* primaryTemplateType = ResolveType(templateIdNode.Primary(), boundCompileUnit, containerScope);
     if (!primaryTemplateType->IsClassTypeSymbol())
     {
         throw Exception("class type symbol expected", templateIdNode.Primary()->GetSpan());
@@ -270,7 +269,7 @@ void TypeResolver::Visit(TemplateIdNode& templateIdNode)
     int n = templateIdNode.TemplateArguments().Count();
     for (int i = 0; i < n; ++i)
     {
-        TypeSymbol* templateArgumentType = ResolveType(templateIdNode.TemplateArguments()[i], boundCompileUnit, containerScope, markExport);
+        TypeSymbol* templateArgumentType = ResolveType(templateIdNode.TemplateArguments()[i], boundCompileUnit, containerScope);
         templateArgumentTypes.push_back(templateArgumentType);
     }
     int m = classTemplate->TemplateParameters().size();
@@ -278,7 +277,7 @@ void TypeResolver::Visit(TemplateIdNode& templateIdNode)
     {
         classTemplateRepository.ResolveDefaultTemplateArguments(templateArgumentTypes, classTemplate, containerScope, templateIdNode.GetSpan());
     }
-    ClassTemplateSpecializationSymbol* classTemplateSpecialization = symbolTable.MakeClassTemplateSpecialization(classTemplate, templateArgumentTypes, templateIdNode.GetSpan(), markExport);
+    ClassTemplateSpecializationSymbol* classTemplateSpecialization = symbolTable.MakeClassTemplateSpecialization(classTemplate, templateArgumentTypes, templateIdNode.GetSpan());
     if (!classTemplateSpecialization->IsBound())
     {
         classTemplateRepository.BindClassTemplateSpecialization(classTemplateSpecialization, containerScope, templateIdNode.GetSpan());
@@ -315,9 +314,9 @@ void TypeResolver::Visit(DotNode& dotNode)
     }
 }
 
-TypeSymbol* ResolveType(Node* typeExprNode, BoundCompileUnit& boundCompileUnit, ContainerScope* containerScope, bool markExport)
+TypeSymbol* ResolveType(Node* typeExprNode, BoundCompileUnit& boundCompileUnit, ContainerScope* containerScope)
 {
-    TypeResolver typeResolver(boundCompileUnit, containerScope, markExport);
+    TypeResolver typeResolver(boundCompileUnit, containerScope);
     typeExprNode->Accept(typeResolver);
     TypeSymbol* type = typeResolver.GetType();
     if (type->IsInComplete())
@@ -327,7 +326,7 @@ TypeSymbol* ResolveType(Node* typeExprNode, BoundCompileUnit& boundCompileUnit, 
     TypeDerivationRec derivationRec = UnifyDerivations(typeResolver.DerivationRec(), type->DerivationRec());
     if (!derivationRec.derivations.empty())
     {
-        return boundCompileUnit.GetSymbolTable().MakeDerivedType(type->BaseType(), derivationRec, typeExprNode->GetSpan(), markExport);
+        return boundCompileUnit.GetSymbolTable().MakeDerivedType(type->BaseType(), derivationRec, typeExprNode->GetSpan());
     }
     return type;
 }

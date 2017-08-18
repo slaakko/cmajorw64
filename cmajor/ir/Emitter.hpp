@@ -28,6 +28,8 @@ public:
     void SetFunction(llvm::Function* function_) { function = function_;  }
     llvm::Function* Function() { return function; }
     virtual llvm::Value* GetGlobalStringPtr(int stringId) = 0;
+    virtual llvm::Value* GetGlobalWStringConstant(int stringId) = 0;
+    virtual llvm::Value* GetGlobalUStringConstant(int stringId) = 0;
     virtual void SetLineNumber(int32_t lineNumber) = 0;
 private:
     llvm::LLVMContext& context;

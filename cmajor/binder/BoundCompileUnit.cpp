@@ -131,7 +131,7 @@ void PtrToVoidPtrConversion::GenerateCall(Emitter& emitter, std::vector<GenObjec
 
 BoundCompileUnit::BoundCompileUnit(Module& module_, CompileUnitNode* compileUnitNode_) : 
     BoundNode(Span(), BoundNodeType::boundCompileUnit), module(module_), symbolTable(module.GetSymbolTable()), compileUnitNode(compileUnitNode_), hasGotos(false), 
-    operationRepository(*this), functionTemplateRepository(*this), classTemplateRepository(*this)
+    operationRepository(*this), functionTemplateRepository(*this), classTemplateRepository(*this), inlineFunctionRepository(*this)
 {
     boost::filesystem::path fileName = boost::filesystem::path(compileUnitNode->FilePath()).filename();
     boost::filesystem::path directory = module.DirectoryPath();
@@ -253,24 +253,50 @@ void BoundCompileUnit::CollectViableFunctions(const std::u32string& groupName, C
     operationRepository.CollectViableFunctions(groupName, containerScope, arguments, currentFunction, viableFunctions, exception, span);
 }
 
-FunctionSymbol* BoundCompileUnit::Instantiate(FunctionSymbol* functionTemplate, const std::unordered_map<TemplateParameterSymbol*, TypeSymbol*>& templateParameterMapping, const Span& span)
+FunctionSymbol* BoundCompileUnit::InstantiateFunctionTemplate(FunctionSymbol* functionTemplate, const std::unordered_map<TemplateParameterSymbol*, TypeSymbol*>& templateParameterMapping, 
+    const Span& span)
 {
     return functionTemplateRepository.Instantiate(functionTemplate, templateParameterMapping, span);
 }
 
-void BoundCompileUnit::Instantiate(FunctionSymbol* memberFunction, ContainerScope* containerScope, const Span& span)
+void BoundCompileUnit::InstantiateClassTemplateMemberFunction(FunctionSymbol* memberFunction, ContainerScope* containerScope, const Span& span)
 {
     classTemplateRepository.Instantiate(memberFunction, containerScope, span);
 }
 
-int BoundCompileUnit::Install(const std::string& str)
+void BoundCompileUnit::InstantiateInlineFunction(FunctionSymbol* inlineFunction, ContainerScope* containerScope, const Span& span)
 {
-    return stringRepository.Install(str);
+    inlineFunctionRepository.Instantiate(inlineFunction, containerScope, span);
 }
 
-const std::string& BoundCompileUnit::GetString(int stringId) const
+int BoundCompileUnit::Install(const std::string& str)
 {
-    return stringRepository.GetString(stringId);
+    return utf8StringRepository.Install(str);
+}
+
+int BoundCompileUnit::Install(const std::u16string& str)
+{
+    return utf16StringRepository.Install(str);
+}
+
+int BoundCompileUnit::Install(const std::u32string& str)
+{
+    return utf32StringRepository.Install(str);
+}
+
+const std::string& BoundCompileUnit::GetUtf8String(int stringId) const
+{
+    return utf8StringRepository.GetString(stringId);
+}
+
+const std::u16string& BoundCompileUnit::GetUtf16String(int stringId) const
+{
+    return utf16StringRepository.GetString(stringId);
+}
+
+const std::u32string& BoundCompileUnit::GetUtf32String(int stringId) const
+{
+    return utf32StringRepository.GetString(stringId);
 }
 
 } } // namespace cmajor::binder

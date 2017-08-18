@@ -86,6 +86,7 @@ public:
     NamespaceSymbol& GlobalNs() { return globalNs; }
     const ContainerSymbol* Container() const { return container; }
     ContainerSymbol* Container() { return container; }
+    void SetCurrentCompileUnit(CompileUnitNode* currentCompileUnit_) { currentCompileUnit = currentCompileUnit_; }
     void BeginContainer(ContainerSymbol* container_);
     void EndContainer();
     void BeginNamespace(NamespaceNode& namespaceNode);
@@ -136,8 +137,8 @@ public:
     void ProcessTypeRequests();
     TypeSymbol* GetTypeByNameNoThrow(const std::u32string& typeName) const;
     TypeSymbol* GetTypeByName(const std::u32string& typeName) const;
-    TypeSymbol* MakeDerivedType(TypeSymbol* baseType, const TypeDerivationRec& derivationRec, const Span& span, bool markExport);
-    ClassTemplateSpecializationSymbol* MakeClassTemplateSpecialization(ClassTypeSymbol* classTemplate, const std::vector<TypeSymbol*>& templateArgumentTypes, const Span& span, bool markExport);
+    TypeSymbol* MakeDerivedType(TypeSymbol* baseType, const TypeDerivationRec& derivationRec, const Span& span);
+    ClassTemplateSpecializationSymbol* MakeClassTemplateSpecialization(ClassTypeSymbol* classTemplate, const std::vector<TypeSymbol*>& templateArgumentTypes, const Span& span);
     const FunctionSymbol* MainFunctionSymbol() const { return mainFunctionSymbol; }
     FunctionSymbol* MainFunctionSymbol() { return mainFunctionSymbol; }
     void AddConversion(FunctionSymbol* conversion);
@@ -148,6 +149,7 @@ public:
     const std::unordered_set<ClassTypeSymbol*>& ClassesHavingStaticConstructor() const { return classesHavingStaticConstructor; }
 private:
     NamespaceSymbol globalNs;
+    CompileUnitNode* currentCompileUnit;
     ContainerSymbol* container;
     ClassTypeSymbol* currentClass;
     std::stack<ClassTypeSymbol*> currentClassStack;
