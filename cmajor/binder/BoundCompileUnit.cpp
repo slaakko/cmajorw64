@@ -8,6 +8,7 @@
 #include <cmajor/symbols/Exception.hpp>
 #include <cmajor/symbols/FunctionSymbol.hpp>
 #include <cmajor/symbols/ClassTypeSymbol.hpp>
+#include <cmajor/symbols/GlobalFlags.hpp>
 #include <cmajor/util/Path.hpp>
 #include <boost/filesystem.hpp>
 
@@ -177,7 +178,7 @@ void BoundCompileUnit::AddBoundNode(std::unique_ptr<BoundNode>&& boundNode)
     boundNodes.push_back(std::move(boundNode));
 }
 
-FunctionSymbol* BoundCompileUnit::GetConversion(TypeSymbol* sourceType, TypeSymbol* targetType, const Span& span)
+FunctionSymbol* BoundCompileUnit::GetConversion(TypeSymbol* sourceType, TypeSymbol* targetType, ContainerScope* containerScope, const Span& span)
 {
     FunctionSymbol* conversion = symbolTable.GetConversion(sourceType, targetType, span);
     if (!conversion)
@@ -242,6 +243,17 @@ FunctionSymbol* BoundCompileUnit::GetConversion(TypeSymbol* sourceType, TypeSymb
                 }
             }
 
+        }
+    }
+    if (conversion)
+    {
+        if (conversion->Parent() && !conversion->IsGeneratedFunction() && conversion->Parent()->GetSymbolType() == SymbolType::classTemplateSpecializationSymbol)
+        {
+            InstantiateClassTemplateMemberFunction(conversion, containerScope, span);
+        }
+        else if (GetGlobalFlag(GlobalFlags::release) && conversion->IsInline())
+        {
+            InstantiateInlineFunction(conversion, containerScope, span);
         }
     }
     return conversion;

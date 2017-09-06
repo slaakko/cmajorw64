@@ -11,9 +11,9 @@ namespace System
         return (n + alignment - 1) & -alignment;
     }
 
-    public nothrow inline int StrLen(const char* s)
+    public nothrow inline long StrLen(const char* s)
     {
-        int len = 0;
+        long len = 0;
         if (s != null)
         {
             while (*s != '\0')
@@ -25,9 +25,9 @@ namespace System
         return len;
     }
     
-    public nothrow inline int StrLen(const wchar* s)
+    public nothrow inline long StrLen(const wchar* s)
     {
-        int len = 0;
+        long len = 0;
         if (s != null)
         {
             while (*s != '\0')
@@ -39,9 +39,9 @@ namespace System
         return len;
     }
     
-    public nothrow inline int StrLen(const uchar* s)
+    public nothrow inline long StrLen(const uchar* s)
     {
-        int len = 0;
+        long len = 0;
         if (s != null)
         {
             while (*s != '\0')
@@ -92,9 +92,9 @@ namespace System
         *buf = '\0';
     }
 
-    public nothrow inline int StrCopy(char* buf, const char* from, int length)
+    public nothrow inline long StrCopy(char* buf, const char* from, long length)
     {
-        int resultLen = 0;
+        long resultLen = 0;
         #assert(buf != null);
         if (from != null)
         {
@@ -112,9 +112,9 @@ namespace System
         return resultLen;
     }
 
-    public nothrow inline int StrCopy(wchar* buf, const wchar* from, int length)
+    public nothrow inline long StrCopy(wchar* buf, const wchar* from, long length)
     {
-        int resultLen = 0;
+        long resultLen = 0;
         #assert(buf != null);
         if (from != null)
         {
@@ -132,9 +132,9 @@ namespace System
         return resultLen;
     }
 
-    public nothrow inline int StrCopy(uchar* buf, const uchar* from, int length)
+    public nothrow inline long StrCopy(uchar* buf, const uchar* from, long length)
     {
-        int resultLen = 0;
+        long resultLen = 0;
         #assert(buf != null);
         if (from != null)
         {

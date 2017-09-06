@@ -5,7 +5,7 @@
 
 #ifndef CMAJOR_BINDER_BOUND_FUNCTION_INCLUDED
 #define CMAJOR_BINDER_BOUND_FUNCTION_INCLUDED
-#include <cmajor/binder/BoundNode.hpp>
+#include <cmajor/binder/BoundExpression.hpp>
 #include <cmajor/symbols/FunctionSymbol.hpp>
 
 namespace cmajor { namespace binder {
@@ -27,10 +27,13 @@ public:
     BoundCompoundStatement* Body() const { return body.get(); }
     void SetHasGotos() { hasGotos = true; }
     bool HasGotos() const { return hasGotos; }
+    void AddTemporaryDestructorCall(std::unique_ptr<BoundFunctionCall>&& destructorCall);
+    void MoveTemporaryDestructorCallsTo(BoundExpression& expression);
 private:
     FunctionSymbol* functionSymbol;
     std::unique_ptr<BoundCompoundStatement> body;
     bool hasGotos;
+    std::vector<std::unique_ptr<BoundFunctionCall>> temporaryDestructorCalls;
 };
 
 } } // namespace cmajor::binder

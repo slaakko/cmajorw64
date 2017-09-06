@@ -68,6 +68,7 @@ private:
     SymbolTable& symbolTable;
     ContainerScope* containerScope;
     std::unique_ptr<BoundStatement> statement;
+    int compoundLevel;
     BoundClass* currentClass;
     BoundFunction* currentFunction;
     StaticConstructorSymbol* currentStaticConstructorSymbol;

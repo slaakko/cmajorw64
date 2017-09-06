@@ -66,11 +66,13 @@ inline bool BetterArgumentMatch(const ArgumentMatch& left, const ArgumentMatch& 
 
 struct FunctionMatch
 {
-    FunctionMatch(FunctionSymbol* fun_) : fun(fun_), numConversions(0), referenceMustBeInitialized(false), castRequired(false), cannotBindConstArgToNonConstParam(false), cannotAssignToConstObject(false),
+    FunctionMatch(FunctionSymbol* fun_) : 
+        fun(fun_), numConversions(0), numQualifyingConversions(0), referenceMustBeInitialized(false), castRequired(false), cannotBindConstArgToNonConstParam(false), cannotAssignToConstObject(false),
         sourceType(nullptr), targetType(nullptr) {}
     FunctionSymbol* fun;
     std::vector<ArgumentMatch> argumentMatches;
     int numConversions;
+    int numQualifyingConversions;
     bool referenceMustBeInitialized;
     bool castRequired;
     bool cannotBindConstArgToNonConstParam;
@@ -85,15 +87,15 @@ struct BetterFunctionMatch
     bool operator()(const FunctionMatch& left, const FunctionMatch& right) const;
 };
 
-bool FindConversions(BoundCompileUnit& boundCompileUnit, FunctionSymbol* function, std::vector<std::unique_ptr<BoundExpression>>& arguments, FunctionMatch& functionMatch,
-    ConversionType conversionType, const Span& span);
+bool FindConversions(BoundCompileUnit& boundCompileUnit, FunctionSymbol* function, std::vector<std::unique_ptr<BoundExpression>>& arguments, FunctionMatch& functionMatch, 
+    ConversionType conversionType, ContainerScope* containerScope, const Span& span);
 
 std::unique_ptr<BoundFunctionCall> ResolveOverload(const std::u32string& groupName, ContainerScope* containerScope, const std::vector<FunctionScopeLookup>& functionScopeLookups,
     std::vector<std::unique_ptr<BoundExpression>>& arguments, BoundCompileUnit& boundCompileUnit, BoundFunction* currentFunction, const Span& span);
 
 std::unique_ptr<BoundFunctionCall> ResolveOverload(const std::u32string& groupName, ContainerScope* containerScope, const std::vector<FunctionScopeLookup>& functionScopeLookups,
     std::vector<std::unique_ptr<BoundExpression>>& arguments, BoundCompileUnit& boundCompileUnit, BoundFunction* currentFunction, const Span& span, 
-    OverloadResolutionFlags flags, std::unique_ptr<Exception>& exception);
+    OverloadResolutionFlags flags, const std::vector<TypeSymbol*>& templateArgumentTypes, std::unique_ptr<Exception>& exception);
 
 } } // namespace cmajor::binder
 

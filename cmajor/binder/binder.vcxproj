@@ -32,6 +32,7 @@
     <ClInclude Include="ExpressionBinder.hpp" />
     <ClInclude Include="FunctionTemplateRepository.hpp" />
     <ClInclude Include="InlineFunctionRepository.hpp" />
+    <ClInclude Include="ModuleBinder.hpp" />
     <ClInclude Include="OperationRepository.hpp" />
     <ClInclude Include="OverloadResolution.hpp" />
     <ClInclude Include="StatementBinder.hpp" />
@@ -53,6 +54,7 @@
     <ClCompile Include="ExpressionBinder.cpp" />
     <ClCompile Include="FunctionTemplateRepository.cpp" />
     <ClCompile Include="InlineFunctionRepository.cpp" />
+    <ClCompile Include="ModuleBinder.cpp" />
     <ClCompile Include="OperationRepository.cpp" />
     <ClCompile Include="OverloadResolution.cpp" />
     <ClCompile Include="StatementBinder.cpp" />

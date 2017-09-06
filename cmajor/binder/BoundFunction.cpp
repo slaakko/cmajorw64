@@ -34,4 +34,18 @@ void BoundFunction::SetBody(std::unique_ptr<BoundCompoundStatement>&& body_)
     body = std::move(body_);
 }
 
+void BoundFunction::AddTemporaryDestructorCall(std::unique_ptr<BoundFunctionCall>&& destructorCall)
+{
+    temporaryDestructorCalls.push_back(std::move(destructorCall));
+}
+
+void BoundFunction::MoveTemporaryDestructorCallsTo(BoundExpression& expression)
+{
+    for (std::unique_ptr<BoundFunctionCall>& destructorCall : temporaryDestructorCalls)
+    {
+        expression.AddTemporaryDestructorCall(std::move(destructorCall));
+    }
+    temporaryDestructorCalls.clear();
+}
+
 } } // namespace cmajor::binder

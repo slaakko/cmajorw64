@@ -36,12 +36,15 @@ public:
     const std::vector<FunctionSymbol*>& Conversions() const { return conversions; }
     void AddClassType(ClassTypeSymbol* classType);
     const std::vector<ClassTypeSymbol*>& ClassTypes() const { return classTypes; }
+    void AddClassTemplateSpecialization(ClassTemplateSpecializationSymbol* classTemplateSpecialization);
+    const std::vector<ClassTemplateSpecializationSymbol*>& ClassTemplateSpecializations() const { return classTemplateSpecializations; }
 private:
     AstReader astReader;
     SymbolTable* symbolTable;
     Module* module;
     std::vector<FunctionSymbol*> conversions;
     std::vector<ClassTypeSymbol*> classTypes;
+    std::vector<ClassTemplateSpecializationSymbol*> classTemplateSpecializations;
 };
 
 } } // namespace cmajor::symbols

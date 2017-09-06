@@ -309,6 +309,7 @@ public:
     const Node* TypeExpr() const { return typeExpr.get(); }
     const IdentifierNode* Id() const { return id.get(); }
     const Node* Container() const { return container.get(); }
+    Node* Container() { return container.get(); }
     const StatementNode* Action() const { return action.get(); }
 private:
     std::unique_ptr<Node> typeExpr;

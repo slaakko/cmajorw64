@@ -67,6 +67,7 @@ public:
     const Span& GetSpan() const { return span; }
     Span& GetSpan() { return span; }
     const Node* Parent() const { return parent; }
+    Node* Parent() { return parent; }
     void SetParent(Node* parent_) { parent = parent_; }
 private:
     NodeType nodeType;

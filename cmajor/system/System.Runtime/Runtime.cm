@@ -12,4 +12,6 @@ public extern cdecl nothrow void RtBeginStaticInitCriticalSection(uint staticCla
 public extern cdecl nothrow void RtEndStaticInitCriticalSection(uint staticClassId);
 public extern cdecl nothrow void RtEnqueueDestruction(void* destructor, void* arg);
 public extern cdecl nothrow void RtFailAssertion(const char* assertion, const char* function, const char* sourceFilePath, int lineNumber);
-public extern cdecl void RtWrite(int handle, const void* buffer, int count);
+public extern cdecl int RtOpen(const char* filePath, byte openMode);
+public extern cdecl void RtClose(int handle);
+public extern cdecl void RtWrite(int handle, const void* buffer, long count);

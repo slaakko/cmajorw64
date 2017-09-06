@@ -75,4 +75,9 @@ void SymbolReader::AddClassType(ClassTypeSymbol* classType)
     classTypes.push_back(classType);
 }
 
+void SymbolReader::AddClassTemplateSpecialization(ClassTemplateSpecializationSymbol* classTemplateSpecialization)
+{
+    classTemplateSpecializations.push_back(classTemplateSpecialization);
+}
+
 } } // namespace cmajor::symbols

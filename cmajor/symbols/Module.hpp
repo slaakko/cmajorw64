@@ -64,7 +64,8 @@ public:
     const std::string& OriginalFilePath() const { return originalFilePath; }
     const std::string& FilePathReadFrom() const { return filePathReadFrom; }
     const std::string& LibraryFilePath() const { return libraryFilePath; }
-    void PrepareForCompilation(const std::vector<std::string>& references, const std::vector<std::string>& sourceFilePaths);
+    void PrepareForCompilation(const std::vector<std::string>& references, const std::vector<std::string>& sourceFilePaths,
+        std::vector<ClassTypeSymbol*>& classTypes, std::vector<ClassTemplateSpecializationSymbol*>& classTemplateSpecializations);
     SymbolTable& GetSymbolTable() { return symbolTable; }
     void Write(SymbolWriter& writer);
     void SetDirectoryPath(const std::string& directoryPath_);
@@ -74,6 +75,12 @@ public:
     void SetSystemModule() { SetFlag(ModuleFlags::system); }
     bool GetFlag(ModuleFlags flag) const { return (flags & flag) != ModuleFlags::none; }
     void SetFlag(ModuleFlags flag) { flags = flags | flag; }
+    void AddExportedFunction(const std::string& exportedFunction);
+    void AddExportedData(const std::string& data);
+    const std::vector<std::string>& ExportedFunctions() { return exportedFunctions; }
+    const std::vector<std::string>& ExportedData() { return exportedData; }
+    const std::vector<std::string>& AllExportedFunctions() const { return allExportedFunctions; }
+    const std::vector<std::string>& AllExportedData() const { return allExportedData; }
 private:
     uint8_t format;
     ModuleFlags flags;
@@ -83,20 +90,25 @@ private:
     std::string libraryFilePath;
     std::vector<std::string> referenceFilePaths;
     std::vector<std::string> sourceFilePaths;
+    std::vector<std::string> exportedFunctions;
+    std::vector<std::string> exportedData;
+    std::vector<std::string> allExportedFunctions;
+    std::vector<std::string> allExportedData;
     ModuleDependency moduleDependency;
     std::vector<std::unique_ptr<Module>> referencedModules;
     uint32_t symbolTablePos;
     SymbolTable symbolTable;
     std::string directoryPath;
     std::vector<std::string> libraryFilePaths;
-    void ReadHeader(SymbolReader& reader, const Module* rootModule, std::unordered_set<std::string>& importSet, std::vector<Module*>& modules,
+    void ReadHeader(SymbolReader& reader, Module* rootModule, std::unordered_set<std::string>& importSet, std::vector<Module*>& modules,
         std::unordered_map<std::string, ModuleDependency*>& moduleDependencyMap, std::unordered_map<std::string, Module*>& readMap);
-    void FinishReads(const Module* rootModule, std::vector<Module*>& finishReadOrder, int prevModuleIndex);
-    void ImportModules(const Module* rootModule, std::unordered_set<std::string>& importSet, std::vector<Module*>& modules,
+    void FinishReads(Module* rootModule, std::vector<Module*>& finishReadOrder, int prevModuleIndex,
+        std::vector<ClassTypeSymbol*>& classTypes, std::vector<ClassTemplateSpecializationSymbol*>& classTemplateSpecializations);
+    void ImportModules(Module* rootModule, std::unordered_set<std::string>& importSet, std::vector<Module*>& modules,
         std::unordered_map<std::string, ModuleDependency*>& dependencyMap, std::unordered_map<std::string, Module*>& readMap);
-    void ImportModules(const std::vector<std::string>& references, std::unordered_set<std::string>& importSet, const Module* rootModule, std::vector<Module*>& modules,
+    void ImportModules(const std::vector<std::string>& references, std::unordered_set<std::string>& importSet, Module* rootModule, std::vector<Module*>& modules,
         std::unordered_map<std::string, ModuleDependency*>& moduleDependencyMap, std::unordered_map<std::string, Module*>& readMap);
-    void Import(const std::vector<std::string>& references, std::unordered_set<std::string>& importSet, const Module* rootModule, std::vector<Module*>& modules, 
+    void Import(const std::vector<std::string>& references, std::unordered_set<std::string>& importSet, Module* rootModule, std::vector<Module*>& modules, 
         std::unordered_map<std::string, ModuleDependency*>& moduleDependencyMap, std::unordered_map<std::string, Module*>& readMap);
 };
 

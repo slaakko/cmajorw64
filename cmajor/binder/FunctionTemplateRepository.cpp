@@ -105,7 +105,7 @@ FunctionSymbol* FunctionTemplateRepository::Instantiate(FunctionSymbol* function
     Symbol* symbol = symbolTable.GetSymbol(functionInstanceNode);
     Assert(symbol->GetSymbolType() == SymbolType::functionSymbol, "function symbol expected");
     FunctionSymbol* functionSymbol = static_cast<FunctionSymbol*>(symbol);
-    functionSymbol->SetWeakOdrLinkage();
+    functionSymbol->SetLinkOnceOdrLinkage();
     functionSymbol->SetTemplateSpecialization();
     functionTemplateMap[key] = functionSymbol;
     for (TemplateParameterSymbol* templateParameter : functionTemplate->TemplateParameters())

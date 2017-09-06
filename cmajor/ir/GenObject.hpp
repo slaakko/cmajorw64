@@ -11,7 +11,7 @@ namespace cmajor { namespace ir {
 
 class Emitter;
 
-enum class OperationFlags : uint8_t
+enum class OperationFlags : uint16_t
 {
     none = 0,
     addr = 1 << 0,
@@ -19,17 +19,28 @@ enum class OperationFlags : uint8_t
     virtualCall = 1 << 2,
     leaveFirstArg = 1 << 3,
     copyFirst = 1 << 4,
-    functionCallFlags = leaveFirstArg
+    functionCallFlags = leaveFirstArg,
+    derefCount = 0xFF << 8
 };
 
 inline OperationFlags operator|(OperationFlags left, OperationFlags right)
 {
-    return OperationFlags(uint8_t(left) | uint8_t(right));
+    return OperationFlags(uint16_t(left) | uint16_t(right));
 }
 
 inline OperationFlags operator&(OperationFlags left, OperationFlags right)
 {
-    return OperationFlags(uint8_t(left) & uint8_t(right));
+    return OperationFlags(uint16_t(left) & uint16_t(right));
+}
+
+inline uint8_t GetDerefCount(OperationFlags flags)
+{
+    return uint8_t(uint16_t(flags & OperationFlags::derefCount) >> 8);
+}
+
+inline OperationFlags SetDerefCount(OperationFlags flags, uint8_t n)
+{
+    return OperationFlags(flags | OperationFlags(n << 8));
 }
 
 class GenObject

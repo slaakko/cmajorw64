@@ -75,8 +75,8 @@ void PointerDefaultConstructorOperation::CollectViableFunctions(ContainerScope* 
     std::unordered_set<FunctionSymbol*>& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span)
 {
     TypeSymbol* type = arguments[0]->GetType();
-    if (type->IsReferenceType()) return;
     if (type->PointerCount() <= 1) return;
+    if (type->IsReferenceType()) return;
     TypeSymbol* pointerType = type->RemovePointer(span);
     FunctionSymbol* function = functionMap[pointerType];
     if (!function)
@@ -140,19 +140,22 @@ void PointerCopyConstructorOperation::CollectViableFunctions(ContainerScope* con
     std::unordered_set<FunctionSymbol*>& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span)
 {
     TypeSymbol* type = arguments[0]->GetType();
-    if (type->IsReferenceType()) return;
     if (type->PointerCount() <= 1) return;
+    if (type->IsReferenceType()) return;
     TypeSymbol* pointerType = type->RemovePointer(span);
-    FunctionSymbol* function = functionMap[pointerType];
-    if (!function)
+    if (!TypesEqual(arguments[1]->GetType(), pointerType->AddRvalueReference(span)) && !arguments[1]->GetFlag(BoundExpressionFlags::bindToRvalueReference))
     {
-        function = new PointerCopyCtor(pointerType, span);
-        function->SetSymbolTable(GetSymbolTable());
-        function->SetParent(&GetSymbolTable()->GlobalNs());
-        functionMap[type] = function;
-        functions.push_back(std::unique_ptr<FunctionSymbol>(function));
+        FunctionSymbol* function = functionMap[pointerType];
+        if (!function)
+        {
+            function = new PointerCopyCtor(pointerType, span);
+            function->SetSymbolTable(GetSymbolTable());
+            function->SetParent(&GetSymbolTable()->GlobalNs());
+            functionMap[type] = function;
+            functions.push_back(std::unique_ptr<FunctionSymbol>(function));
+        }
+        viableFunctions.insert(function);
     }
-    viableFunctions.insert(function);
 }
 
 class PointerMoveCtor : public FunctionSymbol
@@ -207,19 +210,22 @@ void PointerMoveConstructorOperation::CollectViableFunctions(ContainerScope* con
     std::unordered_set<FunctionSymbol*>& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span)
 {
     TypeSymbol* type = arguments[0]->GetType();
-    if (type->IsReferenceType()) return;
     if (type->PointerCount() <= 1) return;
+    if (type->IsReferenceType()) return;
     TypeSymbol* pointerType = type->RemovePointer(span);
-    FunctionSymbol* function = functionMap[pointerType];
-    if (!function)
+    if (TypesEqual(arguments[1]->GetType(), pointerType->AddRvalueReference(span)) || arguments[1]->GetFlag(BoundExpressionFlags::bindToRvalueReference))
     {
-        function = new PointerMoveCtor(pointerType, span);
-        function->SetSymbolTable(GetSymbolTable());
-        function->SetParent(&GetSymbolTable()->GlobalNs());
-        functionMap[type] = function;
-        functions.push_back(std::unique_ptr<FunctionSymbol>(function));
+        FunctionSymbol* function = functionMap[pointerType];
+        if (!function)
+        {
+            function = new PointerMoveCtor(pointerType, span);
+            function->SetSymbolTable(GetSymbolTable());
+            function->SetParent(&GetSymbolTable()->GlobalNs());
+            functionMap[type] = function;
+            functions.push_back(std::unique_ptr<FunctionSymbol>(function));
+        }
+        viableFunctions.insert(function);
     }
-    viableFunctions.insert(function);
 }
 
 class PointerCopyAssignment : public FunctionSymbol
@@ -273,19 +279,22 @@ void PointerCopyAssignmentOperation::CollectViableFunctions(ContainerScope* cont
     std::unordered_set<FunctionSymbol*>& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span)
 {
     TypeSymbol* type = arguments[0]->GetType();
-    if (type->IsReferenceType()) return;
     if (type->PointerCount() <= 1) return;
+    if (type->IsReferenceType()) return;
     TypeSymbol* pointerType = type->RemovePointer(span);
-    FunctionSymbol* function = functionMap[pointerType];
-    if (!function)
+    if (!TypesEqual(arguments[1]->GetType(), pointerType->AddRvalueReference(span)) && !arguments[1]->GetFlag(BoundExpressionFlags::bindToRvalueReference))
     {
-        function = new PointerCopyAssignment(pointerType, GetSymbolTable()->GetTypeByName(U"void"), span);
-        function->SetSymbolTable(GetSymbolTable());
-        function->SetParent(&GetSymbolTable()->GlobalNs());
-        functionMap[type] = function;
-        functions.push_back(std::unique_ptr<FunctionSymbol>(function));
+        FunctionSymbol* function = functionMap[pointerType];
+        if (!function)
+        {
+            function = new PointerCopyAssignment(pointerType, GetSymbolTable()->GetTypeByName(U"void"), span);
+            function->SetSymbolTable(GetSymbolTable());
+            function->SetParent(&GetSymbolTable()->GlobalNs());
+            functionMap[type] = function;
+            functions.push_back(std::unique_ptr<FunctionSymbol>(function));
+        }
+        viableFunctions.insert(function);
     }
-    viableFunctions.insert(function);
 }
 
 class PointerMoveAssignment : public FunctionSymbol
@@ -341,19 +350,22 @@ void PointerMoveAssignmentOperation::CollectViableFunctions(ContainerScope* cont
     std::unordered_set<FunctionSymbol*>& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span)
 {
     TypeSymbol* type = arguments[0]->GetType();
-    if (type->IsReferenceType()) return;
     if (type->PointerCount() <= 1) return;
+    if (type->IsReferenceType()) return;
     TypeSymbol* pointerType = type->RemovePointer(span);
-    FunctionSymbol* function = functionMap[pointerType];
-    if (!function)
+    if (TypesEqual(arguments[1]->GetType(), pointerType->AddRvalueReference(span)) || arguments[1]->GetFlag(BoundExpressionFlags::bindToRvalueReference))
     {
-        function = new PointerMoveAssignment(pointerType, GetSymbolTable()->GetTypeByName(U"void"), span);
-        function->SetSymbolTable(GetSymbolTable());
-        function->SetParent(&GetSymbolTable()->GlobalNs());
-        functionMap[type] = function;
-        functions.push_back(std::unique_ptr<FunctionSymbol>(function));
+        FunctionSymbol* function = functionMap[pointerType];
+        if (!function)
+        {
+            function = new PointerMoveAssignment(pointerType, GetSymbolTable()->GetTypeByName(U"void"), span);
+            function->SetSymbolTable(GetSymbolTable());
+            function->SetParent(&GetSymbolTable()->GlobalNs());
+            functionMap[type] = function;
+            functions.push_back(std::unique_ptr<FunctionSymbol>(function));
+        }
+        viableFunctions.insert(function);
     }
-    viableFunctions.insert(function);
 }
 
 class PointerReturn : public FunctionSymbol
@@ -409,8 +421,8 @@ void PointerReturnOperation::CollectViableFunctions(ContainerScope* containerSco
     std::unordered_set<FunctionSymbol*>& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span)
 {
     TypeSymbol* type = arguments[0]->GetType();
-    if (type->IsReferenceType()) return;
     if (!type->IsPointerType()) return;
+    if (type->IsReferenceType()) return;
     FunctionSymbol* function = functionMap[type];
     if (!function)
     {
@@ -934,6 +946,7 @@ void LvalueReferenceCopyConstructorOperation::CollectViableFunctions(ContainerSc
     TypeSymbol* type = arguments[0]->GetType();
     if (type->PointerCount() < 1 || !type->IsLvalueReferenceType()) return;
     TypeSymbol* lvalueRefType = type->RemovePointer(span);
+    if (lvalueRefType->PlainType(span)->IsClassTypeSymbol()) return;
     FunctionSymbol* function = functionMap[lvalueRefType];
     if (!function)
     {
@@ -999,16 +1012,20 @@ void LvalueReferenceCopyAssignmentOperation::CollectViableFunctions(ContainerSco
     TypeSymbol* type = arguments[0]->GetType();
     if (type->PointerCount() < 1 || !type->IsLvalueReferenceType()) return;
     TypeSymbol* lvalueRefType = type->RemovePointer(span);
-    FunctionSymbol* function = functionMap[lvalueRefType];
-    if (!function)
+    if (lvalueRefType->PlainType(span)->IsClassTypeSymbol()) return;
+    if (!TypesEqual(arguments[1]->GetType()->RemoveConst(span), lvalueRefType->PlainType(span)->AddRvalueReference(span)) && !arguments[1]->GetFlag(BoundExpressionFlags::bindToRvalueReference))
     {
-        function = new LvalueReferenceCopyAssignment(lvalueRefType, GetSymbolTable()->GetTypeByName(U"void"), span);
-        function->SetSymbolTable(GetSymbolTable());
-        function->SetParent(&GetSymbolTable()->GlobalNs());
-        functionMap[lvalueRefType] = function;
-        functions.push_back(std::unique_ptr<FunctionSymbol>(function));
+        FunctionSymbol* function = functionMap[lvalueRefType];
+        if (!function)
+        {
+            function = new LvalueReferenceCopyAssignment(lvalueRefType, GetSymbolTable()->GetTypeByName(U"void"), span);
+            function->SetSymbolTable(GetSymbolTable());
+            function->SetParent(&GetSymbolTable()->GlobalNs());
+            functionMap[lvalueRefType] = function;
+            functions.push_back(std::unique_ptr<FunctionSymbol>(function));
+        }
+        viableFunctions.insert(function);
     }
-    viableFunctions.insert(function);
 }
 
 class LvalueReferenceMoveAssignment : public FunctionSymbol
@@ -1040,6 +1057,8 @@ void LvalueReferenceMoveAssignment::GenerateCall(Emitter& emitter, std::vector<G
 {
     Assert(genObjects.size() == 2, "copy assignment needs two objects");
     genObjects[1]->Load(emitter, OperationFlags::none);
+    llvm::Value* rvalueRefValue = emitter.Stack().Pop();
+    emitter.Stack().Push(emitter.Builder().CreateLoad(rvalueRefValue));
     genObjects[0]->Store(emitter, OperationFlags::none);
 }
 
@@ -1064,16 +1083,20 @@ void LvalueReferenceMoveAssignmentOperation::CollectViableFunctions(ContainerSco
     TypeSymbol* type = arguments[0]->GetType();
     if (type->PointerCount() < 1 || !type->IsLvalueReferenceType()) return;
     TypeSymbol* lvalueRefType = type->RemovePointer(span);
-    FunctionSymbol* function = functionMap[lvalueRefType];
-    if (!function)
+    if (lvalueRefType->PlainType(span)->IsClassTypeSymbol()) return;
+    if (TypesEqual(arguments[1]->GetType()->RemoveConst(span), lvalueRefType->PlainType(span)->AddRvalueReference(span)) || arguments[1]->GetFlag(BoundExpressionFlags::bindToRvalueReference))
     {
-        function = new LvalueReferenceMoveAssignment(lvalueRefType, GetSymbolTable()->GetTypeByName(U"void"), span);
-        function->SetSymbolTable(GetSymbolTable());
-        function->SetParent(&GetSymbolTable()->GlobalNs());
-        functionMap[lvalueRefType] = function;
-        functions.push_back(std::unique_ptr<FunctionSymbol>(function));
+        FunctionSymbol* function = functionMap[lvalueRefType];
+        if (!function)
+        {
+            function = new LvalueReferenceMoveAssignment(lvalueRefType, GetSymbolTable()->GetTypeByName(U"void"), span);
+            function->SetSymbolTable(GetSymbolTable());
+            function->SetParent(&GetSymbolTable()->GlobalNs());
+            functionMap[lvalueRefType] = function;
+            functions.push_back(std::unique_ptr<FunctionSymbol>(function));
+        }
+        viableFunctions.insert(function);
     }
-    viableFunctions.insert(function);
 }
 
 class LvalueReferenceReturn : public FunctionSymbol
@@ -1188,6 +1211,7 @@ void RvalueReferenceCopyConstructorOperation::CollectViableFunctions(ContainerSc
     TypeSymbol* type = arguments[0]->GetType();
     if (type->PointerCount() < 1 || !type->IsRvalueReferenceType()) return;
     TypeSymbol* rvalueRefType = type->RemovePointer(span);
+    if (rvalueRefType->PlainType(span)->IsClassTypeSymbol()) return;
     FunctionSymbol* function = functionMap[rvalueRefType];
     if (!function)
     {
@@ -1229,6 +1253,8 @@ void RvalueReferenceCopyAssignment::GenerateCall(Emitter& emitter, std::vector<G
 {
     Assert(genObjects.size() == 2, "copy assignment needs two objects");
     genObjects[1]->Load(emitter, OperationFlags::none);
+    llvm::Value* rvalueRefValue = emitter.Stack().Pop();
+    emitter.Stack().Push(emitter.Builder().CreateLoad(rvalueRefValue));
     genObjects[0]->Store(emitter, OperationFlags::none);
 }
 
@@ -1253,6 +1279,7 @@ void RvalueReferenceCopyAssignmentOperation::CollectViableFunctions(ContainerSco
     TypeSymbol* type = arguments[0]->GetType();
     if (type->PointerCount() < 1 || !type->IsRvalueReferenceType()) return;
     TypeSymbol* rvalueRefType = type->RemovePointer(span);
+    if (rvalueRefType->PlainType(span)->IsClassTypeSymbol()) return;
     FunctionSymbol* function = functionMap[rvalueRefType];
     if (!function)
     {
@@ -1391,10 +1418,14 @@ void ClassDefaultConstructorOperation::CollectViableFunctions(ContainerScope* co
             function = defaultConstructor.get();
             function->SetSymbolTable(GetSymbolTable());
             function->SetParent(classType);
-            function->SetWeakOdrLinkage();
+            function->SetLinkOnceOdrLinkage();
             function->SetInline();
             functionMap[classType] = function;
             classType->AddMember(defaultConstructor.release());
+        }
+        else
+        {
+            return;
         }
     }
     viableFunctions.insert(function);
@@ -1422,7 +1453,7 @@ bool ClassDefaultConstructorOperation::GenerateImplementation(ClassDefaultConstr
             baseConstructorCallLookups.push_back(FunctionScopeLookup(ScopeLookup::fileScopes, nullptr));
             std::vector<std::unique_ptr<BoundExpression>> baseConstructorCallArguments;
             ParameterSymbol* thisParam = defaultConstructor->Parameters()[0];
-            FunctionSymbol* thisToBaseConversion = GetBoundCompileUnit().GetConversion(thisParam->GetType(), classType->BaseClass()->AddPointer(span), span);
+            FunctionSymbol* thisToBaseConversion = GetBoundCompileUnit().GetConversion(thisParam->GetType(), classType->BaseClass()->AddPointer(span), containerScope, span);
             if (!thisToBaseConversion)
             {
                 throw Exception("base class conversion not found", span, classType->GetSpan());
@@ -1445,7 +1476,7 @@ bool ClassDefaultConstructorOperation::GenerateImplementation(ClassDefaultConstr
             }
             else
             {
-                FunctionSymbol* thisToHolderConversion = GetBoundCompileUnit().GetConversion(thisParam->GetType(), vmtPtrHolderClass->AddPointer(span), span);
+                FunctionSymbol* thisToHolderConversion = GetBoundCompileUnit().GetConversion(thisParam->GetType(), vmtPtrHolderClass->AddPointer(span), containerScope, span);
                 if (!thisToHolderConversion)
                 {
                     throw Exception("base class conversion not found", span, classType->GetSpan());
@@ -1538,7 +1569,7 @@ void ClassCopyConstructorOperation::CollectViableFunctions(ContainerScope* conta
         exception.reset(new Exception("cannot copy an instance of a static class", span, classType->GetSpan()));
         return;
     }
-    if (!TypesEqual(arguments[1]->GetType(), classType->AddRvalueReference(span) )&& !arguments[1]->GetFlag(BoundExpressionFlags::bindToRvalueReference) && 
+    if (!TypesEqual(arguments[1]->GetType(), classType->AddRvalueReference(span) ) && !arguments[1]->GetFlag(BoundExpressionFlags::bindToRvalueReference) && 
         TypesEqual(arguments[1]->GetType()->PlainType(span), classType))
     {
         if (classType->CopyConstructor())
@@ -1558,10 +1589,14 @@ void ClassCopyConstructorOperation::CollectViableFunctions(ContainerScope* conta
                 function = copyConstructor.get();
                 function->SetSymbolTable(GetSymbolTable());
                 function->SetParent(classType);
-                function->SetWeakOdrLinkage();
+                function->SetLinkOnceOdrLinkage();
                 function->SetInline();
                 functionMap[classType] = function;
                 classType->AddMember(copyConstructor.release());
+            }
+            else
+            {
+                return;
             }
         }
         viableFunctions.insert(function);
@@ -1590,7 +1625,7 @@ bool ClassCopyConstructorOperation::GenerateImplementation(ClassCopyConstructor*
             baseConstructorCallLookups.push_back(FunctionScopeLookup(ScopeLookup::fileScopes, nullptr));
             std::vector<std::unique_ptr<BoundExpression>> baseConstructorCallArguments;
             ParameterSymbol* thisParam = copyConstructor->Parameters()[0];
-            FunctionSymbol* thisToBaseConversion = GetBoundCompileUnit().GetConversion(thisParam->GetType(), classType->BaseClass()->AddPointer(span), span);
+            FunctionSymbol* thisToBaseConversion = GetBoundCompileUnit().GetConversion(thisParam->GetType(), classType->BaseClass()->AddPointer(span), containerScope, span);
             if (!thisToBaseConversion)
             {
                 throw Exception("base class conversion not found", span, classType->GetSpan());
@@ -1598,7 +1633,7 @@ bool ClassCopyConstructorOperation::GenerateImplementation(ClassCopyConstructor*
             BoundExpression* baseClassPointerConversion = new BoundConversion(std::unique_ptr<BoundExpression>(new BoundParameter(thisParam)), thisToBaseConversion);
             baseConstructorCallArguments.push_back(std::unique_ptr<BoundExpression>(baseClassPointerConversion));
             ParameterSymbol* thatParam = copyConstructor->Parameters()[1];
-            FunctionSymbol* thatToBaseConversion = GetBoundCompileUnit().GetConversion(thatParam->GetType(), classType->BaseClass()->AddConst(span)->AddLvalueReference(span), span);
+            FunctionSymbol* thatToBaseConversion = GetBoundCompileUnit().GetConversion(thatParam->GetType(), classType->BaseClass()->AddConst(span)->AddLvalueReference(span), containerScope, span);
             if (!thatToBaseConversion)
             {
                 throw Exception("base class conversion not found", span, classType->GetSpan());
@@ -1621,7 +1656,7 @@ bool ClassCopyConstructorOperation::GenerateImplementation(ClassCopyConstructor*
             }
             else
             {
-                FunctionSymbol* thisToHolderConversion = GetBoundCompileUnit().GetConversion(thisParam->GetType(), vmtPtrHolderClass->AddPointer(span), span);
+                FunctionSymbol* thisToHolderConversion = GetBoundCompileUnit().GetConversion(thisParam->GetType(), vmtPtrHolderClass->AddPointer(span), containerScope, span);
                 if (!thisToHolderConversion)
                 {
                     throw Exception("base class conversion not found", span, classType->GetSpan());
@@ -1738,10 +1773,14 @@ void ClassMoveConstructorOperation::CollectViableFunctions(ContainerScope* conta
                 function = moveConstructor.get();
                 function->SetSymbolTable(GetSymbolTable());
                 function->SetParent(classType);
-                function->SetWeakOdrLinkage();
+                function->SetLinkOnceOdrLinkage();
                 function->SetInline();
                 functionMap[classType] = function;
                 classType->AddMember(moveConstructor.release());
+            }
+            else
+            {
+                return;
             }
         }
         viableFunctions.insert(function);
@@ -1770,7 +1809,7 @@ bool ClassMoveConstructorOperation::GenerateImplementation(ClassMoveConstructor*
             baseConstructorCallLookups.push_back(FunctionScopeLookup(ScopeLookup::fileScopes, nullptr));
             std::vector<std::unique_ptr<BoundExpression>> baseConstructorCallArguments;
             ParameterSymbol* thisParam = moveConstructor->Parameters()[0];
-            FunctionSymbol* thisToBaseConversion = GetBoundCompileUnit().GetConversion(thisParam->GetType(), classType->BaseClass()->AddPointer(span), span);
+            FunctionSymbol* thisToBaseConversion = GetBoundCompileUnit().GetConversion(thisParam->GetType(), classType->BaseClass()->AddPointer(span), containerScope, span);
             if (!thisToBaseConversion)
             {
                 throw Exception("base class conversion not found", span, classType->GetSpan());
@@ -1778,7 +1817,7 @@ bool ClassMoveConstructorOperation::GenerateImplementation(ClassMoveConstructor*
             std::unique_ptr<BoundExpression> baseClassPointerConversion(new BoundConversion(std::unique_ptr<BoundExpression>(new BoundParameter(thisParam)), thisToBaseConversion));
             baseConstructorCallArguments.push_back(std::move(baseClassPointerConversion));
             ParameterSymbol* thatParam = moveConstructor->Parameters()[1];
-            FunctionSymbol* thatToBaseConversion = GetBoundCompileUnit().GetConversion(thatParam->GetType(), classType->BaseClass()->AddRvalueReference(span), span);
+            FunctionSymbol* thatToBaseConversion = GetBoundCompileUnit().GetConversion(thatParam->GetType(), classType->BaseClass()->AddRvalueReference(span), containerScope, span);
             if (!thatToBaseConversion)
             {
                 throw Exception("base class conversion not found", span, classType->GetSpan());
@@ -1801,7 +1840,7 @@ bool ClassMoveConstructorOperation::GenerateImplementation(ClassMoveConstructor*
             }
             else
             {
-                FunctionSymbol* thisToHolderConversion = GetBoundCompileUnit().GetConversion(thisParam->GetType(), vmtPtrHolderClass->AddPointer(span), span);
+                FunctionSymbol* thisToHolderConversion = GetBoundCompileUnit().GetConversion(thisParam->GetType(), vmtPtrHolderClass->AddPointer(span), containerScope, span);
                 if (!thisToHolderConversion)
                 {
                     throw Exception("base class conversion not found", span, classType->GetSpan());
@@ -1926,10 +1965,14 @@ void ClassCopyAssignmentOperation::CollectViableFunctions(ContainerScope* contai
                 function = copyAssignment.get();
                 function->SetSymbolTable(GetSymbolTable());
                 function->SetParent(classType);
-                function->SetWeakOdrLinkage();
+                function->SetLinkOnceOdrLinkage();
                 function->SetInline();
                 functionMap[classType] = function;
                 classType->AddMember(copyAssignment.release());
+            }
+            else
+            {
+                return;
             }
         }
         viableFunctions.insert(function);
@@ -1952,7 +1995,7 @@ bool ClassCopyAssignmentOperation::GenerateImplementation(ClassCopyAssignment* c
             baseAssignmentCallLookups.push_back(FunctionScopeLookup(ScopeLookup::fileScopes, nullptr));
             std::vector<std::unique_ptr<BoundExpression>> baseAssignmentCallArguments;
             ParameterSymbol* thisParam = copyAssignment->Parameters()[0];
-            FunctionSymbol* thisToBaseConversion = GetBoundCompileUnit().GetConversion(thisParam->GetType(), classType->BaseClass()->AddPointer(span), span);
+            FunctionSymbol* thisToBaseConversion = GetBoundCompileUnit().GetConversion(thisParam->GetType(), classType->BaseClass()->AddPointer(span), containerScope, span);
             if (!thisToBaseConversion)
             {
                 throw Exception("base class conversion not found", span, classType->GetSpan());
@@ -1960,7 +2003,7 @@ bool ClassCopyAssignmentOperation::GenerateImplementation(ClassCopyAssignment* c
             BoundExpression* baseClassPointerConversion = new BoundConversion(std::unique_ptr<BoundExpression>(new BoundParameter(thisParam)), thisToBaseConversion);
             baseAssignmentCallArguments.push_back(std::unique_ptr<BoundExpression>(baseClassPointerConversion));
             ParameterSymbol* thatParam = copyAssignment->Parameters()[1];
-            FunctionSymbol* thatToBaseConversion = GetBoundCompileUnit().GetConversion(thatParam->GetType(), classType->BaseClass()->AddConst(span)->AddLvalueReference(span), span);
+            FunctionSymbol* thatToBaseConversion = GetBoundCompileUnit().GetConversion(thatParam->GetType(), classType->BaseClass()->AddConst(span)->AddLvalueReference(span), containerScope, span);
             if (!thatToBaseConversion)
             {
                 throw Exception("base class conversion not found", span, classType->GetSpan());
@@ -2082,10 +2125,14 @@ void ClassMoveAssignmentOperation::CollectViableFunctions(ContainerScope* contai
                 function = moveAssignment.get();
                 function->SetSymbolTable(GetSymbolTable());
                 function->SetParent(classType);
-                function->SetWeakOdrLinkage();
+                function->SetLinkOnceOdrLinkage();
                 function->SetInline();
                 functionMap[classType] = function;
                 classType->AddMember(moveAssignment.release());
+            }
+            else
+            {
+                return;
             }
         }
         viableFunctions.insert(function);
@@ -2108,7 +2155,7 @@ bool ClassMoveAssignmentOperation::GenerateImplementation(ClassMoveAssignment* m
             baseAssignmentCallLookups.push_back(FunctionScopeLookup(ScopeLookup::fileScopes, nullptr));
             std::vector<std::unique_ptr<BoundExpression>> baseAssignmentCallArguments;
             ParameterSymbol* thisParam = moveAssignment->Parameters()[0];
-            FunctionSymbol* thisToBaseConversion = GetBoundCompileUnit().GetConversion(thisParam->GetType(), classType->BaseClass()->AddPointer(span), span);
+            FunctionSymbol* thisToBaseConversion = GetBoundCompileUnit().GetConversion(thisParam->GetType(), classType->BaseClass()->AddPointer(span), containerScope, span);
             if (!thisToBaseConversion)
             {
                 throw Exception("base class conversion not found", span, classType->GetSpan());
@@ -2116,7 +2163,7 @@ bool ClassMoveAssignmentOperation::GenerateImplementation(ClassMoveAssignment* m
             std::unique_ptr<BoundExpression> baseClassPointerConversion(new BoundConversion(std::unique_ptr<BoundExpression>(new BoundParameter(thisParam)), thisToBaseConversion));
             baseAssignmentCallArguments.push_back(std::move(baseClassPointerConversion));
             ParameterSymbol* thatParam = moveAssignment->Parameters()[1];
-            FunctionSymbol* thatToBaseConversion = GetBoundCompileUnit().GetConversion(thatParam->GetType(), classType->BaseClass()->AddRvalueReference(span), span);
+            FunctionSymbol* thatToBaseConversion = GetBoundCompileUnit().GetConversion(thatParam->GetType(), classType->BaseClass()->AddRvalueReference(span), containerScope, span);
             if (!thatToBaseConversion)
             {
                 throw Exception("base class conversion not found", span, classType->GetSpan());
@@ -2180,7 +2227,7 @@ void GenerateDestructorImplementation(BoundClass* boundClass, DestructorSymbol* 
             }
             else
             {
-                FunctionSymbol* thisToHolderConversion = boundCompileUnit.GetConversion(thisParam->GetType(), vmtPtrHolderClass->AddPointer(span), span);
+                FunctionSymbol* thisToHolderConversion = boundCompileUnit.GetConversion(thisParam->GetType(), vmtPtrHolderClass->AddPointer(span), containerScope, span);
                 if (!thisToHolderConversion)
                 {
                     throw Exception("base class conversion not found", span, classType->GetSpan());
@@ -2217,7 +2264,7 @@ void GenerateDestructorImplementation(BoundClass* boundClass, DestructorSymbol* 
             baseDestructorCallLookups.push_back(FunctionScopeLookup(ScopeLookup::fileScopes, nullptr));
             std::vector<std::unique_ptr<BoundExpression>> baseDestructorCallArguments;
             ParameterSymbol* thisParam = destructorSymbol->Parameters()[0];
-            FunctionSymbol* thisToBaseConversion = boundCompileUnit.GetConversion(thisParam->GetType(), classType->BaseClass()->AddPointer(span), span);
+            FunctionSymbol* thisToBaseConversion = boundCompileUnit.GetConversion(thisParam->GetType(), classType->BaseClass()->AddPointer(span), containerScope, span);
             if (!thisToBaseConversion)
             {
                 throw Exception("base class conversion not found", span, classType->GetSpan());
@@ -2413,10 +2460,6 @@ void GenerateClassInitialization(ConstructorSymbol* constructorSymbol, Construct
         {
             throw Exception("cannot create default initialization for class '" + ToUtf8(classType->FullName()) + "'. Reason: class is static", constructorNode->GetSpan());
         }
-        if (classType->IsAbstract())
-        {
-            throw Exception("cannot create default initialization for class '" + ToUtf8(classType->FullName()) + "'. Reason: class is abstract", constructorNode->GetSpan());
-        }
     }
     try
     { 
@@ -2499,7 +2542,8 @@ void GenerateClassInitialization(ConstructorSymbol* constructorSymbol, Construct
             lookups.push_back(FunctionScopeLookup(ScopeLookup::this_, classType->BaseClass()->GetContainerScope()));
             lookups.push_back(FunctionScopeLookup(ScopeLookup::fileScopes, nullptr));
             std::vector<std::unique_ptr<BoundExpression>> arguments;
-            FunctionSymbol* thisToBaseConversion = boundCompileUnit.GetConversion(thisParam->GetType(), classType->BaseClass()->AddPointer(constructorNode->GetSpan()), constructorNode->GetSpan());
+            FunctionSymbol* thisToBaseConversion = boundCompileUnit.GetConversion(thisParam->GetType(), classType->BaseClass()->AddPointer(constructorNode->GetSpan()), containerScope, 
+                constructorNode->GetSpan());
             if (!thisToBaseConversion)
             {
                 throw Exception("base class conversion not found", constructorNode->GetSpan(), classType->GetSpan());
@@ -2523,7 +2567,8 @@ void GenerateClassInitialization(ConstructorSymbol* constructorSymbol, Construct
             lookups.push_back(FunctionScopeLookup(ScopeLookup::this_, classType->BaseClass()->GetContainerScope()));
             lookups.push_back(FunctionScopeLookup(ScopeLookup::fileScopes, nullptr));
             std::vector<std::unique_ptr<BoundExpression>> arguments;
-            FunctionSymbol* thisToBaseConversion = boundCompileUnit.GetConversion(thisParam->GetType(), classType->BaseClass()->AddPointer(constructorNode->GetSpan()), constructorNode->GetSpan());
+            FunctionSymbol* thisToBaseConversion = boundCompileUnit.GetConversion(thisParam->GetType(), classType->BaseClass()->AddPointer(constructorNode->GetSpan()), containerScope, 
+                constructorNode->GetSpan());
             if (!thisToBaseConversion)
             {
                 throw Exception("base class conversion not found", constructorNode->GetSpan(), classType->GetSpan());
@@ -2535,7 +2580,7 @@ void GenerateClassInitialization(ConstructorSymbol* constructorSymbol, Construct
             {
                 ParameterSymbol* thatParam = constructorSymbol->Parameters()[1];
                 FunctionSymbol* thatToBaseConversion = boundCompileUnit.GetConversion(thatParam->GetType(), 
-                    classType->BaseClass()->AddConst(constructorNode->GetSpan())->AddLvalueReference(constructorNode->GetSpan()), constructorNode->GetSpan());
+                    classType->BaseClass()->AddConst(constructorNode->GetSpan())->AddLvalueReference(constructorNode->GetSpan()), containerScope, constructorNode->GetSpan());
                 if (!thatToBaseConversion)
                 {
                     throw Exception("base class conversion not found", constructorNode->GetSpan(), classType->GetSpan());
@@ -2557,7 +2602,8 @@ void GenerateClassInitialization(ConstructorSymbol* constructorSymbol, Construct
             }
             else
             {
-                FunctionSymbol* thisToHolderConversion = boundCompileUnit.GetConversion(thisParam->GetType(), vmtPtrHolderClass->AddPointer(constructorNode->GetSpan()), constructorNode->GetSpan());
+                FunctionSymbol* thisToHolderConversion = boundCompileUnit.GetConversion(thisParam->GetType(), vmtPtrHolderClass->AddPointer(constructorNode->GetSpan()), containerScope, 
+                    constructorNode->GetSpan());
                 if (!thisToHolderConversion)
                 {
                     throw Exception("base class conversion not found", constructorNode->GetSpan(), classType->GetSpan());
@@ -2685,10 +2731,6 @@ void GenerateClassAssignment(MemberFunctionSymbol* assignmentFunctionSymbol, Mem
         {
             throw Exception("cannot create default assigment for class '" + ToUtf8(classType->FullName()) + "'. Reason: class is static", assignmentNode->GetSpan());
         }
-        if (classType->IsAbstract())
-        {
-            throw Exception("cannot create default assigment for class '" + ToUtf8(classType->FullName()) + "'. Reason: class is abstract", assignmentNode->GetSpan());
-        }
     }
     try
     {
@@ -2703,7 +2745,8 @@ void GenerateClassAssignment(MemberFunctionSymbol* assignmentFunctionSymbol, Mem
                 lookups.push_back(FunctionScopeLookup(ScopeLookup::this_, classType->BaseClass()->GetContainerScope()));
                 lookups.push_back(FunctionScopeLookup(ScopeLookup::fileScopes, nullptr));
                 std::vector<std::unique_ptr<BoundExpression>> arguments;
-                FunctionSymbol* thisToBaseConversion = boundCompileUnit.GetConversion(thisParam->GetType(), classType->BaseClass()->AddPointer(assignmentNode->GetSpan()), assignmentNode->GetSpan());
+                FunctionSymbol* thisToBaseConversion = boundCompileUnit.GetConversion(thisParam->GetType(), classType->BaseClass()->AddPointer(assignmentNode->GetSpan()), containerScope, 
+                    assignmentNode->GetSpan());
                 if (!thisToBaseConversion)
                 {
                     throw Exception("base class conversion not found", assignmentNode->GetSpan(), classType->GetSpan());
@@ -2712,7 +2755,7 @@ void GenerateClassAssignment(MemberFunctionSymbol* assignmentFunctionSymbol, Mem
                 arguments.push_back(std::unique_ptr<BoundExpression>(baseClassPointerConversion));
                 ParameterSymbol* thatParam = assignmentFunctionSymbol->Parameters()[1];
                 FunctionSymbol* thatToBaseConversion = boundCompileUnit.GetConversion(thatParam->GetType(),
-                    classType->BaseClass()->AddConst(assignmentNode->GetSpan())->AddLvalueReference(assignmentNode->GetSpan()), assignmentNode->GetSpan());
+                    classType->BaseClass()->AddConst(assignmentNode->GetSpan())->AddLvalueReference(assignmentNode->GetSpan()), containerScope, assignmentNode->GetSpan());
                 if (!thatToBaseConversion)
                 {
                     throw Exception("base class conversion not found", assignmentNode->GetSpan(), classType->GetSpan());
@@ -2758,7 +2801,8 @@ void GenerateClassAssignment(MemberFunctionSymbol* assignmentFunctionSymbol, Mem
                 lookups.push_back(FunctionScopeLookup(ScopeLookup::this_, classType->BaseClass()->GetContainerScope()));
                 lookups.push_back(FunctionScopeLookup(ScopeLookup::fileScopes, nullptr));
                 std::vector<std::unique_ptr<BoundExpression>> arguments;
-                FunctionSymbol* thisToBaseConversion = boundCompileUnit.GetConversion(thisParam->GetType(), classType->BaseClass()->AddPointer(assignmentNode->GetSpan()), assignmentNode->GetSpan());
+                FunctionSymbol* thisToBaseConversion = boundCompileUnit.GetConversion(thisParam->GetType(), classType->BaseClass()->AddPointer(assignmentNode->GetSpan()), containerScope, 
+                    assignmentNode->GetSpan());
                 if (!thisToBaseConversion)
                 {
                     throw Exception("base class conversion not found", assignmentNode->GetSpan(), classType->GetSpan());
@@ -2767,7 +2811,7 @@ void GenerateClassAssignment(MemberFunctionSymbol* assignmentFunctionSymbol, Mem
                 arguments.push_back(std::unique_ptr<BoundExpression>(baseClassPointerConversion));
                 ParameterSymbol* thatParam = assignmentFunctionSymbol->Parameters()[1];
                 FunctionSymbol* thatToBaseConversion = boundCompileUnit.GetConversion(thatParam->GetType(),
-                    classType->BaseClass()->AddRvalueReference(assignmentNode->GetSpan()), assignmentNode->GetSpan());
+                    classType->BaseClass()->AddRvalueReference(assignmentNode->GetSpan()), containerScope, assignmentNode->GetSpan());
                 if (!thatToBaseConversion)
                 {
                     throw Exception("base class conversion not found", assignmentNode->GetSpan(), classType->GetSpan());
@@ -2831,7 +2875,8 @@ void GenerateClassTermination(DestructorSymbol* destructorSymbol, DestructorNode
             }
             else
             {
-                FunctionSymbol* thisToHolderConversion = boundCompileUnit.GetConversion(thisParam->GetType(), vmtPtrHolderClass->AddPointer(destructorNode->GetSpan()), destructorNode->GetSpan());
+                FunctionSymbol* thisToHolderConversion = boundCompileUnit.GetConversion(thisParam->GetType(), vmtPtrHolderClass->AddPointer(destructorNode->GetSpan()), containerScope, 
+                    destructorNode->GetSpan());
                 if (!thisToHolderConversion)
                 {
                     throw Exception("base class conversion not found", destructorNode->GetSpan(), classType->GetSpan());
@@ -2867,7 +2912,8 @@ void GenerateClassTermination(DestructorSymbol* destructorSymbol, DestructorNode
             baseDestructorCallLookups.push_back(FunctionScopeLookup(ScopeLookup::this_, classType->BaseClass()->GetContainerScope()));
             baseDestructorCallLookups.push_back(FunctionScopeLookup(ScopeLookup::fileScopes, nullptr));
             std::vector<std::unique_ptr<BoundExpression>> baseDestructorCallArguments;
-            FunctionSymbol* thisToBaseConversion = boundCompileUnit.GetConversion(thisParam->GetType(), classType->BaseClass()->AddPointer(destructorNode->GetSpan()), destructorNode->GetSpan());
+            FunctionSymbol* thisToBaseConversion = boundCompileUnit.GetConversion(thisParam->GetType(), classType->BaseClass()->AddPointer(destructorNode->GetSpan()), containerScope, 
+                destructorNode->GetSpan());
             if (!thisToBaseConversion)
             {
                 throw Exception("base class conversion not found", destructorNode->GetSpan(), classType->GetSpan());

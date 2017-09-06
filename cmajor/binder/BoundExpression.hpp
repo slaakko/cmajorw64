@@ -34,6 +34,9 @@ inline BoundExpressionFlags operator&(BoundExpressionFlags left, BoundExpression
     return BoundExpressionFlags(uint8_t(left) & uint8_t(right));
 }
 
+class BoundFunctionCall;
+class BoundFunction;
+
 class BoundExpression : public BoundNode
 {
 public:
@@ -47,9 +50,12 @@ public:
     TypeSymbol* GetType() { return type; }
     bool GetFlag(BoundExpressionFlags flag) const { return (flags & flag) != BoundExpressionFlags::none;  }
     void SetFlag(BoundExpressionFlags flag) { flags = flags | flag; }
+    void AddTemporaryDestructorCall(std::unique_ptr<BoundFunctionCall>&& destructorCall);
+    void DestroyTemporaries(Emitter& emitter);
 private:
     TypeSymbol* type;
     BoundExpressionFlags flags;
+    std::vector<std::unique_ptr<BoundFunctionCall>> temporaryDestructorCalls;
 };
 
 class BoundParameter : public BoundExpression
@@ -432,12 +438,15 @@ public:
     void SetScopeQualified() { scopeQualified = true; }
     ContainerScope* QualifiedScope() const { return qualifiedScope; }
     void SetQualifiedScope(ContainerScope* qualifiedScope_) { qualifiedScope = qualifiedScope_; }
+    void SetTemplateArgumentTypes(const std::vector<TypeSymbol*>& templateArgumentTypes_);
+    const std::vector<TypeSymbol*>& TemplateArgumentTypes() const { return templateArgumentTypes; }
 private:
     FunctionGroupSymbol* functionGroupSymbol;
     std::unique_ptr<TypeSymbol> functionGroupType;
     std::unique_ptr<BoundExpression> classPtr;
     bool scopeQualified;
     ContainerScope* qualifiedScope;
+    std::vector<TypeSymbol*> templateArgumentTypes;
 };
 
 class BoundMemberExpression : public BoundExpression

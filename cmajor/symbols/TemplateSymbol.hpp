@@ -25,6 +25,7 @@ class BoundTemplateParameterSymbol : public Symbol
 public:
     BoundTemplateParameterSymbol(const Span& span_, const std::u32string& name_);
     std::u32string FullName() const override { return Name(); }
+    bool IsExportSymbol() const override { return false; }
     TypeSymbol* GetType() const { return type; }
     void SetType(TypeSymbol* type_) { type = type_; }
 private:

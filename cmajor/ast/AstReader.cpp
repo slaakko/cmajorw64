@@ -10,7 +10,7 @@
 
 namespace cmajor { namespace ast {
 
-AstReader::AstReader(const std::string& fileName_) : binaryReader(fileName_)
+AstReader::AstReader(const std::string& fileName_) : binaryReader(fileName_), replaceFileIndex(-1), fileIndexOffset(-1)
 {
 }
 
@@ -129,6 +129,14 @@ Span AstReader::ReadSpan()
     else
     {
         uint32_t fileIndex = binaryReader.ReadEncodedUInt();
+        if (replaceFileIndex != -1)
+        {
+            fileIndex = replaceFileIndex;
+        }
+        else if (fileIndexOffset != -1)
+        {
+            fileIndex += fileIndexOffset;
+        }
         uint32_t lineNumber = binaryReader.ReadEncodedUInt();
         uint32_t start = binaryReader.ReadEncodedUInt();
         uint32_t end = binaryReader.ReadEncodedUInt();

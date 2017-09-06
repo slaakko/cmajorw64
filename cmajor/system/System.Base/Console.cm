@@ -1,0 +1,174 @@
+// =================================
+// Copyright (c) 2017 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System.IO;
+
+namespace System
+{
+    public static class Console
+    {
+        static Console() : out(new OutputFileStream(stdout)), err(new OutputFileStream(stderr))
+        {
+        }
+        public static void Write(const char* s)
+        {
+            out->Write(s);
+        }
+        public static void Write(const wchar* s)
+        {
+            out->Write(s);
+        }
+        public static void Write(const uchar* s)
+        {
+            out->Write(s);
+        }
+        public static void Write(const string& s)
+        {
+            out->Write(s);
+        }
+        public static void Write(const wstring& s)
+        {
+            out->Write(s);
+        }
+        public static void Write(const ustring& s)
+        {
+            out->Write(s);
+        }
+        public static void Write(bool b)
+        {
+            out->Write(b);
+        }
+        public static void Write(sbyte s)
+        {
+            out->Write(s);
+        }
+        public static void Write(byte b)
+        {
+            out->Write(b);
+        }
+        public static void Write(short s)
+        {
+            out->Write(s);
+        }
+        public static void Write(ushort u)
+        {
+            out->Write(u);
+        }
+        public static void Write(int i)
+        {
+            out->Write(i);
+        }
+        public static void Write(uint u)
+        {
+            out->Write(u);
+        }
+        public static void Write(long l)
+        {
+            out->Write(l);
+        }
+        public static void Write(ulong u)
+        {
+            out->Write(u);
+        }
+        public static void Write(float f)
+        {
+            out->Write(f);
+        }
+        public static void Write(double d)
+        {
+            out->Write(d);
+        }
+        public static void WriteLine()
+        {
+            out->WriteLine();
+        }
+        public static void WriteLine(const char* s)
+        {
+            out->WriteLine(s);
+        }
+        public static void WriteLine(const wchar* s)
+        {
+            out->WriteLine(s);
+        }
+        public static void WriteLine(const uchar* s)
+        {
+            out->WriteLine(s);
+        }
+        public static void WriteLine(const string& s)
+        {
+            out->WriteLine(s);
+        }
+        public static void WriteLine(const wstring& s)
+        {
+            out->WriteLine(s);
+        }
+        public static void WriteLine(const ustring& s)
+        {
+            out->WriteLine(s);
+        }
+        public static void WriteLine(bool b)
+        {
+            out->WriteLine(b);
+        }
+        public static void WriteLine(sbyte s)
+        {
+            out->WriteLine(s);
+        }
+        public static void WriteLine(byte b)
+        {
+            out->WriteLine(b);
+        }
+        public static void WriteLine(short s)
+        {
+            out->WriteLine(s);
+        }
+        public static void WriteLine(ushort u)
+        {
+            out->WriteLine(u);
+        }
+        public static void WriteLine(int i)
+        {
+            out->WriteLine(i);
+        }
+        public static void WriteLine(uint u)
+        {
+            out->WriteLine(u);
+        }
+        public static void WriteLine(long l)
+        {
+            out->WriteLine(l);
+        }
+        public static void WriteLine(ulong u)
+        {
+            out->WriteLine(u);
+        }
+        public static void WriteLine(float f)
+        {
+            out->WriteLine(f);
+        }
+        public static void WriteLine(double d)
+        {
+            out->WriteLine(d);
+        }
+        public static void SetOut(UniquePtr<OutputStream>&& out_)
+        {
+            out = Rvalue(out_);
+        }
+        public static void SetErr(UniquePtr<OutputStream>&& err_)
+        {
+            err = Rvalue(err_);
+        }
+        public static OutputStream& Out()
+        {
+            return *out;
+        }
+        public static OutputStream& Error()
+        {
+            return *err;
+        }
+        private static UniquePtr<OutputStream> out;
+        private static UniquePtr<OutputStream> err;
+    }
+}

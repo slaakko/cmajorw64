@@ -113,4 +113,98 @@ void EnumConstantSymbol::SetValue(Value* value_)
     value.reset(value_);
 }
 
+EnumTypeToUnderlyingTypeConversion::EnumTypeToUnderlyingTypeConversion(const Span& span_, const std::u32string& name_) : 
+    FunctionSymbol(SymbolType::enumTypeToUnderlyingType, span_, name_), sourceType(), targetType()
+{
+}
+
+EnumTypeToUnderlyingTypeConversion::EnumTypeToUnderlyingTypeConversion(const Span& span_, const std::u32string& name_, TypeSymbol* sourceType_, TypeSymbol* targetType_) : 
+    FunctionSymbol(SymbolType::enumTypeToUnderlyingType, span_, name_), sourceType(sourceType_), targetType(targetType_)
+{
+    SetConversion();
+}
+
+void EnumTypeToUnderlyingTypeConversion::Write(SymbolWriter& writer)
+{
+    FunctionSymbol::Write(writer);
+    writer.GetBinaryWriter().WriteEncodedUInt(sourceType->TypeId());
+    writer.GetBinaryWriter().WriteEncodedUInt(targetType->TypeId());
+}
+
+void EnumTypeToUnderlyingTypeConversion::Read(SymbolReader& reader)
+{
+    FunctionSymbol::Read(reader);
+    uint32_t sourceTypeId = reader.GetBinaryReader().ReadEncodedUInt();
+    GetSymbolTable()->EmplaceTypeRequest(this, sourceTypeId, 1);
+    uint32_t targetTypeId = reader.GetBinaryReader().ReadEncodedUInt();
+    GetSymbolTable()->EmplaceTypeRequest(this, targetTypeId, 2);
+}
+
+void EnumTypeToUnderlyingTypeConversion::EmplaceType(TypeSymbol* typeSymbol, int index)
+{
+    if (index == 1)
+    {
+        sourceType = typeSymbol;
+    }
+    else if (index == 2)
+    {
+        targetType = typeSymbol;
+    }
+    else
+    {
+        FunctionSymbol::EmplaceType(typeSymbol, index);
+    }
+}
+
+void EnumTypeToUnderlyingTypeConversion::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags)
+{
+}
+
+UnderlyingTypeToEnumTypeConversion::UnderlyingTypeToEnumTypeConversion(const Span& span_, const std::u32string& name_)
+    : FunctionSymbol(SymbolType::underlyingToEnumType, span_, name_), sourceType(), targetType()
+{
+}
+
+UnderlyingTypeToEnumTypeConversion::UnderlyingTypeToEnumTypeConversion(const Span& span_, const std::u32string& name_, TypeSymbol* sourceType_, TypeSymbol* targetType_)
+    : FunctionSymbol(SymbolType::underlyingToEnumType, span_, name_), sourceType(sourceType_), targetType(targetType_)
+{
+    SetConversion();
+}
+
+void UnderlyingTypeToEnumTypeConversion::Write(SymbolWriter& writer)
+{
+    FunctionSymbol::Write(writer);
+    writer.GetBinaryWriter().WriteEncodedUInt(sourceType->TypeId());
+    writer.GetBinaryWriter().WriteEncodedUInt(targetType->TypeId());
+}
+
+void UnderlyingTypeToEnumTypeConversion::Read(SymbolReader& reader)
+{
+    FunctionSymbol::Read(reader);
+    uint32_t sourceTypeId = reader.GetBinaryReader().ReadEncodedUInt();
+    GetSymbolTable()->EmplaceTypeRequest(this, sourceTypeId, 1);
+    uint32_t targetTypeId = reader.GetBinaryReader().ReadEncodedUInt();
+    GetSymbolTable()->EmplaceTypeRequest(this, targetTypeId, 2);
+}
+
+void UnderlyingTypeToEnumTypeConversion::EmplaceType(TypeSymbol* typeSymbol, int index)
+{
+    if (index == 1)
+    {
+        sourceType = typeSymbol;
+    }
+    else if (index == 2)
+    {
+        targetType = typeSymbol;
+    }
+    else
+    {
+        FunctionSymbol::EmplaceType(typeSymbol, index);
+    }
+}
+
+void UnderlyingTypeToEnumTypeConversion::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags)
+{
+}
+
 } } // namespace cmajor::symbols

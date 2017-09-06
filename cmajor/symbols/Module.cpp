@@ -7,6 +7,7 @@
 #include <cmajor/symbols/SymbolWriter.hpp>
 #include <cmajor/symbols/SymbolReader.hpp>
 #include <cmajor/symbols/GlobalFlags.hpp>
+#include <cmajor/parser/FileRegistry.hpp>
 #include <cmajor/ast/Project.hpp>
 #include <cmajor/util/Path.hpp>
 #include <cmajor/util/Unicode.hpp>
@@ -15,6 +16,7 @@
 namespace cmajor { namespace symbols {
 
 using namespace cmajor::unicode;
+using namespace cmajor::parser;
 
 class SystemModuleSet
 {
@@ -162,7 +164,8 @@ Module::Module(const std::u32string& name_, const std::string& filePath_) :
     }
 }
 
-void Module::PrepareForCompilation(const std::vector<std::string>& references, const std::vector<std::string>& sourceFilePaths)
+void Module::PrepareForCompilation(const std::vector<std::string>& references, const std::vector<std::string>& sourceFilePaths, 
+    std::vector<ClassTypeSymbol*>& classTypes, std::vector<ClassTemplateSpecializationSymbol*>& classTemplateSpecializations)
 {
     boost::filesystem::path mfd = originalFilePath;
     mfd.remove_filename();
@@ -174,7 +177,7 @@ void Module::PrepareForCompilation(const std::vector<std::string>& references, c
     }
     this->sourceFilePaths = sourceFilePaths;
     std::unordered_set<std::string> importSet;
-    const Module* rootModule = this;
+    Module* rootModule = this;
     std::vector<Module*> modules;
     std::unordered_map<std::string, ModuleDependency*> moduleDependencyMap;
     std::unordered_map<std::string, Module*> readMap;
@@ -198,7 +201,7 @@ void Module::PrepareForCompilation(const std::vector<std::string>& references, c
             libraryFilePaths.push_back(module->LibraryFilePath());
         }
     }
-    FinishReads(rootModule, finishReadOrder, finishReadOrder.size() - 2);
+    FinishReads(rootModule, finishReadOrder, finishReadOrder.size() - 2, classTypes, classTemplateSpecializations);
 }
 
 void Module::Write(SymbolWriter& writer)
@@ -221,10 +224,22 @@ void Module::Write(SymbolWriter& writer)
     {
         writer.GetBinaryWriter().Write(sourceFilePaths[i]);
     }
+    uint32_t efn = exportedFunctions.size();
+    writer.GetBinaryWriter().WriteEncodedUInt(efn);
+    for (uint32_t i = 0; i < efn; ++i)
+    {
+        writer.GetBinaryWriter().Write(exportedFunctions[i]);
+    }
+    uint32_t edn = exportedData.size();
+    writer.GetBinaryWriter().WriteEncodedUInt(edn);
+    for (uint32_t i = 0; i < edn; ++i)
+    {
+        writer.GetBinaryWriter().Write(exportedData[i]);
+    }
     symbolTable.Write(writer);
 }
 
-void Module::ReadHeader(SymbolReader& reader, const Module* rootModule, std::unordered_set<std::string>& importSet, std::vector<Module*>& modules,
+void Module::ReadHeader(SymbolReader& reader, Module* rootModule, std::unordered_set<std::string>& importSet, std::vector<Module*>& modules,
     std::unordered_map<std::string, ModuleDependency*>& dependencyMap, std::unordered_map<std::string, Module*>& readMap)
 {
     ModuleTag expectedTag;
@@ -259,17 +274,37 @@ void Module::ReadHeader(SymbolReader& reader, const Module* rootModule, std::uno
     uint32_t ns = reader.GetBinaryReader().ReadEncodedUInt();
     for (uint32_t i = 0; i < ns; ++i)
     {
-        sourceFilePaths.push_back(reader.GetBinaryReader().ReadUtf8String());
+        std::string sourceFilePath = reader.GetBinaryReader().ReadUtf8String();
+        sourceFilePaths.push_back(sourceFilePath);
     }
     if (!sourceFilePaths.empty())
     {
         libraryFilePath = GetFullPath(boost::filesystem::path(filePathReadFrom).replace_extension(".lib").generic_string());
     }
+    uint32_t efn = reader.GetBinaryReader().ReadEncodedUInt();
+    for (uint32_t i = 0; i < efn; ++i)
+    {
+        exportedFunctions.push_back(reader.GetBinaryReader().ReadUtf8String());
+    }
+    for (const std::string& exportedFunction : exportedFunctions)
+    {
+        rootModule->allExportedFunctions.push_back(exportedFunction);
+    }
+    uint32_t edn = reader.GetBinaryReader().ReadEncodedUInt();
+    for (uint32_t i = 0; i < edn; ++i)
+    {
+        exportedData.push_back(reader.GetBinaryReader().ReadUtf8String());
+    }
+    for (const std::string& data : exportedData)
+    {
+        rootModule->allExportedData.push_back(data);
+    }
     symbolTablePos = reader.GetBinaryReader().Pos();
     ImportModules(rootModule, importSet, modules, dependencyMap, readMap);
 }
 
-void Module::FinishReads(const Module* rootModule, std::vector<Module*>& finishReadOrder, int prevModuleIndex)
+void Module::FinishReads(Module* rootModule, std::vector<Module*>& finishReadOrder, int prevModuleIndex,
+    std::vector<ClassTypeSymbol*>& classTypes, std::vector<ClassTemplateSpecializationSymbol*>& classTemplateSpecializations)
 {
     Module* prevModule = nullptr;
     if (prevModuleIndex >= 0)
@@ -278,7 +313,7 @@ void Module::FinishReads(const Module* rootModule, std::vector<Module*>& finishR
     }
     if (prevModule)
     {
-        prevModule->FinishReads(rootModule, finishReadOrder, prevModuleIndex - 1);
+        prevModule->FinishReads(rootModule, finishReadOrder, prevModuleIndex - 1, classTypes, classTemplateSpecializations);
         symbolTable.Import(prevModule->symbolTable);
     }
     if (this != rootModule)
@@ -287,6 +322,8 @@ void Module::FinishReads(const Module* rootModule, std::vector<Module*>& finishR
         reader.SetModule(this);
         reader.GetBinaryReader().Skip(symbolTablePos);
         symbolTable.Read(reader);
+        classTypes.insert(classTypes.end(), reader.ClassTypes().begin(), reader.ClassTypes().end());
+        classTemplateSpecializations.insert(classTemplateSpecializations.end(), reader.ClassTemplateSpecializations().begin(), reader.ClassTemplateSpecializations().end());
     }
 }
 
@@ -295,13 +332,13 @@ void Module::SetDirectoryPath(const std::string& directoryPath_)
     directoryPath = directoryPath_;
 }
 
-void Module::ImportModules(const Module* rootModule, std::unordered_set<std::string>& importSet, std::vector<Module*>& modules,
+void Module::ImportModules(Module* rootModule, std::unordered_set<std::string>& importSet, std::vector<Module*>& modules,
     std::unordered_map<std::string, ModuleDependency*>& dependencyMap, std::unordered_map<std::string, Module*>& readMap)
 {
     ImportModules(referenceFilePaths, importSet, rootModule, modules, dependencyMap, readMap);
 }
 
-void Module::ImportModules(const std::vector<std::string>& references, std::unordered_set<std::string>& importSet, const Module* rootModule, std::vector<Module*>& modules,
+void Module::ImportModules(const std::vector<std::string>& references, std::unordered_set<std::string>& importSet, Module* rootModule, std::vector<Module*>& modules,
     std::unordered_map<std::string, ModuleDependency*>& moduleDependencyMap, std::unordered_map<std::string, Module*>& readMap)
 {
     std::vector<std::string> allReferences = references;
@@ -312,7 +349,7 @@ void Module::ImportModules(const std::vector<std::string>& references, std::unor
     Import(allReferences, importSet, rootModule, modules, moduleDependencyMap, readMap);
 }
 
-void Module::Import(const std::vector<std::string>& references, std::unordered_set<std::string>& importSet, const Module* rootModule, std::vector<Module*>& modules, 
+void Module::Import(const std::vector<std::string>& references, std::unordered_set<std::string>& importSet, Module* rootModule, std::vector<Module*>& modules, 
     std::unordered_map<std::string, ModuleDependency*>& moduleDependencyMap, std::unordered_map<std::string, Module*>& readMap)
 {
     for (const std::string& reference : references)
@@ -409,6 +446,16 @@ void Module::Import(const std::vector<std::string>& references, std::unordered_s
             }
         }
     }
+}
+
+void Module::AddExportedFunction(const std::string& exportedFunction)
+{
+    exportedFunctions.push_back(exportedFunction);
+}
+
+void Module::AddExportedData(const std::string& data)
+{
+    exportedData.push_back(data);
 }
 
 void InitModule()

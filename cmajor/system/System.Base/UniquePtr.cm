@@ -12,7 +12,7 @@ namespace System
         public nothrow UniquePtr() : ptr(null)
         {
         }
-        public nothrow UniquePtr(T* ptr_) : ptr(ptr_)
+        public explicit nothrow UniquePtr(T* ptr_) : ptr(ptr_)
         {
         }
         suppress UniquePtr(const Self&);

@@ -42,7 +42,7 @@ const char* symbolTypeStr[uint8_t(SymbolType::maxSymbol)] =
     "basicTypeCopyAssignment", "basicTypeMoveAssignment", "basicTypeReturn",
     "basicTypeImplicitSignExtension", "basicTypeImplicitZeroExtension", "basicTypeExplicitSignExtension", "basicTypeExplicitZeroExtension", "basicTypeTruncation", "basicTypeBitCast",
     "basicTypeImplicitUnsignedIntToFloating", "basicTypeImplicitSignedIntToFloating", "basicTypeExplicitUnsignedIntToFloating", "basicTypeExplicitSignedIntToFloating",
-    "basicTypeFloatingToUnsignedInt", "basicTypeFloatingToSignedInt", "basicTypeFloatingExtension", "basicTypeFloatingTruncation",
+    "basicTypeFloatingToUnsignedInt", "basicTypeFloatingToSignedInt", "basicTypeFloatingExtension", "basicTypeFloatingTruncation", "enumTypeToUnderlyingType", "underlyingToEnumType",
     "namespaceTypeSymbol", "functionGroupTypeSymbol", "memberExpressionTypeSymbol", "valueSymbol"
 };
 
@@ -768,6 +768,8 @@ SymbolFactory::SymbolFactory()
     Register(SymbolType::basicTypeFloatingToSignedInt, new ConcreteSymbolCreator<BasicTypeFloatingToSignedIntOperation>());
     Register(SymbolType::basicTypeFloatingExtension, new ConcreteSymbolCreator<BasicTypeFloatingExtensionOperation>());
     Register(SymbolType::basicTypeFloatingTruncation, new ConcreteSymbolCreator<BasicTypeFloatingTruncationOperation>());
+    Register(SymbolType::enumTypeToUnderlyingType, new ConcreteSymbolCreator<EnumTypeToUnderlyingTypeConversion>());
+    Register(SymbolType::underlyingToEnumType, new ConcreteSymbolCreator<UnderlyingTypeToEnumTypeConversion>());
 }
 
 Symbol* SymbolFactory::CreateSymbol(SymbolType symbolType, const Span& span, const std::u32string& name)

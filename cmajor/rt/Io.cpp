@@ -22,7 +22,9 @@ public:
     static void Init();
     static void Done();
     static FileTable& Instance() { Assert(instance, "file table not initialized"); return *instance; }
-    void WriteFile(int32_t fileHandle, const uint8_t* buffer, int32_t count);
+    int32_t OpenFile(const char* filePath, OpenMode openMode);
+    void CloseFile(int32_t fileHandle);
+    void WriteFile(int32_t fileHandle, const uint8_t* buffer, int64_t count);
 private:
     static std::unique_ptr<FileTable> instance;
     const int32_t maxNoLockFileHandles = 256;
@@ -49,9 +51,10 @@ void FileTable::Done()
     instance.reset();
 }
 
-FileTable::FileTable() : stdoutInUtf16Mode(false), stderrInUtf16Mode(false)
+FileTable::FileTable() : stdoutInUtf16Mode(false), stderrInUtf16Mode(false), nextFileHandle(3)
 {
     files.resize(maxNoLockFileHandles);
+    filePaths.resize(maxNoLockFileHandles);
     files[0] = stdin;
     files[1] = stdout;
     files[2] = stderr;
@@ -83,7 +86,124 @@ FileTable::~FileTable()
     }
 }
 
-void FileTable::WriteFile(int32_t fileHandle, const uint8_t* buffer, int32_t count)
+int32_t FileTable::OpenFile(const char* filePath, OpenMode openMode)
+{
+    const char* mode = nullptr;
+    if ((openMode & OpenMode::read) != OpenMode::none)
+    {
+        if ((openMode & (OpenMode::write | OpenMode::append)) != OpenMode::none)
+        {
+            throw FileSystemError("open mode not supported");
+        }
+        if ((openMode & OpenMode::binary) != OpenMode::none)
+        {
+            mode = "rb";
+        }
+        else
+        {
+            mode = "r";
+        }
+    }
+    else if ((openMode & OpenMode::write) != OpenMode::none)
+    {
+        if ((openMode & (OpenMode::read | OpenMode::append)) != OpenMode::none)
+        {
+            throw FileSystemError("open mode not supported");
+        }
+        if ((openMode & OpenMode::binary) != OpenMode::none)
+        {
+            mode = "wb";
+        }
+        else
+        {
+            mode = "w";
+        }
+    }
+    else if ((openMode & OpenMode::append) != OpenMode::none)
+    {
+        if ((openMode & (OpenMode::read | OpenMode::write)) != OpenMode::none)
+        {
+            throw FileSystemError("open mode not supported");
+        }
+        if ((openMode & OpenMode::binary) != OpenMode::none)
+        {
+            mode = "ab";
+        }
+        else
+        {
+            mode = "a";
+        }
+    }
+    else
+    {
+        throw FileSystemError("open mode supported");
+    }
+    FILE* file = std::fopen(filePath, mode);
+    if (!file)
+    {
+        throw FileSystemError("could not open file '" + std::string(filePath) + "': " + strerror(errno));
+    }
+    int32_t fileHandle = nextFileHandle++;
+    if (fileHandle < maxNoLockFileHandles)
+    {
+        files[fileHandle] = file;
+        filePaths[fileHandle] = filePath;
+    }
+    else
+    {
+        std::lock_guard<std::mutex> lock(mtx);
+        fileMap[fileHandle] = file;
+        filePathMap[fileHandle] = filePath;
+    }
+    return fileHandle;
+}
+
+void FileTable::CloseFile(int32_t fileHandle)
+{
+    FILE* file = nullptr;
+    std::string filePath;
+    if (fileHandle < 0)
+    {
+        throw FileSystemError("invalid file handle " + std::to_string(fileHandle));
+    }
+    else if (fileHandle < maxNoLockFileHandles)
+    {
+        file = files[fileHandle];
+    }
+    else
+    {
+        std::lock_guard<std::mutex> lock(mtx);
+        auto it = fileMap.find(fileHandle);
+        if (it != fileMap.cend())
+        {
+            file = it->second;
+        }
+        else
+        {
+            throw FileSystemError("invalid file handle " + std::to_string(fileHandle));
+        }
+    }
+    if (!file)
+    {
+        throw FileSystemError("invalid file handle " + std::to_string(fileHandle));
+    }
+    int result = fclose(file);
+    if (result != 0)
+    {
+        std::string filePath;
+        if (fileHandle < maxNoLockFileHandles)
+        {
+            filePath = filePaths[fileHandle];
+        }
+        else
+        {
+            filePath = filePathMap[fileHandle];
+        }
+        throw FileSystemError("could not close file '" + filePath + "': " + strerror(errno));
+    }
+}
+
+void FileTable::WriteFile(int32_t fileHandle, const uint8_t* buffer, int64_t count)
 {
     FILE* file = nullptr;
     if (fileHandle < 0)
@@ -153,7 +273,34 @@ void DoneIo()
 
 } }  // namespace cmajor::rt
 
-extern "C" RT_API void RtWrite(int32_t fileHandle, const uint8_t* buffer, int32_t count)
+extern "C" RT_API int32_t RtOpen(const char* filePath, OpenMode openMode)
+{
+    try
+    {
+        return cmajor::rt::FileTable::Instance().OpenFile(filePath, openMode);
+    }
+    catch (const cmajor::rt::FileSystemError& ex)
+    {
+        int x = 0;
+        // todo
+        return -1;
+    }
+}
+
+extern "C" RT_API void RtClose(int32_t fileHandle)
+{
+    try
+    {
+        return cmajor::rt::FileTable::Instance().CloseFile(fileHandle);
+    }
+    catch (const cmajor::rt::FileSystemError& ex)
+    {
+        int x = 0;
+        // todo
+    }
+}
+
+extern "C" RT_API void RtWrite(int32_t fileHandle, const uint8_t* buffer, int64_t count)
 {
     try
     {

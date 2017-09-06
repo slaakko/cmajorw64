@@ -9,6 +9,7 @@
 #include <cmajor/symbols/Scope.hpp>
 #include <cmajor/symbols/ClassTypeSymbol.hpp>
 #include <cmajor/symbols/InterfaceTypeSymbol.hpp>
+#include <cmajor/symbols/TypedefSymbol.hpp>
 #include <cmajor/symbols/EnumSymbol.hpp>
 
 namespace cmajor { namespace binder {
@@ -22,6 +23,7 @@ class TypeBinder : public Visitor
 {
 public:
     TypeBinder(BoundCompileUnit& boundCompileUnit_);
+    void AddUsingNodesToCurrentCompileUnit(Node* node);
     void Visit(CompileUnitNode& compileUnitNode) override;
     void Visit(NamespaceNode& namespaceNode) override;
     void Visit(AliasNode& aliasNode) override;
@@ -52,6 +54,7 @@ public:
     void Visit(TryStatementNode& tryStatementNode) override;
 
     void Visit(TypedefNode& typedefNode) override;
+    void BindTypedef(TypedefSymbol* typedefSymbol, TypedefNode* typedefNode, bool fromOwnCompileUnit);
     void Visit(ConstantNode& constantNode) override;
     void Visit(EnumTypeNode& enumTypeNode) override;
     void Visit(EnumConstantNode& enumConstantNode) override;

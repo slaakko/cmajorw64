@@ -47,7 +47,7 @@ enum class FunctionSymbolFlags : uint16_t
     new_ = 1 << 10,
     const_ = 1 << 11,
     conversion = 1 << 12,
-    weakOdrLinkage = 1 << 13,
+    linkOnceOdrLinkage = 1 << 13,
     templateSpecialization = 1 << 14
 };
 
@@ -134,8 +134,8 @@ public:
     void SetConst() { SetFlag(FunctionSymbolFlags::const_); }
     bool IsConversion() const { return GetFlag(FunctionSymbolFlags::conversion); }
     void SetConversion() { SetFlag(FunctionSymbolFlags::conversion); }
-    bool HasWeakOdrLinkage() const { return GetFlag(FunctionSymbolFlags::weakOdrLinkage);  }
-    void SetWeakOdrLinkage() { SetFlag(FunctionSymbolFlags::weakOdrLinkage); }
+    bool HasLinkOnceOdrLinkage() const { return GetFlag(FunctionSymbolFlags::linkOnceOdrLinkage);  }
+    void SetLinkOnceOdrLinkage() { SetFlag(FunctionSymbolFlags::linkOnceOdrLinkage); }
     bool IsTemplateSpecialization() const { return GetFlag(FunctionSymbolFlags::templateSpecialization); }
     void SetTemplateSpecialization() { SetFlag(FunctionSymbolFlags::templateSpecialization); }
     virtual bool DontThrow() const { return IsNothrow() || IsBasicTypeOperation(); }
@@ -195,6 +195,9 @@ public:
     ParameterSymbol* GetThisParam() const override { return Parameters()[0]; }
     bool IsConstructorDestructorOrNonstaticMemberFunction() const override { return true; }
     void SetSpecifiers(Specifiers specifiers);
+    uint8_t ConversionDistance() const override;
+    TypeSymbol* ConversionSourceType() const override;
+    TypeSymbol* ConversionTargetType() const override;
 };
 
 class DestructorSymbol : public FunctionSymbol

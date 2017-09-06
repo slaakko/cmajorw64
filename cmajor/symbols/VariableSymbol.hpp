@@ -45,6 +45,7 @@ public:
     MemberVariableSymbol(const Span& span_, const std::u32string& name_);
     void Write(SymbolWriter& writer) override;
     void Read(SymbolReader& reader) override;
+    bool IsExportSymbol() const override;
     void ComputeExportClosure() override;
     void SetSpecifiers(Specifiers specifiers);
     int32_t LayoutIndex() const { return layoutIndex; }

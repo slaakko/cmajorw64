@@ -10,7 +10,7 @@ namespace cmajor { namespace symbols {
 
 void ConversionTable::AddConversion(FunctionSymbol* conversion)
 {
-    ConversionTableEntry entry(conversion->ConversionSourceType(), conversion->ConversionTargetType());
+    ConversionTableEntry entry(conversion->ConversionSourceType()->PlainType(conversion->GetSpan()), conversion->ConversionTargetType()->PlainType(conversion->GetSpan()));
     conversionMap.insert(std::make_pair(entry, conversion));
 }
 

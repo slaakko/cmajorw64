@@ -1,0 +1,260 @@
+// =================================
+// Copyright (c) 2017 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Unicode;
+
+namespace System.IO
+{
+    public const int stdin = 0;
+    public const int stdout = 1;
+    public const int stderr = 2;
+
+    public enum OpenMode : byte
+    {
+        none = 0u,
+        read = 1u << 0u,
+        write = 1u << 1u,
+        append = 1u << 2u,
+        binary = 1u << 3u
+    }
+
+    public class OutputFileStream : OutputStream
+    {
+        public OutputFileStream() : this(stdout)
+        {
+        }
+        public OutputFileStream(int fileHandle_) : filePath(), fileHandle(fileHandle_), opened(false)
+        {
+        }
+        public OutputFileStream(const string& filePath_) : filePath(), fileHandle(-1), opened(false)
+        {
+            Open(filePath_, OpenMode.write);
+        }
+        public OutputFileStream(const string& filePath_, OpenMode openMode) : filePath(), fileHandle(-1), opened(false)
+        {
+            Open(filePath_, openMode);
+        }
+        public override ~OutputFileStream()
+        {
+            if (opened)
+            {
+                Close();    
+/*
+                try
+                {
+                    Close();
+                }
+                catch (const Exception& ex)
+                {
+                }
+*/
+            }
+        }
+        suppress OutputFileStream(const OutputFileStream&);
+        suppress void operator=(const OutputFileStream&);
+        public nothrow OutputFileStream(OutputFileStream&& that) : fileHandle(that.fileHandle), opened(that.opened), filePath(Rvalue(that.filePath))
+        {
+            that.fileHandle = -1;
+            that.opened = false;
+        }
+        public default nothrow void operator=(OutputFileStream&&);
+        public void Open(const string& filePath_, OpenMode openMode)
+        {
+            if (opened)
+            {
+                Close();
+            }
+            filePath = filePath_;
+            fileHandle = RtOpen(filePath.Chars(), openMode);
+            opened = true;
+        }
+        public void Close()
+        {
+            if (opened)
+            {
+                opened = false;
+                RtClose(fileHandle);
+                fileHandle = -1;
+            }
+            else
+            {
+                // throw 
+            }
+        }
+        public override void Write(const char* s)
+        {
+            RtWrite(fileHandle, s, StrLen(s));
+        }
+        public override void Write(const wchar* s)
+        {
+            Write(ToUtf8(s));
+        }
+        public override void Write(const uchar* s)
+        {
+            Write(ToUtf8(s));
+        }
+        public override void Write(const string& s)
+        {
+            RtWrite(fileHandle, s.Chars(), s.Length());
+        }
+        public override void Write(const wstring& s)
+        {
+            Write(ToUtf8(s));
+        }
+        public override void Write(const ustring& s)
+        {
+            Write(ToUtf8(s));
+        }
+        public override void Write(bool b)
+        {
+            Write(ToString(b));
+        }
+        public override void Write(sbyte s)
+        {
+            Write(ToString(s));
+        }
+        public override void Write(byte b)
+        {
+            Write(ToString(b));
+        }
+        public override void Write(short s)
+        {
+            Write(ToString(s));
+        }
+        public override void Write(ushort u)
+        {
+            Write(ToString(u));
+        }
+        public override void Write(int i)
+        {
+            Write(ToString(i));
+        }
+        public override void Write(uint u)
+        {
+            Write(ToString(u));
+        }
+        public override void Write(long l)
+        {
+            Write(ToString(l));
+        }
+        public override void Write(ulong u)
+        {
+            Write(ToString(u));
+        }
+        public override void Write(float f)
+        {
+            Write(ToString(f));
+        }
+        public override void Write(double d)
+        {
+            Write(ToString(d));
+        }
+        public override void WriteLine()
+        {
+            Write("\n");
+        }
+        public override void WriteLine(const char* s)
+        {
+            Write(s);
+            WriteLine();
+        }
+        public override void WriteLine(const wchar* s)
+        {
+            Write(s);
+            WriteLine();
+        }
+        public override void WriteLine(const uchar* s)
+        {
+            Write(s);
+            WriteLine();
+        }
+        public override void WriteLine(const string& s)
+        {
+            Write(s);
+            WriteLine();
+        }
+        public override void WriteLine(const wstring& s)
+        {
+            Write(s);
+            WriteLine();
+        }
+        public override void WriteLine(const ustring& s)
+        {
+            Write(s);
+            WriteLine();
+        }
+        public override void WriteLine(bool b)
+        {
+            Write(b);
+            WriteLine();
+        }
+        public override void WriteLine(sbyte s)
+        {
+            Write(s);
+            WriteLine();
+        }
+        public override void WriteLine(byte b)
+        {
+            Write(b);
+            WriteLine();
+        }
+        public override void WriteLine(short s)
+        {
+            Write(s);
+            WriteLine();
+        }
+        public override void WriteLine(ushort u)
+        {
+            Write(u);
+            WriteLine();
+        }
+        public override void WriteLine(int i)
+        {
+            Write(i);
+            WriteLine();
+        }
+        public override void WriteLine(uint u)
+        {
+            Write(u);
+            WriteLine();
+        }
+        public override void WriteLine(long l)
+        {
+            Write(l);
+            WriteLine();
+        }
+        public override void WriteLine(ulong u)
+        {
+            Write(u);
+            WriteLine();
+        }
+        public override void WriteLine(float f)
+        {
+            Write(f);
+            WriteLine();
+        }
+        public override void WriteLine(double d)
+        {
+            Write(d);
+            WriteLine();
+        }
+        public int FileHandle() const
+        {
+            return fileHandle;
+        }
+        public bool Opened() const 
+        {
+            return opened;
+        }
+        public const string& FilePath() const
+        {
+            return filePath;
+        }
+        private int fileHandle;
+        private bool opened;
+        private string filePath;
+    }
+}

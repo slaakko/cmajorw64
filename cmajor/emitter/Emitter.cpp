@@ -9,6 +9,7 @@
 #include <cmajor/binder/BoundStatement.hpp>
 #include <cmajor/binder/BoundExpression.hpp>
 #include <cmajor/binder/BoundNodeVisitor.hpp>
+#include <cmajor/symbols/Module.hpp>
 #include <cmajor/ir/Emitter.hpp>
 #include <cmajor/symbols/GlobalFlags.hpp>
 #include <cmajor/util/Unicode.hpp>
@@ -110,7 +111,7 @@ EmittingContext::~EmittingContext()
 class Emitter : public cmajor::ir::Emitter, public BoundNodeVisitor
 {
 public:
-    Emitter(EmittingContext& emittingContext_, const std::string& compileUnitModuleName_);
+    Emitter(EmittingContext& emittingContext_, const std::string& compileUnitModuleName_, cmajor::symbols::Module& symbolsModule_);
     void Visit(BoundCompileUnit& boundCompileUnit) override;
     void Visit(BoundClass& boundClass) override;
     void Visit(BoundFunction& boundFunction) override;
@@ -163,6 +164,7 @@ private:
     EmittingContext& emittingContext;
     SymbolTable* symbolTable;
     std::unique_ptr<llvm::Module> compileUnitModule;
+    cmajor::symbols::Module& symbolsModule;
     llvm::IRBuilder<>& builder;
     cmajor::ir::ValueStack& stack;
     llvm::LLVMContext& context;
@@ -193,9 +195,9 @@ private:
     void SetLineNumber(int32_t lineNumber) override;
 };
 
-Emitter::Emitter(EmittingContext& emittingContext_, const std::string& compileUnitModuleName_) :
+Emitter::Emitter(EmittingContext& emittingContext_, const std::string& compileUnitModuleName_, cmajor::symbols::Module& symbolsModule_) :
     cmajor::ir::Emitter(emittingContext_.GetEmittingContextImpl()->Context()), emittingContext(emittingContext_), symbolTable(nullptr),
-    compileUnitModule(new llvm::Module(compileUnitModuleName_, emittingContext.GetEmittingContextImpl()->Context())), builder(Builder()), stack(Stack()), 
+    compileUnitModule(new llvm::Module(compileUnitModuleName_, emittingContext.GetEmittingContextImpl()->Context())), symbolsModule(symbolsModule_), builder(Builder()), stack(Stack()),
     context(emittingContext.GetEmittingContextImpl()->Context()), compileUnit(nullptr), function(nullptr), trueBlock(nullptr), falseBlock(nullptr), breakTarget(nullptr), continueTarget(nullptr),
     genJumpingBoolCode(false), currentClass(nullptr), currentFunction(nullptr), currentBlock(nullptr), breakTargetBlock(nullptr), continueTargetBlock(nullptr), currentCaseMap(nullptr), 
     defaultDest(nullptr), prevLineNumber(0)
@@ -281,9 +283,12 @@ void Emitter::Visit(BoundFunction& boundFunction)
     FunctionSymbol* functionSymbol = boundFunction.GetFunctionSymbol();
     llvm::FunctionType* functionType = functionSymbol->IrType(*this);
     function = llvm::cast<llvm::Function>(compileUnitModule->getOrInsertFunction(ToUtf8(functionSymbol->MangledName()), functionType));
-    if (functionSymbol->HasWeakOdrLinkage())
+    if (functionSymbol->HasLinkOnceOdrLinkage())
     {
-        function->setLinkage(llvm::GlobalValue::LinkageTypes::WeakODRLinkage);
+        llvm::Comdat* comdat = compileUnitModule->getOrInsertComdat(ToUtf8(functionSymbol->MangledName()));
+        comdat->setSelectionKind(llvm::Comdat::SelectionKind::Any);
+        function->setLinkage(llvm::GlobalValue::LinkageTypes::LinkOnceODRLinkage);
+        function->setComdat(comdat);
     }
     if (functionSymbol->DontThrow())
     {
@@ -303,6 +308,7 @@ void Emitter::Visit(BoundFunction& boundFunction)
     if (currentClass)
     {
         ClassTypeSymbol* classTypeSymbol = currentClass->GetClassTypeSymbol();
+        classTypeSymbol->SetModule(&symbolsModule);
         if (!classTypeSymbol->IsVmtObjectCreated())
         {
             classTypeSymbol->VmtObject(*this, true);
@@ -941,6 +947,7 @@ void Emitter::Visit(BoundDisjunction& boundDisjunction)
         builder.SetInsertPoint(rightBlock);
         falseBlock = prevFalseBlock;
         boundDisjunction.Right()->Accept(*this);
+        boundDisjunction.DestroyTemporaries(*this);
     }
 }
 
@@ -957,6 +964,7 @@ void Emitter::Visit(BoundConjunction& boundConjunction)
         trueBlock = prevTrueBlock;
         builder.SetInsertPoint(rightBlock);
         boundConjunction.Right()->Accept(*this);
+        boundConjunction.DestroyTemporaries(*this);
     }
 }
 
@@ -1057,7 +1065,7 @@ void Emitter::SetLineNumber(int32_t lineNumber)
 
 void GenerateCode(EmittingContext& emittingContext, BoundCompileUnit& boundCompileUnit)
 {
-    Emitter emitter(emittingContext, boundCompileUnit.GetCompileUnitNode()->FilePath());
+    Emitter emitter(emittingContext, boundCompileUnit.GetCompileUnitNode()->FilePath(), boundCompileUnit.GetModule());
     boundCompileUnit.Accept(emitter);
 }
 

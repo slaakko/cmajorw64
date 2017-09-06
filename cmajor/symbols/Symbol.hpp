@@ -45,7 +45,7 @@ enum class SymbolType : uint8_t
     basicTypeReturn,
     basicTypeImplicitSignExtension, basicTypeImplicitZeroExtension, basicTypeExplicitSignExtension, basicTypeExplicitZeroExtension, basicTypeTruncation, basicTypeBitCast,
     basicTypeImplicitUnsignedIntToFloating, basicTypeImplicitSignedIntToFloating, basicTypeExplicitUnsignedIntToFloating, basicTypeExplicitSignedIntToFloating, 
-    basicTypeFloatingToUnsignedInt, basicTypeFloatingToSignedInt, basicTypeFloatingExtension, basicTypeFloatingTruncation,
+    basicTypeFloatingToUnsignedInt, basicTypeFloatingToSignedInt, basicTypeFloatingExtension, basicTypeFloatingTruncation, enumTypeToUnderlyingType, underlyingToEnumType,
     namespaceTypeSymbol, functionGroupTypeSymbol, memberExpressionTypeSymbol, valueSymbol,
     maxSymbol
 };

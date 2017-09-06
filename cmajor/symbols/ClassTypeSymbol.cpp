@@ -12,6 +12,7 @@
 #include <cmajor/symbols/SymbolReader.hpp>
 #include <cmajor/symbols/Exception.hpp>
 #include <cmajor/symbols/TemplateSymbol.hpp>
+#include <cmajor/symbols/Module.hpp>
 #include <cmajor/util/Unicode.hpp>
 #include <cmajor/util/Sha1.hpp>
 #include <llvm/IR/Module.h>
@@ -55,7 +56,7 @@ void ClassTypeSymbol::Write(SymbolWriter& writer)
         writer.GetBinaryWriter().Write(sizeOfAstNodes);
         writer.GetBinaryWriter().Seek(endPos);
     }
-    else
+    else if (GetSymbolType() == SymbolType::classTypeSymbol)
     {
         uint32_t baseClassId = 0;
         if (baseClass)
@@ -88,7 +89,7 @@ void ClassTypeSymbol::Read(SymbolReader& reader)
         reader.GetBinaryReader().Skip(sizeOfAstNodes);
         filePathReadFrom = reader.GetBinaryReader().FileName();
     }
-    else
+    else if (GetSymbolType() == SymbolType::classTypeSymbol)
     {
         uint32_t baseClassId = reader.GetBinaryReader().ReadEncodedUInt();
         if (baseClassId != 0)
@@ -152,6 +153,7 @@ void ClassTypeSymbol::ComputeExportClosure()
 void ClassTypeSymbol::ReadAstNodes()
 {
     AstReader reader(filePathReadFrom);
+    reader.SetReplaceFileIndex(GetSpan().FileIndex());
     reader.GetBinaryReader().Skip(astNodesPos);
     usingNodes.Read(reader);
     Node* node = reader.ReadNode();
@@ -433,6 +435,7 @@ void ClassTypeSymbol::InitVmt()
         if (memberFunction->IsVirtualAbstractOrOverride())
         {
             SetPolymorphic();
+            break;
         }
     }
     if (!implementedInterfaces.empty())
@@ -744,8 +747,13 @@ llvm::Value* ClassTypeSymbol::VmtObject(Emitter& emitter, bool create)
     if (!IsVmtObjectCreated() && create)
     {
         SetVmtObjectCreated();
+        std::string vmtObjectName = VmtObjectName();
+        llvm::Comdat* comdat = emitter.Module()->getOrInsertComdat(vmtObjectName);
+        GetModule()->AddExportedData(vmtObjectName);
+        comdat->setSelectionKind(llvm::Comdat::SelectionKind::Any);
         llvm::GlobalVariable* vmtObjectGlobal = llvm::cast<llvm::GlobalVariable>(vmtObject);
-        vmtObjectGlobal->setDLLStorageClass(llvm::GlobalValue::DLLExportStorageClass);
+        //vmtObjectGlobal->setDLLStorageClass(llvm::GlobalValue::DLLExportStorageClass);
+        vmtObjectGlobal->setComdat(comdat);
         std::vector<llvm::Constant*> vmtArray;
         vmtArray.push_back(llvm::Constant::getNullValue(emitter.Builder().getInt8PtrTy()));
         llvm::Value* className = emitter.Builder().CreateGlobalStringPtr(ToUtf8(FullName()));
@@ -755,7 +763,7 @@ llvm::Value* ClassTypeSymbol::VmtObject(Emitter& emitter, bool create)
         for (int i = 0; i < n; ++i)
         {
             FunctionSymbol* virtualFunction = vmt[i];
-            if (!virtualFunction)
+            if (!virtualFunction || virtualFunction->IsAbstract())
             {
                 vmtArray.push_back(llvm::Constant::getNullValue(emitter.Builder().getInt8PtrTy()));
             }

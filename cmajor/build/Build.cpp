@@ -15,6 +15,7 @@
 #include <cmajor/binder/OverloadResolution.hpp>
 #include <cmajor/binder/StatementBinder.hpp>
 #include <cmajor/binder/BoundStatement.hpp>
+#include <cmajor/binder/ModuleBinder.hpp>
 #include <cmajor/symbols/GlobalFlags.hpp>
 #include <cmajor/symbols/Warning.hpp>
 #include <cmajor/symbols/Module.hpp>
@@ -266,7 +267,7 @@ void GenerateLibrary(const std::vector<std::string>& objectFilePaths, const std:
     }
 }
 
-void Link(const std::string& executableFilePath, const std::vector<std::string>& libraryFilePaths)
+void Link(const std::string& executableFilePath, const std::vector<std::string>& libraryFilePaths, Module& module)
 {
     boost::filesystem::path bdp = executableFilePath;
     bdp.remove_filename();
@@ -277,6 +278,22 @@ void Link(const std::string& executableFilePath, const std::vector<std::string>&
     args.push_back("/debug");
     args.push_back("/out:" + QuotedPath(executableFilePath));
     args.push_back("/stack:16777216");
+    for (const std::string& fun : module.AllExportedFunctions())
+    {
+        args.push_back("/export:" + fun);
+    }
+    for (const std::string& fun : module.ExportedFunctions())
+    {
+        args.push_back("/export:" + fun);
+    }
+    for (const std::string& data : module.AllExportedData())
+    {
+        args.push_back("/export:" + data);
+    }
+    for (const std::string& data : module.ExportedData())
+    {
+        args.push_back("/export:" + data);
+    }
     std::string cmrtLibName = "cmrt200.lib";
     if (GetGlobalFlag(GlobalFlags::linkWithDebugRuntime))
     {
@@ -397,8 +414,27 @@ void BuildProject(Project* project)
     CompileWarningCollection::Instance().SetCurrentProjectName(project->Name());
     std::vector<std::unique_ptr<CompileUnitNode>> compileUnits = ParseSources(project->SourceFilePaths());
     Module module(project->Name(), project->ModuleFilePath());
-    module.PrepareForCompilation(project->References(), project->SourceFilePaths());
+    std::unique_ptr<ModuleBinder> moduleBinder;
+    if (!compileUnits.empty())
+    {
+        moduleBinder.reset(new ModuleBinder(module, compileUnits[0].get()));
+    }
+    std::vector<ClassTypeSymbol*> classTypes;
+    std::vector<ClassTemplateSpecializationSymbol*> classTemplateSpecializations;
+    module.PrepareForCompilation(project->References(), project->SourceFilePaths(), classTypes, classTemplateSpecializations);
     CreateSymbols(module.GetSymbolTable(), compileUnits);
+    if (moduleBinder)
+    {
+        for (ClassTemplateSpecializationSymbol* classTemplateSpecialization : classTemplateSpecializations)
+        {
+            moduleBinder->BindClassTemplateSpecialization(classTemplateSpecialization);
+        }
+        for (ClassTypeSymbol* classType : classTypes)
+        {
+            classType->SetSpecialMemberFunctions();
+            classType->CreateLayouts();
+        }
+    }
     std::vector<std::unique_ptr<BoundCompileUnit>> boundCompileUnits = BindTypes(module, compileUnits);
     EmittingContext emittingContext;
     std::vector<std::string> objectFilePaths;
@@ -420,7 +456,7 @@ void BuildProject(Project* project)
     GenerateLibrary(objectFilePaths, project->LibraryFilePath());
     if (project->GetTarget() == Target::program)
     {
-        Link(project->ExecutableFilePath(), module.LibraryFilePaths());
+        Link(project->ExecutableFilePath(), module.LibraryFilePaths(), module);
         CreateClassFile(project->ExecutableFilePath(), module.GetSymbolTable());
     }
     SymbolWriter writer(project->ModuleFilePath());

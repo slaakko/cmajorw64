@@ -35,6 +35,12 @@ void TypedefSymbol::EmplaceType(TypeSymbol* typeSymbol, int index)
     type = typeSymbol;
 }
 
+bool TypedefSymbol::IsExportSymbol() const
+{
+    if (Parent()->GetSymbolType() == SymbolType::classTemplateSpecializationSymbol) return false;
+    return Symbol::IsExportSymbol();
+}
+
 void TypedefSymbol::ComputeExportClosure()
 {
     if (IsProject())

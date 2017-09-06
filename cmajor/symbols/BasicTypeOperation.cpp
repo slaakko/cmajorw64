@@ -557,8 +557,8 @@ void MakeBasicTypeConversions(SymbolTable& symbolTable, BoolTypeSymbol* boolType
     symbolTable.AddFunctionSymbolToGlobalScope(new BasicTypeExplicitConversion<BasicTypeTruncation>(SymbolType::basicTypeTruncation, U"wchar2bool", wcharType, boolType));
     symbolTable.AddFunctionSymbolToGlobalScope(new BasicTypeExplicitConversion<BasicTypeTruncation>(SymbolType::basicTypeTruncation, U"wchar2sbyte", wcharType, sbyteType));
     symbolTable.AddFunctionSymbolToGlobalScope(new BasicTypeExplicitConversion<BasicTypeTruncation>(SymbolType::basicTypeTruncation, U"wchar2byte", wcharType, byteType));
-    symbolTable.AddFunctionSymbolToGlobalScope(new BasicTypeExplicitConversion<BasicTypeBitCast>(SymbolType::basicTypeBitCast, U"wchar2short", charType, shortType));
-    symbolTable.AddFunctionSymbolToGlobalScope(new BasicTypeExplicitConversion<BasicTypeBitCast>(SymbolType::basicTypeBitCast, U"wchar2ushort", charType, ushortType));
+    symbolTable.AddFunctionSymbolToGlobalScope(new BasicTypeExplicitConversion<BasicTypeBitCast>(SymbolType::basicTypeBitCast, U"wchar2short", wcharType, shortType));
+    symbolTable.AddFunctionSymbolToGlobalScope(new BasicTypeExplicitConversion<BasicTypeBitCast>(SymbolType::basicTypeBitCast, U"wchar2ushort", wcharType, ushortType));
     symbolTable.AddFunctionSymbolToGlobalScope(new BasicTypeExplicitConversion<BasicTypeZeroExtension>(SymbolType::basicTypeExplicitZeroExtension, U"wchar2int", wcharType, intType));
     symbolTable.AddFunctionSymbolToGlobalScope(new BasicTypeExplicitConversion<BasicTypeZeroExtension>(SymbolType::basicTypeExplicitZeroExtension, U"wchar2uint", wcharType, uintType));
     symbolTable.AddFunctionSymbolToGlobalScope(new BasicTypeExplicitConversion<BasicTypeZeroExtension>(SymbolType::basicTypeExplicitZeroExtension, U"wchar2long", wcharType, longType));

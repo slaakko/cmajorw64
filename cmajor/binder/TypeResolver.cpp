@@ -4,6 +4,7 @@
 // =================================
 
 #include <cmajor/binder/TypeResolver.hpp>
+#include <cmajor/binder/TypeBinder.hpp>
 #include <cmajor/binder/BoundCompileUnit.hpp>
 #include <cmajor/ast/Visitor.hpp>
 #include <cmajor/ast/Identifier.hpp>
@@ -204,6 +205,15 @@ void TypeResolver::ResolveSymbol(Node& node, Symbol* symbol)
             case SymbolType::typedefSymbol:
             {
                 TypedefSymbol* typedefSymbol = static_cast<TypedefSymbol*>(symbol);
+                if (typedefSymbol->IsProject() && !typedefSymbol->IsBound())
+                {
+                    TypeBinder typeBinder(boundCompileUnit);
+                    typeBinder.SetContainerScope(typedefSymbol->Parent()->GetContainerScope());
+                    Node* node = symbolTable.GetNode(typedefSymbol);
+                    Assert(node->GetNodeType() == NodeType::typedefNode, "typedef node expected");
+                    TypedefNode* typedefNode = static_cast<TypedefNode*>(node);
+                    typeBinder.BindTypedef(typedefSymbol, typedefNode, false);
+                }
                 type = typedefSymbol->GetType();
                 break;
             }
@@ -319,7 +329,7 @@ TypeSymbol* ResolveType(Node* typeExprNode, BoundCompileUnit& boundCompileUnit, 
     TypeResolver typeResolver(boundCompileUnit, containerScope);
     typeExprNode->Accept(typeResolver);
     TypeSymbol* type = typeResolver.GetType();
-    if (type->IsInComplete())
+    if (!type || type->IsInComplete())
     {
         throw Exception("incomplete type expression", typeExprNode->GetSpan());
     }

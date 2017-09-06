@@ -34,6 +34,7 @@ namespace System
         }
     }
 
+/*
     public nothrow void Reverse<I>(I begin, I end) where I is BidirectionalIterator
     {
         while (true)
@@ -51,6 +52,7 @@ namespace System
             ++begin;
         }
     }
+*/
 
     public Pair<I, I> ReverseUntil<I>(I first, I middle, I last) where I is BidirectionalIterator
     {

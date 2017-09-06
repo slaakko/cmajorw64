@@ -71,6 +71,12 @@ void MemberVariableSymbol::Read(SymbolReader& reader)
     layoutIndex = reader.GetBinaryReader().ReadInt();
 }
 
+bool MemberVariableSymbol::IsExportSymbol() const
+{
+    if (Parent()->GetSymbolType() == SymbolType::classTemplateSpecializationSymbol) return false;
+    return VariableSymbol::IsExportSymbol();
+}
+
 void MemberVariableSymbol::ComputeExportClosure()
 {
     if (IsProject())

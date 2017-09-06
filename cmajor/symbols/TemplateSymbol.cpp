@@ -17,7 +17,7 @@ TypeSymbol* TemplateParameterSymbol::Unify(TypeSymbol* type, const Span& span)
     return type;
 }
 
-BoundTemplateParameterSymbol::BoundTemplateParameterSymbol(const Span& span_, const std::u32string& name_) : Symbol(SymbolType::boundTemplateParameterSymbol, span_, name_)
+BoundTemplateParameterSymbol::BoundTemplateParameterSymbol(const Span& span_, const std::u32string& name_) : Symbol(SymbolType::boundTemplateParameterSymbol, span_, name_), type(nullptr)
 {
 }
 

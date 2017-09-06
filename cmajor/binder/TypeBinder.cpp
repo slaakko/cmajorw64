@@ -23,9 +23,71 @@ namespace cmajor { namespace binder {
 
 using namespace cmajor::unicode;
 
+class UsingNodeAdder : public Visitor
+{
+public:
+    UsingNodeAdder(BoundCompileUnit& boundCompileUnit_, ContainerScope* containerscope);
+    void Visit(NamespaceNode& namespaceNode) override;
+    void Visit(AliasNode& aliasNode) override;
+    void Visit(NamespaceImportNode& namespaceImportNode) override;
+private:
+    BoundCompileUnit& boundCompileUnit;
+    SymbolTable& symbolTable;
+    ContainerScope* containerScope;
+};
+
+UsingNodeAdder::UsingNodeAdder(BoundCompileUnit& boundCompileUnit_, ContainerScope* containerScope_) :
+    boundCompileUnit(boundCompileUnit_), symbolTable(boundCompileUnit.GetSymbolTable()), containerScope(containerScope_)
+{
+}
+
+void UsingNodeAdder::Visit(NamespaceNode& namespaceNode)
+{
+    ContainerScope* prevContainerScope = containerScope;
+    Symbol* symbol = symbolTable.GetSymbol(&namespaceNode);
+    containerScope = symbol->GetContainerScope();
+    int n = namespaceNode.Members().Count();
+    for (int i = 0; i < n; ++i)
+    {
+        Node* member = namespaceNode.Members()[i];
+        member->Accept(*this);
+    }
+    containerScope = prevContainerScope;
+}
+
+void UsingNodeAdder::Visit(AliasNode& aliasNode)
+{
+    boundCompileUnit.FirstFileScope()->InstallAlias(containerScope, &aliasNode);
+}
+
+void UsingNodeAdder::Visit(NamespaceImportNode& namespaceImportNode)
+{
+    boundCompileUnit.FirstFileScope()->InstallNamespaceImport(containerScope, &namespaceImportNode);
+}
+
 TypeBinder::TypeBinder(BoundCompileUnit& boundCompileUnit_) : 
     boundCompileUnit(boundCompileUnit_), symbolTable(boundCompileUnit.GetSymbolTable()), containerScope(), enumType(nullptr)
 {
+}
+
+void TypeBinder::AddUsingNodesToCurrentCompileUnit(Node* node)
+{
+    NamespaceNode* namespaceNode = nullptr;
+    Node* parent = node->Parent();
+    while (parent)
+    {
+        if (parent->GetNodeType() == NodeType::namespaceNode)
+        {
+            namespaceNode = static_cast<NamespaceNode*>(parent);
+        }
+        parent = parent->Parent();
+    }
+    if (!namespaceNode)
+    {
+        throw Exception("global namespace parent not found for node", node->GetSpan());
+    }
+    UsingNodeAdder usingNodeAdder(boundCompileUnit, containerScope);
+    namespaceNode->Accept(usingNodeAdder);
 }
 
 void TypeBinder::Visit(CompileUnitNode& compileUnitNode)
@@ -219,7 +281,7 @@ void TypeBinder::Visit(StaticConstructorNode& staticConstructorNode)
     if (staticConstructorSymbol->Parent()->GetSymbolType() == SymbolType::classTemplateSpecializationSymbol)
     {
         staticConstructorSymbol->SetTemplateSpecialization();
-        staticConstructorSymbol->SetWeakOdrLinkage();
+        staticConstructorSymbol->SetLinkOnceOdrLinkage();
     }
     staticConstructorSymbol->ComputeName();
     if (staticConstructorNode.Body())
@@ -256,7 +318,7 @@ void TypeBinder::Visit(ConstructorNode& constructorNode)
     if (parent->GetSymbolType() == SymbolType::classTemplateSpecializationSymbol)
     {
         constructorSymbol->SetTemplateSpecialization();
-        constructorSymbol->SetWeakOdrLinkage();
+        constructorSymbol->SetLinkOnceOdrLinkage();
     }
     Assert(parent->IsClassTypeSymbol(), "class type symbol expected");
     ClassTypeSymbol* classType = static_cast<ClassTypeSymbol*>(parent);
@@ -282,6 +344,11 @@ void TypeBinder::Visit(ConstructorNode& constructorNode)
     else if (constructorSymbol->IsMoveConstructor())
     {
         classType->SetMoveConstructor(constructorSymbol);
+    }
+    else if (constructorSymbol->Arity() == 2 && !constructorSymbol->IsExplicit())
+    {
+        constructorSymbol->SetConversion();
+        symbolTable.AddConversion(constructorSymbol);
     }
     if (constructorNode.Body())
     {
@@ -317,7 +384,7 @@ void TypeBinder::Visit(DestructorNode& destructorNode)
     if (parent->GetSymbolType() == SymbolType::classTemplateSpecializationSymbol)
     {
         destructorSymbol->SetTemplateSpecialization();
-        destructorSymbol->SetWeakOdrLinkage();
+        destructorSymbol->SetLinkOnceOdrLinkage();
     }
     destructorSymbol->ComputeName();
     if (destructorNode.Body())
@@ -358,7 +425,7 @@ void TypeBinder::Visit(MemberFunctionNode& memberFunctionNode)
     if (parent->GetSymbolType() == SymbolType::classTemplateSpecializationSymbol)
     {
         memberFunctionSymbol->SetTemplateSpecialization();
-        memberFunctionSymbol->SetWeakOdrLinkage();
+        memberFunctionSymbol->SetLinkOnceOdrLinkage();
     }
     int n = memberFunctionNode.Parameters().Count();
     for (int i = 0; i < n; ++i)
@@ -390,7 +457,7 @@ void TypeBinder::Visit(MemberFunctionNode& memberFunctionNode)
     }
     else
     {
-        if (!memberFunctionSymbol->IsDefault() && !memberFunctionSymbol->IsSuppressed() && !memberFunctionSymbol->IsTemplateSpecialization())
+        if (!memberFunctionSymbol->IsAbstract() && !memberFunctionSymbol->IsDefault() && !memberFunctionSymbol->IsSuppressed() && !memberFunctionSymbol->IsTemplateSpecialization())
         {
             throw Exception("member function has no body", memberFunctionSymbol->GetSpan());
         }
@@ -580,22 +647,23 @@ void TypeBinder::Visit(CatchNode& catchNode)
         Assert(symbol->GetSymbolType() == SymbolType::localVariableSymbol, "local variable symbol expected");
         LocalVariableSymbol* exceptionVarSymbol = static_cast<LocalVariableSymbol*>(symbol);
         TypeSymbol* type = ResolveType(catchNode.TypeExpr(), boundCompileUnit, containerScope);
-        if (type->IsClassTypeSymbol())
+        if (type->BaseType()->IsClassTypeSymbol())
         {
-            ClassTypeSymbol* exceptionVarClassType = static_cast<ClassTypeSymbol*>(type);
-            TypeSymbol* systemExceptionType = symbolTable.GetTypeByName(U"System.Exception");
+            ClassTypeSymbol* exceptionVarClassType = static_cast<ClassTypeSymbol*>(type->BaseType());
+            IdentifierNode systemExceptionNode(catchNode.GetSpan(), U"System.Exception");
+            TypeSymbol* systemExceptionType = ResolveType(&systemExceptionNode, boundCompileUnit, containerScope);
             Assert(systemExceptionType->IsClassTypeSymbol(), "System.Exception not of class type");
             ClassTypeSymbol* systemExceptionClassType = static_cast<ClassTypeSymbol*>(systemExceptionType);
             if (exceptionVarClassType->IsProject())
             {
-                Node* exceptionVarNode = symbolTable.GetNode(type);
+                Node* exceptionVarNode = symbolTable.GetNode(exceptionVarClassType);
                 Assert(exceptionVarNode->GetNodeType() == NodeType::classNode, "class node expected");
                 ClassNode* exceptionVarClassNode = static_cast<ClassNode*>(exceptionVarNode);
                 BindClass(exceptionVarClassType, exceptionVarClassNode);
             }
             if (exceptionVarClassType == systemExceptionClassType || exceptionVarClassType->HasBaseClass(systemExceptionClassType))
             {
-                exceptionVarSymbol->SetType(exceptionVarClassType);
+                exceptionVarSymbol->SetType(type);
             }
             else
             {
@@ -627,8 +695,19 @@ void TypeBinder::Visit(TypedefNode& typedefNode)
     Symbol* symbol = symbolTable.GetSymbol(&typedefNode);
     Assert(symbol->GetSymbolType() == SymbolType::typedefSymbol, "typedef symbol expected");
     TypedefSymbol* typedefSymbol = static_cast<TypedefSymbol*>(symbol);
-    typedefSymbol->SetSpecifiers(typedefNode.GetSpecifiers());
-    TypeSymbol* typeSymbol = ResolveType(typedefNode.TypeExpr(), boundCompileUnit, containerScope);
+    BindTypedef(typedefSymbol, &typedefNode, true);
+}
+
+void TypeBinder::BindTypedef(TypedefSymbol* typedefSymbol, TypedefNode* typedefNode, bool fromOwnCompileUnit)
+{
+    if (typedefSymbol->IsBound()) return;
+    typedefSymbol->SetBound();
+    typedefSymbol->SetSpecifiers(typedefNode->GetSpecifiers());
+    if (!fromOwnCompileUnit)
+    {
+        AddUsingNodesToCurrentCompileUnit(typedefNode);
+    }
+    TypeSymbol* typeSymbol = ResolveType(typedefNode->TypeExpr(), boundCompileUnit, containerScope);
     typedefSymbol->SetType(typeSymbol);
 }
 
@@ -669,7 +748,13 @@ void TypeBinder::Visit(EnumTypeNode& enumTypeNode)
     {
         EnumConstantNode* enumConstantNode = enumTypeNode.Constants()[i];
         enumConstantNode->Accept(*this);
-    }
+    } 
+    EnumTypeToUnderlyingTypeConversion* enum2underlying = new EnumTypeToUnderlyingTypeConversion(enumTypeNode.GetSpan(), U"enum2underlying", enumTypeSymbol, underlyingType);
+    symbolTable.AddConversion(enum2underlying);
+    enumTypeSymbol->AddMember(enum2underlying);
+    UnderlyingTypeToEnumTypeConversion* underlying2enum = new UnderlyingTypeToEnumTypeConversion(enumTypeNode.GetSpan(), U"underlying2enum", underlyingType, enumTypeSymbol);
+    symbolTable.AddConversion(underlying2enum);
+    enumTypeSymbol->AddMember(underlying2enum);
     containerScope = prevContainerScope;
     enumType = prevEnumType;
 }

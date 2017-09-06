@@ -6,6 +6,7 @@
 #include <cmajor/binder/BoundExpression.hpp>
 #include <cmajor/binder/TypeResolver.hpp>
 #include <cmajor/binder/BoundNodeVisitor.hpp>
+#include <cmajor/binder/BoundFunction.hpp>
 #include <cmajor/symbols/FunctionSymbol.hpp>
 #include <cmajor/symbols/Exception.hpp>
 #include <cmajor/symbols/EnumSymbol.hpp>
@@ -22,6 +23,19 @@ BoundExpression::BoundExpression(const Span& span_, BoundNodeType boundNodeType_
 {
 }
 
+void BoundExpression::AddTemporaryDestructorCall(std::unique_ptr<BoundFunctionCall>&& destructorCall)
+{
+    temporaryDestructorCalls.push_back(std::move(destructorCall));
+}
+
+void BoundExpression::DestroyTemporaries(Emitter& emitter)
+{
+    for (const std::unique_ptr<BoundFunctionCall>& destructorCall : temporaryDestructorCalls)
+    {
+        destructorCall->Load(emitter, OperationFlags::none);
+    }
+}
+
 BoundParameter::BoundParameter(ParameterSymbol* parameterSymbol_) : 
     BoundExpression(parameterSymbol_->GetSpan(), BoundNodeType::boundParameter, parameterSymbol_->GetType()), parameterSymbol(parameterSymbol_)
 {
@@ -36,16 +50,23 @@ void BoundParameter::Load(Emitter& emitter, OperationFlags flags)
 {
     if ((flags & OperationFlags::addr) != OperationFlags::none)
     {
-        throw Exception("cannot take address of a parameter", GetSpan());
+        emitter.Stack().Push(parameterSymbol->IrObject());
     }
     else if ((flags & OperationFlags::deref) != OperationFlags::none)
     {
-        emitter.Stack().Push(emitter.Builder().CreateLoad(emitter.Builder().CreateLoad(parameterSymbol->IrObject())));
+        llvm::Value* value = emitter.Builder().CreateLoad(parameterSymbol->IrObject());
+        uint8_t n = GetDerefCount(flags);
+        for (uint8_t i = 0; i < n; ++i)
+        {
+            value = emitter.Builder().CreateLoad(value);
+        }
+        emitter.Stack().Push(value);
     }
     else
     {
         emitter.Stack().Push(emitter.Builder().CreateLoad(parameterSymbol->IrObject()));
     }
+    DestroyTemporaries(emitter);
 }
 
 void BoundParameter::Store(Emitter& emitter, OperationFlags flags)
@@ -57,12 +78,19 @@ void BoundParameter::Store(Emitter& emitter, OperationFlags flags)
     }
     else if ((flags & OperationFlags::deref) != OperationFlags::none)
     {
-        emitter.Builder().CreateStore(value, emitter.Builder().CreateLoad(parameterSymbol->IrObject()));
+        llvm::Value* ptr = emitter.Builder().CreateLoad(parameterSymbol->IrObject());
+        uint8_t n = GetDerefCount(flags);
+        for (uint8_t i = 1; i < n; ++i)
+        {
+            ptr = emitter.Builder().CreateLoad(ptr);
+        }
+        emitter.Builder().CreateStore(value, ptr);
     }
     else
     {
         emitter.Builder().CreateStore(value, parameterSymbol->IrObject());
     }
+    DestroyTemporaries(emitter);
 }
 
 void BoundParameter::Accept(BoundNodeVisitor& visitor)
@@ -88,12 +116,19 @@ void BoundLocalVariable::Load(Emitter& emitter, OperationFlags flags)
     }
     else if ((flags & OperationFlags::deref) != OperationFlags::none)
     {
-        emitter.Stack().Push(emitter.Builder().CreateLoad(emitter.Builder().CreateLoad(localVariableSymbol->IrObject())));
+        llvm::Value* value = emitter.Builder().CreateLoad(localVariableSymbol->IrObject());
+        uint8_t n = GetDerefCount(flags);
+        for (uint8_t i = 0; i < n; ++i)
+        {
+            value = emitter.Builder().CreateLoad(value);
+        }
+        emitter.Stack().Push(value);
     }
     else
     {
         emitter.Stack().Push(emitter.Builder().CreateLoad(localVariableSymbol->IrObject()));
     }
+    DestroyTemporaries(emitter);
 }
 
 void BoundLocalVariable::Store(Emitter& emitter, OperationFlags flags)
@@ -105,12 +140,19 @@ void BoundLocalVariable::Store(Emitter& emitter, OperationFlags flags)
     }
     else if ((flags & OperationFlags::deref) != OperationFlags::none)
     {
-        emitter.Builder().CreateStore(value, emitter.Builder().CreateLoad(localVariableSymbol->IrObject()));
+        llvm::Value* ptr = emitter.Builder().CreateLoad(localVariableSymbol->IrObject());
+        uint8_t n = GetDerefCount(flags);
+        for (uint8_t i = 1; i < n; ++i)
+        {
+            ptr = emitter.Builder().CreateLoad(ptr);
+        }
+        emitter.Builder().CreateStore(value, ptr);
     }
     else
     {
         emitter.Builder().CreateStore(value, localVariableSymbol->IrObject());
     }
+    DestroyTemporaries(emitter);
 }
 
 void BoundLocalVariable::Accept(BoundNodeVisitor& visitor)
@@ -168,12 +210,19 @@ void BoundMemberVariable::Load(Emitter& emitter, OperationFlags flags)
     }
     else if ((flags & OperationFlags::deref) != OperationFlags::none)
     {
-        emitter.Stack().Push(emitter.Builder().CreateLoad(emitter.Builder().CreateLoad(memberVariablePtr)));
+        llvm::Value* value = emitter.Builder().CreateLoad(memberVariablePtr);
+        uint8_t n = GetDerefCount(flags);
+        for (uint8_t i = 0; i < n; ++i)
+        {
+            value = emitter.Builder().CreateLoad(value);
+        }
+        emitter.Stack().Push(value);
     }
     else
     {
         emitter.Stack().Push(emitter.Builder().CreateLoad(memberVariablePtr));
     }
+    DestroyTemporaries(emitter);
 }
 
 void BoundMemberVariable::Store(Emitter& emitter, OperationFlags flags)
@@ -210,13 +259,20 @@ void BoundMemberVariable::Store(Emitter& emitter, OperationFlags flags)
         llvm::Value* memberVariablePtr = emitter.Builder().CreateGEP(ptr, indeces);
         if ((flags & OperationFlags::deref) != OperationFlags::none)
         {
-            emitter.Builder().CreateStore(value, emitter.Builder().CreateLoad(memberVariablePtr));
+            llvm::Value* ptr = emitter.Builder().CreateLoad(memberVariablePtr);
+            uint8_t n = GetDerefCount(flags);
+            for (uint8_t i = 1; i < n; ++i)
+            {
+                ptr = emitter.Builder().CreateLoad(ptr);
+            }
+            emitter.Builder().CreateStore(value, ptr);
         }
         else
         {
             emitter.Builder().CreateStore(value, memberVariablePtr);
         }
     }
+    DestroyTemporaries(emitter);
 }
 
 void BoundMemberVariable::Accept(BoundNodeVisitor& visitor)
@@ -252,6 +308,7 @@ void BoundConstant::Load(Emitter& emitter, OperationFlags flags)
     {
         emitter.Stack().Push(constantSymbol->GetValue()->IrValue(emitter));
     }
+    DestroyTemporaries(emitter);
 }
 
 void BoundConstant::Store(Emitter& emitter, OperationFlags flags)
@@ -288,6 +345,7 @@ void BoundEnumConstant::Load(Emitter& emitter, OperationFlags flags)
     {
         emitter.Stack().Push(enumConstantSymbol->GetValue()->IrValue(emitter));
     }
+    DestroyTemporaries(emitter);
 }
 
 void BoundEnumConstant::Store(Emitter& emitter, OperationFlags flags)
@@ -325,6 +383,7 @@ void BoundLiteral::Load(Emitter& emitter, OperationFlags flags)
     {
         emitter.Stack().Push(value->IrValue(emitter));
     }
+    DestroyTemporaries(emitter);
 }
 
 void BoundLiteral::Store(Emitter& emitter, OperationFlags flags)
@@ -361,12 +420,13 @@ void BoundTemporary::Load(Emitter& emitter, OperationFlags flags)
     }
     else if ((flags & OperationFlags::deref) != OperationFlags::none)
     {
-        backingStore->Load(emitter, OperationFlags::deref);
+        backingStore->Load(emitter, SetDerefCount(OperationFlags::deref, GetDerefCount(flags) + 1));
     }
     else
     {
         backingStore->Load(emitter, OperationFlags::none);
     }
+    DestroyTemporaries(emitter);
 }
 
 void BoundTemporary::Store(Emitter& emitter, OperationFlags flags)
@@ -406,6 +466,7 @@ void BoundSizeOfExpression::Load(Emitter& emitter, OperationFlags flags)
         llvm::Value* size = emitter.Builder().CreatePtrToInt(gep, emitter.Builder().getInt64Ty());
         emitter.Stack().Push(size);
     }
+    DestroyTemporaries(emitter);
 }
 
 void BoundSizeOfExpression::Store(Emitter& emitter, OperationFlags flags)
@@ -441,6 +502,7 @@ void BoundAddressOfExpression::Load(Emitter& emitter, OperationFlags flags)
         BoundDereferenceExpression* derefExpr = static_cast<BoundDereferenceExpression*>(subject.get());
         derefExpr->Subject()->Load(emitter, flags);
     }
+    DestroyTemporaries(emitter);
 }
 
 void BoundAddressOfExpression::Store(Emitter& emitter, OperationFlags flags)
@@ -454,6 +516,7 @@ void BoundAddressOfExpression::Store(Emitter& emitter, OperationFlags flags)
         BoundDereferenceExpression* derefExpr = static_cast<BoundDereferenceExpression*>(subject.get());
         derefExpr->Subject()->Store(emitter, flags);
     }
+    DestroyTemporaries(emitter);
 }
 
 void BoundAddressOfExpression::Accept(BoundNodeVisitor& visitor)
@@ -477,26 +540,28 @@ void BoundDereferenceExpression::Load(Emitter& emitter, OperationFlags flags)
 {
     if (subject->GetBoundNodeType() != BoundNodeType::boundAddressOfExpression)
     {
-        subject->Load(emitter, OperationFlags::deref);
+        subject->Load(emitter, SetDerefCount(OperationFlags::deref, GetDerefCount(flags) + 1));
     }
     else
     {
         BoundAddressOfExpression* addressOfExpr = static_cast<BoundAddressOfExpression*>(subject.get());
         addressOfExpr->Subject()->Load(emitter, flags);
     }
+    DestroyTemporaries(emitter);
 }
 
 void BoundDereferenceExpression::Store(Emitter& emitter, OperationFlags flags)
 {
     if (subject->GetBoundNodeType() != BoundNodeType::boundAddressOfExpression)
     {
-        subject->Store(emitter, OperationFlags::deref | (flags & OperationFlags::functionCallFlags));
+        subject->Store(emitter, SetDerefCount(OperationFlags::deref | (flags & OperationFlags::functionCallFlags), GetDerefCount(flags) + 1));
     }
     else
     {
         BoundAddressOfExpression* addressOfExpr = static_cast<BoundAddressOfExpression*>(subject.get());
         addressOfExpr->Subject()->Store(emitter, flags | (flags & OperationFlags::functionCallFlags));
     }
+    DestroyTemporaries(emitter);
 }
 
 void BoundDereferenceExpression::Accept(BoundNodeVisitor& visitor)
@@ -519,11 +584,13 @@ BoundExpression* BoundReferenceToPointerExpression::Clone()
 void BoundReferenceToPointerExpression::Load(Emitter& emitter, OperationFlags flags)
 {
     subject->Load(emitter, flags);
+    DestroyTemporaries(emitter);
 }
 
 void BoundReferenceToPointerExpression::Store(Emitter& emitter, OperationFlags flags)
 {
     subject->Store(emitter, flags);
+    DestroyTemporaries(emitter);
 }
 
 void BoundReferenceToPointerExpression::Accept(BoundNodeVisitor& visitor)
@@ -582,9 +649,16 @@ void BoundFunctionCall::Load(Emitter& emitter, OperationFlags flags)
         functionSymbol->GenerateCall(emitter, genObjects, callFlags);
         if ((flags & OperationFlags::deref) != OperationFlags::none)
         {
-            emitter.Stack().Push(emitter.Builder().CreateLoad(emitter.Stack().Pop()));
+            llvm::Value* value = emitter.Stack().Pop();
+            uint8_t n = GetDerefCount(flags);
+            for (uint8_t i = 0; i < n; ++i)
+            {
+                value = emitter.Builder().CreateLoad(value);
+            }
+            emitter.Stack().Push(value);
         }
     }
+    DestroyTemporaries(emitter);
 }
 
 void BoundFunctionCall::Store(Emitter& emitter, OperationFlags flags)
@@ -618,6 +692,11 @@ void BoundFunctionCall::Store(Emitter& emitter, OperationFlags flags)
         }
         if ((flags & OperationFlags::deref) != OperationFlags::none || GetFlag(BoundExpressionFlags::deref))
         {
+            uint8_t n = GetDerefCount(flags);
+            for (uint8_t i = 1; i < n; ++i)
+            {
+                ptr = emitter.Builder().CreateLoad(ptr);
+            }
             emitter.Builder().CreateStore(value, ptr);
         }
         else
@@ -625,6 +704,7 @@ void BoundFunctionCall::Store(Emitter& emitter, OperationFlags flags)
             emitter.Builder().CreateStore(emitter.Builder().CreateLoad(value), ptr);
         }
     }
+    DestroyTemporaries(emitter);
 }
 
 void BoundFunctionCall::Accept(BoundNodeVisitor& visitor)
@@ -679,6 +759,7 @@ void BoundConstructExpression::Load(Emitter& emitter, OperationFlags flags)
             emitter.ResetObjectPointer();
         }
     }
+    DestroyTemporaries(emitter);
 }
 
 void BoundConstructExpression::Store(Emitter& emitter, OperationFlags flags)
@@ -706,6 +787,7 @@ void BoundConstructAndReturnTemporaryExpression::Load(Emitter& emitter, Operatio
 {
     constructorCall->Load(emitter, OperationFlags::none);
     boundTemporary->Load(emitter, flags);
+    DestroyTemporaries(emitter);
 }
 
 void BoundConstructAndReturnTemporaryExpression::Store(Emitter& emitter, OperationFlags flags)
@@ -735,6 +817,7 @@ void BoundConversion::Load(Emitter& emitter, OperationFlags flags)
     sourceExpr->Load(emitter, flags);
     std::vector<GenObject*> emptyObjects;
     conversionFun->GenerateCall(emitter, emptyObjects, OperationFlags::none);
+    DestroyTemporaries(emitter);
 }
 
 void BoundConversion::Store(Emitter& emitter, OperationFlags flags)
@@ -789,6 +872,7 @@ void BoundIsExpression::Load(Emitter& emitter, OperationFlags flags)
     llvm::Value* remainder = emitter.Builder().CreateURem(leftClassId, rightClassId);
     llvm::Value* remainderIsZero = emitter.Builder().CreateICmpEQ(remainder, emitter.Builder().getInt64(0));
     emitter.Stack().Push(remainderIsZero);
+    DestroyTemporaries(emitter);
 }
 
 void BoundIsExpression::Store(Emitter& emitter, OperationFlags flags)
@@ -859,6 +943,7 @@ void BoundAsExpression::Load(Emitter& emitter, OperationFlags flags)
     emitter.Builder().CreateBr(continueBlock);
     emitter.Builder().SetInsertPoint(continueBlock);
     variable->Load(emitter, OperationFlags::none);
+    DestroyTemporaries(emitter);
 }
 
 void BoundAsExpression::Store(Emitter& emitter, OperationFlags flags)
@@ -908,6 +993,7 @@ void BoundTypeNameExpression::Load(Emitter& emitter, OperationFlags flags)
     llvm::Value* classNamePtr = emitter.Builder().CreateGEP(vmtPtr, indeces);
     llvm::Value* className = emitter.Builder().CreateLoad(classNamePtr);
     emitter.Stack().Push(className);
+    DestroyTemporaries(emitter);
 }
 
 void BoundTypeNameExpression::Store(Emitter& emitter, OperationFlags flags)
@@ -935,6 +1021,7 @@ void BoundBitCast::Load(Emitter& emitter, OperationFlags flags)
     llvm::Value* value = emitter.Stack().Pop();
     llvm::Value* casted = emitter.Builder().CreateBitCast(value, GetType()->IrType(emitter));
     emitter.Stack().Push(casted);
+    DestroyTemporaries(emitter);
 }
 
 void BoundBitCast::Store(Emitter& emitter, OperationFlags flags)
@@ -960,6 +1047,7 @@ void BoundFunctionPtr::Load(Emitter& emitter, OperationFlags flags)
 {
     llvm::Value* irObject = emitter.Module()->getOrInsertFunction(ToUtf8(function->MangledName()), function->IrType(emitter));
     emitter.Stack().Push(irObject);
+    DestroyTemporaries(emitter);
 }
 
 void BoundFunctionPtr::Store(Emitter& emitter, OperationFlags flags)
@@ -1006,6 +1094,7 @@ void BoundDisjunction::Load(Emitter& emitter, OperationFlags flags)
     emitter.Builder().SetInsertPoint(nextBlock);
     llvm::Value* value = emitter.Builder().CreateLoad(temp);
     emitter.Stack().Push(value);
+    DestroyTemporaries(emitter);
 }
 
 void BoundDisjunction::Store(Emitter& emitter, OperationFlags flags)
@@ -1057,6 +1146,7 @@ void BoundConjunction::Load(Emitter& emitter, OperationFlags flags)
     emitter.Builder().SetInsertPoint(nextBlock);
     llvm::Value* value = emitter.Builder().CreateLoad(temp);
     emitter.Stack().Push(value);
+    DestroyTemporaries(emitter);
 }
 
 void BoundConjunction::Store(Emitter& emitter, OperationFlags flags)
@@ -1124,7 +1214,8 @@ void BoundNamespaceExpression::Accept(BoundNodeVisitor& visitor)
 }
 
 BoundFunctionGroupExpression::BoundFunctionGroupExpression(const Span& span_, FunctionGroupSymbol* functionGroupSymbol_) : 
-    BoundExpression(span_, BoundNodeType::boundFunctionGroupExcpression, new FunctionGroupTypeSymbol(functionGroupSymbol_)), functionGroupSymbol(functionGroupSymbol_), scopeQualified(false), qualifiedScope(nullptr)
+    BoundExpression(span_, BoundNodeType::boundFunctionGroupExpression, new FunctionGroupTypeSymbol(functionGroupSymbol_)), 
+    functionGroupSymbol(functionGroupSymbol_), scopeQualified(false), qualifiedScope(nullptr)
 {
     functionGroupType.reset(GetType());
 }
@@ -1159,6 +1250,11 @@ void BoundFunctionGroupExpression::Accept(BoundNodeVisitor& visitor)
 void BoundFunctionGroupExpression::SetClassPtr(std::unique_ptr<BoundExpression>&& classPtr_)
 {
     classPtr = std::move(classPtr_);
+}
+
+void BoundFunctionGroupExpression::SetTemplateArgumentTypes(const std::vector<TypeSymbol*>& templateArgumentTypes_)
+{
+    templateArgumentTypes = templateArgumentTypes_;
 }
 
 BoundMemberExpression::BoundMemberExpression(const Span& span_, std::unique_ptr<BoundExpression>&& classPtr_, std::unique_ptr<BoundExpression>&& member_) :

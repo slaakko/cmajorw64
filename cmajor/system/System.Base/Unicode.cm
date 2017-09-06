@@ -1,0 +1,347 @@
+// =================================
+// Copyright (c) 2017 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+
+namespace System.Unicode
+{
+    public ustring ToUtf32(const string& utf8Str)
+    {
+        ustring result;
+        const char* p = utf8Str.Chars();
+        long bytesRemaining = utf8Str.Length();
+        while (bytesRemaining > 0)
+        {
+            char c = *p;
+            byte x = cast<byte>(c);
+            if ((x & 0x80u) == 0u)
+            {
+                result.Append(cast<uchar>(cast<uint>(x)));
+                --bytesRemaining;
+                ++p;
+            }
+            else if ((x & 0xE0u) == 0xC0u)
+            {
+                if (bytesRemaining < 2)
+                {
+                    ThrowConversionException("invalid UTF-8 sequence");
+                }
+                uchar u = cast<uchar>(cast<uint>(0u));
+                byte b1 = cast<byte>(p[1]);
+                if ((b1 & 0xC0u) != 0x80u)
+                {
+                    ThrowConversionException("invalid UTF-8 sequence");
+                }
+                byte shift = 0u;
+                for (byte i = 0u; i < 6u; ++i)
+                {
+                    byte bit = b1 & 1u;
+                    b1 = b1 >> 1u;
+                    u = cast<uchar>(cast<uint>(u) | (cast<uint>(bit) << shift));
+                    ++shift;
+                }
+                byte b0 = x;
+                for (byte i = 0u; i < 5u; ++i)
+                {
+                    byte bit = b0 & 1u;
+                    b0 = b0 >> 1u;
+                    u = cast<uchar>(cast<uint>(u) | (cast<uint>(bit) << shift));
+                    ++shift;
+                }
+                result.Append(u);
+                bytesRemaining = bytesRemaining - 2;
+                p = p + 2;
+            }
+            else if ((x & 0xF0u) == 0xE0u)
+            {
+                if (bytesRemaining < 3)
+                {
+                    ThrowConversionException("invalid UTF-8 sequence");
+                }
+                uchar u = cast<uchar>(cast<uint>(0u));
+                byte b2 = cast<byte>(p[2]);
+                if ((b2 & 0xC0u) != 0x80u)
+                {
+                    ThrowConversionException("invalid UTF-8 sequence");
+                }
+                byte shift = 0u;
+                for (byte i = 0u; i < 6u; ++i)
+                {
+                    byte bit = b2 & 1u;
+                    b2 = b2 >> 1u;
+                    u = cast<uchar>(cast<uint>(u) | (cast<uint>(bit) << shift));
+                    ++shift;
+                }
+                byte b1 = cast<byte>(p[1]);
+                if ((b1 & 0xC0u) != 0x80u)
+                {
+                    ThrowConversionException("invalid UTF-8 sequence");
+                }
+                for (byte i = 0u; i < 6u; ++i)
+                {
+                    byte bit = b1 & 1u;
+                    b1 = b1 >> 1u;
+                    u = cast<uchar>(cast<uint>(u) | (cast<uint>(bit) << shift));
+                    ++shift;
+                }
+                byte b0 = x;
+                for (byte i = 0u; i < 4u; ++i)
+                {
+                    byte bit = b0 & 1u;
+                    b0 = b0 >> 1u;
+                    u = cast<uchar>(cast<uint>(u) | (cast<uint>(bit) << shift));
+                    ++shift;
+                }
+                result.Append(u);
+                bytesRemaining = bytesRemaining - 3;
+                p = p + 3;
+            }
+            else if ((x & 0xF8u) == 0xF0u)
+            {
+                if (bytesRemaining < 4)
+                {
+                    ThrowConversionException("invalid UTF-8 sequence");
+                }
+                uchar u = cast<uchar>(cast<uint>(0u));
+                byte b3 = cast<byte>(p[3]);
+                if ((b3 & 0xC0u) != 0x80u)
+                {
+                    ThrowConversionException("invalid UTF-8 sequence");
+                }
+                byte shift = 0u;
+                for (byte i = 0u; i < 6u; ++i)
+                {
+                    byte bit = b3 & 1u;
+                    b3 = b3 >> 1u;
+                    u = cast<uchar>(cast<uint>(u) | (cast<uint>(bit) << shift));
+                    ++shift;
+                }
+                byte b2 = cast<byte>(p[2]);
+                if ((b2 & 0xC0u) != 0x80u)
+                {
+                    ThrowConversionException("invalid UTF-8 sequence");
+                }
+                for (byte i = 0u; i < 6u; ++i)
+                {
+                    byte bit = b2 & 1u;
+                    b2 = b2 >> 1u;
+                    u = cast<uchar>(cast<uint>(u) | (cast<uint>(bit) << shift));
+                    ++shift;
+                }
+                byte b1 = cast<byte>(p[1]);
+                if ((b1 & 0xC0u) != 0x80u)
+                {
+                    ThrowConversionException("invalid UTF-8 sequence");
+                }
+                for (byte i = 0u; i < 6u; ++i)
+                {
+                    byte bit = b1 & 1u;
+                    b1 = b1 >> 1u;
+                    u = cast<uchar>(cast<uint>(u) | (cast<uint>(bit) << shift));
+                    ++shift;
+                }
+                byte b0 = x;
+                for (byte i = 0u; i < 3u; ++i)
+                {
+                    byte bit = b0 & 1u;
+                    b0 = b0 >> 1u;
+                    u = cast<uchar>(cast<uint>(u) | (cast<uint>(bit) << shift));
+                    ++shift;
+                }
+                result.Append(u);
+                bytesRemaining = bytesRemaining - 4;
+                p = p + 4;
+            }
+            else
+            {
+                ThrowConversionException("invalid UTF-8 sequence");
+            }
+        }
+        return result;
+    }
+    
+    public ustring ToUtf32(const wstring& utf16Str)
+    {
+        ustring result;
+        const wchar* w = utf16Str.Chars();
+        long remaining = utf16Str.Length();
+        while (remaining > 0)
+        {
+            wchar w1 = *w++;
+            --remaining;
+            if (cast<ushort>(w1) < 0xD800u || cast<ushort>(w1) > 0xDFFFu)
+            {
+                result.Append(w1);
+            }
+            else
+            {
+                if (cast<ushort>(w1) < 0xD800u || cast<ushort>(w1) > 0xDBFFu)
+                {
+                    ThrowConversionException("invalid UTF-16 sequence");
+                }
+                if (remaining > 0)
+                {
+                    wchar w2 = *w++;
+                    --remaining;
+                    if (cast<ushort>(w2) < 0xDC00u || cast<ushort>(w2) > 0xDFFFu)
+                    {
+                        ThrowConversionException("invalid UTF-16 sequence");
+                    }
+                    else
+                    {
+                        uchar uprime = cast<uchar>(((0x03FFu & cast<uint>(w1)) << 10u) | (0x03FFu & cast<uint>(w2)));
+                        uchar u = cast<uchar>(cast<uint>(uprime) + 0x10000u);
+                        result.Append(u);
+                    }
+                }
+                else
+                {
+                    ThrowConversionException("invalid UTF-16 sequence");
+                }
+            } 
+        }
+        return result;
+    }
+
+    public wstring ToUtf16(const ustring& utf32Str)
+    {
+        wstring result;
+        for (uchar u : utf32Str)
+        {
+            if (cast<uint>(u) > 0x10FFFFu)
+            {
+                ThrowConversionException("invalid UTF-32 code point");
+            }
+            if (cast<uint>(u) < 0x10000u)
+            {
+                if (cast<uint>(u) >= 0xD800 && cast<uint>(u) <= 0xDFFF)
+                {
+                    ThrowConversionException("invalid UTF-32 code point (reserved for UTF-16)");
+                }
+                wchar x = cast<wchar>(u);
+                result.Append(x);
+            }
+            else
+            {
+                uchar uprime = cast<uchar>(cast<uint>(u) - 0x10000u);
+                wchar w1 = cast<wchar>(0xD800u);
+                wchar w2 = cast<wchar>(0xDC00u);
+                for (ushort i = 0u; i < 10u; ++i)
+                {
+                    ushort bit = cast<ushort>(cast<uint>(uprime) & (cast<uint>(0x1u) << i));
+                    w2 = cast<wchar>(cast<ushort>(w2) | bit);
+                }
+                for (ushort i = 10u; i < 20u; ++i)
+                {
+                    ushort bit = cast<ushort>((cast<uint>(uprime) & (cast<uint>(0x1u) << i)) >> 10u);
+                    w1 = cast<wchar>(cast<ushort>(w1) | bit);
+                }
+                result.Append(w1);
+                result.Append(w2);
+            }
+        }
+        return result;
+    }
+
+    public wstring ToUtf16(const string& utf8Str)
+    {
+        return ToUtf16(ToUtf32(utf8Str));
+    }
+
+    public string ToUtf8(const ustring& utf32Str)
+    {
+        string result;
+        for (uchar c : utf32Str)
+        {
+            uint x = cast<uint>(c);
+            if (x < 0x80u)
+            {
+                result.Append(cast<char>(x & 0x7Fu));
+            }
+            else if (x < 0x800u)
+            {
+                byte b1 = 0x80u;
+                for (byte i = 0u; i < 6u; ++i)
+                {
+                    b1 = b1 | (cast<byte>(x & 1u) << i);
+                    x = x >> 1u;
+                }
+                byte b0 = 0xC0u;
+                for (byte i = 0u; i < 5u; ++i)
+                {
+                    b0 = b0 | (cast<byte>(x & 1u) << i);
+                    x = x >> 1u;
+                }
+                result.Append(cast<char>(b0));
+                result.Append(cast<char>(b1));
+            }
+            else if (x < 0x10000u)
+            {
+                byte b2 = 0x80u;
+                for (byte i = 0u; i < 6u; ++i)
+                {
+                    b2 = b2 | (cast<byte>(x & 1u) << i);
+                    x = x >> 1u;
+                }
+                byte b1 = 0x80u;
+                for (byte i = 0u; i < 6u; ++i)
+                {
+                    b1 = b1 | (cast<byte>(x & 1u) << i);
+                    x = x >> 1u;
+                }
+                byte b0 = 0xE0u;
+                for (byte i = 0u; i < 4u; ++i)
+                {
+                    b0 = b0 | (cast<byte>(x & 1u) << i);
+                    x = x >> 1u;
+                }
+                result.Append(cast<char>(b0));
+                result.Append(cast<char>(b1));
+                result.Append(cast<char>(b2));
+            }
+            else if (x < 0x110000u)
+            {
+                byte b3 = 0x80u;
+                for (byte i = 0u; i < 6u; ++i)
+                {
+                    b3 = b3 | (cast<byte>(x & 1u) << i);
+                    x = x >> 1u;
+                }
+                byte b2 = 0x80u;
+                for (byte i = 0u; i < 6u; ++i)
+                {
+                    b2 = b2 | (cast<byte>(x & 1u) << i);
+                    x = x >> 1u;
+                }
+                byte b1 = 0x80u;
+                for (byte i = 0u; i < 6u; ++i)
+                {
+                    b1 = b1 | (cast<byte>(x & 1u) << i);
+                    x = x >> 1u;
+                }
+                byte b0 = 0xF0u;
+                for (byte i = 0u; i < 3u; ++i)
+                {
+                    b0 = b0 | (cast<byte>(x & 1u) << i);
+                    x = x >> 1u;
+                }
+                result.Append(cast<char>(b0));
+                result.Append(cast<char>(b1));
+                result.Append(cast<char>(b2));
+                result.Append(cast<char>(b3));
+            }
+            else
+            {
+                ThrowConversionException("invalid UTF-32 code point");
+            }
+        }
+        return result;
+    }
+
+    public string ToUtf8(const wstring& utf16Str)
+    {
+        return ToUtf8(ToUtf32(utf16Str));
+    }
+}

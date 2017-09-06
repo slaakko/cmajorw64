@@ -75,10 +75,10 @@ public:
     TypeSymbol* RemoveReference(const Span& span) override;
     TypeSymbol* RemovePointer(const Span& span) override;
     TypeSymbol* RemoveConst(const Span& span) override;
-    TypeSymbol* AddConst(const Span& span);
-    TypeSymbol* AddLvalueReference(const Span& span);
-    TypeSymbol* AddRvalueReference(const Span& span);
-    TypeSymbol* AddPointer(const Span& span);
+    TypeSymbol* AddConst(const Span& span) override;
+    TypeSymbol* AddLvalueReference(const Span& span) override;
+    TypeSymbol* AddRvalueReference(const Span& span) override;
+    TypeSymbol* AddPointer(const Span& span) override;
     llvm::Type* IrType(Emitter& emitter) override;
     llvm::Constant* CreateDefaultIrValue(Emitter& emitter) override;
     bool IsConstType() const override;

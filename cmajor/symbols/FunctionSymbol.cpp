@@ -207,10 +207,6 @@ void FunctionSymbol::Write(SymbolWriter& writer)
     ContainerSymbol::Write(writer);
     writer.GetBinaryWriter().Write(groupName);
     writer.GetBinaryWriter().Write(static_cast<uint16_t>(flags));
-    if (groupName == U"Align")
-    {
-        int x = 0;
-    }
     if (IsFunctionTemplate() || (GetGlobalFlag(GlobalFlags::release) && IsInline()))
     {
         uint32_t sizePos = writer.GetBinaryWriter().Pos();
@@ -247,10 +243,6 @@ void FunctionSymbol::Read(SymbolReader& reader)
     ContainerSymbol::Read(reader);
     groupName = reader.GetBinaryReader().ReadUtf32String();
     flags = static_cast<FunctionSymbolFlags>(reader.GetBinaryReader().ReadUShort());
-    if (groupName == U"Align")
-    {
-        int x = 0;
-    }
     if (IsFunctionTemplate() || (GetGlobalFlag(GlobalFlags::release) && IsInline()))
     {
         sizeOfAstNodes = reader.GetBinaryReader().ReadUInt();
@@ -310,6 +302,7 @@ void FunctionSymbol::ComputeExportClosure()
 void FunctionSymbol::ReadAstNodes()
 {
     AstReader reader(filePathReadFrom);
+    reader.SetReplaceFileIndex(GetSpan().FileIndex());
     reader.GetBinaryReader().Skip(astNodesPos);
     usingNodes.Read(reader);
     Node* node = reader.ReadNode();
@@ -821,6 +814,21 @@ std::string ConstructorSymbol::TypeString() const
     {
         return "constructor";
     }
+}
+
+uint8_t ConstructorSymbol::ConversionDistance() const
+{
+    return 5;
+}
+
+TypeSymbol* ConstructorSymbol::ConversionSourceType() const
+{
+    return Parameters()[1]->GetType();
+}
+
+TypeSymbol* ConstructorSymbol::ConversionTargetType() const
+{
+    return Parameters()[0]->GetType()->RemovePointer(GetSpan());
 }
 
 void ConstructorSymbol::SetSpecifiers(Specifiers specifiers)

@@ -12,7 +12,28 @@
 const int stdOutFileHandle = 1;
 const int stdErrFileHandle = 2;
 
-extern "C" RT_API void RtWrite(int32_t fileHandle, const uint8_t* buffer, int32_t count);
+enum class OpenMode : uint8_t
+{
+    none = 0,
+    read = 1 << 0, 
+    write = 1 << 1,
+    append = 1 << 2,
+    binary = 1 << 3
+};
+
+inline OpenMode operator&(OpenMode left, OpenMode right)
+{
+    return OpenMode(uint8_t(left) & uint8_t(right));
+}
+
+inline OpenMode operator|(OpenMode left, OpenMode right)
+{
+    return OpenMode(uint8_t(left) | uint8_t(right));
+}
+
+extern "C" RT_API int32_t RtOpen(const char* filePath, OpenMode openMode);
+extern "C" RT_API void RtClose(int32_t fileHandle);
+extern "C" RT_API void RtWrite(int32_t fileHandle, const uint8_t* buffer, int64_t count);
 
 namespace cmajor { namespace rt {
 

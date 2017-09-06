@@ -115,16 +115,12 @@ void SymbolTable::Read(SymbolReader& reader)
     {
         ClassTemplateSpecializationSymbol* classTemplateSpecialization = reader.ReadClassTemplateSpecializationSymbol(&globalNs);
         classTemplateSpecializations.push_back(std::unique_ptr<ClassTemplateSpecializationSymbol>(classTemplateSpecialization));
+        reader.AddClassTemplateSpecialization(classTemplateSpecialization);
     }
     ProcessTypeRequests();
     for (FunctionSymbol* conversion : reader.Conversions())
     {
         AddConversion(conversion);
-    }
-    for (ClassTypeSymbol* classType : reader.ClassTypes())
-    {
-        classType->SetSpecialMemberFunctions();
-        classType->CreateLayouts();
     }
 }
 
@@ -164,10 +160,12 @@ void SymbolTable::Import(SymbolTable& symbolTable)
             derivedTypeVec.push_back(derivedTypeSymbol);
         }
     }
+    classTemplateSpecializations = std::move(symbolTable.classTemplateSpecializations);
     int nc = classTemplateSpecializations.size();
     for (int i = 0; i < nc; ++i)
     {
         ClassTemplateSpecializationSymbol* classTemplateSpecialization = classTemplateSpecializations[i].get();
+        classTemplateSpecialization->SetSymbolTable(this);
         ClassTemplateSpecializationKey key(classTemplateSpecialization->GetClassTemplate(), classTemplateSpecialization->TemplateArgumentTypes());
         auto it = classTemplateSpecializationMap.find(key);
         if (it == classTemplateSpecializationMap.cend())
