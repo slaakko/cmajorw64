@@ -796,6 +796,10 @@ void ExpressionBinder::BindArrow(Node& node, const std::u32string& name)
                         }
                         bmv->SetClassPtr(std::unique_ptr<BoundExpression>(classPtr.release()));
                     }
+                    else
+                    {
+                        throw Exception("member variable '" + ToUtf8(bmv->GetMemberVariableSymbol()->FullName()) + +"' is static", node.GetSpan());
+                    }
                 }
                 else
                 {
@@ -810,12 +814,24 @@ void ExpressionBinder::BindArrow(Node& node, const std::u32string& name)
         else
         {
             throw Exception("type of arrow expression subject must be pointer to class type", node.GetSpan());
-
         }
     }
     else if (expression->GetType()->IsClassTypeSymbol())
     {
-        throw std::runtime_error("arrow returning a class type not implemented yet");
+        TypeSymbol* type = expression->GetType();
+        TypeSymbol* pointerType = type->AddPointer(node.GetSpan());
+        LocalVariableSymbol* temporary = boundFunction->GetFunctionSymbol()->CreateTemporary(type, node.GetSpan());
+        Assert(expression->GetBoundNodeType() == BoundNodeType::boundFunctionCall, "function call expected");
+        BoundFunctionCall* boundFunctionCall = static_cast<BoundFunctionCall*>(expression.get());
+        boundFunctionCall->AddArgument(std::unique_ptr<BoundExpression>(new BoundAddressOfExpression(std::unique_ptr<BoundExpression>(new BoundLocalVariable(temporary)), pointerType)));
+        expression.reset(new BoundAddressOfExpression(std::unique_ptr<BoundExpression>(
+            new BoundConstructAndReturnTemporaryExpression(std::move(expression), std::unique_ptr<BoundExpression>(new BoundLocalVariable(temporary)))), pointerType));
+        BindUnaryOp(expression.release(), node, U"operator->");
+        BindArrow(node, name);
+    }
+    else
+    {
+        throw Exception("arrow operator member function must return a class type object or a pointer to a class type object", node.GetSpan());
     }
 }
 

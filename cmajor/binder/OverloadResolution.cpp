@@ -992,7 +992,8 @@ std::unique_ptr<BoundFunctionCall> ResolveOverload(const std::u32string& groupNa
     std::vector<std::unique_ptr<BoundExpression>>& arguments, BoundCompileUnit& boundCompileUnit, BoundFunction* currentFunction, const Span& span)
 {
     std::unique_ptr<Exception> exception;
-    return ResolveOverload(groupName, containerScope, functionScopeLookups, arguments, boundCompileUnit, currentFunction, span, OverloadResolutionFlags::none, std::vector<TypeSymbol*>(), exception);
+    std::vector<TypeSymbol*> templateArgumentTypes;
+    return ResolveOverload(groupName, containerScope, functionScopeLookups, arguments, boundCompileUnit, currentFunction, span, OverloadResolutionFlags::none, templateArgumentTypes, exception);
 }
 
 std::unique_ptr<BoundFunctionCall> ResolveOverload(const std::u32string& groupName, ContainerScope* containerScope, const std::vector<FunctionScopeLookup>& functionScopeLookups, 
