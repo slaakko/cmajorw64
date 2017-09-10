@@ -4,6 +4,7 @@
 // =================================
 
 #include <cmajor/rt/InitDone.hpp>
+#include <cmajor/rt/Error.hpp>
 #include <cmajor/util/InitDone.hpp>
 #include <cmajor/rt/Io.hpp>
 #include <cmajor/rt/Classes.hpp>
@@ -32,10 +33,12 @@ void Init()
     InitIo();
     InitStatics();
     InitClasses();
+    InitError();
 }
 
 void Done()
 {
+    DoneError();
     DoneClasses();
     DoneStatics();
     DoneIo();

@@ -928,6 +928,13 @@ std::unique_ptr<BoundFunctionCall> SelectViableFunction(const std::unordered_set
             {
                 boundCompileUnit.InstantiateInlineFunction(bestFun, containerScope, span);
             }
+            if (boundFunction->GetFunctionSymbol()->DontThrow() && !boundFunction->GetFunctionSymbol()->HasTry() && !bestFun->DontThrow())
+            {
+                std::vector<Span> references;
+                references.push_back(boundFunction->GetFunctionSymbol()->GetSpan());
+                references.push_back(bestFun->GetSpan());
+                throw Exception("a nothrow function cannot call a function that can throw unless it handles exceptions", span, references);
+            }
             return CreateBoundFunctionCall(bestFun, arguments, boundCompileUnit, boundFunction, bestMatch, span);
         }
         else
@@ -961,6 +968,13 @@ std::unique_ptr<BoundFunctionCall> SelectViableFunction(const std::unordered_set
         else if (GetGlobalFlag(GlobalFlags::release) && singleBest->IsInline())
         {
             boundCompileUnit.InstantiateInlineFunction(singleBest, containerScope, span);
+        }
+        if (boundFunction->GetFunctionSymbol()->DontThrow() && !boundFunction->GetFunctionSymbol()->HasTry() && !singleBest->DontThrow())
+        {
+            std::vector<Span> references;
+            references.push_back(boundFunction->GetFunctionSymbol()->GetSpan());
+            references.push_back(singleBest->GetSpan());
+            throw Exception("a nothrow function cannot call a function that can throw unless it handles exceptions", span, references);
         }
         return CreateBoundFunctionCall(singleBest, arguments, boundCompileUnit, boundFunction, bestMatch, span);
     }

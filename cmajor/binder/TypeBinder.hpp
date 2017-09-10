@@ -50,8 +50,8 @@ public:
     void Visit(SwitchStatementNode& switchStatementNode) override;
     void Visit(CaseStatementNode& caseStatementNode) override;
     void Visit(DefaultStatementNode& defaultStatementNode) override;
-    void Visit(CatchNode& catchNode) override;
     void Visit(TryStatementNode& tryStatementNode) override;
+    void Visit(CatchNode& catchNode) override;
 
     void Visit(TypedefNode& typedefNode) override;
     void BindTypedef(TypedefSymbol* typedefSymbol, TypedefNode* typedefNode, bool fromOwnCompileUnit);
@@ -66,6 +66,7 @@ private:
     ContainerScope* containerScope;
     std::vector<Node*> usingNodes;
     EnumTypeSymbol* enumType;
+    FunctionSymbol* currentFunctionSymbol;
 };
 
 } } // namespace cmajor::binder

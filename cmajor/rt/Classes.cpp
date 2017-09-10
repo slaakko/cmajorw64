@@ -25,6 +25,53 @@ namespace cmajor { namespace rt {
 
 using namespace cmajor::util;
 
+class ClassIdMap
+{
+public:
+    static void Init();
+    static void Done();
+    static ClassIdMap& Instance() { return *instance; }
+    void SetClassId(uint32_t typeId, uint64_t classId);
+    uint64_t GetClassId(uint32_t typeId) const;
+private:
+    static std::unique_ptr<ClassIdMap> instance;
+    std::unordered_map<uint32_t, uint64_t> classIdMap;
+};
+
+std::unique_ptr<ClassIdMap> ClassIdMap::instance;
+
+void ClassIdMap::Init()
+{
+    instance.reset(new ClassIdMap());
+}
+
+void ClassIdMap::Done()
+{
+    instance.reset();
+}
+
+void ClassIdMap::SetClassId(uint32_t typeId, uint64_t classId)
+{
+    classIdMap[typeId] = classId;
+}
+
+uint64_t ClassIdMap::GetClassId(uint32_t typeId) const
+{
+    auto it = classIdMap.find(typeId);
+    if (it != classIdMap.cend())
+    {
+        return it->second;
+    }
+    else
+    {
+        std::stringstream s;
+        s << "internal error : class id for type id " << typeId << " not found.\n";
+        std::string str = s.str();
+        RtWrite(stdErrFileHandle, reinterpret_cast<const uint8_t*>(str.c_str()), str.length());
+        exit(exitCodeInternalError);
+    }
+}
+
 struct ClassInfo
 {
     ClassInfo(uint32_t typeId_, const std::string& vmtObjectName_, uint32_t baseTypeId_) : 
@@ -201,10 +248,24 @@ void SetClassIdsToVmts(const std::vector<ClassInfo*>& classesByPriority)
     }
 }
 
+void SetClassIdsToClassIdMap(const std::vector<ClassInfo*>& classesByPriority)
+{
+    for (ClassInfo* cls : classesByPriority)
+    {
+        ClassIdMap::Instance().SetClassId(cls->typeId, cls->id);
+    }
+}
+
+uint64_t GetClassId(uint32_t typeId)
+{
+    return ClassIdMap::Instance().GetClassId(typeId);
+}
+
 void InitClasses()
 {
     try
     {
+        ClassIdMap::Init();
         std::string executablePath = GetPathToExecutable();
         boost::filesystem::path classFilePath = boost::filesystem::path(executablePath).replace_extension(".cls");
         if (!exists(classFilePath))
@@ -220,6 +281,7 @@ void InitClasses()
         AssignKeys(classesByPriority);
         AssignClassIds(classesByPriority);
         SetClassIdsToVmts(classesByPriority);
+        SetClassIdsToClassIdMap(classesByPriority);
         AllocateMutexes(staticClassIds);
     }
     catch (const std::exception& ex)
@@ -234,6 +296,7 @@ void InitClasses()
 
 void DoneClasses()
 {
+    ClassIdMap::Done();
 }
 
 } } // namespace cmajor::rt

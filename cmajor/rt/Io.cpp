@@ -4,6 +4,7 @@
 // =================================
 
 #include <cmajor/rt/Io.hpp>
+#include <cmajor/rt/Error.hpp>
 #include <cmajor/util/Error.hpp>
 #include <cmajor/util/Unicode.hpp>
 #include <atomic>
@@ -25,6 +26,7 @@ public:
     int32_t OpenFile(const char* filePath, OpenMode openMode);
     void CloseFile(int32_t fileHandle);
     void WriteFile(int32_t fileHandle, const uint8_t* buffer, int64_t count);
+    int32_t ReadFile(int32_t fileHandle, uint8_t* buffer, int64_t bufferSize);
 private:
     static std::unique_ptr<FileTable> instance;
     const int32_t maxNoLockFileHandles = 256;
@@ -257,6 +259,55 @@ void FileTable::WriteFile(int32_t fileHandle, const uint8_t* buffer, int64_t cou
     }
 }
 
+int32_t FileTable::ReadFile(int32_t fileHandle, uint8_t* buffer, int64_t bufferSize)
+{
+    FILE* file = nullptr;
+    if (fileHandle < 0)
+    {
+        throw FileSystemError("invalid file handle " + std::to_string(fileHandle));
+    }
+    else if (fileHandle < maxNoLockFileHandles)
+    {
+        file = files[fileHandle];
+    }
+    else
+    {
+        std::lock_guard<std::mutex> lock(mtx);
+        auto it = fileMap.find(fileHandle);
+        if (it != fileMap.cend())
+        {
+            file = it->second;
+        }
+        else
+        {
+            throw FileSystemError("invalid file handle " + std::to_string(fileHandle));
+        }
+    }
+    if (!file)
+    {
+        throw FileSystemError("invalid file handle " + std::to_string(fileHandle));
+    }
+    int32_t result = 0;
+    result = int32_t(std::fread(buffer, 1, bufferSize, file));
+    if (result < bufferSize)
+    {
+        if (std::ferror(file) != 0)
+        {
+            std::string filePath;
+            if (fileHandle < maxNoLockFileHandles)
+            {
+                filePath = filePaths[fileHandle];
+            }
+            else
+            {
+                filePath = filePathMap[fileHandle];
+            }
+            throw FileSystemError("could not read from '" + filePath + "': " + strerror(errno));
+        }
+    }
+    return result;
+}
+
 FileSystemError::FileSystemError(const std::string& message_) : std::runtime_error(message_)
 {
 }
@@ -281,34 +332,44 @@ extern "C" RT_API int32_t RtOpen(const char* filePath, OpenMode openMode)
     }
     catch (const cmajor::rt::FileSystemError& ex)
     {
-        int x = 0;
-        // todo
-        return -1;
+        return cmajor::rt::InstallError(ex.what());
     }
 }
 
-extern "C" RT_API void RtClose(int32_t fileHandle)
+extern "C" RT_API int32_t RtClose(int32_t fileHandle)
 {
     try
     {
-        return cmajor::rt::FileTable::Instance().CloseFile(fileHandle);
+        cmajor::rt::FileTable::Instance().CloseFile(fileHandle);
+        return 0;
     }
     catch (const cmajor::rt::FileSystemError& ex)
     {
-        int x = 0;
-        // todo
+        return cmajor::rt::InstallError(ex.what());
     }
 }
 
-extern "C" RT_API void RtWrite(int32_t fileHandle, const uint8_t* buffer, int64_t count)
+extern "C" RT_API int32_t RtWrite(int32_t fileHandle, const uint8_t* buffer, int64_t count)
 {
     try
     {
         cmajor::rt::FileTable::Instance().WriteFile(fileHandle, buffer, count);
+        return 0;
     }
     catch (const cmajor::rt::FileSystemError& ex)
     {
-        int x = 0;
-        // todo
+        return cmajor::rt::InstallError(ex.what());
+    }
+}
+
+extern "C" RT_API int32_t RtRead(int32_t fileHandle, uint8_t* buffer, int64_t bufferSize)
+{
+    try
+    {
+        return cmajor::rt::FileTable::Instance().ReadFile(fileHandle, buffer, bufferSize);
+    }
+    catch (const cmajor::rt::FileSystemError& ex)
+    {
+        return cmajor::rt::InstallError(ex.what());
     }
 }

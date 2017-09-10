@@ -14,6 +14,7 @@
 #include <cmajor/binder/OperationRepository.hpp>
 #include <cmajor/binder/Evaluator.hpp>
 #include <cmajor/binder/TypeBinder.hpp>
+#include <cmajor/binder/TypeResolver.hpp>
 #include <cmajor/symbols/FunctionSymbol.hpp>
 #include <cmajor/symbols/Exception.hpp>
 #include <cmajor/symbols/GlobalFlags.hpp>
@@ -554,7 +555,7 @@ void StatementBinder::Visit(ReturnStatementNode& returnStatementNode)
                 returnTypeArgs.push_back(std::unique_ptr<BoundTypeExpression>(boundTypeExpression));
                 std::vector<FunctionScopeLookup> functionScopeLookups;
                 functionScopeLookups.push_back(FunctionScopeLookup(ScopeLookup::this_and_base_and_parent, containerScope));
-                functionScopeLookups.push_back(FunctionScopeLookup(ScopeLookup::this_, returnType->BaseType()->ClassInterfaceOrNsScope()));
+                functionScopeLookups.push_back(FunctionScopeLookup(ScopeLookup::this_and_base_and_parent, returnType->BaseType()->ClassInterfaceOrNsScope()));
                 functionScopeLookups.push_back(FunctionScopeLookup(ScopeLookup::fileScopes, nullptr));
                 std::unique_ptr<BoundFunctionCall> returnFunctionCall = ResolveOverload(U"@return", containerScope, functionScopeLookups, returnTypeArgs, boundCompileUnit, currentFunction,
                     returnStatementNode.GetSpan());
@@ -819,7 +820,7 @@ void StatementBinder::Visit(ConstructionStatementNode& constructionStatementNode
     bool constructDelegateType = localVariableSymbol->GetType()->GetSymbolType() == SymbolType::delegateTypeSymbol;
     bool constructClassDelegateType = localVariableSymbol->GetType()->GetSymbolType() == SymbolType::classDelegateTypeSymbol;
     std::vector<FunctionScopeLookup> functionScopeLookups;
-    functionScopeLookups.push_back(FunctionScopeLookup(ScopeLookup::this_and_base_and_parent, localVariableSymbol->GetType()->ClassInterfaceOrNsScope()));
+    functionScopeLookups.push_back(FunctionScopeLookup(ScopeLookup::this_, localVariableSymbol->GetType()->ClassInterfaceOrNsScope()));
     functionScopeLookups.push_back(FunctionScopeLookup(ScopeLookup::this_and_base_and_parent, containerScope));
     functionScopeLookups.push_back(FunctionScopeLookup(ScopeLookup::fileScopes, nullptr));
     int n = constructionStatementNode.Arguments().Count();
@@ -1212,29 +1213,127 @@ void StatementBinder::Visit(GotoDefaultStatementNode& gotoDefaultStatementNode)
 
 void StatementBinder::Visit(ThrowStatementNode& throwStatementNode)
 {
-    throw std::runtime_error("not implemented yet");
-}
-
-void StatementBinder::Visit(CatchNode& catchNode)
-{
-    throw std::runtime_error("not implemented yet");
+    if (currentFunction->GetFunctionSymbol()->DontThrow() && !currentFunction->GetFunctionSymbol()->HasTry())
+    {
+        throw Exception("a nothrow function cannot contain a throw statement unless it handles exceptions", throwStatementNode.GetSpan(), currentFunction->GetFunctionSymbol()->GetSpan());
+    }
+    Span span = throwStatementNode.GetSpan();
+    Node* exceptionExprNode = throwStatementNode.Expression();
+    std::unique_ptr<BoundExpression> boundExceptionExpr = BindExpression(exceptionExprNode, boundCompileUnit, currentFunction, containerScope, this);
+    if (boundExceptionExpr->GetType()->PlainType(span)->IsClassTypeSymbol())
+    {
+        ClassTypeSymbol* exceptionClassType = static_cast<ClassTypeSymbol*>(boundExceptionExpr->GetType()->PlainType(span));
+        IdentifierNode systemExceptionNode(throwStatementNode.GetSpan(), U"System.Exception");
+        TypeSymbol* systemExceptionType = ResolveType(&systemExceptionNode, boundCompileUnit, containerScope);
+        Assert(systemExceptionType->IsClassTypeSymbol(), "System.Exception not of class type");
+        ClassTypeSymbol* systemExceptionClassType = static_cast<ClassTypeSymbol*>(systemExceptionType);
+        if (exceptionClassType == systemExceptionClassType || exceptionClassType->HasBaseClass(systemExceptionClassType))
+        {
+            uint32_t exceptionTypeId = exceptionClassType->TypeId();
+            NewNode* newNode = new NewNode(span, new IdentifierNode(span, exceptionClassType->FullName()));
+            CloneContext cloneContext;
+            newNode->AddArgument(throwStatementNode.Expression()->Clone(cloneContext));
+            InvokeNode invokeNode(span, new IdentifierNode(span, U"RtThrowException"));
+            invokeNode.AddArgument(newNode);
+            invokeNode.AddArgument(new UIntLiteralNode(span, exceptionTypeId));
+            std::unique_ptr<BoundExpression> throwCall = BindExpression(&invokeNode, boundCompileUnit, currentFunction, containerScope, this);
+            AddStatement(new BoundThrowStatement(span, std::move(throwCall)));
+        }
+        else
+        {
+            throw Exception("exception class must be derived from System.Exception class", throwStatementNode.GetSpan());
+        }
+    }
+    else
+    {
+        throw Exception("exception not of class type", throwStatementNode.GetSpan());
+    }
+    if (throwStatementNode.Label())
+    {
+        statement->SetLabel(throwStatementNode.Label()->Label());
+    }
 }
 
 void StatementBinder::Visit(TryStatementNode& tryStatementNode)
 {
-    throw std::runtime_error("not implemented yet");
+    BoundTryStatement* boundTryStatement = new BoundTryStatement(tryStatementNode.GetSpan());
+    tryStatementNode.TryBlock()->Accept(*this);
+    boundTryStatement->SetTryBlock(std::move(statement));
+    int n = tryStatementNode.Catches().Count();
+    for (int i = 0; i < n; ++i)
+    {
+        CatchNode* catchNode = tryStatementNode.Catches()[i];
+        catchNode->Accept(*this);
+        BoundStatement* s = statement.release();
+        Assert(s->GetBoundNodeType() == BoundNodeType::boundCatchStatement, "catch statement expected");
+        BoundCatchStatement* catchStatement = static_cast<BoundCatchStatement*>(s);
+        boundTryStatement->AddCatch(std::unique_ptr<BoundCatchStatement>(catchStatement));
+    }
+    AddStatement(boundTryStatement);
+    if (tryStatementNode.Label())
+    {
+        statement->SetLabel(tryStatementNode.Label()->Label());
+    }
+}
+
+void StatementBinder::Visit(CatchNode& catchNode)
+{
+    Span span = catchNode.GetSpan();
+    std::unique_ptr<BoundCatchStatement> boundCatchStatement(new BoundCatchStatement(catchNode.GetSpan()));;
+    TypeSymbol* catchedType = ResolveType(catchNode.TypeExpr(), boundCompileUnit, containerScope);
+    boundCatchStatement->SetCatchedType(catchedType);
+    LocalVariableSymbol* catchVar = nullptr;
+    if (catchNode.Id())
+    {
+        Symbol* symbol = symbolTable.GetSymbol(catchNode.Id());
+        Assert(symbol->GetSymbolType() == SymbolType::localVariableSymbol, "local variable symbol expected");
+        catchVar = static_cast<LocalVariableSymbol*>(symbol);
+        boundCatchStatement->SetCatchVar(catchVar);
+        currentFunction->GetFunctionSymbol()->AddLocalVariable(catchVar);
+    }
+    CompoundStatementNode handlerBlock(span);
+    ConstructionStatementNode* getExceptionAddr = new ConstructionStatementNode(span, new PointerNode(span, new IdentifierNode(span, U"void")), new IdentifierNode(span, U"@exceptionAddr"));
+    getExceptionAddr->AddArgument(new InvokeNode(span, new IdentifierNode(span, U"RtGetException")));
+    handlerBlock.AddStatement(getExceptionAddr);
+    PointerNode exceptionPtrTypeNode(span, new IdentifierNode(span, catchedType->BaseType()->FullName()));
+    CloneContext cloneContext;
+    ConstructionStatementNode* constructExceptionPtr = new ConstructionStatementNode(span, exceptionPtrTypeNode.Clone(cloneContext), new IdentifierNode(span, U"@exceptionPtr"));
+    constructExceptionPtr->AddArgument(new CastNode(span, exceptionPtrTypeNode.Clone(cloneContext), new IdentifierNode(span, U"@exceptionAddr")));
+    handlerBlock.AddStatement(constructExceptionPtr);
+    TemplateIdNode* uniquePtrNode = new TemplateIdNode(span, new IdentifierNode(span, U"UniquePtr"));
+    uniquePtrNode->AddTemplateArgument(new IdentifierNode(span, catchedType->BaseType()->FullName()));
+    ConstructionStatementNode* constructUniquePtrException = new ConstructionStatementNode(span, uniquePtrNode, new IdentifierNode(span, U"@exPtr"));
+    constructUniquePtrException->AddArgument(new IdentifierNode(span, U"@exceptionPtr"));
+    handlerBlock.AddStatement(constructUniquePtrException);
+    if (catchVar)
+    {
+        ConstructionStatementNode* setExceptionVar = new ConstructionStatementNode(span, catchNode.TypeExpr()->Clone(cloneContext), static_cast<IdentifierNode*>(catchNode.Id()->Clone(cloneContext)));
+        setExceptionVar->AddArgument(new DerefNode(span, new IdentifierNode(span, U"@exPtr")));
+        handlerBlock.AddStatement(setExceptionVar);
+    }
+    handlerBlock.AddStatement(static_cast<StatementNode*>(catchNode.CatchBlock()->Clone(cloneContext)));
+    symbolTable.BeginContainer(containerScope->Container());
+    SymbolCreatorVisitor symbolCreatorVisitor(symbolTable);
+    handlerBlock.Accept(symbolCreatorVisitor);
+    symbolTable.EndContainer();
+    TypeBinder typeBinder(boundCompileUnit);
+    typeBinder.SetContainerScope(containerScope);
+    handlerBlock.Accept(typeBinder);
+    handlerBlock.Accept(*this);
+    boundCatchStatement->SetCatchBlock(std::move(statement));
+    AddStatement(boundCatchStatement.release());
 }
 
 void StatementBinder::Visit(AssertStatementNode& assertStatementNode)
 {
     if (GetGlobalFlag(GlobalFlags::release))
     {
-        statement.reset(new BoundEmptyStatement(assertStatementNode.GetSpan()));
+        AddStatement(new BoundEmptyStatement(assertStatementNode.GetSpan()));
     }
     else
     {
         std::vector<FunctionScopeLookup> lookups;
-        lookups.push_back(FunctionScopeLookup(ScopeLookup::this_, symbolTable.GlobalNs().GetContainerScope()));
+        lookups.push_back(FunctionScopeLookup(ScopeLookup::this_and_base_and_parent, symbolTable.GlobalNs().GetContainerScope()));
         std::vector<std::unique_ptr<BoundExpression>> arguments;
         TypeSymbol* constCharPtrType = symbolTable.GetTypeByName(U"char")->AddConst(assertStatementNode.GetSpan())->AddPointer(assertStatementNode.GetSpan());
         arguments.push_back(std::unique_ptr<BoundExpression>(new BoundLiteral(std::unique_ptr<Value>(new StringValue(assertStatementNode.GetSpan(),
@@ -1250,7 +1349,7 @@ void StatementBinder::Visit(AssertStatementNode& assertStatementNode)
             std::unique_ptr<BoundStatement>(new BoundEmptyStatement(assertStatementNode.GetSpan())),
             std::unique_ptr<BoundStatement>(new BoundExpressionStatement(ResolveOverload(U"RtFailAssertion", containerScope, lookups, arguments, boundCompileUnit, currentFunction,
                 assertStatementNode.GetSpan())))));
-        statement.reset(ifStatement.release());
+        AddStatement(ifStatement.release());
     }
 }
 

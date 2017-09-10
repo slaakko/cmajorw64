@@ -186,7 +186,7 @@ FunctionSymbol* BoundCompileUnit::GetConversion(TypeSymbol* sourceType, TypeSymb
         conversion = conversionTable.GetConversion(sourceType, targetType, span);
         if (!conversion)
         {
-            if (sourceType->IsNullPtrType() && targetType->IsPointerType())
+            if (sourceType->IsNullPtrType() && targetType->IsPointerType() && !targetType->IsReferenceType())
             {
                 std::unique_ptr<FunctionSymbol> nullPtrToPtrConversion(new NullPtrToPtrConversion(symbolTable.GetTypeByName(U"@nullptr_type"), targetType));
                 conversion = nullPtrToPtrConversion.get();
@@ -194,7 +194,7 @@ FunctionSymbol* BoundCompileUnit::GetConversion(TypeSymbol* sourceType, TypeSymb
                 conversionTable.AddGeneratedConversion(std::move(nullPtrToPtrConversion));
                 return conversion;
             }
-            else if (sourceType->IsVoidPtrType() && targetType->IsPointerType())
+            else if (sourceType->IsVoidPtrType() && targetType->IsPointerType() && !targetType->IsReferenceType())
             {
                 std::unique_ptr<FunctionSymbol> voidPtrToPtrConversion(new VoidPtrToPtrConversion(symbolTable.GetTypeByName(U"void")->AddPointer(span), targetType));
                 conversion = voidPtrToPtrConversion.get();
@@ -202,7 +202,7 @@ FunctionSymbol* BoundCompileUnit::GetConversion(TypeSymbol* sourceType, TypeSymb
                 conversionTable.AddGeneratedConversion(std::move(voidPtrToPtrConversion));
                 return conversion;
             }
-            else if (sourceType->IsPointerType() && targetType->RemoveConst(span)->IsVoidPtrType())
+            else if (sourceType->IsPointerType() && !sourceType->IsReferenceType() && targetType->RemoveConst(span)->IsVoidPtrType())
             {
                 std::unique_ptr<FunctionSymbol> ptrToVoidPtrConversion(new PtrToVoidPtrConversion(sourceType, symbolTable.GetTypeByName(U"void")->AddPointer(span)));
                 conversion = ptrToVoidPtrConversion.get();

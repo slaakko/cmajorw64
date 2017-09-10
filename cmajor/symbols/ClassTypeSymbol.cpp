@@ -169,6 +169,7 @@ void ClassTypeSymbol::EmplaceType(TypeSymbol* typeSymbol, int index)
     {
         Assert(typeSymbol->GetSymbolType() == SymbolType::classTypeSymbol || typeSymbol->GetSymbolType() == SymbolType::classTemplateSpecializationSymbol, "class type symbol expected");
         baseClass = static_cast<ClassTypeSymbol*>(typeSymbol);
+        GetContainerScope()->SetBase(baseClass->GetContainerScope());
     }
     else if (index >= 1)
     {
@@ -261,6 +262,7 @@ void ClassTypeSymbol::CreateDestructorSymbol()
         Assert(destructor, "destructor expected");
         ParameterSymbol* thisParam = new ParameterSymbol(GetSpan(), U"this");
         thisParam->SetType(AddPointer(GetSpan()));
+        destructor->SetAccess(SymbolAccess::public_);
         destructor->AddMember(thisParam);
         destructor->ComputeName();
     }

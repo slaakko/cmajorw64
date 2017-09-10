@@ -32,8 +32,9 @@ inline OpenMode operator|(OpenMode left, OpenMode right)
 }
 
 extern "C" RT_API int32_t RtOpen(const char* filePath, OpenMode openMode);
-extern "C" RT_API void RtClose(int32_t fileHandle);
-extern "C" RT_API void RtWrite(int32_t fileHandle, const uint8_t* buffer, int64_t count);
+extern "C" RT_API int32_t RtClose(int32_t fileHandle);
+extern "C" RT_API int32_t RtWrite(int32_t fileHandle, const uint8_t* buffer, int64_t count);
+extern "C" RT_API int32_t RtRead(int32_t fileHandle, uint8_t* buffer, int64_t bufferSize);
 
 namespace cmajor { namespace rt {
 

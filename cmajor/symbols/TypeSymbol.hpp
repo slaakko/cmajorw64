@@ -23,6 +23,7 @@ public:
     void Read(SymbolReader& reader) override;
     bool IsTypeSymbol() const override { return true; }
     virtual bool IsInComplete() const { return false; }
+    virtual bool IsIntegralType() const { return false; }
     virtual bool IsUnsignedType() const { return false; }
     virtual bool IsVoidType() const { return false; }
     std::string TypeString() const override { return "type"; }

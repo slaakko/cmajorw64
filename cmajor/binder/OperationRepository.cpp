@@ -488,6 +488,14 @@ void PointerPlusOffsetOperation::CollectViableFunctions(ContainerScope* containe
 {
     TypeSymbol* leftType = arguments[0]->GetType();
     if (!leftType->IsPointerType()) return;
+    TypeSymbol* rightType = arguments[1]->GetType();
+    if (!rightType->PlainType(span)->IsIntegralType())
+    {
+        if (!GetBoundCompileUnit().GetConversion(rightType, GetSymbolTable()->GetTypeByName(U"long"), containerScope, span))
+        {
+            return;
+        }
+    }
     FunctionSymbol* function = functionMap[leftType];
     if (!function)
     {
@@ -551,13 +559,21 @@ OffsetPlusPointerOperation::OffsetPlusPointerOperation(BoundCompileUnit& boundCo
 void OffsetPlusPointerOperation::CollectViableFunctions(ContainerScope* containerScope, const std::vector<std::unique_ptr<BoundExpression>>& arguments, BoundFunction* currentFunction,
     std::unordered_set<FunctionSymbol*>& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span)
 {
+    TypeSymbol* leftType = arguments[0]->GetType();
+    if (!leftType->PlainType(span)->IsIntegralType())
+    {
+        if (!GetBoundCompileUnit().GetConversion(leftType, GetSymbolTable()->GetTypeByName(U"long"), containerScope, span))
+        {
+            return;
+        }
+    }
     TypeSymbol* rightType = arguments[1]->GetType();
     if (!rightType->IsPointerType()) return;
-    TypeSymbol* leftType = GetSymbolTable()->GetTypeByName(U"long");
+    TypeSymbol* longType = GetSymbolTable()->GetTypeByName(U"long");
     FunctionSymbol* function = functionMap[rightType];
     if (!function)
     {
-        function = new OffsetPlusPointer(leftType, rightType, span);
+        function = new OffsetPlusPointer(longType, rightType, span);
         function->SetSymbolTable(GetSymbolTable());
         function->SetParent(&GetSymbolTable()->GlobalNs());
         functionMap[rightType] = function;
@@ -620,6 +636,14 @@ void PointerMinusOffsetOperation::CollectViableFunctions(ContainerScope* contain
 {
     TypeSymbol* leftType = arguments[0]->GetType();
     if (!leftType->IsPointerType()) return;
+    TypeSymbol* rightType = arguments[1]->GetType();
+    if (!rightType->PlainType(span)->IsIntegralType())
+    {
+        if (!GetBoundCompileUnit().GetConversion(rightType, GetSymbolTable()->GetTypeByName(U"long"), containerScope, span))
+        {
+            return;
+        }
+    }
     FunctionSymbol* function = functionMap[leftType];
     if (!function)
     {
@@ -946,7 +970,6 @@ void LvalueReferenceCopyConstructorOperation::CollectViableFunctions(ContainerSc
     TypeSymbol* type = arguments[0]->GetType();
     if (type->PointerCount() < 1 || !type->IsLvalueReferenceType()) return;
     TypeSymbol* lvalueRefType = type->RemovePointer(span);
-    if (lvalueRefType->PlainType(span)->IsClassTypeSymbol()) return;
     FunctionSymbol* function = functionMap[lvalueRefType];
     if (!function)
     {
@@ -2688,7 +2711,7 @@ void GenerateClassInitialization(ConstructorSymbol* constructorSymbol, Construct
                     arguments.push_back(std::move(rvalueMemberCall));
                     std::unique_ptr<BoundFunctionCall> memberConstructorCall = ResolveOverload(U"@constructor", containerScope, lookups, arguments, boundCompileUnit, boundFunction, 
                         constructorNode->GetSpan());
-                    boundFunction->Body()->AddStatement(std::unique_ptr<BoundStatement>(new BoundExpressionStatement(std::move(memberConstructorCall))));
+                    boundCompoundStatement->AddStatement(std::unique_ptr<BoundStatement>(new BoundExpressionStatement(std::move(memberConstructorCall))));
                 }
                 else
                 {

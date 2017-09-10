@@ -7,6 +7,19 @@ using System;
 
 namespace System.IO
 {
+    public abstract class InputStream
+    {
+        public nothrow default InputStream();
+        public virtual default ~InputStream();
+        suppress InputStream(const InputStream&);
+        suppress void operator=(const InputStream&);
+        public nothrow default InputStream(InputStream&&);
+        public nothrow default void operator=(InputStream&&);
+        public abstract string ReadLine();
+        public abstract string ReadToEnd();
+        public nothrow abstract bool EndOfStream() const;
+    }
+
     public abstract class OutputStream
     {
         public nothrow default OutputStream();

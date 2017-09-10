@@ -276,4 +276,50 @@ void BoundSetVmtPtrStatement::Accept(BoundNodeVisitor& visitor)
     visitor.Visit(*this);
 }
 
+BoundThrowStatement::BoundThrowStatement(const Span& span_, std::unique_ptr<BoundExpression>&& throwCall_) : 
+    BoundStatement(span_, BoundNodeType::boundThrowStatement), throwCall(std::move(throwCall_))
+{
+}
+
+void BoundThrowStatement::Accept(BoundNodeVisitor& visitor)
+{
+    visitor.Visit(*this);
+}
+
+BoundTryStatement::BoundTryStatement(const Span& span_) : BoundStatement(span_, BoundNodeType::boundTryStatement)
+{
+}
+
+void BoundTryStatement::SetTryBlock(std::unique_ptr<BoundStatement>&& tryBlock_)
+{
+    tryBlock = std::move(tryBlock_);
+    tryBlock->SetParent(this);
+}
+
+void BoundTryStatement::AddCatch(std::unique_ptr<BoundCatchStatement>&& catchStatement)
+{
+    catchStatement->SetParent(this);
+    catches.push_back(std::move(catchStatement));
+}
+
+void BoundTryStatement::Accept(BoundNodeVisitor& visitor)
+{
+    visitor.Visit(*this);
+}
+
+BoundCatchStatement::BoundCatchStatement(const Span& span_) : BoundStatement(span_, BoundNodeType::boundCatchStatement), catchedType(nullptr)
+{
+}
+
+void BoundCatchStatement::SetCatchBlock(std::unique_ptr<BoundStatement>&& catchBlock_)
+{
+    catchBlock = std::move(catchBlock_);
+    catchBlock->SetParent(this);
+}
+
+void BoundCatchStatement::Accept(BoundNodeVisitor& visitor)
+{
+    visitor.Visit(*this);
+}
+
 } } // namespace cmajor::binder

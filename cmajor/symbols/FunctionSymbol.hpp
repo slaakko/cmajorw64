@@ -48,7 +48,8 @@ enum class FunctionSymbolFlags : uint16_t
     const_ = 1 << 11,
     conversion = 1 << 12,
     linkOnceOdrLinkage = 1 << 13,
-    templateSpecialization = 1 << 14
+    templateSpecialization = 1 << 14,
+    hasTry = 1 << 15
 };
 
 inline FunctionSymbolFlags operator|(FunctionSymbolFlags left, FunctionSymbolFlags right)
@@ -138,6 +139,8 @@ public:
     void SetLinkOnceOdrLinkage() { SetFlag(FunctionSymbolFlags::linkOnceOdrLinkage); }
     bool IsTemplateSpecialization() const { return GetFlag(FunctionSymbolFlags::templateSpecialization); }
     void SetTemplateSpecialization() { SetFlag(FunctionSymbolFlags::templateSpecialization); }
+    bool HasTry() const { return GetFlag(FunctionSymbolFlags::hasTry); }
+    void SetHasTry() { SetFlag(FunctionSymbolFlags::hasTry); }
     virtual bool DontThrow() const { return IsNothrow() || IsBasicTypeOperation(); }
     FunctionSymbolFlags GetFunctionSymbolFlags() const { return flags; }
     bool GetFlag(FunctionSymbolFlags flag) const { return (flags & flag) != FunctionSymbolFlags::none; }

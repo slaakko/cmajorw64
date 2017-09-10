@@ -414,6 +414,7 @@ public:
     bool IsCaseTerminatingNode() const override { return true; }
     bool IsDefaultTerminatingNode() const override { return true; }
     const Node* Expression() const { return expression.get(); }
+    Node* Expression() { return expression.get(); }
 private:
     std::unique_ptr<Node> expression;
 };

@@ -12,6 +12,14 @@ public extern cdecl nothrow void RtBeginStaticInitCriticalSection(uint staticCla
 public extern cdecl nothrow void RtEndStaticInitCriticalSection(uint staticClassId);
 public extern cdecl nothrow void RtEnqueueDestruction(void* destructor, void* arg);
 public extern cdecl nothrow void RtFailAssertion(const char* assertion, const char* function, const char* sourceFilePath, int lineNumber);
-public extern cdecl int RtOpen(const char* filePath, byte openMode);
-public extern cdecl void RtClose(int handle);
-public extern cdecl void RtWrite(int handle, const void* buffer, long count);
+public extern cdecl void RtThrowException(void* exception, uint exceptionTypeId);
+public extern cdecl nothrow bool RtHandleException(uint exceptionTypeId);
+public extern cdecl nothrow void* RtGetException();
+public extern cdecl nothrow const char* RtGetError(int errorId);
+public extern cdecl nothrow void RtDisposeError(int errorId);
+public extern cdecl nothrow const char* RtGetStackTrace();
+public extern cdecl nothrow void RtDisposeStackTrace();
+public extern cdecl nothrow int RtOpen(const char* filePath, byte openMode);
+public extern cdecl nothrow int RtClose(int handle);
+public extern cdecl nothrow int RtWrite(int handle, const void* buffer, long count);
+public extern cdecl nothrow int RtRead(int handle, void* buffer, long bufferSize);

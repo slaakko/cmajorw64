@@ -261,8 +261,8 @@ public:
     virtual void Visit(GotoCaseStatementNode& gotoCaseStatementNode) {}
     virtual void Visit(GotoDefaultStatementNode& gotoDefaultStatementNode) {}
     virtual void Visit(ThrowStatementNode& throwStatementNode) {}
-    virtual void Visit(CatchNode& catchNode) {}
     virtual void Visit(TryStatementNode& tryStatementNode) {}
+    virtual void Visit(CatchNode& catchNode) {}
     virtual void Visit(AssertStatementNode& assertStatementNode) {}
 
     virtual void Visit(TypedefNode& typedefNode) {}

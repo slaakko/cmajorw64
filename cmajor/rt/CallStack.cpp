@@ -47,6 +47,16 @@ __thread CallStack* callStack = nullptr;
 
 #endif
 
+#ifdef _WIN32
+
+__declspec(thread) std::string* stackTrace = nullptr;
+
+#else
+
+__thread CallStack* std::string* stackTrace = nullptr;
+
+#endif
+
 } }  // namespace cmajor::rt
 
 extern "C" RT_API void RtEnterFunction(const char* functionName, const char* sourceFilePath)
@@ -109,4 +119,23 @@ extern "C" RT_API void RtPrintCallStack(int fileHandle)
     }
     std::string str = s.str();
     RtWrite(stdErrFileHandle, reinterpret_cast<const uint8_t*>(str.c_str()), str.length());
+}
+
+extern "C" RT_API const char* RtGetStackTrace()
+{
+    std::stringstream s;
+    cmajor::rt::CallStack* callStack = cmajor::rt::callStack;
+    int n = callStack->Locations().size();
+    for (int i = n - 1; i >= 0; --i)
+    {
+        const cmajor::rt::SourceLocation& location = callStack->Locations()[i];
+        s << location.functionName << " " << location.sourceFilePath << ":" << location.lineNumber << "\n";
+    }
+    cmajor::rt::stackTrace = new std::string(s.str());
+    return cmajor::rt::stackTrace->c_str();
+}
+
+extern "C" RT_API void RtDisposeStackTrace()
+{
+    delete cmajor::rt::stackTrace;
 }

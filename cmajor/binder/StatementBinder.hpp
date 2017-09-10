@@ -52,8 +52,8 @@ public:
     void Visit(GotoCaseStatementNode& gotoCaseStatementNode) override;
     void Visit(GotoDefaultStatementNode& gotoDefaultStatementNode) override;
     void Visit(ThrowStatementNode& throwStatementNode) override;
-    void Visit(CatchNode& catchNode) override;
     void Visit(TryStatementNode& tryStatementNode) override;
+    void Visit(CatchNode& catchNode) override;
     void Visit(AssertStatementNode& assertStatementNode) override;
     void CompileStatement(Node* statementNode, bool setPostfix);
     void SetCurrentClass(BoundClass* currentClass_) { currentClass = currentClass_; }

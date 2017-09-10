@@ -21,6 +21,221 @@ namespace System.IO
         binary = 1u << 3u
     }
 
+    public class FileSystemException : Exception
+    {
+        public nothrow FileSystemException(const string& message_) : base(message_)
+        {
+        }
+    }
+
+    public class IOBuffer
+    {
+        public nothrow IOBuffer(long size_) : size(size_), mem(RtMemAlloc(size))
+        {
+        }
+        suppress IOBuffer(const IOBuffer&);
+        suppress void operator=(const IOBuffer&);
+        public nothrow IOBuffer(IOBuffer&& that): size(that.size), mem(that.mem)
+        {
+            that.size = 0;
+            that.mem = null;
+        }
+        public nothrow default void operator=(IOBuffer&& that);
+        public ~IOBuffer()
+        {
+            RtMemFree(mem);
+        }
+        public nothrow inline long Size() const 
+        {
+            return size;
+        }
+        public nothrow inline void* Mem() const
+        {
+            return mem;
+        }
+        private long size;
+        private void* mem;
+    }
+
+    public class InputFileStream : InputStream
+    {
+        public nothrow InputFileStream() : this(stdin, defaultBufferSize)
+        {
+        }
+        public nothrow InputFileStream(int fileHandle_, long bufferSize_) : buffer(bufferSize_), pos(null), end(null), filePath(), fileHandle(fileHandle_), opened(false), endOfStream(false)
+        {
+        }
+        public InputFileStream(const string& filePath_) : this(-1, defaultBufferSize)
+        {
+            Open(filePath_, OpenMode.read);
+        }
+        public InputFileStream(const string& filePath_, long bufferSize_) : this(-1, bufferSize_)
+        {
+            Open(filePath_, OpenMode.read);
+        }
+        public InputFileStream(const string& filePath_, long bufferSize_, OpenMode openMode_) : this(-1, bufferSize_)
+        {
+            Open(filePath_, openMode_);
+        }
+        suppress InputFileStream(const InputFileStream&);
+        suppress void operator=(const InputFileStream&);
+        public nothrow InputFileStream(InputFileStream&& that) : 
+            buffer(Rvalue(that.buffer)), filePath(Rvalue(that.filePath)), fileHandle(that.fileHandle), opened(that.opened), endOfStream(that.endOfStream)
+        {
+            that.fileHandle = -1;
+            that.opened = false;
+            that.pos = null;
+            that.end = null;
+            that.endOfStream = false;
+        }
+        public nothrow default void operator=(InputFileStream&&);
+        public override ~InputFileStream()
+        {
+            if (opened)
+            {
+                try
+                {
+                    Close();
+                }
+                catch (const Exception&)
+                {
+                }
+            }
+        }
+        public void Open(const string& filePath_, OpenMode openMode)
+        {
+            if (opened)
+            {
+                Close();
+            }
+            filePath = filePath_;
+            if (filePath.IsEmpty())
+            {
+                throw FileSystemException("provided file name is empty");
+            }
+            int result = RtOpen(filePath.Chars(), openMode);
+            if (result < 0)
+            {
+                string errorMessage = RtGetError(result);
+                RtDisposeError(result);
+                throw FileSystemException(errorMessage);
+            }
+            else
+            {
+                fileHandle = result;
+            }
+            opened = true;
+        }
+        public void Close()
+        {
+            if (opened)
+            {
+                opened = false;
+                int result = RtClose(fileHandle);
+                if (result < 0)
+                {
+                    string errorMessage = RtGetError(result);
+                    RtDisposeError(result);
+                    throw FileSystemException(errorMessage);
+                }
+                fileHandle = -1;
+            }
+            else
+            {
+                throw FileSystemException("file not opened");
+            }
+        }
+        public override string ReadLine()
+        {
+            string line;
+            while (!endOfStream)
+            {
+                if (pos == end)
+                {
+                    int result = RtRead(fileHandle, buffer.Mem(), buffer.Size());
+                    if (result < 0)
+                    {
+                        string errorMessage = RtGetError(result);
+                        RtDisposeError(result);
+                        throw FileSystemException(errorMessage);
+                    }
+                    else if (result == 0)
+                    {
+                        endOfStream = true;
+                    }
+                    else
+                    {
+                        pos = cast<const char*>(buffer.Mem());
+                        end = pos + result;
+                    }
+                }
+                while (pos != end)
+                {
+                    if (*pos == '\n')
+                    {
+                        ++pos;
+                        return line;
+                    }
+                    line.Append(*pos++);
+                }
+            }
+            return line;
+        }
+        public override string ReadToEnd()
+        {
+            string content;
+            while (!endOfStream)
+            {
+                int result = RtRead(fileHandle, buffer.Mem(), buffer.Size());
+                if (result < 0)
+                {
+                    string errorMessage = RtGetError(result);
+                    RtDisposeError(result);
+                    throw FileSystemException(errorMessage);
+                }
+                else if (result == 0)
+                {
+                    endOfStream = true;
+                }
+                else
+                {
+                    content.Append(cast<const char*>(buffer.Mem()), result);
+                }
+            }
+            return content;
+        }
+        public nothrow override bool EndOfStream() const
+        {
+            return endOfStream;
+        }
+        public nothrow inline const string& FilePath() const
+        {
+            return filePath;
+        }
+        public nothrow inline int FileHandle() const
+        {
+            return fileHandle;
+        }
+        public nothrow inline bool Opened() const 
+        {
+            return opened;
+        }
+        public const long defaultBufferSize = 4096;
+        private IOBuffer buffer;
+        private const char* pos;
+        private const char* end;
+        private string filePath;
+        private int fileHandle;
+        private bool opened;
+        private bool endOfStream;
+    }
+
+    public string ReadFile(const string& filePath)
+    {
+        InputFileStream file(filePath, cast<long>(4) * 1024 * 1024);
+        return file.ReadToEnd();
+    }
+
     public class OutputFileStream : OutputStream
     {
         public OutputFileStream() : this(stdout)
@@ -41,16 +256,13 @@ namespace System.IO
         {
             if (opened)
             {
-                Close();    
-/*
                 try
                 {
                     Close();
                 }
-                catch (const Exception& ex)
+                catch (const Exception&)
                 {
                 }
-*/
             }
         }
         suppress OutputFileStream(const OutputFileStream&);
@@ -68,7 +280,21 @@ namespace System.IO
                 Close();
             }
             filePath = filePath_;
-            fileHandle = RtOpen(filePath.Chars(), openMode);
+            if (filePath.IsEmpty())
+            {
+                throw FileSystemException("provided file name is empty");
+            }
+            int result = RtOpen(filePath.Chars(), openMode);
+            if (result < 0)
+            {
+                string errorMessage = RtGetError(result);
+                RtDisposeError(result);
+                throw FileSystemException(errorMessage);
+            }
+            else
+            {
+                fileHandle = result;
+            }
             opened = true;
         }
         public void Close()
@@ -76,17 +302,29 @@ namespace System.IO
             if (opened)
             {
                 opened = false;
-                RtClose(fileHandle);
+                int result = RtClose(fileHandle);
+                if (result < 0)
+                {
+                    string errorMessage = RtGetError(result);
+                    RtDisposeError(result);
+                    throw FileSystemException(errorMessage);
+                }
                 fileHandle = -1;
             }
             else
             {
-                // throw 
+                throw FileSystemException("file not opened");
             }
         }
         public override void Write(const char* s)
         {
-            RtWrite(fileHandle, s, StrLen(s));
+            int result = RtWrite(fileHandle, s, StrLen(s));
+            if (result < 0)
+            {
+                string errorMessage = RtGetError(result);
+                RtDisposeError(result);
+                throw FileSystemException(errorMessage);
+            }
         }
         public override void Write(const wchar* s)
         {
@@ -98,7 +336,13 @@ namespace System.IO
         }
         public override void Write(const string& s)
         {
-            RtWrite(fileHandle, s.Chars(), s.Length());
+            int result = RtWrite(fileHandle, s.Chars(), s.Length());
+            if (result < 0)
+            {
+                string errorMessage = RtGetError(result);
+                RtDisposeError(result);
+                throw FileSystemException(errorMessage);
+            }
         }
         public override void Write(const wstring& s)
         {
@@ -241,20 +485,20 @@ namespace System.IO
             Write(d);
             WriteLine();
         }
-        public int FileHandle() const
-        {
-            return fileHandle;
-        }
-        public bool Opened() const 
-        {
-            return opened;
-        }
-        public const string& FilePath() const
+        public nothrow inline const string& FilePath() const
         {
             return filePath;
         }
+        public nothrow inline int FileHandle() const
+        {
+            return fileHandle;
+        }
+        public nothrow inline bool Opened() const 
+        {
+            return opened;
+        }
+        private string filePath;
         private int fileHandle;
         private bool opened;
-        private string filePath;
     }
 }

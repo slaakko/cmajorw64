@@ -34,6 +34,7 @@ public:
     std::string TypeString() const override { return "sbyte"; }
     llvm::Type* IrType(Emitter& emitter) override { return llvm::Type::getInt8Ty(emitter.Context()); }
     llvm::Constant* CreateDefaultIrValue(Emitter& emitter) override { return emitter.Builder().getInt8(0); }
+    bool IsIntegralType() const override { return true; }
     bool IsSwitchConditionType() const override { return true; }
 };
 
@@ -44,6 +45,7 @@ public:
     std::string TypeString() const override { return "byte"; }
     llvm::Type* IrType(Emitter& emitter) override { return llvm::Type::getInt8Ty(emitter.Context()); }
     llvm::Constant* CreateDefaultIrValue(Emitter& emitter) override { return emitter.Builder().getInt8(0); }
+    bool IsIntegralType() const override { return true; }
     bool IsUnsignedType() const override { return true; }
     bool IsSwitchConditionType() const override { return true; }
 };
@@ -55,6 +57,7 @@ public:
     std::string TypeString() const override { return "short"; }
     llvm::Type* IrType(Emitter& emitter) override { return llvm::Type::getInt16Ty(emitter.Context()); }
     llvm::Constant* CreateDefaultIrValue(Emitter& emitter) override { return emitter.Builder().getInt16(0); }
+    bool IsIntegralType() const override { return true; }
     bool IsSwitchConditionType() const override { return true; }
 };
 
@@ -65,6 +68,7 @@ public:
     std::string TypeString() const override { return "ushort"; }
     llvm::Type* IrType(Emitter& emitter) override { return llvm::Type::getInt16Ty(emitter.Context()); }
     llvm::Constant* CreateDefaultIrValue(Emitter& emitter) override { return emitter.Builder().getInt16(0); }
+    bool IsIntegralType() const override { return true; }
     bool IsUnsignedType() const override { return true; }
     bool IsSwitchConditionType() const override { return true; }
 };
@@ -76,6 +80,7 @@ public:
     std::string TypeString() const override { return "int"; }
     llvm::Type* IrType(Emitter& emitter) override { return llvm::Type::getInt32Ty(emitter.Context()); }
     llvm::Constant* CreateDefaultIrValue(Emitter& emitter) override { return emitter.Builder().getInt32(0); }
+    bool IsIntegralType() const override { return true; }
     bool IsSwitchConditionType() const override { return true; }
 };
 
@@ -86,6 +91,7 @@ public:
     std::string TypeString() const override { return "uint"; }
     llvm::Type* IrType(Emitter& emitter) override { return llvm::Type::getInt32Ty(emitter.Context()); }
     llvm::Constant* CreateDefaultIrValue(Emitter& emitter) override { return emitter.Builder().getInt32(0); }
+    bool IsIntegralType() const override { return true; }
     bool IsUnsignedType() const override { return true; }
     bool IsSwitchConditionType() const override { return true; }
 };
@@ -97,6 +103,7 @@ public:
     std::string TypeString() const override { return "long"; }
     llvm::Type* IrType(Emitter& emitter) override { return llvm::Type::getInt64Ty(emitter.Context()); }
     llvm::Constant* CreateDefaultIrValue(Emitter& emitter) override { return emitter.Builder().getInt64(0); }
+    bool IsIntegralType() const override { return true; }
     bool IsSwitchConditionType() const override { return true; }
 };
 
@@ -107,6 +114,7 @@ public:
     std::string TypeString() const override { return "ulong"; }
     llvm::Type* IrType(Emitter& emitter) override { return llvm::Type::getInt64Ty(emitter.Context()); }
     llvm::Constant* CreateDefaultIrValue(Emitter& emitter) override { return emitter.Builder().getInt64(0); }
+    bool IsIntegralType() const override { return true; }
     bool IsUnsignedType() const override { return true; }
     bool IsSwitchConditionType() const override { return true; }
 };

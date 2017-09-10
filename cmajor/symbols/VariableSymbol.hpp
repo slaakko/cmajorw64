@@ -37,6 +37,7 @@ class LocalVariableSymbol : public VariableSymbol
 public:     
     LocalVariableSymbol(const Span& span_, const std::u32string& name_);
     SymbolAccess DeclaredAccess() const override { return SymbolAccess::public_; }
+    bool IsExportSymbol() const override { return false; }
 };
 
 class MemberVariableSymbol : public VariableSymbol

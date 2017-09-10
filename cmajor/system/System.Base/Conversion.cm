@@ -10,7 +10,7 @@ namespace System
         #assert(false);
     }
 
-    public nothrow string ToString<I, U>(I x) where I is SignedInteger and U is UnsignedInteger and ExplicitlyConvertible<I, U> and ExplicitlyConvertible<U, byte>
+    public nothrow string ToStringGeneric<I, U>(I x) where I is SignedInteger and U is UnsignedInteger and ExplicitlyConvertible<I, U> and ExplicitlyConvertible<U, byte>
     {
         string s;
         U u = 0u;
@@ -37,7 +37,7 @@ namespace System
         return s;
     }
 
-    public nothrow string ToString<U>(U x, bool) where U is UnsignedInteger and ExplicitlyConvertible<U, byte>
+    public nothrow string ToStringGeneric<U>(U x, bool) where U is UnsignedInteger and ExplicitlyConvertible<U, byte>
     {
         string s;
         do
@@ -72,22 +72,22 @@ namespace System
 
     public nothrow string ToString(int x)
     {
-        return ToString<int, uint>(x);
+        return ToStringGeneric<int, uint>(x);
     }
 
     public nothrow string ToString(uint x)
     {
-        return ToString<uint>(x, true);
+        return ToStringGeneric<uint>(x, true);
     }
 
     public nothrow string ToString(long x)
     {
-        return ToString<long, ulong>(x);
+        return ToStringGeneric<long, ulong>(x);
     }
 
     public nothrow string ToString(ulong x)
     {
-        return ToString<ulong>(x, true);
+        return ToStringGeneric<ulong>(x, true);
     }
 
     public nothrow string ToString(float f)

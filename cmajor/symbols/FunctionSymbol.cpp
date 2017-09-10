@@ -478,13 +478,68 @@ void FunctionSymbol::GenerateCall(Emitter& emitter, std::vector<GenObject*>& gen
         llvm::Value* arg = emitter.Stack().Pop();
         args[n - i - 1] = arg;
     }
+    llvm::BasicBlock* handlerBlock = emitter.HandlerBlock();
+    llvm::Value* currentPad = emitter.CurrentPad();
+    std::vector<llvm::OperandBundleDef> bundles;
+    if (currentPad != nullptr)
+    {
+        std::vector<llvm::Value*> inputs;
+        inputs.push_back(currentPad);
+        bundles.push_back(llvm::OperandBundleDef("funclet", inputs));
+    }
     if (ReturnType() && ReturnType()->GetSymbolType() != SymbolType::voidTypeSymbol && !ReturnsClassByValue())
     {
-        emitter.Stack().Push(emitter.Builder().CreateCall(callee, args));
+        if (DontThrow() || !handlerBlock)
+        {
+            if (currentPad == nullptr)
+            {
+                emitter.Stack().Push(emitter.Builder().CreateCall(callee, args));
+            }
+            else
+            {
+                emitter.Stack().Push(llvm::CallInst::Create(callee, args, bundles, "", emitter.CurrentBasicBlock()));
+            }
+        }
+        else
+        {
+            llvm::BasicBlock* nextBlock = llvm::BasicBlock::Create(emitter.Context(), "next", emitter.Function());
+            if (currentPad == nullptr)
+            {
+                emitter.Stack().Push(emitter.Builder().CreateInvoke(callee, nextBlock, handlerBlock, args));
+            }
+            else
+            {
+                emitter.Stack().Push(llvm::InvokeInst::Create(callee, nextBlock, handlerBlock, args, bundles, "", emitter.CurrentBasicBlock()));
+            }
+            emitter.SetCurrentBasicBlock(nextBlock);
+        }
     }
     else
     {
-        emitter.Builder().CreateCall(callee, args);
+        if (DontThrow() || !handlerBlock)
+        {
+            if (currentPad == nullptr)
+            {
+                emitter.Builder().CreateCall(callee, args);
+            }
+            else
+            {
+                llvm::CallInst::Create(callee, args, bundles, "", emitter.CurrentBasicBlock());
+            }
+        }
+        else
+        {
+            llvm::BasicBlock* nextBlock = llvm::BasicBlock::Create(emitter.Context(), "next", emitter.Function());
+            if (currentPad == nullptr)
+            {
+                emitter.Builder().CreateInvoke(callee, nextBlock, handlerBlock, args);
+            }
+            else
+            {
+                llvm::InvokeInst::Create(callee, nextBlock, handlerBlock, args, bundles, "", emitter.CurrentBasicBlock());
+            }
+            emitter.SetCurrentBasicBlock(nextBlock);
+        }
     }
 }
 
@@ -527,19 +582,78 @@ void FunctionSymbol::GenerateVirtualCall(Emitter& emitter, std::vector<GenObject
     }
     ArgVector args;
     int n = Parameters().size();
+    if (ReturnsClassByValue())
+    {
+        ++n;
+    }
     args.resize(n);
     for (int i = 0; i < n; ++i)
     {
         llvm::Value* arg = emitter.Stack().Pop();
         args[n - i - 1] = arg;
     }
+    llvm::BasicBlock* handlerBlock = emitter.HandlerBlock();
+    std::vector<llvm::OperandBundleDef> bundles;
+    llvm::Value* currentPad = emitter.CurrentPad();
+    if (currentPad != nullptr)
+    {
+        std::vector<llvm::Value*> inputs;
+        inputs.push_back(currentPad);
+        bundles.push_back(llvm::OperandBundleDef("funclet", inputs));
+    }
     if (ReturnType() && !ReturnType()->IsVoidType() && !ReturnsClassByValue())
     {
-        emitter.Stack().Push(emitter.Builder().CreateCall(IrType(emitter), callee, args));
+        if (DontThrow() || !handlerBlock)
+        {
+            if (currentPad == nullptr)
+            {
+                emitter.Stack().Push(emitter.Builder().CreateCall(IrType(emitter), callee, args));
+            }
+            else
+            {
+                emitter.Stack().Push(llvm::CallInst::Create(callee, args, bundles, "", emitter.CurrentBasicBlock()));
+            }
+        }
+        else
+        {
+            llvm::BasicBlock* nextBlock = llvm::BasicBlock::Create(emitter.Context(), "next", emitter.Function());
+            if (currentPad == nullptr)
+            {
+                emitter.Stack().Push(emitter.Builder().CreateInvoke(callee, nextBlock, handlerBlock, args));
+            }
+            else
+            {
+                emitter.Stack().Push(llvm::InvokeInst::Create(callee, nextBlock, handlerBlock, args, bundles, "", emitter.CurrentBasicBlock()));
+            }
+            emitter.SetCurrentBasicBlock(nextBlock);
+        }
     }
     else
     {
-        emitter.Builder().CreateCall(IrType(emitter), callee, args);
+        if (DontThrow() || !handlerBlock)
+        {
+            if (currentPad == nullptr)
+            {
+                emitter.Builder().CreateCall(IrType(emitter), callee, args);
+            }
+            else
+            {
+                llvm::CallInst::Create(callee, args, bundles, "", emitter.CurrentBasicBlock());
+            }
+        }
+        else
+        {
+            llvm::BasicBlock* nextBlock = llvm::BasicBlock::Create(emitter.Context(), "next", emitter.Function());
+            if (currentPad == nullptr)
+            {
+                emitter.Builder().CreateInvoke(callee, nextBlock, handlerBlock, args);
+            }
+            else
+            {
+                llvm::InvokeInst::Create(callee, nextBlock, handlerBlock, args, bundles, "", emitter.CurrentBasicBlock());
+            }
+            emitter.SetCurrentBasicBlock(nextBlock);
+        }
     }
 }
 

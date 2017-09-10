@@ -66,7 +66,7 @@ void UsingNodeAdder::Visit(NamespaceImportNode& namespaceImportNode)
 }
 
 TypeBinder::TypeBinder(BoundCompileUnit& boundCompileUnit_) : 
-    boundCompileUnit(boundCompileUnit_), symbolTable(boundCompileUnit.GetSymbolTable()), containerScope(), enumType(nullptr)
+    boundCompileUnit(boundCompileUnit_), symbolTable(boundCompileUnit.GetSymbolTable()), containerScope(), enumType(nullptr), currentFunctionSymbol(nullptr)
 {
 }
 
@@ -128,6 +128,8 @@ void TypeBinder::Visit(FunctionNode& functionNode)
     Symbol* symbol = symbolTable.GetSymbol(&functionNode);
     Assert(symbol->GetSymbolType() == SymbolType::functionSymbol, "function symbol expected");
     FunctionSymbol* functionSymbol = static_cast<FunctionSymbol*>(symbol);
+    FunctionSymbol* prevFunctionSymbol = currentFunctionSymbol;
+    currentFunctionSymbol = functionSymbol;
     if (functionSymbol->IsFunctionTemplate())
     {
         for (TemplateParameterSymbol* templateParameterSymbol : functionSymbol->TemplateParameters())
@@ -175,6 +177,7 @@ void TypeBinder::Visit(FunctionNode& functionNode)
         }
     }
     containerScope = prevContainerScope;
+    currentFunctionSymbol = prevFunctionSymbol;
 }
 
 void TypeBinder::Visit(ClassNode& classNode)
@@ -275,6 +278,8 @@ void TypeBinder::Visit(StaticConstructorNode& staticConstructorNode)
     Symbol* symbol = symbolTable.GetSymbol(&staticConstructorNode);
     Assert(symbol->GetSymbolType() == SymbolType::staticConstructorSymbol, "static constructor symbol expected");
     StaticConstructorSymbol* staticConstructorSymbol = static_cast<StaticConstructorSymbol*>(symbol);
+    FunctionSymbol* prevFunctionSymbol = currentFunctionSymbol;
+    currentFunctionSymbol = staticConstructorSymbol;
     ContainerScope* prevContainerScope = containerScope;
     containerScope = staticConstructorSymbol->GetContainerScope();
     staticConstructorSymbol->SetSpecifiers(staticConstructorNode.GetSpecifiers());
@@ -296,6 +301,7 @@ void TypeBinder::Visit(StaticConstructorNode& staticConstructorNode)
         }
     }
     containerScope = prevContainerScope;
+    currentFunctionSymbol = prevFunctionSymbol;
 }
 
 void TypeBinder::Visit(ConstructorNode& constructorNode)
@@ -303,6 +309,8 @@ void TypeBinder::Visit(ConstructorNode& constructorNode)
     Symbol* symbol = symbolTable.GetSymbol(&constructorNode);
     Assert(symbol->GetSymbolType() == SymbolType::constructorSymbol, "constructor symbol expected");
     ConstructorSymbol* constructorSymbol = static_cast<ConstructorSymbol*>(symbol);
+    FunctionSymbol* prevFunctionSymbol = currentFunctionSymbol;
+    currentFunctionSymbol = constructorSymbol;
     ContainerScope* prevContainerScope = containerScope;
     containerScope = constructorSymbol->GetContainerScope();
     constructorSymbol->SetSpecifiers(constructorNode.GetSpecifiers());
@@ -366,6 +374,7 @@ void TypeBinder::Visit(ConstructorNode& constructorNode)
         }
     }
     containerScope = prevContainerScope;
+    currentFunctionSymbol = prevFunctionSymbol;
 }
 
 void TypeBinder::Visit(DestructorNode& destructorNode)
@@ -373,6 +382,8 @@ void TypeBinder::Visit(DestructorNode& destructorNode)
     Symbol* symbol = symbolTable.GetSymbol(&destructorNode);
     Assert(symbol->GetSymbolType() == SymbolType::destructorSymbol, "destructor symbol expected");
     DestructorSymbol* destructorSymbol = static_cast<DestructorSymbol*>(symbol);
+    FunctionSymbol* prevFunctionSymbol = currentFunctionSymbol;
+    currentFunctionSymbol = destructorSymbol;
     ContainerScope* prevContainerScope = containerScope;
     containerScope = destructorSymbol->GetContainerScope();
     destructorSymbol->SetSpecifiers(destructorNode.GetSpecifiers());
@@ -403,6 +414,7 @@ void TypeBinder::Visit(DestructorNode& destructorNode)
         }
     }
     containerScope = prevContainerScope;
+    currentFunctionSymbol = prevFunctionSymbol;
 }
 
 void TypeBinder::Visit(MemberFunctionNode& memberFunctionNode)
@@ -410,6 +422,8 @@ void TypeBinder::Visit(MemberFunctionNode& memberFunctionNode)
     Symbol* symbol = symbolTable.GetSymbol(&memberFunctionNode);
     Assert(symbol->GetSymbolType() == SymbolType::memberFunctionSymbol, "member function symbol expected");
     MemberFunctionSymbol* memberFunctionSymbol = static_cast<MemberFunctionSymbol*>(symbol);
+    FunctionSymbol* prevFunctionSymbol = currentFunctionSymbol;
+    currentFunctionSymbol = memberFunctionSymbol;
     ContainerScope* prevContainerScope = containerScope;
     containerScope = memberFunctionSymbol->GetContainerScope();
     memberFunctionSymbol->SetSpecifiers(memberFunctionNode.GetSpecifiers());
@@ -463,6 +477,7 @@ void TypeBinder::Visit(MemberFunctionNode& memberFunctionNode)
         }
     }
     containerScope = prevContainerScope;
+    currentFunctionSymbol = prevFunctionSymbol;
 }
 
 void TypeBinder::Visit(MemberVariableNode& memberVariableNode)
@@ -634,6 +649,18 @@ void TypeBinder::Visit(DefaultStatementNode& defaultStatementNode)
     }
 }
 
+void TypeBinder::Visit(TryStatementNode& tryStatementNode)
+{
+    currentFunctionSymbol->SetHasTry();
+    tryStatementNode.TryBlock()->Accept(*this);
+    int n = tryStatementNode.Catches().Count();
+    for (int i = 0; i < n; ++i)
+    {
+        CatchNode* catchNode = tryStatementNode.Catches()[i];
+        catchNode->Accept(*this);
+    }
+}
+
 void TypeBinder::Visit(CatchNode& catchNode)
 {
     Symbol* symbol = symbolTable.GetSymbol(&catchNode);
@@ -677,17 +704,6 @@ void TypeBinder::Visit(CatchNode& catchNode)
     }
     catchNode.CatchBlock()->Accept(*this);
     containerScope = prevContainerScope;
-}
-
-void TypeBinder::Visit(TryStatementNode& tryStatementNode)
-{
-    tryStatementNode.TryBlock()->Accept(*this);
-    int n = tryStatementNode.Catches().Count();
-    for (int i = 0; i < n; ++i)
-    {
-        CatchNode* catchNode = tryStatementNode.Catches()[i];
-        catchNode->Accept(*this);
-    }
 }
 
 void TypeBinder::Visit(TypedefNode& typedefNode)

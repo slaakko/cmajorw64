@@ -7,7 +7,7 @@
 
 namespace cmajor { namespace ir {
 
-Emitter::Emitter(llvm::LLVMContext& context_) : context(context_), builder(context), module(nullptr), stack(), objectPointer(nullptr), function(nullptr)
+Emitter::Emitter(llvm::LLVMContext& context_) : context(context_), builder(context), module(nullptr), stack(), objectPointer(nullptr), function(nullptr), currentBasicBlock(nullptr)
 {
 }
 

@@ -259,6 +259,49 @@ private:
     ClassTypeSymbol* classType;
 };
 
+class BoundThrowStatement : public BoundStatement
+{
+public:
+    BoundThrowStatement(const Span& span_, std::unique_ptr<BoundExpression>&& throwCall_);
+    void Accept(BoundNodeVisitor& visitor) override;
+    BoundExpression* ThrowCall() { return throwCall.get(); }
+private:
+    std::unique_ptr<BoundExpression> throwCall;
+};
+
+class BoundCatchStatement;
+
+class BoundTryStatement : public BoundStatement
+{
+public:
+    BoundTryStatement(const Span& span_);
+    void SetTryBlock(std::unique_ptr<BoundStatement>&& tryBlock_);
+    BoundStatement* TryBlock() { return tryBlock.get(); }
+    void AddCatch(std::unique_ptr<BoundCatchStatement>&& catchStatement);
+    const std::vector<std::unique_ptr<BoundCatchStatement>>& Catches() const { return catches; }
+    void Accept(BoundNodeVisitor& visitor) override;
+private:
+    std::unique_ptr<BoundStatement> tryBlock;
+    std::vector<std::unique_ptr<BoundCatchStatement>> catches;
+};
+
+class BoundCatchStatement : public BoundStatement
+{
+public:
+    BoundCatchStatement(const Span& span_);
+    void SetCatchedType(TypeSymbol* catchedType_) { catchedType = catchedType_; }
+    TypeSymbol* CatchedType() { return catchedType; }
+    void SetCatchVar(LocalVariableSymbol* catchVar_) { catchVar = catchVar_; }
+    LocalVariableSymbol* CatchVar() { return catchVar; }
+    void SetCatchBlock(std::unique_ptr<BoundStatement>&& catchBlock_);
+    BoundStatement* CatchBlock() { return catchBlock.get(); }
+    void Accept(BoundNodeVisitor& visitor) override;
+private:
+    TypeSymbol* catchedType;
+    LocalVariableSymbol* catchVar;
+    std::unique_ptr<BoundStatement> catchBlock;
+};
+
 } } // namespace cmajor::binder
 
 #endif // CMAJOR_BINDER_BOUND_STATEMENT_INCLUDED

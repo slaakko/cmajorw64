@@ -135,6 +135,8 @@ public:
     void Visit(BoundExpressionStatement& boundExpressionStatement) override;
     void Visit(BoundEmptyStatement& boundEmptyStatement) override;
     void Visit(BoundSetVmtPtrStatement& boundSetVmtPtrStatement) override;
+    void Visit(BoundThrowStatement& boundThrowStatement) override;
+    void Visit(BoundTryStatement& boundTryStatement) override;
     void Visit(BoundParameter& boundParameter) override;
     void Visit(BoundLocalVariable& boundLocalVariable) override;
     void Visit(BoundMemberVariable& boundMemberVariable) override;
@@ -160,6 +162,8 @@ public:
     llvm::Value* GetGlobalStringPtr(int stringId) override;
     llvm::Value* GetGlobalWStringConstant(int stringId) override;
     llvm::Value* GetGlobalUStringConstant(int stringId) override;
+    llvm::BasicBlock* HandlerBlock() override { return handlerBlock; }
+    llvm::Value* CurrentPad() override { return currentPad;  }
 private:
     EmittingContext& emittingContext;
     SymbolTable* symbolTable;
@@ -173,6 +177,8 @@ private:
     llvm::BasicBlock* falseBlock;
     llvm::BasicBlock* breakTarget;
     llvm::BasicBlock* continueTarget;
+    llvm::BasicBlock* handlerBlock;
+    llvm::Value* currentPad;
     bool genJumpingBoolCode;
     BoundCompileUnit* compileUnit;
     BoundClass* currentClass;
@@ -199,8 +205,8 @@ Emitter::Emitter(EmittingContext& emittingContext_, const std::string& compileUn
     cmajor::ir::Emitter(emittingContext_.GetEmittingContextImpl()->Context()), emittingContext(emittingContext_), symbolTable(nullptr),
     compileUnitModule(new llvm::Module(compileUnitModuleName_, emittingContext.GetEmittingContextImpl()->Context())), symbolsModule(symbolsModule_), builder(Builder()), stack(Stack()),
     context(emittingContext.GetEmittingContextImpl()->Context()), compileUnit(nullptr), function(nullptr), trueBlock(nullptr), falseBlock(nullptr), breakTarget(nullptr), continueTarget(nullptr),
-    genJumpingBoolCode(false), currentClass(nullptr), currentFunction(nullptr), currentBlock(nullptr), breakTargetBlock(nullptr), continueTargetBlock(nullptr), currentCaseMap(nullptr), 
-    defaultDest(nullptr), prevLineNumber(0)
+    handlerBlock(nullptr), currentPad(nullptr), genJumpingBoolCode(false), currentClass(nullptr), currentFunction(nullptr), currentBlock(nullptr),
+    breakTargetBlock(nullptr), continueTargetBlock(nullptr), currentCaseMap(nullptr), defaultDest(nullptr), prevLineNumber(0)
 {
     compileUnitModule->setTargetTriple(emittingContext.GetEmittingContextImpl()->TargetTriple());
     compileUnitModule->setDataLayout(emittingContext.GetEmittingContextImpl()->DataLayout());
@@ -279,6 +285,8 @@ void Emitter::Visit(BoundFunction& boundFunction)
 {
     if (!boundFunction.Body()) return;
     currentFunction = &boundFunction;
+    handlerBlock = nullptr;
+    currentPad = nullptr;
     prevLineNumber = 0;
     FunctionSymbol* functionSymbol = boundFunction.GetFunctionSymbol();
     llvm::FunctionType* functionType = functionSymbol->IrType(*this);
@@ -290,7 +298,7 @@ void Emitter::Visit(BoundFunction& boundFunction)
         function->setLinkage(llvm::GlobalValue::LinkageTypes::LinkOnceODRLinkage);
         function->setComdat(comdat);
     }
-    if (functionSymbol->DontThrow())
+    if (functionSymbol->DontThrow() && !boundFunction.GetFunctionSymbol()->HasTry())
     {
         function->addFnAttr(llvm::Attribute::NoUnwind);
     }
@@ -302,9 +310,15 @@ void Emitter::Visit(BoundFunction& boundFunction)
     {
         function->addFnAttr(llvm::Attribute::InlineHint);
     }
+    if (boundFunction.GetFunctionSymbol()->HasTry()) 
+    {
+        llvm::FunctionType* personalityFunctionType = llvm::FunctionType::get(builder.getInt32Ty(), true);
+        llvm::Function* personalityFunction = llvm::cast<llvm::Function>(compileUnitModule->getOrInsertFunction("__CxxFrameHandler3", personalityFunctionType));
+        function->setPersonalityFn(llvm::ConstantExpr::getBitCast(personalityFunction, builder.getInt8PtrTy()));
+    }
     SetFunction(function);
     llvm::BasicBlock* entryBlock = llvm::BasicBlock::Create(context, "entry", function);
-    builder.SetInsertPoint(entryBlock);
+    SetCurrentBasicBlock(entryBlock);
     if (currentClass)
     {
         ClassTypeSymbol* classTypeSymbol = currentClass->GetClassTypeSymbol();
@@ -462,7 +476,7 @@ void Emitter::Visit(BoundReturnStatement& boundReturnStatement)
     if (lastStatement && lastStatement != &boundReturnStatement)
     {
         llvm::BasicBlock* nextBlock = llvm::BasicBlock::Create(context, "next", function);
-        builder.SetInsertPoint(nextBlock);
+        SetCurrentBasicBlock(nextBlock);
     }
 }
 
@@ -484,18 +498,18 @@ void Emitter::Visit(BoundIfStatement& boundIfStatement)
     genJumpingBoolCode = true;
     boundIfStatement.Condition()->Accept(*this);
     genJumpingBoolCode = prevGenJumpingBoolCode;
-    builder.SetInsertPoint(trueBlock);
+    SetCurrentBasicBlock(trueBlock);
     boundIfStatement.ThenS()->Accept(*this);
     builder.CreateBr(nextBlock);
     if (boundIfStatement.ElseS())
     {
-        builder.SetInsertPoint(falseBlock);
+        SetCurrentBasicBlock(falseBlock);
         boundIfStatement.ElseS()->Accept(*this);
         builder.CreateBr(nextBlock);
     }
     trueBlock = prevTrueBlock;
     falseBlock = prevFalseBlock;
-    builder.SetInsertPoint(nextBlock);
+    SetCurrentBasicBlock(nextBlock);
 }
 
 void Emitter::Visit(BoundWhileStatement& boundWhileStatement)
@@ -513,16 +527,16 @@ void Emitter::Visit(BoundWhileStatement& boundWhileStatement)
     breakTarget = falseBlock;
     llvm::BasicBlock* condBlock = llvm::BasicBlock::Create(context, "cond", function);
     builder.CreateBr(condBlock);
-    builder.SetInsertPoint(condBlock);
+    SetCurrentBasicBlock(condBlock);
     continueTarget = condBlock;
     bool prevGenJumpingBoolCode = genJumpingBoolCode;
     genJumpingBoolCode = true;
     boundWhileStatement.Condition()->Accept(*this);
     genJumpingBoolCode = prevGenJumpingBoolCode;
-    builder.SetInsertPoint(trueBlock);
+    SetCurrentBasicBlock(trueBlock);
     boundWhileStatement.Statement()->Accept(*this);
     builder.CreateBr(condBlock);
-    builder.SetInsertPoint(falseBlock);
+    SetCurrentBasicBlock(falseBlock);
     breakTargetBlock = prevBreakTargetBlock;
     continueTargetBlock = prevContinueTargetBlock;
     breakTarget = prevBreakTarget;
@@ -548,15 +562,15 @@ void Emitter::Visit(BoundDoStatement& boundDoStatement)
     breakTarget = falseBlock;
     continueTarget = condBlock;
     builder.CreateBr(doBlock);
-    builder.SetInsertPoint(doBlock);
+    SetCurrentBasicBlock(doBlock);
     boundDoStatement.Statement()->Accept(*this);
     builder.CreateBr(condBlock);
-    builder.SetInsertPoint(condBlock);
+    SetCurrentBasicBlock(condBlock);
     bool prevGenJumpingBoolCode = genJumpingBoolCode;
     genJumpingBoolCode = true;
     boundDoStatement.Condition()->Accept(*this);
     genJumpingBoolCode = prevGenJumpingBoolCode;
-    builder.SetInsertPoint(falseBlock);
+    SetCurrentBasicBlock(falseBlock);
     breakTargetBlock = prevBreakTargetBlock;
     continueTargetBlock = prevContinueTargetBlock;
     breakTarget = prevBreakTarget;
@@ -584,18 +598,18 @@ void Emitter::Visit(BoundForStatement& boundForStatement)
     breakTargetBlock = currentBlock;
     continueTargetBlock = currentBlock;
     builder.CreateBr(condBlock);
-    builder.SetInsertPoint(condBlock);
+    SetCurrentBasicBlock(condBlock);
     bool prevGenJumpingBoolCode = genJumpingBoolCode;
     genJumpingBoolCode = true;
     boundForStatement.Condition()->Accept(*this);
     genJumpingBoolCode = prevGenJumpingBoolCode;
-    builder.SetInsertPoint(actionBlock);
+    SetCurrentBasicBlock(actionBlock);
     boundForStatement.ActionS()->Accept(*this);
     builder.CreateBr(loopBlock);
-    builder.SetInsertPoint(loopBlock);
+    SetCurrentBasicBlock(loopBlock);
     boundForStatement.LoopS()->Accept(*this);
     builder.CreateBr(condBlock);
-    builder.SetInsertPoint(falseBlock);
+    SetCurrentBasicBlock(falseBlock);
     breakTargetBlock = prevBreakTargetBlock;
     continueTargetBlock = prevContinueTargetBlock;
     breakTarget = prevBreakTarget;
@@ -649,7 +663,7 @@ void Emitter::Visit(BoundSwitchStatement& boundSwitchStatement)
     {
         boundSwitchStatement.DefaultStatement()->Accept(*this);
     }
-    builder.SetInsertPoint(next);
+    SetCurrentBasicBlock(next);
     currentCaseMap = prevCaseMap;
     defaultDest = prevDefaultDest;
     breakTargetBlock = prevBreakTargetBlock;
@@ -665,7 +679,7 @@ void Emitter::Visit(BoundCaseStatement& boundCaseStatement)
         if (it != currentCaseMap->cend())
         {
             llvm::BasicBlock* caseDest = it->second;
-            builder.SetInsertPoint(caseDest);
+            SetCurrentBasicBlock(caseDest);
             boundCaseStatement.CompoundStatement()->Accept(*this);
         }
         else
@@ -683,7 +697,7 @@ void Emitter::Visit(BoundDefaultStatement& boundDefaultStatement)
 {
     if (defaultDest)
     {
-        builder.SetInsertPoint(defaultDest);
+        SetCurrentBasicBlock(defaultDest);
         boundDefaultStatement.CompoundStatement()->Accept(*this);
     }
     else
@@ -727,7 +741,7 @@ void Emitter::Visit(BoundBreakStatement& boundBreakStatement)
     if (!currentCaseMap) // not in switch
     {
         llvm::BasicBlock* nextBlock = llvm::BasicBlock::Create(context, "next", function);
-        builder.SetInsertPoint(nextBlock);
+        SetCurrentBasicBlock(nextBlock);
     }
 }
 
@@ -737,7 +751,7 @@ void Emitter::Visit(BoundContinueStatement& boundContinueStatement)
     ExitBlocks(continueTargetBlock);
     builder.CreateBr(continueTarget);
     llvm::BasicBlock* nextBlock = llvm::BasicBlock::Create(context, "next", function);
-    builder.SetInsertPoint(nextBlock);
+    SetCurrentBasicBlock(nextBlock);
 }
 
 void Emitter::Visit(BoundGotoStatement& boundGotoStatement)
@@ -748,31 +762,34 @@ void Emitter::Visit(BoundGotoStatement& boundGotoStatement)
 void Emitter::Visit(BoundConstructionStatement& boundConstructionStatement)
 {
     boundConstructionStatement.ConstructorCall()->Accept(*this);
-    int n = boundConstructionStatement.ConstructorCall()->Arguments().size();
-    if (n > 0)
+    if (!boundConstructionStatement.ConstructorCall()->GetFunctionSymbol()->IsBasicTypeOperation())
     {
-        const std::unique_ptr<BoundExpression>& firstArgument = boundConstructionStatement.ConstructorCall()->Arguments()[0];
-        TypeSymbol* firstArgumentBaseType = firstArgument->GetType()->BaseType();
-        if (firstArgumentBaseType->IsClassTypeSymbol())
+        int n = boundConstructionStatement.ConstructorCall()->Arguments().size();
+        if (n > 0)
         {
-            if (firstArgument->GetType()->IsPointerType() && firstArgument->GetType()->RemovePointer(boundConstructionStatement.GetSpan())->IsClassTypeSymbol())
+            const std::unique_ptr<BoundExpression>& firstArgument = boundConstructionStatement.ConstructorCall()->Arguments()[0];
+            TypeSymbol* firstArgumentBaseType = firstArgument->GetType()->BaseType();
+            if (firstArgumentBaseType->IsClassTypeSymbol())
             {
-                ClassTypeSymbol* classType = static_cast<ClassTypeSymbol*>(firstArgumentBaseType);
-                if (classType->Destructor())
+                if (firstArgument->GetType()->IsPointerType() && firstArgument->GetType()->RemovePointer(boundConstructionStatement.GetSpan())->IsClassTypeSymbol())
                 {
-                    std::unique_ptr<BoundExpression> classPtrArgument(firstArgument->Clone());
-                    std::unique_ptr<BoundFunctionCall> destructorCall(new BoundFunctionCall(boundConstructionStatement.GetSpan(), classType->Destructor()));
-                    destructorCall->AddArgument(std::move(classPtrArgument));
-                    Assert(currentBlock, "current block not set");
-                    auto it = blockDestructionMap.find(currentBlock);
-                    if (it != blockDestructionMap.cend())
+                    ClassTypeSymbol* classType = static_cast<ClassTypeSymbol*>(firstArgumentBaseType);
+                    if (classType->Destructor())
                     {
-                        std::vector<std::unique_ptr<BoundFunctionCall>>& destructorCallVec = it->second;
-                        destructorCallVec.push_back(std::move(destructorCall));
-                    }
-                    else
-                    {
-                        Assert(false, "block destruction not found");
+                        std::unique_ptr<BoundExpression> classPtrArgument(firstArgument->Clone());
+                        std::unique_ptr<BoundFunctionCall> destructorCall(new BoundFunctionCall(boundConstructionStatement.GetSpan(), classType->Destructor()));
+                        destructorCall->AddArgument(std::move(classPtrArgument));
+                        Assert(currentBlock, "current block not set");
+                        auto it = blockDestructionMap.find(currentBlock);
+                        if (it != blockDestructionMap.cend())
+                        {
+                            std::vector<std::unique_ptr<BoundFunctionCall>>& destructorCallVec = it->second;
+                            destructorCallVec.push_back(std::move(destructorCall));
+                        }
+                        else
+                        {
+                            Assert(false, "block destruction not found");
+                        }
                     }
                 }
             }
@@ -801,7 +818,21 @@ void Emitter::Visit(BoundEmptyStatement& boundEmptyStatement)
     llvm::FunctionType* doNothingFunType = llvm::FunctionType::get(retType, paramTypes, false);
     llvm::Function* doNothingFun = llvm::cast<llvm::Function>(compileUnitModule->getOrInsertFunction("llvm.donothing", doNothingFunType));
     ArgVector args;
-    builder.CreateCall(doNothingFunType, doNothingFun, args);
+    std::vector<llvm::OperandBundleDef> bundles;
+    if (currentPad != nullptr)
+    {
+        std::vector<llvm::Value*> inputs;
+        inputs.push_back(currentPad);
+        bundles.push_back(llvm::OperandBundleDef("funclet", inputs));
+    }
+    if (currentPad == nullptr)
+    {
+        builder.CreateCall(doNothingFunType, doNothingFun, args);
+    }
+    else
+    {
+        llvm::CallInst::Create(doNothingFun, args, bundles, "", CurrentBasicBlock());
+    }
 }
 
 void Emitter::Visit(BoundSetVmtPtrStatement& boundSetVmtPtrStatement)
@@ -820,6 +851,100 @@ void Emitter::Visit(BoundSetVmtPtrStatement& boundSetVmtPtrStatement)
     llvm::Value* ptr = builder.CreateGEP(classPtrValue, indeces);
     llvm::Value* vmtPtr = builder.CreateBitCast(boundSetVmtPtrStatement.ClassType()->VmtObject(*this, false), builder.getInt8PtrTy());
     builder.CreateStore(vmtPtr, ptr);
+}
+
+void Emitter::Visit(BoundThrowStatement& boundThrowStatement)
+{
+    boundThrowStatement.ThrowCall()->Accept(*this);
+}
+
+void Emitter::Visit(BoundTryStatement& boundTryStatement)
+{
+    llvm::BasicBlock* prevHandlerBlock = handlerBlock;
+    handlerBlock = llvm::BasicBlock::Create(context, "handlers", function);
+    boundTryStatement.TryBlock()->Accept(*this);
+    llvm::BasicBlock* nextTarget = llvm::BasicBlock::Create(context, "next", function);
+    builder.CreateBr(nextTarget);
+    SetCurrentBasicBlock(handlerBlock);
+    handlerBlock = prevHandlerBlock;
+    llvm::Value* parentPad = currentPad;
+    llvm::CatchSwitchInst* catchSwitch = nullptr;
+    if (parentPad == nullptr)
+    {
+        catchSwitch = builder.CreateCatchSwitch(llvm::ConstantTokenNone::get(context), prevHandlerBlock, 1);
+    }
+    else
+    {
+        catchSwitch = builder.CreateCatchSwitch(parentPad, prevHandlerBlock, 1);
+    }
+    currentPad = catchSwitch;
+    llvm::BasicBlock* catchPadTarget = llvm::BasicBlock::Create(context, "catchpad", function);
+    catchSwitch->addHandler(catchPadTarget);
+    SetCurrentBasicBlock(catchPadTarget);
+    ArgVector catchPadArgs;
+    catchPadArgs.push_back(llvm::Constant::getNullValue(builder.getInt8PtrTy()));
+    catchPadArgs.push_back(builder.getInt32(64));
+    catchPadArgs.push_back(llvm::Constant::getNullValue(builder.getInt8PtrTy()));
+    llvm::CatchPadInst* catchPad = builder.CreateCatchPad(currentPad, catchPadArgs);
+    currentPad = catchPad;
+    llvm::BasicBlock* catchTarget = llvm::BasicBlock::Create(context, "catch", function);
+    llvm::BasicBlock* resumeTarget = llvm::BasicBlock::Create(context, "resume", function);
+    builder.CreateBr(catchTarget);
+    int n = boundTryStatement.Catches().size();
+    for (int i = 0; i < n; ++i)
+    {
+        const std::unique_ptr<BoundCatchStatement>& boundCatchStatement = boundTryStatement.Catches()[i];
+        uint32_t catchTypeId = boundCatchStatement->CatchedType()->BaseType()->TypeId();
+        SetCurrentBasicBlock(catchTarget);
+        std::vector<llvm::Type*> handleExceptionParamTypes;
+        handleExceptionParamTypes.push_back(builder.getInt32Ty());
+        llvm::FunctionType* handleExceptionFunctionType = llvm::FunctionType::get(builder.getInt1Ty(), handleExceptionParamTypes, false);
+        ArgVector handleExceptionArgs;
+        handleExceptionArgs.push_back(builder.getInt32(catchTypeId));
+        llvm::Function* handleException = llvm::cast<llvm::Function>(compileUnitModule->getOrInsertFunction("RtHandleException", handleExceptionFunctionType));
+        llvm::Value* handleThisEx = nullptr;
+        if (currentPad == nullptr)
+        {
+            handleThisEx = builder.CreateCall(handleException, handleExceptionArgs);
+        }
+        else
+        {
+            std::vector<llvm::OperandBundleDef> bundles;
+            std::vector<llvm::Value*> inputs;
+            inputs.push_back(currentPad);
+            bundles.push_back(llvm::OperandBundleDef("funclet", inputs));
+            handleThisEx = llvm::CallInst::Create(handleException, handleExceptionArgs, bundles, "", CurrentBasicBlock());
+        }
+        llvm::BasicBlock* nextHandlerTarget = nullptr;
+        if (i < n - 1)
+        {
+            catchTarget = llvm::BasicBlock::Create(context, "catch", function);
+            nextHandlerTarget = catchTarget;
+        }
+        else
+        {
+            nextHandlerTarget = resumeTarget;
+        }
+        llvm::BasicBlock* thisHandlerTarget = llvm::BasicBlock::Create(context, "handler", function);
+        builder.CreateCondBr(handleThisEx, thisHandlerTarget, nextHandlerTarget);
+        SetCurrentBasicBlock(thisHandlerTarget);
+        boundCatchStatement->CatchBlock()->Accept(*this);
+        builder.CreateCatchRet(llvm::cast<llvm::CatchPadInst>(currentPad), nextTarget);
+    }
+    SetCurrentBasicBlock(resumeTarget);
+    llvm::Function* cxxThrowFunction = llvm::cast<llvm::Function>(compileUnitModule->getOrInsertFunction("_CxxThrowException", 
+        builder.getVoidTy(), builder.getInt8PtrTy(), builder.getInt8PtrTy(), nullptr));
+    ArgVector rethrowArgs;
+    rethrowArgs.push_back(llvm::Constant::getNullValue(builder.getInt8PtrTy()));
+    rethrowArgs.push_back(llvm::Constant::getNullValue(builder.getInt8PtrTy()));
+    std::vector<llvm::OperandBundleDef> bundles;
+    std::vector<llvm::Value*> inputs;
+    inputs.push_back(currentPad);
+    bundles.push_back(llvm::OperandBundleDef("funclet", inputs));
+    llvm::CallInst::Create(cxxThrowFunction, rethrowArgs, bundles, "", resumeTarget);
+    builder.CreateBr(nextTarget);
+    currentPad = parentPad;
+    SetCurrentBasicBlock(nextTarget);
 }
 
 void Emitter::Visit(BoundParameter& boundParameter)
@@ -944,7 +1069,7 @@ void Emitter::Visit(BoundDisjunction& boundDisjunction)
         llvm::BasicBlock* prevFalseBlock = falseBlock;
         falseBlock = rightBlock;
         boundDisjunction.Left()->Accept(*this);
-        builder.SetInsertPoint(rightBlock);
+        SetCurrentBasicBlock(rightBlock);
         falseBlock = prevFalseBlock;
         boundDisjunction.Right()->Accept(*this);
         boundDisjunction.DestroyTemporaries(*this);
@@ -962,7 +1087,7 @@ void Emitter::Visit(BoundConjunction& boundConjunction)
         trueBlock = rightBlock;
         boundConjunction.Left()->Accept(*this);
         trueBlock = prevTrueBlock;
-        builder.SetInsertPoint(rightBlock);
+        SetCurrentBasicBlock(rightBlock);
         boundConjunction.Right()->Accept(*this);
         boundConjunction.DestroyTemporaries(*this);
     }
@@ -1046,7 +1171,18 @@ void Emitter::CreateExitFunctionCall()
     llvm::FunctionType* exitFunctionType = llvm::FunctionType::get(builder.getVoidTy(), exitFunctionParamTypes, false);
     llvm::Function* exitFunction = llvm::cast<llvm::Function>(compileUnitModule->getOrInsertFunction("RtExitFunction", exitFunctionType));
     ArgVector exitFunctionArgs;
-    builder.CreateCall(exitFunction, exitFunctionArgs);
+    if (currentPad == nullptr)
+    {
+        builder.CreateCall(exitFunction, exitFunctionArgs);
+    }
+    else
+    {
+        std::vector<llvm::OperandBundleDef> bundles;
+        std::vector<llvm::Value*> inputs;
+        inputs.push_back(currentPad);
+        bundles.push_back(llvm::OperandBundleDef("funclet", inputs));
+        llvm::CallInst::Create(exitFunction, exitFunctionArgs, bundles, "", CurrentBasicBlock());
+    }
 }
 
 void Emitter::SetLineNumber(int32_t lineNumber)
@@ -1060,7 +1196,18 @@ void Emitter::SetLineNumber(int32_t lineNumber)
     llvm::Function* setLineNumberFunction = llvm::cast<llvm::Function>(compileUnitModule->getOrInsertFunction("RtSetLineNumber", setLineNumberFunctionType));
     ArgVector setLineNumberFunctionArgs;
     setLineNumberFunctionArgs.push_back(builder.getInt32(lineNumber));
-    builder.CreateCall(setLineNumberFunction, setLineNumberFunctionArgs);
+    if (currentPad == nullptr)
+    {
+        builder.CreateCall(setLineNumberFunction, setLineNumberFunctionArgs);
+    }
+    else
+    {
+        std::vector<llvm::OperandBundleDef> bundles;
+        std::vector<llvm::Value*> inputs;
+        inputs.push_back(currentPad);
+        bundles.push_back(llvm::OperandBundleDef("funclet", inputs));
+        llvm::CallInst::Create(setLineNumberFunction, setLineNumberFunctionArgs, bundles, "", CurrentBasicBlock());
+    }
 }
 
 void GenerateCode(EmittingContext& emittingContext, BoundCompileUnit& boundCompileUnit)

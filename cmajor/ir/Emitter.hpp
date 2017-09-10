@@ -31,6 +31,10 @@ public:
     virtual llvm::Value* GetGlobalWStringConstant(int stringId) = 0;
     virtual llvm::Value* GetGlobalUStringConstant(int stringId) = 0;
     virtual void SetLineNumber(int32_t lineNumber) = 0;
+    virtual llvm::BasicBlock* HandlerBlock() = 0;
+    llvm::BasicBlock* CurrentBasicBlock() const { return currentBasicBlock; }
+    void SetCurrentBasicBlock(llvm::BasicBlock* currentBasicBlock_) { currentBasicBlock = currentBasicBlock_; builder.SetInsertPoint(currentBasicBlock); }
+    virtual llvm::Value* CurrentPad() = 0;
 private:
     llvm::LLVMContext& context;
     llvm::IRBuilder<> builder;
@@ -38,6 +42,7 @@ private:
     ValueStack stack;
     llvm::Value* objectPointer;
     llvm::Function* function;
+    llvm::BasicBlock* currentBasicBlock;
 };
 
 } } // namespace cmajor::ir
