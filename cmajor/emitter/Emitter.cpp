@@ -108,6 +108,15 @@ EmittingContext::~EmittingContext()
     delete emittingContextImpl;
 }
 
+struct Cleanup
+{
+    Cleanup(llvm::BasicBlock* cleanupBlock_, llvm::BasicBlock* handlerBlock_, llvm::Value* currentPad_) : cleanupBlock(cleanupBlock_), handlerBlock(handlerBlock_), currentPad(currentPad_) {}
+    llvm::BasicBlock* cleanupBlock;
+    llvm::BasicBlock* handlerBlock;
+    llvm::Value* currentPad;
+    std::vector<std::unique_ptr<BoundFunctionCall>> destructors;
+};
+
 class Emitter : public cmajor::ir::Emitter, public BoundNodeVisitor
 {
 public:
@@ -163,6 +172,9 @@ public:
     llvm::Value* GetGlobalWStringConstant(int stringId) override;
     llvm::Value* GetGlobalUStringConstant(int stringId) override;
     llvm::BasicBlock* HandlerBlock() override { return handlerBlock; }
+    llvm::BasicBlock* CleanupBlock() override { return cleanupBlock; }
+    bool NewCleanupNeeded() override { return newCleanupNeeded; }
+    void CreateCleanup() override;
     llvm::Value* CurrentPad() override { return currentPad;  }
 private:
     EmittingContext& emittingContext;
@@ -178,6 +190,9 @@ private:
     llvm::BasicBlock* breakTarget;
     llvm::BasicBlock* continueTarget;
     llvm::BasicBlock* handlerBlock;
+    llvm::BasicBlock* cleanupBlock;
+    bool newCleanupNeeded;
+    std::vector<std::unique_ptr<Cleanup>> cleanups;
     llvm::Value* currentPad;
     bool genJumpingBoolCode;
     BoundCompileUnit* compileUnit;
@@ -199,13 +214,14 @@ private:
     void ExitBlocks(BoundCompoundStatement* targetBlock);
     void CreateExitFunctionCall();
     void SetLineNumber(int32_t lineNumber) override;
+    void GenerateCodeForCleanups();
 };
 
 Emitter::Emitter(EmittingContext& emittingContext_, const std::string& compileUnitModuleName_, cmajor::symbols::Module& symbolsModule_) :
     cmajor::ir::Emitter(emittingContext_.GetEmittingContextImpl()->Context()), emittingContext(emittingContext_), symbolTable(nullptr),
     compileUnitModule(new llvm::Module(compileUnitModuleName_, emittingContext.GetEmittingContextImpl()->Context())), symbolsModule(symbolsModule_), builder(Builder()), stack(Stack()),
     context(emittingContext.GetEmittingContextImpl()->Context()), compileUnit(nullptr), function(nullptr), trueBlock(nullptr), falseBlock(nullptr), breakTarget(nullptr), continueTarget(nullptr),
-    handlerBlock(nullptr), currentPad(nullptr), genJumpingBoolCode(false), currentClass(nullptr), currentFunction(nullptr), currentBlock(nullptr),
+    handlerBlock(nullptr), cleanupBlock(nullptr), newCleanupNeeded(false), currentPad(nullptr), genJumpingBoolCode(false), currentClass(nullptr), currentFunction(nullptr), currentBlock(nullptr),
     breakTargetBlock(nullptr), continueTargetBlock(nullptr), currentCaseMap(nullptr), defaultDest(nullptr), prevLineNumber(0)
 {
     compileUnitModule->setTargetTriple(emittingContext.GetEmittingContextImpl()->TargetTriple());
@@ -286,8 +302,11 @@ void Emitter::Visit(BoundFunction& boundFunction)
     if (!boundFunction.Body()) return;
     currentFunction = &boundFunction;
     handlerBlock = nullptr;
+    cleanupBlock = nullptr;
+    newCleanupNeeded = false;
     currentPad = nullptr;
     prevLineNumber = 0;
+    cleanups.clear();
     FunctionSymbol* functionSymbol = boundFunction.GetFunctionSymbol();
     llvm::FunctionType* functionType = functionSymbol->IrType(*this);
     function = llvm::cast<llvm::Function>(compileUnitModule->getOrInsertFunction(ToUtf8(functionSymbol->MangledName()), functionType));
@@ -298,23 +317,9 @@ void Emitter::Visit(BoundFunction& boundFunction)
         function->setLinkage(llvm::GlobalValue::LinkageTypes::LinkOnceODRLinkage);
         function->setComdat(comdat);
     }
-    if (functionSymbol->DontThrow() && !boundFunction.GetFunctionSymbol()->HasTry())
-    {
-        function->addFnAttr(llvm::Attribute::NoUnwind);
-    }
-    else
-    {
-        function->addFnAttr(llvm::Attribute::UWTable);
-    }
     if (GetGlobalFlag(GlobalFlags::release) && functionSymbol->IsInline())
     {
         function->addFnAttr(llvm::Attribute::InlineHint);
-    }
-    if (boundFunction.GetFunctionSymbol()->HasTry()) 
-    {
-        llvm::FunctionType* personalityFunctionType = llvm::FunctionType::get(builder.getInt32Ty(), true);
-        llvm::Function* personalityFunction = llvm::cast<llvm::Function>(compileUnitModule->getOrInsertFunction("__CxxFrameHandler3", personalityFunctionType));
-        function->setPersonalityFn(llvm::ConstantExpr::getBitCast(personalityFunction, builder.getInt8PtrTy()));
     }
     SetFunction(function);
     llvm::BasicBlock* entryBlock = llvm::BasicBlock::Create(context, "entry", function);
@@ -399,6 +404,21 @@ void Emitter::Visit(BoundFunction& boundFunction)
             builder.CreateRetVoid();
         }
     }
+    if (functionSymbol->HasTry() || !cleanups.empty())
+    {
+        llvm::FunctionType* personalityFunctionType = llvm::FunctionType::get(builder.getInt32Ty(), true);
+        llvm::Function* personalityFunction = llvm::cast<llvm::Function>(compileUnitModule->getOrInsertFunction("__CxxFrameHandler3", personalityFunctionType));
+        function->setPersonalityFn(llvm::ConstantExpr::getBitCast(personalityFunction, builder.getInt8PtrTy()));
+    }
+    if (functionSymbol->DontThrow() && !functionSymbol->HasTry() && cleanups.empty())
+    {
+        function->addFnAttr(llvm::Attribute::NoUnwind);
+    }
+    else
+    {
+        function->addFnAttr(llvm::Attribute::UWTable);
+    }
+    GenerateCodeForCleanups();
 }
 
 void Emitter::Visit(BoundSequenceStatement& boundSequenceStatement)
@@ -776,6 +796,7 @@ void Emitter::Visit(BoundConstructionStatement& boundConstructionStatement)
                     ClassTypeSymbol* classType = static_cast<ClassTypeSymbol*>(firstArgumentBaseType);
                     if (classType->Destructor())
                     {
+                        newCleanupNeeded = true;
                         std::unique_ptr<BoundExpression> classPtrArgument(firstArgument->Clone());
                         std::unique_ptr<BoundFunctionCall> destructorCall(new BoundFunctionCall(boundConstructionStatement.GetSpan(), classType->Destructor()));
                         destructorCall->AddArgument(std::move(classPtrArgument));
@@ -861,12 +882,14 @@ void Emitter::Visit(BoundThrowStatement& boundThrowStatement)
 void Emitter::Visit(BoundTryStatement& boundTryStatement)
 {
     llvm::BasicBlock* prevHandlerBlock = handlerBlock;
+    llvm::BasicBlock* prevCleanupBlock = cleanupBlock;
     handlerBlock = llvm::BasicBlock::Create(context, "handlers", function);
     boundTryStatement.TryBlock()->Accept(*this);
     llvm::BasicBlock* nextTarget = llvm::BasicBlock::Create(context, "next", function);
     builder.CreateBr(nextTarget);
     SetCurrentBasicBlock(handlerBlock);
     handlerBlock = prevHandlerBlock;
+    cleanupBlock = prevCleanupBlock;
     llvm::Value* parentPad = currentPad;
     llvm::CatchSwitchInst* catchSwitch = nullptr;
     if (parentPad == nullptr)
@@ -1207,6 +1230,74 @@ void Emitter::SetLineNumber(int32_t lineNumber)
         inputs.push_back(currentPad);
         bundles.push_back(llvm::OperandBundleDef("funclet", inputs));
         llvm::CallInst::Create(setLineNumberFunction, setLineNumberFunctionArgs, bundles, "", CurrentBasicBlock());
+    }
+}
+
+void Emitter::CreateCleanup()
+{
+    cleanupBlock = llvm::BasicBlock::Create(context, "cleanup", function);
+    BoundCompoundStatement* targetBlock = nullptr;
+    BoundStatement* parent = currentBlock->Parent();
+    while (parent && parent->GetBoundNodeType() != BoundNodeType::boundTryStatement)
+    {
+        parent = parent->Parent();
+    }
+    if (parent)
+    {
+        targetBlock = parent->Block();
+    }
+    Cleanup* cleanup = new Cleanup(cleanupBlock, handlerBlock, currentPad);
+    int n = blocks.size();
+    for (int i = n - 1; i >= 0; --i)
+    {
+        BoundCompoundStatement* block = blocks[i];
+        if (block == targetBlock)
+        {
+            break;
+        }
+        auto it = blockDestructionMap.find(block);
+        if (it != blockDestructionMap.cend())
+        {
+            std::vector<std::unique_ptr<BoundFunctionCall>>& destructorCallVec = it->second;
+            int nd = destructorCallVec.size();
+            for (int i = nd - 1; i >= 0; --i)
+            {
+                std::unique_ptr<BoundFunctionCall>& destructorCall = destructorCallVec[i];
+                if (destructorCall)
+                {
+                    cleanup->destructors.push_back(std::unique_ptr<BoundFunctionCall>(static_cast<BoundFunctionCall*>(destructorCall->Clone())));
+                }
+            }
+        }
+    }
+    cleanups.push_back(std::unique_ptr<Cleanup>(cleanup));
+    newCleanupNeeded = false;
+}
+
+void Emitter::GenerateCodeForCleanups()
+{
+    for (const std::unique_ptr<Cleanup>& cleanup : cleanups)
+    {
+        SetCurrentBasicBlock(cleanup->cleanupBlock);
+        llvm::Value* parentPad = cleanup->currentPad;
+        llvm::CleanupPadInst* cleanupPad = nullptr;
+        if (parentPad)
+        {
+            ArgVector args;
+            cleanupPad = builder.CreateCleanupPad(parentPad, args);
+        }
+        else
+        {
+            ArgVector args;
+            cleanupPad = builder.CreateCleanupPad(llvm::ConstantTokenNone::get(context), args);
+        }
+        currentPad = cleanupPad;
+        for (const std::unique_ptr<BoundFunctionCall>& destructorCall : cleanup->destructors)
+        {
+            destructorCall->Accept(*this);
+        }
+        llvm::BasicBlock* unwindTarget = cleanup->handlerBlock;
+        builder.CreateCleanupRet(llvm::cast<llvm::CleanupPadInst>(cleanupPad), unwindTarget);
     }
 }
 

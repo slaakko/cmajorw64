@@ -32,6 +32,9 @@ public:
     virtual llvm::Value* GetGlobalUStringConstant(int stringId) = 0;
     virtual void SetLineNumber(int32_t lineNumber) = 0;
     virtual llvm::BasicBlock* HandlerBlock() = 0;
+    virtual llvm::BasicBlock* CleanupBlock() = 0;
+    virtual bool NewCleanupNeeded() = 0;
+    virtual void CreateCleanup() = 0;
     llvm::BasicBlock* CurrentBasicBlock() const { return currentBasicBlock; }
     void SetCurrentBasicBlock(llvm::BasicBlock* currentBasicBlock_) { currentBasicBlock = currentBasicBlock_; builder.SetInsertPoint(currentBasicBlock); }
     virtual llvm::Value* CurrentPad() = 0;

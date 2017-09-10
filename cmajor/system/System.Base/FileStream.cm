@@ -59,7 +59,10 @@ namespace System.IO
 
     public class InputFileStream : InputStream
     {
-        public nothrow InputFileStream() : this(stdin, defaultBufferSize)
+        public nothrow InputFileStream() : this(stdin)
+        {
+        }
+        public nothrow InputFileStream(int fileHandle_) : this(fileHandle_, defaultBufferSize)
         {
         }
         public nothrow InputFileStream(int fileHandle_, long bufferSize_) : buffer(bufferSize_), pos(null), end(null), filePath(), fileHandle(fileHandle_), opened(false), endOfStream(false)
@@ -238,10 +241,10 @@ namespace System.IO
 
     public class OutputFileStream : OutputStream
     {
-        public OutputFileStream() : this(stdout)
+        public nothrow OutputFileStream() : this(stdout)
         {
         }
-        public OutputFileStream(int fileHandle_) : filePath(), fileHandle(fileHandle_), opened(false)
+        public nothrow OutputFileStream(int fileHandle_) : filePath(), fileHandle(fileHandle_), opened(false)
         {
         }
         public OutputFileStream(const string& filePath_) : filePath(), fileHandle(-1), opened(false)

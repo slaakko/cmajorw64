@@ -479,6 +479,8 @@ void FunctionSymbol::GenerateCall(Emitter& emitter, std::vector<GenObject*>& gen
         args[n - i - 1] = arg;
     }
     llvm::BasicBlock* handlerBlock = emitter.HandlerBlock();
+    llvm::BasicBlock* cleanupBlock = emitter.CleanupBlock();
+    bool newCleanupNeeded = emitter.NewCleanupNeeded();
     llvm::Value* currentPad = emitter.CurrentPad();
     std::vector<llvm::OperandBundleDef> bundles;
     if (currentPad != nullptr)
@@ -489,7 +491,7 @@ void FunctionSymbol::GenerateCall(Emitter& emitter, std::vector<GenObject*>& gen
     }
     if (ReturnType() && ReturnType()->GetSymbolType() != SymbolType::voidTypeSymbol && !ReturnsClassByValue())
     {
-        if (DontThrow() || !handlerBlock)
+        if (DontThrow() || (!handlerBlock && !cleanupBlock && !newCleanupNeeded))
         {
             if (currentPad == nullptr)
             {
@@ -503,20 +505,31 @@ void FunctionSymbol::GenerateCall(Emitter& emitter, std::vector<GenObject*>& gen
         else
         {
             llvm::BasicBlock* nextBlock = llvm::BasicBlock::Create(emitter.Context(), "next", emitter.Function());
+            if (newCleanupNeeded)
+            {
+                emitter.CreateCleanup();
+                cleanupBlock = emitter.CleanupBlock();
+            }
+            llvm::BasicBlock* unwindBlock = cleanupBlock;
+            if (unwindBlock == nullptr)
+            {
+                unwindBlock = handlerBlock;
+                Assert(unwindBlock, "no unwind block");
+            }
             if (currentPad == nullptr)
             {
-                emitter.Stack().Push(emitter.Builder().CreateInvoke(callee, nextBlock, handlerBlock, args));
+                emitter.Stack().Push(emitter.Builder().CreateInvoke(callee, nextBlock, unwindBlock, args));
             }
             else
             {
-                emitter.Stack().Push(llvm::InvokeInst::Create(callee, nextBlock, handlerBlock, args, bundles, "", emitter.CurrentBasicBlock()));
+                emitter.Stack().Push(llvm::InvokeInst::Create(callee, nextBlock, unwindBlock, args, bundles, "", emitter.CurrentBasicBlock()));
             }
             emitter.SetCurrentBasicBlock(nextBlock);
         }
     }
     else
     {
-        if (DontThrow() || !handlerBlock)
+        if (DontThrow() || (!handlerBlock && !cleanupBlock && !newCleanupNeeded))
         {
             if (currentPad == nullptr)
             {
@@ -530,13 +543,24 @@ void FunctionSymbol::GenerateCall(Emitter& emitter, std::vector<GenObject*>& gen
         else
         {
             llvm::BasicBlock* nextBlock = llvm::BasicBlock::Create(emitter.Context(), "next", emitter.Function());
+            if (newCleanupNeeded)
+            {
+                emitter.CreateCleanup();
+                cleanupBlock = emitter.CleanupBlock();
+            }
+            llvm::BasicBlock* unwindBlock = cleanupBlock;
+            if (unwindBlock == nullptr)
+            {
+                unwindBlock = handlerBlock;
+                Assert(unwindBlock, "no unwind block");
+            }
             if (currentPad == nullptr)
             {
-                emitter.Builder().CreateInvoke(callee, nextBlock, handlerBlock, args);
+                emitter.Builder().CreateInvoke(callee, nextBlock, unwindBlock, args);
             }
             else
             {
-                llvm::InvokeInst::Create(callee, nextBlock, handlerBlock, args, bundles, "", emitter.CurrentBasicBlock());
+                llvm::InvokeInst::Create(callee, nextBlock, unwindBlock, args, bundles, "", emitter.CurrentBasicBlock());
             }
             emitter.SetCurrentBasicBlock(nextBlock);
         }
@@ -593,6 +617,8 @@ void FunctionSymbol::GenerateVirtualCall(Emitter& emitter, std::vector<GenObject
         args[n - i - 1] = arg;
     }
     llvm::BasicBlock* handlerBlock = emitter.HandlerBlock();
+    llvm::BasicBlock* cleanupBlock = emitter.CleanupBlock();
+    bool newCleanupNeeded = emitter.NewCleanupNeeded();
     std::vector<llvm::OperandBundleDef> bundles;
     llvm::Value* currentPad = emitter.CurrentPad();
     if (currentPad != nullptr)
@@ -603,7 +629,7 @@ void FunctionSymbol::GenerateVirtualCall(Emitter& emitter, std::vector<GenObject
     }
     if (ReturnType() && !ReturnType()->IsVoidType() && !ReturnsClassByValue())
     {
-        if (DontThrow() || !handlerBlock)
+        if (DontThrow() || (!handlerBlock && !cleanupBlock && !newCleanupNeeded))
         {
             if (currentPad == nullptr)
             {
@@ -617,20 +643,31 @@ void FunctionSymbol::GenerateVirtualCall(Emitter& emitter, std::vector<GenObject
         else
         {
             llvm::BasicBlock* nextBlock = llvm::BasicBlock::Create(emitter.Context(), "next", emitter.Function());
+            if (newCleanupNeeded)
+            {
+                emitter.CreateCleanup();
+                cleanupBlock = emitter.CleanupBlock();
+            }
+            llvm::BasicBlock* unwindBlock = cleanupBlock;
+            if (unwindBlock == nullptr)
+            {
+                unwindBlock = handlerBlock;
+                Assert(unwindBlock, "no unwind block");
+            }
             if (currentPad == nullptr)
             {
-                emitter.Stack().Push(emitter.Builder().CreateInvoke(callee, nextBlock, handlerBlock, args));
+                emitter.Stack().Push(emitter.Builder().CreateInvoke(callee, nextBlock, unwindBlock, args));
             }
             else
             {
-                emitter.Stack().Push(llvm::InvokeInst::Create(callee, nextBlock, handlerBlock, args, bundles, "", emitter.CurrentBasicBlock()));
+                emitter.Stack().Push(llvm::InvokeInst::Create(callee, nextBlock, unwindBlock, args, bundles, "", emitter.CurrentBasicBlock()));
             }
             emitter.SetCurrentBasicBlock(nextBlock);
         }
     }
     else
     {
-        if (DontThrow() || !handlerBlock)
+        if (DontThrow() || (!handlerBlock && !cleanupBlock && !newCleanupNeeded))
         {
             if (currentPad == nullptr)
             {
@@ -644,13 +681,24 @@ void FunctionSymbol::GenerateVirtualCall(Emitter& emitter, std::vector<GenObject
         else
         {
             llvm::BasicBlock* nextBlock = llvm::BasicBlock::Create(emitter.Context(), "next", emitter.Function());
+            if (newCleanupNeeded)
+            {
+                emitter.CreateCleanup();
+                cleanupBlock = emitter.CleanupBlock();
+            }
+            llvm::BasicBlock* unwindBlock = cleanupBlock;
+            if (unwindBlock == nullptr)
+            {
+                unwindBlock = handlerBlock;
+                Assert(unwindBlock, "no unwind block");
+            }
             if (currentPad == nullptr)
             {
-                emitter.Builder().CreateInvoke(callee, nextBlock, handlerBlock, args);
+                emitter.Builder().CreateInvoke(callee, nextBlock, unwindBlock, args);
             }
             else
             {
-                llvm::InvokeInst::Create(callee, nextBlock, handlerBlock, args, bundles, "", emitter.CurrentBasicBlock());
+                llvm::InvokeInst::Create(callee, nextBlock, unwindBlock, args, bundles, "", emitter.CurrentBasicBlock());
             }
             emitter.SetCurrentBasicBlock(nextBlock);
         }

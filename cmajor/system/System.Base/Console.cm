@@ -9,7 +9,7 @@ namespace System
 {
     public static class Console
     {
-        static Console() : out(new OutputFileStream(stdout)), err(new OutputFileStream(stderr))
+        static nothrow Console() : in(new InputFileStream(stdin)), out(new OutputFileStream(stdout)), err(new OutputFileStream(stderr))
         {
         }
         public static void Write(const char* s)
@@ -168,6 +168,7 @@ namespace System
         {
             return *err;
         }
+        private static UniquePtr<InputStream> in;
         private static UniquePtr<OutputStream> out;
         private static UniquePtr<OutputStream> err;
     }
