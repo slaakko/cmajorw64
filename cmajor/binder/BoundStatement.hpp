@@ -269,6 +269,16 @@ private:
     std::unique_ptr<BoundExpression> throwCall;
 };
 
+class BoundRethrowStatement : public BoundStatement
+{
+public:
+    BoundRethrowStatement(const Span& span_, std::unique_ptr<BoundExpression>&& releaseCall_);
+    void Accept(BoundNodeVisitor& visitor) override;
+    BoundExpression* ReleaseCall() { return releaseCall.get(); }
+private:
+    std::unique_ptr<BoundExpression> releaseCall;
+};
+
 class BoundCatchStatement;
 
 class BoundTryStatement : public BoundStatement

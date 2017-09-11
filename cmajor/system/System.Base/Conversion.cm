@@ -5,9 +5,16 @@
 
 namespace System
 {
-    void ThrowConversionException(const string& message)
+    public class ConversionException : Exception
     {
-        #assert(false);
+        public nothrow ConversionException(const string& message) : base(message)
+        {
+        }
+    }
+
+    public void ThrowConversionException(const string& message)
+    {
+        throw ConversionException(message);
     }
 
     public nothrow string ToStringGeneric<I, U>(I x) where I is SignedInteger and U is UnsignedInteger and ExplicitlyConvertible<I, U> and ExplicitlyConvertible<U, byte>
@@ -129,7 +136,7 @@ namespace System
         return result;
     }
 
-    public string ToString(char c)
+    public nothrow string ToString(char c)
     {
         return string(c);
     }

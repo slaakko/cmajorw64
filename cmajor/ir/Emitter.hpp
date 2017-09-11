@@ -12,6 +12,13 @@ namespace cmajor { namespace ir {
 
 typedef llvm::SmallVector<llvm::Value*, 4> ArgVector;
 
+struct Pad
+{
+    Pad() : parent(nullptr), value(nullptr) {}
+    Pad* parent;
+    llvm::Value* value;
+};
+
 class Emitter
 {
 public:
@@ -37,7 +44,7 @@ public:
     virtual void CreateCleanup() = 0;
     llvm::BasicBlock* CurrentBasicBlock() const { return currentBasicBlock; }
     void SetCurrentBasicBlock(llvm::BasicBlock* currentBasicBlock_) { currentBasicBlock = currentBasicBlock_; builder.SetInsertPoint(currentBasicBlock); }
-    virtual llvm::Value* CurrentPad() = 0;
+    virtual Pad* CurrentPad() = 0;
 private:
     llvm::LLVMContext& context;
     llvm::IRBuilder<> builder;

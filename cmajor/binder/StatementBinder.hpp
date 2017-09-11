@@ -69,6 +69,7 @@ private:
     ContainerScope* containerScope;
     std::unique_ptr<BoundStatement> statement;
     int compoundLevel;
+    bool insideCatch;
     BoundClass* currentClass;
     BoundFunction* currentFunction;
     StaticConstructorSymbol* currentStaticConstructorSymbol;

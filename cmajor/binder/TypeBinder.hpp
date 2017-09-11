@@ -60,6 +60,7 @@ public:
     void Visit(EnumConstantNode& enumConstantNode) override;
 
     void SetContainerScope(ContainerScope* containerScope_) { containerScope = containerScope_; }
+    void SetCurrentFunctionSymbol(FunctionSymbol* currentFunctionSymbol_) { currentFunctionSymbol = currentFunctionSymbol_; }
 private:
     BoundCompileUnit& boundCompileUnit;
     SymbolTable& symbolTable;

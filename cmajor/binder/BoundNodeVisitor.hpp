@@ -32,6 +32,7 @@ class BoundExpressionStatement;
 class BoundEmptyStatement;
 class BoundSetVmtPtrStatement;
 class BoundThrowStatement;
+class BoundRethrowStatement;
 class BoundTryStatement;
 class BoundCatchStatement;
 class BoundParameter;
@@ -85,6 +86,7 @@ public:
     virtual void Visit(BoundEmptyStatement& boundEmptyStatement) {}
     virtual void Visit(BoundSetVmtPtrStatement& boundSetVmtPtrStatement) {}
     virtual void Visit(BoundThrowStatement& boundThrowStatement) {}
+    virtual void Visit(BoundRethrowStatement& boundRethrowStatement) {}
     virtual void Visit(BoundTryStatement& boundTryStatement) {}
     virtual void Visit(BoundCatchStatement& boundCatchStatement) {}
     virtual void Visit(BoundParameter& boundParameter) {}

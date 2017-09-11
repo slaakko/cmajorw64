@@ -205,10 +205,10 @@ void CheckFunctionReturnPaths(FunctionSymbol* functionSymbol, CompoundStatementN
 }
 
 StatementBinder::StatementBinder(BoundCompileUnit& boundCompileUnit_) :  
-    boundCompileUnit(boundCompileUnit_), symbolTable(boundCompileUnit.GetSymbolTable()), containerScope(nullptr), statement(), compoundLevel(0), currentClass(nullptr), currentFunction(nullptr),
-    currentStaticConstructorSymbol(nullptr), currentStaticConstructorNode(nullptr), currentConstructorSymbol(nullptr), currentConstructorNode(nullptr), 
-    currentDestructorSymbol(nullptr), currentDestructorNode(nullptr), currentMemberFunctionSymbol(nullptr), currentMemberFunctionNode(nullptr), switchConditionType(nullptr), 
-    currentCaseValueMap(nullptr), currentGotoCaseStatements(nullptr), currentGotoDefaultStatements(nullptr), postfix(false)
+    boundCompileUnit(boundCompileUnit_), symbolTable(boundCompileUnit.GetSymbolTable()), containerScope(nullptr), statement(), compoundLevel(0), insideCatch(false), 
+    currentClass(nullptr), currentFunction(nullptr), currentStaticConstructorSymbol(nullptr), currentStaticConstructorNode(nullptr), currentConstructorSymbol(nullptr), 
+    currentConstructorNode(nullptr), currentDestructorSymbol(nullptr), currentDestructorNode(nullptr), currentMemberFunctionSymbol(nullptr), currentMemberFunctionNode(nullptr), 
+    switchConditionType(nullptr), currentCaseValueMap(nullptr), currentGotoCaseStatements(nullptr), currentGotoDefaultStatements(nullptr), postfix(false)
 {
 }
 
@@ -990,6 +990,7 @@ void StatementBinder::Visit(RangeForStatementNode& rangeForStatementNode)
     }
     CloneContext cloneContext;
     std::unique_ptr<CompoundStatementNode> compoundStatementNode(new CompoundStatementNode(span));
+    compoundStatementNode->SetParent(rangeForStatementNode.Parent());
     ConstructionStatementNode* constructEndIteratorStatement = new ConstructionStatementNode(span, 
         new DotNode(span, containerTypeNode->Clone(cloneContext), static_cast<IdentifierNode*>(iteratorTypeNode->Clone(cloneContext))), new IdentifierNode(span, U"@end"));
     if (container->GetType()->IsConstType())
@@ -1028,6 +1029,7 @@ void StatementBinder::Visit(RangeForStatementNode& rangeForStatementNode)
     symbolTable.EndContainer();
     TypeBinder typeBinder(boundCompileUnit);
     typeBinder.SetContainerScope(containerScope);
+    typeBinder.SetCurrentFunctionSymbol(currentFunction->GetFunctionSymbol());
     compoundStatementNode->Accept(typeBinder);
     compoundStatementNode->Accept(*this);
 }
@@ -1219,34 +1221,50 @@ void StatementBinder::Visit(ThrowStatementNode& throwStatementNode)
     }
     Span span = throwStatementNode.GetSpan();
     Node* exceptionExprNode = throwStatementNode.Expression();
-    std::unique_ptr<BoundExpression> boundExceptionExpr = BindExpression(exceptionExprNode, boundCompileUnit, currentFunction, containerScope, this);
-    if (boundExceptionExpr->GetType()->PlainType(span)->IsClassTypeSymbol())
+    if (exceptionExprNode)
     {
-        ClassTypeSymbol* exceptionClassType = static_cast<ClassTypeSymbol*>(boundExceptionExpr->GetType()->PlainType(span));
-        IdentifierNode systemExceptionNode(throwStatementNode.GetSpan(), U"System.Exception");
-        TypeSymbol* systemExceptionType = ResolveType(&systemExceptionNode, boundCompileUnit, containerScope);
-        Assert(systemExceptionType->IsClassTypeSymbol(), "System.Exception not of class type");
-        ClassTypeSymbol* systemExceptionClassType = static_cast<ClassTypeSymbol*>(systemExceptionType);
-        if (exceptionClassType == systemExceptionClassType || exceptionClassType->HasBaseClass(systemExceptionClassType))
+        std::unique_ptr<BoundExpression> boundExceptionExpr = BindExpression(exceptionExprNode, boundCompileUnit, currentFunction, containerScope, this);
+        if (boundExceptionExpr->GetType()->PlainType(span)->IsClassTypeSymbol())
         {
-            uint32_t exceptionTypeId = exceptionClassType->TypeId();
-            NewNode* newNode = new NewNode(span, new IdentifierNode(span, exceptionClassType->FullName()));
-            CloneContext cloneContext;
-            newNode->AddArgument(throwStatementNode.Expression()->Clone(cloneContext));
-            InvokeNode invokeNode(span, new IdentifierNode(span, U"RtThrowException"));
-            invokeNode.AddArgument(newNode);
-            invokeNode.AddArgument(new UIntLiteralNode(span, exceptionTypeId));
-            std::unique_ptr<BoundExpression> throwCall = BindExpression(&invokeNode, boundCompileUnit, currentFunction, containerScope, this);
-            AddStatement(new BoundThrowStatement(span, std::move(throwCall)));
+            ClassTypeSymbol* exceptionClassType = static_cast<ClassTypeSymbol*>(boundExceptionExpr->GetType()->PlainType(span));
+            IdentifierNode systemExceptionNode(throwStatementNode.GetSpan(), U"System.Exception");
+            TypeSymbol* systemExceptionType = ResolveType(&systemExceptionNode, boundCompileUnit, containerScope);
+            Assert(systemExceptionType->IsClassTypeSymbol(), "System.Exception not of class type");
+            ClassTypeSymbol* systemExceptionClassType = static_cast<ClassTypeSymbol*>(systemExceptionType);
+            if (exceptionClassType == systemExceptionClassType || exceptionClassType->HasBaseClass(systemExceptionClassType))
+            {
+                uint32_t exceptionTypeId = exceptionClassType->TypeId();
+                NewNode* newNode = new NewNode(span, new IdentifierNode(span, exceptionClassType->FullName()));
+                CloneContext cloneContext;
+                newNode->AddArgument(throwStatementNode.Expression()->Clone(cloneContext));
+                InvokeNode invokeNode(span, new IdentifierNode(span, U"RtThrowException"));
+                invokeNode.AddArgument(newNode);
+                invokeNode.AddArgument(new UIntLiteralNode(span, exceptionTypeId));
+                std::unique_ptr<BoundExpression> throwCall = BindExpression(&invokeNode, boundCompileUnit, currentFunction, containerScope, this);
+                AddStatement(new BoundThrowStatement(span, std::move(throwCall)));
+            }
+            else
+            {
+                throw Exception("exception class must be derived from System.Exception class", throwStatementNode.GetSpan());
+            }
         }
         else
         {
-            throw Exception("exception class must be derived from System.Exception class", throwStatementNode.GetSpan());
+            throw Exception("exception not of class type", throwStatementNode.GetSpan());
         }
     }
     else
     {
-        throw Exception("exception not of class type", throwStatementNode.GetSpan());
+        if (insideCatch)
+        {
+            InvokeNode invokeNode(span, new DotNode(span, new IdentifierNode(span, U"@exPtr"), new IdentifierNode(span, U"Release")));
+            std::unique_ptr<BoundExpression> releaseCall = BindExpression(&invokeNode, boundCompileUnit, currentFunction, containerScope, this);
+            AddStatement(new BoundRethrowStatement(span, std::move(releaseCall)));
+        }
+        else
+        {
+            throw Exception("rethrow must occur inside a catch clause", throwStatementNode.GetSpan());
+        }
     }
     if (throwStatementNode.Label())
     {
@@ -1278,6 +1296,8 @@ void StatementBinder::Visit(TryStatementNode& tryStatementNode)
 
 void StatementBinder::Visit(CatchNode& catchNode)
 {
+    bool prevInsideCatch = insideCatch;
+    insideCatch = true;
     Span span = catchNode.GetSpan();
     std::unique_ptr<BoundCatchStatement> boundCatchStatement(new BoundCatchStatement(catchNode.GetSpan()));;
     TypeSymbol* catchedType = ResolveType(catchNode.TypeExpr(), boundCompileUnit, containerScope);
@@ -1292,6 +1312,7 @@ void StatementBinder::Visit(CatchNode& catchNode)
         currentFunction->GetFunctionSymbol()->AddLocalVariable(catchVar);
     }
     CompoundStatementNode handlerBlock(span);
+    handlerBlock.SetParent(catchNode.Parent());
     ConstructionStatementNode* getExceptionAddr = new ConstructionStatementNode(span, new PointerNode(span, new IdentifierNode(span, U"void")), new IdentifierNode(span, U"@exceptionAddr"));
     getExceptionAddr->AddArgument(new InvokeNode(span, new IdentifierNode(span, U"RtGetException")));
     handlerBlock.AddStatement(getExceptionAddr);
@@ -1318,10 +1339,12 @@ void StatementBinder::Visit(CatchNode& catchNode)
     symbolTable.EndContainer();
     TypeBinder typeBinder(boundCompileUnit);
     typeBinder.SetContainerScope(containerScope);
+    typeBinder.SetCurrentFunctionSymbol(currentFunction->GetFunctionSymbol());
     handlerBlock.Accept(typeBinder);
     handlerBlock.Accept(*this);
     boundCatchStatement->SetCatchBlock(std::move(statement));
     AddStatement(boundCatchStatement.release());
+    insideCatch = prevInsideCatch;
 }
 
 void StatementBinder::Visit(AssertStatementNode& assertStatementNode)

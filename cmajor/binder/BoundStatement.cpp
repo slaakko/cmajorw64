@@ -286,6 +286,16 @@ void BoundThrowStatement::Accept(BoundNodeVisitor& visitor)
     visitor.Visit(*this);
 }
 
+BoundRethrowStatement::BoundRethrowStatement(const Span& span_, std::unique_ptr<BoundExpression>&& releaseCall_) :
+    BoundStatement(span_, BoundNodeType::boundRethrowStatement), releaseCall(std::move(releaseCall_))
+{
+}
+
+void BoundRethrowStatement::Accept(BoundNodeVisitor& visitor)
+{
+    visitor.Visit(*this);
+}
+
 BoundTryStatement::BoundTryStatement(const Span& span_) : BoundStatement(span_, BoundNodeType::boundTryStatement)
 {
 }

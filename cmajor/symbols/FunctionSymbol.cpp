@@ -481,12 +481,12 @@ void FunctionSymbol::GenerateCall(Emitter& emitter, std::vector<GenObject*>& gen
     llvm::BasicBlock* handlerBlock = emitter.HandlerBlock();
     llvm::BasicBlock* cleanupBlock = emitter.CleanupBlock();
     bool newCleanupNeeded = emitter.NewCleanupNeeded();
-    llvm::Value* currentPad = emitter.CurrentPad();
+    Pad* currentPad = emitter.CurrentPad();
     std::vector<llvm::OperandBundleDef> bundles;
     if (currentPad != nullptr)
     {
         std::vector<llvm::Value*> inputs;
-        inputs.push_back(currentPad);
+        inputs.push_back(currentPad->value);
         bundles.push_back(llvm::OperandBundleDef("funclet", inputs));
     }
     if (ReturnType() && ReturnType()->GetSymbolType() != SymbolType::voidTypeSymbol && !ReturnsClassByValue())
@@ -620,11 +620,11 @@ void FunctionSymbol::GenerateVirtualCall(Emitter& emitter, std::vector<GenObject
     llvm::BasicBlock* cleanupBlock = emitter.CleanupBlock();
     bool newCleanupNeeded = emitter.NewCleanupNeeded();
     std::vector<llvm::OperandBundleDef> bundles;
-    llvm::Value* currentPad = emitter.CurrentPad();
+    Pad* currentPad = emitter.CurrentPad();
     if (currentPad != nullptr)
     {
         std::vector<llvm::Value*> inputs;
-        inputs.push_back(currentPad);
+        inputs.push_back(currentPad->value);
         bundles.push_back(llvm::OperandBundleDef("funclet", inputs));
     }
     if (ReturnType() && !ReturnType()->IsVoidType() && !ReturnsClassByValue())

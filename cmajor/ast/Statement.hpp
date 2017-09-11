@@ -419,6 +419,26 @@ private:
     std::unique_ptr<Node> expression;
 };
 
+class CatchNode;
+
+class TryStatementNode : public StatementNode
+{
+public:
+    TryStatementNode(const Span& span_);
+    TryStatementNode(const Span& span_, CompoundStatementNode* tryBlock_);
+    Node* Clone(CloneContext& cloneContext) const override;
+    void Accept(Visitor& visitor) override;
+    void Write(AstWriter& writer) override;
+    void Read(AstReader& reader) override;
+    const CompoundStatementNode* TryBlock() const { return tryBlock.get(); }
+    CompoundStatementNode* TryBlock() { return tryBlock.get(); }
+    const NodeList<CatchNode>& Catches() const { return catches; }
+    void AddCatch(CatchNode* catch_);
+private:
+    std::unique_ptr<CompoundStatementNode> tryBlock;
+    NodeList<CatchNode> catches;
+};
+
 class CatchNode : public Node
 {
 public:
@@ -438,24 +458,6 @@ private:
     std::unique_ptr<Node> typeExpr;
     std::unique_ptr<IdentifierNode> id;
     std::unique_ptr<CompoundStatementNode> catchBlock;
-};
-
-class TryStatementNode : public StatementNode
-{
-public:
-    TryStatementNode(const Span& span_);
-    TryStatementNode(const Span& span_, CompoundStatementNode* tryBlock_);
-    Node* Clone(CloneContext& cloneContext) const override;
-    void Accept(Visitor& visitor) override;
-    void Write(AstWriter& writer) override;
-    void Read(AstReader& reader) override;
-    const CompoundStatementNode* TryBlock() const { return tryBlock.get(); }
-    CompoundStatementNode* TryBlock() { return tryBlock.get(); }
-    const NodeList<CatchNode>& Catches() const { return catches; }
-    void AddCatch(CatchNode* catch_);
-private:
-    std::unique_ptr<CompoundStatementNode> tryBlock;
-    NodeList<CatchNode> catches;
 };
 
 class AssertStatementNode : public StatementNode
