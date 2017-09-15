@@ -48,4 +48,9 @@ void BoundFunction::MoveTemporaryDestructorCallsTo(BoundExpression& expression)
     temporaryDestructorCalls.clear();
 }
 
+void BoundFunction::AddLabeledStatement(BoundStatement* labeledStatement)
+{
+    labeledStatements.push_back(labeledStatement);
+}
+
 } } // namespace cmajor::binder

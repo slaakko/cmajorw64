@@ -22,6 +22,7 @@ class SymbolReader;
 class ContainerScope;
 class ContainerSymbol;
 class TypeSymbol;
+class ConceptSymbol;
 class ClassTypeSymbol;
 class InterfaceTypeSymbol;
 class NamespaceSymbol;
@@ -35,7 +36,7 @@ enum class SymbolType : uint8_t
     charTypeSymbol, wcharTypeSymbol, ucharTypeSymbol, voidTypeSymbol, nullPtrTypeSymbol,
     derivedTypeSymbol,
     namespaceSymbol, functionSymbol, staticConstructorSymbol, constructorSymbol, destructorSymbol, memberFunctionSymbol, functionGroupSymbol, classTypeSymbol, classTemplateSpecializationSymbol, 
-    interfaceTypeSymbol,
+    interfaceTypeSymbol, conceptGroupSymbol, conceptSymbol, 
     delegateTypeSymbol, classDelegateTypeSymbol, declarationBlock, typedefSymbol, constantSymbol, enumTypeSymbol, enumConstantSymbol,
     templateParameterSymbol, boundTemplateParameterSymbol, parameterSymbol, localVariableSymbol, memberVariableSymbol,
     basicTypeUnaryPlus, basicTypeIntUnaryMinus, basicTypeFloatUnaryMinus, basicTypeComplement, basicTypeAdd, basicTypeFAdd, basicTypeSub, basicTypeFSub, basicTypeMul, basicTypeFMul, 
@@ -94,6 +95,7 @@ public:
     virtual void Write(SymbolWriter& writer);
     virtual void Read(SymbolReader& reader);
     virtual void EmplaceType(TypeSymbol* typeSymbol, int index) {}
+    virtual void EmplaceConcept(ConceptSymbol* conceptSymbol) {}
     virtual bool IsExportSymbol() const { return IsProject(); }
     virtual bool IsContainerSymbol() const { return false; }
     virtual bool IsFunctionSymbol() const { return false; }

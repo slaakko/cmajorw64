@@ -6,6 +6,8 @@
 #include <cmajor/binder/OverloadResolution.hpp>
 #include <cmajor/binder/BoundCompileUnit.hpp>
 #include <cmajor/binder/BoundFunction.hpp>
+#include <cmajor/binder/BoundConstraint.hpp>
+#include <cmajor/binder/Concept.hpp>
 #include <cmajor/symbols/TemplateSymbol.hpp>
 #include <cmajor/symbols/GlobalFlags.hpp>
 #include <cmajor/util/Unicode.hpp>
@@ -79,6 +81,27 @@ bool BetterFunctionMatch::operator()(const FunctionMatch& left, const FunctionMa
     if (left.fun->IsTemplateSpecialization() && !right.fun->IsTemplateSpecialization())
     {
         return false;
+    }
+    if (left.boundConstraint && !right.boundConstraint)
+    {
+        return true;
+    }
+    if (!left.boundConstraint && right.boundConstraint)
+    {
+        return false;
+    }
+    if (left.boundConstraint && right.boundConstraint)
+    {
+        bool leftSubsumeRight = left.boundConstraint->Subsume(right.boundConstraint);
+        bool rightSubsumeLeft = right.boundConstraint->Subsume(left.boundConstraint);
+        if (leftSubsumeRight && !rightSubsumeLeft)
+        {
+            return true;
+        }
+        if (rightSubsumeLeft && !leftSubsumeRight)
+        {
+            return false;
+        }
     }
     return false;
 }
@@ -562,7 +585,7 @@ std::unique_ptr<BoundFunctionCall> FailWithNoViableFunction(const std::u32string
         std::string note;
         if (exception)
         {
-            note.append(": Note: ").append(exception->What());
+            note.append(": Note: ").append(exception->Message());
         }
         if ((flags & OverloadResolutionFlags::dontThrow) != OverloadResolutionFlags::none)
         {
@@ -593,11 +616,11 @@ std::unique_ptr<BoundFunctionCall> FailWithOverloadNotFound(const std::unordered
     std::string note;
     if (exception)
     {
-        note.append(": Note: ").append(exception->What());
+        note.append(" Note: ").append(exception->What());
     }
     if (!failedFunctionMatches.empty())
     {
-        int n = int(failedFunctionMatches.size());
+        int n = failedFunctionMatches.size();
         for (int i = 0; i < n; ++i)
         {
             if (failedFunctionMatches[i].referenceMustBeInitialized)
@@ -620,7 +643,7 @@ std::unique_ptr<BoundFunctionCall> FailWithOverloadNotFound(const std::unordered
                 }
             }
         }
-        if (!castRequired)
+        if (!referenceMustBeInitialized && !castRequired)
         {
             for (int i = 0; i < n; ++i)
             {
@@ -634,7 +657,7 @@ std::unique_ptr<BoundFunctionCall> FailWithOverloadNotFound(const std::unordered
                 }
             }
         }
-        if (!cannotBindConstArgToNonConstParam)
+        if (!referenceMustBeInitialized && !castRequired && !cannotBindConstArgToNonConstParam)
         {
             for (int i = 0; i < n; ++i)
             {
@@ -642,6 +665,22 @@ std::unique_ptr<BoundFunctionCall> FailWithOverloadNotFound(const std::unordered
                 {
                     cannotAssignToConstObject = true;
                     references.push_back(failedFunctionMatches[i].fun->GetSpan());
+                    break;
+                }
+            }
+        }
+        if (!referenceMustBeInitialized && !castRequired && !cannotBindConstArgToNonConstParam && !cannotAssignToConstObject)
+        {
+            for (int i = 0; i < n; ++i)
+            {
+                if (failedFunctionMatches[i].conceptCheckException)
+                {
+                    if (!note.empty())
+                    {
+                        note.append(".");
+                    }
+                    note.append(" Note: concept check failed: " + failedFunctionMatches[i].conceptCheckException->Message());
+                    references.insert(references.end(), failedFunctionMatches[i].conceptCheckException->References().begin(), failedFunctionMatches[i].conceptCheckException->References().end());
                     break;
                 }
             }
@@ -859,6 +898,8 @@ std::unique_ptr<BoundFunctionCall> SelectViableFunction(const std::unordered_set
 {
     std::vector<FunctionMatch> functionMatches;
     std::vector<FunctionMatch> failedFunctionMatches;
+    std::vector<std::unique_ptr<Exception>> conceptCheckExceptions;
+    std::vector<std::unique_ptr<BoundConstraint>> boundConstraints;
     for (FunctionSymbol* viableFunction : viableFunctions)
     {
         FunctionMatch functionMatch(viableFunction);
@@ -887,7 +928,67 @@ std::unique_ptr<BoundFunctionCall> SelectViableFunction(const std::unordered_set
         }
         if (FindConversions(boundCompileUnit, viableFunction, arguments, functionMatch, ConversionType::implicit_, containerScope, span))
         {
-            functionMatches.push_back(functionMatch);
+            if (viableFunction->IsFunctionTemplate())
+            {
+                if (!viableFunction->Constraint())
+                {
+                    Node* node = boundCompileUnit.GetSymbolTable().GetNode(viableFunction);
+                    Assert(node->GetNodeType() == NodeType::functionNode, "function node expected");
+                    FunctionNode* functionNode = static_cast<FunctionNode*>(node);
+                    ConstraintNode* constraint = functionNode->WhereConstraint();
+                    if (constraint)
+                    {
+                        CloneContext cloneContext;
+                        viableFunction->SetConstraint(static_cast<ConstraintNode*>(constraint->Clone(cloneContext)));
+                    }
+                }
+                if (viableFunction->Constraint())
+                {
+                    std::unique_ptr<Exception> conceptCheckException;
+                    std::unique_ptr<BoundConstraint> boundConstraint;
+                    bool candidateFound = CheckConstraint(viableFunction->Constraint(), viableFunction->UsingNodes(), boundCompileUnit, containerScope, boundFunction,
+                        viableFunction->TemplateParameters(), functionMatch.templateParameterMap, boundConstraint, span, viableFunction, conceptCheckException);
+                    if (candidateFound)
+                    {
+                        functionMatch.boundConstraint = boundConstraint.get();
+                        functionMatches.push_back(functionMatch);
+                        boundConstraints.push_back(std::move(boundConstraint));
+                    }
+                    else
+                    {
+                        failedFunctionMatches.push_back(functionMatch);
+                        functionMatch.conceptCheckException = conceptCheckException.get();
+                        conceptCheckExceptions.push_back(std::move(conceptCheckException));
+                    }
+                }
+                else
+                {
+                    bool allTemplateParametersFound = true;
+                    int n = viableFunction->TemplateParameters().size();
+                    for (int i = 0; i < n; ++i)
+                    {
+                        TemplateParameterSymbol* templateParameterSymbol = viableFunction->TemplateParameters()[i];
+                        auto it = functionMatch.templateParameterMap.find(templateParameterSymbol);
+                        if (it == functionMatch.templateParameterMap.cend())
+                        {
+                            allTemplateParametersFound = false;
+                            break;
+                        }
+                    }
+                    if (allTemplateParametersFound)
+                    {
+                        functionMatches.push_back(functionMatch);
+                    }
+                    else
+                    {
+                        failedFunctionMatches.push_back(functionMatch);
+                    }
+                }
+            }
+            else
+            {
+                functionMatches.push_back(functionMatch);
+            }
         }
         else
         {
@@ -910,30 +1011,49 @@ std::unique_ptr<BoundFunctionCall> SelectViableFunction(const std::unordered_set
                 if ((flags & OverloadResolutionFlags::dontThrow) != OverloadResolutionFlags::none)
                 {
                     exception.reset(new Exception("cannot call a suppressed member function", span, bestFun->GetSpan()));
+                    return std::unique_ptr<BoundFunctionCall>();
                 }
                 else
                 {
                     throw Exception("cannot call a suppressed member function", span, bestFun->GetSpan());
                 }
             }
+            bool instantiate = (flags & OverloadResolutionFlags::dontInstantiate) == OverloadResolutionFlags::none;
             if (bestFun->IsFunctionTemplate())
             {
-                bestFun = boundCompileUnit.InstantiateFunctionTemplate(bestFun, bestMatch.templateParameterMap, span);
+                if (instantiate)
+                {
+                    bestFun = boundCompileUnit.InstantiateFunctionTemplate(bestFun, bestMatch.templateParameterMap, span);
+                }
             }
             else if (!bestFun->IsGeneratedFunction() && bestFun->Parent()->GetSymbolType() == SymbolType::classTemplateSpecializationSymbol)
             {
-                boundCompileUnit.InstantiateClassTemplateMemberFunction(bestFun, containerScope, span);
+                if (instantiate)
+                {
+                    boundCompileUnit.InstantiateClassTemplateMemberFunction(bestFun, containerScope, span);
+                }
             }
             else if (GetGlobalFlag(GlobalFlags::release) && bestFun->IsInline())
             {
-                boundCompileUnit.InstantiateInlineFunction(bestFun, containerScope, span);
+                if (instantiate)
+                {
+                    boundCompileUnit.InstantiateInlineFunction(bestFun, containerScope, span);
+                }
             }
             if (boundFunction->GetFunctionSymbol()->DontThrow() && !boundFunction->GetFunctionSymbol()->HasTry() && !bestFun->DontThrow())
             {
                 std::vector<Span> references;
                 references.push_back(boundFunction->GetFunctionSymbol()->GetSpan());
                 references.push_back(bestFun->GetSpan());
-                throw Exception("a nothrow function cannot call a function that can throw unless it handles exceptions", span, references);
+                if ((flags & OverloadResolutionFlags::dontThrow) != OverloadResolutionFlags::none)
+                {
+                    exception.reset(new Exception("a nothrow function cannot call a function that can throw unless it handles exceptions", span, references));
+                    return std::unique_ptr<BoundFunctionCall>();
+                }
+                else
+                {
+                    throw Exception("a nothrow function cannot call a function that can throw unless it handles exceptions", span, references);
+                }
             }
             return CreateBoundFunctionCall(bestFun, arguments, boundCompileUnit, boundFunction, bestMatch, span);
         }
@@ -951,23 +1071,34 @@ std::unique_ptr<BoundFunctionCall> SelectViableFunction(const std::unordered_set
             if ((flags & OverloadResolutionFlags::dontThrow) != OverloadResolutionFlags::none)
             {
                 exception.reset(new Exception("cannot call a suppressed member function", span, singleBest->GetSpan()));
+                return std::unique_ptr<BoundFunctionCall>();
             }
             else
             {
                 throw Exception("cannot call a suppressed member function", span, singleBest->GetSpan());
             }
         }
+        bool instantiate = (flags & OverloadResolutionFlags::dontInstantiate) == OverloadResolutionFlags::none;
         if (singleBest->IsFunctionTemplate())
         {
-            singleBest = boundCompileUnit.InstantiateFunctionTemplate(singleBest, bestMatch.templateParameterMap, span);
+            if (instantiate)
+            {
+                singleBest = boundCompileUnit.InstantiateFunctionTemplate(singleBest, bestMatch.templateParameterMap, span);
+            }
         }
         else if (!singleBest->IsGeneratedFunction() && singleBest->Parent()->GetSymbolType() == SymbolType::classTemplateSpecializationSymbol)
         {
-            boundCompileUnit.InstantiateClassTemplateMemberFunction(singleBest, containerScope, span);
+            if (instantiate)
+            {
+                boundCompileUnit.InstantiateClassTemplateMemberFunction(singleBest, containerScope, span);
+            }
         }
         else if (GetGlobalFlag(GlobalFlags::release) && singleBest->IsInline())
         {
-            boundCompileUnit.InstantiateInlineFunction(singleBest, containerScope, span);
+            if (instantiate)
+            {
+                boundCompileUnit.InstantiateInlineFunction(singleBest, containerScope, span);
+            }
         }
         if (boundFunction->GetFunctionSymbol()->DontThrow() && !boundFunction->GetFunctionSymbol()->HasTry() && !singleBest->DontThrow())
         {

@@ -11,6 +11,7 @@
 #include <cmajor/binder/ClassTemplateRepository.hpp>
 #include <cmajor/binder/InlineFunctionRepository.hpp>
 #include <cmajor/binder/StringRepository.hpp>
+#include <cmajor/binder/ConceptRepository.hpp>
 #include <cmajor/symbols/Module.hpp>
 #include <cmajor/symbols/ConversionTable.hpp>
 #include <cmajor/ast/CompileUnit.hpp>
@@ -56,6 +57,7 @@ public:
     void SetHasGotos() { hasGotos = true; }
     bool HasGotos() const { return hasGotos; }
     ClassTemplateRepository& GetClassTemplateRepository() { return classTemplateRepository; }
+    ConceptRepository& GetConceptRepository() { return conceptRepository; }
 private:
     Module& module;
     SymbolTable& symbolTable;
@@ -73,6 +75,7 @@ private:
     StringRepository<std::string> utf8StringRepository;
     StringRepository<std::u16string> utf16StringRepository;
     StringRepository<std::u32string> utf32StringRepository;
+    ConceptRepository conceptRepository;
     ConversionTable conversionTable;
 };
 

@@ -395,7 +395,12 @@ void FunctionSymbol::ComputeMangledName()
             mangledName.append(1, U'_').append(parentClass->SimpleName());
         }
     }
-    mangledName.append(1, U'_').append(ToUtf32(GetSha1MessageDigest(ToUtf8(FullNameWithSpecifiers()))));
+    std::string constraintString;
+    if (Constraint())
+    {
+        constraintString = " " + Constraint()->ToString();
+    }
+    mangledName.append(1, U'_').append(ToUtf32(GetSha1MessageDigest(ToUtf8(FullNameWithSpecifiers()) + constraintString)));
     SetMangledName(mangledName);
 }    
 

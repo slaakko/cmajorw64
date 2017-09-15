@@ -25,7 +25,7 @@ void TypeSymbol::Read(SymbolReader& reader)
 {
     ContainerSymbol::Read(reader);
     typeId = reader.GetBinaryReader().ReadEncodedUInt();
-    GetSymbolTable()->AddTypeSymbolToTypeIdMap(this);
+    GetSymbolTable()->AddTypeOrConceptSymbolToTypeIdMap(this);
 }
 
 TypeSymbol* TypeSymbol::AddConst(const Span& span)

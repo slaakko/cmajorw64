@@ -81,6 +81,8 @@ public:
     void ReadAstNodes();
     const NodeList<Node>& UsingNodes() const { return usingNodes; }
     FunctionNode* GetFunctionNode() { return functionNode.get(); }
+    ConstraintNode* Constraint() { return constraint.get(); }
+    void SetConstraint(ConstraintNode* constraint_) { constraint.reset(constraint_); }
     void EmplaceType(TypeSymbol* typeSymbol_, int index) override;
     void AddMember(Symbol* member) override;
     bool IsFunctionSymbol() const override { return true; }
@@ -175,6 +177,7 @@ private:
     int32_t imtIndex;
     NodeList<Node> usingNodes;
     std::unique_ptr<FunctionNode> functionNode;
+    std::unique_ptr<ConstraintNode> constraint;
     llvm::FunctionType* irType;
     int nextTemporaryIndex;
     uint32_t sizeOfAstNodes;

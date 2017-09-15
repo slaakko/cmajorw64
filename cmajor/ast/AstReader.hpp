@@ -21,6 +21,7 @@ class DefaultStatementNode;
 class CompoundStatementNode;
 class ConstraintNode;
 class ConceptIdNode;
+class ConceptNode;
 
 class AstReader
 {
@@ -35,6 +36,7 @@ public:
     CompoundStatementNode* ReadCompoundStatementNode();
     ConstraintNode* ReadConstraintNode();
     ConceptIdNode* ReadConceptIdNode();
+    ConceptNode* ReadConceptNode();
     Specifiers ReadSpecifiers();
     Span ReadSpan();
     void SetReplaceFileIndex(int32_t replaceFileIndex_) { replaceFileIndex = replaceFileIndex_; }

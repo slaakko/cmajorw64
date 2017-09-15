@@ -33,6 +33,7 @@ public:
     void Visit(InterfaceNode& interfaceNode) override;
     void Visit(DelegateNode& delegateNode) override;
     void Visit(ClassDelegateNode& classDelegateNode) override;
+    void Visit(ConceptNode& conceptNode) override;
     void Visit(CompoundStatementNode& compoundStatementNode) override;
     void Visit(IfStatementNode& ifStatementNode) override;
     void Visit(WhileStatementNode& whileStatementNode) override;

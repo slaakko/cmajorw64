@@ -67,6 +67,10 @@ Node* FunctionNode::Clone(CloneContext& cloneContext) const
             clone->SetBody(static_cast<CompoundStatementNode*>(body->Clone(cloneContext)));
         }
     }
+    if (whereConstraint)
+    {
+        clone->SetConstraint(static_cast<WhereConstraintNode*>(whereConstraint->Clone(cloneContext)));
+    }
     return clone;
 }
 

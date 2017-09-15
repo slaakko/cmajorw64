@@ -30,7 +30,9 @@ enum class NodeType : uint8_t
     interfaceNode, delegateNode, classDelegateNode,
     disjunctiveConstraintNode, conjunctiveConstraintNode, whereConstraintNode, predicateConstraintNode, isConstraintNode, multiParamConstraintNode, typeNameConstraintNode,
     constructorConstraintNode, destructorConstraintNode, memberFunctionConstraintNode, functionConstraintNode,
-    axiomStatementNode, axiomNode, conceptIdNode, conceptNode,
+    sameConstraintNode, derivedConstraintNode, convertibleConstraintNode, explicitlyConvertibleConstraintNode, commonConstraintNode, nonreferenceTypeConstraintNode,
+    axiomStatementNode, axiomNode, conceptIdNode, conceptNode, 
+    sameConceptNode, derivedConceptNode, convertibleConceptNode, explicitlyConvertibleConceptNode, commonConceptNode, nonreferenceTypeConceptNode,
     labelNode, compoundStatementNode, returnStatementNode, ifStatementNode, whileStatementNode, doStatementNode, forStatementNode, breakStatementNode, continueStatementNode,
     gotoStatementNode, constructionStatementNode, deleteStatementNode, destroyStatementNode, assignmentStatementNode, expressionStatementNode, emptyStatementNode,
     rangeForStatementNode, switchStatementNode, caseStatementNode, defaultStatementNode, gotoCaseStatementNode, gotoDefaultStatementNode,
@@ -63,7 +65,9 @@ public:
     virtual bool IsUnsignedTypeNode() const { return false; }
     virtual bool IsStatementNode() const { return false; }
     virtual bool IsConstraintNode() const { return false; }
+    virtual bool IsConceptNode() const { return false; }
     virtual bool IsFunctionNode() const { return false; }
+    virtual bool IsIntrinsicConceptNode() const { return false; }
     const Span& GetSpan() const { return span; }
     Span& GetSpan() { return span; }
     const Node* Parent() const { return parent; }

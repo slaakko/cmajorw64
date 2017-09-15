@@ -12,6 +12,7 @@ namespace cmajor { namespace binder {
 
 using namespace cmajor::symbols;
 
+class BoundStatement;
 class BoundCompoundStatement;
 
 class BoundFunction : public BoundNode
@@ -29,11 +30,14 @@ public:
     bool HasGotos() const { return hasGotos; }
     void AddTemporaryDestructorCall(std::unique_ptr<BoundFunctionCall>&& destructorCall);
     void MoveTemporaryDestructorCallsTo(BoundExpression& expression);
+    void AddLabeledStatement(BoundStatement* labeledStatement);
+    const std::vector<BoundStatement*>& LabeledStatements() const { return labeledStatements; }
 private:
     FunctionSymbol* functionSymbol;
     std::unique_ptr<BoundCompoundStatement> body;
     bool hasGotos;
     std::vector<std::unique_ptr<BoundFunctionCall>> temporaryDestructorCalls;
+    std::vector<BoundStatement*> labeledStatements;
 };
 
 } } // namespace cmajor::binder

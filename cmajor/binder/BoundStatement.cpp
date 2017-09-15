@@ -218,7 +218,8 @@ void BoundContinueStatement::Accept(BoundNodeVisitor& visitor)
     visitor.Visit(*this);
 }
 
-BoundGotoStatement::BoundGotoStatement(const Span& span_, const std::u32string& target_) : BoundStatement(span_, BoundNodeType::boundGotoStatement), target(target_)
+BoundGotoStatement::BoundGotoStatement(const Span& span_, const std::u32string& target_) : 
+    BoundStatement(span_, BoundNodeType::boundGotoStatement), target(target_), targetStatement(nullptr), targetBlock(nullptr)
 {
 }
 

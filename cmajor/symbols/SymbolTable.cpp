@@ -18,6 +18,7 @@
 #include <cmajor/symbols/EnumSymbol.hpp>
 #include <cmajor/symbols/Exception.hpp>
 #include <cmajor/symbols/TemplateSymbol.hpp>
+#include <cmajor/symbols/ConceptSymbol.hpp>
 #include <cmajor/ast/Identifier.hpp>
 #include <cmajor/util/Unicode.hpp>
 #include <boost/filesystem.hpp>
@@ -117,7 +118,7 @@ void SymbolTable::Read(SymbolReader& reader)
         classTemplateSpecializations.push_back(std::unique_ptr<ClassTemplateSpecializationSymbol>(classTemplateSpecialization));
         reader.AddClassTemplateSpecialization(classTemplateSpecialization);
     }
-    ProcessTypeRequests();
+    ProcessTypeAndConceptRequests();
     for (FunctionSymbol* conversion : reader.Conversions())
     {
         AddConversion(conversion);
@@ -129,9 +130,22 @@ void SymbolTable::Import(SymbolTable& symbolTable)
     globalNs.Import(&symbolTable.globalNs, *this);
     for (const auto& pair : symbolTable.typeIdMap)
     {
-        TypeSymbol* type = pair.second;
-        typeIdMap[type->TypeId()] = type;
-        typeNameMap[type->FullName()] = type;
+        Symbol* typeOrConcept = pair.second;
+        if (typeOrConcept->IsTypeSymbol())
+        {
+            TypeSymbol* type = static_cast<TypeSymbol*>(typeOrConcept);
+            typeIdMap[type->TypeId()] = type;
+            typeNameMap[type->FullName()] = type;
+        }
+        else if (typeOrConcept->GetSymbolType() == SymbolType::conceptSymbol)
+        {
+            ConceptSymbol* concept = static_cast<ConceptSymbol*>(typeOrConcept);
+            typeIdMap[concept->TypeId()] = concept;
+        }
+        else
+        {
+            Assert(false, "type or concept symbol expected");
+        }
     }
     for (auto& derivedType : symbolTable.derivedTypes)
     {
@@ -353,6 +367,16 @@ void SymbolTable::AddTemplateParameter(TemplateParameterNode& templateParameterN
     container->AddMember(templateParameterSymbol);
 }
 
+void SymbolTable::AddTemplateParameter(IdentifierNode& identifierNode)
+{
+    TemplateParameterSymbol* templateParameterSymbol = new TemplateParameterSymbol(identifierNode.GetSpan(), identifierNode.Str());
+    templateParameterSymbol->SetCompileUnit(currentCompileUnit);
+    templateParameterSymbol->SetSymbolTable(this);
+    SetTypeIdFor(templateParameterSymbol);
+    MapNode(&identifierNode, templateParameterSymbol);
+    container->AddMember(templateParameterSymbol);
+}
+
 void SymbolTable::BeginInterface(InterfaceNode& interfaceNode)
 {
     InterfaceTypeSymbol* interfaceTypeSymbol = new InterfaceTypeSymbol(interfaceNode.GetSpan(), interfaceNode.Id()->Str());
@@ -568,6 +592,27 @@ void SymbolTable::EndClassDelegate()
     EndContainer();
 }
 
+void SymbolTable::BeginConcept(ConceptNode& conceptNode)
+{
+    ConceptSymbol* conceptSymbol = new ConceptSymbol(conceptNode.GetSpan(), conceptNode.Id()->Str());
+    conceptSymbol->SetGroupName(conceptNode.Id()->Str());
+    conceptSymbol->SetCompileUnit(currentCompileUnit);
+    conceptSymbol->SetSymbolTable(this);
+    MapNode(&conceptNode, conceptSymbol);
+    SetTypeIdFor(conceptSymbol);
+    ContainerScope* conceptScope = conceptSymbol->GetContainerScope();
+    ContainerScope* containerScope = container->GetContainerScope();
+    conceptScope->SetParent(containerScope);
+    BeginContainer(conceptSymbol);
+}
+
+void SymbolTable::EndConcept()
+{
+    ConceptSymbol* conceptSymbol = static_cast<ConceptSymbol*>(container);
+    EndContainer();
+    container->AddMember(conceptSymbol);
+}
+
 void SymbolTable::BeginDeclarationBlock(Node& node)
 {
     DeclarationBlock* declarationBlock = new DeclarationBlock(node.GetSpan(), U"@locals" + ToUtf32(std::to_string(GetNextDeclarationBlockIndex())));
@@ -726,9 +771,22 @@ Node* SymbolTable::GetNode(Symbol* symbol) const
     }
 }
 
-void SymbolTable::AddTypeSymbolToTypeIdMap(TypeSymbol* typeSymbol)
+void SymbolTable::AddTypeOrConceptSymbolToTypeIdMap(Symbol* typeOrConceptSymbol)
 {
-    typeIdMap[typeSymbol->TypeId()] = typeSymbol;
+    if (typeOrConceptSymbol->IsTypeSymbol())
+    {
+        TypeSymbol* typeSymbol = static_cast<TypeSymbol*>(typeOrConceptSymbol);
+        typeIdMap[typeSymbol->TypeId()] = typeSymbol;
+    }
+    else if (typeOrConceptSymbol->GetSymbolType() == SymbolType::conceptSymbol)
+    {
+        ConceptSymbol* conceptSymbol = static_cast<ConceptSymbol*>(typeOrConceptSymbol);
+        typeIdMap[conceptSymbol->TypeId()] = conceptSymbol;
+    }
+    else
+    {
+        Assert(false, "type or concept symbol expected");
+    }
 }
 
 void SymbolTable::SetTypeIdFor(TypeSymbol* typeSymbol)
@@ -736,38 +794,97 @@ void SymbolTable::SetTypeIdFor(TypeSymbol* typeSymbol)
     typeSymbol->SetTypeId(TypeIdCounter::Instance().GetNextTypeId());
 }
 
+void SymbolTable::SetTypeIdFor(ConceptSymbol* conceptSymbol)
+{
+    conceptSymbol->SetTypeId(TypeIdCounter::Instance().GetNextTypeId());
+}
+
 void SymbolTable::EmplaceTypeRequest(Symbol* forSymbol, uint32_t typeId, int index)
+{
+    EmplaceTypeOrConceptRequest(forSymbol, typeId, index);
+}
+
+const int conceptRequestIndex = std::numeric_limits<int>::max();
+
+void SymbolTable::EmplaceConceptRequest(Symbol* forSymbol, uint32_t typeId)
+{
+    EmplaceTypeOrConceptRequest(forSymbol, typeId, conceptRequestIndex);
+}
+
+void SymbolTable::EmplaceTypeOrConceptRequest(Symbol* forSymbol, uint32_t typeId, int index)
 {
     auto it = typeIdMap.find(typeId);
     if (it != typeIdMap.cend())
     {
-        TypeSymbol* typeSymbol = it->second;
-        forSymbol->EmplaceType(typeSymbol, index);
-    }
-    else
-    {
-        typeRequests.push_back(TypeRequest(forSymbol, typeId, index));
-    }
-}
-
-void SymbolTable::ProcessTypeRequests()
-{
-    for (const TypeRequest& typeRequest : typeRequests)
-    {
-        Symbol* symbol = typeRequest.symbol;
-        auto it = typeIdMap.find(typeRequest.typeId);
-        if (it != typeIdMap.cend())
+        Symbol* typeOrConceptSymbol = it->second;
+        if (typeOrConceptSymbol->IsTypeSymbol())
         {
-            TypeSymbol* typeSymbol = it->second;
-            int index = typeRequest.index;
-            symbol->EmplaceType(typeSymbol, index);
+            if (index == conceptRequestIndex)
+            {
+                throw Exception("internal error: invalid concept request (id denotes a type)", forSymbol->GetSpan());
+            }
+            TypeSymbol* typeSymbol = static_cast<TypeSymbol*>(typeOrConceptSymbol);
+            forSymbol->EmplaceType(typeSymbol, index);
+        }
+        else if (typeOrConceptSymbol->GetSymbolType() == SymbolType::conceptSymbol)
+        {
+            if (index != conceptRequestIndex)
+            {
+                throw Exception("internal error: invalid type request (id denotes a concept)", forSymbol->GetSpan());
+            }
+            ConceptSymbol* conceptSymbol = static_cast<ConceptSymbol*>(typeOrConceptSymbol);
+            forSymbol->EmplaceConcept(conceptSymbol);
         }
         else
         {
-            throw std::runtime_error("cannot satisfy type request for symbol '" + ToUtf8(symbol->Name()) + "': type not found from symbol table");
+            Assert(false, "internal error: type or concept symbol expected");
         }
     }
-    typeRequests.clear();
+    else
+    {
+        typeAndConceptRequests.push_back(TypeOrConceptRequest(forSymbol, typeId, index));
+    }
+}
+
+void SymbolTable::ProcessTypeAndConceptRequests()
+{
+    for (const TypeOrConceptRequest& typeOrConceptRequest : typeAndConceptRequests)
+    {
+        Symbol* symbol = typeOrConceptRequest.symbol;
+        auto it = typeIdMap.find(typeOrConceptRequest.typeId);
+        if (it != typeIdMap.cend())
+        {
+            Symbol* typeOrConceptSymbol = it->second;
+            int index = typeOrConceptRequest.index;
+            if (typeOrConceptSymbol->IsTypeSymbol())
+            {
+                if (index == conceptRequestIndex)
+                {
+                    throw Exception("internal error: invalid concept request (id denotes a type)", symbol->GetSpan());
+                }
+                TypeSymbol* typeSymbol = static_cast<TypeSymbol*>(typeOrConceptSymbol);
+                symbol->EmplaceType(typeSymbol, index);
+            }
+            else if (typeOrConceptSymbol->GetSymbolType() == SymbolType::conceptSymbol)
+            {
+                if (index != conceptRequestIndex)
+                {
+                    throw Exception("internal error: invalid type request (id denotes a concept)", symbol->GetSpan());
+                }
+                ConceptSymbol* conceptSymbol = static_cast<ConceptSymbol*>(typeOrConceptSymbol);
+                symbol->EmplaceConcept(conceptSymbol);
+            }
+            else
+            {
+                Assert(false, "internal error: type or concept symbol expected");
+            }
+        }
+        else
+        {
+            throw std::runtime_error("internal error: cannot satisfy type or concept request for symbol '" + ToUtf8(symbol->Name()) + "': type or concept not found from symbol table");
+        }
+    }
+    typeAndConceptRequests.clear();
 }
 
 TypeSymbol* SymbolTable::GetTypeByNameNoThrow(const std::u32string& typeName) const
@@ -873,6 +990,36 @@ void SymbolTable::AddClassHavingStaticConstructor(ClassTypeSymbol* classHavingSt
     classesHavingStaticConstructor.insert(classHavingStaticConstructor);
 }
 
+class IntrinsicConcepts
+{
+public:
+    static void Init();
+    static void Done();
+    static IntrinsicConcepts& Instance() { return *instance; }
+    void AddIntrinsicConcept(ConceptNode* intrinsicConcept);
+    const std::vector<std::unique_ptr<ConceptNode>>& GetIntrinsicConcepts() const { return intrinsicConcepts; }
+private:
+    static std::unique_ptr<IntrinsicConcepts> instance;
+    std::vector<std::unique_ptr<ConceptNode>> intrinsicConcepts;
+};
+
+std::unique_ptr<IntrinsicConcepts> IntrinsicConcepts::instance;
+
+void IntrinsicConcepts::Init()
+{
+    instance.reset(new IntrinsicConcepts());
+}
+
+void IntrinsicConcepts::Done()
+{
+    instance.reset();
+}
+
+void IntrinsicConcepts::AddIntrinsicConcept(ConceptNode* intrinsicConcept)
+{
+    intrinsicConcepts.push_back(std::unique_ptr<ConceptNode>(intrinsicConcept));
+}
+
 void InitCoreSymbolTable(SymbolTable& symbolTable)
 {
     BoolTypeSymbol* boolType = new BoolTypeSymbol(Span(), U"bool");
@@ -907,6 +1054,23 @@ void InitCoreSymbolTable(SymbolTable& symbolTable)
     symbolTable.AddTypeSymbolToGlobalScope(voidType);
     symbolTable.AddTypeSymbolToGlobalScope(new NullPtrType(Span(), U"@nullptr_type"));
     MakeBasicTypeOperations(symbolTable, boolType, sbyteType, byteType, shortType, ushortType, intType, uintType, longType, ulongType, floatType, doubleType, charType, wcharType, ucharType, voidType);
+    IntrinsicConcepts::Instance().AddIntrinsicConcept(new SameConceptNode());
+    IntrinsicConcepts::Instance().AddIntrinsicConcept(new DerivedConceptNode());
+    IntrinsicConcepts::Instance().AddIntrinsicConcept(new ConvertibleConceptNode());
+    IntrinsicConcepts::Instance().AddIntrinsicConcept(new ExplicitlyConvertibleConceptNode());
+    IntrinsicConcepts::Instance().AddIntrinsicConcept(new CommonConceptNode());
+    IntrinsicConcepts::Instance().AddIntrinsicConcept(new NonreferenceTypeConceptNode());
+    for (const std::unique_ptr<ConceptNode>& conceptNode : IntrinsicConcepts::Instance().GetIntrinsicConcepts())
+    {
+        symbolTable.BeginConcept(*conceptNode);
+        int n = conceptNode->TypeParameters().Count();
+        for (int i = 0; i < n; ++i)
+        {
+            IdentifierNode* typeParamId = conceptNode->TypeParameters()[i];
+            symbolTable.AddTemplateParameter(*typeParamId);
+        }
+        symbolTable.EndConcept();
+    }
 }
 
 void CreateClassFile(const std::string& executableFilePath, const SymbolTable& symbolTable)
@@ -941,12 +1105,14 @@ void CreateClassFile(const std::string& executableFilePath, const SymbolTable& s
 
 void InitSymbolTable()
 {
+    IntrinsicConcepts::Init();
     TypeIdCounter::Init();
 }
 
 void DoneSymbolTable()
 {
     TypeIdCounter::Done();
+    IntrinsicConcepts::Done();
 }
 
 } } // namespace cmajor::symbols

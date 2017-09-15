@@ -57,6 +57,9 @@ class BoundBitCast;
 class BoundFunctionPtr;
 class BoundDisjunction;
 class BoundConjunction;
+class BoundAtomicConstraint;
+class BoundDisjunctiveConstraint;
+class BoundConjunctiveConstraint;
 
 class BoundNodeVisitor
 {
@@ -111,6 +114,9 @@ public:
     virtual void Visit(BoundFunctionPtr& boundFunctionPtr) {}
     virtual void Visit(BoundDisjunction& boundDisjunction) {}
     virtual void Visit(BoundConjunction& boundConjunction) {}
+    virtual void Visit(BoundAtomicConstraint& boundAtomicConstraint) {}
+    virtual void Visit(BoundDisjunctiveConstraint& boundDisjunctiveConstraint) {}
+    virtual void Visit(BoundConjunctiveConstraint& boundConjunctiveConstraint) {}
 };
 
 } } // namespace cmajor::binder

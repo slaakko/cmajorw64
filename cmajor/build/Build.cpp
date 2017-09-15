@@ -16,6 +16,7 @@
 #include <cmajor/binder/StatementBinder.hpp>
 #include <cmajor/binder/BoundStatement.hpp>
 #include <cmajor/binder/ModuleBinder.hpp>
+#include <cmajor/binder/ControlFlowAnalyzer.hpp>
 #include <cmajor/symbols/GlobalFlags.hpp>
 #include <cmajor/symbols/Warning.hpp>
 #include <cmajor/symbols/Module.hpp>
@@ -441,6 +442,10 @@ void BuildProject(Project* project)
     for (std::unique_ptr<BoundCompileUnit>& boundCompileUnit : boundCompileUnits)
     {
         BindStatements(*boundCompileUnit);
+        if (boundCompileUnit->HasGotos())
+        {
+            AnalyzeControlFlow(*boundCompileUnit);
+        }
         GenerateCode(emittingContext, *boundCompileUnit);
         objectFilePaths.push_back(boundCompileUnit->ObjectFilePath());
         boundCompileUnit.reset();

@@ -24,10 +24,11 @@ using namespace cmajor::ast;
 
 class FunctionSymbol;
 class TypeSymbol;
+class ConceptSymbol;
 
-struct TypeRequest
+struct TypeOrConceptRequest
 {
-    TypeRequest(Symbol* symbol_, uint32_t typeId_, int index_) : symbol(symbol_), typeId(typeId_), index(index_) {}
+    TypeOrConceptRequest(Symbol* symbol_, uint32_t typeId_, int index_) : symbol(symbol_), typeId(typeId_), index(index_) {}
     Symbol* symbol;
     uint32_t typeId;
     int index;
@@ -100,6 +101,7 @@ public:
     void BeginClassTemplateSpecialization(ClassNode& classInstanceNode, ClassTemplateSpecializationSymbol* classTemplateSpecialization);
     void EndClassTemplateSpecialization();
     void AddTemplateParameter(TemplateParameterNode& templateParameterNode);
+    void AddTemplateParameter(IdentifierNode& identifierNode);
     void BeginInterface(InterfaceNode& interfaceNode);
     void EndInterface();
     void BeginStaticConstructor(StaticConstructorNode& staticConstructorNode);
@@ -115,6 +117,8 @@ public:
     void EndDelegate();
     void BeginClassDelegate(ClassDelegateNode& classDelegateNode);
     void EndClassDelegate();
+    void BeginConcept(ConceptNode& conceptNode);
+    void EndConcept();
     void BeginDeclarationBlock(Node& node);
     void EndDeclarationBlock();
     void AddLocalVariable(ConstructionStatementNode& constructionStatementNode);
@@ -132,9 +136,11 @@ public:
     Node* GetNodeNoThrow(Symbol* symbol) const;
     Node* GetNode(Symbol* symbol) const;
     void SetTypeIdFor(TypeSymbol* typeSymbol);
-    void AddTypeSymbolToTypeIdMap(TypeSymbol* typeSymbol);
+    void SetTypeIdFor(ConceptSymbol* conceptSymbol);
+    void AddTypeOrConceptSymbolToTypeIdMap(Symbol* typeOrConceptSymbol);
     void EmplaceTypeRequest(Symbol* forSymbol, uint32_t typeId, int index);
-    void ProcessTypeRequests();
+    void EmplaceConceptRequest(Symbol* forSymbol, uint32_t typeId);
+    void ProcessTypeAndConceptRequests();
     TypeSymbol* GetTypeByNameNoThrow(const std::u32string& typeName) const;
     TypeSymbol* GetTypeByName(const std::u32string& typeName) const;
     TypeSymbol* MakeDerivedType(TypeSymbol* baseType, const TypeDerivationRec& derivationRec, const Span& span);
@@ -161,18 +167,19 @@ private:
     int declarationBlockIndex;
     std::unordered_map<Node*, Symbol*> nodeSymbolMap;
     std::unordered_map<Symbol*, Node*> symbolNodeMap;
-    std::unordered_map<uint32_t, TypeSymbol*> typeIdMap;
+    std::unordered_map<uint32_t, Symbol*> typeIdMap;
     std::unordered_map<std::u32string, TypeSymbol*> typeNameMap;
     std::unordered_map<TypeSymbol*, std::vector<DerivedTypeSymbol*>> derivedTypeMap; 
     std::vector<std::unique_ptr<DerivedTypeSymbol>> derivedTypes;
     std::unordered_map<ClassTemplateSpecializationKey, ClassTemplateSpecializationSymbol*, ClassTemplateSpecializationKeyHash> classTemplateSpecializationMap;
     std::vector<std::unique_ptr<ClassTemplateSpecializationSymbol>> classTemplateSpecializations;
-    std::vector<TypeRequest> typeRequests;
+    std::vector<TypeOrConceptRequest> typeAndConceptRequests;
     ConversionTable conversionTable;
     std::unordered_set<ClassTypeSymbol*> polymorphicClasses;
     std::unordered_set<ClassTypeSymbol*> classesHavingStaticConstructor;
     int GetNextDeclarationBlockIndex() { return declarationBlockIndex++; }
     void ResetDeclarationBlockIndex() { declarationBlockIndex = 0; }
+    void EmplaceTypeOrConceptRequest(Symbol* forSymbol, uint32_t typeId, int index);
 };
 
 void InitCoreSymbolTable(SymbolTable& symbolTable);

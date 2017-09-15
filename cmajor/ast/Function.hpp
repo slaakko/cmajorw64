@@ -37,6 +37,7 @@ public:
     const NodeList<ParameterNode>& Parameters() const { return parameters; }
     void SetReturnTypeExpr(Node* returnTypeExpr_);
     const WhereConstraintNode* WhereConstraint() const { return whereConstraint.get(); }
+    WhereConstraintNode* WhereConstraint() { return whereConstraint.get(); }
     void SetSpecifiers(Specifiers specifiers_);
     void SetConstraint(WhereConstraintNode* whereConstraint_);
     const CompoundStatementNode* Body() const { return body.get(); }

@@ -6,6 +6,7 @@
 #include <cmajor/binder/TypeBinder.hpp>
 #include <cmajor/binder/BoundCompileUnit.hpp>
 #include <cmajor/binder/TypeResolver.hpp>
+#include <cmajor/binder/Concept.hpp>
 #include <cmajor/binder/Evaluator.hpp>
 #include <cmajor/ast/CompileUnit.hpp>
 #include <cmajor/ast/Identifier.hpp>
@@ -16,6 +17,7 @@
 #include <cmajor/symbols/ConstantSymbol.hpp>
 #include <cmajor/symbols/Exception.hpp>
 #include <cmajor/symbols/TemplateSymbol.hpp>
+#include <cmajor/symbols/ConceptSymbol.hpp>
 #include <cmajor/symbols/GlobalFlags.hpp>
 #include <cmajor/util/Unicode.hpp>
 
@@ -157,6 +159,11 @@ void TypeBinder::Visit(FunctionNode& functionNode)
     }
     TypeSymbol* returnType = ResolveType(functionNode.ReturnTypeExpr(), boundCompileUnit, containerScope);
     functionSymbol->SetReturnType(returnType);
+    if (!functionSymbol->Constraint() && functionNode.WhereConstraint())
+    {
+        CloneContext cloneContext;
+        functionSymbol->SetConstraint(static_cast<WhereConstraintNode*>(functionNode.WhereConstraint()->Clone(cloneContext)));
+    }
     functionSymbol->ComputeName();
     if (functionSymbol->ReturnsClassByValue())
     {
@@ -557,6 +564,34 @@ void TypeBinder::Visit(ClassDelegateNode& classDelegateNode)
     }
     TypeSymbol* returnType = ResolveType(classDelegateNode.ReturnTypeExpr(), boundCompileUnit, containerScope);
     classDelegateTypeSymbol->SetReturnType(returnType);
+}
+
+void TypeBinder::Visit(ConceptNode& conceptNode)
+{
+    Symbol* symbol = symbolTable.GetSymbol(&conceptNode);
+    Assert(symbol->GetSymbolType() == SymbolType::conceptSymbol, "concept symbol expected");
+    ConceptSymbol* conceptSymbol = static_cast<ConceptSymbol*>(symbol);
+    BindConcept(conceptSymbol, &conceptNode);
+}
+
+void TypeBinder::BindConcept(ConceptSymbol* conceptSymbol, ConceptNode* conceptNode)
+{
+    if (conceptSymbol->IsBound()) return;
+    conceptSymbol->SetBound();
+    conceptSymbol->SetSpecifiers(conceptNode->GetSpecifiers());
+    if (conceptNode->Refinement())
+    {
+        ConceptIdNode* refinedConceptIdNode = conceptNode->Refinement();
+        ConceptSymbol* refinedConceptSymbol = ResolveConceptId(refinedConceptIdNode, boundCompileUnit, containerScope);
+        if (refinedConceptSymbol->IsProject())
+        {
+            Node* node = symbolTable.GetNode(refinedConceptSymbol);
+            Assert(node->GetNodeType() == NodeType::conceptNode, "concept node expected");
+            ConceptNode* refinedConceptNode = static_cast<ConceptNode*>(node);
+            BindConcept(refinedConceptSymbol, refinedConceptNode);
+        }
+        conceptSymbol->SetRefinedConcept(refinedConceptSymbol);
+    }
 }
 
 void TypeBinder::Visit(CompoundStatementNode& compoundStatementNode)

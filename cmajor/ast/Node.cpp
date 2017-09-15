@@ -36,7 +36,9 @@ const char* nodeTypeStr[] =
     "interfaceNode", "delegateNode", "classDelegateNode",
     "disjunctiveConstraintNode", "conjunctiveConstraintNode", "whereConstraintNode", "predicateConstraintNode", "isConstraintNode", "multiParamConstraintNode", "typeNameConstraintNode",
     "constructorConstraintNode", "destructorConstraintNode", "memberFunctionConstraintNode", "functionConstraintNode",
-    "axiomStatementNode", "axiomNode", "conceptIdNode", "conceptNode",
+    "sameConstraintNode", "derivedConstraintNode", "convertibleConstraintNode", "explicitlyConvertibleConstraintNode", "commonConstraintNode", "nonreferenceTypeConstraintNode",
+    "axiomStatementNode", "axiomNode", "conceptIdNode", "conceptNode", 
+    "sameConceptNode", "derivedConceptNode", "convertibleConceptNode", "ecxplicitlyConvertibleConceptNode", "commonConceptNode", "nonreferenceTypeConceptNode",
     "labelNode", "compoundStatementNode", "returnStatementNode", "ifStatementNode", "whileStatementNode", "doStatementNode", "forStatementNode", "breakStatementNode", "continueStatementNode",
     "gotoStatementNode", "constructionStatementNode", "deleteStatementNode", "destroyStatementNode", "assignmentStatementNode", "expressionStatementNode", "emptyStatementNode", 
     "rangeForStatementNode", "switchStatementNode", "caseStatementNode", "defaultStatementNode", "gotoCaseStatementNode", 
@@ -214,10 +216,22 @@ NodeFactory::NodeFactory()
     Register(NodeType::destructorConstraintNode, new ConcreteNodeCreator<DestructorConstraintNode>()); 
     Register(NodeType::memberFunctionConstraintNode, new ConcreteNodeCreator<MemberFunctionConstraintNode>());
     Register(NodeType::functionConstraintNode, new ConcreteNodeCreator<FunctionConstraintNode>());
+    Register(NodeType::sameConstraintNode, new ConcreteNodeCreator<SameConstraintNode>());
+    Register(NodeType::derivedConstraintNode, new ConcreteNodeCreator<DerivedConstraintNode>());
+    Register(NodeType::convertibleConstraintNode, new ConcreteNodeCreator<ConvertibleConstraintNode>());
+    Register(NodeType::explicitlyConvertibleConstraintNode, new ConcreteNodeCreator<ExplicitlyConvertibleConstraintNode>());
+    Register(NodeType::commonConstraintNode, new ConcreteNodeCreator<CommonConstraintNode>());
+    Register(NodeType::nonreferenceTypeConstraintNode, new ConcreteNodeCreator<NonreferenceTypeConstraintNode>());
     Register(NodeType::axiomStatementNode, new ConcreteNodeCreator<AxiomStatementNode>());
     Register(NodeType::axiomNode, new ConcreteNodeCreator<AxiomNode>());
     Register(NodeType::conceptIdNode, new ConcreteNodeCreator<ConceptIdNode>());
     Register(NodeType::conceptNode, new ConcreteNodeCreator<ConceptNode>());
+    Register(NodeType::sameConceptNode, new ConcreteNodeCreator<SameConceptNode>());
+    Register(NodeType::derivedConceptNode, new ConcreteNodeCreator<DerivedConceptNode>());
+    Register(NodeType::convertibleConceptNode, new ConcreteNodeCreator<ConvertibleConceptNode>());
+    Register(NodeType::explicitlyConvertibleConceptNode, new ConcreteNodeCreator<ExplicitlyConvertibleConceptNode>());
+    Register(NodeType::commonConceptNode, new ConcreteNodeCreator<CommonConceptNode>());
+    Register(NodeType::nonreferenceTypeConceptNode, new ConcreteNodeCreator<NonreferenceTypeConceptNode>());
 
     Register(NodeType::labelNode, new ConcreteNodeCreator<LabelNode>());
     Register(NodeType::compoundStatementNode, new ConcreteNodeCreator<CompoundStatementNode>());

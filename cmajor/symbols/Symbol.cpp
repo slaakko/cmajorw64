@@ -20,6 +20,7 @@
 #include <cmajor/symbols/EnumSymbol.hpp>
 #include <cmajor/symbols/Exception.hpp>
 #include <cmajor/symbols/TemplateSymbol.hpp>
+#include <cmajor/symbols/ConceptSymbol.hpp>
 #include <cmajor/util/Unicode.hpp>
 #include <cmajor/util/Sha1.hpp>
 
@@ -33,6 +34,7 @@ const char* symbolTypeStr[uint8_t(SymbolType::maxSymbol)] =
     "charTypeSymbol", "wcharTypeSymbol", "ucharTypeSymbol", "voidTypeSymbol", "nullPtrTypeSymbol",
     "derivedTypeSymbol"
     "namespaceSymbol", "functionSymbol", "staticConstructorSymbol", "constructorSymbol", "destructorSymbol", "memberFunctionSymbol", "functionGroupSymbol", "classTypeSymbol", "interfaceTypeSymbol",
+    "conceptGroupSymbol", "conceptSymbol", 
     "delegateTypeSymbol", "classDelegateTypeSymbol", "declarationBlock", "typedefSymbol", "constantSymbol", "enumTypeSymbol", "enumConstantSymbol",
     "templateParameterSymbol", "boundTemplateParameterSymbol", "parameterSymbol", "localVariableSymbol", "memberVariableSymbol",
     "basicTypeUnaryPlus", "basicTypeIntUnaryMinus", "basicTypeFloatUnaryMinus", "basicTypeComplement", "basicTypeAdd", "basicTypeFAdd", "basicTypeSub", "basicTypeFSub", "basicTypeMul", "basicTypeFMul",
@@ -703,6 +705,8 @@ SymbolFactory::SymbolFactory()
     Register(SymbolType::classTypeSymbol, new ConcreteSymbolCreator<ClassTypeSymbol>());
     Register(SymbolType::classTemplateSpecializationSymbol, new ConcreteSymbolCreator<ClassTemplateSpecializationSymbol>());
     Register(SymbolType::interfaceTypeSymbol, new ConcreteSymbolCreator<InterfaceTypeSymbol>());
+    Register(SymbolType::conceptGroupSymbol, new ConcreteSymbolCreator<ConceptGroupSymbol>());
+    Register(SymbolType::conceptSymbol, new ConcreteSymbolCreator<ConceptSymbol>());
     Register(SymbolType::delegateTypeSymbol, new ConcreteSymbolCreator<DelegateTypeSymbol>());
     Register(SymbolType::classDelegateTypeSymbol, new ConcreteSymbolCreator<ClassDelegateTypeSymbol>());
     Register(SymbolType::declarationBlock, new ConcreteSymbolCreator<DeclarationBlock>());

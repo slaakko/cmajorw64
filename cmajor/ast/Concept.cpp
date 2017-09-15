@@ -6,8 +6,11 @@
 #include <cmajor/ast/Concept.hpp>
 #include <cmajor/ast/Identifier.hpp>
 #include <cmajor/ast/Visitor.hpp>
+#include <cmajor/util/Unicode.hpp>
 
 namespace cmajor { namespace ast {
+
+using namespace cmajor::unicode;
 
 ConstraintNode::ConstraintNode(NodeType nodeType_, const Span& span_) : Node(nodeType_, span_)
 {
@@ -58,6 +61,11 @@ void DisjunctiveConstraintNode::Accept(Visitor& visitor)
     visitor.Visit(*this);
 }
 
+std::string DisjunctiveConstraintNode::ToString() const
+{
+    return Left()->ToString() + " or " + Right()->ToString();
+}
+
 ConjunctiveConstraintNode::ConjunctiveConstraintNode(const Span& span_) : BinaryConstraintNode(NodeType::conjunctiveConstraintNode, span_)
 {
 }
@@ -76,6 +84,12 @@ void ConjunctiveConstraintNode::Accept(Visitor& visitor)
 {
     visitor.Visit(*this);
 }
+
+std::string ConjunctiveConstraintNode::ToString() const
+{
+    return Left()->ToString() + " and " + Right()->ToString();
+}
+
 
 WhereConstraintNode::WhereConstraintNode(const Span& span_) : ConstraintNode(NodeType::whereConstraintNode, span_), constraint()
 {
@@ -109,6 +123,11 @@ void WhereConstraintNode::Read(AstReader& reader)
     constraint->SetParent(this);
 }
 
+std::string WhereConstraintNode::ToString() const
+{
+    return "where " + constraint->ToString();
+}
+
 PredicateConstraintNode::PredicateConstraintNode(const Span& span_) : ConstraintNode(NodeType::predicateConstraintNode, span_), invokeExpr()
 {
 }
@@ -139,6 +158,11 @@ void PredicateConstraintNode::Read(AstReader& reader)
     ConstraintNode::Read(reader);
     invokeExpr.reset(reader.ReadConstraintNode());
     invokeExpr->SetParent(this);
+}
+
+std::string PredicateConstraintNode::ToString() const
+{
+    return invokeExpr->ToString();
 }
 
 IsConstraintNode::IsConstraintNode(const Span& span_) : ConstraintNode(NodeType::isConstraintNode, span_), typeExpr(), conceptOrTypeName()
@@ -176,6 +200,11 @@ void IsConstraintNode::Read(AstReader& reader)
     typeExpr->SetParent(this);
     conceptOrTypeName.reset(reader.ReadNode());
     conceptOrTypeName->SetParent(this);
+}
+
+std::string IsConstraintNode::ToString() const
+{
+    return typeExpr->ToString() + " is " + conceptOrTypeName->ToString();
 }
 
 MultiParamConstraintNode::MultiParamConstraintNode(const Span& span_) : ConstraintNode(NodeType::multiParamConstraintNode, span_), conceptId(), typeExprs()
@@ -225,6 +254,23 @@ void MultiParamConstraintNode::AddTypeExpr(Node* typeExpr)
     typeExprs.Add(typeExpr);
 }
 
+std::string MultiParamConstraintNode::ToString() const
+{
+    std::string s = conceptId->ToString();
+    s.append(1, '<');
+    int n = typeExprs.Count();
+    for (int i = 0; i < n; ++i)
+    {
+        if (i > 0)
+        {
+            s.append(", ");
+        }
+        s.append(typeExprs[i]->ToString());
+    }
+    s.append(1, '>');
+    return s;
+}
+
 TypeNameConstraintNode::TypeNameConstraintNode(const Span& span_) : ConstraintNode(NodeType::typeNameConstraintNode, span_), typeId()
 {
 }
@@ -254,6 +300,11 @@ void TypeNameConstraintNode::Read(AstReader& reader)
 {
     ConstraintNode::Read(reader);
     typeId.reset(reader.ReadNode());
+}
+
+std::string TypeNameConstraintNode::ToString() const
+{
+    return "typename " + typeId->ToString();
 }
 
 SignatureConstraintNode::SignatureConstraintNode(NodeType nodeType_, const Span& span_) : ConstraintNode(nodeType_, span_)
@@ -302,9 +353,28 @@ void ConstructorConstraintNode::Read(AstReader& reader)
     parameters.SetParent(this);
 }
 
+std::string ConstructorConstraintNode::ToString() const
+{
+    std::string s = typeParamId->ToString();
+    s.append(1, '(');
+    int n = parameters.Count();
+    for (int i = 0; i < n; ++i)
+    {
+        if (i > 0)
+        {
+            s.append(", ");
+        }
+        ParameterNode* p = parameters[i];
+        s.append(p->TypeExpr()->ToString());
+    }
+    s.append(1, ')');
+    return s;
+}
+
 void ConstructorConstraintNode::AddParameter(ParameterNode* parameter)
 {
     parameter->SetParent(this);
+    parameters.Add(parameter);
 }
 
 DestructorConstraintNode::DestructorConstraintNode(const Span& span_) : SignatureConstraintNode(NodeType::destructorConstraintNode, span_), typeParamId()
@@ -337,6 +407,13 @@ void DestructorConstraintNode::Read(AstReader& reader)
     SignatureConstraintNode::Read(reader);
     typeParamId.reset(reader.ReadIdentifierNode());
     typeParamId->SetParent(this);
+}
+
+std::string DestructorConstraintNode::ToString() const
+{
+    std::string s = "~" + typeParamId->ToString();
+    s.append("()");
+    return s;
 }
 
 MemberFunctionConstraintNode::MemberFunctionConstraintNode(const Span& span_) : 
@@ -394,6 +471,25 @@ void MemberFunctionConstraintNode::AddParameter(ParameterNode* parameter)
     parameters.Add(parameter);
 }
 
+std::string MemberFunctionConstraintNode::ToString() const
+{
+    std::string s = typeParamId->ToString();
+    s.append(".").append(ToUtf8(groupId));
+    s.append(1, '(');
+    int n = parameters.Count();
+    for (int i = 0; i < n; ++i)
+    {
+        if (i > 0)
+        {
+            s.append(", ");
+        }
+        ParameterNode* p = parameters[i];
+        s.append(p->TypeExpr()->ToString());
+    }
+    s.append(1, ')');
+    return s;
+}
+
 FunctionConstraintNode::FunctionConstraintNode(const Span& span_) : SignatureConstraintNode(NodeType::functionConstraintNode, span_), returnTypeExpr(), groupId(), parameters()
 {
 }
@@ -444,6 +540,25 @@ void FunctionConstraintNode::AddParameter(ParameterNode* parameter)
     parameters.Add(parameter);
 }
 
+std::string FunctionConstraintNode::ToString() const
+{
+    std::string s;
+    s.append(ToUtf8(groupId));
+    s.append(1, '(');
+    int n = parameters.Count();
+    for (int i = 0; i < n; ++i)
+    {
+        if (i > 0)
+        {
+            s.append(", ");
+        }
+        ParameterNode* p = parameters[i];
+        s.append(p->TypeExpr()->ToString());
+    }
+    s.append(1, ')');
+    return s;
+}
+
 AxiomStatementNode::AxiomStatementNode(const Span& span_) : Node(NodeType::axiomStatementNode, span_), expression(), text()
 {
 }
@@ -475,6 +590,12 @@ void AxiomStatementNode::Read(AstReader& reader)
     Node::Read(reader);
     expression.reset(reader.ReadNode());
     expression->SetParent(this);
+    text = reader.GetBinaryReader().ReadUtf32String();
+}
+
+std::string AxiomStatementNode::ToString() const
+{
+    return ToUtf8(text);
 }
 
 AxiomNode::AxiomNode(const Span& span_) : Node(NodeType::axiomNode, span_), id(), parameters(), statements()
@@ -585,12 +706,39 @@ void ConceptIdNode::AddTypeParameter(Node* typeParameter)
     typeParameters.Add(typeParameter);
 }
 
+std::string ConceptIdNode::ToString() const
+{
+    std::string s = id->ToString();
+    s.append(1, '<');
+    int n = typeParameters.Count();
+    for (int i = 0; i < n; ++i)
+    {
+        if (i > 0)
+        {
+            s.append(", ");
+        }
+        s.append(typeParameters[i]->ToString());
+    }
+    s.append(1, '>');
+    return s;
+}
+
 ConceptNode::ConceptNode(const Span& span_) : Node(NodeType::conceptNode, span_), specifiers(Specifiers::none), id(), typeParameters(), refinement(), constraints(), axioms()
+{
+}
+
+ConceptNode::ConceptNode(NodeType nodeType_, const Span& span_) : Node(nodeType_, span_), specifiers(Specifiers::none), id(), typeParameters(), refinement(), constraints(), axioms()
 {
 }
 
 ConceptNode::ConceptNode(const Span& span_, Specifiers specifiers_, IdentifierNode* id_) : 
     Node(NodeType::conceptNode, span_), specifiers(specifiers_), id(id_), typeParameters(), refinement(), constraints(), axioms()
+{
+    id->SetParent(this);
+}
+
+ConceptNode::ConceptNode(NodeType nodeType_, const Span& span_, Specifiers specifiers_, IdentifierNode* id_) :
+    Node(nodeType_, span_), specifiers(specifiers_), id(id_), typeParameters(), refinement(), constraints(), axioms()
 {
     id->SetParent(this);
 }
@@ -683,6 +831,184 @@ void ConceptNode::AddAxiom(AxiomNode* axiom)
 {
     axiom->SetParent(this);
     axioms.Add(axiom);
+}
+
+IntrinsicConstraintNode::IntrinsicConstraintNode(NodeType nodeType_) : ConstraintNode(nodeType_, Span())
+{
+}
+
+SameConstraintNode::SameConstraintNode() : IntrinsicConstraintNode(NodeType::sameConstraintNode)
+{
+}
+
+SameConstraintNode::SameConstraintNode(const Span& span_) : IntrinsicConstraintNode(NodeType::sameConstraintNode)
+{
+}
+
+void SameConstraintNode::Accept(Visitor& visitor)
+{
+    visitor.Visit(*this);
+}
+
+Node* SameConstraintNode::Clone(CloneContext& cloneContext) const
+{
+    return new SameConstraintNode();
+}
+
+DerivedConstraintNode::DerivedConstraintNode() : IntrinsicConstraintNode(NodeType::derivedConstraintNode)
+{
+}
+
+DerivedConstraintNode::DerivedConstraintNode(const Span& span_) : IntrinsicConstraintNode(NodeType::derivedConstraintNode)
+{
+}
+
+void DerivedConstraintNode::Accept(Visitor& visitor)
+{
+    visitor.Visit(*this);
+}
+
+Node* DerivedConstraintNode::Clone(CloneContext& cloneContext) const
+{
+    return new DerivedConstraintNode();
+}
+
+ConvertibleConstraintNode::ConvertibleConstraintNode() : IntrinsicConstraintNode(NodeType::convertibleConstraintNode)
+{
+}
+
+ConvertibleConstraintNode::ConvertibleConstraintNode(const Span& span_) : IntrinsicConstraintNode(NodeType::convertibleConstraintNode)
+{
+}
+
+void ConvertibleConstraintNode::Accept(Visitor& visitor)
+{
+    visitor.Visit(*this);
+}
+
+Node* ConvertibleConstraintNode::Clone(CloneContext& cloneContext) const
+{
+    return new ConvertibleConstraintNode();
+}
+
+ExplicitlyConvertibleConstraintNode::ExplicitlyConvertibleConstraintNode() : IntrinsicConstraintNode(NodeType::explicitlyConvertibleConstraintNode)
+{
+}
+
+ExplicitlyConvertibleConstraintNode::ExplicitlyConvertibleConstraintNode(const Span& span_) : IntrinsicConstraintNode(NodeType::explicitlyConvertibleConstraintNode)
+{
+}
+
+void ExplicitlyConvertibleConstraintNode::Accept(Visitor& visitor)
+{
+    visitor.Visit(*this);
+}
+
+Node* ExplicitlyConvertibleConstraintNode::Clone(CloneContext& cloneContext) const
+{
+    return new ExplicitlyConvertibleConstraintNode();
+}
+
+CommonConstraintNode::CommonConstraintNode() : IntrinsicConstraintNode(NodeType::commonConstraintNode)
+{
+}
+
+CommonConstraintNode::CommonConstraintNode(const Span& span_) : IntrinsicConstraintNode(NodeType::commonConstraintNode)
+{
+}
+
+void CommonConstraintNode::Accept(Visitor& visitor)
+{
+    visitor.Visit(*this);
+}
+
+Node* CommonConstraintNode::Clone(CloneContext& cloneContext) const
+{
+    return new CommonConstraintNode();
+}
+
+NonreferenceTypeConstraintNode::NonreferenceTypeConstraintNode() : IntrinsicConstraintNode(NodeType::nonreferenceTypeConstraintNode)
+{
+}
+
+NonreferenceTypeConstraintNode::NonreferenceTypeConstraintNode(const Span& span_) : IntrinsicConstraintNode(NodeType::nonreferenceTypeConstraintNode)
+{
+}
+
+void NonreferenceTypeConstraintNode::Accept(Visitor& visitor)
+{
+    visitor.Visit(*this);
+}
+
+Node* NonreferenceTypeConstraintNode::Clone(CloneContext& cloneContext) const
+{
+    return new NonreferenceTypeConstraintNode();
+}
+
+SameConceptNode::SameConceptNode() : ConceptNode(NodeType::sameConceptNode, Span(), Specifiers::public_, new IdentifierNode(Span(), U"Same"))
+{
+    AddTypeParameter(new IdentifierNode(Span(), U"T"));
+    AddTypeParameter(new IdentifierNode(Span(), U"U"));
+    AddConstraint(new SameConstraintNode());
+}
+
+SameConceptNode::SameConceptNode(const Span& span_) : ConceptNode(NodeType::sameConceptNode, span_)
+{
+}
+
+DerivedConceptNode::DerivedConceptNode() : ConceptNode(NodeType::derivedConceptNode, Span(), Specifiers::public_, new IdentifierNode(Span(), U"Derived"))
+{
+    AddTypeParameter(new IdentifierNode(Span(), U"T"));
+    AddTypeParameter(new IdentifierNode(Span(), U"U"));
+    AddConstraint(new DerivedConstraintNode());
+}
+
+DerivedConceptNode::DerivedConceptNode(const Span& span_) : ConceptNode(NodeType::derivedConceptNode, span_)
+{
+}
+
+ConvertibleConceptNode::ConvertibleConceptNode() : ConceptNode(NodeType::convertibleConceptNode, Span(), Specifiers::public_, new IdentifierNode(Span(), U"Convertible"))
+{
+    AddTypeParameter(new IdentifierNode(Span(), U"T"));
+    AddTypeParameter(new IdentifierNode(Span(), U"U"));
+    AddConstraint(new ConvertibleConstraintNode());
+}
+
+ConvertibleConceptNode::ConvertibleConceptNode(const Span& span_) : ConceptNode(NodeType::convertibleConceptNode, span_)
+{
+}
+
+ExplicitlyConvertibleConceptNode::ExplicitlyConvertibleConceptNode() : 
+    ConceptNode(NodeType::explicitlyConvertibleConceptNode, Span(), Specifiers::public_, new IdentifierNode(Span(), U"ExplicitlyConvertible"))
+{
+    AddTypeParameter(new IdentifierNode(Span(), U"T"));
+    AddTypeParameter(new IdentifierNode(Span(), U"U"));
+    AddConstraint(new ExplicitlyConvertibleConstraintNode());
+}
+
+ExplicitlyConvertibleConceptNode::ExplicitlyConvertibleConceptNode(const Span& span_) : ConceptNode(NodeType::explicitlyConvertibleConceptNode, span_)
+{
+}
+
+CommonConceptNode::CommonConceptNode() : ConceptNode(NodeType::commonConceptNode, Span(), Specifiers::public_, new IdentifierNode(Span(), U"Common"))
+{
+    AddTypeParameter(new IdentifierNode(Span(), U"T"));
+    AddTypeParameter(new IdentifierNode(Span(), U"U"));
+    AddConstraint(new CommonConstraintNode());
+}
+
+CommonConceptNode::CommonConceptNode(const Span& span_) : ConceptNode(NodeType::commonConceptNode, span_)
+{
+}
+
+NonreferenceTypeConceptNode::NonreferenceTypeConceptNode() : ConceptNode(NodeType::nonreferenceTypeConceptNode, Span(), Specifiers::public_, new IdentifierNode(Span(), U"NonreferenceType"))
+{
+    AddTypeParameter(new IdentifierNode(Span(), U"T"));
+    AddConstraint(new NonreferenceTypeConstraintNode());
+}
+
+NonreferenceTypeConceptNode::NonreferenceTypeConceptNode(const Span& span_) : ConceptNode(NodeType::nonreferenceTypeConceptNode, span_)
+{
 }
 
 } } // namespace cmajor::ast

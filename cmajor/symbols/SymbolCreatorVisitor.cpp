@@ -199,6 +199,18 @@ void SymbolCreatorVisitor::Visit(ClassDelegateNode& classDelegateNode)
     symbolTable.EndClassDelegate();
 }
 
+void SymbolCreatorVisitor::Visit(ConceptNode& conceptNode)
+{
+    symbolTable.BeginConcept(conceptNode);
+    int n = conceptNode.TypeParameters().Count();
+    for (int i = 0; i < n; ++i)
+    {
+        IdentifierNode* identifierNode = conceptNode.TypeParameters()[i];
+        symbolTable.AddTemplateParameter(*identifierNode);
+    }
+    symbolTable.EndConcept();
+}
+
 void SymbolCreatorVisitor::Visit(CompoundStatementNode& compoundStatementNode)
 {
     symbolTable.BeginDeclarationBlock(compoundStatementNode);

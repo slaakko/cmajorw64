@@ -2,6 +2,7 @@ project System.Base;
 target=library;
 reference <../System.Runtime/System.Runtime.cmp>;
 source <Algorithm.cm>;
+source <Concept.cm>;
 source <Console.cm>;
 source <Conversion.cm>;
 source <Exception.cm>;

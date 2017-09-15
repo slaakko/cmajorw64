@@ -11,6 +11,7 @@
 #include <cmajor/symbols/InterfaceTypeSymbol.hpp>
 #include <cmajor/symbols/TypedefSymbol.hpp>
 #include <cmajor/symbols/EnumSymbol.hpp>
+#include <cmajor/symbols/ConceptSymbol.hpp>
 
 namespace cmajor { namespace binder {
 
@@ -40,6 +41,8 @@ public:
     void BindInterface(InterfaceTypeSymbol* interfaceTypeSymbol, InterfaceNode* interfaceNode);
     void Visit(DelegateNode& delegateNode) override;
     void Visit(ClassDelegateNode& classDelegateNode) override;
+    void Visit(ConceptNode& conceptNode) override;
+    void BindConcept(ConceptSymbol* conceptSymbol, ConceptNode* conceptNode);
 
     void Visit(CompoundStatementNode& compoundStatementNode) override;
     void Visit(IfStatementNode& ifStatementNode) override;

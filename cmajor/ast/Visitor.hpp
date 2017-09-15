@@ -79,6 +79,13 @@ class AxiomNode;
 class ConceptIdNode;
 class ConceptNode;
 
+class SameConstraintNode;
+class DerivedConstraintNode;
+class ConvertibleConstraintNode;
+class ExplicitlyConvertibleConstraintNode;
+class CommonConstraintNode;
+class NonreferenceTypeConstraintNode;
+
 class LabelNode;
 class CompoundStatementNode;
 class ReturnStatementNode;
@@ -237,6 +244,13 @@ public:
     virtual void Visit(AxiomNode& axiomNode) {}
     virtual void Visit(ConceptIdNode& conceptIdNode) {}
     virtual void Visit(ConceptNode& conceptNode) {}
+
+    virtual void Visit(SameConstraintNode& sameConstraintNode) {}
+    virtual void Visit(DerivedConstraintNode& derivedConstraintNode) {}
+    virtual void Visit(ConvertibleConstraintNode& convertibleConstraintNode) {}
+    virtual void Visit(ExplicitlyConvertibleConstraintNode& explicitlyConvertibleConstraintNode) {}
+    virtual void Visit(CommonConstraintNode& commonConstraintNode) {}
+    virtual void Visit(NonreferenceTypeConstraintNode& nonreferenceTypeConstraintNode) {}
 
     virtual void Visit(LabelNode& labelNode) {}
     virtual void Visit(CompoundStatementNode& compoundStatementNode) {}

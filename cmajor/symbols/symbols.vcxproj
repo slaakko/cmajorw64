@@ -23,6 +23,7 @@
     <ClInclude Include="BasicTypeSymbol.hpp" />
     <ClInclude Include="ClassTemplateSpecializationSymbol.hpp" />
     <ClInclude Include="ClassTypeSymbol.hpp" />
+    <ClInclude Include="ConceptSymbol.hpp" />
     <ClInclude Include="ConstantSymbol.hpp" />
     <ClInclude Include="ContainerSymbol.hpp" />
     <ClInclude Include="ConversionTable.hpp" />
@@ -55,6 +56,7 @@
     <ClCompile Include="BasicTypeSymbol.cpp" />
     <ClCompile Include="ClassTemplateSpecializationSymbol.cpp" />
     <ClCompile Include="ClassTypeSymbol.cpp" />
+    <ClCompile Include="ConceptSymbol.cpp" />
     <ClCompile Include="ConstantSymbol.cpp" />
     <ClCompile Include="ContainerSymbol.cpp" />
     <ClCompile Include="ConversionTable.cpp" />

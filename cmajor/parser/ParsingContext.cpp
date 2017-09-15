@@ -7,7 +7,8 @@
 
 namespace cmajor { namespace parser {
 
-ParsingContext::ParsingContext() : parsingExpressionStatement(false), parsingLvalue(false), parsingArguments(false), parsingIsOrAs(false), parsingTypeExpr(false), parsingConcept(false)
+ParsingContext::ParsingContext() : 
+    parsingExpressionStatement(false), parsingLvalue(false), parsingArguments(false), parsingIsOrAs(false), parsingTypeExpr(false), parsingConcept(false), parsingTemplateId(false)
 {
 }
 

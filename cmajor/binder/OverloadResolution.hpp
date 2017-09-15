@@ -16,13 +16,15 @@ class BoundExpression;
 class BoundFunctionCall;
 class BoundCompileUnit;
 class BoundFunction;
+class BoundConstraint;
 
 using namespace cmajor::symbols;
 
 enum class OverloadResolutionFlags : uint8_t
 {
     none = 0,
-    dontThrow = 1 << 0
+    dontThrow = 1 << 0,
+    dontInstantiate = 1 << 1
 };
 
 inline OverloadResolutionFlags operator&(OverloadResolutionFlags left, OverloadResolutionFlags right)
@@ -68,7 +70,7 @@ struct FunctionMatch
 {
     FunctionMatch(FunctionSymbol* fun_) : 
         fun(fun_), numConversions(0), numQualifyingConversions(0), referenceMustBeInitialized(false), castRequired(false), cannotBindConstArgToNonConstParam(false), cannotAssignToConstObject(false),
-        sourceType(nullptr), targetType(nullptr) {}
+        sourceType(nullptr), targetType(nullptr), conceptCheckException(nullptr), boundConstraint(nullptr) {}
     FunctionSymbol* fun;
     std::vector<ArgumentMatch> argumentMatches;
     int numConversions;
@@ -80,6 +82,8 @@ struct FunctionMatch
     TypeSymbol* sourceType;
     TypeSymbol* targetType;
     std::unordered_map<TemplateParameterSymbol*, TypeSymbol*> templateParameterMap;
+    Exception* conceptCheckException;
+    BoundConstraint* boundConstraint;
 };
 
 struct BetterFunctionMatch

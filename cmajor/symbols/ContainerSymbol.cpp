@@ -10,6 +10,7 @@
 #include <cmajor/symbols/SymbolWriter.hpp>
 #include <cmajor/symbols/SymbolReader.hpp>
 #include <cmajor/symbols/Exception.hpp>
+#include <cmajor/symbols/ConceptSymbol.hpp>
 #include <cmajor/util/Unicode.hpp>
 
 namespace cmajor { namespace symbols {
@@ -63,6 +64,13 @@ void ContainerSymbol::AddMember(Symbol* member)
         functionGroupSymbol->AddFunction(functionSymbol);
         functionSymbol->GetContainerScope()->SetParent(GetContainerScope());
     }
+    else if (member->GetSymbolType() == SymbolType::conceptSymbol)
+    {
+        ConceptSymbol* conceptSymbol = static_cast<ConceptSymbol*>(member);
+        ConceptGroupSymbol* conceptGroupSymbol = MakeConceptGroupSymbol(conceptSymbol->GroupName(), conceptSymbol->GetSpan());
+        conceptGroupSymbol->AddConcept(conceptSymbol);
+        conceptSymbol->GetContainerScope()->SetParent(GetContainerScope());
+    }
     else
     {
         containerScope.Install(member);
@@ -107,6 +115,26 @@ FunctionGroupSymbol* ContainerSymbol::MakeFunctionGroupSymbol(const std::u32stri
     else
     {
         throw Exception("name of symbol '" + ToUtf8(symbol->FullName()) + "' conflicts with a function group '" + ToUtf8(groupName) + "'", symbol->GetSpan(), span);
+    }
+}
+
+ConceptGroupSymbol* ContainerSymbol::MakeConceptGroupSymbol(const std::u32string& groupName, const Span& span)
+{
+    Symbol* symbol = containerScope.Lookup(groupName);
+    if (!symbol)
+    {
+        ConceptGroupSymbol* conceptGroupSymbol = new ConceptGroupSymbol(span, groupName);
+        conceptGroupSymbol->SetSymbolTable(GetSymbolTable());
+        AddMember(conceptGroupSymbol);
+        return conceptGroupSymbol;
+    }
+    if (symbol->GetSymbolType() == SymbolType::conceptGroupSymbol)
+    {
+        return static_cast<ConceptGroupSymbol*>(symbol);
+    }
+    else
+    {
+        throw Exception("name of symbol '" + ToUtf8(symbol->FullName()) + "' conflicts with a concept group '" + ToUtf8(groupName) + "'", symbol->GetSpan(), span);
     }
 }
 

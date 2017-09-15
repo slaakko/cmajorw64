@@ -206,8 +206,14 @@ public:
     BoundGotoStatement(const Span& span_, const std::u32string& target_);
     void Accept(BoundNodeVisitor& visitor) override;
     const std::u32string& Target() const { return target; }
+    void SetTargetStatement(BoundStatement* targetStatement_) { targetStatement = targetStatement_; }
+    BoundStatement* TargetStatement() { return targetStatement; }
+    void SetTargetBlock(BoundCompoundStatement* targetBlock_) { targetBlock = targetBlock_; }
+    BoundCompoundStatement* TargetBlock() { return targetBlock; }
 private:
     std::u32string target;
+    BoundStatement* targetStatement;
+    BoundCompoundStatement* targetBlock;
 };
 
 class BoundConstructionStatement : public BoundStatement

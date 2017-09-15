@@ -114,6 +114,19 @@ ConceptIdNode* AstReader::ReadConceptIdNode()
     }
 }
 
+ConceptNode* AstReader::ReadConceptNode()
+{
+    Node* node = ReadNode();
+    if (node->IsConceptNode())
+    {
+        return static_cast<ConceptNode*>(node);
+    }
+    else
+    {
+        throw std::runtime_error("concept node expected");
+    }
+}
+
 Specifiers AstReader::ReadSpecifiers()
 {
     return static_cast<Specifiers>(binaryReader.ReadUInt());
