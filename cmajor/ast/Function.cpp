@@ -105,6 +105,10 @@ void FunctionNode::CloneContent(FunctionNode* clone, CloneContext& cloneContext)
             clone->SetBody(static_cast<CompoundStatementNode*>(body->Clone(cloneContext)));
         }
     }
+    if (whereConstraint)
+    { 
+        clone->SetConstraint(static_cast<WhereConstraintNode*>(whereConstraint->Clone(cloneContext)));
+    }
 }
 
 void FunctionNode::Accept(Visitor& visitor)

@@ -930,59 +930,59 @@ std::unique_ptr<BoundFunctionCall> SelectViableFunction(const std::unordered_set
         {
             if (viableFunction->IsFunctionTemplate())
             {
-                if (!viableFunction->Constraint())
+                bool allTemplateParametersFound = true;
+                int n = viableFunction->TemplateParameters().size();
+                for (int i = 0; i < n; ++i)
                 {
-                    Node* node = boundCompileUnit.GetSymbolTable().GetNode(viableFunction);
-                    Assert(node->GetNodeType() == NodeType::functionNode, "function node expected");
-                    FunctionNode* functionNode = static_cast<FunctionNode*>(node);
-                    ConstraintNode* constraint = functionNode->WhereConstraint();
-                    if (constraint)
+                    TemplateParameterSymbol* templateParameterSymbol = viableFunction->TemplateParameters()[i];
+                    auto it = functionMatch.templateParameterMap.find(templateParameterSymbol);
+                    if (it == functionMatch.templateParameterMap.cend())
                     {
-                        CloneContext cloneContext;
-                        viableFunction->SetConstraint(static_cast<ConstraintNode*>(constraint->Clone(cloneContext)));
+                        allTemplateParametersFound = false;
+                        break;
                     }
                 }
-                if (viableFunction->Constraint())
+                if (allTemplateParametersFound)
                 {
-                    std::unique_ptr<Exception> conceptCheckException;
-                    std::unique_ptr<BoundConstraint> boundConstraint;
-                    bool candidateFound = CheckConstraint(viableFunction->Constraint(), viableFunction->UsingNodes(), boundCompileUnit, containerScope, boundFunction,
-                        viableFunction->TemplateParameters(), functionMatch.templateParameterMap, boundConstraint, span, viableFunction, conceptCheckException);
-                    if (candidateFound)
+                    if (!viableFunction->Constraint())
                     {
-                        functionMatch.boundConstraint = boundConstraint.get();
-                        functionMatches.push_back(functionMatch);
-                        boundConstraints.push_back(std::move(boundConstraint));
+                        Node* node = boundCompileUnit.GetSymbolTable().GetNode(viableFunction);
+                        Assert(node->GetNodeType() == NodeType::functionNode, "function node expected");
+                        FunctionNode* functionNode = static_cast<FunctionNode*>(node);
+                        ConstraintNode* constraint = functionNode->WhereConstraint();
+                        if (constraint)
+                        {
+                            CloneContext cloneContext;
+                            viableFunction->SetConstraint(static_cast<ConstraintNode*>(constraint->Clone(cloneContext)));
+                        }
+                    }
+                    if (viableFunction->Constraint())
+                    {
+                        std::unique_ptr<Exception> conceptCheckException;
+                        std::unique_ptr<BoundConstraint> boundConstraint;
+                        bool candidateFound = CheckConstraint(viableFunction->Constraint(), viableFunction->UsingNodes(), boundCompileUnit, containerScope, boundFunction,
+                            viableFunction->TemplateParameters(), functionMatch.templateParameterMap, boundConstraint, span, viableFunction, conceptCheckException);
+                        if (candidateFound)
+                        {
+                            functionMatch.boundConstraint = boundConstraint.get();
+                            functionMatches.push_back(functionMatch);
+                            boundConstraints.push_back(std::move(boundConstraint));
+                        }
+                        else
+                        {
+                            functionMatch.conceptCheckException = conceptCheckException.get();
+                            failedFunctionMatches.push_back(functionMatch);
+                            conceptCheckExceptions.push_back(std::move(conceptCheckException));
+                        }
                     }
                     else
                     {
-                        failedFunctionMatches.push_back(functionMatch);
-                        functionMatch.conceptCheckException = conceptCheckException.get();
-                        conceptCheckExceptions.push_back(std::move(conceptCheckException));
+                        functionMatches.push_back(functionMatch);
                     }
                 }
                 else
                 {
-                    bool allTemplateParametersFound = true;
-                    int n = viableFunction->TemplateParameters().size();
-                    for (int i = 0; i < n; ++i)
-                    {
-                        TemplateParameterSymbol* templateParameterSymbol = viableFunction->TemplateParameters()[i];
-                        auto it = functionMatch.templateParameterMap.find(templateParameterSymbol);
-                        if (it == functionMatch.templateParameterMap.cend())
-                        {
-                            allTemplateParametersFound = false;
-                            break;
-                        }
-                    }
-                    if (allTemplateParametersFound)
-                    {
-                        functionMatches.push_back(functionMatch);
-                    }
-                    else
-                    {
-                        failedFunctionMatches.push_back(functionMatch);
-                    }
+                    failedFunctionMatches.push_back(functionMatch);
                 }
             }
             else

@@ -256,8 +256,6 @@ namespace System.Concepts
     {
         I operator-(I);     // unary minus
         I operator~(I);     // complement
-        I& operator++(I&);  // increment
-        I& operator--(I&);  // decrement
         I operator+(I, I);  // addition
         I operator-(I, I);  // subtraction
         I operator*(I, I);  // multiplication

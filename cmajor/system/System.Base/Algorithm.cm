@@ -3,6 +3,8 @@
 // Distributed under the MIT license
 // =================================
 
+using System.Concepts;
+
 namespace System
 {
     public nothrow inline const T& Min<T>(const T& left, const T& right) where T is LessThanComparable

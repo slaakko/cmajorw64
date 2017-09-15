@@ -913,6 +913,10 @@ void StatementBinder::Visit(DestroyStatementNode& destroyStatementNode)
 
 void StatementBinder::Visit(AssignmentStatementNode& assignmentStatementNode)
 {
+    if (currentFunction->GetFunctionSymbol()->GroupName() == U"SetOut")
+    {
+        int x = 0;
+    }
     std::unique_ptr<BoundExpression> target = BindExpression(assignmentStatementNode.TargetExpr(), boundCompileUnit, currentFunction, containerScope, this, true);
     TypeSymbol* targetPlainType = target->GetType()->PlainType(assignmentStatementNode.GetSpan());
     if (targetPlainType->IsClassTypeSymbol() && target->GetType()->IsReferenceType())
