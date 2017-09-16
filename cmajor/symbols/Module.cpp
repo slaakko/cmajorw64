@@ -7,11 +7,14 @@
 #include <cmajor/symbols/SymbolWriter.hpp>
 #include <cmajor/symbols/SymbolReader.hpp>
 #include <cmajor/symbols/GlobalFlags.hpp>
+#include <cmajor/symbols/SymbolCollector.hpp>
 #include <cmajor/parser/FileRegistry.hpp>
 #include <cmajor/ast/Project.hpp>
+#include <cmajor/util/CodeFormatter.hpp>
 #include <cmajor/util/Path.hpp>
 #include <cmajor/util/Unicode.hpp>
 #include <boost/filesystem.hpp>
+#include <iostream>
 
 namespace cmajor { namespace symbols {
 
@@ -87,6 +90,20 @@ void ModuleTag::Read(SymbolReader& reader)
     bytes[3] = reader.GetBinaryReader().ReadByte();
 }
 
+std::string ModuleFlagStr(ModuleFlags flags)
+{
+    std::string s;
+    if ((flags & ModuleFlags::system) != ModuleFlags::none)
+    {
+        if (!s.empty())
+        {
+            s.append(1, ' ');
+        }
+        s.append("system");
+    }
+    return s;
+}
+
 ModuleDependency::ModuleDependency(Module* module_) : module(module_)
 {
 }
@@ -98,7 +115,15 @@ void ModuleDependency::AddReferencedModule(Module* referencedModule)
 
 void ModuleDependency::Dump(CodeFormatter& formatter)
 {
-    // todo
+    formatter.IncIndent();
+    int n = referencedModules.size();
+    for (int i = 0; i < n; ++i)
+    {
+        Module* referencedModule = referencedModules[i];
+        formatter.WriteLine(ToUtf8(referencedModule->Name()));
+        referencedModule->GetModuleDependency().Dump(formatter);
+    }
+    formatter.DecIndent();
 }
 
 void Visit(std::vector<Module*>& finishReadOrder, Module* module, std::unordered_set<Module*>& visited, std::unordered_set<Module*>& tempVisit,
@@ -152,6 +177,64 @@ Module::Module() :
     format(currentModuleFormat), flags(ModuleFlags::none), name(), originalFilePath(), filePathReadFrom(), referenceFilePaths(), moduleDependency(this), symbolTablePos(0), symbolTable(), 
     directoryPath(), libraryFilePaths()
 {
+}
+
+Module::Module(const std::string& filePath)  :
+    format(currentModuleFormat), flags(ModuleFlags::none), name(), originalFilePath(), filePathReadFrom(), referenceFilePaths(), moduleDependency(this), symbolTablePos(0), symbolTable(),
+    directoryPath(), libraryFilePaths()
+{
+    SymbolReader reader(filePath);
+    ModuleTag expectedTag;
+    ModuleTag tag;
+    tag.Read(reader);
+    for (int i = 0; i < 3; ++i)
+    {
+        if (tag.bytes[i] != expectedTag.bytes[i])
+        {
+            throw std::runtime_error("Invalid Cmajor module tag read from file '" + reader.GetBinaryReader().FileName() + "', please rebuild module from sources");
+        }
+    }
+    if (tag.bytes[3] != expectedTag.bytes[3])
+    {
+        throw std::runtime_error("Cmajor module format version mismatch reading from file '" + reader.GetBinaryReader().FileName() +
+            "': format " + std::string(1, expectedTag.bytes[3]) + " expected, format " + std::string(1, tag.bytes[3]) + " read, please rebuild module from sources");
+    }
+    flags = ModuleFlags(reader.GetBinaryReader().ReadByte());
+    name = reader.GetBinaryReader().ReadUtf32String();
+    std::unordered_set<std::string> importSet;
+    Module* rootModule = this;
+    std::vector<Module*> modules;
+    std::unordered_map<std::string, ModuleDependency*> moduleDependencyMap;
+    std::unordered_map<std::string, Module*> readMap;
+    if (SystemModuleSet::Instance().IsSystemModule(name)) SetSystemModule();
+    SymbolReader reader2(filePath);
+    ReadHeader(reader2, rootModule, importSet, modules, moduleDependencyMap, readMap);
+    moduleDependencyMap[originalFilePath] = &moduleDependency;
+    std::unordered_map<Module*, ModuleDependency*> dependencyMap;
+    for (const auto& p : moduleDependencyMap)
+    {
+        dependencyMap[p.second->GetModule()] = p.second;
+    }
+    std::vector<Module*> finishReadOrder = CreateFinishReadOrder(modules, dependencyMap, rootModule);
+    if (!sourceFilePaths.empty())
+    {
+        libraryFilePath = GetFullPath(boost::filesystem::path(originalFilePath).replace_extension(".lib").generic_string());
+    }
+    for (Module* module : finishReadOrder)
+    {
+        if (!module->LibraryFilePath().empty())
+        {
+            libraryFilePaths.push_back(module->LibraryFilePath());
+        }
+    }
+    std::vector<ClassTypeSymbol*> classTypes;
+    std::vector<ClassTemplateSpecializationSymbol*> classTemplateSpecializations;
+    FinishReads(rootModule, finishReadOrder, finishReadOrder.size() - 2, classTypes, classTemplateSpecializations);
+    SymbolReader reader3(filePathReadFrom);
+    reader3.SetProjectBitForSymbols();
+    reader3.SetModule(this);
+    reader3.GetBinaryReader().Skip(symbolTablePos);
+    symbolTable.Read(reader3);
 }
 
 Module::Module(const std::u32string& name_, const std::string& filePath_) : 
@@ -265,7 +348,7 @@ void Module::ReadHeader(SymbolReader& reader, Module* rootModule, std::unordered
         modules.push_back(this);
         dependencyMap[originalFilePath] = &moduleDependency;
     }
-    filePathReadFrom = reader.GetBinaryReader().FileName();
+    filePathReadFrom = GetFullPath(reader.GetBinaryReader().FileName());
     uint32_t nr = reader.GetBinaryReader().ReadEncodedUInt();
     for (uint32_t i = 0; i < nr; ++i)
     {
@@ -456,6 +539,153 @@ void Module::AddExportedFunction(const std::string& exportedFunction)
 void Module::AddExportedData(const std::string& data)
 {
     exportedData.push_back(data);
+}
+
+void Module::Dump()
+{
+    CodeFormatter formatter(std::cout);
+    formatter.WriteLine("========================");
+    formatter.WriteLine("MODULE " + ToUtf8(name));
+    formatter.WriteLine("========================");
+    formatter.WriteLine();
+    formatter.WriteLine("format: " + std::string(1, format));
+    formatter.WriteLine("flags: " + ModuleFlagStr(flags));
+    formatter.WriteLine("original file path: " + originalFilePath);
+    formatter.WriteLine("file path read from: " + filePathReadFrom);
+    if (!libraryFilePath.empty())
+    {
+        formatter.WriteLine("library file path: " + libraryFilePath);
+    }
+    int n = referenceFilePaths.size();
+    if (n > 0)
+    {
+        formatter.WriteLine("reference file paths:");
+        formatter.IncIndent();
+        for (int i = 0; i < n; ++i)
+        {
+            formatter.WriteLine(referenceFilePaths[i]);
+        }
+        formatter.DecIndent();
+    }
+    n = sourceFilePaths.size();
+    if (n > 0)
+    {
+        formatter.WriteLine("source file paths:");
+        formatter.IncIndent();
+        for (int i = 0; i < n; ++i)
+        {
+            formatter.WriteLine(sourceFilePaths[i]);
+        }
+        formatter.DecIndent();
+    }
+    formatter.WriteLine("module dependencies:");
+    formatter.IncIndent();
+    formatter.WriteLine(ToUtf8(Name()));
+    moduleDependency.Dump(formatter);
+    formatter.DecIndent();
+    SymbolCollector collector;
+    symbolTable.GlobalNs().Accept(&collector);
+    collector.Sort();
+    if (!collector.BasicTypes().empty())
+    {
+        formatter.WriteLine();
+        formatter.WriteLine("BASIC TYPES");
+        for (BasicTypeSymbol* basicType : collector.BasicTypes())
+        {
+            formatter.WriteLine();
+            basicType->Dump(formatter);
+        }
+    }
+    if (!collector.Functions().empty())
+    {
+        formatter.WriteLine();
+        formatter.WriteLine("FUNCTIONS");
+        for (FunctionSymbol* function : collector.Functions())
+        {
+            formatter.WriteLine();
+            function->Dump(formatter);
+        }
+    }
+    if (!collector.Classes().empty())
+    {
+        formatter.WriteLine();
+        formatter.WriteLine("CLASSES");
+        for (ClassTypeSymbol* class_ : collector.Classes())
+        {
+            formatter.WriteLine();
+            class_->Dump(formatter);
+        }
+    }
+    if (!collector.Interfaces().empty())
+    {
+        formatter.WriteLine();
+        formatter.WriteLine("INTERFACES");
+        for (InterfaceTypeSymbol* interface : collector.Interfaces())
+        {
+            formatter.WriteLine();
+            interface->Dump(formatter);
+        }
+    }
+    if (!collector.Typedefs().empty())
+    {
+        formatter.WriteLine();
+        formatter.WriteLine("TYPEDEFS");
+        for (TypedefSymbol* typedef_ : collector.Typedefs())
+        {
+            formatter.WriteLine();
+            typedef_->Dump(formatter);
+        }
+    }
+    if (!collector.Concepts().empty())
+    {
+        formatter.WriteLine();
+        formatter.WriteLine("CONCEPTS");
+        for (ConceptSymbol* concept_ : collector.Concepts())
+        {
+            formatter.WriteLine();
+            concept_->Dump(formatter);
+        }
+    }
+    if (!collector.Constants().empty())
+    {
+        formatter.WriteLine();
+        formatter.WriteLine("CONSTANTS");
+        for (ConstantSymbol* constant : collector.Constants())
+        {
+            formatter.WriteLine();
+            constant->Dump(formatter);
+        }
+    }
+    if (!collector.Delegates().empty())
+    {
+        formatter.WriteLine();
+        formatter.WriteLine("DELEGATES");
+        for (DelegateTypeSymbol* delegate_ : collector.Delegates())
+        {
+            formatter.WriteLine();
+            delegate_->Dump(formatter);
+        }
+    }
+    if (!collector.ClassDelegates().empty())
+    {
+        formatter.WriteLine();
+        formatter.WriteLine("CLASS DELEGATES");
+        for (ClassDelegateTypeSymbol* classDelegate : collector.ClassDelegates())
+        {
+            formatter.WriteLine();
+            classDelegate->Dump(formatter);
+        }
+    }
+    if (!collector.EnumeratedTypes().empty())
+    {
+        formatter.WriteLine();
+        formatter.WriteLine("ENUMERATED TYPES");
+        for (EnumTypeSymbol* enumeratedType : collector.EnumeratedTypes())
+        {
+            formatter.WriteLine();
+            enumeratedType->Dump(formatter);
+        }
+    }
 }
 
 void InitModule()

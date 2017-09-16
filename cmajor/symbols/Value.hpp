@@ -38,8 +38,11 @@ public:
     virtual Value* Clone() = 0;
     virtual Value* As(ValueType targetType, bool cast, const Span& span, bool dontThrow) const = 0;
     virtual llvm::Value* IrValue(Emitter& emitter) = 0;
+    virtual void Write(BinaryWriter& writer) = 0;
+    virtual void Read(BinaryReader& reader) = 0;
     virtual bool IsComplete() const { return true; }
     virtual bool IsScopedValue() const { return false; }
+    virtual std::string ToString() const { return std::string(); }
     const Span& GetSpan() const { return span; }
     ValueType GetValueType() const { return valueType; }
 private:
@@ -54,7 +57,10 @@ public:
     BoolValue(const Span& span_, bool value_);
     Value* Clone() override { return new BoolValue(GetSpan(), value); }
     llvm::Value* IrValue(Emitter& emitter) override;
+    void Write(BinaryWriter& writer) override;
+    void Read(BinaryReader& reader) override;
     Value* As(ValueType targetType, bool cast, const Span& span, bool dontThrow) const override;
+    std::string ToString() const override { return value ? "true" : "false"; }
     bool GetValue() const { return value; }
 private:
     bool value;
@@ -67,7 +73,10 @@ public:
     SByteValue(const Span& span_, int8_t value_);
     Value* Clone() override { return new SByteValue(GetSpan(), value); }
     llvm::Value* IrValue(Emitter& emitter) override;
+    void Write(BinaryWriter& writer) override;
+    void Read(BinaryReader& reader) override;
     Value* As(ValueType targetType, bool cast, const Span& span, bool dontThrow) const override;
+    std::string ToString() const override { return std::to_string(value); }
     int8_t GetValue() const { return value; }
 private:
     int8_t value;
@@ -80,7 +89,10 @@ public:
     ByteValue(const Span& span_, uint8_t value_);
     Value* Clone() override { return new ByteValue(GetSpan(), value); }
     llvm::Value* IrValue(Emitter& emitter) override;
+    void Write(BinaryWriter& writer) override;
+    void Read(BinaryReader& reader) override;
     Value* As(ValueType targetType, bool cast, const Span& span, bool dontThrow) const override;
+    std::string ToString() const override { return std::to_string(value); }
     uint8_t GetValue() const { return value; }
 private:
     uint8_t value;
@@ -93,7 +105,10 @@ public:
     ShortValue(const Span& span_, int16_t value_);
     Value* Clone() override { return new ShortValue(GetSpan(), value); }
     llvm::Value* IrValue(Emitter& emitter) override;
+    void Write(BinaryWriter& writer) override;
+    void Read(BinaryReader& reader) override;
     Value* As(ValueType targetType, bool cast, const Span& span, bool dontThrow) const override;
+    std::string ToString() const override { return std::to_string(value); }
     int16_t GetValue() const { return value; }
 private:
     int16_t value;
@@ -106,7 +121,10 @@ public:
     UShortValue(const Span& span_, uint16_t value_);
     Value* Clone() override { return new UShortValue(GetSpan(), value); }
     llvm::Value* IrValue(Emitter& emitter) override;
+    void Write(BinaryWriter& writer) override;
+    void Read(BinaryReader& reader) override;
     Value* As(ValueType targetType, bool cast, const Span& span, bool dontThrow) const override;
+    std::string ToString() const override { return std::to_string(value); }
     uint16_t GetValue() const { return value; }
 private:
     uint16_t value;
@@ -119,7 +137,10 @@ public:
     IntValue(const Span& span_, int32_t value_);
     Value* Clone() override { return new IntValue(GetSpan(), value); }
     llvm::Value* IrValue(Emitter& emitter) override;
+    void Write(BinaryWriter& writer) override;
+    void Read(BinaryReader& reader) override;
     Value* As(ValueType targetType, bool cast, const Span& span, bool dontThrow) const override;
+    std::string ToString() const override { return std::to_string(value); }
     int32_t GetValue() const { return value; }
 private:
     int32_t value;
@@ -132,7 +153,10 @@ public:
     UIntValue(const Span& span_, uint32_t value_);
     Value* Clone() override { return new UIntValue(GetSpan(), value); }
     llvm::Value* IrValue(Emitter& emitter) override;
+    void Write(BinaryWriter& writer) override;
+    void Read(BinaryReader& reader) override;
     Value* As(ValueType targetType, bool cast, const Span& span, bool dontThrow) const override;
+    std::string ToString() const override { return std::to_string(value); }
     uint32_t GetValue() const { return value; }
 private:
     uint32_t value;
@@ -145,7 +169,10 @@ public:
     LongValue(const Span& span_, int64_t value_);
     Value* Clone() override { return new LongValue(GetSpan(), value); }
     llvm::Value* IrValue(Emitter& emitter) override;
+    void Write(BinaryWriter& writer) override;
+    void Read(BinaryReader& reader) override;
     Value* As(ValueType targetType, bool cast, const Span& span, bool dontThrow) const override;
+    std::string ToString() const override { return std::to_string(value); }
     int64_t GetValue() const { return value; }
 private:
     int64_t value;
@@ -158,7 +185,10 @@ public:
     ULongValue(const Span& span_, uint64_t value_);
     Value* Clone() override { return new ULongValue(GetSpan(), value); }
     llvm::Value* IrValue(Emitter& emitter) override;
+    void Write(BinaryWriter& writer) override;
+    void Read(BinaryReader& reader) override;
     Value* As(ValueType targetType, bool cast, const Span& span, bool dontThrow) const override;
+    std::string ToString() const override { return std::to_string(value); }
     uint64_t GetValue() const { return value; }
 private:
     uint64_t value;
@@ -171,7 +201,10 @@ public:
     FloatValue(const Span& span_, float value_);
     Value* Clone() override { return new FloatValue(GetSpan(), value); }
     llvm::Value* IrValue(Emitter& emitter) override;
+    void Write(BinaryWriter& writer) override;
+    void Read(BinaryReader& reader) override;
     Value* As(ValueType targetType, bool cast, const Span& span, bool dontThrow) const override;
+    std::string ToString() const override { return std::to_string(value); }
     float GetValue() const { return value; }
 private:
     float value;
@@ -184,7 +217,10 @@ public:
     DoubleValue(const Span& span_, double value_);
     Value* Clone() override { return new DoubleValue(GetSpan(), value); }
     llvm::Value* IrValue(Emitter& emitter) override;
+    void Write(BinaryWriter& writer) override;
+    void Read(BinaryReader& reader) override;
     Value* As(ValueType targetType, bool cast, const Span& span, bool dontThrow) const override;
+    std::string ToString() const override { return std::to_string(value); }
     double GetValue() const { return value; }
 private:
     double value;
@@ -197,7 +233,10 @@ public:
     CharValue(const Span& span_, unsigned char value_);
     Value* Clone() override { return new CharValue(GetSpan(), value); }
     llvm::Value* IrValue(Emitter& emitter) override;
+    void Write(BinaryWriter& writer) override;
+    void Read(BinaryReader& reader) override;
     Value* As(ValueType targetType, bool cast, const Span& span, bool dontThrow) const override;
+    std::string ToString() const override { return std::to_string(value); }
     unsigned char GetValue() const { return value; }
 private:
     unsigned char value;
@@ -210,7 +249,10 @@ public:
     WCharValue(const Span& span_, char16_t value_);
     Value* Clone() override { return new WCharValue(GetSpan(), value); }
     llvm::Value* IrValue(Emitter& emitter) override;
+    void Write(BinaryWriter& writer) override;
+    void Read(BinaryReader& reader) override;
     Value* As(ValueType targetType, bool cast, const Span& span, bool dontThrow) const override;
+    std::string ToString() const override { return std::to_string(value); }
     char16_t GetValue() const { return value; }
 private:
     char16_t value;
@@ -223,7 +265,10 @@ public:
     UCharValue(const Span& span_, char32_t value_);
     Value* Clone() override { return new UCharValue(GetSpan(), value); }
     llvm::Value* IrValue(Emitter& emitter) override;
+    void Write(BinaryWriter& writer) override;
+    void Read(BinaryReader& reader) override;
     Value* As(ValueType targetType, bool cast, const Span& span, bool dontThrow) const override;
+    std::string ToString() const override { return std::to_string(value); }
     char32_t GetValue() const { return value; }
 private:
     char32_t value;
@@ -235,6 +280,8 @@ public:
     StringValue(const Span& span_, int stringId_);
     Value* Clone() override { return new StringValue(GetSpan(), stringId); }
     llvm::Value* IrValue(Emitter& emitter) override;
+    void Write(BinaryWriter& writer) override;
+    void Read(BinaryReader& reader) override;
     Value* As(ValueType targetType, bool cast, const Span& span, bool dontThrow) const override;
 private:
     int stringId;
@@ -246,6 +293,8 @@ public:
     WStringValue(const Span& span_, int stringId_);
     Value* Clone() override { return new WStringValue(GetSpan(), stringId); }
     llvm::Value* IrValue(Emitter& emitter) override;
+    void Write(BinaryWriter& writer) override;
+    void Read(BinaryReader& reader) override;
     Value* As(ValueType targetType, bool cast, const Span& span, bool dontThrow) const override;
 private:
     int stringId;
@@ -257,6 +306,8 @@ public:
     UStringValue(const Span& span_, int stringId_);
     Value* Clone() override { return new UStringValue(GetSpan(), stringId); }
     llvm::Value* IrValue(Emitter& emitter) override;
+    void Write(BinaryWriter& writer) override;
+    void Read(BinaryReader& reader) override;
     Value* As(ValueType targetType, bool cast, const Span& span, bool dontThrow) const override;
 private:
     int stringId;
@@ -268,7 +319,10 @@ public:
     NullValue(const Span& span_, TypeSymbol* nullPtrType_);
     Value* Clone() override { return new NullValue(GetSpan(), nullPtrType); }
     llvm::Value* IrValue(Emitter& emitter) override;
+    void Write(BinaryWriter& writer) override;
+    void Read(BinaryReader& reader) override;
     Value* As(ValueType targetType, bool cast, const Span& span, bool dontThrow) const override;
+    std::string ToString() const override { return "null"; }
 private:
     TypeSymbol* nullPtrType;
 };
@@ -302,6 +356,9 @@ struct IntegralValueHash
 {
     size_t operator()(IntegralValue integralValue) const;
 };
+
+void WriteValue(Value* value, BinaryWriter& writer);
+Value* ReadValue(BinaryReader& reader);
 
 } } // namespace cmajor::symbols
 

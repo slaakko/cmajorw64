@@ -6,6 +6,7 @@
 #include <cmajor/symbols/InterfaceTypeSymbol.hpp>
 #include <cmajor/symbols/FunctionSymbol.hpp>
 #include <cmajor/symbols/Exception.hpp>
+#include <cmajor/symbols/SymbolCollector.hpp>
 
 namespace cmajor { namespace symbols {
 
@@ -21,6 +22,14 @@ void InterfaceTypeSymbol::AddMember(Symbol* member)
         MemberFunctionSymbol* memberFunction = static_cast<MemberFunctionSymbol*>(member);
         memberFunction->SetImtIndex(memberFunctions.size());
         memberFunctions.push_back(memberFunction);
+    }
+}
+
+void InterfaceTypeSymbol::Accept(SymbolCollector* collector)
+{
+    if (IsProject())
+    {
+        collector->AddInterface(this);
     }
 }
 

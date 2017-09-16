@@ -38,6 +38,7 @@ ClassTypeConversion::ClassTypeConversion(const std::u32string& name_, Conversion
 {
     SetConversion();
     SetGroupName(U"@conversion");
+    SetAccess(SymbolAccess::public_);
 }
 
 void ClassTypeConversion::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags)
@@ -66,6 +67,7 @@ NullPtrToPtrConversion::NullPtrToPtrConversion(TypeSymbol* nullPtrType_, TypeSym
 {
     SetConversion();
     SetGroupName(U"@conversion");
+    SetAccess(SymbolAccess::public_);
 }
 
 void NullPtrToPtrConversion::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags)
@@ -94,6 +96,7 @@ VoidPtrToPtrConversion::VoidPtrToPtrConversion(TypeSymbol* voidPtrType_, TypeSym
 {
     SetConversion();
     SetGroupName(U"@conversion");
+    SetAccess(SymbolAccess::public_);
 }
 
 void VoidPtrToPtrConversion::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags)
@@ -122,6 +125,7 @@ PtrToVoidPtrConversion::PtrToVoidPtrConversion(TypeSymbol* sourcePtrType_, TypeS
 {
     SetConversion();
     SetGroupName(U"@conversion");
+    SetAccess(SymbolAccess::public_);
 }
 
 void PtrToVoidPtrConversion::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags)

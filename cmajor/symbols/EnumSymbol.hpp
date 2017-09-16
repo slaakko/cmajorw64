@@ -19,6 +19,8 @@ public:
     void Read(SymbolReader& reader) override;
     void EmplaceType(TypeSymbol* typeSymbol_, int index) override;
     std::string TypeString() const override { return "enumerated_type"; }
+    void Accept(SymbolCollector* collector) override;
+    void Dump(CodeFormatter& formatter) override;
     void SetSpecifiers(Specifiers specifiers);
     const TypeSymbol* UnderlyingType() const { return underlyingType; }
     TypeSymbol* UnderlyingType() { return underlyingType; }
@@ -36,6 +38,10 @@ public:
     EnumConstantSymbol(const Span& span_, const std::u32string& name_);
     SymbolAccess DeclaredAccess() const override { return SymbolAccess::public_; }
     std::string TypeString() const override { return "enumeration_constant"; }
+    void Accept(SymbolCollector* collector) override;
+    void Dump(CodeFormatter& formatter) override;
+    void Write(SymbolWriter& writer) override;
+    void Read(SymbolReader& reader) override;
     bool Evaluating() const { return evaluating; }
     void SetEvaluating() { evaluating = true; }
     void ResetEvaluating() { evaluating = false; }

@@ -17,6 +17,8 @@ public:
     void Write(SymbolWriter& writer) override;
     void Read(SymbolReader& reader) override;
     void EmplaceType(TypeSymbol* typeSymbol, int index) override;
+    void Accept(SymbolCollector* collector) override;
+    void Dump(CodeFormatter& formatter) override;
     std::string TypeString() const override { return "constant"; }
     void SetSpecifiers(Specifiers specifiers);
     bool Evaluating() const { return evaluating; }

@@ -15,6 +15,8 @@ public:
     BasicTypeSymbol(SymbolType symbolType_, const Span& span_, const std::u32string& name_);
     std::string TypeString() const override { return "basic_type"; }
     bool IsBasicTypeSymbol() const override { return true; }
+    void Accept(SymbolCollector* collector) override;
+    void Dump(CodeFormatter& formatter) override;
 };
 
 class BoolTypeSymbol : public BasicTypeSymbol

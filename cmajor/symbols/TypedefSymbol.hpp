@@ -18,6 +18,8 @@ public:
     void EmplaceType(TypeSymbol* typeSymbol_, int index) override;
     bool IsExportSymbol() const override;
     void ComputeExportClosure() override;
+    void Accept(SymbolCollector* collector) override;
+    void Dump(CodeFormatter& formatter) override;
     std::string TypeString() const override { return "typedef"; }
     void SetSpecifiers(Specifiers specifiers);
     const TypeSymbol* GetType() const { return type; }

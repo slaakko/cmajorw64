@@ -630,6 +630,7 @@ BasicTypeConversion<ConversionOp>::BasicTypeConversion(SymbolType symbolType) :
 {
     SetGroupName(U"@conversion");
     SetConversion();
+    SetAccess(SymbolAccess::public_);
 }
 
 template <typename ConversionOp>
@@ -638,6 +639,7 @@ BasicTypeConversion<ConversionOp>::BasicTypeConversion(SymbolType symbolType, co
 {
     SetGroupName(U"@conversion");
     SetConversion();
+    SetAccess(SymbolAccess::public_);
 }
 
 template <typename ConversionOp>

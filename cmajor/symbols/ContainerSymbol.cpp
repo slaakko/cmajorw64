@@ -92,6 +92,17 @@ void ContainerSymbol::ComputeExportClosure()
     }
 }
 
+void ContainerSymbol::Accept(SymbolCollector* collector)
+{
+    if (IsProject())
+    {
+        for (std::unique_ptr<Symbol>& member : members)
+        {
+            member->Accept(collector);
+        }
+    }
+}
+
 void ContainerSymbol::Clear()
 {
     containerScope.Clear();

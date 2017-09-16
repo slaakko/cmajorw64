@@ -33,6 +33,8 @@ public:
     void Write(SymbolWriter& writer) override;
     void Read(SymbolReader& reader) override;
     void EmplaceConcept(ConceptSymbol* concept) override;
+    void Accept(SymbolCollector* collector) override;
+    void Dump(CodeFormatter& formatter) override;
     void AddMember(Symbol* member) override;
     void SetSpecifiers(Specifiers specifiers);
     void SetTypeId(uint32_t typeId_) { typeId = typeId_; }

@@ -13,6 +13,7 @@
 #include <cmajor/symbols/Exception.hpp>
 #include <cmajor/symbols/TemplateSymbol.hpp>
 #include <cmajor/symbols/GlobalFlags.hpp>
+#include <cmajor/symbols/SymbolCollector.hpp>
 #include <cmajor/util/Unicode.hpp>
 #include <cmajor/util/Sha1.hpp>
 #include <llvm/IR/Module.h>
@@ -236,6 +237,15 @@ void FunctionSymbol::Write(SymbolWriter& writer)
     {
         writer.Write(returnParam.get());
     }
+    if (constraint)
+    {
+        writer.GetBinaryWriter().Write(true);
+        writer.GetAstWriter().Write(constraint.get());
+    }
+    else
+    {
+        writer.GetBinaryWriter().Write(false);
+    }
 }
 
 void FunctionSymbol::Read(SymbolReader& reader)
@@ -261,6 +271,11 @@ void FunctionSymbol::Read(SymbolReader& reader)
     if (hasReturnParam)
     {
         returnParam.reset(reader.ReadParameterSymbol(this));
+    }
+    bool hasConstraint = reader.GetBinaryReader().ReadBool();
+    if (hasConstraint)
+    {
+        constraint.reset(reader.GetAstReader().ReadConstraintNode());
     }
     if (IsConversion())
     {
@@ -296,6 +311,14 @@ void FunctionSymbol::ComputeExportClosure()
                 returnType->ComputeExportClosure();
             }
         }
+    }
+}
+
+void FunctionSymbol::Accept(SymbolCollector* collector)
+{
+    if (IsProject())
+    {
+        collector->AddFunction(this);
     }
 }
 
@@ -707,6 +730,40 @@ void FunctionSymbol::GenerateVirtualCall(Emitter& emitter, std::vector<GenObject
             }
             emitter.SetCurrentBasicBlock(nextBlock);
         }
+    }
+}
+
+void FunctionSymbol::Dump(CodeFormatter& formatter)
+{
+    formatter.WriteLine(ToUtf8(Name()));
+    formatter.WriteLine("group name: " + ToUtf8(groupName));
+    formatter.WriteLine("full name: " + ToUtf8(FullNameWithSpecifiers()));
+    if (!MangledName().empty())
+    {
+        formatter.WriteLine("mangled name: " + ToUtf8(MangledName()));
+    }
+    if (constraint)
+    {
+        formatter.WriteLine("constraint: " + constraint->ToString());
+    }
+    if (IsConversion())
+    {
+        formatter.WriteLine("conversion:");
+        formatter.IncIndent();
+        std::string conversionTypeStr; 
+        if (GetConversionType() == ConversionType::implicit_)
+        {
+            conversionTypeStr = "implicit";
+        }
+        else if (GetConversionType() == ConversionType::explicit_)
+        {
+            conversionTypeStr = "explicit";
+        }
+        formatter.WriteLine("conversion type: " + conversionTypeStr);
+        formatter.WriteLine("source type: " + ToUtf8(ConversionSourceType()->FullName()));
+        formatter.WriteLine("target type: " + ToUtf8(ConversionTargetType()->FullName()));
+        formatter.WriteLine("distance: " + std::to_string(ConversionDistance()));
+        formatter.DecIndent();
     }
 }
 

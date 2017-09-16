@@ -17,6 +17,7 @@ public:
     InterfaceTypeSymbol(const Span& span_, const std::u32string& name_);
     std::string TypeString() const override { return "interface_type"; }
     void AddMember(Symbol* member) override;
+    void Accept(SymbolCollector* collector) override;
     void SetSpecifiers(Specifiers specifiers);
     llvm::Type* IrType(Emitter& emitter) override { return nullptr; } // todo
     llvm::Constant* CreateDefaultIrValue(Emitter& emitter) override { return nullptr; } // todo

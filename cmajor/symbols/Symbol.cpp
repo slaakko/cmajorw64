@@ -103,6 +103,10 @@ void Symbol::Write(SymbolWriter& writer)
 void Symbol::Read(SymbolReader& reader)
 {
     flags = static_cast<SymbolFlags>(reader.GetBinaryReader().ReadByte());
+    if (reader.SetProjectBit())
+    {
+        flags = flags | SymbolFlags::project;
+    }
     mangledName = reader.GetBinaryReader().ReadUtf32String();
 }
 

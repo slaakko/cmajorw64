@@ -38,6 +38,8 @@ public:
     const std::vector<ClassTypeSymbol*>& ClassTypes() const { return classTypes; }
     void AddClassTemplateSpecialization(ClassTemplateSpecializationSymbol* classTemplateSpecialization);
     const std::vector<ClassTemplateSpecializationSymbol*>& ClassTemplateSpecializations() const { return classTemplateSpecializations; }
+    bool SetProjectBit() const { return setProjectBit; }
+    void SetProjectBitForSymbols() { setProjectBit = true; }
 private:
     AstReader astReader;
     SymbolTable* symbolTable;
@@ -45,6 +47,7 @@ private:
     std::vector<FunctionSymbol*> conversions;
     std::vector<ClassTypeSymbol*> classTypes;
     std::vector<ClassTemplateSpecializationSymbol*> classTemplateSpecializations;
+    bool setProjectBit;
 };
 
 } } // namespace cmajor::symbols

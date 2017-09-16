@@ -9,8 +9,12 @@
 #include <cmajor/symbols/SymbolReader.hpp>
 #include <cmajor/symbols/TypeSymbol.hpp>
 #include <cmajor/symbols/Exception.hpp>
+#include <cmajor/symbols/SymbolCollector.hpp>
+#include <cmajor/util/Unicode.hpp>
 
 namespace cmajor { namespace symbols {
+
+using namespace cmajor::unicode;
 
 TypedefSymbol::TypedefSymbol(const Span& span_, const std::u32string& name_) : Symbol(SymbolType::typedefSymbol, span_, name_), type()
 {
@@ -51,6 +55,21 @@ void TypedefSymbol::ComputeExportClosure()
             type->ComputeExportClosure();
         }
     }
+}
+
+void TypedefSymbol::Accept(SymbolCollector* collector)
+{
+    if (IsProject())
+    {
+        collector->AddTypedef(this);
+    }
+}
+
+void TypedefSymbol::Dump(CodeFormatter& formatter)
+{
+    formatter.WriteLine(ToUtf8(Name()));
+    formatter.WriteLine("full name: " + ToUtf8(FullNameWithSpecifiers()));
+    formatter.WriteLine("type: " + ToUtf8(type->FullName()));
 }
 
 void TypedefSymbol::SetSpecifiers(Specifiers specifiers)

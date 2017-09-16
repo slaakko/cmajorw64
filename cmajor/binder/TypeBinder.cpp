@@ -139,6 +139,11 @@ void TypeBinder::Visit(FunctionNode& functionNode)
             symbolTable.SetTypeIdFor(templateParameterSymbol);
         }
         functionSymbol->CloneUsingNodes(usingNodes);
+        if (functionNode.WhereConstraint())
+        {
+            CloneContext cloneContext;
+            functionSymbol->SetConstraint(static_cast<WhereConstraintNode*>(functionNode.WhereConstraint()->Clone(cloneContext)));
+        }
     }
     containerScope = functionSymbol->GetContainerScope();
     Specifiers specifiers = functionNode.GetSpecifiers();

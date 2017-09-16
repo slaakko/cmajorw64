@@ -4,11 +4,29 @@
 // =================================
 
 #include <cmajor/symbols/BasicTypeSymbol.hpp>
+#include <cmajor/symbols/SymbolCollector.hpp>
+#include <cmajor/util/Unicode.hpp>
 
 namespace cmajor { namespace symbols {
 
+    using namespace cmajor::unicode;
+
 BasicTypeSymbol::BasicTypeSymbol(SymbolType symbolType_, const Span& span_, const std::u32string& name_) : TypeSymbol(symbolType_, span_, name_)
 {
+}
+
+void BasicTypeSymbol::Accept(SymbolCollector* collector)
+{
+    if (IsProject())
+    {
+        collector->AddBasicType(this);
+    }
+}
+
+void BasicTypeSymbol::Dump(CodeFormatter& formatter)
+{
+    formatter.WriteLine(ToUtf8(Name()));
+    formatter.WriteLine("typeid: " + std::to_string(TypeId()));
 }
 
 BoolTypeSymbol::BoolTypeSymbol(const Span& span_, const std::u32string& name_) : BasicTypeSymbol(SymbolType::boolTypeSymbol, span_, name_)

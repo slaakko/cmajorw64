@@ -48,6 +48,8 @@ public:
     void Read(SymbolReader& reader) override;
     bool IsExportSymbol() const override;
     void ComputeExportClosure() override;
+    void Accept(SymbolCollector* collector) override;
+    void Dump(CodeFormatter& formatter) override;
     void SetSpecifiers(Specifiers specifiers);
     int32_t LayoutIndex() const { return layoutIndex; }
     void SetLayoutIndex(int32_t layoutIndex_) { layoutIndex = layoutIndex_; }

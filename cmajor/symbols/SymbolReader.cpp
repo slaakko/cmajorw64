@@ -9,7 +9,7 @@
 
 namespace cmajor { namespace symbols {
 
-SymbolReader::SymbolReader(const std::string& fileName_) : astReader(fileName_), symbolTable(nullptr), module(nullptr)
+SymbolReader::SymbolReader(const std::string& fileName_) : astReader(fileName_), symbolTable(nullptr), module(nullptr), setProjectBit(false)
 {
 }
 

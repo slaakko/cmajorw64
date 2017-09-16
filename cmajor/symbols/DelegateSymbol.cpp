@@ -9,8 +9,12 @@
 #include <cmajor/symbols/SymbolWriter.hpp>
 #include <cmajor/symbols/SymbolReader.hpp>
 #include <cmajor/symbols/Exception.hpp>
+#include <cmajor/symbols/SymbolCollector.hpp>
+#include <cmajor/util/Unicode.hpp>
 
 namespace cmajor { namespace symbols {
+
+using namespace cmajor::unicode;
 
 DelegateTypeSymbol::DelegateTypeSymbol(const Span& span_, const std::u32string& name_) : TypeSymbol(SymbolType::delegateTypeSymbol, span_, name_), returnType(), parameters()
 {
@@ -63,6 +67,21 @@ void DelegateTypeSymbol::AddMember(Symbol* member)
     {
         parameters.push_back(static_cast<ParameterSymbol*>(member));
     }
+}
+
+void DelegateTypeSymbol::Accept(SymbolCollector* collector)
+{
+    if (IsProject())
+    {
+        collector->AddDelegate(this);
+    }
+}
+
+void DelegateTypeSymbol::Dump(CodeFormatter& formatter)
+{
+    formatter.WriteLine(ToUtf8(Name()));
+    formatter.WriteLine("full name: " + ToUtf8(FullNameWithSpecifiers()));
+    formatter.WriteLine("typeid: " + std::to_string(TypeId()));
 }
 
 void DelegateTypeSymbol::SetSpecifiers(Specifiers specifiers)
@@ -195,6 +214,21 @@ void ClassDelegateTypeSymbol::AddMember(Symbol* member)
     {
         parameters.push_back(static_cast<ParameterSymbol*>(member));
     }
+}
+
+void ClassDelegateTypeSymbol::Accept(SymbolCollector* collector)
+{
+    if (IsProject())
+    {
+        collector->AddClassDelegate(this);
+    }
+}
+
+void ClassDelegateTypeSymbol::Dump(CodeFormatter& formatter)
+{
+    formatter.WriteLine(ToUtf8(Name()));
+    formatter.WriteLine("full name: " + ToUtf8(FullNameWithSpecifiers()));
+    formatter.WriteLine("typeid: " + std::to_string(TypeId()));
 }
 
 void ClassDelegateTypeSymbol::SetSpecifiers(Specifiers specifiers)

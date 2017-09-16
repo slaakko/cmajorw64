@@ -8,6 +8,7 @@
 #include <cmajor/ast/Specifier.hpp>
 #include <cmajor/ast/CompileUnit.hpp>
 #include <cmajor/parsing/Scanner.hpp>
+#include <cmajor/util/CodeFormatter.hpp>
 #include <llvm/IR/Value.h>
 #include <unordered_set>
 #include <stdint.h>
@@ -16,6 +17,7 @@ namespace cmajor { namespace symbols {
 
 using cmajor::parsing::Span;
 using namespace cmajor::ast;
+using namespace cmajor::util;
 
 class SymbolWriter;
 class SymbolReader;
@@ -29,6 +31,7 @@ class NamespaceSymbol;
 class FunctionSymbol;
 class SymbolTable;
 class Module;
+class SymbolCollector;
 
 enum class SymbolType : uint8_t
 {
@@ -101,6 +104,7 @@ public:
     virtual bool IsFunctionSymbol() const { return false; }
     virtual bool IsTypeSymbol() const { return false; }
     virtual bool IsClassTypeSymbol() const { return false; }
+    virtual void Accept(SymbolCollector* collector) {}
     virtual const ContainerScope* GetContainerScope() const { return nullptr; }
     virtual ContainerScope* GetContainerScope() { return nullptr; }
     virtual std::u32string FullName() const;
@@ -111,6 +115,7 @@ public:
     virtual llvm::Value* IrObject() { return irObject; }
     virtual void ComputeMangledName();
     virtual void ComputeExportClosure();
+    virtual void Dump(CodeFormatter& formatter) {}
     void SetMangledName(const std::u32string& mangledName_);
     SymbolAccess Access() const { return SymbolAccess(flags & SymbolFlags::access);  }
     void SetAccess(SymbolAccess access_) { flags = flags | SymbolFlags(access_); }

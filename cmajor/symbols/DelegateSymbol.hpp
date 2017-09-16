@@ -21,6 +21,8 @@ public:
     void ComputeExportClosure() override;
     void AddMember(Symbol* member) override;
     std::string TypeString() const override { return "delegate"; }
+    void Accept(SymbolCollector* collector) override;
+    void Dump(CodeFormatter& formatter) override;
     void SetSpecifiers(Specifiers specifiers);
     const TypeSymbol* ReturnType() const { return returnType; }
     void SetReturnType(TypeSymbol* returnType_) { returnType = returnType_; }
@@ -41,6 +43,8 @@ public:
     void ComputeExportClosure() override;
     void AddMember(Symbol* member) override;
     std::string TypeString() const override { return "class_delegate"; }
+    void Accept(SymbolCollector* collector) override;
+    void Dump(CodeFormatter& formatter) override;
     bool IsClassTypeSymbol() const override { return false; }
     void SetSpecifiers(Specifiers specifiers);
     const TypeSymbol* ReturnType() const { return returnType; }

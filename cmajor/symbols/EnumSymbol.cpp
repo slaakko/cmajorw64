@@ -8,8 +8,12 @@
 #include <cmajor/symbols/SymbolWriter.hpp>
 #include <cmajor/symbols/SymbolReader.hpp>
 #include <cmajor/symbols/Exception.hpp>
+#include <cmajor/symbols/SymbolCollector.hpp>
+#include <cmajor/util/Unicode.hpp>
 
 namespace cmajor { namespace symbols {
+
+using namespace cmajor::unicode;
 
 EnumTypeSymbol::EnumTypeSymbol(const Span& span_, const std::u32string& name_) : TypeSymbol(SymbolType::enumTypeSymbol, span_, name_), underlyingType()
 {
@@ -32,6 +36,32 @@ void EnumTypeSymbol::EmplaceType(TypeSymbol* typeSymbol_, int index)
 {
     Assert(index == 0, "invalid emplace type index");
     underlyingType = typeSymbol_;
+}
+
+void EnumTypeSymbol::Accept(SymbolCollector* collector)
+{
+    if (IsProject())
+    {
+        collector->AddEnumeratedType(this);
+    }
+}
+
+void EnumTypeSymbol::Dump(CodeFormatter& formatter)
+{
+    formatter.WriteLine(ToUtf8(Name()));
+    formatter.WriteLine("full name: " + ToUtf8(FullNameWithSpecifiers()));
+    formatter.WriteLine("underlying type: " + ToUtf8(underlyingType->FullName()));
+    formatter.WriteLine("typeid: " + std::to_string(TypeId()));
+    formatter.WriteLine("enumeration constants:");
+    formatter.IncIndent();
+    SymbolCollector collector;
+    TypeSymbol::Accept(&collector);
+    for (EnumConstantSymbol* enumConstant : collector.EnumerationConstants())
+    {
+        formatter.WriteLine();
+        enumConstant->Dump(formatter);
+    }
+    formatter.DecIndent();
 }
 
 void EnumTypeSymbol::SetSpecifiers(Specifiers specifiers)
@@ -111,6 +141,32 @@ EnumConstantSymbol::EnumConstantSymbol(const Span& span_, const std::u32string& 
 void EnumConstantSymbol::SetValue(Value* value_)
 {
     value.reset(value_);
+}
+
+void EnumConstantSymbol::Accept(SymbolCollector* collector)
+{
+    if (IsProject())
+    {
+        collector->AddEnumerationConstant(this);
+    }
+}
+
+void EnumConstantSymbol::Dump(CodeFormatter& formatter)
+{
+    formatter.WriteLine(ToUtf8(Name()));
+    formatter.WriteLine("value: " + value->ToString());
+}
+
+void EnumConstantSymbol::Write(SymbolWriter& writer)
+{
+    Symbol::Write(writer);
+    WriteValue(value.get(), writer.GetBinaryWriter());
+}
+
+void EnumConstantSymbol::Read(SymbolReader& reader)
+{
+    Symbol::Read(reader);
+    value.reset(ReadValue(reader.GetBinaryReader()));
 }
 
 EnumTypeToUnderlyingTypeConversion::EnumTypeToUnderlyingTypeConversion(const Span& span_, const std::u32string& name_) : 

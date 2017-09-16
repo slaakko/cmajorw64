@@ -1063,6 +1063,8 @@ void InitCoreSymbolTable(SymbolTable& symbolTable)
     for (const std::unique_ptr<ConceptNode>& conceptNode : IntrinsicConcepts::Instance().GetIntrinsicConcepts())
     {
         symbolTable.BeginConcept(*conceptNode);
+        ConceptSymbol* conceptSymbol = static_cast<ConceptSymbol*>(symbolTable.Container());
+        conceptSymbol->SetAccess(SymbolAccess::public_);
         int n = conceptNode->TypeParameters().Count();
         for (int i = 0; i < n; ++i)
         {

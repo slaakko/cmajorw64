@@ -78,6 +78,7 @@ public:
     void Write(SymbolWriter& writer) override;
     void Read(SymbolReader& reader) override;
     void ComputeExportClosure() override;
+    void Accept(SymbolCollector* collector) override;
     void ReadAstNodes();
     const NodeList<Node>& UsingNodes() const { return usingNodes; }
     FunctionNode* GetFunctionNode() { return functionNode.get(); }
@@ -101,6 +102,7 @@ public:
     void GenerateVirtualCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags);
     virtual ParameterSymbol* GetThisParam() const { return nullptr; }
     virtual bool IsConstructorDestructorOrNonstaticMemberFunction() const { return false; }
+    void Dump(CodeFormatter& formatter) override;
     bool IsDefaultConstructor() const;
     bool IsCopyConstructor() const;
     bool IsMoveConstructor() const;

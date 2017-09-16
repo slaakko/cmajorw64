@@ -13,6 +13,7 @@
 #include <cmajor/symbols/Exception.hpp>
 #include <cmajor/symbols/TemplateSymbol.hpp>
 #include <cmajor/symbols/Module.hpp>
+#include <cmajor/symbols/SymbolCollector.hpp>
 #include <cmajor/util/Unicode.hpp>
 #include <cmajor/util/Sha1.hpp>
 #include <llvm/IR/Module.h>
@@ -252,6 +253,147 @@ bool ClassTypeSymbol::HasNontrivialDestructor() const
         }
     }
     return false;
+}
+
+void ClassTypeSymbol::Accept(SymbolCollector* collector)
+{
+    if (IsProject())
+    {
+        collector->AddClass(this);
+    }
+}
+
+void ClassTypeSymbol::Dump(CodeFormatter& formatter)
+{
+    formatter.WriteLine(ToUtf8(Name()));
+    formatter.WriteLine("full name: " + ToUtf8(FullNameWithSpecifiers()));
+    if (baseClass)
+    {
+        formatter.WriteLine("base class: " + ToUtf8(baseClass->FullName()));
+    }
+    if (!implementedInterfaces.empty())
+    {
+        formatter.WriteLine("implemented interfaces:");
+        formatter.IncIndent();
+        for (InterfaceTypeSymbol* interface : implementedInterfaces)
+        {
+            formatter.WriteLine(ToUtf8(interface->FullName()));
+        }
+        formatter.DecIndent();
+    }
+    formatter.WriteLine("typeid: " + std::to_string(TypeId()));
+    if (IsPolymorphic())
+    {
+        formatter.WriteLine("vmt object name: " + VmtObjectName());
+    }
+    if (!staticLayout.empty())
+    {
+        formatter.WriteLine("static object name: " + StaticObjectName());
+    }
+    formatter.IncIndent();
+    SymbolCollector collector;
+    TypeSymbol::Accept(&collector);
+    if (!collector.Functions().empty())
+    {
+        formatter.WriteLine();
+        formatter.WriteLine("MEMBER FUNCTIONS");
+        for (FunctionSymbol* function : collector.Functions())
+        {
+            formatter.WriteLine();
+            function->Dump(formatter);
+        }
+    }
+    if (!collector.Classes().empty())
+    {
+        formatter.WriteLine();
+        formatter.WriteLine("CLASSES");
+        for (ClassTypeSymbol* class_ : collector.Classes())
+        {
+            formatter.WriteLine();
+            class_->Dump(formatter);
+        }
+    }
+    if (!collector.Interfaces().empty())
+    {
+        formatter.WriteLine();
+        formatter.WriteLine("INTERFACES");
+        for (InterfaceTypeSymbol* interface : collector.Interfaces())
+        {
+            formatter.WriteLine();
+            interface->Dump(formatter);
+        }
+    }
+    if (!collector.Typedefs().empty())
+    {
+        formatter.WriteLine();
+        formatter.WriteLine("TYPEDEFS");
+        for (TypedefSymbol* typedef_ : collector.Typedefs())
+        {
+            formatter.WriteLine();
+            typedef_->Dump(formatter);
+        }
+    }
+    if (!collector.Concepts().empty())
+    {
+        formatter.WriteLine();
+        formatter.WriteLine("CONCEPTS");
+        for (ConceptSymbol* concept_ : collector.Concepts())
+        {
+            formatter.WriteLine();
+            concept_->Dump(formatter);
+        }
+    }
+    if (!collector.Constants().empty())
+    {
+        formatter.WriteLine();
+        formatter.WriteLine("CONSTANTS");
+        for (ConstantSymbol* constant : collector.Constants())
+        {
+            formatter.WriteLine();
+            constant->Dump(formatter);
+        }
+    }
+    if (!collector.Delegates().empty())
+    {
+        formatter.WriteLine();
+        formatter.WriteLine("DELEGATES");
+        for (DelegateTypeSymbol* delegate_ : collector.Delegates())
+        {
+            formatter.WriteLine();
+            delegate_->Dump(formatter);
+        }
+    }
+    if (!collector.ClassDelegates().empty())
+    {
+        formatter.WriteLine();
+        formatter.WriteLine("CLASS DELEGATES");
+        for (ClassDelegateTypeSymbol* classDelegate : collector.ClassDelegates())
+        {
+            formatter.WriteLine();
+            classDelegate->Dump(formatter);
+        }
+    }
+    if (!collector.EnumeratedTypes().empty())
+    {
+        formatter.WriteLine();
+        formatter.WriteLine("ENUMERATED TYPES");
+        for (EnumTypeSymbol* enumeratedType : collector.EnumeratedTypes())
+        {
+            formatter.WriteLine();
+            enumeratedType->Dump(formatter);
+        }
+    }
+    if (!collector.MemberVariables().empty())
+    {
+        formatter.WriteLine();
+        formatter.WriteLine("MEMBER VARIABLES");
+        for (MemberVariableSymbol* memberVariable : collector.MemberVariables())
+        {
+            formatter.WriteLine();
+            memberVariable->Dump(formatter);
+        }
+    }
+    formatter.DecIndent();
 }
 
 void ClassTypeSymbol::CreateDestructorSymbol()

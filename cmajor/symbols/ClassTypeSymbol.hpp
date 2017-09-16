@@ -68,6 +68,8 @@ public:
     bool IsClassTypeSymbol() const override { return true; }
     std::string TypeString() const override { return "class"; }
     bool HasNontrivialDestructor() const override;
+    void Accept(SymbolCollector* collector) override;
+    void Dump(CodeFormatter& formatter) override;
     void CreateDestructorSymbol();
     const ClassTypeSymbol* BaseClass() const { return baseClass; }
     ClassTypeSymbol* BaseClass() { return baseClass; }

@@ -38,6 +38,8 @@ inline ModuleFlags operator&(ModuleFlags left, ModuleFlags right)
     return ModuleFlags(uint8_t(left) & uint8_t(right));
 }
 
+std::string ModuleFlagStr(ModuleFlags flags);
+
 class Module;
 
 class ModuleDependency
@@ -57,6 +59,7 @@ class Module
 {
 public:
     Module();
+    Module(const std::string& filePath_);
     Module(const std::u32string& name_, const std::string& filePath_);
     uint8_t Format() const { return format; }
     ModuleFlags Flags() const { return flags; }
@@ -81,6 +84,8 @@ public:
     const std::vector<std::string>& ExportedData() { return exportedData; }
     const std::vector<std::string>& AllExportedFunctions() const { return allExportedFunctions; }
     const std::vector<std::string>& AllExportedData() const { return allExportedData; }
+    void Dump();
+    ModuleDependency& GetModuleDependency() { return moduleDependency; }
 private:
     uint8_t format;
     ModuleFlags flags;

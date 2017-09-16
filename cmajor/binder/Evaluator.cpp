@@ -36,6 +36,8 @@ public:
     const ContainerSymbol* GetContainerSymbol() const { return containerSymbol; }
     ContainerSymbol* GetContainerSymbol() { return containerSymbol; }
     Value* Clone() override { Assert(false, "scoped value cannot be cloned"); return nullptr; }
+    void Write(BinaryWriter& writer) override {}
+    void Read(BinaryReader& reader) override {}
     Value* As(ValueType targetType, bool cast, const Span& span, bool dontThrow) const override { Assert(false, "scoped value cannot be converted"); return nullptr; }
     llvm::Value* IrValue(Emitter& emitter) override { Assert(false, "scoped value does not have ir value"); return nullptr; }
 private:

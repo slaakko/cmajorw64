@@ -199,6 +199,16 @@ llvm::Value* BoolValue::IrValue(Emitter& emitter)
     return emitter.Builder().getInt1(value);
 }
 
+void BoolValue::Write(BinaryWriter& writer)
+{
+    writer.Write(value);
+}
+
+void BoolValue::Read(BinaryReader& reader)
+{
+    reader.ReadBool();
+}
+
 Value* BoolValue::As(ValueType targetType, bool cast, const Span& span, bool dontThrow) const
 {
     switch (targetType)
@@ -464,6 +474,16 @@ llvm::Value* SByteValue::IrValue(Emitter& emitter)
     return emitter.Builder().getInt8(static_cast<uint8_t>(value));
 }
 
+void SByteValue::Write(BinaryWriter& writer)
+{
+    writer.Write(value);
+}
+
+void SByteValue::Read(BinaryReader& reader)
+{
+    value = reader.ReadSByte();
+}
+
 Value* SByteValue::As(ValueType targetType, bool cast, const Span& span, bool dontThrow) const
 {
     switch (targetType)
@@ -659,6 +679,16 @@ llvm::Value* ByteValue::IrValue(Emitter& emitter)
     return emitter.Builder().getInt8(value);
 }
 
+void ByteValue::Write(BinaryWriter& writer)
+{
+    writer.Write(value);
+}
+
+void ByteValue::Read(BinaryReader& reader)
+{
+    value = reader.ReadByte();
+}
+
 Value* ByteValue::As(ValueType targetType, bool cast, const Span& span, bool dontThrow) const
 {
     switch (targetType)
@@ -810,6 +840,16 @@ ShortValue::ShortValue(const Span& span_, int16_t value_) : Value(span_, ValueTy
 llvm::Value* ShortValue::IrValue(Emitter& emitter)
 {
     return emitter.Builder().getInt16(static_cast<uint16_t>(value));
+}
+
+void ShortValue::Write(BinaryWriter& writer)
+{
+    writer.Write(value);
+}
+
+void ShortValue::Read(BinaryReader& reader)
+{
+    value = reader.ReadShort();
 }
 
 Value* ShortValue::As(ValueType targetType, bool cast, const Span& span, bool dontThrow) const
@@ -1021,6 +1061,16 @@ llvm::Value* UShortValue::IrValue(Emitter& emitter)
     return emitter.Builder().getInt16(value);
 }
 
+void UShortValue::Write(BinaryWriter& writer)
+{
+    writer.Write(value);
+}
+
+void UShortValue::Read(BinaryReader& reader)
+{
+    value = reader.ReadUShort();
+}
+
 Value* UShortValue::As(ValueType targetType, bool cast, const Span& span, bool dontThrow) const
 {
     switch (targetType)
@@ -1200,6 +1250,16 @@ IntValue::IntValue(const Span& span_, int32_t value_) : Value(span_, ValueType::
 llvm::Value* IntValue::IrValue(Emitter& emitter)
 {
     return emitter.Builder().getInt32(static_cast<uint32_t>(value));
+}
+
+void IntValue::Write(BinaryWriter& writer)
+{
+    writer.Write(value);
+}
+
+void IntValue::Read(BinaryReader& reader)
+{
+    value = reader.ReadInt();
 }
 
 Value* IntValue::As(ValueType targetType, bool cast, const Span& span, bool dontThrow) const
@@ -1425,6 +1485,16 @@ llvm::Value* UIntValue::IrValue(Emitter& emitter)
     return emitter.Builder().getInt32(value);
 }
 
+void UIntValue::Write(BinaryWriter& writer)
+{
+    writer.Write(value);
+}
+
+void UIntValue::Read(BinaryReader& reader)
+{
+    value = reader.ReadUInt();
+}
+
 Value* UIntValue::As(ValueType targetType, bool cast, const Span& span, bool dontThrow) const
 {
     switch (targetType)
@@ -1632,6 +1702,16 @@ LongValue::LongValue(const Span& span_, int64_t value_) : Value(span_, ValueType
 llvm::Value* LongValue::IrValue(Emitter& emitter)
 {
     return emitter.Builder().getInt64(static_cast<uint64_t>(value));
+}
+
+void LongValue::Write(BinaryWriter& writer)
+{
+    writer.Write(value);
+}
+
+void LongValue::Read(BinaryReader& reader)
+{
+    value = reader.ReadLong();
 }
 
 Value* LongValue::As(ValueType targetType, bool cast, const Span& span, bool dontThrow) const
@@ -1871,6 +1951,16 @@ llvm::Value* ULongValue::IrValue(Emitter& emitter)
     return emitter.Builder().getInt64(value);
 }
 
+void ULongValue::Write(BinaryWriter& writer)
+{
+    writer.Write(value);
+}
+
+void ULongValue::Read(BinaryReader& reader)
+{
+    value = reader.ReadULong();
+}
+
 Value* ULongValue::As(ValueType targetType, bool cast, const Span& span, bool dontThrow) const
 {
     switch (targetType)
@@ -2106,6 +2196,16 @@ FloatValue::FloatValue(const Span& span_, float value_) : Value(span_, ValueType
 llvm::Value* FloatValue::IrValue(Emitter& emitter)
 {
     return llvm::ConstantFP::get(emitter.Builder().getFloatTy(), value);
+}
+
+void FloatValue::Write(BinaryWriter& writer)
+{
+    writer.Write(value);
+}
+
+void FloatValue::Read(BinaryReader& reader)
+{
+    value = reader.ReadFloat();
 }
 
 Value* FloatValue::As(ValueType targetType, bool cast, const Span& span, bool dontThrow) const
@@ -2357,6 +2457,16 @@ DoubleValue::DoubleValue(const Span& span_, double value_) : Value(span_, ValueT
 llvm::Value* DoubleValue::IrValue(Emitter& emitter)
 {
     return llvm::ConstantFP::get(emitter.Builder().getDoubleTy(), value);
+}
+
+void DoubleValue::Write(BinaryWriter& writer)
+{
+    writer.Write(value);
+}
+
+void DoubleValue::Read(BinaryReader& reader)
+{
+    value = reader.ReadDouble();
 }
 
 Value* DoubleValue::As(ValueType targetType, bool cast, const Span& span, bool dontThrow) const
@@ -2624,6 +2734,16 @@ llvm::Value* CharValue::IrValue(Emitter& emitter)
     return emitter.Builder().getInt8(static_cast<uint8_t>(value));
 }
 
+void CharValue::Write(BinaryWriter& writer)
+{
+    writer.Write(value);
+}
+
+void CharValue::Read(BinaryReader& reader)
+{
+    value = reader.ReadChar();
+}
+
 Value* CharValue::As(ValueType targetType, bool cast, const Span& span, bool dontThrow) const
 {
     switch (targetType)
@@ -2859,6 +2979,16 @@ WCharValue::WCharValue(const Span& span_, char16_t value_) : Value(span_, ValueT
 llvm::Value* WCharValue::IrValue(Emitter& emitter)
 {
     return emitter.Builder().getInt16(static_cast<uint16_t>(value));
+}
+
+void WCharValue::Write(BinaryWriter& writer)
+{
+    writer.Write(value);
+}
+
+void WCharValue::Read(BinaryReader& reader)
+{
+    value = reader.ReadWChar();
 }
 
 Value* WCharValue::As(ValueType targetType, bool cast, const Span& span, bool dontThrow) const
@@ -3110,6 +3240,16 @@ UCharValue::UCharValue(const Span& span_, char32_t value_) : Value(span_, ValueT
 llvm::Value* UCharValue::IrValue(Emitter& emitter)
 {
     return emitter.Builder().getInt32(static_cast<uint32_t>(value));
+}
+
+void UCharValue::Write(BinaryWriter& writer)
+{
+    writer.Write(value);
+}
+
+void UCharValue::Read(BinaryReader& reader)
+{
+    value = reader.ReadUChar();
 }
 
 Value* UCharValue::As(ValueType targetType, bool cast, const Span& span, bool dontThrow) const
@@ -3377,6 +3517,14 @@ llvm::Value* StringValue::IrValue(Emitter& emitter)
     return emitter.GetGlobalStringPtr(stringId);
 }
 
+void StringValue::Write(BinaryWriter& writer)
+{
+}
+
+void StringValue::Read(BinaryReader& reader)
+{
+}
+
 Value* StringValue::As(ValueType targetType, bool cast, const Span& span, bool dontThrow) const
 {
     switch (targetType)
@@ -3410,6 +3558,14 @@ llvm::Value* WStringValue::IrValue(Emitter& emitter)
     indeces.push_back(emitter.Builder().getInt32(0));
     indeces.push_back(emitter.Builder().getInt32(0));
     return emitter.Builder().CreateGEP(wstringConstant, indeces);
+}
+
+void WStringValue::Write(BinaryWriter& writer)
+{
+}
+
+void WStringValue::Read(BinaryReader& reader)
+{
 }
 
 Value* WStringValue::As(ValueType targetType, bool cast, const Span& span, bool dontThrow) const
@@ -3447,6 +3603,14 @@ llvm::Value* UStringValue::IrValue(Emitter& emitter)
     return emitter.Builder().CreateGEP(ustringConstant, indeces);
 }
 
+void UStringValue::Write(BinaryWriter& writer)
+{
+}
+
+void UStringValue::Read(BinaryReader& reader)
+{
+}
+
 Value* UStringValue::As(ValueType targetType, bool cast, const Span& span, bool dontThrow) const
 {
     switch (targetType)
@@ -3476,6 +3640,14 @@ NullValue::NullValue(const Span& span_, TypeSymbol* nullPtrType_) : Value(span_,
 llvm::Value* NullValue::IrValue(Emitter& emitter)
 {
     return llvm::Constant::getNullValue(nullPtrType->IrType(emitter));
+}
+
+void NullValue::Write(BinaryWriter& writer)
+{
+}
+
+void NullValue::Read(BinaryReader& reader)
+{
 }
 
 Value* NullValue::As(ValueType targetType, bool cast, const Span& span, bool dontThrow) const
@@ -3539,6 +3711,39 @@ size_t IntegralValueHash::operator()(IntegralValue integralValue) const
         case ValueType::ucharValue: return GetHashCode(*static_cast<UCharValue*>(integralValue.value));
     }
     return 0;
+}
+
+void WriteValue(Value* value, BinaryWriter& writer)
+{
+    writer.Write(static_cast<uint8_t>(value->GetValueType()));
+    value->Write(writer);
+}
+
+Value* ReadValue(BinaryReader& reader)
+{
+    ValueType valueType = static_cast<ValueType>(reader.ReadByte());
+    Value* value = nullptr;
+    switch (valueType)
+    {
+        case ValueType::boolValue: value = new BoolValue(Span(), false); break;
+        case ValueType::sbyteValue: value = new SByteValue(Span(), 0); break;
+        case ValueType::byteValue: value = new ByteValue(Span(), 0); break;
+        case ValueType::shortValue: value = new ShortValue(Span(), 0); break;
+        case ValueType::ushortValue: value = new UShortValue(Span(), 0); break;
+        case ValueType::intValue: value = new IntValue(Span(), 0); break;
+        case ValueType::uintValue: value = new UIntValue(Span(), 0); break;
+        case ValueType::longValue: value = new LongValue(Span(), 0); break;
+        case ValueType::ulongValue: value = new ULongValue(Span(), 0); break;
+        case ValueType::charValue: value = new CharValue(Span(), '\0'); break;
+        case ValueType::wcharValue: value = new WCharValue(Span(), '\0'); break;
+        case ValueType::ucharValue: value = new UCharValue(Span(), '\0'); break;
+    }
+    if (value)
+    {
+        value->Read(reader);
+        return value;
+    }
+    return nullptr;
 }
 
 } } // namespace cmajor::symbols
