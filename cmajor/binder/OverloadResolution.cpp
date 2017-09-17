@@ -951,14 +951,17 @@ std::unique_ptr<BoundFunctionCall> SelectViableFunction(const std::unordered_set
                 {
                     if (!viableFunction->Constraint())
                     {
-                        Node* node = boundCompileUnit.GetSymbolTable().GetNode(viableFunction);
-                        Assert(node->GetNodeType() == NodeType::functionNode, "function node expected");
-                        FunctionNode* functionNode = static_cast<FunctionNode*>(node);
-                        ConstraintNode* constraint = functionNode->WhereConstraint();
-                        if (constraint)
+                        Node* node = boundCompileUnit.GetSymbolTable().GetNodeNoThrow(viableFunction);
+                        if (node)
                         {
-                            CloneContext cloneContext;
-                            viableFunction->SetConstraint(static_cast<ConstraintNode*>(constraint->Clone(cloneContext)));
+                            Assert(node->GetNodeType() == NodeType::functionNode, "function node expected");
+                            FunctionNode* functionNode = static_cast<FunctionNode*>(node);
+                            ConstraintNode* constraint = functionNode->WhereConstraint();
+                            if (constraint)
+                            {
+                                CloneContext cloneContext;
+                                viableFunction->SetConstraint(static_cast<ConstraintNode*>(constraint->Clone(cloneContext)));
+                            }
                         }
                     }
                     if (viableFunction->Constraint())

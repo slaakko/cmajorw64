@@ -319,6 +319,7 @@ void SymbolTable::AddParameter(ParameterNode& parameterNode)
 void SymbolTable::BeginClass(ClassNode& classNode)
 {
     ClassTypeSymbol* classTypeSymbol = new ClassTypeSymbol(classNode.GetSpan(), classNode.Id()->Str());
+    classTypeSymbol->SetGroupName(classNode.Id()->Str());
     currentClassStack.push(currentClass);
     currentClass = classTypeSymbol;
     classTypeSymbol->SetCompileUnit(currentCompileUnit);
@@ -955,6 +956,7 @@ ClassTemplateSpecializationSymbol* SymbolTable::MakeClassTemplateSpecialization(
     {
         ClassTemplateSpecializationSymbol* classTemplateSpecialization = new ClassTemplateSpecializationSymbol(span,
             MakeClassTemplateSpecializationName(classTemplate, templateArgumentTypes), classTemplate, templateArgumentTypes);
+        classTemplateSpecialization->SetGroupName(classTemplate->GroupName());
         classTemplateSpecializationMap[key] = classTemplateSpecialization;
         classTemplateSpecialization->SetSymbolTable(this);
         classTemplateSpecializations.push_back(std::unique_ptr<ClassTemplateSpecializationSymbol>(classTemplateSpecialization));
@@ -1072,6 +1074,7 @@ void InitCoreSymbolTable(SymbolTable& symbolTable)
             symbolTable.AddTemplateParameter(*typeParamId);
         }
         symbolTable.EndConcept();
+        conceptSymbol->ComputeName();
     }
 }
 

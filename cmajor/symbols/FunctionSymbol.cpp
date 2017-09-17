@@ -387,7 +387,7 @@ void FunctionSymbol::ComputeName()
     }
     name.append(1, U')');
     SetName(name);
-    if (!IsBasicTypeOperation() && !IsFunctionTemplate())
+    if (!IsBasicTypeOperation())
     {
         ComputeMangledName();
     }
@@ -943,6 +943,26 @@ llvm::FunctionType* FunctionSymbol::IrType(Emitter& emitter)
 StaticConstructorSymbol::StaticConstructorSymbol(const Span& span_, const std::u32string& name_) : FunctionSymbol(SymbolType::staticConstructorSymbol, span_, name_)
 {
     SetGroupName(U"@static_constructor");
+}
+
+std::u32string StaticConstructorSymbol::FullNameWithSpecifiers() const
+{
+    std::u32string fullNameWithSpecifiers = ToUtf32(SymbolFlagStr(GetSymbolFlags(), true));
+    std::u32string f = ToUtf32(FunctionSymbolFlagStr(GetFunctionSymbolFlags()));
+    if (!f.empty())
+    {
+        if (!fullNameWithSpecifiers.empty())
+        {
+            fullNameWithSpecifiers.append(1, U' ');
+        }
+        fullNameWithSpecifiers.append(f);
+    }
+    if (!fullNameWithSpecifiers.empty())
+    {
+        fullNameWithSpecifiers.append(1, U' ');
+    }
+    fullNameWithSpecifiers.append(FullName());
+    return fullNameWithSpecifiers;
 }
 
 void StaticConstructorSymbol::SetSpecifiers(Specifiers specifiers)

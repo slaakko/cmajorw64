@@ -41,6 +41,7 @@ ClassTypeSymbol::ClassTypeSymbol(SymbolType symbolType_, const Span& span_, cons
 void ClassTypeSymbol::Write(SymbolWriter& writer)
 {
     TypeSymbol::Write(writer);
+    writer.GetBinaryWriter().Write(groupName);
     writer.GetBinaryWriter().Write(static_cast<uint8_t>(flags & ~ClassTypeSymbolFlags::layoutsComputed));
     if (IsClassTemplate())
     {
@@ -56,6 +57,12 @@ void ClassTypeSymbol::Write(SymbolWriter& writer)
         writer.GetBinaryWriter().Seek(sizePos);
         writer.GetBinaryWriter().Write(sizeOfAstNodes);
         writer.GetBinaryWriter().Seek(endPos);
+        bool hasConstraint = constraint != nullptr;
+        writer.GetBinaryWriter().Write(hasConstraint);
+        if (hasConstraint)
+        {
+            writer.GetAstWriter().Write(constraint.get());
+        }
     }
     else if (GetSymbolType() == SymbolType::classTypeSymbol)
     {
@@ -76,12 +83,19 @@ void ClassTypeSymbol::Write(SymbolWriter& writer)
         uint32_t vmtSize = vmt.size();
         writer.GetBinaryWriter().WriteEncodedUInt(vmtSize);
         writer.GetBinaryWriter().Write(vmtPtrIndex);
+        bool hasConstraint = constraint != nullptr;
+        writer.GetBinaryWriter().Write(hasConstraint);
+        if (hasConstraint)
+        {
+            writer.GetAstWriter().Write(constraint.get());
+        }
     }
 }
 
 void ClassTypeSymbol::Read(SymbolReader& reader)
 {
     TypeSymbol::Read(reader);
+    groupName = reader.GetBinaryReader().ReadUtf32String();
     flags = static_cast<ClassTypeSymbolFlags>(reader.GetBinaryReader().ReadByte());
     if (IsClassTemplate())
     {
@@ -89,6 +103,11 @@ void ClassTypeSymbol::Read(SymbolReader& reader)
         astNodesPos = reader.GetBinaryReader().Pos();
         reader.GetBinaryReader().Skip(sizeOfAstNodes);
         filePathReadFrom = reader.GetBinaryReader().FileName();
+        bool hasConstraint = reader.GetBinaryReader().ReadBool();
+        if (hasConstraint)
+        {
+            constraint.reset(reader.GetAstReader().ReadConstraintNode());
+        }
     }
     else if (GetSymbolType() == SymbolType::classTypeSymbol)
     {
@@ -107,6 +126,11 @@ void ClassTypeSymbol::Read(SymbolReader& reader)
         uint32_t vmtSize = reader.GetBinaryReader().ReadEncodedUInt();
         vmt.resize(vmtSize);
         vmtPtrIndex = reader.GetBinaryReader().ReadInt();
+        bool hasConstraint = reader.GetBinaryReader().ReadBool();
+        if (hasConstraint)
+        {
+            constraint.reset(reader.GetAstReader().ReadConstraintNode());
+        }
         if (destructor)
         {
             if (destructor->VmtIndex() != -1)
@@ -266,7 +290,9 @@ void ClassTypeSymbol::Accept(SymbolCollector* collector)
 void ClassTypeSymbol::Dump(CodeFormatter& formatter)
 {
     formatter.WriteLine(ToUtf8(Name()));
+    formatter.WriteLine("group name: " + ToUtf8(groupName));
     formatter.WriteLine("full name: " + ToUtf8(FullNameWithSpecifiers()));
+    formatter.WriteLine("mangled name: " + ToUtf8(MangledName()));
     if (baseClass)
     {
         formatter.WriteLine("base class: " + ToUtf8(baseClass->FullName()));
@@ -410,6 +436,11 @@ void ClassTypeSymbol::CreateDestructorSymbol()
     }
 }
 
+void ClassTypeSymbol::SetGroupName(const std::u32string& groupName_)
+{
+    groupName = groupName_;
+}
+
 bool ClassTypeSymbol::HasBaseClass(ClassTypeSymbol* cls) const
 {
     if (!baseClass) return false;
@@ -517,6 +548,44 @@ void ClassTypeSymbol::SetSpecifiers(Specifiers specifiers)
     {
         throw Exception("class type symbol cannot be unit_test", GetSpan());
     }
+}
+
+void ClassTypeSymbol::ComputeName()
+{
+    std::u32string name = Name();
+    if (IsClassTemplate())
+    {
+        name.append(1, '<');
+        bool first = true;
+        for (TemplateParameterSymbol* templateParameter : templateParameters)
+        {
+            if (first)
+            {
+                first = false;
+            }
+            else
+            {
+                name.append(U", ");
+            }
+            name.append(templateParameter->Name());
+        }
+        name.append(1, '>');
+    }
+    SetName(name);
+    ComputeMangledName();
+}
+
+void ClassTypeSymbol::ComputeMangledName()
+{
+    std::u32string mangledName = ToUtf32(TypeString());
+    mangledName.append(1, U'_').append(SimpleName());
+    std::string constraintStr;
+    if (constraint)
+    {
+        constraintStr = " " + constraint->ToString();
+    }
+    mangledName.append(1, U'_').append(ToUtf32(GetSha1MessageDigest(ToUtf8(FullNameWithSpecifiers()) + constraintStr)));
+    SetMangledName(mangledName);
 }
 
 void ClassTypeSymbol::SetSpecialMemberFunctions()
@@ -818,6 +887,7 @@ void ClassTypeSymbol::CreateLayouts()
 
 llvm::Type* ClassTypeSymbol::IrType(Emitter& emitter)
 {
+    bool recursive = false;
     if (!irType)
     {
         std::vector<llvm::Type*> elementTypes;
@@ -825,9 +895,32 @@ llvm::Type* ClassTypeSymbol::IrType(Emitter& emitter)
         for (int i = 0; i < n; ++i)
         {
             TypeSymbol* elementType = objectLayout[i];
-            elementTypes.push_back(elementType->IrType(emitter));
+            if (TypesEqual(elementType->BaseType(), this))
+            {
+                recursive = true;
+                break;
+            }
         }
-        irType = llvm::StructType::get(emitter.Context(), elementTypes);
+        if (!recursive)
+        {
+            for (int i = 0; i < n; ++i)
+            {
+                TypeSymbol* elementType = objectLayout[i];
+                elementTypes.push_back(elementType->IrType(emitter));
+            }
+            irType = llvm::StructType::get(emitter.Context(), elementTypes);
+        }
+        else
+        {
+            llvm::StructType* forwardDeclaredType = llvm::StructType::create(emitter.Context());
+            irType = forwardDeclaredType;
+            for (int i = 0; i < n; ++i)
+            {
+                TypeSymbol* elementType = objectLayout[i];
+                elementTypes.push_back(elementType->IrType(emitter));
+            }
+            forwardDeclaredType->setBody(elementTypes);
+        }
     }
     return irType;
 }

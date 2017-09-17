@@ -89,6 +89,7 @@ inline SymbolFlags operator~(SymbolFlags flags)
 }
 
 std::string SymbolFlagStr(SymbolFlags symbolFlags);
+std::string SymbolFlagStr(SymbolFlags symbolFlags, bool noAccess);
 
 class Symbol
 {

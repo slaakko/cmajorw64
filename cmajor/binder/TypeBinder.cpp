@@ -211,11 +211,24 @@ void TypeBinder::BindClass(ClassTypeSymbol* classTypeSymbol, ClassNode* classNod
             symbolTable.SetTypeIdFor(templateParameterSymbol);
         }
         classTypeSymbol->CloneUsingNodes(usingNodes);
+        if (classNode->WhereConstraint())
+        {
+            CloneContext cloneContext;
+            classTypeSymbol->SetConstraint(static_cast<ConstraintNode*>(classNode->WhereConstraint()->Clone(cloneContext)));
+        }
+        classTypeSymbol->SetAccess(classNode->GetSpecifiers() & Specifiers::access_);
+        classTypeSymbol->ComputeName();
         return;
     }
     ContainerScope* prevContainerScope = containerScope;
     containerScope = classTypeSymbol->GetContainerScope();
     classTypeSymbol->SetSpecifiers(classNode->GetSpecifiers());
+    if (classNode->WhereConstraint())
+    {
+        CloneContext cloneContext;
+        classTypeSymbol->SetConstraint(static_cast<ConstraintNode*>(classNode->WhereConstraint()->Clone(cloneContext)));
+    }
+    classTypeSymbol->ComputeName();
     int nb = classNode->BaseClassOrInterfaces().Count();
     for (int i = 0; i < nb; ++i)
     {
@@ -584,6 +597,7 @@ void TypeBinder::BindConcept(ConceptSymbol* conceptSymbol, ConceptNode* conceptN
     if (conceptSymbol->IsBound()) return;
     conceptSymbol->SetBound();
     conceptSymbol->SetSpecifiers(conceptNode->GetSpecifiers());
+    conceptSymbol->ComputeName();
     if (conceptNode->Refinement())
     {
         ConceptIdNode* refinedConceptIdNode = conceptNode->Refinement();

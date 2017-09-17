@@ -55,14 +55,22 @@ std::string SymbolTypeStr(SymbolType symbolType)
 
 std::string SymbolFlagStr(SymbolFlags symbolFlags)
 {
+    return SymbolFlagStr(symbolFlags, false);
+}
+
+std::string SymbolFlagStr(SymbolFlags symbolFlags, bool noAccess)
+{
     std::string s;
-    SymbolAccess access = SymbolAccess(symbolFlags & SymbolFlags::access);
-    switch (access)
-    { 
-        case SymbolAccess::private_: s.append("private"); break;
-        case SymbolAccess::protected_: s.append("protected"); break;
-        case SymbolAccess::internal_: s.append("internal"); break;
-        case SymbolAccess::public_: s.append("public"); break;
+    if (!noAccess)
+    {
+        SymbolAccess access = SymbolAccess(symbolFlags & SymbolFlags::access);
+        switch (access)
+        {
+            case SymbolAccess::private_: s.append("private"); break;
+            case SymbolAccess::protected_: s.append("protected"); break;
+            case SymbolAccess::internal_: s.append("internal"); break;
+            case SymbolAccess::public_: s.append("public"); break;
+        }
     }
     if ((symbolFlags & SymbolFlags::static_) != SymbolFlags::none)
     {

@@ -67,10 +67,13 @@ public:
     void AddMember(Symbol* member) override;
     bool IsClassTypeSymbol() const override { return true; }
     std::string TypeString() const override { return "class"; }
+    std::u32string SimpleName() const override { return groupName; }
     bool HasNontrivialDestructor() const override;
     void Accept(SymbolCollector* collector) override;
     void Dump(CodeFormatter& formatter) override;
     void CreateDestructorSymbol();
+    const std::u32string& GroupName() const { return groupName; }
+    void SetGroupName(const std::u32string& groupName_);
     const ClassTypeSymbol* BaseClass() const { return baseClass; }
     ClassTypeSymbol* BaseClass() { return baseClass; }
     void SetBaseClass(ClassTypeSymbol* baseClass_) { baseClass = baseClass_; }
@@ -82,6 +85,10 @@ public:
     bool IsClassTemplate() const { return !templateParameters.empty(); }
     void CloneUsingNodes(const std::vector<Node*>& usingNodes_);
     void SetSpecifiers(Specifiers specifiers);
+    void ComputeName();
+    void ComputeMangledName() override;
+    void SetConstraint(ConstraintNode* constraint_) { constraint.reset(constraint_); }
+    ConstraintNode* Constraint() { return constraint.get(); }
     StaticConstructorSymbol* StaticConstructor() { return staticConstructor; }
     ConstructorSymbol* DefaultConstructor() { return defaultConstructor; }
     void SetDefaultConstructor(ConstructorSymbol* defaultConstructor_) { defaultConstructor = defaultConstructor_; }
@@ -133,6 +140,7 @@ public:
     llvm::StructType* StaticObjectType(Emitter& emitter);
     const std::string& StaticObjectName();
 private:
+    std::u32string groupName;
     ClassTypeSymbol* baseClass;
     ClassTypeSymbolFlags flags;
     std::vector<InterfaceTypeSymbol*> implementedInterfaces;
@@ -158,6 +166,7 @@ private:
     int32_t vmtPtrIndex;
     NodeList<Node> usingNodes;
     std::unique_ptr<ClassNode> classNode;
+    std::unique_ptr<ConstraintNode> constraint;
     uint32_t sizeOfAstNodes;
     uint32_t astNodesPos;
     std::string filePathReadFrom;

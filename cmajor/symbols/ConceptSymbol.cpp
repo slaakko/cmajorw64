@@ -97,6 +97,7 @@ void ConceptSymbol::Dump(CodeFormatter& formatter)
     formatter.WriteLine(ToUtf8(Name()));
     formatter.WriteLine("group name: " + ToUtf8(groupName));
     formatter.WriteLine("full name: " + ToUtf8(FullNameWithSpecifiers()));
+    formatter.WriteLine("mangled name: " + ToUtf8(MangledName()));
     formatter.WriteLine("typeid: " + std::to_string(typeId));
     if (refinedConcept)
     {
@@ -111,6 +112,28 @@ void ConceptSymbol::AddMember(Symbol* member)
     {
         templateParameters.push_back(static_cast<TemplateParameterSymbol*>(member));
     }
+}
+
+void ConceptSymbol::ComputeName()
+{
+    std::u32string name = groupName;
+    bool first = true;
+    name.append(1, '<');
+    for (TemplateParameterSymbol* templateParameter : templateParameters)
+    {
+        if (first)
+        {
+            first = false;
+        }
+        else
+        {
+            name.append(U", ");
+        }
+        name.append(templateParameter->Name());
+    }
+    name.append(1, '>');
+    SetName(name);
+    ComputeMangledName();
 }
 
 void ConceptSymbol::SetSpecifiers(Specifiers specifiers)

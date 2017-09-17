@@ -36,6 +36,9 @@ public:
     void Accept(SymbolCollector* collector) override;
     void Dump(CodeFormatter& formatter) override;
     void AddMember(Symbol* member) override;
+    std::string TypeString() const override { return "concept"; }
+    std::u32string SimpleName() const override { return groupName; }
+    void ComputeName();
     void SetSpecifiers(Specifiers specifiers);
     void SetTypeId(uint32_t typeId_) { typeId = typeId_; }
     uint32_t TypeId() const { return typeId; }

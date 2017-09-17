@@ -8,6 +8,7 @@ source <Conversion.cm>;
 source <Exception.cm>;
 source <FileStream.cm>;
 source <Functional.cm>;
+source <ForwardList.cm>;
 source <List.cm>;
 source <Pair.cm>;
 source <RandomAccessIterator.cm>;

@@ -194,7 +194,9 @@ public:
     StaticConstructorSymbol(const Span& span_, const std::u32string& name_);
     std::string TypeString() const override { return "static_constructor"; }
     void SetSpecifiers(Specifiers specifiers);
+    std::u32string FullNameWithSpecifiers() const override;
 };
+   
 
 class ConstructorSymbol : public FunctionSymbol
 {
