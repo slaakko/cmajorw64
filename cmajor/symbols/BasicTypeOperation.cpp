@@ -544,7 +544,7 @@ void MakeBasicTypeConversions(SymbolTable& symbolTable, BoolTypeSymbol* boolType
     symbolTable.AddFunctionSymbolToGlobalScope(new BasicTypeExplicitConversion<BasicTypeBitCast>(SymbolType::basicTypeBitCast, U"char2sbyte", charType, sbyteType));
     symbolTable.AddFunctionSymbolToGlobalScope(new BasicTypeExplicitConversion<BasicTypeBitCast>(SymbolType::basicTypeBitCast, U"char2byte", charType, byteType));
     symbolTable.AddFunctionSymbolToGlobalScope(new BasicTypeExplicitConversion<BasicTypeZeroExtension>(SymbolType::basicTypeExplicitZeroExtension, U"char2short", charType, shortType));
-    symbolTable.AddFunctionSymbolToGlobalScope(new BasicTypeExplicitConversion<BasicTypeZeroExtension>(SymbolType::basicTypeExplicitZeroExtension, U"char2ushort", charType, shortType));
+    symbolTable.AddFunctionSymbolToGlobalScope(new BasicTypeExplicitConversion<BasicTypeZeroExtension>(SymbolType::basicTypeExplicitZeroExtension, U"char2ushort", charType, ushortType));
     symbolTable.AddFunctionSymbolToGlobalScope(new BasicTypeExplicitConversion<BasicTypeZeroExtension>(SymbolType::basicTypeExplicitZeroExtension, U"char2int", charType, intType));
     symbolTable.AddFunctionSymbolToGlobalScope(new BasicTypeExplicitConversion<BasicTypeZeroExtension>(SymbolType::basicTypeExplicitZeroExtension, U"char2uint", charType, uintType));
     symbolTable.AddFunctionSymbolToGlobalScope(new BasicTypeExplicitConversion<BasicTypeZeroExtension>(SymbolType::basicTypeExplicitZeroExtension, U"char2long", charType, longType));

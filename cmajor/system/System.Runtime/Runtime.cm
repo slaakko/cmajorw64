@@ -23,3 +23,4 @@ public extern cdecl nothrow int RtOpen(const char* filePath, byte openMode);
 public extern cdecl nothrow int RtClose(int handle);
 public extern cdecl nothrow int RtWrite(int handle, const void* buffer, long count);
 public extern cdecl nothrow int RtRead(int handle, void* buffer, long bufferSize);
+public extern cdecl nothrow double RtPow(double x, int exponent);

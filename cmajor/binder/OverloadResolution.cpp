@@ -466,6 +466,11 @@ bool FindConversions(BoundCompileUnit& boundCompileUnit, FunctionSymbol* functio
                     continue;
                 }
             }
+            else if (i == 1 && function->IsLvalueReferenceCopyAssignment() && TypesEqual(sourceType, targetType->RemoveReference(span)))
+            {
+                functionMatch.argumentMatches.push_back(ArgumentMatch(nullptr, OperationFlags::none, 0));
+                continue;
+            }
         }
         if (TypesEqual(sourceType, targetType))    // exact match
         {

@@ -165,6 +165,7 @@
     <ClInclude Include="CallStack.hpp" />
     <ClInclude Include="Classes.hpp" />
     <ClInclude Include="InitDone.hpp" />
+    <ClInclude Include="Math.hpp" />
     <ClInclude Include="Memory.hpp" />
     <ClInclude Include="RtApi.hpp" />
     <ClInclude Include="Io.hpp" />
@@ -177,6 +178,7 @@
     <ClCompile Include="DllMain.cpp" />
     <ClCompile Include="InitDone.cpp" />
     <ClCompile Include="Io.cpp" />
+    <ClCompile Include="Math.cpp" />
     <ClCompile Include="Memory.cpp" />
     <ClCompile Include="Statics.cpp" />
   </ItemGroup>

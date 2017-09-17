@@ -98,6 +98,7 @@ public:
     virtual TypeSymbol* ConversionTargetType() const { return nullptr; }
     virtual bool IsBasicTypeOperation() const { return false; }
     virtual bool IsGeneratedFunction() const { return false; }
+    virtual bool IsLvalueReferenceCopyAssignment() const { return false; }
     virtual void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags);
     void GenerateVirtualCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags);
     virtual ParameterSymbol* GetThisParam() const { return nullptr; }

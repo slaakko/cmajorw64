@@ -989,6 +989,7 @@ public:
     SymbolAccess DeclaredAccess() const override { return SymbolAccess::public_; }
     void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags) override;
     bool IsBasicTypeOperation() const override { return true; }
+    bool IsLvalueReferenceCopyAssignment() const { return true; }
 private:
     TypeSymbol* type;
 };
