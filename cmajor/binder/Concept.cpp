@@ -236,6 +236,11 @@ void ConstraintChecker::Reset()
 
 TypeSymbol* ConstraintChecker::GetType()
 {
+    if (type && type->GetSymbolType() == SymbolType::classGroupTypeSymbol)
+    {
+        ClassGroupTypeSymbol* classGroup = static_cast<ClassGroupTypeSymbol*>(type);
+        type = classGroup->GetClass(0);
+    }
     if (type && !derivationRec.IsEmpty())
     {
         TypeDerivationRec unifiedDerivationRec = UnifyDerivations(derivationRec, type->DerivationRec());
