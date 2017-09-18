@@ -168,6 +168,7 @@ public:
     void Visit(PointerNode& pointerNode) override;
     void Visit(ArrayNode& arrayNode) override;
     void Visit(IdentifierNode& identifierNode) override;
+    void Visit(TemplateIdNode& templateIdNode) override;
     void Visit(DotNode& dotNode) override;
 
     void Visit(DisjunctiveConstraintNode& disjunctiveConstraintNode) override;
@@ -441,6 +442,11 @@ void ConstraintChecker::Visit(IdentifierNode& identifierNode)
     {
         throw Exception("type or concept symbol '" + ToUtf8(name) + "' not found", identifierNode.GetSpan());
     }
+}
+
+void ConstraintChecker::Visit(TemplateIdNode& templateIdNode)
+{
+    type = ResolveType(&templateIdNode, boundCompileUnit, containerScope);
 }
 
 void ConstraintChecker::Visit(DotNode& dotNode)
