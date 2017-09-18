@@ -329,15 +329,17 @@ void SymbolTable::BeginClass(ClassNode& classNode)
     ContainerScope* classScope = classTypeSymbol->GetContainerScope();
     ContainerScope* containerScope = container->GetContainerScope();
     classScope->SetParent(containerScope);
-    container->AddMember(classTypeSymbol);
     BeginContainer(classTypeSymbol);
 }
 
 void SymbolTable::EndClass()
 {
+    ClassTypeSymbol* classTypeSymbol = currentClass;
     currentClass = currentClassStack.top();
     currentClassStack.pop();
     EndContainer();
+    classTypeSymbol->ComputeMinArity();
+    container->AddMember(classTypeSymbol);
 }
 
 void SymbolTable::BeginClassTemplateSpecialization(ClassNode& classInstanceNode, ClassTemplateSpecializationSymbol* classTemplateSpecialization)
@@ -362,8 +364,13 @@ void SymbolTable::EndClassTemplateSpecialization()
 void SymbolTable::AddTemplateParameter(TemplateParameterNode& templateParameterNode)
 {
     TemplateParameterSymbol* templateParameterSymbol = new TemplateParameterSymbol(templateParameterNode.GetSpan(), templateParameterNode.Id()->Str());
+    if (templateParameterNode.DefaultTemplateArgument())
+    {
+        templateParameterSymbol->SetHasDefault();
+    }
     templateParameterSymbol->SetCompileUnit(currentCompileUnit);
     templateParameterSymbol->SetSymbolTable(this);
+    SetTypeIdFor(templateParameterSymbol);
     MapNode(&templateParameterNode, templateParameterSymbol);
     container->AddMember(templateParameterSymbol);
 }

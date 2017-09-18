@@ -5,11 +5,25 @@
 
 #include <cmajor/symbols/TemplateSymbol.hpp>
 #include <cmajor/symbols/SymbolTable.hpp>
+#include <cmajor/symbols/SymbolWriter.hpp>
+#include <cmajor/symbols/SymbolReader.hpp>
 
 namespace cmajor { namespace symbols {
 
-TemplateParameterSymbol::TemplateParameterSymbol(const Span& span_, const std::u32string& name_) : TypeSymbol(SymbolType::templateParameterSymbol, span_, name_)
+TemplateParameterSymbol::TemplateParameterSymbol(const Span& span_, const std::u32string& name_) : TypeSymbol(SymbolType::templateParameterSymbol, span_, name_), hasDefault(false)
 {
+}
+
+void TemplateParameterSymbol::Write(SymbolWriter& writer)
+{
+    TypeSymbol::Write(writer);
+    writer.GetBinaryWriter().Write(hasDefault);
+}
+
+void TemplateParameterSymbol::Read(SymbolReader& reader)
+{
+    TypeSymbol::Read(reader);
+    hasDefault = reader.GetBinaryReader().ReadBool();
 }
 
 TypeSymbol* TemplateParameterSymbol::Unify(TypeSymbol* type, const Span& span)

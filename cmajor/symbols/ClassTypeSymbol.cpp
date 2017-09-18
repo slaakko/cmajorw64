@@ -22,9 +22,48 @@ namespace cmajor { namespace symbols {
 
 using namespace cmajor::unicode;
 
+ClassGroupTypeSymbol::ClassGroupTypeSymbol(const Span& span_, const std::u32string& name_) : TypeSymbol(SymbolType::classGroupTypeSymbol, span_, name_)
+{
+}
+
+llvm::Type* ClassGroupTypeSymbol::IrType(Emitter& emitter)
+{
+    Assert(false, "tried to get ir type of class group");
+    return nullptr;
+}
+
+llvm::Constant* ClassGroupTypeSymbol::CreateDefaultIrValue(Emitter& emitter)
+{
+    Assert(false, "tried to create default ir value of class group");
+    return nullptr;
+}
+
+void ClassGroupTypeSymbol::AddClass(ClassTypeSymbol* classTypeSymbol)
+{
+    for (int arity = classTypeSymbol->MinArity(); arity <= classTypeSymbol->MaxArity(); ++arity)
+    {
+        if (arityClassMap.find(arity) != arityClassMap.cend())
+        {
+            throw Exception("already has class with arity " + std::to_string(arity) + " in class group '" + ToUtf8(Name()) + "'", GetSpan(), classTypeSymbol->GetSpan());
+        }
+        arityClassMap[arity] = classTypeSymbol;
+    }
+}
+
+ClassTypeSymbol* ClassGroupTypeSymbol::GetClass(int arity) const
+{
+    auto it = arityClassMap.find(arity);
+    if (it != arityClassMap.cend())
+    {
+        ClassTypeSymbol* classTypeSymbol = it->second;
+        return classTypeSymbol;
+    }
+    return nullptr;
+}
+
 ClassTypeSymbol::ClassTypeSymbol(const Span& span_, const std::u32string& name_) : 
     TypeSymbol(SymbolType::classTypeSymbol, span_, name_), 
-    baseClass(), flags(ClassTypeSymbolFlags::none), implementedInterfaces(), templateParameters(), memberVariables(), staticMemberVariables(), 
+    minArity(0), baseClass(), flags(ClassTypeSymbolFlags::none), implementedInterfaces(), templateParameters(), memberVariables(), staticMemberVariables(),
     staticConstructor(nullptr), defaultConstructor(nullptr), copyConstructor(nullptr), moveConstructor(nullptr), copyAssignment(nullptr), moveAssignment(nullptr), 
     constructors(), destructor(nullptr), memberFunctions(), vmtPtrIndex(-1), irType(nullptr), vmtObjectType(nullptr), staticObjectType(nullptr)
 {
@@ -32,7 +71,7 @@ ClassTypeSymbol::ClassTypeSymbol(const Span& span_, const std::u32string& name_)
 
 ClassTypeSymbol::ClassTypeSymbol(SymbolType symbolType_, const Span& span_, const std::u32string& name_) :
     TypeSymbol(symbolType_, span_, name_),
-    baseClass(), flags(ClassTypeSymbolFlags::none), implementedInterfaces(), templateParameters(), memberVariables(), staticMemberVariables(), 
+    minArity(0), baseClass(), flags(ClassTypeSymbolFlags::none), implementedInterfaces(), templateParameters(), memberVariables(), staticMemberVariables(),
     staticConstructor(nullptr), defaultConstructor(nullptr), copyConstructor(nullptr), moveConstructor(nullptr), copyAssignment(nullptr), moveAssignment(nullptr), 
     constructors(), destructor(nullptr), memberFunctions(), vmtPtrIndex(-1), irType(nullptr), vmtObjectType(nullptr), staticObjectType(nullptr)
 {
@@ -43,6 +82,7 @@ void ClassTypeSymbol::Write(SymbolWriter& writer)
     TypeSymbol::Write(writer);
     writer.GetBinaryWriter().Write(groupName);
     writer.GetBinaryWriter().Write(static_cast<uint8_t>(flags & ~ClassTypeSymbolFlags::layoutsComputed));
+    writer.GetBinaryWriter().Write(static_cast<int32_t>(minArity));
     if (IsClassTemplate())
     {
         uint32_t sizePos = writer.GetBinaryWriter().Pos();
@@ -97,6 +137,7 @@ void ClassTypeSymbol::Read(SymbolReader& reader)
     TypeSymbol::Read(reader);
     groupName = reader.GetBinaryReader().ReadUtf32String();
     flags = static_cast<ClassTypeSymbolFlags>(reader.GetBinaryReader().ReadByte());
+    minArity = reader.GetBinaryReader().ReadInt();
     if (IsClassTemplate())
     {
         sizeOfAstNodes = reader.GetBinaryReader().ReadUInt();
@@ -439,6 +480,26 @@ void ClassTypeSymbol::CreateDestructorSymbol()
 void ClassTypeSymbol::SetGroupName(const std::u32string& groupName_)
 {
     groupName = groupName_;
+}
+
+void ClassTypeSymbol::ComputeMinArity()
+{
+    bool defaultHit = false;
+    int n = templateParameters.size();
+    for (int i = 0; i < n; ++i)
+    {
+        TemplateParameterSymbol* templateParameter = templateParameters[i];
+        if (templateParameter->HasDefault())
+        {
+            defaultHit = true;
+            break;
+        }
+        minArity = i;
+    }
+    if (!defaultHit)
+    {
+        minArity = n;
+    }
 }
 
 bool ClassTypeSymbol::HasBaseClass(ClassTypeSymbol* cls) const

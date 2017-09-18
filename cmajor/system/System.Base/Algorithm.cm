@@ -643,7 +643,7 @@ namespace System
 
     public nothrow inline bool Equal<I1, I2>(I1 first1, I1 last1, I2 first2, I2 last2) where I1 is InputIterator and I2 is InputIterator and EqualityComparable<I1.ValueType, I2.ValueType>
     {
-        return Equal(first1, last1, first2, last2, EqualTo2<I1.ValueType, I2.ValueType>());
+        return Equal(first1, last1, first2, last2, EqualTo<I1.ValueType, I2.ValueType>());
     }
 
     public nothrow bool LexicographicalCompare<I1, I2, R>(I1 first1, I1 last1, I2 first2, I2 last2, R r)
@@ -667,7 +667,7 @@ namespace System
 
     public nothrow inline bool LexicographicalCompare<I1, I2>(I1 first1, I1 last1, I2 first2, I2 last2) where I1 is InputIterator and I2 is InputIterator and LessThanComparable<I1.ValueType, I2.ValueType>
     {
-        return LexicographicalCompare(first1, last1, first2, last2, Less2<I1.ValueType, I2.ValueType>());
+        return LexicographicalCompare(first1, last1, first2, last2, Less<I1.ValueType, I2.ValueType>());
     }
 
     public nothrow I MinElement<I>(I first, I last) where I is ForwardIterator and I.ValueType is TotallyOrdered

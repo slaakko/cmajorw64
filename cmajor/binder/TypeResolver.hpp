@@ -30,6 +30,7 @@ private:
 };
 
 TypeSymbol* ResolveType(Node* typeExprNode, BoundCompileUnit& boundCompileUnit, ContainerScope* containerScope);
+TypeSymbol* ResolveType(Node* typeExprNode, BoundCompileUnit& boundCompileUnit, ContainerScope* containerScope, bool resolveClassGroup);
 
 } } // namespace cmajor::binder
 

@@ -71,6 +71,13 @@ void ContainerSymbol::AddMember(Symbol* member)
         conceptGroupSymbol->AddConcept(conceptSymbol);
         conceptSymbol->GetContainerScope()->SetParent(GetContainerScope());
     }
+    else if (member->GetSymbolType() == SymbolType::classTypeSymbol || member->GetSymbolType() == SymbolType::classTemplateSpecializationSymbol)
+    {
+        ClassTypeSymbol* classTypeSymbol = static_cast<ClassTypeSymbol*>(member);
+        ClassGroupTypeSymbol* classGroupTypeSymbol = MakeClassGroupTypeSymbol(classTypeSymbol->GroupName(), classTypeSymbol->GetSpan());
+        classGroupTypeSymbol->AddClass(classTypeSymbol);
+        classTypeSymbol->GetContainerScope()->SetParent(GetContainerScope());
+    }
     else
     {
         containerScope.Install(member);
@@ -146,6 +153,26 @@ ConceptGroupSymbol* ContainerSymbol::MakeConceptGroupSymbol(const std::u32string
     else
     {
         throw Exception("name of symbol '" + ToUtf8(symbol->FullName()) + "' conflicts with a concept group '" + ToUtf8(groupName) + "'", symbol->GetSpan(), span);
+    }
+}
+
+ClassGroupTypeSymbol* ContainerSymbol::MakeClassGroupTypeSymbol(const std::u32string& groupName, const Span& span)
+{
+    Symbol* symbol = containerScope.Lookup(groupName);
+    if (!symbol)
+    {
+        ClassGroupTypeSymbol* classGroupTypeSymbol = new ClassGroupTypeSymbol(span, groupName);
+        classGroupTypeSymbol->SetSymbolTable(GetSymbolTable());
+        AddMember(classGroupTypeSymbol);
+        return classGroupTypeSymbol;
+    }
+    if (symbol->GetSymbolType() == SymbolType::classGroupTypeSymbol)
+    {
+        return static_cast<ClassGroupTypeSymbol*>(symbol);
+    }
+    else
+    {
+        throw Exception("name of symbol '" + ToUtf8(symbol->FullName()) + "' conflicts with a class group '" + ToUtf8(groupName) + "'", symbol->GetSpan(), span);
     }
 }
 

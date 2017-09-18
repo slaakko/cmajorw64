@@ -260,6 +260,12 @@ void ExpressionBinder::BindSymbol(Symbol* symbol)
             expression.reset(new BoundTypeExpression(span, classTypeSymbol));
             break;
         }
+        case SymbolType::classGroupTypeSymbol: 
+        {
+            ClassGroupTypeSymbol* classGroupTypeSymbol = static_cast<ClassGroupTypeSymbol*>(symbol);
+            expression.reset(new BoundTypeExpression(span, classGroupTypeSymbol));
+            break;
+        }
         case SymbolType::typedefSymbol:
         {
             TypedefSymbol* typedefSymbol = static_cast<TypedefSymbol*>(symbol);
@@ -583,9 +589,20 @@ void ExpressionBinder::Visit(IdentifierNode& identifierNode)
 
 void ExpressionBinder::Visit(TemplateIdNode& templateIdNode)
 {
+    int arity = templateIdNode.TemplateArguments().Count();
     templateIdNode.Primary()->Accept(*this);
+    if (expression->GetBoundNodeType() == BoundNodeType::boundTypeExpression)
+    {
+        TypeSymbol* typeSymbol = expression->GetType();
+        if (typeSymbol->GetSymbolType() == SymbolType::classGroupTypeSymbol)
+        {
+            ClassGroupTypeSymbol* classGroup = static_cast<ClassGroupTypeSymbol*>(typeSymbol);
+            typeSymbol = classGroup->GetClass(arity);
+            expression.reset(new BoundTypeExpression(span, typeSymbol));
+        }
+    }
     std::vector<TypeSymbol*> templateArgumentTypes;
-    int n = templateIdNode.TemplateArguments().Count();
+    int n = arity;
     for (int i = 0; i < n; ++i)
     {
         Node* templateArgumentNode = templateIdNode.TemplateArguments()[i];
@@ -605,14 +622,58 @@ void ExpressionBinder::Visit(TemplateIdNode& templateIdNode)
             BoundFunctionGroupExpression* bfge = static_cast<BoundFunctionGroupExpression*>(bme->Member());
             bfge->SetTemplateArgumentTypes(templateArgumentTypes);
         }
+        else if (bme->Member()->GetBoundNodeType() == BoundNodeType::boundTypeExpression)
+        {
+            TypeSymbol* typeSymbol = bme->Member()->GetType();
+            if (typeSymbol->IsClassTypeSymbol())
+            {
+                ClassTypeSymbol* classTypeSymbol = static_cast<ClassTypeSymbol*>(typeSymbol);
+                if (classTypeSymbol->IsClassTemplate())
+                {
+                    int m = classTypeSymbol->TemplateParameters().size();
+                    if (n < m)
+                    {
+                        boundCompileUnit.GetClassTemplateRepository().ResolveDefaultTemplateArguments(templateArgumentTypes, classTypeSymbol, containerScope, templateIdNode.GetSpan());
+                    }
+                    ClassTemplateSpecializationSymbol* classTemplateSpecialization = symbolTable.MakeClassTemplateSpecialization(classTypeSymbol, templateArgumentTypes, templateIdNode.GetSpan());
+                    if (!classTemplateSpecialization->IsBound())
+                    {
+                        boundCompileUnit.GetClassTemplateRepository().BindClassTemplateSpecialization(classTemplateSpecialization, containerScope, templateIdNode.GetSpan());
+                    }
+                    expression.reset(new BoundTypeExpression(span, classTemplateSpecialization));
+                }
+            }
+        }
         else
         {
-            throw Exception("function group expected", templateIdNode.GetSpan());
+            throw Exception("function group or class group expected", templateIdNode.GetSpan());
+        }
+    }
+    else if (expression->GetBoundNodeType() == BoundNodeType::boundTypeExpression)
+    {
+        TypeSymbol* typeSymbol = expression->GetType();
+        if (typeSymbol->IsClassTypeSymbol())
+        {
+            ClassTypeSymbol* classTypeSymbol = static_cast<ClassTypeSymbol*>(typeSymbol);
+            if (classTypeSymbol->IsClassTemplate())
+            {
+                int m = classTypeSymbol->TemplateParameters().size();
+                if (n < m)
+                {
+                    boundCompileUnit.GetClassTemplateRepository().ResolveDefaultTemplateArguments(templateArgumentTypes, classTypeSymbol, containerScope, templateIdNode.GetSpan());
+                }
+                ClassTemplateSpecializationSymbol* classTemplateSpecialization = symbolTable.MakeClassTemplateSpecialization(classTypeSymbol, templateArgumentTypes, templateIdNode.GetSpan());
+                if (!classTemplateSpecialization->IsBound())
+                {
+                    boundCompileUnit.GetClassTemplateRepository().BindClassTemplateSpecialization(classTemplateSpecialization, containerScope, templateIdNode.GetSpan());
+                }
+                expression.reset(new BoundTypeExpression(span, classTemplateSpecialization));
+            }
         }
     }
     else
     {
-        throw Exception("function group expected", templateIdNode.GetSpan());
+        throw Exception("function group or class group expected", templateIdNode.GetSpan());
     }
 }
 
@@ -657,6 +718,23 @@ void ExpressionBinder::Visit(DotNode& dotNode)
 {
     ContainerScope* prevContainerScope = containerScope;
     expression = std::move(BindExpression(dotNode.Subject(), boundCompileUnit, boundFunction, containerScope, statementBinder, false, true, true, true, false));
+    if (expression->GetBoundNodeType() == BoundNodeType::boundTypeExpression)
+    {
+        TypeSymbol* typeSymbol = expression->GetType();
+        if (typeSymbol->GetSymbolType() == SymbolType::classGroupTypeSymbol)
+        {
+            ClassGroupTypeSymbol* classGroupTypeSymbol = static_cast<ClassGroupTypeSymbol*>(typeSymbol);
+            typeSymbol = classGroupTypeSymbol->GetClass(0);
+            if (!typeSymbol)
+            {
+                throw Exception("ordinary class not found from class group '" + ToUtf8(classGroupTypeSymbol->FullName()) + "'", span, classGroupTypeSymbol->GetSpan());
+            }
+            else
+            {
+                expression.reset(new BoundTypeExpression(span, typeSymbol));
+            }
+        }
+    }
     if (expression->GetBoundNodeType() == BoundNodeType::boundNamespaceExpression)
     {
         BoundNamespaceExpression* bns = static_cast<BoundNamespaceExpression*>(expression.get());
@@ -1319,6 +1397,17 @@ void ExpressionBinder::Visit(InvokeNode& invokeNode)
     else if (expression->GetBoundNodeType() == BoundNodeType::boundTypeExpression)
     {
         TypeSymbol* type = expression->GetType();
+        if (type->GetSymbolType() == SymbolType::classGroupTypeSymbol)
+        {
+            ClassGroupTypeSymbol* classGroup = static_cast<ClassGroupTypeSymbol*>(type);
+            ClassTypeSymbol* classTypeSymbol = classGroup->GetClass(0);
+            if (!classTypeSymbol)
+            {
+                throw Exception("ordinary class not found from class group '" + ToUtf8(classGroup->FullName()) + "'", span, classGroup->GetSpan());
+            }
+            expression.reset(new BoundTypeExpression(span, classTypeSymbol));
+            type = classTypeSymbol;
+        }
         if (!scopeQualified)
         {
             functionScopeLookups.push_back(FunctionScopeLookup(ScopeLookup::this_and_base, type->BaseType()->ClassInterfaceOrNsScope()));
@@ -1544,6 +1633,19 @@ void ExpressionBinder::Visit(PostfixDecrementNode& postfixDecrementNode)
 void ExpressionBinder::Visit(SizeOfNode& sizeOfNode) 
 {
     sizeOfNode.Expression()->Accept(*this);
+    if (expression->GetBoundNodeType() == BoundNodeType::boundTypeExpression && expression->GetType()->GetSymbolType() == SymbolType::classGroupTypeSymbol)
+    {
+        ClassGroupTypeSymbol* classGroup = static_cast<ClassGroupTypeSymbol*>(expression->GetType());
+        ClassTypeSymbol* classTypeSymbol = classGroup->GetClass(0);
+        if (classTypeSymbol)
+        {
+            expression.reset(new BoundTypeExpression(span, classTypeSymbol));
+        }
+        else
+        {
+            throw Exception("ordinary class not found from class group '" + ToUtf8(classGroup->FullName()) + "'", span, classGroup->GetSpan());
+        }
+    }
     expression.reset(new BoundSizeOfExpression(sizeOfNode.GetSpan(), symbolTable.GetTypeByName(U"long"), expression->GetType()->AddPointer(sizeOfNode.GetSpan())));
 }
 

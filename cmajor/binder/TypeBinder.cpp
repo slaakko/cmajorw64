@@ -134,10 +134,6 @@ void TypeBinder::Visit(FunctionNode& functionNode)
     currentFunctionSymbol = functionSymbol;
     if (functionSymbol->IsFunctionTemplate())
     {
-        for (TemplateParameterSymbol* templateParameterSymbol : functionSymbol->TemplateParameters())
-        {
-            symbolTable.SetTypeIdFor(templateParameterSymbol);
-        }
         functionSymbol->CloneUsingNodes(usingNodes);
         if (functionNode.WhereConstraint())
         {
@@ -206,10 +202,6 @@ void TypeBinder::BindClass(ClassTypeSymbol* classTypeSymbol, ClassNode* classNod
     classTypeSymbol->SetBound();
     if (classTypeSymbol->IsClassTemplate())
     {
-        for (TemplateParameterSymbol* templateParameterSymbol : classTypeSymbol->TemplateParameters())
-        {
-            symbolTable.SetTypeIdFor(templateParameterSymbol);
-        }
         classTypeSymbol->CloneUsingNodes(usingNodes);
         if (classNode->WhereConstraint())
         {

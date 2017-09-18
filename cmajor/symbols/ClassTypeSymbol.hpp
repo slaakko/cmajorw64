@@ -19,6 +19,21 @@ class ConstructorSymbol;
 class DestructorSymbol;
 class MemberFunctionSymbol;
 
+class ClassGroupTypeSymbol : public TypeSymbol
+{
+public:
+    ClassGroupTypeSymbol(const Span& span_, const std::u32string& name_);
+    bool IsExportSymbol() const override { return false; }
+    std::string TypeString() const override { return "class_group"; }
+    bool IsInComplete() const override { return true; }
+    llvm::Type* IrType(Emitter& emitter) override;
+    llvm::Constant* CreateDefaultIrValue(Emitter& emitter) override;
+    void AddClass(ClassTypeSymbol* classTypeSymbol);
+    ClassTypeSymbol* GetClass(int arity) const;
+private:
+    std::unordered_map<int, ClassTypeSymbol*> arityClassMap;
+};
+
 enum class ClassTypeSymbolFlags : uint8_t
 {
     none = 0,
@@ -74,6 +89,9 @@ public:
     void CreateDestructorSymbol();
     const std::u32string& GroupName() const { return groupName; }
     void SetGroupName(const std::u32string& groupName_);
+    int MinArity() const { return minArity; }
+    int MaxArity() const { return templateParameters.size(); }
+    void ComputeMinArity();
     const ClassTypeSymbol* BaseClass() const { return baseClass; }
     ClassTypeSymbol* BaseClass() { return baseClass; }
     void SetBaseClass(ClassTypeSymbol* baseClass_) { baseClass = baseClass_; }
@@ -141,6 +159,7 @@ public:
     const std::string& StaticObjectName();
 private:
     std::u32string groupName;
+    int minArity;
     ClassTypeSymbol* baseClass;
     ClassTypeSymbolFlags flags;
     std::vector<InterfaceTypeSymbol*> implementedInterfaces;

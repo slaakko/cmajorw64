@@ -22,7 +22,9 @@ void NamespaceSymbol::Import(NamespaceSymbol* that, SymbolTable& symbolTable)
             NamespaceSymbol* thatNs = static_cast<NamespaceSymbol*>(symbol.get());
             Import(thatNs, symbolTable);
         }
-        else if (symbol->GetSymbolType() != SymbolType::functionGroupSymbol && symbol->GetSymbolType() != SymbolType::conceptGroupSymbol)
+        else if (symbol->GetSymbolType() != SymbolType::functionGroupSymbol && 
+            symbol->GetSymbolType() != SymbolType::conceptGroupSymbol && 
+            symbol->GetSymbolType() != SymbolType::classGroupTypeSymbol)
         {
             symbolTable.Container()->AddMember(symbol.release());
         }

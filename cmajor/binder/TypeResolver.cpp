@@ -265,7 +265,13 @@ void TypeResolver::Visit(IdentifierNode& identifierNode)
 
 void TypeResolver::Visit(TemplateIdNode& templateIdNode)
 {
-    TypeSymbol* primaryTemplateType = ResolveType(templateIdNode.Primary(), boundCompileUnit, containerScope);
+    int arity = templateIdNode.TemplateArguments().Count();
+    TypeSymbol* primaryTemplateType = ResolveType(templateIdNode.Primary(), boundCompileUnit, containerScope, true);
+    if (primaryTemplateType->GetSymbolType() == SymbolType::classGroupTypeSymbol)
+    {
+        ClassGroupTypeSymbol* classGroup = static_cast<ClassGroupTypeSymbol*>(primaryTemplateType);
+        primaryTemplateType = classGroup->GetClass(arity);
+    }
     if (!primaryTemplateType->IsClassTypeSymbol())
     {
         throw Exception("class type symbol expected", templateIdNode.Primary()->GetSpan());
@@ -276,7 +282,7 @@ void TypeResolver::Visit(TemplateIdNode& templateIdNode)
         throw Exception("class template expected", templateIdNode.Primary()->GetSpan());
     }
     std::vector<TypeSymbol*> templateArgumentTypes;
-    int n = templateIdNode.TemplateArguments().Count();
+    int n = arity;
     for (int i = 0; i < n; ++i)
     {
         TypeSymbol* templateArgumentType = ResolveType(templateIdNode.TemplateArguments()[i], boundCompileUnit, containerScope);
@@ -326,9 +332,23 @@ void TypeResolver::Visit(DotNode& dotNode)
 
 TypeSymbol* ResolveType(Node* typeExprNode, BoundCompileUnit& boundCompileUnit, ContainerScope* containerScope)
 {
+    return ResolveType(typeExprNode, boundCompileUnit, containerScope, false);
+}
+
+TypeSymbol* ResolveType(Node* typeExprNode, BoundCompileUnit& boundCompileUnit, ContainerScope* containerScope, bool resolveClassGroup)
+{
     TypeResolver typeResolver(boundCompileUnit, containerScope);
     typeExprNode->Accept(typeResolver);
     TypeSymbol* type = typeResolver.GetType();
+    if (resolveClassGroup && type && type->GetSymbolType() == SymbolType::classGroupTypeSymbol)
+    {
+        return type;
+    }
+    if (type && type->GetSymbolType() == SymbolType::classGroupTypeSymbol)
+    {
+        ClassGroupTypeSymbol* classGroup = static_cast<ClassGroupTypeSymbol*>(type);
+        type = classGroup->GetClass(0);
+    }
     if (!type || type->IsInComplete())
     {
         throw Exception("incomplete type expression", typeExprNode->GetSpan());

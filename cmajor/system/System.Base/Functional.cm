@@ -105,7 +105,7 @@ namespace System
         }
     }
 
-    public class EqualTo2<T, U> : BinaryPred<T, U> where EqualityComparable<T, U>
+    public class EqualTo<T, U> : BinaryPred<T, U> where EqualityComparable<T, U>
     {
         public nothrow inline bool operator()(const T& left, const U& right) const
         {
@@ -121,7 +121,7 @@ namespace System
         }
     }
 
-    public class NotEqualTo2<T, U> : BinaryPred<T, U> where EqualityComparable<T, U>
+    public class NotEqualTo<T, U> : BinaryPred<T, U> where EqualityComparable<T, U>
     {
         public nothrow inline bool operator()(const T& left, const U& right) const
         {
@@ -137,7 +137,7 @@ namespace System
         }
     }
 
-    public class Less2<T, U> : BinaryPred<T, U> where LessThanComparable<T, U>
+    public class Less<T, U> : BinaryPred<T, U> where LessThanComparable<T, U>
     {
         public nothrow inline bool operator()(const T& left, const U& right) const
         {
@@ -153,7 +153,7 @@ namespace System
         }
     }
 
-    public class Greater2<T, U> : BinaryPred<T, U> where LessThanComparable<T, U>
+    public class Greater<T, U> : BinaryPred<T, U> where LessThanComparable<T, U>
     {
         public nothrow inline bool operator()(const T& left, const U& right) const
         {
@@ -169,7 +169,7 @@ namespace System
         }
     }
 
-    public class LessOrEqualTo2<T, U> : BinaryPred<T, U> where LessThanComparable<T, U>
+    public class LessOrEqualTo<T, U> : BinaryPred<T, U> where LessThanComparable<T, U>
     {
         public nothrow inline bool operator()(const T& left, const U& right) const
         {
@@ -185,7 +185,7 @@ namespace System
         }
     }
 
-    public class GreaterOrEqualTo2<T, U> : BinaryPred<T, U> where LessThanComparable<T, U>
+    public class GreaterOrEqualTo<T, U> : BinaryPred<T, U> where LessThanComparable<T, U>
     {
         public nothrow inline bool operator()(const T& left, const U& right) const
         {

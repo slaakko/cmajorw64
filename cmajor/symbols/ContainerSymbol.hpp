@@ -12,6 +12,7 @@ namespace cmajor { namespace symbols {
 
 class FunctionGroupSymbol;
 class ConceptGroupSymbol;
+class ClassGroupTypeSymbol;
 
 class ContainerSymbol : public Symbol
 {
@@ -34,6 +35,7 @@ private:
     ContainerScope containerScope;
     FunctionGroupSymbol* MakeFunctionGroupSymbol(const std::u32string& groupName, const Span& span);
     ConceptGroupSymbol* MakeConceptGroupSymbol(const std::u32string& groupName, const Span& span);
+    ClassGroupTypeSymbol* MakeClassGroupTypeSymbol(const std::u32string& groupName, const Span& span);
 };
 
 class DeclarationBlock : public ContainerSymbol
