@@ -49,7 +49,9 @@ enum class SymbolType : uint8_t
     basicTypeReturn,
     basicTypeImplicitSignExtension, basicTypeImplicitZeroExtension, basicTypeExplicitSignExtension, basicTypeExplicitZeroExtension, basicTypeTruncation, basicTypeBitCast,
     basicTypeImplicitUnsignedIntToFloating, basicTypeImplicitSignedIntToFloating, basicTypeExplicitUnsignedIntToFloating, basicTypeExplicitSignedIntToFloating, 
-    basicTypeFloatingToUnsignedInt, basicTypeFloatingToSignedInt, basicTypeFloatingExtension, basicTypeFloatingTruncation, enumTypeToUnderlyingType, underlyingToEnumType,
+    basicTypeFloatingToUnsignedInt, basicTypeFloatingToSignedInt, basicTypeFloatingExtension, basicTypeFloatingTruncation, 
+    enumTypeDefaultConstructor, enumTypeCopyConstructor, enumTypeMoveConstructor, enumTypeCopyAssignment, enumTypeMoveAssignment, enumTypeReturn, enumTypeEquality, 
+    enumTypeToUnderlyingType, underlyingToEnumType,
     namespaceTypeSymbol, functionGroupTypeSymbol, memberExpressionTypeSymbol, valueSymbol,
     maxSymbol
 };
@@ -100,6 +102,7 @@ public:
     virtual void Read(SymbolReader& reader);
     virtual void EmplaceType(TypeSymbol* typeSymbol, int index) {}
     virtual void EmplaceConcept(ConceptSymbol* conceptSymbol) {}
+    virtual void EmplaceFunction(FunctionSymbol* functionSymbol, int index) {}
     virtual bool IsExportSymbol() const { return IsProject(); }
     virtual bool IsContainerSymbol() const { return false; }
     virtual bool IsFunctionSymbol() const { return false; }
@@ -154,6 +157,8 @@ public:
     ContainerSymbol* ClassOrNsNoThrow() ;
     const ContainerSymbol* ClassInterfaceOrNsNoThrow() const;
     ContainerSymbol* ClassInterfaceOrNsNoThrow();
+    const ContainerSymbol* ClassInterfaceEnumOrNsNoThrow() const;
+    ContainerSymbol* ClassInterfaceEnumOrNsNoThrow();
     const ClassTypeSymbol* Class() const;
     ClassTypeSymbol* Class();
     const ClassTypeSymbol* ContainingClassNoThrow() const;
@@ -172,6 +177,8 @@ public:
     ContainerScope* ClassOrNsScope();
     const ContainerScope* ClassInterfaceOrNsScope() const;
     ContainerScope* ClassInterfaceOrNsScope() ;
+    const ContainerScope* ClassInterfaceEnumOrNsScope() const;
+    ContainerScope* ClassInterfaceEnumOrNsScope();
     const SymbolTable* GetSymbolTable() const { return symbolTable; }
     SymbolTable* GetSymbolTable() { return symbolTable; }
     void SetSymbolTable(SymbolTable* symbolTable_) { symbolTable = symbolTable_; }

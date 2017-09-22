@@ -169,7 +169,397 @@ void EnumConstantSymbol::Read(SymbolReader& reader)
     value.reset(ReadValue(reader.GetBinaryReader()));
 }
 
-EnumTypeToUnderlyingTypeConversion::EnumTypeToUnderlyingTypeConversion(const Span& span_, const std::u32string& name_) : 
+EnumTypeDefaultConstructor::EnumTypeDefaultConstructor(const Span& span_, const std::u32string& name_) : 
+    FunctionSymbol(SymbolType::enumTypeDefaultConstructor, span_, name_), underlyingTypeDefaultConstructor(nullptr)
+{
+}
+
+EnumTypeDefaultConstructor::EnumTypeDefaultConstructor(EnumTypeSymbol* enumType_) : 
+    FunctionSymbol(SymbolType::enumTypeDefaultConstructor, enumType_->GetSpan(), U"enumTypeDefaultConstructor"), underlyingTypeDefaultConstructor(nullptr)
+{
+    SetGroupName(U"@constructor");
+    SetAccess(SymbolAccess::public_);
+    ParameterSymbol* thisParam = new ParameterSymbol(Span(), U"this");
+    thisParam->SetType(enumType_->AddPointer(Span()));
+    AddMember(thisParam);
+    ComputeName();
+    TypeSymbol* underlyingType = enumType_->UnderlyingType();
+    Assert(underlyingType->IsBasicTypeSymbol(), "basic type expected");
+    BasicTypeSymbol* basicTypeSymbol = static_cast<BasicTypeSymbol*>(underlyingType);
+    underlyingTypeDefaultConstructor = basicTypeSymbol->DefaultConstructor();
+}
+
+void EnumTypeDefaultConstructor::Write(SymbolWriter& writer) 
+{
+    FunctionSymbol::Write(writer);
+    Assert(underlyingTypeDefaultConstructor, "underlying default constructor not set");
+    uint32_t defaultConstructorId = underlyingTypeDefaultConstructor->FunctionId();
+    writer.GetBinaryWriter().WriteEncodedUInt(defaultConstructorId);
+}
+
+void EnumTypeDefaultConstructor::Read(SymbolReader& reader)
+{
+    FunctionSymbol::Read(reader);
+    uint32_t defaultConstructorId = reader.GetBinaryReader().ReadEncodedUInt();
+    GetSymbolTable()->EmplaceFunctionRequest(this, defaultConstructorId, 0);
+}
+
+void EnumTypeDefaultConstructor::EmplaceFunction(FunctionSymbol* functionSymbol, int index)
+{
+    if (index == 0)
+    {
+        underlyingTypeDefaultConstructor = functionSymbol;
+    }
+    else
+    {
+        Assert(false, "invalid emplace function index");
+    }
+}
+
+void EnumTypeDefaultConstructor::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags)
+{
+    Assert(underlyingTypeDefaultConstructor, "underlying default constructor not set");
+    underlyingTypeDefaultConstructor->GenerateCall(emitter, genObjects, flags);
+}
+
+EnumTypeCopyConstructor::EnumTypeCopyConstructor(const Span& span_, const std::u32string& name_) : 
+    FunctionSymbol(SymbolType::enumTypeCopyConstructor, span_, name_), underlyingTypeCopyConstructor(nullptr)
+{
+}
+
+EnumTypeCopyConstructor::EnumTypeCopyConstructor(EnumTypeSymbol* enumType_) : 
+    FunctionSymbol(SymbolType::enumTypeCopyConstructor, enumType_->GetSpan(), U"enumTypeCopyConstructor"), underlyingTypeCopyConstructor(nullptr)
+{
+    SetGroupName(U"@constructor");
+    SetAccess(SymbolAccess::public_);
+    ParameterSymbol* thisParam = new ParameterSymbol(Span(), U"this");
+    thisParam->SetType(enumType_->AddPointer(Span()));
+    AddMember(thisParam);
+    ParameterSymbol* thatParam = new ParameterSymbol(Span(), U"that");
+    thatParam->SetType(enumType_);
+    AddMember(thatParam);
+    ComputeName();
+    TypeSymbol* underlyingType = enumType_->UnderlyingType();
+    Assert(underlyingType->IsBasicTypeSymbol(), "basic type expected");
+    BasicTypeSymbol* basicTypeSymbol = static_cast<BasicTypeSymbol*>(underlyingType);
+    underlyingTypeCopyConstructor = basicTypeSymbol->CopyConstructor();
+}
+
+void EnumTypeCopyConstructor::Write(SymbolWriter& writer)
+{
+    FunctionSymbol::Write(writer);
+    Assert(underlyingTypeCopyConstructor, "underlying copy constructor not set");
+    uint32_t copyConstructorId = underlyingTypeCopyConstructor->FunctionId();
+    writer.GetBinaryWriter().WriteEncodedUInt(copyConstructorId);
+}
+
+void EnumTypeCopyConstructor::Read(SymbolReader& reader)
+{
+    FunctionSymbol::Read(reader);
+    uint32_t copyConstructorId = reader.GetBinaryReader().ReadEncodedUInt();
+    GetSymbolTable()->EmplaceFunctionRequest(this, copyConstructorId, 0);
+}
+
+void EnumTypeCopyConstructor::EmplaceFunction(FunctionSymbol* functionSymbol, int index)
+{
+    if (index == 0)
+    {
+        underlyingTypeCopyConstructor = functionSymbol;
+    }
+    else
+    {
+        Assert(false, "invalid emplace function index");
+    }
+}
+
+void EnumTypeCopyConstructor::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags)
+{
+    Assert(underlyingTypeCopyConstructor, "underlying copy constructor not set");
+    underlyingTypeCopyConstructor->GenerateCall(emitter, genObjects, flags);
+}
+
+EnumTypeMoveConstructor::EnumTypeMoveConstructor(const Span& span_, const std::u32string& name_) : 
+    FunctionSymbol(SymbolType::enumTypeMoveConstructor, span_, name_), underlyingTypeMoveConstructor(nullptr)
+{
+}
+
+EnumTypeMoveConstructor::EnumTypeMoveConstructor(EnumTypeSymbol* enumType_) : 
+    FunctionSymbol(SymbolType::enumTypeMoveConstructor, enumType_->GetSpan(), U"enumTypeMoveConstructor"), underlyingTypeMoveConstructor(nullptr)
+{
+    SetGroupName(U"@constructor");
+    SetAccess(SymbolAccess::public_);
+    ParameterSymbol* thisParam = new ParameterSymbol(Span(), U"this");
+    thisParam->SetType(enumType_->AddPointer(Span()));
+    AddMember(thisParam);
+    ParameterSymbol* thatParam = new ParameterSymbol(Span(), U"that");
+    thatParam->SetType(enumType_->AddRvalueReference(Span()));
+    AddMember(thatParam);
+    ComputeName();
+    TypeSymbol* underlyingType = enumType_->UnderlyingType();
+    Assert(underlyingType->IsBasicTypeSymbol(), "basic type expected");
+    BasicTypeSymbol* basicTypeSymbol = static_cast<BasicTypeSymbol*>(underlyingType);
+    underlyingTypeMoveConstructor = basicTypeSymbol->MoveConstructor();
+}
+
+void EnumTypeMoveConstructor::Write(SymbolWriter& writer)
+{
+    FunctionSymbol::Write(writer);
+    Assert(underlyingTypeMoveConstructor, "underlying move constructor not set");
+    uint32_t moveConstructorId = underlyingTypeMoveConstructor->FunctionId();
+    writer.GetBinaryWriter().WriteEncodedUInt(moveConstructorId);
+}
+
+void EnumTypeMoveConstructor::Read(SymbolReader& reader)
+{
+    FunctionSymbol::Read(reader);
+    uint32_t moveConstructorId = reader.GetBinaryReader().ReadEncodedUInt();
+    GetSymbolTable()->EmplaceFunctionRequest(this, moveConstructorId, 0);
+}
+
+void EnumTypeMoveConstructor::EmplaceFunction(FunctionSymbol* functionSymbol, int index)
+{
+    if (index == 0)
+    {
+        underlyingTypeMoveConstructor = functionSymbol;
+    }
+    else
+    {
+        Assert(false, "invalid emplace function index");
+    }
+}
+
+void EnumTypeMoveConstructor::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags)
+{
+    Assert(underlyingTypeMoveConstructor, "underlying move constructor not set");
+    underlyingTypeMoveConstructor->GenerateCall(emitter, genObjects, flags);
+}
+
+EnumTypeCopyAssignment::EnumTypeCopyAssignment(const Span& span_, const std::u32string& name_) : 
+    FunctionSymbol(SymbolType::enumTypeCopyAssignment, span_, name_), underlyingTypeCopyAssignment(nullptr)
+{
+}
+
+EnumTypeCopyAssignment::EnumTypeCopyAssignment(EnumTypeSymbol* enumType_, TypeSymbol* voidType_) :
+    FunctionSymbol(SymbolType::enumTypeCopyAssignment, enumType_->GetSpan(), U"enumTypeCopyAssignment"), underlyingTypeCopyAssignment(nullptr)
+{
+    SetGroupName(U"operator=");
+    SetAccess(SymbolAccess::public_);
+    ParameterSymbol* thisParam = new ParameterSymbol(Span(), U"this");
+    thisParam->SetType(enumType_->AddPointer(Span()));
+    AddMember(thisParam);
+    ParameterSymbol* thatParam = new ParameterSymbol(Span(), U"that");
+    thatParam->SetType(enumType_);
+    AddMember(thatParam);
+    SetReturnType(voidType_);
+    ComputeName();
+    TypeSymbol* underlyingType = enumType_->UnderlyingType();
+    Assert(underlyingType->IsBasicTypeSymbol(), "basic type expected");
+    BasicTypeSymbol* basicTypeSymbol = static_cast<BasicTypeSymbol*>(underlyingType);
+    underlyingTypeCopyAssignment = basicTypeSymbol->CopyAssignment();
+}
+
+void EnumTypeCopyAssignment::Write(SymbolWriter& writer)
+{
+    FunctionSymbol::Write(writer);
+    Assert(underlyingTypeCopyAssignment, "underlying copy assignment not set");
+    uint32_t copyAssignmentId = underlyingTypeCopyAssignment->FunctionId();
+    writer.GetBinaryWriter().WriteEncodedUInt(copyAssignmentId);
+}
+
+void EnumTypeCopyAssignment::Read(SymbolReader& reader)
+{
+    FunctionSymbol::Read(reader);
+    uint32_t copyAssignmentId = reader.GetBinaryReader().ReadEncodedUInt();
+    GetSymbolTable()->EmplaceFunctionRequest(this, copyAssignmentId, 0);
+}
+
+void EnumTypeCopyAssignment::EmplaceFunction(FunctionSymbol* functionSymbol, int index)
+{
+    if (index == 0)
+    {
+        underlyingTypeCopyAssignment = functionSymbol;
+    }
+    else
+    {
+        Assert(false, "invalid emplace function index");
+    }
+}
+
+void EnumTypeCopyAssignment::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags)
+{
+    Assert(underlyingTypeCopyAssignment, "underlying copy assignment not set");
+    underlyingTypeCopyAssignment->GenerateCall(emitter, genObjects, flags);
+}
+
+EnumTypeMoveAssignment::EnumTypeMoveAssignment(const Span& span_, const std::u32string& name_) : 
+    FunctionSymbol(SymbolType::enumTypeMoveAssignment, span_, name_), underlyingTypeMoveAssignment(nullptr)
+{
+}
+
+EnumTypeMoveAssignment::EnumTypeMoveAssignment(EnumTypeSymbol* enumType_, TypeSymbol* voidType_) : 
+    FunctionSymbol(SymbolType::enumTypeMoveAssignment, enumType_->GetSpan(), U"enumTypeMoveAssignment"), underlyingTypeMoveAssignment(nullptr)
+{
+    SetGroupName(U"operator=");
+    SetAccess(SymbolAccess::public_);
+    ParameterSymbol* thisParam = new ParameterSymbol(Span(), U"this");
+    thisParam->SetType(enumType_->AddPointer(Span()));
+    AddMember(thisParam);
+    ParameterSymbol* thatParam = new ParameterSymbol(Span(), U"that");
+    thatParam->SetType(enumType_->AddRvalueReference(Span()));
+    AddMember(thatParam);
+    SetReturnType(voidType_);
+    ComputeName();
+    TypeSymbol* underlyingType = enumType_->UnderlyingType();
+    Assert(underlyingType->IsBasicTypeSymbol(), "basic type expected");
+    BasicTypeSymbol* basicTypeSymbol = static_cast<BasicTypeSymbol*>(underlyingType);
+    underlyingTypeMoveAssignment = basicTypeSymbol->MoveAssignment();
+}
+
+void EnumTypeMoveAssignment::Write(SymbolWriter& writer)
+{
+    FunctionSymbol::Write(writer);
+    Assert(underlyingTypeMoveAssignment, "underlying move assignment not set");
+    uint32_t moveAssignmentId = underlyingTypeMoveAssignment->FunctionId();
+    writer.GetBinaryWriter().WriteEncodedUInt(moveAssignmentId);
+}
+
+void EnumTypeMoveAssignment::Read(SymbolReader& reader)
+{
+    FunctionSymbol::Read(reader);
+    uint32_t moveAssignmentId = reader.GetBinaryReader().ReadEncodedUInt();
+    GetSymbolTable()->EmplaceFunctionRequest(this, moveAssignmentId, 0);
+}
+
+void EnumTypeMoveAssignment::EmplaceFunction(FunctionSymbol* functionSymbol, int index)
+{
+    if (index == 0)
+    {
+        underlyingTypeMoveAssignment = functionSymbol;
+    }
+    else
+    {
+        Assert(false, "invalid emplace function index");
+    }
+}
+
+void EnumTypeMoveAssignment::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags)
+{
+    Assert(underlyingTypeMoveAssignment, "underlying move assignment not set");
+    underlyingTypeMoveAssignment->GenerateCall(emitter, genObjects, flags);
+}
+
+EnumTypeReturn::EnumTypeReturn(const Span& span_, const std::u32string& name_) : 
+    FunctionSymbol(SymbolType::enumTypeReturn, span_, name_), underlyingTypeReturn(nullptr)
+{
+}
+
+EnumTypeReturn::EnumTypeReturn(EnumTypeSymbol* enumType_) : 
+    FunctionSymbol(SymbolType::enumTypeReturn, enumType_->GetSpan(), U"enumTypeReturn"), underlyingTypeReturn(nullptr)
+{
+    SetGroupName(U"@return");
+    SetAccess(SymbolAccess::public_);
+    ParameterSymbol* valueParam = new ParameterSymbol(Span(), U"value");
+    valueParam->SetType(enumType_);
+    AddMember(valueParam);
+    SetReturnType(enumType_);
+    ComputeName();
+    TypeSymbol* underlyingType = enumType_->UnderlyingType();
+    Assert(underlyingType->IsBasicTypeSymbol(), "basic type expected");
+    BasicTypeSymbol* basicTypeSymbol = static_cast<BasicTypeSymbol*>(underlyingType);
+    underlyingTypeReturn = basicTypeSymbol->ReturnFun();
+}
+
+void EnumTypeReturn::Write(SymbolWriter& writer)
+{
+    FunctionSymbol::Write(writer);
+    Assert(underlyingTypeReturn, "underlying return not set");
+    uint32_t returnId = underlyingTypeReturn->FunctionId();
+    writer.GetBinaryWriter().WriteEncodedUInt(returnId);
+}
+
+void EnumTypeReturn::Read(SymbolReader& reader)
+{
+    FunctionSymbol::Read(reader);
+    uint32_t returnId = reader.GetBinaryReader().ReadEncodedUInt();
+    GetSymbolTable()->EmplaceFunctionRequest(this, returnId, 0);
+}
+
+void EnumTypeReturn::EmplaceFunction(FunctionSymbol* functionSymbol, int index)
+{
+    if (index == 0)
+    {
+        underlyingTypeReturn = functionSymbol;
+    }
+    else
+    {
+        Assert(false, "invalid emplace function index");
+    }
+}
+
+void EnumTypeReturn::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags)
+{
+    Assert(underlyingTypeReturn, "underlying return not set");
+    underlyingTypeReturn->GenerateCall(emitter, genObjects, flags);
+}
+
+EnumTypeEqualityOp::EnumTypeEqualityOp(const Span& span_, const std::u32string& name_) : 
+    FunctionSymbol(SymbolType::enumTypeEquality, span_, name_), underlyingTypeEquality(nullptr)
+{
+}
+
+EnumTypeEqualityOp::EnumTypeEqualityOp(EnumTypeSymbol* enumType_, TypeSymbol* boolType_) : 
+    FunctionSymbol(SymbolType::enumTypeEquality, enumType_->GetSpan(), U"enumTypeEquality"), underlyingTypeEquality(nullptr)
+{
+    SetGroupName(U"operator==");
+    SetAccess(SymbolAccess::public_);
+    ParameterSymbol* leftParam = new ParameterSymbol(enumType_->GetSpan(), U"left");
+    leftParam->SetType(enumType_);
+    AddMember(leftParam);
+    ParameterSymbol* rightParam = new ParameterSymbol(enumType_->GetSpan(), U"right");
+    rightParam->SetType(enumType_);
+    AddMember(rightParam);
+    SetReturnType(boolType_);
+    ComputeName();
+    TypeSymbol* underlyingType = enumType_->UnderlyingType();
+    Assert(underlyingType->IsBasicTypeSymbol(), "basic type expected");
+    BasicTypeSymbol* basicTypeSymbol = static_cast<BasicTypeSymbol*>(underlyingType);
+    underlyingTypeEquality = basicTypeSymbol->EqualityOp();
+}
+
+void EnumTypeEqualityOp::Write(SymbolWriter& writer)
+{
+    FunctionSymbol::Write(writer);
+    Assert(underlyingTypeEquality, "underlying equality not set");
+    uint32_t equalityId = underlyingTypeEquality->FunctionId();
+    writer.GetBinaryWriter().WriteEncodedUInt(equalityId);
+}
+
+void EnumTypeEqualityOp::Read(SymbolReader& reader)
+{
+    FunctionSymbol::Read(reader);
+    uint32_t equalityId = reader.GetBinaryReader().ReadEncodedUInt();
+    GetSymbolTable()->EmplaceFunctionRequest(this, equalityId, 0);
+}
+
+void EnumTypeEqualityOp::EmplaceFunction(FunctionSymbol* functionSymbol, int index)
+{
+    if (index == 0)
+    {
+        underlyingTypeEquality = functionSymbol;
+    }
+    else
+    {
+        Assert(false, "invalid emplace function index");
+    }
+}
+
+void EnumTypeEqualityOp::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags)
+{
+    Assert(underlyingTypeEquality, "underlying equality not set");
+    underlyingTypeEquality->GenerateCall(emitter, genObjects, flags);
+}
+
+EnumTypeToUnderlyingTypeConversion::EnumTypeToUnderlyingTypeConversion(const Span& span_, const std::u32string& name_) :
     FunctionSymbol(SymbolType::enumTypeToUnderlyingType, span_, name_), sourceType(), targetType()
 {
 }

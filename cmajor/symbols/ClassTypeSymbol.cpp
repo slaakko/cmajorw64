@@ -188,7 +188,7 @@ void ClassTypeSymbol::Read(SymbolReader& reader)
                 vmt[memberFunction->VmtIndex()] = memberFunction;
             }
         }
-        if (IsPolymorphic())
+        if (IsPolymorphic() && !IsPrototypeTemplateSpecialization())
         {
             GetSymbolTable()->AddPolymorphicClass(this);
         }
@@ -467,12 +467,19 @@ void ClassTypeSymbol::CreateDestructorSymbol()
 {
     if (!destructor)
     {
-        AddMember(new DestructorSymbol(GetSpan(), U"@destructor"));
-        Assert(destructor, "destructor expected");
+        DestructorSymbol* destructorSymbol = new DestructorSymbol(GetSpan(), U"@destructor");
+        GetSymbolTable()->SetFunctionIdFor(destructorSymbol);
+        destructorSymbol->SetGenerated();
         ParameterSymbol* thisParam = new ParameterSymbol(GetSpan(), U"this");
         thisParam->SetType(AddPointer(GetSpan()));
-        destructor->SetAccess(SymbolAccess::public_);
-        destructor->AddMember(thisParam);
+        destructorSymbol->SetAccess(SymbolAccess::public_);
+        destructorSymbol->AddMember(thisParam);
+        AddMember(destructorSymbol);
+        Assert(destructor, "destructor expected");
+        if (GetSymbolType() == SymbolType::classTemplateSpecializationSymbol)
+        {
+            destructor->SetLinkOnceOdrLinkage();
+        }
         destructor->ComputeName();
     }
 }
@@ -546,7 +553,6 @@ void ClassTypeSymbol::SetSpecifiers(Specifiers specifiers)
     if ((specifiers & Specifiers::static_) != Specifiers::none)
     {
         SetStatic();
-        SetDontCreateDefaultConstructor();
     }
     if ((specifiers & Specifiers::virtual_) != Specifiers::none)
     {

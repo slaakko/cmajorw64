@@ -4,15 +4,125 @@
 // =================================
 
 #include <cmajor/symbols/BasicTypeSymbol.hpp>
+#include <cmajor/symbols/SymbolWriter.hpp>
+#include <cmajor/symbols/SymbolReader.hpp>
+#include <cmajor/symbols/SymbolTable.hpp>
 #include <cmajor/symbols/SymbolCollector.hpp>
 #include <cmajor/util/Unicode.hpp>
 
 namespace cmajor { namespace symbols {
 
-    using namespace cmajor::unicode;
+using namespace cmajor::unicode;
 
-BasicTypeSymbol::BasicTypeSymbol(SymbolType symbolType_, const Span& span_, const std::u32string& name_) : TypeSymbol(symbolType_, span_, name_)
+BasicTypeSymbol::BasicTypeSymbol(SymbolType symbolType_, const Span& span_, const std::u32string& name_) : 
+    TypeSymbol(symbolType_, span_, name_), 
+    defaultConstructor(nullptr), copyConstructor(nullptr), moveConstructor(nullptr), copyAssignment(nullptr), moveAssignment(nullptr), returnFun(nullptr), equalityOp(nullptr)
 {
+}
+
+void BasicTypeSymbol::Write(SymbolWriter& writer)
+{
+    TypeSymbol::Write(writer);
+    uint32_t defaultConstructorId = 0;
+    if (defaultConstructor)
+    {
+        defaultConstructorId = defaultConstructor->FunctionId();
+    }
+    writer.GetBinaryWriter().WriteEncodedUInt(defaultConstructorId);
+    uint32_t copyConstructorId = 0;
+    if (copyConstructor)
+    {
+        copyConstructorId = copyConstructor->FunctionId();
+    }
+    writer.GetBinaryWriter().WriteEncodedUInt(copyConstructorId);
+    uint32_t moveConstructorId = 0;
+    if (moveConstructor)
+    {
+        moveConstructorId = moveConstructor->FunctionId();
+    }
+    writer.GetBinaryWriter().WriteEncodedUInt(moveConstructorId);
+    uint32_t copyAssignmentId = 0;
+    if (copyAssignment)
+    {
+        copyAssignmentId = copyAssignment->FunctionId();
+    }
+    writer.GetBinaryWriter().WriteEncodedUInt(copyAssignmentId);
+    uint32_t moveAssignmentId = 0;
+    if (moveAssignment)
+    {
+        moveAssignmentId = moveAssignment->FunctionId();
+    }
+    writer.GetBinaryWriter().WriteEncodedUInt(moveAssignmentId);
+    uint32_t returnId = 0;
+    if (returnFun)
+    {
+        returnId = returnFun->FunctionId();
+    }
+    writer.GetBinaryWriter().WriteEncodedUInt(returnId);
+    uint32_t equalityOpId = 0;
+    if (equalityOp)
+    {
+        equalityOpId = equalityOp->FunctionId();
+    }
+    writer.GetBinaryWriter().WriteEncodedUInt(equalityOpId);
+}
+
+void BasicTypeSymbol::Read(SymbolReader& reader)
+{
+    TypeSymbol::Read(reader);
+    uint32_t defaultConstructorId = reader.GetBinaryReader().ReadEncodedUInt();
+    if (defaultConstructorId != 0)
+    {
+        GetSymbolTable()->EmplaceFunctionRequest(this, defaultConstructorId, 0);
+    }
+    uint32_t copyConstructorId = reader.GetBinaryReader().ReadEncodedUInt();
+    if (copyConstructorId != 0)
+    {
+        GetSymbolTable()->EmplaceFunctionRequest(this, copyConstructorId, 1);
+    }
+    uint32_t moveConstructorId = reader.GetBinaryReader().ReadEncodedUInt();
+    if (moveConstructorId != 0)
+    {
+        GetSymbolTable()->EmplaceFunctionRequest(this, moveConstructorId, 2);
+    }
+    uint32_t copyAssignmentId = reader.GetBinaryReader().ReadEncodedUInt();
+    if (copyAssignmentId != 0)
+    {
+        GetSymbolTable()->EmplaceFunctionRequest(this, copyAssignmentId, 3);
+    }
+    uint32_t moveAssignmentId = reader.GetBinaryReader().ReadEncodedUInt();
+    if (moveAssignmentId != 0)
+    {
+        GetSymbolTable()->EmplaceFunctionRequest(this, moveAssignmentId, 4);
+    }
+    uint32_t returnId = reader.GetBinaryReader().ReadEncodedUInt();
+    if (returnId != 0)
+    {
+        GetSymbolTable()->EmplaceFunctionRequest(this, returnId, 5);
+    }
+    uint32_t equalityOpId = reader.GetBinaryReader().ReadEncodedUInt();
+    if (equalityOpId != 0)
+    {
+        GetSymbolTable()->EmplaceFunctionRequest(this, equalityOpId, 6);
+    }
+}
+
+void BasicTypeSymbol::EmplaceFunction(FunctionSymbol* functionSymbol, int index)
+{
+    switch (index)
+    {
+        case 0: defaultConstructor = functionSymbol; break;
+        case 1: copyConstructor = functionSymbol; break;
+        case 2: moveConstructor = functionSymbol; break;
+        case 3: copyAssignment = functionSymbol; break;
+        case 4: moveAssignment = functionSymbol; break;
+        case 5: returnFun = functionSymbol; break;
+        case 6: equalityOp = functionSymbol; break;
+        default:
+        {
+            Assert(false, "invalid emplace function index");
+        }
+    }
 }
 
 void BasicTypeSymbol::Accept(SymbolCollector* collector)

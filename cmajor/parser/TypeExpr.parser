@@ -20,6 +20,8 @@ namespace cmajor.parser
         using IdentifierGrammar.Identifier;
         using BasicTypeGrammar.BasicType;
         using ExpressionGrammar.Expression;
+        using stdlib.spaces;
+        skip spaces;
         
         TypeExpr(ParsingContext* ctx) : Node*
             ::= PrefixTypeExpr(ctx){ value = PrefixTypeExpr; }

@@ -783,7 +783,7 @@ void ConstraintChecker::Visit(ConstructorConstraintNode& constructorConstraintNo
     }
     std::vector<FunctionScopeLookup> lookups;
     lookups.push_back(FunctionScopeLookup(ScopeLookup::this_and_base_and_parent, containerScope));
-    lookups.push_back(FunctionScopeLookup(ScopeLookup::this_, firstTypeArgument->BaseType()->ClassInterfaceOrNsScope()));
+    lookups.push_back(FunctionScopeLookup(ScopeLookup::this_, firstTypeArgument->BaseType()->ClassInterfaceEnumOrNsScope()));
     std::vector<TypeSymbol*> templateArgumentTypes;
     std::unique_ptr<Exception> exception;
     std::unique_ptr<BoundFunctionCall> constructorCall = ResolveOverload(U"@constructor", containerScope, lookups, arguments, boundCompileUnit, currentFunction, span,
@@ -888,7 +888,7 @@ void ConstraintChecker::Visit(FunctionConstraintNode& functionConstraintNode)
     std::vector<TypeSymbol*> parameterTypes;
     std::vector<FunctionScopeLookup> lookups;
     lookups.push_back(FunctionScopeLookup(ScopeLookup::this_and_base_and_parent, containerScope));
-    lookups.push_back(FunctionScopeLookup(ScopeLookup::this_, firstTypeArgument->BaseType()->ClassInterfaceOrNsScope()));
+    lookups.push_back(FunctionScopeLookup(ScopeLookup::this_, firstTypeArgument->BaseType()->ClassInterfaceEnumOrNsScope()));
     int n = functionConstraintNode.Parameters().Count();
     for (int i = 0; i < n; ++i)
     {
@@ -931,7 +931,7 @@ void ConstraintChecker::Visit(FunctionConstraintNode& functionConstraintNode)
             {
                 ParameterNode* parameterNode = functionConstraintNode.Parameters()[i];
                 TypeSymbol* parameterType = ResolveType(parameterNode->TypeExpr(), boundCompileUnit, containerScope);
-                lookups.push_back(FunctionScopeLookup(ScopeLookup::this_and_base_and_parent, parameterType->BaseType()->ClassInterfaceOrNsScope()));
+                lookups.push_back(FunctionScopeLookup(ScopeLookup::this_and_base_and_parent, parameterType->BaseType()->ClassInterfaceEnumOrNsScope()));
                 parameterTypes.push_back(parameterType);
                 arguments.push_back(std::unique_ptr<BoundExpression>(new BoundTypeExpression(span, parameterType)));
             }

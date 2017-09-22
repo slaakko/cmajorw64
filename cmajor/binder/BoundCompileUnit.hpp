@@ -34,6 +34,7 @@ public:
     CompileUnitNode* GetCompileUnitNode() const { return compileUnitNode; }
     void AddFileScope(FileScope* fileScope);
     void RemoveLastFileScope();
+    FileScope* ReleaseLastFileScope();
     FileScope* FirstFileScope() const { Assert(!fileScopes.empty(), "file scopes empty");  return fileScopes.front().get(); }
     const std::vector<std::unique_ptr<FileScope>>& FileScopes() const { return fileScopes; }
     void AddBoundNode(std::unique_ptr<BoundNode>&& boundNode);
@@ -58,6 +59,10 @@ public:
     bool HasGotos() const { return hasGotos; }
     ClassTemplateRepository& GetClassTemplateRepository() { return classTemplateRepository; }
     ConceptRepository& GetConceptRepository() { return conceptRepository; }
+    void PushBindingTypes();
+    void PopBindingTypes();
+    bool BindingTypes() const { return bindingTypes; }
+    void FinalizeBinding(ClassTypeSymbol* classType);
 private:
     Module& module;
     SymbolTable& symbolTable;
@@ -77,6 +82,8 @@ private:
     StringRepository<std::u32string> utf32StringRepository;
     ConceptRepository conceptRepository;
     ConversionTable conversionTable;
+    bool bindingTypes;
+    std::stack<bool> bindingTypesStack;
 };
 
 } } // namespace cmajor::binder

@@ -109,6 +109,8 @@ public:
     bool IsMoveConstructor() const;
     bool IsCopyAssignment() const;
     bool IsMoveAssignment() const;
+    uint32_t FunctionId() const { Assert(functionId != 0, "function id not initialized");  return functionId; }
+    void SetFunctionId(uint32_t functionId_) { functionId = functionId_; }
     const std::u32string& GroupName() const { return groupName; }
     void SetGroupName(const std::u32string& groupName_);
     const std::vector<TemplateParameterSymbol*>& TemplateParameters() const { return templateParameters; }
@@ -169,6 +171,7 @@ public:
     int32_t ImtIndex() const { return imtIndex; }
     void SetImtIndex(int32_t imtIndex_) { imtIndex = imtIndex_; }
 private:
+    uint32_t functionId;
     std::u32string groupName;
     std::vector<TemplateParameterSymbol*> templateParameters;
     std::vector<ParameterSymbol*> parameters;
@@ -215,11 +218,17 @@ class DestructorSymbol : public FunctionSymbol
 {
 public:
     DestructorSymbol(const Span& span_, const std::u32string& name_);
+    void Write(SymbolWriter& writer) override;
+    void Read(SymbolReader& reader) override;
     std::string TypeString() const override { return "destructor"; }
     ParameterSymbol* GetThisParam() const override { return Parameters()[0]; }
     bool IsConstructorDestructorOrNonstaticMemberFunction() const override { return true; }
+    bool IsGeneratedFunction() const { return generated; }
     bool DontThrow() const override { return true; }
     void SetSpecifiers(Specifiers specifiers);
+    void SetGenerated() { generated = true; }
+private:
+    bool generated;
 };
 
 class MemberFunctionSymbol : public FunctionSymbol

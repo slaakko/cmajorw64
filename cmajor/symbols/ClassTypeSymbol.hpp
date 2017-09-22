@@ -44,7 +44,7 @@ enum class ClassTypeSymbolFlags : uint8_t
     layoutsComputed = 1 << 4,
     vmtObjectCreated = 1 << 5,
     staticObjectCreated = 1 << 6,
-    dontCreateDefaultConstructor = 1 << 7
+    statementsNotBound = 1 << 7
 };
 
 inline ClassTypeSymbolFlags operator|(ClassTypeSymbolFlags left, ClassTypeSymbolFlags right)
@@ -86,6 +86,7 @@ public:
     bool HasNontrivialDestructor() const override;
     void Accept(SymbolCollector* collector) override;
     void Dump(CodeFormatter& formatter) override;
+    virtual bool IsPrototypeTemplateSpecialization() const { return false; }
     void CreateDestructorSymbol();
     const std::u32string& GroupName() const { return groupName; }
     void SetGroupName(const std::u32string& groupName_);
@@ -138,11 +139,13 @@ public:
     void SetVmtObjectCreated() { SetFlag(ClassTypeSymbolFlags::vmtObjectCreated); }
     bool IsStaticObjectCreated() const { return GetFlag(ClassTypeSymbolFlags::staticObjectCreated); }
     void SetStaticObjectCreated() { SetFlag(ClassTypeSymbolFlags::staticObjectCreated); }
-    bool DontCreateDefaultConstructor() const { return GetFlag(ClassTypeSymbolFlags::dontCreateDefaultConstructor); }
-    void SetDontCreateDefaultConstructor() { SetFlag(ClassTypeSymbolFlags::dontCreateDefaultConstructor); }
+    bool StatementsNotBound() const { return GetFlag(ClassTypeSymbolFlags::statementsNotBound); }
+    void SetStatementsNotBound() { SetFlag(ClassTypeSymbolFlags::statementsNotBound); }
+    void ResetStatementsNotBound() { ResetFlag(ClassTypeSymbolFlags::statementsNotBound); }
     ClassTypeSymbolFlags GetClassTypeSymbolFlags() const { return flags; }
     bool GetFlag(ClassTypeSymbolFlags flag) const { return (flags & flag) != ClassTypeSymbolFlags::none; }
     void SetFlag(ClassTypeSymbolFlags flag) { flags = flags | flag; }
+    void ResetFlag(ClassTypeSymbolFlags flag) { flags = flags & (~flag); }
     void InitVmt();
     void InitImts();
     void CreateLayouts();

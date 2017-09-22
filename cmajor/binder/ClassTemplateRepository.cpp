@@ -164,6 +164,10 @@ void ClassTemplateRepository::BindClassTemplateSpecialization(ClassTemplateSpeci
         boundTemplateParameter->SetType(templateArgumentType);
         classTemplateSpecialization->AddMember(boundTemplateParameter);
     }
+    if (templateParameterBinding)
+    {
+        classTemplateSpecialization->SetPrototype();
+    }
     symbolTable.SetCurrentCompileUnit(boundCompileUnit.GetCompileUnitNode());
     SymbolCreatorVisitor symbolCreatorVisitor(symbolTable);
     symbolCreatorVisitor.SetClassInstanceNode(classInstanceNode);
@@ -177,6 +181,16 @@ void ClassTemplateRepository::BindClassTemplateSpecialization(ClassTemplateSpeci
         if (fileScopeAdded)
         {
             boundCompileUnit.RemoveLastFileScope();
+        }
+    }
+    else if (boundCompileUnit.BindingTypes())
+    {
+        classTemplateSpecialization->SetGlobalNs(std::move(globalNs));
+        classTemplateSpecialization->SetStatementsNotBound();
+        if (fileScopeAdded)
+        {
+            FileScope* fileScope = boundCompileUnit.ReleaseLastFileScope();
+            classTemplateSpecialization->SetFileScope(fileScope);
         }
     }
     else
@@ -199,6 +213,7 @@ void ClassTemplateRepository::Instantiate(FunctionSymbol* memberFunction, Contai
     Symbol* parent = memberFunction->Parent();
     Assert(parent->GetSymbolType() == SymbolType::classTemplateSpecializationSymbol, "class template specialization expected");
     ClassTemplateSpecializationSymbol* classTemplateSpecialization = static_cast<ClassTemplateSpecializationSymbol*>(parent);
+    boundCompileUnit.FinalizeBinding(classTemplateSpecialization);
     ClassTypeSymbol* classTemplate = classTemplateSpecialization->GetClassTemplate();
     FileScope* fileScope = new FileScope();
     int nu = classTemplate->UsingNodes().Count();
@@ -280,11 +295,17 @@ void ClassTemplateRepository::InstantiateDestructorAndVirtualFunctions(ClassTemp
 {
     for (FunctionSymbol* virtualMemberFunction : classTemplateSpecialization->Vmt())
     {
-        Instantiate(virtualMemberFunction, containerScope, span);
+        if (!virtualMemberFunction->IsGeneratedFunction())
+        {
+            Instantiate(virtualMemberFunction, containerScope, span);
+        }
     }
     if (classTemplateSpecialization->Destructor())
     {
-        Instantiate(classTemplateSpecialization->Destructor(), containerScope, span);
+        if (!classTemplateSpecialization->Destructor()->IsGeneratedFunction())
+        {
+            Instantiate(classTemplateSpecialization->Destructor(), containerScope, span);
+        }
     }
 }
 

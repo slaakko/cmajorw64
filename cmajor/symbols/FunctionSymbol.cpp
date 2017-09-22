@@ -192,13 +192,13 @@ std::string FunctionSymbolFlagStr(FunctionSymbolFlags flags)
 }
 
 FunctionSymbol::FunctionSymbol(const Span& span_, const std::u32string& name_) : 
-    ContainerSymbol(SymbolType::functionSymbol, span_, name_), groupName(), parameters(), localVariables(), returnType(), flags(FunctionSymbolFlags::none), vmtIndex(-1), imtIndex(-1), 
+    ContainerSymbol(SymbolType::functionSymbol, span_, name_), functionId(0), groupName(), parameters(), localVariables(), returnType(), flags(FunctionSymbolFlags::none), vmtIndex(-1), imtIndex(-1),
     irType(nullptr), nextTemporaryIndex(0)
 {
 }
 
 FunctionSymbol::FunctionSymbol(SymbolType symbolType_, const Span& span_, const std::u32string& name_) : 
-    ContainerSymbol(symbolType_, span_, name_), groupName(), parameters(), localVariables(), returnType(), flags(FunctionSymbolFlags::none), vmtIndex(-1), imtIndex(-1), 
+    ContainerSymbol(symbolType_, span_, name_), functionId(0), groupName(), parameters(), localVariables(), returnType(), flags(FunctionSymbolFlags::none), vmtIndex(-1), imtIndex(-1),
     irType(nullptr), nextTemporaryIndex(0), sizeOfAstNodes(0), astNodesPos(0)
 {
 }
@@ -206,6 +206,8 @@ FunctionSymbol::FunctionSymbol(SymbolType symbolType_, const Span& span_, const 
 void FunctionSymbol::Write(SymbolWriter& writer)
 {
     ContainerSymbol::Write(writer);
+    Assert(functionId != 0, "function id not initialized");
+    writer.GetBinaryWriter().WriteEncodedUInt(functionId);
     writer.GetBinaryWriter().Write(groupName);
     writer.GetBinaryWriter().Write(static_cast<uint16_t>(flags));
     if (IsFunctionTemplate() || (GetGlobalFlag(GlobalFlags::release) && IsInline()))
@@ -251,6 +253,8 @@ void FunctionSymbol::Write(SymbolWriter& writer)
 void FunctionSymbol::Read(SymbolReader& reader)
 {
     ContainerSymbol::Read(reader);
+    functionId = reader.GetBinaryReader().ReadEncodedUInt();
+    GetSymbolTable()->AddFunctionSymbolToFunctionIdMap(this);
     groupName = reader.GetBinaryReader().ReadUtf32String();
     flags = static_cast<FunctionSymbolFlags>(reader.GetBinaryReader().ReadUShort());
     if (IsFunctionTemplate() || (GetGlobalFlag(GlobalFlags::release) && IsInline()))
@@ -1152,9 +1156,21 @@ void ConstructorSymbol::SetSpecifiers(Specifiers specifiers)
     }
 }
 
-DestructorSymbol::DestructorSymbol(const Span& span_, const std::u32string& name_) : FunctionSymbol(SymbolType::destructorSymbol, span_, name_)
+DestructorSymbol::DestructorSymbol(const Span& span_, const std::u32string& name_) : FunctionSymbol(SymbolType::destructorSymbol, span_, name_), generated(false)
 {
     SetGroupName(U"@destructor");
+}
+
+void DestructorSymbol::Write(SymbolWriter& writer)
+{
+    FunctionSymbol::Write(writer);
+    writer.GetBinaryWriter().Write(generated);
+}
+
+void DestructorSymbol::Read(SymbolReader& reader)
+{
+    FunctionSymbol::Read(reader);
+    generated = reader.GetBinaryReader().ReadBool();
 }
 
 void DestructorSymbol::SetSpecifiers(Specifiers specifiers)

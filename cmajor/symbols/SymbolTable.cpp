@@ -43,6 +43,22 @@ TypeIdCounter::TypeIdCounter() : nextTypeId(1)
 {
 }
 
+void FunctionIdCounter::Init()
+{
+    instance.reset(new FunctionIdCounter());
+}
+
+void FunctionIdCounter::Done()
+{
+    instance.reset();
+}
+
+std::unique_ptr<FunctionIdCounter> FunctionIdCounter::instance;
+
+FunctionIdCounter::FunctionIdCounter() : nextFunctionId(1)
+{
+}
+
 bool operator==(const ClassTemplateSpecializationKey& left, const ClassTemplateSpecializationKey& right)
 {
     if (!TypesEqual(left.classTemplate, right.classTemplate)) return false;
@@ -118,7 +134,7 @@ void SymbolTable::Read(SymbolReader& reader)
         classTemplateSpecializations.push_back(std::unique_ptr<ClassTemplateSpecializationSymbol>(classTemplateSpecialization));
         reader.AddClassTemplateSpecialization(classTemplateSpecialization);
     }
-    ProcessTypeAndConceptRequests();
+    ProcessTypeConceptAndFunctionRequests();
     for (FunctionSymbol* conversion : reader.Conversions())
     {
         AddConversion(conversion);
@@ -146,6 +162,11 @@ void SymbolTable::Import(SymbolTable& symbolTable)
         {
             Assert(false, "type or concept symbol expected");
         }
+    }
+    for (const auto& pair : symbolTable.functionIdMap)
+    {
+        FunctionSymbol* function = pair.second;
+        functionIdMap[function->FunctionId()] = function;
     }
     for (auto& derivedType : symbolTable.derivedTypes)
     {
@@ -204,6 +225,7 @@ void SymbolTable::Clear()
 {
     globalNs.Clear();
     typeIdMap.clear();
+    functionIdMap.clear();
     typeNameMap.clear();
 }
 
@@ -267,6 +289,7 @@ void SymbolTable::EndNamespace()
 void SymbolTable::BeginFunction(FunctionNode& functionNode)
 {
     FunctionSymbol* functionSymbol = new FunctionSymbol(functionNode.GetSpan(), functionNode.GroupId());
+    SetFunctionIdFor(functionSymbol);
     functionSymbol->SetCompileUnit(currentCompileUnit);
     functionSymbol->SetSymbolTable(this);
     functionSymbol->SetGroupName(functionNode.GroupId());
@@ -411,6 +434,7 @@ void SymbolTable::EndInterface()
 void SymbolTable::BeginStaticConstructor(StaticConstructorNode& staticConstructorNode)
 {
     StaticConstructorSymbol* staticConstructorSymbol = new StaticConstructorSymbol(staticConstructorNode.GetSpan(), U"@static_constructor");
+    SetFunctionIdFor(staticConstructorSymbol);
     staticConstructorSymbol->SetCompileUnit(currentCompileUnit);
     staticConstructorSymbol->SetSymbolTable(this);
     MapNode(&staticConstructorNode, staticConstructorSymbol);
@@ -431,6 +455,7 @@ void SymbolTable::EndStaticConstructor()
 void SymbolTable::BeginConstructor(ConstructorNode& constructorNode)
 {
     ConstructorSymbol* constructorSymbol = new ConstructorSymbol(constructorNode.GetSpan(), U"@constructor");
+    SetFunctionIdFor(constructorSymbol);
     constructorSymbol->SetCompileUnit(currentCompileUnit);
     constructorSymbol->SetSymbolTable(this);
     MapNode(&constructorNode, constructorSymbol);
@@ -466,6 +491,7 @@ void SymbolTable::EndConstructor()
 void SymbolTable::BeginDestructor(DestructorNode& destructorNode)
 {
     DestructorSymbol* destructorSymbol = new DestructorSymbol(destructorNode.GetSpan(), U"@destructor");
+    SetFunctionIdFor(destructorSymbol);
     destructorSymbol->SetCompileUnit(currentCompileUnit);
     destructorSymbol->SetSymbolTable(this);
     MapNode(&destructorNode, destructorSymbol);
@@ -500,6 +526,7 @@ void SymbolTable::EndDestructor()
 void SymbolTable::BeginMemberFunction(MemberFunctionNode& memberFunctionNode)
 {
     MemberFunctionSymbol* memberFunctionSymbol = new MemberFunctionSymbol(memberFunctionNode.GetSpan(), memberFunctionNode.GroupId());
+    SetFunctionIdFor(memberFunctionSymbol);
     memberFunctionSymbol->SetCompileUnit(currentCompileUnit);
     memberFunctionSymbol->SetSymbolTable(this);
     memberFunctionSymbol->SetGroupName(memberFunctionNode.GroupId());
@@ -713,6 +740,7 @@ void SymbolTable::AddTypeSymbolToGlobalScope(TypeSymbol* typeSymbol)
 
 void SymbolTable::AddFunctionSymbolToGlobalScope(FunctionSymbol* functionSymbol)
 {
+    SetFunctionIdFor(functionSymbol);
     functionSymbol->SetSymbolTable(this);
     globalNs.AddMember(functionSymbol);
     if (functionSymbol->IsConversion())
@@ -797,6 +825,11 @@ void SymbolTable::AddTypeOrConceptSymbolToTypeIdMap(Symbol* typeOrConceptSymbol)
     }
 }
 
+void SymbolTable::AddFunctionSymbolToFunctionIdMap(FunctionSymbol* functionSymbol)
+{
+    functionIdMap[functionSymbol->FunctionId()] = functionSymbol;
+}
+
 void SymbolTable::SetTypeIdFor(TypeSymbol* typeSymbol)
 {
     typeSymbol->SetTypeId(TypeIdCounter::Instance().GetNextTypeId());
@@ -805,6 +838,11 @@ void SymbolTable::SetTypeIdFor(TypeSymbol* typeSymbol)
 void SymbolTable::SetTypeIdFor(ConceptSymbol* conceptSymbol)
 {
     conceptSymbol->SetTypeId(TypeIdCounter::Instance().GetNextTypeId());
+}
+
+void SymbolTable::SetFunctionIdFor(FunctionSymbol* functionSymbol)
+{
+    functionSymbol->SetFunctionId(FunctionIdCounter::Instance().GetNextFunctionId());
 }
 
 void SymbolTable::EmplaceTypeRequest(Symbol* forSymbol, uint32_t typeId, int index)
@@ -854,7 +892,21 @@ void SymbolTable::EmplaceTypeOrConceptRequest(Symbol* forSymbol, uint32_t typeId
     }
 }
 
-void SymbolTable::ProcessTypeAndConceptRequests()
+void SymbolTable::EmplaceFunctionRequest(Symbol* forSymbol, uint32_t functionId, int index)
+{
+    auto it = functionIdMap.find(functionId);
+    if (it != functionIdMap.cend())
+    {
+        FunctionSymbol* functionSymbol = it->second;
+        forSymbol->EmplaceFunction(functionSymbol, index);
+    }
+    else
+    {
+        functionRequests.push_back(FunctionRequest(forSymbol, functionId, index));
+    }
+}
+
+void SymbolTable::ProcessTypeConceptAndFunctionRequests()
 {
     for (const TypeOrConceptRequest& typeOrConceptRequest : typeAndConceptRequests)
     {
@@ -893,6 +945,22 @@ void SymbolTable::ProcessTypeAndConceptRequests()
         }
     }
     typeAndConceptRequests.clear();
+    for (const FunctionRequest& functionRequest : functionRequests)
+    {
+        Symbol* symbol = functionRequest.symbol;
+        auto it = functionIdMap.find(functionRequest.functionId);
+        if (it != functionIdMap.cend())
+        {
+            FunctionSymbol* functionSymbol = it->second;
+            int index = functionRequest.index;
+            symbol->EmplaceFunction(functionSymbol, index);
+        }
+        else
+        {
+            throw std::runtime_error("internal error: cannot satisfy function request for symbol '" + ToUtf8(symbol->Name()) + "': function not found from symbol table");
+        }
+    }
+    functionRequests.clear();
 }
 
 TypeSymbol* SymbolTable::GetTypeByNameNoThrow(const std::u32string& typeName) const
@@ -1119,10 +1187,12 @@ void InitSymbolTable()
 {
     IntrinsicConcepts::Init();
     TypeIdCounter::Init();
+    FunctionIdCounter::Init();
 }
 
 void DoneSymbolTable()
 {
+    FunctionIdCounter::Done();
     TypeIdCounter::Done();
     IntrinsicConcepts::Done();
 }

@@ -34,6 +34,14 @@ struct TypeOrConceptRequest
     int index;
 };
 
+struct FunctionRequest
+{
+    FunctionRequest(Symbol* symbol_, uint32_t functionId_, int index_) : symbol(symbol_), functionId(functionId_), index(index_) {}
+    Symbol* symbol;
+    uint32_t functionId;
+    int index;
+};
+
 class TypeIdCounter
 {
 public:
@@ -46,6 +54,20 @@ private:
     static std::unique_ptr<TypeIdCounter> instance;
     TypeIdCounter();
     int nextTypeId;
+};
+
+class FunctionIdCounter
+{
+public:
+    static void Init();
+    static void Done();
+    static FunctionIdCounter& Instance() { Assert(instance, "function id counter not initialized"); return *instance; }
+    int GetNextFunctionId() { return nextFunctionId++; }
+    void SetNextFunctionId(int nextFunctionId_) { nextFunctionId = nextFunctionId_; }
+private:
+    static std::unique_ptr<FunctionIdCounter> instance;
+    FunctionIdCounter();
+    int nextFunctionId;
 };
 
 struct ClassTemplateSpecializationKey
@@ -137,10 +159,13 @@ public:
     Node* GetNode(Symbol* symbol) const;
     void SetTypeIdFor(TypeSymbol* typeSymbol);
     void SetTypeIdFor(ConceptSymbol* conceptSymbol);
+    void SetFunctionIdFor(FunctionSymbol* functionSymbol);
     void AddTypeOrConceptSymbolToTypeIdMap(Symbol* typeOrConceptSymbol);
+    void AddFunctionSymbolToFunctionIdMap(FunctionSymbol* functionSymbol);
     void EmplaceTypeRequest(Symbol* forSymbol, uint32_t typeId, int index);
     void EmplaceConceptRequest(Symbol* forSymbol, uint32_t typeId);
-    void ProcessTypeAndConceptRequests();
+    void EmplaceFunctionRequest(Symbol* forSymbol, uint32_t functionId, int index);
+    void ProcessTypeConceptAndFunctionRequests();
     TypeSymbol* GetTypeByNameNoThrow(const std::u32string& typeName) const;
     TypeSymbol* GetTypeByName(const std::u32string& typeName) const;
     TypeSymbol* MakeDerivedType(TypeSymbol* baseType, const TypeDerivationRec& derivationRec, const Span& span);
@@ -168,12 +193,14 @@ private:
     std::unordered_map<Node*, Symbol*> nodeSymbolMap;
     std::unordered_map<Symbol*, Node*> symbolNodeMap;
     std::unordered_map<uint32_t, Symbol*> typeIdMap;
+    std::unordered_map<uint32_t, FunctionSymbol*> functionIdMap;
     std::unordered_map<std::u32string, TypeSymbol*> typeNameMap;
     std::unordered_map<TypeSymbol*, std::vector<DerivedTypeSymbol*>> derivedTypeMap; 
     std::vector<std::unique_ptr<DerivedTypeSymbol>> derivedTypes;
     std::unordered_map<ClassTemplateSpecializationKey, ClassTemplateSpecializationSymbol*, ClassTemplateSpecializationKeyHash> classTemplateSpecializationMap;
     std::vector<std::unique_ptr<ClassTemplateSpecializationSymbol>> classTemplateSpecializations;
     std::vector<TypeOrConceptRequest> typeAndConceptRequests;
+    std::vector<FunctionRequest> functionRequests;
     ConversionTable conversionTable;
     std::unordered_set<ClassTypeSymbol*> polymorphicClasses;
     std::unordered_set<ClassTypeSymbol*> classesHavingStaticConstructor;

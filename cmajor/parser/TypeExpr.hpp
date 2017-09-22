@@ -1,5 +1,5 @@
-#ifndef TypeExpr_hpp_21397
-#define TypeExpr_hpp_21397
+#ifndef TypeExpr_hpp_4325
+#define TypeExpr_hpp_4325
 
 #include <cmajor/parsing/Grammar.hpp>
 #include <cmajor/parsing/Keyword.hpp>
@@ -27,4 +27,4 @@ private:
 
 } } // namespace cmajor.parser
 
-#endif // TypeExpr_hpp_21397
+#endif // TypeExpr_hpp_4325

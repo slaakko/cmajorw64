@@ -186,30 +186,35 @@ struct DefaultDouble
 struct BasicTypeIntegerEquality
 {
     static const char32_t* GroupName() { return U"operator=="; }
+    static bool IsIntegerOpEqual() { return true; }
     static llvm::Value* Generate(llvm::IRBuilder<>& builder, llvm::Value* left, llvm::Value* right) { return builder.CreateICmpEQ(left, right); }
 };
 
 struct BasicTypeFloatingEquality
 {
     static const char32_t* GroupName() { return U"operator=="; }
+    static bool IsIntegerOpEqual() { return false; }
     static llvm::Value* Generate(llvm::IRBuilder<>& builder, llvm::Value* left, llvm::Value* right) { return builder.CreateFCmpOEQ(left, right); }
 };
 
 struct BasicTypeUnsignedIntegerLessThan
 {
     static const char32_t* GroupName() { return U"operator<"; }
+    static bool IsIntegerOpEqual() { return false; }
     static llvm::Value* Generate(llvm::IRBuilder<>& builder, llvm::Value* left, llvm::Value* right) { return builder.CreateICmpULT(left, right); }
 };
 
 struct BasicTypeSignedIntegerLessThan
 {
     static const char32_t* GroupName() { return U"operator<"; }
+    static bool IsIntegerOpEqual() { return false; }
     static llvm::Value* Generate(llvm::IRBuilder<>& builder, llvm::Value* left, llvm::Value* right) { return builder.CreateICmpSLT(left, right); }
 };
 
 struct BasicTypeFloatingLessThan
 {
     static const char32_t* GroupName() { return U"operator<"; }
+    static bool IsIntegerOpEqual() { return false; }
     static llvm::Value* Generate(llvm::IRBuilder<>& builder, llvm::Value* left, llvm::Value* right) { return builder.CreateFCmpOLT(left, right); }
 };
 
@@ -499,6 +504,11 @@ BasicTypeDefaultCtor<DefaultOp>::BasicTypeDefaultCtor(SymbolType symbolType, Typ
     thisParam->SetType(type->AddPointer(Span()));
     AddMember(thisParam);
     ComputeName();
+    if (type->IsBasicTypeSymbol())
+    {
+        BasicTypeSymbol* basicTypeSymbol = static_cast<BasicTypeSymbol*>(type);
+        basicTypeSymbol->SetDefaultConstructor(this);
+    }
 }
 
 template<typename DefaultOp>
@@ -839,6 +849,14 @@ BasicTypeComparisonOperation<ComparisonOp>::BasicTypeComparisonOperation(SymbolT
     AddMember(rightParam);
     SetReturnType(boolType);
     ComputeName();
+    if (ComparisonOp::IsIntegerOpEqual())
+    {
+        if (type->IsBasicTypeSymbol())
+        {
+            BasicTypeSymbol* basicTypeSymbol = static_cast<BasicTypeSymbol*>(type);
+            basicTypeSymbol->SetEqualityOp(this);
+        }
+    }
 }
 
 template<typename ComparisonOp>

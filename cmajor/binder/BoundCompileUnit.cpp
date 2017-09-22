@@ -5,6 +5,8 @@
 
 #include <cmajor/binder/BoundCompileUnit.hpp>
 #include <cmajor/binder/BoundNodeVisitor.hpp>
+#include <cmajor/binder/StatementBinder.hpp>
+#include <cmajor/binder/BoundStatement.hpp>
 #include <cmajor/symbols/Exception.hpp>
 #include <cmajor/symbols/FunctionSymbol.hpp>
 #include <cmajor/symbols/ClassTypeSymbol.hpp>
@@ -136,7 +138,7 @@ void PtrToVoidPtrConversion::GenerateCall(Emitter& emitter, std::vector<GenObjec
 
 BoundCompileUnit::BoundCompileUnit(Module& module_, CompileUnitNode* compileUnitNode_) : 
     BoundNode(Span(), BoundNodeType::boundCompileUnit), module(module_), symbolTable(module.GetSymbolTable()), compileUnitNode(compileUnitNode_), hasGotos(false), 
-    operationRepository(*this), functionTemplateRepository(*this), classTemplateRepository(*this), inlineFunctionRepository(*this)
+    operationRepository(*this), functionTemplateRepository(*this), classTemplateRepository(*this), inlineFunctionRepository(*this), bindingTypes(false)
 {
     boost::filesystem::path fileName = boost::filesystem::path(compileUnitNode->FilePath()).filename();
     boost::filesystem::path directory = module.DirectoryPath();
@@ -172,9 +174,20 @@ void BoundCompileUnit::RemoveLastFileScope()
 {
     if (fileScopes.empty())
     {
-        throw Exception("cannot remove last file scope from empty list of file scopes", GetSpan());
+        throw Exception("file scopes of bound compile unit is empty", GetSpan());
     }
     fileScopes.erase(fileScopes.end() - 1);
+}
+
+FileScope* BoundCompileUnit::ReleaseLastFileScope()
+{
+    if (fileScopes.empty())
+    {
+        throw Exception("file scopes of bound compile unit is empty", GetSpan());
+    }
+    FileScope* fileScope = fileScopes.back().release();
+    RemoveLastFileScope();
+    return fileScope;
 }
 
 void BoundCompileUnit::AddBoundNode(std::unique_ptr<BoundNode>&& boundNode)
@@ -313,6 +326,41 @@ const std::u16string& BoundCompileUnit::GetUtf16String(int stringId) const
 const std::u32string& BoundCompileUnit::GetUtf32String(int stringId) const
 {
     return utf32StringRepository.GetString(stringId);
+}
+
+void BoundCompileUnit::PushBindingTypes()
+{
+    bindingTypesStack.push(bindingTypes);
+    bindingTypes = true;
+}
+
+void BoundCompileUnit::PopBindingTypes()
+{
+    bindingTypes = bindingTypesStack.top();
+    bindingTypesStack.pop();
+}
+
+void BoundCompileUnit::FinalizeBinding(ClassTypeSymbol* classType)
+{
+    if (classType->GetSymbolType() != SymbolType::classTemplateSpecializationSymbol) return;
+    ClassTemplateSpecializationSymbol* classTemplateSpecialization = static_cast<ClassTemplateSpecializationSymbol*>(classType);
+    if (classTemplateSpecialization->StatementsNotBound())
+    {
+        classTemplateSpecialization->ResetStatementsNotBound();
+        FileScope* fileScope = classTemplateSpecialization->ReleaseFileScope();
+        bool fileScopeAdded = false;
+        if (fileScope)
+        {
+            AddFileScope(fileScope);
+            fileScopeAdded = true;
+        }
+        StatementBinder statementBinder(*this);
+        classTemplateSpecialization->GlobalNs()->Accept(statementBinder);
+        if (fileScopeAdded)
+        {
+            RemoveLastFileScope();
+        }
+    }
 }
 
 } } // namespace cmajor::binder

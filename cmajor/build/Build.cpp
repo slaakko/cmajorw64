@@ -227,8 +227,10 @@ std::vector<std::unique_ptr<BoundCompileUnit>> BindTypes(Module& module, const s
     for (const std::unique_ptr<CompileUnitNode>& compileUnit : compileUnits)
     {
         std::unique_ptr<BoundCompileUnit> boundCompileUnit(new BoundCompileUnit(module, compileUnit.get()));
+        boundCompileUnit->PushBindingTypes();
         TypeBinder typeBinder(*boundCompileUnit);
         compileUnit->Accept(typeBinder);
+        boundCompileUnit->PopBindingTypes();
         boundCompileUnits.push_back(std::move(boundCompileUnit));
     }
     return boundCompileUnits;
@@ -371,6 +373,30 @@ void WriteTypeIdCounter(const std::string& config)
     }
 }
 
+void ReadFunctionIdCounter(const std::string& config)
+{
+    boost::filesystem::path functionIdCounterFile = Path::Combine(Path::Combine(CmajorRootDir(), "counter"), "functionid." + config);
+    if (boost::filesystem::exists(functionIdCounterFile))
+    {
+        std::ifstream f(functionIdCounterFile.generic_string());
+        int nextFunctionId = 1;
+        f >> nextFunctionId;
+        FunctionIdCounter::Instance().SetNextFunctionId(nextFunctionId);
+    }
+}
+
+void WriteFunctionIdCounter(const std::string& config)
+{
+    boost::filesystem::path functionIdCounterFile = Path::Combine(Path::Combine(CmajorRootDir(), "counter"), "functionid." + config);
+    std::ofstream f(functionIdCounterFile.generic_string());
+    int nextFunctionId = FunctionIdCounter::Instance().GetNextFunctionId();
+    f << nextFunctionId << std::endl;
+    if (!f)
+    {
+        throw std::runtime_error("could not write to " + functionIdCounterFile.generic_string());
+    }
+}
+
 void CreateMainUnit(std::vector<std::string>& objectFilePaths, Module& module, EmittingContext& emittingContext)
 {
     CompileUnitNode mainCompileUnit(Span(), boost::filesystem::path(module.OriginalFilePath()).parent_path().append("__main__.cm").generic_string());
@@ -412,6 +438,7 @@ void BuildProject(Project* project)
         std::cout << "Building project '" << ToUtf8(project->Name()) << "' (" << project->FilePath() << ") using " << config << " configuration." << std::endl;
     }
     ReadTypeIdCounter(config);
+    ReadFunctionIdCounter(config);
     CompileWarningCollection::Instance().SetCurrentProjectName(project->Name());
     std::vector<std::unique_ptr<CompileUnitNode>> compileUnits = ParseSources(project->SourceFilePaths());
     Module module(project->Name(), project->ModuleFilePath());
@@ -467,6 +494,7 @@ void BuildProject(Project* project)
     SymbolWriter writer(project->ModuleFilePath());
     module.Write(writer);
     WriteTypeIdCounter(config);
+    WriteFunctionIdCounter(config);
     if (GetGlobalFlag(GlobalFlags::verbose))
     {
         std::cout << "Project '" << ToUtf8(project->Name()) << "' built successfully." << std::endl;

@@ -12,7 +12,7 @@ namespace cmajor { namespace symbols {
 
 std::u32string MakeClassTemplateSpecializationName(ClassTypeSymbol* classTemplate, const std::vector<TypeSymbol*>& templateArgumentTypes)
 {
-    std::u32string name = classTemplate->Name();
+    std::u32string name = classTemplate->GroupName();
     name.append(1, '<');
     int n = templateArgumentTypes.size();
     for (int i = 0; i < n; ++i)
@@ -28,18 +28,18 @@ std::u32string MakeClassTemplateSpecializationName(ClassTypeSymbol* classTemplat
 }
 
 ClassTemplateSpecializationSymbol::ClassTemplateSpecializationSymbol(const Span& span_, const std::u32string& name_) : 
-    ClassTypeSymbol(SymbolType::classTemplateSpecializationSymbol, span_, name_), classTemplate(nullptr), templateArgumentTypes()
+    ClassTypeSymbol(SymbolType::classTemplateSpecializationSymbol, span_, name_), classTemplate(nullptr), templateArgumentTypes(), prototype(false)
 {
 }
 
 ClassTemplateSpecializationSymbol::ClassTemplateSpecializationSymbol(const Span& span_, std::u32string& name_, ClassTypeSymbol* classTemplate_, const std::vector<TypeSymbol*>& templateArgumentTypes_) : 
-    ClassTypeSymbol(SymbolType::classTemplateSpecializationSymbol, span_, name_), classTemplate(classTemplate_), templateArgumentTypes(templateArgumentTypes_)
+    ClassTypeSymbol(SymbolType::classTemplateSpecializationSymbol, span_, name_), classTemplate(classTemplate_), templateArgumentTypes(templateArgumentTypes_), prototype(false)
 {
 }
 
 std::u32string ClassTemplateSpecializationSymbol::SimpleName() const
 {
-    std::u32string simpleName = classTemplate->Name();
+    std::u32string simpleName = classTemplate->GroupName();
     int n = templateArgumentTypes.size();
     for (int i = 0; i < n; ++i)
     {
@@ -61,6 +61,7 @@ void ClassTemplateSpecializationSymbol::Write(SymbolWriter& writer)
         uint32_t templateArgumentTypeId = templateArgumentType->TypeId();
         writer.GetBinaryWriter().WriteEncodedUInt(templateArgumentTypeId);
     }
+    writer.GetBinaryWriter().Write(prototype);
 }
 
 void ClassTemplateSpecializationSymbol::Read(SymbolReader& reader)
@@ -75,6 +76,7 @@ void ClassTemplateSpecializationSymbol::Read(SymbolReader& reader)
         uint32_t typeArgumentId = reader.GetBinaryReader().ReadEncodedUInt();
         GetSymbolTable()->EmplaceTypeRequest(this, typeArgumentId, -2 - i);
     }
+    prototype = reader.GetBinaryReader().ReadBool();
 }
 
 void ClassTemplateSpecializationSymbol::EmplaceType(TypeSymbol* typeSymbol, int index)
@@ -124,9 +126,24 @@ void ClassTemplateSpecializationSymbol::ComputeExportClosure()
     }
 }
 
+bool ClassTemplateSpecializationSymbol::IsPrototypeTemplateSpecialization() const
+{
+    return prototype;
+}
+
 void ClassTemplateSpecializationSymbol::SetGlobalNs(std::unique_ptr<Node>&& globalNs_)
 {
     globalNs = std::move(globalNs_);
+}
+
+void ClassTemplateSpecializationSymbol::SetFileScope(FileScope* fileScope_)
+{
+    fileScope.reset(fileScope_);
+}
+
+FileScope* ClassTemplateSpecializationSymbol::ReleaseFileScope()
+{
+    return fileScope.release();
 }
 
 } } // namespace cmajor::symbols

@@ -55,6 +55,104 @@ private:
     bool evaluating;
 };
 
+class EnumTypeDefaultConstructor : public FunctionSymbol
+{
+public:
+    EnumTypeDefaultConstructor(const Span& span_, const std::u32string& name_);
+    EnumTypeDefaultConstructor(EnumTypeSymbol* enumType_);
+    void Write(SymbolWriter& writer) override;
+    void Read(SymbolReader& reader) override;
+    void EmplaceFunction(FunctionSymbol* functionSymbol, int index) override;
+    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags) override;
+    bool IsBasicTypeOperation() const override { return true; }
+private:
+    FunctionSymbol* underlyingTypeDefaultConstructor;
+};
+
+class EnumTypeCopyConstructor : public FunctionSymbol
+{
+public:
+    EnumTypeCopyConstructor(const Span& span_, const std::u32string& name_);
+    EnumTypeCopyConstructor(EnumTypeSymbol* enumType_);
+    void Write(SymbolWriter& writer) override;
+    void Read(SymbolReader& reader) override;
+    void EmplaceFunction(FunctionSymbol* functionSymbol, int index) override;
+    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags) override;
+    bool IsBasicTypeOperation() const override { return true; }
+private:
+    FunctionSymbol* underlyingTypeCopyConstructor;
+};
+
+class EnumTypeMoveConstructor : public FunctionSymbol
+{
+public:
+    EnumTypeMoveConstructor(const Span& span_, const std::u32string& name_);
+    EnumTypeMoveConstructor(EnumTypeSymbol* enumType_);
+    void Write(SymbolWriter& writer) override;
+    void Read(SymbolReader& reader) override;
+    void EmplaceFunction(FunctionSymbol* functionSymbol, int index) override;
+    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags) override;
+    bool IsBasicTypeOperation() const override { return true; }
+private:
+    FunctionSymbol* underlyingTypeMoveConstructor;
+};
+
+class EnumTypeCopyAssignment : public FunctionSymbol
+{
+public:
+    EnumTypeCopyAssignment(const Span& span_, const std::u32string& name_);
+    EnumTypeCopyAssignment(EnumTypeSymbol* enumType_, TypeSymbol* voidType_);
+    void Write(SymbolWriter& writer) override;
+    void Read(SymbolReader& reader) override;
+    void EmplaceFunction(FunctionSymbol* functionSymbol, int index) override;
+    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags) override;
+    bool IsBasicTypeOperation() const override { return true; }
+private:
+    FunctionSymbol* underlyingTypeCopyAssignment;
+};
+
+class EnumTypeMoveAssignment : public FunctionSymbol
+{
+public:
+    EnumTypeMoveAssignment(const Span& span_, const std::u32string& name_);
+    EnumTypeMoveAssignment(EnumTypeSymbol* enumType_, TypeSymbol* voidType_);
+    void Write(SymbolWriter& writer) override;
+    void Read(SymbolReader& reader) override;
+    void EmplaceFunction(FunctionSymbol* functionSymbol, int index) override;
+    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags) override;
+    bool IsBasicTypeOperation() const override { return true; }
+private:
+    FunctionSymbol* underlyingTypeMoveAssignment;
+};
+
+class EnumTypeReturn : public FunctionSymbol
+{
+public:
+    EnumTypeReturn(const Span& span_, const std::u32string& name_);
+    EnumTypeReturn(EnumTypeSymbol* enumType_);
+    void Write(SymbolWriter& writer) override;
+    void Read(SymbolReader& reader) override;
+    void EmplaceFunction(FunctionSymbol* functionSymbol, int index) override;
+    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags) override;
+    bool IsBasicTypeOperation() const override { return true; }
+private:
+    FunctionSymbol* underlyingTypeReturn;
+};
+
+class EnumTypeEqualityOp : public FunctionSymbol
+{
+public:
+    EnumTypeEqualityOp(const Span& span_, const std::u32string& name_);
+    EnumTypeEqualityOp(EnumTypeSymbol* enumType_, TypeSymbol* boolType_);
+    void Write(SymbolWriter& writer) override;
+    void Read(SymbolReader& reader) override;
+    void EmplaceFunction(FunctionSymbol* functionSymbol, int index) override;
+    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags) override;
+    bool IsBasicTypeOperation() const override { return true; }
+private:
+    FunctionSymbol* underlyingTypeEquality;
+};
+
 class EnumTypeToUnderlyingTypeConversion : public FunctionSymbol
 {
 public:

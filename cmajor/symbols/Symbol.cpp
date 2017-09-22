@@ -33,18 +33,20 @@ const char* symbolTypeStr[uint8_t(SymbolType::maxSymbol)] =
     "boolTypeSymbol", "sbyteTypeSymbol", "byteTypeSymbol", "shortTypeSymbol", "ushortTypeSymbol", "intTypeSymbol", "uintTypeSymbol", "longTypeSymbol", "ulongTypeSymbol", "floatTypeSymbol", "doubleTypeSymbol",
     "charTypeSymbol", "wcharTypeSymbol", "ucharTypeSymbol", "voidTypeSymbol", "nullPtrTypeSymbol",
     "derivedTypeSymbol"
-    "namespaceSymbol", "functionSymbol", "staticConstructorSymbol", "constructorSymbol", "destructorSymbol", "memberFunctionSymbol", "functionGroupSymbol", 
-    "classGroupTypeSymbol", "classTypeSymbol", "interfaceTypeSymbol", "conceptGroupSymbol", "conceptSymbol", 
+    "namespaceSymbol", "functionSymbol", "staticConstructorSymbol", "constructorSymbol", "destructorSymbol", "memberFunctionSymbol", "functionGroupSymbol",
+    "classGroupTypeSymbol", "classTypeSymbol", "interfaceTypeSymbol", "conceptGroupSymbol", "conceptSymbol",
     "delegateTypeSymbol", "classDelegateTypeSymbol", "declarationBlock", "typedefSymbol", "constantSymbol", "enumTypeSymbol", "enumConstantSymbol",
     "templateParameterSymbol", "boundTemplateParameterSymbol", "parameterSymbol", "localVariableSymbol", "memberVariableSymbol",
     "basicTypeUnaryPlus", "basicTypeIntUnaryMinus", "basicTypeFloatUnaryMinus", "basicTypeComplement", "basicTypeAdd", "basicTypeFAdd", "basicTypeSub", "basicTypeFSub", "basicTypeMul", "basicTypeFMul",
     "basicTypeSDiv", "basicTypeUDiv", "basicTypeFDiv", "basicTypeSRem", "basicTypeURem", "basicTypeAnd", "basicTypeOr", "basicTypeXor", "basicTypeShl", "basicTypeAShr", "basicTypeLShr",
     "basicTypeNot", "basicTypeIntegerEquality", "basicTypeUnsignedIntegerLessThan", "basicTypeSignedIntegerLessThan", "basicTypeFloatingEquality"", basicTypeFloatingLessThan",
-    "defaultInt1", "defaultInt8", "defaultInt16", "defaultInt32", "defaultInt64", "defaultFloat", "defaultDouble", "basicTypeCopyCtor", "basicTypeMoveCtor", 
+    "defaultInt1", "defaultInt8", "defaultInt16", "defaultInt32", "defaultInt64", "defaultFloat", "defaultDouble", "basicTypeCopyCtor", "basicTypeMoveCtor",
     "basicTypeCopyAssignment", "basicTypeMoveAssignment", "basicTypeReturn",
     "basicTypeImplicitSignExtension", "basicTypeImplicitZeroExtension", "basicTypeExplicitSignExtension", "basicTypeExplicitZeroExtension", "basicTypeTruncation", "basicTypeBitCast",
     "basicTypeImplicitUnsignedIntToFloating", "basicTypeImplicitSignedIntToFloating", "basicTypeExplicitUnsignedIntToFloating", "basicTypeExplicitSignedIntToFloating",
-    "basicTypeFloatingToUnsignedInt", "basicTypeFloatingToSignedInt", "basicTypeFloatingExtension", "basicTypeFloatingTruncation", "enumTypeToUnderlyingType", "underlyingToEnumType",
+    "basicTypeFloatingToUnsignedInt", "basicTypeFloatingToSignedInt", "basicTypeFloatingExtension", "basicTypeFloatingTruncation",
+    "enumTypeDefaultConstructor", "enumTypeCopyConstructor", "enumTypeMoveConstructor", "enumTypeCopyAssignment", "enumTypeMoveAssignment", "enumTypeReturn", "enumTypeEquality", 
+    "enumTypeToUnderlyingType", "underlyingToEnumType",
     "namespaceTypeSymbol", "functionGroupTypeSymbol", "memberExpressionTypeSymbol", "valueSymbol"
 };
 
@@ -408,6 +410,68 @@ ContainerSymbol* Symbol::ClassInterfaceOrNsNoThrow()
     }
 }
 
+const ContainerSymbol* Symbol::ClassInterfaceEnumOrNsNoThrow() const
+{
+    if (symbolType == SymbolType::namespaceSymbol)
+    {
+        return static_cast<const NamespaceSymbol*>(this);
+    }
+    else if (symbolType == SymbolType::interfaceTypeSymbol)
+    {
+        return static_cast<const InterfaceTypeSymbol*>(this);
+    }
+    else if (symbolType == SymbolType::enumTypeSymbol)
+    {
+        return static_cast<const EnumTypeSymbol*>(this);
+    }
+    else if (IsClassTypeSymbol())
+    {
+        return static_cast<const ClassTypeSymbol*>(this);
+    }
+    else
+    {
+        if (parent)
+        {
+            return parent->ClassInterfaceEnumOrNsNoThrow();
+        }
+        else
+        {
+            return nullptr;
+        }
+    }
+}
+
+ContainerSymbol* Symbol::ClassInterfaceEnumOrNsNoThrow()
+{
+    if (symbolType == SymbolType::namespaceSymbol)
+    {
+        return static_cast<NamespaceSymbol*>(this);
+    }
+    else if (symbolType == SymbolType::interfaceTypeSymbol)
+    {
+        return static_cast<InterfaceTypeSymbol*>(this);
+    }
+    else if (symbolType == SymbolType::enumTypeSymbol)
+    {
+        return static_cast<EnumTypeSymbol*>(this);
+    }
+    else if (IsClassTypeSymbol())
+    {
+        return static_cast<ClassTypeSymbol*>(this);
+    }
+    else
+    {
+        if (parent)
+        {
+            return parent->ClassInterfaceEnumOrNsNoThrow();
+        }
+        else
+        {
+            return nullptr;
+        }
+    }
+}
+
 const ClassTypeSymbol* Symbol::Class() const
 {
     const ClassTypeSymbol* cls = ClassNoThrow();
@@ -660,6 +724,31 @@ ContainerScope* Symbol::ClassInterfaceOrNsScope()
     }
 }
 
+const ContainerScope* Symbol::ClassInterfaceEnumOrNsScope() const
+{
+    const ContainerSymbol* classInterfaceEnumOrNs = ClassInterfaceEnumOrNsNoThrow();
+    if (classInterfaceEnumOrNs)
+    {
+        return classInterfaceEnumOrNs->GetContainerScope();
+    }
+    else
+    {
+        throw std::runtime_error("class, interface, enumeration or namespace scope not found");
+    }
+}
+
+ContainerScope* Symbol::ClassInterfaceEnumOrNsScope()
+{
+    ContainerSymbol* classInterfaceEnumOrNs = ClassInterfaceEnumOrNsNoThrow();
+    if (classInterfaceEnumOrNs)
+    {
+        return classInterfaceEnumOrNs->GetContainerScope();
+    }
+    else
+    {
+        throw std::runtime_error("class, interface, enumeration or namespace scope not found");
+    }
+}
 
 SymbolCreator::~SymbolCreator()
 {
@@ -785,6 +874,13 @@ SymbolFactory::SymbolFactory()
     Register(SymbolType::basicTypeFloatingToSignedInt, new ConcreteSymbolCreator<BasicTypeFloatingToSignedIntOperation>());
     Register(SymbolType::basicTypeFloatingExtension, new ConcreteSymbolCreator<BasicTypeFloatingExtensionOperation>());
     Register(SymbolType::basicTypeFloatingTruncation, new ConcreteSymbolCreator<BasicTypeFloatingTruncationOperation>());
+    Register(SymbolType::enumTypeDefaultConstructor, new ConcreteSymbolCreator<EnumTypeDefaultConstructor>());
+    Register(SymbolType::enumTypeCopyConstructor, new ConcreteSymbolCreator<EnumTypeCopyConstructor>());
+    Register(SymbolType::enumTypeMoveConstructor, new ConcreteSymbolCreator<EnumTypeMoveConstructor>());
+    Register(SymbolType::enumTypeCopyAssignment, new ConcreteSymbolCreator<EnumTypeCopyAssignment>());
+    Register(SymbolType::enumTypeMoveAssignment, new ConcreteSymbolCreator<EnumTypeMoveAssignment>());
+    Register(SymbolType::enumTypeReturn, new ConcreteSymbolCreator<EnumTypeReturn>());
+    Register(SymbolType::enumTypeEquality, new ConcreteSymbolCreator<EnumTypeEqualityOp>());
     Register(SymbolType::enumTypeToUnderlyingType, new ConcreteSymbolCreator<EnumTypeToUnderlyingTypeConversion>());
     Register(SymbolType::underlyingToEnumType, new ConcreteSymbolCreator<UnderlyingTypeToEnumTypeConversion>());
 }

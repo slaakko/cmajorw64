@@ -134,6 +134,11 @@ BasicTypeCopyCtor::BasicTypeCopyCtor(TypeSymbol* type) : FunctionSymbol(SymbolTy
     thatParam->SetType(type);
     AddMember(thatParam);
     ComputeName();
+    if (type->IsBasicTypeSymbol())
+    {
+        BasicTypeSymbol* basicTypeSymbol = static_cast<BasicTypeSymbol*>(type);
+        basicTypeSymbol->SetCopyConstructor(this);
+    }
 }
 
 BasicTypeCopyCtor::BasicTypeCopyCtor(const Span& span_, const std::u32string& name_) : FunctionSymbol(SymbolType::basicTypeCopyCtor, span_, name_)
@@ -158,6 +163,11 @@ BasicTypeMoveCtor::BasicTypeMoveCtor(TypeSymbol* type) : FunctionSymbol(SymbolTy
     thatParam->SetType(type->AddRvalueReference(Span()));
     AddMember(thatParam);
     ComputeName();
+    if (type->IsBasicTypeSymbol())
+    {
+        BasicTypeSymbol* basicTypeSymbol = static_cast<BasicTypeSymbol*>(type);
+        basicTypeSymbol->SetMoveConstructor(this);
+    }
 }
 
 BasicTypeMoveCtor::BasicTypeMoveCtor(const Span& span_, const std::u32string& name_) : FunctionSymbol(SymbolType::basicTypeMoveCtor, span_, name_)
@@ -185,6 +195,11 @@ BasicTypeCopyAssignment::BasicTypeCopyAssignment(TypeSymbol* type, TypeSymbol* v
     AddMember(thatParam);
     SetReturnType(voidType);
     ComputeName();
+    if (type->IsBasicTypeSymbol())
+    {
+        BasicTypeSymbol* basicTypeSymbol = static_cast<BasicTypeSymbol*>(type);
+        basicTypeSymbol->SetCopyAssignment(this);
+    }
 }
 
 BasicTypeCopyAssignment::BasicTypeCopyAssignment(const Span& span_, const std::u32string& name_) : FunctionSymbol(SymbolType::basicTypeCopyAssignment, span_, name_)
@@ -210,6 +225,11 @@ BasicTypeMoveAssignment::BasicTypeMoveAssignment(TypeSymbol* type, TypeSymbol* v
     AddMember(thatParam);
     SetReturnType(voidType);
     ComputeName();
+    if (type->IsBasicTypeSymbol())
+    {
+        BasicTypeSymbol* basicTypeSymbol = static_cast<BasicTypeSymbol*>(type);
+        basicTypeSymbol->SetMoveAssignment(this);
+    }
 }
 
 BasicTypeMoveAssignment::BasicTypeMoveAssignment(const Span& span_, const std::u32string& name_) : FunctionSymbol(SymbolType::basicTypeMoveAssignment, span_, name_)
@@ -234,6 +254,11 @@ BasicTypeReturn::BasicTypeReturn(TypeSymbol* type) : FunctionSymbol(SymbolType::
     AddMember(valueParam);
     SetReturnType(type);
     ComputeName();
+    if (type->IsBasicTypeSymbol())
+    {
+        BasicTypeSymbol* basicTypeSymbol = static_cast<BasicTypeSymbol*>(type);
+        basicTypeSymbol->SetReturnFun(this);
+    }
 }
 
 BasicTypeReturn::BasicTypeReturn(const Span& span_, const std::u32string& name_) : FunctionSymbol(SymbolType::basicTypeReturn, span_, name_)

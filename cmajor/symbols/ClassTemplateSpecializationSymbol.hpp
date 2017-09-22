@@ -21,14 +21,20 @@ public:
     void Read(SymbolReader& reader) override;
     void EmplaceType(TypeSymbol* typeSymbol, int index) override;
     void ComputeExportClosure() override;
+    bool IsPrototypeTemplateSpecialization() const override;
     ClassTypeSymbol* GetClassTemplate() { return classTemplate; }
-    void SetGlobalNs(std::unique_ptr<Node>&& globalNs_);
     const std::vector<TypeSymbol*>& TemplateArgumentTypes() const { return templateArgumentTypes; }
+    void SetGlobalNs(std::unique_ptr<Node>&& globalNs_);
     Node* GlobalNs() { return globalNs.get(); }
+    void SetFileScope(FileScope* fileScope_);
+    FileScope* ReleaseFileScope();
+    void SetPrototype() { prototype = true; }
 private:
     ClassTypeSymbol* classTemplate;
     std::vector<TypeSymbol*> templateArgumentTypes;
     std::unique_ptr<Node> globalNs;
+    std::unique_ptr<FileScope> fileScope;
+    bool prototype;
 };
 
 } } // namespace cmajor::symbols

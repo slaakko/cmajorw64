@@ -279,7 +279,7 @@ void TypeBinder::BindClass(ClassTypeSymbol* classTypeSymbol, ClassNode* classNod
     classTypeSymbol->InitVmt();
     classTypeSymbol->InitImts();
     classTypeSymbol->CreateLayouts();
-    if (classTypeSymbol->IsPolymorphic())
+    if (classTypeSymbol->IsPolymorphic() && !classTypeSymbol->IsPrototypeTemplateSpecialization())
     {
         symbolTable.AddPolymorphicClass(classTypeSymbol);
     }
@@ -811,10 +811,33 @@ void TypeBinder::Visit(EnumTypeNode& enumTypeNode)
         EnumConstantNode* enumConstantNode = enumTypeNode.Constants()[i];
         enumConstantNode->Accept(*this);
     } 
+    EnumTypeDefaultConstructor* defaultConstructor = new EnumTypeDefaultConstructor(enumTypeSymbol);
+    symbolTable.SetFunctionIdFor(defaultConstructor);
+    enumTypeSymbol->AddMember(defaultConstructor);
+    EnumTypeCopyConstructor* copyConstructor = new EnumTypeCopyConstructor(enumTypeSymbol);
+    symbolTable.SetFunctionIdFor(copyConstructor);
+    enumTypeSymbol->AddMember(copyConstructor);
+    EnumTypeMoveConstructor* moveConstructor = new EnumTypeMoveConstructor(enumTypeSymbol);
+    symbolTable.SetFunctionIdFor(moveConstructor);
+    enumTypeSymbol->AddMember(moveConstructor);
+    EnumTypeCopyAssignment* copyAssignment = new EnumTypeCopyAssignment(enumTypeSymbol, symbolTable.GetTypeByName(U"void"));
+    symbolTable.SetFunctionIdFor(copyAssignment);
+    enumTypeSymbol->AddMember(copyAssignment);
+    EnumTypeMoveAssignment* moveAssignment = new EnumTypeMoveAssignment(enumTypeSymbol, symbolTable.GetTypeByName(U"void"));
+    symbolTable.SetFunctionIdFor(moveAssignment);
+    enumTypeSymbol->AddMember(moveAssignment);
+    EnumTypeReturn* returnFun = new EnumTypeReturn(enumTypeSymbol);
+    symbolTable.SetFunctionIdFor(returnFun);
+    enumTypeSymbol->AddMember(returnFun);
+    EnumTypeEqualityOp* equality = new EnumTypeEqualityOp(enumTypeSymbol, symbolTable.GetTypeByName(U"bool"));
+    symbolTable.SetFunctionIdFor(equality);
+    enumTypeSymbol->Ns()->AddMember(equality);
     EnumTypeToUnderlyingTypeConversion* enum2underlying = new EnumTypeToUnderlyingTypeConversion(enumTypeNode.GetSpan(), U"enum2underlying", enumTypeSymbol, underlyingType);
+    symbolTable.SetFunctionIdFor(enum2underlying);
     symbolTable.AddConversion(enum2underlying);
     enumTypeSymbol->AddMember(enum2underlying);
     UnderlyingTypeToEnumTypeConversion* underlying2enum = new UnderlyingTypeToEnumTypeConversion(enumTypeNode.GetSpan(), U"underlying2enum", underlyingType, enumTypeSymbol);
+    symbolTable.SetFunctionIdFor(underlying2enum);
     symbolTable.AddConversion(underlying2enum);
     enumTypeSymbol->AddMember(underlying2enum);
     containerScope = prevContainerScope;

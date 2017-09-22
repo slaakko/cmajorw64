@@ -1430,6 +1430,7 @@ void ClassDefaultConstructorOperation::CollectViableFunctions(ContainerScope* co
         viableFunctions.insert(classType->DefaultConstructor());
         return;
     }
+    GetBoundCompileUnit().FinalizeBinding(classType);
     FunctionSymbol* function = functionMap[classType];
     if (!function)
     {
@@ -1515,7 +1516,7 @@ bool ClassDefaultConstructorOperation::GenerateImplementation(ClassDefaultConstr
             MemberVariableSymbol* memberVariableSymbol = classType->MemberVariables()[i];
             std::vector<FunctionScopeLookup> memberConstructorCallLookups;
             memberConstructorCallLookups.push_back(FunctionScopeLookup(ScopeLookup::this_and_base_and_parent, containerScope));
-            memberConstructorCallLookups.push_back(FunctionScopeLookup(ScopeLookup::this_, memberVariableSymbol->GetType()->BaseType()->ClassInterfaceOrNsScope()));
+            memberConstructorCallLookups.push_back(FunctionScopeLookup(ScopeLookup::this_, memberVariableSymbol->GetType()->BaseType()->ClassInterfaceEnumOrNsScope()));
             memberConstructorCallLookups.push_back(FunctionScopeLookup(ScopeLookup::fileScopes, nullptr));
             std::vector<std::unique_ptr<BoundExpression>> memberConstructorCallArguments;
             BoundMemberVariable* boundMemberVariable = new BoundMemberVariable(memberVariableSymbol);
@@ -1601,6 +1602,7 @@ void ClassCopyConstructorOperation::CollectViableFunctions(ContainerScope* conta
             viableFunctions.insert(classType->CopyConstructor());
             return;
         }
+        GetBoundCompileUnit().FinalizeBinding(classType);
         FunctionSymbol* function = functionMap[classType];
         if (!function)
         {
@@ -1695,7 +1697,7 @@ bool ClassCopyConstructorOperation::GenerateImplementation(ClassCopyConstructor*
             MemberVariableSymbol* memberVariableSymbol = classType->MemberVariables()[i];
             std::vector<FunctionScopeLookup> memberConstructorCallLookups;
             memberConstructorCallLookups.push_back(FunctionScopeLookup(ScopeLookup::this_and_base_and_parent, containerScope));
-            memberConstructorCallLookups.push_back(FunctionScopeLookup(ScopeLookup::this_, memberVariableSymbol->GetType()->BaseType()->ClassInterfaceOrNsScope()));
+            memberConstructorCallLookups.push_back(FunctionScopeLookup(ScopeLookup::this_, memberVariableSymbol->GetType()->BaseType()->ClassInterfaceEnumOrNsScope()));
             memberConstructorCallLookups.push_back(FunctionScopeLookup(ScopeLookup::fileScopes, nullptr));
             std::vector<std::unique_ptr<BoundExpression>> memberConstructorCallArguments;
             BoundMemberVariable* boundMemberVariable = new BoundMemberVariable(memberVariableSymbol);
@@ -1785,6 +1787,7 @@ void ClassMoveConstructorOperation::CollectViableFunctions(ContainerScope* conta
             viableFunctions.insert(classType->MoveConstructor());
             return;
         }
+        GetBoundCompileUnit().FinalizeBinding(classType);
         FunctionSymbol* function = functionMap[classType];
         if (!function)
         {
@@ -1879,7 +1882,7 @@ bool ClassMoveConstructorOperation::GenerateImplementation(ClassMoveConstructor*
             MemberVariableSymbol* memberVariableSymbol = classType->MemberVariables()[i];
             std::vector<FunctionScopeLookup> memberConstructorCallLookups;
             memberConstructorCallLookups.push_back(FunctionScopeLookup(ScopeLookup::this_and_base_and_parent, containerScope));
-            memberConstructorCallLookups.push_back(FunctionScopeLookup(ScopeLookup::this_, memberVariableSymbol->GetType()->BaseType()->ClassInterfaceOrNsScope()));
+            memberConstructorCallLookups.push_back(FunctionScopeLookup(ScopeLookup::this_, memberVariableSymbol->GetType()->BaseType()->ClassInterfaceEnumOrNsScope()));
             memberConstructorCallLookups.push_back(FunctionScopeLookup(ScopeLookup::fileScopes, nullptr));
             std::vector<std::unique_ptr<BoundExpression>> memberConstructorCallArguments;
             BoundMemberVariable* boundMemberVariable = new BoundMemberVariable(memberVariableSymbol);
@@ -1977,6 +1980,7 @@ void ClassCopyAssignmentOperation::CollectViableFunctions(ContainerScope* contai
             viableFunctions.insert(classType->CopyAssignment());
             return;
         }
+        GetBoundCompileUnit().FinalizeBinding(classType);
         FunctionSymbol* function = functionMap[classType];
         if (!function)
         {
@@ -2045,7 +2049,7 @@ bool ClassCopyAssignmentOperation::GenerateImplementation(ClassCopyAssignment* c
             MemberVariableSymbol* memberVariableSymbol = classType->MemberVariables()[i];
             std::vector<FunctionScopeLookup> memberAssignmentCallLookups;
             memberAssignmentCallLookups.push_back(FunctionScopeLookup(ScopeLookup::this_and_base_and_parent, containerScope));
-            memberAssignmentCallLookups.push_back(FunctionScopeLookup(ScopeLookup::this_, memberVariableSymbol->GetType()->BaseType()->ClassInterfaceOrNsScope()));
+            memberAssignmentCallLookups.push_back(FunctionScopeLookup(ScopeLookup::this_, memberVariableSymbol->GetType()->BaseType()->ClassInterfaceEnumOrNsScope()));
             memberAssignmentCallLookups.push_back(FunctionScopeLookup(ScopeLookup::fileScopes, nullptr));
             std::vector<std::unique_ptr<BoundExpression>> memberAssignmentCallArguments;
             BoundMemberVariable* boundMemberVariable = new BoundMemberVariable(memberVariableSymbol);
@@ -2137,6 +2141,7 @@ void ClassMoveAssignmentOperation::CollectViableFunctions(ContainerScope* contai
             viableFunctions.insert(classType->MoveAssignment());
             return;
         }
+        GetBoundCompileUnit().FinalizeBinding(classType);
         FunctionSymbol* function = functionMap[classType];
         if (!function)
         {
@@ -2917,7 +2922,7 @@ void GenerateClassTermination(DestructorSymbol* destructorSymbol, DestructorNode
             {
                 std::vector<FunctionScopeLookup> memberDestructorCallLookups;
                 memberDestructorCallLookups.push_back(FunctionScopeLookup(ScopeLookup::this_and_base_and_parent, containerScope));
-                memberDestructorCallLookups.push_back(FunctionScopeLookup(ScopeLookup::this_, memberVariableSymbol->GetType()->BaseType()->ClassInterfaceOrNsScope()));
+                memberDestructorCallLookups.push_back(FunctionScopeLookup(ScopeLookup::this_, memberVariableSymbol->GetType()->BaseType()->ClassInterfaceEnumOrNsScope()));
                 memberDestructorCallLookups.push_back(FunctionScopeLookup(ScopeLookup::fileScopes, nullptr));
                 std::vector<std::unique_ptr<BoundExpression>> memberDestructorCallArguments;
                 BoundMemberVariable* boundMemberVariable = new BoundMemberVariable(memberVariableSymbol);

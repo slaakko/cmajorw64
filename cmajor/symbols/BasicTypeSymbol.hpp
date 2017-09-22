@@ -15,8 +15,33 @@ public:
     BasicTypeSymbol(SymbolType symbolType_, const Span& span_, const std::u32string& name_);
     std::string TypeString() const override { return "basic_type"; }
     bool IsBasicTypeSymbol() const override { return true; }
+    void Write(SymbolWriter& writer) override;
+    void Read(SymbolReader& reader) override;
+    void EmplaceFunction(FunctionSymbol* functionSymbol, int index) override;
     void Accept(SymbolCollector* collector) override;
     void Dump(CodeFormatter& formatter) override;
+    FunctionSymbol* DefaultConstructor() { return defaultConstructor; }
+    void SetDefaultConstructor(FunctionSymbol* defaultConstructor_) { defaultConstructor = defaultConstructor_; }
+    FunctionSymbol* CopyConstructor() { return copyConstructor; }
+    void SetCopyConstructor(FunctionSymbol* copyConstructor_) { copyConstructor = copyConstructor_; }
+    FunctionSymbol* MoveConstructor() { return moveConstructor; }
+    void SetMoveConstructor(FunctionSymbol* moveConstructor_) { moveConstructor = moveConstructor_; }
+    FunctionSymbol* CopyAssignment() { return copyAssignment; }
+    void SetCopyAssignment(FunctionSymbol* copyAssignment_) { copyAssignment = copyAssignment_; }
+    FunctionSymbol* MoveAssignment() { return moveAssignment; }
+    void SetMoveAssignment(FunctionSymbol* moveAssignment_) { moveAssignment = moveAssignment_; }
+    FunctionSymbol* ReturnFun() { return returnFun; }
+    void SetReturnFun(FunctionSymbol* returnFun_) { returnFun = returnFun_; }
+    FunctionSymbol* EqualityOp() { return equalityOp; }
+    void SetEqualityOp(FunctionSymbol* equalityOp_) { equalityOp = equalityOp_; }
+private:
+    FunctionSymbol* defaultConstructor;
+    FunctionSymbol* copyConstructor;
+    FunctionSymbol* moveConstructor;
+    FunctionSymbol* copyAssignment;
+    FunctionSymbol* moveAssignment;
+    FunctionSymbol* returnFun;
+    FunctionSymbol* equalityOp;
 };
 
 class BoolTypeSymbol : public BasicTypeSymbol
