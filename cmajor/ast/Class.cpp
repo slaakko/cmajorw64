@@ -334,6 +334,31 @@ void MemberFunctionNode::Accept(Visitor& visitor)
     visitor.Visit(*this);
 }
 
+ConversionFunctionNode::ConversionFunctionNode(const Span& span_) : FunctionNode(NodeType::conversionFunctionNode, span_)
+{
+}
+
+ConversionFunctionNode::ConversionFunctionNode(const Span& span_, Specifiers specifiers_, Node* returnTypeExpr_) :
+    FunctionNode(NodeType::conversionFunctionNode, span_, specifiers_, returnTypeExpr_, U"@operator_conv")
+{
+}
+
+Node* ConversionFunctionNode::Clone(CloneContext& cloneContext) const
+{
+    ConversionFunctionNode* clone = new ConversionFunctionNode(GetSpan());
+    CloneContent(clone, cloneContext);
+    if (IsConst())
+    {
+        clone->SetConst();
+    }
+    return clone;
+}
+
+void ConversionFunctionNode::Accept(Visitor& visitor)
+{
+    visitor.Visit(*this);
+}
+
 MemberVariableNode::MemberVariableNode(const Span& span_) : Node(NodeType::memberVariableNode, span_)
 {
 }

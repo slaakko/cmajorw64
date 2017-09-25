@@ -30,6 +30,7 @@ public:
     void Visit(ConstructorNode& constructorNode) override;
     void Visit(DestructorNode& destructorNode) override;
     void Visit(MemberFunctionNode& memberFunctionNode) override;
+    void Visit(ConversionFunctionNode& conversionFunctionNode) override;
     void Visit(CompoundStatementNode& compoundStatementNode) override;
     void Visit(ReturnStatementNode& returnStatementNode) override;
     void Visit(IfStatementNode& ifStatementNode) override;

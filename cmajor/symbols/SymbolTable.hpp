@@ -134,6 +134,8 @@ public:
     void EndDestructor();
     void BeginMemberFunction(MemberFunctionNode& memberFunctionNode);
     void EndMemberFunction();
+    void BeginConversionFunction(ConversionFunctionNode& conversionFunctionNode);
+    void EndConversionFunction();
     void AddMemberVariable(MemberVariableNode& memberVariableNode);
     void BeginDelegate(DelegateNode& delegateNode);
     void EndDelegate();

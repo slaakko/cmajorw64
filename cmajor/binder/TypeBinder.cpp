@@ -497,6 +497,53 @@ void TypeBinder::Visit(MemberFunctionNode& memberFunctionNode)
     currentFunctionSymbol = prevFunctionSymbol;
 }
 
+void TypeBinder::Visit(ConversionFunctionNode& conversionFunctionNode)
+{
+    Symbol* symbol = symbolTable.GetSymbol(&conversionFunctionNode);
+    Assert(symbol->GetSymbolType() == SymbolType::conversionFunctionSymbol, "conversion function symbol expected");
+    ConversionFunctionSymbol* conversionFunctionSymbol = static_cast<ConversionFunctionSymbol*>(symbol);
+    FunctionSymbol* prevFunctionSymbol = currentFunctionSymbol;
+    currentFunctionSymbol = conversionFunctionSymbol;
+    ContainerScope* prevContainerScope = containerScope;
+    containerScope = conversionFunctionSymbol->GetContainerScope();
+    conversionFunctionSymbol->SetSpecifiers(conversionFunctionNode.GetSpecifiers());
+    if (GetGlobalFlag(GlobalFlags::release) && conversionFunctionSymbol->IsInline())
+    {
+        conversionFunctionSymbol->CloneUsingNodes(usingNodes);
+    }
+    const Symbol* parent = conversionFunctionSymbol->Parent();
+    if (parent->IsStatic())
+    {
+        throw Exception("static class cannot contain conversion functions", conversionFunctionSymbol->GetSpan(), parent->GetSpan());
+    }
+    if (parent->GetSymbolType() == SymbolType::classTemplateSpecializationSymbol)
+    {
+        conversionFunctionSymbol->SetTemplateSpecialization();
+        conversionFunctionSymbol->SetLinkOnceOdrLinkage();
+    }
+    TypeSymbol* returnType = ResolveType(conversionFunctionNode.ReturnTypeExpr(), boundCompileUnit, containerScope);
+    conversionFunctionSymbol->SetReturnType(returnType);
+    conversionFunctionSymbol->ComputeName();
+    if (conversionFunctionSymbol->ReturnsClassByValue())
+    {
+        ParameterSymbol* returnParam = new ParameterSymbol(conversionFunctionNode.ReturnTypeExpr()->GetSpan(), U"@return");
+        returnParam->SetParent(conversionFunctionSymbol);
+        returnParam->SetType(returnType->AddPointer(conversionFunctionNode.GetSpan()));
+        conversionFunctionSymbol->SetReturnParam(returnParam);
+    }
+    symbolTable.AddConversion(conversionFunctionSymbol);
+    if (conversionFunctionNode.Body())
+    {
+        conversionFunctionNode.Body()->Accept(*this);
+    }
+    else
+    {
+        throw Exception("conversion function has no body", conversionFunctionSymbol->GetSpan());
+    }
+    containerScope = prevContainerScope;
+    currentFunctionSymbol = prevFunctionSymbol;
+}
+
 void TypeBinder::Visit(MemberVariableNode& memberVariableNode)
 {
     Symbol* symbol = symbolTable.GetSymbol(&memberVariableNode);

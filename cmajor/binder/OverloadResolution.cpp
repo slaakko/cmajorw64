@@ -159,9 +159,11 @@ bool FindQualificationConversion(TypeSymbol* sourceType, TypeSymbol* targetType,
         ++functionMatch.numQualifyingConversions;
         return true;
     }
-    else if (!sourceType->IsReferenceType() && (targetType->IsReferenceType() || targetType->IsClassTypeSymbol()))
+    else if (!sourceType->IsReferenceType() && (targetType->IsReferenceType() || targetType->IsClassTypeSymbol() || 
+        conversionFun && conversionFun->GetSymbolType() == SymbolType::conversionFunctionSymbol))
     {
-        if (targetType->IsConstType() || targetType->IsClassTypeSymbol())
+        if (targetType->IsConstType() || targetType->IsClassTypeSymbol() || 
+            conversionFun && conversionFun->GetSymbolType() == SymbolType::conversionFunctionSymbol)
         {
             functionMatch.argumentMatches.push_back(ArgumentMatch(conversionFun, OperationFlags::addr, distance));
             ++functionMatch.numQualifyingConversions;
@@ -470,6 +472,16 @@ bool FindConversions(BoundCompileUnit& boundCompileUnit, FunctionSymbol* functio
             {
                 functionMatch.argumentMatches.push_back(ArgumentMatch(nullptr, OperationFlags::none, 0));
                 continue;
+            }
+            else if (i == 1 && function->IsLvalueReferenceCopyAssignment())
+            {
+                FunctionSymbol* conversionFun = boundCompileUnit.GetConversion(sourceType, targetType->RemoveReference(span), containerScope, span);
+                if (conversionFun->GetConversionType() == conversionType || conversionFun->GetConversionType() == ConversionType::implicit_)
+                {
+                    ++functionMatch.numConversions;
+                    functionMatch.argumentMatches.push_back(ArgumentMatch(conversionFun, OperationFlags::none, 1));
+                    continue;
+                }
             }
         }
         if (TypesEqual(sourceType, targetType))    // exact match
@@ -868,7 +880,13 @@ std::unique_ptr<BoundFunctionCall> CreateBoundFunctionCall(FunctionSymbol* bestF
         {
             if (argumentMatch.referenceConversionFlags == OperationFlags::addr)
             {
-                if (!argument->IsLvalueExpression())
+                bool lvalueExpr = argument->IsLvalueExpression();
+                if (argument->GetBoundNodeType() == BoundNodeType::boundConversion && 
+                    static_cast<BoundConversion*>(argument.get())->ConversionFun()->GetSymbolType() == SymbolType::conversionFunctionSymbol)
+                {
+                    lvalueExpr = true;
+                }
+                if (!lvalueExpr)
                 {
                     BoundLocalVariable* backingStore = new BoundLocalVariable(boundFunction->GetFunctionSymbol()->CreateTemporary(argument->GetType(), span));
                     argument.reset(new BoundTemporary(std::move(argument), std::unique_ptr<BoundLocalVariable>(backingStore)));

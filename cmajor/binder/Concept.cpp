@@ -7,6 +7,7 @@
 #include <cmajor/binder/BoundCompileUnit.hpp>
 #include <cmajor/binder/TypeResolver.hpp>
 #include <cmajor/binder/BoundConstraint.hpp>
+#include <cmajor/binder/BoundFunction.hpp>
 #include <cmajor/binder/OverloadResolution.hpp>
 #include <cmajor/symbols/TypedefSymbol.hpp>
 #include <cmajor/symbols/ConceptSymbol.hpp>
@@ -1281,7 +1282,10 @@ std::unique_ptr<BoundConcept> Instantiate(ConceptSymbol* conceptSymbol, const st
                     throw Exception("'CommonType' symbol found from concept instantiation scope is not bound template parameter", span, commonTypeSymbol->GetSpan());
                 }
                 BoundTemplateParameterSymbol* commonType = static_cast<BoundTemplateParameterSymbol*>(commonTypeSymbol);
-                containerScope->Install(commonType);
+                BoundTemplateParameterSymbol* commonTypeClone = new BoundTemplateParameterSymbol(span, U"CommonType");
+                commonTypeClone->SetType(commonType->GetType());
+                boundConcept->AddBoundTemplateParameter(std::unique_ptr<BoundTemplateParameterSymbol>(commonTypeClone));
+                containerScope->Install(commonTypeClone);
                 boundConcept->SetCommonType(commonType->GetType());
             }
             return std::unique_ptr<BoundConcept>(boundConcept);

@@ -84,7 +84,7 @@ void PointerDefaultConstructorOperation::CollectViableFunctions(ContainerScope* 
         function = new PointerDefaultCtor(pointerType, span);
         function->SetSymbolTable(GetSymbolTable());
         function->SetParent(&GetSymbolTable()->GlobalNs());
-        functionMap[type] = function;
+        functionMap[pointerType] = function;
         functions.push_back(std::unique_ptr<FunctionSymbol>(function));
     }
     viableFunctions.insert(function);
@@ -118,6 +118,12 @@ void PointerCopyCtor::GenerateCall(Emitter& emitter, std::vector<GenObject*>& ge
 {
     Assert(genObjects.size() == 2, "copy constructor needs two objects");
     genObjects[1]->Load(emitter, OperationFlags::none);
+    if ((flags & OperationFlags::leaveFirstArg) != OperationFlags::none)
+    {
+        emitter.Stack().Dup();
+        llvm::Value* ptr = emitter.Stack().Pop();
+        emitter.SaveObjectPointer(ptr);
+    }
     genObjects[0]->Store(emitter, OperationFlags::none);
 }
 
@@ -151,7 +157,7 @@ void PointerCopyConstructorOperation::CollectViableFunctions(ContainerScope* con
             function = new PointerCopyCtor(pointerType, span);
             function->SetSymbolTable(GetSymbolTable());
             function->SetParent(&GetSymbolTable()->GlobalNs());
-            functionMap[type] = function;
+            functionMap[pointerType] = function;
             functions.push_back(std::unique_ptr<FunctionSymbol>(function));
         }
         viableFunctions.insert(function);
@@ -188,6 +194,12 @@ void PointerMoveCtor::GenerateCall(Emitter& emitter, std::vector<GenObject*>& ge
     genObjects[1]->Load(emitter, OperationFlags::none);
     llvm::Value* rvalueRefValue = emitter.Stack().Pop();
     emitter.Stack().Push(emitter.Builder().CreateLoad(rvalueRefValue));
+    if ((flags & OperationFlags::leaveFirstArg) != OperationFlags::none)
+    {
+        emitter.Stack().Dup();
+        llvm::Value* ptr = emitter.Stack().Pop();
+        emitter.SaveObjectPointer(ptr);
+    }
     genObjects[0]->Store(emitter, OperationFlags::none);
 }
 
@@ -221,7 +233,7 @@ void PointerMoveConstructorOperation::CollectViableFunctions(ContainerScope* con
             function = new PointerMoveCtor(pointerType, span);
             function->SetSymbolTable(GetSymbolTable());
             function->SetParent(&GetSymbolTable()->GlobalNs());
-            functionMap[type] = function;
+            functionMap[pointerType] = function;
             functions.push_back(std::unique_ptr<FunctionSymbol>(function));
         }
         viableFunctions.insert(function);
@@ -290,7 +302,7 @@ void PointerCopyAssignmentOperation::CollectViableFunctions(ContainerScope* cont
             function = new PointerCopyAssignment(pointerType, GetSymbolTable()->GetTypeByName(U"void"), span);
             function->SetSymbolTable(GetSymbolTable());
             function->SetParent(&GetSymbolTable()->GlobalNs());
-            functionMap[type] = function;
+            functionMap[pointerType] = function;
             functions.push_back(std::unique_ptr<FunctionSymbol>(function));
         }
         viableFunctions.insert(function);
@@ -361,7 +373,7 @@ void PointerMoveAssignmentOperation::CollectViableFunctions(ContainerScope* cont
             function = new PointerMoveAssignment(pointerType, GetSymbolTable()->GetTypeByName(U"void"), span);
             function->SetSymbolTable(GetSymbolTable());
             function->SetParent(&GetSymbolTable()->GlobalNs());
-            functionMap[type] = function;
+            functionMap[pointerType] = function;
             functions.push_back(std::unique_ptr<FunctionSymbol>(function));
         }
         viableFunctions.insert(function);

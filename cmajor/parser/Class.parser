@@ -70,7 +70,8 @@ namespace cmajor.parser
             ::= StaticConstructor(ctx, classNode){ value = StaticConstructor; }
             |   Constructor(ctx, classNode){ value = Constructor; }
             |   Destructor(ctx, classNode){ value = Destructor; }
-            |   MemberFunction(ctx, classNode){ value= MemberFunction; }
+            |   MemberFunction(ctx){ value = MemberFunction; }
+            |   ConversionFunction(ctx){ value = ConversionFunction; }
             |   MemberVariable(ctx){ value = MemberVariable; }
             |   Typedef(ctx){ value = Typedef; }
             |   Class(ctx){ value = Class; }
@@ -113,7 +114,7 @@ namespace cmajor.parser
             |   Identifier{ value = new MemberInitializerNode(span, Identifier); } '('! ArgumentList(ctx, value):memberArgs! ')'!
             ;
 
-        MemberFunction(ParsingContext* ctx, ClassNode* classNode, var std::unique_ptr<MemberFunctionNode> memFun, var std::unique_ptr<IdentifierNode> qid) : Node*
+        MemberFunction(ParsingContext* ctx, var std::unique_ptr<MemberFunctionNode> memFun, var std::unique_ptr<IdentifierNode> qid) : Node*
             ::= (Specifiers TypeExpr(ctx) FunctionGroupId(ctx))
                 { 
                     memFun.reset(new MemberFunctionNode(span, Specifiers, TypeExpr, FunctionGroupId)); 
@@ -121,6 +122,13 @@ namespace cmajor.parser
                 ParameterList(ctx, memFun.get()) (keyword("const"){ memFun->SetConst(); })?
                 (WhereConstraint(ctx){ memFun->SetConstraint(WhereConstraint); })?
                 (CompoundStatement(ctx){ memFun->SetBody(CompoundStatement); } | ';' ){ value = memFun.release(); }
+            ;
+
+        ConversionFunction(ParsingContext* ctx, var std::unique_ptr<ConversionFunctionNode> conversionFun) : Node*
+            ::= (Specifiers keyword("operator") TypeExpr(ctx) '('! ')'!){ conversionFun.reset(new ConversionFunctionNode(span, Specifiers, TypeExpr)); }
+                (keyword("const"){ conversionFun->SetConst(); })? 
+                (WhereConstraint(ctx){ conversionFun->SetConstraint(WhereConstraint); })?
+                (CompoundStatement(ctx){ conversionFun->SetBody(CompoundStatement); } | ';'){ value = conversionFun.release(); }
             ;
 
         MemberVariable(ParsingContext* ctx) : Node*

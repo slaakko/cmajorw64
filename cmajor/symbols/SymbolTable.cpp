@@ -574,6 +574,42 @@ void SymbolTable::EndMemberFunction()
     container->AddMember(memberFunctionSymbol);
 }
 
+void SymbolTable::BeginConversionFunction(ConversionFunctionNode& conversionFunctionNode)
+{
+    ConversionFunctionSymbol* conversionFunctionSymbol = new ConversionFunctionSymbol(conversionFunctionNode.GetSpan(), U"@conversion");
+    SetFunctionIdFor(conversionFunctionSymbol);
+    conversionFunctionSymbol->SetCompileUnit(currentCompileUnit);
+    conversionFunctionSymbol->SetSymbolTable(this);
+    conversionFunctionSymbol->SetGroupName(U"@operator_conv");
+    MapNode(&conversionFunctionNode, conversionFunctionSymbol);
+    ContainerScope* conversionFunctionScope = conversionFunctionSymbol->GetContainerScope();
+    ContainerScope* containerScope = container->GetContainerScope();
+    conversionFunctionScope->SetParent(containerScope);
+    BeginContainer(conversionFunctionSymbol);
+    ResetDeclarationBlockIndex();
+    ParameterSymbol* thisParam = new ParameterSymbol(conversionFunctionNode.GetSpan(), U"this");
+    thisParam->SetSymbolTable(this);
+    TypeSymbol* thisParamType = nullptr;
+    if (conversionFunctionNode.IsConst())
+    {
+        thisParamType = currentClass->AddConst(conversionFunctionNode.GetSpan())->AddPointer(conversionFunctionNode.GetSpan());
+    }
+    else
+    {
+        thisParamType = currentClass->AddPointer(conversionFunctionNode.GetSpan());
+    }
+    thisParam->SetType(thisParamType);
+    thisParam->SetBound();
+    conversionFunctionSymbol->AddMember(thisParam);
+}
+
+void SymbolTable::EndConversionFunction()
+{
+    ConversionFunctionSymbol* conversionFunctionSymbol = static_cast<ConversionFunctionSymbol*>(container);
+    EndContainer();
+    container->AddMember(conversionFunctionSymbol);
+}
+
 void SymbolTable::AddMemberVariable(MemberVariableNode& memberVariableNode)
 {
     MemberVariableSymbol* memberVariableSymbol = new MemberVariableSymbol(memberVariableNode.GetSpan(), memberVariableNode.Id()->Str());

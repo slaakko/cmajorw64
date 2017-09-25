@@ -457,6 +457,29 @@ void StatementBinder::Visit(MemberFunctionNode& memberFunctionNode)
     currentMemberFunctionSymbol = prevMemberFunctionSymbol;
 }
 
+void StatementBinder::Visit(ConversionFunctionNode& conversionFunctionNode)
+{
+    ContainerScope* prevContainerScope = containerScope;
+    Symbol* symbol = boundCompileUnit.GetSymbolTable().GetSymbol(&conversionFunctionNode);
+    Assert(symbol->GetSymbolType() == SymbolType::conversionFunctionSymbol, "conversion function symbol expected");
+    ConversionFunctionSymbol* conversionFunctionSymbol = static_cast<ConversionFunctionSymbol*>(symbol);
+    containerScope = symbol->GetContainerScope();
+    std::unique_ptr<BoundFunction> boundFunction(new BoundFunction(conversionFunctionSymbol));
+    BoundFunction* prevFunction = currentFunction;
+    currentFunction = boundFunction.get();
+    Assert(conversionFunctionNode.Body(), "body expected");
+    compoundLevel = 0;
+    conversionFunctionNode.Body()->Accept(*this);
+    BoundStatement* boundStatement = statement.release();
+    Assert(boundStatement->GetBoundNodeType() == BoundNodeType::boundCompoundStatement, "bound compound statement expected");
+    BoundCompoundStatement* compoundStatement = static_cast<BoundCompoundStatement*>(boundStatement);
+    boundFunction->SetBody(std::unique_ptr<BoundCompoundStatement>(compoundStatement));
+    CheckFunctionReturnPaths(conversionFunctionSymbol, conversionFunctionNode, containerScope, boundCompileUnit);
+    currentClass->AddMember(std::move(boundFunction));
+    currentFunction = prevFunction;
+    containerScope = prevContainerScope;
+}
+
 void StatementBinder::Visit(CompoundStatementNode& compoundStatementNode)
 {
     ContainerScope* prevContainerScope = containerScope;

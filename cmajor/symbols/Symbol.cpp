@@ -33,7 +33,7 @@ const char* symbolTypeStr[uint8_t(SymbolType::maxSymbol)] =
     "boolTypeSymbol", "sbyteTypeSymbol", "byteTypeSymbol", "shortTypeSymbol", "ushortTypeSymbol", "intTypeSymbol", "uintTypeSymbol", "longTypeSymbol", "ulongTypeSymbol", "floatTypeSymbol", "doubleTypeSymbol",
     "charTypeSymbol", "wcharTypeSymbol", "ucharTypeSymbol", "voidTypeSymbol", "nullPtrTypeSymbol",
     "derivedTypeSymbol"
-    "namespaceSymbol", "functionSymbol", "staticConstructorSymbol", "constructorSymbol", "destructorSymbol", "memberFunctionSymbol", "functionGroupSymbol",
+    "namespaceSymbol", "functionSymbol", "staticConstructorSymbol", "constructorSymbol", "destructorSymbol", "memberFunctionSymbol", "conversionFunctionSymbol", "functionGroupSymbol",
     "classGroupTypeSymbol", "classTypeSymbol", "interfaceTypeSymbol", "conceptGroupSymbol", "conceptSymbol",
     "delegateTypeSymbol", "classDelegateTypeSymbol", "declarationBlock", "typedefSymbol", "constantSymbol", "enumTypeSymbol", "enumConstantSymbol",
     "templateParameterSymbol", "boundTemplateParameterSymbol", "parameterSymbol", "localVariableSymbol", "memberVariableSymbol",
@@ -802,6 +802,7 @@ SymbolFactory::SymbolFactory()
     Register(SymbolType::constructorSymbol, new ConcreteSymbolCreator<ConstructorSymbol>());
     Register(SymbolType::destructorSymbol, new ConcreteSymbolCreator<DestructorSymbol>());
     Register(SymbolType::memberFunctionSymbol, new ConcreteSymbolCreator<MemberFunctionSymbol>());
+    Register(SymbolType::conversionFunctionSymbol, new ConcreteSymbolCreator<ConversionFunctionSymbol>());
     Register(SymbolType::functionGroupSymbol, new ConcreteSymbolCreator<FunctionGroupSymbol>());
     Register(SymbolType::classGroupTypeSymbol, new ConcreteSymbolCreator<ClassGroupTypeSymbol>());
     Register(SymbolType::classTypeSymbol, new ConcreteSymbolCreator<ClassTypeSymbol>());

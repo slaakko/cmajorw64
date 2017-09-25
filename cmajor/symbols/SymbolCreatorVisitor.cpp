@@ -158,6 +158,16 @@ void SymbolCreatorVisitor::Visit(MemberFunctionNode& memberFunctionNode)
     symbolTable.EndMemberFunction();
 }
 
+void SymbolCreatorVisitor::Visit(ConversionFunctionNode& conversionFunctionNode)
+{
+    symbolTable.BeginConversionFunction(conversionFunctionNode);
+    if (conversionFunctionNode.Body())
+    {
+        conversionFunctionNode.Body()->Accept(*this);
+    }
+    symbolTable.EndConversionFunction();
+}
+
 void SymbolCreatorVisitor::Visit(MemberVariableNode& memberVariableNode)
 {
     symbolTable.AddMemberVariable(memberVariableNode);

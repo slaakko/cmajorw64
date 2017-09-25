@@ -1277,7 +1277,7 @@ void MemberFunctionSymbol::SetSpecifiers(Specifiers specifiers)
     SetAccess(accessSpecifiers);
     if ((specifiers & Specifiers::static_) != Specifiers::none)
     {
-    SetStatic();
+        SetStatic();
     }
     if ((specifiers & Specifiers::virtual_) != Specifiers::none)
     {
@@ -1367,6 +1367,95 @@ void MemberFunctionSymbol::SetSpecifiers(Specifiers specifiers)
     if ((specifiers & Specifiers::unit_test_) != Specifiers::none)
     {
         throw Exception("member function cannot be unit_test", GetSpan());
+    }
+}
+
+ConversionFunctionSymbol::ConversionFunctionSymbol(const Span& span_, const std::u32string& name_) : FunctionSymbol(SymbolType::conversionFunctionSymbol, span_, name_)
+{
+    SetConversion();
+}
+
+TypeSymbol* ConversionFunctionSymbol::ConversionSourceType() const
+{
+    Assert(Parent()->IsTypeSymbol(), "type symbol expected");
+    return const_cast<TypeSymbol*>(static_cast<const TypeSymbol*>(Parent()));
+}
+
+TypeSymbol* ConversionFunctionSymbol::ConversionTargetType() const
+{
+    return ReturnType();
+}
+
+void ConversionFunctionSymbol::SetSpecifiers(Specifiers specifiers)
+{
+    Specifiers accessSpecifiers = specifiers & Specifiers::access_;
+    SetAccess(accessSpecifiers);
+    if ((specifiers & Specifiers::static_) != Specifiers::none)
+    {
+        throw Exception("conversion function cannot be static", GetSpan());
+    }
+    if ((specifiers & Specifiers::virtual_) != Specifiers::none)
+    {
+        throw Exception("conversion function cannot be virtual", GetSpan());
+    }
+    if ((specifiers & Specifiers::override_) != Specifiers::none)
+    {
+        throw Exception("conversion function cannot be override", GetSpan());
+    }
+    if ((specifiers & Specifiers::abstract_) != Specifiers::none)
+    {
+        throw Exception("conversion function cannot be abstract", GetSpan());
+    }
+    if ((specifiers & Specifiers::inline_) != Specifiers::none)
+    {
+        SetInline();
+    }
+    if ((specifiers & Specifiers::explicit_) != Specifiers::none)
+    {
+        throw Exception("conversion function cannot be explicit", GetSpan());
+    }
+    if ((specifiers & Specifiers::external_) != Specifiers::none)
+    {
+        throw Exception("conversion function cannot be external", GetSpan());
+    }
+    if ((specifiers & Specifiers::suppress_) != Specifiers::none)
+    {
+        throw Exception("conversion function cannot be suppressed", GetSpan());
+    }
+    if ((specifiers & Specifiers::default_) != Specifiers::none)
+    {
+        throw Exception("conversion function cannot be default", GetSpan());
+    }
+    if ((specifiers & Specifiers::constexpr_) != Specifiers::none)
+    {
+        SetConstExpr();
+    }
+    if ((specifiers & Specifiers::cdecl_) != Specifiers::none)
+    {
+        throw Exception("conversion function cannot be cdecl", GetSpan());
+    }
+    if ((specifiers & Specifiers::nothrow_) != Specifiers::none)
+    {
+        SetNothrow();
+    }
+    if ((specifiers & Specifiers::throw_) != Specifiers::none)
+    {
+        if (IsNothrow())
+        {
+            throw Exception("conversion function cannot be throw and nothrow at the same time", GetSpan());
+        }
+    }
+    if ((specifiers & Specifiers::new_) != Specifiers::none)
+    {
+        throw Exception("conversion function cannot be new", GetSpan());
+    }
+    if ((specifiers & Specifiers::const_) != Specifiers::none)
+    {
+        SetConst();
+    }
+    if ((specifiers & Specifiers::unit_test_) != Specifiers::none)
+    {
+        throw Exception("conversion function cannot be unit_test", GetSpan());
     }
 }
 

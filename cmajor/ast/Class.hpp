@@ -129,6 +129,17 @@ public:
     void SetConst() { SetSpecifiers(GetSpecifiers() | Specifiers::const_); }
 };
 
+class ConversionFunctionNode : public FunctionNode
+{
+public:
+    ConversionFunctionNode(const Span& span_);
+    ConversionFunctionNode(const Span& span_, Specifiers specifiers_, Node* returnTypeExpr_);
+    Node* Clone(CloneContext& cloneContext) const override;
+    void Accept(Visitor& visitor) override;
+    bool IsConst() const { return (GetSpecifiers() & Specifiers::const_) != Specifiers::none; }
+    void SetConst() { SetSpecifiers(GetSpecifiers() | Specifiers::const_); }
+};
+
 class MemberVariableNode : public Node
 {
 public:

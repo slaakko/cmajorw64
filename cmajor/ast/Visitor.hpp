@@ -58,6 +58,7 @@ class StaticConstructorNode;
 class ConstructorNode;
 class DestructorNode;
 class MemberFunctionNode;
+class ConversionFunctionNode;
 class MemberVariableNode;
 class InterfaceNode;
 class DelegateNode;
@@ -224,6 +225,7 @@ public:
     virtual void Visit(ConstructorNode& constructorNode) {}
     virtual void Visit(DestructorNode& destructorNode) {}
     virtual void Visit(MemberFunctionNode& memberFunctionNode) {}
+    virtual void Visit(ConversionFunctionNode& conversionFunctionNode) {}
     virtual void Visit(MemberVariableNode& memberVariableNode) {}
     virtual void Visit(InterfaceNode& interfaceNode) {}
     virtual void Visit(DelegateNode& delegateNode) {}

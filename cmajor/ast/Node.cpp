@@ -32,7 +32,8 @@ const char* nodeTypeStr[] =
     "booleanLiteralNode", "sbyteLiteralNode", "byteLiteralNode", "shortLiteralNode", "ushortLiteralNode", "intLiteralNode", "uintLiteralNode", "longLiteralNode", "ulongLiteralNode",
     "floatLiteralNode", "doubleLiteralNode", "charLiteralNode", "wcharLiteralNode", "ucharLiteralNode", "stringLiteralNode", "wstringLiteralNode", "ustringLiteralNode", "nullLiteralNode",
     "compileUnitNode", "namespaceNode", "aliasNode", "namespaceImportNode", "identifierNode", "templateIdNode", "functionNode", 
-    "classNode", "thisInitializerNode", "baseInitializerNode", "memberInitializerNode", "staticConstructorNode", "constructorNode", "destructorNode", "memberFunctionNode", "memberVariableNode",
+    "classNode", "thisInitializerNode", "baseInitializerNode", "memberInitializerNode", "staticConstructorNode", "constructorNode", "destructorNode", "memberFunctionNode", "conversionFunctionNode",
+    "memberVariableNode",
     "interfaceNode", "delegateNode", "classDelegateNode",
     "disjunctiveConstraintNode", "conjunctiveConstraintNode", "whereConstraintNode", "predicateConstraintNode", "isConstraintNode", "multiParamConstraintNode", "typeNameConstraintNode",
     "constructorConstraintNode", "destructorConstraintNode", "memberFunctionConstraintNode", "functionConstraintNode",
@@ -200,6 +201,7 @@ NodeFactory::NodeFactory()
     Register(NodeType::constructorNode, new ConcreteNodeCreator<ConstructorNode>());
     Register(NodeType::destructorNode, new ConcreteNodeCreator<DestructorNode>());
     Register(NodeType::memberFunctionNode, new ConcreteNodeCreator<MemberFunctionNode>());
+    Register(NodeType::conversionFunctionNode, new ConcreteNodeCreator<ConversionFunctionNode>());
     Register(NodeType::memberVariableNode, new ConcreteNodeCreator<MemberVariableNode>());
     Register(NodeType::interfaceNode, new ConcreteNodeCreator<InterfaceNode>());
     Register(NodeType::delegateNode, new ConcreteNodeCreator<DelegateNode>());

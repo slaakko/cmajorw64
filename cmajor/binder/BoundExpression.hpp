@@ -282,6 +282,7 @@ public:
     void Accept(BoundNodeVisitor& visitor) override;
     bool HasValue() const override { return true; }
     std::string TypeString() const override { return "conversion"; }
+    FunctionSymbol* ConversionFun() { return conversionFun; }
 private:
     std::unique_ptr<BoundExpression> sourceExpr;
     FunctionSymbol* conversionFun;

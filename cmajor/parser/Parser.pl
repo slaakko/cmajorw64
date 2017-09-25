@@ -52,7 +52,8 @@ namespace cmajor.parser
         Constructor(ParsingContext* ctx, ClassNode* classNode, var std::unique_ptr<IdentifierNode> id, var std::unique_ptr<ConstructorNode> ctor): Node*;
         Destructor(ParsingContext* ctx, ClassNode* classNode, var std::unique_ptr<IdentifierNode> id, var std::unique_ptr<DestructorNode> dtor): Node*;
         Initializer(ParsingContext* ctx): InitializerNode*;
-        MemberFunction(ParsingContext* ctx, ClassNode* classNode, var std::unique_ptr<MemberFunctionNode> memFun, var std::unique_ptr<IdentifierNode> qid): Node*;
+        MemberFunction(ParsingContext* ctx, var std::unique_ptr<MemberFunctionNode> memFun, var std::unique_ptr<IdentifierNode> qid): Node*;
+        ConversionFunction(ParsingContext* ctx, var std::unique_ptr<ConversionFunctionNode> conversionFun): Node*;
         MemberVariable(ParsingContext* ctx): Node*;
     }
     grammar DelegateGrammar

@@ -1445,7 +1445,7 @@ void ExpressionBinder::Visit(InvokeNode& invokeNode)
         }
         if (!scopeQualified)
         {
-            functionScopeLookups.push_back(FunctionScopeLookup(ScopeLookup::this_and_base, type->BaseType()->ClassInterfaceOrNsScope()));
+            functionScopeLookups.push_back(FunctionScopeLookup(ScopeLookup::this_and_base, type->BaseType()->ClassInterfaceEnumOrNsScope()));
         }
         temporary = boundFunction->GetFunctionSymbol()->CreateTemporary(type, invokeNode.GetSpan());
         std::unique_ptr<BoundExpression> addrOfTemporary(new BoundAddressOfExpression(std::unique_ptr<BoundExpression>(new BoundLocalVariable(temporary)), type->AddPointer(invokeNode.GetSpan())));

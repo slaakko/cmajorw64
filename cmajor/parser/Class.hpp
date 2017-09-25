@@ -1,5 +1,5 @@
-#ifndef Class_hpp_8260
-#define Class_hpp_8260
+#ifndef Class_hpp_8252
+#define Class_hpp_8252
 
 #include <cmajor/parsing/Grammar.hpp>
 #include <cmajor/parsing/Keyword.hpp>
@@ -29,9 +29,10 @@ private:
     class DestructorRule;
     class InitializerRule;
     class MemberFunctionRule;
+    class ConversionFunctionRule;
     class MemberVariableRule;
 };
 
 } } // namespace cmajor.parser
 
-#endif // Class_hpp_8260
+#endif // Class_hpp_8252

@@ -20,7 +20,7 @@ extern "C" RT_API void RtDone()
     cmajor::rt::Done();
 }
 
-extern "C" RT_API void RtExit(int exitCode)
+extern "C" RT_API void RtExit(int32_t exitCode)
 {
     exit(exitCode);
 }

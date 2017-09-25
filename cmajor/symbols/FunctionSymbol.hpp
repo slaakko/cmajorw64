@@ -241,6 +241,20 @@ public:
     void SetSpecifiers(Specifiers specifiers);
 };
 
+class ConversionFunctionSymbol : public FunctionSymbol
+{
+public:
+    ConversionFunctionSymbol(const Span& span_, const std::u32string& name_);
+    std::string TypeString() const override { return "conversion_function";  }
+    ParameterSymbol* GetThisParam() const override { return Parameters()[0]; }
+    bool IsConstructorDestructorOrNonstaticMemberFunction() const override { return true; }
+    ConversionType GetConversionType() const override { return ConversionType::implicit_; }
+    uint8_t ConversionDistance() const override { return 255; }
+    TypeSymbol* ConversionSourceType() const override;
+    TypeSymbol* ConversionTargetType() const override;
+    void SetSpecifiers(Specifiers specifiers);
+};
+
 class FunctionGroupTypeSymbol : public TypeSymbol
 {
 public:

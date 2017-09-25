@@ -136,6 +136,35 @@ void PtrToVoidPtrConversion::GenerateCall(Emitter& emitter, std::vector<GenObjec
     emitter.Stack().Push(emitter.Builder().CreateBitCast(value, voidPtrType->IrType(emitter)));
 }
 
+class PtrToULongConversion : public FunctionSymbol
+{
+public:
+    PtrToULongConversion(TypeSymbol* otrType_, TypeSymbol* ulongType_);
+    ConversionType GetConversionType() const override { return ConversionType::explicit_; }
+    uint8_t ConversionDistance() const override { return 255; }
+    TypeSymbol* ConversionSourceType() const { return ptrType; }
+    TypeSymbol* ConversionTargetType() const { return ulongType; }
+    bool IsBasicTypeOperation() const override { return true; }
+    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags) override;
+private:
+    TypeSymbol* ptrType;
+    TypeSymbol* ulongType;
+};
+
+PtrToULongConversion::PtrToULongConversion(TypeSymbol* ptrType_, TypeSymbol* ulongType_) :
+    FunctionSymbol(Span(), U"ptr2ulong"), ptrType(ptrType_), ulongType(ulongType_)
+{
+    SetConversion();
+    SetGroupName(U"@conversion");
+    SetAccess(SymbolAccess::public_);
+}
+
+void PtrToULongConversion::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags)
+{
+    llvm::Value* value = emitter.Stack().Pop();
+    emitter.Stack().Push(emitter.Builder().CreatePtrToInt(value, ulongType->IrType(emitter)));
+}
+
 BoundCompileUnit::BoundCompileUnit(Module& module_, CompileUnitNode* compileUnitNode_) : 
     BoundNode(Span(), BoundNodeType::boundCompileUnit), module(module_), symbolTable(module.GetSymbolTable()), compileUnitNode(compileUnitNode_), hasGotos(false), 
     operationRepository(*this), functionTemplateRepository(*this), classTemplateRepository(*this), inlineFunctionRepository(*this), bindingTypes(false)
@@ -217,6 +246,14 @@ FunctionSymbol* BoundCompileUnit::GetConversion(TypeSymbol* sourceType, TypeSymb
                 conversion = voidPtrToPtrConversion.get();
                 conversionTable.AddConversion(conversion);
                 conversionTable.AddGeneratedConversion(std::move(voidPtrToPtrConversion));
+                return conversion;
+            }
+            else if (sourceType->IsPointerType() && !sourceType->IsReferenceType() && targetType == symbolTable.GetTypeByName(U"ulong"))
+            {
+                std::unique_ptr<FunctionSymbol> ptrToULongConversion(new PtrToULongConversion(sourceType, symbolTable.GetTypeByName(U"ulong")));
+                conversion = ptrToULongConversion.get();
+                conversionTable.AddConversion(conversion);
+                conversionTable.AddGeneratedConversion(std::move(ptrToULongConversion));
                 return conversion;
             }
             else if (sourceType->IsPointerType() && !sourceType->IsReferenceType() && targetType->RemoveConst(span)->IsVoidPtrType())

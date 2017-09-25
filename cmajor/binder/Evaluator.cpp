@@ -396,7 +396,7 @@ UnaryOperatorFun complement[uint8_t(ValueType::maxValue)] =
 class Evaluator : public Visitor
 {
 public:
-    Evaluator(BoundCompileUnit& boundCompileUnit_, ContainerScope* containerScope_, ValueType targetType_, bool dontThrow_);
+    Evaluator(BoundCompileUnit& boundCompileUnit_, ContainerScope* containerScope_, ValueType targetType_, bool cast_, bool dontThrow_);
     bool Error() const { return error; }
     std::unique_ptr<Value> GetValue();
     void Visit(BoolNode& boolNode) override;
@@ -483,6 +483,7 @@ public:
 private:
     BoundCompileUnit& boundCompileUnit;
     ContainerScope* containerScope;
+    bool cast;
     bool dontThrow;
     bool error;
     std::unique_ptr<Value> value;
@@ -494,8 +495,8 @@ private:
     void EvaluateEnumConstantSymbol(EnumConstantSymbol* enumConstantSymbol, const Span& span);
 };
 
-Evaluator::Evaluator(BoundCompileUnit& boundCompileUnit_, ContainerScope* containerScope_, ValueType targetType_, bool dontThrow_) :
-    boundCompileUnit(boundCompileUnit_), containerScope(containerScope_), dontThrow(dontThrow_), error(false), value(), targetType(targetType_)
+Evaluator::Evaluator(BoundCompileUnit& boundCompileUnit_, ContainerScope* containerScope_, ValueType targetType_, bool cast_, bool dontThrow_) :
+    boundCompileUnit(boundCompileUnit_), containerScope(containerScope_), cast(cast_), dontThrow(dontThrow_), error(false), value(), targetType(targetType_)
 {
 }
 
@@ -521,8 +522,8 @@ void Evaluator::EvaluateBinOp(BinaryNode& node, BinaryOperatorFun* fun)
     {
         operationType = targetType;
     }
-    std::unique_ptr<Value> leftConverted(left->As(operationType, false, node.GetSpan(), dontThrow));
-    std::unique_ptr<Value> rightConverted(right->As(operationType, false, node.GetSpan(), dontThrow));
+    std::unique_ptr<Value> leftConverted(left->As(operationType, cast, node.GetSpan(), dontThrow));
+    std::unique_ptr<Value> rightConverted(right->As(operationType, cast, node.GetSpan(), dontThrow));
     if (dontThrow)
     {
         if (!leftConverted || !rightConverted)
@@ -549,7 +550,7 @@ void Evaluator::EvaluateUnaryOp(UnaryNode& node, UnaryOperatorFun* fun)
     {
         operationType = targetType;
     }
-    std::unique_ptr<Value> subjectConverted(subject->As(operationType, false, node.GetSpan(), dontThrow));
+    std::unique_ptr<Value> subjectConverted(subject->As(operationType, cast, node.GetSpan(), dontThrow));
     if (dontThrow)
     {
         if (!subjectConverted)
@@ -1323,8 +1324,11 @@ void Evaluator::Visit(CastNode& castNode)
     TypeSymbol* type = ResolveType(castNode.TargetTypeExpr(), boundCompileUnit, containerScope);
     SymbolType symbolType = type->GetSymbolType();
     ValueType valueType = GetValueTypeFor(symbolType);
+    bool prevCast = cast;
+    cast = true;
     castNode.SourceExpr()->Accept(*this);
     value.reset(value->As(valueType, true, castNode.GetSpan(), dontThrow));
+    cast = prevCast;
 }
 
 void Evaluator::Visit(ConstructNode& constructNode)
@@ -1377,7 +1381,7 @@ void Evaluator::Visit(BaseNode& baseNode)
 
 std::unique_ptr<Value> Evaluate(Node* node, ValueType targetType, ContainerScope* containerScope, BoundCompileUnit& boundCompileUnit, bool dontThrow)
 {
-    Evaluator evaluator(boundCompileUnit, containerScope, targetType, dontThrow);
+    Evaluator evaluator(boundCompileUnit, containerScope, targetType, false, dontThrow);
     node->Accept(evaluator);
     if (evaluator.Error())
     {

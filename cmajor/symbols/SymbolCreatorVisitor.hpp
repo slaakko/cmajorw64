@@ -29,6 +29,7 @@ public:
     void Visit(ConstructorNode& constructorNode) override;
     void Visit(DestructorNode& destructorNode) override;
     void Visit(MemberFunctionNode& memberFunctionNode) override;
+    void Visit(ConversionFunctionNode& conversionFunctionNode) override;
     void Visit(MemberVariableNode& memberVariableNode) override;
     void Visit(InterfaceNode& interfaceNode) override;
     void Visit(DelegateNode& delegateNode) override;
