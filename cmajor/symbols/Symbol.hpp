@@ -52,6 +52,7 @@ enum class SymbolType : uint8_t
     basicTypeFloatingToUnsignedInt, basicTypeFloatingToSignedInt, basicTypeFloatingExtension, basicTypeFloatingTruncation, 
     enumTypeDefaultConstructor, enumTypeCopyConstructor, enumTypeMoveConstructor, enumTypeCopyAssignment, enumTypeMoveAssignment, enumTypeReturn, enumTypeEquality, 
     enumTypeToUnderlyingType, underlyingToEnumType,
+    delegateTypeDefaultConstructor, delegateTypeCopyConstructor, delegateTypeMoveConstructor, delegateTypeCopyAssignment, delegateTypeMoveAssignment, delegateTypeReturn, delegateTypeEquality,
     namespaceTypeSymbol, functionGroupTypeSymbol, memberExpressionTypeSymbol, valueSymbol,
     maxSymbol
 };
@@ -157,8 +158,8 @@ public:
     ContainerSymbol* ClassOrNsNoThrow() ;
     const ContainerSymbol* ClassInterfaceOrNsNoThrow() const;
     ContainerSymbol* ClassInterfaceOrNsNoThrow();
-    const ContainerSymbol* ClassInterfaceEnumOrNsNoThrow() const;
-    ContainerSymbol* ClassInterfaceEnumOrNsNoThrow();
+    const ContainerSymbol* ClassInterfaceEnumDelegateOrNsNoThrow() const;
+    ContainerSymbol* ClassInterfaceEnumDelegateOrNsNoThrow();
     const ClassTypeSymbol* Class() const;
     ClassTypeSymbol* Class();
     const ClassTypeSymbol* ContainingClassNoThrow() const;
@@ -177,8 +178,8 @@ public:
     ContainerScope* ClassOrNsScope();
     const ContainerScope* ClassInterfaceOrNsScope() const;
     ContainerScope* ClassInterfaceOrNsScope() ;
-    const ContainerScope* ClassInterfaceEnumOrNsScope() const;
-    ContainerScope* ClassInterfaceEnumOrNsScope();
+    const ContainerScope* ClassInterfaceEnumDelegateOrNsScope() const;
+    ContainerScope* ClassInterfaceEnumDelegateOrNsScope();
     const SymbolTable* GetSymbolTable() const { return symbolTable; }
     SymbolTable* GetSymbolTable() { return symbolTable; }
     void SetSymbolTable(SymbolTable* symbolTable_) { symbolTable = symbolTable_; }

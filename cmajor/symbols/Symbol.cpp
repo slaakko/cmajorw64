@@ -410,7 +410,7 @@ ContainerSymbol* Symbol::ClassInterfaceOrNsNoThrow()
     }
 }
 
-const ContainerSymbol* Symbol::ClassInterfaceEnumOrNsNoThrow() const
+const ContainerSymbol* Symbol::ClassInterfaceEnumDelegateOrNsNoThrow() const
 {
     if (symbolType == SymbolType::namespaceSymbol)
     {
@@ -424,6 +424,10 @@ const ContainerSymbol* Symbol::ClassInterfaceEnumOrNsNoThrow() const
     {
         return static_cast<const EnumTypeSymbol*>(this);
     }
+    else if (symbolType == SymbolType::delegateTypeSymbol)
+    {
+        return static_cast<const EnumTypeSymbol*>(this);
+    }
     else if (IsClassTypeSymbol())
     {
         return static_cast<const ClassTypeSymbol*>(this);
@@ -432,7 +436,7 @@ const ContainerSymbol* Symbol::ClassInterfaceEnumOrNsNoThrow() const
     {
         if (parent)
         {
-            return parent->ClassInterfaceEnumOrNsNoThrow();
+            return parent->ClassInterfaceEnumDelegateOrNsNoThrow();
         }
         else
         {
@@ -441,7 +445,7 @@ const ContainerSymbol* Symbol::ClassInterfaceEnumOrNsNoThrow() const
     }
 }
 
-ContainerSymbol* Symbol::ClassInterfaceEnumOrNsNoThrow()
+ContainerSymbol* Symbol::ClassInterfaceEnumDelegateOrNsNoThrow()
 {
     if (symbolType == SymbolType::namespaceSymbol)
     {
@@ -455,6 +459,10 @@ ContainerSymbol* Symbol::ClassInterfaceEnumOrNsNoThrow()
     {
         return static_cast<EnumTypeSymbol*>(this);
     }
+    else if (symbolType == SymbolType::delegateTypeSymbol)
+    {
+        return static_cast<EnumTypeSymbol*>(this);
+    }
     else if (IsClassTypeSymbol())
     {
         return static_cast<ClassTypeSymbol*>(this);
@@ -463,7 +471,7 @@ ContainerSymbol* Symbol::ClassInterfaceEnumOrNsNoThrow()
     {
         if (parent)
         {
-            return parent->ClassInterfaceEnumOrNsNoThrow();
+            return parent->ClassInterfaceEnumDelegateOrNsNoThrow();
         }
         else
         {
@@ -724,29 +732,29 @@ ContainerScope* Symbol::ClassInterfaceOrNsScope()
     }
 }
 
-const ContainerScope* Symbol::ClassInterfaceEnumOrNsScope() const
+const ContainerScope* Symbol::ClassInterfaceEnumDelegateOrNsScope() const
 {
-    const ContainerSymbol* classInterfaceEnumOrNs = ClassInterfaceEnumOrNsNoThrow();
-    if (classInterfaceEnumOrNs)
+    const ContainerSymbol* classInterfaceEnumDelegateOrNs = ClassInterfaceEnumDelegateOrNsNoThrow();
+    if (classInterfaceEnumDelegateOrNs)
     {
-        return classInterfaceEnumOrNs->GetContainerScope();
+        return classInterfaceEnumDelegateOrNs->GetContainerScope();
     }
     else
     {
-        throw std::runtime_error("class, interface, enumeration or namespace scope not found");
+        throw std::runtime_error("class, interface, enumeration, delegate, class delegate or namespace scope not found");
     }
 }
 
-ContainerScope* Symbol::ClassInterfaceEnumOrNsScope()
+ContainerScope* Symbol::ClassInterfaceEnumDelegateOrNsScope()
 {
-    ContainerSymbol* classInterfaceEnumOrNs = ClassInterfaceEnumOrNsNoThrow();
-    if (classInterfaceEnumOrNs)
+    ContainerSymbol* classInterfaceEnumDelegateOrNs = ClassInterfaceEnumDelegateOrNsNoThrow();
+    if (classInterfaceEnumDelegateOrNs)
     {
-        return classInterfaceEnumOrNs->GetContainerScope();
+        return classInterfaceEnumDelegateOrNs->GetContainerScope();
     }
     else
     {
-        throw std::runtime_error("class, interface, enumeration or namespace scope not found");
+        throw std::runtime_error("class, interface, enumeration, delegate, class delegate or namespace scope not found");
     }
 }
 

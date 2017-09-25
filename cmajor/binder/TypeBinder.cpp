@@ -601,6 +601,27 @@ void TypeBinder::Visit(DelegateNode& delegateNode)
     }
     TypeSymbol* returnType = ResolveType(delegateNode.ReturnTypeExpr(), boundCompileUnit, containerScope);
     delegateTypeSymbol->SetReturnType(returnType);
+    DelegateTypeDefaultConstructor* defaultConstructor = new DelegateTypeDefaultConstructor(delegateTypeSymbol);
+    symbolTable.SetFunctionIdFor(defaultConstructor);
+    delegateTypeSymbol->AddMember(defaultConstructor);
+    DelegateTypeCopyConstructor* copyConstructor = new DelegateTypeCopyConstructor(delegateTypeSymbol);
+    symbolTable.SetFunctionIdFor(copyConstructor);
+    delegateTypeSymbol->AddMember(copyConstructor);
+    DelegateTypeMoveConstructor* moveConstructor = new DelegateTypeMoveConstructor(delegateTypeSymbol);
+    symbolTable.SetFunctionIdFor(moveConstructor);
+    delegateTypeSymbol->AddMember(moveConstructor);
+    DelegateTypeCopyAssignment* copyAssignment = new DelegateTypeCopyAssignment(delegateTypeSymbol, symbolTable.GetTypeByName(U"void"));
+    symbolTable.SetFunctionIdFor(copyAssignment);
+    delegateTypeSymbol->AddMember(copyAssignment);
+    DelegateTypeMoveAssignment* moveAssignment = new DelegateTypeMoveAssignment(delegateTypeSymbol, symbolTable.GetTypeByName(U"void"));
+    symbolTable.SetFunctionIdFor(moveAssignment);
+    delegateTypeSymbol->AddMember(moveAssignment);
+    DelegateTypeReturn* returnFun = new DelegateTypeReturn(delegateTypeSymbol);
+    symbolTable.SetFunctionIdFor(returnFun);
+    delegateTypeSymbol->AddMember(returnFun); 
+    DelegateTypeEquality* equality = new DelegateTypeEquality(delegateTypeSymbol, symbolTable.GetTypeByName(U"bool"));
+    symbolTable.SetFunctionIdFor(equality);
+    delegateTypeSymbol->Ns()->AddMember(equality);
 }
 
 void TypeBinder::Visit(ClassDelegateNode& classDelegateNode)

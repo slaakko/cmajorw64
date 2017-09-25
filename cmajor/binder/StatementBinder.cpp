@@ -578,7 +578,7 @@ void StatementBinder::Visit(ReturnStatementNode& returnStatementNode)
                 returnTypeArgs.push_back(std::unique_ptr<BoundTypeExpression>(boundTypeExpression));
                 std::vector<FunctionScopeLookup> functionScopeLookups;
                 functionScopeLookups.push_back(FunctionScopeLookup(ScopeLookup::this_and_base_and_parent, containerScope));
-                functionScopeLookups.push_back(FunctionScopeLookup(ScopeLookup::this_and_base_and_parent, returnType->BaseType()->ClassInterfaceEnumOrNsScope()));
+                functionScopeLookups.push_back(FunctionScopeLookup(ScopeLookup::this_and_base_and_parent, returnType->BaseType()->ClassInterfaceEnumDelegateOrNsScope()));
                 functionScopeLookups.push_back(FunctionScopeLookup(ScopeLookup::fileScopes, nullptr));
                 std::unique_ptr<BoundFunctionCall> returnFunctionCall = ResolveOverload(U"@return", containerScope, functionScopeLookups, returnTypeArgs, boundCompileUnit, currentFunction,
                     returnStatementNode.GetSpan());
@@ -843,7 +843,7 @@ void StatementBinder::Visit(ConstructionStatementNode& constructionStatementNode
     bool constructDelegateType = localVariableSymbol->GetType()->GetSymbolType() == SymbolType::delegateTypeSymbol;
     bool constructClassDelegateType = localVariableSymbol->GetType()->GetSymbolType() == SymbolType::classDelegateTypeSymbol;
     std::vector<FunctionScopeLookup> functionScopeLookups;
-    functionScopeLookups.push_back(FunctionScopeLookup(ScopeLookup::this_, localVariableSymbol->GetType()->ClassInterfaceEnumOrNsScope()));
+    functionScopeLookups.push_back(FunctionScopeLookup(ScopeLookup::this_, localVariableSymbol->GetType()->ClassInterfaceEnumDelegateOrNsScope()));
     functionScopeLookups.push_back(FunctionScopeLookup(ScopeLookup::this_and_base_and_parent, containerScope));
     functionScopeLookups.push_back(FunctionScopeLookup(ScopeLookup::fileScopes, nullptr));
     int n = constructionStatementNode.Arguments().Count();
@@ -956,7 +956,7 @@ void StatementBinder::Visit(AssignmentStatementNode& assignmentStatementNode)
     arguments.push_back(std::move(target));
     arguments.push_back(std::move(source));
     std::vector<FunctionScopeLookup> functionScopeLookups;
-    functionScopeLookups.push_back(FunctionScopeLookup(ScopeLookup::this_, targetType->ClassInterfaceEnumOrNsScope()));
+    functionScopeLookups.push_back(FunctionScopeLookup(ScopeLookup::this_, targetType->ClassInterfaceEnumDelegateOrNsScope()));
     functionScopeLookups.push_back(FunctionScopeLookup(ScopeLookup::this_and_base_and_parent, containerScope));
     functionScopeLookups.push_back(FunctionScopeLookup(ScopeLookup::fileScopes, nullptr));
     std::unique_ptr<BoundFunctionCall> assignmentCall = ResolveOverload(U"operator=", containerScope, functionScopeLookups, arguments, boundCompileUnit, currentFunction, 
