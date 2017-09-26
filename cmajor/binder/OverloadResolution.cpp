@@ -829,8 +829,12 @@ std::unique_ptr<BoundFunctionCall> FailWithAmbiguousOverload(const std::u32strin
 }
 
 std::unique_ptr<BoundFunctionCall> CreateBoundFunctionCall(FunctionSymbol* bestFun, std::vector<std::unique_ptr<BoundExpression>>& arguments, BoundCompileUnit& boundCompileUnit, 
-    BoundFunction* boundFunction, const FunctionMatch& bestMatch, const Span& span)
+    BoundFunction* boundFunction, const FunctionMatch& bestMatch, ContainerScope* containerScope, const Span& span)
 {
+    if (boundFunction->GetFunctionSymbol()->GroupName() == U"ToString")
+    {
+        int x = 0;
+    }
     std::unique_ptr<BoundFunctionCall> boundFunctionCall(new BoundFunctionCall(span, bestFun));
     int arity = arguments.size();
     for (int i = 0; i < arity; ++i)
@@ -909,6 +913,23 @@ std::unique_ptr<BoundFunctionCall> CreateBoundFunctionCall(FunctionSymbol* bestF
                 BoundDereferenceExpression* dereferenceExpression = new BoundDereferenceExpression(std::move(argument), type);
                 argument.reset(dereferenceExpression);
             }
+        }
+        if (argument->GetType()->IsClassTypeSymbol())
+        {
+            ClassTypeSymbol* classType = static_cast<ClassTypeSymbol*>(argument->GetType());
+            if (!classType->CopyConstructor())
+            {
+                try
+                {
+                    boundCompileUnit.GenerateCopyConstructorFor(classType, containerScope, span);
+                }
+                catch (const Exception& ex)
+                {
+                    throw Exception("cannot pass class '" + ToUtf8(classType->FullName()) + "' by value because: " + ex.Message(), argument->GetSpan(), ex.References());
+                }
+            }
+            TypeSymbol* type = classType->AddConst(span)->AddLvalueReference(span);
+            argument.reset(new BoundAddressOfExpression(std::move(argument), type));
         }
         boundFunctionCall->AddArgument(std::move(argument));
     }
@@ -1081,7 +1102,7 @@ std::unique_ptr<BoundFunctionCall> SelectViableFunction(const std::unordered_set
                     throw Exception("a nothrow function cannot call a function that can throw unless it handles exceptions", span, references);
                 }
             }
-            return CreateBoundFunctionCall(bestFun, arguments, boundCompileUnit, boundFunction, bestMatch, span);
+            return CreateBoundFunctionCall(bestFun, arguments, boundCompileUnit, boundFunction, bestMatch, containerScope, span);
         }
         else
         {
@@ -1133,7 +1154,7 @@ std::unique_ptr<BoundFunctionCall> SelectViableFunction(const std::unordered_set
             references.push_back(singleBest->GetSpan());
             throw Exception("a nothrow function cannot call a function that can throw unless it handles exceptions", span, references);
         }
-        return CreateBoundFunctionCall(singleBest, arguments, boundCompileUnit, boundFunction, bestMatch, span);
+        return CreateBoundFunctionCall(singleBest, arguments, boundCompileUnit, boundFunction, bestMatch, containerScope, span);
     }
 }
 

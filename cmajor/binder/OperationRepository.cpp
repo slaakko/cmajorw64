@@ -3034,33 +3034,34 @@ void OperationGroup::CollectViableFunctions(ContainerScope* containerScope, cons
     }
 }
 
-OperationRepository::OperationRepository(BoundCompileUnit& boundCompileUnit_)
+OperationRepository::OperationRepository(BoundCompileUnit& boundCompileUnit_) : boundCompileUnit(boundCompileUnit_), copyConstructorOperation(nullptr)
 {
-    Add(new LvalueReferenceCopyConstructorOperation(boundCompileUnit_));
-    Add(new LvalueReferenceCopyAssignmentOperation(boundCompileUnit_));
-    Add(new LvalueReferenceMoveAssignmentOperation(boundCompileUnit_));
-    Add(new LvalueReferenceReturnOperation(boundCompileUnit_));
-    Add(new RvalueReferenceCopyConstructorOperation(boundCompileUnit_));
-    Add(new RvalueReferenceCopyAssignmentOperation(boundCompileUnit_));
-    Add(new RvalueReferenceReturnOperation(boundCompileUnit_));
-    Add(new PointerDefaultConstructorOperation(boundCompileUnit_));
-    Add(new PointerCopyConstructorOperation(boundCompileUnit_));
-    Add(new PointerMoveConstructorOperation(boundCompileUnit_));
-    Add(new PointerCopyAssignmentOperation(boundCompileUnit_));
-    Add(new PointerMoveAssignmentOperation(boundCompileUnit_));
-    Add(new PointerReturnOperation(boundCompileUnit_));
-    Add(new PointerPlusOffsetOperation(boundCompileUnit_));
-    Add(new OffsetPlusPointerOperation(boundCompileUnit_));
-    Add(new PointerMinusOffsetOperation(boundCompileUnit_));
-    Add(new PointerMinusPointerOperation(boundCompileUnit_));
-    Add(new PointerEqualOperation(boundCompileUnit_));
-    Add(new PointerLessOperation(boundCompileUnit_));
-    Add(new PointerArrowOperation(boundCompileUnit_));
-    Add(new ClassDefaultConstructorOperation(boundCompileUnit_));
-    Add(new ClassCopyConstructorOperation(boundCompileUnit_));
-    Add(new ClassMoveConstructorOperation(boundCompileUnit_));
-    Add(new ClassCopyAssignmentOperation(boundCompileUnit_));
-    Add(new ClassMoveAssignmentOperation(boundCompileUnit_));
+    Add(new LvalueReferenceCopyConstructorOperation(boundCompileUnit));
+    Add(new LvalueReferenceCopyAssignmentOperation(boundCompileUnit));
+    Add(new LvalueReferenceMoveAssignmentOperation(boundCompileUnit));
+    Add(new LvalueReferenceReturnOperation(boundCompileUnit));
+    Add(new RvalueReferenceCopyConstructorOperation(boundCompileUnit));
+    Add(new RvalueReferenceCopyAssignmentOperation(boundCompileUnit));
+    Add(new RvalueReferenceReturnOperation(boundCompileUnit));
+    Add(new PointerDefaultConstructorOperation(boundCompileUnit));
+    Add(new PointerCopyConstructorOperation(boundCompileUnit));
+    Add(new PointerMoveConstructorOperation(boundCompileUnit));
+    Add(new PointerCopyAssignmentOperation(boundCompileUnit));
+    Add(new PointerMoveAssignmentOperation(boundCompileUnit));
+    Add(new PointerReturnOperation(boundCompileUnit));
+    Add(new PointerPlusOffsetOperation(boundCompileUnit));
+    Add(new OffsetPlusPointerOperation(boundCompileUnit));
+    Add(new PointerMinusOffsetOperation(boundCompileUnit));
+    Add(new PointerMinusPointerOperation(boundCompileUnit));
+    Add(new PointerEqualOperation(boundCompileUnit));
+    Add(new PointerLessOperation(boundCompileUnit));
+    Add(new PointerArrowOperation(boundCompileUnit));
+    Add(new ClassDefaultConstructorOperation(boundCompileUnit));
+    copyConstructorOperation = new ClassCopyConstructorOperation(boundCompileUnit);
+    Add(copyConstructorOperation);
+    Add(new ClassMoveConstructorOperation(boundCompileUnit));
+    Add(new ClassCopyAssignmentOperation(boundCompileUnit));
+    Add(new ClassMoveAssignmentOperation(boundCompileUnit));
 }
 
 void OperationRepository::Add(Operation* operation)
@@ -3089,6 +3090,35 @@ void OperationRepository::CollectViableFunctions(const std::u32string& groupName
     {
         OperationGroup* operationGroup = it->second;
         operationGroup->CollectViableFunctions(containerScope, arguments, currentFunction, viableFunctions, exception, span);
+    }
+}
+
+void OperationRepository::GenerateCopyConstructorFor(ClassTypeSymbol* classTypeSymbol, ContainerScope* containerScope, const Span& span)
+{
+    std::unique_ptr<ClassCopyConstructor> copyConstructor(new ClassCopyConstructor(classTypeSymbol, span));
+    copyConstructor->SetCompileUnit(boundCompileUnit.GetCompileUnitNode());
+    copyConstructor->SetSymbolTable(&boundCompileUnit.GetSymbolTable());
+    ClassCopyConstructorOperation* copyConstructorOp = static_cast<ClassCopyConstructorOperation*>(copyConstructorOperation);
+    std::unique_ptr<Exception> exception;
+    if (copyConstructorOp->GenerateImplementation(copyConstructor.get(), containerScope, exception, span))
+    {
+        copyConstructor->SetSymbolTable(&boundCompileUnit.GetSymbolTable());
+        copyConstructor->SetParent(classTypeSymbol);
+        copyConstructor->SetLinkOnceOdrLinkage();
+        copyConstructor->SetInline();
+        classTypeSymbol->SetCopyConstructor(copyConstructor.get());
+        classTypeSymbol->AddMember(copyConstructor.release());
+    }
+    else
+    {
+        if (exception)
+        {
+            throw *exception;
+        }
+        else
+        {
+            throw Exception("could not generate copy constructor for class '" + ToUtf8(classTypeSymbol->FullName()) + "'", span);
+        }
     }
 }
 

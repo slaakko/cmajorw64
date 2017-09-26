@@ -507,20 +507,21 @@ void FunctionToDelegateConversion::GenerateCall(Emitter& emitter, std::vector<Ge
     emitter.Stack().Push(emitter.Module()->getOrInsertFunction(ToUtf8(function->MangledName()), function->IrType(emitter)));
 }
 
-ClassDelegateTypeSymbol::ClassDelegateTypeSymbol(const Span& span_, const std::u32string& name_) : ClassTypeSymbol(SymbolType::classDelegateTypeSymbol, span_, name_), returnType(), parameters()
+ClassDelegateTypeSymbol::ClassDelegateTypeSymbol(const Span& span_, const std::u32string& name_) : 
+    TypeSymbol(SymbolType::classDelegateTypeSymbol, span_, name_), returnType(), parameters(), delegateType(), irType(nullptr)
 {
 }
 
 void ClassDelegateTypeSymbol::Write(SymbolWriter& writer)
 {
-    ClassTypeSymbol::Write(writer);
+    TypeSymbol::Write(writer);
     uint32_t returnTypeId = returnType->TypeId();
     writer.GetBinaryWriter().WriteEncodedUInt(returnTypeId);
 }
 
 void ClassDelegateTypeSymbol::Read(SymbolReader& reader)
 {
-    ClassTypeSymbol::Read(reader);
+    TypeSymbol::Read(reader);
     uint32_t returnTypeId = reader.GetBinaryReader().ReadEncodedUInt();
     GetSymbolTable()->EmplaceTypeRequest(this, returnTypeId, -1);
 }
@@ -533,7 +534,7 @@ void ClassDelegateTypeSymbol::EmplaceType(TypeSymbol* typeSymbol_, int index)
     }
     else
     {
-        ClassTypeSymbol::EmplaceType(typeSymbol_, index);
+        TypeSymbol::EmplaceType(typeSymbol_, index);
     }
 }
 
@@ -559,10 +560,14 @@ void ClassDelegateTypeSymbol::ComputeExportClosure()
 
 void ClassDelegateTypeSymbol::AddMember(Symbol* member)
 {
-    ClassTypeSymbol::AddMember(member);
+    TypeSymbol::AddMember(member);
     if (member->GetSymbolType() == SymbolType::parameterSymbol)
     {
         parameters.push_back(static_cast<ParameterSymbol*>(member));
+    }
+    else if (member->GetSymbolType() == SymbolType::delegateTypeSymbol)
+    {
+        delegateType = static_cast<DelegateTypeSymbol*>(member);
     }
 }
 
@@ -579,6 +584,26 @@ void ClassDelegateTypeSymbol::Dump(CodeFormatter& formatter)
     formatter.WriteLine(ToUtf8(Name()));
     formatter.WriteLine("full name: " + ToUtf8(FullNameWithSpecifiers()));
     formatter.WriteLine("typeid: " + std::to_string(TypeId()));
+}
+
+llvm::Type* ClassDelegateTypeSymbol::IrType(Emitter& emitter)
+{
+    if (!irType)
+    {
+        std::vector<llvm::Type*> elementTypes;
+        elementTypes.push_back(emitter.Builder().getInt8PtrTy());
+        elementTypes.push_back(delegateType->IrType(emitter));
+        irType = llvm::StructType::get(emitter.Context(), elementTypes);
+    }
+    return irType;
+}
+
+llvm::Constant* ClassDelegateTypeSymbol::CreateDefaultIrValue(Emitter& emitter)
+{
+    std::vector<llvm::Constant*> constants;
+    constants.push_back(llvm::Constant::getNullValue(emitter.Builder().getInt8PtrTy()));
+    constants.push_back(delegateType->CreateDefaultIrValue(emitter));
+    return llvm::ConstantStruct::get(llvm::cast<llvm::StructType>(IrType(emitter)), constants);
 }
 
 void ClassDelegateTypeSymbol::SetSpecifiers(Specifiers specifiers)
@@ -652,6 +677,294 @@ void ClassDelegateTypeSymbol::SetSpecifiers(Specifiers specifiers)
     {
         throw Exception("class delegate cannot be unit_test", GetSpan());
     }
+}
+
+ClassDelegateTypeDefaultConstructor::ClassDelegateTypeDefaultConstructor(const Span& span_, const std::u32string& name_) : 
+    FunctionSymbol(SymbolType::classDelegateTypeDefaultConstructor, span_, name_)
+{
+}
+
+ClassDelegateTypeDefaultConstructor::ClassDelegateTypeDefaultConstructor(ClassDelegateTypeSymbol* classDelegateType_) : 
+    FunctionSymbol(SymbolType::classDelegateTypeDefaultConstructor, Span(), U"@constructor"), classDelegateType(classDelegateType_)
+{
+    SetGroupName(U"@constructor");
+    SetAccess(SymbolAccess::public_);
+    ParameterSymbol* thisParam = new ParameterSymbol(Span(), U"this");
+    thisParam->SetType(classDelegateType->AddPointer(Span()));
+    AddMember(thisParam);
+    ComputeName();
+}
+
+void ClassDelegateTypeDefaultConstructor::Write(SymbolWriter& writer)
+{
+    FunctionSymbol::Write(writer);
+    writer.GetBinaryWriter().WriteEncodedUInt(classDelegateType->TypeId());
+}
+
+void ClassDelegateTypeDefaultConstructor::Read(SymbolReader& reader)
+{
+    FunctionSymbol::Read(reader);
+    uint32_t typeId = reader.GetBinaryReader().ReadEncodedUInt();
+    GetSymbolTable()->EmplaceTypeRequest(this, typeId, 1);
+}
+
+void ClassDelegateTypeDefaultConstructor::EmplaceType(TypeSymbol* typeSymbol, int index)
+{
+    if (index == 1)
+    {
+        Assert(typeSymbol->GetSymbolType() == SymbolType::classDelegateTypeSymbol, "class delegate type symbol expected");
+        classDelegateType = static_cast<ClassDelegateTypeSymbol*>(typeSymbol);
+    }
+    else
+    {
+        FunctionSymbol::EmplaceType(typeSymbol, index);
+    }
+}
+
+void ClassDelegateTypeDefaultConstructor::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags)
+{
+    Assert(genObjects.size() == 1, "default constructor needs one object");
+    llvm::Value* objectValue = llvm::Constant::getNullValue(emitter.Builder().getInt8PtrTy());
+    ArgVector objectIndeces;
+    objectIndeces.push_back(emitter.Builder().getInt32(0));
+    objectIndeces.push_back(emitter.Builder().getInt32(0));
+    genObjects[0]->Load(emitter, OperationFlags::addr);
+    llvm::Value* ptr = emitter.Stack().Pop();
+    llvm::Value* objectPtr = emitter.Builder().CreateGEP(ptr, objectIndeces);
+    emitter.Builder().CreateStore(objectValue, objectPtr);
+    llvm::Value* delegateValue = classDelegateType->DelegateType()->CreateDefaultIrValue(emitter);
+    ArgVector delegateIndeces;
+    delegateIndeces.push_back(emitter.Builder().getInt32(0));
+    delegateIndeces.push_back(emitter.Builder().getInt32(1));
+    llvm::Value* delegatePtr = emitter.Builder().CreateGEP(ptr, delegateIndeces);
+    emitter.Builder().CreateStore(delegateValue, delegatePtr);
+}
+
+ClassDelegateTypeCopyConstructor::ClassDelegateTypeCopyConstructor(const Span& span_, const std::u32string& name_) :
+    FunctionSymbol(SymbolType::classDelegateTypeCopyConstructor, span_, name_)
+{
+}
+
+ClassDelegateTypeCopyConstructor::ClassDelegateTypeCopyConstructor(ClassDelegateTypeSymbol* classDelegateType) :
+    FunctionSymbol(SymbolType::classDelegateTypeCopyConstructor, Span(), U"@constructor")
+{
+    SetGroupName(U"@constructor");
+    SetAccess(SymbolAccess::public_);
+    ParameterSymbol* thisParam = new ParameterSymbol(Span(), U"this");
+    thisParam->SetType(classDelegateType->AddPointer(Span()));
+    AddMember(thisParam);
+    ParameterSymbol* thatParam = new ParameterSymbol(Span(), U"that");
+    thatParam->SetType(classDelegateType->AddConst(Span())->AddLvalueReference(Span()));
+    AddMember(thatParam);
+    ComputeName();
+}
+
+void ClassDelegateTypeCopyConstructor::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags)
+{
+    ArgVector objectIndeces;
+    objectIndeces.push_back(emitter.Builder().getInt32(0));
+    objectIndeces.push_back(emitter.Builder().getInt32(0));
+    genObjects[1]->Load(emitter, OperationFlags::none);
+    llvm::Value* thatPtr = emitter.Stack().Pop();
+    llvm::Value* thatObjectPtr = emitter.Builder().CreateGEP(thatPtr, objectIndeces);
+    llvm::Value* objectValue = emitter.Builder().CreateLoad(thatObjectPtr);
+    genObjects[0]->Load(emitter, OperationFlags::addr);
+    llvm::Value* thisPtr = emitter.Stack().Pop();
+    llvm::Value* thisObjectPtr = emitter.Builder().CreateGEP(thisPtr, objectIndeces);
+    emitter.Builder().CreateStore(objectValue, thisObjectPtr);
+    ArgVector delegateIndeces;
+    delegateIndeces.push_back(emitter.Builder().getInt32(0));
+    delegateIndeces.push_back(emitter.Builder().getInt32(1));
+    llvm::Value* thatDelegatePtr = emitter.Builder().CreateGEP(thatPtr, delegateIndeces);
+    llvm::Value* delegateValue = emitter.Builder().CreateLoad(thatDelegatePtr);
+    llvm::Value* thisDelegatePtr = emitter.Builder().CreateGEP(thisPtr, delegateIndeces);
+    emitter.Builder().CreateStore(delegateValue, thisDelegatePtr);
+}
+
+ClassDelegateTypeMoveConstructor::ClassDelegateTypeMoveConstructor(const Span& span_, const std::u32string& name_) :
+    FunctionSymbol(SymbolType::classDelegateTypeMoveConstructor, span_, name_)
+{
+}
+
+ClassDelegateTypeMoveConstructor::ClassDelegateTypeMoveConstructor(ClassDelegateTypeSymbol* classDelegateType) :
+    FunctionSymbol(SymbolType::classDelegateTypeCopyConstructor, Span(), U"@constructor")
+{
+    SetGroupName(U"@constructor");
+    SetAccess(SymbolAccess::public_);
+    ParameterSymbol* thisParam = new ParameterSymbol(Span(), U"this");
+    thisParam->SetType(classDelegateType->AddPointer(Span()));
+    AddMember(thisParam);
+    ParameterSymbol* thatParam = new ParameterSymbol(Span(), U"that");
+    thatParam->SetType(classDelegateType->AddRvalueReference(Span()));
+    AddMember(thatParam);
+    ComputeName();
+}
+
+void ClassDelegateTypeMoveConstructor::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags)
+{
+    ArgVector objectIndeces;
+    objectIndeces.push_back(emitter.Builder().getInt32(0));
+    objectIndeces.push_back(emitter.Builder().getInt32(0));
+    genObjects[1]->Load(emitter, OperationFlags::none);
+    llvm::Value* thatPtr = emitter.Stack().Pop();
+    llvm::Value* thatObjectPtr = emitter.Builder().CreateGEP(thatPtr, objectIndeces);
+    llvm::Value* objectValue = emitter.Builder().CreateLoad(thatObjectPtr);
+    genObjects[0]->Load(emitter, OperationFlags::addr);
+    llvm::Value* thisPtr = emitter.Stack().Pop();
+    llvm::Value* thisObjectPtr = emitter.Builder().CreateGEP(thisPtr, objectIndeces);
+    emitter.Builder().CreateStore(objectValue, thisObjectPtr);
+    ArgVector delegateIndeces;
+    delegateIndeces.push_back(emitter.Builder().getInt32(0));
+    delegateIndeces.push_back(emitter.Builder().getInt32(1));
+    llvm::Value* thatDelegatePtr = emitter.Builder().CreateGEP(thatPtr, delegateIndeces);
+    llvm::Value* delegateValue = emitter.Builder().CreateLoad(thatDelegatePtr);
+    llvm::Value* thisDelegatePtr = emitter.Builder().CreateGEP(thisPtr, delegateIndeces);
+    emitter.Builder().CreateStore(delegateValue, thisDelegatePtr);
+}
+
+ClassDelegateTypeCopyAssignment::ClassDelegateTypeCopyAssignment(const Span& span_, const std::u32string& name_) :
+    FunctionSymbol(SymbolType::classDelegateTypeCopyAssignment, span_, name_)
+{
+}
+
+ClassDelegateTypeCopyAssignment::ClassDelegateTypeCopyAssignment(ClassDelegateTypeSymbol* classDelegateType, TypeSymbol* voidType) :
+    FunctionSymbol(SymbolType::classDelegateTypeCopyAssignment, Span(), U"operator=")
+{
+    SetGroupName(U"operator=");
+    SetAccess(SymbolAccess::public_);
+    ParameterSymbol* thisParam = new ParameterSymbol(Span(), U"this");
+    thisParam->SetType(classDelegateType->AddPointer(Span()));
+    AddMember(thisParam);
+    ParameterSymbol* thatParam = new ParameterSymbol(Span(), U"that");
+    thatParam->SetType(classDelegateType->AddConst(Span())->AddLvalueReference(Span()));
+    AddMember(thatParam);
+    SetReturnType(voidType);
+    ComputeName();
+}
+
+void ClassDelegateTypeCopyAssignment::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags)
+{
+    ArgVector objectIndeces;
+    objectIndeces.push_back(emitter.Builder().getInt32(0));
+    objectIndeces.push_back(emitter.Builder().getInt32(0));
+    genObjects[1]->Load(emitter, OperationFlags::none);
+    llvm::Value* thatPtr = emitter.Stack().Pop();
+    llvm::Value* thatObjectPtr = emitter.Builder().CreateGEP(thatPtr, objectIndeces);
+    llvm::Value* objectValue = emitter.Builder().CreateLoad(thatObjectPtr);
+    genObjects[0]->Load(emitter, OperationFlags::addr);
+    llvm::Value* thisPtr = emitter.Stack().Pop();
+    llvm::Value* thisObjectPtr = emitter.Builder().CreateGEP(thisPtr, objectIndeces);
+    emitter.Builder().CreateStore(objectValue, thisObjectPtr);
+    ArgVector delegateIndeces;
+    delegateIndeces.push_back(emitter.Builder().getInt32(0));
+    delegateIndeces.push_back(emitter.Builder().getInt32(1));
+    llvm::Value* thatDelegatePtr = emitter.Builder().CreateGEP(thatPtr, delegateIndeces);
+    llvm::Value* delegateValue = emitter.Builder().CreateLoad(thatDelegatePtr);
+    llvm::Value* thisDelegatePtr = emitter.Builder().CreateGEP(thisPtr, delegateIndeces);
+    emitter.Builder().CreateStore(delegateValue, thisDelegatePtr);
+}
+
+ClassDelegateTypeMoveAssignment::ClassDelegateTypeMoveAssignment(const Span& span_, const std::u32string& name_) :
+    FunctionSymbol(SymbolType::classDelegateTypeMoveAssignment, span_, name_)
+{
+}
+
+ClassDelegateTypeMoveAssignment::ClassDelegateTypeMoveAssignment(ClassDelegateTypeSymbol* classDelegateType, TypeSymbol* voidType) :
+    FunctionSymbol(SymbolType::classDelegateTypeMoveAssignment, Span(), U"operator=")
+{
+    SetGroupName(U"operator=");
+    SetAccess(SymbolAccess::public_);
+    ParameterSymbol* thisParam = new ParameterSymbol(Span(), U"this");
+    thisParam->SetType(classDelegateType->AddPointer(Span()));
+    AddMember(thisParam);
+    ParameterSymbol* thatParam = new ParameterSymbol(Span(), U"that");
+    thatParam->SetType(classDelegateType->AddRvalueReference(Span()));
+    AddMember(thatParam);
+    SetReturnType(voidType);
+    ComputeName();
+}
+
+void ClassDelegateTypeMoveAssignment::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags)
+{
+    ArgVector objectIndeces;
+    objectIndeces.push_back(emitter.Builder().getInt32(0));
+    objectIndeces.push_back(emitter.Builder().getInt32(0));
+    genObjects[1]->Load(emitter, OperationFlags::none);
+    llvm::Value* thatPtr = emitter.Stack().Pop();
+    llvm::Value* thatObjectPtr = emitter.Builder().CreateGEP(thatPtr, objectIndeces);
+    llvm::Value* objectValue = emitter.Builder().CreateLoad(thatObjectPtr);
+    genObjects[0]->Load(emitter, OperationFlags::addr);
+    llvm::Value* thisPtr = emitter.Stack().Pop();
+    llvm::Value* thisObjectPtr = emitter.Builder().CreateGEP(thisPtr, objectIndeces);
+    emitter.Builder().CreateStore(objectValue, thisObjectPtr);
+    ArgVector delegateIndeces;
+    delegateIndeces.push_back(emitter.Builder().getInt32(0));
+    delegateIndeces.push_back(emitter.Builder().getInt32(1));
+    llvm::Value* thatDelegatePtr = emitter.Builder().CreateGEP(thatPtr, delegateIndeces);
+    llvm::Value* delegateValue = emitter.Builder().CreateLoad(thatDelegatePtr);
+    llvm::Value* thisDelegatePtr = emitter.Builder().CreateGEP(thisPtr, delegateIndeces);
+    emitter.Builder().CreateStore(delegateValue, thisDelegatePtr);
+}
+
+ClassDelegateTypeEquality::ClassDelegateTypeEquality(const Span& span_, const std::u32string& name_) :
+    FunctionSymbol(SymbolType::classDelegateTypeEquality, span_, name_)
+{
+}
+
+ClassDelegateTypeEquality::ClassDelegateTypeEquality(ClassDelegateTypeSymbol* classDelegateType, TypeSymbol* boolType) :
+    FunctionSymbol(SymbolType::classDelegateTypeEquality, Span(), U"operator==")
+{
+    SetGroupName(U"operator==");
+    SetAccess(SymbolAccess::public_);
+    ParameterSymbol* leftParam = new ParameterSymbol(Span(), U"left");
+    leftParam->SetType(classDelegateType->AddConst(Span())->AddLvalueReference(Span()));
+    AddMember(leftParam);
+    ParameterSymbol* rightParam = new ParameterSymbol(Span(), U"right");
+    rightParam->SetType(classDelegateType->AddConst(Span())->AddLvalueReference(Span()));
+    AddMember(rightParam);
+    SetReturnType(boolType);
+    ComputeName();
+}
+
+void ClassDelegateTypeEquality::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags)
+{
+    ArgVector objectIndeces;
+    objectIndeces.push_back(emitter.Builder().getInt32(0));
+    objectIndeces.push_back(emitter.Builder().getInt32(0));
+    genObjects[0]->Load(emitter, OperationFlags::none);
+    llvm::Value* leftPtr = emitter.Stack().Pop();
+    llvm::Value* leftObjectPtr = emitter.Builder().CreateGEP(leftPtr, objectIndeces);
+    llvm::Value* leftObjectValue = emitter.Builder().CreateLoad(leftObjectPtr);
+    genObjects[1]->Load(emitter, OperationFlags::none);
+    llvm::Value* rightPtr = emitter.Stack().Pop();
+    llvm::Value* rightObjectPtr = emitter.Builder().CreateGEP(rightPtr, objectIndeces);
+    llvm::Value* rightObjectValue = emitter.Builder().CreateLoad(rightObjectPtr);
+    llvm::Value* objectsEqual = emitter.Builder().CreateICmpEQ(leftObjectValue, rightObjectValue);
+    ArgVector delegateIndeces;
+    delegateIndeces.push_back(emitter.Builder().getInt32(0));
+    delegateIndeces.push_back(emitter.Builder().getInt32(1));
+    llvm::Value* leftDelegatePtr = emitter.Builder().CreateGEP(leftPtr, delegateIndeces);
+    llvm::Value* leftDelegateValue = emitter.Builder().CreateLoad(leftDelegatePtr);
+    llvm::Value* rightDelegatePtr = emitter.Builder().CreateGEP(rightPtr, delegateIndeces);
+    llvm::Value* rightDelegateValue = emitter.Builder().CreateLoad(rightDelegatePtr);
+    llvm::Value* delegatesEqual = emitter.Builder().CreateICmpEQ(leftDelegateValue, rightDelegateValue);
+    llvm::Value* equal = emitter.Builder().CreateAnd(objectsEqual, delegatesEqual);
+    emitter.Stack().Push(equal);
+}
+
+MemberFunctionToClassDelegateConversion::MemberFunctionToClassDelegateConversion(const Span& span_, const std::u32string& name_) :
+    FunctionSymbol(SymbolType::memberFunctionToClassDelegateSymbol, span_, name_)
+{
+}
+
+MemberFunctionToClassDelegateConversion::MemberFunctionToClassDelegateConversion(TypeSymbol* sourceType_, TypeSymbol* targetType_, FunctionSymbol* function_) :
+    FunctionSymbol(SymbolType::memberFunctionToClassDelegateSymbol, Span(), U"@conversion"), sourceType(sourceType_), targetType(targetType_), function(function_)
+{
+}
+
+void MemberFunctionToClassDelegateConversion::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags)
+{
+    // todo
 }
 
 } } // namespace cmajor::symbols

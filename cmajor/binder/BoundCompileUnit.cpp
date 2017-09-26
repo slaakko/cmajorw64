@@ -370,6 +370,11 @@ void BoundCompileUnit::InstantiateInlineFunction(FunctionSymbol* inlineFunction,
     inlineFunctionRepository.Instantiate(inlineFunction, containerScope, span);
 }
 
+void BoundCompileUnit::GenerateCopyConstructorFor(ClassTypeSymbol* classTypeSymbol, ContainerScope* containerScope, const Span& span)
+{
+    operationRepository.GenerateCopyConstructorFor(classTypeSymbol, containerScope, span);
+}
+
 int BoundCompileUnit::Install(const std::string& str)
 {
     return utf8StringRepository.Install(str);

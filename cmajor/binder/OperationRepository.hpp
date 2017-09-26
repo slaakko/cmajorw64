@@ -65,10 +65,13 @@ public:
     void Add(Operation* operation);
     void CollectViableFunctions(const std::u32string& groupName, ContainerScope* containerScope, const std::vector<std::unique_ptr<BoundExpression>>& arguments, 
         BoundFunction* currentFunction, std::unordered_set<FunctionSymbol*>& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span);
+    void GenerateCopyConstructorFor(ClassTypeSymbol* classTypeSymbol, ContainerScope* containerScope, const Span& span);
 private:
+    BoundCompileUnit& boundCompileUnit;
     std::unordered_map<std::u32string, OperationGroup*> operationGroupMap;
     std::vector<std::unique_ptr<OperationGroup>> operationGroups;
     std::vector<std::unique_ptr<Operation>> operations;
+    Operation* copyConstructorOperation;
 };
 
 void GenerateDestructorImplementation(BoundClass* boundClass, DestructorSymbol* destructorSymbol, BoundCompileUnit& boundCompileUnit, ContainerScope* containerScope, const Span& span);

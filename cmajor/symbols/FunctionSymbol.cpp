@@ -933,7 +933,12 @@ llvm::FunctionType* FunctionSymbol::IrType(Emitter& emitter)
         for (int i = 0; i < np; ++i)
         {
             ParameterSymbol* parameter = parameters[i];
-            paramTypes.push_back(parameter->GetType()->IrType(emitter));
+            TypeSymbol* paramType = parameter->GetType();
+            if (paramType->IsClassTypeSymbol())
+            {
+                paramType = paramType->AddConst(GetSpan())->AddLvalueReference(GetSpan());
+            }
+            paramTypes.push_back(paramType->IrType(emitter));
         }
         if (returnParam)
         {

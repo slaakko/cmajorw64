@@ -49,6 +49,8 @@ const char* symbolTypeStr[uint8_t(SymbolType::maxSymbol)] =
     "enumTypeToUnderlyingType", "underlyingToEnumType",
     "delegateTypeDefaultConstructor", "delegateTypeCopyConstructor", "delegateTypeMoveConstructor", "delegateTypeCopyAssignment", "delegateTypeMoveAssignment", "delegateTypeReturn", 
     "delegateTypeEquality", "functionToDelegateSymbol",
+    "classDelegateTypeDefaultConstructor", "classDelegateTypeCopyConstructor", "classDelegateTypeMoveConstructor", "classDelegateTypeCopyAssignment", "classDelegateTypeMoveAssignment",
+    "classDelegateTypeEquality", "memberFunctionToClassDelegateSymbol",
     "namespaceTypeSymbol", "functionGroupTypeSymbol", "memberExpressionTypeSymbol", "valueSymbol"
 };
 
@@ -428,7 +430,11 @@ const ContainerSymbol* Symbol::ClassInterfaceEnumDelegateOrNsNoThrow() const
     }
     else if (symbolType == SymbolType::delegateTypeSymbol)
     {
-        return static_cast<const EnumTypeSymbol*>(this);
+        return static_cast<const DelegateTypeSymbol*>(this);
+    }
+    else if (symbolType == SymbolType::classDelegateTypeSymbol)
+    {
+        return static_cast<const ClassDelegateTypeSymbol*>(this);
     }
     else if (IsClassTypeSymbol())
     {
@@ -463,7 +469,11 @@ ContainerSymbol* Symbol::ClassInterfaceEnumDelegateOrNsNoThrow()
     }
     else if (symbolType == SymbolType::delegateTypeSymbol)
     {
-        return static_cast<EnumTypeSymbol*>(this);
+        return static_cast<DelegateTypeSymbol*>(this);
+    }
+    else if (symbolType == SymbolType::classDelegateTypeSymbol)
+    {
+        return static_cast<ClassDelegateTypeSymbol*>(this);
     }
     else if (IsClassTypeSymbol())
     {
@@ -902,6 +912,13 @@ SymbolFactory::SymbolFactory()
     Register(SymbolType::delegateTypeReturn, new ConcreteSymbolCreator<DelegateTypeReturn>());
     Register(SymbolType::delegateTypeEquality, new ConcreteSymbolCreator<DelegateTypeEquality>());
     Register(SymbolType::functionToDelegateSymbol, new ConcreteSymbolCreator<FunctionToDelegateConversion>());
+    Register(SymbolType::classDelegateTypeDefaultConstructor, new ConcreteSymbolCreator<ClassDelegateTypeDefaultConstructor>());
+    Register(SymbolType::classDelegateTypeCopyConstructor, new ConcreteSymbolCreator<ClassDelegateTypeCopyConstructor>());
+    Register(SymbolType::classDelegateTypeMoveConstructor, new ConcreteSymbolCreator<ClassDelegateTypeMoveConstructor>()); 
+    Register(SymbolType::classDelegateTypeCopyAssignment, new ConcreteSymbolCreator<ClassDelegateTypeCopyAssignment>());
+    Register(SymbolType::classDelegateTypeMoveAssignment, new ConcreteSymbolCreator<ClassDelegateTypeMoveAssignment>());
+    Register(SymbolType::classDelegateTypeEquality, new ConcreteSymbolCreator<ClassDelegateTypeEquality>());
+    Register(SymbolType::memberFunctionToClassDelegateSymbol, new ConcreteSymbolCreator<MemberFunctionToClassDelegateConversion>());
 }
 
 Symbol* SymbolFactory::CreateSymbol(SymbolType symbolType, const Span& span, const std::u32string& name)

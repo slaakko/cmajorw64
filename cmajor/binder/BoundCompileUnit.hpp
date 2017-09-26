@@ -45,6 +45,7 @@ public:
     FunctionSymbol* InstantiateFunctionTemplate(FunctionSymbol* functionTemplate, const std::unordered_map<TemplateParameterSymbol*, TypeSymbol*>& templateParameterMapping, const Span& span);
     void InstantiateClassTemplateMemberFunction(FunctionSymbol* memberFunction, ContainerScope* containerScope, const Span& span);
     void InstantiateInlineFunction(FunctionSymbol* inlineFunction, ContainerScope* containerScope, const Span& span);
+    void GenerateCopyConstructorFor(ClassTypeSymbol* classTypeSymbol, ContainerScope* containerScope, const Span& span);
     int Install(const std::string& str);
     int Install(const std::u16string& str);
     int Install(const std::u32string& str);

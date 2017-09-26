@@ -630,6 +630,11 @@ void TypeBinder::Visit(ClassDelegateNode& classDelegateNode)
     Assert(symbol->GetSymbolType() == SymbolType::classDelegateTypeSymbol, "class delegate type symbol expected");
     ClassDelegateTypeSymbol* classDelegateTypeSymbol = static_cast<ClassDelegateTypeSymbol*>(symbol);
     classDelegateTypeSymbol->SetSpecifiers(classDelegateNode.GetSpecifiers());
+    DelegateTypeSymbol* memberDelegateType = new DelegateTypeSymbol(classDelegateNode.GetSpan(), U"@dlg_type");
+    symbolTable.SetTypeIdFor(memberDelegateType);
+    ParameterSymbol* objectParam = new ParameterSymbol(classDelegateNode.GetSpan(), U"@obj");
+    objectParam->SetType(symbolTable.GetTypeByName(U"void")->AddPointer(classDelegateNode.GetSpan()));
+    memberDelegateType->AddMember(objectParam);
     int n = classDelegateNode.Parameters().Count();
     for (int i = 0; i < n; ++i)
     {
@@ -639,9 +644,32 @@ void TypeBinder::Visit(ClassDelegateNode& classDelegateNode)
         Assert(symbol->GetSymbolType() == SymbolType::parameterSymbol, "parameter symbol expected");
         ParameterSymbol* parameterSymbol = static_cast<ParameterSymbol*>(symbol);
         parameterSymbol->SetType(parameterType);
+        ParameterSymbol* memberParam = new ParameterSymbol(classDelegateNode.GetSpan(), ToUtf32("@p" + std::to_string(i)));
+        memberParam->SetType(parameterType);
+        memberDelegateType->AddMember(memberParam);
     }
     TypeSymbol* returnType = ResolveType(classDelegateNode.ReturnTypeExpr(), boundCompileUnit, containerScope);
     classDelegateTypeSymbol->SetReturnType(returnType);
+    memberDelegateType->SetReturnType(returnType);
+    classDelegateTypeSymbol->AddMember(memberDelegateType);
+    ClassDelegateTypeDefaultConstructor* defaultConstructor = new ClassDelegateTypeDefaultConstructor(classDelegateTypeSymbol);
+    symbolTable.SetFunctionIdFor(defaultConstructor);
+    classDelegateTypeSymbol->AddMember(defaultConstructor);
+    ClassDelegateTypeCopyConstructor* copyConstructor = new ClassDelegateTypeCopyConstructor(classDelegateTypeSymbol);
+    symbolTable.SetFunctionIdFor(copyConstructor);
+    classDelegateTypeSymbol->AddMember(copyConstructor);
+    ClassDelegateTypeMoveConstructor* moveConstructor = new ClassDelegateTypeMoveConstructor(classDelegateTypeSymbol);
+    symbolTable.SetFunctionIdFor(moveConstructor);
+    classDelegateTypeSymbol->AddMember(moveConstructor);
+    ClassDelegateTypeCopyAssignment* copyAssignment = new ClassDelegateTypeCopyAssignment(classDelegateTypeSymbol, symbolTable.GetTypeByName(U"void"));
+    symbolTable.SetFunctionIdFor(copyAssignment);
+    classDelegateTypeSymbol->AddMember(copyAssignment);
+    ClassDelegateTypeMoveAssignment* moveAssignment = new ClassDelegateTypeMoveAssignment(classDelegateTypeSymbol, symbolTable.GetTypeByName(U"void"));
+    symbolTable.SetFunctionIdFor(moveAssignment);
+    classDelegateTypeSymbol->AddMember(moveAssignment);
+    ClassDelegateTypeEquality* equality = new ClassDelegateTypeEquality(classDelegateTypeSymbol, symbolTable.GetTypeByName(U"bool"));
+    symbolTable.SetFunctionIdFor(equality);
+    classDelegateTypeSymbol->Ns()->AddMember(equality);
 }
 
 void TypeBinder::Visit(ConceptNode& conceptNode)

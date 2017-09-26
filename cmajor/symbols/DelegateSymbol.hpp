@@ -131,7 +131,7 @@ private:
     FunctionSymbol* function;
 };
 
-class ClassDelegateTypeSymbol : public ClassTypeSymbol
+class ClassDelegateTypeSymbol : public TypeSymbol
 {
 public:
     ClassDelegateTypeSymbol(const Span& span_, const std::u32string& name_);
@@ -143,16 +143,107 @@ public:
     std::string TypeString() const override { return "class_delegate"; }
     void Accept(SymbolCollector* collector) override;
     void Dump(CodeFormatter& formatter) override;
-    bool IsClassTypeSymbol() const override { return false; }
+    llvm::Type* IrType(Emitter& emitter) override;
+    llvm::Constant* CreateDefaultIrValue(Emitter& emitter) override;
     void SetSpecifiers(Specifiers specifiers);
     int Arity() const { return parameters.size(); }
+    const std::vector<ParameterSymbol*>& Parameters() const { return parameters; }
     const TypeSymbol* ReturnType() const { return returnType; }
     void SetReturnType(TypeSymbol* returnType_) { returnType = returnType_; }
-    llvm::Type* IrType(Emitter& emitter) override { return nullptr; } // todo
-    llvm::Constant* CreateDefaultIrValue(Emitter& emitter) override { return nullptr; } // todo
+    DelegateTypeSymbol* DelegateType() { return delegateType; }
 private:
     TypeSymbol* returnType;
     std::vector<ParameterSymbol*> parameters;
+    DelegateTypeSymbol* delegateType;
+    llvm::Type* irType;
+};
+
+class ClassDelegateTypeDefaultConstructor : public FunctionSymbol
+{
+public:
+    ClassDelegateTypeDefaultConstructor(const Span& span_, const std::u32string& name_);
+    ClassDelegateTypeDefaultConstructor(ClassDelegateTypeSymbol* classDelegateType_);
+    void Write(SymbolWriter& writer) override;
+    void Read(SymbolReader& reader) override;
+    void EmplaceType(TypeSymbol* typeSymbol, int index) override;
+    SymbolAccess DeclaredAccess() const override { return SymbolAccess::public_; }
+    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags) override;
+    bool IsBasicTypeOperation() const override { return true; }
+    bool IsConstructorDestructorOrNonstaticMemberFunction() const override { return true; }
+private:
+    ClassDelegateTypeSymbol* classDelegateType;
+};
+
+class ClassDelegateTypeCopyConstructor : public FunctionSymbol
+{
+public:
+    ClassDelegateTypeCopyConstructor(const Span& span_, const std::u32string& name_);
+    ClassDelegateTypeCopyConstructor(ClassDelegateTypeSymbol* classDelegateType);
+    SymbolAccess DeclaredAccess() const override { return SymbolAccess::public_; }
+    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags) override;
+    bool IsBasicTypeOperation() const override { return true; }
+    bool IsConstructorDestructorOrNonstaticMemberFunction() const override { return true; }
+};
+
+class ClassDelegateTypeMoveConstructor : public FunctionSymbol
+{
+public:
+    ClassDelegateTypeMoveConstructor(const Span& span_, const std::u32string& name_);
+    ClassDelegateTypeMoveConstructor(ClassDelegateTypeSymbol* classDelegateType);
+    SymbolAccess DeclaredAccess() const override { return SymbolAccess::public_; }
+    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags) override;
+    bool IsBasicTypeOperation() const override { return true; }
+    bool IsConstructorDestructorOrNonstaticMemberFunction() const override { return true; }
+};
+
+class ClassDelegateTypeCopyAssignment : public FunctionSymbol
+{
+public:
+    ClassDelegateTypeCopyAssignment(const Span& span_, const std::u32string& name_);
+    ClassDelegateTypeCopyAssignment(ClassDelegateTypeSymbol* classDelegateType, TypeSymbol* voidType);
+    SymbolAccess DeclaredAccess() const override { return SymbolAccess::public_; }
+    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags) override;
+    bool IsBasicTypeOperation() const override { return true; }
+    bool IsConstructorDestructorOrNonstaticMemberFunction() const override { return true; }
+};
+
+class ClassDelegateTypeMoveAssignment : public FunctionSymbol
+{
+public:
+    ClassDelegateTypeMoveAssignment(const Span& span_, const std::u32string& name_);
+    ClassDelegateTypeMoveAssignment(ClassDelegateTypeSymbol* classDelegateType, TypeSymbol* voidType);
+    SymbolAccess DeclaredAccess() const override { return SymbolAccess::public_; }
+    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags) override;
+    bool IsBasicTypeOperation() const override { return true; }
+    bool IsConstructorDestructorOrNonstaticMemberFunction() const override { return true; }
+};
+
+class ClassDelegateTypeEquality : public FunctionSymbol
+{
+public:
+    ClassDelegateTypeEquality(const Span& span_, const std::u32string& name_);
+    ClassDelegateTypeEquality(ClassDelegateTypeSymbol* classDelegateType, TypeSymbol* boolType);
+    SymbolAccess DeclaredAccess() const override { return SymbolAccess::public_; }
+    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags) override;
+    bool IsBasicTypeOperation() const override { return true; }
+    bool IsConstructorDestructorOrNonstaticMemberFunction() const override { return true; }
+};
+
+class MemberFunctionToClassDelegateConversion : public FunctionSymbol
+{
+public:
+    MemberFunctionToClassDelegateConversion(const Span& span_, const std::u32string& name_);
+    MemberFunctionToClassDelegateConversion(TypeSymbol* sourceType_, TypeSymbol* targetType_, FunctionSymbol* function_);
+    ConversionType GetConversionType() const override { return ConversionType::implicit_; }
+    uint8_t ConversionDistance() const override { return 1; }
+    TypeSymbol* ConversionSourceType() const override { return sourceType; }
+    TypeSymbol* ConversionTargetType() const override { return targetType; }
+    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags) override;
+    bool IsBasicTypeOperation() const override { return true; }
+private:
+    TypeSymbol* sourceType;
+    TypeSymbol* targetType;
+    FunctionSymbol* function;
 };
 
 } } // namespace cmajor::symbols

@@ -400,7 +400,20 @@ void Emitter::Visit(BoundFunction& boundFunction)
     for (int i = 0; i < np; ++i)
     {
         ParameterSymbol* parameter = functionSymbol->Parameters()[i];
-        builder.CreateStore(&*it, parameter->IrObject());
+        if (parameter->GetType()->IsClassTypeSymbol())
+        {
+            ClassTypeSymbol* classType = static_cast<ClassTypeSymbol*>(parameter->GetType());
+            llvm::FunctionType* copyCtor = classType->CopyConstructor()->IrType(*this);
+            llvm::Function* callee = llvm::cast<llvm::Function>(compileUnitModule->getOrInsertFunction(ToUtf8(classType->CopyConstructor()->MangledName()), copyCtor));
+            ArgVector args;
+            args.push_back(parameter->IrObject());
+            args.push_back(&*it);
+            builder.CreateCall(callee, args);
+        }
+        else
+        {
+            builder.CreateStore(&*it, parameter->IrObject());
+        }
         ++it;
     }
     if (functionSymbol->ReturnParam())
