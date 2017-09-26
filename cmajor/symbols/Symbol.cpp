@@ -47,6 +47,8 @@ const char* symbolTypeStr[uint8_t(SymbolType::maxSymbol)] =
     "basicTypeFloatingToUnsignedInt", "basicTypeFloatingToSignedInt", "basicTypeFloatingExtension", "basicTypeFloatingTruncation",
     "enumTypeDefaultConstructor", "enumTypeCopyConstructor", "enumTypeMoveConstructor", "enumTypeCopyAssignment", "enumTypeMoveAssignment", "enumTypeReturn", "enumTypeEquality", 
     "enumTypeToUnderlyingType", "underlyingToEnumType",
+    "delegateTypeDefaultConstructor", "delegateTypeCopyConstructor", "delegateTypeMoveConstructor", "delegateTypeCopyAssignment", "delegateTypeMoveAssignment", "delegateTypeReturn", 
+    "delegateTypeEquality", "functionToDelegateSymbol",
     "namespaceTypeSymbol", "functionGroupTypeSymbol", "memberExpressionTypeSymbol", "valueSymbol"
 };
 
@@ -892,6 +894,14 @@ SymbolFactory::SymbolFactory()
     Register(SymbolType::enumTypeEquality, new ConcreteSymbolCreator<EnumTypeEqualityOp>());
     Register(SymbolType::enumTypeToUnderlyingType, new ConcreteSymbolCreator<EnumTypeToUnderlyingTypeConversion>());
     Register(SymbolType::underlyingToEnumType, new ConcreteSymbolCreator<UnderlyingTypeToEnumTypeConversion>());
+    Register(SymbolType::delegateTypeDefaultConstructor, new ConcreteSymbolCreator<DelegateTypeDefaultConstructor>());
+    Register(SymbolType::delegateTypeCopyConstructor, new ConcreteSymbolCreator<DelegateTypeCopyConstructor>());
+    Register(SymbolType::delegateTypeMoveConstructor, new ConcreteSymbolCreator<DelegateTypeMoveConstructor>());
+    Register(SymbolType::delegateTypeCopyAssignment, new ConcreteSymbolCreator<DelegateTypeCopyAssignment>());
+    Register(SymbolType::delegateTypeMoveAssignment, new ConcreteSymbolCreator<DelegateTypeMoveAssignment>());
+    Register(SymbolType::delegateTypeReturn, new ConcreteSymbolCreator<DelegateTypeReturn>());
+    Register(SymbolType::delegateTypeEquality, new ConcreteSymbolCreator<DelegateTypeEquality>());
+    Register(SymbolType::functionToDelegateSymbol, new ConcreteSymbolCreator<FunctionToDelegateConversion>());
 }
 
 Symbol* SymbolFactory::CreateSymbol(SymbolType symbolType, const Span& span, const std::u32string& name)

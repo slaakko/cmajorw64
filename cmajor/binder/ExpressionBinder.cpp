@@ -1478,6 +1478,71 @@ void ExpressionBinder::Visit(InvokeNode& invokeNode)
         }
         arguments.push_back(std::unique_ptr<BoundExpression>(expression.release()));
     }
+    else if (expression->GetType()->PlainType(span)->GetSymbolType() == SymbolType::delegateTypeSymbol)
+    {
+        TypeSymbol* type = expression->GetType();
+        if (type->IsReferenceType())
+        {
+            arguments.push_back(std::unique_ptr<BoundExpression>(new BoundDereferenceExpression(std::move(expression), type->RemoveReference(span))));
+        }
+        else
+        {
+            arguments.push_back(std::move(expression));
+        }
+        DelegateTypeSymbol* delegateTypeSymbol = static_cast<DelegateTypeSymbol*>(type->BaseType());
+        int n = invokeNode.Arguments().Count();
+        if (n != delegateTypeSymbol->Arity())
+        {
+            throw Exception("wrong number of arguments for calling delegate type '" + ToUtf8(delegateTypeSymbol->FullName()) + "'", span);
+        }
+        for (int i = 0; i < n; ++i)
+        {
+            TypeSymbol* delegateParameterType = delegateTypeSymbol->Parameters()[i]->GetType();
+            Node* argument = invokeNode.Arguments()[i];
+            argument->Accept(*this);
+            TypeSymbol* argumentType = expression->GetType();
+            if (!TypesEqual(argumentType, delegateParameterType))
+            {
+                if (TypesEqual(argumentType->PlainType(span), delegateParameterType->PlainType(span)))
+                {
+                    if (argumentType->IsReferenceType() && !delegateParameterType->IsReferenceType())
+                    {
+                        TypeSymbol* type = argumentType->RemoveReference(span);
+                        BoundDereferenceExpression* dereferenceExpression = new BoundDereferenceExpression(std::move(expression), type);
+                        expression.reset(dereferenceExpression);
+                    }
+                    else if (!argumentType->IsReferenceType() && (delegateParameterType->IsReferenceType() || delegateParameterType->IsClassTypeSymbol()))
+                    {
+                        TypeSymbol* type = argumentType->AddLvalueReference(span);
+                        BoundAddressOfExpression* addressOfExpression = new BoundAddressOfExpression(std::move(expression), type);
+                        expression.reset(addressOfExpression);
+                    }
+                }
+                else
+                {
+                    FunctionSymbol* conversionFun = boundCompileUnit.GetConversion(argumentType, delegateParameterType, containerScope, span);
+                    if (conversionFun)
+                    {
+                        BoundConversion* conversion = new BoundConversion(std::move(expression), conversionFun);
+                        expression.reset(conversion);
+                    }
+                    else
+                    {
+                        throw Exception("cannot convert '" + ToUtf8(argumentType->FullName()) + "' type argument to '" + ToUtf8(delegateParameterType->FullName()) + "' type parameter",
+                            argument->GetSpan(), span);
+                    }
+                }
+            }
+            arguments.push_back(std::unique_ptr<BoundExpression>(expression.release()));
+        }
+        BoundDelegateCall* delegateCall = new BoundDelegateCall(span, delegateTypeSymbol);
+        for (std::unique_ptr<BoundExpression>& argument : arguments)
+        {
+            delegateCall->AddArgument(std::move(argument));
+        }
+        expression.reset(delegateCall);
+        return;
+    }
     else
     {
         throw Exception("invoke cannot be applied to this type of expression", invokeNode.Subject()->GetSpan());

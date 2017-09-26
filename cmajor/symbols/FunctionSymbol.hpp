@@ -263,6 +263,7 @@ public:
     llvm::Type* IrType(Emitter& emitter) override { Assert(false, "tried to get ir type of function group type"); return nullptr; }
     llvm::Constant* CreateDefaultIrValue(Emitter& emitter) override { Assert(false, "tried to get default ir value of function group type"); return nullptr; }
     const FunctionGroupSymbol* FunctionGroup() const { return functionGroup; }
+    FunctionGroupSymbol* FunctionGroup() { return functionGroup; }
 private:
     FunctionGroupSymbol* functionGroup;
 };

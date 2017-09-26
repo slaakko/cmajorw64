@@ -10,6 +10,7 @@
 #include <cmajor/symbols/VariableSymbol.hpp>
 #include <cmajor/symbols/ConstantSymbol.hpp>
 #include <cmajor/symbols/EnumSymbol.hpp>
+#include <cmajor/symbols/DelegateSymbol.hpp>
 
 namespace cmajor { namespace binder {
 
@@ -239,6 +240,24 @@ public:
     const std::vector<std::unique_ptr<BoundExpression>>& Arguments() const { return arguments; }
 private:
     FunctionSymbol* functionSymbol;
+    std::vector<std::unique_ptr<BoundExpression>> arguments;
+};
+
+class BoundDelegateCall : public BoundExpression
+{
+public:
+    BoundDelegateCall(const Span& span_, DelegateTypeSymbol* delegateType_);
+    BoundExpression* Clone() override;
+    void Load(Emitter& emitter, OperationFlags flags) override;
+    void Store(Emitter& emitter, OperationFlags flags) override;
+    void Accept(BoundNodeVisitor& visitor) override;
+    bool HasValue() const override;
+    std::string TypeString() const override { return "delegate call"; }
+    bool IsLvalueExpression() const override;
+    void AddArgument(std::unique_ptr<BoundExpression>&& argument);
+    const std::vector<std::unique_ptr<BoundExpression>>& Arguments() const { return arguments; }
+private:
+    DelegateTypeSymbol* delegateTypeSymbol;
     std::vector<std::unique_ptr<BoundExpression>> arguments;
 };
 

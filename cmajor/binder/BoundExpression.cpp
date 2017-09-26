@@ -727,6 +727,79 @@ bool BoundFunctionCall::IsLvalueExpression() const
     return false;
 }
 
+BoundDelegateCall::BoundDelegateCall(const Span& span_, DelegateTypeSymbol* delegateType_) :
+    BoundExpression(span_, BoundNodeType::boundDelegateCall, delegateType_->ReturnType()), delegateTypeSymbol(delegateType_), arguments()
+{
+}
+
+BoundExpression* BoundDelegateCall::Clone()
+{
+    return new BoundDelegateCall(GetSpan(), delegateTypeSymbol);
+}
+
+void BoundDelegateCall::Load(Emitter& emitter, OperationFlags flags)
+{
+    if ((flags & OperationFlags::addr) != OperationFlags::none)
+    {
+        throw Exception("cannot take address of a delegate call", GetSpan());
+    }
+    else
+    {
+        std::vector<GenObject*> genObjects;
+        for (const std::unique_ptr<BoundExpression>& argument : arguments)
+        {
+            genObjects.push_back(argument.get());
+        }
+        OperationFlags callFlags = flags & OperationFlags::functionCallFlags;
+        if (!delegateTypeSymbol->IsNothrow())
+        {
+            emitter.SetLineNumber(GetSpan().LineNumber());
+        }
+        delegateTypeSymbol->GenerateCall(emitter, genObjects, callFlags);
+        if ((flags & OperationFlags::deref) != OperationFlags::none)
+        {
+            llvm::Value* value = emitter.Stack().Pop();
+            uint8_t n = GetDerefCount(flags);
+            for (uint8_t i = 0; i < n; ++i)
+            {
+                value = emitter.Builder().CreateLoad(value);
+            }
+            emitter.Stack().Push(value);
+        }
+    }
+    DestroyTemporaries(emitter);
+}
+
+void BoundDelegateCall::Store(Emitter& emitter, OperationFlags flags)
+{
+    // todo
+}
+
+void BoundDelegateCall::Accept(BoundNodeVisitor& visitor)
+{
+    visitor.Visit(*this);
+}
+
+bool BoundDelegateCall::HasValue() const
+{
+    return delegateTypeSymbol->ReturnType()->GetSymbolType() != SymbolType::voidTypeSymbol;
+}
+
+bool BoundDelegateCall::IsLvalueExpression() const
+{
+    TypeSymbol* returnType = delegateTypeSymbol->ReturnType();
+    if (returnType->GetSymbolType() != SymbolType::voidTypeSymbol)
+    {
+        return !returnType->IsConstType() && returnType->IsLvalueReferenceType();
+    }
+    return false;
+}
+
+void BoundDelegateCall::AddArgument(std::unique_ptr<BoundExpression>&& argument)
+{
+    arguments.push_back(std::move(argument));
+}
+
 BoundConstructExpression::BoundConstructExpression(std::unique_ptr<BoundExpression>&& constructorCall_, TypeSymbol* resultType_) :
     BoundExpression(constructorCall_->GetSpan(), BoundNodeType::boundConstructExpression, resultType_), constructorCall(std::move(constructorCall_))
 {

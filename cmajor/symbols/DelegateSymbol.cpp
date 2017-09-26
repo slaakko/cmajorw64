@@ -11,6 +11,7 @@
 #include <cmajor/symbols/Exception.hpp>
 #include <cmajor/symbols/SymbolCollector.hpp>
 #include <cmajor/util/Unicode.hpp>
+#include <llvm/IR/Module.h>
 
 namespace cmajor { namespace symbols {
 
@@ -180,6 +181,116 @@ void DelegateTypeSymbol::SetSpecifiers(Specifiers specifiers)
     if ((specifiers & Specifiers::unit_test_) != Specifiers::none)
     {
         throw Exception("delegate cannot be unit_test", GetSpan());
+    }
+}
+
+void DelegateTypeSymbol::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags)
+{
+    llvm::Value* callee = nullptr;
+    int na = genObjects.size();
+    for (int i = 0; i < na; ++i)
+    {
+        GenObject* genObject = genObjects[i];
+        genObject->Load(emitter, flags & OperationFlags::functionCallFlags);
+        if (i == 0)
+        {
+            callee = emitter.Stack().Pop();
+        }
+    }
+    ArgVector args;
+    int n = parameters.size();
+    args.resize(n);
+    for (int i = 0; i < n; ++i)
+    {
+        llvm::Value* arg = emitter.Stack().Pop();
+        args[n - i - 1] = arg;
+    }
+    llvm::BasicBlock* handlerBlock = emitter.HandlerBlock();
+    llvm::BasicBlock* cleanupBlock = emitter.CleanupBlock();
+    bool newCleanupNeeded = emitter.NewCleanupNeeded();
+    Pad* currentPad = emitter.CurrentPad();
+    std::vector<llvm::OperandBundleDef> bundles;
+    if (currentPad != nullptr)
+    {
+        std::vector<llvm::Value*> inputs;
+        inputs.push_back(currentPad->value);
+        bundles.push_back(llvm::OperandBundleDef("funclet", inputs));
+    }
+    if (returnType->GetSymbolType() != SymbolType::voidTypeSymbol)
+    {
+        if (IsNothrow() || (!handlerBlock && !cleanupBlock && !newCleanupNeeded))
+        {
+            if (currentPad == nullptr)
+            {
+                emitter.Stack().Push(emitter.Builder().CreateCall(callee, args));
+            }
+            else
+            {
+                emitter.Stack().Push(llvm::CallInst::Create(callee, args, bundles, "", emitter.CurrentBasicBlock()));
+            }
+        }
+        else
+        {
+            llvm::BasicBlock* nextBlock = llvm::BasicBlock::Create(emitter.Context(), "next", emitter.Function());
+            if (newCleanupNeeded)
+            {
+                emitter.CreateCleanup();
+                cleanupBlock = emitter.CleanupBlock();
+            }
+            llvm::BasicBlock* unwindBlock = cleanupBlock;
+            if (unwindBlock == nullptr)
+            {
+                unwindBlock = handlerBlock;
+                Assert(unwindBlock, "no unwind block");
+            }
+            if (currentPad == nullptr)
+            {
+                emitter.Stack().Push(emitter.Builder().CreateInvoke(callee, nextBlock, unwindBlock, args));
+            }
+            else
+            {
+                emitter.Stack().Push(llvm::InvokeInst::Create(callee, nextBlock, unwindBlock, args, bundles, "", emitter.CurrentBasicBlock()));
+            }
+            emitter.SetCurrentBasicBlock(nextBlock);
+        }
+    }
+    else
+    {
+        if (IsNothrow() || (!handlerBlock && !cleanupBlock && !newCleanupNeeded))
+        {
+            if (currentPad == nullptr)
+            {
+                emitter.Builder().CreateCall(callee, args);
+            }
+            else
+            {
+                llvm::CallInst::Create(callee, args, bundles, "", emitter.CurrentBasicBlock());
+            }
+        }
+        else
+        {
+            llvm::BasicBlock* nextBlock = llvm::BasicBlock::Create(emitter.Context(), "next", emitter.Function());
+            if (newCleanupNeeded)
+            {
+                emitter.CreateCleanup();
+                cleanupBlock = emitter.CleanupBlock();
+            }
+            llvm::BasicBlock* unwindBlock = cleanupBlock;
+            if (unwindBlock == nullptr)
+            {
+                unwindBlock = handlerBlock;
+                Assert(unwindBlock, "no unwind block");
+            }
+            if (currentPad == nullptr)
+            {
+                emitter.Builder().CreateInvoke(callee, nextBlock, unwindBlock, args);
+            }
+            else
+            {
+                llvm::InvokeInst::Create(callee, nextBlock, unwindBlock, args, bundles, "", emitter.CurrentBasicBlock());
+            }
+            emitter.SetCurrentBasicBlock(nextBlock);
+        }
     }
 }
 
@@ -379,6 +490,21 @@ void DelegateTypeEquality::GenerateCall(Emitter& emitter, std::vector<GenObject*
     genObjects[1]->Load(emitter, OperationFlags::none);
     llvm::Value* right = emitter.Stack().Pop();
     emitter.Stack().Push(emitter.Builder().CreateICmpEQ(left, right));
+}
+
+FunctionToDelegateConversion::FunctionToDelegateConversion(const Span& span_, const std::u32string& name_) : FunctionSymbol(SymbolType::functionToDelegateSymbol, span_, name_)
+{
+}
+
+FunctionToDelegateConversion::FunctionToDelegateConversion(TypeSymbol* sourceType_, TypeSymbol* targetType_, FunctionSymbol* function_) :
+    FunctionSymbol(SymbolType::functionToDelegateSymbol, Span(), U"@conversion"), sourceType(sourceType_), targetType(targetType_), function(function_)
+{
+    SetConversion();
+}
+
+void FunctionToDelegateConversion::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags)
+{
+    emitter.Stack().Push(emitter.Module()->getOrInsertFunction(ToUtf8(function->MangledName()), function->IrType(emitter)));
 }
 
 ClassDelegateTypeSymbol::ClassDelegateTypeSymbol(const Span& span_, const std::u32string& name_) : ClassTypeSymbol(SymbolType::classDelegateTypeSymbol, span_, name_), returnType(), parameters()

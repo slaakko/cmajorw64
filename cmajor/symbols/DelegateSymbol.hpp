@@ -27,8 +27,12 @@ public:
     llvm::Type* IrType(Emitter& emitter) override;
     llvm::Constant* CreateDefaultIrValue(Emitter& emitter) override;
     void SetSpecifiers(Specifiers specifiers);
+    int Arity() const { return parameters.size(); }
+    const std::vector<ParameterSymbol*>& Parameters() const { return parameters; }
     const TypeSymbol* ReturnType() const { return returnType; }
+    TypeSymbol* ReturnType() { return returnType; }
     void SetReturnType(TypeSymbol* returnType_) { returnType = returnType_; }
+    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags);
 private:
     TypeSymbol* returnType;
     std::vector<ParameterSymbol*> parameters;
@@ -110,6 +114,23 @@ public:
     bool IsBasicTypeOperation() const override { return true; }
 };
 
+class FunctionToDelegateConversion : public FunctionSymbol
+{
+public:
+    FunctionToDelegateConversion(const Span& span_, const std::u32string& name_);
+    FunctionToDelegateConversion(TypeSymbol* sourceType_, TypeSymbol* targetType_, FunctionSymbol* function_);
+    ConversionType GetConversionType() const override { return ConversionType::implicit_; }
+    uint8_t ConversionDistance() const override { return 1; }
+    TypeSymbol* ConversionSourceType() const override { return sourceType; }
+    TypeSymbol* ConversionTargetType() const override { return targetType; }
+    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags) override;
+    bool IsBasicTypeOperation() const override { return true; }
+private:
+    TypeSymbol* sourceType;
+    TypeSymbol* targetType;
+    FunctionSymbol* function;
+};
+
 class ClassDelegateTypeSymbol : public ClassTypeSymbol
 {
 public:
@@ -124,6 +145,7 @@ public:
     void Dump(CodeFormatter& formatter) override;
     bool IsClassTypeSymbol() const override { return false; }
     void SetSpecifiers(Specifiers specifiers);
+    int Arity() const { return parameters.size(); }
     const TypeSymbol* ReturnType() const { return returnType; }
     void SetReturnType(TypeSymbol* returnType_) { returnType = returnType_; }
     llvm::Type* IrType(Emitter& emitter) override { return nullptr; } // todo

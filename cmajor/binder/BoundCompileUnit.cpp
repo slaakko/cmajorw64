@@ -11,6 +11,7 @@
 #include <cmajor/symbols/FunctionSymbol.hpp>
 #include <cmajor/symbols/ClassTypeSymbol.hpp>
 #include <cmajor/symbols/GlobalFlags.hpp>
+#include <cmajor/symbols/DelegateSymbol.hpp>
 #include <cmajor/util/Path.hpp>
 #include <boost/filesystem.hpp>
 
@@ -296,7 +297,41 @@ FunctionSymbol* BoundCompileUnit::GetConversion(TypeSymbol* sourceType, TypeSymb
                     }
                 }
             }
-
+            else if (sourceType->GetSymbolType() == SymbolType::functionGroupTypeSymbol && targetType->GetSymbolType() == SymbolType::delegateTypeSymbol)
+            {
+                FunctionGroupTypeSymbol* functionGroupTypeSymbol = static_cast<FunctionGroupTypeSymbol*>(sourceType);
+                FunctionGroupSymbol* functionGroupSymbol = functionGroupTypeSymbol->FunctionGroup();
+                DelegateTypeSymbol* delegateTypeSymbol = static_cast<DelegateTypeSymbol*>(targetType);
+                int arity = delegateTypeSymbol->Arity();
+                std::unordered_set<FunctionSymbol*> viableFunctions;
+                functionGroupSymbol->CollectViableFunctions(arity, viableFunctions);
+                for (FunctionSymbol* viableFunction : viableFunctions)
+                {
+                    bool found = true;
+                    for (int i = 0; i < arity; ++i)
+                    {
+                        ParameterSymbol* sourceParam = viableFunction->Parameters()[i];
+                        ParameterSymbol* targetParam = delegateTypeSymbol->Parameters()[i];
+                        if (!TypesEqual(sourceParam->GetType(), targetParam->GetType()))
+                        {
+                            found = false;
+                            break;
+                        }
+                    }
+                    if (found)
+                    {
+                        found = TypesEqual(viableFunction->ReturnType(), delegateTypeSymbol->ReturnType());
+                    }
+                    if (found)
+                    {
+                        std::unique_ptr<FunctionSymbol> functionToDelegateConversion(new FunctionToDelegateConversion(sourceType, delegateTypeSymbol, viableFunction));
+                        conversion = functionToDelegateConversion.get();
+                        conversionTable.AddConversion(conversion);
+                        conversionTable.AddGeneratedConversion(std::move(functionToDelegateConversion));
+                        return conversion;
+                    }
+                }
+            }
         }
     }
     if (conversion)

@@ -159,6 +159,7 @@ public:
     void Visit(BoundDereferenceExpression& boundDereferenceExpression) override;
     void Visit(BoundReferenceToPointerExpression& boundReferenceToPointerExpression) override;
     void Visit(BoundFunctionCall& boundFunctionCall) override;
+    void Visit(BoundDelegateCall& boundDelegateCall) override;
     void Visit(BoundConversion& boundConversion) override;
     void Visit(BoundConstructExpression& boundConstructExpression) override;
     void Visit(BoundConstructAndReturnTemporaryExpression& boundConstructAndReturnTemporaryExpression) override;
@@ -1200,6 +1201,12 @@ void Emitter::Visit(BoundReferenceToPointerExpression& boundReferenceToPointerEx
 void Emitter::Visit(BoundFunctionCall& boundFunctionCall)
 {
     boundFunctionCall.Load(*this, OperationFlags::none);
+    GenJumpingBoolCode();
+}
+
+void Emitter::Visit(BoundDelegateCall& boundDelegateCall)
+{
+    boundDelegateCall.Load(*this, OperationFlags::none);
     GenJumpingBoolCode();
 }
 
