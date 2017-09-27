@@ -240,7 +240,7 @@ bool FindQualificationConversion(TypeSymbol* sourceType, TypeSymbol* targetType,
 }
 
 bool FindTemplateParameterMatch(TypeSymbol* sourceType, TypeSymbol* targetType, ConversionType conversionType, BoundExpression* argument,
-    BoundCompileUnit& boundCompileUnit, FunctionMatch& functionMatch, ContainerScope* containerScope, const Span& span)
+    BoundCompileUnit& boundCompileUnit, FunctionMatch& functionMatch, ContainerScope* containerScope, BoundFunction* currentFunction, const Span& span)
 {
     if (targetType->BaseType()->GetSymbolType() != SymbolType::templateParameterSymbol) return false;
     TemplateParameterSymbol* templateParameter = static_cast<TemplateParameterSymbol*>(targetType->BaseType());
@@ -285,7 +285,7 @@ bool FindTemplateParameterMatch(TypeSymbol* sourceType, TypeSymbol* targetType, 
         }
         else
         {
-            FunctionSymbol* conversionFun = boundCompileUnit.GetConversion(sourceType, targetType, containerScope, span);
+            FunctionSymbol* conversionFun = boundCompileUnit.GetConversion(sourceType, targetType, containerScope, currentFunction, span);
             if (conversionFun)
             {
                 if (conversionFun->GetConversionType() == conversionType || conversionFun->GetConversionType() == ConversionType::implicit_)
@@ -315,7 +315,7 @@ bool FindTemplateParameterMatch(TypeSymbol* sourceType, TypeSymbol* targetType, 
 }
 
 bool FindClassTemplateSpecializationMatch(TypeSymbol* sourceType, TypeSymbol* targetType, ConversionType conversionType, BoundExpression* argument,
-    BoundCompileUnit& boundCompileUnit, FunctionMatch& functionMatch, ContainerScope* containerScope, const Span& span)
+    BoundCompileUnit& boundCompileUnit, FunctionMatch& functionMatch, ContainerScope* containerScope, BoundFunction* currentFunction, const Span& span)
 {
     if (targetType->BaseType()->GetSymbolType() != SymbolType::classTemplateSpecializationSymbol)
     {
@@ -333,7 +333,7 @@ bool FindClassTemplateSpecializationMatch(TypeSymbol* sourceType, TypeSymbol* ta
         {
             TypeSymbol* sourceArgumentType = sourceClassTemplateSpecialization->TemplateArgumentTypes()[i];
             TypeSymbol* targetArgumentType = targetClassTemplateSpecialization->TemplateArgumentTypes()[i];
-            if (!FindTemplateParameterMatch(sourceArgumentType, targetArgumentType, conversionType, argument, boundCompileUnit, functionMatch, containerScope, span))
+            if (!FindTemplateParameterMatch(sourceArgumentType, targetArgumentType, conversionType, argument, boundCompileUnit, functionMatch, containerScope, currentFunction, span))
             {
                 return false;
             }
@@ -375,7 +375,7 @@ bool FindClassTemplateSpecializationMatch(TypeSymbol* sourceType, TypeSymbol* ta
         }
         else
         {
-            FunctionSymbol* conversionFun = boundCompileUnit.GetConversion(sourceType, targetType, containerScope, span);
+            FunctionSymbol* conversionFun = boundCompileUnit.GetConversion(sourceType, targetType, containerScope, currentFunction, span);
             if (conversionFun)
             {
                 if (conversionFun->GetConversionType() == conversionType || conversionFun->GetConversionType() == ConversionType::implicit_)
@@ -405,7 +405,7 @@ bool FindClassTemplateSpecializationMatch(TypeSymbol* sourceType, TypeSymbol* ta
 }
 
 bool FindConversions(BoundCompileUnit& boundCompileUnit, FunctionSymbol* function, std::vector<std::unique_ptr<BoundExpression>>& arguments, FunctionMatch& functionMatch, 
-    ConversionType conversionType, ContainerScope* containerScope, const Span& span)
+    ConversionType conversionType, ContainerScope* containerScope, BoundFunction* currentFunction, const Span& span)
 {
     int arity = arguments.size();
     if (arity == 1 && function->GroupName() == U"@constructor" && arguments[0]->GetType()->IsReferenceType())
@@ -475,7 +475,7 @@ bool FindConversions(BoundCompileUnit& boundCompileUnit, FunctionSymbol* functio
             }
             else if (i == 1 && function->IsLvalueReferenceCopyAssignment())
             {
-                FunctionSymbol* conversionFun = boundCompileUnit.GetConversion(sourceType, targetType->RemoveReference(span), containerScope, span);
+                FunctionSymbol* conversionFun = boundCompileUnit.GetConversion(sourceType, targetType->RemoveReference(span), containerScope, currentFunction, span);
                 if (conversionFun->GetConversionType() == conversionType || conversionFun->GetConversionType() == ConversionType::implicit_)
                 {
                     ++functionMatch.numConversions;
@@ -504,7 +504,7 @@ bool FindConversions(BoundCompileUnit& boundCompileUnit, FunctionSymbol* functio
             }
             if (!qualificationConversionMatch)
             {
-                FunctionSymbol* conversionFun = boundCompileUnit.GetConversion(sourceType, targetType, containerScope, span);
+                FunctionSymbol* conversionFun = boundCompileUnit.GetConversion(sourceType, targetType, containerScope, currentFunction, span);
                 if (conversionFun)
                 {
                     if (conversionFun->GetConversionType() == conversionType || conversionFun->GetConversionType() == ConversionType::implicit_)
@@ -534,11 +534,11 @@ bool FindConversions(BoundCompileUnit& boundCompileUnit, FunctionSymbol* functio
                 {
                     if (function->IsFunctionTemplate())
                     {
-                        if (FindTemplateParameterMatch(sourceType, targetType, conversionType, argument, boundCompileUnit, functionMatch, containerScope, span))
+                        if (FindTemplateParameterMatch(sourceType, targetType, conversionType, argument, boundCompileUnit, functionMatch, containerScope, currentFunction, span))
                         {
                             continue;
                         }
-                        if (FindClassTemplateSpecializationMatch(sourceType, targetType, conversionType, argument, boundCompileUnit, functionMatch, containerScope, span))
+                        if (FindClassTemplateSpecializationMatch(sourceType, targetType, conversionType, argument, boundCompileUnit, functionMatch, containerScope, currentFunction, span))
                         {
                             continue;
                         }
@@ -885,8 +885,7 @@ std::unique_ptr<BoundFunctionCall> CreateBoundFunctionCall(FunctionSymbol* bestF
             if (argumentMatch.referenceConversionFlags == OperationFlags::addr)
             {
                 bool lvalueExpr = argument->IsLvalueExpression();
-                if (argument->GetBoundNodeType() == BoundNodeType::boundConversion && 
-                    static_cast<BoundConversion*>(argument.get())->ConversionFun()->GetSymbolType() == SymbolType::conversionFunctionSymbol)
+                if (argument->GetBoundNodeType() == BoundNodeType::boundConversion)
                 {
                     lvalueExpr = true;
                 }
@@ -921,7 +920,7 @@ std::unique_ptr<BoundFunctionCall> CreateBoundFunctionCall(FunctionSymbol* bestF
             {
                 try
                 {
-                    boundCompileUnit.GenerateCopyConstructorFor(classType, containerScope, span);
+                    boundCompileUnit.GenerateCopyConstructorFor(classType, containerScope, boundFunction, span);
                 }
                 catch (const Exception& ex)
                 {
@@ -970,7 +969,7 @@ std::unique_ptr<BoundFunctionCall> SelectViableFunction(const std::unordered_set
                 continue;
             }
         }
-        if (FindConversions(boundCompileUnit, viableFunction, arguments, functionMatch, ConversionType::implicit_, containerScope, span))
+        if (FindConversions(boundCompileUnit, viableFunction, arguments, functionMatch, ConversionType::implicit_, containerScope, boundFunction, span))
         {
             if (viableFunction->IsFunctionTemplate())
             {

@@ -258,14 +258,16 @@ public:
 class FunctionGroupTypeSymbol : public TypeSymbol
 {
 public:
-    FunctionGroupTypeSymbol(FunctionGroupSymbol* functionGroup_);
+    FunctionGroupTypeSymbol(FunctionGroupSymbol* functionGroup_, void* boundFunctionGroup_);
     bool IsExportSymbol() const override { return false; }
     llvm::Type* IrType(Emitter& emitter) override { Assert(false, "tried to get ir type of function group type"); return nullptr; }
     llvm::Constant* CreateDefaultIrValue(Emitter& emitter) override { Assert(false, "tried to get default ir value of function group type"); return nullptr; }
     const FunctionGroupSymbol* FunctionGroup() const { return functionGroup; }
     FunctionGroupSymbol* FunctionGroup() { return functionGroup; }
+    void* BoundFunctionGroup() const { return boundFunctionGroup; }
 private:
     FunctionGroupSymbol* functionGroup;
+    void* boundFunctionGroup;
 };
 
 class MemberExpressionTypeSymbol : public TypeSymbol

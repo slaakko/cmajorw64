@@ -800,6 +800,79 @@ void BoundDelegateCall::AddArgument(std::unique_ptr<BoundExpression>&& argument)
     arguments.push_back(std::move(argument));
 }
 
+BoundClassDelegateCall::BoundClassDelegateCall(const Span& span_, ClassDelegateTypeSymbol* classDelegateType_) :
+    BoundExpression(span_, BoundNodeType::boundClassDelegateCall, classDelegateType_->ReturnType()), classDelegateTypeSymbol(classDelegateType_), arguments()
+{
+}
+
+BoundExpression* BoundClassDelegateCall::Clone()
+{
+    return new BoundClassDelegateCall(GetSpan(), classDelegateTypeSymbol);
+}
+
+void BoundClassDelegateCall::Load(Emitter& emitter, OperationFlags flags)
+{
+    if ((flags & OperationFlags::addr) != OperationFlags::none)
+    {
+        throw Exception("cannot take address of a delegate call", GetSpan());
+    }
+    else
+    {
+        std::vector<GenObject*> genObjects;
+        for (const std::unique_ptr<BoundExpression>& argument : arguments)
+        {
+            genObjects.push_back(argument.get());
+        }
+        OperationFlags callFlags = flags & OperationFlags::functionCallFlags;
+        if (!classDelegateTypeSymbol->IsNothrow())
+        {
+            emitter.SetLineNumber(GetSpan().LineNumber());
+        }
+        classDelegateTypeSymbol->GenerateCall(emitter, genObjects, callFlags);
+        if ((flags & OperationFlags::deref) != OperationFlags::none)
+        {
+            llvm::Value* value = emitter.Stack().Pop();
+            uint8_t n = GetDerefCount(flags);
+            for (uint8_t i = 0; i < n; ++i)
+            {
+                value = emitter.Builder().CreateLoad(value);
+            }
+            emitter.Stack().Push(value);
+        }
+    }
+    DestroyTemporaries(emitter);
+}
+
+void BoundClassDelegateCall::Store(Emitter& emitter, OperationFlags flags)
+{
+    // todo
+}
+
+void BoundClassDelegateCall::Accept(BoundNodeVisitor& visitor)
+{
+    visitor.Visit(*this);
+}
+
+bool BoundClassDelegateCall::HasValue() const
+{
+    return classDelegateTypeSymbol->ReturnType()->GetSymbolType() != SymbolType::voidTypeSymbol;
+}
+
+bool BoundClassDelegateCall::IsLvalueExpression() const
+{
+    TypeSymbol* returnType = classDelegateTypeSymbol->ReturnType();
+    if (returnType->GetSymbolType() != SymbolType::voidTypeSymbol)
+    {
+        return !returnType->IsConstType() && returnType->IsLvalueReferenceType();
+    }
+    return false;
+}
+
+void BoundClassDelegateCall::AddArgument(std::unique_ptr<BoundExpression>&& argument)
+{
+    arguments.push_back(std::move(argument));
+}
+
 BoundConstructExpression::BoundConstructExpression(std::unique_ptr<BoundExpression>&& constructorCall_, TypeSymbol* resultType_) :
     BoundExpression(constructorCall_->GetSpan(), BoundNodeType::boundConstructExpression, resultType_), constructorCall(std::move(constructorCall_))
 {
@@ -1287,7 +1360,7 @@ void BoundNamespaceExpression::Accept(BoundNodeVisitor& visitor)
 }
 
 BoundFunctionGroupExpression::BoundFunctionGroupExpression(const Span& span_, FunctionGroupSymbol* functionGroupSymbol_) : 
-    BoundExpression(span_, BoundNodeType::boundFunctionGroupExpression, new FunctionGroupTypeSymbol(functionGroupSymbol_)), 
+    BoundExpression(span_, BoundNodeType::boundFunctionGroupExpression, new FunctionGroupTypeSymbol(functionGroupSymbol_, this)), 
     functionGroupSymbol(functionGroupSymbol_), scopeQualified(false), qualifiedScope(nullptr)
 {
     functionGroupType.reset(GetType());
@@ -1307,7 +1380,14 @@ BoundExpression* BoundFunctionGroupExpression::Clone()
 
 void BoundFunctionGroupExpression::Load(Emitter& emitter, OperationFlags flags)
 {
-    // Fun2Dlg conversion does not need source value, so this implementation is intentionally left empty.
+    if (classPtr)
+    {
+        classPtr->Load(emitter, flags);
+    }
+    else
+    {
+        emitter.Stack().Push(nullptr);
+    }
 }
 
 void BoundFunctionGroupExpression::Store(Emitter& emitter, OperationFlags flags)
@@ -1343,7 +1423,14 @@ BoundExpression* BoundMemberExpression::Clone()
 
 void BoundMemberExpression::Load(Emitter& emitter, OperationFlags flags)
 {
-    throw Exception("cannot load from a member expression", GetSpan());
+    if (classPtr)
+    {
+        classPtr->Load(emitter, flags);
+    }
+    else
+    {
+        emitter.Stack().Push(nullptr);
+    }
 }
 
 void BoundMemberExpression::Store(Emitter& emitter, OperationFlags flags)

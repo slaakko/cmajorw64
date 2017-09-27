@@ -6,6 +6,7 @@
 #ifndef CMAJOR_IR_GEN_OBJECT_INCLUDED
 #define CMAJOR_IR_GEN_OBJECT_INCLUDED
 #include <stdint.h>
+#include <llvm/IR/Value.h>
 
 namespace cmajor { namespace ir {
 
@@ -54,6 +55,16 @@ public:
     void* GetType() { return type; }
 private:
     void* type;
+};
+
+class LlvmValue : public GenObject
+{
+public:
+    LlvmValue(llvm::Value* value_) : value(value_) {}
+    void Load(Emitter& emitter, OperationFlags flags) override;
+    void Store(Emitter& emitter, OperationFlags flags) override;
+private:
+    llvm::Value* value;
 };
 
 } } // namespace cmajor::ir

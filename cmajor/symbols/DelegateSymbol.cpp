@@ -504,11 +504,12 @@ FunctionToDelegateConversion::FunctionToDelegateConversion(TypeSymbol* sourceTyp
 
 void FunctionToDelegateConversion::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags)
 {
+    emitter.Stack().Pop();
     emitter.Stack().Push(emitter.Module()->getOrInsertFunction(ToUtf8(function->MangledName()), function->IrType(emitter)));
 }
 
 ClassDelegateTypeSymbol::ClassDelegateTypeSymbol(const Span& span_, const std::u32string& name_) : 
-    TypeSymbol(SymbolType::classDelegateTypeSymbol, span_, name_), returnType(), parameters(), delegateType(), irType(nullptr)
+    TypeSymbol(SymbolType::classDelegateTypeSymbol, span_, name_), returnType(nullptr), parameters(), delegateType(nullptr), objectDelegatePairType(nullptr), irType(nullptr)
 {
 }
 
@@ -568,6 +569,10 @@ void ClassDelegateTypeSymbol::AddMember(Symbol* member)
     else if (member->GetSymbolType() == SymbolType::delegateTypeSymbol)
     {
         delegateType = static_cast<DelegateTypeSymbol*>(member);
+    }
+    else if (member->GetSymbolType() == SymbolType::classTypeSymbol)
+    {
+        objectDelegatePairType = static_cast<ClassTypeSymbol*>(member);
     }
 }
 
@@ -677,6 +682,35 @@ void ClassDelegateTypeSymbol::SetSpecifiers(Specifiers specifiers)
     {
         throw Exception("class delegate cannot be unit_test", GetSpan());
     }
+}
+
+void ClassDelegateTypeSymbol::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags)
+{
+    Assert(!genObjects.empty(), "gen objects is empty");
+    genObjects[0]->Load(emitter, flags);
+    llvm::Value* classDelegatePtr = emitter.Stack().Pop();
+    ArgVector delegateIndeces;
+    delegateIndeces.push_back(emitter.Builder().getInt32(0));
+    delegateIndeces.push_back(emitter.Builder().getInt32(1));
+    llvm::Value* delegatePtr = emitter.Builder().CreateGEP(classDelegatePtr, delegateIndeces);
+    llvm::Value* callee = emitter.Builder().CreateLoad(delegatePtr);
+    LlvmValue calleeValue(callee);
+    ArgVector objectIndeces;
+    objectIndeces.push_back(emitter.Builder().getInt32(0));
+    objectIndeces.push_back(emitter.Builder().getInt32(0));
+    llvm::Value* objectPtr = emitter.Builder().CreateGEP(classDelegatePtr, objectIndeces);
+    llvm::Value* object = emitter.Builder().CreateLoad(objectPtr);
+    LlvmValue objectValue(object);
+    std::vector<GenObject*> classDelegateCallObjects;
+    classDelegateCallObjects.push_back(&calleeValue);
+    classDelegateCallObjects.push_back(&objectValue);
+    int na = genObjects.size();
+    for (int i = 1; i < na; ++i)
+    {
+        GenObject* genObject = genObjects[i];
+        classDelegateCallObjects.push_back(genObject);
+    }
+    delegateType->GenerateCall(emitter, classDelegateCallObjects, flags);
 }
 
 ClassDelegateTypeDefaultConstructor::ClassDelegateTypeDefaultConstructor(const Span& span_, const std::u32string& name_) : 
@@ -957,14 +991,36 @@ MemberFunctionToClassDelegateConversion::MemberFunctionToClassDelegateConversion
 {
 }
 
-MemberFunctionToClassDelegateConversion::MemberFunctionToClassDelegateConversion(TypeSymbol* sourceType_, TypeSymbol* targetType_, FunctionSymbol* function_) :
-    FunctionSymbol(SymbolType::memberFunctionToClassDelegateSymbol, Span(), U"@conversion"), sourceType(sourceType_), targetType(targetType_), function(function_)
+MemberFunctionToClassDelegateConversion::MemberFunctionToClassDelegateConversion(const Span& span_, TypeSymbol* sourceType_, ClassDelegateTypeSymbol* targetType_, FunctionSymbol* function_,
+    LocalVariableSymbol* objectDelegatePairVariable_) :
+    FunctionSymbol(SymbolType::memberFunctionToClassDelegateSymbol, span_, U"@conversion"), sourceType(sourceType_), targetType(targetType_), function(function_), 
+    objectDelegatePairVariable(objectDelegatePairVariable_)
 {
+    SetConversion();
 }
 
 void MemberFunctionToClassDelegateConversion::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags)
 {
-    // todo
+    llvm::Value* objectValue = emitter.Stack().Pop();
+    if (!objectValue)
+    {
+        throw Exception("cannot construct class delegate because expression has no this pointer", GetSpan());
+    }
+    llvm::Value* objectValueAsVoidPtr = emitter.Builder().CreateBitCast(objectValue, emitter.Builder().getInt8PtrTy());
+    llvm::Value* memFunPtrValue = emitter.Module()->getOrInsertFunction(ToUtf8(function->MangledName()), function->IrType(emitter));
+    llvm::Value* ptr = objectDelegatePairVariable->IrObject();
+    ArgVector objectIndeces;
+    objectIndeces.push_back(emitter.Builder().getInt32(0));
+    objectIndeces.push_back(emitter.Builder().getInt32(0));
+    llvm::Value* objectPtr = emitter.Builder().CreateGEP(ptr, objectIndeces);
+    emitter.Builder().CreateStore(objectValueAsVoidPtr, objectPtr);
+    ArgVector delegateIndeces;
+    delegateIndeces.push_back(emitter.Builder().getInt32(0));
+    delegateIndeces.push_back(emitter.Builder().getInt32(1));
+    llvm::Value* delegatePtr = emitter.Builder().CreateGEP(ptr, delegateIndeces);
+    llvm::Value* delegateValue = emitter.Builder().CreateBitCast(memFunPtrValue, targetType->DelegateType()->IrType(emitter));
+    emitter.Builder().CreateStore(delegateValue, delegatePtr);
+    emitter.Stack().Push(ptr);
 }
 
 } } // namespace cmajor::symbols

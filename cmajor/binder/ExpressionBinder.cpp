@@ -346,7 +346,7 @@ void ExpressionBinder::BindSymbol(Symbol* symbol)
                         thisPointerType = thisPointerType->AddConst(span);
                         containingClassPointerType->AddConst(span);
                     }
-                    FunctionSymbol* conversionFun = boundCompileUnit.GetConversion(thisPointerType, containingClassPointerType, containerScope, span);
+                    FunctionSymbol* conversionFun = boundCompileUnit.GetConversion(thisPointerType, containingClassPointerType, containerScope, boundFunction, span);
                     if (conversionFun)
                     {
                         bmv->SetClassPtr(std::unique_ptr<BoundExpression>(new BoundConversion(std::unique_ptr<BoundExpression>(new BoundParameter(thisParam)), conversionFun)));
@@ -796,12 +796,12 @@ void ExpressionBinder::Visit(DotNode& dotNode)
                             if (classPtr->GetType()->IsConstType())
                             {
                                 classPtr.reset(new BoundConversion(std::unique_ptr<BoundExpression>(classPtr.release()),
-                                    boundCompileUnit.GetConversion(classType->AddConst(span)->AddPointer(span), owner->AddConst(span)->AddPointer(span), containerScope, dotNode.GetSpan())));
+                                    boundCompileUnit.GetConversion(classType->AddConst(span)->AddPointer(span), owner->AddConst(span)->AddPointer(span), containerScope, boundFunction, dotNode.GetSpan())));
                             }
                             else
                             {
                                 classPtr.reset(new BoundConversion(std::unique_ptr<BoundExpression>(classPtr.release()),
-                                    boundCompileUnit.GetConversion(classType->AddPointer(span), owner->AddPointer(span), containerScope, dotNode.GetSpan())));
+                                    boundCompileUnit.GetConversion(classType->AddPointer(span), owner->AddPointer(span), containerScope, boundFunction, dotNode.GetSpan())));
                             }
                         }
                     }
@@ -827,12 +827,12 @@ void ExpressionBinder::Visit(DotNode& dotNode)
                             if (classPtr->GetType()->IsConstType())
                             {
                                 classPtr.reset(new BoundConversion(std::unique_ptr<BoundExpression>(classPtr.release()),
-                                    boundCompileUnit.GetConversion(classType->AddConst(span)->AddPointer(span), owner->AddConst(span)->AddPointer(span), containerScope, dotNode.GetSpan())));
+                                    boundCompileUnit.GetConversion(classType->AddConst(span)->AddPointer(span), owner->AddConst(span)->AddPointer(span), containerScope, boundFunction, dotNode.GetSpan())));
                             }
                             else
                             {
                                 classPtr.reset(new BoundConversion(std::unique_ptr<BoundExpression>(classPtr.release()),
-                                    boundCompileUnit.GetConversion(classType->AddPointer(span), owner->AddPointer(span), containerScope, dotNode.GetSpan())));
+                                    boundCompileUnit.GetConversion(classType->AddPointer(span), owner->AddPointer(span), containerScope, boundFunction, dotNode.GetSpan())));
                             }
                         }
                         bmv->SetClassPtr(std::unique_ptr<BoundExpression>(classPtr.release()));
@@ -901,12 +901,12 @@ void ExpressionBinder::BindArrow(Node& node, const std::u32string& name)
                             if (classPtr->GetType()->IsConstType())
                             {
                                 classPtr.reset(new BoundConversion(std::unique_ptr<BoundExpression>(classPtr.release()),
-                                    boundCompileUnit.GetConversion(classType->AddConst(span)->AddPointer(span), owner->AddConst(span)->AddPointer(span), containerScope, node.GetSpan())));
+                                    boundCompileUnit.GetConversion(classType->AddConst(span)->AddPointer(span), owner->AddConst(span)->AddPointer(span), containerScope, boundFunction, node.GetSpan())));
                             }
                             else
                             {
                                 classPtr.reset(new BoundConversion(std::unique_ptr<BoundExpression>(classPtr.release()),
-                                    boundCompileUnit.GetConversion(classType->AddPointer(span), owner->AddPointer(span), containerScope, node.GetSpan())));
+                                    boundCompileUnit.GetConversion(classType->AddPointer(span), owner->AddPointer(span), containerScope, boundFunction, node.GetSpan())));
                             }
                         }
                     }
@@ -926,12 +926,12 @@ void ExpressionBinder::BindArrow(Node& node, const std::u32string& name)
                             if (classPtr->GetType()->IsConstType())
                             {
                                 classPtr.reset(new BoundConversion(std::unique_ptr<BoundExpression>(classPtr.release()),
-                                    boundCompileUnit.GetConversion(classType->AddConst(span)->AddPointer(span), owner->AddConst(span)->AddPointer(span), containerScope, node.GetSpan())));
+                                    boundCompileUnit.GetConversion(classType->AddConst(span)->AddPointer(span), owner->AddConst(span)->AddPointer(span), containerScope, boundFunction, node.GetSpan())));
                             }
                             else
                             {
                                 classPtr.reset(new BoundConversion(std::unique_ptr<BoundExpression>(classPtr.release()),
-                                    boundCompileUnit.GetConversion(classType->AddPointer(span), owner->AddPointer(span), containerScope, node.GetSpan())));
+                                    boundCompileUnit.GetConversion(classType->AddPointer(span), owner->AddPointer(span), containerScope, boundFunction, node.GetSpan())));
                             }
                         }
                         bmv->SetClassPtr(std::unique_ptr<BoundExpression>(classPtr.release()));
@@ -1520,7 +1520,7 @@ void ExpressionBinder::Visit(InvokeNode& invokeNode)
                 }
                 else
                 {
-                    FunctionSymbol* conversionFun = boundCompileUnit.GetConversion(argumentType, delegateParameterType, containerScope, span);
+                    FunctionSymbol* conversionFun = boundCompileUnit.GetConversion(argumentType, delegateParameterType, containerScope, boundFunction, span);
                     if (conversionFun)
                     {
                         BoundConversion* conversion = new BoundConversion(std::move(expression), conversionFun);
@@ -1541,6 +1541,71 @@ void ExpressionBinder::Visit(InvokeNode& invokeNode)
             delegateCall->AddArgument(std::move(argument));
         }
         expression.reset(delegateCall);
+        return;
+    }
+    else if (expression->GetType()->PlainType(span)->GetSymbolType() == SymbolType::classDelegateTypeSymbol)
+    {
+        TypeSymbol* type = expression->GetType();
+        if (type->IsReferenceType())
+        {
+            arguments.push_back(std::unique_ptr<BoundExpression>(new BoundReferenceToPointerExpression(std::move(expression), type->RemoveReference(span)->AddPointer(span))));
+        }
+        else
+        {
+            arguments.push_back(std::unique_ptr<BoundExpression>(new BoundAddressOfExpression(std::move(expression), type->AddPointer(span))));
+        }
+        ClassDelegateTypeSymbol* classDelegateTypeSymbol = static_cast<ClassDelegateTypeSymbol*>(type->BaseType());
+        int n = invokeNode.Arguments().Count();
+        if (n != classDelegateTypeSymbol->Arity())
+        {
+            throw Exception("wrong number of arguments for calling delegate type '" + ToUtf8(classDelegateTypeSymbol->FullName()) + "'", span);
+        }
+        for (int i = 0; i < n; ++i)
+        {
+            TypeSymbol* classDelegateParameterType = classDelegateTypeSymbol->Parameters()[i]->GetType();
+            Node* argument = invokeNode.Arguments()[i];
+            argument->Accept(*this);
+            TypeSymbol* argumentType = expression->GetType();
+            if (!TypesEqual(argumentType, classDelegateParameterType))
+            {
+                if (TypesEqual(argumentType->PlainType(span), classDelegateParameterType->PlainType(span)))
+                {
+                    if (argumentType->IsReferenceType() && !classDelegateParameterType->IsReferenceType())
+                    {
+                        TypeSymbol* type = argumentType->RemoveReference(span);
+                        BoundDereferenceExpression* dereferenceExpression = new BoundDereferenceExpression(std::move(expression), type);
+                        expression.reset(dereferenceExpression);
+                    }
+                    else if (!argumentType->IsReferenceType() && (classDelegateParameterType->IsReferenceType() || classDelegateParameterType->IsClassTypeSymbol()))
+                    {
+                        TypeSymbol* type = argumentType->AddLvalueReference(span);
+                        BoundAddressOfExpression* addressOfExpression = new BoundAddressOfExpression(std::move(expression), type);
+                        expression.reset(addressOfExpression);
+                    }
+                }
+                else
+                {
+                    FunctionSymbol* conversionFun = boundCompileUnit.GetConversion(argumentType, classDelegateParameterType, containerScope, boundFunction, span);
+                    if (conversionFun)
+                    {
+                        BoundConversion* conversion = new BoundConversion(std::move(expression), conversionFun);
+                        expression.reset(conversion);
+                    }
+                    else
+                    {
+                        throw Exception("cannot convert '" + ToUtf8(argumentType->FullName()) + "' type argument to '" + ToUtf8(classDelegateParameterType->FullName()) + "' type parameter",
+                            argument->GetSpan(), span);
+                    }
+                }
+            }
+            arguments.push_back(std::unique_ptr<BoundExpression>(expression.release()));
+        }
+        BoundClassDelegateCall* classDelegateCall = new BoundClassDelegateCall(span, classDelegateTypeSymbol);
+        for (std::unique_ptr<BoundExpression>& argument : arguments)
+        {
+            classDelegateCall->AddArgument(std::move(argument));
+        }
+        expression.reset(classDelegateCall);
         return;
     }
     else
@@ -1812,7 +1877,8 @@ void ExpressionBinder::Visit(CastNode& castNode)
     std::vector<std::unique_ptr<BoundExpression>> castArguments;
     castArguments.push_back(std::move(expression));
     FunctionMatch functionMatch(castFunctionCall->GetFunctionSymbol());
-    bool conversionFound = FindConversions(boundCompileUnit, castFunctionCall->GetFunctionSymbol(), castArguments, functionMatch, ConversionType::explicit_, containerScope, castNode.GetSpan());
+    bool conversionFound = FindConversions(boundCompileUnit, castFunctionCall->GetFunctionSymbol(), castArguments, functionMatch, ConversionType::explicit_, containerScope, boundFunction,
+        castNode.GetSpan());
     if (conversionFound)
     {
         Assert(!functionMatch.argumentMatches.empty(), "argument match expected");
@@ -1972,7 +2038,7 @@ void ExpressionBinder::Visit(BaseNode& baseNode)
                 {
                     basePointerType = basePointerType->AddConst(baseNode.GetSpan());
                 }
-                FunctionSymbol* thisAsBaseConversionFunction = boundCompileUnit.GetConversion(thisParam->GetType(), basePointerType, containerScope, baseNode.GetSpan());
+                FunctionSymbol* thisAsBaseConversionFunction = boundCompileUnit.GetConversion(thisParam->GetType(), basePointerType, containerScope, boundFunction, baseNode.GetSpan());
                 if (thisAsBaseConversionFunction)
                 {
                     expression.reset(new BoundConversion(std::unique_ptr<BoundExpression>(new BoundParameter(thisParam)), thisAsBaseConversionFunction));

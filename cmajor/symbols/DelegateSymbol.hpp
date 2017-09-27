@@ -149,12 +149,16 @@ public:
     int Arity() const { return parameters.size(); }
     const std::vector<ParameterSymbol*>& Parameters() const { return parameters; }
     const TypeSymbol* ReturnType() const { return returnType; }
+    TypeSymbol* ReturnType() { return returnType; }
     void SetReturnType(TypeSymbol* returnType_) { returnType = returnType_; }
     DelegateTypeSymbol* DelegateType() { return delegateType; }
+    ClassTypeSymbol* ObjectDelegatePairType() { Assert(objectDelegatePairType, "object delegate pair type not set");  return objectDelegatePairType; }
+    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags);
 private:
     TypeSymbol* returnType;
     std::vector<ParameterSymbol*> parameters;
     DelegateTypeSymbol* delegateType;
+    ClassTypeSymbol* objectDelegatePairType;
     llvm::Type* irType;
 };
 
@@ -233,7 +237,8 @@ class MemberFunctionToClassDelegateConversion : public FunctionSymbol
 {
 public:
     MemberFunctionToClassDelegateConversion(const Span& span_, const std::u32string& name_);
-    MemberFunctionToClassDelegateConversion(TypeSymbol* sourceType_, TypeSymbol* targetType_, FunctionSymbol* function_);
+    MemberFunctionToClassDelegateConversion(const Span& span_, TypeSymbol* sourceType_, ClassDelegateTypeSymbol* targetType_, FunctionSymbol* function_, 
+        LocalVariableSymbol* objectDelegatePairVariable_);
     ConversionType GetConversionType() const override { return ConversionType::implicit_; }
     uint8_t ConversionDistance() const override { return 1; }
     TypeSymbol* ConversionSourceType() const override { return sourceType; }
@@ -242,8 +247,9 @@ public:
     bool IsBasicTypeOperation() const override { return true; }
 private:
     TypeSymbol* sourceType;
-    TypeSymbol* targetType;
+    ClassDelegateTypeSymbol* targetType;
     FunctionSymbol* function;
+    LocalVariableSymbol* objectDelegatePairVariable;
 };
 
 } } // namespace cmajor::symbols

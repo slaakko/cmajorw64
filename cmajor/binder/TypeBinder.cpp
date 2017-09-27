@@ -633,7 +633,8 @@ void TypeBinder::Visit(ClassDelegateNode& classDelegateNode)
     DelegateTypeSymbol* memberDelegateType = new DelegateTypeSymbol(classDelegateNode.GetSpan(), U"@dlg_type");
     symbolTable.SetTypeIdFor(memberDelegateType);
     ParameterSymbol* objectParam = new ParameterSymbol(classDelegateNode.GetSpan(), U"@obj");
-    objectParam->SetType(symbolTable.GetTypeByName(U"void")->AddPointer(classDelegateNode.GetSpan()));
+    TypeSymbol* voidPtrType = symbolTable.GetTypeByName(U"void")->AddPointer(classDelegateNode.GetSpan());
+    objectParam->SetType(voidPtrType);
     memberDelegateType->AddMember(objectParam);
     int n = classDelegateNode.Parameters().Count();
     for (int i = 0; i < n; ++i)
@@ -652,6 +653,16 @@ void TypeBinder::Visit(ClassDelegateNode& classDelegateNode)
     classDelegateTypeSymbol->SetReturnType(returnType);
     memberDelegateType->SetReturnType(returnType);
     classDelegateTypeSymbol->AddMember(memberDelegateType);
+    ClassTypeSymbol* objectDelegatePairType = new ClassTypeSymbol(classDelegateNode.GetSpan(), U"@objectDelegatePairType");
+    MemberVariableSymbol* objVar = new MemberVariableSymbol(classDelegateNode.GetSpan(), U"@obj");
+    objVar->SetType(voidPtrType);
+    MemberVariableSymbol* dlgVar = new MemberVariableSymbol(classDelegateNode.GetSpan(), U"@dlg");
+    dlgVar->SetType(memberDelegateType);
+    objectDelegatePairType->AddMember(objVar);
+    objectDelegatePairType->AddMember(dlgVar);
+    symbolTable.SetTypeIdFor(objectDelegatePairType);
+    objectDelegatePairType->CreateLayouts();
+    classDelegateTypeSymbol->AddMember(objectDelegatePairType);
     ClassDelegateTypeDefaultConstructor* defaultConstructor = new ClassDelegateTypeDefaultConstructor(classDelegateTypeSymbol);
     symbolTable.SetFunctionIdFor(defaultConstructor);
     classDelegateTypeSymbol->AddMember(defaultConstructor);

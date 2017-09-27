@@ -7,6 +7,7 @@
 #include <cmajor/binder/BoundNodeVisitor.hpp>
 #include <cmajor/binder/StatementBinder.hpp>
 #include <cmajor/binder/BoundStatement.hpp>
+#include <cmajor/binder/BoundFunction.hpp>
 #include <cmajor/symbols/Exception.hpp>
 #include <cmajor/symbols/FunctionSymbol.hpp>
 #include <cmajor/symbols/ClassTypeSymbol.hpp>
@@ -225,7 +226,7 @@ void BoundCompileUnit::AddBoundNode(std::unique_ptr<BoundNode>&& boundNode)
     boundNodes.push_back(std::move(boundNode));
 }
 
-FunctionSymbol* BoundCompileUnit::GetConversion(TypeSymbol* sourceType, TypeSymbol* targetType, ContainerScope* containerScope, const Span& span)
+FunctionSymbol* BoundCompileUnit::GetConversion(TypeSymbol* sourceType, TypeSymbol* targetType, ContainerScope* containerScope, BoundFunction* currentFunction, const Span& span)
 {
     FunctionSymbol* conversion = symbolTable.GetConversion(sourceType, targetType, span);
     if (!conversion)
@@ -332,6 +333,62 @@ FunctionSymbol* BoundCompileUnit::GetConversion(TypeSymbol* sourceType, TypeSymb
                     }
                 }
             }
+            else if ((sourceType->GetSymbolType() == SymbolType::functionGroupTypeSymbol || sourceType->GetSymbolType() == SymbolType::memberExpressionTypeSymbol) && 
+                targetType->PlainType(span)->GetSymbolType() == SymbolType::classDelegateTypeSymbol)
+            {
+                ClassDelegateTypeSymbol* classDelegateType = static_cast<ClassDelegateTypeSymbol*>(targetType->PlainType(span));
+                FunctionGroupSymbol* functionGroup = nullptr;
+                if (sourceType->GetSymbolType() == SymbolType::functionGroupTypeSymbol)
+                {
+                    FunctionGroupTypeSymbol* functionGroupTypeSymbol = static_cast<FunctionGroupTypeSymbol*>(sourceType);
+                    BoundFunctionGroupExpression* boundFunctionGroup = static_cast<BoundFunctionGroupExpression*>(functionGroupTypeSymbol->BoundFunctionGroup());
+                    functionGroup = functionGroupTypeSymbol->FunctionGroup();
+                }
+                else if (sourceType->GetSymbolType() == SymbolType::memberExpressionTypeSymbol)
+                {
+                    MemberExpressionTypeSymbol* memberExpressionType = static_cast<MemberExpressionTypeSymbol*>(sourceType);
+                    BoundMemberExpression* boundMemberExpr = static_cast<BoundMemberExpression*>(memberExpressionType->BoundMemberExpression());
+                    if (boundMemberExpr->Member()->GetBoundNodeType() == BoundNodeType::boundFunctionGroupExpression)
+                    {
+                        BoundFunctionGroupExpression* boundFunctionGroup = static_cast<BoundFunctionGroupExpression*>(boundMemberExpr->Member());
+                        functionGroup = boundFunctionGroup->FunctionGroup();
+                    }
+                }
+                if (functionGroup)
+                {
+                    int arity = classDelegateType->Arity();
+                    std::unordered_set<FunctionSymbol*> viableFunctions;
+                    functionGroup->CollectViableFunctions(arity + 1, viableFunctions);
+                    for (FunctionSymbol* viableFunction : viableFunctions)
+                    {
+                        bool found = true;
+                        for (int i = 1; i < arity + 1; ++i)
+                        {
+                            ParameterSymbol* sourceParam = viableFunction->Parameters()[i];
+                            ParameterSymbol* targetParam = classDelegateType->Parameters()[i - 1];
+                            if (!TypesEqual(sourceParam->GetType(), targetParam->GetType()))
+                            {
+                                found = false;
+                                break;
+                            }
+                        }
+                        if (found)
+                        {
+                            found = TypesEqual(viableFunction->ReturnType(), classDelegateType->ReturnType());
+                        }
+                        if (found)
+                        {
+                            LocalVariableSymbol* objectDelegatePairVariable = currentFunction->GetFunctionSymbol()->CreateTemporary(classDelegateType->ObjectDelegatePairType(), span);
+                            std::unique_ptr<FunctionSymbol> memberFunctionToClassDelegateConversion(new MemberFunctionToClassDelegateConversion(span, sourceType, classDelegateType, viableFunction,
+                                objectDelegatePairVariable));
+                            conversion = memberFunctionToClassDelegateConversion.get();
+                            conversionTable.AddConversion(conversion);
+                            conversionTable.AddGeneratedConversion(std::move(memberFunctionToClassDelegateConversion));
+                            return conversion;
+                        }
+                    }
+                }
+            }
         }
     }
     if (conversion)
@@ -370,9 +427,9 @@ void BoundCompileUnit::InstantiateInlineFunction(FunctionSymbol* inlineFunction,
     inlineFunctionRepository.Instantiate(inlineFunction, containerScope, span);
 }
 
-void BoundCompileUnit::GenerateCopyConstructorFor(ClassTypeSymbol* classTypeSymbol, ContainerScope* containerScope, const Span& span)
+void BoundCompileUnit::GenerateCopyConstructorFor(ClassTypeSymbol* classTypeSymbol, ContainerScope* containerScope, BoundFunction* currentFunction, const Span& span)
 {
-    operationRepository.GenerateCopyConstructorFor(classTypeSymbol, containerScope, span);
+    operationRepository.GenerateCopyConstructorFor(classTypeSymbol, containerScope, currentFunction, span);
 }
 
 int BoundCompileUnit::Install(const std::string& str)

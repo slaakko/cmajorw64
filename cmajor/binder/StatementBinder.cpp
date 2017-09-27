@@ -261,7 +261,7 @@ void StatementBinder::Visit(ClassNode& classNode)
         Node* node = symbolTable.GetNodeNoThrow(destructorSymbol);
         if (!node)
         {
-            GenerateDestructorImplementation(currentClass, destructorSymbol, boundCompileUnit, containerScope, classNode.GetSpan());
+            GenerateDestructorImplementation(currentClass, destructorSymbol, boundCompileUnit, containerScope, currentFunction, classNode.GetSpan());
         }
     }
     containerScope = prevContainerScope;
@@ -588,7 +588,7 @@ void StatementBinder::Visit(ReturnStatementNode& returnStatementNode)
                 returnValueArguments.push_back(std::move(expression));
                 FunctionMatch functionMatch(returnFunctionCall->GetFunctionSymbol());
                 bool conversionFound = FindConversions(boundCompileUnit, returnFunctionCall->GetFunctionSymbol(), returnValueArguments, functionMatch, ConversionType::implicit_, 
-                    containerScope, returnStatementNode.GetSpan());
+                    containerScope, currentFunction, returnStatementNode.GetSpan());
                 if (conversionFound)
                 {
                     Assert(!functionMatch.argumentMatches.empty(), "argument match expected");

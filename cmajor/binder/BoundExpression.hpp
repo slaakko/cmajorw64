@@ -261,6 +261,24 @@ private:
     std::vector<std::unique_ptr<BoundExpression>> arguments;
 };
 
+class BoundClassDelegateCall : public BoundExpression
+{
+public:
+    BoundClassDelegateCall(const Span& span_, ClassDelegateTypeSymbol* classDelegateType_);
+    BoundExpression* Clone() override;
+    void Load(Emitter& emitter, OperationFlags flags) override;
+    void Store(Emitter& emitter, OperationFlags flags) override;
+    void Accept(BoundNodeVisitor& visitor) override;
+    bool HasValue() const override;
+    std::string TypeString() const override { return "class delegate call"; }
+    bool IsLvalueExpression() const override;
+    void AddArgument(std::unique_ptr<BoundExpression>&& argument);
+    const std::vector<std::unique_ptr<BoundExpression>>& Arguments() const { return arguments; }
+private:
+    ClassDelegateTypeSymbol* classDelegateTypeSymbol;
+    std::vector<std::unique_ptr<BoundExpression>> arguments;
+};
+
 class BoundConstructExpression : public BoundExpression
 {
 public:
@@ -454,6 +472,7 @@ public:
     const FunctionGroupSymbol* FunctionGroup() const { return functionGroupSymbol; }
     FunctionGroupSymbol* FunctionGroup() { return functionGroupSymbol; }
     void SetClassPtr(std::unique_ptr<BoundExpression>&& classPtr_);
+    BoundExpression* ClassPtr() { return classPtr.get(); }
     bool IsScopeQualified() const { return scopeQualified; }
     void SetScopeQualified() { scopeQualified = true; }
     ContainerScope* QualifiedScope() const { return qualifiedScope; }
