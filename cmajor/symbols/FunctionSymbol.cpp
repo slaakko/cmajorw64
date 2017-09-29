@@ -500,7 +500,7 @@ void FunctionSymbol::GenerateCall(Emitter& emitter, std::vector<GenObject*>& gen
     llvm::Function* callee = llvm::cast<llvm::Function>(emitter.Module()->getOrInsertFunction(ToUtf8(MangledName()), functionType));
     ArgVector args;
     int n = parameters.size();
-    if (ReturnsClassByValue())
+    if (ReturnsClassOrClassDelegateByValue())
     {
         ++n;
     }
@@ -521,7 +521,7 @@ void FunctionSymbol::GenerateCall(Emitter& emitter, std::vector<GenObject*>& gen
         inputs.push_back(currentPad->value);
         bundles.push_back(llvm::OperandBundleDef("funclet", inputs));
     }
-    if (ReturnType() && ReturnType()->GetSymbolType() != SymbolType::voidTypeSymbol && !ReturnsClassByValue())
+    if (ReturnType() && ReturnType()->GetSymbolType() != SymbolType::voidTypeSymbol && !ReturnsClassOrClassDelegateByValue())
     {
         if (DontThrow() || (!handlerBlock && !cleanupBlock && !newCleanupNeeded))
         {
@@ -638,7 +638,7 @@ void FunctionSymbol::GenerateVirtualCall(Emitter& emitter, std::vector<GenObject
     }
     ArgVector args;
     int n = Parameters().size();
-    if (ReturnsClassByValue())
+    if (ReturnsClassOrClassDelegateByValue())
     {
         ++n;
     }
@@ -659,7 +659,7 @@ void FunctionSymbol::GenerateVirtualCall(Emitter& emitter, std::vector<GenObject
         inputs.push_back(currentPad->value);
         bundles.push_back(llvm::OperandBundleDef("funclet", inputs));
     }
-    if (ReturnType() && !ReturnType()->IsVoidType() && !ReturnsClassByValue())
+    if (ReturnType() && !ReturnType()->IsVoidType() && !ReturnsClassOrClassDelegateByValue())
     {
         if (DontThrow() || (!handlerBlock && !cleanupBlock && !newCleanupNeeded))
         {
@@ -813,9 +813,9 @@ void FunctionSymbol::AddLocalVariable(LocalVariableSymbol* localVariable)
     localVariables.push_back(localVariable);
 }
 
-bool FunctionSymbol::ReturnsClassByValue() const
+bool FunctionSymbol::ReturnsClassOrClassDelegateByValue() const
 {
-    return returnType && returnType->IsClassTypeSymbol();
+    return returnType && (returnType->IsClassTypeSymbol() || returnType->GetSymbolType() == SymbolType::classDelegateTypeSymbol);
 }
 
 void FunctionSymbol::SetReturnParam(ParameterSymbol* returnParam_)
@@ -924,7 +924,7 @@ llvm::FunctionType* FunctionSymbol::IrType(Emitter& emitter)
     if (!irType)
     {
         llvm::Type* retType = llvm::Type::getVoidTy(emitter.Context());
-        if (returnType && returnType->GetSymbolType() != SymbolType::voidTypeSymbol && !ReturnsClassByValue())
+        if (returnType && returnType->GetSymbolType() != SymbolType::voidTypeSymbol && !ReturnsClassOrClassDelegateByValue())
         {
             retType = returnType->IrType(emitter);
         }
@@ -934,7 +934,7 @@ llvm::FunctionType* FunctionSymbol::IrType(Emitter& emitter)
         {
             ParameterSymbol* parameter = parameters[i];
             TypeSymbol* paramType = parameter->GetType();
-            if (paramType->IsClassTypeSymbol())
+            if (paramType->IsClassTypeSymbol() || paramType->GetSymbolType() == SymbolType::classDelegateTypeSymbol)
             {
                 paramType = paramType->AddConst(GetSpan())->AddLvalueReference(GetSpan());
             }

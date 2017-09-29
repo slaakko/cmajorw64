@@ -634,6 +634,7 @@ void BoundFunctionCall::Load(Emitter& emitter, OperationFlags flags)
         for (const std::unique_ptr<BoundExpression>& argument : arguments)
         {
             genObjects.push_back(argument.get());
+            genObjects.back()->SetType(argument->GetType());
         }
         OperationFlags callFlags = flags & OperationFlags::functionCallFlags;
         if (GetFlag(BoundExpressionFlags::virtualCall))
@@ -674,6 +675,7 @@ void BoundFunctionCall::Store(Emitter& emitter, OperationFlags flags)
         for (const std::unique_ptr<BoundExpression>& argument : arguments)
         {
             genObjects.push_back(argument.get());
+            genObjects.back()->SetType(argument->GetType());
         }
         OperationFlags callFlags = OperationFlags::none;
         if (GetFlag(BoundExpressionFlags::virtualCall))
@@ -749,6 +751,7 @@ void BoundDelegateCall::Load(Emitter& emitter, OperationFlags flags)
         for (const std::unique_ptr<BoundExpression>& argument : arguments)
         {
             genObjects.push_back(argument.get());
+            genObjects.back()->SetType(argument->GetType());
         }
         OperationFlags callFlags = flags & OperationFlags::functionCallFlags;
         if (!delegateTypeSymbol->IsNothrow())
@@ -772,7 +775,49 @@ void BoundDelegateCall::Load(Emitter& emitter, OperationFlags flags)
 
 void BoundDelegateCall::Store(Emitter& emitter, OperationFlags flags)
 {
-    // todo
+    if ((flags & OperationFlags::addr) != OperationFlags::none)
+    {
+        throw Exception("cannot take address of a function call", GetSpan());
+    }
+    else
+    {
+        llvm::Value* value = emitter.Stack().Pop();
+        std::vector<GenObject*> genObjects;
+        for (const std::unique_ptr<BoundExpression>& argument : arguments)
+        {
+            genObjects.push_back(argument.get());
+            genObjects.back()->SetType(argument->GetType());
+        }
+        OperationFlags callFlags = OperationFlags::none;
+        if (GetFlag(BoundExpressionFlags::virtualCall))
+        {
+            callFlags = callFlags | OperationFlags::virtualCall;
+        }
+        if (!delegateTypeSymbol->IsNothrow())
+        {
+            emitter.SetLineNumber(GetSpan().LineNumber());
+        }
+        delegateTypeSymbol->GenerateCall(emitter, genObjects, callFlags);
+        llvm::Value* ptr = emitter.Stack().Pop();
+        if ((flags & OperationFlags::leaveFirstArg) != OperationFlags::none)
+        {
+            emitter.SaveObjectPointer(ptr);
+        }
+        if ((flags & OperationFlags::deref) != OperationFlags::none || GetFlag(BoundExpressionFlags::deref))
+        {
+            uint8_t n = GetDerefCount(flags);
+            for (uint8_t i = 1; i < n; ++i)
+            {
+                ptr = emitter.Builder().CreateLoad(ptr);
+            }
+            emitter.Builder().CreateStore(value, ptr);
+        }
+        else
+        {
+            emitter.Builder().CreateStore(emitter.Builder().CreateLoad(value), ptr);
+        }
+    }
+    DestroyTemporaries(emitter);
 }
 
 void BoundDelegateCall::Accept(BoundNodeVisitor& visitor)
@@ -822,6 +867,7 @@ void BoundClassDelegateCall::Load(Emitter& emitter, OperationFlags flags)
         for (const std::unique_ptr<BoundExpression>& argument : arguments)
         {
             genObjects.push_back(argument.get());
+            genObjects.back()->SetType(argument->GetType());
         }
         OperationFlags callFlags = flags & OperationFlags::functionCallFlags;
         if (!classDelegateTypeSymbol->IsNothrow())
@@ -845,7 +891,49 @@ void BoundClassDelegateCall::Load(Emitter& emitter, OperationFlags flags)
 
 void BoundClassDelegateCall::Store(Emitter& emitter, OperationFlags flags)
 {
-    // todo
+    if ((flags & OperationFlags::addr) != OperationFlags::none)
+    {
+        throw Exception("cannot take address of a function call", GetSpan());
+    }
+    else
+    {
+        llvm::Value* value = emitter.Stack().Pop();
+        std::vector<GenObject*> genObjects;
+        for (const std::unique_ptr<BoundExpression>& argument : arguments)
+        {
+            genObjects.push_back(argument.get());
+            genObjects.back()->SetType(argument->GetType());
+        }
+        OperationFlags callFlags = OperationFlags::none;
+        if (GetFlag(BoundExpressionFlags::virtualCall))
+        {
+            callFlags = callFlags | OperationFlags::virtualCall;
+        }
+        if (!classDelegateTypeSymbol->IsNothrow())
+        {
+            emitter.SetLineNumber(GetSpan().LineNumber());
+        }
+        classDelegateTypeSymbol->GenerateCall(emitter, genObjects, callFlags);
+        llvm::Value* ptr = emitter.Stack().Pop();
+        if ((flags & OperationFlags::leaveFirstArg) != OperationFlags::none)
+        {
+            emitter.SaveObjectPointer(ptr);
+        }
+        if ((flags & OperationFlags::deref) != OperationFlags::none || GetFlag(BoundExpressionFlags::deref))
+        {
+            uint8_t n = GetDerefCount(flags);
+            for (uint8_t i = 1; i < n; ++i)
+            {
+                ptr = emitter.Builder().CreateLoad(ptr);
+            }
+            emitter.Builder().CreateStore(value, ptr);
+        }
+        else
+        {
+            emitter.Builder().CreateStore(emitter.Builder().CreateLoad(value), ptr);
+        }
+    }
+    DestroyTemporaries(emitter);
 }
 
 void BoundClassDelegateCall::Accept(BoundNodeVisitor& visitor)
@@ -969,6 +1057,12 @@ void BoundConversion::Load(Emitter& emitter, OperationFlags flags)
 void BoundConversion::Store(Emitter& emitter, OperationFlags flags)
 {
     throw Exception("cannot store to a conversion", GetSpan());
+}
+
+bool BoundConversion::IsLvalueExpression() const
+{
+    if (conversionFun->GetSymbolType() == SymbolType::conversionFunctionSymbol) return true;
+    return false;
 }
 
 void BoundConversion::Accept(BoundNodeVisitor& visitor)

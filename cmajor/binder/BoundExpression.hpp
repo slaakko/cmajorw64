@@ -318,6 +318,7 @@ public:
     void Store(Emitter& emitter, OperationFlags flags) override;
     void Accept(BoundNodeVisitor& visitor) override;
     bool HasValue() const override { return true; }
+    bool IsLvalueExpression() const override;
     std::string TypeString() const override { return "conversion"; }
     FunctionSymbol* ConversionFun() { return conversionFun; }
 private:

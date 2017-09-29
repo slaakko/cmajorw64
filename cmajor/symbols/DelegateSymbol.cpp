@@ -26,6 +26,12 @@ void DelegateTypeSymbol::Write(SymbolWriter& writer)
     TypeSymbol::Write(writer);
     uint32_t returnTypeId = returnType->TypeId();
     writer.GetBinaryWriter().WriteEncodedUInt(returnTypeId);
+    bool hasReturnParam = returnParam != nullptr;
+    writer.GetBinaryWriter().Write(hasReturnParam);
+    if (hasReturnParam)
+    {
+        writer.Write(returnParam.get());
+    }
 }
 
 void DelegateTypeSymbol::Read(SymbolReader& reader)
@@ -33,6 +39,11 @@ void DelegateTypeSymbol::Read(SymbolReader& reader)
     TypeSymbol::Read(reader);
     uint32_t returnTypeId = reader.GetBinaryReader().ReadEncodedUInt();
     GetSymbolTable()->EmplaceTypeRequest(this, returnTypeId, 0);
+    bool hasReturnParam = reader.GetBinaryReader().ReadBool();
+    if (hasReturnParam)
+    {
+        returnParam.reset(reader.ReadParameterSymbol(this));
+    }
 }
 
 void DelegateTypeSymbol::EmplaceType(TypeSymbol* typeSymbol_, int index)
@@ -41,32 +52,43 @@ void DelegateTypeSymbol::EmplaceType(TypeSymbol* typeSymbol_, int index)
     returnType = typeSymbol_;
 }
 
-void DelegateTypeSymbol::ComputeExportClosure()
-{
-    if (IsProject())
-    {
-        for (ParameterSymbol* param : parameters)
-        {
-            if (!param->ExportComputed())
-            {
-                param->SetExportComputed();
-                param->ComputeExportClosure();
-            }
-        }
-        if (!returnType->ExportComputed())
-        {
-            returnType->SetExportComputed();
-            returnType->ComputeExportClosure();
-        }
-    }
-}
-
 void DelegateTypeSymbol::AddMember(Symbol* member)
 {
     TypeSymbol::AddMember(member);
     if (member->GetSymbolType() == SymbolType::parameterSymbol)
     {
         parameters.push_back(static_cast<ParameterSymbol*>(member));
+    }
+}
+
+void DelegateTypeSymbol::ComputeExportClosure()
+{
+    if (IsProject())
+    {
+        for (ParameterSymbol* parameter : parameters)
+        {
+            if (!parameter->ExportComputed())
+            {
+                parameter->SetExportComputed();
+                parameter->ComputeExportClosure();
+            }
+        }
+        if (returnParam)
+        {
+            if (!returnParam->ExportComputed())
+            {
+                returnParam->SetExportComputed();
+                returnParam->ComputeExportClosure();
+            }
+        }
+        if (returnType)
+        {
+            if (!returnType->ExportComputed())
+            {
+                returnType->SetExportComputed();
+                returnType->ComputeExportClosure();
+            }
+        }
     }
 }
 
@@ -90,7 +112,7 @@ llvm::Type* DelegateTypeSymbol::IrType(Emitter& emitter)
     if (!irType)
     {
         llvm::Type* retType = llvm::Type::getVoidTy(emitter.Context());
-        if (!returnType->IsVoidType())
+        if (!returnType->IsVoidType() && !ReturnsClassOrClassDelegateByValue())
         {
             retType = returnType->IrType(emitter);
         }
@@ -100,6 +122,10 @@ llvm::Type* DelegateTypeSymbol::IrType(Emitter& emitter)
         {
             ParameterSymbol* parameter = parameters[i];
             paramTypes.push_back(parameter->GetType()->IrType(emitter));
+        }
+        if (returnParam)
+        {
+            paramTypes.push_back(returnParam->GetType()->IrType(emitter));
         }
         irType = llvm::PointerType::get(llvm::FunctionType::get(retType, paramTypes, false), 0);
     }
@@ -184,6 +210,16 @@ void DelegateTypeSymbol::SetSpecifiers(Specifiers specifiers)
     }
 }
 
+bool DelegateTypeSymbol::ReturnsClassOrClassDelegateByValue() const
+{
+    return returnType->IsClassTypeSymbol() || returnType->GetSymbolType() == SymbolType::classDelegateTypeSymbol;
+}
+
+void DelegateTypeSymbol::SetReturnParam(ParameterSymbol* returnParam_)
+{
+    returnParam.reset(returnParam_);
+}
+
 void DelegateTypeSymbol::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags)
 {
     llvm::Value* callee = nullptr;
@@ -199,6 +235,10 @@ void DelegateTypeSymbol::GenerateCall(Emitter& emitter, std::vector<GenObject*>&
     }
     ArgVector args;
     int n = parameters.size();
+    if (ReturnsClassOrClassDelegateByValue())
+    {
+        ++n;
+    }
     args.resize(n);
     for (int i = 0; i < n; ++i)
     {
@@ -216,7 +256,7 @@ void DelegateTypeSymbol::GenerateCall(Emitter& emitter, std::vector<GenObject*>&
         inputs.push_back(currentPad->value);
         bundles.push_back(llvm::OperandBundleDef("funclet", inputs));
     }
-    if (returnType->GetSymbolType() != SymbolType::voidTypeSymbol)
+    if (returnType->GetSymbolType() != SymbolType::voidTypeSymbol && !ReturnsClassOrClassDelegateByValue())
     {
         if (IsNothrow() || (!handlerBlock && !cleanupBlock && !newCleanupNeeded))
         {
@@ -509,7 +549,7 @@ void FunctionToDelegateConversion::GenerateCall(Emitter& emitter, std::vector<Ge
 }
 
 ClassDelegateTypeSymbol::ClassDelegateTypeSymbol(const Span& span_, const std::u32string& name_) : 
-    TypeSymbol(SymbolType::classDelegateTypeSymbol, span_, name_), returnType(nullptr), parameters(), delegateType(nullptr), objectDelegatePairType(nullptr), irType(nullptr)
+    TypeSymbol(SymbolType::classDelegateTypeSymbol, span_, name_), returnType(nullptr), parameters(), delegateType(nullptr), objectDelegatePairType(nullptr), irType(nullptr), copyConstructor(nullptr)
 {
 }
 
@@ -543,18 +583,29 @@ void ClassDelegateTypeSymbol::ComputeExportClosure()
 {
     if (IsProject())
     {
-        for (ParameterSymbol* param : parameters)
+        for (ParameterSymbol* parameter : parameters)
         {
-            if (!param->ExportComputed())
+            if (!parameter->ExportComputed())
             {
-                param->SetExportComputed();
-                param->ComputeExportClosure();
+                parameter->SetExportComputed();
+                parameter->ComputeExportClosure();
             }
         }
-        if (!returnType->ExportComputed())
+        if (returnParam)
         {
-            returnType->SetExportComputed();
-            returnType->ComputeExportClosure();
+            if (!returnParam->ExportComputed())
+            {
+                returnParam->SetExportComputed();
+                returnParam->ComputeExportClosure();
+            }
+        }
+        if (returnType)
+        {
+            if (!returnType->ExportComputed())
+            {
+                returnType->SetExportComputed();
+                returnType->ComputeExportClosure();
+            }
         }
     }
 }
@@ -573,6 +624,14 @@ void ClassDelegateTypeSymbol::AddMember(Symbol* member)
     else if (member->GetSymbolType() == SymbolType::classTypeSymbol)
     {
         objectDelegatePairType = static_cast<ClassTypeSymbol*>(member);
+    }
+    else if (member->IsFunctionSymbol())
+    {
+        FunctionSymbol* functionSymbol = static_cast<FunctionSymbol*>(member);
+        if (functionSymbol->IsClassDelegateCopyConstructor())
+        {
+            copyConstructor = functionSymbol;
+        }
     }
 }
 
@@ -609,6 +668,16 @@ llvm::Constant* ClassDelegateTypeSymbol::CreateDefaultIrValue(Emitter& emitter)
     constants.push_back(llvm::Constant::getNullValue(emitter.Builder().getInt8PtrTy()));
     constants.push_back(delegateType->CreateDefaultIrValue(emitter));
     return llvm::ConstantStruct::get(llvm::cast<llvm::StructType>(IrType(emitter)), constants);
+}
+
+bool ClassDelegateTypeSymbol::ReturnsClassOrClassDelegateByValue() const
+{
+    return returnType->IsClassTypeSymbol() || returnType->GetSymbolType() == SymbolType::classDelegateTypeSymbol;
+}
+
+void ClassDelegateTypeSymbol::SetReturnParam(ParameterSymbol* returnParam_)
+{
+    returnParam.reset(returnParam_);
 }
 
 void ClassDelegateTypeSymbol::SetSpecifiers(Specifiers specifiers)
@@ -762,7 +831,7 @@ void ClassDelegateTypeDefaultConstructor::GenerateCall(Emitter& emitter, std::ve
     ArgVector objectIndeces;
     objectIndeces.push_back(emitter.Builder().getInt32(0));
     objectIndeces.push_back(emitter.Builder().getInt32(0));
-    genObjects[0]->Load(emitter, OperationFlags::addr);
+    genObjects[0]->Load(emitter, OperationFlags::none);
     llvm::Value* ptr = emitter.Stack().Pop();
     llvm::Value* objectPtr = emitter.Builder().CreateGEP(ptr, objectIndeces);
     emitter.Builder().CreateStore(objectValue, objectPtr);
@@ -802,7 +871,7 @@ void ClassDelegateTypeCopyConstructor::GenerateCall(Emitter& emitter, std::vecto
     llvm::Value* thatPtr = emitter.Stack().Pop();
     llvm::Value* thatObjectPtr = emitter.Builder().CreateGEP(thatPtr, objectIndeces);
     llvm::Value* objectValue = emitter.Builder().CreateLoad(thatObjectPtr);
-    genObjects[0]->Load(emitter, OperationFlags::addr);
+    genObjects[0]->Load(emitter, OperationFlags::none);
     llvm::Value* thisPtr = emitter.Stack().Pop();
     llvm::Value* thisObjectPtr = emitter.Builder().CreateGEP(thisPtr, objectIndeces);
     emitter.Builder().CreateStore(objectValue, thisObjectPtr);
@@ -843,7 +912,7 @@ void ClassDelegateTypeMoveConstructor::GenerateCall(Emitter& emitter, std::vecto
     llvm::Value* thatPtr = emitter.Stack().Pop();
     llvm::Value* thatObjectPtr = emitter.Builder().CreateGEP(thatPtr, objectIndeces);
     llvm::Value* objectValue = emitter.Builder().CreateLoad(thatObjectPtr);
-    genObjects[0]->Load(emitter, OperationFlags::addr);
+    genObjects[0]->Load(emitter, OperationFlags::none);
     llvm::Value* thisPtr = emitter.Stack().Pop();
     llvm::Value* thisObjectPtr = emitter.Builder().CreateGEP(thisPtr, objectIndeces);
     emitter.Builder().CreateStore(objectValue, thisObjectPtr);
@@ -885,7 +954,7 @@ void ClassDelegateTypeCopyAssignment::GenerateCall(Emitter& emitter, std::vector
     llvm::Value* thatPtr = emitter.Stack().Pop();
     llvm::Value* thatObjectPtr = emitter.Builder().CreateGEP(thatPtr, objectIndeces);
     llvm::Value* objectValue = emitter.Builder().CreateLoad(thatObjectPtr);
-    genObjects[0]->Load(emitter, OperationFlags::addr);
+    genObjects[0]->Load(emitter, OperationFlags::none);
     llvm::Value* thisPtr = emitter.Stack().Pop();
     llvm::Value* thisObjectPtr = emitter.Builder().CreateGEP(thisPtr, objectIndeces);
     emitter.Builder().CreateStore(objectValue, thisObjectPtr);
@@ -927,7 +996,7 @@ void ClassDelegateTypeMoveAssignment::GenerateCall(Emitter& emitter, std::vector
     llvm::Value* thatPtr = emitter.Stack().Pop();
     llvm::Value* thatObjectPtr = emitter.Builder().CreateGEP(thatPtr, objectIndeces);
     llvm::Value* objectValue = emitter.Builder().CreateLoad(thatObjectPtr);
-    genObjects[0]->Load(emitter, OperationFlags::addr);
+    genObjects[0]->Load(emitter, OperationFlags::none);
     llvm::Value* thisPtr = emitter.Stack().Pop();
     llvm::Value* thisObjectPtr = emitter.Builder().CreateGEP(thisPtr, objectIndeces);
     emitter.Builder().CreateStore(objectValue, thisObjectPtr);

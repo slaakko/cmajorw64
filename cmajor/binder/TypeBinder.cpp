@@ -166,7 +166,7 @@ void TypeBinder::Visit(FunctionNode& functionNode)
         functionSymbol->SetConstraint(static_cast<WhereConstraintNode*>(functionNode.WhereConstraint()->Clone(cloneContext)));
     }
     functionSymbol->ComputeName();
-    if (functionSymbol->ReturnsClassByValue())
+    if (functionSymbol->ReturnsClassOrClassDelegateByValue())
     {
         ParameterSymbol* returnParam = new ParameterSymbol(functionNode.ReturnTypeExpr()->GetSpan(), U"@return");
         returnParam->SetParent(functionSymbol);
@@ -471,7 +471,7 @@ void TypeBinder::Visit(MemberFunctionNode& memberFunctionNode)
     TypeSymbol* returnType = ResolveType(memberFunctionNode.ReturnTypeExpr(), boundCompileUnit, containerScope);
     memberFunctionSymbol->SetReturnType(returnType);
     memberFunctionSymbol->ComputeName();
-    if (memberFunctionSymbol->ReturnsClassByValue())
+    if (memberFunctionSymbol->ReturnsClassOrClassDelegateByValue())
     {
         ParameterSymbol* returnParam = new ParameterSymbol(memberFunctionNode.ReturnTypeExpr()->GetSpan(), U"@return");
         returnParam->SetParent(memberFunctionSymbol);
@@ -524,7 +524,7 @@ void TypeBinder::Visit(ConversionFunctionNode& conversionFunctionNode)
     TypeSymbol* returnType = ResolveType(conversionFunctionNode.ReturnTypeExpr(), boundCompileUnit, containerScope);
     conversionFunctionSymbol->SetReturnType(returnType);
     conversionFunctionSymbol->ComputeName();
-    if (conversionFunctionSymbol->ReturnsClassByValue())
+    if (conversionFunctionSymbol->ReturnsClassOrClassDelegateByValue())
     {
         ParameterSymbol* returnParam = new ParameterSymbol(conversionFunctionNode.ReturnTypeExpr()->GetSpan(), U"@return");
         returnParam->SetParent(conversionFunctionSymbol);
@@ -601,6 +601,13 @@ void TypeBinder::Visit(DelegateNode& delegateNode)
     }
     TypeSymbol* returnType = ResolveType(delegateNode.ReturnTypeExpr(), boundCompileUnit, containerScope);
     delegateTypeSymbol->SetReturnType(returnType);
+    if (delegateTypeSymbol->ReturnsClassOrClassDelegateByValue())
+    {
+        ParameterSymbol* returnParam = new ParameterSymbol(delegateNode.ReturnTypeExpr()->GetSpan(), U"@return");
+        returnParam->SetParent(delegateTypeSymbol);
+        returnParam->SetType(returnType->AddPointer(delegateNode.GetSpan()));
+        delegateTypeSymbol->SetReturnParam(returnParam);
+    }
     DelegateTypeDefaultConstructor* defaultConstructor = new DelegateTypeDefaultConstructor(delegateTypeSymbol);
     symbolTable.SetFunctionIdFor(defaultConstructor);
     delegateTypeSymbol->AddMember(defaultConstructor);
@@ -651,6 +658,17 @@ void TypeBinder::Visit(ClassDelegateNode& classDelegateNode)
     }
     TypeSymbol* returnType = ResolveType(classDelegateNode.ReturnTypeExpr(), boundCompileUnit, containerScope);
     classDelegateTypeSymbol->SetReturnType(returnType);
+    if (classDelegateTypeSymbol->ReturnsClassOrClassDelegateByValue())
+    {
+        ParameterSymbol* returnParam = new ParameterSymbol(classDelegateNode.ReturnTypeExpr()->GetSpan(), U"@return");
+        returnParam->SetParent(classDelegateTypeSymbol);
+        returnParam->SetType(returnType->AddPointer(classDelegateNode.GetSpan()));
+        classDelegateTypeSymbol->SetReturnParam(returnParam);
+        ParameterSymbol* memberReturnParam = new ParameterSymbol(classDelegateNode.ReturnTypeExpr()->GetSpan(), U"@return");
+        memberReturnParam->SetParent(memberDelegateType);
+        memberReturnParam->SetType(returnType->AddPointer(classDelegateNode.GetSpan()));
+        memberDelegateType->SetReturnParam(memberReturnParam);
+    }
     memberDelegateType->SetReturnType(returnType);
     classDelegateTypeSymbol->AddMember(memberDelegateType);
     ClassTypeSymbol* objectDelegatePairType = new ClassTypeSymbol(classDelegateNode.GetSpan(), U"@objectDelegatePairType");

@@ -411,6 +411,17 @@ void Emitter::Visit(BoundFunction& boundFunction)
             args.push_back(&*it);
             builder.CreateCall(callee, args);
         }
+        else if (parameter->GetType()->GetSymbolType() == SymbolType::classDelegateTypeSymbol)
+        {
+            ClassDelegateTypeSymbol* classDelegateType = static_cast<ClassDelegateTypeSymbol*>(parameter->GetType());
+            FunctionSymbol* copyConstructor = classDelegateType->CopyConstructor();
+            std::vector<GenObject*> copyCtorArgs;
+            LlvmValue paramValue(parameter->IrObject());
+            copyCtorArgs.push_back(&paramValue);
+            LlvmValue argumentValue(&*it);
+            copyCtorArgs.push_back(&argumentValue);
+            copyConstructor->GenerateCall(*this, copyCtorArgs, OperationFlags::none);
+        }
         else
         {
             builder.CreateStore(&*it, parameter->IrObject());
@@ -436,7 +447,7 @@ void Emitter::Visit(BoundFunction& boundFunction)
     if (!lastStatement || lastStatement->GetBoundNodeType() != BoundNodeType::boundReturnStatement)
     {
         CreateExitFunctionCall();
-        if (functionSymbol->ReturnType() && functionSymbol->ReturnType()->GetSymbolType() != SymbolType::voidTypeSymbol && !functionSymbol->ReturnsClassByValue())
+        if (functionSymbol->ReturnType() && functionSymbol->ReturnType()->GetSymbolType() != SymbolType::voidTypeSymbol && !functionSymbol->ReturnsClassOrClassDelegateByValue())
         {
             llvm::Value* defaultValue = functionSymbol->ReturnType()->CreateDefaultIrValue(*this);
             builder.CreateRet(defaultValue);

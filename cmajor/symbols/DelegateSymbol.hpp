@@ -32,10 +32,13 @@ public:
     const TypeSymbol* ReturnType() const { return returnType; }
     TypeSymbol* ReturnType() { return returnType; }
     void SetReturnType(TypeSymbol* returnType_) { returnType = returnType_; }
+    bool ReturnsClassOrClassDelegateByValue() const;
+    void SetReturnParam(ParameterSymbol* returnParam_);
     void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags);
 private:
     TypeSymbol* returnType;
     std::vector<ParameterSymbol*> parameters;
+    std::unique_ptr<ParameterSymbol> returnParam;
     llvm::Type* irType;
 };
 
@@ -151,15 +154,20 @@ public:
     const TypeSymbol* ReturnType() const { return returnType; }
     TypeSymbol* ReturnType() { return returnType; }
     void SetReturnType(TypeSymbol* returnType_) { returnType = returnType_; }
+    bool ReturnsClassOrClassDelegateByValue() const;
+    void SetReturnParam(ParameterSymbol* returnParam_);
     DelegateTypeSymbol* DelegateType() { return delegateType; }
     ClassTypeSymbol* ObjectDelegatePairType() { Assert(objectDelegatePairType, "object delegate pair type not set");  return objectDelegatePairType; }
+    FunctionSymbol* CopyConstructor() { Assert(copyConstructor, "class delegate copy constructor not set");  return copyConstructor; }
     void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags);
 private:
     TypeSymbol* returnType;
     std::vector<ParameterSymbol*> parameters;
+    std::unique_ptr<ParameterSymbol> returnParam;
     DelegateTypeSymbol* delegateType;
     ClassTypeSymbol* objectDelegatePairType;
     llvm::Type* irType;
+    FunctionSymbol* copyConstructor;
 };
 
 class ClassDelegateTypeDefaultConstructor : public FunctionSymbol
@@ -187,6 +195,7 @@ public:
     void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags) override;
     bool IsBasicTypeOperation() const override { return true; }
     bool IsConstructorDestructorOrNonstaticMemberFunction() const override { return true; }
+    bool IsClassDelegateCopyConstructor() const override { return true; }
 };
 
 class ClassDelegateTypeMoveConstructor : public FunctionSymbol

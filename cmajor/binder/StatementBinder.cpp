@@ -536,19 +536,27 @@ void StatementBinder::Visit(ReturnStatementNode& returnStatementNode)
 {
     if (returnStatementNode.Expression())
     {
-        if (currentFunction->GetFunctionSymbol()->ReturnsClassByValue())
+        if (currentFunction->GetFunctionSymbol()->ReturnsClassOrClassDelegateByValue())
         {
             std::vector<FunctionScopeLookup> classReturnLookups;
             classReturnLookups.push_back(FunctionScopeLookup(ScopeLookup::this_and_base_and_parent, containerScope));
-            classReturnLookups.push_back(FunctionScopeLookup(ScopeLookup::this_, currentFunction->GetFunctionSymbol()->ReturnType()->ClassInterfaceOrNsScope()));
+            classReturnLookups.push_back(FunctionScopeLookup(ScopeLookup::this_and_base_and_parent, currentFunction->GetFunctionSymbol()->ReturnType()->ClassInterfaceEnumDelegateOrNsScope()));
             classReturnLookups.push_back(FunctionScopeLookup(ScopeLookup::fileScopes, nullptr));
             std::vector<std::unique_ptr<BoundExpression>> classReturnArgs;
             classReturnArgs.push_back(std::unique_ptr<BoundExpression>(new BoundParameter(currentFunction->GetFunctionSymbol()->ReturnParam())));
-            std::unique_ptr<BoundExpression> expression = BindExpression(returnStatementNode.Expression(), boundCompileUnit, currentFunction, containerScope, this, false, false, false);
+            TypeSymbol* returnType = currentFunction->GetFunctionSymbol()->ReturnType();
+            bool returnClassDelegateType = returnType->GetSymbolType() == SymbolType::classDelegateTypeSymbol;
+            std::unique_ptr<BoundExpression> expression = BindExpression(returnStatementNode.Expression(), boundCompileUnit, currentFunction, containerScope, this, false, returnClassDelegateType, 
+                returnClassDelegateType);
             std::vector<FunctionScopeLookup> rvalueLookups;
             rvalueLookups.push_back(FunctionScopeLookup(ScopeLookup::this_and_base_and_parent, containerScope));
             rvalueLookups.push_back(FunctionScopeLookup(ScopeLookup::fileScopes, nullptr));
-            std::vector<std::unique_ptr<BoundExpression>> rvalueArguments;
+            std::vector<std::unique_ptr<BoundExpression>> rvalueArguments; 
+            if (returnClassDelegateType && expression->GetType()->BaseType()->GetSymbolType() == SymbolType::functionGroupTypeSymbol)
+            {
+                TypeSymbol* exprType = expression->GetType();
+                expression.reset(new BoundConversion(std::move(expression), boundCompileUnit.GetConversion(exprType, returnType, containerScope, currentFunction, returnStatementNode.GetSpan())));
+            }
             rvalueArguments.push_back(std::move(expression));
             std::unique_ptr<BoundExpression> rvalueExpr = ResolveOverload(U"System.Rvalue", containerScope, rvalueLookups, rvalueArguments, boundCompileUnit, currentFunction,
                 returnStatementNode.GetSpan());

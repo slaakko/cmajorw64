@@ -831,10 +831,6 @@ std::unique_ptr<BoundFunctionCall> FailWithAmbiguousOverload(const std::u32strin
 std::unique_ptr<BoundFunctionCall> CreateBoundFunctionCall(FunctionSymbol* bestFun, std::vector<std::unique_ptr<BoundExpression>>& arguments, BoundCompileUnit& boundCompileUnit, 
     BoundFunction* boundFunction, const FunctionMatch& bestMatch, ContainerScope* containerScope, const Span& span)
 {
-    if (boundFunction->GetFunctionSymbol()->GroupName() == U"ToString")
-    {
-        int x = 0;
-    }
     std::unique_ptr<BoundFunctionCall> boundFunctionCall(new BoundFunctionCall(span, bestFun));
     int arity = arguments.size();
     for (int i = 0; i < arity; ++i)
@@ -884,12 +880,7 @@ std::unique_ptr<BoundFunctionCall> CreateBoundFunctionCall(FunctionSymbol* bestF
         {
             if (argumentMatch.referenceConversionFlags == OperationFlags::addr)
             {
-                bool lvalueExpr = argument->IsLvalueExpression();
-                if (argument->GetBoundNodeType() == BoundNodeType::boundConversion)
-                {
-                    lvalueExpr = true;
-                }
-                if (!lvalueExpr)
+                if (!argument->IsLvalueExpression())
                 {
                     BoundLocalVariable* backingStore = new BoundLocalVariable(boundFunction->GetFunctionSymbol()->CreateTemporary(argument->GetType(), span));
                     argument.reset(new BoundTemporary(std::move(argument), std::unique_ptr<BoundLocalVariable>(backingStore)));
@@ -913,22 +904,30 @@ std::unique_ptr<BoundFunctionCall> CreateBoundFunctionCall(FunctionSymbol* bestF
                 argument.reset(dereferenceExpression);
             }
         }
-        if (argument->GetType()->IsClassTypeSymbol())
+        if (argument->GetType()->IsClassTypeSymbol() || argument->GetType()->GetSymbolType() == SymbolType::classDelegateTypeSymbol)
         {
-            ClassTypeSymbol* classType = static_cast<ClassTypeSymbol*>(argument->GetType());
-            if (!classType->CopyConstructor())
+            if (argument->GetType()->IsClassTypeSymbol())
             {
-                try
+                ClassTypeSymbol* classType = static_cast<ClassTypeSymbol*>(argument->GetType());
+                if (!classType->CopyConstructor())
                 {
-                    boundCompileUnit.GenerateCopyConstructorFor(classType, containerScope, boundFunction, span);
+                    try
+                    {
+                        boundCompileUnit.GenerateCopyConstructorFor(classType, containerScope, boundFunction, span);
+                    }
+                    catch (const Exception& ex)
+                    {
+                        throw Exception("cannot pass class '" + ToUtf8(classType->FullName()) + "' by value because: " + ex.Message(), argument->GetSpan(), ex.References());
+                    }
                 }
-                catch (const Exception& ex)
-                {
-                    throw Exception("cannot pass class '" + ToUtf8(classType->FullName()) + "' by value because: " + ex.Message(), argument->GetSpan(), ex.References());
-                }
+                TypeSymbol* type = classType->AddConst(span)->AddLvalueReference(span);
+                argument.reset(new BoundAddressOfExpression(std::move(argument), type));
             }
-            TypeSymbol* type = classType->AddConst(span)->AddLvalueReference(span);
-            argument.reset(new BoundAddressOfExpression(std::move(argument), type));
+            else if (argument->GetType()->GetSymbolType() == SymbolType::classDelegateTypeSymbol)
+            {
+                TypeSymbol* type = argument->GetType()->AddConst(span)->AddLvalueReference(span);
+                argument.reset(new BoundAddressOfExpression(std::move(argument), type));
+            }
         }
         boundFunctionCall->AddArgument(std::move(argument));
     }

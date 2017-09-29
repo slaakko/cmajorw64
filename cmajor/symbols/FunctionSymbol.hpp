@@ -103,6 +103,7 @@ public:
     void GenerateVirtualCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags);
     virtual ParameterSymbol* GetThisParam() const { return nullptr; }
     virtual bool IsConstructorDestructorOrNonstaticMemberFunction() const { return false; }
+    virtual bool IsClassDelegateCopyConstructor() const { return false; }
     void Dump(CodeFormatter& formatter) override;
     bool IsDefaultConstructor() const;
     bool IsCopyConstructor() const;
@@ -161,7 +162,7 @@ public:
     TypeSymbol* ReturnType() const { return returnType; }
     ParameterSymbol* ReturnParam() { return returnParam.get(); }
     void SetReturnParam(ParameterSymbol* returnParam_);
-    bool ReturnsClassByValue() const;
+    bool ReturnsClassOrClassDelegateByValue() const;
     bool IsFunctionTemplate() const { return !templateParameters.empty(); }
     void CloneUsingNodes(const std::vector<Node*>& usingNodes_);
     LocalVariableSymbol* CreateTemporary(TypeSymbol* type, const Span& span);
