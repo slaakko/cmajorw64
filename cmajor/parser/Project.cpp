@@ -350,6 +350,59 @@ private:
     };
 };
 
+class ProjectGrammar::TextFileDeclarationRule : public cmajor::parsing::Rule
+{
+public:
+    TextFileDeclarationRule(const std::u32string& name_, Scope* enclosingScope_, int id_, Parser* definition_):
+        cmajor::parsing::Rule(name_, enclosingScope_, id_, definition_)
+    {
+        SetValueTypeName(ToUtf32("ProjectDeclaration*"));
+    }
+    virtual void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData)
+    {
+        parsingData->PushContext(Id(), new Context());
+        Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
+    }
+    virtual void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched)
+    {
+        Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
+        if (matched)
+        {
+            stack.push(std::unique_ptr<cmajor::parsing::Object>(new cmajor::parsing::ValueObject<ProjectDeclaration*>(context->value)));
+        }
+        parsingData->PopContext(Id());
+    }
+    virtual void Link()
+    {
+        cmajor::parsing::ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
+        a0ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<TextFileDeclarationRule>(this, &TextFileDeclarationRule::A0Action));
+        cmajor::parsing::NonterminalParser* filePathNonterminalParser = GetNonterminal(ToUtf32("FilePath"));
+        filePathNonterminalParser->SetPostCall(new cmajor::parsing::MemberPostCall<TextFileDeclarationRule>(this, &TextFileDeclarationRule::PostFilePath));
+    }
+    void A0Action(const char32_t* matchBegin, const char32_t* matchEnd, const Span& span, const std::string& fileName, ParsingData* parsingData, bool& pass)
+    {
+        Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
+        context->value = new TextFileDeclaration(context->fromFilePath);
+    }
+    void PostFilePath(cmajor::parsing::ObjectStack& stack, ParsingData* parsingData, bool matched)
+    {
+        Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
+        if (matched)
+        {
+            std::unique_ptr<cmajor::parsing::Object> fromFilePath_value = std::move(stack.top());
+            context->fromFilePath = *static_cast<cmajor::parsing::ValueObject<std::string>*>(fromFilePath_value.get());
+            stack.pop();
+        }
+    }
+private:
+    struct Context : cmajor::parsing::Context
+    {
+        Context(): value(), fromFilePath() {}
+        ProjectDeclaration* value;
+        std::string fromFilePath;
+    };
+};
+
 class ProjectGrammar::TargetDeclarationRule : public cmajor::parsing::Rule
 {
 public:
@@ -539,6 +592,15 @@ void ProjectGrammar::CreateRules()
             new cmajor::parsing::SequenceParser(
                 new cmajor::parsing::SequenceParser(
                     new cmajor::parsing::KeywordParser(ToUtf32("source")),
+                    new cmajor::parsing::ExpectationParser(
+                        new cmajor::parsing::NonterminalParser(ToUtf32("FilePath"), ToUtf32("FilePath"), 0))),
+                new cmajor::parsing::ExpectationParser(
+                    new cmajor::parsing::CharParser(';'))))));
+    AddRule(new TextFileDeclarationRule(ToUtf32("TextFileDeclaration"), GetScope(), GetParsingDomain()->GetNextRuleId(),
+        new cmajor::parsing::ActionParser(ToUtf32("A0"),
+            new cmajor::parsing::SequenceParser(
+                new cmajor::parsing::SequenceParser(
+                    new cmajor::parsing::KeywordParser(ToUtf32("text")),
                     new cmajor::parsing::ExpectationParser(
                         new cmajor::parsing::NonterminalParser(ToUtf32("FilePath"), ToUtf32("FilePath"), 0))),
                 new cmajor::parsing::ExpectationParser(

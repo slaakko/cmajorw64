@@ -1,5 +1,5 @@
-#ifndef Solution_hpp_21397
-#define Solution_hpp_21397
+#ifndef Solution_hpp_22774
+#define Solution_hpp_22774
 
 #include <cmajor/parsing/Grammar.hpp>
 #include <cmajor/parsing/Keyword.hpp>
@@ -21,9 +21,10 @@ private:
     class SolutionRule;
     class DeclarationRule;
     class SolutionProjectDeclarationRule;
+    class ActiveProjectDeclarationRule;
     class FilePathRule;
 };
 
 } } // namespace cmajor.parser
 
-#endif // Solution_hpp_21397
+#endif // Solution_hpp_22774

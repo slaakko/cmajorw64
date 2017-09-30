@@ -18,7 +18,7 @@ std::string CmajorSystemModuleFilePath(const std::string& config);
 
 enum class ProjectDeclarationType : uint8_t
 {
-    referenceDeclaration, sourceFileDeclaration, targetDeclaration
+    referenceDeclaration, sourceFileDeclaration, textFileDeclaration, targetDeclaration
 };
 
 class ProjectDeclaration
@@ -44,6 +44,15 @@ class SourceFileDeclaration : public ProjectDeclaration
 {
 public:
     SourceFileDeclaration(const std::string& filePath_);
+    const std::string& FilePath() const { return filePath; }
+private:
+    std::string filePath;
+};
+
+class TextFileDeclaration : public ProjectDeclaration
+{
+public:
+    TextFileDeclaration(const std::string& filePath_);
     const std::string& FilePath() const { return filePath; }
 private:
     std::string filePath;

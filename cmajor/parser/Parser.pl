@@ -114,6 +114,7 @@ namespace cmajor.parser
         Solution: Solution*;
         Declaration: SolutionDeclaration*;
         SolutionProjectDeclaration: SolutionDeclaration*;
+        ActiveProjectDeclaration: SolutionDeclaration*;
         FilePath: std::string;
     }
     grammar EnumerationGrammar
@@ -174,6 +175,7 @@ namespace cmajor.parser
         Declaration: ProjectDeclaration*;
         ReferenceDeclaration: ProjectDeclaration*;
         SourceFileDeclaration: ProjectDeclaration*;
+        TextFileDeclaration: ProjectDeclaration*;
         TargetDeclaration: ProjectDeclaration*;
         Target: Target;
         FilePath: std::string;

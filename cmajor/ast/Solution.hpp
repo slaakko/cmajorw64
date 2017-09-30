@@ -25,6 +25,15 @@ private:
     std::string filePath;
 };
 
+class SolutionActiveProjectDeclaration : public SolutionDeclaration
+{
+public:
+    SolutionActiveProjectDeclaration(const std::u32string& activeProjectName_);
+    const std::u32string& ActiveProjectName() const { return activeProjectName; }
+private:
+    std::u32string activeProjectName;
+};
+
 class ProjectDependencyDeclaration : public SolutionDeclaration
 {
 public:
@@ -45,6 +54,7 @@ public:
     const std::string& FilePath() const { return filePath; }
     const boost::filesystem::path& BasePath() const { return basePath; }
     const std::vector<std::string>& ProjectFilePaths() const { return projectFilePaths; }
+    const std::u32string& ActiveProjectName() const { return activeProjectName; }
     void AddProject(std::unique_ptr<Project>&& project);
     std::vector<Project*> CreateBuildOrder();
     void AddDeclaration(SolutionDeclaration* declaration);
@@ -56,6 +66,7 @@ private:
     std::vector<std::unique_ptr<SolutionDeclaration>> declarations;
     std::vector<std::string> projectFilePaths;
     std::vector<std::unique_ptr<Project>> projects;
+    std::u32string activeProjectName;
     std::vector<std::unique_ptr<ProjectDependencyDeclaration>> additionalDependencyDeclarations;
     std::unordered_map<std::u32string, ProjectDependencyDeclaration*> dependencyMap;
     void AddDependencies();

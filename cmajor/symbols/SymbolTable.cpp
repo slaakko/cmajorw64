@@ -19,9 +19,11 @@
 #include <cmajor/symbols/Exception.hpp>
 #include <cmajor/symbols/TemplateSymbol.hpp>
 #include <cmajor/symbols/ConceptSymbol.hpp>
+#include <cmajor/symbols/GlobalFlags.hpp>
 #include <cmajor/ast/Identifier.hpp>
 #include <cmajor/util/Unicode.hpp>
 #include <boost/filesystem.hpp>
+#include <iostream>
 
 namespace cmajor { namespace symbols {
 
@@ -1191,6 +1193,10 @@ void InitCoreSymbolTable(SymbolTable& symbolTable)
 
 void CreateClassFile(const std::string& executableFilePath, const SymbolTable& symbolTable)
 {
+    if (GetGlobalFlag(GlobalFlags::verbose))
+    {
+        std::cout << "Generating class file..." << std::endl;
+    }
     std::string classFilePath = boost::filesystem::path(executableFilePath).replace_extension(".cls").generic_string();
     const std::unordered_set<ClassTypeSymbol*>& polymorphicClasses = symbolTable.PolymorphicClasses();
     uint32_t n = polymorphicClasses.size();
@@ -1216,6 +1222,10 @@ void CreateClassFile(const std::string& executableFilePath, const SymbolTable& s
     {
         uint32_t typeId = classHavingStaticConstructor->TypeId();
         writer.WriteEncodedUInt(typeId);
+    }
+    if (GetGlobalFlag(GlobalFlags::verbose))
+    {
+        std::cout << "==> " << classFilePath << std::endl;
     }
 }
 

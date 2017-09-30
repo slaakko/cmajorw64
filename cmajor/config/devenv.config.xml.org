@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cmdevenv.configuration>
+    <cmc>cmc.exe</cmc>
+    <tabSize>4</tabSize>
+    <infoDelaySecs>10</infoDelaySecs>
+    <formSizeX>1051</formSizeX>
+    <formSizeY>632</formSizeY>
+    <formTop>80</formTop>
+    <formLeft>60</formLeft>
+    <textVisX>200</textVisX>
+    <textVisY>200</textVisY>
+    <textVisW>200</textVisW>
+    <textVisH>200</textVisH>
+    <horizontalSplitterPos>784</horizontalSplitterPos>
+    <verticalSplitterPos>300</verticalSplitterPos>
+    <windowState>Normal</windowState>
+    <maxRecentProjects>10</maxRecentProjects>
+    <recentProjects />
+</cmdevenv.configuration>

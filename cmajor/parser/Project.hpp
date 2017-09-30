@@ -1,5 +1,5 @@
-#ifndef Project_hpp_21397
-#define Project_hpp_21397
+#ifndef Project_hpp_24677
+#define Project_hpp_24677
 
 #include <cmajor/parsing/Grammar.hpp>
 #include <cmajor/parsing/Keyword.hpp>
@@ -22,6 +22,7 @@ private:
     class DeclarationRule;
     class ReferenceDeclarationRule;
     class SourceFileDeclarationRule;
+    class TextFileDeclarationRule;
     class TargetDeclarationRule;
     class TargetRule;
     class FilePathRule;
@@ -29,4 +30,4 @@ private:
 
 } } // namespace cmajor.parser
 
-#endif // Project_hpp_21397
+#endif // Project_hpp_24677

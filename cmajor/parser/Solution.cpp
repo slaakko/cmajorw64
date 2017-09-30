@@ -171,13 +171,22 @@ public:
     {
         cmajor::parsing::ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
         a0ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<DeclarationRule>(this, &DeclarationRule::A0Action));
+        cmajor::parsing::ActionParser* a1ActionParser = GetAction(ToUtf32("A1"));
+        a1ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<DeclarationRule>(this, &DeclarationRule::A1Action));
         cmajor::parsing::NonterminalParser* solutionProjectDeclarationNonterminalParser = GetNonterminal(ToUtf32("SolutionProjectDeclaration"));
         solutionProjectDeclarationNonterminalParser->SetPostCall(new cmajor::parsing::MemberPostCall<DeclarationRule>(this, &DeclarationRule::PostSolutionProjectDeclaration));
+        cmajor::parsing::NonterminalParser* activeProjectDeclarationNonterminalParser = GetNonterminal(ToUtf32("ActiveProjectDeclaration"));
+        activeProjectDeclarationNonterminalParser->SetPostCall(new cmajor::parsing::MemberPostCall<DeclarationRule>(this, &DeclarationRule::PostActiveProjectDeclaration));
     }
     void A0Action(const char32_t* matchBegin, const char32_t* matchEnd, const Span& span, const std::string& fileName, ParsingData* parsingData, bool& pass)
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
         context->value = context->fromSolutionProjectDeclaration;
+    }
+    void A1Action(const char32_t* matchBegin, const char32_t* matchEnd, const Span& span, const std::string& fileName, ParsingData* parsingData, bool& pass)
+    {
+        Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
+        context->value = context->fromActiveProjectDeclaration;
     }
     void PostSolutionProjectDeclaration(cmajor::parsing::ObjectStack& stack, ParsingData* parsingData, bool matched)
     {
@@ -189,12 +198,23 @@ public:
             stack.pop();
         }
     }
+    void PostActiveProjectDeclaration(cmajor::parsing::ObjectStack& stack, ParsingData* parsingData, bool matched)
+    {
+        Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
+        if (matched)
+        {
+            std::unique_ptr<cmajor::parsing::Object> fromActiveProjectDeclaration_value = std::move(stack.top());
+            context->fromActiveProjectDeclaration = *static_cast<cmajor::parsing::ValueObject<SolutionDeclaration*>*>(fromActiveProjectDeclaration_value.get());
+            stack.pop();
+        }
+    }
 private:
     struct Context : cmajor::parsing::Context
     {
-        Context(): value(), fromSolutionProjectDeclaration() {}
+        Context(): value(), fromSolutionProjectDeclaration(), fromActiveProjectDeclaration() {}
         SolutionDeclaration* value;
         SolutionDeclaration* fromSolutionProjectDeclaration;
+        SolutionDeclaration* fromActiveProjectDeclaration;
     };
 };
 
@@ -251,6 +271,59 @@ private:
     };
 };
 
+class SolutionGrammar::ActiveProjectDeclarationRule : public cmajor::parsing::Rule
+{
+public:
+    ActiveProjectDeclarationRule(const std::u32string& name_, Scope* enclosingScope_, int id_, Parser* definition_):
+        cmajor::parsing::Rule(name_, enclosingScope_, id_, definition_)
+    {
+        SetValueTypeName(ToUtf32("SolutionDeclaration*"));
+    }
+    virtual void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData)
+    {
+        parsingData->PushContext(Id(), new Context());
+        Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
+    }
+    virtual void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched)
+    {
+        Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
+        if (matched)
+        {
+            stack.push(std::unique_ptr<cmajor::parsing::Object>(new cmajor::parsing::ValueObject<SolutionDeclaration*>(context->value)));
+        }
+        parsingData->PopContext(Id());
+    }
+    virtual void Link()
+    {
+        cmajor::parsing::ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
+        a0ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<ActiveProjectDeclarationRule>(this, &ActiveProjectDeclarationRule::A0Action));
+        cmajor::parsing::NonterminalParser* qualified_idNonterminalParser = GetNonterminal(ToUtf32("qualified_id"));
+        qualified_idNonterminalParser->SetPostCall(new cmajor::parsing::MemberPostCall<ActiveProjectDeclarationRule>(this, &ActiveProjectDeclarationRule::Postqualified_id));
+    }
+    void A0Action(const char32_t* matchBegin, const char32_t* matchEnd, const Span& span, const std::string& fileName, ParsingData* parsingData, bool& pass)
+    {
+        Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
+        context->value = new SolutionActiveProjectDeclaration(context->fromqualified_id);
+    }
+    void Postqualified_id(cmajor::parsing::ObjectStack& stack, ParsingData* parsingData, bool matched)
+    {
+        Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
+        if (matched)
+        {
+            std::unique_ptr<cmajor::parsing::Object> fromqualified_id_value = std::move(stack.top());
+            context->fromqualified_id = *static_cast<cmajor::parsing::ValueObject<std::u32string>*>(fromqualified_id_value.get());
+            stack.pop();
+        }
+    }
+private:
+    struct Context : cmajor::parsing::Context
+    {
+        Context(): value(), fromqualified_id() {}
+        SolutionDeclaration* value;
+        std::u32string fromqualified_id;
+    };
+};
+
 class SolutionGrammar::FilePathRule : public cmajor::parsing::Rule
 {
 public:
@@ -281,7 +354,7 @@ public:
     void A0Action(const char32_t* matchBegin, const char32_t* matchEnd, const Span& span, const std::string& fileName, ParsingData* parsingData, bool& pass)
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
-        context->value = std::string(matchBegin, matchEnd);
+        context->value = ToUtf8(std::u32string(matchBegin, matchEnd));
     }
 private:
     struct Context : cmajor::parsing::Context
@@ -304,8 +377,8 @@ void SolutionGrammar::GetReferencedGrammars()
 
 void SolutionGrammar::CreateRules()
 {
-    AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("qualified_id"), this, ToUtf32("cmajor.parsing.stdlib.qualified_id")));
     AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("spaces_and_comments"), this, ToUtf32("cmajor.parsing.stdlib.spaces_and_comments")));
+    AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("qualified_id"), this, ToUtf32("cmajor.parsing.stdlib.qualified_id")));
     AddRule(new SolutionRule(ToUtf32("Solution"), GetScope(), GetParsingDomain()->GetNextRuleId(),
         new cmajor::parsing::SequenceParser(
             new cmajor::parsing::SequenceParser(
@@ -318,14 +391,24 @@ void SolutionGrammar::CreateRules()
                 new cmajor::parsing::ActionParser(ToUtf32("A1"),
                     new cmajor::parsing::NonterminalParser(ToUtf32("Declaration"), ToUtf32("Declaration"), 0))))));
     AddRule(new DeclarationRule(ToUtf32("Declaration"), GetScope(), GetParsingDomain()->GetNextRuleId(),
-        new cmajor::parsing::ActionParser(ToUtf32("A0"),
-            new cmajor::parsing::NonterminalParser(ToUtf32("SolutionProjectDeclaration"), ToUtf32("SolutionProjectDeclaration"), 0))));
+        new cmajor::parsing::AlternativeParser(
+            new cmajor::parsing::ActionParser(ToUtf32("A0"),
+                new cmajor::parsing::NonterminalParser(ToUtf32("SolutionProjectDeclaration"), ToUtf32("SolutionProjectDeclaration"), 0)),
+            new cmajor::parsing::ActionParser(ToUtf32("A1"),
+                new cmajor::parsing::NonterminalParser(ToUtf32("ActiveProjectDeclaration"), ToUtf32("ActiveProjectDeclaration"), 0)))));
     AddRule(new SolutionProjectDeclarationRule(ToUtf32("SolutionProjectDeclaration"), GetScope(), GetParsingDomain()->GetNextRuleId(),
         new cmajor::parsing::ActionParser(ToUtf32("A0"),
             new cmajor::parsing::SequenceParser(
                 new cmajor::parsing::SequenceParser(
                     new cmajor::parsing::KeywordParser(ToUtf32("project")),
                     new cmajor::parsing::NonterminalParser(ToUtf32("FilePath"), ToUtf32("FilePath"), 0)),
+                new cmajor::parsing::CharParser(';')))));
+    AddRule(new ActiveProjectDeclarationRule(ToUtf32("ActiveProjectDeclaration"), GetScope(), GetParsingDomain()->GetNextRuleId(),
+        new cmajor::parsing::ActionParser(ToUtf32("A0"),
+            new cmajor::parsing::SequenceParser(
+                new cmajor::parsing::SequenceParser(
+                    new cmajor::parsing::KeywordParser(ToUtf32("activeProject")),
+                    new cmajor::parsing::NonterminalParser(ToUtf32("qualified_id"), ToUtf32("qualified_id"), 0)),
                 new cmajor::parsing::CharParser(';')))));
     AddRule(new FilePathRule(ToUtf32("FilePath"), GetScope(), GetParsingDomain()->GetNextRuleId(),
         new cmajor::parsing::TokenParser(

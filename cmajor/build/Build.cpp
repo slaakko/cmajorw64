@@ -244,6 +244,10 @@ void BindStatements(BoundCompileUnit& boundCompileUnit)
 
 void GenerateLibrary(const std::vector<std::string>& objectFilePaths, const std::string& libraryFilePath)
 {
+    if (GetGlobalFlag(GlobalFlags::verbose))
+    {
+        std::cout << "Creating library..." << std::endl;
+    }
     std::vector<std::string> args;
     args.push_back("/out:" + QuotedPath(libraryFilePath));
     int n = objectFilePaths.size();
@@ -268,10 +272,18 @@ void GenerateLibrary(const std::vector<std::string>& objectFilePaths, const std:
         std::string errors = ReadFile(libErrorFilePath);
         throw std::runtime_error("generating library '" + libraryFilePath + "' failed: " + ex.what() + ":\nerrors:\n" + errors);
     }
+    if (GetGlobalFlag(GlobalFlags::verbose))
+    {
+        std::cout << "==> " << libraryFilePath << std::endl;
+    }
 }
 
 void Link(const std::string& executableFilePath, const std::vector<std::string>& libraryFilePaths, Module& module)
 {
+    if (GetGlobalFlag(GlobalFlags::verbose))
+    {
+        std::cout << "Linking..." << std::endl;
+    }
     boost::filesystem::path bdp = executableFilePath;
     bdp.remove_filename();
     boost::filesystem::create_directories(bdp);
@@ -324,6 +336,10 @@ void Link(const std::string& executableFilePath, const std::vector<std::string>&
     {
         std::string errors = ReadFile(linkErrorFilePath);
         throw std::runtime_error("linking executable '" + executableFilePath + "' failed: " + ex.what() + ":\nerrors:\n" + errors);
+    }
+    if (GetGlobalFlag(GlobalFlags::verbose))
+    {
+        std::cout << "==>" << executableFilePath << std::endl;
     }
 }
 
@@ -463,11 +479,23 @@ void BuildProject(Project* project)
             classType->CreateLayouts();
         }
     }
+    if (GetGlobalFlag(GlobalFlags::verbose))
+    {
+        std::cout << "Binding types..." << std::endl;
+    }
     std::vector<std::unique_ptr<BoundCompileUnit>> boundCompileUnits = BindTypes(module, compileUnits);
     EmittingContext emittingContext;
     std::vector<std::string> objectFilePaths;
+    if (GetGlobalFlag(GlobalFlags::verbose))
+    {
+        std::cout << "Compiling..." << std::endl;
+    }
     for (std::unique_ptr<BoundCompileUnit>& boundCompileUnit : boundCompileUnits)
     {
+        if (GetGlobalFlag(GlobalFlags::verbose))
+        {
+            std::cout << "> " << boost::filesystem::path(boundCompileUnit->GetCompileUnitNode()->FilePath()).filename().generic_string() << std::endl;
+        }
         BindStatements(*boundCompileUnit);
         if (boundCompileUnit->HasGotos())
         {
@@ -479,6 +507,10 @@ void BuildProject(Project* project)
     }
     if (project->GetTarget() == Target::program)
     {
+        if (GetGlobalFlag(GlobalFlags::verbose))
+        {
+            std::cout << "Creating main unit..." << std::endl;
+        }
         if (!module.GetSymbolTable().MainFunctionSymbol())
         {
             throw std::runtime_error("program has no main function");
@@ -491,10 +523,18 @@ void BuildProject(Project* project)
         Link(project->ExecutableFilePath(), module.LibraryFilePaths(), module);
         CreateClassFile(project->ExecutableFilePath(), module.GetSymbolTable());
     }
+    if (GetGlobalFlag(GlobalFlags::verbose))
+    {
+        std::cout << "Writing module file..." << std::endl;
+    }
     SymbolWriter writer(project->ModuleFilePath());
     module.Write(writer);
     WriteTypeIdCounter(config);
     WriteFunctionIdCounter(config);
+    if (GetGlobalFlag(GlobalFlags::verbose))
+    {
+        std::cout << "==> " << project->ModuleFilePath() << std::endl;
+    }
     if (GetGlobalFlag(GlobalFlags::verbose))
     {
         std::cout << "Project '" << ToUtf8(project->Name()) << "' built successfully." << std::endl;

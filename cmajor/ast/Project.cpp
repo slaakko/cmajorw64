@@ -52,6 +52,10 @@ SourceFileDeclaration::SourceFileDeclaration(const std::string& filePath_) : Pro
 {
 }
 
+TextFileDeclaration::TextFileDeclaration(const std::string& filePath_) : ProjectDeclaration(ProjectDeclarationType::textFileDeclaration), filePath(filePath_)
+{
+}
+
 TargetDeclaration::TargetDeclaration(Target target_) : ProjectDeclaration(ProjectDeclarationType::targetDeclaration), target(target_)
 {
 }
@@ -165,6 +169,10 @@ void Project::ResolveDeclarations()
             {
                 TargetDeclaration* targetDeclaration = static_cast<TargetDeclaration*>(declaration.get());
                 target = targetDeclaration->GetTarget();
+                break;
+            }
+            case ProjectDeclarationType::textFileDeclaration:
+            {
                 break;
             }
             default:

@@ -21,6 +21,10 @@ SolutionProjectDeclaration::SolutionProjectDeclaration(const std::string& filePa
 {
 }
 
+SolutionActiveProjectDeclaration::SolutionActiveProjectDeclaration(const std::u32string& activeProjectName_) : activeProjectName(activeProjectName_)
+{
+}
+
 ProjectDependencyDeclaration::ProjectDependencyDeclaration(const std::u32string& projectName_) : projectName(projectName_)
 {
 }
@@ -64,6 +68,10 @@ void Solution::ResolveDeclarations()
             {
                 projectFilePaths.push_back(projectFilePath);
             }
+        }
+        else if (SolutionActiveProjectDeclaration* activeProjectDeclaration = dynamic_cast<SolutionActiveProjectDeclaration*>(declaration.get()))
+        {
+            activeProjectName = activeProjectDeclaration->ActiveProjectName();
         }
         else if (ProjectDependencyDeclaration* projectDependencyDeclaration = dynamic_cast<ProjectDependencyDeclaration*>(declaration.get()))
         {

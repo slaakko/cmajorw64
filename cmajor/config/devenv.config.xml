@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cmdevenv.configuration>
+    <cmc>cmc.exe</cmc>
+    <tabSize>4</tabSize>
+    <infoDelaySecs>10</infoDelaySecs>
+    <formSizeX>1667</formSizeX>
+    <formSizeY>916</formSizeY>
+    <formTop>52</formTop>
+    <formLeft>60</formLeft>
+    <textVisX>200</textVisX>
+    <textVisY>200</textVisY>
+    <textVisW>200</textVisW>
+    <textVisH>200</textVisH>
+    <horizontalSplitterPos>1249</horizontalSplitterPos>
+    <verticalSplitterPos>507</verticalSplitterPos>
+    <windowState>Normal</windowState>
+    <maxRecentProjects>10</maxRecentProjects>
+    <recentProjects>
+        <recentProject>
+            <path>C:\Users\Seppo\cmajorw64\cmajor\system\System.cms</path>
+            <openFiles />
+        </recentProject>
+    </recentProjects>
+</cmdevenv.configuration>

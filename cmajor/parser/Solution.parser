@@ -22,14 +22,19 @@ namespace cmajor.parser
 
         Declaration : SolutionDeclaration*
             ::= SolutionProjectDeclaration{ value = SolutionProjectDeclaration; }
+            |   ActiveProjectDeclaration{ value = ActiveProjectDeclaration; }
             ;
 
         SolutionProjectDeclaration : SolutionDeclaration*
             ::= (keyword("project") FilePath ';'){ value = new SolutionProjectDeclaration(FilePath); }
             ;
 
+        ActiveProjectDeclaration : SolutionDeclaration*
+            ::= (keyword("activeProject") qualified_id ';'){ value = new SolutionActiveProjectDeclaration(qualified_id); }
+            ;
+
         FilePath: std::string
-            ::= token('<' ([^>]+){ value = std::string(matchBegin, matchEnd); } '>'!)
+            ::= token('<' ([^>]+){ value = ToUtf8(std::u32string(matchBegin, matchEnd)); } '>'!)
             ;
     }
 }
