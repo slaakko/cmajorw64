@@ -136,6 +136,14 @@ namespace cmajor.parser
         InterfaceMemFun(ParsingContext* ctx, var std::unique_ptr<MemberFunctionNode> memFun): Node*;
         InterfaceFunctionGroupId(var std::unique_ptr<IdentifierNode> id): std::u32string;
     }
+    grammar JsonGrammar
+    {
+        Value: JsonValue*;
+        String: JsonString*;
+        Number: JsonNumber*;
+        Object(var std::unique_ptr<JsonString> js, var std::unique_ptr<JsonValue> jv): JsonObject*;
+        Array(var std::unique_ptr<JsonValue> item): JsonArray*;
+    }
     grammar KeywordGrammar
     {
         Keyword;

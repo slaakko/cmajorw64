@@ -11,6 +11,7 @@ source <Expression.parser>;
 source <Function.parser>;
 source <Identifier.parser>;
 source <Interface.parser>;
+source <Json.parser>;
 source <Keyword.parser>;
 source <Literal.parser>;
 source <Parameter.parser>;

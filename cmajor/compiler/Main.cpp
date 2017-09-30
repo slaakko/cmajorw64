@@ -153,6 +153,10 @@ int main(int argc, const char** argv)
                 PrintHelp();
                 return 0;
             }
+            if (GetGlobalFlag(GlobalFlags::verbose))
+            {
+                std::cout << "Cmajor compiler version " << version << " for Windows x64" << std::endl;
+            }
             for (const std::string& projectOrSolution : projectsAndSolutions)
             {
                 boost::filesystem::path fp(projectOrSolution);

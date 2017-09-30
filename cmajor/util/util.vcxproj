@@ -23,6 +23,7 @@
     <ClCompile Include="BinaryWriter.cpp" />
     <ClCompile Include="CodeFormatter.cpp" />
     <ClCompile Include="InitDone.cpp" />
+    <ClCompile Include="Json.cpp" />
     <ClCompile Include="MappedInputFile.cpp" />
     <ClCompile Include="MemoryReader.cpp" />
     <ClCompile Include="Mutex.cpp" />
@@ -42,6 +43,7 @@
     <ClInclude Include="Error.hpp" />
     <ClInclude Include="Handle.hpp" />
     <ClInclude Include="InitDone.hpp" />
+    <ClInclude Include="Json.hpp" />
     <ClInclude Include="MappedInputFile.hpp" />
     <ClInclude Include="MemoryReader.hpp" />
     <ClInclude Include="Mutex.hpp" />
