@@ -32,32 +32,42 @@ void JsonString::Append(char32_t c)
     value.append(1, c);
 }
 
-std::u32string JsonString::JsonCharStr(char32_t c) const
+std::u16string JsonString::JsonCharStr(char32_t c) const
 {
-    switch (c)
+    std::u16string result;
+    std::u32string s(1, c);
+    std::u16string t = ToUtf16(s);
+    for (char16_t x : t)
     {
-        case '"': return U"\\\"";
-        case '\\': return U"\\\\";
-        case '/': return U"\\/";
-        case '\b': return U"\\b";
-        case '\f': return U"\\f";
-        case '\n': return U"\\n";
-        case '\r': return U"\\r";
-        case '\t': return U"\\t";
-        default:
+        switch (x)
         {
-            if (c >= 32 && c <= 126)
+            case '"': result.append(u"\\\""); break;
+            case '\\': result.append(u"\\\\"); break;
+            case '/': result.append(u"\\/"); break;
+            case '\b': result.append(u"\\b"); break;
+            case '\f': result.append(u"\\f"); break;
+            case '\n': result.append(u"\\n"); break;
+            case '\r': result.append(u"\\r"); break;
+            case '\t': result.append(u"\\t"); break;
+            default:
             {
-                return std::u32string(1, c);
+                if (x >= 32 && x <= 126)
+                {
+                    result.append(1, x);
+                }
+                else
+                {
+                    result.append(u"\\u").append(ToUtf16(ToHexString(static_cast<uint16_t>(x))));
+                }
             }
-            return U"\\u" + ToUtf32(ToHexString(static_cast<uint16_t>(c)));
         }
     }
+    return result;
 }
 
 std::string JsonString::ToString() const
 {
-    std::u32string s;
+    std::u16string s;
     for (char32_t c : value)
     {
         s.append(JsonCharStr(c));
