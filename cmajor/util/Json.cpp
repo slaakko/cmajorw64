@@ -4,6 +4,7 @@
 // =================================
 
 #include <cmajor/util/Json.hpp>
+#include <cmajor/util/TextUtils.hpp>
 #include <cmajor/util/Unicode.hpp>
 
 namespace cmajor { namespace util {
@@ -31,9 +32,37 @@ void JsonString::Append(char32_t c)
     value.append(1, c);
 }
 
+std::u32string JsonString::JsonCharStr(char32_t c) const
+{
+    switch (c)
+    {
+        case '"': return U"\\\"";
+        case '\\': return U"\\\\";
+        case '/': return U"\\/";
+        case '\b': return U"\\b";
+        case '\f': return U"\\f";
+        case '\n': return U"\\n";
+        case '\r': return U"\\r";
+        case '\t': return U"\\t";
+        default:
+        {
+            if (c >= 32 && c <= 126)
+            {
+                return std::u32string(1, c);
+            }
+            return U"\\u" + ToUtf32(ToHexString(static_cast<uint32_t>(c)));
+        }
+    }
+}
+
 std::string JsonString::ToString() const
 {
-    return "\"" + ToUtf8(value) + "\"";
+    std::u32string s;
+    for (char32_t c : value)
+    {
+        s.append(JsonCharStr(c));
+    }
+    return "\"" + ToUtf8(s) + "\"";
 }
 
 JsonNumber::JsonNumber() : JsonValue(JsonValueType::number), value(0.0)

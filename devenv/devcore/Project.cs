@@ -83,6 +83,13 @@ namespace devcore
         public SourceFile AddSourceFile(string sourceFilePath, SourceFile.Kind kind)
         {
             string filePath = PathUtil.MakeCanonicalPath(Path.IsPathRooted(sourceFilePath) ? sourceFilePath : Path.Combine(basePath, sourceFilePath));
+            foreach (SourceFile sf in sourceFiles)
+            {
+                if (Path.GetFileName(sf.FilePath) == Path.GetFileName(filePath))
+                {
+                    throw new Exception("Project '" + name + "' already contains source file named '" + Path.GetFileName(sf.FilePath) + "'");
+                }
+            }
             SourceFile sourceFile = new SourceFile(Path.GetFileName(sourceFilePath), filePath, kind);
             sourceFile.Project = this;
             sourceFiles.Add(sourceFile);
@@ -127,9 +134,9 @@ namespace devcore
             get { return built; }
             set { built = value; }
         }
-        public string GetOutputPath(string config)
+        public string GetModuleFilePath(string config)
         {
-            return PathUtil.MakeCanonicalPath(Path.Combine(Path.Combine(Path.Combine(basePath, config), Path.GetFileName(filePath))));
+            return PathUtil.MakeCanonicalPath(Path.Combine(Path.Combine(Path.Combine(basePath, "lib"), config), name + ".cmm"));
         }
         private string name;
         private string filePath;

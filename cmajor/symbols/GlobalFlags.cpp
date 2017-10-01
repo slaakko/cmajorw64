@@ -74,4 +74,28 @@ void SetOptimizationLevel(int optimizationLevel_)
     optimizationLevel = optimizationLevel_;
 }
 
+std::u32string currentProjectName;
+
+void SetCurrentProjectName(const std::u32string& currentProjectName_)
+{
+    currentProjectName = currentProjectName_;
+}
+
+std::u32string GetCurrentProjectName()
+{
+    return currentProjectName;
+}
+
+std::u32string currentToolName;
+
+void SetCurrentTooName(const std::u32string& currentToolName_)
+{
+    currentToolName = currentToolName_;
+}
+
+std::u32string GetCurrentToolName()
+{
+    return currentToolName;
+}
+
 } } // namespace cmajor::symbols

@@ -10,7 +10,7 @@
 
 namespace cmajor { namespace symbols {
 
-enum class GlobalFlags : uint8_t
+enum class GlobalFlags : uint16_t
 {
     none = 0,
     verbose = 1 << 0,
@@ -20,7 +20,8 @@ enum class GlobalFlags : uint8_t
     debugParsing = 1 << 4,
     emitLlvm = 1 << 5,
     emitOptLlvm = 1 << 6,
-    linkWithDebugRuntime = 1 << 7
+    linkWithDebugRuntime = 1 << 7,
+    ide = 1 << 8
 };
 
 void SetGlobalFlag(GlobalFlags flag);
@@ -30,6 +31,11 @@ bool GetGlobalFlag(GlobalFlags flag);
 std::string GetConfig();
 int GetOptimizationLevel();
 void SetOptimizationLevel(int optimizationLevel_);
+
+void SetCurrentProjectName(const std::u32string& currentProjectName_);
+std::u32string GetCurrentProjectName();
+void SetCurrentTooName(const std::u32string& currentToolName_);
+std::u32string GetCurrentToolName();
 
 } } // namespace cmajor::symbols
 

@@ -89,25 +89,6 @@ namespace devcore
             }
             return "\"" + s.ToString() + "\"";
         }
-        static public bool operator ==(JsonString left, JsonString right)
-        {
-            return left.value == right.value;
-        }
-        static public bool operator !=(JsonString left, JsonString right)
-        {
-            return !(left == right);
-        }
-        public override bool Equals(object obj)
-        {
-            if (obj == null) return false;
-            if (obj is JsonString) return this == (JsonString)obj;
-            return false;
-        }
-        public override int GetHashCode()
-        {
-            return value.GetHashCode();
-        }
-
         private string value;
     }
 
@@ -134,25 +115,6 @@ namespace devcore
             get { return this.value; }
             set { this.value = value; }
         }
-        static public bool operator ==(JsonNumber left, JsonNumber right)
-        {
-            return left.value == right.value;
-        }
-        static public bool operator !=(JsonNumber left, JsonNumber right)
-        {
-            return !(left == right);
-        }
-        public override bool Equals(object obj)
-        {
-            if (obj == null) return false;
-            if (obj is JsonNumber) return this == (JsonNumber)obj;
-            return false;
-        }
-        public override int GetHashCode()
-        {
-            return value.GetHashCode();
-        }
-
         private double value;
     }
 
@@ -179,25 +141,6 @@ namespace devcore
             get { return this.value; }
             set { this.value = value; }
         }
-        static public bool operator ==(JsonBool left, JsonBool right)
-        {
-            return left.value == right.value;
-        }
-        static public bool operator !=(JsonBool left, JsonBool right)
-        {
-            return !(left == right);
-        }
-        public override bool Equals(object obj)
-        {
-            if (obj == null) return false;
-            if (obj is JsonBool) return this == (JsonBool)obj;
-            return false;
-        }
-        public override int GetHashCode()
-        {
-            return value.GetHashCode();
-        }
-
         private bool value;
     }
 
@@ -217,17 +160,17 @@ namespace devcore
     {
         public JsonObject()
         {
-            fields = new Dictionary<JsonString, JsonValue>();
+            fields = new Dictionary<string, JsonValue>();
         }
         public override bool IsObject() 
         { 
             return true;
         }
-        public void AddField(JsonString name, JsonValue value)
+        public void AddField(string name, JsonValue value)
         {
             fields[name] = value;
         }
-        public JsonValue GetField(JsonString name)
+        public JsonValue GetField(string name)
         {
             if (fields.ContainsKey(name))
             {
@@ -240,7 +183,7 @@ namespace devcore
             StringBuilder s = new StringBuilder();
             s.Append("{");
             bool first = true;
-            foreach (KeyValuePair<JsonString, JsonValue> p in fields)
+            foreach (KeyValuePair<string, JsonValue> p in fields)
             {
                 if (first)
                 {
@@ -250,13 +193,12 @@ namespace devcore
                 {
                     s.Append(", ");
                 }
-                s.Append(p.Key.ToString()).Append(":").Append(p.Value.ToString());
+                s.Append(new JsonString(p.Key).ToString()).Append(":").Append(p.Value.ToString());
             }
             s.Append("}");
             return s.ToString();
         }
-
-        private Dictionary<JsonString, JsonValue> fields;
+        private Dictionary<string, JsonValue> fields;
     }
     public class JsonArray : JsonValue
     {
@@ -305,7 +247,6 @@ namespace devcore
             s.Append("]");
             return s.ToString();
         }
-
         private List<JsonValue> items;
     }
 }

@@ -1,0 +1,36 @@
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+using devcore;
+using server;
+
+namespace cmdevenv
+{
+    public partial class BuildOptionsDialog : Form
+    {
+        public BuildOptionsDialog()
+        {
+            InitializeComponent();
+        }
+        public bool EmitLlvm
+        {
+            get { return emitLlvmCheckBox.Checked; }
+            set { emitLlvmCheckBox.Checked = value; }
+        }
+        public bool EmitOptLlvm
+        {
+            get { return emitOptLlvmCheckBox.Checked; }
+            set { emitOptLlvmCheckBox.Checked = value; }
+        }
+        private void okButton_Click(object sender, EventArgs e)
+        {
+            DialogResult = System.Windows.Forms.DialogResult.OK;
+        }
+    }
+}

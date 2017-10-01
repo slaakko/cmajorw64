@@ -12,6 +12,7 @@ namespace cmajor { namespace parsing {
 
 void SetFileInfo(const std::vector<std::string>& files_);
 std::u32string GetErrorLines(const char32_t* start, const char32_t* end, const Span& span);
+void GetColumns(const char32_t* start, const char32_t* end, const Span& span, int32_t& startCol, int32_t& endCol);
 void ThrowException(const std::string& message, const Span& span);
 
 class ParsingException : public std::runtime_error

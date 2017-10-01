@@ -65,6 +65,17 @@ namespace devcore
         {
             return Path.ChangeExtension(filePath, ".cms.usr");
         }
+        public void AddProject(Project project)
+        {
+            foreach (Project p in projects)
+            { 
+                if (p.Name == project.Name)
+                {
+                    throw new Exception("solution '" + name + "' already has a project named '" + project.Name + "'");
+                }
+            }
+            projects.Add(project);
+        }
         public void Save()
         {
             projects.Sort();
@@ -106,6 +117,13 @@ namespace devcore
         }
         public void RenameProject(Project project, string newProjectName)
         {
+            foreach (Project p in projects)
+            {
+                if (p.Name == newProjectName)
+                {
+                    throw new Exception("solution '" + name + "' already has a project named '" + newProjectName + "'");
+                }
+            }
             string oldProjectName = project.Name;
             project.Rename(newProjectName);
         }

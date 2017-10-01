@@ -22,7 +22,7 @@ namespace parser
             ;
             
         Object : JsonObject
-            ::= '{'{ value = new JsonObject(); } ((String:name ':' Value:val){ value.AddField(name, val); } % ',')? '}'
+            ::= '{'{ value = new JsonObject(); } ((String:name ':' Value:val){ value.AddField(name.Value, val); } % ',')? '}'
             ;
             
         Array : JsonArray

@@ -13,6 +13,8 @@
 #include <cmajor/symbols/GlobalFlags.hpp>
 #include <cmajor/util/Util.hpp>
 #include <cmajor/util/Path.hpp>
+#include <cmajor/util/Json.hpp>
+#include <cmajor/util/Unicode.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/lexical_cast.hpp>
 #include <iostream>
@@ -43,9 +45,36 @@ const char* version = "2.0.0";
 void PrintHelp()
 {
     std::cout << "Cmajor compiler version " << version << " for Windows x64" << std::endl;
+    std::cout << "Usage: cmc [options] { project.cmp | solution.cms }" << std::endl;
+    std::cout << "Compiles given Cmajor solutions and projects." << std::endl;
+    std::cout << "Options:\n" <<
+        "--help (-h)\n" <<
+        "   print this help message\n" <<
+        "--config=CONFIG (c=CONFIG)\n" <<
+        "   set configuration to CONFIG (debug | release | profile)\n" <<
+        "   default is debug\n" <<
+        "--optimization-level=LEVEL (-O=LEVEL)\n" <<
+        "   set optimization level to LEVEL=0-3\n" <<
+        "   defaults: debug=0, release=3\n" <<
+        "--verbose (-v)\n" <<
+        "   print verbose messages\n" <<
+        "--quiet (-q)\n" <<
+        "   print no messages\n" <<
+        "--emit-llvm (-l)\n" <<
+        "   emit intermediate LLVM code to file.ll files\n" <<
+        "--emit-opt-llvm (-o)\n" <<
+        "   emit optimized intermediate LLVM code to file.opt.ll files\n" <<
+        "--clean (-e)\n" <<
+        "   clean given solutions and projects\n" <<
+        "--debug-parse (-p)\n" <<
+        "   debug parsing to stdout\n" <<
+        "--link-with-debug-runtime (-d)\n" <<
+        "   link with the debug version of the runtime library cmrt200(d).dll\n" <<
+        std::endl;
 }
 
 using namespace cmajor::util;
+using namespace cmajor::unicode;
 using namespace cmajor::symbols;
 using namespace cmajor::build;
 
@@ -82,6 +111,10 @@ int main(int argc, const char** argv)
                     else if (arg == "--clean" || arg == "-e")
                     {
                         SetGlobalFlag(GlobalFlags::clean);
+                    }
+                    else if (arg == "--ide" || arg == "-i")
+                    {
+                        SetGlobalFlag(GlobalFlags::ide);
                     }
                     else if (arg == "--debug-parse" || arg == "-p")
                     {
@@ -187,19 +220,46 @@ int main(int argc, const char** argv)
                     throw std::runtime_error("Argument '" + fp.generic_string() + "' has invalid extension. Not Cmajor solution (.cms) or project (.cmp) file.");
                 }
             }
+            std::unique_ptr<JsonObject> compileResult(new JsonObject());
+            compileResult->AddField(U"success", std::unique_ptr<JsonValue>(new JsonBool(true)));
+            std::cerr << compileResult->ToString() << std::endl;
         }
     }
     catch (const Exception& ex)
     {
-        if (!GetGlobalFlag(GlobalFlags::quiet))
+        if (!GetGlobalFlag(GlobalFlags::quiet) && !GetGlobalFlag(GlobalFlags::ide))
         {
             std::cerr << ex.What() << std::endl;
+        }
+        if (GetGlobalFlag(GlobalFlags::ide))
+        {
+            std::cout << ex.What() << std::endl;
+            std::unique_ptr<JsonObject> compileResult(new JsonObject());
+            compileResult->AddField(U"success", std::unique_ptr<JsonValue>(new JsonBool(false)));
+            compileResult->AddField(U"diagnostics", std::move(ex.ToJson()));
+            std::cerr << compileResult->ToString() << std::endl;
         }
         return 1;
     }
     catch (const std::exception& ex)
     {
-        std::cerr << ex.what() << std::endl;
+        if (!GetGlobalFlag(GlobalFlags::quiet) && !GetGlobalFlag(GlobalFlags::ide))
+        {
+            std::cerr << ex.what() << std::endl;
+        }
+        if (GetGlobalFlag(GlobalFlags::ide))
+        {
+            std::cout << ex.what() << std::endl;
+            std::unique_ptr<JsonObject> compileResult(new JsonObject());
+            compileResult->AddField(U"success", std::unique_ptr<JsonValue>(new JsonBool(false)));
+            std::unique_ptr<JsonObject> diagnostics(new JsonObject());
+            diagnostics->AddField(U"tool", std::unique_ptr<JsonValue>(new JsonString(GetCurrentToolName())));
+            diagnostics->AddField(U"kind", std::unique_ptr<JsonValue>(new JsonString(U"error")));
+            diagnostics->AddField(U"project", std::unique_ptr<JsonValue>(new JsonString(GetCurrentProjectName())));
+            diagnostics->AddField(U"message", std::unique_ptr<JsonValue>(new JsonString(ToUtf32(ex.what()))));
+            compileResult->AddField(U"diagnostics", std::move(diagnostics));
+            std::cerr << compileResult->ToString() << std::endl;
+        }
         return 1;
     }
     return 0;

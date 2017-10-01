@@ -65,9 +65,8 @@ namespace cmdevenv
                 descriptionColWidth = new IntField("descriptionColWidth", Fields);
                 fileColWidth = new IntField("fileColWidth", Fields);
                 lineColWidth = new IntField("lineColWidth", Fields);
-                startColumnColWidth = new IntField("startColumnColWidth", Fields);
-                endColumnColWidth = new IntField("endColumnColWidth", Fields);
                 projectColWidth = new IntField("projectColWidth", Fields);
+                textColWidth = new IntField("textColWidth", Fields);
                 findFileColWidth = new IntField("findFileColWidth", Fields);
                 findLineColWidth = new IntField("findLineColWidth", Fields);
                 findProjectColWidth = new IntField("findProjectColWidth", Fields);
@@ -81,6 +80,10 @@ namespace cmdevenv
                 maxRecentProjects = new IntField("maxRecentProjects", Fields);
                 maxRecentProjects.Value = 10;
                 recentProjects = new Array<RecentProject>("recentProjects", "recentProject", Fields);
+                emitLlvm = new BooleanField("emitLlvm", Fields);
+                emitLlvm.Value = false;
+                emitOptLlvm = new BooleanField("emitOptLlvm", Fields);
+                emitOptLlvm.Value = false;
             }
             public string CmcPath
             {
@@ -162,21 +165,15 @@ namespace cmdevenv
                 get { return lineColWidth.Value; }
                 set { lineColWidth.Value = value; }
             }
-            public int StartColumnColWidth
-            {
-                get { return startColumnColWidth.Value; }
-                set { startColumnColWidth.Value = value; }
-            }
-            public int EndColumnColWidth
-            {
-                get { return endColumnColWidth.Value; }
-                set { endColumnColWidth.Value = value; }
-            }
-
             public int ProjectColWidth
             {
                 get { return projectColWidth.Value; }
                 set { projectColWidth.Value = value; }
+            }
+            public int TextColWidth
+            {
+                get { return textColWidth.Value;  }
+                set { textColWidth.Value = value; }
             }
             public int FindFileColWidth
             {
@@ -222,6 +219,16 @@ namespace cmdevenv
             {
                 get { return recentProjects; }
             }
+            public bool EmitLlvm
+            {
+                get { return emitLlvm.Value; }
+                set { emitLlvm.Value = value; }
+            }
+            public bool EmitOptLlvm
+            {
+                get { return emitOptLlvm.Value; }
+                set { emitOptLlvm.Value = value; }
+            }
             private StringField cmc;
             private IntField tabSize;
             private IntField infoDelaySecs;
@@ -238,9 +245,8 @@ namespace cmdevenv
             private IntField descriptionColWidth;
             private IntField fileColWidth;
             private IntField lineColWidth;
-            private IntField startColumnColWidth;
-            private IntField endColumnColWidth;
             private IntField projectColWidth;
+            private IntField textColWidth;
             private IntField findFileColWidth;
             private IntField findLineColWidth;
             private IntField findProjectColWidth;
@@ -250,6 +256,8 @@ namespace cmdevenv
             private IntField verticalSplitterPos;
             private IntField maxRecentProjects;
             private Array<RecentProject> recentProjects;
+            private BooleanField emitLlvm;
+            private BooleanField emitOptLlvm;
         }
         public Configuration()
         {
@@ -343,20 +351,15 @@ namespace cmdevenv
             get { return config.LineColWidth; }
             set { config.LineColWidth = value; }
         }
-        public int StartColumnColWidth
-        {
-            get { return config.StartColumnColWidth; }
-            set { config.StartColumnColWidth = value; }
-        }
-        public int EndColumnColWidth
-        {
-            get { return config.EndColumnColWidth; }
-            set { config.EndColumnColWidth = value; }
-        }
         public int ProjectColWidth
         {
             get { return config.ProjectColWidth; }
             set { config.ProjectColWidth = value; }
+        }
+        public int TextColWidth
+        {
+            get { return config.TextColWidth; }
+            set { config.TextColWidth = value; }
         }
         public int FindFileColWidth
         {
@@ -407,6 +410,16 @@ namespace cmdevenv
             }
             return recentProjects;
         }
+        public bool EmitLlvm
+        {
+            get { return config.EmitLlvm; }
+            set { config.EmitLlvm = value; }
+        }
+        public bool EmitOptLlvm
+        {
+            get { return config.EmitOptLlvm; }
+            set { config.EmitOptLlvm = value; }
+        }
         public void RemoveRecentProjectPath(string recentProjectPath)
         {
             foreach (RecentProject project in config.RecentProjects.Items)
@@ -421,6 +434,11 @@ namespace cmdevenv
         public int NumRecentProjects
         {
             get { return config.RecentProjects.Items.Count; }
+        }
+        public void ClearRecentProjects()
+        {
+            config.RecentProjects.Clear();
+            Save();
         }
         public string GetRecentProjectPath(int index)
         {

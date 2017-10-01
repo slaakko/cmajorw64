@@ -248,6 +248,7 @@ void GenerateLibrary(const std::vector<std::string>& objectFilePaths, const std:
     {
         std::cout << "Creating library..." << std::endl;
     }
+    SetCurrentTooName(U"llvm-lib");
     std::vector<std::string> args;
     args.push_back("/out:" + QuotedPath(libraryFilePath));
     int n = objectFilePaths.size();
@@ -284,6 +285,7 @@ void Link(const std::string& executableFilePath, const std::vector<std::string>&
     {
         std::cout << "Linking..." << std::endl;
     }
+    SetCurrentTooName(U"lld-link");
     boost::filesystem::path bdp = executableFilePath;
     bdp.remove_filename();
     boost::filesystem::create_directories(bdp);
@@ -456,6 +458,8 @@ void BuildProject(Project* project)
     ReadTypeIdCounter(config);
     ReadFunctionIdCounter(config);
     CompileWarningCollection::Instance().SetCurrentProjectName(project->Name());
+    SetCurrentProjectName(project->Name());
+    SetCurrentTooName(U"cmc");
     std::vector<std::unique_ptr<CompileUnitNode>> compileUnits = ParseSources(project->SourceFilePaths());
     Module module(project->Name(), project->ModuleFilePath());
     std::unique_ptr<ModuleBinder> moduleBinder;
@@ -478,10 +482,6 @@ void BuildProject(Project* project)
             classType->SetSpecialMemberFunctions();
             classType->CreateLayouts();
         }
-    }
-    if (GetGlobalFlag(GlobalFlags::verbose))
-    {
-        std::cout << "Binding types..." << std::endl;
     }
     std::vector<std::unique_ptr<BoundCompileUnit>> boundCompileUnits = BindTypes(module, compileUnits);
     EmittingContext emittingContext;
@@ -507,10 +507,6 @@ void BuildProject(Project* project)
     }
     if (project->GetTarget() == Target::program)
     {
-        if (GetGlobalFlag(GlobalFlags::verbose))
-        {
-            std::cout << "Creating main unit..." << std::endl;
-        }
         if (!module.GetSymbolTable().MainFunctionSymbol())
         {
             throw std::runtime_error("program has no main function");

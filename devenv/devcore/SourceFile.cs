@@ -48,13 +48,13 @@ namespace devcore
             File.Move(filePath, newFilePath);
             filePath = master.util.io.PathUtil.MakeCanonicalPath(newFilePath);
         }
-        public string GetIntermediateCodePath(string config, string backEnd)
+        public string GetIntermediateCodePath(string config)
         {
-            return Path.ChangeExtension(Path.Combine(Path.Combine(Path.Combine(project.BasePath, config), backEnd), name), backEnd == "llvm" ? ".ll" : backEnd == "c" ? ".c" : "");
+            return Path.ChangeExtension(Path.Combine(Path.Combine(Path.Combine(project.BasePath, "lib"), config), name), ".ll");
         }
-        public string GetOptimizedIntermediateCodePath(string config, string backEnd)
+        public string GetOptimizedIntermediateCodePath(string config)
         {
-            return Path.ChangeExtension(Path.Combine(Path.Combine(Path.Combine(project.BasePath, config), backEnd), name), ".opt.ll");
+            return Path.ChangeExtension(Path.Combine(Path.Combine(Path.Combine(project.BasePath, "lib"), config), name), ".opt.ll");
         }
         private string name;
         private string filePath;

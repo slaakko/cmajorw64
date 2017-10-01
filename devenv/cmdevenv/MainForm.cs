@@ -10,6 +10,7 @@ using System.Windows.Forms;
 using System.IO;
 using devcore;
 using parser;
+using server;
 
 namespace cmdevenv
 {
@@ -23,6 +24,8 @@ namespace cmdevenv
         public MainForm()
         {
             InitializeComponent();
+            progressChars = "|/-\\";
+            progressIndex = 0;
             editorTabControl = new XTabControl();
             editorTabControl.Dock = System.Windows.Forms.DockStyle.Fill;
             editorTabControl.Location = new System.Drawing.Point(0, 0);
@@ -32,6 +35,28 @@ namespace cmdevenv
             editorTabControl.TabIndex = 0;
             editorTabControl.TabClosing += editorTabControl_TabClosing;
             editorSplitContainer.Panel1.Controls.Add(editorTabControl);
+            configComboBox.SelectedIndex = 0;
+            compiler = new Compiler();
+            compiler.CmcPath = Configuration.Instance.CmcPath;
+            compiler.SetWriteMethod(this, WriteOutputLine);
+            compiler.SetHandleCompileResultMethod(this, HandleCompileResult);
+            executor = new Executor();
+            executor.SetWriteMethod(this, WriteToConsole);
+            executor.SetExecuteReadyMethod(this, ProjectRun);
+            console = new ConsoleWindow(executor);
+            consoleTabPage.Controls.Add(console);
+            processRunning = false;
+            buildInProgress = false;
+            compileAborted = false;
+            emitLlvm = Configuration.Instance.EmitLlvm; ;
+            emitOptLlvm = Configuration.Instance.EmitOptLlvm;
+            optimizationLevel = -1;
+            errorListView.ContextMenuStrip = errorsListViewContextMenuStrip;
+            string[] args = Environment.GetCommandLineArgs();
+            if (args.Length > 1)
+            {
+                OpenProjectOrSolution(args[1]);
+            }
         }
         private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -70,6 +95,7 @@ namespace cmdevenv
                 {
                     Configuration.Instance.AddRecentProject(solutionFileName);
                     Configuration.Instance.Save();
+                    SetupRecentProjectMenu();
                     SolutionFile solutionFileParser = ParserRepository.Instance.SolutionFileParser;
                     solution = solutionFileParser.Parse(File.ReadAllText(solutionFileName), 0, solutionFileName);
                 }
@@ -78,9 +104,11 @@ namespace cmdevenv
                     ProjectFile projectFileParser = ParserRepository.Instance.ProjectFileParser;
                     Project project = projectFileParser.Parse(File.ReadAllText(projectOrSolutionName), 0, projectOrSolutionName);
                     solution = new Solution(project.Name, Path.ChangeExtension(project.FilePath, ".cms"));
-                    solution.Projects.Add(project);
+                    solution.AddProject(project);
                     solution.Save();
                     Configuration.Instance.AddRecentProject(solution.FilePath);
+                    Configuration.Instance.Save();
+                    SetupRecentProjectMenu();
                 }
                 await SetupSolutionExplorer(null);
                 SetMenuItemStatus();
@@ -167,9 +195,7 @@ namespace cmdevenv
             batchBuildToolStripMenuItem.Enabled = editing && solutionHasProjects;
             buildSolutionToolStripMenuItem.Enabled = editing && solutionHasProjects;
             buildToolStripMenuItem1.Enabled = editing && solutionHasProjects;
-            rebuildSolutionToolStripMenuItem.Enabled = editing && solutionHasProjects;
             buildActiveProjectToolStripMenuItem.Enabled = editing && activeProjectSet;
-            rebuildActiveProjectToolStripMenuItem.Enabled = editing && activeProjectSet;
             buildSolutionToolStripMenuItem.Enabled = editing && solutionHasProjects;
             cleanSolutionToolStripMenuItem.Enabled = editing && solutionHasProjects;
             cleanSolutionToolStripMenuItem2.Enabled = editing && solutionHasProjects;
@@ -184,19 +210,6 @@ namespace cmdevenv
             gotoLineToolStripMenuItem.Enabled = editorOpen;
             formatContentToolStripMenuItem.Enabled = editing && editorOpen;
             findToolStripMenuItem.Enabled = activeProjectSet && solution.ActiveProject.SourceFiles.Count > 0;
-            compileCurrentFileToolStripMenuItem.Enabled = false;
-            if (editing && editorOpen)
-            {
-                TabPage selectedTab = editorTabControl.SelectedTab;
-                if (selectedTab != null)
-                {
-                    Editor editor = (Editor)selectedTab.Tag;
-                    if (editor.SourceFile.GetKind() == SourceFile.Kind.cm)
-                    {
-                        compileCurrentFileToolStripMenuItem.Enabled = true;
-                    }
-                }
-            }
         }
         private async Task<bool> CloseSolution()
         {
@@ -225,23 +238,6 @@ namespace cmdevenv
         private void SetState(State state)
         {
             this.state = state;
-            foreach (TabPage editorTabPage in editorTabControl.TabPages)
-            {
-                Editor editor = (Editor)editorTabPage.Tag;
-                if (editor != null)
-                {
-/*
-                    if (this.state == State.editing)
-                    {
-                        editor.Mode = EditorMode.editing;
-                    }
-                    else if (this.state == State.debugging)
-                    {
-                        editor.Mode = EditorMode.debugging;
-                    }
-*/
-                }
-            }
             SetMenuItemStatus();
         }
         private void MainForm_Shown(object sender, EventArgs e)
@@ -261,9 +257,8 @@ namespace cmdevenv
                 if (Configuration.Instance.DescriptionColWidth != 0) descriptionColumnHeader.Width = Configuration.Instance.DescriptionColWidth;
                 if (Configuration.Instance.FileColWidth != 0) fileColumnHeader.Width = Configuration.Instance.FileColWidth;
                 if (Configuration.Instance.LineColWidth != 0) lineColumnHeader.Width = Configuration.Instance.LineColWidth;
-                if (Configuration.Instance.StartColumnColWidth != 0) startColColumnHeader.Width = Configuration.Instance.StartColumnColWidth;
-                if (Configuration.Instance.EndColumnColWidth != 0) endColColumnHeader.Width = Configuration.Instance.EndColumnColWidth;
                 if (Configuration.Instance.ProjectColWidth != 0) projectColumnHeader.Width = Configuration.Instance.ProjectColWidth;
+                if (Configuration.Instance.TextColWidth != 0) textColumnHeader.Width = Configuration.Instance.TextColWidth;
                 if (Configuration.Instance.FindFileColWidth != 0) findFileColumnHeader.Width = Configuration.Instance.FindFileColWidth;
                 if (Configuration.Instance.FindLineColWidth != 0) findLineColumnHeader.Width = Configuration.Instance.FindLineColWidth;
                 if (Configuration.Instance.FindProjectColWidth != 0) findProjectColumnHeader.Width = Configuration.Instance.FindProjectColWidth;
@@ -290,6 +285,7 @@ namespace cmdevenv
                 List<string> recentProjects = Configuration.Instance.GetRecentProjectPaths();
                 int n = recentProjects.Count;
                 recentProjectsToolStripMenuItem.Enabled = n != 0;
+                clearRecentProjectsToolStripMenuItem.Enabled = n != 0;
                 for (int i = 0; i < n; ++i)
                 {
                     ToolStripMenuItem recentProjectItem = new ToolStripMenuItem((i + 1).ToString() + " " + recentProjects[i]);
@@ -476,7 +472,15 @@ namespace cmdevenv
                         Project project = solution.GetProject(projectName);
                         if (project != null)
                         {
-                            solution.RenameProject(project, e.Label);
+                            try
+                            {
+                                solution.RenameProject(project, e.Label);
+                            }
+                            catch (Exception ex)
+                            {
+                                e.CancelEdit = true;
+                                throw;
+                            }
                             solution.Save();
                         }
                         else
@@ -646,9 +650,908 @@ namespace cmdevenv
                 MessageBox.Show(ex.Message);
             }
         }
+        private void WriteOutputLine(string line)
+        {
+            outputRichTextBox.AppendText(line + Environment.NewLine);
+            outputRichTextBox.ScrollToCaret();
+        }
+        private void WriteToConsole(string chars)
+        {
+            console.Write(chars);
+        }
+        private void ProjectRun()
+        {
+            abortToolStripMenuItem.Enabled = false;
+            processRunning = false;
+            console.ReadOnly = true;
+            SetState(State.editing);
+        }
+        private void exitToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                Configuration.Instance.Save();
+                Application.Exit();
+                SetMenuItemStatus();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+        private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            try
+            {
+                foreach (TabPage editorTab in editorTabControl.TabPages)
+                {
+                    Editor editor = (Editor)editorTab.Tag;
+                    DialogResult result = editor.Close();
+                    if (result == DialogResult.Cancel)
+                    {
+                        e.Cancel = true;
+                        return;
+                    }
+                }
+                compiler.DoExit();
+                compiler.WaitForExit();
+                executor.DoExit();
+                executor.WaitForExit();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+        private void SaveAll()
+        {
+            try
+            {
+                if (solution != null)
+                {
+                    solution.Save();
+                    foreach (TabPage editorTab in editorTabControl.TabPages)
+                    {
+                        Editor editor = (Editor)editorTab.Tag;
+                        editor.Save();
+                    }
+                }
+                Configuration.Instance.Save();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+        private async void newProjectSolutionToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                NewProjectDialog dialog = new NewProjectDialog(true, solution != null);
+                string cmajorProjectsDir = Environment.GetEnvironmentVariable("CMAJOR_ROOT") + "\\projects";
+                if (!Directory.Exists(cmajorProjectsDir))
+                {
+                    Directory.CreateDirectory(cmajorProjectsDir);
+                }
+                dialog.ProjectLocation = solution != null ? solution.BasePath : cmajorProjectsDir;
+                DialogResult result = dialog.ShowDialog();
+                if (result == DialogResult.OK)
+                {
+                    if (dialog.NewSolution || dialog.SelectedProjectType == ProjectType.blankSolution)
+                    {
+                        if (solution != null)
+                        {
+                            if (!await CloseSolution())
+                            {
+                                return;
+                            }
+                        }
+                    }
+                    if (dialog.SelectedProjectType == ProjectType.blankSolution)
+                    {
+                        string solutionName = Path.GetFileNameWithoutExtension(dialog.ProjectName);
+                        string solutionFilePath = Path.Combine(Path.Combine(dialog.ProjectLocation, solutionName), solutionName + ".cms");
+                        Directory.CreateDirectory(Path.GetDirectoryName(solutionFilePath));
+                        solution = new Solution(solutionName, solutionFilePath);
+                        await SetupSolutionExplorer(null);
+                        Configuration.Instance.AddRecentProject(solutionFilePath);
+                        Configuration.Instance.Save();
+                        SetupRecentProjectMenu();
+                    }
+                    else
+                    {
+                        string projectName = dialog.ProjectName;
+                        if (projectName.EndsWith(".cmp") || projectName.EndsWith(".cms"))
+                        {
+                            projectName = projectName.Remove(projectName.Length - 4);
+                        }
+                        string solutionDirectory = Path.Combine(dialog.ProjectLocation, projectName);
+                        Directory.CreateDirectory(solutionDirectory);
+                        if (dialog.NewSolution)
+                        {
+                            string solutionName = projectName;
+                            string solutionFilePath = Path.Combine(solutionDirectory, solutionName + ".cms");
+                            solution = new Solution(solutionName, solutionFilePath);
+                            await SetupSolutionExplorer(null);
+                            Configuration.Instance.AddRecentProject(solutionFilePath);
+                            Configuration.Instance.Save();
+                            SetupRecentProjectMenu();
+                        }
+                        Project project = new Project(projectName, Path.Combine(solutionDirectory, projectName + ".cmp"));
+                        if (dialog.SelectedProjectType == ProjectType.consoleApp)
+                        {
+                            project.Target = Target.program;
+                        }
+                        else if (dialog.SelectedProjectType == ProjectType.library)
+                        {
+                            project.Target = Target.library;
+                        }
+                        solution.AddProject(project);
+                        TreeNode solutionNode = solutionExplorerTreeView.Nodes[0];
+                        TreeNode projectNode = solutionNode.Nodes.Add(project.Name);
+                        projectNode.Tag = project;
+                        projectNode.ContextMenuStrip = projectContextMenuStrip;
+                    }
+                    await SetupSolutionExplorer(null);
+                    solution.Save();
+                }
+                SetMenuItemStatus();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+        private async void newSourceFileToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                Project project = (Project)solutionExplorerTreeView.SelectedNode.Tag;
+                NewSourceFileDialog dialog = new NewSourceFileDialog();
+                dialog.SourceFileName = "file1.cm";
+                if (dialog.ShowDialog() == DialogResult.OK)
+                {
+                    string sourceFileName = dialog.SourceFileName;
+                    SourceFile.Kind kind = SourceFile.Kind.cm;
+                    if (!sourceFileName.EndsWith(".cm"))
+                    {
+                        kind = SourceFile.Kind.text;
+                    }
+                    SourceFile sourceFile = project.AddSourceFile(sourceFileName, kind);
+                    using (StreamWriter writer = File.CreateText(sourceFile.FilePath))
+                    {
+                    }
+                    solution.Save();
+                    await SetupSolutionExplorer(project);
+                    SetMenuItemStatus();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+        private void buildSolutionToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            BuildSolution();
+        }
+        private void buildToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            BuildSolution();
+        }
+        private void buildActiveProjectToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            BuildProject(solution.ActiveProject);
+        }
+        private void buildToolStripMenuItem2_Click(object sender, EventArgs e)
+        {
+            TreeNode selectedNode = solutionExplorerTreeView.SelectedNode;
+            if (selectedNode != null)
+            {
+                Project selectedProject = selectedNode.Tag as Project;
+                if (selectedProject != null)
+                {
+                    BuildProject(selectedProject);
+                }
+            }
+        }
+        private void BuildSolution()
+        {
+            try
+            {
+                if (processRunning)
+                {
+                    throw new Exception("Cannot build while process is running");
+                }
+                if (state == State.debugging)
+                {
+                    throw new Exception("Stop debugging before building");
+                }
+                SaveAll();
+                progressTimer.Start();
+                outputRichTextBox.Clear();
+                errorListView.Items.Clear();
+                showErrorDescriptionInTextWindowToolStripMenuItem.Enabled = false;
+                buildSolutionToolStripMenuItem.Enabled = false;
+                buildToolStripMenuItem1.Enabled = false;
+                buildActiveProjectToolStripMenuItem.Enabled = false;
+                outputTabControl.SelectedTab = outputTabPage;
+                if (solution != null && solution.Projects.Count > 0)
+                {
+                    string config = configComboBox.Text;
+                    compileStartTime = DateTime.Now;
+                    compileTimer.Start();
+                    cancelToolStripMenuItem.Enabled = true;
+                    buildInProgress = true;
+                    SetState(State.compiling);
+                    compiler.DoCompile(solution.FilePath, config, emitLlvm, emitOptLlvm, optimizationLevel);
+                    infoLabel.Text = "Building";
+                }
+            }
+            catch (Exception ex)
+            {
+                SetState(State.editing);
+                MessageBox.Show(ex.Message);
+            }
+        }
+        private void BuildProject(Project project)
+        {
+            try
+            {
+                if (processRunning)
+                {
+                    throw new Exception("Cannot build while process is running");
+                }
+                SaveAll();
+                progressTimer.Start();
+                outputRichTextBox.Clear();
+                errorListView.Items.Clear();
+                showErrorDescriptionInTextWindowToolStripMenuItem.Enabled = false;
+                buildSolutionToolStripMenuItem.Enabled = false;
+                buildToolStripMenuItem1.Enabled = false;
+                buildActiveProjectToolStripMenuItem.Enabled = false;
+                outputTabControl.SelectedTab = outputTabPage;
+                string config = configComboBox.Text;
+                compileStartTime = DateTime.Now;
+                compileTimer.Start();
+                cancelToolStripMenuItem.Enabled = true;
+                buildInProgress = true;
+                SetState(State.compiling);
+                compiler.DoCompile(project.FilePath, config, emitLlvm, emitOptLlvm, optimizationLevel);
+                infoLabel.Text = "Building";
+            }
+            catch (Exception ex)
+            {
+                SetState(State.editing);
+                MessageBox.Show(ex.Message);
+            }
+        }
+        private void HandleCompileResult(CompileResult compileResult)
+        {
+            cancelToolStripMenuItem.Enabled = false;
+            buildInProgress = false;
+            compileTimer.Stop();
+            compileTimeStatusLabel.Text = "";
+            progressTimer.Stop();
+            progressLabel.Text = "";
+            bool hasErrors = !compileResult.Success;
+            bool hasWarningsOrInfos = false;
+            if (hasErrors || hasWarningsOrInfos)
+            {
+                if (hasErrors)
+                {
+                    if (compiling)
+                    {
+                        compiling = false;
+                        infoLabel.Text = "Compile failed";
+                    }
+                    else if (cleaning)
+                    {
+                        cleaning = false;
+                        infoLabel.Text = "Clean failed";
+                    }
+                    else
+                    {
+                        infoLabel.Text = "Build failed";
+                    }
+                }
+                else
+                {
+                    if (compileAborted)
+                    {
+                        compileAborted = false;
+                        infoLabel.Text = "Compile aborted";
+                    }
+                    else if (compiling)
+                    {
+                        compiling = false;
+                        infoLabel.Text = "Compile succeeded";
+                    }
+                    else if (cleaning)
+                    {
+                        cleaning = false;
+                        infoLabel.Text = "Clean succeeded";
+                    }
+                    else
+                    {
+                        infoLabel.Text = "Build succeeded";
+                    }
+                }
+                Diagnostics diagnostics = compileResult.Diagnostics;
+                if (diagnostics != null)
+                {
+                    string tool = diagnostics.Tool;
+                    string file = "";
+                    string line = "";
+                    string text = "";
+                    Reference mainReference = null;
+                    if (diagnostics.References.Count > 0)
+                    {
+                        mainReference = diagnostics.References[0];
+                        file = mainReference.File;
+                        if (mainReference.Line != 0)
+                        {
+                            line = mainReference.Line.ToString();
+                        }
+                        else
+                        {
+                            line = "";
+                        }
+                        text = mainReference.Text.Trim();
+                    }
+                    ListViewItem item = new ListViewItem(new string[] { tool, diagnostics.Kind, diagnostics.Message, file, line, diagnostics.Project, text });
+                    item.Tag = mainReference;
+                    errorListView.Items.Add(item);
+                    for (int i = 1; i < diagnostics.References.Count; ++i)
+                    {
+                        Reference reference = diagnostics.References[i];
+                        file = reference.File;
+                        if (reference.Line != 0)
+                        {
+                            line = reference.Line.ToString();
+                        }
+                        else
+                        {
+                            line = "";
+                        }
+                        text = reference.Text.Trim();
+                        ListViewItem refItem = new ListViewItem(new string[] { "cmc", "info", "see reference to", file, line, "", text });
+                        refItem.Tag = reference;
+                        errorListView.Items.Add(refItem);
+                    }
+                    showErrorDescriptionInTextWindowToolStripMenuItem.Enabled = true;
+                }
+                outputTabControl.SelectedTab = errorTabPage;
+            }
+            else
+            {
+                if (compileAborted)
+                {
+                    compileAborted = false;
+                    infoLabel.Text = "Compile aborted";
+                }
+                else if (compiling)
+                {
+                    compiling = false;
+                    infoLabel.Text = "Compile succeeded";
+                }
+                else if (cleaning)
+                {
+                    cleaning = false;
+                    infoLabel.Text = "Clean succeeded";
+                }
+                else
+                {
+                    infoLabel.Text = "Build succeeded";
+                }
+            }
+            infoTimer.Start();
+            SetState(State.editing);
+        }
+        private void showErrorDescriptionInTextWindowToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                if (errorListView.SelectedItems.Count > 0)
+                {
+                    ListViewItem item = errorListView.SelectedItems[0];
+                    string description = item.SubItems[2].Text;
+                    TextVisualizerForm form = new TextVisualizerForm();
+                    form.Text = "Error Description";
+                    form.Left = Configuration.Instance.TextVisX;
+                    form.Top = Configuration.Instance.TextVisY;
+                    form.Width = Configuration.Instance.TextVisW;
+                    form.Height = Configuration.Instance.TextVisH;
+                    form.TextContent = description;
+                    form.ShowDialog();
+                    Configuration.Instance.TextVisX = form.Left;
+                    Configuration.Instance.TextVisY = form.Top;
+                    Configuration.Instance.TextVisW = form.Width;
+                    Configuration.Instance.TextVisH = form.Height;
+                    Configuration.Instance.Save();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+        private void errorListView_ItemActivate(object sender, EventArgs e)
+        {
+            try
+            {
+                if (errorListView.SelectedItems.Count > 0)
+                {
+                    ListViewItem selectedItem = errorListView.SelectedItems[0];
+                    string projectName = selectedItem.SubItems[5].Text;
+                    Reference reference = (Reference)selectedItem.Tag;
+                    if (reference != null)
+                    {
+                        string filePath = reference.File;
+                        if (!string.IsNullOrEmpty(filePath))
+                        {
+                            SourceFile sourceFile = solution.GetSourceFileByPath(filePath);
+                            if (sourceFile == null)
+                            {
+                                sourceFile = new SourceFile(Path.GetFileName(filePath), filePath, (filePath.EndsWith(".cm") ? SourceFile.Kind.cm : SourceFile.Kind.text));
+                            }
+                            Editor editor = EditSourceFile(sourceFile);
+                            int line = reference.Line;
+                            if (line != 0)
+                            {
+                                int startCol = reference.StartCol;
+                                int endCol = reference.EndCol;
+                                if (startCol != 0 && endCol == 0 || startCol == endCol)
+                                {
+                                    endCol = startCol + 1;
+                                }
+                                LineCol startLineCol = new LineCol(line, startCol);
+                                LineCol endLineCol = new LineCol(line, endCol);
+                                editor.SetCursorPos(line, 1);
+                                editor.SetHilite(startLineCol, endLineCol, Editor.Hilite.errorPos);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+        private void progressTimer_Tick(object sender, EventArgs e)
+        {
+            progressLabel.Text = new string(progressChars[progressIndex], 1);
+            progressIndex = (progressIndex + 1) % progressChars.Length;
+        }
+        private void errorListView_ColumnWidthChanged(object sender, ColumnWidthChangedEventArgs e)
+        {
+            try
+            {
+                switch (e.ColumnIndex)
+                {
+                    case 0: Configuration.Instance.ToolColWidth = errorListView.Columns[0].Width; break;
+                    case 1: Configuration.Instance.CategoryColWidth = errorListView.Columns[1].Width; break;
+                    case 2: Configuration.Instance.DescriptionColWidth = errorListView.Columns[2].Width; break;
+                    case 3: Configuration.Instance.FileColWidth = errorListView.Columns[3].Width; break;
+                    case 4: Configuration.Instance.LineColWidth = errorListView.Columns[4].Width; break;
+                    case 5: Configuration.Instance.ProjectColWidth = errorListView.Columns[5].Width; break;
+                    case 6: Configuration.Instance.TextColWidth = errorListView.Columns[6].Width; break;
+                }
+                Configuration.Instance.Save();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+        private void saveAllToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                SaveAll();
+                SetMenuItemStatus();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+        private void saveToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                TabPage editorTab = editorTabControl.SelectedTab;
+                if (editorTab != null)
+                {
+                    Editor editor = (Editor)editorTab.Tag;
+                    editor.Save();
+                }
+                SetMenuItemStatus();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+        private void closeToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                TabPage editorTab = editorTabControl.SelectedTab;
+                if (editorTab != null)
+                {
+                    Editor editor = (Editor)editorTab.Tag;
+                    DialogResult result = editor.Close();
+                    if (result == DialogResult.Cancel)
+                    {
+                        return;
+                    }
+                    editorTabControl.TabPages.RemoveAt(editorTabControl.SelectedIndex);
+                }
+                SetMenuItemStatus();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+        private void optionsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                BuildOptionsDialog dialog = new BuildOptionsDialog();
+                emitLlvm = Configuration.Instance.EmitLlvm;
+                emitOptLlvm = Configuration.Instance.EmitOptLlvm;
+                dialog.EmitLlvm = emitLlvm;
+                dialog.EmitOptLlvm = emitOptLlvm;
+                if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                {
+                    emitLlvm = dialog.EmitLlvm;
+                    emitOptLlvm = dialog.EmitOptLlvm;
+                    Configuration.Instance.EmitLlvm = emitLlvm;
+                    Configuration.Instance.EmitOptLlvm = emitOptLlvm;
+                    Configuration.Instance.Save();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+        private void intermediateCodeToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                SourceFile sourceFile = (SourceFile)solutionExplorerTreeView.SelectedNode.Tag;
+                string intermediateCodePath = sourceFile.GetIntermediateCodePath(configComboBox.Text);
+                EditSourceFile(new SourceFile(Path.GetFileName(intermediateCodePath), intermediateCodePath, SourceFile.Kind.text));
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+        private void optimizedIntermediateCodeToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                SourceFile sourceFile = (SourceFile)solutionExplorerTreeView.SelectedNode.Tag;
+                string optimizedIntermediateCodePath = sourceFile.GetOptimizedIntermediateCodePath(configComboBox.Text);
+                EditSourceFile(new SourceFile(Path.GetFileName(optimizedIntermediateCodePath), optimizedIntermediateCodePath, SourceFile.Kind.text));
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+        private void viewFileToolStripMenuItem_DropDownOpened(object sender, EventArgs e)
+        {
+            try
+            {
+                SourceFile sourceFile = (SourceFile)solutionExplorerTreeView.SelectedNode.Tag;
+                string intermediateCodePath = sourceFile.GetIntermediateCodePath(configComboBox.Text);
+                intermediateCodeToolStripMenuItem.Enabled = File.Exists(intermediateCodePath);
+                string optimizedIntermediateCodePath = sourceFile.GetOptimizedIntermediateCodePath(configComboBox.Text);
+                optimizedIntermediateCodeToolStripMenuItem.Enabled = File.Exists(optimizedIntermediateCodePath);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+        private void cleanSolutionToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            CleanProjectOrSolution(solution.FilePath);
+        }
+        private void cleanSolutionToolStripMenuItem2_Click(object sender, EventArgs e)
+        {
+            CleanProjectOrSolution(solution.FilePath);
+        }
+        private void CleanProjectOrSolution(string solutionOrProjectFilePath)
+        {
+            try
+            {
+                if (state == State.debugging)
+                {
+                    throw new Exception("Stop debugging before cleaning");
+                }
+                string config = configComboBox.Text;
+                SaveAll();
+                progressTimer.Start();
+                outputRichTextBox.Clear();
+                errorListView.Items.Clear();
+                showErrorDescriptionInTextWindowToolStripMenuItem.Enabled = false;
+                buildSolutionToolStripMenuItem.Enabled = false;
+                buildToolStripMenuItem1.Enabled = false;
+                buildActiveProjectToolStripMenuItem.Enabled = false;
+                outputTabControl.SelectedTab = outputTabPage;
+                cleaning = true;
+                cancelToolStripMenuItem.Enabled = true;
+                buildInProgress = true;
+                SetState(State.compiling);
+                compiler.DoClean(solutionOrProjectFilePath, config);
+                infoLabel.Text = "Cleaning";
+            }
+            catch (Exception ex)
+            {
+                SetState(State.editing);
+                MessageBox.Show(ex.Message);
+            }
+        }
+        private void cleanActiveProjectToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            CleanProjectOrSolution(solution.ActiveProject.FilePath);
+        }
+        private void cleanProjectToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            TreeNode selectedNode = solutionExplorerTreeView.SelectedNode;
+            if (selectedNode != null)
+            {
+                Project selectedProject = selectedNode.Tag as Project;
+                if (selectedProject != null)
+                {
+                    CleanProjectOrSolution(selectedProject.FilePath);
+                }
+            }
+        }
+        private void closeAllToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                foreach (TabPage editorTab in editorTabControl.TabPages)
+                {
+                    Editor editor = (Editor)editorTab.Tag;
+                    DialogResult result = editor.Close();
+                    if (result == DialogResult.Cancel)
+                    {
+                        break;
+                    }
+                    editorTabControl.TabPages.Remove(editorTab);
+                }
+                SetMenuItemStatus();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+        private async void existingSourceFileToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                Project project = (Project)solutionExplorerTreeView.SelectedNode.Tag;
+                addExistingSourceFileDialog.InitialDirectory = project.BasePath;
+                if (addExistingSourceFileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    string fileName = addExistingSourceFileDialog.FileName;
+                    SourceFile.Kind kind = SourceFile.Kind.cm;
+                    if (!fileName.EndsWith(".cm"))
+                    {
+                        kind = SourceFile.Kind.text;
+                    }
+                    project.AddSourceFile(fileName, kind);
+                    solution.Save();
+                    await SetupSolutionExplorer(project);
+                    SetMenuItemStatus();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+        private async void newProjectToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                NewProjectDialog dialog = new NewProjectDialog(false, solution != null);
+                dialog.ProjectLocation = solution.BasePath;
+                DialogResult result = dialog.ShowDialog();
+                if (result == DialogResult.OK)
+                {
+                    string projectName = dialog.ProjectName;
+                    if (projectName.EndsWith(".cmp"))
+                    {
+                        projectName = projectName.Remove(projectName.Length - 4);
+                    }
+                    Project project = new Project(projectName, Path.Combine(Path.Combine(dialog.ProjectLocation, projectName), projectName + ".cmp"));
+                    Directory.CreateDirectory(Path.GetDirectoryName(project.FilePath));
+                    if (dialog.SelectedProjectType == ProjectType.consoleApp)
+                    {
+                        project.Target = Target.program;
+                    }
+                    else if (dialog.SelectedProjectType == ProjectType.library)
+                    {
+                        project.Target = Target.library;
+                    }
+                    solution.AddProject(project);
+                    TreeNode solutionNode = solutionExplorerTreeView.Nodes[0];
+                    TreeNode projectNode = solutionNode.Nodes.Add(project.Name);
+                    projectNode.Tag = project;
+                    projectNode.ContextMenuStrip = projectContextMenuStrip;
+                    solution.Save();
+                    await SetupSolutionExplorer(null);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+        private async void existingProjectToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                addExistingProjectFileDialog.InitialDirectory = solution.BasePath;
+                if (addExistingProjectFileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    ProjectFile projectFileParser = ParserRepository.Instance.ProjectFileParser;
+                    Project project = projectFileParser.Parse(File.ReadAllText(addExistingProjectFileDialog.FileName), 0, addExistingProjectFileDialog.FileName);
+                    solution.AddProject(project);
+                    TreeNode solutionNode = solutionExplorerTreeView.Nodes[0];
+                    TreeNode projectNode = solutionNode.Nodes.Add(project.Name);
+                    projectNode.Tag = project;
+                    projectNode.ContextMenuStrip = projectContextMenuStrip;
+                    solution.Save();
+                    await SetupSolutionExplorer(null);
+                    SetMenuItemStatus();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+        private void renameToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            solutionExplorerTreeView.SelectedNode.BeginEdit();
+        }
+        private async void removeToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                TreeNode node = solutionExplorerTreeView.SelectedNode;
+                Project toRemove = (Project)node.Tag;
+                if (MessageBox.Show("'" + toRemove.Name + "' will be removed.", "Cmajor Development Environment", MessageBoxButtons.OKCancel) == DialogResult.OK)
+                {
+                    solution.RemoveProject(toRemove);
+                    solution.Save();
+                    await SetupSolutionExplorer(null);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+        private void moduleContentToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                TreeNode selectedNode = solutionExplorerTreeView.SelectedNode;
+                if (selectedNode != null)
+                {
+                    Project selectedProject = selectedNode.Tag as Project;
+                    if (selectedProject != null)
+                    {
+                        string moduleFilePath = selectedProject.GetModuleFilePath(configComboBox.Text);
+                        System.Diagnostics.ProcessStartInfo startInfo = new System.Diagnostics.ProcessStartInfo("cmmdump.exe", moduleFilePath);
+                        startInfo.UseShellExecute = false;
+                        startInfo.CreateNoWindow = true;
+                        startInfo.RedirectStandardOutput = true;
+                        startInfo.RedirectStandardError = true;
+                        System.Diagnostics.Process cmlDump = System.Diagnostics.Process.Start(startInfo);
+                        string output = cmlDump.StandardOutput.ReadToEnd();
+                        string errorText = cmlDump.StandardError.ReadToEnd();
+                        cmlDump.WaitForExit();
+                        if (cmlDump.ExitCode != 0)
+                        {
+                            throw new Exception(errorText);
+                        }
+                        else
+                        {
+                            string cmmTextFilePath = moduleFilePath + ".txt";
+                            using (StreamWriter writer = File.CreateText(cmmTextFilePath))
+                            {
+                                writer.Write(output);
+                            }
+                            EditSourceFile(new SourceFile(selectedProject.Name + ".cmm", cmmTextFilePath, SourceFile.Kind.text));
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+        private async void newTextFileToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                Project project = (Project)solutionExplorerTreeView.SelectedNode.Tag;
+                NewTextFileDialog dialog = new NewTextFileDialog();
+                dialog.TextFileName = "file1.txt";
+                if (dialog.ShowDialog() == DialogResult.OK)
+                {
+                    string textFileName = dialog.TextFileName;
+                    SourceFile.Kind kind = SourceFile.Kind.text;
+                    SourceFile sourceFile = project.AddSourceFile(textFileName, kind);
+                    using (StreamWriter writer = File.CreateText(sourceFile.FilePath))
+                    {
+                    }
+                    solution.Save();
+                    await SetupSolutionExplorer(project);
+                    SetMenuItemStatus();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+        private void clearRecentProjectsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                Configuration.Instance.ClearRecentProjects();
+                SetupRecentProjectMenu();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+        private async void systemLibraryToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                string cmajorRootDir = Environment.GetEnvironmentVariable("CMAJOR_ROOT");
+                await OpenProjectOrSolution(Path.Combine(Path.Combine(cmajorRootDir, "system"), "System.cms")); ;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
         private Solution solution;
         private XTabControl editorTabControl;
         private State state;
         private bool alterConfig;
+        private Compiler compiler;
+        private Executor executor;
+        private ConsoleWindow console;
+        private bool buildInProgress;
+        private string progressChars;
+        private int progressIndex;
+        private bool processRunning;
+        private bool compileAborted;
+        private bool compiling;
+        private bool cleaning;
+        private bool emitLlvm;
+        private bool emitOptLlvm;
+        private int optimizationLevel;
+        private DateTime compileStartTime;
     }
 }

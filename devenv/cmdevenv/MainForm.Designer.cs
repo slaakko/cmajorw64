@@ -47,6 +47,7 @@ namespace cmdevenv
             this.cmparsergenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator6 = new System.Windows.Forms.ToolStripSeparator();
             this.recentProjectsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.clearRecentProjectsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.editToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -55,17 +56,13 @@ namespace cmdevenv
             this.formatContentToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.buildToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.buildSolutionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.rebuildSolutionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.cleanSolutionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem16 = new System.Windows.Forms.ToolStripSeparator();
             this.buildActiveProjectToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.rebuildActiveProjectToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.cleanActiveProjectToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem12 = new System.Windows.Forms.ToolStripSeparator();
             this.batchBuildToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem4 = new System.Windows.Forms.ToolStripSeparator();
-            this.compileCurrentFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.cancelToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
             this.optionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -112,9 +109,8 @@ namespace cmdevenv
             this.descriptionColumnHeader = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.fileColumnHeader = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.lineColumnHeader = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.startColColumnHeader = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.endColColumnHeader = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.projectColumnHeader = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.textColumnHeader = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.findResultsTabPage = new System.Windows.Forms.TabPage();
             this.findResultsListView = new System.Windows.Forms.ListView();
             this.findFileColumnHeader = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
@@ -125,7 +121,6 @@ namespace cmdevenv
             this.openProjectDialog = new System.Windows.Forms.OpenFileDialog();
             this.solutionContextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.buildToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
-            this.rebuildToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.cleanSolutionToolStripMenuItem2 = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem5 = new System.Windows.Forms.ToolStripSeparator();
             this.addToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -139,7 +134,6 @@ namespace cmdevenv
             this.closeToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.projectContextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.buildToolStripMenuItem2 = new System.Windows.Forms.ToolStripMenuItem();
-            this.rebuildToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.cleanProjectToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem8 = new System.Windows.Forms.ToolStripSeparator();
             this.addToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
@@ -159,9 +153,8 @@ namespace cmdevenv
             this.projectPropertiesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator5 = new System.Windows.Forms.ToolStripSeparator();
             this.viewProjectToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.libraryInterfaceToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.moduleContentToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.sourceFileContextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.compileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.openToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.removeToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.deleteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -178,6 +171,12 @@ namespace cmdevenv
             this.padLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.lineLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.colLabel = new System.Windows.Forms.ToolStripStatusLabel();
+            this.compileTimer = new System.Windows.Forms.Timer(this.components);
+            this.progressTimer = new System.Windows.Forms.Timer(this.components);
+            this.errorsListViewContextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.showErrorDescriptionInTextWindowToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.addExistingSourceFileDialog = new System.Windows.Forms.OpenFileDialog();
+            this.addExistingProjectFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.editorSplitContainer)).BeginInit();
             this.editorSplitContainer.Panel2.SuspendLayout();
@@ -190,6 +189,7 @@ namespace cmdevenv
             this.projectContextMenuStrip.SuspendLayout();
             this.sourceFileContextMenuStrip.SuspendLayout();
             this.statusStrip1.SuspendLayout();
+            this.errorsListViewContextMenuStrip.SuspendLayout();
             this.SuspendLayout();
             // 
             // menuStrip1
@@ -222,6 +222,7 @@ namespace cmdevenv
             this.toolStripMenuItem14,
             this.toolStripSeparator6,
             this.recentProjectsToolStripMenuItem,
+            this.clearRecentProjectsToolStripMenuItem,
             this.toolStripSeparator1,
             this.exitToolStripMenuItem});
             this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
@@ -234,6 +235,7 @@ namespace cmdevenv
             this.newProjectSolutionToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.N)));
             this.newProjectSolutionToolStripMenuItem.Size = new System.Drawing.Size(244, 22);
             this.newProjectSolutionToolStripMenuItem.Text = "&New Project...";
+            this.newProjectSolutionToolStripMenuItem.Click += new System.EventHandler(this.newProjectSolutionToolStripMenuItem_Click);
             // 
             // openProjectSolutionToolStripMenuItem
             // 
@@ -254,6 +256,7 @@ namespace cmdevenv
             this.closeToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.F4)));
             this.closeToolStripMenuItem.Size = new System.Drawing.Size(244, 22);
             this.closeToolStripMenuItem.Text = "&Close";
+            this.closeToolStripMenuItem.Click += new System.EventHandler(this.closeToolStripMenuItem_Click);
             // 
             // closeSolutionToolStripMenuItem
             // 
@@ -273,6 +276,7 @@ namespace cmdevenv
             this.saveToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.S)));
             this.saveToolStripMenuItem.Size = new System.Drawing.Size(244, 22);
             this.saveToolStripMenuItem.Text = "&Save";
+            this.saveToolStripMenuItem.Click += new System.EventHandler(this.saveToolStripMenuItem_Click);
             // 
             // saveAllToolStripMenuItem
             // 
@@ -281,6 +285,7 @@ namespace cmdevenv
             | System.Windows.Forms.Keys.S)));
             this.saveAllToolStripMenuItem.Size = new System.Drawing.Size(244, 22);
             this.saveAllToolStripMenuItem.Text = "Save &All";
+            this.saveAllToolStripMenuItem.Click += new System.EventHandler(this.saveAllToolStripMenuItem_Click);
             // 
             // toolStripMenuItem3
             // 
@@ -302,6 +307,7 @@ namespace cmdevenv
             this.systemLibraryToolStripMenuItem.Name = "systemLibraryToolStripMenuItem";
             this.systemLibraryToolStripMenuItem.Size = new System.Drawing.Size(203, 22);
             this.systemLibraryToolStripMenuItem.Text = "System Library";
+            this.systemLibraryToolStripMenuItem.Click += new System.EventHandler(this.systemLibraryToolStripMenuItem_Click);
             // 
             // examplesToolStripMenuItem
             // 
@@ -326,6 +332,13 @@ namespace cmdevenv
             this.recentProjectsToolStripMenuItem.Size = new System.Drawing.Size(244, 22);
             this.recentProjectsToolStripMenuItem.Text = "&Recent Projects";
             // 
+            // clearRecentProjectsToolStripMenuItem
+            // 
+            this.clearRecentProjectsToolStripMenuItem.Name = "clearRecentProjectsToolStripMenuItem";
+            this.clearRecentProjectsToolStripMenuItem.Size = new System.Drawing.Size(244, 22);
+            this.clearRecentProjectsToolStripMenuItem.Text = "Clear Recent Projects";
+            this.clearRecentProjectsToolStripMenuItem.Click += new System.EventHandler(this.clearRecentProjectsToolStripMenuItem_Click);
+            // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
@@ -337,6 +350,7 @@ namespace cmdevenv
             this.exitToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Alt | System.Windows.Forms.Keys.F4)));
             this.exitToolStripMenuItem.Size = new System.Drawing.Size(244, 22);
             this.exitToolStripMenuItem.Text = "E&xit";
+            this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
             // 
             // editToolStripMenuItem
             // 
@@ -373,17 +387,13 @@ namespace cmdevenv
             // 
             this.buildToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.buildSolutionToolStripMenuItem,
-            this.rebuildSolutionToolStripMenuItem,
             this.cleanSolutionToolStripMenuItem,
             this.toolStripMenuItem16,
             this.buildActiveProjectToolStripMenuItem,
-            this.rebuildActiveProjectToolStripMenuItem,
             this.cleanActiveProjectToolStripMenuItem,
             this.toolStripMenuItem12,
             this.batchBuildToolStripMenuItem,
             this.toolStripMenuItem4,
-            this.compileCurrentFileToolStripMenuItem,
-            this.toolStripSeparator2,
             this.cancelToolStripMenuItem,
             this.toolStripSeparator4,
             this.optionsToolStripMenuItem});
@@ -395,93 +405,72 @@ namespace cmdevenv
             // 
             this.buildSolutionToolStripMenuItem.Name = "buildSolutionToolStripMenuItem";
             this.buildSolutionToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F6;
-            this.buildSolutionToolStripMenuItem.Size = new System.Drawing.Size(241, 22);
+            this.buildSolutionToolStripMenuItem.Size = new System.Drawing.Size(228, 22);
             this.buildSolutionToolStripMenuItem.Text = "&Build Solution";
-            // 
-            // rebuildSolutionToolStripMenuItem
-            // 
-            this.rebuildSolutionToolStripMenuItem.Name = "rebuildSolutionToolStripMenuItem";
-            this.rebuildSolutionToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F8;
-            this.rebuildSolutionToolStripMenuItem.Size = new System.Drawing.Size(241, 22);
-            this.rebuildSolutionToolStripMenuItem.Text = "&Rebuild Solution";
+            this.buildSolutionToolStripMenuItem.Click += new System.EventHandler(this.buildSolutionToolStripMenuItem_Click);
             // 
             // cleanSolutionToolStripMenuItem
             // 
             this.cleanSolutionToolStripMenuItem.Name = "cleanSolutionToolStripMenuItem";
-            this.cleanSolutionToolStripMenuItem.Size = new System.Drawing.Size(241, 22);
+            this.cleanSolutionToolStripMenuItem.Size = new System.Drawing.Size(228, 22);
             this.cleanSolutionToolStripMenuItem.Text = "&Clean Solution";
+            this.cleanSolutionToolStripMenuItem.Click += new System.EventHandler(this.cleanSolutionToolStripMenuItem_Click);
             // 
             // toolStripMenuItem16
             // 
             this.toolStripMenuItem16.Name = "toolStripMenuItem16";
-            this.toolStripMenuItem16.Size = new System.Drawing.Size(238, 6);
+            this.toolStripMenuItem16.Size = new System.Drawing.Size(225, 6);
             // 
             // buildActiveProjectToolStripMenuItem
             // 
             this.buildActiveProjectToolStripMenuItem.Name = "buildActiveProjectToolStripMenuItem";
             this.buildActiveProjectToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Shift | System.Windows.Forms.Keys.F6)));
-            this.buildActiveProjectToolStripMenuItem.Size = new System.Drawing.Size(241, 22);
+            this.buildActiveProjectToolStripMenuItem.Size = new System.Drawing.Size(228, 22);
             this.buildActiveProjectToolStripMenuItem.Text = "Build Active &Project";
-            // 
-            // rebuildActiveProjectToolStripMenuItem
-            // 
-            this.rebuildActiveProjectToolStripMenuItem.Name = "rebuildActiveProjectToolStripMenuItem";
-            this.rebuildActiveProjectToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Shift | System.Windows.Forms.Keys.F8)));
-            this.rebuildActiveProjectToolStripMenuItem.Size = new System.Drawing.Size(241, 22);
-            this.rebuildActiveProjectToolStripMenuItem.Text = "Rebuild Active Project";
+            this.buildActiveProjectToolStripMenuItem.Click += new System.EventHandler(this.buildActiveProjectToolStripMenuItem_Click);
             // 
             // cleanActiveProjectToolStripMenuItem
             // 
             this.cleanActiveProjectToolStripMenuItem.Name = "cleanActiveProjectToolStripMenuItem";
-            this.cleanActiveProjectToolStripMenuItem.Size = new System.Drawing.Size(241, 22);
+            this.cleanActiveProjectToolStripMenuItem.Size = new System.Drawing.Size(228, 22);
             this.cleanActiveProjectToolStripMenuItem.Text = "Clean Active Project";
+            this.cleanActiveProjectToolStripMenuItem.Click += new System.EventHandler(this.cleanActiveProjectToolStripMenuItem_Click);
             // 
             // toolStripMenuItem12
             // 
             this.toolStripMenuItem12.Name = "toolStripMenuItem12";
-            this.toolStripMenuItem12.Size = new System.Drawing.Size(238, 6);
+            this.toolStripMenuItem12.Size = new System.Drawing.Size(225, 6);
             // 
             // batchBuildToolStripMenuItem
             // 
             this.batchBuildToolStripMenuItem.Name = "batchBuildToolStripMenuItem";
-            this.batchBuildToolStripMenuItem.Size = new System.Drawing.Size(241, 22);
+            this.batchBuildToolStripMenuItem.Size = new System.Drawing.Size(228, 22);
             this.batchBuildToolStripMenuItem.Text = "B&atch build...";
             // 
             // toolStripMenuItem4
             // 
             this.toolStripMenuItem4.Name = "toolStripMenuItem4";
-            this.toolStripMenuItem4.Size = new System.Drawing.Size(238, 6);
-            // 
-            // compileCurrentFileToolStripMenuItem
-            // 
-            this.compileCurrentFileToolStripMenuItem.Name = "compileCurrentFileToolStripMenuItem";
-            this.compileCurrentFileToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.F7)));
-            this.compileCurrentFileToolStripMenuItem.Size = new System.Drawing.Size(241, 22);
-            this.compileCurrentFileToolStripMenuItem.Text = "Compile";
-            // 
-            // toolStripSeparator2
-            // 
-            this.toolStripSeparator2.Name = "toolStripSeparator2";
-            this.toolStripSeparator2.Size = new System.Drawing.Size(238, 6);
+            this.toolStripMenuItem4.Size = new System.Drawing.Size(225, 6);
             // 
             // cancelToolStripMenuItem
             // 
             this.cancelToolStripMenuItem.Enabled = false;
             this.cancelToolStripMenuItem.Name = "cancelToolStripMenuItem";
             this.cancelToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.C)));
-            this.cancelToolStripMenuItem.Size = new System.Drawing.Size(241, 22);
+            this.cancelToolStripMenuItem.Size = new System.Drawing.Size(228, 22);
             this.cancelToolStripMenuItem.Text = "Cancel";
             // 
             // toolStripSeparator4
             // 
             this.toolStripSeparator4.Name = "toolStripSeparator4";
-            this.toolStripSeparator4.Size = new System.Drawing.Size(238, 6);
+            this.toolStripSeparator4.Size = new System.Drawing.Size(225, 6);
             // 
             // optionsToolStripMenuItem
             // 
             this.optionsToolStripMenuItem.Name = "optionsToolStripMenuItem";
-            this.optionsToolStripMenuItem.Size = new System.Drawing.Size(241, 22);
+            this.optionsToolStripMenuItem.Size = new System.Drawing.Size(228, 22);
             this.optionsToolStripMenuItem.Text = "&Options...";
+            this.optionsToolStripMenuItem.Click += new System.EventHandler(this.optionsToolStripMenuItem_Click);
             // 
             // runToolStripMenuItem
             // 
@@ -526,6 +515,7 @@ namespace cmdevenv
             this.closeAllToolStripMenuItem.Name = "closeAllToolStripMenuItem";
             this.closeAllToolStripMenuItem.Size = new System.Drawing.Size(120, 22);
             this.closeAllToolStripMenuItem.Text = "Close &All";
+            this.closeAllToolStripMenuItem.Click += new System.EventHandler(this.closeAllToolStripMenuItem_Click);
             // 
             // helpToolStripMenuItem
             // 
@@ -784,7 +774,7 @@ namespace cmdevenv
             this.errorTabPage.Location = new System.Drawing.Point(4, 22);
             this.errorTabPage.Name = "errorTabPage";
             this.errorTabPage.Padding = new System.Windows.Forms.Padding(3);
-            this.errorTabPage.Size = new System.Drawing.Size(761, 42);
+            this.errorTabPage.Size = new System.Drawing.Size(761, 43);
             this.errorTabPage.TabIndex = 1;
             this.errorTabPage.Text = "Errors";
             this.errorTabPage.UseVisualStyleBackColor = true;
@@ -797,9 +787,8 @@ namespace cmdevenv
             this.descriptionColumnHeader,
             this.fileColumnHeader,
             this.lineColumnHeader,
-            this.startColColumnHeader,
-            this.endColColumnHeader,
-            this.projectColumnHeader});
+            this.projectColumnHeader,
+            this.textColumnHeader});
             this.errorListView.Dock = System.Windows.Forms.DockStyle.Fill;
             this.errorListView.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.errorListView.FullRowSelect = true;
@@ -807,10 +796,12 @@ namespace cmdevenv
             this.errorListView.Location = new System.Drawing.Point(3, 3);
             this.errorListView.MultiSelect = false;
             this.errorListView.Name = "errorListView";
-            this.errorListView.Size = new System.Drawing.Size(755, 36);
+            this.errorListView.Size = new System.Drawing.Size(755, 37);
             this.errorListView.TabIndex = 0;
             this.errorListView.UseCompatibleStateImageBehavior = false;
             this.errorListView.View = System.Windows.Forms.View.Details;
+            this.errorListView.ColumnWidthChanged += new System.Windows.Forms.ColumnWidthChangedEventHandler(this.errorListView_ColumnWidthChanged);
+            this.errorListView.ItemActivate += new System.EventHandler(this.errorListView_ItemActivate);
             // 
             // toolColumnHeader
             // 
@@ -825,38 +816,33 @@ namespace cmdevenv
             // descriptionColumnHeader
             // 
             this.descriptionColumnHeader.Text = "Description";
-            this.descriptionColumnHeader.Width = 418;
+            this.descriptionColumnHeader.Width = 300;
             // 
             // fileColumnHeader
             // 
             this.fileColumnHeader.Text = "File";
-            this.fileColumnHeader.Width = 220;
+            this.fileColumnHeader.Width = 200;
             // 
             // lineColumnHeader
             // 
             this.lineColumnHeader.Text = "Line";
-            // 
-            // startColColumnHeader
-            // 
-            this.startColColumnHeader.Text = "S";
-            this.startColColumnHeader.Width = 30;
-            // 
-            // endColColumnHeader
-            // 
-            this.endColColumnHeader.Text = "E";
-            this.endColColumnHeader.Width = 30;
             // 
             // projectColumnHeader
             // 
             this.projectColumnHeader.Text = "Project";
             this.projectColumnHeader.Width = 80;
             // 
+            // textColumnHeader
+            // 
+            this.textColumnHeader.Text = "Text";
+            this.textColumnHeader.Width = 40;
+            // 
             // findResultsTabPage
             // 
             this.findResultsTabPage.Controls.Add(this.findResultsListView);
             this.findResultsTabPage.Location = new System.Drawing.Point(4, 22);
             this.findResultsTabPage.Name = "findResultsTabPage";
-            this.findResultsTabPage.Size = new System.Drawing.Size(761, 42);
+            this.findResultsTabPage.Size = new System.Drawing.Size(761, 43);
             this.findResultsTabPage.TabIndex = 2;
             this.findResultsTabPage.Text = "Find Results";
             this.findResultsTabPage.UseVisualStyleBackColor = true;
@@ -875,7 +861,7 @@ namespace cmdevenv
             this.findResultsListView.Location = new System.Drawing.Point(0, 0);
             this.findResultsListView.MultiSelect = false;
             this.findResultsListView.Name = "findResultsListView";
-            this.findResultsListView.Size = new System.Drawing.Size(761, 42);
+            this.findResultsListView.Size = new System.Drawing.Size(761, 43);
             this.findResultsListView.TabIndex = 0;
             this.findResultsListView.UseCompatibleStateImageBehavior = false;
             this.findResultsListView.View = System.Windows.Forms.View.Details;
@@ -904,7 +890,7 @@ namespace cmdevenv
             // 
             this.consoleTabPage.Location = new System.Drawing.Point(4, 22);
             this.consoleTabPage.Name = "consoleTabPage";
-            this.consoleTabPage.Size = new System.Drawing.Size(761, 42);
+            this.consoleTabPage.Size = new System.Drawing.Size(761, 43);
             this.consoleTabPage.TabIndex = 3;
             this.consoleTabPage.Text = "Console";
             this.consoleTabPage.UseVisualStyleBackColor = true;
@@ -917,7 +903,6 @@ namespace cmdevenv
             // 
             this.solutionContextMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.buildToolStripMenuItem1,
-            this.rebuildToolStripMenuItem,
             this.cleanSolutionToolStripMenuItem2,
             this.toolStripMenuItem5,
             this.addToolStripMenuItem,
@@ -928,25 +913,21 @@ namespace cmdevenv
             this.renameToolStripMenuItem,
             this.closeToolStripMenuItem1});
             this.solutionContextMenuStrip.Name = "solutionContextMenuStrip";
-            this.solutionContextMenuStrip.Size = new System.Drawing.Size(198, 198);
+            this.solutionContextMenuStrip.Size = new System.Drawing.Size(198, 176);
             // 
             // buildToolStripMenuItem1
             // 
             this.buildToolStripMenuItem1.Name = "buildToolStripMenuItem1";
             this.buildToolStripMenuItem1.Size = new System.Drawing.Size(197, 22);
             this.buildToolStripMenuItem1.Text = "Build";
-            // 
-            // rebuildToolStripMenuItem
-            // 
-            this.rebuildToolStripMenuItem.Name = "rebuildToolStripMenuItem";
-            this.rebuildToolStripMenuItem.Size = new System.Drawing.Size(197, 22);
-            this.rebuildToolStripMenuItem.Text = "Rebuild";
+            this.buildToolStripMenuItem1.Click += new System.EventHandler(this.buildToolStripMenuItem1_Click);
             // 
             // cleanSolutionToolStripMenuItem2
             // 
             this.cleanSolutionToolStripMenuItem2.Name = "cleanSolutionToolStripMenuItem2";
             this.cleanSolutionToolStripMenuItem2.Size = new System.Drawing.Size(197, 22);
             this.cleanSolutionToolStripMenuItem2.Text = "Clean";
+            this.cleanSolutionToolStripMenuItem2.Click += new System.EventHandler(this.cleanSolutionToolStripMenuItem2_Click);
             // 
             // toolStripMenuItem5
             // 
@@ -967,12 +948,14 @@ namespace cmdevenv
             this.newProjectToolStripMenuItem1.Name = "newProjectToolStripMenuItem1";
             this.newProjectToolStripMenuItem1.Size = new System.Drawing.Size(163, 22);
             this.newProjectToolStripMenuItem1.Text = "New Project...";
+            this.newProjectToolStripMenuItem1.Click += new System.EventHandler(this.newProjectToolStripMenuItem1_Click);
             // 
             // existingProjectToolStripMenuItem
             // 
             this.existingProjectToolStripMenuItem.Name = "existingProjectToolStripMenuItem";
             this.existingProjectToolStripMenuItem.Size = new System.Drawing.Size(163, 22);
             this.existingProjectToolStripMenuItem.Text = "Existing Project...";
+            this.existingProjectToolStripMenuItem.Click += new System.EventHandler(this.existingProjectToolStripMenuItem_Click);
             // 
             // toolStripMenuItem6
             // 
@@ -1012,7 +995,6 @@ namespace cmdevenv
             // 
             this.projectContextMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.buildToolStripMenuItem2,
-            this.rebuildToolStripMenuItem1,
             this.cleanProjectToolStripMenuItem,
             this.toolStripMenuItem8,
             this.addToolStripMenuItem1,
@@ -1030,25 +1012,21 @@ namespace cmdevenv
             this.toolStripSeparator5,
             this.viewProjectToolStripMenuItem});
             this.projectContextMenuStrip.Name = "projectContextMenuStrip";
-            this.projectContextMenuStrip.Size = new System.Drawing.Size(198, 304);
+            this.projectContextMenuStrip.Size = new System.Drawing.Size(198, 282);
             // 
             // buildToolStripMenuItem2
             // 
             this.buildToolStripMenuItem2.Name = "buildToolStripMenuItem2";
             this.buildToolStripMenuItem2.Size = new System.Drawing.Size(197, 22);
             this.buildToolStripMenuItem2.Text = "Build";
-            // 
-            // rebuildToolStripMenuItem1
-            // 
-            this.rebuildToolStripMenuItem1.Name = "rebuildToolStripMenuItem1";
-            this.rebuildToolStripMenuItem1.Size = new System.Drawing.Size(197, 22);
-            this.rebuildToolStripMenuItem1.Text = "Rebuild";
+            this.buildToolStripMenuItem2.Click += new System.EventHandler(this.buildToolStripMenuItem2_Click);
             // 
             // cleanProjectToolStripMenuItem
             // 
             this.cleanProjectToolStripMenuItem.Name = "cleanProjectToolStripMenuItem";
             this.cleanProjectToolStripMenuItem.Size = new System.Drawing.Size(197, 22);
             this.cleanProjectToolStripMenuItem.Text = "Clean";
+            this.cleanProjectToolStripMenuItem.Click += new System.EventHandler(this.cleanProjectToolStripMenuItem_Click);
             // 
             // toolStripMenuItem8
             // 
@@ -1070,18 +1048,21 @@ namespace cmdevenv
             this.newSourceFileToolStripMenuItem.Name = "newSourceFileToolStripMenuItem";
             this.newSourceFileToolStripMenuItem.Size = new System.Drawing.Size(183, 22);
             this.newSourceFileToolStripMenuItem.Text = "New Source File...";
+            this.newSourceFileToolStripMenuItem.Click += new System.EventHandler(this.newSourceFileToolStripMenuItem_Click);
             // 
             // existingSourceFileToolStripMenuItem
             // 
             this.existingSourceFileToolStripMenuItem.Name = "existingSourceFileToolStripMenuItem";
             this.existingSourceFileToolStripMenuItem.Size = new System.Drawing.Size(183, 22);
             this.existingSourceFileToolStripMenuItem.Text = "Existing Source File...";
+            this.existingSourceFileToolStripMenuItem.Click += new System.EventHandler(this.existingSourceFileToolStripMenuItem_Click);
             // 
             // newTextFileToolStripMenuItem
             // 
             this.newTextFileToolStripMenuItem.Name = "newTextFileToolStripMenuItem";
             this.newTextFileToolStripMenuItem.Size = new System.Drawing.Size(183, 22);
             this.newTextFileToolStripMenuItem.Text = "New Text File...";
+            this.newTextFileToolStripMenuItem.Click += new System.EventHandler(this.newTextFileToolStripMenuItem_Click);
             // 
             // toolStripMenuItem9
             // 
@@ -1127,12 +1108,14 @@ namespace cmdevenv
             this.renameToolStripMenuItem1.Name = "renameToolStripMenuItem1";
             this.renameToolStripMenuItem1.Size = new System.Drawing.Size(197, 22);
             this.renameToolStripMenuItem1.Text = "Rename";
+            this.renameToolStripMenuItem1.Click += new System.EventHandler(this.renameToolStripMenuItem1_Click);
             // 
             // removeToolStripMenuItem
             // 
             this.removeToolStripMenuItem.Name = "removeToolStripMenuItem";
             this.removeToolStripMenuItem.Size = new System.Drawing.Size(197, 22);
             this.removeToolStripMenuItem.Text = "Remove";
+            this.removeToolStripMenuItem.Click += new System.EventHandler(this.removeToolStripMenuItem_Click);
             // 
             // toolStripSeparator3
             // 
@@ -1153,60 +1136,54 @@ namespace cmdevenv
             // viewProjectToolStripMenuItem
             // 
             this.viewProjectToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.libraryInterfaceToolStripMenuItem});
+            this.moduleContentToolStripMenuItem});
             this.viewProjectToolStripMenuItem.Name = "viewProjectToolStripMenuItem";
             this.viewProjectToolStripMenuItem.Size = new System.Drawing.Size(197, 22);
             this.viewProjectToolStripMenuItem.Text = "View";
             // 
-            // libraryInterfaceToolStripMenuItem
+            // moduleContentToolStripMenuItem
             // 
-            this.libraryInterfaceToolStripMenuItem.Name = "libraryInterfaceToolStripMenuItem";
-            this.libraryInterfaceToolStripMenuItem.Size = new System.Drawing.Size(159, 22);
-            this.libraryInterfaceToolStripMenuItem.Text = "Library Interface";
+            this.moduleContentToolStripMenuItem.Name = "moduleContentToolStripMenuItem";
+            this.moduleContentToolStripMenuItem.Size = new System.Drawing.Size(187, 22);
+            this.moduleContentToolStripMenuItem.Text = "Module File Contents";
+            this.moduleContentToolStripMenuItem.Click += new System.EventHandler(this.moduleContentToolStripMenuItem_Click);
             // 
             // sourceFileContextMenuStrip
             // 
             this.sourceFileContextMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.compileToolStripMenuItem,
             this.openToolStripMenuItem,
             this.removeToolStripMenuItem1,
             this.deleteToolStripMenuItem,
             this.renameToolStripMenuItem2,
             this.viewFileToolStripMenuItem});
             this.sourceFileContextMenuStrip.Name = "sourceFileContextMenuStrip";
-            this.sourceFileContextMenuStrip.Size = new System.Drawing.Size(120, 136);
-            // 
-            // compileToolStripMenuItem
-            // 
-            this.compileToolStripMenuItem.Name = "compileToolStripMenuItem";
-            this.compileToolStripMenuItem.Size = new System.Drawing.Size(119, 22);
-            this.compileToolStripMenuItem.Text = "Compile";
+            this.sourceFileContextMenuStrip.Size = new System.Drawing.Size(118, 114);
             // 
             // openToolStripMenuItem
             // 
             this.openToolStripMenuItem.Name = "openToolStripMenuItem";
-            this.openToolStripMenuItem.Size = new System.Drawing.Size(119, 22);
+            this.openToolStripMenuItem.Size = new System.Drawing.Size(117, 22);
             this.openToolStripMenuItem.Text = "Open";
             this.openToolStripMenuItem.Click += new System.EventHandler(this.openToolStripMenuItem_Click);
             // 
             // removeToolStripMenuItem1
             // 
             this.removeToolStripMenuItem1.Name = "removeToolStripMenuItem1";
-            this.removeToolStripMenuItem1.Size = new System.Drawing.Size(119, 22);
+            this.removeToolStripMenuItem1.Size = new System.Drawing.Size(117, 22);
             this.removeToolStripMenuItem1.Text = "Remove";
             this.removeToolStripMenuItem1.Click += new System.EventHandler(this.removeToolStripMenuItem1_Click);
             // 
             // deleteToolStripMenuItem
             // 
             this.deleteToolStripMenuItem.Name = "deleteToolStripMenuItem";
-            this.deleteToolStripMenuItem.Size = new System.Drawing.Size(119, 22);
+            this.deleteToolStripMenuItem.Size = new System.Drawing.Size(117, 22);
             this.deleteToolStripMenuItem.Text = "Delete";
             this.deleteToolStripMenuItem.Click += new System.EventHandler(this.deleteToolStripMenuItem_Click);
             // 
             // renameToolStripMenuItem2
             // 
             this.renameToolStripMenuItem2.Name = "renameToolStripMenuItem2";
-            this.renameToolStripMenuItem2.Size = new System.Drawing.Size(119, 22);
+            this.renameToolStripMenuItem2.Size = new System.Drawing.Size(117, 22);
             this.renameToolStripMenuItem2.Text = "Rename";
             this.renameToolStripMenuItem2.Click += new System.EventHandler(this.renameToolStripMenuItem2_Click);
             // 
@@ -1216,20 +1193,23 @@ namespace cmdevenv
             this.intermediateCodeToolStripMenuItem,
             this.optimizedIntermediateCodeToolStripMenuItem});
             this.viewFileToolStripMenuItem.Name = "viewFileToolStripMenuItem";
-            this.viewFileToolStripMenuItem.Size = new System.Drawing.Size(119, 22);
+            this.viewFileToolStripMenuItem.Size = new System.Drawing.Size(117, 22);
             this.viewFileToolStripMenuItem.Text = "View";
+            this.viewFileToolStripMenuItem.DropDownOpened += new System.EventHandler(this.viewFileToolStripMenuItem_DropDownOpened);
             // 
             // intermediateCodeToolStripMenuItem
             // 
             this.intermediateCodeToolStripMenuItem.Name = "intermediateCodeToolStripMenuItem";
             this.intermediateCodeToolStripMenuItem.Size = new System.Drawing.Size(230, 22);
             this.intermediateCodeToolStripMenuItem.Text = "Intermediate Code";
+            this.intermediateCodeToolStripMenuItem.Click += new System.EventHandler(this.intermediateCodeToolStripMenuItem_Click);
             // 
             // optimizedIntermediateCodeToolStripMenuItem
             // 
             this.optimizedIntermediateCodeToolStripMenuItem.Name = "optimizedIntermediateCodeToolStripMenuItem";
             this.optimizedIntermediateCodeToolStripMenuItem.Size = new System.Drawing.Size(230, 22);
             this.optimizedIntermediateCodeToolStripMenuItem.Text = "Optimized Intermediate Code";
+            this.optimizedIntermediateCodeToolStripMenuItem.Click += new System.EventHandler(this.optimizedIntermediateCodeToolStripMenuItem_Click);
             // 
             // statusStrip1
             // 
@@ -1286,6 +1266,38 @@ namespace cmdevenv
             this.colLabel.Name = "colLabel";
             this.colLabel.Size = new System.Drawing.Size(100, 17);
             // 
+            // compileTimer
+            // 
+            this.compileTimer.Interval = 1000;
+            // 
+            // progressTimer
+            // 
+            this.progressTimer.Tick += new System.EventHandler(this.progressTimer_Tick);
+            // 
+            // errorsListViewContextMenuStrip
+            // 
+            this.errorsListViewContextMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.showErrorDescriptionInTextWindowToolStripMenuItem});
+            this.errorsListViewContextMenuStrip.Name = "errorsListViewContextMenuStrip";
+            this.errorsListViewContextMenuStrip.Size = new System.Drawing.Size(279, 26);
+            // 
+            // showErrorDescriptionInTextWindowToolStripMenuItem
+            // 
+            this.showErrorDescriptionInTextWindowToolStripMenuItem.Name = "showErrorDescriptionInTextWindowToolStripMenuItem";
+            this.showErrorDescriptionInTextWindowToolStripMenuItem.Size = new System.Drawing.Size(278, 22);
+            this.showErrorDescriptionInTextWindowToolStripMenuItem.Text = "&Show Error Description in Text Window";
+            this.showErrorDescriptionInTextWindowToolStripMenuItem.Click += new System.EventHandler(this.showErrorDescriptionInTextWindowToolStripMenuItem_Click);
+            // 
+            // addExistingSourceFileDialog
+            // 
+            this.addExistingSourceFileDialog.DefaultExt = "cm";
+            this.addExistingSourceFileDialog.Filter = "Source files|*.cm|All files|*.*";
+            // 
+            // addExistingProjectFileDialog
+            // 
+            this.addExistingProjectFileDialog.DefaultExt = "cmp";
+            this.addExistingProjectFileDialog.Filter = "Project files|*.cmp";
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1303,6 +1315,7 @@ namespace cmdevenv
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "MainForm";
             this.Text = "Cmajor Development Environment";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainForm_FormClosing);
             this.Shown += new System.EventHandler(this.MainForm_Shown);
             this.Move += new System.EventHandler(this.MainForm_Move);
             this.Resize += new System.EventHandler(this.MainForm_Resize);
@@ -1320,6 +1333,7 @@ namespace cmdevenv
             this.sourceFileContextMenuStrip.ResumeLayout(false);
             this.statusStrip1.ResumeLayout(false);
             this.statusStrip1.PerformLayout();
+            this.errorsListViewContextMenuStrip.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -1353,15 +1367,11 @@ namespace cmdevenv
         private System.Windows.Forms.ToolStripMenuItem batchBuildToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripMenuItem4;
         private System.Windows.Forms.ToolStripMenuItem buildSolutionToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem rebuildSolutionToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem cleanSolutionToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripMenuItem16;
         private System.Windows.Forms.ToolStripMenuItem buildActiveProjectToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem rebuildActiveProjectToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem cleanActiveProjectToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripMenuItem12;
-        private System.Windows.Forms.ToolStripMenuItem compileCurrentFileToolStripMenuItem;
-        private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
         private System.Windows.Forms.ToolStripMenuItem cancelToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator4;
         private System.Windows.Forms.ToolStripMenuItem optionsToolStripMenuItem;
@@ -1412,8 +1422,6 @@ namespace cmdevenv
         private System.Windows.Forms.ColumnHeader descriptionColumnHeader;
         private System.Windows.Forms.ColumnHeader fileColumnHeader;
         private System.Windows.Forms.ColumnHeader lineColumnHeader;
-        private System.Windows.Forms.ColumnHeader startColColumnHeader;
-        private System.Windows.Forms.ColumnHeader endColColumnHeader;
         private System.Windows.Forms.ColumnHeader projectColumnHeader;
         private System.Windows.Forms.TabPage outputTabPage;
         private System.Windows.Forms.RichTextBox outputRichTextBox;
@@ -1421,7 +1429,6 @@ namespace cmdevenv
         private System.Windows.Forms.OpenFileDialog openProjectDialog;
         private System.Windows.Forms.ContextMenuStrip solutionContextMenuStrip;
         private System.Windows.Forms.ToolStripMenuItem buildToolStripMenuItem1;
-        private System.Windows.Forms.ToolStripMenuItem rebuildToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem cleanSolutionToolStripMenuItem2;
         private System.Windows.Forms.ToolStripSeparator toolStripMenuItem5;
         private System.Windows.Forms.ToolStripMenuItem addToolStripMenuItem;
@@ -1435,7 +1442,6 @@ namespace cmdevenv
         private System.Windows.Forms.ToolStripMenuItem closeToolStripMenuItem1;
         private System.Windows.Forms.ContextMenuStrip projectContextMenuStrip;
         private System.Windows.Forms.ToolStripMenuItem buildToolStripMenuItem2;
-        private System.Windows.Forms.ToolStripMenuItem rebuildToolStripMenuItem1;
         private System.Windows.Forms.ToolStripMenuItem cleanProjectToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripMenuItem8;
         private System.Windows.Forms.ToolStripMenuItem addToolStripMenuItem1;
@@ -1455,9 +1461,8 @@ namespace cmdevenv
         private System.Windows.Forms.ToolStripMenuItem projectPropertiesToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator5;
         private System.Windows.Forms.ToolStripMenuItem viewProjectToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem libraryInterfaceToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem moduleContentToolStripMenuItem;
         private System.Windows.Forms.ContextMenuStrip sourceFileContextMenuStrip;
-        private System.Windows.Forms.ToolStripMenuItem compileToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem openToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem removeToolStripMenuItem1;
         private System.Windows.Forms.ToolStripMenuItem deleteToolStripMenuItem;
@@ -1474,6 +1479,14 @@ namespace cmdevenv
         private System.Windows.Forms.ToolStripStatusLabel padLabel;
         private System.Windows.Forms.ToolStripStatusLabel lineLabel;
         private System.Windows.Forms.ToolStripStatusLabel colLabel;
+        private System.Windows.Forms.Timer compileTimer;
+        private System.Windows.Forms.Timer progressTimer;
+        private System.Windows.Forms.ColumnHeader textColumnHeader;
+        private System.Windows.Forms.ContextMenuStrip errorsListViewContextMenuStrip;
+        private System.Windows.Forms.ToolStripMenuItem showErrorDescriptionInTextWindowToolStripMenuItem;
+        private System.Windows.Forms.OpenFileDialog addExistingSourceFileDialog;
+        private System.Windows.Forms.OpenFileDialog addExistingProjectFileDialog;
+        private System.Windows.Forms.ToolStripMenuItem clearRecentProjectsToolStripMenuItem;
     }
 }
 

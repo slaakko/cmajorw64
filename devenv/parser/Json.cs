@@ -288,7 +288,7 @@ namespace parser
             }
             private void A1Action(string match, string content, Position position, string fileName, ref bool pass)
             {
-                context.value.AddField(context.fromname, context.fromval);
+                context.value.AddField(context.fromname.Value, context.fromval);
             }
             private void Postname(Stack<object> stack, bool matched)
             {

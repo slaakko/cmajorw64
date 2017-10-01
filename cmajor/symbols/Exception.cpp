@@ -4,6 +4,7 @@
 // =================================
 
 #include <cmajor/symbols/Exception.hpp>
+#include <cmajor/symbols/GlobalFlags.hpp>
 #include <cmajor/parser/FileRegistry.hpp>
 #include <cmajor/parsing/Exception.hpp>
 #include <cmajor/util/MappedInputFile.hpp>
@@ -68,6 +69,27 @@ std::string Expand(const std::string& errorMessage, const Span& span, const std:
     return expandedMessage;
 }
 
+std::unique_ptr<JsonObject> SpanToJson(const Span& span)
+{
+    if (!span.Valid()) return std::unique_ptr<JsonObject>();
+    const std::string& fileName = FileRegistry::Instance().GetFilePath(span.FileIndex());
+    if (fileName.empty()) return std::unique_ptr<JsonObject>();
+    std::unique_ptr<JsonObject> json(new JsonObject());
+    json->AddField(U"file", std::unique_ptr<JsonValue>(new JsonString(ToUtf32(fileName))));
+    json->AddField(U"line", std::unique_ptr<JsonValue>(new JsonString(ToUtf32(std::to_string(span.LineNumber())))));
+    MappedInputFile file(fileName);
+    std::string s(file.Begin(), file.End());
+    std::u32string t(ToUtf32(s));
+    std::u32string text = cmajor::parsing::GetErrorLines(&t[0], &t[0] + t.length(), span);
+    int32_t startCol = 0;
+    int32_t endCol = 0;
+    GetColumns(&t[0], &t[0] + t.length(), span, startCol, endCol);
+    json->AddField(U"startCol", std::unique_ptr<JsonValue>(new JsonString(ToUtf32(std::to_string(startCol)))));
+    json->AddField(U"endCol", std::unique_ptr<JsonValue>(new JsonString(ToUtf32(std::to_string(endCol)))));
+    json->AddField(U"text", std::unique_ptr<JsonValue>(new JsonString(text)));
+    return json;
+}
+
 Exception::Exception(const std::string& message_, const Span& defined_) : what(Expand(message_, defined_)), message(message_), defined(defined_)
 {
 }
@@ -84,6 +106,31 @@ Exception::Exception(const std::string& message_, const Span& defined_, const st
 
 Exception::~Exception()
 {
+}
+
+std::unique_ptr<JsonValue> Exception::ToJson() const
+{
+    std::unique_ptr<JsonObject> json(new JsonObject());
+    json->AddField(U"tool", std::unique_ptr<JsonValue>(new JsonString(GetCurrentToolName())));
+    json->AddField(U"kind", std::unique_ptr<JsonValue>(new JsonString(U"error")));
+    json->AddField(U"project", std::unique_ptr<JsonValue>(new JsonString(GetCurrentProjectName())));
+    json->AddField(U"message", std::unique_ptr<JsonValue>(new JsonString(ToUtf32(message))));
+    std::unique_ptr<JsonArray> refs(new JsonArray());
+    std::unique_ptr<JsonObject> ref = SpanToJson(defined);
+    if (ref)
+    {
+        refs->AddItem(std::move(ref));
+    }
+    for (const Span& referenceSpan : references)
+    {
+        std::unique_ptr<JsonObject> ref = SpanToJson(referenceSpan);
+        if (ref)
+        {
+            refs->AddItem(std::move(ref));
+        }
+    }
+    json->AddField(U"references", std::move(refs));
+    return json;
 }
 
 CastOverloadException::CastOverloadException(const std::string& message_, const Span& defined_) : Exception(message_, defined_)

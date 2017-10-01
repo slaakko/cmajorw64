@@ -51,7 +51,16 @@
     <Compile Include="AboutBox.Designer.cs">
       <DependentUpon>AboutBox.cs</DependentUpon>
     </Compile>
+    <Compile Include="BuildOptionsDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="BuildOptionsDialog.designer.cs">
+      <DependentUpon>BuildOptionsDialog.cs</DependentUpon>
+    </Compile>
     <Compile Include="Configuration.cs" />
+    <Compile Include="Console.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Editor.cs" />
     <Compile Include="Editor.designer.cs">
       <DependentUpon>Editor.cs</DependentUpon>
@@ -62,16 +71,52 @@
     <Compile Include="MainForm.Designer.cs">
       <DependentUpon>MainForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="NewProjectDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="NewProjectDialog.designer.cs">
+      <DependentUpon>NewProjectDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="NewSourceFileDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="NewSourceFileDialog.designer.cs">
+      <DependentUpon>NewSourceFileDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="NewTextFileDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="NewTextFileDialog.designer.cs">
+      <DependentUpon>NewTextFileDialog.cs</DependentUpon>
+    </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TextVisualizerForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="TextVisualizerForm.designer.cs">
+      <DependentUpon>TextVisualizerForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="XTabControl.cs">
       <SubType>Component</SubType>
     </Compile>
     <EmbeddedResource Include="AboutBox.resx">
       <DependentUpon>AboutBox.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="BuildOptionsDialog.resx">
+      <DependentUpon>BuildOptionsDialog.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="NewProjectDialog.resx">
+      <DependentUpon>NewProjectDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="NewSourceFileDialog.resx">
+      <DependentUpon>NewSourceFileDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="NewTextFileDialog.resx">
+      <DependentUpon>NewTextFileDialog.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -111,6 +156,10 @@
     <ProjectReference Include="..\parser\parser.csproj">
       <Project>{8290ba99-cd29-47c4-80a3-c0597cd5e5bd}</Project>
       <Name>parser</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\server\server.csproj">
+      <Project>{997ae1a3-89db-41c8-8379-de9b4fa561f1}</Project>
+      <Name>server</Name>
     </ProjectReference>
     <ProjectReference Include="..\soul.codedom\soul.codedom.csproj">
       <Project>{4f6d51e0-4e50-49bc-90e8-8e76ced326e2}</Project>

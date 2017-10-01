@@ -35,6 +35,7 @@ public:
     JsonString(const std::u32string& value_);
     void Append(char32_t c);
     const std::u32string& Value() const { return value; }
+    std::u32string JsonCharStr(char32_t c) const;
     std::string ToString() const override;
 private:
     std::u32string value;

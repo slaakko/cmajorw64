@@ -67,6 +67,32 @@ std::u32string GetErrorLines(const char32_t* start, const char32_t* end, const S
     return lines;
 }
 
+void GetColumns(const char32_t* start, const char32_t* end, const Span& span, int32_t& startCol, int32_t& endCol)
+{
+    startCol = 0;
+    endCol = 0;
+    const char32_t* startPos = start + span.Start();
+    if (startPos < start || startPos >= end)
+    {
+        return;
+    }
+    const char32_t* lineStart = LineStart(start, startPos);
+    int cols = static_cast<int>(startPos - lineStart);
+    if (cols < 0)
+    {
+        cols = 0;
+    }
+    startCol = cols + 1;
+    const char32_t* lineEnd = LineEnd(end, startPos);
+    if (lineEnd < lineStart)
+    {
+        lineEnd = lineStart;
+    }
+    int lineLength = static_cast<int>(lineEnd - lineStart);
+    int spanCols = std::max(1, std::min(span.End() - span.Start(), lineLength - cols));
+    endCol = startCol + spanCols;
+}
+
 void ThrowException(const std::string& message, const Span& span)
 {
     if (span.FileIndex() >= 0 && span.FileIndex() < int(files.size()))
