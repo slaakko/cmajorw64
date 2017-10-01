@@ -50,7 +50,7 @@ std::u32string JsonString::JsonCharStr(char32_t c) const
             {
                 return std::u32string(1, c);
             }
-            return U"\\u" + ToUtf32(ToHexString(static_cast<uint32_t>(c)));
+            return U"\\u" + ToUtf32(ToHexString(static_cast<uint16_t>(c)));
         }
     }
 }
