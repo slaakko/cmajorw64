@@ -303,9 +303,23 @@ void Module::Write(SymbolWriter& writer)
     }
     uint32_t ns = sourceFilePaths.size();
     writer.GetBinaryWriter().WriteEncodedUInt(ns);
+    std::string cmajorRoot;
+    if (IsSystemModule())
+    {
+        cmajorRoot = GetFullPath(CmajorRootDir());
+    }
     for (uint32_t i = 0; i < ns; ++i)
     {
-        writer.GetBinaryWriter().Write(sourceFilePaths[i]);
+        std::string sfp = sourceFilePaths[i];
+        if (IsSystemModule())
+        {
+            sfp = GetFullPath(sfp);
+            if (sfp.find(cmajorRoot, 0) == 0)
+            {
+                sfp = sfp.substr(cmajorRoot.size());
+            }
+        }
+        writer.GetBinaryWriter().Write(sfp);
     }
     uint32_t efn = exportedFunctions.size();
     writer.GetBinaryWriter().WriteEncodedUInt(efn);

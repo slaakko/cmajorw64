@@ -9,6 +9,7 @@
 #include <cmajor/parsing/Exception.hpp>
 #include <cmajor/util/MappedInputFile.hpp>
 #include <cmajor/util/Unicode.hpp>
+#include <algorithm>
 
 namespace cmajor { namespace symbols {
 
@@ -41,10 +42,12 @@ std::string Expand(const std::string& errorMessage, const Span& span, const std:
 
 std::string Expand(const std::string& errorMessage, const Span& span, const std::vector<Span>& references, const std::string& title)
 {
+    std::vector<Span> referenceSpans = references;
+    referenceSpans.erase(std::unique(referenceSpans.begin(), referenceSpans.end()), referenceSpans.end());
     std::string expandedMessage = title + ": " + errorMessage;
     if (span.Valid())
     {
-        const std::string& fileName = FileRegistry::Instance().GetFilePath(span.FileIndex());
+        std::string fileName = FileRegistry::Instance().GetFilePath(span.FileIndex());
         if (!fileName.empty())
         {
             expandedMessage.append(" (file '" + fileName + "', line " + std::to_string(span.LineNumber()) + ")");
@@ -53,17 +56,19 @@ std::string Expand(const std::string& errorMessage, const Span& span, const std:
             std::u32string t(ToUtf32(s));
             expandedMessage.append(":\n").append(ToUtf8(cmajor::parsing::GetErrorLines(&t[0], &t[0] + t.length(), span)));
         }
-        for (const Span& referenceSpan : references)
+    }
+    for (const Span& referenceSpan : referenceSpans)
+    {
+        if (!referenceSpan.Valid()) continue;
+        if (referenceSpan == span) continue;
+        std::string fileName = FileRegistry::Instance().GetFilePath(referenceSpan.FileIndex());
+        if (!fileName.empty())
         {
-            const std::string& fileName = FileRegistry::Instance().GetFilePath(referenceSpan.FileIndex());
-            if (!fileName.empty())
-            {
-                expandedMessage.append("\nsee reference to file '" + fileName + "', line " + std::to_string(referenceSpan.LineNumber()));
-                MappedInputFile file(fileName);
-                std::string s(file.Begin(), file.End());
-                std::u32string t(ToUtf32(s));
-                expandedMessage.append(":\n").append(ToUtf8(cmajor::parsing::GetErrorLines(&t[0], &t[0] + t.length(), referenceSpan)));
-            }
+            expandedMessage.append("\nsee reference to file '" + fileName + "', line " + std::to_string(referenceSpan.LineNumber()));
+            MappedInputFile file(fileName);
+            std::string s(file.Begin(), file.End());
+            std::u32string t(ToUtf32(s));
+            expandedMessage.append(":\n").append(ToUtf8(cmajor::parsing::GetErrorLines(&t[0], &t[0] + t.length(), referenceSpan)));
         }
     }
     return expandedMessage;
@@ -121,8 +126,12 @@ std::unique_ptr<JsonValue> Exception::ToJson() const
     {
         refs->AddItem(std::move(ref));
     }
-    for (const Span& referenceSpan : references)
+    std::vector<Span> referenceSpans = references;
+    referenceSpans.erase(std::unique(referenceSpans.begin(), referenceSpans.end()), referenceSpans.end());
+    for (const Span& referenceSpan : referenceSpans)
     {
+        if (!referenceSpan.Valid()) continue;
+        if (referenceSpan == defined) continue;
         std::unique_ptr<JsonObject> ref = SpanToJson(referenceSpan);
         if (ref)
         {

@@ -11,14 +11,17 @@
 #include <cmajor/binder/BoundClass.hpp>
 #include <cmajor/binder/BoundFunction.hpp>
 #include <cmajor/binder/BoundStatement.hpp>
+#include <cmajor/binder/Concept.hpp>
 #include <cmajor/symbols/TemplateSymbol.hpp>
 #include <cmajor/symbols/SymbolCreatorVisitor.hpp>
 #include <cmajor/ast/Identifier.hpp>
 #include <cmajor/util/Util.hpp>
+#include <cmajor/util/Unicode.hpp>
 
 namespace cmajor { namespace binder {
 
 using namespace cmajor::util;
+using namespace cmajor::unicode;
 
 ClassTemplateRepository::ClassTemplateRepository(BoundCompileUnit& boundCompileUnit_) : boundCompileUnit(boundCompileUnit_)
 {
@@ -205,106 +208,167 @@ void ClassTemplateRepository::BindClassTemplateSpecialization(ClassTemplateSpeci
     }
 }
 
-void ClassTemplateRepository::Instantiate(FunctionSymbol* memberFunction, ContainerScope* containerScope, const Span& span)
+void ClassTemplateRepository::Instantiate(FunctionSymbol* memberFunction, ContainerScope* containerScope, BoundFunction* currentFunction, const Span& span)
 {
     if (instantiatedMemberFunctions.find(memberFunction) != instantiatedMemberFunctions.cend()) return;
     instantiatedMemberFunctions.insert(memberFunction);
-    SymbolTable& symbolTable = boundCompileUnit.GetSymbolTable();
-    Symbol* parent = memberFunction->Parent();
-    Assert(parent->GetSymbolType() == SymbolType::classTemplateSpecializationSymbol, "class template specialization expected");
-    ClassTemplateSpecializationSymbol* classTemplateSpecialization = static_cast<ClassTemplateSpecializationSymbol*>(parent);
-    boundCompileUnit.FinalizeBinding(classTemplateSpecialization);
-    ClassTypeSymbol* classTemplate = classTemplateSpecialization->GetClassTemplate();
-    FileScope* fileScope = new FileScope();
-    int nu = classTemplate->UsingNodes().Count();
-    for (int i = 0; i < nu; ++i)
+    try
     {
-        Node* usingNode = classTemplate->UsingNodes()[i];
-        if (usingNode->GetNodeType() == NodeType::namespaceImportNode)
+        SymbolTable& symbolTable = boundCompileUnit.GetSymbolTable();
+        Symbol* parent = memberFunction->Parent();
+        Assert(parent->GetSymbolType() == SymbolType::classTemplateSpecializationSymbol, "class template specialization expected");
+        ClassTemplateSpecializationSymbol* classTemplateSpecialization = static_cast<ClassTemplateSpecializationSymbol*>(parent);
+        boundCompileUnit.FinalizeBinding(classTemplateSpecialization);
+        ClassTypeSymbol* classTemplate = classTemplateSpecialization->GetClassTemplate();
+        std::unordered_map<TemplateParameterSymbol*, TypeSymbol*> templateParameterMap;
+        int n = classTemplateSpecialization->TemplateArgumentTypes().size();
+        for (int i = 0; i < n; ++i)
         {
-            NamespaceImportNode* namespaceImportNode = static_cast<NamespaceImportNode*>(usingNode);
-            fileScope->InstallNamespaceImport(containerScope, namespaceImportNode);
+            TemplateParameterSymbol* templateParameter = classTemplate->TemplateParameters()[i];
+            TypeSymbol* templateArgument = classTemplateSpecialization->TemplateArgumentTypes()[i];
+            templateParameterMap[templateParameter] = templateArgument;
         }
-        else if (usingNode->GetNodeType() == NodeType::aliasNode)
+        if (!classTemplateSpecialization->IsConstraintChecked())
         {
-            AliasNode* aliasNode = static_cast<AliasNode*>(usingNode);
-            fileScope->InstallAlias(containerScope, aliasNode);
+            classTemplateSpecialization->SetConstraintChecked();
+            if (classTemplate->Constraint())
+            {
+                std::unique_ptr<BoundConstraint> boundConstraint;
+                std::unique_ptr<Exception> conceptCheckException;
+                if (!CheckConstraint(classTemplate->Constraint(), classTemplate->UsingNodes(), boundCompileUnit, containerScope, currentFunction, classTemplate->TemplateParameters(),
+                    templateParameterMap, boundConstraint, span, memberFunction, conceptCheckException))
+                {
+                    if (conceptCheckException)
+                    {
+                        throw Exception("concept check of class template specialization '" + ToUtf8(classTemplateSpecialization->FullName()) + "' failed: " + conceptCheckException->Message(), span,
+                            conceptCheckException->References());
+                    }
+                    else
+                    {
+                        throw Exception("concept check of class template specialization '" + ToUtf8(classTemplateSpecialization->FullName()) + "' failed.", span);
+                    }
+                }
+            }
         }
-    }
-    if (!classTemplate->Ns()->IsGlobalNamespace())
-    {
-        fileScope->AddContainerScope(classTemplate->Ns()->GetContainerScope());
-    }
-    boundCompileUnit.AddFileScope(fileScope);
-    Node* node = symbolTable.GetNode(memberFunction);
-    Assert(node->IsFunctionNode(), "function node expected");
-    FunctionNode* functionInstanceNode = static_cast<FunctionNode*>(node);
-    Assert(functionInstanceNode->BodySource(), "body source expected");
-    CloneContext cloneContext;
-    functionInstanceNode->SetBody(static_cast<CompoundStatementNode*>(functionInstanceNode->BodySource()->Clone(cloneContext)));
-    symbolTable.SetCurrentCompileUnit(boundCompileUnit.GetCompileUnitNode());
-    SymbolCreatorVisitor symbolCreatorVisitor(symbolTable);
-    symbolTable.BeginContainer(memberFunction);
-    functionInstanceNode->Body()->Accept(symbolCreatorVisitor);
-    symbolTable.EndContainer();
-    TypeBinder typeBinder(boundCompileUnit);
-    typeBinder.SetContainerScope(memberFunction->GetContainerScope());
-    functionInstanceNode->Body()->Accept(typeBinder);
-    StatementBinder statementBinder(boundCompileUnit);
-    std::unique_ptr<BoundClass> boundClass(new BoundClass(classTemplateSpecialization));
-    statementBinder.SetCurrentClass(boundClass.get());
-    std::unique_ptr<BoundFunction> boundFunction(new BoundFunction(memberFunction));
-    statementBinder.SetCurrentFunction(boundFunction.get());
-    statementBinder.SetContainerScope(memberFunction->GetContainerScope());
-    if (memberFunction->GetSymbolType() == SymbolType::constructorSymbol)
-    {
-        ConstructorSymbol* constructorSymbol = static_cast<ConstructorSymbol*>(memberFunction);
+        FileScope* fileScope = new FileScope();
+        int nu = classTemplate->UsingNodes().Count();
+        for (int i = 0; i < nu; ++i)
+        {
+            Node* usingNode = classTemplate->UsingNodes()[i];
+            if (usingNode->GetNodeType() == NodeType::namespaceImportNode)
+            {
+                NamespaceImportNode* namespaceImportNode = static_cast<NamespaceImportNode*>(usingNode);
+                fileScope->InstallNamespaceImport(containerScope, namespaceImportNode);
+            }
+            else if (usingNode->GetNodeType() == NodeType::aliasNode)
+            {
+                AliasNode* aliasNode = static_cast<AliasNode*>(usingNode);
+                fileScope->InstallAlias(containerScope, aliasNode);
+            }
+        }
+        if (!classTemplate->Ns()->IsGlobalNamespace())
+        {
+            fileScope->AddContainerScope(classTemplate->Ns()->GetContainerScope());
+        }
+        boundCompileUnit.AddFileScope(fileScope);
         Node* node = symbolTable.GetNode(memberFunction);
-        Assert(node->GetNodeType() == NodeType::constructorNode, "constructor node expected");
-        ConstructorNode* constructorNode = static_cast<ConstructorNode*>(node);
-        statementBinder.SetCurrentConstructor(constructorSymbol, constructorNode);
+        Assert(node->IsFunctionNode(), "function node expected");
+        FunctionNode* functionInstanceNode = static_cast<FunctionNode*>(node);
+        Assert(functionInstanceNode->BodySource(), "body source expected");
+        CloneContext cloneContext;
+        functionInstanceNode->SetBody(static_cast<CompoundStatementNode*>(functionInstanceNode->BodySource()->Clone(cloneContext)));
+        if (functionInstanceNode->WhereConstraint())
+        {
+            std::unique_ptr<BoundConstraint> boundConstraint;
+            std::unique_ptr<Exception> conceptCheckException;
+            if (!CheckConstraint(functionInstanceNode->WhereConstraint(), classTemplate->UsingNodes(), boundCompileUnit, containerScope, currentFunction, classTemplate->TemplateParameters(),
+                templateParameterMap, boundConstraint, span, memberFunction, conceptCheckException))
+            {
+                if (conceptCheckException)
+                {
+                    std::vector<Span> references;
+                    references.push_back(conceptCheckException->Defined());
+                    references.insert(references.end(), conceptCheckException->References().begin(), conceptCheckException->References().end());
+                    throw Exception("concept check of class template member function '" + ToUtf8(memberFunction->FullName()) + "' failed: " + conceptCheckException->Message(), span, references);
+                }
+                else
+                {
+                    throw Exception("concept check of class template template member function '" + ToUtf8(memberFunction->FullName()) + "' failed.", span);
+                }
+            }
+        }
+        symbolTable.SetCurrentCompileUnit(boundCompileUnit.GetCompileUnitNode());
+        SymbolCreatorVisitor symbolCreatorVisitor(symbolTable);
+        symbolTable.BeginContainer(memberFunction);
+        functionInstanceNode->Body()->Accept(symbolCreatorVisitor);
+        symbolTable.EndContainer();
+        TypeBinder typeBinder(boundCompileUnit);
+        typeBinder.SetContainerScope(memberFunction->GetContainerScope());
+        functionInstanceNode->Body()->Accept(typeBinder);
+        StatementBinder statementBinder(boundCompileUnit);
+        std::unique_ptr<BoundClass> boundClass(new BoundClass(classTemplateSpecialization));
+        statementBinder.SetCurrentClass(boundClass.get());
+        std::unique_ptr<BoundFunction> boundFunction(new BoundFunction(memberFunction));
+        statementBinder.SetCurrentFunction(boundFunction.get());
+        statementBinder.SetContainerScope(memberFunction->GetContainerScope());
+        if (memberFunction->GetSymbolType() == SymbolType::constructorSymbol)
+        {
+            ConstructorSymbol* constructorSymbol = static_cast<ConstructorSymbol*>(memberFunction);
+            Node* node = symbolTable.GetNode(memberFunction);
+            Assert(node->GetNodeType() == NodeType::constructorNode, "constructor node expected");
+            ConstructorNode* constructorNode = static_cast<ConstructorNode*>(node);
+            statementBinder.SetCurrentConstructor(constructorSymbol, constructorNode);
+        }
+        else if (memberFunction->GetSymbolType() == SymbolType::destructorSymbol)
+        {
+            DestructorSymbol* destructorSymbol = static_cast<DestructorSymbol*>(memberFunction);
+            Node* node = symbolTable.GetNode(memberFunction);
+            Assert(node->GetNodeType() == NodeType::destructorNode, "destructor node expected");
+            DestructorNode* destructorNode = static_cast<DestructorNode*>(node);
+            statementBinder.SetCurrentDestructor(destructorSymbol, destructorNode);
+        }
+        else if (memberFunction->GetSymbolType() == SymbolType::memberFunctionSymbol)
+        {
+            MemberFunctionSymbol* memberFunctionSymbol = static_cast<MemberFunctionSymbol*>(memberFunction);
+            Node* node = symbolTable.GetNode(memberFunction);
+            Assert(node->GetNodeType() == NodeType::memberFunctionNode, "member function node expected");
+            MemberFunctionNode* memberFunctionNode = static_cast<MemberFunctionNode*>(node);
+            statementBinder.SetCurrentMemberFunction(memberFunctionSymbol, memberFunctionNode);
+        }
+        functionInstanceNode->Body()->Accept(statementBinder);
+        BoundStatement* boundStatement = statementBinder.ReleaseStatement();
+        Assert(boundStatement->GetBoundNodeType() == BoundNodeType::boundCompoundStatement, "bound compound statement expected");
+        BoundCompoundStatement* compoundStatement = static_cast<BoundCompoundStatement*>(boundStatement);
+        boundFunction->SetBody(std::unique_ptr<BoundCompoundStatement>(compoundStatement));
+        boundClass->AddMember(std::move(boundFunction));
+        boundCompileUnit.AddBoundNode(std::move(boundClass));
+        boundCompileUnit.RemoveLastFileScope();
+        InstantiateDestructorAndVirtualFunctions(classTemplateSpecialization, containerScope, currentFunction, span);
     }
-    else if (memberFunction->GetSymbolType() == SymbolType::destructorSymbol)
+    catch (const Exception& ex)
     {
-        DestructorSymbol* destructorSymbol = static_cast<DestructorSymbol*>(memberFunction);
-        Node* node = symbolTable.GetNode(memberFunction);
-        Assert(node->GetNodeType() == NodeType::destructorNode, "destructor node expected");
-        DestructorNode* destructorNode = static_cast<DestructorNode*>(node);
-        statementBinder.SetCurrentDestructor(destructorSymbol, destructorNode);
+        std::vector<Span> references;
+        references.push_back(memberFunction->GetSpan());
+        references.push_back(ex.Defined());
+        references.insert(references.end(), ex.References().begin(), ex.References().end());
+        throw Exception("could not instantiate member function '" + ToUtf8(memberFunction->FullName()) + "'. Reason: " + ex.Message(), span, references);
     }
-    else if (memberFunction->GetSymbolType() == SymbolType::memberFunctionSymbol)
-    {
-        MemberFunctionSymbol* memberFunctionSymbol = static_cast<MemberFunctionSymbol*>(memberFunction);
-        Node* node = symbolTable.GetNode(memberFunction);
-        Assert(node->GetNodeType() == NodeType::memberFunctionNode, "member function node expected");
-        MemberFunctionNode* memberFunctionNode = static_cast<MemberFunctionNode*>(node);
-        statementBinder.SetCurrentMemberFunction(memberFunctionSymbol, memberFunctionNode);
-    }
-    functionInstanceNode->Body()->Accept(statementBinder);
-    BoundStatement* boundStatement = statementBinder.ReleaseStatement();
-    Assert(boundStatement->GetBoundNodeType() == BoundNodeType::boundCompoundStatement, "bound compound statement expected");
-    BoundCompoundStatement* compoundStatement = static_cast<BoundCompoundStatement*>(boundStatement);
-    boundFunction->SetBody(std::unique_ptr<BoundCompoundStatement>(compoundStatement));
-    boundClass->AddMember(std::move(boundFunction));
-    boundCompileUnit.AddBoundNode(std::move(boundClass));
-    boundCompileUnit.RemoveLastFileScope();
-    InstantiateDestructorAndVirtualFunctions(classTemplateSpecialization, containerScope, span);
 }
 
-void ClassTemplateRepository::InstantiateDestructorAndVirtualFunctions(ClassTemplateSpecializationSymbol* classTemplateSpecialization, ContainerScope* containerScope, const Span& span)
+void ClassTemplateRepository::InstantiateDestructorAndVirtualFunctions(ClassTemplateSpecializationSymbol* classTemplateSpecialization, ContainerScope* containerScope, BoundFunction* currentFunction, const Span& span)
 {
     for (FunctionSymbol* virtualMemberFunction : classTemplateSpecialization->Vmt())
     {
         if (!virtualMemberFunction->IsGeneratedFunction())
         {
-            Instantiate(virtualMemberFunction, containerScope, span);
+            Instantiate(virtualMemberFunction, containerScope, currentFunction, span);
         }
     }
     if (classTemplateSpecialization->Destructor())
     {
         if (!classTemplateSpecialization->Destructor()->IsGeneratedFunction())
         {
-            Instantiate(classTemplateSpecialization->Destructor(), containerScope, span);
+            Instantiate(classTemplateSpecialization->Destructor(), containerScope, currentFunction, span);
         }
     }
 }

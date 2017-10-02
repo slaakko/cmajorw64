@@ -917,7 +917,10 @@ std::unique_ptr<BoundFunctionCall> CreateBoundFunctionCall(FunctionSymbol* bestF
                     }
                     catch (const Exception& ex)
                     {
-                        throw Exception("cannot pass class '" + ToUtf8(classType->FullName()) + "' by value because: " + ex.Message(), argument->GetSpan(), ex.References());
+                        std::vector<Span> references;
+                        references.push_back(ex.Defined());
+                        references.insert(references.end(), ex.References().begin(), ex.References().end());
+                        throw Exception("cannot pass class '" + ToUtf8(classType->FullName()) + "' by value because: " + ex.Message(), argument->GetSpan(), references);
                     }
                 }
                 TypeSymbol* type = classType->AddConst(span)->AddLvalueReference(span);
@@ -1055,12 +1058,12 @@ std::unique_ptr<BoundFunctionCall> SelectViableFunction(const std::unordered_set
             {
                 if ((flags & OverloadResolutionFlags::dontThrow) != OverloadResolutionFlags::none)
                 {
-                    exception.reset(new Exception("cannot call a suppressed member function", span, bestFun->GetSpan()));
+                    exception.reset(new Exception("cannot call a suppressed member function '" + ToUtf8(bestFun->FullName()) + "'", span, bestFun->GetSpan()));
                     return std::unique_ptr<BoundFunctionCall>();
                 }
                 else
                 {
-                    throw Exception("cannot call a suppressed member function", span, bestFun->GetSpan());
+                    throw Exception("cannot call a suppressed member function '" + ToUtf8(bestFun->FullName()) + "'", span, bestFun->GetSpan());
                 }
             }
             bool instantiate = (flags & OverloadResolutionFlags::dontInstantiate) == OverloadResolutionFlags::none;
@@ -1075,7 +1078,7 @@ std::unique_ptr<BoundFunctionCall> SelectViableFunction(const std::unordered_set
             {
                 if (instantiate)
                 {
-                    boundCompileUnit.InstantiateClassTemplateMemberFunction(bestFun, containerScope, span);
+                    boundCompileUnit.InstantiateClassTemplateMemberFunction(bestFun, containerScope, boundFunction, span);
                 }
             }
             else if (GetGlobalFlag(GlobalFlags::release) && bestFun->IsInline())
@@ -1115,12 +1118,12 @@ std::unique_ptr<BoundFunctionCall> SelectViableFunction(const std::unordered_set
         {
             if ((flags & OverloadResolutionFlags::dontThrow) != OverloadResolutionFlags::none)
             {
-                exception.reset(new Exception("cannot call a suppressed member function", span, singleBest->GetSpan()));
+                exception.reset(new Exception("cannot call a suppressed member function '" + ToUtf8(singleBest->FullName()) + "'", span, singleBest->GetSpan()));
                 return std::unique_ptr<BoundFunctionCall>();
             }
             else
             {
-                throw Exception("cannot call a suppressed member function", span, singleBest->GetSpan());
+                throw Exception("cannot call a suppressed member function '" + ToUtf8(singleBest->FullName()) + "'", span, singleBest->GetSpan());
             }
         }
         bool instantiate = (flags & OverloadResolutionFlags::dontInstantiate) == OverloadResolutionFlags::none;
@@ -1135,7 +1138,7 @@ std::unique_ptr<BoundFunctionCall> SelectViableFunction(const std::unordered_set
         {
             if (instantiate)
             {
-                boundCompileUnit.InstantiateClassTemplateMemberFunction(singleBest, containerScope, span);
+                boundCompileUnit.InstantiateClassTemplateMemberFunction(singleBest, containerScope, boundFunction, span);
             }
         }
         else if (GetGlobalFlag(GlobalFlags::release) && singleBest->IsInline())

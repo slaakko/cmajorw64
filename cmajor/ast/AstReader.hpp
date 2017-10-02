@@ -20,6 +20,7 @@ class StatementNode;
 class DefaultStatementNode;
 class CompoundStatementNode;
 class ConstraintNode;
+class WhereConstraintNode;
 class ConceptIdNode;
 class ConceptNode;
 
@@ -35,16 +36,13 @@ public:
     DefaultStatementNode* ReadDefaultStatementNode();
     CompoundStatementNode* ReadCompoundStatementNode();
     ConstraintNode* ReadConstraintNode();
+    WhereConstraintNode* ReadWhereConstraintNode();
     ConceptIdNode* ReadConceptIdNode();
     ConceptNode* ReadConceptNode();
     Specifiers ReadSpecifiers();
     Span ReadSpan();
-    void SetReplaceFileIndex(int32_t replaceFileIndex_) { replaceFileIndex = replaceFileIndex_; }
-    void SetFileIndexOffset(int32_t fileIndexOffset_) { fileIndexOffset = fileIndexOffset_; }
 private:
     BinaryReader binaryReader;
-    int32_t replaceFileIndex;
-    int32_t fileIndexOffset;
 };
 
 } } // namespace cmajor::ast

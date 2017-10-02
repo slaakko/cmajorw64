@@ -329,7 +329,6 @@ void FunctionSymbol::Accept(SymbolCollector* collector)
 void FunctionSymbol::ReadAstNodes()
 {
     AstReader reader(filePathReadFrom);
-    reader.SetReplaceFileIndex(GetSpan().FileIndex());
     reader.GetBinaryReader().Skip(astNodesPos);
     usingNodes.Read(reader);
     Node* node = reader.ReadNode();

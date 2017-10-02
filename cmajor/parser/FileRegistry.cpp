@@ -4,9 +4,12 @@
 // =================================
 
 #include <cmajor/parser/FileRegistry.hpp>
+#include <cmajor/ast/SystemFileIndex.hpp>
 #include <mutex>
 
 namespace cmajor { namespace parser {
+
+using namespace cmajor::ast;
 
 std::mutex mtx;
 
@@ -17,28 +20,59 @@ void FileRegistry::Init()
     instance.reset(new FileRegistry());
 }
 
-int FileRegistry::RegisterFile(const std::string& filePath)
+FileRegistry::FileRegistry() : obtainSystemFileIndeces(false)
 {
-    std::lock_guard<std::mutex> lock(mtx);
-    int fileIndex = GetNumberOfFilePaths();
-    filePaths.push_back(filePath);
-    return fileIndex;
 }
 
-const std::string& FileRegistry::GetFilePath(int filePathIndex)
+void FileRegistry::PushObtainSystemFileIndeces()
+{
+    obtainsSystemFileIndecesStack.push(obtainSystemFileIndeces);
+    obtainSystemFileIndeces = true;
+}
+
+void FileRegistry::PopObtainSystemFileIndeces()
+{
+    obtainSystemFileIndeces = obtainsSystemFileIndecesStack.top();
+    obtainsSystemFileIndecesStack.pop();
+}
+
+uint32_t FileRegistry::RegisterFile(const std::string& filePath)
 {
     std::lock_guard<std::mutex> lock(mtx);
-    static std::string emptyFileName;
-    if (filePathIndex >= 0 && filePathIndex < GetNumberOfFilePaths())
+    if (obtainSystemFileIndeces)
     {
-        return filePaths[filePathIndex];
+        uint32_t fileIndex = SystemFileIndex::Instance().RegisterSystemSourceFile(filePath);
+        return fileIndex;
     }
-    return emptyFileName;
+    else
+    {
+        uint32_t fileIndex = GetNumberOfFilePaths();
+        filePaths.push_back(filePath);
+        return fileIndex;
+    }
 }
 
-int FileRegistry::GetNumberOfFilePaths()
+std::string FileRegistry::GetFilePath(uint32_t filePathIndex)
 {
-    return int(filePaths.size());
+    std::lock_guard<std::mutex> lock(mtx);
+    if (filePathIndex >= firstSystemFileIndex)
+    {
+        return SystemFileIndex::Instance().GetSystemSourceFilePath(filePathIndex);
+    }
+    else
+    {
+        static std::string emptyFileName;
+        if (filePathIndex >= 0 && filePathIndex < GetNumberOfFilePaths())
+        {
+            return filePaths[filePathIndex];
+        }
+        return emptyFileName;
+    }
+}
+
+uint32_t FileRegistry::GetNumberOfFilePaths()
+{
+    return uint32_t(filePaths.size());
 }
 
 } } // namespace cmajor::parser

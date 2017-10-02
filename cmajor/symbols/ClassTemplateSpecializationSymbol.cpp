@@ -28,12 +28,12 @@ std::u32string MakeClassTemplateSpecializationName(ClassTypeSymbol* classTemplat
 }
 
 ClassTemplateSpecializationSymbol::ClassTemplateSpecializationSymbol(const Span& span_, const std::u32string& name_) : 
-    ClassTypeSymbol(SymbolType::classTemplateSpecializationSymbol, span_, name_), classTemplate(nullptr), templateArgumentTypes(), prototype(false)
+    ClassTypeSymbol(SymbolType::classTemplateSpecializationSymbol, span_, name_), classTemplate(nullptr), templateArgumentTypes(), flags(ClassTemplateSpecializationFlags::none)
 {
 }
 
 ClassTemplateSpecializationSymbol::ClassTemplateSpecializationSymbol(const Span& span_, std::u32string& name_, ClassTypeSymbol* classTemplate_, const std::vector<TypeSymbol*>& templateArgumentTypes_) : 
-    ClassTypeSymbol(SymbolType::classTemplateSpecializationSymbol, span_, name_), classTemplate(classTemplate_), templateArgumentTypes(templateArgumentTypes_), prototype(false)
+    ClassTypeSymbol(SymbolType::classTemplateSpecializationSymbol, span_, name_), classTemplate(classTemplate_), templateArgumentTypes(templateArgumentTypes_), flags(ClassTemplateSpecializationFlags::none)
 {
 }
 
@@ -61,7 +61,7 @@ void ClassTemplateSpecializationSymbol::Write(SymbolWriter& writer)
         uint32_t templateArgumentTypeId = templateArgumentType->TypeId();
         writer.GetBinaryWriter().WriteEncodedUInt(templateArgumentTypeId);
     }
-    writer.GetBinaryWriter().Write(prototype);
+    writer.GetBinaryWriter().Write(uint8_t(flags));
 }
 
 void ClassTemplateSpecializationSymbol::Read(SymbolReader& reader)
@@ -76,7 +76,7 @@ void ClassTemplateSpecializationSymbol::Read(SymbolReader& reader)
         uint32_t typeArgumentId = reader.GetBinaryReader().ReadEncodedUInt();
         GetSymbolTable()->EmplaceTypeRequest(this, typeArgumentId, -2 - i);
     }
-    prototype = reader.GetBinaryReader().ReadBool();
+    flags = ClassTemplateSpecializationFlags(reader.GetBinaryReader().ReadByte());
 }
 
 void ClassTemplateSpecializationSymbol::EmplaceType(TypeSymbol* typeSymbol, int index)
@@ -128,7 +128,7 @@ void ClassTemplateSpecializationSymbol::ComputeExportClosure()
 
 bool ClassTemplateSpecializationSymbol::IsPrototypeTemplateSpecialization() const
 {
-    return prototype;
+    return IsPrototype();
 }
 
 void ClassTemplateSpecializationSymbol::SetGlobalNs(std::unique_ptr<Node>&& globalNs_)

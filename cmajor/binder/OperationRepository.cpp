@@ -1549,7 +1549,10 @@ bool ClassDefaultConstructorOperation::GenerateImplementation(ClassDefaultConstr
     }
     catch (const Exception& ex)
     {
-        exception.reset(new Exception("cannot create default constructor for class '" + ToUtf8(classType->FullName()) + "'. Reason: " + ex.Message(), span, ex.References()));
+        std::vector<Span> references;
+        references.push_back(ex.Defined());
+        references.insert(references.end(), ex.References().begin(), ex.References().end());
+        exception.reset(new Exception("cannot create default constructor for class '" + ToUtf8(classType->FullName()) + "'. Reason: " + ex.Message(), span, references));
         return false;
     }
     return  true;
@@ -1737,7 +1740,10 @@ bool ClassCopyConstructorOperation::GenerateImplementation(ClassCopyConstructor*
     }
     catch (const Exception& ex)
     {
-        exception.reset(new Exception("cannot create copy constructor for class '" + ToUtf8(classType->FullName()) + "'. Reason: " + ex.Message(), span, ex.References()));
+        std::vector<Span> references;
+        references.push_back(ex.Defined());
+        references.insert(references.end(), ex.References().begin(), ex.References().end());
+        exception.reset(new Exception("cannot create copy constructor for class '" + ToUtf8(classType->FullName()) + "'. Reason: " + ex.Message(), span, references));
         return false;
     }
     return true;
@@ -1929,7 +1935,10 @@ bool ClassMoveConstructorOperation::GenerateImplementation(ClassMoveConstructor*
     }
     catch (const Exception& ex)
     {
-        exception.reset(new Exception("cannot create move constructor for class '" + ToUtf8(classType->FullName()) + "'. Reason: " + ex.Message(), span, ex.References()));
+        std::vector<Span> references;
+        references.push_back(ex.Defined());
+        references.insert(references.end(), ex.References().begin(), ex.References().end());
+        exception.reset(new Exception("cannot create move constructor for class '" + ToUtf8(classType->FullName()) + "'. Reason: " + ex.Message(), span, references));
         return false;
     }
     return true;
@@ -2092,7 +2101,10 @@ bool ClassCopyAssignmentOperation::GenerateImplementation(ClassCopyAssignment* c
     }
     catch (const Exception& ex)
     {
-        exception.reset(new Exception("cannot create copy assignment for class '" + ToUtf8(classType->FullName()) + "'. Reason: " + ex.Message(), span, ex.References()));
+        std::vector<Span> references;
+        references.push_back(ex.Defined());
+        references.insert(references.end(), ex.References().begin(), ex.References().end());
+        exception.reset(new Exception("cannot create copy assignment for class '" + ToUtf8(classType->FullName()) + "'. Reason: " + ex.Message(), span, references));
         return false;
     }
     return true;
@@ -2251,7 +2263,10 @@ bool ClassMoveAssignmentOperation::GenerateImplementation(ClassMoveAssignment* m
     }
     catch (const Exception& ex)
     {
-        exception.reset(new Exception("cannot create move assignment for class '" + ToUtf8(classType->FullName()) + "'. Reason: " + ex.Message(), span, ex.References()));
+        std::vector<Span> references;
+        references.push_back(ex.Defined());
+        references.insert(references.end(), ex.References().begin(), ex.References().end());
+        exception.reset(new Exception("cannot create move assignment for class '" + ToUtf8(classType->FullName()) + "'. Reason: " + ex.Message(), span, references));
         return false;
     }
     return true;
@@ -2328,7 +2343,10 @@ void GenerateDestructorImplementation(BoundClass* boundClass, DestructorSymbol* 
     }
     catch (const Exception& ex)
     {
-        throw Exception("cannot create destructor for class '" + ToUtf8(classType->FullName()) + "'. Reason: " + ex.Message(), span, ex.References());
+        std::vector<Span> references;
+        references.push_back(ex.Defined());
+        references.insert(references.end(), ex.References().begin(), ex.References().end());
+        throw Exception("cannot create destructor for class '" + ToUtf8(classType->FullName()) + "'. Reason: " + ex.Message(), span, references);
     }
 }
 
@@ -2493,7 +2511,10 @@ void GenerateStaticClassInitialization(StaticConstructorSymbol* staticConstructo
     }
     catch (const Exception& ex)
     {
-        throw Exception("could not generate static initialization for class '" + ToUtf8(classType->FullName()) + "'. Reason: " + ex.Message(), staticConstructorNode->GetSpan(), ex.References());
+        std::vector<Span> references;
+        references.push_back(ex.Defined());
+        references.insert(references.end(), ex.References().begin(), ex.References().end());
+        throw Exception("could not generate static initialization for class '" + ToUtf8(classType->FullName()) + "'. Reason: " + ex.Message(), staticConstructorNode->GetSpan(), references);
     }
 }
 
@@ -2764,7 +2785,10 @@ void GenerateClassInitialization(ConstructorSymbol* constructorSymbol, Construct
     }
     catch (const Exception& ex)
     {
-        throw Exception("could not generate initialization for class '" + ToUtf8(classType->FullName()) + "'. Reason: " + ex.Message(), constructorNode->GetSpan(), ex.References());
+        std::vector<Span> references;
+        references.push_back(ex.Defined());
+        references.insert(references.end(), ex.References().begin(), ex.References().end());
+        throw Exception("could not generate initialization for class '" + ToUtf8(classType->FullName()) + "'. Reason: " + ex.Message(), constructorNode->GetSpan(), references);
     }
 }
 
@@ -2899,7 +2923,10 @@ void GenerateClassAssignment(MemberFunctionSymbol* assignmentFunctionSymbol, Mem
     }
     catch (const Exception& ex)
     {
-        throw Exception("could not generate assignment for class '" + ToUtf8(classType->FullName()) + "'. Reason: " + ex.Message(), assignmentNode->GetSpan(), ex.References());
+        std::vector<Span> references;
+        references.push_back(ex.Defined());
+        references.insert(references.end(), ex.References().begin(), ex.References().end());
+        throw Exception("could not generate assignment for class '" + ToUtf8(classType->FullName()) + "'. Reason: " + ex.Message(), assignmentNode->GetSpan(), references);
     }
 }
 
@@ -2976,7 +3003,10 @@ void GenerateClassTermination(DestructorSymbol* destructorSymbol, DestructorNode
     }
     catch (const Exception& ex)
     {
-        throw Exception("could not generate termination for class '" + ToUtf8(classType->FullName()) + "'. Reason: " + ex.Message(), destructorNode->GetSpan(), ex.References());
+        std::vector<Span> references;
+        references.push_back(ex.Defined());
+        references.insert(references.end(), ex.References().begin(), ex.References().end());
+        throw Exception("could not generate termination for class '" + ToUtf8(classType->FullName()) + "'. Reason: " + ex.Message(), destructorNode->GetSpan(), references);
     }
 }
 

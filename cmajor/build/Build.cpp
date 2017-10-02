@@ -23,6 +23,7 @@
 #include <cmajor/symbols/SymbolWriter.hpp>
 #include <cmajor/symbols/SymbolReader.hpp>
 #include <cmajor/symbols/SymbolCreatorVisitor.hpp>
+#include <cmajor/ast/SystemFileIndex.hpp>
 #include <cmajor/util/Unicode.hpp>
 #include <cmajor/util/Path.hpp>
 #include <cmajor/util/System.hpp>
@@ -369,7 +370,7 @@ void CleanProject(Project* project)
 
 void ReadTypeIdCounter(const std::string& config)
 {
-    boost::filesystem::path typeIdCounterFile = Path::Combine(Path::Combine(CmajorRootDir(), "counter"), "typeid." + config);
+    boost::filesystem::path typeIdCounterFile = Path::Combine(Path::Combine(CmajorRootDir(), "config"), "typeIdCounter." + config);
     if (boost::filesystem::exists(typeIdCounterFile))
     {
         std::ifstream f(typeIdCounterFile.generic_string());
@@ -381,7 +382,7 @@ void ReadTypeIdCounter(const std::string& config)
 
 void WriteTypeIdCounter(const std::string& config)
 {
-    boost::filesystem::path typeIdCounterFile = Path::Combine(Path::Combine(CmajorRootDir(), "counter"), "typeid." + config);
+    boost::filesystem::path typeIdCounterFile = Path::Combine(Path::Combine(CmajorRootDir(), "config"), "typeIdCounter." + config);
     std::ofstream f(typeIdCounterFile.generic_string());
     int nextTypeId = TypeIdCounter::Instance().GetNextTypeId();
     f << nextTypeId << std::endl;
@@ -393,7 +394,7 @@ void WriteTypeIdCounter(const std::string& config)
 
 void ReadFunctionIdCounter(const std::string& config)
 {
-    boost::filesystem::path functionIdCounterFile = Path::Combine(Path::Combine(CmajorRootDir(), "counter"), "functionid." + config);
+    boost::filesystem::path functionIdCounterFile = Path::Combine(Path::Combine(CmajorRootDir(), "config"), "functionIdCounter." + config);
     if (boost::filesystem::exists(functionIdCounterFile))
     {
         std::ifstream f(functionIdCounterFile.generic_string());
@@ -405,7 +406,7 @@ void ReadFunctionIdCounter(const std::string& config)
 
 void WriteFunctionIdCounter(const std::string& config)
 {
-    boost::filesystem::path functionIdCounterFile = Path::Combine(Path::Combine(CmajorRootDir(), "counter"), "functionid." + config);
+    boost::filesystem::path functionIdCounterFile = Path::Combine(Path::Combine(CmajorRootDir(), "config"), "functionIdCounter." + config);
     std::ofstream f(functionIdCounterFile.generic_string());
     int nextFunctionId = FunctionIdCounter::Instance().GetNextFunctionId();
     f << nextFunctionId << std::endl;
@@ -413,6 +414,21 @@ void WriteFunctionIdCounter(const std::string& config)
     {
         throw std::runtime_error("could not write to " + functionIdCounterFile.generic_string());
     }
+}
+
+void ReadSystemFileIndex(const std::string& config)
+{
+    boost::filesystem::path systemFileIndexFile = Path::Combine(Path::Combine(CmajorRootDir(), "config"), "systemFileIndex." + config);
+    if (boost::filesystem::exists(systemFileIndexFile))
+    {
+        SystemFileIndex::Instance().Read(GetFullPath(systemFileIndexFile.generic_string()));
+    }
+}
+
+void WriteSystemFileIndex(const std::string& config)
+{
+    boost::filesystem::path systemFileIndexFile = Path::Combine(Path::Combine(CmajorRootDir(), "config"), "systemFileIndex." + config);
+    SystemFileIndex::Instance().Write(GetFullPath(systemFileIndexFile.generic_string()));
 }
 
 void CreateMainUnit(std::vector<std::string>& objectFilePaths, Module& module, EmittingContext& emittingContext)
@@ -457,11 +473,20 @@ void BuildProject(Project* project)
     }
     ReadTypeIdCounter(config);
     ReadFunctionIdCounter(config);
+    ReadSystemFileIndex(config);
     CompileWarningCollection::Instance().SetCurrentProjectName(project->Name());
     SetCurrentProjectName(project->Name());
     SetCurrentTooName(U"cmc");
-    std::vector<std::unique_ptr<CompileUnitNode>> compileUnits = ParseSources(project->SourceFilePaths());
     Module module(project->Name(), project->ModuleFilePath());
+    if (module.IsSystemModule())
+    {
+        FileRegistry::Instance().PushObtainSystemFileIndeces();
+    }
+    std::vector<std::unique_ptr<CompileUnitNode>> compileUnits = ParseSources(project->SourceFilePaths());
+    if (module.IsSystemModule())
+    {
+        FileRegistry::Instance().PopObtainSystemFileIndeces();
+    }
     std::unique_ptr<ModuleBinder> moduleBinder;
     if (!compileUnits.empty())
     {
@@ -527,6 +552,10 @@ void BuildProject(Project* project)
     module.Write(writer);
     WriteTypeIdCounter(config);
     WriteFunctionIdCounter(config);
+    if (module.IsSystemModule())
+    {
+        WriteSystemFileIndex(config);
+    }
     if (GetGlobalFlag(GlobalFlags::verbose))
     {
         std::cout << "==> " << project->ModuleFilePath() << std::endl;

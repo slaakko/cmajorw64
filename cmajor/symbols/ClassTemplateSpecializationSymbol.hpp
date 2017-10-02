@@ -9,6 +9,23 @@
 
 namespace cmajor { namespace symbols {
 
+enum class ClassTemplateSpecializationFlags : uint8_t
+{
+    none = 0,
+    prototype = 1 << 0,
+    constraintChecked = 1 << 1
+};
+
+inline ClassTemplateSpecializationFlags operator|(ClassTemplateSpecializationFlags left, ClassTemplateSpecializationFlags right)
+{
+    return ClassTemplateSpecializationFlags(uint8_t(left) | uint8_t(right));
+}
+
+inline ClassTemplateSpecializationFlags operator&(ClassTemplateSpecializationFlags left, ClassTemplateSpecializationFlags right)
+{
+    return ClassTemplateSpecializationFlags(uint8_t(left) & uint8_t(right));
+}
+
 std::u32string MakeClassTemplateSpecializationName(ClassTypeSymbol* classTemplate, const std::vector<TypeSymbol*>& templateArgumentTypes);
 
 class ClassTemplateSpecializationSymbol : public ClassTypeSymbol
@@ -28,13 +45,18 @@ public:
     Node* GlobalNs() { return globalNs.get(); }
     void SetFileScope(FileScope* fileScope_);
     FileScope* ReleaseFileScope();
-    void SetPrototype() { prototype = true; }
+    void SetPrototype() { SetFlag(ClassTemplateSpecializationFlags::prototype); }
+    bool IsPrototype() const { return GetFlag(ClassTemplateSpecializationFlags::prototype); }
+    void SetConstraintChecked() { SetFlag(ClassTemplateSpecializationFlags::constraintChecked); }
+    bool IsConstraintChecked() { return GetFlag(ClassTemplateSpecializationFlags::constraintChecked); }
+    void SetFlag(ClassTemplateSpecializationFlags flag) { flags = flags | flag; }
+    bool GetFlag(ClassTemplateSpecializationFlags flag) const { return (flags & flag) != ClassTemplateSpecializationFlags::none;  }
 private:
     ClassTypeSymbol* classTemplate;
     std::vector<TypeSymbol*> templateArgumentTypes;
     std::unique_ptr<Node> globalNs;
     std::unique_ptr<FileScope> fileScope;
-    bool prototype;
+    ClassTemplateSpecializationFlags flags;
 };
 
 } } // namespace cmajor::symbols

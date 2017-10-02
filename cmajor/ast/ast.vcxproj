@@ -43,6 +43,7 @@
     <ClInclude Include="Solution.hpp" />
     <ClInclude Include="Specifier.hpp" />
     <ClInclude Include="Statement.hpp" />
+    <ClInclude Include="SystemFileIndex.hpp" />
     <ClInclude Include="Template.hpp" />
     <ClInclude Include="Typedef.hpp" />
     <ClInclude Include="TypeExpr.hpp" />
@@ -72,6 +73,7 @@
     <ClCompile Include="Solution.cpp" />
     <ClCompile Include="Specifier.cpp" />
     <ClCompile Include="Statement.cpp" />
+    <ClCompile Include="SystemFileIndex.cpp" />
     <ClCompile Include="Template.cpp" />
     <ClCompile Include="Typedef.cpp" />
     <ClCompile Include="TypeExpr.cpp" />

@@ -395,7 +395,7 @@ FunctionSymbol* BoundCompileUnit::GetConversion(TypeSymbol* sourceType, TypeSymb
     {
         if (conversion->Parent() && !conversion->IsGeneratedFunction() && conversion->Parent()->GetSymbolType() == SymbolType::classTemplateSpecializationSymbol)
         {
-            InstantiateClassTemplateMemberFunction(conversion, containerScope, span);
+            InstantiateClassTemplateMemberFunction(conversion, containerScope, currentFunction, span);
         }
         else if (GetGlobalFlag(GlobalFlags::release) && conversion->IsInline())
         {
@@ -417,9 +417,9 @@ FunctionSymbol* BoundCompileUnit::InstantiateFunctionTemplate(FunctionSymbol* fu
     return functionTemplateRepository.Instantiate(functionTemplate, templateParameterMapping, span);
 }
 
-void BoundCompileUnit::InstantiateClassTemplateMemberFunction(FunctionSymbol* memberFunction, ContainerScope* containerScope, const Span& span)
+void BoundCompileUnit::InstantiateClassTemplateMemberFunction(FunctionSymbol* memberFunction, ContainerScope* containerScope, BoundFunction* currentFunction, const Span& span)
 {
-    classTemplateRepository.Instantiate(memberFunction, containerScope, span);
+    classTemplateRepository.Instantiate(memberFunction, containerScope, currentFunction, span);
 }
 
 void BoundCompileUnit::InstantiateInlineFunction(FunctionSymbol* inlineFunction, ContainerScope* containerScope, const Span& span)

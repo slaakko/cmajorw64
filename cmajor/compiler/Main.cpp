@@ -220,9 +220,12 @@ int main(int argc, const char** argv)
                     throw std::runtime_error("Argument '" + fp.generic_string() + "' has invalid extension. Not Cmajor solution (.cms) or project (.cmp) file.");
                 }
             }
-            std::unique_ptr<JsonObject> compileResult(new JsonObject());
-            compileResult->AddField(U"success", std::unique_ptr<JsonValue>(new JsonBool(true)));
-            std::cerr << compileResult->ToString() << std::endl;
+            if (GetGlobalFlag(GlobalFlags::ide))
+            {
+                std::unique_ptr<JsonObject> compileResult(new JsonObject());
+                compileResult->AddField(U"success", std::unique_ptr<JsonValue>(new JsonBool(true)));
+                std::cerr << compileResult->ToString() << std::endl;
+            }
         }
     }
     catch (const Exception& ex)

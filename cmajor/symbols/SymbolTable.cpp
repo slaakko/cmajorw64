@@ -295,6 +295,11 @@ void SymbolTable::BeginFunction(FunctionNode& functionNode)
     functionSymbol->SetCompileUnit(currentCompileUnit);
     functionSymbol->SetSymbolTable(this);
     functionSymbol->SetGroupName(functionNode.GroupId());
+    if (functionNode.WhereConstraint())
+    {
+        CloneContext cloneContext;
+        functionSymbol->SetConstraint(static_cast<WhereConstraintNode*>(functionNode.WhereConstraint()->Clone(cloneContext)));
+    }
     if (functionSymbol->GroupName() == U"main")
     {
         if (mainFunctionSymbol)
@@ -439,6 +444,11 @@ void SymbolTable::BeginStaticConstructor(StaticConstructorNode& staticConstructo
     SetFunctionIdFor(staticConstructorSymbol);
     staticConstructorSymbol->SetCompileUnit(currentCompileUnit);
     staticConstructorSymbol->SetSymbolTable(this);
+    if (staticConstructorNode.WhereConstraint())
+    {
+        CloneContext cloneContext;
+        staticConstructorSymbol->SetConstraint(static_cast<WhereConstraintNode*>(staticConstructorNode.WhereConstraint()->Clone(cloneContext)));
+    }
     MapNode(&staticConstructorNode, staticConstructorSymbol);
     ContainerScope* staticConstructorScope = staticConstructorSymbol->GetContainerScope();
     ContainerScope* containerScope = container->GetContainerScope();
@@ -460,6 +470,11 @@ void SymbolTable::BeginConstructor(ConstructorNode& constructorNode)
     SetFunctionIdFor(constructorSymbol);
     constructorSymbol->SetCompileUnit(currentCompileUnit);
     constructorSymbol->SetSymbolTable(this);
+    if (constructorNode.WhereConstraint())
+    {
+        CloneContext cloneContext;
+        constructorSymbol->SetConstraint(static_cast<WhereConstraintNode*>(constructorNode.WhereConstraint()->Clone(cloneContext)));
+    }
     MapNode(&constructorNode, constructorSymbol);
     ContainerScope* constructorScope = constructorSymbol->GetContainerScope();
     ContainerScope* containerScope = container->GetContainerScope();
@@ -496,6 +511,11 @@ void SymbolTable::BeginDestructor(DestructorNode& destructorNode)
     SetFunctionIdFor(destructorSymbol);
     destructorSymbol->SetCompileUnit(currentCompileUnit);
     destructorSymbol->SetSymbolTable(this);
+    if (destructorNode.WhereConstraint())
+    {
+        CloneContext cloneContext;
+        destructorSymbol->SetConstraint(static_cast<WhereConstraintNode*>(destructorNode.WhereConstraint()->Clone(cloneContext)));
+    }
     MapNode(&destructorNode, destructorSymbol);
     ContainerScope* destructorScope = destructorSymbol->GetContainerScope();
     ContainerScope* containerScope = container->GetContainerScope();
@@ -532,6 +552,11 @@ void SymbolTable::BeginMemberFunction(MemberFunctionNode& memberFunctionNode)
     memberFunctionSymbol->SetCompileUnit(currentCompileUnit);
     memberFunctionSymbol->SetSymbolTable(this);
     memberFunctionSymbol->SetGroupName(memberFunctionNode.GroupId());
+    if (memberFunctionNode.WhereConstraint())
+    {
+        CloneContext cloneContext;
+        memberFunctionSymbol->SetConstraint(static_cast<WhereConstraintNode*>(memberFunctionNode.WhereConstraint()->Clone(cloneContext)));
+    }
     MapNode(&memberFunctionNode, memberFunctionSymbol);
     ContainerScope* memberFunctionScope = memberFunctionSymbol->GetContainerScope();
     ContainerScope* containerScope = container->GetContainerScope();
@@ -583,6 +608,11 @@ void SymbolTable::BeginConversionFunction(ConversionFunctionNode& conversionFunc
     conversionFunctionSymbol->SetCompileUnit(currentCompileUnit);
     conversionFunctionSymbol->SetSymbolTable(this);
     conversionFunctionSymbol->SetGroupName(U"@operator_conv");
+    if (conversionFunctionNode.WhereConstraint())
+    {
+        CloneContext cloneContext;
+        conversionFunctionSymbol->SetConstraint(static_cast<WhereConstraintNode*>(conversionFunctionNode.WhereConstraint()->Clone(cloneContext)));
+    }
     MapNode(&conversionFunctionNode, conversionFunctionSymbol);
     ContainerScope* conversionFunctionScope = conversionFunctionSymbol->GetContainerScope();
     ContainerScope* containerScope = container->GetContainerScope();

@@ -808,11 +808,14 @@ void ConstraintChecker::Visit(ConstructorConstraintNode& constructorConstraintNo
         }
         signature.append(1, ')');
         std::string message = "constructor signature '" + signature + "' not found";
+        std::vector<Span> references;
         if (exception)
         {
             message.append(": ").append(exception->Message());
+            references.push_back(exception->Defined());
+            references.insert(references.end(), exception->References().begin(), exception->References().end());
         }
-        throw Exception(message, span);
+        throw Exception(message, span, references);
     }
     else
     {
@@ -869,11 +872,14 @@ void ConstraintChecker::Visit(MemberFunctionConstraintNode& memberFunctionConstr
         }
         signature.append(1, ')');
         std::string message = "member function signature '" + signature + "' not found";
+        std::vector<Span> references;
         if (exception)
         {
             message.append(": ").append(exception->Message());
+            references.push_back(exception->Defined());
+            references.insert(references.end(), exception->References().begin(), exception->References().end());
         }
-        throw Exception(message, span);
+        throw Exception(message, span, references);
     }
     else
     {
@@ -959,11 +965,14 @@ void ConstraintChecker::Visit(FunctionConstraintNode& functionConstraintNode)
                 }
                 signature.append(1, ')');
                 std::string message = "function signature '" + signature + "' not found";
+                std::vector<Span> references;
                 if (exception)
                 {
                     message.append(": ").append(exception->Message());
+                    references.push_back(exception->Defined());
+                    references.insert(references.end(), exception->References().begin(), exception->References().end());
                 }
-                throw Exception(message, span);
+                throw Exception(message, span, references);
             }
             else
             {
@@ -1300,7 +1309,7 @@ std::unique_ptr<BoundConcept> Instantiate(ConceptSymbol* conceptSymbol, const st
         std::string message;
         if (typeArguments.size() == 1)
         {
-            message.append("type '" + ToUtf8(firstTypeArgument->FullName()) + "' does not fulfill the requirements of concept ");
+            message.append("type '" + ToUtf8(firstTypeArgument->FullName()) + "' does not fulfill the requirements of concept '");
         }
         else
         {
@@ -1322,7 +1331,11 @@ std::unique_ptr<BoundConcept> Instantiate(ConceptSymbol* conceptSymbol, const st
         }
         message.append(ToUtf8(conceptSymbol->FullName())).append("' because:\n");
         message.append(ex.Message());
-        throw Exception(message, span, ex.References());
+        std::vector<Span> references;
+        references.push_back(conceptSymbol->GetSpan());
+        references.push_back(ex.Defined());
+        references.insert(references.end(), ex.References().begin(), ex.References().end());
+        throw Exception(message, span, references);
     }
 }
 

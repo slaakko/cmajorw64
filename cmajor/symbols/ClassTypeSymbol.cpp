@@ -219,7 +219,6 @@ void ClassTypeSymbol::ComputeExportClosure()
 void ClassTypeSymbol::ReadAstNodes()
 {
     AstReader reader(filePathReadFrom);
-    reader.SetReplaceFileIndex(GetSpan().FileIndex());
     reader.GetBinaryReader().Skip(astNodesPos);
     usingNodes.Read(reader);
     Node* node = reader.ReadNode();

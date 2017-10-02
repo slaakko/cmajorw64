@@ -52,6 +52,11 @@ private:
     int32_t end;
 };
 
+inline bool operator==(const Span& left, const Span& right)
+{
+    return left.FileIndex() == right.FileIndex() && left.LineNumber() == right.LineNumber() && left.Start() == right.Start() && left.End() == right.End();
+}
+
 std::u32string NarrowString(const char32_t* start, const char32_t* end);
 
 class Parser;

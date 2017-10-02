@@ -10,7 +10,7 @@
 
 namespace cmajor { namespace ast {
 
-AstReader::AstReader(const std::string& fileName_) : binaryReader(fileName_), replaceFileIndex(-1), fileIndexOffset(-1)
+AstReader::AstReader(const std::string& fileName_) : binaryReader(fileName_)
 {
 }
 
@@ -101,6 +101,19 @@ ConstraintNode* AstReader::ReadConstraintNode()
     }
 }
 
+WhereConstraintNode* AstReader::ReadWhereConstraintNode()
+{
+    Node* node = ReadNode();
+    if (node->GetNodeType() == NodeType::whereConstraintNode)
+    {
+        return static_cast<WhereConstraintNode*>(node);
+    }
+    else
+    {
+        throw std::runtime_error("where constraint node expected");
+    }
+}
+
 ConceptIdNode* AstReader::ReadConceptIdNode()
 {
     Node* node = ReadNode();
@@ -142,14 +155,6 @@ Span AstReader::ReadSpan()
     else
     {
         uint32_t fileIndex = binaryReader.ReadEncodedUInt();
-        if (replaceFileIndex != -1)
-        {
-            fileIndex = replaceFileIndex;
-        }
-        else if (fileIndexOffset != -1)
-        {
-            fileIndex += fileIndexOffset;
-        }
         uint32_t lineNumber = binaryReader.ReadEncodedUInt();
         uint32_t start = binaryReader.ReadEncodedUInt();
         uint32_t end = binaryReader.ReadEncodedUInt();

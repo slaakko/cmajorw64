@@ -305,6 +305,11 @@ void TypeBinder::Visit(StaticConstructorNode& staticConstructorNode)
         staticConstructorSymbol->SetTemplateSpecialization();
         staticConstructorSymbol->SetLinkOnceOdrLinkage();
     }
+    if (!staticConstructorSymbol->Constraint() && staticConstructorNode.WhereConstraint())
+    {
+        CloneContext cloneContext;
+        staticConstructorSymbol->SetConstraint(static_cast<WhereConstraintNode*>(staticConstructorNode.WhereConstraint()->Clone(cloneContext)));
+    }
     staticConstructorSymbol->ComputeName();
     if (staticConstructorNode.Body())
     {
@@ -356,6 +361,11 @@ void TypeBinder::Visit(ConstructorNode& constructorNode)
         Assert(symbol->GetSymbolType() == SymbolType::parameterSymbol, "parameter symbol expected");
         ParameterSymbol* parameterSymbol = static_cast<ParameterSymbol*>(symbol);
         parameterSymbol->SetType(parameterType);
+    }
+    if (!constructorSymbol->Constraint() && constructorNode.WhereConstraint())
+    {
+        CloneContext cloneContext;
+        constructorSymbol->SetConstraint(static_cast<WhereConstraintNode*>(constructorNode.WhereConstraint()->Clone(cloneContext)));
     }
     constructorSymbol->ComputeName();
     if (constructorSymbol->IsDefaultConstructor())
@@ -414,6 +424,11 @@ void TypeBinder::Visit(DestructorNode& destructorNode)
         destructorSymbol->SetTemplateSpecialization();
         destructorSymbol->SetLinkOnceOdrLinkage();
     }
+    if (!destructorSymbol->Constraint() && destructorNode.WhereConstraint())
+    {
+        CloneContext cloneContext;
+        destructorSymbol->SetConstraint(static_cast<WhereConstraintNode*>(destructorNode.WhereConstraint()->Clone(cloneContext)));
+    }
     destructorSymbol->ComputeName();
     if (destructorNode.Body())
     {
@@ -470,6 +485,11 @@ void TypeBinder::Visit(MemberFunctionNode& memberFunctionNode)
     }
     TypeSymbol* returnType = ResolveType(memberFunctionNode.ReturnTypeExpr(), boundCompileUnit, containerScope);
     memberFunctionSymbol->SetReturnType(returnType);
+    if (!memberFunctionSymbol->Constraint() && memberFunctionNode.WhereConstraint())
+    {
+        CloneContext cloneContext;
+        memberFunctionSymbol->SetConstraint(static_cast<WhereConstraintNode*>(memberFunctionNode.WhereConstraint()->Clone(cloneContext)));
+    }
     memberFunctionSymbol->ComputeName();
     if (memberFunctionSymbol->ReturnsClassOrClassDelegateByValue())
     {
@@ -523,6 +543,11 @@ void TypeBinder::Visit(ConversionFunctionNode& conversionFunctionNode)
     }
     TypeSymbol* returnType = ResolveType(conversionFunctionNode.ReturnTypeExpr(), boundCompileUnit, containerScope);
     conversionFunctionSymbol->SetReturnType(returnType);
+    if (!conversionFunctionSymbol->Constraint() && conversionFunctionNode.WhereConstraint())
+    {
+        CloneContext cloneContext;
+        conversionFunctionSymbol->SetConstraint(static_cast<WhereConstraintNode*>(conversionFunctionNode.WhereConstraint()->Clone(cloneContext)));
+    }
     conversionFunctionSymbol->ComputeName();
     if (conversionFunctionSymbol->ReturnsClassOrClassDelegateByValue())
     {

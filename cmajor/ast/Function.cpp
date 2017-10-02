@@ -129,6 +129,12 @@ void FunctionNode::Write(AstWriter& writer)
     writer.GetBinaryWriter().Write(groupId);
     templateParameters.Write(writer);
     parameters.Write(writer);
+    bool hasConstraint = whereConstraint != nullptr;
+    writer.GetBinaryWriter().Write(hasConstraint);
+    if (hasConstraint)
+    {
+        writer.Write(whereConstraint.get());
+    }
     bool hasBody = body != nullptr;
     writer.GetBinaryWriter().Write(hasBody);
     if (hasBody)
@@ -158,6 +164,11 @@ void FunctionNode::Read(AstReader& reader)
     templateParameters.SetParent(this);
     parameters.Read(reader);
     parameters.SetParent(this);
+    bool hasConstraint = reader.GetBinaryReader().ReadBool();;
+    if (hasConstraint)
+    {
+        whereConstraint.reset(reader.ReadWhereConstraintNode());
+    }
     bool hasBody = reader.GetBinaryReader().ReadBool();
     if (hasBody)
     {
