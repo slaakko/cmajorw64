@@ -1,12 +1,36 @@
-// =================================
+﻿// =================================
 // Copyright (c) 2017 Seppo Laakko
 // Distributed under the MIT license
 // =================================
 
 using System;
+using System.IO;
 
 namespace System.Unicode
 {
+    public class UnicodeException : Exception
+    {
+        public nothrow UnicodeException(const string& message_) : base(message_)
+        {
+        }
+    }
+    
+    public void ThrowUnicodeException(const string& message)
+    {
+        throw UnicodeException(message);
+    }
+    
+    public string PathToUnicodeDirectory()
+    {
+        string cmajorRoot = RtGetEnvironmentVariable("CMAJOR_ROOT");
+        if (cmajorRoot.IsEmpty())
+        {
+            ThrowUnicodeException("CMAJOR_ROOT environment variable not set (set it to /path/to/cmajor directory)");
+            return string();
+        }
+        return Path.Combine(cmajorRoot, "unicode");
+    }
+    
     public ustring ToUtf32(const string& utf8Str)
     {
         ustring result;

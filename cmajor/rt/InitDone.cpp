@@ -9,6 +9,7 @@
 #include <cmajor/rt/Io.hpp>
 #include <cmajor/rt/Classes.hpp>
 #include <cmajor/rt/Statics.hpp>
+#include <cmajor/rt/String.hpp>
 
 extern "C" RT_API void RtInit()
 {
@@ -34,10 +35,12 @@ void Init()
     InitStatics();
     InitClasses();
     InitError();
+    InitString();
 }
 
 void Done()
 {
+    DoneString();
     DoneError();
     DoneClasses();
     DoneStatics();

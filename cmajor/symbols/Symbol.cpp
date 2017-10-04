@@ -252,7 +252,7 @@ const NamespaceSymbol* Symbol::Ns() const
         }
         else
         {
-            throw std::runtime_error("namespace symbol not found");
+            throw Exception("namespace symbol not found", GetSpan());
         }
     }
 }
@@ -271,7 +271,7 @@ NamespaceSymbol* Symbol::Ns()
         }
         else
         {
-            throw std::runtime_error("namespace symbol not found");
+            throw Exception("namespace symbol not found", GetSpan());
         }
     }
 }
@@ -501,7 +501,7 @@ const ClassTypeSymbol* Symbol::Class() const
     }
     else
     {
-        throw std::runtime_error("class type symbol not found");
+        throw Exception("class type symbol not found", GetSpan());
     }
 }
 
@@ -514,7 +514,7 @@ ClassTypeSymbol* Symbol::Class()
     }
     else
     {
-        throw std::runtime_error("class type symbol not found");
+        throw Exception("class type symbol not found", GetSpan());
     }
 }
 
@@ -651,7 +651,7 @@ const FunctionSymbol* Symbol::Function() const
     }
     else
     {
-        throw std::runtime_error("function symbol not found");
+        throw Exception("function symbol not found", GetSpan());
     }
 }
 
@@ -664,7 +664,7 @@ FunctionSymbol* Symbol::Function()
     }
     else
     {
-        throw std::runtime_error("function symbol not found");
+        throw Exception("function symbol not found", GetSpan());
     }
 }
 
@@ -701,7 +701,7 @@ const ContainerScope* Symbol::ClassOrNsScope() const
     }
     else
     {
-        throw std::runtime_error("class or namespace scope not found");
+        throw Exception("class or namespace scope not found", GetSpan());
     }
 }
 
@@ -714,7 +714,7 @@ ContainerScope* Symbol::ClassOrNsScope()
     }
     else
     {
-        throw std::runtime_error("class or namespace scope not found");
+        throw Exception("class or namespace scope not found", GetSpan());
     }
 }
 
@@ -727,7 +727,7 @@ const ContainerScope* Symbol::ClassInterfaceOrNsScope() const
     }
     else
     {
-        throw std::runtime_error("class, interface or namespace scope not found");
+        throw Exception("class, interface or namespace scope not found", GetSpan());
     }
 }
 
@@ -740,7 +740,7 @@ ContainerScope* Symbol::ClassInterfaceOrNsScope()
     }
     else
     {
-        throw std::runtime_error("class, interface or namespace scope not found");
+        throw Exception("class, interface or namespace scope not found", GetSpan());
     }
 }
 
@@ -753,7 +753,7 @@ const ContainerScope* Symbol::ClassInterfaceEnumDelegateOrNsScope() const
     }
     else
     {
-        throw std::runtime_error("class, interface, enumeration, delegate, class delegate or namespace scope not found");
+        throw Exception("class, interface, enumeration, delegate, class delegate or namespace scope not found", GetSpan());
     }
 }
 
@@ -766,7 +766,7 @@ ContainerScope* Symbol::ClassInterfaceEnumDelegateOrNsScope()
     }
     else
     {
-        throw std::runtime_error("class, interface, enumeration, delegate, class delegate or namespace scope not found");
+        throw Exception("class, interface, enumeration, delegate, class delegate or namespace scope not found", GetSpan());
     }
 }
 

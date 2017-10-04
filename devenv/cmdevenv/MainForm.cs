@@ -1683,6 +1683,14 @@ namespace cmdevenv
                 HandleCompileResult(null);
             }
         }
+        private async void closeToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            await CloseSolution();
+        }
+        private void renameToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            solutionExplorerTreeView.SelectedNode.BeginEdit();
+        }
         private Solution solution;
         private XTabControl editorTabControl;
         private State state;
