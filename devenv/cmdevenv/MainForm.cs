@@ -988,8 +988,12 @@ namespace cmdevenv
             compileTimeStatusLabel.Text = "";
             progressTimer.Stop();
             progressLabel.Text = "";
-            bool hasErrors = !compileResult.Success;
+            bool hasErrors = false;
             bool hasWarningsOrInfos = false;
+            if (compileResult != null)
+            {
+                hasErrors = !compileResult.Success;
+            }
             if (hasErrors || hasWarningsOrInfos)
             {
                 if (hasErrors)
@@ -1031,49 +1035,52 @@ namespace cmdevenv
                         infoLabel.Text = "Build succeeded";
                     }
                 }
-                Diagnostics diagnostics = compileResult.Diagnostics;
-                if (diagnostics != null)
+                if (compileResult != null)
                 {
-                    string tool = diagnostics.Tool;
-                    string file = "";
-                    string line = "";
-                    string text = "";
-                    Reference mainReference = null;
-                    if (diagnostics.References.Count > 0)
+                    Diagnostics diagnostics = compileResult.Diagnostics;
+                    if (diagnostics != null)
                     {
-                        mainReference = diagnostics.References[0];
-                        file = mainReference.File;
-                        if (mainReference.Line != 0)
+                        string tool = diagnostics.Tool;
+                        string file = "";
+                        string line = "";
+                        string text = "";
+                        Reference mainReference = null;
+                        if (diagnostics.References.Count > 0)
                         {
-                            line = mainReference.Line.ToString();
+                            mainReference = diagnostics.References[0];
+                            file = mainReference.File;
+                            if (mainReference.Line != 0)
+                            {
+                                line = mainReference.Line.ToString();
+                            }
+                            else
+                            {
+                                line = "";
+                            }
+                            text = mainReference.Text.Trim();
                         }
-                        else
+                        ListViewItem item = new ListViewItem(new string[] { tool, diagnostics.Kind, diagnostics.Message, file, line, diagnostics.Project, text });
+                        item.Tag = mainReference;
+                        errorListView.Items.Add(item);
+                        for (int i = 1; i < diagnostics.References.Count; ++i)
                         {
-                            line = "";
+                            Reference reference = diagnostics.References[i];
+                            file = reference.File;
+                            if (reference.Line != 0)
+                            {
+                                line = reference.Line.ToString();
+                            }
+                            else
+                            {
+                                line = "";
+                            }
+                            text = reference.Text.Trim();
+                            ListViewItem refItem = new ListViewItem(new string[] { "cmc", "info", "see reference to", file, line, "", text });
+                            refItem.Tag = reference;
+                            errorListView.Items.Add(refItem);
                         }
-                        text = mainReference.Text.Trim();
+                        showErrorDescriptionInTextWindowToolStripMenuItem.Enabled = true;
                     }
-                    ListViewItem item = new ListViewItem(new string[] { tool, diagnostics.Kind, diagnostics.Message, file, line, diagnostics.Project, text });
-                    item.Tag = mainReference;
-                    errorListView.Items.Add(item);
-                    for (int i = 1; i < diagnostics.References.Count; ++i)
-                    {
-                        Reference reference = diagnostics.References[i];
-                        file = reference.File;
-                        if (reference.Line != 0)
-                        {
-                            line = reference.Line.ToString();
-                        }
-                        else
-                        {
-                            line = "";
-                        }
-                        text = reference.Text.Trim();
-                        ListViewItem refItem = new ListViewItem(new string[] { "cmc", "info", "see reference to", file, line, "", text });
-                        refItem.Tag = reference;
-                        errorListView.Items.Add(refItem);
-                    }
-                    showErrorDescriptionInTextWindowToolStripMenuItem.Enabled = true;
                 }
                 outputTabControl.SelectedTab = errorTabPage;
             }
@@ -1625,6 +1632,10 @@ namespace cmdevenv
                 Project activeProject = solution.ActiveProject;
                 if (activeProject != null)
                 {
+                    if (activeProject.Target != Target.program)
+                    {
+                        throw new Exception("cannot execute: active project is a library");
+                    }
                     console.ReadOnly = false;
                     console.Clear();
                     outputTabControl.SelectedTab = consoleTabPage;
@@ -1644,6 +1655,34 @@ namespace cmdevenv
                 MessageBox.Show(ex.Message);
             }
         }
+        private void abortToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            batchBuilding = false;
+            if (processRunning)
+            {
+                executor.TerminateRunningProcess();
+            }
+            else if (buildInProgress)
+            {
+                compiler.AbortCompile();
+                compileAborted = true;
+                HandleCompileResult(null);
+            }
+        }
+        private void cancelToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            batchBuilding = false;
+            if (processRunning)
+            {
+                executor.TerminateRunningProcess();
+            }
+            else if (buildInProgress)
+            {
+                compiler.AbortCompile();
+                compileAborted = true;
+                HandleCompileResult(null);
+            }
+        }
         private Solution solution;
         private XTabControl editorTabControl;
         private State state;
@@ -1652,6 +1691,7 @@ namespace cmdevenv
         private Executor executor;
         private ConsoleWindow console;
         private bool buildInProgress;
+        private bool batchBuilding;
         private string progressChars;
         private int progressIndex;
         private bool processRunning;

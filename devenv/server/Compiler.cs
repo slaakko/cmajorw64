@@ -442,6 +442,19 @@ namespace server
                 return compileResult;
             }
         }
+        public void AbortCompile()
+        {
+            if (compileProcess != null)
+            {
+                if (writeControl != null && writeDelegate != null)
+                {
+                    writeControl.Invoke(writeDelegate, "Abort compile pending...");
+                }
+                compileProcess.Kill();
+                compileAborted = true;
+                compileProcess = null;
+            }
+        }
         public void DoClean(string solutionOrProjectFilePath, string config)
         {
             Request request = new CleanRequest(solutionOrProjectFilePath, config);

@@ -460,6 +460,7 @@ namespace cmdevenv
             this.cancelToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.C)));
             this.cancelToolStripMenuItem.Size = new System.Drawing.Size(228, 22);
             this.cancelToolStripMenuItem.Text = "Cancel";
+            this.cancelToolStripMenuItem.Click += new System.EventHandler(this.cancelToolStripMenuItem_Click);
             // 
             // toolStripSeparator4
             // 
@@ -503,6 +504,7 @@ namespace cmdevenv
             this.abortToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.C)));
             this.abortToolStripMenuItem.Size = new System.Drawing.Size(325, 22);
             this.abortToolStripMenuItem.Text = "&Terminate Running Process";
+            this.abortToolStripMenuItem.Click += new System.EventHandler(this.abortToolStripMenuItem_Click);
             // 
             // windowToolStripMenuItem
             // 
