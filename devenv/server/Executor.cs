@@ -80,11 +80,23 @@ namespace server
         {
             if (processStdin != null)
             {
-                processStdin.WriteLine(line);
+                byte[] bytes = UTF8.Encode(line);
+                foreach (byte b in bytes)
+                {
+                    processStdin.BaseStream.WriteByte(b);
+                }
+                processStdin.WriteLine();
             }
             else
             {
                 throw new Exception("standard input of the process is closed, because of process exit");
+            }
+        }
+        public void CloseProcessStandardInput()
+        {
+            if (processStdin != null)
+            {
+                processStdin.Close();
             }
         }
         private void ProcessRequests()
@@ -135,11 +147,12 @@ namespace server
                 processStdin = process.StandardInput;
                 runningProcess = process;
                 List<byte> stdoutBytes = new List<byte>();
-                int x = process.StandardOutput.Read();
-                while (x != -1)
+                List<byte> stderrBytes = new List<byte>();
+                int stdoutByte = process.StandardOutput.Read();
+                while (stdoutByte != -1)
                 {
-                    stdoutBytes.Add((byte)x);
-                    if ((byte)x == '\n')
+                    stdoutBytes.Add((byte)stdoutByte);
+                    if ((char)stdoutByte == '\n')
                     {
                         if (writeControl != null && writeDelegate != null)
                         {
@@ -147,7 +160,21 @@ namespace server
                         }
                         stdoutBytes.Clear();
                     }
-                    x = process.StandardOutput.Read();
+                    stdoutByte = process.StandardOutput.Read();
+                }
+                int stderrByte = process.StandardError.Read();
+                while (stderrByte != -1)
+                {
+                    stderrBytes.Add((byte)stderrByte);
+                    if ((char)stderrByte == '\n')
+                    {
+                        if (writeControl != null && writeDelegate != null)
+                        {
+                            writeControl.Invoke(writeDelegate, UTF8.Decode(stderrBytes.ToArray()));
+                        }
+                        stderrBytes.Clear();
+                    }
+                    stderrByte = process.StandardError.Read();
                 }
                 if (stdoutBytes.Count > 0)
                 {
@@ -156,24 +183,16 @@ namespace server
                         writeControl.Invoke(writeDelegate, UTF8.Decode(stdoutBytes.ToArray()));
                     }
                 }
-                process.WaitForExit();
-                runningProcess = null;
-                processStdin = null;
-                List<byte> stderrBytes = new List<byte>();
-                x = process.StandardError.Read();
-                while (x != -1)
-                {
-                    stderrBytes.Add((byte)x);
-                    x = process.StandardError.Read();
-                }
-                string errorText = UTF8.Decode(stderrBytes.ToArray());
-                if (!string.IsNullOrEmpty(errorText))
+                if (stderrBytes.Count > 0)
                 {
                     if (writeControl != null && writeDelegate != null)
                     {
-                        writeControl.Invoke(writeDelegate, "\nstandard error:\n" + errorText);
+                        writeControl.Invoke(writeDelegate, UTF8.Decode(stderrBytes.ToArray()));
                     }
                 }
+                process.WaitForExit();
+                runningProcess = null;
+                processStdin = null;
                 if (writeControl != null && writeDelegate != null)
                 {
                     if (processKilled)

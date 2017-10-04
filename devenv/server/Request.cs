@@ -31,12 +31,13 @@ namespace server
 
     public class CompileRequest : Request
     {
-        public CompileRequest(string filePath, string config, bool emitLlvm, bool emitOptLlvm, int optimizationLevel)
+        public CompileRequest(string filePath, string config, bool emitLlvm, bool emitOptLlvm, bool linkWithDebugRuntime, int optimizationLevel)
         {
             this.filePath = filePath;
             this.config = config;
             this.emitLlvm = emitLlvm;
             this.emitOptLlvm = emitOptLlvm;
+            this.linkWithDebugRuntime = linkWithDebugRuntime;
             this.optimizationLevel = optimizationLevel;
         }
         public override void Process(RequestHandler handler)
@@ -59,6 +60,10 @@ namespace server
         {
             get { return emitOptLlvm; }
         }
+        public bool LinkWithDebugRuntime
+        {
+            get { return linkWithDebugRuntime; }
+        }
         public int OptimizationLevel
         {
             get { return optimizationLevel; }
@@ -67,6 +72,7 @@ namespace server
         private string config;
         private bool emitLlvm;
         private bool emitOptLlvm;
+        private bool linkWithDebugRuntime;
         private int optimizationLevel;
     }
 

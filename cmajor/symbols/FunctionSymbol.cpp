@@ -1165,6 +1165,12 @@ DestructorSymbol::DestructorSymbol(const Span& span_, const std::u32string& name
     SetGroupName(U"@destructor");
 }
 
+bool DestructorSymbol::IsExportSymbol() const
+{
+    if (IsTemplateSpecialization()) return false;
+    return true;
+}
+
 void DestructorSymbol::Write(SymbolWriter& writer)
 {
     FunctionSymbol::Write(writer);

@@ -307,6 +307,7 @@ void ClassTypeSymbol::AddMember(Symbol* member)
 bool ClassTypeSymbol::HasNontrivialDestructor() const
 {
     if (destructor || IsPolymorphic()) return true;
+    if (baseClass && baseClass->Destructor()) return true;
     int n = memberVariables.size();
     for (int i = 0; i < n; ++i)
     {
@@ -464,6 +465,10 @@ void ClassTypeSymbol::Dump(CodeFormatter& formatter)
 
 void ClassTypeSymbol::CreateDestructorSymbol()
 {
+    if (GroupName() == U"StreamWriter")
+    {
+        int x = 0;
+    }
     if (!destructor)
     {
         DestructorSymbol* destructorSymbol = new DestructorSymbol(GetSpan(), U"@destructor");

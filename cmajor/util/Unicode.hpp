@@ -25,6 +25,20 @@ public:
     UnicodeException(const std::string& message_);
 };
 
+class Utf8ToUtf32Engine
+{
+public:
+    Utf8ToUtf32Engine();
+    void Put(uint8_t x);
+    bool ResulReady() const { return resultReady; }
+    char32_t Result() const { return result; }
+private:
+    int state;
+    bool resultReady;
+    char32_t result;
+    uint8_t bytes[4];
+};
+
 std::u32string ToUtf32(const std::string& utf8Str);
 std::u32string ToUtf32(const std::u16string& utf16Str);
 std::u16string ToUtf16(const std::u32string& utf32Str);

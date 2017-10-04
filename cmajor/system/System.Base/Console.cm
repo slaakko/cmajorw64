@@ -1,4 +1,4 @@
-// =================================
+﻿// =================================
 // Copyright (c) 2017 Seppo Laakko
 // Distributed under the MIT license
 // =================================
@@ -151,6 +151,18 @@ namespace System
         public static void WriteLine(double d)
         {
             out->WriteLine(d);
+        }
+        public static int Read()
+        {
+            return in->Read();
+        }
+        public static string ReadLine()
+        {
+            return in->ReadLine();
+        }
+        public static string ReadToEnd()
+        {
+            return in->ReadToEnd();
         }
         public static void SetOut(UniquePtr<OutputStream>&& out_)
         {

@@ -251,6 +251,10 @@ void StatementBinder::Visit(ClassNode& classNode)
         classMember->Accept(*this);
     }
     boundCompileUnit.AddBoundNode(std::move(boundClass));
+    if (classTypeSymbol->GroupName() == U"StreamWriter")
+    {
+        int x = 0;
+    }
     if (classTypeSymbol->HasNontrivialDestructor())
     {
         classTypeSymbol->CreateDestructorSymbol();

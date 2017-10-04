@@ -1,4 +1,4 @@
-// =================================
+﻿// =================================
 // Copyright (c) 2017 Seppo Laakko
 // Distributed under the MIT license
 // =================================
@@ -52,6 +52,15 @@ namespace System.IO
         public nothrow inline void* Mem() const
         {
             return mem;
+        }
+        public nothrow inline byte operator[](long index) const
+        {
+            #assert(index >= 0 && index < size);
+            return cast<byte*>(mem)[index];
+        }
+        public nothrow inline byte& operator[](long index) 
+        {
+            return cast<byte*>(mem)[index];
         }
         private long size;
         private void* mem;
@@ -148,40 +157,21 @@ namespace System.IO
                 throw FileSystemException("file not opened");
             }
         }
+        public override int Read()
+        {
+            return RtReadByte(fileHandle);
+        }
         public override string ReadLine()
         {
             string line;
-            while (!endOfStream)
+            int x = RtReadByte(fileHandle);
+            while (x != -1 && cast<char>(x) != '\n')
             {
-                if (pos == end)
-                {
-                    int result = RtRead(fileHandle, buffer.Mem(), buffer.Size());
-                    if (result < 0)
-                    {
-                        string errorMessage = RtGetError(result);
-                        RtDisposeError(result);
-                        throw FileSystemException(errorMessage);
-                    }
-                    else if (result == 0)
-                    {
-                        endOfStream = true;
-                    }
-                    else
-                    {
-                        pos = cast<const char*>(buffer.Mem());
-                        end = pos + result;
-                    }
-                }
-                while (pos != end)
-                {
-                    if (*pos == '\n')
-                    {
-                        ++pos;
-                        return line;
-                    }
-                    line.Append(*pos++);
-                }
+                char c = cast<char>(x);
+                line.Append(c);
+                x = RtReadByte(fileHandle);
             }
+            endOfStream = x == -1;
             return line;
         }
         public override string ReadToEnd()
@@ -189,11 +179,12 @@ namespace System.IO
             string content;
             while (!endOfStream)
             {
-                int result = RtRead(fileHandle, buffer.Mem(), buffer.Size());
+                long result = RtRead(fileHandle, buffer.Mem(), buffer.Size());
                 if (result < 0)
                 {
-                    string errorMessage = RtGetError(result);
-                    RtDisposeError(result);
+                    int res = cast<int>(result);
+                    string errorMessage = RtGetError(res);
+                    RtDisposeError(res);
                     throw FileSystemException(errorMessage);
                 }
                 else if (result == 0)
@@ -359,6 +350,18 @@ namespace System.IO
         {
             Write(ToString(b));
         }
+        public override void Write(char c)
+        {
+            Write(ToString(c));
+        }
+        public override void Write(wchar c)
+        {
+            Write(ToString(c));
+        }
+        public override void Write(uchar c)
+        {
+            Write(ToString(c));
+        }
         public override void Write(sbyte s)
         {
             Write(ToString(s));
@@ -436,6 +439,21 @@ namespace System.IO
         public override void WriteLine(bool b)
         {
             Write(b);
+            WriteLine();
+        }
+        public override void WriteLine(char c)
+        {
+            Write(c);
+            WriteLine();
+        }
+        public override void WriteLine(wchar c)
+        {
+            Write(c);
+            WriteLine();
+        }
+        public override void WriteLine(uchar c)
+        {
+            Write(c);
             WriteLine();
         }
         public override void WriteLine(sbyte s)

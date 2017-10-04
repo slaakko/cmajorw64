@@ -1,0 +1,164 @@
+﻿// =================================
+// Copyright (c) 2017 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Unicode;
+
+namespace System.IO
+{
+    public class StreamWriter
+    {
+        public StreamWriter(UniquePtr<ByteStream>&& stream_) : stream(Rvalue(stream_))
+        {
+        }
+        suppress StreamWriter(const StreamWriter&);
+        suppress void operator=(const StreamWriter&);
+        public default nothrow StreamWriter(StreamWriter&&);
+        public default nothrow void operator=(StreamWriter&&);
+        public void Write(const string& x)
+        {
+            void* buf = x.Chars();
+            stream->Write(cast<byte*>(buf), x.Length());
+        }
+        public void Write(const wstring& x)
+        {
+            Write(ToUtf8(x));
+        }
+        public void Write(const ustring& x)
+        {
+            Write(ToUtf8(x));
+        }
+        public void Write(bool x)
+        {
+            Write(ToString(x));
+        }
+        public void Write(char x)
+        {
+            Write(ToString(x));
+        }
+        public void Write(wchar x)
+        {
+            Write(ToString(x));
+        }
+        public void Write(uchar x)
+        {
+            Write(ToString(x));
+        }
+        public void Write(sbyte x)
+        {
+            Write(ToString(x));
+        }
+        public void Write(byte x)
+        {
+            Write(ToString(x));
+        }
+        public void Write(short x)
+        {
+            Write(ToString(x));
+        }
+        public void Write(ushort x)
+        {
+            Write(ToString(x));
+        }
+        public void Write(int x)
+        {
+            Write(ToString(x));
+        }
+        public void Write(uint x)
+        {
+            Write(ToString(x));
+        }
+        public void Write(long x)
+        {
+            Write(ToString(x));
+        }
+        public void Write(ulong x)
+        {
+            Write(ToString(x));
+        }
+        public void Write(float x)
+        {
+            Write(ToString(x));
+        }
+        public void Write(double x)
+        {
+            Write(ToString(x));
+        }
+        public void WriteLine()
+        {
+            Write("\n");
+        }
+        public void WriteLine(const string& x)
+        {
+            Write(x);
+            WriteLine();
+        }
+        public void WriteLine(const wstring& x)
+        {
+            Write(x);
+            WriteLine();
+        }
+        public void WriteLine(const ustring& x)
+        {
+            Write(x);
+            WriteLine();
+        }
+        public void WriteLine(sbyte x)
+        {
+            Write(x);
+            WriteLine();
+        }
+        public void WriteLine(byte x)
+        {
+            Write(x);
+            WriteLine();
+        }
+        public void WriteLine(short x)
+        {
+            Write(x);
+            WriteLine();
+        }
+        public void WriteLine(ushort x)
+        {
+            Write(x);
+            WriteLine();
+        }
+        public void WriteLine(int x)
+        {
+            Write(x);
+            WriteLine();
+        }
+        public void WriteLine(uint x)
+        {
+            Write(x);
+            WriteLine();
+        }
+        public void WriteLine(long x)
+        {
+            Write(x);
+            WriteLine();
+        }
+        public void WriteLine(ulong x)
+        {
+            Write(x);
+            WriteLine();
+        }
+        public void WriteLine(float x)
+        {
+            Write(x);
+            WriteLine();
+        }
+        public void WriteLine(double x)
+        {
+            Write(x);
+            WriteLine();
+        }
+        public ByteStream& ContainedStream()
+        {
+            return *stream;
+        }
+        private UniquePtr<ByteStream> stream;
+    }
+}

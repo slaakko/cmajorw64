@@ -975,6 +975,8 @@ BoundExpression* BoundConstructExpression::Clone()
 
 void BoundConstructExpression::Load(Emitter& emitter, OperationFlags flags)
 {
+    llvm::Value* prevObjectPointer = emitter.GetObjectPointer();
+    emitter.SetObjectPointer(nullptr);
     if ((flags & OperationFlags::addr) != OperationFlags::none)
     {
         throw Exception("cannot take address of a construct expression", GetSpan());
@@ -985,15 +987,15 @@ void BoundConstructExpression::Load(Emitter& emitter, OperationFlags flags)
         llvm::Value* objectPointer = emitter.GetObjectPointer();
         if (!objectPointer)
         {
-            throw Exception("does not have object pointer", GetSpan());
+            throw Exception("do not have object pointer", GetSpan());
         }
         else
         {
             emitter.Stack().Push(objectPointer);
-            emitter.ResetObjectPointer();
         }
     }
     DestroyTemporaries(emitter);
+    emitter.SetObjectPointer(prevObjectPointer);
 }
 
 void BoundConstructExpression::Store(Emitter& emitter, OperationFlags flags)
@@ -1020,6 +1022,10 @@ BoundExpression* BoundConstructAndReturnTemporaryExpression::Clone()
 void BoundConstructAndReturnTemporaryExpression::Load(Emitter& emitter, OperationFlags flags)
 {
     constructorCall->Load(emitter, OperationFlags::none);
+    if (boundTemporary->GetType()->IsClassTypeSymbol() || boundTemporary->GetType()->GetSymbolType() == SymbolType::classDelegateTypeSymbol)
+    {
+        flags = flags | OperationFlags::addr;
+    }
     boundTemporary->Load(emitter, flags);
     DestroyTemporaries(emitter);
 }

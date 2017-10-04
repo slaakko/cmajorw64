@@ -276,7 +276,7 @@ namespace server
         }
         public override void HandleCompileRequest(CompileRequest request)
         {
-            Compile(request.FilePath, request.Config, request.EmitLlvm, request.EmitOptLlvm, request.OptimizationLevel);
+            Compile(request.FilePath, request.Config, request.EmitLlvm, request.EmitOptLlvm, request.LinkWithDebugRuntime, request.OptimizationLevel);
         }
         public void SetWriteMethod(Control writer, WriteLineToOutputWindow writeMethod)
         {
@@ -306,16 +306,16 @@ namespace server
         {
             exit.WaitOne();
         }
-        public void DoCompile(string filePath, string config, bool emitLlvm, bool emitOptLlvm, int optimizationLevel)
+        public void DoCompile(string filePath, string config, bool emitLlvm, bool emitOptLlvm, bool linkWithDebugRuntime, int optimizationLevel)
         {
-            Request request = new CompileRequest(filePath, config, emitLlvm, emitOptLlvm, optimizationLevel);
+            Request request = new CompileRequest(filePath, config, emitLlvm, emitOptLlvm, linkWithDebugRuntime, optimizationLevel);
             lock (requestQueue)
             {
                 requestQueue.Enqueue(request);
             }
             requestWaiting.Set();
         }
-        private void Compile(string filePath, string config, bool emitLlvm, bool emitOptLlvm, int optimizationLevel)
+        private void Compile(string filePath, string config, bool emitLlvm, bool emitOptLlvm, bool linkWithDebugRuntime, int optimizationLevel)
         {
             try
             {
@@ -330,6 +330,10 @@ namespace server
                 if (emitOptLlvm)
                 {
                     arguments.Append(" --emit-opt-llvm");
+                }
+                if (linkWithDebugRuntime)
+                {
+                    arguments.Append(" --link-with-debug-runtime");
                 }
                 if (optimizationLevel != -1)
                 {
@@ -351,7 +355,7 @@ namespace server
                 {
                     stdoutBytes.Add((byte)readResult);
                     readResult = cmc.StandardOutput.Read();
-                    if ((byte)readResult == '\n')
+                    if ((char)readResult == '\n')
                     {
                         if (writeControl != null && writeDelegate != null)
                         {

@@ -1,4 +1,4 @@
-// =================================
+﻿// =================================
 // Copyright (c) 2017 Seppo Laakko
 // Distributed under the MIT license
 // =================================
@@ -15,6 +15,7 @@ namespace System.IO
         suppress void operator=(const InputStream&);
         public nothrow default InputStream(InputStream&&);
         public nothrow default void operator=(InputStream&&);
+        public abstract int Read();
         public abstract string ReadLine();
         public abstract string ReadToEnd();
         public nothrow abstract bool EndOfStream() const;
@@ -35,6 +36,9 @@ namespace System.IO
         public abstract void Write(const wstring& s);
         public abstract void Write(const ustring& s);
         public abstract void Write(bool b);
+        public abstract void Write(char c);
+        public abstract void Write(wchar c);
+        public abstract void Write(uchar c);
         public abstract void Write(sbyte s);
         public abstract void Write(byte b);
         public abstract void Write(short s);
@@ -53,6 +57,9 @@ namespace System.IO
         public abstract void WriteLine(const wstring& s);
         public abstract void WriteLine(const ustring& s);
         public abstract void WriteLine(bool b);
+        public abstract void WriteLine(char c);
+        public abstract void WriteLine(wchar c);
+        public abstract void WriteLine(uchar c);
         public abstract void WriteLine(sbyte s);
         public abstract void WriteLine(byte b);
         public abstract void WriteLine(short s);

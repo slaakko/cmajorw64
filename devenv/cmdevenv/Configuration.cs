@@ -84,6 +84,8 @@ namespace cmdevenv
                 emitLlvm.Value = false;
                 emitOptLlvm = new BooleanField("emitOptLlvm", Fields);
                 emitOptLlvm.Value = false;
+                linkWithDebugRuntime = new BooleanField("linkWithDebugRuntime", Fields);
+                linkWithDebugRuntime.Value = false;
             }
             public string CmcPath
             {
@@ -229,6 +231,11 @@ namespace cmdevenv
                 get { return emitOptLlvm.Value; }
                 set { emitOptLlvm.Value = value; }
             }
+            public bool LinkWithDebugRuntime
+            {
+                get { return linkWithDebugRuntime.Value; }
+                set { linkWithDebugRuntime.Value = value; }
+            }
             private StringField cmc;
             private IntField tabSize;
             private IntField infoDelaySecs;
@@ -258,6 +265,7 @@ namespace cmdevenv
             private Array<RecentProject> recentProjects;
             private BooleanField emitLlvm;
             private BooleanField emitOptLlvm;
+            private BooleanField linkWithDebugRuntime;
         }
         public Configuration()
         {
@@ -419,6 +427,11 @@ namespace cmdevenv
         {
             get { return config.EmitOptLlvm; }
             set { config.EmitOptLlvm = value; }
+        }
+        public bool LinkWithDebugRuntime
+        {
+            get { return config.LinkWithDebugRuntime; }
+            set { config.LinkWithDebugRuntime = value; }
         }
         public void RemoveRecentProjectPath(string recentProjectPath)
         {

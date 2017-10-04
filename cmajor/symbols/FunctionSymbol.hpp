@@ -221,6 +221,7 @@ public:
     DestructorSymbol(const Span& span_, const std::u32string& name_);
     void Write(SymbolWriter& writer) override;
     void Read(SymbolReader& reader) override;
+    bool IsExportSymbol() const override;
     std::string TypeString() const override { return "destructor"; }
     ParameterSymbol* GetThisParam() const override { return Parameters()[0]; }
     bool IsConstructorDestructorOrNonstaticMemberFunction() const override { return true; }

@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Runtime.InteropServices;
 using System.IO;
 using devcore;
 using parser;
@@ -19,11 +20,12 @@ namespace cmdevenv
         editing, compiling, running, debugging
     }
 
-    public partial class MainForm : Form
+    public partial class MainForm : Form, IMessageFilter
     {
         public MainForm()
         {
             InitializeComponent();
+            Application.AddMessageFilter(this);
             progressChars = "|/-\\";
             progressIndex = 0;
             editorTabControl = new XTabControl();
@@ -50,6 +52,7 @@ namespace cmdevenv
             compileAborted = false;
             emitLlvm = Configuration.Instance.EmitLlvm; ;
             emitOptLlvm = Configuration.Instance.EmitOptLlvm;
+            linkWithDebugRuntime = Configuration.Instance.LinkWithDebugRuntime;
             optimizationLevel = -1;
             errorListView.ContextMenuStrip = errorsListViewContextMenuStrip;
             string[] args = Environment.GetCommandLineArgs();
@@ -57,6 +60,57 @@ namespace cmdevenv
             {
                 OpenProjectOrSolution(args[1]);
             }
+        }
+        public bool PreFilterMessage(ref Message m)
+        {
+            try
+            {
+                const int WM_KEYDOWN = 0x100;
+                if (m.Msg == WM_KEYDOWN)
+                {
+                    int w = (int)m.WParam;
+                    Keys key = (Keys)w & Keys.KeyCode;
+                    if (key == Keys.Tab)
+                    {
+                        bool controlPressed = KeyboardUtil.KeyPressed((int)Keys.ControlKey);
+                        if (controlPressed)
+                        {
+                            if (editorTabControl.TabCount > 1)
+                            {
+                                bool shiftPressed = KeyboardUtil.KeyPressed((int)Keys.ShiftKey);
+                                if (shiftPressed)
+                                {
+                                    if (editorTabControl.SelectedIndex > 0)
+                                    {
+                                        --editorTabControl.SelectedIndex;
+                                    }
+                                    else
+                                    {
+                                        editorTabControl.SelectedIndex = editorTabControl.TabCount - 1;
+                                    }
+                                }
+                                else
+                                {
+                                    if (editorTabControl.SelectedIndex < editorTabControl.TabCount - 1)
+                                    {
+                                        ++editorTabControl.SelectedIndex;
+                                    }
+                                    else
+                                    {
+                                        editorTabControl.SelectedIndex = 0;
+                                    }
+                                }
+                            }
+                            return true;
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            return false;
         }
         private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -884,7 +938,7 @@ namespace cmdevenv
                     cancelToolStripMenuItem.Enabled = true;
                     buildInProgress = true;
                     SetState(State.compiling);
-                    compiler.DoCompile(solution.FilePath, config, emitLlvm, emitOptLlvm, optimizationLevel);
+                    compiler.DoCompile(solution.FilePath, config, emitLlvm, emitOptLlvm, linkWithDebugRuntime, optimizationLevel);
                     infoLabel.Text = "Building";
                 }
             }
@@ -917,7 +971,7 @@ namespace cmdevenv
                 cancelToolStripMenuItem.Enabled = true;
                 buildInProgress = true;
                 SetState(State.compiling);
-                compiler.DoCompile(project.FilePath, config, emitLlvm, emitOptLlvm, optimizationLevel);
+                compiler.DoCompile(project.FilePath, config, emitLlvm, emitOptLlvm, linkWithDebugRuntime, optimizationLevel);
                 infoLabel.Text = "Building";
             }
             catch (Exception ex)
@@ -1203,14 +1257,18 @@ namespace cmdevenv
                 BuildOptionsDialog dialog = new BuildOptionsDialog();
                 emitLlvm = Configuration.Instance.EmitLlvm;
                 emitOptLlvm = Configuration.Instance.EmitOptLlvm;
+                linkWithDebugRuntime = Configuration.Instance.LinkWithDebugRuntime;
                 dialog.EmitLlvm = emitLlvm;
                 dialog.EmitOptLlvm = emitOptLlvm;
+                dialog.LinkWithDebugRuntime = linkWithDebugRuntime;
                 if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                 {
                     emitLlvm = dialog.EmitLlvm;
                     emitOptLlvm = dialog.EmitOptLlvm;
+                    linkWithDebugRuntime = dialog.LinkWithDebugRuntime;
                     Configuration.Instance.EmitLlvm = emitLlvm;
                     Configuration.Instance.EmitOptLlvm = emitOptLlvm;
+                    Configuration.Instance.LinkWithDebugRuntime = linkWithDebugRuntime;
                     Configuration.Instance.Save();
                 }
             }
@@ -1535,6 +1593,57 @@ namespace cmdevenv
                 MessageBox.Show(ex.Message);
             }
         }
+        private void formatContentToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                if (editorTabControl.SelectedTab != null)
+                {
+                    Editor currentEditor = (Editor)editorTabControl.SelectedTab.Tag;
+                    if (currentEditor != null)
+                    {
+                        if (currentEditor.SourceFile.GetKind() == SourceFile.Kind.cm)
+                        {
+                            currentEditor.FormatContent();
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+        private void runActiveProjectToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                if (buildInProgress)
+                {
+                    throw new Exception("cannot run while build is in progress");
+                }
+                Project activeProject = solution.ActiveProject;
+                if (activeProject != null)
+                {
+                    console.ReadOnly = false;
+                    console.Clear();
+                    outputTabControl.SelectedTab = consoleTabPage;
+                    console.Focus();
+                    //ProjectConfig config = ProjectConfigurations.Instance.GetProjectConfig(activeProject.GetConfigurationFilePath());
+                    //string arguments = config.GetCommandLineArguments(configComboBox.Text);
+                    string arguments = "";
+                    string executablePath = activeProject.GetExecutablePath(configComboBox.Text);
+                    abortToolStripMenuItem.Enabled = true;
+                    processRunning = true;
+                    SetState(State.running);
+                    executor.DoExecute(executablePath, arguments);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
         private Solution solution;
         private XTabControl editorTabControl;
         private State state;
@@ -1551,7 +1660,19 @@ namespace cmdevenv
         private bool cleaning;
         private bool emitLlvm;
         private bool emitOptLlvm;
+        private bool linkWithDebugRuntime;
         private int optimizationLevel;
         private DateTime compileStartTime;
     }
+
+    public static class KeyboardUtil
+    {
+        [DllImport("user32.dll", EntryPoint = "GetKeyState")]
+        private static extern short GetKeyState(int virtualKey);
+        public static bool KeyPressed(int virtualKey)
+        {
+            return (GetKeyState(virtualKey) & 0x8000) != 0;
+        }
+    }
+
 }

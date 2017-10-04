@@ -8,6 +8,10 @@ namespace devcore
 {
     public static class UTF8
     {
+        public static byte[] Encode(string s)
+        {
+            return Encoding.UTF8.GetBytes(s.ToArray());
+        }
         public static string Decode(byte[] bytes)
         {
             char[] chars = Encoding.UTF8.GetChars(bytes);

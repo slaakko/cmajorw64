@@ -28,6 +28,11 @@ namespace cmdevenv
             get { return emitOptLlvmCheckBox.Checked; }
             set { emitOptLlvmCheckBox.Checked = value; }
         }
+        public bool LinkWithDebugRuntime
+        {
+            get { return linkWithDebugRuntimeCheckBox.Checked; }
+            set { linkWithDebugRuntimeCheckBox.Checked = value; }
+        }
         private void okButton_Click(object sender, EventArgs e)
         {
             DialogResult = System.Windows.Forms.DialogResult.OK;

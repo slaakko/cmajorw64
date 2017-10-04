@@ -1,0 +1,90 @@
+﻿// =================================
+// Copyright (c) 2017 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+
+namespace System.IO
+{
+    public class StreamReader
+    {
+        public StreamReader(UniquePtr<ByteStream>&& stream_) : stream(Rvalue(stream_)), buffered(false)
+        {
+        }
+        suppress StreamReader(const StreamReader&);
+        suppress void operator=(const StreamReader&);
+        public default nothrow StreamReader(StreamReader&&);
+        public default nothrow void operator=(StreamReader&&);
+        public int Read()
+        {
+            return Get(false);
+        }
+        public int Peek()
+        {
+            return Get(true);
+        }
+        public string ReadLine()
+        {
+            string result;
+            int x = Read();
+            while (x != -1)
+            {
+                if (cast<char>(x) == '\n')
+                {
+                    return result;
+                }
+                else
+                {
+                    result.Append(cast<char>(x));
+                }
+                x = Read();
+            }
+            return result;
+        }
+        public string ReadToEnd()
+        {
+            string result;
+            int x = Read();
+            while (x != -1)
+            {
+                result.Append(cast<char>(x));
+                x = Read();
+            }
+            return result;
+        }
+        public void PutBack(byte b)
+        {
+            buffered = true;
+            buffer = b;
+        }
+        private int Get(bool peek)
+        {
+            if (buffered)
+            {
+                if (!peek)
+                {
+                    buffered = false;
+                }
+                return buffer;
+            }
+            else
+            {
+                int x = stream->ReadByte();
+                if (peek)
+                {
+                    buffer = x;
+                    buffered = true;
+                }
+                return x;
+            }
+        }
+        public ByteStream& ContainedStream()
+        {
+            return *stream;
+        }
+        private UniquePtr<ByteStream> stream;
+        private bool buffered;
+        private int buffer;
+    }
+}

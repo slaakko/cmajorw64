@@ -30,7 +30,7 @@ public:
     ValueStack& Stack() { return stack; }
     void SetModule(llvm::Module* module_) { module = module_; }
     void SaveObjectPointer(llvm::Value* objectPointer_);
-    void ResetObjectPointer() { objectPointer = nullptr; }
+    void SetObjectPointer(llvm::Value* objectPointer_) { objectPointer = objectPointer_;  }
     llvm::Value* GetObjectPointer() { return objectPointer; }
     void SetFunction(llvm::Function* function_) { function = function_;  }
     llvm::Function* Function() { return function; }

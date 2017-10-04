@@ -43,6 +43,11 @@ namespace cmdevenv
                         executor.WriteLineToProcessStandardInput(line);
                         inputStartPos = GetFirstCharIndexOfCurrentLine();
                     }
+                    else if (e.KeyCode == Keys.Z && e.Control)
+                    {
+                        Text = Text + "<EOF>";
+                        executor.CloseProcessStandardInput();
+                    }
                     else if (e.KeyCode == Keys.Home)
                     {
                         SelectionStart = inputStartPos;

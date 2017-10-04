@@ -21,6 +21,11 @@ enum class OpenMode : uint8_t
     binary = 1 << 3
 };
 
+enum class Origin : uint8_t
+{
+    seekSet, seekCur, seekEnd
+};
+
 inline OpenMode operator&(OpenMode left, OpenMode right)
 {
     return OpenMode(uint8_t(left) & uint8_t(right));
@@ -34,7 +39,12 @@ inline OpenMode operator|(OpenMode left, OpenMode right)
 extern "C" RT_API int32_t RtOpen(const char* filePath, OpenMode openMode);
 extern "C" RT_API int32_t RtClose(int32_t fileHandle);
 extern "C" RT_API int32_t RtWrite(int32_t fileHandle, const uint8_t* buffer, int64_t count);
-extern "C" RT_API int32_t RtRead(int32_t fileHandle, uint8_t* buffer, int64_t bufferSize);
+extern "C" RT_API int32_t RtWriteByte(int32_t fileHandle, uint8_t x);
+extern "C" RT_API int64_t RtRead(int32_t fileHandle, uint8_t* buffer, int64_t bufferSize);
+extern "C" RT_API int32_t RtReadByte(int32_t fileHandle);
+extern "C" RT_API int32_t RtSeek(int32_t fileHandle, int64_t pos,  Origin origin);
+extern "C" RT_API int64_t RtTell(int32_t fileHandle);
+extern "C" RT_API bool RtFileExists(const char* filePath);
 
 namespace cmajor { namespace rt {
 

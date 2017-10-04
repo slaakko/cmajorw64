@@ -31,14 +31,17 @@
             this.okButton = new System.Windows.Forms.Button();
             this.cancelButton = new System.Windows.Forms.Button();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.emitLlvmCheckBox = new System.Windows.Forms.CheckBox();
             this.emitOptLlvmCheckBox = new System.Windows.Forms.CheckBox();
+            this.emitLlvmCheckBox = new System.Windows.Forms.CheckBox();
+            this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.linkWithDebugRuntimeCheckBox = new System.Windows.Forms.CheckBox();
             this.groupBox1.SuspendLayout();
+            this.groupBox2.SuspendLayout();
             this.SuspendLayout();
             // 
             // okButton
             // 
-            this.okButton.Location = new System.Drawing.Point(90, 108);
+            this.okButton.Location = new System.Drawing.Point(92, 186);
             this.okButton.Name = "okButton";
             this.okButton.Size = new System.Drawing.Size(75, 23);
             this.okButton.TabIndex = 6;
@@ -49,7 +52,7 @@
             // cancelButton
             // 
             this.cancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.cancelButton.Location = new System.Drawing.Point(171, 108);
+            this.cancelButton.Location = new System.Drawing.Point(173, 186);
             this.cancelButton.Name = "cancelButton";
             this.cancelButton.Size = new System.Drawing.Size(75, 23);
             this.cancelButton.TabIndex = 7;
@@ -67,16 +70,6 @@
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "LLVM options";
             // 
-            // emitLlvmCheckBox
-            // 
-            this.emitLlvmCheckBox.AutoSize = true;
-            this.emitLlvmCheckBox.Location = new System.Drawing.Point(17, 27);
-            this.emitLlvmCheckBox.Name = "emitLlvmCheckBox";
-            this.emitLlvmCheckBox.Size = new System.Drawing.Size(164, 17);
-            this.emitLlvmCheckBox.TabIndex = 0;
-            this.emitLlvmCheckBox.Text = "Emit LLVM intermediate code";
-            this.emitLlvmCheckBox.UseVisualStyleBackColor = true;
-            // 
             // emitOptLlvmCheckBox
             // 
             this.emitOptLlvmCheckBox.AutoSize = true;
@@ -87,13 +80,44 @@
             this.emitOptLlvmCheckBox.Text = "Emit optimized LLVM intermediate code";
             this.emitOptLlvmCheckBox.UseVisualStyleBackColor = true;
             // 
+            // emitLlvmCheckBox
+            // 
+            this.emitLlvmCheckBox.AutoSize = true;
+            this.emitLlvmCheckBox.Location = new System.Drawing.Point(17, 27);
+            this.emitLlvmCheckBox.Name = "emitLlvmCheckBox";
+            this.emitLlvmCheckBox.Size = new System.Drawing.Size(164, 17);
+            this.emitLlvmCheckBox.TabIndex = 0;
+            this.emitLlvmCheckBox.Text = "Emit LLVM intermediate code";
+            this.emitLlvmCheckBox.UseVisualStyleBackColor = true;
+            // 
+            // groupBox2
+            // 
+            this.groupBox2.Controls.Add(this.linkWithDebugRuntimeCheckBox);
+            this.groupBox2.Location = new System.Drawing.Point(12, 108);
+            this.groupBox2.Name = "groupBox2";
+            this.groupBox2.Size = new System.Drawing.Size(234, 61);
+            this.groupBox2.TabIndex = 13;
+            this.groupBox2.TabStop = false;
+            this.groupBox2.Text = "Debugging options";
+            // 
+            // linkWithDebugRuntimeCheckBox
+            // 
+            this.linkWithDebugRuntimeCheckBox.AutoSize = true;
+            this.linkWithDebugRuntimeCheckBox.Location = new System.Drawing.Point(17, 28);
+            this.linkWithDebugRuntimeCheckBox.Name = "linkWithDebugRuntimeCheckBox";
+            this.linkWithDebugRuntimeCheckBox.Size = new System.Drawing.Size(138, 17);
+            this.linkWithDebugRuntimeCheckBox.TabIndex = 0;
+            this.linkWithDebugRuntimeCheckBox.Text = "Link with debug runtime";
+            this.linkWithDebugRuntimeCheckBox.UseVisualStyleBackColor = true;
+            // 
             // BuildOptionsDialog
             // 
             this.AcceptButton = this.okButton;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.cancelButton;
-            this.ClientSize = new System.Drawing.Size(260, 148);
+            this.ClientSize = new System.Drawing.Size(260, 228);
+            this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.cancelButton);
             this.Controls.Add(this.okButton);
@@ -104,6 +128,8 @@
             this.Text = "Build Options";
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
+            this.groupBox2.ResumeLayout(false);
+            this.groupBox2.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -115,5 +141,7 @@
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.CheckBox emitOptLlvmCheckBox;
         private System.Windows.Forms.CheckBox emitLlvmCheckBox;
+        private System.Windows.Forms.GroupBox groupBox2;
+        private System.Windows.Forms.CheckBox linkWithDebugRuntimeCheckBox;
     }
 }

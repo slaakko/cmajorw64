@@ -382,6 +382,7 @@ namespace cmdevenv
             this.formatContentToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.M)));
             this.formatContentToolStripMenuItem.Size = new System.Drawing.Size(203, 22);
             this.formatContentToolStripMenuItem.Text = "For&mat Content";
+            this.formatContentToolStripMenuItem.Click += new System.EventHandler(this.formatContentToolStripMenuItem_Click);
             // 
             // buildToolStripMenuItem
             // 
@@ -488,6 +489,7 @@ namespace cmdevenv
             this.runActiveProjectToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.F5)));
             this.runActiveProjectToolStripMenuItem.Size = new System.Drawing.Size(325, 22);
             this.runActiveProjectToolStripMenuItem.Text = "&Run Active Project Without Debugging";
+            this.runActiveProjectToolStripMenuItem.Click += new System.EventHandler(this.runActiveProjectToolStripMenuItem_Click);
             // 
             // toolStripMenuItem13
             // 

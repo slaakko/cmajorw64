@@ -1,4 +1,4 @@
-// =================================
+﻿// =================================
 // Copyright (c) 2017 Seppo Laakko
 // Distributed under the MIT license
 // =================================
@@ -20,7 +20,12 @@ public extern cdecl nothrow void RtDisposeError(int errorId);
 public extern cdecl nothrow const char* RtGetStackTrace();
 public extern cdecl nothrow void RtDisposeStackTrace();
 public extern cdecl nothrow int RtOpen(const char* filePath, byte openMode);
-public extern cdecl nothrow int RtClose(int handle);
-public extern cdecl nothrow int RtWrite(int handle, const void* buffer, long count);
-public extern cdecl nothrow int RtRead(int handle, void* buffer, long bufferSize);
+public extern cdecl nothrow int RtClose(int fileHandle);
+public extern cdecl nothrow int RtWrite(int fileHandle, const void* buffer, long count);
+public extern cdecl nothrow int RtWriteByte(int fileHandle, byte x);
+public extern cdecl nothrow long RtRead(int fileHandle, void* buffer, long bufferSize);
+public extern cdecl nothrow int RtReadByte(int fileHandle);
+public extern cdecl nothrow int RtSeek(int fileHandle, long pos, byte origin);
+public extern cdecl nothrow long RtTell(int fileHandle);
+public extern cdecl nothrow bool RtFileExists(const char* filePath);
 public extern cdecl nothrow double RtPow(double x, int exponent);
