@@ -80,6 +80,8 @@ namespace cmdevenv
                 maxRecentProjects = new IntField("maxRecentProjects", Fields);
                 maxRecentProjects.Value = 10;
                 recentProjects = new Array<RecentProject>("recentProjects", "recentProject", Fields);
+                strictNothrow = new BooleanField("strictNothrow", Fields);
+                strictNothrow.Value = false;
                 emitLlvm = new BooleanField("emitLlvm", Fields);
                 emitLlvm.Value = false;
                 emitOptLlvm = new BooleanField("emitOptLlvm", Fields);
@@ -221,6 +223,11 @@ namespace cmdevenv
             {
                 get { return recentProjects; }
             }
+            public bool StrictNothrow
+            {
+                get { return strictNothrow.Value; }
+                set { strictNothrow.Value = value; }
+            }
             public bool EmitLlvm
             {
                 get { return emitLlvm.Value; }
@@ -263,6 +270,7 @@ namespace cmdevenv
             private IntField verticalSplitterPos;
             private IntField maxRecentProjects;
             private Array<RecentProject> recentProjects;
+            private BooleanField strictNothrow;
             private BooleanField emitLlvm;
             private BooleanField emitOptLlvm;
             private BooleanField linkWithDebugRuntime;
@@ -417,6 +425,11 @@ namespace cmdevenv
                 recentProjects.Add(project.Path);
             }
             return recentProjects;
+        }
+        public bool StrictNothrow
+        {
+            get { return config.StrictNothrow; }
+            set { config.StrictNothrow = value; }
         }
         public bool EmitLlvm
         {

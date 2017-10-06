@@ -27,7 +27,6 @@ void Done()
     DoneModule();
     DoneFunctionSymbol();
     DoneSymbol();
-    DoneWarning();
 }
 
 } } // namespace cmajor::symbols

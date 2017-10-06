@@ -18,14 +18,14 @@ public:
     const std::u32string& Project() const { return project; }
     const std::string& Message() const { return message; }
     const Span& Defined() const { return defined; }
-    const Span& Referenced() const { return referenced; }
     void SetDefined(const Span& defined_) { defined = defined_; }
-    void SetReferenced(const Span& referenced_) { referenced = referenced_; }
+    const std::vector<Span>& References() const { return references; }
+    void SetReferences(const std::vector<Span>& references_);
 private:
     std::u32string project;
     std::string message;
     Span defined;
-    Span referenced;
+    std::vector<Span> references;
 };
 
 class CompileWarningCollection

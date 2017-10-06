@@ -31,10 +31,11 @@ namespace server
 
     public class CompileRequest : Request
     {
-        public CompileRequest(string filePath, string config, bool emitLlvm, bool emitOptLlvm, bool linkWithDebugRuntime, int optimizationLevel)
+        public CompileRequest(string filePath, string config, bool strictNothrow, bool emitLlvm, bool emitOptLlvm, bool linkWithDebugRuntime, int optimizationLevel)
         {
             this.filePath = filePath;
             this.config = config;
+            this.strictNothrow = strictNothrow;
             this.emitLlvm = emitLlvm;
             this.emitOptLlvm = emitOptLlvm;
             this.linkWithDebugRuntime = linkWithDebugRuntime;
@@ -51,6 +52,10 @@ namespace server
         public string Config
         {
             get { return config; }
+        }
+        public bool StrictNothrow
+        {
+            get { return strictNothrow; }
         }
         public bool EmitLlvm
         {
@@ -70,6 +75,7 @@ namespace server
         }
         private string filePath;
         private string config;
+        private bool strictNothrow;
         private bool emitLlvm;
         private bool emitOptLlvm;
         private bool linkWithDebugRuntime;

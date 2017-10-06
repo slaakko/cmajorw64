@@ -35,13 +35,16 @@
             this.emitLlvmCheckBox = new System.Windows.Forms.CheckBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.linkWithDebugRuntimeCheckBox = new System.Windows.Forms.CheckBox();
+            this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.strictNothrowCheckBox = new System.Windows.Forms.CheckBox();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
+            this.groupBox3.SuspendLayout();
             this.SuspendLayout();
             // 
             // okButton
             // 
-            this.okButton.Location = new System.Drawing.Point(92, 186);
+            this.okButton.Location = new System.Drawing.Point(94, 266);
             this.okButton.Name = "okButton";
             this.okButton.Size = new System.Drawing.Size(75, 23);
             this.okButton.TabIndex = 6;
@@ -52,7 +55,7 @@
             // cancelButton
             // 
             this.cancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.cancelButton.Location = new System.Drawing.Point(173, 186);
+            this.cancelButton.Location = new System.Drawing.Point(175, 266);
             this.cancelButton.Name = "cancelButton";
             this.cancelButton.Size = new System.Drawing.Size(75, 23);
             this.cancelButton.TabIndex = 7;
@@ -63,7 +66,7 @@
             // 
             this.groupBox1.Controls.Add(this.emitOptLlvmCheckBox);
             this.groupBox1.Controls.Add(this.emitLlvmCheckBox);
-            this.groupBox1.Location = new System.Drawing.Point(12, 12);
+            this.groupBox1.Location = new System.Drawing.Point(14, 92);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Size = new System.Drawing.Size(234, 90);
             this.groupBox1.TabIndex = 12;
@@ -93,7 +96,7 @@
             // groupBox2
             // 
             this.groupBox2.Controls.Add(this.linkWithDebugRuntimeCheckBox);
-            this.groupBox2.Location = new System.Drawing.Point(12, 108);
+            this.groupBox2.Location = new System.Drawing.Point(14, 188);
             this.groupBox2.Name = "groupBox2";
             this.groupBox2.Size = new System.Drawing.Size(234, 61);
             this.groupBox2.TabIndex = 13;
@@ -110,13 +113,34 @@
             this.linkWithDebugRuntimeCheckBox.Text = "Link with debug runtime";
             this.linkWithDebugRuntimeCheckBox.UseVisualStyleBackColor = true;
             // 
+            // groupBox3
+            // 
+            this.groupBox3.Controls.Add(this.strictNothrowCheckBox);
+            this.groupBox3.Location = new System.Drawing.Point(14, 13);
+            this.groupBox3.Name = "groupBox3";
+            this.groupBox3.Size = new System.Drawing.Size(236, 73);
+            this.groupBox3.TabIndex = 14;
+            this.groupBox3.TabStop = false;
+            this.groupBox3.Text = "Compiling options";
+            // 
+            // strictNothrowCheckBox
+            // 
+            this.strictNothrowCheckBox.AutoSize = true;
+            this.strictNothrowCheckBox.Location = new System.Drawing.Point(17, 28);
+            this.strictNothrowCheckBox.Name = "strictNothrowCheckBox";
+            this.strictNothrowCheckBox.Size = new System.Drawing.Size(91, 17);
+            this.strictNothrowCheckBox.TabIndex = 0;
+            this.strictNothrowCheckBox.Text = "Strict nothrow";
+            this.strictNothrowCheckBox.UseVisualStyleBackColor = true;
+            // 
             // BuildOptionsDialog
             // 
             this.AcceptButton = this.okButton;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.cancelButton;
-            this.ClientSize = new System.Drawing.Size(260, 228);
+            this.ClientSize = new System.Drawing.Size(260, 324);
+            this.Controls.Add(this.groupBox3);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.cancelButton);
@@ -130,6 +154,8 @@
             this.groupBox1.PerformLayout();
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
+            this.groupBox3.ResumeLayout(false);
+            this.groupBox3.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -143,5 +169,7 @@
         private System.Windows.Forms.CheckBox emitLlvmCheckBox;
         private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.CheckBox linkWithDebugRuntimeCheckBox;
+        private System.Windows.Forms.GroupBox groupBox3;
+        private System.Windows.Forms.CheckBox strictNothrowCheckBox;
     }
 }

@@ -1,0 +1,50 @@
+﻿// =================================
+// Copyright (c) 2017 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+
+namespace System.Threading
+{
+    public class Mutex
+    {
+        public nothrow Mutex() : mutexId(RtAllocateMutex())
+        {
+        }
+        public ~Mutex()
+        {
+            RtFreeMutex(mutexId);
+        }
+        suppress Mutex(const Mutex&);
+        suppress void operator=(Mutex&);
+        suppress Mutex(Mutex&&);
+        suppress void operator=(Mutex&&);
+        public nothrow void Lock()
+        {
+            RtLockMutex(mutexId);
+        }
+        public nothrow void Unlock()
+        {
+            RtUnlockMutex(mutexId);
+        }
+        private int mutexId;
+    }
+    
+    public class LockGuard
+    {
+        public nothrow LockGuard(Mutex& mtx_) : mtx(mtx_)
+        {
+            mtx.Lock();
+        }
+        public ~LockGuard()
+        {
+            mtx.Unlock();
+        }
+        suppress LockGuard(const LockGuard&);
+        suppress void operator=(const LockGuard&);
+        suppress LockGuard(LockGuard&&);
+        suppress void operator=(LockGuard&&);
+        private Mutex& mtx;
+    }
+}

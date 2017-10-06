@@ -11,6 +11,7 @@
 #include <cmajor/symbols/Exception.hpp>
 #include <cmajor/symbols/InitDone.hpp>
 #include <cmajor/symbols/GlobalFlags.hpp>
+#include <cmajor/symbols/Warning.hpp>
 #include <cmajor/util/Util.hpp>
 #include <cmajor/util/Path.hpp>
 #include <cmajor/util/Json.hpp>
@@ -60,6 +61,8 @@ void PrintHelp()
         "   print verbose messages\n" <<
         "--quiet (-q)\n" <<
         "   print no messages\n" <<
+        "--strict-nothrow (-s)\n" <<
+        "   treat nothrow violation as error\n" <<
         "--emit-llvm (-l)\n" <<
         "   emit intermediate LLVM code to file.ll files\n" <<
         "--emit-opt-llvm (-o)\n" <<
@@ -119,6 +122,10 @@ int main(int argc, const char** argv)
                     else if (arg == "--debug-parse" || arg == "-p")
                     {
                         SetGlobalFlag(GlobalFlags::debugParsing);
+                    }
+                    else if (arg == "--strict-nothrow" || arg == "-s")
+                    {
+                        SetGlobalFlag(GlobalFlags::strictNothrow);
                     }
                     else if (arg == "--emit-llvm" || arg == "-l")
                     {
@@ -220,7 +227,28 @@ int main(int argc, const char** argv)
                     throw std::runtime_error("Argument '" + fp.generic_string() + "' has invalid extension. Not Cmajor solution (.cms) or project (.cmp) file.");
                 }
             }
-            if (GetGlobalFlag(GlobalFlags::ide))
+            if (!CompileWarningCollection::Instance().Warnings().empty())
+            {
+                if (!GetGlobalFlag(GlobalFlags::quiet) && !GetGlobalFlag(GlobalFlags::ide))
+                {
+                    for (const Warning& warning : CompileWarningCollection::Instance().Warnings())
+                    {
+                        std::string what = Expand(warning.Message(), warning.Defined(), warning.References(), "Warning");
+                        std::cerr << what << std::endl;
+                    }
+                }
+                if (GetGlobalFlag(GlobalFlags::ide))
+                {
+                    std::unique_ptr<JsonObject> compileResult(new JsonObject());
+                    compileResult->AddField(U"success", std::unique_ptr<JsonValue>(new JsonBool(true)));
+                    if (!CompileWarningCollection::Instance().Warnings().empty())
+                    {
+                        // todo
+                    }
+                    std::cerr << compileResult->ToString() << std::endl;
+                }
+            }
+            else if (GetGlobalFlag(GlobalFlags::ide))
             {
                 std::unique_ptr<JsonObject> compileResult(new JsonObject());
                 compileResult->AddField(U"success", std::unique_ptr<JsonValue>(new JsonBool(true)));
@@ -233,6 +261,11 @@ int main(int argc, const char** argv)
         if (!GetGlobalFlag(GlobalFlags::quiet) && !GetGlobalFlag(GlobalFlags::ide))
         {
             std::cerr << ex.What() << std::endl;
+            for (const Warning& warning : CompileWarningCollection::Instance().Warnings())
+            {
+                std::string what = Expand(warning.Message(), warning.Defined(), warning.References(), "Warning");
+                std::cerr << what << std::endl;
+            }
         }
         if (GetGlobalFlag(GlobalFlags::ide))
         {
@@ -240,6 +273,10 @@ int main(int argc, const char** argv)
             std::unique_ptr<JsonObject> compileResult(new JsonObject());
             compileResult->AddField(U"success", std::unique_ptr<JsonValue>(new JsonBool(false)));
             compileResult->AddField(U"diagnostics", std::move(ex.ToJson()));
+            if (!CompileWarningCollection::Instance().Warnings().empty())
+            {
+                // todo
+            }
             std::cerr << compileResult->ToString() << std::endl;
         }
         return 1;
@@ -249,6 +286,11 @@ int main(int argc, const char** argv)
         if (!GetGlobalFlag(GlobalFlags::quiet) && !GetGlobalFlag(GlobalFlags::ide))
         {
             std::cerr << ex.what() << std::endl;
+            for (const Warning& warning : CompileWarningCollection::Instance().Warnings())
+            {
+                std::string what = Expand(warning.Message(), warning.Defined(), warning.References(), "Warning");
+                std::cerr << what << std::endl;
+            }
         }
         if (GetGlobalFlag(GlobalFlags::ide))
         {
@@ -261,6 +303,10 @@ int main(int argc, const char** argv)
             diagnostics->AddField(U"project", std::unique_ptr<JsonValue>(new JsonString(GetCurrentProjectName())));
             diagnostics->AddField(U"message", std::unique_ptr<JsonValue>(new JsonString(ToUtf32(ex.what()))));
             compileResult->AddField(U"diagnostics", std::move(diagnostics));
+            if (!CompileWarningCollection::Instance().Warnings().empty())
+            {
+                // todo
+            }
             std::cerr << compileResult->ToString() << std::endl;
         }
         return 1;

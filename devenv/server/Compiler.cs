@@ -276,7 +276,7 @@ namespace server
         }
         public override void HandleCompileRequest(CompileRequest request)
         {
-            Compile(request.FilePath, request.Config, request.EmitLlvm, request.EmitOptLlvm, request.LinkWithDebugRuntime, request.OptimizationLevel);
+            Compile(request.FilePath, request.Config, request.StrictNothrow, request.EmitLlvm, request.EmitOptLlvm, request.LinkWithDebugRuntime, request.OptimizationLevel);
         }
         public void SetWriteMethod(Control writer, WriteLineToOutputWindow writeMethod)
         {
@@ -306,16 +306,16 @@ namespace server
         {
             exit.WaitOne();
         }
-        public void DoCompile(string filePath, string config, bool emitLlvm, bool emitOptLlvm, bool linkWithDebugRuntime, int optimizationLevel)
+        public void DoCompile(string filePath, string config, bool strictNothrow, bool emitLlvm, bool emitOptLlvm, bool linkWithDebugRuntime, int optimizationLevel)
         {
-            Request request = new CompileRequest(filePath, config, emitLlvm, emitOptLlvm, linkWithDebugRuntime, optimizationLevel);
+            Request request = new CompileRequest(filePath, config, strictNothrow, emitLlvm, emitOptLlvm, linkWithDebugRuntime, optimizationLevel);
             lock (requestQueue)
             {
                 requestQueue.Enqueue(request);
             }
             requestWaiting.Set();
         }
-        private void Compile(string filePath, string config, bool emitLlvm, bool emitOptLlvm, bool linkWithDebugRuntime, int optimizationLevel)
+        private void Compile(string filePath, string config, bool strictNothrow, bool emitLlvm, bool emitOptLlvm, bool linkWithDebugRuntime, int optimizationLevel)
         {
             try
             {
@@ -323,6 +323,10 @@ namespace server
                 arguments.Append("--config=").Append(config);
                 arguments.Append(" --ide");
                 arguments.Append(" --verbose");
+                if (strictNothrow)
+                {
+                    arguments.Append(" --strict-nothrow");
+                }
                 if (emitLlvm)
                 {
                     arguments.Append(" --emit-llvm");

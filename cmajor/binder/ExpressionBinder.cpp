@@ -351,10 +351,6 @@ void ExpressionBinder::BindSymbol(Symbol* symbol)
                     {
                         bmv->SetClassPtr(std::unique_ptr<BoundExpression>(new BoundConversion(std::unique_ptr<BoundExpression>(new BoundParameter(thisParam)), conversionFun)));
                     }
-                    else
-                    {
-                        throw Exception("cannot convert from '" + ToUtf8(thisParam->GetType()->FullName()) + "' to '" + ToUtf8(containingClassPointerType->FullName()) + "'", span);
-                    }
                 }
             }
             expression.reset(bmv);
@@ -869,7 +865,7 @@ void ExpressionBinder::Visit(DotNode& dotNode)
         }
         else
         {
-            throw Exception("expression must denote a namespace, class type, interface type, or an enumerated type type object", dotNode.Subject()->GetSpan());
+            throw Exception("expression must denote a namespace, class type, interface type, or an enumerated type type object", dotNode.GetSpan());
         }
     }
     containerScope = prevContainerScope;

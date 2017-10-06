@@ -33,3 +33,7 @@ public extern cdecl nothrow const char* RtGetEnvironmentVariable(const char* env
 public extern cdecl nothrow int RtGetCurrentWorkingDirectoryHandle();
 public extern cdecl nothrow const char* RtGetCurrentWorkingDirectory(int currentWorkingDirectoryHandle);
 public extern cdecl nothrow void RtFreeCurrentWorkingDirectoryHandle(int currentWorkingDirectoryHandle);
+public extern cdecl nothrow int RtAllocateMutex();
+public extern cdecl nothrow void RtFreeMutex(int mutexId);
+public extern cdecl nothrow void RtLockMutex(int mutexId);
+public extern cdecl nothrow void RtUnlockMutex(int mutexId);

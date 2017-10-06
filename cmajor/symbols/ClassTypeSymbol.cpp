@@ -465,10 +465,6 @@ void ClassTypeSymbol::Dump(CodeFormatter& formatter)
 
 void ClassTypeSymbol::CreateDestructorSymbol()
 {
-    if (GroupName() == U"StreamWriter")
-    {
-        int x = 0;
-    }
     if (!destructor)
     {
         DestructorSymbol* destructorSymbol = new DestructorSymbol(GetSpan(), U"@destructor");

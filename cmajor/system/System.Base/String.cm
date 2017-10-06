@@ -1,9 +1,10 @@
-// =================================
+﻿// =================================
 // Copyright (c) 2017 Seppo Laakko
 // Distributed under the MIT license
 // =================================
 
 using System.Collections;
+using System.Unicode;
 
 namespace System
 {
@@ -440,10 +441,10 @@ namespace System
         long n = Min(leftLen, rightLen);
         for (long i = 0; i < n; ++i)
         {
-            CharT left = left[i];
-            CharT right = right[i];
-            if (left < right) return true;
-            if (left > right) return false;
+            CharT l = left[i];
+            CharT r = right[i];
+            if (l < r) return true;
+            if (l > r) return false;
         }
         if (leftLen < rightLen) return true;
         return false;
@@ -483,6 +484,44 @@ namespace System
         }
         return true;
     }
-
-// todo: ToLower, etc...
+    
+    public ustring ToLower(const ustring& s)
+    {
+        ustring lower;
+        for (uchar c : s)
+        {
+            lower.Append(ToLower(c));
+        }
+        return lower;
+    }
+    
+    public ustring ToUpper(const ustring& s)
+    {
+        ustring upper;
+        for (uchar c : s)
+        {
+            upper.Append(ToUpper(c));
+        }
+        return upper;
+    }
+    
+    public wstring ToLower(const wstring& s)
+    {
+        return ToUtf16(ToLower(ToUtf32(s)));
+    }
+    
+    public wstring ToUpper(const wstring& s)
+    {
+        return ToUtf16(ToUpper(ToUtf32(s)));
+    }
+    
+    public string ToLower(const string& s)
+    {
+        return ToUtf8(ToLower(ToUtf32(s)));
+    }
+    
+    public string ToUpper(const string& s)
+    {
+        return ToUtf8(ToUpper(ToUtf32(s)));
+    }
 }

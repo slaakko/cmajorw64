@@ -12,7 +12,7 @@
 #include <cerrno>
 #include <direct.h>
 
-extern "C" const char* RtGetEnvironmentVariable(const char* environmentVariableName)
+extern "C" RT_API const char* RtGetEnvironmentVariable(const char* environmentVariableName)
 {
     const char* envVar = std::getenv(environmentVariableName);
     if (envVar)
@@ -24,7 +24,7 @@ extern "C" const char* RtGetEnvironmentVariable(const char* environmentVariableN
 
 std::mutex mtx;
 
-extern "C" int32_t RtGetCurrentWorkingDirectoryHandle()
+extern "C" RT_API int32_t RtGetCurrentWorkingDirectoryHandle()
 {
     std::lock_guard<std::mutex> lock(mtx);
     std::unique_ptr<char[]> buffer(new char[8192]);
@@ -38,12 +38,12 @@ extern "C" int32_t RtGetCurrentWorkingDirectoryHandle()
     }
 }
 
-extern "C" const char* RtGetCurrentWorkingDirectory(int32_t currentWorkingDirectoryHandle)
+extern "C" RT_API const char* RtGetCurrentWorkingDirectory(int32_t currentWorkingDirectoryHandle)
 {
     return cmajor::rt::GetString(currentWorkingDirectoryHandle);
 }
 
-extern "C" void RtFreeCurrentWorkingDirectoryHandle(int32_t currentWorkingDirectoryHandle)
+extern "C" RT_API void RtFreeCurrentWorkingDirectoryHandle(int32_t currentWorkingDirectoryHandle)
 {
     cmajor::rt::DisposeString(currentWorkingDirectoryHandle);
 }

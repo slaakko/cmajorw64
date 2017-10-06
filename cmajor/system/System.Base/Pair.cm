@@ -1,15 +1,17 @@
-// =================================
+﻿// =================================
 // Copyright (c) 2017 Seppo Laakko
 // Distributed under the MIT license
 // =================================
+
+using System.Concepts;
 
 namespace System
 {
     public class Pair<T, U> where T is Semiregular and U is Semiregular
     {
-        public Pair() : first(), second() {}
+        public nothrow Pair() : first(), second() {}
         public Pair(const T& first_, const U& second_) : first(first_), second(second_) {}
-        public Pair(T&& first_, U&& second_) : first(Rvalue(first_)), second(Rvalue(second_)) {}
+        public nothrow Pair(T&& first_, U&& second_) : first(Rvalue(first_)), second(Rvalue(second_)) {}
         public T first;
         public U second;
     }

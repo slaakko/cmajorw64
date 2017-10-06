@@ -10,6 +10,7 @@
 #include <cmajor/binder/Concept.hpp>
 #include <cmajor/symbols/TemplateSymbol.hpp>
 #include <cmajor/symbols/GlobalFlags.hpp>
+#include <cmajor/symbols/Warning.hpp>
 #include <cmajor/util/Unicode.hpp>
 
 namespace cmajor { namespace binder {
@@ -1093,14 +1094,24 @@ std::unique_ptr<BoundFunctionCall> SelectViableFunction(const std::unordered_set
                 std::vector<Span> references;
                 references.push_back(boundFunction->GetFunctionSymbol()->GetSpan());
                 references.push_back(bestFun->GetSpan());
-                if ((flags & OverloadResolutionFlags::dontThrow) != OverloadResolutionFlags::none)
+                if (GetGlobalFlag(GlobalFlags::strictNothrow))
                 {
-                    exception.reset(new Exception("a nothrow function cannot call a function that can throw unless it handles exceptions", span, references));
-                    return std::unique_ptr<BoundFunctionCall>();
+                    if ((flags & OverloadResolutionFlags::dontThrow) != OverloadResolutionFlags::none)
+                    {
+                        exception.reset(new Exception("a nothrow function cannot call a function that can throw unless it handles exceptions (compiled with --strict-nothrow)", span, references));
+                        return std::unique_ptr<BoundFunctionCall>();
+                    }
+                    else
+                    {
+                        throw Exception("a nothrow function cannot call a function that can throw unless it handles exceptions (compiled with --strict-nothrow)", span, references);
+                    }
                 }
                 else
                 {
-                    throw Exception("a nothrow function cannot call a function that can throw unless it handles exceptions", span, references);
+                    Warning warning(CompileWarningCollection::Instance().GetCurrentProjectName(), "a nothrow function calls a function that can throw and does not handle exceptions");
+                    warning.SetDefined(span);
+                    warning.SetReferences(references);
+                    CompileWarningCollection::Instance().AddWarning(warning);
                 }
             }
             return CreateBoundFunctionCall(bestFun, arguments, boundCompileUnit, boundFunction, bestMatch, containerScope, span);
@@ -1153,7 +1164,25 @@ std::unique_ptr<BoundFunctionCall> SelectViableFunction(const std::unordered_set
             std::vector<Span> references;
             references.push_back(boundFunction->GetFunctionSymbol()->GetSpan());
             references.push_back(singleBest->GetSpan());
-            throw Exception("a nothrow function cannot call a function that can throw unless it handles exceptions", span, references);
+            if (GetGlobalFlag(GlobalFlags::strictNothrow))
+            {
+                if ((flags & OverloadResolutionFlags::dontThrow) != OverloadResolutionFlags::none)
+                {
+                    exception.reset(new Exception("a nothrow function cannot call a function that can throw unless it handles exceptions (compiled with --strict-nothrow)", span, references));
+                    return std::unique_ptr<BoundFunctionCall>();
+                }
+                else
+                {
+                    throw Exception("a nothrow function cannot call a function that can throw unless it handles exceptions (compiled with --strict-nothrow)", span, references);
+                }
+            }
+            else
+            {
+                Warning warning(CompileWarningCollection::Instance().GetCurrentProjectName(), "a nothrow function calls a function that can throw and does not handle exceptions");
+                warning.SetDefined(span);
+                warning.SetReferences(references);
+                CompileWarningCollection::Instance().AddWarning(warning);
+            }
         }
         return CreateBoundFunctionCall(singleBest, arguments, boundCompileUnit, boundFunction, bestMatch, containerScope, span);
     }

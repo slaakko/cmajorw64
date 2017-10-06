@@ -11,6 +11,11 @@ Warning::Warning(const std::u32string& project_, const std::string& message_) : 
 {
 }
 
+void Warning::SetReferences(const std::vector<Span>& references_)
+{
+    references = references_;
+}
+
 CompileWarningCollection::CompileWarningCollection()
 {
 }

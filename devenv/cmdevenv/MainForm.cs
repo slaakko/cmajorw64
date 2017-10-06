@@ -50,7 +50,8 @@ namespace cmdevenv
             processRunning = false;
             buildInProgress = false;
             compileAborted = false;
-            emitLlvm = Configuration.Instance.EmitLlvm; ;
+            strictNothrow = Configuration.Instance.StrictNothrow;
+            emitLlvm = Configuration.Instance.EmitLlvm; 
             emitOptLlvm = Configuration.Instance.EmitOptLlvm;
             linkWithDebugRuntime = Configuration.Instance.LinkWithDebugRuntime;
             optimizationLevel = -1;
@@ -938,7 +939,7 @@ namespace cmdevenv
                     cancelToolStripMenuItem.Enabled = true;
                     buildInProgress = true;
                     SetState(State.compiling);
-                    compiler.DoCompile(solution.FilePath, config, emitLlvm, emitOptLlvm, linkWithDebugRuntime, optimizationLevel);
+                    compiler.DoCompile(solution.FilePath, config, strictNothrow, emitLlvm, emitOptLlvm, linkWithDebugRuntime, optimizationLevel);
                     infoLabel.Text = "Building";
                 }
             }
@@ -971,7 +972,7 @@ namespace cmdevenv
                 cancelToolStripMenuItem.Enabled = true;
                 buildInProgress = true;
                 SetState(State.compiling);
-                compiler.DoCompile(project.FilePath, config, emitLlvm, emitOptLlvm, linkWithDebugRuntime, optimizationLevel);
+                compiler.DoCompile(project.FilePath, config, strictNothrow, emitLlvm, emitOptLlvm, linkWithDebugRuntime, optimizationLevel);
                 infoLabel.Text = "Building";
             }
             catch (Exception ex)
@@ -1262,6 +1263,7 @@ namespace cmdevenv
             try
             {
                 BuildOptionsDialog dialog = new BuildOptionsDialog();
+                strictNothrow = Configuration.Instance.StrictNothrow;
                 emitLlvm = Configuration.Instance.EmitLlvm;
                 emitOptLlvm = Configuration.Instance.EmitOptLlvm;
                 linkWithDebugRuntime = Configuration.Instance.LinkWithDebugRuntime;
@@ -1270,9 +1272,11 @@ namespace cmdevenv
                 dialog.LinkWithDebugRuntime = linkWithDebugRuntime;
                 if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                 {
+                    strictNothrow = dialog.StrictNothrow;
                     emitLlvm = dialog.EmitLlvm;
                     emitOptLlvm = dialog.EmitOptLlvm;
                     linkWithDebugRuntime = dialog.LinkWithDebugRuntime;
+                    Configuration.Instance.StrictNothrow = strictNothrow;
                     Configuration.Instance.EmitLlvm = emitLlvm;
                     Configuration.Instance.EmitOptLlvm = emitOptLlvm;
                     Configuration.Instance.LinkWithDebugRuntime = linkWithDebugRuntime;
@@ -1706,6 +1710,7 @@ namespace cmdevenv
         private bool compileAborted;
         private bool compiling;
         private bool cleaning;
+        private bool strictNothrow;
         private bool emitLlvm;
         private bool emitOptLlvm;
         private bool linkWithDebugRuntime;

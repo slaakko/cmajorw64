@@ -10,6 +10,7 @@
 #include <cmajor/rt/Classes.hpp>
 #include <cmajor/rt/Statics.hpp>
 #include <cmajor/rt/String.hpp>
+#include <cmajor/rt/Mutex.hpp>
 
 extern "C" RT_API void RtInit()
 {
@@ -36,10 +37,12 @@ void Init()
     InitClasses();
     InitError();
     InitString();
+    InitMutex();
 }
 
 void Done()
 {
+    DoneMutex();
     DoneString();
     DoneError();
     DoneClasses();

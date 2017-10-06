@@ -251,10 +251,6 @@ void StatementBinder::Visit(ClassNode& classNode)
         classMember->Accept(*this);
     }
     boundCompileUnit.AddBoundNode(std::move(boundClass));
-    if (classTypeSymbol->GroupName() == U"StreamWriter")
-    {
-        int x = 0;
-    }
     if (classTypeSymbol->HasNontrivialDestructor())
     {
         classTypeSymbol->CreateDestructorSymbol();
@@ -921,11 +917,15 @@ void StatementBinder::Visit(DeleteStatementNode& deleteStatementNode)
 void StatementBinder::Visit(DestroyStatementNode& destroyStatementNode)
 {
     std::unique_ptr<BoundExpression> ptr = BindExpression(destroyStatementNode.Expression(), boundCompileUnit, currentFunction, containerScope, this);
-    TypeSymbol* baseType = ptr->GetType()->BaseType();
-    if (baseType->HasNontrivialDestructor())
+    if (!ptr->GetType()->IsPointerType())
     {
-        Assert(baseType->GetSymbolType() == SymbolType::classTypeSymbol || baseType->GetSymbolType() == SymbolType::classTemplateSpecializationSymbol, "class type expected");
-        ClassTypeSymbol* classType = static_cast<ClassTypeSymbol*>(baseType);
+        throw Exception("destroy statement needs pointer type operand", destroyStatementNode.GetSpan());
+    }
+    TypeSymbol* pointeeType = ptr->GetType()->RemovePointer(destroyStatementNode.GetSpan());
+    if (pointeeType->HasNontrivialDestructor())
+    {
+        Assert(pointeeType->GetSymbolType() == SymbolType::classTypeSymbol || pointeeType->GetSymbolType() == SymbolType::classTemplateSpecializationSymbol, "class type expected");
+        ClassTypeSymbol* classType = static_cast<ClassTypeSymbol*>(pointeeType);
         std::vector<FunctionScopeLookup> lookups;
         lookups.push_back(FunctionScopeLookup(ScopeLookup::this_and_base_and_parent, containerScope));
         lookups.push_back(FunctionScopeLookup(ScopeLookup::this_, classType->ClassInterfaceOrNsScope()));

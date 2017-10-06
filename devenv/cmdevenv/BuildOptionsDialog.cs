@@ -18,6 +18,11 @@ namespace cmdevenv
         {
             InitializeComponent();
         }
+        public bool StrictNothrow
+        {
+            get { return strictNothrowCheckBox.Checked; }
+            set { strictNothrowCheckBox.Checked = value; }
+        }
         public bool EmitLlvm
         {
             get { return emitLlvmCheckBox.Checked; }

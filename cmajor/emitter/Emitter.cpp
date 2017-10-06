@@ -215,6 +215,8 @@ private:
     std::unordered_map<int, llvm::Value*> utf16stringMap;
     std::unordered_map<int, llvm::Value*> utf32stringMap;
     int prevLineNumber;
+    bool destructorCallGenerated;
+    bool lastInstructionWasRet;
     void GenJumpingBoolCode();
     void ExitBlocks(BoundCompoundStatement* targetBlock);
     void CreateExitFunctionCall();
@@ -328,10 +330,16 @@ void Emitter::Visit(BoundFunction& boundFunction)
     newCleanupNeeded = false;
     currentPad = nullptr;
     prevLineNumber = 0;
+    destructorCallGenerated = false;
+    lastInstructionWasRet = false;
     cleanups.clear();
     pads.clear();
     labeledStatementMap.clear();
     FunctionSymbol* functionSymbol = boundFunction.GetFunctionSymbol();
+    if (functionSymbol->MangledName() == U"member_function_op_index_Map_String_char_String_char_Less_String_char_CC2CDFC39A4F29E07E67C9B417D9AEDB87AF0706")
+    {
+        int x = 0;
+    }
     llvm::FunctionType* functionType = functionSymbol->IrType(*this);
     function = llvm::cast<llvm::Function>(compileUnitModule->getOrInsertFunction(ToUtf8(functionSymbol->MangledName()), functionType));
     if (functionSymbol->HasLinkOnceOdrLinkage())
@@ -444,17 +452,19 @@ void Emitter::Visit(BoundFunction& boundFunction)
     {
         lastStatement = body->Statements().back().get();
     }
-    if (!lastStatement || lastStatement->GetBoundNodeType() != BoundNodeType::boundReturnStatement)
+    if (!lastStatement || lastStatement->GetBoundNodeType() != BoundNodeType::boundReturnStatement || lastStatement->GetBoundNodeType() == BoundNodeType::boundReturnStatement && destructorCallGenerated)
     {
         CreateExitFunctionCall();
         if (functionSymbol->ReturnType() && functionSymbol->ReturnType()->GetSymbolType() != SymbolType::voidTypeSymbol && !functionSymbol->ReturnsClassOrClassDelegateByValue())
         {
             llvm::Value* defaultValue = functionSymbol->ReturnType()->CreateDefaultIrValue(*this);
             builder.CreateRet(defaultValue);
+            lastInstructionWasRet = true;
         }
         else
         {
             builder.CreateRetVoid();
+            lastInstructionWasRet = true;
         }
     }
     if (functionSymbol->HasTry() || !cleanups.empty())
@@ -476,6 +486,8 @@ void Emitter::Visit(BoundFunction& boundFunction)
 
 void Emitter::Visit(BoundSequenceStatement& boundSequenceStatement)
 {
+    destructorCallGenerated = false;
+    lastInstructionWasRet = false;
     SetTarget(&boundSequenceStatement);
     boundSequenceStatement.First()->Accept(*this);
     boundSequenceStatement.Second()->Accept(*this);
@@ -483,6 +495,21 @@ void Emitter::Visit(BoundSequenceStatement& boundSequenceStatement)
 
 void Emitter::ExitBlocks(BoundCompoundStatement* targetBlock)
 {
+    bool createBasicBlock = false;
+    BoundStatement* lastStatement = nullptr;
+    if (!currentFunction->Body()->Statements().empty())
+    {
+        lastStatement = currentFunction->Body()->Statements().back().get();
+    }
+    BoundStatement* currentBlockLastStatement = nullptr;
+    if (currentBlock && !currentBlock->Statements().empty())
+    {
+        currentBlockLastStatement = currentBlock->Statements().back().get();
+    }
+    if (lastStatement && currentBlockLastStatement && lastStatement == currentBlockLastStatement && currentBlockLastStatement->GetBoundNodeType() == BoundNodeType::boundReturnStatement)
+    {
+        createBasicBlock = true;
+    }
     int n = blocks.size();
     for (int i = n - 1; i >= 0; --i)
     {
@@ -501,7 +528,18 @@ void Emitter::ExitBlocks(BoundCompoundStatement* targetBlock)
                 std::unique_ptr<BoundFunctionCall>& destructorCall = destructorCallVec[i];
                 if (destructorCall)
                 {
+                    if (createBasicBlock)
+                    {
+                        llvm::BasicBlock* nextBlock = llvm::BasicBlock::Create(context, "next", function);
+                        if (!lastInstructionWasRet)
+                        {
+                            builder.CreateBr(nextBlock);
+                        }
+                        SetCurrentBasicBlock(nextBlock);
+                        createBasicBlock = false;
+                    }
                     destructorCall->Accept(*this);
+                    destructorCallGenerated = true;
                 }
             }
         }
@@ -510,6 +548,8 @@ void Emitter::ExitBlocks(BoundCompoundStatement* targetBlock)
 
 void Emitter::Visit(BoundCompoundStatement& boundCompoundStatement)
 {
+    destructorCallGenerated = false;
+    lastInstructionWasRet = false;
     SetTarget(&boundCompoundStatement);
     BoundCompoundStatement* prevBlock = currentBlock;
     currentBlock = &boundCompoundStatement;
@@ -529,6 +569,8 @@ void Emitter::Visit(BoundCompoundStatement& boundCompoundStatement)
 
 void Emitter::Visit(BoundReturnStatement& boundReturnStatement)
 {
+    destructorCallGenerated = false;
+    lastInstructionWasRet = false;
     SetTarget(&boundReturnStatement);
     Pad* prevCurrentPad = currentPad;
     while (currentPad != nullptr)
@@ -546,10 +588,12 @@ void Emitter::Visit(BoundReturnStatement& boundReturnStatement)
         returnFunctionCall->Accept(*this);
         llvm::Value* returnValue = stack.Pop();
         builder.CreateRet(returnValue);
+        lastInstructionWasRet = true;
     }
     else
     {
         builder.CreateRetVoid();
+        lastInstructionWasRet = true;
     }
     BoundCompoundStatement* body = currentFunction->Body();
     BoundStatement* lastStatement = nullptr;
@@ -561,12 +605,15 @@ void Emitter::Visit(BoundReturnStatement& boundReturnStatement)
     {
         llvm::BasicBlock* nextBlock = llvm::BasicBlock::Create(context, "next", function);
         SetCurrentBasicBlock(nextBlock);
+        lastInstructionWasRet = false;
     }
     currentPad = prevCurrentPad;
 }
 
 void Emitter::Visit(BoundIfStatement& boundIfStatement)
 {
+    destructorCallGenerated = false;
+    lastInstructionWasRet = false;
     SetTarget(&boundIfStatement);
     llvm::BasicBlock* prevTrueBlock = trueBlock;
     llvm::BasicBlock* prevFalseBlock = falseBlock;
@@ -600,6 +647,8 @@ void Emitter::Visit(BoundIfStatement& boundIfStatement)
 
 void Emitter::Visit(BoundWhileStatement& boundWhileStatement)
 {
+    destructorCallGenerated = false;
+    lastInstructionWasRet = false;
     SetTarget(&boundWhileStatement);
     llvm::BasicBlock* prevTrueBlock = trueBlock;
     llvm::BasicBlock* prevFalseBlock = falseBlock;
@@ -634,6 +683,8 @@ void Emitter::Visit(BoundWhileStatement& boundWhileStatement)
 
 void Emitter::Visit(BoundDoStatement& boundDoStatement)
 {
+    destructorCallGenerated = false;
+    lastInstructionWasRet = false;
     SetTarget(&boundDoStatement);
     llvm::BasicBlock* prevTrueBlock = trueBlock;
     llvm::BasicBlock* prevFalseBlock = falseBlock;
@@ -669,6 +720,8 @@ void Emitter::Visit(BoundDoStatement& boundDoStatement)
 
 void Emitter::Visit(BoundForStatement& boundForStatement)
 {
+    destructorCallGenerated = false;
+    lastInstructionWasRet = false;
     SetTarget(&boundForStatement);
     llvm::BasicBlock* prevTrueBlock = trueBlock;
     llvm::BasicBlock* prevFalseBlock = falseBlock;
@@ -709,6 +762,8 @@ void Emitter::Visit(BoundForStatement& boundForStatement)
 
 void Emitter::Visit(BoundSwitchStatement& boundSwitchStatement)
 {
+    destructorCallGenerated = false;
+    lastInstructionWasRet = false;
     SetTarget(&boundSwitchStatement);
     llvm::BasicBlock* prevBreakTarget = breakTarget;
     BoundCompoundStatement* prevBreakTargetBlock = breakTargetBlock;
@@ -762,6 +817,8 @@ void Emitter::Visit(BoundSwitchStatement& boundSwitchStatement)
 
 void Emitter::Visit(BoundCaseStatement& boundCaseStatement)
 {
+    destructorCallGenerated = false;
+    lastInstructionWasRet = false;
     SetTarget(&boundCaseStatement);
     if (!boundCaseStatement.CaseValues().empty())
     {
@@ -786,6 +843,8 @@ void Emitter::Visit(BoundCaseStatement& boundCaseStatement)
 
 void Emitter::Visit(BoundDefaultStatement& boundDefaultStatement)
 {
+    destructorCallGenerated = false;
+    lastInstructionWasRet = false;
     SetTarget(&boundDefaultStatement);
     if (defaultDest)
     {
@@ -800,6 +859,8 @@ void Emitter::Visit(BoundDefaultStatement& boundDefaultStatement)
 
 void Emitter::Visit(BoundGotoCaseStatement& boundGotoCaseStatement)
 {
+    destructorCallGenerated = false;
+    lastInstructionWasRet = false;
     SetTarget(&boundGotoCaseStatement);
     Assert(breakTargetBlock, "break target not set");
     Pad* prevCurrentPad = currentPad;
@@ -832,6 +893,8 @@ void Emitter::Visit(BoundGotoCaseStatement& boundGotoCaseStatement)
 
 void Emitter::Visit(BoundGotoDefaultStatement& boundGotoDefaultStatement)
 {
+    destructorCallGenerated = false;
+    lastInstructionWasRet = false;
     SetTarget(&boundGotoDefaultStatement);
     Assert(breakTargetBlock, "break target not set");
     Pad* prevCurrentPad = currentPad;
@@ -861,6 +924,8 @@ void Emitter::Visit(BoundGotoDefaultStatement& boundGotoDefaultStatement)
 
 void Emitter::Visit(BoundBreakStatement& boundBreakStatement)
 {
+    destructorCallGenerated = false;
+    lastInstructionWasRet = false;
     SetTarget(&boundBreakStatement);
     Assert(breakTarget && breakTargetBlock, "break target not set");
     Pad* prevCurrentPad = currentPad;
@@ -888,6 +953,8 @@ void Emitter::Visit(BoundBreakStatement& boundBreakStatement)
 
 void Emitter::Visit(BoundContinueStatement& boundContinueStatement)
 {
+    destructorCallGenerated = false;
+    lastInstructionWasRet = false;
     SetTarget(&boundContinueStatement);
     Assert(continueTarget && continueTargetBlock, "continue target not set");
     Pad* prevCurrentPad = currentPad;
@@ -912,6 +979,8 @@ void Emitter::Visit(BoundContinueStatement& boundContinueStatement)
 
 void Emitter::Visit(BoundGotoStatement& boundGotoStatement)
 {
+    destructorCallGenerated = false;
+    lastInstructionWasRet = false;
     SetTarget(&boundGotoStatement);
     Pad* prevCurrentPad = currentPad;
     BoundStatement* parent = currentBlock;
@@ -944,6 +1013,8 @@ void Emitter::Visit(BoundGotoStatement& boundGotoStatement)
 
 void Emitter::Visit(BoundConstructionStatement& boundConstructionStatement)
 {
+    destructorCallGenerated = false;
+    lastInstructionWasRet = false;
     SetTarget(&boundConstructionStatement);
     boundConstructionStatement.ConstructorCall()->Accept(*this);
     if (!boundConstructionStatement.ConstructorCall()->GetFunctionSymbol()->IsBasicTypeOperation())
@@ -984,12 +1055,16 @@ void Emitter::Visit(BoundConstructionStatement& boundConstructionStatement)
 
 void Emitter::Visit(BoundAssignmentStatement& boundAssignmentStatement)
 {
+    destructorCallGenerated = false;
+    lastInstructionWasRet = false;
     SetTarget(&boundAssignmentStatement);
     boundAssignmentStatement.AssignmentCall()->Accept(*this);
 }
 
 void Emitter::Visit(BoundExpressionStatement& boundExpressionStatement)
 {
+    destructorCallGenerated = false;
+    lastInstructionWasRet = false;
     SetTarget(&boundExpressionStatement);
     boundExpressionStatement.Expression()->Accept(*this);
     if (boundExpressionStatement.Expression()->HasValue())
@@ -1000,6 +1075,8 @@ void Emitter::Visit(BoundExpressionStatement& boundExpressionStatement)
 
 void Emitter::Visit(BoundEmptyStatement& boundEmptyStatement)
 {
+    destructorCallGenerated = false;
+    lastInstructionWasRet = false;
     SetTarget(&boundEmptyStatement);
     llvm::Type* retType = llvm::Type::getVoidTy(context);
     std::vector<llvm::Type*> paramTypes;
@@ -1025,6 +1102,8 @@ void Emitter::Visit(BoundEmptyStatement& boundEmptyStatement)
 
 void Emitter::Visit(BoundSetVmtPtrStatement& boundSetVmtPtrStatement)
 {
+    destructorCallGenerated = false;
+    lastInstructionWasRet = false;
     SetTarget(&boundSetVmtPtrStatement);
     BoundExpression* classPtr = boundSetVmtPtrStatement.ClassPtr();
     TypeSymbol* type = classPtr->GetType()->BaseType();
@@ -1044,12 +1123,16 @@ void Emitter::Visit(BoundSetVmtPtrStatement& boundSetVmtPtrStatement)
 
 void Emitter::Visit(BoundThrowStatement& boundThrowStatement)
 {
+    destructorCallGenerated = false;
+    lastInstructionWasRet = false;
     SetTarget(&boundThrowStatement);
     boundThrowStatement.ThrowCall()->Accept(*this);
 }
 
 void Emitter::Visit(BoundRethrowStatement& boundRethrowStatement)
 {
+    destructorCallGenerated = false;
+    lastInstructionWasRet = false;
     SetTarget(&boundRethrowStatement);
     boundRethrowStatement.ReleaseCall()->Accept(*this);
     llvm::Function* cxxThrowFunction = llvm::cast<llvm::Function>(compileUnitModule->getOrInsertFunction("_CxxThrowException",
@@ -1066,6 +1149,8 @@ void Emitter::Visit(BoundRethrowStatement& boundRethrowStatement)
 
 void Emitter::Visit(BoundTryStatement& boundTryStatement)
 {
+    destructorCallGenerated = false;
+    lastInstructionWasRet = false;
     SetTarget(&boundTryStatement);
     llvm::BasicBlock* prevHandlerBlock = handlerBlock;
     llvm::BasicBlock* prevCleanupBlock = cleanupBlock;

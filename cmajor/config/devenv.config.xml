@@ -3,31 +3,37 @@
     <cmc>cmc.exe</cmc>
     <tabSize>4</tabSize>
     <infoDelaySecs>10</infoDelaySecs>
-    <formSizeX>1387</formSizeX>
-    <formSizeY>906</formSizeY>
-    <formTop>51</formTop>
-    <formLeft>127</formLeft>
-    <textVisX>130</textVisX>
-    <textVisY>130</textVisY>
-    <textVisW>805</textVisW>
-    <textVisH>307</textVisH>
+    <formSizeX>1626</formSizeX>
+    <formSizeY>938</formSizeY>
+    <formTop>0</formTop>
+    <formLeft>0</formLeft>
+    <textVisX>234</textVisX>
+    <textVisY>234</textVisY>
+    <textVisW>1259</textVisW>
+    <textVisH>482</textVisH>
     <toolColWidth>80</toolColWidth>
     <categoryColWidth>80</categoryColWidth>
-    <descriptionColWidth>389</descriptionColWidth>
+    <descriptionColWidth>492</descriptionColWidth>
     <fileColWidth>340</fileColWidth>
     <lineColWidth>60</lineColWidth>
     <projectColWidth>80</projectColWidth>
-    <textColWidth>252</textColWidth>
-    <horizontalSplitterPos>1048</horizontalSplitterPos>
+    <textColWidth>308</textColWidth>
+    <horizontalSplitterPos>1230</horizontalSplitterPos>
     <verticalSplitterPos>529</verticalSplitterPos>
     <windowState>Normal</windowState>
     <maxRecentProjects>10</maxRecentProjects>
     <recentProjects>
         <recentProject>
+            <path>C:\Users\Seppo\cmajorw64\cmajor\test\foo\foo.cms</path>
+            <openFiles />
+        </recentProject>
+        <recentProject>
             <path>C:\Users\Seppo\cmajorw64\cmajor\system\System.cms</path>
             <openFiles />
         </recentProject>
     </recentProjects>
-    <emitLlvm>false</emitLlvm>
+    <strictNothrow>true</strictNothrow>
+    <emitLlvm>true</emitLlvm>
     <emitOptLlvm>false</emitOptLlvm>
+    <linkWithDebugRuntime>true</linkWithDebugRuntime>
 </cmdevenv.configuration>
