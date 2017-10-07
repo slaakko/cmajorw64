@@ -358,11 +358,11 @@ namespace server
                 compileProcess = cmc;
                 List<byte> stdoutBytes = new List<byte>();
                 List<byte> stderrBytes = new List<byte>();
-                int readResult = cmc.StandardOutput.Read();
+                int readResult = cmc.StandardOutput.BaseStream.ReadByte();
                 while (readResult != -1)
                 {
                     stdoutBytes.Add((byte)readResult);
-                    readResult = cmc.StandardOutput.Read();
+                    readResult = cmc.StandardOutput.BaseStream.ReadByte();
                     if ((char)readResult == '\n')
                     {
                         if (writeControl != null && writeDelegate != null)
@@ -387,11 +387,11 @@ namespace server
                     {
                         break;
                     }
-                    readResult = cmc.StandardOutput.Read();
+                    readResult = cmc.StandardOutput.BaseStream.ReadByte();
                     while (readResult != -1)
                     {
                         stdoutBytes.Add((byte)readResult);
-                        readResult = cmc.StandardOutput.Read();
+                        readResult = cmc.StandardOutput.BaseStream.ReadByte();
                     }
                 }
                 if (compileAborted)
@@ -401,11 +401,11 @@ namespace server
                 }
                 cmc.WaitForExit();
                 compileProcess = null;
-                int stderrReadResult = cmc.StandardError.Read();
+                int stderrReadResult = cmc.StandardError.BaseStream.ReadByte();
                 while (stderrReadResult != -1)
                 {
                     stderrBytes.Add((byte)stderrReadResult);
-                    stderrReadResult = cmc.StandardError.Read();
+                    stderrReadResult = cmc.StandardError.BaseStream.ReadByte();
                 }
                 string compileResultString = UTF8.Decode(stderrBytes.ToArray());
                 if (compileResultHandler != null && compileReady != null)
