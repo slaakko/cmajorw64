@@ -1269,6 +1269,7 @@ namespace cmdevenv
                 emitOptLlvm = Configuration.Instance.EmitOptLlvm;
                 linkWithDebugRuntime = Configuration.Instance.LinkWithDebugRuntime;
                 linkWithMsLink = Configuration.Instance.LinkWithMsLink;
+                dialog.StrictNothrow = strictNothrow;
                 dialog.EmitLlvm = emitLlvm;
                 dialog.EmitOptLlvm = emitOptLlvm;
                 dialog.LinkWithDebugRuntime = linkWithDebugRuntime;

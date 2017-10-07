@@ -8,7 +8,7 @@ using System.Collections;
 using System.IO;
 using System.Threading;
 
-namespace System.Unicode
+namespace System
 {
     public class UnicodeException : Exception
     {

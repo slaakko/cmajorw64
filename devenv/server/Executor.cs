@@ -148,7 +148,7 @@ namespace server
                 runningProcess = process;
                 List<byte> stdoutBytes = new List<byte>();
                 List<byte> stderrBytes = new List<byte>();
-                int stdoutByte = process.StandardOutput.Read();
+                int stdoutByte = process.StandardOutput.BaseStream.ReadByte();
                 while (stdoutByte != -1)
                 {
                     stdoutBytes.Add((byte)stdoutByte);
@@ -160,9 +160,9 @@ namespace server
                         }
                         stdoutBytes.Clear();
                     }
-                    stdoutByte = process.StandardOutput.Read();
+                    stdoutByte = process.StandardOutput.BaseStream.ReadByte();
                 }
-                int stderrByte = process.StandardError.Read();
+                int stderrByte = process.StandardError.BaseStream.ReadByte();
                 while (stderrByte != -1)
                 {
                     stderrBytes.Add((byte)stderrByte);
@@ -174,7 +174,7 @@ namespace server
                         }
                         stderrBytes.Clear();
                     }
-                    stderrByte = process.StandardError.Read();
+                    stderrByte = process.StandardError.BaseStream.ReadByte();
                 }
                 if (stdoutBytes.Count > 0)
                 {

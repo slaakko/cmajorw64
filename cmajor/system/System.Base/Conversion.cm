@@ -1,4 +1,4 @@
-// =================================
+﻿// =================================
 // Copyright (c) 2017 Seppo Laakko
 // Distributed under the MIT license
 // =================================
@@ -146,13 +146,13 @@ namespace System
     public string ToString(wchar c)
     {
         wstring s(c);
-        return System.Unicode.ToUtf8(s);
+        return ToUtf8(s);
     }
     
     public string ToString(uchar c)
     {
         ustring s(c);
-        return System.Unicode.ToUtf8(s);
+        return ToUtf8(s);
     }
 
     public nothrow string ToString(bool b)
