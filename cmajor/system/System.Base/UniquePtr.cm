@@ -1,4 +1,4 @@
-// =================================
+﻿// =================================
 // Copyright (c) 2017 Seppo Laakko
 // Distributed under the MIT license
 // =================================
@@ -82,7 +82,17 @@ namespace System
             #assert(ptr != null);
             return ptr;
         }
+        public inline nothrow const T* operator->() const
+        {
+            #assert(ptr != null);
+            return ptr;
+        }
         public inline nothrow T& operator*()
+        {
+            #assert(ptr != null);
+            return *ptr;
+        }
+        public inline nothrow const T& operator*() const
         {
             #assert(ptr != null);
             return *ptr;

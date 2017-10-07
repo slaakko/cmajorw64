@@ -73,6 +73,8 @@ void PrintHelp()
         "   debug parsing to stdout\n" <<
         "--link-with-debug-runtime (-d)\n" <<
         "   link with the debug version of the runtime library cmrt200(d).dll\n" <<
+        "--link-with-ms-link (-m)\n" <<
+        "   use Microsoft link.exe to link\n" << 
         std::endl;
 }
 
@@ -139,6 +141,10 @@ int main(int argc, const char** argv)
                     else if (arg == "--link-with-debug-runtime" || arg == "-d")
                     {
                         SetGlobalFlag(GlobalFlags::linkWithDebugRuntime);
+                    }
+                    else if (arg == "--link-with-ms-link" || arg == "-m")
+                    {
+                        SetGlobalFlag(GlobalFlags::linkWithMsLink);
                     }
                     else if (arg.find('=') != std::string::npos)
                     {

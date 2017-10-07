@@ -563,6 +563,7 @@ void StatementBinder::Visit(ReturnStatementNode& returnStatementNode)
             classReturnArgs.push_back(std::move(rvalueExpr));
             std::unique_ptr<BoundFunctionCall> constructorCall = ResolveOverload(U"@constructor", containerScope, classReturnLookups, classReturnArgs, boundCompileUnit, currentFunction,
                 returnStatementNode.GetSpan());
+            //MoveTemporaryDestructorCallsTo(*constructorCall);
             std::unique_ptr<BoundStatement> constructStatement(new BoundExpressionStatement(std::move(constructorCall)));
             AddStatement(constructStatement.release());
             std::unique_ptr<BoundFunctionCall> returnFunctionCall;

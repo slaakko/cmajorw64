@@ -28,6 +28,15 @@ void BoundExpression::AddTemporaryDestructorCall(std::unique_ptr<BoundFunctionCa
     temporaryDestructorCalls.push_back(std::move(destructorCall));
 }
 
+void BoundExpression::MoveTemporaryDestructorCallsTo(BoundExpression& expression)
+{
+    for (std::unique_ptr<BoundFunctionCall>& destructorCall : temporaryDestructorCalls)
+    {
+        expression.AddTemporaryDestructorCall(std::move(destructorCall));
+    }
+    temporaryDestructorCalls.clear();
+}
+
 void BoundExpression::DestroyTemporaries(Emitter& emitter)
 {
     for (const std::unique_ptr<BoundFunctionCall>& destructorCall : temporaryDestructorCalls)
@@ -399,6 +408,8 @@ void BoundLiteral::Accept(BoundNodeVisitor& visitor)
 BoundTemporary::BoundTemporary(std::unique_ptr<BoundExpression>&& rvalueExpr_, std::unique_ptr<BoundLocalVariable>&& backingStore_) :
     BoundExpression(rvalueExpr_->GetSpan(), BoundNodeType::boundTemporary, rvalueExpr_->GetType()), rvalueExpr(std::move(rvalueExpr_)), backingStore(std::move(backingStore_))
 {
+    rvalueExpr->MoveTemporaryDestructorCallsTo(*this);
+    backingStore->MoveTemporaryDestructorCallsTo(*this);
 }
 
 BoundExpression* BoundTemporary::Clone()
@@ -482,6 +493,7 @@ void BoundSizeOfExpression::Accept(BoundNodeVisitor& visitor)
 BoundAddressOfExpression::BoundAddressOfExpression(std::unique_ptr<BoundExpression>&& subject_, TypeSymbol* type_)  : 
     BoundExpression(subject_->GetSpan(), BoundNodeType::boundAddressOfExpression, type_), subject(std::move(subject_))
 {
+    subject->MoveTemporaryDestructorCallsTo(*this);
 }
 
 BoundExpression* BoundAddressOfExpression::Clone()
@@ -527,6 +539,7 @@ void BoundAddressOfExpression::Accept(BoundNodeVisitor& visitor)
 BoundDereferenceExpression::BoundDereferenceExpression(std::unique_ptr<BoundExpression>&& subject_, TypeSymbol* type_) :
     BoundExpression(subject_->GetSpan(), BoundNodeType::boundDereferenceExpression, type_), subject(std::move(subject_))
 {
+    subject->MoveTemporaryDestructorCallsTo(*this);
 }
 
 BoundExpression* BoundDereferenceExpression::Clone()
@@ -572,6 +585,7 @@ void BoundDereferenceExpression::Accept(BoundNodeVisitor& visitor)
 BoundReferenceToPointerExpression::BoundReferenceToPointerExpression(std::unique_ptr<BoundExpression>&& subject_, TypeSymbol* type_) :
     BoundExpression(subject_->GetSpan(), BoundNodeType::boundReferenceToPointerExpression, type_), subject(std::move(subject_))
 {
+    subject->MoveTemporaryDestructorCallsTo(*this);
 }
 
 BoundExpression* BoundReferenceToPointerExpression::Clone()
@@ -614,6 +628,7 @@ BoundExpression* BoundFunctionCall::Clone()
 
 void BoundFunctionCall::AddArgument(std::unique_ptr<BoundExpression>&& argument)
 {
+    argument->MoveTemporaryDestructorCallsTo(*this);
     arguments.push_back(std::move(argument));
 }
 
@@ -964,6 +979,7 @@ void BoundClassDelegateCall::AddArgument(std::unique_ptr<BoundExpression>&& argu
 BoundConstructExpression::BoundConstructExpression(std::unique_ptr<BoundExpression>&& constructorCall_, TypeSymbol* resultType_) :
     BoundExpression(constructorCall_->GetSpan(), BoundNodeType::boundConstructExpression, resultType_), constructorCall(std::move(constructorCall_))
 {
+    constructorCall->MoveTemporaryDestructorCallsTo(*this);
 }
 
 BoundExpression* BoundConstructExpression::Clone()
@@ -1012,6 +1028,8 @@ BoundConstructAndReturnTemporaryExpression::BoundConstructAndReturnTemporaryExpr
     BoundExpression(constructorCall_->GetSpan(), BoundNodeType::boundConstructAndReturnTemporary, boundTemporary_->GetType()), constructorCall(std::move(constructorCall_)), 
     boundTemporary(std::move(boundTemporary_))
 {
+    constructorCall->MoveTemporaryDestructorCallsTo(*this);
+    boundTemporary->MoveTemporaryDestructorCallsTo(*this);
 }
 
 BoundExpression* BoundConstructAndReturnTemporaryExpression::Clone()
@@ -1043,6 +1061,7 @@ void BoundConstructAndReturnTemporaryExpression::Accept(BoundNodeVisitor& visito
 BoundConversion::BoundConversion(std::unique_ptr<BoundExpression>&& sourceExpr_, FunctionSymbol* conversionFun_) :
     BoundExpression(sourceExpr_->GetSpan(), BoundNodeType::boundConversion, conversionFun_->ConversionTargetType()), sourceExpr(std::move(sourceExpr_)), conversionFun(conversionFun_)
 {
+    sourceExpr->MoveTemporaryDestructorCallsTo(*this);
 }
 
 BoundExpression* BoundConversion::Clone()
@@ -1205,6 +1224,7 @@ void BoundAsExpression::Accept(BoundNodeVisitor& visitor)
 BoundTypeNameExpression::BoundTypeNameExpression(std::unique_ptr<BoundExpression>&& classPtr_, TypeSymbol* constCharPtrType_) :
     BoundExpression(classPtr_->GetSpan(), BoundNodeType::boundTypeNameExpression, constCharPtrType_), classPtr(std::move(classPtr_))
 {
+    classPtr->MoveTemporaryDestructorCallsTo(*this);
 }
 
 BoundExpression* BoundTypeNameExpression::Clone()
@@ -1254,6 +1274,7 @@ void BoundTypeNameExpression::Accept(BoundNodeVisitor& visitor)
 
 BoundBitCast::BoundBitCast(std::unique_ptr<BoundExpression>&& expr_, TypeSymbol* type_) : BoundExpression(expr_->GetSpan(), BoundNodeType::boundBitCast, type_), expr(std::move(expr_))
 {
+    expr->MoveTemporaryDestructorCallsTo(*this);
 }
 
 BoundExpression* BoundBitCast::Clone()
@@ -1514,6 +1535,7 @@ BoundMemberExpression::BoundMemberExpression(const Span& span_, std::unique_ptr<
     BoundExpression(span_, BoundNodeType::boundMemberExpression, new MemberExpressionTypeSymbol(span_, member_->GetType()->Name(), this)), classPtr(std::move(classPtr_)), member(std::move(member_))
 {
     memberExpressionType.reset(GetType());
+    classPtr->MoveTemporaryDestructorCallsTo(*this);
 }
 
 BoundExpression* BoundMemberExpression::Clone()

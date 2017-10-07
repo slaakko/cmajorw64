@@ -276,7 +276,7 @@ namespace server
         }
         public override void HandleCompileRequest(CompileRequest request)
         {
-            Compile(request.FilePath, request.Config, request.StrictNothrow, request.EmitLlvm, request.EmitOptLlvm, request.LinkWithDebugRuntime, request.OptimizationLevel);
+            Compile(request.FilePath, request.Config, request.StrictNothrow, request.EmitLlvm, request.EmitOptLlvm, request.LinkWithDebugRuntime, request.LinkWithMsLink, request.OptimizationLevel);
         }
         public void SetWriteMethod(Control writer, WriteLineToOutputWindow writeMethod)
         {
@@ -306,16 +306,16 @@ namespace server
         {
             exit.WaitOne();
         }
-        public void DoCompile(string filePath, string config, bool strictNothrow, bool emitLlvm, bool emitOptLlvm, bool linkWithDebugRuntime, int optimizationLevel)
+        public void DoCompile(string filePath, string config, bool strictNothrow, bool emitLlvm, bool emitOptLlvm, bool linkWithDebugRuntime, bool linkWithMsLink, int optimizationLevel)
         {
-            Request request = new CompileRequest(filePath, config, strictNothrow, emitLlvm, emitOptLlvm, linkWithDebugRuntime, optimizationLevel);
+            Request request = new CompileRequest(filePath, config, strictNothrow, emitLlvm, emitOptLlvm, linkWithDebugRuntime, linkWithMsLink, optimizationLevel);
             lock (requestQueue)
             {
                 requestQueue.Enqueue(request);
             }
             requestWaiting.Set();
         }
-        private void Compile(string filePath, string config, bool strictNothrow, bool emitLlvm, bool emitOptLlvm, bool linkWithDebugRuntime, int optimizationLevel)
+        private void Compile(string filePath, string config, bool strictNothrow, bool emitLlvm, bool emitOptLlvm, bool linkWithDebugRuntime, bool linkWithMsLink, int optimizationLevel)
         {
             try
             {
@@ -338,6 +338,10 @@ namespace server
                 if (linkWithDebugRuntime)
                 {
                     arguments.Append(" --link-with-debug-runtime");
+                }
+                if (linkWithMsLink)
+                {
+                    arguments.Append(" --link-with-ms-link");
                 }
                 if (optimizationLevel != -1)
                 {

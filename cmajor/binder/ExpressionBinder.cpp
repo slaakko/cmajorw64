@@ -1192,7 +1192,12 @@ void ExpressionBinder::BindDerefExpr(Node& node)
         TypeSymbol* plainSubjectType = expression->GetType()->PlainType(node.GetSpan());
         if (plainSubjectType->IsClassTypeSymbol())
         {
-            if (expression->GetType()->IsClassTypeSymbol())
+            if (expression->GetType()->IsReferenceType())
+            {
+                TypeSymbol* type = expression->GetType()->RemoveReference(node.GetSpan())->AddPointer(node.GetSpan());
+                expression.reset(new BoundReferenceToPointerExpression(std::move(expression), type));
+            }
+            else if (expression->GetType()->IsClassTypeSymbol())
             {
                 TypeSymbol* type = expression->GetType()->AddPointer(node.GetSpan());
                 expression.reset(new BoundAddressOfExpression(std::move(expression), type));

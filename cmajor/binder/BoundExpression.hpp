@@ -52,6 +52,7 @@ public:
     bool GetFlag(BoundExpressionFlags flag) const { return (flags & flag) != BoundExpressionFlags::none;  }
     void SetFlag(BoundExpressionFlags flag) { flags = flags | flag; }
     void AddTemporaryDestructorCall(std::unique_ptr<BoundFunctionCall>&& destructorCall);
+    void MoveTemporaryDestructorCallsTo(BoundExpression& expression);
     void DestroyTemporaries(Emitter& emitter);
 private:
     TypeSymbol* type;

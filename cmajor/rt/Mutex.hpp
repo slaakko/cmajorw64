@@ -5,12 +5,13 @@
 
 #ifndef CMAJOR_RT_MUTEX_INCLUDED
 #define CMAJOR_RT_MUTEX_INCLUDED
+#include <cmajor/rt/RtApi.hpp>
 #include <stdint.h>
 
-extern "C" int32_t RtAllocateMutex();
-extern "C" void RtFreeMutex(int32_t mutexId);
-extern "C" void RtLockMutex(int32_t mutexId);
-extern "C" void RtUnlockMutex(int32_t mutexId);
+extern "C" RT_API int32_t RtAllocateMutex();
+extern "C" RT_API void RtFreeMutex(int32_t mutexId);
+extern "C" RT_API void RtLockMutex(int32_t mutexId);
+extern "C" RT_API void RtUnlockMutex(int32_t mutexId);
 
 namespace cmajor { namespace rt { 
 

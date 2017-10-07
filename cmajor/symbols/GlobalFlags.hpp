@@ -21,8 +21,9 @@ enum class GlobalFlags : uint16_t
     emitLlvm = 1 << 5,
     emitOptLlvm = 1 << 6,
     linkWithDebugRuntime = 1 << 7,
-    ide = 1 << 8,
-    strictNothrow = 1 << 9
+    linkWithMsLink = 1 << 8,
+    ide = 1 << 9,
+    strictNothrow = 1 << 10,
 };
 
 void SetGlobalFlag(GlobalFlags flag);

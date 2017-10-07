@@ -116,22 +116,22 @@ void DoneMutex()
 
 } } // namespace cmajor::rt
 
-extern "C" int32_t RtAllocateMutex()
+extern "C" RT_API int32_t RtAllocateMutex()
 {
     return cmajor::rt::MutexTable::Instance().AllocateMutex();
 }
 
-extern "C" void RtFreeMutex(int32_t mutexId)
+extern "C" RT_API void RtFreeMutex(int32_t mutexId)
 {
     return cmajor::rt::MutexTable::Instance().FreeMutex(mutexId);
 }
 
-extern "C" void RtLockMutex(int32_t mutexId)
+extern "C" RT_API void RtLockMutex(int32_t mutexId)
 {
     cmajor::rt::MutexTable::Instance().LockMutex(mutexId);
 }
 
-extern "C" void RtUnlockMutex(int32_t mutexId)
+extern "C" RT_API void RtUnlockMutex(int32_t mutexId)
 {
     cmajor::rt::MutexTable::Instance().UnlockMutex(mutexId);
 }

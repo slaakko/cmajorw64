@@ -31,24 +31,24 @@ namespace cmajor { namespace rt {
 
 void Init()
 {
+    InitMutex();
     cmajor::util::Init();
     InitIo();
-    InitStatics();
-    InitClasses();
     InitError();
     InitString();
-    InitMutex();
+    InitStatics();
+    InitClasses();
 }
 
 void Done()
 {
-    DoneMutex();
-    DoneString();
-    DoneError();
     DoneClasses();
     DoneStatics();
+    DoneString();
+    DoneError();
     DoneIo();
     cmajor::util::Done();
+    DoneMutex();
 }
 
 } } // namespace cmajor::rt

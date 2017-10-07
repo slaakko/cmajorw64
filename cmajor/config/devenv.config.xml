@@ -5,8 +5,8 @@
     <infoDelaySecs>10</infoDelaySecs>
     <formSizeX>1626</formSizeX>
     <formSizeY>938</formSizeY>
-    <formTop>0</formTop>
-    <formLeft>0</formLeft>
+    <formTop>31</formTop>
+    <formLeft>89</formLeft>
     <textVisX>234</textVisX>
     <textVisY>234</textVisY>
     <textVisW>1259</textVisW>
@@ -32,8 +32,9 @@
             <openFiles />
         </recentProject>
     </recentProjects>
-    <strictNothrow>true</strictNothrow>
+    <strictNothrow>false</strictNothrow>
     <emitLlvm>true</emitLlvm>
     <emitOptLlvm>false</emitOptLlvm>
     <linkWithDebugRuntime>true</linkWithDebugRuntime>
+    <linkWithMsLink>true</linkWithMsLink>
 </cmdevenv.configuration>

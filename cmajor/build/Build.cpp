@@ -286,7 +286,14 @@ void Link(const std::string& executableFilePath, const std::vector<std::string>&
     {
         std::cout << "Linking..." << std::endl;
     }
-    SetCurrentTooName(U"lld-link");
+    if (GetGlobalFlag(GlobalFlags::linkWithMsLink))
+    {
+        SetCurrentTooName(U"link");
+    }
+    else
+    {
+        SetCurrentTooName(U"lld-link");
+    }
     boost::filesystem::path bdp = executableFilePath;
     bdp.remove_filename();
     boost::filesystem::create_directories(bdp);
@@ -323,12 +330,22 @@ void Link(const std::string& executableFilePath, const std::vector<std::string>&
     {
         args.push_back(QuotedPath(libraryFilePaths[i]));
     }
-    std::string linkCommandLine = "lld-link";
+    std::string linkCommandLine;
+    std::string linkErrorFilePath;
+    if (GetGlobalFlag(GlobalFlags::linkWithMsLink))
+    {
+        linkCommandLine = "link";
+        linkErrorFilePath = Path::Combine(Path::GetDirectoryName(executableFilePath), "link.error");
+    }
+    else
+    {
+        linkCommandLine = "lld-link";
+        linkErrorFilePath = Path::Combine(Path::GetDirectoryName(executableFilePath), "lld-link.error");
+    }
     for (const std::string& arg : args)
     {
         linkCommandLine.append(1, ' ').append(arg);
     }
-    std::string linkErrorFilePath = Path::Combine(Path::GetDirectoryName(executableFilePath), "lld-link.error");
     int redirectHandle = 2; // stderr
     try
     {
@@ -342,7 +359,7 @@ void Link(const std::string& executableFilePath, const std::vector<std::string>&
     }
     if (GetGlobalFlag(GlobalFlags::verbose))
     {
-        std::cout << "==>" << executableFilePath << std::endl;
+        std::cout << "==> " << executableFilePath << std::endl;
     }
 }
 

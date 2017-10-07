@@ -54,6 +54,7 @@ namespace cmdevenv
             emitLlvm = Configuration.Instance.EmitLlvm; 
             emitOptLlvm = Configuration.Instance.EmitOptLlvm;
             linkWithDebugRuntime = Configuration.Instance.LinkWithDebugRuntime;
+            linkWithMsLink = Configuration.Instance.LinkWithMsLink;
             optimizationLevel = -1;
             errorListView.ContextMenuStrip = errorsListViewContextMenuStrip;
             string[] args = Environment.GetCommandLineArgs();
@@ -939,7 +940,7 @@ namespace cmdevenv
                     cancelToolStripMenuItem.Enabled = true;
                     buildInProgress = true;
                     SetState(State.compiling);
-                    compiler.DoCompile(solution.FilePath, config, strictNothrow, emitLlvm, emitOptLlvm, linkWithDebugRuntime, optimizationLevel);
+                    compiler.DoCompile(solution.FilePath, config, strictNothrow, emitLlvm, emitOptLlvm, linkWithDebugRuntime, linkWithMsLink, optimizationLevel);
                     infoLabel.Text = "Building";
                 }
             }
@@ -972,7 +973,7 @@ namespace cmdevenv
                 cancelToolStripMenuItem.Enabled = true;
                 buildInProgress = true;
                 SetState(State.compiling);
-                compiler.DoCompile(project.FilePath, config, strictNothrow, emitLlvm, emitOptLlvm, linkWithDebugRuntime, optimizationLevel);
+                compiler.DoCompile(project.FilePath, config, strictNothrow, emitLlvm, emitOptLlvm, linkWithDebugRuntime, linkWithMsLink, optimizationLevel);
                 infoLabel.Text = "Building";
             }
             catch (Exception ex)
@@ -1267,19 +1268,23 @@ namespace cmdevenv
                 emitLlvm = Configuration.Instance.EmitLlvm;
                 emitOptLlvm = Configuration.Instance.EmitOptLlvm;
                 linkWithDebugRuntime = Configuration.Instance.LinkWithDebugRuntime;
+                linkWithMsLink = Configuration.Instance.LinkWithMsLink;
                 dialog.EmitLlvm = emitLlvm;
                 dialog.EmitOptLlvm = emitOptLlvm;
                 dialog.LinkWithDebugRuntime = linkWithDebugRuntime;
+                dialog.LinkWithMsLink = linkWithMsLink;
                 if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                 {
                     strictNothrow = dialog.StrictNothrow;
                     emitLlvm = dialog.EmitLlvm;
                     emitOptLlvm = dialog.EmitOptLlvm;
                     linkWithDebugRuntime = dialog.LinkWithDebugRuntime;
+                    linkWithMsLink = dialog.LinkWithMsLink;
                     Configuration.Instance.StrictNothrow = strictNothrow;
                     Configuration.Instance.EmitLlvm = emitLlvm;
                     Configuration.Instance.EmitOptLlvm = emitOptLlvm;
                     Configuration.Instance.LinkWithDebugRuntime = linkWithDebugRuntime;
+                    Configuration.Instance.LinkWithMsLink = linkWithMsLink;
                     Configuration.Instance.Save();
                 }
             }
@@ -1714,6 +1719,7 @@ namespace cmdevenv
         private bool emitLlvm;
         private bool emitOptLlvm;
         private bool linkWithDebugRuntime;
+        private bool linkWithMsLink;
         private int optimizationLevel;
         private DateTime compileStartTime;
     }

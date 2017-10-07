@@ -125,6 +125,14 @@ namespace System.IO
             string s = ReadString();
             return ToUtf32(s);
         }
+        public void Seek(long pos, Origin origin)
+        {
+            stream->Seek(pos, origin);
+        }
+        public long Tell() 
+        {
+            return stream->Tell();
+        }
         public ByteStream& ContainedStream() 
         {
             return *stream;
