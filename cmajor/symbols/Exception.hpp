@@ -19,6 +19,8 @@ std::string Expand(const std::string& errorMessage, const Span& primarySpan, con
 std::string Expand(const std::string& errorMessage, const Span& span, const std::vector<Span>& references);
 std::string Expand(const std::string& errorMessage, const Span& span, const std::vector<Span>& references, const std::string& title);
 
+std::unique_ptr<JsonObject> SpanToJson(const Span& span);
+
 class Exception
 {
 public:

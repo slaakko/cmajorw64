@@ -19,14 +19,17 @@ namespace server
         {
             this.success = success;
             this.diagnostics = null;
+            this.warnings = new List<Warning>();
         }
         public CompileResult(bool success, Diagnostics diagnostics)
         {
             this.success = success;
             this.diagnostics = diagnostics;
+            this.warnings = new List<Warning>();
         }
         public CompileResult(JsonValue json)
         {
+            this.warnings = new List<Warning>();
             JsonObject resultObject = json as JsonObject;
             if (resultObject != null)
             {
@@ -44,6 +47,21 @@ namespace server
                 {
                     diagnostics = new Diagnostics(diagnosticsValue);
                 }
+                JsonValue warningsValue = resultObject.GetField("warnings");
+                if (warningsValue != null)
+                {
+                    JsonArray warningsArray = warningsValue as JsonArray;
+                    if (warningsArray != null)
+                    {
+                        int n = warningsArray.Count;
+                        for (int i = 0; i < n; ++i)
+                        {
+                            JsonValue warningValue = warningsArray[i];
+                            Warning warning = new Warning(warningValue);
+                            warnings.Add(warning);
+                        }
+                    }
+                }
             }
         }
         public bool Success
@@ -54,8 +72,13 @@ namespace server
         {
             get { return diagnostics; }
         }
+        public List<Warning> Warnings
+        {
+            get { return warnings; }
+        }
         private bool success;
         private Diagnostics diagnostics;
+        private List<Warning> warnings;
     }
 
     public class Diagnostics
@@ -151,6 +174,74 @@ namespace server
         }
         private string tool;
         private string kind;
+        private string project;
+        private string message;
+        private List<Reference> references;
+    }
+
+    public class Warning
+    {
+        public Warning(string project, string message)
+        {
+            this.project = project;
+            this.message = message;
+            this.references = new List<Reference>();
+        }
+        public Warning(JsonValue json)
+        {
+            this.references = new List<Reference>();
+            if (json is JsonObject)
+            {
+                JsonObject warning = (JsonObject)json;
+                JsonValue projectValue = warning.GetField("project");
+                if (projectValue != null)
+                {
+                    JsonString s = projectValue as JsonString;
+                    if (s != null)
+                    {
+                        project = s.Value;
+                    }
+                }
+                JsonValue messageValue = warning.GetField("message");
+                if (messageValue != null)
+                {
+                    JsonString s = messageValue as JsonString;
+                    if (s != null)
+                    {
+                        message = s.Value;
+                    }
+                }
+                JsonValue referencesValue = warning.GetField("references");
+                if (referencesValue != null)
+                {
+                    JsonArray referencesArray = referencesValue as JsonArray;
+                    if (referencesArray != null)
+                    {
+                        int n = referencesArray.Count;
+                        for (int i = 0; i < n; ++i)
+                        {
+                            JsonValue referenceValue = referencesArray[i];
+                            if (referenceValue != null)
+                            {
+                                references.Add(new Reference(referenceValue));
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        public string Project
+        {
+            get { return project; }
+        }
+        public string Message
+        {
+            get { return message; }
+        }
+        public List<Reference> References
+        {
+            get { return references; }
+        }
         private string project;
         private string message;
         private List<Reference> references;
@@ -276,7 +367,7 @@ namespace server
         }
         public override void HandleCompileRequest(CompileRequest request)
         {
-            Compile(request.FilePath, request.Config, request.StrictNothrow, request.EmitLlvm, request.EmitOptLlvm, request.LinkWithDebugRuntime, request.LinkWithMsLink, request.OptimizationLevel);
+            Compile(request.FilePath, request.Config, request.StrictNothrow, request.EmitLlvm, request.EmitOptLlvm, request.LinkWithDebugRuntime, request.LinkUsingMsLink, request.OptimizationLevel);
         }
         public void SetWriteMethod(Control writer, WriteLineToOutputWindow writeMethod)
         {
@@ -306,16 +397,16 @@ namespace server
         {
             exit.WaitOne();
         }
-        public void DoCompile(string filePath, string config, bool strictNothrow, bool emitLlvm, bool emitOptLlvm, bool linkWithDebugRuntime, bool linkWithMsLink, int optimizationLevel)
+        public void DoCompile(string filePath, string config, bool strictNothrow, bool emitLlvm, bool emitOptLlvm, bool linkWithDebugRuntime, bool linkUsingMsLink, int optimizationLevel)
         {
-            Request request = new CompileRequest(filePath, config, strictNothrow, emitLlvm, emitOptLlvm, linkWithDebugRuntime, linkWithMsLink, optimizationLevel);
+            Request request = new CompileRequest(filePath, config, strictNothrow, emitLlvm, emitOptLlvm, linkWithDebugRuntime, linkUsingMsLink, optimizationLevel);
             lock (requestQueue)
             {
                 requestQueue.Enqueue(request);
             }
             requestWaiting.Set();
         }
-        private void Compile(string filePath, string config, bool strictNothrow, bool emitLlvm, bool emitOptLlvm, bool linkWithDebugRuntime, bool linkWithMsLink, int optimizationLevel)
+        private void Compile(string filePath, string config, bool strictNothrow, bool emitLlvm, bool emitOptLlvm, bool linkWithDebugRuntime, bool linkUsingMsLink, int optimizationLevel)
         {
             try
             {
@@ -339,9 +430,9 @@ namespace server
                 {
                     arguments.Append(" --link-with-debug-runtime");
                 }
-                if (linkWithMsLink)
+                if (linkUsingMsLink)
                 {
-                    arguments.Append(" --link-with-ms-link");
+                    arguments.Append(" --link-using-ms-link");
                 }
                 if (optimizationLevel != -1)
                 {

@@ -336,10 +336,6 @@ void Emitter::Visit(BoundFunction& boundFunction)
     pads.clear();
     labeledStatementMap.clear();
     FunctionSymbol* functionSymbol = boundFunction.GetFunctionSymbol();
-    if (functionSymbol->MangledName() == U"member_function_op_index_Map_String_char_String_char_Less_String_char_CC2CDFC39A4F29E07E67C9B417D9AEDB87AF0706")
-    {
-        int x = 0;
-    }
     llvm::FunctionType* functionType = functionSymbol->IrType(*this);
     function = llvm::cast<llvm::Function>(compileUnitModule->getOrInsertFunction(ToUtf8(functionSymbol->MangledName()), functionType));
     if (functionSymbol->HasLinkOnceOdrLinkage())

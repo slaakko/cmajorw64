@@ -54,6 +54,7 @@ public:
     virtual bool ContainsTemplateParameter() const { return false; }
     void SetTypeId(uint32_t typeId_) { typeId = typeId_; }
     uint32_t TypeId() const { Assert(typeId != 0, "type id not initialized");  return typeId; }
+    bool TypeIdNotSet() const { return typeId == 0; }
     virtual const TypeDerivationRec& DerivationRec() const;
     virtual TypeSymbol* RemoveDerivations(const TypeDerivationRec& sourceDerivationRec, const Span& span);
     virtual TypeSymbol* Unify(TypeSymbol* that, const Span& span) { return nullptr; }

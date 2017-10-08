@@ -28,14 +28,16 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.okButton = new System.Windows.Forms.Button();
             this.cancelButton = new System.Windows.Forms.Button();
             this.emitOptLlvmCheckBox = new System.Windows.Forms.CheckBox();
             this.emitLlvmCheckBox = new System.Windows.Forms.CheckBox();
             this.linkWithDebugRuntimeCheckBox = new System.Windows.Forms.CheckBox();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.linkUsingMsLinkCheckBox = new System.Windows.Forms.CheckBox();
             this.strictNothrowCheckBox = new System.Windows.Forms.CheckBox();
-            this.linkWithMsLinkCheckBox = new System.Windows.Forms.CheckBox();
+            this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.groupBox3.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -67,6 +69,7 @@
             this.emitOptLlvmCheckBox.Size = new System.Drawing.Size(211, 17);
             this.emitOptLlvmCheckBox.TabIndex = 1;
             this.emitOptLlvmCheckBox.Text = "Emit optimized LLVM intermediate code";
+            this.toolTip1.SetToolTip(this.emitOptLlvmCheckBox, "Emit optimized LLVM intermediate code to .opt.ll files while compiling.");
             this.emitOptLlvmCheckBox.UseVisualStyleBackColor = true;
             // 
             // emitLlvmCheckBox
@@ -77,6 +80,7 @@
             this.emitLlvmCheckBox.Size = new System.Drawing.Size(164, 17);
             this.emitLlvmCheckBox.TabIndex = 0;
             this.emitLlvmCheckBox.Text = "Emit LLVM intermediate code";
+            this.toolTip1.SetToolTip(this.emitLlvmCheckBox, "Emit LLVM intermediate code to .ll files while compiling.");
             this.emitLlvmCheckBox.UseVisualStyleBackColor = true;
             // 
             // linkWithDebugRuntimeCheckBox
@@ -87,11 +91,12 @@
             this.linkWithDebugRuntimeCheckBox.Size = new System.Drawing.Size(138, 17);
             this.linkWithDebugRuntimeCheckBox.TabIndex = 0;
             this.linkWithDebugRuntimeCheckBox.Text = "Link with debug runtime";
+            this.toolTip1.SetToolTip(this.linkWithDebugRuntimeCheckBox, "Link with the debug version of the runtime library cmrt200d.dll.");
             this.linkWithDebugRuntimeCheckBox.UseVisualStyleBackColor = true;
             // 
             // groupBox3
             // 
-            this.groupBox3.Controls.Add(this.linkWithMsLinkCheckBox);
+            this.groupBox3.Controls.Add(this.linkUsingMsLinkCheckBox);
             this.groupBox3.Controls.Add(this.linkWithDebugRuntimeCheckBox);
             this.groupBox3.Controls.Add(this.emitOptLlvmCheckBox);
             this.groupBox3.Controls.Add(this.strictNothrowCheckBox);
@@ -103,6 +108,18 @@
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Compiling options";
             // 
+            // linkUsingMsLinkCheckBox
+            // 
+            this.linkUsingMsLinkCheckBox.AutoSize = true;
+            this.linkUsingMsLinkCheckBox.Location = new System.Drawing.Point(17, 120);
+            this.linkUsingMsLinkCheckBox.Name = "linkUsingMsLinkCheckBox";
+            this.linkUsingMsLinkCheckBox.Size = new System.Drawing.Size(197, 17);
+            this.linkUsingMsLinkCheckBox.TabIndex = 2;
+            this.linkUsingMsLinkCheckBox.Text = "Use Microsoft\'s link.exe as the linker";
+            this.toolTip1.SetToolTip(this.linkUsingMsLinkCheckBox, "Use link.exe as the linker instead of LLVM\'s lld-link.exe. \r\nThen link.exe must b" +
+        "e found from PATH.\r\n");
+            this.linkUsingMsLinkCheckBox.UseVisualStyleBackColor = true;
+            // 
             // strictNothrowCheckBox
             // 
             this.strictNothrowCheckBox.AutoSize = true;
@@ -111,17 +128,8 @@
             this.strictNothrowCheckBox.Size = new System.Drawing.Size(91, 17);
             this.strictNothrowCheckBox.TabIndex = 0;
             this.strictNothrowCheckBox.Text = "Strict nothrow";
+            this.toolTip1.SetToolTip(this.strictNothrowCheckBox, "Treat calling a function that can throw from a nothrow function as an error.\r\n");
             this.strictNothrowCheckBox.UseVisualStyleBackColor = true;
-            // 
-            // linkWithMsLinkCheckBox
-            // 
-            this.linkWithMsLinkCheckBox.AutoSize = true;
-            this.linkWithMsLinkCheckBox.Location = new System.Drawing.Point(17, 120);
-            this.linkWithMsLinkCheckBox.Name = "linkWithMsLinkCheckBox";
-            this.linkWithMsLinkCheckBox.Size = new System.Drawing.Size(160, 17);
-            this.linkWithMsLinkCheckBox.TabIndex = 2;
-            this.linkWithMsLinkCheckBox.Text = "Link with Microsoft\'s link.exe";
-            this.linkWithMsLinkCheckBox.UseVisualStyleBackColor = true;
             // 
             // BuildOptionsDialog
             // 
@@ -153,6 +161,7 @@
         private System.Windows.Forms.CheckBox linkWithDebugRuntimeCheckBox;
         private System.Windows.Forms.GroupBox groupBox3;
         private System.Windows.Forms.CheckBox strictNothrowCheckBox;
-        private System.Windows.Forms.CheckBox linkWithMsLinkCheckBox;
+        private System.Windows.Forms.CheckBox linkUsingMsLinkCheckBox;
+        private System.Windows.Forms.ToolTip toolTip1;
     }
 }

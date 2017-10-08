@@ -1,0 +1,6 @@
+project System.Text.Parsing.CodeDom;
+target=library;
+reference <../System.Base/System.Base.cmp>;
+source <BasicType.cm>;
+source <DomObject.cm>;
+source <Visitor.cm>;

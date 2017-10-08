@@ -54,7 +54,7 @@ namespace cmdevenv
             emitLlvm = Configuration.Instance.EmitLlvm; 
             emitOptLlvm = Configuration.Instance.EmitOptLlvm;
             linkWithDebugRuntime = Configuration.Instance.LinkWithDebugRuntime;
-            linkWithMsLink = Configuration.Instance.LinkWithMsLink;
+            linkUsingMsLink = Configuration.Instance.LinkUsingMsLink;
             optimizationLevel = -1;
             errorListView.ContextMenuStrip = errorsListViewContextMenuStrip;
             string[] args = Environment.GetCommandLineArgs();
@@ -259,10 +259,6 @@ namespace cmdevenv
             cleanProjectToolStripMenuItem.Enabled = editing && solutionHasProjects;
             optionsToolStripMenuItem.Enabled = editing && solutionOpen;
             setAsActiveProjectToolStripMenuItem.Enabled = editing && solutionHasProjects;
-            projectDependenciesToolStripMenuItem.Enabled = editing && solutionHasProjects;
-            projectBuildOrderToolStripMenuItem.Enabled = editing && solutionHasProjects;
-            projectDependenciesToolStripMenuItem1.Enabled = editing && solutionHasProjects;
-            projectBuildOrderToolStripMenuItem1.Enabled = editing && solutionHasProjects;
             gotoLineToolStripMenuItem.Enabled = editorOpen;
             formatContentToolStripMenuItem.Enabled = editing && editorOpen;
             findToolStripMenuItem.Enabled = activeProjectSet && solution.ActiveProject.SourceFiles.Count > 0;
@@ -940,7 +936,7 @@ namespace cmdevenv
                     cancelToolStripMenuItem.Enabled = true;
                     buildInProgress = true;
                     SetState(State.compiling);
-                    compiler.DoCompile(solution.FilePath, config, strictNothrow, emitLlvm, emitOptLlvm, linkWithDebugRuntime, linkWithMsLink, optimizationLevel);
+                    compiler.DoCompile(solution.FilePath, config, strictNothrow, emitLlvm, emitOptLlvm, linkWithDebugRuntime, linkUsingMsLink, optimizationLevel);
                     infoLabel.Text = "Building";
                 }
             }
@@ -973,7 +969,7 @@ namespace cmdevenv
                 cancelToolStripMenuItem.Enabled = true;
                 buildInProgress = true;
                 SetState(State.compiling);
-                compiler.DoCompile(project.FilePath, config, strictNothrow, emitLlvm, emitOptLlvm, linkWithDebugRuntime, linkWithMsLink, optimizationLevel);
+                compiler.DoCompile(project.FilePath, config, strictNothrow, emitLlvm, emitOptLlvm, linkWithDebugRuntime, linkUsingMsLink, optimizationLevel);
                 infoLabel.Text = "Building";
             }
             catch (Exception ex)
@@ -995,6 +991,7 @@ namespace cmdevenv
             if (compileResult != null)
             {
                 hasErrors = !compileResult.Success;
+                hasWarningsOrInfos = compileResult.Warnings.Count > 0;
             }
             if (hasErrors || hasWarningsOrInfos)
             {
@@ -1078,6 +1075,47 @@ namespace cmdevenv
                             }
                             text = reference.Text.Trim();
                             ListViewItem refItem = new ListViewItem(new string[] { "cmc", "info", "see reference to", file, line, "", text });
+                            refItem.Tag = reference;
+                            errorListView.Items.Add(refItem);
+                        }
+                        showErrorDescriptionInTextWindowToolStripMenuItem.Enabled = true;
+                    }
+                    foreach (Warning warning in compileResult.Warnings)
+                    {
+                        Reference mainWarningReference = null;
+                        string warningFile = "";
+                        string warningLine = "";
+                        string warningText = "";
+                        if (warning.References.Count > 0)
+                        {
+                            mainWarningReference = warning.References[0];
+                            warningFile = mainWarningReference.File;
+                            if (mainWarningReference.Line != 0)
+                            {
+                                warningLine = mainWarningReference.Line.ToString();
+                            }
+                            else
+                            {
+                                warningLine = "";
+                            }
+                        }
+                        ListViewItem item = new ListViewItem(new string[] { "cmc", "warning", warning.Message, warningFile, warningLine, warning.Project, "" });
+                        item.Tag = mainWarningReference;
+                        errorListView.Items.Add(item);
+                        for (int i = 1; i < warning.References.Count; ++i)
+                        {
+                            Reference reference = warning.References[i];
+                            warningFile = reference.File;
+                            if (reference.Line != 0)
+                            {
+                                warningLine = reference.Line.ToString();
+                            }
+                            else
+                            {
+                                warningLine = "";
+                            }
+                            warningText = reference.Text.Trim();
+                            ListViewItem refItem = new ListViewItem(new string[] { "cmc", "info", "see reference to", warningFile, warningLine, "", warningText });
                             refItem.Tag = reference;
                             errorListView.Items.Add(refItem);
                         }
@@ -1268,24 +1306,24 @@ namespace cmdevenv
                 emitLlvm = Configuration.Instance.EmitLlvm;
                 emitOptLlvm = Configuration.Instance.EmitOptLlvm;
                 linkWithDebugRuntime = Configuration.Instance.LinkWithDebugRuntime;
-                linkWithMsLink = Configuration.Instance.LinkWithMsLink;
+                linkUsingMsLink = Configuration.Instance.LinkUsingMsLink;
                 dialog.StrictNothrow = strictNothrow;
                 dialog.EmitLlvm = emitLlvm;
                 dialog.EmitOptLlvm = emitOptLlvm;
                 dialog.LinkWithDebugRuntime = linkWithDebugRuntime;
-                dialog.LinkWithMsLink = linkWithMsLink;
+                dialog.LinkUsingMsLink = linkUsingMsLink;
                 if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                 {
                     strictNothrow = dialog.StrictNothrow;
                     emitLlvm = dialog.EmitLlvm;
                     emitOptLlvm = dialog.EmitOptLlvm;
                     linkWithDebugRuntime = dialog.LinkWithDebugRuntime;
-                    linkWithMsLink = dialog.LinkWithMsLink;
+                    linkUsingMsLink = dialog.LinkUsingMsLink;
                     Configuration.Instance.StrictNothrow = strictNothrow;
                     Configuration.Instance.EmitLlvm = emitLlvm;
                     Configuration.Instance.EmitOptLlvm = emitOptLlvm;
                     Configuration.Instance.LinkWithDebugRuntime = linkWithDebugRuntime;
-                    Configuration.Instance.LinkWithMsLink = linkWithMsLink;
+                    Configuration.Instance.LinkUsingMsLink = linkUsingMsLink;
                     Configuration.Instance.Save();
                 }
             }
@@ -1701,6 +1739,26 @@ namespace cmdevenv
         {
             solutionExplorerTreeView.SelectedNode.BeginEdit();
         }
+        private void projectReferencesItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                TreeNode selectedNode = solutionExplorerTreeView.SelectedNode;
+                if (selectedNode != null)
+                {
+                    Project selectedProject = selectedNode.Tag as Project;
+                    if (selectedProject != null)
+                    {
+                        ProjectReferencesDialog dialog = new ProjectReferencesDialog(addProjectReferenceDialog, solution, selectedProject);
+                        dialog.ShowDialog();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
         private Solution solution;
         private XTabControl editorTabControl;
         private State state;
@@ -1720,7 +1778,7 @@ namespace cmdevenv
         private bool emitLlvm;
         private bool emitOptLlvm;
         private bool linkWithDebugRuntime;
-        private bool linkWithMsLink;
+        private bool linkUsingMsLink;
         private int optimizationLevel;
         private DateTime compileStartTime;
     }

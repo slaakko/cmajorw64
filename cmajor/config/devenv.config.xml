@@ -7,13 +7,13 @@
     <formSizeY>938</formSizeY>
     <formTop>31</formTop>
     <formLeft>89</formLeft>
-    <textVisX>52</textVisX>
-    <textVisY>52</textVisY>
+    <textVisX>78</textVisX>
+    <textVisY>78</textVisY>
     <textVisW>1259</textVisW>
     <textVisH>482</textVisH>
     <toolColWidth>80</toolColWidth>
     <categoryColWidth>80</categoryColWidth>
-    <descriptionColWidth>492</descriptionColWidth>
+    <descriptionColWidth>793</descriptionColWidth>
     <fileColWidth>340</fileColWidth>
     <lineColWidth>60</lineColWidth>
     <projectColWidth>80</projectColWidth>
@@ -24,11 +24,11 @@
     <maxRecentProjects>10</maxRecentProjects>
     <recentProjects>
         <recentProject>
-            <path>C:\Users\Seppo\cmajorw64\cmajor\test\foo\foo.cms</path>
+            <path>C:\Users\Seppo\cmajorw64\cmajor\system\System.cms</path>
             <openFiles />
         </recentProject>
         <recentProject>
-            <path>C:\Users\Seppo\cmajorw64\cmajor\system\System.cms</path>
+            <path>C:\Users\Seppo\cmajorw64\cmajor\test\foo\foo.cms</path>
             <openFiles />
         </recentProject>
     </recentProjects>
@@ -36,5 +36,5 @@
     <emitLlvm>true</emitLlvm>
     <emitOptLlvm>true</emitOptLlvm>
     <linkWithDebugRuntime>true</linkWithDebugRuntime>
-    <linkWithMsLink>true</linkWithMsLink>
+    <linkUsingMsLink>true</linkUsingMsLink>
 </cmdevenv.configuration>

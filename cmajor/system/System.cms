@@ -3,4 +3,6 @@ project <System/System.cmp>;
 project <System.Base/System.Base.cmp>;
 project <System.Core/System.Core.cmp>;
 project <System.Runtime/System.Runtime.cmp>;
+project <System.Text.Parsing/System.Text.Parsing.cmp>;
+project <System.Text.Parsing.CodeDom/System.Text.Parsing.CodeDom.cmp>;
 activeProject System.Base;

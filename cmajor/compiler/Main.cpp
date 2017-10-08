@@ -73,8 +73,8 @@ void PrintHelp()
         "   debug parsing to stdout\n" <<
         "--link-with-debug-runtime (-d)\n" <<
         "   link with the debug version of the runtime library cmrt200(d).dll\n" <<
-        "--link-with-ms-link (-m)\n" <<
-        "   use Microsoft link.exe to link\n" << 
+        "--link-using-ms-link (-m)\n" <<
+        "   use Microsoft's link.exe as the linker\n" << 
         std::endl;
 }
 
@@ -142,9 +142,9 @@ int main(int argc, const char** argv)
                     {
                         SetGlobalFlag(GlobalFlags::linkWithDebugRuntime);
                     }
-                    else if (arg == "--link-with-ms-link" || arg == "-m")
+                    else if (arg == "--link-using-ms-link" || arg == "-m")
                     {
-                        SetGlobalFlag(GlobalFlags::linkWithMsLink);
+                        SetGlobalFlag(GlobalFlags::linkUsingMsLink);
                     }
                     else if (arg.find('=') != std::string::npos)
                     {
@@ -245,11 +245,21 @@ int main(int argc, const char** argv)
                 }
                 if (GetGlobalFlag(GlobalFlags::ide))
                 {
+                    for (const Warning& warning : CompileWarningCollection::Instance().Warnings())
+                    {
+                        std::string what = Expand(warning.Message(), warning.Defined(), warning.References(), "Warning");
+                        std::cout << what << std::endl;
+                    }
                     std::unique_ptr<JsonObject> compileResult(new JsonObject());
                     compileResult->AddField(U"success", std::unique_ptr<JsonValue>(new JsonBool(true)));
                     if (!CompileWarningCollection::Instance().Warnings().empty())
                     {
-                        // todo
+                        JsonArray* warningsArray = new JsonArray();
+                        for (const Warning& warning : CompileWarningCollection::Instance().Warnings())
+                        {
+                            warningsArray->AddItem(std::move(warning.ToJson()));
+                        }
+                        compileResult->AddField(U"warnings", std::unique_ptr<JsonValue>(warningsArray));
                     }
                     std::cerr << compileResult->ToString() << std::endl;
                 }
@@ -276,12 +286,22 @@ int main(int argc, const char** argv)
         if (GetGlobalFlag(GlobalFlags::ide))
         {
             std::cout << ex.What() << std::endl;
+            for (const Warning& warning : CompileWarningCollection::Instance().Warnings())
+            {
+                std::string what = Expand(warning.Message(), warning.Defined(), warning.References(), "Warning");
+                std::cout << what << std::endl;
+            }
             std::unique_ptr<JsonObject> compileResult(new JsonObject());
             compileResult->AddField(U"success", std::unique_ptr<JsonValue>(new JsonBool(false)));
             compileResult->AddField(U"diagnostics", std::move(ex.ToJson()));
             if (!CompileWarningCollection::Instance().Warnings().empty())
             {
-                // todo
+                JsonArray* warningsArray = new JsonArray();
+                for (const Warning& warning : CompileWarningCollection::Instance().Warnings())
+                {
+                    warningsArray->AddItem(std::move(warning.ToJson()));
+                }
+                compileResult->AddField(U"warnings", std::unique_ptr<JsonValue>(warningsArray));
             }
             std::cerr << compileResult->ToString() << std::endl;
         }
@@ -301,6 +321,11 @@ int main(int argc, const char** argv)
         if (GetGlobalFlag(GlobalFlags::ide))
         {
             std::cout << ex.what() << std::endl;
+            for (const Warning& warning : CompileWarningCollection::Instance().Warnings())
+            {
+                std::string what = Expand(warning.Message(), warning.Defined(), warning.References(), "Warning");
+                std::cout << what << std::endl;
+            }
             std::unique_ptr<JsonObject> compileResult(new JsonObject());
             compileResult->AddField(U"success", std::unique_ptr<JsonValue>(new JsonBool(false)));
             std::unique_ptr<JsonObject> diagnostics(new JsonObject());
@@ -311,7 +336,12 @@ int main(int argc, const char** argv)
             compileResult->AddField(U"diagnostics", std::move(diagnostics));
             if (!CompileWarningCollection::Instance().Warnings().empty())
             {
-                // todo
+                JsonArray* warningsArray = new JsonArray();
+                for (const Warning& warning : CompileWarningCollection::Instance().Warnings())
+                {
+                    warningsArray->AddItem(std::move(warning.ToJson()));
+                }
+                compileResult->AddField(U"warnings", std::unique_ptr<JsonValue>(warningsArray));
             }
             std::cerr << compileResult->ToString() << std::endl;
         }

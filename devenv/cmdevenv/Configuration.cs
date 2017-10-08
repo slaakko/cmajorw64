@@ -88,8 +88,8 @@ namespace cmdevenv
                 emitOptLlvm.Value = false;
                 linkWithDebugRuntime = new BooleanField("linkWithDebugRuntime", Fields);
                 linkWithDebugRuntime.Value = false;
-                linkWithMsLink = new BooleanField("linkWithMsLink", Fields);
-                linkWithMsLink.Value = false;
+                linkUsingMsLink = new BooleanField("linkUsingMsLink", Fields);
+                linkUsingMsLink.Value = false;
             }
             public string CmcPath
             {
@@ -245,10 +245,10 @@ namespace cmdevenv
                 get { return linkWithDebugRuntime.Value; }
                 set { linkWithDebugRuntime.Value = value; }
             }
-            public bool LinkWithMsLink
+            public bool LinkUsingMsLink
             {
-                get { return linkWithMsLink.Value; }
-                set { linkWithMsLink.Value = value; }
+                get { return linkUsingMsLink.Value; }
+                set { linkUsingMsLink.Value = value; }
             }
             private StringField cmc;
             private IntField tabSize;
@@ -281,7 +281,7 @@ namespace cmdevenv
             private BooleanField emitLlvm;
             private BooleanField emitOptLlvm;
             private BooleanField linkWithDebugRuntime;
-            private BooleanField linkWithMsLink;
+            private BooleanField linkUsingMsLink;
         }
         public Configuration()
         {
@@ -454,10 +454,10 @@ namespace cmdevenv
             get { return config.LinkWithDebugRuntime; }
             set { config.LinkWithDebugRuntime = value; }
         }
-        public bool LinkWithMsLink
+        public bool LinkUsingMsLink
         {
-            get { return config.LinkWithMsLink; }
-            set { config.LinkWithMsLink = value; }
+            get { return config.LinkUsingMsLink; }
+            set { config.LinkUsingMsLink = value; }
         }
         public void RemoveRecentProjectPath(string recentProjectPath)
         {

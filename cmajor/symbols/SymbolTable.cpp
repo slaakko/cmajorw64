@@ -377,7 +377,10 @@ void SymbolTable::BeginClassTemplateSpecialization(ClassNode& classInstanceNode,
     currentClassStack.push(currentClass);
     currentClass = classTemplateSpecialization;
     MapNode(&classInstanceNode, classTemplateSpecialization);
-    SetTypeIdFor(classTemplateSpecialization);
+    if (classTemplateSpecialization->TypeIdNotSet())
+    {
+        SetTypeIdFor(classTemplateSpecialization);
+    }
     ContainerScope* containerScope = container->GetContainerScope();
     ContainerScope* classScope = classTemplateSpecialization->GetContainerScope();
     classScope->SetParent(containerScope);

@@ -38,10 +38,10 @@ namespace cmdevenv
             get { return linkWithDebugRuntimeCheckBox.Checked; }
             set { linkWithDebugRuntimeCheckBox.Checked = value; }
         }
-        public bool LinkWithMsLink
+        public bool LinkUsingMsLink
         {
-            get { return linkWithMsLinkCheckBox.Checked; }
-            set { linkWithMsLinkCheckBox.Checked = value; }
+            get { return linkUsingMsLinkCheckBox.Checked; }
+            set { linkUsingMsLinkCheckBox.Checked = value; }
         }
         private void okButton_Click(object sender, EventArgs e)
         {

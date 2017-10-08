@@ -286,7 +286,7 @@ void Link(const std::string& executableFilePath, const std::vector<std::string>&
     {
         std::cout << "Linking..." << std::endl;
     }
-    if (GetGlobalFlag(GlobalFlags::linkWithMsLink))
+    if (GetGlobalFlag(GlobalFlags::linkUsingMsLink))
     {
         SetCurrentTooName(U"link");
     }
@@ -332,7 +332,7 @@ void Link(const std::string& executableFilePath, const std::vector<std::string>&
     }
     std::string linkCommandLine;
     std::string linkErrorFilePath;
-    if (GetGlobalFlag(GlobalFlags::linkWithMsLink))
+    if (GetGlobalFlag(GlobalFlags::linkUsingMsLink))
     {
         linkCommandLine = "link";
         linkErrorFilePath = Path::Combine(Path::GetDirectoryName(executableFilePath), "link.error");

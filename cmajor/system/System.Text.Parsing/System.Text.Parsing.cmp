@@ -1,0 +1,3 @@
+project System.Text.Parsing;
+target=library;
+reference <../System.Text.Parsing.CodeDom/System.Text.Parsing.CodeDom.cmp>;

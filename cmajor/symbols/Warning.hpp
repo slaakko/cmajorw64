@@ -6,10 +6,12 @@
 #ifndef CMAJOR_SYMBOLS_WARNING_INCLUDED
 #define CMAJOR_SYMBOLS_WARNING_INCLUDED
 #include <cmajor/parsing/Scanner.hpp>
+#include <cmajor/util/Json.hpp>
 
 namespace cmajor { namespace symbols {
 
 using cmajor::parsing::Span;
+using cmajor::util::JsonValue;
 
 class Warning
 {
@@ -21,6 +23,7 @@ public:
     void SetDefined(const Span& defined_) { defined = defined_; }
     const std::vector<Span>& References() const { return references; }
     void SetReferences(const std::vector<Span>& references_);
+    std::unique_ptr<JsonValue> ToJson() const;
 private:
     std::u32string project;
     std::string message;

@@ -1,0 +1,29 @@
+﻿// =================================
+// Copyright (c) 2017 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+
+namespace System.Text.Parsing.CodeDom
+{
+    public class Visitor
+    {
+        public default virtual ~Visitor();
+        public virtual void Visit(BoolType& boolType) {}
+        public virtual void Visit(CharType& charType) {}
+        public virtual void Visit(WCharType& wcharType) {}
+        public virtual void Visit(UCharType& ucharType) {}
+        public virtual void Visit(SByteType& sbyteType) {}
+        public virtual void Visit(ByteType& byteType) {}
+        public virtual void Visit(ShortType& shortType) {}
+        public virtual void Visit(UShortType& ushortType) {}
+        public virtual void Visit(IntType& intType) {}
+        public virtual void Visit(UIntType& uintType) {}
+        public virtual void Visit(LongType& longType) {}
+        public virtual void Visit(ULongType& ulongType) {}
+        public virtual void Visit(FloatType& floatType) {}
+        public virtual void Visit(DoubleType& doubleType) {}
+        public virtual void Visit(VoidType& voidType) {}
+    }
+}

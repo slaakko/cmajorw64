@@ -8,6 +8,7 @@
 #include <cmajor/symbols/SymbolReader.hpp>
 #include <cmajor/symbols/GlobalFlags.hpp>
 #include <cmajor/symbols/SymbolCollector.hpp>
+#include <cmajor/symbols/Warning.hpp>
 #include <cmajor/parser/FileRegistry.hpp>
 #include <cmajor/ast/Project.hpp>
 #include <cmajor/util/CodeFormatter.hpp>
@@ -51,6 +52,8 @@ SystemModuleSet::SystemModuleSet()
     systemModuleNames.insert(U"System.Core");
     systemModuleNames.insert(U"System.Runtime");
     systemModuleNames.insert(U"System.Base");
+    systemModuleNames.insert(U"System.Text.Parsing.CodeDom");
+    systemModuleNames.insert(U"System.Text.Parsing");
     systemModuleNames.insert(U"System");
 }
 
@@ -396,6 +399,7 @@ void Module::ReadHeader(SymbolReader& reader, Module* rootModule, std::unordered
     {
         rootModule->allExportedData.push_back(data);
     }
+    CheckUpToDate();
     symbolTablePos = reader.GetBinaryReader().Pos();
     ImportModules(rootModule, importSet, modules, dependencyMap, readMap);
 }
@@ -698,6 +702,46 @@ void Module::Dump()
         {
             formatter.WriteLine();
             enumeratedType->Dump(formatter);
+        }
+    }
+}
+
+void Module::CheckUpToDate()
+{
+    if (sourceFilePaths.empty()) return;
+    std::string cmajorRootDir = GetFullPath(CmajorRootDir());
+    boost::filesystem::path libDirPath = boost::filesystem::path(originalFilePath).parent_path();
+    for (const std::string& sourceFilePath : sourceFilePaths)
+    {
+        boost::filesystem::path sfp(sourceFilePath);
+        if (IsSystemModule())
+        {
+            sfp = cmajorRootDir / sfp;
+        }
+        if (boost::filesystem::exists(sfp))
+        {
+            boost::filesystem::path objectFilePath = libDirPath / sfp.filename().replace_extension(".obj");
+            if (boost::filesystem::exists(objectFilePath))
+            {
+                if (boost::filesystem::last_write_time(sfp) > boost::filesystem::last_write_time(objectFilePath))
+                {
+                    Warning warning(CompileWarningCollection::Instance().GetCurrentProjectName(), "source file '" + GetFullPath(sfp.generic_string()) + "' is more recent than object file '" +
+                        GetFullPath(objectFilePath.generic_string()) + "'");
+                    bool found = false;
+                    for (const Warning& prev : CompileWarningCollection::Instance().Warnings())
+                    {
+                        if (prev.Message() == warning.Message())
+                        {
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (!found)
+                    {
+                        CompileWarningCollection::Instance().AddWarning(warning);
+                    }
+                }
+            }
         }
     }
 }
