@@ -1136,7 +1136,8 @@ void ConstraintChecker::Visit(ConvertibleConstraintNode& convertibleConstraintNo
 {
     if (firstTypeArgument && secondTypeArgument)
     {
-        FunctionSymbol* conversion = boundCompileUnit.GetConversion(firstTypeArgument, secondTypeArgument, containerScope, currentFunction, span);
+        ArgumentMatch argumentMatch;
+        FunctionSymbol* conversion = boundCompileUnit.GetConversion(firstTypeArgument, secondTypeArgument, containerScope, currentFunction, span, argumentMatch);
         if (!conversion || conversion->GetConversionType() == ConversionType::explicit_)
         {
             throw Exception("type '" + ToUtf8(firstTypeArgument->FullName()) + "' is not implicitly convertible to '" + ToUtf8(secondTypeArgument->FullName()) + "'", span);
@@ -1157,7 +1158,8 @@ void ConstraintChecker::Visit(ExplicitlyConvertibleConstraintNode& explicitlyCon
 {
     if (firstTypeArgument && secondTypeArgument)
     {
-        FunctionSymbol* conversion = boundCompileUnit.GetConversion(firstTypeArgument, secondTypeArgument, containerScope, currentFunction, span);
+        ArgumentMatch argumentMatch;
+        FunctionSymbol* conversion = boundCompileUnit.GetConversion(firstTypeArgument, secondTypeArgument, containerScope, currentFunction, span, argumentMatch);
         if (!conversion || conversion->GetConversionType() != ConversionType::explicit_)
         {
             throw Exception("type '" + ToUtf8(firstTypeArgument->FullName()) + "' is not explicitly convertible to '" + ToUtf8(secondTypeArgument->FullName()) + "'", span);
@@ -1186,14 +1188,16 @@ void ConstraintChecker::Visit(CommonConstraintNode& commonConstraintNode)
         }
         else
         {
-            FunctionSymbol* conversion = boundCompileUnit.GetConversion(firstTypeArgument, secondTypeArgument, containerScope, currentFunction, span);
+            ArgumentMatch argumentMatch;
+            FunctionSymbol* conversion = boundCompileUnit.GetConversion(firstTypeArgument, secondTypeArgument, containerScope, currentFunction, span, argumentMatch);
             if (conversion && conversion->GetConversionType() == ConversionType::implicit_)
             {
                 commonType->SetType(secondTypeArgument);
             }
             else
             {
-                FunctionSymbol* conversion = boundCompileUnit.GetConversion(secondTypeArgument, firstTypeArgument, containerScope, currentFunction, span);
+                ArgumentMatch argumentMatch;
+                FunctionSymbol* conversion = boundCompileUnit.GetConversion(secondTypeArgument, firstTypeArgument, containerScope, currentFunction, span, argumentMatch);
                 if (conversion && conversion->GetConversionType() == ConversionType::implicit_)
                 {
                     commonType->SetType(firstTypeArgument);

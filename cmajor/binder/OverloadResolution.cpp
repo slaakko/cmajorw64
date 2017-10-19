@@ -107,12 +107,12 @@ bool BetterFunctionMatch::operator()(const FunctionMatch& left, const FunctionMa
     return false;
 }
 
-bool FindQualificationConversion(TypeSymbol* sourceType, TypeSymbol* targetType, BoundExpression* argument, ConversionType conversionType, FunctionSymbol* conversionFun, FunctionMatch& functionMatch, const Span& span)
+bool FindQualificationConversion(TypeSymbol* sourceType, TypeSymbol* targetType, BoundExpression* argument, ConversionType conversionType, const Span& span, FunctionMatch& functionMatch, ArgumentMatch& argumentMatch)
 {
     int distance = 0;
-    if (conversionFun)
+    if (argumentMatch.conversionFun)
     {
-        distance = conversionFun->ConversionDistance();
+        distance = argumentMatch.conversionFun->ConversionDistance();
     }
     if (targetType->IsRvalueReferenceType() && !sourceType->IsRvalueReferenceType())
     {
@@ -156,17 +156,19 @@ bool FindQualificationConversion(TypeSymbol* sourceType, TypeSymbol* targetType,
     }
     if (sourceType->IsReferenceType() && !targetType->IsReferenceType())
     {
-        functionMatch.argumentMatches.push_back(ArgumentMatch(conversionFun, OperationFlags::deref, distance));
+        argumentMatch.postReferenceConversionFlags = OperationFlags::deref;
+        argumentMatch.conversionDistance = distance;
         ++functionMatch.numQualifyingConversions;
         return true;
     }
     else if (!sourceType->IsReferenceType() && (targetType->IsReferenceType() || targetType->IsClassTypeSymbol() || 
-        conversionFun && conversionFun->GetSymbolType() == SymbolType::conversionFunctionSymbol))
+        argumentMatch.conversionFun && argumentMatch.conversionFun->GetSymbolType() == SymbolType::conversionFunctionSymbol))
     {
         if (targetType->IsConstType() || targetType->IsClassTypeSymbol() || 
-            conversionFun && conversionFun->GetSymbolType() == SymbolType::conversionFunctionSymbol)
+            argumentMatch.conversionFun && argumentMatch.conversionFun->GetSymbolType() == SymbolType::conversionFunctionSymbol)
         {
-            functionMatch.argumentMatches.push_back(ArgumentMatch(conversionFun, OperationFlags::addr, distance));
+            argumentMatch.postReferenceConversionFlags = OperationFlags::addr;
+            argumentMatch.conversionDistance = distance;
             ++functionMatch.numQualifyingConversions;
             return true;
         }
@@ -183,7 +185,8 @@ bool FindQualificationConversion(TypeSymbol* sourceType, TypeSymbol* targetType,
                     distance += 10;
                 }
             }
-            functionMatch.argumentMatches.push_back(ArgumentMatch(conversionFun, OperationFlags::addr, distance));
+            argumentMatch.postReferenceConversionFlags = OperationFlags::addr;
+            argumentMatch.conversionDistance = distance;
             ++functionMatch.numQualifyingConversions;
             return true;
         }
@@ -203,7 +206,7 @@ bool FindQualificationConversion(TypeSymbol* sourceType, TypeSymbol* targetType,
             ++distance;
             ++functionMatch.numQualifyingConversions;
         }
-        functionMatch.argumentMatches.push_back(ArgumentMatch(conversionFun, OperationFlags::none, distance));
+        argumentMatch.conversionDistance = distance;
         return true;
     }
     else if (!sourceType->IsConstType() && targetType->IsConstType())
@@ -215,26 +218,26 @@ bool FindQualificationConversion(TypeSymbol* sourceType, TypeSymbol* targetType,
             ++distance;
             ++functionMatch.numQualifyingConversions;
         }
-        functionMatch.argumentMatches.push_back(ArgumentMatch(conversionFun, OperationFlags::none, distance));
+        argumentMatch.conversionDistance = distance;
         return true;
     }
     else if (sourceType->IsLvalueReferenceType() && targetType->IsRvalueReferenceType())
     {
         ++distance;
         ++functionMatch.numQualifyingConversions;
-        functionMatch.argumentMatches.push_back(ArgumentMatch(conversionFun, OperationFlags::none, distance));
+        argumentMatch.conversionDistance = distance;
         return true;
     }
     else if (sourceType->IsRvalueReferenceType() && targetType->IsLvalueReferenceType())
     {
         ++distance;
         ++functionMatch.numQualifyingConversions;
-        functionMatch.argumentMatches.push_back(ArgumentMatch(conversionFun, OperationFlags::none, distance));
+        argumentMatch.conversionDistance = distance;
         return true;
     }
-    else if (conversionFun)
+    else if (argumentMatch.conversionFun)
     {
-        functionMatch.argumentMatches.push_back(ArgumentMatch(conversionFun, OperationFlags::none, distance));
+        argumentMatch.conversionDistance = distance;
         return true;
     }
     return false;
@@ -276,29 +279,48 @@ bool FindTemplateParameterMatch(TypeSymbol* sourceType, TypeSymbol* targetType, 
     else
     {
         bool qualificationConversionMatch = false;
+        ArgumentMatch argumentMatch;
         if (TypesEqual(sourceType->PlainType(span), targetType->PlainType(span)))
         {
-            qualificationConversionMatch = FindQualificationConversion(sourceType, targetType, argument, conversionType, nullptr, functionMatch, span);
+            qualificationConversionMatch = FindQualificationConversion(sourceType, targetType, argument, conversionType, span, functionMatch, argumentMatch);
         }
         if (qualificationConversionMatch)
         {
+            functionMatch.argumentMatches.push_back(argumentMatch);
             return true;
         }
         else
         {
-            FunctionSymbol* conversionFun = boundCompileUnit.GetConversion(sourceType, targetType, containerScope, currentFunction, span);
+            FunctionSymbol* conversionFun = boundCompileUnit.GetConversion(sourceType, targetType, containerScope, currentFunction, span, argumentMatch);
             if (conversionFun)
             {
                 if (conversionFun->GetConversionType() == conversionType || conversionFun->GetConversionType() == ConversionType::implicit_)
                 {
                     ++functionMatch.numConversions;
-                    if (FindQualificationConversion(sourceType, targetType, argument, conversionType, conversionFun, functionMatch, span))
+                    argumentMatch.conversionFun = conversionFun;
+                    if (argumentMatch.postReferenceConversionFlags == OperationFlags::none)
                     {
-                        return true;
+                        if (FindQualificationConversion(sourceType, targetType, argument, conversionType, span, functionMatch, argumentMatch))
+                        {
+                            functionMatch.argumentMatches.push_back(argumentMatch);
+                            return true;
+                        }
+                        else
+                        {
+                            return false;
+                        }
                     }
                     else
                     {
-                        return false;
+                        if (FindQualificationConversion(conversionFun->ConversionSourceType(), targetType, argument, conversionType, span, functionMatch, argumentMatch))
+                        {
+                            functionMatch.argumentMatches.push_back(argumentMatch);
+                            return true;
+                        }
+                        else
+                        {
+                            return false;
+                        }
                     }
                 }
                 else
@@ -366,29 +388,48 @@ bool FindClassTemplateSpecializationMatch(TypeSymbol* sourceType, TypeSymbol* ta
     else
     {
         bool qualificationConversionMatch = false;
+        ArgumentMatch argumentMatch;
         if (TypesEqual(sourceType->PlainType(span), targetType->PlainType(span)))
         {
-            qualificationConversionMatch = FindQualificationConversion(sourceType, targetType, argument, conversionType, nullptr, functionMatch, span);
+            qualificationConversionMatch = FindQualificationConversion(sourceType, targetType, argument, conversionType, span, functionMatch, argumentMatch);
         }
         if (qualificationConversionMatch)
         {
+            functionMatch.argumentMatches.push_back(argumentMatch);
             return true;
         }
         else
         {
-            FunctionSymbol* conversionFun = boundCompileUnit.GetConversion(sourceType, targetType, containerScope, currentFunction, span);
+            FunctionSymbol* conversionFun = boundCompileUnit.GetConversion(sourceType, targetType, containerScope, currentFunction, span, argumentMatch);
             if (conversionFun)
             {
                 if (conversionFun->GetConversionType() == conversionType || conversionFun->GetConversionType() == ConversionType::implicit_)
                 {
+                    argumentMatch.conversionFun = conversionFun;
                     ++functionMatch.numConversions;
-                    if (FindQualificationConversion(sourceType, targetType, argument, conversionType, conversionFun, functionMatch, span))
+                    if (argumentMatch.preReferenceConversionFlags == OperationFlags::none)
                     {
-                        return true;
+                        if (FindQualificationConversion(sourceType, targetType, argument, conversionType, span, functionMatch, argumentMatch))
+                        {
+                            functionMatch.argumentMatches.push_back(argumentMatch);
+                            return true;
+                        }
+                        else
+                        {
+                            return false;
+                        }
                     }
                     else
                     {
-                        return false;
+                        if (FindQualificationConversion(conversionFun->ConversionSourceType(), targetType, argument, conversionType, span, functionMatch, argumentMatch))
+                        {
+                            functionMatch.argumentMatches.push_back(argumentMatch);
+                            return true;
+                        }
+                        else
+                        {
+                            return false;
+                        }
                     }
                 }
                 else
@@ -439,7 +480,7 @@ bool FindConversions(BoundCompileUnit& boundCompileUnit, FunctionSymbol* functio
             {
                 if (sourceType->IsReferenceType() && !function->IsConstructorDestructorOrNonstaticMemberFunction())
                 {
-                    functionMatch.argumentMatches.push_back(ArgumentMatch(nullptr, OperationFlags::deref, 1));
+                    functionMatch.argumentMatches.push_back(ArgumentMatch(OperationFlags::none, nullptr, OperationFlags::deref, 1));
                     ++functionMatch.numConversions;
                     continue;
                 }
@@ -448,7 +489,7 @@ bool FindConversions(BoundCompileUnit& boundCompileUnit, FunctionSymbol* functio
             {
                 if (!function->IsConstructorDestructorOrNonstaticMemberFunction())
                 {
-                    functionMatch.argumentMatches.push_back(ArgumentMatch(nullptr, OperationFlags::deref, 1));
+                    functionMatch.argumentMatches.push_back(ArgumentMatch(OperationFlags::none, nullptr, OperationFlags::deref, 1));
                     ++functionMatch.numConversions;
                     continue;
                 }
@@ -457,7 +498,7 @@ bool FindConversions(BoundCompileUnit& boundCompileUnit, FunctionSymbol* functio
             {
                 if (!function->IsConstructorDestructorOrNonstaticMemberFunction())
                 {
-                    functionMatch.argumentMatches.push_back(ArgumentMatch(nullptr, OperationFlags::none, 0));
+                    functionMatch.argumentMatches.push_back(ArgumentMatch(OperationFlags::none, nullptr, OperationFlags::none, 0));
                     continue;
                 }
             }
@@ -465,22 +506,23 @@ bool FindConversions(BoundCompileUnit& boundCompileUnit, FunctionSymbol* functio
             {
                 if (!function->IsConstructorDestructorOrNonstaticMemberFunction())
                 {
-                    functionMatch.argumentMatches.push_back(ArgumentMatch(nullptr, OperationFlags::none , 0));
+                    functionMatch.argumentMatches.push_back(ArgumentMatch(OperationFlags::none, nullptr, OperationFlags::none , 0));
                     continue;
                 }
             }
             else if (i == 1 && function->IsLvalueReferenceCopyAssignment() && TypesEqual(sourceType, targetType->RemoveReference(span)))
             {
-                functionMatch.argumentMatches.push_back(ArgumentMatch(nullptr, OperationFlags::none, 0));
+                functionMatch.argumentMatches.push_back(ArgumentMatch(OperationFlags::none, nullptr, OperationFlags::none, 0));
                 continue;
             }
             else if (i == 1 && function->IsLvalueReferenceCopyAssignment())
             {
-                FunctionSymbol* conversionFun = boundCompileUnit.GetConversion(sourceType, targetType->RemoveReference(span), containerScope, currentFunction, span);
+                ArgumentMatch argumentMatch;
+                FunctionSymbol* conversionFun = boundCompileUnit.GetConversion(sourceType, targetType->RemoveReference(span), containerScope, currentFunction, span, argumentMatch);
                 if (conversionFun->GetConversionType() == conversionType || conversionFun->GetConversionType() == ConversionType::implicit_)
                 {
                     ++functionMatch.numConversions;
-                    functionMatch.argumentMatches.push_back(ArgumentMatch(conversionFun, OperationFlags::none, 1));
+                    functionMatch.argumentMatches.push_back(ArgumentMatch(OperationFlags::none, conversionFun, OperationFlags::none, 1));
                     continue;
                 }
             }
@@ -499,25 +541,44 @@ bool FindConversions(BoundCompileUnit& boundCompileUnit, FunctionSymbol* functio
                 }
             }
             bool qualificationConversionMatch = false;
+            ArgumentMatch argumentMatch;
             if (TypesEqual(sourceType->PlainType(span), targetType->PlainType(span)))
             {
-                qualificationConversionMatch = FindQualificationConversion(sourceType, targetType, argument, conversionType, nullptr, functionMatch, span);
+                qualificationConversionMatch = FindQualificationConversion(sourceType, targetType, argument, conversionType, span, functionMatch, argumentMatch);
+                functionMatch.argumentMatches.push_back(argumentMatch);
             }
             if (!qualificationConversionMatch)
             {
-                FunctionSymbol* conversionFun = boundCompileUnit.GetConversion(sourceType, targetType, containerScope, currentFunction, span);
+                FunctionSymbol* conversionFun = boundCompileUnit.GetConversion(sourceType, targetType, containerScope, currentFunction, span, argumentMatch);
                 if (conversionFun)
                 {
                     if (conversionFun->GetConversionType() == conversionType || conversionFun->GetConversionType() == ConversionType::implicit_)
                     {
+                        argumentMatch.conversionFun = conversionFun;
                         ++functionMatch.numConversions;
-                        if (FindQualificationConversion(sourceType, targetType, argument, conversionType, conversionFun, functionMatch, span))
+                        if (argumentMatch.preReferenceConversionFlags == OperationFlags::none)
                         {
-                            continue;
+                            if (FindQualificationConversion(sourceType, targetType, argument, conversionType, span, functionMatch, argumentMatch))
+                            {
+                                functionMatch.argumentMatches.push_back(argumentMatch);
+                                continue;
+                            }
+                            else
+                            {
+                                return false;
+                            }
                         }
                         else
                         {
-                            return false;
+                            if (FindQualificationConversion(conversionFun->ConversionSourceType(), targetType, argument, conversionType, span, functionMatch, argumentMatch))
+                            {
+                                functionMatch.argumentMatches.push_back(argumentMatch);
+                                continue;
+                            }
+                            else
+                            {
+                                return false;
+                            }
                         }
                     }
                     else
@@ -590,12 +651,12 @@ std::unique_ptr<BoundFunctionCall> FailWithNoViableFunction(const std::u32string
     {
         if ((flags & OverloadResolutionFlags::dontThrow) != OverloadResolutionFlags::none)
         {
-            exception.reset(new Exception("overload resolution failed: '" + overloadName + "' not found. Note: reference must be initialized.", span, arguments[0]->GetSpan()));
+            exception.reset(new NoViableFunctionException("overload resolution failed: '" + overloadName + "' not found. Note: reference must be initialized.", span, arguments[0]->GetSpan()));
             return std::unique_ptr<BoundFunctionCall>();
         }
         else
         {
-            throw Exception("overload resolution failed: '" + overloadName + "' not found. Note: reference must be initialized.", span, arguments[0]->GetSpan());
+            throw NoViableFunctionException("overload resolution failed: '" + overloadName + "' not found. Note: reference must be initialized.", span, arguments[0]->GetSpan());
         }
     }
     else
@@ -607,13 +668,13 @@ std::unique_ptr<BoundFunctionCall> FailWithNoViableFunction(const std::u32string
         }
         if ((flags & OverloadResolutionFlags::dontThrow) != OverloadResolutionFlags::none)
         {
-            exception.reset(new Exception("overload resolution failed: '" + overloadName + "' not found. " +
+            exception.reset(new NoViableFunctionException("overload resolution failed: '" + overloadName + "' not found. " +
                 "No viable functions taking " + std::to_string(arity) + " arguments found in function group '" + ToUtf8(groupName) + "'" + note, span));
             return std::unique_ptr<BoundFunctionCall>();
         }
         else
         {
-            throw Exception("overload resolution failed: '" + overloadName + "' not found. " +
+            throw NoViableFunctionException("overload resolution failed: '" + overloadName + "' not found. " +
                 "No viable functions taking " + std::to_string(arity) + " arguments found in function group '" + ToUtf8(groupName) + "'" + note, span);
         }
     }
@@ -846,6 +907,34 @@ std::unique_ptr<BoundFunctionCall> CreateBoundFunctionCall(FunctionSymbol* bestF
             argument.reset(subject.release());
         }
         const ArgumentMatch& argumentMatch = bestMatch.argumentMatches[i];
+        if (argumentMatch.preReferenceConversionFlags != OperationFlags::none)
+        {
+            if (argumentMatch.preReferenceConversionFlags == OperationFlags::addr)
+            {
+                if (!argument->IsLvalueExpression())
+                {
+                    BoundLocalVariable* backingStore = new BoundLocalVariable(boundFunction->GetFunctionSymbol()->CreateTemporary(argument->GetType(), span));
+                    argument.reset(new BoundTemporary(std::move(argument), std::unique_ptr<BoundLocalVariable>(backingStore)));
+                }
+                TypeSymbol* type = nullptr;
+                if (argument->GetType()->IsClassTypeSymbol() && argument->GetFlag(BoundExpressionFlags::bindToRvalueReference))
+                {
+                    type = argument->GetType()->AddRvalueReference(span);
+                }
+                else
+                {
+                    type = argument->GetType()->AddLvalueReference(span);
+                }
+                BoundAddressOfExpression* addressOfExpression = new BoundAddressOfExpression(std::move(argument), type);
+                argument.reset(addressOfExpression);
+            }
+            else if (argumentMatch.preReferenceConversionFlags == OperationFlags::deref)
+            {
+                TypeSymbol* type = argument->GetType()->RemoveReference(span);
+                BoundDereferenceExpression* dereferenceExpression = new BoundDereferenceExpression(std::move(argument), type);
+                argument.reset(dereferenceExpression);
+            }
+        }
         if (argumentMatch.conversionFun)
         {
             FunctionSymbol* conversionFun = argumentMatch.conversionFun;
@@ -877,9 +966,9 @@ std::unique_ptr<BoundFunctionCall> CreateBoundFunctionCall(FunctionSymbol* bestF
                 argument.reset(conversion);
             }
         }
-        if (argumentMatch.referenceConversionFlags != OperationFlags::none)
+        if (argumentMatch.postReferenceConversionFlags != OperationFlags::none)
         {
-            if (argumentMatch.referenceConversionFlags == OperationFlags::addr)
+            if (argumentMatch.postReferenceConversionFlags == OperationFlags::addr)
             {
                 if (!argument->IsLvalueExpression())
                 {
@@ -898,7 +987,7 @@ std::unique_ptr<BoundFunctionCall> CreateBoundFunctionCall(FunctionSymbol* bestF
                 BoundAddressOfExpression* addressOfExpression = new BoundAddressOfExpression(std::move(argument), type);
                 argument.reset(addressOfExpression);
             }
-            else if (argumentMatch.referenceConversionFlags == OperationFlags::deref)
+            else if (argumentMatch.postReferenceConversionFlags == OperationFlags::deref)
             {
                 TypeSymbol* type = argument->GetType()->RemoveReference(span);
                 BoundDereferenceExpression* dereferenceExpression = new BoundDereferenceExpression(std::move(argument), type);
@@ -1009,6 +1098,14 @@ std::unique_ptr<BoundFunctionCall> SelectViableFunction(const std::unordered_set
                     {
                         std::unique_ptr<Exception> conceptCheckException;
                         std::unique_ptr<BoundConstraint> boundConstraint;
+                        Node* node = boundCompileUnit.GetSymbolTable().GetNodeNoThrow(viableFunction);
+                        if (!node)
+                        {
+                            if (!viableFunction->GetFunctionNode())
+                            {
+                                viableFunction->ReadAstNodes();
+                            }
+                        }
                         bool candidateFound = CheckConstraint(viableFunction->Constraint(), viableFunction->UsingNodes(), boundCompileUnit, containerScope, boundFunction,
                             viableFunction->TemplateParameters(), functionMatch.templateParameterMap, boundConstraint, span, viableFunction, conceptCheckException);
                         if (candidateFound)

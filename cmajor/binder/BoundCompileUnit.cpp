@@ -8,6 +8,7 @@
 #include <cmajor/binder/StatementBinder.hpp>
 #include <cmajor/binder/BoundStatement.hpp>
 #include <cmajor/binder/BoundFunction.hpp>
+#include <cmajor/binder/OverloadResolution.hpp>
 #include <cmajor/symbols/Exception.hpp>
 #include <cmajor/symbols/FunctionSymbol.hpp>
 #include <cmajor/symbols/ClassTypeSymbol.hpp>
@@ -226,7 +227,7 @@ void BoundCompileUnit::AddBoundNode(std::unique_ptr<BoundNode>&& boundNode)
     boundNodes.push_back(std::move(boundNode));
 }
 
-FunctionSymbol* BoundCompileUnit::GetConversion(TypeSymbol* sourceType, TypeSymbol* targetType, ContainerScope* containerScope, BoundFunction* currentFunction, const Span& span)
+FunctionSymbol* BoundCompileUnit::GetConversion(TypeSymbol* sourceType, TypeSymbol* targetType, ContainerScope* containerScope, BoundFunction* currentFunction, const Span& span, ArgumentMatch& argumentMatch)
 {
     FunctionSymbol* conversion = symbolTable.GetConversion(sourceType, targetType, span);
     if (!conversion)
@@ -276,10 +277,19 @@ FunctionSymbol* BoundCompileUnit::GetConversion(TypeSymbol* sourceType, TypeSymb
                     uint8_t conversionDistance = 0;
                     if (sourceClassType->HasBaseClass(targetClassType, conversionDistance))
                     {
+                        if (targetType->IsLvalueReferenceType() && !sourceType->IsReferenceType())
+                        {
+                            argumentMatch.preReferenceConversionFlags = OperationFlags::addr;
+                            sourceType = sourceType->AddLvalueReference(span);
+                            if (targetType->IsConstType())
+                            {
+                                sourceType = sourceType->AddConst(span);
+                            }
+                        }
                         std::u32string conversionName = sourceType->FullName() + U"2" + targetType->FullName();
                         std::unique_ptr<FunctionSymbol> implicitClassTypeConversion(new ClassTypeConversion(conversionName, ConversionType::implicit_, conversionDistance, sourceType, targetType));
                         conversion = implicitClassTypeConversion.get();
-                        conversionTable.AddConversion(conversion);
+                        // do not add entry to the conversion table
                         conversionTable.AddGeneratedConversion(std::move(implicitClassTypeConversion));
                         return conversion;
                     }
@@ -288,10 +298,19 @@ FunctionSymbol* BoundCompileUnit::GetConversion(TypeSymbol* sourceType, TypeSymb
                         uint8_t conversionDistance = 0;
                         if (targetClassType->HasBaseClass(sourceClassType, conversionDistance))
                         {
+                            if (targetType->IsLvalueReferenceType() && !sourceType->IsReferenceType())
+                            {
+                                argumentMatch.preReferenceConversionFlags = OperationFlags::addr;
+                                sourceType = sourceType->AddLvalueReference(span);
+                                if (targetType->IsConstType())
+                                {
+                                    sourceType = sourceType->AddConst(span);
+                                }
+                            }
                             std::u32string conversionName = sourceType->FullName() + U"2" + targetType->FullName();
                             std::unique_ptr<FunctionSymbol> explicitClassTypeConversion(new ClassTypeConversion(conversionName, ConversionType::explicit_, conversionDistance, sourceType, targetType));
                             conversion = explicitClassTypeConversion.get();
-                            conversionTable.AddConversion(conversion);
+                            // do not add entry to the conversion table
                             conversionTable.AddGeneratedConversion(std::move(explicitClassTypeConversion));
                             return conversion;
                         }

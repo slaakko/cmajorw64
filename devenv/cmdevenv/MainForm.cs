@@ -1759,6 +1759,127 @@ namespace cmdevenv
                 MessageBox.Show(ex.Message);
             }
         }
+        private void findToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                SourceFile currentSourceFile = null;
+                TabPage selectedTab = editorTabControl.SelectedTab;
+                if (selectedTab != null)
+                {
+                    Editor currentEditor = (Editor)selectedTab.Tag;
+                    if (currentEditor != null)
+                    {
+                        currentSourceFile = currentEditor.SourceFile;
+                    }
+                }
+                FindDialog findDialog = new FindDialog(currentSourceFile != null);
+                findDialog.FindWhat = findWhatText;
+                findDialog.MatchCase = matchCase;
+                findDialog.MatchWholeWord = matchWholeWord;
+                findDialog.UseRegularExpression = useRegularExpression;
+                if (findDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                {
+                    outputTabControl.SelectedTab = findResultsTabPage;
+                    findWhatText = findDialog.FindWhat;
+                    matchCase = findDialog.MatchCase;
+                    matchWholeWord = findDialog.MatchWholeWord;
+                    useRegularExpression = findDialog.UseRegularExpression;
+                    Solution findSolution = null;
+                    Project findProject = null;
+                    SourceFile findSourceFile = null;
+                    if (findDialog.LookIn == FindExtent.entireSolution)
+                    {
+                        findSolution = solution;
+                    }
+                    else if (findDialog.LookIn == FindExtent.activeProject)
+                    {
+                        findProject = solution.ActiveProject;
+                    }
+                    else if (findDialog.LookIn == FindExtent.currentDocument)
+                    {
+                        findSourceFile = currentSourceFile;
+                    }
+                    Cursor prevCursor = Cursor.Current;
+                    try
+                    {
+                        Cursor.Current = Cursors.WaitCursor;
+                        findResultsListView.Items.Clear();
+                        infoLabel.Text = "Searching '" + findWhatText + "'...";
+                        List<FindResult> results = Finder.Find(findSolution, findProject, findSourceFile, findDialog.MatchCase, findDialog.MatchWholeWord, findDialog.UseRegularExpression, findWhatText);
+                        foreach (FindResult result in results)
+                        {
+                            ListViewItem item = new ListViewItem(new string[] { result.File.FilePath, result.LineNumber.ToString(), result.File.Project.Name, result.Line });
+                            item.Tag = result;
+                            findResultsListView.Items.Add(item);
+                        }
+                        infoTimer.Start();
+                        infoLabel.Text = results.Count.ToString() + " matching lines found";
+                    }
+                    finally
+                    {
+                        Cursor.Current = prevCursor;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+        private void gotoLineToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                GotoDialog gotoDialog = new GotoDialog();
+                if (gotoDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                {
+                    int line = gotoDialog.Line;
+                    if (editorTabControl.SelectedTab != null)
+                    {
+                        Editor currentEditor = (Editor)editorTabControl.SelectedTab.Tag;
+                        if (currentEditor != null)
+                        {
+                            currentEditor.SetCursorPos(line, 1);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+        private void findResultsListView_ItemActivate(object sender, EventArgs e)
+        {
+            if (findResultsListView.SelectedItems.Count > 0)
+            {
+                ListViewItem selectedItem = findResultsListView.SelectedItems[0];
+                FindResult result = (FindResult)selectedItem.Tag;
+                SourceFile sourceFile = result.File;
+                Editor editor = EditSourceFile(sourceFile);
+                editor.SetCursorPos(result.LineNumber, 1);
+                editor.SelectLine(result.LineNumber);
+            }
+        }
+        private void findResultsListView_ColumnWidthChanged(object sender, ColumnWidthChangedEventArgs e)
+        {
+            try
+            {
+                switch (e.ColumnIndex)
+                {
+                    case 0: Configuration.Instance.FindFileColWidth = findResultsListView.Columns[0].Width; break;
+                    case 1: Configuration.Instance.FindLineColWidth = findResultsListView.Columns[1].Width; break;
+                    case 2: Configuration.Instance.FindProjectColWidth = findResultsListView.Columns[2].Width; break;
+                    case 3: Configuration.Instance.FindTextColWidth = findResultsListView.Columns[3].Width; break;
+                }
+                Configuration.Instance.Save();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
         private Solution solution;
         private XTabControl editorTabControl;
         private State state;
@@ -1781,6 +1902,10 @@ namespace cmdevenv
         private bool linkUsingMsLink;
         private int optimizationLevel;
         private DateTime compileStartTime;
+        private string findWhatText;
+        private bool matchCase;
+        private bool matchWholeWord;
+        private bool useRegularExpression;
     }
 
     public static class KeyboardUtil

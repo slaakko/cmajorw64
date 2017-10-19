@@ -93,6 +93,7 @@ public:
     const TypeDerivationRec& DerivationRec() const override { return derivationRec; }
     TypeSymbol* RemoveDerivations(const TypeDerivationRec& sourceDerivationRec, const Span& span) override;
     TypeSymbol* Unify(TypeSymbol* sourceType, const Span& span) override;
+    bool IsRecursive(TypeSymbol* type, std::unordered_set<TypeSymbol*>& tested) override;
 private:
     TypeSymbol* baseType;
     TypeDerivationRec derivationRec;

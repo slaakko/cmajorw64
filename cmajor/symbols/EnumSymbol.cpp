@@ -22,13 +22,13 @@ EnumTypeSymbol::EnumTypeSymbol(const Span& span_, const std::u32string& name_) :
 void EnumTypeSymbol::Write(SymbolWriter& writer)
 {
     TypeSymbol::Write(writer);
-    writer.GetBinaryWriter().WriteEncodedUInt(underlyingType->TypeId());
+    writer.GetBinaryWriter().Write(underlyingType->TypeId());
 }
 
 void EnumTypeSymbol::Read(SymbolReader& reader)
 {
     TypeSymbol::Read(reader);
-    uint32_t underlyingTypeId = reader.GetBinaryReader().ReadEncodedUInt();
+    uint32_t underlyingTypeId = reader.GetBinaryReader().ReadUInt();
     GetSymbolTable()->EmplaceTypeRequest(this, underlyingTypeId, 0);
 }
 
@@ -194,13 +194,13 @@ void EnumTypeDefaultConstructor::Write(SymbolWriter& writer)
     FunctionSymbol::Write(writer);
     Assert(underlyingTypeDefaultConstructor, "underlying default constructor not set");
     uint32_t defaultConstructorId = underlyingTypeDefaultConstructor->FunctionId();
-    writer.GetBinaryWriter().WriteEncodedUInt(defaultConstructorId);
+    writer.GetBinaryWriter().Write(defaultConstructorId);
 }
 
 void EnumTypeDefaultConstructor::Read(SymbolReader& reader)
 {
     FunctionSymbol::Read(reader);
-    uint32_t defaultConstructorId = reader.GetBinaryReader().ReadEncodedUInt();
+    uint32_t defaultConstructorId = reader.GetBinaryReader().ReadUInt();
     GetSymbolTable()->EmplaceFunctionRequest(this, defaultConstructorId, 0);
 }
 
@@ -250,13 +250,13 @@ void EnumTypeCopyConstructor::Write(SymbolWriter& writer)
     FunctionSymbol::Write(writer);
     Assert(underlyingTypeCopyConstructor, "underlying copy constructor not set");
     uint32_t copyConstructorId = underlyingTypeCopyConstructor->FunctionId();
-    writer.GetBinaryWriter().WriteEncodedUInt(copyConstructorId);
+    writer.GetBinaryWriter().Write(copyConstructorId);
 }
 
 void EnumTypeCopyConstructor::Read(SymbolReader& reader)
 {
     FunctionSymbol::Read(reader);
-    uint32_t copyConstructorId = reader.GetBinaryReader().ReadEncodedUInt();
+    uint32_t copyConstructorId = reader.GetBinaryReader().ReadUInt();
     GetSymbolTable()->EmplaceFunctionRequest(this, copyConstructorId, 0);
 }
 
@@ -306,13 +306,13 @@ void EnumTypeMoveConstructor::Write(SymbolWriter& writer)
     FunctionSymbol::Write(writer);
     Assert(underlyingTypeMoveConstructor, "underlying move constructor not set");
     uint32_t moveConstructorId = underlyingTypeMoveConstructor->FunctionId();
-    writer.GetBinaryWriter().WriteEncodedUInt(moveConstructorId);
+    writer.GetBinaryWriter().Write(moveConstructorId);
 }
 
 void EnumTypeMoveConstructor::Read(SymbolReader& reader)
 {
     FunctionSymbol::Read(reader);
-    uint32_t moveConstructorId = reader.GetBinaryReader().ReadEncodedUInt();
+    uint32_t moveConstructorId = reader.GetBinaryReader().ReadUInt();
     GetSymbolTable()->EmplaceFunctionRequest(this, moveConstructorId, 0);
 }
 
@@ -363,13 +363,13 @@ void EnumTypeCopyAssignment::Write(SymbolWriter& writer)
     FunctionSymbol::Write(writer);
     Assert(underlyingTypeCopyAssignment, "underlying copy assignment not set");
     uint32_t copyAssignmentId = underlyingTypeCopyAssignment->FunctionId();
-    writer.GetBinaryWriter().WriteEncodedUInt(copyAssignmentId);
+    writer.GetBinaryWriter().Write(copyAssignmentId);
 }
 
 void EnumTypeCopyAssignment::Read(SymbolReader& reader)
 {
     FunctionSymbol::Read(reader);
-    uint32_t copyAssignmentId = reader.GetBinaryReader().ReadEncodedUInt();
+    uint32_t copyAssignmentId = reader.GetBinaryReader().ReadUInt();
     GetSymbolTable()->EmplaceFunctionRequest(this, copyAssignmentId, 0);
 }
 
@@ -420,13 +420,13 @@ void EnumTypeMoveAssignment::Write(SymbolWriter& writer)
     FunctionSymbol::Write(writer);
     Assert(underlyingTypeMoveAssignment, "underlying move assignment not set");
     uint32_t moveAssignmentId = underlyingTypeMoveAssignment->FunctionId();
-    writer.GetBinaryWriter().WriteEncodedUInt(moveAssignmentId);
+    writer.GetBinaryWriter().Write(moveAssignmentId);
 }
 
 void EnumTypeMoveAssignment::Read(SymbolReader& reader)
 {
     FunctionSymbol::Read(reader);
-    uint32_t moveAssignmentId = reader.GetBinaryReader().ReadEncodedUInt();
+    uint32_t moveAssignmentId = reader.GetBinaryReader().ReadUInt();
     GetSymbolTable()->EmplaceFunctionRequest(this, moveAssignmentId, 0);
 }
 
@@ -474,13 +474,13 @@ void EnumTypeReturn::Write(SymbolWriter& writer)
     FunctionSymbol::Write(writer);
     Assert(underlyingTypeReturn, "underlying return not set");
     uint32_t returnId = underlyingTypeReturn->FunctionId();
-    writer.GetBinaryWriter().WriteEncodedUInt(returnId);
+    writer.GetBinaryWriter().Write(returnId);
 }
 
 void EnumTypeReturn::Read(SymbolReader& reader)
 {
     FunctionSymbol::Read(reader);
-    uint32_t returnId = reader.GetBinaryReader().ReadEncodedUInt();
+    uint32_t returnId = reader.GetBinaryReader().ReadUInt();
     GetSymbolTable()->EmplaceFunctionRequest(this, returnId, 0);
 }
 
@@ -531,13 +531,13 @@ void EnumTypeEqualityOp::Write(SymbolWriter& writer)
     FunctionSymbol::Write(writer);
     Assert(underlyingTypeEquality, "underlying equality not set");
     uint32_t equalityId = underlyingTypeEquality->FunctionId();
-    writer.GetBinaryWriter().WriteEncodedUInt(equalityId);
+    writer.GetBinaryWriter().Write(equalityId);
 }
 
 void EnumTypeEqualityOp::Read(SymbolReader& reader)
 {
     FunctionSymbol::Read(reader);
-    uint32_t equalityId = reader.GetBinaryReader().ReadEncodedUInt();
+    uint32_t equalityId = reader.GetBinaryReader().ReadUInt();
     GetSymbolTable()->EmplaceFunctionRequest(this, equalityId, 0);
 }
 
@@ -573,16 +573,16 @@ EnumTypeToUnderlyingTypeConversion::EnumTypeToUnderlyingTypeConversion(const Spa
 void EnumTypeToUnderlyingTypeConversion::Write(SymbolWriter& writer)
 {
     FunctionSymbol::Write(writer);
-    writer.GetBinaryWriter().WriteEncodedUInt(sourceType->TypeId());
-    writer.GetBinaryWriter().WriteEncodedUInt(targetType->TypeId());
+    writer.GetBinaryWriter().Write(sourceType->TypeId());
+    writer.GetBinaryWriter().Write(targetType->TypeId());
 }
 
 void EnumTypeToUnderlyingTypeConversion::Read(SymbolReader& reader)
 {
     FunctionSymbol::Read(reader);
-    uint32_t sourceTypeId = reader.GetBinaryReader().ReadEncodedUInt();
+    uint32_t sourceTypeId = reader.GetBinaryReader().ReadUInt();
     GetSymbolTable()->EmplaceTypeRequest(this, sourceTypeId, 1);
-    uint32_t targetTypeId = reader.GetBinaryReader().ReadEncodedUInt();
+    uint32_t targetTypeId = reader.GetBinaryReader().ReadUInt();
     GetSymbolTable()->EmplaceTypeRequest(this, targetTypeId, 2);
 }
 
@@ -620,16 +620,16 @@ UnderlyingTypeToEnumTypeConversion::UnderlyingTypeToEnumTypeConversion(const Spa
 void UnderlyingTypeToEnumTypeConversion::Write(SymbolWriter& writer)
 {
     FunctionSymbol::Write(writer);
-    writer.GetBinaryWriter().WriteEncodedUInt(sourceType->TypeId());
-    writer.GetBinaryWriter().WriteEncodedUInt(targetType->TypeId());
+    writer.GetBinaryWriter().Write(sourceType->TypeId());
+    writer.GetBinaryWriter().Write(targetType->TypeId());
 }
 
 void UnderlyingTypeToEnumTypeConversion::Read(SymbolReader& reader)
 {
     FunctionSymbol::Read(reader);
-    uint32_t sourceTypeId = reader.GetBinaryReader().ReadEncodedUInt();
+    uint32_t sourceTypeId = reader.GetBinaryReader().ReadUInt();
     GetSymbolTable()->EmplaceTypeRequest(this, sourceTypeId, 1);
-    uint32_t targetTypeId = reader.GetBinaryReader().ReadEncodedUInt();
+    uint32_t targetTypeId = reader.GetBinaryReader().ReadUInt();
     GetSymbolTable()->EmplaceTypeRequest(this, targetTypeId, 2);
 }
 

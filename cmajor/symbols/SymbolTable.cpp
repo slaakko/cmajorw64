@@ -1244,9 +1244,9 @@ void CreateClassFile(const std::string& executableFilePath, const SymbolTable& s
         {
             baseClassTypeId = polymorphicClass->BaseClass()->TypeId();
         }
-        writer.WriteEncodedUInt(typeId);
+        writer.Write(typeId);
         writer.Write(vmtObjectName);
-        writer.WriteEncodedUInt(baseClassTypeId);
+        writer.Write(baseClassTypeId);
     }
     const std::unordered_set<ClassTypeSymbol*>& classesHavingStaticConstructor = symbolTable.ClassesHavingStaticConstructor();
     uint32_t ns = classesHavingStaticConstructor.size();
@@ -1254,7 +1254,7 @@ void CreateClassFile(const std::string& executableFilePath, const SymbolTable& s
     for (ClassTypeSymbol* classHavingStaticConstructor : classesHavingStaticConstructor)
     {
         uint32_t typeId = classHavingStaticConstructor->TypeId();
-        writer.WriteEncodedUInt(typeId);
+        writer.Write(typeId);
     }
     if (GetGlobalFlag(GlobalFlags::verbose))
     {

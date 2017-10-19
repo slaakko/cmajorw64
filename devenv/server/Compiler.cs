@@ -414,6 +414,7 @@ namespace server
                 arguments.Append("--config=").Append(config);
                 arguments.Append(" --ide");
                 arguments.Append(" --verbose");
+                arguments.Append(" --time");
                 if (strictNothrow)
                 {
                     arguments.Append(" --strict-nothrow");

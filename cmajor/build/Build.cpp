@@ -280,6 +280,30 @@ void GenerateLibrary(const std::vector<std::string>& objectFilePaths, const std:
     }
 }
 
+void CreateDefFile(const std::string& defFilePath, Module& module)
+{
+    std::ofstream defFile(defFilePath);
+    CodeFormatter formatter(defFile);
+    formatter.WriteLine("EXPORTS");
+    formatter.IncIndent();
+    for (const std::string& fun : module.AllExportedFunctions())
+    {
+        formatter.WriteLine(fun);
+    }
+    for (const std::string& fun : module.ExportedFunctions())
+    {
+        formatter.WriteLine(fun);
+    }
+    for (const std::string& data : module.AllExportedData())
+    {
+        formatter.WriteLine(data + " DATA");
+    }
+    for (const std::string& data : module.ExportedData())
+    {
+        formatter.WriteLine(data + " DATA");
+    }
+}
+
 void Link(const std::string& executableFilePath, const std::vector<std::string>& libraryFilePaths, Module& module)
 {
     if (GetGlobalFlag(GlobalFlags::verbose))
@@ -302,7 +326,12 @@ void Link(const std::string& executableFilePath, const std::vector<std::string>&
     args.push_back("/entry:main");
     args.push_back("/debug");
     args.push_back("/out:" + QuotedPath(executableFilePath));
+    boost::filesystem::path out = executableFilePath;
     args.push_back("/stack:16777216");
+    std::string defFilePath = GetFullPath(out.replace_extension(".def").generic_string());
+    CreateDefFile(defFilePath, module);
+    args.push_back("/def:" + QuotedPath(defFilePath));
+/*
     for (const std::string& fun : module.AllExportedFunctions())
     {
         args.push_back("/export:" + fun);
@@ -319,6 +348,7 @@ void Link(const std::string& executableFilePath, const std::vector<std::string>&
     {
         args.push_back("/export:" + data);
     }
+*/
     std::string cmrtLibName = "cmrt200.lib";
     if (GetGlobalFlag(GlobalFlags::linkWithDebugRuntime))
     {

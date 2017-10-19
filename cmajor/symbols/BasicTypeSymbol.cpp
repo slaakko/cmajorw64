@@ -28,79 +28,79 @@ void BasicTypeSymbol::Write(SymbolWriter& writer)
     {
         defaultConstructorId = defaultConstructor->FunctionId();
     }
-    writer.GetBinaryWriter().WriteEncodedUInt(defaultConstructorId);
+    writer.GetBinaryWriter().Write(defaultConstructorId);
     uint32_t copyConstructorId = 0;
     if (copyConstructor)
     {
         copyConstructorId = copyConstructor->FunctionId();
     }
-    writer.GetBinaryWriter().WriteEncodedUInt(copyConstructorId);
+    writer.GetBinaryWriter().Write(copyConstructorId);
     uint32_t moveConstructorId = 0;
     if (moveConstructor)
     {
         moveConstructorId = moveConstructor->FunctionId();
     }
-    writer.GetBinaryWriter().WriteEncodedUInt(moveConstructorId);
+    writer.GetBinaryWriter().Write(moveConstructorId);
     uint32_t copyAssignmentId = 0;
     if (copyAssignment)
     {
         copyAssignmentId = copyAssignment->FunctionId();
     }
-    writer.GetBinaryWriter().WriteEncodedUInt(copyAssignmentId);
+    writer.GetBinaryWriter().Write(copyAssignmentId);
     uint32_t moveAssignmentId = 0;
     if (moveAssignment)
     {
         moveAssignmentId = moveAssignment->FunctionId();
     }
-    writer.GetBinaryWriter().WriteEncodedUInt(moveAssignmentId);
+    writer.GetBinaryWriter().Write(moveAssignmentId);
     uint32_t returnId = 0;
     if (returnFun)
     {
         returnId = returnFun->FunctionId();
     }
-    writer.GetBinaryWriter().WriteEncodedUInt(returnId);
+    writer.GetBinaryWriter().Write(returnId);
     uint32_t equalityOpId = 0;
     if (equalityOp)
     {
         equalityOpId = equalityOp->FunctionId();
     }
-    writer.GetBinaryWriter().WriteEncodedUInt(equalityOpId);
+    writer.GetBinaryWriter().Write(equalityOpId);
 }
 
 void BasicTypeSymbol::Read(SymbolReader& reader)
 {
     TypeSymbol::Read(reader);
-    uint32_t defaultConstructorId = reader.GetBinaryReader().ReadEncodedUInt();
+    uint32_t defaultConstructorId = reader.GetBinaryReader().ReadUInt();
     if (defaultConstructorId != 0)
     {
         GetSymbolTable()->EmplaceFunctionRequest(this, defaultConstructorId, 0);
     }
-    uint32_t copyConstructorId = reader.GetBinaryReader().ReadEncodedUInt();
+    uint32_t copyConstructorId = reader.GetBinaryReader().ReadUInt();
     if (copyConstructorId != 0)
     {
         GetSymbolTable()->EmplaceFunctionRequest(this, copyConstructorId, 1);
     }
-    uint32_t moveConstructorId = reader.GetBinaryReader().ReadEncodedUInt();
+    uint32_t moveConstructorId = reader.GetBinaryReader().ReadUInt();
     if (moveConstructorId != 0)
     {
         GetSymbolTable()->EmplaceFunctionRequest(this, moveConstructorId, 2);
     }
-    uint32_t copyAssignmentId = reader.GetBinaryReader().ReadEncodedUInt();
+    uint32_t copyAssignmentId = reader.GetBinaryReader().ReadUInt();
     if (copyAssignmentId != 0)
     {
         GetSymbolTable()->EmplaceFunctionRequest(this, copyAssignmentId, 3);
     }
-    uint32_t moveAssignmentId = reader.GetBinaryReader().ReadEncodedUInt();
+    uint32_t moveAssignmentId = reader.GetBinaryReader().ReadUInt();
     if (moveAssignmentId != 0)
     {
         GetSymbolTable()->EmplaceFunctionRequest(this, moveAssignmentId, 4);
     }
-    uint32_t returnId = reader.GetBinaryReader().ReadEncodedUInt();
+    uint32_t returnId = reader.GetBinaryReader().ReadUInt();
     if (returnId != 0)
     {
         GetSymbolTable()->EmplaceFunctionRequest(this, returnId, 5);
     }
-    uint32_t equalityOpId = reader.GetBinaryReader().ReadEncodedUInt();
+    uint32_t equalityOpId = reader.GetBinaryReader().ReadUInt();
     if (equalityOpId != 0)
     {
         GetSymbolTable()->EmplaceFunctionRequest(this, equalityOpId, 6);

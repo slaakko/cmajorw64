@@ -47,20 +47,23 @@ struct FunctionScopeLookup
 
 struct ArgumentMatch
 {
-    ArgumentMatch() : conversionFun(nullptr), referenceConversionFlags(OperationFlags::none), conversionDistance(0) {}
-    ArgumentMatch(FunctionSymbol* conversionFun_, OperationFlags referenceConversionFlags_, int conversionDistance_) :
-        conversionFun(conversionFun_), referenceConversionFlags(referenceConversionFlags_), conversionDistance(conversionDistance_) {}
+    ArgumentMatch() : preReferenceConversionFlags(OperationFlags::none), conversionFun(nullptr), postReferenceConversionFlags(OperationFlags::none), conversionDistance(0) {}
+    ArgumentMatch(OperationFlags preReferenceConversionFlags_, FunctionSymbol* conversionFun_, OperationFlags postReferenceConversionFlags_, int conversionDistance_) :
+        preReferenceConversionFlags(preReferenceConversionFlags_), conversionFun(conversionFun_), postReferenceConversionFlags(postReferenceConversionFlags_), conversionDistance(conversionDistance_) {}
+    OperationFlags preReferenceConversionFlags;
     FunctionSymbol* conversionFun;
-    OperationFlags referenceConversionFlags;
+    OperationFlags postReferenceConversionFlags;
     int conversionDistance;
 };
 
 inline bool BetterArgumentMatch(const ArgumentMatch& left, const ArgumentMatch& right)
 {
+    if (left.preReferenceConversionFlags == OperationFlags::none && right.preReferenceConversionFlags != OperationFlags::none) return true;
+    if (left.preReferenceConversionFlags != OperationFlags::none && right.preReferenceConversionFlags == OperationFlags::none) return false;
     if (left.conversionFun == nullptr && right.conversionFun != nullptr) return true;
     if (right.conversionFun == nullptr && left.conversionFun != nullptr) return false;
-    if (left.referenceConversionFlags == OperationFlags::none && right.referenceConversionFlags != OperationFlags::none) return true;
-    if (left.referenceConversionFlags != OperationFlags::none && right.referenceConversionFlags == OperationFlags::none) return false;
+    if (left.postReferenceConversionFlags == OperationFlags::none && right.postReferenceConversionFlags != OperationFlags::none) return true;
+    if (left.postReferenceConversionFlags != OperationFlags::none && right.postReferenceConversionFlags == OperationFlags::none) return false;
     if (left.conversionDistance < right.conversionDistance) return true;
     if (left.conversionDistance > right.conversionDistance) return false;
     return false;

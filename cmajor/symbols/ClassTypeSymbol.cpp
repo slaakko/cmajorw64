@@ -111,14 +111,14 @@ void ClassTypeSymbol::Write(SymbolWriter& writer)
         {
             baseClassId = baseClass->TypeId();
         }
-        writer.GetBinaryWriter().WriteEncodedUInt(baseClassId);
+        writer.GetBinaryWriter().Write(baseClassId);
         uint32_t n = uint32_t(implementedInterfaces.size());
         writer.GetBinaryWriter().WriteEncodedUInt(n);
         for (uint32_t i = 0; i < n; ++i)
         {
             InterfaceTypeSymbol* intf = implementedInterfaces[i];
             uint32_t intfTypeId = intf->TypeId();
-            writer.GetBinaryWriter().WriteEncodedUInt(intfTypeId);
+            writer.GetBinaryWriter().Write(intfTypeId);
         }
         uint32_t vmtSize = vmt.size();
         writer.GetBinaryWriter().WriteEncodedUInt(vmtSize);
@@ -152,7 +152,7 @@ void ClassTypeSymbol::Read(SymbolReader& reader)
     }
     else if (GetSymbolType() == SymbolType::classTypeSymbol)
     {
-        uint32_t baseClassId = reader.GetBinaryReader().ReadEncodedUInt();
+        uint32_t baseClassId = reader.GetBinaryReader().ReadUInt();
         if (baseClassId != 0)
         {
             GetSymbolTable()->EmplaceTypeRequest(this, baseClassId, 0);
@@ -161,7 +161,7 @@ void ClassTypeSymbol::Read(SymbolReader& reader)
         implementedInterfaces.resize(n);
         for (uint32_t i = 0; i < n; ++i)
         {
-            uint32_t intfTypeId = reader.GetBinaryReader().ReadEncodedUInt();
+            uint32_t intfTypeId = reader.GetBinaryReader().ReadUInt();
             GetSymbolTable()->EmplaceTypeRequest(this, intfTypeId, 1 + i);
         }
         uint32_t vmtSize = reader.GetBinaryReader().ReadEncodedUInt();
@@ -461,6 +461,19 @@ void ClassTypeSymbol::Dump(CodeFormatter& formatter)
         }
     }
     formatter.DecIndent();
+}
+
+bool ClassTypeSymbol::IsRecursive(TypeSymbol* type, std::unordered_set<TypeSymbol*>& tested) 
+{
+    if (tested.find(type) != tested.cend()) return type == this;
+    tested.insert(this);
+    if (TypeSymbol::IsRecursive(type, tested)) return true;
+    if (baseClass && baseClass->IsRecursive(type, tested)) return true;
+    for (MemberVariableSymbol* memberVariable : memberVariables)
+    {
+        if (memberVariable->GetType()->IsRecursive(type, tested)) return true;
+    }
+    return false;
 }
 
 void ClassTypeSymbol::CreateDestructorSymbol()
@@ -962,7 +975,8 @@ llvm::Type* ClassTypeSymbol::IrType(Emitter& emitter)
         for (int i = 0; i < n; ++i)
         {
             TypeSymbol* elementType = objectLayout[i];
-            if (TypesEqual(elementType->BaseType(), this))
+            std::unordered_set<TypeSymbol*> tested;
+            if (elementType->IsRecursive(this, tested))
             {
                 recursive = true;
                 break;

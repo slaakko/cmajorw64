@@ -23,13 +23,13 @@ VariableSymbol::VariableSymbol(SymbolType symbolType_, const Span& span_, const 
 void VariableSymbol::Write(SymbolWriter& writer)
 {
     Symbol::Write(writer);
-    writer.GetBinaryWriter().WriteEncodedUInt(type->TypeId());
+    writer.GetBinaryWriter().Write(type->TypeId());
 }
 
 void VariableSymbol::Read(SymbolReader& reader)
 {
     Symbol::Read(reader);
-    uint32_t typeId = reader.GetBinaryReader().ReadEncodedUInt();
+    uint32_t typeId = reader.GetBinaryReader().ReadUInt();
     GetSymbolTable()->EmplaceTypeRequest(this, typeId, 0);
 }
 

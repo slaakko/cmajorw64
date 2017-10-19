@@ -383,7 +383,7 @@ std::u32string DerivedTypeSymbol::SimpleName() const
 void DerivedTypeSymbol::Write(SymbolWriter& writer)
 {
     TypeSymbol::Write(writer);
-    writer.GetBinaryWriter().WriteEncodedUInt(baseType->TypeId());
+    writer.GetBinaryWriter().Write(baseType->TypeId());
     writer.GetBinaryWriter().Write(static_cast<uint8_t>(derivationRec.derivations.size()));
     for (Derivation derivation : derivationRec.derivations)
     {
@@ -399,7 +399,7 @@ void DerivedTypeSymbol::Write(SymbolWriter& writer)
 void DerivedTypeSymbol::Read(SymbolReader& reader)
 {
     TypeSymbol::Read(reader);
-    uint32_t typeId = reader.GetBinaryReader().ReadEncodedUInt();
+    uint32_t typeId = reader.GetBinaryReader().ReadUInt();
     GetSymbolTable()->EmplaceTypeRequest(this, typeId, 0);
     uint8_t nd = reader.GetBinaryReader().ReadByte();
     for (uint8_t i = 0; i < nd; ++i)
@@ -570,6 +570,13 @@ TypeSymbol* DerivedTypeSymbol::Unify(TypeSymbol* sourceType, const Span& span)
 {
     TypeSymbol* newBaseType = baseType->Unify(sourceType->BaseType(), span);
     return GetSymbolTable()->MakeDerivedType(newBaseType, UnifyDerivations(derivationRec, sourceType->DerivationRec()), span);
+}
+
+bool DerivedTypeSymbol::IsRecursive(TypeSymbol* type, std::unordered_set<TypeSymbol*>& tested) 
+{
+    if (tested.find(this) != tested.cend()) return type == this;
+    tested.insert(this);
+    return TypeSymbol::IsRecursive(type, tested) || baseType->IsRecursive(type, tested);
 }
 
 llvm::Type* DerivedTypeSymbol::IrType(Emitter& emitter) 

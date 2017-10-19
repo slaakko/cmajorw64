@@ -658,8 +658,8 @@ void BasicTypeConversion<ConversionOp>::Write(SymbolWriter& writer)
     FunctionSymbol::Write(writer);
     writer.GetBinaryWriter().Write(static_cast<uint8_t>(conversionType));
     writer.GetBinaryWriter().Write(conversionDistance);
-    writer.GetBinaryWriter().WriteEncodedUInt(sourceType->TypeId());
-    writer.GetBinaryWriter().WriteEncodedUInt(targetType->TypeId());
+    writer.GetBinaryWriter().Write(sourceType->TypeId());
+    writer.GetBinaryWriter().Write(targetType->TypeId());
 }
 
 template <typename ConversionOp>
@@ -668,9 +668,9 @@ void BasicTypeConversion<ConversionOp>::Read(SymbolReader& reader)
     FunctionSymbol::Read(reader);
     conversionType = static_cast<ConversionType>(reader.GetBinaryReader().ReadByte());
     conversionDistance = reader.GetBinaryReader().ReadByte();
-    uint32_t sourceTypeId = reader.GetBinaryReader().ReadEncodedUInt();
+    uint32_t sourceTypeId = reader.GetBinaryReader().ReadUInt();
     GetSymbolTable()->EmplaceTypeRequest(this, sourceTypeId, 1);
-    uint32_t targetTypeId = reader.GetBinaryReader().ReadEncodedUInt();
+    uint32_t targetTypeId = reader.GetBinaryReader().ReadUInt();
     GetSymbolTable()->EmplaceTypeRequest(this, targetTypeId, 2);
 }
 

@@ -31,7 +31,7 @@ public:
     void Visit(NamespaceImportNode& namespaceImportNode) override;
     void Visit(FunctionNode& functionNode) override;
     void Visit(ClassNode& classNode) override;
-    void BindClass(ClassTypeSymbol* classTypeSymbol, ClassNode* classNode);
+    void BindClass(ClassTypeSymbol* classTypeSymbol, ClassNode* classNode, bool fromOwnCompileUnit);
     void Visit(StaticConstructorNode& staticConstructorNode) override;
     void Visit(ConstructorNode& constructorNode) override;
     void Visit(DestructorNode& destructorNode) override;
@@ -39,7 +39,7 @@ public:
     void Visit(ConversionFunctionNode& conversionFunctionNode) override;
     void Visit(MemberVariableNode& memberVariableNode) override;
     void Visit(InterfaceNode& interfaceNode) override;
-    void BindInterface(InterfaceTypeSymbol* interfaceTypeSymbol, InterfaceNode* interfaceNode);
+    void BindInterface(InterfaceTypeSymbol* interfaceTypeSymbol, InterfaceNode* interfaceNode, bool fromOwnCompileUnit);
     void Visit(DelegateNode& delegateNode) override;
     void Visit(ClassDelegateNode& classDelegateNode) override;
     void Visit(ConceptNode& conceptNode) override;

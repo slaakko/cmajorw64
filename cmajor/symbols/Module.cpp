@@ -725,7 +725,7 @@ void Module::CheckUpToDate()
             {
                 if (boost::filesystem::last_write_time(sfp) > boost::filesystem::last_write_time(objectFilePath))
                 {
-                    Warning warning(CompileWarningCollection::Instance().GetCurrentProjectName(), "source file '" + GetFullPath(sfp.generic_string()) + "' is more recent than object file '" +
+                    Warning warning(name, "source file '" + GetFullPath(sfp.generic_string()) + "' is more recent than object file '" +
                         GetFullPath(objectFilePath.generic_string()) + "'");
                     bool found = false;
                     for (const Warning& prev : CompileWarningCollection::Instance().Warnings())

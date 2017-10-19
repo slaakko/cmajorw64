@@ -182,4 +182,18 @@ CannotAssignToConstOverloadException::CannotAssignToConstOverloadException(const
 {
 }
 
+NoViableFunctionException::NoViableFunctionException(const std::string& message_, const Span& defined_) : Exception(message_, defined_)
+{
+}
+
+NoViableFunctionException::NoViableFunctionException(const std::string& message_, const Span& defined_, const Span& referenced_) :
+    Exception(message_, defined_, referenced_)
+{
+}
+
+NoViableFunctionException::NoViableFunctionException(const std::string& message_, const Span& defined_, const std::vector<Span>& references_) :
+    Exception(message_, defined_, references_)
+{
+}
+
 } } // namespace cmajor::symbols

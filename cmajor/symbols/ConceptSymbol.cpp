@@ -52,14 +52,14 @@ void ConceptSymbol::Write(SymbolWriter& writer)
 {
     ContainerSymbol::Write(writer);
     Assert(typeId != 0, "type id not initialized");
-    writer.GetBinaryWriter().WriteEncodedUInt(typeId);
+    writer.GetBinaryWriter().Write(typeId);
     writer.GetBinaryWriter().Write(groupName);
     uint32_t refineConceptId = 0;
     if (refinedConcept)
     {
         refineConceptId = refinedConcept->TypeId();
     }
-    writer.GetBinaryWriter().WriteEncodedUInt(refineConceptId);
+    writer.GetBinaryWriter().Write(refineConceptId);
     Node* node = GetSymbolTable()->GetNode(this);
     Assert(node->IsConceptNode(), "concept node expected");
     writer.GetAstWriter().Write(node);
@@ -68,10 +68,10 @@ void ConceptSymbol::Write(SymbolWriter& writer)
 void ConceptSymbol::Read(SymbolReader& reader)
 {
     ContainerSymbol::Read(reader);
-    typeId = reader.GetBinaryReader().ReadEncodedUInt();
+    typeId = reader.GetBinaryReader().ReadUInt();
     GetSymbolTable()->AddTypeOrConceptSymbolToTypeIdMap(this);
     groupName = reader.GetBinaryReader().ReadUtf32String();
-    uint32_t refinedConcepId = reader.GetBinaryReader().ReadEncodedUInt();
+    uint32_t refinedConcepId = reader.GetBinaryReader().ReadUInt();
     if (refinedConcepId != 0)
     {
         GetSymbolTable()->EmplaceConceptRequest(this, refinedConcepId);

@@ -1,0 +1,26 @@
+﻿// =================================
+// Copyright (c) 2017 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+
+namespace System.Text.Parsing
+{
+    public class Namespace : ParsingObject
+    {
+        public Namespace(const ustring& qualifiedName_, Scope* enclosingScope_) : base(qualifiedName_, enclosingScope_)
+        {
+            Scope* containerScope = new Scope(Name(), EnclosingScope());
+            SetContainerScope(containerScope);
+            Own(containerScope);
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.BeginVisit(*this);
+            GetScope()->Accept(visitor);
+            visitor.EndVisit(*this);
+        }
+    }
+}

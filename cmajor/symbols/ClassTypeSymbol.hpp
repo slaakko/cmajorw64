@@ -86,6 +86,7 @@ public:
     bool HasNontrivialDestructor() const override;
     void Accept(SymbolCollector* collector) override;
     void Dump(CodeFormatter& formatter) override;
+    bool IsRecursive(TypeSymbol* type, std::unordered_set<TypeSymbol*>& tested) override;
     virtual bool IsPrototypeTemplateSpecialization() const { return false; }
     void CreateDestructorSymbol();
     const std::u32string& GroupName() const { return groupName; }

@@ -193,13 +193,17 @@ void TypeBinder::Visit(ClassNode& classNode)
     Symbol* symbol = symbolTable.GetSymbol(&classNode);
     Assert(symbol->GetSymbolType() == SymbolType::classTypeSymbol || symbol->GetSymbolType() == SymbolType::classTemplateSpecializationSymbol, "class type symbol expected");
     ClassTypeSymbol* classTypeSymbol = static_cast<ClassTypeSymbol*>(symbol);
-    BindClass(classTypeSymbol, &classNode);
+    BindClass(classTypeSymbol, &classNode, true);
 }
 
-void TypeBinder::BindClass(ClassTypeSymbol* classTypeSymbol, ClassNode* classNode)
+void TypeBinder::BindClass(ClassTypeSymbol* classTypeSymbol, ClassNode* classNode, bool fromOwnCompileUnit)
 {
     if (classTypeSymbol->IsBound()) return;
     classTypeSymbol->SetBound();
+    if (!fromOwnCompileUnit)
+    {
+        AddUsingNodesToCurrentCompileUnit(classNode);
+    }
     if (classTypeSymbol->IsClassTemplate())
     {
         classTypeSymbol->CloneUsingNodes(usingNodes);
@@ -234,7 +238,7 @@ void TypeBinder::BindClass(ClassTypeSymbol* classTypeSymbol, ClassNode* classNod
                 Node* node = symbolTable.GetNode(baseClassSymbol);
                 Assert(node->GetNodeType() == NodeType::classNode, "class node expected");
                 ClassNode* baseClassNode = static_cast<ClassNode*>(node);
-                BindClass(baseClassSymbol, baseClassNode);
+                BindClass(baseClassSymbol, baseClassNode, false);
             }
             if (classTypeSymbol->BaseClass())
             {
@@ -257,7 +261,7 @@ void TypeBinder::BindClass(ClassTypeSymbol* classTypeSymbol, ClassNode* classNod
                 Node* node = symbolTable.GetNode(interfaceTypeSymbol);
                 Assert(node->GetNodeType() == NodeType::interfaceNode, "interface node expected");
                 InterfaceNode* interfaceNode = static_cast<InterfaceNode*>(node);
-                BindInterface(interfaceTypeSymbol, interfaceNode);
+                BindInterface(interfaceTypeSymbol, interfaceNode, false);
             }
             classTypeSymbol->AddImplementedInterface(interfaceTypeSymbol);
         }
@@ -589,14 +593,18 @@ void TypeBinder::Visit(InterfaceNode& interfaceNode)
     Symbol* symbol = symbolTable.GetSymbol(&interfaceNode);
     Assert(symbol->GetSymbolType() == SymbolType::interfaceTypeSymbol, "interface type symbol expected");
     InterfaceTypeSymbol* interfaceTypeSymbol = static_cast<InterfaceTypeSymbol*>(symbol);
-    BindInterface(interfaceTypeSymbol, &interfaceNode);
+    BindInterface(interfaceTypeSymbol, &interfaceNode, true);
 }
 
-void TypeBinder::BindInterface(InterfaceTypeSymbol* interfaceTypeSymbol, InterfaceNode* interfaceNode)
+void TypeBinder::BindInterface(InterfaceTypeSymbol* interfaceTypeSymbol, InterfaceNode* interfaceNode, bool fromOwnCompileUnit)
 {
     if (interfaceTypeSymbol->IsBound()) return;
     interfaceTypeSymbol->SetBound();
     interfaceTypeSymbol->SetSpecifiers(interfaceNode->GetSpecifiers());
+    if (!fromOwnCompileUnit)
+    {
+        AddUsingNodesToCurrentCompileUnit(interfaceNode);
+    }
     ContainerScope* prevContainerScope = containerScope;
     containerScope = interfaceTypeSymbol->GetContainerScope();
     int nm = interfaceNode->Members().Count();
@@ -882,7 +890,7 @@ void TypeBinder::Visit(CatchNode& catchNode)
                 Node* exceptionVarNode = symbolTable.GetNode(exceptionVarClassType);
                 Assert(exceptionVarNode->GetNodeType() == NodeType::classNode, "class node expected");
                 ClassNode* exceptionVarClassNode = static_cast<ClassNode*>(exceptionVarNode);
-                BindClass(exceptionVarClassType, exceptionVarClassNode);
+                BindClass(exceptionVarClassType, exceptionVarClassNode, false);
             }
             if (exceptionVarClassType == systemExceptionClassType || exceptionVarClassType->HasBaseClass(systemExceptionClassType))
             {

@@ -23,14 +23,14 @@ ConstantSymbol::ConstantSymbol(const Span& span_, const std::u32string& name_) :
 void ConstantSymbol::Write(SymbolWriter& writer)
 {
     Symbol::Write(writer);
-    writer.GetBinaryWriter().WriteEncodedUInt(type->TypeId());
+    writer.GetBinaryWriter().Write(type->TypeId());
     WriteValue(value.get(), writer.GetBinaryWriter());
 }
 
 void ConstantSymbol::Read(SymbolReader& reader)
 {
     Symbol::Read(reader);
-    uint32_t typeId = reader.GetBinaryReader().ReadEncodedUInt();
+    uint32_t typeId = reader.GetBinaryReader().ReadUInt();
     GetSymbolTable()->EmplaceTypeRequest(this, typeId, 0);
     value.reset(ReadValue(reader.GetBinaryReader()));
 }

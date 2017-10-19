@@ -52,14 +52,14 @@ void ClassTemplateSpecializationSymbol::Write(SymbolWriter& writer)
 {
     ClassTypeSymbol::Write(writer);
     uint32_t classTemplateId = classTemplate->TypeId();
-    writer.GetBinaryWriter().WriteEncodedUInt(classTemplateId);
+    writer.GetBinaryWriter().Write(classTemplateId);
     uint32_t n = templateArgumentTypes.size();
     writer.GetBinaryWriter().WriteEncodedUInt(n);
     for (uint32_t i = 0; i < n; ++i)
     {
         TypeSymbol* templateArgumentType = templateArgumentTypes[i];
         uint32_t templateArgumentTypeId = templateArgumentType->TypeId();
-        writer.GetBinaryWriter().WriteEncodedUInt(templateArgumentTypeId);
+        writer.GetBinaryWriter().Write(templateArgumentTypeId);
     }
     writer.GetBinaryWriter().Write(uint8_t(flags));
 }
@@ -67,13 +67,13 @@ void ClassTemplateSpecializationSymbol::Write(SymbolWriter& writer)
 void ClassTemplateSpecializationSymbol::Read(SymbolReader& reader)
 {
     ClassTypeSymbol::Read(reader);
-    uint32_t classTemplateId = reader.GetBinaryReader().ReadEncodedUInt();
+    uint32_t classTemplateId = reader.GetBinaryReader().ReadUInt();
     GetSymbolTable()->EmplaceTypeRequest(this, classTemplateId, -1);
     uint32_t n = reader.GetBinaryReader().ReadEncodedUInt();
     templateArgumentTypes.resize(n);
     for (uint32_t i = 0; i < n; ++i)
     {
-        uint32_t typeArgumentId = reader.GetBinaryReader().ReadEncodedUInt();
+        uint32_t typeArgumentId = reader.GetBinaryReader().ReadUInt();
         GetSymbolTable()->EmplaceTypeRequest(this, typeArgumentId, -2 - i);
     }
     flags = ClassTemplateSpecializationFlags(reader.GetBinaryReader().ReadByte());

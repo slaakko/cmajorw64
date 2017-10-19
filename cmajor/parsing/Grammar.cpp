@@ -108,12 +108,14 @@ void Grammar::Parse(const char32_t* start, const char32_t* end, int fileIndex, c
         xmlLog.reset(new XmlLog(*log, maxLogLineLength));
         scanner.SetLog(xmlLog.get());
         xmlLog->WriteBeginRule("parse");
+        xmlLog->IncIndent();
     }
     ObjectStack stack;
     Match match = Parse(scanner, stack, parsingData);
     Span stop = scanner.GetSpan();
     if (log)
     {
+        xmlLog->DecIndent();
         xmlLog->WriteEndRule("parse");
     }
     if (!match.Hit() || stop.Start() != int(end - start))

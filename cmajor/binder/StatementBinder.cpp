@@ -555,7 +555,8 @@ void StatementBinder::Visit(ReturnStatementNode& returnStatementNode)
             if (returnClassDelegateType && expression->GetType()->BaseType()->GetSymbolType() == SymbolType::functionGroupTypeSymbol)
             {
                 TypeSymbol* exprType = expression->GetType();
-                expression.reset(new BoundConversion(std::move(expression), boundCompileUnit.GetConversion(exprType, returnType, containerScope, currentFunction, returnStatementNode.GetSpan())));
+                ArgumentMatch argumentMatch;
+                expression.reset(new BoundConversion(std::move(expression), boundCompileUnit.GetConversion(exprType, returnType, containerScope, currentFunction, returnStatementNode.GetSpan(), argumentMatch)));
             }
             rvalueArguments.push_back(std::move(expression));
             std::unique_ptr<BoundExpression> rvalueExpr = ResolveOverload(U"System.Rvalue", containerScope, rvalueLookups, rvalueArguments, boundCompileUnit, currentFunction,
@@ -563,7 +564,6 @@ void StatementBinder::Visit(ReturnStatementNode& returnStatementNode)
             classReturnArgs.push_back(std::move(rvalueExpr));
             std::unique_ptr<BoundFunctionCall> constructorCall = ResolveOverload(U"@constructor", containerScope, classReturnLookups, classReturnArgs, boundCompileUnit, currentFunction,
                 returnStatementNode.GetSpan());
-            //MoveTemporaryDestructorCallsTo(*constructorCall);
             std::unique_ptr<BoundStatement> constructStatement(new BoundExpressionStatement(std::move(constructorCall)));
             AddStatement(constructStatement.release());
             std::unique_ptr<BoundFunctionCall> returnFunctionCall;
@@ -602,6 +602,21 @@ void StatementBinder::Visit(ReturnStatementNode& returnStatementNode)
                 {
                     Assert(!functionMatch.argumentMatches.empty(), "argument match expected");
                     ArgumentMatch argumentMatch = functionMatch.argumentMatches[0];
+                    if (argumentMatch.preReferenceConversionFlags != OperationFlags::none)
+                    {
+                        if (argumentMatch.preReferenceConversionFlags == OperationFlags::addr)
+                        {
+                            TypeSymbol* type = returnValueArguments[0]->GetType()->AddLvalueReference(returnStatementNode.GetSpan());
+                            BoundAddressOfExpression* addressOfExpression = new BoundAddressOfExpression(std::move(returnValueArguments[0]), type);
+                            returnValueArguments[0].reset(addressOfExpression);
+                        }
+                        else if (argumentMatch.preReferenceConversionFlags == OperationFlags::deref)
+                        {
+                            TypeSymbol* type = returnValueArguments[0]->GetType()->RemoveReference(returnStatementNode.GetSpan());
+                            BoundDereferenceExpression* dereferenceExpression = new BoundDereferenceExpression(std::move(returnValueArguments[0]), type);
+                            returnValueArguments[0].reset(dereferenceExpression);
+                        }
+                    }
                     FunctionSymbol* conversionFun = argumentMatch.conversionFun;
                     if (conversionFun)
                     {
@@ -622,15 +637,15 @@ void StatementBinder::Visit(ReturnStatementNode& returnStatementNode)
                             returnValueArguments[0].reset(boundConversion);
                         }
                     }
-                    if (argumentMatch.referenceConversionFlags != OperationFlags::none)
+                    if (argumentMatch.postReferenceConversionFlags != OperationFlags::none)
                     {
-                        if (argumentMatch.referenceConversionFlags == OperationFlags::addr)
+                        if (argumentMatch.postReferenceConversionFlags == OperationFlags::addr)
                         {
                             TypeSymbol* type = returnValueArguments[0]->GetType()->AddLvalueReference(returnStatementNode.GetSpan());
                             BoundAddressOfExpression* addressOfExpression = new BoundAddressOfExpression(std::move(returnValueArguments[0]), type);
                             returnValueArguments[0].reset(addressOfExpression);
                         }
-                        else if (argumentMatch.referenceConversionFlags == OperationFlags::deref)
+                        else if (argumentMatch.postReferenceConversionFlags == OperationFlags::deref)
                         {
                             TypeSymbol* type = returnValueArguments[0]->GetType()->RemoveReference(returnStatementNode.GetSpan());
                             BoundDereferenceExpression* dereferenceExpression = new BoundDereferenceExpression(std::move(returnValueArguments[0]), type);

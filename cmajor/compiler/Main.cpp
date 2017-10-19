@@ -21,6 +21,7 @@
 #include <iostream>
 #include <string>
 #include <stdexcept>
+#include <chrono>
 
 struct InitDone
 {
@@ -63,6 +64,8 @@ void PrintHelp()
         "   print no messages\n" <<
         "--strict-nothrow (-s)\n" <<
         "   treat nothrow violation as error\n" <<
+        "--time (-t)\n" <<
+        "   print duration of compilation\n" <<
         "--emit-llvm (-l)\n" <<
         "   emit intermediate LLVM code to file.ll files\n" <<
         "--emit-opt-llvm (-o)\n" <<
@@ -87,6 +90,7 @@ int main(int argc, const char** argv)
 {
     try
     {
+        std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
         InitDone initDone;
         std::vector<std::string> projectsAndSolutions;
         if (argc < 2)
@@ -145,6 +149,10 @@ int main(int argc, const char** argv)
                     else if (arg == "--link-using-ms-link" || arg == "-m")
                     {
                         SetGlobalFlag(GlobalFlags::linkUsingMsLink);
+                    }
+                    else if (arg == "--time" || arg == "-t")
+                    {
+                        SetGlobalFlag(GlobalFlags::time);
                     }
                     else if (arg.find('=') != std::string::npos)
                     {
@@ -269,6 +277,19 @@ int main(int argc, const char** argv)
                 std::unique_ptr<JsonObject> compileResult(new JsonObject());
                 compileResult->AddField(U"success", std::unique_ptr<JsonValue>(new JsonBool(true)));
                 std::cerr << compileResult->ToString() << std::endl;
+            }
+            if (GetGlobalFlag(GlobalFlags::time))
+            {
+                std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+                auto dur = end - start;
+                long long totalSecs = std::chrono::duration_cast<std::chrono::seconds>(dur).count() + 1;
+                int hours = static_cast<int>(totalSecs / 3600);
+                int mins = static_cast<int>((totalSecs / 60) % 60);
+                int secs = static_cast<int>(totalSecs % 60);
+                std::cout <<
+                    (hours > 0 ? std::to_string(hours) + " hour" + ((hours != 1) ? "s " : " ") : "") <<
+                    (mins > 0 ? std::to_string(mins) + " minute" + ((mins != 1) ? "s " : " ") : "") <<
+                    secs << " second" << ((secs != 1) ? "s" : "") << std::endl;
             }
         }
     }

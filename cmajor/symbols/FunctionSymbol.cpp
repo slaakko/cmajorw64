@@ -207,7 +207,7 @@ void FunctionSymbol::Write(SymbolWriter& writer)
 {
     ContainerSymbol::Write(writer);
     Assert(functionId != 0, "function id not initialized");
-    writer.GetBinaryWriter().WriteEncodedUInt(functionId);
+    writer.GetBinaryWriter().Write(functionId);
     writer.GetBinaryWriter().Write(groupName);
     writer.GetBinaryWriter().Write(static_cast<uint16_t>(flags));
     if (IsFunctionTemplate() || (GetGlobalFlag(GlobalFlags::release) && IsInline()))
@@ -230,7 +230,7 @@ void FunctionSymbol::Write(SymbolWriter& writer)
     {
         returnTypeId = returnType->TypeId();
     }
-    writer.GetBinaryWriter().WriteEncodedUInt(returnTypeId);
+    writer.GetBinaryWriter().Write(returnTypeId);
     writer.GetBinaryWriter().Write(vmtIndex);
     writer.GetBinaryWriter().Write(imtIndex);
     bool hasReturnParam = returnParam != nullptr;
@@ -253,7 +253,7 @@ void FunctionSymbol::Write(SymbolWriter& writer)
 void FunctionSymbol::Read(SymbolReader& reader)
 {
     ContainerSymbol::Read(reader);
-    functionId = reader.GetBinaryReader().ReadEncodedUInt();
+    functionId = reader.GetBinaryReader().ReadUInt();
     GetSymbolTable()->AddFunctionSymbolToFunctionIdMap(this);
     groupName = reader.GetBinaryReader().ReadUtf32String();
     flags = static_cast<FunctionSymbolFlags>(reader.GetBinaryReader().ReadUShort());
@@ -264,7 +264,7 @@ void FunctionSymbol::Read(SymbolReader& reader)
         reader.GetBinaryReader().Skip(sizeOfAstNodes);
         filePathReadFrom = reader.GetBinaryReader().FileName();
     }
-    uint32_t returnTypeId = reader.GetBinaryReader().ReadEncodedUInt();
+    uint32_t returnTypeId = reader.GetBinaryReader().ReadUInt();
     if (returnTypeId != 0)
     {
         GetSymbolTable()->EmplaceTypeRequest(this, returnTypeId, 0);

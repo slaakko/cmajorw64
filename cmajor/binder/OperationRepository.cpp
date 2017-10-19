@@ -503,7 +503,8 @@ void PointerPlusOffsetOperation::CollectViableFunctions(ContainerScope* containe
     TypeSymbol* rightType = arguments[1]->GetType();
     if (!rightType->PlainType(span)->IsIntegralType())
     {
-        if (!GetBoundCompileUnit().GetConversion(rightType, GetSymbolTable()->GetTypeByName(U"long"), containerScope, currentFunction, span))
+        ArgumentMatch argumentMatch;
+        if (!GetBoundCompileUnit().GetConversion(rightType, GetSymbolTable()->GetTypeByName(U"long"), containerScope, currentFunction, span, argumentMatch))
         {
             return;
         }
@@ -574,7 +575,8 @@ void OffsetPlusPointerOperation::CollectViableFunctions(ContainerScope* containe
     TypeSymbol* leftType = arguments[0]->GetType();
     if (!leftType->PlainType(span)->IsIntegralType())
     {
-        if (!GetBoundCompileUnit().GetConversion(leftType, GetSymbolTable()->GetTypeByName(U"long"), containerScope, currentFunction, span))
+        ArgumentMatch argumentMatch;
+        if (!GetBoundCompileUnit().GetConversion(leftType, GetSymbolTable()->GetTypeByName(U"long"), containerScope, currentFunction, span, argumentMatch))
         {
             return;
         }
@@ -651,7 +653,8 @@ void PointerMinusOffsetOperation::CollectViableFunctions(ContainerScope* contain
     TypeSymbol* rightType = arguments[1]->GetType();
     if (!rightType->PlainType(span)->IsIntegralType())
     {
-        if (!GetBoundCompileUnit().GetConversion(rightType, GetSymbolTable()->GetTypeByName(U"long"), containerScope, currentFunction, span))
+        ArgumentMatch argumentMatch;
+        if (!GetBoundCompileUnit().GetConversion(rightType, GetSymbolTable()->GetTypeByName(U"long"), containerScope, currentFunction, span, argumentMatch))
         {
             return;
         }
@@ -1491,7 +1494,8 @@ bool ClassDefaultConstructorOperation::GenerateImplementation(ClassDefaultConstr
             baseConstructorCallLookups.push_back(FunctionScopeLookup(ScopeLookup::fileScopes, nullptr));
             std::vector<std::unique_ptr<BoundExpression>> baseConstructorCallArguments;
             ParameterSymbol* thisParam = defaultConstructor->Parameters()[0];
-            FunctionSymbol* thisToBaseConversion = GetBoundCompileUnit().GetConversion(thisParam->GetType(), classType->BaseClass()->AddPointer(span), containerScope, currentFunction, span);
+            ArgumentMatch argumentMatch;
+            FunctionSymbol* thisToBaseConversion = GetBoundCompileUnit().GetConversion(thisParam->GetType(), classType->BaseClass()->AddPointer(span), containerScope, currentFunction, span, argumentMatch);
             if (!thisToBaseConversion)
             {
                 throw Exception("base class conversion not found", span, classType->GetSpan());
@@ -1514,7 +1518,8 @@ bool ClassDefaultConstructorOperation::GenerateImplementation(ClassDefaultConstr
             }
             else
             {
-                FunctionSymbol* thisToHolderConversion = GetBoundCompileUnit().GetConversion(thisParam->GetType(), vmtPtrHolderClass->AddPointer(span), containerScope, currentFunction, span);
+                ArgumentMatch argumentMatch;
+                FunctionSymbol* thisToHolderConversion = GetBoundCompileUnit().GetConversion(thisParam->GetType(), vmtPtrHolderClass->AddPointer(span), containerScope, currentFunction, span, argumentMatch);
                 if (!thisToHolderConversion)
                 {
                     throw Exception("base class conversion not found", span, classType->GetSpan());
@@ -1668,7 +1673,8 @@ bool ClassCopyConstructorOperation::GenerateImplementation(ClassCopyConstructor*
             baseConstructorCallLookups.push_back(FunctionScopeLookup(ScopeLookup::fileScopes, nullptr));
             std::vector<std::unique_ptr<BoundExpression>> baseConstructorCallArguments;
             ParameterSymbol* thisParam = copyConstructor->Parameters()[0];
-            FunctionSymbol* thisToBaseConversion = GetBoundCompileUnit().GetConversion(thisParam->GetType(), classType->BaseClass()->AddPointer(span), containerScope, currentFunction, span);
+            ArgumentMatch argumentMatch;
+            FunctionSymbol* thisToBaseConversion = GetBoundCompileUnit().GetConversion(thisParam->GetType(), classType->BaseClass()->AddPointer(span), containerScope, currentFunction, span, argumentMatch);
             if (!thisToBaseConversion)
             {
                 throw Exception("base class conversion not found", span, classType->GetSpan());
@@ -1677,7 +1683,7 @@ bool ClassCopyConstructorOperation::GenerateImplementation(ClassCopyConstructor*
             baseConstructorCallArguments.push_back(std::unique_ptr<BoundExpression>(baseClassPointerConversion));
             ParameterSymbol* thatParam = copyConstructor->Parameters()[1];
             FunctionSymbol* thatToBaseConversion = GetBoundCompileUnit().GetConversion(thatParam->GetType(), classType->BaseClass()->AddConst(span)->AddLvalueReference(span), containerScope, 
-                currentFunction, span);
+                currentFunction, span, argumentMatch);
             if (!thatToBaseConversion)
             {
                 throw Exception("base class conversion not found", span, classType->GetSpan());
@@ -1700,7 +1706,8 @@ bool ClassCopyConstructorOperation::GenerateImplementation(ClassCopyConstructor*
             }
             else
             {
-                FunctionSymbol* thisToHolderConversion = GetBoundCompileUnit().GetConversion(thisParam->GetType(), vmtPtrHolderClass->AddPointer(span), containerScope, currentFunction, span);
+                ArgumentMatch argumentMatch;
+                FunctionSymbol* thisToHolderConversion = GetBoundCompileUnit().GetConversion(thisParam->GetType(), vmtPtrHolderClass->AddPointer(span), containerScope, currentFunction, span, argumentMatch);
                 if (!thisToHolderConversion)
                 {
                     throw Exception("base class conversion not found", span, classType->GetSpan());
@@ -1858,7 +1865,8 @@ bool ClassMoveConstructorOperation::GenerateImplementation(ClassMoveConstructor*
             baseConstructorCallLookups.push_back(FunctionScopeLookup(ScopeLookup::fileScopes, nullptr));
             std::vector<std::unique_ptr<BoundExpression>> baseConstructorCallArguments;
             ParameterSymbol* thisParam = moveConstructor->Parameters()[0];
-            FunctionSymbol* thisToBaseConversion = GetBoundCompileUnit().GetConversion(thisParam->GetType(), classType->BaseClass()->AddPointer(span), containerScope, currentFunction, span);
+            ArgumentMatch argumentMatch;
+            FunctionSymbol* thisToBaseConversion = GetBoundCompileUnit().GetConversion(thisParam->GetType(), classType->BaseClass()->AddPointer(span), containerScope, currentFunction, span, argumentMatch);
             if (!thisToBaseConversion)
             {
                 throw Exception("base class conversion not found", span, classType->GetSpan());
@@ -1866,7 +1874,7 @@ bool ClassMoveConstructorOperation::GenerateImplementation(ClassMoveConstructor*
             std::unique_ptr<BoundExpression> baseClassPointerConversion(new BoundConversion(std::unique_ptr<BoundExpression>(new BoundParameter(thisParam)), thisToBaseConversion));
             baseConstructorCallArguments.push_back(std::move(baseClassPointerConversion));
             ParameterSymbol* thatParam = moveConstructor->Parameters()[1];
-            FunctionSymbol* thatToBaseConversion = GetBoundCompileUnit().GetConversion(thatParam->GetType(), classType->BaseClass()->AddRvalueReference(span), containerScope, currentFunction, span);
+            FunctionSymbol* thatToBaseConversion = GetBoundCompileUnit().GetConversion(thatParam->GetType(), classType->BaseClass()->AddRvalueReference(span), containerScope, currentFunction, span, argumentMatch);
             if (!thatToBaseConversion)
             {
                 throw Exception("base class conversion not found", span, classType->GetSpan());
@@ -1889,7 +1897,8 @@ bool ClassMoveConstructorOperation::GenerateImplementation(ClassMoveConstructor*
             }
             else
             {
-                FunctionSymbol* thisToHolderConversion = GetBoundCompileUnit().GetConversion(thisParam->GetType(), vmtPtrHolderClass->AddPointer(span), containerScope, currentFunction, span);
+                ArgumentMatch argumentMatch;
+                FunctionSymbol* thisToHolderConversion = GetBoundCompileUnit().GetConversion(thisParam->GetType(), vmtPtrHolderClass->AddPointer(span), containerScope, currentFunction, span, argumentMatch);
                 if (!thisToHolderConversion)
                 {
                     throw Exception("base class conversion not found", span, classType->GetSpan());
@@ -2049,7 +2058,8 @@ bool ClassCopyAssignmentOperation::GenerateImplementation(ClassCopyAssignment* c
             baseAssignmentCallLookups.push_back(FunctionScopeLookup(ScopeLookup::fileScopes, nullptr));
             std::vector<std::unique_ptr<BoundExpression>> baseAssignmentCallArguments;
             ParameterSymbol* thisParam = copyAssignment->Parameters()[0];
-            FunctionSymbol* thisToBaseConversion = GetBoundCompileUnit().GetConversion(thisParam->GetType(), classType->BaseClass()->AddPointer(span), containerScope, currentFunction, span);
+            ArgumentMatch argumentMatch;
+            FunctionSymbol* thisToBaseConversion = GetBoundCompileUnit().GetConversion(thisParam->GetType(), classType->BaseClass()->AddPointer(span), containerScope, currentFunction, span, argumentMatch);
             if (!thisToBaseConversion)
             {
                 throw Exception("base class conversion not found", span, classType->GetSpan());
@@ -2058,7 +2068,7 @@ bool ClassCopyAssignmentOperation::GenerateImplementation(ClassCopyAssignment* c
             baseAssignmentCallArguments.push_back(std::unique_ptr<BoundExpression>(baseClassPointerConversion));
             ParameterSymbol* thatParam = copyAssignment->Parameters()[1];
             FunctionSymbol* thatToBaseConversion = GetBoundCompileUnit().GetConversion(thatParam->GetType(), classType->BaseClass()->AddConst(span)->AddLvalueReference(span), containerScope, 
-                currentFunction, span);
+                currentFunction, span, argumentMatch);
             if (!thatToBaseConversion)
             {
                 throw Exception("base class conversion not found", span, classType->GetSpan());
@@ -2215,7 +2225,8 @@ bool ClassMoveAssignmentOperation::GenerateImplementation(ClassMoveAssignment* m
             baseAssignmentCallLookups.push_back(FunctionScopeLookup(ScopeLookup::fileScopes, nullptr));
             std::vector<std::unique_ptr<BoundExpression>> baseAssignmentCallArguments;
             ParameterSymbol* thisParam = moveAssignment->Parameters()[0];
-            FunctionSymbol* thisToBaseConversion = GetBoundCompileUnit().GetConversion(thisParam->GetType(), classType->BaseClass()->AddPointer(span), containerScope, currentFunction, span);
+            ArgumentMatch argumentMatch;
+            FunctionSymbol* thisToBaseConversion = GetBoundCompileUnit().GetConversion(thisParam->GetType(), classType->BaseClass()->AddPointer(span), containerScope, currentFunction, span, argumentMatch);
             if (!thisToBaseConversion)
             {
                 throw Exception("base class conversion not found", span, classType->GetSpan());
@@ -2223,7 +2234,7 @@ bool ClassMoveAssignmentOperation::GenerateImplementation(ClassMoveAssignment* m
             std::unique_ptr<BoundExpression> baseClassPointerConversion(new BoundConversion(std::unique_ptr<BoundExpression>(new BoundParameter(thisParam)), thisToBaseConversion));
             baseAssignmentCallArguments.push_back(std::move(baseClassPointerConversion));
             ParameterSymbol* thatParam = moveAssignment->Parameters()[1];
-            FunctionSymbol* thatToBaseConversion = GetBoundCompileUnit().GetConversion(thatParam->GetType(), classType->BaseClass()->AddRvalueReference(span), containerScope, currentFunction, span);
+            FunctionSymbol* thatToBaseConversion = GetBoundCompileUnit().GetConversion(thatParam->GetType(), classType->BaseClass()->AddRvalueReference(span), containerScope, currentFunction, span, argumentMatch);
             if (!thatToBaseConversion)
             {
                 throw Exception("base class conversion not found", span, classType->GetSpan());
@@ -2291,7 +2302,8 @@ void GenerateDestructorImplementation(BoundClass* boundClass, DestructorSymbol* 
             }
             else
             {
-                FunctionSymbol* thisToHolderConversion = boundCompileUnit.GetConversion(thisParam->GetType(), vmtPtrHolderClass->AddPointer(span), containerScope, currentFunction, span);
+                ArgumentMatch argumentMatch;
+                FunctionSymbol* thisToHolderConversion = boundCompileUnit.GetConversion(thisParam->GetType(), vmtPtrHolderClass->AddPointer(span), containerScope, currentFunction, span, argumentMatch);
                 if (!thisToHolderConversion)
                 {
                     throw Exception("base class conversion not found", span, classType->GetSpan());
@@ -2328,7 +2340,8 @@ void GenerateDestructorImplementation(BoundClass* boundClass, DestructorSymbol* 
             baseDestructorCallLookups.push_back(FunctionScopeLookup(ScopeLookup::fileScopes, nullptr));
             std::vector<std::unique_ptr<BoundExpression>> baseDestructorCallArguments;
             ParameterSymbol* thisParam = destructorSymbol->Parameters()[0];
-            FunctionSymbol* thisToBaseConversion = boundCompileUnit.GetConversion(thisParam->GetType(), classType->BaseClass()->AddPointer(span), containerScope, currentFunction, span);
+            ArgumentMatch argumentMatch;
+            FunctionSymbol* thisToBaseConversion = boundCompileUnit.GetConversion(thisParam->GetType(), classType->BaseClass()->AddPointer(span), containerScope, currentFunction, span, argumentMatch);
             if (!thisToBaseConversion)
             {
                 throw Exception("base class conversion not found", span, classType->GetSpan());
@@ -2612,8 +2625,9 @@ void GenerateClassInitialization(ConstructorSymbol* constructorSymbol, Construct
             lookups.push_back(FunctionScopeLookup(ScopeLookup::this_, classType->BaseClass()->GetContainerScope()));
             lookups.push_back(FunctionScopeLookup(ScopeLookup::fileScopes, nullptr));
             std::vector<std::unique_ptr<BoundExpression>> arguments;
+            ArgumentMatch argumentMatch;
             FunctionSymbol* thisToBaseConversion = boundCompileUnit.GetConversion(thisParam->GetType(), classType->BaseClass()->AddPointer(constructorNode->GetSpan()), containerScope, boundFunction,
-                constructorNode->GetSpan());
+                constructorNode->GetSpan(), argumentMatch);
             if (!thisToBaseConversion)
             {
                 throw Exception("base class conversion not found", constructorNode->GetSpan(), classType->GetSpan());
@@ -2637,8 +2651,9 @@ void GenerateClassInitialization(ConstructorSymbol* constructorSymbol, Construct
             lookups.push_back(FunctionScopeLookup(ScopeLookup::this_, classType->BaseClass()->GetContainerScope()));
             lookups.push_back(FunctionScopeLookup(ScopeLookup::fileScopes, nullptr));
             std::vector<std::unique_ptr<BoundExpression>> arguments;
+            ArgumentMatch argumentMatch;
             FunctionSymbol* thisToBaseConversion = boundCompileUnit.GetConversion(thisParam->GetType(), classType->BaseClass()->AddPointer(constructorNode->GetSpan()), containerScope, boundFunction,
-                constructorNode->GetSpan());
+                constructorNode->GetSpan(), argumentMatch);
             if (!thisToBaseConversion)
             {
                 throw Exception("base class conversion not found", constructorNode->GetSpan(), classType->GetSpan());
@@ -2649,8 +2664,9 @@ void GenerateClassInitialization(ConstructorSymbol* constructorSymbol, Construct
             if (copyConstructor)
             {
                 ParameterSymbol* thatParam = constructorSymbol->Parameters()[1];
+                ArgumentMatch argumentMatch;
                 FunctionSymbol* thatToBaseConversion = boundCompileUnit.GetConversion(thatParam->GetType(), 
-                    classType->BaseClass()->AddConst(constructorNode->GetSpan())->AddLvalueReference(constructorNode->GetSpan()), containerScope, boundFunction, constructorNode->GetSpan());
+                    classType->BaseClass()->AddConst(constructorNode->GetSpan())->AddLvalueReference(constructorNode->GetSpan()), containerScope, boundFunction, constructorNode->GetSpan(), argumentMatch);
                 if (!thatToBaseConversion)
                 {
                     throw Exception("base class conversion not found", constructorNode->GetSpan(), classType->GetSpan());
@@ -2672,8 +2688,9 @@ void GenerateClassInitialization(ConstructorSymbol* constructorSymbol, Construct
             }
             else
             {
+                ArgumentMatch argumentMatch;
                 FunctionSymbol* thisToHolderConversion = boundCompileUnit.GetConversion(thisParam->GetType(), vmtPtrHolderClass->AddPointer(constructorNode->GetSpan()), containerScope, boundFunction,
-                    constructorNode->GetSpan());
+                    constructorNode->GetSpan(), argumentMatch);
                 if (!thisToHolderConversion)
                 {
                     throw Exception("base class conversion not found", constructorNode->GetSpan(), classType->GetSpan());
@@ -2818,8 +2835,9 @@ void GenerateClassAssignment(MemberFunctionSymbol* assignmentFunctionSymbol, Mem
                 lookups.push_back(FunctionScopeLookup(ScopeLookup::this_, classType->BaseClass()->GetContainerScope()));
                 lookups.push_back(FunctionScopeLookup(ScopeLookup::fileScopes, nullptr));
                 std::vector<std::unique_ptr<BoundExpression>> arguments;
+                ArgumentMatch argumentMatch;
                 FunctionSymbol* thisToBaseConversion = boundCompileUnit.GetConversion(thisParam->GetType(), classType->BaseClass()->AddPointer(assignmentNode->GetSpan()), containerScope, boundFunction,
-                    assignmentNode->GetSpan());
+                    assignmentNode->GetSpan(), argumentMatch);
                 if (!thisToBaseConversion)
                 {
                     throw Exception("base class conversion not found", assignmentNode->GetSpan(), classType->GetSpan());
@@ -2828,7 +2846,7 @@ void GenerateClassAssignment(MemberFunctionSymbol* assignmentFunctionSymbol, Mem
                 arguments.push_back(std::unique_ptr<BoundExpression>(baseClassPointerConversion));
                 ParameterSymbol* thatParam = assignmentFunctionSymbol->Parameters()[1];
                 FunctionSymbol* thatToBaseConversion = boundCompileUnit.GetConversion(thatParam->GetType(),
-                    classType->BaseClass()->AddConst(assignmentNode->GetSpan())->AddLvalueReference(assignmentNode->GetSpan()), containerScope, boundFunction, assignmentNode->GetSpan());
+                    classType->BaseClass()->AddConst(assignmentNode->GetSpan())->AddLvalueReference(assignmentNode->GetSpan()), containerScope, boundFunction, assignmentNode->GetSpan(), argumentMatch);
                 if (!thatToBaseConversion)
                 {
                     throw Exception("base class conversion not found", assignmentNode->GetSpan(), classType->GetSpan());
@@ -2874,8 +2892,9 @@ void GenerateClassAssignment(MemberFunctionSymbol* assignmentFunctionSymbol, Mem
                 lookups.push_back(FunctionScopeLookup(ScopeLookup::this_, classType->BaseClass()->GetContainerScope()));
                 lookups.push_back(FunctionScopeLookup(ScopeLookup::fileScopes, nullptr));
                 std::vector<std::unique_ptr<BoundExpression>> arguments;
+                ArgumentMatch argumentMatch;
                 FunctionSymbol* thisToBaseConversion = boundCompileUnit.GetConversion(thisParam->GetType(), classType->BaseClass()->AddPointer(assignmentNode->GetSpan()), containerScope, 
-                    boundFunction, assignmentNode->GetSpan());
+                    boundFunction, assignmentNode->GetSpan(), argumentMatch);
                 if (!thisToBaseConversion)
                 {
                     throw Exception("base class conversion not found", assignmentNode->GetSpan(), classType->GetSpan());
@@ -2884,7 +2903,7 @@ void GenerateClassAssignment(MemberFunctionSymbol* assignmentFunctionSymbol, Mem
                 arguments.push_back(std::unique_ptr<BoundExpression>(baseClassPointerConversion));
                 ParameterSymbol* thatParam = assignmentFunctionSymbol->Parameters()[1];
                 FunctionSymbol* thatToBaseConversion = boundCompileUnit.GetConversion(thatParam->GetType(),
-                    classType->BaseClass()->AddRvalueReference(assignmentNode->GetSpan()), containerScope, boundFunction, assignmentNode->GetSpan());
+                    classType->BaseClass()->AddRvalueReference(assignmentNode->GetSpan()), containerScope, boundFunction, assignmentNode->GetSpan(), argumentMatch);
                 if (!thatToBaseConversion)
                 {
                     throw Exception("base class conversion not found", assignmentNode->GetSpan(), classType->GetSpan());
@@ -2951,8 +2970,9 @@ void GenerateClassTermination(DestructorSymbol* destructorSymbol, DestructorNode
             }
             else
             {
+                ArgumentMatch argumentMatch;
                 FunctionSymbol* thisToHolderConversion = boundCompileUnit.GetConversion(thisParam->GetType(), vmtPtrHolderClass->AddPointer(destructorNode->GetSpan()), containerScope, boundFunction,
-                    destructorNode->GetSpan());
+                    destructorNode->GetSpan(), argumentMatch);
                 if (!thisToHolderConversion)
                 {
                     throw Exception("base class conversion not found", destructorNode->GetSpan(), classType->GetSpan());
@@ -2988,8 +3008,9 @@ void GenerateClassTermination(DestructorSymbol* destructorSymbol, DestructorNode
             baseDestructorCallLookups.push_back(FunctionScopeLookup(ScopeLookup::this_, classType->BaseClass()->GetContainerScope()));
             baseDestructorCallLookups.push_back(FunctionScopeLookup(ScopeLookup::fileScopes, nullptr));
             std::vector<std::unique_ptr<BoundExpression>> baseDestructorCallArguments;
+            ArgumentMatch argumentMatch;
             FunctionSymbol* thisToBaseConversion = boundCompileUnit.GetConversion(thisParam->GetType(), classType->BaseClass()->AddPointer(destructorNode->GetSpan()), containerScope, boundFunction,
-                destructorNode->GetSpan());
+                destructorNode->GetSpan(), argumentMatch);
             if (!thisToBaseConversion)
             {
                 throw Exception("base class conversion not found", destructorNode->GetSpan(), classType->GetSpan());

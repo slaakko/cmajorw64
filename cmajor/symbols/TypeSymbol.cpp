@@ -18,13 +18,13 @@ void TypeSymbol::Write(SymbolWriter& writer)
 {
     ContainerSymbol::Write(writer);
     Assert(typeId != 0, "type id not initialized");
-    writer.GetBinaryWriter().WriteEncodedUInt(typeId);
+    writer.GetBinaryWriter().Write(typeId);
 }
 
 void TypeSymbol::Read(SymbolReader& reader)
 {
     ContainerSymbol::Read(reader);
-    typeId = reader.GetBinaryReader().ReadEncodedUInt();
+    typeId = reader.GetBinaryReader().ReadUInt();
     GetSymbolTable()->AddTypeOrConceptSymbolToTypeIdMap(this);
 }
 
@@ -67,6 +67,13 @@ TypeSymbol* TypeSymbol::RemoveDerivations(const TypeDerivationRec& sourceDerivat
     if (HasArrayDerivation(sourceDerivationRec.derivations)) return nullptr;
     if (HasPointerDerivation(sourceDerivationRec.derivations)) return nullptr;
     return this;
+}
+
+bool TypeSymbol::IsRecursive(TypeSymbol* type, std::unordered_set<TypeSymbol*>& tested) 
+{ 
+    if (tested.find(this) != tested.cend()) return type == this;
+    tested.insert(this);
+    return TypesEqual(type, this); 
 }
 
 bool CompareTypesForEquality(const TypeSymbol* left, const TypeSymbol* right)

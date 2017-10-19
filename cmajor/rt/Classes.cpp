@@ -91,15 +91,15 @@ void ReadClasses(const std::string& classFilePath, std::vector<std::unique_ptr<C
     uint32_t n = reader.ReadEncodedUInt();
     for (uint32_t i = 0; i < n; ++i)
     {
-        uint32_t typeId = reader.ReadEncodedUInt();
+        uint32_t typeId = reader.ReadUInt();
         std::string vmtObjectName = reader.ReadUtf8String();
-        uint32_t baseTypeId = reader.ReadEncodedUInt();
+        uint32_t baseTypeId = reader.ReadUInt();
         classInfos.push_back(std::unique_ptr<ClassInfo>(new ClassInfo(typeId, vmtObjectName, baseTypeId)));
     }
     uint32_t ns = reader.ReadEncodedUInt();
     for (uint32_t i = 0; i < ns; ++i)
     {
-        uint32_t typeId = reader.ReadEncodedUInt();
+        uint32_t typeId = reader.ReadUInt();
         staticClassIds.push_back(typeId);
     }
 }

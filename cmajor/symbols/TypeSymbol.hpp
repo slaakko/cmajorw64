@@ -58,6 +58,7 @@ public:
     virtual const TypeDerivationRec& DerivationRec() const;
     virtual TypeSymbol* RemoveDerivations(const TypeDerivationRec& sourceDerivationRec, const Span& span);
     virtual TypeSymbol* Unify(TypeSymbol* that, const Span& span) { return nullptr; }
+    virtual bool IsRecursive(TypeSymbol* type, std::unordered_set<TypeSymbol*>& tested);
 private:
     uint32_t typeId;
 };

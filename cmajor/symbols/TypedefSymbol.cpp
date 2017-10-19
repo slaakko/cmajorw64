@@ -23,13 +23,13 @@ TypedefSymbol::TypedefSymbol(const Span& span_, const std::u32string& name_) : S
 void TypedefSymbol::Write(SymbolWriter& writer)
 {
     Symbol::Write(writer);
-    writer.GetBinaryWriter().WriteEncodedUInt(type->TypeId());
+    writer.GetBinaryWriter().Write(type->TypeId());
 }
 
 void TypedefSymbol::Read(SymbolReader& reader)
 {
     Symbol::Read(reader);
-    uint32_t typeId = reader.GetBinaryReader().ReadEncodedUInt();
+    uint32_t typeId = reader.GetBinaryReader().ReadUInt();
     GetSymbolTable()->EmplaceTypeRequest(this, typeId, 0);
 }
 

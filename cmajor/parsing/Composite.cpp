@@ -38,7 +38,7 @@ void OptionalParser::Accept(Visitor& visitor)
     visitor.EndVisit(*this);
 }
 
-PositiveParser::PositiveParser(Parser* child_): UnaryParser(U"positive", child_, child_->Info()) 
+PositiveParser::PositiveParser(Parser* child_): UnaryParser(U"positive", child_, child_->Info() + U"+")
 {
 }
 
@@ -73,7 +73,7 @@ void PositiveParser::Accept(Visitor& visitor)
     visitor.EndVisit(*this);
 }
 
-KleeneStarParser::KleeneStarParser(Parser* child_): UnaryParser(U"kleene", child_, child_->Info()) 
+KleeneStarParser::KleeneStarParser(Parser* child_): UnaryParser(U"kleene", child_, child_->Info() + U"*")
 {
 }
 
@@ -113,7 +113,7 @@ void KleeneStarParser::Accept(Visitor& visitor)
     visitor.EndVisit(*this);
 }
 
-ExpectationParser::ExpectationParser(Parser* child_): UnaryParser(U"expectation", child_, child_->Info()) 
+ExpectationParser::ExpectationParser(Parser* child_): UnaryParser(U"expectation", child_, child_->Info() + U"!") 
 {
 }
 
@@ -291,7 +291,7 @@ void ExclusiveOrParser::Accept(Visitor& visitor)
     visitor.EndVisit(*this);
 }
 
-IntersectionParser::IntersectionParser(Parser* left_, Parser* right_): BinaryParser(U"intersection", left_, right_, left_->Info() + U" ^ " + right_->Info()) 
+IntersectionParser::IntersectionParser(Parser* left_, Parser* right_): BinaryParser(U"intersection", left_, right_, left_->Info() + U" & " + right_->Info()) 
 {
 }
 

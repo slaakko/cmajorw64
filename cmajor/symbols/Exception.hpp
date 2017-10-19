@@ -64,6 +64,14 @@ public:
     CannotAssignToConstOverloadException(const std::string& message_, const Span& defined_, const std::vector<Span>& references_);
 };
 
+class NoViableFunctionException : public Exception
+{
+public:
+    NoViableFunctionException(const std::string& message_, const Span& defined_);
+    NoViableFunctionException(const std::string& message_, const Span& defined_, const Span& referenced_);
+    NoViableFunctionException(const std::string& message_, const Span& defined_, const std::vector<Span>& references_);
+};
+
 } } // namespace cmajor::symbols
 
 #endif // CMAJOR_SYMBOLS_EXCEPTION_INCLUDED

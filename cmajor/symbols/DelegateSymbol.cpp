@@ -25,7 +25,7 @@ void DelegateTypeSymbol::Write(SymbolWriter& writer)
 {
     TypeSymbol::Write(writer);
     uint32_t returnTypeId = returnType->TypeId();
-    writer.GetBinaryWriter().WriteEncodedUInt(returnTypeId);
+    writer.GetBinaryWriter().Write(returnTypeId);
     bool hasReturnParam = returnParam != nullptr;
     writer.GetBinaryWriter().Write(hasReturnParam);
     if (hasReturnParam)
@@ -37,7 +37,7 @@ void DelegateTypeSymbol::Write(SymbolWriter& writer)
 void DelegateTypeSymbol::Read(SymbolReader& reader)
 {
     TypeSymbol::Read(reader);
-    uint32_t returnTypeId = reader.GetBinaryReader().ReadEncodedUInt();
+    uint32_t returnTypeId = reader.GetBinaryReader().ReadUInt();
     GetSymbolTable()->EmplaceTypeRequest(this, returnTypeId, 0);
     bool hasReturnParam = reader.GetBinaryReader().ReadBool();
     if (hasReturnParam)
@@ -352,13 +352,13 @@ DelegateTypeDefaultConstructor::DelegateTypeDefaultConstructor(DelegateTypeSymbo
 void DelegateTypeDefaultConstructor::Write(SymbolWriter& writer)
 {
     FunctionSymbol::Write(writer);
-    writer.GetBinaryWriter().WriteEncodedUInt(delegateType->TypeId());
+    writer.GetBinaryWriter().Write(delegateType->TypeId());
 }
 
 void DelegateTypeDefaultConstructor::Read(SymbolReader& reader)
 {
     FunctionSymbol::Read(reader);
-    uint32_t typeId = reader.GetBinaryReader().ReadEncodedUInt();
+    uint32_t typeId = reader.GetBinaryReader().ReadUInt();
     GetSymbolTable()->EmplaceTypeRequest(this, typeId, 1);
 }
 
@@ -557,13 +557,13 @@ void ClassDelegateTypeSymbol::Write(SymbolWriter& writer)
 {
     TypeSymbol::Write(writer);
     uint32_t returnTypeId = returnType->TypeId();
-    writer.GetBinaryWriter().WriteEncodedUInt(returnTypeId);
+    writer.GetBinaryWriter().Write(returnTypeId);
 }
 
 void ClassDelegateTypeSymbol::Read(SymbolReader& reader)
 {
     TypeSymbol::Read(reader);
-    uint32_t returnTypeId = reader.GetBinaryReader().ReadEncodedUInt();
+    uint32_t returnTypeId = reader.GetBinaryReader().ReadUInt();
     GetSymbolTable()->EmplaceTypeRequest(this, returnTypeId, -1);
 }
 
@@ -801,13 +801,13 @@ ClassDelegateTypeDefaultConstructor::ClassDelegateTypeDefaultConstructor(ClassDe
 void ClassDelegateTypeDefaultConstructor::Write(SymbolWriter& writer)
 {
     FunctionSymbol::Write(writer);
-    writer.GetBinaryWriter().WriteEncodedUInt(classDelegateType->TypeId());
+    writer.GetBinaryWriter().Write(classDelegateType->TypeId());
 }
 
 void ClassDelegateTypeDefaultConstructor::Read(SymbolReader& reader)
 {
     FunctionSymbol::Read(reader);
-    uint32_t typeId = reader.GetBinaryReader().ReadEncodedUInt();
+    uint32_t typeId = reader.GetBinaryReader().ReadUInt();
     GetSymbolTable()->EmplaceTypeRequest(this, typeId, 1);
 }
 

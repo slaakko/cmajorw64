@@ -24,6 +24,7 @@ enum class GlobalFlags : uint16_t
     linkUsingMsLink = 1 << 8,
     ide = 1 << 9,
     strictNothrow = 1 << 10,
+    time = 1 << 11
 };
 
 void SetGlobalFlag(GlobalFlags flag);

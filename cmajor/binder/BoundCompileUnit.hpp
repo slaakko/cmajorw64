@@ -21,6 +21,7 @@ namespace cmajor { namespace binder {
 using namespace cmajor::symbols;
 
 class BoundExpression;
+struct ArgumentMatch;
 
 class BoundCompileUnit : public BoundNode
 {
@@ -39,7 +40,7 @@ public:
     const std::vector<std::unique_ptr<FileScope>>& FileScopes() const { return fileScopes; }
     void AddBoundNode(std::unique_ptr<BoundNode>&& boundNode);
     const std::vector<std::unique_ptr<BoundNode>>& BoundNodes() const { return boundNodes; }
-    FunctionSymbol* GetConversion(TypeSymbol* sourceType, TypeSymbol* targetType, ContainerScope* containerScope, BoundFunction* currentFunction, const Span& span);
+    FunctionSymbol* GetConversion(TypeSymbol* sourceType, TypeSymbol* targetType, ContainerScope* containerScope, BoundFunction* currentFunction, const Span& span, ArgumentMatch& argumentMatch);
     void CollectViableFunctions(const std::u32string& groupName, ContainerScope* containerScope, std::vector<std::unique_ptr<BoundExpression>>& arguments, BoundFunction* currentFunction,
         std::unordered_set<FunctionSymbol*>& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span);
     FunctionSymbol* InstantiateFunctionTemplate(FunctionSymbol* functionTemplate, const std::unordered_map<TemplateParameterSymbol*, TypeSymbol*>& templateParameterMapping, const Span& span);
