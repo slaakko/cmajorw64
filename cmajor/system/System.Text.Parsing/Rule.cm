@@ -13,6 +13,9 @@ namespace System.Text.Parsing
         public nothrow AttrOrVar(const ustring& type_, const ustring& name_) : type(type_), name(name_)
         {
         }
+        public ~AttrOrVar()
+        {
+        }
         public inline nothrow const ustring& Type() const
         {
             return type;

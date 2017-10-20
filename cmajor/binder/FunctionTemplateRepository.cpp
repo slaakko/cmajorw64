@@ -70,6 +70,7 @@ FunctionSymbol* FunctionTemplateRepository::Instantiate(FunctionSymbol* function
         Assert(node, "function node not read");
     }
     Assert(node->GetNodeType() == NodeType::functionNode, "function node expected");
+    instantiated.insert(functionTemplate);
     FunctionNode* functionNode = static_cast<FunctionNode*>(node);
     std::unique_ptr<NamespaceNode> globalNs(new NamespaceNode(span, new IdentifierNode(span, U"")));
     NamespaceNode* currentNs = globalNs.get();
@@ -131,6 +132,7 @@ FunctionSymbol* FunctionTemplateRepository::Instantiate(FunctionSymbol* function
     {
         boundCompileUnit.RemoveLastFileScope();
     }
+    functionSymbol->SetGlobalNs(std::move(globalNs));
     return functionSymbol;
 }
 

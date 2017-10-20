@@ -1179,7 +1179,7 @@ std::unique_ptr<BoundFunctionCall> SelectViableFunction(const std::unordered_set
                     boundCompileUnit.InstantiateClassTemplateMemberFunction(bestFun, containerScope, boundFunction, span);
                 }
             }
-            else if (GetGlobalFlag(GlobalFlags::release) && bestFun->IsInline())
+            else if (!bestFun->IsGeneratedFunction() && GetGlobalFlag(GlobalFlags::release) && bestFun->IsInline())
             {
                 if (instantiate)
                 {
@@ -1249,7 +1249,7 @@ std::unique_ptr<BoundFunctionCall> SelectViableFunction(const std::unordered_set
                 boundCompileUnit.InstantiateClassTemplateMemberFunction(singleBest, containerScope, boundFunction, span);
             }
         }
-        else if (GetGlobalFlag(GlobalFlags::release) && singleBest->IsInline())
+        else if (!singleBest->IsGeneratedFunction() && GetGlobalFlag(GlobalFlags::release) && singleBest->IsInline())
         {
             if (instantiate)
             {

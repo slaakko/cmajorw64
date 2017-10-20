@@ -185,7 +185,9 @@ namespace System
 {
     public class Endl
     {
-        public default inline nothrow Endl();
+        public inline nothrow Endl()
+        {
+        }
     }
 
     public inline nothrow Endl endl()

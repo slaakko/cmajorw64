@@ -17,6 +17,7 @@ class InlineFunctionRepository
 {
 public:
     InlineFunctionRepository(BoundCompileUnit& boundCompileUnit_);
+    ~InlineFunctionRepository();
     void Instantiate(FunctionSymbol* inlineFunction, ContainerScope* containerScope, const Span& span);
 private:
     BoundCompileUnit& boundCompileUnit;

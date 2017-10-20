@@ -21,6 +21,7 @@ public:
     bool IsExportSymbol() const override { return false; }
     std::string TypeString() const override { return "function_group"; }
     void AddFunction(FunctionSymbol* function);
+    void RemoveFunction(FunctionSymbol* function);
     void CollectViableFunctions(int arity, std::unordered_set<FunctionSymbol*>& viableFunctions);
 private:
     std::unordered_map<int, std::vector<FunctionSymbol*>> arityFunctionListMap;
@@ -171,6 +172,10 @@ public:
     void SetVmtIndex(int32_t vmtIndex_) { vmtIndex = vmtIndex_; }
     int32_t ImtIndex() const { return imtIndex; }
     void SetImtIndex(int32_t imtIndex_) { imtIndex = imtIndex_; }
+    void SetGlobalNs(std::unique_ptr<Node>&& globalNs_);
+    Node* GlobalNs() { return globalNs.get(); }
+    FunctionGroupSymbol* FunctionGroup() { return functionGroup; }
+    void SetFunctionGroup(FunctionGroupSymbol* functionGroup_) { functionGroup = functionGroup_; }
 private:
     uint32_t functionId;
     std::u32string groupName;
@@ -190,6 +195,8 @@ private:
     uint32_t sizeOfAstNodes;
     uint32_t astNodesPos;
     std::string filePathReadFrom;
+    std::unique_ptr<Node> globalNs;
+    FunctionGroupSymbol* functionGroup;
 };
 
 class StaticConstructorSymbol : public FunctionSymbol

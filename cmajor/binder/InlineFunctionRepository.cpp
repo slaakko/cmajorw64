@@ -22,6 +22,21 @@ InlineFunctionRepository::InlineFunctionRepository(BoundCompileUnit& boundCompil
 {
 }
 
+InlineFunctionRepository::~InlineFunctionRepository()
+{
+    for (FunctionSymbol* inlineFunctionSymbol : instantiatedInlineFunctions)
+    {
+        if (inlineFunctionSymbol->IsTemplateSpecialization())
+        {
+            FunctionGroupSymbol* functionGroup = inlineFunctionSymbol->FunctionGroup();
+            if (functionGroup)
+            {
+                functionGroup->RemoveFunction(inlineFunctionSymbol);
+            }
+        }
+    }
+}
+
 void InlineFunctionRepository::Instantiate(FunctionSymbol* inlineFunction, ContainerScope* containerScope, const Span& span)
 {
     if (inlineFunction->GetCompileUnit() == boundCompileUnit.GetCompileUnitNode()) return;
@@ -35,23 +50,32 @@ void InlineFunctionRepository::Instantiate(FunctionSymbol* inlineFunction, Conta
         node = inlineFunction->GetFunctionNode();
         Assert(node, "function node not read");
     }
-    Assert(node->GetNodeType() == NodeType::functionNode, "function node expected");
     FunctionNode* functionNode = static_cast<FunctionNode*>(node);
     std::unique_ptr<NamespaceNode> globalNs(new NamespaceNode(span, new IdentifierNode(span, U"")));
     NamespaceNode* currentNs = globalNs.get();
     CloneContext cloneContext;
     cloneContext.SetInstantiateFunctionNode();
-    int n = inlineFunction->UsingNodes().Count();
-    for (int i = 0; i < n; ++i)
-    {
-        Node* usingNode = inlineFunction->UsingNodes()[i];
-        globalNs->AddMember(usingNode->Clone(cloneContext));
-    }
     bool fileScopeAdded = false;
-    if (!inlineFunction->Ns()->IsGlobalNamespace())
+    int n = inlineFunction->UsingNodes().Count();
+    if (!inlineFunction->Ns()->IsGlobalNamespace() || n > 0)
     {
         FileScope* primaryFileScope = new FileScope();
-        primaryFileScope->AddContainerScope(inlineFunction->Ns()->GetContainerScope());
+        if (!inlineFunction->Ns()->IsGlobalNamespace())
+        {
+            primaryFileScope->AddContainerScope(inlineFunction->Ns()->GetContainerScope());
+        }
+        for (int i = 0; i < n; ++i)
+        {
+            Node* usingNode = inlineFunction->UsingNodes()[i];
+            if (usingNode->GetNodeType() == NodeType::namespaceImportNode)
+            {
+                primaryFileScope->InstallNamespaceImport(containerScope, static_cast<NamespaceImportNode*>(usingNode));
+            }
+            else if (usingNode->GetNodeType() == NodeType::aliasNode)
+            {
+                primaryFileScope->InstallAlias(containerScope, static_cast<AliasNode*>(usingNode));
+            }
+        }
         boundCompileUnit.AddFileScope(primaryFileScope);
         fileScopeAdded = true;
         std::u32string fullNsName = inlineFunction->Ns()->FullName();
@@ -85,7 +109,6 @@ void InlineFunctionRepository::Instantiate(FunctionSymbol* inlineFunction, Conta
         if (inlineFunction->GetSymbolType() == SymbolType::constructorSymbol)
         {
             ConstructorSymbol* constructorSymbol = static_cast<ConstructorSymbol*>(inlineFunction);
-            Node* node = symbolTable.GetNode(inlineFunction);
             Assert(node->GetNodeType() == NodeType::constructorNode, "constructor node expected");
             ConstructorNode* constructorNode = static_cast<ConstructorNode*>(node);
             statementBinder.SetCurrentConstructor(constructorSymbol, constructorNode);
@@ -93,7 +116,6 @@ void InlineFunctionRepository::Instantiate(FunctionSymbol* inlineFunction, Conta
         else if (inlineFunction->GetSymbolType() == SymbolType::memberFunctionSymbol)
         {
             MemberFunctionSymbol* memberFunctionSymbol = static_cast<MemberFunctionSymbol*>(inlineFunction);
-            Node* node = symbolTable.GetNode(inlineFunction);
             Assert(node->GetNodeType() == NodeType::memberFunctionNode, "member function node expected");
             MemberFunctionNode* memberFunctionNode = static_cast<MemberFunctionNode*>(node);
             statementBinder.SetCurrentMemberFunction(memberFunctionSymbol, memberFunctionNode);
@@ -118,6 +140,7 @@ void InlineFunctionRepository::Instantiate(FunctionSymbol* inlineFunction, Conta
     {
         boundCompileUnit.RemoveLastFileScope();
     }
+    inlineFunction->SetGlobalNs(std::move(globalNs));
 }
 
 } } // namespace cmajor::binder

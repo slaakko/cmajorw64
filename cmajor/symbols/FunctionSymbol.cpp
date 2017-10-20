@@ -94,6 +94,15 @@ void FunctionGroupSymbol::AddFunction(FunctionSymbol* function)
     int arity = function->Arity();
     std::vector<FunctionSymbol*>& functionList = arityFunctionListMap[arity];
     functionList.push_back(function);
+    function->SetFunctionGroup(this);
+}
+
+void FunctionGroupSymbol::RemoveFunction(FunctionSymbol* function)
+{
+    int arity = function->Arity();
+    std::vector<FunctionSymbol*>& functionList = arityFunctionListMap[arity];
+    auto end = std::remove(functionList.begin(), functionList.end(), function);
+    functionList.erase(end, functionList.end());
 }
 
 void FunctionGroupSymbol::CollectViableFunctions(int arity, std::unordered_set<FunctionSymbol*>& viableFunctions)
@@ -193,13 +202,13 @@ std::string FunctionSymbolFlagStr(FunctionSymbolFlags flags)
 
 FunctionSymbol::FunctionSymbol(const Span& span_, const std::u32string& name_) : 
     ContainerSymbol(SymbolType::functionSymbol, span_, name_), functionId(0), groupName(), parameters(), localVariables(), returnType(), flags(FunctionSymbolFlags::none), vmtIndex(-1), imtIndex(-1),
-    irType(nullptr), nextTemporaryIndex(0)
+    irType(nullptr), nextTemporaryIndex(0), functionGroup(nullptr)
 {
 }
 
 FunctionSymbol::FunctionSymbol(SymbolType symbolType_, const Span& span_, const std::u32string& name_) : 
     ContainerSymbol(symbolType_, span_, name_), functionId(0), groupName(), parameters(), localVariables(), returnType(), flags(FunctionSymbolFlags::none), vmtIndex(-1), imtIndex(-1),
-    irType(nullptr), nextTemporaryIndex(0), sizeOfAstNodes(0), astNodesPos(0)
+    irType(nullptr), nextTemporaryIndex(0), sizeOfAstNodes(0), astNodesPos(0), functionGroup(nullptr)
 {
 }
 
@@ -332,7 +341,6 @@ void FunctionSymbol::ReadAstNodes()
     reader.GetBinaryReader().Skip(astNodesPos);
     usingNodes.Read(reader);
     Node* node = reader.ReadNode();
-    Assert(node->GetNodeType() == NodeType::functionNode, "function node expected");
     FunctionNode* funNode = static_cast<FunctionNode*>(node);
     functionNode.reset(funNode);
     GetSymbolTable()->MapNode(funNode, this);
@@ -355,6 +363,11 @@ void FunctionSymbol::AddMember(Symbol* member)
     {
         parameters.push_back(static_cast<ParameterSymbol*>(member));
     }
+}
+
+void FunctionSymbol::SetGlobalNs(std::unique_ptr<Node>&& globalNs_)
+{
+    globalNs = std::move(globalNs_);
 }
 
 bool FunctionSymbol::IsExportSymbol() const
@@ -1117,6 +1130,10 @@ void ConstructorSymbol::SetSpecifiers(Specifiers specifiers)
     }
     if ((specifiers & Specifiers::suppress_) != Specifiers::none)
     {
+        if (IsInline())
+        {
+            throw Exception("suppressed member function cannot be inline", GetSpan());
+        }
         SetSuppressed();
     }
     if ((specifiers & Specifiers::default_) != Specifiers::none)
@@ -1124,6 +1141,10 @@ void ConstructorSymbol::SetSpecifiers(Specifiers specifiers)
         if (IsSuppressed())
         {
             throw Exception("constructor cannot be default and suppressed at the same time", GetSpan());
+        }
+        if (IsInline())
+        {
+            throw Exception("default member function cannot be inline", GetSpan());
         }
         SetDefault();
     }
@@ -1323,6 +1344,10 @@ void MemberFunctionSymbol::SetSpecifiers(Specifiers specifiers)
     }
     if ((specifiers & Specifiers::suppress_) != Specifiers::none)
     {
+        if (IsInline())
+        {
+            throw Exception("suppressed member function cannot be inline", GetSpan());
+        }
         if (GroupName() == U"operator=")
         {
             SetSuppressed();
@@ -1337,6 +1362,10 @@ void MemberFunctionSymbol::SetSpecifiers(Specifiers specifiers)
         if (IsSuppressed())
         {
             throw Exception("member function cannot be default and suppressed at the same time", GetSpan());
+        }
+        if (IsInline())
+        {
+            throw Exception("default member function cannot be inline", GetSpan());
         }
         if (GroupName() == U"operator=")
         {
