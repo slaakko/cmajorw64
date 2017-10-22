@@ -310,6 +310,22 @@ private:
     std::unique_ptr<BoundExpression> boundTemporary;
 };
 
+class BoundClassOrClassDelegateConversionResult : public BoundExpression
+{
+public:
+    BoundClassOrClassDelegateConversionResult(std::unique_ptr<BoundExpression>&& conversionResult_, std::unique_ptr<BoundFunctionCall>&& conversionFunctionCall_);
+    BoundExpression* Clone() override;
+    void Load(Emitter& emitter, OperationFlags flags) override;
+    void Store(Emitter& emitter, OperationFlags flags) override;
+    void Accept(BoundNodeVisitor& visitor) override;
+    bool HasValue() const override { return true; }
+    bool IsLvalueExpression() const override { return true; }
+    std::string TypeString() const override { return "class conversion result"; }
+private:
+    std::unique_ptr<BoundExpression> conversionResult;
+    std::unique_ptr<BoundFunctionCall> conversionFunctionCall;
+};
+
 class BoundConversion : public BoundExpression
 {
 public:

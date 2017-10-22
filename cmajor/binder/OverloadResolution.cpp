@@ -161,11 +161,9 @@ bool FindQualificationConversion(TypeSymbol* sourceType, TypeSymbol* targetType,
         ++functionMatch.numQualifyingConversions;
         return true;
     }
-    else if (!sourceType->IsReferenceType() && (targetType->IsReferenceType() || targetType->IsClassTypeSymbol() || 
-        argumentMatch.conversionFun && argumentMatch.conversionFun->GetSymbolType() == SymbolType::conversionFunctionSymbol))
+    else if (!sourceType->IsReferenceType() && (targetType->IsReferenceType() || targetType->IsClassTypeSymbol())) // conversion function logic removed!
     {
-        if (targetType->IsConstType() || targetType->IsClassTypeSymbol() || 
-            argumentMatch.conversionFun && argumentMatch.conversionFun->GetSymbolType() == SymbolType::conversionFunctionSymbol)
+        if (targetType->IsConstType() || targetType->IsClassTypeSymbol()) // conversion function logic removed!
         {
             argumentMatch.postReferenceConversionFlags = OperationFlags::addr;
             argumentMatch.conversionDistance = distance;
@@ -944,7 +942,7 @@ std::unique_ptr<BoundFunctionCall> CreateBoundFunctionCall(FunctionSymbol* bestF
                 TypeSymbol* conversionTargetType = conversionFun->ConversionTargetType();
                 LocalVariableSymbol* temporary = boundFunction->GetFunctionSymbol()->CreateTemporary(conversionTargetType, span);
                 constructorCall->AddArgument(std::unique_ptr<BoundExpression>(new BoundAddressOfExpression(std::unique_ptr<BoundExpression>(new BoundLocalVariable(temporary)),
-                    conversionFun->ConversionTargetType()->AddPointer(span))));
+                    conversionTargetType->AddPointer(span))));
                 if (conversionTargetType->IsClassTypeSymbol())
                 {
                     ClassTypeSymbol* classType = static_cast<ClassTypeSymbol*>(conversionTargetType);
@@ -960,9 +958,32 @@ std::unique_ptr<BoundFunctionCall> CreateBoundFunctionCall(FunctionSymbol* bestF
                     std::unique_ptr<BoundExpression>(new BoundLocalVariable(temporary)));
                 argument.reset(conversion);
             }
+            else if (conversionFun->GetSymbolType() == SymbolType::conversionFunctionSymbol && conversionFun->ReturnsClassOrClassDelegateByValue())
+            {
+                BoundFunctionCall* conversionFunctionCall = new BoundFunctionCall(span, conversionFun);
+                conversionFunctionCall->AddArgument(std::move(argument));
+                TypeSymbol* conversionTargetType = conversionFun->ConversionTargetType();
+                LocalVariableSymbol* temporary = boundFunction->GetFunctionSymbol()->CreateTemporary(conversionTargetType, span);
+                conversionFunctionCall->AddArgument(std::unique_ptr<BoundExpression>(new BoundAddressOfExpression(std::unique_ptr<BoundExpression>(new BoundLocalVariable(temporary)),
+                    conversionTargetType->AddPointer(span))));
+                BoundLocalVariable* conversionResult = new BoundLocalVariable(temporary);
+                if (conversionTargetType->IsClassTypeSymbol())
+                {
+                    ClassTypeSymbol* classType = static_cast<ClassTypeSymbol*>(conversionTargetType);
+                    if (classType->Destructor())
+                    {
+                        std::unique_ptr<BoundFunctionCall> destructorCall(new BoundFunctionCall(span, classType->Destructor()));
+                        destructorCall->AddArgument(std::unique_ptr<BoundExpression>(conversionResult->Clone()));
+                        boundFunction->AddTemporaryDestructorCall(std::move(destructorCall));
+                    }
+                }
+                BoundClassOrClassDelegateConversionResult* conversion = new BoundClassOrClassDelegateConversionResult(std::unique_ptr<BoundExpression>(conversionResult),
+                    std::unique_ptr<BoundFunctionCall>(conversionFunctionCall));
+                argument.reset(conversion);
+            }
             else
             {
-                BoundConversion* conversion = new BoundConversion(std::move(argument), argumentMatch.conversionFun);
+                BoundConversion* conversion = new BoundConversion(std::move(argument), conversionFun);
                 argument.reset(conversion);
             }
         }

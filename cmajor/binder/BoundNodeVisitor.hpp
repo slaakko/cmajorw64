@@ -52,6 +52,7 @@ class BoundClassDelegateCall;
 class BoundConversion;
 class BoundConstructExpression;
 class BoundConstructAndReturnTemporaryExpression;
+class BoundClassOrClassDelegateConversionResult;
 class BoundIsExpression;
 class BoundAsExpression;
 class BoundTypeNameExpression;
@@ -111,6 +112,7 @@ public:
     virtual void Visit(BoundConversion& boundConversion) {}
     virtual void Visit(BoundConstructExpression& boundConstructExpression) {}
     virtual void Visit(BoundConstructAndReturnTemporaryExpression& boundConstructAndReturnTemporaryExpression) {}
+    virtual void Visit(BoundClassOrClassDelegateConversionResult& boundClassOrClassDelegateConversionResult) {}
     virtual void Visit(BoundIsExpression& boundIsExpression) {}
     virtual void Visit(BoundAsExpression& boundAsExpression) {}
     virtual void Visit(BoundTypeNameExpression& boundTypeNameExpression) {}

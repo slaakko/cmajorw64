@@ -243,6 +243,7 @@ void StatementBinder::Visit(ClassNode& classNode)
     }
     containerScope = symbol->GetContainerScope();
     std::unique_ptr<BoundClass> boundClass(new BoundClass(classTypeSymbol));
+    BoundClass* prevClass = currentClass;
     currentClass = boundClass.get();
     int n = classNode.Members().Count();
     for (int i = 0; i < n; ++i)
@@ -264,6 +265,7 @@ void StatementBinder::Visit(ClassNode& classNode)
             GenerateDestructorImplementation(currentClass, destructorSymbol, boundCompileUnit, containerScope, currentFunction, classNode.GetSpan());
         }
     }
+    currentClass = prevClass;
     containerScope = prevContainerScope;
 }
 
@@ -467,15 +469,17 @@ void StatementBinder::Visit(ConversionFunctionNode& conversionFunctionNode)
     std::unique_ptr<BoundFunction> boundFunction(new BoundFunction(conversionFunctionSymbol));
     BoundFunction* prevFunction = currentFunction;
     currentFunction = boundFunction.get();
-    Assert(conversionFunctionNode.Body(), "body expected");
-    compoundLevel = 0;
-    conversionFunctionNode.Body()->Accept(*this);
-    BoundStatement* boundStatement = statement.release();
-    Assert(boundStatement->GetBoundNodeType() == BoundNodeType::boundCompoundStatement, "bound compound statement expected");
-    BoundCompoundStatement* compoundStatement = static_cast<BoundCompoundStatement*>(boundStatement);
-    boundFunction->SetBody(std::unique_ptr<BoundCompoundStatement>(compoundStatement));
-    CheckFunctionReturnPaths(conversionFunctionSymbol, conversionFunctionNode, containerScope, boundCompileUnit);
-    currentClass->AddMember(std::move(boundFunction));
+    if (conversionFunctionNode.Body())
+    {
+        compoundLevel = 0;
+        conversionFunctionNode.Body()->Accept(*this);
+        BoundStatement* boundStatement = statement.release();
+        Assert(boundStatement->GetBoundNodeType() == BoundNodeType::boundCompoundStatement, "bound compound statement expected");
+        BoundCompoundStatement* compoundStatement = static_cast<BoundCompoundStatement*>(boundStatement);
+        boundFunction->SetBody(std::unique_ptr<BoundCompoundStatement>(compoundStatement));
+        CheckFunctionReturnPaths(conversionFunctionSymbol, conversionFunctionNode, containerScope, boundCompileUnit);
+        currentClass->AddMember(std::move(boundFunction));
+    }
     currentFunction = prevFunction;
     containerScope = prevContainerScope;
 }

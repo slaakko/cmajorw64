@@ -23,6 +23,7 @@ namespace cmajor.parser
         Declaration : ProjectDeclaration*
             ::= ReferenceDeclaration{ value = ReferenceDeclaration; }
             |   SourceFileDeclaration{ value = SourceFileDeclaration; }
+            |   TextFileDeclaration{ value = TextFileDeclaration; }
             |   TargetDeclaration{ value = TargetDeclaration; }
             ;
 

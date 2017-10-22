@@ -164,6 +164,7 @@ public:
     void Visit(BoundConversion& boundConversion) override;
     void Visit(BoundConstructExpression& boundConstructExpression) override;
     void Visit(BoundConstructAndReturnTemporaryExpression& boundConstructAndReturnTemporaryExpression) override;
+    void Visit(BoundClassOrClassDelegateConversionResult& boundClassOrClassDelegateConversionResult) override;
     void Visit(BoundIsExpression& boundIsExpression) override;
     void Visit(BoundAsExpression& boundAsExpression) override;
     void Visit(BoundTypeNameExpression& boundTypeNameExpression) override;
@@ -1382,6 +1383,12 @@ void Emitter::Visit(BoundConstructExpression& boundConstructExpression)
 void Emitter::Visit(BoundConstructAndReturnTemporaryExpression& boundConstructAndReturnTemporaryExpression)
 {
     boundConstructAndReturnTemporaryExpression.Load(*this, OperationFlags::none);
+    GenJumpingBoolCode();
+}
+
+void Emitter::Visit(BoundClassOrClassDelegateConversionResult& boundClassOrClassDelegateConversionResult)
+{
+    boundClassOrClassDelegateConversionResult.Load(*this, OperationFlags::none);
     GenJumpingBoolCode();
 }
 

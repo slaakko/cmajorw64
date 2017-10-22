@@ -230,6 +230,10 @@ void BoundCompileUnit::AddBoundNode(std::unique_ptr<BoundNode>&& boundNode)
 FunctionSymbol* BoundCompileUnit::GetConversion(TypeSymbol* sourceType, TypeSymbol* targetType, ContainerScope* containerScope, BoundFunction* currentFunction, const Span& span, ArgumentMatch& argumentMatch)
 {
     FunctionSymbol* conversion = symbolTable.GetConversion(sourceType, targetType, span);
+    if (conversion && conversion->GetSymbolType() == SymbolType::conversionFunctionSymbol)
+    {
+        argumentMatch.preReferenceConversionFlags = OperationFlags::addr;
+    }
     if (!conversion)
     {
         conversion = conversionTable.GetConversion(sourceType, targetType, span);

@@ -21,6 +21,7 @@ enum class BoundNodeType : uint8_t
     boundGotoStatement, boundConstructionStatement, boundAssignmentStatement, boundExpressionStatement, boundEmptyStatement, boundSetVmtPtrStatement, 
     boundThrowStatement, boundRethrowStatement, boundTryStatement, boundCatchStatement,
     boundParameter, boundLocalVariable, boundMemberVariable, boundConstant, boundEnumConstant, boundLiteral, boundTemporary, boundBitCast, boundFunctionPtr, boundConstructAndReturnTemporary,
+    boundClassOrClassDelegateConversionResult,
     boundFunctionCall, boundDelegateCall, boundClassDelegateCall, boundConversion, boundSizeOfExpression, boundAddressOfExpression, boundDereferenceExpression, boundReferenceToPointerExpression, 
     boundConstructExpression, boundIsExpression, boundAsExpression, boundTypeNameExpression, boundDisjunction, boundConjunction,
     boundAtomicConstraint, boundDisjunctiveConstraint, boundConjunctiveConstraint, boundConcept,

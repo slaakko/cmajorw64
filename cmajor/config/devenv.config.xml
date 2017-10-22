@@ -7,8 +7,8 @@
     <formSizeY>950</formSizeY>
     <formTop>0</formTop>
     <formLeft>0</formLeft>
-    <textVisX>78</textVisX>
-    <textVisY>78</textVisY>
+    <textVisX>104</textVisX>
+    <textVisY>104</textVisY>
     <textVisW>1259</textVisW>
     <textVisH>482</textVisH>
     <toolColWidth>80</toolColWidth>
@@ -33,6 +33,10 @@
         </recentProject>
         <recentProject>
             <path>C:\Users\Seppo\cmajorw64\cmajor\test\foo\foo.cms</path>
+            <openFiles />
+        </recentProject>
+        <recentProject>
+            <path>C:\Users\Seppo\cmajorw64\cmajor\cmparsergen\cmparsergen.cms</path>
             <openFiles />
         </recentProject>
     </recentProjects>

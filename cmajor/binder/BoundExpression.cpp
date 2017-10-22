@@ -1058,6 +1058,34 @@ void BoundConstructAndReturnTemporaryExpression::Accept(BoundNodeVisitor& visito
     visitor.Visit(*this);
 }
 
+BoundClassOrClassDelegateConversionResult::BoundClassOrClassDelegateConversionResult(std::unique_ptr<BoundExpression>&& conversionResult_, std::unique_ptr<BoundFunctionCall>&& conversionFunctionCall_) :
+    BoundExpression(conversionResult_->GetSpan(), BoundNodeType::boundClassOrClassDelegateConversionResult, conversionResult_->GetType()),
+    conversionResult(std::move(conversionResult_)), conversionFunctionCall(std::move(conversionFunctionCall_))
+{
+}
+
+BoundExpression* BoundClassOrClassDelegateConversionResult::Clone()
+{
+    return new BoundClassOrClassDelegateConversionResult(std::unique_ptr<BoundExpression>(conversionResult->Clone()),
+        std::unique_ptr<BoundFunctionCall>(static_cast<BoundFunctionCall*>(conversionFunctionCall->Clone())));
+}
+
+void BoundClassOrClassDelegateConversionResult::Load(Emitter& emitter, OperationFlags flags)
+{
+    conversionFunctionCall->Load(emitter, OperationFlags::none);
+    conversionResult->Load(emitter, flags);
+}
+
+void BoundClassOrClassDelegateConversionResult::Store(Emitter& emitter, OperationFlags flags)
+{
+    throw Exception("cannot store to class conversion result", GetSpan());
+}
+
+void BoundClassOrClassDelegateConversionResult::Accept(BoundNodeVisitor& visitor)
+{
+    visitor.Visit(*this);
+}
+
 BoundConversion::BoundConversion(std::unique_ptr<BoundExpression>&& sourceExpr_, FunctionSymbol* conversionFun_) :
     BoundExpression(sourceExpr_->GetSpan(), BoundNodeType::boundConversion, conversionFun_->ConversionTargetType()), sourceExpr(std::move(sourceExpr_)), conversionFun(conversionFun_)
 {

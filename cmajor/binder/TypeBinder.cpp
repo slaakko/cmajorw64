@@ -540,10 +540,12 @@ void TypeBinder::Visit(ConversionFunctionNode& conversionFunctionNode)
     {
         throw Exception("static class cannot contain conversion functions", conversionFunctionSymbol->GetSpan(), parent->GetSpan());
     }
+    bool requireBody = true;
     if (parent->GetSymbolType() == SymbolType::classTemplateSpecializationSymbol)
     {
         conversionFunctionSymbol->SetTemplateSpecialization();
         conversionFunctionSymbol->SetLinkOnceOdrLinkage();
+        requireBody = false;
     }
     TypeSymbol* returnType = ResolveType(conversionFunctionNode.ReturnTypeExpr(), boundCompileUnit, containerScope);
     conversionFunctionSymbol->SetReturnType(returnType);
@@ -567,7 +569,10 @@ void TypeBinder::Visit(ConversionFunctionNode& conversionFunctionNode)
     }
     else
     {
-        throw Exception("conversion function has no body", conversionFunctionSymbol->GetSpan());
+        if (requireBody)
+        {
+            throw Exception("conversion function has no body", conversionFunctionSymbol->GetSpan());
+        }
     }
     containerScope = prevContainerScope;
     currentFunctionSymbol = prevFunctionSymbol;

@@ -181,10 +181,14 @@ public:
         a1ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<DeclarationRule>(this, &DeclarationRule::A1Action));
         cmajor::parsing::ActionParser* a2ActionParser = GetAction(ToUtf32("A2"));
         a2ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<DeclarationRule>(this, &DeclarationRule::A2Action));
+        cmajor::parsing::ActionParser* a3ActionParser = GetAction(ToUtf32("A3"));
+        a3ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<DeclarationRule>(this, &DeclarationRule::A3Action));
         cmajor::parsing::NonterminalParser* referenceDeclarationNonterminalParser = GetNonterminal(ToUtf32("ReferenceDeclaration"));
         referenceDeclarationNonterminalParser->SetPostCall(new cmajor::parsing::MemberPostCall<DeclarationRule>(this, &DeclarationRule::PostReferenceDeclaration));
         cmajor::parsing::NonterminalParser* sourceFileDeclarationNonterminalParser = GetNonterminal(ToUtf32("SourceFileDeclaration"));
         sourceFileDeclarationNonterminalParser->SetPostCall(new cmajor::parsing::MemberPostCall<DeclarationRule>(this, &DeclarationRule::PostSourceFileDeclaration));
+        cmajor::parsing::NonterminalParser* textFileDeclarationNonterminalParser = GetNonterminal(ToUtf32("TextFileDeclaration"));
+        textFileDeclarationNonterminalParser->SetPostCall(new cmajor::parsing::MemberPostCall<DeclarationRule>(this, &DeclarationRule::PostTextFileDeclaration));
         cmajor::parsing::NonterminalParser* targetDeclarationNonterminalParser = GetNonterminal(ToUtf32("TargetDeclaration"));
         targetDeclarationNonterminalParser->SetPostCall(new cmajor::parsing::MemberPostCall<DeclarationRule>(this, &DeclarationRule::PostTargetDeclaration));
     }
@@ -199,6 +203,11 @@ public:
         context->value = context->fromSourceFileDeclaration;
     }
     void A2Action(const char32_t* matchBegin, const char32_t* matchEnd, const Span& span, const std::string& fileName, ParsingData* parsingData, bool& pass)
+    {
+        Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
+        context->value = context->fromTextFileDeclaration;
+    }
+    void A3Action(const char32_t* matchBegin, const char32_t* matchEnd, const Span& span, const std::string& fileName, ParsingData* parsingData, bool& pass)
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
         context->value = context->fromTargetDeclaration;
@@ -223,6 +232,16 @@ public:
             stack.pop();
         }
     }
+    void PostTextFileDeclaration(cmajor::parsing::ObjectStack& stack, ParsingData* parsingData, bool matched)
+    {
+        Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
+        if (matched)
+        {
+            std::unique_ptr<cmajor::parsing::Object> fromTextFileDeclaration_value = std::move(stack.top());
+            context->fromTextFileDeclaration = *static_cast<cmajor::parsing::ValueObject<ProjectDeclaration*>*>(fromTextFileDeclaration_value.get());
+            stack.pop();
+        }
+    }
     void PostTargetDeclaration(cmajor::parsing::ObjectStack& stack, ParsingData* parsingData, bool matched)
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
@@ -236,10 +255,11 @@ public:
 private:
     struct Context : cmajor::parsing::Context
     {
-        Context(): value(), fromReferenceDeclaration(), fromSourceFileDeclaration(), fromTargetDeclaration() {}
+        Context(): value(), fromReferenceDeclaration(), fromSourceFileDeclaration(), fromTextFileDeclaration(), fromTargetDeclaration() {}
         ProjectDeclaration* value;
         ProjectDeclaration* fromReferenceDeclaration;
         ProjectDeclaration* fromSourceFileDeclaration;
+        ProjectDeclaration* fromTextFileDeclaration;
         ProjectDeclaration* fromTargetDeclaration;
     };
 };
@@ -572,11 +592,14 @@ void ProjectGrammar::CreateRules()
     AddRule(new DeclarationRule(ToUtf32("Declaration"), GetScope(), GetParsingDomain()->GetNextRuleId(),
         new cmajor::parsing::AlternativeParser(
             new cmajor::parsing::AlternativeParser(
-                new cmajor::parsing::ActionParser(ToUtf32("A0"),
-                    new cmajor::parsing::NonterminalParser(ToUtf32("ReferenceDeclaration"), ToUtf32("ReferenceDeclaration"), 0)),
-                new cmajor::parsing::ActionParser(ToUtf32("A1"),
-                    new cmajor::parsing::NonterminalParser(ToUtf32("SourceFileDeclaration"), ToUtf32("SourceFileDeclaration"), 0))),
-            new cmajor::parsing::ActionParser(ToUtf32("A2"),
+                new cmajor::parsing::AlternativeParser(
+                    new cmajor::parsing::ActionParser(ToUtf32("A0"),
+                        new cmajor::parsing::NonterminalParser(ToUtf32("ReferenceDeclaration"), ToUtf32("ReferenceDeclaration"), 0)),
+                    new cmajor::parsing::ActionParser(ToUtf32("A1"),
+                        new cmajor::parsing::NonterminalParser(ToUtf32("SourceFileDeclaration"), ToUtf32("SourceFileDeclaration"), 0))),
+                new cmajor::parsing::ActionParser(ToUtf32("A2"),
+                    new cmajor::parsing::NonterminalParser(ToUtf32("TextFileDeclaration"), ToUtf32("TextFileDeclaration"), 0))),
+            new cmajor::parsing::ActionParser(ToUtf32("A3"),
                 new cmajor::parsing::NonterminalParser(ToUtf32("TargetDeclaration"), ToUtf32("TargetDeclaration"), 0)))));
     AddRule(new ReferenceDeclarationRule(ToUtf32("ReferenceDeclaration"), GetScope(), GetParsingDomain()->GetNextRuleId(),
         new cmajor::parsing::ActionParser(ToUtf32("A0"),

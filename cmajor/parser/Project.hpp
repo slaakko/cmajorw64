@@ -1,5 +1,5 @@
-#ifndef Project_hpp_24677
-#define Project_hpp_24677
+#ifndef Project_hpp_17124
+#define Project_hpp_17124
 
 #include <cmajor/parsing/Grammar.hpp>
 #include <cmajor/parsing/Keyword.hpp>
@@ -30,4 +30,4 @@ private:
 
 } } // namespace cmajor.parser
 
-#endif // Project_hpp_24677
+#endif // Project_hpp_17124
