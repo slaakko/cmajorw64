@@ -59,7 +59,7 @@ class Module
 {
 public:
     Module();
-    Module(const std::string& filePath_);
+    Module(const std::string& filePath, std::vector<ClassTypeSymbol*>& classTypes, std::vector<ClassTemplateSpecializationSymbol*>& classTemplateSpecializations);
     Module(const std::u32string& name_, const std::string& filePath_);
     uint8_t Format() const { return format; }
     ModuleFlags Flags() const { return flags; }

@@ -32,6 +32,7 @@ public:
     void Visit(FunctionNode& functionNode) override;
     void Visit(ClassNode& classNode) override;
     void BindClass(ClassTypeSymbol* classTypeSymbol, ClassNode* classNode, bool fromOwnCompileUnit);
+    void BindClassTemplate(ClassTypeSymbol* classTypeSymbol, ClassNode* classNode);
     void Visit(StaticConstructorNode& staticConstructorNode) override;
     void Visit(ConstructorNode& constructorNode) override;
     void Visit(DestructorNode& destructorNode) override;

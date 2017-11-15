@@ -8,16 +8,16 @@
 
 namespace cmajor { namespace ast {
 
-FunctionNode::FunctionNode(const Span& span_) : Node(NodeType::functionNode, span_), specifiers(Specifiers::none), returnTypeExpr(), groupId(), parameters(), body(), bodySource()
+FunctionNode::FunctionNode(const Span& span_) : Node(NodeType::functionNode, span_), specifiers(Specifiers::none), returnTypeExpr(), groupId(), parameters(), body(), bodySource(), programMain(false)
 {
 }
 
-FunctionNode::FunctionNode(NodeType nodeType_, const Span& span_) : Node(nodeType_, span_), specifiers(Specifiers::none), returnTypeExpr(), groupId(), parameters(), body(), bodySource()
+FunctionNode::FunctionNode(NodeType nodeType_, const Span& span_) : Node(nodeType_, span_), specifiers(Specifiers::none), returnTypeExpr(), groupId(), parameters(), body(), bodySource(), programMain(false)
 {
 }
 
 FunctionNode::FunctionNode(const Span& span_, Specifiers specifiers_, Node* returnTypeExpr_, const std::u32string& groupId_) :
-    Node(NodeType::functionNode, span_), specifiers(specifiers_), returnTypeExpr(returnTypeExpr_), groupId(groupId_), templateParameters(), parameters(), body(), bodySource()
+    Node(NodeType::functionNode, span_), specifiers(specifiers_), returnTypeExpr(returnTypeExpr_), groupId(groupId_), templateParameters(), parameters(), body(), bodySource(), programMain(false)
 {
     if (returnTypeExpr)
     {
@@ -26,7 +26,7 @@ FunctionNode::FunctionNode(const Span& span_, Specifiers specifiers_, Node* retu
 }
 
 FunctionNode::FunctionNode(NodeType nodeType_, const Span& span_, Specifiers specifiers_, Node* returnTypeExpr_, const std::u32string& groupId_) : 
-    Node(nodeType_, span_), specifiers(specifiers_), returnTypeExpr(returnTypeExpr_), groupId(groupId_), templateParameters(), parameters(), body(), bodySource()
+    Node(nodeType_, span_), specifiers(specifiers_), returnTypeExpr(returnTypeExpr_), groupId(groupId_), templateParameters(), parameters(), body(), bodySource(), programMain(false)
 {
     if (returnTypeExpr)
     {

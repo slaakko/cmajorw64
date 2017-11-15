@@ -1287,6 +1287,14 @@ namespace System.Text.Parsing
         public nothrow RangeParser(uint rangeStart_, uint rangeEnd_) : base(u"range", u"<range>"), rangeStart(rangeStart_), rangeEnd(rangeEnd_)
         {
         }
+        public nothrow inline uint Start() const
+        {
+            return rangeStart;
+        }
+        public nothrow inline uint End() const
+        {
+            return rangeEnd;
+        }
         public override Match Parse(Scanner& scanner, Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
         {
             if (!scanner.AtEnd())

@@ -12,6 +12,23 @@ namespace System.Text.Parsing
     
     public class delegate void PostCall(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched);
     
+    public class ArgumentCollector : System.Text.Parsing.CodeDom.DomObject
+    {
+        public override void AddArgument(System.Text.Parsing.CodeDom.DomObject* argument)
+        {
+            arguments.Add(UniquePtr<System.Text.Parsing.CodeDom.DomObject>(argument));
+        }
+        public List<UniquePtr<System.Text.Parsing.CodeDom.DomObject>> Arguments() 
+        {
+            return Rvalue(arguments);
+        }
+        public override void Accept(System.Text.Parsing.CodeDom.Visitor& visitor)
+        {
+            throw Exception("cannot visit argument collector");
+        }
+        private List<UniquePtr<System.Text.Parsing.CodeDom.DomObject>> arguments;
+    }
+    
     public class NonterminalParser : Parser
     {
         public NonterminalParser() : this(u"nonterminal", u"rule")
@@ -47,6 +64,10 @@ namespace System.Text.Parsing
         public inline nothrow const List<UniquePtr<System.Text.Parsing.CodeDom.DomObject>>& Arguments() const
         {
             return arguments;
+        }
+        public void SetArguments(List<UniquePtr<System.Text.Parsing.CodeDom.DomObject>>&& arguments_)
+        {
+            arguments = arguments_;
         }
         public inline nothrow RuleParser* Rule() const
         {

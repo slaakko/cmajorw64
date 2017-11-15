@@ -29,6 +29,7 @@ class ParameterSymbol : public VariableSymbol
 public:    
     ParameterSymbol(const Span& span_, const std::u32string& name_);
     SymbolAccess DeclaredAccess() const override { return SymbolAccess::public_; }
+    std::string TypeString() const override { return "parameter"; }
     void ComputeExportClosure() override;
 };
 
@@ -50,6 +51,8 @@ public:
     void ComputeExportClosure() override;
     void Accept(SymbolCollector* collector) override;
     void Dump(CodeFormatter& formatter) override;
+    std::string TypeString() const override { return "variable"; }
+    std::string Syntax() const override;
     void SetSpecifiers(Specifiers specifiers);
     int32_t LayoutIndex() const { return layoutIndex; }
     void SetLayoutIndex(int32_t layoutIndex_) { layoutIndex = layoutIndex_; }

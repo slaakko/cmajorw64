@@ -38,12 +38,30 @@ void EnumTypeSymbol::EmplaceType(TypeSymbol* typeSymbol_, int index)
     underlyingType = typeSymbol_;
 }
 
+std::string EnumTypeSymbol::Syntax() const
+{
+    std::string syntax = GetSpecifierStr();
+    if (!syntax.empty())
+    {
+        syntax.append(1, ' ');
+    }
+    syntax.append("enum ");
+    syntax.append(ToUtf8(DocName()));
+    syntax.append(1, ';');
+    return syntax;
+}
+
 void EnumTypeSymbol::Accept(SymbolCollector* collector)
 {
-    if (IsProject())
+    if (IsProject() && Access() == SymbolAccess::public_)
     {
         collector->AddEnumeratedType(this);
     }
+}
+
+void EnumTypeSymbol::CollectMembers(SymbolCollector* collector)
+{
+    TypeSymbol::Accept(collector);
 }
 
 void EnumTypeSymbol::Dump(CodeFormatter& formatter)

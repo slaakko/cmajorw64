@@ -12,6 +12,7 @@
 #include <cmajor/symbols/InitDone.hpp>
 #include <cmajor/symbols/GlobalFlags.hpp>
 #include <cmajor/symbols/Warning.hpp>
+#include <cmajor/parsing/Exception.hpp>
 #include <cmajor/util/Util.hpp>
 #include <cmajor/util/Path.hpp>
 #include <cmajor/util/Json.hpp>
@@ -84,6 +85,7 @@ void PrintHelp()
 using namespace cmajor::util;
 using namespace cmajor::unicode;
 using namespace cmajor::symbols;
+using namespace cmajor::parsing;
 using namespace cmajor::build;
 
 int main(int argc, const char** argv)
@@ -292,6 +294,53 @@ int main(int argc, const char** argv)
                     secs << " second" << ((secs != 1) ? "s" : "") << std::endl;
             }
         }
+    }
+    catch (const ParsingException& ex)
+    {
+        if (!GetGlobalFlag(GlobalFlags::quiet) && !GetGlobalFlag(GlobalFlags::ide))
+        {
+            std::cerr << ex.what() << std::endl;
+            for (const Warning& warning : CompileWarningCollection::Instance().Warnings())
+            {
+                std::string what = Expand(warning.Message(), warning.Defined(), warning.References(), "Warning");
+                std::cerr << what << std::endl;
+            }
+        }
+        if (GetGlobalFlag(GlobalFlags::ide))
+        {
+            std::cout << ex.what() << std::endl;
+            for (const Warning& warning : CompileWarningCollection::Instance().Warnings())
+            {
+                std::string what = Expand(warning.Message(), warning.Defined(), warning.References(), "Warning");
+                std::cout << what << std::endl;
+            }
+            std::unique_ptr<JsonObject> compileResult(new JsonObject());
+            compileResult->AddField(U"success", std::unique_ptr<JsonValue>(new JsonBool(false)));
+            std::unique_ptr<JsonObject> json(new JsonObject());
+            json->AddField(U"tool", std::unique_ptr<JsonValue>(new JsonString(U"cmc")));
+            json->AddField(U"kind", std::unique_ptr<JsonValue>(new JsonString(U"error")));
+            json->AddField(U"project", std::unique_ptr<JsonValue>(new JsonString(GetCurrentProjectName())));
+            json->AddField(U"message", std::unique_ptr<JsonValue>(new JsonString(ToUtf32(ex.Message()))));
+            std::unique_ptr<JsonArray> refs(new JsonArray());
+            std::unique_ptr<JsonObject> ref = SpanToJson(ex.GetSpan());
+            if (ref)
+            {
+                refs->AddItem(std::move(ref));
+            }
+            json->AddField(U"references", std::move(refs));
+            compileResult->AddField(U"diagnostics", std::move(json));
+            if (!CompileWarningCollection::Instance().Warnings().empty())
+            {
+                JsonArray* warningsArray = new JsonArray();
+                for (const Warning& warning : CompileWarningCollection::Instance().Warnings())
+                {
+                    warningsArray->AddItem(std::move(warning.ToJson()));
+                }
+                compileResult->AddField(U"warnings", std::unique_ptr<JsonValue>(warningsArray));
+            }
+            std::cerr << compileResult->ToString() << std::endl;
+        }
+        return 1;
     }
     catch (const Exception& ex)
     {

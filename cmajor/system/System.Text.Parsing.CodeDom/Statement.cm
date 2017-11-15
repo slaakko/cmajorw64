@@ -405,6 +405,10 @@ namespace System.Text.Parsing.CodeDom
                 argument->Accept(visitor);
             }
         }
+        public nothrow void SetParens()
+        {
+            parens = true;
+        }
         private UniquePtr<DomObject> typeExpr;
         private UniquePtr<DomObject> id;
         private List<UniquePtr<DomObject>> arguments;
@@ -785,6 +789,10 @@ namespace System.Text.Parsing.CodeDom
     {
         public TryStatement(CompoundStatement* tryBlock_) : base(u"try"), tryBlock(tryBlock_)
         {            
+        }
+        public void AddCatch(Catch* catch_)
+        {
+            catches.Add(UniquePtr<Catch>(catch_));
         }
         public override void Print(CodeFormatter& formatter)
         {

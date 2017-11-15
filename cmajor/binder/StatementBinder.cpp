@@ -257,7 +257,7 @@ void StatementBinder::Visit(ClassNode& classNode)
         classTypeSymbol->CreateDestructorSymbol();
     }
     DestructorSymbol* destructorSymbol = classTypeSymbol->Destructor();
-    if (destructorSymbol)
+    if (destructorSymbol && !GetGlobalFlag(GlobalFlags::info))
     {
         Node* node = symbolTable.GetNodeNoThrow(destructorSymbol);
         if (!node)

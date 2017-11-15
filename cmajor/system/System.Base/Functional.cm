@@ -1,17 +1,19 @@
-// =================================
+﻿// =================================
 // Copyright (c) 2017 Seppo Laakko
 // Distributed under the MIT license
 // =================================
 
+using System.Concepts;
+
 namespace System
 {
-    public class UnaryFun<Argument, Result> where Argument is Semiregular
+    public abstract class UnaryFun<Argument, Result> where Argument is Semiregular
     {
         public typedef Argument ArgumentType;
         public typedef Result ResultType;
     }
 
-    public class BinaryFun<Argument1, Argument2, Result> where Argument1 is Semiregular and Argument2 is Semiregular
+    public abstract class BinaryFun<Argument1, Argument2, Result> where Argument1 is Semiregular and Argument2 is Semiregular
     {
         public typedef Argument1 FirstArgumentType;
         public typedef Argument2 SecondArgumentType;

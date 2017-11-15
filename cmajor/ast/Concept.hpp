@@ -300,6 +300,7 @@ public:
     void AddConstraint(ConstraintNode* constraint);
     const NodeList<ConstraintNode>& Constraints() const { return constraints; }
     void AddAxiom(AxiomNode* axiom);
+    const NodeList<AxiomNode>& Axioms() const { return axioms; }
     Specifiers GetSpecifiers() const { return specifiers; }
 private:
     Specifiers specifiers;

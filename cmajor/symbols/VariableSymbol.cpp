@@ -95,7 +95,7 @@ void MemberVariableSymbol::ComputeExportClosure()
 
 void MemberVariableSymbol::Accept(SymbolCollector* collector)
 {
-    if (IsProject())
+    if (IsProject() && Access() == SymbolAccess::public_)
     {
         collector->AddMemberVariable(this);
     }
@@ -105,8 +105,23 @@ void MemberVariableSymbol::Dump(CodeFormatter& formatter)
 {
     formatter.WriteLine(ToUtf8(Name()));
     formatter.WriteLine("full name: " + ToUtf8(FullNameWithSpecifiers()));
+    formatter.WriteLine("mangled name: " + ToUtf8(MangledName()));
     formatter.WriteLine("type: " + ToUtf8(GetType()->FullName()));
     formatter.WriteLine("layout index: " + std::to_string(layoutIndex));
+}
+
+std::string MemberVariableSymbol::Syntax() const
+{
+    std::string syntax = GetSpecifierStr();
+    if (!syntax.empty())
+    {
+        syntax.append(1, ' ');
+    }
+    syntax.append(ToUtf8(GetType()->DocName()));
+    syntax.append(1, ' ');
+    syntax.append(ToUtf8(DocName()));
+    syntax.append(1, ';');
+    return syntax;
 }
 
 void MemberVariableSymbol::SetSpecifiers(Specifiers specifiers)

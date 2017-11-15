@@ -7,8 +7,11 @@
 #include <cmajor/symbols/SymbolTable.hpp>
 #include <cmajor/symbols/SymbolWriter.hpp>
 #include <cmajor/symbols/SymbolReader.hpp>
+#include <cmajor/util/Unicode.hpp>
 
 namespace cmajor { namespace symbols {
+
+using namespace cmajor::unicode;
 
 TypeSymbol::TypeSymbol(SymbolType symbolType_, const Span& span_, const std::u32string& name_) : ContainerSymbol(symbolType_, span_, name_), typeId(0)
 {
@@ -74,6 +77,11 @@ bool TypeSymbol::IsRecursive(TypeSymbol* type, std::unordered_set<TypeSymbol*>& 
     if (tested.find(this) != tested.cend()) return type == this;
     tested.insert(this);
     return TypesEqual(type, this); 
+}
+
+std::u32string TypeSymbol::Id() const 
+{ 
+    return ToUtf32(std::to_string(TypeId())); 
 }
 
 bool CompareTypesForEquality(const TypeSymbol* left, const TypeSymbol* right)

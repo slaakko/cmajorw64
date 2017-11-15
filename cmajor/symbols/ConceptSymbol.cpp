@@ -86,7 +86,7 @@ void ConceptSymbol::EmplaceConcept(ConceptSymbol* concept)
 
 void ConceptSymbol::Accept(SymbolCollector* collector)
 {
-    if (IsProject())
+    if (IsProject() && Access() == SymbolAccess::public_)
     {
         collector->AddConcept(this);
     }

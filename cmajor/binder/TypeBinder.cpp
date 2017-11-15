@@ -102,6 +102,7 @@ void TypeBinder::Visit(NamespaceNode& namespaceNode)
 {
     ContainerScope* prevContainerScope = containerScope;
     Symbol* symbol = symbolTable.GetSymbol(&namespaceNode);
+    symbol->ComputeMangledName();
     containerScope = symbol->GetContainerScope();
     int n = namespaceNode.Members().Count();
     for (int i = 0; i < n; ++i)
@@ -166,6 +167,10 @@ void TypeBinder::Visit(FunctionNode& functionNode)
         functionSymbol->SetConstraint(static_cast<WhereConstraintNode*>(functionNode.WhereConstraint()->Clone(cloneContext)));
     }
     functionSymbol->ComputeName();
+    for (ParameterSymbol* parameterSymbol : functionSymbol->Parameters())
+    {
+        parameterSymbol->ComputeMangledName();
+    }
     if (functionSymbol->ReturnsClassOrClassDelegateByValue())
     {
         ParameterSymbol* returnParam = new ParameterSymbol(functionNode.ReturnTypeExpr()->GetSpan(), U"@return");
@@ -196,6 +201,28 @@ void TypeBinder::Visit(ClassNode& classNode)
     BindClass(classTypeSymbol, &classNode, true);
 }
 
+void TypeBinder::BindClassTemplate(ClassTypeSymbol* classTemplate, ClassNode* classNode)
+{
+    classTemplate->CloneUsingNodes(usingNodes);
+    if (classNode->WhereConstraint())
+    {
+        CloneContext cloneContext;
+        classTemplate->SetConstraint(static_cast<ConstraintNode*>(classNode->WhereConstraint()->Clone(cloneContext)));
+    }
+    classTemplate->SetAccess(classNode->GetSpecifiers() & Specifiers::access_);
+    classTemplate->ComputeName();
+    std::vector<TypeSymbol*> templateArgumentTypes;
+    for (TemplateParameterSymbol* templateParam : classTemplate->TemplateParameters())
+    {
+        templateArgumentTypes.push_back(templateParam);
+    }
+    ClassTemplateSpecializationSymbol* prototype = symbolTable.MakeClassTemplateSpecialization(classTemplate, templateArgumentTypes, classTemplate->GetSpan());
+    prototype->MarkExport();
+    prototype->SetAccess(SymbolAccess::public_);
+    boundCompileUnit.GetClassTemplateRepository().BindClassTemplateSpecialization(prototype, containerScope, classTemplate->GetSpan());
+    classTemplate->SetPrototype(prototype);
+}
+
 void TypeBinder::BindClass(ClassTypeSymbol* classTypeSymbol, ClassNode* classNode, bool fromOwnCompileUnit)
 {
     if (classTypeSymbol->IsBound()) return;
@@ -206,14 +233,7 @@ void TypeBinder::BindClass(ClassTypeSymbol* classTypeSymbol, ClassNode* classNod
     }
     if (classTypeSymbol->IsClassTemplate())
     {
-        classTypeSymbol->CloneUsingNodes(usingNodes);
-        if (classNode->WhereConstraint())
-        {
-            CloneContext cloneContext;
-            classTypeSymbol->SetConstraint(static_cast<ConstraintNode*>(classNode->WhereConstraint()->Clone(cloneContext)));
-        }
-        classTypeSymbol->SetAccess(classNode->GetSpecifiers() & Specifiers::access_);
-        classTypeSymbol->ComputeName();
+        BindClassTemplate(classTypeSymbol, classNode);
         return;
     }
     ContainerScope* prevContainerScope = containerScope;
@@ -233,7 +253,7 @@ void TypeBinder::BindClass(ClassTypeSymbol* classTypeSymbol, ClassNode* classNod
         if (baseOrInterfaceSymbol->IsClassTypeSymbol())
         {
             ClassTypeSymbol* baseClassSymbol = static_cast<ClassTypeSymbol*>(baseOrInterfaceSymbol);
-            if (baseClassSymbol->IsProject())
+            if (baseClassSymbol->IsProject() && !GetGlobalFlag(GlobalFlags::info))
             {
                 Node* node = symbolTable.GetNode(baseClassSymbol);
                 Assert(node->GetNodeType() == NodeType::classNode, "class node expected");
@@ -372,6 +392,10 @@ void TypeBinder::Visit(ConstructorNode& constructorNode)
         constructorSymbol->SetConstraint(static_cast<WhereConstraintNode*>(constructorNode.WhereConstraint()->Clone(cloneContext)));
     }
     constructorSymbol->ComputeName();
+    for (ParameterSymbol* parameterSymbol : constructorSymbol->Parameters())
+    {
+        parameterSymbol->ComputeMangledName();
+    }
     if (constructorSymbol->IsDefaultConstructor())
     {
         classType->SetDefaultConstructor(constructorSymbol);
@@ -384,7 +408,7 @@ void TypeBinder::Visit(ConstructorNode& constructorNode)
     {
         classType->SetMoveConstructor(constructorSymbol);
     }
-    else if (constructorSymbol->Arity() == 2 && !constructorSymbol->IsExplicit())
+    else if (constructorSymbol->Arity() == 2 && !constructorSymbol->IsExplicit() && !constructorSymbol->IsGeneratedFunction())
     {
         constructorSymbol->SetConversion();
         symbolTable.AddConversion(constructorSymbol);
@@ -495,6 +519,10 @@ void TypeBinder::Visit(MemberFunctionNode& memberFunctionNode)
         memberFunctionSymbol->SetConstraint(static_cast<WhereConstraintNode*>(memberFunctionNode.WhereConstraint()->Clone(cloneContext)));
     }
     memberFunctionSymbol->ComputeName();
+    for (ParameterSymbol* parameterSymbol : memberFunctionSymbol->Parameters())
+    {
+        parameterSymbol->ComputeMangledName();
+    }
     if (memberFunctionSymbol->ReturnsClassOrClassDelegateByValue())
     {
         ParameterSymbol* returnParam = new ParameterSymbol(memberFunctionNode.ReturnTypeExpr()->GetSpan(), U"@return");
@@ -584,6 +612,7 @@ void TypeBinder::Visit(MemberVariableNode& memberVariableNode)
     Assert(symbol->GetSymbolType() == SymbolType::memberVariableSymbol, "member variable symbol expected");
     MemberVariableSymbol* memberVariableSymbol = static_cast<MemberVariableSymbol*>(symbol);
     memberVariableSymbol->SetSpecifiers(memberVariableNode.GetSpecifiers());
+    memberVariableSymbol->ComputeMangledName();
     const Symbol* parent = memberVariableSymbol->Parent();
     if (parent->IsStatic() && !memberVariableSymbol->IsStatic())
     {
@@ -645,6 +674,10 @@ void TypeBinder::Visit(DelegateNode& delegateNode)
         returnParam->SetParent(delegateTypeSymbol);
         returnParam->SetType(returnType->AddPointer(delegateNode.GetSpan()));
         delegateTypeSymbol->SetReturnParam(returnParam);
+    }
+    for (ParameterSymbol* parameterSymbol : delegateTypeSymbol->Parameters())
+    {
+        parameterSymbol->ComputeMangledName();
     }
     DelegateTypeDefaultConstructor* defaultConstructor = new DelegateTypeDefaultConstructor(delegateTypeSymbol);
     symbolTable.SetFunctionIdFor(defaultConstructor);
@@ -708,6 +741,10 @@ void TypeBinder::Visit(ClassDelegateNode& classDelegateNode)
         memberDelegateType->SetReturnParam(memberReturnParam);
     }
     memberDelegateType->SetReturnType(returnType);
+    for (ParameterSymbol* parameterSymbol : classDelegateTypeSymbol->Parameters())
+    {
+        parameterSymbol->ComputeMangledName();
+    }
     classDelegateTypeSymbol->AddMember(memberDelegateType);
     ClassTypeSymbol* objectDelegatePairType = new ClassTypeSymbol(classDelegateNode.GetSpan(), U"@objectDelegatePairType");
     MemberVariableSymbol* objVar = new MemberVariableSymbol(classDelegateNode.GetSpan(), U"@obj");
@@ -928,6 +965,7 @@ void TypeBinder::BindTypedef(TypedefSymbol* typedefSymbol, TypedefNode* typedefN
     if (typedefSymbol->IsBound()) return;
     typedefSymbol->SetBound();
     typedefSymbol->SetSpecifiers(typedefNode->GetSpecifiers());
+    typedefSymbol->ComputeMangledName();
     if (!fromOwnCompileUnit)
     {
         AddUsingNodesToCurrentCompileUnit(typedefNode);
@@ -942,6 +980,7 @@ void TypeBinder::Visit(ConstantNode& constantNode)
     Assert(symbol->GetSymbolType() == SymbolType::constantSymbol, "constant symbol expected");
     ConstantSymbol* constantSymbol = static_cast<ConstantSymbol*>(symbol);
     constantSymbol->SetSpecifiers(constantNode.GetSpecifiers());
+    constantSymbol->ComputeMangledName();
     TypeSymbol* typeSymbol = ResolveType(constantNode.TypeExpr(), boundCompileUnit, containerScope);
     constantSymbol->SetType(typeSymbol);
     constantSymbol->SetEvaluating();
@@ -1012,6 +1051,7 @@ void TypeBinder::Visit(EnumConstantNode& enumConstantNode)
     Symbol* symbol = symbolTable.GetSymbol(&enumConstantNode);
     Assert(symbol->GetSymbolType() == SymbolType::enumConstantSymbol, "enumeration constant symbol expected");
     EnumConstantSymbol* enumConstantSymbol = static_cast<EnumConstantSymbol*>(symbol);
+    enumConstantSymbol->ComputeMangledName();
     enumConstantSymbol->SetEvaluating();
     std::unique_ptr<Value> value = Evaluate(enumConstantNode.GetValue(), GetValueTypeFor(enumType->UnderlyingType()->GetSymbolType()), containerScope, boundCompileUnit, false);
     enumConstantSymbol->SetValue(value.release());

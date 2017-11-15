@@ -40,6 +40,7 @@ source <StreamReader.cm>;
 source <StreamWriter.cm>;
 source <String.cm>;
 source <StringStream.cm>;
+source <TextUtil.cm>;
 source <Unicode.cm>;
 source <UnicodeChar.cm>;
 source <UniquePtr.cm>;

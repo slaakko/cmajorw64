@@ -19,6 +19,16 @@
 
 namespace cmajor { namespace symbols {
 
+struct ByFullName
+{
+    bool operator()(Symbol* left, Symbol* right) const;
+};
+
+struct ByDocName
+{
+    bool operator()(Symbol* left, Symbol* right) const;
+};
+
 class SymbolCollector
 {
 public:
@@ -35,24 +45,26 @@ public:
     void AddInterface(InterfaceTypeSymbol* interface_);
     void AddTypedef(TypedefSymbol* typedef_);
     void AddMemberVariable(MemberVariableSymbol* memberVariable);
-    void Sort();
+    void SortByFullName();
+    void SortByDocName();
     const std::vector<BasicTypeSymbol*>& BasicTypes() const { return basicTypes; }
-    const std::vector<FunctionSymbol*>& Functions() const { return functions; }
     const std::vector<ClassTypeSymbol*>& Classes() const { return classes; }
     const std::vector<InterfaceTypeSymbol*>& Interfaces() const { return interfaces; }
+    const std::vector<FunctionSymbol*>& Functions() const { return functions; }
     const std::vector<TypedefSymbol*>& Typedefs() const { return typedefs; }
     const std::vector<ConceptSymbol*>& Concepts() const { return concepts; }
-    const std::vector<ConstantSymbol*>& Constants() const { return constants; }
     const std::vector<DelegateTypeSymbol*>& Delegates() const { return delegates; }
     const std::vector<ClassDelegateTypeSymbol*>& ClassDelegates() const { return classDelegates; }
+    const std::vector<ConstantSymbol*>& Constants() const { return constants; }
     const std::vector<EnumTypeSymbol*>& EnumeratedTypes() const { return enumeratedTypes; }
     const std::vector<EnumConstantSymbol*>& EnumerationConstants() const { return enumerationConstants; }
     const std::vector<MemberVariableSymbol*>& MemberVariables() const { return memberVariables; }
+    bool IsEmpty() const;
 private:
     std::vector<BasicTypeSymbol*> basicTypes;
-    std::vector<FunctionSymbol*> functions;
     std::vector<ClassTypeSymbol*> classes;
     std::vector<InterfaceTypeSymbol*> interfaces;
+    std::vector<FunctionSymbol*> functions;
     std::vector<TypedefSymbol*> typedefs;
     std::vector<ConceptSymbol*> concepts;
     std::vector<ConstantSymbol*> constants;

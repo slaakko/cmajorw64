@@ -182,7 +182,7 @@ Module::Module() :
 {
 }
 
-Module::Module(const std::string& filePath)  :
+Module::Module(const std::string& filePath, std::vector<ClassTypeSymbol*>& classTypes, std::vector<ClassTemplateSpecializationSymbol*>& classTemplateSpecializations)  :
     format(currentModuleFormat), flags(ModuleFlags::none), name(), originalFilePath(), filePathReadFrom(), referenceFilePaths(), moduleDependency(this), symbolTablePos(0), symbolTable(),
     directoryPath(), libraryFilePaths()
 {
@@ -230,14 +230,17 @@ Module::Module(const std::string& filePath)  :
             libraryFilePaths.push_back(module->LibraryFilePath());
         }
     }
-    std::vector<ClassTypeSymbol*> classTypes;
-    std::vector<ClassTemplateSpecializationSymbol*> classTemplateSpecializations;
     FinishReads(rootModule, finishReadOrder, finishReadOrder.size() - 2, classTypes, classTemplateSpecializations);
     SymbolReader reader3(filePathReadFrom);
     reader3.SetProjectBitForSymbols();
     reader3.SetModule(this);
     reader3.GetBinaryReader().Skip(symbolTablePos);
-    symbolTable.Read(reader3);
+    SymbolTable st;
+    st.Copy(symbolTable);
+    st.Read(reader3);
+    symbolTable.Import(st);
+    classTypes.insert(classTypes.end(), reader3.ClassTypes().begin(), reader3.ClassTypes().end());
+    classTemplateSpecializations.insert(classTemplateSpecializations.end(), reader3.ClassTemplateSpecializations().begin(), reader3.ClassTemplateSpecializations().end());
 }
 
 Module::Module(const std::u32string& name_, const std::string& filePath_) : 
@@ -603,7 +606,7 @@ void Module::Dump()
     formatter.DecIndent();
     SymbolCollector collector;
     symbolTable.GlobalNs().Accept(&collector);
-    collector.Sort();
+    collector.SortByFullName();
     if (!collector.BasicTypes().empty())
     {
         formatter.WriteLine();
@@ -612,16 +615,6 @@ void Module::Dump()
         {
             formatter.WriteLine();
             basicType->Dump(formatter);
-        }
-    }
-    if (!collector.Functions().empty())
-    {
-        formatter.WriteLine();
-        formatter.WriteLine("FUNCTIONS");
-        for (FunctionSymbol* function : collector.Functions())
-        {
-            formatter.WriteLine();
-            function->Dump(formatter);
         }
     }
     if (!collector.Classes().empty())
@@ -644,6 +637,16 @@ void Module::Dump()
             interface->Dump(formatter);
         }
     }
+    if (!collector.Functions().empty())
+    {
+        formatter.WriteLine();
+        formatter.WriteLine("FUNCTIONS");
+        for (FunctionSymbol* function : collector.Functions())
+        {
+            formatter.WriteLine();
+            function->Dump(formatter);
+        }
+    }
     if (!collector.Typedefs().empty())
     {
         formatter.WriteLine();
@@ -664,16 +667,6 @@ void Module::Dump()
             concept_->Dump(formatter);
         }
     }
-    if (!collector.Constants().empty())
-    {
-        formatter.WriteLine();
-        formatter.WriteLine("CONSTANTS");
-        for (ConstantSymbol* constant : collector.Constants())
-        {
-            formatter.WriteLine();
-            constant->Dump(formatter);
-        }
-    }
     if (!collector.Delegates().empty())
     {
         formatter.WriteLine();
@@ -692,6 +685,16 @@ void Module::Dump()
         {
             formatter.WriteLine();
             classDelegate->Dump(formatter);
+        }
+    }
+    if (!collector.Constants().empty())
+    {
+        formatter.WriteLine();
+        formatter.WriteLine("CONSTANTS");
+        for (ConstantSymbol* constant : collector.Constants())
+        {
+            formatter.WriteLine();
+            constant->Dump(formatter);
         }
     }
     if (!collector.EnumeratedTypes().empty())

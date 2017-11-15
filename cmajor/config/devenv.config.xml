@@ -7,8 +7,8 @@
     <formSizeY>950</formSizeY>
     <formTop>0</formTop>
     <formLeft>0</formLeft>
-    <textVisX>104</textVisX>
-    <textVisY>104</textVisY>
+    <textVisX>26</textVisX>
+    <textVisY>26</textVisY>
     <textVisW>1259</textVisW>
     <textVisH>482</textVisH>
     <toolColWidth>80</toolColWidth>
@@ -21,7 +21,7 @@
     <findFileColWidth>442</findFileColWidth>
     <findLineColWidth>85</findLineColWidth>
     <findProjectColWidth>183</findProjectColWidth>
-    <findTextColWidth>271</findTextColWidth>
+    <findTextColWidth>738</findTextColWidth>
     <horizontalSplitterPos>1346</horizontalSplitterPos>
     <verticalSplitterPos>529</verticalSplitterPos>
     <windowState>Normal</windowState>
@@ -32,11 +32,11 @@
             <openFiles />
         </recentProject>
         <recentProject>
-            <path>C:\Users\Seppo\cmajorw64\cmajor\test\foo\foo.cms</path>
+            <path>C:\Users\Seppo\cmajorw64\cmajor\cmparsergen\cmparsergen.cms</path>
             <openFiles />
         </recentProject>
         <recentProject>
-            <path>C:\Users\Seppo\cmajorw64\cmajor\cmparsergen\cmparsergen.cms</path>
+            <path>C:\Users\Seppo\cmajorw64\cmajor\test\foo\foo.cms</path>
             <openFiles />
         </recentProject>
     </recentProjects>

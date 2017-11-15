@@ -3,8 +3,8 @@
 // Distributed under the MIT license
 // =================================
 
-#ifndef CMINOR_XML_XML_CONTENT_HANDLER
-#define CMINOR_XML_XML_CONTENT_HANDLER
+#ifndef CMAJOR_XML_XML_CONTENT_HANDLER
+#define CMAJOR_XML_XML_CONTENT_HANDLER
 #include <string>
 #include <vector>
 
@@ -60,4 +60,4 @@ public:
 
 } } // namespace cmajor::xml
 
-#endif // CMINOR_XML_XML_CONTENT_HANDLER
+#endif // CMAJOR_XML_XML_CONTENT_HANDLER

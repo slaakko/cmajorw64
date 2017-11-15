@@ -797,3 +797,14 @@ extern "C" RT_API bool RtFileExists(const char* filePath)
 {
     return boost::filesystem::exists(filePath);
 }
+
+extern "C" RT_API bool RtLastWriteTimeLess(const char* filePath1, const char* filePath2)
+{
+    boost::filesystem::path f1 = filePath1;
+    boost::filesystem::path f2 = filePath2;
+    if (boost::filesystem::last_write_time(f1) < boost::filesystem::last_write_time(f2))
+    {
+        return true;
+    }
+    return false;
+}

@@ -19,7 +19,9 @@ public:
     void Read(SymbolReader& reader) override;
     void EmplaceType(TypeSymbol* typeSymbol_, int index) override;
     std::string TypeString() const override { return "enumerated_type"; }
+    std::string Syntax() const override;
     void Accept(SymbolCollector* collector) override;
+    void CollectMembers(SymbolCollector* collector);
     void Dump(CodeFormatter& formatter) override;
     void SetSpecifiers(Specifiers specifiers);
     const TypeSymbol* UnderlyingType() const { return underlyingType; }

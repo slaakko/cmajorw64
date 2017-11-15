@@ -3,8 +3,8 @@
 // Distributed under the MIT license
 // =================================
 
-#ifndef CMINOR_XML_XML_PROCESSOR
-#define CMINOR_XML_XML_PROCESSOR
+#ifndef CMAJOR_XML_XML_PROCESSOR
+#define CMAJOR_XML_XML_PROCESSOR
 #include <cmajor/xml/XmlContentHandler.hpp>
 #include <cmajor/parsing/Scanner.hpp>
 #include <memory>
@@ -81,4 +81,4 @@ private:
 
 } } // namespace cmajor::xml
 
-#endif // CMINOR_XML_XML_PROCESSOR
+#endif // CMAJOR_XML_XML_PROCESSOR

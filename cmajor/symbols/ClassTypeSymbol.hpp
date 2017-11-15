@@ -18,6 +18,7 @@ class StaticConstructorSymbol;
 class ConstructorSymbol;
 class DestructorSymbol;
 class MemberFunctionSymbol;
+class ClassTemplateSpecializationSymbol;
 
 class ClassGroupTypeSymbol : public TypeSymbol
 {
@@ -83,8 +84,10 @@ public:
     bool IsClassTypeSymbol() const override { return true; }
     std::string TypeString() const override { return "class"; }
     std::u32string SimpleName() const override { return groupName; }
+    std::string GetSpecifierStr() const override;
     bool HasNontrivialDestructor() const override;
     void Accept(SymbolCollector* collector) override;
+    void CollectMembers(SymbolCollector* collector);
     void Dump(CodeFormatter& formatter) override;
     bool IsRecursive(TypeSymbol* type, std::unordered_set<TypeSymbol*>& tested) override;
     virtual bool IsPrototypeTemplateSpecialization() const { return false; }
@@ -161,6 +164,8 @@ public:
     llvm::Value* StaticObject(Emitter& emitter, bool create);
     llvm::StructType* StaticObjectType(Emitter& emitter);
     const std::string& StaticObjectName();
+    void SetPrototype(ClassTemplateSpecializationSymbol* prototype_) { prototype = prototype_; }
+    ClassTemplateSpecializationSymbol* Prototype() const { return prototype; }
 private:
     std::u32string groupName;
     int minArity;
@@ -196,6 +201,7 @@ private:
     std::string vmtObjectName;
     llvm::StructType* staticObjectType;
     std::string staticObjectName;
+    ClassTemplateSpecializationSymbol* prototype;
     void InitVmt(std::vector<FunctionSymbol*>& vmtToInit);
 };
 

@@ -7,12 +7,17 @@
 #include <cmajor/symbols/SymbolTable.hpp>
 #include <cmajor/symbols/SymbolWriter.hpp>
 #include <cmajor/symbols/SymbolReader.hpp>
+#include <cmajor/util/Unicode.hpp>
+#include <cmajor/util/Sha1.hpp>
 
 namespace cmajor { namespace symbols {
+
+using namespace cmajor::unicode;
 
 TemplateParameterSymbol::TemplateParameterSymbol(const Span& span_, const std::u32string& name_) : TypeSymbol(SymbolType::templateParameterSymbol, span_, name_), hasDefault(false)
 {
 }
+
 
 void TemplateParameterSymbol::Write(SymbolWriter& writer)
 {

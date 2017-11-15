@@ -7,6 +7,7 @@
 #include <cmajor/symbols/TypeSymbol.hpp>
 #include <cmajor/symbols/VariableSymbol.hpp>
 #include <cmajor/symbols/ClassTypeSymbol.hpp>
+#include <cmajor/symbols/ClassTemplateSpecializationSymbol.hpp>
 #include <cmajor/symbols/SymbolTable.hpp>
 #include <cmajor/symbols/SymbolWriter.hpp>
 #include <cmajor/symbols/SymbolReader.hpp>
@@ -88,8 +89,24 @@ FunctionGroupSymbol::FunctionGroupSymbol(const Span& span_, const std::u32string
 {
 }
 
+void FunctionGroupSymbol::ComputeMangledName()
+{
+    std::u32string mangledName = ToUtf32(TypeString());
+    if (Name().find(U"operator") != std::u32string::npos)
+    {
+        mangledName.append(1, U'_').append(OperatorMangleMap::Instance().Mangle(Name()));
+    }
+    else if (Name().find(U'@') == std::u32string::npos)
+    {
+        mangledName.append(1, U'_').append(Name());
+    }
+    mangledName.append(1, U'_').append(ToUtf32(GetSha1MessageDigest(ToUtf8(FullNameWithSpecifiers()))));
+    SetMangledName(mangledName);
+}
+
 void FunctionGroupSymbol::AddFunction(FunctionSymbol* function)
 {
+    if (function->IsProgramMain()) return;
     Assert(function->GroupName() == Name(), "wrong function group");
     int arity = function->Arity();
     std::vector<FunctionSymbol*>& functionList = arityFunctionListMap[arity];
@@ -202,13 +219,13 @@ std::string FunctionSymbolFlagStr(FunctionSymbolFlags flags)
 
 FunctionSymbol::FunctionSymbol(const Span& span_, const std::u32string& name_) : 
     ContainerSymbol(SymbolType::functionSymbol, span_, name_), functionId(0), groupName(), parameters(), localVariables(), returnType(), flags(FunctionSymbolFlags::none), vmtIndex(-1), imtIndex(-1),
-    irType(nullptr), nextTemporaryIndex(0), functionGroup(nullptr)
+    irType(nullptr), nextTemporaryIndex(0), functionGroup(nullptr), isProgramMain(false)
 {
 }
 
 FunctionSymbol::FunctionSymbol(SymbolType symbolType_, const Span& span_, const std::u32string& name_) : 
     ContainerSymbol(symbolType_, span_, name_), functionId(0), groupName(), parameters(), localVariables(), returnType(), flags(FunctionSymbolFlags::none), vmtIndex(-1), imtIndex(-1),
-    irType(nullptr), nextTemporaryIndex(0), sizeOfAstNodes(0), astNodesPos(0), functionGroup(nullptr)
+    irType(nullptr), nextTemporaryIndex(0), sizeOfAstNodes(0), astNodesPos(0), functionGroup(nullptr), isProgramMain(false)
 {
 }
 
@@ -329,7 +346,7 @@ void FunctionSymbol::ComputeExportClosure()
 
 void FunctionSymbol::Accept(SymbolCollector* collector)
 {
-    if (IsProject())
+    if (IsProject() && Access() == SymbolAccess::public_ && !IsGeneratedFunction())
     {
         collector->AddFunction(this);
     }
@@ -441,7 +458,7 @@ void FunctionSymbol::ComputeMangledName()
     }
     mangledName.append(1, U'_').append(ToUtf32(GetSha1MessageDigest(ToUtf8(FullNameWithSpecifiers()) + constraintString)));
     SetMangledName(mangledName);
-}    
+}
 
 std::u32string FunctionSymbol::FullName() const
 {
@@ -493,6 +510,82 @@ std::u32string FunctionSymbol::FullNameWithSpecifiers() const
     }
     fullNameWithSpecifiers.append(FullName());
     return fullNameWithSpecifiers;
+}
+
+std::u32string FunctionSymbol::DocName() const
+{
+    std::u32string docName = groupName;
+    if (!templateParameters.empty())
+    {
+        docName.append(1, '<');
+        bool first = true;
+        for (TemplateParameterSymbol* templateParameter : templateParameters)
+        {
+            if (first)
+            {
+                first = false;
+            }
+            else
+            {
+                docName.append(U", ");
+            }
+            docName.append(templateParameter->DocName());
+        }
+        docName.append(1, '>');
+    }
+    docName.append(1, '(');
+    int n = parameters.size();
+    for (int i = 0; i < n; ++i)
+    {
+        if (i > 0)
+        {
+            docName.append(U", ");
+        }
+        ParameterSymbol* parameter = parameters[i];
+        if (parameter->GetType()->Ns() == Ns())
+        {
+            docName.append(parameter->GetType()->Name());
+        }
+        else
+        {
+            docName.append(parameter->GetType()->FullName());
+        }
+        docName.append(1, ' ').append(parameter->Name());
+    }
+    docName.append(1, ')');
+    return docName;
+}
+
+std::string FunctionSymbol::GetSpecifierStr() const
+{
+    std::string specifierStr = SymbolFlagStr(GetSymbolFlags());
+    std::string f = FunctionSymbolFlagStr(flags);
+    if (!f.empty())
+    {
+        if (!specifierStr.empty())
+        {
+            specifierStr.append(1, ' ');
+        }
+        specifierStr.append(f);
+    }
+    return specifierStr;
+}
+
+std::string FunctionSymbol::Syntax() const
+{
+    std::string syntax = GetSpecifierStr();
+    if (!syntax.empty())
+    {
+        syntax.append(1, ' ');
+    }
+    if (ReturnType())
+    {
+        syntax.append(ToUtf8(ReturnType()->DocName()));
+        syntax.append(1, ' ');
+    }
+    syntax.append(ToUtf8(DocName()));
+    syntax.append(1, ';');
+    return syntax;
 }
 
 void FunctionSymbol::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags)
@@ -1081,6 +1174,33 @@ std::string ConstructorSymbol::TypeString() const
     }
 }
 
+std::u32string ConstructorSymbol::DocName() const
+{
+    std::u32string docName;
+    docName.append(Parent()->DocName());
+    docName.append(1, '(');
+    int n = Parameters().size();
+    for (int i = 1; i < n; ++i)
+    {
+        if (i > 1)
+        {
+            docName.append(U", ");
+        }
+        ParameterSymbol* parameter = Parameters()[i];
+        if (parameter->GetType()->Ns() == Ns())
+        {
+            docName.append(parameter->GetType()->Name());
+        }
+        else
+        {
+            docName.append(parameter->GetType()->FullName());
+        }
+        docName.append(1, ' ').append(parameter->Name());
+    }
+    docName.append(1, ')');
+    return docName;
+}
+
 uint8_t ConstructorSymbol::ConversionDistance() const
 {
     return 5;
@@ -1189,6 +1309,14 @@ DestructorSymbol::DestructorSymbol(const Span& span_, const std::u32string& name
 bool DestructorSymbol::IsExportSymbol() const
 {
     if (IsTemplateSpecialization()) return false;
+    if (Parent()->GetSymbolType() == SymbolType::classTemplateSpecializationSymbol)
+    {
+        const ClassTemplateSpecializationSymbol* classTemplateSpecialization = static_cast<const ClassTemplateSpecializationSymbol*>(Parent());
+        if (classTemplateSpecialization->IsPrototype())
+        {
+            return false;
+        }
+    }
     return true;
 }
 
@@ -1302,6 +1430,57 @@ std::string MemberFunctionSymbol::TypeString() const
     }
 }
 
+std::u32string MemberFunctionSymbol::DocName() const
+{
+    std::u32string docName;
+    docName.append(GroupName());
+    docName.append(1, '(');
+    int n = Parameters().size();
+    int start = 1;
+    if (IsStatic())
+    {
+        start = 0;
+    }
+    for (int i = start; i < n; ++i)
+    {
+        if (i > start)
+        {
+            docName.append(U", ");
+        }
+        ParameterSymbol* parameter = Parameters()[i];
+        if (parameter->GetType()->GetSymbolType() == SymbolType::classTemplateSpecializationSymbol)
+        {
+            ClassTemplateSpecializationSymbol* classTemplateSpecializationSymbol = static_cast<ClassTemplateSpecializationSymbol*>(parameter->GetType());
+            if (classTemplateSpecializationSymbol->GetClassTemplate()->Ns() == Ns())
+            {
+                docName.append(classTemplateSpecializationSymbol->Name());
+            }
+            else
+            {
+                docName.append(classTemplateSpecializationSymbol->FullName());
+            }
+        }
+        else
+        {
+            if (parameter->GetType()->Ns() == Ns())
+            {
+                docName.append(parameter->GetType()->Name());
+            }
+            else
+            {
+                docName.append(parameter->GetType()->FullName());
+            }
+        }
+        docName.append(1, ' ').append(parameter->Name());
+    }
+    docName.append(1, ')');
+    if (IsConst())
+    {
+        docName.append(U" const");
+    }
+    return docName;
+}
+
 void MemberFunctionSymbol::SetSpecifiers(Specifiers specifiers)
 {
     Specifiers accessSpecifiers = specifiers & Specifiers::access_;
@@ -1412,6 +1591,27 @@ void MemberFunctionSymbol::SetSpecifiers(Specifiers specifiers)
 ConversionFunctionSymbol::ConversionFunctionSymbol(const Span& span_, const std::u32string& name_) : FunctionSymbol(SymbolType::conversionFunctionSymbol, span_, name_)
 {
     SetConversion();
+}
+
+std::u32string ConversionFunctionSymbol::DocName() const
+{
+    std::u32string docName;
+    docName.append(U"operator ");
+    TypeSymbol* type = ReturnType();
+    if (type->Ns() == Ns())
+    {
+        docName.append(type->Name());
+    }
+    else
+    {
+        docName.append(type->FullName());
+    }
+    docName.append(U"()");
+    if (IsConst())
+    {
+        docName.append(U" const");
+    }
+    return docName;
 }
 
 TypeSymbol* ConversionFunctionSymbol::ConversionSourceType() const

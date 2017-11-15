@@ -21,6 +21,7 @@ public:
     void Accept(SymbolCollector* collector) override;
     void Dump(CodeFormatter& formatter) override;
     std::string TypeString() const override { return "typedef"; }
+    std::string Syntax() const override;
     void SetSpecifiers(Specifiers specifiers);
     const TypeSymbol* GetType() const { return type; }
     TypeSymbol* GetType() { return type; }

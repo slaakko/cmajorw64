@@ -1,4 +1,4 @@
-// =================================
+﻿// =================================
 // Copyright (c) 2017 Seppo Laakko
 // Distributed under the MIT license
 // =================================
@@ -28,6 +28,7 @@ public extern cdecl nothrow int RtReadByte(int fileHandle);
 public extern cdecl nothrow int RtSeek(int fileHandle, long pos, byte origin);
 public extern cdecl nothrow long RtTell(int fileHandle);
 public extern cdecl nothrow bool RtFileExists(const char* filePath);
+public extern cdecl nothrow bool RtLastWriteTimeLess(const char* filePath1, const char* filePath2);
 public extern cdecl nothrow double RtPow(double x, int exponent);
 public extern cdecl nothrow const char* RtGetEnvironmentVariable(const char* environmentVariableName);
 public extern cdecl nothrow int RtGetCurrentWorkingDirectoryHandle();

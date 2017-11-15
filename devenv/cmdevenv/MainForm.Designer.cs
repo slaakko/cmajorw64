@@ -996,7 +996,7 @@ namespace cmdevenv
             this.toolStripSeparator5,
             this.viewProjectToolStripMenuItem});
             this.projectContextMenuStrip.Name = "projectContextMenuStrip";
-            this.projectContextMenuStrip.Size = new System.Drawing.Size(181, 238);
+            this.projectContextMenuStrip.Size = new System.Drawing.Size(181, 260);
             // 
             // buildToolStripMenuItem2
             // 
@@ -1070,6 +1070,7 @@ namespace cmdevenv
             this.setAsActiveProjectToolStripMenuItem.Name = "setAsActiveProjectToolStripMenuItem";
             this.setAsActiveProjectToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.setAsActiveProjectToolStripMenuItem.Text = "Set as Active Project";
+            this.setAsActiveProjectToolStripMenuItem.Click += new System.EventHandler(this.setAsActiveProjectToolStripMenuItem_Click);
             // 
             // toolStripMenuItem11
             // 

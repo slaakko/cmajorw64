@@ -43,7 +43,7 @@ void ConstantSymbol::EmplaceType(TypeSymbol* typeSymbol, int index)
 
 void ConstantSymbol::Accept(SymbolCollector* collector)
 {
-    if (IsProject())
+    if (IsProject() && Access() == SymbolAccess::public_)
     {
         collector->AddConstant(this);
     }
@@ -53,6 +53,7 @@ void ConstantSymbol::Dump(CodeFormatter& formatter)
 {
     formatter.WriteLine(ToUtf8(Name()));
     formatter.WriteLine("full name: " + ToUtf8(FullNameWithSpecifiers()));
+    formatter.WriteLine("mangled name: " + ToUtf8(MangledName()));
     formatter.WriteLine("type: " + ToUtf8(type->FullName()));
     formatter.WriteLine("value: " + value->ToString());
 }
@@ -125,6 +126,28 @@ void ConstantSymbol::SetSpecifiers(Specifiers specifiers)
     {
         throw Exception("constant cannot be unit_test", GetSpan());
     }
+}
+
+std::string ConstantSymbol::Syntax() const
+{
+    std::string syntax = GetSpecifierStr();
+    if (!syntax.empty())
+    {
+        syntax.append(1, ' ');
+    }
+    syntax.append("const ");
+    syntax.append(ToUtf8(GetType()->DocName()));
+    syntax.append(1, ' ');
+    syntax.append(ToUtf8(DocName()));
+    syntax.append(" = ");
+    std::string valueStr = value->ToString();
+    if (GetType()->IsUnsignedType())
+    {
+        valueStr.append(1, 'u');
+    }
+    syntax.append(valueStr);
+    syntax.append(1, ';');
+    return syntax;
 }
 
 void ConstantSymbol::SetValue(Value* value_)

@@ -1880,6 +1880,31 @@ namespace cmdevenv
                 MessageBox.Show(ex.Message);
             }
         }
+        private async void setAsActiveProjectToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                if (solution != null)
+                {
+                    if (state == State.debugging)
+                    {
+                        throw new Exception("Cannot set active project while debugging");
+                    }
+                    TreeNode selectedNode = solutionExplorerTreeView.SelectedNode;
+                    if (selectedNode != null)
+                    {
+                        Project project = (Project)selectedNode.Tag;
+                        solution.ActiveProject = project;
+                        solution.Save();
+                        await SetupSolutionExplorer(project);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
         private Solution solution;
         private XTabControl editorTabControl;
         private State state;

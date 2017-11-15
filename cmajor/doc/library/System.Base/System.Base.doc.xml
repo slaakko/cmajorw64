@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<docs>
+  <doc id="System.Console">
+    Represents the standard input, output and error streams.
+  </doc>
+  <doc id="System.Collections.List&lt;T>">
+    List is a compact container whose elements are laid out side by side in memory.
+    List grows as needed when new elements are added to it.
+  </doc>
+  <doc id="System.Collections.List&lt;T>.T">
+    The type of the element contained by the list.
+  </doc>
+</docs>

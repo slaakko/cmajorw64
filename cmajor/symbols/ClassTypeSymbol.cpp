@@ -65,7 +65,7 @@ ClassTypeSymbol::ClassTypeSymbol(const Span& span_, const std::u32string& name_)
     TypeSymbol(SymbolType::classTypeSymbol, span_, name_), 
     minArity(0), baseClass(), flags(ClassTypeSymbolFlags::none), implementedInterfaces(), templateParameters(), memberVariables(), staticMemberVariables(),
     staticConstructor(nullptr), defaultConstructor(nullptr), copyConstructor(nullptr), moveConstructor(nullptr), copyAssignment(nullptr), moveAssignment(nullptr), 
-    constructors(), destructor(nullptr), memberFunctions(), vmtPtrIndex(-1), irType(nullptr), vmtObjectType(nullptr), staticObjectType(nullptr)
+    constructors(), destructor(nullptr), memberFunctions(), vmtPtrIndex(-1), irType(nullptr), vmtObjectType(nullptr), staticObjectType(nullptr), prototype(nullptr)
 {
 }
 
@@ -73,7 +73,7 @@ ClassTypeSymbol::ClassTypeSymbol(SymbolType symbolType_, const Span& span_, cons
     TypeSymbol(symbolType_, span_, name_),
     minArity(0), baseClass(), flags(ClassTypeSymbolFlags::none), implementedInterfaces(), templateParameters(), memberVariables(), staticMemberVariables(),
     staticConstructor(nullptr), defaultConstructor(nullptr), copyConstructor(nullptr), moveConstructor(nullptr), copyAssignment(nullptr), moveAssignment(nullptr), 
-    constructors(), destructor(nullptr), memberFunctions(), vmtPtrIndex(-1), irType(nullptr), vmtObjectType(nullptr), staticObjectType(nullptr)
+    constructors(), destructor(nullptr), memberFunctions(), vmtPtrIndex(-1), irType(nullptr), vmtObjectType(nullptr), staticObjectType(nullptr), prototype(nullptr)
 {
 }
 
@@ -102,6 +102,12 @@ void ClassTypeSymbol::Write(SymbolWriter& writer)
         if (hasConstraint)
         {
             writer.GetAstWriter().Write(constraint.get());
+        }
+        bool hasPrototype = prototype != nullptr;
+        writer.GetBinaryWriter().Write(hasPrototype);
+        if (hasPrototype)
+        {
+            writer.GetBinaryWriter().Write(prototype->TypeId());
         }
     }
     else if (GetSymbolType() == SymbolType::classTypeSymbol)
@@ -148,6 +154,12 @@ void ClassTypeSymbol::Read(SymbolReader& reader)
         if (hasConstraint)
         {
             constraint.reset(reader.GetAstReader().ReadConstraintNode());
+        }
+        bool hasPrototype = reader.GetBinaryReader().ReadBool();
+        if (hasPrototype)
+        {
+            uint32_t prototypeId = reader.GetBinaryReader().ReadUInt();
+            GetSymbolTable()->EmplaceTypeRequest(this, prototypeId, 1000000);
         }
     }
     else if (GetSymbolType() == SymbolType::classTypeSymbol)
@@ -238,9 +250,17 @@ void ClassTypeSymbol::EmplaceType(TypeSymbol* typeSymbol, int index)
     }
     else if (index >= 1)
     {
-        Assert(typeSymbol->GetSymbolType() == SymbolType::interfaceTypeSymbol, "interface type symbol expected");
-        InterfaceTypeSymbol* interfaceTypeSymbol = static_cast<InterfaceTypeSymbol*>(typeSymbol);
-        implementedInterfaces[index - 1] = interfaceTypeSymbol;
+        if (index == 1000000)
+        {
+            Assert(typeSymbol->GetSymbolType() == SymbolType::classTemplateSpecializationSymbol, "class template specialization expected");
+            SetPrototype(static_cast<ClassTemplateSpecializationSymbol*>(typeSymbol));
+        }
+        else
+        {
+            Assert(typeSymbol->GetSymbolType() == SymbolType::interfaceTypeSymbol, "interface type symbol expected");
+            InterfaceTypeSymbol* interfaceTypeSymbol = static_cast<InterfaceTypeSymbol*>(typeSymbol);
+            implementedInterfaces[index - 1] = interfaceTypeSymbol;
+        }
     }
 }
 
@@ -304,6 +324,22 @@ void ClassTypeSymbol::AddMember(Symbol* member)
     }
 }
 
+std::string ClassTypeSymbol::GetSpecifierStr() const
+{
+    std::string specifierStr;
+    if (IsAbstract())
+    {
+        specifierStr.append("abstract");
+    }
+    std::string baseSpecifierStr = TypeSymbol::GetSpecifierStr();
+    if (!baseSpecifierStr.empty())
+    {
+        specifierStr.append(1, ' ');
+    }
+    specifierStr.append(baseSpecifierStr);
+    return specifierStr;
+}
+
 bool ClassTypeSymbol::HasNontrivialDestructor() const
 {
     if (destructor || IsPolymorphic()) return true;
@@ -324,8 +360,29 @@ void ClassTypeSymbol::Accept(SymbolCollector* collector)
 {
     if (IsProject())
     {
-        collector->AddClass(this);
+        if (prototype)
+        {
+            prototype->SetParent(Ns());
+            if (Constraint())
+            {
+                CloneContext cloneContext;
+                prototype->SetConstraint(static_cast<ConstraintNode*>(Constraint()->Clone(cloneContext)));
+            }
+            collector->AddClass(prototype);
+        }
+        else
+        {
+            if (Access() == SymbolAccess::public_)
+            {
+                collector->AddClass(this);
+            }
+        }
     }
+}
+
+void ClassTypeSymbol::CollectMembers(SymbolCollector* collector)
+{
+    TypeSymbol::Accept(collector);
 }
 
 void ClassTypeSymbol::Dump(CodeFormatter& formatter)
@@ -333,7 +390,6 @@ void ClassTypeSymbol::Dump(CodeFormatter& formatter)
     formatter.WriteLine(ToUtf8(Name()));
     formatter.WriteLine("group name: " + ToUtf8(groupName));
     formatter.WriteLine("full name: " + ToUtf8(FullNameWithSpecifiers()));
-    formatter.WriteLine("mangled name: " + ToUtf8(MangledName()));
     if (baseClass)
     {
         formatter.WriteLine("base class: " + ToUtf8(baseClass->FullName()));
@@ -347,6 +403,10 @@ void ClassTypeSymbol::Dump(CodeFormatter& formatter)
             formatter.WriteLine(ToUtf8(interface->FullName()));
         }
         formatter.DecIndent();
+    }
+    if (constraint)
+    {
+        formatter.WriteLine("constraint: " + constraint->ToString());
     }
     formatter.WriteLine("typeid: " + std::to_string(TypeId()));
     if (IsPolymorphic())

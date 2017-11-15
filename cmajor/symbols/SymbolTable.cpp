@@ -197,12 +197,16 @@ void SymbolTable::Import(SymbolTable& symbolTable)
             derivedTypeVec.push_back(derivedTypeSymbol);
         }
     }
-    classTemplateSpecializations = std::move(symbolTable.classTemplateSpecializations);
+    for (auto& s : symbolTable.classTemplateSpecializations)
+    {
+        classTemplateSpecializations.push_back(std::move(s));
+    }
     int nc = classTemplateSpecializations.size();
     for (int i = 0; i < nc; ++i)
     {
         ClassTemplateSpecializationSymbol* classTemplateSpecialization = classTemplateSpecializations[i].get();
         classTemplateSpecialization->SetSymbolTable(this);
+        classTemplateSpecialization->SetParent(&globalNs);
         ClassTemplateSpecializationKey key(classTemplateSpecialization->GetClassTemplate(), classTemplateSpecialization->TemplateArgumentTypes());
         auto it = classTemplateSpecializationMap.find(key);
         if (it == classTemplateSpecializationMap.cend())
@@ -210,8 +214,7 @@ void SymbolTable::Import(SymbolTable& symbolTable)
             classTemplateSpecializationMap[key] = classTemplateSpecialization;
         }
     }
-    Assert(conversionTable.IsEmpty(), "empty conversion table expected");
-    conversionTable = std::move(symbolTable.conversionTable);
+    conversionTable.Add(symbolTable.conversionTable);
     for (ClassTypeSymbol* polymorphicClass : symbolTable.PolymorphicClasses())
     {
         AddPolymorphicClass(polymorphicClass);
@@ -302,13 +305,21 @@ void SymbolTable::BeginFunction(FunctionNode& functionNode)
     }
     if (functionSymbol->GroupName() == U"main")
     {
-        if (mainFunctionSymbol)
+        if (functionNode.IsProgramMain())
         {
-            throw Exception("already has main function", functionNode.GetSpan(), mainFunctionSymbol->GetSpan());
+            functionSymbol->SetCDecl();
+            functionSymbol->SetProgramMain();
         }
         else
         {
-            mainFunctionSymbol = functionSymbol;
+            if (mainFunctionSymbol)
+            {
+                throw Exception("already has main function", functionNode.GetSpan(), mainFunctionSymbol->GetSpan());
+            }
+            else
+            {
+                mainFunctionSymbol = functionSymbol;
+            }
         }
     }
     MapNode(&functionNode, functionSymbol);
@@ -1104,9 +1115,24 @@ ClassTemplateSpecializationSymbol* SymbolTable::MakeClassTemplateSpecialization(
             MakeClassTemplateSpecializationName(classTemplate, templateArgumentTypes), classTemplate, templateArgumentTypes);
         classTemplateSpecialization->SetGroupName(classTemplate->GroupName());
         classTemplateSpecializationMap[key] = classTemplateSpecialization;
+        classTemplateSpecialization->SetParent(&globalNs);
         classTemplateSpecialization->SetSymbolTable(this);
         classTemplateSpecializations.push_back(std::unique_ptr<ClassTemplateSpecializationSymbol>(classTemplateSpecialization));
         return classTemplateSpecialization;
+    }
+}
+
+void SymbolTable::AddClassTemplateSpecializationsToClassTemplateSpecializationMap(const std::vector<ClassTemplateSpecializationSymbol*>& classTemplateSpecializations)
+{
+    for (ClassTemplateSpecializationSymbol* classTemplateSpecialization : classTemplateSpecializations)
+    {
+        classTemplateSpecialization->SetSymbolTable(this);
+        ClassTemplateSpecializationKey key(classTemplateSpecialization->GetClassTemplate(), classTemplateSpecialization->TemplateArgumentTypes());
+        auto it = classTemplateSpecializationMap.find(key);
+        if (it == classTemplateSpecializationMap.cend())
+        {
+            classTemplateSpecializationMap[key] = classTemplateSpecialization;
+        }
     }
 }
 
@@ -1136,6 +1162,37 @@ void SymbolTable::AddClassHavingStaticConstructor(ClassTypeSymbol* classHavingSt
         throw Exception("not having static constructor", classHavingStaticConstructor->GetSpan());
     }
     classesHavingStaticConstructor.insert(classHavingStaticConstructor);
+}
+
+std::vector<TypeSymbol*> SymbolTable::Types() const
+{
+    std::vector<TypeSymbol*> types;
+    for (const auto& p : typeNameMap)
+    {
+        TypeSymbol* type = p.second;
+        types.push_back(type);
+    }
+    for (const std::unique_ptr<DerivedTypeSymbol>& dt : derivedTypes)
+    {
+        types.push_back(dt.get());
+    }
+    for (const std::unique_ptr<ClassTemplateSpecializationSymbol>& ts : classTemplateSpecializations)
+    {
+        types.push_back(ts.get());
+    }
+    return types;
+}
+
+void SymbolTable::Copy(const SymbolTable& that)
+{
+    for (const auto& p : that.typeIdMap)
+    {
+        typeIdMap[p.first] = p.second;
+    }
+    for (const auto& p : that.functionIdMap)
+    {
+        functionIdMap[p.first] = p.second;
+    }
 }
 
 class IntrinsicConcepts

@@ -20,6 +20,7 @@ public:
     FunctionGroupSymbol(const Span& span_, const std::u32string& name_);
     bool IsExportSymbol() const override { return false; }
     std::string TypeString() const override { return "function_group"; }
+    void ComputeMangledName() override;
     void AddFunction(FunctionSymbol* function);
     void RemoveFunction(FunctionSymbol* function);
     void CollectViableFunctions(int arity, std::unordered_set<FunctionSymbol*>& viableFunctions);
@@ -93,6 +94,9 @@ public:
     virtual void ComputeName();
     std::u32string FullName() const override;
     std::u32string FullNameWithSpecifiers() const override;
+    std::u32string DocName() const override;
+    std::string GetSpecifierStr() const override;
+    std::string Syntax() const override;
     virtual ConversionType GetConversionType() const { return ConversionType::implicit_; }
     virtual uint8_t ConversionDistance() const { return 0; }
     virtual TypeSymbol* ConversionSourceType() const { return nullptr; }
@@ -154,7 +158,7 @@ public:
     FunctionSymbolFlags GetFunctionSymbolFlags() const { return flags; }
     bool GetFlag(FunctionSymbolFlags flag) const { return (flags & flag) != FunctionSymbolFlags::none; }
     void SetFlag(FunctionSymbolFlags flag) { flags = flags | flag; }
-    void ComputeMangledName();
+    void ComputeMangledName() override;
     int Arity() const { return parameters.size(); }
     const std::vector<ParameterSymbol*>& Parameters() const { return parameters; }
     void AddLocalVariable(LocalVariableSymbol* localVariable);
@@ -176,6 +180,8 @@ public:
     Node* GlobalNs() { return globalNs.get(); }
     FunctionGroupSymbol* FunctionGroup() { return functionGroup; }
     void SetFunctionGroup(FunctionGroupSymbol* functionGroup_) { functionGroup = functionGroup_; }
+    bool IsProgramMain() const { return isProgramMain; }
+    void SetProgramMain() { isProgramMain = true; }
 private:
     uint32_t functionId;
     std::u32string groupName;
@@ -197,6 +203,7 @@ private:
     std::string filePathReadFrom;
     std::unique_ptr<Node> globalNs;
     FunctionGroupSymbol* functionGroup;
+    bool isProgramMain;
 };
 
 class StaticConstructorSymbol : public FunctionSymbol
@@ -204,6 +211,7 @@ class StaticConstructorSymbol : public FunctionSymbol
 public:
     StaticConstructorSymbol(const Span& span_, const std::u32string& name_);
     std::string TypeString() const override { return "static_constructor"; }
+    void Accept(SymbolCollector* collector) override {}
     void SetSpecifiers(Specifiers specifiers);
     std::u32string FullNameWithSpecifiers() const override;
 };
@@ -214,6 +222,7 @@ class ConstructorSymbol : public FunctionSymbol
 public:
     ConstructorSymbol(const Span& span_, const std::u32string& name_);
     std::string TypeString() const override;
+    std::u32string DocName() const override;
     ParameterSymbol* GetThisParam() const override { return Parameters()[0]; }
     bool IsConstructorDestructorOrNonstaticMemberFunction() const override { return true; }
     void SetSpecifiers(Specifiers specifiers);
@@ -229,6 +238,7 @@ public:
     void Write(SymbolWriter& writer) override;
     void Read(SymbolReader& reader) override;
     bool IsExportSymbol() const override;
+    void Accept(SymbolCollector* collector) override {}
     std::string TypeString() const override { return "destructor"; }
     ParameterSymbol* GetThisParam() const override { return Parameters()[0]; }
     bool IsConstructorDestructorOrNonstaticMemberFunction() const override { return true; }
@@ -245,6 +255,7 @@ class MemberFunctionSymbol : public FunctionSymbol
 public:
     MemberFunctionSymbol(const Span& span_, const std::u32string& name_);
     std::string TypeString() const override;
+    std::u32string DocName() const override;
     ParameterSymbol* GetThisParam() const override { if (IsStatic()) return nullptr; else return Parameters()[0]; }
     bool IsConstructorDestructorOrNonstaticMemberFunction() const override { return !IsStatic(); }
     void SetSpecifiers(Specifiers specifiers);
@@ -255,6 +266,7 @@ class ConversionFunctionSymbol : public FunctionSymbol
 public:
     ConversionFunctionSymbol(const Span& span_, const std::u32string& name_);
     std::string TypeString() const override { return "conversion_function";  }
+    std::u32string DocName() const override;
     ParameterSymbol* GetThisParam() const override { return Parameters()[0]; }
     bool IsConstructorDestructorOrNonstaticMemberFunction() const override { return true; }
     ConversionType GetConversionType() const override { return ConversionType::implicit_; }

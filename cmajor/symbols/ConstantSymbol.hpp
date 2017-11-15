@@ -20,6 +20,7 @@ public:
     void Accept(SymbolCollector* collector) override;
     void Dump(CodeFormatter& formatter) override;
     std::string TypeString() const override { return "constant"; }
+    std::string Syntax() const override;
     void SetSpecifiers(Specifiers specifiers);
     bool Evaluating() const { return evaluating; }
     void SetEvaluating() { evaluating = true; }

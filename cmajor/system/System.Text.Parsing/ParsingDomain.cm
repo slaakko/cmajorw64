@@ -97,6 +97,14 @@ namespace System.Text.Parsing
         {
             return globalNamespace;
         }
+        public inline nothrow Namespace* CurrentNamespace() const
+        {
+            return currentNamespace;
+        }
+        public inline nothrow Scope* CurrentScope() const
+        {
+            return currentNamespace->GetScope();
+        }
         private HashMap<ustring, Grammar*> grammarMap;
         private Namespace* globalNamespace;
         private Scope* globalScope;

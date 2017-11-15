@@ -14,6 +14,18 @@ void ConversionTable::AddConversion(FunctionSymbol* conversion)
     conversionMap.insert(std::make_pair(entry, conversion));
 }
 
+void ConversionTable::Add(ConversionTable& that)
+{
+    for (std::unique_ptr<FunctionSymbol>& conversion : that.generatedConversions)
+    {
+        generatedConversions.push_back(std::move(conversion));
+    }
+    for (const auto& p : that.conversionMap)
+    {
+        conversionMap[p.first] = p.second;
+    }
+}
+
 FunctionSymbol* ConversionTable::GetConversion(TypeSymbol* sourceType, TypeSymbol* targetType, const Span& span) const
 {
     TypeSymbol* sourcePlainType = sourceType->PlainType(span);

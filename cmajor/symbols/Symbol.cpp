@@ -161,6 +161,26 @@ void Symbol::ComputeExportClosure()
 {
 }
 
+std::string Symbol::GetSpecifierStr() const
+{
+    return SymbolFlagStr(flags);
+}
+
+std::string Symbol::Syntax() const
+{
+    std::string syntax;
+    syntax.append(GetSpecifierStr());
+    if (!syntax.empty())
+    {
+        syntax.append(1, ' ');
+    }
+    syntax.append(TypeString());
+    syntax.append(1, ' ');
+    syntax.append(ToUtf8(DocName()));
+    syntax.append(1, ';');
+    return syntax;
+}
+
 void Symbol::SetMangledName(const std::u32string& mangledName_)
 {
     mangledName = mangledName_;

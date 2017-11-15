@@ -172,6 +172,7 @@ public:
     TypeSymbol* GetTypeByName(const std::u32string& typeName) const;
     TypeSymbol* MakeDerivedType(TypeSymbol* baseType, const TypeDerivationRec& derivationRec, const Span& span);
     ClassTemplateSpecializationSymbol* MakeClassTemplateSpecialization(ClassTypeSymbol* classTemplate, const std::vector<TypeSymbol*>& templateArgumentTypes, const Span& span);
+    void AddClassTemplateSpecializationsToClassTemplateSpecializationMap(const std::vector<ClassTemplateSpecializationSymbol*>& classTemplateSpecializations);
     const FunctionSymbol* MainFunctionSymbol() const { return mainFunctionSymbol; }
     FunctionSymbol* MainFunctionSymbol() { return mainFunctionSymbol; }
     void AddConversion(FunctionSymbol* conversion);
@@ -180,6 +181,8 @@ public:
     const std::unordered_set<ClassTypeSymbol*>& PolymorphicClasses() const { return polymorphicClasses; }
     void AddClassHavingStaticConstructor(ClassTypeSymbol* classHavingStaticConstructor);
     const std::unordered_set<ClassTypeSymbol*>& ClassesHavingStaticConstructor() const { return classesHavingStaticConstructor; }
+    std::vector<TypeSymbol*> Types() const;
+    void Copy(const SymbolTable& that);
 private:
     NamespaceSymbol globalNs;
     CompileUnitNode* currentCompileUnit;

@@ -23,6 +23,12 @@
 #include <cmajor/symbols/SymbolWriter.hpp>
 #include <cmajor/symbols/SymbolReader.hpp>
 #include <cmajor/symbols/SymbolCreatorVisitor.hpp>
+#include <cmajor/ast/Function.hpp>
+#include <cmajor/ast/BasicType.hpp>
+#include <cmajor/ast/Identifier.hpp>
+#include <cmajor/ast/TypeExpr.hpp>
+#include <cmajor/ast/Expression.hpp>
+#include <cmajor/ast/Literal.hpp>
 #include <cmajor/ast/SystemFileIndex.hpp>
 #include <cmajor/util/Unicode.hpp>
 #include <cmajor/util/Path.hpp>
@@ -304,7 +310,7 @@ void CreateDefFile(const std::string& defFilePath, Module& module)
     }
 }
 
-void Link(const std::string& executableFilePath, const std::vector<std::string>& libraryFilePaths, Module& module)
+void Link(const std::string& executableFilePath, const std::string& libraryFilePath, const std::vector<std::string>& libraryFilePaths, Module& module)
 {
     if (GetGlobalFlag(GlobalFlags::verbose))
     {
@@ -328,27 +334,9 @@ void Link(const std::string& executableFilePath, const std::vector<std::string>&
     args.push_back("/out:" + QuotedPath(executableFilePath));
     boost::filesystem::path out = executableFilePath;
     args.push_back("/stack:16777216");
-    std::string defFilePath = GetFullPath(out.replace_extension(".def").generic_string());
+    std::string defFilePath = GetFullPath(boost::filesystem::path(libraryFilePath).replace_extension(".def").generic_string());
     CreateDefFile(defFilePath, module);
     args.push_back("/def:" + QuotedPath(defFilePath));
-/*
-    for (const std::string& fun : module.AllExportedFunctions())
-    {
-        args.push_back("/export:" + fun);
-    }
-    for (const std::string& fun : module.ExportedFunctions())
-    {
-        args.push_back("/export:" + fun);
-    }
-    for (const std::string& data : module.AllExportedData())
-    {
-        args.push_back("/export:" + data);
-    }
-    for (const std::string& data : module.ExportedData())
-    {
-        args.push_back("/export:" + data);
-    }
-*/
     std::string cmrtLibName = "cmrt200.lib";
     if (GetGlobalFlag(GlobalFlags::linkWithDebugRuntime))
     {
@@ -478,37 +466,107 @@ void WriteSystemFileIndex(const std::string& config)
     SystemFileIndex::Instance().Write(GetFullPath(systemFileIndexFile.generic_string()));
 }
 
+void CheckMainFunctionSymbol(Module& module)
+{
+    FunctionSymbol* userMain = module.GetSymbolTable().MainFunctionSymbol();
+    if (!userMain)
+    {
+        throw Exception("program has no main function", Span());
+    }
+    if (!userMain->Parameters().empty())
+    {
+        if (userMain->Parameters().size() != 2)
+        {
+            throw Exception("main function must either take no parameters or take two parameters", userMain->GetSpan());
+        }
+        if (!TypesEqual(userMain->Parameters()[0]->GetType(), module.GetSymbolTable().GetTypeByName(U"int")))
+        {
+            throw Exception("first parameter of main function must be of int type", userMain->GetSpan());
+        }
+        if (!TypesEqual(userMain->Parameters()[1]->GetType(), module.GetSymbolTable().GetTypeByName(U"char")->AddConst(userMain->GetSpan())->AddPointer(userMain->GetSpan())->AddPointer(userMain->GetSpan())))
+        {
+            throw Exception("second parameter of main function must be of 'const char**' type", userMain->GetSpan());
+        }
+    }
+    if (userMain->ReturnType() && !userMain->ReturnType()->IsVoidType())
+    {
+        if (!TypesEqual(userMain->ReturnType(), module.GetSymbolTable().GetTypeByName(U"int")))
+        {
+            throw Exception("main function must either be void function or return an int", userMain->GetSpan());
+        }
+    }
+}
+
 void CreateMainUnit(std::vector<std::string>& objectFilePaths, Module& module, EmittingContext& emittingContext)
 {
     CompileUnitNode mainCompileUnit(Span(), boost::filesystem::path(module.OriginalFilePath()).parent_path().append("__main__.cm").generic_string());
-    BoundCompileUnit mainUnit(module, &mainCompileUnit);
-    FunctionSymbol mainFunctionSymbol(Span(), U"main");
-    mainFunctionSymbol.SetGroupName(U"main");
-    mainFunctionSymbol.SetMangledName(U"main");
-    mainFunctionSymbol.SetNothrow();
-    std::unique_ptr<BoundFunction> mainFunction(new BoundFunction(&mainFunctionSymbol));
-    std::unique_ptr<BoundCompoundStatement> body(new BoundCompoundStatement(Span()));
-    std::vector<FunctionScopeLookup> lookups;
-    lookups.push_back(FunctionScopeLookup(ScopeLookup::this_, module.GetSymbolTable().GlobalNs().GetContainerScope()));
-    std::vector<std::unique_ptr<BoundExpression>> initArguments;
-    std::unique_ptr<BoundStatement> initStatement(new BoundExpressionStatement(
-        ResolveOverload(U"RtInit", module.GetSymbolTable().GlobalNs().GetContainerScope(), lookups, initArguments, mainUnit, mainFunction.get(), Span())));
-    body->AddStatement(std::move(initStatement));
-    std::unique_ptr<BoundStatement> mainStatement(new BoundExpressionStatement(std::unique_ptr<BoundExpression>(new BoundFunctionCall(Span(), module.GetSymbolTable().MainFunctionSymbol()))));
-    body->AddStatement(std::move(mainStatement));
-    std::vector<std::unique_ptr<BoundExpression>> doneArguments;
-    std::unique_ptr<BoundStatement> doneStatement(new BoundExpressionStatement(
-        ResolveOverload(U"RtDone", module.GetSymbolTable().GlobalNs().GetContainerScope(), lookups, doneArguments, mainUnit, mainFunction.get(), Span())));
-    body->AddStatement(std::move(doneStatement));
-    std::vector<std::unique_ptr<BoundExpression>> exitArguments;
-    exitArguments.push_back(std::unique_ptr<BoundExpression>(new BoundLiteral(std::unique_ptr<Value>(new IntValue(Span(), 0)), module.GetSymbolTable().GetTypeByName(U"int"))));
-    std::unique_ptr<BoundStatement> exitStatement(new BoundExpressionStatement(
-        ResolveOverload(U"RtExit", module.GetSymbolTable().GlobalNs().GetContainerScope(), lookups, exitArguments, mainUnit, mainFunction.get(), Span())));
-    body->AddStatement(std::move(exitStatement));
-    mainFunction->SetBody(std::move(body));
-    mainUnit.AddBoundNode(std::move(mainFunction));
-    GenerateCode(emittingContext, mainUnit);
-    objectFilePaths.push_back(mainUnit.ObjectFilePath());
+    mainCompileUnit.GlobalNs()->AddMember(new NamespaceImportNode(Span(), new IdentifierNode(Span(), U"System")));
+    FunctionNode* mainFunction(new FunctionNode(Span(), Specifiers::public_, new IntNode(Span()), U"main"));
+    mainFunction->SetProgramMain();
+    mainFunction->AddParameter(new ParameterNode(Span(), new IntNode(Span()), new IdentifierNode(Span(), U"argc")));
+    mainFunction->AddParameter(new ParameterNode(Span(), new ConstNode(Span(), new PointerNode(Span(), new PointerNode(Span(), new CharNode(Span())))), new IdentifierNode(Span(), U"argv")));
+    CompoundStatementNode* mainFunctionBody = new CompoundStatementNode(Span());
+    ConstructionStatementNode* constructExitCode = new ConstructionStatementNode(Span(), new IntNode(Span()), new IdentifierNode(Span(), U"exitCode"));
+    mainFunctionBody->AddStatement(constructExitCode);
+    ExpressionStatementNode* rtInitCall = new ExpressionStatementNode(Span(), new InvokeNode(Span(), new IdentifierNode(Span(), U"RtInit")));
+    mainFunctionBody->AddStatement(rtInitCall);
+    CompoundStatementNode* tryBlock = new CompoundStatementNode(Span());
+    FunctionSymbol* userMain = module.GetSymbolTable().MainFunctionSymbol();
+    InvokeNode* invokeMain = new InvokeNode(Span(), new IdentifierNode(Span(), userMain->GroupName()));
+    if (!userMain->Parameters().empty())
+    {
+        invokeMain->AddArgument(new IdentifierNode(Span(), U"argc"));
+        invokeMain->AddArgument(new IdentifierNode(Span(), U"argv"));
+    }
+    StatementNode* callMainStatement = nullptr;
+    if (!userMain->ReturnType() || userMain->ReturnType()->IsVoidType())
+    {
+        callMainStatement = new ExpressionStatementNode(Span(), invokeMain);
+    }
+    else
+    {
+        callMainStatement = new AssignmentStatementNode(Span(), new IdentifierNode(Span(), U"exitCode"), invokeMain);
+    }
+    tryBlock->AddStatement(callMainStatement);
+    TryStatementNode* tryStatement = new TryStatementNode(Span(), tryBlock);
+    CompoundStatementNode* catchBlock = new CompoundStatementNode(Span());
+    InvokeNode* consoleError = new InvokeNode(Span(), new DotNode(Span(), new IdentifierNode(Span(), U"System.Console"), new IdentifierNode(Span(), U"Error")));
+    DotNode* writeLine = new DotNode(Span(), consoleError, new IdentifierNode(Span(), U"WriteLine"));
+    InvokeNode* printEx = new InvokeNode(Span(), writeLine);
+    InvokeNode* exToString = new InvokeNode(Span(), new DotNode(Span(), new IdentifierNode(Span(), U"ex"), new IdentifierNode(Span(), U"ToString")));
+    printEx->AddArgument(exToString);
+    ExpressionStatementNode* printExStatement = new ExpressionStatementNode(Span(), printEx);
+    catchBlock->AddStatement(printExStatement);
+    AssignmentStatementNode* assignExitCodeStatement = new AssignmentStatementNode(Span(), new IdentifierNode(Span(), U"exitCode"), new IntLiteralNode(Span(), 1));
+    catchBlock->AddStatement(assignExitCodeStatement);
+    CatchNode* catchAll = new CatchNode(Span(), new ConstNode(Span(), new LValueRefNode(Span(), new IdentifierNode(Span(), U"System.Exception"))), new IdentifierNode(Span(), U"ex"), catchBlock);
+    tryStatement->AddCatch(catchAll);
+    mainFunctionBody->AddStatement(tryStatement);
+    ExpressionStatementNode* rtDoneCall = new ExpressionStatementNode(Span(), new InvokeNode(Span(), new IdentifierNode(Span(), U"RtDone")));
+    mainFunctionBody->AddStatement(rtDoneCall);
+    InvokeNode* exitCall = new InvokeNode(Span(), new IdentifierNode(Span(), U"RtExit"));
+    exitCall->AddArgument(new IdentifierNode(Span(), U"exitCode"));
+    ExpressionStatementNode* rtExitCall = new ExpressionStatementNode(Span(), exitCall);
+    mainFunctionBody->AddStatement(rtExitCall);
+    ReturnStatementNode* returnStatement = new ReturnStatementNode(Span(), new IdentifierNode(Span(), U"exitCode"));
+    mainFunctionBody->AddStatement(returnStatement);
+    mainFunction->SetBody(mainFunctionBody);
+    mainCompileUnit.GlobalNs()->AddMember(mainFunction);
+    SymbolCreatorVisitor symbolCreator(module.GetSymbolTable());
+    mainCompileUnit.Accept(symbolCreator);
+    BoundCompileUnit boundMainCompileUnit(module, &mainCompileUnit);
+    boundMainCompileUnit.PushBindingTypes();
+    TypeBinder typeBinder(boundMainCompileUnit);
+    mainCompileUnit.Accept(typeBinder);
+    boundMainCompileUnit.PopBindingTypes();
+    StatementBinder statementBinder(boundMainCompileUnit);
+    mainCompileUnit.Accept(statementBinder);
+    if (boundMainCompileUnit.HasGotos())
+    {
+        AnalyzeControlFlow(boundMainCompileUnit);
+    }
+    GenerateCode(emittingContext, boundMainCompileUnit);
+    objectFilePaths.push_back(boundMainCompileUnit.ObjectFilePath());
 }
 
 void BuildProject(Project* project)
@@ -579,16 +637,13 @@ void BuildProject(Project* project)
     }
     if (project->GetTarget() == Target::program)
     {
-        if (!module.GetSymbolTable().MainFunctionSymbol())
-        {
-            throw std::runtime_error("program has no main function");
-        }
+        CheckMainFunctionSymbol(module);
         CreateMainUnit(objectFilePaths, module, emittingContext);
     }
     GenerateLibrary(objectFilePaths, project->LibraryFilePath());
     if (project->GetTarget() == Target::program)
     {
-        Link(project->ExecutableFilePath(), module.LibraryFilePaths(), module);
+        Link(project->ExecutableFilePath(), project->LibraryFilePath(), module.LibraryFilePaths(), module);
         CreateClassFile(project->ExecutableFilePath(), module.GetSymbolTable());
     }
     if (GetGlobalFlag(GlobalFlags::verbose))

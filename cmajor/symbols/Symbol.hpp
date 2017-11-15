@@ -118,12 +118,16 @@ public:
     virtual std::u32string FullName() const;
     virtual std::u32string FullNameWithSpecifiers() const;
     virtual std::u32string SimpleName() const { return Name(); }
+    virtual std::u32string DocName() const { return Name(); }
+    virtual std::u32string Id() const { return mangledName; }
     virtual SymbolAccess DeclaredAccess() const { return Access(); }
     virtual std::string TypeString() const { return "symbol";  }
     virtual llvm::Value* IrObject() { return irObject; }
     virtual void ComputeMangledName();
     virtual void ComputeExportClosure();
     virtual void Dump(CodeFormatter& formatter) {}
+    virtual std::string GetSpecifierStr() const;
+    virtual std::string Syntax() const;
     void SetMangledName(const std::u32string& mangledName_);
     SymbolAccess Access() const { return SymbolAccess(flags & SymbolFlags::access);  }
     void SetAccess(SymbolAccess access_) { flags = flags | SymbolFlags(access_); }

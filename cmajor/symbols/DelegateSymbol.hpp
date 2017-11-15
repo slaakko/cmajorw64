@@ -22,6 +22,7 @@ public:
     void ComputeExportClosure() override;
     void AddMember(Symbol* member) override;
     std::string TypeString() const override { return "delegate"; }
+    std::string Syntax() const override;
     void Accept(SymbolCollector* collector) override;
     void Dump(CodeFormatter& formatter) override;
     llvm::Type* IrType(Emitter& emitter) override;
@@ -144,6 +145,7 @@ public:
     void ComputeExportClosure() override;
     void AddMember(Symbol* member) override;
     std::string TypeString() const override { return "class_delegate"; }
+    std::string Syntax() const override;
     void Accept(SymbolCollector* collector) override;
     void Dump(CodeFormatter& formatter) override;
     llvm::Type* IrType(Emitter& emitter) override;

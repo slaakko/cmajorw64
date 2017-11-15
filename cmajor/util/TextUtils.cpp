@@ -76,9 +76,9 @@ std::string TrimAll(const std::string& s)
 std::u32string Trim(const std::u32string& s)
 {
     int b = 0;
-    while (b < int(s.length()) && std::isspace(s[b])) ++b;
+    while (b < int(s.length()) && IsWhiteSpace(s[b])) ++b;
     int e = int(s.length()) - 1;
-    while (e >= b && std::isspace(s[e])) --e;
+    while (e >= b && IsWhiteSpace(s[e])) --e;
     return s.substr(b, e - b + 1);
 }
 
@@ -95,7 +95,7 @@ std::u32string TrimAll(const std::u32string& s)
         {
             case 0:
             {
-                if (!std::isspace(c))
+                if (!IsWhiteSpace(c))
                 {
                     result.append(1, c);
                     state = 1;
@@ -104,7 +104,7 @@ std::u32string TrimAll(const std::u32string& s)
             }
             case 1:
             {
-                if (std::isspace(c))
+                if (IsWhiteSpace(c))
                 {
                     state = 2;
                 }
@@ -116,7 +116,7 @@ std::u32string TrimAll(const std::u32string& s)
             }
             case 2:
             {
-                if (!std::isspace(c))
+                if (!IsWhiteSpace(c))
                 {
                     result.append(1, ' ');
                     result.append(1, c);

@@ -61,6 +61,37 @@ void DelegateTypeSymbol::AddMember(Symbol* member)
     }
 }
 
+std::string DelegateTypeSymbol::Syntax() const
+{
+    std::string syntax = GetSpecifierStr();
+    if (!syntax.empty())
+    {
+        syntax.append(1, ' ');
+    }
+    syntax.append("delegate ");
+    syntax.append(ToUtf8(ReturnType()->DocName()));
+    syntax.append(1, ' ');
+    syntax.append(ToUtf8(DocName()));
+    syntax.append(1, '(');
+    bool first = true;
+    for (ParameterSymbol* param : parameters)
+    {
+        if (first)
+        {
+            first = false;
+        }
+        else
+        {
+            syntax.append(", ");
+        }
+        syntax.append(ToUtf8(param->GetType()->DocName()));
+        syntax.append(1, ' ');
+        syntax.append(ToUtf8(param->DocName()));
+    }
+    syntax.append(");");
+    return syntax;
+}
+
 void DelegateTypeSymbol::ComputeExportClosure()
 {
     if (IsProject())
@@ -94,7 +125,7 @@ void DelegateTypeSymbol::ComputeExportClosure()
 
 void DelegateTypeSymbol::Accept(SymbolCollector* collector)
 {
-    if (IsProject())
+    if (IsProject() && Access() == SymbolAccess::public_)
     {
         collector->AddDelegate(this);
     }
@@ -635,9 +666,40 @@ void ClassDelegateTypeSymbol::AddMember(Symbol* member)
     }
 }
 
+std::string ClassDelegateTypeSymbol::Syntax() const
+{
+    std::string syntax = GetSpecifierStr();
+    if (!syntax.empty())
+    {
+        syntax.append(1, ' ');
+    }
+    syntax.append("class delegate ");
+    syntax.append(ToUtf8(ReturnType()->DocName()));
+    syntax.append(1, ' ');
+    syntax.append(ToUtf8(DocName()));
+    syntax.append(1, '(');
+    bool first = true;
+    for (ParameterSymbol* param : parameters)
+    {
+        if (first)
+        {
+            first = false;
+        }
+        else
+        {
+            syntax.append(", ");
+        }
+        syntax.append(ToUtf8(param->GetType()->DocName()));
+        syntax.append(1, ' ');
+        syntax.append(ToUtf8(param->DocName()));
+    }
+    syntax.append(");");
+    return syntax;
+}
+
 void ClassDelegateTypeSymbol::Accept(SymbolCollector* collector)
 {
-    if (IsProject())
+    if (IsProject() && Access() == SymbolAccess::public_)
     {
         collector->AddClassDelegate(this);
     }

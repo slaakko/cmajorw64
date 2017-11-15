@@ -27,7 +27,7 @@ void InterfaceTypeSymbol::AddMember(Symbol* member)
 
 void InterfaceTypeSymbol::Accept(SymbolCollector* collector)
 {
-    if (IsProject())
+    if (IsProject() && Access() == SymbolAccess::public_)
     {
         collector->AddInterface(this);
     }

@@ -57,6 +57,10 @@ namespace System.Text.Parsing
         {
             return inheritedAttributes;
         }
+        public void AddInheritedAttribute(const AttrOrVar& attr)
+        {
+            inheritedAttributes.Add(attr);
+        }
         public inline nothrow int NumberOfParameters() const
         {
             return cast<int>(inheritedAttributes.Count());
@@ -64,6 +68,10 @@ namespace System.Text.Parsing
         public inline nothrow List<AttrOrVar>& LocalVariables() const
         {
             return localVariables;
+        }
+        public void AddLocalVariable(const AttrOrVar& var)
+        {
+            localVariables.Add(var);
         }
         public inline nothrow const ustring& ValueTypeName() const
         {

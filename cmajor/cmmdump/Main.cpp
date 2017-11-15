@@ -6,9 +6,11 @@
 #include <cmajor/ast/InitDone.hpp>
 #include <cmajor/parsing/InitDone.hpp>
 #include <cmajor/util/InitDone.hpp>
+#include <cmajor/binder/ModuleBinder.hpp>
 #include <cmajor/symbols/InitDone.hpp>
 #include <cmajor/symbols/Exception.hpp>
 #include <cmajor/symbols/Module.hpp>
+#include <cmajor/symbols/GlobalFlags.hpp>
 #include <cmajor/parser/FileRegistry.hpp>
 #include <boost/filesystem.hpp>
 #include <iostream>
@@ -41,6 +43,7 @@ void PrintHelp()
 }
 
 using namespace cmajor::symbols;
+using namespace cmajor::binder;
 
 int main(int argc, const char** argv)
 {
@@ -52,6 +55,7 @@ int main(int argc, const char** argv)
             PrintHelp();
             return 0;
         }
+        SetGlobalFlag(GlobalFlags::info);
         std::vector<std::string> moduleFilePaths;
         for (int i = 1; i < argc; ++i)
         {
@@ -90,7 +94,25 @@ int main(int argc, const char** argv)
             {
                 throw std::runtime_error("Cmajor module file '" + moduleFilePath + "' not found.");
             }
-            Module module(moduleFilePath);
+            std::vector<ClassTypeSymbol*> classTypes;
+            std::vector<ClassTemplateSpecializationSymbol*> classTemplateSpecializations;
+            Module module(moduleFilePath, classTypes, classTemplateSpecializations);
+            std::unique_ptr<ModuleBinder> moduleBinder;
+            CompileUnitNode compileUnit(Span(), "foo");
+            moduleBinder.reset(new ModuleBinder(module, &compileUnit));
+            if (moduleBinder)
+            {
+                module.GetSymbolTable().AddClassTemplateSpecializationsToClassTemplateSpecializationMap(classTemplateSpecializations);
+                for (ClassTemplateSpecializationSymbol* classTemplateSpecialization : classTemplateSpecializations)
+                {
+                    moduleBinder->BindClassTemplateSpecialization(classTemplateSpecialization);
+                }
+                for (ClassTypeSymbol* classType : classTypes)
+                {
+                    classType->SetSpecialMemberFunctions();
+                    classType->CreateLayouts();
+                }
+            }
             module.Dump();
         }
     }

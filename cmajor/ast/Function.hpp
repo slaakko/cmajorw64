@@ -45,6 +45,8 @@ public:
     void SetBody(CompoundStatementNode* body_);
     const CompoundStatementNode* BodySource() const { return bodySource.get(); }
     void SetBodySource(CompoundStatementNode* bodySource_);
+    bool IsProgramMain() const { return programMain; }
+    void SetProgramMain() { programMain = true; }
 private:
     Specifiers specifiers;
     std::unique_ptr<Node> returnTypeExpr;
@@ -54,6 +56,7 @@ private:
     std::unique_ptr<WhereConstraintNode> whereConstraint;
     std::unique_ptr<CompoundStatementNode> body;
     std::unique_ptr<CompoundStatementNode> bodySource;
+    bool programMain;
 };
 
 } } // namespace cmajor::ast
