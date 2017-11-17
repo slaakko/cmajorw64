@@ -1,0 +1,683 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>Language Reference</title>
+    <link href="../style/langref.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+    <h1>Language Reference</h1>
+
+    <h2>Table of Contents</h2>
+
+    <h2 id="lexical-structure">Lexical Structure</h2>
+
+    <h3 id="white-space-and-comments">White Space and Comments</h3>
+
+    <p>
+        Other lexical elements such as keywords, identifiers, literals and operators may be separated by any number of white space characters and comments that match the syntax rule
+        <span class="rule"><a href="#rule.white-space-and-comments">white&#8209;space&#8209;and&#8209;comments</a></span>.
+    </p>
+
+    <h4 id="white-space-and-comments-syntax">Syntax</h4>
+
+    <table class="grammar">
+        <tr>
+            <td class="rule" id="rule.white-space-and-comments">white&#8209;space&#8209;and&#8209;comments</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                (<span class="rule"><a href="#rule.white-space-char">white&#8209;space&#8209;char</a></span> |
+                <span class="rule"><a href="#rule.comment">comment</a></span>)*
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.white-space-char">white&#8209;space&#8209;char</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                'any Unicode character having property WSpace=Y'
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.comment">comment</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.line-comment">line&#8209;comment</a></span> |
+                <span class="rule"><a href="#rule.block-comment">block&#8209;comment</a></span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.line-comment">line&#8209;comment</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="mono">//</span>
+                <span class="op">[^\r\n]*</span>
+                <span class="rule"><a href="#rule.newline">newline</a></span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.newline">newline</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="mono">\r\n</span> |
+                <span class="mono">\n</span> |
+                <span class="mono">\r</span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.block-comment">block&#8209;comment</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="mono">/*</span>
+                (<span class="rule"><a href="#rule.any-char">any&#8209;char</a></span>
+                <span class="op">&minus;</span>
+                <span class="mono">*/</span>)*
+                <span class="mono">*/</span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.any-char">any&#8209;char</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                'any Unicode character'
+            </td>
+        </tr>
+    </table>
+
+    <p>
+        See Wikipedia article about <a href="http://en.wikipedia.org/wiki/Whitespace_character">Unicode Whitespace Character</a>.
+    </p>
+
+    <h3 id="keywords">Keywords</h3>
+
+    <p>
+        Keywords have a context-dependent meaning. They cannot be used as identifiers.
+    </p>
+
+    <h4 id="keywords-syntax">Syntax</h4>
+
+    <table class="grammar">
+        <tr>
+            <td class="rule" id="rule.keyword">keyword</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="kw">abstract</span> |
+                <span class="kw">and</span> |
+                <span class="kw">as</span> |
+                <span class="kw">axiom</span> |
+                <span class="kw">base</span> |
+                <span class="kw">bool</span> |
+                <span class="kw">break</span> |
+                <span class="kw">byte</span> |
+                <span class="kw">case</span> |
+                <span class="kw">cast</span> |
+                <span class="kw">catch</span> |
+                <span class="kw">cdecl</span> |
+                <span class="kw">char</span> |
+                <span class="kw">class</span> |
+                <span class="kw">concept</span> |
+                <span class="kw">const</span> |
+                <span class="kw">constexpr</span> |
+                <span class="kw">construct</span> |
+                <span class="kw">continue</span> |
+                <span class="kw">default</span> |
+                <span class="kw">delegate</span> |
+                <span class="kw">delete</span> |
+                <span class="kw">destroy</span> |
+                <span class="kw">do</span> |
+                <span class="kw">double</span> |
+                <span class="kw">else</span> |
+                <span class="kw">enum</span> |
+                <span class="kw">explicit</span> |
+                <span class="kw">extern</span> |
+                <span class="kw">false</span> |
+                <span class="kw">float</span> |
+                <span class="kw">for</span> |
+                <span class="kw">goto</span> |
+                <span class="kw">if</span> |
+                <span class="kw">inline</span> |
+                <span class="kw">int</span> |
+                <span class="kw">interface</span> |
+                <span class="kw">internal</span> |
+                <span class="kw">is</span> |
+                <span class="kw">long</span> |
+                <span class="kw">namespace</span> |
+                <span class="kw">new</span> |
+                <span class="kw">not</span> |
+                <span class="kw">nothrow</span> |
+                <span class="kw">null</span> |
+                <span class="kw">operator</span> |
+                <span class="kw">or</span> |
+                <span class="kw">override</span> |
+                <span class="kw">private</span> |
+                <span class="kw">protected</span> |
+                <span class="kw">public</span> |
+                <span class="kw">return</span> |
+                <span class="kw">sbyte</span> |
+                <span class="kw">short</span> |
+                <span class="kw">sizeof</span> |
+                <span class="kw">static</span> |
+                <span class="kw">suppress</span> |
+                <span class="kw">switch</span> |
+                <span class="kw">this</span> |
+                <span class="kw">throw</span> |
+                <span class="kw">true</span> |
+                <span class="kw">try</span> |
+                <span class="kw">typedef</span> |
+                <span class="kw">typename</span> |
+                <span class="kw">uchar</span> |
+                <span class="kw">uint</span>  |
+                <span class="kw">ulong</span> |
+                <span class="kw">ushort</span>  |
+                <span class="kw">using</span> |
+                <span class="kw">virtual</span> |
+                <span class="kw">void</span> |
+                <span class="kw">wchar</span> |
+                <span class="kw">where</span> |
+                <span class="kw">while</span>
+            </td>
+        </tr>
+    </table>
+
+    <h3 id="identifiers">Identifiers</h3>
+
+    <p>
+        <a href="#rule.identifier">Identifiers</a> are used to name variables, types, constants and functions.
+        A <a href="#rule.qualified-id">qualified&#8209;id</a> names an entity unambiguously in a progam.
+        It can be used to refer to an entity when a simple identifier of it would be ambiguous.
+        It consists of the namespaces containing the entity (if any) separated by periods followed by the names
+        of the types (if any) containing the entity separated by periods followed by the identifier of the entity itself.
+        An enumeration constant must always be referred by prefixing the name of it by the name of the enumerated type
+        that contains it. A local variable cannot be referred by a fully qualified identifier.
+        An identifier of a local variable refers always to the local variable in the innermost scope that contains it.
+    </p>
+
+    <h4 id="identifiers-syntax">Syntax</h4>
+
+    <table class="grammar">
+        <tr>
+            <td class="rule" id="rule.identifier">identifier</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.id-char-sequence">id&#8209;char&#8209;sequence</a></span>
+                <span class="op">&minus;</span>
+                <span class="rule"><a href="#rule.keyword">keyword</a></span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.id-char-sequence">id&#8209;char&#8209;sequence</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.idstart">idstart</a></span>
+                <span class="rule"><a href="#rule.idcont">idcont</a>*
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.idstart">idstart</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                'Unicode characters having property ID_Start'
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.idcont">idcont</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                'Unicode characters having property ID_Continue'
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.qualified-id">qualified&#8209;id</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.identifier">identifier</a></span>
+                (<span class="mono">.</span>
+                <span class="rule"><a href="#rule.identifier">identifier</a></span>)*
+            </td>
+        </tr>
+    </table>
+
+    <p>
+        Information about Unicode identifier syntax can be bound in article <a href="http://www.unicode.org/reports/tr31/tr31-27.html#Default_Identifier_Syntax">UNICODE IDENTIFIER AND PATTERN SYNTAX</a>.
+    </p>
+
+    <h3 id="literals">Literals</h3>
+
+    <p>
+        Literals are used to enter values in a program. Literals have value and type.
+    </p>
+
+    <h4 id="literals-syntax">Syntax</h4>
+
+    <table class="grammar">
+        <tr>
+            <td class="rule" id="rule.literal">literal</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.boolean-literal">boolean&#8209;literal</a></span> |
+                <span class="rule"><a href="#rule.floating-literal">floating&#8209;literal</a></span> |
+                <span class="rule"><a href="#rule.integer-literal">integer&#8209;literal</a></span> |
+                <span class="rule"><a href="#rule.char-literal">char&#8209;literal</a></span> |
+                <span class="rule"><a href="#rule.string-literal">string&#8209;literal</a></span> |
+                <span class="rule"><a href="#rule.null-literal">null&#8209;literal</a></span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.boolean-literal">boolean&#8209;literal</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="kw">true</span> |
+                <span class="kw">false</span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.floating-literal">floating&#8209;literal</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                (<span class="rule"><a href="#rule.fractional-floating-literal">fractional&#8209;floating&#8209;literal</a></span> |
+                <span class="rule"><a href="#rule.exponent-floating-literal">exponent&#8209;floating&#8209;literal</a></span>) 
+                <span class="op">[fF]?</span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.fractional-floating-literal">fractional&#8209;floating&#8209;literal</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.dec-digit-sequence">dec&#8209;digit&#8209;sequence</a></span>?
+                <span class="mono">.</span>
+                <span class="rule"><a href="#rule.dec-digit-sequence">dec&#8209;digit&#8209;sequence</a></span>
+                <span class="rule"><a href="#rule.exponent-part">exponent&#8209;part</a></span>?
+                <br />
+                <span class="rule"><a href="#rule.dec-digit-sequence">dec&#8209;digit&#8209;sequence</a></span>
+                <span class="mono">.</span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.dec-digit-sequence">dec&#8209;digit&#8209;sequence</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="op">[0-9]+</span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.exponent-floating-literal">exponent&#8209;floating&#8209;literal</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.dec-digit-sequence">dec&#8209;digit&#8209;sequence</a></span>
+                <span class="rule"><a href="#rule.exponent-part">exponent&#8209;part</a></span> 
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.exponent-part">exponent&#8209;part</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="op">[eE]</span>
+                <span class="rule"><a href="#rule.sign">sign</a></span>?
+                <span class="rule"><a href="#rule.dec-digit-sequence">dec&#8209;digit&#8209;sequence</a></span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.sign">sign</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="mono">+</span> |
+                <span class="mono">-</span>
+            </td>
+        <tr>
+            <td class="rule" id="rule.integer-literal">integer&#8209;literal</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                (<span class="rule"><a href="#rule.hex-integer-literal">hex&#8209;integer&#8209;literal</a></span> |
+                <span class="rule"><a href="#rule.dec-integer-literal">dec&#8209;integer&#8209;literal</a></span>)
+                <span class="op">[uU]?</span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.hex-integer-literal">hex&#8209;integer&#8209;literal</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                (<span class="mono">0x</span> |
+                <span class="mono">0X</span>)
+                <span class="rule"><a href="#rule.hex-digit-sequence">hex&#8209;digit&#8209;sequence</a></span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.hex-digit-sequence">hex&#8209;digit&#8209;sequence</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="op">[0-9a-fA-F]+</span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.dec-integer-literal">dec&#8209;integer&#8209;literal</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.dec-digit-sequence">dec&#8209;digit&#8209;sequence</a></span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.char-literal">char&#8209;literal</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                (<span class="mono">w</span> | <span class="mono">u</span>)?
+                <span class="mono">'</span>
+                (<span class="op">[^'\\\r\n]+</span>
+                | <span class="rule"><a href="#rule.char-escape">char&#8209;escape</a></span>)
+                <span class="mono">'</span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.char-escape">char&#8209;escape</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="mono">\</span>
+                (<span class="op">[xX]</span> <span class="rule"><a href="#rule.hex-digit-sequence">hex&#8209;digit&#8209;sequence</a></span>
+                | <span class="op">[dD]</span> <span class="rule"><a href="#rule.dec-digit-sequence">dec&#8209;digit&#8209;sequence</a></span>
+                | <span class="rule"><a href="#rule.octal-digit-sequence">octal&#8209;digit&#8209;sequence</a></span>
+                | <span class="mono">u</span>&nbsp;<span class="rule"><a href="#rule.hex-digit-4">hex&#8209;digit&#8209;4</a></span>
+                | <span class="mono">U</span>&nbsp;<span class="rule"><a href="#rule.hex-digit-8">hex&#8209;digit&#8209;8</a></span>
+                | <span class="op">[abfnrtv]</span> 
+                | <span class="rule"><a href="#rule.any-char">any&#8209;char</a></span>)
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.octal-digit-sequence">octal&#8209;digit&#8209;sequence</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="op">[0-7]+</span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.hex-digit-4">hex&#8209;digit&#8209;4</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.hex-digit">hex&#8209;digit</a></span>
+                <span class="rule"><a href="#rule.hex-digit">hex&#8209;digit</a></span>
+                <span class="rule"><a href="#rule.hex-digit">hex&#8209;digit</a></span>
+                <span class="rule"><a href="#rule.hex-digit">hex&#8209;digit</a></span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.hex-digit-8">hex&#8209;digit&#8209;8</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.hex-digit">hex&#8209;digit</a></span>
+                <span class="rule"><a href="#rule.hex-digit">hex&#8209;digit</a></span>
+                <span class="rule"><a href="#rule.hex-digit">hex&#8209;digit</a></span>
+                <span class="rule"><a href="#rule.hex-digit">hex&#8209;digit</a></span>
+                <span class="rule"><a href="#rule.hex-digit">hex&#8209;digit</a></span>
+                <span class="rule"><a href="#rule.hex-digit">hex&#8209;digit</a></span>
+                <span class="rule"><a href="#rule.hex-digit">hex&#8209;digit</a></span>
+                <span class="rule"><a href="#rule.hex-digit">hex&#8209;digit</a></span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.hex-digit">hex&#8209;digit</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="op">[0-9a-fA-F]</span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.string-literal">string&#8209;literal</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.raw-string-literal">raw&#8209;string&#8209;literal</a></span>
+              | <span class="rule"><a href="#rule.regular-string-literal">regular&#8209;string&#8209;literal</a></span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.raw-string-literal">raw&#8209;string&#8209;literal</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                (<span class="mono">w</span>
+                | <span class="mono">u</span>)?
+                <span class="mono">@</span>
+                <span class="mono">"</span>
+                <span class="op">[^"]*</span>
+                <span class="mono">"</span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.regular-string-literal">regular&#8209;string&#8209;literal</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                (<span class="mono">w</span>
+                | <span class="mono">u</span>)?
+                <span class="mono">"</span>
+                (<span class="op">[^"\\\r\n]+</span>
+                | <span class="rule"><a href="#rule.char-escape">char&#8209;escape</a></span>)*
+                <span class="mono">"</span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.null-literal">null&#8209;literal</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="kw">null</span>
+            </td>
+        </tr>
+    </table>
+
+    <h4 id="boolean-literals">Boolean Literals</h4>
+
+    <p>
+        A <a href="#rule.boolean-literal">Boolean literal</a> can have value <span class="kw">true</span> or <span class="kw">false</span>.
+        The type of Boolean literals is <span class="kw"><a href="#basic-type-bool">bool</a></span>.
+    </p>
+
+    <h4 id="floating-literals">Floating Literals</h4>
+
+    <p>
+        A <a href="#rule.floating-literal">floating literal</a> represents a fractional or exponential floating-point number. 
+        If it has 'f' or 'F' suffix its type is <span class="kw"><a href="#basic-floating-point-types">float</a></span>, otherwise its type is 
+        <span class="kw"><a href="#basic-floating-point-types">double</a></span>.
+    </p>
+
+    <h4 id="integer-literals">Integer Literals</h4>
+
+    <p>
+        An <a href="#rule.integer-literal">integer literal</a> represents a hexadecimal or decimal signed or unsigned integer.
+        If it has <span class="mono">u</span> or <span class="mono">U</span> suffix its type is smallest of the following types that can contain its value: 
+        <span class="kw">byte</span>, <span class="kw">ushort</span>, <span class="kw">uint</span>, <span class="kw">ulong</span>.
+        Otherwise its type is smallest of the following types that can contain its value:
+        <span class="kw">sbyte</span>, <span class="kw">short</span>, <span class="kw">int</span>, <span class="kw">long</span>.
+        If the literal has prefix <span class="mono">0x</span> or <span class="mono">0X</span>, it represents a hexadecimal, or base 16, value, 
+        otherwise it represents a decimal, or base 10, value.
+    </p>
+
+    <h4 id="character-literals">Character Literals</h4>
+
+    <p>
+        A <a href="#rule.char-literal">character literal</a> represents an ASCII or a Unicode character value. 
+        Graphical character values can be entered by enclosing the character in single quotes. An escape mechanism is provided for entering
+        character values that do not have a graphical representation. If the character literal is has a <span class="mono">w</span> prefix,
+        its type is <span class="kw"><a href="#basic-character-types">wchar</a></span>, 
+        if it has a <span class="mono">u</span> prefix its type is <span class="kw"><a href="#basic-character-types">uchar</a></span>,
+        otherwise its type is <span class="kw"><a href="#basic-character-types">char</a></span>.
+    </p>
+
+    <p>
+        By prefixing character value with the backslash <span class="mono">\</span> character, the ASCII, or Unicode code point of the character can be 
+        given in hexadecimal (<span class="mono">x</span>, <span class="mono">X</span>, <span class="mono">u</span> or <span class="mono">U</span> prefix), 
+        decimal <span class="mono">d</span> or <span class="mono">D</span> prefix), 
+        or octal notation (lack of prefix). Some special control characters can be also entered using character combinations 
+        <span class="mono">\a</span>, <span class="mono">\b</span>, <span class="mono">\f</span>, <span class="mono">\n</span>, <span class="mono">\r</span>, 
+        <span class="mono">\t</span> and <span class="mono">\v</span>.
+        Their meaning can be found in the Wikipedia article for <a href="http://en.wikipedia.org/wiki/ASCII">ASCII</a>.
+    </p>
+    
+    <h4 id="string-literals">String Literals</h4>
+
+    <p>
+        A <a href="#rule.string-literal">string literal</a> represents an ASCII, a Unicode UTF-8, a Unicode UTF-16, or a Unicode UTF-32 encoded string.
+        The string is entered by enclosing its value in double quotes.
+        If the string literal is prefixed with <span class="mono">@</span> character the content may have no escapes, in other words, the backslash 
+        character <span class="mono">\</span> has its literal meaning, otherwise the backslash character provides an escape mechanism for entering
+        non-graphical character values in the same way as described in section for <a href="#character-literals">character literals</a>.
+    </p>
+
+    <p>
+        If the string literal has a <span class="mono">w</span> prefix, its type is <span class="mono">const wchar*</span>, and it represents a Unicode UTF-16 encoded string.
+        If the string literal has a <span class="mono">u</span> prefix, its type is <span class="mono">const uchar*</span>, and it represents a Unicode UTF-32 encoded string.
+        If the string literal has no <span class="mono">w</span> or <span class="mono">u</span> prefix, its type is <span class="mono">const char*</span>, and 
+        it represents an ASCII or a Unicode UTF-8 encoded string. Note: by convention Cmajor source files have UTF-8 encoding, so that string literals are 
+        always entered using UTF-8 encoding, but internal representation of a string in a program can be ASCII, UTF-8, UTF-16 or UTF-32 encoded string.
+    </p>
+
+    <h4 id="null-literal">Null Literal</h4>
+
+    The <a href="#rule.null-literal">null literal</a> represents a special value of a pointer that does not point to any memory location.
+    Its type is a special <span class="mono">@nullptr_type</span> that is implicitly convertible to any other pointer type.
+
+    <h3 id="operators">Operators</h3>
+
+    <p>
+        Operators allow expressions to be written with a notation close to mathematical notation.
+    </p>
+
+    <table class="grammar">
+        <tr>
+            <td class="rule" id="rule.operator">operator</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="mono">.</span> |
+                <span class="mono">&&</span> |
+                <span class="mono">&</span> |
+                <span class="mono">[</span> |
+                <span class="mono">]</span> |
+                <span class="mono">&lt;</span> |
+                <span class="mono">&gt;</span> |
+                <span class="mono">,</span> |
+                <span class="mono">=</span> |
+                <span class="mono">&lt;=&gt;</span> |
+                <span class="mono">=&gt;</span> |
+                <span class="mono">||</span> |
+                <span class="mono">&&</span> |
+                <span class="mono">|</span> |
+                <span class="mono">^</span> |
+                <span class="mono">&</span> |
+                <span class="mono">==</span> |
+                <span class="mono">!=</span> |
+                <span class="mono">&lt;=</span> |
+                <span class="mono">&gt;=</span> |
+                <span class="mono">&lt;</span> |
+                <span class="mono">&gt;</span> |
+                <span class="mono">&lt;&lt;</span> |
+                <span class="mono">&gt;&gt;</span> |
+                <span class="mono">+</span> |
+                <span class="mono">&minus;</span> |
+                <span class="mono">*</span> |
+                <span class="mono">/</span> |
+                <span class="mono">%</span> |
+                <span class="mono">++</span> |
+                <span class="mono">&minus;&minus;</span> |
+                <span class="mono">!</span> |
+                <span class="mono">~</span> |
+                <span class="mono">&minus;&gt;</span> |
+                <span class="mono">(</span> |
+                <span class="mono">)</span>
+            </td>
+        </tr>
+    </table>
+
+    <h2 id="basic-types">Basic Types</h2>
+
+    <h3 id="basic-types-syntax">Syntax</h3>
+
+    <table class="grammar">
+        <tr>
+            <td class="rule" id="rule.basic-type">basic&#8209;type</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="kw">bool</span> |
+                <span class="kw">sbyte</span> |
+                <span class="kw">byte</span> |
+                <span class="kw">short</span> |
+                <span class="kw">ushort</span> |
+                <span class="kw">int</span> |
+                <span class="kw">uint</span> |
+                <span class="kw">long</span> |
+                <span class="kw">ulong</span> |
+                <span class="kw">float</span> |
+                <span class="kw">double</span> |
+                <span class="kw">char</span> |
+                <span class="kw">wchar</span> |
+                <span class="kw">uchar</span> |
+                <span class="kw">void</span>
+            </td>
+        </tr>
+    </table>
+
+    <h4 id="basic-type-bool">Boolean type</h4>
+
+    <p>
+        The <span class="kw">bool</span> type represents a truth value. It has values <span class="kw">true</span> and <span class="kw">false</span>.
+    </p>
+
+    <h4 id="basic-integer-types">Basic Integer Types</h4>
+
+    <p>
+        The <span class="kw">sbyte</span> type is a signed 8-bit integer type. It has values -128...127.
+    </p>
+
+    <p>
+        The <span class="kw">byte</span> type is an unsigned 8-bit integer type. It has values 0u...255u.
+    </p>
+
+    <p>
+        The <span class="kw">short</span> type is a signed 16-bit integer type. It has values -32768...32767.
+    </p>
+
+    <p>
+        The <span class="kw">ushort</span> type is an unsigned 16-bit integer type. It has values 0u...65535u.
+    </p>
+
+    <p>
+        The <span class="kw">int</span> type is a signed 32-bit integer type. It has values –2147483648...2147483647.
+    </p>
+
+    <p>
+        The <span class="kw">uint</span> type is an unsigned 32-bit integer type. It has values 0u...4294967295u.
+    </p>
+
+    <p>
+        The <span class="kw">long</span> type is a signed 64-bit integer type. It has values –9223372036854775808...9223372036854775807.
+    </p>
+
+    <p>
+        The <span class="kw">ulong</span> type is an unsigned 64-bit integer type. It has values 0u...18446744073709551615u.
+    </p>
+
+    <h4 id="basic-floating-point-types">Basic Floating-Point Types</h4>
+
+    <p>
+        The <span class="kw">float</span> type is a 32-bit single precision <a href="http://en.wikipedia.org/wiki/IEEE_754">IEEE 754</a> floating-point number type.
+    </p>
+
+    <p>
+        The <span class="kw">double</span> type is a 64-bit double precision <a href="http://en.wikipedia.org/wiki/IEEE_754">IEEE 754</a> floating-point number type.
+    </p>
+
+    <h4 id="basic-character-types">Basic Character Types</h4>
+
+    <p>
+        The <span class="kw">char</span> type is an unsigned 8-bit character type. It can have an <a href="http://en.wikipedia.org/wiki/ASCII">ASCII code</a> value.
+    </p>
+
+    <p>
+        The <span class="kw">wchar</span> type is an unsigned 16-bit character type. It can have a <a href="http://en.wikipedia.org/wiki/Unicode">Unicode</a> UTF-16 code point value.
+    </p>
+
+    <p>
+        The <span class="kw">uchar</span> type is an unsigned 32-bit character type. It can have a <a href="http://en.wikipedia.org/wiki/Unicode">Unicode</a> UTF-32 code point value.
+    </p>
+
+    <h4 id="void-type">Void Type</h4>
+
+    <p>
+        The <span class="kw">void</span> keyword represents lack of value.
+    </p>
+
+</body>
+</html>
