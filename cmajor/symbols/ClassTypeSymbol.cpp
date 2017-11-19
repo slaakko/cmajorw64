@@ -1083,6 +1083,10 @@ const std::string& ClassTypeSymbol::VmtObjectName()
     {
         vmtObjectName = "vmt_" + ToUtf8(SimpleName()) + "_" + GetSha1MessageDigest(ToUtf8(FullNameWithSpecifiers()));
     }
+    if (vmtObjectName == "vmt_UnaryFun_bool_bool_EFCF6DDEE35D2662DEB56AF8F9EE7C4B2C88616B")
+    {
+        int x = 0;
+    }
     return vmtObjectName;
 }
 

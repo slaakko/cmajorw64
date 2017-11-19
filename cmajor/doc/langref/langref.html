@@ -9,18 +9,74 @@
 <body>
     <h1>Language Reference</h1>
 
-    <h2>Table of Contents</h2>
+    <h2>Table of contents</h2>
 
-    <h2 id="lexical-structure">Lexical Structure</h2>
+    <div class="toc">
+        1 <a href="#lexical-structure">Lexical Structure</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;1.1 <a href="#white-space-and-comments">White Space and Comments</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1.1.1 <a href="#white-space-and-comments-syntax">Syntax</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;1.2 <a href="#keywords">Keywords</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1.2.1 <a href="#keywords-syntax">Syntax</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;1.3 <a href="#identifiers">Identifiers</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1.3.1 <a href="#identifiers-syntax">Syntax</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;1.4 <a href="#literals">Literals</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1.4.1 <a href="#literals-syntax">Syntax</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1.4.2 <a href="#boolean-literals">Boolean Literals</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1.4.3 <a href="#floating-literals">Floating Literals</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1.4.4 <a href="#integer-literals">Integer Literals</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1.4.5 <a href="#character-literals">Character Literals</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1.4.6 <a href="#string-literals">String Literals</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1.4.7 <a href="#null-literal">Null Literal</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;1.5 <a href="#operators">Operators</a><br />
+        2 <a href="#basic-types">Basic Types</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;2.1 <a href="#basic-types-syntax">Syntax</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;2.2 <a href="#basic-type-bool">Boolean Type</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;2.3 <a href="#basic-integer-types">Basic Integer Types</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;2.4 <a href="#basic-floating-point-types">Basic Floating-Point Types</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;2.5 <a href="#basic-character-types">Basic Character Types</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;2.6 <a href="#void-type">Void Type</a><br />
+        3 <a href="#expressions">Expressions</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;3.1 <a href="#expressions-syntax">Syntax</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;3.2 <a href="#axiom-expressions">Axiom Expressions</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;3.3 <a href="#boolean-expressions">Boolean Expressions</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;3.4 <a href="#bitwise-expressions">Bitwise Expressions</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;3.5 <a href="#equality-expressions">Equality Expressions</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;3.6 <a href="#relational-expressions">Relational Expressions</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;3.7 <a href="#is-and-as-expressions">Is and As Expressions</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;3.8 <a href="#shift-expressions">Shift Expressions</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;3.9 <a href="#additive-expressions">Additive Expressions</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;3.10 <a href="#multiplicative-expressions">Multiplicative Expressions</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;3.11 <a href="#prefix-expressions">Prefix Expressions</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.11.1 <a href="#prefix-increment-and-decrement-expressions">Prefix Increment and Decrement Expressions</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.11.2 <a href="#unary-plus-and-unary-minus-expressions">Unary Plus and Unary Minus Expressions</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.11.3 <a href="#logical-not-expression">Logical Not Expression</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.11.4 <a href="#bitwise-complement-expression">Bitrwise Complement Expression</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.11.5 <a href="#dereference-expression">Pointer Dereference Expression</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.11.6 <a href="#address-of-expression">Address-of Expression</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;3.12 <a href="#postfix-expressions">Postfix Expressions</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.12.1 <a href="#postfix-increment-and-decrement-expressions">Postfix Increment and Decrement Expressions</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.12.2 <a href="#member-access-expression">Member Access Expression</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.12.3 <a href="#pointer-member-access-expression">Pointer Member Access Expression</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.12.4 <a href="#subscript-expression">Subscript Expression</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.12.5 <a href="#invocation-expression">Invocation Expression</a><br />
+    </div>
 
-    <h3 id="white-space-and-comments">White Space and Comments</h3>
+    <h2 id="lexical-structure">1 Lexical Structure</h2>
+
+    <p>
+        Cmajor source files are ordinary <a href="http://en.wikipedia.org/wiki/UTF-8">UTF-8</a>-encoded plain text files.
+        Each source file consists lexically of keywords, identifiers, literals and operators that can be 
+        separated by comments and white space characters such as spaces, tabulations, and newline characters.
+    </p>
+
+    <h3 id="white-space-and-comments">1.1 White Space and Comments</h3>
 
     <p>
         Other lexical elements such as keywords, identifiers, literals and operators may be separated by any number of white space characters and comments that match the syntax rule
         <span class="rule"><a href="#rule.white-space-and-comments">white&#8209;space&#8209;and&#8209;comments</a></span>.
     </p>
 
-    <h4 id="white-space-and-comments-syntax">Syntax</h4>
+    <h4 id="white-space-and-comments-syntax">1.1.1 Syntax</h4>
 
     <table class="grammar">
         <tr>
@@ -85,16 +141,16 @@
     </table>
 
     <p>
-        See Wikipedia article about <a href="http://en.wikipedia.org/wiki/Whitespace_character">Unicode Whitespace Character</a>.
+        See Wikipedia article about <a href="http://en.wikipedia.org/wiki/Whitespace_character">Unicode Whitespace Characters</a>.
     </p>
 
-    <h3 id="keywords">Keywords</h3>
+    <h3 id="keywords">1.2 Keywords</h3>
 
     <p>
-        Keywords have a context-dependent meaning. They cannot be used as identifiers.
+        Keywords have a context-dependent meaning in programs. They cannot be used as <a href="#identifiers">identifiers</a>.
     </p>
 
-    <h4 id="keywords-syntax">Syntax</h4>
+    <h4 id="keywords-syntax">1.2.1 Syntax</h4>
 
     <table class="grammar">
         <tr>
@@ -179,20 +235,27 @@
         </tr>
     </table>
 
-    <h3 id="identifiers">Identifiers</h3>
+    <h3 id="identifiers">1.3 Identifiers</h3>
 
     <p>
-        <a href="#rule.identifier">Identifiers</a> are used to name variables, types, constants and functions.
-        A <a href="#rule.qualified-id">qualified&#8209;id</a> names an entity unambiguously in a progam.
-        It can be used to refer to an entity when a simple identifier of it would be ambiguous.
-        It consists of the namespaces containing the entity (if any) separated by periods followed by the names
+        <a href="#rule.identifier">Identifiers</a> are used to name variables, parameters, types, constants, namespaces, typedefs and functions.
+    </p>
+
+    <p>
+        A <a href="#rule.qualified-id">qualified&#8209;id</a> can be used to refer to an entity 
+        when a simple identifier of it would be ambiguous in its context.
+        It consists of the names of the <a href="#namespace">namespaces</a> containing the entity (if any) separated by periods followed by the names
         of the types (if any) containing the entity separated by periods followed by the identifier of the entity itself.
-        An enumeration constant must always be referred by prefixing the name of it by the name of the enumerated type
-        that contains it. A local variable cannot be referred by a fully qualified identifier.
+    </p>
+
+    <p>
+        An <a href="#enumeration-constant">enumeration constant</a> must always be referred by prefixing the name of it by the name of the 
+        <a href="#enumerated type">enumerated type</a>
+        that contains it. A <a href="#local-variable">local variable</a> cannot be referred by a fully qualified identifier.
         An identifier of a local variable refers always to the local variable in the innermost scope that contains it.
     </p>
 
-    <h4 id="identifiers-syntax">Syntax</h4>
+    <h4 id="identifiers-syntax">1.3.1 Syntax</h4>
 
     <table class="grammar">
         <tr>
@@ -241,13 +304,13 @@
         Information about Unicode identifier syntax can be bound in article <a href="http://www.unicode.org/reports/tr31/tr31-27.html#Default_Identifier_Syntax">UNICODE IDENTIFIER AND PATTERN SYNTAX</a>.
     </p>
 
-    <h3 id="literals">Literals</h3>
+    <h3 id="literals">1.4 Literals</h3>
 
     <p>
         Literals are used to enter values in a program. Literals have value and type.
     </p>
 
-    <h4 id="literals-syntax">Syntax</h4>
+    <h4 id="literals-syntax">1.4.1 Syntax</h4>
 
     <table class="grammar">
         <tr>
@@ -275,7 +338,7 @@
             <td class="sep">&rarr;</td>
             <td class="rcontent">
                 (<span class="rule"><a href="#rule.fractional-floating-literal">fractional&#8209;floating&#8209;literal</a></span> |
-                <span class="rule"><a href="#rule.exponent-floating-literal">exponent&#8209;floating&#8209;literal</a></span>) 
+                <span class="rule"><a href="#rule.exponent-floating-literal">exponent&#8209;floating&#8209;literal</a></span>)
                 <span class="op">[fF]?</span>
             </td>
         </tr>
@@ -304,7 +367,7 @@
             <td class="sep">&rarr;</td>
             <td class="rcontent">
                 <span class="rule"><a href="#rule.dec-digit-sequence">dec&#8209;digit&#8209;sequence</a></span>
-                <span class="rule"><a href="#rule.exponent-part">exponent&#8209;part</a></span> 
+                <span class="rule"><a href="#rule.exponent-part">exponent&#8209;part</a></span>
             </td>
         </tr>
         <tr>
@@ -376,7 +439,7 @@
                 | <span class="rule"><a href="#rule.octal-digit-sequence">octal&#8209;digit&#8209;sequence</a></span>
                 | <span class="mono">u</span>&nbsp;<span class="rule"><a href="#rule.hex-digit-4">hex&#8209;digit&#8209;4</a></span>
                 | <span class="mono">U</span>&nbsp;<span class="rule"><a href="#rule.hex-digit-8">hex&#8209;digit&#8209;8</a></span>
-                | <span class="op">[abfnrtv]</span> 
+                | <span class="op">[abfnrtv]</span>
                 | <span class="rule"><a href="#rule.any-char">any&#8209;char</a></span>)
             </td>
         </tr>
@@ -423,7 +486,7 @@
             <td class="sep">&rarr;</td>
             <td class="rcontent">
                 <span class="rule"><a href="#rule.raw-string-literal">raw&#8209;string&#8209;literal</a></span>
-              | <span class="rule"><a href="#rule.regular-string-literal">regular&#8209;string&#8209;literal</a></span>
+                | <span class="rule"><a href="#rule.regular-string-literal">regular&#8209;string&#8209;literal</a></span>
             </td>
         </tr>
         <tr>
@@ -459,60 +522,60 @@
         </tr>
     </table>
 
-    <h4 id="boolean-literals">Boolean Literals</h4>
+    <h4 id="boolean-literals">1.4.2 Boolean Literals</h4>
 
     <p>
         A <a href="#rule.boolean-literal">Boolean literal</a> can have value <span class="kw">true</span> or <span class="kw">false</span>.
         The type of Boolean literals is <span class="kw"><a href="#basic-type-bool">bool</a></span>.
     </p>
 
-    <h4 id="floating-literals">Floating Literals</h4>
+    <h4 id="floating-literals">1.4.3 Floating Literals</h4>
 
     <p>
-        A <a href="#rule.floating-literal">floating literal</a> represents a fractional or exponential floating-point number. 
-        If it has 'f' or 'F' suffix its type is <span class="kw"><a href="#basic-floating-point-types">float</a></span>, otherwise its type is 
+        A <a href="#rule.floating-literal">floating literal</a> represents a fractional or exponential floating-point number.
+        If it has 'f' or 'F' suffix its type is <span class="kw"><a href="#basic-floating-point-types">float</a></span>, otherwise its type is
         <span class="kw"><a href="#basic-floating-point-types">double</a></span>.
     </p>
 
-    <h4 id="integer-literals">Integer Literals</h4>
+    <h4 id="integer-literals">1.4.4 Integer Literals</h4>
 
     <p>
         An <a href="#rule.integer-literal">integer literal</a> represents a hexadecimal or decimal signed or unsigned integer.
-        If it has <span class="mono">u</span> or <span class="mono">U</span> suffix its type is smallest of the following types that can contain its value: 
-        <span class="kw">byte</span>, <span class="kw">ushort</span>, <span class="kw">uint</span>, <span class="kw">ulong</span>.
+        If it has <span class="mono">u</span> or <span class="mono">U</span> suffix its type is smallest of the following types that can contain its value:
+        <span class="kw">byte</span>, <span class="kw">ushort</span>, <span class="kw">uint</span>, <span class="kw">ulong</span> (see <a href="#basic-integer-types">basic integer types</a>).
         Otherwise its type is smallest of the following types that can contain its value:
-        <span class="kw">sbyte</span>, <span class="kw">short</span>, <span class="kw">int</span>, <span class="kw">long</span>.
-        If the literal has prefix <span class="mono">0x</span> or <span class="mono">0X</span>, it represents a hexadecimal, or base 16, value, 
+        <span class="kw">sbyte</span>, <span class="kw">short</span>, <span class="kw">int</span>, <span class="kw">long</span> (see <a href="#basic-integer-types">basic integer types</a>).
+        If the literal has prefix <span class="mono">0x</span> or <span class="mono">0X</span>, it represents a hexadecimal, or base 16, value,
         otherwise it represents a decimal, or base 10, value.
     </p>
 
-    <h4 id="character-literals">Character Literals</h4>
+    <h4 id="character-literals">1.4.5 Character Literals</h4>
 
     <p>
-        A <a href="#rule.char-literal">character literal</a> represents an ASCII or a Unicode character value. 
+        A <a href="#rule.char-literal">character literal</a> represents an ASCII or a Unicode character value.
         Graphical character values can be entered by enclosing the character in single quotes. An escape mechanism is provided for entering
         character values that do not have a graphical representation. If the character literal is has a <span class="mono">w</span> prefix,
-        its type is <span class="kw"><a href="#basic-character-types">wchar</a></span>, 
+        its type is <span class="kw"><a href="#basic-character-types">wchar</a></span>,
         if it has a <span class="mono">u</span> prefix its type is <span class="kw"><a href="#basic-character-types">uchar</a></span>,
         otherwise its type is <span class="kw"><a href="#basic-character-types">char</a></span>.
     </p>
 
     <p>
-        By prefixing character value with the backslash <span class="mono">\</span> character, the ASCII, or Unicode code point of the character can be 
-        given in hexadecimal (<span class="mono">x</span>, <span class="mono">X</span>, <span class="mono">u</span> or <span class="mono">U</span> prefix), 
-        decimal <span class="mono">d</span> or <span class="mono">D</span> prefix), 
-        or octal notation (lack of prefix). Some special control characters can be also entered using character combinations 
-        <span class="mono">\a</span>, <span class="mono">\b</span>, <span class="mono">\f</span>, <span class="mono">\n</span>, <span class="mono">\r</span>, 
+        By prefixing character value with the backslash <span class="mono">\</span> character, the ASCII, or Unicode code point of the character can be
+        given in hexadecimal (<span class="mono">x</span>, <span class="mono">X</span>, <span class="mono">u</span> or <span class="mono">U</span> prefix),
+        decimal <span class="mono">d</span> or <span class="mono">D</span> prefix),
+        or octal notation (lack of prefix). Some special control characters can be also entered using character combinations
+        <span class="mono">\a</span>, <span class="mono">\b</span>, <span class="mono">\f</span>, <span class="mono">\n</span>, <span class="mono">\r</span>,
         <span class="mono">\t</span> and <span class="mono">\v</span>.
         Their meaning can be found in the Wikipedia article for <a href="http://en.wikipedia.org/wiki/ASCII">ASCII</a>.
     </p>
-    
-    <h4 id="string-literals">String Literals</h4>
+
+    <h4 id="string-literals">1.4.6 String Literals</h4>
 
     <p>
         A <a href="#rule.string-literal">string literal</a> represents an ASCII, a Unicode UTF-8, a Unicode UTF-16, or a Unicode UTF-32 encoded string.
         The string is entered by enclosing its value in double quotes.
-        If the string literal is prefixed with <span class="mono">@</span> character the content may have no escapes, in other words, the backslash 
+        If the string literal is prefixed with <span class="mono">@</span> character the content may have no escapes, in other words, the backslash
         character <span class="mono">\</span> has its literal meaning, otherwise the backslash character provides an escape mechanism for entering
         non-graphical character values in the same way as described in section for <a href="#character-literals">character literals</a>.
     </p>
@@ -520,20 +583,20 @@
     <p>
         If the string literal has a <span class="mono">w</span> prefix, its type is <span class="mono">const wchar*</span>, and it represents a Unicode UTF-16 encoded string.
         If the string literal has a <span class="mono">u</span> prefix, its type is <span class="mono">const uchar*</span>, and it represents a Unicode UTF-32 encoded string.
-        If the string literal has no <span class="mono">w</span> or <span class="mono">u</span> prefix, its type is <span class="mono">const char*</span>, and 
-        it represents an ASCII or a Unicode UTF-8 encoded string. Note: by convention Cmajor source files have UTF-8 encoding, so that string literals are 
+        If the string literal has no <span class="mono">w</span> or <span class="mono">u</span> prefix, its type is <span class="mono">const char*</span>, and
+        it represents an ASCII or a Unicode UTF-8 encoded string. Note: by convention Cmajor source files have UTF-8 encoding, so that string literals are
         always entered using UTF-8 encoding, but internal representation of a string in a program can be ASCII, UTF-8, UTF-16 or UTF-32 encoded string.
     </p>
 
-    <h4 id="null-literal">Null Literal</h4>
+    <h4 id="null-literal">1.4.7 Null Literal</h4>
 
-    The <a href="#rule.null-literal">null literal</a> represents a special value of a pointer that does not point to any memory location.
+    The <a href="#rule.null-literal">null literal</a> represents a special value of a <a href="#pointer-type">pointer</a> that does not point to any memory location.
     Its type is a special <span class="mono">@nullptr_type</span> that is implicitly convertible to any other pointer type.
 
-    <h3 id="operators">Operators</h3>
+    <h3 id="operators">1.5 Operators</h3>
 
     <p>
-        Operators allow expressions to be written with a notation close to mathematical notation.
+        Operators allow <a href="#expressions">expressions</a> to be written with a notation close to mathematical notation.
     </p>
 
     <table class="grammar">
@@ -542,8 +605,6 @@
             <td class="sep">&rarr;</td>
             <td class="rcontent">
                 <span class="mono">.</span> |
-                <span class="mono">&&</span> |
-                <span class="mono">&</span> |
                 <span class="mono">[</span> |
                 <span class="mono">]</span> |
                 <span class="mono">&lt;</span> |
@@ -581,9 +642,16 @@
         </tr>
     </table>
 
-    <h2 id="basic-types">Basic Types</h2>
+    <h2 id="basic-types">2 Basic Types</h2>
 
-    <h3 id="basic-types-syntax">Syntax</h3>
+    <p>
+        Programming language constructs such as variables, parameters, constants and literal values have a <em>type</em>.
+        A type provides an intepretation of the contents of such a construct and specifies what are the possible values for those constructs.
+        A language has a small number of predefined built-in types also called basic types or primitive types.
+        The Cmajor language defines the following basic types for operating with truth values, numbers and characters.
+    </p>
+
+    <h3 id="basic-types-syntax">2.1 Syntax</h3>
 
     <table class="grammar">
         <tr>
@@ -609,13 +677,13 @@
         </tr>
     </table>
 
-    <h4 id="basic-type-bool">Boolean type</h4>
+    <h3 id="basic-type-bool">2.2 Boolean Type</h3>
 
     <p>
         The <span class="kw">bool</span> type represents a truth value. It has values <span class="kw">true</span> and <span class="kw">false</span>.
     </p>
 
-    <h4 id="basic-integer-types">Basic Integer Types</h4>
+    <h3 id="basic-integer-types">2.3 Basic Integer Types</h3>
 
     <p>
         The <span class="kw">sbyte</span> type is a signed 8-bit integer type. It has values -128...127.
@@ -649,7 +717,7 @@
         The <span class="kw">ulong</span> type is an unsigned 64-bit integer type. It has values 0u...18446744073709551615u.
     </p>
 
-    <h4 id="basic-floating-point-types">Basic Floating-Point Types</h4>
+    <h3 id="basic-floating-point-types">2.4 Basic Floating-Point Types</h3>
 
     <p>
         The <span class="kw">float</span> type is a 32-bit single precision <a href="http://en.wikipedia.org/wiki/IEEE_754">IEEE 754</a> floating-point number type.
@@ -659,7 +727,7 @@
         The <span class="kw">double</span> type is a 64-bit double precision <a href="http://en.wikipedia.org/wiki/IEEE_754">IEEE 754</a> floating-point number type.
     </p>
 
-    <h4 id="basic-character-types">Basic Character Types</h4>
+    <h3 id="basic-character-types">2.5 Basic Character Types</h3>
 
     <p>
         The <span class="kw">char</span> type is an unsigned 8-bit character type. It can have an <a href="http://en.wikipedia.org/wiki/ASCII">ASCII code</a> value.
@@ -673,11 +741,779 @@
         The <span class="kw">uchar</span> type is an unsigned 32-bit character type. It can have a <a href="http://en.wikipedia.org/wiki/Unicode">Unicode</a> UTF-32 code point value.
     </p>
 
-    <h4 id="void-type">Void Type</h4>
+    <h3 id="void-type">2.6 Void Type</h3>
 
     <p>
         The <span class="kw">void</span> keyword represents lack of value.
     </p>
+
+    <h2 id="expressions">3 Expressions</h2>
+
+    <p>
+        Most expressions consist of <em><a href="#operators">operators</a></em> and <em>operands</em>.
+        Some expressions can also contain <a href="#keywords">keywords</a>.
+        Operands can be <a href="#identifiers">names</a> of constants, variables, parameters, types, namespaces and functions. They can also be <a href="#literals">literal</a> values or subexpressions.
+        Expressions can be <em>evaluated</em>, or have their value computed. <sup><a href="#footnote-1">1</a></sup>
+    </p>
+
+    <p>
+        Many operators can be <em>overloaded</em>. An overloaded operator has the same name as some built-in operator, but takes at least one parameter that is of a user-defined type.
+    </p>
+
+    <p>
+        Expressions can be classified as being <em>infix</em> expressions where operator is between the operands, <em>prefix</em> expressions where operator comes before the operand and
+        <em>postfix</em> expressions where operator comes after the operand.
+    </p>
+
+    <h3 id="expressions-syntax">3.1 Syntax</h3>
+
+    <table class="grammar">
+        <tr>
+            <td class="rule" id="rule.expression">expression</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.equivalence">equivalence</a></span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.equivalence">equivalence</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.implication">implication</a></span>
+                (<span class="mono">&lt;=&gt;</span> 
+                <span class="rule"><a href="#rule.implication">implication</a></span>)*
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.implication">implication</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.disjunction">disjunction</a></span>
+                (<span class="mono">=&gt;</span>
+                <span class="rule"><a href="#rule.disjunction">disjunction</a></span>)?
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.disjunction">disjunction</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.conjunction">conjunction</a></span>
+                (<span class="mono">||</span>
+                <span class="rule"><a href="#rule.conjunction">conjunction</a></span>)*
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.conjunction">conjunction</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.bit-or">bit&#8209;or</a></span>
+                (<span class="mono">&&</span>
+                <span class="rule"><a href="#rule.bit-or">bit&#8209;or</a></span>)*
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.bit-or">bit&#8209;or</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.bit-xor">bit&#8209;xor</a></span>
+                (<span class="mono">|</span>
+                <span class="rule"><a href="#rule.bit-xor">bit&#8209;xor</a></span>)*
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.bit-xor">bit&#8209;xor</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.bit-and">bit&#8209;and</a></span>
+                (<span class="mono">^</span>
+                <span class="rule"><a href="#rule.bit-and">bit&#8209;and</a></span>)*
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.bit-and">bit&#8209;and</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.equality">equality</a></span>
+                (<span class="mono">&</span>
+                <span class="rule"><a href="#rule.equality">equality</a></span>)*
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.equality">equality</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.relational">relational</a></span>
+                ((<span class="mono">==</span> | (<span class="mono">!=</span>)
+                <span class="rule"><a href="#rule.relational">relational</a></span>)*
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.relational">relational</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.shift">shift</a></span>
+                ((<span class="mono">&lt;=</span> | <span class="mono">&gt;=</span> |
+                <span class="mono">&lt;</span> | <span class="mono">&gt;</span>)
+                <span class="rule"><a href="#rule.shift">shift</a></span>)* |<br />
+                <span class="rule"><a href="#rule.shift">shift</a></span> <span class="kw">is</span> <span class="rule"><a href="#rule.type-expr">type-expr</a></span> |<br />
+                <span class="rule"><a href="#rule.shift">shift</a></span> <span class="kw">as</span> <span class="rule"><a href="#rule.type-expr">type-expr</a></span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.shift">shift</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.additive">additive</a></span>
+                ((<span class="mono">&lt;&lt;</span> |
+                <span class="mono">&gt;&gt;</span>)
+                <span class="rule"><a href="#rule.additive">additive</a></span>
+                )*
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.additive">additive</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.multiplicative">multiplicative</a></span>
+                ((<span class="mono">+</span> |
+                <span class="mono">&minus;</span>)
+                <span class="rule"><a href="#rule.multiplicative">multiplicative</a></span>
+                )*
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.multiplicative">multiplicative</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.prefix">prefix</a></span>
+                ((<span class="mono">*</span> |
+                <span class="mono">/</span> |
+                <span class="mono">%</span>)
+                <span class="rule"><a href="#rule.prefix">prefix</a></span>
+                )*
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.prefix">prefix</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                (<span class="mono">++</span> |
+                <span class="mono">&minus;&minus;</span> |
+                <span class="mono">+</span> |
+                <span class="mono">&minus;</span> |
+                <span class="mono">!</span> |
+                <span class="mono">~</span> |
+                <span class="mono">*</span> |
+                <span class="mono">&</span>)
+                <span class="rule"><a href="#rule.prefix">prefix</a></span> |
+                <span class="rule"><a href="#rule.postfix">postfix</a></span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.postfix">postfix</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.primary">primary</a></span>
+                (<span class="mono">++</span> |
+                <span class="mono">&minus;&minus;</span> |
+                <span class="mono">.</span> 
+                <span class="rule"><a href="#rule.identifier">identifier</a></span> |
+                <span class="mono">&minus;&gt;</span> 
+                <span class="rule"><a href="#rule.identifier">identifier</a></span> |
+                <span class="mono">[</span> 
+                <span class="rule"><a href="#rule.expression">expression</a></span>
+                <span class="mono">]</span> |
+                <span class="mono">(</span> 
+                <span class="rule"><a href="#rule.argument-list">argument&#8209;list</a></span>
+                <span class="mono">)</span>)*
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.primary">primary</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="mono">(</span>
+                <span class="rule"><a href="#rule.expression">expression</a></span>
+                <span class="mono">)</span> |
+                <span class="rule"><a href="#rule.literal">literal</a></span> |
+                <span class="rule"><a href="#rule.basic-type">basic&#8209;type</a></span> |
+                <span class="rule"><a href="#rule.template-id">template&#8209;id</a></span> |
+                <span class="rule"><a href="#rule.identifier">identifier</a></span> |
+                <span class="kw">this</span> |
+                <span class="kw">base</span> |
+                <span class="rule"><a href="#rule.size-of-expr">size&#8209;of&#8209;expr</a></span> |
+                <span class="rule"><a href="#rule.type-name-expr">type&#8209;name&#8209;expr</a></span> |
+                <span class="rule"><a href="#rule.cast-expr">cast&#8209;expr</a></span> |
+                <span class="rule"><a href="#rule.construct-expr">construct&#8209;expr</a></span> |
+                <span class="rule"><a href="#rule.new-expr">new&#8209;expr</a></span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.size-of-expr">size&#8209;of&#8209;expr</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="kw">sizeof</span>
+                <span class="mono">(</span>
+                <span class="rule"><a href="#rule.expression">expression</a></span>
+                <span class="mono">)</span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.type-name-expr">type&#8209;name&#8209;expr</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="kw">typename</span>
+                <span class="mono">(</span>
+                <span class="rule"><a href="#rule.expression">expression</a></span>
+                <span class="mono">)</span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.cast-expr">cast&#8209;expr</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="kw">cast</span>
+                <span class="mono">&lt;</span>
+                <span class="rule"><a href="#rule.type-expr">type-expr</a></span>
+                <span class="mono">&gt;</span>
+                <span class="mono">(</span>
+                <span class="rule"><a href="#rule.expression">expression</a></span>
+                <span class="mono">)</span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.construct-expr">construct&#8209;expr</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="kw">construct</span>
+                <span class="mono">&lt;</span>
+                <span class="rule"><a href="#rule.type-expr">type-expr</a></span>
+                <span class="mono">&gt;</span>
+                <span class="mono">(</span>
+                <span class="rule"><a href="#rule.expression-list">expression&#8209;list</a></span>
+                <span class="mono">)</span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.new-expr">new&#8209;expr</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="kw">new</span>
+                <span class="rule"><a href="#rule.type-expr">type-expr</a></span>
+                <span class="mono">(</span>
+                <span class="rule"><a href="#rule.argument-list">argument&#8209;list</a></span>
+                <span class="mono">)</span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.argument-list">argument&#8209;list</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.expression-list">expression&#8209;list</a></span>?
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.expression-list">expression&#8209;list</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.expression">expression</a></span> 
+                (<span class="mono">,</span>
+                <span class="rule"><a href="#rule.expression">expression</a></span>)*
+            </td>
+        </tr>
+    </table>
+
+    <h3 id="axiom-expressions">3.2 Axiom Expressions</h3>
+
+    <p>
+        An expression that is a true <a href="#rule.equivalence">equivalence</a> expression (and not just a <a href="#rule.equivalence">disjunction</a> for example) can only be used
+        in <a href="#axiom">axioms</a>. The same applies to <a href="#rule.implication">implication</a> expression. 
+        An expression used in an axiom, for example 
+        <span class="var">a</span> <span class="mono">!=</span> <span class="var">b</span> <span class="mono"><=></span> <span class="mono">!</span>(<span class="var">a</span> <span class="mono">==</span>
+        <span class="var">b</span>) is not evaluated at all, it has purely informative value.
+    </p>
+
+    <h3 id="boolean-expressions">3.3 Boolean Expressions</h3>
+
+    <p>
+        A <a href="#rule.disjunction">disjunction</a> expression takes <span class="kw"><a href="#basic-type-bool">bool</a></span> type operands and yields 
+        a <span class="kw"><a href="#basic-type-bool">bool</a></span> type result.
+        A disjunction, for example <span class="var">a</span> <span class="mono">||</span> <span class="var">b</span>, is <span class="kw">true</span>, 
+        if either <span class="var">a</span> or <span class="var">b</span>, or both evaluate to true. It is <span class="kw">false</span> otherwise.
+        Disjunctive expressions are evaluated using so called short-circuit evaluation: if the left operand is <span class="kw">true</span>, the right operand is not evaluated, because the result 
+        is already known to be <span class="kw">true</span>.
+    </p>
+
+    <p>
+        A <a href="#rule.conjunction">conjunction</a> expression takes <span class="kw"><a href="#basic-type-bool">bool</a></span> type operands and yields 
+        a <span class="kw"><a href="#basic-type-bool">bool</a></span> type result.
+        A conjunction, for example <span class="var">a</span> <span class="mono">&&</span> <span class="var">b</span>, is <span class="kw">true</span>, 
+        if both <span class="var">a</span> and <span class="var">b</span> evaluate to true. It is <span class="kw">false</span> otherwise.
+        Conjunctive expressions are also evaluated using short-circuit evaluation: if the left operand is <span class="kw">false</span>, the right operand is not evaluated, because the  result is 
+        already known to be <span class="kw">false</span>.
+    </p>
+
+    <p>
+        The <span class="mono">||</span> and <span class="mono">&&</span> operators cannot be overloaded.
+    </p>
+
+    <h3 id="bitwise-expressions">3.4 Bitwise Expressions</h3>
+
+    <p>
+        Bitwise expressions, <a href="#rule.bit-or">bit-or</a>, <a href="#rule.bit-xor">bit-xor</a> and <a href="#rule.bit-and">bit-and</a> expressions,
+        take <a href="#basic-integer-types">integer</a> type operands, and yield <a href="#basic-integer-types">integer</a> type result.
+    </p>
+
+    <p>
+        A <a href="#rule.bit-or">bit-or</a> expression, for example <span class="var">a</span> <span class="mono">|</span> <span class="var">b</span>, is evaluated as follows:
+        for each bit <em>x<sub>i</sub></em> of <em>a</em> and corresponding bit <em>y<sub>i</sub></em> of <em>b</em>, if both bits are <span class="mono">0</span>, 
+        the corresponding bit <em>z<sub>i</sub></em> of the result is <span class="mono">0</span>. Otherwise, if either <em>x<sub>i</sub></em>, or 
+        <em>y<sub>i</sub></em> is <span class="mono">1</span>, the result bit <em>z<sub>i</sub></em> is <span class="mono">1</span>.
+    </p>
+
+    <p>
+        A <a href="#rule.bit-xor">bit-xor</a> expression, for example <span class="var">a</span> <span class="mono">^</span> <span class="var">b</span>, is evaluated as follows:
+        for each bit <em>x<sub>i</sub></em> of <em>a</em> and corresponding bit <em>y<sub>i</sub></em> of <em>b</em>, if either <em>x<sub>i</sub></em> or 
+        <em>y<sub>i</sub></em>, but not both, is <span class="mono">1</span>, 
+        the corresponding bit <em>z<sub>i</sub></em> of the result is <span class="mono">1</span>. Otherwise, if both <em>x<sub>i</sub></em> and 
+        <em>y<sub>i</sub></em> are both <span class="mono">0</span> or both are <span class="mono">1</span>, the result bit <em>z<sub>i</sub></em> is <span class="mono">0</span>.
+    </p>
+
+    <p>
+        A <a href="#rule.bit-and">bit-and</a> expression, for example <span class="var">a</span> <span class="mono">&</span> <span class="var">b</span>, is evaluated as follows:
+        for each bit <em>x<sub>i</sub></em> of <em>a</em> and corresponding bit <em>y<sub>i</sub></em> of <em>b</em>, if both bits are <span class="mono">1</span>,
+        the corresponding bit <em>z<sub>i</sub></em> of the result is <span class="mono">1</span>. Otherwise, if either <em>x<sub>i</sub></em>, or
+        <em>y<sub>i</sub></em> is <span class="mono">0</span>, the result bit <em>z<sub>i</sub></em> is <span class="mono">0</span>.
+    </p>
+
+    <p>
+        Bitwise operators <span class="mono">|</span>, <span class="mono">^</span>, and <span class="mono">&</span> can be overloaded, 
+        in which case they take operands of user-defined types and yield a result of some user-defined or built-in type.
+    </p>
+
+    <h3 id="equality-expressions">3.5 Equality Expressions</h3>
+
+    <p>
+        An <a href="#rule.equality">equality</a> expression takes <a href="#basic-types">basic type</a> (other that <span class="kw">void</span>), or <a href="#pointer-type">pointer type</a> operands and yields a 
+        <span class="kw"><a href="#basic-type-bool">bool</a></span> type result.
+    </p>
+
+    <p>
+        Expression <em>a</em> <span class="mono">==</span> <em>b</em> evaluates to <span class="kw">true</span> if the value of <em>a</em> is equal to the value of <em>b</em>, and <span class="kw">false</span> otherwise.
+    </p>
+
+    <p>
+        Expression <em>a</em> <span class="mono">!=</span> <em>b</em> evaluates to <span class="kw">true</span> if the value of <em>a</em> is not equal to the value of <em>b</em>, and <span class="kw">false</span> otherwise.
+    </p>
+
+    <p>
+        Equality operator <span class="mono">==</span> can be overloaded, in which case it takes operands of user-defined types and yields a result of some user-defined or built-in type.
+        Inequality operator <span class="mono">!=</span> cannot be overloaded. Instead, if equality operator is overloaded for some type <em>T</em>, and <em>a</em> and <em>b</em> are expressions of type <em>T</em>, 
+        expression <em>a</em> <span class="mono">!=</span> <em>b</em> is equivalent to an expression <span class="mono">!</span>(<em>a</em> <span class="mono">==</span> <em>b</em>).
+
+    </p>
+
+    <h3 id="relational-expressions">3.6 Relational Expressions</h3>
+
+    <p>
+        An <a href="#rule.relational">relational</a> expression takes <a href="#basic-types">basic type</a> (other that <span class="kw">bool</span> or <span class="kw">void</span>),
+        or <a href="#pointer-type">pointer type</a> operands and yields a
+        <span class="kw"><a href="#basic-type-bool">bool</a></span> type result.
+    </p>
+
+    <p>
+        Expression <em>a</em> <span class="mono">&lt;</span> <em>b</em> evaluates to <span class="kw">true</span> if value of <em>a</em> is less than value of <em>b</em>, and <span class="kw">false</span> otherwise.
+    </p>
+
+    <p>
+        Expression <em>a</em> <span class="mono">&gt;</span> <em>b</em> evaluates to <span class="kw">true</span> if value of <em>a</em> is greater than value of <em>b</em>, and <span class="kw">false</span> otherwise.
+    </p>
+
+    <p>
+        Expression <em>a</em> <span class="mono">&lt;=</span> <em>b</em> evaluates to <span class="kw">true</span> if value of <em>a</em> is less than or equal to value of <em>b</em>, and <span class="kw">false</span> otherwise.
+    </p>
+
+    <p>
+        Expression <em>a</em> <span class="mono">&gt;=</span> <em>b</em> evaluates to <span class="kw">true</span> if value of <em>a</em> is greater than or equal to value of <em>b</em>, and <span class="kw">false</span> otherwise.
+    </p>
+
+    <p>
+        If operands of <span class="mono">&lt;</span>, <span class="mono">&gt;</span>, <span class="mono">&lt;=</span> or <span class="mono">&gt;=</span> operators are
+        of character types <span class="kw">char</span>, <span class="kw">wchar</span> or <span class="kw">uchar</span>, the comparison operators compare codepoint values, that is, numeric character code values of the
+        operands.
+    </p>
+
+    <p>
+        If operands of <span class="mono">&lt;</span>, <span class="mono">&gt;</span>, <span class="mono">&lt;=</span> or <span class="mono">&gt;=</span> operators are pointers, 
+        the comparison operators compare the memory address values of the operands.
+    </p>
+
+    <p>
+        Less-than operator <span class="mono">&lt;</span> can be overloaded, in which case it takes operands of user-defined types and yields a result of some user-defined or built-in type.
+        Other relational operators <span class="mono">&gt;</span>, <span class="mono">&lt;=</span> and <span class="mono">&gt;=</span> cannot be overloaded.
+        Instead, if less-than operator is overloaded for some type <em>T</em>, and <em>a</em> and <em>b</em> are expressions of type <em>T</em>,
+        expression <em>a</em> <span class="mono">&gt;</span> <em>b</em> is equivalent to an expression <em>b</em> <span class="mono">&lt;</span> <em>a</em>,
+        expression <em>a</em> <span class="mono">&lt;=</span> <em>b</em> is equivalent to an expression <span class="mono">!</span>(<em>b</em> <span class="mono">&lt;</span> <em>a</em>), and
+        expression <em>a</em> <span class="mono">&gt;=</span> <em>b</em> is equivalent to an expression <span class="mono">!</span>(<em>a</em> <span class="mono">&lt;</span> <em>b</em>).
+    </p>
+
+    <h3 id="is-and-as-expressions">3.7 Is and As Expressions</h3>
+
+    <p>
+        If <em>p</em> is a pointer to object of some polymorphic class type, and <em>T</em> is some polymorphic class type, expression 
+        <em>p</em> <span class="kw">is</span> <em>T</em>* tests whether pointer <em>p</em> actually points to an object of type <em>T</em> or of type <em>U</em> that derives from type <em>T</em>. 
+        The test yields a <span class="kw"><a href="#basic-type-bool">bool</a></span> result.
+    </p>
+
+    <p>
+        If <em>p</em> is a pointer to object of some polymorphic class type, and <em>T</em> is some polymorphic class type, expression
+        <em>p</em> <span class="kw">as</span> <em>T</em>* tests whether pointer <em>p</em> actually points to an object of type <em>T</em> or of type <em>U</em> that derives from type <em>T</em>.
+        If the test is successful, the result is a pointer to class <em>T</em>, otherwise the result is <span class="kw">null</span>.
+    </p>
+
+    <p>
+        The <span class="kw">is</span> and <span class="kw">as</span> operators cannot be overloaded.
+    </p>
+
+    <h3 id="shift-expressions">3.8 Shift Expressions</h3>
+
+    <p>
+        A <a href="#rule.shift">shift</a> expression take <a href="#basic-integer-types">integer</a> type operands, and yield <a href="#basic-integer-types">integer</a> type result.
+    </p>
+
+    <p>
+        Expression <em>a</em> <span class="mono">&lt;&lt;</span> <em>b</em> returns operand <em>a</em> shifted operand <em>b</em> bit positions left. 
+        The vacant rightmost bit positions of the result are filled with zero bits.
+    </p>
+
+    <p>
+        Expression <em>a</em> <span class="mono">&gt;&gt;</span> <em>b</em> returns operand <em>a</em> shifted operand <em>b</em> bit positions right.
+        The vacant leftmost bit positions of the result are filled with bits depending of the common type of <em>a</em> and <em>b</em>:
+        If the common type of <em>a</em> and <em>b</em> is an unsigned type <span class="kw">byte</span>, <span class="kw">ushort</span>, <span class="kw"> uint</span>, or <span class="kw">ulong</span>,
+        the leftmost bit positios of the result are zero-filled. Otherwise, if the common type of <em>a</em> and <em>b</em> is a signed type <span class="kw">sbyte</span>, <span class="kw">short</span>, 
+        <span class="kw">int</span> or <span class="kw">long</span>, the leftmost bit positions of the result are filled with a bit equal to the leftmost bit of <em>a</em>.
+    </p>
+
+    <p>
+        Shift operators <span class="mono">&lt;&lt;</span> and <span class="mono">&gt;&gt;</span> can be overloaded,
+        in which case they take operands of user-defined types and yield a result of some user-defined or built-in type.
+        For example, in the system library the <span class="mono">&lt;&lt;</span> operator has 
+        <a href="../library/System.Base/System.Base.html#function_group_op_shl_247FCBBC20E82D4A1D0D55C77A382CB9751F0C4C">these</a> overloads.
+        
+    </p>
+
+    <h3 id="additive-expressions">3.9 Additive Expressions</h3>
+
+    <p>
+        An <a href="#rule.additive">additive</a> expression takes <a href="#basic-integer-types">integer</a>, <a href="#basic-floating-point-types">floating-point</a>, 
+        or <a href="#pointer-type">pointer</a> type operands. The result is of the <a href="#common-type">common</a> type of the operand types. 
+    </p>
+    
+    <p>
+        When <em>a</em> and <em>b</em> are of integer or floating-point types, the expression <em>a</em> <span class="mono">+</span> <em>b</em> returns the sum of <em>a</em> and <em>b</em>.
+        and expression <em>a</em> <span class="mono">&minus;</span> <em>b</em> returns the difference of <em>a</em> and <em>b</em>. 
+        If at least one operands is of a floating-point type, the result is of a floating-point type, otherwise it is of an integer type.
+    </p>
+
+    <p>
+        When <em>p</em> is of a pointer type and <em>i</em> is of an integer type, the value of expression <em>p</em> <span class="mono">+</span> <em>i</em> is (informally) a 
+        pointer pointing <em>i</em> objects "after" <em>p</em>. The same applies to the expression <em>i</em> <span class="mono">+</span> <em>p</em>.
+        The value of expression <em>p</em> <span class="mono">&minus;</span> <em>i</em> is (informally) a pointer pointing <em>i</em> objects "before" <em>p</em>.
+        When <em>p</em> and <em>q</em> are of pointer types, the value of expression <em>p</em> <span class="mono">&minus;</span> <em>q</em> is (informally) the "number of objects" between <em>p</em> and <em>q</em>.
+    </p>
+
+    <p>
+        Additive operators <span class="mono">+</span> and <span class="mono">&minus;</span> can be overloaded, 
+        in which case they take operands of user-defined types and yield a result of some user-defined or built-in type.
+        For example, in the system library the <span class="mono">+</span> operator has 
+        <a href="../library/System.Base/System.Base.html#function_group_op_plus_C9FCFD8E4E0F27EFEFEA982DE2CE2508CDB3F20F">these</a> overloads.
+    </p>
+
+    <h3 id="multiplicative-expressions">3.10 Multiplicative Expressions</h3>
+
+    <p>
+        A <a href="#rule.multiplicative">multiplicative</a> expression takes <a href="#basic-integer-types">integer</a> or <a href="#basic-floating-point-types">floating-point</a> type operands.
+        The result is of the <a href="#common-type">common</a> type of the operand types.
+    </p>
+
+    <p>
+        Expression <em>a</em> <span class="mono">*</span> <em>b</em> returns the product of <em>a</em> multiplied by <em>b</em>.
+    </p>
+
+    <p>
+        Expression <em>a</em> <span class="mono">/</span> <em>b</em> returns the quotient of <em>a</em> divided by <em>b</em>.
+        If <em>a</em> and <em>b</em> are of integer types, the result is of an integer type. It is truncated to the nearest whole integer towards zero.
+    </p>
+
+    <p>
+        Expression <em>a</em> <span class="mono">%</span> <em>b</em> returns the remainder of integer division <em>a</em> divided by <em>b</em>.
+        Remainder operation is defined only for integer type operands.
+        If <em>a</em> is negative, the result is negative, otherwise the result is nonnegative.
+    </p>
+
+    <p>
+        Multiplicative operators <span class="mono">*</span>, <span class="mono">/</span> and <span class="mono">%</span> can be overloaded,
+        in which case they take operands of user-defined types and yield a result of some user-defined or built-in type.
+    </p>
+
+    <h3 id="prefix-expressions">3.11 Prefix Expressions</h3>
+
+    <a href="#rule.prefix">Prefix</a> expressions have many forms. There are expressions for <a href="#prefix-increment-and-decrement-expressions">incrementing or decrementing</a> a variable, 
+    returning operand <a href="#unary-plus-and-unary-minus-expressions">negated</a>, returning <a href="#logical-not-expression">logical not</a> of the operand, 
+    returning a <a href="#bitwise-complement-expression">bitwise complement</a> of the operand, <a href="#dereference-expression">dereferencing</a> a pointer, and 
+    taking <a href="#address-of-expression">address</a> of a variable.
+
+    <p>
+        All prefix operators <span class="mono">++</span>, <span class="mono">&minus;&minus;</span>, <span class="mono">+</span>, <span class="mono">&minus;</span>, 
+        <span class="mono">!</span>, <span class="mono">~</span>, <span class="mono">*</span> and
+        <span class="mono">&</span> can be overloaded, in which case they take an operand of some user-defined type and yield a result of some user-defined or built-in type.
+    </p>
+
+    <h4 id="prefix-increment-and-decrement-expressions">3.11.1 Prefix Increment and Decrement Expressions</h4>
+
+    <p>
+        Prefix increment and decrement expressions take <a href="#basic-integer-types">integer</a> or <a href="#pointer-type">pointer</a> type variable operands and yield result of the same type.
+    </p>
+
+    <p>
+        If <em>a</em> is an integer variable, expression <span class="mono">++</span><em>a</em> increments <em>a</em> by one. The value of the expression is the value of <em>a</em> after incrementing it.
+    </p>
+
+    <p>
+        If <em>a</em> is an integer variable, expression <span class="mono">&minus;&minus;</span><em>a</em> decrements <em>a</em> by one. The value of the expression is the value of <em>a</em> after decrementing it.
+    </p>
+
+    <p>
+        If <em>p</em> is a pointer to an object of type <em>T</em>, expression <span class="mono">++</span><em>p</em> increments <em>p</em>, so that <em>p</em> will point to the next object of type <em>T</em> in
+        memory. The value of the expression is the value of <em>p</em> after incrementing it.
+    </p>
+
+    <p>
+        If <em>p</em> is a pointer to an object of type <em>T</em>, expression <span class="mono">&minus;&minus;</span><em>p</em> decrements <em>p</em>, 
+        so that <em>p</em> will point to the previous object of type <em>T</em> in memory. The value of the expression is the value of <em>p</em> after decrementing it.
+    </p>
+
+    <h4 id="unary-plus-and-unary-minus-expressions">3.11.2 Unary Plus and Unary Minus Expressions</h4>
+
+    <p>
+        Unary plus and unary minus expressions take <a href="#basic-integer-types">integer</a> or <a href="#basic-floating-point-types">floating-point</a> type operands.
+    </p>
+
+    <p>
+        Expression <span class="mono">+</span><em>a</em> will yield value of <em>a</em> and expression <span class="mono">&minus;</span><em>a</em> will yield value of <em>a</em> negated.
+    </p>
+
+    <h4 id="logical-not-expression">3.11.3 Logical Not Expression</h4>
+
+    <p>
+        Logical not expression takes a <span class="kw"><a href="#basic-type-bool">bool</a></span> type operand and yields a <span class="kw"><a href="#basic-type-bool">bool</a></span> type result.
+    </p>
+
+    <p>
+        If value of <em>a</em> is <span class="kw">true</span>, value of <span class="mono">!</span><em>a</em> is <span class="kw">false</span>,
+        and if value of <em>a</em> is <span class="kw">false</span>, value of <span class="mono">!</span><em>a</em> is <span class="kw">true</span>.
+    </p>
+
+    <h4 id="bitwise-complement-expression">3.11.4 Bitwise Complement Expression</h4>
+
+    <p>
+        Bitwise complement expression takes an <a href="#basic-integer-types">integer</a> operand and yields an <a href="#basic-integer-types">integer</a> type result.
+    </p>
+
+    <p>
+        For each bit <em>x</em><sub><em>i</em></sub> of an integer value <em>a</em>, the value of <span class="mono">~</span><em>a</em> is computed as follows:
+        If <em>x</em><sub><em>i</em></sub> is <span class="mono">0</span>, the corresponding bit <em>y</em><sub><em>i</em></sub> of the result will be <span class="mono">1</span>, and
+        if <em>x</em><sub><em>i</em></sub> is <span class="mono">1</span>, the corresponding bit <em>y</em><sub><em>i</em></sub> of the result will be <span class="mono">0</span>.
+    </p>
+
+    <h4 id="dereference-expression">3.11.5 Pointer Dereference Expression</h4>
+
+    <p>
+        Pointer dereference expression takes a <a href="#pointer-type">pointer</a> type operand and returns the value of pointed-to type.
+    </p>
+
+    <p>
+        If <em>p</em> is a pointer to type <em>T</em> object, <span class="mono">*</span><em>p</em> returns the value of that pointed object of type <em>T</em>.
+    </p>
+
+    <p>
+        Expression <span class="mono">*</span><em>p</em> can occur also as the left side of an <a href="#assignment-statement">assignment statement</a>, in which case the 
+        pointed-to object is assigned a new value.
+    </p>
+
+    <p>
+        When pointer dereference expression is overloaded, the return value of the operator function is often of a <a href="#reference-type">reference type</a>, 
+        so the expression can be used as the left side of an assignment statement.
+    </p>
+
+    <h4 id="address-of-expression">3.11.6 Address-of Expression</h4>
+
+    <p>
+        Address-of expression takes a variable operand and returns a pointer that contains the memory address of that variable.
+    </p>
+
+    <p>
+        If <em>a</em> is an object of type <em>T</em>, expression <span class="mono">&</span><em>a</em> yields a pointer to type <em>T</em> that contains the address of <em>a</em>.
+    </p>
+
+    <h3 id="postfix-expressions">3.12 Postfix Expressions</h3>
+
+    A <a href="#rule.postfix">postfix</a> expression can be a <a href="#postfix-increment-and-decrement-expressions">postfix increment or decrement</a> expression, 
+    a <a href="#member-access-expression">member access</a> expression, a <a href="#pointer-member-access-expression">pointer member access</a> expression, 
+    a <a href="#subscript-expression">subscript</a> expression, or an <a href="#invocation-expression">invocation</a> expression.
+
+    <h4 id="postfix-increment-and-decrement-expressions">3.12.1 Postfix Increment and Decrement Expressions</h4>
+
+    <p>
+        Postfix increment and decrement expressions take <a href="#basic-integer-types">integer</a> or <a href="#pointer-type">pointer</a> type variable operands and yield result of the same type.
+    </p>
+
+    <p>
+        If <em>a</em> is an integer variable, expression <em>a</em><span class="mono">++</span> increments <em>a</em> by one. The value of the expression is the value of <em>a</em> <em>before</em> incrementing it.
+    </p>
+
+    <p>
+        If <em>a</em> is an integer variable, expression <em>a</em><span class="mono">&minus;&minus;</span> decrements <em>a</em> by one. The value of the expression is the value of <em>a</em> before decrementing it.
+    </p>
+
+    <p>
+        If <em>p</em> is a pointer to an object of type <em>T</em>, expression <em>p</em><span class="mono">++</span> increments <em>p</em>, so that <em>p</em> will point to the next object of type <em>T</em> in
+        memory. The value of the expression is the value of <em>p</em> before incrementing it.
+    </p>
+
+    <p>
+        If <em>p</em> is a pointer to an object of type <em>T</em>, expression <em>p</em><span class="mono">&minus;&minus;</span> decrements <em>p</em>,
+        so that <em>p</em> will point to the previous object of type <em>T</em> in memory. The value of the expression is the value of <em>p</em> before decrementing it.
+    </p>
+
+    <p>
+        The postfix increment and decrement operators <span class="mono">++</span> and <span class="mono">&minus;&minus;</span> cannot be overloaded.
+        They are implemented by the compiler if the prefix forms of the operators are overloaded.
+    </p>
+
+    <h4 id="member-access-expression">3.12.2 Member Access Expression</h4>
+
+    <p>
+        Expression <em>a</em><span class="mono">.</span><em>b</em> accesses member <em>b</em> of namespace, enumerated type or class object <em>a</em>.
+        Then <em>b</em> can be, depending on <em>a</em>, a <a href="#identifiers">name</a> of a namespace, enumeration constant, constant, type, member variable, typedef, or function.
+        If <em>b</em> has a type, then the type of the expression will be the type of <em>b</em> and the value of the expression will be the value of <em>b</em>.
+    </p>
+
+    <p>
+        Member access operator <span class="mono">.</span> cannot be overloaded.
+    </p>
+
+    <h4 id="pointer-member-access-expression">3.12.3 Pointer Member Access Expression</h4>
+
+    <p>
+        Expression <em>a</em><span class="mono">&minus;&gt;</span><em>b</em> accesses member <em>b</em> of a class object through a pointer (case 1),
+        or through an object of a class that overloads the <span class="mono">&minus;&gt;</span> operator (case 2).
+    </p>
+
+    <p>
+        The member <em>b</em> accessed can be a member variable or a member function. 
+        If <em>b</em> is a member variable, the type of the expression will be the type of <em>b</em>, and the value of expression will be the value of <em>b</em>.
+        If <em>b</em> is a member function, the type of the expression will be the type returned by the member function <em>b</em> and the value of the expression 
+        will be the value returned by the member function <em>b</em> (if any).
+    </p>
+
+    <h5>Case 1</h5>
+
+    <p>
+        If <em>a</em> is a pointer to class object <em>T</em>, then <em>b</em> must be a member of the class <em>T</em>, 
+        or member of the base class or ancestor class of <em>T</em>.
+    </p>
+
+    <h5>Case 2</h5>
+
+    <p>
+        If <em>a</em> is an object of a class that overloads the <span class="mono">&minus;&gt;</span> operator, 
+        then that operator function can return either a pointer to a class object (case 1),
+        or return an object of another class that in turn overloads the <span class="mono">&minus;&gt;</span> operator (case 2), 
+        thus providing another level of indirection.
+    </p>
+
+    <p>
+        This indirection mechanism, along with overloading the <a href="#dereference-expression">pointer dereference operator</a>, 
+        makes it possible to implement pointer-like classes, such as "smart pointers" and iterators.
+        For example, the system library contains a UniquePtr class having 
+        <a href="../library/System.Base/System.Base.html#function_group_op_arrow_1AA165D4000489BF4D95084C086A2565790F8B78">these</a> overloads.
+    </p>
+
+    <h4 id="subscript-expression">3.12.4 Subscript Expression</h4>
+
+    <p>
+        A subscript expression provides access to individual elements of an array or other sequence of elements.
+    </p>
+
+    <p>
+        If <em>a</em> is an array, expression <em>a</em><span class="mono">[</span><em>i</em><span class="mono">]</span> provides access to <em>i</em>'th array element.
+        By convention the first element has index <span class="mono" >0</span>. The type of index <em>i</em> is <span class="kw">long</span>.
+    </p>
+
+    <p>
+        If <em>p</em> is a pointer to type <em>T</em> object, expression <em>p</em><span class="mono">[</span><em>i</em><span class="mono">]</span> is equivalent to 
+        expression <span class="mono">*</span>(<em>p</em><span class="mono">+</span><em>i</em>), thus providing access to <em>i</em>'th object of type <em>T</em> 
+        in a sequence of elements pointed by <em>p</em>. Again indexing starts from <span class="mono">0</span>.
+    </p>
+
+    <p>
+        A subscript expression can also occur in the left side of an <a href="#assignment-statement">assignment statement</a>. In that case the accessed element is assigned a new value.
+    </p>
+
+    <p>
+        The subscript operator <span class="mono">[]</span> can be overloaded, in which case it takes an operand of a user-defined type and yields a result of some user-defined or built-in type.
+    </p>
+
+    <h4 id="invocation-expression">3.12.5 Invocation Expression</h4>
+
+    <p>
+        Invocation expression takes form <em>x</em>(<em>a<sub><span class="mono">0</span></sub></em>, <em>a<sub><span class="mono">1</span></sub></em>, ...), 
+        where <em>x</em> can be for example an <a href="#rule.identifier">identifier</a>, <a href="#rule.qualified-id">qualified id</a> or <a href="#rule.keyword">keyword</a> 
+        that names a function, delegate, class delegate, typedef, type or object of a class type, and 
+        <em>a<sub><span class="mono">0</span></sub></em>, <em>a<sub><span class="mono">1</span></sub></em>, ... is a possibly empty list of argument expressions separated by commas and enclosed in parentheses.
+    </p>
+
+    <h5>Function Call</h5>
+
+    <p>
+        When <em>x</em> is a name of a function, <a href="#overload-resolution">overload resolution</a> process selects the best-matching function overload to be called with the specified arguments.
+        The number of arguments must match exacly to the number of parameters of the function, but if the argument types do not match exactly the signature of the selected function overload, 
+        <a href="#conversion">conversions</a> take place. 
+        If no single best-matching function can be found, or many overloads are found to be equally good matches, the compiler issues an error.
+    </p>
+
+    <h5>Delegate and Class Delegate Calls</h5>
+
+    <p>
+        When <em>x</em> is a name of a delegate or a class delegate, again the number of arguments must match exactly the number of parameters of the delegate or class delegate, 
+        and conversions may take place. Delegates and class delegates cannot be overloaded.
+    </p>
+
+    <h5>Construction of a Temporary</h5>
+
+    <p>
+        When <em>x</em> is a name of a typedef or a type, the expression yields a call of a <a href="#constructor">constructor</a> and creation of a temporary variable of that type.
+        Constructor to be called is selected by the overload resolution process.
+    </p>
+
+    <p>
+        Constructed temporary can be bound to an <a href="#rvalue-reference-type">rvalue reference</a> without the need to call 
+        <a href="../library/System.Base/System.Base.html#function_Rvalue_FC16F1187C8C3CF8D9182A63AC59041EF4474FA2">Rvalue</a> function for it.
+    </p>
+
+    <h5>Call of a Function Call Operator</h5>
+
+    <p>
+        When <em>x</em> denotes an object of a class type (a variable or a temporary, for instance), and that class type overloads the function call operator <span class="mono">()</span>, 
+        the expression yields a call to that operator function.
+        Matching function call operator is selected using the overload resolution process. 
+    </p>
+
+    <hr />
+
+    <sup id="footnote-1">1. Invocation of a <span class="kw">void</span> function does not have a value, but it can have
+    <em><a href="http://en.wikipedia.org/wiki/Side_effect_(computer_science)">side-effects</a></em>, for example write text to a stream.</sup>
 
 </body>
 </html>

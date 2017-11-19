@@ -214,7 +214,7 @@ void* GetSymbolAddess(const std::string& symbolName)
     void* symbolAddress = GetProcAddress(exeHandle, symbolName.c_str());
     if (!symbolAddress)
     {
-        throw std::runtime_error("error assigning class id's: could not resolve address of a symbol '" + symbolName);
+        throw std::runtime_error("error assigning class id's: could not resolve address of a symbol '" + symbolName + "'");
     }
     return symbolAddress;
 }

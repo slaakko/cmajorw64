@@ -1905,6 +1905,33 @@ namespace cmdevenv
                 MessageBox.Show(ex.Message);
             }
         }
+        private void toolStripMenuItem17_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                string cmajorRoot = Environment.GetEnvironmentVariable("CMAJOR_ROOT");
+                if (string.IsNullOrEmpty(cmajorRoot))
+                {
+                    throw new Exception("CMAJOR_ROOT environment variable not set, please set it to contain /path/to/cmajor directory");
+                }
+                System.Diagnostics.Process.Start(Path.Combine(cmajorRoot, Path.Combine("doc", "index.html")));
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+        private void toolStripMenuItem7_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                System.Diagnostics.Process.Start("http://slaakko.github.io/cmajor/");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
         private Solution solution;
         private XTabControl editorTabControl;
         private State state;

@@ -73,6 +73,8 @@ namespace cmdevenv
             this.windowToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.closeAllToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem7 = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.gettingStartedGuideToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.compilerUsersManualToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.languageSpecificationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -173,6 +175,7 @@ namespace cmdevenv
             this.addExistingSourceFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.addExistingProjectFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.addProjectReferenceDialog = new System.Windows.Forms.OpenFileDialog();
+            this.toolStripMenuItem17 = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.editorSplitContainer)).BeginInit();
             this.editorSplitContainer.Panel2.SuspendLayout();
@@ -522,6 +525,9 @@ namespace cmdevenv
             // helpToolStripMenuItem
             // 
             this.helpToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toolStripMenuItem17,
+            this.toolStripMenuItem7,
+            this.toolStripSeparator2,
             this.gettingStartedGuideToolStripMenuItem,
             this.compilerUsersManualToolStripMenuItem,
             this.languageSpecificationToolStripMenuItem,
@@ -538,6 +544,18 @@ namespace cmdevenv
             this.helpToolStripMenuItem.Name = "helpToolStripMenuItem";
             this.helpToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
             this.helpToolStripMenuItem.Text = "&Help";
+            // 
+            // toolStripMenuItem7
+            // 
+            this.toolStripMenuItem7.Name = "toolStripMenuItem7";
+            this.toolStripMenuItem7.Size = new System.Drawing.Size(230, 22);
+            this.toolStripMenuItem7.Text = "Homepage";
+            this.toolStripMenuItem7.Click += new System.EventHandler(this.toolStripMenuItem7_Click);
+            // 
+            // toolStripSeparator2
+            // 
+            this.toolStripSeparator2.Name = "toolStripSeparator2";
+            this.toolStripSeparator2.Size = new System.Drawing.Size(227, 6);
             // 
             // gettingStartedGuideToolStripMenuItem
             // 
@@ -996,7 +1014,7 @@ namespace cmdevenv
             this.toolStripSeparator5,
             this.viewProjectToolStripMenuItem});
             this.projectContextMenuStrip.Name = "projectContextMenuStrip";
-            this.projectContextMenuStrip.Size = new System.Drawing.Size(181, 260);
+            this.projectContextMenuStrip.Size = new System.Drawing.Size(181, 238);
             // 
             // buildToolStripMenuItem2
             // 
@@ -1277,6 +1295,13 @@ namespace cmdevenv
             this.addProjectReferenceDialog.DefaultExt = "cmp";
             this.addProjectReferenceDialog.Filter = "Cmajor Project Files|*.cmp";
             // 
+            // toolStripMenuItem17
+            // 
+            this.toolStripMenuItem17.Name = "toolStripMenuItem17";
+            this.toolStripMenuItem17.Size = new System.Drawing.Size(230, 22);
+            this.toolStripMenuItem17.Text = "Local Documentation";
+            this.toolStripMenuItem17.Click += new System.EventHandler(this.toolStripMenuItem17_Click);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1462,6 +1487,9 @@ namespace cmdevenv
         private System.Windows.Forms.OpenFileDialog addExistingProjectFileDialog;
         private System.Windows.Forms.ToolStripMenuItem clearRecentProjectsToolStripMenuItem;
         private System.Windows.Forms.OpenFileDialog addProjectReferenceDialog;
+        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem7;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
+        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem17;
     }
 }
 

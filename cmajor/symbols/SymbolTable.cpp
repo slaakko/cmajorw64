@@ -1289,11 +1289,17 @@ void CreateClassFile(const std::string& executableFilePath, const SymbolTable& s
     }
     std::string classFilePath = boost::filesystem::path(executableFilePath).replace_extension(".cls").generic_string();
     const std::unordered_set<ClassTypeSymbol*>& polymorphicClasses = symbolTable.PolymorphicClasses();
-    uint32_t n = polymorphicClasses.size();
+    uint32_t n = 0;
+    for (ClassTypeSymbol* polymorphicClass : polymorphicClasses)
+    {
+        if (!polymorphicClass->IsVmtObjectCreated()) continue;
+        ++n;
+    }
     BinaryWriter writer(classFilePath);
     writer.WriteEncodedUInt(n);
     for (ClassTypeSymbol* polymorphicClass : polymorphicClasses)
     {
+        if (!polymorphicClass->IsVmtObjectCreated()) continue;
         uint32_t typeId = polymorphicClass->TypeId();
         const std::string& vmtObjectName = polymorphicClass->VmtObjectName();
         uint32_t baseClassTypeId = 0;
