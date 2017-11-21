@@ -34,7 +34,7 @@
         &nbsp;&nbsp;&nbsp;&nbsp;2.3 <a href="#basic-integer-types">Basic Integer Types</a><br />
         &nbsp;&nbsp;&nbsp;&nbsp;2.4 <a href="#basic-floating-point-types">Basic Floating-Point Types</a><br />
         &nbsp;&nbsp;&nbsp;&nbsp;2.5 <a href="#basic-character-types">Basic Character Types</a><br />
-        &nbsp;&nbsp;&nbsp;&nbsp;2.6 <a href="#void-type">Void Type</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;2.6 <a href="#void-type">Void</a><br />
         3 <a href="#expressions">Expressions</a><br />
         &nbsp;&nbsp;&nbsp;&nbsp;3.1 <a href="#expressions-syntax">Syntax</a><br />
         &nbsp;&nbsp;&nbsp;&nbsp;3.2 <a href="#axiom-expressions">Axiom Expressions</a><br />
@@ -59,14 +59,26 @@
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.12.3 <a href="#pointer-member-access-expression">Pointer Member Access Expression</a><br />
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.12.4 <a href="#subscript-expression">Subscript Expression</a><br />
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.12.5 <a href="#invocation-expression">Invocation Expression</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;3.13 <a href="#primary-expressions">Primary Expressions</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.13.1 <a href="#grouping-expression">Grouping Expression</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.13.2 <a href="#literal-expression">Literals in Expressions</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.13.3 <a href="#basic-type-expression">Basic Types in Expressions</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.13.4 <a href="#template-id-expression">Template Identifier in Expressions</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.13.5 <a href="#identifier-expression">Identifiers in Expressions</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.13.6 <a href="#this-and-base-access">This and Base Access</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.13.7 <a href="#size-of-expression">Size-of Expresssion</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.13.8 <a href="#typename-expression">Typename Expresssion</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.13.9 <a href="#cast-expression">Cast Expresssion</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.13.10 <a href="#construct-expression">Construction Expresssion</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.13.11 <a href="#new-expression">New Expresssion</a><br />
     </div>
 
     <h2 id="lexical-structure">1 Lexical Structure</h2>
 
     <p>
         Cmajor source files are ordinary <a href="http://en.wikipedia.org/wiki/UTF-8">UTF-8</a>-encoded plain text files.
-        Each source file consists lexically of keywords, identifiers, literals and operators that can be 
-        separated by comments and white space characters such as spaces, tabulations, and newline characters.
+        Each source file consists lexically of <a href="#keywords">keywords</a>, <a href="#identifiers">identifiers</a>, <a href="#literals">literals</a> and 
+        <a href="#operators">operators </a>that can be separated by comments and white space characters such as spaces, tabulations, and newline characters.
     </p>
 
     <h3 id="white-space-and-comments">1.1 White Space and Comments</h3>
@@ -246,12 +258,9 @@
         when a simple identifier of it would be ambiguous in its context.
         It consists of the names of the <a href="#namespace">namespaces</a> containing the entity (if any) separated by periods followed by the names
         of the types (if any) containing the entity separated by periods followed by the identifier of the entity itself.
-    </p>
-
-    <p>
         An <a href="#enumeration-constant">enumeration constant</a> must always be referred by prefixing the name of it by the name of the 
-        <a href="#enumerated type">enumerated type</a>
-        that contains it. A <a href="#local-variable">local variable</a> cannot be referred by a fully qualified identifier.
+        <a href="#enumerated type">enumerated type</a> 
+        that contains it and a period. A <a href="#local-variable">local variable</a> cannot be referred by a fully qualified identifier.
         An identifier of a local variable refers always to the local variable in the innermost scope that contains it.
     </p>
 
@@ -272,21 +281,21 @@
             <td class="sep">&rarr;</td>
             <td class="rcontent">
                 <span class="rule"><a href="#rule.idstart">idstart</a></span>
-                <span class="rule"><a href="#rule.idcont">idcont</a>*
+                <span class="rule"><a href="#rule.idcont">idcont</a>*</span>
             </td>
         </tr>
         <tr>
             <td class="rule" id="rule.idstart">idstart</td>
             <td class="sep">&rarr;</td>
             <td class="rcontent">
-                'Unicode characters having property ID_Start'
+                'any Unicode character having property ID_Start'
             </td>
         </tr>
         <tr>
             <td class="rule" id="rule.idcont">idcont</td>
             <td class="sep">&rarr;</td>
             <td class="rcontent">
-                'Unicode characters having property ID_Continue'
+                'any Unicode character having property ID_Continue'
             </td>
         </tr>
         <tr>
@@ -541,9 +550,10 @@
 
     <p>
         An <a href="#rule.integer-literal">integer literal</a> represents a hexadecimal or decimal signed or unsigned integer.
-        If it has <span class="mono">u</span> or <span class="mono">U</span> suffix its type is smallest of the following types that can contain its value:
+        If it has <span class="mono">u</span> or <span class="mono">U</span> suffix, it represents an <em>unsigned</em> integer literal, 
+        and its type is the smallest of the following types that can contain its value:
         <span class="kw">byte</span>, <span class="kw">ushort</span>, <span class="kw">uint</span>, <span class="kw">ulong</span> (see <a href="#basic-integer-types">basic integer types</a>).
-        Otherwise its type is smallest of the following types that can contain its value:
+        Otherwise it represents a <em>signed</em> integer literal, and its type is the smallest of the following types that can contain its value:
         <span class="kw">sbyte</span>, <span class="kw">short</span>, <span class="kw">int</span>, <span class="kw">long</span> (see <a href="#basic-integer-types">basic integer types</a>).
         If the literal has prefix <span class="mono">0x</span> or <span class="mono">0X</span>, it represents a hexadecimal, or base 16, value,
         otherwise it represents a decimal, or base 10, value.
@@ -720,11 +730,11 @@
     <h3 id="basic-floating-point-types">2.4 Basic Floating-Point Types</h3>
 
     <p>
-        The <span class="kw">float</span> type is a 32-bit single precision <a href="http://en.wikipedia.org/wiki/IEEE_754">IEEE 754</a> floating-point number type.
+        The <span class="kw">float</span> type is a 32-bit single precision floating-point number type.
     </p>
 
     <p>
-        The <span class="kw">double</span> type is a 64-bit double precision <a href="http://en.wikipedia.org/wiki/IEEE_754">IEEE 754</a> floating-point number type.
+        The <span class="kw">double</span> type is a 64-bit double precision floating-point number type.
     </p>
 
     <h3 id="basic-character-types">2.5 Basic Character Types</h3>
@@ -741,7 +751,7 @@
         The <span class="kw">uchar</span> type is an unsigned 32-bit character type. It can have a <a href="http://en.wikipedia.org/wiki/Unicode">Unicode</a> UTF-32 code point value.
     </p>
 
-    <h3 id="void-type">2.6 Void Type</h3>
+    <h3 id="void-type">2.6 Void</h3>
 
     <p>
         The <span class="kw">void</span> keyword represents lack of value.
@@ -1394,7 +1404,7 @@
     <h4 id="member-access-expression">3.12.2 Member Access Expression</h4>
 
     <p>
-        Expression <em>a</em><span class="mono">.</span><em>b</em> accesses member <em>b</em> of namespace, enumerated type or class object <em>a</em>.
+        Expression <em>a</em><span class="mono">.</span><em>b</em> accesses member <em>b</em> of namespace, type or class object <em>a</em>.
         Then <em>b</em> can be, depending on <em>a</em>, a <a href="#identifiers">name</a> of a namespace, enumeration constant, constant, type, member variable, typedef, or function.
         If <em>b</em> has a type, then the type of the expression will be the type of <em>b</em> and the value of the expression will be the value of <em>b</em>.
     </p>
@@ -1469,8 +1479,8 @@
 
     <p>
         Invocation expression takes form <em>x</em>(<em>a<sub><span class="mono">0</span></sub></em>, <em>a<sub><span class="mono">1</span></sub></em>, ...), 
-        where <em>x</em> can be for example an <a href="#rule.identifier">identifier</a>, <a href="#rule.qualified-id">qualified id</a> or <a href="#rule.keyword">keyword</a> 
-        that names a function, delegate, class delegate, typedef, type or object of a class type, and 
+        where <em>x</em> can be for example an <a href="#rule.identifier">identifier</a> or a <a href="#rule.qualified-id">qualified id</a> 
+        naming a function, delegate, class delegate, typedef, type or object of a class type, and 
         <em>a<sub><span class="mono">0</span></sub></em>, <em>a<sub><span class="mono">1</span></sub></em>, ... is a possibly empty list of argument expressions separated by commas and enclosed in parentheses.
     </p>
 
@@ -1478,7 +1488,7 @@
 
     <p>
         When <em>x</em> is a name of a function, <a href="#overload-resolution">overload resolution</a> process selects the best-matching function overload to be called with the specified arguments.
-        The number of arguments must match exacly to the number of parameters of the function, but if the argument types do not match exactly the signature of the selected function overload, 
+        The number of arguments must match exactly to the number of parameters of the function, but if the argument types do not match exactly the signature of the selected function overload, 
         <a href="#conversion">conversions</a> take place. 
         If no single best-matching function can be found, or many overloads are found to be equally good matches, the compiler issues an error.
     </p>
@@ -1490,7 +1500,7 @@
         and conversions may take place. Delegates and class delegates cannot be overloaded.
     </p>
 
-    <h5>Construction of a Temporary</h5>
+    <h5 id="construction-of-temporary">Construction of a Temporary</h5>
 
     <p>
         When <em>x</em> is a name of a typedef or a type, the expression yields a call of a <a href="#constructor">constructor</a> and creation of a temporary variable of that type.
@@ -1510,10 +1520,87 @@
         Matching function call operator is selected using the overload resolution process. 
     </p>
 
+    <h3 id="primary-expressions">3.13 Primary Expressions</h3>
+
+    A <a href="#rule.primary">primary</a> expression can be a <a href="#grouping-expression">grouping</a> expression, a <a href="#literal-expression">literal</a>, 
+    a <a href="#basic-type-expression">basic type</a>, a <a href="#template-id-expression">template identifier</a>, an <a href="#identifier-expression">identifier</a>,
+    <a href="#this-and-base-access">this or base access</a>, a <a href="#size-of-expression">size-of</a> expression, a <a href="#typename-expression">typename</a> expression,
+    a <a href="#cast-expression">cast</a> expression, a <a href="#construct-expression">construct</a> expression, or a <a href="#new-expression">new</a> expression.
+
+    <h4 id="grouping-expression">3.13.1 Grouping Expression</h4>
+
+    Parentheses can be used to group subexpressions.
+    Precedence of multiplicative operators is greater than the precedence of additive operators, so 
+    <em>a</em> <span class="mono">+</span> <em>b</em> <span class="mono">*</span> <em>c</em> means <em>a</em> <span class="mono">+</span> (<em>b</em> <span class="mono">*</span> <em>c</em>).
+    If the addition is ment to be be performed first, this can be accomplished by using parentheses: (<em>a</em> <span class="mono">+</span> <em>b</em>) <span class="mono">*</span> <em>c</em>.
+
+    <h4 id="literal-expression">3.13.2 Literals in Expressions</h4>
+
+    Literals can be used for example as operands of of arithmetic expressions or as arguments of function calls. 
+
+    <h4 id="basic-type-expression">3.13.3 Basic Types in Expressions</h4>
+
+    A basic type can be used for example in <a href="#construction-of-temporary">construction of a temporary</a> or in a <a href="#size-of-expression">size-of expression</a>
+
+    <h4 id="template-id-expression">3.13.4 Template Identifiers in Expression</h4>
+
+    A template identifier can be a name a class or a function template along with a template argument list.
+    It can be used to refer to a class template specialization or to call a function template specialization, for instance.
+
+    <h4 id="identifier-expression">3.13.5 Identifiers in Expressions</h4>
+
+    Identifiers are used in expressions to refer to a variable, parameter, type, constant, namespace, typedef or function.
+
+    <h4 id="this-and-base-access">3.13.6 This and Base Accesss</h4>
+
+    Keyword <span class="kw">this</span> refers to the current class object and <span class="kw">base</span> refers to the base class object in a member a function context.
+    They can be used for example to call a function of the same (<span class="kw">this</span>) or the base class (<span class="kw">base</span>) of the current class, 
+    or to refer to a member variable of the same (<span class="kw">this</span>) or the base class (<span class="kw">base</span>) of the current class.
+
+    <h4 id="size-of-expression">3.13.7 Size-of Expression</h4>
+
+    A <a href="#rule.size-of-expr">size-of</a> expression yields the size of the specified object or type in bytes. The type of the result is <span class="kw">long</span>.
+    The size of a class object may be bigger than the sum of the sizes of its members, because of <a href="#alignment">alignment</a>.
+
+    <h4 id="typename-expression">3.13.8 Typename Expression</h4>
+
+    A <a href="#rule.type-name-expr">typename</a> expression yields the <em>dynamic</em> type name of the specified object or type. The type of the result is <span class="mono">const char*</span>.
+    If <em>p</em> is a pointer to class <em>T</em> object, the <em>static</em> type of <em>p</em> is <em>T</em><span class="mono">*</span>, but the actual type of the object <em>p</em> points to can
+    be <em>U</em>, a type derived from <em>T</em>. In this case <em>U</em> is the dynamic type of expression <span class="mono">*</span><em>p</em> and expression 
+    <span class="kw">typename</span>(<span class="mono">*</span><em>p</em>) returns the fully qualified name of type <em>U</em>.
+
+    <h4 id="cast-expression">3.13.9 Cast Expresssion</h4>
+
+    A <a href="#rule.cast-expr">cast</a> expression performs explicit type conversion. It takes the type of the target type enclosed in angle brackets and a source expression to be converted
+    enclosed in parentheses. Any <a href="#basic-types">basic</a> type excluding <span class="kw">void</span> 
+    can be explicitly converted to any other basic type excluding <span class="kw">void</span>. 
+    Any <a href="#pointer-type">pointer</a> type can be explicitly converted to any other pointer type. 
+    You can also cast away constness of an operand. If <em>p</em> is of type <span class="mono">const T*</span>, <span class="kw">cast</span><span class="mono">&lt;T*&gt;(</span><em>p</em>)
+    yields a plain pointer. Similarly, if <em>c</em> is of type <span class="mono">const T&amp;</span>, <span class="kw">cast</span><span class="mono">&lt;T&amp;&gt;(</span><em>c</em>)
+    yields a plain reference.
+
+    <h4 id="construct-expression">3.13.10 Construction Expresssion</h4>
+
+    A <a href="#rule.construct-expr">construction</a> expression constructs an object "in place" into a memory location.
+    It takes the type of an object to construct enclosed in angle brackets, and then a list of arguments <em>p</em>, <em>a</em><sub>0</sub>, <em>a</em><sub>1</sub>, ... enclosed in parentheses,
+    where <em>p</em> is a pointer to the memory location where into to construct the object and <em>a</em><sub>0</sub>, <em>a</em><sub>1</sub>, ... is a possibly empty list of arguments
+    separated by commas. If <em>T</em> is the type of the object to construct, the type of <em>p</em> can be either <span class="kw">void</span><span class="mono">*</span> or <em>T</em><span class="mono">*</span>.
+    The expression yields a <em>T</em><span class="mono">*</span> result.
+    
+    <h4 id="new-expression">3.13.11 New Expresssion</h4>
+
+    A <a href="#rule.new-expr">new</a> expression creates an object of the specified type. 
+    If <em>T</em> is the type of object to create, <span class="kw">sizeof</span>(<em>T</em>) bytes of memory is allocated from the <a href="free-store">free store</a> and 
+    then the object is constructed into that memory.
+    The new expression takes the type of an object to construct and a possibly empty list of constructor arguments enclosed in parentheses as operands.
+    It yields a pointer to the newly created object as a result.
+
     <hr />
 
-    <sup id="footnote-1">1. Invocation of a <span class="kw">void</span> function does not have a value, but it can have
-    <em><a href="http://en.wikipedia.org/wiki/Side_effect_(computer_science)">side-effects</a></em>, for example write text to a stream.</sup>
+    <sup id="footnote-1">
+        1. Invocation of a <span class="kw">void</span> function does not have a value, but it can have
+        <em><a href="http://en.wikipedia.org/wiki/Side_effect_(computer_science)">side-effects</a></em>, for example write text to a stream.
+    </sup>
 
 </body>
 </html>
