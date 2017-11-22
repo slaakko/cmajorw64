@@ -71,13 +71,41 @@
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.13.9 <a href="#cast-expression">Cast Expresssion</a><br />
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.13.10 <a href="#construct-expression">Construction Expresssion</a><br />
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.13.11 <a href="#new-expression">New Expresssion</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;3.14 <a href="#constant-expression">Constant Expresssion</a><br />
+        4 <a href="#statements">Statements</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;4.1 <a href="#statements-syntax">Syntax</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;4.2 <a href="#labeled-statement">Labeled Statement</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;4.3 <a href="#control-statements">Control Statements</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;4.3.1 <a href="#compound-statement">Compound Statement</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;4.3.2 <a href="#return-statement">Return Statement</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;4.3.3 <a href="#if-statement">If Statement</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;4.3.4 <a href="#while-statement">While Statement</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;4.3.5 <a href="#do-statement">Do Statement</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;4.3.6 <a href="#for-statement">For Statement</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;4.3.7 <a href="#range-for-statement">Range-for Statement</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;4.3.8 <a href="#break-statement">Break Statement</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;4.3.9 <a href="#continue-statement">Continue Statement</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;4.3.10 <a href="#goto-statement">Goto Statement</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;4.3.11 <a href="#switch-statement">Switch Statement</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;4.3.12 <a href="#case-statement">Case Statement</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;4.3.13 <a href="#default-statement">Default Statement</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;4.3.14 <a href="#goto-case-statement">Goto Case Statement</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;4.3.15 <a href="#goto-default-statement">Goto Default Statement</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;4.4 <a href="#expression-statement">Expression Statement</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;4.5 <a href="#empty-statement">Empty Statement</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;4.6 <a href="#assignment-statement">Assignment Statement</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;4.7 <a href="#construction-statement">Construction Statement</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;4.8 <a href="#delete-and-destroy-statements">Delete and Destroy Statements</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;4.9 <a href="#throw-statement">Throw Statement</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;4.10 <a href="#try-statement">Try Statement</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;4.11 <a href="#assert-statement">Assert Statement</a><br />
     </div>
 
     <h2 id="lexical-structure">1 Lexical Structure</h2>
 
     <p>
         Cmajor source files are ordinary <a href="http://en.wikipedia.org/wiki/UTF-8">UTF-8</a>-encoded plain text files.
-        Each source file consists lexically of <a href="#keywords">keywords</a>, <a href="#identifiers">identifiers</a>, <a href="#literals">literals</a> and 
+        Each source file consists lexically of <a href="#keywords">keywords</a>, <a href="#identifiers">identifiers</a>, <a href="#literals">literals</a> and
         <a href="#operators">operators </a>that can be separated by comments and white space characters such as spaces, tabulations, and newline characters.
     </p>
 
@@ -254,13 +282,13 @@
     </p>
 
     <p>
-        A <a href="#rule.qualified-id">qualified&#8209;id</a> can be used to refer to an entity 
+        A <a href="#rule.qualified-id">qualified&#8209;id</a> can be used to refer to an entity
         when a simple identifier of it would be ambiguous in its context.
         It consists of the names of the <a href="#namespace">namespaces</a> containing the entity (if any) separated by periods followed by the names
         of the types (if any) containing the entity separated by periods followed by the identifier of the entity itself.
-        An <a href="#enumeration-constant">enumeration constant</a> must always be referred by prefixing the name of it by the name of the 
-        <a href="#enumerated type">enumerated type</a> 
-        that contains it and a period. A <a href="#local-variable">local variable</a> cannot be referred by a fully qualified identifier.
+        An <a href="#enumeration-constant">enumeration constant</a> must always be referred by prefixing the name of it by the name of the
+        <a href="#enumerated type">enumerated type</a> that contains it and a period. 
+        A <a href="#construction-statement">local variable</a> cannot be referred by a fully qualified identifier.
         An identifier of a local variable refers always to the local variable in the innermost scope that contains it.
     </p>
 
@@ -550,7 +578,7 @@
 
     <p>
         An <a href="#rule.integer-literal">integer literal</a> represents a hexadecimal or decimal signed or unsigned integer.
-        If it has <span class="mono">u</span> or <span class="mono">U</span> suffix, it represents an <em>unsigned</em> integer literal, 
+        If it has <span class="mono">u</span> or <span class="mono">U</span> suffix, it represents an <em>unsigned</em> integer literal,
         and its type is the smallest of the following types that can contain its value:
         <span class="kw">byte</span>, <span class="kw">ushort</span>, <span class="kw">uint</span>, <span class="kw">ulong</span> (see <a href="#basic-integer-types">basic integer types</a>).
         Otherwise it represents a <em>signed</em> integer literal, and its type is the smallest of the following types that can contain its value:
@@ -600,8 +628,10 @@
 
     <h4 id="null-literal">1.4.7 Null Literal</h4>
 
-    The <a href="#rule.null-literal">null literal</a> represents a special value of a <a href="#pointer-type">pointer</a> that does not point to any memory location.
-    Its type is a special <span class="mono">@nullptr_type</span> that is implicitly convertible to any other pointer type.
+    <p>
+        The <a href="#rule.null-literal">null literal</a> represents a special value of a <a href="#pointer-type">pointer</a> that does not point to any memory location.
+        Its type is a special <span class="mono">@nullptr_type</span> that is implicitly convertible to any other pointer type.
+    </p>
 
     <h3 id="operators">1.5 Operators</h3>
 
@@ -790,7 +820,7 @@
             <td class="sep">&rarr;</td>
             <td class="rcontent">
                 <span class="rule"><a href="#rule.implication">implication</a></span>
-                (<span class="mono">&lt;=&gt;</span> 
+                (<span class="mono">&lt;=&gt;</span>
                 <span class="rule"><a href="#rule.implication">implication</a></span>)*
             </td>
         </tr>
@@ -926,14 +956,14 @@
                 <span class="rule"><a href="#rule.primary">primary</a></span>
                 (<span class="mono">++</span> |
                 <span class="mono">&minus;&minus;</span> |
-                <span class="mono">.</span> 
+                <span class="mono">.</span>
                 <span class="rule"><a href="#rule.identifier">identifier</a></span> |
-                <span class="mono">&minus;&gt;</span> 
+                <span class="mono">&minus;&gt;</span>
                 <span class="rule"><a href="#rule.identifier">identifier</a></span> |
-                <span class="mono">[</span> 
+                <span class="mono">[</span>
                 <span class="rule"><a href="#rule.expression">expression</a></span>
                 <span class="mono">]</span> |
-                <span class="mono">(</span> 
+                <span class="mono">(</span>
                 <span class="rule"><a href="#rule.argument-list">argument&#8209;list</a></span>
                 <span class="mono">)</span>)*
             </td>
@@ -1026,9 +1056,16 @@
             <td class="rule" id="rule.expression-list">expression&#8209;list</td>
             <td class="sep">&rarr;</td>
             <td class="rcontent">
-                <span class="rule"><a href="#rule.expression">expression</a></span> 
+                <span class="rule"><a href="#rule.expression">expression</a></span>
                 (<span class="mono">,</span>
                 <span class="rule"><a href="#rule.expression">expression</a></span>)*
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.constant-expression">constant&#8209;expression</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#expression">expression</a></span>
             </td>
         </tr>
     </table>
@@ -1037,8 +1074,8 @@
 
     <p>
         An expression that is a true <a href="#rule.equivalence">equivalence</a> expression (and not just a <a href="#rule.equivalence">disjunction</a> for example) can only be used
-        in <a href="#axiom">axioms</a>. The same applies to <a href="#rule.implication">implication</a> expression. 
-        An expression used in an axiom, for example 
+        in <a href="#axiom">axioms</a>. The same applies to <a href="#rule.implication">implication</a> expression.
+        An expression used in an axiom, for example
         <span class="var">a</span> <span class="mono">!=</span> <span class="var">b</span> <span class="mono"><=></span> <span class="mono">!</span>(<span class="var">a</span> <span class="mono">==</span>
         <span class="var">b</span>) is not evaluated at all, it has purely informative value.
     </p>
@@ -1046,20 +1083,20 @@
     <h3 id="boolean-expressions">3.3 Boolean Expressions</h3>
 
     <p>
-        A <a href="#rule.disjunction">disjunction</a> expression takes <span class="kw"><a href="#basic-type-bool">bool</a></span> type operands and yields 
+        A <a href="#rule.disjunction">disjunction</a> expression takes <span class="kw"><a href="#basic-type-bool">bool</a></span> type operands and yields
         a <span class="kw"><a href="#basic-type-bool">bool</a></span> type result.
-        A disjunction, for example <span class="var">a</span> <span class="mono">||</span> <span class="var">b</span>, is <span class="kw">true</span>, 
+        A disjunction, for example <span class="var">a</span> <span class="mono">||</span> <span class="var">b</span>, is <span class="kw">true</span>,
         if either <span class="var">a</span> or <span class="var">b</span>, or both evaluate to true. It is <span class="kw">false</span> otherwise.
-        Disjunctive expressions are evaluated using so called short-circuit evaluation: if the left operand is <span class="kw">true</span>, the right operand is not evaluated, because the result 
+        Disjunctive expressions are evaluated using so called short-circuit evaluation: if the left operand is <span class="kw">true</span>, the right operand is not evaluated, because the result
         is already known to be <span class="kw">true</span>.
     </p>
 
     <p>
-        A <a href="#rule.conjunction">conjunction</a> expression takes <span class="kw"><a href="#basic-type-bool">bool</a></span> type operands and yields 
+        A <a href="#rule.conjunction">conjunction</a> expression takes <span class="kw"><a href="#basic-type-bool">bool</a></span> type operands and yields
         a <span class="kw"><a href="#basic-type-bool">bool</a></span> type result.
-        A conjunction, for example <span class="var">a</span> <span class="mono">&&</span> <span class="var">b</span>, is <span class="kw">true</span>, 
+        A conjunction, for example <span class="var">a</span> <span class="mono">&&</span> <span class="var">b</span>, is <span class="kw">true</span>,
         if both <span class="var">a</span> and <span class="var">b</span> evaluate to true. It is <span class="kw">false</span> otherwise.
-        Conjunctive expressions are also evaluated using short-circuit evaluation: if the left operand is <span class="kw">false</span>, the right operand is not evaluated, because the  result is 
+        Conjunctive expressions are also evaluated using short-circuit evaluation: if the left operand is <span class="kw">false</span>, the right operand is not evaluated, because the  result is
         already known to be <span class="kw">false</span>.
     </p>
 
@@ -1076,16 +1113,16 @@
 
     <p>
         A <a href="#rule.bit-or">bit-or</a> expression, for example <span class="var">a</span> <span class="mono">|</span> <span class="var">b</span>, is evaluated as follows:
-        for each bit <em>x<sub>i</sub></em> of <em>a</em> and corresponding bit <em>y<sub>i</sub></em> of <em>b</em>, if both bits are <span class="mono">0</span>, 
-        the corresponding bit <em>z<sub>i</sub></em> of the result is <span class="mono">0</span>. Otherwise, if either <em>x<sub>i</sub></em>, or 
+        for each bit <em>x<sub>i</sub></em> of <em>a</em> and corresponding bit <em>y<sub>i</sub></em> of <em>b</em>, if both bits are <span class="mono">0</span>,
+        the corresponding bit <em>z<sub>i</sub></em> of the result is <span class="mono">0</span>. Otherwise, if either <em>x<sub>i</sub></em>, or
         <em>y<sub>i</sub></em> is <span class="mono">1</span>, the result bit <em>z<sub>i</sub></em> is <span class="mono">1</span>.
     </p>
 
     <p>
         A <a href="#rule.bit-xor">bit-xor</a> expression, for example <span class="var">a</span> <span class="mono">^</span> <span class="var">b</span>, is evaluated as follows:
-        for each bit <em>x<sub>i</sub></em> of <em>a</em> and corresponding bit <em>y<sub>i</sub></em> of <em>b</em>, if either <em>x<sub>i</sub></em> or 
-        <em>y<sub>i</sub></em>, but not both, is <span class="mono">1</span>, 
-        the corresponding bit <em>z<sub>i</sub></em> of the result is <span class="mono">1</span>. Otherwise, if both <em>x<sub>i</sub></em> and 
+        for each bit <em>x<sub>i</sub></em> of <em>a</em> and corresponding bit <em>y<sub>i</sub></em> of <em>b</em>, if either <em>x<sub>i</sub></em> or
+        <em>y<sub>i</sub></em>, but not both, is <span class="mono">1</span>,
+        the corresponding bit <em>z<sub>i</sub></em> of the result is <span class="mono">1</span>. Otherwise, if both <em>x<sub>i</sub></em> and
         <em>y<sub>i</sub></em> are both <span class="mono">0</span> or both are <span class="mono">1</span>, the result bit <em>z<sub>i</sub></em> is <span class="mono">0</span>.
     </p>
 
@@ -1097,14 +1134,14 @@
     </p>
 
     <p>
-        Bitwise operators <span class="mono">|</span>, <span class="mono">^</span>, and <span class="mono">&</span> can be overloaded, 
+        Bitwise operators <span class="mono">|</span>, <span class="mono">^</span>, and <span class="mono">&</span> can be overloaded,
         in which case they take operands of user-defined types and yield a result of some user-defined or built-in type.
     </p>
 
     <h3 id="equality-expressions">3.5 Equality Expressions</h3>
 
     <p>
-        An <a href="#rule.equality">equality</a> expression takes <a href="#basic-types">basic type</a> (other that <span class="kw">void</span>), or <a href="#pointer-type">pointer type</a> operands and yields a 
+        An <a href="#rule.equality">equality</a> expression takes <a href="#basic-types">basic type</a> (other that <span class="kw">void</span>), or <a href="#pointer-type">pointer type</a> operands and yields a
         <span class="kw"><a href="#basic-type-bool">bool</a></span> type result.
     </p>
 
@@ -1118,7 +1155,7 @@
 
     <p>
         Equality operator <span class="mono">==</span> can be overloaded, in which case it takes operands of user-defined types and yields a result of some user-defined or built-in type.
-        Inequality operator <span class="mono">!=</span> cannot be overloaded. Instead, if equality operator is overloaded for some type <em>T</em>, and <em>a</em> and <em>b</em> are expressions of type <em>T</em>, 
+        Inequality operator <span class="mono">!=</span> cannot be overloaded. Instead, if equality operator is overloaded for some type <em>T</em>, and <em>a</em> and <em>b</em> are expressions of type <em>T</em>,
         expression <em>a</em> <span class="mono">!=</span> <em>b</em> is equivalent to an expression <span class="mono">!</span>(<em>a</em> <span class="mono">==</span> <em>b</em>).
 
     </p>
@@ -1154,7 +1191,7 @@
     </p>
 
     <p>
-        If operands of <span class="mono">&lt;</span>, <span class="mono">&gt;</span>, <span class="mono">&lt;=</span> or <span class="mono">&gt;=</span> operators are pointers, 
+        If operands of <span class="mono">&lt;</span>, <span class="mono">&gt;</span>, <span class="mono">&lt;=</span> or <span class="mono">&gt;=</span> operators are pointers,
         the comparison operators compare the memory address values of the operands.
     </p>
 
@@ -1170,8 +1207,8 @@
     <h3 id="is-and-as-expressions">3.7 Is and As Expressions</h3>
 
     <p>
-        If <em>p</em> is a pointer to object of some polymorphic class type, and <em>T</em> is some polymorphic class type, expression 
-        <em>p</em> <span class="kw">is</span> <em>T</em>* tests whether pointer <em>p</em> actually points to an object of type <em>T</em> or of type <em>U</em> that derives from type <em>T</em>. 
+        If <em>p</em> is a pointer to object of some polymorphic class type, and <em>T</em> is some polymorphic class type, expression
+        <em>p</em> <span class="kw">is</span> <em>T</em>* tests whether pointer <em>p</em> actually points to an object of type <em>T</em> or of type <em>U</em> that derives from type <em>T</em>.
         The test yields a <span class="kw"><a href="#basic-type-bool">bool</a></span> result.
     </p>
 
@@ -1192,7 +1229,7 @@
     </p>
 
     <p>
-        Expression <em>a</em> <span class="mono">&lt;&lt;</span> <em>b</em> returns operand <em>a</em> shifted operand <em>b</em> bit positions left. 
+        Expression <em>a</em> <span class="mono">&lt;&lt;</span> <em>b</em> returns operand <em>a</em> shifted operand <em>b</em> bit positions left.
         The vacant rightmost bit positions of the result are filled with zero bits.
     </p>
 
@@ -1200,42 +1237,42 @@
         Expression <em>a</em> <span class="mono">&gt;&gt;</span> <em>b</em> returns operand <em>a</em> shifted operand <em>b</em> bit positions right.
         The vacant leftmost bit positions of the result are filled with bits depending of the common type of <em>a</em> and <em>b</em>:
         If the common type of <em>a</em> and <em>b</em> is an unsigned type <span class="kw">byte</span>, <span class="kw">ushort</span>, <span class="kw"> uint</span>, or <span class="kw">ulong</span>,
-        the leftmost bit positios of the result are zero-filled. Otherwise, if the common type of <em>a</em> and <em>b</em> is a signed type <span class="kw">sbyte</span>, <span class="kw">short</span>, 
+        the leftmost bit positios of the result are zero-filled. Otherwise, if the common type of <em>a</em> and <em>b</em> is a signed type <span class="kw">sbyte</span>, <span class="kw">short</span>,
         <span class="kw">int</span> or <span class="kw">long</span>, the leftmost bit positions of the result are filled with a bit equal to the leftmost bit of <em>a</em>.
     </p>
 
     <p>
         Shift operators <span class="mono">&lt;&lt;</span> and <span class="mono">&gt;&gt;</span> can be overloaded,
         in which case they take operands of user-defined types and yield a result of some user-defined or built-in type.
-        For example, in the system library the <span class="mono">&lt;&lt;</span> operator has 
+        For example, in the system library the <span class="mono">&lt;&lt;</span> operator has
         <a href="../library/System.Base/System.Base.html#function_group_op_shl_247FCBBC20E82D4A1D0D55C77A382CB9751F0C4C">these</a> overloads.
-        
+
     </p>
 
     <h3 id="additive-expressions">3.9 Additive Expressions</h3>
 
     <p>
-        An <a href="#rule.additive">additive</a> expression takes <a href="#basic-integer-types">integer</a>, <a href="#basic-floating-point-types">floating-point</a>, 
-        or <a href="#pointer-type">pointer</a> type operands. The result is of the <a href="#common-type">common</a> type of the operand types. 
+        An <a href="#rule.additive">additive</a> expression takes <a href="#basic-integer-types">integer</a>, <a href="#basic-floating-point-types">floating-point</a>,
+        or <a href="#pointer-type">pointer</a> type operands. The result is of the <a href="#common-type">common</a> type of the operand types.
     </p>
-    
+
     <p>
         When <em>a</em> and <em>b</em> are of integer or floating-point types, the expression <em>a</em> <span class="mono">+</span> <em>b</em> returns the sum of <em>a</em> and <em>b</em>.
-        and expression <em>a</em> <span class="mono">&minus;</span> <em>b</em> returns the difference of <em>a</em> and <em>b</em>. 
+        and expression <em>a</em> <span class="mono">&minus;</span> <em>b</em> returns the difference of <em>a</em> and <em>b</em>.
         If at least one operands is of a floating-point type, the result is of a floating-point type, otherwise it is of an integer type.
     </p>
 
     <p>
-        When <em>p</em> is of a pointer type and <em>i</em> is of an integer type, the value of expression <em>p</em> <span class="mono">+</span> <em>i</em> is (informally) a 
+        When <em>p</em> is of a pointer type and <em>i</em> is of an integer type, the value of expression <em>p</em> <span class="mono">+</span> <em>i</em> is (informally) a
         pointer pointing <em>i</em> objects "after" <em>p</em>. The same applies to the expression <em>i</em> <span class="mono">+</span> <em>p</em>.
         The value of expression <em>p</em> <span class="mono">&minus;</span> <em>i</em> is (informally) a pointer pointing <em>i</em> objects "before" <em>p</em>.
         When <em>p</em> and <em>q</em> are of pointer types, the value of expression <em>p</em> <span class="mono">&minus;</span> <em>q</em> is (informally) the "number of objects" between <em>p</em> and <em>q</em>.
     </p>
 
     <p>
-        Additive operators <span class="mono">+</span> and <span class="mono">&minus;</span> can be overloaded, 
+        Additive operators <span class="mono">+</span> and <span class="mono">&minus;</span> can be overloaded,
         in which case they take operands of user-defined types and yield a result of some user-defined or built-in type.
-        For example, in the system library the <span class="mono">+</span> operator has 
+        For example, in the system library the <span class="mono">+</span> operator has
         <a href="../library/System.Base/System.Base.html#function_group_op_plus_C9FCFD8E4E0F27EFEFEA982DE2CE2508CDB3F20F">these</a> overloads.
     </p>
 
@@ -1268,13 +1305,15 @@
 
     <h3 id="prefix-expressions">3.11 Prefix Expressions</h3>
 
-    <a href="#rule.prefix">Prefix</a> expressions have many forms. There are expressions for <a href="#prefix-increment-and-decrement-expressions">incrementing or decrementing</a> a variable, 
-    returning operand <a href="#unary-plus-and-unary-minus-expressions">negated</a>, returning <a href="#logical-not-expression">logical not</a> of the operand, 
-    returning a <a href="#bitwise-complement-expression">bitwise complement</a> of the operand, <a href="#dereference-expression">dereferencing</a> a pointer, and 
-    taking <a href="#address-of-expression">address</a> of a variable.
+    <p>
+        <a href="#rule.prefix">Prefix</a> expressions have many forms. There are expressions for <a href="#prefix-increment-and-decrement-expressions">incrementing or decrementing</a> a variable,
+        returning operand <a href="#unary-plus-and-unary-minus-expressions">negated</a>, returning <a href="#logical-not-expression">logical not</a> of the operand,
+        returning a <a href="#bitwise-complement-expression">bitwise complement</a> of the operand, <a href="#dereference-expression">dereferencing</a> a pointer, and
+        taking <a href="#address-of-expression">address</a> of a variable.
+    </p>
 
     <p>
-        All prefix operators <span class="mono">++</span>, <span class="mono">&minus;&minus;</span>, <span class="mono">+</span>, <span class="mono">&minus;</span>, 
+        All prefix operators <span class="mono">++</span>, <span class="mono">&minus;&minus;</span>, <span class="mono">+</span>, <span class="mono">&minus;</span>,
         <span class="mono">!</span>, <span class="mono">~</span>, <span class="mono">*</span> and
         <span class="mono">&</span> can be overloaded, in which case they take an operand of some user-defined type and yield a result of some user-defined or built-in type.
     </p>
@@ -1299,7 +1338,7 @@
     </p>
 
     <p>
-        If <em>p</em> is a pointer to an object of type <em>T</em>, expression <span class="mono">&minus;&minus;</span><em>p</em> decrements <em>p</em>, 
+        If <em>p</em> is a pointer to an object of type <em>T</em>, expression <span class="mono">&minus;&minus;</span><em>p</em> decrements <em>p</em>,
         so that <em>p</em> will point to the previous object of type <em>T</em> in memory. The value of the expression is the value of <em>p</em> after decrementing it.
     </p>
 
@@ -1347,12 +1386,12 @@
     </p>
 
     <p>
-        Expression <span class="mono">*</span><em>p</em> can occur also as the left side of an <a href="#assignment-statement">assignment statement</a>, in which case the 
+        Expression <span class="mono">*</span><em>p</em> can occur also as the left side of an <a href="#assignment-statement">assignment statement</a>, in which case the
         pointed-to object is assigned a new value.
     </p>
 
     <p>
-        When pointer dereference expression is overloaded, the return value of the operator function is often of a <a href="#reference-type">reference type</a>, 
+        When pointer dereference expression is overloaded, the return value of the operator function is often of a <a href="#reference-type">reference type</a>,
         so the expression can be used as the left side of an assignment statement.
     </p>
 
@@ -1368,9 +1407,11 @@
 
     <h3 id="postfix-expressions">3.12 Postfix Expressions</h3>
 
-    A <a href="#rule.postfix">postfix</a> expression can be a <a href="#postfix-increment-and-decrement-expressions">postfix increment or decrement</a> expression, 
-    a <a href="#member-access-expression">member access</a> expression, a <a href="#pointer-member-access-expression">pointer member access</a> expression, 
-    a <a href="#subscript-expression">subscript</a> expression, or an <a href="#invocation-expression">invocation</a> expression.
+    <p>
+        A <a href="#rule.postfix">postfix</a> expression can be a <a href="#postfix-increment-and-decrement-expressions">postfix increment or decrement</a> expression,
+        a <a href="#member-access-expression">member access</a> expression, a <a href="#pointer-member-access-expression">pointer member access</a> expression,
+        a <a href="#subscript-expression">subscript</a> expression, or an <a href="#invocation-expression">invocation</a> expression.
+    </p>
 
     <h4 id="postfix-increment-and-decrement-expressions">3.12.1 Postfix Increment and Decrement Expressions</h4>
 
@@ -1421,32 +1462,32 @@
     </p>
 
     <p>
-        The member <em>b</em> accessed can be a member variable or a member function. 
+        The member <em>b</em> accessed can be a member variable or a member function.
         If <em>b</em> is a member variable, the type of the expression will be the type of <em>b</em>, and the value of expression will be the value of <em>b</em>.
-        If <em>b</em> is a member function, the type of the expression will be the type returned by the member function <em>b</em> and the value of the expression 
+        If <em>b</em> is a member function, the type of the expression will be the type returned by the member function <em>b</em> and the value of the expression
         will be the value returned by the member function <em>b</em> (if any).
     </p>
 
     <h5>Case 1</h5>
 
     <p>
-        If <em>a</em> is a pointer to class object <em>T</em>, then <em>b</em> must be a member of the class <em>T</em>, 
+        If <em>a</em> is a pointer to class object <em>T</em>, then <em>b</em> must be a member of the class <em>T</em>,
         or member of the base class or ancestor class of <em>T</em>.
     </p>
 
     <h5>Case 2</h5>
 
     <p>
-        If <em>a</em> is an object of a class that overloads the <span class="mono">&minus;&gt;</span> operator, 
+        If <em>a</em> is an object of a class that overloads the <span class="mono">&minus;&gt;</span> operator,
         then that operator function can return either a pointer to a class object (case 1),
-        or return an object of another class that in turn overloads the <span class="mono">&minus;&gt;</span> operator (case 2), 
+        or return an object of another class that in turn overloads the <span class="mono">&minus;&gt;</span> operator (case 2),
         thus providing another level of indirection.
     </p>
 
     <p>
-        This indirection mechanism, along with overloading the <a href="#dereference-expression">pointer dereference operator</a>, 
+        This indirection mechanism, along with overloading the <a href="#dereference-expression">pointer dereference operator</a>,
         makes it possible to implement pointer-like classes, such as "smart pointers" and iterators.
-        For example, the system library contains a UniquePtr class having 
+        For example, the system library contains a UniquePtr class having
         <a href="../library/System.Base/System.Base.html#function_group_op_arrow_1AA165D4000489BF4D95084C086A2565790F8B78">these</a> overloads.
     </p>
 
@@ -1458,12 +1499,12 @@
 
     <p>
         If <em>a</em> is an array, expression <em>a</em><span class="mono">[</span><em>i</em><span class="mono">]</span> provides access to <em>i</em>'th array element.
-        By convention the first element has index <span class="mono" >0</span>. The type of index <em>i</em> is <span class="kw">long</span>.
+        By convention the first element has index <span class="mono">0</span>. The type of index <em>i</em> is <span class="kw">long</span>.
     </p>
 
     <p>
-        If <em>p</em> is a pointer to type <em>T</em> object, expression <em>p</em><span class="mono">[</span><em>i</em><span class="mono">]</span> is equivalent to 
-        expression <span class="mono">*</span>(<em>p</em><span class="mono">+</span><em>i</em>), thus providing access to <em>i</em>'th object of type <em>T</em> 
+        If <em>p</em> is a pointer to type <em>T</em> object, expression <em>p</em><span class="mono">[</span><em>i</em><span class="mono">]</span> is equivalent to
+        expression <span class="mono">*</span>(<em>p</em><span class="mono">+</span><em>i</em>), thus providing access to <em>i</em>'th object of type <em>T</em>
         in a sequence of elements pointed by <em>p</em>. Again indexing starts from <span class="mono">0</span>.
     </p>
 
@@ -1478,9 +1519,9 @@
     <h4 id="invocation-expression">3.12.5 Invocation Expression</h4>
 
     <p>
-        Invocation expression takes form <em>x</em>(<em>a<sub><span class="mono">0</span></sub></em>, <em>a<sub><span class="mono">1</span></sub></em>, ...), 
-        where <em>x</em> can be for example an <a href="#rule.identifier">identifier</a> or a <a href="#rule.qualified-id">qualified id</a> 
-        naming a function, delegate, class delegate, typedef, type or object of a class type, and 
+        Invocation expression takes form <em>x</em>(<em>a<sub><span class="mono">0</span></sub></em>, <em>a<sub><span class="mono">1</span></sub></em>, ...),
+        where <em>x</em> can be for example an <a href="#rule.identifier">identifier</a> or a <a href="#rule.qualified-id">qualified id</a>
+        naming a function, delegate, class delegate, typedef, type or object of a class type, and
         <em>a<sub><span class="mono">0</span></sub></em>, <em>a<sub><span class="mono">1</span></sub></em>, ... is a possibly empty list of argument expressions separated by commas and enclosed in parentheses.
     </p>
 
@@ -1488,15 +1529,15 @@
 
     <p>
         When <em>x</em> is a name of a function, <a href="#overload-resolution">overload resolution</a> process selects the best-matching function overload to be called with the specified arguments.
-        The number of arguments must match exactly to the number of parameters of the function, but if the argument types do not match exactly the signature of the selected function overload, 
-        <a href="#conversion">conversions</a> take place. 
+        The number of arguments must match exactly to the number of parameters of the function, but if the argument types do not match exactly the signature of the selected function overload,
+        <a href="#conversion">conversions</a> take place.
         If no single best-matching function can be found, or many overloads are found to be equally good matches, the compiler issues an error.
     </p>
 
     <h5>Delegate and Class Delegate Calls</h5>
 
     <p>
-        When <em>x</em> is a name of a delegate or a class delegate, again the number of arguments must match exactly the number of parameters of the delegate or class delegate, 
+        When <em>x</em> is a name of a delegate or a class delegate, again the number of arguments must match exactly the number of parameters of the delegate or class delegate,
         and conversions may take place. Delegates and class delegates cannot be overloaded.
     </p>
 
@@ -1508,98 +1549,759 @@
     </p>
 
     <p>
-        Constructed temporary can be bound to an <a href="#rvalue-reference-type">rvalue reference</a> without the need to call 
+        Constructed temporary can be bound to an <a href="#rvalue-reference-type">rvalue reference</a> without the need to call
         <a href="../library/System.Base/System.Base.html#function_Rvalue_FC16F1187C8C3CF8D9182A63AC59041EF4474FA2">Rvalue</a> function for it.
     </p>
 
     <h5>Call of a Function Call Operator</h5>
 
     <p>
-        When <em>x</em> denotes an object of a class type (a variable or a temporary, for instance), and that class type overloads the function call operator <span class="mono">()</span>, 
+        When <em>x</em> denotes an object of a class type (a variable or a temporary, for instance), and that class type overloads the function call operator <span class="mono">()</span>,
         the expression yields a call to that operator function.
-        Matching function call operator is selected using the overload resolution process. 
+        Matching function call operator is selected using the overload resolution process.
     </p>
 
     <h3 id="primary-expressions">3.13 Primary Expressions</h3>
 
-    A <a href="#rule.primary">primary</a> expression can be a <a href="#grouping-expression">grouping</a> expression, a <a href="#literal-expression">literal</a>, 
-    a <a href="#basic-type-expression">basic type</a>, a <a href="#template-id-expression">template identifier</a>, an <a href="#identifier-expression">identifier</a>,
-    <a href="#this-and-base-access">this or base access</a>, a <a href="#size-of-expression">size-of</a> expression, a <a href="#typename-expression">typename</a> expression,
-    a <a href="#cast-expression">cast</a> expression, a <a href="#construct-expression">construct</a> expression, or a <a href="#new-expression">new</a> expression.
+    <p>
+        A <a href="#rule.primary">primary</a> expression can be a <a href="#grouping-expression">grouping</a> expression, a <a href="#literal-expression">literal</a>,
+        a <a href="#basic-type-expression">basic type</a>, a <a href="#template-id-expression">template identifier</a>, an <a href="#identifier-expression">identifier</a>,
+        <a href="#this-and-base-access">this or base access</a>, a <a href="#size-of-expression">size-of</a> expression, a <a href="#typename-expression">typename</a> expression,
+        a <a href="#cast-expression">cast</a> expression, a <a href="#construct-expression">construct</a> expression, or a <a href="#new-expression">new</a> expression.
+    </p>
 
     <h4 id="grouping-expression">3.13.1 Grouping Expression</h4>
 
-    Parentheses can be used to group subexpressions.
-    Precedence of multiplicative operators is greater than the precedence of additive operators, so 
-    <em>a</em> <span class="mono">+</span> <em>b</em> <span class="mono">*</span> <em>c</em> means <em>a</em> <span class="mono">+</span> (<em>b</em> <span class="mono">*</span> <em>c</em>).
-    If the addition is ment to be be performed first, this can be accomplished by using parentheses: (<em>a</em> <span class="mono">+</span> <em>b</em>) <span class="mono">*</span> <em>c</em>.
-
+    <p>
+        Parentheses can be used to group subexpressions.
+        Precedence of multiplicative operators is greater than the precedence of additive operators, so
+        <em>a</em> <span class="mono">+</span> <em>b</em> <span class="mono">*</span> <em>c</em> means <em>a</em> <span class="mono">+</span> (<em>b</em> <span class="mono">*</span> <em>c</em>).
+        If the addition is ment to be be performed first, this can be accomplished by using parentheses: (<em>a</em> <span class="mono">+</span> <em>b</em>) <span class="mono">*</span> <em>c</em>.
+    </p>
     <h4 id="literal-expression">3.13.2 Literals in Expressions</h4>
 
-    Literals can be used for example as operands of of arithmetic expressions or as arguments of function calls. 
+    <p>
+        Literals can be used for example as operands of of arithmetic expressions or as arguments of function calls.
+    </p>
 
     <h4 id="basic-type-expression">3.13.3 Basic Types in Expressions</h4>
 
-    A basic type can be used for example in <a href="#construction-of-temporary">construction of a temporary</a> or in a <a href="#size-of-expression">size-of expression</a>
+    <p>
+        A basic type can be used for example in <a href="#construction-of-temporary">construction of a temporary</a> or in a <a href="#size-of-expression">size-of expression</a>
+    </p>
 
     <h4 id="template-id-expression">3.13.4 Template Identifiers in Expression</h4>
 
-    A template identifier can be a name a class or a function template along with a template argument list.
-    It can be used to refer to a class template specialization or to call a function template specialization, for instance.
+    <p>
+        A template identifier can be a name a class or a function template along with a template argument list.
+        It can be used to refer to a class template specialization or to call a function template specialization, for instance.
+    </p>
 
     <h4 id="identifier-expression">3.13.5 Identifiers in Expressions</h4>
 
-    Identifiers are used in expressions to refer to a variable, parameter, type, constant, namespace, typedef or function.
+    <p>
+        Identifiers are used in expressions to refer to a variable, parameter, type, constant, namespace, typedef or function.
+    </p>
 
     <h4 id="this-and-base-access">3.13.6 This and Base Accesss</h4>
 
-    Keyword <span class="kw">this</span> refers to the current class object and <span class="kw">base</span> refers to the base class object in a member a function context.
-    They can be used for example to call a function of the same (<span class="kw">this</span>) or the base class (<span class="kw">base</span>) of the current class, 
-    or to refer to a member variable of the same (<span class="kw">this</span>) or the base class (<span class="kw">base</span>) of the current class.
+    <p>
+        Keyword <span class="kw">this</span> refers to the current class object and <span class="kw">base</span> refers to the base class object in a member a function context.
+        They can be used for example to call a function of the same (<span class="kw">this</span>) or the base class (<span class="kw">base</span>) of the current class,
+        or to refer to a member variable of the same (<span class="kw">this</span>) or the base class (<span class="kw">base</span>) of the current class.
+    </p>
 
     <h4 id="size-of-expression">3.13.7 Size-of Expression</h4>
 
-    A <a href="#rule.size-of-expr">size-of</a> expression yields the size of the specified object or type in bytes. The type of the result is <span class="kw">long</span>.
-    The size of a class object may be bigger than the sum of the sizes of its members, because of <a href="#alignment">alignment</a>.
+    <p>
+        A <a href="#rule.size-of-expr">size-of</a> expression yields the size of the specified object or type in bytes. The type of the result is <span class="kw">long</span>.
+        The size of a class object may be bigger than the sum of the sizes of its members, because of <a href="#alignment">alignment</a>.
+    </p>
 
     <h4 id="typename-expression">3.13.8 Typename Expression</h4>
 
-    A <a href="#rule.type-name-expr">typename</a> expression yields the <em>dynamic</em> type name of the specified object or type. The type of the result is <span class="mono">const char*</span>.
-    If <em>p</em> is a pointer to class <em>T</em> object, the <em>static</em> type of <em>p</em> is <em>T</em><span class="mono">*</span>, but the actual type of the object <em>p</em> points to can
-    be <em>U</em>, a type derived from <em>T</em>. In this case <em>U</em> is the dynamic type of expression <span class="mono">*</span><em>p</em> and expression 
-    <span class="kw">typename</span>(<span class="mono">*</span><em>p</em>) returns the fully qualified name of type <em>U</em>.
+    <p>
+        A <a href="#rule.type-name-expr">typename</a> expression yields the <em>dynamic</em> type name of the specified object or type. The type of the result is <span class="mono">const char*</span>.
+        If <em>p</em> is a pointer to class <em>T</em> object, the <em>static</em> type of <em>p</em> is <em>T</em><span class="mono">*</span>, but the actual type of the object <em>p</em> points to can
+        be <em>U</em>, a type derived from <em>T</em>. In this case <em>U</em> is the dynamic type of expression <span class="mono">*</span><em>p</em> and expression
+        <span class="kw">typename</span>(<span class="mono">*</span><em>p</em>) returns the fully qualified name of type <em>U</em>.
+    </p>
 
     <h4 id="cast-expression">3.13.9 Cast Expresssion</h4>
 
-    A <a href="#rule.cast-expr">cast</a> expression performs explicit type conversion. It takes the type of the target type enclosed in angle brackets and a source expression to be converted
-    enclosed in parentheses. Any <a href="#basic-types">basic</a> type excluding <span class="kw">void</span> 
-    can be explicitly converted to any other basic type excluding <span class="kw">void</span>. 
-    Any <a href="#pointer-type">pointer</a> type can be explicitly converted to any other pointer type. 
-    You can also cast away constness of an operand. If <em>p</em> is of type <span class="mono">const T*</span>, <span class="kw">cast</span><span class="mono">&lt;T*&gt;(</span><em>p</em>)
-    yields a plain pointer. Similarly, if <em>c</em> is of type <span class="mono">const T&amp;</span>, <span class="kw">cast</span><span class="mono">&lt;T&amp;&gt;(</span><em>c</em>)
-    yields a plain reference.
+    <p>
+        A <a href="#rule.cast-expr">cast</a> expression performs explicit type conversion. It takes a target type enclosed in angle brackets and a source expression to be converted
+        enclosed in parentheses. Any <a href="#basic-types">basic</a> type excluding <span class="kw">void</span>
+        can be explicitly converted to any other basic type excluding <span class="kw">void</span>.
+        Any <a href="#pointer-type">pointer</a> type can be explicitly converted to any other pointer type.
+        You can also cast away constness of an operand as follows. If <em>p</em> is of type <span class="mono">const T*</span>, <span class="kw">cast</span><span class="mono">&lt;T*&gt;(</span><em>p</em>)
+        yields a plain pointer. Similarly, if <em>c</em> is of type <span class="mono">const T&amp;</span>, <span class="kw">cast</span><span class="mono">&lt;T&amp;&gt;(</span><em>c</em>)
+        yields a plain reference.
+    </p>
 
     <h4 id="construct-expression">3.13.10 Construction Expresssion</h4>
 
-    A <a href="#rule.construct-expr">construction</a> expression constructs an object "in place" into a memory location.
-    It takes the type of an object to construct enclosed in angle brackets, and then a list of arguments <em>p</em>, <em>a</em><sub>0</sub>, <em>a</em><sub>1</sub>, ... enclosed in parentheses,
-    where <em>p</em> is a pointer to the memory location where into to construct the object and <em>a</em><sub>0</sub>, <em>a</em><sub>1</sub>, ... is a possibly empty list of arguments
-    separated by commas. If <em>T</em> is the type of the object to construct, the type of <em>p</em> can be either <span class="kw">void</span><span class="mono">*</span> or <em>T</em><span class="mono">*</span>.
-    The expression yields a <em>T</em><span class="mono">*</span> result.
-    
+    <p>
+        A <a href="#rule.construct-expr">construction</a> expression constructs an object "in place" into a memory location.
+        It takes the type of an object to construct enclosed in angle brackets, and then a list of arguments <em>p</em>, <em>a</em><sub>0</sub>, <em>a</em><sub>1</sub>, ... enclosed in parentheses,
+        where <em>p</em> is a pointer to the memory location where into to construct the object and <em>a</em><sub>0</sub>, <em>a</em><sub>1</sub>, ... is a possibly empty list of arguments
+        separated by commas. If <em>T</em> is the type of the object to construct, the type of <em>p</em> can be either <span class="kw">void</span><span class="mono">*</span> or <em>T</em><span class="mono">*</span>.
+        The expression yields a <em>T</em><span class="mono">*</span> result.
+    </p>
+
     <h4 id="new-expression">3.13.11 New Expresssion</h4>
 
-    A <a href="#rule.new-expr">new</a> expression creates an object of the specified type. 
-    If <em>T</em> is the type of object to create, <span class="kw">sizeof</span>(<em>T</em>) bytes of memory is allocated from the <a href="free-store">free store</a> and 
-    then the object is constructed into that memory.
-    The new expression takes the type of an object to construct and a possibly empty list of constructor arguments enclosed in parentheses as operands.
-    It yields a pointer to the newly created object as a result.
+    <p>
+        A <a href="#rule.new-expr">new</a> expression creates an object of the specified type.
+        If <em>T</em> is the type of object to create, <span class="kw">sizeof</span>(<em>T</em>) bytes of memory is allocated from the <a href="free-store">free store</a> and
+        then the object is constructed into that memory.
+        The new expression takes the type of an object to construct and a possibly empty list of constructor arguments enclosed in parentheses as operands.
+        It yields a pointer to the newly created object as a result.
+    </p>
+
+    <h3 id="constant-expression">3.14 Constant Expression</h3>
+
+    <p>
+        A <a href="#rule.constant-expression">constant expression</a> is syntactically an <a href="#rule.expression">expression</a> that can be evaluated at compile time.
+        It can contain <a href="#literals">literals</a>, <a href="#constant">constants</a>, <a href="#enumeration-constant">enumeration constants</a> and operators that do not
+        involve taking an address of an object.
+    </p>
+
+    <h2 id="statements">4 Statements</h2>
+
+    <p>
+        Statements are used in programs to define <a href="#control-statements">flow of control</a>, to <a href="#expression-statement">evaluate expressions</a> for side-effects, 
+        to <a href="#assignment-statement">assign</a> values to variables, to construct <a href="#construction-statement">local variables</a>, 
+        to explicitly <a href="#delete-and-destroy-statements">release allocated resources</a>, to <a href="#throw-statement">throw</a> and <a href="#try-statement">handle</a> exceptions, and 
+        to <a href="#assert-statement">test assertions</a>. 
+    </p>
+
+    <h3 id="statements-syntax">4.1 Syntax</h3>
+
+    <table class="grammar">
+        <tr>
+            <td class="rule" id="rule.statement">statement</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.labeled-statement">labeled&#8209;statement</a></span> |
+                <span class="rule"><a href="#rule.control-statement">control&#8209;statement</a></span> |
+                <span class="rule"><a href="#rule.expression-statement">expression&#8209;statement</a></span> |
+                <span class="rule"><a href="#rule.empty-statement">empty&#8209;statement</a></span> |
+                <span class="rule"><a href="#rule.assignment-statement">assignment&#8209;statement</a></span> |
+                <span class="rule"><a href="#rule.construction-statement">construction&#8209;statement</a></span> |
+                <span class="rule"><a href="#rule.delete-statement">delete&#8209;statement</a></span> |
+                <span class="rule"><a href="#rule.destroy-statement">destroy&#8209;statement</a></span> |
+                <span class="rule"><a href="#rule.throw-statement">throw&#8209;statement</a></span> |
+                <span class="rule"><a href="#rule.try-statement">try&#8209;statement</a></span> |
+                <span class="rule"><a href="#rule.assert-statement">assert&#8209;statement</a></span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.labeled-statement">labeled&#8209;statement</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.identifier">identifier</a></span>
+                <span class="mono">:</span>
+                <span class="rule"><a href="#rule.statement">statement</a></span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.control-statement">control&#8209;statement</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.compound-statement">compound&#8209;statement</a></span> |
+                <span class="rule"><a href="#rule.return-statement">return&#8209;statement</a></span> |
+                <span class="rule"><a href="#rule.if-statement">if&#8209;statement</a></span> |
+                <span class="rule"><a href="#rule.while-statement">while&#8209;statement</a></span> |
+                <span class="rule"><a href="#rule.do-statement">do&#8209;statement</a></span> |
+                <span class="rule"><a href="#rule.for-statement">for&#8209;statement</a></span> |
+                <span class="rule"><a href="#rule.range-for-statement">range&#8209;for&#8209;statement</a></span> |
+                <span class="rule"><a href="#rule.break-statement">break&#8209;statement</a></span> |
+                <span class="rule"><a href="#rule.continue-statement">continue&#8209;statement</a></span> |
+                <span class="rule"><a href="#rule.goto-statement">goto&#8209;statement</a></span> |
+                <span class="rule"><a href="#rule.switch-statement">switch&#8209;statement</a></span> |
+                <span class="rule"><a href="#rule.goto-case-statement">goto&#8209;case&#8209;statement</a></span> |
+                <span class="rule"><a href="#rule.goto-default-statement">goto&#8209;default&#8209;statement</a></span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.compound-statement">compound&#8209;statement</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="mono">{</span>
+                <span class="rule"><a href="#rule.statement">statement</a></span>*
+                <span class="mono">}</span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.return-statement">return&#8209;statement</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="kw">return</span>
+                <span class="rule"><a href="#rule.expression">expression</a></span>?
+                <span class="mono">;</span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.if-statement">if&#8209;statement</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="kw">if</span>
+                <span class="mono">(</span>
+                <span class="rule"><a href="#rule.expression">expression</a></span>
+                <span class="mono">)</span>
+                <span class="rule"><a href="#rule.statement">statement</a></span>
+                (<span class="kw">else</span>
+                <span class="rule"><a href="#rule.statement">statement</a></span>)?
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.while-statement">while&#8209;statement</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="kw">while</span> <span class="mono">(</span>
+                <span class="rule"><a href="#rule.expression">expression</a></span>
+                <span class="mono">)</span>
+                <span class="rule"><a href="#rule.statement">statement</a></span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.do-statement">do&#8209;statement</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="kw">do</span>
+                <span class="rule"><a href="#rule.statement">statement</a></span>
+                <span class="kw">while</span>
+                <span class="mono">(</span><span class="rule"><a href="#rule.expression">expression</a></span><span class="mono">);</span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.for-statement">for&#8209;statement</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="kw">for</span>
+                <span class="mono">(</span>
+                <span class="rule"><a href="#rule.for-init-statement">for&#8209;init&#8209;statement</a></span>
+                <span class="rule"><a href="#rule.expression">expression</a></span>?
+                <span class="mono">;</span>
+                <span class="rule"><a href="#rule.for-loop-expression">for&#8209;loop&#8209;expression</a></span>
+                <span class="mono">)</span>
+                <span class="rule"><a href="#rule.statement">statement</a></span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.for-init-statement">for&#8209;init&#8209;statement</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.assignment-statement">assignment&#8209;statement</a></span> |
+                <span class="rule"><a href="#rule.construction-statement">construction&#8209;statement</a></span> |
+                <span class="rule"><a href="#rule.empty-statement">empty&#8209;statement</a></span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.for-loop-expression">for&#8209;loop&#8209;expression</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.assignment">assignment</a></span> |
+                <span class="rule"><a href="#rule.expression">expression</a></span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.range-for-statement">range&#8209;for&#8209;statement</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="kw">for</span>
+                <span class="mono">(</span>
+                <span class="rule"><a href="#rule.type-expr">type&#8209;expr</a></span>
+                <span class="rule"><a href="#rule.identifier">identifier</a></span>
+                <span class="mono">:</span>
+                <span class="rule"><a href="#rule.container">container</a></span>
+                <span class="mono">)</span>
+                <span class="rule"><a href="#rule.statement">statement</a></span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.container">container</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.expression">expression</a></span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.break-statement">break&#8209;statement</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="kw">break</span>
+                <span class="mono">;</span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.continue-statement">continue&#8209;statement</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="kw">continue</span>
+                <span class="mono">;</span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.goto-statement">goto&#8209;statement</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="kw">goto</span>
+                <span class="rule"><a href="#rule.identifier">identifier</a></span>
+                <span class="mono">;</span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.switch-statement">switch&#8209;statement</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="kw">switch</span>
+                <span class="mono">(</span>
+                <span class="rule"><a href="#rule.expression">expression</a></span>
+                <span class="mono">)</span>
+                <span class="mono">{</span>
+                (<span class="rule"><a href="#rule.case-statement">case&#8209;statement</a></span> |
+                <span class="rule"><a href="#rule.default-statement">default&#8209;statement</a></span>)*
+                <span class="mono">}</span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.case-statement">case&#8209;statement</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                (<span class="kw">case</span>
+                <span class="rule"><a href="#rule.constant-expression">constant&#8209;expression</a></span>
+                <span class="mono">:</span>)+
+                <span class="rule"><a href="#rule.statement">statement</a></span>*
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.default-statement">default&#8209;statement</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="kw">default</span>
+                <span class="mono">:</span>
+                <span class="rule"><a href="#rule.statement">statement</a></span>*
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.goto-case-statement">goto&#8209;case&#8209;statement</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="kw">goto</span>
+                <span class="kw">case</span>
+                <span class="rule"><a href="#rule.constant-expression">constant&#8209;expression</a></span>
+                <span class="mono">;</span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.goto-default-statement">goto&#8209;default&#8209;statement</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="kw">goto</span>
+                <span class="kw">default</span>
+                <span class="mono">;</span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.expression-statement">expression&#8209;statement</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.expression">expression</a></span>
+                <span class="mono">;</span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.empty-statement">empty&#8209;statement</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="mono">;</span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.assignment-statement">assignment&#8209;statement</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.assignment">assignment</a></span>
+                <span class="mono">;</span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.assignment">assignment</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.expression">expression</a></span>
+                <span class="mono">=</span>
+                <span class="rule"><a href="#rule.expression">expression</a></span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.construction-statement">construction&#8209;statement</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.type-expr">type&#8209;expr</a></span>
+                <span class="rule"><a href="#rule.identifier">identifier</a></span>
+                (   <span class="mono">=</span>
+                <span class="rule"><a href="#rule.expression">expression</a></span> |
+                <span class="mono">(</span>
+                <span class="rule"><a href="#rule.argument-list">argument&#8209;list</a></span>
+                <span class="mono">)</span>
+                )?
+                <span class="mono">;</span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.delete-statement">delete&#8209;statement</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="kw">delete</span>
+                <span class="rule"><a href="#rule.expression">expression</a></span>
+                <span class="mono">;</span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.destroy-statement">destroy&#8209;statement</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="kw">destroy</span>
+                <span class="rule"><a href="#rule.expression">expression</a></span>
+                <span class="mono">;</span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.throw-statement">throw&#8209;statement</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="kw">throw</span>
+                <span class="rule"><a href="#rule.expression">expression</a></span>?
+                <span class="mono">;</span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.try-statement">try&#8209;statement</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="kw">try</span>
+                <span class="rule"><a href="#rule.compound-statement">compound&#8209;statement</a></span>
+                <span class="rule"><a href="#rule.exception-handler">exception&#8209;handler</a></span>+
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.exception-handler">exception&#8209;handler</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="kw">catch</span>
+                <span class="mono">(</span>
+                <span class="rule"><a href="#rule.type-expr">type&#8209;expr</a></span>
+                <span class="rule"><a href="#rule.identifier">identifier</a></span>?
+                <span class="mono">)</span>
+                <span class="rule"><a href="#rule.compound-statement">compound&#8209;statement</a></span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.assert-statement">assert&#8209;statement</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="mono">#</span>
+                <span class="kw">assert</span>
+                <span class="mono">(</span>
+                <span class="rule"><a href="#rule.expression">expression</a></span>
+                <span class="mono">)</span>
+                <span class="mono">;</span>
+            </td>
+        </tr>
+    </table>
+
+    <h3 id="labeled-statement">4.2 Labeled Statement</h3>
+
+    <p>
+        A <a href="#rule.labeled-statement">labeled</a> statement consists of an identifier that acts as a target label for a <a href="#goto-statement">goto</a> statement, a colon, and a statement.
+    </p>
+
+    <h3 id="control-statements">4.3 Control Statements</h3>
+
+    <p>
+        The <a href="#rule.control-statement">control</a> statements provide basic means for defining the flow of control of a function: sequence, selection and repetition.
+    </p>
+
+    <h4 id="compound-statement">4.3.1 Compound Statement</h4>
+
+    <p>
+        A <a href="#rule.compound-statement">compound</a> statement executes a sequence of statements in order.
+        A <a href="#rule.compound-statement">compound-statement</a> is syntactically a <a href="#rule.statement">statement</a> so it can be used whenever syntax allows a <a href="#rule.statement">statement</a> to occur.
+    </p>
+
+    <h4 id="return-statement">4.3.2 Return Statement</h4>
+
+    <p>
+        A <a href="#rule.return-statement">return</a> statement returns control from the currently executing function to the caller of that function.
+        If the function has a return type that is not <span class="kw">void</span>, the return statement must have an expression, a return value, that is evaluated and returned to the caller.
+        Otherwise, if the function is a constructor, a destructor, or a member function or nonmember function that has a <span class="kw">void</span> return type,
+        the return statement is not allowed to contain a return expression.
+    </p>
+
+    <h4 id="if-statement">4.3.3 If Statement</h4>
+
+    <p>
+        An <a href="#rule.if-statement">if</a> statement executes a statement conditionally.
+        The if statement contains a <span class="kw"><a href="#basic-type-bool">bool</a></span>-valued expression, a condition, that is evaluated.
+        If evaluation of the condition results <span class="kw">true</span>, the statement following the condition of the if statement is executed and
+        then control is transferred to the statement that comes after the if statement.
+        Otherwise, if evaluation of the condition results <span class="kw">false</span> and the if statement has an else part, the statement following the <span class="kw">else</span> keyword is executed.
+        If evaluation of the condition results <span class="kw">false</span> and the if statement has not an else part, control is transferred directly to the statement that comes after the if statement.
+    </p>
+
+    <h4 id="while-statement">4.3.4 While Statement</h4>
+
+    <p>
+        A <a href="#rule.while-statement">while</a> statement executes a statement repeatedly as long as a <span class="kw"><a href="#basic-type-bool">bool</a></span>-valued expression,
+        the condition of the while statement, evaluates to <span class="kw">true</span>. If the condition evaluates <span class="kw">true</span>, control is transferred to the statement
+        following the condition of the while statement. Then control is transferred back to evaluating the condition, and so on, until the condition evaluates <span class="kw">false</span>.
+        Then control is transferred to the statement that comes after the while statement. The statement contained by the while statement is executed zero or more times.
+    </p>
+
+    <h4 id="do-statement">4.3.5 Do Statement</h4>
+
+    <p>
+        A <a href="#rule.do-statement">do</a> statement executes a statement repeatedly until a <span class="kw"><a href="#basic-type-bool">bool</a></span>-valued expression,
+        the condition of the do statement, evaluates to <span class="kw">false</span>. First the statement following the <span class="kw">do</span> keyword is executed.
+        Then the condition of the do statement is evaluated. If the condition evaluates <span class="kw">true</span>, control is transferred back to the statement following
+        <span class="kw">do</span> keyword, and so on, until the condition evaluates <span class="kw">false</span>.
+        Then control is transferred to the statement that comes after the do statement. The statement contained by the do statement is executed at least once.
+    </p>
+
+    <h4 id="for-statement">4.3.6 For Statement</h4>
+
+    <p>
+        A <a href="#rule.for-statement">for</a> statement consists of a <a href="#rule.for-init-statement">for-init-statement</a>, a <span class="kw"><a href="#basic-type-bool">bool</a></span>-valued expression,
+        a <a href="#rule.for-loop-expression">for-loop-expression</a> and a statement.
+    </p>
+
+    <p>
+        The for statement is commonly used as follows: the <a href="#rule.for-init-statement">for-init-statement</a> constructs a loop variable, 
+        the expression evaluates some condition that depends on the loop variable. As long as the condition evaluate to <span class="kw">true</span>, the statement contained by the for statement is executed,
+        the <a href="#rule.for-loop-expression">for-loop-expression</a> that manipulates the loop variable is executed, and control is transferred back to testing the condition.
+    </p>
+
+    <p>
+        For example, here's a for loop that prints integer 0 ... 9 to the standard output stream: <br/><br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">for</span> <span class="mono">(</span><span class="kw">int</span> <em>i</em> <span class="mono">=</span> 0<span class="mono">;</span> <em>i</em> <span class="mono"><</span> 10<span class="mono">;</span> <span class="mono">++</span><em>i</em><span class="mono">)</span><br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="mono">{</span><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<em>Console</em><span class="mono">.</span><em>WriteLine</em><span class="mono">(</span><em>i</em><span class="mono">)</span><span class="mono">;</span><br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="mono">}</span><br />
+    </p>
+
+    <h4 id="range-for-statement">4.3.7 Range-for Statement</h4>
+
+    <p>
+        A <a href="#rule.range-for-statement">range-for</a> statement executes a statement for each element of a container.
+        The range-for statement consists of a type and name of a local variable that is bound to each element of a sequence of elements in turn. When the element is bound to the local variable,
+        the statement contained by the range-for statement is executed.
+    </p>
+
+    <p>
+        The <a href="#rule.container">container</a> of the range-for statement must refer to an object of a class that contains types or typedefs named <em>Iterator</em> and <em>ConstIterator</em> and
+        member functions <em>Begin()</em>, <em>End()</em>, <em>CBegin()</em> and <em>CEnd()</em> that return those iterator types: <em>Begin()</em>, <em>End()</em> must return an <em>Iterator</em>,
+        and <em>CBegin()</em> and <em>CEnd()</em> must return a <em>ConstIterator</em>. The iterator types, <em>Iterator</em> and <em>ConstIterator</em>, must support two operations:
+        a <a href="#dereference-expression">dereference</a> operator overload for accessing an element of a sequence, and
+        an <a href="#prefix-increment-and-decrement-expressions">increment</a> operator overload for incrementing the iterator.
+        These requirements are fulfilled by all container and string classes in the system library.
+        When these requirements are fulfilled by some user-defined class, it also supports the range-for statement.
+    </p>
+
+    <p>
+        If the <a href="#rule.container">container</a> refers to a <span class="kw">const</span> object, the range-for statement
+        <span class="kw">for</span> <span class="mono">(</span><em>T</em> <em>x</em> <span class="mono">:</span> <em>c</em><span class="mono">)</span> <em>stmt</em><span class="mono">;</span> is lowered by the compiler to the following
+        sequence of statements: <br /><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<em>ConstIterator</em> <em>e</em> <span class="mono">=</span> <em>c</em><span class="mono">.</span><em>CEnd()</em><span class="mono">;</span><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">for</span> <span class="mono">(</span><em>ConstIterator</em> <em>i</em> <span class="mono">=</span> <em>c</em><span class="mono">.</span><em>CBegin()</em><span class="mono">;</span> <em>i</em> <span class="mono">!=</span> <em>e</em><span class="mono">;</span> <span class="mono">++</span><em>i</em>)<br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="mono">{</span><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<em>T</em> <em>x</em> <span class="mono">=</span> <span class="mono">*</span><em>i</em><span class="mono">;</span><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<em>stmt</em><span class="mono">;</span><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="mono">}</span><br />
+    </p>
+
+    <p>
+        If the <a href="#rule.container">container</a> refers to a non-<span class="kw">const</span> object, the range-for statement
+        <span class="kw">for</span> <span class="mono">(</span><em>T</em> <em>x</em> <span class="mono">:</span> <em>c</em><span class="mono">)</span> <em>stmt</em><span class="mono">;</span> is lowered by the compiler to the following
+        sequence of statements: <br /><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<em>Iterator</em> <em>e</em> <span class="mono">=</span> <em>c</em><span class="mono">.</span><em>End()</em><span class="mono">;</span><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">for</span> <span class="mono">(</span><em>Iterator</em> <em>i</em> <span class="mono">=</span> <em>c</em><span class="mono">.</span><em>Begin()</em><span class="mono">;</span> <em>i</em> <span class="mono">!=</span> <em>e</em><span class="mono">;</span> <span class="mono">++</span><em>i</em>)<br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="mono">{</span><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<em>T</em> <em>x</em> <span class="mono">=</span> <span class="mono">*</span><em>i</em><span class="mono">;</span><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<em>stmt</em><span class="mono">;</span><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="mono">}</span><br />
+    </p>
+
+    <h4 id="break-statement">4.3.8 Break Statement</h4>
+
+    <p>
+        A <a href="#rule.break-statement">break</a> statement terminates a <span class="kw">while</span>, <span class="kw">do</span> or <span class="kw">for</span> loop by transferring control
+        to the statement after the looping statement.
+        It is used also to terminate a <a href="#case-statment">case</a> or <a href="#default-statmenet">default</a> statement.
+    </p>
+
+    <h4 id="continue-statement">4.3.9 Continue Statement</h4>
+
+    <p>
+        A <a href="#rule.continue-statement">continue</a> statement transfers control from inside of a <span class="kw">while</span> or <span class="kw">do</span> statement to the condition of the statement,
+        and from inside of a <span class="kw">for</span> statement to the <a href="#rule.for-loop-expression">for-loop-expression</a> of the for statement.
+    </p>
+
+    <h4 id="goto-statement">4.3.10 Goto Statement</h4>
+
+    <p>
+        A <a href="#rule.goto-statement">goto</a> statement transfers control to a <a href="#labeled-statement">labeled</a> statement.
+    </p>
+
+    <h4 id="switch-statement">4.3.11 Switch Statement</h4>
+
+    <p>
+        A <a href="#rule.switch-statement">switch</a> statement consists of an condition expression that evaluates to an <a href="#integral-value">integral value</a>, 
+        a nonnegative number of <a href="#case-statement">case</a> statements and possibly a <a href="#default-statement">default</a> statement.
+        The condition of the switch statement is evaluated and control is transferred to a case statement with a matching value.
+        If none of the case values match, and the switch statement contains a default statement, control is transferred to the default statement.
+        Otherwise, if none of the case values match, but the switch statement does not contain a default statement, control is transferred to the statement coming after the switch statement.
+    </p>
+
+    <h4 id="case-statement">4.3.12 Case Statement</h4>
+
+    <p>
+        A <a href="#rule.case-statement">case</a> statement has a number case values that must be <a href="#integral-value">integral</a> compile-time constants and a possibly empty sequence of statements 
+        that are executed if the condition of the <a href="#switch-statement">switch</a> statement match one of the case values.
+        The case statement must be terminated by a <a href="#break-statement">break</a>, <a href="#goto-case-statement">goto case</a>, <a href="#goto-default-statement">goto default</a>, 
+        <a href="#return-statement">return</a> or <a href="#throw-statement">throw</a> statement.
+    </p>
+
+    <h4 id="default-statement">4.3.13 Default Statement</h4>
+
+    <p>
+        A <a href="#rule.default-statement">default</a> has a possibly empty sequence of statement that are executed if the condition of the <a href="#switch-statement">switch</a> statement does not 
+        match any of the case values. The default statement must be terminated by a <a href="#break-statement">break</a>, <a href="#goto-case-statement">goto case</a>, 
+        <a href="#return-statement">return</a> or <a href="#throw-statement">throw</a> statement.
+    </p>
+
+    <h4 id="goto-case-statement">4.3.14 Goto Case Statement</h4>
+
+    <p>
+        A <a href="#rule.goto-case-statement">goto case</a> statement is used to transfer control from a <a href="#case-statement">case</a>, 
+        or <a href="#default-statement">default</a> statement to a case statement.
+    </p>
+
+    <h4 id="goto-default-statement">4.3.15 Goto Default Statement</h4>
+
+    <p>
+        A <a href="#rule.goto-default-statement">goto default</a> statement is used to transfer control from a <a href="#case-statement">case</a> statement to a <a href="#default-statement">default</a> statement.
+    </p>
+
+    <h3 id="expression-statement">4.4 Expression Statement</h3>
+
+    <p>
+        An <a href="#rule.expression-statement">expression</a> statement evaluates an expression but the possible result of the evaluation is not used.
+        Instead the expression is evaluated for its <a href="http://en.wikipedia.org/wiki/Side_effect_(computer_science)">side-effects</a>.
+        The evaluated expression can for example increment or decrement a variable, or call a function, delegate or class delegate.
+    </p>
+
+    <h3 id="empty-statement">4.5 Empty Statement</h3>
+
+    <p>
+        An <a href="#rule.empty-statement">empty</a> statement does nothing. It can be used when the syntax requires a statement but there's nothing to be done.
+    </p>
+
+    <h3 id="assignment-statement">4.6 Assignment Statement</h3>
+
+    <p>
+        An <a href="#rule.assignment-statement">assignment</a> statement evaluates the expression that is on the right-hand side of the assignment operator and assigns it to an 
+        <em><a href="#lvalue">lvalue</a></em> expression that is on the left-hand side of the assignment operator. An lvalue expression can be for instance a variable, 
+        a <a href="#dereference-expression">dereferenced</a> pointer or iterator, or a reference-valued result of a function call.
+    </p>
+
+    <h3 id="construction-statement">4.7 Construction Statement</h3>
+
+    <p>
+        A <a href="#rule.construction-statement">construction</a> statement declares a <em>local variable</em> into its scope,
+        allocates memory for it from the stack frame of the current function<sup><a href="#footnote-2">2</a></sup> and
+        sets an initial value for it. The local variable will have given <a href="#type-expr">type</a> and <a href="#identifiers">name</a>.
+        It is initialized to the value given on the right side of the assignment operator symbol or 
+        resulting of a call to a constructor with arguments enclosed in parentheses. 
+        If no initializer is given, the variable will be <a href="#default-initialized">default initialized</a>.
+    </p>
+
+    <h3 id="delete-and-destroy-statements">4.8 Delete and Destroy Statements</h3>
+
+    <p>
+        If <em>p</em> is a pointer to type <em>T</em> object that is created using the <a href="#new-expression">new</a> expression, 
+        statement <span class="kw"><a href="#rule.delete-statement">delete</a></span> <em>p</em>
+        calls the destructor of <em>T</em> (if <em>T</em> is a class type having one), and then frees the memory allocated for the object back to the <a href="#free-store">free store</a>.
+        It is not an error to call <span class="kw">delete</span> for a <span class="kw">null</span> pointer.
+    </p>
+
+    <p>
+        If <em>p</em> is a pointer to type <em>T</em> object, statement <span class="kw"><a href="#rule.destroy-statement">destroy</a></span> <em>p</em> calls the destructor of <em>T</em>, 
+        but does not free any memory.
+        It is not an error to call <span class="kw">destroy</span> for a type <em>T</em> that has no destructor. In that case the statement has no effect.
+    </p>
+
+    <h3 id="throw-statement">4.9 Throw Statement</h3>
+
+    <p>
+        A <a href="#rule.throw-statement">throw</a> statement throws or rethrows an exception. 
+        If the throw statement contains an expression, it must be an expression of a class type that is derived from the <em>System</em><span class="mono">.</span><em>Exception</em> class.
+        If the throw statement does not contain an expression, it can be used only in an <a href="#rule.exception-handler">exception handler</a> block to rethrow the current exception being handled.
+    </p>
+
+    <p>
+        Throwing an exception transfers control to a matching <a href="#rule.exception-handler">exception handler</a>, if any.
+        If no matching exception handler is found, the error message and stack trace of the exception is written to the standard error stream of the process and the execution of the process is ended with exit code 1.
+    </p>
+
+    <p>
+        Exceptions should be thrown by value, and catched by reference (or reference to <span class="kw">const</span>), as in <span class="mono">C++</span>.
+        For example, if <em>AlphaException</em> is a class derived from the <em>System</em><span class="mono">.</span><em>Exception</em> class, statement<br/><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">throw</span> <em>AlphaException</em><span class="mono">("error");</span><br /><br />
+        will throw an exception of type <em>AlphaException</em> with message <span class="mono">"error"</span>.
+    </p>
+
+    <h3 id="try-statement">4.10 Try Statement</h3>
+
+    <p>
+        A <a href="#rule.try-statement">try</a> statement executes a block of code, and handles one or more classes of exceptions that may be thrown from that block of code.
+        The exception classes must be derived from the <em>System</em><span class="mono">.</span><em>Exception</em> class.
+    </p>
+
+    <p>
+        Exceptions should be thrown by value, and catched by reference (or reference to <span class="kw">const</span>), as in <span class="mono">C++</span>.
+        For example, if <em>AlphaException</em> is a class derived from the <em>System</em><span class="mono">.</span><em>Exception</em> class, the statement<br /><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">try</span><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="mono">{</span><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<em>Write</em><span class="mono">();</span><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="mono">}</span><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">catch</span> <span class="mono">(</span><span class="kw">const</span> <em>AlphaException</em><span class="mono">&amp;</span> <em>ex</em><span class="mono">)</span><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="mono">{</span><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<em>Console</em><span class="mono">.</span><em>WriteLine</em><span class="mono">(</span><em>ex</em><span class="mono">.</span><em>Message</em><span class="mono">());</span><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="mono">}</span><br /><br />
+        will handle an exception thrown from the <em>Write</em><span class="mono">()</span> function call, if that exception is of class <em>AlphaException</em> or of a class derived from the <em>AlphaException</em> class.
+    </p>
+
+    <h3 id="assert-statement">4.11 Assert Statement</h3>
+
+    <p>
+        An <a href="#rule.assert-statement">assert</a> statement can be used to test <a href="#basic-type-bool"><span class="kw">bool</span></a>-valued conditions that should always hold in a valid program. 
+        If an assertion expression evaluates to <span class="kw">false</span>, an error message "assertion failed" with a function name, 
+        source file name and line number along with a possibly incomplete call stack is printed to standard error stream of the process,
+        and the execution of the process is ended with exit code 254. Assert statements have no effect in a program compiled using the release configuration.
+    </p>
 
     <hr />
 
     <sup id="footnote-1">
         1. Invocation of a <span class="kw">void</span> function does not have a value, but it can have
         <em><a href="http://en.wikipedia.org/wiki/Side_effect_(computer_science)">side-effects</a></em>, for example write text to a stream.
+    </sup><br />
+
+    <sup id="footnote-2">
+        2. Actually a local variable can reside only in a processor register if its address is not needed.
     </sup>
 
 </body>
