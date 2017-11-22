@@ -189,7 +189,6 @@ void TypeResolver::Visit(ArrayNode& arrayNode)
         throw Exception("cannot have array of reference type", arrayNode.GetSpan());
     }
     // todo: evaluate size
-    derivationRec.derivations.push_back(Derivation::arrayDerivation);
 }
 
 void TypeResolver::ResolveSymbol(Node& node, Symbol* symbol)

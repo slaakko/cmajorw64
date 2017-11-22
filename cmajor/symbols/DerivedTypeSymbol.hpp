@@ -12,24 +12,22 @@ namespace cmajor { namespace symbols {
 
 enum class Derivation : uint8_t
 {
-    none = 0, constDerivation = 1, lvalueRefDerivation = 2, rvalueRefDerivation = 3, pointerDerivation = 4, arrayDerivation = 5
+    none = 0, constDerivation = 1, lvalueRefDerivation = 2, rvalueRefDerivation = 3, pointerDerivation = 4
 };
 
 std::u32string DerivationStr(Derivation derivation);
 
 typedef llvm::SmallVector<Derivation, 8> DerivationVec;
-typedef llvm::SmallVector<uint64_t, 4> ArrayDimensionVec;
 
 struct TypeDerivationRec
 {
     DerivationVec derivations;
-    ArrayDimensionVec arrayDimensions;
-    bool IsEmpty() const { return derivations.empty() && arrayDimensions.empty(); }
+    bool IsEmpty() const { return derivations.empty(); }
 };
 
 inline bool operator==(const TypeDerivationRec& left, const TypeDerivationRec& right)
 {
-    return left.derivations == right.derivations && left.arrayDimensions == right.arrayDimensions;
+    return left.derivations == right.derivations;
 }
 
 inline bool operator!=(const TypeDerivationRec& left, const TypeDerivationRec& right)
@@ -43,7 +41,6 @@ bool HasFrontConstDerivation(const DerivationVec& derivations);
 bool HasReferenceDerivation(const DerivationVec& derivations);
 bool HasLvalueReferenceDerivation(const DerivationVec& derivations);
 bool HasRvalueReferenceDerivation(const DerivationVec& derivations);
-bool HasArrayDerivation(const DerivationVec& derivations);
 bool HasReferenceOrConstDerivation(const DerivationVec& derivations);
 bool HasPointerDerivation(const DerivationVec& derivations);
 int CountPointerDerivations(const DerivationVec& derivations);
@@ -85,7 +82,6 @@ public:
     bool IsReferenceType() const override;
     bool IsLvalueReferenceType() const override;
     bool IsRvalueReferenceType() const override;
-    bool IsArrayType() const override;
     bool IsPointerType() const override;
     bool IsVoidPtrType() const override;
     int PointerCount() const override;

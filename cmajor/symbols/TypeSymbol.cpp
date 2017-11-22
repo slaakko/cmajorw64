@@ -67,7 +67,6 @@ const TypeDerivationRec& TypeSymbol::DerivationRec() const
 
 TypeSymbol* TypeSymbol::RemoveDerivations(const TypeDerivationRec& sourceDerivationRec, const Span& span)
 {
-    if (HasArrayDerivation(sourceDerivationRec.derivations)) return nullptr;
     if (HasPointerDerivation(sourceDerivationRec.derivations)) return nullptr;
     return this;
 }

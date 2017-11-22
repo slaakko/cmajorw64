@@ -21,7 +21,6 @@ std::u32string DerivationStr(Derivation derivation)
         case Derivation::lvalueRefDerivation: return U"R";
         case Derivation::rvalueRefDerivation: return U"RR";
         case Derivation::pointerDerivation: return U"P";
-        case Derivation::arrayDerivation: return U"A";
         default: return std::u32string();
     }
 }
@@ -74,18 +73,6 @@ bool HasRvalueReferenceDerivation(const DerivationVec& derivations)
     return false;
 }
 
-bool HasArrayDerivation(const DerivationVec& derivations)
-{
-    for (Derivation derivation : derivations)
-    {
-        if (derivation == Derivation::arrayDerivation)
-        {
-            return true;
-        }
-    }
-    return false;
-}
-
 bool HasReferenceOrConstDerivation(const DerivationVec& derivations)
 {
     for (Derivation derivation : derivations)
@@ -123,10 +110,9 @@ int CountPointerDerivations(const DerivationVec& derivations)
 TypeDerivationRec MakePlainDerivationRec(const TypeDerivationRec& typeDerivationRec)
 {
     TypeDerivationRec plainDerivationRec;
-    plainDerivationRec.arrayDimensions = typeDerivationRec.arrayDimensions;
     for (Derivation derivation : typeDerivationRec.derivations)
     {
-        if (derivation == Derivation::pointerDerivation || derivation == Derivation::arrayDerivation)
+        if (derivation == Derivation::pointerDerivation)
         {
             plainDerivationRec.derivations.push_back(derivation);
         }
@@ -137,10 +123,9 @@ TypeDerivationRec MakePlainDerivationRec(const TypeDerivationRec& typeDerivation
 TypeDerivationRec RemoveReferenceDerivation(const TypeDerivationRec& typeDerivationRec)
 {
     TypeDerivationRec referenceRemovedDerivationRec;
-    referenceRemovedDerivationRec.arrayDimensions = typeDerivationRec.arrayDimensions;
     for (Derivation derivation : typeDerivationRec.derivations)
     {
-        if (derivation == Derivation::constDerivation || derivation == Derivation::pointerDerivation || derivation == Derivation::arrayDerivation)
+        if (derivation == Derivation::constDerivation || derivation == Derivation::pointerDerivation)
         {
             referenceRemovedDerivationRec.derivations.push_back(derivation);
         }
@@ -151,7 +136,6 @@ TypeDerivationRec RemoveReferenceDerivation(const TypeDerivationRec& typeDerivat
 TypeDerivationRec RemovePointerDerivation(const TypeDerivationRec& typeDerivationRec)
 {
     TypeDerivationRec pointerRemovedDerivationRec;
-    pointerRemovedDerivationRec.arrayDimensions = typeDerivationRec.arrayDimensions;
     int numPointers = CountPointerDerivations(typeDerivationRec.derivations);
     if (numPointers > 0)
     {
@@ -181,7 +165,6 @@ TypeDerivationRec RemovePointerDerivation(const TypeDerivationRec& typeDerivatio
 TypeDerivationRec RemoveConstDerivation(const TypeDerivationRec& typeDerivationRec)
 {
     TypeDerivationRec constRemovedDerivationRec;
-    constRemovedDerivationRec.arrayDimensions = typeDerivationRec.arrayDimensions;
     for (Derivation derivation : typeDerivationRec.derivations)
     {
         if (derivation != Derivation::constDerivation)
@@ -195,7 +178,6 @@ TypeDerivationRec RemoveConstDerivation(const TypeDerivationRec& typeDerivationR
 TypeDerivationRec AddConstDerivation(const TypeDerivationRec& typeDerivationRec)
 {
     TypeDerivationRec constAddedDerivationRec;
-    constAddedDerivationRec.arrayDimensions = typeDerivationRec.arrayDimensions;
     constAddedDerivationRec.derivations.push_back(Derivation::constDerivation);
     for (Derivation derivation : typeDerivationRec.derivations)
     {
@@ -210,7 +192,6 @@ TypeDerivationRec AddConstDerivation(const TypeDerivationRec& typeDerivationRec)
 TypeDerivationRec AddLvalueReferenceDerivation(const TypeDerivationRec& typeDerivationRec)
 {
     TypeDerivationRec lvalueReferenceAddedDerivationRec;
-    lvalueReferenceAddedDerivationRec.arrayDimensions = typeDerivationRec.arrayDimensions;
     for (Derivation derivation : typeDerivationRec.derivations)
     {
         if (derivation != Derivation::lvalueRefDerivation && derivation != Derivation::rvalueRefDerivation)
@@ -225,7 +206,6 @@ TypeDerivationRec AddLvalueReferenceDerivation(const TypeDerivationRec& typeDeri
 TypeDerivationRec AddRvalueReferenceDerivation(const TypeDerivationRec& typeDerivationRec)
 {
     TypeDerivationRec rvalueReferenceAddedDerivationRec;
-    rvalueReferenceAddedDerivationRec.arrayDimensions = typeDerivationRec.arrayDimensions;
     for (Derivation derivation : typeDerivationRec.derivations)
     {
         if (derivation != Derivation::lvalueRefDerivation && derivation != Derivation::rvalueRefDerivation)
@@ -240,7 +220,6 @@ TypeDerivationRec AddRvalueReferenceDerivation(const TypeDerivationRec& typeDeri
 TypeDerivationRec AddPointerDerivation(const TypeDerivationRec& typeDerivationRec)
 {
     TypeDerivationRec pointerAddedDerivationRec;
-    pointerAddedDerivationRec.arrayDimensions = typeDerivationRec.arrayDimensions;
     int numPointers = CountPointerDerivations(typeDerivationRec.derivations);
     int np = 0;
     for (Derivation derivation : typeDerivationRec.derivations)
@@ -261,10 +240,6 @@ TypeDerivationRec AddPointerDerivation(const TypeDerivationRec& typeDerivationRe
 
 TypeDerivationRec UnifyDerivations(const TypeDerivationRec& left, const TypeDerivationRec& right)
 {
-    if (HasArrayDerivation(left.derivations) || HasArrayDerivation(right.derivations))
-    {
-        throw std::runtime_error("arrays not supported yet");
-    }
     TypeDerivationRec result;
     if (HasFrontConstDerivation(left.derivations) || HasFrontConstDerivation(right.derivations))
     {
@@ -308,7 +283,6 @@ std::u32string MakeDerivedTypeName(TypeSymbol* baseType, const TypeDerivationRec
         derivedTypeName.append(1, U' ');
     }
     derivedTypeName.append(baseType->Name());
-    int dimensionIndex = 0;
     for (Derivation derivation : derivationRec.derivations)
     {
         switch (derivation)
@@ -344,18 +318,6 @@ std::u32string MakeDerivedTypeName(TypeSymbol* baseType, const TypeDerivationRec
                 derivedTypeName.append(U"*");
                 break;
             }
-            case Derivation::arrayDerivation:
-            {
-                if (dimensionIndex < derivationRec.arrayDimensions.size())
-                {
-                    derivedTypeName.append(1, U'[').append(ToUtf32(std::to_string(derivationRec.arrayDimensions[dimensionIndex++]))).append(1, U']');
-                }
-                else
-                {
-                    derivedTypeName.append(U"[]");
-                }
-                break;
-            }
         }
     }
     return derivedTypeName;
@@ -389,11 +351,6 @@ void DerivedTypeSymbol::Write(SymbolWriter& writer)
     {
         writer.GetBinaryWriter().Write(static_cast<uint8_t>(derivation));
     }
-    writer.GetBinaryWriter().Write(static_cast<uint8_t>(derivationRec.arrayDimensions.size()));
-    for (uint64_t dimension : derivationRec.arrayDimensions)
-    {
-        writer.GetBinaryWriter().Write(dimension);
-    }
 }
 
 void DerivedTypeSymbol::Read(SymbolReader& reader)
@@ -406,12 +363,6 @@ void DerivedTypeSymbol::Read(SymbolReader& reader)
     {
         Derivation derivation = static_cast<Derivation>(reader.GetBinaryReader().ReadByte());
         derivationRec.derivations.push_back(derivation);
-    }
-    uint8_t na = reader.GetBinaryReader().ReadByte();
-    for (uint8_t i = 0; i < na; ++i)
-    {
-        uint64_t dimension = reader.GetBinaryReader().ReadULong();
-        derivationRec.arrayDimensions.push_back(dimension);
     }
 }
 
@@ -452,11 +403,6 @@ bool DerivedTypeSymbol::IsLvalueReferenceType() const
 bool DerivedTypeSymbol::IsRvalueReferenceType() const
 {
     return HasRvalueReferenceDerivation(derivationRec.derivations);
-}
-
-bool DerivedTypeSymbol::IsArrayType() const
-{
-    return HasArrayDerivation(derivationRec.derivations);
 }
 
 bool DerivedTypeSymbol::IsPointerType() const 
@@ -538,10 +484,6 @@ TypeSymbol* DerivedTypeSymbol::AddPointer(const Span& span)
 TypeSymbol* DerivedTypeSymbol::RemoveDerivations(const TypeDerivationRec& sourceDerivationRec, const Span& span)
 {
     TypeDerivationRec result;
-    if (HasArrayDerivation(derivationRec.derivations) || HasArrayDerivation(sourceDerivationRec.derivations))
-    {
-        throw std::runtime_error("arrays not supported yet");
-    }
     const DerivationVec& sourceDerivations = sourceDerivationRec.derivations;
     if (!HasFrontConstDerivation(sourceDerivations) && HasFrontConstDerivation(derivationRec.derivations))
     {
