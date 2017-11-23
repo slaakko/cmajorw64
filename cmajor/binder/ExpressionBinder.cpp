@@ -1405,7 +1405,7 @@ void ExpressionBinder::Visit(IndexingNode& indexingNode)
     }
     else if (plainSubjectType->IsArrayType())
     {
-        throw std::runtime_error("indexing for arrays not implemented yet");
+        BindBinaryOp(subject.release(), index.release(), indexingNode, U"operator[]");
     }
     else
     {

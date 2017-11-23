@@ -8,6 +8,7 @@
 #include <cmajor/symbols/SymbolReader.hpp>
 #include <cmajor/symbols/BasicTypeSymbol.hpp>
 #include <cmajor/symbols/BasicTypeOperation.hpp>
+#include <cmajor/symbols/ArrayTypeSymbol.hpp>
 #include <cmajor/symbols/DerivedTypeSymbol.hpp>
 #include <cmajor/symbols/NamespaceSymbol.hpp>
 #include <cmajor/symbols/FunctionSymbol.hpp>
@@ -32,7 +33,7 @@ const char* symbolTypeStr[uint8_t(SymbolType::maxSymbol)] =
 {
     "boolTypeSymbol", "sbyteTypeSymbol", "byteTypeSymbol", "shortTypeSymbol", "ushortTypeSymbol", "intTypeSymbol", "uintTypeSymbol", "longTypeSymbol", "ulongTypeSymbol", "floatTypeSymbol", "doubleTypeSymbol",
     "charTypeSymbol", "wcharTypeSymbol", "ucharTypeSymbol", "voidTypeSymbol", "nullPtrTypeSymbol",
-    "derivedTypeSymbol"
+    "arrayTypeSymbol", "derivedTypeSymbol"
     "namespaceSymbol", "functionSymbol", "staticConstructorSymbol", "constructorSymbol", "destructorSymbol", "memberFunctionSymbol", "conversionFunctionSymbol", "functionGroupSymbol",
     "classGroupTypeSymbol", "classTypeSymbol", "interfaceTypeSymbol", "conceptGroupSymbol", "conceptSymbol",
     "delegateTypeSymbol", "classDelegateTypeSymbol", "declarationBlock", "typedefSymbol", "constantSymbol", "enumTypeSymbol", "enumConstantSymbol",
@@ -835,6 +836,7 @@ SymbolFactory::SymbolFactory()
     Register(SymbolType::ucharTypeSymbol, new ConcreteSymbolCreator<UCharTypeSymbol>());
     Register(SymbolType::voidTypeSymbol, new ConcreteSymbolCreator<VoidTypeSymbol>());
     Register(SymbolType::nullPtrTypeSymbol, new ConcreteSymbolCreator<NullPtrType>());
+    Register(SymbolType::arrayTypeSymbol, new ConcreteSymbolCreator<ArrayTypeSymbol>());
     Register(SymbolType::derivedTypeSymbol, new ConcreteSymbolCreator<DerivedTypeSymbol>());
     Register(SymbolType::namespaceSymbol, new ConcreteSymbolCreator<NamespaceSymbol>());
     Register(SymbolType::functionSymbol, new ConcreteSymbolCreator<FunctionSymbol>());

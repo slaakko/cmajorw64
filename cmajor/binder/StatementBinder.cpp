@@ -1354,7 +1354,7 @@ void StatementBinder::Visit(CatchNode& catchNode)
     bool prevInsideCatch = insideCatch;
     insideCatch = true;
     Span span = catchNode.GetSpan();
-    std::unique_ptr<BoundCatchStatement> boundCatchStatement(new BoundCatchStatement(catchNode.GetSpan()));;
+    std::unique_ptr<BoundCatchStatement> boundCatchStatement(new BoundCatchStatement(catchNode.GetSpan()));
     TypeSymbol* catchedType = ResolveType(catchNode.TypeExpr(), boundCompileUnit, containerScope);
     boundCatchStatement->SetCatchedType(catchedType);
     LocalVariableSymbol* catchVar = nullptr;

@@ -12,6 +12,7 @@ namespace cmajor { namespace symbols {
 using namespace cmajor::ast;
 
 class Symbol;
+class ArrayTypeSymbol;
 class DerivedTypeSymbol;
 class ClassTemplateSpecializationSymbol;
 class SymbolTable;
@@ -27,6 +28,7 @@ public:
     AstReader& GetAstReader() { return astReader; }
     BinaryReader& GetBinaryReader() { return astReader.GetBinaryReader(); }
     Symbol* ReadSymbol(Symbol* parent);
+    ArrayTypeSymbol* ReadArrayTypeSymbol(Symbol* parent);
     DerivedTypeSymbol* ReadDerivedTypeSymbol(Symbol* parent);
     ClassTemplateSpecializationSymbol* ReadClassTemplateSpecializationSymbol(Symbol* parent);
     ParameterSymbol* ReadParameterSymbol(Symbol* parent);

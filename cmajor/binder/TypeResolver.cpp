@@ -6,6 +6,7 @@
 #include <cmajor/binder/TypeResolver.hpp>
 #include <cmajor/binder/TypeBinder.hpp>
 #include <cmajor/binder/BoundCompileUnit.hpp>
+#include <cmajor/binder/Evaluator.hpp>
 #include <cmajor/ast/Visitor.hpp>
 #include <cmajor/ast/Identifier.hpp>
 #include <cmajor/ast/Expression.hpp>
@@ -183,12 +184,26 @@ void TypeResolver::Visit(PointerNode& pointerNode)
 
 void TypeResolver::Visit(ArrayNode& arrayNode)
 {
-    arrayNode.Subject()->Accept(*this);
-    if (HasReferenceDerivation(derivationRec.derivations))
+    type = ResolveType(arrayNode.Subject(), boundCompileUnit, containerScope);
+    if (type->IsReferenceType())
     {
         throw Exception("cannot have array of reference type", arrayNode.GetSpan());
     }
-    // todo: evaluate size
+    uint64_t size = 0;
+    if (arrayNode.Size())
+    {
+        std::unique_ptr<Value> sizeValue = Evaluate(arrayNode.Size(), ValueType::ulongValue, containerScope, boundCompileUnit, false);
+        if (sizeValue->GetValueType() == ValueType::ulongValue)
+        {
+            ULongValue* ulongSizeValue = static_cast<ULongValue*>(sizeValue.get());
+            size = ulongSizeValue->GetValue();
+        }
+        else
+        {
+            throw Exception("ulong type expected value", arrayNode.Size()->GetSpan());
+        }
+    }
+    type = symbolTable.MakeArrayType(type, size, arrayNode.GetSpan());
 }
 
 void TypeResolver::ResolveSymbol(Node& node, Symbol* symbol)

@@ -8,6 +8,7 @@
 #include <cmajor/symbols/NamespaceSymbol.hpp>
 #include <cmajor/symbols/DerivedTypeSymbol.hpp>
 #include <cmajor/symbols/ClassTemplateSpecializationSymbol.hpp>
+#include <cmajor/symbols/ArrayTypeSymbol.hpp>
 #include <cmajor/symbols/ConversionTable.hpp>
 #include <cmajor/ast/Namespace.hpp>
 #include <cmajor/ast/Function.hpp>
@@ -97,6 +98,26 @@ struct ClassTemplateSpecializationKeyHash
 bool operator==(const ClassTemplateSpecializationKey& left, const ClassTemplateSpecializationKey& right);
 bool operator!=(const ClassTemplateSpecializationKey& left, const ClassTemplateSpecializationKey& right);
 
+struct ArrayKey
+{
+    ArrayKey(TypeSymbol* elementType_, uint64_t size_) : elementType(elementType_), size(size_) {}
+    TypeSymbol* elementType;
+    uint64_t size;
+};
+
+bool operator==(const ArrayKey& left, const ArrayKey& right);
+bool operator!=(const ArrayKey& left, const ArrayKey& right);
+
+struct ArrayKeyHash
+{
+    size_t operator()(const ArrayKey& key) const
+    {
+        size_t x = std::hash<TypeSymbol*>()(key.elementType);
+        x = x ^ std::hash<uint64_t>()(key.size);
+        return x;
+    }
+};
+
 class SymbolTable
 {
 public:
@@ -173,6 +194,7 @@ public:
     TypeSymbol* MakeDerivedType(TypeSymbol* baseType, const TypeDerivationRec& derivationRec, const Span& span);
     ClassTemplateSpecializationSymbol* MakeClassTemplateSpecialization(ClassTypeSymbol* classTemplate, const std::vector<TypeSymbol*>& templateArgumentTypes, const Span& span);
     void AddClassTemplateSpecializationsToClassTemplateSpecializationMap(const std::vector<ClassTemplateSpecializationSymbol*>& classTemplateSpecializations);
+    ArrayTypeSymbol* MakeArrayType(TypeSymbol* elementType, uint64_t size, const Span& span);
     const FunctionSymbol* MainFunctionSymbol() const { return mainFunctionSymbol; }
     FunctionSymbol* MainFunctionSymbol() { return mainFunctionSymbol; }
     void AddConversion(FunctionSymbol* conversion);
@@ -204,6 +226,8 @@ private:
     std::vector<std::unique_ptr<DerivedTypeSymbol>> derivedTypes;
     std::unordered_map<ClassTemplateSpecializationKey, ClassTemplateSpecializationSymbol*, ClassTemplateSpecializationKeyHash> classTemplateSpecializationMap;
     std::vector<std::unique_ptr<ClassTemplateSpecializationSymbol>> classTemplateSpecializations;
+    std::unordered_map<ArrayKey, ArrayTypeSymbol*, ArrayKeyHash> arrayTypeMap;
+    std::vector<std::unique_ptr<ArrayTypeSymbol>> arrayTypes;
     std::vector<TypeOrConceptRequest> typeAndConceptRequests;
     std::vector<FunctionRequest> functionRequests;
     ConversionTable conversionTable;

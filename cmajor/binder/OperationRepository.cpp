@@ -1391,6 +1391,273 @@ void RvalueReferenceReturnOperation::CollectViableFunctions(ContainerScope* cont
     viableFunctions.insert(function);
 }
 
+class ArrayDefaultConstructorOperation : public Operation
+{
+public:
+    ArrayDefaultConstructorOperation(BoundCompileUnit& boundCompileUnit_);
+    void CollectViableFunctions(ContainerScope* containerScope_, const std::vector<std::unique_ptr<BoundExpression>>& arguments, BoundFunction* currentFunction,
+        std::unordered_set<FunctionSymbol*>& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span) override;
+private:
+    std::unordered_map<TypeSymbol*, FunctionSymbol*> functionMap;
+    std::vector<std::unique_ptr<FunctionSymbol>> functions;
+};
+
+ArrayDefaultConstructorOperation::ArrayDefaultConstructorOperation(BoundCompileUnit& boundCompileUnit_) : Operation(U"@constructor", 1, boundCompileUnit_)
+{
+}
+
+void ArrayDefaultConstructorOperation::CollectViableFunctions(ContainerScope* containerScope, const std::vector<std::unique_ptr<BoundExpression>>& arguments, BoundFunction* currentFunction,
+    std::unordered_set<FunctionSymbol*>& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span)
+{
+    TypeSymbol* type = arguments[0]->GetType();
+    if (type->PointerCount() != 1 || !type->RemovePointer(span)->IsArrayType()) return;
+    ArrayTypeSymbol* arrayType = static_cast<ArrayTypeSymbol*>(type->RemovePointer(span));
+    FunctionSymbol* function = functionMap[arrayType];
+    if (!function)
+    { 
+        std::vector<FunctionScopeLookup> elementLookups;
+        elementLookups.push_back(FunctionScopeLookup(ScopeLookup::this_and_base_and_parent, containerScope));
+        elementLookups.push_back(FunctionScopeLookup(ScopeLookup::this_, arrayType->ElementType()->BaseType()->ClassInterfaceEnumDelegateOrNsScope()));
+        elementLookups.push_back(FunctionScopeLookup(ScopeLookup::fileScopes, nullptr));
+        std::vector<std::unique_ptr<BoundExpression>> elementArguments;
+        elementArguments.push_back(std::unique_ptr<BoundExpression>(new BoundTypeExpression(span, arrayType->ElementType()->AddPointer(span))));
+        std::unique_ptr<BoundFunctionCall> elementDefaultConstructor = ResolveOverload(U"@constructor", containerScope, elementLookups, elementArguments, GetBoundCompileUnit(), currentFunction, span);
+        FunctionSymbol* elementTypeDefaultConstructor = elementDefaultConstructor->GetFunctionSymbol();
+        function = new ArrayTypeDefaultConstructor(arrayType, currentFunction->GetFunctionSymbol()->CreateTemporary(GetSymbolTable()->GetTypeByName(U"ulong"), span), elementTypeDefaultConstructor, span);
+        function->SetSymbolTable(GetSymbolTable());
+        function->SetParent(&GetSymbolTable()->GlobalNs());
+        functionMap[arrayType] = function;
+        functions.push_back(std::unique_ptr<FunctionSymbol>(function));
+    }
+    viableFunctions.insert(function);
+}
+
+class ArrayCopyConstructorOperation : public Operation
+{
+public:
+    ArrayCopyConstructorOperation(BoundCompileUnit& boundCompileUnit_);
+    void CollectViableFunctions(ContainerScope* containerScope_, const std::vector<std::unique_ptr<BoundExpression>>& arguments, BoundFunction* currentFunction,
+        std::unordered_set<FunctionSymbol*>& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span) override;
+private:
+    std::unordered_map<TypeSymbol*, FunctionSymbol*> functionMap;
+    std::vector<std::unique_ptr<FunctionSymbol>> functions;
+};
+
+ArrayCopyConstructorOperation::ArrayCopyConstructorOperation(BoundCompileUnit& boundCompileUnit_) : Operation(U"@constructor", 2, boundCompileUnit_)
+{
+}
+
+void ArrayCopyConstructorOperation::CollectViableFunctions(ContainerScope* containerScope, const std::vector<std::unique_ptr<BoundExpression>>& arguments, BoundFunction* currentFunction,
+    std::unordered_set<FunctionSymbol*>& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span)
+{
+    TypeSymbol* type = arguments[0]->GetType();
+    if (type->PointerCount() != 1 || !type->RemovePointer(span)->IsArrayType()) return;
+    ArrayTypeSymbol* arrayType = static_cast<ArrayTypeSymbol*>(type->RemovePointer(span));
+    if (!TypesEqual(arguments[1]->GetType(), arrayType->AddRvalueReference(span)) && !arguments[1]->GetFlag(BoundExpressionFlags::bindToRvalueReference) &&
+        TypesEqual(arguments[1]->GetType()->PlainType(span), arrayType))
+    {
+        FunctionSymbol* function = functionMap[arrayType];
+        if (!function)
+        {
+            std::vector<FunctionScopeLookup> elementLookups;
+            elementLookups.push_back(FunctionScopeLookup(ScopeLookup::this_and_base_and_parent, containerScope));
+            elementLookups.push_back(FunctionScopeLookup(ScopeLookup::this_, arrayType->ElementType()->BaseType()->ClassInterfaceEnumDelegateOrNsScope()));
+            elementLookups.push_back(FunctionScopeLookup(ScopeLookup::fileScopes, nullptr));
+            std::vector<std::unique_ptr<BoundExpression>> elementArguments;
+            elementArguments.push_back(std::unique_ptr<BoundExpression>(new BoundTypeExpression(span, arrayType->ElementType()->AddPointer(span))));
+            elementArguments.push_back(std::unique_ptr<BoundExpression>(new BoundTypeExpression(span, arrayType->ElementType()->AddConst(span)->AddLvalueReference(span))));
+            std::unique_ptr<BoundFunctionCall> elementCopyConstructor = ResolveOverload(U"@constructor", containerScope, elementLookups, elementArguments, GetBoundCompileUnit(), currentFunction, span);
+            FunctionSymbol* elementTypeCopyConstructor = elementCopyConstructor->GetFunctionSymbol();
+            function = new ArrayTypeCopyConstructor(arrayType, currentFunction->GetFunctionSymbol()->CreateTemporary(GetSymbolTable()->GetTypeByName(U"ulong"), span), elementTypeCopyConstructor, span);
+            function->SetSymbolTable(GetSymbolTable());
+            function->SetParent(&GetSymbolTable()->GlobalNs());
+            functionMap[arrayType] = function;
+            functions.push_back(std::unique_ptr<FunctionSymbol>(function));
+        }
+        viableFunctions.insert(function);
+    }
+}
+
+class ArrayMoveConstructorOperation : public Operation
+{
+public:
+    ArrayMoveConstructorOperation(BoundCompileUnit& boundCompileUnit_);
+    void CollectViableFunctions(ContainerScope* containerScope_, const std::vector<std::unique_ptr<BoundExpression>>& arguments, BoundFunction* currentFunction,
+        std::unordered_set<FunctionSymbol*>& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span) override;
+private:
+    std::unordered_map<TypeSymbol*, FunctionSymbol*> functionMap;
+    std::vector<std::unique_ptr<FunctionSymbol>> functions;
+};
+
+ArrayMoveConstructorOperation::ArrayMoveConstructorOperation(BoundCompileUnit& boundCompileUnit_) : Operation(U"@constructor", 2, boundCompileUnit_)
+{
+}
+
+void ArrayMoveConstructorOperation::CollectViableFunctions(ContainerScope* containerScope, const std::vector<std::unique_ptr<BoundExpression>>& arguments, BoundFunction* currentFunction,
+    std::unordered_set<FunctionSymbol*>& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span)
+{
+    TypeSymbol* type = arguments[0]->GetType();
+    if (type->PointerCount() != 1 || !type->RemovePointer(span)->IsArrayType()) return;
+    ArrayTypeSymbol* arrayType = static_cast<ArrayTypeSymbol*>(type->RemovePointer(span));
+    if (TypesEqual(arguments[1]->GetType(), arrayType->AddRvalueReference(span)) || arguments[1]->GetFlag(BoundExpressionFlags::bindToRvalueReference))
+    {
+        FunctionSymbol* function = functionMap[arrayType];
+        if (!function)
+        {
+            std::vector<FunctionScopeLookup> elementLookups;
+            elementLookups.push_back(FunctionScopeLookup(ScopeLookup::this_and_base_and_parent, containerScope));
+            elementLookups.push_back(FunctionScopeLookup(ScopeLookup::this_, arrayType->ElementType()->BaseType()->ClassInterfaceEnumDelegateOrNsScope()));
+            elementLookups.push_back(FunctionScopeLookup(ScopeLookup::fileScopes, nullptr));
+            std::vector<std::unique_ptr<BoundExpression>> elementArguments;
+            elementArguments.push_back(std::unique_ptr<BoundExpression>(new BoundTypeExpression(span, arrayType->ElementType()->AddPointer(span))));
+            elementArguments.push_back(std::unique_ptr<BoundExpression>(new BoundTypeExpression(span, arrayType->ElementType()->AddRvalueReference(span))));
+            elementArguments.back()->SetFlag(BoundExpressionFlags::bindToRvalueReference);
+            std::unique_ptr<BoundFunctionCall> elementMoveConstructor = ResolveOverload(U"@constructor", containerScope, elementLookups, elementArguments, GetBoundCompileUnit(), currentFunction, span);
+            FunctionSymbol* elementTypeMoveConstructor = elementMoveConstructor->GetFunctionSymbol();
+            function = new ArrayTypeMoveConstructor(arrayType, currentFunction->GetFunctionSymbol()->CreateTemporary(GetSymbolTable()->GetTypeByName(U"ulong"), span), elementTypeMoveConstructor, span);
+            function->SetSymbolTable(GetSymbolTable());
+            function->SetParent(&GetSymbolTable()->GlobalNs());
+            functionMap[arrayType] = function;
+            functions.push_back(std::unique_ptr<FunctionSymbol>(function));
+        }
+        viableFunctions.insert(function);
+    }
+}
+
+class ArrayCopyAssignmentOperation : public Operation
+{
+public:
+    ArrayCopyAssignmentOperation(BoundCompileUnit& boundCompileUnit_);
+    void CollectViableFunctions(ContainerScope* containerScope_, const std::vector<std::unique_ptr<BoundExpression>>& arguments, BoundFunction* currentFunction,
+        std::unordered_set<FunctionSymbol*>& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span) override;
+private:
+    std::unordered_map<TypeSymbol*, FunctionSymbol*> functionMap;
+    std::vector<std::unique_ptr<FunctionSymbol>> functions;
+};
+
+ArrayCopyAssignmentOperation::ArrayCopyAssignmentOperation(BoundCompileUnit& boundCompileUnit_) : Operation(U"operator=", 2, boundCompileUnit_)
+{
+}
+
+void ArrayCopyAssignmentOperation::CollectViableFunctions(ContainerScope* containerScope, const std::vector<std::unique_ptr<BoundExpression>>& arguments, BoundFunction* currentFunction,
+    std::unordered_set<FunctionSymbol*>& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span)
+{
+    TypeSymbol* type = arguments[0]->GetType();
+    if (type->PointerCount() != 1 || !type->RemovePointer(span)->IsArrayType()) return;
+    ArrayTypeSymbol* arrayType = static_cast<ArrayTypeSymbol*>(type->RemovePointer(span));
+    if (!TypesEqual(arguments[1]->GetType(), arrayType->AddRvalueReference(span)) && !arguments[1]->GetFlag(BoundExpressionFlags::bindToRvalueReference) &&
+        TypesEqual(arguments[1]->GetType()->PlainType(span), arrayType))
+    {
+        FunctionSymbol* function = functionMap[arrayType];
+        if (!function)
+        {
+            std::vector<FunctionScopeLookup> elementLookups;
+            elementLookups.push_back(FunctionScopeLookup(ScopeLookup::this_and_base_and_parent, containerScope));
+            elementLookups.push_back(FunctionScopeLookup(ScopeLookup::this_, arrayType->ElementType()->BaseType()->ClassInterfaceEnumDelegateOrNsScope()));
+            elementLookups.push_back(FunctionScopeLookup(ScopeLookup::fileScopes, nullptr));
+            std::vector<std::unique_ptr<BoundExpression>> elementArguments;
+            elementArguments.push_back(std::unique_ptr<BoundExpression>(new BoundTypeExpression(span, arrayType->ElementType()->AddPointer(span))));
+            elementArguments.push_back(std::unique_ptr<BoundExpression>(new BoundTypeExpression(span, arrayType->ElementType()->AddConst(span)->AddLvalueReference(span))));
+            std::unique_ptr<BoundFunctionCall> elementCopyAssignment = ResolveOverload(U"operator=", containerScope, elementLookups, elementArguments, GetBoundCompileUnit(), currentFunction, span);
+            FunctionSymbol* elementTypeCopyAssignment = elementCopyAssignment->GetFunctionSymbol();
+            function = new ArrayTypeCopyAssignment(arrayType, currentFunction->GetFunctionSymbol()->CreateTemporary(GetSymbolTable()->GetTypeByName(U"ulong"), span), elementTypeCopyAssignment, span);
+            function->SetSymbolTable(GetSymbolTable());
+            function->SetParent(&GetSymbolTable()->GlobalNs());
+            functionMap[arrayType] = function;
+            functions.push_back(std::unique_ptr<FunctionSymbol>(function));
+        }
+        viableFunctions.insert(function);
+    }
+}
+
+class ArrayMoveAssignmentOperation : public Operation
+{
+public:
+    ArrayMoveAssignmentOperation(BoundCompileUnit& boundCompileUnit_);
+    void CollectViableFunctions(ContainerScope* containerScope_, const std::vector<std::unique_ptr<BoundExpression>>& arguments, BoundFunction* currentFunction,
+        std::unordered_set<FunctionSymbol*>& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span) override;
+private:
+    std::unordered_map<TypeSymbol*, FunctionSymbol*> functionMap;
+    std::vector<std::unique_ptr<FunctionSymbol>> functions;
+};
+
+ArrayMoveAssignmentOperation::ArrayMoveAssignmentOperation(BoundCompileUnit& boundCompileUnit_) : Operation(U"operator=", 2, boundCompileUnit_)
+{
+}
+
+void ArrayMoveAssignmentOperation::CollectViableFunctions(ContainerScope* containerScope, const std::vector<std::unique_ptr<BoundExpression>>& arguments, BoundFunction* currentFunction,
+    std::unordered_set<FunctionSymbol*>& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span)
+{
+    TypeSymbol* type = arguments[0]->GetType();
+    if (type->PointerCount() != 1 || !type->RemovePointer(span)->IsArrayType()) return;
+    ArrayTypeSymbol* arrayType = static_cast<ArrayTypeSymbol*>(type->RemovePointer(span));
+    if (TypesEqual(arguments[1]->GetType(), arrayType->AddRvalueReference(span)) || arguments[1]->GetFlag(BoundExpressionFlags::bindToRvalueReference))
+    {
+        FunctionSymbol* function = functionMap[arrayType];
+        if (!function)
+        {
+            std::vector<FunctionScopeLookup> elementLookups;
+            elementLookups.push_back(FunctionScopeLookup(ScopeLookup::this_and_base_and_parent, containerScope));
+            elementLookups.push_back(FunctionScopeLookup(ScopeLookup::this_, arrayType->ElementType()->BaseType()->ClassInterfaceEnumDelegateOrNsScope()));
+            elementLookups.push_back(FunctionScopeLookup(ScopeLookup::fileScopes, nullptr));
+            std::vector<std::unique_ptr<BoundExpression>> elementArguments;
+            elementArguments.push_back(std::unique_ptr<BoundExpression>(new BoundTypeExpression(span, arrayType->ElementType()->AddPointer(span))));
+            elementArguments.push_back(std::unique_ptr<BoundExpression>(new BoundTypeExpression(span, arrayType->ElementType()->AddRvalueReference(span))));
+            elementArguments.back()->SetFlag(BoundExpressionFlags::bindToRvalueReference);
+            std::unique_ptr<BoundFunctionCall> elementMoveAssignment = ResolveOverload(U"operator=", containerScope, elementLookups, elementArguments, GetBoundCompileUnit(), currentFunction, span);
+            FunctionSymbol* elementTypeMoveAssignment = elementMoveAssignment->GetFunctionSymbol();
+            function = new ArrayTypeMoveAssignment(arrayType, currentFunction->GetFunctionSymbol()->CreateTemporary(GetSymbolTable()->GetTypeByName(U"ulong"), span), elementTypeMoveAssignment, span);
+            function->SetSymbolTable(GetSymbolTable());
+            function->SetParent(&GetSymbolTable()->GlobalNs());
+            functionMap[arrayType] = function;
+            functions.push_back(std::unique_ptr<FunctionSymbol>(function));
+        }
+        viableFunctions.insert(function);
+    }
+}
+
+class ArrayElementAccessOperation : public Operation
+{
+public:
+    ArrayElementAccessOperation(BoundCompileUnit& boundCompileUnit_);
+    void CollectViableFunctions(ContainerScope* containerScope_, const std::vector<std::unique_ptr<BoundExpression>>& arguments, BoundFunction* currentFunction,
+        std::unordered_set<FunctionSymbol*>& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span) override;
+private:
+    std::unordered_map<TypeSymbol*, FunctionSymbol*> functionMap;
+    std::vector<std::unique_ptr<FunctionSymbol>> functions;
+};
+
+ArrayElementAccessOperation::ArrayElementAccessOperation(BoundCompileUnit& boundCompileUnit_) : Operation(U"operator[]", 2, boundCompileUnit_)
+{
+}
+
+void ArrayElementAccessOperation::CollectViableFunctions(ContainerScope* containerScope, const std::vector<std::unique_ptr<BoundExpression>>& arguments, BoundFunction* currentFunction,
+    std::unordered_set<FunctionSymbol*>& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span)
+{
+    TypeSymbol* leftType = arguments[0]->GetType();
+    if (!leftType->PlainType(span)->IsArrayType()) return;
+    ArrayTypeSymbol* arrayType = static_cast<ArrayTypeSymbol*>(leftType->PlainType(span));
+    TypeSymbol* rightType = arguments[1]->GetType();
+    if (!rightType->PlainType(span)->IsIntegralType())
+    {
+        ArgumentMatch argumentMatch;
+        if (!GetBoundCompileUnit().GetConversion(rightType, GetSymbolTable()->GetTypeByName(U"long"), containerScope, currentFunction, span, argumentMatch))
+        {
+            return;
+        }
+    }
+    FunctionSymbol* function = functionMap[arrayType];
+    if (!function)
+    {
+        function = new ArrayTypeElementAccess(arrayType, span);
+        function->SetSymbolTable(GetSymbolTable());
+        function->SetParent(&GetSymbolTable()->GlobalNs());
+        functionMap[arrayType] = function;
+        functions.push_back(std::unique_ptr<FunctionSymbol>(function));
+    }
+    viableFunctions.insert(function);
+}
+
 class ClassDefaultConstructor : public ConstructorSymbol
 {
 public:
@@ -3121,6 +3388,12 @@ OperationRepository::OperationRepository(BoundCompileUnit& boundCompileUnit_) : 
     Add(new ClassMoveConstructorOperation(boundCompileUnit));
     Add(new ClassCopyAssignmentOperation(boundCompileUnit));
     Add(new ClassMoveAssignmentOperation(boundCompileUnit));
+    Add(new ArrayDefaultConstructorOperation(boundCompileUnit));
+    Add(new ArrayCopyConstructorOperation(boundCompileUnit));
+    Add(new ArrayMoveConstructorOperation(boundCompileUnit));
+    Add(new ArrayCopyAssignmentOperation(boundCompileUnit));
+    Add(new ArrayMoveAssignmentOperation(boundCompileUnit));
+    Add(new ArrayElementAccessOperation(boundCompileUnit));
 }
 
 void OperationRepository::Add(Operation* operation)

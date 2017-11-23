@@ -23,7 +23,8 @@ void LlvmValue::Load(Emitter& emitter, OperationFlags flags)
 
 void LlvmValue::Store(Emitter& emitter, OperationFlags flags)
 { 
-    throw std::runtime_error("cannot store to llvm value"); 
+    llvm::Value* val = emitter.Stack().Pop();
+    emitter.Builder().CreateStore(val, value);
 }
 
 } } // namespace cmajor::ir

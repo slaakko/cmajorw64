@@ -641,7 +641,20 @@ void BoundFunctionCall::Load(Emitter& emitter, OperationFlags flags)
 {
     if ((flags & OperationFlags::addr) != OperationFlags::none)
     {
-        throw Exception("cannot take address of a function call", GetSpan());
+        if (functionSymbol->IsArrayElementAccess())
+        {
+            std::vector<GenObject*> genObjects;
+            for (const std::unique_ptr<BoundExpression>& argument : arguments)
+            {
+                genObjects.push_back(argument.get());
+                genObjects.back()->SetType(argument->GetType());
+            }
+            functionSymbol->GenerateCall(emitter, genObjects, flags);
+        }
+        else
+        {
+            throw Exception("cannot take address of a function call", GetSpan());
+        }
     }
     else
     {
@@ -701,24 +714,33 @@ void BoundFunctionCall::Store(Emitter& emitter, OperationFlags flags)
         {
             emitter.SetLineNumber(GetSpan().LineNumber());
         }
-        functionSymbol->GenerateCall(emitter, genObjects, callFlags);
-        llvm::Value* ptr = emitter.Stack().Pop();
-        if ((flags & OperationFlags::leaveFirstArg) != OperationFlags::none)
+        if (functionSymbol->IsArrayElementAccess())
         {
-            emitter.SaveObjectPointer(ptr);
-        }
-        if ((flags & OperationFlags::deref) != OperationFlags::none || GetFlag(BoundExpressionFlags::deref))
-        {
-            uint8_t n = GetDerefCount(flags);
-            for (uint8_t i = 1; i < n; ++i)
-            {
-                ptr = emitter.Builder().CreateLoad(ptr);
-            }
+            functionSymbol->GenerateCall(emitter, genObjects, callFlags | OperationFlags::addr);
+            llvm::Value* ptr = emitter.Stack().Pop();
             emitter.Builder().CreateStore(value, ptr);
         }
         else
         {
-            emitter.Builder().CreateStore(emitter.Builder().CreateLoad(value), ptr);
+            functionSymbol->GenerateCall(emitter, genObjects, callFlags);
+            llvm::Value* ptr = emitter.Stack().Pop();
+            if ((flags & OperationFlags::leaveFirstArg) != OperationFlags::none)
+            {
+                emitter.SaveObjectPointer(ptr);
+            }
+            if ((flags & OperationFlags::deref) != OperationFlags::none || GetFlag(BoundExpressionFlags::deref))
+            {
+                uint8_t n = GetDerefCount(flags);
+                for (uint8_t i = 1; i < n; ++i)
+                {
+                    ptr = emitter.Builder().CreateLoad(ptr);
+                }
+                emitter.Builder().CreateStore(value, ptr);
+            }
+            else
+            {
+                emitter.Builder().CreateStore(emitter.Builder().CreateLoad(value), ptr);
+            }
         }
     }
     DestroyTemporaries(emitter);
@@ -736,6 +758,7 @@ bool BoundFunctionCall::HasValue() const
 
 bool BoundFunctionCall::IsLvalueExpression() const
 {
+    if (functionSymbol->IsArrayElementAccess()) return true;
     TypeSymbol* returnType = functionSymbol->ReturnType();
     if (returnType && returnType->GetSymbolType() != SymbolType::voidTypeSymbol)
     {

@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ArrayTypeSymbol.hpp" />
     <ClInclude Include="BasicTypeOperation.hpp" />
     <ClInclude Include="BasicTypeSymbol.hpp" />
     <ClInclude Include="ClassTemplateSpecializationSymbol.hpp" />
@@ -53,6 +54,7 @@
     <ClInclude Include="Warning.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="ArrayTypeSymbol.cpp" />
     <ClCompile Include="BasicTypeOperation.cpp" />
     <ClCompile Include="BasicTypeSymbol.cpp" />
     <ClCompile Include="ClassTemplateSpecializationSymbol.cpp" />

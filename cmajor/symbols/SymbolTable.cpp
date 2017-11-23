@@ -78,6 +78,18 @@ bool operator!=(const ClassTemplateSpecializationKey& left, const ClassTemplateS
     return !(left == right);
 }
 
+bool operator==(const ArrayKey& left, const ArrayKey& right)
+{
+    if (!TypesEqual(left.elementType, right.elementType)) return false;
+    if (left.size != right.size) return false;
+    return true;
+}
+
+bool operator!=(const ArrayKey& left, const ArrayKey& right)
+{
+    return !(left == right);
+}
+
 SymbolTable::SymbolTable() : 
     globalNs(Span(), std::u32string()), currentCompileUnit(nullptr), container(&globalNs), currentClass(nullptr), currentInterface(nullptr), mainFunctionSymbol(nullptr), 
     parameterIndex(0), declarationBlockIndex(0)
@@ -88,6 +100,12 @@ SymbolTable::SymbolTable() :
 void SymbolTable::Write(SymbolWriter& writer)
 {
     globalNs.Write(writer);
+    uint32_t na = arrayTypes.size();
+    writer.GetBinaryWriter().WriteEncodedUInt(na);
+    for (const std::unique_ptr<ArrayTypeSymbol>& arrayType : arrayTypes)
+    {
+        writer.Write(arrayType.get());
+    }
     globalNs.ComputeExportClosure();
     std::vector<TypeSymbol*> exportedDerivedTypes;
     for (const auto& derivedType : derivedTypes)
@@ -123,6 +141,12 @@ void SymbolTable::Read(SymbolReader& reader)
 {
     reader.SetSymbolTable(this);
     globalNs.Read(reader);
+    uint32_t na = reader.GetBinaryReader().ReadEncodedUInt();
+    for (uint32_t i = 0; i < na; ++i)
+    {
+        ArrayTypeSymbol* arrayTypeSymbol = reader.ReadArrayTypeSymbol(&globalNs);
+        arrayTypes.push_back(std::unique_ptr<ArrayTypeSymbol>(arrayTypeSymbol));
+    }
     uint32_t nd = reader.GetBinaryReader().ReadEncodedUInt();
     for (uint32_t i = 0; i < nd; ++i)
     {
@@ -169,6 +193,15 @@ void SymbolTable::Import(SymbolTable& symbolTable)
     {
         FunctionSymbol* function = pair.second;
         functionIdMap[function->FunctionId()] = function;
+    }
+    for (auto& arrayType : symbolTable.arrayTypes)
+    {
+        arrayType->SetSymbolTable(this);
+        arrayType->SetParent(&globalNs);
+        ArrayTypeSymbol* releasedArrayType = arrayType.release();
+        arrayTypes.push_back(std::unique_ptr<ArrayTypeSymbol>(releasedArrayType));
+        ArrayKey key(releasedArrayType->ElementType(), releasedArrayType->Size());
+        arrayTypeMap[key] = releasedArrayType;
     }
     for (auto& derivedType : symbolTable.derivedTypes)
     {
@@ -1119,6 +1152,27 @@ ClassTemplateSpecializationSymbol* SymbolTable::MakeClassTemplateSpecialization(
         classTemplateSpecialization->SetSymbolTable(this);
         classTemplateSpecializations.push_back(std::unique_ptr<ClassTemplateSpecializationSymbol>(classTemplateSpecialization));
         return classTemplateSpecialization;
+    }
+}
+
+ArrayTypeSymbol* SymbolTable::MakeArrayType(TypeSymbol* elementType, uint64_t size, const Span& span)
+{
+    ArrayKey key(elementType, size);
+    auto it = arrayTypeMap.find(key);
+    if (it != arrayTypeMap.cend())
+    {
+        ArrayTypeSymbol* arrayType = it->second;
+        return arrayType;
+    }
+    else
+    {
+        ArrayTypeSymbol* arrayType = new ArrayTypeSymbol(span, elementType->FullName() + U"[" + ToUtf32(std::to_string(size)) + U"]", elementType, size);
+        SetTypeIdFor(arrayType);
+        arrayTypeMap[key] = arrayType;
+        arrayType->SetParent(&globalNs); 
+        arrayType->SetSymbolTable(this);
+        arrayTypes.push_back(std::unique_ptr<ArrayTypeSymbol>(arrayType));
+        return arrayType;
     }
 }
 

@@ -4,6 +4,7 @@
 // =================================
 
 #include <cmajor/symbols/SymbolReader.hpp>
+#include <cmajor/symbols/ArrayTypeSymbol.hpp>
 #include <cmajor/symbols/DerivedTypeSymbol.hpp>
 #include <cmajor/symbols/ClassTemplateSpecializationSymbol.hpp>
 
@@ -26,6 +27,19 @@ Symbol* SymbolReader::ReadSymbol(Symbol* parent)
     return symbol;
 }
 
+ArrayTypeSymbol* SymbolReader::ReadArrayTypeSymbol(Symbol* parent)
+{
+    Symbol* symbol = ReadSymbol(parent);
+    if (symbol->GetSymbolType() == SymbolType::arrayTypeSymbol)
+    {
+        return static_cast<ArrayTypeSymbol*>(symbol);
+    }
+    else
+    {
+        throw std::runtime_error("internal error: array type symbol expected");
+    }
+}
+
 DerivedTypeSymbol* SymbolReader::ReadDerivedTypeSymbol(Symbol* parent)
 {
     Symbol* symbol = ReadSymbol(parent);
@@ -35,7 +49,7 @@ DerivedTypeSymbol* SymbolReader::ReadDerivedTypeSymbol(Symbol* parent)
     }
     else
     {
-        throw std::runtime_error("derived type symbol expected");
+        throw std::runtime_error("internal error: derived type symbol expected");
     }
 }
 
@@ -48,7 +62,7 @@ ClassTemplateSpecializationSymbol* SymbolReader::ReadClassTemplateSpecialization
     }
     else
     {
-        throw std::runtime_error("class template specialization symbol expected");
+        throw std::runtime_error("internal error: class template specialization symbol expected");
     }
 }
 
@@ -61,7 +75,7 @@ ParameterSymbol* SymbolReader::ReadParameterSymbol(Symbol* parent)
     }
     else
     {
-        throw std::runtime_error("parameter symbol expected");
+        throw std::runtime_error("internal error: parameter symbol expected");
     }
 }
 
