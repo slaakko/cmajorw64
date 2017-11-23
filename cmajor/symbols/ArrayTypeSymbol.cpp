@@ -344,7 +344,7 @@ ArrayTypeElementAccess::ArrayTypeElementAccess(ArrayTypeSymbol* arrayType_, cons
     indexParam->SetType(arrayType->GetSymbolTable()->GetTypeByName(U"long"));
     AddMember(indexParam);
     TypeSymbol* returnType = arrayType->ElementType();
-    if (returnType->IsClassTypeSymbol())
+    if (!returnType->IsBasicTypeSymbol() && !returnType->IsPointerType() && returnType->GetSymbolType() != SymbolType::delegateTypeSymbol)
     {
         returnType = returnType->AddLvalueReference(span_);
     }
@@ -364,7 +364,7 @@ void ArrayTypeElementAccess::GenerateCall(Emitter& emitter, std::vector<GenObjec
     elementIndeces.push_back(indexValue);
     llvm::Value* elementPtr = emitter.Builder().CreateGEP(ptr, elementIndeces);
     TypeSymbol* elementType = arrayType->ElementType();
-    if ((flags & OperationFlags::addr) == OperationFlags::none && elementType->IsBasicTypeSymbol() || elementType->IsPointerType() || elementType->GetSymbolType() == SymbolType::delegateTypeSymbol)
+    if ((flags & OperationFlags::addr) == OperationFlags::none && (elementType->IsBasicTypeSymbol() || elementType->IsPointerType() || elementType->GetSymbolType() == SymbolType::delegateTypeSymbol))
     {
         llvm::Value* elementValue = emitter.Builder().CreateLoad(elementPtr);
         emitter.Stack().Push(elementValue);
