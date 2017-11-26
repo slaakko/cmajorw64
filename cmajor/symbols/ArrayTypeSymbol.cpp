@@ -354,7 +354,7 @@ ArrayTypeElementAccess::ArrayTypeElementAccess(ArrayTypeSymbol* arrayType_, cons
 
 void ArrayTypeElementAccess::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags)
 {
-    Assert(genObjects.size() >= 2, "element access needs two objects");
+    Assert(genObjects.size() == 2, "element access needs two objects");
     genObjects[0]->Load(emitter, OperationFlags::addr);
     llvm::Value* ptr = emitter.Stack().Pop();
     genObjects[1]->Load(emitter, OperationFlags::none);

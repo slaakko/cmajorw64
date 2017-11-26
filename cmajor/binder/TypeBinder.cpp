@@ -540,7 +540,11 @@ void TypeBinder::Visit(MemberFunctionNode& memberFunctionNode)
     }
     else
     {
-        if (!memberFunctionSymbol->IsAbstract() && !memberFunctionSymbol->IsDefault() && !memberFunctionSymbol->IsSuppressed() && !memberFunctionSymbol->IsTemplateSpecialization())
+        if (memberFunctionSymbol->Parent()->GetSymbolType() != SymbolType::interfaceTypeSymbol && 
+            !memberFunctionSymbol->IsAbstract() && 
+            !memberFunctionSymbol->IsDefault() && 
+            !memberFunctionSymbol->IsSuppressed() && 
+            !memberFunctionSymbol->IsTemplateSpecialization())
         {
             throw Exception("member function has no body", memberFunctionSymbol->GetSpan());
         }

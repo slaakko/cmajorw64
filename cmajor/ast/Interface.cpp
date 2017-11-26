@@ -9,11 +9,11 @@
 
 namespace cmajor { namespace ast {
 
-InterfaceNode::InterfaceNode(const Span& span_) : Node(NodeType::interfaceNode, span_), id(), members()
+InterfaceNode::InterfaceNode(const Span& span_) : Node(NodeType::interfaceNode, span_), specifiers(), id(), members()
 {
 }
 
-InterfaceNode::InterfaceNode(const Span& span_, Specifiers specifiers_, IdentifierNode* id_) : Node(NodeType::interfaceNode, span_), id(id_), members()
+InterfaceNode::InterfaceNode(const Span& span_, Specifiers specifiers_, IdentifierNode* id_) : Node(NodeType::interfaceNode, span_), specifiers(specifiers_), id(id_), members()
 {
     id->SetParent(this);
 }

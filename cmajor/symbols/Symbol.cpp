@@ -51,7 +51,7 @@ const char* symbolTypeStr[uint8_t(SymbolType::maxSymbol)] =
     "delegateTypeDefaultConstructor", "delegateTypeCopyConstructor", "delegateTypeMoveConstructor", "delegateTypeCopyAssignment", "delegateTypeMoveAssignment", "delegateTypeReturn", 
     "delegateTypeEquality", "functionToDelegateSymbol",
     "classDelegateTypeDefaultConstructor", "classDelegateTypeCopyConstructor", "classDelegateTypeMoveConstructor", "classDelegateTypeCopyAssignment", "classDelegateTypeMoveAssignment",
-    "classDelegateTypeEquality", "memberFunctionToClassDelegateSymbol",
+    "classDelegateTypeEquality", "memberFunctionToClassDelegateSymbol", 
     "namespaceTypeSymbol", "functionGroupTypeSymbol", "memberExpressionTypeSymbol", "valueSymbol"
 };
 

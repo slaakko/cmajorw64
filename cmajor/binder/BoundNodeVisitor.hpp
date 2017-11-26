@@ -49,6 +49,7 @@ class BoundReferenceToPointerExpression;
 class BoundFunctionCall;
 class BoundDelegateCall;
 class BoundClassDelegateCall;
+class BoundInterfaceCall;
 class BoundConversion;
 class BoundConstructExpression;
 class BoundConstructAndReturnTemporaryExpression;
@@ -109,6 +110,7 @@ public:
     virtual void Visit(BoundFunctionCall& boundFunctionCall) {}
     virtual void Visit(BoundDelegateCall& boundDelegateCall) {}
     virtual void Visit(BoundClassDelegateCall& boundClassDelegateCall) {}
+    virtual void Visit(BoundInterfaceCall& boundInterfaceCall) {}
     virtual void Visit(BoundConversion& boundConversion) {}
     virtual void Visit(BoundConstructExpression& boundConstructExpression) {}
     virtual void Visit(BoundConstructAndReturnTemporaryExpression& boundConstructAndReturnTemporaryExpression) {}

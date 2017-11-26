@@ -12,6 +12,7 @@
 #include <cmajor/binder/TypeResolver.hpp>
 #include <cmajor/binder/Access.hpp>
 #include <cmajor/symbols/ClassTypeSymbol.hpp>
+#include <cmajor/symbols/InterfaceTypeSymbol.hpp>
 #include <cmajor/symbols/ConstantSymbol.hpp>
 #include <cmajor/symbols/EnumSymbol.hpp>
 #include <cmajor/symbols/TypedefSymbol.hpp>
@@ -269,6 +270,12 @@ void ExpressionBinder::BindSymbol(Symbol* symbol)
         {
             ClassGroupTypeSymbol* classGroupTypeSymbol = static_cast<ClassGroupTypeSymbol*>(symbol);
             expression.reset(new BoundTypeExpression(span, classGroupTypeSymbol));
+            break;
+        }
+        case SymbolType::interfaceTypeSymbol:
+        {
+            InterfaceTypeSymbol* interfaceTypeSymbol = static_cast<InterfaceTypeSymbol*>(symbol); 
+            expression.reset(new BoundTypeExpression(span, interfaceTypeSymbol));
             break;
         }
         case SymbolType::delegateTypeSymbol:
@@ -870,7 +877,30 @@ void ExpressionBinder::Visit(DotNode& dotNode)
         }
         else if (type->GetSymbolType() == SymbolType::interfaceTypeSymbol)
         {
-            throw std::runtime_error("not implemented yet");
+            InterfaceTypeSymbol* interfaceType = static_cast<InterfaceTypeSymbol*>(type->BaseType());
+            ContainerScope* scope = interfaceType->GetContainerScope();
+            std::u32string name = dotNode.MemberId()->Str();
+            Symbol* symbol = scope->Lookup(name, ScopeLookup::this_);
+            if (symbol)
+            {
+                std::unique_ptr<BoundExpression> interfacePtr;
+                interfacePtr.reset(expression.release());
+                BindSymbol(symbol);
+                if (expression->GetBoundNodeType() == BoundNodeType::boundFunctionGroupExpression)
+                {
+                    BoundFunctionGroupExpression* bfg = static_cast<BoundFunctionGroupExpression*>(expression.get());
+                    BoundMemberExpression* bme = new BoundMemberExpression(dotNode.GetSpan(), std::unique_ptr<BoundExpression>(interfacePtr.release()), std::move(expression));
+                    expression.reset(bme);
+                }
+                else 
+                {
+                    throw Exception("symbol '" + ToUtf8(name) + "' does not denote a function group", dotNode.MemberId()->GetSpan());
+                }
+            }
+            else
+            {
+                throw Exception("symbol '" + ToUtf8(name) + "' not found from interface '" + ToUtf8(interfaceType->FullName()) + "'", dotNode.MemberId()->GetSpan());
+            }
         }
         else if (type->GetSymbolType() == SymbolType::enumTypeSymbol)
         {
@@ -1457,6 +1487,19 @@ void ExpressionBinder::Visit(InvokeNode& invokeNode)
                 functionScopeLookups.push_back(FunctionScopeLookup(ScopeLookup::this_and_base, bme->ClassPtr()->GetType()->BaseType()->ClassInterfaceOrNsScope()));
             }
             arguments.push_back(std::unique_ptr<BoundExpression>(bme->ReleaseClassPtr()));
+            if (arguments.front()->GetType()->PlainType(span)->GetSymbolType() == SymbolType::interfaceTypeSymbol)
+            {
+                if (arguments.front()->GetType()->IsReferenceType())
+                {
+                    TypeSymbol* type = arguments.front()->GetType()->RemoveReference(span)->AddPointer(span);
+                    arguments[0].reset(new BoundReferenceToPointerExpression(std::move(arguments[0]), type));
+                }
+                else
+                {
+                    TypeSymbol* type = arguments.front()->GetType()->AddPointer(span);
+                    arguments[0].reset(new BoundAddressOfExpression(std::move(arguments[0]), type));
+                }
+            }
         }
         else
         {

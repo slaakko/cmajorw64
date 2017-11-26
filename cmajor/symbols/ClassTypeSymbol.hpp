@@ -159,6 +159,8 @@ public:
     llvm::Value* VmtObject(Emitter& emitter, bool create);
     llvm::Type* VmtPtrType(Emitter& emitter);
     const std::string& VmtObjectName();
+    const std::string& ImtArrayObjectName();
+    std::string ImtObjectName(int index);
     int32_t VmtPtrIndex() const { return vmtPtrIndex; }
     ClassTypeSymbol* VmtPtrHolderClass();
     llvm::Value* StaticObject(Emitter& emitter, bool create);
@@ -199,10 +201,13 @@ private:
     uint32_t astNodesPos;
     std::string filePathReadFrom;
     std::string vmtObjectName;
+    std::string itabsArrayObjectName;
     llvm::StructType* staticObjectType;
     std::string staticObjectName;
     ClassTemplateSpecializationSymbol* prototype;
     void InitVmt(std::vector<FunctionSymbol*>& vmtToInit);
+    llvm::Value* CreateImt(Emitter& emitter, int index);
+    llvm::Value* CreateImts(Emitter& emitter);
 };
 
 } } // namespace cmajor::symbols

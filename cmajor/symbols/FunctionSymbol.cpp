@@ -1033,17 +1033,25 @@ llvm::FunctionType* FunctionSymbol::IrType(Emitter& emitter)
         {
             retType = returnType->IrType(emitter);
         }
+        bool interfaceMemFun = Parent()->GetSymbolType() == SymbolType::interfaceTypeSymbol;
         std::vector<llvm::Type*> paramTypes;
         int np = parameters.size();
         for (int i = 0; i < np; ++i)
         {
-            ParameterSymbol* parameter = parameters[i];
-            TypeSymbol* paramType = parameter->GetType();
-            if (paramType->IsClassTypeSymbol() || paramType->GetSymbolType() == SymbolType::classDelegateTypeSymbol)
+            if (i == 0 && interfaceMemFun)
             {
-                paramType = paramType->AddConst(GetSpan())->AddLvalueReference(GetSpan());
+                paramTypes.push_back(emitter.Builder().getInt8PtrTy());
             }
-            paramTypes.push_back(paramType->IrType(emitter));
+            else
+            {
+                ParameterSymbol* parameter = parameters[i];
+                TypeSymbol* paramType = parameter->GetType();
+                if (paramType->IsClassTypeSymbol() || paramType->GetSymbolType() == SymbolType::classDelegateTypeSymbol)
+                {
+                    paramType = paramType->AddConst(GetSpan())->AddLvalueReference(GetSpan());
+                }
+                paramTypes.push_back(paramType->IrType(emitter));
+            }
         }
         if (returnParam)
         {

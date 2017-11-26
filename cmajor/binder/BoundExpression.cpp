@@ -11,6 +11,7 @@
 #include <cmajor/symbols/Exception.hpp>
 #include <cmajor/symbols/EnumSymbol.hpp>
 #include <cmajor/symbols/ClassTypeSymbol.hpp>
+#include <cmajor/symbols/InterfaceTypeSymbol.hpp>
 #include <cmajor/ir/Emitter.hpp>
 #include <cmajor/util/Unicode.hpp>
 #include <llvm/IR/Module.h>
@@ -675,7 +676,16 @@ void BoundFunctionCall::Load(Emitter& emitter, OperationFlags flags)
         {
             emitter.SetLineNumber(GetSpan().LineNumber());
         }
-        functionSymbol->GenerateCall(emitter, genObjects, callFlags);
+        if (functionSymbol->Parent()->GetSymbolType() == SymbolType::interfaceTypeSymbol)
+        {
+            InterfaceTypeSymbol* interfaceType = static_cast<InterfaceTypeSymbol*>(functionSymbol->Parent());
+            MemberFunctionSymbol* interfaceMemberFunction = static_cast<MemberFunctionSymbol*>(functionSymbol);
+            interfaceType->GenerateCall(emitter, genObjects, callFlags, interfaceMemberFunction);
+        }
+        else
+        {
+            functionSymbol->GenerateCall(emitter, genObjects, callFlags);
+        }
         if ((flags & OperationFlags::deref) != OperationFlags::none)
         {
             llvm::Value* value = emitter.Stack().Pop();
@@ -1138,6 +1148,7 @@ void BoundConversion::Store(Emitter& emitter, OperationFlags flags)
 bool BoundConversion::IsLvalueExpression() const
 {
     if (conversionFun->GetSymbolType() == SymbolType::conversionFunctionSymbol) return true;
+    if (conversionFun->IsClassToInterfaceTypeConversion()) return true;
     return false;
 }
 

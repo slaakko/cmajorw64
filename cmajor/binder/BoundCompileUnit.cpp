@@ -14,6 +14,7 @@
 #include <cmajor/symbols/ClassTypeSymbol.hpp>
 #include <cmajor/symbols/GlobalFlags.hpp>
 #include <cmajor/symbols/DelegateSymbol.hpp>
+#include <cmajor/symbols/InterfaceTypeSymbol.hpp>
 #include <cmajor/util/Path.hpp>
 #include <boost/filesystem.hpp>
 
@@ -407,6 +408,28 @@ FunctionSymbol* BoundCompileUnit::GetConversion(TypeSymbol* sourceType, TypeSymb
                             conversion = memberFunctionToClassDelegateConversion.get();
                             conversionTable.AddConversion(conversion);
                             conversionTable.AddGeneratedConversion(std::move(memberFunctionToClassDelegateConversion));
+                            return conversion;
+                        }
+                    }
+                }
+            }
+            else if (targetType->PlainType(span)->GetSymbolType() == SymbolType::interfaceTypeSymbol)
+            {
+                InterfaceTypeSymbol* targetInterfaceType = static_cast<InterfaceTypeSymbol*>(targetType->PlainType(span));
+                if (sourceType->IsClassTypeSymbol()) 
+                {
+                    ClassTypeSymbol* sourceClassType = static_cast<ClassTypeSymbol*>(sourceType);
+                    int32_t n = sourceClassType->ImplementedInterfaces().size();
+                    for (int32_t i = 0; i < n; ++i)
+                    {
+                        InterfaceTypeSymbol* sourceInterfaceType = sourceClassType->ImplementedInterfaces()[i];
+                        if (TypesEqual(targetInterfaceType, sourceInterfaceType))
+                        {
+                            LocalVariableSymbol* temporaryInterfaceObjectVar = currentFunction->GetFunctionSymbol()->CreateTemporary(targetInterfaceType, span);
+                            std::unique_ptr<FunctionSymbol> classToInterfaceConversion(new ClassToInterfaceConversion(sourceClassType, targetInterfaceType, temporaryInterfaceObjectVar, i, span));
+                            conversion = classToInterfaceConversion.get();
+                            conversionTable.AddConversion(conversion);
+                            conversionTable.AddGeneratedConversion(std::move(classToInterfaceConversion));
                             return conversion;
                         }
                     }

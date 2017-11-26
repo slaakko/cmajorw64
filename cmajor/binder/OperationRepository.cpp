@@ -14,6 +14,7 @@
 #include <cmajor/symbols/BasicTypeOperation.hpp>
 #include <cmajor/symbols/Exception.hpp>
 #include <cmajor/symbols/ClassTypeSymbol.hpp>
+#include <cmajor/symbols/InterfaceTypeSymbol.hpp>
 #include <cmajor/ast/Identifier.hpp>
 #include <cmajor/ast/Expression.hpp>
 #include <cmajor/util/Unicode.hpp>
@@ -1656,6 +1657,185 @@ void ArrayElementAccessOperation::CollectViableFunctions(ContainerScope* contain
         functions.push_back(std::unique_ptr<FunctionSymbol>(function));
     }
     viableFunctions.insert(function);
+}
+
+class InterfaceDefaultConstructorOperation : public Operation
+{
+public:
+    InterfaceDefaultConstructorOperation(BoundCompileUnit& boundCompileUnit_);
+    void CollectViableFunctions(ContainerScope* containerScope_, const std::vector<std::unique_ptr<BoundExpression>>& arguments, BoundFunction* currentFunction,
+        std::unordered_set<FunctionSymbol*>& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span) override;
+private:
+    std::unordered_map<TypeSymbol*, FunctionSymbol*> functionMap;
+    std::vector<std::unique_ptr<FunctionSymbol>> functions;
+};
+
+InterfaceDefaultConstructorOperation::InterfaceDefaultConstructorOperation(BoundCompileUnit& boundCompileUnit_) : Operation(U"@constructor", 1, boundCompileUnit_)
+{
+}
+
+void InterfaceDefaultConstructorOperation::CollectViableFunctions(ContainerScope* containerScope, const std::vector<std::unique_ptr<BoundExpression>>& arguments, BoundFunction* currentFunction,
+    std::unordered_set<FunctionSymbol*>& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span)
+{
+    TypeSymbol* type = arguments[0]->GetType();
+    if (type->PointerCount() != 1 || type->RemovePointer(span)->GetSymbolType() != SymbolType::interfaceTypeSymbol) return;
+    InterfaceTypeSymbol* interfaceType = static_cast<InterfaceTypeSymbol*>(type->RemovePointer(span));
+    FunctionSymbol* function = functionMap[interfaceType];
+    if (!function)
+    {
+        function = new InterfaceTypeDefaultConstructor(interfaceType, span);
+        function->SetSymbolTable(GetSymbolTable());
+        function->SetParent(&GetSymbolTable()->GlobalNs());
+        functionMap[interfaceType] = function;
+        functions.push_back(std::unique_ptr<FunctionSymbol>(function));
+    }
+    viableFunctions.insert(function);
+}
+
+class InterfaceCopyConstructorOperation : public Operation
+{
+public:
+    InterfaceCopyConstructorOperation(BoundCompileUnit& boundCompileUnit_);
+    void CollectViableFunctions(ContainerScope* containerScope_, const std::vector<std::unique_ptr<BoundExpression>>& arguments, BoundFunction* currentFunction,
+        std::unordered_set<FunctionSymbol*>& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span) override;
+private:
+    std::unordered_map<TypeSymbol*, FunctionSymbol*> functionMap;
+    std::vector<std::unique_ptr<FunctionSymbol>> functions;
+};
+
+InterfaceCopyConstructorOperation::InterfaceCopyConstructorOperation(BoundCompileUnit& boundCompileUnit_) : Operation(U"@constructor", 2, boundCompileUnit_)
+{
+}
+
+void InterfaceCopyConstructorOperation::CollectViableFunctions(ContainerScope* containerScope, const std::vector<std::unique_ptr<BoundExpression>>& arguments, BoundFunction* currentFunction,
+    std::unordered_set<FunctionSymbol*>& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span)
+{
+    TypeSymbol* type = arguments[0]->GetType();
+    if (type->PointerCount() != 1 || type->RemovePointer(span)->GetSymbolType() != SymbolType::interfaceTypeSymbol) return;
+    InterfaceTypeSymbol* interfaceType = static_cast<InterfaceTypeSymbol*>(type->RemovePointer(span));
+    if (!TypesEqual(arguments[1]->GetType(), interfaceType->AddRvalueReference(span)) && !arguments[1]->GetFlag(BoundExpressionFlags::bindToRvalueReference) &&
+        (TypesEqual(arguments[1]->GetType()->PlainType(span), interfaceType) || arguments[1]->GetType()->PlainType(span)->IsClassTypeSymbol()))
+    {
+        FunctionSymbol* function = functionMap[interfaceType];
+        if (!function)
+        {
+            function = new InterfaceTypeCopyConstructor(interfaceType, span);
+            function->SetSymbolTable(GetSymbolTable());
+            function->SetParent(&GetSymbolTable()->GlobalNs());
+            functionMap[interfaceType] = function;
+            functions.push_back(std::unique_ptr<FunctionSymbol>(function));
+        }
+        viableFunctions.insert(function);
+    }
+}
+
+class InterfaceMoveConstructorOperation : public Operation
+{
+public:
+    InterfaceMoveConstructorOperation(BoundCompileUnit& boundCompileUnit_);
+    void CollectViableFunctions(ContainerScope* containerScope_, const std::vector<std::unique_ptr<BoundExpression>>& arguments, BoundFunction* currentFunction,
+        std::unordered_set<FunctionSymbol*>& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span) override;
+private:
+    std::unordered_map<TypeSymbol*, FunctionSymbol*> functionMap;
+    std::vector<std::unique_ptr<FunctionSymbol>> functions;
+};
+
+InterfaceMoveConstructorOperation::InterfaceMoveConstructorOperation(BoundCompileUnit& boundCompileUnit_) : Operation(U"@constructor", 2, boundCompileUnit_)
+{
+}
+
+void InterfaceMoveConstructorOperation::CollectViableFunctions(ContainerScope* containerScope, const std::vector<std::unique_ptr<BoundExpression>>& arguments, BoundFunction* currentFunction,
+    std::unordered_set<FunctionSymbol*>& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span)
+{
+    TypeSymbol* type = arguments[0]->GetType();
+    if (type->PointerCount() != 1 || type->RemovePointer(span)->GetSymbolType() != SymbolType::interfaceTypeSymbol) return;
+    InterfaceTypeSymbol* interfaceType = static_cast<InterfaceTypeSymbol*>(type->RemovePointer(span));
+    if (TypesEqual(arguments[1]->GetType(), interfaceType->AddRvalueReference(span)) || arguments[1]->GetFlag(BoundExpressionFlags::bindToRvalueReference))
+    {
+        FunctionSymbol* function = functionMap[interfaceType];
+        if (!function)
+        {
+            function = new InterfaceTypeMoveConstructor(interfaceType, span);
+            function->SetSymbolTable(GetSymbolTable());
+            function->SetParent(&GetSymbolTable()->GlobalNs());
+            functionMap[interfaceType] = function;
+            functions.push_back(std::unique_ptr<FunctionSymbol>(function));
+        }
+        viableFunctions.insert(function);
+    }
+}
+
+class InterfaceCopyAssignmentOperation : public Operation
+{
+public:
+    InterfaceCopyAssignmentOperation(BoundCompileUnit& boundCompileUnit_);
+    void CollectViableFunctions(ContainerScope* containerScope_, const std::vector<std::unique_ptr<BoundExpression>>& arguments, BoundFunction* currentFunction,
+        std::unordered_set<FunctionSymbol*>& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span) override;
+private:
+    std::unordered_map<TypeSymbol*, FunctionSymbol*> functionMap;
+    std::vector<std::unique_ptr<FunctionSymbol>> functions;
+};
+
+InterfaceCopyAssignmentOperation::InterfaceCopyAssignmentOperation(BoundCompileUnit& boundCompileUnit_) : Operation(U"operator=", 2, boundCompileUnit_)
+{
+}
+
+void InterfaceCopyAssignmentOperation::CollectViableFunctions(ContainerScope* containerScope, const std::vector<std::unique_ptr<BoundExpression>>& arguments, BoundFunction* currentFunction,
+    std::unordered_set<FunctionSymbol*>& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span)
+{
+    TypeSymbol* type = arguments[0]->GetType();
+    if (type->PointerCount() != 1 || type->RemovePointer(span)->GetSymbolType() != SymbolType::interfaceTypeSymbol) return;
+    InterfaceTypeSymbol* interfaceType = static_cast<InterfaceTypeSymbol*>(type->RemovePointer(span));
+    if (!TypesEqual(arguments[1]->GetType(), interfaceType->AddRvalueReference(span)) && !arguments[1]->GetFlag(BoundExpressionFlags::bindToRvalueReference) &&
+        TypesEqual(arguments[1]->GetType()->PlainType(span), interfaceType))
+    {
+        FunctionSymbol* function = functionMap[interfaceType];
+        if (!function)
+        {
+            function = new InterfaceTypeCopyAssignment(interfaceType, span);
+            function->SetSymbolTable(GetSymbolTable());
+            function->SetParent(&GetSymbolTable()->GlobalNs());
+            functionMap[interfaceType] = function;
+            functions.push_back(std::unique_ptr<FunctionSymbol>(function));
+        }
+        viableFunctions.insert(function);
+    }
+}
+
+class InterfaceMoveAssignmentOperation : public Operation
+{
+public:
+    InterfaceMoveAssignmentOperation(BoundCompileUnit& boundCompileUnit_);
+    void CollectViableFunctions(ContainerScope* containerScope_, const std::vector<std::unique_ptr<BoundExpression>>& arguments, BoundFunction* currentFunction,
+        std::unordered_set<FunctionSymbol*>& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span) override;
+private:
+    std::unordered_map<TypeSymbol*, FunctionSymbol*> functionMap;
+    std::vector<std::unique_ptr<FunctionSymbol>> functions;
+};
+
+InterfaceMoveAssignmentOperation::InterfaceMoveAssignmentOperation(BoundCompileUnit& boundCompileUnit_) : Operation(U"operator=", 2, boundCompileUnit_)
+{
+}
+
+void InterfaceMoveAssignmentOperation::CollectViableFunctions(ContainerScope* containerScope, const std::vector<std::unique_ptr<BoundExpression>>& arguments, BoundFunction* currentFunction,
+    std::unordered_set<FunctionSymbol*>& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span)
+{
+    TypeSymbol* type = arguments[0]->GetType();
+    if (type->PointerCount() != 1 || type->RemovePointer(span)->GetSymbolType() != SymbolType::interfaceTypeSymbol) return;
+    InterfaceTypeSymbol* interfaceType = static_cast<InterfaceTypeSymbol*>(type->RemovePointer(span));
+    if (TypesEqual(arguments[1]->GetType(), interfaceType->AddRvalueReference(span)) || arguments[1]->GetFlag(BoundExpressionFlags::bindToRvalueReference))
+    {
+        FunctionSymbol* function = functionMap[interfaceType];
+        if (!function)
+        {
+            function = new InterfaceTypeMoveAssignment(interfaceType, span);
+            function->SetSymbolTable(GetSymbolTable());
+            function->SetParent(&GetSymbolTable()->GlobalNs());
+            functionMap[interfaceType] = function;
+            functions.push_back(std::unique_ptr<FunctionSymbol>(function));
+        }
+        viableFunctions.insert(function);
+    }
 }
 
 class ClassDefaultConstructor : public ConstructorSymbol
@@ -3394,6 +3574,11 @@ OperationRepository::OperationRepository(BoundCompileUnit& boundCompileUnit_) : 
     Add(new ArrayCopyAssignmentOperation(boundCompileUnit));
     Add(new ArrayMoveAssignmentOperation(boundCompileUnit));
     Add(new ArrayElementAccessOperation(boundCompileUnit));
+    Add(new InterfaceDefaultConstructorOperation(boundCompileUnit));
+    Add(new InterfaceCopyConstructorOperation(boundCompileUnit));
+    Add(new InterfaceMoveConstructorOperation(boundCompileUnit));
+    Add(new InterfaceCopyAssignmentOperation(boundCompileUnit));
+    Add(new InterfaceMoveAssignmentOperation(boundCompileUnit));
 }
 
 void OperationRepository::Add(Operation* operation)

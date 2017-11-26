@@ -1083,11 +1083,21 @@ const std::string& ClassTypeSymbol::VmtObjectName()
     {
         vmtObjectName = "vmt_" + ToUtf8(SimpleName()) + "_" + GetSha1MessageDigest(ToUtf8(FullNameWithSpecifiers()));
     }
-    if (vmtObjectName == "vmt_UnaryFun_bool_bool_EFCF6DDEE35D2662DEB56AF8F9EE7C4B2C88616B")
-    {
-        int x = 0;
-    }
     return vmtObjectName;
+}
+
+const std::string& ClassTypeSymbol::ImtArrayObjectName()
+{
+    if (itabsArrayObjectName.empty())
+    {
+        itabsArrayObjectName = "imts_" + ToUtf8(SimpleName()) + "_" + GetSha1MessageDigest(ToUtf8(FullNameWithSpecifiers()));
+    }
+    return itabsArrayObjectName;
+}
+
+std::string ClassTypeSymbol::ImtObjectName(int index)
+{ 
+    return "imt_" + std::to_string(index) + "_" + ToUtf8(SimpleName()) + "_" + GetSha1MessageDigest(ToUtf8(FullNameWithSpecifiers()));
 }
 
 ClassTypeSymbol* ClassTypeSymbol::VmtPtrHolderClass() 
@@ -1118,6 +1128,46 @@ llvm::Type* ClassTypeSymbol::VmtPtrType(Emitter& emitter)
     return llvm::PointerType::get(llvm::ArrayType::get(emitter.Builder().getInt8PtrTy(), vmt.size() + functionVmtIndexOffset), 0);
 }
 
+llvm::Value* ClassTypeSymbol::CreateImt(Emitter& emitter, int index)
+{
+    std::vector<FunctionSymbol*>& imt = imts[index];
+    std::string imtObjectName = ImtObjectName(index);
+    llvm::ArrayType* imtType = llvm::ArrayType::get(emitter.Builder().getInt8PtrTy(), imt.size());
+    llvm::Constant* imtObject = emitter.Module()->getOrInsertGlobal(imtObjectName, imtType);
+    llvm::Comdat* comdat = emitter.Module()->getOrInsertComdat(imtObjectName);
+    llvm::GlobalVariable* imtObjectGlobal = llvm::cast<llvm::GlobalVariable>(imtObject);
+    imtObjectGlobal->setComdat(comdat);
+    std::vector<llvm::Constant*> irImt;
+    int n = imt.size();
+    for (int i = 0; i < n; ++i)
+    {
+        FunctionSymbol* memFun = imt[i];
+        llvm::Function* interfaceFun = llvm::cast<llvm::Function>(emitter.Module()->getOrInsertFunction(ToUtf8(memFun->MangledName()), memFun->IrType(emitter)));
+        irImt.push_back(llvm::cast<llvm::Constant>(emitter.Builder().CreateBitCast(interfaceFun, emitter.Builder().getInt8PtrTy())));
+    }
+    imtObjectGlobal->setInitializer(llvm::ConstantArray::get(imtType, irImt));
+    return imtObject;
+}
+
+llvm::Value* ClassTypeSymbol::CreateImts(Emitter& emitter)
+{
+    std::string imtArrayObjectName = ImtArrayObjectName();
+    llvm::ArrayType* imtsArrayType = llvm::ArrayType::get(emitter.Builder().getInt8PtrTy(), implementedInterfaces.size());
+    llvm::Constant* imtsArrayObject = emitter.Module()->getOrInsertGlobal(itabsArrayObjectName, imtsArrayType);
+    llvm::Comdat* comdat = emitter.Module()->getOrInsertComdat(itabsArrayObjectName);
+    llvm::GlobalVariable* imtsArrayObjectGlobal = llvm::cast<llvm::GlobalVariable>(imtsArrayObject);
+    imtsArrayObjectGlobal->setComdat(comdat);
+    std::vector<llvm::Constant*> imtsArray;
+    int n = imts.size();
+    for (int i = 0; i < n; ++i)
+    {
+        llvm::Value* irImt = CreateImt(emitter, i);
+        imtsArray.push_back(llvm::cast<llvm::Constant>(emitter.Builder().CreateBitCast(irImt, emitter.Builder().getInt8PtrTy())));
+    }
+    imtsArrayObjectGlobal->setInitializer(llvm::ConstantArray::get(imtsArrayType, imtsArray));
+    return imtsArrayObject;
+}
+
 llvm::Value* ClassTypeSymbol::VmtObject(Emitter& emitter, bool create)
 {
     if (!IsPolymorphic()) return nullptr;
@@ -1134,13 +1184,20 @@ llvm::Value* ClassTypeSymbol::VmtObject(Emitter& emitter, bool create)
         GetModule()->AddExportedData(vmtObjectName);
         comdat->setSelectionKind(llvm::Comdat::SelectionKind::Any);
         llvm::GlobalVariable* vmtObjectGlobal = llvm::cast<llvm::GlobalVariable>(vmtObject);
-        //vmtObjectGlobal->setDLLStorageClass(llvm::GlobalValue::DLLExportStorageClass);
         vmtObjectGlobal->setComdat(comdat);
         std::vector<llvm::Constant*> vmtArray;
         vmtArray.push_back(llvm::Constant::getNullValue(emitter.Builder().getInt8PtrTy()));
         llvm::Value* className = emitter.Builder().CreateGlobalStringPtr(ToUtf8(FullName()));
         vmtArray.push_back(llvm::cast<llvm::Constant>(emitter.Builder().CreateBitCast(className, emitter.Builder().getInt8PtrTy())));
-        vmtArray.push_back(llvm::Constant::getNullValue(emitter.Builder().getInt8PtrTy()));
+        if (!implementedInterfaces.empty())
+        {
+            llvm::Value* itabsArrayObject = CreateImts(emitter);
+            vmtArray.push_back(llvm::cast<llvm::Constant>(emitter.Builder().CreateBitCast(itabsArrayObject, emitter.Builder().getInt8PtrTy())));
+        }
+        else
+        {
+            vmtArray.push_back(llvm::Constant::getNullValue(emitter.Builder().getInt8PtrTy()));
+        }
         int n = vmt.size();
         for (int i = 0; i < n; ++i)
         {

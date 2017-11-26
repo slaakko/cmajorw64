@@ -55,7 +55,7 @@ enum class SymbolType : uint8_t
     delegateTypeDefaultConstructor, delegateTypeCopyConstructor, delegateTypeMoveConstructor, delegateTypeCopyAssignment, delegateTypeMoveAssignment, delegateTypeReturn, delegateTypeEquality,
     functionToDelegateSymbol,
     classDelegateTypeDefaultConstructor, classDelegateTypeCopyConstructor, classDelegateTypeMoveConstructor, classDelegateTypeCopyAssignment, classDelegateTypeMoveAssignment, 
-    classDelegateTypeEquality, memberFunctionToClassDelegateSymbol,
+    classDelegateTypeEquality, memberFunctionToClassDelegateSymbol, 
     namespaceTypeSymbol, functionGroupTypeSymbol, memberExpressionTypeSymbol, valueSymbol,
     maxSymbol
 };
