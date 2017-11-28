@@ -478,6 +478,11 @@ void BoundCompileUnit::GenerateCopyConstructorFor(ClassTypeSymbol* classTypeSymb
     operationRepository.GenerateCopyConstructorFor(classTypeSymbol, containerScope, currentFunction, span);
 }
 
+void BoundCompileUnit::GenerateCopyConstructorFor(InterfaceTypeSymbol* interfaceTypeSymbol, ContainerScope* containerScope, BoundFunction* currentFunction, const Span& span)
+{
+    operationRepository.GenerateCopyConstructorFor(interfaceTypeSymbol, containerScope, currentFunction, span);
+}
+
 int BoundCompileUnit::Install(const std::string& str)
 {
     return utf8StringRepository.Install(str);

@@ -169,7 +169,7 @@ public:
     TypeSymbol* ReturnType() const { return returnType; }
     ParameterSymbol* ReturnParam() { return returnParam.get(); }
     void SetReturnParam(ParameterSymbol* returnParam_);
-    bool ReturnsClassOrClassDelegateByValue() const;
+    bool ReturnsClassInterfaceOrClassDelegateByValue() const;
     bool IsFunctionTemplate() const { return !templateParameters.empty(); }
     void CloneUsingNodes(const std::vector<Node*>& usingNodes_);
     LocalVariableSymbol* CreateTemporary(TypeSymbol* type, const Span& span);

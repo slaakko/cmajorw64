@@ -11,6 +11,7 @@
 namespace cmajor { namespace symbols {
 
 class MemberFunctionSymbol;
+class InterfaceTypeCopyConstructor;
 
 class InterfaceTypeSymbol : public TypeSymbol
 {
@@ -24,9 +25,12 @@ public:
     llvm::Constant* CreateDefaultIrValue(Emitter& emitter) override;
     const std::vector<MemberFunctionSymbol*>& MemberFunctions() const { return memberFunctions; }
     void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, MemberFunctionSymbol* interfaceMemberFunction);
+    void SetCopyConstructor(InterfaceTypeCopyConstructor* copyConstructor_) { copyConstructor = copyConstructor_; }
+    InterfaceTypeCopyConstructor* CopyConstructor() { return copyConstructor; }
 private:
     std::vector<MemberFunctionSymbol*> memberFunctions;
     llvm::Type* irType;
+    InterfaceTypeCopyConstructor* copyConstructor;
 };
 
 class InterfaceTypeDefaultConstructor : public FunctionSymbol

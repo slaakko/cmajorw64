@@ -33,7 +33,7 @@ public:
     const TypeSymbol* ReturnType() const { return returnType; }
     TypeSymbol* ReturnType() { return returnType; }
     void SetReturnType(TypeSymbol* returnType_) { returnType = returnType_; }
-    bool ReturnsClassOrClassDelegateByValue() const;
+    bool ReturnsClassInterfaceOrClassDelegateByValue() const;
     void SetReturnParam(ParameterSymbol* returnParam_);
     void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags);
 private:
@@ -156,7 +156,7 @@ public:
     const TypeSymbol* ReturnType() const { return returnType; }
     TypeSymbol* ReturnType() { return returnType; }
     void SetReturnType(TypeSymbol* returnType_) { returnType = returnType_; }
-    bool ReturnsClassOrClassDelegateByValue() const;
+    bool ReturnsClassInterfaceOrClassDelegateByValue() const;
     void SetReturnParam(ParameterSymbol* returnParam_);
     DelegateTypeSymbol* DelegateType() { return delegateType; }
     ClassTypeSymbol* ObjectDelegatePairType() { Assert(objectDelegatePairType, "object delegate pair type not set");  return objectDelegatePairType; }

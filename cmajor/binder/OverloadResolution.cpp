@@ -9,6 +9,7 @@
 #include <cmajor/binder/BoundConstraint.hpp>
 #include <cmajor/binder/Concept.hpp>
 #include <cmajor/symbols/TemplateSymbol.hpp>
+#include <cmajor/symbols/InterfaceTypeSymbol.hpp>
 #include <cmajor/symbols/GlobalFlags.hpp>
 #include <cmajor/symbols/Warning.hpp>
 #include <cmajor/util/Unicode.hpp>
@@ -958,7 +959,7 @@ std::unique_ptr<BoundFunctionCall> CreateBoundFunctionCall(FunctionSymbol* bestF
                     std::unique_ptr<BoundExpression>(new BoundLocalVariable(temporary)));
                 argument.reset(conversion);
             }
-            else if (conversionFun->GetSymbolType() == SymbolType::conversionFunctionSymbol && conversionFun->ReturnsClassOrClassDelegateByValue())
+            else if (conversionFun->GetSymbolType() == SymbolType::conversionFunctionSymbol && conversionFun->ReturnsClassInterfaceOrClassDelegateByValue())
             {
                 BoundFunctionCall* conversionFunctionCall = new BoundFunctionCall(span, conversionFun);
                 conversionFunctionCall->AddArgument(std::move(argument));
@@ -1015,7 +1016,7 @@ std::unique_ptr<BoundFunctionCall> CreateBoundFunctionCall(FunctionSymbol* bestF
                 argument.reset(dereferenceExpression);
             }
         }
-        if (argument->GetType()->IsClassTypeSymbol() || argument->GetType()->GetSymbolType() == SymbolType::classDelegateTypeSymbol)
+        if (argument->GetType()->IsClassTypeSymbol() || argument->GetType()->GetSymbolType() == SymbolType::classDelegateTypeSymbol || argument->GetType()->GetSymbolType() == SymbolType::interfaceTypeSymbol)
         {
             if (argument->GetType()->IsClassTypeSymbol())
             {
@@ -1039,6 +1040,16 @@ std::unique_ptr<BoundFunctionCall> CreateBoundFunctionCall(FunctionSymbol* bestF
             }
             else if (argument->GetType()->GetSymbolType() == SymbolType::classDelegateTypeSymbol)
             {
+                TypeSymbol* type = argument->GetType()->AddConst(span)->AddLvalueReference(span);
+                argument.reset(new BoundAddressOfExpression(std::move(argument), type));
+            }
+            else if (argument->GetType()->GetSymbolType() == SymbolType::interfaceTypeSymbol)
+            {
+                InterfaceTypeSymbol* interfaceTypeSymbol = static_cast<InterfaceTypeSymbol*>(argument->GetType());
+                if (!interfaceTypeSymbol->CopyConstructor())
+                { 
+                    boundCompileUnit.GenerateCopyConstructorFor(interfaceTypeSymbol, containerScope, boundFunction, span);
+                }
                 TypeSymbol* type = argument->GetType()->AddConst(span)->AddLvalueReference(span);
                 argument.reset(new BoundAddressOfExpression(std::move(argument), type));
             }

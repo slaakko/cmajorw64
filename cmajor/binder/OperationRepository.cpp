@@ -3639,4 +3639,15 @@ void OperationRepository::GenerateCopyConstructorFor(ClassTypeSymbol* classTypeS
     }
 }
 
+void OperationRepository::GenerateCopyConstructorFor(InterfaceTypeSymbol* interfaceTypeSymbol, ContainerScope* containerScope, BoundFunction* currentFunction, const Span& span)
+{
+    std::unique_ptr<InterfaceTypeCopyConstructor> copyConstructor(new InterfaceTypeCopyConstructor(interfaceTypeSymbol, span));
+    boundCompileUnit.GetSymbolTable().SetFunctionIdFor(copyConstructor.get());
+    copyConstructor->SetCompileUnit(boundCompileUnit.GetCompileUnitNode());
+    copyConstructor->SetSymbolTable(&boundCompileUnit.GetSymbolTable());
+    copyConstructor->SetParent(interfaceTypeSymbol);
+    interfaceTypeSymbol->SetCopyConstructor(copyConstructor.get());
+    interfaceTypeSymbol->AddMember(copyConstructor.release());
+}
+
 } } // namespace cmajor::binder

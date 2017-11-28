@@ -540,7 +540,7 @@ void StatementBinder::Visit(ReturnStatementNode& returnStatementNode)
 {
     if (returnStatementNode.Expression())
     {
-        if (currentFunction->GetFunctionSymbol()->ReturnsClassOrClassDelegateByValue())
+        if (currentFunction->GetFunctionSymbol()->ReturnsClassInterfaceOrClassDelegateByValue())
         {
             std::vector<FunctionScopeLookup> classReturnLookups;
             classReturnLookups.push_back(FunctionScopeLookup(ScopeLookup::this_and_base_and_parent, containerScope));

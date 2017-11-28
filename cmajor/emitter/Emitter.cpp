@@ -10,6 +10,7 @@
 #include <cmajor/binder/BoundExpression.hpp>
 #include <cmajor/binder/BoundNodeVisitor.hpp>
 #include <cmajor/symbols/Module.hpp>
+#include <cmajor/symbols/InterfaceTypeSymbol.hpp>
 #include <cmajor/ir/Emitter.hpp>
 #include <cmajor/symbols/GlobalFlags.hpp>
 #include <cmajor/util/Unicode.hpp>
@@ -430,6 +431,19 @@ void Emitter::Visit(BoundFunction& boundFunction)
             copyCtorArgs.push_back(&argumentValue);
             copyConstructor->GenerateCall(*this, copyCtorArgs, OperationFlags::none);
         }
+        else if (parameter->GetType()->GetSymbolType() == SymbolType::interfaceTypeSymbol)
+        {
+            InterfaceTypeSymbol* interfaceType = static_cast<InterfaceTypeSymbol*>(parameter->GetType());
+            FunctionSymbol* copyConstructor = interfaceType->CopyConstructor();
+            std::vector<GenObject*> copyCtorArgs;
+            LlvmValue paramValue(parameter->IrObject());
+            paramValue.SetType(interfaceType->AddPointer(Span()));
+            copyCtorArgs.push_back(&paramValue);
+            LlvmValue argumentValue(&*it);
+            argumentValue.SetType(interfaceType->AddPointer(Span()));
+            copyCtorArgs.push_back(&argumentValue);
+            copyConstructor->GenerateCall(*this, copyCtorArgs, OperationFlags::none);
+        }
         else
         {
             builder.CreateStore(&*it, parameter->IrObject());
@@ -455,7 +469,7 @@ void Emitter::Visit(BoundFunction& boundFunction)
     if (!lastStatement || lastStatement->GetBoundNodeType() != BoundNodeType::boundReturnStatement || lastStatement->GetBoundNodeType() == BoundNodeType::boundReturnStatement && destructorCallGenerated)
     {
         CreateExitFunctionCall();
-        if (functionSymbol->ReturnType() && functionSymbol->ReturnType()->GetSymbolType() != SymbolType::voidTypeSymbol && !functionSymbol->ReturnsClassOrClassDelegateByValue())
+        if (functionSymbol->ReturnType() && functionSymbol->ReturnType()->GetSymbolType() != SymbolType::voidTypeSymbol && !functionSymbol->ReturnsClassInterfaceOrClassDelegateByValue())
         {
             llvm::Value* defaultValue = functionSymbol->ReturnType()->CreateDefaultIrValue(*this);
             builder.CreateRet(defaultValue);

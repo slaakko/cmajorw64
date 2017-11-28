@@ -14,7 +14,7 @@ namespace cmajor { namespace symbols {
 
 using namespace cmajor::unicode;
 
-InterfaceTypeSymbol::InterfaceTypeSymbol(const Span& span_, const std::u32string& name_) : TypeSymbol(SymbolType::interfaceTypeSymbol, span_, name_), irType(nullptr)
+InterfaceTypeSymbol::InterfaceTypeSymbol(const Span& span_, const std::u32string& name_) : TypeSymbol(SymbolType::interfaceTypeSymbol, span_, name_), irType(nullptr), copyConstructor(nullptr)
 {
 }
 
@@ -161,7 +161,7 @@ void InterfaceTypeSymbol::GenerateCall(Emitter& emitter, std::vector<GenObject*>
     }
     ArgVector args;
     int n = interfaceMemberFunction->Parameters().size();
-    if (interfaceMemberFunction->ReturnsClassOrClassDelegateByValue())
+    if (interfaceMemberFunction->ReturnsClassInterfaceOrClassDelegateByValue())
     {
         ++n;
     }
@@ -183,7 +183,7 @@ void InterfaceTypeSymbol::GenerateCall(Emitter& emitter, std::vector<GenObject*>
         inputs.push_back(currentPad->value);
         bundles.push_back(llvm::OperandBundleDef("funclet", inputs));
     }
-    if (interfaceMemberFunction->ReturnType()->GetSymbolType() != SymbolType::voidTypeSymbol && !interfaceMemberFunction->ReturnsClassOrClassDelegateByValue())
+    if (interfaceMemberFunction->ReturnType()->GetSymbolType() != SymbolType::voidTypeSymbol && !interfaceMemberFunction->ReturnsClassInterfaceOrClassDelegateByValue())
     {
         if (IsNothrow() || (!handlerBlock && !cleanupBlock && !newCleanupNeeded))
         {

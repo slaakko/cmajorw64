@@ -150,7 +150,7 @@ void ExpressionBinder::BindUnaryOp(BoundExpression* operand, Node& node, const s
     std::unique_ptr<BoundFunctionCall> operatorFunCall = ResolveOverload(groupName, containerScope, functionScopeLookups, arguments, boundCompileUnit, boundFunction, node.GetSpan());
     CheckAccess(boundFunction->GetFunctionSymbol(), operatorFunCall->GetFunctionSymbol());
     LocalVariableSymbol* temporary = nullptr;
-    if (operatorFunCall->GetFunctionSymbol()->ReturnsClassOrClassDelegateByValue())
+    if (operatorFunCall->GetFunctionSymbol()->ReturnsClassInterfaceOrClassDelegateByValue())
     {
         TypeSymbol* type = operatorFunCall->GetFunctionSymbol()->ReturnType();
         temporary = boundFunction->GetFunctionSymbol()->CreateTemporary(type, node.GetSpan());
@@ -228,7 +228,7 @@ void ExpressionBinder::BindBinaryOp(BoundExpression* left, BoundExpression* righ
     }
     CheckAccess(boundFunction->GetFunctionSymbol(), operatorFunCall->GetFunctionSymbol());
     LocalVariableSymbol* temporary = nullptr;
-    if (operatorFunCall->GetFunctionSymbol()->ReturnsClassOrClassDelegateByValue())
+    if (operatorFunCall->GetFunctionSymbol()->ReturnsClassInterfaceOrClassDelegateByValue())
     {
         TypeSymbol* type = operatorFunCall->GetFunctionSymbol()->ReturnType();
         temporary = boundFunction->GetFunctionSymbol()->CreateTemporary(type, node.GetSpan());
@@ -1619,7 +1619,7 @@ void ExpressionBinder::Visit(InvokeNode& invokeNode)
             delegateCall->AddArgument(std::move(argument));
         }
         LocalVariableSymbol* temporary = nullptr;
-        if (delegateTypeSymbol->ReturnsClassOrClassDelegateByValue())
+        if (delegateTypeSymbol->ReturnsClassInterfaceOrClassDelegateByValue())
         {
             TypeSymbol* type = delegateTypeSymbol->ReturnType();
             temporary = boundFunction->GetFunctionSymbol()->CreateTemporary(type, invokeNode.GetSpan());
@@ -1698,7 +1698,7 @@ void ExpressionBinder::Visit(InvokeNode& invokeNode)
             classDelegateCall->AddArgument(std::move(argument));
         }
         LocalVariableSymbol* temporary = nullptr;
-        if (classDelegateTypeSymbol->ReturnsClassOrClassDelegateByValue())
+        if (classDelegateTypeSymbol->ReturnsClassInterfaceOrClassDelegateByValue())
         {
             TypeSymbol* type = classDelegateTypeSymbol->ReturnType();
             temporary = boundFunction->GetFunctionSymbol()->CreateTemporary(type, invokeNode.GetSpan());
@@ -1830,7 +1830,7 @@ void ExpressionBinder::Visit(InvokeNode& invokeNode)
             functionCall->SetFlag(BoundExpressionFlags::virtualCall);
         }
     }
-    if (functionSymbol->ReturnsClassOrClassDelegateByValue())
+    if (functionSymbol->ReturnsClassInterfaceOrClassDelegateByValue())
     {
         TypeSymbol* type = functionSymbol->ReturnType();
         temporary = boundFunction->GetFunctionSymbol()->CreateTemporary(type, invokeNode.GetSpan());

@@ -143,7 +143,7 @@ llvm::Type* DelegateTypeSymbol::IrType(Emitter& emitter)
     if (!irType)
     {
         llvm::Type* retType = llvm::Type::getVoidTy(emitter.Context());
-        if (!returnType->IsVoidType() && !ReturnsClassOrClassDelegateByValue())
+        if (!returnType->IsVoidType() && !ReturnsClassInterfaceOrClassDelegateByValue())
         {
             retType = returnType->IrType(emitter);
         }
@@ -241,9 +241,9 @@ void DelegateTypeSymbol::SetSpecifiers(Specifiers specifiers)
     }
 }
 
-bool DelegateTypeSymbol::ReturnsClassOrClassDelegateByValue() const
+bool DelegateTypeSymbol::ReturnsClassInterfaceOrClassDelegateByValue() const
 {
-    return returnType->IsClassTypeSymbol() || returnType->GetSymbolType() == SymbolType::classDelegateTypeSymbol;
+    return returnType->IsClassTypeSymbol() || returnType->GetSymbolType() == SymbolType::classDelegateTypeSymbol || returnType->GetSymbolType() == SymbolType::interfaceTypeSymbol;
 }
 
 void DelegateTypeSymbol::SetReturnParam(ParameterSymbol* returnParam_)
@@ -266,7 +266,7 @@ void DelegateTypeSymbol::GenerateCall(Emitter& emitter, std::vector<GenObject*>&
     }
     ArgVector args;
     int n = parameters.size();
-    if (ReturnsClassOrClassDelegateByValue())
+    if (ReturnsClassInterfaceOrClassDelegateByValue())
     {
         ++n;
     }
@@ -287,7 +287,7 @@ void DelegateTypeSymbol::GenerateCall(Emitter& emitter, std::vector<GenObject*>&
         inputs.push_back(currentPad->value);
         bundles.push_back(llvm::OperandBundleDef("funclet", inputs));
     }
-    if (returnType->GetSymbolType() != SymbolType::voidTypeSymbol && !ReturnsClassOrClassDelegateByValue())
+    if (returnType->GetSymbolType() != SymbolType::voidTypeSymbol && !ReturnsClassInterfaceOrClassDelegateByValue())
     {
         if (IsNothrow() || (!handlerBlock && !cleanupBlock && !newCleanupNeeded))
         {
@@ -732,9 +732,9 @@ llvm::Constant* ClassDelegateTypeSymbol::CreateDefaultIrValue(Emitter& emitter)
     return llvm::ConstantStruct::get(llvm::cast<llvm::StructType>(IrType(emitter)), constants);
 }
 
-bool ClassDelegateTypeSymbol::ReturnsClassOrClassDelegateByValue() const
+bool ClassDelegateTypeSymbol::ReturnsClassInterfaceOrClassDelegateByValue() const
 {
-    return returnType->IsClassTypeSymbol() || returnType->GetSymbolType() == SymbolType::classDelegateTypeSymbol;
+    return returnType->IsClassTypeSymbol() || returnType->GetSymbolType() == SymbolType::classDelegateTypeSymbol || returnType->GetSymbolType() == SymbolType::interfaceTypeSymbol;
 }
 
 void ClassDelegateTypeSymbol::SetReturnParam(ParameterSymbol* returnParam_)
