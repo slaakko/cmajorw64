@@ -18,22 +18,34 @@ TemplateParameterSymbol::TemplateParameterSymbol(const Span& span_, const std::u
 {
 }
 
-
 void TemplateParameterSymbol::Write(SymbolWriter& writer)
 {
     TypeSymbol::Write(writer);
     writer.GetBinaryWriter().Write(hasDefault);
+    if (hasDefault)
+    {
+        writer.GetBinaryWriter().Write(defaultStr);
+    }
 }
 
 void TemplateParameterSymbol::Read(SymbolReader& reader)
 {
     TypeSymbol::Read(reader);
     hasDefault = reader.GetBinaryReader().ReadBool();
+    if (hasDefault)
+    {
+        defaultStr = reader.GetBinaryReader().ReadUtf8String();
+    }
 }
 
 TypeSymbol* TemplateParameterSymbol::Unify(TypeSymbol* type, const Span& span)
 {
     return type;
+}
+
+void TemplateParameterSymbol::SetDefaultStr(const std::string& defaultStr_)
+{
+    defaultStr = defaultStr_;
 }
 
 BoundTemplateParameterSymbol::BoundTemplateParameterSymbol(const Span& span_, const std::u32string& name_) : Symbol(SymbolType::boundTemplateParameterSymbol, span_, name_), type(nullptr)

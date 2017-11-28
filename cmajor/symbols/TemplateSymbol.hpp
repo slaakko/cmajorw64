@@ -22,8 +22,11 @@ public:
     bool ContainsTemplateParameter() const override { return true; }
     bool HasDefault() const { return hasDefault; }
     void SetHasDefault() { hasDefault = true; }
+    void SetDefaultStr(const std::string& defaultStr_);
+    const std::string& DefaultStr() const { return defaultStr; }
 private:
     bool hasDefault;
+    std::string defaultStr;
 };
 
 class BoundTemplateParameterSymbol : public Symbol

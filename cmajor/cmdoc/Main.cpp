@@ -661,6 +661,16 @@ void GenerateClassXml(Element* parentElement, ClassTypeSymbol* cls)
                 std::unique_ptr<Element> templateParameterNameElement(new Element(U"name"));
                 templateParameterNameElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(templateParameter->DocName())));
                 templateParameterElement->AppendChild(std::move(templateParameterNameElement));
+                if (templateParameter->GetSymbolType() == SymbolType::templateParameterSymbol)
+                {
+                    TemplateParameterSymbol* symbol = static_cast<TemplateParameterSymbol*>(templateParameter);
+                    if (symbol->HasDefault())
+                    {
+                        std::unique_ptr<Element> defaultElement(new Element(U"default"));
+                        defaultElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(ToUtf32(symbol->DefaultStr()))));
+                        templateParameterElement->AppendChild(std::move(defaultElement));
+                    }
+                }
                 templateParametersElement->AppendChild(std::move(templateParameterElement));
             }
             classElement->AppendChild(std::move(templateParametersElement));
@@ -764,6 +774,12 @@ void GenerateXmlForConcepts(Element* parentElement, const std::vector<ConceptSym
             std::unique_ptr<Element> templateParameterNameElement(new Element(U"name"));
             templateParameterNameElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(templateParameter->DocName())));
             templateParameterElement->AppendChild(std::move(templateParameterNameElement));
+            if (templateParameter->HasDefault())
+            {
+                std::unique_ptr<Element> defaultElement(new Element(U"default"));
+                defaultElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(ToUtf32(templateParameter->DefaultStr()))));
+                templateParameterElement->AppendChild(std::move(defaultElement));
+            }
             templateParametersElement->AppendChild(std::move(templateParameterElement));
         }
         conceptElement->AppendChild(std::move(templateParametersElement));
@@ -772,10 +788,6 @@ void GenerateXmlForConcepts(Element* parentElement, const std::vector<ConceptSym
             std::unique_ptr<Element> refinesElement(new Element(U"refines"));
             refinesElement->SetAttribute(U"ref", concept->RefinedConcept()->Id());
             conceptElement->AppendChild(std::move(refinesElement));
-        }
-        if (concept->GroupName() == U"Common")
-        {
-            int x = 0;
         }
         std::unique_ptr<Element> constraintsElement(new Element(U"constraints"));
         ConceptNode* conceptNode = concept->GetConceptNode();
@@ -1310,13 +1322,19 @@ void GenerateXmlForFunctions(Element* parentElement, const std::vector<FunctionS
                     if (!overload->TemplateParameters().empty())
                     {
                         std::unique_ptr<Element> templateParametersElement(new Element(U"templateParameters"));
-                        for (TypeSymbol* templateParameter : overload->TemplateParameters())
+                        for (TemplateParameterSymbol* templateParameter : overload->TemplateParameters())
                         {
                             std::unique_ptr<Element> templateParameterElement(new Element(U"templateParameter"));
                             templateParameterElement->SetAttribute(U"id", templateParameter->Id());
                             std::unique_ptr<Element> templateParameterNameElement(new Element(U"name"));
                             templateParameterNameElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(templateParameter->DocName())));
                             templateParameterElement->AppendChild(std::move(templateParameterNameElement));
+                            if (templateParameter->HasDefault())
+                            {
+                                std::unique_ptr<Element> defaultElement(new Element(U"default"));
+                                defaultElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(ToUtf32(templateParameter->DefaultStr()))));
+                                templateParameterElement->AppendChild(std::move(defaultElement));
+                            }
                             templateParametersElement->AppendChild(std::move(templateParameterElement));
                         }
                         overloadElement->AppendChild(std::move(templateParametersElement));
@@ -1364,13 +1382,19 @@ void GenerateXmlForFunctions(Element* parentElement, const std::vector<FunctionS
                 if (!function->TemplateParameters().empty())
                 {
                     std::unique_ptr<Element> templateParametersElement(new Element(U"templateParameters"));
-                    for (TypeSymbol* templateParameter : function->TemplateParameters())
+                    for (TemplateParameterSymbol* templateParameter : function->TemplateParameters())
                     {
                         std::unique_ptr<Element> templateParameterElement(new Element(U"templateParameter"));
                         templateParameterElement->SetAttribute(U"id", templateParameter->Id());
                         std::unique_ptr<Element> templateParameterNameElement(new Element(U"name"));
                         templateParameterNameElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(templateParameter->DocName())));
                         templateParameterElement->AppendChild(std::move(templateParameterNameElement));
+                        if (templateParameter->HasDefault())
+                        {
+                            std::unique_ptr<Element> defaultElement(new Element(U"default"));
+                            defaultElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(ToUtf32(templateParameter->DefaultStr()))));
+                            templateParameterElement->AppendChild(std::move(defaultElement));
+                        }
                         templateParametersElement->AppendChild(std::move(templateParameterElement));
                     }
                     functionElement->AppendChild(std::move(templateParametersElement));
@@ -1456,13 +1480,19 @@ void GenerateXmlForFunctions(Element* parentElement, const std::vector<FunctionS
                     if (!overload->TemplateParameters().empty())
                     {
                         std::unique_ptr<Element> templateParametersElement(new Element(U"templateParameters"));
-                        for (TypeSymbol* templateParameter : overload->TemplateParameters())
+                        for (TemplateParameterSymbol* templateParameter : overload->TemplateParameters())
                         {
                             std::unique_ptr<Element> templateParameterElement(new Element(U"templateParameter"));
                             templateParameterElement->SetAttribute(U"id", templateParameter->Id());
                             std::unique_ptr<Element> templateParameterNameElement(new Element(U"name"));
                             templateParameterNameElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(templateParameter->DocName())));
                             templateParameterElement->AppendChild(std::move(templateParameterNameElement));
+                            if (templateParameter->HasDefault())
+                            {
+                                std::unique_ptr<Element> defaultElement(new Element(U"default"));
+                                defaultElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(ToUtf32(templateParameter->DefaultStr()))));
+                                templateParameterElement->AppendChild(std::move(defaultElement));
+                            }
                             templateParametersElement->AppendChild(std::move(templateParameterElement));
                         }
                         overloadElement->AppendChild(std::move(templateParametersElement));
@@ -1510,7 +1540,7 @@ void GenerateXmlForFunctions(Element* parentElement, const std::vector<FunctionS
                 if (!function->TemplateParameters().empty())
                 {
                     std::unique_ptr<Element> templateParametersElement(new Element(U"templateParameters"));
-                    for (TypeSymbol* templateParameter : function->TemplateParameters())
+                    for (TemplateParameterSymbol* templateParameter : function->TemplateParameters())
                     {
                         std::unique_ptr<Element> templateParameterElement(new Element(U"templateParameter"));
                         templateParameterElement->SetAttribute(U"id", templateParameter->Id());
@@ -1518,6 +1548,12 @@ void GenerateXmlForFunctions(Element* parentElement, const std::vector<FunctionS
                         templateParameterNameElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(templateParameter->DocName())));
                         templateParameterElement->AppendChild(std::move(templateParameterNameElement));
                         templateParametersElement->AppendChild(std::move(templateParameterElement));
+                        if (templateParameter->HasDefault())
+                        {
+                            std::unique_ptr<Element> defaultElement(new Element(U"default"));
+                            defaultElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(ToUtf32(templateParameter->DefaultStr()))));
+                            templateParameterElement->AppendChild(std::move(defaultElement));
+                        }
                     }
                     functionElement->AppendChild(std::move(templateParametersElement));
                 }
@@ -1870,6 +1906,27 @@ std::u32string GetName(cmajor::dom::Element* element, bool optional)
     }
     cmajor::dom::Text* name = static_cast<cmajor::dom::Text*>(nameNode);
     return name->Data();
+}
+
+std::u32string GetDefault(cmajor::dom::Element* element)
+{
+    std::unique_ptr<cmajor::xpath::XPathObject> nameObject = cmajor::xpath::Evaluate(U"default/text()", element);
+    if (nameObject->Type() != cmajor::xpath::XPathObjectType::nodeSet)
+    {
+        throw std::runtime_error("nodeset expected");
+    }
+    cmajor::xpath::XPathNodeSet* nodeSet = static_cast<cmajor::xpath::XPathNodeSet*>(nameObject.get());
+    if (nodeSet->Length() != 1)
+    {
+        return std::u32string();
+    }
+    cmajor::dom::Node* defaultNode = (*nodeSet)[0];
+    if (defaultNode->GetNodeType() != cmajor::dom::NodeType::textNode)
+    {
+        throw std::runtime_error("text node expected");
+    }
+    cmajor::dom::Text* default_ = static_cast<cmajor::dom::Text*>(defaultNode);
+    return default_->Data();
 }
 
 std::u32string GetValue(cmajor::dom::Element* element)
@@ -3052,6 +3109,7 @@ void GenerateTemplateParameterHtml(cmajor::dom::Element* parentElement, cmajor::
         {
             cmajor::dom::Element* templateParameterElement = templateParameterElements[i];
             std::u32string templateParameterName = GetName(templateParameterElement);
+            std::u32string templateParameterDefault = GetDefault(templateParameterElement);
             std::unique_ptr<Element> tableRowElement(new Element(U"tr"));
             tableRowElement->SetAttribute(U"class", U"params");
             std::unique_ptr<Element> tableColElement(new Element(U"td"));
@@ -3059,7 +3117,12 @@ void GenerateTemplateParameterHtml(cmajor::dom::Element* parentElement, cmajor::
             std::unique_ptr<Element> span(new Element(U"span"));
             span->SetAttribute(U"id", templateParameterElement->GetAttribute(U"id"));
             span->SetAttribute(U"class", U"param");
-            span->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(templateParameterName)));
+            std::u32string defaultStr;
+            if (!templateParameterDefault.empty())
+            {
+                defaultStr = U" = " + templateParameterDefault;
+            }
+            span->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(templateParameterName + defaultStr)));
             tableColElement->AppendChild(std::move(span));
             tableRowElement->AppendChild(std::move(tableColElement));
             if (docXml)

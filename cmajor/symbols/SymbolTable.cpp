@@ -444,6 +444,7 @@ void SymbolTable::AddTemplateParameter(TemplateParameterNode& templateParameterN
     if (templateParameterNode.DefaultTemplateArgument())
     {
         templateParameterSymbol->SetHasDefault();
+        templateParameterSymbol->SetDefaultStr(templateParameterNode.DefaultTemplateArgument()->ToString());
     }
     templateParameterSymbol->SetCompileUnit(currentCompileUnit);
     templateParameterSymbol->SetSymbolTable(this);
