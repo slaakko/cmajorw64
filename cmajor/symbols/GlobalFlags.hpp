@@ -41,6 +41,10 @@ std::u32string GetCurrentProjectName();
 void SetCurrentTooName(const std::u32string& currentToolName_);
 std::u32string GetCurrentToolName();
 
+void ClearDefines();
+void DefineSymbol(const std::u32string& symbol);
+bool IsSymbolDefined(const std::u32string& symbol);
+
 } } // namespace cmajor::symbols
 
 #endif // CMAJOR_SYMBOLS_GLOBAL_FLAGS_INCLUDED

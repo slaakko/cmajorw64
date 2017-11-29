@@ -569,6 +569,33 @@ void CreateMainUnit(std::vector<std::string>& objectFilePaths, Module& module, E
     objectFilePaths.push_back(boundMainCompileUnit.ObjectFilePath());
 }
 
+void SetDefines(const std::string& definesFilePath)
+{
+    ClearDefines();
+    if (GetConfig() == "debug")
+    {
+        DefineSymbol(U"DEBUG");
+    }
+    else if (GetConfig() == "release")
+    {
+        DefineSymbol(U"RELEASE");
+    }
+    else if (GetConfig() == "profile")
+    {
+        DefineSymbol(U"RELEASE");
+        DefineSymbol(U"PROFILE");
+    }
+    std::ifstream definesFile(definesFilePath);
+    if (definesFile)
+    {
+        std::string line;
+        while (std::getline(definesFile, line))
+        {
+            DefineSymbol(ToUtf32(line));
+        }
+    }
+}
+
 void BuildProject(Project* project)
 {
     std::string config = GetConfig();
@@ -582,6 +609,10 @@ void BuildProject(Project* project)
     CompileWarningCollection::Instance().SetCurrentProjectName(project->Name());
     SetCurrentProjectName(project->Name());
     SetCurrentTooName(U"cmc");
+    boost::filesystem::path libraryFilePath = project->LibraryFilePath();
+    boost::filesystem::path libDir = libraryFilePath.remove_filename();
+    std::string definesFilePath = GetFullPath((libDir / boost::filesystem::path("defines.txt")).generic_string());
+    SetDefines(definesFilePath);
     Module module(project->Name(), project->ModuleFilePath());
     if (module.IsSystemModule())
     {

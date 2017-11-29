@@ -35,6 +35,7 @@ namespace cmajor.parser
             |   ThrowStatement(ctx){ value = ThrowStatement; }
             |   TryStatement(ctx){ value = TryStatement; }
             |   AssertStatement(ctx){ value = AssertStatement; }
+            |   ConditionalCompilationStatement(ctx){ value = ConditionalCompilationStatement; }
             ;
 
         LabelId : std::u32string
@@ -210,5 +211,41 @@ namespace cmajor.parser
             ::= ('#' keyword("assert") Expression(ctx)! ';'!){ value = new AssertStatementNode(span, Expression); }
             ;
 
+        ConditionalCompilationStatement(ParsingContext* ctx) : ConditionalCompilationStatementNode*
+            ::= '#' keyword("if") '('! ConditionalCompilationExpression:ifExpr{ value = new ConditionalCompilationStatementNode(span, ifExpr); } ')'! (Statement(ctx):ifS{ value->AddIfStatement(ifS); })*
+                (
+                    '#' keyword("elif") '('! ConditionalCompilationExpression:elifExpr{ value->AddElifExpr(span, elifExpr); } ')'! (Statement(ctx):elifS{ value->AddElifStatement(elifS); })*
+                )*
+                (
+                    '#' keyword("else") (Statement(ctx):elseS{ value->AddElseStatement(span, elseS); })*
+                )?
+                '#' keyword("endif")!
+            ;
+
+        ConditionalCompilationExpression : ConditionalCompilationExpressionNode*
+            ::= ConditionalCompilationDisjunction{ value = ConditionalCompilationDisjunction; }
+            ;
+
+        ConditionalCompilationDisjunction(var Span s) : ConditionalCompilationExpressionNode*
+            ::= ConditionalCompilationConjunction:left{ s = span; value = left; } ("||" ConditionalCompilationConjunction:right{ s.SetEnd(span.End()); value = new ConditionalCompilationDisjunctionNode(s, value, right); })*
+            ;
+
+        ConditionalCompilationConjunction(var Span s): ConditionalCompilationExpressionNode*
+            ::= ConditionalCompilationPrefix:left{ s = span; value = left; } ("&&" ConditionalCompilationPrefix:right{ s.SetEnd(span.End()); value = new ConditionalCompilationConjunctionNode(s, value, right); })*
+            ;
+
+        ConditionalCompilationPrefix : ConditionalCompilationExpressionNode*
+            ::= ('!' ConditionalCompilationPrefix:left!){ value = new ConditionalCompilationNotNode(span, left); }
+            |   ConditionalCompilationPrimary:right!{ value = right; }
+            ;
+
+        ConditionalCompilationPrimary : ConditionalCompilationExpressionNode* 
+            ::= Symbol:symb{ value = new ConditionalCompilationPrimaryNode(span, symb); }
+            |   '(' ConditionalCompilationExpression:expr{ value = expr; } ')'
+            ;
+
+        Symbol : std::u32string
+            ::= (identifier - Keyword){ value = std::u32string(matchBegin, matchEnd); }
+            ;
     }
 }

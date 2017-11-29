@@ -138,9 +138,17 @@ namespace devcore
         {
             return PathUtil.MakeCanonicalPath(Path.Combine(Path.Combine(Path.Combine(basePath, "lib"), config), name + ".cmm"));
         }
+        public string DefinesFilePath(string config)
+        {
+            return PathUtil.MakeCanonicalPath(Path.Combine(Path.Combine(Path.Combine(basePath, "lib"), config), "defines.txt"));
+        }
         public string GetExecutablePath(string config)
         {
             return PathUtil.MakeCanonicalPath(Path.Combine(Path.Combine(Path.Combine(basePath, "bin"), config), name + ".exe"));
+        }
+        public string GetConfigurationFilePath()
+        {
+            return PathUtil.MakeCanonicalPath(Path.Combine(basePath, name + ".usr"));
         }
         private string name;
         private string filePath;

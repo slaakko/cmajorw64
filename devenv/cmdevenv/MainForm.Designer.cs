@@ -73,6 +73,7 @@ namespace cmdevenv
             this.windowToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.closeAllToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem17 = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem7 = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.gettingStartedGuideToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -175,7 +176,6 @@ namespace cmdevenv
             this.addExistingSourceFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.addExistingProjectFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.addProjectReferenceDialog = new System.Windows.Forms.OpenFileDialog();
-            this.toolStripMenuItem17 = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.editorSplitContainer)).BeginInit();
             this.editorSplitContainer.Panel2.SuspendLayout();
@@ -544,6 +544,13 @@ namespace cmdevenv
             this.helpToolStripMenuItem.Name = "helpToolStripMenuItem";
             this.helpToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
             this.helpToolStripMenuItem.Text = "&Help";
+            // 
+            // toolStripMenuItem17
+            // 
+            this.toolStripMenuItem17.Name = "toolStripMenuItem17";
+            this.toolStripMenuItem17.Size = new System.Drawing.Size(230, 22);
+            this.toolStripMenuItem17.Text = "Local Documentation";
+            this.toolStripMenuItem17.Click += new System.EventHandler(this.toolStripMenuItem17_Click);
             // 
             // toolStripMenuItem7
             // 
@@ -1014,7 +1021,7 @@ namespace cmdevenv
             this.toolStripSeparator5,
             this.viewProjectToolStripMenuItem});
             this.projectContextMenuStrip.Name = "projectContextMenuStrip";
-            this.projectContextMenuStrip.Size = new System.Drawing.Size(181, 238);
+            this.projectContextMenuStrip.Size = new System.Drawing.Size(181, 260);
             // 
             // buildToolStripMenuItem2
             // 
@@ -1119,6 +1126,7 @@ namespace cmdevenv
             this.projectPropertiesToolStripMenuItem.Name = "projectPropertiesToolStripMenuItem";
             this.projectPropertiesToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.projectPropertiesToolStripMenuItem.Text = "Properties...";
+            this.projectPropertiesToolStripMenuItem.Click += new System.EventHandler(this.projectPropertiesToolStripMenuItem_Click);
             // 
             // toolStripSeparator5
             // 
@@ -1294,13 +1302,6 @@ namespace cmdevenv
             // 
             this.addProjectReferenceDialog.DefaultExt = "cmp";
             this.addProjectReferenceDialog.Filter = "Cmajor Project Files|*.cmp";
-            // 
-            // toolStripMenuItem17
-            // 
-            this.toolStripMenuItem17.Name = "toolStripMenuItem17";
-            this.toolStripMenuItem17.Size = new System.Drawing.Size(230, 22);
-            this.toolStripMenuItem17.Text = "Local Documentation";
-            this.toolStripMenuItem17.Click += new System.EventHandler(this.toolStripMenuItem17_Click);
             // 
             // MainForm
             // 

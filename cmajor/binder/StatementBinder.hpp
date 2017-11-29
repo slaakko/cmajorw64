@@ -56,6 +56,12 @@ public:
     void Visit(TryStatementNode& tryStatementNode) override;
     void Visit(CatchNode& catchNode) override;
     void Visit(AssertStatementNode& assertStatementNode) override;
+    void Visit(ConditionalCompilationPartNode& conditionalCompilationPartNode) override;
+    void Visit(ConditionalCompilationDisjunctionNode& conditionalCompilationDisjunctionNode) override;
+    void Visit(ConditionalCompilationConjunctionNode& conditionalCompilationConjunctionNode) override;
+    void Visit(ConditionalCompilationNotNode& conditionalCompilationNotNode) override;
+    void Visit(ConditionalCompilationPrimaryNode& conditionalCompilationPrimaryNode) override;
+    void Visit(ConditionalCompilationStatementNode& conditionalCompilationStatementNode) override;
     void CompileStatement(Node* statementNode, bool setPostfix);
     void SetCurrentClass(BoundClass* currentClass_) { currentClass = currentClass_; }
     void SetCurrentFunction(BoundFunction* currentFunction_) { currentFunction = currentFunction_; }
@@ -86,6 +92,7 @@ private:
     std::vector<std::pair<BoundGotoCaseStatement*, IntegralValue>>* currentGotoCaseStatements;
     std::vector<BoundGotoDefaultStatement*>* currentGotoDefaultStatements;
     bool postfix;
+    std::stack<bool> conditionalCompilationStack;
     void AddStatement(BoundStatement* boundStatement);
 };
 

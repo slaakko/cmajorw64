@@ -475,6 +475,101 @@ private:
     std::unique_ptr<Node> assertExpr;
 };
 
+class ConditionalCompilationExpressionNode : public Node
+{
+public:
+    ConditionalCompilationExpressionNode(NodeType nodeType_, const Span& span_);
+};
+
+class ConditionalCompilationBinaryExpressionNode : public ConditionalCompilationExpressionNode
+{
+public:
+    ConditionalCompilationBinaryExpressionNode(NodeType nodeType_, const Span& span_);
+    ConditionalCompilationBinaryExpressionNode(NodeType nodeType_, const Span& span_, ConditionalCompilationExpressionNode* left_, ConditionalCompilationExpressionNode* right_);
+    ConditionalCompilationExpressionNode* Left() const { return left.get(); }
+    ConditionalCompilationExpressionNode* Right() const { return right.get(); }
+private:
+    std::unique_ptr<ConditionalCompilationExpressionNode> left;
+    std::unique_ptr<ConditionalCompilationExpressionNode> right;
+};
+
+class ConditionalCompilationDisjunctionNode : public ConditionalCompilationBinaryExpressionNode
+{
+public:
+    ConditionalCompilationDisjunctionNode(const Span& span_);
+    ConditionalCompilationDisjunctionNode(const Span& span_, ConditionalCompilationExpressionNode* left_, ConditionalCompilationExpressionNode* right_);
+    Node* Clone(CloneContext& cloneContext) const override;
+    void Accept(Visitor& visitor) override;
+};
+
+class ConditionalCompilationConjunctionNode : public ConditionalCompilationBinaryExpressionNode
+{
+public:
+    ConditionalCompilationConjunctionNode(const Span& span_);
+    ConditionalCompilationConjunctionNode(const Span& span_, ConditionalCompilationExpressionNode* left_, ConditionalCompilationExpressionNode* right_);
+    Node* Clone(CloneContext& cloneContext) const override;
+    void Accept(Visitor& visitor) override;
+};
+
+class ConditionalCompilationNotNode : public ConditionalCompilationExpressionNode
+{
+public:
+    ConditionalCompilationNotNode(const Span& span_);
+    ConditionalCompilationNotNode(const Span& span_, ConditionalCompilationExpressionNode* expr_);
+    Node* Clone(CloneContext& cloneContext) const override;
+    void Accept(Visitor& visitor) override;
+    ConditionalCompilationExpressionNode* Expr() const { return expr.get(); }
+private:
+    std::unique_ptr<ConditionalCompilationExpressionNode> expr;
+};
+
+class ConditionalCompilationPrimaryNode : public ConditionalCompilationExpressionNode
+{
+public:
+    ConditionalCompilationPrimaryNode(const Span& span_);
+    ConditionalCompilationPrimaryNode(const Span& span_, const std::u32string& symbol_);
+    Node* Clone(CloneContext& cloneContext) const override;
+    void Accept(Visitor& visitor) override;
+    const std::u32string& Symbol() const { return symbol; }
+private:
+    std::u32string symbol;
+};
+
+class ConditionalCompilationPartNode : public Node
+{
+public:
+    ConditionalCompilationPartNode(const Span& span_);
+    ConditionalCompilationPartNode(const Span& span_, ConditionalCompilationExpressionNode* expr_);
+    void AddStatement(StatementNode* statement);
+    Node* Clone(CloneContext& cloneContext) const override;
+    void Accept(Visitor& visitor) override;
+    ConditionalCompilationExpressionNode* Expr() const { return expr.get();  }
+    const NodeList<StatementNode>& Statements() const { return statements; }
+private:
+    std::unique_ptr<ConditionalCompilationExpressionNode> expr;
+    NodeList<StatementNode> statements;
+};
+
+class ConditionalCompilationStatementNode : public StatementNode
+{
+public:
+    ConditionalCompilationStatementNode(const Span& span_);
+    ConditionalCompilationStatementNode(const Span& span_, ConditionalCompilationExpressionNode* ifExpr_);
+    Node* Clone(CloneContext& cloneContext) const override;
+    void Accept(Visitor& visitor) override;
+    void AddIfStatement(StatementNode* statement);
+    void AddElifExpr(const Span& span, ConditionalCompilationExpressionNode* expr);
+    void AddElifStatement(StatementNode* statement);
+    void AddElseStatement(const Span& span, StatementNode* statement);
+    ConditionalCompilationPartNode* IfPart() { return ifPart.get(); }
+    const NodeList<ConditionalCompilationPartNode>& ElifParts() const { return elifParts; }
+    ConditionalCompilationPartNode* ElsePart() { return elsePart.get(); }
+private:
+    std::unique_ptr<ConditionalCompilationPartNode> ifPart;
+    NodeList<ConditionalCompilationPartNode> elifParts;
+    std::unique_ptr<ConditionalCompilationPartNode> elsePart;
+};
+
 } } // namespace cmajor::ast
 
 #endif // CMAJOR_AST_STATEMENT_INCLUDED

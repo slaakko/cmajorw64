@@ -228,6 +228,13 @@ namespace cmajor.parser
         TryStatement(ParsingContext* ctx): TryStatementNode*;
         Catch(ParsingContext* ctx): CatchNode*;
         AssertStatement(ParsingContext* ctx): StatementNode*;
+        ConditionalCompilationStatement(ParsingContext* ctx): ConditionalCompilationStatementNode*;
+        ConditionalCompilationExpression: ConditionalCompilationExpressionNode*;
+        ConditionalCompilationDisjunction(var Span s): ConditionalCompilationExpressionNode*;
+        ConditionalCompilationConjunction(var Span s): ConditionalCompilationExpressionNode*;
+        ConditionalCompilationPrefix: ConditionalCompilationExpressionNode*;
+        ConditionalCompilationPrimary: ConditionalCompilationExpressionNode*;
+        Symbol: std::u32string;
     }
     grammar TemplateGrammar
     {

@@ -113,6 +113,12 @@ class ThrowStatementNode;
 class CatchNode;
 class TryStatementNode;
 class AssertStatementNode;
+class ConditionalCompilationPartNode;
+class ConditionalCompilationDisjunctionNode;
+class ConditionalCompilationConjunctionNode;
+class ConditionalCompilationNotNode;
+class ConditionalCompilationPrimaryNode;
+class ConditionalCompilationStatementNode;
 
 class ConstantNode;
 class EnumTypeNode;
@@ -280,6 +286,12 @@ public:
     virtual void Visit(TryStatementNode& tryStatementNode) {}
     virtual void Visit(CatchNode& catchNode) {}
     virtual void Visit(AssertStatementNode& assertStatementNode) {}
+    virtual void Visit(ConditionalCompilationPartNode& conditionalCompilationPartNode) {}
+    virtual void Visit(ConditionalCompilationDisjunctionNode& conditionalCompilationDisjunctionNode) {}
+    virtual void Visit(ConditionalCompilationConjunctionNode& conditionalCompilationConjunctionNode) {}
+    virtual void Visit(ConditionalCompilationNotNode& conditionalCompilationNotNode) {}
+    virtual void Visit(ConditionalCompilationPrimaryNode& conditionalCompilationPrimaryNode) {}
+    virtual void Visit(ConditionalCompilationStatementNode& conditionalCompilationStatementNode) {}
 
     virtual void Visit(TypedefNode& typedefNode) {}
     virtual void Visit(ConstantNode& constantNode) {}

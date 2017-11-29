@@ -127,6 +127,8 @@ public:
         a9ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<StatementRule>(this, &StatementRule::A9Action));
         cmajor::parsing::ActionParser* a10ActionParser = GetAction(ToUtf32("A10"));
         a10ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<StatementRule>(this, &StatementRule::A10Action));
+        cmajor::parsing::ActionParser* a11ActionParser = GetAction(ToUtf32("A11"));
+        a11ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<StatementRule>(this, &StatementRule::A11Action));
         cmajor::parsing::NonterminalParser* labeledStatementNonterminalParser = GetNonterminal(ToUtf32("LabeledStatement"));
         labeledStatementNonterminalParser->SetPreCall(new cmajor::parsing::MemberPreCall<StatementRule>(this, &StatementRule::PreLabeledStatement));
         labeledStatementNonterminalParser->SetPostCall(new cmajor::parsing::MemberPostCall<StatementRule>(this, &StatementRule::PostLabeledStatement));
@@ -160,6 +162,9 @@ public:
         cmajor::parsing::NonterminalParser* assertStatementNonterminalParser = GetNonterminal(ToUtf32("AssertStatement"));
         assertStatementNonterminalParser->SetPreCall(new cmajor::parsing::MemberPreCall<StatementRule>(this, &StatementRule::PreAssertStatement));
         assertStatementNonterminalParser->SetPostCall(new cmajor::parsing::MemberPostCall<StatementRule>(this, &StatementRule::PostAssertStatement));
+        cmajor::parsing::NonterminalParser* conditionalCompilationStatementNonterminalParser = GetNonterminal(ToUtf32("ConditionalCompilationStatement"));
+        conditionalCompilationStatementNonterminalParser->SetPreCall(new cmajor::parsing::MemberPreCall<StatementRule>(this, &StatementRule::PreConditionalCompilationStatement));
+        conditionalCompilationStatementNonterminalParser->SetPostCall(new cmajor::parsing::MemberPostCall<StatementRule>(this, &StatementRule::PostConditionalCompilationStatement));
     }
     void A0Action(const char32_t* matchBegin, const char32_t* matchEnd, const Span& span, const std::string& fileName, ParsingData* parsingData, bool& pass)
     {
@@ -215,6 +220,11 @@ public:
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
         context->value = context->fromAssertStatement;
+    }
+    void A11Action(const char32_t* matchBegin, const char32_t* matchEnd, const Span& span, const std::string& fileName, ParsingData* parsingData, bool& pass)
+    {
+        Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
+        context->value = context->fromConditionalCompilationStatement;
     }
     void PreLabeledStatement(cmajor::parsing::ObjectStack& stack, ParsingData* parsingData)
     {
@@ -381,10 +391,25 @@ public:
             stack.pop();
         }
     }
+    void PreConditionalCompilationStatement(cmajor::parsing::ObjectStack& stack, ParsingData* parsingData)
+    {
+        Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
+        stack.push(std::unique_ptr<cmajor::parsing::Object>(new cmajor::parsing::ValueObject<ParsingContext*>(context->ctx)));
+    }
+    void PostConditionalCompilationStatement(cmajor::parsing::ObjectStack& stack, ParsingData* parsingData, bool matched)
+    {
+        Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
+        if (matched)
+        {
+            std::unique_ptr<cmajor::parsing::Object> fromConditionalCompilationStatement_value = std::move(stack.top());
+            context->fromConditionalCompilationStatement = *static_cast<cmajor::parsing::ValueObject<ConditionalCompilationStatementNode*>*>(fromConditionalCompilationStatement_value.get());
+            stack.pop();
+        }
+    }
 private:
     struct Context : cmajor::parsing::Context
     {
-        Context(): ctx(), value(), fromLabeledStatement(), fromControlStatement(), fromExpressionStatement(), fromAssignmentStatement(), fromConstructionStatement(), fromDeleteStatement(), fromDestroyStatement(), fromEmptyStatement(), fromThrowStatement(), fromTryStatement(), fromAssertStatement() {}
+        Context(): ctx(), value(), fromLabeledStatement(), fromControlStatement(), fromExpressionStatement(), fromAssignmentStatement(), fromConstructionStatement(), fromDeleteStatement(), fromDestroyStatement(), fromEmptyStatement(), fromThrowStatement(), fromTryStatement(), fromAssertStatement(), fromConditionalCompilationStatement() {}
         ParsingContext* ctx;
         StatementNode* value;
         StatementNode* fromLabeledStatement;
@@ -398,6 +423,7 @@ private:
         StatementNode* fromThrowStatement;
         TryStatementNode* fromTryStatement;
         StatementNode* fromAssertStatement;
+        ConditionalCompilationStatementNode* fromConditionalCompilationStatement;
     };
 };
 
@@ -3257,47 +3283,609 @@ private:
     };
 };
 
+class StatementGrammar::ConditionalCompilationStatementRule : public cmajor::parsing::Rule
+{
+public:
+    ConditionalCompilationStatementRule(const std::u32string& name_, Scope* enclosingScope_, int id_, Parser* definition_):
+        cmajor::parsing::Rule(name_, enclosingScope_, id_, definition_)
+    {
+        AddInheritedAttribute(AttrOrVariable(ToUtf32("ParsingContext*"), ToUtf32("ctx")));
+        SetValueTypeName(ToUtf32("ConditionalCompilationStatementNode*"));
+    }
+    virtual void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData)
+    {
+        parsingData->PushContext(Id(), new Context());
+        Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
+        std::unique_ptr<cmajor::parsing::Object> ctx_value = std::move(stack.top());
+        context->ctx = *static_cast<cmajor::parsing::ValueObject<ParsingContext*>*>(ctx_value.get());
+        stack.pop();
+    }
+    virtual void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched)
+    {
+        Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
+        if (matched)
+        {
+            stack.push(std::unique_ptr<cmajor::parsing::Object>(new cmajor::parsing::ValueObject<ConditionalCompilationStatementNode*>(context->value)));
+        }
+        parsingData->PopContext(Id());
+    }
+    virtual void Link()
+    {
+        cmajor::parsing::ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
+        a0ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<ConditionalCompilationStatementRule>(this, &ConditionalCompilationStatementRule::A0Action));
+        cmajor::parsing::ActionParser* a1ActionParser = GetAction(ToUtf32("A1"));
+        a1ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<ConditionalCompilationStatementRule>(this, &ConditionalCompilationStatementRule::A1Action));
+        cmajor::parsing::ActionParser* a2ActionParser = GetAction(ToUtf32("A2"));
+        a2ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<ConditionalCompilationStatementRule>(this, &ConditionalCompilationStatementRule::A2Action));
+        cmajor::parsing::ActionParser* a3ActionParser = GetAction(ToUtf32("A3"));
+        a3ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<ConditionalCompilationStatementRule>(this, &ConditionalCompilationStatementRule::A3Action));
+        cmajor::parsing::ActionParser* a4ActionParser = GetAction(ToUtf32("A4"));
+        a4ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<ConditionalCompilationStatementRule>(this, &ConditionalCompilationStatementRule::A4Action));
+        cmajor::parsing::NonterminalParser* ifExprNonterminalParser = GetNonterminal(ToUtf32("ifExpr"));
+        ifExprNonterminalParser->SetPostCall(new cmajor::parsing::MemberPostCall<ConditionalCompilationStatementRule>(this, &ConditionalCompilationStatementRule::PostifExpr));
+        cmajor::parsing::NonterminalParser* ifSNonterminalParser = GetNonterminal(ToUtf32("ifS"));
+        ifSNonterminalParser->SetPreCall(new cmajor::parsing::MemberPreCall<ConditionalCompilationStatementRule>(this, &ConditionalCompilationStatementRule::PreifS));
+        ifSNonterminalParser->SetPostCall(new cmajor::parsing::MemberPostCall<ConditionalCompilationStatementRule>(this, &ConditionalCompilationStatementRule::PostifS));
+        cmajor::parsing::NonterminalParser* elifExprNonterminalParser = GetNonterminal(ToUtf32("elifExpr"));
+        elifExprNonterminalParser->SetPostCall(new cmajor::parsing::MemberPostCall<ConditionalCompilationStatementRule>(this, &ConditionalCompilationStatementRule::PostelifExpr));
+        cmajor::parsing::NonterminalParser* elifSNonterminalParser = GetNonterminal(ToUtf32("elifS"));
+        elifSNonterminalParser->SetPreCall(new cmajor::parsing::MemberPreCall<ConditionalCompilationStatementRule>(this, &ConditionalCompilationStatementRule::PreelifS));
+        elifSNonterminalParser->SetPostCall(new cmajor::parsing::MemberPostCall<ConditionalCompilationStatementRule>(this, &ConditionalCompilationStatementRule::PostelifS));
+        cmajor::parsing::NonterminalParser* elseSNonterminalParser = GetNonterminal(ToUtf32("elseS"));
+        elseSNonterminalParser->SetPreCall(new cmajor::parsing::MemberPreCall<ConditionalCompilationStatementRule>(this, &ConditionalCompilationStatementRule::PreelseS));
+        elseSNonterminalParser->SetPostCall(new cmajor::parsing::MemberPostCall<ConditionalCompilationStatementRule>(this, &ConditionalCompilationStatementRule::PostelseS));
+    }
+    void A0Action(const char32_t* matchBegin, const char32_t* matchEnd, const Span& span, const std::string& fileName, ParsingData* parsingData, bool& pass)
+    {
+        Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
+        context->value = new ConditionalCompilationStatementNode(span, context->fromifExpr);
+    }
+    void A1Action(const char32_t* matchBegin, const char32_t* matchEnd, const Span& span, const std::string& fileName, ParsingData* parsingData, bool& pass)
+    {
+        Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
+        context->value->AddIfStatement(context->fromifS);
+    }
+    void A2Action(const char32_t* matchBegin, const char32_t* matchEnd, const Span& span, const std::string& fileName, ParsingData* parsingData, bool& pass)
+    {
+        Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
+        context->value->AddElifExpr(span, context->fromelifExpr);
+    }
+    void A3Action(const char32_t* matchBegin, const char32_t* matchEnd, const Span& span, const std::string& fileName, ParsingData* parsingData, bool& pass)
+    {
+        Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
+        context->value->AddElifStatement(context->fromelifS);
+    }
+    void A4Action(const char32_t* matchBegin, const char32_t* matchEnd, const Span& span, const std::string& fileName, ParsingData* parsingData, bool& pass)
+    {
+        Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
+        context->value->AddElseStatement(span, context->fromelseS);
+    }
+    void PostifExpr(cmajor::parsing::ObjectStack& stack, ParsingData* parsingData, bool matched)
+    {
+        Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
+        if (matched)
+        {
+            std::unique_ptr<cmajor::parsing::Object> fromifExpr_value = std::move(stack.top());
+            context->fromifExpr = *static_cast<cmajor::parsing::ValueObject<ConditionalCompilationExpressionNode*>*>(fromifExpr_value.get());
+            stack.pop();
+        }
+    }
+    void PreifS(cmajor::parsing::ObjectStack& stack, ParsingData* parsingData)
+    {
+        Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
+        stack.push(std::unique_ptr<cmajor::parsing::Object>(new cmajor::parsing::ValueObject<ParsingContext*>(context->ctx)));
+    }
+    void PostifS(cmajor::parsing::ObjectStack& stack, ParsingData* parsingData, bool matched)
+    {
+        Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
+        if (matched)
+        {
+            std::unique_ptr<cmajor::parsing::Object> fromifS_value = std::move(stack.top());
+            context->fromifS = *static_cast<cmajor::parsing::ValueObject<StatementNode*>*>(fromifS_value.get());
+            stack.pop();
+        }
+    }
+    void PostelifExpr(cmajor::parsing::ObjectStack& stack, ParsingData* parsingData, bool matched)
+    {
+        Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
+        if (matched)
+        {
+            std::unique_ptr<cmajor::parsing::Object> fromelifExpr_value = std::move(stack.top());
+            context->fromelifExpr = *static_cast<cmajor::parsing::ValueObject<ConditionalCompilationExpressionNode*>*>(fromelifExpr_value.get());
+            stack.pop();
+        }
+    }
+    void PreelifS(cmajor::parsing::ObjectStack& stack, ParsingData* parsingData)
+    {
+        Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
+        stack.push(std::unique_ptr<cmajor::parsing::Object>(new cmajor::parsing::ValueObject<ParsingContext*>(context->ctx)));
+    }
+    void PostelifS(cmajor::parsing::ObjectStack& stack, ParsingData* parsingData, bool matched)
+    {
+        Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
+        if (matched)
+        {
+            std::unique_ptr<cmajor::parsing::Object> fromelifS_value = std::move(stack.top());
+            context->fromelifS = *static_cast<cmajor::parsing::ValueObject<StatementNode*>*>(fromelifS_value.get());
+            stack.pop();
+        }
+    }
+    void PreelseS(cmajor::parsing::ObjectStack& stack, ParsingData* parsingData)
+    {
+        Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
+        stack.push(std::unique_ptr<cmajor::parsing::Object>(new cmajor::parsing::ValueObject<ParsingContext*>(context->ctx)));
+    }
+    void PostelseS(cmajor::parsing::ObjectStack& stack, ParsingData* parsingData, bool matched)
+    {
+        Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
+        if (matched)
+        {
+            std::unique_ptr<cmajor::parsing::Object> fromelseS_value = std::move(stack.top());
+            context->fromelseS = *static_cast<cmajor::parsing::ValueObject<StatementNode*>*>(fromelseS_value.get());
+            stack.pop();
+        }
+    }
+private:
+    struct Context : cmajor::parsing::Context
+    {
+        Context(): ctx(), value(), fromifExpr(), fromifS(), fromelifExpr(), fromelifS(), fromelseS() {}
+        ParsingContext* ctx;
+        ConditionalCompilationStatementNode* value;
+        ConditionalCompilationExpressionNode* fromifExpr;
+        StatementNode* fromifS;
+        ConditionalCompilationExpressionNode* fromelifExpr;
+        StatementNode* fromelifS;
+        StatementNode* fromelseS;
+    };
+};
+
+class StatementGrammar::ConditionalCompilationExpressionRule : public cmajor::parsing::Rule
+{
+public:
+    ConditionalCompilationExpressionRule(const std::u32string& name_, Scope* enclosingScope_, int id_, Parser* definition_):
+        cmajor::parsing::Rule(name_, enclosingScope_, id_, definition_)
+    {
+        SetValueTypeName(ToUtf32("ConditionalCompilationExpressionNode*"));
+    }
+    virtual void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData)
+    {
+        parsingData->PushContext(Id(), new Context());
+        Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
+    }
+    virtual void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched)
+    {
+        Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
+        if (matched)
+        {
+            stack.push(std::unique_ptr<cmajor::parsing::Object>(new cmajor::parsing::ValueObject<ConditionalCompilationExpressionNode*>(context->value)));
+        }
+        parsingData->PopContext(Id());
+    }
+    virtual void Link()
+    {
+        cmajor::parsing::ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
+        a0ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<ConditionalCompilationExpressionRule>(this, &ConditionalCompilationExpressionRule::A0Action));
+        cmajor::parsing::NonterminalParser* conditionalCompilationDisjunctionNonterminalParser = GetNonterminal(ToUtf32("ConditionalCompilationDisjunction"));
+        conditionalCompilationDisjunctionNonterminalParser->SetPostCall(new cmajor::parsing::MemberPostCall<ConditionalCompilationExpressionRule>(this, &ConditionalCompilationExpressionRule::PostConditionalCompilationDisjunction));
+    }
+    void A0Action(const char32_t* matchBegin, const char32_t* matchEnd, const Span& span, const std::string& fileName, ParsingData* parsingData, bool& pass)
+    {
+        Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
+        context->value = context->fromConditionalCompilationDisjunction;
+    }
+    void PostConditionalCompilationDisjunction(cmajor::parsing::ObjectStack& stack, ParsingData* parsingData, bool matched)
+    {
+        Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
+        if (matched)
+        {
+            std::unique_ptr<cmajor::parsing::Object> fromConditionalCompilationDisjunction_value = std::move(stack.top());
+            context->fromConditionalCompilationDisjunction = *static_cast<cmajor::parsing::ValueObject<ConditionalCompilationExpressionNode*>*>(fromConditionalCompilationDisjunction_value.get());
+            stack.pop();
+        }
+    }
+private:
+    struct Context : cmajor::parsing::Context
+    {
+        Context(): value(), fromConditionalCompilationDisjunction() {}
+        ConditionalCompilationExpressionNode* value;
+        ConditionalCompilationExpressionNode* fromConditionalCompilationDisjunction;
+    };
+};
+
+class StatementGrammar::ConditionalCompilationDisjunctionRule : public cmajor::parsing::Rule
+{
+public:
+    ConditionalCompilationDisjunctionRule(const std::u32string& name_, Scope* enclosingScope_, int id_, Parser* definition_):
+        cmajor::parsing::Rule(name_, enclosingScope_, id_, definition_)
+    {
+        SetValueTypeName(ToUtf32("ConditionalCompilationExpressionNode*"));
+        AddLocalVariable(AttrOrVariable(ToUtf32("Span"), ToUtf32("s")));
+    }
+    virtual void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData)
+    {
+        parsingData->PushContext(Id(), new Context());
+        Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
+    }
+    virtual void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched)
+    {
+        Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
+        if (matched)
+        {
+            stack.push(std::unique_ptr<cmajor::parsing::Object>(new cmajor::parsing::ValueObject<ConditionalCompilationExpressionNode*>(context->value)));
+        }
+        parsingData->PopContext(Id());
+    }
+    virtual void Link()
+    {
+        cmajor::parsing::ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
+        a0ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<ConditionalCompilationDisjunctionRule>(this, &ConditionalCompilationDisjunctionRule::A0Action));
+        cmajor::parsing::ActionParser* a1ActionParser = GetAction(ToUtf32("A1"));
+        a1ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<ConditionalCompilationDisjunctionRule>(this, &ConditionalCompilationDisjunctionRule::A1Action));
+        cmajor::parsing::NonterminalParser* leftNonterminalParser = GetNonterminal(ToUtf32("left"));
+        leftNonterminalParser->SetPostCall(new cmajor::parsing::MemberPostCall<ConditionalCompilationDisjunctionRule>(this, &ConditionalCompilationDisjunctionRule::Postleft));
+        cmajor::parsing::NonterminalParser* rightNonterminalParser = GetNonterminal(ToUtf32("right"));
+        rightNonterminalParser->SetPostCall(new cmajor::parsing::MemberPostCall<ConditionalCompilationDisjunctionRule>(this, &ConditionalCompilationDisjunctionRule::Postright));
+    }
+    void A0Action(const char32_t* matchBegin, const char32_t* matchEnd, const Span& span, const std::string& fileName, ParsingData* parsingData, bool& pass)
+    {
+        Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
+        context->s = span;
+        context->value = context->fromleft;
+    }
+    void A1Action(const char32_t* matchBegin, const char32_t* matchEnd, const Span& span, const std::string& fileName, ParsingData* parsingData, bool& pass)
+    {
+        Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
+        context->s.SetEnd(span.End());
+        context->value = new ConditionalCompilationDisjunctionNode(context->s, context->value, context->fromright);
+    }
+    void Postleft(cmajor::parsing::ObjectStack& stack, ParsingData* parsingData, bool matched)
+    {
+        Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
+        if (matched)
+        {
+            std::unique_ptr<cmajor::parsing::Object> fromleft_value = std::move(stack.top());
+            context->fromleft = *static_cast<cmajor::parsing::ValueObject<ConditionalCompilationExpressionNode*>*>(fromleft_value.get());
+            stack.pop();
+        }
+    }
+    void Postright(cmajor::parsing::ObjectStack& stack, ParsingData* parsingData, bool matched)
+    {
+        Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
+        if (matched)
+        {
+            std::unique_ptr<cmajor::parsing::Object> fromright_value = std::move(stack.top());
+            context->fromright = *static_cast<cmajor::parsing::ValueObject<ConditionalCompilationExpressionNode*>*>(fromright_value.get());
+            stack.pop();
+        }
+    }
+private:
+    struct Context : cmajor::parsing::Context
+    {
+        Context(): value(), s(), fromleft(), fromright() {}
+        ConditionalCompilationExpressionNode* value;
+        Span s;
+        ConditionalCompilationExpressionNode* fromleft;
+        ConditionalCompilationExpressionNode* fromright;
+    };
+};
+
+class StatementGrammar::ConditionalCompilationConjunctionRule : public cmajor::parsing::Rule
+{
+public:
+    ConditionalCompilationConjunctionRule(const std::u32string& name_, Scope* enclosingScope_, int id_, Parser* definition_):
+        cmajor::parsing::Rule(name_, enclosingScope_, id_, definition_)
+    {
+        SetValueTypeName(ToUtf32("ConditionalCompilationExpressionNode*"));
+        AddLocalVariable(AttrOrVariable(ToUtf32("Span"), ToUtf32("s")));
+    }
+    virtual void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData)
+    {
+        parsingData->PushContext(Id(), new Context());
+        Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
+    }
+    virtual void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched)
+    {
+        Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
+        if (matched)
+        {
+            stack.push(std::unique_ptr<cmajor::parsing::Object>(new cmajor::parsing::ValueObject<ConditionalCompilationExpressionNode*>(context->value)));
+        }
+        parsingData->PopContext(Id());
+    }
+    virtual void Link()
+    {
+        cmajor::parsing::ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
+        a0ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<ConditionalCompilationConjunctionRule>(this, &ConditionalCompilationConjunctionRule::A0Action));
+        cmajor::parsing::ActionParser* a1ActionParser = GetAction(ToUtf32("A1"));
+        a1ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<ConditionalCompilationConjunctionRule>(this, &ConditionalCompilationConjunctionRule::A1Action));
+        cmajor::parsing::NonterminalParser* leftNonterminalParser = GetNonterminal(ToUtf32("left"));
+        leftNonterminalParser->SetPostCall(new cmajor::parsing::MemberPostCall<ConditionalCompilationConjunctionRule>(this, &ConditionalCompilationConjunctionRule::Postleft));
+        cmajor::parsing::NonterminalParser* rightNonterminalParser = GetNonterminal(ToUtf32("right"));
+        rightNonterminalParser->SetPostCall(new cmajor::parsing::MemberPostCall<ConditionalCompilationConjunctionRule>(this, &ConditionalCompilationConjunctionRule::Postright));
+    }
+    void A0Action(const char32_t* matchBegin, const char32_t* matchEnd, const Span& span, const std::string& fileName, ParsingData* parsingData, bool& pass)
+    {
+        Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
+        context->s = span;
+        context->value = context->fromleft;
+    }
+    void A1Action(const char32_t* matchBegin, const char32_t* matchEnd, const Span& span, const std::string& fileName, ParsingData* parsingData, bool& pass)
+    {
+        Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
+        context->s.SetEnd(span.End());
+        context->value = new ConditionalCompilationConjunctionNode(context->s, context->value, context->fromright);
+    }
+    void Postleft(cmajor::parsing::ObjectStack& stack, ParsingData* parsingData, bool matched)
+    {
+        Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
+        if (matched)
+        {
+            std::unique_ptr<cmajor::parsing::Object> fromleft_value = std::move(stack.top());
+            context->fromleft = *static_cast<cmajor::parsing::ValueObject<ConditionalCompilationExpressionNode*>*>(fromleft_value.get());
+            stack.pop();
+        }
+    }
+    void Postright(cmajor::parsing::ObjectStack& stack, ParsingData* parsingData, bool matched)
+    {
+        Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
+        if (matched)
+        {
+            std::unique_ptr<cmajor::parsing::Object> fromright_value = std::move(stack.top());
+            context->fromright = *static_cast<cmajor::parsing::ValueObject<ConditionalCompilationExpressionNode*>*>(fromright_value.get());
+            stack.pop();
+        }
+    }
+private:
+    struct Context : cmajor::parsing::Context
+    {
+        Context(): value(), s(), fromleft(), fromright() {}
+        ConditionalCompilationExpressionNode* value;
+        Span s;
+        ConditionalCompilationExpressionNode* fromleft;
+        ConditionalCompilationExpressionNode* fromright;
+    };
+};
+
+class StatementGrammar::ConditionalCompilationPrefixRule : public cmajor::parsing::Rule
+{
+public:
+    ConditionalCompilationPrefixRule(const std::u32string& name_, Scope* enclosingScope_, int id_, Parser* definition_):
+        cmajor::parsing::Rule(name_, enclosingScope_, id_, definition_)
+    {
+        SetValueTypeName(ToUtf32("ConditionalCompilationExpressionNode*"));
+    }
+    virtual void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData)
+    {
+        parsingData->PushContext(Id(), new Context());
+        Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
+    }
+    virtual void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched)
+    {
+        Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
+        if (matched)
+        {
+            stack.push(std::unique_ptr<cmajor::parsing::Object>(new cmajor::parsing::ValueObject<ConditionalCompilationExpressionNode*>(context->value)));
+        }
+        parsingData->PopContext(Id());
+    }
+    virtual void Link()
+    {
+        cmajor::parsing::ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
+        a0ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<ConditionalCompilationPrefixRule>(this, &ConditionalCompilationPrefixRule::A0Action));
+        cmajor::parsing::ActionParser* a1ActionParser = GetAction(ToUtf32("A1"));
+        a1ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<ConditionalCompilationPrefixRule>(this, &ConditionalCompilationPrefixRule::A1Action));
+        cmajor::parsing::NonterminalParser* leftNonterminalParser = GetNonterminal(ToUtf32("left"));
+        leftNonterminalParser->SetPostCall(new cmajor::parsing::MemberPostCall<ConditionalCompilationPrefixRule>(this, &ConditionalCompilationPrefixRule::Postleft));
+        cmajor::parsing::NonterminalParser* rightNonterminalParser = GetNonterminal(ToUtf32("right"));
+        rightNonterminalParser->SetPostCall(new cmajor::parsing::MemberPostCall<ConditionalCompilationPrefixRule>(this, &ConditionalCompilationPrefixRule::Postright));
+    }
+    void A0Action(const char32_t* matchBegin, const char32_t* matchEnd, const Span& span, const std::string& fileName, ParsingData* parsingData, bool& pass)
+    {
+        Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
+        context->value = new ConditionalCompilationNotNode(span, context->fromleft);
+    }
+    void A1Action(const char32_t* matchBegin, const char32_t* matchEnd, const Span& span, const std::string& fileName, ParsingData* parsingData, bool& pass)
+    {
+        Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
+        context->value = context->fromright;
+    }
+    void Postleft(cmajor::parsing::ObjectStack& stack, ParsingData* parsingData, bool matched)
+    {
+        Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
+        if (matched)
+        {
+            std::unique_ptr<cmajor::parsing::Object> fromleft_value = std::move(stack.top());
+            context->fromleft = *static_cast<cmajor::parsing::ValueObject<ConditionalCompilationExpressionNode*>*>(fromleft_value.get());
+            stack.pop();
+        }
+    }
+    void Postright(cmajor::parsing::ObjectStack& stack, ParsingData* parsingData, bool matched)
+    {
+        Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
+        if (matched)
+        {
+            std::unique_ptr<cmajor::parsing::Object> fromright_value = std::move(stack.top());
+            context->fromright = *static_cast<cmajor::parsing::ValueObject<ConditionalCompilationExpressionNode*>*>(fromright_value.get());
+            stack.pop();
+        }
+    }
+private:
+    struct Context : cmajor::parsing::Context
+    {
+        Context(): value(), fromleft(), fromright() {}
+        ConditionalCompilationExpressionNode* value;
+        ConditionalCompilationExpressionNode* fromleft;
+        ConditionalCompilationExpressionNode* fromright;
+    };
+};
+
+class StatementGrammar::ConditionalCompilationPrimaryRule : public cmajor::parsing::Rule
+{
+public:
+    ConditionalCompilationPrimaryRule(const std::u32string& name_, Scope* enclosingScope_, int id_, Parser* definition_):
+        cmajor::parsing::Rule(name_, enclosingScope_, id_, definition_)
+    {
+        SetValueTypeName(ToUtf32("ConditionalCompilationExpressionNode*"));
+    }
+    virtual void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData)
+    {
+        parsingData->PushContext(Id(), new Context());
+        Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
+    }
+    virtual void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched)
+    {
+        Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
+        if (matched)
+        {
+            stack.push(std::unique_ptr<cmajor::parsing::Object>(new cmajor::parsing::ValueObject<ConditionalCompilationExpressionNode*>(context->value)));
+        }
+        parsingData->PopContext(Id());
+    }
+    virtual void Link()
+    {
+        cmajor::parsing::ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
+        a0ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<ConditionalCompilationPrimaryRule>(this, &ConditionalCompilationPrimaryRule::A0Action));
+        cmajor::parsing::ActionParser* a1ActionParser = GetAction(ToUtf32("A1"));
+        a1ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<ConditionalCompilationPrimaryRule>(this, &ConditionalCompilationPrimaryRule::A1Action));
+        cmajor::parsing::NonterminalParser* symbNonterminalParser = GetNonterminal(ToUtf32("symb"));
+        symbNonterminalParser->SetPostCall(new cmajor::parsing::MemberPostCall<ConditionalCompilationPrimaryRule>(this, &ConditionalCompilationPrimaryRule::Postsymb));
+        cmajor::parsing::NonterminalParser* exprNonterminalParser = GetNonterminal(ToUtf32("expr"));
+        exprNonterminalParser->SetPostCall(new cmajor::parsing::MemberPostCall<ConditionalCompilationPrimaryRule>(this, &ConditionalCompilationPrimaryRule::Postexpr));
+    }
+    void A0Action(const char32_t* matchBegin, const char32_t* matchEnd, const Span& span, const std::string& fileName, ParsingData* parsingData, bool& pass)
+    {
+        Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
+        context->value = new ConditionalCompilationPrimaryNode(span, context->fromsymb);
+    }
+    void A1Action(const char32_t* matchBegin, const char32_t* matchEnd, const Span& span, const std::string& fileName, ParsingData* parsingData, bool& pass)
+    {
+        Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
+        context->value = context->fromexpr;
+    }
+    void Postsymb(cmajor::parsing::ObjectStack& stack, ParsingData* parsingData, bool matched)
+    {
+        Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
+        if (matched)
+        {
+            std::unique_ptr<cmajor::parsing::Object> fromsymb_value = std::move(stack.top());
+            context->fromsymb = *static_cast<cmajor::parsing::ValueObject<std::u32string>*>(fromsymb_value.get());
+            stack.pop();
+        }
+    }
+    void Postexpr(cmajor::parsing::ObjectStack& stack, ParsingData* parsingData, bool matched)
+    {
+        Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
+        if (matched)
+        {
+            std::unique_ptr<cmajor::parsing::Object> fromexpr_value = std::move(stack.top());
+            context->fromexpr = *static_cast<cmajor::parsing::ValueObject<ConditionalCompilationExpressionNode*>*>(fromexpr_value.get());
+            stack.pop();
+        }
+    }
+private:
+    struct Context : cmajor::parsing::Context
+    {
+        Context(): value(), fromsymb(), fromexpr() {}
+        ConditionalCompilationExpressionNode* value;
+        std::u32string fromsymb;
+        ConditionalCompilationExpressionNode* fromexpr;
+    };
+};
+
+class StatementGrammar::SymbolRule : public cmajor::parsing::Rule
+{
+public:
+    SymbolRule(const std::u32string& name_, Scope* enclosingScope_, int id_, Parser* definition_):
+        cmajor::parsing::Rule(name_, enclosingScope_, id_, definition_)
+    {
+        SetValueTypeName(ToUtf32("std::u32string"));
+    }
+    virtual void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData)
+    {
+        parsingData->PushContext(Id(), new Context());
+        Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
+    }
+    virtual void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched)
+    {
+        Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
+        if (matched)
+        {
+            stack.push(std::unique_ptr<cmajor::parsing::Object>(new cmajor::parsing::ValueObject<std::u32string>(context->value)));
+        }
+        parsingData->PopContext(Id());
+    }
+    virtual void Link()
+    {
+        cmajor::parsing::ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
+        a0ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<SymbolRule>(this, &SymbolRule::A0Action));
+        cmajor::parsing::NonterminalParser* identifierNonterminalParser = GetNonterminal(ToUtf32("identifier"));
+        identifierNonterminalParser->SetPostCall(new cmajor::parsing::MemberPostCall<SymbolRule>(this, &SymbolRule::Postidentifier));
+    }
+    void A0Action(const char32_t* matchBegin, const char32_t* matchEnd, const Span& span, const std::string& fileName, ParsingData* parsingData, bool& pass)
+    {
+        Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
+        context->value = std::u32string(matchBegin, matchEnd);
+    }
+    void Postidentifier(cmajor::parsing::ObjectStack& stack, ParsingData* parsingData, bool matched)
+    {
+        Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
+        if (matched)
+        {
+            std::unique_ptr<cmajor::parsing::Object> fromidentifier_value = std::move(stack.top());
+            context->fromidentifier = *static_cast<cmajor::parsing::ValueObject<std::u32string>*>(fromidentifier_value.get());
+            stack.pop();
+        }
+    }
+private:
+    struct Context : cmajor::parsing::Context
+    {
+        Context(): value(), fromidentifier() {}
+        std::u32string value;
+        std::u32string fromidentifier;
+    };
+};
+
 void StatementGrammar::GetReferencedGrammars()
 {
     cmajor::parsing::ParsingDomain* pd = GetParsingDomain();
-    cmajor::parsing::Grammar* grammar0 = pd->GetGrammar(ToUtf32("cmajor.parsing.stdlib"));
+    cmajor::parsing::Grammar* grammar0 = pd->GetGrammar(ToUtf32("cmajor.parser.TypeExprGrammar"));
     if (!grammar0)
     {
-        grammar0 = cmajor::parsing::stdlib::Create(pd);
+        grammar0 = cmajor::parser::TypeExprGrammar::Create(pd);
     }
     AddGrammarReference(grammar0);
-    cmajor::parsing::Grammar* grammar1 = pd->GetGrammar(ToUtf32("cmajor.parser.TypeExprGrammar"));
+    cmajor::parsing::Grammar* grammar1 = pd->GetGrammar(ToUtf32("cmajor.parser.KeywordGrammar"));
     if (!grammar1)
     {
-        grammar1 = cmajor::parser::TypeExprGrammar::Create(pd);
+        grammar1 = cmajor::parser::KeywordGrammar::Create(pd);
     }
     AddGrammarReference(grammar1);
-    cmajor::parsing::Grammar* grammar2 = pd->GetGrammar(ToUtf32("cmajor.parser.IdentifierGrammar"));
+    cmajor::parsing::Grammar* grammar2 = pd->GetGrammar(ToUtf32("cmajor.parsing.stdlib"));
     if (!grammar2)
     {
-        grammar2 = cmajor::parser::IdentifierGrammar::Create(pd);
+        grammar2 = cmajor::parsing::stdlib::Create(pd);
     }
     AddGrammarReference(grammar2);
-    cmajor::parsing::Grammar* grammar3 = pd->GetGrammar(ToUtf32("cmajor.parser.KeywordGrammar"));
+    cmajor::parsing::Grammar* grammar3 = pd->GetGrammar(ToUtf32("cmajor.parser.ExpressionGrammar"));
     if (!grammar3)
     {
-        grammar3 = cmajor::parser::KeywordGrammar::Create(pd);
+        grammar3 = cmajor::parser::ExpressionGrammar::Create(pd);
     }
     AddGrammarReference(grammar3);
-    cmajor::parsing::Grammar* grammar4 = pd->GetGrammar(ToUtf32("cmajor.parser.ExpressionGrammar"));
+    cmajor::parsing::Grammar* grammar4 = pd->GetGrammar(ToUtf32("cmajor.parser.IdentifierGrammar"));
     if (!grammar4)
     {
-        grammar4 = cmajor::parser::ExpressionGrammar::Create(pd);
+        grammar4 = cmajor::parser::IdentifierGrammar::Create(pd);
     }
     AddGrammarReference(grammar4);
 }
 
 void StatementGrammar::CreateRules()
 {
-    AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("identifier"), this, ToUtf32("cmajor.parsing.stdlib.identifier")));
-    AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("TypeExpr"), this, ToUtf32("TypeExprGrammar.TypeExpr")));
     AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("Keyword"), this, ToUtf32("KeywordGrammar.Keyword")));
+    AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("identifier"), this, ToUtf32("cmajor.parsing.stdlib.identifier")));
     AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("Expression"), this, ToUtf32("ExpressionGrammar.Expression")));
+    AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("TypeExpr"), this, ToUtf32("TypeExprGrammar.TypeExpr")));
     AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("Identifier"), this, ToUtf32("IdentifierGrammar.Identifier")));
     AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("ArgumentList"), this, ToUtf32("ExpressionGrammar.ArgumentList")));
     AddRule(new StatementRule(ToUtf32("Statement"), GetScope(), GetParsingDomain()->GetNextRuleId(),
@@ -3311,28 +3899,31 @@ void StatementGrammar::CreateRules()
                                     new cmajor::parsing::AlternativeParser(
                                         new cmajor::parsing::AlternativeParser(
                                             new cmajor::parsing::AlternativeParser(
-                                                new cmajor::parsing::ActionParser(ToUtf32("A0"),
-                                                    new cmajor::parsing::NonterminalParser(ToUtf32("LabeledStatement"), ToUtf32("LabeledStatement"), 1)),
-                                                new cmajor::parsing::ActionParser(ToUtf32("A1"),
-                                                    new cmajor::parsing::NonterminalParser(ToUtf32("ControlStatement"), ToUtf32("ControlStatement"), 1))),
-                                            new cmajor::parsing::ActionParser(ToUtf32("A2"),
-                                                new cmajor::parsing::NonterminalParser(ToUtf32("ExpressionStatement"), ToUtf32("ExpressionStatement"), 1))),
-                                        new cmajor::parsing::ActionParser(ToUtf32("A3"),
-                                            new cmajor::parsing::NonterminalParser(ToUtf32("AssignmentStatement"), ToUtf32("AssignmentStatement"), 1))),
-                                    new cmajor::parsing::ActionParser(ToUtf32("A4"),
-                                        new cmajor::parsing::NonterminalParser(ToUtf32("ConstructionStatement"), ToUtf32("ConstructionStatement"), 1))),
-                                new cmajor::parsing::ActionParser(ToUtf32("A5"),
-                                    new cmajor::parsing::NonterminalParser(ToUtf32("DeleteStatement"), ToUtf32("DeleteStatement"), 1))),
-                            new cmajor::parsing::ActionParser(ToUtf32("A6"),
-                                new cmajor::parsing::NonterminalParser(ToUtf32("DestroyStatement"), ToUtf32("DestroyStatement"), 1))),
-                        new cmajor::parsing::ActionParser(ToUtf32("A7"),
-                            new cmajor::parsing::NonterminalParser(ToUtf32("EmptyStatement"), ToUtf32("EmptyStatement"), 1))),
-                    new cmajor::parsing::ActionParser(ToUtf32("A8"),
-                        new cmajor::parsing::NonterminalParser(ToUtf32("ThrowStatement"), ToUtf32("ThrowStatement"), 1))),
-                new cmajor::parsing::ActionParser(ToUtf32("A9"),
-                    new cmajor::parsing::NonterminalParser(ToUtf32("TryStatement"), ToUtf32("TryStatement"), 1))),
-            new cmajor::parsing::ActionParser(ToUtf32("A10"),
-                new cmajor::parsing::NonterminalParser(ToUtf32("AssertStatement"), ToUtf32("AssertStatement"), 1)))));
+                                                new cmajor::parsing::AlternativeParser(
+                                                    new cmajor::parsing::ActionParser(ToUtf32("A0"),
+                                                        new cmajor::parsing::NonterminalParser(ToUtf32("LabeledStatement"), ToUtf32("LabeledStatement"), 1)),
+                                                    new cmajor::parsing::ActionParser(ToUtf32("A1"),
+                                                        new cmajor::parsing::NonterminalParser(ToUtf32("ControlStatement"), ToUtf32("ControlStatement"), 1))),
+                                                new cmajor::parsing::ActionParser(ToUtf32("A2"),
+                                                    new cmajor::parsing::NonterminalParser(ToUtf32("ExpressionStatement"), ToUtf32("ExpressionStatement"), 1))),
+                                            new cmajor::parsing::ActionParser(ToUtf32("A3"),
+                                                new cmajor::parsing::NonterminalParser(ToUtf32("AssignmentStatement"), ToUtf32("AssignmentStatement"), 1))),
+                                        new cmajor::parsing::ActionParser(ToUtf32("A4"),
+                                            new cmajor::parsing::NonterminalParser(ToUtf32("ConstructionStatement"), ToUtf32("ConstructionStatement"), 1))),
+                                    new cmajor::parsing::ActionParser(ToUtf32("A5"),
+                                        new cmajor::parsing::NonterminalParser(ToUtf32("DeleteStatement"), ToUtf32("DeleteStatement"), 1))),
+                                new cmajor::parsing::ActionParser(ToUtf32("A6"),
+                                    new cmajor::parsing::NonterminalParser(ToUtf32("DestroyStatement"), ToUtf32("DestroyStatement"), 1))),
+                            new cmajor::parsing::ActionParser(ToUtf32("A7"),
+                                new cmajor::parsing::NonterminalParser(ToUtf32("EmptyStatement"), ToUtf32("EmptyStatement"), 1))),
+                        new cmajor::parsing::ActionParser(ToUtf32("A8"),
+                            new cmajor::parsing::NonterminalParser(ToUtf32("ThrowStatement"), ToUtf32("ThrowStatement"), 1))),
+                    new cmajor::parsing::ActionParser(ToUtf32("A9"),
+                        new cmajor::parsing::NonterminalParser(ToUtf32("TryStatement"), ToUtf32("TryStatement"), 1))),
+                new cmajor::parsing::ActionParser(ToUtf32("A10"),
+                    new cmajor::parsing::NonterminalParser(ToUtf32("AssertStatement"), ToUtf32("AssertStatement"), 1))),
+            new cmajor::parsing::ActionParser(ToUtf32("A11"),
+                new cmajor::parsing::NonterminalParser(ToUtf32("ConditionalCompilationStatement"), ToUtf32("ConditionalCompilationStatement"), 1)))));
     AddRule(new LabelIdRule(ToUtf32("LabelId"), GetScope(), GetParsingDomain()->GetNextRuleId(),
         new cmajor::parsing::ActionParser(ToUtf32("A0"),
             new cmajor::parsing::DifferenceParser(
@@ -3732,6 +4323,101 @@ void StatementGrammar::CreateRules()
                         new cmajor::parsing::NonterminalParser(ToUtf32("Expression"), ToUtf32("Expression"), 1))),
                 new cmajor::parsing::ExpectationParser(
                     new cmajor::parsing::CharParser(';'))))));
+    AddRule(new ConditionalCompilationStatementRule(ToUtf32("ConditionalCompilationStatement"), GetScope(), GetParsingDomain()->GetNextRuleId(),
+        new cmajor::parsing::SequenceParser(
+            new cmajor::parsing::SequenceParser(
+                new cmajor::parsing::SequenceParser(
+                    new cmajor::parsing::SequenceParser(
+                        new cmajor::parsing::SequenceParser(
+                            new cmajor::parsing::SequenceParser(
+                                new cmajor::parsing::SequenceParser(
+                                    new cmajor::parsing::SequenceParser(
+                                        new cmajor::parsing::SequenceParser(
+                                            new cmajor::parsing::CharParser('#'),
+                                            new cmajor::parsing::KeywordParser(ToUtf32("if"))),
+                                        new cmajor::parsing::ExpectationParser(
+                                            new cmajor::parsing::CharParser('('))),
+                                    new cmajor::parsing::ActionParser(ToUtf32("A0"),
+                                        new cmajor::parsing::NonterminalParser(ToUtf32("ifExpr"), ToUtf32("ConditionalCompilationExpression"), 0))),
+                                new cmajor::parsing::ExpectationParser(
+                                    new cmajor::parsing::CharParser(')'))),
+                            new cmajor::parsing::KleeneStarParser(
+                                new cmajor::parsing::ActionParser(ToUtf32("A1"),
+                                    new cmajor::parsing::NonterminalParser(ToUtf32("ifS"), ToUtf32("Statement"), 1)))),
+                        new cmajor::parsing::KleeneStarParser(
+                            new cmajor::parsing::SequenceParser(
+                                new cmajor::parsing::SequenceParser(
+                                    new cmajor::parsing::SequenceParser(
+                                        new cmajor::parsing::SequenceParser(
+                                            new cmajor::parsing::SequenceParser(
+                                                new cmajor::parsing::CharParser('#'),
+                                                new cmajor::parsing::KeywordParser(ToUtf32("elif"))),
+                                            new cmajor::parsing::ExpectationParser(
+                                                new cmajor::parsing::CharParser('('))),
+                                        new cmajor::parsing::ActionParser(ToUtf32("A2"),
+                                            new cmajor::parsing::NonterminalParser(ToUtf32("elifExpr"), ToUtf32("ConditionalCompilationExpression"), 0))),
+                                    new cmajor::parsing::ExpectationParser(
+                                        new cmajor::parsing::CharParser(')'))),
+                                new cmajor::parsing::KleeneStarParser(
+                                    new cmajor::parsing::ActionParser(ToUtf32("A3"),
+                                        new cmajor::parsing::NonterminalParser(ToUtf32("elifS"), ToUtf32("Statement"), 1)))))),
+                    new cmajor::parsing::OptionalParser(
+                        new cmajor::parsing::SequenceParser(
+                            new cmajor::parsing::SequenceParser(
+                                new cmajor::parsing::CharParser('#'),
+                                new cmajor::parsing::KeywordParser(ToUtf32("else"))),
+                            new cmajor::parsing::KleeneStarParser(
+                                new cmajor::parsing::ActionParser(ToUtf32("A4"),
+                                    new cmajor::parsing::NonterminalParser(ToUtf32("elseS"), ToUtf32("Statement"), 1)))))),
+                new cmajor::parsing::CharParser('#')),
+            new cmajor::parsing::ExpectationParser(
+                new cmajor::parsing::KeywordParser(ToUtf32("endif"))))));
+    AddRule(new ConditionalCompilationExpressionRule(ToUtf32("ConditionalCompilationExpression"), GetScope(), GetParsingDomain()->GetNextRuleId(),
+        new cmajor::parsing::ActionParser(ToUtf32("A0"),
+            new cmajor::parsing::NonterminalParser(ToUtf32("ConditionalCompilationDisjunction"), ToUtf32("ConditionalCompilationDisjunction"), 0))));
+    AddRule(new ConditionalCompilationDisjunctionRule(ToUtf32("ConditionalCompilationDisjunction"), GetScope(), GetParsingDomain()->GetNextRuleId(),
+        new cmajor::parsing::SequenceParser(
+            new cmajor::parsing::ActionParser(ToUtf32("A0"),
+                new cmajor::parsing::NonterminalParser(ToUtf32("left"), ToUtf32("ConditionalCompilationConjunction"), 0)),
+            new cmajor::parsing::KleeneStarParser(
+                new cmajor::parsing::SequenceParser(
+                    new cmajor::parsing::StringParser(ToUtf32("||")),
+                    new cmajor::parsing::ActionParser(ToUtf32("A1"),
+                        new cmajor::parsing::NonterminalParser(ToUtf32("right"), ToUtf32("ConditionalCompilationConjunction"), 0)))))));
+    AddRule(new ConditionalCompilationConjunctionRule(ToUtf32("ConditionalCompilationConjunction"), GetScope(), GetParsingDomain()->GetNextRuleId(),
+        new cmajor::parsing::SequenceParser(
+            new cmajor::parsing::ActionParser(ToUtf32("A0"),
+                new cmajor::parsing::NonterminalParser(ToUtf32("left"), ToUtf32("ConditionalCompilationPrefix"), 0)),
+            new cmajor::parsing::KleeneStarParser(
+                new cmajor::parsing::SequenceParser(
+                    new cmajor::parsing::StringParser(ToUtf32("&&")),
+                    new cmajor::parsing::ActionParser(ToUtf32("A1"),
+                        new cmajor::parsing::NonterminalParser(ToUtf32("right"), ToUtf32("ConditionalCompilationPrefix"), 0)))))));
+    AddRule(new ConditionalCompilationPrefixRule(ToUtf32("ConditionalCompilationPrefix"), GetScope(), GetParsingDomain()->GetNextRuleId(),
+        new cmajor::parsing::AlternativeParser(
+            new cmajor::parsing::ActionParser(ToUtf32("A0"),
+                new cmajor::parsing::SequenceParser(
+                    new cmajor::parsing::CharParser('!'),
+                    new cmajor::parsing::ExpectationParser(
+                        new cmajor::parsing::NonterminalParser(ToUtf32("left"), ToUtf32("ConditionalCompilationPrefix"), 0)))),
+            new cmajor::parsing::ActionParser(ToUtf32("A1"),
+                new cmajor::parsing::ExpectationParser(
+                    new cmajor::parsing::NonterminalParser(ToUtf32("right"), ToUtf32("ConditionalCompilationPrimary"), 0))))));
+    AddRule(new ConditionalCompilationPrimaryRule(ToUtf32("ConditionalCompilationPrimary"), GetScope(), GetParsingDomain()->GetNextRuleId(),
+        new cmajor::parsing::AlternativeParser(
+            new cmajor::parsing::ActionParser(ToUtf32("A0"),
+                new cmajor::parsing::NonterminalParser(ToUtf32("symb"), ToUtf32("Symbol"), 0)),
+            new cmajor::parsing::SequenceParser(
+                new cmajor::parsing::SequenceParser(
+                    new cmajor::parsing::CharParser('('),
+                    new cmajor::parsing::ActionParser(ToUtf32("A1"),
+                        new cmajor::parsing::NonterminalParser(ToUtf32("expr"), ToUtf32("ConditionalCompilationExpression"), 0))),
+                new cmajor::parsing::CharParser(')')))));
+    AddRule(new SymbolRule(ToUtf32("Symbol"), GetScope(), GetParsingDomain()->GetNextRuleId(),
+        new cmajor::parsing::ActionParser(ToUtf32("A0"),
+            new cmajor::parsing::DifferenceParser(
+                new cmajor::parsing::NonterminalParser(ToUtf32("identifier"), ToUtf32("identifier"), 0),
+                new cmajor::parsing::NonterminalParser(ToUtf32("Keyword"), ToUtf32("Keyword"), 0)))));
 }
 
 } } // namespace cmajor.parser

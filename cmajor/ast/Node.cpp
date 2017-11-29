@@ -50,6 +50,8 @@ const char* nodeTypeStr[] =
     "lessOrEqualNode", "greaterOrEqualNode", "shiftLeftNode", "shiftRightNode", 
     "addNode", "subNode", "mulNode", "divNode", "remNode", "notNode", "unaryPlusNode", "unaryMinusNode", "prefixIncrementNode", "prefixDecrementNode", "complementNode", "derefNode", "addrOfNode",
     "isNode", "asNode", "indexingNode", "invokeNode", "postfixIncrementNode", "postfixDecrementNode", "sizeOfNode", "typeNameNode", "castNode", "constructNode", "newNode", "thisNode", "baseNode",
+    "conditionalCompilationDisjunctionNode", "conditionalCompilationConjunctionNode", "conditionalCompilationNotNode", "conditionalCompilationPrimaryNode", "conditionalCompilationPartNode", 
+    "conditionalCompilationStatementNode",
     "maxNode"
 };
 
@@ -318,6 +320,12 @@ NodeFactory::NodeFactory()
     Register(NodeType::newNode, new ConcreteNodeCreator<NewNode>());
     Register(NodeType::thisNode, new ConcreteNodeCreator<ThisNode>());
     Register(NodeType::baseNode, new ConcreteNodeCreator<BaseNode>());
+    Register(NodeType::conditionalCompilationDisjunctionNode, new ConcreteNodeCreator<ConditionalCompilationDisjunctionNode>());
+    Register(NodeType::conditionalCompilationConjunctionNode, new ConcreteNodeCreator<ConditionalCompilationConjunctionNode>());
+    Register(NodeType::conditionalCompilationNotNode, new ConcreteNodeCreator<ConditionalCompilationNotNode>());
+    Register(NodeType::conditionalCompilationPrimaryNode, new ConcreteNodeCreator<ConditionalCompilationPrimaryNode>());
+    Register(NodeType::conditionalCompilationPartNode, new ConcreteNodeCreator<ConditionalCompilationPartNode>());
+    Register(NodeType::conditionalCompilationStatementNode, new ConcreteNodeCreator<ConditionalCompilationStatementNode>());
 }
 
 void NodeFactory::Register(NodeType nodeType, NodeCreator* creator)

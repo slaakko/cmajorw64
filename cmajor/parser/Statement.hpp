@@ -1,5 +1,5 @@
-#ifndef Statement_hpp_29247
-#define Statement_hpp_29247
+#ifndef Statement_hpp_18389
+#define Statement_hpp_18389
 
 #include <cmajor/parsing/Grammar.hpp>
 #include <cmajor/parsing/Keyword.hpp>
@@ -52,8 +52,15 @@ private:
     class TryStatementRule;
     class CatchRule;
     class AssertStatementRule;
+    class ConditionalCompilationStatementRule;
+    class ConditionalCompilationExpressionRule;
+    class ConditionalCompilationDisjunctionRule;
+    class ConditionalCompilationConjunctionRule;
+    class ConditionalCompilationPrefixRule;
+    class ConditionalCompilationPrimaryRule;
+    class SymbolRule;
 };
 
 } } // namespace cmajor.parser
 
-#endif // Statement_hpp_29247
+#endif // Statement_hpp_18389

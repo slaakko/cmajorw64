@@ -4,6 +4,7 @@
 // =================================
 
 #include <cmajor/symbols/GlobalFlags.hpp>
+#include <set>
 
 namespace cmajor { namespace symbols {
 
@@ -96,6 +97,31 @@ void SetCurrentTooName(const std::u32string& currentToolName_)
 std::u32string GetCurrentToolName()
 {
     return currentToolName;
+}
+
+std::set<std::u32string> defines;
+
+void ClearDefines()
+{
+    defines.clear();
+}
+
+void DefineSymbol(const std::u32string& symbol)
+{
+    defines.insert(symbol);
+}
+
+bool IsSymbolDefined(const std::u32string& symbol)
+{
+    auto it = defines.find(symbol);
+    if (it != defines.cend())
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
 }
 
 } } // namespace cmajor::symbols

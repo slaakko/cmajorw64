@@ -907,6 +907,32 @@ namespace cmdevenv
                 }
             }
         }
+        private void SetDefinesFor(Project project, string config)
+        {
+            try
+            {
+                string definesFilePath = project.DefinesFilePath(config);
+                Directory.CreateDirectory(Path.GetDirectoryName(definesFilePath));
+                if (File.Exists(definesFilePath))
+                {
+                    File.Delete(definesFilePath);
+                }
+                ProjectConfig projectConfig = ProjectConfigurations.Instance.GetProjectConfig(project.GetConfigurationFilePath());
+                string condionalCompilationSymbolsString = projectConfig.GetConditionalCompilationSymbols(config);
+                string[] conditionalCompilationSymbols = condionalCompilationSymbolsString.Split(' ');
+                using (StreamWriter writer = File.CreateText(definesFilePath))
+                {
+                    foreach (string conditionalCompilationSymbol in conditionalCompilationSymbols)
+                    {
+                        writer.WriteLine(conditionalCompilationSymbol);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
         private void BuildSolution()
         {
             try
@@ -936,6 +962,10 @@ namespace cmdevenv
                     cancelToolStripMenuItem.Enabled = true;
                     buildInProgress = true;
                     SetState(State.compiling);
+                    foreach (Project project in solution.Projects)
+                    {
+                        SetDefinesFor(project, config);
+                    }
                     compiler.DoCompile(solution.FilePath, config, strictNothrow, emitLlvm, emitOptLlvm, linkWithDebugRuntime, linkUsingMsLink, optimizationLevel);
                     infoLabel.Text = "Building";
                 }
@@ -969,6 +999,7 @@ namespace cmdevenv
                 cancelToolStripMenuItem.Enabled = true;
                 buildInProgress = true;
                 SetState(State.compiling);
+                SetDefinesFor(project, config);
                 compiler.DoCompile(project.FilePath, config, strictNothrow, emitLlvm, emitOptLlvm, linkWithDebugRuntime, linkUsingMsLink, optimizationLevel);
                 infoLabel.Text = "Building";
             }
@@ -1688,9 +1719,8 @@ namespace cmdevenv
                     console.Clear();
                     outputTabControl.SelectedTab = consoleTabPage;
                     console.Focus();
-                    //ProjectConfig config = ProjectConfigurations.Instance.GetProjectConfig(activeProject.GetConfigurationFilePath());
-                    //string arguments = config.GetCommandLineArguments(configComboBox.Text);
-                    string arguments = "";
+                    ProjectConfig config = ProjectConfigurations.Instance.GetProjectConfig(activeProject.GetConfigurationFilePath());
+                    string arguments = config.GetCommandLineArguments(configComboBox.Text);
                     string executablePath = activeProject.GetExecutablePath(configComboBox.Text);
                     abortToolStripMenuItem.Enabled = true;
                     processRunning = true;
@@ -1926,6 +1956,27 @@ namespace cmdevenv
             try
             {
                 System.Diagnostics.Process.Start("http://slaakko.github.io/cmajor/");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+        private void projectPropertiesToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                TreeNode selectedNode = solutionExplorerTreeView.SelectedNode;
+                if (selectedNode != null)
+                {
+                    Project selectedProject = selectedNode.Tag as Project;
+                    if (selectedProject != null)
+                    {
+                        ProjectPropertiesDialog dialog = new ProjectPropertiesDialog(selectedProject);
+                        dialog.ShowDialog();
+                    }
+                }
+                    
             }
             catch (Exception ex)
             {

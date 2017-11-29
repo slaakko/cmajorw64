@@ -1105,4 +1105,189 @@ void AssertStatementNode::Read(AstReader& reader)
     assertExpr->SetParent(this);
 }
 
+ConditionalCompilationExpressionNode::ConditionalCompilationExpressionNode(NodeType nodeType_, const Span& span_) : Node(nodeType_, span_)
+{
+}
+
+ConditionalCompilationBinaryExpressionNode::ConditionalCompilationBinaryExpressionNode(NodeType nodeType_, const Span& span_) : ConditionalCompilationExpressionNode(nodeType_, span_)
+{
+}
+
+ConditionalCompilationBinaryExpressionNode::ConditionalCompilationBinaryExpressionNode(NodeType nodeType_, const Span& span_, ConditionalCompilationExpressionNode* left_, ConditionalCompilationExpressionNode* right_) :
+    ConditionalCompilationExpressionNode(nodeType_, span_), left(left_), right(right_)
+{
+    left->SetParent(this);
+    right->SetParent(this);
+}
+
+ConditionalCompilationDisjunctionNode::ConditionalCompilationDisjunctionNode(const Span& span_) : ConditionalCompilationBinaryExpressionNode(NodeType::conditionalCompilationDisjunctionNode, span_)
+{
+}
+
+ConditionalCompilationDisjunctionNode::ConditionalCompilationDisjunctionNode(const Span& span_, ConditionalCompilationExpressionNode* left_, ConditionalCompilationExpressionNode* right_) :
+    ConditionalCompilationBinaryExpressionNode(NodeType::conditionalCompilationDisjunctionNode, span_, left_, right_)
+{
+}
+
+Node* ConditionalCompilationDisjunctionNode::Clone(CloneContext& cloneContext) const
+{
+    return new ConditionalCompilationDisjunctionNode(GetSpan(), static_cast<ConditionalCompilationExpressionNode*>(Left()->Clone(cloneContext)), static_cast<ConditionalCompilationExpressionNode*>(Right()->Clone(cloneContext)));
+}
+
+void ConditionalCompilationDisjunctionNode::Accept(Visitor& visitor)
+{
+    visitor.Visit(*this);
+}
+
+ConditionalCompilationConjunctionNode::ConditionalCompilationConjunctionNode(const Span& span_) : ConditionalCompilationBinaryExpressionNode(NodeType::conditionalCompilationConjunctionNode, span_)
+{
+}
+
+ConditionalCompilationConjunctionNode::ConditionalCompilationConjunctionNode(const Span& span_, ConditionalCompilationExpressionNode* left_, ConditionalCompilationExpressionNode* right_) :
+    ConditionalCompilationBinaryExpressionNode(NodeType::conditionalCompilationConjunctionNode, span_, left_, right_)
+{
+}
+
+Node* ConditionalCompilationConjunctionNode::Clone(CloneContext& cloneContext) const
+{
+    return new ConditionalCompilationConjunctionNode(GetSpan(), static_cast<ConditionalCompilationExpressionNode*>(Left()->Clone(cloneContext)), static_cast<ConditionalCompilationExpressionNode*>(Right()->Clone(cloneContext)));
+}
+
+void ConditionalCompilationConjunctionNode::Accept(Visitor& visitor)
+{
+    visitor.Visit(*this);
+}
+
+ConditionalCompilationNotNode::ConditionalCompilationNotNode(const Span& span_) : ConditionalCompilationExpressionNode(NodeType::conditionalCompilationNotNode, span_)
+{
+}
+
+ConditionalCompilationNotNode::ConditionalCompilationNotNode(const Span& span_, ConditionalCompilationExpressionNode* expr_) : 
+    ConditionalCompilationExpressionNode(NodeType::conditionalCompilationNotNode, span_), expr(expr_)
+{
+}
+
+Node* ConditionalCompilationNotNode::Clone(CloneContext& cloneContext) const
+{
+    return new ConditionalCompilationNotNode(GetSpan(), static_cast<ConditionalCompilationExpressionNode*>(expr->Clone(cloneContext)));
+}
+
+void ConditionalCompilationNotNode::Accept(Visitor& visitor)
+{
+    visitor.Visit(*this);
+}
+
+ConditionalCompilationPrimaryNode::ConditionalCompilationPrimaryNode(const Span& span_) : ConditionalCompilationExpressionNode(NodeType::conditionalCompilationPrimaryNode, span_)
+{
+}
+
+ConditionalCompilationPrimaryNode::ConditionalCompilationPrimaryNode(const Span& span_, const std::u32string& symbol_) :
+    ConditionalCompilationExpressionNode(NodeType::conditionalCompilationPrimaryNode, span_), symbol(symbol_)
+{
+}
+
+Node* ConditionalCompilationPrimaryNode::Clone(CloneContext& cloneContext) const
+{
+    return new ConditionalCompilationPrimaryNode(GetSpan(), symbol);
+}
+
+void ConditionalCompilationPrimaryNode::Accept(Visitor& visitor)
+{
+    visitor.Visit(*this);
+}
+
+ConditionalCompilationPartNode::ConditionalCompilationPartNode(const Span& span_) : Node(NodeType::conditionalCompilationPartNode, span_)
+{
+}
+
+ConditionalCompilationPartNode::ConditionalCompilationPartNode(const Span& span_, ConditionalCompilationExpressionNode* expr_) : Node(NodeType::conditionalCompilationPartNode, span_), expr(expr_)
+{
+    expr->SetParent(this);
+}
+
+void ConditionalCompilationPartNode::AddStatement(StatementNode* statement)
+{
+    statement->SetParent(this);
+    statements.Add(statement);
+}
+
+Node* ConditionalCompilationPartNode::Clone(CloneContext& cloneContext) const
+{
+    ConditionalCompilationExpressionNode* clonedIfExpr = nullptr;
+    if (expr)
+    {
+        clonedIfExpr = static_cast<ConditionalCompilationExpressionNode*>(expr->Clone(cloneContext));
+    }
+    ConditionalCompilationPartNode* clone = new ConditionalCompilationPartNode(GetSpan(), clonedIfExpr);
+    int n = statements.Count();
+    for (int i = 0; i < n; ++i)
+    {
+        clone->AddStatement(static_cast<StatementNode*>(statements[i]->Clone(cloneContext)));
+    }
+    return clone;
+}
+
+void ConditionalCompilationPartNode::Accept(Visitor& visitor)
+{
+    visitor.Visit(*this);
+}
+
+ConditionalCompilationStatementNode::ConditionalCompilationStatementNode(const Span& span_) : StatementNode(NodeType::conditionalCompilationStatementNode, span_), ifPart(nullptr)
+{
+}
+
+ConditionalCompilationStatementNode::ConditionalCompilationStatementNode(const Span& span_, ConditionalCompilationExpressionNode* ifExpr_) :
+    StatementNode(NodeType::conditionalCompilationStatementNode, span_), ifPart(new ConditionalCompilationPartNode(span_, ifExpr_))
+{
+}
+
+void ConditionalCompilationStatementNode::AddIfStatement(StatementNode* statement)
+{
+    ifPart->AddStatement(statement);
+}
+
+void ConditionalCompilationStatementNode::AddElifExpr(const Span& span, ConditionalCompilationExpressionNode* expr)
+{
+    elifParts.Add(new ConditionalCompilationPartNode(span, expr));
+}
+
+void ConditionalCompilationStatementNode::AddElifStatement(StatementNode* statement)
+{
+    elifParts[elifParts.Count() - 1]->AddStatement(statement);
+}
+
+void ConditionalCompilationStatementNode::AddElseStatement(const Span& span, StatementNode* statement)
+{
+    if (!elsePart)
+    {
+        elsePart.reset(new ConditionalCompilationPartNode(span));
+    }
+    elsePart->AddStatement(statement);
+}
+
+Node* ConditionalCompilationStatementNode::Clone(CloneContext& cloneContext) const
+{
+    ConditionalCompilationStatementNode* clone = new ConditionalCompilationStatementNode(GetSpan());
+    ConditionalCompilationPartNode* clonedIfPart = static_cast<ConditionalCompilationPartNode*>(ifPart->Clone(cloneContext));
+    clone->ifPart.reset(clonedIfPart);
+    int n = elifParts.Count();
+    for (int i = 0; i < n; ++i)
+    {
+        ConditionalCompilationPartNode* elifPart = elifParts[i];
+        ConditionalCompilationPartNode* clonedElifPart = static_cast<ConditionalCompilationPartNode*>(elifPart->Clone(cloneContext));
+        clone->elifParts.Add(clonedElifPart);
+    }
+    if (elsePart)
+    {
+        ConditionalCompilationPartNode* clonedElsePart = static_cast<ConditionalCompilationPartNode*>(elsePart->Clone(cloneContext));
+        clone->elsePart.reset(clonedElsePart);
+    }
+    return clone;
+}
+
+void ConditionalCompilationStatementNode::Accept(Visitor& visitor)
+{
+    visitor.Visit(*this);
+}
+
 } } // namespace cmajor::ast
