@@ -366,10 +366,10 @@ void DerivedTypeSymbol::Read(SymbolReader& reader)
     }
 }
 
-void DerivedTypeSymbol::EmplaceType(TypeSymbol* typeSymbol_, int index)
+void DerivedTypeSymbol::EmplaceType(TypeSymbol* typeSymbol, int index)
 {
     Assert(index == 0, "invalid emplace type index");
-    baseType = typeSymbol_;
+    baseType = typeSymbol;
 }
 
 void DerivedTypeSymbol::ComputeExportClosure()
@@ -567,6 +567,15 @@ llvm::Constant* DerivedTypeSymbol::CreateDefaultIrValue(Emitter& emitter)
     }
 }
 
+ValueType DerivedTypeSymbol::GetValueType() const 
+{
+    if (HasPointerDerivation(derivationRec.derivations))
+    {
+        return ValueType::pointerValue;
+    }
+    return ValueType::none;
+}
+
 NullPtrType::NullPtrType(const Span& span_, const std::u32string& name_) : TypeSymbol(SymbolType::nullPtrTypeSymbol, span_, name_)
 {
 }
@@ -579,6 +588,11 @@ llvm::Type* NullPtrType::IrType(Emitter& emitter)
 llvm::Constant* NullPtrType::CreateDefaultIrValue(Emitter& emitter)
 {
     return llvm::Constant::getNullValue(IrType(emitter));
+}
+
+ValueType NullPtrType::GetValueType() const
+{
+    return ValueType::nullValue;
 }
 
 } } // namespace cmajor::symbols

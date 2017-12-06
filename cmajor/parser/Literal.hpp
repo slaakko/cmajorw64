@@ -1,9 +1,10 @@
-#ifndef Literal_hpp_21397
-#define Literal_hpp_21397
+#ifndef Literal_hpp_24813
+#define Literal_hpp_24813
 
 #include <cmajor/parsing/Grammar.hpp>
 #include <cmajor/parsing/Keyword.hpp>
 #include <cmajor/ast/Literal.hpp>
+#include <cmajor/parser/ParsingContext.hpp>
 
 namespace cmajor { namespace parser {
 
@@ -13,7 +14,7 @@ class LiteralGrammar : public cmajor::parsing::Grammar
 public:
     static LiteralGrammar* Create();
     static LiteralGrammar* Create(cmajor::parsing::ParsingDomain* parsingDomain);
-    Node* Parse(const char32_t* start, const char32_t* end, int fileIndex, const std::string& fileName);
+    Node* Parse(const char32_t* start, const char32_t* end, int fileIndex, const std::string& fileName, ParsingContext* ctx);
 private:
     LiteralGrammar(cmajor::parsing::ParsingDomain* parsingDomain_);
     virtual void CreateRules();
@@ -29,6 +30,7 @@ private:
     class CharLiteralRule;
     class StringLiteralRule;
     class NullLiteralRule;
+    class ArrayLiteralRule;
     class CharEscapeRule;
     class DecDigitSequenceRule;
     class HexDigitSequenceRule;
@@ -39,4 +41,4 @@ private:
 
 } } // namespace cmajor.parser
 
-#endif // Literal_hpp_21397
+#endif // Literal_hpp_24813

@@ -33,7 +33,7 @@ using namespace cmajor::parser;
 
 bool IsAlwaysTrue(Node* node, BoundCompileUnit& boundCompileUnit, ContainerScope* containerScope)
 {
-    std::unique_ptr<Value> value = Evaluate(node, ValueType::boolValue, containerScope, boundCompileUnit, true);
+    std::unique_ptr<Value> value = Evaluate(node, boundCompileUnit.GetSymbolTable().GetTypeByName(U"bool"), containerScope, boundCompileUnit, true, nullptr, node->GetSpan());
     if (value)
     {
         if (value->GetValueType() == ValueType::boolValue)
@@ -1179,7 +1179,7 @@ void StatementBinder::Visit(CaseStatementNode& caseStatementNode)
     for (int i = 0; i < ne; ++i)
     {
         Node* caseExprNode = caseStatementNode.CaseExprs()[i];
-        std::unique_ptr<Value> caseValue = Evaluate(caseExprNode, GetValueTypeFor(switchConditionType->GetSymbolType()), containerScope, boundCompileUnit, false);
+        std::unique_ptr<Value> caseValue = Evaluate(caseExprNode, switchConditionType, containerScope, boundCompileUnit, false, currentFunction, caseExprNode->GetSpan());
         IntegralValue integralCaseValue(caseValue.get());
         Assert(currentCaseValueMap, "current case value map not set");
         auto it = currentCaseValueMap->find(integralCaseValue);
@@ -1235,7 +1235,7 @@ void StatementBinder::Visit(GotoCaseStatementNode& gotoCaseStatementNode)
         throw Exception("goto case statement must be enclosed in a case or default statement", gotoCaseStatementNode.GetSpan());
     }
     Node* caseExprNode = gotoCaseStatementNode.CaseExpr();
-    std::unique_ptr<Value> caseValue = Evaluate(caseExprNode, GetValueTypeFor(switchConditionType->GetSymbolType()), containerScope, boundCompileUnit, false);
+    std::unique_ptr<Value> caseValue = Evaluate(caseExprNode, switchConditionType, containerScope, boundCompileUnit, false, currentFunction, gotoCaseStatementNode.GetSpan());
     Value* caseValuePtr = caseValue.get();
     BoundGotoCaseStatement* boundGotoCaseStatement = new BoundGotoCaseStatement(gotoCaseStatementNode.GetSpan(), std::move(caseValue));
     Assert(currentGotoCaseStatements, "current goto case statement vector not set");
@@ -1480,10 +1480,17 @@ void StatementBinder::Visit(ConditionalCompilationStatementNode& conditionalComp
     if (defined)
     {
         int n = conditionalCompilationStatementNode.IfPart()->Statements().Count();
-        for (int i = 0; i < n; ++i)
+        if (n > 0)
         {
-            StatementNode* statement = conditionalCompilationStatementNode.IfPart()->Statements()[i];
-            statement->Accept(*this);
+            for (int i = 0; i < n; ++i)
+            {
+                StatementNode* statement = conditionalCompilationStatementNode.IfPart()->Statements()[i];
+                statement->Accept(*this);
+            }
+        }
+        else
+        {
+            AddStatement(new BoundEmptyStatement(conditionalCompilationStatementNode.GetSpan()));
         }
     }
     else
@@ -1499,10 +1506,17 @@ void StatementBinder::Visit(ConditionalCompilationStatementNode& conditionalComp
             if (defined)
             {
                 int n = elifPart->Statements().Count();
-                for (int i = 0; i < n; ++i)
+                if (n > 0)
                 {
-                    StatementNode* statement = elifPart->Statements()[i];
-                    statement->Accept(*this);
+                    for (int i = 0; i < n; ++i)
+                    {
+                        StatementNode* statement = elifPart->Statements()[i];
+                        statement->Accept(*this);
+                    }
+                }
+                else
+                {
+                    AddStatement(new BoundEmptyStatement(conditionalCompilationStatementNode.GetSpan()));
                 }
                 executed = true;
                 break;
@@ -1514,11 +1528,22 @@ void StatementBinder::Visit(ConditionalCompilationStatementNode& conditionalComp
             if (elsePart)
             {
                 int n = elsePart->Statements().Count();
-                for (int i = 0; i < n; ++i)
+                if (n > 0)
                 {
-                    StatementNode* statement = elsePart->Statements()[i];
-                    statement->Accept(*this);
+                    for (int i = 0; i < n; ++i)
+                    {
+                        StatementNode* statement = elsePart->Statements()[i];
+                        statement->Accept(*this);
+                    }
                 }
+                else
+                {
+                    AddStatement(new BoundEmptyStatement(conditionalCompilationStatementNode.GetSpan()));
+                }
+            }
+            else
+            {
+                AddStatement(new BoundEmptyStatement(conditionalCompilationStatementNode.GetSpan()));
             }
         }
     }

@@ -143,56 +143,126 @@ BoolTypeSymbol::BoolTypeSymbol(const Span& span_, const std::u32string& name_) :
 {
 }
 
+ValueType BoolTypeSymbol::GetValueType() const
+{
+    return ValueType::boolValue;
+}
+
 SByteTypeSymbol::SByteTypeSymbol(const Span& span_, const std::u32string& name_) : BasicTypeSymbol(SymbolType::sbyteTypeSymbol, span_, name_)
 {
+}
+
+ValueType SByteTypeSymbol::GetValueType() const
+{
+    return ValueType::sbyteValue;
 }
 
 ByteTypeSymbol::ByteTypeSymbol(const Span& span_, const std::u32string& name_) : BasicTypeSymbol(SymbolType::byteTypeSymbol, span_, name_)
 {
 }
 
+ValueType ByteTypeSymbol::GetValueType() const
+{
+    return ValueType::byteValue;
+}
+
 ShortTypeSymbol::ShortTypeSymbol(const Span& span_, const std::u32string& name_) : BasicTypeSymbol(SymbolType::shortTypeSymbol, span_, name_)
 {
+}
+
+ValueType ShortTypeSymbol::GetValueType() const
+{
+    return ValueType::shortValue;
 }
 
 UShortTypeSymbol::UShortTypeSymbol(const Span& span_, const std::u32string& name_) : BasicTypeSymbol(SymbolType::ushortTypeSymbol, span_, name_)
 {
 }
 
+ValueType UShortTypeSymbol::GetValueType() const
+{
+    return ValueType::ushortValue;
+}
+
 IntTypeSymbol::IntTypeSymbol(const Span& span_, const std::u32string& name_) : BasicTypeSymbol(SymbolType::intTypeSymbol, span_, name_)
 {
+}
+
+ValueType IntTypeSymbol::GetValueType() const
+{
+    return ValueType::intValue;
 }
 
 UIntTypeSymbol::UIntTypeSymbol(const Span& span_, const std::u32string& name_) : BasicTypeSymbol(SymbolType::uintTypeSymbol, span_, name_)
 {
 }
 
+ValueType UIntTypeSymbol::GetValueType() const
+{
+    return ValueType::uintValue;
+}
+
 LongTypeSymbol::LongTypeSymbol(const Span& span_, const std::u32string& name_) : BasicTypeSymbol(SymbolType::longTypeSymbol, span_, name_)
 {
+}
+
+ValueType LongTypeSymbol::GetValueType() const
+{
+    return ValueType::longValue;
 }
 
 ULongTypeSymbol::ULongTypeSymbol(const Span& span_, const std::u32string& name_) : BasicTypeSymbol(SymbolType::ulongTypeSymbol, span_, name_)
 {
 }
 
+ValueType ULongTypeSymbol::GetValueType() const
+{
+    return ValueType::ulongValue;
+}
+
 FloatTypeSymbol::FloatTypeSymbol(const Span& span_, const std::u32string& name_) : BasicTypeSymbol(SymbolType::floatTypeSymbol, span_, name_)
 {
+}
+
+ValueType FloatTypeSymbol::GetValueType() const
+{
+    return ValueType::floatValue;
 }
 
 DoubleTypeSymbol::DoubleTypeSymbol(const Span& span_, const std::u32string& name_) : BasicTypeSymbol(SymbolType::doubleTypeSymbol, span_, name_)
 {
 }
 
+ValueType DoubleTypeSymbol::GetValueType() const
+{
+    return ValueType::doubleValue;
+}
+
 CharTypeSymbol::CharTypeSymbol(const Span& span_, const std::u32string& name_) : BasicTypeSymbol(SymbolType::charTypeSymbol, span_, name_)
 {
+}
+
+ValueType CharTypeSymbol::GetValueType() const
+{
+    return ValueType::charValue;
 }
 
 WCharTypeSymbol::WCharTypeSymbol(const Span& span_, const std::u32string& name_) : BasicTypeSymbol(SymbolType::wcharTypeSymbol, span_, name_)
 {
 }
 
+ValueType WCharTypeSymbol::GetValueType() const
+{
+    return ValueType::wcharValue;
+}
+
 UCharTypeSymbol::UCharTypeSymbol(const Span& span_, const std::u32string& name_) : BasicTypeSymbol(SymbolType::ucharTypeSymbol, span_, name_)
 {
+}
+
+ValueType UCharTypeSymbol::GetValueType() const
+{
+    return ValueType::ucharValue;
 }
 
 VoidTypeSymbol::VoidTypeSymbol(const Span& span_, const std::u32string& name_) : BasicTypeSymbol(SymbolType::voidTypeSymbol, span_, name_)

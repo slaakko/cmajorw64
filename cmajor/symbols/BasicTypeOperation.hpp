@@ -11,6 +11,7 @@
 #include <cmajor/symbols/SymbolTable.hpp>
 #include <cmajor/symbols/SymbolWriter.hpp>
 #include <cmajor/symbols/SymbolReader.hpp>
+#include <cmajor/symbols/Value.hpp>
 #include <cmajor/ir/Emitter.hpp>
 #include <llvm/IR/Constants.h>
 
@@ -151,36 +152,85 @@ struct BasicTypeLShr
 struct DefaultInt1
 {
     static llvm::Value* Generate(llvm::IRBuilder<>& builder) { return builder.getInt1(false); }
+    static std::unique_ptr<Value> ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span) { return std::unique_ptr<Value>(new BoolValue(span, false)); }
 };
 
-struct DefaultInt8
+struct DefaultSInt8
 {
     static llvm::Value* Generate(llvm::IRBuilder<>& builder) { return builder.getInt8(0); }
+    static std::unique_ptr<Value> ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span) { return std::unique_ptr<Value>(new SByteValue(span, 0)); }
 };
 
-struct DefaultInt16
+struct DefaultUInt8
+{
+    static llvm::Value* Generate(llvm::IRBuilder<>& builder) { return builder.getInt8(0); }
+    static std::unique_ptr<Value> ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span) { return std::unique_ptr<Value>(new ByteValue(span, 0)); }
+};
+
+struct DefaultSInt16
 {
     static llvm::Value* Generate(llvm::IRBuilder<>& builder) { return builder.getInt16(0); }
+    static std::unique_ptr<Value> ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span) { return std::unique_ptr<Value>(new ShortValue(span, 0)); }
 };
 
-struct DefaultInt32
+struct DefaultUInt16
+{
+    static llvm::Value* Generate(llvm::IRBuilder<>& builder) { return builder.getInt16(0); }
+    static std::unique_ptr<Value> ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span) { return std::unique_ptr<Value>(new UShortValue(span, 0)); }
+};
+
+struct DefaultSInt32
 {
     static llvm::Value* Generate(llvm::IRBuilder<>& builder) { return builder.getInt32(0); }
+    static std::unique_ptr<Value> ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span) { return std::unique_ptr<Value>(new IntValue(span, 0)); }
 };
 
-struct DefaultInt64
+struct DefaultUInt32
+{
+    static llvm::Value* Generate(llvm::IRBuilder<>& builder) { return builder.getInt32(0); }
+    static std::unique_ptr<Value> ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span) { return std::unique_ptr<Value>(new UIntValue(span, 0)); }
+};
+
+struct DefaultSInt64
 {
     static llvm::Value* Generate(llvm::IRBuilder<>& builder) { return builder.getInt64(0); }
+    static std::unique_ptr<Value> ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span) { return std::unique_ptr<Value>(new LongValue(span, 0)); }
+};
+
+struct DefaultUInt64
+{
+    static llvm::Value* Generate(llvm::IRBuilder<>& builder) { return builder.getInt64(0); }
+    static std::unique_ptr<Value> ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span) { return std::unique_ptr<Value>(new ULongValue(span, 0)); }
 };
 
 struct DefaultFloat
 {
     static llvm::Value* Generate(llvm::IRBuilder<>& builder) { return llvm::ConstantFP::get(llvm::Type::getFloatTy(builder.getContext()), 0.0); }
+    static std::unique_ptr<Value> ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span) { return std::unique_ptr<Value>(new FloatValue(span, 0.0)); }
 };
 
 struct DefaultDouble
 {
     static llvm::Value* Generate(llvm::IRBuilder<>& builder) { return llvm::ConstantFP::get(llvm::Type::getDoubleTy(builder.getContext()), 0.0); }
+    static std::unique_ptr<Value> ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span) { return std::unique_ptr<Value>(new DoubleValue(span, 0.0)); }
+};
+
+struct DefaultChar
+{
+    static llvm::Value* Generate(llvm::IRBuilder<>& builder) { return builder.getInt8(0); }
+    static std::unique_ptr<Value> ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span) { return std::unique_ptr<Value>(new CharValue(span, '\0')); }
+};
+
+struct DefaultWChar
+{
+    static llvm::Value* Generate(llvm::IRBuilder<>& builder) { return builder.getInt16(0); }
+    static std::unique_ptr<Value> ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span) { return std::unique_ptr<Value>(new WCharValue(span, '\0')); }
+};
+
+struct DefaultUChar
+{
+    static llvm::Value* Generate(llvm::IRBuilder<>& builder) { return builder.getInt32(0); }
+    static std::unique_ptr<Value> ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span) { return std::unique_ptr<Value>(new UCharValue(span, '\0')); }
 };
 
 struct BasicTypeIntegerEquality
@@ -488,6 +538,8 @@ public:
     SymbolAccess DeclaredAccess() const override { return SymbolAccess::public_; }
     void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags) override;
     bool IsBasicTypeOperation() const override { return true; }
+    std::unique_ptr<Value> ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span) const override;
+    bool IsCompileTimePrimitiveFunction() const override { return true; }
 };
 
 template<typename DefaultOp>
@@ -519,34 +571,65 @@ void BasicTypeDefaultCtor<DefaultOp>::GenerateCall(Emitter& emitter, std::vector
     genObjects[0]->Store(emitter, OperationFlags::none);
 }
 
+template<typename DefaultOp>
+std::unique_ptr<Value> BasicTypeDefaultCtor<DefaultOp>::ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span) const
+{
+    return DefaultOp::ConstructValue(argumentValues, span);
+}
+
 class BasicTypeDefaultInt1Operation : public BasicTypeDefaultCtor<DefaultInt1>
 {
 public:
     BasicTypeDefaultInt1Operation(const Span& span_, const std::u32string& name_);
 };
 
-class BasicTypeDefaultInt8Operation : public BasicTypeDefaultCtor<DefaultInt8>
+class BasicTypeDefaultSInt8Operation : public BasicTypeDefaultCtor<DefaultSInt8>
 {
 public:
-    BasicTypeDefaultInt8Operation(const Span& span_, const std::u32string& name_);
+    BasicTypeDefaultSInt8Operation(const Span& span_, const std::u32string& name_);
 };
 
-class BasicTypeDefaultInt16Operation : public BasicTypeDefaultCtor<DefaultInt16>
+class BasicTypeDefaultUInt8Operation : public BasicTypeDefaultCtor<DefaultUInt8>
 {
 public:
-    BasicTypeDefaultInt16Operation(const Span& span_, const std::u32string& name_);
+    BasicTypeDefaultUInt8Operation(const Span& span_, const std::u32string& name_);
 };
 
-class BasicTypeDefaultInt32Operation : public BasicTypeDefaultCtor<DefaultInt32>
+class BasicTypeDefaultSInt16Operation : public BasicTypeDefaultCtor<DefaultSInt16>
 {
 public:
-    BasicTypeDefaultInt32Operation(const Span& span_, const std::u32string& name_);
+    BasicTypeDefaultSInt16Operation(const Span& span_, const std::u32string& name_);
 };
 
-class BasicTypeDefaultInt64Operation : public BasicTypeDefaultCtor<DefaultInt64>
+class BasicTypeDefaultUInt16Operation : public BasicTypeDefaultCtor<DefaultUInt16>
 {
 public:
-    BasicTypeDefaultInt64Operation(const Span& span_, const std::u32string& name_);
+    BasicTypeDefaultUInt16Operation(const Span& span_, const std::u32string& name_);
+};
+
+class BasicTypeDefaultSInt32Operation : public BasicTypeDefaultCtor<DefaultSInt32>
+{
+public:
+    BasicTypeDefaultSInt32Operation(const Span& span_, const std::u32string& name_);
+};
+
+class BasicTypeDefaultUInt32Operation : public BasicTypeDefaultCtor<DefaultUInt32>
+{
+public:
+    BasicTypeDefaultUInt32Operation(const Span& span_, const std::u32string& name_);
+};
+
+
+class BasicTypeDefaultSInt64Operation : public BasicTypeDefaultCtor<DefaultSInt64>
+{
+public:
+    BasicTypeDefaultSInt64Operation(const Span& span_, const std::u32string& name_);
+};
+
+class BasicTypeDefaultUInt64Operation : public BasicTypeDefaultCtor<DefaultUInt64>
+{
+public:
+    BasicTypeDefaultUInt64Operation(const Span& span_, const std::u32string& name_);
 };
 
 class BasicTypeDefaultFloatOperation : public BasicTypeDefaultCtor<DefaultFloat>
@@ -561,6 +644,24 @@ public:
     BasicTypeDefaultDoubleOperation(const Span& span_, const std::u32string& name_);
 };
 
+class BasicTypeDefaultCharOperation : public BasicTypeDefaultCtor<DefaultChar>
+{
+public:
+    BasicTypeDefaultCharOperation(const Span& span_, const std::u32string& name_);
+};
+
+class BasicTypeDefaultWCharOperation : public BasicTypeDefaultCtor<DefaultWChar>
+{
+public:
+    BasicTypeDefaultWCharOperation(const Span& span_, const std::u32string& name_);
+};
+
+class BasicTypeDefaultUCharOperation : public BasicTypeDefaultCtor<DefaultUChar>
+{
+public:
+    BasicTypeDefaultUCharOperation(const Span& span_, const std::u32string& name_);
+};
+
 class BasicTypeCopyCtor : public FunctionSymbol
 {
 public:
@@ -568,7 +669,9 @@ public:
     BasicTypeCopyCtor(const Span& span_, const std::u32string& name_);
     SymbolAccess DeclaredAccess() const override { return SymbolAccess::public_; }
     void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags) override;
+    std::unique_ptr<Value> ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span) const override;
     bool IsBasicTypeOperation() const override { return true; }
+    bool IsCompileTimePrimitiveFunction() const override { return true; }
 };
 
 class BasicTypeMoveCtor : public FunctionSymbol
@@ -578,7 +681,9 @@ public:
     BasicTypeMoveCtor(const Span& span_, const std::u32string& name_);
     SymbolAccess DeclaredAccess() const override { return SymbolAccess::public_; }
     void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags) override;
+    std::unique_ptr<Value> ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span) const override;
     bool IsBasicTypeOperation() const override { return true; }
+    bool IsCompileTimePrimitiveFunction() const override { return true; }
 };
 
 class BasicTypeCopyAssignment : public FunctionSymbol
@@ -589,6 +694,7 @@ public:
     SymbolAccess DeclaredAccess() const override { return SymbolAccess::public_; }
     void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags) override;
     bool IsBasicTypeOperation() const override { return true; }
+    bool IsCompileTimePrimitiveFunction() const override { return true; }
 };
 
 class BasicTypeMoveAssignment : public FunctionSymbol
@@ -619,7 +725,7 @@ public:
     BasicTypeConversion(SymbolType symbolType, const std::u32string& name_, ConversionType conversionType_, uint8_t conversionDistance, TypeSymbol* sourceType_, TypeSymbol* targetType_);
     void Write(SymbolWriter& writer) override;
     void Read(SymbolReader& reader) override;
-    void EmplaceType(TypeSymbol* typeSymbol_, int index) override;
+    void EmplaceType(TypeSymbol* typeSymbol, int index) override;
     SymbolAccess DeclaredAccess() const override { return SymbolAccess::public_; }
     void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags) override;
     bool IsBasicTypeOperation() const override { return true; }
@@ -675,19 +781,19 @@ void BasicTypeConversion<ConversionOp>::Read(SymbolReader& reader)
 }
 
 template <typename ConversionOp>
-void BasicTypeConversion<ConversionOp>::EmplaceType(TypeSymbol* typeSymbol_, int index)
+void BasicTypeConversion<ConversionOp>::EmplaceType(TypeSymbol* typeSymbol, int index)
 {
     if (index == 1)
     {
-        sourceType = typeSymbol_;
+        sourceType = typeSymbol;
     }
     else if (index == 2)
     {
-        targetType = typeSymbol_;
+        targetType = typeSymbol;
     }
     else
     {
-        FunctionSymbol::EmplaceType(typeSymbol_, index);
+        FunctionSymbol::EmplaceType(typeSymbol, index);
     }
 }
 
@@ -704,6 +810,7 @@ class BasicTypeImplicitConversion : public BasicTypeConversion<ConversionOp>
 public:
     BasicTypeImplicitConversion(SymbolType symbolType);
     BasicTypeImplicitConversion(SymbolType symbolType, const std::u32string& name_, uint8_t conversionDistance, TypeSymbol* sourceType_, TypeSymbol* targetType_);
+    std::unique_ptr<Value> ConvertValue(const std::unique_ptr<Value>& value) const override;
 };
 
 template <typename ConversionOp>
@@ -718,11 +825,23 @@ BasicTypeImplicitConversion<ConversionOp>::BasicTypeImplicitConversion(SymbolTyp
 }
 
 template <typename ConversionOp>
+std::unique_ptr<Value> BasicTypeImplicitConversion<ConversionOp>::ConvertValue(const std::unique_ptr<Value>& value) const 
+{
+    if (value)
+    {
+        TypeSymbol* targetType = ConversionTargetType();
+        return std::unique_ptr<Value>(value->As(targetType, false, value->GetSpan(), true));
+    }
+    return std::unique_ptr<Value>();
+}
+
+template <typename ConversionOp>
 class BasicTypeExplicitConversion : public BasicTypeConversion<ConversionOp>
 {
 public:
     BasicTypeExplicitConversion(SymbolType symbolType);
     BasicTypeExplicitConversion(SymbolType symbolType, const std::u32string& name_, TypeSymbol* sourceType_, TypeSymbol* targetType_);
+    std::unique_ptr<Value> ConvertValue(const std::unique_ptr<Value>& value) const override;
 };
 
 template <typename ConversionOp>
@@ -734,6 +853,17 @@ template <typename ConversionOp>
 BasicTypeExplicitConversion<ConversionOp>::BasicTypeExplicitConversion(SymbolType symbolType, const std::u32string& name_, TypeSymbol* sourceType_, TypeSymbol* targetType_) :
     BasicTypeConversion<ConversionOp>(symbolType, name_, ConversionType::explicit_, 255, sourceType_, targetType_)
 {
+}
+
+template <typename ConversionOp>
+std::unique_ptr<Value> BasicTypeExplicitConversion<ConversionOp>::ConvertValue(const std::unique_ptr<Value>& value) const
+{
+    if (value)
+    {
+        TypeSymbol* targetType = ConversionTargetType();
+        return std::unique_ptr<Value>(value->As(targetType, true, value->GetSpan(), true));
+    }
+    return std::unique_ptr<Value>();
 }
 
 class BasicTypeImplicitSignExtensionOperation : public BasicTypeImplicitConversion<BasicTypeSignExtension>

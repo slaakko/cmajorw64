@@ -1424,7 +1424,7 @@ void ArrayDefaultConstructorOperation::CollectViableFunctions(ContainerScope* co
         elementArguments.push_back(std::unique_ptr<BoundExpression>(new BoundTypeExpression(span, arrayType->ElementType()->AddPointer(span))));
         std::unique_ptr<BoundFunctionCall> elementDefaultConstructor = ResolveOverload(U"@constructor", containerScope, elementLookups, elementArguments, GetBoundCompileUnit(), currentFunction, span);
         FunctionSymbol* elementTypeDefaultConstructor = elementDefaultConstructor->GetFunctionSymbol();
-        function = new ArrayTypeDefaultConstructor(arrayType, currentFunction->GetFunctionSymbol()->CreateTemporary(GetSymbolTable()->GetTypeByName(U"ulong"), span), elementTypeDefaultConstructor, span);
+        function = new ArrayTypeDefaultConstructor(arrayType, currentFunction->GetFunctionSymbol()->CreateTemporary(GetSymbolTable()->GetTypeByName(U"long"), span), elementTypeDefaultConstructor, span);
         function->SetSymbolTable(GetSymbolTable());
         function->SetParent(&GetSymbolTable()->GlobalNs());
         functionMap[arrayType] = function;
@@ -1469,7 +1469,7 @@ void ArrayCopyConstructorOperation::CollectViableFunctions(ContainerScope* conta
             elementArguments.push_back(std::unique_ptr<BoundExpression>(new BoundTypeExpression(span, arrayType->ElementType()->AddConst(span)->AddLvalueReference(span))));
             std::unique_ptr<BoundFunctionCall> elementCopyConstructor = ResolveOverload(U"@constructor", containerScope, elementLookups, elementArguments, GetBoundCompileUnit(), currentFunction, span);
             FunctionSymbol* elementTypeCopyConstructor = elementCopyConstructor->GetFunctionSymbol();
-            function = new ArrayTypeCopyConstructor(arrayType, currentFunction->GetFunctionSymbol()->CreateTemporary(GetSymbolTable()->GetTypeByName(U"ulong"), span), elementTypeCopyConstructor, span);
+            function = new ArrayTypeCopyConstructor(arrayType, currentFunction->GetFunctionSymbol()->CreateTemporary(GetSymbolTable()->GetTypeByName(U"long"), span), elementTypeCopyConstructor, span);
             function->SetSymbolTable(GetSymbolTable());
             function->SetParent(&GetSymbolTable()->GlobalNs());
             functionMap[arrayType] = function;
@@ -1515,7 +1515,7 @@ void ArrayMoveConstructorOperation::CollectViableFunctions(ContainerScope* conta
             elementArguments.back()->SetFlag(BoundExpressionFlags::bindToRvalueReference);
             std::unique_ptr<BoundFunctionCall> elementMoveConstructor = ResolveOverload(U"@constructor", containerScope, elementLookups, elementArguments, GetBoundCompileUnit(), currentFunction, span);
             FunctionSymbol* elementTypeMoveConstructor = elementMoveConstructor->GetFunctionSymbol();
-            function = new ArrayTypeMoveConstructor(arrayType, currentFunction->GetFunctionSymbol()->CreateTemporary(GetSymbolTable()->GetTypeByName(U"ulong"), span), elementTypeMoveConstructor, span);
+            function = new ArrayTypeMoveConstructor(arrayType, currentFunction->GetFunctionSymbol()->CreateTemporary(GetSymbolTable()->GetTypeByName(U"long"), span), elementTypeMoveConstructor, span);
             function->SetSymbolTable(GetSymbolTable());
             function->SetParent(&GetSymbolTable()->GlobalNs());
             functionMap[arrayType] = function;
@@ -1561,7 +1561,7 @@ void ArrayCopyAssignmentOperation::CollectViableFunctions(ContainerScope* contai
             elementArguments.push_back(std::unique_ptr<BoundExpression>(new BoundTypeExpression(span, arrayType->ElementType()->AddConst(span)->AddLvalueReference(span))));
             std::unique_ptr<BoundFunctionCall> elementCopyAssignment = ResolveOverload(U"operator=", containerScope, elementLookups, elementArguments, GetBoundCompileUnit(), currentFunction, span);
             FunctionSymbol* elementTypeCopyAssignment = elementCopyAssignment->GetFunctionSymbol();
-            function = new ArrayTypeCopyAssignment(arrayType, currentFunction->GetFunctionSymbol()->CreateTemporary(GetSymbolTable()->GetTypeByName(U"ulong"), span), elementTypeCopyAssignment, span);
+            function = new ArrayTypeCopyAssignment(arrayType, currentFunction->GetFunctionSymbol()->CreateTemporary(GetSymbolTable()->GetTypeByName(U"long"), span), elementTypeCopyAssignment, span);
             function->SetSymbolTable(GetSymbolTable());
             function->SetParent(&GetSymbolTable()->GlobalNs());
             functionMap[arrayType] = function;
@@ -1607,7 +1607,7 @@ void ArrayMoveAssignmentOperation::CollectViableFunctions(ContainerScope* contai
             elementArguments.back()->SetFlag(BoundExpressionFlags::bindToRvalueReference);
             std::unique_ptr<BoundFunctionCall> elementMoveAssignment = ResolveOverload(U"operator=", containerScope, elementLookups, elementArguments, GetBoundCompileUnit(), currentFunction, span);
             FunctionSymbol* elementTypeMoveAssignment = elementMoveAssignment->GetFunctionSymbol();
-            function = new ArrayTypeMoveAssignment(arrayType, currentFunction->GetFunctionSymbol()->CreateTemporary(GetSymbolTable()->GetTypeByName(U"ulong"), span), elementTypeMoveAssignment, span);
+            function = new ArrayTypeMoveAssignment(arrayType, currentFunction->GetFunctionSymbol()->CreateTemporary(GetSymbolTable()->GetTypeByName(U"long"), span), elementTypeMoveAssignment, span);
             function->SetSymbolTable(GetSymbolTable());
             function->SetParent(&GetSymbolTable()->GlobalNs());
             functionMap[arrayType] = function;

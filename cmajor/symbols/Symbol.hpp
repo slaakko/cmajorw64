@@ -45,18 +45,20 @@ enum class SymbolType : uint8_t
     basicTypeUnaryPlus, basicTypeIntUnaryMinus, basicTypeFloatUnaryMinus, basicTypeComplement, basicTypeAdd, basicTypeFAdd, basicTypeSub, basicTypeFSub, basicTypeMul, basicTypeFMul, 
     basicTypeSDiv, basicTypeUDiv, basicTypeFDiv, basicTypeSRem, basicTypeURem, basicTypeAnd, basicTypeOr, basicTypeXor, basicTypeShl, basicTypeAShr, basicTypeLShr,
     basicTypeNot, basicTypeIntegerEquality, basicTypeUnsignedIntegerLessThan, basicTypeSignedIntegerLessThan, basicTypeFloatingEquality, basicTypeFloatingLessThan,
-    defaultInt1, defaultInt8, defaultInt16, defaultInt32, defaultInt64, defaultFloat, defaultDouble, basicTypeCopyCtor, basicTypeMoveCtor, basicTypeCopyAssignment, basicTypeMoveAssignment, 
+    defaultInt1, defaultSInt8, defaultUInt8, defaultSInt16, defaultUInt16, defaultSInt32, defaultUInt32, defaultSInt64, defaultUInt64, 
+    defaultChar, defaultWChar, defaultUChar, defaultFloat, defaultDouble, basicTypeCopyCtor, basicTypeMoveCtor, basicTypeCopyAssignment, basicTypeMoveAssignment,
     basicTypeReturn,
     basicTypeImplicitSignExtension, basicTypeImplicitZeroExtension, basicTypeExplicitSignExtension, basicTypeExplicitZeroExtension, basicTypeTruncation, basicTypeBitCast,
     basicTypeImplicitUnsignedIntToFloating, basicTypeImplicitSignedIntToFloating, basicTypeExplicitUnsignedIntToFloating, basicTypeExplicitSignedIntToFloating, 
     basicTypeFloatingToUnsignedInt, basicTypeFloatingToSignedInt, basicTypeFloatingExtension, basicTypeFloatingTruncation, 
     enumTypeDefaultConstructor, enumTypeCopyConstructor, enumTypeMoveConstructor, enumTypeCopyAssignment, enumTypeMoveAssignment, enumTypeReturn, enumTypeEquality, 
-    enumTypeToUnderlyingType, underlyingToEnumType,
+    enumTypeToUnderlyingType, underlyingToEnumType, 
     delegateTypeDefaultConstructor, delegateTypeCopyConstructor, delegateTypeMoveConstructor, delegateTypeCopyAssignment, delegateTypeMoveAssignment, delegateTypeReturn, delegateTypeEquality,
     functionToDelegateSymbol,
     classDelegateTypeDefaultConstructor, classDelegateTypeCopyConstructor, classDelegateTypeMoveConstructor, classDelegateTypeCopyAssignment, classDelegateTypeMoveAssignment, 
     classDelegateTypeEquality, memberFunctionToClassDelegateSymbol, 
-    namespaceTypeSymbol, functionGroupTypeSymbol, memberExpressionTypeSymbol, valueSymbol,
+    arrayLengthFunctionSymbol, arrayBeginFunctionSymbol, arrayEndFunctionSymbol, arrayCBeginFunctionSymbol, arrayCEndFunctionSymbol,
+    namespaceTypeSymbol, functionGroupTypeSymbol, memberExpressionTypeSymbol, valueSymbol, variableValueSymbol,
     maxSymbol
 };
 
@@ -113,8 +115,8 @@ public:
     virtual bool IsTypeSymbol() const { return false; }
     virtual bool IsClassTypeSymbol() const { return false; }
     virtual void Accept(SymbolCollector* collector) {}
-    virtual const ContainerScope* GetContainerScope() const { return nullptr; }
-    virtual ContainerScope* GetContainerScope() { return nullptr; }
+    virtual const ContainerScope* GetContainerScope() const;
+    virtual ContainerScope* GetContainerScope();
     virtual std::u32string FullName() const;
     virtual std::u32string FullNameWithSpecifiers() const;
     virtual std::u32string SimpleName() const { return Name(); }

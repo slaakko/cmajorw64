@@ -78,6 +78,11 @@ bool TypeSymbol::IsRecursive(TypeSymbol* type, std::unordered_set<TypeSymbol*>& 
     return TypesEqual(type, this); 
 }
 
+ValueType TypeSymbol::GetValueType() const
+{
+    return ValueType::none;
+}
+
 std::u32string TypeSymbol::Id() const 
 { 
     return ToUtf32(std::to_string(TypeId())); 

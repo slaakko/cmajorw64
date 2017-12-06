@@ -9,6 +9,7 @@
 #include <cmajor/binder/BoundConstraint.hpp>
 #include <cmajor/binder/BoundFunction.hpp>
 #include <cmajor/binder/OverloadResolution.hpp>
+#include <cmajor/binder/Evaluator.hpp>
 #include <cmajor/symbols/TypedefSymbol.hpp>
 #include <cmajor/symbols/ConceptSymbol.hpp>
 #include <cmajor/ast/Visitor.hpp>
@@ -458,7 +459,15 @@ void ConstraintChecker::Visit(DotNode& dotNode)
     {
         throw Exception("symbol '" + dotNode.Subject()->ToString() + "' does not denote a type", dotNode.Subject()->GetSpan());
     }
-    Scope* typeContainerScope = subjectType->BaseType()->GetContainerScope();
+    Scope* typeContainerScope = nullptr;
+    if (subjectType->IsPointerType())
+    {
+        typeContainerScope = subjectType->GetContainerScope();
+    }
+    else
+    {
+        typeContainerScope = subjectType->BaseType()->GetContainerScope();
+    }
     if (subjectType->GetSymbolType() == SymbolType::namespaceTypeSymbol)
     {
         NamespaceTypeSymbol* nsTypeSymbol = static_cast<NamespaceTypeSymbol*>(subjectType);
@@ -630,7 +639,12 @@ void ConstraintChecker::Visit(WhereConstraintNode& whereConstraintNode)
 
 void ConstraintChecker::Visit(PredicateConstraintNode& predicateConstraintNode)
 {
-    // todo
+    Reset();
+    Node* invokeExprNode = predicateConstraintNode.InvokeExpr();
+    std::unique_ptr<Value> evaluationResult = Evaluate(invokeExprNode, symbolTable.GetTypeByName(U"bool"), containerScope, boundCompileUnit, false, currentFunction, predicateConstraintNode.GetSpan());
+    BoolValue* boolResult = static_cast<BoolValue*>(evaluationResult.get());
+    result = boolResult->GetValue();
+    boundConstraint.reset(new BoundAtomicConstraint(predicateConstraintNode.GetSpan(), result));
 }
 
 void ConstraintChecker::Visit(IsConstraintNode& isConstraintNode)
@@ -896,6 +910,18 @@ void ConstraintChecker::Visit(FunctionConstraintNode& functionConstraintNode)
     lookups.push_back(FunctionScopeLookup(ScopeLookup::this_and_base_and_parent, containerScope));
     lookups.push_back(FunctionScopeLookup(ScopeLookup::this_, firstTypeArgument->BaseType()->ClassInterfaceEnumDelegateOrNsScope()));
     int n = functionConstraintNode.Parameters().Count();
+    if (firstTypeArgument->IsPointerType() &&
+        ((n == 0 &&
+            (functionConstraintNode.GroupId() == U"operator*" ||
+            functionConstraintNode.GroupId() == U"operator++" ||
+            functionConstraintNode.GroupId() == U"operator--")) ||
+        (n == 1 &&
+            functionConstraintNode.GroupId() == U"operator[]")))
+    {
+        result = true;
+        boundConstraint.reset(new BoundAtomicConstraint(span, true));
+        return;
+    }
     for (int i = 0; i < n; ++i)
     {
         ParameterNode* parameterNode = functionConstraintNode.Parameters()[i];
@@ -1263,6 +1289,10 @@ std::unique_ptr<BoundConcept> Instantiate(ConceptSymbol* conceptSymbol, const st
     {
         TemplateParameterSymbol* templateParameterSymbol = conceptSymbol->TemplateParameters()[i];
         TypeSymbol* typeArgument = typeArguments[i];
+        if (typeArgument->RemoveConst(span)->IsBasicTypeSymbol())
+        {
+            typeArgument = typeArgument->RemoveConst(span);
+        }
         if (i == 0)
         {
             firstTypeArgument = typeArgument;

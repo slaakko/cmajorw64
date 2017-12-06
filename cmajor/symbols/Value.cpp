@@ -6,12 +6,16 @@
 #include <cmajor/symbols/Value.hpp>
 #include <cmajor/symbols/TypeSymbol.hpp>
 #include <cmajor/symbols/Exception.hpp>
+#include <cmajor/symbols/SymbolTable.hpp>
+#include <cmajor/util/Unicode.hpp>
 
 namespace cmajor { namespace symbols {
 
+using namespace cmajor::unicode;
+
 const char* valueTypeStr[]
 {
-    "none", "bool", "sbyte", "byte", "short", "ushort", "int", "uint", "long", "ulong", "float", "double", "char", "wchar", "uchar", "string", "wstring", "ustring", "null"
+    "none", "bool", "sbyte", "byte", "short", "ushort", "int", "uint", "long", "ulong", "float", "double", "char", "wchar", "uchar", "string", "wstring", "ustring", "null", "pointer", "array", "structure"
 };
 
 std::string ValueTypeStr(ValueType valueType)
@@ -25,133 +29,176 @@ ValueType commonType[uint8_t(ValueType::maxValue)][uint8_t(ValueType::maxValue)]
     {   
         ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none, 
         ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none, 
-        ValueType::none, ValueType::none, ValueType::none, ValueType::none
+        ValueType::none, ValueType::none, ValueType::none, ValueType::none,
+        ValueType::none, ValueType::none, ValueType::none
     },
 
     // ValueType::boolValue
     {   
         ValueType::none, ValueType::boolValue, ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none,
         ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none, 
-        ValueType::none, ValueType::none, ValueType::none, ValueType::none
+        ValueType::none, ValueType::none, ValueType::none, ValueType::none,
+        ValueType::none, ValueType::none, ValueType::none
     },
     
     // ValueType::sbyteValue
     {   
         ValueType::none, ValueType::none, ValueType::sbyteValue, ValueType::shortValue, ValueType::shortValue, ValueType::intValue, ValueType::intValue, ValueType::longValue,
         ValueType::longValue, ValueType::none, ValueType::floatValue, ValueType::doubleValue, ValueType::none, ValueType::none, ValueType::none, 
-        ValueType::none, ValueType::none, ValueType::none, ValueType::none
+        ValueType::none, ValueType::none, ValueType::none, ValueType::none,
+        ValueType::none, ValueType::none, ValueType::none
     },
 
     // ValueType::byteValue
     {
         ValueType::none, ValueType::none, ValueType::shortValue, ValueType::byteValue, ValueType::shortValue, ValueType::ushortValue, ValueType::intValue, ValueType::uintValue,
         ValueType::longValue, ValueType::ulongValue, ValueType::floatValue, ValueType::doubleValue, ValueType::none, ValueType::none, ValueType::none, 
-        ValueType::none, ValueType::none, ValueType::none, ValueType::none
+        ValueType::none, ValueType::none, ValueType::none, ValueType::none,
+        ValueType::none, ValueType::none, ValueType::none
     },
 
     // ValueType::shortValue
     {
         ValueType::none, ValueType::none, ValueType::shortValue, ValueType::shortValue, ValueType::shortValue, ValueType::intValue, ValueType::intValue, ValueType::longValue,
         ValueType::longValue, ValueType::none, ValueType::floatValue, ValueType::doubleValue, ValueType::none, ValueType::none, ValueType::none,
-        ValueType::none, ValueType::none, ValueType::none, ValueType::none
+        ValueType::none, ValueType::none, ValueType::none, ValueType::none,
+        ValueType::none, ValueType::none, ValueType::none
     },
 
     // ValueType::ushortValue
     {
         ValueType::none, ValueType::none, ValueType::intValue, ValueType::ushortValue, ValueType::intValue, ValueType::ushortValue, ValueType::intValue, ValueType::uintValue,
         ValueType::longValue, ValueType::ulongValue, ValueType::floatValue, ValueType::doubleValue, ValueType::none, ValueType::none, ValueType::none, 
-        ValueType::none, ValueType::none, ValueType::none, ValueType::none
+        ValueType::none, ValueType::none, ValueType::none, ValueType::none,
+        ValueType::none, ValueType::none, ValueType::none
     },
 
     // ValueType::intValue
     {
         ValueType::none, ValueType::none, ValueType::intValue, ValueType::intValue, ValueType::intValue, ValueType::intValue, ValueType::intValue, ValueType::longValue,
         ValueType::longValue, ValueType::none, ValueType::floatValue, ValueType::doubleValue, ValueType::none, ValueType::none, ValueType::none, 
-        ValueType::none, ValueType::none, ValueType::none, ValueType::none
+        ValueType::none, ValueType::none, ValueType::none, ValueType::none,
+        ValueType::none, ValueType::none, ValueType::none
     },
 
     // ValueType::uintValue
     {
         ValueType::none, ValueType::none, ValueType::longValue, ValueType::uintValue, ValueType::longValue, ValueType::uintValue, ValueType::longValue, ValueType::uintValue,
         ValueType::longValue, ValueType::ulongValue, ValueType::floatValue, ValueType::doubleValue, ValueType::none, ValueType::none, ValueType::none, 
-        ValueType::none, ValueType::none, ValueType::none, ValueType::none
+        ValueType::none, ValueType::none, ValueType::none, ValueType::none,
+        ValueType::none, ValueType::none, ValueType::none
     },
 
     // ValueType::longValue
     {
         ValueType::none, ValueType::none, ValueType::longValue, ValueType::longValue, ValueType::longValue, ValueType::longValue, ValueType::longValue, ValueType::longValue,
         ValueType::longValue, ValueType::none, ValueType::floatValue, ValueType::doubleValue, ValueType::none, ValueType::none, ValueType::none, 
-        ValueType::none, ValueType::none, ValueType::none, ValueType::none
+        ValueType::none, ValueType::none, ValueType::none, ValueType::none,
+        ValueType::none, ValueType::none, ValueType::none
     },
 
     // ValueType::ulongValue
     {
         ValueType::none, ValueType::none, ValueType::none, ValueType::ulongValue, ValueType::none, ValueType::ulongValue, ValueType::none, ValueType::ulongValue,
         ValueType::none, ValueType::ulongValue, ValueType::floatValue, ValueType::doubleValue, ValueType::none, ValueType::none, ValueType::none, 
-        ValueType::none, ValueType::none, ValueType::none, ValueType::none
+        ValueType::none, ValueType::none, ValueType::none, ValueType::none,
+        ValueType::none, ValueType::none, ValueType::none
     },
 
     // ValueType::floatValue
     {
         ValueType::none, ValueType::none, ValueType::floatValue, ValueType::floatValue, ValueType::floatValue, ValueType::floatValue, ValueType::floatValue, ValueType::floatValue,
         ValueType::floatValue, ValueType::floatValue, ValueType::floatValue, ValueType::doubleValue, ValueType::none, ValueType::none, ValueType::none, 
-        ValueType::none, ValueType::none, ValueType::none, ValueType::none
+        ValueType::none, ValueType::none, ValueType::none, ValueType::none, 
+        ValueType::none, ValueType::none, ValueType::none
     },
 
     // ValueType::doubleValue
     {
         ValueType::none, ValueType::none, ValueType::doubleValue, ValueType::doubleValue, ValueType::doubleValue, ValueType::doubleValue, ValueType::doubleValue, ValueType::doubleValue,
         ValueType::doubleValue, ValueType::doubleValue, ValueType::doubleValue, ValueType::doubleValue, ValueType::none, ValueType::none, ValueType::none, 
-        ValueType::none, ValueType::none, ValueType::none, ValueType::none
+        ValueType::none, ValueType::none, ValueType::none, ValueType::none,
+        ValueType::none, ValueType::none, ValueType::none
     },
 
     // ValueType::charValue
     {
         ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none, 
         ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::charValue, ValueType::wcharValue, ValueType::ucharValue, 
-        ValueType::none, ValueType::none, ValueType::none, ValueType::none
+        ValueType::none, ValueType::none, ValueType::none, ValueType::none,
+        ValueType::none, ValueType::none, ValueType::none
     },
 
     // ValueType::wcharValue
     {
         ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none,
         ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::wcharValue, ValueType::wcharValue, ValueType::ucharValue, 
-        ValueType::none, ValueType::none, ValueType::none, ValueType::none
+        ValueType::none, ValueType::none, ValueType::none, ValueType::none,
+        ValueType::none, ValueType::none, ValueType::none
     },
 
     // ValueType::ucharValue
     {
         ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none,
         ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::ucharValue, ValueType::ucharValue, ValueType::ucharValue, 
-        ValueType::none, ValueType::none, ValueType::none, ValueType::none
+        ValueType::none, ValueType::none, ValueType::none, ValueType::none,
+        ValueType::none, ValueType::none, ValueType::none
     },
 
     // ValueType::stringValue
     {
         ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none,
         ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none, 
-        ValueType::stringValue, ValueType::none, ValueType::none, ValueType::none
+        ValueType::stringValue, ValueType::none, ValueType::none, ValueType::none,
+        ValueType::none, ValueType::none, ValueType::none
     },
 
     // ValueType::wstringValue
     {
         ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none,
         ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none,
-        ValueType::none, ValueType::wstringValue, ValueType::none, ValueType::none
+        ValueType::none, ValueType::wstringValue, ValueType::none, ValueType::none,
+        ValueType::none, ValueType::none, ValueType::none
     },
 
     // ValueType::ustringValue
     {
         ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none,
         ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none,
-        ValueType::none, ValueType::none, ValueType::ustringValue, ValueType::none
+        ValueType::none, ValueType::none, ValueType::ustringValue, ValueType::none,
+        ValueType::none, ValueType::none, ValueType::none
     },
         
     // ValueType::nullValue
     {
         ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none,
         ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none, 
-        ValueType::none, ValueType::none, ValueType::none, ValueType::nullValue
+        ValueType::none, ValueType::none, ValueType::none, ValueType::nullValue,
+        ValueType::pointerValue, ValueType::none, ValueType::none
+    },
+
+    // ValueType::pointerValue
+    {
+        ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none,
+        ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none, 
+        ValueType::none, ValueType::none, ValueType::none, ValueType::pointerValue,
+        ValueType::pointerValue, ValueType::none, ValueType::none
+    }, 
+
+    // ValueType::arrayValue
+    {
+        ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none,
+        ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none,
+        ValueType::none, ValueType::none, ValueType::none, ValueType::none,
+        ValueType::none, ValueType::arrayValue, ValueType::none
+    },
+
+    // ValueType::structuredValue
+    {
+        ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none,
+        ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none, ValueType::none,
+        ValueType::none, ValueType::none, ValueType::none, ValueType::none,
+        ValueType::none, ValueType::structuredValue, ValueType::none
     }
 };
 
@@ -160,26 +207,27 @@ ValueType CommonType(ValueType left, ValueType right)
     return commonType[uint8_t(left)][uint8_t(right)];
 }
 
-ValueType GetValueTypeFor(SymbolType symbolType)
+TypeSymbol* GetTypeFor(ValueType valueType, SymbolTable* symbolTable)
 {
-    switch (symbolType)
+    switch (valueType)
     {
-        case SymbolType::boolTypeSymbol: return ValueType::boolValue;
-        case SymbolType::sbyteTypeSymbol: return ValueType::sbyteValue;
-        case SymbolType::byteTypeSymbol: return ValueType::byteValue;
-        case SymbolType::shortTypeSymbol: return ValueType::shortValue;
-        case SymbolType::ushortTypeSymbol: return ValueType::ushortValue;
-        case SymbolType::intTypeSymbol: return ValueType::intValue;
-        case SymbolType::uintTypeSymbol: return ValueType::uintValue;
-        case SymbolType::longTypeSymbol: return ValueType::longValue;
-        case SymbolType::ulongTypeSymbol: return ValueType::ulongValue;
-        case SymbolType::floatTypeSymbol: return ValueType::floatValue;
-        case SymbolType::doubleTypeSymbol: return ValueType::doubleValue;
-        case SymbolType::charTypeSymbol: return ValueType::charValue;
-        case SymbolType::wcharTypeSymbol: return ValueType::wcharValue;
-        case SymbolType::ucharTypeSymbol: return ValueType::ucharValue;
-        default: return ValueType::none;
+        case ValueType::boolValue: return symbolTable->GetTypeByName(U"bool");
+        case ValueType::sbyteValue: return symbolTable->GetTypeByName(U"sbyte");
+        case ValueType::byteValue: return symbolTable->GetTypeByName(U"byte");
+        case ValueType::shortValue: return symbolTable->GetTypeByName(U"short");
+        case ValueType::ushortValue: return symbolTable->GetTypeByName(U"ushort");
+        case ValueType::intValue: return symbolTable->GetTypeByName(U"int");
+        case ValueType::uintValue: return symbolTable->GetTypeByName(U"uint");
+        case ValueType::longValue: return symbolTable->GetTypeByName(U"long");
+        case ValueType::ulongValue: return symbolTable->GetTypeByName(U"ulong");
+        case ValueType::floatValue: return symbolTable->GetTypeByName(U"float");
+        case ValueType::doubleValue: return symbolTable->GetTypeByName(U"double");
+        case ValueType::charValue: return symbolTable->GetTypeByName(U"char");
+        case ValueType::wcharValue: return symbolTable->GetTypeByName(U"wchar");
+        case ValueType::ucharValue: return symbolTable->GetTypeByName(U"uchar");
+        case ValueType::nullValue: return symbolTable->GetTypeByName(U"@nullptr_type");
     }
+    return nullptr;
 }
 
 Value::Value(const Span& span_, ValueType valueType_) : span(span_), valueType(valueType_)
@@ -209,9 +257,9 @@ void BoolValue::Read(BinaryReader& reader)
     reader.ReadBool();
 }
 
-Value* BoolValue::As(ValueType targetType, bool cast, const Span& span, bool dontThrow) const
+Value* BoolValue::As(TypeSymbol* targetType, bool cast, const Span& span, bool dontThrow) const
 {
-    switch (targetType)
+    switch (targetType->GetValueType())
     {
         case ValueType::boolValue: 
         {
@@ -231,7 +279,7 @@ Value* BoolValue::As(ValueType targetType, bool cast, const Span& span, bool don
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -249,7 +297,7 @@ Value* BoolValue::As(ValueType targetType, bool cast, const Span& span, bool don
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -267,7 +315,7 @@ Value* BoolValue::As(ValueType targetType, bool cast, const Span& span, bool don
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -285,7 +333,7 @@ Value* BoolValue::As(ValueType targetType, bool cast, const Span& span, bool don
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -303,7 +351,7 @@ Value* BoolValue::As(ValueType targetType, bool cast, const Span& span, bool don
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -321,7 +369,7 @@ Value* BoolValue::As(ValueType targetType, bool cast, const Span& span, bool don
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -339,7 +387,7 @@ Value* BoolValue::As(ValueType targetType, bool cast, const Span& span, bool don
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -357,7 +405,7 @@ Value* BoolValue::As(ValueType targetType, bool cast, const Span& span, bool don
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -375,7 +423,7 @@ Value* BoolValue::As(ValueType targetType, bool cast, const Span& span, bool don
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -393,7 +441,7 @@ Value* BoolValue::As(ValueType targetType, bool cast, const Span& span, bool don
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -411,7 +459,7 @@ Value* BoolValue::As(ValueType targetType, bool cast, const Span& span, bool don
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -429,7 +477,7 @@ Value* BoolValue::As(ValueType targetType, bool cast, const Span& span, bool don
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -447,7 +495,7 @@ Value* BoolValue::As(ValueType targetType, bool cast, const Span& span, bool don
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -459,10 +507,15 @@ Value* BoolValue::As(ValueType targetType, bool cast, const Span& span, bool don
             }
             else
             {
-                throw Exception("conversion from " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " is not valid", span);
+                throw Exception("conversion from " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " is not valid", span);
             }
         }
     }
+}
+
+TypeSymbol* BoolValue::GetType(SymbolTable* symbolTable)
+{
+    return symbolTable->GetTypeByName(U"bool");
 }
 
 SByteValue::SByteValue(const Span& span_, int8_t value_) : Value(span_, ValueType::sbyteValue), value(value_)
@@ -484,9 +537,9 @@ void SByteValue::Read(BinaryReader& reader)
     value = reader.ReadSByte();
 }
 
-Value* SByteValue::As(ValueType targetType, bool cast, const Span& span, bool dontThrow) const
+Value* SByteValue::As(TypeSymbol* targetType, bool cast, const Span& span, bool dontThrow) const
 {
-    switch (targetType)
+    switch (targetType->GetValueType())
     {
         case ValueType::boolValue:
         {
@@ -502,7 +555,7 @@ Value* SByteValue::As(ValueType targetType, bool cast, const Span& span, bool do
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -524,7 +577,7 @@ Value* SByteValue::As(ValueType targetType, bool cast, const Span& span, bool do
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -546,7 +599,7 @@ Value* SByteValue::As(ValueType targetType, bool cast, const Span& span, bool do
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -568,7 +621,7 @@ Value* SByteValue::As(ValueType targetType, bool cast, const Span& span, bool do
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -590,7 +643,7 @@ Value* SByteValue::As(ValueType targetType, bool cast, const Span& span, bool do
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -616,7 +669,7 @@ Value* SByteValue::As(ValueType targetType, bool cast, const Span& span, bool do
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -634,7 +687,7 @@ Value* SByteValue::As(ValueType targetType, bool cast, const Span& span, bool do
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -652,7 +705,7 @@ Value* SByteValue::As(ValueType targetType, bool cast, const Span& span, bool do
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -664,10 +717,15 @@ Value* SByteValue::As(ValueType targetType, bool cast, const Span& span, bool do
             }
             else
             {
-                throw Exception("conversion from " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " is not valid", span);
+                throw Exception("conversion from " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " is not valid", span);
             }
         }
     }
+}
+
+TypeSymbol* SByteValue::GetType(SymbolTable* symbolTable)
+{
+    return symbolTable->GetTypeByName(U"sbyte");
 }
 
 ByteValue::ByteValue(const Span& span_, uint8_t value_) : Value(span_, ValueType::byteValue), value(value_)
@@ -689,9 +747,9 @@ void ByteValue::Read(BinaryReader& reader)
     value = reader.ReadByte();
 }
 
-Value* ByteValue::As(ValueType targetType, bool cast, const Span& span, bool dontThrow) const
+Value* ByteValue::As(TypeSymbol* targetType, bool cast, const Span& span, bool dontThrow) const
 {
-    switch (targetType)
+    switch (targetType->GetValueType())
     {
         case ValueType::boolValue:
         {
@@ -707,7 +765,7 @@ Value* ByteValue::As(ValueType targetType, bool cast, const Span& span, bool don
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -725,7 +783,7 @@ Value* ByteValue::As(ValueType targetType, bool cast, const Span& span, bool don
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -779,7 +837,7 @@ Value* ByteValue::As(ValueType targetType, bool cast, const Span& span, bool don
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -797,7 +855,7 @@ Value* ByteValue::As(ValueType targetType, bool cast, const Span& span, bool don
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -815,7 +873,7 @@ Value* ByteValue::As(ValueType targetType, bool cast, const Span& span, bool don
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -827,10 +885,15 @@ Value* ByteValue::As(ValueType targetType, bool cast, const Span& span, bool don
             }
             else
             {
-                throw Exception("conversion from " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " is not valid", span);
+                throw Exception("conversion from " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " is not valid", span);
             }
         }
     }
+}
+
+TypeSymbol* ByteValue::GetType(SymbolTable* symbolTable)
+{
+    return symbolTable->GetTypeByName(U"byte");
 }
 
 ShortValue::ShortValue(const Span& span_, int16_t value_) : Value(span_, ValueType::shortValue), value(value_)
@@ -852,9 +915,9 @@ void ShortValue::Read(BinaryReader& reader)
     value = reader.ReadShort();
 }
 
-Value* ShortValue::As(ValueType targetType, bool cast, const Span& span, bool dontThrow) const
+Value* ShortValue::As(TypeSymbol* targetType, bool cast, const Span& span, bool dontThrow) const
 {
-    switch (targetType)
+    switch (targetType->GetValueType())
     {
         case ValueType::boolValue:
         {
@@ -870,7 +933,7 @@ Value* ShortValue::As(ValueType targetType, bool cast, const Span& span, bool do
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -888,7 +951,7 @@ Value* ShortValue::As(ValueType targetType, bool cast, const Span& span, bool do
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -906,7 +969,7 @@ Value* ShortValue::As(ValueType targetType, bool cast, const Span& span, bool do
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -928,7 +991,7 @@ Value* ShortValue::As(ValueType targetType, bool cast, const Span& span, bool do
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -950,7 +1013,7 @@ Value* ShortValue::As(ValueType targetType, bool cast, const Span& span, bool do
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -972,7 +1035,7 @@ Value* ShortValue::As(ValueType targetType, bool cast, const Span& span, bool do
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -998,7 +1061,7 @@ Value* ShortValue::As(ValueType targetType, bool cast, const Span& span, bool do
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -1016,7 +1079,7 @@ Value* ShortValue::As(ValueType targetType, bool cast, const Span& span, bool do
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -1034,7 +1097,7 @@ Value* ShortValue::As(ValueType targetType, bool cast, const Span& span, bool do
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -1046,10 +1109,15 @@ Value* ShortValue::As(ValueType targetType, bool cast, const Span& span, bool do
             }
             else
             {
-                throw Exception("conversion from " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " is not valid", span);
+                throw Exception("conversion from " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " is not valid", span);
             }
         }
     }
+}
+
+TypeSymbol* ShortValue::GetType(SymbolTable* symbolTable)
+{
+    return symbolTable->GetTypeByName(U"short");
 }
 
 UShortValue::UShortValue(const Span& span_, uint16_t value_) : Value(span_, ValueType::ushortValue), value(value_)
@@ -1071,9 +1139,9 @@ void UShortValue::Read(BinaryReader& reader)
     value = reader.ReadUShort();
 }
 
-Value* UShortValue::As(ValueType targetType, bool cast, const Span& span, bool dontThrow) const
+Value* UShortValue::As(TypeSymbol* targetType, bool cast, const Span& span, bool dontThrow) const
 {
-    switch (targetType)
+    switch (targetType->GetValueType())
     {
         case ValueType::boolValue:
         {
@@ -1089,7 +1157,7 @@ Value* UShortValue::As(ValueType targetType, bool cast, const Span& span, bool d
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -1107,7 +1175,7 @@ Value* UShortValue::As(ValueType targetType, bool cast, const Span& span, bool d
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -1125,7 +1193,7 @@ Value* UShortValue::As(ValueType targetType, bool cast, const Span& span, bool d
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -1143,7 +1211,7 @@ Value* UShortValue::As(ValueType targetType, bool cast, const Span& span, bool d
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -1189,7 +1257,7 @@ Value* UShortValue::As(ValueType targetType, bool cast, const Span& span, bool d
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -1207,7 +1275,7 @@ Value* UShortValue::As(ValueType targetType, bool cast, const Span& span, bool d
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -1225,7 +1293,7 @@ Value* UShortValue::As(ValueType targetType, bool cast, const Span& span, bool d
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -1237,10 +1305,15 @@ Value* UShortValue::As(ValueType targetType, bool cast, const Span& span, bool d
             }
             else
             {
-                throw Exception("conversion from " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " is not valid", span);
+                throw Exception("conversion from " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " is not valid", span);
             }
         }
     }
+}
+
+TypeSymbol* UShortValue::GetType(SymbolTable* symbolTable)
+{
+    return symbolTable->GetTypeByName(U"ushort");
 }
 
 IntValue::IntValue(const Span& span_, int32_t value_) : Value(span_, ValueType::intValue), value(value_)
@@ -1262,9 +1335,9 @@ void IntValue::Read(BinaryReader& reader)
     value = reader.ReadInt();
 }
 
-Value* IntValue::As(ValueType targetType, bool cast, const Span& span, bool dontThrow) const
+Value* IntValue::As(TypeSymbol* targetType, bool cast, const Span& span, bool dontThrow) const
 {
-    switch (targetType)
+    switch (targetType->GetValueType())
     {
         case ValueType::boolValue:
         {
@@ -1280,7 +1353,7 @@ Value* IntValue::As(ValueType targetType, bool cast, const Span& span, bool dont
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -1298,7 +1371,7 @@ Value* IntValue::As(ValueType targetType, bool cast, const Span& span, bool dont
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -1316,7 +1389,7 @@ Value* IntValue::As(ValueType targetType, bool cast, const Span& span, bool dont
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -1334,7 +1407,7 @@ Value* IntValue::As(ValueType targetType, bool cast, const Span& span, bool dont
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -1352,7 +1425,7 @@ Value* IntValue::As(ValueType targetType, bool cast, const Span& span, bool dont
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -1374,7 +1447,7 @@ Value* IntValue::As(ValueType targetType, bool cast, const Span& span, bool dont
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -1396,7 +1469,7 @@ Value* IntValue::As(ValueType targetType, bool cast, const Span& span, bool dont
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -1422,7 +1495,7 @@ Value* IntValue::As(ValueType targetType, bool cast, const Span& span, bool dont
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -1440,7 +1513,7 @@ Value* IntValue::As(ValueType targetType, bool cast, const Span& span, bool dont
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -1458,7 +1531,7 @@ Value* IntValue::As(ValueType targetType, bool cast, const Span& span, bool dont
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -1470,10 +1543,15 @@ Value* IntValue::As(ValueType targetType, bool cast, const Span& span, bool dont
             }
             else
             {
-                throw Exception("conversion from " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " is not valid", span);
+                throw Exception("conversion from " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " is not valid", span);
             }
         }
     }
+}
+
+TypeSymbol* IntValue::GetType(SymbolTable* symbolTable)
+{
+    return symbolTable->GetTypeByName(U"int");
 }
 
 UIntValue::UIntValue(const Span& span_, uint32_t value_) : Value(span_, ValueType::uintValue), value(value_)
@@ -1495,9 +1573,9 @@ void UIntValue::Read(BinaryReader& reader)
     value = reader.ReadUInt();
 }
 
-Value* UIntValue::As(ValueType targetType, bool cast, const Span& span, bool dontThrow) const
+Value* UIntValue::As(TypeSymbol* targetType, bool cast, const Span& span, bool dontThrow) const
 {
-    switch (targetType)
+    switch (targetType->GetValueType())
     {
         case ValueType::boolValue:
         {
@@ -1513,7 +1591,7 @@ Value* UIntValue::As(ValueType targetType, bool cast, const Span& span, bool don
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -1531,7 +1609,7 @@ Value* UIntValue::As(ValueType targetType, bool cast, const Span& span, bool don
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -1549,7 +1627,7 @@ Value* UIntValue::As(ValueType targetType, bool cast, const Span& span, bool don
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -1567,7 +1645,7 @@ Value* UIntValue::As(ValueType targetType, bool cast, const Span& span, bool don
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -1585,7 +1663,7 @@ Value* UIntValue::As(ValueType targetType, bool cast, const Span& span, bool don
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -1603,7 +1681,7 @@ Value* UIntValue::As(ValueType targetType, bool cast, const Span& span, bool don
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -1641,7 +1719,7 @@ Value* UIntValue::As(ValueType targetType, bool cast, const Span& span, bool don
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -1659,7 +1737,7 @@ Value* UIntValue::As(ValueType targetType, bool cast, const Span& span, bool don
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -1677,7 +1755,7 @@ Value* UIntValue::As(ValueType targetType, bool cast, const Span& span, bool don
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -1689,10 +1767,15 @@ Value* UIntValue::As(ValueType targetType, bool cast, const Span& span, bool don
             }
             else
             {
-                throw Exception("conversion from " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " is not valid", span);
+                throw Exception("conversion from " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " is not valid", span);
             }
         }
     }
+}
+
+TypeSymbol* UIntValue::GetType(SymbolTable* symbolTable)
+{
+    return symbolTable->GetTypeByName(U"uint");
 }
 
 LongValue::LongValue(const Span& span_, int64_t value_) : Value(span_, ValueType::longValue), value(value_)
@@ -1714,9 +1797,9 @@ void LongValue::Read(BinaryReader& reader)
     value = reader.ReadLong();
 }
 
-Value* LongValue::As(ValueType targetType, bool cast, const Span& span, bool dontThrow) const
+Value* LongValue::As(TypeSymbol* targetType, bool cast, const Span& span, bool dontThrow) const
 {
-    switch (targetType)
+    switch (targetType->GetValueType())
     {
         case ValueType::boolValue:
         {
@@ -1732,7 +1815,7 @@ Value* LongValue::As(ValueType targetType, bool cast, const Span& span, bool don
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -1750,7 +1833,7 @@ Value* LongValue::As(ValueType targetType, bool cast, const Span& span, bool don
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -1768,7 +1851,7 @@ Value* LongValue::As(ValueType targetType, bool cast, const Span& span, bool don
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -1786,7 +1869,7 @@ Value* LongValue::As(ValueType targetType, bool cast, const Span& span, bool don
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -1804,7 +1887,7 @@ Value* LongValue::As(ValueType targetType, bool cast, const Span& span, bool don
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -1822,7 +1905,7 @@ Value* LongValue::As(ValueType targetType, bool cast, const Span& span, bool don
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -1840,7 +1923,7 @@ Value* LongValue::As(ValueType targetType, bool cast, const Span& span, bool don
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -1862,7 +1945,7 @@ Value* LongValue::As(ValueType targetType, bool cast, const Span& span, bool don
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -1888,7 +1971,7 @@ Value* LongValue::As(ValueType targetType, bool cast, const Span& span, bool don
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -1906,7 +1989,7 @@ Value* LongValue::As(ValueType targetType, bool cast, const Span& span, bool don
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -1924,7 +2007,7 @@ Value* LongValue::As(ValueType targetType, bool cast, const Span& span, bool don
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -1936,10 +2019,15 @@ Value* LongValue::As(ValueType targetType, bool cast, const Span& span, bool don
             }
             else
             {
-                throw Exception("conversion from " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " is not valid", span);
+                throw Exception("conversion from " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " is not valid", span);
             }
         }
     }
+}
+
+TypeSymbol* LongValue::GetType(SymbolTable* symbolTable)
+{
+    return symbolTable->GetTypeByName(U"long");
 }
 
 ULongValue::ULongValue(const Span& span_, uint64_t value_) : Value(span_, ValueType::ulongValue), value(value_)
@@ -1961,9 +2049,9 @@ void ULongValue::Read(BinaryReader& reader)
     value = reader.ReadULong();
 }
 
-Value* ULongValue::As(ValueType targetType, bool cast, const Span& span, bool dontThrow) const
+Value* ULongValue::As(TypeSymbol* targetType, bool cast, const Span& span, bool dontThrow) const
 {
-    switch (targetType)
+    switch (targetType->GetValueType())
     {
         case ValueType::boolValue:
         {
@@ -1979,7 +2067,7 @@ Value* ULongValue::As(ValueType targetType, bool cast, const Span& span, bool do
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -1997,7 +2085,7 @@ Value* ULongValue::As(ValueType targetType, bool cast, const Span& span, bool do
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -2015,7 +2103,7 @@ Value* ULongValue::As(ValueType targetType, bool cast, const Span& span, bool do
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -2033,7 +2121,7 @@ Value* ULongValue::As(ValueType targetType, bool cast, const Span& span, bool do
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -2051,7 +2139,7 @@ Value* ULongValue::As(ValueType targetType, bool cast, const Span& span, bool do
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -2069,7 +2157,7 @@ Value* ULongValue::As(ValueType targetType, bool cast, const Span& span, bool do
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -2087,7 +2175,7 @@ Value* ULongValue::As(ValueType targetType, bool cast, const Span& span, bool do
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -2105,7 +2193,7 @@ Value* ULongValue::As(ValueType targetType, bool cast, const Span& span, bool do
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -2135,7 +2223,7 @@ Value* ULongValue::As(ValueType targetType, bool cast, const Span& span, bool do
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -2153,7 +2241,7 @@ Value* ULongValue::As(ValueType targetType, bool cast, const Span& span, bool do
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -2171,7 +2259,7 @@ Value* ULongValue::As(ValueType targetType, bool cast, const Span& span, bool do
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -2183,10 +2271,15 @@ Value* ULongValue::As(ValueType targetType, bool cast, const Span& span, bool do
             }
             else
             {
-                throw Exception("conversion from " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " is not valid", span);
+                throw Exception("conversion from " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " is not valid", span);
             }
         }
     }
+}
+
+TypeSymbol* ULongValue::GetType(SymbolTable* symbolTable)
+{
+    return symbolTable->GetTypeByName(U"ulong");
 }
 
 FloatValue::FloatValue(const Span& span_, float value_) : Value(span_, ValueType::floatValue), value(value_)
@@ -2208,9 +2301,9 @@ void FloatValue::Read(BinaryReader& reader)
     value = reader.ReadFloat();
 }
 
-Value* FloatValue::As(ValueType targetType, bool cast, const Span& span, bool dontThrow) const
+Value* FloatValue::As(TypeSymbol* targetType, bool cast, const Span& span, bool dontThrow) const
 {
-    switch (targetType)
+    switch (targetType->GetValueType())
     {
         case ValueType::boolValue:
         {
@@ -2226,7 +2319,7 @@ Value* FloatValue::As(ValueType targetType, bool cast, const Span& span, bool do
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -2244,7 +2337,7 @@ Value* FloatValue::As(ValueType targetType, bool cast, const Span& span, bool do
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -2262,7 +2355,7 @@ Value* FloatValue::As(ValueType targetType, bool cast, const Span& span, bool do
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -2280,7 +2373,7 @@ Value* FloatValue::As(ValueType targetType, bool cast, const Span& span, bool do
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -2298,7 +2391,7 @@ Value* FloatValue::As(ValueType targetType, bool cast, const Span& span, bool do
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -2316,7 +2409,7 @@ Value* FloatValue::As(ValueType targetType, bool cast, const Span& span, bool do
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -2334,7 +2427,7 @@ Value* FloatValue::As(ValueType targetType, bool cast, const Span& span, bool do
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -2352,7 +2445,7 @@ Value* FloatValue::As(ValueType targetType, bool cast, const Span& span, bool do
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -2370,7 +2463,7 @@ Value* FloatValue::As(ValueType targetType, bool cast, const Span& span, bool do
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -2396,7 +2489,7 @@ Value* FloatValue::As(ValueType targetType, bool cast, const Span& span, bool do
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -2414,7 +2507,7 @@ Value* FloatValue::As(ValueType targetType, bool cast, const Span& span, bool do
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -2432,7 +2525,7 @@ Value* FloatValue::As(ValueType targetType, bool cast, const Span& span, bool do
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -2444,10 +2537,15 @@ Value* FloatValue::As(ValueType targetType, bool cast, const Span& span, bool do
             }
             else
             {
-                throw Exception("conversion from " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " is not valid", span);
+                throw Exception("conversion from " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " is not valid", span);
             }
         }
     }
+}
+
+TypeSymbol* FloatValue::GetType(SymbolTable* symbolTable)
+{
+    return symbolTable->GetTypeByName(U"float");
 }
 
 DoubleValue::DoubleValue(const Span& span_, double value_) : Value(span_, ValueType::doubleValue), value(value_)
@@ -2469,9 +2567,9 @@ void DoubleValue::Read(BinaryReader& reader)
     value = reader.ReadDouble();
 }
 
-Value* DoubleValue::As(ValueType targetType, bool cast, const Span& span, bool dontThrow) const
+Value* DoubleValue::As(TypeSymbol* targetType, bool cast, const Span& span, bool dontThrow) const
 {
-    switch (targetType)
+    switch (targetType->GetValueType())
     {
         case ValueType::boolValue:
         {
@@ -2487,7 +2585,7 @@ Value* DoubleValue::As(ValueType targetType, bool cast, const Span& span, bool d
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -2505,7 +2603,7 @@ Value* DoubleValue::As(ValueType targetType, bool cast, const Span& span, bool d
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -2523,7 +2621,7 @@ Value* DoubleValue::As(ValueType targetType, bool cast, const Span& span, bool d
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -2541,7 +2639,7 @@ Value* DoubleValue::As(ValueType targetType, bool cast, const Span& span, bool d
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -2559,7 +2657,7 @@ Value* DoubleValue::As(ValueType targetType, bool cast, const Span& span, bool d
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -2577,7 +2675,7 @@ Value* DoubleValue::As(ValueType targetType, bool cast, const Span& span, bool d
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -2595,7 +2693,7 @@ Value* DoubleValue::As(ValueType targetType, bool cast, const Span& span, bool d
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -2613,7 +2711,7 @@ Value* DoubleValue::As(ValueType targetType, bool cast, const Span& span, bool d
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -2631,7 +2729,7 @@ Value* DoubleValue::As(ValueType targetType, bool cast, const Span& span, bool d
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -2649,7 +2747,7 @@ Value* DoubleValue::As(ValueType targetType, bool cast, const Span& span, bool d
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -2671,7 +2769,7 @@ Value* DoubleValue::As(ValueType targetType, bool cast, const Span& span, bool d
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -2689,7 +2787,7 @@ Value* DoubleValue::As(ValueType targetType, bool cast, const Span& span, bool d
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -2707,7 +2805,7 @@ Value* DoubleValue::As(ValueType targetType, bool cast, const Span& span, bool d
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -2719,10 +2817,15 @@ Value* DoubleValue::As(ValueType targetType, bool cast, const Span& span, bool d
             }
             else
             {
-                throw Exception("conversion from " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " is not valid", span);
+                throw Exception("conversion from " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " is not valid", span);
             }
         }
     }
+}
+
+TypeSymbol* DoubleValue::GetType(SymbolTable* symbolTable)
+{
+    return symbolTable->GetTypeByName(U"double");
 }
 
 CharValue::CharValue(const Span& span_, unsigned char value_) : Value(span_, ValueType::charValue), value(value_)
@@ -2744,9 +2847,9 @@ void CharValue::Read(BinaryReader& reader)
     value = reader.ReadChar();
 }
 
-Value* CharValue::As(ValueType targetType, bool cast, const Span& span, bool dontThrow) const
+Value* CharValue::As(TypeSymbol* targetType, bool cast, const Span& span, bool dontThrow) const
 {
-    switch (targetType)
+    switch (targetType->GetValueType())
     {
         case ValueType::boolValue:
         {
@@ -2762,7 +2865,7 @@ Value* CharValue::As(ValueType targetType, bool cast, const Span& span, bool don
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -2780,7 +2883,7 @@ Value* CharValue::As(ValueType targetType, bool cast, const Span& span, bool don
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -2798,7 +2901,7 @@ Value* CharValue::As(ValueType targetType, bool cast, const Span& span, bool don
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -2816,7 +2919,7 @@ Value* CharValue::As(ValueType targetType, bool cast, const Span& span, bool don
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -2834,7 +2937,7 @@ Value* CharValue::As(ValueType targetType, bool cast, const Span& span, bool don
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -2852,7 +2955,7 @@ Value* CharValue::As(ValueType targetType, bool cast, const Span& span, bool don
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -2870,7 +2973,7 @@ Value* CharValue::As(ValueType targetType, bool cast, const Span& span, bool don
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -2888,7 +2991,7 @@ Value* CharValue::As(ValueType targetType, bool cast, const Span& span, bool don
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -2906,7 +3009,7 @@ Value* CharValue::As(ValueType targetType, bool cast, const Span& span, bool don
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -2924,7 +3027,7 @@ Value* CharValue::As(ValueType targetType, bool cast, const Span& span, bool don
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -2942,7 +3045,7 @@ Value* CharValue::As(ValueType targetType, bool cast, const Span& span, bool don
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -2966,10 +3069,15 @@ Value* CharValue::As(ValueType targetType, bool cast, const Span& span, bool don
             }
             else
             {
-                throw Exception("conversion from " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " is not valid", span);
+                throw Exception("conversion from " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " is not valid", span);
             }
         }
     }
+}
+
+TypeSymbol* CharValue::GetType(SymbolTable* symbolTable)
+{
+    return symbolTable->GetTypeByName(U"char");
 }
 
 WCharValue::WCharValue(const Span& span_, char16_t value_) : Value(span_, ValueType::wcharValue), value(value_)
@@ -2991,9 +3099,9 @@ void WCharValue::Read(BinaryReader& reader)
     value = reader.ReadWChar();
 }
 
-Value* WCharValue::As(ValueType targetType, bool cast, const Span& span, bool dontThrow) const
+Value* WCharValue::As(TypeSymbol* targetType, bool cast, const Span& span, bool dontThrow) const
 {
-    switch (targetType)
+    switch (targetType->GetValueType())
     {
         case ValueType::boolValue:
         {
@@ -3009,7 +3117,7 @@ Value* WCharValue::As(ValueType targetType, bool cast, const Span& span, bool do
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -3027,7 +3135,7 @@ Value* WCharValue::As(ValueType targetType, bool cast, const Span& span, bool do
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -3045,7 +3153,7 @@ Value* WCharValue::As(ValueType targetType, bool cast, const Span& span, bool do
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -3063,7 +3171,7 @@ Value* WCharValue::As(ValueType targetType, bool cast, const Span& span, bool do
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -3081,7 +3189,7 @@ Value* WCharValue::As(ValueType targetType, bool cast, const Span& span, bool do
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -3099,7 +3207,7 @@ Value* WCharValue::As(ValueType targetType, bool cast, const Span& span, bool do
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -3117,7 +3225,7 @@ Value* WCharValue::As(ValueType targetType, bool cast, const Span& span, bool do
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -3135,7 +3243,7 @@ Value* WCharValue::As(ValueType targetType, bool cast, const Span& span, bool do
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -3153,7 +3261,7 @@ Value* WCharValue::As(ValueType targetType, bool cast, const Span& span, bool do
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -3171,7 +3279,7 @@ Value* WCharValue::As(ValueType targetType, bool cast, const Span& span, bool do
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -3189,7 +3297,7 @@ Value* WCharValue::As(ValueType targetType, bool cast, const Span& span, bool do
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -3207,7 +3315,7 @@ Value* WCharValue::As(ValueType targetType, bool cast, const Span& span, bool do
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -3227,10 +3335,15 @@ Value* WCharValue::As(ValueType targetType, bool cast, const Span& span, bool do
             }
             else
             {
-                throw Exception("conversion from " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " is not valid", span);
+                throw Exception("conversion from " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " is not valid", span);
             }
         }
     }
+}
+
+TypeSymbol* WCharValue::GetType(SymbolTable* symbolTable)
+{
+    return symbolTable->GetTypeByName(U"wchar");
 }
 
 UCharValue::UCharValue(const Span& span_, char32_t value_) : Value(span_, ValueType::ucharValue), value(value_)
@@ -3252,9 +3365,9 @@ void UCharValue::Read(BinaryReader& reader)
     value = reader.ReadUChar();
 }
 
-Value* UCharValue::As(ValueType targetType, bool cast, const Span& span, bool dontThrow) const
+Value* UCharValue::As(TypeSymbol* targetType, bool cast, const Span& span, bool dontThrow) const
 {
-    switch (targetType)
+    switch (targetType->GetValueType())
     {
         case ValueType::boolValue:
         {
@@ -3270,7 +3383,7 @@ Value* UCharValue::As(ValueType targetType, bool cast, const Span& span, bool do
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -3288,7 +3401,7 @@ Value* UCharValue::As(ValueType targetType, bool cast, const Span& span, bool do
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -3306,7 +3419,7 @@ Value* UCharValue::As(ValueType targetType, bool cast, const Span& span, bool do
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -3324,7 +3437,7 @@ Value* UCharValue::As(ValueType targetType, bool cast, const Span& span, bool do
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -3342,7 +3455,7 @@ Value* UCharValue::As(ValueType targetType, bool cast, const Span& span, bool do
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -3360,7 +3473,7 @@ Value* UCharValue::As(ValueType targetType, bool cast, const Span& span, bool do
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -3378,7 +3491,7 @@ Value* UCharValue::As(ValueType targetType, bool cast, const Span& span, bool do
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -3396,7 +3509,7 @@ Value* UCharValue::As(ValueType targetType, bool cast, const Span& span, bool do
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -3414,7 +3527,7 @@ Value* UCharValue::As(ValueType targetType, bool cast, const Span& span, bool do
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -3432,7 +3545,7 @@ Value* UCharValue::As(ValueType targetType, bool cast, const Span& span, bool do
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -3450,7 +3563,7 @@ Value* UCharValue::As(ValueType targetType, bool cast, const Span& span, bool do
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -3468,7 +3581,7 @@ Value* UCharValue::As(ValueType targetType, bool cast, const Span& span, bool do
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -3486,7 +3599,7 @@ Value* UCharValue::As(ValueType targetType, bool cast, const Span& span, bool do
                 }
                 else
                 {
-                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " without a cast", span);
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
                 }
             }
         }
@@ -3502,10 +3615,15 @@ Value* UCharValue::As(ValueType targetType, bool cast, const Span& span, bool do
             }
             else
             {
-                throw Exception("conversion from " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " is not valid", span);
+                throw Exception("conversion from " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " is not valid", span);
             }
         }
     }
+}
+
+TypeSymbol* UCharValue::GetType(SymbolTable* symbolTable)
+{
+    return symbolTable->GetTypeByName(U"uchar");
 }
 
 StringValue::StringValue(const Span& span_, int stringId_) : Value(span_, ValueType::stringValue), stringId(stringId_)
@@ -3519,15 +3637,17 @@ llvm::Value* StringValue::IrValue(Emitter& emitter)
 
 void StringValue::Write(BinaryWriter& writer)
 {
+    Assert(false, "write for string value not supported");
 }
 
 void StringValue::Read(BinaryReader& reader)
 {
+    Assert(false, "read for string value not supported");
 }
 
-Value* StringValue::As(ValueType targetType, bool cast, const Span& span, bool dontThrow) const
+Value* StringValue::As(TypeSymbol* targetType, bool cast, const Span& span, bool dontThrow) const
 {
-    switch (targetType)
+    switch (targetType->GetValueType())
     {
         case ValueType::stringValue:
         {
@@ -3541,10 +3661,15 @@ Value* StringValue::As(ValueType targetType, bool cast, const Span& span, bool d
             }
             else
             {
-                throw Exception("conversion from " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " is not valid", span);
+                throw Exception("conversion from " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " is not valid", span);
             }
         }
     }
+}
+
+TypeSymbol* StringValue::GetType(SymbolTable* symbolTable)
+{
+    return symbolTable->GetTypeByName(U"char")->AddConst(GetSpan())->AddPointer(GetSpan());
 }
 
 WStringValue::WStringValue(const Span& span_, int stringId_) : Value(span_, ValueType::wstringValue), stringId(stringId_)
@@ -3562,15 +3687,17 @@ llvm::Value* WStringValue::IrValue(Emitter& emitter)
 
 void WStringValue::Write(BinaryWriter& writer)
 {
+    Assert(false, "write for wstring value not supported");
 }
 
 void WStringValue::Read(BinaryReader& reader)
 {
+    Assert(false, "read for wstring value not supported");
 }
 
-Value* WStringValue::As(ValueType targetType, bool cast, const Span& span, bool dontThrow) const
+Value* WStringValue::As(TypeSymbol* targetType, bool cast, const Span& span, bool dontThrow) const
 {
-    switch (targetType)
+    switch (targetType->GetValueType())
     {
         case ValueType::wstringValue:
         {
@@ -3584,10 +3711,15 @@ Value* WStringValue::As(ValueType targetType, bool cast, const Span& span, bool 
             }
             else
             {
-                throw Exception("conversion from " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " is not valid", span);
+                throw Exception("conversion from " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " is not valid", span);
             }
         }
     }
+}
+
+TypeSymbol* WStringValue::GetType(SymbolTable* symbolTable)
+{
+    return symbolTable->GetTypeByName(U"wchar")->AddConst(GetSpan())->AddPointer(GetSpan());
 }
 
 UStringValue::UStringValue(const Span& span_, int stringId_) : Value(span_, ValueType::ustringValue), stringId(stringId_)
@@ -3605,15 +3737,17 @@ llvm::Value* UStringValue::IrValue(Emitter& emitter)
 
 void UStringValue::Write(BinaryWriter& writer)
 {
+    Assert(false, "write for ustring value not supported");
 }
 
 void UStringValue::Read(BinaryReader& reader)
 {
+    Assert(false, "read for ustring value not supported");
 }
 
-Value* UStringValue::As(ValueType targetType, bool cast, const Span& span, bool dontThrow) const
+Value* UStringValue::As(TypeSymbol* targetType, bool cast, const Span& span, bool dontThrow) const
 {
-    switch (targetType)
+    switch (targetType->GetValueType())
     {
         case ValueType::ustringValue:
         {
@@ -3627,10 +3761,15 @@ Value* UStringValue::As(ValueType targetType, bool cast, const Span& span, bool 
             }
             else
             {
-                throw Exception("conversion from " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " is not valid", span);
+                throw Exception("conversion from " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " is not valid", span);
             }
         }
     }
+}
+
+TypeSymbol* UStringValue::GetType(SymbolTable* symbolTable)
+{
+    return symbolTable->GetTypeByName(U"uchar")->AddConst(GetSpan())->AddPointer(GetSpan());
 }
 
 NullValue::NullValue(const Span& span_, TypeSymbol* nullPtrType_) : Value(span_, ValueType::nullValue), nullPtrType(nullPtrType_)
@@ -3650,13 +3789,31 @@ void NullValue::Read(BinaryReader& reader)
 {
 }
 
-Value* NullValue::As(ValueType targetType, bool cast, const Span& span, bool dontThrow) const
+Value* NullValue::As(TypeSymbol* targetType, bool cast, const Span& span, bool dontThrow) const
 {
-    switch (targetType)
+    switch (targetType->GetValueType())
     {
         case ValueType::nullValue:
         {
             return new NullValue(span, nullPtrType);
+        }
+        case ValueType::pointerValue:
+        {
+            if (targetType->IsPointerType())
+            {
+                return new PointerValue(span, targetType, nullptr);
+            }
+            else
+            {
+                if (dontThrow)
+                {
+                    return nullptr;
+                }
+                else
+                {
+                    throw Exception("conversion from " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " is not valid", span);
+                }
+            }
         }
         default:
         {
@@ -3666,8 +3823,275 @@ Value* NullValue::As(ValueType targetType, bool cast, const Span& span, bool don
             }
             else
             {
-                throw Exception("conversion from " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType) + " is not valid", span);
+                throw Exception("conversion from " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " is not valid", span);
             }
+        }
+    }
+}
+
+TypeSymbol* NullValue::GetType(SymbolTable* symbolTable)
+{
+    return nullPtrType;
+}
+
+PointerValue::PointerValue(const Span& span_, TypeSymbol* type_, const void* ptr_) : Value(span_, ValueType::pointerValue), type(type_), ptr(ptr_)
+{
+}
+
+llvm::Value* PointerValue::IrValue(Emitter& emitter)
+{
+    Assert(false, "ir value for pointer value not supported");
+    return nullptr;
+}
+
+void PointerValue::Write(BinaryWriter& writer)
+{
+}
+
+void PointerValue::Read(BinaryReader& reader)
+{
+}
+
+Value* PointerValue::As(TypeSymbol* targetType, bool cast, const Span& span, bool dontThrow) const
+{
+    switch (targetType->GetValueType())
+    {
+        case ValueType::pointerValue:
+        {
+            if (cast)
+            {
+                return new PointerValue(span, targetType, ptr);
+            }
+            else
+            {
+                if (dontThrow)
+                {
+                    return nullptr;
+                }
+                else
+                {
+                    throw Exception("cannot convert " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " without a cast", span);
+                }
+            }
+        }
+        default:
+        {
+            if (dontThrow)
+            {
+                return nullptr;
+            }
+            else
+            {
+                throw Exception("conversion from " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " is not valid", span);
+            }
+        }
+    }
+}
+
+TypeSymbol* PointerValue::GetType(SymbolTable* symbolTable)
+{
+    return type;
+}
+
+TypeSymbol* PointerValue::PointeeType() const
+{ 
+    return type->RemovePointer(GetSpan()); 
+}
+
+Value* PointerValue::Add(int64_t offset) const
+{
+    ValueType pointeeValueType = PointeeType()->GetValueType();
+    switch (pointeeValueType)
+    {
+        case ValueType::boolValue: return new PointerValue(GetSpan(), type, static_cast<const BoolValue::OperandType*>(ptr) + offset);
+        case ValueType::sbyteValue: return new PointerValue(GetSpan(), type, static_cast<const SByteValue::OperandType*>(ptr) + offset);
+        case ValueType::byteValue: return new PointerValue(GetSpan(), type, static_cast<const ByteValue::OperandType*>(ptr) + offset);
+        case ValueType::shortValue: return new PointerValue(GetSpan(), type, static_cast<const ShortValue::OperandType*>(ptr) + offset);
+        case ValueType::ushortValue: return new PointerValue(GetSpan(), type, static_cast<const UShortValue::OperandType*>(ptr) + offset);
+        case ValueType::intValue: return new PointerValue(GetSpan(), type, static_cast<const IntValue::OperandType*>(ptr) + offset);
+        case ValueType::uintValue: return new PointerValue(GetSpan(), type, static_cast<const UIntValue::OperandType*>(ptr) + offset);
+        case ValueType::longValue: return new PointerValue(GetSpan(), type, static_cast<const LongValue::OperandType*>(ptr) + offset);
+        case ValueType::ulongValue: return new PointerValue(GetSpan(), type, static_cast<const ULongValue::OperandType*>(ptr) + offset);
+        case ValueType::floatValue: return new PointerValue(GetSpan(), type, static_cast<const FloatValue::OperandType*>(ptr) + offset);
+        case ValueType::doubleValue: return new PointerValue(GetSpan(), type, static_cast<const DoubleValue::OperandType*>(ptr) + offset);
+        case ValueType::charValue: return new PointerValue(GetSpan(), type, static_cast<const CharValue::OperandType*>(ptr) + offset);
+        case ValueType::wcharValue: return new PointerValue(GetSpan(), type, static_cast<const WCharValue::OperandType*>(ptr) + offset);
+        case ValueType::ucharValue: return new PointerValue(GetSpan(), type, static_cast<const UCharValue::OperandType*>(ptr) + offset);
+        case ValueType::pointerValue: return new PointerValue(GetSpan(), type, static_cast<const PointerValue::OperandType*>(ptr) + offset);
+    }
+    return nullptr;
+}
+
+Value* PointerValue::Sub(int64_t offset) const
+{
+    ValueType pointeeValueType = PointeeType()->GetValueType();
+    switch (pointeeValueType)
+    {
+        case ValueType::boolValue: return new PointerValue(GetSpan(), type, static_cast<const BoolValue::OperandType*>(ptr) - offset);
+        case ValueType::sbyteValue: return new PointerValue(GetSpan(), type, static_cast<const SByteValue::OperandType*>(ptr) - offset);
+        case ValueType::byteValue: return new PointerValue(GetSpan(), type, static_cast<const ByteValue::OperandType*>(ptr) - offset);
+        case ValueType::shortValue: return new PointerValue(GetSpan(), type, static_cast<const ShortValue::OperandType*>(ptr) - offset);
+        case ValueType::ushortValue: return new PointerValue(GetSpan(), type, static_cast<const UShortValue::OperandType*>(ptr) - offset);
+        case ValueType::intValue: return new PointerValue(GetSpan(), type, static_cast<const IntValue::OperandType*>(ptr) - offset);
+        case ValueType::uintValue: return new PointerValue(GetSpan(), type, static_cast<const UIntValue::OperandType*>(ptr) - offset);
+        case ValueType::longValue: return new PointerValue(GetSpan(), type, static_cast<const LongValue::OperandType*>(ptr) - offset);
+        case ValueType::ulongValue: return new PointerValue(GetSpan(), type, static_cast<const ULongValue::OperandType*>(ptr) - offset);
+        case ValueType::floatValue: return new PointerValue(GetSpan(), type, static_cast<const FloatValue::OperandType*>(ptr) - offset);
+        case ValueType::doubleValue: return new PointerValue(GetSpan(), type, static_cast<const DoubleValue::OperandType*>(ptr) - offset);
+        case ValueType::charValue: return new PointerValue(GetSpan(), type, static_cast<const CharValue::OperandType*>(ptr) - offset);
+        case ValueType::wcharValue: return new PointerValue(GetSpan(), type, static_cast<const WCharValue::OperandType*>(ptr) - offset);
+        case ValueType::ucharValue: return new PointerValue(GetSpan(), type, static_cast<const UCharValue::OperandType*>(ptr) - offset);
+        case ValueType::pointerValue: return new PointerValue(GetSpan(), type, static_cast<const PointerValue::OperandType*>(ptr) - offset);
+    }
+    return nullptr;
+}
+
+Value* PointerValue::Sub(const void* thatPtr) const
+{
+    ValueType pointeeValueType = PointeeType()->GetValueType();
+    switch (pointeeValueType)
+    {
+        case ValueType::boolValue: return new LongValue(GetSpan(), static_cast<const BoolValue::OperandType*>(ptr) - static_cast<const BoolValue::OperandType*>(thatPtr));
+        case ValueType::sbyteValue: return new LongValue(GetSpan(), static_cast<const SByteValue::OperandType*>(ptr) - static_cast<const SByteValue::OperandType*>(thatPtr));
+        case ValueType::byteValue: return new LongValue(GetSpan(), static_cast<const ByteValue::OperandType*>(ptr) - static_cast<const ByteValue::OperandType*>(thatPtr));
+        case ValueType::shortValue: return new LongValue(GetSpan(), static_cast<const ShortValue::OperandType*>(ptr) - static_cast<const ShortValue::OperandType*>(thatPtr));
+        case ValueType::ushortValue: return new LongValue(GetSpan(), static_cast<const UShortValue::OperandType*>(ptr) - static_cast<const UShortValue::OperandType*>(thatPtr));
+        case ValueType::intValue: return new LongValue(GetSpan(), static_cast<const IntValue::OperandType*>(ptr) - static_cast<const IntValue::OperandType*>(thatPtr));
+        case ValueType::uintValue: return new LongValue(GetSpan(), static_cast<const UIntValue::OperandType*>(ptr) - static_cast<const UIntValue::OperandType*>(thatPtr));
+        case ValueType::longValue: return new LongValue(GetSpan(), static_cast<const LongValue::OperandType*>(ptr) - static_cast<const LongValue::OperandType*>(thatPtr));
+        case ValueType::ulongValue: return new LongValue(GetSpan(), static_cast<const ULongValue::OperandType*>(ptr) - static_cast<const ULongValue::OperandType*>(thatPtr));
+        case ValueType::floatValue: return new LongValue(GetSpan(), static_cast<const FloatValue::OperandType*>(ptr) - static_cast<const FloatValue::OperandType*>(thatPtr));
+        case ValueType::doubleValue: return new LongValue(GetSpan(), static_cast<const DoubleValue::OperandType*>(ptr) - static_cast<const DoubleValue::OperandType*>(thatPtr));
+        case ValueType::charValue: return new LongValue(GetSpan(), static_cast<const CharValue::OperandType*>(ptr) - static_cast<const CharValue::OperandType*>(thatPtr));
+        case ValueType::wcharValue: return new LongValue(GetSpan(), static_cast<const WCharValue::OperandType*>(ptr) - static_cast<const WCharValue::OperandType*>(thatPtr));
+        case ValueType::ucharValue: return new LongValue(GetSpan(), static_cast<const UCharValue::OperandType*>(ptr) - static_cast<const UCharValue::OperandType*>(thatPtr));
+    }
+    return nullptr;
+}
+
+Value* PointerValue::Deref() const
+{
+    ValueType pointeeValueType = PointeeType()->GetValueType();
+    switch (pointeeValueType)
+    {
+        case ValueType::boolValue: return new BoolValue(GetSpan(), *static_cast<const BoolValue::OperandType*>(ptr));
+        case ValueType::sbyteValue: return new SByteValue(GetSpan(), *static_cast<const SByteValue::OperandType*>(ptr));
+        case ValueType::byteValue: return new ByteValue(GetSpan(), *static_cast<const ByteValue::OperandType*>(ptr));
+        case ValueType::shortValue: return new ShortValue(GetSpan(), *static_cast<const ShortValue::OperandType*>(ptr));
+        case ValueType::ushortValue: return new UShortValue(GetSpan(), *static_cast<const UShortValue::OperandType*>(ptr));
+        case ValueType::intValue: return new IntValue(GetSpan(), *static_cast<const IntValue::OperandType*>(ptr));
+        case ValueType::uintValue: return new UIntValue(GetSpan(), *static_cast<const UIntValue::OperandType*>(ptr));
+        case ValueType::longValue: return new LongValue(GetSpan(), *static_cast<const LongValue::OperandType*>(ptr));
+        case ValueType::ulongValue: return new ULongValue(GetSpan(), *static_cast<const ULongValue::OperandType*>(ptr));
+        case ValueType::floatValue: return new FloatValue(GetSpan(), *static_cast<const FloatValue::OperandType*>(ptr));
+        case ValueType::doubleValue: return new DoubleValue(GetSpan(), *static_cast<const DoubleValue::OperandType*>(ptr));
+        case ValueType::charValue: return new CharValue(GetSpan(), *static_cast<const CharValue::OperandType*>(ptr));
+        case ValueType::wcharValue: return new WCharValue(GetSpan(), *static_cast<const WCharValue::OperandType*>(ptr));
+        case ValueType::ucharValue: return new UCharValue(GetSpan(), *static_cast<const UCharValue::OperandType*>(ptr));
+    }
+    return nullptr;
+}
+
+ArrayValue::ArrayValue(const Span& span_, TypeSymbol* type_, std::vector<std::unique_ptr<Value>>&& elementValues_) :
+    Value(span_, ValueType::arrayValue), type(type_), elementValues(std::move(elementValues_))
+{
+}
+
+Value* ArrayValue::Clone() const
+{
+    std::vector<std::unique_ptr<Value>> clonedElementValues; 
+    int64_t n = elementValues.size();
+    for (int64_t i = 0; i < n; ++i)
+    {
+        clonedElementValues.push_back(std::unique_ptr<Value>(elementValues[i]->Clone()));
+    }
+    return new ArrayValue(GetSpan(), type, std::move(clonedElementValues));
+}
+
+llvm::Value* ArrayValue::IrValue(Emitter& emitter)
+{
+    std::vector<llvm::Constant*> elementConstants;
+    int64_t n = elementValues.size();
+    for (int64_t i = 0; i < n; ++i)
+    {
+        elementConstants.push_back(llvm::cast<llvm::Constant>(elementValues[i]->IrValue(emitter)));
+    }
+    return llvm::ConstantArray::get(llvm::cast<llvm::ArrayType>(type->IrType(emitter)), elementConstants);
+}
+
+void ArrayValue::Write(BinaryWriter& writer)
+{
+}
+
+void ArrayValue::Read(BinaryReader& reader)
+{
+}
+
+Value* ArrayValue::As(TypeSymbol* targetType, bool cast, const Span& span, bool dontThrow) const
+{
+    if (TypesEqual(targetType, type))
+    {
+        return Clone();
+    }
+    else
+    {
+        if (dontThrow)
+        {
+            return nullptr;
+        }
+        else
+        {
+            throw Exception("conversion from " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " is not valid", span);
+        }
+    }
+}
+
+StructuredValue::StructuredValue(const Span& span_, TypeSymbol* type_, std::vector<std::unique_ptr<Value>>&& memberValues_) :
+    Value(span_, ValueType::structuredValue), type(type_), memberValues(std::move(memberValues_))
+{
+}
+
+Value* StructuredValue::Clone() const
+{
+    std::vector<std::unique_ptr<Value>> clonedMemberValues;
+    int n = memberValues.size();
+    for (int i = 0; i < n; ++i)
+    {
+        std::unique_ptr<Value> memberValue(memberValues[i]->Clone());
+        clonedMemberValues.push_back(std::move(memberValue));
+    }
+    return new StructuredValue(GetSpan(), type, std::move(clonedMemberValues));
+}
+
+llvm::Value* StructuredValue::IrValue(Emitter& emitter) 
+{
+    // todo
+    return nullptr;
+}
+
+void StructuredValue::Write(BinaryWriter& writer)
+{
+}
+
+void StructuredValue::Read(BinaryReader& reader)
+{
+}
+
+Value* StructuredValue::As(TypeSymbol* targetType, bool cast, const Span& span, bool dontThrow) const
+{
+    if (TypesEqual(targetType, type))
+    {
+        return Clone();
+    }
+    else
+    {
+        if (dontThrow)
+        {
+            return nullptr;
+        }
+        else
+        {
+            throw Exception("conversion from " + ValueTypeStr(GetValueType()) + " to " + ValueTypeStr(targetType->GetValueType()) + " is not valid", span);
         }
     }
 }
@@ -3719,31 +4143,36 @@ void WriteValue(Value* value, BinaryWriter& writer)
     value->Write(writer);
 }
 
-Value* ReadValue(BinaryReader& reader)
+std::unique_ptr<Value> ReadValue(BinaryReader& reader, const Span& span)
 {
     ValueType valueType = static_cast<ValueType>(reader.ReadByte());
-    Value* value = nullptr;
+    std::unique_ptr<Value> value;
     switch (valueType)
     {
-        case ValueType::boolValue: value = new BoolValue(Span(), false); break;
-        case ValueType::sbyteValue: value = new SByteValue(Span(), 0); break;
-        case ValueType::byteValue: value = new ByteValue(Span(), 0); break;
-        case ValueType::shortValue: value = new ShortValue(Span(), 0); break;
-        case ValueType::ushortValue: value = new UShortValue(Span(), 0); break;
-        case ValueType::intValue: value = new IntValue(Span(), 0); break;
-        case ValueType::uintValue: value = new UIntValue(Span(), 0); break;
-        case ValueType::longValue: value = new LongValue(Span(), 0); break;
-        case ValueType::ulongValue: value = new ULongValue(Span(), 0); break;
-        case ValueType::charValue: value = new CharValue(Span(), '\0'); break;
-        case ValueType::wcharValue: value = new WCharValue(Span(), '\0'); break;
-        case ValueType::ucharValue: value = new UCharValue(Span(), '\0'); break;
+        case ValueType::boolValue: value.reset(new BoolValue(Span(), false)); break;
+        case ValueType::sbyteValue: value.reset(new SByteValue(Span(), 0)); break;
+        case ValueType::byteValue: value.reset(new ByteValue(Span(), 0)); break;
+        case ValueType::shortValue: value.reset(new ShortValue(Span(), 0)); break;
+        case ValueType::ushortValue: value.reset(new UShortValue(Span(), 0)); break;
+        case ValueType::intValue: value.reset(new IntValue(Span(), 0)); break;
+        case ValueType::uintValue: value.reset(new UIntValue(Span(), 0)); break;
+        case ValueType::longValue: value.reset(new LongValue(Span(), 0)); break;
+        case ValueType::ulongValue: value.reset(new ULongValue(Span(), 0)); break;
+        case ValueType::floatValue: value.reset(new FloatValue(Span(), 0.0)); break;
+        case ValueType::doubleValue: value.reset(new DoubleValue(Span(), 0.0)); break;
+        case ValueType::charValue: value.reset(new CharValue(Span(), '\0')); break;
+        case ValueType::wcharValue: value.reset(new WCharValue(Span(), '\0')); break;
+        case ValueType::ucharValue: value.reset(new UCharValue(Span(), '\0')); break;
     }
     if (value)
     {
         value->Read(reader);
         return value;
     }
-    return nullptr;
+    else
+    {
+        throw Exception("internal error: could not read value of type '" + ValueTypeStr(valueType) + "'", span);
+    }
 }
 
 } } // namespace cmajor::symbols

@@ -659,5 +659,41 @@ void NullLiteralNode::Accept(Visitor& visitor)
     visitor.Visit(*this);
 }
 
-} } // namespace cmajor::ast
+ArrayLiteralNode::ArrayLiteralNode(const Span& span_) : Node(NodeType::arrayLiteralNode, span_)
+{
+}
 
+Node* ArrayLiteralNode::Clone(CloneContext& cloneContext) const
+{
+    ArrayLiteralNode* clone = new ArrayLiteralNode(GetSpan());
+    int n = values.Count();
+    for (int i = 0; i < n; ++i)
+    {
+        clone->AddValue(values[i]->Clone(cloneContext));
+    }
+    return clone;
+}
+
+void ArrayLiteralNode::Accept(Visitor& visitor)
+{
+    visitor.Visit(*this);
+}
+
+void ArrayLiteralNode::Write(AstWriter& writer)
+{
+    Node::Write(writer);
+    values.Write(writer);
+}
+
+void ArrayLiteralNode::Read(AstReader& reader)
+{
+    Node::Read(reader);
+    values.Read(reader);
+}
+
+void ArrayLiteralNode::AddValue(Node* value)
+{
+    values.Add(value);
+}
+
+} } // namespace cmajor::ast

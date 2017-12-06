@@ -63,6 +63,7 @@ public:
     TypeSymbol* ConversionTargetType() const { return targetPointerType; }
     bool IsBasicTypeOperation() const override { return true; }
     void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags) override;
+    std::unique_ptr<Value> ConvertValue(const std::unique_ptr<Value>& value) const override;
 private:
     TypeSymbol* nullPtrType;
     TypeSymbol* targetPointerType;;
@@ -80,6 +81,19 @@ void NullPtrToPtrConversion::GenerateCall(Emitter& emitter, std::vector<GenObjec
 {
     llvm::Value* value = emitter.Stack().Pop();
     emitter.Stack().Push(emitter.Builder().CreateBitCast(value, targetPointerType->IrType(emitter)));
+}
+
+std::unique_ptr<Value> NullPtrToPtrConversion::ConvertValue(const std::unique_ptr<Value>& value) const
+{
+    TypeSymbol* type = value->GetType(nullPtrType->GetSymbolTable());
+    if (type->IsPointerType())
+    {
+        return std::unique_ptr<Value>(new PointerValue(value->GetSpan(), type, nullptr));
+    }
+    else
+    {
+        return std::unique_ptr<Value>();
+    }
 }
 
 class VoidPtrToPtrConversion : public FunctionSymbol
@@ -171,7 +185,7 @@ void PtrToULongConversion::GenerateCall(Emitter& emitter, std::vector<GenObject*
 
 BoundCompileUnit::BoundCompileUnit(Module& module_, CompileUnitNode* compileUnitNode_) : 
     BoundNode(Span(), BoundNodeType::boundCompileUnit), module(module_), symbolTable(module.GetSymbolTable()), compileUnitNode(compileUnitNode_), hasGotos(false), 
-    operationRepository(*this), functionTemplateRepository(*this), classTemplateRepository(*this), inlineFunctionRepository(*this), bindingTypes(false)
+    operationRepository(*this), functionTemplateRepository(*this), classTemplateRepository(*this), inlineFunctionRepository(*this), constExprFunctionRepository(*this), bindingTypes(false)
 {
     boost::filesystem::path fileName = boost::filesystem::path(compileUnitNode->FilePath()).filename();
     boost::filesystem::path directory = module.DirectoryPath();
@@ -358,7 +372,7 @@ FunctionSymbol* BoundCompileUnit::GetConversion(TypeSymbol* sourceType, TypeSymb
                 }
             }
             else if ((sourceType->GetSymbolType() == SymbolType::functionGroupTypeSymbol || sourceType->GetSymbolType() == SymbolType::memberExpressionTypeSymbol) && 
-                targetType->PlainType(span)->GetSymbolType() == SymbolType::classDelegateTypeSymbol)
+                targetType->PlainType(span)->GetSymbolType() == SymbolType::classDelegateTypeSymbol && currentFunction)
             {
                 ClassDelegateTypeSymbol* classDelegateType = static_cast<ClassDelegateTypeSymbol*>(targetType->PlainType(span));
                 FunctionGroupSymbol* functionGroup = nullptr;
@@ -413,7 +427,7 @@ FunctionSymbol* BoundCompileUnit::GetConversion(TypeSymbol* sourceType, TypeSymb
                     }
                 }
             }
-            else if (targetType->PlainType(span)->GetSymbolType() == SymbolType::interfaceTypeSymbol)
+            else if (targetType->PlainType(span)->GetSymbolType() == SymbolType::interfaceTypeSymbol && currentFunction)
             {
                 InterfaceTypeSymbol* targetInterfaceType = static_cast<InterfaceTypeSymbol*>(targetType->PlainType(span));
                 if (sourceType->IsClassTypeSymbol()) 
@@ -473,6 +487,11 @@ void BoundCompileUnit::InstantiateInlineFunction(FunctionSymbol* inlineFunction,
     inlineFunctionRepository.Instantiate(inlineFunction, containerScope, span);
 }
 
+FunctionNode* BoundCompileUnit::GetFunctionNodeFor(FunctionSymbol* constExprFunctionSymbol)
+{
+    return constExprFunctionRepository.GetFunctionNodeFor(constExprFunctionSymbol);
+}
+
 void BoundCompileUnit::GenerateCopyConstructorFor(ClassTypeSymbol* classTypeSymbol, ContainerScope* containerScope, BoundFunction* currentFunction, const Span& span)
 {
     operationRepository.GenerateCopyConstructorFor(classTypeSymbol, containerScope, currentFunction, span);
@@ -511,6 +530,26 @@ const std::u16string& BoundCompileUnit::GetUtf16String(int stringId) const
 const std::u32string& BoundCompileUnit::GetUtf32String(int stringId) const
 {
     return utf32StringRepository.GetString(stringId);
+}
+
+const unsigned char* BoundCompileUnit::GetUtf8CharPtr(int stringId) const
+{
+    return utf8StringRepository.CharPtr(stringId);
+}
+
+const char16_t* BoundCompileUnit::GetUtf16CharPtr(int stringId) const
+{
+    return utf16StringRepository.CharPtr(stringId);
+}
+
+const char32_t* BoundCompileUnit::GetUtf32CharPtr(int stringId) const
+{
+    return utf32StringRepository.CharPtr(stringId);
+}
+
+void BoundCompileUnit::AddConstantArray(ConstantSymbol* constantArraySymbol)
+{
+    constantArrayRepository.AddConstantArray(constantArraySymbol);
 }
 
 void BoundCompileUnit::PushBindingTypes()

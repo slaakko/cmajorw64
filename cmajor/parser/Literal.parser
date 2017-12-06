@@ -4,6 +4,8 @@
 // =================================
 
 [hpp]#include <cmajor/ast/Literal.hpp>
+[hpp]#include <cmajor/parser/ParsingContext.hpp>
+[cpp]#include <cmajor/parser/Expression.hpp>
 [cpp]#include <sstream>
 
 namespace cmajor.parser
@@ -13,13 +15,16 @@ namespace cmajor.parser
 
     grammar LiteralGrammar
     {
-        Literal : Node*
+        using ExpressionGrammar.Expression;
+
+        Literal(ParsingContext* ctx) : Node*
             ::= BooleanLiteral{ value = BooleanLiteral; }
             |   FloatingLiteral{ value = FloatingLiteral; }
             |   IntegerLiteral{ value = IntegerLiteral; }
             |   CharLiteral{ value = CharLiteral; }
             |   StringLiteral{ value = StringLiteral; }
             |   NullLiteral{ value = NullLiteral; }
+            |   ArrayLiteral(ctx){ value = ArrayLiteral; }
             ;
 
         BooleanLiteral : Node*
@@ -129,6 +134,10 @@ namespace cmajor.parser
 
         NullLiteral : Node*
             ::= keyword("null"){ value = new NullLiteralNode(span); }
+            ;
+
+        ArrayLiteral(ParsingContext* ctx) : ArrayLiteralNode*
+            ::= '['{ value = new ArrayLiteralNode(span); } (Expression(ctx){ value->AddValue(Expression); } % ',') ']'!
             ;
 
         CharEscape : char32_t

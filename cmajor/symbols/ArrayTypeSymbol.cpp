@@ -18,7 +18,7 @@ ArrayTypeSymbol::ArrayTypeSymbol(const Span& span_, const std::u32string& name_)
 {
 }
 
-ArrayTypeSymbol::ArrayTypeSymbol(const Span& span_, const std::u32string& name_, TypeSymbol* elementType_, uint64_t size_) : 
+ArrayTypeSymbol::ArrayTypeSymbol(const Span& span_, const std::u32string& name_, TypeSymbol* elementType_, int64_t size_) : 
     TypeSymbol(SymbolType::arrayTypeSymbol, span_, name_), elementType(elementType_), size(size_), irType(nullptr)
 {
 }
@@ -36,7 +36,7 @@ void ArrayTypeSymbol::Read(SymbolReader& reader)
     TypeSymbol::Read(reader);
     uint32_t elementTypeId = reader.GetBinaryReader().ReadUInt();
     GetSymbolTable()->EmplaceTypeRequest(this, elementTypeId, 0);
-    size = reader.GetBinaryReader().ReadULong();
+    size = reader.GetBinaryReader().ReadLong();
 }
 
 void ArrayTypeSymbol::EmplaceType(TypeSymbol* typeSymbol, int index)
@@ -72,11 +72,286 @@ llvm::Constant* ArrayTypeSymbol::CreateDefaultIrValue(Emitter& emitter)
     }
     llvm::Type* irType = IrType(emitter);
     std::vector<llvm::Constant*> arrayOfDefaults;
-    for (uint64_t i = 0; i < size; ++i)
+    for (int64_t i = 0; i < size; ++i)
     {
         arrayOfDefaults.push_back(elementType->CreateDefaultIrValue(emitter));
     }
     return llvm::ConstantArray::get(llvm::cast<llvm::ArrayType>(irType), arrayOfDefaults);
+}
+
+ValueType ArrayTypeSymbol::GetValueType() const
+{
+    return ValueType::arrayValue;
+}
+
+ArrayLengthFunction::ArrayLengthFunction(const Span& span_, const std::u32string& name_) : FunctionSymbol(SymbolType::arrayLengthFunctionSymbol, span_, name_)
+{
+}
+
+ArrayLengthFunction::ArrayLengthFunction(ArrayTypeSymbol* arrayType_) : FunctionSymbol(SymbolType::arrayLengthFunctionSymbol, arrayType_->GetSpan(), U"Length"), arrayType(arrayType_)
+{
+    SetGroupName(U"Length");
+    SetAccess(SymbolAccess::public_);
+    ParameterSymbol* arrayParam = new ParameterSymbol(arrayType->GetSpan(), U"array");
+    arrayParam->SetType(arrayType);
+    AddMember(arrayParam);
+    TypeSymbol* longType = arrayType->GetSymbolTable()->GetTypeByName(U"long");
+    SetReturnType(longType);
+    ComputeName();
+}
+
+void ArrayLengthFunction::Write(SymbolWriter& writer)
+{
+    FunctionSymbol::Write(writer);
+    writer.GetBinaryWriter().Write(arrayType->TypeId());
+}
+
+void ArrayLengthFunction::Read(SymbolReader& reader)
+{
+    FunctionSymbol::Read(reader);
+    uint32_t typeId = reader.GetBinaryReader().ReadUInt();
+    GetSymbolTable()->EmplaceTypeRequest(this, typeId, 1);
+}
+
+void ArrayLengthFunction::EmplaceType(TypeSymbol* typeSymbol, int index)
+{
+    if (index == 1)
+    {
+        Assert(typeSymbol->GetSymbolType() == SymbolType::arrayTypeSymbol, "array type expected");
+        arrayType = static_cast<ArrayTypeSymbol*>(typeSymbol);
+    }
+    else
+    {
+        FunctionSymbol::EmplaceType(typeSymbol, index);
+    }
+}
+
+void ArrayLengthFunction::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags)
+{
+    Assert(genObjects.size() == 1, "array length needs one object");
+    llvm::Value* size = emitter.Builder().getInt64(arrayType->Size());
+    emitter.Stack().Push(size);
+}
+
+std::unique_ptr<Value> ArrayLengthFunction::ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span) const
+{
+    return std::unique_ptr<Value>(new LongValue(span, arrayType->Size()));
+}
+
+ArrayBeginFunction::ArrayBeginFunction(const Span& span_, const std::u32string& name_) : FunctionSymbol(SymbolType::arrayBeginFunctionSymbol, span_, name_)
+{
+}
+
+ArrayBeginFunction::ArrayBeginFunction(ArrayTypeSymbol* arrayType_) : FunctionSymbol(SymbolType::arrayBeginFunctionSymbol, arrayType_->GetSpan(), U"@arrayBegin"), arrayType(arrayType_)
+{
+    SetGroupName(U"Begin");
+    SetAccess(SymbolAccess::public_);
+    ParameterSymbol* arrayParam = new ParameterSymbol(arrayType->GetSpan(), U"array");
+    arrayParam->SetType(arrayType);
+    AddMember(arrayParam);
+    TypeSymbol* returnType = arrayType->ElementType()->AddPointer(arrayType->GetSpan());
+    SetReturnType(returnType);
+    ComputeName();
+}
+
+void ArrayBeginFunction::Write(SymbolWriter& writer)
+{
+    FunctionSymbol::Write(writer);
+    writer.GetBinaryWriter().Write(arrayType->TypeId());
+}
+
+void ArrayBeginFunction::Read(SymbolReader& reader)
+{
+    FunctionSymbol::Read(reader);
+    uint32_t typeId = reader.GetBinaryReader().ReadUInt();
+    GetSymbolTable()->EmplaceTypeRequest(this, typeId, 1);
+}
+
+void ArrayBeginFunction::EmplaceType(TypeSymbol* typeSymbol, int index)
+{
+    if (index == 1)
+    {
+        Assert(typeSymbol->GetSymbolType() == SymbolType::arrayTypeSymbol, "array type expected");
+        arrayType = static_cast<ArrayTypeSymbol*>(typeSymbol);
+    }
+    else
+    {
+        FunctionSymbol::EmplaceType(typeSymbol, index);
+    }
+}
+
+void ArrayBeginFunction::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags)
+{
+    Assert(genObjects.size() == 1, "array begin needs one object");
+    genObjects[0]->Load(emitter, OperationFlags::addr);
+    llvm::Value* arrayPtr = emitter.Stack().Pop();
+    ArgVector elementIndeces;
+    elementIndeces.push_back(emitter.Builder().getInt64(0));
+    elementIndeces.push_back(emitter.Builder().getInt64(0));
+    llvm::Value* beginPtr = emitter.Builder().CreateGEP(arrayPtr, elementIndeces);
+    emitter.Stack().Push(beginPtr);
+}
+
+ArrayEndFunction::ArrayEndFunction(const Span& span_, const std::u32string& name_) : FunctionSymbol(SymbolType::arrayEndFunctionSymbol, span_, name_)
+{
+}
+
+ArrayEndFunction::ArrayEndFunction(ArrayTypeSymbol* arrayType_) : FunctionSymbol(SymbolType::arrayEndFunctionSymbol, arrayType_->GetSpan(), U"@arrayEnd"), arrayType(arrayType_)
+{
+    SetGroupName(U"End");
+    SetAccess(SymbolAccess::public_);
+    ParameterSymbol* arrayParam = new ParameterSymbol(arrayType->GetSpan(), U"array");
+    arrayParam->SetType(arrayType);
+    AddMember(arrayParam);
+    TypeSymbol* returnType = arrayType->ElementType()->AddPointer(arrayType->GetSpan());
+    SetReturnType(returnType);
+    ComputeName();
+}
+
+void ArrayEndFunction::Write(SymbolWriter& writer)
+{
+    FunctionSymbol::Write(writer);
+    writer.GetBinaryWriter().Write(arrayType->TypeId());
+}
+
+void ArrayEndFunction::Read(SymbolReader& reader)
+{
+    FunctionSymbol::Read(reader);
+    uint32_t typeId = reader.GetBinaryReader().ReadUInt();
+    GetSymbolTable()->EmplaceTypeRequest(this, typeId, 1);
+}
+
+void ArrayEndFunction::EmplaceType(TypeSymbol* typeSymbol, int index)
+{
+    if (index == 1)
+    {
+        Assert(typeSymbol->GetSymbolType() == SymbolType::arrayTypeSymbol, "array type expected");
+        arrayType = static_cast<ArrayTypeSymbol*>(typeSymbol);
+    }
+    else
+    {
+        FunctionSymbol::EmplaceType(typeSymbol, index);
+    }
+}
+
+void ArrayEndFunction::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags)
+{
+    Assert(genObjects.size() == 1, "array end needs one object");
+    genObjects[0]->Load(emitter, OperationFlags::addr);
+    llvm::Value* arrayPtr = emitter.Stack().Pop();
+    ArgVector elementIndeces;
+    elementIndeces.push_back(emitter.Builder().getInt64(0));
+    elementIndeces.push_back(emitter.Builder().getInt64(arrayType->Size()));
+    llvm::Value* endPtr = emitter.Builder().CreateGEP(arrayPtr, elementIndeces);
+    emitter.Stack().Push(endPtr);
+}
+
+ArrayCBeginFunction::ArrayCBeginFunction(const Span& span_, const std::u32string& name_) : FunctionSymbol(SymbolType::arrayCBeginFunctionSymbol, span_, name_)
+{
+}
+
+ArrayCBeginFunction::ArrayCBeginFunction(ArrayTypeSymbol* arrayType_) : FunctionSymbol(SymbolType::arrayCBeginFunctionSymbol, arrayType_->GetSpan(), U"@arrayCBegin"), arrayType(arrayType_)
+{
+    SetGroupName(U"CBegin");
+    SetAccess(SymbolAccess::public_);
+    ParameterSymbol* arrayParam = new ParameterSymbol(arrayType->GetSpan(), U"array");
+    arrayParam->SetType(arrayType);
+    AddMember(arrayParam);
+    TypeSymbol* returnType = arrayType->ElementType()->AddConst(arrayType->GetSpan())->AddPointer(arrayType->GetSpan());
+    SetReturnType(returnType);
+    ComputeName();
+}
+
+void ArrayCBeginFunction::Write(SymbolWriter& writer)
+{
+    FunctionSymbol::Write(writer);
+    writer.GetBinaryWriter().Write(arrayType->TypeId());
+}
+
+void ArrayCBeginFunction::Read(SymbolReader& reader)
+{
+    FunctionSymbol::Read(reader);
+    uint32_t typeId = reader.GetBinaryReader().ReadUInt();
+    GetSymbolTable()->EmplaceTypeRequest(this, typeId, 1);
+}
+
+void ArrayCBeginFunction::EmplaceType(TypeSymbol* typeSymbol, int index)
+{
+    if (index == 1)
+    {
+        Assert(typeSymbol->GetSymbolType() == SymbolType::arrayTypeSymbol, "array type expected");
+        arrayType = static_cast<ArrayTypeSymbol*>(typeSymbol);
+    }
+    else
+    {
+        FunctionSymbol::EmplaceType(typeSymbol, index);
+    }
+}
+
+void ArrayCBeginFunction::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags)
+{
+    Assert(genObjects.size() == 1, "array cbegin needs one object");
+    genObjects[0]->Load(emitter, OperationFlags::addr);
+    llvm::Value* arrayPtr = emitter.Stack().Pop();
+    ArgVector elementIndeces;
+    elementIndeces.push_back(emitter.Builder().getInt64(0));
+    elementIndeces.push_back(emitter.Builder().getInt64(0));
+    llvm::Value* beginPtr = emitter.Builder().CreateGEP(arrayPtr, elementIndeces);
+    emitter.Stack().Push(beginPtr);
+}
+
+ArrayCEndFunction::ArrayCEndFunction(const Span& span_, const std::u32string& name_) : FunctionSymbol(SymbolType::arrayCEndFunctionSymbol, span_, name_)
+{
+}
+
+ArrayCEndFunction::ArrayCEndFunction(ArrayTypeSymbol* arrayType_) : FunctionSymbol(SymbolType::arrayCEndFunctionSymbol, arrayType_->GetSpan(), U"@arrayCEnd"), arrayType(arrayType_)
+{
+    SetGroupName(U"CEnd");
+    SetAccess(SymbolAccess::public_);
+    ParameterSymbol* arrayParam = new ParameterSymbol(arrayType->GetSpan(), U"array");
+    arrayParam->SetType(arrayType);
+    AddMember(arrayParam);
+    TypeSymbol* returnType = arrayType->ElementType()->AddConst(arrayType->GetSpan())->AddPointer(arrayType->GetSpan());
+    SetReturnType(returnType);
+    ComputeName();
+}
+
+void ArrayCEndFunction::Write(SymbolWriter& writer)
+{
+    FunctionSymbol::Write(writer);
+    writer.GetBinaryWriter().Write(arrayType->TypeId());
+}
+
+void ArrayCEndFunction::Read(SymbolReader& reader)
+{
+    FunctionSymbol::Read(reader);
+    uint32_t typeId = reader.GetBinaryReader().ReadUInt();
+    GetSymbolTable()->EmplaceTypeRequest(this, typeId, 1);
+}
+
+void ArrayCEndFunction::EmplaceType(TypeSymbol* typeSymbol, int index)
+{
+    if (index == 1)
+    {
+        Assert(typeSymbol->GetSymbolType() == SymbolType::arrayTypeSymbol, "array type expected");
+        arrayType = static_cast<ArrayTypeSymbol*>(typeSymbol);
+    }
+    else
+    {
+        FunctionSymbol::EmplaceType(typeSymbol, index);
+    }
+}
+
+void ArrayCEndFunction::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags)
+{
+    Assert(genObjects.size() == 1, "array cend needs one object");
+    genObjects[0]->Load(emitter, OperationFlags::addr);
+    llvm::Value* arrayPtr = emitter.Stack().Pop();
+    ArgVector elementIndeces;
+    elementIndeces.push_back(emitter.Builder().getInt64(0));
+    elementIndeces.push_back(emitter.Builder().getInt64(arrayType->Size()));
+    llvm::Value* endPtr = emitter.Builder().CreateGEP(arrayPtr, elementIndeces);
+    emitter.Stack().Push(endPtr);
 }
 
 ArrayTypeDefaultConstructor::ArrayTypeDefaultConstructor(ArrayTypeSymbol* arrayType_, LocalVariableSymbol* loopVar_, FunctionSymbol* elementTypeDefaultConstructor_, const Span& span_) :

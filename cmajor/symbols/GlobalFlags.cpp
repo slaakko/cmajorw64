@@ -99,11 +99,18 @@ std::u32string GetCurrentToolName()
     return currentToolName;
 }
 
+std::set<std::u32string> commandLineDefines;
+
+void DefineCommandLineConditionalSymbol(const std::u32string& symbol)
+{
+    commandLineDefines.insert(symbol);
+}
+
 std::set<std::u32string> defines;
 
 void ClearDefines()
 {
-    defines.clear();
+    defines = commandLineDefines;
 }
 
 void DefineSymbol(const std::u32string& symbol)

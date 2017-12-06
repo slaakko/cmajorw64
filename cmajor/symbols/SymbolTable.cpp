@@ -100,11 +100,19 @@ SymbolTable::SymbolTable() :
 void SymbolTable::Write(SymbolWriter& writer)
 {
     globalNs.Write(writer);
-    uint32_t na = arrayTypes.size();
-    writer.GetBinaryWriter().WriteEncodedUInt(na);
+    std::vector<ArrayTypeSymbol*> exportedArrayTypes;
     for (const std::unique_ptr<ArrayTypeSymbol>& arrayType : arrayTypes)
     {
-        writer.Write(arrayType.get());
+        if (arrayType->IsProject())
+        {
+            exportedArrayTypes.push_back(arrayType.get());
+        }
+    }
+    uint32_t na = exportedArrayTypes.size();
+    writer.GetBinaryWriter().WriteEncodedUInt(na);
+    for (ArrayTypeSymbol* exportedArrayType : exportedArrayTypes)
+    {
+        writer.Write(exportedArrayType);
     }
     globalNs.ComputeExportClosure();
     std::vector<TypeSymbol*> exportedDerivedTypes;
@@ -1131,6 +1139,27 @@ TypeSymbol* SymbolTable::MakeDerivedType(TypeSymbol* baseType, const TypeDerivat
     SetTypeIdFor(derivedType);
     mappedDerivedTypes.push_back(derivedType);
     derivedTypes.push_back(std::unique_ptr<DerivedTypeSymbol>(derivedType));
+    if (derivedType->IsPointerType() && !derivedType->BaseType()->IsVoidType() && !derivedType->IsReferenceType())
+    {
+        TypedefSymbol* valueType = new TypedefSymbol(span, U"ValueType");
+        valueType->SetAccess(SymbolAccess::public_);
+        valueType->SetType(derivedType->RemovePointer(span));
+        valueType->SetBound();
+        valueType->GetType()->MarkExport();
+        derivedType->AddMember(valueType);
+        TypedefSymbol* referenceType = new TypedefSymbol(span, U"ReferenceType");
+        referenceType->SetAccess(SymbolAccess::public_);
+        referenceType->SetType(valueType->GetType()->AddLvalueReference(span));
+        referenceType->SetBound();
+        referenceType->GetType()->MarkExport();
+        derivedType->AddMember(referenceType);
+        TypedefSymbol* pointerType = new TypedefSymbol(span, U"PointerType");
+        pointerType->SetAccess(SymbolAccess::public_);
+        pointerType->SetType(derivedType);
+        pointerType->SetBound();
+        pointerType->GetType()->MarkExport();
+        derivedType->AddMember(pointerType);
+    }
     return derivedType;
 }
 
@@ -1156,7 +1185,7 @@ ClassTemplateSpecializationSymbol* SymbolTable::MakeClassTemplateSpecialization(
     }
 }
 
-ArrayTypeSymbol* SymbolTable::MakeArrayType(TypeSymbol* elementType, uint64_t size, const Span& span)
+ArrayTypeSymbol* SymbolTable::MakeArrayType(TypeSymbol* elementType, int64_t size, const Span& span)
 {
     ArrayKey key(elementType, size);
     auto it = arrayTypeMap.find(key);
@@ -1172,6 +1201,31 @@ ArrayTypeSymbol* SymbolTable::MakeArrayType(TypeSymbol* elementType, uint64_t si
         arrayTypeMap[key] = arrayType;
         arrayType->SetParent(&globalNs); 
         arrayType->SetSymbolTable(this);
+        ArrayLengthFunction* arrayLengthFunction = new ArrayLengthFunction(arrayType);
+        SetFunctionIdFor(arrayLengthFunction);
+        arrayType->AddMember(arrayLengthFunction);
+        ArrayBeginFunction* arrayBeginFunction = new ArrayBeginFunction(arrayType);
+        SetFunctionIdFor(arrayBeginFunction);
+        arrayType->AddMember(arrayBeginFunction);
+        ArrayEndFunction* arrayEndFunction = new ArrayEndFunction(arrayType);
+        SetFunctionIdFor(arrayEndFunction);
+        arrayType->AddMember(arrayEndFunction);
+        ArrayCBeginFunction* arrayCBeginFunction = new ArrayCBeginFunction(arrayType);
+        SetFunctionIdFor(arrayCBeginFunction);
+        arrayType->AddMember(arrayCBeginFunction);
+        ArrayCEndFunction* arrayCEndFunction = new ArrayCEndFunction(arrayType);
+        SetFunctionIdFor(arrayCEndFunction);
+        arrayType->AddMember(arrayCEndFunction);
+        TypedefSymbol* iterator = new TypedefSymbol(span, U"Iterator");
+        iterator->SetAccess(SymbolAccess::public_);
+        iterator->SetType(arrayType->ElementType()->AddPointer(span));
+        iterator->SetBound();
+        arrayType->AddMember(iterator);
+        TypedefSymbol* constIterator = new TypedefSymbol(span, U"ConstIterator");
+        constIterator->SetAccess(SymbolAccess::public_);
+        constIterator->SetType(arrayType->ElementType()->AddConst(span)->AddPointer(span));
+        constIterator->SetBound();
+        arrayType->AddMember(constIterator);
         arrayTypes.push_back(std::unique_ptr<ArrayTypeSymbol>(arrayType));
         return arrayType;
     }

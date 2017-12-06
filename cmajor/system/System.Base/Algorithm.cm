@@ -1,4 +1,4 @@
-// =================================
+﻿// =================================
 // Copyright (c) 2017 Seppo Laakko
 // Distributed under the MIT license
 // =================================
@@ -756,7 +756,7 @@ namespace System
     }
 
     // naive implementation...
-    public nothrow U Factorial<U>(U n) where U is UnsignedInteger
+    public constexpr nothrow U Factorial<U>(U n) where U is UnsignedInteger
     {
         U f = 1u;
         for (U u = 2u; u <= n; ++u)
@@ -766,7 +766,7 @@ namespace System
         return f;
     }
 
-    public nothrow T Gcd<T>(T a, T b) where T is EuclideanSemiring
+    public constexpr nothrow T Gcd<T>(T a, T b) where T is EuclideanSemiring
     {
         while (true)
         {

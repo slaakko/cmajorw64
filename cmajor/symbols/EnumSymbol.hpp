@@ -17,9 +17,10 @@ public:
     EnumTypeSymbol(const Span& span_, const std::u32string& name_);
     void Write(SymbolWriter& writer) override;
     void Read(SymbolReader& reader) override;
-    void EmplaceType(TypeSymbol* typeSymbol_, int index) override;
+    void EmplaceType(TypeSymbol* typeSymbol, int index) override;
     std::string TypeString() const override { return "enumerated_type"; }
     std::string Syntax() const override;
+    bool IsEnumeratedType() const override { return true; }
     void Accept(SymbolCollector* collector) override;
     void CollectMembers(SymbolCollector* collector);
     void Dump(CodeFormatter& formatter) override;
@@ -30,6 +31,7 @@ public:
     llvm::Type* IrType(Emitter& emitter) override { return underlyingType->IrType(emitter); }
     llvm::Constant* CreateDefaultIrValue(Emitter& emitter) override { return underlyingType->CreateDefaultIrValue(emitter); }
     bool IsSwitchConditionType() const override { return true; }
+    ValueType GetValueType() const override;
 private:
     TypeSymbol* underlyingType;
 };

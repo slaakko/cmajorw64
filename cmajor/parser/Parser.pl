@@ -150,7 +150,7 @@ namespace cmajor.parser
     }
     grammar LiteralGrammar
     {
-        Literal: Node*;
+        Literal(ParsingContext* ctx): Node*;
         BooleanLiteral: Node*;
         FloatingLiteral(var Span s): Node*;
         FloatingLiteralValue: double;
@@ -164,6 +164,7 @@ namespace cmajor.parser
         CharLiteral(var char32_t litValue): Node*;
         StringLiteral(var std::u32string s): Node*;
         NullLiteral: Node*;
+        ArrayLiteral(ParsingContext* ctx): ArrayLiteralNode*;
         CharEscape: char32_t;
         DecDigitSequence: uint64_t;
         HexDigitSequence: uint64_t;

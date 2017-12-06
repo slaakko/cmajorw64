@@ -236,7 +236,7 @@ void FunctionSymbol::Write(SymbolWriter& writer)
     writer.GetBinaryWriter().Write(functionId);
     writer.GetBinaryWriter().Write(groupName);
     writer.GetBinaryWriter().Write(static_cast<uint16_t>(flags));
-    if (IsFunctionTemplate() || (GetGlobalFlag(GlobalFlags::release) && IsInline()))
+    if (IsFunctionTemplate() || (GetGlobalFlag(GlobalFlags::release) && IsInline()) || IsConstExpr())
     {
         uint32_t sizePos = writer.GetBinaryWriter().Pos();
         uint32_t sizeOfAstNodes = 0;
@@ -283,7 +283,7 @@ void FunctionSymbol::Read(SymbolReader& reader)
     GetSymbolTable()->AddFunctionSymbolToFunctionIdMap(this);
     groupName = reader.GetBinaryReader().ReadUtf32String();
     flags = static_cast<FunctionSymbolFlags>(reader.GetBinaryReader().ReadUShort());
-    if (IsFunctionTemplate() || (GetGlobalFlag(GlobalFlags::release) && IsInline()))
+    if (IsFunctionTemplate() || (GetGlobalFlag(GlobalFlags::release) && IsInline()) || IsConstExpr())
     {
         sizeOfAstNodes = reader.GetBinaryReader().ReadUInt();
         astNodesPos = reader.GetBinaryReader().Pos();
@@ -363,10 +363,10 @@ void FunctionSymbol::ReadAstNodes()
     GetSymbolTable()->MapNode(funNode, this);
 }
 
-void FunctionSymbol::EmplaceType(TypeSymbol* typeSymbol_, int index)
+void FunctionSymbol::EmplaceType(TypeSymbol* typeSymbol, int index)
 {
     Assert(index == 0, "invalid emplace type index");
-    returnType = typeSymbol_;
+    returnType = typeSymbol;
 }
 
 void FunctionSymbol::AddMember(Symbol* member)
@@ -391,6 +391,7 @@ bool FunctionSymbol::IsExportSymbol() const
 {
     if (IsTemplateSpecialization()) return false;
     if (IsGeneratedFunction()) return false;
+    if (intrinsic) return false;
     return ContainerSymbol::IsExportSymbol();
 }
 
@@ -420,7 +421,7 @@ void FunctionSymbol::ComputeName()
     }
     name.append(1, U')');
     SetName(name);
-    if (!IsBasicTypeOperation())
+    if (!IsBasicTypeOperation() && !intrinsic)
     {
         ComputeMangledName();
     }
@@ -840,6 +841,16 @@ void FunctionSymbol::GenerateVirtualCall(Emitter& emitter, std::vector<GenObject
             emitter.SetCurrentBasicBlock(nextBlock);
         }
     }
+}
+
+std::unique_ptr<Value> FunctionSymbol::ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span) const
+{
+    return std::unique_ptr<Value>();
+}
+
+std::unique_ptr<Value> FunctionSymbol::ConvertValue(const std::unique_ptr<Value>& value) const
+{
+    return std::unique_ptr<Value>();
 }
 
 void FunctionSymbol::Dump(CodeFormatter& formatter)

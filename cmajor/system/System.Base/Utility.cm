@@ -5,13 +5,13 @@
 
 namespace System
 {
-    public nothrow inline long Align(long n, long alignment)
+    public constexpr nothrow inline long Align(long n, long alignment)
     {
         #assert(alignment > 0);
         return (n + alignment - 1) & -alignment;
     }
 
-    public nothrow inline long StrLen(const char* s)
+    public constexpr nothrow inline long StrLen(const char* s)
     {
         long len = 0;
         if (s != null)
@@ -25,7 +25,7 @@ namespace System
         return len;
     }
     
-    public nothrow inline long StrLen(const wchar* s)
+    public constexpr nothrow inline long StrLen(const wchar* s)
     {
         long len = 0;
         if (s != null)
@@ -39,7 +39,7 @@ namespace System
         return len;
     }
     
-    public nothrow inline long StrLen(const uchar* s)
+    public constexpr nothrow inline long StrLen(const uchar* s)
     {
         long len = 0;
         if (s != null)

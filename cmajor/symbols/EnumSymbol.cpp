@@ -32,10 +32,10 @@ void EnumTypeSymbol::Read(SymbolReader& reader)
     GetSymbolTable()->EmplaceTypeRequest(this, underlyingTypeId, 0);
 }
 
-void EnumTypeSymbol::EmplaceType(TypeSymbol* typeSymbol_, int index)
+void EnumTypeSymbol::EmplaceType(TypeSymbol* typeSymbol, int index)
 {
     Assert(index == 0, "invalid emplace type index");
-    underlyingType = typeSymbol_;
+    underlyingType = typeSymbol;
 }
 
 std::string EnumTypeSymbol::Syntax() const
@@ -152,6 +152,11 @@ void EnumTypeSymbol::SetSpecifiers(Specifiers specifiers)
     }
 }
 
+ValueType EnumTypeSymbol::GetValueType() const
+{
+    return underlyingType->GetValueType();
+}
+
 EnumConstantSymbol::EnumConstantSymbol(const Span& span_, const std::u32string& name_) : Symbol(SymbolType::enumConstantSymbol, span_, name_), evaluating(false)
 {
 }
@@ -184,7 +189,7 @@ void EnumConstantSymbol::Write(SymbolWriter& writer)
 void EnumConstantSymbol::Read(SymbolReader& reader)
 {
     Symbol::Read(reader);
-    value.reset(ReadValue(reader.GetBinaryReader()));
+    value = ReadValue(reader.GetBinaryReader(), GetSpan());
 }
 
 EnumTypeDefaultConstructor::EnumTypeDefaultConstructor(const Span& span_, const std::u32string& name_) : 

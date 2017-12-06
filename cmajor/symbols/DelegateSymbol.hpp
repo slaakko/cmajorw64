@@ -18,11 +18,12 @@ public:
     DelegateTypeSymbol(const Span& span_, const std::u32string& name_);
     void Write(SymbolWriter& writer) override;
     void Read(SymbolReader& reader) override;
-    void EmplaceType(TypeSymbol* typeSymbol_, int index) override;
+    void EmplaceType(TypeSymbol* typeSymbol, int index) override;
     void ComputeExportClosure() override;
     void AddMember(Symbol* member) override;
     std::string TypeString() const override { return "delegate"; }
     std::string Syntax() const override;
+    bool IsDelegateType() const override { return true; }
     void Accept(SymbolCollector* collector) override;
     void Dump(CodeFormatter& formatter) override;
     llvm::Type* IrType(Emitter& emitter) override;
@@ -141,11 +142,12 @@ public:
     ClassDelegateTypeSymbol(const Span& span_, const std::u32string& name_);
     void Write(SymbolWriter& writer) override;
     void Read(SymbolReader& reader) override;
-    void EmplaceType(TypeSymbol* typeSymbol_, int index) override;
+    void EmplaceType(TypeSymbol* typeSymbol, int index) override;
     void ComputeExportClosure() override;
     void AddMember(Symbol* member) override;
     std::string TypeString() const override { return "class_delegate"; }
     std::string Syntax() const override;
+    bool IsClassDelegateType() const override { return true; }
     void Accept(SymbolCollector* collector) override;
     void Dump(CodeFormatter& formatter) override;
     llvm::Type* IrType(Emitter& emitter) override;

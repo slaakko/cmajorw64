@@ -12,11 +12,12 @@
 namespace cmajor { namespace binder {
 
 class BoundCompileUnit;
+class BoundFunction;
 
 using namespace cmajor::symbols;
 using namespace cmajor::ast;
 
-std::unique_ptr<Value> Evaluate(Node* node, ValueType targetType, ContainerScope* containerScope, BoundCompileUnit& boundCompileUnit, bool dontThrow);
+std::unique_ptr<Value> Evaluate(Node* node, TypeSymbol* targetType, ContainerScope* containerScope, BoundCompileUnit& boundCompileUnit, bool dontThrow, BoundFunction* currentFunction, const Span& span);
 
 } } // namespace cmajor::binder
 

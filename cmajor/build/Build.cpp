@@ -23,6 +23,7 @@
 #include <cmajor/symbols/SymbolWriter.hpp>
 #include <cmajor/symbols/SymbolReader.hpp>
 #include <cmajor/symbols/SymbolCreatorVisitor.hpp>
+#include <cmajor/symbols/Meta.hpp>
 #include <cmajor/ast/Function.hpp>
 #include <cmajor/ast/BasicType.hpp>
 #include <cmajor/ast/Identifier.hpp>
@@ -631,6 +632,7 @@ void BuildProject(Project* project)
     std::vector<ClassTypeSymbol*> classTypes;
     std::vector<ClassTemplateSpecializationSymbol*> classTemplateSpecializations;
     module.PrepareForCompilation(project->References(), project->SourceFilePaths(), classTypes, classTemplateSpecializations);
+    cmajor::symbols::MetaInit(module.GetSymbolTable());
     CreateSymbols(module.GetSymbolTable(), compileUnits);
     if (moduleBinder)
     {

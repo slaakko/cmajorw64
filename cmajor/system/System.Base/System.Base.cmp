@@ -22,6 +22,7 @@ source <Functional.cm>;
 source <HashMap.cm>;
 source <HashSet.cm>;
 source <Hashtable.cm>;
+source <Limits.cm>;
 source <LinkedList.cm>;
 source <List.cm>;
 source <Map.cm>;

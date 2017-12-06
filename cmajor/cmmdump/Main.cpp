@@ -97,6 +97,10 @@ int main(int argc, const char** argv)
             std::vector<ClassTypeSymbol*> classTypes;
             std::vector<ClassTemplateSpecializationSymbol*> classTemplateSpecializations;
             Module module(moduleFilePath, classTypes, classTemplateSpecializations);
+            if (module.Name() == U"System.Base")
+            {
+                cmajor::symbols::MetaInit(module.GetSymbolTable());
+            }
             std::unique_ptr<ModuleBinder> moduleBinder;
             CompileUnitNode compileUnit(Span(), "foo");
             moduleBinder.reset(new ModuleBinder(module, &compileUnit));

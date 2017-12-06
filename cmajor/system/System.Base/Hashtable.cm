@@ -8,64 +8,24 @@ using System.Concepts;
 
 namespace System.Collections
 {
-    public static class HashtablePrimes
+    public const long[] hashtablePrimes = 
+    [   
+        53, 97, 193, 389, 769, 1543, 3079, 6151,
+        12289, 24593, 49157, 98317, 196613, 393241, 786433, 1572869,
+        3145739, 6291469, 12582917, 25165843, 50331653, 100663319, 201326611, 402653189,
+        805306457, 1610612741
+    ];
+    
+    public constexpr inline nothrow long GetNextHashtablePrime(long n)
     {
-        static nothrow HashtablePrimes()
+        const long* p = LowerBound(hashtablePrimes.CBegin(), hashtablePrimes.CEnd(), n);
+        if (p < hashtablePrimes.CEnd())
         {
-            try
-            {
-                primes.Reserve(26);
-                primes.Add(53);
-                primes.Add(97);
-                primes.Add(193);
-                primes.Add(389);
-                primes.Add(769);
-                primes.Add(1543);
-                primes.Add(3079);
-                primes.Add(6151);
-                primes.Add(12289);
-                primes.Add(24593);
-                primes.Add(49157);
-                primes.Add(98317);
-                primes.Add(196613);
-                primes.Add(393241);
-                primes.Add(786433);
-                primes.Add(1572869);
-                primes.Add(3145739);
-                primes.Add(6291469);
-                primes.Add(12582917);
-                primes.Add(25165843);
-                primes.Add(50331653);
-                primes.Add(100663319);
-                primes.Add(201326611);
-                primes.Add(402653189);
-                primes.Add(805306457);
-                primes.Add(1610612741);
-            }
-            catch (const Exception& ex)
-            {
-                try
-                {
-                    Console.Error() << "hashtable primes initialization failed" << endl();
-                }
-                catch (const Exception&)
-                {
-                }
-                RtExit(1);
-            }
+            return *p;
         }
-        public static nothrow long GetNextPrime(long n)
-        {
-            List<long>.ConstIterator p = LowerBound(primes.CBegin(), primes.CEnd(), n);
-            if (p < primes.CEnd())
-            {
-                return *p;
-            }
-            return primes.Back();
-        }
-        private static List<long> primes;
-    }
-
+        return hashtablePrimes[hashtablePrimes.Length() - 1];
+    } 
+    
     public inline nothrow ulong GetHashCode(long x)
     {
         return cast<ulong>(x);
@@ -318,7 +278,7 @@ namespace System.Collections
         {
             if (buckets.Count() == 0)
             {
-                buckets.Resize(HashtablePrimes.GetNextPrime(0));
+                buckets.Resize(GetNextHashtablePrime(0));
             }
             const KeyType& key = KeyOf(value);
             long index = Hash(key);
@@ -484,7 +444,7 @@ namespace System.Collections
             List<Bucket<ValueType>*> b;
             Swap(buckets, b);
             long n = b.Count();
-            buckets.Resize(HashtablePrimes.GetNextPrime(n + 1));
+            buckets.Resize(GetNextHashtablePrime(n + 1));
             for (long i = 0; i < n; ++i)
             {
                 Bucket<ValueType>* bucket = b[i];

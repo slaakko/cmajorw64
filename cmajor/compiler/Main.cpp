@@ -79,6 +79,8 @@ void PrintHelp()
         "   link with the debug version of the runtime library cmrt200(d).dll\n" <<
         "--link-using-ms-link (-m)\n" <<
         "   use Microsoft's link.exe as the linker\n" << 
+        "--define SYMBOL (-D SYMBOL)\n" <<
+        "   define a conditional compilatio symbol SYMBOL.\n" <<
         std::endl;
 }
 
@@ -101,6 +103,7 @@ int main(int argc, const char** argv)
         }
         else
         {
+            bool prevWasDefine = false;
             for (int i = 1; i < argc; ++i)
             {
                 std::string arg = argv[i];
@@ -156,6 +159,10 @@ int main(int argc, const char** argv)
                     {
                         SetGlobalFlag(GlobalFlags::time);
                     }
+                    else if (arg == "--define" || arg == "-D")
+                    {
+                        prevWasDefine = true;
+                    }
                     else if (arg.find('=') != std::string::npos)
                     {
                         std::vector<std::string> components = Split(arg, '=');
@@ -193,6 +200,11 @@ int main(int argc, const char** argv)
                         {
                             throw std::runtime_error("invalid argument '" + arg + "'");
                         }
+                    }
+                    else if (prevWasDefine)
+                    {
+                        prevWasDefine = false;
+                        DefineCommandLineConditionalSymbol(ToUtf32(arg));
                     }
                     else
                     {

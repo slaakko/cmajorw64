@@ -1260,4 +1260,9 @@ const std::string& ClassTypeSymbol::StaticObjectName()
     return staticObjectName;
 }
 
+ValueType ClassTypeSymbol::GetValueType() const
+{
+    return ValueType::structuredValue;
+}
+
 } } // namespace cmajor::symbols

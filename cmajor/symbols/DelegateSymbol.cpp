@@ -46,10 +46,10 @@ void DelegateTypeSymbol::Read(SymbolReader& reader)
     }
 }
 
-void DelegateTypeSymbol::EmplaceType(TypeSymbol* typeSymbol_, int index)
+void DelegateTypeSymbol::EmplaceType(TypeSymbol* typeSymbol, int index)
 {
     Assert(index == 0, "invalid emplace type index");
-    returnType = typeSymbol_;
+    returnType = typeSymbol;
 }
 
 void DelegateTypeSymbol::AddMember(Symbol* member)
@@ -598,15 +598,15 @@ void ClassDelegateTypeSymbol::Read(SymbolReader& reader)
     GetSymbolTable()->EmplaceTypeRequest(this, returnTypeId, -1);
 }
 
-void ClassDelegateTypeSymbol::EmplaceType(TypeSymbol* typeSymbol_, int index)
+void ClassDelegateTypeSymbol::EmplaceType(TypeSymbol* typeSymbol, int index)
 {
     if (index == -1)
     {
-        returnType = typeSymbol_;
+        returnType = typeSymbol;
     }
     else
     {
-        TypeSymbol::EmplaceType(typeSymbol_, index);
+        TypeSymbol::EmplaceType(typeSymbol, index);
     }
 }
 

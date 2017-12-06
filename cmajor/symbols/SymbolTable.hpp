@@ -100,9 +100,9 @@ bool operator!=(const ClassTemplateSpecializationKey& left, const ClassTemplateS
 
 struct ArrayKey
 {
-    ArrayKey(TypeSymbol* elementType_, uint64_t size_) : elementType(elementType_), size(size_) {}
+    ArrayKey(TypeSymbol* elementType_, int64_t size_) : elementType(elementType_), size(size_) {}
     TypeSymbol* elementType;
-    uint64_t size;
+    int64_t size;
 };
 
 bool operator==(const ArrayKey& left, const ArrayKey& right);
@@ -113,7 +113,7 @@ struct ArrayKeyHash
     size_t operator()(const ArrayKey& key) const
     {
         size_t x = std::hash<TypeSymbol*>()(key.elementType);
-        x = x ^ std::hash<uint64_t>()(key.size);
+        x = x ^ std::hash<int64_t>()(key.size);
         return x;
     }
 };
@@ -194,7 +194,7 @@ public:
     TypeSymbol* MakeDerivedType(TypeSymbol* baseType, const TypeDerivationRec& derivationRec, const Span& span);
     ClassTemplateSpecializationSymbol* MakeClassTemplateSpecialization(ClassTypeSymbol* classTemplate, const std::vector<TypeSymbol*>& templateArgumentTypes, const Span& span);
     void AddClassTemplateSpecializationsToClassTemplateSpecializationMap(const std::vector<ClassTemplateSpecializationSymbol*>& classTemplateSpecializations);
-    ArrayTypeSymbol* MakeArrayType(TypeSymbol* elementType, uint64_t size, const Span& span);
+    ArrayTypeSymbol* MakeArrayType(TypeSymbol* elementType, int64_t size, const Span& span);
     const FunctionSymbol* MainFunctionSymbol() const { return mainFunctionSymbol; }
     FunctionSymbol* MainFunctionSymbol() { return mainFunctionSymbol; }
     void AddConversion(FunctionSymbol* conversion);

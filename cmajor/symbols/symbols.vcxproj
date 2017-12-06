@@ -36,6 +36,7 @@
     <ClInclude Include="GlobalFlags.hpp" />
     <ClInclude Include="InitDone.hpp" />
     <ClInclude Include="InterfaceTypeSymbol.hpp" />
+    <ClInclude Include="Meta.hpp" />
     <ClInclude Include="Module.hpp" />
     <ClInclude Include="NamespaceSymbol.hpp" />
     <ClInclude Include="Operation.hpp" />
@@ -71,6 +72,7 @@
     <ClCompile Include="GlobalFlags.cpp" />
     <ClCompile Include="InitDone.cpp" />
     <ClCompile Include="InterfaceTypeSymbol.cpp" />
+    <ClCompile Include="Meta.cpp" />
     <ClCompile Include="Module.cpp" />
     <ClCompile Include="NamespaceSymbol.cpp" />
     <ClCompile Include="Operation.cpp" />

@@ -52,7 +52,8 @@ const char* symbolTypeStr[uint8_t(SymbolType::maxSymbol)] =
     "delegateTypeEquality", "functionToDelegateSymbol",
     "classDelegateTypeDefaultConstructor", "classDelegateTypeCopyConstructor", "classDelegateTypeMoveConstructor", "classDelegateTypeCopyAssignment", "classDelegateTypeMoveAssignment",
     "classDelegateTypeEquality", "memberFunctionToClassDelegateSymbol", 
-    "namespaceTypeSymbol", "functionGroupTypeSymbol", "memberExpressionTypeSymbol", "valueSymbol"
+    "arrayLengthFunctionSymbol", "arrayBeginFunctionSymbol", "arrayEndFunctionSymbol", "arrayCBeginFunctionSymbol", "arrayCEndFunctionSymbol",
+    "namespaceTypeSymbol", "functionGroupTypeSymbol", "memberExpressionTypeSymbol", "valueSymbol", "variableValueSymbol"
 };
 
 std::string SymbolTypeStr(SymbolType symbolType)
@@ -123,6 +124,16 @@ void Symbol::Read(SymbolReader& reader)
         flags = flags | SymbolFlags::project;
     }
     mangledName = reader.GetBinaryReader().ReadUtf32String();
+}
+
+const ContainerScope* Symbol::GetContainerScope() const 
+{ 
+    return parent ? parent->GetContainerScope() : nullptr; 
+}
+
+ContainerScope* Symbol::GetContainerScope() 
+{ 
+    return parent ? parent->GetContainerScope() : nullptr;
 }
 
 std::u32string Symbol::FullName() const
@@ -892,12 +903,19 @@ SymbolFactory::SymbolFactory()
     Register(SymbolType::basicTypeFloatingEquality, new ConcreteSymbolCreator<BasicTypeFloatingEqualityOperation>());
     Register(SymbolType::basicTypeFloatingLessThan, new ConcreteSymbolCreator<BasicTypeFloatingLessThanOperation>());
     Register(SymbolType::defaultInt1, new ConcreteSymbolCreator<BasicTypeDefaultInt1Operation>());
-    Register(SymbolType::defaultInt8, new ConcreteSymbolCreator<BasicTypeDefaultInt8Operation>());
-    Register(SymbolType::defaultInt16, new ConcreteSymbolCreator<BasicTypeDefaultInt16Operation>());
-    Register(SymbolType::defaultInt32, new ConcreteSymbolCreator<BasicTypeDefaultInt32Operation>());
-    Register(SymbolType::defaultInt64, new ConcreteSymbolCreator<BasicTypeDefaultInt64Operation>());
+    Register(SymbolType::defaultSInt8, new ConcreteSymbolCreator<BasicTypeDefaultSInt8Operation>());
+    Register(SymbolType::defaultUInt8, new ConcreteSymbolCreator<BasicTypeDefaultUInt8Operation>());
+    Register(SymbolType::defaultSInt16, new ConcreteSymbolCreator<BasicTypeDefaultSInt16Operation>());
+    Register(SymbolType::defaultUInt16, new ConcreteSymbolCreator<BasicTypeDefaultUInt16Operation>());
+    Register(SymbolType::defaultSInt32, new ConcreteSymbolCreator<BasicTypeDefaultSInt32Operation>());
+    Register(SymbolType::defaultUInt32, new ConcreteSymbolCreator<BasicTypeDefaultUInt32Operation>());
+    Register(SymbolType::defaultSInt64, new ConcreteSymbolCreator<BasicTypeDefaultSInt64Operation>());
+    Register(SymbolType::defaultUInt64, new ConcreteSymbolCreator<BasicTypeDefaultUInt64Operation>());
     Register(SymbolType::defaultFloat, new ConcreteSymbolCreator<BasicTypeDefaultFloatOperation>());
     Register(SymbolType::defaultDouble, new ConcreteSymbolCreator<BasicTypeDefaultDoubleOperation>());
+    Register(SymbolType::defaultChar, new ConcreteSymbolCreator<BasicTypeDefaultCharOperation>());
+    Register(SymbolType::defaultWChar, new ConcreteSymbolCreator<BasicTypeDefaultWCharOperation>());
+    Register(SymbolType::defaultUChar, new ConcreteSymbolCreator<BasicTypeDefaultUCharOperation>());
     Register(SymbolType::basicTypeCopyCtor, new ConcreteSymbolCreator<BasicTypeCopyCtor>());
     Register(SymbolType::basicTypeMoveCtor, new ConcreteSymbolCreator<BasicTypeMoveCtor>());
     Register(SymbolType::basicTypeCopyAssignment, new ConcreteSymbolCreator<BasicTypeCopyAssignment>());
@@ -941,6 +959,11 @@ SymbolFactory::SymbolFactory()
     Register(SymbolType::classDelegateTypeMoveAssignment, new ConcreteSymbolCreator<ClassDelegateTypeMoveAssignment>());
     Register(SymbolType::classDelegateTypeEquality, new ConcreteSymbolCreator<ClassDelegateTypeEquality>());
     Register(SymbolType::memberFunctionToClassDelegateSymbol, new ConcreteSymbolCreator<MemberFunctionToClassDelegateConversion>());
+    Register(SymbolType::arrayLengthFunctionSymbol, new ConcreteSymbolCreator<ArrayLengthFunction>());
+    Register(SymbolType::arrayBeginFunctionSymbol, new ConcreteSymbolCreator<ArrayBeginFunction>()),
+    Register(SymbolType::arrayEndFunctionSymbol, new ConcreteSymbolCreator<ArrayEndFunction>());
+    Register(SymbolType::arrayCBeginFunctionSymbol, new ConcreteSymbolCreator<ArrayCBeginFunction>());
+    Register(SymbolType::arrayCEndFunctionSymbol, new ConcreteSymbolCreator<ArrayCEndFunction>());
 }
 
 Symbol* SymbolFactory::CreateSymbol(SymbolType symbolType, const Span& span, const std::u32string& name)

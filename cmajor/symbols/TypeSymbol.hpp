@@ -14,6 +14,8 @@ namespace cmajor { namespace symbols {
 using namespace cmajor::ir;
 
 struct TypeDerivationRec;
+enum class ValueType : uint8_t;
+class Value;
 
 class TypeSymbol : public ContainerSymbol
 {
@@ -24,10 +26,14 @@ public:
     bool IsTypeSymbol() const override { return true; }
     virtual bool IsInComplete() const { return false; }
     virtual bool IsIntegralType() const { return false; }
+    virtual bool IsFloatingPointType() const { return false; }
     virtual bool IsUnsignedType() const { return false; }
     virtual bool IsVoidType() const { return false; }
     std::string TypeString() const override { return "type"; }
     virtual bool IsBasicTypeSymbol() const { return false; }
+    virtual bool IsDelegateType() const { return false; }
+    virtual bool IsClassDelegateType() const { return false; }
+    virtual bool IsEnumeratedType() const { return false; }
     virtual const TypeSymbol* BaseType() const { return this; }
     virtual TypeSymbol* BaseType() { return this; }
     virtual TypeSymbol* PlainType(const Span& span) { return this; }
@@ -48,6 +54,7 @@ public:
     virtual bool IsPointerType() const { return false; }
     virtual bool IsNullPtrType() const { return false; }
     virtual bool IsVoidPtrType() const { return false; }
+    virtual bool IsPolymorphicType() const { return false; }
     virtual bool IsSwitchConditionType() const { return false; }
     virtual int PointerCount() const { return 0; }
     virtual bool HasNontrivialDestructor() const { return false; }
@@ -59,6 +66,7 @@ public:
     virtual TypeSymbol* RemoveDerivations(const TypeDerivationRec& sourceDerivationRec, const Span& span);
     virtual TypeSymbol* Unify(TypeSymbol* that, const Span& span) { return nullptr; }
     virtual bool IsRecursive(TypeSymbol* type, std::unordered_set<TypeSymbol*>& tested);
+    virtual ValueType GetValueType() const;
     std::u32string Id() const override;
 private:
     uint32_t typeId;

@@ -33,6 +33,7 @@ public:
     ClassTemplateSpecializationSymbol* ReadClassTemplateSpecializationSymbol(Symbol* parent);
     ParameterSymbol* ReadParameterSymbol(Symbol* parent);
     void SetSymbolTable(SymbolTable* symbolTable_) { symbolTable = symbolTable_; }
+    SymbolTable* GetSymbolTable() const { return symbolTable; }
     void SetModule(Module* module_) { module = module_; }
     void AddConversion(FunctionSymbol* conversion);
     const std::vector<FunctionSymbol*>& Conversions() const { return conversions; }

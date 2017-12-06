@@ -10,7 +10,9 @@
 #include <cmajor/binder/FunctionTemplateRepository.hpp>
 #include <cmajor/binder/ClassTemplateRepository.hpp>
 #include <cmajor/binder/InlineFunctionRepository.hpp>
+#include <cmajor/binder/ConstExprFunctionRepository.hpp>
 #include <cmajor/binder/StringRepository.hpp>
+#include <cmajor/binder/ConstantArrayRepository.hpp>
 #include <cmajor/binder/ConceptRepository.hpp>
 #include <cmajor/symbols/Module.hpp>
 #include <cmajor/symbols/ConversionTable.hpp>
@@ -46,6 +48,7 @@ public:
     FunctionSymbol* InstantiateFunctionTemplate(FunctionSymbol* functionTemplate, const std::unordered_map<TemplateParameterSymbol*, TypeSymbol*>& templateParameterMapping, const Span& span);
     void InstantiateClassTemplateMemberFunction(FunctionSymbol* memberFunction, ContainerScope* containerScope, BoundFunction* currentFunction, const Span& span);
     void InstantiateInlineFunction(FunctionSymbol* inlineFunction, ContainerScope* containerScope, const Span& span);
+    FunctionNode* GetFunctionNodeFor(FunctionSymbol* constExprFunctionSymbol);
     void GenerateCopyConstructorFor(ClassTypeSymbol* classTypeSymbol, ContainerScope* containerScope, BoundFunction* currentFunction, const Span& span);
     void GenerateCopyConstructorFor(InterfaceTypeSymbol* interfaceTypeSymbol, ContainerScope* containerScope, BoundFunction* currentFunction, const Span& span);
     int Install(const std::string& str);
@@ -54,6 +57,11 @@ public:
     const std::string& GetUtf8String(int stringId) const;
     const std::u16string& GetUtf16String(int stringId) const;
     const std::u32string& GetUtf32String(int stringId) const;
+    const unsigned char* GetUtf8CharPtr(int stringId) const;
+    const char16_t* GetUtf16CharPtr(int stringId) const;
+    const char32_t* GetUtf32CharPtr(int stringId) const;
+    void AddConstantArray(ConstantSymbol* constantArraySymbol);
+    ConstantArrayRepository& GetConstantArrayRepository() { return constantArrayRepository; }
     const std::string& SourceFilePath() const { return compileUnitNode->FilePath(); }
     const std::string& LLFilePath() const { return llFilePath; }
     const std::string& OptLLFilePath() const { return optLLFilePath; }
@@ -80,9 +88,11 @@ private:
     FunctionTemplateRepository functionTemplateRepository;
     ClassTemplateRepository classTemplateRepository;
     InlineFunctionRepository inlineFunctionRepository;
-    StringRepository<std::string> utf8StringRepository;
-    StringRepository<std::u16string> utf16StringRepository;
-    StringRepository<std::u32string> utf32StringRepository;
+    ConstExprFunctionRepository constExprFunctionRepository;
+    StringRepository<std::string, const unsigned char*> utf8StringRepository;
+    StringRepository<std::u16string, const char16_t*> utf16StringRepository;
+    StringRepository<std::u32string, const char32_t*> utf32StringRepository;
+    ConstantArrayRepository constantArrayRepository;
     ConceptRepository conceptRepository;
     ConversionTable conversionTable;
     bool bindingTypes;

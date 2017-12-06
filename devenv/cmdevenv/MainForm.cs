@@ -919,12 +919,37 @@ namespace cmdevenv
                 }
                 ProjectConfig projectConfig = ProjectConfigurations.Instance.GetProjectConfig(project.GetConfigurationFilePath());
                 string condionalCompilationSymbolsString = projectConfig.GetConditionalCompilationSymbols(config);
-                string[] conditionalCompilationSymbols = condionalCompilationSymbolsString.Split(' ');
-                using (StreamWriter writer = File.CreateText(definesFilePath))
+                if (!string.IsNullOrEmpty(condionalCompilationSymbolsString))
                 {
-                    foreach (string conditionalCompilationSymbol in conditionalCompilationSymbols)
+                    condionalCompilationSymbolsString = condionalCompilationSymbolsString.Trim();
+                    if (!string.IsNullOrEmpty(condionalCompilationSymbolsString))
                     {
-                        writer.WriteLine(conditionalCompilationSymbol);
+                        string[] conditionalCompilationSymbols = condionalCompilationSymbolsString.Split(' ');
+                        if (conditionalCompilationSymbols.Length > 0)
+                        {
+                            bool empty = true;
+                            foreach (string conditionalCompilationSymbol in conditionalCompilationSymbols)
+                            {
+                                if (!string.IsNullOrEmpty(conditionalCompilationSymbol))
+                                {
+                                    empty = false;
+                                    break;
+                                }
+                            }
+                            if (!empty)
+                            {
+                                using (StreamWriter writer = File.CreateText(definesFilePath))
+                                {
+                                    foreach (string conditionalCompilationSymbol in conditionalCompilationSymbols)
+                                    {
+                                        if (!string.IsNullOrEmpty(conditionalCompilationSymbol))
+                                        {
+                                            writer.WriteLine(conditionalCompilationSymbol);
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }

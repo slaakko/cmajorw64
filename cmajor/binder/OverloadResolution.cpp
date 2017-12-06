@@ -459,8 +459,16 @@ bool FindConversions(BoundCompileUnit& boundCompileUnit, FunctionSymbol* functio
     {
         BoundExpression* argument = arguments[i].get();
         TypeSymbol* sourceType = argument->GetType();
+        if (sourceType->RemoveConst(span)->IsBasicTypeSymbol())
+        {
+            sourceType = sourceType->RemoveConst(span);
+        }
         ParameterSymbol* parameter = function->Parameters()[i];
         TypeSymbol* targetType = parameter->GetType();
+        if (targetType->RemoveConst(span)->IsBasicTypeSymbol())
+        {
+            targetType = targetType->RemoveConst(span);
+        }
         if (arity == 2 && function->GroupName() == U"operator=")
         {
             if (targetType->IsRvalueReferenceType() && !sourceType->IsRvalueReferenceType() && !argument->GetFlag(BoundExpressionFlags::bindToRvalueReference))
@@ -912,6 +920,10 @@ std::unique_ptr<BoundFunctionCall> CreateBoundFunctionCall(FunctionSymbol* bestF
             {
                 if (!argument->IsLvalueExpression())
                 {
+                    if (!boundFunction)
+                    {
+                        return std::unique_ptr<BoundFunctionCall>();
+                    }
                     BoundLocalVariable* backingStore = new BoundLocalVariable(boundFunction->GetFunctionSymbol()->CreateTemporary(argument->GetType(), span));
                     argument.reset(new BoundTemporary(std::move(argument), std::unique_ptr<BoundLocalVariable>(backingStore)));
                 }
@@ -939,6 +951,10 @@ std::unique_ptr<BoundFunctionCall> CreateBoundFunctionCall(FunctionSymbol* bestF
             FunctionSymbol* conversionFun = argumentMatch.conversionFun;
             if (conversionFun->GetSymbolType() == SymbolType::constructorSymbol)
             {
+                if (!boundFunction)
+                {
+                    return std::unique_ptr<BoundFunctionCall>();
+                }
                 BoundFunctionCall* constructorCall = new BoundFunctionCall(span, conversionFun);
                 TypeSymbol* conversionTargetType = conversionFun->ConversionTargetType();
                 LocalVariableSymbol* temporary = boundFunction->GetFunctionSymbol()->CreateTemporary(conversionTargetType, span);
@@ -961,6 +977,10 @@ std::unique_ptr<BoundFunctionCall> CreateBoundFunctionCall(FunctionSymbol* bestF
             }
             else if (conversionFun->GetSymbolType() == SymbolType::conversionFunctionSymbol && conversionFun->ReturnsClassInterfaceOrClassDelegateByValue())
             {
+                if (!boundFunction)
+                {
+                    return std::unique_ptr<BoundFunctionCall>();
+                }
                 BoundFunctionCall* conversionFunctionCall = new BoundFunctionCall(span, conversionFun);
                 conversionFunctionCall->AddArgument(std::move(argument));
                 TypeSymbol* conversionTargetType = conversionFun->ConversionTargetType();
@@ -994,6 +1014,10 @@ std::unique_ptr<BoundFunctionCall> CreateBoundFunctionCall(FunctionSymbol* bestF
             {
                 if (!argument->IsLvalueExpression())
                 {
+                    if (!boundFunction)
+                    {
+                        return std::unique_ptr<BoundFunctionCall>();
+                    }
                     BoundLocalVariable* backingStore = new BoundLocalVariable(boundFunction->GetFunctionSymbol()->CreateTemporary(argument->GetType(), span));
                     argument.reset(new BoundTemporary(std::move(argument), std::unique_ptr<BoundLocalVariable>(backingStore)));
                 }
@@ -1218,7 +1242,7 @@ std::unique_ptr<BoundFunctionCall> SelectViableFunction(const std::unordered_set
                     boundCompileUnit.InstantiateInlineFunction(bestFun, containerScope, span);
                 }
             }
-            if (boundFunction->GetFunctionSymbol()->DontThrow() && !boundFunction->GetFunctionSymbol()->HasTry() && !bestFun->DontThrow())
+            if (boundFunction && boundFunction->GetFunctionSymbol()->DontThrow() && !boundFunction->GetFunctionSymbol()->HasTry() && !bestFun->DontThrow())
             {
                 std::vector<Span> references;
                 references.push_back(boundFunction->GetFunctionSymbol()->GetSpan());
@@ -1288,7 +1312,7 @@ std::unique_ptr<BoundFunctionCall> SelectViableFunction(const std::unordered_set
                 boundCompileUnit.InstantiateInlineFunction(singleBest, containerScope, span);
             }
         }
-        if (boundFunction->GetFunctionSymbol()->DontThrow() && !boundFunction->GetFunctionSymbol()->HasTry() && !singleBest->DontThrow())
+        if (boundFunction && boundFunction->GetFunctionSymbol()->DontThrow() && !boundFunction->GetFunctionSymbol()->HasTry() && !singleBest->DontThrow())
         {
             std::vector<Span> references;
             references.push_back(boundFunction->GetFunctionSymbol()->GetSpan());
@@ -1353,7 +1377,10 @@ std::unique_ptr<BoundFunctionCall> ResolveOverload(const std::u32string& groupNa
 {
     int arity = arguments.size();
     std::unordered_set<FunctionSymbol*> viableFunctions;
-    boundCompileUnit.CollectViableFunctions(groupName, containerScope, arguments, currentFunction, viableFunctions, exception, span);
+    if (currentFunction)
+    {
+        boundCompileUnit.CollectViableFunctions(groupName, containerScope, arguments, currentFunction, viableFunctions, exception, span);
+    }
     if (viableFunctions.empty())
     {
         if ((flags & OverloadResolutionFlags::dontThrow) == OverloadResolutionFlags::none && exception)

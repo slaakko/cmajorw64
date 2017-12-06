@@ -99,6 +99,12 @@
         &nbsp;&nbsp;&nbsp;&nbsp;4.9 <a href="#throw-statement">Throw Statement</a><br />
         &nbsp;&nbsp;&nbsp;&nbsp;4.10 <a href="#try-statement">Try Statement</a><br />
         &nbsp;&nbsp;&nbsp;&nbsp;4.11 <a href="#assert-statement">Assert Statement</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;4.12 <a href="#conditional-compilation-statement">Conditional Compilation Statement</a><br />
+        5 <a href="#access-specifiers">Access Specifiers</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;5.1 <a href="#access-specifiers-syntax">Syntax</a><br />
+        6 <a href="#type-expressions">Type Expressions</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;6.1 <a href="#type-expressions-syntax">Syntax</a><br />
+        7 <a href="#functions">Functions</a><br />
     </div>
 
     <h2 id="lexical-structure">1 Lexical Structure</h2>
@@ -287,7 +293,7 @@
         It consists of the names of the <a href="#namespace">namespaces</a> containing the entity (if any) separated by periods followed by the names
         of the types (if any) containing the entity separated by periods followed by the identifier of the entity itself.
         An <a href="#enumeration-constant">enumeration constant</a> must always be referred by prefixing the name of it by the name of the
-        <a href="#enumerated type">enumerated type</a> that contains it and a period. 
+        <a href="#enumerated type">enumerated type</a> that contains it and a period.
         A <a href="#construction-statement">local variable</a> cannot be referred by a fully qualified identifier.
         An identifier of a local variable refers always to the local variable in the innermost scope that contains it.
     </p>
@@ -1643,7 +1649,7 @@
 
     <p>
         A <a href="#rule.construct-expr">construction</a> expression constructs an object "in place" into a memory location.
-        It takes the type of an object to construct enclosed in angle brackets, and then a list of arguments <em>p</em>, <em>a</em><sub>0</sub>, <em>a</em><sub>1</sub>, ... enclosed in parentheses,
+        It takes the <a href="#rule.type-expr">type</a> of an object to construct enclosed in angle brackets, and then a list of arguments <em>p</em>, <em>a</em><sub>0</sub>, <em>a</em><sub>1</sub>, ... enclosed in parentheses,
         where <em>p</em> is a pointer to the memory location where into to construct the object and <em>a</em><sub>0</sub>, <em>a</em><sub>1</sub>, ... is a possibly empty list of arguments
         separated by commas. If <em>T</em> is the type of the object to construct, the type of <em>p</em> can be either <span class="kw">void</span><span class="mono">*</span> or <em>T</em><span class="mono">*</span>.
         The expression yields a <em>T</em><span class="mono">*</span> result.
@@ -1655,7 +1661,7 @@
         A <a href="#rule.new-expr">new</a> expression creates an object of the specified type.
         If <em>T</em> is the type of object to create, <span class="kw">sizeof</span>(<em>T</em>) bytes of memory is allocated from the <a href="free-store">free store</a> and
         then the object is constructed into that memory.
-        The new expression takes the type of an object to construct and a possibly empty list of constructor arguments enclosed in parentheses as operands.
+        The new expression takes the <a href="#rule.type-expr">type</a> of an object to construct and a possibly empty list of constructor arguments enclosed in parentheses as operands.
         It yields a pointer to the newly created object as a result.
     </p>
 
@@ -1670,10 +1676,10 @@
     <h2 id="statements">4 Statements</h2>
 
     <p>
-        Statements are used in programs to define <a href="#control-statements">flow of control</a>, to <a href="#expression-statement">evaluate expressions</a> for side-effects, 
-        to <a href="#assignment-statement">assign</a> values to variables, to construct <a href="#construction-statement">local variables</a>, 
-        to explicitly <a href="#delete-and-destroy-statements">release allocated resources</a>, to <a href="#throw-statement">throw</a> and <a href="#try-statement">handle</a> exceptions, and 
-        to <a href="#assert-statement">test assertions</a>. 
+        Statements are used in programs to define <a href="#control-statements">flow of control</a>, to <a href="#expression-statement">evaluate expressions</a> for side-effects,
+        to <a href="#assignment-statement">assign</a> values to variables, to construct <a href="#construction-statement">local variables</a>,
+        to explicitly <a href="#delete-and-destroy-statements">release allocated resources</a>, to <a href="#throw-statement">throw</a> and <a href="#try-statement">handle</a> exceptions, to
+        <a href="#assert-statement">test assertions</a> and compile statements <a href="#conditional-compilation-statement">conditionally</a>
     </p>
 
     <h3 id="statements-syntax">4.1 Syntax</h3>
@@ -1693,7 +1699,8 @@
                 <span class="rule"><a href="#rule.destroy-statement">destroy&#8209;statement</a></span> |
                 <span class="rule"><a href="#rule.throw-statement">throw&#8209;statement</a></span> |
                 <span class="rule"><a href="#rule.try-statement">try&#8209;statement</a></span> |
-                <span class="rule"><a href="#rule.assert-statement">assert&#8209;statement</a></span>
+                <span class="rule"><a href="#rule.assert-statement">assert&#8209;statement</a></span> |
+                <span class="rule"><a href="#rule.conditional-compilation-statement">conditional&#8209;compilation&#8209;statement</a></span>
             </td>
         </tr>
         <tr>
@@ -2011,6 +2018,86 @@
                 <span class="mono">;</span>
             </td>
         </tr>
+        <tr>
+            <td class="rule" id="rule.conditional-compilation-statement">conditional&#8209;compilation&#8209;statement</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="mono">#</span>
+                <span class="kw">if</span>
+                <span class="mono">(</span>
+                <span class="rule"><a href="#rule.conditional-compilation-expression">conditional&#8209;compilation&#8209;expression</a></span>
+                <span class="mono">)</span>
+                <span class="rule"><a href="#rule.statement">statement</a></span>*<br />
+                (
+                <span class="mono">#</span>
+                <span class="kw">elif</span>
+                <span class="mono">(</span>
+                <span class="rule"><a href="#rule.conditional-compilation-expression">conditional&#8209;compilation&#8209;expression</a></span>
+                <span class="mono">)</span>
+                <span class="rule"><a href="#rule.statement">statement</a></span>*
+                )*
+                <br />
+                (
+                <span class="mono">#</span>
+                <span class="kw">else</span>
+                <span class="rule"><a href="#rule.statement">statement</a></span>*
+                )?
+                <br />
+                <span class="mono">#</span>
+                <span class="kw">endif</span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.conditional-compilation-expression">conditional&#8209;compilation&#8209;expression</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.conditional-compilation-disjunction">conditional&#8209;compilation&#8209;disjunction</a></span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.conditional-compilation-disjunction">conditional&#8209;compilation&#8209;disjunction</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.conditional-compilation-conjunction">conditional&#8209;compilation&#8209;conjunction</a></span><br />
+                (<span class="mono">||</span>
+                <span class="rule"><a href="#rule.conditional-compilation-conjunction">conditional&#8209;compilation&#8209;conjunction</a></span>)*
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.conditional-compilation-conjunction">conditional&#8209;compilation&#8209;conjunction</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.conditional-compilation-prefix">conditional&#8209;compilation&#8209;prefix</a></span><br />
+                (<span class="mono">&&</span>
+                <span class="rule"><a href="#rule.conditional-compilation-prefix">conditional&#8209;compilation&#8209;prefix</a></span>)*
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.conditional-compilation-prefix">conditional&#8209;compilation&#8209;prefix</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="mono">!</span>
+                <span class="rule"><a href="#rule.conditional-compilation-prefix">conditional&#8209;compilation&#8209;prefix</a></span> | <br />
+                <span class="rule"><a href="#rule.conditional-compilation-primary">conditional&#8209;compilation&#8209;primary</a></span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.conditional-compilation-primary">conditional&#8209;compilation&#8209;primary</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.conditional-compilation-symbol">conditional&#8209;compilation&#8209;symbol</a></span> |<br />
+                <span class="mono">(</span>
+                <span class="rule"><a href="#rule.conditional-compilation-expression">conditional&#8209;compilation&#8209;expression</a></span>
+                <span class="mono">)</span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.conditional-compilation-symbol">conditional&#8209;compilation&#8209;symbol</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.identifier">identifier</a></span>
+            </td>
+        </tr>
     </table>
 
     <h3 id="labeled-statement">4.2 Labeled Statement</h3>
@@ -2079,16 +2166,16 @@
     </p>
 
     <p>
-        The for statement is commonly used as follows: the <a href="#rule.for-init-statement">for-init-statement</a> constructs a loop variable, 
+        The for statement is commonly used as follows: the <a href="#rule.for-init-statement">for-init-statement</a> constructs a loop variable,
         the expression evaluates some condition that depends on the loop variable. As long as the condition evaluate to <span class="kw">true</span>, the statement contained by the for statement is executed,
         the <a href="#rule.for-loop-expression">for-loop-expression</a> that manipulates the loop variable is executed, and control is transferred back to testing the condition.
     </p>
 
     <p>
-        For example, here's a for loop that prints integer 0 ... 9 to the standard output stream: <br/><br/>
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">for</span> <span class="mono">(</span><span class="kw">int</span> <em>i</em> <span class="mono">=</span> 0<span class="mono">;</span> <em>i</em> <span class="mono"><</span> 10<span class="mono">;</span> <span class="mono">++</span><em>i</em><span class="mono">)</span><br/>
+        For example, here's a for loop that prints integer 0 ... 9 to the standard output stream: <br /><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">for</span> <span class="mono">(</span><span class="kw">int</span> <em>i</em> <span class="mono">=</span> 0<span class="mono">;</span> <em>i</em> <span class="mono"><</span> 10<span class="mono">;</span> <span class="mono">++</span><em>i</em><span class="mono">)</span><br />
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="mono">{</span><br />
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<em>Console</em><span class="mono">.</span><em>WriteLine</em><span class="mono">(</span><em>i</em><span class="mono">)</span><span class="mono">;</span><br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<em>Console</em><span class="mono">.</span><em>WriteLine</em><span class="mono">(</span><em>i</em><span class="mono">)</span><span class="mono">;</span><br />
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="mono">}</span><br />
     </p>
 
@@ -2158,7 +2245,7 @@
     <h4 id="switch-statement">4.3.11 Switch Statement</h4>
 
     <p>
-        A <a href="#rule.switch-statement">switch</a> statement consists of an condition expression that evaluates to an <a href="#integral-value">integral value</a>, 
+        A <a href="#rule.switch-statement">switch</a> statement consists of an condition expression that evaluates to an <a href="#integral-value">integral value</a>,
         a nonnegative number of <a href="#case-statement">case</a> statements and possibly a <a href="#default-statement">default</a> statement.
         The condition of the switch statement is evaluated and control is transferred to a case statement with a matching value.
         If none of the case values match, and the switch statement contains a default statement, control is transferred to the default statement.
@@ -2168,24 +2255,24 @@
     <h4 id="case-statement">4.3.12 Case Statement</h4>
 
     <p>
-        A <a href="#rule.case-statement">case</a> statement has a number case values that must be <a href="#integral-value">integral</a> compile-time constants and a possibly empty sequence of statements 
+        A <a href="#rule.case-statement">case</a> statement has a number case values that must be <a href="#integral-value">integral</a> compile-time constants and a possibly empty sequence of statements
         that are executed if the condition of the <a href="#switch-statement">switch</a> statement match one of the case values.
-        The case statement must be terminated by a <a href="#break-statement">break</a>, <a href="#goto-case-statement">goto case</a>, <a href="#goto-default-statement">goto default</a>, 
+        The case statement must be terminated by a <a href="#break-statement">break</a>, <a href="#goto-case-statement">goto case</a>, <a href="#goto-default-statement">goto default</a>,
         <a href="#return-statement">return</a> or <a href="#throw-statement">throw</a> statement.
     </p>
 
     <h4 id="default-statement">4.3.13 Default Statement</h4>
 
     <p>
-        A <a href="#rule.default-statement">default</a> has a possibly empty sequence of statement that are executed if the condition of the <a href="#switch-statement">switch</a> statement does not 
-        match any of the case values. The default statement must be terminated by a <a href="#break-statement">break</a>, <a href="#goto-case-statement">goto case</a>, 
+        A <a href="#rule.default-statement">default</a> has a possibly empty sequence of statement that are executed if the condition of the <a href="#switch-statement">switch</a> statement does not
+        match any of the case values. The default statement must be terminated by a <a href="#break-statement">break</a>, <a href="#goto-case-statement">goto case</a>,
         <a href="#return-statement">return</a> or <a href="#throw-statement">throw</a> statement.
     </p>
 
     <h4 id="goto-case-statement">4.3.14 Goto Case Statement</h4>
 
     <p>
-        A <a href="#rule.goto-case-statement">goto case</a> statement is used to transfer control from a <a href="#case-statement">case</a>, 
+        A <a href="#rule.goto-case-statement">goto case</a> statement is used to transfer control from a <a href="#case-statement">case</a>,
         or <a href="#default-statement">default</a> statement to a case statement.
     </p>
 
@@ -2212,8 +2299,8 @@
     <h3 id="assignment-statement">4.6 Assignment Statement</h3>
 
     <p>
-        An <a href="#rule.assignment-statement">assignment</a> statement evaluates the expression that is on the right-hand side of the assignment operator and assigns it to an 
-        <em><a href="#lvalue">lvalue</a></em> expression that is on the left-hand side of the assignment operator. An lvalue expression can be for instance a variable, 
+        An <a href="#rule.assignment-statement">assignment</a> statement evaluates the expression that is on the right-hand side of the assignment operator and assigns it to an
+        <em><a href="#lvalue">lvalue</a></em> expression that is on the left-hand side of the assignment operator. An lvalue expression can be for instance a variable,
         a <a href="#dereference-expression">dereferenced</a> pointer or iterator, or a reference-valued result of a function call.
     </p>
 
@@ -2222,23 +2309,23 @@
     <p>
         A <a href="#rule.construction-statement">construction</a> statement declares a <em>local variable</em> into its scope,
         allocates memory for it from the stack frame of the current function<sup><a href="#footnote-2">2</a></sup> and
-        sets an initial value for it. The local variable will have given <a href="#type-expr">type</a> and <a href="#identifiers">name</a>.
-        It is initialized to the value given on the right side of the assignment operator symbol or 
-        resulting of a call to a constructor with arguments enclosed in parentheses. 
+        sets an initial value for it. The local variable will have given <a href="#type-expressions">type</a> and <a href="#identifiers">name</a>.
+        It is initialized to the value given on the right side of the assignment operator symbol or
+        resulting of a call to a constructor with arguments enclosed in parentheses.
         If no initializer is given, the variable will be <a href="#default-initialized">default initialized</a>.
     </p>
 
     <h3 id="delete-and-destroy-statements">4.8 Delete and Destroy Statements</h3>
 
     <p>
-        If <em>p</em> is a pointer to type <em>T</em> object that is created using the <a href="#new-expression">new</a> expression, 
+        If <em>p</em> is a pointer to type <em>T</em> object that is created using the <a href="#new-expression">new</a> expression,
         statement <span class="kw"><a href="#rule.delete-statement">delete</a></span> <em>p</em>
         calls the destructor of <em>T</em> (if <em>T</em> is a class type having one), and then frees the memory allocated for the object back to the <a href="#free-store">free store</a>.
         It is not an error to call <span class="kw">delete</span> for a <span class="kw">null</span> pointer.
     </p>
 
     <p>
-        If <em>p</em> is a pointer to type <em>T</em> object, statement <span class="kw"><a href="#rule.destroy-statement">destroy</a></span> <em>p</em> calls the destructor of <em>T</em>, 
+        If <em>p</em> is a pointer to type <em>T</em> object, statement <span class="kw"><a href="#rule.destroy-statement">destroy</a></span> <em>p</em> calls the destructor of <em>T</em>,
         but does not free any memory.
         It is not an error to call <span class="kw">destroy</span> for a type <em>T</em> that has no destructor. In that case the statement has no effect.
     </p>
@@ -2246,7 +2333,7 @@
     <h3 id="throw-statement">4.9 Throw Statement</h3>
 
     <p>
-        A <a href="#rule.throw-statement">throw</a> statement throws or rethrows an exception. 
+        A <a href="#rule.throw-statement">throw</a> statement throws or rethrows an exception.
         If the throw statement contains an expression, it must be an expression of a class type that is derived from the <em>System</em><span class="mono">.</span><em>Exception</em> class.
         If the throw statement does not contain an expression, it can be used only in an <a href="#rule.exception-handler">exception handler</a> block to rethrow the current exception being handled.
     </p>
@@ -2258,7 +2345,7 @@
 
     <p>
         Exceptions should be thrown by value, and catched by reference (or reference to <span class="kw">const</span>), as in <span class="mono">C++</span>.
-        For example, if <em>AlphaException</em> is a class derived from the <em>System</em><span class="mono">.</span><em>Exception</em> class, statement<br/><br />
+        For example, if <em>AlphaException</em> is a class derived from the <em>System</em><span class="mono">.</span><em>Exception</em> class, statement<br /><br />
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">throw</span> <em>AlphaException</em><span class="mono">("error");</span><br /><br />
         will throw an exception of type <em>AlphaException</em> with message <span class="mono">"error"</span>.
     </p>
@@ -2287,11 +2374,274 @@
     <h3 id="assert-statement">4.11 Assert Statement</h3>
 
     <p>
-        An <a href="#rule.assert-statement">assert</a> statement can be used to test <a href="#basic-type-bool"><span class="kw">bool</span></a>-valued conditions that should always hold in a valid program. 
-        If an assertion expression evaluates to <span class="kw">false</span>, an error message "assertion failed" with a function name, 
+        An <a href="#rule.assert-statement">assert</a> statement can be used to test <a href="#basic-type-bool"><span class="kw">bool</span></a>-valued conditions that should always hold in a valid program.
+        If an assertion expression evaluates to <span class="kw">false</span>, an error message "assertion failed" with a function name,
         source file name and line number along with a possibly incomplete call stack is printed to the standard error stream of the process,
         and the execution of the process is ended with exit code 254. Assert statements have no effect in a program compiled using the release configuration.
     </p>
+
+    <h3 id="conditional-compilation-statement">4.12 Conditional Compilation Statement</h3>
+
+    <p>
+        A <a href="#rule.conditional-compilation-statement">conditional compilation statement</a> includes statements to be compiled conditionally depending on symbols
+        supplied from the command line or from the IDE.
+    </p>
+
+    <p>
+        The <span class="kw">#if</span> part contains a conditional compilation expression that is evaluated.
+        If the expression evaluates to <span class="kw">true</span> the statements following the expression are included in the compilation.
+        Otherwise an expression contained by one of the <span class="kw">#elif</span> parts is evaluated. As soon as one of them evaluates to <span class="kw">true</span>, the statements following that
+        expression are included in the compilation. Otherwise, if neither <span class="kw">#if</span> or any <span class="kw">#elif</span> part expressions evaluates to <span class="kw">true</span>, and the
+        statement has an <span class="kw">#else</span> part, the statements in the <span class="kw">#else</span> part are included in the compilation.
+    </p>
+
+    <p>
+        A <a href="#rule.conditional-compilation-expression">conditional compilation expression</a> can be a
+        <ul>
+            <li>
+                <a href="#rule.conditional-compilation-disjunction">disjunction</a> that evaluates to
+                <span class="kw">true</span> if its left expression or its right expression evaluates to
+                <span class="kw">true</span>
+            </li>
+            <li>
+                <a href="#rule.conditional-compilation-conjunction">conjunction</a> that evaluates to
+                <span class="kw">true</span> if its left expression and its right expression evaluates to
+                <span class="kw">true</span>
+            </li>
+            <li>
+                <a href="#rule.conditional-compilation-prefix">logical not</a> expression that evaluates to
+                <span class="kw">true</span> if its operand expression evaluates to <span class="kw">false</span>, or a
+            </li> 
+            <li>
+                <a href="#rule.conditional-compilation-primary">primary</a> expression that evaluates to
+                <span class="kw">true</span> if the conditional compilation symbol operand is defined and
+                <span class="kw">false</span> otherwise.
+            </li>
+        </ul>
+    </p>
+
+    <h2 id="access-specifiers">5 Access Specifiers</h2>
+
+    <p>
+        Access specifiers are used to grant or reject access to a program entity from another program entity. 
+    </p>
+
+    <h3 id="access-specifiers-syntax">5.1 Syntax</h3>
+
+    <table class="grammar">
+        <tr>
+            <td class="rule" id="rule.access-specifier">access&#8209;specifier</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="kw">public</span> |
+                <span class="kw">protected</span> |
+                <span class="kw">private</span> |
+                <span class="kw">internal</span>
+            </td>
+        </tr>
+    </table>
+
+    <ul>
+        <li>
+            <span class="kw">public</span> access grants access from everywhere.
+        </li>
+        <li>
+            <span class="kw">protected</span> access grants access for an entity defined 
+            within the same or derived class and rejects it for other entities.
+        </li>
+        <li>
+            <span class="kw">private</span> access grants access for an entity defined
+            within the same class and rejects it for other entities.
+        </li>
+        <li>
+            <span class="kw">internal</span> access grants access for an entity defined 
+            within the same program or library and rejects it for other entities.
+        </li>
+    </ul>
+
+    <p>
+        If no access specifier is given, the default access for a namespace-level entity is 
+        <span class="kw">internal</span> access, and for a class-level entity it is 
+        <span class="kw">private</span> access.
+    </p>
+
+    <h2 id="type-expressions">6 Type Expressions</h2>
+
+    <p>
+        Type expressions are used for instance for declaring the type of a variable, parameter or constant, or the return type of a function.
+    </p>
+
+    <h3 id="type-expressions-syntax">6.1 Syntax</h3>
+
+    <table class="grammar">
+        <tr>
+            <td class="rule" id="rule.type-expr">type&#8209;expr</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.prefix-type-expr">prefix&#8209;type&#8209;expr</a></span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.prefix-type-expr">prefix&#8209;type&#8209;expr</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="kw">const</span>
+                <span class="rule"><a href="#rule.postfix-type-expr">postfix&#8209;type&#8209;expr</a></span> |
+                <span class="rule"><a href="#rule.postfix-type-expr">postfix&#8209;type&#8209;expr</a></span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.postfix-type-expr">postfix&#8209;type&#8209;expr</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.primary-type-expr">primary&#8209;type&#8209;expr</a></span>
+                (
+                    <span class="rule"><a href="#rule.member">member</a></span> |
+                    <span class="rule"><a href="#rule.pointer">pointer</a></span> |
+                    <span class="rule"><a href="#rule.rvalue-ref">rvalue&#8209;ref</a></span> |
+                    <span class="rule"><a href="#rule.lvalue-ref">lvalue&#8209;ref</a></span> |
+                    <span class="rule"><a href="#rule.array">array</a></span> 
+                )*
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.member">member</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="mono">.</span>
+                <span class="rule"><a href="#rule.identifier">identifier</a></span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.pointer">pointer</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="mono">*</span> 
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.rvalue-ref">rvalue&#8209;ref</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="mono">&amp;&amp;</span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.lvalue-ref">lvalue&#8209;ref</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="mono">&amp;</span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.array">array</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="mono">[</span>
+                <span class="rule"><a href="#rule.expression">expression</a></span>?
+                <span class="mono">]</span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.primary-type-expr">primary&#8209;type&#8209;expr</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.basic-type">basic&#8209;type</a></span> | 
+                <span class="rule"><a href="#rule.template-id">template&#8209;id</a></span> |
+                <span class="rule"><a href="#rule.identifier">identifier</a></span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.template-id">template&#8209;id</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.qualified-id">qualified&#8209;id</a></span>
+                <span class="mono">&lt;</span>
+                <span class="rule"><a href="#rule.type-expr">type&#8209;expr</a></span>
+                (
+                    <span class="mono">,</span>
+                    <span class="rule"><a href="#rule.type-expr">type&#8209;expr</a></span>
+                )*
+                <span class="mono">&gt;</span>
+            </td>
+        </tr>
+    </table>
+
+    <h3 id="const-qualifier">6.2 Const Qualifier</h3>
+
+    <p>
+        A <a href="#rule.prefix-type-expr"><span class="kw">const</span></a> qualifier 
+        indicates an intent that an object is not ment to be changed.
+        For example, type expression <span class="kw">const</span> <em>T</em><span class="mono">&amp</span>; 
+        declares a reference to constant <em>T</em> type, and 
+        <span class="kw">const</span> <em>T</em><span class="mono">*</span> 
+        declares a pointer to constant <em>T</em> type.
+    </p>
+
+    <h3 id="member-operation">6.3 Member Operation</h3>
+
+    <p>
+        A <a href="#rule.member">member</a> operation in a type expression
+        is used to access a member of a namespace or a class type.
+        For example, if <em>N</em> is a namespace that contains type <em>T</em>,
+        type expression <em>N</em><span class="mono">.</span><em>T</em> <span class="mono">*</span>
+        declares a pointer to type <em>T</em> in namespace <em>N</em> type.
+    </p>
+
+    <h3 id="pointer-type">6.4 Pointer Types</h3>
+
+    <p>
+        A <a href="#rule.pointer">pointer</a> qualifier is used for declaring pointer types.
+        The value of a pointer object is the memory address of the object it points to or it can be 
+        a special <a href="#null-literal"><span class="kw">null</span></a> value that means it does not point to any object.
+        The default value of a pointer type object is <span class="kw">null</span>.
+    </p>
+
+    <h4 id="generic-pointer-type">6.4.1 Generic Pointer Type</h4>
+
+    <p>
+        The <span class="kw">void</span><span class="mono">*</span> type represents a 
+        generic point type. Its value is a memory address or <span class="kw">null</span> value 
+        just like the value of other pointer types but it does not have information about the 
+        type of an object it points to, it is a bare memory address.
+        Other pointer types have an implicit conversion to the generic pointer type and
+        the generic pointer type can be explicitly casted to any other pointer type.
+        The default value of a generic pointer type object is <span class="kw">null</span>.
+    </p>
+
+    <h3 id="reference-type">6.5 Reference Types</h3>
+
+    <p>
+        The <a href="#rule.lvalue-ref">lvalue</a> and <a href="#rule.rvalue-ref">rvalue</a> reference qualifiers are
+        used for declaring reference types.
+        A reference always refers to some other object, it has no default value and it cannot be <span class="kw">null</span>. 
+        A reference is bound to the object it refers to when it is created and it always refers to the same object for the 
+        whole lifetime of it. When a reference is used as the left operand of an assignment, a new value is assigned
+        to the object the reference refers to. When it is used as an operand in an expression, the value of the
+        object the reference refers to is retrieved. In that sense it can be throught of as being an 
+        "automatically dereferenced pointer".
+    </p>
+
+    <h4 id="lvalue-reference-type">6.5.1 Lvalue Reference Type</h4>
+
+    <h4 id="lvalue-reference-type">6.5.2 Rvalue Reference Type</h4>
+
+    <p>
+        Rvalue reference types are used for implementing move semantics.
+    </p>
+
+    <h2 id="functions">7 Functions</h2>
+
+    <h3 id="functions-syntax">7.1 Syntax</h3>
+
+    <table class="grammar">
+        <tr>
+            <td class="rule" id="rule.function">access&#8209;specifier</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+            </td>
+        </tr>
+    </table>
 
     <hr />
 

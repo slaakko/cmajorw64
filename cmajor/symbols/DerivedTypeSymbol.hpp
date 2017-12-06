@@ -64,7 +64,7 @@ public:
     std::u32string SimpleName() const;
     void Write(SymbolWriter& writer) override;
     void Read(SymbolReader& reader) override;
-    void EmplaceType(TypeSymbol* typeSymbol_, int index) override;
+    void EmplaceType(TypeSymbol* typeSymbol, int index) override;
     void ComputeExportClosure() override;
     const TypeSymbol* BaseType() const override { return baseType; }
     TypeSymbol* BaseType() override { return baseType; }
@@ -90,6 +90,7 @@ public:
     TypeSymbol* RemoveDerivations(const TypeDerivationRec& sourceDerivationRec, const Span& span) override;
     TypeSymbol* Unify(TypeSymbol* sourceType, const Span& span) override;
     bool IsRecursive(TypeSymbol* type, std::unordered_set<TypeSymbol*>& tested) override;
+    ValueType GetValueType() const override;
 private:
     TypeSymbol* baseType;
     TypeDerivationRec derivationRec;
@@ -105,6 +106,7 @@ public:
     bool IsNullPtrType() const override { return true; }
     llvm::Type* IrType(Emitter& emitter) override;
     llvm::Constant* CreateDefaultIrValue(Emitter& emitter) override;
+    ValueType GetValueType() const override;
 };
 
 } } // namespace cmajor::symbols

@@ -6,6 +6,7 @@
 #ifndef CMAJOR_SYMBOLS_FUNCTION_SYMBOL_INCLUDED
 #define CMAJOR_SYMBOLS_FUNCTION_SYMBOL_INCLUDED
 #include <cmajor/symbols/TypeSymbol.hpp>
+#include <cmajor/symbols/Meta.hpp>
 #include <cmajor/ast/Function.hpp>
 #include <cmajor/ir/GenObject.hpp>
 #include <unordered_set>
@@ -13,6 +14,8 @@
 namespace cmajor {  namespace symbols {
 
 using namespace cmajor::ir;
+class Value;
+class IntrinsicFunction;
 
 class FunctionGroupSymbol : public Symbol
 {
@@ -86,7 +89,7 @@ public:
     FunctionNode* GetFunctionNode() { return functionNode.get(); }
     ConstraintNode* Constraint() { return constraint.get(); }
     void SetConstraint(ConstraintNode* constraint_) { constraint.reset(constraint_); }
-    void EmplaceType(TypeSymbol* typeSymbol_, int index) override;
+    void EmplaceType(TypeSymbol* typeSymbol, int index) override;
     void AddMember(Symbol* member) override;
     bool IsFunctionSymbol() const override { return true; }
     std::string TypeString() const override { return "function"; }
@@ -105,9 +108,12 @@ public:
     virtual bool IsGeneratedFunction() const { return false; }
     virtual bool IsLvalueReferenceCopyAssignment() const { return false; }
     virtual bool IsArrayElementAccess() const { return false; }
+    virtual bool IsCompileTimePrimitiveFunction() const { return false; }
     virtual bool IsClassToInterfaceTypeConversion() const { return false; }
     virtual void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags);
     void GenerateVirtualCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags);
+    virtual std::unique_ptr<Value> ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span) const;
+    virtual std::unique_ptr<Value> ConvertValue(const std::unique_ptr<Value>& value) const;
     virtual ParameterSymbol* GetThisParam() const { return nullptr; }
     virtual bool IsConstructorDestructorOrNonstaticMemberFunction() const { return false; }
     virtual bool IsClassDelegateCopyConstructor() const { return false; }
@@ -182,6 +188,8 @@ public:
     Node* GlobalNs() { return globalNs.get(); }
     FunctionGroupSymbol* FunctionGroup() { return functionGroup; }
     void SetFunctionGroup(FunctionGroupSymbol* functionGroup_) { functionGroup = functionGroup_; }
+    IntrinsicFunction* GetIntrinsic() { return intrinsic.get(); }
+    void SetIntrinsic(IntrinsicFunction* intrinsic_) { intrinsic.reset(intrinsic_); }
     bool IsProgramMain() const { return isProgramMain; }
     void SetProgramMain() { isProgramMain = true; }
 private:
@@ -205,6 +213,7 @@ private:
     std::string filePathReadFrom;
     std::unique_ptr<Node> globalNs;
     FunctionGroupSymbol* functionGroup;
+    std::unique_ptr<IntrinsicFunction> intrinsic;
     bool isProgramMain;
 };
 

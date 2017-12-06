@@ -41,6 +41,8 @@ std::u32string GetCurrentProjectName();
 void SetCurrentTooName(const std::u32string& currentToolName_);
 std::u32string GetCurrentToolName();
 
+void DefineCommandLineConditionalSymbol(const std::u32string& symbol);
+
 void ClearDefines();
 void DefineSymbol(const std::u32string& symbol);
 bool IsSymbolDefined(const std::u32string& symbol);

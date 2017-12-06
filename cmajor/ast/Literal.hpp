@@ -6,6 +6,7 @@
 #ifndef CMAJOR_AST_LITERAL_INCLUDED
 #define CMAJOR_AST_LITERAL_INCLUDED
 #include <cmajor/ast/Node.hpp>
+#include <cmajor/ast/NodeList.hpp>
 
 namespace cmajor { namespace ast {
 
@@ -274,6 +275,22 @@ public:
     Node* Clone(CloneContext& cloneContext) const override;
     void Accept(Visitor& visitor) override;
     std::string ToString() const override { return "null"; }
+};
+
+class ArrayLiteralNode : public Node
+{
+public:
+    ArrayLiteralNode(const Span& span_);
+    Node* Clone(CloneContext& cloneContext) const override;
+    void Accept(Visitor& visitor) override;
+    void Write(AstWriter& writer) override;
+    void Read(AstReader& reader) override;
+    std::string ToString() const override { return "array"; }
+    void AddValue(Node* value);
+    const NodeList<Node>& Values() const { return values; }
+    NodeList<Node>& Values() { return values; }
+private:
+    NodeList<Node> values;
 };
 
 } } // namespace cmajor::ast

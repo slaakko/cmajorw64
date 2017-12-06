@@ -295,7 +295,7 @@ namespace cmajor.parser
 
         Primary(ParsingContext* ctx) : Node*
             ::= ('(' Expression(ctx) ')'){ value = Expression; }
-            |   Literal{ value = Literal; }
+            |   Literal(ctx){ value = Literal; }
             |   BasicType{ value = BasicType; }
             |   TemplateId(ctx){ value = TemplateId; }
             |   Identifier{ value = Identifier; }

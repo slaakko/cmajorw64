@@ -15,7 +15,7 @@ public:
     TypedefSymbol(const Span& span_, const std::u32string& name_);
     void Write(SymbolWriter& writer) override;
     void Read(SymbolReader& reader) override;
-    void EmplaceType(TypeSymbol* typeSymbol_, int index) override;
+    void EmplaceType(TypeSymbol* typeSymbol, int index) override;
     bool IsExportSymbol() const override;
     void ComputeExportClosure() override;
     void Accept(SymbolCollector* collector) override;

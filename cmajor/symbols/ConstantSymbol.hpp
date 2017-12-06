@@ -31,6 +31,7 @@ public:
     void SetValue(Value* value_);
     const Value* GetValue() const { return value.get(); }
     Value* GetValue() { return value.get(); }
+    llvm::Value* ArrayIrObject(Emitter& emitter, bool create);
 private:
     TypeSymbol* type;
     std::unique_ptr<Value> value;

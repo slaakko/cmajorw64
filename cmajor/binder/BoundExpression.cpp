@@ -7,6 +7,7 @@
 #include <cmajor/binder/TypeResolver.hpp>
 #include <cmajor/binder/BoundNodeVisitor.hpp>
 #include <cmajor/binder/BoundFunction.hpp>
+#include <cmajor/binder/BoundCompileUnit.hpp>
 #include <cmajor/symbols/FunctionSymbol.hpp>
 #include <cmajor/symbols/Exception.hpp>
 #include <cmajor/symbols/EnumSymbol.hpp>
@@ -306,17 +307,24 @@ BoundExpression* BoundConstant::Clone()
 
 void BoundConstant::Load(Emitter& emitter, OperationFlags flags)
 {
-    if ((flags & OperationFlags::addr) != OperationFlags::none)
+    if (constantSymbol->GetValue()->GetValueType() == ValueType::arrayValue && (flags & OperationFlags::addr) != OperationFlags::none)
     {
-        throw Exception("cannot take address of a constant", GetSpan());
-    }
-    else if ((flags & OperationFlags::deref) != OperationFlags::none)
-    {
-        throw Exception("cannot dereference a constant", GetSpan());
+        emitter.Stack().Push(constantSymbol->ArrayIrObject(emitter, false));
     }
     else
     {
-        emitter.Stack().Push(constantSymbol->GetValue()->IrValue(emitter));
+        if ((flags & OperationFlags::addr) != OperationFlags::none)
+        {
+            throw Exception("cannot take address of a constant", GetSpan());
+        }
+        else if ((flags & OperationFlags::deref) != OperationFlags::none)
+        {
+            throw Exception("cannot dereference a constant", GetSpan());
+        }
+        else
+        {
+            emitter.Stack().Push(constantSymbol->GetValue()->IrValue(emitter));
+        }
     }
     DestroyTemporaries(emitter);
 }
@@ -404,6 +412,33 @@ void BoundLiteral::Store(Emitter& emitter, OperationFlags flags)
 void BoundLiteral::Accept(BoundNodeVisitor& visitor)
 {
     visitor.Visit(*this);
+}
+
+std::unique_ptr<Value> BoundLiteral::ToValue(BoundCompileUnit& boundCompileUnit) const
+{ 
+    switch (value->GetValueType())
+    {
+        case ValueType::stringValue: 
+        {
+            StringValue* stringValue = static_cast<StringValue*>(value.get());
+            return std::unique_ptr<Value>(new PointerValue(GetSpan(), boundCompileUnit.GetSymbolTable().GetTypeByName(U"char")->AddPointer(Span()), boundCompileUnit.GetUtf8CharPtr(stringValue->StringId()))); 
+        }
+        case ValueType::wstringValue:
+        {
+            WStringValue* wstringValue = static_cast<WStringValue*>(value.get());
+            return std::unique_ptr<Value>(new PointerValue(GetSpan(), boundCompileUnit.GetSymbolTable().GetTypeByName(U"wchar")->AddPointer(Span()), boundCompileUnit.GetUtf16CharPtr(wstringValue->StringId())));
+        }
+        case ValueType::ustringValue:
+        {
+            UStringValue* ustringValue = static_cast<UStringValue*>(value.get());
+            return std::unique_ptr<Value>(new PointerValue(GetSpan(), boundCompileUnit.GetSymbolTable().GetTypeByName(U"uchar")->AddPointer(Span()), boundCompileUnit.GetUtf32CharPtr(ustringValue->StringId())));
+        }
+        default: 
+        {
+            return std::unique_ptr<Value>(value->Clone());
+        }
+    }
+    return std::unique_ptr<Value>();
 }
 
 BoundTemporary::BoundTemporary(std::unique_ptr<BoundExpression>&& rvalueExpr_, std::unique_ptr<BoundLocalVariable>&& backingStore_) :
@@ -1155,6 +1190,16 @@ bool BoundConversion::IsLvalueExpression() const
 void BoundConversion::Accept(BoundNodeVisitor& visitor)
 {
     visitor.Visit(*this);
+}
+
+std::unique_ptr<Value> BoundConversion::ToValue(BoundCompileUnit& boundCompileUnit) const
+{ 
+    std::unique_ptr<Value> sourceValue = sourceExpr->ToValue(boundCompileUnit);
+    if (sourceValue)
+    {
+        return conversionFun->ConvertValue(sourceValue);
+    }
+    return std::unique_ptr<Value>();
 }
 
 BoundIsExpression::BoundIsExpression(std::unique_ptr<BoundExpression>&& expr_, ClassTypeSymbol* rightClassType_, TypeSymbol* boolType_) :

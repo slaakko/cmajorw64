@@ -2127,6 +2127,7 @@ public:
         expressionNonterminalParser->SetPreCall(new cmajor::parsing::MemberPreCall<PrimaryRule>(this, &PrimaryRule::PreExpression));
         expressionNonterminalParser->SetPostCall(new cmajor::parsing::MemberPostCall<PrimaryRule>(this, &PrimaryRule::PostExpression));
         cmajor::parsing::NonterminalParser* literalNonterminalParser = GetNonterminal(ToUtf32("Literal"));
+        literalNonterminalParser->SetPreCall(new cmajor::parsing::MemberPreCall<PrimaryRule>(this, &PrimaryRule::PreLiteral));
         literalNonterminalParser->SetPostCall(new cmajor::parsing::MemberPostCall<PrimaryRule>(this, &PrimaryRule::PostLiteral));
         cmajor::parsing::NonterminalParser* basicTypeNonterminalParser = GetNonterminal(ToUtf32("BasicType"));
         basicTypeNonterminalParser->SetPostCall(new cmajor::parsing::MemberPostCall<PrimaryRule>(this, &PrimaryRule::PostBasicType));
@@ -2225,6 +2226,11 @@ public:
             context->fromExpression = *static_cast<cmajor::parsing::ValueObject<Node*>*>(fromExpression_value.get());
             stack.pop();
         }
+    }
+    void PreLiteral(cmajor::parsing::ObjectStack& stack, ParsingData* parsingData)
+    {
+        Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
+        stack.push(std::unique_ptr<cmajor::parsing::Object>(new cmajor::parsing::ValueObject<ParsingContext*>(context->ctx)));
     }
     void PostLiteral(cmajor::parsing::ObjectStack& stack, ParsingData* parsingData, bool matched)
     {
@@ -3015,10 +3021,10 @@ void ExpressionGrammar::GetReferencedGrammars()
         grammar1 = cmajor::parser::LiteralGrammar::Create(pd);
     }
     AddGrammarReference(grammar1);
-    cmajor::parsing::Grammar* grammar2 = pd->GetGrammar(ToUtf32("cmajor.parser.BasicTypeGrammar"));
+    cmajor::parsing::Grammar* grammar2 = pd->GetGrammar(ToUtf32("cmajor.parsing.stdlib"));
     if (!grammar2)
     {
-        grammar2 = cmajor::parser::BasicTypeGrammar::Create(pd);
+        grammar2 = cmajor::parsing::stdlib::Create(pd);
     }
     AddGrammarReference(grammar2);
     cmajor::parsing::Grammar* grammar3 = pd->GetGrammar(ToUtf32("cmajor.parser.TemplateGrammar"));
@@ -3027,16 +3033,16 @@ void ExpressionGrammar::GetReferencedGrammars()
         grammar3 = cmajor::parser::TemplateGrammar::Create(pd);
     }
     AddGrammarReference(grammar3);
-    cmajor::parsing::Grammar* grammar4 = pd->GetGrammar(ToUtf32("cmajor.parser.TypeExprGrammar"));
+    cmajor::parsing::Grammar* grammar4 = pd->GetGrammar(ToUtf32("cmajor.parser.BasicTypeGrammar"));
     if (!grammar4)
     {
-        grammar4 = cmajor::parser::TypeExprGrammar::Create(pd);
+        grammar4 = cmajor::parser::BasicTypeGrammar::Create(pd);
     }
     AddGrammarReference(grammar4);
-    cmajor::parsing::Grammar* grammar5 = pd->GetGrammar(ToUtf32("cmajor.parsing.stdlib"));
+    cmajor::parsing::Grammar* grammar5 = pd->GetGrammar(ToUtf32("cmajor.parser.TypeExprGrammar"));
     if (!grammar5)
     {
-        grammar5 = cmajor::parsing::stdlib::Create(pd);
+        grammar5 = cmajor::parser::TypeExprGrammar::Create(pd);
     }
     AddGrammarReference(grammar5);
 }
@@ -3044,11 +3050,11 @@ void ExpressionGrammar::GetReferencedGrammars()
 void ExpressionGrammar::CreateRules()
 {
     AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("Literal"), this, ToUtf32("LiteralGrammar.Literal")));
+    AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("identifier"), this, ToUtf32("cmajor.parsing.stdlib.identifier")));
     AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("BasicType"), this, ToUtf32("BasicTypeGrammar.BasicType")));
-    AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("TypeExpr"), this, ToUtf32("TypeExprGrammar.TypeExpr")));
     AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("TemplateId"), this, ToUtf32("TemplateGrammar.TemplateId")));
     AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("Identifier"), this, ToUtf32("IdentifierGrammar.Identifier")));
-    AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("identifier"), this, ToUtf32("cmajor.parsing.stdlib.identifier")));
+    AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("TypeExpr"), this, ToUtf32("TypeExprGrammar.TypeExpr")));
     AddRule(new ExpressionRule(ToUtf32("Expression"), GetScope(), GetParsingDomain()->GetNextRuleId(),
         new cmajor::parsing::ActionParser(ToUtf32("A0"),
             new cmajor::parsing::NonterminalParser(ToUtf32("Equivalence"), ToUtf32("Equivalence"), 1))));
@@ -3344,7 +3350,7 @@ void ExpressionGrammar::CreateRules()
                                                                 new cmajor::parsing::NonterminalParser(ToUtf32("Expression"), ToUtf32("Expression"), 1)),
                                                             new cmajor::parsing::CharParser(')'))),
                                                     new cmajor::parsing::ActionParser(ToUtf32("A1"),
-                                                        new cmajor::parsing::NonterminalParser(ToUtf32("Literal"), ToUtf32("Literal"), 0))),
+                                                        new cmajor::parsing::NonterminalParser(ToUtf32("Literal"), ToUtf32("Literal"), 1))),
                                                 new cmajor::parsing::ActionParser(ToUtf32("A2"),
                                                     new cmajor::parsing::NonterminalParser(ToUtf32("BasicType"), ToUtf32("BasicType"), 0))),
                                             new cmajor::parsing::ActionParser(ToUtf32("A3"),

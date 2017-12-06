@@ -988,9 +988,15 @@ void TypeBinder::Visit(ConstantNode& constantNode)
     TypeSymbol* typeSymbol = ResolveType(constantNode.TypeExpr(), boundCompileUnit, containerScope);
     constantSymbol->SetType(typeSymbol);
     constantSymbol->SetEvaluating();
-    std::unique_ptr<Value> value = Evaluate(constantNode.Value(), GetValueTypeFor(typeSymbol->GetSymbolType()), containerScope, boundCompileUnit, false);
+    std::unique_ptr<Value> value = Evaluate(constantNode.Value(), typeSymbol, containerScope, boundCompileUnit, false, nullptr, constantNode.GetSpan());
+    Value* val = value.get();
+    constantSymbol->SetType(value->GetType(&symbolTable));
     constantSymbol->SetValue(value.release());
     constantSymbol->ResetEvaluating();
+    if (val && val->GetValueType() == ValueType::arrayValue)
+    {
+        boundCompileUnit.AddConstantArray(constantSymbol);
+    }
 }
 
 void TypeBinder::Visit(EnumTypeNode& enumTypeNode)
@@ -1057,7 +1063,7 @@ void TypeBinder::Visit(EnumConstantNode& enumConstantNode)
     EnumConstantSymbol* enumConstantSymbol = static_cast<EnumConstantSymbol*>(symbol);
     enumConstantSymbol->ComputeMangledName();
     enumConstantSymbol->SetEvaluating();
-    std::unique_ptr<Value> value = Evaluate(enumConstantNode.GetValue(), GetValueTypeFor(enumType->UnderlyingType()->GetSymbolType()), containerScope, boundCompileUnit, false);
+    std::unique_ptr<Value> value = Evaluate(enumConstantNode.GetValue(), enumType->UnderlyingType(), containerScope, boundCompileUnit, false, nullptr, enumConstantNode.GetSpan());
     enumConstantSymbol->SetValue(value.release());
     enumConstantSymbol->ResetEvaluating();
 }

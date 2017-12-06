@@ -65,8 +65,8 @@ private:
     void ResolveSymbol(Node& node, Symbol* symbol);
 };
 
-TypeResolver::TypeResolver(BoundCompileUnit& boundCompileUnit_, ContainerScope* containerScope_) : 
-    boundCompileUnit(boundCompileUnit_), symbolTable(boundCompileUnit.GetSymbolTable()), classTemplateRepository(boundCompileUnit.GetClassTemplateRepository()), containerScope(containerScope_), 
+TypeResolver::TypeResolver(BoundCompileUnit& boundCompileUnit_, ContainerScope* containerScope_) :
+    boundCompileUnit(boundCompileUnit_), symbolTable(boundCompileUnit.GetSymbolTable()), classTemplateRepository(boundCompileUnit.GetClassTemplateRepository()), containerScope(containerScope_),
     type(nullptr), derivationRec(), nsTypeSymbol()
 {
 }
@@ -189,18 +189,18 @@ void TypeResolver::Visit(ArrayNode& arrayNode)
     {
         throw Exception("cannot have array of reference type", arrayNode.GetSpan());
     }
-    uint64_t size = 0;
+    int64_t size = 0;
     if (arrayNode.Size())
     {
-        std::unique_ptr<Value> sizeValue = Evaluate(arrayNode.Size(), ValueType::ulongValue, containerScope, boundCompileUnit, false);
-        if (sizeValue->GetValueType() == ValueType::ulongValue)
+        std::unique_ptr<Value> sizeValue = Evaluate(arrayNode.Size(), boundCompileUnit.GetSymbolTable().GetTypeByName(U"long"), containerScope, boundCompileUnit, false, nullptr, arrayNode.GetSpan());
+        if (sizeValue->GetValueType() == ValueType::longValue)
         {
-            ULongValue* ulongSizeValue = static_cast<ULongValue*>(sizeValue.get());
-            size = ulongSizeValue->GetValue();
+            LongValue* longSizeValue = static_cast<LongValue*>(sizeValue.get());
+            size = longSizeValue->GetValue();
         }
         else
         {
-            throw Exception("ulong type expected value", arrayNode.Size()->GetSpan());
+            throw Exception("long type value expected ", arrayNode.Size()->GetSpan());
         }
     }
     type = symbolTable.MakeArrayType(type, size, arrayNode.GetSpan());
@@ -324,13 +324,13 @@ void TypeResolver::Visit(DotNode& dotNode)
         NamespaceTypeSymbol* nsType = static_cast<NamespaceTypeSymbol*>(type);
         scope = nsType->Ns()->GetContainerScope();
     }
-    else if (type->IsClassTypeSymbol())
+    else if (type->IsClassTypeSymbol() || type->IsArrayType())
     {
         scope = type->GetContainerScope();
     }
     else
     {
-        throw Exception("symbol '" + ToUtf8(type->FullName()) + "' does not denote a class or a namespace", dotNode.GetSpan(), type->GetSpan());
+        throw Exception("symbol '" + ToUtf8(type->FullName()) + "' does not denote a class type, an array type or a namespace", dotNode.GetSpan(), type->GetSpan());
     }
     std::u32string name = dotNode.MemberId()->Str();
     Symbol* symbol = scope->Lookup(name, ScopeLookup::this_and_base);

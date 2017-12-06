@@ -1741,6 +1741,11 @@ std::unique_ptr<Document> GenerateLibraryXmlFile(const std::string& moduleFilePa
     std::vector<ClassTypeSymbol*> classTypes;
     std::vector<ClassTemplateSpecializationSymbol*> classTemplateSpecializations;
     Module module(moduleFilePath, classTypes, classTemplateSpecializations);
+    if (module.Name() == U"System.Base")
+    {
+        cmajor::symbols::MetaInit(module.GetSymbolTable());
+    }
+    cmajor::symbols::MetaInit(module.GetSymbolTable());
     std::unique_ptr<ModuleBinder> moduleBinder;
     CompileUnitNode compileUnit(Span(), "foo");
     moduleBinder.reset(new ModuleBinder(module, &compileUnit));

@@ -110,6 +110,7 @@ public:
     void SetSpecifiers(Specifiers specifiers);
     void ComputeName();
     void ComputeMangledName() override;
+    bool IsPolymorphicType() const override { return IsPolymorphic(); }
     void SetConstraint(ConstraintNode* constraint_) { constraint.reset(constraint_); }
     ConstraintNode* Constraint() { return constraint.get(); }
     StaticConstructorSymbol* StaticConstructor() { return staticConstructor; }
@@ -168,6 +169,7 @@ public:
     const std::string& StaticObjectName();
     void SetPrototype(ClassTemplateSpecializationSymbol* prototype_) { prototype = prototype_; }
     ClassTemplateSpecializationSymbol* Prototype() const { return prototype; }
+    ValueType GetValueType() const override;
 private:
     std::u32string groupName;
     int minArity;

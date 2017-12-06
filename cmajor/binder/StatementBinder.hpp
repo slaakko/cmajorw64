@@ -18,6 +18,8 @@ class BoundGotoDefaultStatement;
 class BoundClass;
 class BoundFunction;
 
+void CheckFunctionReturnPaths(FunctionSymbol* functionSymbol, FunctionNode& functionNode, ContainerScope* containerScope, BoundCompileUnit& boundCompileUnit);
+
 class StatementBinder : public Visitor
 {
 public:

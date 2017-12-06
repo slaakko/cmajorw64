@@ -15,6 +15,7 @@
 namespace cmajor { namespace binder {
 
 using namespace cmajor::symbols;
+class BoundCompileUnit;
 
 enum class BoundExpressionFlags : uint8_t
 {
@@ -47,6 +48,7 @@ public:
     virtual bool IsLvalueExpression() const { return false; }
     virtual bool HasValue() const { return false; }
     virtual std::string TypeString() const { return "expression"; }
+    virtual std::unique_ptr<Value> ToValue(BoundCompileUnit& boundCompileUnit) const { return std::unique_ptr<Value>(); }
     const TypeSymbol* GetType() const { return type; }
     TypeSymbol* GetType() { return type; }
     bool GetFlag(BoundExpressionFlags flag) const { return (flags & flag) != BoundExpressionFlags::none;  }
@@ -120,6 +122,7 @@ public:
     void Accept(BoundNodeVisitor& visitor) override;
     bool HasValue() const override { return true; }
     std::string TypeString() const override { return "constant"; }
+    std::unique_ptr<Value> ToValue(BoundCompileUnit& boundCompileUnit) const override { return std::unique_ptr<Value>(constantSymbol->GetValue()->Clone()); }
 private:
     ConstantSymbol* constantSymbol;
 };
@@ -134,6 +137,7 @@ public:
     void Accept(BoundNodeVisitor& visitor) override;
     bool HasValue() const override { return true; }
     std::string TypeString() const override { return "enumeration constant"; }
+    std::unique_ptr<Value> ToValue(BoundCompileUnit& boundCompileUnit) const override { return std::unique_ptr<Value>(enumConstantSymbol->GetValue()->Clone()); }
 private:
     EnumConstantSymbol* enumConstantSymbol;
 };
@@ -148,6 +152,7 @@ public:
     void Accept(BoundNodeVisitor& visitor) override;
     std::string TypeString() const override { return "literal"; }
     bool HasValue() const override { return true; }
+    std::unique_ptr<Value> ToValue(BoundCompileUnit& boundCompileUnit) const override;
 private:
     std::unique_ptr<Value> value;
 };
@@ -338,6 +343,7 @@ public:
     bool IsLvalueExpression() const override;
     std::string TypeString() const override { return "conversion"; }
     FunctionSymbol* ConversionFun() { return conversionFun; }
+    std::unique_ptr<Value> ToValue(BoundCompileUnit& boundCompileUnit) const override;
 private:
     std::unique_ptr<BoundExpression> sourceExpr;
     FunctionSymbol* conversionFun;
@@ -491,6 +497,7 @@ public:
     FunctionGroupSymbol* FunctionGroup() { return functionGroupSymbol; }
     void SetClassPtr(std::unique_ptr<BoundExpression>&& classPtr_);
     BoundExpression* ClassPtr() { return classPtr.get(); }
+    BoundExpression* ReleaseClassPtr() { return classPtr.release(); }
     bool IsScopeQualified() const { return scopeQualified; }
     void SetScopeQualified() { scopeQualified = true; }
     ContainerScope* QualifiedScope() const { return qualifiedScope; }

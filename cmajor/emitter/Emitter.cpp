@@ -271,6 +271,11 @@ void Emitter::Visit(BoundCompileUnit& boundCompileUnit)
 {
     compileUnit = &boundCompileUnit;
     symbolTable = &boundCompileUnit.GetSymbolTable();
+    ConstantArrayRepository& constantArrayRepository = boundCompileUnit.GetConstantArrayRepository();
+    for (ConstantSymbol* constantSymbol : constantArrayRepository.ConstantArrays())
+    {
+        constantSymbol->ArrayIrObject(*this, true);
+    }
     int n = boundCompileUnit.BoundNodes().size();
     for (int i = 0; i < n; ++i)
     {

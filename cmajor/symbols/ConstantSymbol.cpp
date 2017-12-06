@@ -10,7 +10,9 @@
 #include <cmajor/symbols/SymbolReader.hpp>
 #include <cmajor/symbols/Exception.hpp>
 #include <cmajor/symbols/SymbolCollector.hpp>
+#include <cmajor/emitter/Emitter.hpp>
 #include <cmajor/util/Unicode.hpp>
+#include <llvm/IR/Module.h>
 
 namespace cmajor { namespace symbols {
 
@@ -24,7 +26,12 @@ void ConstantSymbol::Write(SymbolWriter& writer)
 {
     Symbol::Write(writer);
     writer.GetBinaryWriter().Write(type->TypeId());
-    WriteValue(value.get(), writer.GetBinaryWriter());
+    bool hasExternalValue = type->IsBasicTypeSymbol() || type->IsEnumeratedType();
+    writer.GetBinaryWriter().Write(hasExternalValue);
+    if (hasExternalValue)
+    {
+        WriteValue(value.get(), writer.GetBinaryWriter());
+    }
 }
 
 void ConstantSymbol::Read(SymbolReader& reader)
@@ -32,7 +39,11 @@ void ConstantSymbol::Read(SymbolReader& reader)
     Symbol::Read(reader);
     uint32_t typeId = reader.GetBinaryReader().ReadUInt();
     GetSymbolTable()->EmplaceTypeRequest(this, typeId, 0);
-    value.reset(ReadValue(reader.GetBinaryReader()));
+    bool hasExternalValue = reader.GetBinaryReader().ReadBool();
+    if (hasExternalValue)
+    {
+        value = ReadValue(reader.GetBinaryReader(), GetSpan());
+    }
 }
 
 void ConstantSymbol::EmplaceType(TypeSymbol* typeSymbol, int index)
@@ -153,6 +164,31 @@ std::string ConstantSymbol::Syntax() const
 void ConstantSymbol::SetValue(Value* value_)
 {
     value.reset(value_);
+}
+
+llvm::Value* ConstantSymbol::ArrayIrObject(Emitter& emitter, bool create)
+{
+    if (!type->IsArrayType())
+    {
+        throw Exception("internal error: array object expected", GetSpan());
+    }
+    if (!value)
+    {
+        throw Exception("internal error: array value missing", GetSpan());
+    }
+    if (value->GetValueType() != ValueType::arrayValue)
+    {
+        throw Exception("internal error: array value expected", GetSpan());
+    }
+    ArrayValue* arrayValue = static_cast<ArrayValue*>(value.get());
+    llvm::ArrayType* irArrayType = llvm::cast<llvm::ArrayType>(type->IrType(emitter));
+    llvm::Constant* irArrayObject = emitter.Module()->getOrInsertGlobal(ToUtf8(MangledName()), irArrayType);
+    if (create)
+    {
+        llvm::GlobalVariable* arrayObjectGlobal = llvm::cast<llvm::GlobalVariable>(irArrayObject);
+        arrayObjectGlobal->setInitializer(llvm::cast<llvm::Constant>(arrayValue->IrValue(emitter)));
+    }
+    return irArrayObject;
 }
 
 } } // namespace cmajor::symbols
