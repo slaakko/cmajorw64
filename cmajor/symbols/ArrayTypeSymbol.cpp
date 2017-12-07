@@ -14,7 +14,7 @@ namespace cmajor { namespace symbols {
 
 using namespace cmajor::unicode;
 
-ArrayTypeSymbol::ArrayTypeSymbol(const Span& span_, const std::u32string& name_) : TypeSymbol(SymbolType::arrayTypeSymbol, span_, name_), elementType(nullptr), size(0), irType(nullptr)
+ArrayTypeSymbol::ArrayTypeSymbol(const Span& span_, const std::u32string& name_) : TypeSymbol(SymbolType::arrayTypeSymbol, span_, name_), elementType(nullptr), size(-1), irType(nullptr)
 {
 }
 
@@ -53,7 +53,7 @@ void ArrayTypeSymbol::EmplaceType(TypeSymbol* typeSymbol, int index)
 
 llvm::Type* ArrayTypeSymbol::IrType(Emitter& emitter)
 {
-    if (size == 0)
+    if (size == -1)
     {
         throw Exception("array '" + ToUtf8(FullName()) + "' size not defined", GetSpan());
     }
@@ -66,7 +66,7 @@ llvm::Type* ArrayTypeSymbol::IrType(Emitter& emitter)
 
 llvm::Constant* ArrayTypeSymbol::CreateDefaultIrValue(Emitter& emitter)
 {
-    if (size == 0)
+    if (size == -1)
     {
         throw Exception("array '" + ToUtf8(FullName()) + "' size not defined", GetSpan());
     }

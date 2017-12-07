@@ -8,6 +8,7 @@
 #include <cmajor/binder/BoundFunction.hpp>
 #include <cmajor/binder/BoundConstraint.hpp>
 #include <cmajor/binder/Concept.hpp>
+#include <cmajor/binder/TypeBinder.hpp>
 #include <cmajor/symbols/TemplateSymbol.hpp>
 #include <cmajor/symbols/InterfaceTypeSymbol.hpp>
 #include <cmajor/symbols/GlobalFlags.hpp>
@@ -448,6 +449,19 @@ bool FindClassTemplateSpecializationMatch(TypeSymbol* sourceType, TypeSymbol* ta
 bool FindConversions(BoundCompileUnit& boundCompileUnit, FunctionSymbol* function, std::vector<std::unique_ptr<BoundExpression>>& arguments, FunctionMatch& functionMatch, 
     ConversionType conversionType, ContainerScope* containerScope, BoundFunction* currentFunction, const Span& span)
 {
+    if (!currentFunction)
+    {
+        if (!function->IsBound())
+        {
+            Node* node = boundCompileUnit.GetSymbolTable().GetNodeNoThrow(function);
+            if (node)
+            {
+                TypeBinder typeBinder(boundCompileUnit);
+                typeBinder.SetContainerScope(containerScope);
+                node->Accept(typeBinder);
+            }
+        }
+    }
     int arity = arguments.size();
     if (arity == 1 && function->GroupName() == U"@constructor" && arguments[0]->GetType()->IsReferenceType())
     {
@@ -465,10 +479,6 @@ bool FindConversions(BoundCompileUnit& boundCompileUnit, FunctionSymbol* functio
         }
         ParameterSymbol* parameter = function->Parameters()[i];
         TypeSymbol* targetType = parameter->GetType();
-        if (targetType->RemoveConst(span)->IsBasicTypeSymbol())
-        {
-            targetType = targetType->RemoveConst(span);
-        }
         if (arity == 2 && function->GroupName() == U"operator=")
         {
             if (targetType->IsRvalueReferenceType() && !sourceType->IsRvalueReferenceType() && !argument->GetFlag(BoundExpressionFlags::bindToRvalueReference))

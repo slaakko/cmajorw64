@@ -23,19 +23,22 @@ namespace System.Ascii
         punct = 1u << 7u,
         space = 1u << 8u
     }
-
-    public static class CharClassTable
+    
+    public class CharClassTable
     {
-        static nothrow CharClassTable()
+        static nothrow CharClassTable() : instance(new CharClassTable())
         {
-            try
-            {
-                table.Resize(256);
-            }
-            catch (const Exception& ex)
-            {
-                RtExit(1);
-            }
+        }
+        public static nothrow CharClassTable& Instance()
+        {
+            return *instance;
+        }
+        public nothrow inline CharClass GetCharacterClass(char c)
+        {
+            return table[cast<byte>(c)];
+        }
+        private nothrow CharClassTable()
+        {
             SetCharacterClass(cast<byte>('a'), cast<byte>('z'), CharClass.lower);
             SetCharacterClass(cast<byte>('A'), cast<byte>('Z'), CharClass.upper);
             SetCharacterClass(cast<byte>('0'), cast<byte>('9'), CharClass.digit);
@@ -53,17 +56,14 @@ namespace System.Ascii
             SetCharacterClass(9u, 13u, CharClass.space);
             SetCharacterClass(32u, 32u, CharClass.space);
         }
-        public static nothrow CharClass GetCharacterClass(char c)
-        {
-            return table[cast<byte>(c)];
-        }
-        private static nothrow void SetCharacterClass(byte first, byte last, CharClass c)
+        private nothrow void SetCharacterClass(byte first, byte last, CharClass c)
         {
             for (byte i = first; i <= last; ++i)
             {
                 table[i] = cast<CharClass>(table[i] | c);
             }
         }
-        private static List<CharClass> table;
+        private static UniquePtr<CharClassTable> instance;
+        private CharClass[cast<long>(MaxValue<byte>()) + 1] table;
     }
 }

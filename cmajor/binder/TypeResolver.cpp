@@ -189,7 +189,7 @@ void TypeResolver::Visit(ArrayNode& arrayNode)
     {
         throw Exception("cannot have array of reference type", arrayNode.GetSpan());
     }
-    int64_t size = 0;
+    int64_t size = -1;
     if (arrayNode.Size())
     {
         std::unique_ptr<Value> sizeValue = Evaluate(arrayNode.Size(), boundCompileUnit.GetSymbolTable().GetTypeByName(U"long"), containerScope, boundCompileUnit, false, nullptr, arrayNode.GetSpan());

@@ -165,6 +165,7 @@ namespace cmajor.parser
         StringLiteral(var std::u32string s): Node*;
         NullLiteral: Node*;
         ArrayLiteral(ParsingContext* ctx): ArrayLiteralNode*;
+        StructuredLiteral(ParsingContext* ctx): StructuredLiteralNode*;
         CharEscape: char32_t;
         DecDigitSequence: uint64_t;
         HexDigitSequence: uint64_t;

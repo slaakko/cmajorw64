@@ -1,5 +1,5 @@
-#ifndef Literal_hpp_24813
-#define Literal_hpp_24813
+#ifndef Literal_hpp_27450
+#define Literal_hpp_27450
 
 #include <cmajor/parsing/Grammar.hpp>
 #include <cmajor/parsing/Keyword.hpp>
@@ -31,6 +31,7 @@ private:
     class StringLiteralRule;
     class NullLiteralRule;
     class ArrayLiteralRule;
+    class StructuredLiteralRule;
     class CharEscapeRule;
     class DecDigitSequenceRule;
     class HexDigitSequenceRule;
@@ -41,4 +42,4 @@ private:
 
 } } // namespace cmajor.parser
 
-#endif // Literal_hpp_24813
+#endif // Literal_hpp_27450

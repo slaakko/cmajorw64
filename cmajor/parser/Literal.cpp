@@ -118,6 +118,8 @@ public:
         a5ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<LiteralRule>(this, &LiteralRule::A5Action));
         cmajor::parsing::ActionParser* a6ActionParser = GetAction(ToUtf32("A6"));
         a6ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<LiteralRule>(this, &LiteralRule::A6Action));
+        cmajor::parsing::ActionParser* a7ActionParser = GetAction(ToUtf32("A7"));
+        a7ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<LiteralRule>(this, &LiteralRule::A7Action));
         cmajor::parsing::NonterminalParser* booleanLiteralNonterminalParser = GetNonterminal(ToUtf32("BooleanLiteral"));
         booleanLiteralNonterminalParser->SetPostCall(new cmajor::parsing::MemberPostCall<LiteralRule>(this, &LiteralRule::PostBooleanLiteral));
         cmajor::parsing::NonterminalParser* floatingLiteralNonterminalParser = GetNonterminal(ToUtf32("FloatingLiteral"));
@@ -133,6 +135,9 @@ public:
         cmajor::parsing::NonterminalParser* arrayLiteralNonterminalParser = GetNonterminal(ToUtf32("ArrayLiteral"));
         arrayLiteralNonterminalParser->SetPreCall(new cmajor::parsing::MemberPreCall<LiteralRule>(this, &LiteralRule::PreArrayLiteral));
         arrayLiteralNonterminalParser->SetPostCall(new cmajor::parsing::MemberPostCall<LiteralRule>(this, &LiteralRule::PostArrayLiteral));
+        cmajor::parsing::NonterminalParser* structuredLiteralNonterminalParser = GetNonterminal(ToUtf32("StructuredLiteral"));
+        structuredLiteralNonterminalParser->SetPreCall(new cmajor::parsing::MemberPreCall<LiteralRule>(this, &LiteralRule::PreStructuredLiteral));
+        structuredLiteralNonterminalParser->SetPostCall(new cmajor::parsing::MemberPostCall<LiteralRule>(this, &LiteralRule::PostStructuredLiteral));
     }
     void A0Action(const char32_t* matchBegin, const char32_t* matchEnd, const Span& span, const std::string& fileName, ParsingData* parsingData, bool& pass)
     {
@@ -168,6 +173,11 @@ public:
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
         context->value = context->fromArrayLiteral;
+    }
+    void A7Action(const char32_t* matchBegin, const char32_t* matchEnd, const Span& span, const std::string& fileName, ParsingData* parsingData, bool& pass)
+    {
+        Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
+        context->value = context->fromStructuredLiteral;
     }
     void PostBooleanLiteral(cmajor::parsing::ObjectStack& stack, ParsingData* parsingData, bool matched)
     {
@@ -244,10 +254,25 @@ public:
             stack.pop();
         }
     }
+    void PreStructuredLiteral(cmajor::parsing::ObjectStack& stack, ParsingData* parsingData)
+    {
+        Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
+        stack.push(std::unique_ptr<cmajor::parsing::Object>(new cmajor::parsing::ValueObject<ParsingContext*>(context->ctx)));
+    }
+    void PostStructuredLiteral(cmajor::parsing::ObjectStack& stack, ParsingData* parsingData, bool matched)
+    {
+        Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
+        if (matched)
+        {
+            std::unique_ptr<cmajor::parsing::Object> fromStructuredLiteral_value = std::move(stack.top());
+            context->fromStructuredLiteral = *static_cast<cmajor::parsing::ValueObject<StructuredLiteralNode*>*>(fromStructuredLiteral_value.get());
+            stack.pop();
+        }
+    }
 private:
     struct Context : cmajor::parsing::Context
     {
-        Context(): ctx(), value(), fromBooleanLiteral(), fromFloatingLiteral(), fromIntegerLiteral(), fromCharLiteral(), fromStringLiteral(), fromNullLiteral(), fromArrayLiteral() {}
+        Context(): ctx(), value(), fromBooleanLiteral(), fromFloatingLiteral(), fromIntegerLiteral(), fromCharLiteral(), fromStringLiteral(), fromNullLiteral(), fromArrayLiteral(), fromStructuredLiteral() {}
         ParsingContext* ctx;
         Node* value;
         Node* fromBooleanLiteral;
@@ -257,6 +282,7 @@ private:
         Node* fromStringLiteral;
         Node* fromNullLiteral;
         ArrayLiteralNode* fromArrayLiteral;
+        StructuredLiteralNode* fromStructuredLiteral;
     };
 };
 
@@ -1101,6 +1127,77 @@ private:
     };
 };
 
+class LiteralGrammar::StructuredLiteralRule : public cmajor::parsing::Rule
+{
+public:
+    StructuredLiteralRule(const std::u32string& name_, Scope* enclosingScope_, int id_, Parser* definition_):
+        cmajor::parsing::Rule(name_, enclosingScope_, id_, definition_)
+    {
+        AddInheritedAttribute(AttrOrVariable(ToUtf32("ParsingContext*"), ToUtf32("ctx")));
+        SetValueTypeName(ToUtf32("StructuredLiteralNode*"));
+    }
+    virtual void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData)
+    {
+        parsingData->PushContext(Id(), new Context());
+        Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
+        std::unique_ptr<cmajor::parsing::Object> ctx_value = std::move(stack.top());
+        context->ctx = *static_cast<cmajor::parsing::ValueObject<ParsingContext*>*>(ctx_value.get());
+        stack.pop();
+    }
+    virtual void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched)
+    {
+        Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
+        if (matched)
+        {
+            stack.push(std::unique_ptr<cmajor::parsing::Object>(new cmajor::parsing::ValueObject<StructuredLiteralNode*>(context->value)));
+        }
+        parsingData->PopContext(Id());
+    }
+    virtual void Link()
+    {
+        cmajor::parsing::ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
+        a0ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<StructuredLiteralRule>(this, &StructuredLiteralRule::A0Action));
+        cmajor::parsing::ActionParser* a1ActionParser = GetAction(ToUtf32("A1"));
+        a1ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<StructuredLiteralRule>(this, &StructuredLiteralRule::A1Action));
+        cmajor::parsing::NonterminalParser* expressionNonterminalParser = GetNonterminal(ToUtf32("Expression"));
+        expressionNonterminalParser->SetPreCall(new cmajor::parsing::MemberPreCall<StructuredLiteralRule>(this, &StructuredLiteralRule::PreExpression));
+        expressionNonterminalParser->SetPostCall(new cmajor::parsing::MemberPostCall<StructuredLiteralRule>(this, &StructuredLiteralRule::PostExpression));
+    }
+    void A0Action(const char32_t* matchBegin, const char32_t* matchEnd, const Span& span, const std::string& fileName, ParsingData* parsingData, bool& pass)
+    {
+        Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
+        context->value = new StructuredLiteralNode(span);
+    }
+    void A1Action(const char32_t* matchBegin, const char32_t* matchEnd, const Span& span, const std::string& fileName, ParsingData* parsingData, bool& pass)
+    {
+        Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
+        context->value->AddMember(context->fromExpression);
+    }
+    void PreExpression(cmajor::parsing::ObjectStack& stack, ParsingData* parsingData)
+    {
+        Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
+        stack.push(std::unique_ptr<cmajor::parsing::Object>(new cmajor::parsing::ValueObject<ParsingContext*>(context->ctx)));
+    }
+    void PostExpression(cmajor::parsing::ObjectStack& stack, ParsingData* parsingData, bool matched)
+    {
+        Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
+        if (matched)
+        {
+            std::unique_ptr<cmajor::parsing::Object> fromExpression_value = std::move(stack.top());
+            context->fromExpression = *static_cast<cmajor::parsing::ValueObject<Node*>*>(fromExpression_value.get());
+            stack.pop();
+        }
+    }
+private:
+    struct Context : cmajor::parsing::Context
+    {
+        Context(): ctx(), value(), fromExpression() {}
+        ParsingContext* ctx;
+        StructuredLiteralNode* value;
+        Node* fromExpression;
+    };
+};
+
 class LiteralGrammar::CharEscapeRule : public cmajor::parsing::Rule
 {
 public:
@@ -1519,20 +1616,23 @@ void LiteralGrammar::CreateRules()
                     new cmajor::parsing::AlternativeParser(
                         new cmajor::parsing::AlternativeParser(
                             new cmajor::parsing::AlternativeParser(
-                                new cmajor::parsing::ActionParser(ToUtf32("A0"),
-                                    new cmajor::parsing::NonterminalParser(ToUtf32("BooleanLiteral"), ToUtf32("BooleanLiteral"), 0)),
-                                new cmajor::parsing::ActionParser(ToUtf32("A1"),
-                                    new cmajor::parsing::NonterminalParser(ToUtf32("FloatingLiteral"), ToUtf32("FloatingLiteral"), 0))),
-                            new cmajor::parsing::ActionParser(ToUtf32("A2"),
-                                new cmajor::parsing::NonterminalParser(ToUtf32("IntegerLiteral"), ToUtf32("IntegerLiteral"), 0))),
-                        new cmajor::parsing::ActionParser(ToUtf32("A3"),
-                            new cmajor::parsing::NonterminalParser(ToUtf32("CharLiteral"), ToUtf32("CharLiteral"), 0))),
-                    new cmajor::parsing::ActionParser(ToUtf32("A4"),
-                        new cmajor::parsing::NonterminalParser(ToUtf32("StringLiteral"), ToUtf32("StringLiteral"), 0))),
-                new cmajor::parsing::ActionParser(ToUtf32("A5"),
-                    new cmajor::parsing::NonterminalParser(ToUtf32("NullLiteral"), ToUtf32("NullLiteral"), 0))),
-            new cmajor::parsing::ActionParser(ToUtf32("A6"),
-                new cmajor::parsing::NonterminalParser(ToUtf32("ArrayLiteral"), ToUtf32("ArrayLiteral"), 1)))));
+                                new cmajor::parsing::AlternativeParser(
+                                    new cmajor::parsing::ActionParser(ToUtf32("A0"),
+                                        new cmajor::parsing::NonterminalParser(ToUtf32("BooleanLiteral"), ToUtf32("BooleanLiteral"), 0)),
+                                    new cmajor::parsing::ActionParser(ToUtf32("A1"),
+                                        new cmajor::parsing::NonterminalParser(ToUtf32("FloatingLiteral"), ToUtf32("FloatingLiteral"), 0))),
+                                new cmajor::parsing::ActionParser(ToUtf32("A2"),
+                                    new cmajor::parsing::NonterminalParser(ToUtf32("IntegerLiteral"), ToUtf32("IntegerLiteral"), 0))),
+                            new cmajor::parsing::ActionParser(ToUtf32("A3"),
+                                new cmajor::parsing::NonterminalParser(ToUtf32("CharLiteral"), ToUtf32("CharLiteral"), 0))),
+                        new cmajor::parsing::ActionParser(ToUtf32("A4"),
+                            new cmajor::parsing::NonterminalParser(ToUtf32("StringLiteral"), ToUtf32("StringLiteral"), 0))),
+                    new cmajor::parsing::ActionParser(ToUtf32("A5"),
+                        new cmajor::parsing::NonterminalParser(ToUtf32("NullLiteral"), ToUtf32("NullLiteral"), 0))),
+                new cmajor::parsing::ActionParser(ToUtf32("A6"),
+                    new cmajor::parsing::NonterminalParser(ToUtf32("ArrayLiteral"), ToUtf32("ArrayLiteral"), 1))),
+            new cmajor::parsing::ActionParser(ToUtf32("A7"),
+                new cmajor::parsing::NonterminalParser(ToUtf32("StructuredLiteral"), ToUtf32("StructuredLiteral"), 1)))));
     AddRule(new BooleanLiteralRule(ToUtf32("BooleanLiteral"), GetScope(), GetParsingDomain()->GetNextRuleId(),
         new cmajor::parsing::AlternativeParser(
             new cmajor::parsing::ActionParser(ToUtf32("A0"),
@@ -1755,12 +1855,25 @@ void LiteralGrammar::CreateRules()
             new cmajor::parsing::SequenceParser(
                 new cmajor::parsing::ActionParser(ToUtf32("A0"),
                     new cmajor::parsing::CharParser('[')),
-                new cmajor::parsing::ListParser(
-                    new cmajor::parsing::ActionParser(ToUtf32("A1"),
-                        new cmajor::parsing::NonterminalParser(ToUtf32("Expression"), ToUtf32("Expression"), 1)),
-                    new cmajor::parsing::CharParser(','))),
+                new cmajor::parsing::OptionalParser(
+                    new cmajor::parsing::ListParser(
+                        new cmajor::parsing::ActionParser(ToUtf32("A1"),
+                            new cmajor::parsing::NonterminalParser(ToUtf32("Expression"), ToUtf32("Expression"), 1)),
+                        new cmajor::parsing::CharParser(',')))),
             new cmajor::parsing::ExpectationParser(
                 new cmajor::parsing::CharParser(']')))));
+    AddRule(new StructuredLiteralRule(ToUtf32("StructuredLiteral"), GetScope(), GetParsingDomain()->GetNextRuleId(),
+        new cmajor::parsing::SequenceParser(
+            new cmajor::parsing::SequenceParser(
+                new cmajor::parsing::ActionParser(ToUtf32("A0"),
+                    new cmajor::parsing::CharParser('{')),
+                new cmajor::parsing::OptionalParser(
+                    new cmajor::parsing::ListParser(
+                        new cmajor::parsing::ActionParser(ToUtf32("A1"),
+                            new cmajor::parsing::NonterminalParser(ToUtf32("Expression"), ToUtf32("Expression"), 1)),
+                        new cmajor::parsing::CharParser(',')))),
+            new cmajor::parsing::ExpectationParser(
+                new cmajor::parsing::CharParser('}')))));
     AddRule(new CharEscapeRule(ToUtf32("CharEscape"), GetScope(), GetParsingDomain()->GetNextRuleId(),
         new cmajor::parsing::TokenParser(
             new cmajor::parsing::SequenceParser(

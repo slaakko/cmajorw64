@@ -336,6 +336,10 @@ void SymbolTable::BeginFunction(FunctionNode& functionNode)
 {
     FunctionSymbol* functionSymbol = new FunctionSymbol(functionNode.GetSpan(), functionNode.GroupId());
     SetFunctionIdFor(functionSymbol);
+    if ((functionNode.GetSpecifiers() & Specifiers::constexpr_) != Specifiers::none)
+    {
+        functionSymbol->SetConstExpr();
+    }
     functionSymbol->SetCompileUnit(currentCompileUnit);
     functionSymbol->SetSymbolTable(this);
     functionSymbol->SetGroupName(functionNode.GroupId());
@@ -524,6 +528,10 @@ void SymbolTable::BeginConstructor(ConstructorNode& constructorNode)
 {
     ConstructorSymbol* constructorSymbol = new ConstructorSymbol(constructorNode.GetSpan(), U"@constructor");
     SetFunctionIdFor(constructorSymbol);
+    if ((constructorNode.GetSpecifiers() & Specifiers::constexpr_) != Specifiers::none)
+    {
+        constructorSymbol->SetConstExpr();
+    }
     constructorSymbol->SetCompileUnit(currentCompileUnit);
     constructorSymbol->SetSymbolTable(this);
     if (constructorNode.WhereConstraint())
@@ -605,6 +613,10 @@ void SymbolTable::BeginMemberFunction(MemberFunctionNode& memberFunctionNode)
 {
     MemberFunctionSymbol* memberFunctionSymbol = new MemberFunctionSymbol(memberFunctionNode.GetSpan(), memberFunctionNode.GroupId());
     SetFunctionIdFor(memberFunctionSymbol);
+    if ((memberFunctionNode.GetSpecifiers() & Specifiers::constexpr_) != Specifiers::none)
+    {
+        memberFunctionSymbol->SetConstExpr();
+    }
     memberFunctionSymbol->SetCompileUnit(currentCompileUnit);
     memberFunctionSymbol->SetSymbolTable(this);
     memberFunctionSymbol->SetGroupName(memberFunctionNode.GroupId());
@@ -661,6 +673,10 @@ void SymbolTable::BeginConversionFunction(ConversionFunctionNode& conversionFunc
 {
     ConversionFunctionSymbol* conversionFunctionSymbol = new ConversionFunctionSymbol(conversionFunctionNode.GetSpan(), U"@conversion");
     SetFunctionIdFor(conversionFunctionSymbol);
+    if ((conversionFunctionNode.GetSpecifiers() & Specifiers::constexpr_) != Specifiers::none)
+    {
+        conversionFunctionSymbol->SetConstExpr();
+    }
     conversionFunctionSymbol->SetCompileUnit(currentCompileUnit);
     conversionFunctionSymbol->SetSymbolTable(this);
     conversionFunctionSymbol->SetGroupName(U"@operator_conv");
@@ -1144,6 +1160,10 @@ TypeSymbol* SymbolTable::MakeDerivedType(TypeSymbol* baseType, const TypeDerivat
         TypedefSymbol* valueType = new TypedefSymbol(span, U"ValueType");
         valueType->SetAccess(SymbolAccess::public_);
         valueType->SetType(derivedType->RemovePointer(span));
+        if (valueType->GetType()->RemoveConst(span)->IsBasicTypeSymbol())
+        {
+            valueType->SetType(valueType->GetType()->RemoveConst(span));
+        }
         valueType->SetBound();
         valueType->GetType()->MarkExport();
         derivedType->AddMember(valueType);

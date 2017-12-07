@@ -25,6 +25,7 @@ namespace cmajor.parser
             |   StringLiteral{ value = StringLiteral; }
             |   NullLiteral{ value = NullLiteral; }
             |   ArrayLiteral(ctx){ value = ArrayLiteral; }
+            |   StructuredLiteral(ctx){ value = StructuredLiteral; }
             ;
 
         BooleanLiteral : Node*
@@ -137,7 +138,11 @@ namespace cmajor.parser
             ;
 
         ArrayLiteral(ParsingContext* ctx) : ArrayLiteralNode*
-            ::= '['{ value = new ArrayLiteralNode(span); } (Expression(ctx){ value->AddValue(Expression); } % ',') ']'!
+            ::= '['{ value = new ArrayLiteralNode(span); } (Expression(ctx){ value->AddValue(Expression); } % ',')? ']'!
+            ;
+
+        StructuredLiteral(ParsingContext* ctx) : StructuredLiteralNode*
+            ::= '{'{ value = new StructuredLiteralNode(span); } (Expression(ctx){ value->AddMember(Expression); } % ',')? '}'!
             ;
 
         CharEscape : char32_t

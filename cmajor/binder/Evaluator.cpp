@@ -573,6 +573,7 @@ public:
     void Visit(UStringLiteralNode& ustringLiteralNode) override;
     void Visit(NullLiteralNode& nullLiteralNode) override;
     void Visit(ArrayLiteralNode& arrayLiteralNode) override;
+    void Visit(StructuredLiteralNode& structuredLiteralNode) override;
 
     void Visit(IdentifierNode& identifierNode) override;
     void Visit(TemplateIdNode& templateIdNode) override;
@@ -1842,7 +1843,7 @@ void Evaluator::Visit(ArrayLiteralNode& arrayLiteralNode)
     TypeSymbol* elementType = arrayType->ElementType();
     std::vector<std::unique_ptr<Value>> elementValues;
     int n = arrayLiteralNode.Values().Count();
-    if (arrayType->Size() != 0 && arrayType->Size() != n)
+    if (arrayType->Size() != -1 && arrayType->Size() != n)
     {
         if (dontThrow)
         {
@@ -1859,11 +1860,49 @@ void Evaluator::Visit(ArrayLiteralNode& arrayLiteralNode)
         value = Evaluate(arrayLiteralNode.Values()[i], elementType, containerScope, boundCompileUnit, dontThrow, currentFunction, arrayLiteralNode.GetSpan());
         elementValues.push_back(std::move(value));
     }
-    if (arrayType->Size() == 0)
+    if (arrayType->Size() == -1)
     {
         arrayType = symbolTable->MakeArrayType(arrayType->ElementType(), n, arrayLiteralNode.GetSpan());
     }
     value.reset(new ArrayValue(arrayLiteralNode.GetSpan(), arrayType, std::move(elementValues)));
+}
+
+void Evaluator::Visit(StructuredLiteralNode& structuredLiteralNode)
+{
+    if (targetValueType != ValueType::structuredValue)
+    {
+        if (dontThrow)
+        {
+            error = true;
+            return;
+        }
+        else
+        {
+            throw Exception("class type expected", span);
+        }
+    }
+    ClassTypeSymbol* classType = static_cast<ClassTypeSymbol*>(targetType);
+    std::vector<std::unique_ptr<Value>> memberValues;
+    int n = structuredLiteralNode.Members().Count();
+    if (classType->MemberVariables().size() != n)
+    {
+        if (dontThrow)
+        {
+            error = true;
+            return;
+        }
+        else
+        {
+            throw Exception("wrong number of members for class literal of type '" + ToUtf8(classType->FullName()) + "'", structuredLiteralNode.GetSpan());
+        }
+    }
+    for (int i = 0; i < n; ++i)
+    {
+        TypeSymbol* memberType = classType->MemberVariables()[i]->GetType();
+        value = Evaluate(structuredLiteralNode.Members()[i], memberType, containerScope, boundCompileUnit, dontThrow, currentFunction, structuredLiteralNode.GetSpan());
+        memberValues.push_back(std::move(value));
+    }
+    value.reset(new StructuredValue(structuredLiteralNode.GetSpan(), classType, std::move(memberValues)));
 }
 
 void Evaluator::Visit(IdentifierNode& identifierNode)
@@ -2867,7 +2906,7 @@ std::unique_ptr<Value> Evaluate(Node* node, TypeSymbol* targetType, ContainerSco
         {
             if (!TypesEqual(targetType, value->GetType(&boundCompileUnit.GetSymbolTable())))
             {
-                if (targetType->IsArrayType() && static_cast<ArrayTypeSymbol*>(targetType)->Size() == 0)
+                if (targetType->IsArrayType() && static_cast<ArrayTypeSymbol*>(targetType)->Size() == -1)
                 {
                     return std::move(value);
                 }

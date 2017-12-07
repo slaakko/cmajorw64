@@ -43,6 +43,7 @@ class WStringLiteralNode;
 class UStringLiteralNode;
 class NullLiteralNode;
 class ArrayLiteralNode;
+class StructuredLiteralNode;
 
 class CompileUnitNode;
 class NamespaceNode;
@@ -217,6 +218,7 @@ public:
     virtual void Visit(UStringLiteralNode& ustringLiteralNode) {}
     virtual void Visit(NullLiteralNode& nullLiteralNode) {}
     virtual void Visit(ArrayLiteralNode& arrayLiteralNode) {}
+    virtual void Visit(StructuredLiteralNode& structuredLiteralNode) {}
 
     virtual void Visit(CompileUnitNode& compileUnitNode) {}
     virtual void Visit(NamespaceNode& namespaceNode) {}

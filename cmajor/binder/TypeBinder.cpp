@@ -131,6 +131,8 @@ void TypeBinder::Visit(FunctionNode& functionNode)
     Symbol* symbol = symbolTable.GetSymbol(&functionNode);
     Assert(symbol->GetSymbolType() == SymbolType::functionSymbol, "function symbol expected");
     FunctionSymbol* functionSymbol = static_cast<FunctionSymbol*>(symbol);
+    if (functionSymbol->IsBound()) return;
+    functionSymbol->SetBound();
     FunctionSymbol* prevFunctionSymbol = currentFunctionSymbol;
     currentFunctionSymbol = functionSymbol;
     if (functionSymbol->IsFunctionTemplate())
@@ -355,6 +357,8 @@ void TypeBinder::Visit(ConstructorNode& constructorNode)
     Symbol* symbol = symbolTable.GetSymbol(&constructorNode);
     Assert(symbol->GetSymbolType() == SymbolType::constructorSymbol, "constructor symbol expected");
     ConstructorSymbol* constructorSymbol = static_cast<ConstructorSymbol*>(symbol);
+    if (constructorSymbol->IsBound()) return;
+    constructorSymbol->SetBound();
     FunctionSymbol* prevFunctionSymbol = currentFunctionSymbol;
     currentFunctionSymbol = constructorSymbol;
     ContainerScope* prevContainerScope = containerScope;
@@ -482,6 +486,8 @@ void TypeBinder::Visit(MemberFunctionNode& memberFunctionNode)
     Symbol* symbol = symbolTable.GetSymbol(&memberFunctionNode);
     Assert(symbol->GetSymbolType() == SymbolType::memberFunctionSymbol, "member function symbol expected");
     MemberFunctionSymbol* memberFunctionSymbol = static_cast<MemberFunctionSymbol*>(symbol);
+    if (memberFunctionSymbol->IsBound()) return;
+    memberFunctionSymbol->SetBound();
     FunctionSymbol* prevFunctionSymbol = currentFunctionSymbol;
     currentFunctionSymbol = memberFunctionSymbol;
     ContainerScope* prevContainerScope = containerScope;
@@ -558,6 +564,8 @@ void TypeBinder::Visit(ConversionFunctionNode& conversionFunctionNode)
     Symbol* symbol = symbolTable.GetSymbol(&conversionFunctionNode);
     Assert(symbol->GetSymbolType() == SymbolType::conversionFunctionSymbol, "conversion function symbol expected");
     ConversionFunctionSymbol* conversionFunctionSymbol = static_cast<ConversionFunctionSymbol*>(symbol);
+    if (conversionFunctionSymbol->IsBound()) return;
+    conversionFunctionSymbol->SetBound();
     FunctionSymbol* prevFunctionSymbol = currentFunctionSymbol;
     currentFunctionSymbol = conversionFunctionSymbol;
     ContainerScope* prevContainerScope = containerScope;

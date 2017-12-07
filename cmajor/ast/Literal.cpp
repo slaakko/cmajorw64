@@ -693,7 +693,46 @@ void ArrayLiteralNode::Read(AstReader& reader)
 
 void ArrayLiteralNode::AddValue(Node* value)
 {
+    value->SetParent(this);
     values.Add(value);
+}
+
+StructuredLiteralNode::StructuredLiteralNode(const Span& span_) : Node(NodeType::structuredLiteralNode, span_)
+{
+}
+
+Node* StructuredLiteralNode::Clone(CloneContext& cloneContext) const
+{
+    StructuredLiteralNode* clone = new StructuredLiteralNode(GetSpan());
+    int n = members.Count();
+    for (int i = 0; i < n; ++i)
+    {
+        clone->AddMember(members[i]->Clone(cloneContext));
+    }
+    return clone;
+}
+
+void StructuredLiteralNode::Accept(Visitor& visitor)
+{
+    visitor.Visit(*this);
+}
+
+void StructuredLiteralNode::Write(AstWriter& writer)
+{
+    Node::Write(writer);
+    members.Write(writer);
+}
+
+void StructuredLiteralNode::Read(AstReader& reader)
+{
+    Node::Read(reader);
+    members.Read(reader);
+}
+
+void StructuredLiteralNode::AddMember(Node* member)
+{
+    member->SetParent(this);
+    members.Add(member);
 }
 
 } } // namespace cmajor::ast

@@ -293,6 +293,22 @@ private:
     NodeList<Node> values;
 };
 
+class StructuredLiteralNode : public Node
+{
+public:
+    StructuredLiteralNode(const Span& span_);
+    Node* Clone(CloneContext& cloneContext) const override;
+    void Accept(Visitor& visitor) override;
+    void Write(AstWriter& writer) override;
+    void Read(AstReader& reader) override;
+    std::string ToString() const override { return "structure"; }
+    void AddMember(Node* member);
+    const NodeList<Node>& Members() const { return members; }
+    NodeList<Node>& Members() { return members; }
+private:
+    NodeList<Node> members;
+};
+
 } } // namespace cmajor::ast
 
 #endif // CMAJOR_AST_LITERAL_INCLUDED

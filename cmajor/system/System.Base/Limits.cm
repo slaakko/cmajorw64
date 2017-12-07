@@ -84,7 +84,7 @@ namespace System
     {
         return cast<ulong>(0xFFFFFFFFFFFFFFFF);
     }
-
+    
     public constexpr inline nothrow I MinValue<I>() 
     {
         return MinValue(cast<I>(0));
