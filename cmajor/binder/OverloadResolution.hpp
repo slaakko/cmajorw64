@@ -102,7 +102,7 @@ std::unique_ptr<BoundFunctionCall> ResolveOverload(const std::u32string& groupNa
 
 std::unique_ptr<BoundFunctionCall> ResolveOverload(const std::u32string& groupName, ContainerScope* containerScope, const std::vector<FunctionScopeLookup>& functionScopeLookups,
     std::vector<std::unique_ptr<BoundExpression>>& arguments, BoundCompileUnit& boundCompileUnit, BoundFunction* currentFunction, const Span& span, 
-    OverloadResolutionFlags flags, const std::vector<TypeSymbol*>& templateArgumentTypes, std::unique_ptr<Exception>& exception);
+    OverloadResolutionFlags flags, std::vector<TypeSymbol*>& templateArgumentTypes, std::unique_ptr<Exception>& exception);
 
 } } // namespace cmajor::binder
 

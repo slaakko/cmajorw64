@@ -18,7 +18,7 @@ namespace cmajor { namespace symbols {
 
 using namespace cmajor::unicode;
 
-ConstantSymbol::ConstantSymbol(const Span& span_, const std::u32string& name_) : Symbol(SymbolType::constantSymbol, span_, name_), type(), evaluating(false)
+ConstantSymbol::ConstantSymbol(const Span& span_, const std::u32string& name_) : Symbol(SymbolType::constantSymbol, span_, name_), type(), evaluating(false), sizeOfValue(0), valuePos(0)
 {
 }
 
@@ -26,9 +26,22 @@ void ConstantSymbol::Write(SymbolWriter& writer)
 {
     Symbol::Write(writer);
     writer.GetBinaryWriter().Write(type->TypeId());
-    bool hasExternalValue = type->IsBasicTypeSymbol() || type->IsEnumeratedType();
-    writer.GetBinaryWriter().Write(hasExternalValue);
-    if (hasExternalValue)
+    bool hasComplexValue = value->IsComplexValue();
+    writer.GetBinaryWriter().Write(hasComplexValue);
+    if (hasComplexValue)
+    {
+        uint32_t sizePos = writer.GetBinaryWriter().Pos();
+        uint32_t sizeOfValue = 0;
+        writer.GetBinaryWriter().Write(sizeOfValue);
+        uint32_t startPos = writer.GetBinaryWriter().Pos();
+        value->Write(writer.GetBinaryWriter());
+        uint32_t endPos = writer.GetBinaryWriter().Pos();
+        sizeOfValue = endPos - startPos;
+        writer.GetBinaryWriter().Seek(sizePos);
+        writer.GetBinaryWriter().Write(sizeOfValue);
+        writer.GetBinaryWriter().Seek(endPos);
+    }
+    else
     {
         WriteValue(value.get(), writer.GetBinaryWriter());
     }
@@ -39,11 +52,38 @@ void ConstantSymbol::Read(SymbolReader& reader)
     Symbol::Read(reader);
     uint32_t typeId = reader.GetBinaryReader().ReadUInt();
     GetSymbolTable()->EmplaceTypeRequest(this, typeId, 0);
-    bool hasExternalValue = reader.GetBinaryReader().ReadBool();
-    if (hasExternalValue)
+    bool hasComplexValue = reader.GetBinaryReader().ReadBool();
+    if (hasComplexValue)
+    {
+        sizeOfValue = reader.GetBinaryReader().ReadUInt();
+        valuePos = reader.GetBinaryReader().Pos();
+        reader.GetBinaryReader().Skip(sizeOfValue);
+        filePathReadFrom = reader.GetBinaryReader().FileName();
+    }
+    else
     {
         value = ReadValue(reader.GetBinaryReader(), GetSpan());
     }
+}
+
+Value* ConstantSymbol::GetValue() 
+{
+    if (!value)
+    {
+        if (filePathReadFrom.empty())
+        {
+            throw Exception("internal error: could not read value: value file name not set", GetSpan());
+        }
+        BinaryReader reader(filePathReadFrom);
+        reader.Skip(valuePos);
+        value.reset(type->MakeValue());
+        if (!value)
+        {
+            throw Exception("internal error: could not read value because could not create value of type '" + ToUtf8(type->FullName()) + "'", GetSpan());
+        }
+        value->Read(reader);
+    }
+    return value.get(); 
 }
 
 void ConstantSymbol::EmplaceType(TypeSymbol* typeSymbol, int index)
@@ -189,6 +229,31 @@ llvm::Value* ConstantSymbol::ArrayIrObject(Emitter& emitter, bool create)
         arrayObjectGlobal->setInitializer(llvm::cast<llvm::Constant>(arrayValue->IrValue(emitter)));
     }
     return irArrayObject;
+}
+
+llvm::Value* ConstantSymbol::StructureIrObject(Emitter& emitter, bool create)
+{
+    if (!type->IsClassTypeSymbol())
+    {
+        throw Exception("internal error: class type object expected", GetSpan());
+    }
+    if (!value)
+    {
+        throw Exception("internal error: structured value missing", GetSpan());
+    }
+    if (value->GetValueType() != ValueType::structuredValue)
+    {
+        throw Exception("internal error: structured value expected", GetSpan());
+    }
+    StructuredValue* structuredValue = static_cast<StructuredValue*>(value.get());
+    llvm::StructType* irStructureType = llvm::cast<llvm::StructType>(type->IrType(emitter));
+    llvm::Constant* irStructureObject = emitter.Module()->getOrInsertGlobal(ToUtf8(MangledName()), irStructureType);
+    if (create)
+    {
+        llvm::GlobalVariable* structureObjectGlobal = llvm::cast<llvm::GlobalVariable>(irStructureObject);
+        structureObjectGlobal->setInitializer(llvm::cast<llvm::Constant>(structuredValue->IrValue(emitter)));
+    }
+    return irStructureObject;
 }
 
 } } // namespace cmajor::symbols

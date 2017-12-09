@@ -157,6 +157,11 @@ ValueType EnumTypeSymbol::GetValueType() const
     return underlyingType->GetValueType();
 }
 
+Value* EnumTypeSymbol::MakeValue() const
+{
+    return underlyingType->MakeValue();
+}
+
 EnumConstantSymbol::EnumConstantSymbol(const Span& span_, const std::u32string& name_) : Symbol(SymbolType::enumConstantSymbol, span_, name_), evaluating(false)
 {
 }

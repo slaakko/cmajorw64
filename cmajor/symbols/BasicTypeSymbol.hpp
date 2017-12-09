@@ -53,6 +53,7 @@ public:
     llvm::Constant* CreateDefaultIrValue(Emitter& emitter) override { return emitter.Builder().getInt1(false); }
     bool IsSwitchConditionType() const override { return true; }
     ValueType GetValueType() const override;
+    Value* MakeValue() const override;
 };
 
 class SByteTypeSymbol : public BasicTypeSymbol
@@ -65,6 +66,7 @@ public:
     bool IsIntegralType() const override { return true; }
     bool IsSwitchConditionType() const override { return true; }
     ValueType GetValueType() const override;
+    Value* MakeValue() const override;
 };
 
 class ByteTypeSymbol : public BasicTypeSymbol
@@ -78,6 +80,7 @@ public:
     bool IsUnsignedType() const override { return true; }
     bool IsSwitchConditionType() const override { return true; }
     ValueType GetValueType() const override;
+    Value* MakeValue() const override;
 };
 
 class ShortTypeSymbol : public BasicTypeSymbol
@@ -90,6 +93,7 @@ public:
     bool IsIntegralType() const override { return true; }
     bool IsSwitchConditionType() const override { return true; }
     ValueType GetValueType() const override;
+    Value* MakeValue() const override;
 };
 
 class UShortTypeSymbol : public BasicTypeSymbol
@@ -103,6 +107,7 @@ public:
     bool IsUnsignedType() const override { return true; }
     bool IsSwitchConditionType() const override { return true; }
     ValueType GetValueType() const override;
+    Value* MakeValue() const override;
 };
 
 class IntTypeSymbol : public BasicTypeSymbol
@@ -115,6 +120,7 @@ public:
     bool IsIntegralType() const override { return true; }
     bool IsSwitchConditionType() const override { return true; }
     ValueType GetValueType() const override;
+    Value* MakeValue() const override;
 };
 
 class UIntTypeSymbol : public BasicTypeSymbol
@@ -128,6 +134,7 @@ public:
     bool IsUnsignedType() const override { return true; }
     bool IsSwitchConditionType() const override { return true; }
     ValueType GetValueType() const override;
+    Value* MakeValue() const override;
 };
 
 class LongTypeSymbol : public BasicTypeSymbol
@@ -140,6 +147,7 @@ public:
     bool IsIntegralType() const override { return true; }
     bool IsSwitchConditionType() const override { return true; }
     ValueType GetValueType() const override;
+    Value* MakeValue() const override;
 };
 
 class ULongTypeSymbol : public BasicTypeSymbol
@@ -153,6 +161,7 @@ public:
     bool IsUnsignedType() const override { return true; }
     bool IsSwitchConditionType() const override { return true; }
     ValueType GetValueType() const override;
+    Value* MakeValue() const override;
 };
 
 class FloatTypeSymbol : public BasicTypeSymbol
@@ -164,6 +173,7 @@ public:
     llvm::Constant* CreateDefaultIrValue(Emitter& emitter) override { return llvm::ConstantFP::get(llvm::Type::getFloatTy(emitter.Context()), 0.0); }
     bool IsFloatingPointType() const override { return true; }
     ValueType GetValueType() const override;
+    Value* MakeValue() const override;
 };
 
 class DoubleTypeSymbol : public BasicTypeSymbol
@@ -175,6 +185,7 @@ public:
     llvm::Constant* CreateDefaultIrValue(Emitter& emitter) override { return llvm::ConstantFP::get(llvm::Type::getDoubleTy(emitter.Context()), 0.0); }
     bool IsFloatingPointType() const override { return true; }
     ValueType GetValueType() const override;
+    Value* MakeValue() const override;
 };
 
 class CharTypeSymbol : public BasicTypeSymbol
@@ -186,6 +197,7 @@ public:
     llvm::Constant* CreateDefaultIrValue(Emitter& emitter) override { return emitter.Builder().getInt8(0); }
     bool IsSwitchConditionType() const override { return true; }
     ValueType GetValueType() const override;
+    Value* MakeValue() const override;
 };
 
 class WCharTypeSymbol : public BasicTypeSymbol
@@ -197,6 +209,7 @@ public:
     llvm::Constant* CreateDefaultIrValue(Emitter& emitter) override { return emitter.Builder().getInt16(0); }
     bool IsSwitchConditionType() const override { return true; }
     ValueType GetValueType() const override;
+    Value* MakeValue() const override;
 };
 
 class UCharTypeSymbol : public BasicTypeSymbol
@@ -208,6 +221,7 @@ public:
     llvm::Constant* CreateDefaultIrValue(Emitter& emitter) override { return emitter.Builder().getInt32(0); }
     bool IsSwitchConditionType() const override { return true; }
     ValueType GetValueType() const override;
+    Value* MakeValue() const override;
 };
 
 class VoidTypeSymbol : public BasicTypeSymbol

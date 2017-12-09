@@ -762,6 +762,15 @@ void ClassTypeSymbol::SetSpecialMemberFunctions()
     }
 }
 
+bool ClassTypeSymbol::IsLiteralClassType() const
+{
+    if (IsPolymorphic()) return false;
+    if (HasNontrivialDestructor()) return false;
+    if (!StaticMemberVariables().empty()) return false;
+    if (BaseClass()) return false;
+    return true;
+}
+
 void ClassTypeSymbol::SetInitializedVar(MemberVariableSymbol* initializedVar_) 
 { 
     initializedVar.reset(initializedVar_); 
@@ -1263,6 +1272,12 @@ const std::string& ClassTypeSymbol::StaticObjectName()
 ValueType ClassTypeSymbol::GetValueType() const
 {
     return ValueType::structuredValue;
+}
+
+Value* ClassTypeSymbol::MakeValue() const
+{
+    std::vector<std::unique_ptr<Value>> memberValues;
+    return new StructuredValue(GetSpan(), const_cast<TypeSymbol*>(static_cast<const TypeSymbol*>(this)), std::move(memberValues));
 }
 
 } } // namespace cmajor::symbols

@@ -276,6 +276,11 @@ void Emitter::Visit(BoundCompileUnit& boundCompileUnit)
     {
         constantSymbol->ArrayIrObject(*this, true);
     }
+    ConstantStructureRepository& constantStructureRepository = boundCompileUnit.GetConstantStructureRepository();
+    for (ConstantSymbol* constantSymbol : constantStructureRepository.ConstantStructures())
+    {
+        constantSymbol->StructureIrObject(*this, true);
+    }
     int n = boundCompileUnit.BoundNodes().size();
     for (int i = 0; i < n; ++i)
     {

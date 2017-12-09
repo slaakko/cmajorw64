@@ -3846,10 +3846,12 @@ llvm::Value* PointerValue::IrValue(Emitter& emitter)
 
 void PointerValue::Write(BinaryWriter& writer)
 {
+    Assert(false, "write for pointer value not supported");
 }
 
 void PointerValue::Read(BinaryReader& reader)
 {
+    Assert(false, "write for ustring value not supported");
 }
 
 Value* PointerValue::As(TypeSymbol* targetType, bool cast, const Span& span, bool dontThrow) const
@@ -4021,10 +4023,24 @@ llvm::Value* ArrayValue::IrValue(Emitter& emitter)
 
 void ArrayValue::Write(BinaryWriter& writer)
 {
+    int64_t length = elementValues.size();
+    writer.Write(length);
+    for (int64_t i = 0; i < length; ++i)
+    {
+        Value* value = elementValues[i].get();
+        value->Write(writer);
+    }
 }
 
 void ArrayValue::Read(BinaryReader& reader)
 {
+    int64_t length = reader.ReadLong();
+    for (int64_t i = 0; i < length; ++i)
+    {
+        Value* elementValue = static_cast<ArrayTypeSymbol*>(type)->ElementType()->MakeValue();
+        elementValue->Read(reader);
+        elementValues.push_back(std::unique_ptr<Value>(elementValue));
+    }
 }
 
 Value* ArrayValue::As(TypeSymbol* targetType, bool cast, const Span& span, bool dontThrow) const
@@ -4065,16 +4081,45 @@ Value* StructuredValue::Clone() const
 
 llvm::Value* StructuredValue::IrValue(Emitter& emitter) 
 {
-    // todo
-    return nullptr;
+    std::vector<llvm::Constant*> memberConstants;
+    int64_t n = memberValues.size();
+    if (n == 0)
+    {
+        ClassTypeSymbol* classType = static_cast<ClassTypeSymbol*>(type);
+        const std::vector<TypeSymbol*>& objectLayout = classType->ObjectLayout();
+        n = objectLayout.size();
+        for (int64_t i = 0; i < n; ++i)
+        {
+            TypeSymbol* type = objectLayout[i];
+            memberConstants.push_back(type->CreateDefaultIrValue(emitter));
+        }
+    }
+    else
+    {
+        for (int64_t i = 0; i < n; ++i)
+        {
+            memberConstants.push_back(llvm::cast<llvm::Constant>(memberValues[i]->IrValue(emitter)));
+        }
+    }
+    return llvm::ConstantStruct::get(llvm::cast<llvm::StructType>(type->IrType(emitter)), memberConstants);
 }
 
 void StructuredValue::Write(BinaryWriter& writer)
 {
+    for (const std::unique_ptr<Value>& memberValue : memberValues)
+    {
+        memberValue->Write(writer);
+    }
 }
 
 void StructuredValue::Read(BinaryReader& reader)
 {
+    for (MemberVariableSymbol* memberVariable : static_cast<ClassTypeSymbol*>(type)->MemberVariables())
+    {
+        Value* memberValue = memberVariable->GetType()->MakeValue();
+        memberValue->Read(reader);
+        memberValues.push_back(std::unique_ptr<Value>(memberValue));
+    }
 }
 
 Value* StructuredValue::As(TypeSymbol* targetType, bool cast, const Span& span, bool dontThrow) const

@@ -113,6 +113,7 @@ public:
     bool IsPolymorphicType() const override { return IsPolymorphic(); }
     void SetConstraint(ConstraintNode* constraint_) { constraint.reset(constraint_); }
     ConstraintNode* Constraint() { return constraint.get(); }
+    bool IsLiteralClassType() const;
     StaticConstructorSymbol* StaticConstructor() { return staticConstructor; }
     ConstructorSymbol* DefaultConstructor() { return defaultConstructor; }
     void SetDefaultConstructor(ConstructorSymbol* defaultConstructor_) { defaultConstructor = defaultConstructor_; }
@@ -154,6 +155,7 @@ public:
     void InitVmt();
     void InitImts();
     void CreateLayouts();
+    const std::vector<TypeSymbol*>& ObjectLayout() const { return objectLayout; }
     const std::vector<FunctionSymbol*>& Vmt() const { return vmt; }
     llvm::Type* IrType(Emitter& emitter) override;
     llvm::Constant* CreateDefaultIrValue(Emitter& emitter) override;
@@ -170,6 +172,7 @@ public:
     void SetPrototype(ClassTemplateSpecializationSymbol* prototype_) { prototype = prototype_; }
     ClassTemplateSpecializationSymbol* Prototype() const { return prototype; }
     ValueType GetValueType() const override;
+    Value* MakeValue() const override;
 private:
     std::u32string groupName;
     int minArity;

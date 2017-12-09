@@ -29,13 +29,16 @@ public:
     TypeSymbol* GetType() { return type; }
     void SetType(TypeSymbol* typeSymbol) { type = typeSymbol; }
     void SetValue(Value* value_);
-    const Value* GetValue() const { return value.get(); }
-    Value* GetValue() { return value.get(); }
+    Value* GetValue();
     llvm::Value* ArrayIrObject(Emitter& emitter, bool create);
+    llvm::Value* StructureIrObject(Emitter& emitter, bool create);
 private:
     TypeSymbol* type;
     std::unique_ptr<Value> value;
     bool evaluating;
+    uint32_t sizeOfValue;
+    uint32_t valuePos;
+    std::string filePathReadFrom;
 };
 
 } } // namespace cmajor::symbols

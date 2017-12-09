@@ -24,6 +24,7 @@ public:
     TypeSymbol* ElementType() const { return elementType; }
     int64_t Size() const { return size; }
     ValueType GetValueType() const override;
+    Value* MakeValue() const override;
 private:
     TypeSymbol* elementType;
     int64_t size;

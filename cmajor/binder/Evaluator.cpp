@@ -21,9 +21,14 @@ namespace cmajor { namespace binder {
 
 using namespace cmajor::unicode;
 
-void ThrowCannotEvaluateStatically(const Span& span)
+void ThrowCannotEvaluateStatically(const Span& defined)
 {
-    throw Exception("cannot evaluate statically", span);
+    throw Exception("cannot evaluate statically", defined);
+}
+
+void ThrowCannotEvaluateStatically(const Span& defined, const Span& referenced)
+{
+    throw Exception("cannot evaluate statically", defined, referenced);
 }
 
 typedef Value* (*BinaryOperatorFun)(Value* left, Value* right, const Span& span, bool dontThrow);
@@ -44,9 +49,12 @@ public:
     llvm::Value* IrValue(Emitter& emitter) override { Assert(false, "scoped value does not have ir value"); return nullptr; }
     TypeSymbol* GetType(SymbolTable* symbolTable) override { return type; }
     void SetType(TypeSymbol* type_) { type = type_; }
+    Value* Subject() { return subject.get(); }
+    void SetSubject(Value* subject_) { subject.reset(subject_); }
 private:
     ContainerSymbol* containerSymbol;
     TypeSymbol* type;
+    std::unique_ptr<Value> subject;
 };
 
 ScopedValue::ScopedValue(const Span& span_, ContainerSymbol* containerSymbol_) : Value(span_, ValueType::none), containerSymbol(containerSymbol_), type(nullptr)
@@ -71,7 +79,6 @@ public:
     std::vector<TypeSymbol*> TemplateTypeArguments() { return std::move(templateTypeArguments); }
     void SetReceiver(std::unique_ptr<Value>&& receiver_) { receiver = std::move(receiver_); }
     Value* Receiver() { return receiver.get(); }
-    std::unique_ptr<Value> ReleaseReceiver() { return std::move(receiver); }
 private:
     FunctionGroupSymbol* functionGroup;
     ContainerScope* qualifiedScope;
@@ -100,6 +107,26 @@ private:
 };
 
 ArrayReferenceValue::ArrayReferenceValue(ArrayValue* arrayValue_) : Value(arrayValue_->GetSpan(), ValueType::none), arrayValue(arrayValue_)
+{
+}
+
+class StructuredReferenceValue : public Value
+{
+public:
+    StructuredReferenceValue(StructuredValue* structuredValue_);
+    bool IsStructuredReferenceValue() const override { return true; }
+    Value* Clone() const override { return new StructuredReferenceValue(structuredValue); }
+    void Write(BinaryWriter& writer) override {}
+    void Read(BinaryReader& reader) override {}
+    Value* As(TypeSymbol* targetType, bool cast, const Span& span, bool dontThrow) const override { Assert(false, "structured reference value cannot be converted"); return nullptr; }
+    llvm::Value* IrValue(Emitter& emitter) override { Assert(false, "structured reference does not have ir value"); return nullptr; }
+    TypeSymbol* GetType(SymbolTable* symbolTable) override { return structuredValue->GetType(symbolTable); }
+    StructuredValue* GetStructuredValue() const { return structuredValue; }
+private:
+    StructuredValue* structuredValue;
+};
+
+StructuredReferenceValue::StructuredReferenceValue(StructuredValue* structuredValue_) : Value(structuredValue_->GetSpan(), ValueType::none), structuredValue(structuredValue_)
 {
 }
 
@@ -522,9 +549,19 @@ public:
     bool Error() const { return error; }
     std::unique_ptr<Value> GetValue();
 
-    void Visit(FunctionNode& functionNode) override;
     void Visit(NamespaceImportNode& namespaceImportNode) override;
     void Visit(AliasNode& aliasNode) override;
+    void Visit(FunctionNode& functionNode) override;
+    void Visit(ClassNode& classNode) override;
+    void Visit(StaticConstructorNode& staticConstructorNode) override;
+    void Visit(ConstructorNode& constructorNode) override;
+    void Visit(DestructorNode& destructorNode) override;
+    void Visit(MemberFunctionNode& memberFunctionNode) override;
+    void Visit(ConversionFunctionNode& conversionFunctionNode) override;
+    void Visit(MemberVariableNode& memberVariableNode) override;
+    void Visit(InterfaceNode& interfaceNode) override;
+    void Visit(DelegateNode& delegateNode) override;
+    void Visit(ClassDelegateNode& classDelegateNode) override;
 
     void Visit(CompoundStatementNode& compoundStatementNode) override;
     void Visit(ReturnStatementNode& returnStatementNode) override;
@@ -534,9 +571,29 @@ public:
     void Visit(ForStatementNode& forStatementNode) override;
     void Visit(BreakStatementNode& breakStatementNode) override;
     void Visit(ContinueStatementNode& continueStatementNode) override;
+    void Visit(GotoStatementNode& gotoStatementNode) override;
     void Visit(ConstructionStatementNode& constructionStatementNode) override;
+    void Visit(DeleteStatementNode& deleteStatementNode) override;
+    void Visit(DestroyStatementNode& destroyStatementNode) override;
     void Visit(AssignmentStatementNode& assignmentStatementNode) override;
     void Visit(ExpressionStatementNode& expressionStatementNode) override;
+    void Visit(EmptyStatementNode& emptyStatementNode) override;
+    void Visit(RangeForStatementNode& rangeForStatementNode) override;
+    void Visit(SwitchStatementNode& switchStatementNode) override;
+    void Visit(CaseStatementNode& caseStatementNode) override;
+    void Visit(DefaultStatementNode& defaultStatementNode) override;
+    void Visit(GotoCaseStatementNode& gotoCaseStatementNode) override;
+    void Visit(GotoDefaultStatementNode& gotoDefaultStatementNode) override;
+    void Visit(ThrowStatementNode& throwStatementNode) override;
+    void Visit(TryStatementNode& tryStatementNode) override;
+    void Visit(CatchNode& catchNode) override;
+    void Visit(AssertStatementNode& assertStatementNode) override;
+    void Visit(ConditionalCompilationPartNode& conditionalCompilationPartNode) override;
+    void Visit(ConditionalCompilationDisjunctionNode& conditionalCompilationDisjunctionNode) override;
+    void Visit(ConditionalCompilationConjunctionNode& conditionalCompilationConjunctionNode) override;
+    void Visit(ConditionalCompilationNotNode& conditionalCompilationNotNode) override;
+    void Visit(ConditionalCompilationPrimaryNode& conditionalCompilationPrimaryNode) override;
+    void Visit(ConditionalCompilationStatementNode& conditionalCompilationStatementNode) override;
 
     void Visit(BoolNode& boolNode) override;
     void Visit(SByteNode& sbyteNode) override;
@@ -629,6 +686,7 @@ private:
     BoundFunction* currentFunction;
     DeclarationBlock* currentDeclarationBlock;
     FileScope* currentFileScope;
+    ClassTypeSymbol* currentClassType;
     bool cast;
     bool dontThrow;
     bool error;
@@ -642,6 +700,7 @@ private:
     ValueType targetValueType;
     VariableValueSymbol* targetValueSymbol;
     std::vector<std::unique_ptr<Value>> argumentValues;
+    std::unique_ptr<Value> structureReferenceValue;
     std::vector<TypeSymbol*> templateTypeArguments;
     void EvaluateBinOp(BinaryNode& node, BinaryOperatorFun* fun);
     void EvaluateBinOp(BinaryNode& node, BinaryOperatorFun* fun, Operator op);
@@ -655,7 +714,7 @@ private:
 Evaluator::Evaluator(BoundCompileUnit& boundCompileUnit_, ContainerScope* containerScope_, TypeSymbol* targetType_, ValueType targetValueType_, bool cast_, bool dontThrow_, BoundFunction* currentFunction_, 
     const Span& span_) :
     boundCompileUnit(boundCompileUnit_), symbolTable(&boundCompileUnit.GetSymbolTable()), containerScope(containerScope_), qualifiedScope(nullptr), cast(cast_), dontThrow(dontThrow_), error(false), 
-    returned(false), broke(false), continued(false), lvalue(false), currentFunction(currentFunction_), currentDeclarationBlock(nullptr), currentFileScope(nullptr), span(span_), value(), 
+    returned(false), broke(false), continued(false), lvalue(false), currentFunction(currentFunction_), currentDeclarationBlock(nullptr), currentFileScope(nullptr), currentClassType(nullptr), span(span_), value(),
     targetType(targetType_), targetValueType(targetValueType_), targetValueSymbol(nullptr)
 {
 }
@@ -681,7 +740,7 @@ void Evaluator::EvaluateBinOp(BinaryNode& node, BinaryOperatorFun* fun, Operator
         }
         else
         {
-            ThrowCannotEvaluateStatically(node.GetSpan());
+            ThrowCannotEvaluateStatically(span, node.GetSpan());
         }
     }
     std::unique_ptr<Value> left(value.release());
@@ -699,7 +758,7 @@ void Evaluator::EvaluateBinOp(BinaryNode& node, BinaryOperatorFun* fun, Operator
         }
         else
         {
-            ThrowCannotEvaluateStatically(node.GetSpan());
+            ThrowCannotEvaluateStatically(span, node.GetSpan());
         }
     }
     std::unique_ptr<Value> right(value.release());
@@ -921,7 +980,7 @@ void Evaluator::EvaluateUnaryOp(UnaryNode& node, UnaryOperatorFun* fun)
         }
         else
         {
-            ThrowCannotEvaluateStatically(node.GetSpan());
+            ThrowCannotEvaluateStatically(span, node.GetSpan());
         }
     }
     std::unique_ptr<Value> subject(value.release());
@@ -994,6 +1053,7 @@ void Evaluator::Visit(FunctionNode& functionNode)
     DeclarationBlock declarationBlock(span, U"functionBlock");
     currentDeclarationBlock = &declarationBlock;
     ContainerScope* prevContainerScope = containerScope;
+    containerScope = symbol->GetContainerScope();
     declarationBlock.GetContainerScope()->SetParent(containerScope);
     containerScope = declarationBlock.GetContainerScope();
     int nt = functionNode.TemplateParameters().Count();
@@ -1055,6 +1115,415 @@ void Evaluator::Visit(FunctionNode& functionNode)
     }
 }
 
+void Evaluator::Visit(ConstructorNode& constructorNode)
+{
+    bool fileScopeAdded = false;
+    Symbol* symbol = symbolTable->GetSymbol(&constructorNode);
+    ClassTypeSymbol* classType = static_cast<ClassTypeSymbol*>(symbol->Parent());
+    ClassTypeSymbol* prevClassType = currentClassType;
+    currentClassType = classType;
+    if (symbol->IsFunctionSymbol())
+    {
+        FunctionSymbol* functionSymbol = static_cast<FunctionSymbol*>(symbol);
+        int n = functionSymbol->UsingNodes().Count();
+        if (n > 0)
+        {
+            FileScope* fileScope = new FileScope();
+            FileScope* prevFileScope = currentFileScope;
+            currentFileScope = fileScope;
+            boundCompileUnit.AddFileScope(fileScope);
+            fileScopeAdded = true;
+            for (int i = 0; i < n; ++i)
+            {
+                Node* usingNode = functionSymbol->UsingNodes()[i];
+                usingNode->Accept(*this);
+            }
+            currentFileScope = prevFileScope;
+        }
+    }
+    bool prevReturned = returned;
+    DeclarationBlock* prevDeclarationBlock = currentDeclarationBlock;
+    DeclarationBlock declarationBlock(span, U"constructorBlock");
+    currentDeclarationBlock = &declarationBlock;
+    ContainerScope* prevContainerScope = containerScope;
+    containerScope = symbol->GetContainerScope();
+    declarationBlock.GetContainerScope()->SetParent(containerScope);
+    containerScope = declarationBlock.GetContainerScope();
+    int n = constructorNode.Parameters().Count();
+    if (n != argumentValues.size())
+    {
+        if (dontThrow)
+        {
+            containerScope = prevContainerScope;
+            currentDeclarationBlock = prevDeclarationBlock;
+            returned = prevReturned;
+            currentClassType = prevClassType;
+            error = true;
+            return;
+        }
+        else
+        {
+            throw Exception("wrong number of constructor arguments", span);
+        }
+    }
+    for (int i = 0; i < n; ++i)
+    {
+        std::unique_ptr<Value> argumentValue = std::move(argumentValues[i]);
+        TypeSymbol* argumentType = argumentValue->GetType(symbolTable);
+        ParameterNode* parameterNode = constructorNode.Parameters()[i];
+        VariableValueSymbol* variableValueSymbol = new VariableValueSymbol(parameterNode->GetSpan(), parameterNode->Id()->Str(), std::move(argumentValue));
+        variableValueSymbol->SetType(argumentType);
+        declarationBlock.AddMember(variableValueSymbol);
+    }
+    std::unordered_map<std::u32string, MemberInitializerNode*> memberInitializerMap;
+    int ni = constructorNode.Initializers().Count();
+    for (int i = 0; i < ni; ++i)
+    {
+        InitializerNode* initializer = constructorNode.Initializers()[i];
+        if (initializer->GetNodeType() == NodeType::thisInitializerNode || initializer->GetNodeType() == NodeType::baseInitializerNode)
+        {
+            if (dontThrow)
+            {
+                containerScope = prevContainerScope;
+                currentDeclarationBlock = prevDeclarationBlock;
+                returned = prevReturned;
+                currentClassType = prevClassType;
+                error = true;
+                return;
+            }
+            else
+            {
+                throw Exception("this and base initializers not supported for a constexpr constructor", constructorNode.GetSpan());
+            }
+        }
+        else
+        {
+            MemberInitializerNode* memberInitializer = static_cast<MemberInitializerNode*>(initializer);
+            std::u32string memberName = memberInitializer->MemberId()->Str();
+            auto it = memberInitializerMap.find(memberName);
+            if (it != memberInitializerMap.cend())
+            {
+                if (dontThrow)
+                {
+                    containerScope = prevContainerScope;
+                    currentDeclarationBlock = prevDeclarationBlock;
+                    returned = prevReturned;
+                    currentClassType = prevClassType;
+                    error = true;
+                    return;
+                }
+                else
+                {
+                    throw Exception("already has initializer for member variable '" + ToUtf8(memberName) + "'", initializer->GetSpan());
+                }
+            }
+            memberInitializerMap[memberName] = memberInitializer;
+        }
+    }
+    std::vector<std::unique_ptr<Value>> memberValues;
+    int nm = classType->MemberVariables().size();
+    for (int i = 0; i < nm; ++i)
+    {
+        value.reset();
+        MemberVariableSymbol* memberVariableSymbol = classType->MemberVariables()[i];
+        std::vector<std::unique_ptr<Value>> initializerArgumentValues;
+        auto it = memberInitializerMap.find(memberVariableSymbol->Name());
+        if (it != memberInitializerMap.cend())
+        {
+            MemberInitializerNode* memberInitializer = it->second;
+            int na = memberInitializer->Arguments().Count();
+            for (int i = 0; i < na; ++i)
+            {
+                Node* argumentNode = memberInitializer->Arguments()[i];
+                argumentNode->Accept(*this);
+                if (error) return;
+                if (!value)
+                {
+                    if (dontThrow)
+                    {
+                        containerScope = prevContainerScope;
+                        currentDeclarationBlock = prevDeclarationBlock;
+                        returned = prevReturned;
+                        currentClassType = prevClassType;
+                        error = true;
+                        return;
+                    }
+                    else
+                    {
+                        ThrowCannotEvaluateStatically(span, constructorNode.GetSpan());
+                    }
+                }
+                initializerArgumentValues.push_back(std::move(value));
+            }
+        }
+        std::vector<FunctionScopeLookup> lookups;
+        lookups.push_back(FunctionScopeLookup(ScopeLookup::this_and_base_and_parent, containerScope));
+        lookups.push_back(FunctionScopeLookup(ScopeLookup::this_, memberVariableSymbol->GetType()->BaseType()->GetContainerScope()));
+        lookups.push_back(FunctionScopeLookup(ScopeLookup::fileScopes, nullptr));
+        std::vector<std::unique_ptr<BoundExpression>> initializerArguments = ValuesToLiterals(initializerArgumentValues, symbolTable, error);
+        if (error)
+        {
+            if (dontThrow)
+            {
+                containerScope = prevContainerScope;
+                currentDeclarationBlock = prevDeclarationBlock;
+                returned = prevReturned;
+                currentClassType = prevClassType;
+                return;
+            }
+            else
+            {
+                ThrowCannotEvaluateStatically(span, constructorNode.GetSpan());
+            }
+        }
+        initializerArguments.insert(initializerArguments.begin(), std::unique_ptr<BoundExpression>(new BoundTypeExpression(span, memberVariableSymbol->GetType()->AddPointer(span))));
+        OverloadResolutionFlags flags = OverloadResolutionFlags::dontInstantiate;
+        if (dontThrow)
+        {
+            flags = flags | OverloadResolutionFlags::dontThrow;
+        }
+        std::vector<TypeSymbol*> templateArgumentTypes;
+        std::unique_ptr<Exception> exception;
+        std::unique_ptr<BoundFunctionCall> constructorCall = ResolveOverload(U"@constructor", containerScope, lookups, initializerArguments, boundCompileUnit, currentFunction, constructorNode.GetSpan(),
+            flags, templateArgumentTypes, exception);
+        if (!constructorCall)
+        {
+            if (dontThrow)
+            {
+                containerScope = prevContainerScope;
+                currentDeclarationBlock = prevDeclarationBlock;
+                returned = prevReturned;
+                currentClassType = prevClassType;
+                error = true;
+                return;
+            }
+            else
+            {
+                ThrowCannotEvaluateStatically(span, constructorNode.GetSpan());
+            }
+        }
+        argumentValues = ArgumentsToValues(constructorCall->Arguments(), error, true, boundCompileUnit);
+        if (error)
+        {
+            if (dontThrow)
+            {
+                return;
+            }
+            else
+            {
+                ThrowCannotEvaluateStatically(span, constructorNode.GetSpan());
+            }
+        }
+        FunctionSymbol* constructorSymbol = constructorCall->GetFunctionSymbol();
+        if (constructorSymbol->IsCompileTimePrimitiveFunction())
+        {
+            value = constructorSymbol->ConstructValue(argumentValues, span);
+            if (!value)
+            {
+                if (dontThrow)
+                {
+                    containerScope = prevContainerScope;
+                    currentDeclarationBlock = prevDeclarationBlock;
+                    returned = prevReturned;
+                    currentClassType = prevClassType;
+                    error = true;
+                    return;
+                }
+                else
+                {
+                    ThrowCannotEvaluateStatically(span, constructorNode.GetSpan());
+                }
+            }
+        }
+        else if (constructorSymbol->IsConstExpr())
+        {
+            FunctionNode* ctorNode = boundCompileUnit.GetFunctionNodeFor(constructorSymbol);
+            ctorNode->Accept(*this);
+            if (!value)
+            {
+                if (dontThrow)
+                {
+                    containerScope = prevContainerScope;
+                    currentDeclarationBlock = prevDeclarationBlock;
+                    returned = prevReturned;
+                    currentClassType = prevClassType;
+                    error = true;
+                    return;
+                }
+                else
+                {
+                    ThrowCannotEvaluateStatically(span, ctorNode->GetSpan());
+                }
+            }
+        }
+        else
+        {
+            if (dontThrow)
+            {
+                containerScope = prevContainerScope;
+                currentDeclarationBlock = prevDeclarationBlock;
+                returned = prevReturned;
+                currentClassType = prevClassType;
+                error = true;
+                return;
+            }
+            else
+            {
+                ThrowCannotEvaluateStatically(span, constructorNode.GetSpan());
+            }
+        }
+        memberValues.push_back(std::move(value));
+    }
+    constructorNode.Body()->Accept(*this);
+    value.reset(new StructuredValue(span, classType, std::move(memberValues)));
+    containerScope = prevContainerScope;
+    currentDeclarationBlock = prevDeclarationBlock;
+    returned = prevReturned;
+    currentClassType = prevClassType;
+    if (fileScopeAdded)
+    {
+        boundCompileUnit.RemoveLastFileScope();
+    }
+}
+
+void Evaluator::Visit(MemberFunctionNode& memberFunctionNode)
+{
+    bool fileScopeAdded = false;
+    Symbol* symbol = symbolTable->GetSymbol(&memberFunctionNode);
+    if (symbol->IsFunctionSymbol())
+    {
+        FunctionSymbol* functionSymbol = static_cast<FunctionSymbol*>(symbol);
+        int n = functionSymbol->UsingNodes().Count();
+        if (n > 0)
+        {
+            FileScope* fileScope = new FileScope();
+            FileScope* prevFileScope = currentFileScope;
+            currentFileScope = fileScope;
+            boundCompileUnit.AddFileScope(fileScope);
+            fileScopeAdded = true;
+            for (int i = 0; i < n; ++i)
+            {
+                Node* usingNode = functionSymbol->UsingNodes()[i];
+                usingNode->Accept(*this);
+            }
+            currentFileScope = prevFileScope;
+        }
+    }
+    bool prevReturned = returned;
+    DeclarationBlock* prevDeclarationBlock = currentDeclarationBlock;
+    DeclarationBlock declarationBlock(span, U"functionBlock");
+    currentDeclarationBlock = &declarationBlock;
+    ContainerScope* prevContainerScope = containerScope;
+    containerScope = symbol->GetContainerScope();
+    declarationBlock.GetContainerScope()->SetParent(containerScope);
+    containerScope = declarationBlock.GetContainerScope();
+    int n = memberFunctionNode.Parameters().Count();
+    if (n != argumentValues.size())
+    {
+        if (dontThrow)
+        {
+            containerScope = prevContainerScope;
+            currentDeclarationBlock = prevDeclarationBlock;
+            returned = prevReturned;
+            error = true;
+            return;
+        }
+        else
+        {
+            throw Exception("wrong number of function arguments", memberFunctionNode.GetSpan());
+        }
+    }
+    for (int i = 0; i < n; ++i)
+    {
+        std::unique_ptr<Value> argumentValue = std::move(argumentValues[i]);
+        TypeSymbol* argumentType = argumentValue->GetType(symbolTable);
+        ParameterNode* parameterNode = memberFunctionNode.Parameters()[i];
+        VariableValueSymbol* variableValueSymbol = new VariableValueSymbol(parameterNode->GetSpan(), parameterNode->Id()->Str(), std::move(argumentValue));
+        variableValueSymbol->SetType(argumentType);
+        declarationBlock.AddMember(variableValueSymbol);
+    }
+    if (currentClassType && structureReferenceValue)
+    {
+        StructuredValue* structuredValue = nullptr;
+        if (structureReferenceValue->IsStructuredReferenceValue())
+        {
+            structuredValue = static_cast<StructuredReferenceValue*>(structureReferenceValue.get())->GetStructuredValue();
+        }
+        else
+        {
+            if (dontThrow)
+            {
+                containerScope = prevContainerScope;
+                currentDeclarationBlock = prevDeclarationBlock;
+                returned = prevReturned;
+                error = true;
+                return;
+            }
+            else
+            {
+                throw Exception("structured reference value expected", memberFunctionNode.GetSpan());
+            }
+        }
+        int n = currentClassType->MemberVariables().size();
+        if (n != structuredValue->Members().size())
+        {
+            if (dontThrow)
+            {
+                containerScope = prevContainerScope;
+                currentDeclarationBlock = prevDeclarationBlock;
+                returned = prevReturned;
+                error = true;
+                return;
+            }
+            else
+            {
+                throw Exception("wrong number of structured value members", memberFunctionNode.GetSpan());
+            }
+        }
+        for (int i = 0; i < n; ++i)
+        {
+            MemberVariableSymbol* memberVariableSymbol = currentClassType->MemberVariables()[i];
+            Value* memberValue = structuredValue->Members()[i].get();
+            ConstantSymbol* constantSymbol = new ConstantSymbol(span, memberVariableSymbol->Name());
+            constantSymbol->SetType(memberVariableSymbol->GetType());
+            if (memberValue->GetValueType() == ValueType::arrayValue)
+            {
+                constantSymbol->SetValue(new ArrayReferenceValue(static_cast<ArrayValue*>(memberValue)));
+            }
+            else if (memberValue->GetValueType() == ValueType::structuredValue)
+            {
+                constantSymbol->SetValue(new StructuredReferenceValue(static_cast<StructuredValue*>(memberValue)));
+            }
+            else
+            {
+                constantSymbol->SetValue(memberValue->Clone());
+            }
+            declarationBlock.AddMember(constantSymbol);
+        }
+    }
+    memberFunctionNode.Body()->Accept(*this);
+    containerScope = prevContainerScope;
+    currentDeclarationBlock = prevDeclarationBlock;
+    returned = prevReturned;
+    if (fileScopeAdded)
+    {
+        boundCompileUnit.RemoveLastFileScope();
+    }
+}
+
+void Evaluator::Visit(ConversionFunctionNode& conversionFunctionNode)
+{
+    if (dontThrow)
+    {
+        error = true;
+        return;
+    }
+    else
+    {
+        ThrowCannotEvaluateStatically(span, conversionFunctionNode.GetSpan());
+    }
+}
+
 void Evaluator::Visit(NamespaceImportNode& namespaceImportNode)
 {
     if (currentFileScope)
@@ -1068,6 +1537,89 @@ void Evaluator::Visit(AliasNode& aliasNode)
     if (currentFileScope)
     {
         currentFileScope->InstallAlias(containerScope, &aliasNode);
+    }
+}
+
+void Evaluator::Visit(ClassNode& classNode)
+{
+    if (dontThrow)
+    {
+        error = true;
+        return;
+    }
+    else
+    {
+        ThrowCannotEvaluateStatically(span, classNode.GetSpan());
+    }
+}
+
+void Evaluator::Visit(StaticConstructorNode& staticConstructorNode)
+{
+    if (dontThrow)
+    {
+        error = true;
+        return;
+    }
+    else
+    {
+        ThrowCannotEvaluateStatically(span, staticConstructorNode.GetSpan());
+    }
+}
+
+void Evaluator::Visit(DestructorNode& destructorNode)
+{
+    if (dontThrow)
+    {
+        error = true;
+        return;
+    }
+    else
+    {
+        ThrowCannotEvaluateStatically(span, destructorNode.GetSpan());
+    }
+}
+
+void Evaluator::Visit(MemberVariableNode& memberVariableNode)
+{
+    memberVariableNode.Id()->Accept(*this);
+}
+
+void Evaluator::Visit(InterfaceNode& interfaceNode)
+{
+    if (dontThrow)
+    {
+        error = true;
+        return;
+    }
+    else
+    {
+        ThrowCannotEvaluateStatically(span, interfaceNode.GetSpan());
+    }
+}
+
+void Evaluator::Visit(DelegateNode& delegateNode)
+{
+    if (dontThrow)
+    {
+        error = true;
+        return;
+    }
+    else
+    {
+        ThrowCannotEvaluateStatically(span, delegateNode.GetSpan());
+    }
+}
+
+void Evaluator::Visit(ClassDelegateNode& classDelegateNode)
+{
+    if (dontThrow)
+    {
+        error = true;
+        return;
+    }
+    else
+    {
+        ThrowCannotEvaluateStatically(span, classDelegateNode.GetSpan());
     }
 }
 
@@ -1384,6 +1936,19 @@ void Evaluator::Visit(ContinueStatementNode& continueStatementNode)
     continued = true;
 }
 
+void Evaluator::Visit(GotoStatementNode& gotoStatementNode)
+{
+    if (dontThrow)
+    {
+        error = true;
+        return;
+    }
+    else
+    {
+        ThrowCannotEvaluateStatically(span, gotoStatementNode.GetSpan());
+    }
+}
+
 void Evaluator::Visit(ConstructionStatementNode& constructionStatementNode)
 {
     if (!currentDeclarationBlock)
@@ -1415,7 +1980,7 @@ void Evaluator::Visit(ConstructionStatementNode& constructionStatementNode)
             }
             else
             {
-                ThrowCannotEvaluateStatically(constructionStatementNode.GetSpan());
+                ThrowCannotEvaluateStatically(span, constructionStatementNode.GetSpan());
             }
         }
         values.push_back(std::move(value));
@@ -1429,7 +1994,7 @@ void Evaluator::Visit(ConstructionStatementNode& constructionStatementNode)
         }
         else
         {
-            ThrowCannotEvaluateStatically(constructionStatementNode.GetSpan());
+            ThrowCannotEvaluateStatically(span, constructionStatementNode.GetSpan());
         }
     }
     arguments.insert(arguments.begin(), std::unique_ptr<BoundExpression>(new BoundTypeExpression(span, type->AddPointer(span))));
@@ -1453,7 +2018,7 @@ void Evaluator::Visit(ConstructionStatementNode& constructionStatementNode)
         }
         else
         {
-            ThrowCannotEvaluateStatically(constructionStatementNode.GetSpan());
+            ThrowCannotEvaluateStatically(span, constructionStatementNode.GetSpan());
         }
     }
     argumentValues = ArgumentsToValues(constructorCall->Arguments(), error, true, boundCompileUnit);
@@ -1465,12 +2030,44 @@ void Evaluator::Visit(ConstructionStatementNode& constructionStatementNode)
         }
         else
         {
-            ThrowCannotEvaluateStatically(constructionStatementNode.GetSpan());
+            ThrowCannotEvaluateStatically(span, constructionStatementNode.GetSpan());
         }
     }
     FunctionSymbol* constructorSymbol = constructorCall->GetFunctionSymbol();
-    value = constructorSymbol->ConstructValue(argumentValues, span);
-    if (!value)
+    if (constructorSymbol->IsCompileTimePrimitiveFunction())
+    {
+        value = constructorSymbol->ConstructValue(argumentValues, span);
+        if (!value)
+        {
+            if (dontThrow)
+            {
+                error = true;
+                return;
+            }
+            else
+            {
+                ThrowCannotEvaluateStatically(span, constructionStatementNode.GetSpan());
+            }
+        }
+    }
+    else if (constructorSymbol->IsConstExpr())
+    {
+        FunctionNode* ctorNode = boundCompileUnit.GetFunctionNodeFor(constructorSymbol);
+        ctorNode->Accept(*this);
+        if (!value)
+        {
+            if (dontThrow)
+            {
+                error = true;
+                return;
+            }
+            else
+            {
+                ThrowCannotEvaluateStatically(span, ctorNode->GetSpan());
+            }
+        }
+    }
+    else
     {
         if (dontThrow)
         {
@@ -1479,12 +2076,38 @@ void Evaluator::Visit(ConstructionStatementNode& constructionStatementNode)
         }
         else
         {
-            ThrowCannotEvaluateStatically(constructionStatementNode.GetSpan());
+            ThrowCannotEvaluateStatically(span, constructionStatementNode.GetSpan());
         }
     }
     VariableValueSymbol* variableValue = new VariableValueSymbol(span, constructionStatementNode.Id()->Str(), std::move(value));
     variableValue->SetType(type);
     currentDeclarationBlock->AddMember(variableValue);
+}
+
+void Evaluator::Visit(DeleteStatementNode& deleteStatementNode)
+{
+    if (dontThrow)
+    {
+        error = true;
+        return;
+    }
+    else
+    {
+        ThrowCannotEvaluateStatically(span, deleteStatementNode.GetSpan());
+    }
+}
+
+void Evaluator::Visit(DestroyStatementNode& destroyStatementNode)
+{
+    if (dontThrow)
+    {
+        error = true;
+        return;
+    }
+    else
+    {
+        ThrowCannotEvaluateStatically(span, destroyStatementNode.GetSpan());
+    }
 }
 
 void Evaluator::Visit(AssignmentStatementNode& assignmentStatementNode)
@@ -1508,7 +2131,7 @@ void Evaluator::Visit(AssignmentStatementNode& assignmentStatementNode)
         }
         else
         {
-            ThrowCannotEvaluateStatically(assignmentStatementNode.GetSpan());
+            ThrowCannotEvaluateStatically(span, assignmentStatementNode.GetSpan());
         }
     }
     arguments.insert(arguments.begin(), std::unique_ptr<BoundExpression>(new BoundTypeExpression(span, target->GetType()->AddPointer(span))));
@@ -1532,7 +2155,7 @@ void Evaluator::Visit(AssignmentStatementNode& assignmentStatementNode)
         }
         else
         {
-            ThrowCannotEvaluateStatically(assignmentStatementNode.GetSpan());
+            ThrowCannotEvaluateStatically(span, assignmentStatementNode.GetSpan());
         }
     }
     argumentValues = ArgumentsToValues(assignmentCall->Arguments(), error, true, boundCompileUnit);
@@ -1544,7 +2167,7 @@ void Evaluator::Visit(AssignmentStatementNode& assignmentStatementNode)
         }
         else
         {
-            ThrowCannotEvaluateStatically(assignmentStatementNode.GetSpan());
+            ThrowCannotEvaluateStatically(span, assignmentStatementNode.GetSpan());
         }
     }
     target->SetValue(argumentValues.front().release());
@@ -1555,6 +2178,255 @@ void Evaluator::Visit(ExpressionStatementNode& expressionStatementNode)
     expressionStatementNode.Expression()->Accept(*this);
 }
 
+void Evaluator::Visit(EmptyStatementNode& emptyStatementNode)
+{
+}
+
+void Evaluator::Visit(RangeForStatementNode& rangeForStatementNode)
+{
+    // todo
+    if (dontThrow)
+    {
+        error = true;
+        return;
+    }
+    else
+    {
+        ThrowCannotEvaluateStatically(span, rangeForStatementNode.GetSpan());
+    }
+}
+
+void Evaluator::Visit(SwitchStatementNode& switchStatementNode)
+{
+    // todo
+    if (dontThrow)
+    {
+        error = true;
+        return;
+    }
+    else
+    {
+        ThrowCannotEvaluateStatically(span, switchStatementNode.GetSpan());
+    }
+}
+
+void Evaluator::Visit(CaseStatementNode& caseStatementNode)
+{
+    // todo
+    if (dontThrow)
+    {
+        error = true;
+        return;
+    }
+    else
+    {
+        ThrowCannotEvaluateStatically(span, caseStatementNode.GetSpan());
+    }
+}
+
+void Evaluator::Visit(DefaultStatementNode& defaultStatementNode)
+{
+    // todo
+    if (dontThrow)
+    {
+        error = true;
+        return;
+    }
+    else
+    {
+        ThrowCannotEvaluateStatically(span, defaultStatementNode.GetSpan());
+    }
+}
+
+void Evaluator::Visit(GotoCaseStatementNode& gotoCaseStatementNode)
+{
+    if (dontThrow)
+    {
+        error = true;
+        return;
+    }
+    else
+    {
+        ThrowCannotEvaluateStatically(span, gotoCaseStatementNode.GetSpan());
+    }
+}
+
+void Evaluator::Visit(GotoDefaultStatementNode& gotoDefaultStatementNode)
+{
+    if (dontThrow)
+    {
+        error = true;
+        return;
+    }
+    else
+    {
+        ThrowCannotEvaluateStatically(span, gotoDefaultStatementNode.GetSpan());
+    }
+}
+
+void Evaluator::Visit(ThrowStatementNode& throwStatementNode)
+{
+    if (dontThrow)
+    {
+        error = true;
+        return;
+    }
+    else
+    {
+        ThrowCannotEvaluateStatically(span, throwStatementNode.GetSpan());
+    }
+}
+
+void Evaluator::Visit(TryStatementNode& tryStatementNode)
+{
+    if (dontThrow)
+    {
+        error = true;
+        return;
+    }
+    else
+    {
+        ThrowCannotEvaluateStatically(span, tryStatementNode.GetSpan());
+    }
+}
+
+void Evaluator::Visit(CatchNode& catchNode)
+{
+    if (dontThrow)
+    {
+        error = true;
+        return;
+    }
+    else
+    {
+        ThrowCannotEvaluateStatically(span, catchNode.GetSpan());
+    }
+}
+
+void Evaluator::Visit(AssertStatementNode& assertStatementNode)
+{
+    assertStatementNode.AssertExpr()->Accept(*this);
+    if (error) return;
+    if (!value)
+    {
+        if (dontThrow)
+        {
+            error = true;
+            return;
+        }
+        else
+        {
+            ThrowCannotEvaluateStatically(span, assertStatementNode.GetSpan());
+        }
+    }
+    if (value->GetValueType() == ValueType::boolValue)
+    {
+        BoolValue* boolValue = static_cast<BoolValue*>(value.get());
+        if (!boolValue->GetValue())
+        {
+            if (dontThrow)
+            {
+                error = true;
+                return;
+            }
+            else
+            {
+                throw Exception("assertion '" + assertStatementNode.AssertExpr()->ToString() + "' failed", span, assertStatementNode.GetSpan());
+            }
+        }
+    }
+    else
+    {
+        if (dontThrow)
+        {
+            error = true;
+            return;
+        }
+        else
+        {
+            throw Exception("assertion expression is not a Boolean-valued expression", span, assertStatementNode.GetSpan());
+        }
+    }
+}
+
+void Evaluator::Visit(ConditionalCompilationPartNode& conditionalCompilationPartNode)
+{
+    if (dontThrow)
+    {
+        error = true;
+        return;
+    }
+    else
+    {
+        ThrowCannotEvaluateStatically(span, conditionalCompilationPartNode.GetSpan());
+    }
+}
+
+void Evaluator::Visit(ConditionalCompilationDisjunctionNode& conditionalCompilationDisjunctionNode)
+{
+    if (dontThrow)
+    {
+        error = true;
+        return;
+    }
+    else
+    {
+        ThrowCannotEvaluateStatically(span, conditionalCompilationDisjunctionNode.GetSpan());
+    }
+}
+
+void Evaluator::Visit(ConditionalCompilationConjunctionNode& conditionalCompilationConjunctionNode)
+{
+    if (dontThrow)
+    {
+        error = true;
+        return;
+    }
+    else
+    {
+        ThrowCannotEvaluateStatically(span, conditionalCompilationConjunctionNode.GetSpan());
+    }
+}
+
+void Evaluator::Visit(ConditionalCompilationNotNode& conditionalCompilationNotNode)
+{
+    if (dontThrow)
+    {
+        error = true;
+        return;
+    }
+    else
+    {
+        ThrowCannotEvaluateStatically(span, conditionalCompilationNotNode.GetSpan());
+    }
+}
+
+void Evaluator::Visit(ConditionalCompilationPrimaryNode& conditionalCompilationPrimaryNode)
+{
+    if (dontThrow)
+    {
+        error = true;
+        return;
+    }
+    else
+    {
+        ThrowCannotEvaluateStatically(span, conditionalCompilationPrimaryNode.GetSpan());
+    }
+}
+
+void Evaluator::Visit(ConditionalCompilationStatementNode& conditionalCompilationStatementNode)
+{
+    if (dontThrow)
+    {
+        error = true;
+        return;
+    }
+    else
+    {
+        ThrowCannotEvaluateStatically(span, conditionalCompilationStatementNode.GetSpan());
+    }
+}
+
 void Evaluator::Visit(BoolNode& boolNode)
 {
     if (dontThrow)
@@ -1563,7 +2435,7 @@ void Evaluator::Visit(BoolNode& boolNode)
     }
     else
     {
-        ThrowCannotEvaluateStatically(boolNode.GetSpan());
+        ThrowCannotEvaluateStatically(span, boolNode.GetSpan());
     }
 }
 
@@ -1575,7 +2447,7 @@ void Evaluator::Visit(SByteNode& sbyteNode)
     }
     else
     {
-        ThrowCannotEvaluateStatically(sbyteNode.GetSpan());
+        ThrowCannotEvaluateStatically(span, sbyteNode.GetSpan());
     }
 }
 
@@ -1587,7 +2459,7 @@ void Evaluator::Visit(ByteNode& byteNode)
     }
     else
     {
-        ThrowCannotEvaluateStatically(byteNode.GetSpan());
+        ThrowCannotEvaluateStatically(span, byteNode.GetSpan());
     }
 }
 
@@ -1599,7 +2471,7 @@ void Evaluator::Visit(ShortNode& shortNode)
     }
     else
     {
-        ThrowCannotEvaluateStatically(shortNode.GetSpan());
+        ThrowCannotEvaluateStatically(span, shortNode.GetSpan());
     }
 }
 
@@ -1611,7 +2483,7 @@ void Evaluator::Visit(UShortNode& ushortNode)
     }
     else
     {
-        ThrowCannotEvaluateStatically(ushortNode.GetSpan());
+        ThrowCannotEvaluateStatically(span, ushortNode.GetSpan());
     }
 }
 
@@ -1623,7 +2495,7 @@ void Evaluator::Visit(IntNode& intNode)
     }
     else
     {
-        ThrowCannotEvaluateStatically(intNode.GetSpan());
+        ThrowCannotEvaluateStatically(span, intNode.GetSpan());
     }
 }
 
@@ -1635,7 +2507,7 @@ void Evaluator::Visit(UIntNode& uintNode)
     }
     else
     {
-        ThrowCannotEvaluateStatically(uintNode.GetSpan());
+        ThrowCannotEvaluateStatically(span, uintNode.GetSpan());
     }
 }
 
@@ -1647,7 +2519,7 @@ void Evaluator::Visit(LongNode& longNode)
     }
     else
     {
-        ThrowCannotEvaluateStatically(longNode.GetSpan());
+        ThrowCannotEvaluateStatically(span, longNode.GetSpan());
     }
 }
 
@@ -1659,7 +2531,7 @@ void Evaluator::Visit(ULongNode& ulongNode)
     }
     else
     {
-        ThrowCannotEvaluateStatically(ulongNode.GetSpan());
+        ThrowCannotEvaluateStatically(span, ulongNode.GetSpan());
     }
 }
 
@@ -1671,7 +2543,7 @@ void Evaluator::Visit(FloatNode& floatNode)
     }
     else
     {
-        ThrowCannotEvaluateStatically(floatNode.GetSpan());
+        ThrowCannotEvaluateStatically(span, floatNode.GetSpan());
     }
 }
 
@@ -1683,7 +2555,7 @@ void Evaluator::Visit(DoubleNode& doubleNode)
     }
     else
     {
-        ThrowCannotEvaluateStatically(doubleNode.GetSpan());
+        ThrowCannotEvaluateStatically(span, doubleNode.GetSpan());
     }
 }
 
@@ -1695,7 +2567,7 @@ void Evaluator::Visit(CharNode& charNode)
     }
     else
     {
-        ThrowCannotEvaluateStatically(charNode.GetSpan());
+        ThrowCannotEvaluateStatically(span, charNode.GetSpan());
     }
 }
 
@@ -1707,7 +2579,7 @@ void Evaluator::Visit(WCharNode& wcharNode)
     }
     else
     {
-        ThrowCannotEvaluateStatically(wcharNode.GetSpan());
+        ThrowCannotEvaluateStatically(span, wcharNode.GetSpan());
     }
 }
 
@@ -1719,7 +2591,7 @@ void Evaluator::Visit(UCharNode& ucharNode)
     }
     else
     {
-        ThrowCannotEvaluateStatically(ucharNode.GetSpan());
+        ThrowCannotEvaluateStatically(span, ucharNode.GetSpan());
     }
 }
 
@@ -1731,7 +2603,7 @@ void Evaluator::Visit(VoidNode& voidNode)
     }
     else
     {
-        ThrowCannotEvaluateStatically(voidNode.GetSpan());
+        ThrowCannotEvaluateStatically(span, voidNode.GetSpan());
     }
 }
 
@@ -1858,6 +2730,29 @@ void Evaluator::Visit(ArrayLiteralNode& arrayLiteralNode)
     for (int i = 0; i < n; ++i)
     {
         value = Evaluate(arrayLiteralNode.Values()[i], elementType, containerScope, boundCompileUnit, dontThrow, currentFunction, arrayLiteralNode.GetSpan());
+        if (error)
+        {
+            if (dontThrow)
+            {
+                return;
+            }
+            else
+            {
+                ThrowCannotEvaluateStatically(span, arrayLiteralNode.GetSpan());
+            }
+        }
+        if (!value)
+        {
+            if (dontThrow)
+            {
+                error = true;
+                return;
+            }
+            else
+            {
+                ThrowCannotEvaluateStatically(span, arrayLiteralNode.GetSpan());
+            }
+        }
         elementValues.push_back(std::move(value));
     }
     if (arrayType->Size() == -1)
@@ -1882,9 +2777,133 @@ void Evaluator::Visit(StructuredLiteralNode& structuredLiteralNode)
         }
     }
     ClassTypeSymbol* classType = static_cast<ClassTypeSymbol*>(targetType);
-    std::vector<std::unique_ptr<Value>> memberValues;
-    int n = structuredLiteralNode.Members().Count();
-    if (classType->MemberVariables().size() != n)
+    if (!currentFunction)
+    {
+        if (classType->IsProject() && !classType->IsBound())
+        {
+            Node* node = boundCompileUnit.GetSymbolTable().GetNodeNoThrow(classType);
+            if (node)
+            {
+                TypeBinder typeBinder(boundCompileUnit);
+                typeBinder.SetContainerScope(containerScope);
+                node->Accept(typeBinder);
+            }
+        }
+    }
+    if (classType->IsLiteralClassType())
+    {
+        std::vector<std::unique_ptr<Value>> memberValues;
+        int n = structuredLiteralNode.Members().Count();
+        if (classType->MemberVariables().size() != n)
+        {
+            if (dontThrow)
+            {
+                error = true;
+                return;
+            }
+            else
+            {
+                throw Exception("wrong number of members variables for class literal of type '" + ToUtf8(classType->FullName()) + "'", structuredLiteralNode.GetSpan());
+            }
+        }
+        for (int i = 0; i < n; ++i)
+        {
+            TypeSymbol* memberType = classType->MemberVariables()[i]->GetType();
+            value = Evaluate(structuredLiteralNode.Members()[i], memberType, containerScope, boundCompileUnit, dontThrow, currentFunction, structuredLiteralNode.GetSpan());
+            if (error)
+            {
+                if (dontThrow)
+                {
+                    return;
+                }
+                else
+                {
+                    ThrowCannotEvaluateStatically(span, structuredLiteralNode.GetSpan());
+                }
+            }
+            if (!value)
+            {
+                if (dontThrow)
+                {
+                    error = true;
+                    return;
+                }
+                else
+                {
+                    ThrowCannotEvaluateStatically(span, structuredLiteralNode.GetSpan());
+                }
+            }
+            memberValues.push_back(std::move(value));
+        }
+        std::vector<std::unique_ptr<BoundExpression>> arguments = ValuesToLiterals(memberValues, symbolTable, error);
+        if (error)
+        {
+            if (dontThrow)
+            {
+                return;
+            }
+            else
+            {
+                ThrowCannotEvaluateStatically(span, structuredLiteralNode.GetSpan());
+            }
+        }
+        arguments.insert(arguments.begin(), std::unique_ptr<BoundExpression>(new BoundTypeExpression(span, classType->AddPointer(span))));
+        std::vector<FunctionScopeLookup> scopeLookups;
+        scopeLookups.push_back(FunctionScopeLookup(ScopeLookup::this_and_base_and_parent, classType->ClassOrNsScope()));
+        scopeLookups.push_back(FunctionScopeLookup(ScopeLookup::this_and_base_and_parent, containerScope));
+        scopeLookups.push_back(FunctionScopeLookup(ScopeLookup::fileScopes, nullptr));
+        std::unique_ptr<Exception> exception;
+        OverloadResolutionFlags flags = OverloadResolutionFlags::dontInstantiate;
+        if (dontThrow)
+        {
+            flags = flags | OverloadResolutionFlags::dontThrow;
+        }
+        std::vector<TypeSymbol*> templateArgumentTypes;
+        std::unique_ptr<BoundFunctionCall> constructorCall = ResolveOverload(U"@constructor", containerScope, scopeLookups, arguments, boundCompileUnit, currentFunction, span, flags, templateArgumentTypes, exception);
+        if (!constructorCall)
+        {
+            if (dontThrow)
+            {
+                error = true;
+                return;
+            }
+            else
+            {
+                ThrowCannotEvaluateStatically(span, structuredLiteralNode.GetSpan());
+            }
+        }
+        argumentValues = ArgumentsToValues(constructorCall->Arguments(), error, true, boundCompileUnit);
+        if (error)
+        {
+            if (dontThrow)
+            {
+                return;
+            }
+            else
+            {
+                ThrowCannotEvaluateStatically(span, structuredLiteralNode.GetSpan());
+            }
+        }
+        FunctionSymbol* constructorSymbol = constructorCall->GetFunctionSymbol();
+        if (constructorSymbol->IsConstExpr())
+        {
+            FunctionNode* constructorNode = boundCompileUnit.GetFunctionNodeFor(constructorSymbol);
+            constructorNode->Accept(*this);
+        }
+        else
+        {
+            if (dontThrow)
+            {
+                error = true;
+                return;
+            }
+            else
+            {
+                ThrowCannotEvaluateStatically(span, structuredLiteralNode.GetSpan());
+            }
+        }
+    }
+    else
     {
         if (dontThrow)
         {
@@ -1893,16 +2912,9 @@ void Evaluator::Visit(StructuredLiteralNode& structuredLiteralNode)
         }
         else
         {
-            throw Exception("wrong number of members for class literal of type '" + ToUtf8(classType->FullName()) + "'", structuredLiteralNode.GetSpan());
+            throw Exception("class '" + ToUtf8(classType->FullName()) + "' is not a literal class ", structuredLiteralNode.GetSpan());
         }
     }
-    for (int i = 0; i < n; ++i)
-    {
-        TypeSymbol* memberType = classType->MemberVariables()[i]->GetType();
-        value = Evaluate(structuredLiteralNode.Members()[i], memberType, containerScope, boundCompileUnit, dontThrow, currentFunction, structuredLiteralNode.GetSpan());
-        memberValues.push_back(std::move(value));
-    }
-    value.reset(new StructuredValue(structuredLiteralNode.GetSpan(), classType, std::move(memberValues)));
 }
 
 void Evaluator::Visit(IdentifierNode& identifierNode)
@@ -1966,7 +2978,7 @@ void Evaluator::Visit(TemplateIdNode& templateIdNode)
         }
         else
         {
-            ThrowCannotEvaluateStatically(templateIdNode.GetSpan());
+            ThrowCannotEvaluateStatically(span, templateIdNode.GetSpan());
         }
     }
 }
@@ -2035,6 +3047,10 @@ void Evaluator::EvaluateConstantSymbol(ConstantSymbol* constantSymbol, const Spa
         if (constantValue->GetValueType() == ValueType::arrayValue)
         {
             value.reset(new ArrayReferenceValue(static_cast<ArrayValue*>(constantValue)));
+        }
+        else if (constantValue->GetValueType() == ValueType::structuredValue)
+        {
+            value.reset(new StructuredReferenceValue(static_cast<StructuredValue*>(constantValue)));
         }
         else
         {
@@ -2107,12 +3123,30 @@ void Evaluator::Visit(DotNode& dotNode)
     {
         return;
     }
-    if (value && value->IsArrayReferenceValue())
+    if (value)
     {
-        TypeSymbol* type = static_cast<ArrayReferenceValue*>(value.get())->GetArrayValue()->GetType(symbolTable);
-        ScopedValue* scopedValue = new ScopedValue(span, type);
-        scopedValue->SetType(type);
-        value.reset(scopedValue);
+        if (value->IsArrayReferenceValue())
+        {
+            TypeSymbol* type = static_cast<ArrayReferenceValue*>(value.get())->GetArrayValue()->GetType(symbolTable);
+            ScopedValue* scopedValue = new ScopedValue(span, type);
+            scopedValue->SetType(type);
+            value.reset(scopedValue);
+        }
+        else if (value->IsStructuredReferenceValue())
+        {
+            TypeSymbol* type = static_cast<StructuredReferenceValue*>(value.get())->GetStructuredValue()->GetType(symbolTable);
+            ScopedValue* scopedValue = new ScopedValue(span, type);
+            scopedValue->SetType(type->AddPointer(span));
+            scopedValue->SetSubject(value.release());
+            value.reset(scopedValue);
+        }
+        else if (value->GetValueType() == ValueType::structuredValue)
+        {
+            TypeSymbol* type = static_cast<StructuredValue*>(value.get())->GetType(symbolTable);
+            ScopedValue* scopedValue = new ScopedValue(span, type);
+            scopedValue->SetType(type);
+            value.reset(scopedValue);
+        }
     }
     if (value && value->IsScopedValue())
     {
@@ -2130,7 +3164,7 @@ void Evaluator::Visit(DotNode& dotNode)
         if (symbol)
         {
             std::unique_ptr<Value> receiver;
-            if (scopedValue->GetType(symbolTable) && scopedValue->GetType(symbolTable)->IsArrayType())
+            if (scopedValue->GetType(symbolTable) && (scopedValue->GetType(symbolTable)->IsArrayType() || scopedValue->GetType(symbolTable)->BaseType()->IsClassTypeSymbol()))
             {
                 receiver = std::move(value);
             }
@@ -2177,7 +3211,7 @@ void Evaluator::Visit(ArrowNode& arrowNode)
     }
     else
     {
-        ThrowCannotEvaluateStatically(arrowNode.GetSpan());
+        ThrowCannotEvaluateStatically(span, arrowNode.GetSpan());
     }
 }
 
@@ -2189,7 +3223,7 @@ void Evaluator::Visit(EquivalenceNode& equivalenceNode)
     }
     else
     {
-        ThrowCannotEvaluateStatically(equivalenceNode.GetSpan());
+        ThrowCannotEvaluateStatically(span, equivalenceNode.GetSpan());
     }
 }
 
@@ -2201,7 +3235,7 @@ void Evaluator::Visit(ImplicationNode& implicationNode)
     }
     else
     {
-        ThrowCannotEvaluateStatically(implicationNode.GetSpan());
+        ThrowCannotEvaluateStatically(span, implicationNode.GetSpan());
     }
 }
 
@@ -2326,7 +3360,7 @@ void Evaluator::Visit(PrefixIncrementNode& prefixIncrementNode)
         }
         else
         {
-            ThrowCannotEvaluateStatically(prefixIncrementNode.GetSpan());
+            ThrowCannotEvaluateStatically(span, prefixIncrementNode.GetSpan());
         }
     }
     bool unsignedType = value->GetType(symbolTable)->IsUnsignedType();
@@ -2357,7 +3391,7 @@ void Evaluator::Visit(PrefixIncrementNode& prefixIncrementNode)
         }
         else
         {
-            ThrowCannotEvaluateStatically(prefixIncrementNode.GetSpan());
+            ThrowCannotEvaluateStatically(span, prefixIncrementNode.GetSpan());
         }
     }
 }
@@ -2378,7 +3412,7 @@ void Evaluator::Visit(PrefixDecrementNode& prefixDecrementNode)
         }
         else
         {
-            ThrowCannotEvaluateStatically(prefixDecrementNode.GetSpan());
+            ThrowCannotEvaluateStatically(span, prefixDecrementNode.GetSpan());
         }
     }
     bool unsignedType = value->GetType(symbolTable)->IsUnsignedType();
@@ -2405,7 +3439,7 @@ void Evaluator::Visit(PrefixDecrementNode& prefixDecrementNode)
         }
         else
         {
-            ThrowCannotEvaluateStatically(prefixDecrementNode.GetSpan());
+            ThrowCannotEvaluateStatically(span, prefixDecrementNode.GetSpan());
         }
     }
 }
@@ -2450,7 +3484,7 @@ void Evaluator::Visit(AddrOfNode& addrOfNode)
     }
     else
     {
-        ThrowCannotEvaluateStatically(addrOfNode.GetSpan());
+        ThrowCannotEvaluateStatically(span, addrOfNode.GetSpan());
     }
 }
 
@@ -2467,7 +3501,7 @@ void Evaluator::Visit(IsNode& isNode)
     }
     else
     {
-        ThrowCannotEvaluateStatically(isNode.GetSpan());
+        ThrowCannotEvaluateStatically(span, isNode.GetSpan());
     }
 }
 
@@ -2479,7 +3513,7 @@ void Evaluator::Visit(AsNode& asNode)
     }
     else
     {
-        ThrowCannotEvaluateStatically(asNode.GetSpan());
+        ThrowCannotEvaluateStatically(span, asNode.GetSpan());
     }
 }
 
@@ -2499,7 +3533,7 @@ void Evaluator::Visit(IndexingNode& indexingNode)
             }
             else
             {
-                ThrowCannotEvaluateStatically(indexingNode.GetSpan());
+                ThrowCannotEvaluateStatically(span, indexingNode.GetSpan());
             }
         }
         LongValue* indexValue = static_cast<LongValue*>(value.get());
@@ -2534,7 +3568,7 @@ void Evaluator::Visit(IndexingNode& indexingNode)
         }
         else
         {
-            ThrowCannotEvaluateStatically(indexingNode.GetSpan());
+            ThrowCannotEvaluateStatically(span, indexingNode.GetSpan());
         }
     }
 }
@@ -2558,7 +3592,7 @@ void Evaluator::Visit(InvokeNode& invokeNode)
             }
             else
             {
-                ThrowCannotEvaluateStatically(invokeNode.GetSpan());
+                ThrowCannotEvaluateStatically(span, invokeNode.GetSpan());
             }
         }
         values.push_back(std::move(value));
@@ -2589,7 +3623,7 @@ void Evaluator::Visit(InvokeNode& invokeNode)
             }
             else
             {
-                ThrowCannotEvaluateStatically(invokeNode.GetSpan());
+                ThrowCannotEvaluateStatically(span, invokeNode.GetSpan());
             }
         }
         if (functionGroupValue->Receiver() && functionGroupValue->Receiver()->IsScopedValue())
@@ -2603,22 +3637,39 @@ void Evaluator::Visit(InvokeNode& invokeNode)
         templateTypeArguments = std::move(functionGroupValue->TemplateTypeArguments());
         std::unique_ptr<Exception> exception;
         OverloadResolutionFlags flags = OverloadResolutionFlags::dontInstantiate;
-        if (dontThrow)
-        {
-            flags = flags | OverloadResolutionFlags::dontThrow;
-        }
+        flags = flags | OverloadResolutionFlags::dontThrow;
         std::unique_ptr<BoundFunctionCall> functionCall = ResolveOverload(functionGroup->Name(), containerScope, functionScopeLookups, arguments, boundCompileUnit, currentFunction, span, flags,
             templateTypeArguments, exception);
+        bool memberFunctionCall = false;
         if (!functionCall)
         {
-            if (dontThrow)
+            if (currentClassType)
             {
-                error = true;
-                return;
+                arguments.insert(arguments.begin(), std::unique_ptr<BoundExpression>(new BoundTypeExpression(span, currentClassType->AddPointer(span))));
+                functionScopeLookups.push_back(FunctionScopeLookup(ScopeLookup::this_and_base_and_parent, currentClassType->GetContainerScope()));
+                OverloadResolutionFlags flags = OverloadResolutionFlags::dontInstantiate;
+                if (dontThrow)
+                {
+                    flags = flags | OverloadResolutionFlags::dontThrow;
+                }
+                std::unique_ptr<Exception> exception;
+                functionCall = ResolveOverload(functionGroup->Name(), containerScope, functionScopeLookups, arguments, boundCompileUnit, currentFunction, span, flags, templateTypeArguments, exception);
+                if (functionCall)
+                {
+                    memberFunctionCall = true;
+                }
             }
-            else
+            if (!functionCall)
             {
-                ThrowCannotEvaluateStatically(invokeNode.GetSpan());
+                if (dontThrow)
+                {
+                    error = true;
+                    return;
+                }
+                else
+                {
+                    ThrowCannotEvaluateStatically(span, invokeNode.GetSpan());
+                }
             }
         }
         FunctionSymbol* functionSymbol = functionCall->GetFunctionSymbol();
@@ -2634,7 +3685,7 @@ void Evaluator::Visit(InvokeNode& invokeNode)
                 }
                 else
                 {
-                    ThrowCannotEvaluateStatically(invokeNode.GetSpan());
+                    ThrowCannotEvaluateStatically(span, invokeNode.GetSpan());
                 }
             }
             value = functionSymbol->ConstructValue(argumentValues, invokeNode.GetSpan());
@@ -2647,7 +3698,7 @@ void Evaluator::Visit(InvokeNode& invokeNode)
                 }
                 else
                 {
-                    ThrowCannotEvaluateStatically(invokeNode.GetSpan());
+                    ThrowCannotEvaluateStatically(span, invokeNode.GetSpan());
                 }
             }
         }
@@ -2655,7 +3706,8 @@ void Evaluator::Visit(InvokeNode& invokeNode)
         {
             FunctionNode* functionNode = boundCompileUnit.GetFunctionNodeFor(functionSymbol);
             CheckFunctionReturnPaths(functionSymbol, *functionNode, containerScope, boundCompileUnit);
-            argumentValues = ArgumentsToValues(functionCall->Arguments(), error, boundCompileUnit);
+            bool skipFirst = memberFunctionCall || functionGroupValue->Receiver();
+            argumentValues = ArgumentsToValues(functionCall->Arguments(), error, skipFirst, boundCompileUnit);
             if (error)
             {
                 if (dontThrow)
@@ -2664,10 +3716,21 @@ void Evaluator::Visit(InvokeNode& invokeNode)
                 }
                 else
                 {
-                    ThrowCannotEvaluateStatically(invokeNode.GetSpan());
+                    ThrowCannotEvaluateStatically(span, invokeNode.GetSpan());
+                }
+            }
+            ClassTypeSymbol* prevClassType = currentClassType;
+            if (functionGroupValue->Receiver() && functionGroupValue->Receiver()->IsScopedValue())
+            {
+                ScopedValue* receiver = static_cast<ScopedValue*>(functionGroupValue->Receiver());
+                if (receiver->Subject() && receiver->Subject()->GetType(symbolTable)->IsClassTypeSymbol())
+                {
+                    currentClassType = static_cast<ClassTypeSymbol*>(receiver->Subject()->GetType(symbolTable));
+                    structureReferenceValue = std::unique_ptr<Value>(receiver->Subject()->Clone());
                 }
             }
             functionNode->Accept(*this);
+            currentClassType = prevClassType;
         }
         else 
         {
@@ -2683,7 +3746,7 @@ void Evaluator::Visit(InvokeNode& invokeNode)
                     }
                     else
                     {
-                        ThrowCannotEvaluateStatically(invokeNode.GetSpan());
+                        ThrowCannotEvaluateStatically(span, invokeNode.GetSpan());
                     }
                 }
                 value = intrinsic->Evaluate(argumentValues, templateTypeArguments, invokeNode.GetSpan());
@@ -2696,7 +3759,7 @@ void Evaluator::Visit(InvokeNode& invokeNode)
                     }
                     else
                     {
-                        ThrowCannotEvaluateStatically(invokeNode.GetSpan());
+                        ThrowCannotEvaluateStatically(span, invokeNode.GetSpan());
                     }
                 }
             }
@@ -2709,7 +3772,7 @@ void Evaluator::Visit(InvokeNode& invokeNode)
                 }
                 else
                 {
-                    ThrowCannotEvaluateStatically(invokeNode.GetSpan());
+                    ThrowCannotEvaluateStatically(span, invokeNode.GetSpan());
                 }
             }
         }
@@ -2740,7 +3803,7 @@ void Evaluator::Visit(PostfixIncrementNode& postfixIncrementNode)
         }
         else
         {
-            ThrowCannotEvaluateStatically(postfixIncrementNode.GetSpan());
+            ThrowCannotEvaluateStatically(span, postfixIncrementNode.GetSpan());
         }
     }
     bool unsignedType = value->GetType(symbolTable)->IsUnsignedType();
@@ -2774,7 +3837,7 @@ void Evaluator::Visit(PostfixDecrementNode& postfixDecrementNode)
         }
         else
         {
-            ThrowCannotEvaluateStatically(postfixDecrementNode.GetSpan());
+            ThrowCannotEvaluateStatically(span, postfixDecrementNode.GetSpan());
         }
     }
     bool unsignedType = value->GetType(symbolTable)->IsUnsignedType();
@@ -2803,7 +3866,7 @@ void Evaluator::Visit(SizeOfNode& sizeOfNode)
     }
     else
     {
-        ThrowCannotEvaluateStatically(sizeOfNode.GetSpan());
+        ThrowCannotEvaluateStatically(span, sizeOfNode.GetSpan());
     }
 }
 
@@ -2815,7 +3878,7 @@ void Evaluator::Visit(TypeNameNode& typeNameNode)
     }
     else
     {
-        ThrowCannotEvaluateStatically(typeNameNode.GetSpan());
+        ThrowCannotEvaluateStatically(span, typeNameNode.GetSpan());
     }
 }
 
@@ -2835,7 +3898,7 @@ void Evaluator::Visit(CastNode& castNode)
         }
         else
         {
-            ThrowCannotEvaluateStatically(castNode.GetSpan());
+            ThrowCannotEvaluateStatically(span, castNode.GetSpan());
         }
     }
     value.reset(value->As(type, true, castNode.GetSpan(), dontThrow));
@@ -2850,7 +3913,7 @@ void Evaluator::Visit(ConstructNode& constructNode)
     }
     else
     {
-        ThrowCannotEvaluateStatically(constructNode.GetSpan());
+        ThrowCannotEvaluateStatically(span, constructNode.GetSpan());
     }
 }
 
@@ -2862,7 +3925,7 @@ void Evaluator::Visit(NewNode& newNode)
     }
     else
     {
-        ThrowCannotEvaluateStatically(newNode.GetSpan());
+        ThrowCannotEvaluateStatically(span, newNode.GetSpan());
     }
 }
 
@@ -2874,7 +3937,7 @@ void Evaluator::Visit(ThisNode& thisNode)
     }
     else
     {
-        ThrowCannotEvaluateStatically(thisNode.GetSpan());
+        ThrowCannotEvaluateStatically(span, thisNode.GetSpan());
     }
 }
 
@@ -2886,7 +3949,7 @@ void Evaluator::Visit(BaseNode& baseNode)
     }
     else
     {
-        ThrowCannotEvaluateStatically(baseNode.GetSpan());
+        ThrowCannotEvaluateStatically(span, baseNode.GetSpan());
     }
 }
 
@@ -2904,13 +3967,13 @@ std::unique_ptr<Value> Evaluate(Node* node, TypeSymbol* targetType, ContainerSco
         std::unique_ptr<Value> value = evaluator.GetValue();
         if (value && value->IsComplete())
         {
-            if (!TypesEqual(targetType, value->GetType(&boundCompileUnit.GetSymbolTable())))
+            if (!TypesEqual(targetType->PlainType(span), value->GetType(&boundCompileUnit.GetSymbolTable())))
             {
                 if (targetType->IsArrayType() && static_cast<ArrayTypeSymbol*>(targetType)->Size() == -1)
                 {
                     return std::move(value);
                 }
-                value.reset(value->As(targetType, false, node->GetSpan(), dontThrow));
+                value.reset(value->As(targetType->PlainType(span), false, node->GetSpan(), dontThrow));
             }
             return std::move(value);
         }

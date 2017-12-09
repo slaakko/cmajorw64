@@ -1001,9 +1001,16 @@ void TypeBinder::Visit(ConstantNode& constantNode)
     constantSymbol->SetType(value->GetType(&symbolTable));
     constantSymbol->SetValue(value.release());
     constantSymbol->ResetEvaluating();
-    if (val && val->GetValueType() == ValueType::arrayValue)
+    if (val)
     {
-        boundCompileUnit.AddConstantArray(constantSymbol);
+        if (val->GetValueType() == ValueType::arrayValue)
+        {
+            boundCompileUnit.AddConstantArray(constantSymbol);
+        }
+        else if (val->GetValueType() == ValueType::structuredValue)
+        {
+            boundCompileUnit.AddConstantStructure(constantSymbol);
+        }
     }
 }
 

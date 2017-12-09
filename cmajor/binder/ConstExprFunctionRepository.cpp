@@ -4,6 +4,7 @@
 // =================================
 
 #include <cmajor/binder/ConstExprFunctionRepository.hpp>
+#include <cmajor/binder/TypeBinder.hpp>
 #include <cmajor/binder/BoundCompileUnit.hpp>
 
 namespace cmajor { namespace binder {
@@ -14,6 +15,7 @@ ConstExprFunctionRepository::ConstExprFunctionRepository(BoundCompileUnit& bound
 
 FunctionNode* ConstExprFunctionRepository::GetFunctionNodeFor(FunctionSymbol* constExprFunctionSymbol)
 {
+    constExprFunctionSymbol->SetSymbolTable(&boundCompileUnit.GetSymbolTable());
     Node* node = boundCompileUnit.GetSymbolTable().GetNodeNoThrow(constExprFunctionSymbol);
     if (!node)
     {
@@ -22,6 +24,11 @@ FunctionNode* ConstExprFunctionRepository::GetFunctionNodeFor(FunctionSymbol* co
     }
     if (node->IsFunctionNode())
     {
+        if (constExprFunctionSymbol->IsProject() && !constExprFunctionSymbol->IsBound())
+        {
+            TypeBinder typeBinder(boundCompileUnit);
+            node->Accept(typeBinder);
+        }
         return static_cast<FunctionNode*>(node);
     }
     else

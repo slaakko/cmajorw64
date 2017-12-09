@@ -44,6 +44,8 @@ public:
     virtual bool IsScopedValue() const { return false; }
     virtual bool IsFunctionGroupValue() const { return false; }
     virtual bool IsArrayReferenceValue() const { return false; }
+    virtual bool IsStructuredReferenceValue() const { return false; }
+    virtual bool IsComplexValue() const { return false; }
     virtual std::string ToString() const { return std::string(); }
     virtual TypeSymbol* GetType(SymbolTable* symbolTable) = 0;
     const Span& GetSpan() const { return span; }
@@ -381,6 +383,7 @@ public:
     llvm::Value* IrValue(Emitter& emitter) override;
     void Write(BinaryWriter& writer) override;
     void Read(BinaryReader& reader) override;
+    bool IsComplexValue() const override { return true; }
     Value* As(TypeSymbol* targetType, bool cast, const Span& span, bool dontThrow) const override;
     TypeSymbol* GetType(SymbolTable* symbolTable) override { return type; }
     const std::vector<std::unique_ptr<Value>>& Elements() const { return elementValues; }
@@ -398,6 +401,7 @@ public:
     llvm::Value* IrValue(Emitter& emitter) override;
     void Write(BinaryWriter& writer) override;
     void Read(BinaryReader& reader) override;
+    bool IsComplexValue() const override { return true; }
     Value* As(TypeSymbol* targetType, bool cast, const Span& span, bool dontThrow) const override;
     void SetType(TypeSymbol* type_) { type = type_; }
     TypeSymbol* GetType(SymbolTable* symbolTable) override { return type; }

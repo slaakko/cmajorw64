@@ -13,6 +13,7 @@
 #include <cmajor/binder/ConstExprFunctionRepository.hpp>
 #include <cmajor/binder/StringRepository.hpp>
 #include <cmajor/binder/ConstantArrayRepository.hpp>
+#include <cmajor/binder/ConstantStructureRepository.hpp>
 #include <cmajor/binder/ConceptRepository.hpp>
 #include <cmajor/symbols/Module.hpp>
 #include <cmajor/symbols/ConversionTable.hpp>
@@ -62,6 +63,8 @@ public:
     const char32_t* GetUtf32CharPtr(int stringId) const;
     void AddConstantArray(ConstantSymbol* constantArraySymbol);
     ConstantArrayRepository& GetConstantArrayRepository() { return constantArrayRepository; }
+    void AddConstantStructure(ConstantSymbol* constantStructureSymbol);
+    ConstantStructureRepository& GetConstantStructureRepository() { return constantStructureRepository; }
     const std::string& SourceFilePath() const { return compileUnitNode->FilePath(); }
     const std::string& LLFilePath() const { return llFilePath; }
     const std::string& OptLLFilePath() const { return optLLFilePath; }
@@ -93,6 +96,7 @@ private:
     StringRepository<std::u16string, const char16_t*> utf16StringRepository;
     StringRepository<std::u32string, const char32_t*> utf32StringRepository;
     ConstantArrayRepository constantArrayRepository;
+    ConstantStructureRepository constantStructureRepository;
     ConceptRepository conceptRepository;
     ConversionTable conversionTable;
     bool bindingTypes;

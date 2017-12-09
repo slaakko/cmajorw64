@@ -32,6 +32,7 @@ public:
     llvm::Constant* CreateDefaultIrValue(Emitter& emitter) override { return underlyingType->CreateDefaultIrValue(emitter); }
     bool IsSwitchConditionType() const override { return true; }
     ValueType GetValueType() const override;
+    Value* MakeValue() const override;
 private:
     TypeSymbol* underlyingType;
 };

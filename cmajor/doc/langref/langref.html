@@ -27,6 +27,8 @@
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1.4.5 <a href="#character-literals">Character Literals</a><br />
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1.4.6 <a href="#string-literals">String Literals</a><br />
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1.4.7 <a href="#null-literal">Null Literal</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1.4.8 <a href="#array-literal">Array Literal</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1.4.9 <a href="#class-literal">Class Literal</a><br />
         &nbsp;&nbsp;&nbsp;&nbsp;1.5 <a href="#operators">Operators</a><br />
         2 <a href="#basic-types">Basic Types</a><br />
         &nbsp;&nbsp;&nbsp;&nbsp;2.1 <a href="#basic-types-syntax">Syntax</a><br />
@@ -104,7 +106,24 @@
         &nbsp;&nbsp;&nbsp;&nbsp;5.1 <a href="#access-specifiers-syntax">Syntax</a><br />
         6 <a href="#type-expressions">Type Expressions</a><br />
         &nbsp;&nbsp;&nbsp;&nbsp;6.1 <a href="#type-expressions-syntax">Syntax</a><br />
-        7 <a href="#functions">Functions</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;6.2 <a href="#const-qualifier">Const Qualifier</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;6.3 <a href="#type-member-access">Type Member Access</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;6.4 <a href="#pointer-type">Pointer Types</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;6.5 <a href="#reference-type">Reference Types</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;6.5.1 <a href="#lvalue-reference-type">Lvalue Reference Type</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;6.5.2 <a href="#rvalue-reference-type">Rvalue Reference Type</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;6.5 <a href="#array-type">Array Types</a><br />
+        7 <a href="#constants">Constants</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;7.1 <a href="#constants-syntax">Syntax</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;7.2 <a href="#constants-values">Constant Values</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;7.3 <a href="#constants-examples">Examples</a><br />
+        8 <a href="#enumerations">Enumerations</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;8.1 <a href="#enumerations-syntax">Syntax</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;8.2 <a href="#enumerations-underlying-type">Underlying Type</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;8.3 <a href="#enumeration-constants">Enumeration Constants</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;8.4 <a href="#enumerations-examples">Examples</a><br />
+        9 <a href="#functions">Functions</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;9.1 <a href="#functions-syntax">Syntax</a><br />
     </div>
 
     <h2 id="lexical-structure">1 Lexical Structure</h2>
@@ -292,8 +311,8 @@
         when a simple identifier of it would be ambiguous in its context.
         It consists of the names of the <a href="#namespace">namespaces</a> containing the entity (if any) separated by periods followed by the names
         of the types (if any) containing the entity separated by periods followed by the identifier of the entity itself.
-        An <a href="#enumeration-constant">enumeration constant</a> must always be referred by prefixing the name of it by the name of the
-        <a href="#enumerated type">enumerated type</a> that contains it and a period.
+        An <a href="#enumeration-constants">enumeration constant</a> must always be referred by prefixing the name of it by the name of the
+        <a href="#enumerations">enumerated type</a> that contains it and a period.
         A <a href="#construction-statement">local variable</a> cannot be referred by a fully qualified identifier.
         An identifier of a local variable refers always to the local variable in the innermost scope that contains it.
     </p>
@@ -365,7 +384,9 @@
                 <span class="rule"><a href="#rule.integer-literal">integer&#8209;literal</a></span> |
                 <span class="rule"><a href="#rule.char-literal">char&#8209;literal</a></span> |
                 <span class="rule"><a href="#rule.string-literal">string&#8209;literal</a></span> |
-                <span class="rule"><a href="#rule.null-literal">null&#8209;literal</a></span>
+                <span class="rule"><a href="#rule.null-literal">null&#8209;literal</a></span> |
+                <span class="rule"><a href="#rule.array-literal">array&#8209;literal</a></span> |
+                <span class="rule"><a href="#rule.class-literal">class&#8209;literal</a></span>
             </td>
         </tr>
         <tr>
@@ -563,6 +584,28 @@
                 <span class="kw">null</span>
             </td>
         </tr>
+        <tr>
+            <td class="rule" id="rule.array-literal">array&#8209;literal</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="mono">[</span>
+                (<span class="rule"><a href="#rule.constant-expression">constant&#8209;expression</a></span>
+                    (<span class="mono">,</span> <span class="rule"><a href="#rule.constant-expression">constant&#8209;expression</a></span>)*
+                )?
+                <span class="mono">]</span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.class-literal">class&#8209;literal</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="mono">{</span>
+                (<span class="rule"><a href="#rule.constant-expression">constant&#8209;expression</a></span>
+                (<span class="mono">,</span> <span class="rule"><a href="#rule.constant-expression">constant&#8209;expression</a></span>)*
+                )?
+                <span class="mono">}</span>
+            </td>
+        </tr>
     </table>
 
     <h4 id="boolean-literals">1.4.2 Boolean Literals</h4>
@@ -637,6 +680,20 @@
     <p>
         The <a href="#rule.null-literal">null literal</a> represents a special value of a <a href="#pointer-type">pointer</a> that does not point to any memory location.
         Its type is a special <span class="mono">@nullptr_type</span> that is implicitly convertible to any other pointer type.
+    </p>
+
+    <h4 id="array-literal">1.4.8 Array Literal</h4>
+
+    <p>
+        An <a href="#rule.array-literal">array literal</a> represents a value of a <em>constant array</em>. 
+        Elements of a constant array must be <a href="#constant-expression">constant expressions</a> that evaluate to literals, constants or enumeration constants.
+    </p>
+
+    <h4 id="class-literal">1.4.9 Class Literal</h4>
+
+    <p>
+        A <a href="#rule.class-literal">class literal</a> represents a value of <em>literal class</em>.
+        Members of a literal class must be <a href="#constant-expression">constant expressions</a> that evaluate to literals, constants or enumeration constants.
     </p>
 
     <h3 id="operators">1.5 Operators</h3>
@@ -1668,9 +1725,10 @@
     <h3 id="constant-expression">3.14 Constant Expression</h3>
 
     <p>
-        A <a href="#rule.constant-expression">constant expression</a> is syntactically an <a href="#rule.expression">expression</a> that can be evaluated at compile time.
-        It can contain <a href="#literals">literals</a>, <a href="#constant">constants</a>, <a href="#enumeration-constant">enumeration constants</a> and operators that do not
-        involve taking an address of an object.
+        A <a href="#rule.constant-expression">constant expression</a> is an <a href="#rule.expression">expression</a> that is sufficiently simple so that it 
+        can be evaluated at compile time.
+        It can contain <a href="#literals">literals</a>, <a href="#constants">constants</a>, <a href="#enumeration-constants">enumeration constants</a>, operators that do not
+        involve taking an address of an object and invocations of <a href="#const-expr-function">constexpr functions</a>.
     </p>
 
     <h2 id="statements">4 Statements</h2>
@@ -2468,7 +2526,7 @@
     <h2 id="type-expressions">6 Type Expressions</h2>
 
     <p>
-        Type expressions are used for instance for declaring the type of a variable, parameter or constant, or the return type of a function.
+        Type expressions are used for instance for declaring the type of a variable, parameter or <a href="#constants">constan</a>t, or the return type of a <a href="#functions">function</a>.
     </p>
 
     <h3 id="type-expressions-syntax">6.1 Syntax</h3>
@@ -2538,7 +2596,7 @@
             <td class="sep">&rarr;</td>
             <td class="rcontent">
                 <span class="mono">[</span>
-                <span class="rule"><a href="#rule.expression">expression</a></span>?
+                <span class="rule"><a href="#rule.constant-expression">constant&#8209;expression</a></span>?
                 <span class="mono">]</span>
             </td>
         </tr>
@@ -2578,10 +2636,10 @@
         declares a pointer to constant <em>T</em> type.
     </p>
 
-    <h3 id="member-operation">6.3 Member Operation</h3>
+    <h3 id="type-member-access">6.3 Type Member Access</h3>
 
     <p>
-        A <a href="#rule.member">member</a> operation in a type expression
+        A <a href="#rule.member">member</a> access in a type expression
         is used to access a member of a namespace or a class type.
         For example, if <em>N</em> is a namespace that contains type <em>T</em>,
         type expression <em>N</em><span class="mono">.</span><em>T</em> <span class="mono">*</span>
@@ -2595,6 +2653,11 @@
         The value of a pointer object is the memory address of the object it points to or it can be 
         a special <a href="#null-literal"><span class="kw">null</span></a> value that means it does not point to any object.
         The default value of a pointer type object is <span class="kw">null</span>.
+    </p>
+
+    <p>
+        A simple pointed-to object is accessed using the <a href="#dereference-expression">dereference</a> expression.
+        A member of a class object is accessed using the <a href="#pointer-member-access-expression">pointer member access</a> expression.
     </p>
 
     <h4 id="generic-pointer-type">6.4.1 Generic Pointer Type</h4>
@@ -2624,21 +2687,385 @@
 
     <h4 id="lvalue-reference-type">6.5.1 Lvalue Reference Type</h4>
 
-    <h4 id="lvalue-reference-type">6.5.2 Rvalue Reference Type</h4>
+    Lvalue reference types are typically used for passing parameters by reference or by reference to a constant.
+    Only a variable or derefenced pointer can be bound to a nonconstant reference parameter.
+    But a <a href="#literals">literal</a> can also be bound to a parameter that is a reference to a constant. 
+    In that case the literal value is assigned to a temporary variable that is passed as a parameter.
+
+    <h4 id="rvalue-reference-type">6.5.2 Rvalue Reference Type</h4>
 
     <p>
         Rvalue reference types are used for implementing move semantics.
     </p>
 
-    <h2 id="functions">7 Functions</h2>
+    <h3 id="array-type">6.6 Array Types</h3>
 
-    <h3 id="functions-syntax">7.1 Syntax</h3>
+    <p>
+        An <a href="#rule.array">array</a> qualifier is used for declaring an array type.
+        An expression inside the square brackets is the length of the array. 
+        It is optional for constant arrays for which the compiler can calculate the length of the array from its initializing expression.
+        If the length of the constant array is specified it must match the length of the array initializer.
+    </p>
+
+    <p>
+        If <em>a</em> denotes an array object, the length of it can be obtained using <em>a.Length()</em> notation.
+    </p>
+
+    <p>
+        Multidimensional arrays can be declarated as arrays of arrays, for example, <span class="kw">int</span>[3][3] <span class="var">x</span>,
+        defines <em>x</em> as a two-dimensional array of nine integers.
+    </p>
+
+    <h2 id="constants">7 Constants</h2>
+
+    <p>
+        A <a href="#rule.constant">constant</a> represents either a simple value of a <a href="#basic-types">basic</a> or
+        <a href="#enumerations">enumerated</a> type,
+        or an <a href="#array-type">array</a> or <a href="#literal-class">structure</a> of values that the compiler must be 
+        able to evaluate at compile time.
+    </p>
+
+    <h3 id="constants-syntax">7.1 Syntax</h3>
 
     <table class="grammar">
         <tr>
-            <td class="rule" id="rule.function">access&#8209;specifier</td>
+            <td class="rule" id="rule.constant">constant</td>
             <td class="sep">&rarr;</td>
             <td class="rcontent">
+                <span class="rule"><a href="#rule.access-specifier">access&#8209;specifier</a></span>?
+                <span class="kw">const</span>
+                <span class="rule"><a href="#rule.constant-type">constant&#8209;type</a></span>
+                <span class="rule"><a href="#rule.constant-name">constant&#8209;name</a></span>
+                <span class="mono">=</span>
+                <span class="rule"><a href="#rule.constant-value">constant&#8209;value</a></span>
+                <span class="mono">;</span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.constant-type">constant&#8209;type</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.type-expr">type&#8209;expr</a></span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.constant-name">constant&#8209;name</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.identifier">identifier</a></span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.constant-value">constant&#8209;value</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.constant-expression">constant&#8209;expression</a></span>
+            </td>
+        </tr>
+    </table>
+
+    <h3 id="constants-values">7.2 Constant Values</h3>
+
+    <p>
+        The value of a constant must be a <a href="#constant-expression">constant&#8209;expression</a>
+        that means it is sufficiently simple so that the compiler can evaluate it at compile time.
+        It cannot use <a href="#free-store">free store</a> so it cannot contain a <a href="#rule.new-expr">new expression</a>
+        for example. However, it <em>can</em> contain invocations of <a href="#const-expr-function">constexpr</a> functions with constant arguments.
+        Some algorithms in the system library are declared <span class="kw">constexpr</span>.
+    </p>
+
+    <h3 id="constants-examples">7.3 Examples</h3>
+
+    <p>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span> <span class="kw">class</span> <span class="var">LiteralClass</span><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span> <span class="kw">constexpr</span> <span class="var">LiteralClass</span>(<span class="kw">int</span> <span class="var">x_</span>, <span class="kw">double</span> <span class="var">y_</span>) : <span class="var">x</span>(<span class="var">x_</span>), <span class="var">y</span>(<span class="var">y_</span>)<br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span> <span class="kw">constexpr</span> <span class="kw">int</span> <span class="var">X()</span> <span class="kw">const</span><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span> <span class="var">x</span>;<br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span> <span class="kw">constexpr</span> <span class="kw">double</span> <span class="var">Y()</span> <span class="kw">const</span><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span> <span class="var">y</span>;<br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">private</span> <span class="kw">int</span> <span class="var">x</span>;<br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">private</span> <span class="kw">double</span> <span class="var">y</span>;<br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br />
+        <br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span> <span class="kw">const</span> <span class="kw">int</span> <span class="var">meaningOfLife</span> <span class="mono">=</span> <span class="mono">42</span><span class="mono">;</span><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span> <span class="kw">const</span> <span class="kw">double</span> <span class="var">pi</span> <span class="mono">=</span> <span class="mono">3.1415926</span><span class="mono">;</span><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span> <span class="kw">const</span> <span class="kw">int[]</span> <span class="var">numberArray</span> <span class="mono">= [</span><span class="mono">1</span><span class="mono">,</span> <span class="mono">2</span><span class="mono">,</span> <span class="mono">3</span><span class="mono">]</span><span class="mono">;</span><br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span> <span class="kw">const</span> <span class="kw">long</span> <span class="var">lengthOfNumbers</span> <span class="mono">=</span> <span class="var">numberArray.Length()</span><span class="mono">;</span><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span> <span class="kw">const</span> <span class="var">LiteralClass</span> <span class="var">literalClass</span> <span class="mono">= {</span><span class="mono">1 + 2 * 3</span><span class="mono">,</span> <span class="mono">Min(pi, 4.13)</span><span class="mono">};</span><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span> <span class="kw">const</span> <span class="kw">double</span> <span class="var">y</span> <span class="mono">= </span><span class="var">literalClass.Y()</span><span class="mono">;</span><br/>
+    </p>
+    
+
+    <h2 id="enumerations">8 Enumerations</h2>
+
+    <p>
+        An enumeration is a group of constants collected under a common name called <em>enumerated type</em>.
+    </p>
+
+    <h3 id="enumerations-syntax">8.1 Syntax</h3>
+
+    <table class="grammar">
+        <tr>
+            <td class="rule" id="rule.enumerated-type">enumerated&#8209;type</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.access-specifier">access&#8209;specifier</a></span>?
+                <span class="kw">enum</span>
+                <span class="rule"><a href="#rule.enumerated-type-name">enumerated&#8209;type&#8209;name</a></span>
+                <span class="rule"><a href="#rule.underlying-type">underlying&#8209;type</a></span>?<br/>
+                <span class="mono">{</span>
+                <span class="rule"><a href="#rule.enumeration-constants">enumeration&#8209;constants</a></span>
+                <span class="mono">}</span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.enumerated-type-name">enumerated&#8209;type&#8209;name</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.identifier">identifier</a></span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.underlying-type">underlying&#8209;type</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="mono">:</span>
+                <span class="rule"><a href="#rule.type-expr">type&#8209;expr</a></span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.enumeration-constants">enumeration&#8209;constants</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.enumeration-constant">enumeration&#8209;constant</a></span>
+                (<span class="mono">,</span>
+                <span class="rule"><a href="#rule.enumeration-constant">enumeration&#8209;constant</a></span>)*
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.enumeration-constant">enumeration&#8209;constant</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.enumeration-constant-name">enumeration&#8209;constant&#8209;name</a></span>
+                (
+                <span class="mono">=</span>
+                <span class="rule"><a href="#rule.enumeration-constant-value">enumeration&#8209;constant&#8209;value</a></span>
+                )?
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.enumeration-constant-name">enumeration&#8209;constant&#8209;name</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.identifier">identifier</a></span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.enumeration-constant-value">enumeration&#8209;constant&#8209;value</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.constant-expression">constant&#8209;expression</a></span>
+            </td>
+        </tr>
+    </table>
+
+    <h3 id="enumerations-underlying-type">8.2 Underlying Type</h3>
+
+    <p>
+        Enumerated type has an <em>underlying</em> type that must be, if specified, a <a href="#basic-integer-types">basic integer type</a>.
+        If the underlying type is not specified, <span class="kw">int</span> is used as the underlying type.
+    </p>
+
+    <h3 id="enumeration-constants">8.3 Enumeration Constants</h3>
+
+    <p>
+        The value of an enumeration constant, if specified, must be a <a href="#constant-expression">constant expression</a> that evaluates to
+        a value that is convertible to the <a href="#enumerations-underlying-type">underlying</a> type of the enumerated type.
+        If the value of the first enumeration constant is not specified, it has value zero.
+        If the value of any other enumeration constant is not specified, it has the value of the preceding enumeration constant plus one.
+    </p>
+
+    <p>
+        Enumeration constants are accessed with <em>EnumType.enumConstant</em> syntax.
+    </p>
+
+    <h3 id="enumerations-examples">8.4 Examples</h3>
+
+    <p>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span> <span class="kw">enum</span> <span class="var">TrafficLight</span><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="mono">{</span><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="var">green, yellow, red</span><br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="mono">}</span><br />
+        <br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span> <span class="kw">enum</span> <span class="var">Flags</span> <span class="mono">:</span> <span class="kw">byte</span><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="mono">{</span><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="var">foo</span> <span class="mono">=</span> <span class="var">1u &lt;&lt; 0u</span><span class="mono">;</span><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="var">bar</span> <span class="mono">=</span> <span class="var">1u &lt;&lt; 1u</span><span class="mono">;</span><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="mono">}</span><br />
+        <br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span> <span class="var">main()</span><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="mono">{</span><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="var">TrafficLight light </span><span class="mono">=</span> <span class="var">TrafficLight.green</span><span class="mono">;</span><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="mono">}</span><br />
+    </p>
+    
+
+    <h2 id="functions">9 Functions</h2>
+
+    <p>
+        A function represents computation that can be <a href="#invocation-expression">invoked</a> at run time and in simple cases also at compile time. 
+        The computation is defined by a <a href="#compound-statement">block of statements</a> that define the control flow of the function. 
+        Invocation of a function may yield a value, or the function can be a <span class="kw">void</span> function that is invoked for its 
+        <em><a href="http://en.wikipedia.org/wiki/Side_effect_(computer_science)">side-effects</a></em>.
+    </p>
+
+    <h3 id="functions-syntax">9.1 Syntax</h3>
+
+    <table class="grammar">
+        <tr>
+            <td class="rule" id="rule.function">function</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.function-specifiers">function&#8209;specifiers</a></span>
+                <span class="rule"><a href="#rule.return-type">return&#8209;type</a></span>
+                <span class="rule"><a href="#rule.function-group-id">function&#8209;group&#8209;id</a></span>
+                <span class="rule"><a href="#rule.template-parameter-list">template&#8209;parameter&#8209;list</a></span>?
+                <span class="rule"><a href="#rule.parameters">parameters</a></span>
+                <span class="rule"><a href="#rule.where-constraint">where&#8209;constraint</a></span>?
+                (<span class="rule"><a href="#rule.compound-statement">compound&#8209;statement</a></span> |
+                <span class="mono">;</span>)
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.function-specifiers">function&#8209;specifiers</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                (<span class="rule"><a href="#rule.access-specifier">access&#8209;specifier</a></span> |
+                <span class="kw">constexpr</span> |
+                <span class="kw">inline</span> |
+                <span class="kw">extern</span> |
+                <span class="kw">cdecl</span> |
+                <span class="kw">nothrow</span> |
+                <span class="kw">throw</span>)*
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.return-type">return&#8209;type</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.type-expr">type&#8209;expr</a></span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.function-group-id">function&#8209;group&#8209;id</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.identifier">identifier</a></span> |
+                <span class="rule"><a href="#rule.operator-function-group-id">operator&#8209;function&#8209;group&#8209;id</a></span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.operator-function-group-id">operator&#8209;function&#8209;group&#8209;id</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="kw">operator</span>
+                (<span class="mono">&lt;&lt;</span> |
+                <span class="mono">&gt;&gt;</span> |
+                <span class="mono">==</span> |
+                <span class="mono">=</span> |
+                <span class="mono">&lt;</span> |
+                <span class="mono">&minus;&gt;</span> |
+                <span class="mono">++</span> |
+                <span class="mono">&minus;&minus;</span> |
+                <span class="mono">+</span> |
+                <span class="mono">&minus;</span> |
+                <span class="mono">*</span> |
+                <span class="mono">/</span> |
+                <span class="mono">%</span> |
+                <span class="mono">&amp;</span> |
+                <span class="mono">|</span> |
+                <span class="mono">^</span> |
+                <span class="mono">!</span> |
+                <span class="mono">~</span> |
+                <span class="mono">[]</span> |
+                <span class="mono">()</span>)
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.template-parameter-list">template&#8209;parameter&#8209;list</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="mono">&lt;</span>
+                <span class="rule"><a href="#rule.template-parameter">template&#8209;parameter</a></span>
+                (
+                <span class="mono">,</span>
+                <span class="rule"><a href="#rule.template-parameter">template&#8209;parameter</a></span>
+                )*
+                <span class="mono">&gt;</span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.template-parameter">template&#8209;parameter</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.identifier">identifier</a></span>
+                (<span class="mono">=</span>
+                <span class="rule"><a href="#rule.default-value">default&#8209;value</a></span>
+                )?
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.default-value">default&#8209;value</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.type-expr">type&#8209;expr</a></span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.parameters">parameters</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="mono">(</span>
+                <span class="rule"><a href="#rule.parameter-list">parameter&#8209;list</a></span>?
+                <span class="mono">)</span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.parameter-list">parameter&#8209;list</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.parameter">parameter</a></span>
+                (<span class="mono">,</span>
+                <span class="rule"><a href="#rule.parameter">parameter</a></span>)*
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.parameter">parameter</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.parameter-type">parameter&#8209;type</a></span>
+                <span class="rule"><a href="#rule.parameter-name">parameter&#8209;name</a></span>?
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.parameter-type">parameter&#8209;type</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.type-expr">type&#8209;expr</a></span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.parameter-type">parameter&#8209;name</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.identifier">identifier</a></span>
             </td>
         </tr>
     </table>
@@ -2648,7 +3075,8 @@
     <sup id="footnote-1">
         1. Invocation of a <span class="kw">void</span> function does not have a value, but it can have
         <em><a href="http://en.wikipedia.org/wiki/Side_effect_(computer_science)">side-effects</a></em>, for example write text to a stream.
-    </sup><br />
+    </sup>
+    <br />
 
     <sup id="footnote-2">
         2. Actually a local variable can reside only in a processor register if its address is not needed.

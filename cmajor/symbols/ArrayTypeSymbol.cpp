@@ -84,7 +84,13 @@ ValueType ArrayTypeSymbol::GetValueType() const
     return ValueType::arrayValue;
 }
 
-ArrayLengthFunction::ArrayLengthFunction(const Span& span_, const std::u32string& name_) : FunctionSymbol(SymbolType::arrayLengthFunctionSymbol, span_, name_)
+Value* ArrayTypeSymbol::MakeValue() const
+{
+    std::vector<std::unique_ptr<Value>> elementValues;
+    return new ArrayValue(GetSpan(), const_cast<TypeSymbol*>(static_cast<const TypeSymbol*>(this)), std::move(elementValues));
+}
+
+ArrayLengthFunction::ArrayLengthFunction(const Span& span_, const std::u32string& name_) : FunctionSymbol(SymbolType::arrayLengthFunctionSymbol, span_, name_), arrayType(nullptr)
 {
 }
 
@@ -138,7 +144,7 @@ std::unique_ptr<Value> ArrayLengthFunction::ConstructValue(const std::vector<std
     return std::unique_ptr<Value>(new LongValue(span, arrayType->Size()));
 }
 
-ArrayBeginFunction::ArrayBeginFunction(const Span& span_, const std::u32string& name_) : FunctionSymbol(SymbolType::arrayBeginFunctionSymbol, span_, name_)
+ArrayBeginFunction::ArrayBeginFunction(const Span& span_, const std::u32string& name_) : FunctionSymbol(SymbolType::arrayBeginFunctionSymbol, span_, name_), arrayType(nullptr)
 {
 }
 
@@ -192,7 +198,7 @@ void ArrayBeginFunction::GenerateCall(Emitter& emitter, std::vector<GenObject*>&
     emitter.Stack().Push(beginPtr);
 }
 
-ArrayEndFunction::ArrayEndFunction(const Span& span_, const std::u32string& name_) : FunctionSymbol(SymbolType::arrayEndFunctionSymbol, span_, name_)
+ArrayEndFunction::ArrayEndFunction(const Span& span_, const std::u32string& name_) : FunctionSymbol(SymbolType::arrayEndFunctionSymbol, span_, name_), arrayType(nullptr)
 {
 }
 
@@ -246,7 +252,7 @@ void ArrayEndFunction::GenerateCall(Emitter& emitter, std::vector<GenObject*>& g
     emitter.Stack().Push(endPtr);
 }
 
-ArrayCBeginFunction::ArrayCBeginFunction(const Span& span_, const std::u32string& name_) : FunctionSymbol(SymbolType::arrayCBeginFunctionSymbol, span_, name_)
+ArrayCBeginFunction::ArrayCBeginFunction(const Span& span_, const std::u32string& name_) : FunctionSymbol(SymbolType::arrayCBeginFunctionSymbol, span_, name_), arrayType(nullptr)
 {
 }
 
@@ -300,7 +306,7 @@ void ArrayCBeginFunction::GenerateCall(Emitter& emitter, std::vector<GenObject*>
     emitter.Stack().Push(beginPtr);
 }
 
-ArrayCEndFunction::ArrayCEndFunction(const Span& span_, const std::u32string& name_) : FunctionSymbol(SymbolType::arrayCEndFunctionSymbol, span_, name_)
+ArrayCEndFunction::ArrayCEndFunction(const Span& span_, const std::u32string& name_) : FunctionSymbol(SymbolType::arrayCEndFunctionSymbol, span_, name_), arrayType(nullptr)
 {
 }
 

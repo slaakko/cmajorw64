@@ -552,6 +552,11 @@ void BoundCompileUnit::AddConstantArray(ConstantSymbol* constantArraySymbol)
     constantArrayRepository.AddConstantArray(constantArraySymbol);
 }
 
+void BoundCompileUnit::AddConstantStructure(ConstantSymbol* constantStructureSymbol)
+{
+    constantStructureRepository.AddConstantStructure(constantStructureSymbol);
+}
+
 void BoundCompileUnit::PushBindingTypes()
 {
     bindingTypesStack.push(bindingTypes);

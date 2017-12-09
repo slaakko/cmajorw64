@@ -451,7 +451,7 @@ bool FindConversions(BoundCompileUnit& boundCompileUnit, FunctionSymbol* functio
 {
     if (!currentFunction)
     {
-        if (!function->IsBound())
+        if (function->IsProject() && !function->IsBound())
         {
             Node* node = boundCompileUnit.GetSymbolTable().GetNodeNoThrow(function);
             if (node)
@@ -930,11 +930,11 @@ std::unique_ptr<BoundFunctionCall> CreateBoundFunctionCall(FunctionSymbol* bestF
             {
                 if (!argument->IsLvalueExpression())
                 {
-                    if (!boundFunction)
+                    BoundLocalVariable* backingStore = nullptr;
+                    if (boundFunction)
                     {
-                        return std::unique_ptr<BoundFunctionCall>();
+                        backingStore = new BoundLocalVariable(boundFunction->GetFunctionSymbol()->CreateTemporary(argument->GetType(), span));
                     }
-                    BoundLocalVariable* backingStore = new BoundLocalVariable(boundFunction->GetFunctionSymbol()->CreateTemporary(argument->GetType(), span));
                     argument.reset(new BoundTemporary(std::move(argument), std::unique_ptr<BoundLocalVariable>(backingStore)));
                 }
                 TypeSymbol* type = nullptr;
@@ -1024,11 +1024,11 @@ std::unique_ptr<BoundFunctionCall> CreateBoundFunctionCall(FunctionSymbol* bestF
             {
                 if (!argument->IsLvalueExpression())
                 {
-                    if (!boundFunction)
+                    BoundLocalVariable* backingStore = nullptr;
+                    if (boundFunction)
                     {
-                        return std::unique_ptr<BoundFunctionCall>();
+                        backingStore = new BoundLocalVariable(boundFunction->GetFunctionSymbol()->CreateTemporary(argument->GetType(), span));
                     }
-                    BoundLocalVariable* backingStore = new BoundLocalVariable(boundFunction->GetFunctionSymbol()->CreateTemporary(argument->GetType(), span));
                     argument.reset(new BoundTemporary(std::move(argument), std::unique_ptr<BoundLocalVariable>(backingStore)));
                 }
                 TypeSymbol* type = nullptr;
@@ -1095,7 +1095,7 @@ std::unique_ptr<BoundFunctionCall> CreateBoundFunctionCall(FunctionSymbol* bestF
 
 std::unique_ptr<BoundFunctionCall> SelectViableFunction(const std::unordered_set<FunctionSymbol*>& viableFunctions, const std::u32string& groupName, 
     std::vector<std::unique_ptr<BoundExpression>>& arguments, ContainerScope* containerScope, BoundCompileUnit& boundCompileUnit, BoundFunction* boundFunction, const Span& span,
-    OverloadResolutionFlags flags, const std::vector<TypeSymbol*>& templateArgumentTypes, std::unique_ptr<Exception>& exception)
+    OverloadResolutionFlags flags, std::vector<TypeSymbol*>& templateArgumentTypes, std::unique_ptr<Exception>& exception)
 {
     std::vector<FunctionMatch> functionMatches;
     std::vector<FunctionMatch> failedFunctionMatches;
@@ -1237,6 +1237,19 @@ std::unique_ptr<BoundFunctionCall> SelectViableFunction(const std::unordered_set
                 {
                     bestFun = boundCompileUnit.InstantiateFunctionTemplate(bestFun, bestMatch.templateParameterMap, span);
                 }
+                else
+                {
+                    templateArgumentTypes.clear();
+                    for (TemplateParameterSymbol* templateParameter : bestFun->TemplateParameters())
+                    {
+                        auto it = bestMatch.templateParameterMap.find(templateParameter);
+                        if (it != bestMatch.templateParameterMap.cend())
+                        {
+                            TypeSymbol* templateArgumentType = it->second;
+                            templateArgumentTypes.push_back(templateArgumentType);
+                        }
+                    }
+                }
             }
             else if (!bestFun->IsGeneratedFunction() && bestFun->Parent()->GetSymbolType() == SymbolType::classTemplateSpecializationSymbol)
             {
@@ -1306,6 +1319,19 @@ std::unique_ptr<BoundFunctionCall> SelectViableFunction(const std::unordered_set
             if (instantiate)
             {
                 singleBest = boundCompileUnit.InstantiateFunctionTemplate(singleBest, bestMatch.templateParameterMap, span);
+            }
+            else
+            {
+                templateArgumentTypes.clear();
+                for (TemplateParameterSymbol* templateParameter : singleBest->TemplateParameters())
+                {
+                    auto it = bestMatch.templateParameterMap.find(templateParameter);
+                    if (it != bestMatch.templateParameterMap.cend())
+                    {
+                        TypeSymbol* templateArgumentType = it->second;
+                        templateArgumentTypes.push_back(templateArgumentType);
+                    }
+                }
             }
         }
         else if (!singleBest->IsGeneratedFunction() && singleBest->Parent()->GetSymbolType() == SymbolType::classTemplateSpecializationSymbol)
@@ -1383,7 +1409,7 @@ std::unique_ptr<BoundFunctionCall> ResolveOverload(const std::u32string& groupNa
 
 std::unique_ptr<BoundFunctionCall> ResolveOverload(const std::u32string& groupName, ContainerScope* containerScope, const std::vector<FunctionScopeLookup>& functionScopeLookups, 
     std::vector<std::unique_ptr<BoundExpression>>& arguments, BoundCompileUnit& boundCompileUnit, BoundFunction* currentFunction, const Span& span, 
-    OverloadResolutionFlags flags, const std::vector<TypeSymbol*>& templateArgumentTypes, std::unique_ptr<Exception>& exception)
+    OverloadResolutionFlags flags, std::vector<TypeSymbol*>& templateArgumentTypes, std::unique_ptr<Exception>& exception)
 {
     int arity = arguments.size();
     std::unordered_set<FunctionSymbol*> viableFunctions;

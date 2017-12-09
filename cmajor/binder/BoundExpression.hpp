@@ -168,6 +168,7 @@ public:
     bool HasValue() const override { return true; }
     bool IsLvalueExpression() const override { return true; }
     std::string TypeString() const override { return "temporary"; }
+    std::unique_ptr<Value> ToValue(BoundCompileUnit& boundCompileUnit) const override;
 private:
     std::unique_ptr<BoundExpression> rvalueExpr;
     std::unique_ptr<BoundLocalVariable> backingStore;
@@ -196,6 +197,7 @@ public:
     void Accept(BoundNodeVisitor& visitor) override;
     std::string TypeString() const override { return "address of expression"; }
     std::unique_ptr<BoundExpression>& Subject() { return subject; }
+    std::unique_ptr<Value> ToValue(BoundCompileUnit& boundCompileUnit) const override;
 private:
     std::unique_ptr<BoundExpression> subject;
 };

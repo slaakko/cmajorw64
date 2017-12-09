@@ -7,13 +7,13 @@ using System.Concepts;
 
 namespace System
 {
-    public nothrow inline const T& Min<T>(const T& left, const T& right) where T is LessThanComparable
+    public constexpr nothrow inline const T& Min<T>(const T& left, const T& right) where T is LessThanComparable
     {
         if (left <= right) return left;
         return right;
     }
 
-    public nothrow inline const T& Max<T>(const T& left, const T& right) where T is LessThanComparable
+    public constexpr nothrow inline const T& Max<T>(const T& left, const T& right) where T is LessThanComparable
     {
         if (right >= left) return right;
         return left;
@@ -120,7 +120,7 @@ namespace System
         return to;
     }
 
-    public nothrow long Distance<I>(I first, I last) where I is ForwardIterator
+    public constexpr nothrow long Distance<I>(I first, I last) where I is ForwardIterator
     {
         long distance = 0;
         while (first != last)
@@ -131,12 +131,12 @@ namespace System
         return distance;
     }
 
-    public nothrow inline long Distance<I>(I first, I last) where I is RandomAccessIterator
+    public constexpr nothrow inline long Distance<I>(I first, I last) where I is RandomAccessIterator
     {
         return last - first;
     }
 
-    public nothrow I Next<I>(I i, long n) where I is ForwardIterator
+    public constexpr nothrow I Next<I>(I i, long n) where I is ForwardIterator
     {
         #assert(n >= 0);
         while (n > 0)
@@ -147,12 +147,12 @@ namespace System
         return i;
     }
 
-    public nothrow inline I Next<I>(I i, long n) where I is RandomAccessIterator
+    public constexpr nothrow inline I Next<I>(I i, long n) where I is RandomAccessIterator
     {
         return i + n;
     }
 
-    public nothrow I LowerBound<I, T>(I first, I last, const T& value) where I is ForwardIterator and TotallyOrdered<T, I.ValueType>
+    public constexpr nothrow I LowerBound<I, T>(I first, I last, const T& value) where I is ForwardIterator and TotallyOrdered<T, I.ValueType>
     {
         long len = Distance(first, last);
         while (len > 0)
@@ -173,7 +173,7 @@ namespace System
         return first;
     }
 
-    public nothrow I LowerBound<I, T, R>(I first, I last, const T& value, R r) where I is ForwardIterator and T is I.ValueType and R is Relation and R.Domain is I.ValueType
+    public constexpr nothrow I LowerBound<I, T, R>(I first, I last, const T& value, R r) where I is ForwardIterator and T is I.ValueType and R is Relation and R.Domain is I.ValueType
     {
         long len = Distance(first, last);
         while (len > 0)
@@ -194,7 +194,7 @@ namespace System
         return first;
     }
 
-    public nothrow I UpperBound<I, T>(I first, I last, const T& value) where I is ForwardIterator and TotallyOrdered<T, I.ValueType>
+    public constexpr nothrow I UpperBound<I, T>(I first, I last, const T& value) where I is ForwardIterator and TotallyOrdered<T, I.ValueType>
     {
         long len = Distance(first, last);
         while (len > 0)
@@ -215,7 +215,7 @@ namespace System
         return first;
     }
 
-    public nothrow I UpperBound<I, T, R>(I first, I last, const T& value, R r) where I is ForwardIterator and T is I.ValueType and R is Relation and R.Domain is I.ValueType
+    public constexpr nothrow I UpperBound<I, T, R>(I first, I last, const T& value, R r) where I is ForwardIterator and T is I.ValueType and R is Relation and R.Domain is I.ValueType
     {
         long len = Distance(first, last);
         while (len > 0)
@@ -236,7 +236,7 @@ namespace System
         return first;
     }
 
-    public Pair<I, I> EqualRange<I, T>(I first, I last, const T& value) where I is ForwardIterator and TotallyOrdered<T, I.ValueType>
+    public constexpr Pair<I, I> EqualRange<I, T>(I first, I last, const T& value) where I is ForwardIterator and TotallyOrdered<T, I.ValueType>
     {
         long len = Distance(first, last);
         while (len > 0)
@@ -265,7 +265,7 @@ namespace System
         return Pair<I, I>(first, first);
     }
 
-    public Pair<I, I> EqualRange<I, T, R>(I first, I last, const T& value, R r) where I is ForwardIterator and T is I.ValueType and R is Relation and R.Domain is I.ValueType
+    public constexpr Pair<I, I> EqualRange<I, T, R>(I first, I last, const T& value, R r) where I is ForwardIterator and T is I.ValueType and R is Relation and R.Domain is I.ValueType
     {
         long len = Distance(first, last);
         while (len > 0)
@@ -294,7 +294,7 @@ namespace System
         return Pair<I, I>(first, first);
     }
 
-    public nothrow I Find<I, T>(I begin, I end, const T& value) where I is InputIterator and T is Semiregular and EqualityComparable<T, I.ValueType>
+    public constexpr nothrow I Find<I, T>(I begin, I end, const T& value) where I is InputIterator and T is Semiregular and EqualityComparable<T, I.ValueType>
     {
         while (begin != end)
         {
@@ -307,7 +307,7 @@ namespace System
         return end;
     }
 
-    public nothrow I Find<I, P>(I begin, I end, P p) where I is InputIterator and P is UnaryPredicate and P.ArgumentType is I.ValueType
+    public constexpr nothrow I Find<I, P>(I begin, I end, P p) where I is InputIterator and P is UnaryPredicate and P.ArgumentType is I.ValueType
     {
         while (begin != end)
         {
@@ -320,7 +320,7 @@ namespace System
         return end;
     }
 
-    public nothrow long Count<I, T>(I begin, I end, const T& value) where I is InputIterator and T is Semiregular and EqualityComparable<T, I.ValueType>
+    public constexpr nothrow long Count<I, T>(I begin, I end, const T& value) where I is InputIterator and T is Semiregular and EqualityComparable<T, I.ValueType>
     {
         long count = 0;
         while (begin != end)
@@ -334,7 +334,7 @@ namespace System
         return count;
     }
 
-    public nothrow long Count<I, P>(I begin, I end, P p) where I is InputIterator and P is UnaryPredicate and P.ArgumentType is I.ValueType
+    public constexpr nothrow long Count<I, P>(I begin, I end, P p) where I is InputIterator and P is UnaryPredicate and P.ArgumentType is I.ValueType
     {
         long count = 0;
         while (begin != end)
@@ -426,7 +426,7 @@ namespace System
         return init;
     }
 
-    public F ForEach<I, F>(I begin, I end, F f) where I is InputIterator and F is UnaryFunction and F.ArgumentType is I.ValueType
+    public constexpr F ForEach<I, F>(I begin, I end, F f) where I is InputIterator and F is UnaryFunction and F.ArgumentType is I.ValueType
     {
         while (begin != end)
         {
@@ -627,7 +627,7 @@ namespace System
         Copy(list.CBegin(), list.CEnd(), c.Begin());
     }
 
-    public nothrow bool Equal<I1, I2, R>(I1 first1, I1 last1, I2 first2, I2 last2, R r) where I1 is InputIterator and I2 is InputIterator and Relation<R, I1.ValueType, I2.ValueType>
+    public constexpr nothrow bool Equal<I1, I2, R>(I1 first1, I1 last1, I2 first2, I2 last2, R r) where I1 is InputIterator and I2 is InputIterator and Relation<R, I1.ValueType, I2.ValueType>
     {
         while (first1 != last1 && first2 != last2)
         {
@@ -641,12 +641,12 @@ namespace System
         return first1 == last1 && first2 == last2;
     }
 
-    public nothrow inline bool Equal<I1, I2>(I1 first1, I1 last1, I2 first2, I2 last2) where I1 is InputIterator and I2 is InputIterator and EqualityComparable<I1.ValueType, I2.ValueType>
+    public constexpr nothrow inline bool Equal<I1, I2>(I1 first1, I1 last1, I2 first2, I2 last2) where I1 is InputIterator and I2 is InputIterator and EqualityComparable<I1.ValueType, I2.ValueType>
     {
         return Equal(first1, last1, first2, last2, EqualTo<I1.ValueType, I2.ValueType>());
     }
 
-    public nothrow bool LexicographicalCompare<I1, I2, R>(I1 first1, I1 last1, I2 first2, I2 last2, R r)
+    public constexpr nothrow bool LexicographicalCompare<I1, I2, R>(I1 first1, I1 last1, I2 first2, I2 last2, R r)
         where I1 is InputIterator and I2 is InputIterator and Same<I1.ValueType, I2.ValueType> and Relation<R, I1.ValueType, I2.ValueType> and Relation<R, I2.ValueType, I1.ValueType>
     {
         while (first1 != last1 && first2 != last2)
@@ -665,12 +665,12 @@ namespace System
         return first1 == last1 && first2 != last2;
     }
 
-    public nothrow inline bool LexicographicalCompare<I1, I2>(I1 first1, I1 last1, I2 first2, I2 last2) where I1 is InputIterator and I2 is InputIterator and LessThanComparable<I1.ValueType, I2.ValueType>
+    public constexpr nothrow inline bool LexicographicalCompare<I1, I2>(I1 first1, I1 last1, I2 first2, I2 last2) where I1 is InputIterator and I2 is InputIterator and LessThanComparable<I1.ValueType, I2.ValueType>
     {
         return LexicographicalCompare(first1, last1, first2, last2, Less<I1.ValueType, I2.ValueType>());
     }
 
-    public nothrow I MinElement<I>(I first, I last) where I is ForwardIterator and I.ValueType is TotallyOrdered
+    public constexpr nothrow I MinElement<I>(I first, I last) where I is ForwardIterator and I.ValueType is TotallyOrdered
     {
         if (first == last)
         {
@@ -689,7 +689,7 @@ namespace System
         return minElementPos;
     }
 
-    public nothrow I MinElement<I, R>(I first, I last, R r) where I is ForwardIterator and R is Relation and R.Domain is I.ValueType
+    public constexpr nothrow I MinElement<I, R>(I first, I last, R r) where I is ForwardIterator and R is Relation and R.Domain is I.ValueType
     {
         if (first == last)
         {
@@ -708,7 +708,7 @@ namespace System
         return minElementPos;
     }
 
-    public nothrow I MaxElement<I>(I first, I last) where I is ForwardIterator and I.ValueType is TotallyOrdered
+    public constexpr nothrow I MaxElement<I>(I first, I last) where I is ForwardIterator and I.ValueType is TotallyOrdered
     {
         if (first == last)
         {
@@ -727,7 +727,7 @@ namespace System
         return maxElementPos;
     }
 
-    public nothrow I MaxElement<I, R>(I first, I last, R r) where I is ForwardIterator and R is Relation and R.Domain is I.ValueType
+    public constexpr nothrow I MaxElement<I, R>(I first, I last, R r) where I is ForwardIterator and R is Relation and R.Domain is I.ValueType
     {
         if (first == last)
         {
@@ -746,7 +746,7 @@ namespace System
         return maxElementPos;
     }
 
-    public nothrow inline T Abs<T>(const T& x) where T is OrderedAdditiveGroup
+    public constexpr nothrow inline T Abs<T>(const T& x) where T is OrderedAdditiveGroup
     {
         if (x < T(0))
         {

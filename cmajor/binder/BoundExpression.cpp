@@ -445,7 +445,10 @@ BoundTemporary::BoundTemporary(std::unique_ptr<BoundExpression>&& rvalueExpr_, s
     BoundExpression(rvalueExpr_->GetSpan(), BoundNodeType::boundTemporary, rvalueExpr_->GetType()), rvalueExpr(std::move(rvalueExpr_)), backingStore(std::move(backingStore_))
 {
     rvalueExpr->MoveTemporaryDestructorCallsTo(*this);
-    backingStore->MoveTemporaryDestructorCallsTo(*this);
+    if (backingStore)
+    {
+        backingStore->MoveTemporaryDestructorCallsTo(*this);
+    }
 }
 
 BoundExpression* BoundTemporary::Clone()
@@ -453,13 +456,20 @@ BoundExpression* BoundTemporary::Clone()
     std::unique_ptr<BoundExpression> clonedRvalueExpr;
     clonedRvalueExpr.reset(rvalueExpr->Clone());
     std::unique_ptr<BoundLocalVariable> clonedBackingStore;
-    clonedBackingStore.reset(static_cast<BoundLocalVariable*>(backingStore->Clone()));
+    if (backingStore)
+    {
+        clonedBackingStore.reset(static_cast<BoundLocalVariable*>(backingStore->Clone()));
+    }
     return new BoundTemporary(std::move(clonedRvalueExpr), std::move(clonedBackingStore));
 }
 
 void BoundTemporary::Load(Emitter& emitter, OperationFlags flags)
 {
     rvalueExpr->Load(emitter, OperationFlags::none);
+    if (!backingStore)
+    {
+        throw Exception("backing store of temporary not set", GetSpan());
+    }
     backingStore->Store(emitter, OperationFlags::none);
     if ((flags & OperationFlags::addr) != OperationFlags::none)
     {
@@ -484,6 +494,11 @@ void BoundTemporary::Store(Emitter& emitter, OperationFlags flags)
 void BoundTemporary::Accept(BoundNodeVisitor& visitor)
 {
     visitor.Visit(*this);
+}
+
+std::unique_ptr<Value> BoundTemporary::ToValue(BoundCompileUnit& boundCompileUnit) const
+{
+    return rvalueExpr->ToValue(boundCompileUnit);
 }
 
 BoundSizeOfExpression::BoundSizeOfExpression(const Span& span_, TypeSymbol* type_, TypeSymbol* pointerType_) : 
@@ -570,6 +585,11 @@ void BoundAddressOfExpression::Store(Emitter& emitter, OperationFlags flags)
 void BoundAddressOfExpression::Accept(BoundNodeVisitor& visitor)
 {
     visitor.Visit(*this);
+}
+
+std::unique_ptr<Value> BoundAddressOfExpression::ToValue(BoundCompileUnit& boundCompileUnit) const
+{
+    return subject->ToValue(boundCompileUnit);
 }
 
 BoundDereferenceExpression::BoundDereferenceExpression(std::unique_ptr<BoundExpression>&& subject_, TypeSymbol* type_) :

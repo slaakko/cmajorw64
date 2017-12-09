@@ -32,6 +32,7 @@
     <ClInclude Include="Concept.hpp" />
     <ClInclude Include="ConceptRepository.hpp" />
     <ClInclude Include="ConstantArrayRepository.hpp" />
+    <ClInclude Include="ConstantStructureRepository.hpp" />
     <ClInclude Include="ConstExprFunctionRepository.hpp" />
     <ClInclude Include="ControlFlowAnalyzer.hpp" />
     <ClInclude Include="Evaluator.hpp" />
@@ -60,6 +61,7 @@
     <ClCompile Include="Concept.cpp" />
     <ClCompile Include="ConceptRepository.cpp" />
     <ClCompile Include="ConstantArrayRepository.cpp" />
+    <ClCompile Include="ConstantStructureRepository.cpp" />
     <ClCompile Include="ConstExprFunctionRepository.cpp" />
     <ClCompile Include="ControlFlowAnalyzer.cpp" />
     <ClCompile Include="Evaluator.cpp" />
