@@ -124,6 +124,15 @@
         &nbsp;&nbsp;&nbsp;&nbsp;8.4 <a href="#enumerations-examples">Examples</a><br />
         9 <a href="#functions">Functions</a><br />
         &nbsp;&nbsp;&nbsp;&nbsp;9.1 <a href="#functions-syntax">Syntax</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;9.2 <a href="#functions-regular">Regular Function</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;9.3 <a href="#functions-constexpr">Constexpr Specifier</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;9.4 <a href="#functions-inline">Inline Specifier</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;9.5 <a href="#functions-cdecl">CDecl Specifier</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;9.6 <a href="#functions-extern">Extern Specifier</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;9.7 <a href="#functions-nothrow">Nothrow Specifier</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;9.8 <a href="#functions-throw">Throw Specifier</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;9.9 <a href="#functions-template">Function Templates</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;9.10 <a href="#overload-resolution">Function Overload Resolution</a><br />
     </div>
 
     <h2 id="lexical-structure">1 Lexical Structure</h2>
@@ -1591,8 +1600,8 @@
     <h5>Function Call</h5>
 
     <p>
-        When <em>x</em> is a name of a function, <a href="#overload-resolution">overload resolution</a> process selects the best-matching function overload to be called with the specified arguments.
-        The number of arguments must match exactly to the number of parameters of the function, but if the argument types do not match exactly the signature of the selected function overload,
+        When <em>x</em> is a name of a function, <a href="#overload-resolution">overload resolution</a> selects the best-matching function overload to be called with the specified arguments.
+        The number of arguments must match exactly to the number of parameters of the function, but if the argument types do not match exactly the <a href="#function-signature">signature</a> of the selected function overload,
         <a href="#conversion">conversions</a> take place.
         If no single best-matching function can be found, or many overloads are found to be equally good matches, the compiler issues an error.
     </p>
@@ -1608,7 +1617,7 @@
 
     <p>
         When <em>x</em> is a name of a typedef or a type, the expression yields a call of a <a href="#constructor">constructor</a> and creation of a temporary variable of that type.
-        Constructor to be called is selected by the overload resolution process.
+        Constructor to be called is selected by overload resolution.
     </p>
 
     <p>
@@ -1621,7 +1630,7 @@
     <p>
         When <em>x</em> denotes an object of a class type (a variable or a temporary, for instance), and that class type overloads the function call operator <span class="mono">()</span>,
         the expression yields a call to that operator function.
-        Matching function call operator is selected using the overload resolution process.
+        Matching function call operator is selected using overload resolution.
     </p>
 
     <h3 id="primary-expressions">3.13 Primary Expressions</h3>
@@ -1716,7 +1725,7 @@
 
     <p>
         A <a href="#rule.new-expr">new</a> expression creates an object of the specified type.
-        If <em>T</em> is the type of object to create, <span class="kw">sizeof</span>(<em>T</em>) bytes of memory is allocated from the <a href="free-store">free store</a> and
+        If <em>T</em> is the type of object to create, <span class="kw">sizeof</span>(<em>T</em>) bytes of memory is allocated from the <a href="#free-store">free store</a> and
         then the object is constructed into that memory.
         The new expression takes the <a href="#rule.type-expr">type</a> of an object to construct and a possibly empty list of constructor arguments enclosed in parentheses as operands.
         It yields a pointer to the newly created object as a result.
@@ -1728,7 +1737,7 @@
         A <a href="#rule.constant-expression">constant expression</a> is an <a href="#rule.expression">expression</a> that is sufficiently simple so that it 
         can be evaluated at compile time.
         It can contain <a href="#literals">literals</a>, <a href="#constants">constants</a>, <a href="#enumeration-constants">enumeration constants</a>, operators that do not
-        involve taking an address of an object and invocations of <a href="#const-expr-function">constexpr functions</a>.
+        involve taking an address of an object and invocations of <a href="#functions-constexpr">constexpr functions</a>.
     </p>
 
     <h2 id="statements">4 Statements</h2>
@@ -2251,7 +2260,7 @@
         and <em>CBegin()</em> and <em>CEnd()</em> must return a <em>ConstIterator</em>. The iterator types, <em>Iterator</em> and <em>ConstIterator</em>, must support two operations:
         a <a href="#dereference-expression">dereference</a> operator overload for accessing an element of a sequence, and
         an <a href="#prefix-increment-and-decrement-expressions">increment</a> operator overload for incrementing the iterator.
-        These requirements are fulfilled by all container and string classes in the system library.
+        These requirements are fulfilled by arrays and all container and string classes in the system library.
         When these requirements are fulfilled by some user-defined class, it also supports the range-for statement.
     </p>
 
@@ -2687,9 +2696,9 @@
 
     <h4 id="lvalue-reference-type">6.5.1 Lvalue Reference Type</h4>
 
-    Lvalue reference types are typically used for passing parameters by reference or by reference to a constant.
+    Lvalue reference types are typically used for passing parameters by reference or by reference-to-const.
     Only a variable or derefenced pointer can be bound to a nonconstant reference parameter.
-    But a <a href="#literals">literal</a> can also be bound to a parameter that is a reference to a constant. 
+    A <a href="#literals">literal</a> can also be bound to a parameter that is a reference-to-const. 
     In that case the literal value is assigned to a temporary variable that is passed as a parameter.
 
     <h4 id="rvalue-reference-type">6.5.2 Rvalue Reference Type</h4>
@@ -2701,14 +2710,15 @@
     <h3 id="array-type">6.6 Array Types</h3>
 
     <p>
-        An <a href="#rule.array">array</a> qualifier is used for declaring an array type.
+        An <a href="#rule.array">array</a> qualifier is used for declaring an array type. An array is a sequence of objects of the same type.
+        If that type is a pointer type the objects pointed to can actually be of different types though.
         An expression inside the square brackets is the length of the array. 
         It is optional for constant arrays for which the compiler can calculate the length of the array from its initializing expression.
         If the length of the constant array is specified it must match the length of the array initializer.
     </p>
 
     <p>
-        If <em>a</em> denotes an array object, the length of it can be obtained using <em>a.Length()</em> notation.
+        If <em>a</em> denotes an array object, the length of it can be obtained using <em>a.Length()</em> notation. The type of the array length is <span class="kw">long</span>.
     </p>
 
     <p>
@@ -2768,9 +2778,9 @@
 
     <p>
         The value of a constant must be a <a href="#constant-expression">constant&#8209;expression</a>
-        that means it is sufficiently simple so that the compiler can evaluate it at compile time.
+        that means it must be sufficiently simple so that the compiler can evaluate it at compile time.
         It cannot use <a href="#free-store">free store</a> so it cannot contain a <a href="#rule.new-expr">new expression</a>
-        for example. However, it <em>can</em> contain invocations of <a href="#const-expr-function">constexpr</a> functions with constant arguments.
+        for example. However, it <em>can</em> contain invocations of <a href="#functions-constexpr">constexpr</a> functions with constant arguments.
         Some algorithms in the system library are declared <span class="kw">constexpr</span>.
     </p>
 
@@ -2797,7 +2807,7 @@
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span> <span class="kw">const</span> <span class="kw">int</span> <span class="var">meaningOfLife</span> <span class="mono">=</span> <span class="mono">42</span><span class="mono">;</span><br />
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span> <span class="kw">const</span> <span class="kw">double</span> <span class="var">pi</span> <span class="mono">=</span> <span class="mono">3.1415926</span><span class="mono">;</span><br />
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span> <span class="kw">const</span> <span class="kw">int[]</span> <span class="var">numberArray</span> <span class="mono">= [</span><span class="mono">1</span><span class="mono">,</span> <span class="mono">2</span><span class="mono">,</span> <span class="mono">3</span><span class="mono">]</span><span class="mono">;</span><br/>
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span> <span class="kw">const</span> <span class="kw">long</span> <span class="var">lengthOfNumbers</span> <span class="mono">=</span> <span class="var">numberArray.Length()</span><span class="mono">;</span><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span> <span class="kw">const</span> <span class="kw">long</span> <span class="var">lengthOfNumberArray</span> <span class="mono">=</span> <span class="var">numberArray.Length()</span><span class="mono">;</span><br />
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span> <span class="kw">const</span> <span class="var">LiteralClass</span> <span class="var">literalClass</span> <span class="mono">= {</span><span class="mono">1 + 2 * 3</span><span class="mono">,</span> <span class="mono">Min(pi, 4.13)</span><span class="mono">};</span><br />
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span> <span class="kw">const</span> <span class="kw">double</span> <span class="var">y</span> <span class="mono">= </span><span class="var">literalClass.Y()</span><span class="mono">;</span><br/>
     </p>
@@ -2806,7 +2816,7 @@
     <h2 id="enumerations">8 Enumerations</h2>
 
     <p>
-        An enumeration is a group of constants collected under a common name called <em>enumerated type</em>.
+        An enumeration is a group of constants collected under a common name called an <em>enumerated type</em>.
     </p>
 
     <h3 id="enumerations-syntax">8.1 Syntax</h3>
@@ -2950,8 +2960,8 @@
                 (<span class="rule"><a href="#rule.access-specifier">access&#8209;specifier</a></span> |
                 <span class="kw">constexpr</span> |
                 <span class="kw">inline</span> |
-                <span class="kw">extern</span> |
                 <span class="kw">cdecl</span> |
+                <span class="kw">extern</span> |
                 <span class="kw">nothrow</span> |
                 <span class="kw">throw</span>)*
             </td>
@@ -3069,6 +3079,242 @@
             </td>
         </tr>
     </table>
+
+    <h3 id="functions-regular">9.2 Regular Function</h3>
+
+    <p>
+        A regular function has no other specifiers than a possible <a href="#access-specifiers">access</a> specifier.
+    </p>
+
+    <h3 id="functions-constexpr">9.3 Constexpr Specifier</h3>
+
+    <p>
+        The <span class="kw">constexpr</span> specifier enables compile time evaluation of a function when the function arguments are
+        <a href="#constant-expression">constant expressions</a>. 
+        If the evaluation succeeds, the function call is substituted by the compile time constant that is the result of the evaluation.
+        A <span class="kw">constexpr</span> function can be used also in cases when the arguments are <em>not</em> constant expressions. 
+        In those cases the function is called just like a regular function. This saves from having to write two versions of 
+        the same function, a <span class="kw">constexpr</span> and a non-<span class="kw">constexpr</span> version.
+    </p>
+
+    <p>
+        A <span class="kw">constexpr</span> function cannot have the following kinds of statements:
+        <a href="#rule.goto-statement">goto</a>, <a href="#rule.range-for-statement">range-for</a>, 
+        <a href="#rule.delete-statement">delete</a>, <a href="#rule.destroy-statement">destroy</a>,
+        <a href="#rule.switch-statement">switch</a>, <a href="#rule.case-statement">case</a>, 
+        <a href="#rule.default-statement">default</a>, <a href="#rule.goto-case-statement">goto case</a>,
+        <a href="#rule.goto-default-statement">goto default</a>, <a href="#rule.throw-statement">throw</a>, 
+        <a href="#rule.try-statement">try</a>, or a <a href="#rule.conditional-compilation-statement">conditional compilation</a>
+        statement.
+    </p>
+
+    <h3 id="functions-inline">9.4 Inline Specifier</h3>
+
+    <p>
+        The <span class="kw">inline</span> specifier is a hint to the compiler that the function should be inlined 
+        when the program is compiled using release configuration.
+        When a function is inlined, a function call is substituted by the body of the function,
+        so it is best used for short functions.
+        Function inlining avoids a function call overhead and increase other optimizing opportunities so that the 
+        generated code can be adapted to the arguments of the function call.
+        Function inlining helps the compiler generating efficient code.
+    </p>
+
+    <h3 id="functions-cdecl">9.5 CDecl Specifier</h3>
+
+    <p>
+        The <span class="kw">cdecl</span> specifier disables name mangling. 
+        Name mangling makes it possible to have many functions with the same <a href="#function-group-name">group name</a> but different parameter types.
+        When name mangling is disabled there can be only a single function with the given group name in the whole program and all libraries it uses.
+        The <span class="kw">cdecl</span> specifier can ease interoperability with libraries written in other languages.
+    </p>
+
+    <h3 id="functions-extern">9.6 Extern Specifier</h3>
+
+    The <span class="kw">extern</span> specifier makes it possible to call a function written in another language from a Cmajor program.
+    It is almost always used with the <span class="kw">cdecl</span> specifier to prevent the compiler from mangling the name of the function.
+    An <span class="kw">extern</span> function cannot have a body.
+
+    <h3 id="functions-nothrow">9.7 Nothrow Specifier</h3>
+
+    <p>
+        The <span class="kw">nothrow</span> specifier is used for indicating that the function is not supposed to throw any exceptions and
+        it either does not call any function that can throw exceptions, or it handles all exceptions arising from the functions it calls.
+        The <span class="kw">nothrow</span> specifier helps the compiler generating efficient code.
+    </p>
+
+    <h3 id="functions-throw">9.8 Throw Specifier</h3>
+
+    <p>
+        The <span class="kw">throw</span> specifier can be used to emphasize the fact that a function may throw exceptions. 
+        It has no additional semantics compared to a function without the <span class="kw">throw</span> specifier and it has 
+        purely informational value.
+    </p>
+
+    <h3 id="functions-template">9.9 Function Templates</h3>
+
+    <p>
+        When the function definition has a <a href="#rule.template-parameter-list">template parameter list</a> and possibly a <a href="#where-constraint">constraint</a>,
+        it defines a <em>function template</em>.
+        The compiler <em>instantiates</em>, or creates a specialized version from the function template for each different set of argument types.
+        When a function is instantiated, the <a href="#rule.template-parameter">template parameters</a> of the function template 
+        are substituted by concrete types and the function is compiled using those substituted types.
+        The concrete types can be specified in the function call by using a <a href="#rule.template-id">template-id</a>, or if not specified, they can be automatically deduced by the compiler
+        from the argument types of the function call.
+    </p>
+
+    <p>
+        Function templates participate in <a href="#overload-resolution">overload resolution</a>. 
+        When two or more function templates have the same <a href=#function-group-name>group name</a> and number of parameters but different 
+        <a href="#where-constraint">constraints</a> they are overloaded based on those constraints. 
+        The compiler checks the constraints in the function call site by substituting the type parameters in the contraints by the concrete types in the function call 
+        and accepts or rejects overloads according to whether the constraints are satisfied or not. If two or more function templates satisfy the constraints, 
+        the compiler selects the one having most strict constraints. 
+    </p>
+
+    <p>
+        For example, see the <a href="../library/System.Base/System.Base.html#function_group_Next_3F376F15397ED19B4B36DC08482D988F68581D43">Next</a> function templates in the system library.
+        If a <em>Next</em> function is called with a type that satisfies both the <a href="../library/System.Base/System.Base.html#concept_ForwardIterator_4C777D423CF589B8535F29F910C025990ED656D4">
+        ForwardIterator</a> concept and the <a href="../library/System.Base/System.Base.html#concept_RandomAccessIterator_A5A1B6A4EC8E181A67C733002B3BE437554D3484">RandomAccessIterator</a> concept,
+        the random access function overload is called because 
+        <a href="../library/System.Base/System.Base.html#concept_RandomAccessIterator_A5A1B6A4EC8E181A67C733002B3BE437554D3484">RandomAccessIterator</a> refines 
+        <a href="../library/System.Base/System.Base.html#concept_BidirectionalIterator_96C10B73881A17B6DC9C0804E7DF2141C2E58DA6">BidirectionalIterator</a> concept that refines
+        <a href="../library/System.Base/System.Base.html#concept_ForwardIterator_4C777D423CF589B8535F29F910C025990ED656D4">ForwardIterator</a> concept.
+    </p>
+
+    <h3 id="overload-resolution">9.10 Function Overload Resolution</h3>
+
+    <p>
+        Overload resolution is done in three stages:
+        <ol>
+            <li>
+                First the compiler searches the symbol table for <em>viable functions</em>. 
+                Each viable function has given <a href="#function-group-name">group name</a> and <a href="#function-arity">arity</a>.
+            </li>
+            <li>
+                <p>
+                    Then the set of viable functions is filtered to form a set of <em>overload candidates</em>.
+                </p>
+
+                <p>
+                    If the viable function is not a function template, it becomes an overload candidate if there exists a valid sequence of conversions from each argument type 
+                    to the corresponding parameter type of the viable function. The sequence of needed conversions is memorized for the final stage.
+                </p>
+                <p>
+                    If the viable function is a function template, the argument types are bound to the template parameters of the function template.
+                    In this case the viable function can be rejected because arguments cannot be bound or there is no valid conversion sequence for a bound parameter.
+                </p>
+                <p>
+                    If the viable function is a constrained function template, after successfully binding the argument types,  
+                    the constraint is checked by substituting parameter types in the constraint with bound argument types.
+                    In this case the viable function can be rejected because the constraint is not satisfied. Otherwise the viable function survives to be an overload candidate and its 
+                    constraint is memorized for the final stage.
+                </p>
+            </li>
+            <li>
+                Finally, if there are no overload candidates survived to this stage, the compiler issues an overload not found error.
+                Otherwise, the set of overload candidates is sorted according to ordering rules that take into account the number, kind and <a href="#conversion-distance">distance</a> of needed conversions and 
+                a possible <a href="#where-constraint">constraint</a> for those overload candidates that are function templates.
+                If a single best overload is found according to the ordering rules, the function call resolves to it, 
+                otherwise the compiler issues an ambiguous overload resolution error and lists equally good overload candidates.
+            </li>
+        </ol>
+
+        Actually the overload resolution can be issued maximum of three times with different argument combinations to resolve a single function call, 
+        because member functions have an implicit <em>this</em> parameter that can be bound to the receiver or to the current <em>this</em> parameter if the call is issued from inside a member function.
+    </p>
+
+    The overload candidates are sorted according to the ordering rules that are informally described as follows:
+    When comparing two overload candidates <em>a</em> and <em>b</em>:
+
+    <p>
+        First compare the argument conversions to <em>a</em> and <em>b</em>:
+        For all arguments, count the number of <em>better argument conversion</em> to <em>a</em> compared to <em>b</em>.
+        If the number of better argument conversions to <em>a</em> is greater than to <em>b</em>, <em>a</em> is better than <em>b</em>.
+        The better argument conversion means that no conversion is better than a conversion, 
+        and when both have a conversion, a smaller <a href="#conversion-distance">conversion distance</a> is better than greater distance.
+    </p>
+
+    <p>
+        Then, if <em>a</em> is not a function template and <em>b</em> is a function template, <em>a</em> is better than <em>b</em>. This is to ensure we don't have to instantiate the same function template for
+        the same argument types many times.
+    </p>
+        
+    <p>
+        Then, if <em>a</em> is not a function template specialization and <em>b</em> is a function template specialization, <em>a</em> is better than <em>b</em>.
+    </p>
+
+    <p>
+        Then, if <em>a</em> is a constrained function template and <em>b</em> is an unconstrained function template, <em>a</em> is better than <em>b</em>.
+    </p>
+
+    <p>
+        Finally, if <em>a</em> and <em>b</em> is are constrained function templates and the constraint of <em>a</em> is more strict than the constraint of <em>b</em>, <em>a</em> is better than <em>b</em>.
+    </p>
+
+    <h2 id="appendix-a">Appendix A Terms</h2>
+
+    <div id="function-arity">
+        <b>ARITY OF A FUNCTION</b><br />
+        <p>
+            The number of parameters of the function.
+        </p>
+    </div>
+
+    <div id="conversion-distance">
+        <b>CONVERSION DISTANCE</b><br />
+        <p>
+            If <em>A</em> and <em>B</em> are class types, and <em>A</em> is the same class as <em>B</em> or <em>A</em> is derived directly or indirectly from <em>B</em>, their conversion distance is derined as follows:
+            if <em>A</em> = <em>B</em>, <em>distance(A, B) = 0</em>, otherwise <em>distance(A, B) = 1 + distance(baseClassOf(A), B)</em>.
+        </p>
+        <p>
+            If <em>A</em> and <em>B</em> are class types and <em>A</em> have no inheritance relationship or <em>B</em> is derived from <em>A</em>, we define <em>distance(A, B) = 255</em>.
+        </p>
+        <p>
+            If <em>A</em> and <em>B</em> are pointer-to-class types, their distance is defined as the distance of the pointed-to types.
+            If <em>A</em> or <em>B</em> or both are reference-to-class types, their distance is defined as the distance of types for which references are removed.
+        </p>
+
+        <p>
+            If <em>A</em> and <em>B</em> are <a href="#basic-types">basic</a> types, and <em>A</em> is implicitly convertible to <em>B</em> we define their conversion distance by 
+            associating integers to the types and computing the distance as the difference of those integers. 
+            For example, <em>distance(<span class="kw">byte</span>, <span class="kw">short</span>)&nbsp;=&nbsp;1</em>,
+            <em>distance(<span class="kw">byte</span>, <span class="kw">ushort</span>)&nbsp;=&nbsp;2</em>, 
+            <em>distance(<span class="kw">byte</span>, <span class="kw">int</span>)&nbsp;=&nbsp;3</em>, etc.
+        </p>
+    </div>
+
+    <div id="free-store">
+        <b>FREE STORE</b><br />
+        <p>
+            A memory area managed by the runtime library and eventually by the operating system. A program can allocate memory from the free store and then release it back when it has finished using it.
+        </p>
+    </div>
+
+    <div id="function-group-name">
+        <b>FUNCTION GROUP NAME</b>
+        <p>
+            The name of the function without the parameter list. For example, these functions have all the same group name <em>foo</em>:<br />
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span> <span class="kw">void</span> <span class="var">foo</span>(<span class="kw">int</span> <span class="var">x</span>) <span class="mono">{}</span><br /><br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span> <span class="kw">void</span> <span class="var">foo</span>(<span class="kw">double</span> <span class="var">y</span>) <span class="mono">{}</span><br /><br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span> <span class="kw">class</span> <span class="var">Alpha</span><br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="mono">{</span><br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span> <span class="kw">void</span> <span class="var">foo()</span> <span class="mono">{}</span><br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="mono">}</span><br />
+        </p>
+    </div>
+
+    <div id="function-signature">
+        <b>FUNCTION SIGNATURE</b>
+        <p>
+            The name of the function, the types of the parameters of the function, and possibly the <a href="#where-constraint">constraint</a> of the function.
+            For example, function<br />
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span> <span class="kw">void</span> <span class="var">foo</span>(<span class="kw">int</span> <span class="var">x</span>) <span class="mono">{}</span><br /><br />
+            has signature <span class="var">foo</span>(<span class="kw">int</span>)
+        </p>
+    </div>
 
     <hr />
 
