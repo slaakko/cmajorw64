@@ -133,6 +133,10 @@
         &nbsp;&nbsp;&nbsp;&nbsp;9.8 <a href="#functions-throw">Throw Specifier</a><br />
         &nbsp;&nbsp;&nbsp;&nbsp;9.9 <a href="#functions-template">Function Templates</a><br />
         &nbsp;&nbsp;&nbsp;&nbsp;9.10 <a href="#overload-resolution">Function Overload Resolution</a><br />
+        10 <a href="#typedefs">Typedefs</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;10.1 <a href="#typedefs-syntax">Syntax</a><br />
+        11 <a href="#classes">Classes</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;11.1 <a href="#classes-syntax">Syntax</a><br />
     </div>
 
     <h2 id="lexical-structure">1 Lexical Structure</h2>
@@ -1279,15 +1283,19 @@
     <h3 id="is-and-as-expressions">3.7 Is and As Expressions</h3>
 
     <p>
-        If <em>p</em> is a pointer to object of some polymorphic class type, and <em>T</em> is some polymorphic class type, expression
-        <em>p</em> <span class="kw">is</span> <em>T</em>* tests whether pointer <em>p</em> actually points to an object of type <em>T</em> or of type <em>U</em> that derives from type <em>T</em>.
+        If <em>p</em> is a pointer to an object of some <a href="#polymorphic-class-type">polymorphic class type</a>, and <em>T</em> is some polymorphic class type, expression
+        <blockquote><em>p</em> <span class="kw">is</span> <em>T</em>*</blockquote> tests whether pointer <em>p</em> actually points to an object of type <em>T</em> or of type <em>U</em> that derives from type <em>T</em>.
         The test yields a <span class="kw"><a href="#basic-type-bool">bool</a></span> result.
     </p>
 
     <p>
         If <em>p</em> is a pointer to object of some polymorphic class type, and <em>T</em> is some polymorphic class type, expression
-        <em>p</em> <span class="kw">as</span> <em>T</em>* tests whether pointer <em>p</em> actually points to an object of type <em>T</em> or of type <em>U</em> that derives from type <em>T</em>.
+        <blockquote><em>p</em> <span class="kw">as</span> <em>T</em>*</blockquote> tests whether pointer <em>p</em> actually points to an object of type <em>T</em> or of type <em>U</em> that derives from type <em>T</em>.
         If the test is successful, the result is a pointer to class <em>T</em>, otherwise the result is <span class="kw">null</span>.
+    </p>
+
+    <p>
+        The implementation of this feature is described <a href="../implementation/implementation.html#is-and-as-expressions">here</a>.
     </p>
 
     <p>
@@ -1307,7 +1315,7 @@
 
     <p>
         Expression <em>a</em> <span class="mono">&gt;&gt;</span> <em>b</em> returns operand <em>a</em> shifted operand <em>b</em> bit positions right.
-        The vacant leftmost bit positions of the result are filled with bits depending of the common type of <em>a</em> and <em>b</em>:
+        The vacant leftmost bit positions of the result are filled with bits depending of the <a href="#common-type">common type</a> of <em>a</em> and <em>b</em>:
         If the common type of <em>a</em> and <em>b</em> is an unsigned type <span class="kw">byte</span>, <span class="kw">ushort</span>, <span class="kw"> uint</span>, or <span class="kw">ulong</span>,
         the leftmost bit positios of the result are zero-filled. Otherwise, if the common type of <em>a</em> and <em>b</em> is a signed type <span class="kw">sbyte</span>, <span class="kw">short</span>,
         <span class="kw">int</span> or <span class="kw">long</span>, the leftmost bit positions of the result are filled with a bit equal to the leftmost bit of <em>a</em>.
@@ -1325,7 +1333,7 @@
 
     <p>
         An <a href="#rule.additive">additive</a> expression takes <a href="#basic-integer-types">integer</a>, <a href="#basic-floating-point-types">floating-point</a>,
-        or <a href="#pointer-type">pointer</a> type operands. The result is of the <a href="#common-type">common</a> type of the operand types.
+        or <a href="#pointer-type">pointer</a> type operands. The result is of the <a href="#common-type">common type</a> of the operand types.
     </p>
 
     <p>
@@ -1352,7 +1360,7 @@
 
     <p>
         A <a href="#rule.multiplicative">multiplicative</a> expression takes <a href="#basic-integer-types">integer</a> or <a href="#basic-floating-point-types">floating-point</a> type operands.
-        The result is of the <a href="#common-type">common</a> type of the operand types.
+        The result is of the <a href="#common-type">common type</a> of the operand types.
     </p>
 
     <p>
@@ -2266,7 +2274,10 @@
 
     <p>
         If the <a href="#rule.container">container</a> refers to a <span class="kw">const</span> object, the range-for statement
-        <span class="kw">for</span> <span class="mono">(</span><em>T</em> <em>x</em> <span class="mono">:</span> <em>c</em><span class="mono">)</span> <em>stmt</em><span class="mono">;</span> is lowered by the compiler to the following
+        <blockquote>
+            <span class="kw">for</span> <span class="mono">(</span><em>T</em> <em>x</em> <span class="mono">:</span> <em>c</em><span class="mono">)</span> <em>stmt</em><span class="mono">;</span>
+        </blockquote>
+        is lowered by the compiler to the following
         sequence of statements: <br /><br />
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<em>ConstIterator</em> <em>e</em> <span class="mono">=</span> <em>c</em><span class="mono">.</span><em>CEnd()</em><span class="mono">;</span><br />
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">for</span> <span class="mono">(</span><em>ConstIterator</em> <em>i</em> <span class="mono">=</span> <em>c</em><span class="mono">.</span><em>CBegin()</em><span class="mono">;</span> <em>i</em> <span class="mono">!=</span> <em>e</em><span class="mono">;</span> <span class="mono">++</span><em>i</em>)<br />
@@ -2278,7 +2289,10 @@
 
     <p>
         If the <a href="#rule.container">container</a> refers to a non-<span class="kw">const</span> object, the range-for statement
-        <span class="kw">for</span> <span class="mono">(</span><em>T</em> <em>x</em> <span class="mono">:</span> <em>c</em><span class="mono">)</span> <em>stmt</em><span class="mono">;</span> is lowered by the compiler to the following
+        <blockquote>
+            <span class="kw">for</span> <span class="mono">(</span><em>T</em> <em>x</em> <span class="mono">:</span> <em>c</em><span class="mono">)</span> <em>stmt</em><span class="mono">;</span>
+        </blockquote>
+        is lowered by the compiler to the following
         sequence of statements: <br /><br />
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<em>Iterator</em> <em>e</em> <span class="mono">=</span> <em>c</em><span class="mono">.</span><em>End()</em><span class="mono">;</span><br />
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">for</span> <span class="mono">(</span><em>Iterator</em> <em>i</em> <span class="mono">=</span> <em>c</em><span class="mono">.</span><em>Begin()</em><span class="mono">;</span> <em>i</em> <span class="mono">!=</span> <em>e</em><span class="mono">;</span> <span class="mono">++</span><em>i</em>)<br />
@@ -3189,7 +3203,7 @@
         <ol>
             <li>
                 First the compiler searches the symbol table for <em>viable functions</em>. 
-                Each viable function has given <a href="#function-group-name">group name</a> and <a href="#function-arity">arity</a>.
+                A viable function is a function that has given <a href="#function-group-name">group name</a> and <a href="#function-arity">arity</a>.
             </li>
             <li>
                 <p>
@@ -3252,12 +3266,585 @@
         Finally, if <em>a</em> and <em>b</em> is are constrained function templates and the constraint of <em>a</em> is more strict than the constraint of <em>b</em>, <em>a</em> is better than <em>b</em>.
     </p>
 
+    <h2 id="typedefs">10 Typedefs</h2>
+
+    <p>
+        A <a href="#rule.typedef">typedef</a> instroduces a named alias for a <a href="#type-expressions">type expression</a>.
+    </p>
+
+    <h3 id="typedefs-syntax">10.1 Syntax</h3>
+
+    <table class="grammar">
+        <tr>
+            <td class="rule" id="rule.typedef">typedef</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.access-specifier">access&#8209;specifier</a></span>?
+                <span class="kw">typedef</span>
+                <span class="rule"><a href="#rule.type-expr">type&#8209;expr</a></span>
+                <span class="rule"><a href="#rule.identifier">identifier</a></span>
+                <span class="mono">;</span>
+            </td>
+        </tr>
+    </table>
+
+    <h2 id="classes">11 Classes</h2>
+
+    <p>
+        todo
+    </p>
+
+    <h3 id="classes-syntax">11.1 Syntax</h3>
+
+    <table class="grammar">
+        <tr>
+            <td class="rule" id="rule.class">class</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.class-specifiers">class&#8209;specifiers</a></span>
+                <span class="kw">class</span>
+                <span class="rule"><a href="#rule.class-name">class&#8209;name</a></span>
+                <span class="rule"><a href="#rule.template-parameter-list">template&#8209;parameter&#8209;list</a></span>?
+                <span class="rule"><a href="#rule.inheritance-and-implemented-interfaces">inheritance&#8209;and&#8209;implemented&#8209;interfaces</a></span>?
+                <span class="rule"><a href="#rule.where-constraint">where&#8209;constraint</a></span>?<br/>
+                <span class="mono">{</span>
+                <span class="rule"><a href="#rule.class-content">class&#8209;content</a></span>
+                <span class="mono">}</span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.class-specifiers">class&#8209;specifiers</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                (<span class="rule"><a href="#rule.access-specifier">access&#8209;specifier</a></span> |
+                <span class="kw">abstract</span> | 
+                <span class="kw">static</span>)*
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.class-name">class&#8209;name</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.identifier">identifier</a></span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.inheritance-and-implemented-interfaces">inheritance&#8209;and&#8209;implemented&#8209;interfaces</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="mono">:</span>
+                <span class="rule"><a href="#rule.base-class-or-interface">base&#8209;class&#8209;or&#8209;interface</a></span>
+                (<span class="mono">,</span>
+                <span class="rule"><a href="#rule.base-class-or-interface">base&#8209;class&#8209;or&#8209;interface</a></span>)*
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.base-class-or-interface">base&#8209;class&#8209;or&#8209;interface</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.template-id">template&#8209;id</a></span> | 
+                <span class="rule"><a href="#rule.qualified-id">qualified&#8209;id</a></span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.class-content">class&#8209;content</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.class-member">class&#8209;member</a></span>*
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.class-member">class&#8209;member</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.static-constructor">static&#8209;constructor</a></span> | 
+                <span class="rule"><a href="#rule.constructor">constructor</a></span> |
+                <span class="rule"><a href="#rule.destructor">destructor</a></span> | 
+                <span class="rule"><a href="#rule.member-function">member&#8209;function</a></span> | 
+                <span class="rule"><a href="#rule.conversion-function">conversion&#8209;function</a></span> |
+                <span class="rule"><a href="#rule.member-variable">member&#8209;variable</a></span> |
+                <span class="rule"><a href="#rule.typedef">typedef</a></span> |
+                <span class="rule"><a href="#rule.class">class</a></span> | 
+                <span class="rule"><a href="#rule.constant">constant</a></span> |
+                <span class="rule"><a href="#rule.enumerated-type">enumerated&#8209;type</a></span> | 
+                <span class="rule"><a href="#rule.delegate">delegate</a></span> | 
+                <span class="rule"><a href="#rule.class-delegate">class&#8209;delegate</a></span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.static-constructor">static&#8209;constructor</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="kw">static</span>
+                <span class="rule"><a href="#rule.class-name">class&#8209;name</a></span>
+                <span class="mono">()</span>
+                <span class="rule"><a href="#rule.initializer-list">initializer&#8209;list</a></span>?
+                <span class="rule"><a href="#rule.where-constraint">where&#8209;constraint</a></span>?
+                (<span class="rule"><a href="#rule.compound-statement">compound&#8209;statement</a></span> |
+                <span class="mono">;</span>)
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.initializer-list">initializer&#8209;list</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="mono">:</span>
+                <span class="rule"><a href="#rule.initializer">initializer</a></span>
+                (<span class="mono">,</span>
+                <span class="rule"><a href="#rule.initializer">initializer</a></span>)*
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.initializer">initializer</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.this-initializer">this&#8209;initializer</a></span> |
+                <span class="rule"><a href="#rule.base-initializer">base&#8209;initializer</a></span> |
+                <span class="rule"><a href="#rule.member-variable-initializer">member&#8209;variable&#8209;initializer</a></span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.this-initializer">this&#8209;initializer</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="kw">this</span>
+                <span class="mono">(</span>
+                <span class="rule"><a href="#rule.argument-list">argument&#8209;list</a></span>
+                <span class="mono">)</span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.base-initializer">base&#8209;initializer</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="kw">base</span>
+                <span class="mono">(</span>
+                <span class="rule"><a href="#rule.argument-list">argument&#8209;list</a></span>
+                <span class="mono">)</span>
+            </td>
+        <tr>
+            <td class="rule" id="rule.member-variable-initializer">member&#8209;variable&#8209;initializer</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.member-variable-name">member&#8209;variable&#8209;name</a></span>
+                <span class="mono">(</span>
+                <span class="rule"><a href="#rule.argument-list">argument&#8209;list</a></span>
+                <span class="mono">)</span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.member-variable-name">member&#8209;variable&#8209;name</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.identifier">identifier</a></span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.constructor">constructor</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.constructor-specifiers">constructor&#8209;specifiers</a></span>
+                <span class="rule"><a href="#rule.class-name">class&#8209;name</a></span>
+                <span class="rule"><a href="#rule.parameters">parameters</a></span>
+                <span class="rule"><a href="#rule.initializer-list">initializer&#8209;list</a></span>?
+                <span class="rule"><a href="#rule.where-constraint">where&#8209;constraint</a></span>?
+                (<span class="rule"><a href="#rule.compound-statement">compound&#8209;statement</a></span> |
+                <span class="mono">;</span>)
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.constructor-specifiers">constructor&#8209;specifiers</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                (<span class="rule"><a href="#rule.access-specifier">access&#8209;specifier</a></span> |
+                <span class="kw">constexpr</span> |
+                <span class="kw">explicit</span> | 
+                <span class="kw">inline</span> |
+                <span class="kw">suppress</span> | 
+                <span class="kw">default</span> |
+                <span class="kw">nothrow</span> |
+                <span class="kw">throw</span>)*
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.destructor">destructor</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.destructor-specifiers">destructor&#8209;specifiers</a></span>
+                <span class="mono">~</span>
+                <span class="rule"><a href="#rule.class-name">class&#8209;name</a></span>
+                <span class="mono">()</span>
+                <span class="rule"><a href="#rule.where-constraint">where&#8209;constraint</a></span>?
+                (<span class="rule"><a href="#rule.compound-statement">compound&#8209;statement</a></span> |
+                <span class="mono">;</span>)
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.destructor-specifiers">destructor&#8209;specifiers</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                (<span class="rule"><a href="#rule.access-specifier">access&#8209;specifier</a></span> |
+                <span class="kw">virtual</span> |
+                <span class="kw">override</span> |
+                <span class="kw">default</span>)*
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.member-function">member&#8209;function</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.member-function-specifiers">member&#8209;function&#8209;specifiers</a></span>
+                <span class="rule"><a href="#rule.return-type">return&#8209;type</a></span>
+                <span class="rule"><a href="#rule.function-group-id">function&#8209;group&#8209;id</a></span>
+                <span class="rule"><a href="#rule.parameters">parameters</a></span>
+                <span class="kw">const</span>?
+                <span class="rule"><a href="#rule.where-constraint">where&#8209;constraint</a></span>?
+                (<span class="rule"><a href="#rule.compound-statement">compound&#8209;statement</a></span> |
+                <span class="mono">;</span>)
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.member-function-specifiers">member&#8209;function&#8209;specifiers</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                (<span class="rule"><a href="#rule.access-specifier">access&#8209;specifier</a></span> |
+                <span class="kw">constexpr</span> |
+                <span class="kw">static</span> |
+                <span class="kw">virtual</span> |
+                <span class="kw">override</span> |
+                <span class="kw">abstract</span> |
+                <span class="kw">inline</span> |
+                <span class="kw">suppress</span> |
+                <span class="kw">default</span> |
+                <span class="kw">nothrow</span> |
+                <span class="kw">throw</span> |
+                <span class="kw">new</span>)*
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.conversion-function">conversion&#8209;function</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.conversion-function-specifiers">conversion&#8209;function&#8209;specifiers</a></span>
+                <span class="rule"><a href="#rule.return-type">return&#8209;type</a></span>
+                <span class="mono">()</span>
+                <span class="kw">const</span>?
+                <span class="rule"><a href="#rule.where-constraint">where&#8209;constraint</a></span>?
+                (<span class="rule"><a href="#rule.compound-statement">compound&#8209;statement</a></span> |
+                <span class="mono">;</span>)
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.conversion-function-specifiers">conversion&#8209;function&#8209;specifiers</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                (<span class="rule"><a href="#rule.access-specifier">access&#8209;specifier</a></span> |
+                <span class="kw">constexpr</span> |
+                <span class="kw">inline</span> |
+                <span class="kw">nothrow</span> |
+                <span class="kw">throw</span>)*
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.member-variable">member&#8209;variable</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.member-variable-specifiers">member&#8209;variable&#8209;specifiers</a></span>
+                <span class="rule"><a href="#rule.member-variable-type">member&#8209;variable&#8209;type</a></span>
+                <span class="rule"><a href="#rule.member-variable-name">member&#8209;variable&#8209;name</a></span>
+                <span class="mono">;</span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.member-variable-specifiers">member&#8209;variable&#8209;specifiers</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                (<span class="rule"><a href="#rule.access-specifier">access&#8209;specifier</a></span> |
+                <span class="kw">static</span>)*
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.member-variable-type">member&#8209;variable&#8209;type</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.type-expr">type&#8209;expr</a></span>
+            </td>
+        </tr>
+    </table>
+
     <h2 id="appendix-a">Appendix A Terms</h2>
 
     <div id="function-arity">
-        <b>ARITY OF A FUNCTION</b><br />
+        <b>ARITY OF A FUNCTION</b>
         <p>
-            The number of parameters of the function.
+            The number of parameters of a function.
+        </p>
+    </div>
+
+    <div id="common-type">
+        <b>COMMON TYPE</b>
+        <p>
+            The common type for two <a href="#basic-types">basic</a> types is the narrowist type that can contain a value of both types.
+            The following table contains the common type function given two basic types:
+        </p>
+        <p>
+            <table class="common-type">
+                <tr class="common-type">
+                    <th class="common-type"></th>
+                    <th class="common-type">bool</th>
+                    <th class="common-type">sbyte</th>
+                    <th class="common-type">byte</th>
+                    <th class="common-type">short</th>
+                    <th class="common-type">ushort</th>
+                    <th class="common-type">int</th>
+                    <th class="common-type">uint</th>
+                    <th class="common-type">long</th>
+                    <th class="common-type">ulong</th>
+                    <th class="common-type">float</th>
+                    <th class="common-type">double</th>
+                    <th class="common-type">char</th>
+                    <th class="common-type">wchar</th>
+                    <th class="common-type">uchar</th>
+                </tr>
+                <tr class="common-type">
+                    <th class="common-type">bool</th>
+                    <td class="common-type">bool</td>
+                    <th class="common-type"></th>
+                    <th class="common-type"></th>
+                    <th class="common-type"></th>
+                    <th class="common-type"></th>
+                    <th class="common-type"></th>
+                    <th class="common-type"></th>
+                    <th class="common-type"></th>
+                    <th class="common-type"></th>
+                    <th class="common-type"></th>
+                    <th class="common-type"></th>
+                    <th class="common-type"></th>
+                    <th class="common-type"></th>
+                    <th class="common-type"></th>
+                </tr>
+                <tr class="common-type">
+                    <th class="common-type">sbyte</th>
+                    <td class="common-type"></td>
+                    <td class="common-type">sbyte</td>
+                    <td class="common-type">short</td>
+                    <td class="common-type">short</td>
+                    <td class="common-type">int</td>
+                    <td class="common-type">int</td>
+                    <td class="common-type">long</td>
+                    <td class="common-type">long</td>
+                    <td class="common-type"></td>
+                    <td class="common-type">float</td>
+                    <td class="common-type">double</td>
+                    <th class="common-type"></th>
+                    <th class="common-type"></th>
+                    <th class="common-type"></th>
+                </tr>
+                <tr class="common-type">
+                    <th class="common-type">byte</th>
+                    <td class="common-type"></td>
+                    <td class="common-type">short</td>
+                    <td class="common-type">byte</td>
+                    <td class="common-type">short</td>
+                    <td class="common-type">ushort</td>
+                    <td class="common-type">int</td>
+                    <td class="common-type">uint</td>
+                    <td class="common-type">long</td>
+                    <td class="common-type">ulong</td>
+                    <td class="common-type">float</td>
+                    <td class="common-type">double</td>
+                    <td class="common-type"></td>
+                    <td class="common-type"></td>
+                    <td class="common-type"></td>
+                </tr>
+                <tr class="common-type">
+                    <th class="common-type">short</th>
+                    <td class="common-type"></td>
+                    <td class="common-type">short</td>
+                    <td class="common-type">short</td>
+                    <td class="common-type">short</td>
+                    <td class="common-type">int</td>
+                    <td class="common-type">int</td>
+                    <td class="common-type">long</td>
+                    <td class="common-type">long</td>
+                    <td class="common-type"></td>
+                    <td class="common-type">float</td>
+                    <td class="common-type">double</td>
+                    <td class="common-type"></td>
+                    <td class="common-type"></td>
+                    <td class="common-type"></td>
+                </tr>
+                <tr class="common-type">
+                    <th class="common-type">ushort</th>
+                    <td class="common-type"></td>
+                    <td class="common-type">int</td>
+                    <td class="common-type">ushort</td>
+                    <td class="common-type">int</td>
+                    <td class="common-type">ushort</td>
+                    <td class="common-type">int</td>
+                    <td class="common-type">uint</td>
+                    <td class="common-type">long</td>
+                    <td class="common-type">ulong</td>
+                    <td class="common-type">float</td>
+                    <td class="common-type">double</td>
+                    <td class="common-type"></td>
+                    <td class="common-type"></td>
+                    <td class="common-type"></td>
+                </tr>
+                <tr class="common-type">
+                    <th class="common-type">int</th>
+                    <td class="common-type"></td>
+                    <td class="common-type">int</td>
+                    <td class="common-type">int</td>
+                    <td class="common-type">int</td>
+                    <td class="common-type">int</td>
+                    <td class="common-type">int</td>
+                    <td class="common-type">long</td>
+                    <td class="common-type">long</td>
+                    <td class="common-type"></td>
+                    <td class="common-type">float</td>
+                    <td class="common-type">double</td>
+                    <td class="common-type"></td>
+                    <td class="common-type"></td>
+                    <td class="common-type"></td>
+                </tr>
+                <tr class="common-type">
+                    <th class="common-type">uint</th>
+                    <td class="common-type"></td>
+                    <td class="common-type">long</td>
+                    <td class="common-type">uint</td>
+                    <td class="common-type">long</td>
+                    <td class="common-type">uint</td>
+                    <td class="common-type">long</td>
+                    <td class="common-type">uint</td>
+                    <td class="common-type">long</td>
+                    <td class="common-type">ulong</td>
+                    <td class="common-type">float</td>
+                    <td class="common-type">double</td>
+                    <td class="common-type"></td>
+                    <td class="common-type"></td>
+                    <td class="common-type"></td>
+                </tr>
+                <tr class="common-type">
+                    <th class="common-type">long</th>
+                    <td class="common-type"></td>
+                    <td class="common-type">long</td>
+                    <td class="common-type">long</td>
+                    <td class="common-type">long</td>
+                    <td class="common-type">long</td>
+                    <td class="common-type">long</td>
+                    <td class="common-type">long</td>
+                    <td class="common-type">long</td>
+                    <td class="common-type"></td>
+                    <td class="common-type">float</td>
+                    <td class="common-type">double</td>
+                    <td class="common-type"></td>
+                    <td class="common-type"></td>
+                    <td class="common-type"></td>
+                </tr>
+                <tr class="common-type">
+                    <th class="common-type">ulong</th>
+                    <td class="common-type"></td>
+                    <td class="common-type"></td>
+                    <td class="common-type">ulong</td>
+                    <td class="common-type"></td>
+                    <td class="common-type">ulong</td>
+                    <td class="common-type"></td>
+                    <td class="common-type">ulong</td>
+                    <td class="common-type"></td>
+                    <td class="common-type">ulong</td>
+                    <td class="common-type">float</td>
+                    <td class="common-type">double</td>
+                    <td class="common-type"></td>
+                    <td class="common-type"></td>
+                    <td class="common-type"></td>
+                </tr>
+                <tr class="common-type">
+                    <th class="common-type">float</th>
+                    <td class="common-type"></td>
+                    <td class="common-type">float</td>
+                    <td class="common-type">float</td>
+                    <td class="common-type">float</td>
+                    <td class="common-type">float</td>
+                    <td class="common-type">float</td>
+                    <td class="common-type">float</td>
+                    <td class="common-type">float</td>
+                    <td class="common-type">float</td>
+                    <td class="common-type">float</td>
+                    <td class="common-type">double</td>
+                    <td class="common-type"></td>
+                    <td class="common-type"></td>
+                    <td class="common-type"></td>
+                </tr>
+                <tr class="common-type">
+                    <th class="common-type">double</th>
+                    <td class="common-type"></td>
+                    <td class="common-type">double</td>
+                    <td class="common-type">double</td>
+                    <td class="common-type">double</td>
+                    <td class="common-type">double</td>
+                    <td class="common-type">double</td>
+                    <td class="common-type">double</td>
+                    <td class="common-type">double</td>
+                    <td class="common-type">double</td>
+                    <td class="common-type">double</td>
+                    <td class="common-type">double</td>
+                    <td class="common-type"></td>
+                    <td class="common-type"></td>
+                    <td class="common-type"></td>
+                </tr>
+                <tr class="common-type">
+                    <th class="common-type">char</th>
+                    <td class="common-type"></td>
+                    <td class="common-type"></td>
+                    <td class="common-type"></td>
+                    <td class="common-type"></td>
+                    <td class="common-type"></td>
+                    <td class="common-type"></td>
+                    <td class="common-type"></td>
+                    <td class="common-type"></td>
+                    <td class="common-type"></td>
+                    <td class="common-type"></td>
+                    <td class="common-type"></td>
+                    <td class="common-type">char</td>
+                    <td class="common-type">wchar</td>
+                    <td class="common-type">uchar</td>
+                </tr>
+                <tr class="common-type">
+                    <th class="common-type">wchar</th>
+                    <td class="common-type"></td>
+                    <td class="common-type"></td>
+                    <td class="common-type"></td>
+                    <td class="common-type"></td>
+                    <td class="common-type"></td>
+                    <td class="common-type"></td>
+                    <td class="common-type"></td>
+                    <td class="common-type"></td>
+                    <td class="common-type"></td>
+                    <td class="common-type"></td>
+                    <td class="common-type"></td>
+                    <td class="common-type">wchar</td>
+                    <td class="common-type">wchar</td>
+                    <td class="common-type">uchar</td>
+                </tr>
+                <tr class="common-type">
+                    <th class="common-type">uchar</th>
+                    <td class="common-type"></td>
+                    <td class="common-type"></td>
+                    <td class="common-type"></td>
+                    <td class="common-type"></td>
+                    <td class="common-type"></td>
+                    <td class="common-type"></td>
+                    <td class="common-type"></td>
+                    <td class="common-type"></td>
+                    <td class="common-type"></td>
+                    <td class="common-type"></td>
+                    <td class="common-type"></td>
+                    <td class="common-type">uchar</td>
+                    <td class="common-type">uchar</td>
+                    <td class="common-type">uchar</td>
+                </tr>
+            </table>
         </p>
     </div>
 
@@ -3313,6 +3900,23 @@
             <br />
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span> <span class="kw">void</span> <span class="var">foo</span>(<span class="kw">int</span> <span class="var">x</span>) <span class="mono">{}</span><br /><br />
             has signature <span class="var">foo</span>(<span class="kw">int</span>)
+        </p>
+    </div>
+
+    <div id="polymorphic-class-type">
+        <b>POLYMORPHIC CLASS TYPE</b>
+        <p>
+            A class is polymorphic, if one or more of the following conditions are true:
+            <ul>
+                <li>the class is abstract,</li>
+                <li>it has a base class that is polymorphic,</li>
+                <li>it has a virtual or overridden destructor,</li>
+                <li>it has a member function that is virtual, abstract or overridden,</li>
+                <li>it implements an interface.</li>
+            </ul>
+        </p>
+        <p>
+            A polymorphic class type has a virtual method table.
         </p>
     </div>
 

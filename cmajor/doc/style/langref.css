@@ -51,6 +51,13 @@ td.rule
     text-align: right
 }
 
+table.common-type, th.common-type, td.common-type
+{
+    border: 1px solid #dddddd;
+    border-collapse: collapse;
+    padding: 8px;
+}
+
 .rule
 {
     font-style: italic;
