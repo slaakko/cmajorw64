@@ -3432,7 +3432,7 @@ void GenerateClassTermination(DestructorSymbol* destructorSymbol, DestructorNode
                 }
                 classPtr = new BoundConversion(std::unique_ptr<BoundExpression>(new BoundParameter(thisParam)), thisToHolderConversion);
             }
-            boundCompoundStatement->AddStatement(std::unique_ptr<BoundStatement>(new BoundSetVmtPtrStatement(std::unique_ptr<BoundExpression>(classPtr), classType)));
+            boundCompoundStatement->InsertStatementToFront(std::unique_ptr<BoundStatement>(new BoundSetVmtPtrStatement(std::unique_ptr<BoundExpression>(classPtr), classType)));
         }
         int n = classType->MemberVariables().size();
         for (int i = n - 1; i >= 0; --i)

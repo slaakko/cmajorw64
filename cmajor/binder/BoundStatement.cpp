@@ -59,6 +59,12 @@ void BoundCompoundStatement::Accept(BoundNodeVisitor& visitor)
     visitor.Visit(*this);
 }
 
+void BoundCompoundStatement::InsertStatementToFront(std::unique_ptr<BoundStatement>&& statement)
+{
+    statement->SetParent(this);
+    statements.insert(statements.begin(), std::move(statement));
+}
+
 void BoundCompoundStatement::AddStatement(std::unique_ptr<BoundStatement>&& statement)
 {
     statement->SetParent(this);

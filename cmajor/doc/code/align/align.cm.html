@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8"/>
+    <title>align.cm</title>
+    <link rel="stylesheet" type="text/css" href="../../style/code.css"/>
+</head>
+<body>
+<pre>
+<div class="code">
+<span class="keyword">public</span> <span class="keyword">constexpr</span> <span class="keyword">nothrow</span> <span class="keyword">inline</span> <span class="keyword">long</span> <span class="identifier">Align</span><span class="other">(</span><span class="keyword">long</span> <span class="identifier">n</span><span class="other">,</span> <span class="keyword">long</span> <span class="identifier">alignment</span><span class="other">)</span>
+<span class="other">{</span>
+    <span class="other">#</span><span class="identifier">assert</span><span class="other">(</span><span class="identifier">alignment</span> <span class="other">&gt;</span> <span class="number">0</span><span class="other">)</span><span class="other">;</span>
+    <span class="keyword">return</span> <span class="other">(</span><span class="identifier">n</span> <span class="other">+</span> <span class="identifier">alignment</span> <span class="other">-</span> <span class="number">1</span><span class="other">)</span> <span class="other">&amp;</span> <span class="other">-</span><span class="identifier">alignment</span><span class="other">;</span>
+<span class="other">}</span>
+
+<span class="keyword">void</span> <span class="identifier">main</span><span class="other">(</span><span class="other">)</span>
+<span class="other">{</span>
+    <span class="keyword">long</span> <span class="identifier">a</span> <span class="other">=</span> <span class="identifier">Align</span><span class="other">(</span><span class="number">10</span><span class="other">,</span> <span class="number">4</span><span class="other">)</span><span class="other">;</span>
+    <span class="keyword">if</span> <span class="other">(</span><span class="identifier">a</span> <span class="other">=</span><span class="other">=</span> <span class="number">12</span><span class="other">)</span>
+    <span class="other">{</span>
+        <span class="identifier">System.Console.WriteLine</span><span class="other">(</span><span class="string">&quot;Align(10, 4) is 12&quot;</span><span class="other">)</span><span class="other">;</span>
+    <span class="other">}</span>
+    <span class="keyword">else</span>
+    <span class="other">{</span>
+        <span class="identifier">System.Console.WriteLine</span><span class="other">(</span><span class="string">&quot;bug&quot;</span><span class="other">)</span><span class="other">;</span>
+    <span class="other">}</span>
+<span class="other">}</span>
+</div
+</pre>
+</body>
+</html>

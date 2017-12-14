@@ -164,6 +164,10 @@ namespace System
         {
             return in->ReadToEnd();
         }
+        public static void SetIn(UniquePtr<InputStream>&& in_)
+        {
+            in = Rvalue(in_);
+        }
         public static void SetOut(UniquePtr<OutputStream>&& out_)
         {
             out = Rvalue(out_);
@@ -171,6 +175,10 @@ namespace System
         public static void SetErr(UniquePtr<OutputStream>&& err_)
         {
             err = Rvalue(err_);
+        }
+        public static InputStream& In()
+        {
+            return *in;
         }
         public static OutputStream& Out()
         {

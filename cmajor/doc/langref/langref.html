@@ -106,13 +106,14 @@
         &nbsp;&nbsp;&nbsp;&nbsp;5.1 <a href="#access-specifiers-syntax">Syntax</a><br />
         6 <a href="#type-expressions">Type Expressions</a><br />
         &nbsp;&nbsp;&nbsp;&nbsp;6.1 <a href="#type-expressions-syntax">Syntax</a><br />
-        &nbsp;&nbsp;&nbsp;&nbsp;6.2 <a href="#const-qualifier">Const Qualifier</a><br />
-        &nbsp;&nbsp;&nbsp;&nbsp;6.3 <a href="#type-member-access">Type Member Access</a><br />
-        &nbsp;&nbsp;&nbsp;&nbsp;6.4 <a href="#pointer-type">Pointer Types</a><br />
-        &nbsp;&nbsp;&nbsp;&nbsp;6.5 <a href="#reference-type">Reference Types</a><br />
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;6.5.1 <a href="#lvalue-reference-type">Lvalue Reference Type</a><br />
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;6.5.2 <a href="#rvalue-reference-type">Rvalue Reference Type</a><br />
-        &nbsp;&nbsp;&nbsp;&nbsp;6.5 <a href="#array-type">Array Types</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;6.2 <a href="#primary-type-expression">Primary Type Expressions</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;6.3 <a href="#const-qualifier">Const Qualifier</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;6.4 <a href="#type-member-access">Type Member Access</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;6.5 <a href="#pointer-type">Pointer Types</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;6.6 <a href="#reference-type">Reference Types</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;6.6.1 <a href="#lvalue-reference-type">Lvalue Reference Type</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;6.6.2 <a href="#rvalue-reference-type">Rvalue Reference Type</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;6.7 <a href="#array-type">Array Types</a><br />
         7 <a href="#constants">Constants</a><br />
         &nbsp;&nbsp;&nbsp;&nbsp;7.1 <a href="#constants-syntax">Syntax</a><br />
         &nbsp;&nbsp;&nbsp;&nbsp;7.2 <a href="#constants-values">Constant Values</a><br />
@@ -135,6 +136,7 @@
         &nbsp;&nbsp;&nbsp;&nbsp;9.10 <a href="#overload-resolution">Function Overload Resolution</a><br />
         10 <a href="#typedefs">Typedefs</a><br />
         &nbsp;&nbsp;&nbsp;&nbsp;10.1 <a href="#typedefs-syntax">Syntax</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;10.2 <a href="#typedefs-examples">Examples</a><br />
         11 <a href="#classes">Classes</a><br />
         &nbsp;&nbsp;&nbsp;&nbsp;11.1 <a href="#classes-syntax">Syntax</a><br />
     </div>
@@ -2191,7 +2193,7 @@
 
     <p>
         A <a href="#rule.compound-statement">compound</a> statement executes a sequence of statements in order.
-        A <a href="#rule.compound-statement">compound-statement</a> is syntactically a <a href="#rule.statement">statement</a> so it can be used whenever syntax allows a <a href="#rule.statement">statement</a> to occur.
+        A <a href="#rule.compound-statement">compound-statement</a> is a <a href="#rule.statement">statement</a> so it can be used whenever syntax allows a <a href="#rule.statement">statement</a> to occur.
     </p>
 
     <h4 id="return-statement">4.3.2 Return Statement</h4>
@@ -2393,7 +2395,7 @@
         sets an initial value for it. The local variable will have given <a href="#type-expressions">type</a> and <a href="#identifiers">name</a>.
         It is initialized to the value given on the right side of the assignment operator symbol or
         resulting of a call to a constructor with arguments enclosed in parentheses.
-        If no initializer is given, the variable will be <a href="#default-initialized">default initialized</a>.
+        If no initializer is given, the variable will be <a href="#default-initialization">default initialized</a>.
     </p>
 
     <h3 id="delete-and-destroy-statements">4.8 Delete and Destroy Statements</h3>
@@ -2549,7 +2551,7 @@
     <h2 id="type-expressions">6 Type Expressions</h2>
 
     <p>
-        Type expressions are used for instance for declaring the type of a variable, parameter or <a href="#constants">constan</a>t, or the return type of a <a href="#functions">function</a>.
+        Type expressions are used for declaring the type of a variable, parameter or <a href="#constants">constant</a>, or the return type of a <a href="#functions">function</a>.
     </p>
 
     <h3 id="type-expressions-syntax">6.1 Syntax</h3>
@@ -2648,7 +2650,14 @@
         </tr>
     </table>
 
-    <h3 id="const-qualifier">6.2 Const Qualifier</h3>
+    <h3 id="primary-type-expression">6.2 Primary Type Expressions</h3>
+
+    <p>
+        A <a href="#rule.primary-type-expr">primary type expression</a> is a name of a <a href="#basic-types">basic</a> or <a href="#user-defined-type">user-defined</a> type,
+        or a name of a <a href="#class-template">class template</a> with type arguments.
+    </p>
+
+    <h3 id="const-qualifier">6.3 Const Qualifier</h3>
 
     <p>
         A <a href="#rule.prefix-type-expr"><span class="kw">const</span></a> qualifier 
@@ -2659,17 +2668,17 @@
         declares a pointer to constant <em>T</em> type.
     </p>
 
-    <h3 id="type-member-access">6.3 Type Member Access</h3>
+    <h3 id="type-member-access">6.4 Type Member Access</h3>
 
     <p>
         A <a href="#rule.member">member</a> access in a type expression
-        is used to access a member of a namespace or a class type.
+        is used for accesssing a member of a <a href="#namespaces">namespace</a> or a <a href="#classes">class type</a>.
         For example, if <em>N</em> is a namespace that contains type <em>T</em>,
         type expression <em>N</em><span class="mono">.</span><em>T</em> <span class="mono">*</span>
         declares a pointer to type <em>T</em> in namespace <em>N</em> type.
     </p>
 
-    <h3 id="pointer-type">6.4 Pointer Types</h3>
+    <h3 id="pointer-type">6.5 Pointer Types</h3>
 
     <p>
         A <a href="#rule.pointer">pointer</a> qualifier is used for declaring pointer types.
@@ -2683,7 +2692,7 @@
         A member of a class object is accessed using the <a href="#pointer-member-access-expression">pointer member access</a> expression.
     </p>
 
-    <h4 id="generic-pointer-type">6.4.1 Generic Pointer Type</h4>
+    <h4 id="generic-pointer-type">6.5.1 Generic Pointer Type</h4>
 
     <p>
         The <span class="kw">void</span><span class="mono">*</span> type represents a 
@@ -2695,7 +2704,7 @@
         The default value of a generic pointer type object is <span class="kw">null</span>.
     </p>
 
-    <h3 id="reference-type">6.5 Reference Types</h3>
+    <h3 id="reference-type">6.6 Reference Types</h3>
 
     <p>
         The <a href="#rule.lvalue-ref">lvalue</a> and <a href="#rule.rvalue-ref">rvalue</a> reference qualifiers are
@@ -2708,20 +2717,20 @@
         "automatically dereferenced pointer".
     </p>
 
-    <h4 id="lvalue-reference-type">6.5.1 Lvalue Reference Type</h4>
+    <h4 id="lvalue-reference-type">6.6.1 Lvalue Reference Type</h4>
 
     Lvalue reference types are typically used for passing parameters by reference or by reference-to-const.
     Only a variable or derefenced pointer can be bound to a nonconstant reference parameter.
     A <a href="#literals">literal</a> can also be bound to a parameter that is a reference-to-const. 
     In that case the literal value is assigned to a temporary variable that is passed as a parameter.
 
-    <h4 id="rvalue-reference-type">6.5.2 Rvalue Reference Type</h4>
+    <h4 id="rvalue-reference-type">6.6.2 Rvalue Reference Type</h4>
 
     <p>
         Rvalue reference types are used for implementing move semantics.
     </p>
 
-    <h3 id="array-type">6.6 Array Types</h3>
+    <h3 id="array-type">6.7 Array Types</h3>
 
     <p>
         An <a href="#rule.array">array</a> qualifier is used for declaring an array type. An array is a sequence of objects of the same type.
@@ -2738,6 +2747,10 @@
     <p>
         Multidimensional arrays can be declarated as arrays of arrays, for example, <span class="kw">int</span>[3][3] <span class="var">x</span>,
         defines <em>x</em> as a two-dimensional array of nine integers.
+    </p>
+
+    <p>
+        Elements of an array are accessed using the <a href="#subscript-expression">subscript expression</a>.
     </p>
 
     <h2 id="constants">7 Constants</h2>
@@ -2830,7 +2843,7 @@
     <h2 id="enumerations">8 Enumerations</h2>
 
     <p>
-        An enumeration is a group of constants collected under a common name called an <em>enumerated type</em>.
+        An <a href="#rule.enumerated-type">enumerated type</a> defines a user-defined type that contains a list of <a href="#enumeration-constants">enumeration constants</a>.
     </p>
 
     <h3 id="enumerations-syntax">8.1 Syntax</h3>
@@ -2907,6 +2920,11 @@
         If the underlying type is not specified, <span class="kw">int</span> is used as the underlying type.
     </p>
 
+    <p>
+        There's an implicit conversion from the enumerated type to the underlying type, and an explicit conversion (cast) from the underlying type to the enumerated type.
+        For an example, see <span class="var">NextMonth</span> function and setting <span class="var">permissions</span> in the <a href="#enumerations-examples">examples</a>.
+    </p>
+
     <h3 id="enumeration-constants">8.3 Enumeration Constants</h3>
 
     <p>
@@ -2928,15 +2946,31 @@
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="var">green, yellow, red</span><br/>
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="mono">}</span><br />
         <br />
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span> <span class="kw">enum</span> <span class="var">Flags</span> <span class="mono">:</span> <span class="kw">byte</span><br />
+
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span> <span class="kw">enum</span> <span class="var">Month</span> <span class="mono">:</span> <span class="kw">sbyte</span><br />
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="mono">{</span><br />
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="var">foo</span> <span class="mono">=</span> <span class="var">1u &lt;&lt; 0u</span><span class="mono">;</span><br />
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="var">bar</span> <span class="mono">=</span> <span class="var">1u &lt;&lt; 1u</span><span class="mono">;</span><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="var">january</span> <span class="mono">=</span> <span class="var">1</span>, <span class="var">february</span>, <span class="var">march</span>, <span class="var">april</span>, <span class="var">may</span>, <span class="var">june</span>, <span class="var">july</span>, <span class="var">august</span>, <span class="var">september</span>, <span class="var">october</span>, <span class="var">november</span>, <span class="var">december</span><br />
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="mono">}</span><br />
         <br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span> <span class="kw">enum</span> <span class="var">Permission</span> <span class="mono">:</span> <span class="kw">byte</span><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="mono">{</span><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="var">read</span> <span class="mono">=</span> <span class="var">1u &lt;&lt; 0u</span><span class="mono">;</span><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="var">write</span> <span class="mono">=</span> <span class="var">1u &lt;&lt; 1u</span><span class="mono">;</span><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="var">execute</span> <span class="mono">=</span> <span class="var">1u &lt;&lt; 2u</span><span class="mono">;</span><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="mono">}</span><br />
+        <br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span> <span class="var">Month</span> <span class="var">NextMonth</span>(<span class="var">Month</span> <span class="var">month</span>)<br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="mono">{</span><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span> <span class="kw">cast</span>&lt;<span class="var">Month</span>&gt;<span class="var">(month</span> <span class="mono">%</span> <span class="var">12</span> <span class="mono">+</span> <span class="var">1)</span><span class="mono">;</span><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="mono">}</span><br />
+        <br />
+
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span> <span class="var">main()</span><br />
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="mono">{</span><br />
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="var">TrafficLight light </span><span class="mono">=</span> <span class="var">TrafficLight.green</span><span class="mono">;</span><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="var">Month month </span><span class="mono">=</span> <span class="var">Month.january</span><span class="mono">;</span><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="var">Month next </span><span class="mono">=</span> <span class="var">NextMonth(month)</span><span class="mono">;</span><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="var">Permission permissions </span><span class="mono">=</span> <span class="kw">cast</span><span class="mono">&lt;</span><span class="var">Permission</span><span class="mono">&gt;</span><span class="var">(Permission.read</span> <span class="mono">|</span> <span class="var">Permission.write)</span><span class="mono">;</span><br />
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="mono">}</span><br />
     </p>
     
@@ -2945,7 +2979,8 @@
 
     <p>
         A function represents computation that can be <a href="#invocation-expression">invoked</a> at run time and in simple cases also at compile time. 
-        The computation is defined by a <a href="#compound-statement">block of statements</a> that define the control flow of the function. 
+        The computation is defined by the <em>body</em> of the function. 
+        The body is a <a href="#compound-statement">compound statement</a> that contains statements that define the control flow of the function. 
         Invocation of a function may yield a value, or the function can be a <span class="kw">void</span> function that is invoked for its 
         <em><a href="http://en.wikipedia.org/wiki/Side_effect_(computer_science)">side-effects</a></em>.
     </p>
@@ -3100,6 +3135,12 @@
         A regular function has no other specifiers than a possible <a href="#access-specifiers">access</a> specifier.
     </p>
 
+    <p>
+        For an example of a regular function, see <a href="../code/strlen/strlen.cm.html">strlen.cm</a>.
+    </p>
+
+    <!-- <iframe src="../code/strlen/strlen.cm.html" height="300px" width="800px" style="border:none;"></iframe>-->
+    
     <h3 id="functions-constexpr">9.3 Constexpr Specifier</h3>
 
     <p>
@@ -3120,6 +3161,16 @@
         <a href="#rule.goto-default-statement">goto default</a>, <a href="#rule.throw-statement">throw</a>, 
         <a href="#rule.try-statement">try</a>, or a <a href="#rule.conditional-compilation-statement">conditional compilation</a>
         statement.
+    </p>
+
+    <p>
+        Often <span class="kw">constexpr</span> specifier is combined with <a href="#functions-inline"><span class="kw">inline</span></a> and 
+        <a href="#functions-nothrow"><span class="kw">nothrow</span></a> specifiers because <span class="kw">constexpr</span> functions are
+        typically short and do not throw exceptions.
+    </p>
+
+    <p>
+        For an example of a <span class="kw">constexpr</span> function, see <a href="../code/align/align.cm.html">align.cm</a>.
     </p>
 
     <h3 id="functions-inline">9.4 Inline Specifier</h3>
@@ -3194,6 +3245,10 @@
         <a href="../library/System.Base/System.Base.html#concept_RandomAccessIterator_A5A1B6A4EC8E181A67C733002B3BE437554D3484">RandomAccessIterator</a> refines 
         <a href="../library/System.Base/System.Base.html#concept_BidirectionalIterator_96C10B73881A17B6DC9C0804E7DF2141C2E58DA6">BidirectionalIterator</a> concept that refines
         <a href="../library/System.Base/System.Base.html#concept_ForwardIterator_4C777D423CF589B8535F29F910C025990ED656D4">ForwardIterator</a> concept.
+    </p>
+
+    <p>
+        For an example of a function template, see <a href="../code/min/min.cm.html">min.cm</a>.
     </p>
 
     <h3 id="overload-resolution">9.10 Function Overload Resolution</h3>
@@ -3288,10 +3343,19 @@
         </tr>
     </table>
 
+    <h3 id="typedefs-examples">10.2 Examples</h3>
+
+    <p>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public typedef</span> <span class="var">String</span><span class="mono">&lt;</span><span class="kw">char</span><span class="mono">&gt;</span> <span class="var">string</span><span class="mono">;</span><br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public typedef</span> <span class="var">String</span><span class="mono">&lt;</span><span class="kw">wchar</span><span class="mono">&gt;</span> <span class="var">wstring</span><span class="mono">;</span><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public typedef</span> <span class="var">String</span><span class="mono">&lt;</span><span class="kw">uchar</span><span class="mono">&gt;</span> <span class="var">ustring</span><span class="mono">;</span><br />
+    </p>
+
     <h2 id="classes">11 Classes</h2>
 
     <p>
-        todo
+        A <a href="#rule.class">class</a> definition defines a user-defined type. It may contain member functions, member variables, types, typedefs and constants.
+        It may have a base class and it can implement any number of interfaces.
     </p>
 
     <h3 id="classes-syntax">11.1 Syntax</h3>
@@ -3460,8 +3524,8 @@
                 <span class="kw">constexpr</span> |
                 <span class="kw">explicit</span> | 
                 <span class="kw">inline</span> |
-                <span class="kw">suppress</span> | 
                 <span class="kw">default</span> |
+                <span class="kw">suppress</span> | 
                 <span class="kw">nothrow</span> |
                 <span class="kw">throw</span>)*
             </td>
@@ -3571,6 +3635,377 @@
             </td>
         </tr>
     </table>
+
+    <h3 id="regular-class">11.x Regular Class</h3>
+
+    <p>
+        A regular class may have each kind of <a href="#class-members">class member</a>. It may have a <a href="#class-hierarchies">base class</a> and can
+        <a href="#implementing-interfaces">implement interfaces</a>.
+    </p>
+
+    <h3 id="abstract-class">11.x Abstract Class</h3>
+
+    <p>
+        An <span class="kw">abstract</span> class is a class that cannot be created an instance of. Typically it is a base class of a <a href="#class-hierarchies">class hierarcy</a>,
+        or an intermediate class that derives from a base class but is not a <a href="#concrete-class">concrete class</a> because it has or inherits an abstract member function.
+        An abstract class may have <a href="#abstract-member-function">abstract member functions</a> but does not have to.
+        If a class has or inherits an abstract member function it must explicitly be declared abstract.
+    </p>
+
+    <h3 id="static-class">11.x Static Class</h3>
+
+    <p>
+        A <span class="kw">static</span> class can have only
+        <ul>
+            <li>a <a href="#static-constructor">static constructor</a>,</li>
+            <li><a href="#static-member-variable">static member variables</a>,</li>
+            <li><a href="#static-member-function">static member functions</a>,</li>
+            <li><a href="#typedefs">typedefs</a>,</li>
+            <li><a href="#constants">constants</a> and</li>
+            <li><a href="#enumerations">enumerated types</a>.</li>
+        </ul>
+    </p>
+
+    <p>
+        For an example of a static class, see <a href="../code/console/console.cm.html">console.cm</a>.
+    </p>
+
+    <h3 id="class-members">11.x Class Members</h3>
+
+    A class can contain a <a href="#static-constructor">static constructor</a>, <a href="#constructor">constructors</a>, a <a href="#destructor">destructor</a>, 
+    other <a href="#member-function">member functions</a>, <a href="#member-variable">member variables</a>, <a href="#typedefs">typedefs</a>, classes, <a href="#constants">constants</a>, 
+    <a href="#enumerations">enumerated types</a>, delegates and class delegates.
+
+    <h4 id="static-constructor">11.x.y Static Constructor</h4>
+
+    <p>
+        A <a href="#rule.static-constructor">static constructor</a> is special member function that is used for initializing static member variables of the class it belongs to.
+        The name of the static constructor must be the name of the class that contains it.
+    </p>
+
+    <p>
+        A static constructor is typically used in classes that need <em>one-time initialization</em>. An example of such a class is a <a href="http://en.wikipedia.org/wiki/Singleton_pattern">singleton</a>.
+        Each static constructor is guarded by a recursive mutex and a Boolean flag provided by the Cmajor runtime. They ensure together that initialization is thread-safe and happens exactly once.
+        A static constructor gets executed before control arrives to the body of a constructor or a static member function of the same class, or 
+        before a static member variable of a class is accessed from outside of the class.
+    </p>
+
+    <p>
+        For an example of a singleton class that has a static constructor take a look at <a href="../code/phonebook/phonebook.cm.html">phonebook.cm</a>.
+        The singleton is accessed using the static <em>Instance()</em> member function. Before <em>Instance()</em> returns a reference to a static <em>instance</em> member variable,
+        the static constructor gets executed if it has not already been executed.
+        The static constructor creates an instance of the PhoneBook class that assigns it to a static <em>instance</em> member variable.
+        Creating an instance of the PhoneBook class involves calling the default constructor of the class that in turn calls the static constructor. 
+        But this time the initialization flag provided by the runtime has already been set so control returns from the static constructor right away. 
+    </p>
+
+    <p>
+        In the start of the static constructor the language implementation checks whether the initialization flag is set.
+        If it has been set the control returns and the body of the static constructor is not executed.
+        Otherwise the language implementation next locks the recursive mutex, and then checks again whether the the initialization flag is set and unlocks the mutex and returns if it is set.
+        This is called the <a href="http://en.wikipedia.org/wiki/Double-checked_locking">double checked locking pattern</a>. 
+        Otherwise the initialization has not yet been done, so the language implementation sets the initialization flag to true, executes the body of the static constructor, unlocks the mutex and returns.
+    </p>        
+
+    <p>
+        Like a destructor, a static constructor should not throw any exceptions. 
+        Although the implementation ensures that the recursive mutex gets unlocked regardless whether control leaves the body of the static constructor normally or by throwing an exception, 
+        things won't probably work, because critical data has not been fully initialized. When it comes to exceptions, the static constructor should handle them all gracefully, 
+        or give up and exit the program.
+    </p>
+
+    <p>
+        If the class having a static constructor has a member variable of a class that has a nontrivial destructor, the class should implement a destructor.
+        If the destructor does not have other things to do besides calling destructors of the member variables, this can be done by using a <em>default</em> destructor:
+        <blockquote>
+            <span class="kw">public class </span><span class="var">MyClass</span><br/>
+            <span class="mono">{</span><br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// ...<br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public default</span> ~<span class="var">MyClass()</span><span class="mono">;</span><br />
+            <span class="mono">}</span><br />
+        </blockquote>
+    </p>
+
+    <h4 id="constructor">11.x.y Constructors</h4>
+
+    <p>
+        A <a href="#rule.constructor">constructor</a> is a special member function that creates an object of the class it belongs to. 
+        The task of a constructor is to initialize member variables and allocate resources. Memory is also considered as a kind of resource.
+        The name of the constructor must be the name of the class that contains it.
+    </p>
+
+    <h5 id="constructor-initializer-list">Initializer List</h5>
+
+    <p>
+        Member variables and a possible base class object can be initialized by using an <a href="#rule.initializer-list">initializer list</a>.
+        An initializer list consists of <a href="#rule.initializer">initializers</a> separated by commas.
+        There are three kinds of initializers:
+    </p>
+
+    <ul>
+        <li>
+            A <a href="#rule.this-initializer"><span class="kw">this</span> initializer</a> delegates the initialization of some of the member variables to another constructor of the same class.
+            The constructor called is resolved using <a href="#overload-resolution">overload resolution</a> and takes the number and type of arguments of the this-initializer into account.
+            There can be at most one this-initializer in an initializer list and if an initializer list has a this-initializer it cannot have a base-initializer.
+        </li> 
+        <li>
+            A <a href="#rule.base-initializer"><span class="kw">base</span> initializer</a> calls a constructor of the base class to initialize inherited member variables.
+            The base class constructor called is resolved using <a href="#overload-resolution">overload resolution</a> and takes the number and type of arguments of the base-initializer into account.
+            There can be at most one base-initializer in an initializer list and if an initializer list has a base-initializer it cannot have a this-initializer.
+        </li>
+        <li>
+            A <a href="#rule.member-variable-initializer">member variable initializer</a> initializes a member variable of given name with supplied arguments.
+            If the member variable is of a class type, a constructor of that class is called with given arguments.
+            If there is no member variable initializer for a specific member variable in the initializer list, 
+            that member variable will be <a href="#default-initialization">default initialized</a>, copied or moved regarding whether we are in a <a href="#default-constructor">default</a> 
+            or other constructor, in a <a href="#copy-constructor">copy constructor</a> or in a <a href="#move-constructor">move constructor</a> respectively.
+        </li>
+    </ul>
+
+    <p>
+        There are three kinds of special constructors. A <a href="#default-constructor">default constructor</a>, a <a href="#copy-constructor">copy constructor</a> and a <a href="#move-constructor">move constructor</a>.
+    </p>
+
+    <h5 id="default-constructor">Default Constructor</h5>
+
+    <p>
+        The default constructor has <a href="#function-signature">signature</a>
+        <blockquote>
+            <span class="var">ClassName()</span>
+        </blockquote>
+        The purpose of it is to <a href="#default-initialization">default initialize</a> an object of the class it belongs to.
+        If a class has no user-defined default constructor, the compiler will generate one if it is needed.
+        The generated default constructor will call the default constructor of the possible base class and it will <a href="#default-initialization">default initialize</a> all member variables of the class.
+
+    <p>
+        User can request the automatic generation of the default constructor by using the <span class="kw">default</span> keyword:
+        <blockquote>
+            <span class="kw">public</span> <span class="kw">default</span> <span class="var">ClassName()</span><span class="mono">;</span>
+        </blockquote>
+        The <span class="kw">default</span> default constructor cannot have a body.
+    </p>
+
+    <p>
+        User can suppress the automatic generation of the default constructor by using the <span class="kw">suppress</span> keyword:
+        <blockquote>
+            <span class="kw">suppress</span> <span class="var">ClassName(</span>)</span><span class="mono">;</span>
+        </blockquote>
+        The suppressed default constructor cannot have a body.
+    </p>
+
+    <p>
+        A class may have at most one default constructor.
+    </p>
+
+    <h5 id="copy-constructor">Copy Constructor</h5>
+
+    <p>
+        The copy constructor has <a href="#function-signature">signature</a> 
+        <blockquote>
+            <span class="var">ClassName(</span><span class="kw">const</span> <span class="var">ClassName&amp;)</span>
+        </blockquote>
+        It takes another object of the same class as an lvalue-reference-to-const parameter and typically copies members from that object by using an <a href="#rule.initializer-list">initializer list</a>.
+        If a class has no user-defined copy constructor, the compiler will generate one if it is needed. 
+        The generated copy constructor will copy the value of a possible base class object and the values of all member variables from another object of the same class.
+    </p>
+
+    <p>
+        User can request the automatic generation of the copy constructor by using the <span class="kw">default</span> keyword:
+        <blockquote>
+            <span class="kw">public</span> <span class="kw">default</span> <span class="var">ClassName(</span><span class="kw">const</span> <span class="var">ClassName&amp;)</span><span class="mono">;</span>
+        </blockquote>
+        The default copy constructor cannot have a body.
+    </p>
+
+    <p>
+        User can suppress the automatic generation of the copy constructor by using the <span class="kw">suppress</span> keyword:
+        <blockquote>
+            <span class="kw">suppress</span> <span class="var">ClassName(</span><span class="kw">const</span> <span class="var">ClassName&amp;)</span><span class="mono">;</span>
+        </blockquote>
+        The suppressed copy constructor cannot have a body.
+    </p>
+
+    <p>
+        A class may have at most one copy constructor.
+    </p>
+
+    <h5 id="move-constructor">Move Constructor</h5>
+
+    <p>
+        The move constructor has <a href="#function-signature">signature</a>
+        <blockquote>
+            <span class="var">ClassName(</span><span class="var">ClassName&amp;&amp;)</span>
+        </blockquote>
+        It takes another object of the same class as a rvalue-reference parameter and typically moves members from that object by using an <a href="#rule.initializer-list">initializer list</a> or
+        implementing the move in the body of the move constructor.
+    </p>
+
+    <p>
+        User can request the automatic generation of the move constructor by using the <span class="kw">default</span> keyword:
+        <blockquote>
+            <span class="kw">public</span> <span class="kw">default</span> <span class="var">ClassName(</span><span class="var">ClassName&amp;&amp;)</span><span class="mono">;</span>
+        </blockquote>
+        The default move constructor cannot have a body.
+    </p>
+
+    <p>
+        User can suppress the automatic generation of the move constructor by using the <span class="kw">suppress</span> keyword:
+        <blockquote>
+            <span class="kw">suppress</span> <span class="var">ClassName(</span><span class="var">ClassName&amp;&amp;)</span><span class="mono">;</span>
+        </blockquote>
+        The suppressed move constructor cannot have a body.
+    </p>
+
+    <p>
+        A class may have at most one move constructor.
+    </p>
+
+    <h5 id="constructor-initialization-actions">Compiler-Generated Initializing Actions</h5>
+
+    <p>
+        Either if the class has a user-defined constructor or a compiler-generated one, the language implementation will complete it with the following actions:
+        <ol>
+            <li>
+                If the class has a static constructor, that will be called first.
+            </li>
+            <li>
+                If the constructor has an <a href="#constructor-initializer-list">initializer list</a> that contains a this-initializer, it is called. 
+            </li>
+            <li>
+                Otherwise, if the constructor has an <a href="#constructor-initializer-list">initializer list</a> that contains a base-initializer, it is called.
+                It will in turn perform these same actions for the base class object.
+            </li>
+            <li>
+                Otherwise, if the class has a base class, the base class constructor is called. 
+                It will in turn perform these same actions for the base class object.
+            </li>
+            <li>
+                If the class is polymorphic and the this-initializer has not been called, 
+                the language implementation will now set the VMT pointer of the current class being constructed to the VMT pointer field of the current class object.
+                This ensures that if a user-defined constructor calls virtual member functions from its body, they are resolved to member functions of the current class or its base class or ancestor class.
+                If they would be resolved to the derived class member functions, they would have access to the not yet constructed member variables of the derived class.
+            </li>
+            <li>
+                For each member variable of the class in declaration order, if the member variable has an initializer, it is called, 
+                otherwise the member variable is <a href="#default-initialized">default initialized</a>, copied, or moved regarding whether we are in a default or other constructor, in a copy constructor, 
+                or in a move constructor respectively.
+            </li>
+            <li>
+                If the constructor is a user-defined one, the body of the constructor is executed.
+            </li>
+        </ol>
+    </p>
+
+
+    <h5 id="constructor-specifiers">Constructor Specifiers</h5>
+
+    A constructor may have the following <a href="#rule.constructor-specifiers">specifiers</a>:
+    
+    <ul>
+        <li>
+            <span class="kw">constexpr</span>. A constexpr constructor is used in
+            <a href="#literal-class">literal</a> classes.
+        </li>
+        <li>
+            <span class="kw">explicit</span>. A constructor of class <em>A</em> that is not a copy or move constructor
+            but has a single parameter of type <em>T</em> is used normally to convert an argument of type <em>T</em> to an object of a class <em>A</em> in <a href="#overload-resolution">overload resolution</a>.
+            By using the <span class="kw">explicit</span> keyword, the programmer can say that argument of type <em>T</em> will <em>not</em> be automatically converted to class type <em>A</em>.
+        </li>
+        <li>
+            <span class="kw">inline</span>. This is a hint to the compiler that the constructor should be <a href="#functions-inline">inlined</a> if possible.
+        </li>
+        <li>
+            <span class="kw">default</span>. Can only be used for the <a href="#default-constructor">default constructor</a>, <a href="#copy-constructor">copy constructor</a> and 
+            <a href="#move-constructor">move constructor</a>.
+        </li>
+        <li>
+            <span class="kw">suppress</span>. Can only be used for the <a href="#default-constructor">default constructor</a>, <a href="#copy-constructor">copy constructor</a> and
+            <a href="#move-constructor">move constructor</a>.
+        </li>
+        <li>
+            <span class="kw">nothrow</span>. A nothrow constructor has the same semantics as a <a href="#functions-nothrow">nonmember nothrow function</a>.
+        </li>
+        <li>
+            <span class="kw">throw</span>. A throw constructor has the same semantics as a <a href="#functions-throw">nonmember throw function</a>.
+        </li>
+    </ul>
+    
+
+    <h4 id="destructor">11.x.y Destructor</h4>
+
+    <p>
+        The purpose of the <a href="#rule.destructor">destructor</a> is to release allocated or otherwise obtained resources. Memory is also considered as a kind of resource.
+        The name of the destructor must be the name of the class that contains it.
+    </p>
+
+    <p>
+        If a class does not have a user-defined destructor and either the class is <a href="#polymorphic-class-type">polymorphic</a> or it has a member variable of a class that has a nontrivial destructor, 
+        the compiler will generate a destructor for the class.
+        If the class has a polymorphic base class, the generated destructor will be set as overridden, otherwise, if the class is polymorphic, it will be set virtual, 
+        otherwise it will remain as a regular destructor.
+    </p>
+
+    <p>
+        Either if the class has a user-defined destructor or a compiler-generated one, the language implementation will complete it with the following actions:
+        <ol>
+            <li>
+                If the class is polymorphic, the language implementation will first set the VMT pointer of the current class being destroyed to the VMT pointer field of the current class object.
+                This ensures that if a user-defined destructor calls virtual member functions from its body, they are resolved to member functions of the current class or its base class or ancestor class.
+                If they would be resolved to the derived class member functions, they would have access to the already destroyed member variables of the derived class.
+            </li>
+            <li>
+                If the destructor is a user-defined one, the body of the destructor is executed.
+            </li>
+            <li>
+                For each member variable of the class in reverse declaration order, if the member variable is of a class that has a nontrivial destructor, the member variable destructor is called.
+            </li>
+            <li>
+                If the class has a base class that has a nontrivial destructor, the base class destructor will be called that in turn performs these same actions.
+            </li>
+        </ol>
+    </p>
+
+    <p>
+        A destructor may have the following <a href="#rule.destructor-specifiers">specifiers</a>:
+        <ul>
+            <li>
+                <span class="kw">virtual</span>. A base class of a <a href="#class-hierarchies">class hierarchy</a> should have a virtual destructor.
+            </li>
+            <li>
+                <span class="kw">override</span>. A class that directly or indirectly derives from a class that has a virtual or overridden destructor may override the destructor.
+            </li>
+            <li>
+                <span class="kw">default</span>. If the destructor does not have other actions to do in addition to destroying member variables and a base class object, 
+                the destructor may be declared default. It may also be declared virtual or overridden in this case.
+                A <span class="kw">default</span> destructor may not have a body.
+            </li>
+        </ul>
+    </p>
+
+    <h3 id="literal-class">11.x Literal Classes</h3>
+
+    A class whose constructors and member functions are declared <a href="#functions-constexpr"><span class="kw">constexpr</span></a> is called a <em>literal</em> class.
+    When arguments to such functions are <a href="#constant-expression">constant expressions</a>, they can be evaluated at compile time.
+    The constructors and member functions of a literal class can be used also when arguments are not constant expressions. 
+    In that case they behave the same way as regular constructors and member functions.
+
+    For an example of a literal class, see <a href="../code/point/point.cm.html">point.cm</a>.
+
+    <h3 id="class-hierarchies">11.x Class Hierarchies</h3>
+
+    <p>
+        In Cmajor a class may have a single <em><a href="#rule.inheritance-and-implemented-interfaces">base class</a></em>. 
+        If class <em>B</em> is the base class of class <em>A</em> we say also that <em>A</em> <em>derives</em> from <em>B</em>,
+        and that <em>A</em> <em>inherits</em> members from <em>B</em>. When <em>A</em> derives from <em>B</em> we may think that <em>A</em> <em>is-a-kind-of</em> <em>B</em>.
+        Inheritance relationship allows us to build hierarchies of classes some of which are base classes and others inheriting from them.
+        If class <em>A</em> derives from class <em>B</em>, <em>A</em> may <em>override</em> some or all the <a href="#virtual-member-function">virtual</a>, 
+        <a href="#abstract-member-function">abstract</a> or already <a href="#overridden-member-function">overridden</a> member functions of <em>B</em>.
+    </p>
+
+    <p>
+        For an example of a class hierarchy, see <a href="../code/vehicles/vehicles.cm.html">vehicles.cm</a>.
+        It contains a hierarchy of vehicle classes: bicycle and car are vehicles, and truck is a kind of car.
+    </p>
 
     <h2 id="appendix-a">Appendix A Terms</h2>
 
@@ -3848,6 +4283,14 @@
         </p>
     </div>
 
+    <div id="concrete-class">
+        <b>CONCRETE CLASS</b><br />
+        <p>
+            Opposite of an <a href="#abstract-class">abstract class</a>.
+            A concrete class may not have an abstract member function and it must override all abstract member functions it inherits.
+        </p>
+    </div>
+
     <div id="conversion-distance">
         <b>CONVERSION DISTANCE</b><br />
         <p>
@@ -3871,8 +4314,28 @@
         </p>
     </div>
 
+    <div id="default-initialization">
+        <b>DEFAULT INITIALIZATION</b>
+        <p>
+            In Cmajor objects of the following kind of types are default initialized as follows:<sup><a href="#footnote-3">3</a></sup>
+            <ul>
+                <li>Objects of the <a href="#basic-type-bool">Boolean</a> type are initialized to <span class="kw">false</span>.</li>
+                <li>
+                    Objects of <a href="#basic-integer-types">basic integer types</a>, <a href="#basic-floating-point-types">basic floating-point types</a> and <a href="#enumerations">enumerated types</a>
+                    are initialized to zero.
+                </li>
+                <li>Objects of <a href="#basic-character-types">basic character types</a> are initialized to NUL character (<span class="mono">'\0'</span>).</li>
+                <li>Pointer type objects are initialized to <a href="#null-literal"><span class="kw">null</span></a>.</li>
+                <li>Array type objects will contain their length number of default initialized objects.</li>
+                <li>Delegate type objects will contain <a href="#null-literal"><span class="kw">null</span></a> as their internal function pointer value.</li>
+                <li>Class delegate type objects will contain <a href="#null-literal"><span class="kw">null</span></a> as their internal object pointer and function pointer value.</li>
+                <li>Class type objects are default initialized by calling the default constructor of their class.</li>
+            </ul>
+        </p>
+    </div>
+
     <div id="free-store">
-        <b>FREE STORE</b><br />
+        <b>FREE STORE</b>
         <p>
             A memory area managed by the runtime library and eventually by the operating system. A program can allocate memory from the free store and then release it back when it has finished using it.
         </p>
@@ -3920,6 +4383,14 @@
         </p>
     </div>
 
+    <div id="user-defined-type">
+        <b>USER-DEFINED TYPE</b>
+        <p>
+            User-defined types are <a href="#enumerations">enumerated</a> types, <a href="#classes">class</a> types, <a href="#interfaces">interface</a> types,
+            and <a href="#delegates">delegate</a> and <a href="#class-delegates">class delegate</a> types.
+        </p>
+    </div>
+
     <hr />
 
     <sup id="footnote-1">
@@ -3931,6 +4402,11 @@
     <sup id="footnote-2">
         2. Actually a local variable can reside only in a processor register if its address is not needed.
     </sup>
+    <br />
 
+    <sup id="footnote-3">
+        3. Default initialization rules for Cmajor are different than in C++. In C++ primitive type objects of automatic storage duration will be default initialized to indeterminate value.
+    </sup>
+    <br />
 </body>
 </html>

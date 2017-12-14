@@ -55,6 +55,7 @@ class BoundCompoundStatement : public BoundStatement
 public:
     BoundCompoundStatement(const Span& span_);
     void Accept(BoundNodeVisitor& visitor) override;
+    void InsertStatementToFront(std::unique_ptr<BoundStatement>&& statement);
     void AddStatement(std::unique_ptr<BoundStatement>&& statement);
     const std::vector<std::unique_ptr<BoundStatement>>& Statements() const { return statements; }
 private:

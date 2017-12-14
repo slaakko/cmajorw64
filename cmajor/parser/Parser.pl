@@ -190,6 +190,13 @@ namespace cmajor.parser
         Target: Target;
         FilePath: std::string;
     }
+    grammar SourceTokenGrammar
+    {
+        SourceTokens(SourceTokenFormatter* formatter);
+        SourceToken(SourceTokenFormatter* formatter);
+        Spaces: std::u32string;
+        Other: std::u32string;
+    }
     grammar SpecifierGrammar
     {
         Specifiers: Specifiers;
