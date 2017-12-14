@@ -3646,7 +3646,7 @@
     <h3 id="abstract-class">11.x Abstract Class</h3>
 
     <p>
-        An <span class="kw">abstract</span> class is a class that cannot be created an instance of. Typically it is a base class of a <a href="#class-hierarchies">class hierarcy</a>,
+        An <span class="kw">abstract</span> class is a class that cannot be created an instance of. Typically it is a base class of a <a href="#class-hierarchies">class hierarchy</a>,
         or an intermediate class that derives from a base class but is not a <a href="#concrete-class">concrete class</a> because it has or inherits an abstract member function.
         An abstract class may have <a href="#abstract-member-function">abstract member functions</a> but does not have to.
         If a class has or inherits an abstract member function it must explicitly be declared abstract.
@@ -3715,7 +3715,7 @@
     </p>
 
     <p>
-        If the class having a static constructor has a member variable of a class that has a nontrivial destructor, the class should implement a destructor.
+        If the class having a static constructor has a member variable that has a <a href="#nontrivial-destructor">nontrivial destructor</a>, the class should implement a destructor.
         If the destructor does not have other things to do besides calling destructors of the member variables, this can be done by using a <em>default</em> destructor:
         <blockquote>
             <span class="kw">public class </span><span class="var">MyClass</span><br/>
@@ -3881,9 +3881,9 @@
             </li>
             <li>
                 If the class is polymorphic and the this-initializer has not been called, 
-                the language implementation will now set the VMT pointer of the current class being constructed to the VMT pointer field of the current class object.
-                This ensures that if a user-defined constructor calls virtual member functions from its body, they are resolved to member functions of the current class or its base class or ancestor class.
-                If they would be resolved to the derived class member functions, they would have access to the not yet constructed member variables of the derived class.
+                the language implementation will now set the <a href="#vmt">VMT</a> pointer of the current class being constructed to the <a href="#vmt">VMT</a> pointer field of the current class object.
+                This ensures that if a user-defined constructor calls virtual member functions from its body, they are dispatched to member functions of the current class or its base class or ancestor class.
+                If they would be dispatched to the derived class member functions, they would have access to the not yet constructed member variables of the derived class.
             </li>
             <li>
                 For each member variable of the class in declaration order, if the member variable has an initializer, it is called, 
@@ -3939,7 +3939,8 @@
     </p>
 
     <p>
-        If a class does not have a user-defined destructor and either the class is <a href="#polymorphic-class-type">polymorphic</a> or it has a member variable of a class that has a nontrivial destructor, 
+        If a class does not have a user-defined destructor and either the class is <a href="#polymorphic-class-type">polymorphic</a> or it has a member variable that has a 
+        <a href="#nontrivial-destructor">nontrivial destructor</a>, 
         the compiler will generate a destructor for the class.
         If the class has a polymorphic base class, the generated destructor will be set as overridden, otherwise, if the class is polymorphic, it will be set virtual, 
         otherwise it will remain as a regular destructor.
@@ -3949,18 +3950,20 @@
         Either if the class has a user-defined destructor or a compiler-generated one, the language implementation will complete it with the following actions:
         <ol>
             <li>
-                If the class is polymorphic, the language implementation will first set the VMT pointer of the current class being destroyed to the VMT pointer field of the current class object.
-                This ensures that if a user-defined destructor calls virtual member functions from its body, they are resolved to member functions of the current class or its base class or ancestor class.
-                If they would be resolved to the derived class member functions, they would have access to the already destroyed member variables of the derived class.
+                If the class is <a href="#polymorphic-class-type">polymorphic</a> the language implementation will first set the <a href="#vmt">VMT</a> pointer of the current class 
+                being destroyed to the <a href="#vmt">VMT</a> pointer field of the current class object.
+                This ensures that if a user-defined destructor calls virtual member functions from its body, they are dispatched to member functions of the current class or its base class or ancestor class.
+                If they would be dispatched to the derived class member functions, they would have access to the already destroyed member variables of the derived class.
             </li>
             <li>
                 If the destructor is a user-defined one, the body of the destructor is executed.
             </li>
             <li>
-                For each member variable of the class in reverse declaration order, if the member variable is of a class that has a nontrivial destructor, the member variable destructor is called.
+                For each member variable of the class in reverse declaration order, if the member variable is of a class that has a <a href="#nontrivial-destructor">nontrivial destructor</a>, 
+                the member variable destructor is called.
             </li>
             <li>
-                If the class has a base class that has a nontrivial destructor, the base class destructor will be called that in turn performs these same actions.
+                If the class has a base class that has a <a href="#nontrivial-destructor">nontrivial destructor</a>, the base class destructor will be called that in turn performs these same actions.
             </li>
         </ol>
     </p>
@@ -3980,6 +3983,12 @@
                 A <span class="kw">default</span> destructor may not have a body.
             </li>
         </ul>
+    </p>
+
+    <h4 id="member-functions">11.x.y Member Functions</h4>
+
+    <p>
+
     </p>
 
     <h3 id="literal-class">11.x Literal Classes</h3>
@@ -4366,6 +4375,35 @@
         </p>
     </div>
 
+    <div id="imt">
+        <b>IMT</b>
+        <p>
+            Interface Method Table. Each <a href="#polymorphic-class-type">polymorphic</a> class has one IMT per implemented interface.
+            The interface method table contains pointers to implemented interface member functions for the class.
+            Each interface member function has an IMT index that is used for getting the member function pointer from the IMT when doing interface call dispatch.
+        </p>
+    </div>
+
+    <div id="nontrivial-destructor">
+        <b>NONTRIVIAL DESTRUCTOR</b>
+        <p>
+            A class has a nontrivial destructor if it has 
+            <ul>
+                <li>a user-defined destructor that is declared <span class="kw">default</span> or </li>
+                <li>a user-defined destructor that has a body, or</li>
+                <li>a nonempty compiler-generated destructor.</li>
+            </ul>
+        </p>
+        <p>
+            The compiler generates a nontrivial destructor for a class if one or more of the following conditions are true:
+            <ul>
+                <li>the class is <a href="#polymorphic">polymorphic</a>,</li>
+                <li>the class has a base class and that base class has a nontrivial destructor,</li>
+                <li>the class has a member variable of a class type that has a nontrivial destructor.</li>
+            </ul>
+        </p>
+    </div>
+
     <div id="polymorphic-class-type">
         <b>POLYMORPHIC CLASS TYPE</b>
         <p>
@@ -4379,7 +4417,7 @@
             </ul>
         </p>
         <p>
-            A polymorphic class type has a virtual method table.
+            A polymorphic class type has a <a href="#VMT">VMT</a>.
         </p>
     </div>
 
@@ -4388,6 +4426,22 @@
         <p>
             User-defined types are <a href="#enumerations">enumerated</a> types, <a href="#classes">class</a> types, <a href="#interfaces">interface</a> types,
             and <a href="#delegates">delegate</a> and <a href="#class-delegates">class delegate</a> types.
+        </p>
+    </div>
+
+    <div id="vmt">
+        <b>VMT</b>
+        <p>
+            Virtual Method Table. There is one virtual method table per <a href="#polymorphic-class-type">polymorphic</a> class. A virtual method table contains:
+            <ul>
+                <li>A 64-bit class identifier. See <a href="../implementation/implementation.html#is-and-as-expressions">implementation of <span class="kw">is</span> and <span class="kw">as</span> expressions</a>.</li>
+                <li>Pointer to the full name of the class.</li>
+                <li>Pointer to the table of <a href="#imt">IMT</a> pointers.</li>
+                <li>Pointers to virtual and overridden member functions for this class.</li>
+            </ul>
+        </p>
+        <p>
+            Each virtual, abstract and overridden member function contains a VMT index that is used for getting the member function pointer from the VMT when doing virtual call dispatch.
         </p>
     </div>
 
