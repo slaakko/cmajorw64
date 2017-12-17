@@ -1595,6 +1595,10 @@ void MemberFunctionSymbol::SetSpecifiers(Specifiers specifiers)
     }
     if ((specifiers & Specifiers::new_) != Specifiers::none)
     {
+        if (IsVirtualAbstractOrOverride())
+        {
+            throw Exception("member function cannot be new and virtual, abstract or overridden at the same time", GetSpan());
+        }
         SetNew();
     }
     if ((specifiers & Specifiers::const_) != Specifiers::none)

@@ -139,6 +139,26 @@
         &nbsp;&nbsp;&nbsp;&nbsp;10.2 <a href="#typedefs-examples">Examples</a><br />
         11 <a href="#classes">Classes</a><br />
         &nbsp;&nbsp;&nbsp;&nbsp;11.1 <a href="#classes-syntax">Syntax</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;11.2 <a href="#regular-class">Regular Classes</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;11.3 <a href="#abstract-class">Abstract Classes</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;11.4 <a href="#static-class">Static Classes</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;11.5 <a href="#class-members">Class Members</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;11.5.1 <a href="#static-constructor">Static Constructor</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;11.5.2 <a href="#constructor">Constructors</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;11.5.3 <a href="#destructor">Destructor</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;11.5.4 <a href="#member-functions">Member Functions</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;11.5.5 <a href="#member-variables">Member Variables</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;11.6 <a href="#literal-class">Literal Classes</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;11.7 <a href="#class-hierarchies">Class Hierarchies</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;11.8 <a href="#class-templates">Class Templates</a><br />
+        12 <a href="#interfaces">Interfaces</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;12.1 <a href="#interfaces-syntax">Syntax</a><br />
+        13 <a href="#delegates">Delegates</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;13.1 <a href="#delegates-syntax">Syntax</a><br />
+        14 <a href="#class-delegates">Class Delegates</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;14.1 <a href="#class-delegates-syntax">Syntax</a><br />
+        15 <a href="#concepts">Concepts</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;15.1 <a href="#concepts-syntax">Syntax</a><br />
     </div>
 
     <h2 id="lexical-structure">1 Lexical Structure</h2>
@@ -1152,7 +1172,7 @@
 
     <p>
         An expression that is a true <a href="#rule.equivalence">equivalence</a> expression (and not just a <a href="#rule.equivalence">disjunction</a> for example) can only be used
-        in <a href="#axiom">axioms</a>. The same applies to <a href="#rule.implication">implication</a> expression.
+        in <a href="#axioms">axioms</a>. The same applies to <a href="#rule.implication">implication</a> expression.
         An expression used in an axiom, for example
         <span class="var">a</span> <span class="mono">!=</span> <span class="var">b</span> <span class="mono"><=></span> <span class="mono">!</span>(<span class="var">a</span> <span class="mono">==</span>
         <span class="var">b</span>) is not evaluated at all, it has purely informative value.
@@ -2654,7 +2674,7 @@
 
     <p>
         A <a href="#rule.primary-type-expr">primary type expression</a> is a name of a <a href="#basic-types">basic</a> or <a href="#user-defined-type">user-defined</a> type,
-        or a name of a <a href="#class-template">class template</a> with type arguments.
+        or a name of a <a href="#class-templates">class template</a> with type arguments.
     </p>
 
     <h3 id="const-qualifier">6.3 Const Qualifier</h3>
@@ -3219,7 +3239,7 @@
     <h3 id="functions-template">9.9 Function Templates</h3>
 
     <p>
-        When the function definition has a <a href="#rule.template-parameter-list">template parameter list</a> and possibly a <a href="#where-constraint">constraint</a>,
+        When the function definition has a <a href="#rule.template-parameter-list">template parameter list</a> and possibly a <a href="#rule.where-constraint">constraint</a>,
         it defines a <em>function template</em>.
         The compiler <em>instantiates</em>, or creates a specialized version from the function template for each different set of argument types.
         When a function is instantiated, the <a href="#rule.template-parameter">template parameters</a> of the function template 
@@ -3255,46 +3275,50 @@
 
     <p>
         Overload resolution is done in three stages:
-        <ol>
-            <li>
-                First the compiler searches the symbol table for <em>viable functions</em>. 
-                A viable function is a function that has given <a href="#function-group-name">group name</a> and <a href="#function-arity">arity</a>.
-            </li>
-            <li>
-                <p>
-                    Then the set of viable functions is filtered to form a set of <em>overload candidates</em>.
-                </p>
+    </p>
+    <ol>
+        <li>
+            First the compiler searches the symbol table for <em>viable functions</em>. 
+            A viable function is a function that has given <a href="#function-group-name">group name</a> and <a href="#function-arity">arity</a>.
+        </li>
+        <li>
+            <p>
+                Then the set of viable functions is filtered to form a set of <em>overload candidates</em>.
+            </p>
 
-                <p>
-                    If the viable function is not a function template, it becomes an overload candidate if there exists a valid sequence of conversions from each argument type 
-                    to the corresponding parameter type of the viable function. The sequence of needed conversions is memorized for the final stage.
-                </p>
-                <p>
-                    If the viable function is a function template, the argument types are bound to the template parameters of the function template.
-                    In this case the viable function can be rejected because arguments cannot be bound or there is no valid conversion sequence for a bound parameter.
-                </p>
-                <p>
-                    If the viable function is a constrained function template, after successfully binding the argument types,  
-                    the constraint is checked by substituting parameter types in the constraint with bound argument types.
-                    In this case the viable function can be rejected because the constraint is not satisfied. Otherwise the viable function survives to be an overload candidate and its 
-                    constraint is memorized for the final stage.
-                </p>
-            </li>
-            <li>
-                Finally, if there are no overload candidates survived to this stage, the compiler issues an overload not found error.
-                Otherwise, the set of overload candidates is sorted according to ordering rules that take into account the number, kind and <a href="#conversion-distance">distance</a> of needed conversions and 
-                a possible <a href="#where-constraint">constraint</a> for those overload candidates that are function templates.
-                If a single best overload is found according to the ordering rules, the function call resolves to it, 
-                otherwise the compiler issues an ambiguous overload resolution error and lists equally good overload candidates.
-            </li>
-        </ol>
+            <p>
+                If the viable function is not a function template, it becomes an overload candidate if there exists a valid sequence of conversions from each argument type 
+                to the corresponding parameter type of the viable function. The sequence of needed conversions is memorized for the final stage.
+            </p>
+            <p>
+                If the viable function is a function template, the argument types are bound to the template parameters of the function template.
+                In this case the viable function can be rejected because arguments cannot be bound or there is no valid conversion sequence for a bound parameter.
+            </p>
+            <p>
+                If the viable function is a constrained function template, after successfully binding the argument types,  
+                the constraint is checked by substituting parameter types in the constraint with bound argument types.
+                In this case the viable function can be rejected because the constraint is not satisfied. Otherwise the viable function survives to be an overload candidate and its 
+                constraint is memorized for the final stage.
+            </p>
+        </li>
+        <li>
+            Finally, if there are no overload candidates survived to this stage, the compiler issues an overload not found error.
+            Otherwise, the set of overload candidates is sorted according to ordering rules that take into account the number, kind and <a href="#conversion-distance">distance</a> of needed conversions and 
+            a possible <a href="#where-constraint">constraint</a> for those overload candidates that are function templates.
+            If a single best overload is found according to the ordering rules, the function call resolves to it, 
+            otherwise the compiler issues an ambiguous overload resolution error and lists equally good overload candidates.
+        </li>
+    </ol>
 
+    <p>
         Actually the overload resolution can be issued maximum of three times with different argument combinations to resolve a single function call, 
         because member functions have an implicit <em>this</em> parameter that can be bound to the receiver or to the current <em>this</em> parameter if the call is issued from inside a member function.
     </p>
 
-    The overload candidates are sorted according to the ordering rules that are informally described as follows:
-    When comparing two overload candidates <em>a</em> and <em>b</em>:
+    <p>
+        The overload candidates are sorted according to the ordering rules that are informally described as follows:
+        When comparing two overload candidates <em>a</em> and <em>b</em>:
+    </p>
 
     <p>
         First compare the argument conversions to <em>a</em> and <em>b</em>:
@@ -3574,12 +3598,12 @@
                 (<span class="rule"><a href="#rule.access-specifier">access&#8209;specifier</a></span> |
                 <span class="kw">constexpr</span> |
                 <span class="kw">static</span> |
+                <span class="kw">abstract</span> |
                 <span class="kw">virtual</span> |
                 <span class="kw">override</span> |
-                <span class="kw">abstract</span> |
                 <span class="kw">inline</span> |
-                <span class="kw">suppress</span> |
                 <span class="kw">default</span> |
+                <span class="kw">suppress</span> |
                 <span class="kw">nothrow</span> |
                 <span class="kw">throw</span> |
                 <span class="kw">new</span>)*
@@ -3636,23 +3660,23 @@
         </tr>
     </table>
 
-    <h3 id="regular-class">11.x Regular Class</h3>
+    <h3 id="regular-class">11.2 Regular Classes</h3>
 
     <p>
         A regular class may have each kind of <a href="#class-members">class member</a>. It may have a <a href="#class-hierarchies">base class</a> and can
-        <a href="#implementing-interfaces">implement interfaces</a>.
+        <a href="#interfaces">implement interfaces</a>.
     </p>
 
-    <h3 id="abstract-class">11.x Abstract Class</h3>
+    <h3 id="abstract-class">11.3 Abstract Classes</h3>
 
     <p>
         An <span class="kw">abstract</span> class is a class that cannot be created an instance of. Typically it is a base class of a <a href="#class-hierarchies">class hierarchy</a>,
         or an intermediate class that derives from a base class but is not a <a href="#concrete-class">concrete class</a> because it has or inherits an abstract member function.
-        An abstract class may have <a href="#abstract-member-function">abstract member functions</a> but does not have to.
+        An abstract class may have each kind of <a href="#class-members">class member</a>. Especially it may have abstract member functions but does not have to.
         If a class has or inherits an abstract member function it must explicitly be declared abstract.
     </p>
 
-    <h3 id="static-class">11.x Static Class</h3>
+    <h3 id="static-class">11.4 Static Classes</h3>
 
     <p>
         A <span class="kw">static</span> class can have only
@@ -3661,8 +3685,10 @@
             <li><a href="#static-member-variable">static member variables</a>,</li>
             <li><a href="#static-member-function">static member functions</a>,</li>
             <li><a href="#typedefs">typedefs</a>,</li>
-            <li><a href="#constants">constants</a> and</li>
-            <li><a href="#enumerations">enumerated types</a>.</li>
+            <li><a href="#constants">constants</a>,</li>
+            <li><a href="#enumerations">enumerated types</a>,</li>
+            <li><a href="#delegates">delegate types</a> and</li>
+            <li><a href="#class-delegates">class delegate types</a>.</li>
         </ul>
     </p>
 
@@ -3670,13 +3696,13 @@
         For an example of a static class, see <a href="../code/console/console.cm.html">console.cm</a>.
     </p>
 
-    <h3 id="class-members">11.x Class Members</h3>
+    <h3 id="class-members">11.5 Class Members</h3>
 
     A class can contain a <a href="#static-constructor">static constructor</a>, <a href="#constructor">constructors</a>, a <a href="#destructor">destructor</a>, 
-    other <a href="#member-function">member functions</a>, <a href="#member-variable">member variables</a>, <a href="#typedefs">typedefs</a>, classes, <a href="#constants">constants</a>, 
-    <a href="#enumerations">enumerated types</a>, delegates and class delegates.
+    other <a href="#member-functions">member functions</a>, <a href="#member-variables">member variables</a>, <a href="#typedefs">typedefs</a>, classes, <a href="#constants">constants</a>, 
+    <a href="#enumerations">enumerated types</a>, <a href="#delegates">delegate types</a> and <a href="#class-delegates">class delegate types</a>.
 
-    <h4 id="static-constructor">11.x.y Static Constructor</h4>
+    <h4 id="static-constructor">11.5.1 Static Constructor</h4>
 
     <p>
         A <a href="#rule.static-constructor">static constructor</a> is special member function that is used for initializing static member variables of the class it belongs to.
@@ -3726,7 +3752,7 @@
         </blockquote>
     </p>
 
-    <h4 id="constructor">11.x.y Constructors</h4>
+    <h4 id="constructor">11.5.2 Constructors</h4>
 
     <p>
         A <a href="#rule.constructor">constructor</a> is a special member function that creates an object of the class it belongs to. 
@@ -3788,7 +3814,7 @@
     <p>
         User can suppress the automatic generation of the default constructor by using the <span class="kw">suppress</span> keyword:
         <blockquote>
-            <span class="kw">suppress</span> <span class="var">ClassName(</span>)</span><span class="mono">;</span>
+            <span class="kw">suppress</span> <span class="var">ClassName()</span><span class="mono">;</span>
         </blockquote>
         The suppressed default constructor cannot have a body.
     </p>
@@ -3903,8 +3929,10 @@
     
     <ul>
         <li>
-            <span class="kw">constexpr</span>. A constexpr constructor is used in
-            <a href="#literal-class">literal</a> classes.
+            An <a href="#access-specifiers">access specifier</a>.
+        </li>
+        <li>
+            <span class="kw">constexpr</span>. A constexpr constructor is used in <a href="#literal-class">literal</a> classes.
         </li>
         <li>
             <span class="kw">explicit</span>. A constructor of class <em>A</em> that is not a copy or move constructor
@@ -3931,7 +3959,7 @@
     </ul>
     
 
-    <h4 id="destructor">11.x.y Destructor</h4>
+    <h4 id="destructor">11.5.3 Destructor</h4>
 
     <p>
         The purpose of the <a href="#rule.destructor">destructor</a> is to release allocated or otherwise obtained resources. Memory is also considered as a kind of resource.
@@ -3972,6 +4000,10 @@
         A destructor may have the following <a href="#rule.destructor-specifiers">specifiers</a>:
         <ul>
             <li>
+                <span class="kw">public</span>. 
+                Destructor cannot be <span class="kw">private</span>, <span class="kw">protected</span> or <span class="kw">internal</span>.
+            </li>
+            <li>
                 <span class="kw">virtual</span>. A base class of a <a href="#class-hierarchies">class hierarchy</a> should have a virtual destructor.
             </li>
             <li>
@@ -3985,13 +4017,118 @@
         </ul>
     </p>
 
-    <h4 id="member-functions">11.x.y Member Functions</h4>
-
     <p>
-
+        A class may have at most one destructor.
     </p>
 
-    <h3 id="literal-class">11.x Literal Classes</h3>
+    <h4 id="member-functions">11.5.4 Member Functions</h4>
+
+    <p>
+        A <a href="#rule.member-function">member function</a> can use nonstatic and static member variables when it performs its job.
+    </p>
+
+    <p>
+        There are two kinds of special member functions left: a <a href="#copy-assignment">copy assignment operator</a> and a <a href="#move-assignment">move assignment operator</a>:
+    </p>
+
+    <h5 id="copy-assignment">Copy Assignment Operator</h5>
+
+    <p>
+        The copy assignment operator has <a href="#function-signature">signature</a>
+        <blockquote>
+            <span class="kw">void</span> <span class="kw">operator</span><span class="mono">=(</span><span class="kw">const</span> <span class="var">ClassName&amp;)</span>
+        </blockquote>
+        It takes another object of the same class as an lvalue-reference-to-const parameter.
+        If a class has no user-defined copy assignment operator, the compiler will generate one if it is needed. 
+        The generated copy assignment operator will assign the base class object and member variables from the passed argument.
+    </p>
+
+    <p>
+        User can request the automatic generation of the copy assignment by using the <span class="kw">default</span> keyword:
+        <blockquote>
+            <span class="kw">public</span> <span class="kw">default</span> <span class="kw">void operator<span class="mono">=</span>(</span><span class="kw">const</span> <span class="var">ClassName&amp;)</span><span class="mono">;</span>
+        </blockquote>
+        The default copy assignment cannot have a body.
+    </p>
+
+    <p>
+        User can suppress the automatic generation of the copy assignment by using the <span class="kw">suppress</span> keyword:
+        <blockquote>
+            <span class="kw">suppress</span> <span class="kw">void operator<span class="mono">=</span>(</span><span class="kw">const</span> <span class="var">ClassName&amp;)</span><span class="mono">;</span>
+        </blockquote>
+        The suppressed copy assignment cannot have a body.
+    </p>
+
+    <p>
+        A class may have at most one copy assignment operator.
+    </p>
+
+    <h5 id="move-assignment">Move Assignment Operator</h5>
+
+    <p>
+        The move assignment operator has <a href="#function-signature">signature</a>
+        <blockquote>
+            <span class="kw">void</span> <span class="kw">operator</span><span class="mono">=(</span><span class="var">ClassName&amp;&amp;)</span>
+        </blockquote>
+        It takes another object of the same class as a rvalue-reference parameter. 
+        If a class has no user-defined move assignment operator, the compiler will generate one if it is needed.
+        The generated move assignment operator will call the move assignment operator of the base class with the base class object of the argument and it will swap all member variables 
+        of the current class object with the member variables of the argument.
+    </p>
+
+    <p>
+        User can request the automatic generation of the move assignment by using the <span class="kw">default</span> keyword:
+        <blockquote>
+            <span class="kw">public</span> <span class="kw">default</span> <span class="kw">void operator<span class="mono">=</span>(</span><span class="var">ClassName&amp;&amp;)</span><span class="mono">;</span>
+        </blockquote>
+        The default move assignment cannot have a body.
+    </p>
+
+    <p>
+        User can suppress the automatic generation of the move assignment by using the <span class="kw">suppress</span> keyword:
+        <blockquote>
+            <span class="kw">suppress</span> <span class="kw">void operator<span class="mono">=</span>(</span><span class="var">ClassName&amp;&amp;)</span><span class="mono">;</span>
+        </blockquote>
+        The suppressed move assignment cannot have a body.
+    </p>
+
+    <h5 id="member-function-specifiers">Member Function Specifiers</h5>
+
+    <p>
+        A member function can have the following <a href="#rule.member-function-specifiers">specifiers:</a>
+        <ul>
+            <li>An <a href="#access-specifiers">access specifier</a>.</li>
+            <li><span class="kw">constexpr</span>. A constexpr member function is used <a href="#literal-class">literal</a> classes.</li>
+            <li><span class="kw">static</span>. A static member function can use static member variables when it performs its job.</li>
+            <li><span class="kw">abstract</span>. An abstract member function must be <em>overridden</em> by member functions of the same name in derived classes.
+            An abstract member function cannot have a body.</li>
+            <li><span class="kw">virtual</span>. A virtual member function may be overridden by member functions of the same name in derived classes.</li>
+            <li><span class="kw">override</span>. Each inherited abstract member function of an <a href="#abstract-class">abstract</a> base or ancestor class must be overridden in a 
+            derived <a href="#concrete-class">concrete class</a>.
+            Each virtual and overridden member function of a base or ancestor class may be overridden in the derived class.</li>
+            <li><span class="kw">inline</span>. This is a hint to the compiler that the member function should be <a href="#functions-inline">inlined</a> if possible.</li>
+            <li><span class="kw">default</span>. A <a href="#copy-assignment">copy assignment</a> or <a href="#move-assignment">move assignment</a> operator may be declared default. 
+            A default copy assignment or move assignment may not have a body.</li>
+            <li><span class="kw">suppress</span>. A <a href="#copy-assignment">copy assignment</a> or <a href="#move-assignment">move assignment</a> operator may be suppressed. 
+            A suppressed copy assignment or move assignment may not have a body.</li>
+            <li><span class="kw">nothrow</span>. A nothrow member function has the same semantics as a <a href="#functions-nothrow">nonmember nothrow function</a>.</li>
+            <li><span class="kw">throw</span>. A throw member function has the same semantics as a <a href="#functions-throw">nonmember throw function</a>.</li>
+            <li><span class="kw">new</span>. A member function that has the same name as some abstract, virtual or overridden member function of its base or ancestor class
+            may be declared new. A member function declared new does not participate in virtual call dispatch. It may not be abstract, virtual or overriddden at the same time.</li>
+            <li><span class="kw">const</span>. A member function that does not change the member variables may be declared <span class="kw">const</span>.</li>
+        </ul>
+    </p>
+
+    <h4 id="member-variables">11.5.5 Member Variables</h4>
+
+    <p>
+        A <a href="#rule.member-variable">member variable</a> has specified <a href="#type-expressions">type</a> and <a href="#identifiers">name</a>.
+        A member variable may have an <a href="#access-specifiers">access specifier</a> and it may be declared <span class="kw">static</span>.
+        Static member variables can be initialized in a <a href="#static-constructor">static constructor</a>. 
+        Nonstatic member variables are also called <em>instance variables</em>. They can be initialized in a <a href="#constructor">constructor</a>.
+    </p>
+
+    <h3 id="literal-class">11.6 Literal Classes</h3>
 
     A class whose constructors and member functions are declared <a href="#functions-constexpr"><span class="kw">constexpr</span></a> is called a <em>literal</em> class.
     When arguments to such functions are <a href="#constant-expression">constant expressions</a>, they can be evaluated at compile time.
@@ -4000,21 +4137,458 @@
 
     For an example of a literal class, see <a href="../code/point/point.cm.html">point.cm</a>.
 
-    <h3 id="class-hierarchies">11.x Class Hierarchies</h3>
+    <h3 id="class-hierarchies">11.7 Class Hierarchies</h3>
 
     <p>
         In Cmajor a class may have a single <em><a href="#rule.inheritance-and-implemented-interfaces">base class</a></em>. 
         If class <em>B</em> is the base class of class <em>A</em> we say also that <em>A</em> <em>derives</em> from <em>B</em>,
         and that <em>A</em> <em>inherits</em> members from <em>B</em>. When <em>A</em> derives from <em>B</em> we may think that <em>A</em> <em>is-a-kind-of</em> <em>B</em>.
         Inheritance relationship allows us to build hierarchies of classes some of which are base classes and others inheriting from them.
-        If class <em>A</em> derives from class <em>B</em>, <em>A</em> may <em>override</em> some or all the <a href="#virtual-member-function">virtual</a>, 
-        <a href="#abstract-member-function">abstract</a> or already <a href="#overridden-member-function">overridden</a> member functions of <em>B</em>.
+        If class <em>A</em> derives from class <em>B</em>, <em>A</em> may <em>override</em> some or all the abstract, virtual, or already overridden member functions of <em>B</em>.
     </p>
 
     <p>
         For an example of a class hierarchy, see <a href="../code/vehicles/vehicles.cm.html">vehicles.cm</a>.
         It contains a hierarchy of vehicle classes: bicycle and car are vehicles, and truck is a kind of car.
     </p>
+
+    <h3 id="class-templates">11.8 Class Templates</h3>
+
+    <p>
+        When the class definition has a <a href="#rule.template-parameter-list">template parameter list</a> and possibly a <a href="#rule.where-constraint">constraint</a>, it defines a class template. 
+        The compiler <em>instantiates</em>, or creates a specialized version from the class template for each different set of template argument types. An instantiated class template is called a <em>class template specialization</em>.
+        When a class template is instantiated, the template parameters of the class template are substituted by specified concrete types and the declarations of the class are type checked using those substituted types. 
+        Those concrete types can be specified by using a <a href="#rule.template-id">template-id</a>.
+        When a member function of a class template specialization is called, the compiler instantiates it using the specified types.
+        The compiler instantiates only a possible destructor, virtual and overridden member functions and those member functions of a class template specialization that are called.
+    </p>
+
+    <p>
+        For an example of a class template, see <a href="../code/unique_ptr/unique_ptr.cm.html">unique_ptr.cm</a>.
+        It's a smart pointer that implements unique ownership.
+    </p>
+
+    <h2 id="interfaces">12 Interfaces</h2>
+
+    <p>
+        An <a href="#rule.interface">interface</a> is a list of member function signatures that describe some behaviour.
+        A class can <em>implement</em> any number of interfaces. 
+        When a class implements an interface it must provide implementation for the member functions contained by the interface.
+    </p>
+
+    <h3 id="interfaces-syntax">12.1 Syntax</h3>
+
+    <table class="grammar">
+        <tr>
+            <td class="rule" id="rule.interface">interface</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.access-specifier">access&#8209;specifier</a></span>?
+                <span class="kw">interface</span>
+                <span class="rule"><a href="#interface-name">interface&#8209;name</a></span>
+                <span class="mono">{</span>
+                <span class="rule"><a href="#interface-content">interface&#8209;content</a></span>
+                <span class="mono">}</span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.interface-name">interface&#8209;name</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.identifier">identifier</a></span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.interface-content">interface&#8209;content</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#interface-member-function">interface&#8209;member&#8209;function</a></span>*
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.interface-member-function">interface&#8209;member&#8209;function</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.return-type">return&#8209;type</a></span>
+                <span class="rule"><a href="#interface-member-function-name">interface&#8209;member&#8209;function&#8209;name</a></span>
+                <span class="rule"><a href="#rule.parameters">parameters</a></span>
+                <span class="mono">;</span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.interface-member-function-name">interface&#8209;member&#8209;function&#8209;name</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.identifier">identifier</a></span>
+            </td>
+        </tr>
+    </table>
+
+    For an example of interfaces, see <a href="../code/interface/interface.cm.html">interface.cm</a>.
+
+    <h2 id="delegates">13 Delegates</h2>
+
+    A <a href="#rule.delegate">delegate</a> todo
+
+    <h3 id="delegates-syntax">13.1 Syntax</h3>
+
+    <table class="grammar">
+        <tr>
+            <td class="rule" id="rule.delegate">delegate</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.delegate-specifiers">delegate&#8209;specifiers</a></span>
+                <span class="kw">delegate</span>
+                <span class="rule"><a href="#rule.return-type">return&#8209;type</a></span>
+                <span class="rule"><a href="#rule.delegate-name">delegate&#8209;name</a></span>
+                <span class="rule"><a href="#rule.parameters">parameters</a></span>
+                <span class="mono">;</span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.delegate-specifiers">delegate&#8209;specifiers</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                (<span class="rule"><a href="#rule.access-specifier">access&#8209;specifier</a></span> |
+                <span class="kw">nothrow</span> | 
+                <span class="kw">throw</span>)*
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.delegate-name">delegate&#8209;name</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.identifier">identifier</a></span>
+            </td>
+        </tr>
+    </table>
+
+    <p>
+        A delegate can be bound to a nonmember function or to a static member function.
+    </p>
+
+    <h2 id="class-delegates">14 Class Delegates</h2>
+
+    A <a href="#rule.class-delegate">class delegate</a> todo
+
+    <h3 id="class-delegates-syntax">14.1 Syntax</h3>
+
+    <table class="grammar">
+        <tr>
+            <td class="rule" id="rule.class-delegate">class&#8209;delegate</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.class-delegate-specifiers">class&#8209;delegate&#8209;specifiers</a></span>
+                <span class="kw">class</span>
+                <span class="kw">delegate</span>
+                <span class="rule"><a href="#rule.return-type">return&#8209;type</a></span>
+                <span class="rule"><a href="#rule.class-delegate-name">class&#8209;delegate&#8209;name</a></span>
+                <span class="rule"><a href="#rule.parameters">parameters</a></span>
+                <span class="mono">;</span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.class-delegate-specifiers">class&#8209;delegate&#8209;specifiers</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                (<span class="rule"><a href="#rule.access-specifier">access&#8209;specifier</a></span> |
+                <span class="kw">nothrow</span> |
+                <span class="kw">throw</span>)*
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.class-delegate-name">class&#8209;delegate&#8209;name</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.identifier">identifier</a></span>
+            </td>
+        </tr>
+    </table>
+
+    <p>
+        A class delegate can be bound to a member function.
+    </p>
+
+    <h2 id="concepts">15 Concepts</h2>
+
+    <p>
+        todo
+    </p>
+    
+    <h3 id="concepts-syntax">15.1 Syntax</h3>
+
+    <table class="grammar">
+        <tr>
+            <td class="rule" id="rule.concept">concept</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.access-specifier">access&#8209;specifier</a></span>?
+                <span class="kw">concept</span>
+                <span class="rule"><a href="#rule.concept-name">concept&#8209;name</a></span><br/>
+                <span class="mono">&lt;</span>
+                <span class="rule"><a href="#rule.type-parameter">type&#8209;parameter</a></span>
+                (<span class="mono">,</span>
+                <span class="rule"><a href="#rule.type-parameter">type&#8209;parameter</a></span>)*
+                <span class="mono">&gt;</span>
+                <span class="rule"><a href="#rule.refinement">refinement</a></span>?
+                <span class="rule"><a href="#rule.where-constraint">where&#8209;constraint</a></span>?<br />
+                <span class="mono">{</span>
+                <span class="rule"><a href="#rule.concept-body">concept&#8209;body</a></span>
+                <span class="mono">}</span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.concept-name">concept&#8209;name</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.identifier">identifier</a></span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.type-parameter">type&#8209;parameter</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.identifier">identifier</a></span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.refinement">refinement</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="mono">:</span>
+                <span class="rule"><a href="#rule.concept-group-id">concept&#8209;group&#8209;id</a></span>
+                <span class="mono">&lt;</span>
+                <span class="rule"><a href="#rule.type-parameter">type&#8209;parameter</a></span>
+                (<span class="mono">,</span>
+                <span class="rule"><a href="#rule.type-parameter">type&#8209;parameter</a></span>)*
+                <span class="mono">&gt;</span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.concept-group-id">concept&#8209;group&#8209;id</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.qualified-id">qualified&#8209;id</a></span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.concept-body">concept&#8209;body</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                (<span class="rule"><a href="#rule.concept-body-constraint">concept&#8209;body&#8209;constraint</a></span> | 
+                <span class="rule"><a href="#rule.axiom">axiom</a></span>)*
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.concept-body-constraint">concept&#8209;body&#8209;constraint</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.typename-constraint">typename&#8209;constraint</a></span> |
+                <span class="rule"><a href="#rule.signature-constraint">signature&#8209;constraint</a></span> |
+                <span class="rule"><a href="#rule.embedded-constraint">embedded&#8209;constraint</a></span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.typename-constraint">typename&#8209;constraint</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="kw">typename</span>
+                <span class="rule"><a href="#rule.type-expr">type&#8209;expr</a></span>
+                <span class="mono">;</span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.signature-constraint">signature&#8209;constraint</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.constructor-constraint">constructor&#8209;constraint</a></span> |
+                <span class="rule"><a href="#rule.destructor-constraint">destructor&#8209;constraint</a></span> |
+                <span class="rule"><a href="#rule.member-function-constraint">member&#8209;function&#8209;constraint</a></span> |
+                <span class="rule"><a href="#rule.function-constraint">function&#8209;constraint</a></span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.constructor-constraint">constructor&#8209;constraint</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="kw">explicit</span>?
+                <span class="rule"><a href="#rule.class-name">class&#8209;name</a></span>
+                <span class="rule"><a href="#rule.parameters">parameters</a></span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.destructor-constraint">destructor&#8209;constraint</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="mono">~</span>
+                <span class="rule"><a href="#rule.class-name">class&#8209;name</a></span>
+                <span class="mono">();</span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.member-function-constraint">member&#8209;function&#8209;constraint</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.return-type">return&#8209;type</a></span>
+                <span class="rule"><a href="#rule.type-parameter">type&#8209;parameter</a></span>
+                <span class="mono">.</span>
+                <span class="rule"><a href="#rule.function-group-id">function&#8209;group&#8209;id</a></span>
+                <span class="rule"><a href="#rule.parameters">parameters</a></span>
+                <span class="mono">;</span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.function-constraint">function&#8209;constraint</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.return-type">return&#8209;type</a></span>
+                <span class="rule"><a href="#rule.function-group-id">function&#8209;group&#8209;id</a></span>
+                <span class="rule"><a href="#rule.parameters">parameters</a></span>
+                <span class="mono">;</span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.embedded-constraint">embedded&#8209;constraint</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.where-constraint">where&#8209;constraint</a></span>
+                <span class="mono">;</span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.where-constraint">where&#8209;constraint</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="kw">where</span>
+                <span class="rule"><a href="#rule.constraint-expression">constraint&#8209;expression</a></span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.constraint-expression">constraint&#8209;expression</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.disjunctive-constraint-expression">disjunctive&#8209;constraint&#8209;expression</a></span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.disjunctive-constraint-expression">disjunctive&#8209;constraint&#8209;expression</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.conjunctive-constraint-expression">conjunctive&#8209;constraint&#8209;expression</a></span><br/>
+                (<span class="kw">or</span>
+                <span class="rule"><a href="#rule.conjunctive-constraint-expression">conjunctive&#8209;constraint&#8209;expression</a></span>)*
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.conjunctive-constraint-expression">conjunctive&#8209;constraint&#8209;expression</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.primary-constraint-expression">primary&#8209;constraint&#8209;expression</a></span>
+                (<span class="kw">and</span>
+                <span class="rule"><a href="#rule.primary-constraint-expression">primary&#8209;constraint&#8209;expression</a></span>)*
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.primary-constraint-expression">primary&#8209;constraint&#8209;expression</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="mono">(</span>
+                <span class="rule"><a href="#rule.constraint-expression">constraint&#8209;expression</a></span>
+                <span class="mono">)</span> |
+                <span class="rule"><a href="#rule.atomic-constraint-expression">atomic&#8209;constraint&#8209;expression</a></span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.atomic-constraint-expression">atomic&#8209;constraint&#8209;expression</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.predicate-constraint">predicate&#8209;constraint</a></span> | 
+                <span class="rule"><a href="#rule.is-constraint">is&#8209;constraint</a></span> |
+                <span class="rule"><a href="#rule.multiparam-constraint">multiparam&#8209;constraint</a></span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.predicate-constraint">predicate&#8209;constraint</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.invoke-expression">invoke&#8209;expression</a></span> | 
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.invoke-expression">invoke&#8209;expression</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                (<span class="rule"><a href="#rule.template-id">template&#8209;id</a></span> | 
+                <span class="rule"><a href="#rule.identifier">identifier</a></span>)
+                (<span class="mono">.</span>
+                <span class="rule"><a href="#rule.identifier">identifier</a></span>)*
+                <span class="mono">(</span>
+                <span class="rule"><a href="#rule.argument-list">argument&#8209;list</a></span>
+                <span class="mono">)</span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.is-constraint">is&#8209;constraint</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.type-expr">type&#8209;expr</a></span>
+                <span class="kw">is</span>
+                <span class="rule"><a href="#rule.concept-or-typename">concept&#8209;or&#8209;typename</a></span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.concept-or-typename">concept&#8209;or&#8209;typename</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.type-expr">type&#8209;expr</a></span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.multiparam-constraint">multiparam&#8209;constraint</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.concept-group-id">concept&#8209;group&#8209;id</a></span>
+                <span class="mono">&lt;</span>
+                <span class="rule"><a href="#rule.type-expr">type&#8209;expr</a></span>
+                (<span class="mono">,</span>
+                <span class="rule"><a href="#rule.type-expr">type&#8209;expr</a></span>)*
+                <span class="mono">&gt;</span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.axiom">axiom</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="kw">axiom</span>
+                <span class="rule"><a href="#rule.identifier">identifier</a></span>?
+                <span class="rule"><a href="#rule.parameters">parameters</a></span>?
+                <span class="mono">{</span>
+                <span class="rule"><a href="#rule.axiom-body">axiom&#8209;body</a></span>
+                <span class="mono">}</span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.axiom-body">axiom&#8209;body</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.axiom-statement">axiom&#8209;statement</a></span>*
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.axiom-statement">axiom&#8209;statement</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.expression">expression</a></span>
+                <span class="mono">;</span>
+            </td>
+        </tr>
+    </table>
+
+    <h3 id="constraints">15.x Constraints</h3>
+
+    <h4 id="where-constraint">15.x.y Where-Constraint</h4>
+
+    <h3 id="axioms">15.x Axioms</h3>
 
     <h2 id="appendix-a">Appendix A Terms</h2>
 

@@ -868,8 +868,9 @@ void StatementBinder::Visit(ConstructionStatementNode& constructionStatementNode
     BoundExpression* localVariable = new BoundLocalVariable(localVariableSymbol);
     arguments.push_back(std::unique_ptr<BoundExpression>(new BoundAddressOfExpression(
         std::unique_ptr<BoundExpression>(localVariable), localVariable->GetType()->AddPointer(constructionStatementNode.GetSpan()))));
-    bool constructDelegateType = localVariableSymbol->GetType()->GetSymbolType() == SymbolType::delegateTypeSymbol;
-    bool constructClassDelegateType = localVariableSymbol->GetType()->GetSymbolType() == SymbolType::classDelegateTypeSymbol;
+    bool constructDelegateOrClassDelegateType = 
+        localVariableSymbol->GetType()->GetSymbolType() == SymbolType::delegateTypeSymbol|| 
+        localVariableSymbol->GetType()->GetSymbolType() == SymbolType::classDelegateTypeSymbol;
     std::vector<FunctionScopeLookup> functionScopeLookups;
     functionScopeLookups.push_back(FunctionScopeLookup(ScopeLookup::this_, localVariableSymbol->GetType()->ClassInterfaceEnumDelegateOrNsScope()));
     functionScopeLookups.push_back(FunctionScopeLookup(ScopeLookup::this_and_base_and_parent, containerScope));
@@ -878,8 +879,7 @@ void StatementBinder::Visit(ConstructionStatementNode& constructionStatementNode
     for (int i = 0; i < n; ++i)
     {
         Node* argumentNode = constructionStatementNode.Arguments()[i];
-        std::unique_ptr<BoundExpression> argument = BindExpression(argumentNode, boundCompileUnit, currentFunction, containerScope, this, false, constructDelegateType || constructClassDelegateType, 
-            constructClassDelegateType);
+        std::unique_ptr<BoundExpression> argument = BindExpression(argumentNode, boundCompileUnit, currentFunction, containerScope, this, false, constructDelegateOrClassDelegateType);
         arguments.push_back(std::move(argument));
     }
     std::unique_ptr<BoundFunctionCall> constructorCall = ResolveOverload(U"@constructor", containerScope, functionScopeLookups, arguments, boundCompileUnit, currentFunction, 
@@ -980,10 +980,8 @@ void StatementBinder::Visit(AssignmentStatementNode& assignmentStatementNode)
         target.reset(new BoundAddressOfExpression(std::move(target), target->GetType()->AddPointer(assignmentStatementNode.GetSpan())));
     }
     TypeSymbol* targetType = target->GetType()->BaseType();
-    bool assignDelegateType = targetType->GetSymbolType() == SymbolType::delegateTypeSymbol;
-    bool assignClassDelegateType = targetType->GetSymbolType() == SymbolType::classDelegateTypeSymbol;
-    std::unique_ptr<BoundExpression> source = BindExpression(assignmentStatementNode.SourceExpr(), boundCompileUnit, currentFunction, containerScope, this, false, 
-        assignDelegateType || assignClassDelegateType, assignClassDelegateType);
+    bool assignDelegateOrClassDelegateType = targetType->GetSymbolType() == SymbolType::delegateTypeSymbol || targetType->GetSymbolType() == SymbolType::classDelegateTypeSymbol;
+    std::unique_ptr<BoundExpression> source = BindExpression(assignmentStatementNode.SourceExpr(), boundCompileUnit, currentFunction, containerScope, this, false, assignDelegateOrClassDelegateType);
     std::vector<std::unique_ptr<BoundExpression>> arguments;
     arguments.push_back(std::move(target));
     arguments.push_back(std::move(source));

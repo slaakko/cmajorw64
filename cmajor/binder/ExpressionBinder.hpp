@@ -22,11 +22,11 @@ std::unique_ptr<BoundExpression> BindExpression(Node* node, BoundCompileUnit& bo
 std::unique_ptr<BoundExpression> BindExpression(Node* node, BoundCompileUnit& boundCompileUnit, BoundFunction* boundFunction, ContainerScope* containerScope, StatementBinder* statementBinder, 
     bool lvalue);
 std::unique_ptr<BoundExpression> BindExpression(Node* node, BoundCompileUnit& boundCompileUnit, BoundFunction* boundFunction, ContainerScope* containerScope, StatementBinder* statementBinder, 
-    bool lvalue, bool acceptFunctionGroup, bool acceptMemberExpression);
+    bool lvalue, bool acceptFunctionGroupOrMemberExpression);
 std::unique_ptr<BoundExpression> BindExpression(Node* node, BoundCompileUnit& boundCompileUnit, BoundFunction* boundFunction, ContainerScope* containerScope, StatementBinder* statementBinder, 
-    bool lvalue, bool acceptFunctionGroup, bool acceptMemberExpression, bool acceptIncomplete);
+    bool lvalue, bool acceptFunctionGroupOrMemberExpression, bool acceptIncomplete);
 std::unique_ptr<BoundExpression> BindExpression(Node* node, BoundCompileUnit& boundCompileUnit, BoundFunction* boundFunction, ContainerScope* containerScope, StatementBinder* statementBinder,
-    bool lvalue, bool acceptFunctionGroup, bool acceptMemberExpression, bool acceptIncomplete, bool moveTemporaryDestructorCalls);
+    bool lvalue, bool acceptFunctionGroupOrMemberExpression, bool acceptIncomplete, bool moveTemporaryDestructorCalls);
 
 } } // namespace cmajor::binder
 

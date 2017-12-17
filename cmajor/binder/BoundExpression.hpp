@@ -526,6 +526,7 @@ public:
     void Accept(BoundNodeVisitor& visitor) override;
     std::string TypeString() const override { return "member expression"; }
     BoundExpression* ClassPtr() { return classPtr.get(); }
+    void ResetClassPtr() { classPtr.reset(); }
     BoundExpression* ReleaseClassPtr() { return classPtr.release(); }
     BoundExpression* Member() { return member.get(); }
 private:

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8"/>
+    <title>interface.cm</title>
+    <link rel="stylesheet" type="text/css" href="../../style/code.css"/>
+</head>
+<body>
+<pre>
+<div class="code">
+<span class="keyword">using</span> <span class="identifier">System</span><span class="other">;</span>
+<span class="keyword">using</span> <span class="identifier">System.IO</span><span class="other">;</span>
+
+<span class="keyword">public</span> <span class="keyword">interface</span> <span class="identifier">Reader</span>
+<span class="other">{</span>
+    <span class="keyword">long</span> <span class="identifier">Read</span><span class="other">(</span><span class="keyword">byte</span><span class="other">*</span> <span class="identifier">buf</span><span class="other">,</span> <span class="keyword">long</span> <span class="identifier">count</span><span class="other">)</span><span class="other">;</span>
+<span class="other">}</span>
+
+<span class="keyword">public</span> <span class="keyword">interface</span> <span class="identifier">Writer</span>
+<span class="other">{</span>
+    <span class="keyword">void</span> <span class="identifier">Write</span><span class="other">(</span><span class="keyword">byte</span><span class="other">*</span> <span class="identifier">buf</span><span class="other">,</span> <span class="keyword">long</span> <span class="identifier">count</span><span class="other">)</span><span class="other">;</span>
+<span class="other">}</span>
+
+<span class="keyword">public</span> <span class="keyword">void</span> <span class="identifier">Copy</span><span class="other">(</span><span class="identifier">Reader</span> <span class="identifier">reader</span><span class="other">,</span> <span class="identifier">Writer</span> <span class="identifier">writer</span><span class="other">)</span>
+<span class="other">{</span>
+    <span class="keyword">byte</span><span class="other">[</span><span class="number">16</span><span class="other">]</span> <span class="identifier">buf</span><span class="other">;</span>
+    <span class="keyword">long</span> <span class="identifier">bytesRead</span> <span class="other">=</span> <span class="identifier">reader.Read</span><span class="other">(</span><span class="other">&amp;</span><span class="identifier">buf</span><span class="other">[</span><span class="number">0</span><span class="other">]</span><span class="other">,</span> <span class="identifier">buf.Length</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span>
+    <span class="keyword">while</span> <span class="other">(</span><span class="identifier">bytesRead</span> <span class="other">&gt;</span> <span class="number">0</span><span class="other">)</span>
+    <span class="other">{</span>
+        <span class="identifier">writer.Write</span><span class="other">(</span><span class="other">&amp;</span><span class="identifier">buf</span><span class="other">[</span><span class="number">0</span><span class="other">]</span><span class="other">,</span> <span class="identifier">bytesRead</span><span class="other">)</span><span class="other">;</span>
+        <span class="identifier">bytesRead</span> <span class="other">=</span> <span class="identifier">reader.Read</span><span class="other">(</span><span class="other">&amp;</span><span class="identifier">buf</span><span class="other">[</span><span class="number">0</span><span class="other">]</span><span class="other">,</span> <span class="identifier">buf.Length</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span>
+    <span class="other">}</span>
+<span class="other">}</span>
+
+<span class="keyword">public</span> <span class="keyword">class</span> <span class="identifier">StringReader</span> <span class="other">:</span> <span class="identifier">Reader</span>
+<span class="other">{</span>
+    <span class="keyword">public</span> <span class="identifier">StringReader</span><span class="other">(</span><span class="keyword">const</span> <span class="identifier">string</span><span class="other">&amp;</span> <span class="identifier">s_</span><span class="other">)</span> <span class="other">:</span> <span class="identifier">s</span><span class="other">(</span><span class="identifier">s_</span><span class="other">)</span><span class="other">,</span> <span class="identifier">pos</span><span class="other">(</span><span class="number">0</span><span class="other">)</span>
+    <span class="other">{</span>
+    <span class="other">}</span>
+    <span class="keyword">public</span> <span class="keyword">long</span> <span class="identifier">Read</span><span class="other">(</span><span class="keyword">byte</span><span class="other">*</span> <span class="identifier">buf</span><span class="other">,</span> <span class="keyword">long</span> <span class="identifier">count</span><span class="other">)</span>
+    <span class="other">{</span>
+        <span class="keyword">long</span> <span class="identifier">bytesLeft</span> <span class="other">=</span> <span class="identifier">s.Length</span><span class="other">(</span><span class="other">)</span> <span class="other">-</span> <span class="identifier">pos</span><span class="other">;</span>
+        <span class="keyword">long</span> <span class="identifier">bytesRead</span> <span class="other">=</span> <span class="identifier">Min</span><span class="other">(</span><span class="identifier">bytesLeft</span><span class="other">,</span> <span class="identifier">count</span><span class="other">)</span><span class="other">;</span>
+        <span class="keyword">for</span> <span class="other">(</span><span class="keyword">long</span> <span class="identifier">i</span> <span class="other">=</span> <span class="number">0</span><span class="other">;</span> <span class="identifier">i</span> <span class="other">&lt;</span> <span class="identifier">bytesRead</span><span class="other">;</span> <span class="other">+</span><span class="other">+</span><span class="identifier">i</span><span class="other">)</span>
+        <span class="other">{</span>
+            <span class="identifier">buf</span><span class="other">[</span><span class="identifier">i</span><span class="other">]</span> <span class="other">=</span> <span class="keyword">cast</span><span class="other">&lt;</span><span class="keyword">byte</span><span class="other">&gt;</span><span class="other">(</span><span class="identifier">s</span><span class="other">[</span><span class="identifier">pos</span> <span class="other">+</span> <span class="identifier">i</span><span class="other">]</span><span class="other">)</span><span class="other">;</span>
+        <span class="other">}</span>
+        <span class="identifier">pos</span> <span class="other">=</span> <span class="identifier">pos</span> <span class="other">+</span> <span class="identifier">bytesRead</span><span class="other">;</span>
+        <span class="keyword">return</span> <span class="identifier">bytesRead</span><span class="other">;</span>
+    <span class="other">}</span>
+    <span class="keyword">private</span> <span class="identifier">string</span> <span class="identifier">s</span><span class="other">;</span>
+    <span class="keyword">private</span> <span class="keyword">long</span> <span class="identifier">pos</span><span class="other">;</span>
+<span class="other">}</span>
+
+<span class="keyword">public</span> <span class="keyword">class</span> <span class="identifier">ConsoleWriter</span> <span class="other">:</span> <span class="identifier">Writer</span>
+<span class="other">{</span>
+    <span class="keyword">public</span> <span class="identifier">ConsoleWriter</span><span class="other">(</span><span class="other">)</span> <span class="other">:</span> <span class="identifier">standardOutputStream</span><span class="other">(</span><span class="identifier">stdout</span><span class="other">)</span>
+    <span class="other">{</span>
+    <span class="other">}</span>
+    <span class="keyword">public</span> <span class="keyword">void</span> <span class="identifier">Write</span><span class="other">(</span><span class="keyword">byte</span><span class="other">*</span> <span class="identifier">buf</span><span class="other">,</span> <span class="keyword">long</span> <span class="identifier">count</span><span class="other">)</span>
+    <span class="other">{</span>
+        <span class="identifier">standardOutputStream.Write</span><span class="other">(</span><span class="identifier">buf</span><span class="other">,</span> <span class="identifier">count</span><span class="other">)</span><span class="other">;</span>
+    <span class="other">}</span>
+    <span class="keyword">private</span> <span class="identifier">FileByteStream</span> <span class="identifier">standardOutputStream</span><span class="other">;</span>
+<span class="other">}</span>
+
+<span class="keyword">void</span> <span class="identifier">main</span><span class="other">(</span><span class="other">)</span>
+<span class="other">{</span>
+    <span class="identifier">StringReader</span> <span class="identifier">stringReader</span><span class="other">(</span><span class="string">&quot;Nothing is impossible, the word itself says &apos;I&apos;m possible&apos;!\n&quot;</span><span class="other">)</span><span class="other">;</span>
+    <span class="identifier">ConsoleWriter</span> <span class="identifier">consoleWriter</span><span class="other">;</span>
+    <span class="identifier">Copy</span><span class="other">(</span><span class="identifier">stringReader</span><span class="other">,</span> <span class="identifier">consoleWriter</span><span class="other">)</span><span class="other">;</span>
+<span class="other">}</span>
+</div
+</pre>
+</body>
+</html>

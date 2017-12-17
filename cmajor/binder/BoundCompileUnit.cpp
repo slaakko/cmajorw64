@@ -336,38 +336,62 @@ FunctionSymbol* BoundCompileUnit::GetConversion(TypeSymbol* sourceType, TypeSymb
                     }
                 }
             }
-            else if (sourceType->GetSymbolType() == SymbolType::functionGroupTypeSymbol && targetType->GetSymbolType() == SymbolType::delegateTypeSymbol)
+            else if ((sourceType->GetSymbolType() == SymbolType::functionGroupTypeSymbol || sourceType->GetSymbolType() == SymbolType::memberExpressionTypeSymbol) && 
+                targetType->GetSymbolType() == SymbolType::delegateTypeSymbol)
             {
-                FunctionGroupTypeSymbol* functionGroupTypeSymbol = static_cast<FunctionGroupTypeSymbol*>(sourceType);
-                FunctionGroupSymbol* functionGroupSymbol = functionGroupTypeSymbol->FunctionGroup();
-                DelegateTypeSymbol* delegateTypeSymbol = static_cast<DelegateTypeSymbol*>(targetType);
-                int arity = delegateTypeSymbol->Arity();
-                std::unordered_set<FunctionSymbol*> viableFunctions;
-                functionGroupSymbol->CollectViableFunctions(arity, viableFunctions);
-                for (FunctionSymbol* viableFunction : viableFunctions)
+                FunctionGroupSymbol* functionGroupSymbol = nullptr;
+                BoundMemberExpression* boundMemberExpression = nullptr;
+                if (sourceType->GetSymbolType() == SymbolType::functionGroupTypeSymbol)
                 {
-                    bool found = true;
-                    for (int i = 0; i < arity; ++i)
+                    FunctionGroupTypeSymbol* functionGroupTypeSymbol = static_cast<FunctionGroupTypeSymbol*>(sourceType);
+                    functionGroupSymbol = functionGroupTypeSymbol->FunctionGroup();
+                }
+                else if (sourceType->GetSymbolType() == SymbolType::memberExpressionTypeSymbol)
+                {
+                    MemberExpressionTypeSymbol* memberExpressionTypeSymbol = static_cast<MemberExpressionTypeSymbol*>(sourceType);
+                    boundMemberExpression = static_cast<BoundMemberExpression*>(memberExpressionTypeSymbol->BoundMemberExpression());
+                    if (boundMemberExpression->Member()->GetBoundNodeType() == BoundNodeType::boundFunctionGroupExpression)
                     {
-                        ParameterSymbol* sourceParam = viableFunction->Parameters()[i];
-                        ParameterSymbol* targetParam = delegateTypeSymbol->Parameters()[i];
-                        if (!TypesEqual(sourceParam->GetType(), targetParam->GetType()))
+                        BoundFunctionGroupExpression* boundFunctionGroupExpression = static_cast<BoundFunctionGroupExpression*>(boundMemberExpression->Member());
+                        functionGroupSymbol = boundFunctionGroupExpression->FunctionGroup();
+                    }
+                }
+                if (functionGroupSymbol)
+                {
+                    DelegateTypeSymbol* delegateTypeSymbol = static_cast<DelegateTypeSymbol*>(targetType);
+                    int arity = delegateTypeSymbol->Arity();
+                    std::unordered_set<FunctionSymbol*> viableFunctions;
+                    functionGroupSymbol->CollectViableFunctions(arity, viableFunctions);
+                    for (FunctionSymbol* viableFunction : viableFunctions)
+                    {
+                        if (viableFunction->GetSymbolType() == SymbolType::memberFunctionSymbol && !viableFunction->IsStatic()) continue;
+                        bool found = true;
+                        for (int i = 0; i < arity; ++i)
                         {
-                            found = false;
-                            break;
+                            ParameterSymbol* sourceParam = viableFunction->Parameters()[i];
+                            ParameterSymbol* targetParam = delegateTypeSymbol->Parameters()[i];
+                            if (!TypesEqual(sourceParam->GetType(), targetParam->GetType()))
+                            {
+                                found = false;
+                                break;
+                            }
                         }
-                    }
-                    if (found)
-                    {
-                        found = TypesEqual(viableFunction->ReturnType(), delegateTypeSymbol->ReturnType());
-                    }
-                    if (found)
-                    {
-                        std::unique_ptr<FunctionSymbol> functionToDelegateConversion(new FunctionToDelegateConversion(sourceType, delegateTypeSymbol, viableFunction));
-                        conversion = functionToDelegateConversion.get();
-                        conversionTable.AddConversion(conversion);
-                        conversionTable.AddGeneratedConversion(std::move(functionToDelegateConversion));
-                        return conversion;
+                        if (found)
+                        {
+                            found = TypesEqual(viableFunction->ReturnType(), delegateTypeSymbol->ReturnType());
+                        }
+                        if (found)
+                        {
+                            if (boundMemberExpression)
+                            {
+                                boundMemberExpression->ResetClassPtr();
+                            }
+                            std::unique_ptr<FunctionSymbol> functionToDelegateConversion(new FunctionToDelegateConversion(sourceType, delegateTypeSymbol, viableFunction));
+                            conversion = functionToDelegateConversion.get();
+                            conversionTable.AddConversion(conversion);
+                            conversionTable.AddGeneratedConversion(std::move(functionToDelegateConversion));
+                            return conversion;
+                        }
                     }
                 }
             }

@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8"/>
+    <title>unique_ptr.cm</title>
+    <link rel="stylesheet" type="text/css" href="../../style/code.css"/>
+</head>
+<body>
+<pre>
+<div class="code">
+<span class="keyword">public</span> <span class="keyword">class</span> <span class="identifier">UniquePtr</span><span class="other">&lt;</span><span class="identifier">T</span><span class="other">&gt;</span>
+<span class="other">{</span>
+    <span class="keyword">private</span> <span class="keyword">typedef</span> <span class="identifier">UniquePtr</span><span class="other">&lt;</span><span class="identifier">T</span><span class="other">&gt;</span> <span class="identifier">Self</span><span class="other">;</span>
+
+    <span class="keyword">public</span> <span class="keyword">nothrow</span> <span class="identifier">UniquePtr</span><span class="other">(</span><span class="other">)</span> <span class="other">:</span> <span class="identifier">ptr</span><span class="other">(</span><span class="keyword">null</span><span class="other">)</span>
+    <span class="other">{</span>
+    <span class="other">}</span>
+    <span class="keyword">public</span> <span class="keyword">explicit</span> <span class="keyword">nothrow</span> <span class="identifier">UniquePtr</span><span class="other">(</span><span class="identifier">T</span><span class="other">*</span> <span class="identifier">ptr_</span><span class="other">)</span> <span class="other">:</span> <span class="identifier">ptr</span><span class="other">(</span><span class="identifier">ptr_</span><span class="other">)</span>
+    <span class="other">{</span>
+    <span class="other">}</span>
+    <span class="keyword">suppress</span> <span class="identifier">UniquePtr</span><span class="other">(</span><span class="keyword">const</span> <span class="identifier">Self</span><span class="other">&amp;</span><span class="other">)</span><span class="other">;</span>
+    <span class="keyword">public</span> <span class="keyword">nothrow</span> <span class="identifier">UniquePtr</span><span class="other">(</span><span class="identifier">Self</span><span class="other">&amp;</span><span class="other">&amp;</span> <span class="identifier">that</span><span class="other">)</span> <span class="other">:</span> <span class="identifier">ptr</span><span class="other">(</span><span class="identifier">that.Release</span><span class="other">(</span><span class="other">)</span><span class="other">)</span>
+    <span class="other">{</span>
+    <span class="other">}</span>
+    <span class="keyword">public</span> <span class="keyword">nothrow</span> <span class="keyword">void</span> <span class="keyword">operator</span><span class="other">=</span><span class="other">(</span><span class="identifier">T</span><span class="other">*</span> <span class="identifier">ptr_</span><span class="other">)</span>
+    <span class="other">{</span>
+        <span class="keyword">if</span> <span class="other">(</span><span class="identifier">ptr</span> <span class="other">!</span><span class="other">=</span> <span class="keyword">null</span><span class="other">)</span>
+        <span class="other">{</span>
+            <span class="keyword">delete</span> <span class="identifier">ptr</span><span class="other">;</span>
+        <span class="other">}</span>
+        <span class="identifier">ptr</span> <span class="other">=</span> <span class="identifier">ptr_</span><span class="other">;</span>
+    <span class="other">}</span>
+    <span class="keyword">suppress</span> <span class="keyword">void</span> <span class="keyword">operator</span><span class="other">=</span><span class="other">(</span><span class="keyword">const</span> <span class="identifier">Self</span><span class="other">&amp;</span><span class="other">)</span><span class="other">;</span>
+    <span class="keyword">public</span> <span class="keyword">nothrow</span> <span class="keyword">void</span> <span class="keyword">operator</span><span class="other">=</span><span class="other">(</span><span class="identifier">Self</span><span class="other">&amp;</span><span class="other">&amp;</span> <span class="identifier">that</span><span class="other">)</span>
+    <span class="other">{</span>
+        <span class="keyword">if</span> <span class="other">(</span><span class="identifier">ptr</span> <span class="other">!</span><span class="other">=</span> <span class="keyword">null</span><span class="other">)</span>
+        <span class="other">{</span>
+            <span class="keyword">delete</span> <span class="identifier">ptr</span><span class="other">;</span>
+        <span class="other">}</span>
+        <span class="identifier">ptr</span> <span class="other">=</span> <span class="identifier">that.Release</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>
+    <span class="other">}</span>
+    <span class="keyword">public</span> <span class="other">~</span><span class="identifier">UniquePtr</span><span class="other">(</span><span class="other">)</span>
+    <span class="other">{</span>
+        <span class="keyword">if</span> <span class="other">(</span><span class="identifier">ptr</span> <span class="other">!</span><span class="other">=</span> <span class="keyword">null</span><span class="other">)</span>
+        <span class="other">{</span>
+            <span class="keyword">delete</span> <span class="identifier">ptr</span><span class="other">;</span>
+        <span class="other">}</span>
+    <span class="other">}</span>
+    <span class="keyword">public</span> <span class="keyword">nothrow</span> <span class="keyword">void</span> <span class="identifier">Reset</span><span class="other">(</span><span class="other">)</span>
+    <span class="other">{</span>
+        <span class="keyword">if</span> <span class="other">(</span><span class="identifier">ptr</span> <span class="other">!</span><span class="other">=</span> <span class="keyword">null</span><span class="other">)</span>
+        <span class="other">{</span>
+            <span class="keyword">delete</span> <span class="identifier">ptr</span><span class="other">;</span>
+            <span class="identifier">ptr</span> <span class="other">=</span> <span class="keyword">null</span><span class="other">;</span>
+        <span class="other">}</span>
+    <span class="other">}</span>
+    <span class="keyword">public</span> <span class="keyword">nothrow</span> <span class="keyword">void</span> <span class="identifier">Reset</span><span class="other">(</span><span class="identifier">T</span><span class="other">*</span> <span class="identifier">ptr_</span><span class="other">)</span>
+    <span class="other">{</span>
+        <span class="keyword">if</span> <span class="other">(</span><span class="identifier">ptr</span> <span class="other">!</span><span class="other">=</span> <span class="keyword">null</span><span class="other">)</span>
+        <span class="other">{</span>
+            <span class="keyword">delete</span> <span class="identifier">ptr</span><span class="other">;</span>
+        <span class="other">}</span>
+        <span class="identifier">ptr</span> <span class="other">=</span> <span class="identifier">ptr_</span><span class="other">;</span>
+    <span class="other">}</span>
+    <span class="keyword">public</span> <span class="keyword">inline</span> <span class="keyword">nothrow</span> <span class="identifier">T</span><span class="other">*</span> <span class="identifier">Release</span><span class="other">(</span><span class="other">)</span>
+    <span class="other">{</span>
+        <span class="identifier">T</span><span class="other">*</span> <span class="identifier">ptr_</span> <span class="other">=</span> <span class="identifier">ptr</span><span class="other">;</span>
+        <span class="identifier">ptr</span> <span class="other">=</span> <span class="keyword">null</span><span class="other">;</span>
+        <span class="keyword">return</span> <span class="identifier">ptr_</span><span class="other">;</span>
+    <span class="other">}</span>
+    <span class="keyword">public</span> <span class="keyword">inline</span> <span class="keyword">nothrow</span> <span class="identifier">T</span><span class="other">*</span> <span class="identifier">Get</span><span class="other">(</span><span class="other">)</span>
+    <span class="other">{</span> 
+        <span class="keyword">return</span> <span class="identifier">ptr</span><span class="other">;</span> 
+    <span class="other">}</span>
+    <span class="keyword">public</span> <span class="keyword">inline</span> <span class="keyword">nothrow</span> <span class="keyword">bool</span> <span class="identifier">IsNull</span><span class="other">(</span><span class="other">)</span> <span class="keyword">const</span> 
+    <span class="other">{</span> 
+        <span class="keyword">return</span> <span class="identifier">ptr</span> <span class="other">=</span><span class="other">=</span> <span class="keyword">null</span><span class="other">;</span> 
+    <span class="other">}</span>
+    <span class="keyword">public</span> <span class="keyword">inline</span> <span class="keyword">nothrow</span> <span class="identifier">T</span><span class="other">*</span> <span class="keyword">operator</span><span class="other">-</span><span class="other">&gt;</span><span class="other">(</span><span class="other">)</span>
+    <span class="other">{</span>
+        <span class="other">#</span><span class="identifier">assert</span><span class="other">(</span><span class="identifier">ptr</span> <span class="other">!</span><span class="other">=</span> <span class="keyword">null</span><span class="other">)</span><span class="other">;</span>
+        <span class="keyword">return</span> <span class="identifier">ptr</span><span class="other">;</span>
+    <span class="other">}</span>
+    <span class="keyword">public</span> <span class="keyword">inline</span> <span class="keyword">nothrow</span> <span class="keyword">const</span> <span class="identifier">T</span><span class="other">*</span> <span class="keyword">operator</span><span class="other">-</span><span class="other">&gt;</span><span class="other">(</span><span class="other">)</span> <span class="keyword">const</span>
+    <span class="other">{</span>
+        <span class="other">#</span><span class="identifier">assert</span><span class="other">(</span><span class="identifier">ptr</span> <span class="other">!</span><span class="other">=</span> <span class="keyword">null</span><span class="other">)</span><span class="other">;</span>
+        <span class="keyword">return</span> <span class="identifier">ptr</span><span class="other">;</span>
+    <span class="other">}</span>
+    <span class="keyword">public</span> <span class="keyword">inline</span> <span class="keyword">nothrow</span> <span class="identifier">T</span><span class="other">&amp;</span> <span class="keyword">operator</span><span class="other">*</span><span class="other">(</span><span class="other">)</span>
+    <span class="other">{</span>
+        <span class="other">#</span><span class="identifier">assert</span><span class="other">(</span><span class="identifier">ptr</span> <span class="other">!</span><span class="other">=</span> <span class="keyword">null</span><span class="other">)</span><span class="other">;</span>
+        <span class="keyword">return</span> <span class="other">*</span><span class="identifier">ptr</span><span class="other">;</span>
+    <span class="other">}</span>
+    <span class="keyword">public</span> <span class="keyword">inline</span> <span class="keyword">nothrow</span> <span class="keyword">const</span> <span class="identifier">T</span><span class="other">&amp;</span> <span class="keyword">operator</span><span class="other">*</span><span class="other">(</span><span class="other">)</span> <span class="keyword">const</span>
+    <span class="other">{</span>
+        <span class="other">#</span><span class="identifier">assert</span><span class="other">(</span><span class="identifier">ptr</span> <span class="other">!</span><span class="other">=</span> <span class="keyword">null</span><span class="other">)</span><span class="other">;</span>
+        <span class="keyword">return</span> <span class="other">*</span><span class="identifier">ptr</span><span class="other">;</span>
+    <span class="other">}</span>
+    <span class="keyword">public</span> <span class="keyword">nothrow</span> <span class="keyword">void</span> <span class="identifier">Swap</span><span class="other">(</span><span class="identifier">Self</span><span class="other">&amp;</span> <span class="identifier">that</span><span class="other">)</span>
+    <span class="other">{</span>
+        <span class="identifier">Swap</span><span class="other">(</span><span class="identifier">ptr</span><span class="other">,</span> <span class="identifier">that.ptr</span><span class="other">)</span><span class="other">;</span>
+    <span class="other">}</span>
+    <span class="keyword">private</span> <span class="identifier">T</span><span class="other">*</span> <span class="identifier">ptr</span><span class="other">;</span>
+<span class="other">}</span>
+
+<span class="keyword">public</span> <span class="keyword">class</span> <span class="identifier">TestClass</span>
+<span class="other">{</span>
+    <span class="keyword">public</span> <span class="keyword">void</span> <span class="identifier">foo</span><span class="other">(</span><span class="other">)</span>
+    <span class="other">{</span>
+        <span class="identifier">System.Console.WriteLine</span><span class="other">(</span><span class="string">&quot;foo&quot;</span><span class="other">)</span><span class="other">;</span>
+    <span class="other">}</span>
+<span class="other">}</span>
+
+<span class="keyword">public</span> <span class="keyword">void</span> <span class="identifier">main</span><span class="other">(</span><span class="other">)</span>
+<span class="other">{</span>
+    <span class="identifier">UniquePtr</span><span class="other">&lt;</span><span class="identifier">TestClass</span><span class="other">&gt;</span> <span class="identifier">p</span> <span class="other">=</span> <span class="keyword">new</span> <span class="identifier">TestClass</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>
+    <span class="identifier">p</span><span class="other">-</span><span class="other">&gt;</span><span class="identifier">foo</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>
+<span class="other">}</span>
+</div
+</pre>
+</body>
+</html>
