@@ -4174,7 +4174,12 @@
         When a class template is instantiated, the template parameters of the class template are substituted by specified concrete types and the declarations of the class are type checked using those substituted types. 
         Those concrete types can be specified by using a <a href="#rule.template-id">template-id</a>.
         When a member function of a class template specialization is called, the compiler instantiates it using the specified types.
-        The compiler instantiates only a possible destructor, virtual and overridden member functions and those member functions of a class template specialization that are called.
+        The compiler instantiates automatically the following member functions for each class template specialization: 
+        <ul>
+            <li>a possible destructor,</li> 
+            <li>virtual and overridden member functions,</li>
+            <li>only those member functions that are called.</li>
+        </ul>
     </p>
 
     <p>
