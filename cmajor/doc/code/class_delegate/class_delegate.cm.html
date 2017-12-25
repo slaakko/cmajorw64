@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8"/>
+    <title>class_delegate.cm</title>
+    <link rel="stylesheet" type="text/css" href="../../style/code.css"/>
+</head>
+<body>
+<pre>
+<div class="code">
+<span class="keyword">public</span> <span class="keyword">class</span> <span class="keyword">delegate</span> <span class="keyword">void</span> <span class="identifier">ClassDelegate</span><span class="other">(</span><span class="keyword">int</span> <span class="identifier">x</span><span class="other">)</span><span class="other">;</span>
+
+<span class="keyword">public</span> <span class="keyword">class</span> <span class="identifier">Alpha</span>
+<span class="other">{</span>
+    <span class="keyword">public</span> <span class="keyword">void</span> <span class="identifier">foo</span><span class="other">(</span><span class="keyword">int</span> <span class="identifier">x</span><span class="other">)</span>
+    <span class="other">{</span>
+        <span class="identifier">System.Console.WriteLine</span><span class="other">(</span><span class="string">&quot;foo called with &quot;</span> <span class="other">+</span> <span class="identifier">System.ToString</span><span class="other">(</span><span class="identifier">x</span><span class="other">)</span><span class="other">)</span><span class="other">;</span>
+    <span class="other">}</span>
+    <span class="keyword">public</span> <span class="keyword">void</span> <span class="identifier">bar</span><span class="other">(</span><span class="keyword">int</span> <span class="identifier">x</span><span class="other">)</span>
+    <span class="other">{</span>
+        <span class="identifier">System.Console.WriteLine</span><span class="other">(</span><span class="string">&quot;bar called with &quot;</span> <span class="other">+</span> <span class="identifier">System.ToString</span><span class="other">(</span><span class="identifier">x</span><span class="other">)</span><span class="other">)</span><span class="other">;</span>
+    <span class="other">}</span>
+    <span class="keyword">public</span> <span class="keyword">void</span> <span class="identifier">baz</span><span class="other">(</span><span class="other">)</span>
+    <span class="other">{</span>
+        <span class="identifier">barDlg</span> <span class="other">=</span> <span class="identifier">bar</span><span class="other">;</span>
+    <span class="other">}</span>
+    <span class="keyword">public</span> <span class="keyword">void</span> <span class="identifier">fuz</span><span class="other">(</span><span class="other">)</span>
+    <span class="other">{</span>
+        <span class="identifier">barDlg</span><span class="other">(</span><span class="number">24</span><span class="other">)</span><span class="other">;</span>
+    <span class="other">}</span>
+    <span class="keyword">private</span> <span class="identifier">ClassDelegate</span> <span class="identifier">barDlg</span><span class="other">;</span>
+<span class="other">}</span>
+
+<span class="keyword">public</span> <span class="keyword">void</span> <span class="identifier">main</span><span class="other">(</span><span class="other">)</span>
+<span class="other">{</span>
+    <span class="identifier">Alpha</span> <span class="identifier">alpha</span><span class="other">;</span>
+    <span class="identifier">ClassDelegate</span> <span class="identifier">fooDlg</span> <span class="other">=</span> <span class="identifier">alpha.foo</span><span class="other">;</span>
+    <span class="identifier">fooDlg</span><span class="other">(</span><span class="number">42</span><span class="other">)</span><span class="other">;</span>
+    <span class="identifier">alpha.baz</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>
+    <span class="identifier">alpha.fuz</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>
+<span class="other">}</span>
+</div
+</pre>
+</body>
+</html>

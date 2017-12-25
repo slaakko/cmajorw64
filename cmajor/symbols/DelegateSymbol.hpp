@@ -256,6 +256,7 @@ public:
     uint8_t ConversionDistance() const override { return 1; }
     TypeSymbol* ConversionSourceType() const override { return sourceType; }
     TypeSymbol* ConversionTargetType() const override { return targetType; }
+    bool IsMemberFunctionToClassDelegateConversion() const override { return true; }
     void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags) override;
     bool IsBasicTypeOperation() const override { return true; }
 private:

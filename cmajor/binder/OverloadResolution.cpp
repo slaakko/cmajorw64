@@ -163,9 +163,9 @@ bool FindQualificationConversion(TypeSymbol* sourceType, TypeSymbol* targetType,
         ++functionMatch.numQualifyingConversions;
         return true;
     }
-    else if (!sourceType->IsReferenceType() && (targetType->IsReferenceType() || targetType->IsClassTypeSymbol())) // conversion function logic removed!
+    else if (!sourceType->IsReferenceType() && (targetType->IsReferenceType() || targetType->IsClassTypeSymbol() || targetType->GetSymbolType() == SymbolType::classDelegateTypeSymbol)) 
     {
-        if (targetType->IsConstType() || targetType->IsClassTypeSymbol()) // conversion function logic removed!
+        if (targetType->IsConstType() || targetType->IsClassTypeSymbol()) 
         {
             argumentMatch.postReferenceConversionFlags = OperationFlags::addr;
             argumentMatch.conversionDistance = distance;

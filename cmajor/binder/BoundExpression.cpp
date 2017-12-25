@@ -1204,6 +1204,7 @@ bool BoundConversion::IsLvalueExpression() const
 {
     if (conversionFun->GetSymbolType() == SymbolType::conversionFunctionSymbol) return true;
     if (conversionFun->IsClassToInterfaceTypeConversion()) return true;
+    if (conversionFun->IsMemberFunctionToClassDelegateConversion()) return true;
     return false;
 }
 

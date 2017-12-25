@@ -110,6 +110,7 @@ public:
     virtual bool IsArrayElementAccess() const { return false; }
     virtual bool IsCompileTimePrimitiveFunction() const { return false; }
     virtual bool IsClassToInterfaceTypeConversion() const { return false; }
+    virtual bool IsMemberFunctionToClassDelegateConversion() const { return false; }
     virtual void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags);
     void GenerateVirtualCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags);
     virtual std::unique_ptr<Value> ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span) const;

@@ -159,6 +159,20 @@
         &nbsp;&nbsp;&nbsp;&nbsp;14.1 <a href="#class-delegates-syntax">Syntax</a><br />
         15 <a href="#concepts">Concepts</a><br />
         &nbsp;&nbsp;&nbsp;&nbsp;15.1 <a href="#concepts-syntax">Syntax</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;15.2 <a href="#constraints">Constraints</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;15.2.1 <a href="#typename-constraint">Typename Constraint</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;15.2.2 <a href="#signature-constraint">Signature Constraints</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;15.2.3 <a href="#embedded-constraint">Embedded Constraint</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;15.2.4 <a href="#where-constraint">Where-Constraint</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;15.3 <a href="#constraint-expression">Constraint Expressions</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;15.3.1 <a href="#disjunctive-constraint-expression">Disjunctive Constraint Expression</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;15.3.2 <a href="#conjunctive-constraint-expression">Conjunctive Constraint Expression</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;15.3.3 <a href="#primary-constraint-expression">Primary Constraint Expression</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;15.3.4 <a href="#atomic-constraint-expression">Atomic Constraint Expression</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;15.3.5 <a href="#predicate-constraint-expression">Predicate Constraint Expression</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;15.3.6 <a href="#is-constraint-expression">Is-Constraint Expression</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;15.3.7 <a href="#multiparam-constraint-expression">Multiparam-Constraint Expression</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;15.4 <a href="#axioms">Axioms</a><br />
     </div>
 
     <h2 id="lexical-structure">1 Lexical Structure</h2>
@@ -4228,7 +4242,7 @@
 
     <h2 id="delegates">13 Delegates</h2>
 
-    A <a href="#rule.delegate">delegate</a> todo
+    A <a href="#rule.delegate">delegate</a> represents a function signature type.
 
     <h3 id="delegates-syntax">13.1 Syntax</h3>
 
@@ -4264,12 +4278,14 @@
     </table>
 
     <p>
-        A delegate can be bound to a nonmember function or to a static member function.
+        A nonmember function or a static member function can be bound to a delegate.
+        An object of a delegate type contains a pointer to a function.
+        For an example of a delegate, see <a href="../code/delegate/delegate.cm.html">delegate.cm</a>.
     </p>
 
     <h2 id="class-delegates">14 Class Delegates</h2>
 
-    A <a href="#rule.class-delegate">class delegate</a> todo
+    A <a href="#rule.class-delegate">class delegate</a> represents a member function signature type.
 
     <h3 id="class-delegates-syntax">14.1 Syntax</h3>
 
@@ -4306,13 +4322,39 @@
     </table>
 
     <p>
-        A class delegate can be bound to a member function.
+        A nonstatic member function can be bound to a class delegate.
+        An object of a class delegate type contains a couple of pointers: a pointer to an object and a pointer to a member function.
+        For an example of a class delegate, see <a href="../code/class_delegate/class_delegate.cm.html">class_delegate.cm</a>.
     </p>
 
     <h2 id="concepts">15 Concepts</h2>
 
     <p>
-        todo
+        A <a href="#rule.concept">concept</a> is a named collection of requirements for a type or for a group of types.
+        Those requirements are called <em>constraints</em>. 
+        Constraints can be thought of as Boolean expressions, or <em>predicates</em>, that operate on properties of types.
+    </p>
+
+    <p>
+        Concepts are <em>checked</em> as part of <a href="#overload-resolution">overload resolution</a>. 
+        When a concept is checked, the type parameters it contains are substituted with argument types of the function call 
+        and then the constraint expressions in the body of the concept are evaluated using those substituted types.
+        If all the results of these evaluations are <b>true</b>, we say that the type or group of types <em>satisfy</em> the concept, 
+        or <em>conform</em> to the concept. Those overloads whose constraint expressions yield <b>true</b> result, 
+        form the set of overload candidates.
+    </p>
+
+    <p>
+        A concept may <em>refine</em> another concept. Overload resolution selects always an overload whose constraint expression is most <em>strict</em>,
+        or contains most refined concepts that are satisfied with argument types of the function call.
+    </p>
+
+    <p>
+        A concept may also contain <a href="#axioms">axioms</a>. 
+        Axioms are <em>not</em> checked or evaluated in any way by the compiler 
+        but they express semantic facts about properties 
+        of types that should always hold when the substituted type or types conform to the concept containing the axiom. 
+        Axioms are ment to be as information for the programmer.
     </p>
     
     <h3 id="concepts-syntax">15.1 Syntax</h3>
@@ -4502,16 +4544,16 @@
             <td class="rule" id="rule.atomic-constraint-expression">atomic&#8209;constraint&#8209;expression</td>
             <td class="sep">&rarr;</td>
             <td class="rcontent">
-                <span class="rule"><a href="#rule.predicate-constraint">predicate&#8209;constraint</a></span> | 
-                <span class="rule"><a href="#rule.is-constraint">is&#8209;constraint</a></span> |
-                <span class="rule"><a href="#rule.multiparam-constraint">multiparam&#8209;constraint</a></span>
+                <span class="rule"><a href="#rule.predicate-constraint-expression">predicate&#8209;constraint&#8209;expression</a></span> | 
+                <span class="rule"><a href="#rule.is-constraint-expression">is&#8209;constraint&#8209;expression</a></span> |
+                <span class="rule"><a href="#rule.multiparam-constraint-expression">multiparam&#8209;constraint&#8209;expression</a></span>
             </td>
         </tr>
         <tr>
-            <td class="rule" id="rule.predicate-constraint">predicate&#8209;constraint</td>
+            <td class="rule" id="rule.predicate-constraint-expression">predicate&#8209;constraint&#8209;expression</td>
             <td class="sep">&rarr;</td>
             <td class="rcontent">
-                <span class="rule"><a href="#rule.invoke-expression">invoke&#8209;expression</a></span> | 
+                <span class="rule"><a href="#rule.invoke-expression">invoke&#8209;expression</a></span>
             </td>
         </tr>
         <tr>
@@ -4528,7 +4570,7 @@
             </td>
         </tr>
         <tr>
-            <td class="rule" id="rule.is-constraint">is&#8209;constraint</td>
+            <td class="rule" id="rule.is-constraint-expression">is&#8209;constraint&#8209;expression</td>
             <td class="sep">&rarr;</td>
             <td class="rcontent">
                 <span class="rule"><a href="#rule.type-expr">type&#8209;expr</a></span>
@@ -4544,7 +4586,7 @@
             </td>
         </tr>
         <tr>
-            <td class="rule" id="rule.multiparam-constraint">multiparam&#8209;constraint</td>
+            <td class="rule" id="rule.multiparam-constraint-expression">multiparam&#8209;constraint&#8209;expression</td>
             <td class="sep">&rarr;</td>
             <td class="rcontent">
                 <span class="rule"><a href="#rule.concept-group-id">concept&#8209;group&#8209;id</a></span>
@@ -4584,11 +4626,221 @@
         </tr>
     </table>
 
-    <h3 id="constraints">15.x Constraints</h3>
+    <h3 id="constraints">15.2 Constraints</h3>
 
-    <h4 id="where-constraint">15.x.y Where-Constraint</h4>
+    <p>
+        A constraint in the body of a constraint can be a <a href="#typename-constraint">typename</a> constraint,
+        a <a href="#signature-constraint">signature</a> constraint, or an <a href="#embedded-constraint">embedded</a>
+        constraint.
+    </p>
 
-    <h3 id="axioms">15.x Axioms</h3>
+    <h4 id="typename-constraint">15.2.1 Typename Constraint</h4>
+
+    <p>
+        Evaluation of a <a href="#rule.typename-constraint">typename</a> constraint yields <b>true</b>, if the substituted type contains a
+        <a href="#typedefs">typedef</a> or type whose name is equal to the identifier contained by the constraint, <b>false</b> otherwise.
+    </p>
+
+    <p>
+        For examples of typename constraints, see <a href="../library/System.Base/System.Base.html#concept_Container_0A128B13B9494DFD21086D34DFB070EAA26D473A">Container</a>
+        concept in the system library.
+        It contains three typename constraints: <span class="mono">T.ValueType</span>, <span class="mono">T.Iterator</span> and <span class="mono">T.ConstIterator</span>.
+        This means that if a type <span class="mono">T</span> satisfies <span class="mono">Container</span> concept it must contain three typedefs named
+        <span class="mono">ValueType</span>, <span class="mono">Iterator</span> and <span class="mono">ConstIterator</span>.
+    </p>
+
+    <h4 id="signature-constraint">15.2.2 Signature Constraints</h4>
+
+    <p>
+        Evaluation of a <a href="#rule.signature-constraint">signature</a> constraint yields <b>true</b>, if there exists a constructor, destructor, member function or function whose
+        signature matches given <a href="#constructor-constraint">constructor</a>, <a href="#destructor-constraint">destructor</a>, <a href="#member-function-constraint">member function</a> 
+        or <a href="#function-constraint">function</a> signature respectively, and <b>false</b> otherwise.
+        Destructor constraint is satisfied always, because a trivial destructor matches a destructor signature.
+    </p>
+
+    <h5 id="constructor-constraint">Constructor Constraint</h5>
+
+    <p>
+        Here's an example of a concept that contains a <a href="#rule.constructor-constraint">constructor</a> constraint:
+         
+        <blockquote>
+            <span class="kw">public </span> <span class="kw">concept</span> <span class="var">MoveConstructible&lt;T&gt;</span><br/>
+            <span class="mono">{</span><br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;T(T&amp;&amp;);<br />
+            <span class="mono">}</span><br />
+        </blockquote>
+
+    </p>
+
+    <h5 id="destructor-constraint">Destructor Constraint</h5>
+
+    <p>
+        Here's an example of a concept that contains a <a href="#rule.destructor-constraint">destructor</a> constraint:
+
+        <blockquote>
+            <span class="kw">public </span> <span class="kw">concept</span> <span class="var">Destructible&lt;T&gt;</span><br />
+            <span class="mono">{</span><br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;~T();<br />
+            <span class="mono">}</span><br />
+        </blockquote>
+    </p>
+
+    <h5 id="member-function-constraint">Member Function Constraint</h5>
+
+    <p>
+        Here's an example of a concept that contains a <a href="#rule.member-function-constraint">member function</a> constraint:
+
+        <blockquote>
+            <span class="kw">public </span> <span class="kw">concept</span> <span class="var">Container&lt;T&gt;</span><br />
+            <span class="mono">{</span><br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// ...<br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">int</span> <span class="mono">T.Count</span>();<br />
+            <span class="mono">}</span><br />
+        </blockquote>
+    </p>
+
+    <h5 id="function-constraint">Function Constraint</h5>
+
+    <p>
+        Here's an example of a concept that contains a <a href="#rule.function-constraint">function</a> constraint:
+
+        <blockquote>
+            <span class="kw">public </span> <span class="kw">concept</span> <span class="var">LessThanComparable&lt;T&gt;</span><br />
+            <span class="mono">{</span><br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">bool</span> <span class="kw">operator</span><span class="mono">&lt;(T, T);</span><br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// ...<br />
+            <span class="mono">}</span><br />
+        </blockquote>
+    </p>
+
+    <h4 id="embedded-constraint">15.2.3 Embedded Constraint</h4>
+
+    <p>
+        An <a href="#rule.embedded-constraint">embedded</a> constraint is a <a href="#where-constraint">where</a> constraint that is embedded in the concept body.
+        An embedded constraint yields <b>true</b>, if the where-constraint yields <b>true</b>, and <b>false</b> otherwise.
+    </p>
+
+    <h4 id="where-constraint">15.2.4 Where-Constraint</h4>
+
+    <p>
+        A <a href="#rule.where-constraint">where</a> constraint consists of the keyword <span class="kw">where</span> and a <a href="#constraint-expression">constraint expression</a>.
+        A where-constraint yields <b>true</b>, if the constraint expression yields <b>true</b>, and <b>false</b> otherwise.
+    </p>
+
+    <h3 id="constraint-expression">15.3 Constraint Expressions</h3>
+
+    <p>
+        A <a href="#rule.constraint-expression">constraint expression</a> can be 
+        a <a href="#disjunctive-constraint-expression">disjunctive constraint expression</a>,
+        a <a href="#conjunctive-constraint-expression">conjunctive constraint expression</a>,
+        a <a href="#primary-constraint-expression">primary constraint expression</a>,
+        an <a href="#atomic-constraint-expression">atomic constraint expression</a>, 
+        a <a href="#predicate-constraint-expression">predicate constraint expression</a>,
+        an <a href="#is-constraint-expression">is-constraint expression</a>, or
+        a <a href="#multiparam-constraint-expression">multiparam-constraint expression</a>.
+    </p>
+
+    <h4 id="disjunctive-constraint-expression">15.3.1 Disjunctive Constraint Expression</h4>
+
+    <p>
+        A <a href="#rule.disjunctive-constraint-expression">disjunctive</a> constraint expression is a sequence of <a href="#conjunctive-constraint-expression">conjunctive</a> constraint expressions separated 
+        by the keyword <span class="kw">or</span>.
+    </p>
+
+    <p>
+        A disjunctive constraint expression <blockquote><em>a</em> <span class="kw">or</span> <em>b</em></blockquote> yields <b>true</b>, if either <em>a</em> or <em>b</em>, or both yield <b>true</b>, and <b>false</b> otherwise.
+    </p>
+
+    <h4 id="conjunctive-constraint-expression">15.3.2 Conjunctive Constraint Expression</h4>
+
+    <p>
+        A <a href="#rule.conjunctive-constraint-expression">conjunctive</a> constraint expression is a sequence of <a href="#primary-constraint-expression">primary</a> constraint expressions separated 
+        by the keyword <span class="kw">and</span>.
+    </p>
+
+    <p>
+        A conjunctive constraint expression <blockquote><em>a</em> <span class="kw">and</span> <em>b</em></blockquote> yields <b>true</b>, if both <em>a</em>  and <em>b</em> yield <b>true</b>.
+    </p>
+
+    <h4 id="primary-constraint-expression">15.3.3 Primary Constraint Expression</h4>
+
+    <p>
+        A <a href="#rule.primary-constraint-expression">primary</a> constraint expression is a parenthesized <a href="#constraint-expression">constraint expression</a>, or an 
+        <a href="#atomic-constraint-expression">atomic</a> constraint expression.
+    </p>
+
+    <p>
+        A primary constraint expression yields <b>true</b> if either the parenthesized constrained expression or the atomic constraint expression yields <b>true</b>, and <b>false</b> otherwise.
+    </p>
+
+    <h4 id="atomic-constraint-expression">15.3.4 Atomic Constraint Expression</h4>
+
+    <p>
+        An <a href="#rule.atomic-constraint-expression">atomic</a> constraint expression is either a <a href="#predicate-constraint-expression">predicate</a> constraint expression, 
+        an <a href="#is-constraint-expression">is-constraint expression</a>, or
+        a <a href="#multiparam-constraint-expression">multiparam-constraint expression</a>. 
+        It yields <b>true</b> if either predicate constraint expression, is-constraint expression or multiparam-constraint expression respectively yields <b>true</b>, and <b>false</b> otherwise.
+    </p>
+
+    <h4 id="predicate-constraint-expression">15.3.5 Predicate Constraint Expression</h4>
+
+    <p>
+        A <a href="#rule.predicate-constraint-expression">predicate</a> constraint is invocation of a Boolean-valued <a href="#functions-constexpr">constexpr</a> or <a href="#intrinsic-function">intrinsic</a> function.
+        It yields <b>true</b> if evaluation of the corresponding function yields <b>true</b>, and <b>false</b> otherwise.
+    </p>
+
+    <h4 id="is-constraint-expression">15.3.6 Is-Constraint Expression</h4>
+
+    <p>
+        An <a href="#rule.is-constraint-expression">is-constraint</a> expression is either of the form
+        <blockquote><em>type</em> <b>is</b> <em>type</em></blockquote> or of the form
+        <blockquote><em>type</em> <b>is</b> <em>concept</em></blockquote>
+        The first form yields <b>true</b>, if the type on the left-hand side is equal to the type on the right-hand side when possible reference and const qualifiers are removed, and <b>false</b> otherwise.
+    </p>
+
+    <p>
+        The second form yields <b>true</b>, if the type on the left-hand side conforms to the concept on the right-hand side, and <b>false</b> otherwise.
+        The conformance of the concept is checked by substituting the type on the left side to the single type parameter of the concept on the right side and evaluating the constraint expressions in the 
+        body of the concept. If all the constraint expressions of the concept yield <b>true</b>, the type conforms to the concept, otherwise it does not conform to the concept.
+    </p>
+    
+    <h4 id="multiparam-constraint-expression">15.3.7 Multiparam-Constraint Expression</h4>
+
+    <p>
+        A <a href="#rule.multiparam-constraint-expression">multiparam-constraint</a> expression is of the form
+        <blockquote><em>concept</em>&lt;<em>type1</em>, <em>type2</em>, ..., <em>type<sub>n</sub></em>&gt;</blockquote>
+        It yields <b>true</b>, if the types <em>type1</em>, <em>type2</em>, ..., <em>type<sub>n</sub></em> conform to the <em>n</em>-parametric concept <em>concept</em>, and <b>false</b> otherwise.
+        The conformance of the concept is checked by substituting type parameters of the <em>concept</em> with types <em>type1</em>, <em>type2</em>, etc. respectively and evaluating the constraint expressions in the
+        body of the concept. If all the constraint expressions of the concept yield <b>true</b>, the types conform to the concept, otherwise they do not conform to the concept.
+    </p>
+
+    <h3 id="axioms">15.4 Axioms</h3>
+
+    <p>
+        An <a href="#rule.axiom">axiom</a> consists of a possible identifier, a possibly empty list of parameters and a body enclosed in braces.
+        A body of an axiom is a possibly empty sequence of <a href="#rule.axiom-statement">axiom statement</a>s.
+        Each axiom statement is a Boolean-valued expression such as an <a href="#rule.equivalence">equivalence</a>, an <a href="#rule.implication">implication</a>, a <a href="#rule.disjunction">disjunction</a>,
+        a <a href="#rule.conjunction">conjunction</a>, an <a href="#rule.equality">equality</a> or a <a href="#rule.relational">relational</a> expression.
+        If a type conforms to a concept that contains these axioms, these axioms should always be <b>true</b> for such a type.
+    </p>
+
+    <p>
+        Here's an example of a concept that contains axioms:
+
+        <blockquote>
+            <span class="kw">public </span> <span class="kw">concept</span> <span class="var">LessThanComparable&lt;T&gt;</span><br />
+            <span class="mono">{</span><br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// ...<br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">axiom</span> irreflexive(T a) { !(a < a); }<br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">axiom</span> antisymmetric(T a, T b) { a < b => !(b < a); }<br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">axiom</span> transitive(T a, T b, T c) { a < b && b < c => a < c; }<br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">axiom</span> total(T a, T b) { a < b || a == b || a > b; }<br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">axiom</span> greaterThan(T a, T b) { a > b <=> b < a; }<br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">axiom</span> greaterThanOrEqualTo(T a, T b) { a >= b <=> !(a < b); }<br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">axiom</span> lessThanOrEqualTo(T a, T b) { a <= b <=> !(b < a); }<br />
+            <span class="mono">}</span><br />
+        </blockquote>
+    </p>
 
     <h2 id="appendix-a">Appendix A Terms</h2>
 
