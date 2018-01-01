@@ -1,5 +1,5 @@
 // =================================
-// Copyright (c) 2017 Seppo Laakko
+// Copyright (c) 2018 Seppo Laakko
 // Distributed under the MIT license
 // =================================
 
@@ -353,16 +353,17 @@ void Emitter::Visit(BoundFunction& boundFunction)
     FunctionSymbol* functionSymbol = boundFunction.GetFunctionSymbol();
     llvm::FunctionType* functionType = functionSymbol->IrType(*this);
     function = llvm::cast<llvm::Function>(compileUnitModule->getOrInsertFunction(ToUtf8(functionSymbol->MangledName()), functionType));
+    if (GetGlobalFlag(GlobalFlags::release) && functionSymbol->IsInline())
+    {
+        function->addFnAttr(llvm::Attribute::InlineHint);
+        functionSymbol->SetLinkOnceOdrLinkage();
+    }
     if (functionSymbol->HasLinkOnceOdrLinkage())
     {
         llvm::Comdat* comdat = compileUnitModule->getOrInsertComdat(ToUtf8(functionSymbol->MangledName()));
         comdat->setSelectionKind(llvm::Comdat::SelectionKind::Any);
         function->setLinkage(llvm::GlobalValue::LinkageTypes::LinkOnceODRLinkage);
         function->setComdat(comdat);
-    }
-    if (GetGlobalFlag(GlobalFlags::release) && functionSymbol->IsInline())
-    {
-        function->addFnAttr(llvm::Attribute::InlineHint);
     }
     SetFunction(function);
     llvm::BasicBlock* entryBlock = llvm::BasicBlock::Create(context, "entry", function);

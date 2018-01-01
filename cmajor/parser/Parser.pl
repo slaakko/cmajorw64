@@ -1,11 +1,5 @@
 namespace cmajor.parser
 {
-    grammar FunctionGrammar
-    {
-        Function(ParsingContext* ctx, var std::unique_ptr<FunctionNode> fun, var Span s): FunctionNode*;
-        FunctionGroupId(ParsingContext* ctx, var std::unique_ptr<IdentifierNode> id): std::u32string;
-        OperatorFunctionGroupId(ParsingContext* ctx, var std::unique_ptr<Node> typeExpr): std::u32string;
-    }
     grammar ExpressionGrammar
     {
         Expression(ParsingContext* ctx): Node*;
@@ -55,6 +49,31 @@ namespace cmajor.parser
         MemberFunction(ParsingContext* ctx, var std::unique_ptr<MemberFunctionNode> memFun, var std::unique_ptr<IdentifierNode> qid): Node*;
         ConversionFunction(ParsingContext* ctx, var std::unique_ptr<ConversionFunctionNode> conversionFun): Node*;
         MemberVariable(ParsingContext* ctx): Node*;
+    }
+    grammar SolutionGrammar
+    {
+        Solution: Solution*;
+        Declaration: SolutionDeclaration*;
+        SolutionProjectDeclaration: SolutionDeclaration*;
+        ActiveProjectDeclaration: SolutionDeclaration*;
+        FilePath: std::string;
+    }
+    grammar EnumerationGrammar
+    {
+        EnumType(ParsingContext* ctx): EnumTypeNode*;
+        UnderlyingType(ParsingContext* ctx): Node*;
+        EnumConstants(ParsingContext* ctx, EnumTypeNode* enumType);
+        EnumConstant(ParsingContext* ctx, EnumTypeNode* enumType, var Span s): EnumConstantNode*;
+    }
+    grammar CommandLineGrammar
+    {
+        CommandLine: std::vector<std::string>;
+        Spaces;
+        Argument: std::string;
+        ArgElement: std::string;
+        OddBackslashesAndLiteralQuotationMark: std::string;
+        EvenBackslashesAndQuotationMark: std::string;
+        StringChar: std::string;
     }
     grammar DelegateGrammar
     {
@@ -109,20 +128,11 @@ namespace cmajor.parser
         AxiomBody(ParsingContext* ctx, AxiomNode* axiom);
         AxiomStatement(ParsingContext* ctx): AxiomStatementNode*;
     }
-    grammar SolutionGrammar
+    grammar FunctionGrammar
     {
-        Solution: Solution*;
-        Declaration: SolutionDeclaration*;
-        SolutionProjectDeclaration: SolutionDeclaration*;
-        ActiveProjectDeclaration: SolutionDeclaration*;
-        FilePath: std::string;
-    }
-    grammar EnumerationGrammar
-    {
-        EnumType(ParsingContext* ctx): EnumTypeNode*;
-        UnderlyingType(ParsingContext* ctx): Node*;
-        EnumConstants(ParsingContext* ctx, EnumTypeNode* enumType);
-        EnumConstant(ParsingContext* ctx, EnumTypeNode* enumType, var Span s): EnumConstantNode*;
+        Function(ParsingContext* ctx, var std::unique_ptr<FunctionNode> fun, var Span s): FunctionNode*;
+        FunctionGroupId(ParsingContext* ctx, var std::unique_ptr<IdentifierNode> id): std::u32string;
+        OperatorFunctionGroupId(ParsingContext* ctx, var std::unique_ptr<Node> typeExpr): std::u32string;
     }
     grammar IdentifierGrammar
     {

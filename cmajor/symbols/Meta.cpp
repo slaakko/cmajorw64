@@ -1,5 +1,5 @@
 // =================================
-// Copyright (c) 2017 Seppo Laakko
+// Copyright (c) 2018 Seppo Laakko
 // Distributed under the MIT license
 // =================================
 
@@ -46,7 +46,9 @@ FunctionSymbol* CreateIntrinsic(IntrinsicFunction* intrinsic, SymbolTable& symbo
         {
             p.append(ToUtf32(std::to_string(i)));
         }
-        fun->AddMember(new TemplateParameterSymbol(Span(), p));
+        TemplateParameterSymbol* s = new TemplateParameterSymbol(Span(), p);
+        symbolTable.SetTypeIdFor(s);
+        fun->AddMember(s);
     }
     fun->ComputeName();
     return fun;

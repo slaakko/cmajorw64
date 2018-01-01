@@ -2,6 +2,7 @@ project Parser;
 reference <StdLib.pl>;
 source <BasicType.parser>;
 source <Class.parser>;
+source <CommandLine.parser>;
 source <CompileUnit.parser>;
 source <Concept.parser>;
 source <Constant.parser>;

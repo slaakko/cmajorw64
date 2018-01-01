@@ -1,5 +1,5 @@
 // =================================
-// Copyright (c) 2017 Seppo Laakko
+// Copyright (c) 2018 Seppo Laakko
 // Distributed under the MIT license
 // =================================
 
@@ -270,17 +270,17 @@ FunctionSymbol* BoundCompileUnit::GetConversion(TypeSymbol* sourceType, TypeSymb
                 conversionTable.AddGeneratedConversion(std::move(voidPtrToPtrConversion));
                 return conversion;
             }
-            else if (sourceType->IsPointerType() && !sourceType->IsReferenceType() && targetType == symbolTable.GetTypeByName(U"ulong"))
+            else if (sourceType->PlainType(span)->IsPointerType() && targetType == symbolTable.GetTypeByName(U"ulong"))
             {
-                std::unique_ptr<FunctionSymbol> ptrToULongConversion(new PtrToULongConversion(sourceType, symbolTable.GetTypeByName(U"ulong")));
+                std::unique_ptr<FunctionSymbol> ptrToULongConversion(new PtrToULongConversion(sourceType->PlainType(span), symbolTable.GetTypeByName(U"ulong")));
                 conversion = ptrToULongConversion.get();
                 conversionTable.AddConversion(conversion);
                 conversionTable.AddGeneratedConversion(std::move(ptrToULongConversion));
                 return conversion;
             }
-            else if (sourceType->IsPointerType() && !sourceType->IsReferenceType() && targetType->RemoveConst(span)->IsVoidPtrType())
+            else if (sourceType->PlainType(span)->IsPointerType() && targetType->RemoveConst(span)->IsVoidPtrType())
             {
-                std::unique_ptr<FunctionSymbol> ptrToVoidPtrConversion(new PtrToVoidPtrConversion(sourceType, symbolTable.GetTypeByName(U"void")->AddPointer(span)));
+                std::unique_ptr<FunctionSymbol> ptrToVoidPtrConversion(new PtrToVoidPtrConversion(sourceType->PlainType(span), symbolTable.GetTypeByName(U"void")->AddPointer(span)));
                 conversion = ptrToVoidPtrConversion.get();
                 conversionTable.AddConversion(conversion);
                 conversionTable.AddGeneratedConversion(std::move(ptrToVoidPtrConversion));

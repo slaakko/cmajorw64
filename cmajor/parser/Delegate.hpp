@@ -1,5 +1,5 @@
-#ifndef Delegate_hpp_21397
-#define Delegate_hpp_21397
+#ifndef Delegate_hpp_391
+#define Delegate_hpp_391
 
 #include <cmajor/parsing/Grammar.hpp>
 #include <cmajor/parsing/Keyword.hpp>
@@ -25,4 +25,4 @@ private:
 
 } } // namespace cmajor.parser
 
-#endif // Delegate_hpp_21397
+#endif // Delegate_hpp_391

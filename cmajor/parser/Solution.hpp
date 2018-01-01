@@ -1,5 +1,5 @@
-#ifndef Solution_hpp_22774
-#define Solution_hpp_22774
+#ifndef Solution_hpp_391
+#define Solution_hpp_391
 
 #include <cmajor/parsing/Grammar.hpp>
 #include <cmajor/parsing/Keyword.hpp>
@@ -27,4 +27,4 @@ private:
 
 } } // namespace cmajor.parser
 
-#endif // Solution_hpp_22774
+#endif // Solution_hpp_391

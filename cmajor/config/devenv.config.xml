@@ -4,11 +4,11 @@
     <tabSize>4</tabSize>
     <infoDelaySecs>10</infoDelaySecs>
     <formSizeX>1779</formSizeX>
-    <formSizeY>950</formSizeY>
+    <formSizeY>963</formSizeY>
     <formTop>0</formTop>
     <formLeft>0</formLeft>
-    <textVisX>26</textVisX>
-    <textVisY>26</textVisY>
+    <textVisX>104</textVisX>
+    <textVisY>104</textVisY>
     <textVisW>1259</textVisW>
     <textVisH>482</textVisH>
     <toolColWidth>80</toolColWidth>
@@ -28,19 +28,31 @@
     <maxRecentProjects>10</maxRecentProjects>
     <recentProjects>
         <recentProject>
+            <path>C:\Users\Seppo\cmajorw64\cmajor\projects\examples\examples.cms</path>
+            <openFiles />
+        </recentProject>
+        <recentProject>
             <path>C:\Users\Seppo\cmajorw64\cmajor\system\System.cms</path>
             <openFiles />
         </recentProject>
         <recentProject>
-            <path>C:\Users\Seppo\cmajorw64\cmajor\cmparsergen\cmparsergen.cms</path>
+            <path>C:\Users\Seppo\cmajorw64\cmajor\projects\cmparsergen\cmparsergen.cms</path>
             <openFiles />
         </recentProject>
         <recentProject>
             <path>C:\Users\Seppo\cmajorw64\cmajor\test\foo\foo.cms</path>
             <openFiles />
         </recentProject>
+        <recentProject>
+            <path>C:/Users/Seppo/cmajorw64/cmajor/test/foolib/foolib.cms</path>
+            <openFiles />
+        </recentProject>
+        <recentProject>
+            <path>C:\Users\Seppo\cmajorw64\cmajor\cmparsergen\cmparsergen.cms</path>
+            <openFiles />
+        </recentProject>
     </recentProjects>
-    <strictNothrow>true</strictNothrow>
+    <strictNothrow>false</strictNothrow>
     <emitLlvm>true</emitLlvm>
     <emitOptLlvm>true</emitOptLlvm>
     <linkWithDebugRuntime>true</linkWithDebugRuntime>

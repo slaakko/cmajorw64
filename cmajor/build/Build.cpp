@@ -1,5 +1,5 @@
 // =================================
-// Copyright (c) 2017 Seppo Laakko
+// Copyright (c) 2018 Seppo Laakko
 // Distributed under the MIT license
 // =================================
 
@@ -504,13 +504,17 @@ void CreateMainUnit(std::vector<std::string>& objectFilePaths, Module& module, E
     mainCompileUnit.GlobalNs()->AddMember(new NamespaceImportNode(Span(), new IdentifierNode(Span(), U"System")));
     FunctionNode* mainFunction(new FunctionNode(Span(), Specifiers::public_, new IntNode(Span()), U"main"));
     mainFunction->SetProgramMain();
-    mainFunction->AddParameter(new ParameterNode(Span(), new IntNode(Span()), new IdentifierNode(Span(), U"argc")));
-    mainFunction->AddParameter(new ParameterNode(Span(), new ConstNode(Span(), new PointerNode(Span(), new PointerNode(Span(), new CharNode(Span())))), new IdentifierNode(Span(), U"argv")));
     CompoundStatementNode* mainFunctionBody = new CompoundStatementNode(Span());
     ConstructionStatementNode* constructExitCode = new ConstructionStatementNode(Span(), new IntNode(Span()), new IdentifierNode(Span(), U"exitCode"));
     mainFunctionBody->AddStatement(constructExitCode);
     ExpressionStatementNode* rtInitCall = new ExpressionStatementNode(Span(), new InvokeNode(Span(), new IdentifierNode(Span(), U"RtInit")));
     mainFunctionBody->AddStatement(rtInitCall);
+    ConstructionStatementNode* argc = new ConstructionStatementNode(Span(), new IntNode(Span()), new IdentifierNode(Span(), U"argc"));
+    argc->AddArgument(new InvokeNode(Span(), new IdentifierNode(Span(), U"RtArgc")));
+    mainFunctionBody->AddStatement(argc);
+    ConstructionStatementNode* argv = new ConstructionStatementNode(Span(), new ConstNode(Span(), new PointerNode(Span(), new PointerNode(Span(), new CharNode(Span())))), new IdentifierNode(Span(), U"argv"));
+    argv->AddArgument(new InvokeNode(Span(), new IdentifierNode(Span(), U"RtArgv")));
+    mainFunctionBody->AddStatement(argv);
     CompoundStatementNode* tryBlock = new CompoundStatementNode(Span());
     FunctionSymbol* userMain = module.GetSymbolTable().MainFunctionSymbol();
     InvokeNode* invokeMain = new InvokeNode(Span(), new IdentifierNode(Span(), userMain->GroupName()));

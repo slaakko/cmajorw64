@@ -1,5 +1,5 @@
-#ifndef SourceToken_hpp_9991
-#define SourceToken_hpp_9991
+#ifndef SourceToken_hpp_391
+#define SourceToken_hpp_391
 
 #include <cmajor/parsing/Grammar.hpp>
 #include <cmajor/parsing/Keyword.hpp>
@@ -26,4 +26,4 @@ private:
 
 } } // namespace cmajor.parser
 
-#endif // SourceToken_hpp_9991
+#endif // SourceToken_hpp_391

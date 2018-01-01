@@ -1,5 +1,5 @@
-#ifndef Literal_hpp_27450
-#define Literal_hpp_27450
+#ifndef Literal_hpp_391
+#define Literal_hpp_391
 
 #include <cmajor/parsing/Grammar.hpp>
 #include <cmajor/parsing/Keyword.hpp>
@@ -42,4 +42,4 @@ private:
 
 } } // namespace cmajor.parser
 
-#endif // Literal_hpp_27450
+#endif // Literal_hpp_391

@@ -133,7 +133,8 @@
         &nbsp;&nbsp;&nbsp;&nbsp;9.7 <a href="#functions-nothrow">Nothrow Specifier</a><br />
         &nbsp;&nbsp;&nbsp;&nbsp;9.8 <a href="#functions-throw">Throw Specifier</a><br />
         &nbsp;&nbsp;&nbsp;&nbsp;9.9 <a href="#functions-template">Function Templates</a><br />
-        &nbsp;&nbsp;&nbsp;&nbsp;9.10 <a href="#overload-resolution">Function Overload Resolution</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;9.10 <a href="#intrinsic-function">Intrinsic Functions</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;9.11 <a href="#overload-resolution">Function Overload Resolution</a><br />
         10 <a href="#typedefs">Typedefs</a><br />
         &nbsp;&nbsp;&nbsp;&nbsp;10.1 <a href="#typedefs-syntax">Syntax</a><br />
         &nbsp;&nbsp;&nbsp;&nbsp;10.2 <a href="#typedefs-examples">Examples</a><br />
@@ -173,6 +174,23 @@
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;15.3.6 <a href="#is-constraint-expression">Is-Constraint Expression</a><br />
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;15.3.7 <a href="#multiparam-constraint-expression">Multiparam-Constraint Expression</a><br />
         &nbsp;&nbsp;&nbsp;&nbsp;15.4 <a href="#axioms">Axioms</a><br />
+        16 <a href="#compile-units">Compile Units</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;16.1 <a href="#compile-units-syntax">Syntax</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;16.2 <a href="#using-directives">Using Directives</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;16.2.1 <a href="#using-alias-directive">Using-Alias Directives</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;16.2.2 <a href="#using-namespace-directive">Using-Namespace Directives</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;16.3 <a href="#definitions">Definitions</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;16.3.1 <a href="#namespace">Namespaces</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;16.3.2 <a href="#namespace-level-definitions">Namespace-level Definitions</a><br />
+        17 <a href="#projects">Projects</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;17.1 <a href="#projects-syntax">Syntax</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;17.2 <a href="#projects-example">Example</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;17.3 <a href="#projects-programs">Programs</a><br />
+        18 <a href="#solutions">Solutions</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;18.1 <a href="#solutions-syntax">Syntax</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;18.2 <a href="#solutions-example">Example</a><br />
+        Appendix A <a href="#appendix-a">Terms</a> <br />
+        Appendix B <a href="#appendix-b">Syntax Notation</a> <br />
     </div>
 
     <h2 id="lexical-structure">1 Lexical Structure</h2>
@@ -191,6 +209,8 @@
     </p>
 
     <h4 id="white-space-and-comments-syntax">1.1.1 Syntax</h4>
+
+    The syntax notation used in this text is explained in the <a href="#appendix-b">Appendix B</a>.
 
     <table class="grammar">
         <tr>
@@ -499,6 +519,7 @@
                 <span class="mono">+</span> |
                 <span class="mono">-</span>
             </td>
+        </tr>
         <tr>
             <td class="rule" id="rule.integer-literal">integer&#8209;literal</td>
             <td class="sep">&rarr;</td>
@@ -639,7 +660,7 @@
             <td class="rcontent">
                 <span class="mono">[</span>
                 (<span class="rule"><a href="#rule.constant-expression">constant&#8209;expression</a></span>
-                    (<span class="mono">,</span> <span class="rule"><a href="#rule.constant-expression">constant&#8209;expression</a></span>)*
+                (<span class="mono">,</span> <span class="rule"><a href="#rule.constant-expression">constant&#8209;expression</a></span>)*
                 )?
                 <span class="mono">]</span>
             </td>
@@ -734,7 +755,7 @@
     <h4 id="array-literal">1.4.8 Array Literal</h4>
 
     <p>
-        An <a href="#rule.array-literal">array literal</a> represents a value of a <em>constant array</em>. 
+        An <a href="#rule.array-literal">array literal</a> represents a value of a <em>constant array</em>.
         Elements of a constant array must be <a href="#constant-expression">constant expressions</a> that evaluate to literals, constants or enumeration constants.
     </p>
 
@@ -1177,7 +1198,7 @@
             <td class="rule" id="rule.constant-expression">constant&#8209;expression</td>
             <td class="sep">&rarr;</td>
             <td class="rcontent">
-                <span class="rule"><a href="#expression">expression</a></span>
+                <span class="rule"><a href="#rule.expression">expression</a></span>
             </td>
         </tr>
     </table>
@@ -1646,7 +1667,7 @@
     <p>
         When <em>x</em> is a name of a function, <a href="#overload-resolution">overload resolution</a> selects the best-matching function overload to be called with the specified arguments.
         The number of arguments must match exactly to the number of parameters of the function, but if the argument types do not match exactly the <a href="#function-signature">signature</a> of the selected function overload,
-        <a href="#conversion">conversions</a> take place.
+        conversions take place.
         If no single best-matching function can be found, or many overloads are found to be equally good matches, the compiler issues an error.
     </p>
 
@@ -1778,7 +1799,7 @@
     <h3 id="constant-expression">3.14 Constant Expression</h3>
 
     <p>
-        A <a href="#rule.constant-expression">constant expression</a> is an <a href="#rule.expression">expression</a> that is sufficiently simple so that it 
+        A <a href="#rule.constant-expression">constant expression</a> is an <a href="#rule.expression">expression</a> that is sufficiently simple so that it
         can be evaluated at compile time.
         It can contain <a href="#literals">literals</a>, <a href="#constants">constants</a>, <a href="#enumeration-constants">enumeration constants</a>, operators that do not
         involve taking an address of an object and invocations of <a href="#functions-constexpr">constexpr functions</a>.
@@ -2343,7 +2364,7 @@
     <p>
         A <a href="#rule.break-statement">break</a> statement terminates a <span class="kw">while</span>, <span class="kw">do</span> or <span class="kw">for</span> loop by transferring control
         to the statement after the looping statement.
-        It is used also to terminate a <a href="#case-statment">case</a> or <a href="#default-statmenet">default</a> statement.
+        It is used also to terminate a <a href="#case-statement">case</a> or <a href="#default-statement">default</a> statement.
     </p>
 
     <h4 id="continue-statement">4.3.9 Continue Statement</h4>
@@ -2381,7 +2402,7 @@
     <h4 id="default-statement">4.3.13 Default Statement</h4>
 
     <p>
-        A <a href="#rule.default-statement">default</a> has a possibly empty sequence of statement that are executed if the condition of the <a href="#switch-statement">switch</a> statement does not
+        A <a href="#rule.default-statement">default</a> statement has a possibly empty sequence of statement that are executed if the condition of the <a href="#switch-statement">switch</a> statement does not
         match any of the case values. The default statement must be terminated by a <a href="#break-statement">break</a>, <a href="#goto-case-statement">goto case</a>,
         <a href="#return-statement">return</a> or <a href="#throw-statement">throw</a> statement.
     </p>
@@ -2417,7 +2438,7 @@
 
     <p>
         An <a href="#rule.assignment-statement">assignment</a> statement evaluates the expression that is on the right-hand side of the assignment operator and assigns it to an
-        <em><a href="#lvalue">lvalue</a></em> expression that is on the left-hand side of the assignment operator. An lvalue expression can be for instance a variable,
+        <em><a href="#lvalue-expression">lvalue</a></em> expression that is on the left-hand side of the assignment operator. An lvalue expression can be for instance a variable,
         a <a href="#dereference-expression">dereferenced</a> pointer or iterator, or a reference-valued result of a function call.
     </p>
 
@@ -2451,7 +2472,7 @@
 
     <p>
         A <a href="#rule.throw-statement">throw</a> statement throws or rethrows an exception.
-        If the throw statement contains an expression, it must be an expression of a class type that is derived from the <em>System</em><span class="mono">.</span><em>Exception</em> class.
+        If the throw statement contains an expression, it must be an expression of a class type that is equal to or derived from the <em>System</em><span class="mono">.</span><em>Exception</em> class.
         If the throw statement does not contain an expression, it can be used only in an <a href="#rule.exception-handler">exception handler</a> block to rethrow the current exception being handled.
     </p>
 
@@ -2471,7 +2492,7 @@
 
     <p>
         A <a href="#rule.try-statement">try</a> statement executes a block of code, and handles one or more classes of exceptions that may be thrown from that block of code.
-        The exception classes must be derived from the <em>System</em><span class="mono">.</span><em>Exception</em> class.
+        The exception classes must be equal to or derived from the <em>System</em><span class="mono">.</span><em>Exception</em> class.
     </p>
 
     <p>
@@ -2528,7 +2549,7 @@
             <li>
                 <a href="#rule.conditional-compilation-prefix">logical not</a> expression that evaluates to
                 <span class="kw">true</span> if its operand expression evaluates to <span class="kw">false</span>, or a
-            </li> 
+            </li>
             <li>
                 <a href="#rule.conditional-compilation-primary">primary</a> expression that evaluates to
                 <span class="kw">true</span> if the conditional compilation symbol operand is defined and
@@ -2540,7 +2561,7 @@
     <h2 id="access-specifiers">5 Access Specifiers</h2>
 
     <p>
-        Access specifiers are used to grant or reject access to a program entity from another program entity. 
+        Access specifiers are used to grant or reject access to a program entity from another program entity.
     </p>
 
     <h3 id="access-specifiers-syntax">5.1 Syntax</h3>
@@ -2563,7 +2584,7 @@
             <span class="kw">public</span> access grants access from everywhere.
         </li>
         <li>
-            <span class="kw">protected</span> access grants access for an entity defined 
+            <span class="kw">protected</span> access grants access for an entity defined
             within the same or derived class and rejects it for other entities.
         </li>
         <li>
@@ -2571,14 +2592,14 @@
             within the same class and rejects it for other entities.
         </li>
         <li>
-            <span class="kw">internal</span> access grants access for an entity defined 
+            <span class="kw">internal</span> access grants access for an entity defined
             within the same program or library and rejects it for other entities.
         </li>
     </ul>
 
     <p>
-        If no access specifier is given, the default access for a namespace-level entity is 
-        <span class="kw">internal</span> access, and for a class-level entity it is 
+        If no access specifier is given, the default access for a namespace-level entity is
+        <span class="kw">internal</span> access, and for a class-level entity it is
         <span class="kw">private</span> access.
     </p>
 
@@ -2613,11 +2634,11 @@
             <td class="rcontent">
                 <span class="rule"><a href="#rule.primary-type-expr">primary&#8209;type&#8209;expr</a></span>
                 (
-                    <span class="rule"><a href="#rule.member">member</a></span> |
-                    <span class="rule"><a href="#rule.pointer">pointer</a></span> |
-                    <span class="rule"><a href="#rule.rvalue-ref">rvalue&#8209;ref</a></span> |
-                    <span class="rule"><a href="#rule.lvalue-ref">lvalue&#8209;ref</a></span> |
-                    <span class="rule"><a href="#rule.array">array</a></span> 
+                <span class="rule"><a href="#rule.member">member</a></span> |
+                <span class="rule"><a href="#rule.pointer">pointer</a></span> |
+                <span class="rule"><a href="#rule.rvalue-ref">rvalue&#8209;ref</a></span> |
+                <span class="rule"><a href="#rule.lvalue-ref">lvalue&#8209;ref</a></span> |
+                <span class="rule"><a href="#rule.array">array</a></span>
                 )*
             </td>
         </tr>
@@ -2633,7 +2654,7 @@
             <td class="rule" id="rule.pointer">pointer</td>
             <td class="sep">&rarr;</td>
             <td class="rcontent">
-                <span class="mono">*</span> 
+                <span class="mono">*</span>
             </td>
         </tr>
         <tr>
@@ -2663,7 +2684,7 @@
             <td class="rule" id="rule.primary-type-expr">primary&#8209;type&#8209;expr</td>
             <td class="sep">&rarr;</td>
             <td class="rcontent">
-                <span class="rule"><a href="#rule.basic-type">basic&#8209;type</a></span> | 
+                <span class="rule"><a href="#rule.basic-type">basic&#8209;type</a></span> |
                 <span class="rule"><a href="#rule.template-id">template&#8209;id</a></span> |
                 <span class="rule"><a href="#rule.identifier">identifier</a></span>
             </td>
@@ -2676,8 +2697,8 @@
                 <span class="mono">&lt;</span>
                 <span class="rule"><a href="#rule.type-expr">type&#8209;expr</a></span>
                 (
-                    <span class="mono">,</span>
-                    <span class="rule"><a href="#rule.type-expr">type&#8209;expr</a></span>
+                <span class="mono">,</span>
+                <span class="rule"><a href="#rule.type-expr">type&#8209;expr</a></span>
                 )*
                 <span class="mono">&gt;</span>
             </td>
@@ -2694,11 +2715,11 @@
     <h3 id="const-qualifier">6.3 Const Qualifier</h3>
 
     <p>
-        A <a href="#rule.prefix-type-expr"><span class="kw">const</span></a> qualifier 
+        A <a href="#rule.prefix-type-expr"><span class="kw">const</span></a> qualifier
         indicates an intent that an object is not ment to be changed.
-        For example, type expression <span class="kw">const</span> <em>T</em><span class="mono">&amp</span>; 
-        declares a reference to constant <em>T</em> type, and 
-        <span class="kw">const</span> <em>T</em><span class="mono">*</span> 
+        For example, type expression <span class="kw">const</span> <em>T</em><span class="mono">&amp</span>;
+        declares a reference to constant <em>T</em> type, and
+        <span class="kw">const</span> <em>T</em><span class="mono">*</span>
         declares a pointer to constant <em>T</em> type.
     </p>
 
@@ -2706,7 +2727,7 @@
 
     <p>
         A <a href="#rule.member">member</a> access in a type expression
-        is used for accesssing a member of a <a href="#namespaces">namespace</a> or a <a href="#classes">class type</a>.
+        is used for accesssing a member of a <a href="#namespace">namespace</a> or a <a href="#classes">class type</a>.
         For example, if <em>N</em> is a namespace that contains type <em>T</em>,
         type expression <em>N</em><span class="mono">.</span><em>T</em> <span class="mono">*</span>
         declares a pointer to type <em>T</em> in namespace <em>N</em> type.
@@ -2716,7 +2737,7 @@
 
     <p>
         A <a href="#rule.pointer">pointer</a> qualifier is used for declaring pointer types.
-        The value of a pointer object is the memory address of the object it points to or it can be 
+        The value of a pointer object is the memory address of the object it points to or it can be
         a special <a href="#null-literal"><span class="kw">null</span></a> value that means it does not point to any object.
         The default value of a pointer type object is <span class="kw">null</span>.
     </p>
@@ -2729,9 +2750,9 @@
     <h4 id="generic-pointer-type">6.5.1 Generic Pointer Type</h4>
 
     <p>
-        The <span class="kw">void</span><span class="mono">*</span> type represents a 
-        generic point type. Its value is a memory address or <span class="kw">null</span> value 
-        just like the value of other pointer types but it does not have information about the 
+        The <span class="kw">void</span><span class="mono">*</span> type represents a
+        generic point type. Its value is a memory address or <span class="kw">null</span> value
+        just like the value of other pointer types but it does not have information about the
         type of an object it points to, it is a bare memory address.
         Other pointer types have an implicit conversion to the generic pointer type and
         the generic pointer type can be explicitly casted to any other pointer type.
@@ -2743,19 +2764,19 @@
     <p>
         The <a href="#rule.lvalue-ref">lvalue</a> and <a href="#rule.rvalue-ref">rvalue</a> reference qualifiers are
         used for declaring reference types.
-        A reference always refers to some other object, it has no default value and it cannot be <span class="kw">null</span>. 
-        A reference is bound to the object it refers to when it is created and it always refers to the same object for the 
+        A reference always refers to some other object, it has no default value and it cannot be <span class="kw">null</span>.
+        A reference is bound to the object it refers to when it is created and it always refers to the same object for the
         whole lifetime of it. When a reference is used as the left operand of an assignment, a new value is assigned
         to the object the reference refers to. When it is used as an operand in an expression, the value of the
-        object the reference refers to is retrieved. In that sense it can be throught of as being an 
+        object the reference refers to is retrieved. In that sense it can be throught of as being an
         "automatically dereferenced pointer".
     </p>
 
     <h4 id="lvalue-reference-type">6.6.1 Lvalue Reference Type</h4>
 
-    Lvalue reference types are typically used for passing parameters by reference or by reference-to-const.
-    Only a variable or derefenced pointer can be bound to a nonconstant reference parameter.
-    A <a href="#literals">literal</a> can also be bound to a parameter that is a reference-to-const. 
+    Lvalue reference types are typically used for passing parameters by reference or by reference-to-const, or returning a reference to a member variable.
+    Only a variable, a derefenced pointer or an array element can be bound to a nonconstant reference parameter.
+    A <a href="#literals">literal</a> can also be bound to a parameter that is a reference-to-const.
     In that case the literal value is assigned to a temporary variable that is passed as a parameter.
 
     <h4 id="rvalue-reference-type">6.6.2 Rvalue Reference Type</h4>
@@ -2769,7 +2790,7 @@
     <p>
         An <a href="#rule.array">array</a> qualifier is used for declaring an array type. An array is a sequence of objects of the same type.
         If that type is a pointer type the objects pointed to can actually be of different types though.
-        An expression inside the square brackets is the length of the array. 
+        An expression inside the square brackets is the length of the array.
         It is optional for constant arrays for which the compiler can calculate the length of the array from its initializing expression.
         If the length of the constant array is specified it must match the length of the array initializer.
     </p>
@@ -2792,7 +2813,7 @@
     <p>
         A <a href="#rule.constant">constant</a> represents either a simple value of a <a href="#basic-types">basic</a> or
         <a href="#enumerations">enumerated</a> type,
-        or an <a href="#array-type">array</a> or <a href="#literal-class">structure</a> of values that the compiler must be 
+        or an <a href="#array-type">array</a> or <a href="#literal-class">structure</a> of values that the compiler must be
         able to evaluate at compile time.
     </p>
 
@@ -2867,12 +2888,12 @@
         <br />
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span> <span class="kw">const</span> <span class="kw">int</span> <span class="var">meaningOfLife</span> <span class="mono">=</span> <span class="mono">42</span><span class="mono">;</span><br />
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span> <span class="kw">const</span> <span class="kw">double</span> <span class="var">pi</span> <span class="mono">=</span> <span class="mono">3.1415926</span><span class="mono">;</span><br />
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span> <span class="kw">const</span> <span class="kw">int[]</span> <span class="var">numberArray</span> <span class="mono">= [</span><span class="mono">1</span><span class="mono">,</span> <span class="mono">2</span><span class="mono">,</span> <span class="mono">3</span><span class="mono">]</span><span class="mono">;</span><br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span> <span class="kw">const</span> <span class="kw">int[]</span> <span class="var">numberArray</span> <span class="mono">= [</span><span class="mono">1</span><span class="mono">,</span> <span class="mono">2</span><span class="mono">,</span> <span class="mono">3</span><span class="mono">]</span><span class="mono">;</span><br />
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span> <span class="kw">const</span> <span class="kw">long</span> <span class="var">lengthOfNumberArray</span> <span class="mono">=</span> <span class="var">numberArray.Length()</span><span class="mono">;</span><br />
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span> <span class="kw">const</span> <span class="var">LiteralClass</span> <span class="var">literalClass</span> <span class="mono">= {</span><span class="mono">1 + 2 * 3</span><span class="mono">,</span> <span class="mono">Min(pi, 4.13)</span><span class="mono">};</span><br />
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span> <span class="kw">const</span> <span class="kw">double</span> <span class="var">y</span> <span class="mono">= </span><span class="var">literalClass.Y()</span><span class="mono">;</span><br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span> <span class="kw">const</span> <span class="kw">double</span> <span class="var">y</span> <span class="mono">= </span><span class="var">literalClass.Y()</span><span class="mono">;</span><br />
     </p>
-    
+
 
     <h2 id="enumerations">8 Enumerations</h2>
 
@@ -2890,7 +2911,7 @@
                 <span class="rule"><a href="#rule.access-specifier">access&#8209;specifier</a></span>?
                 <span class="kw">enum</span>
                 <span class="rule"><a href="#rule.enumerated-type-name">enumerated&#8209;type&#8209;name</a></span>
-                <span class="rule"><a href="#rule.underlying-type">underlying&#8209;type</a></span>?<br/>
+                <span class="rule"><a href="#rule.underlying-type">underlying&#8209;type</a></span>?<br />
                 <span class="mono">{</span>
                 <span class="rule"><a href="#rule.enumeration-constants">enumeration&#8209;constants</a></span>
                 <span class="mono">}</span>
@@ -2977,7 +2998,7 @@
     <p>
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span> <span class="kw">enum</span> <span class="var">TrafficLight</span><br />
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="mono">{</span><br />
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="var">green, yellow, red</span><br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="var">green, yellow, red</span><br />
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="mono">}</span><br />
         <br />
 
@@ -3007,15 +3028,15 @@
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="var">Permission permissions </span><span class="mono">=</span> <span class="kw">cast</span><span class="mono">&lt;</span><span class="var">Permission</span><span class="mono">&gt;</span><span class="var">(Permission.read</span> <span class="mono">|</span> <span class="var">Permission.write)</span><span class="mono">;</span><br />
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="mono">}</span><br />
     </p>
-    
+
 
     <h2 id="functions">9 Functions</h2>
 
     <p>
-        A function represents computation that can be <a href="#invocation-expression">invoked</a> at run time and in simple cases also at compile time. 
-        The computation is defined by the <em>body</em> of the function. 
-        The body is a <a href="#compound-statement">compound statement</a> that contains statements that define the control flow of the function. 
-        Invocation of a function may yield a value, or the function can be a <span class="kw">void</span> function that is invoked for its 
+        A <a href="#rule.function">function</a> represents computation that can be <a href="#invocation-expression">invoked</a> at run time and in simple cases also at compile time.
+        The computation is defined by the <em>body</em> of the function.
+        The body is a <a href="#compound-statement">compound statement</a> that contains statements that define the control flow of the function.
+        Invocation of a function may yield a value, or the function can be a <span class="kw">void</span> function that is invoked for its
         <em><a href="http://en.wikipedia.org/wiki/Side_effect_(computer_science)">side-effects</a></em>.
     </p>
 
@@ -3155,7 +3176,7 @@
             </td>
         </tr>
         <tr>
-            <td class="rule" id="rule.parameter-type">parameter&#8209;name</td>
+            <td class="rule" id="rule.parameter-name">parameter&#8209;name</td>
             <td class="sep">&rarr;</td>
             <td class="rcontent">
                 <span class="rule"><a href="#rule.identifier">identifier</a></span>
@@ -3174,31 +3195,31 @@
     </p>
 
     <!-- <iframe src="../code/strlen/strlen.cm.html" height="300px" width="800px" style="border:none;"></iframe>-->
-    
+
     <h3 id="functions-constexpr">9.3 Constexpr Specifier</h3>
 
     <p>
         The <span class="kw">constexpr</span> specifier enables compile time evaluation of a function when the function arguments are
-        <a href="#constant-expression">constant expressions</a>. 
+        <a href="#constant-expression">constant expressions</a>.
         If the evaluation succeeds, the function call is substituted by the compile time constant that is the result of the evaluation.
-        A <span class="kw">constexpr</span> function can be used also in cases when the arguments are <em>not</em> constant expressions. 
-        In those cases the function is called just like a regular function. This saves from having to write two versions of 
+        A <span class="kw">constexpr</span> function can be used also in cases when the arguments are <em>not</em> constant expressions.
+        In those cases the function is called just like a regular function. This saves from having to write two versions of
         the same function, a <span class="kw">constexpr</span> and a non-<span class="kw">constexpr</span> version.
     </p>
 
     <p>
         A <span class="kw">constexpr</span> function cannot have the following kinds of statements:
-        <a href="#rule.goto-statement">goto</a>, <a href="#rule.range-for-statement">range-for</a>, 
+        <a href="#rule.goto-statement">goto</a>, <a href="#rule.range-for-statement">range-for</a>,
         <a href="#rule.delete-statement">delete</a>, <a href="#rule.destroy-statement">destroy</a>,
-        <a href="#rule.switch-statement">switch</a>, <a href="#rule.case-statement">case</a>, 
+        <a href="#rule.switch-statement">switch</a>, <a href="#rule.case-statement">case</a>,
         <a href="#rule.default-statement">default</a>, <a href="#rule.goto-case-statement">goto case</a>,
-        <a href="#rule.goto-default-statement">goto default</a>, <a href="#rule.throw-statement">throw</a>, 
+        <a href="#rule.goto-default-statement">goto default</a>, <a href="#rule.throw-statement">throw</a>,
         <a href="#rule.try-statement">try</a>, or a <a href="#rule.conditional-compilation-statement">conditional compilation</a>
         statement.
     </p>
 
     <p>
-        Often <span class="kw">constexpr</span> specifier is combined with <a href="#functions-inline"><span class="kw">inline</span></a> and 
+        Often <span class="kw">constexpr</span> specifier is combined with <a href="#functions-inline"><span class="kw">inline</span></a> and
         <a href="#functions-nothrow"><span class="kw">nothrow</span></a> specifiers because <span class="kw">constexpr</span> functions are
         typically short and do not throw exceptions.
     </p>
@@ -3210,11 +3231,11 @@
     <h3 id="functions-inline">9.4 Inline Specifier</h3>
 
     <p>
-        The <span class="kw">inline</span> specifier is a hint to the compiler that the function should be inlined 
+        The <span class="kw">inline</span> specifier is a hint to the compiler that the function should be inlined
         when the program is compiled using release configuration.
         When a function is inlined, a function call is substituted by the body of the function,
         so it is best used for short functions.
-        Function inlining avoids a function call overhead and increase other optimizing opportunities so that the 
+        Function inlining avoids a function call overhead and increase other optimizing opportunities so that the
         generated code can be adapted to the arguments of the function call.
         Function inlining helps the compiler generating efficient code.
     </p>
@@ -3222,7 +3243,7 @@
     <h3 id="functions-cdecl">9.5 CDecl Specifier</h3>
 
     <p>
-        The <span class="kw">cdecl</span> specifier disables name mangling. 
+        The <span class="kw">cdecl</span> specifier disables name mangling.
         Name mangling makes it possible to have many functions with the same <a href="#function-group-name">group name</a> but different parameter types.
         When name mangling is disabled there can be only a single function with the given group name in the whole program and all libraries it uses.
         The <span class="kw">cdecl</span> specifier can ease interoperability with libraries written in other languages.
@@ -3245,8 +3266,8 @@
     <h3 id="functions-throw">9.8 Throw Specifier</h3>
 
     <p>
-        The <span class="kw">throw</span> specifier can be used to emphasize the fact that a function may throw exceptions. 
-        It has no additional semantics compared to a function without the <span class="kw">throw</span> specifier and it has 
+        The <span class="kw">throw</span> specifier can be used to emphasize the fact that a function may throw exceptions.
+        It has no additional semantics compared to a function without the <span class="kw">throw</span> specifier and it has
         purely informational value.
     </p>
 
@@ -3256,27 +3277,28 @@
         When the function definition has a <a href="#rule.template-parameter-list">template parameter list</a> and possibly a <a href="#rule.where-constraint">constraint</a>,
         it defines a <em>function template</em>.
         The compiler <em>instantiates</em>, or creates a specialized version from the function template for each different set of argument types.
-        When a function is instantiated, the <a href="#rule.template-parameter">template parameters</a> of the function template 
-        are substituted by concrete types and the function is compiled using those substituted types.
+        When a function is instantiated, the <a href="#rule.template-parameter">template parameters</a> of the function template
+        are substituted with concrete types and the function is compiled using those substituted types.
         The concrete types can be specified in the function call by using a <a href="#rule.template-id">template-id</a>, or if not specified, they can be automatically deduced by the compiler
         from the argument types of the function call.
     </p>
 
     <p>
-        Function templates participate in <a href="#overload-resolution">overload resolution</a>. 
-        When two or more function templates have the same <a href=#function-group-name>group name</a> and number of parameters but different 
-        <a href="#where-constraint">constraints</a> they are overloaded based on those constraints. 
-        The compiler checks the constraints in the function call site by substituting the type parameters in the contraints by the concrete types in the function call 
-        and accepts or rejects overloads according to whether the constraints are satisfied or not. If two or more function templates satisfy the constraints, 
-        the compiler selects the one having most strict constraints. 
+        Function templates participate in <a href="#overload-resolution">overload resolution</a>.
+        When two or more function templates have the same <a href=#function-group-name>group name</a> and number of parameters but different
+        <a href="#where-constraint">constraints</a> they are overloaded based on those constraints.
+        The compiler checks the constraints in the function call site by substituting the type parameters in the contraints by the concrete types in the function call
+        and accepts or rejects overloads according to whether the constraints are satisfied or not. If two or more function templates satisfy the constraints,
+        the compiler selects the one having most strict constraints.
     </p>
 
     <p>
         For example, see the <a href="../library/System.Base/System.Base.html#function_group_Next_3F376F15397ED19B4B36DC08482D988F68581D43">Next</a> function templates in the system library.
         If a <em>Next</em> function is called with a type that satisfies both the <a href="../library/System.Base/System.Base.html#concept_ForwardIterator_4C777D423CF589B8535F29F910C025990ED656D4">
-        ForwardIterator</a> concept and the <a href="../library/System.Base/System.Base.html#concept_RandomAccessIterator_A5A1B6A4EC8E181A67C733002B3BE437554D3484">RandomAccessIterator</a> concept,
-        the random access function overload is called because 
-        <a href="../library/System.Base/System.Base.html#concept_RandomAccessIterator_A5A1B6A4EC8E181A67C733002B3BE437554D3484">RandomAccessIterator</a> refines 
+            ForwardIterator
+        </a> concept and the <a href="../library/System.Base/System.Base.html#concept_RandomAccessIterator_A5A1B6A4EC8E181A67C733002B3BE437554D3484">RandomAccessIterator</a> concept,
+        the random access function overload is called because
+        <a href="../library/System.Base/System.Base.html#concept_RandomAccessIterator_A5A1B6A4EC8E181A67C733002B3BE437554D3484">RandomAccessIterator</a> refines
         <a href="../library/System.Base/System.Base.html#concept_BidirectionalIterator_96C10B73881A17B6DC9C0804E7DF2141C2E58DA6">BidirectionalIterator</a> concept that refines
         <a href="../library/System.Base/System.Base.html#concept_ForwardIterator_4C777D423CF589B8535F29F910C025990ED656D4">ForwardIterator</a> concept.
     </p>
@@ -3285,14 +3307,22 @@
         For an example of a function template, see <a href="../code/min/min.cm.html">min.cm</a>.
     </p>
 
-    <h3 id="overload-resolution">9.10 Function Overload Resolution</h3>
+    <h3 id="intrinsic-function">9.10 Intrinsic Functions</h3>
+
+    <p>
+        Functions in <a href="../library/System.Base/System.Base.html#System.Meta">System.Meta</a> namespace are <em>intrinsic functions</em>.
+        Intrinsic functions can be called just like regular functions, but they are special in the sense that they are not compiled from source code as regular functions are, 
+        but they are implemented internally inside of the compiler.
+    </p>
+
+    <h3 id="overload-resolution">9.11 Function Overload Resolution</h3>
 
     <p>
         Overload resolution is done in three stages:
     </p>
     <ol>
         <li>
-            First the compiler searches the symbol table for <em>viable functions</em>. 
+            First the compiler searches the symbol table for <em>viable functions</em>.
             A viable function is a function that has given <a href="#function-group-name">group name</a> and <a href="#function-arity">arity</a>.
         </li>
         <li>
@@ -3301,7 +3331,7 @@
             </p>
 
             <p>
-                If the viable function is not a function template, it becomes an overload candidate if there exists a valid sequence of conversions from each argument type 
+                If the viable function is not a function template, it becomes an overload candidate if there exists a valid sequence of conversions from each argument type
                 to the corresponding parameter type of the viable function. The sequence of needed conversions is memorized for the final stage.
             </p>
             <p>
@@ -3309,23 +3339,23 @@
                 In this case the viable function can be rejected because arguments cannot be bound or there is no valid conversion sequence for a bound parameter.
             </p>
             <p>
-                If the viable function is a constrained function template, after successfully binding the argument types,  
+                If the viable function is a constrained function template, after successfully binding the argument types,
                 the constraint is checked by substituting parameter types in the constraint with bound argument types.
-                In this case the viable function can be rejected because the constraint is not satisfied. Otherwise the viable function survives to be an overload candidate and its 
+                In this case the viable function can be rejected because the constraint is not satisfied. Otherwise the viable function survives to be an overload candidate and its
                 constraint is memorized for the final stage.
             </p>
         </li>
         <li>
             Finally, if there are no overload candidates survived to this stage, the compiler issues an overload not found error.
-            Otherwise, the set of overload candidates is sorted according to ordering rules that take into account the number, kind and <a href="#conversion-distance">distance</a> of needed conversions and 
+            Otherwise, the set of overload candidates is sorted according to ordering rules that take into account the number, kind and <a href="#conversion-distance">distance</a> of needed conversions and
             a possible <a href="#where-constraint">constraint</a> for those overload candidates that are function templates.
-            If a single best overload is found according to the ordering rules, the function call resolves to it, 
+            If a single best overload is found according to the ordering rules, the function call resolves to it,
             otherwise the compiler issues an ambiguous overload resolution error and lists equally good overload candidates.
         </li>
     </ol>
 
     <p>
-        Actually the overload resolution can be issued maximum of three times with different argument combinations to resolve a single function call, 
+        Actually the overload resolution can be issued maximum of three times with different argument combinations to resolve a single function call,
         because member functions have an implicit <em>this</em> parameter that can be bound to the receiver or to the current <em>this</em> parameter if the call is issued from inside a member function.
     </p>
 
@@ -3338,7 +3368,7 @@
         First compare the argument conversions to <em>a</em> and <em>b</em>:
         For all arguments, count the number of <em>better argument conversion</em> to <em>a</em> compared to <em>b</em>.
         If the number of better argument conversions to <em>a</em> is greater than to <em>b</em>, <em>a</em> is better than <em>b</em>.
-        The better argument conversion means that no conversion is better than a conversion, 
+        The better argument conversion means that no conversion is better than a conversion,
         and when both have a conversion, a smaller <a href="#conversion-distance">conversion distance</a> is better than greater distance.
     </p>
 
@@ -3346,7 +3376,7 @@
         Then, if <em>a</em> is not a function template and <em>b</em> is a function template, <em>a</em> is better than <em>b</em>. This is to ensure we don't have to instantiate the same function template for
         the same argument types many times.
     </p>
-        
+
     <p>
         Then, if <em>a</em> is not a function template specialization and <em>b</em> is a function template specialization, <em>a</em> is better than <em>b</em>.
     </p>
@@ -3362,7 +3392,7 @@
     <h2 id="typedefs">10 Typedefs</h2>
 
     <p>
-        A <a href="#rule.typedef">typedef</a> instroduces a named alias for a <a href="#type-expressions">type expression</a>.
+        A <a href="#rule.typedef">typedef</a> introduces an alias name for a <a href="#type-expressions">type expression</a>.
     </p>
 
     <h3 id="typedefs-syntax">10.1 Syntax</h3>
@@ -3384,7 +3414,7 @@
     <h3 id="typedefs-examples">10.2 Examples</h3>
 
     <p>
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public typedef</span> <span class="var">String</span><span class="mono">&lt;</span><span class="kw">char</span><span class="mono">&gt;</span> <span class="var">string</span><span class="mono">;</span><br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public typedef</span> <span class="var">String</span><span class="mono">&lt;</span><span class="kw">char</span><span class="mono">&gt;</span> <span class="var">string</span><span class="mono">;</span><br />
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public typedef</span> <span class="var">String</span><span class="mono">&lt;</span><span class="kw">wchar</span><span class="mono">&gt;</span> <span class="var">wstring</span><span class="mono">;</span><br />
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public typedef</span> <span class="var">String</span><span class="mono">&lt;</span><span class="kw">uchar</span><span class="mono">&gt;</span> <span class="var">ustring</span><span class="mono">;</span><br />
     </p>
@@ -3408,7 +3438,7 @@
                 <span class="rule"><a href="#rule.class-name">class&#8209;name</a></span>
                 <span class="rule"><a href="#rule.template-parameter-list">template&#8209;parameter&#8209;list</a></span>?
                 <span class="rule"><a href="#rule.inheritance-and-implemented-interfaces">inheritance&#8209;and&#8209;implemented&#8209;interfaces</a></span>?
-                <span class="rule"><a href="#rule.where-constraint">where&#8209;constraint</a></span>?<br/>
+                <span class="rule"><a href="#rule.where-constraint">where&#8209;constraint</a></span>?<br />
                 <span class="mono">{</span>
                 <span class="rule"><a href="#rule.class-content">class&#8209;content</a></span>
                 <span class="mono">}</span>
@@ -3419,7 +3449,7 @@
             <td class="sep">&rarr;</td>
             <td class="rcontent">
                 (<span class="rule"><a href="#rule.access-specifier">access&#8209;specifier</a></span> |
-                <span class="kw">abstract</span> | 
+                <span class="kw">abstract</span> |
                 <span class="kw">static</span>)*
             </td>
         </tr>
@@ -3444,7 +3474,7 @@
             <td class="rule" id="rule.base-class-or-interface">base&#8209;class&#8209;or&#8209;interface</td>
             <td class="sep">&rarr;</td>
             <td class="rcontent">
-                <span class="rule"><a href="#rule.template-id">template&#8209;id</a></span> | 
+                <span class="rule"><a href="#rule.template-id">template&#8209;id</a></span> |
                 <span class="rule"><a href="#rule.qualified-id">qualified&#8209;id</a></span>
             </td>
         </tr>
@@ -3459,17 +3489,17 @@
             <td class="rule" id="rule.class-member">class&#8209;member</td>
             <td class="sep">&rarr;</td>
             <td class="rcontent">
-                <span class="rule"><a href="#rule.static-constructor">static&#8209;constructor</a></span> | 
+                <span class="rule"><a href="#rule.static-constructor">static&#8209;constructor</a></span> |
                 <span class="rule"><a href="#rule.constructor">constructor</a></span> |
-                <span class="rule"><a href="#rule.destructor">destructor</a></span> | 
-                <span class="rule"><a href="#rule.member-function">member&#8209;function</a></span> | 
+                <span class="rule"><a href="#rule.destructor">destructor</a></span> |
+                <span class="rule"><a href="#rule.member-function">member&#8209;function</a></span> |
                 <span class="rule"><a href="#rule.conversion-function">conversion&#8209;function</a></span> |
                 <span class="rule"><a href="#rule.member-variable">member&#8209;variable</a></span> |
                 <span class="rule"><a href="#rule.typedef">typedef</a></span> |
-                <span class="rule"><a href="#rule.class">class</a></span> | 
+                <span class="rule"><a href="#rule.class">class</a></span> |
                 <span class="rule"><a href="#rule.constant">constant</a></span> |
-                <span class="rule"><a href="#rule.enumerated-type">enumerated&#8209;type</a></span> | 
-                <span class="rule"><a href="#rule.delegate">delegate</a></span> | 
+                <span class="rule"><a href="#rule.enumerated-type">enumerated&#8209;type</a></span> |
+                <span class="rule"><a href="#rule.delegate">delegate</a></span> |
                 <span class="rule"><a href="#rule.class-delegate">class&#8209;delegate</a></span>
             </td>
         </tr>
@@ -3560,10 +3590,10 @@
             <td class="rcontent">
                 (<span class="rule"><a href="#rule.access-specifier">access&#8209;specifier</a></span> |
                 <span class="kw">constexpr</span> |
-                <span class="kw">explicit</span> | 
+                <span class="kw">explicit</span> |
                 <span class="kw">inline</span> |
                 <span class="kw">default</span> |
-                <span class="kw">suppress</span> | 
+                <span class="kw">suppress</span> |
                 <span class="kw">nothrow</span> |
                 <span class="kw">throw</span>)*
             </td>
@@ -3696,8 +3726,8 @@
         A <span class="kw">static</span> class can have only
         <ul>
             <li>a <a href="#static-constructor">static constructor</a>,</li>
-            <li><a href="#static-member-variable">static member variables</a>,</li>
-            <li><a href="#static-member-function">static member functions</a>,</li>
+            <li>static <a href="#member-variables">member variables</a>,</li>
+            <li>static <a href="#member-functions">member functions</a>,</li>
             <li><a href="#typedefs">typedefs</a>,</li>
             <li><a href="#constants">constants</a>,</li>
             <li><a href="#enumerations">enumerated types</a>,</li>
@@ -3712,8 +3742,8 @@
 
     <h3 id="class-members">11.5 Class Members</h3>
 
-    A class can contain a <a href="#static-constructor">static constructor</a>, <a href="#constructor">constructors</a>, a <a href="#destructor">destructor</a>, 
-    other <a href="#member-functions">member functions</a>, <a href="#member-variables">member variables</a>, <a href="#typedefs">typedefs</a>, classes, <a href="#constants">constants</a>, 
+    A class can contain a <a href="#static-constructor">static constructor</a>, <a href="#constructor">constructors</a>, a <a href="#destructor">destructor</a>,
+    other <a href="#member-functions">member functions</a>, <a href="#member-variables">member variables</a>, <a href="#typedefs">typedefs</a>, classes, <a href="#constants">constants</a>,
     <a href="#enumerations">enumerated types</a>, <a href="#delegates">delegate types</a> and <a href="#class-delegates">class delegate types</a>.
 
     <h4 id="static-constructor">11.5.1 Static Constructor</h4>
@@ -3726,7 +3756,7 @@
     <p>
         A static constructor is typically used in classes that need <em>one-time initialization</em>. An example of such a class is a <a href="http://en.wikipedia.org/wiki/Singleton_pattern">singleton</a>.
         Each static constructor is guarded by a recursive mutex and a Boolean flag provided by the Cmajor runtime. They ensure together that initialization is thread-safe and happens exactly once.
-        A static constructor gets executed before control arrives to the body of a constructor or a static member function of the same class, or 
+        A static constructor gets executed before control arrives to the body of a constructor or a static member function of the same class, or
         before a static member variable of a class is accessed from outside of the class.
     </p>
 
@@ -3735,22 +3765,22 @@
         The singleton is accessed using the static <em>Instance()</em> member function. Before <em>Instance()</em> returns a reference to a static <em>instance</em> member variable,
         the static constructor gets executed if it has not already been executed.
         The static constructor creates an instance of the PhoneBook class that assigns it to a static <em>instance</em> member variable.
-        Creating an instance of the PhoneBook class involves calling the default constructor of the class that in turn calls the static constructor. 
-        But this time the initialization flag provided by the runtime has already been set so control returns from the static constructor right away. 
+        Creating an instance of the PhoneBook class involves calling the default constructor of the class that in turn calls the static constructor.
+        But this time the initialization flag provided by the runtime has already been set so control returns from the static constructor right away.
     </p>
 
     <p>
         In the start of the static constructor the language implementation checks whether the initialization flag is set.
         If it has been set the control returns and the body of the static constructor is not executed.
         Otherwise the language implementation next locks the recursive mutex, and then checks again whether the the initialization flag is set and unlocks the mutex and returns if it is set.
-        This is called the <a href="http://en.wikipedia.org/wiki/Double-checked_locking">double checked locking pattern</a>. 
+        This is called the <a href="http://en.wikipedia.org/wiki/Double-checked_locking">double checked locking pattern</a>.
         Otherwise the initialization has not yet been done, so the language implementation sets the initialization flag to true, executes the body of the static constructor, unlocks the mutex and returns.
-    </p>        
+    </p>
 
     <p>
-        Like a destructor, a static constructor should not throw any exceptions. 
-        Although the implementation ensures that the recursive mutex gets unlocked regardless whether control leaves the body of the static constructor normally or by throwing an exception, 
-        things won't probably work, because critical data has not been fully initialized. When it comes to exceptions, the static constructor should handle them all gracefully, 
+        Like a destructor, a static constructor should not throw any exceptions.
+        Although the implementation ensures that the recursive mutex gets unlocked regardless whether control leaves the body of the static constructor normally or by throwing an exception,
+        things won't probably work, because critical data has not been fully initialized. When it comes to exceptions, the static constructor should handle them all gracefully,
         or give up and exit the program.
     </p>
 
@@ -3758,7 +3788,7 @@
         If the class having a static constructor has a member variable that has a <a href="#nontrivial-destructor">nontrivial destructor</a>, the class should implement a destructor.
         If the destructor does not have other things to do besides calling destructors of the member variables, this can be done by using a <em>default</em> destructor:
         <blockquote>
-            <span class="kw">public class </span><span class="var">MyClass</span><br/>
+            <span class="kw">public class </span><span class="var">MyClass</span><br />
             <span class="mono">{</span><br />
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// ...<br />
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public default</span> ~<span class="var">MyClass()</span><span class="mono">;</span><br />
@@ -3769,7 +3799,7 @@
     <h4 id="constructor">11.5.2 Constructors</h4>
 
     <p>
-        A <a href="#rule.constructor">constructor</a> is a special member function that creates an object of the class it belongs to. 
+        A <a href="#rule.constructor">constructor</a> is a special member function that creates an object of the class it belongs to.
         The task of a constructor is to initialize member variables and allocate resources. Memory is also considered as a kind of resource.
         The name of the constructor must be the name of the class that contains it.
     </p>
@@ -3787,7 +3817,7 @@
             A <a href="#rule.this-initializer"><span class="kw">this</span> initializer</a> delegates the initialization of some of the member variables to another constructor of the same class.
             The constructor called is resolved using <a href="#overload-resolution">overload resolution</a> and takes the number and type of arguments of the this-initializer into account.
             There can be at most one this-initializer in an initializer list and if an initializer list has a this-initializer it cannot have a base-initializer.
-        </li> 
+        </li>
         <li>
             A <a href="#rule.base-initializer"><span class="kw">base</span> initializer</a> calls a constructor of the base class to initialize inherited member variables.
             The base class constructor called is resolved using <a href="#overload-resolution">overload resolution</a> and takes the number and type of arguments of the base-initializer into account.
@@ -3796,8 +3826,8 @@
         <li>
             A <a href="#rule.member-variable-initializer">member variable initializer</a> initializes a member variable of given name with supplied arguments.
             If the member variable is of a class type, a constructor of that class is called with given arguments.
-            If there is no member variable initializer for a specific member variable in the initializer list, 
-            that member variable will be <a href="#default-initialization">default initialized</a>, copied or moved regarding whether we are in a <a href="#default-constructor">default</a> 
+            If there is no member variable initializer for a specific member variable in the initializer list,
+            that member variable will be <a href="#default-initialization">default initialized</a>, copied or moved regarding whether we are in a <a href="#default-constructor">default</a>
             or other constructor, in a <a href="#copy-constructor">copy constructor</a> or in a <a href="#move-constructor">move constructor</a> respectively.
         </li>
     </ul>
@@ -3840,12 +3870,12 @@
     <h5 id="copy-constructor">Copy Constructor</h5>
 
     <p>
-        The copy constructor has <a href="#function-signature">signature</a> 
+        The copy constructor has <a href="#function-signature">signature</a>
         <blockquote>
             <span class="var">ClassName(</span><span class="kw">const</span> <span class="var">ClassName&amp;)</span>
         </blockquote>
         It takes another object of the same class as an lvalue-reference-to-const parameter and typically copies members from that object by using an <a href="#rule.initializer-list">initializer list</a>.
-        If a class has no user-defined copy constructor, the compiler will generate one if it is needed. 
+        If a class has no user-defined copy constructor, the compiler will generate one if it is needed.
         The generated copy constructor will copy the value of a possible base class object and the values of all member variables from another object of the same class.
     </p>
 
@@ -3909,25 +3939,25 @@
                 If the class has a static constructor, that will be called first.
             </li>
             <li>
-                If the constructor has an <a href="#constructor-initializer-list">initializer list</a> that contains a this-initializer, it is called. 
+                If the constructor has an <a href="#constructor-initializer-list">initializer list</a> that contains a this-initializer, it is called.
             </li>
             <li>
                 Otherwise, if the constructor has an <a href="#constructor-initializer-list">initializer list</a> that contains a base-initializer, it is called.
                 It will in turn perform these same actions for the base class object.
             </li>
             <li>
-                Otherwise, if the class has a base class, the base class constructor is called. 
+                Otherwise, if the class has a base class, the base class constructor is called.
                 It will in turn perform these same actions for the base class object.
             </li>
             <li>
-                If the class is polymorphic and the this-initializer has not been called, 
+                If the class is polymorphic and the this-initializer has not been called,
                 the language implementation will now set the <a href="#vmt">VMT</a> pointer of the current class being constructed to the <a href="#vmt">VMT</a> pointer field of the current class object.
                 This ensures that if a user-defined constructor calls virtual member functions from its body, they are dispatched to member functions of the current class or its base class or ancestor class.
                 If they would be dispatched to the derived class member functions, they would have access to the not yet constructed member variables of the derived class.
             </li>
             <li>
-                For each member variable of the class in declaration order, if the member variable has an initializer, it is called, 
-                otherwise the member variable is <a href="#default-initialized">default initialized</a>, copied, or moved regarding whether we are in a default or other constructor, in a copy constructor, 
+                For each member variable of the class in declaration order, if the member variable has an initializer, it is called,
+                otherwise the member variable is <a href="#default-initialization">default initialized</a>, copied, or moved regarding whether we are in a default or other constructor, in a copy constructor,
                 or in a move constructor respectively.
             </li>
             <li>
@@ -3940,7 +3970,7 @@
     <h5 id="constructor-specifiers">Constructor Specifiers</h5>
 
     A constructor may have the following <a href="#rule.constructor-specifiers">specifiers</a>:
-    
+
     <ul>
         <li>
             An <a href="#access-specifiers">access specifier</a>.
@@ -3957,7 +3987,7 @@
             <span class="kw">inline</span>. This is a hint to the compiler that the constructor should be <a href="#functions-inline">inlined</a> if possible.
         </li>
         <li>
-            <span class="kw">default</span>. Can only be used for the <a href="#default-constructor">default constructor</a>, <a href="#copy-constructor">copy constructor</a> and 
+            <span class="kw">default</span>. Can only be used for the <a href="#default-constructor">default constructor</a>, <a href="#copy-constructor">copy constructor</a> and
             <a href="#move-constructor">move constructor</a>.
         </li>
         <li>
@@ -3971,7 +4001,7 @@
             <span class="kw">throw</span>. A throw constructor has the same semantics as a <a href="#functions-throw">nonmember throw function</a>.
         </li>
     </ul>
-    
+
 
     <h4 id="destructor">11.5.3 Destructor</h4>
 
@@ -3981,10 +4011,10 @@
     </p>
 
     <p>
-        If a class does not have a user-defined destructor and either the class is <a href="#polymorphic-class-type">polymorphic</a> or it has a member variable that has a 
-        <a href="#nontrivial-destructor">nontrivial destructor</a>, 
+        If a class does not have a user-defined destructor and either the class is <a href="#polymorphic-class-type">polymorphic</a> or it has a member variable that has a
+        <a href="#nontrivial-destructor">nontrivial destructor</a>,
         the compiler will generate a destructor for the class.
-        If the class has a polymorphic base class, the generated destructor will be set as overridden, otherwise, if the class is polymorphic, it will be set virtual, 
+        If the class has a polymorphic base class, the generated destructor will be set as overridden, otherwise, if the class is polymorphic, it will be set virtual,
         otherwise it will remain as a regular destructor.
     </p>
 
@@ -3992,7 +4022,7 @@
         Either if the class has a user-defined destructor or a compiler-generated one, the language implementation will complete it with the following actions:
         <ol>
             <li>
-                If the class is <a href="#polymorphic-class-type">polymorphic</a> the language implementation will first set the <a href="#vmt">VMT</a> pointer of the current class 
+                If the class is <a href="#polymorphic-class-type">polymorphic</a> the language implementation will first set the <a href="#vmt">VMT</a> pointer of the current class
                 being destroyed to the <a href="#vmt">VMT</a> pointer field of the current class object.
                 This ensures that if a user-defined destructor calls virtual member functions from its body, they are dispatched to member functions of the current class or its base class or ancestor class.
                 If they would be dispatched to the derived class member functions, they would have access to the already destroyed member variables of the derived class.
@@ -4001,7 +4031,7 @@
                 If the destructor is a user-defined one, the body of the destructor is executed.
             </li>
             <li>
-                For each member variable of the class in reverse declaration order, if the member variable is of a class that has a <a href="#nontrivial-destructor">nontrivial destructor</a>, 
+                For each member variable of the class in reverse declaration order, if the member variable is of a class that has a <a href="#nontrivial-destructor">nontrivial destructor</a>,
                 the member variable destructor is called.
             </li>
             <li>
@@ -4014,7 +4044,7 @@
         A destructor may have the following <a href="#rule.destructor-specifiers">specifiers</a>:
         <ul>
             <li>
-                <span class="kw">public</span>. 
+                <span class="kw">public</span>.
                 Destructor cannot be <span class="kw">private</span>, <span class="kw">protected</span> or <span class="kw">internal</span>.
             </li>
             <li>
@@ -4024,7 +4054,7 @@
                 <span class="kw">override</span>. A class that directly or indirectly derives from a class that has a virtual or overridden destructor may override the destructor.
             </li>
             <li>
-                <span class="kw">default</span>. If the destructor does not have other actions to do in addition to destroying member variables and a base class object, 
+                <span class="kw">default</span>. If the destructor does not have other actions to do in addition to destroying member variables and a base class object,
                 the destructor may be declared default. It may also be declared virtual or overridden in this case.
                 A <span class="kw">default</span> destructor may not have a body.
             </li>
@@ -4053,7 +4083,7 @@
             <span class="kw">void</span> <span class="kw">operator</span><span class="mono">=(</span><span class="kw">const</span> <span class="var">ClassName&amp;)</span>
         </blockquote>
         It takes another object of the same class as an lvalue-reference-to-const parameter.
-        If a class has no user-defined copy assignment operator, the compiler will generate one if it is needed. 
+        If a class has no user-defined copy assignment operator, the compiler will generate one if it is needed.
         The generated copy assignment operator will assign the base class object and member variables from the passed argument.
     </p>
 
@@ -4084,9 +4114,9 @@
         <blockquote>
             <span class="kw">void</span> <span class="kw">operator</span><span class="mono">=(</span><span class="var">ClassName&amp;&amp;)</span>
         </blockquote>
-        It takes another object of the same class as a rvalue-reference parameter. 
+        It takes another object of the same class as a rvalue-reference parameter.
         If a class has no user-defined move assignment operator, the compiler will generate one if it is needed.
-        The generated move assignment operator will call the move assignment operator of the base class with the base class object of the argument and it will swap all member variables 
+        The generated move assignment operator will call the move assignment operator of the base class with the base class object of the argument and it will swap all member variables
         of the current class object with the member variables of the argument.
     </p>
 
@@ -4114,21 +4144,31 @@
             <li>An <a href="#access-specifiers">access specifier</a>.</li>
             <li><span class="kw">constexpr</span>. A constexpr member function is used <a href="#literal-class">literal</a> classes.</li>
             <li><span class="kw">static</span>. A static member function can use static member variables when it performs its job.</li>
-            <li><span class="kw">abstract</span>. An abstract member function must be <em>overridden</em> by member functions of the same name in derived classes.
-            An abstract member function cannot have a body.</li>
+            <li>
+                <span class="kw">abstract</span>. An abstract member function must be <em>overridden</em> by member functions of the same name in derived classes.
+                An abstract member function cannot have a body.
+            </li>
             <li><span class="kw">virtual</span>. A virtual member function may be overridden by member functions of the same name in derived classes.</li>
-            <li><span class="kw">override</span>. Each inherited abstract member function of an <a href="#abstract-class">abstract</a> base or ancestor class must be overridden in a 
-            derived <a href="#concrete-class">concrete class</a>.
-            Each virtual and overridden member function of a base or ancestor class may be overridden in the derived class.</li>
+            <li>
+                <span class="kw">override</span>. Each inherited abstract member function of an <a href="#abstract-class">abstract</a> base or ancestor class must be overridden in a
+                derived <a href="#concrete-class">concrete class</a>.
+                Each virtual and overridden member function of a base or ancestor class may be overridden in the derived class.
+            </li>
             <li><span class="kw">inline</span>. This is a hint to the compiler that the member function should be <a href="#functions-inline">inlined</a> if possible.</li>
-            <li><span class="kw">default</span>. A <a href="#copy-assignment">copy assignment</a> or <a href="#move-assignment">move assignment</a> operator may be declared default. 
-            A default copy assignment or move assignment may not have a body.</li>
-            <li><span class="kw">suppress</span>. A <a href="#copy-assignment">copy assignment</a> or <a href="#move-assignment">move assignment</a> operator may be suppressed. 
-            A suppressed copy assignment or move assignment may not have a body.</li>
+            <li>
+                <span class="kw">default</span>. A <a href="#copy-assignment">copy assignment</a> or <a href="#move-assignment">move assignment</a> operator may be declared default.
+                A default copy assignment or move assignment may not have a body.
+            </li>
+            <li>
+                <span class="kw">suppress</span>. A <a href="#copy-assignment">copy assignment</a> or <a href="#move-assignment">move assignment</a> operator may be suppressed.
+                A suppressed copy assignment or move assignment may not have a body.
+            </li>
             <li><span class="kw">nothrow</span>. A nothrow member function has the same semantics as a <a href="#functions-nothrow">nonmember nothrow function</a>.</li>
             <li><span class="kw">throw</span>. A throw member function has the same semantics as a <a href="#functions-throw">nonmember throw function</a>.</li>
-            <li><span class="kw">new</span>. A member function that has the same name as some abstract, virtual or overridden member function of its base or ancestor class
-            may be declared new. A member function declared new does not participate in virtual call dispatch. It may not be abstract, virtual or overriddden at the same time.</li>
+            <li>
+                <span class="kw">new</span>. A member function that has the same name as some abstract, virtual or overridden member function of its base or ancestor class
+                may be declared new. A member function declared new does not participate in virtual call dispatch. It may not be abstract, virtual or overriddden at the same time.
+            </li>
             <li><span class="kw">const</span>. A member function that does not change the member variables may be declared <span class="kw">const</span>.</li>
         </ul>
     </p>
@@ -4138,7 +4178,7 @@
     <p>
         A <a href="#rule.member-variable">member variable</a> has specified <a href="#type-expressions">type</a> and <a href="#identifiers">name</a>.
         A member variable may have an <a href="#access-specifiers">access specifier</a> and it may be declared <span class="kw">static</span>.
-        Static member variables can be initialized in a <a href="#static-constructor">static constructor</a>. 
+        Static member variables can be initialized in a <a href="#static-constructor">static constructor</a>.
         Nonstatic member variables are also called <em>instance variables</em>. They can be initialized in a <a href="#constructor">constructor</a>.
     </p>
 
@@ -4146,7 +4186,7 @@
 
     A class whose constructors and member functions are declared <a href="#functions-constexpr"><span class="kw">constexpr</span></a> is called a <em>literal</em> class.
     When arguments to such functions are <a href="#constant-expression">constant expressions</a>, they can be evaluated at compile time.
-    The constructors and member functions of a literal class can be used also when arguments are not constant expressions. 
+    The constructors and member functions of a literal class can be used also when arguments are not constant expressions.
     In that case they behave the same way as regular constructors and member functions.
 
     For an example of a literal class, see <a href="../code/point/point.cm.html">point.cm</a>.
@@ -4154,7 +4194,7 @@
     <h3 id="class-hierarchies">11.7 Class Hierarchies</h3>
 
     <p>
-        In Cmajor a class may have a single <em><a href="#rule.inheritance-and-implemented-interfaces">base class</a></em>. 
+        In Cmajor a class may have a single <em><a href="#rule.inheritance-and-implemented-interfaces">base class</a></em>.
         If class <em>B</em> is the base class of class <em>A</em> we say also that <em>A</em> <em>derives</em> from <em>B</em>,
         and that <em>A</em> <em>inherits</em> members from <em>B</em>. When <em>A</em> derives from <em>B</em> we may think that <em>A</em> <em>is-a-kind-of</em> <em>B</em>.
         Inheritance relationship allows us to build hierarchies of classes some of which are base classes and others inheriting from them.
@@ -4169,14 +4209,14 @@
     <h3 id="class-templates">11.8 Class Templates</h3>
 
     <p>
-        When the class definition has a <a href="#rule.template-parameter-list">template parameter list</a> and possibly a <a href="#rule.where-constraint">constraint</a>, it defines a class template. 
+        When the class definition has a <a href="#rule.template-parameter-list">template parameter list</a> and possibly a <a href="#rule.where-constraint">constraint</a>, it defines a class template.
         The compiler <em>instantiates</em>, or creates a specialized version from the class template for each different set of template argument types. An instantiated class template is called a <em>class template specialization</em>.
-        When a class template is instantiated, the template parameters of the class template are substituted by specified concrete types and the declarations of the class are type checked using those substituted types. 
+        When a class template is instantiated, the template parameters of the class template are substituted by specified concrete types and the declarations of the class are type checked using those substituted types.
         Those concrete types can be specified by using a <a href="#rule.template-id">template-id</a>.
         When a member function of a class template specialization is called, the compiler instantiates it using the specified types.
-        The compiler instantiates automatically the following member functions for each class template specialization: 
+        The compiler instantiates automatically the following member functions for each class template specialization:
         <ul>
-            <li>a possible destructor,</li> 
+            <li>a possible destructor,</li>
             <li>virtual and overridden member functions,</li>
             <li>only those member functions that are called.</li>
         </ul>
@@ -4191,7 +4231,7 @@
 
     <p>
         An <a href="#rule.interface">interface</a> is a list of member function signatures that describe some behaviour.
-        A class can <em>implement</em> any number of interfaces. 
+        A class can <em>implement</em> any number of interfaces.
         When a class implements an interface it must provide implementation for the member functions contained by the interface.
     </p>
 
@@ -4204,9 +4244,9 @@
             <td class="rcontent">
                 <span class="rule"><a href="#rule.access-specifier">access&#8209;specifier</a></span>?
                 <span class="kw">interface</span>
-                <span class="rule"><a href="#interface-name">interface&#8209;name</a></span>
+                <span class="rule"><a href="#rule.interface-name">interface&#8209;name</a></span>
                 <span class="mono">{</span>
-                <span class="rule"><a href="#interface-content">interface&#8209;content</a></span>
+                <span class="rule"><a href="#rule.interface-content">interface&#8209;content</a></span>
                 <span class="mono">}</span>
             </td>
         </tr>
@@ -4221,7 +4261,7 @@
             <td class="rule" id="rule.interface-content">interface&#8209;content</td>
             <td class="sep">&rarr;</td>
             <td class="rcontent">
-                <span class="rule"><a href="#interface-member-function">interface&#8209;member&#8209;function</a></span>*
+                <span class="rule"><a href="#rule.interface-member-function">interface&#8209;member&#8209;function</a></span>*
             </td>
         </tr>
         <tr>
@@ -4229,7 +4269,7 @@
             <td class="sep">&rarr;</td>
             <td class="rcontent">
                 <span class="rule"><a href="#rule.return-type">return&#8209;type</a></span>
-                <span class="rule"><a href="#interface-member-function-name">interface&#8209;member&#8209;function&#8209;name</a></span>
+                <span class="rule"><a href="#rule.interface-member-function-name">interface&#8209;member&#8209;function&#8209;name</a></span>
                 <span class="rule"><a href="#rule.parameters">parameters</a></span>
                 <span class="mono">;</span>
             </td>
@@ -4247,7 +4287,9 @@
 
     <h2 id="delegates">13 Delegates</h2>
 
-    A <a href="#rule.delegate">delegate</a> represents a function signature type.
+    <p>
+        A <a href="#rule.delegate">delegate</a> represents a function signature type.
+    </p>
 
     <h3 id="delegates-syntax">13.1 Syntax</h3>
 
@@ -4269,7 +4311,7 @@
             <td class="sep">&rarr;</td>
             <td class="rcontent">
                 (<span class="rule"><a href="#rule.access-specifier">access&#8209;specifier</a></span> |
-                <span class="kw">nothrow</span> | 
+                <span class="kw">nothrow</span> |
                 <span class="kw">throw</span>)*
             </td>
         </tr>
@@ -4290,7 +4332,9 @@
 
     <h2 id="class-delegates">14 Class Delegates</h2>
 
-    A <a href="#rule.class-delegate">class delegate</a> represents a member function signature type.
+    <p>
+        A <a href="#rule.class-delegate">class delegate</a> represents a member function signature type.
+    </p>
 
     <h3 id="class-delegates-syntax">14.1 Syntax</h3>
 
@@ -4336,16 +4380,16 @@
 
     <p>
         A <a href="#rule.concept">concept</a> is a named collection of requirements for a type or for a group of types.
-        Those requirements are called <em>constraints</em>. 
+        Those requirements are called <em>constraints</em>.
         Constraints can be thought of as Boolean expressions, or <em>predicates</em>, that operate on properties of types.
     </p>
 
     <p>
-        Concepts are <em>checked</em> as part of <a href="#overload-resolution">overload resolution</a>. 
-        When a concept is checked, the type parameters it contains are substituted with argument types of the function call 
+        Concepts are <em>checked</em> as part of <a href="#overload-resolution">overload resolution</a>.
+        When a concept is checked, the type parameters it contains are substituted with argument types of the function call
         and then the constraint expressions in the body of the concept are evaluated using those substituted types.
-        If all the results of these evaluations are <b>true</b>, we say that the type or group of types <em>satisfy</em> the concept, 
-        or <em>conform</em> to the concept. Those overloads whose constraint expressions yield <b>true</b> result, 
+        If all the results of these evaluations are <b>true</b>, we say that the type or group of types <em>satisfy</em> the concept,
+        or <em>conform</em> to the concept. Those overloads whose constraint expressions yield <b>true</b> result,
         form the set of overload candidates.
     </p>
 
@@ -4355,13 +4399,13 @@
     </p>
 
     <p>
-        A concept may also contain <a href="#axioms">axioms</a>. 
-        Axioms are <em>not</em> checked or evaluated in any way by the compiler 
-        but they express semantic facts about properties 
-        of types that should always hold when the substituted type or types conform to the concept containing the axiom. 
+        A concept may also contain <a href="#axioms">axioms</a>.
+        Axioms are <em>not</em> checked or evaluated in any way by the compiler
+        but they express semantic facts about properties
+        of types that should always hold when the substituted type or types conform to the concept containing the axiom.
         Axioms are ment to be as information for the programmer.
     </p>
-    
+
     <h3 id="concepts-syntax">15.1 Syntax</h3>
 
     <table class="grammar">
@@ -4371,7 +4415,7 @@
             <td class="rcontent">
                 <span class="rule"><a href="#rule.access-specifier">access&#8209;specifier</a></span>?
                 <span class="kw">concept</span>
-                <span class="rule"><a href="#rule.concept-name">concept&#8209;name</a></span><br/>
+                <span class="rule"><a href="#rule.concept-name">concept&#8209;name</a></span><br />
                 <span class="mono">&lt;</span>
                 <span class="rule"><a href="#rule.type-parameter">type&#8209;parameter</a></span>
                 (<span class="mono">,</span>
@@ -4422,7 +4466,7 @@
             <td class="rule" id="rule.concept-body">concept&#8209;body</td>
             <td class="sep">&rarr;</td>
             <td class="rcontent">
-                (<span class="rule"><a href="#rule.concept-body-constraint">concept&#8209;body&#8209;constraint</a></span> | 
+                (<span class="rule"><a href="#rule.concept-body-constraint">concept&#8209;body&#8209;constraint</a></span> |
                 <span class="rule"><a href="#rule.axiom">axiom</a></span>)*
             </td>
         </tr>
@@ -4521,7 +4565,7 @@
             <td class="rule" id="rule.disjunctive-constraint-expression">disjunctive&#8209;constraint&#8209;expression</td>
             <td class="sep">&rarr;</td>
             <td class="rcontent">
-                <span class="rule"><a href="#rule.conjunctive-constraint-expression">conjunctive&#8209;constraint&#8209;expression</a></span><br/>
+                <span class="rule"><a href="#rule.conjunctive-constraint-expression">conjunctive&#8209;constraint&#8209;expression</a></span><br />
                 (<span class="kw">or</span>
                 <span class="rule"><a href="#rule.conjunctive-constraint-expression">conjunctive&#8209;constraint&#8209;expression</a></span>)*
             </td>
@@ -4549,7 +4593,7 @@
             <td class="rule" id="rule.atomic-constraint-expression">atomic&#8209;constraint&#8209;expression</td>
             <td class="sep">&rarr;</td>
             <td class="rcontent">
-                <span class="rule"><a href="#rule.predicate-constraint-expression">predicate&#8209;constraint&#8209;expression</a></span> | 
+                <span class="rule"><a href="#rule.predicate-constraint-expression">predicate&#8209;constraint&#8209;expression</a></span> |
                 <span class="rule"><a href="#rule.is-constraint-expression">is&#8209;constraint&#8209;expression</a></span> |
                 <span class="rule"><a href="#rule.multiparam-constraint-expression">multiparam&#8209;constraint&#8209;expression</a></span>
             </td>
@@ -4565,7 +4609,7 @@
             <td class="rule" id="rule.invoke-expression">invoke&#8209;expression</td>
             <td class="sep">&rarr;</td>
             <td class="rcontent">
-                (<span class="rule"><a href="#rule.template-id">template&#8209;id</a></span> | 
+                (<span class="rule"><a href="#rule.template-id">template&#8209;id</a></span> |
                 <span class="rule"><a href="#rule.identifier">identifier</a></span>)
                 (<span class="mono">.</span>
                 <span class="rule"><a href="#rule.identifier">identifier</a></span>)*
@@ -4658,7 +4702,7 @@
 
     <p>
         Evaluation of a <a href="#rule.signature-constraint">signature</a> constraint yields <b>true</b>, if there exists a constructor, destructor, member function or function whose
-        signature matches given <a href="#constructor-constraint">constructor</a>, <a href="#destructor-constraint">destructor</a>, <a href="#member-function-constraint">member function</a> 
+        signature matches given <a href="#constructor-constraint">constructor</a>, <a href="#destructor-constraint">destructor</a>, <a href="#member-function-constraint">member function</a>
         or <a href="#function-constraint">function</a> signature respectively, and <b>false</b> otherwise.
         Destructor constraint is satisfied always, because a trivial destructor matches a destructor signature.
     </p>
@@ -4667,9 +4711,9 @@
 
     <p>
         Here's an example of a concept that contains a <a href="#rule.constructor-constraint">constructor</a> constraint:
-         
+
         <blockquote>
-            <span class="kw">public </span> <span class="kw">concept</span> <span class="var">MoveConstructible&lt;T&gt;</span><br/>
+            <span class="kw">public </span> <span class="kw">concept</span> <span class="var">MoveConstructible&lt;T&gt;</span><br />
             <span class="mono">{</span><br />
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;T(T&amp;&amp;);<br />
             <span class="mono">}</span><br />
@@ -4735,11 +4779,11 @@
     <h3 id="constraint-expression">15.3 Constraint Expressions</h3>
 
     <p>
-        A <a href="#rule.constraint-expression">constraint expression</a> can be 
+        A <a href="#rule.constraint-expression">constraint expression</a> can be
         a <a href="#disjunctive-constraint-expression">disjunctive constraint expression</a>,
         a <a href="#conjunctive-constraint-expression">conjunctive constraint expression</a>,
         a <a href="#primary-constraint-expression">primary constraint expression</a>,
-        an <a href="#atomic-constraint-expression">atomic constraint expression</a>, 
+        an <a href="#atomic-constraint-expression">atomic constraint expression</a>,
         a <a href="#predicate-constraint-expression">predicate constraint expression</a>,
         an <a href="#is-constraint-expression">is-constraint expression</a>, or
         a <a href="#multiparam-constraint-expression">multiparam-constraint expression</a>.
@@ -4748,7 +4792,7 @@
     <h4 id="disjunctive-constraint-expression">15.3.1 Disjunctive Constraint Expression</h4>
 
     <p>
-        A <a href="#rule.disjunctive-constraint-expression">disjunctive</a> constraint expression is a sequence of <a href="#conjunctive-constraint-expression">conjunctive</a> constraint expressions separated 
+        A <a href="#rule.disjunctive-constraint-expression">disjunctive</a> constraint expression is a sequence of <a href="#conjunctive-constraint-expression">conjunctive</a> constraint expressions separated
         by the keyword <span class="kw">or</span>.
     </p>
 
@@ -4759,7 +4803,7 @@
     <h4 id="conjunctive-constraint-expression">15.3.2 Conjunctive Constraint Expression</h4>
 
     <p>
-        A <a href="#rule.conjunctive-constraint-expression">conjunctive</a> constraint expression is a sequence of <a href="#primary-constraint-expression">primary</a> constraint expressions separated 
+        A <a href="#rule.conjunctive-constraint-expression">conjunctive</a> constraint expression is a sequence of <a href="#primary-constraint-expression">primary</a> constraint expressions separated
         by the keyword <span class="kw">and</span>.
     </p>
 
@@ -4770,7 +4814,7 @@
     <h4 id="primary-constraint-expression">15.3.3 Primary Constraint Expression</h4>
 
     <p>
-        A <a href="#rule.primary-constraint-expression">primary</a> constraint expression is a parenthesized <a href="#constraint-expression">constraint expression</a>, or an 
+        A <a href="#rule.primary-constraint-expression">primary</a> constraint expression is a parenthesized <a href="#constraint-expression">constraint expression</a>, or an
         <a href="#atomic-constraint-expression">atomic</a> constraint expression.
     </p>
 
@@ -4781,9 +4825,9 @@
     <h4 id="atomic-constraint-expression">15.3.4 Atomic Constraint Expression</h4>
 
     <p>
-        An <a href="#rule.atomic-constraint-expression">atomic</a> constraint expression is either a <a href="#predicate-constraint-expression">predicate</a> constraint expression, 
+        An <a href="#rule.atomic-constraint-expression">atomic</a> constraint expression is either a <a href="#predicate-constraint-expression">predicate</a> constraint expression,
         an <a href="#is-constraint-expression">is-constraint expression</a>, or
-        a <a href="#multiparam-constraint-expression">multiparam-constraint expression</a>. 
+        a <a href="#multiparam-constraint-expression">multiparam-constraint expression</a>.
         It yields <b>true</b> if either predicate constraint expression, is-constraint expression or multiparam-constraint expression respectively yields <b>true</b>, and <b>false</b> otherwise.
     </p>
 
@@ -4805,10 +4849,10 @@
 
     <p>
         The second form yields <b>true</b>, if the type on the left-hand side conforms to the concept on the right-hand side, and <b>false</b> otherwise.
-        The conformance of the concept is checked by substituting the type on the left side to the single type parameter of the concept on the right side and evaluating the constraint expressions in the 
+        The conformance of the concept is checked by substituting the type on the left side to the single type parameter of the concept on the right side and evaluating the constraint expressions in the
         body of the concept. If all the constraint expressions of the concept yield <b>true</b>, the type conforms to the concept, otherwise it does not conform to the concept.
     </p>
-    
+
     <h4 id="multiparam-constraint-expression">15.3.7 Multiparam-Constraint Expression</h4>
 
     <p>
@@ -4847,7 +4891,571 @@
         </blockquote>
     </p>
 
+    <h2 id="compile-units">16 Compile Units</h2>
+
+    <p>
+        Cmajor projects consist of source files that are also called <a href="#rule.compile-unit"><em>compile unit</em>s</a>.
+        Each compile unit contains a possibly empty sequence of <a href="#using-directives">using directives</a> followed by a possibly empty sequence of <a href="#definitions">definitions</a>.
+    </p>
+
+    <h3 id="compile-units-syntax">16.1 Syntax</h3>
+
+    <table class="grammar">
+        <tr>
+            <td class="rule" id="rule.compile-unit">compile&#8209;unit</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.namespace-content">namespace&#8209;content</a></span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.namespace-content">namespace&#8209;content</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.using-directives">using&#8209;directives</a></span>
+                <span class="rule"><a href="#rule.definitions">definitions</a></span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.using-directives">using&#8209;directives</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.using-directive">using&#8209;directive</a></span>*
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.using-directive">using&#8209;directive</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.using-alias-directive">using&#8209;alias&#8209;directive</a></span> |
+                <span class="rule"><a href="#rule.using-namespace-directive">using&#8209;namespace&#8209;directive</a></span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.using-alias-directive">using&#8209;alias&#8209;directive</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="kw">using</span>
+                <span class="rule"><a href="#rule.identifier">identifier</a></span>
+                <span class="mono">=</span>
+                <span class="rule"><a href="#rule.qualified-id">qualified&#8209;id</a></span>
+                <span class="mono">;</span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.using-namespace-directive">using&#8209;namespace&#8209;directive</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="kw">using</span>
+                <span class="rule"><a href="#rule.qualified-id">qualified&#8209;id</a></span>
+                <span class="mono">;</span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.definitions">definitions</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.definition">definition</a></span>*
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.definition">definition</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.namespace-definition">namespace&#8209;definition</a></span> |
+                <span class="rule"><a href="#rule.constant-definition">constant&#8209;definition</a></span> |
+                <span class="rule"><a href="#rule.enumerated-type-definition">enumerated&#8209;type&#8209;definition</a></span> |
+                <span class="rule"><a href="#rule.function-definition">function&#8209;definition</a></span> |
+                <span class="rule"><a href="#rule.typedef-declaration">typedef&#8209;declaration</a></span> |
+                <span class="rule"><a href="#rule.class-definition">class&#8209;definition</a></span> |
+                <span class="rule"><a href="#rule.interface-definition">interface&#8209;definition</a></span> |
+                <span class="rule"><a href="#rule.delegate-definition">delegate&#8209;definition</a></span> |
+                <span class="rule"><a href="#rule.class-delegate-definition">class&#8209;delegate&#8209;definition</a></span> |
+                <span class="rule"><a href="#rule.concept-definition">concept&#8209;definition</a></span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.namespace-definition">namespace&#8209;definition</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="kw">namespace</span>
+                <span class="rule"><a href="#rule.qualified-id">qualified&#8209;id</a></span>
+                <span class="mono">{</span>
+                <span class="rule"><a href="#rule.namespace-content">namespace&#8209;content</a></span>
+                <span class="mono">}</span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.constant-definition">constant&#8209;definition</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.constant">constant</a></span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.enumerated-type-definition">enumerated&#8209;type&#8209;definition</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.enumerated-type">enumerated&#8209;type</a></span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.function-definition">function&#8209;definition</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.function">function</a></span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.typedef-declaration">typedef&#8209;declaration</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.typedef">typedef</a></span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.class-definition">class&#8209;definition</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.class">class</a></span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.interface-definition">interface&#8209;definition</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.interface">interface</a></span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.delegate-definition">delegate&#8209;definition</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.delegate">delegate</a></span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.class-delegate-definition">class&#8209;delegate&#8209;definition</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.class-delegate">class&#8209;delegate</a></span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.concept-definition">concept&#8209;definition</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.concept">concept</a></span>
+            </td>
+        </tr>
+    </table>
+
+    <h3 id="using-directives">16.2 Using Directives</h3>
+
+    <p>
+        There are two kinds of using directives: <a href="#using-alias-directive">using-alias</a> directives and <a href="#using-namespace-directive">using-namespace</a> directives.
+    </p>
+
+    <h4 id="using-alias-directive">16.2.1 Using-Alias Directives</h4>
+
+    <p>
+        A <a href="#rule.using-alias-directive">using-alias</a> directive introduces an alternate name, a simple identifier, for a <a href="#namespace-level-entity">namespace-level entity</a>
+        referred by its fully qualified name.
+    </p>
+
+    <p>
+        For example, using-alias directive <blockquote><span class="kw">using</span> <em>Console</em> <span class="mono">=</span> <em>System.Console</em><span class="mono">;</span></blockquote>
+        makes it possible to refer to <em>System.Console</em> class as bare <em>Console</em> instead of its fully qualified name <em>System.Console</em>, for example.
+    </p>
+
+    <h4 id="using-namespace-directive">16.2.2 Using-Namespace Directives</h4>
+
+    <p>
+        A <a href="#rule.using-namespace-directive">using-namespace</a> directive makes contents of a namespace available in a compile unit using simple identifiers of
+        <a href="#namespace-level-entity">namespace-level entities</a>.
+    </p>
+
+    <p>
+        For example, using-namespace directive <blockquote><span class="kw">using</span> <em>System</em><span class="mono">;</span></blockquote>
+        makes contents of <em>System</em> namespace available in the current compile unit.
+        This means that one can refer to <em>System.Console</em> class as bare <em>Console</em> instead of its fully qualified name <em>System.Console</em>, for example.
+    </p>
+
+    <p>
+        However, if there are two entities of the same name, <em>Foo</em>, for example, in two namespaces, <em>Alpha</em> and <em>Beta</em>, and
+        both contents of <em>Alpha</em> and <em>Beta</em> namespace are made available with using-namespace directives:
+        <blockquote><span class="kw">using</span> <em>Alpha</em><span class="mono">;</span><br /><span class="kw">using</span> <em>Beta</em><span class="mono">;</span></blockquote>
+        one must refer to <em>Foo</em> using its fully qualified name, <em>Alpha.Foo</em>, for example.
+    </p>
+
+    <h3 id="definitions">16.3 Definitions</h3>
+
+    <p>
+        Definitions can appear inside a <a href="#namespace">namespace</a>, or at the global namespace level, outside any other namespace.
+    </p>
+
+    <h4 id="namespace">16.3.1 Namespaces</h4>
+
+    <p>
+        A <a href="#rule.namespace-definition">namespace</a> definition consists of a keyword <span class="kw">namespace</span> followed by the name of the namespace followed by its
+        <a href="#rule.namespace-content">contents</a>.
+        The name of a namespace can be a simple <a href="#rule.identifier">identifier</a>, <em>Alpha</em>, for example, or a <a href="#rule.qualified-id">fully qualified identifier</a>,
+        <em>Alpha.Beta.Gamma</em>, for example. Then
+        <blockquote><span class="kw">namespace</span> <em>Alpha.Beta.Gamma</em> <span class="mono">{ ... }</span></blockquote>
+        is a shorthand notation for
+        <blockquote><span class="kw">namespace</span> <em>Alpha</em> <span class="mono">{</span> <span class="kw">namespace</span> <em>Beta</em> <span class="mono">{</span> <span class="kw">namespace</span> <em>Gamma</em> <span class="mono">{ ... } } } </span></blockquote>
+    </p>
+
+    <p>
+        Namespaces can be used to organize entities in a library under a common name. They can also be used to prevent name clashes:
+        If both a graphics library <em>Graphics</em> contains a function named <em>draw</em> that draws a shape, and a lottery library <em>Lottery</em> contains also a function named <em>draw</em>
+        that shows a lottery draw, they could be used in the same program if the entities of the graphics library were defined in the namespace <em>Graphics</em>
+        and the entities of the lottery library in the namespace <em>Lottery</em>:
+        <blockquote><span class="kw">namespace</span> <em>Graphics</em> <span class="mono">{ void draw() { ... } }</span></blockquote>
+        <blockquote><span class="kw">namespace</span> <em>Lottery</em> <span class="mono">{ void draw() { ... } }</span></blockquote>
+        <blockquote>
+            <span class="kw">void</span> <em>main</em><br /><span class="mono">
+                {<br /> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Graphics.draw();<br />
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Lottery.draw();<br />}
+            </span>
+        </blockquote>
+    </p>
+
+    <p>
+        Namespaces are <em>open</em>: many compile units can add definitions to the same namespace.
+    </p>
+
+    <h4 id="namespace-level-definitions">16.3.2 Namespace-level Definitions</h4>
+
+    <p>
+        A namespace, including the global namespace, can contain the following:
+        <ul>
+            <li><a href="#constants">constant</a> definitions,</li>
+            <li><a href="#enumerations">enumerated type</a> definitions,</li>
+            <li><a href="#functions">function</a> definitions,</li>
+            <li><a href="#typedefs">typedef</a> declarations,</li>
+            <li><a href="#classes">class</a> definitions,</li>
+            <li><a href="#interfaces">interface</a> definitions,</li>
+            <li><a href="#delegates">delegate</a> definitions,</li>
+            <li><a href="#class-delegates">class delegate</a> definitions, and</li>
+            <li><a href="#concepts">concept</a> definitions.</li>
+        </ul>
+    </p>
+
+    <h2 id="projects">17 Projects</h2>
+
+    <p>
+        There is one project for each Cmajor program and library. By convention each project should be in its own directory and have
+        a <a href="#rule.project-file">project file</a> that ends with <span class="mono">.cmp</span> extension. A project file contains the name of the project and lists the source files belonging to it.
+        A project can <em>reference</em> another project. Reference dependencies must be acyclic.
+    </p>
+
+    <h3 id="projects-syntax">17.1 Syntax</h3>
+
+    <table class="grammar">
+        <tr>
+            <td class="rule" id="rule.project-file">project&#8209;file</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="kw">project</span>
+                <span class="rule"><a href="#rule.project-name">project&#8209;name</a></span>
+                <span class="mono">;</span>
+                <span class="rule"><a href="#rule.project-declarations">project&#8209;declarations</a></span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.project-name">project&#8209;name</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.qualified-id">qualified&#8209;id</a></span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.project-declarations">project&#8209;declarations</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.project-declaration">project&#8209;declaration</a></span>*
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.project-declaration">project&#8209;declaration</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.reference-declaration">reference&#8209;declaration</a></span> |
+                <span class="rule"><a href="#rule.source-file-declaration">source&#8209;file&#8209;declaration</a></span> |
+                <span class="rule"><a href="#rule.text-file-declaration">text&#8209;file&#8209;declaration</a></span> |
+                <span class="rule"><a href="#rule.target-declaration">target&#8209;declaration</a></span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.reference-declaration">reference&#8209;declaration</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="kw">reference</span>
+                <span class="rule"><a href="#rule.file-path">file&#8209;path</a></span>
+                <span class="mono">;</span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.source-file-declaration">source&#8209;file&#8209;declaration</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="kw">source</span>
+                <span class="rule"><a href="#rule.file-path">file&#8209;path</a></span>
+                <span class="mono">;</span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.text-file-declaration">text&#8209;file&#8209;declaration</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="kw">text</span>
+                <span class="rule"><a href="#rule.file-path">file&#8209;path</a></span>
+                <span class="mono">;</span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.target-declaration">target&#8209;declaration</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="kw">target</span>
+                <span class="mono">=</span>
+                <span class="rule"><a href="#rule.target">target</a></span>
+                <span class="mono">;</span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.target">target</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="kw">program</span> |
+                <span class="kw">library</span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.file-path">file&#8209;path</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="mono">&lt;</span>
+                [^&gt;]+
+                <span class="mono">&gt;</span>
+            </td>
+        </tr>
+    </table>
+
+    <h3 id="projects-example">17.2 Example</h3>
+
+    <p>
+        Here's a project file <span class="mono">alpha.cmp</span> for a project named <em>Alpha</em> that references two library projects <em>Beta</em> and <em>Gamma</em>:
+    </p>
+
+    <blockquote>
+        <span class="kw">project</span> <em>Alpha</em><span class="mono">;</span><br/>
+        <span class="kw">target</span><span class="mono">=</span><span class="kw">program</span><span class="mono">;</span><br />
+        <span class="kw">reference</span> <span class="mono">&lt;../beta/beta.cmp&gt;</span><span class="mono">;</span><br />
+        <span class="kw">reference</span> <span class="mono">&lt;../gamma/gamma.cmp&gt;</span><span class="mono">;</span><br />
+        <span class="kw">source</span> <span class="mono">&lt;main.cm&gt;</span><span class="mono">;</span><br />
+    </blockquote>
+
+    <p>
+        Here's the project file <span class="mono">beta.cmp</span>:
+    </p>
+
+    <blockquote>
+        <span class="kw">project</span> <em>Beta</em><span class="mono">;</span><br />
+        <span class="kw">target</span><span class="mono">=</span><span class="kw">library</span><span class="mono">;</span><br />
+        <span class="kw">source</span> <span class="mono">&lt;beta.cm&gt;</span><span class="mono">;</span><br />
+    </blockquote>
+
+    <p>
+        and here's the project file <span class="mono">gamma.cmp</span>:
+    </p>
+
+    <blockquote>
+        <span class="kw">project</span> <em>Gamma</em><span class="mono">;</span><br />
+        <span class="kw">target</span><span class="mono">=</span><span class="kw">library</span><span class="mono">;</span><br />
+        <span class="kw">source</span> <span class="mono">&lt;gamma.cm&gt;</span><span class="mono">;</span><br />
+    </blockquote>
+
+    The directory structure is as follows:
+
+    <pre class="code">
+        |
+        +--alpha
+        |  |
+        |  +--alpha.cmp
+        |  |
+        |  +--main.cm
+        |
+        +--beta
+        |  |
+        |  +--beta.cmp
+        |  |
+        |  +--beta.cm
+        |
+        +--gamma
+           |
+           +--gamma.cmp
+           |
+           +--gamma.cm
+    </pre>
+
+    <p>
+        Here's the contents of the source files: 
+        <a href="../code/solution/alpha/main.cm.html">alpha/main.cm</a>, 
+        <a href="../code/solution/beta/beta.cm.html">beta/beta.cm</a>, and 
+        <a href="../code/solution/gamma/gamma.cm.html">gamma/gamma.cm</a>
+    </p>
+
+    <h3 id="projects-programs">17.3 Programs</h3>
+
+    <p>
+        Each valid Cmajor program must have a <em>main</em> function where the execution of the program starts. The possible signatures of the <em>main</em> function are:
+    </p>
+
+    <blockquote>
+        <span class="kw">void</span> <em>main</em><span class="mono">();</span><br />
+        <span class="kw">int</span> <em>main</em><span class="mono">();</span><br />
+        <span class="kw">void</span> <em>main</em><span class="mono">(</span><span class="kw">int</span> <em>argc</em>, <span class="kw">const char</span>** <em>argv</em>);<br />
+        <span class="kw">int</span> <em>main</em><span class="mono">(</span><span class="kw">int</span> <em>argc</em>, <span class="kw">const char</span>** <em>argv</em>);<br />
+    </blockquote>
+
+    <p>
+        If the return type of the <em>main</em> function is <span class="kw">void</span>, exit code 0 is returned to the caller of the program at the end of a normal program execution.
+    </p>
+
+    <p>
+        If the return type of the <em>main</em> function is <span class="kw">int</span>, the <em>main</em> function must explicitly <a href="#return-statement">return</a> 
+        a value that is then returned to the caller of the program at the end of a normal program execution.
+    </p>
+
+    <p>
+        In the last two signatures <em>argc</em> is the number of program arguments including the name of the program, and <em>argv</em> contains the name of the program and program arguments.
+        By convention <em>argv</em>[0] is the name of the program and <em>argv</em>[1], <em>argv</em>[2], ..., <em>argv</em>[<em>argc</em> &minus; 1] are program arguments.
+    </p>
+
+    <h2 id="solutions">18 Solutions</h2>
+
+    <p>
+        A solution is a group of related projects that can be built as a unit. By convention a solution has a <a href="#rule.solution-file">solution file</a> that ends with <span class="mono">.cms</span> extension.
+        When deciding the build order of the projects in a solution, the Cmajor compiler does a <a href="http://en.wikipedia.org/wiki/Topological_sorting">topological sort</a> of the projects using reference relationship as the sorting criteria.
+        If project <em>A</em> references a project <em>B</em>, project <em>B</em> is built before project <em>A</em>.
+    </p>
+
+    <h3 id="solutions-syntax">18.1 Syntax</h3>
+
+    <table class="grammar">
+        <tr>
+            <td class="rule" id="rule.solution-file">solution&#8209;file</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="kw">solution</span>
+                <span class="rule"><a href="#rule.solution-name">solution&#8209;name</a></span>
+                <span class="mono">;</span>
+                <span class="rule"><a href="#rule.solution-declarations">solution&#8209;declarations</a></span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.solution-name">solution&#8209;name</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.qualified-id">qualified&#8209;id</a></span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.solution-declarations">solution&#8209;declarations</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.solution-declaration">solution&#8209;declaration</a></span>*
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.solution-declaration">solution&#8209;declaration</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.solution-project-declaration">solution&#8209;project&#8209;declaration</a></span> |
+                <span class="rule"><a href="#rule.active-project-declaration">active&#8209;project&#8209;declaration</a></span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.solution-project-declaration">solution&#8209;project&#8209;declaration</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="kw">project</span>
+                <span class="rule"><a href="#rule.file-path">file&#8209;path</a></span>
+                <span class="mono">;</span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.active-project-declaration">active&#8209;project&#8209;declaration</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="kw">activeProject</span>
+                <span class="rule"><a href="#rule.qualified-id">qualified&#8209;id</a></span>
+                <span class="mono">;</span>
+            </td>
+        </tr>
+    </table>
+
+    <h3 id="solutions-example">18.2 Example</h3>
+
+    <p>
+        Here's a solution file <span class="mono">solution.cms</span> that contains three projects <em>Alpha</em>, <em>Beta</em> and <em>Gamma</em>:
+        <blockquote>
+            <span class="kw">solution</span> <em>Solution</em><span class="mono">;</span><br />
+            <span class="kw">project</span> <span class="mono">&lt;alpha/alpha.cmp&gt;</span><span class="mono">;</span><br />
+            <span class="kw">project</span> <span class="mono">&lt;beta/beta.cmp&gt;</span><span class="mono">;</span><br />
+            <span class="kw">project</span> <span class="mono">&lt;gamma/gamma.cmp&gt;</span><span class="mono">;</span><br />
+        </blockquote>
+
+        The directory structure is as follows:
+
+        <pre class="code">
+        +--solution
+           |
+           +--solution.cms
+           |
+           +--alpha
+           |  |
+           |  +--alpha.cmp
+           |  |
+           |  +--main.cm
+           |
+           +--beta
+           |  |
+           |  +--beta.cmp
+           |  |
+           |  +--beta.cm
+           |
+           +--gamma
+              |
+              +--gamma.cmp
+              |
+              +--gamma.cm
+    </pre>
+
+    </p>
+
     <h2 id="appendix-a">Appendix A Terms</h2>
+
+    <div id="alignment">
+        <b>ALIGNMENT</b>
+        <p>
+            Size of a class <em>c</em> may be <em>aligned</em> to <em>a</em>, or rounded to the smallest multiple of the <em>a</em> that is equal to or greater 
+            than the size of <em>c</em> before the alignment has taken place.
+        </p>
+        <p>
+            For example, given class <em>Foo</em>
+            <blockquote>
+                <span class="kw">class</span> <em>Foo</em><br/>
+                <span class="mono">{</span><br/>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">int</span> <em>x</em><span class="mono">;</span><br />
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">byte</span> <em>y</em><span class="mono">;</span><br />
+                <span class="mono">}</span><br />
+            </blockquote>
+            <span class="kw">sizeof</span>(<em>Foo</em>) is 8, and not 5 because of alignment of 4, that is <span class="kw">sizeof</span>(<span class="kw">int</span>).
+        </p>
+    </div>
 
     <div id="function-arity">
         <b>ARITY OF A FUNCTION</b>
@@ -5146,10 +5754,10 @@
         </p>
 
         <p>
-            If <em>A</em> and <em>B</em> are <a href="#basic-types">basic</a> types, and <em>A</em> is implicitly convertible to <em>B</em> we define their conversion distance by 
-            associating integers to the types and computing the distance as the difference of those integers. 
+            If <em>A</em> and <em>B</em> are <a href="#basic-types">basic</a> types, and <em>A</em> is implicitly convertible to <em>B</em> we define their conversion distance by
+            associating integers to the types and computing the distance as the difference of those integers.
             For example, <em>distance(<span class="kw">byte</span>, <span class="kw">short</span>)&nbsp;=&nbsp;1</em>,
-            <em>distance(<span class="kw">byte</span>, <span class="kw">ushort</span>)&nbsp;=&nbsp;2</em>, 
+            <em>distance(<span class="kw">byte</span>, <span class="kw">ushort</span>)&nbsp;=&nbsp;2</em>,
             <em>distance(<span class="kw">byte</span>, <span class="kw">int</span>)&nbsp;=&nbsp;3</em>, etc.
         </p>
     </div>
@@ -5215,10 +5823,50 @@
         </p>
     </div>
 
+    <div id="integral-value">
+        <b>INTEGRAL VALUE</b>
+        <p>
+            An <a href="#enumeration-constants">enumeration constant</a>, an <a href="#basic-integer-types">integer type</a> value or a <a href="#basic-character-types">character type</a> value.
+        </p>
+    </div>
+
+    <div id="lvalue-expression">
+        <b>LVALUE EXPRESSION</b>
+        <p>
+            An expression that can appear on the left-hand side of an assignment.
+            The lvalue expressions are:
+            <ul>
+                <li><a href="#identifiers">name</a> of a variable or parameter,</li>
+                <li><a href="#dereference-expression">dereferenced pointer</a>,</li>
+                <li><a href="#subscript-expression">array element access</a>,</li>
+                <li><a href="#invocation-expression">invocation</a> of a function, delegate or class delegate that returns a nonconst <a href="#lvalue-reference-type">lvalue reference</a> type.</li>
+            </ul>
+        </p>
+    </div>
+
+    <div id="namespace-level-entity">
+        <b>NAMESPACE-LEVEL ENTITY</b>
+        <p>
+            An entity defined at namespace level.
+            Entities that can be defined at namespace level are:
+            <ul>
+                <li>constants,</li>
+                <li>enumerated types,</li>
+                <li>functions,</li>
+                <li>typedefs,</li>
+                <li>classes,</li>
+                <li>interfaces,</li>
+                <li>delegates,</li>
+                <li>class delegates and</li>
+                <li>concepts.</li>
+            </ul>
+        </p>
+    </div>
+
     <div id="nontrivial-destructor">
         <b>NONTRIVIAL DESTRUCTOR</b>
         <p>
-            A class has a nontrivial destructor if it has 
+            A class has a nontrivial destructor if it has
             <ul>
                 <li>a user-defined destructor that is declared <span class="kw">default</span> or </li>
                 <li>a user-defined destructor that has a body, or</li>
@@ -5228,7 +5876,7 @@
         <p>
             The compiler generates a nontrivial destructor for a class if one or more of the following conditions are true:
             <ul>
-                <li>the class is <a href="#polymorphic">polymorphic</a>,</li>
+                <li>the class is <a href="#polymorphic-class-type">polymorphic</a>,</li>
                 <li>the class has a base class and that base class has a nontrivial destructor,</li>
                 <li>the class has a member variable of a class type that has a nontrivial destructor.</li>
             </ul>
@@ -5275,6 +5923,390 @@
             Each virtual, abstract and overridden member function contains a VMT index that is used for getting the member function pointer from the VMT when doing virtual call dispatch.
         </p>
     </div>
+
+    <h2 id="appendix-b">Appendix B Syntax Notation</h2>
+
+    <p>
+        Syntax of the Cmajor programming language is described in this text using a kind of <a href="http://en.wikipedia.org/wiki/Context-free_grammar">context-free grammar</a> called 
+        <a href="http://en.wikipedia.org/wiki/Parsing_expression_grammar">Parsing Expression Grammar</a> or PEG.
+        The notation used is not exaxtly same as PEG notation, but a slightly modified version of it.
+    </p>
+
+    <p>
+        In this notation a <em>grammar</em> consists of <em>rules</em> that are of the form:
+        <table class="grammar">
+            <tr>
+                <td class="rule" id="rule.ruleName">ruleName</td>
+                <td class="sep">&rarr;</td>
+                <td class="rcontent">
+                    <span class="rule">ruleBody</span>
+                </td>
+            </tr>
+        </table>
+    </p>
+
+    <p>
+        A rule produces a set of strings that forms a <em>language</em>. For example, the rule <a href="#rule.compile-unit">compile-unit</a> produces a set a strings that form the language of syntactically valid
+        Cmajor source files. The syntax rules alone are not enough to describe what is a valid Cmajor program though, because syntactically valid source file includes meaningless constructs.
+        For example, program
+        <blockquote>
+            <span class="kw">void</span> <em>main</em><span class="mono">()</span><br />
+            <span class="mono">{</span><br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1 = <em>a</em><span class="mono">;</span><br/>
+            <span class="mono">}</span><br />
+        </blockquote>
+        is syntactically valid but meaningless because one cannot assign to a literal.
+        It is compiler's job to perform <a href="http://en.wikipedia.org/wiki/Semantic_analysis_(compilers)">semantic analysis</a> and detect this kind of errors.
+        In this case the Cmajor compiler produces the following error message:
+        <pre>
+            not an lvalue expression (file 'C:/Users/Seppo/cmajorw64/cmajor/test/foo/main.cm', line 5):
+            1 = a;
+            ^
+        </pre>
+    </p>
+
+    <p>
+        The body of a rule consists of <em>parsing expressions</em> that are combined to produce a pattern that describes a set of strings that forms a language.
+    </p>
+
+    <h3 id="keyword-expression">Keywords</h3>
+
+    <p>
+        One of the simplest kind of parsing expression is a <em>keyword</em>. A keyword is represented using <strong>bold</strong> font.
+        A keyword is a string that appears literally in the produced language.
+        For example, rule <em><a href="#rule.int-rule"><em>int&#8209;rule</em></a></em> produces a language that contains one string, "int":
+
+        <table class="grammar">
+            <tr>
+                <td class="rule" id="rule.int-rule">int&#8209;rule</td>
+                <td class="sep">&rarr;</td>
+                <td class="rcontent">
+                    <span class="kw">int</span>
+                </td>
+            </tr>
+        </table>
+    </p>
+
+    <h3 id="terminal-string-expression">Terminal Strings</h3>
+
+    <p>
+        Another simple kind of parsing expression is a <em>terminal string</em>. A terminal string is represented using <span class="mono">monospace</span> font.
+        A terminal string also appears literal in the produced language.
+        For example, rule <em><a href="#rule.parentheses">parentheses</a></em> produces a language that contains a string consisting of a left and a right parenthesis:
+
+        <table class="grammar">
+            <tr>
+                <td class="rule" id="rule.parentheses">parentheses</td>
+                <td class="sep">&rarr;</td>
+                <td class="rcontent">
+                    <span class="mono">()</span>
+                </td>
+            </tr>
+        </table>
+    </p>
+
+    <h3 id="character-class-expression">Character Classes</h3>
+
+    <p>
+        A <em>character class </em> is a parsing expression that produces one character that is in the character class. A character class represented using <span class="var">serif</span> font and 
+        it is enclosed in square brackets.
+        For example, rule <em><a href="#rule.latin-letter">latin&#8209;letter</a></em> produces a language that contains strings that consist of a single 
+        <a href="http://en.wikipedia.org/wiki/ISO_basic_Latin_alphabet">Latin letter</a>:
+
+        <table class="grammar">
+            <tr>
+                <td class="rule" id="rule.latin-letter">latin&#8209;letter</td>
+                <td class="sep">&rarr;</td>
+                <td class="rcontent">
+                    [a-zA-Z]
+                </td>
+            </tr>
+        </table>
+
+        A character class may have <em>character ranges</em> that consist of the starting characer of the range and a hyphen and the ending character of the range.
+
+        Another example is a rule <em><a href="#rule.nondigit">nondigit</a></em> that produces a language that contains strings that consist of a single letter that is not a decimal digit character:
+
+        <table class="grammar">
+            <tr>
+                <td class="rule" id="rule.nondigit">nondigit</td>
+                <td class="sep">&rarr;</td>
+                <td class="rcontent">
+                    [^0-9]
+                </td>
+            </tr>
+        </table>
+
+        If a character class starts with a hat character (^), it means all characters <em>except</em> the characters or ranges of characters that follow.
+    </p>
+
+    <h3 id="nonterminal-expression">Nonterminals</h3>
+
+    <p>
+        A <em>nonterminal</em> is a name of a grammar rule. A nonterminal is represented using <span class="rule">italic</span> font.
+        A nonterminal produces a language that consists of the strings that the rule it names produces.
+        For example, rule <em><a href="#rule.class-name-example">class&#8209;name</a></em> produces a language that consists of the strings that rule <em><a href="#rule.identifier">identifier</a></em> produces:
+
+        <table class="grammar">
+            <tr>
+                <td class="rule" id="rule.class-name-example">class&#8209;name</td>
+                <td class="sep">&rarr;</td>
+                <td class="rcontent">
+                    <span class="rule"><a href="#rule.identifier">identifier</a></span>
+                </td>
+            </tr>
+        </table>
+    </p>
+
+    <h3 id="informal-expression">Informal Expressions</h3>
+
+    <p>
+        Sometimes it is not possible to include the syntax using formal rules. In that case the produced strings are described in english. The informal rules are enclosed in apostrophies.
+        For example, rule <em><a href="#rule.any-char-example">any&#8209;char</a></em> produces a language that consists of the strings that consist of single Unicode characters:
+
+        <table class="grammar">
+            <tr>
+                <td class="rule" id="rule.any-char-example">any&#8209;char</td>
+                <td class="sep">&rarr;</td>
+                <td class="rcontent">
+                    'any Unicode character'
+                </td>
+            </tr>
+        </table>
+    </p>
+
+    <h3 id="grammar-operators">Grammar Operators</h3>
+
+    <p>
+        The parsing expressions can be combined using <em>grammar operators</em> that are: |, sequence, &minus;, *, +, ?, and ().
+    </p>
+
+    <h4 id="union">Union</h4>
+
+    <p>
+        If <em>e<sub>1</sub></em> and <em>e<sub>2</sub></em> are parsing expressions, <em>e<sub>1</sub></em> | <em>e<sub>2</sub></em> produces the set of strings that is union of 
+        the set of strings that <em>e<sub>1</sub></em> produces and the set of strings that <em>e<sub>2</sub></em> produces.
+        Another way of thinking it is that the bar character (|) operator means <em>alternatives</em>. 
+        Unlike in general context-free grammars, in Parsing Expression Grammars the first alternative that matches an input always wins, so Parsing Expression Grammars cannot be ambiguous
+        as general context-free grammars can.
+    </p>
+
+    <p>
+        For example, the rule <em><a href="#rule.basic-type-example">basic&#8209;type</a></em> produces a language that consists of the names of the Cmajor basic types:
+
+        <table class="grammar">
+            <tr>
+                <td class="rule" id="rule.basic-type-example">basic&#8209;type</td>
+                <td class="sep">&rarr;</td>
+                <td class="rcontent">
+                    <span class="kw">bool</span> |
+                    <span class="kw">sbyte</span> |
+                    <span class="kw">byte</span> |
+                    <span class="kw">short</span> |
+                    <span class="kw">ushort</span> |
+                    <span class="kw">int</span> |
+                    <span class="kw">uint</span> |
+                    <span class="kw">long</span> |
+                    <span class="kw">ulong</span> |
+                    <span class="kw">float</span> |
+                    <span class="kw">double</span> |
+                    <span class="kw">char</span> |
+                    <span class="kw">wchar</span> |
+                    <span class="kw">uchar</span> |
+                    <span class="kw">void</span>
+                </td>
+            </tr>
+        </table>
+    </p>
+
+    <h4 id="sequence">Sequence</h4>
+
+    <p>
+        If <em>e<sub>1</sub></em> and <em>e<sub>2</sub></em> are parsing expressions, <em>e<sub>1</sub></em><em>e<sub>2</sub></em> produces a set of strings that consist of
+        strings that <em>e<sub>1</sub></em> produces <a href="http://en.wikipedia.org/wiki/Concatenation"><em>concatenated</em></a> with strings that <em>e<sub>2</sub></em> produces.
+        Another way of thinking it is that first <em>e<sub>1</sub></em> occurs and then <em>e<sub>2</sub></em> occurs.
+    </p>
+
+    <p>
+        For example, rule <em><a href="#rule.hex-digit-4-example">hex&#8209;digit&#8209;4</a></em> produces a language that consist of strings of four hexadecimal digits:
+
+        <table class="grammar">
+            <tr>
+                <td class="rule" id="rule.hex-digit-4-example">hex&#8209;digit&#8209;4</td>
+                <td class="sep">&rarr;</td>
+                <td class="rcontent">
+                    <span class="rule"><a href="#rule.hex-digit">hex&#8209;digit</a></span>
+                    <span class="rule"><a href="#rule.hex-digit">hex&#8209;digit</a></span>
+                    <span class="rule"><a href="#rule.hex-digit">hex&#8209;digit</a></span>
+                    <span class="rule"><a href="#rule.hex-digit">hex&#8209;digit</a></span>
+                </td>
+            </tr>
+        </table>
+    </p>
+
+    <h4 id="difference">Difference</h4>
+
+    <p>
+        If <em>e<sub>1</sub></em> and <em>e<sub>2</sub></em> are parsing expressions, <em>e<sub>1</sub></em> &minus; <em>e<sub>2</sub></em> produces the set of strings that is 
+        difference of the strings that <em>e<sub>1</sub></em> produces and the strings that <em>e<sub>2</sub></em> produces.
+        Another way of thinking it is that <em>e<sub>1</sub></em> occurs but <em>e<sub>2</sub></em> does not occur.
+    </p>
+
+    <p>
+        For example, rule <em><a href="#rule.identifier-example">identifier</a></em> produces strings that consist of strings that belong to the set of strings that rule
+        <em>id&#8209;char&#8209;sequence</em> produces but do <em>not</em> belong to the set of strings that rule <em>keyword</em> produces:
+
+        <table class="grammar">
+            <tr>
+                <td class="rule" id="rule.identifier-example">identifier</td>
+                <td class="sep">&rarr;</td>
+                <td class="rcontent">
+                    <span class="rule"><a href="#rule.id-char-sequence-example">id&#8209;char&#8209;sequence</a></span>
+                    <span class="op">&minus;</span>
+                    <span class="rule"><a href="#rule.keyword">keyword</a></span>
+                </td>
+            </tr>
+            <tr>
+                <td class="rule" id="rule.id-char-sequence-example">id&#8209;char&#8209;sequence</td>
+                <td class="sep">&rarr;</td>
+                <td class="rcontent">
+                    (<span class="rule"><a href="#rule.letter">letter</a></span> | <span class="mono">_</span>)
+                    (<span class="rule"><a href="#rule.letter">letter</a></span> | 
+                    <span class="rule"><a href="#rule.digit">digit</a></span> | 
+                    <span class="mono">_</span>)*
+                </td>
+            </tr>
+            <tr>
+                <td class="rule" id="rule.letter">letter</td>
+                <td class="sep">&rarr;</td>
+                <td class="rcontent">
+                    [a-zA-Z]
+                </td>
+            </tr>
+            <tr>
+                <td class="rule" id="rule.digit">digit</td>
+                <td class="sep">&rarr;</td>
+                <td class="rcontent">
+                    [0-9]
+                </td>
+            </tr>
+        </table>
+    </p>
+
+    <h4 id="kleene">Kleene Closure</h4>
+
+    <p>
+        If <em>e</em> is a parsing expression and &lambda; denotes an empty string, <em>e</em>* produces strings that the following parsing expressions produce:
+        <blockquote>&lambda;, <em>e</em>, <em>e</em><em>e</em>, <em>e</em><em>e</em><em>e</em>, ...</blockquote>
+        Another way of thinking it is that <em>e</em> occurs zero or more times.
+        The name of this operation is <a href="http://en.wikipedia.org/wiki/Kleene_star">kleene closure</a>.
+    </p>
+
+    <p>
+        For example, rule <em><a href="#rule.digits">digits</a></em> produces strings that consist of zero or more decimal digits:
+
+        <table class="grammar">
+            <tr>
+                <td class="rule" id="rule.digits">digits</td>
+                <td class="sep">&rarr;</td>
+                <td class="rcontent">
+                    [0-9]*
+                </td>
+            </tr>
+        </table>
+    </p>
+
+    <h4 id="positive">Positive</h4>
+
+    <p>
+        If <em>e</em> is a parsing expression, <em>e</em>+ produces strings that the following parsing expressions produce:
+        <blockquote><em>e</em>, <em>e</em><em>e</em>, <em>e</em><em>e</em><em>e</em>, ...</blockquote>
+        Another way of thinking it is that <em>e</em> occurs one or more times.
+    </p>
+
+    <p>
+        For example, rule <em><a href="#rule.dec-digit-sequence-example">dec&#8209;digit&#8209;sequence</a></em> produces strings consisting of nonempty sequences of decimal digits:
+
+        <table class="grammar">
+            <tr>
+                <td class="rule" id="rule.dec-digit-sequence-example">dec&#8209;digit&#8209;sequence</td>
+                <td class="sep">&rarr;</td>
+                <td class="rcontent">
+                    [0-9]+
+                </td>
+            </tr>
+        </table>
+    </p>
+
+    <h4 id="optional">Optional</h4>
+
+    <p>
+        If <em>e</em> is a parsing expression, <em>e</em>? produces strings that consist of the empty string and the strings that parsing expressions <em>e</em> produce.
+        Another way of thinking it is that <em>e</em> may but does not have to occur, it is optional.
+    </p>
+
+    <p>
+        For example, rule <em><a href="#rule.integer">integer</a></em> produces strings that may begin with sign and then comes nonempty sequence of decimal digits:
+
+        <table class="grammar">
+            <tr>
+                <td class="rule" id="rule.integer">integer</td>
+                <td class="sep">&rarr;</td>
+                <td class="rcontent">
+                    <span class="rule"><a href="#rule.sign-example">sign</a></span>?
+                    <span class="rule"><a href="#rule.dec-digit-sequence-example">dec&#8209;digit&#8209;sequence</a></span>
+                </td>
+            </tr>
+            <tr>
+                <td class="rule" id="rule.sign-example">sign</td>
+                <td class="sep">&rarr;</td>
+                <td class="rcontent">
+                    <span class="mono">+</span> |
+                    <span class="mono">-</span>
+                </td>
+            </tr>
+            <tr>
+                <td class="rule" id="rule.dec-digit-sequence-example">dec&#8209;digit&#8209;sequence</td>
+                <td class="sep">&rarr;</td>
+                <td class="rcontent">
+                    [0-9]+
+                </td>
+            </tr>
+        </table>
+    </p>
+
+    <h4 id="grouping">Grouping</h4>
+
+    <p>
+        If <em>e</em> is a parsing expression, (<em>e</em>) produces the same strings that <em>e</em> produce.
+        The parentheses may be used to group parsing expressions another way when the <em>precedence</em> of grammar operators produces wrong result.
+        The precedence of | is lowest, then comes sequence operation, &minus;, and then *, + and ?.
+        This means that for example parsing expression <blockquote><span class="mono">ab</span>*</blockquote>
+        produces strings that consist of character <span class="mono">a</span> followed by zero or more <span class="mono">b</span>'s,
+        because precedence of sequence operation is lower than the precedence of *, so that operator * binds tighter than sequence operation.
+    </p>
+
+    <p>
+        If one wants to produce the following strings: &lambda;, <span class="mono">ab</span>, <span class="mono">abab</span>, <span class="mono">ababab</span>, ...,
+        this can be achieved by using parentheses:
+        <blockquote>(<span class="mono">ab</span>)*</blockquote>
+    </p>
+
+    <p>
+        The parentheses used for grouping are slightly taller than parentheses that are terminal characters:
+
+        <table class="grammar">
+            <tr>
+                <td class="rule" id="rule.grouping-parents">grouping&#8209;parens</td>
+                <td class="sep">&rarr;</td>
+                <td class="rcontent">
+                    (<span class="mono">()</span>)
+                </td>
+            </tr>
+        </table>
+
+        The outer parentheses are grouping operators and the inner parentheses are terminal characters.
+    </p>
 
     <hr />
 

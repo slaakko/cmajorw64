@@ -1452,22 +1452,22 @@ private:
 void CompileUnitGrammar::GetReferencedGrammars()
 {
     cmajor::parsing::ParsingDomain* pd = GetParsingDomain();
-    cmajor::parsing::Grammar* grammar0 = pd->GetGrammar(ToUtf32("cmajor.parser.IdentifierGrammar"));
+    cmajor::parsing::Grammar* grammar0 = pd->GetGrammar(ToUtf32("cmajor.parser.ConstantGrammar"));
     if (!grammar0)
     {
-        grammar0 = cmajor::parser::IdentifierGrammar::Create(pd);
+        grammar0 = cmajor::parser::ConstantGrammar::Create(pd);
     }
     AddGrammarReference(grammar0);
-    cmajor::parsing::Grammar* grammar1 = pd->GetGrammar(ToUtf32("cmajor.parser.EnumerationGrammar"));
+    cmajor::parsing::Grammar* grammar1 = pd->GetGrammar(ToUtf32("cmajor.parser.IdentifierGrammar"));
     if (!grammar1)
     {
-        grammar1 = cmajor::parser::EnumerationGrammar::Create(pd);
+        grammar1 = cmajor::parser::IdentifierGrammar::Create(pd);
     }
     AddGrammarReference(grammar1);
-    cmajor::parsing::Grammar* grammar2 = pd->GetGrammar(ToUtf32("cmajor.parser.ConceptGrammar"));
+    cmajor::parsing::Grammar* grammar2 = pd->GetGrammar(ToUtf32("cmajor.parser.ClassGrammar"));
     if (!grammar2)
     {
-        grammar2 = cmajor::parser::ConceptGrammar::Create(pd);
+        grammar2 = cmajor::parser::ClassGrammar::Create(pd);
     }
     AddGrammarReference(grammar2);
     cmajor::parsing::Grammar* grammar3 = pd->GetGrammar(ToUtf32("cmajor.parser.FunctionGrammar"));
@@ -1476,10 +1476,10 @@ void CompileUnitGrammar::GetReferencedGrammars()
         grammar3 = cmajor::parser::FunctionGrammar::Create(pd);
     }
     AddGrammarReference(grammar3);
-    cmajor::parsing::Grammar* grammar4 = pd->GetGrammar(ToUtf32("cmajor.parser.ConstantGrammar"));
+    cmajor::parsing::Grammar* grammar4 = pd->GetGrammar(ToUtf32("cmajor.parser.InterfaceGrammar"));
     if (!grammar4)
     {
-        grammar4 = cmajor::parser::ConstantGrammar::Create(pd);
+        grammar4 = cmajor::parser::InterfaceGrammar::Create(pd);
     }
     AddGrammarReference(grammar4);
     cmajor::parsing::Grammar* grammar5 = pd->GetGrammar(ToUtf32("cmajor.parser.TypedefGrammar"));
@@ -1488,10 +1488,10 @@ void CompileUnitGrammar::GetReferencedGrammars()
         grammar5 = cmajor::parser::TypedefGrammar::Create(pd);
     }
     AddGrammarReference(grammar5);
-    cmajor::parsing::Grammar* grammar6 = pd->GetGrammar(ToUtf32("cmajor.parser.ClassGrammar"));
+    cmajor::parsing::Grammar* grammar6 = pd->GetGrammar(ToUtf32("cmajor.parser.ConceptGrammar"));
     if (!grammar6)
     {
-        grammar6 = cmajor::parser::ClassGrammar::Create(pd);
+        grammar6 = cmajor::parser::ConceptGrammar::Create(pd);
     }
     AddGrammarReference(grammar6);
     cmajor::parsing::Grammar* grammar7 = pd->GetGrammar(ToUtf32("cmajor.parser.DelegateGrammar"));
@@ -1500,10 +1500,10 @@ void CompileUnitGrammar::GetReferencedGrammars()
         grammar7 = cmajor::parser::DelegateGrammar::Create(pd);
     }
     AddGrammarReference(grammar7);
-    cmajor::parsing::Grammar* grammar8 = pd->GetGrammar(ToUtf32("cmajor.parser.InterfaceGrammar"));
+    cmajor::parsing::Grammar* grammar8 = pd->GetGrammar(ToUtf32("cmajor.parser.EnumerationGrammar"));
     if (!grammar8)
     {
-        grammar8 = cmajor::parser::InterfaceGrammar::Create(pd);
+        grammar8 = cmajor::parser::EnumerationGrammar::Create(pd);
     }
     AddGrammarReference(grammar8);
     cmajor::parsing::Grammar* grammar9 = pd->GetGrammar(ToUtf32("cmajor.parsing.stdlib"));
@@ -1517,16 +1517,16 @@ void CompileUnitGrammar::GetReferencedGrammars()
 void CompileUnitGrammar::CreateRules()
 {
     AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("Identifier"), this, ToUtf32("IdentifierGrammar.Identifier")));
-    AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("QualifiedId"), this, ToUtf32("IdentifierGrammar.QualifiedId")));
-    AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("EnumType"), this, ToUtf32("EnumerationGrammar.EnumType")));
-    AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("Concept"), this, ToUtf32("ConceptGrammar.Concept")));
     AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("Function"), this, ToUtf32("FunctionGrammar.Function")));
-    AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("Constant"), this, ToUtf32("ConstantGrammar.Constant")));
-    AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("Class"), this, ToUtf32("ClassGrammar.Class")));
+    AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("QualifiedId"), this, ToUtf32("IdentifierGrammar.QualifiedId")));
     AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("Interface"), this, ToUtf32("InterfaceGrammar.Interface")));
     AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("Typedef"), this, ToUtf32("TypedefGrammar.Typedef")));
-    AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("Delegate"), this, ToUtf32("DelegateGrammar.Delegate")));
+    AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("Concept"), this, ToUtf32("ConceptGrammar.Concept")));
     AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("ClassDelegate"), this, ToUtf32("DelegateGrammar.ClassDelegate")));
+    AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("Class"), this, ToUtf32("ClassGrammar.Class")));
+    AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("EnumType"), this, ToUtf32("EnumerationGrammar.EnumType")));
+    AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("Constant"), this, ToUtf32("ConstantGrammar.Constant")));
+    AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("Delegate"), this, ToUtf32("DelegateGrammar.Delegate")));
     AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("spaces_and_comments"), this, ToUtf32("cmajor.parsing.stdlib.spaces_and_comments")));
     AddRule(new CompileUnitRule(ToUtf32("CompileUnit"), GetScope(), GetParsingDomain()->GetNextRuleId(),
         new cmajor::parsing::SequenceParser(

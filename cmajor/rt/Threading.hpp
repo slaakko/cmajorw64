@@ -1,0 +1,25 @@
+// =================================
+// Copyright (c) 2018 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+#ifndef CMAJOR_RT_THREADING_INCLUDED
+#define CMAJOR_RT_THREADING_INCLUDED
+#include <cmajor/rt/RtApi.hpp>
+#include <stdint.h>
+
+extern "C" RT_API int32_t RtGetHardwareConcurrency();
+extern "C" RT_API int32_t RtStartThreadFunction(void* function);
+extern "C" RT_API int32_t RtStartThreadFunctionWithParam(void* function, void* param);
+extern "C" RT_API int32_t RtStartThreadMethod(void* classDelegate);
+extern "C" RT_API int32_t RtStartThreadMethodWithParam(void* classDelegate, void* param);
+extern "C" RT_API bool RtJoinThread(int32_t threadId);
+
+namespace cmajor { namespace rt {
+
+void InitThreading();
+void DoneThreading();
+
+} } // namespace cmajor::rt
+
+#endif // CMAJOR_RT_THREADING_INCLUDED

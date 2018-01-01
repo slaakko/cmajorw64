@@ -1,5 +1,5 @@
 // =================================
-// Copyright (c) 2017 Seppo Laakko
+// Copyright (c) 2018 Seppo Laakko
 // Distributed under the MIT license
 // =================================
 
@@ -11,6 +11,11 @@ namespace cmajor { namespace binder {
 ModuleBinder::ModuleBinder(Module& module_, CompileUnitNode* compileUnitNode_) : 
     boundCompileUnit(module_, compileUnitNode_), containerScope(module_.GetSymbolTable().GlobalNs().GetContainerScope()), span(compileUnitNode_->GetSpan())
 {
+}
+
+void ModuleBinder::SetBindingTypes()
+{
+    boundCompileUnit.PushBindingTypes();
 }
 
 void ModuleBinder::BindClassTemplateSpecialization(ClassTemplateSpecializationSymbol* classTemplateSpecialization)

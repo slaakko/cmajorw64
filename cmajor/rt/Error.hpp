@@ -1,5 +1,5 @@
 // =================================
-// Copyright (c) 2017 Seppo Laakko
+// Copyright (c) 2018 Seppo Laakko
 // Distributed under the MIT license
 // =================================
 
@@ -12,6 +12,7 @@
 const int exitCodeInternalError = 255;
 const int exitCodeAssertionFailed = 254;
 const int exitCodeOutOfMemory = 253;
+const int exitCodeExceptionEscapedFromThread = 252;
 
 extern "C" RT_API void RtFailAssertion(const char* assertion, const char* function, const char* sourceFilePath, int lineNumber);
 extern "C" RT_API const char* RtGetError(int32_t errorId);

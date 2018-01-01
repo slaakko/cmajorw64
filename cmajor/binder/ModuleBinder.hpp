@@ -1,5 +1,5 @@
 // =================================
-// Copyright (c) 2017 Seppo Laakko
+// Copyright (c) 2018 Seppo Laakko
 // Distributed under the MIT license
 // =================================
 
@@ -17,6 +17,7 @@ class ModuleBinder
 public:
     ModuleBinder(Module& module_, CompileUnitNode* compileUnitNode_);
     void BindClassTemplateSpecialization(ClassTemplateSpecializationSymbol* classTemplateSpecialization);
+    void SetBindingTypes();
 private:
     BoundCompileUnit boundCompileUnit;
     ContainerScope* containerScope;

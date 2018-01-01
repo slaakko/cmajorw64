@@ -1,5 +1,5 @@
 // =================================
-// Copyright (c) 2017 Seppo Laakko
+// Copyright (c) 2018 Seppo Laakko
 // Distributed under the MIT license
 // =================================
 
@@ -190,13 +190,16 @@ std::string ConstantSymbol::Syntax() const
     syntax.append(ToUtf8(GetType()->DocName()));
     syntax.append(1, ' ');
     syntax.append(ToUtf8(DocName()));
-    syntax.append(" = ");
-    std::string valueStr = value->ToString();
-    if (GetType()->IsUnsignedType())
+    if (value)
     {
-        valueStr.append(1, 'u');
+        syntax.append(" = ");
+        std::string valueStr = value->ToString();
+        if (GetType()->IsUnsignedType())
+        {
+            valueStr.append(1, 'u');
+        }
+        syntax.append(valueStr);
     }
-    syntax.append(valueStr);
     syntax.append(1, ';');
     return syntax;
 }

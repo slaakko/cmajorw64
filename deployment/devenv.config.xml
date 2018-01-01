@@ -1,0 +1,35 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cmdevenv.configuration>
+    <cmc>cmc.exe</cmc>
+    <tabSize>4</tabSize>
+    <infoDelaySecs>10</infoDelaySecs>
+    <formSizeX>1840</formSizeX>
+    <formSizeY>985</formSizeY>
+    <formTop>23</formTop>
+    <formLeft>29</formLeft>
+    <textVisX>52</textVisX>
+    <textVisY>52</textVisY>
+    <textVisW>1259</textVisW>
+    <textVisH>482</textVisH>
+    <toolColWidth>80</toolColWidth>
+    <categoryColWidth>80</categoryColWidth>
+    <descriptionColWidth>1003</descriptionColWidth>
+    <fileColWidth>340</fileColWidth>
+    <lineColWidth>60</lineColWidth>
+    <projectColWidth>80</projectColWidth>
+    <textColWidth>308</textColWidth>
+    <findFileColWidth>442</findFileColWidth>
+    <findLineColWidth>85</findLineColWidth>
+    <findProjectColWidth>183</findProjectColWidth>
+    <findTextColWidth>738</findTextColWidth>
+    <horizontalSplitterPos>1386</horizontalSplitterPos>
+    <verticalSplitterPos>630</verticalSplitterPos>
+    <windowState>Normal</windowState>
+    <maxRecentProjects>10</maxRecentProjects>
+    <recentProjects />
+    <strictNothrow>false</strictNothrow>
+    <emitLlvm>false</emitLlvm>
+    <emitOptLlvm>false</emitOptLlvm>
+    <linkWithDebugRuntime>false</linkWithDebugRuntime>
+    <linkUsingMsLink>false</linkUsingMsLink>
+</cmdevenv.configuration>

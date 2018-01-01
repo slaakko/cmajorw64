@@ -1,5 +1,5 @@
 // =================================
-// Copyright (c) 2017 Seppo Laakko
+// Copyright (c) 2018 Seppo Laakko
 // Distributed under the MIT license
 // =================================
 
@@ -165,7 +165,7 @@ bool FindQualificationConversion(TypeSymbol* sourceType, TypeSymbol* targetType,
     }
     else if (!sourceType->IsReferenceType() && (targetType->IsReferenceType() || targetType->IsClassTypeSymbol() || targetType->GetSymbolType() == SymbolType::classDelegateTypeSymbol)) 
     {
-        if (targetType->IsConstType() || targetType->IsClassTypeSymbol()) 
+        if (targetType->IsConstType() || targetType->IsClassTypeSymbol() || targetType->GetSymbolType() == SymbolType::classDelegateTypeSymbol)
         {
             argumentMatch.postReferenceConversionFlags = OperationFlags::addr;
             argumentMatch.conversionDistance = distance;

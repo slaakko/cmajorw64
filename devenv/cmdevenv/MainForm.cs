@@ -1697,7 +1697,7 @@ namespace cmdevenv
             try
             {
                 string cmajorRootDir = Environment.GetEnvironmentVariable("CMAJOR_ROOT");
-                await OpenProjectOrSolution(Path.Combine(Path.Combine(cmajorRootDir, "system"), "System.cms")); ;
+                await OpenProjectOrSolution(Path.Combine(Path.Combine(cmajorRootDir, "system"), "System.cms"));
             }
             catch (Exception ex)
             {
@@ -1987,6 +1987,22 @@ namespace cmdevenv
                 MessageBox.Show(ex.Message);
             }
         }
+        private void languageReferenceToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                string cmajorRoot = Environment.GetEnvironmentVariable("CMAJOR_ROOT");
+                if (string.IsNullOrEmpty(cmajorRoot))
+                {
+                    throw new Exception("CMAJOR_ROOT environment variable not set, please set it to contain /path/to/cmajor directory");
+                }
+                System.Diagnostics.Process.Start(Path.Combine(cmajorRoot, Path.Combine("doc", Path.Combine("langref", "langref.html"))));
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
         private void projectPropertiesToolStripMenuItem_Click(object sender, EventArgs e)
         {
             try
@@ -2002,6 +2018,18 @@ namespace cmdevenv
                     }
                 }
                     
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+        private async void examplesToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                string cmajorRootDir = Environment.GetEnvironmentVariable("CMAJOR_ROOT");
+                await OpenProjectOrSolution(Path.Combine(Path.Combine(Path.Combine(cmajorRootDir, "projects"), "examples"), "examples.cms"));
             }
             catch (Exception ex)
             {

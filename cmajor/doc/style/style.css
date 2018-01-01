@@ -9,9 +9,9 @@ body.index
     background-repeat: no-repeat;
 }
 
-h1.index
+h1.index, h2.index
 {
-    color: black
+    color: black;
 }
 
 p
@@ -83,7 +83,7 @@ td.bottommiddle
     font-weight: bold;
 }
 
-.options 
+.options
 {
     background-color: FloralWhite;
     margin: 20px;

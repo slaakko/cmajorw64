@@ -1,5 +1,5 @@
 // =================================
-// Copyright (c) 2017 Seppo Laakko
+// Copyright (c) 2018 Seppo Laakko
 // Distributed under the MIT license
 // =================================
 
@@ -120,6 +120,8 @@ void DelegateTypeSymbol::ComputeExportClosure()
                 returnType->ComputeExportClosure();
             }
         }
+        AddConst(GetSpan())->AddLvalueReference(GetSpan())->ComputeExportClosure();
+        AddRvalueReference(GetSpan())->ComputeExportClosure();
     }
 }
 
@@ -638,6 +640,8 @@ void ClassDelegateTypeSymbol::ComputeExportClosure()
                 returnType->ComputeExportClosure();
             }
         }
+        AddConst(GetSpan())->AddLvalueReference(GetSpan())->ComputeExportClosure();
+        AddRvalueReference(GetSpan())->ComputeExportClosure();
     }
 }
 

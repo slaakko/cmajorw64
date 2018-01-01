@@ -43,8 +43,6 @@ namespace cmdevenv
             this.toolStripMenuItem3 = new System.Windows.Forms.ToolStripSeparator();
             this.toolStripMenuItem14 = new System.Windows.Forms.ToolStripMenuItem();
             this.systemLibraryToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.examplesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.cmparsergenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator6 = new System.Windows.Forms.ToolStripSeparator();
             this.recentProjectsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.clearRecentProjectsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -75,25 +73,9 @@ namespace cmdevenv
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem17 = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem7 = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator7 = new System.Windows.Forms.ToolStripSeparator();
+            this.languageReferenceToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
-            this.gettingStartedGuideToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.compilerUsersManualToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.languageSpecificationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.compilerImplementationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.systemLibraryReferenceToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.conceptsTutorialToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.cmajorParserGeneratorToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.debuggingToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.unitTestingToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.profilingCmajorApplicationsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.systemExtensionLibrariesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.systemIOCompressionLibraryToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.systemNetHttpLibraryToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.systemNetSocketsLibraryToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.systemNumericsMultiprecisionLibraryToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.systemTextJsonLibraryToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.systemTextRegularExpressionsLibraryToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripMenuItem15 = new System.Windows.Forms.ToolStripSeparator();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.label2 = new System.Windows.Forms.Label();
@@ -176,6 +158,7 @@ namespace cmdevenv
             this.addExistingSourceFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.addExistingProjectFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.addProjectReferenceDialog = new System.Windows.Forms.OpenFileDialog();
+            this.examplesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.editorSplitContainer)).BeginInit();
             this.editorSplitContainer.Panel2.SuspendLayout();
@@ -295,8 +278,7 @@ namespace cmdevenv
             // 
             this.toolStripMenuItem14.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.systemLibraryToolStripMenuItem,
-            this.examplesToolStripMenuItem,
-            this.cmparsergenToolStripMenuItem});
+            this.examplesToolStripMenuItem});
             this.toolStripMenuItem14.Name = "toolStripMenuItem14";
             this.toolStripMenuItem14.Size = new System.Drawing.Size(244, 22);
             this.toolStripMenuItem14.Text = "&Built-in Projects";
@@ -304,21 +286,9 @@ namespace cmdevenv
             // systemLibraryToolStripMenuItem
             // 
             this.systemLibraryToolStripMenuItem.Name = "systemLibraryToolStripMenuItem";
-            this.systemLibraryToolStripMenuItem.Size = new System.Drawing.Size(203, 22);
+            this.systemLibraryToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.systemLibraryToolStripMenuItem.Text = "System Library";
             this.systemLibraryToolStripMenuItem.Click += new System.EventHandler(this.systemLibraryToolStripMenuItem_Click);
-            // 
-            // examplesToolStripMenuItem
-            // 
-            this.examplesToolStripMenuItem.Name = "examplesToolStripMenuItem";
-            this.examplesToolStripMenuItem.Size = new System.Drawing.Size(203, 22);
-            this.examplesToolStripMenuItem.Text = "Examples";
-            // 
-            // cmparsergenToolStripMenuItem
-            // 
-            this.cmparsergenToolStripMenuItem.Name = "cmparsergenToolStripMenuItem";
-            this.cmparsergenToolStripMenuItem.Size = new System.Drawing.Size(203, 22);
-            this.cmparsergenToolStripMenuItem.Text = "Cmajor Parser Generator";
             // 
             // toolStripSeparator6
             // 
@@ -527,19 +497,9 @@ namespace cmdevenv
             this.helpToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripMenuItem17,
             this.toolStripMenuItem7,
+            this.toolStripSeparator7,
+            this.languageReferenceToolStripMenuItem,
             this.toolStripSeparator2,
-            this.gettingStartedGuideToolStripMenuItem,
-            this.compilerUsersManualToolStripMenuItem,
-            this.languageSpecificationToolStripMenuItem,
-            this.compilerImplementationToolStripMenuItem,
-            this.systemLibraryReferenceToolStripMenuItem,
-            this.conceptsTutorialToolStripMenuItem,
-            this.cmajorParserGeneratorToolStripMenuItem,
-            this.debuggingToolStripMenuItem,
-            this.unitTestingToolStripMenuItem,
-            this.profilingCmajorApplicationsToolStripMenuItem,
-            this.systemExtensionLibrariesToolStripMenuItem,
-            this.toolStripMenuItem15,
             this.aboutToolStripMenuItem});
             this.helpToolStripMenuItem.Name = "helpToolStripMenuItem";
             this.helpToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
@@ -548,140 +508,38 @@ namespace cmdevenv
             // toolStripMenuItem17
             // 
             this.toolStripMenuItem17.Name = "toolStripMenuItem17";
-            this.toolStripMenuItem17.Size = new System.Drawing.Size(230, 22);
+            this.toolStripMenuItem17.Size = new System.Drawing.Size(188, 22);
             this.toolStripMenuItem17.Text = "Local Documentation";
             this.toolStripMenuItem17.Click += new System.EventHandler(this.toolStripMenuItem17_Click);
             // 
             // toolStripMenuItem7
             // 
             this.toolStripMenuItem7.Name = "toolStripMenuItem7";
-            this.toolStripMenuItem7.Size = new System.Drawing.Size(230, 22);
+            this.toolStripMenuItem7.Size = new System.Drawing.Size(188, 22);
             this.toolStripMenuItem7.Text = "Homepage";
             this.toolStripMenuItem7.Click += new System.EventHandler(this.toolStripMenuItem7_Click);
+            // 
+            // toolStripSeparator7
+            // 
+            this.toolStripSeparator7.Name = "toolStripSeparator7";
+            this.toolStripSeparator7.Size = new System.Drawing.Size(185, 6);
+            // 
+            // languageReferenceToolStripMenuItem
+            // 
+            this.languageReferenceToolStripMenuItem.Name = "languageReferenceToolStripMenuItem";
+            this.languageReferenceToolStripMenuItem.Size = new System.Drawing.Size(188, 22);
+            this.languageReferenceToolStripMenuItem.Text = "Language Reference";
+            this.languageReferenceToolStripMenuItem.Click += new System.EventHandler(this.languageReferenceToolStripMenuItem_Click);
             // 
             // toolStripSeparator2
             // 
             this.toolStripSeparator2.Name = "toolStripSeparator2";
-            this.toolStripSeparator2.Size = new System.Drawing.Size(227, 6);
-            // 
-            // gettingStartedGuideToolStripMenuItem
-            // 
-            this.gettingStartedGuideToolStripMenuItem.Name = "gettingStartedGuideToolStripMenuItem";
-            this.gettingStartedGuideToolStripMenuItem.Size = new System.Drawing.Size(230, 22);
-            this.gettingStartedGuideToolStripMenuItem.Text = "&Getting Started Guide";
-            // 
-            // compilerUsersManualToolStripMenuItem
-            // 
-            this.compilerUsersManualToolStripMenuItem.Name = "compilerUsersManualToolStripMenuItem";
-            this.compilerUsersManualToolStripMenuItem.Size = new System.Drawing.Size(230, 22);
-            this.compilerUsersManualToolStripMenuItem.Text = "Compiler &User\'s Manual";
-            // 
-            // languageSpecificationToolStripMenuItem
-            // 
-            this.languageSpecificationToolStripMenuItem.Name = "languageSpecificationToolStripMenuItem";
-            this.languageSpecificationToolStripMenuItem.Size = new System.Drawing.Size(230, 22);
-            this.languageSpecificationToolStripMenuItem.Text = "&Language Specification";
-            // 
-            // compilerImplementationToolStripMenuItem
-            // 
-            this.compilerImplementationToolStripMenuItem.Name = "compilerImplementationToolStripMenuItem";
-            this.compilerImplementationToolStripMenuItem.Size = new System.Drawing.Size(230, 22);
-            this.compilerImplementationToolStripMenuItem.Text = "Compiler &Implementation";
-            // 
-            // systemLibraryReferenceToolStripMenuItem
-            // 
-            this.systemLibraryReferenceToolStripMenuItem.Name = "systemLibraryReferenceToolStripMenuItem";
-            this.systemLibraryReferenceToolStripMenuItem.Size = new System.Drawing.Size(230, 22);
-            this.systemLibraryReferenceToolStripMenuItem.Text = "&System Library Reference";
-            // 
-            // conceptsTutorialToolStripMenuItem
-            // 
-            this.conceptsTutorialToolStripMenuItem.Name = "conceptsTutorialToolStripMenuItem";
-            this.conceptsTutorialToolStripMenuItem.Size = new System.Drawing.Size(230, 22);
-            this.conceptsTutorialToolStripMenuItem.Text = "&Concepts Tutorial";
-            // 
-            // cmajorParserGeneratorToolStripMenuItem
-            // 
-            this.cmajorParserGeneratorToolStripMenuItem.Name = "cmajorParserGeneratorToolStripMenuItem";
-            this.cmajorParserGeneratorToolStripMenuItem.Size = new System.Drawing.Size(230, 22);
-            this.cmajorParserGeneratorToolStripMenuItem.Text = "Cmajor &Parser Generator";
-            // 
-            // debuggingToolStripMenuItem
-            // 
-            this.debuggingToolStripMenuItem.Name = "debuggingToolStripMenuItem";
-            this.debuggingToolStripMenuItem.Size = new System.Drawing.Size(230, 22);
-            this.debuggingToolStripMenuItem.Text = "&Debugging";
-            // 
-            // unitTestingToolStripMenuItem
-            // 
-            this.unitTestingToolStripMenuItem.Name = "unitTestingToolStripMenuItem";
-            this.unitTestingToolStripMenuItem.Size = new System.Drawing.Size(230, 22);
-            this.unitTestingToolStripMenuItem.Text = "&Unit Testing";
-            // 
-            // profilingCmajorApplicationsToolStripMenuItem
-            // 
-            this.profilingCmajorApplicationsToolStripMenuItem.Name = "profilingCmajorApplicationsToolStripMenuItem";
-            this.profilingCmajorApplicationsToolStripMenuItem.Size = new System.Drawing.Size(230, 22);
-            this.profilingCmajorApplicationsToolStripMenuItem.Text = "Profiling Cmajor Applications";
-            // 
-            // systemExtensionLibrariesToolStripMenuItem
-            // 
-            this.systemExtensionLibrariesToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.systemIOCompressionLibraryToolStripMenuItem,
-            this.systemNetHttpLibraryToolStripMenuItem,
-            this.systemNetSocketsLibraryToolStripMenuItem,
-            this.systemNumericsMultiprecisionLibraryToolStripMenuItem,
-            this.systemTextJsonLibraryToolStripMenuItem,
-            this.systemTextRegularExpressionsLibraryToolStripMenuItem});
-            this.systemExtensionLibrariesToolStripMenuItem.Name = "systemExtensionLibrariesToolStripMenuItem";
-            this.systemExtensionLibrariesToolStripMenuItem.Size = new System.Drawing.Size(230, 22);
-            this.systemExtensionLibrariesToolStripMenuItem.Text = "System &Extension Libraries";
-            // 
-            // systemIOCompressionLibraryToolStripMenuItem
-            // 
-            this.systemIOCompressionLibraryToolStripMenuItem.Name = "systemIOCompressionLibraryToolStripMenuItem";
-            this.systemIOCompressionLibraryToolStripMenuItem.Size = new System.Drawing.Size(284, 22);
-            this.systemIOCompressionLibraryToolStripMenuItem.Text = "System.IO.Compression Library";
-            // 
-            // systemNetHttpLibraryToolStripMenuItem
-            // 
-            this.systemNetHttpLibraryToolStripMenuItem.Name = "systemNetHttpLibraryToolStripMenuItem";
-            this.systemNetHttpLibraryToolStripMenuItem.Size = new System.Drawing.Size(284, 22);
-            this.systemNetHttpLibraryToolStripMenuItem.Text = "System.Net.Http Library";
-            // 
-            // systemNetSocketsLibraryToolStripMenuItem
-            // 
-            this.systemNetSocketsLibraryToolStripMenuItem.Name = "systemNetSocketsLibraryToolStripMenuItem";
-            this.systemNetSocketsLibraryToolStripMenuItem.Size = new System.Drawing.Size(284, 22);
-            this.systemNetSocketsLibraryToolStripMenuItem.Text = "System.Net.Sockets Library";
-            // 
-            // systemNumericsMultiprecisionLibraryToolStripMenuItem
-            // 
-            this.systemNumericsMultiprecisionLibraryToolStripMenuItem.Name = "systemNumericsMultiprecisionLibraryToolStripMenuItem";
-            this.systemNumericsMultiprecisionLibraryToolStripMenuItem.Size = new System.Drawing.Size(284, 22);
-            this.systemNumericsMultiprecisionLibraryToolStripMenuItem.Text = "System.Numerics.Multiprecision Library";
-            // 
-            // systemTextJsonLibraryToolStripMenuItem
-            // 
-            this.systemTextJsonLibraryToolStripMenuItem.Name = "systemTextJsonLibraryToolStripMenuItem";
-            this.systemTextJsonLibraryToolStripMenuItem.Size = new System.Drawing.Size(284, 22);
-            this.systemTextJsonLibraryToolStripMenuItem.Text = "System.Text.Json Library";
-            // 
-            // systemTextRegularExpressionsLibraryToolStripMenuItem
-            // 
-            this.systemTextRegularExpressionsLibraryToolStripMenuItem.Name = "systemTextRegularExpressionsLibraryToolStripMenuItem";
-            this.systemTextRegularExpressionsLibraryToolStripMenuItem.Size = new System.Drawing.Size(284, 22);
-            this.systemTextRegularExpressionsLibraryToolStripMenuItem.Text = "System.Text.RegularExpressions Library";
-            // 
-            // toolStripMenuItem15
-            // 
-            this.toolStripMenuItem15.Name = "toolStripMenuItem15";
-            this.toolStripMenuItem15.Size = new System.Drawing.Size(227, 6);
+            this.toolStripSeparator2.Size = new System.Drawing.Size(185, 6);
             // 
             // aboutToolStripMenuItem
             // 
             this.aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
-            this.aboutToolStripMenuItem.Size = new System.Drawing.Size(230, 22);
+            this.aboutToolStripMenuItem.Size = new System.Drawing.Size(188, 22);
             this.aboutToolStripMenuItem.Text = "&About...";
             this.aboutToolStripMenuItem.Click += new System.EventHandler(this.aboutToolStripMenuItem_Click);
             // 
@@ -1021,7 +879,7 @@ namespace cmdevenv
             this.toolStripSeparator5,
             this.viewProjectToolStripMenuItem});
             this.projectContextMenuStrip.Name = "projectContextMenuStrip";
-            this.projectContextMenuStrip.Size = new System.Drawing.Size(181, 260);
+            this.projectContextMenuStrip.Size = new System.Drawing.Size(181, 238);
             // 
             // buildToolStripMenuItem2
             // 
@@ -1303,6 +1161,13 @@ namespace cmdevenv
             this.addProjectReferenceDialog.DefaultExt = "cmp";
             this.addProjectReferenceDialog.Filter = "Cmajor Project Files|*.cmp";
             // 
+            // examplesToolStripMenuItem
+            // 
+            this.examplesToolStripMenuItem.Name = "examplesToolStripMenuItem";
+            this.examplesToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.examplesToolStripMenuItem.Text = "Examples";
+            this.examplesToolStripMenuItem.Click += new System.EventHandler(this.examplesToolStripMenuItem_Click);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1358,8 +1223,6 @@ namespace cmdevenv
         private System.Windows.Forms.ToolStripSeparator toolStripMenuItem3;
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem14;
         private System.Windows.Forms.ToolStripMenuItem systemLibraryToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem examplesToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem cmparsergenToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator6;
         private System.Windows.Forms.ToolStripMenuItem recentProjectsToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
@@ -1387,24 +1250,6 @@ namespace cmdevenv
         private System.Windows.Forms.ToolStripMenuItem windowToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem closeAllToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem helpToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem gettingStartedGuideToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem compilerUsersManualToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem languageSpecificationToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem compilerImplementationToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem systemLibraryReferenceToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem conceptsTutorialToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem cmajorParserGeneratorToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem debuggingToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem unitTestingToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem profilingCmajorApplicationsToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem systemExtensionLibrariesToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem systemIOCompressionLibraryToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem systemNetHttpLibraryToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem systemNetSocketsLibraryToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem systemNumericsMultiprecisionLibraryToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem systemTextJsonLibraryToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem systemTextRegularExpressionsLibraryToolStripMenuItem;
-        private System.Windows.Forms.ToolStripSeparator toolStripMenuItem15;
         private System.Windows.Forms.ToolStripMenuItem aboutToolStripMenuItem;
         private System.Windows.Forms.ToolStrip toolStrip1;
         private System.Windows.Forms.Label label2;
@@ -1491,6 +1336,9 @@ namespace cmdevenv
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem7;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem17;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator7;
+        private System.Windows.Forms.ToolStripMenuItem languageReferenceToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem examplesToolStripMenuItem;
     }
 }
 

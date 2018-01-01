@@ -1,5 +1,5 @@
-#ifndef Specifier_hpp_21397
-#define Specifier_hpp_21397
+#ifndef Specifier_hpp_391
+#define Specifier_hpp_391
 
 #include <cmajor/parsing/Grammar.hpp>
 #include <cmajor/parsing/Keyword.hpp>
@@ -24,4 +24,4 @@ private:
 
 } } // namespace cmajor.parser
 
-#endif // Specifier_hpp_21397
+#endif // Specifier_hpp_391

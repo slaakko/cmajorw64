@@ -1182,6 +1182,10 @@ void GenerateXmlForParameter(ParameterSymbol* parameter, Element* parametersElem
     parameterNameElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(docName)));
     parameterElement->AppendChild(std::move(parameterNameElement));
     std::unique_ptr<Element> parameterTypeElement(new Element(U"type"));
+    if (parameter->GetType()->GetSymbolType() == SymbolType::derivedTypeSymbol)
+    {
+        parameter->GetType()->SetProject();
+    }
     parameterTypeElement->SetAttribute(U"ref", GetTypeId(parameter->GetType()));
     parameterElement->AppendChild(std::move(parameterTypeElement));
     parametersElement->AppendChild(std::move(parameterElement));
@@ -1697,20 +1701,20 @@ struct CheckRefsVisitor : cmajor::dom::Visitor
         std::u32string ref = element->GetAttribute(U"ref");
         if (!ref.empty())
         {
-            Element* element = document->GetElementById(ref);
-            if (!element)
+            Element* refencedElement = document->GetElementById(ref);
+            if (!refencedElement)
             {
                 int n = referenceXmlDocs.size();
                 for (int i = 0; i < n; ++i) 
                 {
                     cmajor::dom::Document* referenceDocuments = referenceXmlDocs[i].get();
-                    element = referenceDocuments->GetElementById(ref);
-                    if (element)
+                    refencedElement = referenceDocuments->GetElementById(ref);
+                    if (refencedElement)
                     {
                         break;
                     }
                 }
-                if (!element)
+                if (!refencedElement)
                 {
                     std::cout << "ref " << ToUtf8(ref) << " not found" << std::endl;
                 }
@@ -1745,10 +1749,10 @@ std::unique_ptr<Document> GenerateLibraryXmlFile(const std::string& moduleFilePa
     {
         cmajor::symbols::MetaInit(module.GetSymbolTable());
     }
-    cmajor::symbols::MetaInit(module.GetSymbolTable());
     std::unique_ptr<ModuleBinder> moduleBinder;
     CompileUnitNode compileUnit(Span(), "foo");
     moduleBinder.reset(new ModuleBinder(module, &compileUnit));
+    moduleBinder->SetBindingTypes();
     module.GetSymbolTable().AddClassTemplateSpecializationsToClassTemplateSpecializationMap(classTemplateSpecializations);
     for (ClassTemplateSpecializationSymbol* classTemplateSpecialization : classTemplateSpecializations)
     {

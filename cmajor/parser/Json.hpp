@@ -1,5 +1,5 @@
-#ifndef Json_hpp_4471
-#define Json_hpp_4471
+#ifndef Json_hpp_391
+#define Json_hpp_391
 
 #include <cmajor/parsing/Grammar.hpp>
 #include <cmajor/parsing/Keyword.hpp>
@@ -28,4 +28,4 @@ private:
 
 } } // namespace cmajor.parser
 
-#endif // Json_hpp_4471
+#endif // Json_hpp_391

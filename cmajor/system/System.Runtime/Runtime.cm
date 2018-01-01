@@ -1,10 +1,12 @@
 ﻿// =================================
-// Copyright (c) 2017 Seppo Laakko
+// Copyright (c) 2018 Seppo Laakko
 // Distributed under the MIT license
 // =================================
 
 public extern cdecl nothrow void RtInit();
 public extern cdecl nothrow void RtDone();
+public extern cdecl nothrow int RtArgc();
+public extern cdecl nothrow const char** RtArgv();
 public extern cdecl nothrow void RtExit(int exitCode);
 public extern cdecl nothrow void* RtMemAlloc(long size);
 public extern cdecl nothrow void RtMemFree(void* ptr);

@@ -21,6 +21,7 @@
   <ItemGroup>
     <None Include="BasicType.parser" />
     <None Include="Class.parser" />
+    <None Include="CommandLine.parser" />
     <None Include="CompileUnit.parser" />
     <None Include="Concept.parser" />
     <None Include="Constant.parser" />
@@ -47,6 +48,7 @@
   <ItemGroup>
     <ClCompile Include="BasicType.cpp" />
     <ClCompile Include="Class.cpp" />
+    <ClCompile Include="CommandLine.cpp" />
     <ClCompile Include="CompileUnit.cpp" />
     <ClCompile Include="Concept.cpp" />
     <ClCompile Include="Constant.cpp" />
@@ -74,6 +76,7 @@
   <ItemGroup>
     <ClInclude Include="BasicType.hpp" />
     <ClInclude Include="Class.hpp" />
+    <ClInclude Include="CommandLine.hpp" />
     <ClInclude Include="CompileUnit.hpp" />
     <ClInclude Include="Concept.hpp" />
     <ClInclude Include="Constant.hpp" />

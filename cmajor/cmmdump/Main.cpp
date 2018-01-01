@@ -1,5 +1,5 @@
 // =================================
-// Copyright (c) 2017 Seppo Laakko
+// Copyright (c) 2018 Seppo Laakko
 // Distributed under the MIT license
 // =================================
 
@@ -104,18 +104,16 @@ int main(int argc, const char** argv)
             std::unique_ptr<ModuleBinder> moduleBinder;
             CompileUnitNode compileUnit(Span(), "foo");
             moduleBinder.reset(new ModuleBinder(module, &compileUnit));
-            if (moduleBinder)
+            moduleBinder->SetBindingTypes();
+            module.GetSymbolTable().AddClassTemplateSpecializationsToClassTemplateSpecializationMap(classTemplateSpecializations);
+            for (ClassTemplateSpecializationSymbol* classTemplateSpecialization : classTemplateSpecializations)
             {
-                module.GetSymbolTable().AddClassTemplateSpecializationsToClassTemplateSpecializationMap(classTemplateSpecializations);
-                for (ClassTemplateSpecializationSymbol* classTemplateSpecialization : classTemplateSpecializations)
-                {
-                    moduleBinder->BindClassTemplateSpecialization(classTemplateSpecialization);
-                }
-                for (ClassTypeSymbol* classType : classTypes)
-                {
-                    classType->SetSpecialMemberFunctions();
-                    classType->CreateLayouts();
-                }
+                moduleBinder->BindClassTemplateSpecialization(classTemplateSpecialization);
+            }
+            for (ClassTypeSymbol* classType : classTypes)
+            {
+                classType->SetSpecialMemberFunctions();
+                classType->CreateLayouts();
             }
             module.Dump();
         }
