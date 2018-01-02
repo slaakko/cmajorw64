@@ -497,7 +497,7 @@ void TypeBinder::Visit(MemberFunctionNode& memberFunctionNode)
     {
         memberFunctionSymbol->CloneUsingNodes(usingNodes);
     }
-    const Symbol* parent = memberFunctionSymbol->Parent();
+    Symbol* parent = memberFunctionSymbol->Parent();
     if (parent->IsStatic() && !memberFunctionSymbol->IsStatic())
     {
         throw Exception("static class cannot contain nonstatic member functions", memberFunctionSymbol->GetSpan(), parent->GetSpan());
@@ -535,6 +535,15 @@ void TypeBinder::Visit(MemberFunctionNode& memberFunctionNode)
         returnParam->SetParent(memberFunctionSymbol);
         returnParam->SetType(returnType->AddPointer(memberFunctionNode.GetSpan()));
         memberFunctionSymbol->SetReturnParam(returnParam);
+    }
+    ClassTypeSymbol* classType = static_cast<ClassTypeSymbol*>(parent);
+    if (memberFunctionSymbol->IsCopyAssignment())
+    {
+        classType->SetCopyAssignment(memberFunctionSymbol);
+    }
+    else if (memberFunctionSymbol->IsMoveAssignment())
+    {
+        classType->SetMoveAssignment(memberFunctionSymbol);
     }
     if (memberFunctionNode.Body())
     {

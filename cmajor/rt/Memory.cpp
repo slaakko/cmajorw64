@@ -9,6 +9,7 @@
 #include <cmajor/rt/CallStack.hpp>
 #include <sstream>
 #include <malloc.h>
+#include <fstream>
 
 namespace cmajor { namespace rt {
 
