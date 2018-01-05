@@ -257,14 +257,14 @@ namespace Syntax
                     for (long i = 0; i < m; ++i)
                     {
                         ActionParser* action = rule->Actions()[i];
-                        formatter.WriteLine("void " + ToUtf8(action->MethodName()) +
+                        formatter.WriteLine("public void " + ToUtf8(action->MethodName()) +
                             "(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)");
                         formatter.SetStart(true);
                         formatter.SetStartText("Context* context = cast<Context*>(parsingData->GetContext(Id()));");
                         action->SuccessCode()->Print(formatter);
                         if (action->FailureCode() != null)
                         {
-                            formatter.WriteLine("void " + ToUtf8(action->MethodName()) + "Fail(ParsingData* parsingData)");
+                            formatter.WriteLine("public void " + ToUtf8(action->MethodName()) + "Fail(ParsingData* parsingData)");
                             formatter.SetStart(true);
                             formatter.SetStartText("Context* context = cast<Context*>(parsingData->GetContext(Id()));");
                             action->FailureCode()->Print(formatter);
