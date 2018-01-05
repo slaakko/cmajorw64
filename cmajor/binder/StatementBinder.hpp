@@ -72,6 +72,7 @@ public:
     void SetCurrentMemberFunction(MemberFunctionSymbol* currentMemberFunctionSymbol_, MemberFunctionNode* currentMemberFunctionNode_);
     void SetContainerScope(ContainerScope* containerScope_) { containerScope = containerScope_; }
     BoundStatement* ReleaseStatement() { return statement.release(); }
+    bool CompilingThrow() const { return compilingThrow; }
 private:
     BoundCompileUnit& boundCompileUnit;
     SymbolTable& symbolTable;
@@ -94,6 +95,7 @@ private:
     std::vector<std::pair<BoundGotoCaseStatement*, IntegralValue>>* currentGotoCaseStatements;
     std::vector<BoundGotoDefaultStatement*>* currentGotoDefaultStatements;
     bool postfix;
+    bool compilingThrow;
     std::stack<bool> conditionalCompilationStack;
     void AddStatement(BoundStatement* boundStatement);
 };

@@ -3,12 +3,12 @@
     <cmc>cmc.exe</cmc>
     <tabSize>4</tabSize>
     <infoDelaySecs>10</infoDelaySecs>
-    <formSizeX>1779</formSizeX>
+    <formSizeX>1762</formSizeX>
     <formSizeY>963</formSizeY>
-    <formTop>0</formTop>
-    <formLeft>0</formLeft>
-    <textVisX>104</textVisX>
-    <textVisY>104</textVisY>
+    <formTop>28</formTop>
+    <formLeft>9</formLeft>
+    <textVisX>208</textVisX>
+    <textVisY>208</textVisY>
     <textVisW>1259</textVisW>
     <textVisH>482</textVisH>
     <toolColWidth>80</toolColWidth>
@@ -18,17 +18,17 @@
     <lineColWidth>60</lineColWidth>
     <projectColWidth>80</projectColWidth>
     <textColWidth>308</textColWidth>
-    <findFileColWidth>442</findFileColWidth>
+    <findFileColWidth>688</findFileColWidth>
     <findLineColWidth>85</findLineColWidth>
     <findProjectColWidth>183</findProjectColWidth>
     <findTextColWidth>738</findTextColWidth>
-    <horizontalSplitterPos>1346</horizontalSplitterPos>
+    <horizontalSplitterPos>1332</horizontalSplitterPos>
     <verticalSplitterPos>529</verticalSplitterPos>
     <windowState>Normal</windowState>
     <maxRecentProjects>10</maxRecentProjects>
     <recentProjects>
         <recentProject>
-            <path>C:\Users\Seppo\cmajorw64\cmajor\projects\examples\examples.cms</path>
+            <path>C:\Users\Seppo\cmajorw64\cmajor\projects\tools\cmparsergen\cmparsergen.cms</path>
             <openFiles />
         </recentProject>
         <recentProject>
@@ -36,11 +36,15 @@
             <openFiles />
         </recentProject>
         <recentProject>
+            <path>C:\Users\Seppo\cmajorw64\cmajor\test\foo\foo.cms</path>
+            <openFiles />
+        </recentProject>
+        <recentProject>
             <path>C:\Users\Seppo\cmajorw64\cmajor\projects\cmparsergen\cmparsergen.cms</path>
             <openFiles />
         </recentProject>
         <recentProject>
-            <path>C:\Users\Seppo\cmajorw64\cmajor\test\foo\foo.cms</path>
+            <path>C:\Users\Seppo\cmajorw64\cmajor\projects\examples\examples.cms</path>
             <openFiles />
         </recentProject>
         <recentProject>

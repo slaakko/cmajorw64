@@ -3,7 +3,12 @@
     <configurations>
         <configuration>
             <name>debug</name>
-            <commandLineArguments />
+            <commandLineArguments>foo file?.* bar</commandLineArguments>
+            <conditionalCompilationSymbols />
+        </configuration>
+        <configuration>
+            <name>release</name>
+            <commandLineArguments>foo file?.* bar</commandLineArguments>
             <conditionalCompilationSymbols />
         </configuration>
     </configurations>

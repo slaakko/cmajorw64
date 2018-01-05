@@ -1,3 +1,3 @@
 solution Examples;
-project <args/args.cmp>;
+project <args/Args.cmp>;
 activeProject Args;

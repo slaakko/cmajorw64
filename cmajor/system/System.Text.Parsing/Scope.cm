@@ -33,6 +33,10 @@ namespace System.Text.Parsing
             Own(nsToAdd);
             Namespace* parent = GetGlobalScope()->Ns();
             List<ustring> components = nsToAdd->FullName().Split(u'.');
+            if (components.IsEmpty())
+            {
+                throw Exception("Scope.AddNamespace: name components empty");
+            }
             long n = components.Count();
             for (long i = 0; i < n - 1; ++i)
             {
@@ -88,12 +92,12 @@ namespace System.Text.Parsing
             ustring fullName = o->FullName();
             if (!fullNameMap.Insert(MakePair(fullName, o)).second)
             {
-                string msg = "object '" + ToUtf8(fullName) + "' already exists (detected in scope '" + ToUtf8(FullName()) + "')";
+                string msg = "object '" + ToUtf8(fullName) + "' already exists in full name map (detected in scope '" + ToUtf8(FullName()) + "')";
                 throw Exception(msg);
             }
             if (!shortNameMap.Insert(MakePair(o->Name(), o)).second)
             {
-                string msg = "object '" + ToUtf8(fullName) + "' already exists (detected in scope '" + ToUtf8(FullName()) + "')";
+                string msg = "object '" + ToUtf8(fullName) + "' ('" + ToUtf8(o->Name()) + "') already exists in short name map (detected in scope '" + ToUtf8(FullName()) + "')";
                 throw Exception(msg);
             }
         }

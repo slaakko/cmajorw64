@@ -1747,6 +1747,10 @@ namespace cmdevenv
                     ProjectConfig config = ProjectConfigurations.Instance.GetProjectConfig(activeProject.GetConfigurationFilePath());
                     string arguments = config.GetCommandLineArguments(configComboBox.Text);
                     string executablePath = activeProject.GetExecutablePath(configComboBox.Text);
+                    if (!File.Exists(executablePath))
+                    {
+                        throw new Exception("executable '" + executablePath + "' not found");
+                    }
                     abortToolStripMenuItem.Enabled = true;
                     processRunning = true;
                     SetState(State.running);
@@ -2030,6 +2034,18 @@ namespace cmdevenv
             {
                 string cmajorRootDir = Environment.GetEnvironmentVariable("CMAJOR_ROOT");
                 await OpenProjectOrSolution(Path.Combine(Path.Combine(Path.Combine(cmajorRootDir, "projects"), "examples"), "examples.cms"));
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+        private async void parserGeneratorToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                string cmajorRootDir = Environment.GetEnvironmentVariable("CMAJOR_ROOT");
+                await OpenProjectOrSolution(Path.Combine(Path.Combine(Path.Combine(Path.Combine(cmajorRootDir, "projects"), "tools"), "cmparsergen"), "cmparsergen.cms"));
             }
             catch (Exception ex)
             {

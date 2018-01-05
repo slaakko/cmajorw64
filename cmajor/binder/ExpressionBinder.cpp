@@ -1056,6 +1056,7 @@ void ExpressionBinder::BindArrow(Node& node, const std::u32string& name)
 void ExpressionBinder::Visit(ArrowNode& arrowNode) 
 {
     arrowNode.Subject()->Accept(*this);
+    bool argIsExplicitThisOrBasePtr = expression->GetFlag(BoundExpressionFlags::argIsExplicitThisOrBasePtr);
     if (expression->GetType()->IsReferenceType() && expression->GetType()->PlainType(arrowNode.GetSpan())->IsClassTypeSymbol())
     {
         TypeSymbol* type = expression->GetType()->RemoveReference(arrowNode.GetSpan())->AddPointer(arrowNode.GetSpan());
@@ -1072,6 +1073,10 @@ void ExpressionBinder::Visit(ArrowNode& arrowNode)
         expression.reset(new BoundAddressOfExpression(std::move(expression), type));
     }
     BindUnaryOp(expression.release(), arrowNode, U"operator->");
+    if (argIsExplicitThisOrBasePtr)
+    {
+        expression->SetFlag(BoundExpressionFlags::argIsExplicitThisOrBasePtr);
+    }
     BindArrow(arrowNode, arrowNode.MemberId()->Str());
 }
 
@@ -1203,6 +1208,10 @@ void ExpressionBinder::Visit(UnaryMinusNode& unaryMinusNode)
 
 void ExpressionBinder::Visit(PrefixIncrementNode& prefixIncrementNode) 
 {
+    if (statementBinder->CompilingThrow())
+    {
+        throw Exception("prefix increment in throw expression no allowed", prefixIncrementNode.GetSpan());
+    }
     prefixIncrementNode.Subject()->Accept(*this);
     if (expression->GetType()->PlainType(prefixIncrementNode.GetSpan())->IsClassTypeSymbol())
     {
@@ -1236,6 +1245,10 @@ void ExpressionBinder::Visit(PrefixIncrementNode& prefixIncrementNode)
 
 void ExpressionBinder::Visit(PrefixDecrementNode& prefixDecrementNode) 
 {
+    if (statementBinder->CompilingThrow())
+    {
+        throw Exception("prefix decrement in throw expression no allowed", prefixDecrementNode.GetSpan());
+    }
     prefixDecrementNode.Subject()->Accept(*this);
     if (expression->GetType()->PlainType(prefixDecrementNode.GetSpan())->IsClassTypeSymbol())
     {
@@ -1897,6 +1910,10 @@ void ExpressionBinder::Visit(InvokeNode& invokeNode)
 
 void ExpressionBinder::Visit(PostfixIncrementNode& postfixIncrementNode)
 {
+    if (statementBinder->CompilingThrow())
+    {
+        throw Exception("postfix increment in throw expression no allowed", postfixIncrementNode.GetSpan());
+    }
     bool prevInhibitCompile = inhibitCompile;
     inhibitCompile = true;
     postfixIncrementNode.Subject()->Accept(*this);
@@ -1933,6 +1950,10 @@ void ExpressionBinder::Visit(PostfixIncrementNode& postfixIncrementNode)
 
 void ExpressionBinder::Visit(PostfixDecrementNode& postfixDecrementNode)
 {
+    if (statementBinder->CompilingThrow())
+    {
+        throw Exception("postfix decrement in throw expression no allowed", postfixDecrementNode.GetSpan());
+    }
     bool prevInhibitCompile = inhibitCompile;
     inhibitCompile = true;
     postfixDecrementNode.Subject()->Accept(*this);

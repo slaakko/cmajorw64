@@ -37,6 +37,10 @@ namespace System.Text.Parsing
                 grammar->SetNs(currentNamespace);
                 grammar->AddToScope();
             }
+            else
+            {
+                Console.WriteLine("ParsingDomain.AddGrammar : grammar already found");
+            }
         }
         public override void Accept(Visitor& visitor)
         {
@@ -48,7 +52,10 @@ namespace System.Text.Parsing
         }
         public Scope* GetNamespaceScope(const ustring& fullNamespaceName) const
         {
-            if (fullNamespaceName.IsEmpty()) return globalScope;
+            if (fullNamespaceName.IsEmpty()) 
+            {
+                return globalScope;
+            }        
             Namespace* ns = globalScope->GetNamespace(fullNamespaceName);
             if (ns == null)
             {

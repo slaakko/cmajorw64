@@ -208,6 +208,7 @@ private:
     BoundCompoundStatement* currentBlock;
     BoundCompoundStatement* breakTargetBlock;
     BoundCompoundStatement* continueTargetBlock;
+    BoundStatement* sequenceSecond;
     std::unordered_map<IntegralValue, llvm::BasicBlock*, IntegralValueHash>* currentCaseMap;
     llvm::BasicBlock* defaultDest;
     std::stack<BoundClass*> classStack;
@@ -233,7 +234,7 @@ Emitter::Emitter(EmittingContext& emittingContext_, const std::string& compileUn
     compileUnitModule(new llvm::Module(compileUnitModuleName_, emittingContext.GetEmittingContextImpl()->Context())), symbolsModule(symbolsModule_), builder(Builder()), stack(Stack()),
     context(emittingContext.GetEmittingContextImpl()->Context()), compileUnit(nullptr), function(nullptr), trueBlock(nullptr), falseBlock(nullptr), breakTarget(nullptr), continueTarget(nullptr),
     handlerBlock(nullptr), cleanupBlock(nullptr), newCleanupNeeded(false), currentPad(nullptr), genJumpingBoolCode(false), currentClass(nullptr), currentFunction(nullptr), 
-    currentBlock(nullptr), breakTargetBlock(nullptr), continueTargetBlock(nullptr), currentCaseMap(nullptr), defaultDest(nullptr), prevLineNumber(0), destructorCallGenerated(false), 
+    currentBlock(nullptr), breakTargetBlock(nullptr), continueTargetBlock(nullptr), sequenceSecond(nullptr), currentCaseMap(nullptr), defaultDest(nullptr), prevLineNumber(0), destructorCallGenerated(false),
     lastInstructionWasRet(false), basicBlockOpen(false)
 {
     compileUnitModule->setTargetTriple(emittingContext.GetEmittingContextImpl()->TargetTriple());
@@ -248,6 +249,13 @@ void Emitter::GenJumpingBoolCode()
     Assert(trueBlock, "true block not set");
     Assert(falseBlock, "false block not set");
     llvm::Value* cond = stack.Pop();
+    if (sequenceSecond)
+    {
+        genJumpingBoolCode = false;
+        sequenceSecond->SetGenerated();
+        sequenceSecond->Accept(*this);
+        genJumpingBoolCode = true;
+    }
     builder.CreateCondBr(cond, trueBlock, falseBlock);
 }
 
@@ -515,8 +523,14 @@ void Emitter::Visit(BoundSequenceStatement& boundSequenceStatement)
     lastInstructionWasRet = false;
     basicBlockOpen = false;
     SetTarget(&boundSequenceStatement);
+    BoundStatement* prevSequence = sequenceSecond;
+    sequenceSecond = boundSequenceStatement.Second();
     boundSequenceStatement.First()->Accept(*this);
-    boundSequenceStatement.Second()->Accept(*this);
+    sequenceSecond = prevSequence;
+    if (!boundSequenceStatement.Second()->Generated())
+    {
+        boundSequenceStatement.Second()->Accept(*this);
+    }
 }
 
 void Emitter::ExitBlocks(BoundCompoundStatement* targetBlock)
@@ -615,6 +629,11 @@ void Emitter::Visit(BoundReturnStatement& boundReturnStatement)
     {
         returnFunctionCall->Accept(*this);
         llvm::Value* returnValue = stack.Pop();
+        if (sequenceSecond)
+        {
+            sequenceSecond->SetGenerated();
+            sequenceSecond->Accept(*this);
+        }
         builder.CreateRet(returnValue);
         lastInstructionWasRet = true;
     }
@@ -1190,7 +1209,7 @@ void Emitter::Visit(BoundThrowStatement& boundThrowStatement)
     lastInstructionWasRet = false;
     basicBlockOpen = false;
     SetTarget(&boundThrowStatement);
-    boundThrowStatement.ThrowCall()->Accept(*this);
+    boundThrowStatement.ThrowCallExpr()->Accept(*this);
 }
 
 void Emitter::Visit(BoundRethrowStatement& boundRethrowStatement)

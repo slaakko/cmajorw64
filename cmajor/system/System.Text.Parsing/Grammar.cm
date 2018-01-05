@@ -9,11 +9,6 @@ using System.IO;
 
 namespace System.Text.Parsing
 {
-    public nothrow inline ulong GetHashCode(Grammar* grammar)
-    {
-        return GetHashCode(cast<void*>(grammar));
-    }
-    
     public class Grammar : ParsingObject
     {
         public Grammar(const ustring& name_, Scope* enclosingScope_) : this(name_, enclosingScope_, new ParsingDomain())
@@ -178,9 +173,9 @@ namespace System.Text.Parsing
         public void AddRuleLink(RuleLink* ruleLink)
         {
             if (ruleLink->IsAddedToGrammar()) return;
+            ruleLink->SetAddedToGrammar();
             Own(ruleLink);
             ruleLinks.Add(ruleLink);
-            ruleLink->SetAddedToGrammar();
         }
         public void ResolveStartRule()
         {

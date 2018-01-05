@@ -37,6 +37,7 @@ namespace Syntax
         ProjectFileGrammar* projectFileGrammar = new ProjectFileGrammar(projectParsingDomain.Get());
         LibraryFileGrammar* libraryFileGrammar = new LibraryFileGrammar(projectParsingDomain.Get());
         ParserFileGrammar* parserFileGrammar = new ParserFileGrammar(projectParsingDomain.Get());
+        Console.WriteLine("grammars created!");
         ustring projectFileContent = ToUtf32(File.ReadAllText(projectFilePath));
         UniquePtr<Project> project = projectFileGrammar->Parse(projectFileContent.Chars(), projectFileContent.Chars() + projectFileContent.Length(), 0, projectFilePath);
         if (verbose)

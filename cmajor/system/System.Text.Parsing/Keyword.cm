@@ -10,6 +10,9 @@ namespace System.Text.Parsing
 {
     public class IdentifierCharsRule
     {
+        static IdentifierCharsRule() : instance(new IdentifierCharsRule())
+        {
+        }
         public static IdentifierCharsRule& Instance() 
         {
             return *instance;
@@ -31,9 +34,7 @@ namespace System.Text.Parsing
         {
             rule->SetOwned();
         }
-        public ~IdentifierCharsRule()
-        {
-        }
+        public default ~IdentifierCharsRule();
         private static UniquePtr<IdentifierCharsRule> instance;
         private UniquePtr<RuleParser> rule;
     }

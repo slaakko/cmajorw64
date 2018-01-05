@@ -73,7 +73,7 @@ namespace System.Text.Parsing
                     bool pass = true;
                     actionSpan.end = scanner.GetSpan().start;
                     const uchar* matchBegin = scanner.Start() + actionSpan.start;
-                    const uchar* matchEnd = scanner.End() + actionSpan.end;
+                    const uchar* matchEnd = scanner.Start() + actionSpan.end;
                     action(matchBegin, matchEnd, actionSpan, scanner.FileName(), parsingData, pass);
                     if (!pass)
                     {

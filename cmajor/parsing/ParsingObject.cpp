@@ -21,10 +21,6 @@ ParsingObject::~ParsingObject()
 {
 }
 
-void SetEnclosingScope(Scope* enclosingScope_)
-{
-}
-
 std::u32string ParsingObject::FullName() const
 {
     std::u32string scopeName = U"";
@@ -74,7 +70,6 @@ void ParsingObject::AddToScope()
             scope->SetEnclosingScope(enclosingScope);
         }
     }
-
 }
 
 } } // namespace cmajor::parsing

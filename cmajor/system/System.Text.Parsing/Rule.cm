@@ -50,8 +50,8 @@ namespace System.Text.Parsing
         }
         public void SetDefinition(Parser* definition_)
         {
-            Own(definition);
             definition = definition_;
+            Own(definition);
         }
         public inline nothrow List<AttrOrVar>& InheritedAttributes() const
         {

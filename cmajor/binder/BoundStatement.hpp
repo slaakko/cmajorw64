@@ -19,6 +19,23 @@ class BoundFunctionCall;
 class BoundExpression;
 class BoundCompoundStatement;
 
+enum class BoundStatementFlags : uint8_t
+{
+    none = 0,
+    postfix = 1 << 0,
+    generated = 1 << 1
+};
+
+inline BoundStatementFlags operator|(BoundStatementFlags left, BoundStatementFlags right)
+{
+    return BoundStatementFlags(uint8_t(left) | uint8_t(right));
+}
+
+inline BoundStatementFlags operator&(BoundStatementFlags left, BoundStatementFlags right)
+{
+    return BoundStatementFlags(uint8_t(left) & uint8_t(right));
+}
+
 class BoundStatement : public BoundNode
 {
 public:
@@ -30,12 +47,16 @@ public:
     BoundCompoundStatement* Block();
     void SetLabel(const std::u32string& label_);
     const std::u32string& Label() const { return label; }
-    void SetPostfix() { postfix = true; }
-    bool Postfix() { return postfix; }
+    void SetPostfix() { SetFlag(BoundStatementFlags::postfix); }
+    bool Postfix() const { return GetFlag(BoundStatementFlags::postfix); }
+    void SetGenerated() { SetFlag(BoundStatementFlags::generated); }
+    bool Generated() const { return GetFlag(BoundStatementFlags::generated); }
 private:
     std::u32string label;
     BoundStatement* parent;
-    bool postfix;
+    BoundStatementFlags flags;
+    bool GetFlag(BoundStatementFlags flag) const { return (flags & flag) != BoundStatementFlags::none;  }
+    void SetFlag(BoundStatementFlags flag) { flags = flags | flag; }
 };
 
 class BoundSequenceStatement : public BoundStatement
@@ -269,11 +290,11 @@ private:
 class BoundThrowStatement : public BoundStatement
 {
 public:
-    BoundThrowStatement(const Span& span_, std::unique_ptr<BoundExpression>&& throwCall_);
+    BoundThrowStatement(const Span& span_, std::unique_ptr<BoundExpression>&& throwCallExpr_);
     void Accept(BoundNodeVisitor& visitor) override;
-    BoundExpression* ThrowCall() { return throwCall.get(); }
+    BoundExpression* ThrowCallExpr() { return throwCallExpr.get(); }
 private:
-    std::unique_ptr<BoundExpression> throwCall;
+    std::unique_ptr<BoundExpression> throwCallExpr;
 };
 
 class BoundRethrowStatement : public BoundStatement

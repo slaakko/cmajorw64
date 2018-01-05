@@ -20,7 +20,7 @@
 namespace cmajor { namespace binder {
 
 using namespace cmajor::unicode;
-
+ 
 BoundExpression::BoundExpression(const Span& span_, BoundNodeType boundNodeType_, TypeSymbol* type_) : BoundNode(span_, boundNodeType_), type(type_), flags(BoundExpressionFlags::none)
 {
 }
@@ -1631,7 +1631,7 @@ void BoundFunctionGroupExpression::Load(Emitter& emitter, OperationFlags flags)
 {
     if (classPtr)
     {
-        classPtr->Load(emitter, flags);
+        classPtr->Load(emitter, OperationFlags::none);  
     }
     else
     {
@@ -1675,7 +1675,7 @@ void BoundMemberExpression::Load(Emitter& emitter, OperationFlags flags)
 {
     if (classPtr)
     {
-        classPtr->Load(emitter, flags);
+        classPtr->Load(emitter, OperationFlags::none);
     }
     else
     {

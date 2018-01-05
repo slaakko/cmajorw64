@@ -13,8 +13,8 @@ namespace System.Text.Parsing
         public Namespace(const ustring& qualifiedName_, Scope* enclosingScope_) : base(qualifiedName_, enclosingScope_)
         {
             Scope* containerScope = new Scope(Name(), EnclosingScope());
-            SetContainerScope(containerScope);
             Own(containerScope);
+            SetContainerScope(containerScope);
         }
         public override void Accept(Visitor& visitor)
         {

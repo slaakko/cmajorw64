@@ -8,6 +8,8 @@
 #include <cmajor/rt/RtApi.hpp>
 #include <stdint.h>
 
+extern "C" RT_API void RtPrintClassDelegate(void* classDelegate);
+
 extern "C" RT_API int32_t RtGetHardwareConcurrency();
 extern "C" RT_API int32_t RtStartThreadFunction(void* function);
 extern "C" RT_API int32_t RtStartThreadFunctionWithParam(void* function, void* param);

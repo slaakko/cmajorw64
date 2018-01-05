@@ -43,7 +43,7 @@ struct InitDone
     }
 };
 
-const char* version = "2.0.0";
+const char* version = "2.0.0 beta-2";
 
 void PrintHelp()
 {
@@ -80,7 +80,7 @@ void PrintHelp()
         "--link-using-ms-link (-m)\n" <<
         "   use Microsoft's link.exe as the linker\n" << 
         "--define SYMBOL (-D SYMBOL)\n" <<
-        "   define a conditional compilatio symbol SYMBOL.\n" <<
+        "   define a conditional compilation symbol SYMBOL.\n" <<
         std::endl;
 }
 

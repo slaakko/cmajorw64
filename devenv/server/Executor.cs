@@ -142,6 +142,7 @@ namespace server
                 startInfo.RedirectStandardInput = true;
                 startInfo.RedirectStandardOutput = true;
                 startInfo.RedirectStandardError = true;
+                startInfo.WorkingDirectory = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(executablePath), "../.."));
                 processKilled = false;
                 Process process = Process.Start(startInfo);
                 processStdin = process.StandardInput;

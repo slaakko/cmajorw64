@@ -1,4 +1,4 @@
-namespace Syntax
+﻿namespace Syntax
 {
     using System;
     using System.Collections;

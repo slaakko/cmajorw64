@@ -17,6 +17,25 @@
 
 namespace cmajor { namespace rt {
 
+struct ClassDlg
+{
+    void* object;
+    void* method;
+};
+
+extern "C" RT_API void RtPrintClassDelegate(void* classDelegate)
+{
+    ClassDlg* c = static_cast<ClassDlg*>(classDelegate);
+    std::string s;
+    s.append("class delegate:\n");
+    uint64_t o = reinterpret_cast<uint64_t>(c->object);
+    s.append("object: ").append(std::to_string(o));
+    uint64_t m = reinterpret_cast<uint64_t>(c->method);
+    s.append("\nmethod: ").append(std::to_string(m));
+    s.append("\n");
+    RtWrite(1, (const uint8_t*)(s.c_str()), s.length());
+}
+
 typedef void(*ThreadFunction)();
 typedef void(*ThreadFunctionWithParam)(void*);
 typedef void(*ThreadMethod)(void*);

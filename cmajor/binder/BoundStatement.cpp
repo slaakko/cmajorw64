@@ -10,7 +10,7 @@
 
 namespace cmajor { namespace binder {
 
-BoundStatement::BoundStatement(const Span& span_, BoundNodeType boundNodeType_) : BoundNode(span_, boundNodeType_), parent(nullptr), postfix(false)
+BoundStatement::BoundStatement(const Span& span_, BoundNodeType boundNodeType_) : BoundNode(span_, boundNodeType_), parent(nullptr), flags(BoundStatementFlags::none)
 {
 }
 
@@ -283,8 +283,7 @@ void BoundSetVmtPtrStatement::Accept(BoundNodeVisitor& visitor)
     visitor.Visit(*this);
 }
 
-BoundThrowStatement::BoundThrowStatement(const Span& span_, std::unique_ptr<BoundExpression>&& throwCall_) : 
-    BoundStatement(span_, BoundNodeType::boundThrowStatement), throwCall(std::move(throwCall_))
+BoundThrowStatement::BoundThrowStatement(const Span& span_, std::unique_ptr<BoundExpression>&& throwCallExpr_) : BoundStatement(span_, BoundNodeType::boundThrowStatement), throwCallExpr(std::move(throwCallExpr_))
 {
 }
 
