@@ -4,16 +4,20 @@
 // =================================
 
 #include <cmajor/rt/CommandLine.hpp>
+#include <cmajor/rt/Memory.hpp>
 #include <cmajor/parser/CommandLine.hpp>
 #include <cmajor/util/Unicode.hpp>
 #include <cmajor/util/Error.hpp>
 #include <cmajor/util/Path.hpp>
+#include <cmajor/util/TextUtils.hpp>
+#include <boost/lexical_cast.hpp>
 #include <memory>
 #include <string>
 #include <Windows.h>
 
 namespace cmajor { namespace rt {
 
+using namespace cmajor::util;
 using namespace cmajor::unicode;
 
 class CommandLineProcessor
@@ -55,7 +59,36 @@ bool ContainsWildCard(const std::string& filePath)
 
 CommandLineProcessor::CommandLineProcessor() : grammar(cmajor::parser::CommandLineGrammar::Create()), commandLine(ToUtf32(GetCommandLine())), argc(0), argv(nullptr)
 {
-    args = grammar->Parse(&commandLine[0], &commandLine[0] + commandLine.length(), 0, "");
+    args = grammar->Parse(&commandLine[0], &commandLine[0] + commandLine.length(), 0, ""); 
+    std::vector<std::string> newArgs;
+    int n = args.size();
+    for (int i = 0; i < n; ++i)
+    {
+        bool processed = false;
+        if (args[i] == "--cmajor-debug-heap")
+        {
+            SetDebugHeap(); 
+            processed = true;
+        }
+        else
+        {
+            if (args[i].find('=') != std::string::npos)
+            {
+                std::vector<std::string> components = Split(args[i], '=');
+                if (components.size() == 2 && components[0] == "--cmajor-debug-allocation")
+                {
+                    int allocation = boost::lexical_cast<int>(components[1]);
+                    SetDebugAllocation(allocation);
+                    processed = true;
+                }
+            }
+        }
+        if (!processed)
+        {
+            newArgs.push_back(args[i]);
+        }
+    }
+    std::swap(args, newArgs);
     argc = args.size();
     bool wildCards = false;
     for (int i = 0; i < argc; ++i)

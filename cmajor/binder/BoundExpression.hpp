@@ -23,7 +23,8 @@ enum class BoundExpressionFlags : uint8_t
     argIsExplicitThisOrBasePtr = 1 << 0,
     bindToRvalueReference = 1 << 1,
     virtualCall = 1 << 2,
-    deref = 1 << 3
+    deref = 1 << 3,
+    exceptionCapture = 1 << 4
 };
 
 inline BoundExpressionFlags operator|(BoundExpressionFlags left, BoundExpressionFlags right)
@@ -49,6 +50,7 @@ public:
     virtual bool HasValue() const { return false; }
     virtual std::string TypeString() const { return "expression"; }
     virtual std::unique_ptr<Value> ToValue(BoundCompileUnit& boundCompileUnit) const { return std::unique_ptr<Value>(); }
+    virtual bool ContainsExceptionCapture() const { return GetFlag(BoundExpressionFlags::exceptionCapture); }
     const TypeSymbol* GetType() const { return type; }
     TypeSymbol* GetType() { return type; }
     bool GetFlag(BoundExpressionFlags flag) const { return (flags & flag) != BoundExpressionFlags::none;  }
@@ -246,6 +248,7 @@ public:
     void AddArgument(std::unique_ptr<BoundExpression>&& argument);
     void SetArguments(std::vector<std::unique_ptr<BoundExpression>>&& arguments_);
     const std::vector<std::unique_ptr<BoundExpression>>& Arguments() const { return arguments; }
+    bool ContainsExceptionCapture() const override;
 private:
     FunctionSymbol* functionSymbol;
     std::vector<std::unique_ptr<BoundExpression>> arguments;
@@ -264,6 +267,7 @@ public:
     bool IsLvalueExpression() const override;
     void AddArgument(std::unique_ptr<BoundExpression>&& argument);
     const std::vector<std::unique_ptr<BoundExpression>>& Arguments() const { return arguments; }
+    bool ContainsExceptionCapture() const override;
 private:
     DelegateTypeSymbol* delegateTypeSymbol;
     std::vector<std::unique_ptr<BoundExpression>> arguments;
@@ -282,6 +286,7 @@ public:
     bool IsLvalueExpression() const override;
     void AddArgument(std::unique_ptr<BoundExpression>&& argument);
     const std::vector<std::unique_ptr<BoundExpression>>& Arguments() const { return arguments; }
+    bool ContainsExceptionCapture() const override;
 private:
     ClassDelegateTypeSymbol* classDelegateTypeSymbol;
     std::vector<std::unique_ptr<BoundExpression>> arguments;
@@ -297,6 +302,7 @@ public:
     void Accept(BoundNodeVisitor& visitor) override;
     bool HasValue() const override { return true; }
     std::string TypeString() const override { return "construct expression"; }
+    bool ContainsExceptionCapture() const override;
 private:
     std::unique_ptr<BoundExpression> constructorCall;
 };
@@ -312,6 +318,7 @@ public:
     bool HasValue() const override { return true; }
     bool IsLvalueExpression() const override { return true; }
     std::string TypeString() const override { return "construct and return temporary expression"; }
+    bool ContainsExceptionCapture() const override;
 private:
     std::unique_ptr<BoundExpression> constructorCall;
     std::unique_ptr<BoundExpression> boundTemporary;
@@ -328,6 +335,7 @@ public:
     bool HasValue() const override { return true; }
     bool IsLvalueExpression() const override { return true; }
     std::string TypeString() const override { return "class conversion result"; }
+    bool ContainsExceptionCapture() const override;
 private:
     std::unique_ptr<BoundExpression> conversionResult;
     std::unique_ptr<BoundFunctionCall> conversionFunctionCall;
@@ -346,6 +354,7 @@ public:
     std::string TypeString() const override { return "conversion"; }
     FunctionSymbol* ConversionFun() { return conversionFun; }
     std::unique_ptr<Value> ToValue(BoundCompileUnit& boundCompileUnit) const override;
+    bool ContainsExceptionCapture() const override;
 private:
     std::unique_ptr<BoundExpression> sourceExpr;
     FunctionSymbol* conversionFun;
@@ -361,6 +370,7 @@ public:
     void Accept(BoundNodeVisitor& visitor) override;
     bool HasValue() const override { return true; }
     std::string TypeString() const override { return "is expression"; }
+    bool ContainsExceptionCapture() const override;
 private:
     std::unique_ptr<BoundExpression> expr;
     ClassTypeSymbol* rightClassType;
@@ -376,6 +386,7 @@ public:
     void Accept(BoundNodeVisitor& visitor) override;
     bool HasValue() const override { return true; }
     std::string TypeString() const override { return "as expression"; }
+    bool ContainsExceptionCapture() const override;
 private:
     std::unique_ptr<BoundExpression> expr;
     ClassTypeSymbol* rightClassType;
@@ -433,6 +444,7 @@ public:
     BoundExpression* Left() { return left.get(); }
     BoundExpression* Right() { return right.get(); }
     void SetTemporary(BoundLocalVariable* temporary_);
+    bool ContainsExceptionCapture() const override;
 private:
     std::unique_ptr<BoundExpression> left;
     std::unique_ptr<BoundExpression> right;
@@ -451,6 +463,7 @@ public:
     BoundExpression* Left() { return left.get(); }
     BoundExpression* Right() { return right.get(); }
     void SetTemporary(BoundLocalVariable* temporary_);
+    bool ContainsExceptionCapture() const override;
 private:
     std::unique_ptr<BoundExpression> left;
     std::unique_ptr<BoundExpression> right;

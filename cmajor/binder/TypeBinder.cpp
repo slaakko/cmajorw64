@@ -313,6 +313,10 @@ void TypeBinder::BindClass(ClassTypeSymbol* classTypeSymbol, ClassNode* classNod
     {
         symbolTable.AddClassHavingStaticConstructor(classTypeSymbol);
     }
+    if (classTypeSymbol->HasNontrivialDestructor())
+    {
+        classTypeSymbol->CreateDestructorSymbol();
+    }
     containerScope = prevContainerScope;
 }
 
@@ -971,6 +975,99 @@ void TypeBinder::Visit(CatchNode& catchNode)
     }
     catchNode.CatchBlock()->Accept(*this);
     containerScope = prevContainerScope;
+}
+
+void TypeBinder::Visit(ConditionalCompilationPartNode& conditionalCompilationPartNode)
+{
+    conditionalCompilationPartNode.Expr()->Accept(*this);
+}
+
+void TypeBinder::Visit(ConditionalCompilationDisjunctionNode& conditionalCompilationDisjunctionNode)
+{
+    conditionalCompilationDisjunctionNode.Left()->Accept(*this);
+    bool left = conditionalCompilationStack.top();
+    conditionalCompilationStack.pop();
+    conditionalCompilationDisjunctionNode.Right()->Accept(*this);
+    bool right = conditionalCompilationStack.top();
+    conditionalCompilationStack.pop();
+    conditionalCompilationStack.push(left || right);
+}
+
+void TypeBinder::Visit(ConditionalCompilationConjunctionNode& conditionalCompilationConjunctionNode)
+{
+    conditionalCompilationConjunctionNode.Left()->Accept(*this);
+    bool left = conditionalCompilationStack.top();
+    conditionalCompilationStack.pop();
+    conditionalCompilationConjunctionNode.Right()->Accept(*this);
+    bool right = conditionalCompilationStack.top();
+    conditionalCompilationStack.pop();
+    conditionalCompilationStack.push(left && right);
+}
+
+void TypeBinder::Visit(ConditionalCompilationNotNode& conditionalCompilationNotNode)
+{
+    conditionalCompilationNotNode.Expr()->Accept(*this);
+    bool operand = conditionalCompilationStack.top();
+    conditionalCompilationStack.pop();
+    conditionalCompilationStack.push(!operand);
+}
+
+void TypeBinder::Visit(ConditionalCompilationPrimaryNode& conditionalCompilationPrimaryNode)
+{
+    bool defined = IsSymbolDefined(conditionalCompilationPrimaryNode.Symbol());
+    conditionalCompilationStack.push(defined);
+}
+
+void TypeBinder::Visit(ConditionalCompilationStatementNode& conditionalCompilationStatementNode)
+{
+    conditionalCompilationStatementNode.IfPart()->Accept(*this);
+    bool defined = conditionalCompilationStack.top();
+    conditionalCompilationStack.pop();
+    if (defined)
+    {
+        int n = conditionalCompilationStatementNode.IfPart()->Statements().Count();
+        for (int i = 0; i < n; ++i)
+        {
+            StatementNode* statement = conditionalCompilationStatementNode.IfPart()->Statements()[i];
+            statement->Accept(*this);
+        }
+    }
+    else
+    {
+        bool executed = false;
+        int n = conditionalCompilationStatementNode.ElifParts().Count();
+        for (int i = 0; i < n; ++i)
+        {
+            ConditionalCompilationPartNode* elifPart = conditionalCompilationStatementNode.ElifParts()[i];
+            elifPart->Accept(*this);
+            bool defined = conditionalCompilationStack.top();
+            conditionalCompilationStack.pop();
+            if (defined)
+            {
+                int n = elifPart->Statements().Count();
+                for (int i = 0; i < n; ++i)
+                {
+                    StatementNode* statement = elifPart->Statements()[i];
+                    statement->Accept(*this);
+                }
+                executed = true;
+                break;
+            }
+        }
+        if (!executed)
+        {
+            ConditionalCompilationPartNode* elsePart = conditionalCompilationStatementNode.ElsePart();
+            if (elsePart)
+            {
+                int n = elsePart->Statements().Count();
+                for (int i = 0; i < n; ++i)
+                {
+                    StatementNode* statement = elsePart->Statements()[i];
+                    statement->Accept(*this);
+                }
+            }
+        }
+    }
 }
 
 void TypeBinder::Visit(TypedefNode& typedefNode)

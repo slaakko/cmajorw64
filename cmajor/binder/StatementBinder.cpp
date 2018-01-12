@@ -208,7 +208,8 @@ StatementBinder::StatementBinder(BoundCompileUnit& boundCompileUnit_) :
     boundCompileUnit(boundCompileUnit_), symbolTable(boundCompileUnit.GetSymbolTable()), containerScope(nullptr), statement(), compoundLevel(0), insideCatch(false), 
     currentClass(nullptr), currentFunction(nullptr), currentStaticConstructorSymbol(nullptr), currentStaticConstructorNode(nullptr), currentConstructorSymbol(nullptr), 
     currentConstructorNode(nullptr), currentDestructorSymbol(nullptr), currentDestructorNode(nullptr), currentMemberFunctionSymbol(nullptr), currentMemberFunctionNode(nullptr), 
-    switchConditionType(nullptr), currentCaseValueMap(nullptr), currentGotoCaseStatements(nullptr), currentGotoDefaultStatements(nullptr), postfix(false), compilingThrow(false)
+    switchConditionType(nullptr), currentCaseValueMap(nullptr), currentGotoCaseStatements(nullptr), currentGotoDefaultStatements(nullptr), postfix(false), compilingThrow(false), 
+    compilingReleaseExceptionStatement(false)
 {
 }
 
@@ -252,10 +253,6 @@ void StatementBinder::Visit(ClassNode& classNode)
         classMember->Accept(*this);
     }
     boundCompileUnit.AddBoundNode(std::move(boundClass));
-    if (classTypeSymbol->HasNontrivialDestructor())
-    {
-        classTypeSymbol->CreateDestructorSymbol();
-    }
     DestructorSymbol* destructorSymbol = classTypeSymbol->Destructor();
     if (destructorSymbol && !GetGlobalFlag(GlobalFlags::info))
     {
@@ -552,6 +549,11 @@ void StatementBinder::Visit(ReturnStatementNode& returnStatementNode)
             bool returnClassDelegateType = returnType->GetSymbolType() == SymbolType::classDelegateTypeSymbol;
             std::unique_ptr<BoundExpression> expression = BindExpression(returnStatementNode.Expression(), boundCompileUnit, currentFunction, containerScope, this, false, returnClassDelegateType, 
                 returnClassDelegateType);
+            bool exceptionCapture = false;
+            if (insideCatch && expression->ContainsExceptionCapture())
+            {
+                exceptionCapture = true;
+            }
             if (expression->GetBoundNodeType() == BoundNodeType::boundLocalVariable)
             {
                 std::vector<FunctionScopeLookup> rvalueLookups;
@@ -576,6 +578,10 @@ void StatementBinder::Visit(ReturnStatementNode& returnStatementNode)
             AddStatement(constructStatement.release());
             std::unique_ptr<BoundFunctionCall> returnFunctionCall;
             std::unique_ptr<BoundStatement> returnStatement(new BoundReturnStatement(std::move(returnFunctionCall), returnStatementNode.GetSpan()));
+            if (exceptionCapture)
+            {
+                AddReleaseExceptionStatement(returnStatementNode.GetSpan());
+            }
             AddStatement(returnStatement.release());
         }
         else
@@ -583,6 +589,7 @@ void StatementBinder::Visit(ReturnStatementNode& returnStatementNode)
             TypeSymbol* returnType = currentFunction->GetFunctionSymbol()->ReturnType();
             bool returnDelegateType = false;
             bool returnClassDelegateType = false;
+            bool exceptionCapture = false;
             if (returnType)
             {
                 returnDelegateType = returnType->GetSymbolType() == SymbolType::delegateTypeSymbol;
@@ -601,6 +608,10 @@ void StatementBinder::Visit(ReturnStatementNode& returnStatementNode)
                     returnStatementNode.GetSpan());
                 std::unique_ptr<BoundExpression> expression = BindExpression(returnStatementNode.Expression(), boundCompileUnit, currentFunction, containerScope, this, false,
                     returnDelegateType || returnClassDelegateType, returnClassDelegateType);
+                if (insideCatch && expression->ContainsExceptionCapture())
+                {
+                    exceptionCapture = true;
+                }
                 std::vector<std::unique_ptr<BoundExpression>> returnValueArguments;
                 returnValueArguments.push_back(std::move(expression));
                 FunctionMatch functionMatch(returnFunctionCall->GetFunctionSymbol());
@@ -668,6 +679,10 @@ void StatementBinder::Visit(ReturnStatementNode& returnStatementNode)
                         returnStatementNode.GetSpan(), currentFunction->GetFunctionSymbol()->GetSpan());
                 }
                 CheckAccess(currentFunction->GetFunctionSymbol(), returnFunctionCall->GetFunctionSymbol());
+                if (exceptionCapture)
+                {
+                    AddReleaseExceptionStatement(returnStatementNode.GetSpan());
+                }
                 AddStatement(new BoundReturnStatement(std::move(returnFunctionCall), returnStatementNode.GetSpan()));
             }
             else
@@ -704,7 +719,12 @@ void StatementBinder::Visit(ReturnStatementNode& returnStatementNode)
 
 void StatementBinder::Visit(IfStatementNode& ifStatementNode)
 {
+    bool exceptionCapture = false;
     std::unique_ptr<BoundExpression> condition = BindExpression(ifStatementNode.Condition(), boundCompileUnit, currentFunction, containerScope, this);
+    if (insideCatch && condition->ContainsExceptionCapture())
+    {
+        exceptionCapture = true;
+    }
     if (!TypesEqual(symbolTable.GetTypeByName(U"bool"), condition->GetType()->PlainType(ifStatementNode.GetSpan())))
     {
         throw Exception("condition of an if statement must be a Boolean expression", ifStatementNode.Condition()->GetSpan());
@@ -726,6 +746,10 @@ void StatementBinder::Visit(IfStatementNode& ifStatementNode)
     {
         AddStatement(s.release());
     }
+    if (exceptionCapture)
+    {
+        AddReleaseExceptionStatement(ifStatementNode.GetSpan());
+    }
     AddStatement(new BoundIfStatement(ifStatementNode.GetSpan(), std::move(condition), std::unique_ptr<BoundStatement>(thenS), std::unique_ptr<BoundStatement>(elseS)));
     if (ifStatementNode.Label())
     {
@@ -735,7 +759,12 @@ void StatementBinder::Visit(IfStatementNode& ifStatementNode)
 
 void StatementBinder::Visit(WhileStatementNode& whileStatementNode)
 {
+    bool exceptionCapture = false;
     std::unique_ptr<BoundExpression> condition = BindExpression(whileStatementNode.Condition(), boundCompileUnit, currentFunction, containerScope, this);
+    if (insideCatch && condition->ContainsExceptionCapture())
+    {
+        exceptionCapture = true;
+    }
     if (!TypesEqual(symbolTable.GetTypeByName(U"bool"), condition->GetType()->PlainType(whileStatementNode.GetSpan())))
     {
         throw Exception("condition of a while statement must be a Boolean expression", whileStatementNode.Condition()->GetSpan());
@@ -751,6 +780,10 @@ void StatementBinder::Visit(WhileStatementNode& whileStatementNode)
     {
         AddStatement(s.release());
     }
+    if (exceptionCapture)
+    {
+        AddReleaseExceptionStatement(whileStatementNode.GetSpan());
+    }
     AddStatement(new BoundWhileStatement(whileStatementNode.GetSpan(), std::move(condition), std::unique_ptr<BoundStatement>(stmt)));
     if (whileStatementNode.Label())
     {
@@ -760,7 +793,12 @@ void StatementBinder::Visit(WhileStatementNode& whileStatementNode)
 
 void StatementBinder::Visit(DoStatementNode& doStatementNode)
 {
+    bool exceptionCapture = false;
     std::unique_ptr<BoundExpression> condition = BindExpression(doStatementNode.Condition(), boundCompileUnit, currentFunction, containerScope, this);
+    if (insideCatch && condition->ContainsExceptionCapture())
+    {
+        exceptionCapture = true;
+    }
     if (!TypesEqual(symbolTable.GetTypeByName(U"bool"), condition->GetType()->PlainType(doStatementNode.GetSpan())))
     {
         throw Exception("condition of a do statement must be a Boolean expression", doStatementNode.Condition()->GetSpan());
@@ -775,6 +813,10 @@ void StatementBinder::Visit(DoStatementNode& doStatementNode)
     if (s)
     {
         AddStatement(s.release());
+    }
+    if (exceptionCapture)
+    {
+        AddReleaseExceptionStatement(doStatementNode.GetSpan());
     }
     AddStatement(new BoundDoStatement(doStatementNode.GetSpan(), std::unique_ptr<BoundStatement>(stmt), std::move(condition)));
     if (doStatementNode.Label())
@@ -800,6 +842,11 @@ void StatementBinder::Visit(ForStatementNode& forStatementNode)
         BooleanLiteralNode trueNode(forStatementNode.GetSpan(), true);
         condition = BindExpression(&trueNode, boundCompileUnit, currentFunction, containerScope, this);
     }
+    bool exceptionCapture = false;
+    if (insideCatch && condition->ContainsExceptionCapture())
+    {
+        exceptionCapture = true;
+    }
     if (!TypesEqual(symbolTable.GetTypeByName(U"bool"), condition->GetType()->PlainType(forStatementNode.GetSpan())))
     {
         throw Exception("condition of a for statement must be a Boolean expression", forStatementNode.Condition()->GetSpan());
@@ -818,6 +865,10 @@ void StatementBinder::Visit(ForStatementNode& forStatementNode)
     if (s)
     {
         AddStatement(s.release());
+    }
+    if (exceptionCapture)
+    {
+        AddReleaseExceptionStatement(forStatementNode.GetSpan());
     }
     AddStatement(new BoundForStatement(forStatementNode.GetSpan(), std::unique_ptr<BoundStatement>(initS), std::move(condition), std::unique_ptr<BoundStatement>(loopS),
         std::unique_ptr<BoundStatement>(actionS)));
@@ -917,16 +968,25 @@ void StatementBinder::Visit(ConstructionStatementNode& constructionStatementNode
     functionScopeLookups.push_back(FunctionScopeLookup(ScopeLookup::this_, localVariableSymbol->GetType()->ClassInterfaceEnumDelegateOrNsScope()));
     functionScopeLookups.push_back(FunctionScopeLookup(ScopeLookup::this_and_base_and_parent, containerScope));
     functionScopeLookups.push_back(FunctionScopeLookup(ScopeLookup::fileScopes, nullptr));
+    bool exceptionCapture = false;
     int n = constructionStatementNode.Arguments().Count();
     for (int i = 0; i < n; ++i)
     {
         Node* argumentNode = constructionStatementNode.Arguments()[i];
         std::unique_ptr<BoundExpression> argument = BindExpression(argumentNode, boundCompileUnit, currentFunction, containerScope, this, false, constructDelegateOrClassDelegateType);
+        if (insideCatch && argument->ContainsExceptionCapture())
+        {
+            exceptionCapture = true;
+        }
         arguments.push_back(std::move(argument));
     }
     std::unique_ptr<BoundFunctionCall> constructorCall = ResolveOverload(U"@constructor", containerScope, functionScopeLookups, arguments, boundCompileUnit, currentFunction, 
         constructionStatementNode.GetSpan());
     CheckAccess(currentFunction->GetFunctionSymbol(), constructorCall->GetFunctionSymbol());
+    if (exceptionCapture)
+    {
+        AddReleaseExceptionStatement(constructionStatementNode.GetSpan());
+    }
     AddStatement(new BoundConstructionStatement(std::move(constructorCall)));
     if (constructionStatementNode.Label())
     {
@@ -936,7 +996,23 @@ void StatementBinder::Visit(ConstructionStatementNode& constructionStatementNode
 
 void StatementBinder::Visit(DeleteStatementNode& deleteStatementNode)
 {
+    bool exceptionCapture = false;
     std::unique_ptr<BoundExpression> ptr = BindExpression(deleteStatementNode.Expression(), boundCompileUnit, currentFunction, containerScope, this);
+    if (insideCatch && ptr->ContainsExceptionCapture())
+    {
+        exceptionCapture = true;
+    }
+    if (GetConfig() == "debug")
+    {
+        std::vector<FunctionScopeLookup> lookups;
+        lookups.push_back(FunctionScopeLookup(ScopeLookup::this_and_base_and_parent, containerScope));
+        lookups.push_back(FunctionScopeLookup(ScopeLookup::fileScopes, nullptr));
+        std::vector<std::unique_ptr<BoundExpression>> arguments;
+        arguments.push_back(std::move(std::unique_ptr<BoundExpression>(ptr->Clone())));
+        std::unique_ptr<BoundFunctionCall> disposeCall = ResolveOverload(U"RtDispose", containerScope, lookups, arguments, boundCompileUnit, currentFunction, deleteStatementNode.GetSpan());
+        CheckAccess(currentFunction->GetFunctionSymbol(), disposeCall->GetFunctionSymbol());
+        AddStatement(new BoundExpressionStatement(std::move(disposeCall)));
+    }
     std::unique_ptr<BoundExpression> memFreePtr;
     TypeSymbol* baseType = ptr->GetType()->BaseType();
     if (baseType->HasNontrivialDestructor())
@@ -957,6 +1033,10 @@ void StatementBinder::Visit(DeleteStatementNode& deleteStatementNode)
         }
         AddStatement(new BoundExpressionStatement(std::move(destructorCall)));
         memFreePtr = BindExpression(deleteStatementNode.Expression(), boundCompileUnit, currentFunction, containerScope, this);
+        if (insideCatch && memFreePtr->ContainsExceptionCapture())
+        {
+            exceptionCapture = true;
+        }
     }
     else
     {
@@ -969,6 +1049,10 @@ void StatementBinder::Visit(DeleteStatementNode& deleteStatementNode)
     arguments.push_back(std::move(memFreePtr));
     std::unique_ptr<BoundFunctionCall> memFreeCall = ResolveOverload(U"RtMemFree", containerScope, lookups, arguments, boundCompileUnit, currentFunction, deleteStatementNode.GetSpan());
     CheckAccess(currentFunction->GetFunctionSymbol(), memFreeCall->GetFunctionSymbol());
+    if (exceptionCapture)
+    {
+        AddReleaseExceptionStatement(deleteStatementNode.GetSpan());
+    }
     AddStatement(new BoundExpressionStatement(std::move(memFreeCall)));
     if (deleteStatementNode.Label())
     {
@@ -978,7 +1062,12 @@ void StatementBinder::Visit(DeleteStatementNode& deleteStatementNode)
 
 void StatementBinder::Visit(DestroyStatementNode& destroyStatementNode)
 {
+    bool exceptionCapture = false;
     std::unique_ptr<BoundExpression> ptr = BindExpression(destroyStatementNode.Expression(), boundCompileUnit, currentFunction, containerScope, this);
+    if (insideCatch && ptr->ContainsExceptionCapture())
+    {
+        exceptionCapture = true;
+    }
     if (!ptr->GetType()->IsPointerType())
     {
         throw Exception("destroy statement needs pointer type operand", destroyStatementNode.GetSpan());
@@ -1000,6 +1089,10 @@ void StatementBinder::Visit(DestroyStatementNode& destroyStatementNode)
         {
             destructorCall->SetFlag(BoundExpressionFlags::virtualCall);
         }
+        if (exceptionCapture)
+        {
+            AddReleaseExceptionStatement(destroyStatementNode.GetSpan());
+        }
         AddStatement(new BoundExpressionStatement(std::move(destructorCall)));
     }
     else
@@ -1010,7 +1103,12 @@ void StatementBinder::Visit(DestroyStatementNode& destroyStatementNode)
 
 void StatementBinder::Visit(AssignmentStatementNode& assignmentStatementNode)
 {
+    bool exceptionCapture = false;
     std::unique_ptr<BoundExpression> target = BindExpression(assignmentStatementNode.TargetExpr(), boundCompileUnit, currentFunction, containerScope, this, true);
+    if (insideCatch && target->ContainsExceptionCapture())
+    {
+        exceptionCapture = true;
+    }
     TypeSymbol* targetPlainType = target->GetType()->PlainType(assignmentStatementNode.GetSpan());
     if (targetPlainType->IsClassTypeSymbol() && target->GetType()->IsReferenceType())
     {
@@ -1024,6 +1122,10 @@ void StatementBinder::Visit(AssignmentStatementNode& assignmentStatementNode)
     TypeSymbol* targetType = target->GetType()->BaseType();
     bool assignDelegateOrClassDelegateType = targetType->GetSymbolType() == SymbolType::delegateTypeSymbol || targetType->GetSymbolType() == SymbolType::classDelegateTypeSymbol;
     std::unique_ptr<BoundExpression> source = BindExpression(assignmentStatementNode.SourceExpr(), boundCompileUnit, currentFunction, containerScope, this, false, assignDelegateOrClassDelegateType);
+    if (insideCatch && source->ContainsExceptionCapture())
+    {
+        exceptionCapture = true;
+    }
     std::vector<std::unique_ptr<BoundExpression>> arguments;
     arguments.push_back(std::move(target));
     arguments.push_back(std::move(source));
@@ -1034,6 +1136,11 @@ void StatementBinder::Visit(AssignmentStatementNode& assignmentStatementNode)
     std::unique_ptr<BoundFunctionCall> assignmentCall = ResolveOverload(U"operator=", containerScope, functionScopeLookups, arguments, boundCompileUnit, currentFunction, 
         assignmentStatementNode.GetSpan());
     CheckAccess(currentFunction->GetFunctionSymbol(), assignmentCall->GetFunctionSymbol());
+    currentFunction->MoveTemporaryDestructorCallsTo(*assignmentCall);
+    if (exceptionCapture)
+    {
+        AddReleaseExceptionStatement(assignmentStatementNode.GetSpan());
+    }
     AddStatement(new BoundAssignmentStatement(std::move(assignmentCall)));
     if (assignmentStatementNode.Label())
     {
@@ -1043,7 +1150,16 @@ void StatementBinder::Visit(AssignmentStatementNode& assignmentStatementNode)
 
 void StatementBinder::Visit(ExpressionStatementNode& expressionStatementNode)
 {
+    bool exceptionCapture = false;
     std::unique_ptr<BoundExpression> expression = BindExpression(expressionStatementNode.Expression(), boundCompileUnit, currentFunction, containerScope, this);
+    if (insideCatch && expression->ContainsExceptionCapture())
+    {
+        exceptionCapture = true;
+    }
+    if (exceptionCapture)
+    {
+        AddReleaseExceptionStatement(expressionStatementNode.GetSpan());
+    }
     AddStatement(new BoundExpressionStatement(std::move(expression)));
     if (expressionStatementNode.Label())
     {
@@ -1131,7 +1247,12 @@ void StatementBinder::Visit(RangeForStatementNode& rangeForStatementNode)
 
 void StatementBinder::Visit(SwitchStatementNode& switchStatementNode)
 {
+    bool exceptionCapture = false;
     std::unique_ptr<BoundExpression> condition = BindExpression(switchStatementNode.Condition(), boundCompileUnit, currentFunction, containerScope, this);
+    if (insideCatch && condition->ContainsExceptionCapture())
+    {
+        exceptionCapture = true;
+    }
     TypeSymbol* conditionType = condition->GetType();
     if (conditionType->IsSwitchConditionType())
     {
@@ -1183,6 +1304,10 @@ void StatementBinder::Visit(SwitchStatementNode& switchStatementNode)
         currentGotoCaseStatements = prevGotoCaseStatements;
         currentGotoDefaultStatements = prevGotoDefaultStatements;
         currentCaseValueMap = prevCaseValueMap;
+        if (exceptionCapture)
+        {
+            AddReleaseExceptionStatement(switchStatementNode.GetSpan());
+        }
         AddStatement(boundSwitchStatement.release());
         if (switchStatementNode.Label())
         {
@@ -1333,11 +1458,15 @@ void StatementBinder::Visit(ThrowStatementNode& throwStatementNode)
                 NewNode* newNode = new NewNode(span, new IdentifierNode(span, exceptionClassType->FullName()));
                 CloneContext cloneContext;
                 newNode->AddArgument(throwStatementNode.Expression()->Clone(cloneContext));
+                std::unique_ptr<BoundExpression> exceptionPtr = BindExpression(newNode, boundCompileUnit, currentFunction, containerScope, this);
                 InvokeNode invokeNode(span, new IdentifierNode(span, U"RtThrowException"));
                 invokeNode.AddArgument(newNode);
                 invokeNode.AddArgument(new UIntLiteralNode(span, exceptionClassType->TypeId()));
                 std::unique_ptr<BoundExpression> throwCallExpr = BindExpression(&invokeNode, boundCompileUnit, currentFunction, containerScope, this);
-                AddStatement(new BoundThrowStatement(span, std::move(throwCallExpr)));
+                Assert(throwCallExpr->GetBoundNodeType() == BoundNodeType::boundFunctionCall, "function call expected");
+                BoundFunctionCall* throwCall = static_cast<BoundFunctionCall*>(throwCallExpr.get());
+                FunctionSymbol* throwFunction = throwCall->GetFunctionSymbol();
+                AddStatement(new BoundThrowStatement(span, std::move(exceptionPtr), throwFunction));
             }
             else
             {
@@ -1615,6 +1744,18 @@ void StatementBinder::SetCurrentMemberFunction(MemberFunctionSymbol* currentMemb
 {
     currentMemberFunctionSymbol = currentMemberFunctionSymbol_;
     currentMemberFunctionNode = currentMemberFunctionNode_;
+}
+
+void StatementBinder::AddReleaseExceptionStatement(const Span& span)
+{
+    if (insideCatch && !compilingReleaseExceptionStatement)
+    {
+        compilingReleaseExceptionStatement = true;
+        InvokeNode* invokeNode(new InvokeNode(span, new DotNode(span, new IdentifierNode(span, U"@exPtr"), new IdentifierNode(span, U"Release"))));
+        ExpressionStatementNode releaseExceptionStatement(span, invokeNode);
+        CompileStatement(&releaseExceptionStatement, true);
+        compilingReleaseExceptionStatement = false;
+    }
 }
 
 void StatementBinder::AddStatement(BoundStatement* boundStatement)

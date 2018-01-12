@@ -479,6 +479,7 @@ class ConditionalCompilationExpressionNode : public Node
 {
 public:
     ConditionalCompilationExpressionNode(NodeType nodeType_, const Span& span_);
+    bool IsConditionalCompilationExpressionNode() const override { return true; }
 };
 
 class ConditionalCompilationBinaryExpressionNode : public ConditionalCompilationExpressionNode
@@ -486,6 +487,8 @@ class ConditionalCompilationBinaryExpressionNode : public ConditionalCompilation
 public:
     ConditionalCompilationBinaryExpressionNode(NodeType nodeType_, const Span& span_);
     ConditionalCompilationBinaryExpressionNode(NodeType nodeType_, const Span& span_, ConditionalCompilationExpressionNode* left_, ConditionalCompilationExpressionNode* right_);
+    void Write(AstWriter& writer) override;
+    void Read(AstReader& reader) override;
     ConditionalCompilationExpressionNode* Left() const { return left.get(); }
     ConditionalCompilationExpressionNode* Right() const { return right.get(); }
 private:
@@ -518,6 +521,8 @@ public:
     ConditionalCompilationNotNode(const Span& span_, ConditionalCompilationExpressionNode* expr_);
     Node* Clone(CloneContext& cloneContext) const override;
     void Accept(Visitor& visitor) override;
+    void Write(AstWriter& writer) override;
+    void Read(AstReader& reader) override;
     ConditionalCompilationExpressionNode* Expr() const { return expr.get(); }
 private:
     std::unique_ptr<ConditionalCompilationExpressionNode> expr;
@@ -530,6 +535,8 @@ public:
     ConditionalCompilationPrimaryNode(const Span& span_, const std::u32string& symbol_);
     Node* Clone(CloneContext& cloneContext) const override;
     void Accept(Visitor& visitor) override;
+    void Write(AstWriter& writer) override;
+    void Read(AstReader& reader) override;
     const std::u32string& Symbol() const { return symbol; }
 private:
     std::u32string symbol;
@@ -543,6 +550,8 @@ public:
     void AddStatement(StatementNode* statement);
     Node* Clone(CloneContext& cloneContext) const override;
     void Accept(Visitor& visitor) override;
+    void Write(AstWriter& writer) override;
+    void Read(AstReader& reader) override;
     ConditionalCompilationExpressionNode* Expr() const { return expr.get();  }
     const NodeList<StatementNode>& Statements() const { return statements; }
 private:
@@ -557,6 +566,8 @@ public:
     ConditionalCompilationStatementNode(const Span& span_, ConditionalCompilationExpressionNode* ifExpr_);
     Node* Clone(CloneContext& cloneContext) const override;
     void Accept(Visitor& visitor) override;
+    void Write(AstWriter& writer) override;
+    void Read(AstReader& reader) override;
     void AddIfStatement(StatementNode* statement);
     void AddElifExpr(const Span& span, ConditionalCompilationExpressionNode* expr);
     void AddElifStatement(StatementNode* statement);

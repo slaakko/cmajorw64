@@ -23,7 +23,7 @@ enum class BoundStatementFlags : uint8_t
 {
     none = 0,
     postfix = 1 << 0,
-    generated = 1 << 1
+    generated = 1 << 1,
 };
 
 inline BoundStatementFlags operator|(BoundStatementFlags left, BoundStatementFlags right)
@@ -290,11 +290,13 @@ private:
 class BoundThrowStatement : public BoundStatement
 {
 public:
-    BoundThrowStatement(const Span& span_, std::unique_ptr<BoundExpression>&& throwCallExpr_);
+    BoundThrowStatement(const Span& span_, std::unique_ptr<BoundExpression>&& exceptionPtr_, FunctionSymbol* throwFunction_);
     void Accept(BoundNodeVisitor& visitor) override;
-    BoundExpression* ThrowCallExpr() { return throwCallExpr.get(); }
+    BoundExpression* ExceptionPtr() { return exceptionPtr.get(); }
+    FunctionSymbol* ThrowFunction() { return throwFunction; }
 private:
-    std::unique_ptr<BoundExpression> throwCallExpr;
+    std::unique_ptr<BoundExpression> exceptionPtr;
+    FunctionSymbol* throwFunction;
 };
 
 class BoundRethrowStatement : public BoundStatement

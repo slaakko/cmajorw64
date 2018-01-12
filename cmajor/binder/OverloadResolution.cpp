@@ -1004,7 +1004,8 @@ std::unique_ptr<BoundFunctionCall> CreateBoundFunctionCall(FunctionSymbol* bestF
                     if (classType->Destructor())
                     {
                         std::unique_ptr<BoundFunctionCall> destructorCall(new BoundFunctionCall(span, classType->Destructor()));
-                        destructorCall->AddArgument(std::unique_ptr<BoundExpression>(conversionResult->Clone()));
+                        TypeSymbol* type = conversionResult->GetType()->AddPointer(span);
+                        destructorCall->AddArgument(std::unique_ptr<BoundExpression>(new BoundAddressOfExpression(std::unique_ptr<BoundExpression>(conversionResult->Clone()), type)));
                         boundFunction->AddTemporaryDestructorCall(std::move(destructorCall));
                     }
                 }

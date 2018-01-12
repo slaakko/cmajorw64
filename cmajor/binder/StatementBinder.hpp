@@ -73,6 +73,7 @@ public:
     void SetContainerScope(ContainerScope* containerScope_) { containerScope = containerScope_; }
     BoundStatement* ReleaseStatement() { return statement.release(); }
     bool CompilingThrow() const { return compilingThrow; }
+    bool InsideCatch() const { return insideCatch; }
 private:
     BoundCompileUnit& boundCompileUnit;
     SymbolTable& symbolTable;
@@ -96,8 +97,10 @@ private:
     std::vector<BoundGotoDefaultStatement*>* currentGotoDefaultStatements;
     bool postfix;
     bool compilingThrow;
+    bool compilingReleaseExceptionStatement;
     std::stack<bool> conditionalCompilationStack;
     void AddStatement(BoundStatement* boundStatement);
+    void AddReleaseExceptionStatement(const Span& span);
 };
 
 } } // namespace cmajor::binder

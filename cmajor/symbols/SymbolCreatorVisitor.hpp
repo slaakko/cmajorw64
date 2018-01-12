@@ -6,6 +6,7 @@
 #ifndef CMAJOR_SYMBOLS_SYMBOL_CREATOR_VISITOR_INCLUDED
 #define CMAJOR_SYMBOLS_SYMBOL_CREATOR_VISITOR_INCLUDED
 #include <cmajor/ast/Visitor.hpp>
+#include <stack>
 
 namespace cmajor { namespace symbols {
 
@@ -46,6 +47,12 @@ public:
     void Visit(DefaultStatementNode& defaultStatementNode) override;
     void Visit(CatchNode& catchNode) override;
     void Visit(TryStatementNode& tryStatementNode) override;
+    void Visit(ConditionalCompilationPartNode& conditionalCompilationPartNode) override;
+    void Visit(ConditionalCompilationDisjunctionNode& conditionalCompilationDisjunctionNode) override;
+    void Visit(ConditionalCompilationConjunctionNode& conditionalCompilationConjunctionNode) override;
+    void Visit(ConditionalCompilationNotNode& conditionalCompilationNotNode) override;
+    void Visit(ConditionalCompilationPrimaryNode& conditionalCompilationPrimaryNode) override;
+    void Visit(ConditionalCompilationStatementNode& conditionalCompilationStatementNode) override;
     void Visit(TypedefNode& typedefNode) override;
     void Visit(ConstantNode& constantNode) override;
     void Visit(EnumTypeNode& enumTypeNode) override;
@@ -54,6 +61,7 @@ private:
     SymbolTable& symbolTable;
     ClassNode* classInstanceNode;
     ClassTemplateSpecializationSymbol* classTemplateSpecialization;
+    std::stack<bool> conditionalCompilationStack;
 };
 
 } } // namespace cmajor::symbols

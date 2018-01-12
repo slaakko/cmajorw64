@@ -70,6 +70,7 @@ public:
     virtual bool IsConceptNode() const { return false; }
     virtual bool IsFunctionNode() const { return false; }
     virtual bool IsIntrinsicConceptNode() const { return false; }
+    virtual bool IsConditionalCompilationExpressionNode() const { return false; }
     const Span& GetSpan() const { return span; }
     Span& GetSpan() { return span; }
     const Node* Parent() const { return parent; }

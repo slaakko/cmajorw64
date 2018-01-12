@@ -444,8 +444,11 @@ public:
     const Node* Expression() const { return expression.get(); }
     Node* Expression() { return expression.get(); }
     std::string ToString() const override;
+    bool Static() const { return static_; }
+    void SetStatic() { static_ = true; }
 private:
     std::unique_ptr<Node> expression;
+    bool static_;
 };
 
 class CastNode : public Node

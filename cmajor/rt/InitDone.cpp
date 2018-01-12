@@ -8,12 +8,15 @@
 #include <cmajor/parsing/InitDone.hpp>
 #include <cmajor/util/InitDone.hpp>
 #include <cmajor/rt/Io.hpp>
+#include <cmajor/rt/CallStack.hpp>
 #include <cmajor/rt/Classes.hpp>
 #include <cmajor/rt/Statics.hpp>
 #include <cmajor/rt/String.hpp>
 #include <cmajor/rt/Mutex.hpp>
-#include <cmajor/rt/Threading.hpp>
+#include <cmajor/rt/Thread.hpp>
+#include <cmajor/rt/Memory.hpp>
 #include <cmajor/rt/CommandLine.hpp>
+#include <csignal>
 
 extern "C" RT_API void RtInit()
 {
@@ -40,18 +43,20 @@ void Init()
     InitIo();
     InitError();
     InitString();
+    InitMemory();
     InitStatics();
     InitClasses();
-    InitThreading();
+    InitThread();
     InitCommandLine();
 }
 
 void Done()
 {
     DoneCommandLine();
-    DoneThreading();
+    DoneThread();
     DoneClasses();
     DoneStatics();
+    DoneMemory();
     DoneString();
     DoneError();
     DoneIo();

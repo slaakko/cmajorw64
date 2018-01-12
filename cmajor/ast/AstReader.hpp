@@ -23,6 +23,8 @@ class ConstraintNode;
 class WhereConstraintNode;
 class ConceptIdNode;
 class ConceptNode;
+class ConditionalCompilationExpressionNode;
+class ConditionalCompilationPartNode;
 
 class AstReader
 {
@@ -39,6 +41,8 @@ public:
     WhereConstraintNode* ReadWhereConstraintNode();
     ConceptIdNode* ReadConceptIdNode();
     ConceptNode* ReadConceptNode();
+    ConditionalCompilationExpressionNode* ReadConditionalCompilationExpressionNode();
+    ConditionalCompilationPartNode* ReadConditionalCompilationPartNode();
     Specifiers ReadSpecifiers();
     Span ReadSpan();
 private:

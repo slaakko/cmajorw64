@@ -609,7 +609,14 @@ void BoundDereferenceExpression::Load(Emitter& emitter, OperationFlags flags)
 {
     if (subject->GetBoundNodeType() != BoundNodeType::boundAddressOfExpression)
     {
-        subject->Load(emitter, SetDerefCount(OperationFlags::deref, GetDerefCount(flags) + 1));
+        if (GetDerefCount(flags) == 0 && (flags & OperationFlags::addr) != OperationFlags::none)
+        {
+            subject->Load(emitter, OperationFlags::none);
+        }
+        else
+        {
+            subject->Load(emitter, SetDerefCount(OperationFlags::deref, GetDerefCount(flags) + 1));
+        }
     }
     else
     {
@@ -691,6 +698,22 @@ void BoundFunctionCall::AddArgument(std::unique_ptr<BoundExpression>&& argument)
 void BoundFunctionCall::SetArguments(std::vector<std::unique_ptr<BoundExpression>>&& arguments_)
 {
     arguments = std::move(arguments_);
+}
+
+bool BoundFunctionCall::ContainsExceptionCapture() const
+{
+    if (BoundExpression::ContainsExceptionCapture())
+    {
+        return true;
+    }
+    for (const std::unique_ptr<BoundExpression>& arg : arguments)
+    {
+        if (arg->ContainsExceptionCapture())
+        {
+            return true;
+        }
+    }
+    return false;
 }
 
 void BoundFunctionCall::Load(Emitter& emitter, OperationFlags flags)
@@ -948,6 +971,22 @@ void BoundDelegateCall::AddArgument(std::unique_ptr<BoundExpression>&& argument)
     arguments.push_back(std::move(argument));
 }
 
+bool BoundDelegateCall::ContainsExceptionCapture() const
+{
+    if (BoundExpression::ContainsExceptionCapture())
+    {
+        return true;
+    }
+    for (const std::unique_ptr<BoundExpression>& arg : arguments)
+    {
+        if (arg->ContainsExceptionCapture())
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
 BoundClassDelegateCall::BoundClassDelegateCall(const Span& span_, ClassDelegateTypeSymbol* classDelegateType_) :
     BoundExpression(span_, BoundNodeType::boundClassDelegateCall, classDelegateType_->ReturnType()), classDelegateTypeSymbol(classDelegateType_), arguments()
 {
@@ -1064,6 +1103,22 @@ void BoundClassDelegateCall::AddArgument(std::unique_ptr<BoundExpression>&& argu
     arguments.push_back(std::move(argument));
 }
 
+bool BoundClassDelegateCall::ContainsExceptionCapture() const
+{
+    if (BoundExpression::ContainsExceptionCapture())
+    {
+        return true;
+    }
+    for (const std::unique_ptr<BoundExpression>& arg : arguments)
+    {
+        if (arg->ContainsExceptionCapture())
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
 BoundConstructExpression::BoundConstructExpression(std::unique_ptr<BoundExpression>&& constructorCall_, TypeSymbol* resultType_) :
     BoundExpression(constructorCall_->GetSpan(), BoundNodeType::boundConstructExpression, resultType_), constructorCall(std::move(constructorCall_))
 {
@@ -1112,6 +1167,15 @@ void BoundConstructExpression::Accept(BoundNodeVisitor& visitor)
     visitor.Visit(*this);
 }
 
+bool BoundConstructExpression::ContainsExceptionCapture() const
+{
+    if (BoundExpression::ContainsExceptionCapture())
+    {
+        return true;
+    }
+    return constructorCall->ContainsExceptionCapture();
+}
+
 BoundConstructAndReturnTemporaryExpression::BoundConstructAndReturnTemporaryExpression(std::unique_ptr<BoundExpression>&& constructorCall_, std::unique_ptr<BoundExpression>&& boundTemporary_) : 
     BoundExpression(constructorCall_->GetSpan(), BoundNodeType::boundConstructAndReturnTemporary, boundTemporary_->GetType()), constructorCall(std::move(constructorCall_)), 
     boundTemporary(std::move(boundTemporary_))
@@ -1146,6 +1210,23 @@ void BoundConstructAndReturnTemporaryExpression::Accept(BoundNodeVisitor& visito
     visitor.Visit(*this);
 }
 
+bool BoundConstructAndReturnTemporaryExpression::ContainsExceptionCapture() const
+{
+    if (BoundExpression::ContainsExceptionCapture())
+    {
+        return true;
+    }
+    if (constructorCall->ContainsExceptionCapture()) 
+    {
+        return true;
+    }
+    if (boundTemporary->ContainsExceptionCapture())
+    {
+        return true;
+    }
+    return false;
+}
+
 BoundClassOrClassDelegateConversionResult::BoundClassOrClassDelegateConversionResult(std::unique_ptr<BoundExpression>&& conversionResult_, std::unique_ptr<BoundFunctionCall>&& conversionFunctionCall_) :
     BoundExpression(conversionResult_->GetSpan(), BoundNodeType::boundClassOrClassDelegateConversionResult, conversionResult_->GetType()),
     conversionResult(std::move(conversionResult_)), conversionFunctionCall(std::move(conversionFunctionCall_))
@@ -1172,6 +1253,23 @@ void BoundClassOrClassDelegateConversionResult::Store(Emitter& emitter, Operatio
 void BoundClassOrClassDelegateConversionResult::Accept(BoundNodeVisitor& visitor)
 {
     visitor.Visit(*this);
+}
+
+bool BoundClassOrClassDelegateConversionResult::ContainsExceptionCapture() const
+{
+    if (BoundExpression::ContainsExceptionCapture())
+    {
+        return true;
+    }
+    if (conversionResult->ContainsExceptionCapture())
+    {
+        return true;
+    }
+    if (conversionFunctionCall->ContainsExceptionCapture())
+    {
+        return true;
+    }
+    return false;
 }
 
 BoundConversion::BoundConversion(std::unique_ptr<BoundExpression>&& sourceExpr_, FunctionSymbol* conversionFun_) :
@@ -1221,6 +1319,15 @@ std::unique_ptr<Value> BoundConversion::ToValue(BoundCompileUnit& boundCompileUn
         return conversionFun->ConvertValue(sourceValue);
     }
     return std::unique_ptr<Value>();
+}
+
+bool BoundConversion::ContainsExceptionCapture() const
+{
+    if (BoundExpression::ContainsExceptionCapture())
+    {
+        return true;
+    }
+    return sourceExpr->ContainsExceptionCapture();
 }
 
 BoundIsExpression::BoundIsExpression(std::unique_ptr<BoundExpression>&& expr_, ClassTypeSymbol* rightClassType_, TypeSymbol* boolType_) :
@@ -1276,6 +1383,15 @@ void BoundIsExpression::Store(Emitter& emitter, OperationFlags flags)
 void BoundIsExpression::Accept(BoundNodeVisitor& visitor)
 {
     visitor.Visit(*this);
+}
+
+bool BoundIsExpression::ContainsExceptionCapture() const
+{
+    if (BoundExpression::ContainsExceptionCapture())
+    {
+        return true;
+    }
+    return expr->ContainsExceptionCapture();
 }
 
 BoundAsExpression::BoundAsExpression(std::unique_ptr<BoundExpression>&& expr_, ClassTypeSymbol* rightClassType_, std::unique_ptr<BoundLocalVariable>&& variable_) :
@@ -1347,6 +1463,15 @@ void BoundAsExpression::Store(Emitter& emitter, OperationFlags flags)
 void BoundAsExpression::Accept(BoundNodeVisitor& visitor)
 {
     visitor.Visit(*this);
+}
+
+bool BoundAsExpression::ContainsExceptionCapture() const
+{
+    if (BoundExpression::ContainsExceptionCapture())
+    {
+        return true;
+    }
+    return expr->ContainsExceptionCapture();
 }
 
 BoundTypeNameExpression::BoundTypeNameExpression(std::unique_ptr<BoundExpression>&& classPtr_, TypeSymbol* constCharPtrType_) :
@@ -1507,6 +1632,23 @@ void BoundDisjunction::SetTemporary(BoundLocalVariable* temporary_)
     temporary.reset(temporary_);
 }
 
+bool BoundDisjunction::ContainsExceptionCapture() const
+{
+    if (BoundExpression::ContainsExceptionCapture())
+    {
+        return true;
+    }
+    if (left->ContainsExceptionCapture())
+    {
+        return true;
+    }
+    if (right->ContainsExceptionCapture())
+    {
+        return true;
+    }
+    return false;
+}
+
 BoundConjunction::BoundConjunction(const Span& span_, std::unique_ptr<BoundExpression>&& left_, std::unique_ptr<BoundExpression>&& right_, TypeSymbol* boolType_) :
     BoundExpression(span_, BoundNodeType::boundConjunction, boolType_), left(std::move(left_)), right(std::move(right_))
 {
@@ -1557,6 +1699,23 @@ void BoundConjunction::Accept(BoundNodeVisitor& visitor)
 void BoundConjunction::SetTemporary(BoundLocalVariable* temporary_)
 {
     temporary.reset(temporary_);
+}
+
+bool BoundConjunction::ContainsExceptionCapture() const
+{
+    if (BoundExpression::ContainsExceptionCapture())
+    {
+        return true;
+    }
+    if (left->ContainsExceptionCapture())
+    {
+        return true;
+    }
+    if (right->ContainsExceptionCapture())
+    {
+        return true;
+    }
+    return false;
 }
 
 BoundTypeExpression::BoundTypeExpression(const Span& span_, TypeSymbol* type_) : BoundExpression(span_, BoundNodeType::boundTypeExpression, type_)

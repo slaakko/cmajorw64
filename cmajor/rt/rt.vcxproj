@@ -174,7 +174,7 @@
     <ClInclude Include="Io.hpp" />
     <ClInclude Include="Statics.hpp" />
     <ClInclude Include="String.hpp" />
-    <ClInclude Include="Threading.hpp" />
+    <ClInclude Include="Thread.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CommandLine.cpp" />
@@ -190,7 +190,7 @@
     <ClCompile Include="Mutex.cpp" />
     <ClCompile Include="Statics.cpp" />
     <ClCompile Include="String.cpp" />
-    <ClCompile Include="Threading.cpp" />
+    <ClCompile Include="Thread.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

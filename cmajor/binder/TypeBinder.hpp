@@ -57,6 +57,12 @@ public:
     void Visit(DefaultStatementNode& defaultStatementNode) override;
     void Visit(TryStatementNode& tryStatementNode) override;
     void Visit(CatchNode& catchNode) override;
+    void Visit(ConditionalCompilationPartNode& conditionalCompilationPartNode) override;
+    void Visit(ConditionalCompilationDisjunctionNode& conditionalCompilationDisjunctionNode) override;
+    void Visit(ConditionalCompilationConjunctionNode& conditionalCompilationConjunctionNode) override;
+    void Visit(ConditionalCompilationNotNode& conditionalCompilationNotNode) override;
+    void Visit(ConditionalCompilationPrimaryNode& conditionalCompilationPrimaryNode) override;
+    void Visit(ConditionalCompilationStatementNode& conditionalCompilationStatementNode) override;
 
     void Visit(TypedefNode& typedefNode) override;
     void BindTypedef(TypedefSymbol* typedefSymbol, TypedefNode* typedefNode, bool fromOwnCompileUnit);
@@ -73,6 +79,7 @@ private:
     std::vector<Node*> usingNodes;
     EnumTypeSymbol* enumType;
     FunctionSymbol* currentFunctionSymbol;
+    std::stack<bool> conditionalCompilationStack;
 };
 
 } } // namespace cmajor::binder

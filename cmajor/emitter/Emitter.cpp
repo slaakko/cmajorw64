@@ -359,6 +359,10 @@ void Emitter::Visit(BoundFunction& boundFunction)
     pads.clear();
     labeledStatementMap.clear();
     FunctionSymbol* functionSymbol = boundFunction.GetFunctionSymbol();
+    if (functionSymbol->GroupName() == U"Foo")
+    {
+        int x = 0;
+    }
     llvm::FunctionType* functionType = functionSymbol->IrType(*this);
     function = llvm::cast<llvm::Function>(compileUnitModule->getOrInsertFunction(ToUtf8(functionSymbol->MangledName()), functionType));
     if (GetGlobalFlag(GlobalFlags::release) && functionSymbol->IsInline())
@@ -622,8 +626,6 @@ void Emitter::Visit(BoundReturnStatement& boundReturnStatement)
         SetCurrentBasicBlock(returnTarget);
         currentPad = currentPad->parent;
     }
-    ExitBlocks(nullptr);
-    CreateExitFunctionCall();
     BoundFunctionCall* returnFunctionCall = boundReturnStatement.ReturnFunctionCall();
     if (returnFunctionCall)
     {
@@ -634,11 +636,15 @@ void Emitter::Visit(BoundReturnStatement& boundReturnStatement)
             sequenceSecond->SetGenerated();
             sequenceSecond->Accept(*this);
         }
+        ExitBlocks(nullptr);
+        CreateExitFunctionCall();
         builder.CreateRet(returnValue);
         lastInstructionWasRet = true;
     }
     else
     {
+        ExitBlocks(nullptr);
+        CreateExitFunctionCall();
         builder.CreateRetVoid();
         lastInstructionWasRet = true;
     }
@@ -1209,7 +1215,13 @@ void Emitter::Visit(BoundThrowStatement& boundThrowStatement)
     lastInstructionWasRet = false;
     basicBlockOpen = false;
     SetTarget(&boundThrowStatement);
-    boundThrowStatement.ThrowCallExpr()->Accept(*this);
+    boundThrowStatement.ExceptionPtr()->Accept(*this);
+    std::vector<GenObject*> genObjects;
+    LlvmValue exceptionPtr(stack.Pop());
+    genObjects.push_back(&exceptionPtr);
+    ExitBlocks(nullptr);
+    CreateExitFunctionCall();
+    boundThrowStatement.ThrowFunction()->GenerateCall(*this, genObjects, OperationFlags::none);
 }
 
 void Emitter::Visit(BoundRethrowStatement& boundRethrowStatement)

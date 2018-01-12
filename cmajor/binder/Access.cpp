@@ -12,7 +12,7 @@ namespace cmajor { namespace binder {
 
 using namespace cmajor::unicode;
 
-void CheckAccess(FunctionSymbol* fromFunction, Symbol* toSymbol)
+void CheckAccess(FunctionSymbol* fromFunction, Symbol* toSymbol) 
 {
     FunctionSymbol* toContainingFunction = toSymbol->ContainingFunctionNoThrow();
     if (toContainingFunction)

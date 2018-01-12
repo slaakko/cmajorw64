@@ -998,18 +998,23 @@ std::string SizeOfNode::ToString() const
     return "sizeof(" + expression->ToString() + ")";
 }
 
-TypeNameNode::TypeNameNode(const Span& span_) : Node(NodeType::typeNameNode, span_), expression()
+TypeNameNode::TypeNameNode(const Span& span_) : Node(NodeType::typeNameNode, span_), expression(), static_(false)
 {
 }
 
-TypeNameNode::TypeNameNode(const Span& span_, Node* expression_) : Node(NodeType::typeNameNode, span_), expression(expression_)
+TypeNameNode::TypeNameNode(const Span& span_, Node* expression_) : Node(NodeType::typeNameNode, span_), expression(expression_), static_(false)
 {
     expression->SetParent(this);
 }
 
 Node* TypeNameNode::Clone(CloneContext& cloneContext) const
 {
-    return new TypeNameNode(GetSpan(), expression->Clone(cloneContext));
+    TypeNameNode* typeNameNode = new TypeNameNode(GetSpan(), expression->Clone(cloneContext));
+    if (static_)
+    {
+        typeNameNode->SetStatic();
+    }
+    return typeNameNode;
 }
 
 void TypeNameNode::Accept(Visitor& visitor)
@@ -1021,6 +1026,7 @@ void TypeNameNode::Write(AstWriter& writer)
 {
     Node::Write(writer);
     writer.Write(expression.get());
+    writer.GetBinaryWriter().Write(static_);
 }
 
 void TypeNameNode::Read(AstReader& reader)
@@ -1028,6 +1034,7 @@ void TypeNameNode::Read(AstReader& reader)
     Node::Read(reader);
     expression.reset(reader.ReadNode());
     expression->SetParent(this);
+    static_ = reader.GetBinaryReader().ReadBool();
 }
 
 std::string TypeNameNode::ToString() const

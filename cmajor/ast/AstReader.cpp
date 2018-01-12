@@ -7,6 +7,7 @@
 #include <cmajor/ast/Identifier.hpp>
 #include <cmajor/ast/Statement.hpp>
 #include <cmajor/ast/Concept.hpp>
+#include <cmajor/ast/Statement.hpp>
 
 namespace cmajor { namespace ast {
 
@@ -137,6 +138,32 @@ ConceptNode* AstReader::ReadConceptNode()
     else
     {
         throw std::runtime_error("concept node expected");
+    }
+}
+
+ConditionalCompilationExpressionNode* AstReader::ReadConditionalCompilationExpressionNode()
+{
+    Node* node = ReadNode();
+    if (node->IsConditionalCompilationExpressionNode())
+    {
+        return static_cast<ConditionalCompilationExpressionNode*>(node);
+    }
+    else
+    {
+        throw std::runtime_error("conditional compilation expression node expected");
+    }
+}
+
+ConditionalCompilationPartNode* AstReader::ReadConditionalCompilationPartNode()
+{
+    Node* node = ReadNode();
+    if (node->GetNodeType() == NodeType::conditionalCompilationPartNode)
+    {
+        return static_cast<ConditionalCompilationPartNode*>(node);
+    }
+    else
+    {
+        throw std::runtime_error("conditional compilation part node expected");
     }
 }
 

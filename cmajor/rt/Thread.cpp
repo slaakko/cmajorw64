@@ -3,7 +3,7 @@
 // Distributed under the MIT license
 // =================================
 
-#include <cmajor/rt/Threading.hpp>
+#include <cmajor/rt/Thread.hpp>
 #include <cmajor/rt/Io.hpp>
 #include <cmajor/rt/CallStack.hpp>
 #include <cmajor/rt/Error.hpp>
@@ -213,12 +213,12 @@ bool ThreadPool::JoinThread(int32_t threadId)
     return false;
 }
 
-void InitThreading()
+void InitThread()
 {
     ThreadPool::Init();
 }
 
-void DoneThreading() 
+void DoneThread() 
 {
     ThreadPool::Done();
 }

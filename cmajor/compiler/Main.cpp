@@ -43,11 +43,11 @@ struct InitDone
     }
 };
 
-const char* version = "2.0.0 beta-2";
+const char* version = "2.0.0 beta-3";
 
 void PrintHelp()
 {
-    std::cout << "Cmajor compiler version " << version << " for Windows x64" << std::endl;
+    std::cout << "Cmajor compiler version " << version << " for Windows x64" << std::endl; 
     std::cout << "Usage: cmc [options] { project.cmp | solution.cms }" << std::endl;
     std::cout << "Compiles given Cmajor solutions and projects." << std::endl;
     std::cout << "Options:\n" <<
@@ -201,15 +201,15 @@ int main(int argc, const char** argv)
                             throw std::runtime_error("invalid argument '" + arg + "'");
                         }
                     }
-                    else if (prevWasDefine)
-                    {
-                        prevWasDefine = false;
-                        DefineCommandLineConditionalSymbol(ToUtf32(arg));
-                    }
                     else
                     {
                         throw std::runtime_error("unknown option '" + arg + "'");
                     }
+                }
+                else if (prevWasDefine)
+                {
+                    prevWasDefine = false;
+                    DefineCommandLineConditionalSymbol(ToUtf32(arg));
                 }
                 else
                 {

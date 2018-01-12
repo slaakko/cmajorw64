@@ -8,10 +8,18 @@
 #include <cmajor/rt/RtApi.hpp>
 #include <stdint.h>
 
+extern "C" RT_API void* RtMemAlloc(int64_t size);
+extern "C" RT_API void* RtMemAllocInfo(int64_t size, const char* info);
+extern "C" RT_API void RtDispose(void* ptr);
+extern "C" RT_API void RtMemFree(void* ptr);
+
 namespace cmajor { namespace rt {
 
-extern "C" RT_API void* RtMemAlloc(int64_t size);
-extern "C" RT_API void RtMemFree(void* ptr);
+void SetDebugHeap();
+void SetDebugAllocation(int allocation);
+
+void InitMemory();
+void DoneMemory();
 
 } }  // namespace cmajor::rt
 

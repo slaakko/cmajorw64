@@ -1120,6 +1120,22 @@ ConditionalCompilationBinaryExpressionNode::ConditionalCompilationBinaryExpressi
     right->SetParent(this);
 }
 
+void ConditionalCompilationBinaryExpressionNode::Write(AstWriter& writer)
+{
+    ConditionalCompilationExpressionNode::Write(writer);
+    writer.Write(left.get());
+    writer.Write(right.get());
+}
+
+void ConditionalCompilationBinaryExpressionNode::Read(AstReader& reader)
+{
+    ConditionalCompilationExpressionNode::Read(reader);
+    left.reset(reader.ReadConditionalCompilationExpressionNode());
+    left->SetParent(this);
+    right.reset(reader.ReadConditionalCompilationExpressionNode());
+    right->SetParent(this);
+}
+
 ConditionalCompilationDisjunctionNode::ConditionalCompilationDisjunctionNode(const Span& span_) : ConditionalCompilationBinaryExpressionNode(NodeType::conditionalCompilationDisjunctionNode, span_)
 {
 }
@@ -1165,6 +1181,7 @@ ConditionalCompilationNotNode::ConditionalCompilationNotNode(const Span& span_) 
 ConditionalCompilationNotNode::ConditionalCompilationNotNode(const Span& span_, ConditionalCompilationExpressionNode* expr_) : 
     ConditionalCompilationExpressionNode(NodeType::conditionalCompilationNotNode, span_), expr(expr_)
 {
+    expr->SetParent(this);
 }
 
 Node* ConditionalCompilationNotNode::Clone(CloneContext& cloneContext) const
@@ -1175,6 +1192,19 @@ Node* ConditionalCompilationNotNode::Clone(CloneContext& cloneContext) const
 void ConditionalCompilationNotNode::Accept(Visitor& visitor)
 {
     visitor.Visit(*this);
+}
+
+void ConditionalCompilationNotNode::Write(AstWriter& writer)
+{
+    ConditionalCompilationExpressionNode::Write(writer);
+    writer.Write(expr.get());
+}
+
+void ConditionalCompilationNotNode::Read(AstReader& reader)
+{
+    ConditionalCompilationExpressionNode::Read(reader);
+    expr.reset(reader.ReadConditionalCompilationExpressionNode());
+    expr->SetParent(this);
 }
 
 ConditionalCompilationPrimaryNode::ConditionalCompilationPrimaryNode(const Span& span_) : ConditionalCompilationExpressionNode(NodeType::conditionalCompilationPrimaryNode, span_)
@@ -1196,13 +1226,28 @@ void ConditionalCompilationPrimaryNode::Accept(Visitor& visitor)
     visitor.Visit(*this);
 }
 
+void ConditionalCompilationPrimaryNode::Write(AstWriter& writer)
+{
+    ConditionalCompilationExpressionNode::Write(writer);
+    writer.GetBinaryWriter().Write(symbol);
+}
+
+void ConditionalCompilationPrimaryNode::Read(AstReader& reader)
+{
+    ConditionalCompilationExpressionNode::Read(reader);
+    symbol = reader.GetBinaryReader().ReadUtf32String();
+}
+
 ConditionalCompilationPartNode::ConditionalCompilationPartNode(const Span& span_) : Node(NodeType::conditionalCompilationPartNode, span_)
 {
 }
 
 ConditionalCompilationPartNode::ConditionalCompilationPartNode(const Span& span_, ConditionalCompilationExpressionNode* expr_) : Node(NodeType::conditionalCompilationPartNode, span_), expr(expr_)
 {
-    expr->SetParent(this);
+    if (expr)
+    {
+        expr->SetParent(this);
+    }
 }
 
 void ConditionalCompilationPartNode::AddStatement(StatementNode* statement)
@@ -1230,6 +1275,31 @@ Node* ConditionalCompilationPartNode::Clone(CloneContext& cloneContext) const
 void ConditionalCompilationPartNode::Accept(Visitor& visitor)
 {
     visitor.Visit(*this);
+}
+
+void ConditionalCompilationPartNode::Write(AstWriter& writer)
+{
+    Node::Write(writer);
+    bool hasExpr = expr != nullptr;
+    writer.GetBinaryWriter().Write(hasExpr);
+    if (hasExpr)
+    {
+        writer.Write(expr.get());
+    }
+    statements.Write(writer);
+}
+
+void ConditionalCompilationPartNode::Read(AstReader& reader)
+{
+    Node::Read(reader);
+    bool hasExpr = reader.GetBinaryReader().ReadBool();
+    if (hasExpr)
+    {
+        expr.reset(reader.ReadConditionalCompilationExpressionNode());
+        expr->SetParent(this);
+    }
+    statements.Read(reader);
+    statements.SetParent(this);
 }
 
 ConditionalCompilationStatementNode::ConditionalCompilationStatementNode(const Span& span_) : StatementNode(NodeType::conditionalCompilationStatementNode, span_), ifPart(nullptr)
@@ -1288,6 +1358,34 @@ Node* ConditionalCompilationStatementNode::Clone(CloneContext& cloneContext) con
 void ConditionalCompilationStatementNode::Accept(Visitor& visitor)
 {
     visitor.Visit(*this);
+}
+
+void ConditionalCompilationStatementNode::Write(AstWriter& writer)
+{
+    StatementNode::Write(writer);
+    writer.Write(ifPart.get());
+    elifParts.Write(writer);
+    bool hasElsePart = elsePart != nullptr;
+    writer.GetBinaryWriter().Write(hasElsePart);
+    if (hasElsePart)
+    {
+        writer.Write(elsePart.get());
+    }
+}
+
+void ConditionalCompilationStatementNode::Read(AstReader& reader)
+{
+    StatementNode::Read(reader);
+    ifPart.reset(reader.ReadConditionalCompilationPartNode());
+    ifPart->SetParent(this);
+    elifParts.Read(reader);
+    elifParts.SetParent(this);
+    bool hasElsePart = reader.GetBinaryReader().ReadBool();
+    if (hasElsePart)
+    {
+        elsePart.reset(reader.ReadConditionalCompilationPartNode());
+        elsePart->SetParent(this);
+    }
 }
 
 } } // namespace cmajor::ast

@@ -3,8 +3,8 @@
 // Distributed under the MIT license
 // =================================
 
-#ifndef CMAJOR_RT_THREADING_INCLUDED
-#define CMAJOR_RT_THREADING_INCLUDED
+#ifndef CMAJOR_RT_THREAD_INCLUDED
+#define CMAJOR_RT_THREAD_INCLUDED
 #include <cmajor/rt/RtApi.hpp>
 #include <stdint.h>
 
@@ -17,9 +17,9 @@ extern "C" RT_API bool RtJoinThread(int32_t threadId);
 
 namespace cmajor { namespace rt {
 
-void InitThreading();
-void DoneThreading();
+void InitThread();
+void DoneThread();
 
 } } // namespace cmajor::rt
 
-#endif // CMAJOR_RT_THREADING_INCLUDED
+#endif // CMAJOR_RT_THREAD_INCLUDED
