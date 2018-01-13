@@ -1215,13 +1215,7 @@ void Emitter::Visit(BoundThrowStatement& boundThrowStatement)
     lastInstructionWasRet = false;
     basicBlockOpen = false;
     SetTarget(&boundThrowStatement);
-    boundThrowStatement.ExceptionPtr()->Accept(*this);
-    std::vector<GenObject*> genObjects;
-    LlvmValue exceptionPtr(stack.Pop());
-    genObjects.push_back(&exceptionPtr);
-    ExitBlocks(nullptr);
-    CreateExitFunctionCall();
-    boundThrowStatement.ThrowFunction()->GenerateCall(*this, genObjects, OperationFlags::none);
+    boundThrowStatement.ThrowCallExpr()->Accept(*this);
 }
 
 void Emitter::Visit(BoundRethrowStatement& boundRethrowStatement)

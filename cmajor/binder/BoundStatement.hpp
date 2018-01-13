@@ -290,13 +290,11 @@ private:
 class BoundThrowStatement : public BoundStatement
 {
 public:
-    BoundThrowStatement(const Span& span_, std::unique_ptr<BoundExpression>&& exceptionPtr_, FunctionSymbol* throwFunction_);
+    BoundThrowStatement(const Span& span_, std::unique_ptr<BoundExpression>&& throwCallExpr_);
     void Accept(BoundNodeVisitor& visitor) override;
-    BoundExpression* ExceptionPtr() { return exceptionPtr.get(); }
-    FunctionSymbol* ThrowFunction() { return throwFunction; }
+    BoundExpression* ThrowCallExpr() { return throwCallExpr.get(); }
 private:
-    std::unique_ptr<BoundExpression> exceptionPtr;
-    FunctionSymbol* throwFunction;
+    std::unique_ptr<BoundExpression> throwCallExpr;
 };
 
 class BoundRethrowStatement : public BoundStatement

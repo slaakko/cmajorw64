@@ -24,6 +24,7 @@
 #include <cmajor/ast/Literal.hpp>
 #include <cmajor/ast/Identifier.hpp>
 #include <cmajor/ast/Expression.hpp>
+#include <cmajor/ast/BasicType.hpp>
 #include <cmajor/util/Unicode.hpp>
 
 namespace cmajor { namespace binder {
@@ -1458,15 +1459,11 @@ void StatementBinder::Visit(ThrowStatementNode& throwStatementNode)
                 NewNode* newNode = new NewNode(span, new IdentifierNode(span, exceptionClassType->FullName()));
                 CloneContext cloneContext;
                 newNode->AddArgument(throwStatementNode.Expression()->Clone(cloneContext));
-                std::unique_ptr<BoundExpression> exceptionPtr = BindExpression(newNode, boundCompileUnit, currentFunction, containerScope, this);
                 InvokeNode invokeNode(span, new IdentifierNode(span, U"RtThrowException"));
                 invokeNode.AddArgument(newNode);
                 invokeNode.AddArgument(new UIntLiteralNode(span, exceptionClassType->TypeId()));
                 std::unique_ptr<BoundExpression> throwCallExpr = BindExpression(&invokeNode, boundCompileUnit, currentFunction, containerScope, this);
-                Assert(throwCallExpr->GetBoundNodeType() == BoundNodeType::boundFunctionCall, "function call expected");
-                BoundFunctionCall* throwCall = static_cast<BoundFunctionCall*>(throwCallExpr.get());
-                FunctionSymbol* throwFunction = throwCall->GetFunctionSymbol();
-                AddStatement(new BoundThrowStatement(span, std::move(exceptionPtr), throwFunction));
+                AddStatement(new BoundThrowStatement(span, std::move(throwCallExpr)));
             }
             else
             {

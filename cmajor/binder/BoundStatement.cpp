@@ -283,8 +283,7 @@ void BoundSetVmtPtrStatement::Accept(BoundNodeVisitor& visitor)
     visitor.Visit(*this);
 }
 
-BoundThrowStatement::BoundThrowStatement(const Span& span_, std::unique_ptr<BoundExpression>&& exceptionPtr_, FunctionSymbol* throwFunction_) :
-    BoundStatement(span_, BoundNodeType::boundThrowStatement), exceptionPtr(std::move(exceptionPtr_)), throwFunction(std::move(throwFunction_))
+BoundThrowStatement::BoundThrowStatement(const Span& span_, std::unique_ptr<BoundExpression>&& throwCallExpr_) : BoundStatement(span_, BoundNodeType::boundThrowStatement), throwCallExpr(std::move(throwCallExpr_))
 {
 }
 
