@@ -2,6 +2,7 @@
 using System.IO;
 using System.Collections;
 using System.Text.Parsing;
+using System.Text;
 using Code;
 
 namespace Syntax

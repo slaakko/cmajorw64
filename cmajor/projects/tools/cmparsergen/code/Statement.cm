@@ -1,10 +1,11 @@
-using System.Text.Parsing.CodeDom;
-using System;
-using System.Collections;
-using System.Text.Parsing;
+﻿using System.Text.Parsing.CodeDom;
 
 namespace Code
 {
+    using System;
+    using System.Collections;
+    using System.Text.Parsing;
+
     public class StatementGrammar : System.Text.Parsing.Grammar
     {
         public StatementGrammar() : this(new ParsingDomain())
@@ -3018,10 +3019,10 @@ namespace Code
         public override void GetReferencedGrammars()
         {
             ParsingDomain* pd = Domain();
-            Grammar* grammar0 = pd->GetGrammar(ToUtf32("Code.KeywordGrammar"));
+            Grammar* grammar0 = pd->GetGrammar(ToUtf32("Code.IdentifierGrammar"));
             if (grammar0 == null)
             {
-                grammar0 = new Code.KeywordGrammar(pd);
+                grammar0 = new Code.IdentifierGrammar(pd);
             }
             AddGrammarReference(grammar0);
             Grammar* grammar1 = pd->GetGrammar(ToUtf32("System.Text.Parsing.stdlib"));
@@ -3036,28 +3037,28 @@ namespace Code
                 grammar2 = new Code.TypeExprGrammar(pd);
             }
             AddGrammarReference(grammar2);
-            Grammar* grammar3 = pd->GetGrammar(ToUtf32("Code.ExpressionGrammar"));
+            Grammar* grammar3 = pd->GetGrammar(ToUtf32("Code.KeywordGrammar"));
             if (grammar3 == null)
             {
-                grammar3 = new Code.ExpressionGrammar(pd);
+                grammar3 = new Code.KeywordGrammar(pd);
             }
             AddGrammarReference(grammar3);
-            Grammar* grammar4 = pd->GetGrammar(ToUtf32("Code.IdentifierGrammar"));
+            Grammar* grammar4 = pd->GetGrammar(ToUtf32("Code.ExpressionGrammar"));
             if (grammar4 == null)
             {
-                grammar4 = new Code.IdentifierGrammar(pd);
+                grammar4 = new Code.ExpressionGrammar(pd);
             }
             AddGrammarReference(grammar4);
         }
 
         public override void CreateRules()
         {
+            AddRuleLink(new System.Text.Parsing.RuleLink(ToUtf32("Identifier"), this, ToUtf32("IdentifierGrammar.Identifier")));
             AddRuleLink(new System.Text.Parsing.RuleLink(ToUtf32("identifier"), this, ToUtf32("System.Text.Parsing.stdlib.identifier")));
             AddRuleLink(new System.Text.Parsing.RuleLink(ToUtf32("TypeExpr"), this, ToUtf32("TypeExprGrammar.TypeExpr")));
             AddRuleLink(new System.Text.Parsing.RuleLink(ToUtf32("Keyword"), this, ToUtf32("KeywordGrammar.Keyword")));
             AddRuleLink(new System.Text.Parsing.RuleLink(ToUtf32("Expression"), this, ToUtf32("ExpressionGrammar.Expression")));
             AddRuleLink(new System.Text.Parsing.RuleLink(ToUtf32("ArgumentList"), this, ToUtf32("ExpressionGrammar.ArgumentList")));
-            AddRuleLink(new System.Text.Parsing.RuleLink(ToUtf32("Identifier"), this, ToUtf32("IdentifierGrammar.Identifier")));
             AddRule(new StatementRule(ToUtf32("Statement"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.AlternativeParser(
                     new System.Text.Parsing.AlternativeParser(
@@ -3485,4 +3486,3 @@ namespace Code
     }
 
 } // namespace Code
-

@@ -706,10 +706,10 @@ namespace Syntax
         public override void GetReferencedGrammars()
         {
             ParsingDomain* pd = Domain();
-            Grammar* grammar0 = pd->GetGrammar(ToUtf32("Code.StatementGrammar"));
+            Grammar* grammar0 = pd->GetGrammar(ToUtf32("Code.IdentifierGrammar"));
             if (grammar0 == null)
             {
-                grammar0 = new Code.StatementGrammar(pd);
+                grammar0 = new Code.IdentifierGrammar(pd);
             }
             AddGrammarReference(grammar0);
             Grammar* grammar1 = pd->GetGrammar(ToUtf32("Syntax.CompositeGrammar"));
@@ -730,21 +730,21 @@ namespace Syntax
                 grammar3 = new Code.ExpressionGrammar(pd);
             }
             AddGrammarReference(grammar3);
-            Grammar* grammar4 = pd->GetGrammar(ToUtf32("Code.IdentifierGrammar"));
+            Grammar* grammar4 = pd->GetGrammar(ToUtf32("Code.StatementGrammar"));
             if (grammar4 == null)
             {
-                grammar4 = new Code.IdentifierGrammar(pd);
+                grammar4 = new Code.StatementGrammar(pd);
             }
             AddGrammarReference(grammar4);
         }
 
         public override void CreateRules()
         {
-            AddRuleLink(new System.Text.Parsing.RuleLink(ToUtf32("CompoundStatement"), this, ToUtf32("Code.StatementGrammar.CompoundStatement")));
+            AddRuleLink(new System.Text.Parsing.RuleLink(ToUtf32("Identifier"), this, ToUtf32("Code.IdentifierGrammar.Identifier")));
             AddRuleLink(new System.Text.Parsing.RuleLink(ToUtf32("Alternative"), this, ToUtf32("CompositeGrammar.Alternative")));
             AddRuleLink(new System.Text.Parsing.RuleLink(ToUtf32("Primitive"), this, ToUtf32("PrimitiveGrammar.Primitive")));
             AddRuleLink(new System.Text.Parsing.RuleLink(ToUtf32("ArgumentList"), this, ToUtf32("Code.ExpressionGrammar.ArgumentList")));
-            AddRuleLink(new System.Text.Parsing.RuleLink(ToUtf32("Identifier"), this, ToUtf32("Code.IdentifierGrammar.Identifier")));
+            AddRuleLink(new System.Text.Parsing.RuleLink(ToUtf32("CompoundStatement"), this, ToUtf32("Code.StatementGrammar.CompoundStatement")));
             AddRule(new PrimaryRule(ToUtf32("Primary"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.SequenceParser(
                     new System.Text.Parsing.SequenceParser(

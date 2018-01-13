@@ -1,10 +1,11 @@
-using System.Text.Parsing.CodeDom;
-using System;
-using System.Collections;
-using System.Text.Parsing;
+﻿using System.Text.Parsing.CodeDom;
 
 namespace Code
 {
+    using System;
+    using System.Collections;
+    using System.Text.Parsing;
+
     public class IdentifierGrammar : System.Text.Parsing.Grammar
     {
         public IdentifierGrammar() : this(new ParsingDomain())
@@ -163,6 +164,7 @@ namespace Code
             {
                 AddInheritedAttribute(AttrOrVar(ToUtf32("ParsingContext*"), ToUtf32("ctx")));
                 SetValueTypeName(ToUtf32("TemplateId*"));
+                AddLocalVariable(AttrOrVar(ToUtf32("UniquePtr<Identifier>"), ToUtf32("qid")));
                 AddLocalVariable(AttrOrVar(ToUtf32("UniquePtr<TemplateId>"), ToUtf32("templateId")));
             }
             public override void Enter(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
@@ -217,6 +219,7 @@ namespace Code
             public void A2Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                context->qid.Reset(context->fromprimary);
                 context->templateId.Reset(new TemplateId(context->fromprimary->Name()));
             }
             public void A3Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
@@ -249,11 +252,12 @@ namespace Code
             }
             public class Context : System.Text.Parsing.Context
             {
-                public Context() : ctx(), value(), templateId(), fromprimary(), fromtemplateArg()
+                public Context() : ctx(), value(), qid(), templateId(), fromprimary(), fromtemplateArg()
                 {
                 }
                 public ParsingContext* ctx;
                 public TemplateId* value;
+                public UniquePtr<Identifier> qid;
                 public UniquePtr<TemplateId> templateId;
                 public Identifier* fromprimary;
                 public DomObject* fromtemplateArg;
@@ -404,16 +408,16 @@ namespace Code
         public override void GetReferencedGrammars()
         {
             ParsingDomain* pd = Domain();
-            Grammar* grammar0 = pd->GetGrammar(ToUtf32("Code.KeywordGrammar"));
+            Grammar* grammar0 = pd->GetGrammar(ToUtf32("System.Text.Parsing.stdlib"));
             if (grammar0 == null)
             {
-                grammar0 = new Code.KeywordGrammar(pd);
+                grammar0 = new System.Text.Parsing.stdlib(pd);
             }
             AddGrammarReference(grammar0);
-            Grammar* grammar1 = pd->GetGrammar(ToUtf32("System.Text.Parsing.stdlib"));
+            Grammar* grammar1 = pd->GetGrammar(ToUtf32("Code.KeywordGrammar"));
             if (grammar1 == null)
             {
-                grammar1 = new System.Text.Parsing.stdlib(pd);
+                grammar1 = new Code.KeywordGrammar(pd);
             }
             AddGrammarReference(grammar1);
             Grammar* grammar2 = pd->GetGrammar(ToUtf32("Code.TypeExprGrammar"));
@@ -480,4 +484,3 @@ namespace Code
     }
 
 } // namespace Code
-

@@ -1,10 +1,11 @@
-using System.Text.Parsing.CodeDom;
-using System;
-using System.Collections;
-using System.Text.Parsing;
+﻿using System.Text.Parsing.CodeDom;
 
 namespace Code
 {
+    using System;
+    using System.Collections;
+    using System.Text.Parsing;
+
     public class ExpressionGrammar : System.Text.Parsing.Grammar
     {
         public ExpressionGrammar() : this(new ParsingDomain())
@@ -2443,16 +2444,16 @@ namespace Code
         public override void GetReferencedGrammars()
         {
             ParsingDomain* pd = Domain();
-            Grammar* grammar0 = pd->GetGrammar(ToUtf32("Code.LiteralGrammar"));
+            Grammar* grammar0 = pd->GetGrammar(ToUtf32("Code.BasicTypeGrammar"));
             if (grammar0 == null)
             {
-                grammar0 = new Code.LiteralGrammar(pd);
+                grammar0 = new Code.BasicTypeGrammar(pd);
             }
             AddGrammarReference(grammar0);
-            Grammar* grammar1 = pd->GetGrammar(ToUtf32("Code.BasicTypeGrammar"));
+            Grammar* grammar1 = pd->GetGrammar(ToUtf32("Code.LiteralGrammar"));
             if (grammar1 == null)
             {
-                grammar1 = new Code.BasicTypeGrammar(pd);
+                grammar1 = new Code.LiteralGrammar(pd);
             }
             AddGrammarReference(grammar1);
             Grammar* grammar2 = pd->GetGrammar(ToUtf32("Code.IdentifierGrammar"));
@@ -2471,8 +2472,8 @@ namespace Code
 
         public override void CreateRules()
         {
-            AddRuleLink(new System.Text.Parsing.RuleLink(ToUtf32("Literal"), this, ToUtf32("LiteralGrammar.Literal")));
             AddRuleLink(new System.Text.Parsing.RuleLink(ToUtf32("BasicType"), this, ToUtf32("BasicTypeGrammar.BasicType")));
+            AddRuleLink(new System.Text.Parsing.RuleLink(ToUtf32("Literal"), this, ToUtf32("LiteralGrammar.Literal")));
             AddRuleLink(new System.Text.Parsing.RuleLink(ToUtf32("Identifier"), this, ToUtf32("IdentifierGrammar.Identifier")));
             AddRuleLink(new System.Text.Parsing.RuleLink(ToUtf32("TemplateId"), this, ToUtf32("IdentifierGrammar.TemplateId")));
             AddRuleLink(new System.Text.Parsing.RuleLink(ToUtf32("TypeExpr"), this, ToUtf32("TypeExprGrammar.TypeExpr")));
@@ -2852,4 +2853,3 @@ namespace Code
     }
 
 } // namespace Code
-

@@ -108,11 +108,14 @@ namespace System.Text.Parsing
         }
         public void Own(ParsingObject* object)
         {
-            if (!object->owned)
+            if (object != null)
             {
-                object->owned = true;
-                ownedObjects.Add(UniquePtr<ParsingObject>(object));
-            }
+                if (!object->owned)
+                {
+                    object->owned = true;
+                    ownedObjects.Add(UniquePtr<ParsingObject>(object));
+                }
+            }            
         }
         public inline nothrow bool IsOwned() const
         {
@@ -121,6 +124,20 @@ namespace System.Text.Parsing
         public inline nothrow void SetOwned()
         {
             owned = true;
+        }
+        public void Dump(CodeFormatter& formatter)
+        {
+            long n = ownedObjects.Count();
+            formatter.WriteLine(string(typename(*this)) + " : " + ToUtf8(name) + " : " + ToString(n));
+            formatter.WriteLine("{");
+            formatter.IncIndent();
+            for (long i = 0; i < n; ++i)
+            {
+                ParsingObject* o = ownedObjects[i].Get();
+                o->Dump(formatter);
+            }
+            formatter.DecIndent();
+            formatter.WriteLine("}");
         }
         private const int external = -1;
         private bool owned;

@@ -70,6 +70,7 @@ namespace Syntax
         {
             formatter.WriteLine("using " + ToUtf8(usingAlias) + ";");
         }
+        formatter.WriteLine();
         ObjectSelectorVisitor selectorVisitor(parserFile->Id());
         parserFile->GetParsingDomain()->GlobalNamespace()->Accept(selectorVisitor);
         const Map<Namespace*, NamespaceContent>& nsContentMap = selectorVisitor.NsContentMap();
@@ -93,9 +94,12 @@ namespace Syntax
                 formatter.DecIndent();
                 formatter.Write("} ");
                 formatter.WriteLine("// " + ToUtf8(ns->FullName()));
-                formatter.WriteLine();
             }
         }
+        if (Flags.Instance().Verbose())
+        {
+            Console.WriteLine("=> " + cmFilePath);
+        }        
     }
     
     public void GenerateCode(List<UniquePtr<ParserFileContent>>& parserFiles)

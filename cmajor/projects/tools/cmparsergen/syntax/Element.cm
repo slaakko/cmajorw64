@@ -701,16 +701,16 @@ namespace Syntax
                 grammar0 = new System.Text.Parsing.stdlib(pd);
             }
             AddGrammarReference(grammar0);
-            Grammar* grammar1 = pd->GetGrammar(ToUtf32("Code.TypeExprGrammar"));
+            Grammar* grammar1 = pd->GetGrammar(ToUtf32("Code.IdentifierGrammar"));
             if (grammar1 == null)
             {
-                grammar1 = new Code.TypeExprGrammar(pd);
+                grammar1 = new Code.IdentifierGrammar(pd);
             }
             AddGrammarReference(grammar1);
-            Grammar* grammar2 = pd->GetGrammar(ToUtf32("Code.IdentifierGrammar"));
+            Grammar* grammar2 = pd->GetGrammar(ToUtf32("Code.TypeExprGrammar"));
             if (grammar2 == null)
             {
-                grammar2 = new Code.IdentifierGrammar(pd);
+                grammar2 = new Code.TypeExprGrammar(pd);
             }
             AddGrammarReference(grammar2);
         }
@@ -718,10 +718,10 @@ namespace Syntax
         public override void CreateRules()
         {
             AddRuleLink(new System.Text.Parsing.RuleLink(ToUtf32("identifier"), this, ToUtf32("System.Text.Parsing.stdlib.identifier")));
-            AddRuleLink(new System.Text.Parsing.RuleLink(ToUtf32("Type"), this, ToUtf32("Code.TypeExprGrammar.TypeExpr")));
             AddRuleLink(new System.Text.Parsing.RuleLink(ToUtf32("qualified_id"), this, ToUtf32("System.Text.Parsing.stdlib.qualified_id")));
-            AddRuleLink(new System.Text.Parsing.RuleLink(ToUtf32("string"), this, ToUtf32("System.Text.Parsing.stdlib.string")));
             AddRuleLink(new System.Text.Parsing.RuleLink(ToUtf32("Id"), this, ToUtf32("Code.IdentifierGrammar.Identifier")));
+            AddRuleLink(new System.Text.Parsing.RuleLink(ToUtf32("string"), this, ToUtf32("System.Text.Parsing.stdlib.string")));
+            AddRuleLink(new System.Text.Parsing.RuleLink(ToUtf32("Type"), this, ToUtf32("Code.TypeExprGrammar.TypeExpr")));
             AddRule(new RuleLinkRule(ToUtf32("RuleLink"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.AlternativeParser(
                     new System.Text.Parsing.ActionParser(ToUtf32("A0"),
@@ -774,8 +774,10 @@ namespace Syntax
                         new System.Text.Parsing.ActionParser(ToUtf32("A2"),
                             new System.Text.Parsing.NonterminalParser(ToUtf32("Id"), ToUtf32("Id"), 0))))));
             AddRule(new ReturnTypeRule(ToUtf32("ReturnType"), GetScope(), Domain()->GetNextRuleId(),
-                new System.Text.Parsing.ActionParser(ToUtf32("A0"),
-                    new System.Text.Parsing.NonterminalParser(ToUtf32("Type"), ToUtf32("Type"), 1))));
+                new System.Text.Parsing.SequenceParser(
+                    new System.Text.Parsing.CharParser(':'),
+                    new System.Text.Parsing.ActionParser(ToUtf32("A0"),
+                        new System.Text.Parsing.NonterminalParser(ToUtf32("Type"), ToUtf32("Type"), 1)))));
             AddRule(new System.Text.Parsing.RuleParser(ToUtf32("Keyword"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.KeywordListParser(ToUtf32("identifier"), keywords0)));
             AddRule(new IdentifierRule(ToUtf32("Identifier"), GetScope(), Domain()->GetNextRuleId(),

@@ -34,7 +34,10 @@ namespace System.Text.Parsing
         }
         public override void Visit(RuleLink& ruleLink)
         {
-            if (currentGrammar == null) return;
+            if (currentGrammar == null) 
+            {
+                return;
+            }            
             ParsingObject* o = currentGrammar->GetScope()->Get(ruleLink.LinkedRuleName());
             if (o != null)
             {

@@ -257,7 +257,11 @@ namespace System.Collections
         private void Grow(long minRes)
         {
             minRes = MemGrow(minRes);
-            ValueType* newItems = cast<ValueType*>(RtMemAlloc(minRes * sizeof(ValueType)));
+        #if (MEM_DEBUG)
+            ValueType* newItems = cast<ValueType*>(MemAlloc(minRes * sizeof(ValueType), typename(*this)));
+        #else
+            ValueType* newItems = cast<ValueType*>(MemAlloc(minRes * sizeof(ValueType)));
+        #endif            
             if (items != null)
             {
                 ConstructiveMove(newItems, items, count);
@@ -277,7 +281,7 @@ namespace System.Collections
             }
             if (res > 0)
             {
-                RtMemFree(items);
+                MemFree(items);
                 items = null;
                 res = 0;
             }

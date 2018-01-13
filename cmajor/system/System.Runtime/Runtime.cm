@@ -9,6 +9,8 @@ public extern cdecl nothrow int RtArgc();
 public extern cdecl nothrow const char** RtArgv();
 public extern cdecl nothrow void RtExit(int exitCode);
 public extern cdecl nothrow void* RtMemAlloc(long size);
+public extern cdecl nothrow void* RtMemAllocInfo(long size, const char* info);
+public extern cdecl nothrow void RtDispose(void* ptr);
 public extern cdecl nothrow void RtMemFree(void* ptr);
 public extern cdecl nothrow void RtBeginStaticInitCriticalSection(uint staticClassId);
 public extern cdecl nothrow void RtEndStaticInitCriticalSection(uint staticClassId);
@@ -17,6 +19,8 @@ public extern cdecl nothrow void RtFailAssertion(const char* assertion, const ch
 public extern cdecl void RtThrowException(void* exception, uint exceptionTypeId);
 public extern cdecl nothrow bool RtHandleException(uint exceptionTypeId);
 public extern cdecl nothrow void* RtGetException();
+public extern cdecl nothrow void RtCaptureException(void*& exception, ulong& exceptionClassId);
+public extern cdecl nothrow void RtThrowCapturedException(void* exception, ulong exceptionClassId);
 public extern cdecl nothrow const char* RtGetError(int errorId);
 public extern cdecl nothrow void RtDisposeError(int errorId);
 public extern cdecl nothrow const char* RtGetStackTrace();

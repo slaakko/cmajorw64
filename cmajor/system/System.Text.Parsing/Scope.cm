@@ -126,6 +126,23 @@ namespace System.Text.Parsing
             }
             return null;
         }
+        public void Dump(CodeFormatter& formatter)
+        {
+            formatter.WriteLine("Scope '" + ToUtf8(FullName()) + "'");
+            formatter.WriteLine("{");
+            formatter.IncIndent();
+            for (const Pair<ustring, ParsingObject*>& p : fullNameMap)
+            {
+                formatter.WriteLine(ToUtf8(p.first));
+            }
+            formatter.WriteLine("---");
+            for (const Pair<ustring, ParsingObject*>& p : shortNameMap)
+            {
+                formatter.WriteLine(ToUtf8(p.first));
+            }
+            formatter.DecIndent();
+            formatter.WriteLine("}");
+        }
         private nothrow Scope* GetGlobalScope() const
         {
             Scope* globalScope = this;

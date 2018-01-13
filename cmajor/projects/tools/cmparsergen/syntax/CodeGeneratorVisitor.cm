@@ -411,7 +411,6 @@ namespace Syntax
             }
             formatter.DecIndent();
             formatter.WriteLine("}");
-            formatter.WriteLine();
             formatter.WriteLine("public override void CreateRules()");
             formatter.WriteLine("{");
             formatter.IncIndent();
@@ -437,7 +436,6 @@ namespace Syntax
             }
             formatter.DecIndent();
             formatter.WriteLine("}");
-            formatter.WriteLine();
         }
         public override void Visit(CharParser& parser)
         {

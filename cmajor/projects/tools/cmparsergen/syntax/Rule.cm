@@ -260,16 +260,16 @@ namespace Syntax
         public override void GetReferencedGrammars()
         {
             ParsingDomain* pd = Domain();
-            Grammar* grammar0 = pd->GetGrammar(ToUtf32("Syntax.ElementGrammar"));
+            Grammar* grammar0 = pd->GetGrammar(ToUtf32("Syntax.CompositeGrammar"));
             if (grammar0 == null)
             {
-                grammar0 = new Syntax.ElementGrammar(pd);
+                grammar0 = new Syntax.CompositeGrammar(pd);
             }
             AddGrammarReference(grammar0);
-            Grammar* grammar1 = pd->GetGrammar(ToUtf32("Syntax.CompositeGrammar"));
+            Grammar* grammar1 = pd->GetGrammar(ToUtf32("Syntax.ElementGrammar"));
             if (grammar1 == null)
             {
-                grammar1 = new Syntax.CompositeGrammar(pd);
+                grammar1 = new Syntax.ElementGrammar(pd);
             }
             AddGrammarReference(grammar1);
         }

@@ -45,9 +45,9 @@ namespace Syntax
         CharSetRange: ustring;
         CharSetChar: uchar;
         Keyword: System.Text.Parsing.Parser*;
-        KeywordBody: System.Text.Parsing.Parser*;
+        KeywordBody(var UniquePtr<Identifier> qid): System.Text.Parsing.Parser*;
         KeywordList: System.Text.Parsing.Parser*;
-        KeywordListBody(var List<ustring> keywords): System.Text.Parsing.Parser*;
+        KeywordListBody(var UniquePtr<Identifier> qid, var List<ustring> keywords): System.Text.Parsing.Parser*;
         Range: System.Text.Parsing.Parser*;
         CodePoint: uint;
         Empty: System.Text.Parsing.Parser*;

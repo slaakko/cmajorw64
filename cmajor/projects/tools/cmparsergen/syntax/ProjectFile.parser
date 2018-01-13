@@ -15,11 +15,11 @@
             ;
             
         Source : string
-            ::= keyword("source") FilePath{ value = FilePath; }
+            ::= keyword("source") FilePath{ value = FilePath; } ';'
             ;
             
         Reference : string
-            ::= keyword("reference") FilePath{ value = FilePath; }
+            ::= keyword("reference") FilePath{ value = FilePath; } ';'
             ;
             
         FilePath : string

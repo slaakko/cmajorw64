@@ -353,14 +353,18 @@ namespace Syntax
                             new System.Text.Parsing.NonterminalParser(ToUtf32("Reference"), ToUtf32("Reference"), 0))))));
             AddRule(new SourceRule(ToUtf32("Source"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.SequenceParser(
-                    new System.Text.Parsing.KeywordParser(ToUtf32("source")),
-                    new System.Text.Parsing.ActionParser(ToUtf32("A0"),
-                        new System.Text.Parsing.NonterminalParser(ToUtf32("FilePath"), ToUtf32("FilePath"), 0)))));
+                    new System.Text.Parsing.SequenceParser(
+                        new System.Text.Parsing.KeywordParser(ToUtf32("source")),
+                        new System.Text.Parsing.ActionParser(ToUtf32("A0"),
+                            new System.Text.Parsing.NonterminalParser(ToUtf32("FilePath"), ToUtf32("FilePath"), 0))),
+                    new System.Text.Parsing.CharParser(';'))));
             AddRule(new ReferenceRule(ToUtf32("Reference"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.SequenceParser(
-                    new System.Text.Parsing.KeywordParser(ToUtf32("reference")),
-                    new System.Text.Parsing.ActionParser(ToUtf32("A0"),
-                        new System.Text.Parsing.NonterminalParser(ToUtf32("FilePath"), ToUtf32("FilePath"), 0)))));
+                    new System.Text.Parsing.SequenceParser(
+                        new System.Text.Parsing.KeywordParser(ToUtf32("reference")),
+                        new System.Text.Parsing.ActionParser(ToUtf32("A0"),
+                            new System.Text.Parsing.NonterminalParser(ToUtf32("FilePath"), ToUtf32("FilePath"), 0))),
+                    new System.Text.Parsing.CharParser(';'))));
             AddRule(new FilePathRule(ToUtf32("FilePath"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.TokenParser(
                     new System.Text.Parsing.SequenceParser(

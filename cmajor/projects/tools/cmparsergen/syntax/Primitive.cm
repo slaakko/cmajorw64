@@ -1470,6 +1470,7 @@ namespace Syntax
             public KeywordBodyRule(const ustring& name_, Scope* enclosingScope_, int id_, Parser* definition_) : base(name_, enclosingScope_, id_, definition_)
             {
                 SetValueTypeName(ToUtf32("System.Text.Parsing.Parser*"));
+                AddLocalVariable(AttrOrVar(ToUtf32("UniquePtr<Identifier>"), ToUtf32("qid")));
             }
             public override void Enter(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
             {
@@ -1499,6 +1500,7 @@ namespace Syntax
             public void A0Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                context->qid.Reset(context->fromcontinuation);
                 context->value = new KeywordParser(context->fromstr, context->fromcontinuation->Name());
             }
             public void A1Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
@@ -1526,10 +1528,11 @@ namespace Syntax
             }
             public class Context : System.Text.Parsing.Context
             {
-                public Context() : value(), fromstr(), fromcontinuation()
+                public Context() : value(), qid(), fromstr(), fromcontinuation()
                 {
                 }
                 public System.Text.Parsing.Parser* value;
+                public UniquePtr<Identifier> qid;
                 public ustring fromstr;
                 public Identifier* fromcontinuation;
             }
@@ -1591,6 +1594,7 @@ namespace Syntax
             public KeywordListBodyRule(const ustring& name_, Scope* enclosingScope_, int id_, Parser* definition_) : base(name_, enclosingScope_, id_, definition_)
             {
                 SetValueTypeName(ToUtf32("System.Text.Parsing.Parser*"));
+                AddLocalVariable(AttrOrVar(ToUtf32("UniquePtr<Identifier>"), ToUtf32("qid")));
                 AddLocalVariable(AttrOrVar(ToUtf32("List<ustring>"), ToUtf32("keywords")));
             }
             public override void Enter(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
@@ -1611,6 +1615,8 @@ namespace Syntax
             {
                 ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
                 a0ActionParser->SetAction(A0Action);
+                ActionParser* a1ActionParser = GetAction(ToUtf32("A1"));
+                a1ActionParser->SetAction(A1Action);
                 NonterminalParser* selectorNonterminalParser = GetNonterminal(ToUtf32("selector"));
                 selectorNonterminalParser->SetPost(Postselector);
                 NonterminalParser* stringArrayNonterminalParser = GetNonterminal(ToUtf32("StringArray"));
@@ -1620,6 +1626,11 @@ namespace Syntax
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
                 context->value = new KeywordListParser(context->fromselector->Name(), context->keywords);
+            }
+            public void A1Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                context->qid.Reset(context->fromselector);
             }
             public void Postselector(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
             {
@@ -1637,10 +1648,11 @@ namespace Syntax
             }
             public class Context : System.Text.Parsing.Context
             {
-                public Context() : value(), keywords(), fromselector()
+                public Context() : value(), qid(), keywords(), fromselector()
                 {
                 }
                 public System.Text.Parsing.Parser* value;
+                public UniquePtr<Identifier> qid;
                 public List<ustring> keywords;
                 public Identifier* fromselector;
             }
@@ -3654,35 +3666,35 @@ namespace Syntax
         public override void GetReferencedGrammars()
         {
             ParsingDomain* pd = Domain();
-            Grammar* grammar0 = pd->GetGrammar(ToUtf32("System.Text.Parsing.stdlib"));
+            Grammar* grammar0 = pd->GetGrammar(ToUtf32("Code.IdentifierGrammar"));
             if (grammar0 == null)
             {
-                grammar0 = new System.Text.Parsing.stdlib(pd);
+                grammar0 = new Code.IdentifierGrammar(pd);
             }
             AddGrammarReference(grammar0);
-            Grammar* grammar1 = pd->GetGrammar(ToUtf32("Syntax.ElementGrammar"));
+            Grammar* grammar1 = pd->GetGrammar(ToUtf32("System.Text.Parsing.stdlib"));
             if (grammar1 == null)
             {
-                grammar1 = new Syntax.ElementGrammar(pd);
+                grammar1 = new System.Text.Parsing.stdlib(pd);
             }
             AddGrammarReference(grammar1);
-            Grammar* grammar2 = pd->GetGrammar(ToUtf32("Code.IdentifierGrammar"));
+            Grammar* grammar2 = pd->GetGrammar(ToUtf32("Syntax.ElementGrammar"));
             if (grammar2 == null)
             {
-                grammar2 = new Code.IdentifierGrammar(pd);
+                grammar2 = new Syntax.ElementGrammar(pd);
             }
             AddGrammarReference(grammar2);
         }
 
         public override void CreateRules()
         {
+            AddRuleLink(new System.Text.Parsing.RuleLink(ToUtf32("QualifiedId"), this, ToUtf32("Code.IdentifierGrammar.QualifiedId")));
             AddRuleLink(new System.Text.Parsing.RuleLink(ToUtf32("char"), this, ToUtf32("System.Text.Parsing.stdlib.char")));
-            AddRuleLink(new System.Text.Parsing.RuleLink(ToUtf32("uint"), this, ToUtf32("System.Text.Parsing.stdlib.uint")));
-            AddRuleLink(new System.Text.Parsing.RuleLink(ToUtf32("string"), this, ToUtf32("System.Text.Parsing.stdlib.string")));
             AddRuleLink(new System.Text.Parsing.RuleLink(ToUtf32("StringArray"), this, ToUtf32("ElementGrammar.StringArray")));
+            AddRuleLink(new System.Text.Parsing.RuleLink(ToUtf32("string"), this, ToUtf32("System.Text.Parsing.stdlib.string")));
             AddRuleLink(new System.Text.Parsing.RuleLink(ToUtf32("escape"), this, ToUtf32("System.Text.Parsing.stdlib.escape")));
             AddRuleLink(new System.Text.Parsing.RuleLink(ToUtf32("hexdword"), this, ToUtf32("System.Text.Parsing.stdlib.hexdword")));
-            AddRuleLink(new System.Text.Parsing.RuleLink(ToUtf32("QualifiedId"), this, ToUtf32("Code.IdentifierGrammar.QualifiedId")));
+            AddRuleLink(new System.Text.Parsing.RuleLink(ToUtf32("uint"), this, ToUtf32("System.Text.Parsing.stdlib.uint")));
             AddRule(new PrimitiveRule(ToUtf32("Primitive"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.AlternativeParser(
                     new System.Text.Parsing.AlternativeParser(
@@ -3921,8 +3933,9 @@ namespace Syntax
                 new System.Text.Parsing.ActionParser(ToUtf32("A0"),
                     new System.Text.Parsing.SequenceParser(
                         new System.Text.Parsing.SequenceParser(
-                            new System.Text.Parsing.ExpectationParser(
-                                new System.Text.Parsing.NonterminalParser(ToUtf32("selector"), ToUtf32("QualifiedId"), 0)),
+                            new System.Text.Parsing.ActionParser(ToUtf32("A1"),
+                                new System.Text.Parsing.ExpectationParser(
+                                    new System.Text.Parsing.NonterminalParser(ToUtf32("selector"), ToUtf32("QualifiedId"), 0))),
                             new System.Text.Parsing.ExpectationParser(
                                 new System.Text.Parsing.CharParser(','))),
                         new System.Text.Parsing.ExpectationParser(

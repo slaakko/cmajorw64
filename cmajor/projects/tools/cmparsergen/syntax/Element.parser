@@ -44,7 +44,7 @@ namespace Syntax
             ;
             
         ReturnType(ParsingContext* ctx, System.Text.Parsing.RuleParser* rule, var UniquePtr<DomObject> type) 
-            ::= Type(ctx){ type.Reset(Type); rule->SetValueTypeName(type->Name()); }
+            ::= ':' Type(ctx){ type.Reset(Type); rule->SetValueTypeName(type->Name()); }
             ;
             
         Keyword

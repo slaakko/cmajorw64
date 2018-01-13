@@ -29,8 +29,13 @@ namespace System.IO
 
     public class IOBuffer
     {
-        public nothrow IOBuffer(long size_) : size(size_), mem(RtMemAlloc(size))
+        public nothrow IOBuffer(long size_) : size(size_), mem(null)
         {
+        #if (MEM_DEBUG)
+            mem = MemAlloc(size, typename(*this));
+        #else
+            mem = MemAlloc(size);
+        #endif
         }
         suppress IOBuffer(const IOBuffer&);
         suppress void operator=(const IOBuffer&);
@@ -42,7 +47,10 @@ namespace System.IO
         public nothrow default void operator=(IOBuffer&& that);
         public ~IOBuffer()
         {
-            RtMemFree(mem);
+            if (mem != null)
+            {
+                MemFree(mem);
+            }            
         }
         public nothrow inline long Size() const 
         {

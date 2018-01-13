@@ -684,8 +684,7 @@ namespace Syntax
                         new System.Text.Parsing.NonterminalParser(ToUtf32("left"), ToUtf32("Difference"), 1)),
                     new System.Text.Parsing.KleeneStarParser(
                         new System.Text.Parsing.ActionParser(ToUtf32("A1"),
-                            new System.Text.Parsing.ExpectationParser(
-                                new System.Text.Parsing.NonterminalParser(ToUtf32("right"), ToUtf32("Difference"), 1)))))));
+                            new System.Text.Parsing.NonterminalParser(ToUtf32("right"), ToUtf32("Difference"), 1))))));
             AddRule(new DifferenceRule(ToUtf32("Difference"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.SequenceParser(
                     new System.Text.Parsing.ActionParser(ToUtf32("A0"),

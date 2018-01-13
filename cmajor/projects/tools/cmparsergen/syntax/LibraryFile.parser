@@ -5,8 +5,11 @@ namespace Syntax
     grammar LibraryFileGrammar
     {
         using stdlib.qualified_id;
+        using stdlib.spaces_and_comments;
         using ElementGrammar.Identifier;
         using ElementGrammar.Signature;
+        
+        skip spaces_and_comments;        
         
         LibraryFile(ParsingContext* ctx, System.Text.Parsing.ParsingDomain* parsingDomain)
             ::= NamespaceContent(ctx, parsingDomain)

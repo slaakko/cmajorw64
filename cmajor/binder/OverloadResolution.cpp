@@ -921,6 +921,7 @@ std::unique_ptr<BoundFunctionCall> CreateBoundFunctionCall(FunctionSymbol* bestF
         {
             BoundAddressOfExpression* addrOf = static_cast<BoundAddressOfExpression*>(argument.get());
             std::unique_ptr<BoundExpression> subject(std::move(addrOf->Subject()));
+            addrOf->MoveTemporaryDestructorCallsTo(*subject);
             argument.reset(subject.release());
         }
         const ArgumentMatch& argumentMatch = bestMatch.argumentMatches[i];

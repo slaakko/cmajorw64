@@ -7,7 +7,10 @@ namespace Syntax
         using Code.IdentifierGrammar.UsingAlias;
         using Code.IdentifierGrammar.UsingImport;
         using GrammarGrammar.Grammar;
+        using stdlib.spaces_and_comments;
         using stdlib.qualified_id;
+
+        skip spaces_and_comments;
         
         ParserFile(ParsingContext* ctx, int id, System.Text.Parsing.ParsingDomain* parsingDomain) : ParserFileContent*
             ::= empty{ value = new ParserFileContent(id, fileName, parsingDomain); }

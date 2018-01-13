@@ -443,6 +443,7 @@ namespace Syntax
         public override void CreateRules()
         {
             AddRuleLink(new System.Text.Parsing.RuleLink(ToUtf32("qualified_id"), this, ToUtf32("System.Text.Parsing.stdlib.qualified_id")));
+            AddRuleLink(new System.Text.Parsing.RuleLink(ToUtf32("spaces_and_comments"), this, ToUtf32("System.Text.Parsing.stdlib.spaces_and_comments")));
             AddRuleLink(new System.Text.Parsing.RuleLink(ToUtf32("Identifier"), this, ToUtf32("ElementGrammar.Identifier")));
             AddRuleLink(new System.Text.Parsing.RuleLink(ToUtf32("Signature"), this, ToUtf32("ElementGrammar.Signature")));
             AddRule(new LibraryFileRule(ToUtf32("LibraryFile"), GetScope(), Domain()->GetNextRuleId(),
@@ -492,6 +493,7 @@ namespace Syntax
                             new System.Text.Parsing.NonterminalParser(ToUtf32("ruleName"), ToUtf32("Identifier"), 0)),
                         new System.Text.Parsing.NonterminalParser(ToUtf32("Signature"), ToUtf32("Signature"), 2)),
                     new System.Text.Parsing.CharParser(';'))));
+            SetSkipRuleName(ToUtf32("spaces_and_comments"));
         }
     }
 

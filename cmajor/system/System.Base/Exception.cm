@@ -1,4 +1,4 @@
-// =================================
+﻿// =================================
 // Copyright (c) 2018 Seppo Laakko
 // Distributed under the MIT license
 // =================================
@@ -28,5 +28,38 @@ namespace System
         }
         private string message;
         private string stackTrace;
+    }
+    
+    public class ExceptionPtr
+    {
+        public nothrow ExceptionPtr() : exception(null), exceptionClassId(0u)
+        {
+        }
+        public nothrow ExceptionPtr(void* exception_, ulong exceptionClassId_) : exception(exception_), exceptionClassId(exceptionClassId_)
+        {
+        }
+        public inline nothrow void* Exception() const
+        {
+            return exception;
+        }
+        public inline nothrow ulong ExceptionClassId() const
+        {
+            return exceptionClassId;
+        }
+        private void* exception;
+        private ulong exceptionClassId;
+    }
+    
+    public nothrow ExceptionPtr CaptureCurrentException()
+    {
+        void* exception;
+        ulong exceptionClassId;
+        RtCaptureException(exception, exceptionClassId);
+        return ExceptionPtr(exception, exceptionClassId);
+    }
+    
+    public void ThrowCapturedException(const ExceptionPtr& capturedException)
+    {
+        RtThrowCapturedException(capturedException.Exception(), capturedException.ExceptionClassId());
     }
 }

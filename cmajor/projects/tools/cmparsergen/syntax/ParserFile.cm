@@ -292,32 +292,33 @@ namespace Syntax
         public override void GetReferencedGrammars()
         {
             ParsingDomain* pd = Domain();
-            Grammar* grammar0 = pd->GetGrammar(ToUtf32("Code.IdentifierGrammar"));
+            Grammar* grammar0 = pd->GetGrammar(ToUtf32("System.Text.Parsing.stdlib"));
             if (grammar0 == null)
             {
-                grammar0 = new Code.IdentifierGrammar(pd);
+                grammar0 = new System.Text.Parsing.stdlib(pd);
             }
             AddGrammarReference(grammar0);
-            Grammar* grammar1 = pd->GetGrammar(ToUtf32("Syntax.GrammarGrammar"));
+            Grammar* grammar1 = pd->GetGrammar(ToUtf32("Code.IdentifierGrammar"));
             if (grammar1 == null)
             {
-                grammar1 = new Syntax.GrammarGrammar(pd);
+                grammar1 = new Code.IdentifierGrammar(pd);
             }
             AddGrammarReference(grammar1);
-            Grammar* grammar2 = pd->GetGrammar(ToUtf32("System.Text.Parsing.stdlib"));
+            Grammar* grammar2 = pd->GetGrammar(ToUtf32("Syntax.GrammarGrammar"));
             if (grammar2 == null)
             {
-                grammar2 = new System.Text.Parsing.stdlib(pd);
+                grammar2 = new Syntax.GrammarGrammar(pd);
             }
             AddGrammarReference(grammar2);
         }
 
         public override void CreateRules()
         {
-            AddRuleLink(new System.Text.Parsing.RuleLink(ToUtf32("UsingAlias"), this, ToUtf32("Code.IdentifierGrammar.UsingAlias")));
-            AddRuleLink(new System.Text.Parsing.RuleLink(ToUtf32("Grammar"), this, ToUtf32("GrammarGrammar.Grammar")));
-            AddRuleLink(new System.Text.Parsing.RuleLink(ToUtf32("UsingImport"), this, ToUtf32("Code.IdentifierGrammar.UsingImport")));
             AddRuleLink(new System.Text.Parsing.RuleLink(ToUtf32("qualified_id"), this, ToUtf32("System.Text.Parsing.stdlib.qualified_id")));
+            AddRuleLink(new System.Text.Parsing.RuleLink(ToUtf32("UsingAlias"), this, ToUtf32("Code.IdentifierGrammar.UsingAlias")));
+            AddRuleLink(new System.Text.Parsing.RuleLink(ToUtf32("UsingImport"), this, ToUtf32("Code.IdentifierGrammar.UsingImport")));
+            AddRuleLink(new System.Text.Parsing.RuleLink(ToUtf32("Grammar"), this, ToUtf32("GrammarGrammar.Grammar")));
+            AddRuleLink(new System.Text.Parsing.RuleLink(ToUtf32("spaces_and_comments"), this, ToUtf32("System.Text.Parsing.stdlib.spaces_and_comments")));
             AddRule(new ParserFileRule(ToUtf32("ParserFile"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.SequenceParser(
                     new System.Text.Parsing.ActionParser(ToUtf32("A0"),
@@ -351,6 +352,7 @@ namespace Syntax
                     new System.Text.Parsing.ActionParser(ToUtf32("A1"),
                         new System.Text.Parsing.ExpectationParser(
                             new System.Text.Parsing.CharParser('}'))))));
+            SetSkipRuleName(ToUtf32("spaces_and_comments"));
         }
     }
 

@@ -26,7 +26,7 @@ namespace Syntax
         }
         public void AddSourceFile(const string& sourceFilePath)
         {
-            sourceFiles.Add(sourceFilePath);
+            sourceFiles.Add(GetFullPath(Path.Combine(basePath, sourceFilePath)));
         }
         public void AddReferenceFile(const string& referenceFilePath)
         {

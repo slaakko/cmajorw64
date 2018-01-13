@@ -3,7 +3,7 @@
     <configurations>
         <configuration>
             <name>debug</name>
-            <commandLineArguments>foo file?.* bar</commandLineArguments>
+            <commandLineArguments>foo file?.* bar --cmajor-debug-heap</commandLineArguments>
             <conditionalCompilationSymbols />
         </configuration>
         <configuration>

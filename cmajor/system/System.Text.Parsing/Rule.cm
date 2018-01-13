@@ -36,6 +36,7 @@ namespace System.Text.Parsing
         public RuleParser(const ustring& name_, Scope* enclosingScope_, int id_, Parser* definition_) : 
             base(name_, u"<" + name_ + u">"), id(id_), definition(definition_), inheritedAttributes(), localVariables(), valueTypeName(), actions(), nonterminals(), grammar(null)
         {
+            Own(definition);
             Scope* containerScope = new Scope(name_, enclosingScope_);
             Own(containerScope);
             SetContainerScope(containerScope);
@@ -281,7 +282,7 @@ namespace System.Text.Parsing
     
     public class RuleLink : ParsingObject
     {
-        public RuleLink(Grammar* grammar_, const ustring& linkedRuleName_) : this(CommonName(linkedRuleName), grammar_, linkedRuleName_)
+        public RuleLink(Grammar* grammar_, const ustring& linkedRuleName_) : this(CommonName(linkedRuleName_), grammar_, linkedRuleName_)
         {
         }
         public RuleLink(const ustring& name_, Grammar* grammar_, const ustring& linkedRuleName_) : 

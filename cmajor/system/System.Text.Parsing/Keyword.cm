@@ -8,6 +8,18 @@ using System.Collections;
 
 namespace System.Text.Parsing
 {
+    internal RuleParser* CreateIdentifierCharsRule()
+    {
+        return new RuleParser(u"identifier_chars", null, -1,
+            new PositiveParser(
+                new AlternativeParser(
+                    new AlternativeParser(
+                        new AlternativeParser(
+                            new LetterParser(),
+                            new DigitParser()),
+                        new CharParser(u'_')),
+                    new CharParser(u'.'))));
+    }
     public class IdentifierCharsRule
     {
         static IdentifierCharsRule() : instance(new IdentifierCharsRule())
@@ -43,7 +55,8 @@ namespace System.Text.Parsing
     {
         public KeywordParser(const ustring& keyword_) : base(u"keyword", u"\"" + keyword_ + u"\""), keyword(keyword_), continuationRuleName()
         {
-            continuationRule = IdentifierCharsRule.Instance().GetRule();
+            continuationRule = CreateIdentifierCharsRule();
+            Own(continuationRule);
             keywordStringParser = new StringParser(keyword);
             Own(keywordStringParser);
             CreateKeywordRule();
@@ -51,7 +64,8 @@ namespace System.Text.Parsing
         public KeywordParser(const ustring& keyword_, const ustring& continuationRuleName_) : 
             base(u"keyword", u"\"" + keyword_ + u"\""), keyword(keyword_), continuationRuleName(continuationRuleName_)
         {
-            continuationRule = IdentifierCharsRule.Instance().GetRule();
+            continuationRule = CreateIdentifierCharsRule();
+            Own(continuationRule);
             keywordStringParser = new StringParser(keyword);
             Own(keywordStringParser);
             CreateKeywordRule();

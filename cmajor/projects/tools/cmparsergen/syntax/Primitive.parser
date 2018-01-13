@@ -105,9 +105,9 @@ namespace Syntax
             ::= (keyword("keyword") '('! KeywordBody! ')'!){ value = KeywordBody; }
             ;
             
-        KeywordBody : System.Text.Parsing.Parser*
+        KeywordBody(var UniquePtr<Identifier> qid) : System.Text.Parsing.Parser*
             ::= string:str 
-            (   ',' QualifiedId:continuation!{ value = new KeywordParser(str, continuation->Name()); }
+            (   ',' QualifiedId:continuation!{ qid.Reset(continuation); value = new KeywordParser(str, continuation->Name()); }
             |   empty{ value = new KeywordParser(str); }
             )
             ;
@@ -116,8 +116,8 @@ namespace Syntax
             ::= (keyword("keyword_list") '('! KeywordListBody! ')'!){ value = KeywordListBody; }
             ;
             
-        KeywordListBody(var List<ustring> keywords) : System.Text.Parsing.Parser*
-            ::= (QualifiedId:selector! ','! StringArray(&keywords)!){ value = new KeywordListParser(selector->Name(), keywords); }
+        KeywordListBody(var UniquePtr<Identifier> qid, var List<ustring> keywords) : System.Text.Parsing.Parser*
+            ::= (QualifiedId:selector!{ qid.Reset(selector); } ','! StringArray(&keywords)!){ value = new KeywordListParser(selector->Name(), keywords); }
             ;
             
         Range : System.Text.Parsing.Parser*

@@ -1,10 +1,11 @@
-using System.Text.Parsing.CodeDom;
-using System;
-using System.Collections;
-using System.Text.Parsing;
+﻿using System.Text.Parsing.CodeDom;
 
 namespace Code
 {
+    using System;
+    using System.Collections;
+    using System.Text.Parsing;
+
     public class BasicTypeGrammar : System.Text.Parsing.Grammar
     {
         public BasicTypeGrammar() : this(new ParsingDomain())
@@ -247,4 +248,3 @@ namespace Code
     }
 
 } // namespace Code
-

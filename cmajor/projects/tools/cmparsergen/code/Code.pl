@@ -50,7 +50,7 @@ namespace Code
     {
         Identifier: Identifier*;
         QualifiedId: Identifier*;
-        TemplateId(ParsingContext* ctx, var UniquePtr<TemplateId> templateId): TemplateId*;
+        TemplateId(ParsingContext* ctx, var UniquePtr<Identifier> qid, var UniquePtr<TemplateId> templateId): TemplateId*;
         UsingAlias(var UniquePtr<Identifier> id, var UniquePtr<Identifier> qid): ustring;
         UsingImport(var UniquePtr<Identifier> qid): ustring;
     }

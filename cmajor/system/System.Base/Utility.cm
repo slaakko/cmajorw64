@@ -175,4 +175,22 @@ namespace System
             return 2 * Align(size, 4096);
         }
     }
+    
+    public nothrow inline void* MemAlloc(long size)
+    {
+        return RtMemAlloc(size);
+    }
+    
+    public nothrow inline void* MemAlloc(long size, const char* info)
+    {
+        return RtMemAllocInfo(size, info);
+    }
+    
+    public nothrow inline void MemFree(void* ptr)
+    {
+    #if (DEBUG)
+        RtDispose(ptr);
+    #endif
+        RtMemFree(ptr);
+    }
 }

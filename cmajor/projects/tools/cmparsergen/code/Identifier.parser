@@ -16,9 +16,9 @@ namespace Code
             ::= token((identifier - Keyword) % '.'){ value = new Identifier(ustring(matchBegin, matchEnd)); }
             ;
             
-        TemplateId(ParsingContext* ctx, var UniquePtr<TemplateId> templateId) : TemplateId*
+        TemplateId(ParsingContext* ctx, var UniquePtr<Identifier> qid, var UniquePtr<TemplateId> templateId) : TemplateId*
             ::= empty{ ctx->BeginParsingTemplateId(); }
-                (QualifiedId:primary{ templateId.Reset(new TemplateId(primary->Name())); } 
+                (QualifiedId:primary{ qid.Reset(primary); templateId.Reset(new TemplateId(primary->Name())); } 
                 '<' (TypeExpr(ctx):templateArg{ templateId->AddTemplateArg(templateArg); } % ',') '>')
             {
                 ctx->EndParsingTemplateId(); 

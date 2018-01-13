@@ -393,11 +393,15 @@ namespace System
         private nothrow void Grow(long minRes)
         {
             minRes = MemGrow(minRes);
-            CharT* newChars = cast<CharT*>(RtMemAlloc(sizeof(CharT) * minRes));
+        #if (MEM_DEBUG)            
+            CharT* newChars = cast<CharT*>(MemAlloc(sizeof(CharT) * minRes, typename(*this)));
+        #else
+            CharT* newChars = cast<CharT*>(MemAlloc(sizeof(CharT) * minRes));
+        #endif
             if (chars != null)
             {
                 StrCopy(newChars, chars);
-                RtMemFree(chars);
+                MemFree(chars);
             }
             chars = newChars;
             res = minRes;
@@ -407,7 +411,7 @@ namespace System
             len = 0;
             if (res != 0)
             {
-                RtMemFree(chars);
+                MemFree(chars);
                 res = 0;
             }
             chars = null;

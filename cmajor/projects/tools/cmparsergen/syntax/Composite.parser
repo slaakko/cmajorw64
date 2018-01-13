@@ -11,7 +11,7 @@ namespace Syntax
             ;
             
         Sequence(ParsingContext* ctx) : System.Text.Parsing.Parser*
-            ::= Difference(ctx):left{ value = left; } (Difference(ctx):right!{ value = new System.Text.Parsing.SequenceParser(value, right); })*
+            ::= Difference(ctx):left{ value = left; } (Difference(ctx):right{ value = new System.Text.Parsing.SequenceParser(value, right); })*
             ;
             
         Difference(ParsingContext* ctx) : System.Text.Parsing.Parser*
