@@ -1,2 +1,2 @@
 @echo off
-..\..\cmparsergen\bin\debug\cmparsergen --cmajor-debug-heap calc.pp
+..\..\cmparsergen\bin\debug\cmparsergen --cmajor-debug-heap -F calc.pp

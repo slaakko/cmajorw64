@@ -1,4 +1,4 @@
-﻿// =================================
+// =================================
 // Copyright (c) 2018 Seppo Laakko
 // Distributed under the MIT license
 // =================================
@@ -286,7 +286,7 @@ namespace System.Collections
             Bucket<ValueType>* bucket = buckets[index];
             while (bucket != null)
             {
-                if (Equal(KeyOf(bucket->Value()), key))
+                if (KeysEqual(KeyOf(bucket->Value()), key))
                 {
                     return MakePair(Iterator(this, bucket), false);
                 }
@@ -307,7 +307,7 @@ namespace System.Collections
             Bucket<ValueType>* prev = null;
             while (bucket != null)
             {
-                if (Equal(KeyOf(bucket->Value()), key))
+                if (KeysEqual(KeyOf(bucket->Value()), key))
                 {
                     if (prev != null)
                     {
@@ -364,7 +364,7 @@ namespace System.Collections
                 Bucket<ValueType>* bucket = buckets[index];
                 while (bucket != null)
                 {
-                    if (Equal(KeyOf(bucket->Value()), key))
+                    if (KeysEqual(KeyOf(bucket->Value()), key))
                     {
                         return Iterator (this, bucket);
                     }
@@ -381,7 +381,7 @@ namespace System.Collections
                 Bucket<ValueType>* bucket = buckets[index];
                 while (bucket != null)
                 {
-                    if (Equal(KeyOf(bucket->Value()), key))
+                    if (KeysEqual(KeyOf(bucket->Value()), key))
                     {
                         return ConstIterator(this, bucket);
                     }
@@ -398,7 +398,7 @@ namespace System.Collections
                 Bucket<ValueType>* bucket = buckets[index];
                 while (bucket != null)
                 {
-                    if (Equal(KeyOf(bucket->Value()), key))
+                    if (KeysEqual(KeyOf(bucket->Value()), key))
                     {
                         return ConstIterator(this, bucket);
                     }
@@ -500,7 +500,7 @@ namespace System.Collections
             if (buckets.IsEmpty()) return -1;
             return cast<long>(hash(key) % cast<ulong>(buckets.Count()));
         }
-        private inline nothrow bool Equal(const KeyType& left, const KeyType& right) const
+        private inline nothrow bool KeysEqual(const KeyType& left, const KeyType& right) const
         {
             return equal(left, right);
         }

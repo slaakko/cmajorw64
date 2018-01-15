@@ -43,7 +43,7 @@ struct InitDone
     }
 };
 
-const char* version = "2.0.0 beta-3";
+const char* version = "2.0.0 beta-4";
 
 void PrintHelp()
 {

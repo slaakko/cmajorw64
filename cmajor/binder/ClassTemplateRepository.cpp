@@ -214,6 +214,10 @@ void ClassTemplateRepository::Instantiate(FunctionSymbol* memberFunction, Contai
     instantiatedMemberFunctions.insert(memberFunction);
     try
     {
+        if (memberFunction->MangledName() == U"member_function_op_apply_EqualTo_Grammar_P_7A4AD0935BA2FC594D7FE534DEB975E755A011E4")
+        {
+            int x = 0;
+        }
         SymbolTable& symbolTable = boundCompileUnit.GetSymbolTable();
         Symbol* parent = memberFunction->Parent();
         Assert(parent->GetSymbolType() == SymbolType::classTemplateSpecializationSymbol, "class template specialization expected");

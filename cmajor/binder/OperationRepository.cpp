@@ -794,6 +794,10 @@ void PointerEqualOperation::CollectViableFunctions(ContainerScope* containerScop
     if (!leftType->IsPointerType()) return;
     TypeSymbol* rightType = arguments[1]->GetType();
     if (!rightType->IsPointerType()) return;
+    if (leftType->IsReferenceType())
+    {
+        leftType = leftType->PlainType(span);
+    }
     FunctionSymbol* function = functionMap[leftType];
     if (!function)
     {

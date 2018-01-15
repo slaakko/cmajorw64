@@ -1,4 +1,4 @@
-﻿// =================================
+// =================================
 // Copyright (c) 2018 Seppo Laakko
 // Distributed under the MIT license
 // =================================
@@ -11,9 +11,6 @@ namespace System.Text.Parsing
     public class AttrOrVar
     {
         public nothrow AttrOrVar(const ustring& type_, const ustring& name_) : type(type_), name(name_)
-        {
-        }
-        public ~AttrOrVar()
         {
         }
         public inline nothrow const ustring& Type() const

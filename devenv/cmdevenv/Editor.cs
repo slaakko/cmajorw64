@@ -161,7 +161,7 @@ namespace cmdevenv
             {
                 if (dirty)
                 {
-                    using (StreamWriter writer = new StreamWriter(sourceFile.FilePath, false, Encoding.UTF8))
+                    using (StreamWriter writer = new StreamWriter(sourceFile.FilePath, false, new UTF8Encoding(false)))
                     {
                         StringBuilder s = new StringBuilder();
                         foreach (char c in Text)

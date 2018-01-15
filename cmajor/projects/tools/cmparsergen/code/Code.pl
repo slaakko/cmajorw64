@@ -14,7 +14,7 @@ namespace Code
         Additive(ParsingContext* ctx, var UniquePtr<DomObject> expr, var Operator op): DomObject*;
         Multiplicative(ParsingContext* ctx, var UniquePtr<DomObject> expr, var Operator op): DomObject*;
         Prefix(ParsingContext* ctx, var Operator op): DomObject*;
-        Postfix(ParsingContext* ctx, var UniquePtr<DomObject> expr): DomObject*;
+        Postfix(ParsingContext* ctx, var UniquePtr<Identifier> id, var UniquePtr<DomObject> expr): DomObject*;
         Primary(ParsingContext* ctx): DomObject*;
         SizeOfExpr(ParsingContext* ctx): DomObject*;
         TypeNameExpr(ParsingContext* ctx): DomObject*;
@@ -75,7 +75,7 @@ namespace Code
         RangeForStatement(ParsingContext* ctx): Statement*;
         BreakStatement(ParsingContext* ctx): Statement*;
         ContinueStatement(ParsingContext* ctx): Statement*;
-        GotoStatement(ParsingContext* ctx): Statement*;
+        GotoStatement(ParsingContext* ctx, var UniquePtr<Identifier> id): Statement*;
         SwitchStatement(ParsingContext* ctx): SwitchStatement*;
         CaseStatement(ParsingContext* ctx, var UniquePtr<CaseStatement> caseS): CaseStatement*;
         DefaultStatement(ParsingContext* ctx): DefaultStatement*;
@@ -97,7 +97,7 @@ namespace Code
     {
         TypeExpr(ParsingContext* ctx): DomObject*;
         PrefixTypeExpr(ParsingContext* ctx): DomObject*;
-        PostfixTypeExpr(ParsingContext* ctx, var UniquePtr<DomObject> typeExpr): DomObject*;
+        PostfixTypeExpr(ParsingContext* ctx, var UniquePtr<Identifier> id, var UniquePtr<DomObject> typeExpr): DomObject*;
         PrimaryTypeExpr(ParsingContext* ctx): DomObject*;
     }
 }

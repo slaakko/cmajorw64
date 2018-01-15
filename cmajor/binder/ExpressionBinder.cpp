@@ -1109,6 +1109,10 @@ void ExpressionBinder::Visit(ArrowNode& arrowNode)
         expression->SetFlag(BoundExpressionFlags::argIsExplicitThisOrBasePtr);
     }
     BindArrow(arrowNode, arrowNode.MemberId()->Str());
+    if (argIsExplicitThisOrBasePtr)
+    {
+        expression->SetFlag(BoundExpressionFlags::argIsExplicitThisOrBasePtr);
+    }
 }
 
 void ExpressionBinder::Visit(DisjunctionNode& disjunctionNode) 
@@ -1522,6 +1526,7 @@ void ExpressionBinder::Visit(IndexingNode& indexingNode)
 void ExpressionBinder::Visit(InvokeNode& invokeNode) 
 {
     invokeNode.Subject()->Accept(*this);
+    bool argIsExplicitThisOrBasePtr = expression->GetFlag(BoundExpressionFlags::argIsExplicitThisOrBasePtr);
     std::vector<std::unique_ptr<BoundExpression>> arguments;
     std::vector<FunctionScopeLookup> functionScopeLookups;
     functionScopeLookups.push_back(FunctionScopeLookup(ScopeLookup::this_and_base_and_parent, containerScope));
@@ -1835,6 +1840,10 @@ void ExpressionBinder::Visit(InvokeNode& invokeNode)
     std::unique_ptr<Exception> exception;
     std::unique_ptr<Exception> thisEx;
     std::unique_ptr<Exception> nsEx;
+    if (!arguments.empty() && arguments[0]->GetFlag(BoundExpressionFlags::argIsExplicitThisOrBasePtr))
+    {
+        argIsExplicitThisOrBasePtr = true;
+    }
     std::unique_ptr<BoundFunctionCall> functionCall = ResolveOverload(groupName, containerScope, functionScopeLookups, arguments, boundCompileUnit, boundFunction, 
         invokeNode.GetSpan(), OverloadResolutionFlags::dontThrow, templateArgumentTypes, exception);
     if (!functionCall)
@@ -1924,8 +1933,14 @@ void ExpressionBinder::Visit(InvokeNode& invokeNode)
     FunctionSymbol* functionSymbol = functionCall->GetFunctionSymbol();
     if (functionSymbol->GetSymbolType() == SymbolType::memberFunctionSymbol && !functionSymbol->IsStatic() && functionSymbol->IsVirtualAbstractOrOverride())
     {
-        Assert(!functionCall->Arguments().empty(), "nonempty argument list expected");
-        if (!functionCall->Arguments()[0]->GetFlag(BoundExpressionFlags::argIsExplicitThisOrBasePtr))
+        if (argIsExplicitThisOrBasePtr)
+        {
+            if (functionSymbol->IsAbstract())
+            {
+                throw Exception("cannot call abstract member function", span, functionSymbol->GetSpan());
+            }
+        }
+        else
         {
             functionCall->SetFlag(BoundExpressionFlags::virtualCall);
         }

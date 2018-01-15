@@ -1,4 +1,4 @@
-﻿// =================================
+// =================================
 // Copyright (c) 2018 Seppo Laakko
 // Distributed under the MIT license
 // =================================
@@ -13,7 +13,7 @@ namespace System.Text.Parsing.CodeDom
         public nothrow DomObject(const ustring& name_) : name(name_), parens(false)
         {
         }
-        public inline nothrow const ustring& Name() const
+        public nothrow virtual ustring Name() const
         {
             return name;
         }

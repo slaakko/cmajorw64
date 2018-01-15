@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 
 namespace Code
@@ -7,7 +7,7 @@ namespace Code
     {
         public void BeginParsingTemplateId()
         {
-            parsingTemplateIdStack.Push(parsingTemplateId); 
+            parsingTemplateIdStack.Push(parsingTemplateId);
             parsingTemplateId = true;
         }
         public void EndParsingTemplateId()
@@ -16,17 +16,17 @@ namespace Code
         }
         public nothrow inline bool ParsingTemplateId() const
         {
-            return parsingTemplateId; 
+            return parsingTemplateId;
         }
         public void PushParsingLvalue(bool parsingLvalue_)
         {
-            parsingLvalueStack.Push(parsingLvalue); 
+            parsingLvalueStack.Push(parsingLvalue);
             parsingLvalue = parsingLvalue_;
         }
         public void PopParsingLvalue()
         {
             parsingLvalue = parsingLvalueStack.Pop();
-        }    
+        }
         public nothrow inline bool ParsingLvalue() const
         {
             return parsingLvalue;

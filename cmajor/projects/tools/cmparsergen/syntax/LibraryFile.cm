@@ -449,10 +449,11 @@ namespace Syntax
             AddRule(new LibraryFileRule(ToUtf32("LibraryFile"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.NonterminalParser(ToUtf32("NamespaceContent"), ToUtf32("NamespaceContent"), 2)));
             AddRule(new NamespaceContentRule(ToUtf32("NamespaceContent"), GetScope(), Domain()->GetNextRuleId(),
-                new System.Text.Parsing.AlternativeParser(
-                    new System.Text.Parsing.ActionParser(ToUtf32("A0"),
-                        new System.Text.Parsing.NonterminalParser(ToUtf32("Grammar"), ToUtf32("Grammar"), 2)),
-                    new System.Text.Parsing.NonterminalParser(ToUtf32("Namespace"), ToUtf32("Namespace"), 2))));
+                new System.Text.Parsing.KleeneStarParser(
+                    new System.Text.Parsing.AlternativeParser(
+                        new System.Text.Parsing.ActionParser(ToUtf32("A0"),
+                            new System.Text.Parsing.NonterminalParser(ToUtf32("Grammar"), ToUtf32("Grammar"), 2)),
+                        new System.Text.Parsing.NonterminalParser(ToUtf32("Namespace"), ToUtf32("Namespace"), 2)))));
             AddRule(new NamespaceRule(ToUtf32("Namespace"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.SequenceParser(
                     new System.Text.Parsing.SequenceParser(

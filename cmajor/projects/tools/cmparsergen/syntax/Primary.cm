@@ -350,7 +350,6 @@ namespace Syntax
             public NonterminalRule(const ustring& name_, Scope* enclosingScope_, int id_, Parser* definition_) : base(name_, enclosingScope_, id_, definition_)
             {
                 SetValueTypeName(ToUtf32("ustring"));
-                AddLocalVariable(AttrOrVar(ToUtf32("UniquePtr<Identifier>"), ToUtf32("id")));
             }
             public override void Enter(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
             {
@@ -376,8 +375,7 @@ namespace Syntax
             public void A0Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->id.Reset(context->fromIdentifier);
-                context->value = context->id->Name();
+                context->value = context->fromIdentifier;
             }
             public void PostIdentifier(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
             {
@@ -385,17 +383,16 @@ namespace Syntax
                 if (matched)
                 {
                     UniquePtr<Object> fromIdentifier_value = stack.Pop();
-                    context->fromIdentifier = *cast<ValueObject<Identifier*>*>(fromIdentifier_value.Get());
+                    context->fromIdentifier = *cast<ValueObject<ustring>*>(fromIdentifier_value.Get());
                 }
             }
             public class Context : System.Text.Parsing.Context
             {
-                public Context() : value(), id(), fromIdentifier()
+                public Context() : value(), fromIdentifier()
                 {
                 }
                 public ustring value;
-                public UniquePtr<Identifier> id;
-                public Identifier* fromIdentifier;
+                public ustring fromIdentifier;
             }
         }
 
@@ -404,7 +401,6 @@ namespace Syntax
             public AliasRule(const ustring& name_, Scope* enclosingScope_, int id_, Parser* definition_) : base(name_, enclosingScope_, id_, definition_)
             {
                 SetValueTypeName(ToUtf32("ustring"));
-                AddLocalVariable(AttrOrVar(ToUtf32("UniquePtr<Identifier>"), ToUtf32("id")));
             }
             public override void Enter(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
             {
@@ -430,8 +426,7 @@ namespace Syntax
             public void A0Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->id.Reset(context->fromIdentifier);
-                context->value = context->id->Name();
+                context->value = context->fromIdentifier;
             }
             public void PostIdentifier(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
             {
@@ -439,17 +434,16 @@ namespace Syntax
                 if (matched)
                 {
                     UniquePtr<Object> fromIdentifier_value = stack.Pop();
-                    context->fromIdentifier = *cast<ValueObject<Identifier*>*>(fromIdentifier_value.Get());
+                    context->fromIdentifier = *cast<ValueObject<ustring>*>(fromIdentifier_value.Get());
                 }
             }
             public class Context : System.Text.Parsing.Context
             {
-                public Context() : value(), id(), fromIdentifier()
+                public Context() : value(), fromIdentifier()
                 {
                 }
                 public ustring value;
-                public UniquePtr<Identifier> id;
-                public Identifier* fromIdentifier;
+                public ustring fromIdentifier;
             }
         }
 
@@ -706,16 +700,16 @@ namespace Syntax
         public override void GetReferencedGrammars()
         {
             ParsingDomain* pd = Domain();
-            Grammar* grammar0 = pd->GetGrammar(ToUtf32("Code.IdentifierGrammar"));
+            Grammar* grammar0 = pd->GetGrammar(ToUtf32("Code.ExpressionGrammar"));
             if (grammar0 == null)
             {
-                grammar0 = new Code.IdentifierGrammar(pd);
+                grammar0 = new Code.ExpressionGrammar(pd);
             }
             AddGrammarReference(grammar0);
-            Grammar* grammar1 = pd->GetGrammar(ToUtf32("Syntax.CompositeGrammar"));
+            Grammar* grammar1 = pd->GetGrammar(ToUtf32("Code.StatementGrammar"));
             if (grammar1 == null)
             {
-                grammar1 = new Syntax.CompositeGrammar(pd);
+                grammar1 = new Code.StatementGrammar(pd);
             }
             AddGrammarReference(grammar1);
             Grammar* grammar2 = pd->GetGrammar(ToUtf32("Syntax.PrimitiveGrammar"));
@@ -724,26 +718,26 @@ namespace Syntax
                 grammar2 = new Syntax.PrimitiveGrammar(pd);
             }
             AddGrammarReference(grammar2);
-            Grammar* grammar3 = pd->GetGrammar(ToUtf32("Code.ExpressionGrammar"));
+            Grammar* grammar3 = pd->GetGrammar(ToUtf32("Syntax.CompositeGrammar"));
             if (grammar3 == null)
             {
-                grammar3 = new Code.ExpressionGrammar(pd);
+                grammar3 = new Syntax.CompositeGrammar(pd);
             }
             AddGrammarReference(grammar3);
-            Grammar* grammar4 = pd->GetGrammar(ToUtf32("Code.StatementGrammar"));
+            Grammar* grammar4 = pd->GetGrammar(ToUtf32("Syntax.ElementGrammar"));
             if (grammar4 == null)
             {
-                grammar4 = new Code.StatementGrammar(pd);
+                grammar4 = new Syntax.ElementGrammar(pd);
             }
             AddGrammarReference(grammar4);
         }
 
         public override void CreateRules()
         {
-            AddRuleLink(new System.Text.Parsing.RuleLink(ToUtf32("Identifier"), this, ToUtf32("Code.IdentifierGrammar.Identifier")));
+            AddRuleLink(new System.Text.Parsing.RuleLink(ToUtf32("ArgumentList"), this, ToUtf32("Code.ExpressionGrammar.ArgumentList")));
             AddRuleLink(new System.Text.Parsing.RuleLink(ToUtf32("Alternative"), this, ToUtf32("CompositeGrammar.Alternative")));
             AddRuleLink(new System.Text.Parsing.RuleLink(ToUtf32("Primitive"), this, ToUtf32("PrimitiveGrammar.Primitive")));
-            AddRuleLink(new System.Text.Parsing.RuleLink(ToUtf32("ArgumentList"), this, ToUtf32("Code.ExpressionGrammar.ArgumentList")));
+            AddRuleLink(new System.Text.Parsing.RuleLink(ToUtf32("Identifier"), this, ToUtf32("ElementGrammar.Identifier")));
             AddRuleLink(new System.Text.Parsing.RuleLink(ToUtf32("CompoundStatement"), this, ToUtf32("Code.StatementGrammar.CompoundStatement")));
             AddRule(new PrimaryRule(ToUtf32("Primary"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.SequenceParser(

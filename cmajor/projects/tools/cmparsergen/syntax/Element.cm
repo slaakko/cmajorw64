@@ -718,9 +718,9 @@ namespace Syntax
         public override void CreateRules()
         {
             AddRuleLink(new System.Text.Parsing.RuleLink(ToUtf32("identifier"), this, ToUtf32("System.Text.Parsing.stdlib.identifier")));
-            AddRuleLink(new System.Text.Parsing.RuleLink(ToUtf32("qualified_id"), this, ToUtf32("System.Text.Parsing.stdlib.qualified_id")));
             AddRuleLink(new System.Text.Parsing.RuleLink(ToUtf32("Id"), this, ToUtf32("Code.IdentifierGrammar.Identifier")));
             AddRuleLink(new System.Text.Parsing.RuleLink(ToUtf32("string"), this, ToUtf32("System.Text.Parsing.stdlib.string")));
+            AddRuleLink(new System.Text.Parsing.RuleLink(ToUtf32("qualified_id"), this, ToUtf32("System.Text.Parsing.stdlib.qualified_id")));
             AddRuleLink(new System.Text.Parsing.RuleLink(ToUtf32("Type"), this, ToUtf32("Code.TypeExprGrammar.TypeExpr")));
             AddRule(new RuleLinkRule(ToUtf32("RuleLink"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.AlternativeParser(

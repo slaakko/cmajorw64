@@ -1,4 +1,4 @@
-﻿using System.Text.Parsing.CodeDom;
+using System.Text.Parsing.CodeDom;
 
 namespace Code
 {
@@ -465,21 +465,25 @@ namespace Code
                             new System.Text.Parsing.CharParser('>'))))));
             AddRule(new UsingAliasRule(ToUtf32("UsingAlias"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.SequenceParser(
-                    new System.Text.Parsing.KeywordParser(ToUtf32("using")),
-                    new System.Text.Parsing.ActionParser(ToUtf32("A0"),
-                        new System.Text.Parsing.SequenceParser(
+                    new System.Text.Parsing.SequenceParser(
+                        new System.Text.Parsing.KeywordParser(ToUtf32("using")),
+                        new System.Text.Parsing.ActionParser(ToUtf32("A0"),
                             new System.Text.Parsing.SequenceParser(
-                                new System.Text.Parsing.ActionParser(ToUtf32("A1"),
-                                    new System.Text.Parsing.NonterminalParser(ToUtf32("Identifier"), ToUtf32("Identifier"), 0)),
-                                new System.Text.Parsing.CharParser('=')),
-                            new System.Text.Parsing.ActionParser(ToUtf32("A2"),
-                                new System.Text.Parsing.NonterminalParser(ToUtf32("QualifiedId"), ToUtf32("QualifiedId"), 0)))))));
+                                new System.Text.Parsing.SequenceParser(
+                                    new System.Text.Parsing.ActionParser(ToUtf32("A1"),
+                                        new System.Text.Parsing.NonterminalParser(ToUtf32("Identifier"), ToUtf32("Identifier"), 0)),
+                                    new System.Text.Parsing.CharParser('=')),
+                                new System.Text.Parsing.ActionParser(ToUtf32("A2"),
+                                    new System.Text.Parsing.NonterminalParser(ToUtf32("QualifiedId"), ToUtf32("QualifiedId"), 0))))),
+                    new System.Text.Parsing.CharParser(';'))));
             AddRule(new UsingImportRule(ToUtf32("UsingImport"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.SequenceParser(
-                    new System.Text.Parsing.KeywordParser(ToUtf32("using")),
-                    new System.Text.Parsing.ActionParser(ToUtf32("A0"),
-                        new System.Text.Parsing.ActionParser(ToUtf32("A1"),
-                            new System.Text.Parsing.NonterminalParser(ToUtf32("QualifiedId"), ToUtf32("QualifiedId"), 0))))));
+                    new System.Text.Parsing.SequenceParser(
+                        new System.Text.Parsing.KeywordParser(ToUtf32("using")),
+                        new System.Text.Parsing.ActionParser(ToUtf32("A0"),
+                            new System.Text.Parsing.ActionParser(ToUtf32("A1"),
+                                new System.Text.Parsing.NonterminalParser(ToUtf32("QualifiedId"), ToUtf32("QualifiedId"), 0)))),
+                    new System.Text.Parsing.CharParser(';'))));
         }
     }
 

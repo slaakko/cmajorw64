@@ -1,4 +1,4 @@
-﻿// =================================
+// =================================
 // Copyright (c) 2018 Seppo Laakko
 // Distributed under the MIT license
 // =================================
@@ -235,6 +235,10 @@ namespace System.Text.Parsing.CodeDom
         public nothrow Dot(DomObject* subject_, const ustring& memberId_) : base(u".", 11), subject(subject_), memberId(memberId_)
         {
         }
+        public nothrow override ustring Name() const 
+        {
+            return subject->Name() + u"." + memberId;
+        }
         public override void Print(CodeFormatter& formatter)
         {
             if (Parens())
@@ -262,6 +266,10 @@ namespace System.Text.Parsing.CodeDom
     {
         public nothrow Arrow(DomObject* subject_, const ustring& memberId_) : base(u"->", 11), subject(subject_), memberId(memberId_)
         {
+        }
+        public nothrow override ustring Name() const 
+        {
+            return subject->Name() + u"->" + memberId;
         }
         public override void Print(CodeFormatter& formatter)
         {
@@ -588,7 +596,8 @@ namespace System.Text.Parsing.CodeDom
         public override void Accept(Visitor& visitor)
         {
             visitor.Visit(*this);
-            base->Accept(visitor);
+            subject->Accept(visitor);
+            index->Accept(visitor);
         }
         private UniquePtr<DomObject> subject;
         private UniquePtr<DomObject> index;
@@ -633,7 +642,7 @@ namespace System.Text.Parsing.CodeDom
         public override void Accept(Visitor& visitor)
         {
             visitor.Visit(*this);
-            base->Accept(visitor);
+            subject->Accept(visitor);
             for (const UniquePtr<DomObject>& argument : arguments)
             {
                 argument->Accept(visitor);

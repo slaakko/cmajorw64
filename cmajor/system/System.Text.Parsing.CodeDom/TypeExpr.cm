@@ -1,4 +1,4 @@
-﻿// =================================
+// =================================
 // Copyright (c) 2018 Seppo Laakko
 // Distributed under the MIT license
 // =================================
@@ -11,6 +11,10 @@ namespace System.Text.Parsing.CodeDom
     {
         public nothrow Const(DomObject* subject_) : base(), subject(subject_)
         {
+        }
+        public nothrow override ustring Name() const
+        {
+            return u"const " + subject->Name();
         }
         public override void Print(CodeFormatter& formatter)
         {
@@ -38,6 +42,10 @@ namespace System.Text.Parsing.CodeDom
         public nothrow LvalueRef(DomObject* subject_) : base(), subject(subject_)
         {
         }
+        public nothrow override ustring Name() const
+        {
+            return subject->Name() + u"&";
+        }
         public override void Print(CodeFormatter& formatter)
         {
             if (Parens())
@@ -63,6 +71,10 @@ namespace System.Text.Parsing.CodeDom
     {
         public nothrow RvalueRef(DomObject* subject_) : base(), subject(subject_)
         {
+        }
+        public nothrow override ustring Name() const
+        {
+            return subject->Name() + u"&&";
         }
         public override void Print(CodeFormatter& formatter)
         {
@@ -90,6 +102,10 @@ namespace System.Text.Parsing.CodeDom
         public nothrow Pointer(DomObject* subject_) : base(), subject(subject_)
         {
         }
+        public nothrow override ustring Name() const
+        {
+            return subject->Name() + u"*";
+        }
         public override void Print(CodeFormatter& formatter)
         {
             if (Parens())
@@ -115,6 +131,10 @@ namespace System.Text.Parsing.CodeDom
     {
         public nothrow Array(DomObject* subject_, DomObject* size_) : subject(subject_), size(size_)
         {
+        }
+        public nothrow override ustring Name() const
+        {
+            return subject->Name() + u"[" + size->Name() + u"]";
         }
         public override void Print(CodeFormatter& formatter)
         {

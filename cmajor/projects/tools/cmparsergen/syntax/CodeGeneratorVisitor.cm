@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Text;
 using System.Text.Parsing;
@@ -280,7 +280,7 @@ namespace Syntax
                         {
                             if (!nonterminal->Arguments().IsEmpty())
                             {
-                                formatter.WriteLine("private void " + ToUtf8(nonterminal->PreCallMethodName()) + "(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)");
+                                formatter.WriteLine("public void " + ToUtf8(nonterminal->PreCallMethodName()) + "(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)");
                                 formatter.WriteLine("{");
                                 formatter.IncIndent();
                                 formatter.WriteLine("Context* context = cast<Context*>(parsingData->GetContext(Id()));");
@@ -298,7 +298,7 @@ namespace Syntax
                             }
                             if (!nonterminal->Rule()->ValueTypeName().IsEmpty())
                             {
-                                formatter.WriteLine("private void " + ToUtf8(nonterminal->PostCallMethodName()) + "(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)");
+                                formatter.WriteLine("public void " + ToUtf8(nonterminal->PostCallMethodName()) + "(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)");
                                 formatter.WriteLine("{");
                                 formatter.IncIndent();
                                 formatter.WriteLine("Context* context = cast<Context*>(parsingData->GetContext(Id()));");

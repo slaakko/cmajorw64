@@ -1,4 +1,4 @@
-﻿using System.Text.Parsing.CodeDom;
+using System.Text.Parsing.CodeDom;
 
 namespace Code
 {
@@ -210,6 +210,7 @@ namespace Code
             {
                 AddInheritedAttribute(AttrOrVar(ToUtf32("ParsingContext*"), ToUtf32("ctx")));
                 SetValueTypeName(ToUtf32("DomObject*"));
+                AddLocalVariable(AttrOrVar(ToUtf32("UniquePtr<Identifier>"), ToUtf32("id")));
                 AddLocalVariable(AttrOrVar(ToUtf32("UniquePtr<DomObject>"), ToUtf32("typeExpr")));
             }
             public override void Enter(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
@@ -266,6 +267,7 @@ namespace Code
             public void A2Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                context->id.Reset(context->fromIdentifier);
                 context->typeExpr.Reset(new Dot(context->typeExpr.Release(), context->fromIdentifier->Name()));
             }
             public void A3Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
@@ -327,11 +329,12 @@ namespace Code
             }
             public class Context : System.Text.Parsing.Context
             {
-                public Context() : ctx(), value(), typeExpr(), fromPrimaryTypeExpr(), fromIdentifier(), fromsize()
+                public Context() : ctx(), value(), id(), typeExpr(), fromPrimaryTypeExpr(), fromIdentifier(), fromsize()
                 {
                 }
                 public ParsingContext* ctx;
                 public DomObject* value;
+                public UniquePtr<Identifier> id;
                 public UniquePtr<DomObject> typeExpr;
                 public DomObject* fromPrimaryTypeExpr;
                 public Identifier* fromIdentifier;
@@ -464,8 +467,8 @@ namespace Code
         public override void CreateRules()
         {
             AddRuleLink(new System.Text.Parsing.RuleLink(ToUtf32("Identifier"), this, ToUtf32("IdentifierGrammar.Identifier")));
-            AddRuleLink(new System.Text.Parsing.RuleLink(ToUtf32("TemplateId"), this, ToUtf32("IdentifierGrammar.TemplateId")));
             AddRuleLink(new System.Text.Parsing.RuleLink(ToUtf32("Expression"), this, ToUtf32("ExpressionGrammar.Expression")));
+            AddRuleLink(new System.Text.Parsing.RuleLink(ToUtf32("TemplateId"), this, ToUtf32("IdentifierGrammar.TemplateId")));
             AddRuleLink(new System.Text.Parsing.RuleLink(ToUtf32("BasicType"), this, ToUtf32("BasicTypeGrammar.BasicType")));
             AddRule(new TypeExprRule(ToUtf32("TypeExpr"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.ActionParser(ToUtf32("A0"),

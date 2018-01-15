@@ -1,4 +1,4 @@
-﻿// =================================
+// =================================
 // Copyright (c) 2018 Seppo Laakko
 // Distributed under the MIT license
 // =================================
@@ -27,6 +27,26 @@ namespace System.Text.Parsing.CodeDom
     {
         public nothrow TemplateId(const ustring& name_) : base(name_)
         {
+        }
+        public nothrow override ustring Name() const
+        {
+            ustring name = base->Name();
+            name.Append(u"<");
+            bool first = true;
+            for (const UniquePtr<DomObject>& templateArg : templateArgs)
+            {
+                if (first)
+                {
+                    first = false;
+                }
+                else
+                {
+                    name.Append(u", ");
+                }
+                name.Append(templateArg->Name());
+            }
+            name.Append(u">");
+            return name;
         }
         public void AddTemplateArg(DomObject* templateArg)
         {

@@ -1,2 +1,2 @@
 @echo off
-..\..\cmparsergen\bin\release\cmparsergen calc.pp
+..\..\cmparsergen\bin\release\cmparsergen -F calc.pp

@@ -118,8 +118,8 @@ namespace Syntax
     {
         Primary(ParsingContext* ctx): System.Text.Parsing.Parser*;
         RuleCall(ParsingContext* ctx, var ArgumentCollector argumentCollector): System.Text.Parsing.Parser*;
-        Nonterminal(var UniquePtr<Identifier> id): ustring;
-        Alias(var UniquePtr<Identifier> id): ustring;
+        Nonterminal: ustring;
+        Alias: ustring;
         Grouping(ParsingContext* ctx): System.Text.Parsing.Parser*;
         Token(ParsingContext* ctx): System.Text.Parsing.Parser*;
         Expectation(System.Text.Parsing.Parser* child): System.Text.Parsing.Parser*;

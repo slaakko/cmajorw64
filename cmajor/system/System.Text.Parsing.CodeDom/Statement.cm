@@ -1,4 +1,4 @@
-﻿// =================================
+// =================================
 // Copyright (c) 2018 Seppo Laakko
 // Distributed under the MIT license
 // =================================
@@ -44,7 +44,6 @@ namespace System.Text.Parsing.CodeDom
         }
         public override void Print(CodeFormatter& formatter)
         {
-            base->Print(formatter);
             formatter.WriteLine('{');
             formatter.IncIndent();
             if (formatter.Start())
@@ -588,6 +587,7 @@ namespace System.Text.Parsing.CodeDom
                 caseExpr->Print(formatter);
                 formatter.Write(": ");
             }
+            formatter.WriteLine();
             formatter.WriteLine("{");
             formatter.IncIndent();
             for (const UniquePtr<Statement>& statement : statements)

@@ -1,4 +1,4 @@
-﻿using System.Text.Parsing.CodeDom;
+using System.Text.Parsing.CodeDom;
 
 namespace Code
 {
