@@ -30,7 +30,7 @@ namespace Code
             ;
 
         LabeledStatement(ParsingContext* ctx) : Statement*
-            ::= LabelId:lbl Statement(ctx):stmt{ stmt->SetLabel(lbl); value = stmt; }
+            ::= LabelId:lbl ':' Statement(ctx):stmt{ stmt->SetLabel(lbl); value = stmt; }
             ;
 
         ControlStatement(ParsingContext* ctx) : Statement*

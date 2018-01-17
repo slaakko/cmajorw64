@@ -1,11 +1,10 @@
+using System;
+using System.Collections;
+using System.Text.Parsing;
 using System.Text.Parsing.CodeDom;
 
 namespace Code
 {
-    using System;
-    using System.Collections;
-    using System.Text.Parsing;
-
     public class BasicTypeGrammar : System.Text.Parsing.Grammar
     {
         public BasicTypeGrammar() : this(new ParsingDomain())
@@ -112,77 +111,77 @@ namespace Code
             public void A0Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->value = new BoolType;
+                context->value = new BoolType();
             }
             public void A1Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->value = new SByteType;
+                context->value = new SByteType();
             }
             public void A2Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->value = new ByteType;
+                context->value = new ByteType();
             }
             public void A3Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->value = new ShortType;
+                context->value = new ShortType();
             }
             public void A4Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->value = new UShortType;
+                context->value = new UShortType();
             }
             public void A5Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->value = new IntType;
+                context->value = new IntType();
             }
             public void A6Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->value = new UIntType;
+                context->value = new UIntType();
             }
             public void A7Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->value = new LongType;
+                context->value = new LongType();
             }
             public void A8Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->value = new ULongType;
+                context->value = new ULongType();
             }
             public void A9Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->value = new FloatType;
+                context->value = new FloatType();
             }
             public void A10Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->value = new DoubleType;
+                context->value = new DoubleType();
             }
             public void A11Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->value = new CharType;
+                context->value = new CharType();
             }
             public void A12Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->value = new WCharType;
+                context->value = new WCharType();
             }
             public void A13Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->value = new UCharType;
+                context->value = new UCharType();
             }
             public void A14Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->value = new VoidType;
+                context->value = new VoidType();
             }
             public class Context : System.Text.Parsing.Context
             {
@@ -196,7 +195,6 @@ namespace Code
         public override void GetReferencedGrammars()
         {
         }
-
         public override void CreateRules()
         {
             AddRule(new BasicTypeRule(ToUtf32("BasicType"), GetScope(), Domain()->GetNextRuleId(),
@@ -246,5 +244,4 @@ namespace Code
                         new System.Text.Parsing.KeywordParser(ToUtf32("void"))))));
         }
     }
-
-} // namespace Code
+} // Code

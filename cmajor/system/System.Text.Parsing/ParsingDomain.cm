@@ -85,7 +85,10 @@ namespace System.Text.Parsing
                 newNs->GetScope()->SetNs(newNs);
                 namespaceMap[newNs->FullName()] = newNs;
                 currentNamespace = newNs;
-                globalScope->AddNamespace(newNs);
+                if (globalScope->GetNamespace(newNs->FullName()) == null)
+                {
+                    globalScope->AddNamespace(newNs);
+                }
             }
         }
         public void EndNamespace()
@@ -111,6 +114,10 @@ namespace System.Text.Parsing
         public inline nothrow Scope* CurrentScope() const
         {
             return currentNamespace->GetScope();
+        }
+        public void Import(ParsingDomain* pd, bool importExternals)
+        {
+            globalNamespace->Import(pd->GlobalNamespace(), this, importExternals);
         }
         private HashMap<ustring, Grammar*> grammarMap;
         private Namespace* globalNamespace;

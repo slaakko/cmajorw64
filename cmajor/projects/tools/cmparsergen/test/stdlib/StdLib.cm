@@ -1023,24 +1023,51 @@ namespace System.Text.Parsing
                 uchar c = *matchBegin;
                 switch (c)
                 {
-                    case u'a': context->value = u'\a';
-                    break;
-                    case u'b': context->value = u'\b';
-                    break;
-                    case u'f': context->value = u'\f';
-                    break;
-                    case u'n': context->value = u'\n';
-                    break;
-                    case u'r': context->value = u'\r';
-                    break;
-                    case u't': context->value = u'\t';
-                    break;
-                    case u'v': context->value = u'\v';
-                    break;
-                    case u'0': context->value = u'\0';
-                    break;
-                    default: context->value = c;
-                    break;
+                    case u'a': 
+                    {
+                        context->value = u'\a';
+                        break;
+                    }
+                    case u'b': 
+                    {
+                        context->value = u'\b';
+                        break;
+                    }
+                    case u'f': 
+                    {
+                        context->value = u'\f';
+                        break;
+                    }
+                    case u'n': 
+                    {
+                        context->value = u'\n';
+                        break;
+                    }
+                    case u'r': 
+                    {
+                        context->value = u'\r';
+                        break;
+                    }
+                    case u't': 
+                    {
+                        context->value = u'\t';
+                        break;
+                    }
+                    case u'v': 
+                    {
+                        context->value = u'\v';
+                        break;
+                    }
+                    case u'0': 
+                    {
+                        context->value = u'\0';
+                        break;
+                    }
+                    default:
+                    {
+                        context->value = c;
+                        break;
+                    }
                 }
             }
             public void Postx(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
@@ -1221,7 +1248,6 @@ namespace System.Text.Parsing
         public override void GetReferencedGrammars()
         {
         }
-
         public override void CreateRules()
         {
             AddRule(new System.Text.Parsing.RuleParser(ToUtf32("spaces"), GetScope(), Domain()->GetNextRuleId(),
@@ -1494,6 +1520,4 @@ namespace System.Text.Parsing
                             new System.Text.Parsing.CharParser('\"'))))));
         }
     }
-
-} // namespace System.Text.Parsing
-
+} // System.Text.Parsing

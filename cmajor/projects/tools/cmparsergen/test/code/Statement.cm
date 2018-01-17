@@ -3039,16 +3039,16 @@ namespace Code
                 grammar2 = new Code.ExpressionGrammar(pd);
             }
             AddGrammarReference(grammar2);
-            Grammar* grammar3 = pd->GetGrammar(ToUtf32("System.Text.Parsing.stdlib"));
+            Grammar* grammar3 = pd->GetGrammar(ToUtf32("Code.KeywordGrammar"));
             if (grammar3 == null)
             {
-                grammar3 = new System.Text.Parsing.stdlib(pd);
+                grammar3 = new Code.KeywordGrammar(pd);
             }
             AddGrammarReference(grammar3);
-            Grammar* grammar4 = pd->GetGrammar(ToUtf32("Code.KeywordGrammar"));
+            Grammar* grammar4 = pd->GetGrammar(ToUtf32("System.Text.Parsing.stdlib"));
             if (grammar4 == null)
             {
-                grammar4 = new Code.KeywordGrammar(pd);
+                grammar4 = new System.Text.Parsing.stdlib(pd);
             }
             AddGrammarReference(grammar4);
         }
@@ -3101,7 +3101,9 @@ namespace Code
                             new System.Text.Parsing.NonterminalParser(ToUtf32("Keyword"), ToUtf32("Keyword"), 0))))));
             AddRule(new LabeledStatementRule(ToUtf32("LabeledStatement"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.SequenceParser(
-                    new System.Text.Parsing.NonterminalParser(ToUtf32("lbl"), ToUtf32("LabelId"), 0),
+                    new System.Text.Parsing.SequenceParser(
+                        new System.Text.Parsing.NonterminalParser(ToUtf32("lbl"), ToUtf32("LabelId"), 0),
+                        new System.Text.Parsing.CharParser(':')),
                     new System.Text.Parsing.ActionParser(ToUtf32("A0"),
                         new System.Text.Parsing.NonterminalParser(ToUtf32("stmt"), ToUtf32("Statement"), 1)))));
             AddRule(new ControlStatementRule(ToUtf32("ControlStatement"), GetScope(), Domain()->GetNextRuleId(),

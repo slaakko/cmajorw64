@@ -1,7 +1,7 @@
-using System.Text.Parsing.CodeDom;
 using System;
 using System.Collections;
 using System.Text.Parsing;
+using System.Text.Parsing.CodeDom;
 
 namespace Syntax
 {
@@ -1819,7 +1819,7 @@ namespace Syntax
             public void A0Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->value = new System.Text.Parsing.EmptyParser;
+                context->value = new System.Text.Parsing.EmptyParser();
             }
             public class Context : System.Text.Parsing.Context
             {
@@ -1858,7 +1858,7 @@ namespace Syntax
             public void A0Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->value = new System.Text.Parsing.SpaceParser;
+                context->value = new System.Text.Parsing.SpaceParser();
             }
             public class Context : System.Text.Parsing.Context
             {
@@ -1897,7 +1897,7 @@ namespace Syntax
             public void A0Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->value = new System.Text.Parsing.AnyCharParser;
+                context->value = new System.Text.Parsing.AnyCharParser();
             }
             public class Context : System.Text.Parsing.Context
             {
@@ -1936,7 +1936,7 @@ namespace Syntax
             public void A0Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->value = new System.Text.Parsing.LetterParser;
+                context->value = new System.Text.Parsing.LetterParser();
             }
             public class Context : System.Text.Parsing.Context
             {
@@ -1975,7 +1975,7 @@ namespace Syntax
             public void A0Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->value = new System.Text.Parsing.DigitParser;
+                context->value = new System.Text.Parsing.DigitParser();
             }
             public class Context : System.Text.Parsing.Context
             {
@@ -2014,7 +2014,7 @@ namespace Syntax
             public void A0Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->value = new System.Text.Parsing.HexDigitParser;
+                context->value = new System.Text.Parsing.HexDigitParser();
             }
             public class Context : System.Text.Parsing.Context
             {
@@ -2053,7 +2053,7 @@ namespace Syntax
             public void A0Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->value = new System.Text.Parsing.UpperLetterParser;
+                context->value = new System.Text.Parsing.UpperLetterParser();
             }
             public class Context : System.Text.Parsing.Context
             {
@@ -2092,7 +2092,7 @@ namespace Syntax
             public void A0Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->value = new System.Text.Parsing.LowerLetterParser;
+                context->value = new System.Text.Parsing.LowerLetterParser();
             }
             public class Context : System.Text.Parsing.Context
             {
@@ -2131,7 +2131,7 @@ namespace Syntax
             public void A0Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->value = new System.Text.Parsing.TitleLetterParser;
+                context->value = new System.Text.Parsing.TitleLetterParser();
             }
             public class Context : System.Text.Parsing.Context
             {
@@ -2170,7 +2170,7 @@ namespace Syntax
             public void A0Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->value = new System.Text.Parsing.ModifierLetterParser;
+                context->value = new System.Text.Parsing.ModifierLetterParser();
             }
             public class Context : System.Text.Parsing.Context
             {
@@ -2209,7 +2209,7 @@ namespace Syntax
             public void A0Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->value = new System.Text.Parsing.OtherLetterParser;
+                context->value = new System.Text.Parsing.OtherLetterParser();
             }
             public class Context : System.Text.Parsing.Context
             {
@@ -2248,7 +2248,7 @@ namespace Syntax
             public void A0Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->value = new System.Text.Parsing.CasedLetterParser;
+                context->value = new System.Text.Parsing.CasedLetterParser();
             }
             public class Context : System.Text.Parsing.Context
             {
@@ -2287,7 +2287,7 @@ namespace Syntax
             public void A0Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->value = new System.Text.Parsing.MarkParser;
+                context->value = new System.Text.Parsing.MarkParser();
             }
             public class Context : System.Text.Parsing.Context
             {
@@ -2326,7 +2326,7 @@ namespace Syntax
             public void A0Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->value = new System.Text.Parsing.NonspacingMarkParser;
+                context->value = new System.Text.Parsing.NonspacingMarkParser();
             }
             public class Context : System.Text.Parsing.Context
             {
@@ -2365,7 +2365,7 @@ namespace Syntax
             public void A0Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->value = new System.Text.Parsing.SpacingMarkParser;
+                context->value = new System.Text.Parsing.SpacingMarkParser();
             }
             public class Context : System.Text.Parsing.Context
             {
@@ -2404,7 +2404,7 @@ namespace Syntax
             public void A0Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->value = new System.Text.Parsing.EnclosingMarkParser;
+                context->value = new System.Text.Parsing.EnclosingMarkParser();
             }
             public class Context : System.Text.Parsing.Context
             {
@@ -2443,7 +2443,7 @@ namespace Syntax
             public void A0Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->value = new System.Text.Parsing.NumberParser;
+                context->value = new System.Text.Parsing.NumberParser();
             }
             public class Context : System.Text.Parsing.Context
             {
@@ -2482,7 +2482,7 @@ namespace Syntax
             public void A0Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->value = new System.Text.Parsing.DecimalNumberParser;
+                context->value = new System.Text.Parsing.DecimalNumberParser();
             }
             public class Context : System.Text.Parsing.Context
             {
@@ -2521,7 +2521,7 @@ namespace Syntax
             public void A0Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->value = new System.Text.Parsing.LetterNumberParser;
+                context->value = new System.Text.Parsing.LetterNumberParser();
             }
             public class Context : System.Text.Parsing.Context
             {
@@ -2560,7 +2560,7 @@ namespace Syntax
             public void A0Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->value = new System.Text.Parsing.OtherNumberParser;
+                context->value = new System.Text.Parsing.OtherNumberParser();
             }
             public class Context : System.Text.Parsing.Context
             {
@@ -2599,7 +2599,7 @@ namespace Syntax
             public void A0Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->value = new System.Text.Parsing.PunctuationParser;
+                context->value = new System.Text.Parsing.PunctuationParser();
             }
             public class Context : System.Text.Parsing.Context
             {
@@ -2638,7 +2638,7 @@ namespace Syntax
             public void A0Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->value = new System.Text.Parsing.ConnectorPunctuationParser;
+                context->value = new System.Text.Parsing.ConnectorPunctuationParser();
             }
             public class Context : System.Text.Parsing.Context
             {
@@ -2677,7 +2677,7 @@ namespace Syntax
             public void A0Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->value = new System.Text.Parsing.DashPunctuationParser;
+                context->value = new System.Text.Parsing.DashPunctuationParser();
             }
             public class Context : System.Text.Parsing.Context
             {
@@ -2716,7 +2716,7 @@ namespace Syntax
             public void A0Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->value = new System.Text.Parsing.OpenPunctuationParser;
+                context->value = new System.Text.Parsing.OpenPunctuationParser();
             }
             public class Context : System.Text.Parsing.Context
             {
@@ -2755,7 +2755,7 @@ namespace Syntax
             public void A0Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->value = new System.Text.Parsing.ClosePunctuationParser;
+                context->value = new System.Text.Parsing.ClosePunctuationParser();
             }
             public class Context : System.Text.Parsing.Context
             {
@@ -2794,7 +2794,7 @@ namespace Syntax
             public void A0Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->value = new System.Text.Parsing.InitialPunctuationParser;
+                context->value = new System.Text.Parsing.InitialPunctuationParser();
             }
             public class Context : System.Text.Parsing.Context
             {
@@ -2833,7 +2833,7 @@ namespace Syntax
             public void A0Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->value = new System.Text.Parsing.FinalPunctuationParser;
+                context->value = new System.Text.Parsing.FinalPunctuationParser();
             }
             public class Context : System.Text.Parsing.Context
             {
@@ -2872,7 +2872,7 @@ namespace Syntax
             public void A0Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->value = new System.Text.Parsing.OtherPunctuationParser;
+                context->value = new System.Text.Parsing.OtherPunctuationParser();
             }
             public class Context : System.Text.Parsing.Context
             {
@@ -2911,7 +2911,7 @@ namespace Syntax
             public void A0Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->value = new System.Text.Parsing.SymbolParser;
+                context->value = new System.Text.Parsing.SymbolParser();
             }
             public class Context : System.Text.Parsing.Context
             {
@@ -2950,7 +2950,7 @@ namespace Syntax
             public void A0Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->value = new System.Text.Parsing.MathSymbolParser;
+                context->value = new System.Text.Parsing.MathSymbolParser();
             }
             public class Context : System.Text.Parsing.Context
             {
@@ -2989,7 +2989,7 @@ namespace Syntax
             public void A0Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->value = new System.Text.Parsing.CurrencySymbolParser;
+                context->value = new System.Text.Parsing.CurrencySymbolParser();
             }
             public class Context : System.Text.Parsing.Context
             {
@@ -3028,7 +3028,7 @@ namespace Syntax
             public void A0Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->value = new System.Text.Parsing.ModifierSymbolParser;
+                context->value = new System.Text.Parsing.ModifierSymbolParser();
             }
             public class Context : System.Text.Parsing.Context
             {
@@ -3067,7 +3067,7 @@ namespace Syntax
             public void A0Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->value = new System.Text.Parsing.OtherSymbolParser;
+                context->value = new System.Text.Parsing.OtherSymbolParser();
             }
             public class Context : System.Text.Parsing.Context
             {
@@ -3106,7 +3106,7 @@ namespace Syntax
             public void A0Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->value = new System.Text.Parsing.SeparatorParser;
+                context->value = new System.Text.Parsing.SeparatorParser();
             }
             public class Context : System.Text.Parsing.Context
             {
@@ -3145,7 +3145,7 @@ namespace Syntax
             public void A0Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->value = new System.Text.Parsing.SpaceSeparatorParser;
+                context->value = new System.Text.Parsing.SpaceSeparatorParser();
             }
             public class Context : System.Text.Parsing.Context
             {
@@ -3184,7 +3184,7 @@ namespace Syntax
             public void A0Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->value = new System.Text.Parsing.LineSeparatorParser;
+                context->value = new System.Text.Parsing.LineSeparatorParser();
             }
             public class Context : System.Text.Parsing.Context
             {
@@ -3223,7 +3223,7 @@ namespace Syntax
             public void A0Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->value = new System.Text.Parsing.ParagraphSeparatorParser;
+                context->value = new System.Text.Parsing.ParagraphSeparatorParser();
             }
             public class Context : System.Text.Parsing.Context
             {
@@ -3262,7 +3262,7 @@ namespace Syntax
             public void A0Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->value = new System.Text.Parsing.OtherParser;
+                context->value = new System.Text.Parsing.OtherParser();
             }
             public class Context : System.Text.Parsing.Context
             {
@@ -3301,7 +3301,7 @@ namespace Syntax
             public void A0Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->value = new System.Text.Parsing.ControlParser;
+                context->value = new System.Text.Parsing.ControlParser();
             }
             public class Context : System.Text.Parsing.Context
             {
@@ -3340,7 +3340,7 @@ namespace Syntax
             public void A0Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->value = new System.Text.Parsing.FormatParser;
+                context->value = new System.Text.Parsing.FormatParser();
             }
             public class Context : System.Text.Parsing.Context
             {
@@ -3379,7 +3379,7 @@ namespace Syntax
             public void A0Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->value = new System.Text.Parsing.SurrogateParser;
+                context->value = new System.Text.Parsing.SurrogateParser();
             }
             public class Context : System.Text.Parsing.Context
             {
@@ -3418,7 +3418,7 @@ namespace Syntax
             public void A0Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->value = new System.Text.Parsing.PrivateUseParser;
+                context->value = new System.Text.Parsing.PrivateUseParser();
             }
             public class Context : System.Text.Parsing.Context
             {
@@ -3457,7 +3457,7 @@ namespace Syntax
             public void A0Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->value = new System.Text.Parsing.UnassignedParser;
+                context->value = new System.Text.Parsing.UnassignedParser();
             }
             public class Context : System.Text.Parsing.Context
             {
@@ -3496,7 +3496,7 @@ namespace Syntax
             public void A0Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->value = new System.Text.Parsing.GraphicParser;
+                context->value = new System.Text.Parsing.GraphicParser();
             }
             public class Context : System.Text.Parsing.Context
             {
@@ -3535,7 +3535,7 @@ namespace Syntax
             public void A0Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->value = new System.Text.Parsing.BaseCharParser;
+                context->value = new System.Text.Parsing.BaseCharParser();
             }
             public class Context : System.Text.Parsing.Context
             {
@@ -3574,7 +3574,7 @@ namespace Syntax
             public void A0Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->value = new System.Text.Parsing.AlphabeticParser;
+                context->value = new System.Text.Parsing.AlphabeticParser();
             }
             public class Context : System.Text.Parsing.Context
             {
@@ -3613,7 +3613,7 @@ namespace Syntax
             public void A0Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->value = new System.Text.Parsing.IdStartParser;
+                context->value = new System.Text.Parsing.IdStartParser();
             }
             public class Context : System.Text.Parsing.Context
             {
@@ -3652,7 +3652,7 @@ namespace Syntax
             public void A0Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->value = new System.Text.Parsing.IdContParser;
+                context->value = new System.Text.Parsing.IdContParser();
             }
             public class Context : System.Text.Parsing.Context
             {
@@ -3666,10 +3666,10 @@ namespace Syntax
         public override void GetReferencedGrammars()
         {
             ParsingDomain* pd = Domain();
-            Grammar* grammar0 = pd->GetGrammar(ToUtf32("System.Text.Parsing.stdlib"));
+            Grammar* grammar0 = pd->GetGrammar(ToUtf32("Code.IdentifierGrammar"));
             if (grammar0 == null)
             {
-                grammar0 = new System.Text.Parsing.stdlib(pd);
+                grammar0 = new Code.IdentifierGrammar(pd);
             }
             AddGrammarReference(grammar0);
             Grammar* grammar1 = pd->GetGrammar(ToUtf32("Syntax.ElementGrammar"));
@@ -3678,14 +3678,13 @@ namespace Syntax
                 grammar1 = new Syntax.ElementGrammar(pd);
             }
             AddGrammarReference(grammar1);
-            Grammar* grammar2 = pd->GetGrammar(ToUtf32("Code.IdentifierGrammar"));
+            Grammar* grammar2 = pd->GetGrammar(ToUtf32("System.Text.Parsing.stdlib"));
             if (grammar2 == null)
             {
-                grammar2 = new Code.IdentifierGrammar(pd);
+                grammar2 = new System.Text.Parsing.stdlib(pd);
             }
             AddGrammarReference(grammar2);
         }
-
         public override void CreateRules()
         {
             AddRuleLink(new System.Text.Parsing.RuleLink(ToUtf32("char"), this, ToUtf32("System.Text.Parsing.stdlib.char")));
@@ -4112,6 +4111,4 @@ namespace Syntax
                     new System.Text.Parsing.KeywordParser(ToUtf32("idcont")))));
         }
     }
-
-} // namespace Syntax
-
+} // Syntax

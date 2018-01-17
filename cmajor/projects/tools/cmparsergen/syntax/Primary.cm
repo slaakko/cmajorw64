@@ -1,8 +1,8 @@
-using System.Text.Parsing.CodeDom;
-using ParsingContext = Code.ParsingContext;
 using System;
 using System.Collections;
 using System.Text.Parsing;
+using System.Text.Parsing.CodeDom;
+using ParsingContext = Code.ParsingContext;
 
 namespace Syntax
 {
@@ -293,7 +293,7 @@ namespace Syntax
                 {
                     name = alias;
                 }
-                System.Text.Parsing.NonterminalParser * parser = new System.Text.Parsing.NonterminalParser(name, ruleName);
+                System.Text.Parsing.NonterminalParser* parser = new System.Text.Parsing.NonterminalParser(name, ruleName);
                 parser->SetSpan(span);
                 parser->SetArguments(context->argumentCollector.Arguments());
                 context->value = parser;
@@ -700,43 +700,42 @@ namespace Syntax
         public override void GetReferencedGrammars()
         {
             ParsingDomain* pd = Domain();
-            Grammar* grammar0 = pd->GetGrammar(ToUtf32("Code.ExpressionGrammar"));
+            Grammar* grammar0 = pd->GetGrammar(ToUtf32("Syntax.CompositeGrammar"));
             if (grammar0 == null)
             {
-                grammar0 = new Code.ExpressionGrammar(pd);
+                grammar0 = new Syntax.CompositeGrammar(pd);
             }
             AddGrammarReference(grammar0);
-            Grammar* grammar1 = pd->GetGrammar(ToUtf32("Code.StatementGrammar"));
+            Grammar* grammar1 = pd->GetGrammar(ToUtf32("Syntax.PrimitiveGrammar"));
             if (grammar1 == null)
             {
-                grammar1 = new Code.StatementGrammar(pd);
+                grammar1 = new Syntax.PrimitiveGrammar(pd);
             }
             AddGrammarReference(grammar1);
-            Grammar* grammar2 = pd->GetGrammar(ToUtf32("Syntax.PrimitiveGrammar"));
+            Grammar* grammar2 = pd->GetGrammar(ToUtf32("Code.StatementGrammar"));
             if (grammar2 == null)
             {
-                grammar2 = new Syntax.PrimitiveGrammar(pd);
+                grammar2 = new Code.StatementGrammar(pd);
             }
             AddGrammarReference(grammar2);
-            Grammar* grammar3 = pd->GetGrammar(ToUtf32("Syntax.CompositeGrammar"));
+            Grammar* grammar3 = pd->GetGrammar(ToUtf32("Syntax.ElementGrammar"));
             if (grammar3 == null)
             {
-                grammar3 = new Syntax.CompositeGrammar(pd);
+                grammar3 = new Syntax.ElementGrammar(pd);
             }
             AddGrammarReference(grammar3);
-            Grammar* grammar4 = pd->GetGrammar(ToUtf32("Syntax.ElementGrammar"));
+            Grammar* grammar4 = pd->GetGrammar(ToUtf32("Code.ExpressionGrammar"));
             if (grammar4 == null)
             {
-                grammar4 = new Syntax.ElementGrammar(pd);
+                grammar4 = new Code.ExpressionGrammar(pd);
             }
             AddGrammarReference(grammar4);
         }
-
         public override void CreateRules()
         {
-            AddRuleLink(new System.Text.Parsing.RuleLink(ToUtf32("ArgumentList"), this, ToUtf32("Code.ExpressionGrammar.ArgumentList")));
             AddRuleLink(new System.Text.Parsing.RuleLink(ToUtf32("Alternative"), this, ToUtf32("CompositeGrammar.Alternative")));
             AddRuleLink(new System.Text.Parsing.RuleLink(ToUtf32("Primitive"), this, ToUtf32("PrimitiveGrammar.Primitive")));
+            AddRuleLink(new System.Text.Parsing.RuleLink(ToUtf32("ArgumentList"), this, ToUtf32("Code.ExpressionGrammar.ArgumentList")));
             AddRuleLink(new System.Text.Parsing.RuleLink(ToUtf32("Identifier"), this, ToUtf32("ElementGrammar.Identifier")));
             AddRuleLink(new System.Text.Parsing.RuleLink(ToUtf32("CompoundStatement"), this, ToUtf32("Code.StatementGrammar.CompoundStatement")));
             AddRule(new PrimaryRule(ToUtf32("Primary"), GetScope(), Domain()->GetNextRuleId(),
@@ -816,6 +815,4 @@ namespace Syntax
                                 new System.Text.Parsing.NonterminalParser(ToUtf32("failureCode"), ToUtf32("CompoundStatement"), 1)))))));
         }
     }
-
-} // namespace Syntax
-
+} // Syntax

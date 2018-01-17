@@ -413,16 +413,16 @@ namespace Code
                 grammar0 = new Code.TypeExprGrammar(pd);
             }
             AddGrammarReference(grammar0);
-            Grammar* grammar1 = pd->GetGrammar(ToUtf32("System.Text.Parsing.stdlib"));
+            Grammar* grammar1 = pd->GetGrammar(ToUtf32("Code.KeywordGrammar"));
             if (grammar1 == null)
             {
-                grammar1 = new System.Text.Parsing.stdlib(pd);
+                grammar1 = new Code.KeywordGrammar(pd);
             }
             AddGrammarReference(grammar1);
-            Grammar* grammar2 = pd->GetGrammar(ToUtf32("Code.KeywordGrammar"));
+            Grammar* grammar2 = pd->GetGrammar(ToUtf32("System.Text.Parsing.stdlib"));
             if (grammar2 == null)
             {
-                grammar2 = new Code.KeywordGrammar(pd);
+                grammar2 = new System.Text.Parsing.stdlib(pd);
             }
             AddGrammarReference(grammar2);
         }

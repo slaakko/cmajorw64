@@ -1,8 +1,8 @@
-using System.Text.Parsing.CodeDom;
-using ParsingContext = Code.ParsingContext;
 using System;
 using System.Collections;
 using System.Text.Parsing;
+using System.Text.Parsing.CodeDom;
+using ParsingContext = Code.ParsingContext;
 
 namespace Syntax
 {
@@ -14,64 +14,64 @@ namespace Syntax
         public ElementGrammar(ParsingDomain* parsingDomain) : base(ToUtf32("ElementGrammar"), parsingDomain->GetNamespaceScope(ToUtf32("Syntax")), parsingDomain)
         {
             SetOwner(0);
-            keywords0.Add(ToUtf32("alphabetic"));
-            keywords0.Add(ToUtf32("anychar"));
-            keywords0.Add(ToUtf32("basechar"));
-            keywords0.Add(ToUtf32("cased_letter"));
-            keywords0.Add(ToUtf32("close_punctuation"));
-            keywords0.Add(ToUtf32("connector_punctuation"));
-            keywords0.Add(ToUtf32("control"));
-            keywords0.Add(ToUtf32("currency_symbol"));
-            keywords0.Add(ToUtf32("dash_punctuation"));
-            keywords0.Add(ToUtf32("decimal_number"));
-            keywords0.Add(ToUtf32("digit"));
-            keywords0.Add(ToUtf32("empty"));
-            keywords0.Add(ToUtf32("enclosing_mark"));
-            keywords0.Add(ToUtf32("end"));
-            keywords0.Add(ToUtf32("final_punctuation"));
-            keywords0.Add(ToUtf32("format"));
-            keywords0.Add(ToUtf32("grammar"));
-            keywords0.Add(ToUtf32("graphic"));
+            keywords0.Add(ToUtf32("line_separator"));
+            keywords0.Add(ToUtf32("other_number"));
             keywords0.Add(ToUtf32("hexdigit"));
             keywords0.Add(ToUtf32("idcont"));
-            keywords0.Add(ToUtf32("idstart"));
-            keywords0.Add(ToUtf32("initial_punctuation"));
-            keywords0.Add(ToUtf32("keyword"));
-            keywords0.Add(ToUtf32("keyword_list"));
-            keywords0.Add(ToUtf32("letter"));
-            keywords0.Add(ToUtf32("letter_number"));
-            keywords0.Add(ToUtf32("line_separator"));
-            keywords0.Add(ToUtf32("lower_letter"));
-            keywords0.Add(ToUtf32("mark"));
+            keywords0.Add(ToUtf32("token"));
+            keywords0.Add(ToUtf32("cased_letter"));
             keywords0.Add(ToUtf32("math_symbol"));
-            keywords0.Add(ToUtf32("modifier_letter"));
-            keywords0.Add(ToUtf32("modifier_symbol"));
-            keywords0.Add(ToUtf32("nonspacing_mark"));
-            keywords0.Add(ToUtf32("number"));
-            keywords0.Add(ToUtf32("open_punctuation"));
-            keywords0.Add(ToUtf32("other"));
-            keywords0.Add(ToUtf32("other_letter"));
-            keywords0.Add(ToUtf32("other_number"));
-            keywords0.Add(ToUtf32("other_punctuation"));
-            keywords0.Add(ToUtf32("other_symbol"));
-            keywords0.Add(ToUtf32("paragraph_separator"));
-            keywords0.Add(ToUtf32("private_use"));
-            keywords0.Add(ToUtf32("punctuation"));
-            keywords0.Add(ToUtf32("range"));
+            keywords0.Add(ToUtf32("using"));
+            keywords0.Add(ToUtf32("letter"));
+            keywords0.Add(ToUtf32("control"));
+            keywords0.Add(ToUtf32("empty"));
+            keywords0.Add(ToUtf32("end"));
+            keywords0.Add(ToUtf32("title_letter"));
+            keywords0.Add(ToUtf32("spacing_mark"));
+            keywords0.Add(ToUtf32("dash_punctuation"));
             keywords0.Add(ToUtf32("separator"));
+            keywords0.Add(ToUtf32("punctuation"));
+            keywords0.Add(ToUtf32("other_letter"));
+            keywords0.Add(ToUtf32("final_punctuation"));
+            keywords0.Add(ToUtf32("number"));
             keywords0.Add(ToUtf32("skip"));
+            keywords0.Add(ToUtf32("range"));
+            keywords0.Add(ToUtf32("mark"));
+            keywords0.Add(ToUtf32("connector_punctuation"));
+            keywords0.Add(ToUtf32("alphabetic"));
+            keywords0.Add(ToUtf32("keyword_list"));
+            keywords0.Add(ToUtf32("basechar"));
+            keywords0.Add(ToUtf32("other_symbol"));
+            keywords0.Add(ToUtf32("surrogate"));
+            keywords0.Add(ToUtf32("letter_number"));
+            keywords0.Add(ToUtf32("start"));
+            keywords0.Add(ToUtf32("modifier_letter"));
+            keywords0.Add(ToUtf32("graphic"));
+            keywords0.Add(ToUtf32("anychar"));
+            keywords0.Add(ToUtf32("keyword"));
+            keywords0.Add(ToUtf32("nonspacing_mark"));
+            keywords0.Add(ToUtf32("upper_letter"));
+            keywords0.Add(ToUtf32("lower_letter"));
+            keywords0.Add(ToUtf32("modifier_symbol"));
+            keywords0.Add(ToUtf32("unassigned"));
+            keywords0.Add(ToUtf32("other"));
+            keywords0.Add(ToUtf32("digit"));
+            keywords0.Add(ToUtf32("private_use"));
+            keywords0.Add(ToUtf32("currency_symbol"));
+            keywords0.Add(ToUtf32("var"));
+            keywords0.Add(ToUtf32("paragraph_separator"));
             keywords0.Add(ToUtf32("space"));
             keywords0.Add(ToUtf32("space_separator"));
-            keywords0.Add(ToUtf32("spacing_mark"));
-            keywords0.Add(ToUtf32("start"));
-            keywords0.Add(ToUtf32("surrogate"));
+            keywords0.Add(ToUtf32("initial_punctuation"));
             keywords0.Add(ToUtf32("symbol"));
-            keywords0.Add(ToUtf32("title_letter"));
-            keywords0.Add(ToUtf32("token"));
-            keywords0.Add(ToUtf32("unassigned"));
-            keywords0.Add(ToUtf32("upper_letter"));
-            keywords0.Add(ToUtf32("using"));
-            keywords0.Add(ToUtf32("var"));
+            keywords0.Add(ToUtf32("idstart"));
+            keywords0.Add(ToUtf32("enclosing_mark"));
+            keywords0.Add(ToUtf32("close_punctuation"));
+            keywords0.Add(ToUtf32("grammar"));
+            keywords0.Add(ToUtf32("format"));
+            keywords0.Add(ToUtf32("open_punctuation"));
+            keywords0.Add(ToUtf32("decimal_number"));
+            keywords0.Add(ToUtf32("other_punctuation"));
             RegisterParsingDomain(parsingDomain);
             parsingDomain->AddGrammar(this);
             CreateRules();
@@ -145,14 +145,14 @@ namespace Syntax
             public void A0Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                System.Text.Parsing.RuleLink * ruleLink = new System.Text.Parsing.RuleLink(context->fromalias, context->grammar, context->fromrule);
+                System.Text.Parsing.RuleLink* ruleLink = new System.Text.Parsing.RuleLink(context->fromalias, context->grammar, context->fromrule);
                 ruleLink->SetSpan(span);
                 context->grammar->AddRuleLink(ruleLink);
             }
             public void A1Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                System.Text.Parsing.RuleLink * ruleLink = new System.Text.Parsing.RuleLink(context->grammar, context->fromqrule);
+                System.Text.Parsing.RuleLink* ruleLink = new System.Text.Parsing.RuleLink(context->grammar, context->fromqrule);
                 ruleLink->SetSpan(span);
                 context->grammar->AddRuleLink(ruleLink);
             }
@@ -695,16 +695,16 @@ namespace Syntax
         public override void GetReferencedGrammars()
         {
             ParsingDomain* pd = Domain();
-            Grammar* grammar0 = pd->GetGrammar(ToUtf32("System.Text.Parsing.stdlib"));
+            Grammar* grammar0 = pd->GetGrammar(ToUtf32("Code.IdentifierGrammar"));
             if (grammar0 == null)
             {
-                grammar0 = new System.Text.Parsing.stdlib(pd);
+                grammar0 = new Code.IdentifierGrammar(pd);
             }
             AddGrammarReference(grammar0);
-            Grammar* grammar1 = pd->GetGrammar(ToUtf32("Code.IdentifierGrammar"));
+            Grammar* grammar1 = pd->GetGrammar(ToUtf32("System.Text.Parsing.stdlib"));
             if (grammar1 == null)
             {
-                grammar1 = new Code.IdentifierGrammar(pd);
+                grammar1 = new System.Text.Parsing.stdlib(pd);
             }
             AddGrammarReference(grammar1);
             Grammar* grammar2 = pd->GetGrammar(ToUtf32("Code.TypeExprGrammar"));
@@ -714,14 +714,13 @@ namespace Syntax
             }
             AddGrammarReference(grammar2);
         }
-
         public override void CreateRules()
         {
             AddRuleLink(new System.Text.Parsing.RuleLink(ToUtf32("identifier"), this, ToUtf32("System.Text.Parsing.stdlib.identifier")));
-            AddRuleLink(new System.Text.Parsing.RuleLink(ToUtf32("Id"), this, ToUtf32("Code.IdentifierGrammar.Identifier")));
-            AddRuleLink(new System.Text.Parsing.RuleLink(ToUtf32("string"), this, ToUtf32("System.Text.Parsing.stdlib.string")));
             AddRuleLink(new System.Text.Parsing.RuleLink(ToUtf32("qualified_id"), this, ToUtf32("System.Text.Parsing.stdlib.qualified_id")));
+            AddRuleLink(new System.Text.Parsing.RuleLink(ToUtf32("string"), this, ToUtf32("System.Text.Parsing.stdlib.string")));
             AddRuleLink(new System.Text.Parsing.RuleLink(ToUtf32("Type"), this, ToUtf32("Code.TypeExprGrammar.TypeExpr")));
+            AddRuleLink(new System.Text.Parsing.RuleLink(ToUtf32("Id"), this, ToUtf32("Code.IdentifierGrammar.Identifier")));
             AddRule(new RuleLinkRule(ToUtf32("RuleLink"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.AlternativeParser(
                     new System.Text.Parsing.ActionParser(ToUtf32("A0"),
@@ -808,6 +807,4 @@ namespace Syntax
         }
         private List<ustring> keywords0;
     }
-
-} // namespace Syntax
-
+} // Syntax

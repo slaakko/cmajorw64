@@ -126,6 +126,10 @@ namespace System.Text.Parsing
             }
             return null;
         }
+        public HashMap<ustring, ParsingObject*>& FullNameMap() 
+        {
+            return fullNameMap;
+        }
         public void Dump(CodeFormatter& formatter)
         {
             formatter.WriteLine("Scope '" + ToUtf8(FullName()) + "'");

@@ -1,11 +1,10 @@
+using System;
+using System.Collections;
+using System.Text.Parsing;
 using System.Text.Parsing.CodeDom;
 
 namespace Code
 {
-    using System;
-    using System.Collections;
-    using System.Text.Parsing;
-
     public class StatementGrammar : System.Text.Parsing.Grammar
     {
         public StatementGrammar() : this(new ParsingDomain())
@@ -890,7 +889,7 @@ namespace Code
             public void A0Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->value = new CompoundStatement;
+                context->value = new CompoundStatement();
             }
             public void A1Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
@@ -1515,7 +1514,7 @@ namespace Code
             public void A2Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->value = new EmptyStatement;
+                context->value = new EmptyStatement();
             }
             public void PreAssignmentStatementExpr(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
             {
@@ -1697,7 +1696,7 @@ namespace Code
             public void A0Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->value = new BreakStatement;
+                context->value = new BreakStatement();
             }
             public class Context : System.Text.Parsing.Context
             {
@@ -1740,7 +1739,7 @@ namespace Code
             public void A0Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->value = new ContinueStatement;
+                context->value = new ContinueStatement();
             }
             public class Context : System.Text.Parsing.Context
             {
@@ -1970,7 +1969,7 @@ namespace Code
             public void A1Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->caseS.Reset(new CaseStatement);
+                context->caseS.Reset(new CaseStatement());
             }
             public void A2Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
@@ -2059,7 +2058,7 @@ namespace Code
             public void A0Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->value = new DefaultStatement;
+                context->value = new DefaultStatement();
             }
             public void A1Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
@@ -2183,7 +2182,7 @@ namespace Code
             public void A0Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->value = new GotoDefaultStatement;
+                context->value = new GotoDefaultStatement();
             }
             public class Context : System.Text.Parsing.Context
             {
@@ -2708,7 +2707,7 @@ namespace Code
             public void A0Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->value = new EmptyStatement;
+                context->value = new EmptyStatement();
             }
             public class Context : System.Text.Parsing.Context
             {
@@ -3022,10 +3021,10 @@ namespace Code
         public override void GetReferencedGrammars()
         {
             ParsingDomain* pd = Domain();
-            Grammar* grammar0 = pd->GetGrammar(ToUtf32("Code.ExpressionGrammar"));
+            Grammar* grammar0 = pd->GetGrammar(ToUtf32("Code.KeywordGrammar"));
             if (grammar0 == null)
             {
-                grammar0 = new Code.ExpressionGrammar(pd);
+                grammar0 = new Code.KeywordGrammar(pd);
             }
             AddGrammarReference(grammar0);
             Grammar* grammar1 = pd->GetGrammar(ToUtf32("System.Text.Parsing.stdlib"));
@@ -3034,32 +3033,31 @@ namespace Code
                 grammar1 = new System.Text.Parsing.stdlib(pd);
             }
             AddGrammarReference(grammar1);
-            Grammar* grammar2 = pd->GetGrammar(ToUtf32("Code.KeywordGrammar"));
+            Grammar* grammar2 = pd->GetGrammar(ToUtf32("Code.ExpressionGrammar"));
             if (grammar2 == null)
             {
-                grammar2 = new Code.KeywordGrammar(pd);
+                grammar2 = new Code.ExpressionGrammar(pd);
             }
             AddGrammarReference(grammar2);
-            Grammar* grammar3 = pd->GetGrammar(ToUtf32("Code.IdentifierGrammar"));
+            Grammar* grammar3 = pd->GetGrammar(ToUtf32("Code.TypeExprGrammar"));
             if (grammar3 == null)
             {
-                grammar3 = new Code.IdentifierGrammar(pd);
+                grammar3 = new Code.TypeExprGrammar(pd);
             }
             AddGrammarReference(grammar3);
-            Grammar* grammar4 = pd->GetGrammar(ToUtf32("Code.TypeExprGrammar"));
+            Grammar* grammar4 = pd->GetGrammar(ToUtf32("Code.IdentifierGrammar"));
             if (grammar4 == null)
             {
-                grammar4 = new Code.TypeExprGrammar(pd);
+                grammar4 = new Code.IdentifierGrammar(pd);
             }
             AddGrammarReference(grammar4);
         }
-
         public override void CreateRules()
         {
-            AddRuleLink(new System.Text.Parsing.RuleLink(ToUtf32("ArgumentList"), this, ToUtf32("ExpressionGrammar.ArgumentList")));
             AddRuleLink(new System.Text.Parsing.RuleLink(ToUtf32("identifier"), this, ToUtf32("System.Text.Parsing.stdlib.identifier")));
             AddRuleLink(new System.Text.Parsing.RuleLink(ToUtf32("Keyword"), this, ToUtf32("KeywordGrammar.Keyword")));
             AddRuleLink(new System.Text.Parsing.RuleLink(ToUtf32("Expression"), this, ToUtf32("ExpressionGrammar.Expression")));
+            AddRuleLink(new System.Text.Parsing.RuleLink(ToUtf32("ArgumentList"), this, ToUtf32("ExpressionGrammar.ArgumentList")));
             AddRuleLink(new System.Text.Parsing.RuleLink(ToUtf32("TypeExpr"), this, ToUtf32("TypeExprGrammar.TypeExpr")));
             AddRuleLink(new System.Text.Parsing.RuleLink(ToUtf32("Identifier"), this, ToUtf32("IdentifierGrammar.Identifier")));
             AddRule(new StatementRule(ToUtf32("Statement"), GetScope(), Domain()->GetNextRuleId(),
@@ -3103,7 +3101,9 @@ namespace Code
                             new System.Text.Parsing.NonterminalParser(ToUtf32("Keyword"), ToUtf32("Keyword"), 0))))));
             AddRule(new LabeledStatementRule(ToUtf32("LabeledStatement"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.SequenceParser(
-                    new System.Text.Parsing.NonterminalParser(ToUtf32("lbl"), ToUtf32("LabelId"), 0),
+                    new System.Text.Parsing.SequenceParser(
+                        new System.Text.Parsing.NonterminalParser(ToUtf32("lbl"), ToUtf32("LabelId"), 0),
+                        new System.Text.Parsing.CharParser(':')),
                     new System.Text.Parsing.ActionParser(ToUtf32("A0"),
                         new System.Text.Parsing.NonterminalParser(ToUtf32("stmt"), ToUtf32("Statement"), 1)))));
             AddRule(new ControlStatementRule(ToUtf32("ControlStatement"), GetScope(), Domain()->GetNextRuleId(),
@@ -3487,5 +3487,4 @@ namespace Code
                             new System.Text.Parsing.CharParser(';'))))));
         }
     }
-
-} // namespace Code
+} // Code

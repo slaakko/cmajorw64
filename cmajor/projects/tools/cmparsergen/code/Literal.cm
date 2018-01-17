@@ -1,11 +1,10 @@
+using System;
+using System.Collections;
+using System.Text.Parsing;
 using System.Text.Parsing.CodeDom;
 
 namespace Code
 {
-    using System;
-    using System.Collections;
-    using System.Text.Parsing;
-
     public class LiteralGrammar : System.Text.Parsing.Grammar
     {
         public LiteralGrammar() : this(new ParsingDomain())
@@ -502,7 +501,6 @@ namespace Code
             }
             AddGrammarReference(grammar0);
         }
-
         public override void CreateRules()
         {
             AddRuleLink(new System.Text.Parsing.RuleLink(ToUtf32("digit_sequence"), this, ToUtf32("System.Text.Parsing.stdlib.digit_sequence")));
@@ -604,7 +602,7 @@ namespace Code
                                         new System.Text.Parsing.CharParser('\''),
                                         new System.Text.Parsing.AlternativeParser(
                                             new System.Text.Parsing.PositiveParser(
-                                                new System.Text.Parsing.CharSetParser(ToUtf32("\'\\\r\n"), true)),
+                                                new System.Text.Parsing.CharSetParser(ToUtf32("'\\\r\n"), true)),
                                             new System.Text.Parsing.NonterminalParser(ToUtf32("CharEscape"), ToUtf32("CharEscape"), 0))),
                                     new System.Text.Parsing.ExpectationParser(
                                         new System.Text.Parsing.CharParser('\''))))),
@@ -617,7 +615,7 @@ namespace Code
                                             new System.Text.Parsing.CharParser('\''),
                                             new System.Text.Parsing.AlternativeParser(
                                                 new System.Text.Parsing.PositiveParser(
-                                                    new System.Text.Parsing.CharSetParser(ToUtf32("\'\\\r\n"), true)),
+                                                    new System.Text.Parsing.CharSetParser(ToUtf32("'\\\r\n"), true)),
                                                 new System.Text.Parsing.NonterminalParser(ToUtf32("CharEscape"), ToUtf32("CharEscape"), 0))),
                                         new System.Text.Parsing.ExpectationParser(
                                             new System.Text.Parsing.CharParser('\''))))))),
@@ -630,7 +628,7 @@ namespace Code
                                         new System.Text.Parsing.CharParser('\''),
                                         new System.Text.Parsing.AlternativeParser(
                                             new System.Text.Parsing.PositiveParser(
-                                                new System.Text.Parsing.CharSetParser(ToUtf32("\'\\\r\n"), true)),
+                                                new System.Text.Parsing.CharSetParser(ToUtf32("'\\\r\n"), true)),
                                             new System.Text.Parsing.NonterminalParser(ToUtf32("CharEscape"), ToUtf32("CharEscape"), 0))),
                                     new System.Text.Parsing.ExpectationParser(
                                         new System.Text.Parsing.CharParser('\'')))))))));
@@ -761,5 +759,4 @@ namespace Code
                             new System.Text.Parsing.AnyCharParser())))));
         }
     }
-
-} // namespace Code
+} // Code

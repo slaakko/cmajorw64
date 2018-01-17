@@ -22,5 +22,26 @@ namespace System.Text.Parsing
             GetScope()->Accept(visitor);
             visitor.EndVisit(*this);
         }
+        public void Import(Namespace* that, ParsingDomain* targetDomain, bool importExternals)
+        {
+            targetDomain->BeginNamespace(that->Name());
+            Scope* containerScope = that->ContainerScope();
+            for (const Pair<ustring, ParsingObject*>& p : containerScope->FullNameMap())
+            {
+                ParsingObject* o = p.second;
+                if (o is Grammar*)
+                {
+                    if (!importExternals && o->IsExternal()) continue;
+                    Grammar* grammar = cast<Grammar*>(o);
+                    grammar->SetEnclosingScope(targetDomain->CurrentScope());
+                    targetDomain->AddGrammar(grammar);
+                }
+                else if (o is Namespace*)
+                {
+                    Import(cast<Namespace*>(o), targetDomain, importExternals);
+                }
+            }
+            targetDomain->EndNamespace();
+        }
     }
 }

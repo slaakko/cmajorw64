@@ -278,7 +278,7 @@ namespace Syntax
             public void A0Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                ;
+                ustring ruleName;
                 if (!context->fromntargs.IsEmpty())
                 {
                     ruleName = context->fromntargs;
@@ -287,8 +287,8 @@ namespace Syntax
                 {
                     ruleName = context->fromnt;
                 }
-                alias = context->fromAlias;
-                name = ruleName;
+                ustring alias = context->fromAlias;
+                ustring name = ruleName;
                 if (!alias.IsEmpty())
                 {
                     name = alias;
@@ -706,16 +706,16 @@ namespace Syntax
                 grammar0 = new Code.ExpressionGrammar(pd);
             }
             AddGrammarReference(grammar0);
-            Grammar* grammar1 = pd->GetGrammar(ToUtf32("Code.StatementGrammar"));
+            Grammar* grammar1 = pd->GetGrammar(ToUtf32("Syntax.PrimitiveGrammar"));
             if (grammar1 == null)
             {
-                grammar1 = new Code.StatementGrammar(pd);
+                grammar1 = new Syntax.PrimitiveGrammar(pd);
             }
             AddGrammarReference(grammar1);
-            Grammar* grammar2 = pd->GetGrammar(ToUtf32("Syntax.ElementGrammar"));
+            Grammar* grammar2 = pd->GetGrammar(ToUtf32("Code.StatementGrammar"));
             if (grammar2 == null)
             {
-                grammar2 = new Syntax.ElementGrammar(pd);
+                grammar2 = new Code.StatementGrammar(pd);
             }
             AddGrammarReference(grammar2);
             Grammar* grammar3 = pd->GetGrammar(ToUtf32("Syntax.CompositeGrammar"));
@@ -724,10 +724,10 @@ namespace Syntax
                 grammar3 = new Syntax.CompositeGrammar(pd);
             }
             AddGrammarReference(grammar3);
-            Grammar* grammar4 = pd->GetGrammar(ToUtf32("Syntax.PrimitiveGrammar"));
+            Grammar* grammar4 = pd->GetGrammar(ToUtf32("Syntax.ElementGrammar"));
             if (grammar4 == null)
             {
-                grammar4 = new Syntax.PrimitiveGrammar(pd);
+                grammar4 = new Syntax.ElementGrammar(pd);
             }
             AddGrammarReference(grammar4);
         }

@@ -5,8 +5,8 @@
     <infoDelaySecs>10</infoDelaySecs>
     <formSizeX>1781</formSizeX>
     <formSizeY>984</formSizeY>
-    <formTop>33</formTop>
-    <formLeft>21</formLeft>
+    <formTop>0</formTop>
+    <formLeft>0</formLeft>
     <textVisX>208</textVisX>
     <textVisY>208</textVisY>
     <textVisW>1259</textVisW>
@@ -33,6 +33,10 @@
         </recentProject>
         <recentProject>
             <path>C:\Users\Seppo\cmajorw64\cmajor\system\System.cms</path>
+            <openFiles />
+        </recentProject>
+        <recentProject>
+            <path>C:\Users\Seppo\cmajorw64\cmajor\projects\tools\cmparsergen\test_thread\cmparsergen.cms</path>
             <openFiles />
         </recentProject>
         <recentProject>

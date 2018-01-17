@@ -1,9 +1,9 @@
+using System;
+using System.Collections;
+using System.Text.Parsing;
+
 namespace Syntax
 {
-    using System;
-    using System.Collections;
-    using System.Text.Parsing;
-
     public class ProjectFileGrammar : System.Text.Parsing.Grammar
     {
         public ProjectFileGrammar() : this(new ParsingDomain())
@@ -330,7 +330,6 @@ namespace Syntax
             }
             AddGrammarReference(grammar0);
         }
-
         public override void CreateRules()
         {
             AddRuleLink(new System.Text.Parsing.RuleLink(ToUtf32("qualified_id"), this, ToUtf32("System.Text.Parsing.stdlib.qualified_id")));
@@ -377,6 +376,4 @@ namespace Syntax
             SetSkipRuleName(ToUtf32("spaces_and_comments"));
         }
     }
-
-} // namespace Syntax
-
+} // Syntax

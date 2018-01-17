@@ -1,7 +1,7 @@
-using ParsingContext = Code.ParsingContext;
 using System;
 using System.Collections;
 using System.Text.Parsing;
+using ParsingContext = Code.ParsingContext;
 
 namespace Syntax
 {
@@ -664,7 +664,6 @@ namespace Syntax
             }
             AddGrammarReference(grammar0);
         }
-
         public override void CreateRules()
         {
             AddRuleLink(new System.Text.Parsing.RuleLink(ToUtf32("Primary"), this, ToUtf32("PrimaryGrammar.Primary")));
@@ -740,6 +739,4 @@ namespace Syntax
                                 new System.Text.Parsing.CharParser('?')))))));
         }
     }
-
-} // namespace Syntax
-
+} // Syntax

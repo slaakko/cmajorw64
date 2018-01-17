@@ -1,2 +1,2 @@
 @echo off
-..\..\cmparsergen\bin\release\cmparsergen empty.pp
+..\cmparsergen\bin\release\cmparsergen empty.pp

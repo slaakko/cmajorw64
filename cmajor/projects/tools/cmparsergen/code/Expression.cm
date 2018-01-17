@@ -1,11 +1,10 @@
+using System;
+using System.Collections;
+using System.Text.Parsing;
 using System.Text.Parsing.CodeDom;
 
 namespace Code
 {
-    using System;
-    using System.Collections;
-    using System.Text.Parsing;
-
     public class ExpressionGrammar : System.Text.Parsing.Grammar
     {
         public ExpressionGrammar() : this(new ParsingDomain())
@@ -685,24 +684,28 @@ namespace Code
             public void A2Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                if (context->ctx->ParsingLvalue() || context->ctx->ParsingExpressionStatement() && !context->ctx->ParsingArguments()) pass = false;
-                else context->op = Operator.equal;
+                if (context->ctx->ParsingLvalue() || context->ctx->ParsingExpressionStatement() && !context->ctx->ParsingArguments()) pass = false; else context->op = Operator.equal;
             }
             public void A3Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                if (context->ctx->ParsingLvalue() || context->ctx->ParsingExpressionStatement() && !context->ctx->ParsingArguments()) pass = false;
-                else context->op = Operator.notEqual;
+                if (context->ctx->ParsingLvalue() || context->ctx->ParsingExpressionStatement() && !context->ctx->ParsingArguments()) pass = false; else context->op = Operator.notEqual;
             }
             public void A4Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
                 switch (context->op)
                 {
-                    case Operator.equal: context->expr.Reset(new System.Text.Parsing.CodeDom.Equal(context->expr.Release(), context->fromright));
-                    break;
-                    case Operator.notEqual: context->expr.Reset(new System.Text.Parsing.CodeDom.NotEqual(context->expr.Release(), context->fromright));
-                    break;
+                    case Operator.equal: 
+                    {
+                        context->expr.Reset(new System.Text.Parsing.CodeDom.Equal(context->expr.Release(), context->fromright));
+                        break;
+                    }
+                    case Operator.notEqual: 
+                    {
+                        context->expr.Reset(new System.Text.Parsing.CodeDom.NotEqual(context->expr.Release(), context->fromright));
+                        break;
+                    }
                 }
             }
             public void Preleft(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
@@ -883,18 +886,36 @@ namespace Code
                 context->ctx->PopParsingIsOrAs();
                 switch (context->op)
                 {
-                    case Operator.lessOrEqual: context->expr.Reset(new System.Text.Parsing.CodeDom.LessOrEqual(context->expr.Release(), context->fromright));
-                    break;
-                    case Operator.greaterOrEqual: context->expr.Reset(new System.Text.Parsing.CodeDom.GreaterOrEqual(context->expr.Release(), context->fromright));
-                    break;
-                    case Operator.less: context->expr.Reset(new System.Text.Parsing.CodeDom.Less(context->expr.Release(), context->fromright));
-                    break;
-                    case Operator.greater: context->expr.Reset(new System.Text.Parsing.CodeDom.Greater(context->expr.Release(), context->fromright));
-                    break;
-                    case Operator.is_: context->expr.Reset(new Is(context->expr.Release(), context->fromisType));
-                    break;
-                    case Operator.as_: context->expr.Reset(new As(context->expr.Release(), context->fromasType));
-                    break;
+                    case Operator.lessOrEqual: 
+                    {
+                        context->expr.Reset(new System.Text.Parsing.CodeDom.LessOrEqual(context->expr.Release(), context->fromright));
+                        break;
+                    }
+                    case Operator.greaterOrEqual: 
+                    {
+                        context->expr.Reset(new System.Text.Parsing.CodeDom.GreaterOrEqual(context->expr.Release(), context->fromright));
+                        break;
+                    }
+                    case Operator.less: 
+                    {
+                        context->expr.Reset(new System.Text.Parsing.CodeDom.Less(context->expr.Release(), context->fromright));
+                        break;
+                    }
+                    case Operator.greater: 
+                    {
+                        context->expr.Reset(new System.Text.Parsing.CodeDom.Greater(context->expr.Release(), context->fromright));
+                        break;
+                    }
+                    case Operator.is_: 
+                    {
+                        context->expr.Reset(new Is(context->expr.Release(), context->fromisType));
+                        break;
+                    }
+                    case Operator.as_: 
+                    {
+                        context->expr.Reset(new As(context->expr.Release(), context->fromasType));
+                        break;
+                    }
                 }
             }
             public void A9Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
@@ -1034,14 +1055,12 @@ namespace Code
             public void A2Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                if (context->ctx->ParsingLvalue()) pass = false;
-                else context->op = Operator.shiftLeft;
+                if (context->ctx->ParsingLvalue()) pass = false; else context->op = Operator.shiftLeft;
             }
             public void A3Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                if (context->ctx->ParsingLvalue()) pass = false;
-                else context->op = Operator.shiftRight;
+                if (context->ctx->ParsingLvalue()) pass = false; else context->op = Operator.shiftRight;
             }
             public void A4Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
@@ -1053,10 +1072,16 @@ namespace Code
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
                 switch (context->op)
                 {
-                    case Operator.shiftLeft: context->expr.Reset(new System.Text.Parsing.CodeDom.ShiftLeft(context->expr.Release(), context->fromright));
-                    break;
-                    case Operator.shiftRight: context->expr.Reset(new System.Text.Parsing.CodeDom.ShiftRight(context->expr.Release(), context->fromright));
-                    break;
+                    case Operator.shiftLeft: 
+                    {
+                        context->expr.Reset(new System.Text.Parsing.CodeDom.ShiftLeft(context->expr.Release(), context->fromright));
+                        break;
+                    }
+                    case Operator.shiftRight: 
+                    {
+                        context->expr.Reset(new System.Text.Parsing.CodeDom.ShiftRight(context->expr.Release(), context->fromright));
+                        break;
+                    }
                 }
                 context->ctx->PopParsingArguments();
             }
@@ -1164,24 +1189,28 @@ namespace Code
             public void A2Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                if (context->ctx->ParsingLvalue() || context->ctx->ParsingExpressionStatement() && !context->ctx->ParsingArguments()) pass = false;
-                else context->op = Operator.add;
+                if (context->ctx->ParsingLvalue() || context->ctx->ParsingExpressionStatement() && !context->ctx->ParsingArguments()) pass = false; else context->op = Operator.add;
             }
             public void A3Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                if (context->ctx->ParsingLvalue() || context->ctx->ParsingExpressionStatement() && !context->ctx->ParsingArguments()) pass = false;
-                else context->op = Operator.sub;
+                if (context->ctx->ParsingLvalue() || context->ctx->ParsingExpressionStatement() && !context->ctx->ParsingArguments()) pass = false; else context->op = Operator.sub;
             }
             public void A4Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
                 switch (context->op)
                 {
-                    case Operator.add: context->expr.Reset(new Add(context->expr.Release(), context->fromright));
-                    break;
-                    case Operator.sub: context->expr.Reset(new Sub(context->expr.Release(), context->fromright));
-                    break;
+                    case Operator.add: 
+                    {
+                        context->expr.Reset(new Add(context->expr.Release(), context->fromright));
+                        break;
+                    }
+                    case Operator.sub: 
+                    {
+                        context->expr.Reset(new Sub(context->expr.Release(), context->fromright));
+                        break;
+                    }
                 }
             }
             public void Preleft(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
@@ -1285,32 +1314,38 @@ namespace Code
             public void A2Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                if (context->ctx->ParsingLvalue() || context->ctx->ParsingExpressionStatement() && !context->ctx->ParsingArguments()) pass = false;
-                else context->op = Operator.mul;
+                if (context->ctx->ParsingLvalue() || context->ctx->ParsingExpressionStatement() && !context->ctx->ParsingArguments()) pass = false; else context->op = Operator.mul;
             }
             public void A3Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                if (context->ctx->ParsingLvalue() || context->ctx->ParsingExpressionStatement() && !context->ctx->ParsingArguments()) pass = false;
-                else context->op = Operator.div;
+                if (context->ctx->ParsingLvalue() || context->ctx->ParsingExpressionStatement() && !context->ctx->ParsingArguments()) pass = false; else context->op = Operator.div;
             }
             public void A4Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                if (context->ctx->ParsingLvalue() || context->ctx->ParsingExpressionStatement() && !context->ctx->ParsingArguments()) pass = false;
-                else context->op = Operator.rem;
+                if (context->ctx->ParsingLvalue() || context->ctx->ParsingExpressionStatement() && !context->ctx->ParsingArguments()) pass = false; else context->op = Operator.rem;
             }
             public void A5Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
                 switch (context->op)
                 {
-                    case Operator.mul: context->expr.Reset(new Mul(context->expr.Release(), context->fromright));
-                    break;
-                    case Operator.div: context->expr.Reset(new Div(context->expr.Release(), context->fromright));
-                    break;
-                    case Operator.rem: context->expr.Reset(new Rem(context->expr.Release(), context->fromright));
-                    break;
+                    case Operator.mul: 
+                    {
+                        context->expr.Reset(new Mul(context->expr.Release(), context->fromright));
+                        break;
+                    }
+                    case Operator.div: 
+                    {
+                        context->expr.Reset(new Div(context->expr.Release(), context->fromright));
+                        break;
+                    }
+                    case Operator.rem: 
+                    {
+                        context->expr.Reset(new Rem(context->expr.Release(), context->fromright));
+                        break;
+                    }
                 }
             }
             public void Preleft(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
@@ -1421,60 +1456,78 @@ namespace Code
             public void A2Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                if (context->ctx->ParsingExpressionStatement() && !context->ctx->ParsingArguments()) pass = false;
-                else context->op = Operator.unaryMinus;
+                if (context->ctx->ParsingExpressionStatement() && !context->ctx->ParsingArguments()) pass = false; else context->op = Operator.unaryMinus;
             }
             public void A3Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                if (context->ctx->ParsingExpressionStatement() && !context->ctx->ParsingArguments()) pass = false;
-                else context->op = Operator.unaryPlus;
+                if (context->ctx->ParsingExpressionStatement() && !context->ctx->ParsingArguments()) pass = false; else context->op = Operator.unaryPlus;
             }
             public void A4Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                if (context->ctx->ParsingExpressionStatement() && !context->ctx->ParsingArguments()) pass = false;
-                else context->op = Operator.not_;
+                if (context->ctx->ParsingExpressionStatement() && !context->ctx->ParsingArguments()) pass = false; else context->op = Operator.not_;
             }
             public void A5Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                if (context->ctx->ParsingExpressionStatement() && !context->ctx->ParsingArguments()) pass = false;
-                else context->op = Operator.complement;
+                if (context->ctx->ParsingExpressionStatement() && !context->ctx->ParsingArguments()) pass = false; else context->op = Operator.complement;
             }
             public void A6Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                if (context->ctx->ParsingExpressionStatement() && !context->ctx->ParsingArguments()) pass = false;
-                else context->op = Operator.deref;
+                if (context->ctx->ParsingExpressionStatement() && !context->ctx->ParsingArguments()) pass = false; else context->op = Operator.deref;
             }
             public void A7Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                if (context->ctx->ParsingExpressionStatement() && !context->ctx->ParsingArguments()) pass = false;
-                else context->op = Operator.addressOf;
+                if (context->ctx->ParsingExpressionStatement() && !context->ctx->ParsingArguments()) pass = false; else context->op = Operator.addressOf;
             }
             public void A8Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
                 switch (context->op)
                 {
-                    case Operator.increment: context->value = new PrefixIncrement(context->fromprefix);
-                    break;
-                    case Operator.decrement: context->value = new PrefixDecrement(context->fromprefix);
-                    break;
-                    case Operator.unaryMinus: context->value = new UnaryMinus(context->fromprefix);
-                    break;
-                    case Operator.unaryPlus: context->value = new UnaryPlus(context->fromprefix);
-                    break;
-                    case Operator.not_: context->value = new Not(context->fromprefix);
-                    break;
-                    case Operator.complement: context->value = new Complement(context->fromprefix);
-                    break;
-                    case Operator.deref: context->value = new Deref(context->fromprefix);
-                    break;
-                    case Operator.addressOf: context->value = new AddressOf(context->fromprefix);
-                    break;
+                    case Operator.increment: 
+                    {
+                        context->value = new PrefixIncrement(context->fromprefix);
+                        break;
+                    }
+                    case Operator.decrement: 
+                    {
+                        context->value = new PrefixDecrement(context->fromprefix);
+                        break;
+                    }
+                    case Operator.unaryMinus: 
+                    {
+                        context->value = new UnaryMinus(context->fromprefix);
+                        break;
+                    }
+                    case Operator.unaryPlus: 
+                    {
+                        context->value = new UnaryPlus(context->fromprefix);
+                        break;
+                    }
+                    case Operator.not_: 
+                    {
+                        context->value = new Not(context->fromprefix);
+                        break;
+                    }
+                    case Operator.complement: 
+                    {
+                        context->value = new Complement(context->fromprefix);
+                        break;
+                    }
+                    case Operator.deref: 
+                    {
+                        context->value = new Deref(context->fromprefix);
+                        break;
+                    }
+                    case Operator.addressOf: 
+                    {
+                        context->value = new AddressOf(context->fromprefix);
+                        break;
+                    }
                 }
             }
             public void A9Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
@@ -1810,12 +1863,12 @@ namespace Code
             public void A5Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->value = new This;
+                context->value = new This();
             }
             public void A6Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->value = new Base;
+                context->value = new Base();
             }
             public void A7Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
@@ -2448,32 +2501,31 @@ namespace Code
         public override void GetReferencedGrammars()
         {
             ParsingDomain* pd = Domain();
-            Grammar* grammar0 = pd->GetGrammar(ToUtf32("Code.TypeExprGrammar"));
+            Grammar* grammar0 = pd->GetGrammar(ToUtf32("Code.LiteralGrammar"));
             if (grammar0 == null)
             {
-                grammar0 = new Code.TypeExprGrammar(pd);
+                grammar0 = new Code.LiteralGrammar(pd);
             }
             AddGrammarReference(grammar0);
-            Grammar* grammar1 = pd->GetGrammar(ToUtf32("Code.IdentifierGrammar"));
+            Grammar* grammar1 = pd->GetGrammar(ToUtf32("Code.BasicTypeGrammar"));
             if (grammar1 == null)
             {
-                grammar1 = new Code.IdentifierGrammar(pd);
+                grammar1 = new Code.BasicTypeGrammar(pd);
             }
             AddGrammarReference(grammar1);
-            Grammar* grammar2 = pd->GetGrammar(ToUtf32("Code.LiteralGrammar"));
+            Grammar* grammar2 = pd->GetGrammar(ToUtf32("Code.TypeExprGrammar"));
             if (grammar2 == null)
             {
-                grammar2 = new Code.LiteralGrammar(pd);
+                grammar2 = new Code.TypeExprGrammar(pd);
             }
             AddGrammarReference(grammar2);
-            Grammar* grammar3 = pd->GetGrammar(ToUtf32("Code.BasicTypeGrammar"));
+            Grammar* grammar3 = pd->GetGrammar(ToUtf32("Code.IdentifierGrammar"));
             if (grammar3 == null)
             {
-                grammar3 = new Code.BasicTypeGrammar(pd);
+                grammar3 = new Code.IdentifierGrammar(pd);
             }
             AddGrammarReference(grammar3);
         }
-
         public override void CreateRules()
         {
             AddRuleLink(new System.Text.Parsing.RuleLink(ToUtf32("Literal"), this, ToUtf32("LiteralGrammar.Literal")));
@@ -2855,5 +2907,4 @@ namespace Code
                             new System.Text.Parsing.CharParser(','))))));
         }
     }
-
-} // namespace Code
+} // Code
