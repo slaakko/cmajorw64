@@ -9,13 +9,9 @@ namespace System.IO
 {
     public class StreamReader
     {
-        public StreamReader(UniquePtr<ByteStream>&& stream_) : stream(Rvalue(stream_)), buffered(false)
+        public StreamReader(const SharedPtr<ByteStream>& stream_) : stream(stream_), buffered(false)
         {
         }
-        suppress StreamReader(const StreamReader&);
-        suppress void operator=(const StreamReader&);
-        public default nothrow StreamReader(StreamReader&&);
-        public default nothrow void operator=(StreamReader&&);
         public int Read()
         {
             return Get(false);
@@ -79,11 +75,11 @@ namespace System.IO
                 return x;
             }
         }
-        public ByteStream& ContainedStream()
+        public nothrow const SharedPtr<ByteStream>& ContainedStream() 
         {
-            return *stream;
+            return stream;
         }
-        private UniquePtr<ByteStream> stream;
+        private SharedPtr<ByteStream> stream;
         private bool buffered;
         private int buffer;
     }

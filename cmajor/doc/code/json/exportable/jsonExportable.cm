@@ -1,0 +1,38 @@
+using System;
+using System.Json;
+using MyNs;
+
+namespace MyNs
+{
+    public class MyJsonExportableClass
+    {
+        public UniquePtr<JsonValue> ToJson() const
+        {
+            UniquePtr<JsonObject> object = new JsonObject();
+            object->AddField("i", ToJson(i));
+            object->AddField("d", ToJson(d));
+            object->AddField("b", ToJson(b));
+            object->AddField("s", ToJson(s));
+            return UniquePtr<JsonValue>(object.Release());
+        }
+        private int i;
+        private double d;
+        private bool b;
+        private string s;
+    }
+}
+
+void main()
+{
+    try
+    {
+        MyJsonExportableClass exportable;
+        UniquePtr<JsonValue> jsonValue = ToJson(exportable);
+        string jsonText = jsonValue->ToString();
+        Console.WriteLine(jsonText);
+    }
+    catch (const Exception& ex)
+    {
+        Console.WriteLine(ex.ToString());
+    }
+}

@@ -1,0 +1,41 @@
+// =================================
+// Copyright (c) 2018 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.IO;
+
+namespace System.Net.Sockets
+{
+    public class TcpClient
+    {
+        public TcpClient() : socket()
+        {
+        }
+        public TcpClient(const string& node, const string& service) : socket(node, service)
+        {
+        }
+        public nothrow TcpClient(TcpSocket&& socket_) : socket(Rvalue(socket_))
+        {
+        }
+        public void Close()
+        {
+            socket.Close();
+        }
+        public void Connect(const string& node, const string& service)
+        {
+            Close();
+            socket.Connect(node, service);
+        }
+        public SharedPtr<ByteStream> GetStream()
+        {
+            return SharedPtr<ByteStream>(new BufferedByteStream(SharedPtr<ByteStream>(new NetworkByteStream(Rvalue(socket))))); // moves socket to the stream!
+        }
+        public TcpSocket& ContainedSocket() 
+        {
+            return socket;
+        }
+        private TcpSocket socket;
+    }
+}

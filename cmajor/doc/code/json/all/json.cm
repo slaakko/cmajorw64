@@ -1,0 +1,147 @@
+using System;
+using System.Collections;
+using System.Text;
+using System.IO;
+using System.Json;
+
+public class Member
+{
+    public nothrow Member() : x(0)
+    {
+    }
+    public explicit nothrow Member(int x_) : x(x_)
+    {
+    }
+    public explicit Member(JsonValue* value)
+    {
+        FromJson(value, "x", x);
+    }
+    public UniquePtr<JsonValue> ToJson() const
+    {
+        UniquePtr<JsonObject> object = new JsonObject();
+        object->AddField("x", ToJson(x));
+        return UniquePtr<JsonValue>(object.Release());
+    }
+    public void Dump(CodeFormatter& formatter)
+    {
+        formatter.WriteLine("member : x = " + ToString(x));
+    }
+    private int x;
+}
+
+public class Alpha
+{
+    public Alpha() : i(1), d(2.0), b(true), s("foo"), w(w"bar"), u(u"öhkömömmö"), member()
+    {
+        l.Add(1);
+        l.Add(2);
+        l.Add(3);
+        m["abc"] = 4;
+        m["def"] = 5;
+        h["xyz"] = 6.5;
+        memberList.Add(Member(1));
+        memberList.Add(Member(2));
+    }
+    public explicit Alpha(JsonValue* value)
+    {
+        FromJson(value, "i", i);
+        FromJson(value, "d", d);
+        FromJson(value, "b", b);
+        FromJson(value, "s", s);
+        FromJson(value, "w", w);
+        FromJson(value, "u", u);
+        FromJson(value, "l", l);
+        FromJson(value, "m", m);
+        FromJson(value, "h", h);
+        FromJson(value, "member", member);
+        FromJson(value, "memberList", memberList);
+    }
+    public UniquePtr<JsonValue> ToJson() const
+    {
+        UniquePtr<JsonObject> object = new JsonObject();
+        object->AddField("i", ToJson(i));
+        object->AddField("d", ToJson(d));
+        object->AddField("b", ToJson(b));
+        object->AddField("s", ToJson(s));
+        object->AddField("w", ToJson(w));
+        object->AddField("u", ToJson(u));
+        object->AddField("l", ToJson(l));
+        object->AddField("m", ToJson(m));
+        object->AddField("h", ToJson(h));
+        object->AddField("member", ToJson(member));
+        object->AddField("memberList", ToJson(memberList));
+        return UniquePtr<JsonValue>(object.Release());
+    }
+    public void Dump(CodeFormatter& formatter)
+    {
+        formatter.WriteLine("alpha:");
+        formatter.WriteLine("i : " + ToString(i));
+        formatter.WriteLine("d : " + ToString(d));
+        formatter.WriteLine("b : " + ToString(b));
+        formatter.WriteLine("s : " + s);
+        formatter.WriteLine("w : " + ToUtf8(w));
+        formatter.WriteLine("u : " + ToUtf8(u));
+        formatter.WriteLine("l : " + ToString(l.Count()));
+        formatter.IncIndent();
+        for (int x : l)
+        {
+            formatter.WriteLine(ToString(x));
+        }
+        formatter.DecIndent();
+        formatter.WriteLine("m : " + ToString(m.Count()));
+        formatter.IncIndent();
+        for (const Pair<string, int>& x : m)
+        {
+            formatter.WriteLine(x.first + " : " + ToString(x.second));
+        }
+        formatter.DecIndent();
+        formatter.WriteLine("h : " + ToString(h.Count()));
+        formatter.IncIndent();
+        for (const Pair<string, double>& x : h)
+        {
+            formatter.WriteLine(x.first + " : " + ToString(x.second));
+        }
+        formatter.DecIndent();
+        member.Dump(formatter);
+        formatter.WriteLine("memberList : " + ToString(memberList.Count()));
+        formatter.IncIndent();
+        for (const Member& x : memberList)
+        {
+            x.Dump(formatter);
+        }
+        formatter.DecIndent();
+    }
+    private int i;
+    private double d;
+    private bool b;
+    private string s;
+    private wstring w;
+    private ustring u;
+    private List<int> l;
+    private Map<string, int> m;
+    private HashMap<string, double> h;
+    private Member member;
+    private List<Member> memberList;
+}
+
+void main()
+{
+    try
+    {
+        CodeFormatter formatter(Console.Out());
+        Alpha alpha;
+        alpha.Dump(formatter);
+        UniquePtr<JsonValue> value = ToJson(alpha);
+        string jsonText = value->ToString();
+        Console.WriteLine("alpha as JSON:");
+        Console.WriteLine(jsonText);
+        UniquePtr<JsonValue> jsonValue = ParseJson(jsonText);
+        Alpha alphaFromJson;
+        FromJson(jsonValue.Get(), alphaFromJson);
+        alphaFromJson.Dump(formatter);
+    }
+    catch (const Exception& ex)
+    {
+        Console.WriteLine(ex.ToString());
+    }
+}

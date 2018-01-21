@@ -1280,4 +1280,9 @@ Value* ClassTypeSymbol::MakeValue() const
     return new StructuredValue(GetSpan(), const_cast<TypeSymbol*>(static_cast<const TypeSymbol*>(this)), std::move(memberValues));
 }
 
+std::u32string ClassTypeSymbol::Id() const
+{
+    return MangledName();
+}
+
 } } // namespace cmajor::symbols

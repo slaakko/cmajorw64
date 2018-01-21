@@ -1987,7 +1987,7 @@ namespace System.Unicode
             long pageIndex = cast<long>(codePoint) / numInfosInPage;
             if (pages.Count() <= pageIndex)
             {
-                LockGuard lock(characterTableLock);
+                LockGuard<Mutex> lock(characterTableLock);
                 while (pages.Count() <= pageIndex)
                 {
                     pages.Add(UniquePtr<CharacterInfoPage>());
@@ -1996,7 +1996,7 @@ namespace System.Unicode
             CharacterInfoPage* page = pages[pageIndex].Get();
             if (page == null)
             {
-                LockGuard lock(characterTableLock);
+                LockGuard<Mutex> lock(characterTableLock);
                 if (page == null)
                 {
                     BinaryReader reader = File.OpenBinary(PathToUcdBinFile());
@@ -2023,7 +2023,7 @@ namespace System.Unicode
             long pageIndex = cast<long>(codePoint) / numInfosInPage;
             if (extendedPages.Count() <= pageIndex)
             {
-                LockGuard lock(characterTableLock);
+                LockGuard<Mutex> lock(characterTableLock);
                 while (extendedPages.Count() <= pageIndex)
                 {
                     extendedPages.Add(UniquePtr<ExtendedCharacterInfoPage>());
@@ -2032,7 +2032,7 @@ namespace System.Unicode
             ExtendedCharacterInfoPage* extendedPage = extendedPages[pageIndex].Get();
             if (extendedPage == null)
             {
-                LockGuard lock(characterTableLock);
+                LockGuard<Mutex> lock(characterTableLock);
                 if (extendedPage == null)
                 {
                     BinaryReader reader = File.OpenBinary(PathToUcdBinFile());

@@ -9,7 +9,7 @@ namespace System.IO
 {
     public class BinaryWriter
     {
-        public nothrow BinaryWriter(UniquePtr<ByteStream>&& stream_) : stream(Rvalue(stream_))
+        public nothrow BinaryWriter(const SharedPtr<ByteStream>& stream_) : stream(stream_)
         {
         }
         public void Write(bool x)
@@ -121,10 +121,10 @@ namespace System.IO
         {
             return stream->Tell();
         }
-        public ByteStream& ContainedStream()
+        public nothrow const SharedPtr<ByteStream>& ContainedStream() 
         {
-            return *stream;
+            return stream;
         }
-        private UniquePtr<ByteStream> stream;
+        private SharedPtr<ByteStream> stream;
     }
 }

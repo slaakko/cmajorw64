@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<cmdoc>
+  <libraries>
+    <library>
+      <moduleFilePath>../../system/System.Base/lib/debug/System.Base.cmm</moduleFilePath>
+      <libraryXmlFilePath>System.Base/System.Base.xml</libraryXmlFilePath>
+      <docXmlFilePath>System.Base/System.Base.doc.xml</docXmlFilePath>
+      <style>../../style/cmdoc.css</style>
+    </library>
+  </libraries>
+</cmdoc>

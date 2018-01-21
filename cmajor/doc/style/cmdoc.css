@@ -19,14 +19,14 @@ span.var, span.param
     font-family: serif;
 }
 
-table.params 
+table.params
 {
     font-family: sans-serif;
     font-size: 13px;
     border-collapse: collapse;
 }
 
-table.params, th.params, td.params 
+table.params, th.params, td.params
 {
     text-align: left;
     border: 1px solid #dddddd;

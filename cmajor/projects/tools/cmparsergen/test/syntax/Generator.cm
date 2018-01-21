@@ -81,7 +81,7 @@ namespace Syntax
             {
                 string sourceFilePath;
                 {
-                    LockGuard lock(parserData->GetMutex());
+                    LockGuard<Mutex> lock(parserData->GetMutex());
                     if (parserData->FilePos() >= parserData->NumFiles()) return;
                     sourceFileIndex = parserData->NextFilePos();
                     sourceFilePath = parserData->GetSourceFilePath(sourceFileIndex);
@@ -177,23 +177,22 @@ namespace Syntax
         {
             Console.Out() << "Parsing project file " << projectFilePath << "...\n";
         }
-        StreamWriter log(UniquePtr<ByteStream>(new FileByteStream(stderr)));
         UniquePtr<ParsingDomain> projectParsingDomain(new ParsingDomain());
         projectParsingDomain->SetOwned();
         ProjectFileGrammar* projectFileGrammar = new ProjectFileGrammar(projectParsingDomain.Get());
         if (Flags.Instance().DebugProject())
         {
-            projectFileGrammar->SetLog(&log);
+            projectFileGrammar->SetLog(&Console.Error());
         }
         LibraryFileGrammar* libraryFileGrammar = new LibraryFileGrammar(projectParsingDomain.Get());
         if (Flags.Instance().DebugLibrary())
         {
-            libraryFileGrammar->SetLog(&log);
+            libraryFileGrammar->SetLog(&Console.Error());
         }
         ParserFileGrammar* parserFileGrammar = new ParserFileGrammar(projectParsingDomain.Get());
         if (Flags.Instance().DebugParse())
         {
-            parserFileGrammar->SetLog(&log);
+            parserFileGrammar->SetLog(&Console.Error());
         }
         ustring projectFileContent = ToUtf32(File.ReadAllText(projectFilePath));
         UniquePtr<Project> project = projectFileGrammar->Parse(projectFileContent.Chars(), projectFileContent.Chars() + projectFileContent.Length(), 0, projectFilePath);

@@ -359,10 +359,6 @@ void Emitter::Visit(BoundFunction& boundFunction)
     pads.clear();
     labeledStatementMap.clear();
     FunctionSymbol* functionSymbol = boundFunction.GetFunctionSymbol();
-    if (functionSymbol->GroupName() == U"Foo")
-    {
-        int x = 0;
-    }
     llvm::FunctionType* functionType = functionSymbol->IrType(*this);
     function = llvm::cast<llvm::Function>(compileUnitModule->getOrInsertFunction(ToUtf8(functionSymbol->MangledName()), functionType));
     if (GetGlobalFlag(GlobalFlags::release) && functionSymbol->IsInline())

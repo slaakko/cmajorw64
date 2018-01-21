@@ -1,0 +1,144 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>System.Json Library</title>
+    <link href="../../style/library.css" rel="stylesheet" type="text/css"/>
+</head>
+
+<body>
+    <h1>System.Json Library</h1>
+
+    <p>
+        <a href="System.Json.html">System.Json</a> library has basic support for exporting and importing <a href="http://www.json.org/">JSON</a>.
+        The library supports exporting JSON by converting application objects to JSON library objects and then serialization them to JSON text.
+        Importing JSON consists of parsing JSON text to back to JSON library objects and then constructing application objects from them.
+    </p>
+
+    <h2>
+        Exporting JSON
+    </h2>
+
+    <p>
+        Any class that implements a <b>ToJson()</b> member function that returns a <a href="../System.Base/System.Base.html#class_UniquePtr_T_793F841C13E9DD3A6869243C74F1D948C0E04009">unique pointer</a>
+        to a class derived from the
+        <a href="System.Json.html#class_JsonValue_B86942C2856CC5758E1FB19BBBE97E4002D4008A">JsonValue</a> class, such as  
+        <a href="System.Json.html#class_JsonObject_1ACA524ABF05C4E15B709275F66F3BF5C165B69D">JsonObject</a>, can be exported to a JSON library objects that can further be converted to
+        a UTF-8 encoded JSON text by calling the <a href="System.Json.html#member_function_ToString_JsonValue_0E8D02CC91EA26B2A9A8AF1C11DF12FD5FE86F31">ToString()</a> member function of the
+        <a href="System.Json.html#class_JsonValue_B86942C2856CC5758E1FB19BBBE97E4002D4008A">JsonValue</a> class.
+        Here's an example of such a <a href="../../code/json/exportable/jsonExportable.cm.html">JSON exportable class</a>.
+        The program writes the JSON text {"b":false, "d":0, "i":0, "s":""} to the standard output stream.
+    </p>
+
+    <p>
+        Typically the <b>ToJson()</b> member function of the application class creates an instance of a <a href="System.Json.html#class_JsonObject_1ACA524ABF05C4E15B709275F66F3BF5C165B69D">JsonObject</a> class,
+        calls the <a href="System.Json.html#function_group_ToJson_80373CB69AD5A80A6592CC2418A5282FCB2D0F14">ToJson</a> library function
+        for each member variable that needs to be exported, and adds the generated <a href="System.Json.html#class_JsonValue_B86942C2856CC5758E1FB19BBBE97E4002D4008A">JsonValues</a> to the
+        <a href="System.Json.html#class_JsonObject_1ACA524ABF05C4E15B709275F66F3BF5C165B69D">JsonObject</a> by calling
+        the <a href="System.Json.html#function_group_AddField_9C28B5737E68F5B7F6EFF0734E146A93E593F379">AddField</a> member function.
+    </p>
+
+    <p>
+        The library supports the serialization of the following data types:
+        <ul>
+            <li>
+                <a href="../System.Base/System.Base.html#typedef_string_B6DB6B2DEFC437FBF697A2E84F7B7771FC1DDEE3">string</a>
+                <a href="../System.Base/System.Base.html#typedef_wstring_EDB6336488DF46A7779AFB4209BAB1DAF59B5DAE">wstring</a> and
+                <a href="../System.Base/System.Base.html#typedef_ustring_1750E1C62AAF5897C1F1DA3C5BC4999982AE9B36">ustring</a> are
+                converted to <a href="System.Json.html#class_JsonString_5806452F49D8C71DEDC42FCEB48EC3A2163F7516">JSON strings</a>.
+            </li>
+            <li>
+                <b>bool</b> is converted to a <a href="System.Json.html#class_JsonBool_DECA0A9F59CE58DA61371982ADCFCD31F1497F79">JSON bool</a>.
+            </li>
+            <li>
+                Numeric values that are implicitly convertible to a <b>double</b>, such as <b>int</b>, <b>float</b> and <b>double</b> are converted to a
+                <a href="System.Json.html#class_JsonNumber_BA94887A1742701B420D069040E7953026161429">JSON number</a>.
+            </li>
+            <li>
+                <a href="../System.Base/System.Base.html#class_Map_Key_Value_KeyCompare_530B43B96CDA5DBA8045A4DA0691BBB50DE2DB3D">Maps</a> and
+                <a href="../System.Base/System.Base.html#class_HashMap_K_T_H_C_925D53DF947742545E7EC07D3487F3EA8C8D1D36">HashMaps</a> with string keys are converted to a
+                <a href="System.Json.html#class_JsonObject_1ACA524ABF05C4E15B709275F66F3BF5C165B69D">JSON objects</a> with the keys as field names and the mapped types as field values.
+            </li>
+            <li>
+                <a href="../System.Base/System.Base.html#class_List_T_579A89BF19B54042190CDE2A7E54E1DFAAFDB31C">Lists</a> are converted to
+                <a href="System.Json.html#class_JsonArray_595A35C98AB243A92CA1C39BB1B07E82AA246D18">JSON arrays</a> with list elements as array items.
+            </li>
+            <li>
+                A <a href="../System.Json/System.Json.html#concept_JsonExportable_380A04F1C16289D6FC8DB54C68F467C83E565340">JSON exportable</a> class is converted
+                by calling its <b>ToJson</b> member function.
+            </li>
+        </ul>
+    </p>
+
+    <h2>Importing JSON</h2>
+
+    <p>
+        Any class that implements a constructor taking a pointer to a <a href="System.Json.html#class_JsonValue_B86942C2856CC5758E1FB19BBBE97E4002D4008A">JsonValue</a>
+        can import JSON.
+    </p>
+
+    <p>
+        Importing JSON consists of parsing a JSON text by calling the <a href="System.Json.html#function_group_ParseJson_D0F1BA19044FC5C9F02861FE13E01F68658D55A5">ParseJson</a> function 
+        with UTF-8, UTF-16 or UTF-32 encoded string and passing the returned <a href="System.Json.html#class_JsonValue_B86942C2856CC5758E1FB19BBBE97E4002D4008A">JsonValue</a> 
+        to the application class constructor. Here's an example of such a <a href="../../code/json/constructible/jsonConstructible.cm.html">JSON constructible class</a>.
+        The program writes lines 
+        <blockquote>
+            <pre>
+                i : 2
+                d : 1.5
+                b : true
+                s : foo
+            </pre>
+        </blockquote>
+        to the standard output stream.
+    </p>
+
+    <p>
+        Typically the <a href="System.Json.html#class_JsonValue_B86942C2856CC5758E1FB19BBBE97E4002D4008A">JsonValue</a> constructor of an application class 
+        calls the <a href="System.Json.html#function_group_FromJson_22997B691ACDD99EB254F19DD18F75F989FE89EF">FromJson</a> library function for each member variable that needs to be imported.
+        The <a href="System.Json.html#function_group_FromJson_22997B691ACDD99EB254F19DD18F75F989FE89EF">FromJson</a> function takes a 
+        <a href="System.Json.html#class_JsonValue_B86942C2856CC5758E1FB19BBBE97E4002D4008A">JsonValue</a> pointer, field name and member variable as parameters.
+    </p>
+
+    <p>
+        The following data types can be imported:
+
+        <ul>
+            <li>
+                A <a href="System.Json.html#class_JsonString_5806452F49D8C71DEDC42FCEB48EC3A2163F7516">JSON string</a> can be imported to a
+                <a href="../System.Base/System.Base.html#typedef_string_B6DB6B2DEFC437FBF697A2E84F7B7771FC1DDEE3">string</a>
+                <a href="../System.Base/System.Base.html#typedef_wstring_EDB6336488DF46A7779AFB4209BAB1DAF59B5DAE">wstring</a> or
+                <a href="../System.Base/System.Base.html#typedef_ustring_1750E1C62AAF5897C1F1DA3C5BC4999982AE9B36">ustring</a> type variable.
+            </li>
+            <li>
+                A <a href="System.Json.html#class_JsonBool_DECA0A9F59CE58DA61371982ADCFCD31F1497F79">JSON bool</a> can be imported to a <b>bool</b> type variable.
+            </li>
+            <li>
+                A <a href="System.Json.html#class_JsonNumber_BA94887A1742701B420D069040E7953026161429">JSON number</a> can be imported to <b>int</b> or <b>double</b> type variable.
+            </li>
+            <li>
+                A <a href="System.Json.html#class_JsonObject_1ACA524ABF05C4E15B709275F66F3BF5C165B69D">JSON object</a> can be imported to a
+                <a href="../System.Base/System.Base.html#class_Map_Key_Value_KeyCompare_530B43B96CDA5DBA8045A4DA0691BBB50DE2DB3D">map</a> or 
+                <a href="../System.Base/System.Base.html#class_HashMap_K_T_H_C_925D53DF947742545E7EC07D3487F3EA8C8D1D36">hash map</a> member variable with 
+                <a href="../System.Base/System.Base.html#typedef_string_B6DB6B2DEFC437FBF697A2E84F7B7771FC1DDEE3">string</a>,
+                <a href="../System.Base/System.Base.html#typedef_wstring_EDB6336488DF46A7779AFB4209BAB1DAF59B5DAE">wstring</a> or 
+                <a href="../System.Base/System.Base.html#typedef_ustring_1750E1C62AAF5897C1F1DA3C5BC4999982AE9B36">ustring</a> type keys,
+                or to a <a href="System.Json.html#concept_JsonConstructible_FDF8EB5A6050ED39397E14EF89FACCA63F29DDF2">JSON constructible</a> class member variable.
+            </li>
+            <li>
+                A <a href="System.Json.html#class_JsonArray_595A35C98AB243A92CA1C39BB1B07E82AA246D18">JSON array</a> can be imported to a 
+                <a href="../System.Base/System.Base.html#class_List_T_579A89BF19B54042190CDE2A7E54E1DFAAFDB31C">list</a> type member variable.
+            </li>
+        </ul>
+    </p>
+
+    <h2>
+        Example
+    </h2>
+
+    <p>
+        Here's an <a href="../../code/json/all/json.cm.html">example</a> of application classes that support both exporting and importing JSON.
+    </p>
+</body>
+</html>

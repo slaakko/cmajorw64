@@ -173,6 +173,7 @@ public:
     ClassTemplateSpecializationSymbol* Prototype() const { return prototype; }
     ValueType GetValueType() const override;
     Value* MakeValue() const override;
+    std::u32string Id() const override;
 private:
     std::u32string groupName;
     int minArity;

@@ -865,7 +865,7 @@ void ConstraintChecker::Visit(MemberFunctionConstraintNode& memberFunctionConstr
     std::vector<TypeSymbol*> templateArgumentTypes;
     std::unique_ptr<Exception> exception;
     std::unique_ptr<BoundFunctionCall> memberFunctionCall = ResolveOverload(memberFunctionConstraintNode.GroupId(), containerScope, lookups, arguments, boundCompileUnit, currentFunction, span,
-        OverloadResolutionFlags::dontInstantiate | OverloadResolutionFlags::dontThrow, templateArgumentTypes, exception);
+        OverloadResolutionFlags::dontInstantiate | OverloadResolutionFlags::dontThrow | OverloadResolutionFlags::noTemplates, templateArgumentTypes, exception);
     if (!memberFunctionCall)
     {
         std::string signature;

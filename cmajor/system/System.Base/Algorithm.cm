@@ -928,6 +928,36 @@ namespace System
             }
         }
     }
+    
+    public nothrow inline void InitRand(uint seed)
+    {
+        RtInitRand(seed);
+    }
+    
+    public nothrow inline uint Random()
+    {
+        return RtRandom();
+    }
+    
+    public nothrow inline ulong Random64()
+    {
+        return RtRandom64();
+    }
 
-    // todo RandomNumber & RandomShuffle
+    public nothrow inline uint RandomNumber(uint n)
+    {
+        return Random() % n;
+    }
+    
+    public nothrow void RandomShuffle<I>(I begin, I end) where I is RandomAccessIterator
+    {
+        if (begin == end) return;
+        for (I i = begin + 1; i != end; ++i)
+        {
+            long d = (i - begin) + 1;
+            long r = cast<long>(RandomNumber(cast<uint>(d)));
+            I j = begin + r;
+            Swap(*i, *j);
+        }
+    }
 }

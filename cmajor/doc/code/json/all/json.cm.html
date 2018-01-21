@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8"/>
+    <title>json.cm</title>
+    <link rel="stylesheet" type="text/css" href="../../../style/code.css"/>
+</head>
+<body>
+<pre>
+<div class="code">
+<span class="keyword">using</span> <span class="identifier">System</span><span class="other">;</span>
+<span class="keyword">using</span> <span class="identifier">System.Collections</span><span class="other">;</span>
+<span class="keyword">using</span> <span class="identifier">System.Text</span><span class="other">;</span>
+<span class="keyword">using</span> <span class="identifier">System.IO</span><span class="other">;</span>
+<span class="keyword">using</span> <span class="identifier">System.Json</span><span class="other">;</span>
+
+<span class="keyword">public</span> <span class="keyword">class</span> <span class="identifier">Member</span>
+<span class="other">{</span>
+    <span class="keyword">public</span> <span class="keyword">nothrow</span> <span class="identifier">Member</span><span class="other">(</span><span class="other">)</span> <span class="other">:</span> <span class="identifier">x</span><span class="other">(</span><span class="number">0</span><span class="other">)</span>
+    <span class="other">{</span>
+    <span class="other">}</span>
+    <span class="keyword">public</span> <span class="keyword">explicit</span> <span class="keyword">nothrow</span> <span class="identifier">Member</span><span class="other">(</span><span class="keyword">int</span> <span class="identifier">x_</span><span class="other">)</span> <span class="other">:</span> <span class="identifier">x</span><span class="other">(</span><span class="identifier">x_</span><span class="other">)</span>
+    <span class="other">{</span>
+    <span class="other">}</span>
+    <span class="keyword">public</span> <span class="keyword">explicit</span> <span class="identifier">Member</span><span class="other">(</span><span class="identifier">JsonValue</span><span class="other">*</span> <span class="identifier">value</span><span class="other">)</span>
+    <span class="other">{</span>
+        <span class="identifier">FromJson</span><span class="other">(</span><span class="identifier">value</span><span class="other">,</span> <span class="string">&quot;x&quot;</span><span class="other">,</span> <span class="identifier">x</span><span class="other">)</span><span class="other">;</span>
+    <span class="other">}</span>
+    <span class="keyword">public</span> <span class="identifier">UniquePtr</span><span class="other">&lt;</span><span class="identifier">JsonValue</span><span class="other">&gt;</span> <span class="identifier">ToJson</span><span class="other">(</span><span class="other">)</span> <span class="keyword">const</span>
+    <span class="other">{</span>
+        <span class="identifier">UniquePtr</span><span class="other">&lt;</span><span class="identifier">JsonObject</span><span class="other">&gt;</span> <span class="identifier">object</span> <span class="other">=</span> <span class="keyword">new</span> <span class="identifier">JsonObject</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>
+        <span class="identifier">object</span><span class="other">-</span><span class="other">&gt;</span><span class="identifier">AddField</span><span class="other">(</span><span class="string">&quot;x&quot;</span><span class="other">,</span> <span class="identifier">ToJson</span><span class="other">(</span><span class="identifier">x</span><span class="other">)</span><span class="other">)</span><span class="other">;</span>
+        <span class="keyword">return</span> <span class="identifier">UniquePtr</span><span class="other">&lt;</span><span class="identifier">JsonValue</span><span class="other">&gt;</span><span class="other">(</span><span class="identifier">object.Release</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span>
+    <span class="other">}</span>
+    <span class="keyword">public</span> <span class="keyword">void</span> <span class="identifier">Dump</span><span class="other">(</span><span class="identifier">CodeFormatter</span><span class="other">&amp;</span> <span class="identifier">formatter</span><span class="other">)</span>
+    <span class="other">{</span>
+        <span class="identifier">formatter.WriteLine</span><span class="other">(</span><span class="string">&quot;member : x = &quot;</span> <span class="other">+</span> <span class="identifier">ToString</span><span class="other">(</span><span class="identifier">x</span><span class="other">)</span><span class="other">)</span><span class="other">;</span>
+    <span class="other">}</span>
+    <span class="keyword">private</span> <span class="keyword">int</span> <span class="identifier">x</span><span class="other">;</span>
+<span class="other">}</span>
+
+<span class="keyword">public</span> <span class="keyword">class</span> <span class="identifier">Alpha</span>
+<span class="other">{</span>
+    <span class="keyword">public</span> <span class="identifier">Alpha</span><span class="other">(</span><span class="other">)</span> <span class="other">:</span> <span class="identifier">i</span><span class="other">(</span><span class="number">1</span><span class="other">)</span><span class="other">,</span> <span class="identifier">d</span><span class="other">(</span><span class="number">2.0</span><span class="other">)</span><span class="other">,</span> <span class="identifier">b</span><span class="other">(</span><span class="keyword">true</span><span class="other">)</span><span class="other">,</span> <span class="identifier">s</span><span class="other">(</span><span class="string">&quot;foo&quot;</span><span class="other">)</span><span class="other">,</span> <span class="identifier">w</span><span class="other">(</span><span class="identifier">w</span><span class="string">&quot;bar&quot;</span><span class="other">)</span><span class="other">,</span> <span class="identifier">u</span><span class="other">(</span><span class="identifier">u</span><span class="string">&quot;öhkömömmö&quot;</span><span class="other">)</span><span class="other">,</span> <span class="identifier">member</span><span class="other">(</span><span class="other">)</span>
+    <span class="other">{</span>
+        <span class="identifier">l.Add</span><span class="other">(</span><span class="number">1</span><span class="other">)</span><span class="other">;</span>
+        <span class="identifier">l.Add</span><span class="other">(</span><span class="number">2</span><span class="other">)</span><span class="other">;</span>
+        <span class="identifier">l.Add</span><span class="other">(</span><span class="number">3</span><span class="other">)</span><span class="other">;</span>
+        <span class="identifier">m</span><span class="other">[</span><span class="string">&quot;abc&quot;</span><span class="other">]</span> <span class="other">=</span> <span class="number">4</span><span class="other">;</span>
+        <span class="identifier">m</span><span class="other">[</span><span class="string">&quot;def&quot;</span><span class="other">]</span> <span class="other">=</span> <span class="number">5</span><span class="other">;</span>
+        <span class="identifier">h</span><span class="other">[</span><span class="string">&quot;xyz&quot;</span><span class="other">]</span> <span class="other">=</span> <span class="number">6.5</span><span class="other">;</span>
+        <span class="identifier">memberList.Add</span><span class="other">(</span><span class="identifier">Member</span><span class="other">(</span><span class="number">1</span><span class="other">)</span><span class="other">)</span><span class="other">;</span>
+        <span class="identifier">memberList.Add</span><span class="other">(</span><span class="identifier">Member</span><span class="other">(</span><span class="number">2</span><span class="other">)</span><span class="other">)</span><span class="other">;</span>
+    <span class="other">}</span>
+    <span class="keyword">public</span> <span class="keyword">explicit</span> <span class="identifier">Alpha</span><span class="other">(</span><span class="identifier">JsonValue</span><span class="other">*</span> <span class="identifier">value</span><span class="other">)</span>
+    <span class="other">{</span>
+        <span class="identifier">FromJson</span><span class="other">(</span><span class="identifier">value</span><span class="other">,</span> <span class="string">&quot;i&quot;</span><span class="other">,</span> <span class="identifier">i</span><span class="other">)</span><span class="other">;</span>
+        <span class="identifier">FromJson</span><span class="other">(</span><span class="identifier">value</span><span class="other">,</span> <span class="string">&quot;d&quot;</span><span class="other">,</span> <span class="identifier">d</span><span class="other">)</span><span class="other">;</span>
+        <span class="identifier">FromJson</span><span class="other">(</span><span class="identifier">value</span><span class="other">,</span> <span class="string">&quot;b&quot;</span><span class="other">,</span> <span class="identifier">b</span><span class="other">)</span><span class="other">;</span>
+        <span class="identifier">FromJson</span><span class="other">(</span><span class="identifier">value</span><span class="other">,</span> <span class="string">&quot;s&quot;</span><span class="other">,</span> <span class="identifier">s</span><span class="other">)</span><span class="other">;</span>
+        <span class="identifier">FromJson</span><span class="other">(</span><span class="identifier">value</span><span class="other">,</span> <span class="string">&quot;w&quot;</span><span class="other">,</span> <span class="identifier">w</span><span class="other">)</span><span class="other">;</span>
+        <span class="identifier">FromJson</span><span class="other">(</span><span class="identifier">value</span><span class="other">,</span> <span class="string">&quot;u&quot;</span><span class="other">,</span> <span class="identifier">u</span><span class="other">)</span><span class="other">;</span>
+        <span class="identifier">FromJson</span><span class="other">(</span><span class="identifier">value</span><span class="other">,</span> <span class="string">&quot;l&quot;</span><span class="other">,</span> <span class="identifier">l</span><span class="other">)</span><span class="other">;</span>
+        <span class="identifier">FromJson</span><span class="other">(</span><span class="identifier">value</span><span class="other">,</span> <span class="string">&quot;m&quot;</span><span class="other">,</span> <span class="identifier">m</span><span class="other">)</span><span class="other">;</span>
+        <span class="identifier">FromJson</span><span class="other">(</span><span class="identifier">value</span><span class="other">,</span> <span class="string">&quot;h&quot;</span><span class="other">,</span> <span class="identifier">h</span><span class="other">)</span><span class="other">;</span>
+        <span class="identifier">FromJson</span><span class="other">(</span><span class="identifier">value</span><span class="other">,</span> <span class="string">&quot;member&quot;</span><span class="other">,</span> <span class="identifier">member</span><span class="other">)</span><span class="other">;</span>
+        <span class="identifier">FromJson</span><span class="other">(</span><span class="identifier">value</span><span class="other">,</span> <span class="string">&quot;memberList&quot;</span><span class="other">,</span> <span class="identifier">memberList</span><span class="other">)</span><span class="other">;</span>
+    <span class="other">}</span>
+    <span class="keyword">public</span> <span class="identifier">UniquePtr</span><span class="other">&lt;</span><span class="identifier">JsonValue</span><span class="other">&gt;</span> <span class="identifier">ToJson</span><span class="other">(</span><span class="other">)</span> <span class="keyword">const</span>
+    <span class="other">{</span>
+        <span class="identifier">UniquePtr</span><span class="other">&lt;</span><span class="identifier">JsonObject</span><span class="other">&gt;</span> <span class="identifier">object</span> <span class="other">=</span> <span class="keyword">new</span> <span class="identifier">JsonObject</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>
+        <span class="identifier">object</span><span class="other">-</span><span class="other">&gt;</span><span class="identifier">AddField</span><span class="other">(</span><span class="string">&quot;i&quot;</span><span class="other">,</span> <span class="identifier">ToJson</span><span class="other">(</span><span class="identifier">i</span><span class="other">)</span><span class="other">)</span><span class="other">;</span>
+        <span class="identifier">object</span><span class="other">-</span><span class="other">&gt;</span><span class="identifier">AddField</span><span class="other">(</span><span class="string">&quot;d&quot;</span><span class="other">,</span> <span class="identifier">ToJson</span><span class="other">(</span><span class="identifier">d</span><span class="other">)</span><span class="other">)</span><span class="other">;</span>
+        <span class="identifier">object</span><span class="other">-</span><span class="other">&gt;</span><span class="identifier">AddField</span><span class="other">(</span><span class="string">&quot;b&quot;</span><span class="other">,</span> <span class="identifier">ToJson</span><span class="other">(</span><span class="identifier">b</span><span class="other">)</span><span class="other">)</span><span class="other">;</span>
+        <span class="identifier">object</span><span class="other">-</span><span class="other">&gt;</span><span class="identifier">AddField</span><span class="other">(</span><span class="string">&quot;s&quot;</span><span class="other">,</span> <span class="identifier">ToJson</span><span class="other">(</span><span class="identifier">s</span><span class="other">)</span><span class="other">)</span><span class="other">;</span>
+        <span class="identifier">object</span><span class="other">-</span><span class="other">&gt;</span><span class="identifier">AddField</span><span class="other">(</span><span class="string">&quot;w&quot;</span><span class="other">,</span> <span class="identifier">ToJson</span><span class="other">(</span><span class="identifier">w</span><span class="other">)</span><span class="other">)</span><span class="other">;</span>
+        <span class="identifier">object</span><span class="other">-</span><span class="other">&gt;</span><span class="identifier">AddField</span><span class="other">(</span><span class="string">&quot;u&quot;</span><span class="other">,</span> <span class="identifier">ToJson</span><span class="other">(</span><span class="identifier">u</span><span class="other">)</span><span class="other">)</span><span class="other">;</span>
+        <span class="identifier">object</span><span class="other">-</span><span class="other">&gt;</span><span class="identifier">AddField</span><span class="other">(</span><span class="string">&quot;l&quot;</span><span class="other">,</span> <span class="identifier">ToJson</span><span class="other">(</span><span class="identifier">l</span><span class="other">)</span><span class="other">)</span><span class="other">;</span>
+        <span class="identifier">object</span><span class="other">-</span><span class="other">&gt;</span><span class="identifier">AddField</span><span class="other">(</span><span class="string">&quot;m&quot;</span><span class="other">,</span> <span class="identifier">ToJson</span><span class="other">(</span><span class="identifier">m</span><span class="other">)</span><span class="other">)</span><span class="other">;</span>
+        <span class="identifier">object</span><span class="other">-</span><span class="other">&gt;</span><span class="identifier">AddField</span><span class="other">(</span><span class="string">&quot;h&quot;</span><span class="other">,</span> <span class="identifier">ToJson</span><span class="other">(</span><span class="identifier">h</span><span class="other">)</span><span class="other">)</span><span class="other">;</span>
+        <span class="identifier">object</span><span class="other">-</span><span class="other">&gt;</span><span class="identifier">AddField</span><span class="other">(</span><span class="string">&quot;member&quot;</span><span class="other">,</span> <span class="identifier">ToJson</span><span class="other">(</span><span class="identifier">member</span><span class="other">)</span><span class="other">)</span><span class="other">;</span>
+        <span class="identifier">object</span><span class="other">-</span><span class="other">&gt;</span><span class="identifier">AddField</span><span class="other">(</span><span class="string">&quot;memberList&quot;</span><span class="other">,</span> <span class="identifier">ToJson</span><span class="other">(</span><span class="identifier">memberList</span><span class="other">)</span><span class="other">)</span><span class="other">;</span>
+        <span class="keyword">return</span> <span class="identifier">UniquePtr</span><span class="other">&lt;</span><span class="identifier">JsonValue</span><span class="other">&gt;</span><span class="other">(</span><span class="identifier">object.Release</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span>
+    <span class="other">}</span>
+    <span class="keyword">public</span> <span class="keyword">void</span> <span class="identifier">Dump</span><span class="other">(</span><span class="identifier">CodeFormatter</span><span class="other">&amp;</span> <span class="identifier">formatter</span><span class="other">)</span>
+    <span class="other">{</span>
+        <span class="identifier">formatter.WriteLine</span><span class="other">(</span><span class="string">&quot;alpha:&quot;</span><span class="other">)</span><span class="other">;</span>
+        <span class="identifier">formatter.WriteLine</span><span class="other">(</span><span class="string">&quot;i : &quot;</span> <span class="other">+</span> <span class="identifier">ToString</span><span class="other">(</span><span class="identifier">i</span><span class="other">)</span><span class="other">)</span><span class="other">;</span>
+        <span class="identifier">formatter.WriteLine</span><span class="other">(</span><span class="string">&quot;d : &quot;</span> <span class="other">+</span> <span class="identifier">ToString</span><span class="other">(</span><span class="identifier">d</span><span class="other">)</span><span class="other">)</span><span class="other">;</span>
+        <span class="identifier">formatter.WriteLine</span><span class="other">(</span><span class="string">&quot;b : &quot;</span> <span class="other">+</span> <span class="identifier">ToString</span><span class="other">(</span><span class="identifier">b</span><span class="other">)</span><span class="other">)</span><span class="other">;</span>
+        <span class="identifier">formatter.WriteLine</span><span class="other">(</span><span class="string">&quot;s : &quot;</span> <span class="other">+</span> <span class="identifier">s</span><span class="other">)</span><span class="other">;</span>
+        <span class="identifier">formatter.WriteLine</span><span class="other">(</span><span class="string">&quot;w : &quot;</span> <span class="other">+</span> <span class="identifier">ToUtf8</span><span class="other">(</span><span class="identifier">w</span><span class="other">)</span><span class="other">)</span><span class="other">;</span>
+        <span class="identifier">formatter.WriteLine</span><span class="other">(</span><span class="string">&quot;u : &quot;</span> <span class="other">+</span> <span class="identifier">ToUtf8</span><span class="other">(</span><span class="identifier">u</span><span class="other">)</span><span class="other">)</span><span class="other">;</span>
+        <span class="identifier">formatter.WriteLine</span><span class="other">(</span><span class="string">&quot;l : &quot;</span> <span class="other">+</span> <span class="identifier">ToString</span><span class="other">(</span><span class="identifier">l.Count</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">)</span><span class="other">;</span>
+        <span class="identifier">formatter.IncIndent</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>
+        <span class="keyword">for</span> <span class="other">(</span><span class="keyword">int</span> <span class="identifier">x</span> <span class="other">:</span> <span class="identifier">l</span><span class="other">)</span>
+        <span class="other">{</span>
+            <span class="identifier">formatter.WriteLine</span><span class="other">(</span><span class="identifier">ToString</span><span class="other">(</span><span class="identifier">x</span><span class="other">)</span><span class="other">)</span><span class="other">;</span>
+        <span class="other">}</span>
+        <span class="identifier">formatter.DecIndent</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>
+        <span class="identifier">formatter.WriteLine</span><span class="other">(</span><span class="string">&quot;m : &quot;</span> <span class="other">+</span> <span class="identifier">ToString</span><span class="other">(</span><span class="identifier">m.Count</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">)</span><span class="other">;</span>
+        <span class="identifier">formatter.IncIndent</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>
+        <span class="keyword">for</span> <span class="other">(</span><span class="keyword">const</span> <span class="identifier">Pair</span><span class="other">&lt;</span><span class="identifier">string</span><span class="other">,</span> <span class="keyword">int</span><span class="other">&gt;</span><span class="other">&amp;</span> <span class="identifier">x</span> <span class="other">:</span> <span class="identifier">m</span><span class="other">)</span>
+        <span class="other">{</span>
+            <span class="identifier">formatter.WriteLine</span><span class="other">(</span><span class="identifier">x.first</span> <span class="other">+</span> <span class="string">&quot; : &quot;</span> <span class="other">+</span> <span class="identifier">ToString</span><span class="other">(</span><span class="identifier">x.second</span><span class="other">)</span><span class="other">)</span><span class="other">;</span>
+        <span class="other">}</span>
+        <span class="identifier">formatter.DecIndent</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>
+        <span class="identifier">formatter.WriteLine</span><span class="other">(</span><span class="string">&quot;h : &quot;</span> <span class="other">+</span> <span class="identifier">ToString</span><span class="other">(</span><span class="identifier">h.Count</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">)</span><span class="other">;</span>
+        <span class="identifier">formatter.IncIndent</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>
+        <span class="keyword">for</span> <span class="other">(</span><span class="keyword">const</span> <span class="identifier">Pair</span><span class="other">&lt;</span><span class="identifier">string</span><span class="other">,</span> <span class="keyword">double</span><span class="other">&gt;</span><span class="other">&amp;</span> <span class="identifier">x</span> <span class="other">:</span> <span class="identifier">h</span><span class="other">)</span>
+        <span class="other">{</span>
+            <span class="identifier">formatter.WriteLine</span><span class="other">(</span><span class="identifier">x.first</span> <span class="other">+</span> <span class="string">&quot; : &quot;</span> <span class="other">+</span> <span class="identifier">ToString</span><span class="other">(</span><span class="identifier">x.second</span><span class="other">)</span><span class="other">)</span><span class="other">;</span>
+        <span class="other">}</span>
+        <span class="identifier">formatter.DecIndent</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>
+        <span class="identifier">member.Dump</span><span class="other">(</span><span class="identifier">formatter</span><span class="other">)</span><span class="other">;</span>
+        <span class="identifier">formatter.WriteLine</span><span class="other">(</span><span class="string">&quot;memberList : &quot;</span> <span class="other">+</span> <span class="identifier">ToString</span><span class="other">(</span><span class="identifier">memberList.Count</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">)</span><span class="other">;</span>
+        <span class="identifier">formatter.IncIndent</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>
+        <span class="keyword">for</span> <span class="other">(</span><span class="keyword">const</span> <span class="identifier">Member</span><span class="other">&amp;</span> <span class="identifier">x</span> <span class="other">:</span> <span class="identifier">memberList</span><span class="other">)</span>
+        <span class="other">{</span>
+            <span class="identifier">x.Dump</span><span class="other">(</span><span class="identifier">formatter</span><span class="other">)</span><span class="other">;</span>
+        <span class="other">}</span>
+        <span class="identifier">formatter.DecIndent</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>
+    <span class="other">}</span>
+    <span class="keyword">private</span> <span class="keyword">int</span> <span class="identifier">i</span><span class="other">;</span>
+    <span class="keyword">private</span> <span class="keyword">double</span> <span class="identifier">d</span><span class="other">;</span>
+    <span class="keyword">private</span> <span class="keyword">bool</span> <span class="identifier">b</span><span class="other">;</span>
+    <span class="keyword">private</span> <span class="identifier">string</span> <span class="identifier">s</span><span class="other">;</span>
+    <span class="keyword">private</span> <span class="identifier">wstring</span> <span class="identifier">w</span><span class="other">;</span>
+    <span class="keyword">private</span> <span class="identifier">ustring</span> <span class="identifier">u</span><span class="other">;</span>
+    <span class="keyword">private</span> <span class="identifier">List</span><span class="other">&lt;</span><span class="keyword">int</span><span class="other">&gt;</span> <span class="identifier">l</span><span class="other">;</span>
+    <span class="keyword">private</span> <span class="identifier">Map</span><span class="other">&lt;</span><span class="identifier">string</span><span class="other">,</span> <span class="keyword">int</span><span class="other">&gt;</span> <span class="identifier">m</span><span class="other">;</span>
+    <span class="keyword">private</span> <span class="identifier">HashMap</span><span class="other">&lt;</span><span class="identifier">string</span><span class="other">,</span> <span class="keyword">double</span><span class="other">&gt;</span> <span class="identifier">h</span><span class="other">;</span>
+    <span class="keyword">private</span> <span class="identifier">Member</span> <span class="identifier">member</span><span class="other">;</span>
+    <span class="keyword">private</span> <span class="identifier">List</span><span class="other">&lt;</span><span class="identifier">Member</span><span class="other">&gt;</span> <span class="identifier">memberList</span><span class="other">;</span>
+<span class="other">}</span>
+
+<span class="keyword">void</span> <span class="identifier">main</span><span class="other">(</span><span class="other">)</span>
+<span class="other">{</span>
+    <span class="keyword">try</span>
+    <span class="other">{</span>
+        <span class="identifier">CodeFormatter</span> <span class="identifier">formatter</span><span class="other">(</span><span class="identifier">Console.Out</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span>
+        <span class="identifier">Alpha</span> <span class="identifier">alpha</span><span class="other">;</span>
+        <span class="identifier">alpha.Dump</span><span class="other">(</span><span class="identifier">formatter</span><span class="other">)</span><span class="other">;</span>
+        <span class="identifier">UniquePtr</span><span class="other">&lt;</span><span class="identifier">JsonValue</span><span class="other">&gt;</span> <span class="identifier">value</span> <span class="other">=</span> <span class="identifier">ToJson</span><span class="other">(</span><span class="identifier">alpha</span><span class="other">)</span><span class="other">;</span>
+        <span class="identifier">string</span> <span class="identifier">jsonText</span> <span class="other">=</span> <span class="identifier">value</span><span class="other">-</span><span class="other">&gt;</span><span class="identifier">ToString</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>
+        <span class="identifier">Console.WriteLine</span><span class="other">(</span><span class="string">&quot;alpha as JSON:&quot;</span><span class="other">)</span><span class="other">;</span>
+        <span class="identifier">Console.WriteLine</span><span class="other">(</span><span class="identifier">jsonText</span><span class="other">)</span><span class="other">;</span>
+        <span class="identifier">UniquePtr</span><span class="other">&lt;</span><span class="identifier">JsonValue</span><span class="other">&gt;</span> <span class="identifier">jsonValue</span> <span class="other">=</span> <span class="identifier">ParseJson</span><span class="other">(</span><span class="identifier">jsonText</span><span class="other">)</span><span class="other">;</span>
+        <span class="identifier">Alpha</span> <span class="identifier">alphaFromJson</span><span class="other">;</span>
+        <span class="identifier">FromJson</span><span class="other">(</span><span class="identifier">jsonValue.Get</span><span class="other">(</span><span class="other">)</span><span class="other">,</span> <span class="identifier">alphaFromJson</span><span class="other">)</span><span class="other">;</span>
+        <span class="identifier">alphaFromJson.Dump</span><span class="other">(</span><span class="identifier">formatter</span><span class="other">)</span><span class="other">;</span>
+    <span class="other">}</span>
+    <span class="keyword">catch</span> <span class="other">(</span><span class="keyword">const</span> <span class="identifier">Exception</span><span class="other">&amp;</span> <span class="identifier">ex</span><span class="other">)</span>
+    <span class="other">{</span>
+        <span class="identifier">Console.WriteLine</span><span class="other">(</span><span class="identifier">ex.ToString</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span>
+    <span class="other">}</span>
+<span class="other">}</span>
+</div
+</pre>
+</body>
+</html>

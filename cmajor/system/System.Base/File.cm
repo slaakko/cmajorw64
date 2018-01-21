@@ -19,27 +19,27 @@ namespace System.IO
         }
         public static StreamWriter CreateText(const string& filePath)
         {
-            return StreamWriter(UniquePtr<ByteStream>(new BufferedByteStream(UniquePtr<ByteStream>(
+            return StreamWriter(SharedPtr<ByteStream>(new BufferedByteStream(SharedPtr<ByteStream>(
                 new FileByteStream(filePath, OpenMode.write)))));
         }
         public static BinaryWriter CreateBinary(const string& filePath)
         {
-            return BinaryWriter(UniquePtr<ByteStream>(new BufferedByteStream(UniquePtr<ByteStream>(
+            return BinaryWriter(SharedPtr<ByteStream>(new BufferedByteStream(SharedPtr<ByteStream>(
                 new FileByteStream(filePath, cast<OpenMode>(OpenMode.write | OpenMode.binary))))));
         }
         public static StreamWriter AppendText(const string& filePath)
         {
-            return StreamWriter(UniquePtr<ByteStream>(new BufferedByteStream(UniquePtr<ByteStream>(
+            return StreamWriter(SharedPtr<ByteStream>(new BufferedByteStream(SharedPtr<ByteStream>(
                 new FileByteStream(filePath, OpenMode.append)))));
         }
         public static StreamReader OpenRead(const string& filePath)
         {
-            return StreamReader(UniquePtr<ByteStream>(new BufferedByteStream(UniquePtr<ByteStream>(
+            return StreamReader(SharedPtr<ByteStream>(new BufferedByteStream(SharedPtr<ByteStream>(
                 new FileByteStream(filePath, OpenMode.read)))));
         }
         public static BinaryReader OpenBinary(const string& filePath)
         {
-            return BinaryReader(UniquePtr<ByteStream>(new BufferedByteStream(UniquePtr<ByteStream>(
+            return BinaryReader(SharedPtr<ByteStream>(new BufferedByteStream(SharedPtr<ByteStream>(
                 new FileByteStream(filePath, cast<OpenMode>(OpenMode.read | OpenMode.binary))))));
         }
         public static string ReadAllText(const string& filePath)

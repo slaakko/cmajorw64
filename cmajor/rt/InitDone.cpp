@@ -13,9 +13,11 @@
 #include <cmajor/rt/Statics.hpp>
 #include <cmajor/rt/String.hpp>
 #include <cmajor/rt/Mutex.hpp>
+#include <cmajor/rt/ConditionVariable.hpp>
 #include <cmajor/rt/Thread.hpp>
 #include <cmajor/rt/Memory.hpp>
 #include <cmajor/rt/CommandLine.hpp>
+#include <cmajor/rt/Socket.hpp>
 #include <csignal>
 
 extern "C" RT_API void RtInit()
@@ -44,18 +46,22 @@ void Init()
     InitError();
     InitString();
     InitMemory();
+    InitConditionVariable();
+    InitThread();
+    InitSocket();
     InitStatics();
     InitClasses();
-    InitThread();
     InitCommandLine();
 }
 
 void Done()
 {
     DoneCommandLine();
-    DoneThread();
     DoneClasses();
     DoneStatics();
+    DoneSocket();
+    DoneThread();
+    DoneConditionVariable();
     DoneMemory();
     DoneString();
     DoneError();

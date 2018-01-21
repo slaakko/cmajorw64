@@ -59,19 +59,6 @@ namespace System.Threading
         private nothrow Thread(int id_) : id(id_)
         {
         }
-        public ~Thread()
-        {
-            if (id != 0)
-            {
-                try
-                {
-                    Join();
-                }
-                catch (const Exception&)
-                {
-                }
-            }
-        }
         suppress Thread(const Thread&);
         suppress void operator=(const Thread&);
         public nothrow Thread(Thread&& that) : id(that.id)

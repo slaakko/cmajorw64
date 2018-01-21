@@ -62,10 +62,6 @@ __thread CallStack* std::string* stackTrace = nullptr;
 extern "C" RT_API void RtEnterFunction(const char* functionName, const char* sourceFilePath)
 {
     std::string fn = functionName;
-    if (fn.find("BeginNamespace(") != std::string::npos)
-    {
-        int x = 0;
-    }
     cmajor::rt::CallStack* callStack = cmajor::rt::callStack;
     if (!callStack)
     {

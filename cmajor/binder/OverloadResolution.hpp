@@ -24,7 +24,8 @@ enum class OverloadResolutionFlags : uint8_t
 {
     none = 0,
     dontThrow = 1 << 0,
-    dontInstantiate = 1 << 1
+    dontInstantiate = 1 << 1,
+    noTemplates = 1 << 2
 };
 
 inline OverloadResolutionFlags operator&(OverloadResolutionFlags left, OverloadResolutionFlags right)

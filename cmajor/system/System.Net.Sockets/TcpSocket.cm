@@ -1,0 +1,152 @@
+// =================================
+// Copyright (c) 2018 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+
+namespace System.Net.Sockets
+{
+    public enum ShutdownMode : int
+    {
+        receive = 0, send = 1, both = 2
+    }
+    
+    public class SocketException : Exception
+    {
+        public nothrow SocketException(const string& message_) : base(message_)
+        {
+        }
+    }
+    
+    public class TcpSocket
+    {
+        public TcpSocket() : handle(RtCreateSocket())
+        {
+            if (handle < 0)
+            {
+                string errorMessage = RtGetError(handle);
+                RtDisposeError(handle);
+                throw SocketException(errorMessage);
+            }
+        }
+        public TcpSocket(const string& node_, const string& service_) : handle(RtConnectSocket(node_.Chars(), service_.Chars()))
+        {
+            if (handle < 0)
+            {
+                string errorMessage = RtGetError(handle);
+                RtDisposeError(handle);
+                throw SocketException(errorMessage);
+            }
+        }
+        public nothrow TcpSocket(int handle_) : handle(handle_)
+        {
+        }
+        suppress TcpSocket(const TcpSocket&);
+        suppress void operator=(const TcpSocket&);
+        public nothrow TcpSocket(TcpSocket&& that) : handle(that.handle)
+        {
+            that.handle = -1;
+        }
+        public nothrow void operator=(TcpSocket&& that) 
+        {
+            Swap(handle, that.handle);
+        }
+        public ~TcpSocket()
+        {
+            if (handle > 0)
+            {
+                RtCloseSocket(handle);
+            }
+        }
+        public void Close()
+        {
+            if (handle > 0)
+            {
+                int result = RtCloseSocket(handle);
+                if (result < 0)
+                {
+                    string errorMessage = RtGetError(result);
+                    RtDisposeError(result);
+                    throw SocketException(errorMessage);
+                }
+                handle = -1;
+            }
+        }
+        public void Connect(const string& node, const string& service)
+        {
+            Close();
+            handle = RtConnectSocket(node.Chars(), service.Chars());
+            if (handle < 0)
+            {
+                string errorMessage = RtGetError(handle);
+                RtDisposeError(handle);
+                throw SocketException(errorMessage);
+            }
+        }
+        public void Bind(int port)
+        {
+            int result = RtBindSocket(handle, port);
+            if (result < 0)
+            {
+                string errorMessage = RtGetError(result);
+                RtDisposeError(result);
+                throw SocketException(errorMessage);
+            }
+        }
+        public void Listen(int backLog)
+        {
+            int result = RtListenSocket(handle, backLog);
+            if (result < 0)
+            {
+                string errorMessage = RtGetError(result);
+                RtDisposeError(result);
+                throw SocketException(errorMessage);
+            }
+        }
+        public TcpSocket Accept()
+        {
+            int acceptedHandle = RtAcceptSocket(handle);
+            if (acceptedHandle < 0)
+            {
+                string errorMessage = RtGetError(acceptedHandle);
+                RtDisposeError(acceptedHandle);
+                throw SocketException(errorMessage);
+            }
+            return TcpSocket(acceptedHandle);
+        }
+        public void Shutdown(ShutdownMode mode)
+        {
+            int result = RtShutdownSocket(handle, cast<int>(mode));
+            if (result < 0)
+            {
+                string errorMessage = RtGetError(result);
+                RtDisposeError(result);
+                throw SocketException(errorMessage);
+            }
+        }
+        public int Send(byte* buffer, int count)
+        {
+            int result = RtSendSocket(handle, buffer, count, 0);
+            if (result < 0)
+            {
+                string errorMessage = RtGetError(result);
+                RtDisposeError(result);
+                throw SocketException(errorMessage);
+            }
+            return result;
+        }
+        public int Receive(byte* buffer, int count)
+        {
+            int result = RtReceiveSocket(handle, buffer, count, 0);
+            if (result < 0)
+            {
+                string errorMessage = RtGetError(result);
+                RtDisposeError(result);
+                throw SocketException(errorMessage);
+            }
+            return result;
+        }
+        private int handle;
+    }
+}

@@ -150,4 +150,16 @@ FileScope* ClassTemplateSpecializationSymbol::ReleaseFileScope()
     return fileScope.release();
 }
 
+std::u32string ClassTemplateSpecializationSymbol::Id() const
+{
+    if (IsPrototype())
+    {
+        return MangledName();
+    }
+    else
+    {
+        return ToUtf32(std::to_string(TypeId()));
+    }
+}
+
 } } // namespace cmajor::symbols

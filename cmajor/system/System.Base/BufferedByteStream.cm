@@ -9,11 +9,11 @@ namespace System.IO
 {
     public class BufferedByteStream : ByteStream
     {
-        public nothrow BufferedByteStream(UniquePtr<ByteStream>&& baseStream_) : this(Rvalue(baseStream_), 4096)
+        public nothrow BufferedByteStream(const SharedPtr<ByteStream>& baseStream_) : this(baseStream_, 4096)
         {
         }
-        public nothrow BufferedByteStream(UniquePtr<ByteStream>&& baseStream_, long bufferSize_) : 
-            baseStream(Rvalue(baseStream_)), buffer(bufferSize_), pos(buffer.Size()), bytesAvailable(0), end(0)
+        public nothrow BufferedByteStream(const SharedPtr<ByteStream>& baseStream_, long bufferSize_) : 
+            baseStream(baseStream_), buffer(bufferSize_), pos(buffer.Size()), bytesAvailable(0), end(0)
         {
         }
         suppress BufferedByteStream(const BufferedByteStream&);
@@ -101,16 +101,16 @@ namespace System.IO
             Flush();
             return baseStream->Tell() - bytesAvailable;
         }
-        public nothrow ByteStream& ContainedStream()
+        public nothrow const SharedPtr<ByteStream>& ContainedStream() 
         {
-            return *baseStream;
+            return baseStream;
         }
         private void FillBuf()
         {
             bytesAvailable = baseStream->Read(cast<byte*>(buffer.Mem()), buffer.Size());
             pos = 0;
         }
-        private UniquePtr<ByteStream> baseStream;
+        private SharedPtr<ByteStream> baseStream;
         private IOBuffer buffer;
         private long pos;
         private long bytesAvailable;

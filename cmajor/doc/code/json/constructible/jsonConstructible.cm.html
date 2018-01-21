@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8"/>
+    <title>jsonConstructible.cm</title>
+    <link rel="stylesheet" type="text/css" href="../../../style/code.css"/>
+</head>
+<body>
+<pre>
+<div class="code">
+<span class="keyword">using</span> <span class="identifier">System</span><span class="other">;</span>
+<span class="keyword">using</span> <span class="identifier">System.Json</span><span class="other">;</span>
+<span class="keyword">using</span> <span class="identifier">MyNs</span><span class="other">;</span>
+
+<span class="keyword">namespace</span> <span class="identifier">MyNs</span>
+<span class="other">{</span>
+    <span class="keyword">public</span> <span class="keyword">class</span> <span class="identifier">MyJsonConstructibleClass</span>
+    <span class="other">{</span>
+        <span class="keyword">public</span> <span class="keyword">explicit</span> <span class="identifier">MyJsonConstructibleClass</span><span class="other">(</span><span class="identifier">JsonValue</span><span class="other">*</span> <span class="identifier">value</span><span class="other">)</span>
+        <span class="other">{</span>
+            <span class="identifier">FromJson</span><span class="other">(</span><span class="identifier">value</span><span class="other">,</span> <span class="string">&quot;i&quot;</span><span class="other">,</span> <span class="identifier">i</span><span class="other">)</span><span class="other">;</span>
+            <span class="identifier">FromJson</span><span class="other">(</span><span class="identifier">value</span><span class="other">,</span> <span class="string">&quot;d&quot;</span><span class="other">,</span> <span class="identifier">d</span><span class="other">)</span><span class="other">;</span>
+            <span class="identifier">FromJson</span><span class="other">(</span><span class="identifier">value</span><span class="other">,</span> <span class="string">&quot;b&quot;</span><span class="other">,</span> <span class="identifier">b</span><span class="other">)</span><span class="other">;</span>
+            <span class="identifier">FromJson</span><span class="other">(</span><span class="identifier">value</span><span class="other">,</span> <span class="string">&quot;s&quot;</span><span class="other">,</span> <span class="identifier">s</span><span class="other">)</span><span class="other">;</span>
+        <span class="other">}</span>
+        <span class="keyword">public</span> <span class="keyword">void</span> <span class="identifier">Dump</span><span class="other">(</span><span class="other">)</span>
+        <span class="other">{</span>
+            <span class="identifier">Console.WriteLine</span><span class="other">(</span><span class="string">&quot;i : &quot;</span> <span class="other">+</span> <span class="identifier">ToString</span><span class="other">(</span><span class="identifier">i</span><span class="other">)</span><span class="other">)</span><span class="other">;</span>
+            <span class="identifier">Console.WriteLine</span><span class="other">(</span><span class="string">&quot;d : &quot;</span> <span class="other">+</span> <span class="identifier">ToString</span><span class="other">(</span><span class="identifier">d</span><span class="other">)</span><span class="other">)</span><span class="other">;</span>
+            <span class="identifier">Console.WriteLine</span><span class="other">(</span><span class="string">&quot;b : &quot;</span> <span class="other">+</span> <span class="identifier">ToString</span><span class="other">(</span><span class="identifier">b</span><span class="other">)</span><span class="other">)</span><span class="other">;</span>
+            <span class="identifier">Console.WriteLine</span><span class="other">(</span><span class="string">&quot;s : &quot;</span> <span class="other">+</span> <span class="identifier">s</span><span class="other">)</span><span class="other">;</span>
+        <span class="other">}</span>
+        <span class="keyword">private</span> <span class="keyword">int</span> <span class="identifier">i</span><span class="other">;</span>
+        <span class="keyword">private</span> <span class="keyword">double</span> <span class="identifier">d</span><span class="other">;</span>
+        <span class="keyword">private</span> <span class="keyword">bool</span> <span class="identifier">b</span><span class="other">;</span>
+        <span class="keyword">private</span> <span class="identifier">string</span> <span class="identifier">s</span><span class="other">;</span>
+    <span class="other">}</span>
+<span class="other">}</span>
+
+<span class="keyword">void</span> <span class="identifier">main</span><span class="other">(</span><span class="other">)</span>
+<span class="other">{</span>
+    <span class="keyword">try</span>
+    <span class="other">{</span>
+        <span class="identifier">string</span> <span class="identifier">jsonText</span> <span class="other">=</span> <span class="string">&quot;{\&quot;b\&quot;:true, \&quot;d\&quot;:1.5, \&quot;i\&quot;:2, \&quot;s\&quot;:\&quot;foo\&quot;}&quot;</span><span class="other">;</span>
+        <span class="identifier">UniquePtr</span><span class="other">&lt;</span><span class="identifier">JsonValue</span><span class="other">&gt;</span> <span class="identifier">jsonValue</span> <span class="other">=</span> <span class="identifier">ParseJson</span><span class="other">(</span><span class="identifier">jsonText</span><span class="other">)</span><span class="other">;</span>
+        <span class="identifier">MyJsonConstructibleClass</span> <span class="identifier">constructible</span><span class="other">(</span><span class="identifier">jsonValue.Get</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span>
+        <span class="identifier">constructible.Dump</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>
+    <span class="other">}</span>
+    <span class="keyword">catch</span> <span class="other">(</span><span class="keyword">const</span> <span class="identifier">Exception</span><span class="other">&amp;</span> <span class="identifier">ex</span><span class="other">)</span>
+    <span class="other">{</span>
+        <span class="identifier">Console.WriteLine</span><span class="other">(</span><span class="identifier">ex.ToString</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span>
+    <span class="other">}</span>
+<span class="other">}</span>
+</div
+</pre>
+</body>
+</html>

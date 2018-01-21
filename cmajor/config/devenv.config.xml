@@ -3,12 +3,12 @@
     <cmc>cmc.exe</cmc>
     <tabSize>4</tabSize>
     <infoDelaySecs>10</infoDelaySecs>
-    <formSizeX>1781</formSizeX>
+    <formSizeX>1774</formSizeX>
     <formSizeY>984</formSizeY>
-    <formTop>0</formTop>
-    <formLeft>0</formLeft>
-    <textVisX>208</textVisX>
-    <textVisY>208</textVisY>
+    <formTop>16</formTop>
+    <formLeft>25</formLeft>
+    <textVisX>78</textVisX>
+    <textVisY>78</textVisY>
     <textVisW>1259</textVisW>
     <textVisH>482</textVisH>
     <toolColWidth>80</toolColWidth>
@@ -22,13 +22,17 @@
     <findLineColWidth>85</findLineColWidth>
     <findProjectColWidth>183</findProjectColWidth>
     <findTextColWidth>738</findTextColWidth>
-    <horizontalSplitterPos>1346</horizontalSplitterPos>
+    <horizontalSplitterPos>1340</horizontalSplitterPos>
     <verticalSplitterPos>537</verticalSplitterPos>
     <windowState>Normal</windowState>
     <maxRecentProjects>10</maxRecentProjects>
     <recentProjects>
         <recentProject>
-            <path>C:\Users\Seppo\cmajorw64\cmajor\projects\tools\cmparsergen\cmparsergen.cms</path>
+            <path>C:/Users/Seppo/cmajorw64/cmajor/doc/code/threading/transferringExceptions/transferringExceptions.cms</path>
+            <openFiles />
+        </recentProject>
+        <recentProject>
+            <path>C:\Users\Seppo\cmajorw64\cmajor\doc\code\threading\threadSynchronization\threadSynchronization.cms</path>
             <openFiles />
         </recentProject>
         <recentProject>
@@ -36,11 +40,15 @@
             <openFiles />
         </recentProject>
         <recentProject>
-            <path>C:\Users\Seppo\cmajorw64\cmajor\projects\tools\cmparsergen\test_thread\cmparsergen.cms</path>
+            <path>C:/Users/Seppo/cmajorw64/cmajor/doc/code/threading/threadFunction/threadFunction.cms</path>
             <openFiles />
         </recentProject>
         <recentProject>
-            <path>C:\Users\Seppo\cmajorw64\cmajor\test\foo\foo.cms</path>
+            <path>C:/Users/Seppo/cmajorw64/cmajor/doc/code/json/json.cms</path>
+            <openFiles />
+        </recentProject>
+        <recentProject>
+            <path>C:\Users\Seppo\cmajorw64\cmajor\projects\tools\cmparsergen\cmparsergen.cms</path>
             <openFiles />
         </recentProject>
         <recentProject>
@@ -48,19 +56,15 @@
             <openFiles />
         </recentProject>
         <recentProject>
-            <path>C:\Users\Seppo\cmajorw64\cmajor\test\TradeEngine\TradeEngine.cms</path>
+            <path>C:\Users\Seppo\cmajorw64\cmajor\test\foo\foo.cms</path>
             <openFiles />
         </recentProject>
         <recentProject>
-            <path>C:\Users\Seppo\cmajorw64\cmajor\projects\cmparsergen\cmparsergen.cms</path>
+            <path>C:\Users\Seppo\cmajorw64\cmajor\test\foolib\foolib.cms</path>
             <openFiles />
         </recentProject>
         <recentProject>
-            <path>C:/Users/Seppo/cmajorw64/cmajor/test/foolib/foolib.cms</path>
-            <openFiles />
-        </recentProject>
-        <recentProject>
-            <path>C:\Users\Seppo\cmajorw64\cmajor\cmparsergen\cmparsergen.cms</path>
+            <path>C:\Users\Seppo\cmajorw64\cmajor\test\TcpClient\TcpClient.cms</path>
             <openFiles />
         </recentProject>
     </recentProjects>

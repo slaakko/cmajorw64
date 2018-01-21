@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8"/>
+    <title>transferringExceptions.cm</title>
+    <link rel="stylesheet" type="text/css" href="../../../style/code.css"/>
+</head>
+<body>
+<pre>
+<div class="code">
+<span class="keyword">using</span> <span class="identifier">System</span><span class="other">;</span>
+<span class="keyword">using</span> <span class="identifier">System.Threading</span><span class="other">;</span>
+
+<span class="keyword">public</span> <span class="keyword">class</span> <span class="identifier">FooException</span> <span class="other">:</span> <span class="identifier">Exception</span>
+<span class="other">{</span>
+    <span class="keyword">public</span> <span class="identifier">FooException</span><span class="other">(</span><span class="keyword">const</span> <span class="identifier">string</span><span class="other">&amp;</span> <span class="identifier">message_</span><span class="other">)</span> <span class="other">:</span> <span class="keyword">base</span><span class="other">(</span><span class="identifier">message_</span><span class="other">)</span>
+    <span class="other">{</span>
+    <span class="other">}</span>
+<span class="other">}</span>
+
+<span class="keyword">void</span> <span class="identifier">foo</span><span class="other">(</span><span class="other">)</span>
+<span class="other">{</span>
+    <span class="keyword">throw</span> <span class="identifier">FooException</span><span class="other">(</span><span class="string">&quot;foo&quot;</span><span class="other">)</span><span class="other">;</span>
+<span class="other">}</span>
+
+<span class="keyword">class</span> <span class="identifier">ThreadData</span>
+<span class="other">{</span>
+    <span class="keyword">public</span> <span class="keyword">void</span> <span class="identifier">SetCapturedException</span><span class="other">(</span><span class="keyword">const</span> <span class="identifier">ExceptionPtr</span><span class="other">&amp;</span> <span class="identifier">exception_</span><span class="other">)</span>
+    <span class="other">{</span>
+        <span class="identifier">exception</span> <span class="other">=</span> <span class="identifier">exception_</span><span class="other">;</span>
+    <span class="other">}</span>
+    <span class="keyword">public</span> <span class="keyword">const</span> <span class="identifier">ExceptionPtr</span><span class="other">&amp;</span> <span class="identifier">GetCapturedException</span><span class="other">(</span><span class="other">)</span> <span class="keyword">const</span>
+    <span class="other">{</span>
+        <span class="keyword">return</span> <span class="identifier">exception</span><span class="other">;</span>
+    <span class="other">}</span>
+    <span class="keyword">private</span> <span class="identifier">ExceptionPtr</span> <span class="identifier">exception</span><span class="other">;</span>
+<span class="other">}</span>
+
+<span class="keyword">void</span> <span class="identifier">ThreadFunction</span><span class="other">(</span><span class="keyword">void</span><span class="other">*</span> <span class="identifier">arg</span><span class="other">)</span>
+<span class="other">{</span>
+    <span class="identifier">ThreadData</span><span class="other">*</span> <span class="identifier">threadData</span> <span class="other">=</span> <span class="keyword">cast</span><span class="other">&lt;</span><span class="identifier">ThreadData</span><span class="other">*</span><span class="other">&gt;</span><span class="other">(</span><span class="identifier">arg</span><span class="other">)</span><span class="other">;</span>
+    <span class="keyword">try</span>
+    <span class="other">{</span>
+        <span class="identifier">foo</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>
+    <span class="other">}</span>
+    <span class="keyword">catch</span> <span class="other">(</span><span class="keyword">const</span> <span class="identifier">Exception</span><span class="other">&amp;</span> <span class="identifier">ex</span><span class="other">)</span>
+    <span class="other">{</span>
+        <span class="identifier">ExceptionPtr</span> <span class="identifier">exceptionPtr</span> <span class="other">=</span> <span class="identifier">CaptureCurrentException</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>
+        <span class="identifier">threadData</span><span class="other">-</span><span class="other">&gt;</span><span class="identifier">SetCapturedException</span><span class="other">(</span><span class="identifier">exceptionPtr</span><span class="other">)</span><span class="other">;</span>
+    <span class="other">}</span>
+<span class="other">}</span>
+
+<span class="keyword">void</span> <span class="identifier">main</span><span class="other">(</span><span class="other">)</span>
+<span class="other">{</span>
+    <span class="keyword">try</span>
+    <span class="other">{</span>
+        <span class="identifier">ThreadData</span> <span class="identifier">threadData</span><span class="other">;</span>
+        <span class="identifier">Thread</span> <span class="identifier">thread</span> <span class="other">=</span> <span class="identifier">Thread.StartFunction</span><span class="other">(</span><span class="identifier">ThreadFunction</span><span class="other">,</span> <span class="other">&amp;</span><span class="identifier">threadData</span><span class="other">)</span><span class="other">;</span>
+        <span class="identifier">thread.Join</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>
+        <span class="identifier">ExceptionPtr</span> <span class="identifier">capturedExceptionPtr</span> <span class="other">=</span> <span class="identifier">threadData.GetCapturedException</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>
+        <span class="keyword">if</span> <span class="other">(</span><span class="identifier">capturedExceptionPtr.Exception</span><span class="other">(</span><span class="other">)</span> <span class="other">!</span><span class="other">=</span> <span class="keyword">null</span><span class="other">)</span>
+        <span class="other">{</span>
+            <span class="identifier">ThrowCapturedException</span><span class="other">(</span><span class="identifier">capturedExceptionPtr</span><span class="other">)</span><span class="other">;</span>
+        <span class="other">}</span>
+    <span class="other">}</span>
+    <span class="keyword">catch</span> <span class="other">(</span><span class="keyword">const</span> <span class="identifier">Exception</span><span class="other">&amp;</span> <span class="identifier">ex</span><span class="other">)</span>
+    <span class="other">{</span>
+        <span class="identifier">Console.Error</span><span class="other">(</span><span class="other">)</span> <span class="other">&lt;</span><span class="other">&lt;</span> <span class="identifier">ex.ToString</span><span class="other">(</span><span class="other">)</span> <span class="other">&lt;</span><span class="other">&lt;</span> <span class="identifier">endl</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>
+    <span class="other">}</span>
+<span class="other">}</span>
+</div
+</pre>
+</body>
+</html>

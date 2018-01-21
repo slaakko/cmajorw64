@@ -14,6 +14,7 @@ const int exitCodeInternalError = 254;
 const int exitCodeAssertionFailed = 253;
 const int exitCodeOutOfMemory = 252;
 const int exitCodeExceptionEscapedFromThread = 251;
+const int exitCodeSocketInitializationFailed = 250;
 
 extern "C" RT_API void RtFailAssertion(const char* assertion, const char* function, const char* sourceFilePath, int lineNumber);
 extern "C" RT_API const char* RtGetError(int32_t errorId);

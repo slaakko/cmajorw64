@@ -98,7 +98,7 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-      <AdditionalDependencies>parser.lib;parsing.lib;codedom.lib;util.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>ws2_32.lib;parser.lib;parsing.lib;codedom.lib;util.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(OutDir);C:\Programming\boost64;C:\Programming\llvm-4.0.0.src\build\Debug\lib</AdditionalLibraryDirectories>
       <AdditionalOptions>/EXPORT:__CxxFrameHandler3 /EXPORT:_CxxThrowException /EXPORT:__chkstk %(AdditionalOptions)</AdditionalOptions>
     </Link>
@@ -155,13 +155,14 @@
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>parser.lib;parsing.lib;codedom.lib;util.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>ws2_32.lib;parser.lib;parsing.lib;codedom.lib;util.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(OutDir);C:\Programming\boost64;C:\Programming\llvm-4.0.0.src\build\Release\lib</AdditionalLibraryDirectories>
       <AdditionalOptions>/EXPORT:__CxxFrameHandler3 /EXPORT:_CxxThrowException /EXPORT:__chkstk %(AdditionalOptions)</AdditionalOptions>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="CommandLine.hpp" />
+    <ClInclude Include="ConditionVariable.hpp" />
     <ClInclude Include="Environment.hpp" />
     <ClInclude Include="Error.hpp" />
     <ClInclude Include="CallStack.hpp" />
@@ -170,14 +171,18 @@
     <ClInclude Include="Math.hpp" />
     <ClInclude Include="Memory.hpp" />
     <ClInclude Include="Mutex.hpp" />
+    <ClInclude Include="Random.hpp" />
     <ClInclude Include="RtApi.hpp" />
     <ClInclude Include="Io.hpp" />
+    <ClInclude Include="Socket.hpp" />
     <ClInclude Include="Statics.hpp" />
     <ClInclude Include="String.hpp" />
     <ClInclude Include="Thread.hpp" />
+    <ClInclude Include="Time.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CommandLine.cpp" />
+    <ClCompile Include="ConditionVariable.cpp" />
     <ClCompile Include="Environment.cpp" />
     <ClCompile Include="Error.cpp" />
     <ClCompile Include="CallStack.cpp" />
@@ -188,9 +193,12 @@
     <ClCompile Include="Math.cpp" />
     <ClCompile Include="Memory.cpp" />
     <ClCompile Include="Mutex.cpp" />
+    <ClCompile Include="Random.cpp" />
+    <ClCompile Include="Socket.cpp" />
     <ClCompile Include="Statics.cpp" />
     <ClCompile Include="String.cpp" />
     <ClCompile Include="Thread.cpp" />
+    <ClCompile Include="Time.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

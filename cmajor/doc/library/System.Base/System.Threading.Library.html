@@ -1,0 +1,111 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>System.Threading Library</title>
+    <link href="../../style/library.css" rel="stylesheet" type="text/css"/>
+</head>
+
+<body>
+    <h1>System.Threading Library</h1>
+    <p>
+        <a href="System.Base.html#System.Threading">System.Threading</a> library provides basic threading support.
+    </p>
+
+    <h2>Starting a Thread</h2>
+
+    <p>
+        This <a href="../../code/threading/threadFunction/threadFunction.cm.html">example program</a> shows how to execute a function in a separate thread.
+        Main thread should call the <a href="System.Base.html#member_function_Join_Thread_2321207B993A5A106E72F80F93CBAD2DA409A166">Join</a> member function for each started thread before exiting the program.
+        A thread function should handle all exceptions. Since all exceptions derive from the <a href="System.Base.html#class_Exception_02AEA5204AD1035A91C2D843597EACBE078C8989">System.Exception</a> class,
+        catching <b>System.Exception</b> suffices.
+    </p>
+
+    <h2>Thread Synchronization</h2>
+
+    <p>
+        This next <a href="../../code/threading/threadSynchronization/threadSynchronization.cm.html">example</a> demonstrates synchronizing threads using a 
+        <a href="System.Base.html#class_LockGuard_Mtx_F810C02E34A5A6A123C64A7E3F138A4D6473C5A1">lock guard</a>, a
+        <a href="System.Base.html#class_RecursiveMutex_B9ED5479754BBDDED6A4491348BBD2F20F701D82">recursive mutex</a> and a 
+        <a href="System.Base.html#class_ConditionVariable_019A80625043CF98EC88D8F55238C84CFD4A9C26">condition variable</a>.
+    </p>
+
+    <p>
+        The main function of the program starts first the <em>Run</em> member function of the <em>OutputCollector</em> class in a separate thread.
+        Then it starts twice as many output threads as there are cores in the machine. The output threads call the <em>Enqueue</em> member function of the <em>OutputCollector</em> to 
+        enqueue message lines and to notify the <em>OutputCollector</em> that there are output lines available. The <em>OutputCollector</em> waits on the <em>outputAvailableOrExiting</em>
+        <a href="System.Base.html#class_ConditionVariable_019A80625043CF98EC88D8F55238C84CFD4A9C26">condition variable</a> to be notified and then removes messages from <em>outputLines</em>
+        list and prints them to the standard output stream. Finally the main thread waits for the output threads to finish, calls the <em>Exit</em> member function of the <em>OutputCollector</em>
+        and waits for the <em>OutputCollector</em> thread to exit.
+    </p>
+
+    <p>
+        The Cmajor runtime synchronizes execution of static constructors, so the static constructor of the <em>OutputCollector</em> needs no user defined locking. 
+        Container classes such as <a href="System.Base.html#class_List_T_579A89BF19B54042190CDE2A7E54E1DFAAFDB31C">List</a> are not thread safe by design, so they must be guarded by a 
+        <a href="System.Base.html#class_LockGuard_Mtx_F810C02E34A5A6A123C64A7E3F138A4D6473C5A1">LockGuard</a> and either a
+        <a href="System.Base.html#class_Mutex_CAF802A5F8A71934B07EA6C23937F60D9AECD650">Mutex</a> or a <a href="System.Base.html#class_RecursiveMutex_B9ED5479754BBDDED6A4491348BBD2F20F701D82">RecursiveMutex</a>
+        to prevent race conditions when accessed from multiple threads. The <em>outputLines</em> member variable of the <em>OutputCollector</em> class in the previous example is accessed from many threads so access to it is 
+        synchronized using a <a href="System.Base.html#class_LockGuard_Mtx_F810C02E34A5A6A123C64A7E3F138A4D6473C5A1">LockGuard</a> and 
+        a <a href="System.Base.html#class_RecursiveMutex_B9ED5479754BBDDED6A4491348BBD2F20F701D82">RecursiveMutex</a>. 
+        The lock guard calls the <a href="System.Base.html#member_function_Lock_RecursiveMutex_A2F81CC9C445644AA3A86C77332F7B596FAC6C0C">Lock</a> member function of the mutex in its constructor and 
+        the <a href="System.Base.html#member_function_Unlock_RecursiveMutex_241B167E3B6CC62AC9E1FC0B5BFC80F3074CADA7">Unlock</a> member function of the mutex in its destructor, so the mutex gets unlocked also
+        if the scope is exited by a return, break, continue or goto statement or by throwing an exception.
+    </p>
+
+    <p>
+        The <em>outputMutex</em> <a href="System.Base.html#class_RecursiveMutex_B9ED5479754BBDDED6A4491348BBD2F20F701D82">recursive mutex</a> is associated with the <em>outputAvailableOrExiting</em> 
+        <a href="System.Base.html#class_ConditionVariable_019A80625043CF98EC88D8F55238C84CFD4A9C26">condition variable</a>.
+        A condition variable should always be waited on with its associated recursive mutex locked. This is the case in the <em>Run</em> member function of the <em>OutputCollector</em>.
+    </p>
+
+    <p>
+        The <em>Run</em> method cannot be directly passed as argument to the static 
+        <a href="System.Base.html#function_group_StartMethod_FC8283BCBF05DB81E4B46FAD431305B24A966065">StartMethod</a> member function of the 
+        <a href="System.Base.html#class_Thread_805238682CDC09B4D1BB5C11ACA935F47C73BA4F">Thread</a> class due to deficiency of the language implementation.
+        The method must be first passed as argument to the class delegate constructor, and then the class delegate can be passed as argument to the 
+        static <a href="System.Base.html#function_group_StartMethod_FC8283BCBF05DB81E4B46FAD431305B24A966065">StartMethod</a> member function.
+    </p>
+
+    <h2>Transferring Exceptions to the Main Thread</h2>
+
+    <p>
+        This next <a href="../../code/threading/transferringExceptions/transferringExceptions.cm.html">example</a> demonstrates capturing an exception arising from a thread function,
+        transferring it to the main thread, and then rethrowing it from there.
+    </p>
+
+    <p>
+        The main thread starts a thread and passes a pointer to the local <em>ThreadData</em> member variable to the started thread.
+        The thread catches all exceptions as it should and calls the <a href="System.Base.html#function_CaptureCurrentException_2777DD986058C8D3A8C848141454281F049B3B45">CaptureCurrentException</a>
+        library function to capture current exception to an <a href="System.Base.html#class_ExceptionPtr_3E313CB08B225E0124692C11F3BF8F26E971600C">ExceptionPtr</a>.
+        The <b>CaptureCurrentException</b> can only be called from a catch block. Then the thread sets the captured exception to the <em>ThreadData</em> and exits.
+    </p>
+
+    <p>
+        The main thread first joins the started thread and then checks if an exception has occurred in the thread. If the 
+        <a href="System.Base.html#member_function_Exception_ExceptionPtr_7038D6AA666D0F81707FFD4675665ED8AAE66255">Exception</a> member function of the <b>ExceptionPtr</b> is not null, this is the case.
+        In this case it rethrows the captured exception by calling the <a href="System.Base.html#function_ThrowCapturedException_3C8DDE776866EED7DA7C5B7657B761F790C31B75">ThrowCapturedException</a>
+        library function.
+    </p>
+
+    <p>
+        This is the output of the example program:
+    </p>
+
+    <blockquote>
+        <pre>
+    Running 'C:/Users/Seppo/cmajorw64/cmajor/doc/code/threading/transferringExceptions/bin/debug/transferringExceptions.exe':
+
+    FooException: foo
+    CALL STACK:
+    FooException.@constructor(FooException, const String<char>&) C:/Users/Seppo/cmajorw64/cmajor/doc/code/threading/transferringExceptions/transferringExceptions.cm:7
+    foo() C:/Users/Seppo/cmajorw64/cmajor/doc/code/threading/transferringExceptions/transferringExceptions.cm:13
+    ThreadFunction(void*) C:/Users/Seppo/cmajorw64/cmajor/doc/code/threading/transferringExceptions/transferringExceptions.cm:34
+
+
+    Process returned exit code 0.
+        </pre>
+    </blockquote>
+
+</body>
+</html>

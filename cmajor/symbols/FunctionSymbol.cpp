@@ -497,20 +497,20 @@ std::u32string FunctionSymbol::FullNameWithSpecifiers() const
 {
     std::u32string fullNameWithSpecifiers = ToUtf32(SymbolFlagStr(GetSymbolFlags()));
     std::u32string f = ToUtf32(FunctionSymbolFlagStr(flags));
-    if (!f.empty())
-    {
-        if (!fullNameWithSpecifiers.empty())
-        {
-            fullNameWithSpecifiers.append(1, U' ');
-        }
-        fullNameWithSpecifiers.append(f);
-    }
+if (!f.empty())
+{
     if (!fullNameWithSpecifiers.empty())
     {
         fullNameWithSpecifiers.append(1, U' ');
     }
-    fullNameWithSpecifiers.append(FullName());
-    return fullNameWithSpecifiers;
+    fullNameWithSpecifiers.append(f);
+}
+if (!fullNameWithSpecifiers.empty())
+{
+    fullNameWithSpecifiers.append(1, U' ');
+}
+fullNameWithSpecifiers.append(FullName());
+return fullNameWithSpecifiers;
 }
 
 std::u32string FunctionSymbol::DocName() const

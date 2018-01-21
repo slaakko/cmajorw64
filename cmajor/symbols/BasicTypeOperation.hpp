@@ -568,7 +568,7 @@ void BasicTypeDefaultCtor<DefaultOp>::GenerateCall(Emitter& emitter, std::vector
 {
     Assert(genObjects.size() == 1, "default constructor needs one object");
     emitter.Stack().Push(DefaultOp::Generate(emitter.Builder()));
-    genObjects[0]->Store(emitter, OperationFlags::none);
+    genObjects[0]->Store(emitter, OperationFlags::functionCallFlags & flags);
 }
 
 template<typename DefaultOp>

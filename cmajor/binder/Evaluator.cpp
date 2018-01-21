@@ -2932,6 +2932,10 @@ void Evaluator::Visit(IdentifierNode& identifierNode)
     if (symbol)
     {
         qualifiedScope = nullptr;
+        if (name.find('.') != std::u32string::npos)
+        {
+            qualifiedScope = symbol->Parent()->GetContainerScope();
+        }
         EvaluateSymbol(symbol, identifierNode.GetSpan());
         if (error)
         {

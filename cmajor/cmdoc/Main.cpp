@@ -129,12 +129,13 @@ public:
     void Visit(WhereConstraintNode& whereConstraintNode) override;
     void Visit(IsConstraintNode& isConstraintNode) override;
     void Visit(MultiParamConstraintNode& multiParamConstraintNode) override;
+    void Visit(PredicateConstraintNode& predicateConstratintNode) override;
     void Visit(TypeNameConstraintNode& typeNameConstraintNode) override;
     void Visit(ConstructorConstraintNode& constructorConstraintNode) override;
     void Visit(DestructorConstraintNode& destructorConstraintNode) override;
     void Visit(MemberFunctionConstraintNode& memberFunctionConstraintNode) override;
     void Visit(FunctionConstraintNode& functionConstraintNode) override;
-private:
+private: 
     Element* parentElement;
     const std::vector<ContainerScope*>& containerScopes;
     SymbolTable* symbolTable;
@@ -354,10 +355,14 @@ void ConstraintHyperTextGenerator::Visit(ArrayNode& arrayNode)
 void ConstraintHyperTextGenerator::Visit(IdentifierNode& identifierNode)
 {
     const std::u32string& name = identifierNode.Str();
+    if (name == U"string")
+    {
+        int x = 0;
+    }
     bool resolved = false;
     for (ContainerScope* containerScope : containerScopes)
     {
-        Symbol* symbol = containerScope->Lookup(name);
+        Symbol* symbol = containerScope->Lookup(name, ScopeLookup::this_and_base_and_parent);
         if (symbol)
         {
             ResolveSymbol(symbol);
@@ -383,6 +388,17 @@ void ConstraintHyperTextGenerator::ResolveSymbol(Symbol* symbol)
         {
             BoundTemplateParameterSymbol* boundTemplateParameter = static_cast<BoundTemplateParameterSymbol*>(symbol);
             TypeSymbol* type = boundTemplateParameter->GetType();
+            type->SetProject();
+            std::unique_ptr<Element> typeElement(new Element(U"type"));
+            typeElement->SetAttribute(U"ref", GetTypeId(type));
+            parentElement->AppendChild(std::move(typeElement));
+            conceptGroup = nullptr;
+            typeAdded = true;
+        }
+        else if (symbol->GetSymbolType() == SymbolType::typedefSymbol)
+        {
+            TypedefSymbol* typedefSymbol = static_cast<TypedefSymbol*>(symbol);
+            TypeSymbol* type = typedefSymbol->GetType();
             type->SetProject();
             std::unique_ptr<Element> typeElement(new Element(U"type"));
             typeElement->SetAttribute(U"ref", GetTypeId(type));
@@ -545,6 +561,11 @@ void ConstraintHyperTextGenerator::Visit(TypeNameConstraintNode& typeNameConstra
     parentElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(U" " + ToUtf32(typeNameConstraintNode.TypeId()->ToString()))));
 }
 
+void ConstraintHyperTextGenerator::Visit(PredicateConstraintNode& predicateConstratintNode)
+{
+    parentElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(ToUtf32(predicateConstratintNode.ToString()))));
+}
+
 void ConstraintHyperTextGenerator::Visit(ConstructorConstraintNode& constructorConstraintNode)
 {
     parentElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(ToUtf32(constructorConstraintNode.ToString()))));
@@ -575,6 +596,7 @@ std::unique_ptr<Element> ConstraintToXml(ConstraintNode* constraintNode, Symbol*
     if (parent->IsFunctionSymbol())
     {
         FunctionSymbol* fun = static_cast<FunctionSymbol*>(parent);
+        containerScopes.push_back(fun->Ns()->GetContainerScope());
         if (fun->GetSymbolType() == SymbolType::functionSymbol)
         {
             if (!fun->GetFunctionNode())
@@ -592,6 +614,7 @@ std::unique_ptr<Element> ConstraintToXml(ConstraintNode* constraintNode, Symbol*
     {
         ClassTemplateSpecializationSymbol* specialization = static_cast<ClassTemplateSpecializationSymbol*>(parent);
         ClassTypeSymbol* classTemplate = specialization->GetClassTemplate();
+        containerScopes.push_back(classTemplate->Ns()->GetContainerScope());
         if (!classTemplate->GetClassNode())
         {
             classTemplate->ReadAstNodes();
@@ -2335,7 +2358,7 @@ cmajor::dom::Element* GetTypeById(const std::u32string& typeId, Document* librar
             }
             ++docIndex;
         }
-        throw std::runtime_error("element '" + ToUtf8(typeId) + "' not found");
+        return nullptr;
     }
 }
 
@@ -2509,6 +2532,11 @@ void AppendTypeHtml(const std::u32string& typeId, Document* libraryXmlDoc, const
 {
     int index = -1;
     cmajor::dom::Element* type = GetTypeById(typeId, libraryXmlDoc, referenceXmlFilePaths, referenceXmlDocs, index);
+    if (!type)
+    {
+        parentElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(U"typeId " + typeId + U" not found")));
+        return;
+    }
     if (type->GetAttribute(U"basic") == U"true")
     {
         std::unique_ptr<cmajor::dom::Element> spanElement(new Element(U"span"));
@@ -2626,6 +2654,7 @@ void AppendTypeHtml(const std::u32string& typeId, Document* libraryXmlDoc, const
 void AppendConceptHtml(const std::u32string& conceptId, Document* libraryXmlDoc, Element* parentElement, bool groupName)
 {
     Element* conceptElement = libraryXmlDoc->GetElementById(conceptId);
+    if (!conceptElement) return;
     std::unique_ptr<Element> link(new Element(U"a"));
     link->SetAttribute(U"href", U"#" + conceptId);
     std::u32string conceptName;

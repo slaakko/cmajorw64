@@ -59,21 +59,6 @@ namespace System.Text.Parsing.CodeDom
                 formatter.Write('(');
             }
             formatter.Write(ToUtf8(Name()));
-            formatter.Write('<');
-            bool first = true;
-            for (const UniquePtr<DomObject>& templateArg : templateArgs)
-            {
-                if (first)
-                {
-                    first = false;
-                }
-                else
-                {
-                    formatter.Write(", ");
-                }
-                templateArg->Print(formatter);
-            }
-            formatter.Write('>');
             if (Parens())
             {
                 formatter.Write(')');

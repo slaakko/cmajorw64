@@ -9,7 +9,7 @@ namespace System.IO
 {
     public class BinaryReader
     {
-        public nothrow BinaryReader(UniquePtr<ByteStream>&& stream_) : stream(Rvalue(stream_))
+        public nothrow BinaryReader(const SharedPtr<ByteStream>& stream_) : stream(stream_)
         {
         }
         public bool ReadBool()
@@ -132,10 +132,10 @@ namespace System.IO
         {
             return stream->Tell();
         }
-        public ByteStream& ContainedStream() 
+        public nothrow const SharedPtr<ByteStream>& ContainedStream() 
         {
-            return *stream;
+            return stream;
         }
-        private UniquePtr<ByteStream> stream;
+        private SharedPtr<ByteStream> stream;
     }
 }

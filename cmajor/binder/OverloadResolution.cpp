@@ -1108,6 +1108,10 @@ std::unique_ptr<BoundFunctionCall> SelectViableFunction(const std::unordered_set
         FunctionMatch functionMatch(viableFunction);
         if (viableFunction->IsFunctionTemplate())
         {
+            if ((flags & OverloadResolutionFlags::noTemplates) != OverloadResolutionFlags::none)
+            {
+                continue;
+            }
             int n = templateArgumentTypes.size();
             if (n > viableFunction->TemplateParameters().size())
             {

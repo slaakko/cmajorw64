@@ -54,6 +54,8 @@ SystemModuleSet::SystemModuleSet()
     systemModuleNames.insert(U"System.Base");
     systemModuleNames.insert(U"System.Text.Parsing.CodeDom");
     systemModuleNames.insert(U"System.Text.Parsing");
+    systemModuleNames.insert(U"System.Net.Sockets");
+    systemModuleNames.insert(U"System.Json");
     systemModuleNames.insert(U"System");
 }
 

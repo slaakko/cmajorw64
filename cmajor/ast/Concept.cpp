@@ -156,7 +156,7 @@ void PredicateConstraintNode::Write(AstWriter& writer)
 void PredicateConstraintNode::Read(AstReader& reader)
 {
     ConstraintNode::Read(reader);
-    invokeExpr.reset(reader.ReadConstraintNode());
+    invokeExpr.reset(reader.ReadNode());
     invokeExpr->SetParent(this);
 }
 
@@ -473,7 +473,12 @@ void MemberFunctionConstraintNode::AddParameter(ParameterNode* parameter)
 
 std::string MemberFunctionConstraintNode::ToString() const
 {
-    std::string s = typeParamId->ToString();
+    std::string s;
+    if (returnTypeExpr)
+    {
+        s.append(returnTypeExpr->ToString()).append(" ");
+    }
+    s.append(typeParamId->ToString());
     s.append(".").append(ToUtf8(groupId));
     s.append(1, '(');
     int n = parameters.Count();
@@ -543,6 +548,10 @@ void FunctionConstraintNode::AddParameter(ParameterNode* parameter)
 std::string FunctionConstraintNode::ToString() const
 {
     std::string s;
+    if (returnTypeExpr)
+    {
+        s.append(returnTypeExpr->ToString()).append(" ");
+    }
     s.append(ToUtf8(groupId));
     s.append(1, '(');
     int n = parameters.Count();
