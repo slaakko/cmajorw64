@@ -56,6 +56,7 @@ SystemModuleSet::SystemModuleSet()
     systemModuleNames.insert(U"System.Text.Parsing");
     systemModuleNames.insert(U"System.Net.Sockets");
     systemModuleNames.insert(U"System.Json");
+    systemModuleNames.insert(U"System.Xml");
     systemModuleNames.insert(U"System");
 }
 

@@ -476,7 +476,7 @@ namespace Syntax
         }
         public override void Visit(RangeParser& parser)
         {
-            formatter.Write("new System.Text.Parsing.RangeParser(" + ToString(parser.Start()) + ", " + ToString(parser.End()) + ")");
+            formatter.Write("new System.Text.Parsing.RangeParser(" + ToString(parser.Start()) + "u, " + ToString(parser.End()) + "u)");
         }
         public override void Visit(EmptyParser& parser)
         {

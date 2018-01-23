@@ -5,8 +5,8 @@
     <infoDelaySecs>10</infoDelaySecs>
     <formSizeX>1774</formSizeX>
     <formSizeY>984</formSizeY>
-    <formTop>16</formTop>
-    <formLeft>25</formLeft>
+    <formTop>0</formTop>
+    <formLeft>0</formLeft>
     <textVisX>78</textVisX>
     <textVisY>78</textVisY>
     <textVisW>1259</textVisW>
@@ -28,6 +28,18 @@
     <maxRecentProjects>10</maxRecentProjects>
     <recentProjects>
         <recentProject>
+            <path>C:\Users\Seppo\cmajorw64\cmajor\system\System.cms</path>
+            <openFiles />
+        </recentProject>
+        <recentProject>
+            <path>C:\Users\Seppo\cmajorw64\cmajor\test\xmlparsing\xmlparsing.cms</path>
+            <openFiles />
+        </recentProject>
+        <recentProject>
+            <path>C:\Users\Seppo\cmajorw64\cmajor\projects\tools\cmparsergen\cmparsergen.cms</path>
+            <openFiles />
+        </recentProject>
+        <recentProject>
             <path>C:/Users/Seppo/cmajorw64/cmajor/doc/code/threading/transferringExceptions/transferringExceptions.cms</path>
             <openFiles />
         </recentProject>
@@ -36,19 +48,11 @@
             <openFiles />
         </recentProject>
         <recentProject>
-            <path>C:\Users\Seppo\cmajorw64\cmajor\system\System.cms</path>
-            <openFiles />
-        </recentProject>
-        <recentProject>
             <path>C:/Users/Seppo/cmajorw64/cmajor/doc/code/threading/threadFunction/threadFunction.cms</path>
             <openFiles />
         </recentProject>
         <recentProject>
             <path>C:/Users/Seppo/cmajorw64/cmajor/doc/code/json/json.cms</path>
-            <openFiles />
-        </recentProject>
-        <recentProject>
-            <path>C:\Users\Seppo\cmajorw64\cmajor\projects\tools\cmparsergen\cmparsergen.cms</path>
             <openFiles />
         </recentProject>
         <recentProject>
@@ -61,10 +65,6 @@
         </recentProject>
         <recentProject>
             <path>C:\Users\Seppo\cmajorw64\cmajor\test\foolib\foolib.cms</path>
-            <openFiles />
-        </recentProject>
-        <recentProject>
-            <path>C:\Users\Seppo\cmajorw64\cmajor\test\TcpClient\TcpClient.cms</path>
             <openFiles />
         </recentProject>
     </recentProjects>

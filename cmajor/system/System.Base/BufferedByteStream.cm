@@ -18,8 +18,6 @@ namespace System.IO
         }
         suppress BufferedByteStream(const BufferedByteStream&);
         suppress void operator=(const BufferedByteStream&);
-        public default nothrow BufferedByteStream(BufferedByteStream&&);
-        public default nothrow void operator=(BufferedByteStream&&);
         public override ~BufferedByteStream()
         {
             try

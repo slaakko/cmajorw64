@@ -1530,6 +1530,31 @@ namespace cmdevenv
                 MessageBox.Show(ex.Message);
             }
         }
+        private async void existingTextFileToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                Project project = (Project)solutionExplorerTreeView.SelectedNode.Tag;
+                addExistingTextFileDialog.InitialDirectory = project.BasePath;
+                if (addExistingTextFileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    string fileName = addExistingTextFileDialog.FileName;
+                    if (fileName.EndsWith("cm"))
+                    {
+                        throw new Exception("cannot add files ending with .cm with this dialog");
+                    }
+                    SourceFile.Kind kind = SourceFile.Kind.text;
+                    project.AddSourceFile(fileName, kind);
+                    solution.Save();
+                    await SetupSolutionExplorer(project);
+                    SetMenuItemStatus();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
         private async void newProjectToolStripMenuItem1_Click(object sender, EventArgs e)
         {
             try
@@ -2001,6 +2026,22 @@ namespace cmdevenv
                     throw new Exception("CMAJOR_ROOT environment variable not set, please set it to contain /path/to/cmajor directory");
                 }
                 System.Diagnostics.Process.Start(Path.Combine(cmajorRoot, Path.Combine("doc", Path.Combine("langref", "langref.html"))));
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+        private void libraryDocumentationToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                string cmajorRoot = Environment.GetEnvironmentVariable("CMAJOR_ROOT");
+                if (string.IsNullOrEmpty(cmajorRoot))
+                {
+                    throw new Exception("CMAJOR_ROOT environment variable not set, please set it to contain /path/to/cmajor directory");
+                }
+                System.Diagnostics.Process.Start(Path.Combine(cmajorRoot, Path.Combine("doc", Path.Combine("library", "index.html"))));
             }
             catch (Exception ex)
             {

@@ -3,3 +3,4 @@ target=library;
 reference <../System.Text.Parsing/System.Text.Parsing.cmp>;
 reference <../System.Net.Sockets/System.Net.Sockets.cmp>;
 reference <../System.Json/System.Json.cmp>;
+reference <../System.Xml/System.Xml.cmp>;
