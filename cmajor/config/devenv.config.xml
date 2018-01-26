@@ -3,10 +3,10 @@
     <cmc>cmc.exe</cmc>
     <tabSize>4</tabSize>
     <infoDelaySecs>10</infoDelaySecs>
-    <formSizeX>1774</formSizeX>
-    <formSizeY>984</formSizeY>
-    <formTop>0</formTop>
-    <formLeft>0</formLeft>
+    <formSizeX>1761</formSizeX>
+    <formSizeY>948</formSizeY>
+    <formTop>30</formTop>
+    <formLeft>65</formLeft>
     <textVisX>78</textVisX>
     <textVisY>78</textVisY>
     <textVisW>1259</textVisW>
@@ -22,13 +22,17 @@
     <findLineColWidth>85</findLineColWidth>
     <findProjectColWidth>183</findProjectColWidth>
     <findTextColWidth>738</findTextColWidth>
-    <horizontalSplitterPos>1340</horizontalSplitterPos>
+    <horizontalSplitterPos>1330</horizontalSplitterPos>
     <verticalSplitterPos>537</verticalSplitterPos>
     <windowState>Normal</windowState>
     <maxRecentProjects>10</maxRecentProjects>
     <recentProjects>
         <recentProject>
             <path>C:\Users\Seppo\cmajorw64\cmajor\system\System.cms</path>
+            <openFiles />
+        </recentProject>
+        <recentProject>
+            <path>C:\Users\Seppo\cmajorw64\cmajor\test\bigint\bigint.cms</path>
             <openFiles />
         </recentProject>
         <recentProject>
@@ -61,10 +65,6 @@
         </recentProject>
         <recentProject>
             <path>C:\Users\Seppo\cmajorw64\cmajor\test\foo\foo.cms</path>
-            <openFiles />
-        </recentProject>
-        <recentProject>
-            <path>C:\Users\Seppo\cmajorw64\cmajor\test\foolib\foolib.cms</path>
             <openFiles />
         </recentProject>
     </recentProjects>

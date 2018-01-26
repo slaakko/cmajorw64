@@ -61,7 +61,6 @@ __thread CallStack* std::string* stackTrace = nullptr;
 
 extern "C" RT_API void RtEnterFunction(const char* functionName, const char* sourceFilePath)
 {
-    std::string fn = functionName;
     cmajor::rt::CallStack* callStack = cmajor::rt::callStack;
     if (!callStack)
     {

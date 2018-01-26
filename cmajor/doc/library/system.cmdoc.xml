@@ -45,5 +45,17 @@
         <reference>../System.Text.Parsing/System.Text.Parsing.xml</reference>
       </references>
       <style>../../style/cmdoc.css</style>
-    </library>  </libraries>
+    </library>
+    <library>
+      <moduleFilePath>../../system/System.Xml/lib/debug/System.Xml.cmm</moduleFilePath>
+      <libraryXmlFilePath>System.Xml/System.Xml.xml</libraryXmlFilePath>
+      <docXmlFilePath>System.Xml/System.Xml.doc.xml</docXmlFilePath>
+      <references>
+        <reference>../System.Base/System.Base.xml</reference>
+        <reference>../System.Text.Parsing.CodeDom/System.Text.Parsing.CodeDom.xml</reference>
+        <reference>../System.Text.Parsing/System.Text.Parsing.xml</reference>
+      </references>
+      <style>../../stle/cmdoc.css</style>
+    </library>
+  </libraries>
 </cmdoc>

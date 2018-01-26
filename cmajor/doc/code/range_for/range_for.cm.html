@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8"/>
+    <title>range_for.cm</title>
+    <link rel="stylesheet" type="text/css" href="../../style/code.css"/>
+</head>
+<body>
+<pre>
+<div class="code">
+<span class="keyword">using</span> <span class="identifier">System</span><span class="other">;</span>
+<span class="keyword">using</span> <span class="identifier">System.Collections</span><span class="other">;</span>
+<span class="keyword">using</span> <span class="identifier">System.IO</span><span class="other">;</span>
+
+<span class="keyword">public</span> <span class="keyword">void</span> <span class="identifier">PrintIntList</span><span class="other">(</span><span class="keyword">const</span> <span class="identifier">List</span><span class="other">&lt;</span><span class="keyword">int</span><span class="other">&gt;</span><span class="other">&amp;</span> <span class="identifier">intList</span><span class="other">)</span>
+<span class="other">{</span>
+    <span class="identifier">Console.WriteLine</span><span class="other">(</span><span class="string">&quot;intList:&quot;</span><span class="other">)</span><span class="other">;</span>
+    <span class="keyword">for</span> <span class="other">(</span><span class="keyword">int</span> <span class="identifier">i</span> <span class="other">:</span> <span class="identifier">intList</span><span class="other">)</span>
+    <span class="other">{</span>
+        <span class="identifier">Console.WriteLine</span><span class="other">(</span><span class="identifier">i</span><span class="other">)</span><span class="other">;</span>
+    <span class="other">}</span>
+<span class="other">}</span>
+
+<span class="keyword">public</span> <span class="keyword">void</span> <span class="identifier">AddOneToAll</span><span class="other">(</span><span class="identifier">List</span><span class="other">&lt;</span><span class="keyword">int</span><span class="other">&gt;</span><span class="other">&amp;</span> <span class="identifier">intList</span><span class="other">)</span>
+<span class="other">{</span>
+    <span class="keyword">for</span> <span class="other">(</span><span class="keyword">int</span><span class="other">&amp;</span> <span class="identifier">x</span> <span class="other">:</span> <span class="identifier">intList</span><span class="other">)</span>
+    <span class="other">{</span>
+        <span class="identifier">x</span> <span class="other">=</span> <span class="identifier">x</span> <span class="other">+</span> <span class="number">1</span><span class="other">;</span>
+    <span class="other">}</span>
+<span class="other">}</span>
+
+<span class="keyword">public</span> <span class="keyword">void</span> <span class="identifier">PrintStringList</span><span class="other">(</span><span class="keyword">const</span> <span class="identifier">List</span><span class="other">&lt;</span><span class="identifier">string</span><span class="other">&gt;</span><span class="other">&amp;</span> <span class="identifier">stringList</span><span class="other">)</span>
+<span class="other">{</span>
+    <span class="identifier">Console.WriteLine</span><span class="other">(</span><span class="string">&quot;stringList:&quot;</span><span class="other">)</span><span class="other">;</span>
+    <span class="keyword">for</span> <span class="other">(</span><span class="keyword">const</span> <span class="identifier">string</span><span class="other">&amp;</span> <span class="identifier">s</span> <span class="other">:</span> <span class="identifier">stringList</span><span class="other">)</span>
+    <span class="other">{</span>
+        <span class="identifier">Console.WriteLine</span><span class="other">(</span><span class="identifier">s</span><span class="other">)</span><span class="other">;</span>
+    <span class="other">}</span>
+<span class="other">}</span>
+
+<span class="keyword">public</span> <span class="keyword">class</span> <span class="identifier">Foo</span>
+<span class="other">{</span>
+    <span class="keyword">public</span> <span class="identifier">Foo</span><span class="other">(</span><span class="keyword">int</span> <span class="identifier">x_</span><span class="other">)</span> <span class="other">:</span> <span class="identifier">x</span><span class="other">(</span><span class="identifier">x_</span><span class="other">)</span>
+    <span class="other">{</span>
+    <span class="other">}</span>
+    <span class="keyword">public</span> <span class="keyword">int</span> <span class="identifier">X</span><span class="other">(</span><span class="other">)</span> <span class="keyword">const</span>
+    <span class="other">{</span>
+        <span class="keyword">return</span> <span class="identifier">x</span><span class="other">;</span>
+    <span class="other">}</span>
+    <span class="keyword">private</span> <span class="keyword">int</span> <span class="identifier">x</span><span class="other">;</span>
+<span class="other">}</span>
+
+<span class="keyword">public</span> <span class="identifier">StreamWriter</span><span class="other">&amp;</span> <span class="keyword">operator</span><span class="other">&lt;</span><span class="other">&lt;</span><span class="other">(</span><span class="identifier">StreamWriter</span><span class="other">&amp;</span> <span class="identifier">writer</span><span class="other">,</span> <span class="keyword">const</span> <span class="identifier">Foo</span><span class="other">&amp;</span> <span class="identifier">foo</span><span class="other">)</span>
+<span class="other">{</span>
+    <span class="keyword">return</span> <span class="identifier">writer</span> <span class="other">&lt;</span><span class="other">&lt;</span> <span class="string">&quot;Foo: &quot;</span> <span class="other">&lt;</span><span class="other">&lt;</span> <span class="identifier">foo.X</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>
+<span class="other">}</span>
+
+<span class="keyword">public</span> <span class="keyword">class</span> <span class="identifier">MyCollection</span>
+<span class="other">{</span>
+    <span class="keyword">public</span> <span class="keyword">typedef</span> <span class="identifier">List</span><span class="other">&lt;</span><span class="identifier">Foo</span><span class="other">&gt;</span><span class="other">.</span><span class="identifier">ConstIterator</span> <span class="identifier">ConstIterator</span><span class="other">;</span>
+    <span class="keyword">public</span> <span class="keyword">typedef</span> <span class="identifier">List</span><span class="other">&lt;</span><span class="identifier">Foo</span><span class="other">&gt;</span><span class="other">.</span><span class="identifier">Iterator</span> <span class="identifier">Iterator</span><span class="other">;</span>
+    <span class="keyword">public</span> <span class="identifier">ConstIterator</span> <span class="identifier">CBegin</span><span class="other">(</span><span class="other">)</span> <span class="keyword">const</span>
+    <span class="other">{</span>
+        <span class="keyword">return</span> <span class="identifier">fooList.CBegin</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>
+    <span class="other">}</span>
+    <span class="keyword">public</span> <span class="identifier">ConstIterator</span> <span class="identifier">Begin</span><span class="other">(</span><span class="other">)</span> <span class="keyword">const</span>
+    <span class="other">{</span>
+        <span class="keyword">return</span> <span class="identifier">fooList.CBegin</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>
+    <span class="other">}</span>
+    <span class="keyword">public</span> <span class="identifier">Iterator</span> <span class="identifier">Begin</span><span class="other">(</span><span class="other">)</span>
+    <span class="other">{</span>
+        <span class="keyword">return</span> <span class="identifier">fooList.Begin</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>
+    <span class="other">}</span>
+    <span class="keyword">public</span> <span class="identifier">ConstIterator</span> <span class="identifier">CEnd</span><span class="other">(</span><span class="other">)</span> <span class="keyword">const</span>
+    <span class="other">{</span>
+        <span class="keyword">return</span> <span class="identifier">fooList.CEnd</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>
+    <span class="other">}</span>
+    <span class="keyword">public</span> <span class="identifier">ConstIterator</span> <span class="identifier">End</span><span class="other">(</span><span class="other">)</span> <span class="keyword">const</span>
+    <span class="other">{</span>
+        <span class="keyword">return</span> <span class="identifier">fooList.CEnd</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>
+    <span class="other">}</span>
+    <span class="keyword">public</span> <span class="identifier">Iterator</span> <span class="identifier">End</span><span class="other">(</span><span class="other">)</span>
+    <span class="other">{</span>
+        <span class="keyword">return</span> <span class="identifier">fooList.End</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>
+    <span class="other">}</span>
+    <span class="keyword">public</span> <span class="keyword">void</span> <span class="identifier">Add</span><span class="other">(</span><span class="keyword">const</span> <span class="identifier">Foo</span><span class="other">&amp;</span> <span class="identifier">foo</span><span class="other">)</span>
+    <span class="other">{</span>
+        <span class="identifier">fooList.Add</span><span class="other">(</span><span class="identifier">foo</span><span class="other">)</span><span class="other">;</span>
+    <span class="other">}</span>
+    <span class="keyword">private</span> <span class="identifier">List</span><span class="other">&lt;</span><span class="identifier">Foo</span><span class="other">&gt;</span> <span class="identifier">fooList</span><span class="other">;</span>
+<span class="other">}</span>
+
+<span class="keyword">public</span> <span class="keyword">void</span> <span class="identifier">PrintMyCollection</span><span class="other">(</span><span class="keyword">const</span> <span class="identifier">MyCollection</span><span class="other">&amp;</span> <span class="identifier">myCollection</span><span class="other">)</span>
+<span class="other">{</span>
+    <span class="identifier">Console.WriteLine</span><span class="other">(</span><span class="string">&quot;myCollection:&quot;</span><span class="other">)</span><span class="other">;</span>
+    <span class="keyword">for</span> <span class="other">(</span><span class="keyword">const</span> <span class="identifier">Foo</span><span class="other">&amp;</span> <span class="identifier">foo</span> <span class="other">:</span> <span class="identifier">myCollection</span><span class="other">)</span>
+    <span class="other">{</span>
+        <span class="identifier">Console.Out</span><span class="other">(</span><span class="other">)</span> <span class="other">&lt;</span><span class="other">&lt;</span> <span class="identifier">foo</span> <span class="other">&lt;</span><span class="other">&lt;</span> <span class="identifier">endl</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>
+    <span class="other">}</span>
+<span class="other">}</span>
+
+<span class="keyword">void</span> <span class="identifier">main</span><span class="other">(</span><span class="other">)</span>
+<span class="other">{</span>
+    <span class="keyword">try</span>
+    <span class="other">{</span>
+        <span class="identifier">List</span><span class="other">&lt;</span><span class="keyword">int</span><span class="other">&gt;</span> <span class="identifier">intList</span><span class="other">;</span>
+        <span class="identifier">intList.Add</span><span class="other">(</span><span class="number">1</span><span class="other">)</span><span class="other">;</span>
+        <span class="identifier">intList.Add</span><span class="other">(</span><span class="number">2</span><span class="other">)</span><span class="other">;</span>
+        <span class="identifier">intList.Add</span><span class="other">(</span><span class="number">3</span><span class="other">)</span><span class="other">;</span>
+        <span class="identifier">PrintIntList</span><span class="other">(</span><span class="identifier">intList</span><span class="other">)</span><span class="other">;</span>
+        <span class="identifier">AddOneToAll</span><span class="other">(</span><span class="identifier">intList</span><span class="other">)</span><span class="other">;</span>
+        <span class="identifier">PrintIntList</span><span class="other">(</span><span class="identifier">intList</span><span class="other">)</span><span class="other">;</span>
+        <span class="identifier">List</span><span class="other">&lt;</span><span class="identifier">string</span><span class="other">&gt;</span> <span class="identifier">stringList</span><span class="other">;</span>
+        <span class="identifier">stringList.Add</span><span class="other">(</span><span class="string">&quot;foo&quot;</span><span class="other">)</span><span class="other">;</span>
+        <span class="identifier">stringList.Add</span><span class="other">(</span><span class="string">&quot;bar&quot;</span><span class="other">)</span><span class="other">;</span>
+        <span class="identifier">PrintStringList</span><span class="other">(</span><span class="identifier">stringList</span><span class="other">)</span><span class="other">;</span>
+        <span class="identifier">MyCollection</span> <span class="identifier">myCollection</span><span class="other">;</span>
+        <span class="identifier">myCollection.Add</span><span class="other">(</span><span class="identifier">Foo</span><span class="other">(</span><span class="number">1</span><span class="other">)</span><span class="other">)</span><span class="other">;</span>
+        <span class="identifier">myCollection.Add</span><span class="other">(</span><span class="identifier">Foo</span><span class="other">(</span><span class="number">2</span><span class="other">)</span><span class="other">)</span><span class="other">;</span>
+        <span class="identifier">myCollection.Add</span><span class="other">(</span><span class="identifier">Foo</span><span class="other">(</span><span class="number">3</span><span class="other">)</span><span class="other">)</span><span class="other">;</span>
+        <span class="identifier">PrintMyCollection</span><span class="other">(</span><span class="identifier">myCollection</span><span class="other">)</span><span class="other">;</span>
+    <span class="other">}</span>
+    <span class="keyword">catch</span> <span class="other">(</span><span class="keyword">const</span> <span class="identifier">Exception</span><span class="other">&amp;</span> <span class="identifier">ex</span><span class="other">)</span>
+    <span class="other">{</span>
+        <span class="identifier">Console.Error</span><span class="other">(</span><span class="other">)</span> <span class="other">&lt;</span><span class="other">&lt;</span> <span class="identifier">ex.ToString</span><span class="other">(</span><span class="other">)</span> <span class="other">&lt;</span><span class="other">&lt;</span> <span class="identifier">endl</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>
+    <span class="other">}</span>
+<span class="other">}</span>
+</div
+</pre>
+</body>
+</html>

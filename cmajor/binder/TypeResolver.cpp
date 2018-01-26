@@ -319,6 +319,15 @@ void TypeResolver::Visit(DotNode& dotNode)
 {
     dotNode.Subject()->Accept(*this);
     Scope* scope = nullptr;
+    if (type->GetSymbolType() == SymbolType::classGroupTypeSymbol)
+    {
+        ClassGroupTypeSymbol* classGroup = static_cast<ClassGroupTypeSymbol*>(type);
+        type = classGroup->GetClass(0);
+        if (!type)
+        {
+            throw Exception("symbol '" + ToUtf8(type->FullName()) + "' does not denote a class type, an array type or a namespace", dotNode.GetSpan(), type->GetSpan());
+        }
+    }
     if (type->GetSymbolType() == SymbolType::namespaceTypeSymbol)
     {
         NamespaceTypeSymbol* nsType = static_cast<NamespaceTypeSymbol*>(type);

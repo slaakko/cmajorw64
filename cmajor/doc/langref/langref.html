@@ -2320,6 +2320,10 @@
     </p>
 
     <p>
+        Here's an <a href="../code/range_for/range_for.cm.html">example program</a> with various range-for statements.
+    </p>
+
+    <p>
         The <a href="#rule.container">container</a> of the range-for statement must refer to an object of a class that contains types or typedefs named <em>Iterator</em> and <em>ConstIterator</em> and
         member functions <em>Begin()</em>, <em>End()</em>, <em>CBegin()</em> and <em>CEnd()</em> that return those iterator types: <em>Begin()</em>, <em>End()</em> must return an <em>Iterator</em>,
         and <em>CBegin()</em> and <em>CEnd()</em> must return a <em>ConstIterator</em>. The iterator types, <em>Iterator</em> and <em>ConstIterator</em>, must support two operations:
@@ -3861,6 +3865,7 @@
             <span class="kw">suppress</span> <span class="var">ClassName()</span><span class="mono">;</span>
         </blockquote>
         The suppressed default constructor cannot have a body.
+        The compiler generates an error if trying to call a suppressed default constructor.
     </p>
 
     <p>
@@ -3893,6 +3898,7 @@
             <span class="kw">suppress</span> <span class="var">ClassName(</span><span class="kw">const</span> <span class="var">ClassName&amp;)</span><span class="mono">;</span>
         </blockquote>
         The suppressed copy constructor cannot have a body.
+        The compiler generates an error if trying to call a suppressed copy constructor.
     </p>
 
     <p>
@@ -3924,6 +3930,7 @@
             <span class="kw">suppress</span> <span class="var">ClassName(</span><span class="var">ClassName&amp;&amp;)</span><span class="mono">;</span>
         </blockquote>
         The suppressed move constructor cannot have a body.
+        The compiler generates an error if trying to call a suppressed move constructor.
     </p>
 
     <p>
@@ -3993,6 +4000,7 @@
         <li>
             <span class="kw">suppress</span>. Can only be used for the <a href="#default-constructor">default constructor</a>, <a href="#copy-constructor">copy constructor</a> and
             <a href="#move-constructor">move constructor</a>.
+            The compiler generates an error if trying to call a suppressed constructor.
         </li>
         <li>
             <span class="kw">nothrow</span>. A nothrow constructor has the same semantics as a <a href="#functions-nothrow">nonmember nothrow function</a>.
@@ -4101,6 +4109,7 @@
             <span class="kw">suppress</span> <span class="kw">void operator<span class="mono">=</span>(</span><span class="kw">const</span> <span class="var">ClassName&amp;)</span><span class="mono">;</span>
         </blockquote>
         The suppressed copy assignment cannot have a body.
+        The compiler generates an error if trying to call a suppressed copy assignment.
     </p>
 
     <p>
@@ -4134,6 +4143,7 @@
             <span class="kw">suppress</span> <span class="kw">void operator<span class="mono">=</span>(</span><span class="var">ClassName&amp;&amp;)</span><span class="mono">;</span>
         </blockquote>
         The suppressed move assignment cannot have a body.
+        The compiler generates an error if trying to call a suppressed move assignment.
     </p>
 
     <h5 id="member-function-specifiers">Member Function Specifiers</h5>
@@ -4162,6 +4172,7 @@
             <li>
                 <span class="kw">suppress</span>. A <a href="#copy-assignment">copy assignment</a> or <a href="#move-assignment">move assignment</a> operator may be suppressed.
                 A suppressed copy assignment or move assignment may not have a body.
+                The compiler generates an error if trying to call a suppressed member function.
             </li>
             <li><span class="kw">nothrow</span>. A nothrow member function has the same semantics as a <a href="#functions-nothrow">nonmember nothrow function</a>.</li>
             <li><span class="kw">throw</span>. A throw member function has the same semantics as a <a href="#functions-throw">nonmember throw function</a>.</li>

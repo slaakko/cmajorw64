@@ -80,20 +80,22 @@ Element::Element(const std::u32string& name_, std::map<std::u32string, std::uniq
 
 std::unique_ptr<Node> Element::CloneNode(bool deep) 
 {
+    std::unique_ptr<Node> clone(new Element(Name()));
+    ParentNode* cloneAsParent = static_cast<ParentNode*>(clone.get());
     std::map<std::u32string, std::unique_ptr<Attr>> clonedAttributeMap;
     for (const auto& p : attributeMap)
     {
-        std::unique_ptr<Node> attrNode = p.second->CloneNode(false);
-        attrNode->InternalSetParent(this);
-        clonedAttributeMap[p.first] = std::unique_ptr<Attr>(static_cast<Attr*>(attrNode.release()));
+        std::unique_ptr<Node> clonedAttrNode = p.second->CloneNode(false);
+        clonedAttrNode->InternalSetParent(cloneAsParent);
+        clonedAttributeMap[p.first] = std::unique_ptr<Attr>(static_cast<Attr*>(clonedAttrNode.release()));
     }
-    std::unique_ptr<Node> clonedElement = std::unique_ptr<Node>(new Element(Name(), std::move(clonedAttributeMap)));
+    Element* cloneAsElement = static_cast<Element*>(clone.get());
+    cloneAsElement->attributeMap = std::move(clonedAttributeMap);
     if (deep)
     {
-        ParentNode* parentNode = static_cast<ParentNode*>(clonedElement.get());
-        CloneChildrenTo(parentNode);
+        CloneChildrenTo(cloneAsParent);
     }
-    return clonedElement;
+    return clone;
 }
 
 bool Element::HasAttributes() const

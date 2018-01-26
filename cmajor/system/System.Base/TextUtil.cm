@@ -40,6 +40,101 @@ namespace System
         return s.Substring(b, e - b + 1);
     }
     
+    public string TrimAll(const string& s)
+    {
+        string result;
+        result.Reserve(s.Length());
+        int state = 0 ;
+        for (char c : s)
+        {
+            switch (state)
+            {
+                case 0:
+                {
+                    if (!IsSpace(c))
+                    {
+                        result.Append(c);
+                        state = 1;
+                    }
+                    break;
+                }
+                case 1:
+                {
+                    if (IsSpace(c))
+                    {
+                        state = 2;
+                    }
+                    else
+                    {
+                        result.Append(c);
+                    }
+                    break;
+                }
+                case 2:
+                {
+                    if (!IsSpace(c))
+                    {
+                        result.Append(' ');
+                        result.Append(c);
+                        state = 1;
+                    }
+                    break;
+                }
+            }
+        }
+        return result;
+    }
+    
+    public wstring TrimAll(const wstring& s)
+    {
+        return ToUtf16(TrimAll(ToUtf32(s)));
+    }
+    
+    public ustring TrimAll(const ustring& s)
+    {
+        ustring result;
+        result.Reserve(s.Length());
+        int state = 0;
+        for (uchar c : s)
+        {
+            switch (state)
+            {
+                case 0: 
+                {
+                    if (!IsWhiteSpace(c)) 
+                    {
+                        result.Append(c);
+                        state = 1;
+                    }
+                    break;
+                }
+                case 1:
+                {
+                    if (IsWhiteSpace(c))
+                    {
+                        state = 2;
+                    }
+                    else
+                    {
+                        result.Append(c);
+                    }
+                    break;
+                }
+                case 2:
+                {
+                    if (!IsWhiteSpace(c))
+                    {
+                        result.Append(u' ');
+                        result.Append(c);
+                        state = 1;
+                    }
+                    break;
+                }
+            }
+        }
+        return result;
+    }
+    
     public nothrow string HexEscape(char c)
     {
         return "\\x" + ToHexString(cast<byte>(c));
