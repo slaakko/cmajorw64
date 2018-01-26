@@ -59,6 +59,7 @@ SystemModuleSet::SystemModuleSet()
     systemModuleNames.insert(U"System.Xml");
     systemModuleNames.insert(U"System.Dom");
     systemModuleNames.insert(U"System.Numerics.Multiprecision");
+    systemModuleNames.insert(U"System.IO.Compression");
     systemModuleNames.insert(U"System");
 }
 
