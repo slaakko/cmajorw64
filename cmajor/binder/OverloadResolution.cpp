@@ -502,7 +502,7 @@ bool FindConversions(BoundCompileUnit& boundCompileUnit, FunctionSymbol* functio
                     continue;
                 }
             }
-            else if (i == 1 && sourceType->IsReferenceType() && targetType->IsLvalueReferenceType() && TypesEqual(sourceType->RemoveReference(span), targetType->RemoveReference(span)))
+            else if (i == 1 && sourceType->IsReferenceType() && targetType->IsLvalueReferenceType() && TypesEqual(sourceType->RemoveReference(span)->RemoveConst(span), targetType->RemoveReference(span)))
             {
                 if (!function->IsConstructorDestructorOrNonstaticMemberFunction())
                 {
@@ -536,7 +536,7 @@ bool FindConversions(BoundCompileUnit& boundCompileUnit, FunctionSymbol* functio
             {
                 ArgumentMatch argumentMatch;
                 FunctionSymbol* conversionFun = boundCompileUnit.GetConversion(sourceType, targetType->RemoveReference(span), containerScope, currentFunction, span, argumentMatch);
-                if (conversionFun->GetConversionType() == conversionType || conversionFun->GetConversionType() == ConversionType::implicit_)
+                if (conversionFun && (conversionFun->GetConversionType() == conversionType || conversionFun->GetConversionType() == ConversionType::implicit_))
                 {
                     ++functionMatch.numConversions;
                     functionMatch.argumentMatches.push_back(ArgumentMatch(OperationFlags::none, conversionFun, OperationFlags::none, 1));

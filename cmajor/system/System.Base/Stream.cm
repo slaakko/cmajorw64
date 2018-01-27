@@ -173,6 +173,24 @@ namespace System.IO
         s.Write(x);
         return s;
     }
+    
+    public OutputStream& operator<<(OutputStream& s, char x)
+    {
+        s.Write(x);
+        return s;
+    }
+    
+    public OutputStream& operator<<(OutputStream& s, wchar x)
+    {
+        s.Write(x);
+        return s;
+    }
+    
+    public OutputStream& operator<<(OutputStream& s, uchar x)
+    {
+        s.Write(x);
+        return s;
+    }
 
     public OutputStream& operator<<(OutputStream& s, const Endl&)
     {

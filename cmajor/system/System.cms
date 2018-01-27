@@ -10,5 +10,6 @@ project <System.Numerics.Multiprecision/System.Numerics.Multiprecision.cmp>;
 project <System.Runtime/System.Runtime.cmp>;
 project <System.Text.Parsing/System.Text.Parsing.cmp>;
 project <System.Text.Parsing.CodeDom/System.Text.Parsing.CodeDom.cmp>;
+project <System.Text.RegularExpressions/System.Text.RegularExpressions.cmp>;
 project <System.Xml/System.Xml.cmp>;
 activeProject System.Base;

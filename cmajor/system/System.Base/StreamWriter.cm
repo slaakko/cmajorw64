@@ -259,6 +259,24 @@ namespace System.IO
         return writer;
     }
 
+    public StreamWriter& operator<<(StreamWriter& writer, char x)
+    {
+        writer.Write(x);
+        return writer;
+    }
+    
+    public StreamWriter& operator<<(StreamWriter& writer, wchar x)
+    {
+        writer.Write(x);
+        return writer;
+    }
+    
+    public StreamWriter& operator<<(StreamWriter& writer, uchar x)
+    {
+        writer.Write(x);
+        return writer;
+    }
+
     public StreamWriter& operator<<(StreamWriter& writer, const Endl&)
     {
         writer.WriteLine();

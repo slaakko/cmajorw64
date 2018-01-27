@@ -4,6 +4,7 @@
 // =================================
 
 using System;
+using System.Collections;
 
 namespace System.IO
 {
@@ -54,6 +55,31 @@ namespace System.IO
             {
                 return content;
             }
+        }
+        public static List<string> ReadAllLines(const string& filePath)
+        {
+            List<string> lines;
+            bool start = true;
+            StreamReader reader = OpenRead(filePath);
+            string line = reader.ReadLine();
+            while (!reader.EndOfStream())
+            {
+                if (start)
+                {
+                    if (line.Length() >= 3 && cast<byte>(line[0]) == 0xEFu && cast<byte>(line[1]) == 0xBBu && cast<byte>(line[2]) == 0xBFu)
+                    {
+                        line = line.Substring(3);
+                    }
+                    start = false;
+                }
+                lines.Add(line);
+                line = reader.ReadLine();
+            }
+            if (!line.IsEmpty())
+            {
+                lines.Add(line);
+            }
+            return lines;
         }
     }
 }
