@@ -98,7 +98,7 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-      <AdditionalDependencies>cmrt200bz2.lib;cmrt200zlib.lib;cmrt200gmp.lib;ws2_32.lib;parser.lib;parsing.lib;codedom.lib;util.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libbz2.lib;zlibstat.lib;cmrt200gmp.lib;ws2_32.lib;parser.lib;parsing.lib;codedom.lib;util.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(OutDir);C:\Programming\boost64;C:\Programming\llvm-4.0.0.src\build\Debug\lib;C:\Users\Seppo\cmajorw64\cmajor\lib</AdditionalLibraryDirectories>
       <AdditionalOptions>/EXPORT:__CxxFrameHandler3 /EXPORT:_CxxThrowException /EXPORT:__chkstk %(AdditionalOptions)</AdditionalOptions>
       <ModuleDefinitionFile>
@@ -157,12 +157,13 @@
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>cmrt200bz2.lib;cmrt200zlib.lib;cmrt200gmp.lib;ws2_32.lib;parser.lib;parsing.lib;codedom.lib;util.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libbz2.lib;zlibstat.lib;cmrt200gmp.lib;ws2_32.lib;parser.lib;parsing.lib;codedom.lib;util.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(OutDir);C:\Programming\boost64;C:\Programming\llvm-4.0.0.src\build\Release\lib;C:\Users\Seppo\cmajorw64\cmajor\lib</AdditionalLibraryDirectories>
       <AdditionalOptions>/EXPORT:__CxxFrameHandler3 /EXPORT:_CxxThrowException /EXPORT:__chkstk %(AdditionalOptions)</AdditionalOptions>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="BZ2Interface.h" />
     <ClInclude Include="CommandLine.hpp" />
     <ClInclude Include="Compression.hpp" />
     <ClInclude Include="ConditionVariable.hpp" />
@@ -183,8 +184,10 @@
     <ClInclude Include="String.hpp" />
     <ClInclude Include="Thread.hpp" />
     <ClInclude Include="Time.hpp" />
+    <ClInclude Include="ZlibInterface.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="BZ2Interface.c" />
     <ClCompile Include="CommandLine.cpp" />
     <ClCompile Include="Compression.cpp" />
     <ClCompile Include="ConditionVariable.cpp" />
@@ -205,6 +208,7 @@
     <ClCompile Include="String.cpp" />
     <ClCompile Include="Thread.cpp" />
     <ClCompile Include="Time.cpp" />
+    <ClCompile Include="ZlibInterface.c" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

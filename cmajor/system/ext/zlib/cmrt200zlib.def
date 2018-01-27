@@ -1,8 +1,0 @@
-; dlltool --verbose --output-def cmrt200zlib.def zlib_intf.o
-EXPORTS
-	zlib_done @ 1
-	zlib_inflate @ 2
-	zlib_init @ 3
-	zlib_retval_str @ 4
-	zlib_set_input @ 5
-	zlib_deflate @ 6

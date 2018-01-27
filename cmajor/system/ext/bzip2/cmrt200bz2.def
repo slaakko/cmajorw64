@@ -1,8 +1,0 @@
-; dlltool --verbose --output-def cmrt200bz2.def bz2_intf.o
-EXPORTS
-	bz2_decompress @ 1
-	bz2_done @ 2
-	bz2_init @ 3
-	bz2_retval_str @ 4
-	bz2_set_input @ 5
-	bz2_compress @ 6

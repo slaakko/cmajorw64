@@ -1,0 +1,3632 @@
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta charset="utf-8"/>
+        <title>System.Numerics.Multiprecision Library Reference</title>
+        <link href="../../style/cmdoc.css" rel="stylesheet" type="text/css"/>
+    </head>
+    <body>
+        <h1>System.Numerics.Multiprecision Library Reference</h1>
+        <h2>Namespaces</h2>
+        <table>
+            <tr>
+                <td>
+                    <a href="#System.Numerics.Multiprecision">System.Numerics.Multiprecision</a>
+                </td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h2 id="System.Numerics.Multiprecision">System.Numerics.Multiprecision Namespace</h2>
+        <h3>Classes</h3>
+        <table>
+            <tr>
+                <td>
+                    <a href="#class_BigFloat_BC19EFB82C8E666524B4436C56800B572EFBED53">BigFloat</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="#class_BigFloatDefaultPrecisionSetter_CB4ACD3C0708237EDA437E4EAEBD18268C65BDFB">BigFloatDefaultPrecisionSetter</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="#class_BigInt_9326EADB23C0E0FE1858A97CCC64FF60DD2A22D0">BigInt</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="#class_BigRational_0F62DE7516E5ADB5CE79939E2167456710EF7B23">BigRational</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="#class_Precision_9DAFEB710FD18878097281A53A7F8764341F0B2A">Precision</a>
+                </td>
+            </tr>
+        </table>
+        <h3>Functions</h3>
+        <table>
+            <tr>
+                <td>
+                    <a href="#function_group_Abs_E4CE68D81FB8D5B1A65D79ED0BA7D4358D27A208">Abs</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="#function_Ceil_C817E559F2C738FBD22975B3D10B9290702092FA">Ceil(const BigFloat&amp; x)</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="#function_ClearBit_5D06E02EC012493FA5CF446EFCA8D186C858AD3C">ClearBit(BigInt&amp; x, uint bitIndex)</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="#function_Floor_8415F06A552A52B7B001DF605E48DC8A5E763A0E">Floor(const BigFloat&amp; x)</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="#function_GetBigFloatDefaultPrecision_483AC84D8899A5A9226693C3E387D31527352A29">GetBigFloatDefaultPrecision()</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="#function_SetBit_89FDAEFA3B0863EB2A94108DC13944EB3C66F06E">SetBit(BigInt&amp; x, uint bitIndex)</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="#function_Sqrt_1255F3C4594C8479BD9B55E746F127A4B215C584">Sqrt(const BigFloat&amp; x)</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="#function_TestBit_38E54EA4251112CCB31E9E78644C86EEDBCF29C5">TestBit(BigInt&amp; x, uint bitIndex)</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="#function_ToggleBit_2866B63CAB922D367955045744679F9D06F71EB7">ToggleBit(BigInt&amp; x, uint bitIndex)</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="#function_Trunc_8A007277928B2C2F16C0FA3DB750A307F2F61A88">Trunc(const BigFloat&amp; x)</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="#function_op_rem_2B0C09A64E292F4D12091D04EDC86AC780DDAB5D">operator%(const BigInt&amp; left, const BigInt&amp; right)</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="#function_op_and_EC306043569A570820AF0BD9C636E5A9BA3C6C57">operator&amp;(const BigInt&amp; left, const BigInt&amp; right)</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="#function_group_op_star_33CA2CCCC406AC14ACB6EE8CAAD649263ABEB595">operator*</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="#function_group_op_plus_56A27315B56A578F0EF8630C0FF9385E5BE979DC">operator+</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="#function_group_op_minus_332A4C7FC57A2990CF94BAAD11CCFC1B616D7B46">operator-</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="#function_group_op_div_4362D23971F70C9242138FDD0E5E82AAED15E5A4">operator/</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="#function_group_op_less_01AD50632F343E948CAE58C5DED9091EFC0C8AFF">operator&lt;</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="#function_group_op_shl_2AE956980431DA753E03C4D98C544C64D5AACC77">operator&lt;&lt;</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="#function_group_op_eq_E07C6E6EC42CC7A6F491A21ED683ACA7A96D3E15">operator==</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="#function_op_xor_4F7D875F1408C1AD642ED00AECEE4971D87DB691">operator^(const BigInt&amp; left, const BigInt&amp; right)</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="#function_op_or_C16146AC5235A380AA8754B8B163BC5B0C53A95F">operator|(const BigInt&amp; left, const BigInt&amp; right)</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="#function_op_cpl_F2C34039298906124AEC6058776E30FFA1826CCB">operator~(const BigInt&amp; x)</a>
+                </td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h3 id="class_BigFloat_BC19EFB82C8E666524B4436C56800B572EFBED53">BigFloat Class</h3>
+        <h4>Syntax</h4>
+        <table>
+            <tr>
+                <td>
+                    <span class="mono"> public class BigFloat;</span>
+                </td>
+            </tr>
+        </table>
+        <h4>Constructors</h4>
+        <table>
+            <tr>
+                <td>
+                    <a href="#default_constructor_BigFloat_93627EDCE150FB0E6A3C69E270EF5A3D78CD4E6F">BigFloat()</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="#move_constructor_BigFloat_6C11CE3B5E6C96920B4295869E868C328BB6D3B2">BigFloat(BigFloat&amp;&amp; that)</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="#copy_constructor_BigFloat_1F61E552E17087EA5A54972F8181244E0EC960CF">BigFloat(const BigFloat&amp; that)</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="#constructor_BigFloat_20895834C351E98079E7C3115BA0027A051253EB">BigFloat(const BigInt&amp; that)</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="#constructor_BigFloat_8AA5B0FEA3020B51F51CAD27CD80369E60DE1D88">BigFloat(const BigRational&amp; that)</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="#constructor_BigFloat_5A7F5845E5B2EAEA0A1C2C67115107E0DABA1A8E">BigFloat(const Precision&amp; prec)</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="#constructor_BigFloat_4617CA97E98F7F68740CF339DAF91D915CFA2650">BigFloat(const String&lt;char>&amp; str)</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="#constructor_BigFloat_3E12EF7782C96A5646F5EC50B60048654D688D9D">BigFloat(const String&lt;char>&amp; str, int base_)</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="#constructor_BigFloat_BEC5259CEA939F27B59F690ADEDAFEBC9F1A4D0C">BigFloat(double that)</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="#constructor_BigFloat_B46E7D1133D4E6EC69CB7B5C4480C9D7E7D48468">BigFloat(int that)</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="#constructor_BigFloat_DE636A2776098C7E40417E72AE67777028E701F6">BigFloat(uint that)</a>
+                </td>
+            </tr>
+        </table>
+        <h4>Member Functions</h4>
+        <table>
+            <tr>
+                <td>
+                    <a href="#member_function_Handle_BigFloat_1417D6A5E5040218CC579E251EBA879B3ACEC024">Handle() const</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="#member_function_ToDouble_BigFloat_1C528A9567BA04A0264BEC604E7E9DD032674542">ToDouble() const</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="#function_group_ToString_98B3EC27F057E3D2072BD8DC2D98473F5EB390FC">ToString</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="#function_group_op_assign_B5A5FD837F72256AA73DDCB97ADD390F0292332C">operator=</a>
+                </td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h4 id="default_constructor_BigFloat_93627EDCE150FB0E6A3C69E270EF5A3D78CD4E6F">BigFloat() Constructor</h4>
+        <h5>Syntax</h5>
+        <table>
+            <tr>
+                <td>
+                    <span class="mono">public nothrow BigFloat();</span>
+                </td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h4 id="move_constructor_BigFloat_6C11CE3B5E6C96920B4295869E868C328BB6D3B2">BigFloat(BigFloat&amp;&amp; that) Constructor</h4>
+        <h5>Syntax</h5>
+        <table>
+            <tr>
+                <td>
+                    <span class="mono">public nothrow BigFloat(BigFloat&amp;&amp; that);</span>
+                </td>
+            </tr>
+        </table>
+        <h5>Parameters</h5>
+        <table class="params">
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">that</span>
+                </td>
+                <td class="params">
+                    <a href="#class_BigFloat_BC19EFB82C8E666524B4436C56800B572EFBED53">BigFloat</a>
+                    &amp;&amp;</td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h4 id="copy_constructor_BigFloat_1F61E552E17087EA5A54972F8181244E0EC960CF">BigFloat(const BigFloat&amp; that) Constructor</h4>
+        <h5>Syntax</h5>
+        <table>
+            <tr>
+                <td>
+                    <span class="mono">public nothrow BigFloat(const BigFloat&amp; that);</span>
+                </td>
+            </tr>
+        </table>
+        <h5>Parameters</h5>
+        <table class="params">
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">that</span>
+                </td>
+                <td class="params">
+                    <span class="kw">const </span>
+                    <a href="#class_BigFloat_BC19EFB82C8E666524B4436C56800B572EFBED53">BigFloat</a>
+                    &amp;</td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h4 id="constructor_BigFloat_20895834C351E98079E7C3115BA0027A051253EB">BigFloat(const BigInt&amp; that) Constructor</h4>
+        <h5>Syntax</h5>
+        <table>
+            <tr>
+                <td>
+                    <span class="mono">public nothrow BigFloat(const BigInt&amp; that);</span>
+                </td>
+            </tr>
+        </table>
+        <h5>Parameters</h5>
+        <table class="params">
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">that</span>
+                </td>
+                <td class="params">
+                    <span class="kw">const </span>
+                    <a href="#class_BigInt_9326EADB23C0E0FE1858A97CCC64FF60DD2A22D0">BigInt</a>
+                    &amp;</td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h4 id="constructor_BigFloat_8AA5B0FEA3020B51F51CAD27CD80369E60DE1D88">BigFloat(const BigRational&amp; that) Constructor</h4>
+        <h5>Syntax</h5>
+        <table>
+            <tr>
+                <td>
+                    <span class="mono">public nothrow BigFloat(const BigRational&amp; that);</span>
+                </td>
+            </tr>
+        </table>
+        <h5>Parameters</h5>
+        <table class="params">
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">that</span>
+                </td>
+                <td class="params">
+                    <span class="kw">const </span>
+                    <a href="#class_BigRational_0F62DE7516E5ADB5CE79939E2167456710EF7B23">BigRational</a>
+                    &amp;</td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h4 id="constructor_BigFloat_5A7F5845E5B2EAEA0A1C2C67115107E0DABA1A8E">BigFloat(const Precision&amp; prec) Constructor</h4>
+        <h5>Syntax</h5>
+        <table>
+            <tr>
+                <td>
+                    <span class="mono">public nothrow explicit BigFloat(const Precision&amp; prec);</span>
+                </td>
+            </tr>
+        </table>
+        <h5>Parameters</h5>
+        <table class="params">
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">prec</span>
+                </td>
+                <td class="params">
+                    <span class="kw">const </span>
+                    <a href="#class_Precision_9DAFEB710FD18878097281A53A7F8764341F0B2A">Precision</a>
+                    &amp;</td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h4 id="constructor_BigFloat_4617CA97E98F7F68740CF339DAF91D915CFA2650">BigFloat(const String&lt;char>&amp; str) Constructor</h4>
+        <h5>Syntax</h5>
+        <table>
+            <tr>
+                <td>
+                    <span class="mono">public BigFloat(const String&lt;char>&amp; str);</span>
+                </td>
+            </tr>
+        </table>
+        <h5>Parameters</h5>
+        <table class="params">
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">str</span>
+                </td>
+                <td class="params">
+                    <span class="kw">const </span>
+                    <a href="../System.Base/System.Base.html#class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC">String</a>
+                    &lt;<span class="kw">char</span>
+                    >&amp;</td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h4 id="constructor_BigFloat_3E12EF7782C96A5646F5EC50B60048654D688D9D">BigFloat(const String&lt;char>&amp; str, int base_) Constructor</h4>
+        <h5>Syntax</h5>
+        <table>
+            <tr>
+                <td>
+                    <span class="mono">public BigFloat(const String&lt;char>&amp; str, int base_);</span>
+                </td>
+            </tr>
+        </table>
+        <h5>Parameters</h5>
+        <table class="params">
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">str</span>
+                </td>
+                <td class="params">
+                    <span class="kw">const </span>
+                    <a href="../System.Base/System.Base.html#class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC">String</a>
+                    &lt;<span class="kw">char</span>
+                    >&amp;</td>
+            </tr>
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">base_</span>
+                </td>
+                <td class="params">
+                    <span class="kw">int</span>
+                </td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h4 id="constructor_BigFloat_BEC5259CEA939F27B59F690ADEDAFEBC9F1A4D0C">BigFloat(double that) Constructor</h4>
+        <h5>Syntax</h5>
+        <table>
+            <tr>
+                <td>
+                    <span class="mono">public nothrow BigFloat(double that);</span>
+                </td>
+            </tr>
+        </table>
+        <h5>Parameters</h5>
+        <table class="params">
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">that</span>
+                </td>
+                <td class="params">
+                    <span class="kw">double</span>
+                </td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h4 id="constructor_BigFloat_B46E7D1133D4E6EC69CB7B5C4480C9D7E7D48468">BigFloat(int that) Constructor</h4>
+        <h5>Syntax</h5>
+        <table>
+            <tr>
+                <td>
+                    <span class="mono">public nothrow BigFloat(int that);</span>
+                </td>
+            </tr>
+        </table>
+        <h5>Parameters</h5>
+        <table class="params">
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">that</span>
+                </td>
+                <td class="params">
+                    <span class="kw">int</span>
+                </td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h4 id="constructor_BigFloat_DE636A2776098C7E40417E72AE67777028E701F6">BigFloat(uint that) Constructor</h4>
+        <h5>Syntax</h5>
+        <table>
+            <tr>
+                <td>
+                    <span class="mono">public nothrow BigFloat(uint that);</span>
+                </td>
+            </tr>
+        </table>
+        <h5>Parameters</h5>
+        <table class="params">
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">that</span>
+                </td>
+                <td class="params">
+                    <span class="kw">uint</span>
+                </td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h4 id="member_function_Handle_BigFloat_1417D6A5E5040218CC579E251EBA879B3ACEC024">Handle() const Member Function</h4>
+        <h5>Syntax</h5>
+        <table>
+            <tr>
+                <td>
+                    <span class="mono">public nothrow inline void* Handle() const;</span>
+                </td>
+            </tr>
+        </table>
+        <h5>Return Type</h5>
+        <table>
+            <tr>
+                <td>
+                    <span class="kw">void</span>
+                    *</td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h4 id="member_function_ToDouble_BigFloat_1C528A9567BA04A0264BEC604E7E9DD032674542">ToDouble() const Member Function</h4>
+        <h5>Syntax</h5>
+        <table>
+            <tr>
+                <td>
+                    <span class="mono">public nothrow double ToDouble() const;</span>
+                </td>
+            </tr>
+        </table>
+        <h5>Return Type</h5>
+        <table>
+            <tr>
+                <td>
+                    <span class="kw">double</span>
+                </td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h4 id="function_group_ToString_98B3EC27F057E3D2072BD8DC2D98473F5EB390FC">ToString Member Function</h4>
+        <h5>Overloads</h5>
+        <table>
+            <tr>
+                <td>
+                    <a href="#member_function_ToString_BigFloat_E30E31DC5EF5F17B9EDD35EC0A11B2469C3A9A0D">ToString() const</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="#member_function_ToString_BigFloat_1BFFE7FC67796F2BDA21FC70B9104876FD447ED6">ToString(int base_) const</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="#member_function_ToString_BigFloat_2BC083E6A179B017E555D529F1DDCC3938B1C187">ToString(int base_, uint numDigits) const</a>
+                </td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h5 id="member_function_ToString_BigFloat_E30E31DC5EF5F17B9EDD35EC0A11B2469C3A9A0D">ToString() const Overload</h5>
+        <h6>Syntax</h6>
+        <table>
+            <tr>
+                <td>
+                    <span class="mono">public nothrow String&lt;char> ToString() const;</span>
+                </td>
+            </tr>
+        </table>
+        <h6>Return Type</h6>
+        <table>
+            <tr>
+                <td>
+                    <a href="../System.Base/System.Base.html#class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC">String</a>
+                    &lt;<span class="kw">char</span>
+                    ></td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h5 id="member_function_ToString_BigFloat_1BFFE7FC67796F2BDA21FC70B9104876FD447ED6">ToString(int base_) const Overload</h5>
+        <h6>Syntax</h6>
+        <table>
+            <tr>
+                <td>
+                    <span class="mono">public nothrow String&lt;char> ToString(int base_) const;</span>
+                </td>
+            </tr>
+        </table>
+        <h6>Parameters</h6>
+        <table class="params">
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">base_</span>
+                </td>
+                <td class="params">
+                    <span class="kw">int</span>
+                </td>
+            </tr>
+        </table>
+        <h6>Return Type</h6>
+        <table>
+            <tr>
+                <td>
+                    <a href="../System.Base/System.Base.html#class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC">String</a>
+                    &lt;<span class="kw">char</span>
+                    ></td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h5 id="member_function_ToString_BigFloat_2BC083E6A179B017E555D529F1DDCC3938B1C187">ToString(int base_, uint numDigits) const Overload</h5>
+        <h6>Syntax</h6>
+        <table>
+            <tr>
+                <td>
+                    <span class="mono">public nothrow String&lt;char> ToString(int base_, uint numDigits) const;</span>
+                </td>
+            </tr>
+        </table>
+        <h6>Parameters</h6>
+        <table class="params">
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">base_</span>
+                </td>
+                <td class="params">
+                    <span class="kw">int</span>
+                </td>
+            </tr>
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">numDigits</span>
+                </td>
+                <td class="params">
+                    <span class="kw">uint</span>
+                </td>
+            </tr>
+        </table>
+        <h6>Return Type</h6>
+        <table>
+            <tr>
+                <td>
+                    <a href="../System.Base/System.Base.html#class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC">String</a>
+                    &lt;<span class="kw">char</span>
+                    ></td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h4 id="function_group_op_assign_B5A5FD837F72256AA73DDCB97ADD390F0292332C">operator= Member Function</h4>
+        <h5>Overloads</h5>
+        <table>
+            <tr>
+                <td>
+                    <a href="#move_assignment_op_assign_BigFloat_9E1BAB4E59CBA74BB30C7567FE9DB4179CE93CF2">operator=(BigFloat&amp;&amp; @p0)</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="#copy_assignment_op_assign_BigFloat_FAA70BA19A4265F69079DAC0E86B66977549000C">operator=(const BigFloat&amp; that)</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="#member_function_op_assign_BigFloat_53494148E45592ED0A47D64E9A68FCC15C31ACB5">operator=(const BigInt&amp; that)</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="#member_function_op_assign_BigFloat_1F87ED7CF5B22797AE35DD8844B35540FF78BFCC">operator=(const BigRational&amp; that)</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="#member_function_op_assign_BigFloat_072C568232242F7C22BEC668D93A3B33782D2F09">operator=(double that)</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="#member_function_op_assign_BigFloat_4F1B356E056A725F9F8DD930B7D832036107EF1F">operator=(int that)</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="#member_function_op_assign_BigFloat_59BCB3563F5BF847BFD4B3FE6D5D72F826C9294F">operator=(uint that)</a>
+                </td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h5 id="move_assignment_op_assign_BigFloat_9E1BAB4E59CBA74BB30C7567FE9DB4179CE93CF2">operator=(BigFloat&amp;&amp; @p0) Overload</h5>
+        <h6>Syntax</h6>
+        <table>
+            <tr>
+                <td>
+                    <span class="mono">public nothrow default void operator=(BigFloat&amp;&amp; @p0);</span>
+                </td>
+            </tr>
+        </table>
+        <h6>Parameters</h6>
+        <table class="params">
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">@p0</span>
+                </td>
+                <td class="params">
+                    <a href="#class_BigFloat_BC19EFB82C8E666524B4436C56800B572EFBED53">BigFloat</a>
+                    &amp;&amp;</td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h5 id="copy_assignment_op_assign_BigFloat_FAA70BA19A4265F69079DAC0E86B66977549000C">operator=(const BigFloat&amp; that) Overload</h5>
+        <h6>Syntax</h6>
+        <table>
+            <tr>
+                <td>
+                    <span class="mono">public nothrow void operator=(const BigFloat&amp; that);</span>
+                </td>
+            </tr>
+        </table>
+        <h6>Parameters</h6>
+        <table class="params">
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">that</span>
+                </td>
+                <td class="params">
+                    <span class="kw">const </span>
+                    <a href="#class_BigFloat_BC19EFB82C8E666524B4436C56800B572EFBED53">BigFloat</a>
+                    &amp;</td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h5 id="member_function_op_assign_BigFloat_53494148E45592ED0A47D64E9A68FCC15C31ACB5">operator=(const BigInt&amp; that) Overload</h5>
+        <h6>Syntax</h6>
+        <table>
+            <tr>
+                <td>
+                    <span class="mono">public nothrow void operator=(const BigInt&amp; that);</span>
+                </td>
+            </tr>
+        </table>
+        <h6>Parameters</h6>
+        <table class="params">
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">that</span>
+                </td>
+                <td class="params">
+                    <span class="kw">const </span>
+                    <a href="#class_BigInt_9326EADB23C0E0FE1858A97CCC64FF60DD2A22D0">BigInt</a>
+                    &amp;</td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h5 id="member_function_op_assign_BigFloat_1F87ED7CF5B22797AE35DD8844B35540FF78BFCC">operator=(const BigRational&amp; that) Overload</h5>
+        <h6>Syntax</h6>
+        <table>
+            <tr>
+                <td>
+                    <span class="mono">public nothrow void operator=(const BigRational&amp; that);</span>
+                </td>
+            </tr>
+        </table>
+        <h6>Parameters</h6>
+        <table class="params">
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">that</span>
+                </td>
+                <td class="params">
+                    <span class="kw">const </span>
+                    <a href="#class_BigRational_0F62DE7516E5ADB5CE79939E2167456710EF7B23">BigRational</a>
+                    &amp;</td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h5 id="member_function_op_assign_BigFloat_072C568232242F7C22BEC668D93A3B33782D2F09">operator=(double that) Overload</h5>
+        <h6>Syntax</h6>
+        <table>
+            <tr>
+                <td>
+                    <span class="mono">public nothrow void operator=(double that);</span>
+                </td>
+            </tr>
+        </table>
+        <h6>Parameters</h6>
+        <table class="params">
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">that</span>
+                </td>
+                <td class="params">
+                    <span class="kw">double</span>
+                </td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h5 id="member_function_op_assign_BigFloat_4F1B356E056A725F9F8DD930B7D832036107EF1F">operator=(int that) Overload</h5>
+        <h6>Syntax</h6>
+        <table>
+            <tr>
+                <td>
+                    <span class="mono">public nothrow void operator=(int that);</span>
+                </td>
+            </tr>
+        </table>
+        <h6>Parameters</h6>
+        <table class="params">
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">that</span>
+                </td>
+                <td class="params">
+                    <span class="kw">int</span>
+                </td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h5 id="member_function_op_assign_BigFloat_59BCB3563F5BF847BFD4B3FE6D5D72F826C9294F">operator=(uint that) Overload</h5>
+        <h6>Syntax</h6>
+        <table>
+            <tr>
+                <td>
+                    <span class="mono">public nothrow void operator=(uint that);</span>
+                </td>
+            </tr>
+        </table>
+        <h6>Parameters</h6>
+        <table class="params">
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">that</span>
+                </td>
+                <td class="params">
+                    <span class="kw">uint</span>
+                </td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h3 id="class_BigFloatDefaultPrecisionSetter_CB4ACD3C0708237EDA437E4EAEBD18268C65BDFB">BigFloatDefaultPrecisionSetter Class</h3>
+        <h4>Syntax</h4>
+        <table>
+            <tr>
+                <td>
+                    <span class="mono"> public static class BigFloatDefaultPrecisionSetter;</span>
+                </td>
+            </tr>
+        </table>
+        <h4>Static Member Functions</h4>
+        <table>
+            <tr>
+                <td>
+                    <a href="#member_function_Init_BigFloatDefaultPrecisionSetter_466501FD7806CCA3447F4EAC73B22A8C51582068">Init()</a>
+                </td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h4 id="member_function_Init_BigFloatDefaultPrecisionSetter_466501FD7806CCA3447F4EAC73B22A8C51582068">Init() Static Member Function</h4>
+        <h5>Syntax</h5>
+        <table>
+            <tr>
+                <td>
+                    <span class="mono">public static nothrow void Init();</span>
+                </td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h3 id="class_BigInt_9326EADB23C0E0FE1858A97CCC64FF60DD2A22D0">BigInt Class</h3>
+        <h4>Syntax</h4>
+        <table>
+            <tr>
+                <td>
+                    <span class="mono"> public class BigInt;</span>
+                </td>
+            </tr>
+        </table>
+        <h4>Constructors</h4>
+        <table>
+            <tr>
+                <td>
+                    <a href="#default_constructor_BigInt_F0D8CC45932E09FAA2EB14A8B64247F39C1EFFB7">BigInt()</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="#move_constructor_BigInt_D09987D7C430C2B3B3453A653FBAC4415D47F81A">BigInt(BigInt&amp;&amp; that)</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="#copy_constructor_BigInt_FEDC121C2BA0FAF385677CE5CDF2167A78328312">BigInt(const BigInt&amp; that)</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="#constructor_BigInt_B88EFB5B832B57059DB131C18BB6F5EE8DF4483D">BigInt(const String&lt;char>&amp; str)</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="#constructor_BigInt_F81F5A54F2CD3D6F05A0021F721AB3FA30AAE086">BigInt(const String&lt;char>&amp; str, int base_)</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="#constructor_BigInt_47A90AE6B6DCC8EA1BFDBFD2D18FAB80E68E02CE">BigInt(int that)</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="#constructor_BigInt_4F93C9E2AA2CF328A1038B63471043F3B6916D4F">BigInt(uint that)</a>
+                </td>
+            </tr>
+        </table>
+        <h4>Member Functions</h4>
+        <table>
+            <tr>
+                <td>
+                    <a href="#member_function_Handle_BigInt_BBA7C4AD8C6B37F828A4EE438EAE4366E13D0BBA">Handle() const</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="#function_group_ToString_38A1AA35A0463572A5F37530342D49BF3F84209A">ToString</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="#function_group_op_assign_70E1728FD2D77DE93BCD772643DC644EA2344232">operator=</a>
+                </td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h4 id="default_constructor_BigInt_F0D8CC45932E09FAA2EB14A8B64247F39C1EFFB7">BigInt() Constructor</h4>
+        <h5>Syntax</h5>
+        <table>
+            <tr>
+                <td>
+                    <span class="mono">public nothrow BigInt();</span>
+                </td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h4 id="move_constructor_BigInt_D09987D7C430C2B3B3453A653FBAC4415D47F81A">BigInt(BigInt&amp;&amp; that) Constructor</h4>
+        <h5>Syntax</h5>
+        <table>
+            <tr>
+                <td>
+                    <span class="mono">public nothrow BigInt(BigInt&amp;&amp; that);</span>
+                </td>
+            </tr>
+        </table>
+        <h5>Parameters</h5>
+        <table class="params">
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">that</span>
+                </td>
+                <td class="params">
+                    <a href="#class_BigInt_9326EADB23C0E0FE1858A97CCC64FF60DD2A22D0">BigInt</a>
+                    &amp;&amp;</td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h4 id="copy_constructor_BigInt_FEDC121C2BA0FAF385677CE5CDF2167A78328312">BigInt(const BigInt&amp; that) Constructor</h4>
+        <h5>Syntax</h5>
+        <table>
+            <tr>
+                <td>
+                    <span class="mono">public nothrow BigInt(const BigInt&amp; that);</span>
+                </td>
+            </tr>
+        </table>
+        <h5>Parameters</h5>
+        <table class="params">
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">that</span>
+                </td>
+                <td class="params">
+                    <span class="kw">const </span>
+                    <a href="#class_BigInt_9326EADB23C0E0FE1858A97CCC64FF60DD2A22D0">BigInt</a>
+                    &amp;</td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h4 id="constructor_BigInt_B88EFB5B832B57059DB131C18BB6F5EE8DF4483D">BigInt(const String&lt;char>&amp; str) Constructor</h4>
+        <h5>Syntax</h5>
+        <table>
+            <tr>
+                <td>
+                    <span class="mono">public BigInt(const String&lt;char>&amp; str);</span>
+                </td>
+            </tr>
+        </table>
+        <h5>Parameters</h5>
+        <table class="params">
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">str</span>
+                </td>
+                <td class="params">
+                    <span class="kw">const </span>
+                    <a href="../System.Base/System.Base.html#class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC">String</a>
+                    &lt;<span class="kw">char</span>
+                    >&amp;</td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h4 id="constructor_BigInt_F81F5A54F2CD3D6F05A0021F721AB3FA30AAE086">BigInt(const String&lt;char>&amp; str, int base_) Constructor</h4>
+        <h5>Syntax</h5>
+        <table>
+            <tr>
+                <td>
+                    <span class="mono">public BigInt(const String&lt;char>&amp; str, int base_);</span>
+                </td>
+            </tr>
+        </table>
+        <h5>Parameters</h5>
+        <table class="params">
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">str</span>
+                </td>
+                <td class="params">
+                    <span class="kw">const </span>
+                    <a href="../System.Base/System.Base.html#class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC">String</a>
+                    &lt;<span class="kw">char</span>
+                    >&amp;</td>
+            </tr>
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">base_</span>
+                </td>
+                <td class="params">
+                    <span class="kw">int</span>
+                </td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h4 id="constructor_BigInt_47A90AE6B6DCC8EA1BFDBFD2D18FAB80E68E02CE">BigInt(int that) Constructor</h4>
+        <h5>Syntax</h5>
+        <table>
+            <tr>
+                <td>
+                    <span class="mono">public nothrow BigInt(int that);</span>
+                </td>
+            </tr>
+        </table>
+        <h5>Parameters</h5>
+        <table class="params">
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">that</span>
+                </td>
+                <td class="params">
+                    <span class="kw">int</span>
+                </td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h4 id="constructor_BigInt_4F93C9E2AA2CF328A1038B63471043F3B6916D4F">BigInt(uint that) Constructor</h4>
+        <h5>Syntax</h5>
+        <table>
+            <tr>
+                <td>
+                    <span class="mono">public nothrow BigInt(uint that);</span>
+                </td>
+            </tr>
+        </table>
+        <h5>Parameters</h5>
+        <table class="params">
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">that</span>
+                </td>
+                <td class="params">
+                    <span class="kw">uint</span>
+                </td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h4 id="member_function_Handle_BigInt_BBA7C4AD8C6B37F828A4EE438EAE4366E13D0BBA">Handle() const Member Function</h4>
+        <h5>Syntax</h5>
+        <table>
+            <tr>
+                <td>
+                    <span class="mono">public nothrow inline void* Handle() const;</span>
+                </td>
+            </tr>
+        </table>
+        <h5>Return Type</h5>
+        <table>
+            <tr>
+                <td>
+                    <span class="kw">void</span>
+                    *</td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h4 id="function_group_ToString_38A1AA35A0463572A5F37530342D49BF3F84209A">ToString Member Function</h4>
+        <h5>Overloads</h5>
+        <table>
+            <tr>
+                <td>
+                    <a href="#member_function_ToString_BigInt_81B193B60976E09DD78E3CF9D244111E98198646">ToString() const</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="#member_function_ToString_BigInt_EF2C39166B714AD2A345836EA019462E561BBFFE">ToString(int base_) const</a>
+                </td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h5 id="member_function_ToString_BigInt_81B193B60976E09DD78E3CF9D244111E98198646">ToString() const Overload</h5>
+        <h6>Syntax</h6>
+        <table>
+            <tr>
+                <td>
+                    <span class="mono">public nothrow String&lt;char> ToString() const;</span>
+                </td>
+            </tr>
+        </table>
+        <h6>Return Type</h6>
+        <table>
+            <tr>
+                <td>
+                    <a href="../System.Base/System.Base.html#class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC">String</a>
+                    &lt;<span class="kw">char</span>
+                    ></td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h5 id="member_function_ToString_BigInt_EF2C39166B714AD2A345836EA019462E561BBFFE">ToString(int base_) const Overload</h5>
+        <h6>Syntax</h6>
+        <table>
+            <tr>
+                <td>
+                    <span class="mono">public nothrow String&lt;char> ToString(int base_) const;</span>
+                </td>
+            </tr>
+        </table>
+        <h6>Parameters</h6>
+        <table class="params">
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">base_</span>
+                </td>
+                <td class="params">
+                    <span class="kw">int</span>
+                </td>
+            </tr>
+        </table>
+        <h6>Return Type</h6>
+        <table>
+            <tr>
+                <td>
+                    <a href="../System.Base/System.Base.html#class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC">String</a>
+                    &lt;<span class="kw">char</span>
+                    ></td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h4 id="function_group_op_assign_70E1728FD2D77DE93BCD772643DC644EA2344232">operator= Member Function</h4>
+        <h5>Overloads</h5>
+        <table>
+            <tr>
+                <td>
+                    <a href="#move_assignment_op_assign_BigInt_DC3FCEAE0B510623A25F20290991267D0226D4B4">operator=(BigInt&amp;&amp; that)</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="#copy_assignment_op_assign_BigInt_D8618CCF9748BC2CD1F5A48DDF578A1FEA88EBF2">operator=(const BigInt&amp; that)</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="#member_function_op_assign_BigInt_4D6E717A2215A11ADBF322A17C7AD5877511C50E">operator=(int that)</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="#member_function_op_assign_BigInt_BE9829921A6677F81143E1F1F4BDFE371F966ADD">operator=(uint that)</a>
+                </td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h5 id="move_assignment_op_assign_BigInt_DC3FCEAE0B510623A25F20290991267D0226D4B4">operator=(BigInt&amp;&amp; that) Overload</h5>
+        <h6>Syntax</h6>
+        <table>
+            <tr>
+                <td>
+                    <span class="mono">public nothrow default void operator=(BigInt&amp;&amp; that);</span>
+                </td>
+            </tr>
+        </table>
+        <h6>Parameters</h6>
+        <table class="params">
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">that</span>
+                </td>
+                <td class="params">
+                    <a href="#class_BigInt_9326EADB23C0E0FE1858A97CCC64FF60DD2A22D0">BigInt</a>
+                    &amp;&amp;</td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h5 id="copy_assignment_op_assign_BigInt_D8618CCF9748BC2CD1F5A48DDF578A1FEA88EBF2">operator=(const BigInt&amp; that) Overload</h5>
+        <h6>Syntax</h6>
+        <table>
+            <tr>
+                <td>
+                    <span class="mono">public nothrow void operator=(const BigInt&amp; that);</span>
+                </td>
+            </tr>
+        </table>
+        <h6>Parameters</h6>
+        <table class="params">
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">that</span>
+                </td>
+                <td class="params">
+                    <span class="kw">const </span>
+                    <a href="#class_BigInt_9326EADB23C0E0FE1858A97CCC64FF60DD2A22D0">BigInt</a>
+                    &amp;</td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h5 id="member_function_op_assign_BigInt_4D6E717A2215A11ADBF322A17C7AD5877511C50E">operator=(int that) Overload</h5>
+        <h6>Syntax</h6>
+        <table>
+            <tr>
+                <td>
+                    <span class="mono">public nothrow void operator=(int that);</span>
+                </td>
+            </tr>
+        </table>
+        <h6>Parameters</h6>
+        <table class="params">
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">that</span>
+                </td>
+                <td class="params">
+                    <span class="kw">int</span>
+                </td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h5 id="member_function_op_assign_BigInt_BE9829921A6677F81143E1F1F4BDFE371F966ADD">operator=(uint that) Overload</h5>
+        <h6>Syntax</h6>
+        <table>
+            <tr>
+                <td>
+                    <span class="mono">public nothrow void operator=(uint that);</span>
+                </td>
+            </tr>
+        </table>
+        <h6>Parameters</h6>
+        <table class="params">
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">that</span>
+                </td>
+                <td class="params">
+                    <span class="kw">uint</span>
+                </td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h3 id="class_BigRational_0F62DE7516E5ADB5CE79939E2167456710EF7B23">BigRational Class</h3>
+        <h4>Syntax</h4>
+        <table>
+            <tr>
+                <td>
+                    <span class="mono"> public class BigRational;</span>
+                </td>
+            </tr>
+        </table>
+        <h4>Constructors</h4>
+        <table>
+            <tr>
+                <td>
+                    <a href="#default_constructor_BigRational_9DE79FAB17EB1D58E27ED82452FF005E17024137">BigRational()</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="#move_constructor_BigRational_97DF5234EF8EC351D955461A3927AF0904CEDEED">BigRational(BigRational&amp;&amp; that)</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="#constructor_BigRational_E10112D5054C49BE989E0D6579FD11A918622AF4">BigRational(const BigInt&amp; that)</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="#copy_constructor_BigRational_EAFD5EE0FD87C90EDECAF123753D4E73D6AAE6A9">BigRational(const BigRational&amp; that)</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="#constructor_BigRational_0B966659253AAA93D4984CCD6043717020B06C7F">BigRational(const String&lt;char>&amp; str)</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="#constructor_BigRational_D417EECACBCE9AB213A03F148A45A2587D2C3EDC">BigRational(const String&lt;char>&amp; str, int base_)</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="#constructor_BigRational_27F63093542FAAB786B5194C678BA4BC3B10821F">BigRational(int that)</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="#constructor_BigRational_E54905588F1D534D060391B3F51005BDAFE376B6">BigRational(uint that)</a>
+                </td>
+            </tr>
+        </table>
+        <h4>Member Functions</h4>
+        <table>
+            <tr>
+                <td>
+                    <a href="#member_function_Denominator_BigRational_93F785422587940FDBD8744DDE8EDB3BEC34E9AE">Denominator() const</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="#member_function_Handle_BigRational_4B4A4C010B5C73524D802A8358AF857B3C7E2041">Handle() const</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="#member_function_Numerator_BigRational_57AA95ECA704B7D02CAF2FAEC1107D71860712C0">Numerator() const</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="#function_group_ToString_9081DE02019B34FDFB3C2AA6156C9E659D88201A">ToString</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="#function_group_op_assign_75227836E1BEB739B20F4AF2446D905A62609D07">operator=</a>
+                </td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h4 id="default_constructor_BigRational_9DE79FAB17EB1D58E27ED82452FF005E17024137">BigRational() Constructor</h4>
+        <h5>Syntax</h5>
+        <table>
+            <tr>
+                <td>
+                    <span class="mono">public nothrow BigRational();</span>
+                </td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h4 id="move_constructor_BigRational_97DF5234EF8EC351D955461A3927AF0904CEDEED">BigRational(BigRational&amp;&amp; that) Constructor</h4>
+        <h5>Syntax</h5>
+        <table>
+            <tr>
+                <td>
+                    <span class="mono">public nothrow BigRational(BigRational&amp;&amp; that);</span>
+                </td>
+            </tr>
+        </table>
+        <h5>Parameters</h5>
+        <table class="params">
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">that</span>
+                </td>
+                <td class="params">
+                    <a href="#class_BigRational_0F62DE7516E5ADB5CE79939E2167456710EF7B23">BigRational</a>
+                    &amp;&amp;</td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h4 id="constructor_BigRational_E10112D5054C49BE989E0D6579FD11A918622AF4">BigRational(const BigInt&amp; that) Constructor</h4>
+        <h5>Syntax</h5>
+        <table>
+            <tr>
+                <td>
+                    <span class="mono">public nothrow BigRational(const BigInt&amp; that);</span>
+                </td>
+            </tr>
+        </table>
+        <h5>Parameters</h5>
+        <table class="params">
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">that</span>
+                </td>
+                <td class="params">
+                    <span class="kw">const </span>
+                    <a href="#class_BigInt_9326EADB23C0E0FE1858A97CCC64FF60DD2A22D0">BigInt</a>
+                    &amp;</td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h4 id="copy_constructor_BigRational_EAFD5EE0FD87C90EDECAF123753D4E73D6AAE6A9">BigRational(const BigRational&amp; that) Constructor</h4>
+        <h5>Syntax</h5>
+        <table>
+            <tr>
+                <td>
+                    <span class="mono">public nothrow BigRational(const BigRational&amp; that);</span>
+                </td>
+            </tr>
+        </table>
+        <h5>Parameters</h5>
+        <table class="params">
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">that</span>
+                </td>
+                <td class="params">
+                    <span class="kw">const </span>
+                    <a href="#class_BigRational_0F62DE7516E5ADB5CE79939E2167456710EF7B23">BigRational</a>
+                    &amp;</td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h4 id="constructor_BigRational_0B966659253AAA93D4984CCD6043717020B06C7F">BigRational(const String&lt;char>&amp; str) Constructor</h4>
+        <h5>Syntax</h5>
+        <table>
+            <tr>
+                <td>
+                    <span class="mono">public BigRational(const String&lt;char>&amp; str);</span>
+                </td>
+            </tr>
+        </table>
+        <h5>Parameters</h5>
+        <table class="params">
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">str</span>
+                </td>
+                <td class="params">
+                    <span class="kw">const </span>
+                    <a href="../System.Base/System.Base.html#class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC">String</a>
+                    &lt;<span class="kw">char</span>
+                    >&amp;</td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h4 id="constructor_BigRational_D417EECACBCE9AB213A03F148A45A2587D2C3EDC">BigRational(const String&lt;char>&amp; str, int base_) Constructor</h4>
+        <h5>Syntax</h5>
+        <table>
+            <tr>
+                <td>
+                    <span class="mono">public BigRational(const String&lt;char>&amp; str, int base_);</span>
+                </td>
+            </tr>
+        </table>
+        <h5>Parameters</h5>
+        <table class="params">
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">str</span>
+                </td>
+                <td class="params">
+                    <span class="kw">const </span>
+                    <a href="../System.Base/System.Base.html#class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC">String</a>
+                    &lt;<span class="kw">char</span>
+                    >&amp;</td>
+            </tr>
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">base_</span>
+                </td>
+                <td class="params">
+                    <span class="kw">int</span>
+                </td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h4 id="constructor_BigRational_27F63093542FAAB786B5194C678BA4BC3B10821F">BigRational(int that) Constructor</h4>
+        <h5>Syntax</h5>
+        <table>
+            <tr>
+                <td>
+                    <span class="mono">public nothrow BigRational(int that);</span>
+                </td>
+            </tr>
+        </table>
+        <h5>Parameters</h5>
+        <table class="params">
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">that</span>
+                </td>
+                <td class="params">
+                    <span class="kw">int</span>
+                </td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h4 id="constructor_BigRational_E54905588F1D534D060391B3F51005BDAFE376B6">BigRational(uint that) Constructor</h4>
+        <h5>Syntax</h5>
+        <table>
+            <tr>
+                <td>
+                    <span class="mono">public nothrow BigRational(uint that);</span>
+                </td>
+            </tr>
+        </table>
+        <h5>Parameters</h5>
+        <table class="params">
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">that</span>
+                </td>
+                <td class="params">
+                    <span class="kw">uint</span>
+                </td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h4 id="member_function_Denominator_BigRational_93F785422587940FDBD8744DDE8EDB3BEC34E9AE">Denominator() const Member Function</h4>
+        <h5>Syntax</h5>
+        <table>
+            <tr>
+                <td>
+                    <span class="mono">public nothrow BigInt Denominator() const;</span>
+                </td>
+            </tr>
+        </table>
+        <h5>Return Type</h5>
+        <table>
+            <tr>
+                <td>
+                    <a href="#class_BigInt_9326EADB23C0E0FE1858A97CCC64FF60DD2A22D0">BigInt</a>
+                </td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h4 id="member_function_Handle_BigRational_4B4A4C010B5C73524D802A8358AF857B3C7E2041">Handle() const Member Function</h4>
+        <h5>Syntax</h5>
+        <table>
+            <tr>
+                <td>
+                    <span class="mono">public nothrow inline void* Handle() const;</span>
+                </td>
+            </tr>
+        </table>
+        <h5>Return Type</h5>
+        <table>
+            <tr>
+                <td>
+                    <span class="kw">void</span>
+                    *</td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h4 id="member_function_Numerator_BigRational_57AA95ECA704B7D02CAF2FAEC1107D71860712C0">Numerator() const Member Function</h4>
+        <h5>Syntax</h5>
+        <table>
+            <tr>
+                <td>
+                    <span class="mono">public nothrow BigInt Numerator() const;</span>
+                </td>
+            </tr>
+        </table>
+        <h5>Return Type</h5>
+        <table>
+            <tr>
+                <td>
+                    <a href="#class_BigInt_9326EADB23C0E0FE1858A97CCC64FF60DD2A22D0">BigInt</a>
+                </td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h4 id="function_group_ToString_9081DE02019B34FDFB3C2AA6156C9E659D88201A">ToString Member Function</h4>
+        <h5>Overloads</h5>
+        <table>
+            <tr>
+                <td>
+                    <a href="#member_function_ToString_BigRational_C879483567FBA605CCF5B9D89C48D75497225E2B">ToString() const</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="#member_function_ToString_BigRational_52226403A912990BB98B1186A02D3B508FE205A8">ToString(int base_) const</a>
+                </td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h5 id="member_function_ToString_BigRational_C879483567FBA605CCF5B9D89C48D75497225E2B">ToString() const Overload</h5>
+        <h6>Syntax</h6>
+        <table>
+            <tr>
+                <td>
+                    <span class="mono">public nothrow String&lt;char> ToString() const;</span>
+                </td>
+            </tr>
+        </table>
+        <h6>Return Type</h6>
+        <table>
+            <tr>
+                <td>
+                    <a href="../System.Base/System.Base.html#class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC">String</a>
+                    &lt;<span class="kw">char</span>
+                    ></td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h5 id="member_function_ToString_BigRational_52226403A912990BB98B1186A02D3B508FE205A8">ToString(int base_) const Overload</h5>
+        <h6>Syntax</h6>
+        <table>
+            <tr>
+                <td>
+                    <span class="mono">public nothrow String&lt;char> ToString(int base_) const;</span>
+                </td>
+            </tr>
+        </table>
+        <h6>Parameters</h6>
+        <table class="params">
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">base_</span>
+                </td>
+                <td class="params">
+                    <span class="kw">int</span>
+                </td>
+            </tr>
+        </table>
+        <h6>Return Type</h6>
+        <table>
+            <tr>
+                <td>
+                    <a href="../System.Base/System.Base.html#class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC">String</a>
+                    &lt;<span class="kw">char</span>
+                    ></td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h4 id="function_group_op_assign_75227836E1BEB739B20F4AF2446D905A62609D07">operator= Member Function</h4>
+        <h5>Overloads</h5>
+        <table>
+            <tr>
+                <td>
+                    <a href="#move_assignment_op_assign_BigRational_F40F9BE8C7C6FEF21E9226ADE79E7DFCB64FCDDF">operator=(BigRational&amp;&amp; that)</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="#copy_assignment_op_assign_BigRational_A1C2A56E36337DD74601196A898C79636CEA6AB3">operator=(const BigRational&amp; that)</a>
+                </td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h5 id="move_assignment_op_assign_BigRational_F40F9BE8C7C6FEF21E9226ADE79E7DFCB64FCDDF">operator=(BigRational&amp;&amp; that) Overload</h5>
+        <h6>Syntax</h6>
+        <table>
+            <tr>
+                <td>
+                    <span class="mono">public nothrow default void operator=(BigRational&amp;&amp; that);</span>
+                </td>
+            </tr>
+        </table>
+        <h6>Parameters</h6>
+        <table class="params">
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">that</span>
+                </td>
+                <td class="params">
+                    <a href="#class_BigRational_0F62DE7516E5ADB5CE79939E2167456710EF7B23">BigRational</a>
+                    &amp;&amp;</td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h5 id="copy_assignment_op_assign_BigRational_A1C2A56E36337DD74601196A898C79636CEA6AB3">operator=(const BigRational&amp; that) Overload</h5>
+        <h6>Syntax</h6>
+        <table>
+            <tr>
+                <td>
+                    <span class="mono">public nothrow void operator=(const BigRational&amp; that);</span>
+                </td>
+            </tr>
+        </table>
+        <h6>Parameters</h6>
+        <table class="params">
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">that</span>
+                </td>
+                <td class="params">
+                    <span class="kw">const </span>
+                    <a href="#class_BigRational_0F62DE7516E5ADB5CE79939E2167456710EF7B23">BigRational</a>
+                    &amp;</td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h3 id="class_Precision_9DAFEB710FD18878097281A53A7F8764341F0B2A">Precision Class</h3>
+        <h4>Syntax</h4>
+        <table>
+            <tr>
+                <td>
+                    <span class="mono"> public class Precision;</span>
+                </td>
+            </tr>
+        </table>
+        <h4>Constructors</h4>
+        <table>
+            <tr>
+                <td>
+                    <a href="#default_constructor_Precision_A108FFE15EB702D0AD136DEC7FDAE68F99EA056A">Precision()</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="#constructor_Precision_84AC8A34F35EE7259416A6E9DB6CDF22FFE47A09">Precision(uint prec_)</a>
+                </td>
+            </tr>
+        </table>
+        <h4>Member Functions</h4>
+        <table>
+            <tr>
+                <td>
+                    <a href="#member_function_ToUInt_Precision_A1E388CD72EA93FEF3914CFC6942F83536BFF323">ToUInt() const</a>
+                </td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h4 id="default_constructor_Precision_A108FFE15EB702D0AD136DEC7FDAE68F99EA056A">Precision() Constructor</h4>
+        <h5>Syntax</h5>
+        <table>
+            <tr>
+                <td>
+                    <span class="mono">public nothrow Precision();</span>
+                </td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h4 id="constructor_Precision_84AC8A34F35EE7259416A6E9DB6CDF22FFE47A09">Precision(uint prec_) Constructor</h4>
+        <h5>Syntax</h5>
+        <table>
+            <tr>
+                <td>
+                    <span class="mono">public nothrow explicit Precision(uint prec_);</span>
+                </td>
+            </tr>
+        </table>
+        <h5>Parameters</h5>
+        <table class="params">
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">prec_</span>
+                </td>
+                <td class="params">
+                    <span class="kw">uint</span>
+                </td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h4 id="member_function_ToUInt_Precision_A1E388CD72EA93FEF3914CFC6942F83536BFF323">ToUInt() const Member Function</h4>
+        <h5>Syntax</h5>
+        <table>
+            <tr>
+                <td>
+                    <span class="mono">public nothrow uint ToUInt() const;</span>
+                </td>
+            </tr>
+        </table>
+        <h5>Return Type</h5>
+        <table>
+            <tr>
+                <td>
+                    <span class="kw">uint</span>
+                </td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h3 id="function_group_Abs_E4CE68D81FB8D5B1A65D79ED0BA7D4358D27A208">Abs Function</h3>
+        <h4>Overloads</h4>
+        <table>
+            <tr>
+                <td>
+                    <a href="#function_Abs_7AF65AE95722C52CB1ADD3B39BA32D2C508E3BE3">Abs(const BigFloat&amp; x)</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="#function_Abs_F9EBD9B5E297B955626D9D7627866DF6D574D01D">Abs(const BigInt&amp; x)</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="#function_Abs_75D9575092CEFB070B30DCC89DB9675A48C75450">Abs(const BigRational&amp; x)</a>
+                </td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h4 id="function_Abs_7AF65AE95722C52CB1ADD3B39BA32D2C508E3BE3">Abs(const BigFloat&amp; x) Overload</h4>
+        <h5>Syntax</h5>
+        <table>
+            <tr>
+                <td>
+                    <span class="mono">public nothrow BigFloat Abs(const BigFloat&amp; x);</span>
+                </td>
+            </tr>
+        </table>
+        <h5>Parameters</h5>
+        <table class="params">
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">x</span>
+                </td>
+                <td class="params">
+                    <span class="kw">const </span>
+                    <a href="#class_BigFloat_BC19EFB82C8E666524B4436C56800B572EFBED53">BigFloat</a>
+                    &amp;</td>
+            </tr>
+        </table>
+        <h5>Return Type</h5>
+        <table>
+            <tr>
+                <td>
+                    <a href="#class_BigFloat_BC19EFB82C8E666524B4436C56800B572EFBED53">BigFloat</a>
+                </td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h4 id="function_Abs_F9EBD9B5E297B955626D9D7627866DF6D574D01D">Abs(const BigInt&amp; x) Overload</h4>
+        <h5>Syntax</h5>
+        <table>
+            <tr>
+                <td>
+                    <span class="mono">public nothrow BigInt Abs(const BigInt&amp; x);</span>
+                </td>
+            </tr>
+        </table>
+        <h5>Parameters</h5>
+        <table class="params">
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">x</span>
+                </td>
+                <td class="params">
+                    <span class="kw">const </span>
+                    <a href="#class_BigInt_9326EADB23C0E0FE1858A97CCC64FF60DD2A22D0">BigInt</a>
+                    &amp;</td>
+            </tr>
+        </table>
+        <h5>Return Type</h5>
+        <table>
+            <tr>
+                <td>
+                    <a href="#class_BigInt_9326EADB23C0E0FE1858A97CCC64FF60DD2A22D0">BigInt</a>
+                </td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h4 id="function_Abs_75D9575092CEFB070B30DCC89DB9675A48C75450">Abs(const BigRational&amp; x) Overload</h4>
+        <h5>Syntax</h5>
+        <table>
+            <tr>
+                <td>
+                    <span class="mono">public nothrow BigRational Abs(const BigRational&amp; x);</span>
+                </td>
+            </tr>
+        </table>
+        <h5>Parameters</h5>
+        <table class="params">
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">x</span>
+                </td>
+                <td class="params">
+                    <span class="kw">const </span>
+                    <a href="#class_BigRational_0F62DE7516E5ADB5CE79939E2167456710EF7B23">BigRational</a>
+                    &amp;</td>
+            </tr>
+        </table>
+        <h5>Return Type</h5>
+        <table>
+            <tr>
+                <td>
+                    <a href="#class_BigRational_0F62DE7516E5ADB5CE79939E2167456710EF7B23">BigRational</a>
+                </td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h3 id="function_Ceil_C817E559F2C738FBD22975B3D10B9290702092FA">Ceil(const BigFloat&amp; x) Function</h3>
+        <h4>Syntax</h4>
+        <table>
+            <tr>
+                <td>
+                    <span class="mono">public nothrow BigFloat Ceil(const BigFloat&amp; x);</span>
+                </td>
+            </tr>
+        </table>
+        <h4>Parameters</h4>
+        <table class="params">
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">x</span>
+                </td>
+                <td class="params">
+                    <span class="kw">const </span>
+                    <a href="#class_BigFloat_BC19EFB82C8E666524B4436C56800B572EFBED53">BigFloat</a>
+                    &amp;</td>
+            </tr>
+        </table>
+        <h4>Return Type</h4>
+        <table>
+            <tr>
+                <td>
+                    <a href="#class_BigFloat_BC19EFB82C8E666524B4436C56800B572EFBED53">BigFloat</a>
+                </td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h3 id="function_ClearBit_5D06E02EC012493FA5CF446EFCA8D186C858AD3C">ClearBit(BigInt&amp; x, uint bitIndex) Function</h3>
+        <h4>Syntax</h4>
+        <table>
+            <tr>
+                <td>
+                    <span class="mono">public nothrow void ClearBit(BigInt&amp; x, uint bitIndex);</span>
+                </td>
+            </tr>
+        </table>
+        <h4>Parameters</h4>
+        <table class="params">
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">x</span>
+                </td>
+                <td class="params">
+                    <a href="#class_BigInt_9326EADB23C0E0FE1858A97CCC64FF60DD2A22D0">BigInt</a>
+                    &amp;</td>
+            </tr>
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">bitIndex</span>
+                </td>
+                <td class="params">
+                    <span class="kw">uint</span>
+                </td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h3 id="function_Floor_8415F06A552A52B7B001DF605E48DC8A5E763A0E">Floor(const BigFloat&amp; x) Function</h3>
+        <h4>Syntax</h4>
+        <table>
+            <tr>
+                <td>
+                    <span class="mono">public nothrow BigFloat Floor(const BigFloat&amp; x);</span>
+                </td>
+            </tr>
+        </table>
+        <h4>Parameters</h4>
+        <table class="params">
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">x</span>
+                </td>
+                <td class="params">
+                    <span class="kw">const </span>
+                    <a href="#class_BigFloat_BC19EFB82C8E666524B4436C56800B572EFBED53">BigFloat</a>
+                    &amp;</td>
+            </tr>
+        </table>
+        <h4>Return Type</h4>
+        <table>
+            <tr>
+                <td>
+                    <a href="#class_BigFloat_BC19EFB82C8E666524B4436C56800B572EFBED53">BigFloat</a>
+                </td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h3 id="function_GetBigFloatDefaultPrecision_483AC84D8899A5A9226693C3E387D31527352A29">GetBigFloatDefaultPrecision() Function</h3>
+        <h4>Syntax</h4>
+        <table>
+            <tr>
+                <td>
+                    <span class="mono">public nothrow uint GetBigFloatDefaultPrecision();</span>
+                </td>
+            </tr>
+        </table>
+        <h4>Return Type</h4>
+        <table>
+            <tr>
+                <td>
+                    <span class="kw">uint</span>
+                </td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h3 id="function_SetBit_89FDAEFA3B0863EB2A94108DC13944EB3C66F06E">SetBit(BigInt&amp; x, uint bitIndex) Function</h3>
+        <h4>Syntax</h4>
+        <table>
+            <tr>
+                <td>
+                    <span class="mono">public nothrow void SetBit(BigInt&amp; x, uint bitIndex);</span>
+                </td>
+            </tr>
+        </table>
+        <h4>Parameters</h4>
+        <table class="params">
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">x</span>
+                </td>
+                <td class="params">
+                    <a href="#class_BigInt_9326EADB23C0E0FE1858A97CCC64FF60DD2A22D0">BigInt</a>
+                    &amp;</td>
+            </tr>
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">bitIndex</span>
+                </td>
+                <td class="params">
+                    <span class="kw">uint</span>
+                </td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h3 id="function_Sqrt_1255F3C4594C8479BD9B55E746F127A4B215C584">Sqrt(const BigFloat&amp; x) Function</h3>
+        <h4>Syntax</h4>
+        <table>
+            <tr>
+                <td>
+                    <span class="mono">public nothrow BigFloat Sqrt(const BigFloat&amp; x);</span>
+                </td>
+            </tr>
+        </table>
+        <h4>Parameters</h4>
+        <table class="params">
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">x</span>
+                </td>
+                <td class="params">
+                    <span class="kw">const </span>
+                    <a href="#class_BigFloat_BC19EFB82C8E666524B4436C56800B572EFBED53">BigFloat</a>
+                    &amp;</td>
+            </tr>
+        </table>
+        <h4>Return Type</h4>
+        <table>
+            <tr>
+                <td>
+                    <a href="#class_BigFloat_BC19EFB82C8E666524B4436C56800B572EFBED53">BigFloat</a>
+                </td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h3 id="function_TestBit_38E54EA4251112CCB31E9E78644C86EEDBCF29C5">TestBit(BigInt&amp; x, uint bitIndex) Function</h3>
+        <h4>Syntax</h4>
+        <table>
+            <tr>
+                <td>
+                    <span class="mono">public nothrow bool TestBit(BigInt&amp; x, uint bitIndex);</span>
+                </td>
+            </tr>
+        </table>
+        <h4>Parameters</h4>
+        <table class="params">
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">x</span>
+                </td>
+                <td class="params">
+                    <a href="#class_BigInt_9326EADB23C0E0FE1858A97CCC64FF60DD2A22D0">BigInt</a>
+                    &amp;</td>
+            </tr>
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">bitIndex</span>
+                </td>
+                <td class="params">
+                    <span class="kw">uint</span>
+                </td>
+            </tr>
+        </table>
+        <h4>Return Type</h4>
+        <table>
+            <tr>
+                <td>
+                    <span class="kw">bool</span>
+                </td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h3 id="function_ToggleBit_2866B63CAB922D367955045744679F9D06F71EB7">ToggleBit(BigInt&amp; x, uint bitIndex) Function</h3>
+        <h4>Syntax</h4>
+        <table>
+            <tr>
+                <td>
+                    <span class="mono">public nothrow void ToggleBit(BigInt&amp; x, uint bitIndex);</span>
+                </td>
+            </tr>
+        </table>
+        <h4>Parameters</h4>
+        <table class="params">
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">x</span>
+                </td>
+                <td class="params">
+                    <a href="#class_BigInt_9326EADB23C0E0FE1858A97CCC64FF60DD2A22D0">BigInt</a>
+                    &amp;</td>
+            </tr>
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">bitIndex</span>
+                </td>
+                <td class="params">
+                    <span class="kw">uint</span>
+                </td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h3 id="function_Trunc_8A007277928B2C2F16C0FA3DB750A307F2F61A88">Trunc(const BigFloat&amp; x) Function</h3>
+        <h4>Syntax</h4>
+        <table>
+            <tr>
+                <td>
+                    <span class="mono">public nothrow BigFloat Trunc(const BigFloat&amp; x);</span>
+                </td>
+            </tr>
+        </table>
+        <h4>Parameters</h4>
+        <table class="params">
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">x</span>
+                </td>
+                <td class="params">
+                    <span class="kw">const </span>
+                    <a href="#class_BigFloat_BC19EFB82C8E666524B4436C56800B572EFBED53">BigFloat</a>
+                    &amp;</td>
+            </tr>
+        </table>
+        <h4>Return Type</h4>
+        <table>
+            <tr>
+                <td>
+                    <a href="#class_BigFloat_BC19EFB82C8E666524B4436C56800B572EFBED53">BigFloat</a>
+                </td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h3 id="function_op_rem_2B0C09A64E292F4D12091D04EDC86AC780DDAB5D">operator%(const BigInt&amp; left, const BigInt&amp; right) Function</h3>
+        <h4>Syntax</h4>
+        <table>
+            <tr>
+                <td>
+                    <span class="mono">public nothrow BigInt operator%(const BigInt&amp; left, const BigInt&amp; right);</span>
+                </td>
+            </tr>
+        </table>
+        <h4>Parameters</h4>
+        <table class="params">
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">left</span>
+                </td>
+                <td class="params">
+                    <span class="kw">const </span>
+                    <a href="#class_BigInt_9326EADB23C0E0FE1858A97CCC64FF60DD2A22D0">BigInt</a>
+                    &amp;</td>
+            </tr>
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">right</span>
+                </td>
+                <td class="params">
+                    <span class="kw">const </span>
+                    <a href="#class_BigInt_9326EADB23C0E0FE1858A97CCC64FF60DD2A22D0">BigInt</a>
+                    &amp;</td>
+            </tr>
+        </table>
+        <h4>Return Type</h4>
+        <table>
+            <tr>
+                <td>
+                    <a href="#class_BigInt_9326EADB23C0E0FE1858A97CCC64FF60DD2A22D0">BigInt</a>
+                </td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h3 id="function_op_and_EC306043569A570820AF0BD9C636E5A9BA3C6C57">operator&amp;(const BigInt&amp; left, const BigInt&amp; right) Function</h3>
+        <h4>Syntax</h4>
+        <table>
+            <tr>
+                <td>
+                    <span class="mono">public nothrow BigInt operator&amp;(const BigInt&amp; left, const BigInt&amp; right);</span>
+                </td>
+            </tr>
+        </table>
+        <h4>Parameters</h4>
+        <table class="params">
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">left</span>
+                </td>
+                <td class="params">
+                    <span class="kw">const </span>
+                    <a href="#class_BigInt_9326EADB23C0E0FE1858A97CCC64FF60DD2A22D0">BigInt</a>
+                    &amp;</td>
+            </tr>
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">right</span>
+                </td>
+                <td class="params">
+                    <span class="kw">const </span>
+                    <a href="#class_BigInt_9326EADB23C0E0FE1858A97CCC64FF60DD2A22D0">BigInt</a>
+                    &amp;</td>
+            </tr>
+        </table>
+        <h4>Return Type</h4>
+        <table>
+            <tr>
+                <td>
+                    <a href="#class_BigInt_9326EADB23C0E0FE1858A97CCC64FF60DD2A22D0">BigInt</a>
+                </td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h3 id="function_group_op_star_33CA2CCCC406AC14ACB6EE8CAAD649263ABEB595">operator* Function</h3>
+        <h4>Overloads</h4>
+        <table>
+            <tr>
+                <td>
+                    <a href="#function_op_star_29C14CA47F9DE49F712F4A8398692392678764D4">operator*(const BigFloat&amp; left, const BigFloat&amp; right)</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="#function_op_star_7DA2D996E7725DD3B92C7D39EC7BDA80ECDF1B20">operator*(const BigInt&amp; left, const BigInt&amp; right)</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="#function_op_star_B61A03E02FC293D628B81BF2CFBCEA30521DBB65">operator*(const BigRational&amp; left, const BigRational&amp; right)</a>
+                </td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h4 id="function_op_star_29C14CA47F9DE49F712F4A8398692392678764D4">operator*(const BigFloat&amp; left, const BigFloat&amp; right) Overload</h4>
+        <h5>Syntax</h5>
+        <table>
+            <tr>
+                <td>
+                    <span class="mono">public nothrow BigFloat operator*(const BigFloat&amp; left, const BigFloat&amp; right);</span>
+                </td>
+            </tr>
+        </table>
+        <h5>Parameters</h5>
+        <table class="params">
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">left</span>
+                </td>
+                <td class="params">
+                    <span class="kw">const </span>
+                    <a href="#class_BigFloat_BC19EFB82C8E666524B4436C56800B572EFBED53">BigFloat</a>
+                    &amp;</td>
+            </tr>
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">right</span>
+                </td>
+                <td class="params">
+                    <span class="kw">const </span>
+                    <a href="#class_BigFloat_BC19EFB82C8E666524B4436C56800B572EFBED53">BigFloat</a>
+                    &amp;</td>
+            </tr>
+        </table>
+        <h5>Return Type</h5>
+        <table>
+            <tr>
+                <td>
+                    <a href="#class_BigFloat_BC19EFB82C8E666524B4436C56800B572EFBED53">BigFloat</a>
+                </td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h4 id="function_op_star_7DA2D996E7725DD3B92C7D39EC7BDA80ECDF1B20">operator*(const BigInt&amp; left, const BigInt&amp; right) Overload</h4>
+        <h5>Syntax</h5>
+        <table>
+            <tr>
+                <td>
+                    <span class="mono">public nothrow BigInt operator*(const BigInt&amp; left, const BigInt&amp; right);</span>
+                </td>
+            </tr>
+        </table>
+        <h5>Parameters</h5>
+        <table class="params">
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">left</span>
+                </td>
+                <td class="params">
+                    <span class="kw">const </span>
+                    <a href="#class_BigInt_9326EADB23C0E0FE1858A97CCC64FF60DD2A22D0">BigInt</a>
+                    &amp;</td>
+            </tr>
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">right</span>
+                </td>
+                <td class="params">
+                    <span class="kw">const </span>
+                    <a href="#class_BigInt_9326EADB23C0E0FE1858A97CCC64FF60DD2A22D0">BigInt</a>
+                    &amp;</td>
+            </tr>
+        </table>
+        <h5>Return Type</h5>
+        <table>
+            <tr>
+                <td>
+                    <a href="#class_BigInt_9326EADB23C0E0FE1858A97CCC64FF60DD2A22D0">BigInt</a>
+                </td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h4 id="function_op_star_B61A03E02FC293D628B81BF2CFBCEA30521DBB65">operator*(const BigRational&amp; left, const BigRational&amp; right) Overload</h4>
+        <h5>Syntax</h5>
+        <table>
+            <tr>
+                <td>
+                    <span class="mono">public nothrow BigRational operator*(const BigRational&amp; left, const BigRational&amp; right);</span>
+                </td>
+            </tr>
+        </table>
+        <h5>Parameters</h5>
+        <table class="params">
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">left</span>
+                </td>
+                <td class="params">
+                    <span class="kw">const </span>
+                    <a href="#class_BigRational_0F62DE7516E5ADB5CE79939E2167456710EF7B23">BigRational</a>
+                    &amp;</td>
+            </tr>
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">right</span>
+                </td>
+                <td class="params">
+                    <span class="kw">const </span>
+                    <a href="#class_BigRational_0F62DE7516E5ADB5CE79939E2167456710EF7B23">BigRational</a>
+                    &amp;</td>
+            </tr>
+        </table>
+        <h5>Return Type</h5>
+        <table>
+            <tr>
+                <td>
+                    <a href="#class_BigRational_0F62DE7516E5ADB5CE79939E2167456710EF7B23">BigRational</a>
+                </td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h3 id="function_group_op_plus_56A27315B56A578F0EF8630C0FF9385E5BE979DC">operator+ Function</h3>
+        <h4>Overloads</h4>
+        <table>
+            <tr>
+                <td>
+                    <a href="#function_op_plus_D93C682747818BA5D9D7B791D111D1101439A5DB">operator+(const BigFloat&amp; left, const BigFloat&amp; right)</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="#function_op_plus_EA427371E605518798A3E8A1CAEBF51E53B30955">operator+(const BigInt&amp; left, const BigInt&amp; right)</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="#function_op_plus_A05F8F6C489F7EFA03E4A3417E50D280E85B48A0">operator+(const BigRational&amp; left, const BigRational&amp; right)</a>
+                </td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h4 id="function_op_plus_D93C682747818BA5D9D7B791D111D1101439A5DB">operator+(const BigFloat&amp; left, const BigFloat&amp; right) Overload</h4>
+        <h5>Syntax</h5>
+        <table>
+            <tr>
+                <td>
+                    <span class="mono">public nothrow BigFloat operator+(const BigFloat&amp; left, const BigFloat&amp; right);</span>
+                </td>
+            </tr>
+        </table>
+        <h5>Parameters</h5>
+        <table class="params">
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">left</span>
+                </td>
+                <td class="params">
+                    <span class="kw">const </span>
+                    <a href="#class_BigFloat_BC19EFB82C8E666524B4436C56800B572EFBED53">BigFloat</a>
+                    &amp;</td>
+            </tr>
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">right</span>
+                </td>
+                <td class="params">
+                    <span class="kw">const </span>
+                    <a href="#class_BigFloat_BC19EFB82C8E666524B4436C56800B572EFBED53">BigFloat</a>
+                    &amp;</td>
+            </tr>
+        </table>
+        <h5>Return Type</h5>
+        <table>
+            <tr>
+                <td>
+                    <a href="#class_BigFloat_BC19EFB82C8E666524B4436C56800B572EFBED53">BigFloat</a>
+                </td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h4 id="function_op_plus_EA427371E605518798A3E8A1CAEBF51E53B30955">operator+(const BigInt&amp; left, const BigInt&amp; right) Overload</h4>
+        <h5>Syntax</h5>
+        <table>
+            <tr>
+                <td>
+                    <span class="mono">public nothrow BigInt operator+(const BigInt&amp; left, const BigInt&amp; right);</span>
+                </td>
+            </tr>
+        </table>
+        <h5>Parameters</h5>
+        <table class="params">
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">left</span>
+                </td>
+                <td class="params">
+                    <span class="kw">const </span>
+                    <a href="#class_BigInt_9326EADB23C0E0FE1858A97CCC64FF60DD2A22D0">BigInt</a>
+                    &amp;</td>
+            </tr>
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">right</span>
+                </td>
+                <td class="params">
+                    <span class="kw">const </span>
+                    <a href="#class_BigInt_9326EADB23C0E0FE1858A97CCC64FF60DD2A22D0">BigInt</a>
+                    &amp;</td>
+            </tr>
+        </table>
+        <h5>Return Type</h5>
+        <table>
+            <tr>
+                <td>
+                    <a href="#class_BigInt_9326EADB23C0E0FE1858A97CCC64FF60DD2A22D0">BigInt</a>
+                </td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h4 id="function_op_plus_A05F8F6C489F7EFA03E4A3417E50D280E85B48A0">operator+(const BigRational&amp; left, const BigRational&amp; right) Overload</h4>
+        <h5>Syntax</h5>
+        <table>
+            <tr>
+                <td>
+                    <span class="mono">public nothrow BigRational operator+(const BigRational&amp; left, const BigRational&amp; right);</span>
+                </td>
+            </tr>
+        </table>
+        <h5>Parameters</h5>
+        <table class="params">
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">left</span>
+                </td>
+                <td class="params">
+                    <span class="kw">const </span>
+                    <a href="#class_BigRational_0F62DE7516E5ADB5CE79939E2167456710EF7B23">BigRational</a>
+                    &amp;</td>
+            </tr>
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">right</span>
+                </td>
+                <td class="params">
+                    <span class="kw">const </span>
+                    <a href="#class_BigRational_0F62DE7516E5ADB5CE79939E2167456710EF7B23">BigRational</a>
+                    &amp;</td>
+            </tr>
+        </table>
+        <h5>Return Type</h5>
+        <table>
+            <tr>
+                <td>
+                    <a href="#class_BigRational_0F62DE7516E5ADB5CE79939E2167456710EF7B23">BigRational</a>
+                </td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h3 id="function_group_op_minus_332A4C7FC57A2990CF94BAAD11CCFC1B616D7B46">operator- Function</h3>
+        <h4>Overloads</h4>
+        <table>
+            <tr>
+                <td>
+                    <a href="#function_op_minus_99C9221D98E252F2FCE33A60D0BDFC137C8C0FE9">operator-(const BigFloat&amp; left, const BigFloat&amp; right)</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="#function_op_minus_CEEA9BCD92DBE119988EB64738734AE80E018FB5">operator-(const BigFloat&amp; x)</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="#function_op_minus_2C757867007F6B36E4D047F5BE1D206AD00774C1">operator-(const BigInt&amp; left, const BigInt&amp; right)</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="#function_op_minus_2D312A4E8EA0F7FCFAB262227D11E8CABEB9ED3D">operator-(const BigInt&amp; x)</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="#function_op_minus_C7AB9CC4A7F3B11D26791CE549EC58B79FAE4B39">operator-(const BigRational&amp; left, const BigRational&amp; right)</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="#function_op_minus_966229DDAD79D88421205EABD24D495B8C62DEB2">operator-(const BigRational&amp; x)</a>
+                </td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h4 id="function_op_minus_99C9221D98E252F2FCE33A60D0BDFC137C8C0FE9">operator-(const BigFloat&amp; left, const BigFloat&amp; right) Overload</h4>
+        <h5>Syntax</h5>
+        <table>
+            <tr>
+                <td>
+                    <span class="mono">public nothrow BigFloat operator-(const BigFloat&amp; left, const BigFloat&amp; right);</span>
+                </td>
+            </tr>
+        </table>
+        <h5>Parameters</h5>
+        <table class="params">
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">left</span>
+                </td>
+                <td class="params">
+                    <span class="kw">const </span>
+                    <a href="#class_BigFloat_BC19EFB82C8E666524B4436C56800B572EFBED53">BigFloat</a>
+                    &amp;</td>
+            </tr>
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">right</span>
+                </td>
+                <td class="params">
+                    <span class="kw">const </span>
+                    <a href="#class_BigFloat_BC19EFB82C8E666524B4436C56800B572EFBED53">BigFloat</a>
+                    &amp;</td>
+            </tr>
+        </table>
+        <h5>Return Type</h5>
+        <table>
+            <tr>
+                <td>
+                    <a href="#class_BigFloat_BC19EFB82C8E666524B4436C56800B572EFBED53">BigFloat</a>
+                </td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h4 id="function_op_minus_CEEA9BCD92DBE119988EB64738734AE80E018FB5">operator-(const BigFloat&amp; x) Overload</h4>
+        <h5>Syntax</h5>
+        <table>
+            <tr>
+                <td>
+                    <span class="mono">public nothrow BigFloat operator-(const BigFloat&amp; x);</span>
+                </td>
+            </tr>
+        </table>
+        <h5>Parameters</h5>
+        <table class="params">
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">x</span>
+                </td>
+                <td class="params">
+                    <span class="kw">const </span>
+                    <a href="#class_BigFloat_BC19EFB82C8E666524B4436C56800B572EFBED53">BigFloat</a>
+                    &amp;</td>
+            </tr>
+        </table>
+        <h5>Return Type</h5>
+        <table>
+            <tr>
+                <td>
+                    <a href="#class_BigFloat_BC19EFB82C8E666524B4436C56800B572EFBED53">BigFloat</a>
+                </td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h4 id="function_op_minus_2C757867007F6B36E4D047F5BE1D206AD00774C1">operator-(const BigInt&amp; left, const BigInt&amp; right) Overload</h4>
+        <h5>Syntax</h5>
+        <table>
+            <tr>
+                <td>
+                    <span class="mono">public nothrow BigInt operator-(const BigInt&amp; left, const BigInt&amp; right);</span>
+                </td>
+            </tr>
+        </table>
+        <h5>Parameters</h5>
+        <table class="params">
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">left</span>
+                </td>
+                <td class="params">
+                    <span class="kw">const </span>
+                    <a href="#class_BigInt_9326EADB23C0E0FE1858A97CCC64FF60DD2A22D0">BigInt</a>
+                    &amp;</td>
+            </tr>
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">right</span>
+                </td>
+                <td class="params">
+                    <span class="kw">const </span>
+                    <a href="#class_BigInt_9326EADB23C0E0FE1858A97CCC64FF60DD2A22D0">BigInt</a>
+                    &amp;</td>
+            </tr>
+        </table>
+        <h5>Return Type</h5>
+        <table>
+            <tr>
+                <td>
+                    <a href="#class_BigInt_9326EADB23C0E0FE1858A97CCC64FF60DD2A22D0">BigInt</a>
+                </td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h4 id="function_op_minus_2D312A4E8EA0F7FCFAB262227D11E8CABEB9ED3D">operator-(const BigInt&amp; x) Overload</h4>
+        <h5>Syntax</h5>
+        <table>
+            <tr>
+                <td>
+                    <span class="mono">public nothrow BigInt operator-(const BigInt&amp; x);</span>
+                </td>
+            </tr>
+        </table>
+        <h5>Parameters</h5>
+        <table class="params">
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">x</span>
+                </td>
+                <td class="params">
+                    <span class="kw">const </span>
+                    <a href="#class_BigInt_9326EADB23C0E0FE1858A97CCC64FF60DD2A22D0">BigInt</a>
+                    &amp;</td>
+            </tr>
+        </table>
+        <h5>Return Type</h5>
+        <table>
+            <tr>
+                <td>
+                    <a href="#class_BigInt_9326EADB23C0E0FE1858A97CCC64FF60DD2A22D0">BigInt</a>
+                </td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h4 id="function_op_minus_C7AB9CC4A7F3B11D26791CE549EC58B79FAE4B39">operator-(const BigRational&amp; left, const BigRational&amp; right) Overload</h4>
+        <h5>Syntax</h5>
+        <table>
+            <tr>
+                <td>
+                    <span class="mono">public nothrow BigRational operator-(const BigRational&amp; left, const BigRational&amp; right);</span>
+                </td>
+            </tr>
+        </table>
+        <h5>Parameters</h5>
+        <table class="params">
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">left</span>
+                </td>
+                <td class="params">
+                    <span class="kw">const </span>
+                    <a href="#class_BigRational_0F62DE7516E5ADB5CE79939E2167456710EF7B23">BigRational</a>
+                    &amp;</td>
+            </tr>
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">right</span>
+                </td>
+                <td class="params">
+                    <span class="kw">const </span>
+                    <a href="#class_BigRational_0F62DE7516E5ADB5CE79939E2167456710EF7B23">BigRational</a>
+                    &amp;</td>
+            </tr>
+        </table>
+        <h5>Return Type</h5>
+        <table>
+            <tr>
+                <td>
+                    <a href="#class_BigRational_0F62DE7516E5ADB5CE79939E2167456710EF7B23">BigRational</a>
+                </td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h4 id="function_op_minus_966229DDAD79D88421205EABD24D495B8C62DEB2">operator-(const BigRational&amp; x) Overload</h4>
+        <h5>Syntax</h5>
+        <table>
+            <tr>
+                <td>
+                    <span class="mono">public nothrow BigRational operator-(const BigRational&amp; x);</span>
+                </td>
+            </tr>
+        </table>
+        <h5>Parameters</h5>
+        <table class="params">
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">x</span>
+                </td>
+                <td class="params">
+                    <span class="kw">const </span>
+                    <a href="#class_BigRational_0F62DE7516E5ADB5CE79939E2167456710EF7B23">BigRational</a>
+                    &amp;</td>
+            </tr>
+        </table>
+        <h5>Return Type</h5>
+        <table>
+            <tr>
+                <td>
+                    <a href="#class_BigRational_0F62DE7516E5ADB5CE79939E2167456710EF7B23">BigRational</a>
+                </td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h3 id="function_group_op_div_4362D23971F70C9242138FDD0E5E82AAED15E5A4">operator/ Function</h3>
+        <h4>Overloads</h4>
+        <table>
+            <tr>
+                <td>
+                    <a href="#function_op_div_50F27EF62AF5344792B487CCC0274A0D11DD77F9">operator/(const BigFloat&amp; left, const BigFloat&amp; right)</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="#function_op_div_0181C3610D16D6998B08782D86642594FC778E36">operator/(const BigInt&amp; left, const BigInt&amp; right)</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="#function_op_div_E24C6253EDE268977AB8DBF1085636DBCB4D26E8">operator/(const BigRational&amp; left, const BigRational&amp; right)</a>
+                </td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h4 id="function_op_div_50F27EF62AF5344792B487CCC0274A0D11DD77F9">operator/(const BigFloat&amp; left, const BigFloat&amp; right) Overload</h4>
+        <h5>Syntax</h5>
+        <table>
+            <tr>
+                <td>
+                    <span class="mono">public nothrow BigFloat operator/(const BigFloat&amp; left, const BigFloat&amp; right);</span>
+                </td>
+            </tr>
+        </table>
+        <h5>Parameters</h5>
+        <table class="params">
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">left</span>
+                </td>
+                <td class="params">
+                    <span class="kw">const </span>
+                    <a href="#class_BigFloat_BC19EFB82C8E666524B4436C56800B572EFBED53">BigFloat</a>
+                    &amp;</td>
+            </tr>
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">right</span>
+                </td>
+                <td class="params">
+                    <span class="kw">const </span>
+                    <a href="#class_BigFloat_BC19EFB82C8E666524B4436C56800B572EFBED53">BigFloat</a>
+                    &amp;</td>
+            </tr>
+        </table>
+        <h5>Return Type</h5>
+        <table>
+            <tr>
+                <td>
+                    <a href="#class_BigFloat_BC19EFB82C8E666524B4436C56800B572EFBED53">BigFloat</a>
+                </td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h4 id="function_op_div_0181C3610D16D6998B08782D86642594FC778E36">operator/(const BigInt&amp; left, const BigInt&amp; right) Overload</h4>
+        <h5>Syntax</h5>
+        <table>
+            <tr>
+                <td>
+                    <span class="mono">public nothrow BigInt operator/(const BigInt&amp; left, const BigInt&amp; right);</span>
+                </td>
+            </tr>
+        </table>
+        <h5>Parameters</h5>
+        <table class="params">
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">left</span>
+                </td>
+                <td class="params">
+                    <span class="kw">const </span>
+                    <a href="#class_BigInt_9326EADB23C0E0FE1858A97CCC64FF60DD2A22D0">BigInt</a>
+                    &amp;</td>
+            </tr>
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">right</span>
+                </td>
+                <td class="params">
+                    <span class="kw">const </span>
+                    <a href="#class_BigInt_9326EADB23C0E0FE1858A97CCC64FF60DD2A22D0">BigInt</a>
+                    &amp;</td>
+            </tr>
+        </table>
+        <h5>Return Type</h5>
+        <table>
+            <tr>
+                <td>
+                    <a href="#class_BigInt_9326EADB23C0E0FE1858A97CCC64FF60DD2A22D0">BigInt</a>
+                </td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h4 id="function_op_div_E24C6253EDE268977AB8DBF1085636DBCB4D26E8">operator/(const BigRational&amp; left, const BigRational&amp; right) Overload</h4>
+        <h5>Syntax</h5>
+        <table>
+            <tr>
+                <td>
+                    <span class="mono">public nothrow BigRational operator/(const BigRational&amp; left, const BigRational&amp; right);</span>
+                </td>
+            </tr>
+        </table>
+        <h5>Parameters</h5>
+        <table class="params">
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">left</span>
+                </td>
+                <td class="params">
+                    <span class="kw">const </span>
+                    <a href="#class_BigRational_0F62DE7516E5ADB5CE79939E2167456710EF7B23">BigRational</a>
+                    &amp;</td>
+            </tr>
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">right</span>
+                </td>
+                <td class="params">
+                    <span class="kw">const </span>
+                    <a href="#class_BigRational_0F62DE7516E5ADB5CE79939E2167456710EF7B23">BigRational</a>
+                    &amp;</td>
+            </tr>
+        </table>
+        <h5>Return Type</h5>
+        <table>
+            <tr>
+                <td>
+                    <a href="#class_BigRational_0F62DE7516E5ADB5CE79939E2167456710EF7B23">BigRational</a>
+                </td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h3 id="function_group_op_less_01AD50632F343E948CAE58C5DED9091EFC0C8AFF">operator&lt; Function</h3>
+        <h4>Overloads</h4>
+        <table>
+            <tr>
+                <td>
+                    <a href="#function_op_less_778CB342C328F87381B0D038924CC6DCD7C1C65F">operator&lt;(const BigFloat&amp; left, const BigFloat&amp; right)</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="#function_op_less_D4F7C5613F8286585A8FAE55078BF3A240CDCDF7">operator&lt;(const BigInt&amp; left, const BigInt&amp; right)</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="#function_op_less_C3A452199911B0C014169BE00A05B55C2D11A932">operator&lt;(const BigRational&amp; left, const BigRational&amp; right)</a>
+                </td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h4 id="function_op_less_778CB342C328F87381B0D038924CC6DCD7C1C65F">operator&lt;(const BigFloat&amp; left, const BigFloat&amp; right) Overload</h4>
+        <h5>Syntax</h5>
+        <table>
+            <tr>
+                <td>
+                    <span class="mono">public nothrow bool operator&lt;(const BigFloat&amp; left, const BigFloat&amp; right);</span>
+                </td>
+            </tr>
+        </table>
+        <h5>Parameters</h5>
+        <table class="params">
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">left</span>
+                </td>
+                <td class="params">
+                    <span class="kw">const </span>
+                    <a href="#class_BigFloat_BC19EFB82C8E666524B4436C56800B572EFBED53">BigFloat</a>
+                    &amp;</td>
+            </tr>
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">right</span>
+                </td>
+                <td class="params">
+                    <span class="kw">const </span>
+                    <a href="#class_BigFloat_BC19EFB82C8E666524B4436C56800B572EFBED53">BigFloat</a>
+                    &amp;</td>
+            </tr>
+        </table>
+        <h5>Return Type</h5>
+        <table>
+            <tr>
+                <td>
+                    <span class="kw">bool</span>
+                </td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h4 id="function_op_less_D4F7C5613F8286585A8FAE55078BF3A240CDCDF7">operator&lt;(const BigInt&amp; left, const BigInt&amp; right) Overload</h4>
+        <h5>Syntax</h5>
+        <table>
+            <tr>
+                <td>
+                    <span class="mono">public nothrow bool operator&lt;(const BigInt&amp; left, const BigInt&amp; right);</span>
+                </td>
+            </tr>
+        </table>
+        <h5>Parameters</h5>
+        <table class="params">
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">left</span>
+                </td>
+                <td class="params">
+                    <span class="kw">const </span>
+                    <a href="#class_BigInt_9326EADB23C0E0FE1858A97CCC64FF60DD2A22D0">BigInt</a>
+                    &amp;</td>
+            </tr>
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">right</span>
+                </td>
+                <td class="params">
+                    <span class="kw">const </span>
+                    <a href="#class_BigInt_9326EADB23C0E0FE1858A97CCC64FF60DD2A22D0">BigInt</a>
+                    &amp;</td>
+            </tr>
+        </table>
+        <h5>Return Type</h5>
+        <table>
+            <tr>
+                <td>
+                    <span class="kw">bool</span>
+                </td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h4 id="function_op_less_C3A452199911B0C014169BE00A05B55C2D11A932">operator&lt;(const BigRational&amp; left, const BigRational&amp; right) Overload</h4>
+        <h5>Syntax</h5>
+        <table>
+            <tr>
+                <td>
+                    <span class="mono">public nothrow bool operator&lt;(const BigRational&amp; left, const BigRational&amp; right);</span>
+                </td>
+            </tr>
+        </table>
+        <h5>Parameters</h5>
+        <table class="params">
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">left</span>
+                </td>
+                <td class="params">
+                    <span class="kw">const </span>
+                    <a href="#class_BigRational_0F62DE7516E5ADB5CE79939E2167456710EF7B23">BigRational</a>
+                    &amp;</td>
+            </tr>
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">right</span>
+                </td>
+                <td class="params">
+                    <span class="kw">const </span>
+                    <a href="#class_BigRational_0F62DE7516E5ADB5CE79939E2167456710EF7B23">BigRational</a>
+                    &amp;</td>
+            </tr>
+        </table>
+        <h5>Return Type</h5>
+        <table>
+            <tr>
+                <td>
+                    <span class="kw">bool</span>
+                </td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h3 id="function_group_op_shl_2AE956980431DA753E03C4D98C544C64D5AACC77">operator&lt;&lt; Function</h3>
+        <h4>Overloads</h4>
+        <table>
+            <tr>
+                <td>
+                    <a href="#function_op_shl_51185FE91502A20F8199DAAD31F12942792BC6BC">operator&lt;&lt;(OutputStream&amp; s, const BigFloat&amp; x)</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="#function_op_shl_36B833FDDF2C3535DD58C4EEB2E2F244C32CD4FA">operator&lt;&lt;(OutputStream&amp; s, const BigInt&amp; x)</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="#function_op_shl_265F8C16A6D2F9F29E0FAC407B092302F6995376">operator&lt;&lt;(OutputStream&amp; s, const BigRational&amp; x)</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="#function_op_shl_5109EA5D117645C4982C3975B51A22B43196BDCD">operator&lt;&lt;(StreamWriter&amp; s, const BigInt&amp; x)</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="#function_op_shl_92BC67114039AB5A6F50E1330AB0576CE0DAFDE8">operator&lt;&lt;(StreamWriter&amp; writer, const BigFloat&amp; x)</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="#function_op_shl_4FE83EF354E708B1200569E34B607CEB52DA7483">operator&lt;&lt;(StreamWriter&amp; writer, const BigRational&amp; x)</a>
+                </td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h4 id="function_op_shl_51185FE91502A20F8199DAAD31F12942792BC6BC">operator&lt;&lt;(OutputStream&amp; s, const BigFloat&amp; x) Overload</h4>
+        <h5>Syntax</h5>
+        <table>
+            <tr>
+                <td>
+                    <span class="mono">public OutputStream&amp; operator&lt;&lt;(OutputStream&amp; s, const BigFloat&amp; x);</span>
+                </td>
+            </tr>
+        </table>
+        <h5>Parameters</h5>
+        <table class="params">
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">s</span>
+                </td>
+                <td class="params">
+                    <a href="../System.Base/System.Base.html#class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452">OutputStream</a>
+                    &amp;</td>
+            </tr>
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">x</span>
+                </td>
+                <td class="params">
+                    <span class="kw">const </span>
+                    <a href="#class_BigFloat_BC19EFB82C8E666524B4436C56800B572EFBED53">BigFloat</a>
+                    &amp;</td>
+            </tr>
+        </table>
+        <h5>Return Type</h5>
+        <table>
+            <tr>
+                <td>
+                    <a href="../System.Base/System.Base.html#class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452">OutputStream</a>
+                    &amp;</td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h4 id="function_op_shl_36B833FDDF2C3535DD58C4EEB2E2F244C32CD4FA">operator&lt;&lt;(OutputStream&amp; s, const BigInt&amp; x) Overload</h4>
+        <h5>Syntax</h5>
+        <table>
+            <tr>
+                <td>
+                    <span class="mono">public OutputStream&amp; operator&lt;&lt;(OutputStream&amp; s, const BigInt&amp; x);</span>
+                </td>
+            </tr>
+        </table>
+        <h5>Parameters</h5>
+        <table class="params">
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">s</span>
+                </td>
+                <td class="params">
+                    <a href="../System.Base/System.Base.html#class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452">OutputStream</a>
+                    &amp;</td>
+            </tr>
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">x</span>
+                </td>
+                <td class="params">
+                    <span class="kw">const </span>
+                    <a href="#class_BigInt_9326EADB23C0E0FE1858A97CCC64FF60DD2A22D0">BigInt</a>
+                    &amp;</td>
+            </tr>
+        </table>
+        <h5>Return Type</h5>
+        <table>
+            <tr>
+                <td>
+                    <a href="../System.Base/System.Base.html#class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452">OutputStream</a>
+                    &amp;</td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h4 id="function_op_shl_265F8C16A6D2F9F29E0FAC407B092302F6995376">operator&lt;&lt;(OutputStream&amp; s, const BigRational&amp; x) Overload</h4>
+        <h5>Syntax</h5>
+        <table>
+            <tr>
+                <td>
+                    <span class="mono">public OutputStream&amp; operator&lt;&lt;(OutputStream&amp; s, const BigRational&amp; x);</span>
+                </td>
+            </tr>
+        </table>
+        <h5>Parameters</h5>
+        <table class="params">
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">s</span>
+                </td>
+                <td class="params">
+                    <a href="../System.Base/System.Base.html#class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452">OutputStream</a>
+                    &amp;</td>
+            </tr>
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">x</span>
+                </td>
+                <td class="params">
+                    <span class="kw">const </span>
+                    <a href="#class_BigRational_0F62DE7516E5ADB5CE79939E2167456710EF7B23">BigRational</a>
+                    &amp;</td>
+            </tr>
+        </table>
+        <h5>Return Type</h5>
+        <table>
+            <tr>
+                <td>
+                    <a href="../System.Base/System.Base.html#class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452">OutputStream</a>
+                    &amp;</td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h4 id="function_op_shl_5109EA5D117645C4982C3975B51A22B43196BDCD">operator&lt;&lt;(StreamWriter&amp; s, const BigInt&amp; x) Overload</h4>
+        <h5>Syntax</h5>
+        <table>
+            <tr>
+                <td>
+                    <span class="mono">public StreamWriter&amp; operator&lt;&lt;(StreamWriter&amp; s, const BigInt&amp; x);</span>
+                </td>
+            </tr>
+        </table>
+        <h5>Parameters</h5>
+        <table class="params">
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">s</span>
+                </td>
+                <td class="params">
+                    <a href="../System.Base/System.Base.html#class_StreamWriter_40A39F418049D49DB679452BB514CDFE47500311">StreamWriter</a>
+                    &amp;</td>
+            </tr>
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">x</span>
+                </td>
+                <td class="params">
+                    <span class="kw">const </span>
+                    <a href="#class_BigInt_9326EADB23C0E0FE1858A97CCC64FF60DD2A22D0">BigInt</a>
+                    &amp;</td>
+            </tr>
+        </table>
+        <h5>Return Type</h5>
+        <table>
+            <tr>
+                <td>
+                    <a href="../System.Base/System.Base.html#class_StreamWriter_40A39F418049D49DB679452BB514CDFE47500311">StreamWriter</a>
+                    &amp;</td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h4 id="function_op_shl_92BC67114039AB5A6F50E1330AB0576CE0DAFDE8">operator&lt;&lt;(StreamWriter&amp; writer, const BigFloat&amp; x) Overload</h4>
+        <h5>Syntax</h5>
+        <table>
+            <tr>
+                <td>
+                    <span class="mono">public StreamWriter&amp; operator&lt;&lt;(StreamWriter&amp; writer, const BigFloat&amp; x);</span>
+                </td>
+            </tr>
+        </table>
+        <h5>Parameters</h5>
+        <table class="params">
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">writer</span>
+                </td>
+                <td class="params">
+                    <a href="../System.Base/System.Base.html#class_StreamWriter_40A39F418049D49DB679452BB514CDFE47500311">StreamWriter</a>
+                    &amp;</td>
+            </tr>
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">x</span>
+                </td>
+                <td class="params">
+                    <span class="kw">const </span>
+                    <a href="#class_BigFloat_BC19EFB82C8E666524B4436C56800B572EFBED53">BigFloat</a>
+                    &amp;</td>
+            </tr>
+        </table>
+        <h5>Return Type</h5>
+        <table>
+            <tr>
+                <td>
+                    <a href="../System.Base/System.Base.html#class_StreamWriter_40A39F418049D49DB679452BB514CDFE47500311">StreamWriter</a>
+                    &amp;</td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h4 id="function_op_shl_4FE83EF354E708B1200569E34B607CEB52DA7483">operator&lt;&lt;(StreamWriter&amp; writer, const BigRational&amp; x) Overload</h4>
+        <h5>Syntax</h5>
+        <table>
+            <tr>
+                <td>
+                    <span class="mono">public StreamWriter&amp; operator&lt;&lt;(StreamWriter&amp; writer, const BigRational&amp; x);</span>
+                </td>
+            </tr>
+        </table>
+        <h5>Parameters</h5>
+        <table class="params">
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">writer</span>
+                </td>
+                <td class="params">
+                    <a href="../System.Base/System.Base.html#class_StreamWriter_40A39F418049D49DB679452BB514CDFE47500311">StreamWriter</a>
+                    &amp;</td>
+            </tr>
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">x</span>
+                </td>
+                <td class="params">
+                    <span class="kw">const </span>
+                    <a href="#class_BigRational_0F62DE7516E5ADB5CE79939E2167456710EF7B23">BigRational</a>
+                    &amp;</td>
+            </tr>
+        </table>
+        <h5>Return Type</h5>
+        <table>
+            <tr>
+                <td>
+                    <a href="../System.Base/System.Base.html#class_StreamWriter_40A39F418049D49DB679452BB514CDFE47500311">StreamWriter</a>
+                    &amp;</td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h3 id="function_group_op_eq_E07C6E6EC42CC7A6F491A21ED683ACA7A96D3E15">operator== Function</h3>
+        <h4>Overloads</h4>
+        <table>
+            <tr>
+                <td>
+                    <a href="#function_op_eq_F89F98C7BCDAE1EA7E60CAAE44411BF33A6FF57E">operator==(const BigFloat&amp; left, const BigFloat&amp; right)</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="#function_op_eq_4DF70DC46BAE5102B7B93CAD67CCFAB1EFD41F12">operator==(const BigInt&amp; left, const BigInt&amp; right)</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="#function_op_eq_ABE9D40B4046D37E72F56D6EC21271BB78A479CF">operator==(const BigRational&amp; left, const BigRational&amp; right)</a>
+                </td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h4 id="function_op_eq_F89F98C7BCDAE1EA7E60CAAE44411BF33A6FF57E">operator==(const BigFloat&amp; left, const BigFloat&amp; right) Overload</h4>
+        <h5>Syntax</h5>
+        <table>
+            <tr>
+                <td>
+                    <span class="mono">public nothrow bool operator==(const BigFloat&amp; left, const BigFloat&amp; right);</span>
+                </td>
+            </tr>
+        </table>
+        <h5>Parameters</h5>
+        <table class="params">
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">left</span>
+                </td>
+                <td class="params">
+                    <span class="kw">const </span>
+                    <a href="#class_BigFloat_BC19EFB82C8E666524B4436C56800B572EFBED53">BigFloat</a>
+                    &amp;</td>
+            </tr>
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">right</span>
+                </td>
+                <td class="params">
+                    <span class="kw">const </span>
+                    <a href="#class_BigFloat_BC19EFB82C8E666524B4436C56800B572EFBED53">BigFloat</a>
+                    &amp;</td>
+            </tr>
+        </table>
+        <h5>Return Type</h5>
+        <table>
+            <tr>
+                <td>
+                    <span class="kw">bool</span>
+                </td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h4 id="function_op_eq_4DF70DC46BAE5102B7B93CAD67CCFAB1EFD41F12">operator==(const BigInt&amp; left, const BigInt&amp; right) Overload</h4>
+        <h5>Syntax</h5>
+        <table>
+            <tr>
+                <td>
+                    <span class="mono">public nothrow bool operator==(const BigInt&amp; left, const BigInt&amp; right);</span>
+                </td>
+            </tr>
+        </table>
+        <h5>Parameters</h5>
+        <table class="params">
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">left</span>
+                </td>
+                <td class="params">
+                    <span class="kw">const </span>
+                    <a href="#class_BigInt_9326EADB23C0E0FE1858A97CCC64FF60DD2A22D0">BigInt</a>
+                    &amp;</td>
+            </tr>
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">right</span>
+                </td>
+                <td class="params">
+                    <span class="kw">const </span>
+                    <a href="#class_BigInt_9326EADB23C0E0FE1858A97CCC64FF60DD2A22D0">BigInt</a>
+                    &amp;</td>
+            </tr>
+        </table>
+        <h5>Return Type</h5>
+        <table>
+            <tr>
+                <td>
+                    <span class="kw">bool</span>
+                </td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h4 id="function_op_eq_ABE9D40B4046D37E72F56D6EC21271BB78A479CF">operator==(const BigRational&amp; left, const BigRational&amp; right) Overload</h4>
+        <h5>Syntax</h5>
+        <table>
+            <tr>
+                <td>
+                    <span class="mono">public nothrow bool operator==(const BigRational&amp; left, const BigRational&amp; right);</span>
+                </td>
+            </tr>
+        </table>
+        <h5>Parameters</h5>
+        <table class="params">
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">left</span>
+                </td>
+                <td class="params">
+                    <span class="kw">const </span>
+                    <a href="#class_BigRational_0F62DE7516E5ADB5CE79939E2167456710EF7B23">BigRational</a>
+                    &amp;</td>
+            </tr>
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">right</span>
+                </td>
+                <td class="params">
+                    <span class="kw">const </span>
+                    <a href="#class_BigRational_0F62DE7516E5ADB5CE79939E2167456710EF7B23">BigRational</a>
+                    &amp;</td>
+            </tr>
+        </table>
+        <h5>Return Type</h5>
+        <table>
+            <tr>
+                <td>
+                    <span class="kw">bool</span>
+                </td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h3 id="function_op_xor_4F7D875F1408C1AD642ED00AECEE4971D87DB691">operator^(const BigInt&amp; left, const BigInt&amp; right) Function</h3>
+        <h4>Syntax</h4>
+        <table>
+            <tr>
+                <td>
+                    <span class="mono">public nothrow BigInt operator^(const BigInt&amp; left, const BigInt&amp; right);</span>
+                </td>
+            </tr>
+        </table>
+        <h4>Parameters</h4>
+        <table class="params">
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">left</span>
+                </td>
+                <td class="params">
+                    <span class="kw">const </span>
+                    <a href="#class_BigInt_9326EADB23C0E0FE1858A97CCC64FF60DD2A22D0">BigInt</a>
+                    &amp;</td>
+            </tr>
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">right</span>
+                </td>
+                <td class="params">
+                    <span class="kw">const </span>
+                    <a href="#class_BigInt_9326EADB23C0E0FE1858A97CCC64FF60DD2A22D0">BigInt</a>
+                    &amp;</td>
+            </tr>
+        </table>
+        <h4>Return Type</h4>
+        <table>
+            <tr>
+                <td>
+                    <a href="#class_BigInt_9326EADB23C0E0FE1858A97CCC64FF60DD2A22D0">BigInt</a>
+                </td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h3 id="function_op_or_C16146AC5235A380AA8754B8B163BC5B0C53A95F">operator|(const BigInt&amp; left, const BigInt&amp; right) Function</h3>
+        <h4>Syntax</h4>
+        <table>
+            <tr>
+                <td>
+                    <span class="mono">public nothrow BigInt operator|(const BigInt&amp; left, const BigInt&amp; right);</span>
+                </td>
+            </tr>
+        </table>
+        <h4>Parameters</h4>
+        <table class="params">
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">left</span>
+                </td>
+                <td class="params">
+                    <span class="kw">const </span>
+                    <a href="#class_BigInt_9326EADB23C0E0FE1858A97CCC64FF60DD2A22D0">BigInt</a>
+                    &amp;</td>
+            </tr>
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">right</span>
+                </td>
+                <td class="params">
+                    <span class="kw">const </span>
+                    <a href="#class_BigInt_9326EADB23C0E0FE1858A97CCC64FF60DD2A22D0">BigInt</a>
+                    &amp;</td>
+            </tr>
+        </table>
+        <h4>Return Type</h4>
+        <table>
+            <tr>
+                <td>
+                    <a href="#class_BigInt_9326EADB23C0E0FE1858A97CCC64FF60DD2A22D0">BigInt</a>
+                </td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h3 id="function_op_cpl_F2C34039298906124AEC6058776E30FFA1826CCB">operator~(const BigInt&amp; x) Function</h3>
+        <h4>Syntax</h4>
+        <table>
+            <tr>
+                <td>
+                    <span class="mono">public nothrow BigInt operator~(const BigInt&amp; x);</span>
+                </td>
+            </tr>
+        </table>
+        <h4>Parameters</h4>
+        <table class="params">
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">x</span>
+                </td>
+                <td class="params">
+                    <span class="kw">const </span>
+                    <a href="#class_BigInt_9326EADB23C0E0FE1858A97CCC64FF60DD2A22D0">BigInt</a>
+                    &amp;</td>
+            </tr>
+        </table>
+        <h4>Return Type</h4>
+        <table>
+            <tr>
+                <td>
+                    <a href="#class_BigInt_9326EADB23C0E0FE1858A97CCC64FF60DD2A22D0">BigInt</a>
+                </td>
+            </tr>
+        </table>
+    </body>
+</html>

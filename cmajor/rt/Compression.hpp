@@ -26,4 +26,5 @@ extern "C" RT_API int32_t RtCompressBZip2(void* outChunk, uint32_t outChunkSize,
 extern "C" RT_API int32_t RtDecompressBZip2(void* outChunk, uint32_t outChunkSize, uint32_t* have, uint32_t* outAvail, uint32_t* inAvail, void* handle);
 extern "C" RT_API const char* RtRetvalStrBZip2(int32_t retVal);
 
+
 #endif // CMAJOR_RT_COMPRESSION_INCLUDED

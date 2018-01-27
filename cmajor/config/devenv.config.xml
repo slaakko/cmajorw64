@@ -5,8 +5,8 @@
     <infoDelaySecs>10</infoDelaySecs>
     <formSizeX>1761</formSizeX>
     <formSizeY>948</formSizeY>
-    <formTop>0</formTop>
-    <formLeft>0</formLeft>
+    <formTop>30</formTop>
+    <formLeft>65</formLeft>
     <textVisX>78</textVisX>
     <textVisY>78</textVisY>
     <textVisW>1259</textVisW>
@@ -32,7 +32,23 @@
             <openFiles />
         </recentProject>
         <recentProject>
+            <path>C:\Users\Seppo\cmajorw64\cmajor\test\bzip2\bzip2.cms</path>
+            <openFiles />
+        </recentProject>
+        <recentProject>
+            <path>C:/Users/Seppo/cmajorw64/cmajor/test/deflate/deflate.cms</path>
+            <openFiles />
+        </recentProject>
+        <recentProject>
+            <path>C:\Users\Seppo\cmajorw64\cmajor\projects\examples\examples.cms</path>
+            <openFiles />
+        </recentProject>
+        <recentProject>
             <path>C:\Users\Seppo\cmajorw64\cmajor\test\bigint\bigint.cms</path>
+            <openFiles />
+        </recentProject>
+        <recentProject>
+            <path>C:\Users\Seppo\cmajorw64\cmajor\test\foo\foo.cms</path>
             <openFiles />
         </recentProject>
         <recentProject>
@@ -49,22 +65,6 @@
         </recentProject>
         <recentProject>
             <path>C:\Users\Seppo\cmajorw64\cmajor\doc\code\threading\threadSynchronization\threadSynchronization.cms</path>
-            <openFiles />
-        </recentProject>
-        <recentProject>
-            <path>C:/Users/Seppo/cmajorw64/cmajor/doc/code/threading/threadFunction/threadFunction.cms</path>
-            <openFiles />
-        </recentProject>
-        <recentProject>
-            <path>C:/Users/Seppo/cmajorw64/cmajor/doc/code/json/json.cms</path>
-            <openFiles />
-        </recentProject>
-        <recentProject>
-            <path>C:\Users\Seppo\cmajorw64\cmajor\projects\examples\examples.cms</path>
-            <openFiles />
-        </recentProject>
-        <recentProject>
-            <path>C:\Users\Seppo\cmajorw64\cmajor\test\foo\foo.cms</path>
             <openFiles />
         </recentProject>
     </recentProjects>

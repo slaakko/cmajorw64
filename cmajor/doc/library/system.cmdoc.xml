@@ -55,7 +55,37 @@
         <reference>../System.Text.Parsing.CodeDom/System.Text.Parsing.CodeDom.xml</reference>
         <reference>../System.Text.Parsing/System.Text.Parsing.xml</reference>
       </references>
-      <style>../../stle/cmdoc.css</style>
+      <style>../../style/cmdoc.css</style>
+    </library>
+    <library>
+      <moduleFilePath>../../system/System.Dom/lib/debug/System.Dom.cmm</moduleFilePath>
+      <libraryXmlFilePath>System.Dom/System.Dom.xml</libraryXmlFilePath>
+      <docXmlFilePath>System.Dom/System.Dom.doc.xml</docXmlFilePath>
+      <references>
+        <reference>../System.Base/System.Base.xml</reference>
+        <reference>../System.Text.Parsing.CodeDom/System.Text.Parsing.CodeDom.xml</reference>
+        <reference>../System.Text.Parsing/System.Text.Parsing.xml</reference>
+        <reference>../System.Xml/System.Xml.xml</reference>
+      </references>
+      <style>../../style/cmdoc.css</style>
+    </library>
+    <library>
+      <moduleFilePath>../../system/System.IO.Compression/lib/debug/System.IO.Compression.cmm</moduleFilePath>
+      <libraryXmlFilePath>System.IO.Compression/System.IO.Compression.xml</libraryXmlFilePath>
+      <docXmlFilePath>System.IO.Compression/System.IO.Compression.doc.xml</docXmlFilePath>
+      <references>
+        <reference>../System.Base/System.Base.xml</reference>
+      </references>
+      <style>../../style/cmdoc.css</style>
+    </library>
+    <library>
+      <moduleFilePath>../../system/System.Numerics.Multiprecision/lib/debug/System.Numerics.Multiprecision.cmm</moduleFilePath>
+      <libraryXmlFilePath>System.Numerics.Multiprecision/System.Numerics.Multiprecision.xml</libraryXmlFilePath>
+      <docXmlFilePath>System.Numerics.Multiprecision/System.Numerics.Multiprecision.doc.xml</docXmlFilePath>
+      <references>
+        <reference>../System.Base/System.Base.xml</reference>
+      </references>
+      <style>../../style/cmdoc.css</style>
     </library>
   </libraries>
 </cmdoc>

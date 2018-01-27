@@ -263,4 +263,14 @@ namespace System.Numerics.Multiprecision
         RtSqrtBigFloat(target.Handle(), x.Handle());
         return target;
     }
+    
+    public OutputStream& operator<<(OutputStream& s, const BigFloat& x)
+    {
+        return s << x.ToString();
+    }
+    
+    public StreamWriter& operator<<(StreamWriter& writer, const BigFloat& x)
+    {
+        return writer << x.ToString();
+    }
 }

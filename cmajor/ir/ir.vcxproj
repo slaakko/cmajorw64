@@ -139,6 +139,7 @@
       <PreprocessorDefinitions>NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>../..;C:\Programming\boost_1_64_0;C:\Programming\llvm-4.0.0.src\include;C:\Programming\llvm-4.0.0.src\build\include</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4141;4146;4244;4267;4291;4624;4996</DisableSpecificWarnings>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

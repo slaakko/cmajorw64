@@ -4,9 +4,8 @@
 // =================================
 
 #include <cmajor/rt/Compression.hpp>
-#define CMRT_IMPORT
-#include <cmajor/system/ext/zlib/zlib_intf.h>
-#include <cmajor/system/ext/bzip2/bz2_intf.h>
+#include <cmajor/rt/ZlibInterface.h>
+#include <cmajor/rt/BZ2Interface.h>
 
 //  ZLIB:
 
