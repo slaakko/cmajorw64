@@ -79,7 +79,7 @@ CDataSection::CDataSection(const std::u32string& data_) : Text(NodeType::cdataSe
 
 void CDataSection::Write(CodeFormatter& formatter)
 {
-    formatter.Write("<!CDATA[");
+    formatter.Write("<![CDATA[");
     formatter.Write(ToUtf8(Data()));
     formatter.Write("]]>");
 }

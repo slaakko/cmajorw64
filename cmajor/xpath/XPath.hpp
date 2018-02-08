@@ -1,5 +1,5 @@
-#ifndef XPath_hpp_14175
-#define XPath_hpp_14175
+#ifndef XPath_hpp_4275
+#define XPath_hpp_4275
 
 #include <cmajor/parsing/Grammar.hpp>
 #include <cmajor/parsing/Keyword.hpp>
@@ -61,4 +61,4 @@ private:
 
 } } // namespace cmajor.xpath
 
-#endif // XPath_hpp_14175
+#endif // XPath_hpp_4275

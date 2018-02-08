@@ -61,6 +61,7 @@ SystemModuleSet::SystemModuleSet()
     systemModuleNames.insert(U"System.Numerics.Multiprecision");
     systemModuleNames.insert(U"System.IO.Compression");
     systemModuleNames.insert(U"System.Text.RegularExpressions");
+    systemModuleNames.insert(U"System.XPath");
     systemModuleNames.insert(U"System");
 }
 

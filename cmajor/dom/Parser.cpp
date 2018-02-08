@@ -24,23 +24,25 @@ class DomDocumentHandler : public XmlContentHandler
 public:
     DomDocumentHandler();
     std::unique_ptr<Document> GetDocument();
-    void StartDocument();
-    void EndDocument();
-    void Version(const std::u32string& xmlVersion);
-    void Standalone(bool standalone);
-    void Encoding(const std::u32string& encoding);
-    void Text(const std::u32string& text);
-    void Comment(const std::u32string& comment);
-    void PI(const std::u32string& target, const std::u32string& data);
-    void StartElement(const std::u32string& namespaceUri, const std::u32string& localName, const std::u32string& qualifiedName, const Attributes& attributes);
-    void EndElement(const std::u32string& namespaceUri, const std::u32string& localName, const std::u32string& qualifiedName);
-    void SkippedEntity(const std::u32string& entityName);
+    void StartDocument() override;
+    void EndDocument() override;
+    void Version(const std::u32string& xmlVersion) override;
+    void Standalone(bool standalone) override;
+    void Encoding(const std::u32string& encoding) override;
+    void Text(const std::u32string& text) override;
+    void Comment(const std::u32string& comment) override;
+    void PI(const std::u32string& target, const std::u32string& data) override;
+    void CDataSection(const std::u32string& data) override;
+    void StartElement(const std::u32string& namespaceUri, const std::u32string& localName, const std::u32string& qualifiedName, const Attributes& attributes) override;
+    void EndElement(const std::u32string& namespaceUri, const std::u32string& localName, const std::u32string& qualifiedName) override;
+    void SkippedEntity(const std::u32string& entityName) override;
 private:
     std::unique_ptr<Document> document;
     std::unique_ptr<Element> currentElement;
     std::stack<std::unique_ptr<Element>> elementStack;
     std::u32string textContent;
     void AddTextContent();
+    void AddTextContent(bool addSpace);
 };
 
 DomDocumentHandler::DomDocumentHandler() : document(new Document())
@@ -54,11 +56,20 @@ std::unique_ptr<Document> DomDocumentHandler::GetDocument()
 
 void DomDocumentHandler::AddTextContent()
 {
+    AddTextContent(false);
+}
+
+void DomDocumentHandler::AddTextContent(bool addSpace)
+{
     if (currentElement)
     {
         std::u32string text = TrimAll(textContent);
         if (!text.empty())
         {
+            if (addSpace)
+            {
+                text.append(1, ' ');
+            }
             std::unique_ptr<dom::Text> textNode(new dom::Text(text));
             currentElement->AppendChild(std::move(textNode));
         }
@@ -124,9 +135,23 @@ void DomDocumentHandler::PI(const std::u32string& target, const std::u32string& 
     }
 }
 
-void DomDocumentHandler::StartElement(const std::u32string& namespaceUri, const std::u32string& localName, const std::u32string& qualifiedName, const Attributes& attributes)
+void DomDocumentHandler::CDataSection(const std::u32string& data)
 {
     AddTextContent();
+    std::unique_ptr<dom::CDataSection> cdataSection(new dom::CDataSection(data));
+    if (currentElement)
+    {
+        currentElement->AppendChild(std::move(cdataSection));
+    }
+    else
+    {
+        document->AppendChild(std::move(cdataSection));
+    }
+}
+
+void DomDocumentHandler::StartElement(const std::u32string& namespaceUri, const std::u32string& localName, const std::u32string& qualifiedName, const Attributes& attributes)
+{
+    AddTextContent(true);
     elementStack.push(std::move(currentElement));
     std::map<std::u32string, std::unique_ptr<Attr>> attrs;
     for (const Attribute& attr : attributes)

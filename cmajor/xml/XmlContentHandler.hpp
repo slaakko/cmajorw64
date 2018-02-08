@@ -53,6 +53,7 @@ public:
     virtual void Text(const std::u32string& text) {}
     virtual void Comment(const std::u32string& comment) {}
     virtual void PI(const std::u32string& target, const std::u32string& data) {}
+    virtual void CDataSection(const std::u32string& cdata) {}
     virtual void StartElement(const std::u32string& namespaceUri, const std::u32string& localName, const std::u32string& qualifiedName, const Attributes& attributes) {}
     virtual void EndElement(const std::u32string& namespaceUri, const std::u32string& localName, const std::u32string& qualifiedName) {}
     virtual void SkippedEntity(const std::u32string& entityName) {}

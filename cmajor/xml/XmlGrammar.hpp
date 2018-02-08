@@ -1,5 +1,5 @@
-#ifndef XmlGrammar_hpp_14187
-#define XmlGrammar_hpp_14187
+#ifndef XmlGrammar_hpp_12276
+#define XmlGrammar_hpp_12276
 
 #include <cmajor/parsing/Grammar.hpp>
 #include <cmajor/parsing/Keyword.hpp>
@@ -68,4 +68,4 @@ private:
 
 } } // namespace cmajor.xml
 
-#endif // XmlGrammar_hpp_14187
+#endif // XmlGrammar_hpp_12276

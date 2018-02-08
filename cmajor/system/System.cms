@@ -12,4 +12,5 @@ project <System.Text.Parsing/System.Text.Parsing.cmp>;
 project <System.Text.Parsing.CodeDom/System.Text.Parsing.CodeDom.cmp>;
 project <System.Text.RegularExpressions/System.Text.RegularExpressions.cmp>;
 project <System.Xml/System.Xml.cmp>;
+project <System.XPath/System.XPath.cmp>;
 activeProject System.Base;

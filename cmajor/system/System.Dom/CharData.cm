@@ -10,7 +10,7 @@ namespace System.Dom
 {
     public abstract class DomCharacterData : DomNode
     {
-        public nothrow DomCharacterData(const ustring& name_) : base(name_)
+        public nothrow explicit DomCharacterData(const ustring& name_) : base(name_)
         {
         }
         public nothrow DomCharacterData(const ustring& name_, const ustring& data_) : base(name_), data(data_)
@@ -44,7 +44,7 @@ namespace System.Dom
         public nothrow DomText() : base(u"text")
         {
         }
-        public nothrow DomText(const ustring& name_) : base(name_)
+        public nothrow explicit DomText(const ustring& name_) : base(name_)
         {
         }
         public nothrow DomText(const ustring& name_, const ustring& data_) : base(name_, data_)
@@ -69,7 +69,7 @@ namespace System.Dom
         public nothrow DomCDataSection() : base(u"cdata_section")
         {
         }
-        public nothrow DomCDataSection(const ustring& data_) : base(u"cdata_section", data_)
+        public nothrow explicit DomCDataSection(const ustring& data_) : base(u"cdata_section", data_)
         {
         }
         suppress DomCDataSection(const DomCDataSection&);
@@ -78,7 +78,7 @@ namespace System.Dom
         suppress void operator=(DomCDataSection&&);
         public override void Write(CodeFormatter& formatter)
         {
-            formatter.Write("<!CDATA[");
+            formatter.Write("<![CDATA[");
             formatter.Write(ToUtf8(Data()));
             formatter.Write("]]>");
         }
@@ -97,7 +97,7 @@ namespace System.Dom
         public nothrow DomComment() : base(u"comment")
         {
         }
-        public nothrow DomComment(const ustring& data_) : base(u"comment", data_)
+        public nothrow explicit DomComment(const ustring& data_) : base(u"comment", data_)
         {
         }
         suppress DomComment(const DomComment&);

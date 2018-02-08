@@ -522,6 +522,7 @@ namespace System.Xml
             public PIRule(const ustring& name_, Scope* enclosingScope_, int id_, Parser* definition_) : base(name_, enclosingScope_, id_, definition_)
             {
                 AddInheritedAttribute(AttrOrVar(ToUtf32("XmlProcessor*"), ToUtf32("processor")));
+                AddLocalVariable(AttrOrVar(ToUtf32("ustring"), ToUtf32("data")));
             }
             public override void Enter(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
             {
@@ -538,13 +539,20 @@ namespace System.Xml
             {
                 ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
                 a0ActionParser->SetAction(A0Action);
+                ActionParser* a1ActionParser = GetAction(ToUtf32("A1"));
+                a1ActionParser->SetAction(A1Action);
                 NonterminalParser* targetNonterminalParser = GetNonterminal(ToUtf32("target"));
                 targetNonterminalParser->SetPost(Posttarget);
             }
             public void A0Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->processor->PI(context->fromtarget, ustring(matchBegin, matchEnd));
+                context->processor->PI(context->fromtarget, context->data);
+            }
+            public void A1Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                context->data = ustring(matchBegin, matchEnd);
             }
             public void Posttarget(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
             {
@@ -557,10 +565,11 @@ namespace System.Xml
             }
             public class Context : System.Text.Parsing.Context
             {
-                public Context() : processor(), fromtarget()
+                public Context() : processor(), data(), fromtarget()
                 {
                 }
                 public XmlProcessor* processor;
+                public ustring data;
                 public ustring fromtarget;
             }
         }
@@ -643,7 +652,7 @@ namespace System.Xml
             public void A0Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->processor->Text(context->fromCData);
+                context->processor->CDataSection(context->fromCData);
             }
             public void PostCData(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
             {
@@ -2751,23 +2760,18 @@ namespace System.Xml
             AddRule(new PIRule(ToUtf32("PI"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.SequenceParser(
                     new System.Text.Parsing.SequenceParser(
-                        new System.Text.Parsing.SequenceParser(
-                            new System.Text.Parsing.StringParser(ToUtf32("<?")),
-                            new System.Text.Parsing.NonterminalParser(ToUtf32("target"), ToUtf32("PITarget"), 0)),
+                        new System.Text.Parsing.StringParser(ToUtf32("<?")),
                         new System.Text.Parsing.ActionParser(ToUtf32("A0"),
-                            new System.Text.Parsing.OptionalParser(
-                                new System.Text.Parsing.SequenceParser(
-                                    new System.Text.Parsing.NonterminalParser(ToUtf32("S"), ToUtf32("S"), 0),
-                                    new System.Text.Parsing.DifferenceParser(
-                                        new System.Text.Parsing.KleeneStarParser(
-                                            new System.Text.Parsing.NonterminalParser(ToUtf32("Char"), ToUtf32("Char"), 0)),
-                                        new System.Text.Parsing.SequenceParser(
-                                            new System.Text.Parsing.SequenceParser(
-                                                new System.Text.Parsing.KleeneStarParser(
-                                                    new System.Text.Parsing.NonterminalParser(ToUtf32("Char"), ToUtf32("Char"), 0)),
-                                                new System.Text.Parsing.StringParser(ToUtf32("?>"))),
+                            new System.Text.Parsing.SequenceParser(
+                                new System.Text.Parsing.NonterminalParser(ToUtf32("target"), ToUtf32("PITarget"), 0),
+                                new System.Text.Parsing.OptionalParser(
+                                    new System.Text.Parsing.SequenceParser(
+                                        new System.Text.Parsing.NonterminalParser(ToUtf32("S"), ToUtf32("S"), 0),
+                                        new System.Text.Parsing.ActionParser(ToUtf32("A1"),
                                             new System.Text.Parsing.KleeneStarParser(
-                                                new System.Text.Parsing.NonterminalParser(ToUtf32("Char"), ToUtf32("Char"), 0)))))))),
+                                                new System.Text.Parsing.DifferenceParser(
+                                                    new System.Text.Parsing.NonterminalParser(ToUtf32("Char"), ToUtf32("Char"), 0),
+                                                    new System.Text.Parsing.StringParser(ToUtf32("?>")))))))))),
                     new System.Text.Parsing.StringParser(ToUtf32("?>")))));
             AddRule(new PITargetRule(ToUtf32("PITarget"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.ActionParser(ToUtf32("A0"),
@@ -2795,16 +2799,10 @@ namespace System.Xml
                 new System.Text.Parsing.StringParser(ToUtf32("<![CDATA["))));
             AddRule(new CDataRule(ToUtf32("CData"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.ActionParser(ToUtf32("A0"),
-                    new System.Text.Parsing.DifferenceParser(
-                        new System.Text.Parsing.KleeneStarParser(
-                            new System.Text.Parsing.NonterminalParser(ToUtf32("Char"), ToUtf32("Char"), 0)),
-                        new System.Text.Parsing.SequenceParser(
-                            new System.Text.Parsing.SequenceParser(
-                                new System.Text.Parsing.KleeneStarParser(
-                                    new System.Text.Parsing.NonterminalParser(ToUtf32("Char"), ToUtf32("Char"), 0)),
-                                new System.Text.Parsing.StringParser(ToUtf32("]]>"))),
-                            new System.Text.Parsing.KleeneStarParser(
-                                new System.Text.Parsing.NonterminalParser(ToUtf32("Char"), ToUtf32("Char"), 0)))))));
+                    new System.Text.Parsing.KleeneStarParser(
+                        new System.Text.Parsing.DifferenceParser(
+                            new System.Text.Parsing.NonterminalParser(ToUtf32("Char"), ToUtf32("Char"), 0),
+                            new System.Text.Parsing.StringParser(ToUtf32("]]>")))))));
             AddRule(new System.Text.Parsing.RuleParser(ToUtf32("CDEnd"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.StringParser(ToUtf32("]]>"))));
             AddRule(new PrologRule(ToUtf32("Prolog"), GetScope(), Domain()->GetNextRuleId(),

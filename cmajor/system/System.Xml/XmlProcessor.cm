@@ -74,6 +74,10 @@ namespace System.Xml
         {
             contentHandler->PI(target, data);
         }
+        public void CDataSection(const ustring& cdata)
+        {
+            contentHandler->CDataSection(cdata);
+        }
         public void Version(const ustring& version)
         {
             contentHandler->Version(version);

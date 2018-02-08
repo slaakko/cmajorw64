@@ -18,7 +18,7 @@ namespace cmajor.xml
         PubidChar;
         CharData(XmlProcessor* processor);
         Comment(XmlProcessor* processor);
-        PI(XmlProcessor* processor);
+        PI(XmlProcessor* processor, var std::u32string data);
         PITarget: std::u32string;
         CDSect(XmlProcessor* processor);
         CDStart;

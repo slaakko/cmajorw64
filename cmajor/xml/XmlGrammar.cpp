@@ -554,6 +554,7 @@ public:
         cmajor::parsing::Rule(name_, enclosingScope_, id_, definition_)
     {
         AddInheritedAttribute(AttrOrVariable(ToUtf32("XmlProcessor*"), ToUtf32("processor")));
+        AddLocalVariable(AttrOrVariable(ToUtf32("std::u32string"), ToUtf32("data")));
     }
     virtual void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData)
     {
@@ -571,13 +572,20 @@ public:
     {
         cmajor::parsing::ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
         a0ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<PIRule>(this, &PIRule::A0Action));
+        cmajor::parsing::ActionParser* a1ActionParser = GetAction(ToUtf32("A1"));
+        a1ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<PIRule>(this, &PIRule::A1Action));
         cmajor::parsing::NonterminalParser* targetNonterminalParser = GetNonterminal(ToUtf32("target"));
         targetNonterminalParser->SetPostCall(new cmajor::parsing::MemberPostCall<PIRule>(this, &PIRule::Posttarget));
     }
     void A0Action(const char32_t* matchBegin, const char32_t* matchEnd, const Span& span, const std::string& fileName, ParsingData* parsingData, bool& pass)
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
-        context->processor->PI(context->fromtarget, std::u32string(matchBegin, matchEnd));
+        context->processor->PI(context->fromtarget, context->data);
+    }
+    void A1Action(const char32_t* matchBegin, const char32_t* matchEnd, const Span& span, const std::string& fileName, ParsingData* parsingData, bool& pass)
+    {
+        Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
+        context->data = std::u32string(matchBegin, matchEnd);
     }
     void Posttarget(cmajor::parsing::ObjectStack& stack, ParsingData* parsingData, bool matched)
     {
@@ -592,8 +600,9 @@ public:
 private:
     struct Context : cmajor::parsing::Context
     {
-        Context(): processor(), fromtarget() {}
+        Context(): processor(), data(), fromtarget() {}
         XmlProcessor* processor;
+        std::u32string data;
         std::u32string fromtarget;
     };
 };
@@ -681,7 +690,7 @@ public:
     void A0Action(const char32_t* matchBegin, const char32_t* matchEnd, const Span& span, const std::string& fileName, ParsingData* parsingData, bool& pass)
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
-        context->processor->Text(context->fromCData);
+        context->processor->CDataSection(context->fromCData);
     }
     void PostCData(cmajor::parsing::ObjectStack& stack, ParsingData* parsingData, bool matched)
     {
@@ -2817,23 +2826,18 @@ void XmlGrammar::CreateRules()
     AddRule(new PIRule(ToUtf32("PI"), GetScope(), GetParsingDomain()->GetNextRuleId(),
         new cmajor::parsing::SequenceParser(
             new cmajor::parsing::SequenceParser(
-                new cmajor::parsing::SequenceParser(
-                    new cmajor::parsing::StringParser(ToUtf32("<?")),
-                    new cmajor::parsing::NonterminalParser(ToUtf32("target"), ToUtf32("PITarget"), 0)),
+                new cmajor::parsing::StringParser(ToUtf32("<?")),
                 new cmajor::parsing::ActionParser(ToUtf32("A0"),
-                    new cmajor::parsing::OptionalParser(
-                        new cmajor::parsing::SequenceParser(
-                            new cmajor::parsing::NonterminalParser(ToUtf32("S"), ToUtf32("S"), 0),
-                            new cmajor::parsing::DifferenceParser(
-                                new cmajor::parsing::KleeneStarParser(
-                                    new cmajor::parsing::NonterminalParser(ToUtf32("Char"), ToUtf32("Char"), 0)),
-                                new cmajor::parsing::SequenceParser(
-                                    new cmajor::parsing::SequenceParser(
-                                        new cmajor::parsing::KleeneStarParser(
-                                            new cmajor::parsing::NonterminalParser(ToUtf32("Char"), ToUtf32("Char"), 0)),
-                                        new cmajor::parsing::StringParser(ToUtf32("?>"))),
+                    new cmajor::parsing::SequenceParser(
+                        new cmajor::parsing::NonterminalParser(ToUtf32("target"), ToUtf32("PITarget"), 0),
+                        new cmajor::parsing::OptionalParser(
+                            new cmajor::parsing::SequenceParser(
+                                new cmajor::parsing::NonterminalParser(ToUtf32("S"), ToUtf32("S"), 0),
+                                new cmajor::parsing::ActionParser(ToUtf32("A1"),
                                     new cmajor::parsing::KleeneStarParser(
-                                        new cmajor::parsing::NonterminalParser(ToUtf32("Char"), ToUtf32("Char"), 0)))))))),
+                                        new cmajor::parsing::DifferenceParser(
+                                            new cmajor::parsing::NonterminalParser(ToUtf32("Char"), ToUtf32("Char"), 0),
+                                            new cmajor::parsing::StringParser(ToUtf32("?>")))))))))),
             new cmajor::parsing::StringParser(ToUtf32("?>")))));
     AddRule(new PITargetRule(ToUtf32("PITarget"), GetScope(), GetParsingDomain()->GetNextRuleId(),
         new cmajor::parsing::ActionParser(ToUtf32("A0"),
@@ -2861,16 +2865,10 @@ void XmlGrammar::CreateRules()
         new cmajor::parsing::StringParser(ToUtf32("<![CDATA["))));
     AddRule(new CDataRule(ToUtf32("CData"), GetScope(), GetParsingDomain()->GetNextRuleId(),
         new cmajor::parsing::ActionParser(ToUtf32("A0"),
-            new cmajor::parsing::DifferenceParser(
-                new cmajor::parsing::KleeneStarParser(
-                    new cmajor::parsing::NonterminalParser(ToUtf32("Char"), ToUtf32("Char"), 0)),
-                new cmajor::parsing::SequenceParser(
-                    new cmajor::parsing::SequenceParser(
-                        new cmajor::parsing::KleeneStarParser(
-                            new cmajor::parsing::NonterminalParser(ToUtf32("Char"), ToUtf32("Char"), 0)),
-                        new cmajor::parsing::StringParser(ToUtf32("]]>"))),
-                    new cmajor::parsing::KleeneStarParser(
-                        new cmajor::parsing::NonterminalParser(ToUtf32("Char"), ToUtf32("Char"), 0)))))));
+            new cmajor::parsing::KleeneStarParser(
+                new cmajor::parsing::DifferenceParser(
+                    new cmajor::parsing::NonterminalParser(ToUtf32("Char"), ToUtf32("Char"), 0),
+                    new cmajor::parsing::StringParser(ToUtf32("]]>")))))));
     AddRule(new cmajor::parsing::Rule(ToUtf32("CDEnd"), GetScope(), GetParsingDomain()->GetNextRuleId(),
         new cmajor::parsing::StringParser(ToUtf32("]]>"))));
     AddRule(new PrologRule(ToUtf32("Prolog"), GetScope(), GetParsingDomain()->GetNextRuleId(),

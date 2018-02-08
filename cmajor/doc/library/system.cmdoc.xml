@@ -70,6 +70,19 @@
       <style>../../style/cmdoc.css</style>
     </library>
     <library>
+        <moduleFilePath>../../system/System.XPath/lib/debug/System.XPath.cmm</moduleFilePath>
+        <libraryXmlFilePath>System.XPath/System.XPath.xml</libraryXmlFilePath>
+        <docXmlFilePath>System.XPath/System.XPath.doc.xml</docXmlFilePath>
+        <references>
+            <reference>../System.Base/System.Base.xml</reference>
+            <reference>../System.Text.Parsing.CodeDom/System.Text.Parsing.CodeDom.xml</reference>
+            <reference>../System.Text.Parsing/System.Text.Parsing.xml</reference>
+            <reference>../System.Xml/System.Xml.xml</reference>
+            <reference>../System.Dom/System.Dom.xml</reference>
+        </references>
+        <style>../../style/cmdoc.css</style>
+    </library>
+    <library>
       <moduleFilePath>../../system/System.IO.Compression/lib/debug/System.IO.Compression.cmm</moduleFilePath>
       <libraryXmlFilePath>System.IO.Compression/System.IO.Compression.xml</libraryXmlFilePath>
       <docXmlFilePath>System.IO.Compression/System.IO.Compression.doc.xml</docXmlFilePath>
@@ -84,6 +97,17 @@
       <docXmlFilePath>System.Numerics.Multiprecision/System.Numerics.Multiprecision.doc.xml</docXmlFilePath>
       <references>
         <reference>../System.Base/System.Base.xml</reference>
+      </references>
+      <style>../../style/cmdoc.css</style>
+    </library>
+    <library>
+      <moduleFilePath>../../system/System.Text.RegularExpressions/lib/debug/System.Text.RegularExpressions.cmm</moduleFilePath>
+      <libraryXmlFilePath>System.Text.RegularExpressions/System.Text.RegularExpressions.xml</libraryXmlFilePath>
+      <docXmlFilePath>System.Text.RegularExpressions/System.Text.RegularExpressions.doc.xml</docXmlFilePath>
+      <references>
+        <reference>../System.Base/System.Base.xml</reference>
+        <reference>../System.Text.Parsing.CodeDom/System.Text.Parsing.CodeDom.xml</reference>
+        <reference>../System.Text.Parsing/System.Text.Parsing.xml</reference>
       </references>
       <style>../../style/cmdoc.css</style>
     </library>

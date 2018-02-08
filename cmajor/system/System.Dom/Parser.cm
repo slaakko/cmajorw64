@@ -66,6 +66,18 @@ namespace System.Dom
                 document->AppendChild(Rvalue(processingInstruction));
             }
         }
+        public override void CDataSection(const ustring& cdata)
+        {
+            UniquePtr<DomNode> cdataSection(new DomCDataSection(cdata));
+            if (!currentElement.IsNull())
+            {
+                currentElement->AppendChild(Rvalue(cdataSection));
+            }
+            else
+            {
+                document->AppendChild(Rvalue(cdataSection));
+            }
+        }
         public override void StartElement(const ustring& namespaceUri, const ustring& localName, const ustring& qualifiedName, const System.Xml.Attributes& attributes)
         {
             AddTextContent();
@@ -108,7 +120,7 @@ namespace System.Dom
                 ustring text = TrimAll(textContent);
                 if (!text.IsEmpty())
                 {
-                    UniquePtr<DomNode> textNode(new DomText(text));
+                    UniquePtr<DomNode> textNode(new DomText(u"text", text));
                     currentElement->AppendChild(Rvalue(textNode));
                 }                
             }

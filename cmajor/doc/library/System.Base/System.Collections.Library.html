@@ -1,0 +1,113 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>System.Collections Library</title>
+    <link href="../../style/library.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+    <h1>System.Collections Library</h1>
+
+    <p>
+        The <a href="System.Base.html#System.Collections">System.Collections</a> library contains container classes.
+    </p>
+
+    <h2>List</h2>
+
+    <p>
+        The most fundamental container is the <a href="System.Base.html#class_List_T_579A89BF19B54042190CDE2A7E54E1DFAAFDB31C">List</a> class that 
+        is like an array that can grow. Elements can be <a href="System.Base.html#function_group_Add_F4638F3DD74085EFC3B45FB3D7770BFD75CB7F32">added</a> to it either by 
+        <a href="System.Base.html#member_function_Add_List_T_0CEB0F989B58359D06357C988DF595C83DA28430">copying</a> or 
+        <a href="System.Base.html#member_function_Add_List_T_1242E85AAD4D8369255E6BB57F2A841ED245BACD">moving</a>. 
+        When moving an element you can use the <a href="System.Base.html#function_Rvalue_FC16F1187C8C3CF8D9182A63AC59041EF4474FA2">Rvalue</a> function that converts its argument to an rvalue.
+        Adding an element to the end of the list takes amortized constant time.
+        Elements of a list can be accessed by index using the <a href="System.Base.html#function_group_op_index_92651A8823E01FEF6E9EC50F9405EA8D0FF83890">subscript operator</a>.
+        Element access is <em>O(1)</em> operation.
+    </p>
+
+    <h2>Set</h2>
+
+    <p>
+        <a href="System.Base.html#class_Set_T_C_47F8F0E0607A1F93AC7712B5B29065BB126D924F">Set</a> is a collection of unique elements that are kept sorted in a
+        <a href="System.Base.html#class_RedBlackTree_KeyType_ValueType_KeyOfValue_Compare_DB6FC4C558699B41560FB59DF0566AE96A15B9A2">red-black tree</a>.
+        By default the sorting operation is the <a href="System.Base.html#class_Less_T_F840BD6533DFD3706784C819E04FA4FE41C4F3D2">less-than</a> operation,
+        but you can give other ordering relation as the second template argument. Searching for an element in the set and inserting an element to the set are <em>Olog(n)</em> operations.
+    </p>
+
+    <h2>Map</h2>
+
+    <p>
+        <a href="System.Base.html#class_Map_Key_Value_KeyCompare_530B43B96CDA5DBA8045A4DA0691BBB50DE2DB3D">Map</a> is an associative array of key-value pairs that are kept sorted by keys in a
+        <a href="System.Base.html#class_RedBlackTree_KeyType_ValueType_KeyOfValue_Compare_DB6FC4C558699B41560FB59DF0566AE96A15B9A2">red-black tree</a>.
+        By default the keys are sorted by the <a href="System.Base.html#class_Less_T_F840BD6533DFD3706784C819E04FA4FE41C4F3D2">less-than</a> operation, but you can give your own sorting criteria
+        as the third template argument. Searching for an element in the map and inserting an element to the map are <em>Olog(n)</em> operations.
+    </p>
+
+    <h2>HashSet</h2>
+
+    <p>
+        <a href="System.Base.html#class_HashSet_T_H_C_6247CEC2AE0E22CFEFEC71837C21FA087B7840DC">HashSet</a> is a collection of unique elements that are organized in a
+        <a href="System.Base.html#class_Hashtable_KeyType_ValueType_KeyOfValue_HashFun_Compare_B254B0B4EA63FC06733945C26C411D4DEE90B7D2">hashtable</a>.
+        The elements need not be ordered, but you must be able to compare them for <a href="System.Base.html#class_EqualTo_T_483B326DC1355EE905B9A0F4E9331F702788D28E">equality</a>
+        or other equality-like relation provided as the third template argument.
+        The second template argument is a hash function object that is by default the <a href="System.Base.html#class_Hasher_T_9E06FCD9B56B8B3B7E7F8286BE8179D3B1CB8325">Hasher</a> function object that delegates the
+        computation of the hash function for the element to the <a href="System.Base.html#function_group_GetHashCode_6A3EAD743D91EFDE396FB5407DAE9791C10C8B40">GetHashCode</a> function.
+        If there is not a <em>GetHashCode</em> overload for the your element type, you can provide your own, and it should work with the standard <em>Hasher</em>.
+        Adding an element to the hash set depends on the hash function, but can be thought as <em>O(1)</em> operation.
+        Searching for an element in a hash set depends on the hash function, but can be thought as <em>O(1)</em> operation.
+    </p>
+
+    <h2>HashMap</h2>
+
+    <p>
+        <a href="System.Base.html#class_HashMap_K_T_H_C_925D53DF947742545E7EC07D3487F3EA8C8D1D36">HashMap</a> is an associative array of key-value pairs that are organized in a
+        <a href="System.Base.html#class_Hashtable_KeyType_ValueType_KeyOfValue_HashFun_Compare_B254B0B4EA63FC06733945C26C411D4DEE90B7D2">hashtable</a>.
+        The keys need not be ordered, but you must be able to compare for <a href="System.Base.html#class_EqualTo_T_483B326DC1355EE905B9A0F4E9331F702788D28E">equality</a>
+        or other equality-like relation provided as the fourth template argument. As for <em>HashSet</em>, the third template argument is a hash function for the key type,
+        by default <a href="System.Base.html#class_Hasher_T_9E06FCD9B56B8B3B7E7F8286BE8179D3B1CB8325">Hasher</a> function object, that
+        delegates the computation of the hash function to the <a href="System.Base.html#function_group_GetHashCode_6A3EAD743D91EFDE396FB5407DAE9791C10C8B40">GetHashCode</a> function.
+        Adding an element to the hash map depends on the hash function, but can be thought as <em>O(1)</em> operation.
+        Searching for an element in a hash map depends on the hash function, but can be thought as <em>O(1)</em> operation.
+    </p>
+
+    <h2>LinkedList</h2>
+
+    <p>
+        <a href="System.Base.html#class_LinkedList_T_1596EFE994FFA67F5471B17D62A2A8C45B9A2B20">LinkedList</a> is a doubly linked list of elements.
+        Inserting an element to the linked list in a known position is <em>O(1)</em> operation. Searching for an element in a linked list is <em>O(n)</em> operation.
+    </p>
+
+    <h2>ForwardList</h2>
+
+    <p>
+        <a href="System.Base.html#class_ForwardList_T_49B88E2B81E13ED03DA3835C7A074DB98CBE7051">ForwardList</a> is a singly linked list of elements.
+        Inserting an element to the forward list in a known position is <em>O(1)</em> operation. Searching for an element in a forward list is <em>O(n)</em> operation.
+    </p>
+
+    <h2>Stack</h2>
+
+    <p>
+        <a href="System.Base.html#class_Stack_T_44313E678C6CD0E8DB3743953B65AA105D55A963">Stack</a> is a last-in-first-out container of elements implemented as 
+        a <a href="System.Base.html#class_List_T_579A89BF19B54042190CDE2A7E54E1DFAAFDB31C">List</a>. Pushing an element to the top of the stack takes amortized constant time.
+        Popping an element from the top of the stack is <em>O(1)</em> operation.
+    </p>
+
+    <h2>Queue</h2>
+
+    <p>
+        <a href="System.Base.html#class_Queue_T_1C9B1484040D488EB9F21C531882DC9EB5B8CA02">Queue</a> is a first-in-first-out container of elements implemented as a
+        <a href="System.Base.html#class_List_T_579A89BF19B54042190CDE2A7E54E1DFAAFDB31C">List</a>. Putting an element to the end of the queue takes amortized constant time.
+        Getting an element from the start of the queue is <em>O(n)</em> operation.
+
+    </p>
+
+    <h2>Bitset</h2>
+
+    <p>
+        <a href="System.Base.html#class_Bitset_BA1EE2E68426C5445CB6CAF7F957084ADAFD19CA">Bitset</a> is a variable length container of bits implemented as a
+        <a href="System.Base.html#class_List_T_579A89BF19B54042190CDE2A7E54E1DFAAFDB31C">List</a> of <b>ulong</b>s. Setting, resetting and accessing a bit takes constant time.
+    </p>
+
+</body>
+</html>

@@ -160,7 +160,7 @@ bool Element::HasMultilineContent()
     Node* child = FirstChild();
     if (child)
     {
-        if (child->GetNodeType() == NodeType::elementNode) return true;
+        if (child->GetNodeType() == NodeType::elementNode || child->GetNodeType() == NodeType::documentNode) return true;
         if (child->ValueContainsNewLine()) return true;
     }
     return false;
@@ -174,6 +174,11 @@ std::u32string Element::GetAttribute(const std::u32string& attrName) const
         return it->second->Value();
     }
     return std::u32string();
+}
+
+void Element::AddAttribute(std::unique_ptr<Attr>&& attr)
+{
+    attributeMap[attr->Name()] = std::move(attr);
 }
 
 void Element::SetAttribute(const std::u32string& attrName, const std::u32string& attrValue)

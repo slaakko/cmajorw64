@@ -16,6 +16,9 @@ namespace System.Net.Sockets
         public TcpClient(const string& node, const string& service) : socket(node, service)
         {
         }
+        public TcpClient(const string& node, const string& service, ConnectOptions options) : socket(node, service, options)
+        {
+        }
         public nothrow TcpClient(TcpSocket&& socket_) : socket(Rvalue(socket_))
         {
         }
@@ -25,8 +28,12 @@ namespace System.Net.Sockets
         }
         public void Connect(const string& node, const string& service)
         {
+            Connect(node, service, ConnectOptions.none);
+        }
+        public void Connect(const string& node, const string& service, ConnectOptions options)
+        {
             Close();
-            socket.Connect(node, service);
+            socket.Connect(node, service, options);
         }
         public SharedPtr<ByteStream> GetStream()
         {

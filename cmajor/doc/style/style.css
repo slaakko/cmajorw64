@@ -11,7 +11,12 @@ body.index
 
 h1.index, h2.index
 {
-    color: black;
+    color: lightgray;
+}
+
+a.index 
+{
+    color: lightgray;
 }
 
 p

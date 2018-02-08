@@ -33,6 +33,7 @@ public:
     bool IsSwitchConditionType() const override { return true; }
     ValueType GetValueType() const override;
     Value* MakeValue() const override;
+    std::u32string Id() const override;
 private:
     TypeSymbol* underlyingType;
 };

@@ -81,6 +81,14 @@ namespace System.IO
         {
             Write(ToString(x));
         }
+        public void Write(const Date& date)
+        {
+            Write(date.ToString());
+        }
+        public void Write(const DateTime& dateTime)
+        {            
+            Write(dateTime.ToString());
+        }
         public void WriteLine()
         {
             Write("\n");
@@ -148,6 +156,16 @@ namespace System.IO
         public void WriteLine(double x)
         {
             Write(x);
+            WriteLine();
+        }
+        public void WriteLine(const Date& date)
+        {
+            Write(date);
+            WriteLine();
+        }
+        public void WriteLine(const DateTime& dateTime)
+        {            
+            Write(dateTime);
             WriteLine();
         }
         public nothrow const SharedPtr<ByteStream>& ContainedStream()
@@ -256,6 +274,18 @@ namespace System.IO
     public StreamWriter& operator<<(StreamWriter& writer, double x)
     {
         writer.Write(x);
+        return writer;
+    }
+    
+    public StreamWriter& operator<<(StreamWriter& writer, const Date& date)
+    {
+        writer.Write(date);
+        return writer;
+    }
+    
+    public StreamWriter& operator<<(StreamWriter& writer, const DateTime& dateTime)
+    {
+        writer.Write(dateTime);
         return writer;
     }
 

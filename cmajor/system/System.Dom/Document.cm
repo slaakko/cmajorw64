@@ -79,6 +79,15 @@ namespace System.Dom
                 return base->ReplaceChild(newChild, oldChild);
             }
         }
+        public override DomNode* AppendChild(UniquePtr<DomNode>&& newChild)
+        {
+            CheckValidInsert(newChild.Get(), null);
+            if (newChild.Get() is DomElement*)
+            {
+                documentElement = cast<DomElement*>(newChild.Get());
+            }
+            return base->AppendChild(newChild);
+        }
         public DomElement* GetElementById(const ustring& elementId)
         {
             if (!indexValid)

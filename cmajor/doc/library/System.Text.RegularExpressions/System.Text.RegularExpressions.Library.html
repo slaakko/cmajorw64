@@ -1,0 +1,230 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>System.Text.RegularExpressions Library</title>
+    <link href="../../style/library.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+    <h1>System.Text.RegularExpressions Library</h1>
+
+    <p>
+        The <a href="System.Text.RegularExpressions.html">System.Text.RegularExpressions</a> library contains an implementation of a simple 
+        <a href="http://en.wikipedia.org/wiki/Regular_expression">regular expression</a> matching engine.
+    </p>
+
+    <h2>RegEx</h2>
+
+    <p>
+        The <a href="System.Text.RegularExpressions.html#class_RegEx_FF045A8DB810B11A7E1838764E80BDB32C6C837F">RegEx</a> class contains the following basic functionality:
+        <ul>
+            <li>
+                <a href="System.Text.RegularExpressions.html#constructor_RegEx_048A5AC6F13DA9ED011823E2E2E8820225A196C8">RegEx</a> constructor constructs a 
+                regular expression from the given pattern that is not compiled to a DFA, and the pattern must match entirely the input.
+            </li>
+            <li>
+                <a href="System.Text.RegularExpressions.html#constructor_RegEx_80C0AB8F118532186C3778D5E11AA9A69CD4EC01">RegEx constructor</a> takes also flags that 
+                can be ORed together. They allow the regular expression (1) to be compiled to a DFA and (2) match within a line of input instead of the entire input.
+            </li>
+            <li>
+                The <a href="System.Text.RegularExpressions.html#member_function_Matches_RegEx_59E97BBCEE02267BB93B3A7BDB2A90148DB9D40A">Matches</a> member function matches an input string to the 
+                pattern contained by the regular expression and returns <b>true</b> if input matches, and <b>false</b> otherwise.
+            </li>
+        </ul>
+    </p>
+
+    <p>
+        The regular expression is represented inside the engine as an <a href="http://en.wikipedia.org/wiki/Nondeterministic_finite_automaton">NFA</a> or it can be compiled to a 
+        <a href="http://en.wikipedia.org/wiki/Deterministic_finite_automaton">DFA</a>. Compiling to DFA takes somewhat longer than construction of an NFA but matching is faster with DFA than with NFA.
+    </p>
+
+    <h2>Example</h2>
+
+    <p>
+        Here's the <a href="../../code/rex/rex.cm.html">rex</a> example program that reads given files (file names can contain wildcards * and ?) and 
+        prints those input lines that contain a match of the given regular expression pattern.
+    </p>
+
+    <h2>Syntax</h2>
+
+    <p>
+        The following table contains the recognized regular expression pattern syntax:
+
+        <table class="grammar">
+            <tr>
+                <td class="rule" id="rule.regular-expression">regular&#8209;expression</td>
+                <td class="sep">&rarr;</td>
+                <td class="rcontent">
+                    <span class="rule"><a href="#rule.alternative-expr">alternative&#8209;expr</a></span>
+                </td>
+            </tr>
+            <tr>
+                <td class="rule" id="rule.alternative-expr">alternative&#8209;expr</td>
+                <td class="sep">&rarr;</td>
+                <td class="rcontent">
+                    <span class="rule"><a href="#rule.sequence-expr">sequence&#8209;expr</a></span>
+                    (<span class=mono>|</span>
+                    <span class="rule"><a href="#rule.sequence-expr">sequence&#8209;expr</a></span>)*
+                </td>
+            </tr>
+            <tr>
+                <td class="rule" id="rule.sequence-expr">sequence&#8209;expr</td>
+                <td class="sep">&rarr;</td>
+                <td class="rcontent">
+                    <span class="rule"><a href="#rule.postfix-expr">postfix&#8209;expr</a></span>
+                    <span class="rule"><a href="#rule.postfix-expr">postfix&#8209;expr</a></span>*
+                </td>
+            </tr>
+            <tr>
+                <td class="rule" id="rule.postfix-expr">postfix&#8209;expr</td>
+                <td class="sep">&rarr;</td>
+                <td class="rcontent">
+                    <span class="rule"><a href="#rule.primary-expr">primary&#8209;expr</a></span>
+                    (<span class=mono>*</span> | <span class=mono>+</span> | <span class=mono>?</span>)?
+                </td>
+            </tr>
+            <tr>
+                <td class="rule" id="rule.primary-expr">primary&#8209;expr</td>
+                <td class="sep">&rarr;</td>
+                <td class="rcontent">
+                    <span class="rule"><a href="#rule.char">char</a></span> |
+                    <span class=mono>.</span> |
+                    <span class="rule"><a href="#rule.char-class">char&#8209;class</a></span> |
+                    <span class=mono>(</span>
+                    <span class="rule"><a href="#rule.alternative-expr">alternative&#8209;expr</a></span>
+                    <span class=mono>)</span> |
+                    <span class=mono>\d</span> |
+                    <span class=mono>\D</span> |
+                    <span class=mono>\s</span> |
+                    <span class=mono>\S</span> |
+                    <span class=mono>\w</span> |
+                    <span class=mono>\W</span> |
+                    <span class=mono>\l</span> |
+                    <span class=mono>\L</span> |
+                    <span class=mono>\u</span> |
+                    <span class=mono>\U</span> |
+                    <span class="rule"><a href="#rule.escape">escape</a></span>
+                </td>
+            </tr>
+            <tr>
+                <td class="rule" id="rule.char">char</td>
+                <td class="sep">&rarr;</td>
+                <td class="rcontent">
+                    <span class="rule"><a href="#rule.any-char">any&#8209;char</a></span>
+                    <span class="op">&minus;</span>
+                    [()\\\[*+?.]
+                </td>
+            </tr>
+            <tr>
+                <td class="rule" id="rule.any-char">any&#8209;char</td>
+                <td class="sep">&rarr;</td>
+                <td class="rcontent">
+                    'any character'
+                </td>
+            </tr>
+            <tr>
+                <td class="rule" id="rule.char-class">char&#8209;class</td>
+                <td class="sep">&rarr;</td>
+                <td class="rcontent">
+                    <span class=mono>[</span>
+                    (<span class="rule"><a href="#rule.class">class</a></span> |
+                    <span class="rule"><a href="#rule.range">range</a></span>)*
+                    <span class=mono>]</span>
+                </td>
+            </tr>
+            <tr>
+                <td class="rule" id="rule.class">class</td>
+                <td class="sep">&rarr;</td>
+                <td class="rcontent">
+                    <span class=mono>[:alnum:]</span> |
+                    <span class=mono>[:alpha:]</span> |
+                    <span class=mono>[:blank:]</span> |
+                    <span class=mono>[:cntrl:]</span> |
+                    <span class=mono>[:digit:]</span> |
+                    <span class=mono>[:graph:]</span> |
+                    <span class=mono>[:lower:]</span> |
+                    <span class=mono>[:print:]</span> |
+                    <span class=mono>[:punct:]</span> |
+                    <span class=mono>[:space:]</span> |
+                    <span class=mono>[:upper:]</span> |
+                    <span class=mono>[:word:]</span> |
+                    <span class=mono>[:w:]</span> |
+                    <span class=mono>[:xdigit:]</span>
+                </td>
+            </tr>
+            <tr>
+                <td class="rule" id="rule.range">range</td>
+                <td class="sep">&rarr;</td>
+                <td class="rcontent">
+                    <span class="rule"><a href="#rule.class-char">class&#8209;char</a></span>
+                    (<span class=mono>&minus;</span> <span class="rule"><a href="#rule.class-char">class&#8209;char</a></span>)?
+                </td>
+            </tr>
+            <tr>
+                <td class="rule" id="rule.class-char">class&#8209;char</td>
+                <td class="sep">&rarr;</td>
+                <td class="rcontent">
+                    [\\\]] |
+                    <span class="rule"><a href="#rule.escape">escape</a></span>
+                </td>
+            </tr>
+            <tr>
+                <td class="rule" id="rule.escape">escape</td>
+                <td class="sep">&rarr;</td>
+                <td class="rcontent">
+                    <span class=mono>\</span>
+                    [xX]<span class="rule"><a href="#rule.hex">hex</a></span> |
+                    <span class="rule"><a href="#rule.octal">octal</a></span> |
+                    [dD]<span class="rule"><a href="#rule.decimal">decimal</a></span> |
+                    [abfnrtv0]
+                </td>
+            </tr>
+            <tr>
+                <td class="rule" id="rule.hex">hex</td>
+                <td class="sep">&rarr;</td>
+                <td class="rcontent">
+                    <span class="rule"><a href="#rule.hex-digit">hex&#8209;digit</a></span>+
+                </td>
+            </tr>
+            <tr>
+                <td class="rule" id="rule.hex-digit">hex&#8209;digit</td>
+                <td class="sep">&rarr;</td>
+                <td class="rcontent">
+                    [0-9a-fA-F]
+                </td>
+            </tr>
+            <tr>
+                <td class="rule" id="rule.octal">octal</td>
+                <td class="sep">&rarr;</td>
+                <td class="rcontent">
+                    <span class="rule"><a href="#rule.octal-digit">octal&#8209;digit</a></span>
+                    <span class="rule"><a href="#rule.octal-digit">octal&#8209;digit</a></span>
+                    <span class="rule"><a href="#rule.octal-digit">octal&#8209;digit</a></span>
+                </td>
+            </tr>
+            <tr>
+                <td class="rule" id="rule.octal-digit">octal&#8209;digit</td>
+                <td class="sep">&rarr;</td>
+                <td class="rcontent">
+                    [0-7]
+                </td>
+            </tr>
+            <tr>
+                <td class="rule" id="rule.decimal">decimal</td>
+                <td class="sep">&rarr;</td>
+                <td class="rcontent">
+                    <span class="rule"><a href="#rule.decimal-digit">decimal&#8209;digit</a></span>+
+                </td>
+            </tr>
+            <tr>
+                <td class="rule" id="rule.decimal-digit">decimal&#8209;digit</td>
+                <td class="sep">&rarr;</td>
+                <td class="rcontent">
+                    [0-9]
+                </td>
+            </tr>
+        </table>
+    </p>
+</body>
+</html>

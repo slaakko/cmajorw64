@@ -1,0 +1,3 @@
+project SocketClient;
+target=program;
+source <socketClient.cm>;

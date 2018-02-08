@@ -18,6 +18,27 @@ void NodeOp::Apply(Node* node)
 {
 }
 
+std::u32string AxisName(Axis axis)
+{
+    switch (axis)
+    {
+        case Axis::child: return U"child";
+        case Axis::descendant: return U"descendant";
+        case Axis::parent: return U"parent";
+        case Axis::ancestor: return U"ancestor";
+        case Axis::followingSibling: return U"followingSibling";
+        case Axis::precedingSibling: return U"precedingSibling";
+        case Axis::following: return U"following";
+        case Axis::preceding: return U"preceding";
+        case Axis::attribute: return U"attribute";
+        case Axis::ns: return U"namespace";
+        case Axis::self: return U"self";
+        case Axis::descendantOrSelf: return U"descendantOrSelf";
+        case Axis::ancestorOrSelf: return U"ancestorOrSelf";
+    }
+    return std::u32string();
+}
+
 Node::Node(NodeType nodeType_, const std::u32string& name_) : nodeType(nodeType_), name(name_), parent(nullptr), previousSibling(nullptr), nextSibling(nullptr), ownerDocument(nullptr)
 {
 }
@@ -95,10 +116,10 @@ void Node::Walk(NodeOp& nodeOp, Axis axis)
     {
         case Axis::child: WalkChildren(nodeOp); break;
         case Axis::descendant: WalkDescendant(nodeOp); break;
-        case Axis::descendant_or_self: WalkDescendantOrSelf(nodeOp); break;
+        case Axis::descendantOrSelf: WalkDescendantOrSelf(nodeOp); break;
         case Axis::parent: WalkParent(nodeOp); break;
         case Axis::ancestor: WalkAncestor(nodeOp); break;
-        case Axis::ancestor_or_self: WalkAncestorOrSelf(nodeOp); break;
+        case Axis::ancestorOrSelf: WalkAncestorOrSelf(nodeOp); break;
         case Axis::followingSibling: WalkFollowingSibling(nodeOp); break;
         case Axis::precedingSibling: WalkPrecedingSibling(nodeOp); break;
         case Axis::following: WalkFollowing(nodeOp); break;

@@ -5,8 +5,8 @@
     <infoDelaySecs>10</infoDelaySecs>
     <formSizeX>1761</formSizeX>
     <formSizeY>948</formSizeY>
-    <formTop>0</formTop>
-    <formLeft>0</formLeft>
+    <formTop>51</formTop>
+    <formLeft>26</formLeft>
     <textVisX>78</textVisX>
     <textVisY>78</textVisY>
     <textVisW>1259</textVisW>
@@ -28,7 +28,11 @@
     <maxRecentProjects>10</maxRecentProjects>
     <recentProjects>
         <recentProject>
-            <path>C:\Users\Seppo\cmajorw64\cmajor\projects\tools\cmparsergen\cmparsergen.cms</path>
+            <path>C:\Users\Seppo\cmajorw64\cmajor\system\System.cms</path>
+            <openFiles />
+        </recentProject>
+        <recentProject>
+            <path>C:/Users/Seppo/cmajorw64/cmajor/doc/code/xml/xpath/xpath.cms</path>
             <openFiles />
         </recentProject>
         <recentProject>
@@ -36,7 +40,15 @@
             <openFiles />
         </recentProject>
         <recentProject>
-            <path>C:\Users\Seppo\cmajorw64\cmajor\system\System.cms</path>
+            <path>C:/Users/Seppo/cmajorw64/cmajor/doc/code/socket/client/socketClient.cms</path>
+            <openFiles />
+        </recentProject>
+        <recentProject>
+            <path>C:\Users\Seppo\cmajorw64\cmajor\test\foo\foo.cms</path>
+            <openFiles />
+        </recentProject>
+        <recentProject>
+            <path>C:\Users\Seppo\cmajorw64\cmajor\test\xpq\xpq.cms</path>
             <openFiles />
         </recentProject>
         <recentProject>
@@ -44,7 +56,7 @@
             <openFiles />
         </recentProject>
         <recentProject>
-            <path>C:\Users\Seppo\cmajorw64\cmajor\test\foo\foo.cms</path>
+            <path>C:\Users\Seppo\cmajorw64\cmajor\projects\tools\cmparsergen\cmparsergen.cms</path>
             <openFiles />
         </recentProject>
         <recentProject>
@@ -53,18 +65,6 @@
         </recentProject>
         <recentProject>
             <path>C:/Users/Seppo/cmajorw64/cmajor/test/deflate/deflate.cms</path>
-            <openFiles />
-        </recentProject>
-        <recentProject>
-            <path>C:\Users\Seppo\cmajorw64\cmajor\test\bigint\bigint.cms</path>
-            <openFiles />
-        </recentProject>
-        <recentProject>
-            <path>C:\Users\Seppo\cmajorw64\cmajor\test\xmlparsing\xmlparsing.cms</path>
-            <openFiles />
-        </recentProject>
-        <recentProject>
-            <path>C:/Users/Seppo/cmajorw64/cmajor/doc/code/threading/transferringExceptions/transferringExceptions.cms</path>
             <openFiles />
         </recentProject>
     </recentProjects>

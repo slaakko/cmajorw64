@@ -1,0 +1,500 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>XML Processing Libraries</title>
+    <link href="../../style/library.css" rel="stylesheet" type="text/css"/>
+</head>
+
+<body>
+    <h1>XML Processing Libraries</h1>
+
+    <h2>System.Xml Library</h2>
+
+    <p>
+        The <a href="System.Xml.html">System.Xml</a> library contains a non-validating <a href="http://www.w3.org/TR/xml/">XML</a> parser and a
+        <a href="http://en.wikipedia.org/wiki/Simple_API_for_XML">SAX</a>-like API to it.
+        The parser accepts full XML 1.0 syntax including a DTD (modulo bugs) but does not process contained DTD in any way.
+        It recognizes only standard XML entities <span class="code">&amp;amp;</span>, <span class="code">&amp;quot;</span>,
+        <span class="code">&amp;apos;</span>, <span class="code">&amp;lt;</span> and <span class="code">&amp;gt;</span>.
+        Other entities are skipped and the content handler receives <span class="code">SkippedEntity()</span> event for each of them.
+    </p>
+
+    <p>
+        An XML file can be parsed by using the <a href="System.Xml.html#function_ParseXmlFile_7ED565F7B87DFEA8BE61A14E6C0BDB5D473022BC">ParseXmlFile()</a> function.
+        As XML file is parsed, the overridden methods of user supplied class derived from the
+        <a href="System.Xml.html#class_XmlContentHandler_7429223FCBE3A541F14FD9475F2099B20E248715">XmlContentHandler</a> class are called.
+        Here's an <a href="../../code/xml/xmlstats/xmlstats.cm.html">example</a> of XML parsing with a content handler.
+        Here's the output of the program:
+        <pre>
+            System.Json.xml contains:
+            16116 elements
+            9455 attributes
+            0 processing instructions
+            0 comments
+            489430 characters
+        </pre>
+    </p>
+
+    <p>
+        A string containing XML can be parsed by calling one of the <a href="System.Xml.html#function_group_ParseXmlContent_A5F5274E3892415DFA80BEA4DB3D023DA61F8F4E">ParseXmlContent</a> overloads.
+        The <em>systemId</em> parameter is used only for error reporting purposes. It can be for example a file name or URL where the XML content was obtained.
+    </p>
+
+    <h2>System.Dom Library</h2>
+
+    <p>
+        The <a href="../System.Dom/System.Dom.html">System.Dom</a> library provides an in-memory representation of an XML or XHTML document.
+        An XML file can be parsed to a <a href="../System.Dom/System.Dom.html#class_DomDocument_975632F3AA8CF3FEC1D51FB0E91F580D6EBA16C8">DOM document</a>
+        by using the <a href="../System.Dom/System.Dom.html#function_ParseXmlFileToDomDocument_CDBEF03097E654DC3609B662FEAF72116D01B7CA">ParseXmlFileToDomDocument</a> function.
+        An existing DOM document can be written to a stream by using the
+        <a href="../System.Dom/System.Dom.html#member_function_Write_DomParentNode_81B62CCF5A83DC3EEA9195BC39D3F1CC22B26A89">Write</a> member function.
+        The <em>Write</em> member function takes a <a href="../System.Base/System.Base.html#class_CodeFormatter_38898A0914E7D27753F0D42E65A18EC272984F99">CodeFormatter</a> that in turn
+        takes a <a href="../System.Base/System.Base.html#class_StreamWriter_40A39F418049D49DB679452BB514CDFE47500311">StreamWriter</a>.
+        The <a href="../System.Base/System.Base.html#member_function_Out_Console_A4BB5FFE2A3FD21817607224D4BC162094365AE1">Console.Out()</a> member function returns a <em>StreamWriter</em> as do the
+        <a href="..//System.Base/System.Base.html#member_function_CreateText_File_2EF9CAB30DD21BABC54A82CCB9FF835510E74DC2">System.IO.File.CreateText</a> function.
+        Here's an <a href="../../code/xml/dom/dom.cm.html">example</a> of parsing an XML file to a DOM document.
+        Here's the output of the program:
+        <pre>
+            &lt;test>
+                &lt;?pi pidata?>
+                &lt;alpha a="1" b="2">
+                    &lt;beta>
+                        &lt;gamma>text1&lt;/gamma>
+                    &lt;/beta>
+                    &lt;beta name="foo">
+                        &lt;gamma>text2&lt;/gamma>
+                        &lt;delta>&lt;!--  comment  -->&lt;/delta>
+                    &lt;/beta>
+                &lt;/alpha>
+                &lt;alpha c="3">&lt;![CDATA[cdata]]>&lt;/alpha>
+            &lt;/test>
+        </pre>
+    </p>
+
+    <h2>System.XPath Library</h2>
+
+    <p>
+        The <a href="../System.XPath/System.XPath.html">System.XPath</a> library contains an implementation of an <a href="http://www.w3.org/TR/1999/REC-xpath-19991116/">XPath 1.0</a> query engine.
+        An XPath query is evaluated against to given <a href="../System.Dom/System.Dom.html#class_DomDocument_975632F3AA8CF3FEC1D51FB0E91F580D6EBA16C8">DOM document</a> or
+        other <a href="../System.Dom/System.Dom.html#class_DomNode_AAD27BD01107131DCBD7D66B91A6A861C7C23509">DOM node</a> by using one of the
+        <a href="../System.XPath/System.XPath.html#function_group_Evaluate_2E85821996EB2DF1CA3BF5575484B1065478D3B0">Evaluate</a> function overloads.
+        The <em>Evaluate</em> function first parses the query expression string and then executes the compiled form of it for the given DOM node.
+        If the parsing and evaluation succeeds, the <em>Evaluate</em> function returns a unique pointer to an abstract
+        <a href="../System.XPath/System.XPath.html#class_XPathObject_91D53F03F45FCACE5D10959D030939A3CBB38F3E">XPathObject</a> that is in fact an instance of one of the following classes:
+        <a href="../System.XPath/System.XPath.html#class_XPathNodeSet_70D9F2F055A2EAFCF3988BC033AE454E204F643A">XPathNodeSet</a>,
+        <a href="../System.XPath/System.XPath.html#class_XPathBoolean_62EBEB870905B1B981080A7A18EBBBD98ADD5C4A">XPathBoolean</a>,
+        <a href="../System.XPath/System.XPath.html#class_XPathString_A53CB226777116E5435EF7B51EABFD704B80F682">XPathString</a>, or
+        <a href="../System.XPath/System.XPath.html#class_XPathNumber_030E4A77BFA393ABC52B71D17310DFB36384486F">XPathNumber</a> that derive from the
+        <a href="../System.XPath/System.XPath.html#class_XPathObject_91D53F03F45FCACE5D10959D030939A3CBB38F3E">XPathObject</a>.
+        Here's an <a href="../../code/xml/xpath/xpath.cm.html">example</a> of evaluation of an XPath query to previous <em>test.xml</em>. The program prints the following node-set result:
+        <pre>
+            &lt;nodeSet length=&quot;2&quot;>
+                &lt;text>text1&lt;text/text>
+                &lt;text>text2&lt;text/text>
+            &lt;/nodeSet>
+        </pre>
+    </p>
+
+    <p>
+        There's also an <a href="../../code/xml/xpq/main.cm.html">XPath Query Debugger</a> application <em>xpq</em>, whose sources are in the Cmajor examples directory. 
+        The <em>xpq</em> program executes an XPath query to a given XML document and prints the query and results in XML.
+    </p>
+
+    <p>
+        The following table contains the recognized XPath query syntax:
+
+        <table class="grammar">
+            <tr>
+                <td class="rule" id="rule.xpath-expr">xpath&#8209;expr</td>
+                <td class="sep">&rarr;</td>
+                <td class="rcontent">
+                    <span class="rule"><a href="#rule.or-expr">or&#8209;expr</a></span>
+                </td>
+            </tr>
+            <tr>
+                <td class="rule" id="rule.or-expr">or&#8209;expr</td>
+                <td class="sep">&rarr;</td>
+                <td class="rcontent">
+                    <span class="rule"><a href="#rule.and-expr">and&#8209;expr</a></span>
+                    (   <span class="kw">or</span>
+                    <span class="rule"><a href="#rule.and-expr">and&#8209;expr</a></span>
+                    )*
+                </td>
+            </tr>
+            <tr>
+                <td class="rule" id="rule.and-expr">and&#8209;expr</td>
+                <td class="sep">&rarr;</td>
+                <td class="rcontent">
+                    <span class="rule"><a href="#rule.equality-expr">equality&#8209;expr</a></span>
+                    (   <span class="kw">and</span>
+                    <span class="rule"><a href="#rule.equality-expr">equality&#8209;expr</a></span>
+                    )*
+                </td>
+            </tr>
+            <tr>
+                <td class="rule" id="rule.equality-expr">equality&#8209;expr</td>
+                <td class="sep">&rarr;</td>
+                <td class="rcontent">
+                    <span class="rule"><a href="#rule.relational-expr">relational&#8209;expr</a></span>
+                    (   <span class=mono>=</span> | <span class=mono>!=</span> )
+                    <span class="rule"><a href="#rule.relational-expr">relational&#8209;expr</a></span>
+                    )*
+                </td>
+            </tr>
+            <tr>
+                <td class="rule" id="rule.relational-expr">relational&#8209;expr</td>
+                <td class="sep">&rarr;</td>
+                <td class="rcontent">
+                    <span class="rule"><a href="#rule.additive-expr">additive&#8209;expr</a></span>
+                    (   ( <span class=mono>>=</span> | <span class=mono>&lt;=</span> | <span class=mono>&lt;</span> | <span class=mono>></span> )
+                    <span class="rule"><a href="#rule.additive-expr">additive&#8209;expr</a></span>
+                    )*
+                </td>
+            </tr>
+            <tr>
+                <td class="rule" id="rule.additive-expr">additive&#8209;expr</td>
+                <td class="sep">&rarr;</td>
+                <td class="rcontent">
+                    <span class="rule"><a href="#rule.multiplicative-expr">multiplicative&#8209;expr</a></span>
+                    (    (<span class="mono">+</span> | <span class="mono">&minus;</span>)
+                    <span class="rule"><a href="#rule.multiplicative-expr">multiplicative&#8209;expr</a></span>
+                    )*
+                </td>
+            </tr>
+            <tr>
+                <td class="rule" id="rule.multiplicative-expr">multiplicative&#8209;expr</td>
+                <td class="sep">&rarr;</td>
+                <td class="rcontent">
+                    <span class="rule"><a href="#rule.unary-expr">unary&#8209;expr</a></span>
+                    (
+                    (<span class="mono">*</span> | <span class="mono">div</span> | <span class="mono">mod</span>)
+                    <span class="rule"><a href="#rule.unary-expr">unary&#8209;expr</a></span>
+                    )*
+                </td>
+            </tr>
+            <tr>
+                <td class="rule" id="rule.unary-expr">unary&#8209;expr</td>
+                <td class="sep">&rarr;</td>
+                <td class="rcontent">
+                    <span class="mono">&minus;</span>
+                    <span class="rule"><a href="#rule.unary-expr">unary&#8209;expr</a></span> |
+                    <span class="rule"><a href="#rule.union-expr">union&#8209;expr</a></span>
+                </td>
+            </tr>
+            <tr>
+                <td class="rule" id="rule.union-expr">union&#8209;expr</td>
+                <td class="sep">&rarr;</td>
+                <td class="rcontent">
+                    <span class="rule"><a href="#rule.path-expr">path&#8209;expr</a></span>
+                    (   <span class="mono">|</span>
+                    <span class="rule"><a href="#rule.path-expr">path&#8209;expr</a></span>
+                    )*
+                </td>
+            </tr>
+            <tr>
+                <td class="rule" id="rule.path-expr">path&#8209;expr</td>
+                <td class="sep">&rarr;</td>
+                <td class="rcontent">
+                    <span class="rule"><a href="#rule.location-path">location&#8209;path</a></span>
+                    <span class="op">&minus;</span>
+                    <span class="rule"><a href="#rule.function-call">function&#8209;call</a></span> |
+                    <span class="rule"><a href="#rule.filter-expr">filter&#8209;expr</a></span>
+                    ((<span class="mono">//</span> | <span class="mono">/</span>)
+                    <span class="rule"><a href="#rule.relative-location-path">relative&#8209;location&#8209;path</a></span>
+                    )?
+                </td>
+            </tr>
+            <tr>
+                <td class="rule" id="rule.filter-expr">filter&#8209;expr</td>
+                <td class="sep">&rarr;</td>
+                <td class="rcontent">
+                    <span class="rule"><a href="#rule.primary-expr">primary&#8209;expr</a></span>
+                    <span class="rule"><a href="#rule.predicate">predicate</a></span>*
+                </td>
+            </tr>
+            <tr>
+                <td class="rule" id="rule.location-path">location&#8209;path</td>
+                <td class="sep">&rarr;</td>
+                <td class="rcontent">
+                    <span class="rule"><a href="#rule.absolute-location-path">absolute&#8209;location&#8209;path</a></span> |
+                    <span class="rule"><a href="#rule.relative-location-path">relative&#8209;location&#8209;path</a></span>
+                </td>
+            </tr>
+            <tr>
+                <td class="rule" id="rule.absolute-location-path">absolute&#8209;location&#8209;path</td>
+                <td class="sep">&rarr;</td>
+                <td class="rcontent">
+                    <span class="rule"><a href="#rule.abbreviated-absolute-location-path">abbreviated&#8209;absolute&#8209;location&#8209;path</a></span> |
+                    <span class="mono">/</span>
+                    <span class="rule"><a href="#rule.relative-location-path">relative&#8209;location&#8209;path</a></span>?
+                </td>
+            </tr>
+            <tr>
+                <td class="rule" id="rule.relative-location-path">relative&#8209;location&#8209;path</td>
+                <td class="sep">&rarr;</td>
+                <td class="rcontent">
+                    <span class="rule"><a href="#rule.step">step</a></span>
+                    ((<span class="mono">//</span> | <span class="mono">/</span>)
+                    <span class="rule"><a href="#rule.step">step</a></span>
+                    )*
+                </td>
+            </tr>
+            <tr>
+                <td class="rule" id="rule.abbreviated-absolute-location-path">abbreviated&#8209;absolute&#8209;location&#8209;path</td>
+                <td class="sep">&rarr;</td>
+                <td class="rcontent">
+                    <span class="mono">//</span>
+                    <span class="rule"><a href="#rule.relative-location-path">relative&#8209;location&#8209;path</a></span>
+                </td>
+            </tr>
+            <tr>
+                <td class="rule" id="rule.step">step</td>
+                <td class="sep">&rarr;</td>
+                <td class="rcontent">
+                    <span class="rule"><a href="#rule.axis-specifier">axis&#8209;specifier</a></span>
+                    <span class="rule"><a href="#rule.node-test">node&#8209;test</a></span>
+                    <span class="rule"><a href="#rule.predicate">predicate</a></span>* |
+                    <span class="rule"><a href="#rule.abbreviated-step">abbreviated&#8209;step</a></span>
+                </td>
+            </tr>
+            <tr>
+                <td class="rule" id="rule.abbreviated-step">abbreviated&#8209;step</td>
+                <td class="sep">&rarr;</td>
+                <td class="rcontent">
+                    <span class="mono">..</span> |
+                    <span class="mono">.</span>
+                </td>
+            </tr>
+            <tr>
+                <td class="rule" id="rule.axis-specifier">axis&#8209;specifier</td>
+                <td class="sep">&rarr;</td>
+                <td class="rcontent">
+                    <span class="rule"><a href="#rule.axis-name">axis&#8209;name</a></span>
+                    <span class="mono">::</span> |
+                    <span class="rule"><a href="#rule.abbreviated-axis-specifier">abbreviated&#8209;axis&#8209;specifier</a></span>
+                </td>
+            </tr>
+            <tr>
+                <td class="rule" id="rule.axis-name">axis&#8209;name</td>
+                <td class="sep">&rarr;</td>
+                <td class="rcontent">
+                    <span class="kw">ancestor</span> |
+                    <span class="kw">ancestors&#8209;ors&#8209;self</span> |
+                    <span class="kw">attribute</span> |
+                    <span class="kw">child</span> |
+                    <span class="kw">descendant</span> |
+                    <span class="kw">descendant&#8209;ors&#8209;self</span> |
+                    <span class="kw">following</span> |
+                    <span class="kw">following&#8209;sibling</span> |
+                    <span class="kw">namespace</span> |
+                    <span class="kw">parent</span> |
+                    <span class="kw">preceding</span> |
+                    <span class="kw">preceding&#8209;sibling</span> |
+                    <span class="kw">self</span>
+                </td>
+            </tr>
+            <tr>
+                <td class="rule" id="rule.abbreviated-axis-specifier">abbreviated&#8209;axis&#8209;specifier</td>
+                <td class="sep">&rarr;</td>
+                <td class="rcontent">
+                    <span class="mono">@</span>?
+                </td>
+            </tr>
+            <tr>
+                <td class="rule" id="rule.predicate">predicate</td>
+                <td class="sep">&rarr;</td>
+                <td class="rcontent">
+                    <span class="mono">[</span>
+                    <span class="rule"><a href="#rule.predicate-expr">predicate&#8209;expr</a></span>
+                    <span class="mono">]</span>
+                </td>
+            </tr>
+            <tr>
+                <td class="rule" id="rule.predicate-expr">predicate&#8209;expr</td>
+                <td class="sep">&rarr;</td>
+                <td class="rcontent">
+                    <span class="rule"><a href="#rule.xpath-expr">xpath&#8209;expr</a></span>
+                </td>
+            </tr>
+            <tr>
+                <td class="rule" id="rule.node-test">node&#8209;test</td>
+                <td class="sep">&rarr;</td>
+                <td class="rcontent">
+                    <span class="kw">processing&#8209;instruction</span>
+                    <span class="mono">(</span>
+                    <span class="rule"><a href="#rule.literal">literal</a></span>
+                    <span class="mono">)</span> |
+                    <span class="rule"><a href="#rule.node-type">node&#8209;type</a></span>
+                    <span class="mono">(</span>
+                    <span class="mono">)</span> |
+                    <span class="rule"><a href="#rule.name-test">name&#8209;test</a></span>
+                </td>
+            </tr>
+            <tr>
+                <td class="rule" id="rule.name-test">name&#8209;test</td>
+                <td class="sep">&rarr;</td>
+                <td class="rcontent">
+                    <span class="mono">*</span> |
+                    <span class="rule"><a href="#rule.nc-name">nc&#8209;name</a></span>
+                    <span class="mono">:</span>
+                    <span class="mono">*</span> |
+                    <span class="rule"><a href="#rule.q-name">q&#8209;name</a></span>
+                </td>
+            </tr>
+            <tr>
+                <td class="rule" id="rule.node-type">node&#8209;type</td>
+                <td class="sep">&rarr;</td>
+                <td class="rcontent">
+                    <span class="kw">comment</span> |
+                    <span class="kw">text</span> |
+                    <span class="kw">processing&#8209;instruction</span> |
+                    <span class="kw">node</span>
+                </td>
+            </tr>
+            <tr>
+                <td class="rule" id="rule.primary-expr">primary&#8209;expr</td>
+                <td class="sep">&rarr;</td>
+                <td class="rcontent">
+                    <span class="rule"><a href="#rule.function-call">function&#8209;call</a></span> |
+                    <span class="rule"><a href="#rule.variable-reference">variable&#8209;reference</a></span> |
+                    <span class="mono">(</span>
+                    <span class="rule"><a href="#rule.xpath-expr">xpath&#8209;expr</a></span>
+                    <span class="mono">)</span> |
+                    <span class="rule"><a href="#rule.literal">literal</a></span> |
+                    <span class="rule"><a href="#rule.number">number</a></span>
+                </td>
+            </tr>
+            <tr>
+                <td class="rule" id="rule.function-call">function&#8209;call</td>
+                <td class="sep">&rarr;</td>
+                <td class="rcontent">
+                    <span class="rule"><a href="#rule.function-name">function&#8209;name</a></span>
+                    <span class="mono">(</span>
+                    (<span class="rule"><a href="#rule.argument">argument</a></span>
+                    (<span class="mono">,</span>
+                    <span class="rule"><a href="#rule.argument">argument</a></span>)*)?
+                    <span class="mono">)</span>
+                </td>
+            </tr>
+            <tr>
+                <td class="rule" id="rule.variable-reference">variable&#8209;reference</td>
+                <td class="sep">&rarr;</td>
+                <td class="rcontent">
+                    <span class="mono">$</span>
+                    <span class="rule"><a href="#rule.q-name">q&#8209;name</a></span>
+                </td>
+            </tr>
+            <tr>
+                <td class="rule" id="rule.literal">literal</td>
+                <td class="sep">&rarr;</td>
+                <td class="rcontent">
+                    <span class="mono">"</span>
+                    [^"]*
+                    <span class="mono">"</span> |
+                    <span class="mono">'</span>
+                    [^']*
+                    <span class="mono">'</span>
+                </td>
+            </tr>
+            <tr>
+                <td class="rule" id="rule.number">number</td>
+                <td class="sep">&rarr;</td>
+                <td class="rcontent">
+                    <span class="rule"><a href="#rule.digits">digits</a></span>
+                    (<span class="mono">.</span>
+                    <span class="rule"><a href="#rule.digits">digits</a>?</span>)? |
+                    <span class="mono">.</span>
+                    <span class="rule"><a href="#rule.digits">digits</a></span>
+                </td>
+            </tr>
+            <tr>
+                <td class="rule" id="rule.digits">digits</td>
+                <td class="sep">&rarr;</td>
+                <td class="rcontent">
+                    [0-9]+
+                </td>
+            </tr>
+            <tr>
+                <td class="rule" id="rule.argument">argument</td>
+                <td class="sep">&rarr;</td>
+                <td class="rcontent">
+                    <span class="rule"><a href="#rule.xpath-expr">xpath&#8209;expr</a></span>
+                </td>
+            </tr>
+            <tr>
+                <td class="rule" id="rule.function-name">function&#8209;name</td>
+                <td class="sep">&rarr;</td>
+                <td class="rcontent">
+                    <span class="rule"><a href="#rule.q-name">q&#8209;name</a></span>
+                    <span class="op">&minus;</span>
+                    <span class="rule"><a href="#rule.node-type">node&#8209;type</a></span>
+                </td>
+            </tr>
+            <tr>
+                <td class="rule" id="rule.q-name">q&#8209;name</td>
+                <td class="sep">&rarr;</td>
+                <td class="rcontent">
+                    <span class="rule"><a href="#rule.prefixed-name">prefixed&#8209;name</a></span> |
+                    <span class="rule"><a href="#rule.unprefixed-name">unprefixed&#8209;name</a></span>
+                </td>
+            </tr>
+            <tr>
+                <td class="rule" id="rule.prefixed-name">prefixed&#8209;name</td>
+                <td class="sep">&rarr;</td>
+                <td class="rcontent">
+                    <span class="rule"><a href="#rule.prefix">prefix</a></span>
+                    <span class="mono">:</span>
+                    <span class="rule"><a href="#rule.local-part">local&#8209;part</a></span>
+                </td>
+            </tr>
+            <tr>
+                <td class="rule" id="rule.unprefixed-name">unprefixed&#8209;name</td>
+                <td class="sep">&rarr;</td>
+                <td class="rcontent">
+                    <span class="rule"><a href="#rule.local-part">local&#8209;part</a></span>
+                </td>
+            </tr>
+            <tr>
+                <td class="rule" id="rule.prefix">prefix</td>
+                <td class="sep">&rarr;</td>
+                <td class="rcontent">
+                    <span class="rule"><a href="#rule.nc-name">nc&#8209;name</a></span>
+                </td>
+            </tr>
+            <tr>
+                <td class="rule" id="rule.local-part">local&#8209;part</td>
+                <td class="sep">&rarr;</td>
+                <td class="rcontent">
+                    <span class="rule"><a href="#rule.nc-name">nc&#8209;name</a></span>
+                </td>
+            </tr>
+            <tr>
+                <td class="rule" id="rule.nc-name">nc&#8209;name</td>
+                <td class="sep">&rarr;</td>
+                <td class="rcontent">
+                    (<span class="rule"><a href="#rule.name-start-char">name&#8209;start&#8209;char</a></span>
+                    <span class="op">&minus;</span> <span class="mono">:</span>)
+                    (<span class="rule"><a href="#rule.name-char">name&#8209;char</a></span>
+                    <span class="op">&minus;</span> <span class="mono">:</span>)*
+                </td>
+            </tr>
+            <tr>
+                <td class="rule" id="rule.name-start-char">name&#8209;start&#8209;char</td>
+                <td class="sep">&rarr;</td>
+                <td class="rcontent">
+                    <a href="http://www.w3.org/TR/xml/#NT-NameStartChar">XML NameStartChar</a>
+                </td>
+            </tr>
+            <tr>
+                <td class="rule" id="rule.name-char">name&#8209;char</td>
+                <td class="sep">&rarr;</td>
+                <td class="rcontent">
+                    <a href="http://www.w3.org/TR/xml/#NT-NameChar">XML NameChar</a>
+                </td>
+            </tr>
+        </table>
+    </p>
+</body>
+</html>

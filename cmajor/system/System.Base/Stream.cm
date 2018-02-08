@@ -49,6 +49,8 @@ namespace System.IO
         public abstract void Write(ulong u);
         public abstract void Write(float f);
         public abstract void Write(double d);
+        public abstract void Write(const Date& date);
+        public abstract void Write(const DateTime& dateTime);
         public abstract void WriteLine();
         public abstract void WriteLine(const char* s);
         public abstract void WriteLine(const wchar* s);
@@ -70,6 +72,8 @@ namespace System.IO
         public abstract void WriteLine(ulong u);
         public abstract void WriteLine(float f);
         public abstract void WriteLine(double d);
+        public abstract void WriteLine(const Date& date);
+        public abstract void WriteLine(const DateTime& dateTime);
     }
 
     public OutputStream& operator<<(OutputStream& s, const char* x)
@@ -171,6 +175,18 @@ namespace System.IO
     public OutputStream& operator<<(OutputStream& s, double x)
     {
         s.Write(x);
+        return s;
+    }
+    
+    public OutputStream& operator<<(OutputStream& s, const Date& date)
+    {
+        s.Write(date);
+        return s;
+    }
+    
+    public OutputStream& operator<<(OutputStream& s, const DateTime& dateTime)
+    {
+        s.Write(dateTime);
         return s;
     }
     

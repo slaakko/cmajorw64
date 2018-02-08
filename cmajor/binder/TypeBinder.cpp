@@ -1130,6 +1130,7 @@ void TypeBinder::Visit(EnumTypeNode& enumTypeNode)
     EnumTypeSymbol* prevEnumType = enumType;
     enumType = enumTypeSymbol;
     enumTypeSymbol->SetSpecifiers(enumTypeNode.GetSpecifiers());
+    enumTypeSymbol->ComputeMangledName();
     TypeSymbol* underlyingType = symbolTable.GetTypeByName(U"int");
     if (enumTypeNode.GetUnderlyingType())
     {

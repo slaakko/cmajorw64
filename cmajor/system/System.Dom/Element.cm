@@ -143,7 +143,7 @@ namespace System.Dom
     
     public class DomElement : DomParentNode
     {
-        public DomElement(const ustring& name_) : base(name_)
+        public explicit DomElement(const ustring& name_) : base(name_)
         {
         }
         public DomElement(const ustring& name_, List<UniquePtr<DomAttr>>&& attrs_, Map<ustring, DomAttr*>&& attrMap_) :
@@ -268,6 +268,12 @@ namespace System.Dom
             }
             return ustring();
         }
+        public void AddAttribute(UniquePtr<DomAttr>&& attr)
+        {
+            DomAttr* attrPtr = attr.Get();
+            attrMap[attr->Name()] = attrPtr;
+            attrs.Add(attr);
+        }
         public void SetAttribute(const ustring& attrName, const ustring& attrValue) 
         {
             RemoveAttribute(attrName);
@@ -322,7 +328,7 @@ namespace System.Dom
             DomNode* child = FirstChild();
             if (child != null)
             {
-                if (child is DomElement*)
+                if ((child is DomElement*) || (child is DomDocument*))
                 {
                     return true;
                 }

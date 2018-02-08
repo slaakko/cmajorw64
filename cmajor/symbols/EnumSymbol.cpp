@@ -162,6 +162,11 @@ Value* EnumTypeSymbol::MakeValue() const
     return underlyingType->MakeValue();
 }
 
+std::u32string EnumTypeSymbol::Id() const
+{
+    return MangledName();
+}
+
 EnumConstantSymbol::EnumConstantSymbol(const Span& span_, const std::u32string& name_) : Symbol(SymbolType::enumConstantSymbol, span_, name_), evaluating(false)
 {
 }

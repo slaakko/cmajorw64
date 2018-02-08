@@ -1,0 +1,36 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>System.IO.Compression Library</title>
+    <link href="../../style/library.css" rel="stylesheet" type="text/css"/>
+</head>
+<body>
+    <h1>System.IO.Compression Library</h1>
+
+    <p>
+        The <a href="System.IO.Compression.html">System.IO.Compression</a> library contains two classes that provide data compression and decompression:
+        the <a href="System.IO.Compression.html#class_DeflateStream_050C0EA929943E375A089D8EAE56F631A87D3306">DeflateStream</a> class and
+        the <a href="System.IO.Compression.html#class_BZip2Stream_82BE6AC7D0A89DAA12AD1CF0B26FFEAD7D90CF11">BZip2Stream</a> class.
+        Both classes derive from the <a href="../System.Base/System.Base.html#class_ByteStream_3B7A2F3379612ADBD7E416487752A1935AA8B96F">ByteStream</a> class.
+    </p>
+
+    <h2>DeflateStream</h2>
+
+    <p>
+        The <a href="System.IO.Compression.html#class_DeflateStream_050C0EA929943E375A089D8EAE56F631A87D3306">DeflateStream</a> class is implemented with the help of the 
+        <a href="http://www.zlib.net/">zlib</a> library. Here's an <a href="../../code/compression/deflate/main.cm.html">example</a> that compresses and decompresses a file 
+        using the deflate stream.
+    </p>
+
+    <h2>BZip2Stream</h2>
+
+    <p>
+        The <a href="System.IO.Compression.html#class_BZip2Stream_82BE6AC7D0A89DAA12AD1CF0B26FFEAD7D90CF11">BZip2Stream</a> class is implemented with the help of the 
+        <a href="http://www.bzip.org/">bzip2</a> library. Here's an <a href="../../code/compression/bzip2/main.cm.html">example</a> that compresses and decompresses a file
+        using the bzip2 stream.
+    </p>
+
+</body>
+</html>

@@ -48,6 +48,7 @@ public:
     void Text(const std::u32string& text);
     void Comment(const std::u32string& text);
     void PI(const std::u32string& target, const std::u32string& data);
+    void CDataSection(const std::u32string& cdata);
     void Version(const std::u32string& version);
     void Standalone(bool standalone);
     void Encoding(const std::u32string& encoding);

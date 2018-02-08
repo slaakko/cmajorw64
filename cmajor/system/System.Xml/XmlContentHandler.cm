@@ -132,6 +132,9 @@ namespace System.Xml
         public virtual void Text(const ustring& text)
         {
         }
+        public virtual void CDataSection(const ustring& cdata)
+        {
+        }
         public virtual void Comment(const ustring& comment)
         {
         }

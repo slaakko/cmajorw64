@@ -11,7 +11,28 @@ namespace System.Dom
 {
     public enum Axis
     {
-        child, descendant, parent, ancestor, followingSibling, precedingSibling, following, preceding, attribute, ns, self, descendant_or_self, ancestor_or_self
+        child, descendant, parent, ancestor, followingSibling, precedingSibling, following, preceding, attribute, ns, self, descendantOrSelf, ancestorOrSelf
+    }
+    
+    public nothrow ustring AxisName(Axis axis)
+    {
+        switch (axis)
+        {
+            case Axis.child : return u"child"; 
+            case Axis.descendant: return u"descendant";
+            case Axis.parent: return u"parent";
+            case Axis.ancestor: return u"ancestor";
+            case Axis.followingSibling: return u"following-sibling";
+            case Axis.precedingSibling: return u"preceding-sibling";
+            case Axis.following: return u"following";
+            case Axis.preceding: return u"preceding";
+            case Axis.attribute: return u"attribute";
+            case Axis.ns: return u"namespace";
+            case Axis.self: return u"self";
+            case Axis.descendantOrSelf: return u"descendant-or-self";
+            case Axis.ancestorOrSelf: return u"ancestor-or-self";
+        }
+        return ustring();
     }
     
     public class DomException : Exception
@@ -32,14 +53,14 @@ namespace System.Dom
     public abstract class DomNode
     {
         public default virtual ~DomNode();
-        public nothrow DomNode(const ustring& name_) : name(name_)
+        public nothrow explicit DomNode(const ustring& name_) : name(name_)
         {
         }
         suppress DomNode(const DomNode&);
         suppress void operator=(const DomNode&);
         suppress DomNode(DomNode&&);
         suppress void operator=(DomNode&&);
-        public abstract UniquePtr<DomNode>  CloneNode(bool deep) const;
+        public abstract UniquePtr<DomNode> CloneNode(bool deep) const;
         public nothrow inline const ustring& Name() const
         {
             return name;
@@ -86,10 +107,10 @@ namespace System.Dom
             {
                 case Axis.child: WalkChildren(nodeOp); break;
                 case Axis.descendant: WalkDescendant(nodeOp); break;
-                case Axis.descendant_or_self: WalkDescendantOrSelf(nodeOp); break;
+                case Axis.descendantOrSelf: WalkDescendantOrSelf(nodeOp); break;
                 case Axis.parent: WalkParent(nodeOp); break;
                 case Axis.ancestor: WalkAncestor(nodeOp); break;
-                case Axis.ancestor_or_self: WalkAncestorOrSelf(nodeOp); break;
+                case Axis.ancestorOrSelf: WalkAncestorOrSelf(nodeOp); break;
                 case Axis.followingSibling: WalkFollowingSibling(nodeOp); break;
                 case Axis.precedingSibling: WalkPrecedingSibling(nodeOp); break;
                 case Axis.following: WalkFollowing(nodeOp); break;
@@ -228,7 +249,7 @@ namespace System.Dom
     
     public abstract class DomParentNode : DomNode
     {
-        public nothrow DomParentNode(const ustring& name_) : base(name_)
+        public nothrow explicit DomParentNode(const ustring& name_) : base(name_)
         {
         }
         public override ~DomParentNode()
@@ -275,6 +296,7 @@ namespace System.Dom
             while (child != null)
             {
                 clone->AppendChild(child->CloneNode(true));
+                child = child->NextSibling();
             }
         }
         public nothrow inline DomNode* FirstChild() const

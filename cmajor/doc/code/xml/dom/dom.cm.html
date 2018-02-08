@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8"/>
+    <title>dom.cm</title>
+    <link rel="stylesheet" type="text/css" href="../../../style/code.css"/>
+</head>
+<body>
+<pre>
+<div class="code">
+<span class="keyword">using</span> <span class="identifier">System</span><span class="other">;</span>
+<span class="keyword">using</span> <span class="identifier">System.Text</span><span class="other">;</span>
+<span class="keyword">using</span> <span class="identifier">System.Dom</span><span class="other">;</span>
+
+<span class="keyword">void</span> <span class="identifier">main</span><span class="other">(</span><span class="other">)</span>
+<span class="other">{</span>
+    <span class="keyword">try</span>
+    <span class="other">{</span>
+        <span class="identifier">UniquePtr</span><span class="other">&lt;</span><span class="identifier">DomDocument</span><span class="other">&gt;</span> <span class="identifier">doc</span> <span class="other">=</span> <span class="identifier">ParseXmlFileToDomDocument</span><span class="other">(</span><span class="string">&quot;test.xml&quot;</span><span class="other">)</span><span class="other">;</span>
+        <span class="identifier">CodeFormatter</span> <span class="identifier">formatter</span><span class="other">(</span><span class="identifier">Console.Out</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span>
+        <span class="identifier">doc</span><span class="other">-</span><span class="other">&gt;</span><span class="identifier">Write</span><span class="other">(</span><span class="identifier">formatter</span><span class="other">)</span><span class="other">;</span>
+    <span class="other">}</span>
+    <span class="keyword">catch</span> <span class="other">(</span><span class="keyword">const</span> <span class="identifier">Exception</span><span class="other">&amp;</span> <span class="identifier">ex</span><span class="other">)</span>
+    <span class="other">{</span>
+        <span class="identifier">Console.Error</span><span class="other">(</span><span class="other">)</span> <span class="other">&lt;</span><span class="other">&lt;</span> <span class="identifier">ex.ToString</span><span class="other">(</span><span class="other">)</span> <span class="other">&lt;</span><span class="other">&lt;</span> <span class="identifier">endl</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>
+    <span class="other">}</span>
+<span class="other">}</span>
+</div
+</pre>
+</body>
+</html>

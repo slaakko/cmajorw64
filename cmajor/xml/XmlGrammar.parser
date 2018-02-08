@@ -88,8 +88,8 @@ namespace cmajor.xml
             ::= "<!--" (((Char - '-') | ('-' (Char - '-')))*){ processor->Comment(std::u32string(matchBegin, matchEnd)); } "-->"
             ;
 
-        PI(XmlProcessor* processor)
-            ::= "<?" PITarget:target ((S (Char* - (Char* "?>" Char*)))?){ processor->PI(target, std::u32string(matchBegin, matchEnd)); } "?>"
+        PI(XmlProcessor* processor, var std::u32string data)
+            ::= "<?" (PITarget:target (S ((Char - "?>")*){ data = std::u32string(matchBegin, matchEnd); })?){ processor->PI(target, data); } "?>"
             ;
 
         PITarget : std::u32string
@@ -97,7 +97,7 @@ namespace cmajor.xml
             ;
 
         CDSect(XmlProcessor* processor)
-            ::= CDStart CData{ processor->Text(CData); } CDEnd
+            ::= CDStart CData{ processor->CDataSection(CData); } CDEnd
             ;
 
         CDStart
@@ -105,7 +105,7 @@ namespace cmajor.xml
             ;
 
         CData : std::u32string
-            ::= (Char* - (Char* "]]>" Char*)){ value = std::u32string(matchBegin, matchEnd); }
+            ::= ((Char - "]]>")*){ value = std::u32string(matchBegin, matchEnd); }
             ;
 
         CDEnd

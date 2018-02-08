@@ -18,7 +18,7 @@ namespace System.Xml
         PubidChar;
         CharData(XmlProcessor* processor);
         Comment(XmlProcessor* processor);
-        PI(XmlProcessor* processor);
+        PI(XmlProcessor* processor, var ustring data);
         PITarget : ustring;
         CDSect(XmlProcessor* processor);
         CDStart;

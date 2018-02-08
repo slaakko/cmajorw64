@@ -11,3 +11,5 @@ reference <../System.Runtime/System.Runtime.cmp>;
 reference <../System.Text.Parsing.CodeDom/System.Text.Parsing.CodeDom.cmp>;
 reference <../System.IO.Compression/System.IO.Compression.cmp>;
 reference <../System.Text.RegularExpressions/System.Text.RegularExpressions.cmp>;
+reference <../System.Base/System.Base.cmp>;
+reference <../System.XPath/System.XPath.cmp>;

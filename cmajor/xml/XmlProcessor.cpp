@@ -59,6 +59,11 @@ void XmlProcessor::PI(const std::u32string& target, const std::u32string& data)
     contentHandler->PI(target, data);
 }
 
+void XmlProcessor::CDataSection(const std::u32string& cdata)
+{
+    contentHandler->CDataSection(cdata);
+}
+
 void XmlProcessor::Version(const std::u32string& version)
 {
     contentHandler->Version(version);

@@ -227,6 +227,13 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "zlibstat", "system\ext\zlib
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libbz2", "system\ext\bzip2-1.0.6\libbz2.vcxproj", "{ABE43DC6-EDC4-410D-9809-F717CF4C7C5A}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xpq", "xpq\xpq.vcxproj", "{A46AB8AA-8E15-493F-AE3A-634E92229915}"
+	ProjectSection(ProjectDependencies) = postProject
+		{11EE390E-F284-4F92-867C-C8A38013C349} = {11EE390E-F284-4F92-867C-C8A38013C349}
+		{32E61B8C-4433-4969-9E41-A53494A53C1B} = {32E61B8C-4433-4969-9E41-A53494A53C1B}
+		{77CCE7D1-FA82-4620-9F20-309E671E0609} = {77CCE7D1-FA82-4620-9F20-309E671E0609}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Itanium = Debug|Itanium
@@ -705,6 +712,22 @@ Global
 		{ABE43DC6-EDC4-410D-9809-F717CF4C7C5A}.ReleaseWithoutAsm|x64.Build.0 = Release|Win32
 		{ABE43DC6-EDC4-410D-9809-F717CF4C7C5A}.ReleaseWithoutAsm|x86.ActiveCfg = Release|Win32
 		{ABE43DC6-EDC4-410D-9809-F717CF4C7C5A}.ReleaseWithoutAsm|x86.Build.0 = Release|Win32
+		{A46AB8AA-8E15-493F-AE3A-634E92229915}.Debug|Itanium.ActiveCfg = Debug|Win32
+		{A46AB8AA-8E15-493F-AE3A-634E92229915}.Debug|x64.ActiveCfg = Debug|x64
+		{A46AB8AA-8E15-493F-AE3A-634E92229915}.Debug|x64.Build.0 = Debug|x64
+		{A46AB8AA-8E15-493F-AE3A-634E92229915}.Debug|x86.ActiveCfg = Debug|Win32
+		{A46AB8AA-8E15-493F-AE3A-634E92229915}.Debug|x86.Build.0 = Debug|Win32
+		{A46AB8AA-8E15-493F-AE3A-634E92229915}.Release|Itanium.ActiveCfg = Release|Win32
+		{A46AB8AA-8E15-493F-AE3A-634E92229915}.Release|x64.ActiveCfg = Release|x64
+		{A46AB8AA-8E15-493F-AE3A-634E92229915}.Release|x64.Build.0 = Release|x64
+		{A46AB8AA-8E15-493F-AE3A-634E92229915}.Release|x86.ActiveCfg = Release|Win32
+		{A46AB8AA-8E15-493F-AE3A-634E92229915}.Release|x86.Build.0 = Release|Win32
+		{A46AB8AA-8E15-493F-AE3A-634E92229915}.ReleaseWithoutAsm|Itanium.ActiveCfg = Release|x64
+		{A46AB8AA-8E15-493F-AE3A-634E92229915}.ReleaseWithoutAsm|Itanium.Build.0 = Release|x64
+		{A46AB8AA-8E15-493F-AE3A-634E92229915}.ReleaseWithoutAsm|x64.ActiveCfg = Release|x64
+		{A46AB8AA-8E15-493F-AE3A-634E92229915}.ReleaseWithoutAsm|x64.Build.0 = Release|x64
+		{A46AB8AA-8E15-493F-AE3A-634E92229915}.ReleaseWithoutAsm|x86.ActiveCfg = Release|Win32
+		{A46AB8AA-8E15-493F-AE3A-634E92229915}.ReleaseWithoutAsm|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

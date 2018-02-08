@@ -16,7 +16,7 @@ public:
     CodeFormatter(std::ostream& stream_) : stream(stream_), indent(0), indentSize(4), atBeginningOfLine(true), line(1), start(false) {}
     int Indent() const { return indent; }
     int IndentSize() const { return indentSize; }
-    int& IndentSize() { return indentSize; }
+    void SetIndentSize(int indentSize_) { indentSize = indentSize_; }
     int CurrentIndent() const { return indentSize * indent; }
     void Write(const std::string& text);
     void WriteLine(const std::string& text);

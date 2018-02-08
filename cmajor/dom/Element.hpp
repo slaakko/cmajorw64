@@ -41,6 +41,7 @@ public:
     bool HasAttributes() const override;
     void Write(CodeFormatter& formatter) override;
     std::u32string GetAttribute(const std::u32string& attrName) const;
+    void AddAttribute(std::unique_ptr<Attr>&& attr);
     void SetAttribute(const std::u32string& attrName, const std::u32string& attrValue);
     void RemoveAttribute(const std::u32string& attrName);
     void WalkAttribute(NodeOp& nodeOp) override;

@@ -1622,6 +1622,10 @@ void GenerateLibraryXml(SymbolTable& symbolTable, std::map<std::u32string, Symbo
     for (auto& p : byNs)
     {
         const std::u32string& nsName = p.first;
+        if (nsName.empty())
+        {
+            continue;
+        }
         SymbolCollector& collector = p.second;
         if (collector.IsEmpty())
         {
@@ -3259,18 +3263,19 @@ void GenerateClassHtml(cmajor::dom::Element* classElement, Document* libraryXmlD
     std::unique_ptr<Element> classHeadingElement(new Element(U"h" + ToUtf32(std::to_string(level))));
     classHeadingElement->SetAttribute(U"id", classElement->GetAttribute(U"id"));
     classHeadingElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(className + U" Class")));
-    bodyElement->AppendChild(std::move(std::move(classHeadingElement)));
-    std::u32string fullClassName = FullClassName(classElement);
+    bodyElement->AppendChild(std::move(classHeadingElement));
     if (docXml)
     {
-        Element* classDescriptionElement = docXml->GetElementById(fullClassName);
+        Element* classDescriptionElement = docXml->GetElementById(classElement->GetAttribute(U"id"));
         if (classDescriptionElement)
         {
-            classDescriptionElement->CloneChildrenTo(bodyElement);
+            std::unique_ptr<Element> descriptionParagraphElement(new Element(U"p"));
+            classDescriptionElement->CloneChildrenTo(descriptionParagraphElement.get());
+            bodyElement->AppendChild(std::move(descriptionParagraphElement));
         }
     }
     AppendSyntax(classElement, bodyElement, level + 1);
-    GenerateTemplateParameterHtml(classElement, bodyElement, level + 1, docXml, fullClassName, U"Template Parameters");
+    GenerateTemplateParameterHtml(classElement, bodyElement, level + 1, docXml, classElement->GetAttribute(U"id"), U"Template Parameters");
     cmajor::dom::Element* baseClassElement = GetBaseClassElement(classElement);
     if (baseClassElement)
     {
@@ -3311,7 +3316,9 @@ void GenerateTypedefHtml(cmajor::dom::Element* typedefElement, Document* library
         Element* descriptionElement = docXml->GetElementById(typedefId);
         if (descriptionElement)
         {
-            descriptionElement->CloneChildrenTo(bodyElement);
+            std::unique_ptr<Element> descriptionParagraphElement(new Element(U"p"));
+            descriptionElement->CloneChildrenTo(descriptionParagraphElement.get());
+            bodyElement->AppendChild(std::move(descriptionParagraphElement));
         }
     }
     AppendSyntax(typedefElement, bodyElement, level + 1);
@@ -3344,7 +3351,9 @@ void GenerateConceptHtml(cmajor::dom::Element* conceptElement, Document* library
         Element* descriptionElement = docXml->GetElementById(conceptId);
         if (descriptionElement)
         {
-            descriptionElement->CloneChildrenTo(bodyElement);
+            std::unique_ptr<Element> descriptionParagraphElement(new Element(U"p"));
+            descriptionElement->CloneChildrenTo(descriptionParagraphElement.get());
+            bodyElement->AppendChild(std::move(descriptionParagraphElement));
         }
     }
     AppendSyntax(conceptElement, bodyElement, level + 1);
@@ -3427,7 +3436,9 @@ void GenerateDelegateHtml(cmajor::dom::Element* delegateElement, Document* libra
         Element* descriptionElement = docXml->GetElementById(delegateId);
         if (descriptionElement)
         {
-            descriptionElement->CloneChildrenTo(bodyElement);
+            std::unique_ptr<Element> descriptionParagraphElement(new Element(U"p"));
+            descriptionElement->CloneChildrenTo(descriptionParagraphElement.get());
+            bodyElement->AppendChild(std::move(descriptionParagraphElement));
         }
     }
     AppendSyntax(delegateElement, bodyElement, level + 1);
@@ -3481,7 +3492,9 @@ void GenerateClassDelegateHtml(cmajor::dom::Element* classDelegateElement, Docum
         Element* descriptionElement = docXml->GetElementById(classDelegateId);
         if (descriptionElement)
         {
-            descriptionElement->CloneChildrenTo(bodyElement);
+            std::unique_ptr<Element> descriptionParagraphElement(new Element(U"p"));
+            descriptionElement->CloneChildrenTo(descriptionParagraphElement.get());
+            bodyElement->AppendChild(std::move(descriptionParagraphElement));
         }
     }
     AppendSyntax(classDelegateElement, bodyElement, level + 1);
@@ -3535,7 +3548,9 @@ void GenerateConstantHtml(cmajor::dom::Element* constantElement, Document* libra
         Element* descriptionElement = docXml->GetElementById(constantId);
         if (descriptionElement)
         {
-            descriptionElement->CloneChildrenTo(bodyElement);
+            std::unique_ptr<Element> descriptionParagraphElement(new Element(U"p"));
+            descriptionElement->CloneChildrenTo(descriptionParagraphElement.get());
+            bodyElement->AppendChild(std::move(descriptionParagraphElement));
         }
     }
     AppendSyntax(constantElement, bodyElement, level + 1);
@@ -3575,7 +3590,9 @@ void GenerateEnumerationHtml(cmajor::dom::Element* enumerationElement, Document*
         Element* descriptionElement = docXml->GetElementById(enumId);
         if (descriptionElement)
         {
-            descriptionElement->CloneChildrenTo(bodyElement);
+            std::unique_ptr<Element> descriptionParagraphElement(new Element(U"p"));
+            descriptionElement->CloneChildrenTo(descriptionParagraphElement.get());
+            bodyElement->AppendChild(std::move(descriptionParagraphElement));
         }
     }
     AppendSyntax(enumerationElement, bodyElement, level + 1);
@@ -3628,7 +3645,9 @@ void GenerateMemberVariableHtml(cmajor::dom::Element* memberVariableElement, Doc
         Element* descriptionElement = docXml->GetElementById(memberVarId);
         if (descriptionElement)
         {
-            descriptionElement->CloneChildrenTo(bodyElement);
+            std::unique_ptr<Element> descriptionParagraphElement(new Element(U"p"));
+            descriptionElement->CloneChildrenTo(descriptionParagraphElement.get());
+            bodyElement->AppendChild(std::move(descriptionParagraphElement));
         }
     }
     AppendSyntax(memberVariableElement, bodyElement, level + 1);
@@ -3655,6 +3674,16 @@ void GenerateFunctionHtml(cmajor::dom::Element* functionElement, Document* libra
     functionHeadingElement->SetAttribute(U"id", functionId);
     functionHeadingElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(functionName + U" " + functionKind)));
     bodyElement->AppendChild(std::move(std::move(functionHeadingElement)));
+    if (docXml)
+    {
+        Element* descriptionElement = docXml->GetElementById(functionId);
+        if (descriptionElement)
+        {
+            std::unique_ptr<Element> descriptionParagraphElement(new Element(U"p"));
+            descriptionElement->CloneChildrenTo(descriptionParagraphElement.get());
+            bodyElement->AppendChild(std::move(descriptionParagraphElement));
+        }
+    }
     AppendSyntax(functionElement, bodyElement, level + 1);
     GenerateTemplateParameterHtml(functionElement, bodyElement, level + 1, docXml, functionId, U"Template Parameters");
     cmajor::dom::Element* constraintElement = GetConstraintElement(functionElement);

@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8"/>
+    <title>main.cm</title>
+    <link rel="stylesheet" type="text/css" href="../../../style/code.css"/>
+</head>
+<body>
+<pre>
+<div class="code">
+<span class="keyword">using</span> <span class="identifier">System</span><span class="other">;</span>
+<span class="keyword">using</span> <span class="identifier">System.IO</span><span class="other">;</span>
+<span class="keyword">using</span> <span class="identifier">System.Text</span><span class="other">;</span>
+<span class="keyword">using</span> <span class="identifier">System.Dom</span><span class="other">;</span>
+<span class="keyword">using</span> <span class="identifier">System.XPath</span><span class="other">;</span>
+
+<span class="keyword">public</span> <span class="identifier">string</span> <span class="identifier">Version</span><span class="other">(</span><span class="other">)</span>
+<span class="other">{</span>
+    <span class="keyword">return</span> <span class="string">&quot;2.0.0&quot;</span><span class="other">;</span>
+<span class="other">}</span>
+
+<span class="keyword">void</span> <span class="identifier">PrintHelp</span><span class="other">(</span><span class="other">)</span>
+<span class="other">{</span>
+    <span class="identifier">Console.WriteLine</span><span class="other">(</span><span class="string">&quot;XPath Query Debugger version &quot;</span> <span class="other">+</span> <span class="identifier">Version</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span>
+    <span class="identifier">Console.WriteLine</span><span class="other">(</span><span class="string">&quot;Usage: xpq [options] \&quot;&lt;XPath query&gt;\&quot; &lt;xmlFileName&gt;&quot;</span><span class="other">)</span><span class="other">;</span>
+    <span class="identifier">Console.WriteLine</span><span class="other">(</span><span class="string">&quot;Compiles given XPath query, executes it on given &lt;xmlFileName&gt; and prints the query and results as XML.&quot;</span><span class="other">)</span><span class="other">;</span>
+    <span class="identifier">Console.WriteLine</span><span class="other">(</span><span class="string">&quot;Options:&quot;</span><span class="other">)</span><span class="other">;</span>
+    <span class="identifier">Console.WriteLine</span><span class="other">(</span><span class="string">&quot;--help | -h&quot;</span><span class="other">)</span><span class="other">;</span>
+    <span class="identifier">Console.WriteLine</span><span class="other">(</span><span class="string">&quot;     Print this help.&quot;</span><span class="other">)</span><span class="other">;</span>
+    <span class="identifier">Console.WriteLine</span><span class="other">(</span><span class="string">&quot;--verbose | -v&quot;</span><span class="other">)</span><span class="other">;</span>
+    <span class="identifier">Console.WriteLine</span><span class="other">(</span><span class="string">&quot;     Be verbose.&quot;</span><span class="other">)</span><span class="other">;</span>
+    <span class="identifier">Console.WriteLine</span><span class="other">(</span><span class="string">&quot;--debug-parsing | -p&quot;</span><span class="other">)</span><span class="other">;</span>
+    <span class="identifier">Console.WriteLine</span><span class="other">(</span><span class="string">&quot;     Print parsing query expression to stdout.&quot;</span><span class="other">)</span><span class="other">;</span>
+<span class="other">}</span>
+
+<span class="keyword">void</span> <span class="identifier">Execute</span><span class="other">(</span><span class="keyword">const</span> <span class="identifier">string</span><span class="other">&amp;</span> <span class="identifier">xpathQuery</span><span class="other">,</span> <span class="keyword">const</span> <span class="identifier">string</span><span class="other">&amp;</span> <span class="identifier">xmlFilePath</span><span class="other">,</span> <span class="identifier">Duration</span><span class="other">&amp;</span> <span class="identifier">parsingDuration</span><span class="other">,</span> <span class="keyword">bool</span> <span class="identifier">verbose</span><span class="other">)</span>
+<span class="other">{</span>
+    <span class="keyword">if</span> <span class="other">(</span><span class="identifier">verbose</span><span class="other">)</span>
+    <span class="other">{</span>
+        <span class="identifier">Console.WriteLine</span><span class="other">(</span><span class="string">&quot;&gt; &quot;</span> <span class="other">+</span> <span class="identifier">xmlFilePath</span><span class="other">)</span><span class="other">;</span>
+    <span class="other">}</span>
+    <span class="identifier">TimePoint</span> <span class="identifier">startParsing</span> <span class="other">=</span> <span class="identifier">Now</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>
+    <span class="identifier">UniquePtr</span><span class="other">&lt;</span><span class="identifier">DomDocument</span><span class="other">&gt;</span> <span class="identifier">document</span> <span class="other">=</span> <span class="identifier">ParseXmlFileToDomDocument</span><span class="other">(</span><span class="identifier">xmlFilePath</span><span class="other">)</span><span class="other">;</span>
+    <span class="identifier">TimePoint</span> <span class="identifier">endParsing</span> <span class="other">=</span> <span class="identifier">Now</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>
+    <span class="identifier">parsingDuration</span> <span class="other">=</span> <span class="identifier">endParsing</span> <span class="other">-</span> <span class="identifier">startParsing</span><span class="other">;</span>
+    <span class="keyword">if</span> <span class="other">(</span><span class="identifier">verbose</span><span class="other">)</span>
+    <span class="other">{</span>
+        <span class="identifier">Console.WriteLine</span><span class="other">(</span><span class="string">&quot;&gt; &quot;</span> <span class="other">+</span> <span class="identifier">xpathQuery</span><span class="other">)</span><span class="other">;</span>
+    <span class="other">}</span>
+    <span class="identifier">UniquePtr</span><span class="other">&lt;</span><span class="identifier">XPathObject</span><span class="other">&gt;</span> <span class="identifier">evaluationResult</span> <span class="other">=</span> <span class="identifier">Evaluate</span><span class="other">(</span><span class="identifier">ToUtf32</span><span class="other">(</span><span class="identifier">xpathQuery</span><span class="other">)</span><span class="other">,</span> <span class="identifier">document.Get</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span>
+    <span class="identifier">UniquePtr</span><span class="other">&lt;</span><span class="identifier">DomNode</span><span class="other">&gt;</span> <span class="identifier">evaluationDom</span><span class="other">;</span>
+    <span class="keyword">if</span> <span class="other">(</span><span class="other">!</span><span class="identifier">evaluationResult.IsNull</span><span class="other">(</span><span class="other">)</span><span class="other">)</span>
+    <span class="other">{</span>
+        <span class="identifier">evaluationDom</span> <span class="other">=</span> <span class="identifier">evaluationResult</span><span class="other">-</span><span class="other">&gt;</span><span class="identifier">ToDom</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>
+    <span class="other">}</span>    
+    <span class="identifier">UniquePtr</span><span class="other">&lt;</span><span class="identifier">DomDocument</span><span class="other">&gt;</span> <span class="identifier">result</span><span class="other">(</span><span class="keyword">new</span> <span class="identifier">DomDocument</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span>
+    <span class="identifier">result</span><span class="other">-</span><span class="other">&gt;</span><span class="identifier">AppendChild</span><span class="other">(</span><span class="identifier">UniquePtr</span><span class="other">&lt;</span><span class="identifier">DomNode</span><span class="other">&gt;</span><span class="other">(</span><span class="keyword">new</span> <span class="identifier">DomElement</span><span class="other">(</span><span class="identifier">u</span><span class="string">&quot;xpath&quot;</span><span class="other">)</span><span class="other">)</span><span class="other">)</span><span class="other">;</span>
+    <span class="identifier">DomElement</span><span class="other">*</span> <span class="identifier">queryElement</span> <span class="other">=</span> <span class="keyword">new</span> <span class="identifier">DomElement</span><span class="other">(</span><span class="identifier">u</span><span class="string">&quot;query&quot;</span><span class="other">)</span><span class="other">;</span>
+    <span class="identifier">result</span><span class="other">-</span><span class="other">&gt;</span><span class="identifier">DocumentElement</span><span class="other">(</span><span class="other">)</span><span class="other">-</span><span class="other">&gt;</span><span class="identifier">AppendChild</span><span class="other">(</span><span class="identifier">UniquePtr</span><span class="other">&lt;</span><span class="identifier">DomNode</span><span class="other">&gt;</span><span class="other">(</span><span class="identifier">queryElement</span><span class="other">)</span><span class="other">)</span><span class="other">;</span>
+    <span class="identifier">UniquePtr</span><span class="other">&lt;</span><span class="identifier">DomNode</span><span class="other">&gt;</span> <span class="identifier">queryNode</span> <span class="other">=</span> <span class="identifier">XPathDebug.Instance</span><span class="other">(</span><span class="other">)</span><span class="other">.</span><span class="identifier">GetQueryDom</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>
+    <span class="keyword">if</span> <span class="other">(</span><span class="other">!</span><span class="identifier">queryNode.IsNull</span><span class="other">(</span><span class="other">)</span><span class="other">)</span>
+    <span class="other">{</span>
+        <span class="identifier">queryElement</span><span class="other">-</span><span class="other">&gt;</span><span class="identifier">AppendChild</span><span class="other">(</span><span class="identifier">Rvalue</span><span class="other">(</span><span class="identifier">queryNode</span><span class="other">)</span><span class="other">)</span><span class="other">;</span>
+    <span class="other">}</span>
+    <span class="identifier">DomElement</span><span class="other">*</span> <span class="identifier">resultElement</span> <span class="other">=</span> <span class="keyword">new</span> <span class="identifier">DomElement</span><span class="other">(</span><span class="identifier">u</span><span class="string">&quot;result&quot;</span><span class="other">)</span><span class="other">;</span>
+    <span class="identifier">result</span><span class="other">-</span><span class="other">&gt;</span><span class="identifier">DocumentElement</span><span class="other">(</span><span class="other">)</span><span class="other">-</span><span class="other">&gt;</span><span class="identifier">AppendChild</span><span class="other">(</span><span class="identifier">UniquePtr</span><span class="other">&lt;</span><span class="identifier">DomNode</span><span class="other">&gt;</span><span class="other">(</span><span class="identifier">resultElement</span><span class="other">)</span><span class="other">)</span><span class="other">;</span>
+    <span class="keyword">if</span> <span class="other">(</span><span class="other">!</span><span class="identifier">evaluationDom.IsNull</span><span class="other">(</span><span class="other">)</span><span class="other">)</span>
+    <span class="other">{</span>
+        <span class="identifier">resultElement</span><span class="other">-</span><span class="other">&gt;</span><span class="identifier">AppendChild</span><span class="other">(</span><span class="identifier">Rvalue</span><span class="other">(</span><span class="identifier">evaluationDom</span><span class="other">)</span><span class="other">)</span><span class="other">;</span>
+    <span class="other">}</span>
+    <span class="identifier">CodeFormatter</span> <span class="identifier">formatter</span><span class="other">(</span><span class="identifier">Console.Out</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span>
+    <span class="identifier">formatter.SetIndentSize</span><span class="other">(</span><span class="number">2</span><span class="other">)</span><span class="other">;</span>
+    <span class="identifier">result</span><span class="other">-</span><span class="other">&gt;</span><span class="identifier">Write</span><span class="other">(</span><span class="identifier">formatter</span><span class="other">)</span><span class="other">;</span>
+<span class="other">}</span>
+
+<span class="keyword">int</span> <span class="identifier">main</span><span class="other">(</span><span class="keyword">int</span> <span class="identifier">argc</span><span class="other">,</span> <span class="keyword">const</span> <span class="keyword">char</span><span class="other">*</span><span class="other">*</span> <span class="identifier">argv</span><span class="other">)</span>
+<span class="other">{</span>
+    <span class="keyword">try</span>
+    <span class="other">{</span>
+        <span class="identifier">TimePoint</span> <span class="identifier">start</span> <span class="other">=</span> <span class="identifier">Now</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>
+        <span class="keyword">bool</span> <span class="identifier">first</span> <span class="other">=</span> <span class="keyword">true</span><span class="other">;</span>
+        <span class="keyword">bool</span> <span class="identifier">verbose</span> <span class="other">=</span> <span class="keyword">false</span><span class="other">;</span>
+        <span class="identifier">string</span> <span class="identifier">query</span><span class="other">;</span>
+        <span class="identifier">string</span> <span class="identifier">xmlFilePath</span><span class="other">;</span>
+        <span class="identifier">XPathDebug.Instance</span><span class="other">(</span><span class="other">)</span><span class="other">.</span><span class="identifier">SetDebugQuery</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>
+        <span class="keyword">for</span> <span class="other">(</span><span class="keyword">int</span> <span class="identifier">i</span> <span class="other">=</span> <span class="number">1</span><span class="other">;</span> <span class="identifier">i</span> <span class="other">&lt;</span> <span class="identifier">argc</span><span class="other">;</span> <span class="other">+</span><span class="other">+</span><span class="identifier">i</span><span class="other">)</span>
+        <span class="other">{</span>
+            <span class="identifier">string</span> <span class="identifier">arg</span> <span class="other">=</span> <span class="identifier">argv</span><span class="other">[</span><span class="identifier">i</span><span class="other">]</span><span class="other">;</span>
+            <span class="keyword">if</span> <span class="other">(</span><span class="identifier">arg.StartsWith</span><span class="other">(</span><span class="string">&quot;-&quot;</span><span class="other">)</span><span class="other">)</span>
+            <span class="other">{</span>
+                <span class="keyword">if</span> <span class="other">(</span><span class="identifier">arg</span> <span class="other">=</span><span class="other">=</span> <span class="string">&quot;--help&quot;</span> <span class="other">|</span><span class="other">|</span> <span class="identifier">arg</span> <span class="other">=</span><span class="other">=</span> <span class="string">&quot;-h&quot;</span><span class="other">)</span>
+                <span class="other">{</span>
+                    <span class="identifier">PrintHelp</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>
+                    <span class="keyword">return</span> <span class="number">0</span><span class="other">;</span>
+                <span class="other">}</span>
+                <span class="keyword">else</span> <span class="keyword">if</span> <span class="other">(</span><span class="identifier">arg</span> <span class="other">=</span><span class="other">=</span> <span class="string">&quot;--verbose&quot;</span> <span class="other">|</span><span class="other">|</span> <span class="identifier">arg</span> <span class="other">=</span><span class="other">=</span> <span class="string">&quot;-v&quot;</span><span class="other">)</span>
+                <span class="other">{</span>
+                    <span class="identifier">verbose</span> <span class="other">=</span> <span class="keyword">true</span><span class="other">;</span>
+                <span class="other">}</span>
+                <span class="keyword">else</span> <span class="keyword">if</span> <span class="other">(</span><span class="identifier">arg</span> <span class="other">=</span><span class="other">=</span> <span class="string">&quot;--debug-parsing&quot;</span> <span class="other">|</span><span class="other">|</span> <span class="identifier">arg</span> <span class="other">=</span><span class="other">=</span> <span class="string">&quot;-p&quot;</span><span class="other">)</span>
+                <span class="other">{</span>
+                    <span class="identifier">XPathDebug.Instance</span><span class="other">(</span><span class="other">)</span><span class="other">.</span><span class="identifier">SetDebugParsing</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>
+                <span class="other">}</span>
+                <span class="keyword">else</span> 
+                <span class="other">{</span>
+                    <span class="keyword">throw</span> <span class="identifier">Exception</span><span class="other">(</span><span class="string">&quot;unknown option &apos;&quot;</span> <span class="other">+</span> <span class="identifier">arg</span> <span class="other">+</span> <span class="string">&quot;&apos;&quot;</span><span class="other">)</span><span class="other">;</span>
+                <span class="other">}</span>
+            <span class="other">}</span>
+            <span class="keyword">else</span>
+            <span class="other">{</span>
+                <span class="keyword">if</span> <span class="other">(</span><span class="identifier">first</span><span class="other">)</span>
+                <span class="other">{</span>
+                    <span class="identifier">first</span> <span class="other">=</span> <span class="keyword">false</span><span class="other">;</span>
+                    <span class="identifier">query</span> <span class="other">=</span> <span class="identifier">arg</span><span class="other">;</span>
+                <span class="other">}</span>
+                <span class="keyword">else</span> <span class="keyword">if</span> <span class="other">(</span><span class="identifier">xmlFilePath.IsEmpty</span><span class="other">(</span><span class="other">)</span><span class="other">)</span>
+                <span class="other">{</span>
+                    <span class="identifier">xmlFilePath</span> <span class="other">=</span> <span class="identifier">GetFullPath</span><span class="other">(</span><span class="identifier">arg</span><span class="other">)</span><span class="other">;</span>
+                <span class="other">}</span>
+                <span class="keyword">else</span>
+                <span class="other">{</span>
+                    <span class="identifier">PrintHelp</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>
+                    <span class="keyword">return</span> <span class="number">1</span><span class="other">;</span>
+                <span class="other">}</span>
+            <span class="other">}</span>
+        <span class="other">}</span>
+        <span class="keyword">if</span> <span class="other">(</span><span class="identifier">query.IsEmpty</span><span class="other">(</span><span class="other">)</span><span class="other">)</span>
+        <span class="other">{</span>
+            <span class="keyword">throw</span> <span class="identifier">Exception</span><span class="other">(</span><span class="string">&quot;no query specified&quot;</span><span class="other">)</span><span class="other">;</span>
+        <span class="other">}</span>
+        <span class="keyword">if</span> <span class="other">(</span><span class="identifier">xmlFilePath.IsEmpty</span><span class="other">(</span><span class="other">)</span><span class="other">)</span>
+        <span class="other">{</span>
+            <span class="keyword">throw</span> <span class="identifier">Exception</span><span class="other">(</span><span class="string">&quot;no xml file specified&quot;</span><span class="other">)</span><span class="other">;</span>
+        <span class="other">}</span>
+        <span class="identifier">Duration</span> <span class="identifier">parsingDuration</span><span class="other">;</span>
+        <span class="identifier">Execute</span><span class="other">(</span><span class="identifier">query</span><span class="other">,</span> <span class="identifier">xmlFilePath</span><span class="other">,</span> <span class="identifier">parsingDuration</span><span class="other">,</span> <span class="identifier">verbose</span><span class="other">)</span><span class="other">;</span>
+        <span class="identifier">TimePoint</span> <span class="identifier">end</span> <span class="other">=</span> <span class="identifier">Now</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>
+        <span class="identifier">Duration</span> <span class="identifier">duration</span> <span class="other">=</span> <span class="identifier">end</span> <span class="other">-</span> <span class="identifier">start</span><span class="other">;</span>
+        <span class="identifier">Console.WriteLine</span><span class="other">(</span><span class="string">&quot;parsing XML took &quot;</span> <span class="other">+</span> <span class="identifier">ToString</span><span class="other">(</span><span class="identifier">parsingDuration.Milliseconds</span><span class="other">(</span><span class="other">)</span><span class="other">)</span> <span class="other">+</span> <span class="string">&quot; ms&quot;</span><span class="other">)</span><span class="other">;</span>
+        <span class="identifier">Console.WriteLine</span><span class="other">(</span><span class="string">&quot;parsing XPath query took &quot;</span> <span class="other">+</span> <span class="identifier">ToString</span><span class="other">(</span><span class="identifier">XPathDebug.Instance</span><span class="other">(</span><span class="other">)</span><span class="other">.</span><span class="identifier">GetQueryDuration</span><span class="other">(</span><span class="other">)</span><span class="other">.</span><span class="identifier">Milliseconds</span><span class="other">(</span><span class="other">)</span><span class="other">)</span> <span class="other">+</span> <span class="string">&quot; ms&quot;</span><span class="other">)</span><span class="other">;</span>
+        <span class="identifier">Console.WriteLine</span><span class="other">(</span><span class="string">&quot;evaluating XPath query took &quot;</span> <span class="other">+</span> <span class="identifier">ToString</span><span class="other">(</span><span class="identifier">XPathDebug.Instance</span><span class="other">(</span><span class="other">)</span><span class="other">.</span><span class="identifier">GetExecutionDuration</span><span class="other">(</span><span class="other">)</span><span class="other">.</span><span class="identifier">Milliseconds</span><span class="other">(</span><span class="other">)</span><span class="other">)</span> <span class="other">+</span> <span class="string">&quot; ms&quot;</span><span class="other">)</span><span class="other">;</span>
+        <span class="identifier">Console.WriteLine</span><span class="other">(</span><span class="string">&quot;total duration: &quot;</span> <span class="other">+</span> <span class="identifier">ToString</span><span class="other">(</span><span class="identifier">duration.Milliseconds</span><span class="other">(</span><span class="other">)</span><span class="other">)</span> <span class="other">+</span> <span class="string">&quot; ms&quot;</span><span class="other">)</span><span class="other">;</span>
+    <span class="other">}</span>
+    <span class="keyword">catch</span> <span class="other">(</span><span class="keyword">const</span> <span class="identifier">Exception</span><span class="other">&amp;</span> <span class="identifier">ex</span><span class="other">)</span>
+    <span class="other">{</span>
+        <span class="identifier">Console.Error</span><span class="other">(</span><span class="other">)</span> <span class="other">&lt;</span><span class="other">&lt;</span> <span class="identifier">ex.ToString</span><span class="other">(</span><span class="other">)</span> <span class="other">&lt;</span><span class="other">&lt;</span> <span class="identifier">endl</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>
+        <span class="keyword">return</span> <span class="number">1</span><span class="other">;</span>
+    <span class="other">}</span>
+    <span class="keyword">return</span> <span class="number">0</span><span class="other">;</span>
+<span class="other">}</span>
+</div
+</pre>
+</body>
+</html>

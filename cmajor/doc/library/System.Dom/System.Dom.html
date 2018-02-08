@@ -119,6 +119,11 @@
             </tr>
             <tr>
                 <td>
+                    <a href="#function_AxisName_D89A234F6060B307C3C9DADFF0CBDE9BF2CA2312">AxisName(Axis axis)</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
                     <a href="#function_MakeXmlAttrValue_EF82DEEB8B524A7E6BE0F669B376D42D9ED4A48A">MakeXmlAttrValue(const String&lt;uchar>&amp; attrValue)</a>
                 </td>
             </tr>
@@ -147,7 +152,7 @@
         <table>
             <tr>
                 <td>
-                    <a href="#5457844">Axis</a>
+                    <a href="#enumerated_type_Axis_8D4FE5B83262A122798FD80A5636BA4533BD15EB">Axis</a>
                 </td>
             </tr>
         </table>
@@ -508,7 +513,7 @@
             </tr>
             <tr>
                 <td>
-                    <a href="#constructor_DomCDataSection_6BE746C72CF86C6EF8807AF4A6713D1D89F658BE">DomCDataSection(const String&lt;uchar>&amp; data_)</a>
+                    <a href="#constructor_DomCDataSection_21A8F4462D9EA214BEDDD2AC7C0AD09A1CC34403">DomCDataSection(const String&lt;uchar>&amp; data_)</a>
                 </td>
             </tr>
         </table>
@@ -543,12 +548,12 @@
         </table>
         <br/>
         <hr/>
-        <h4 id="constructor_DomCDataSection_6BE746C72CF86C6EF8807AF4A6713D1D89F658BE">DomCDataSection(const String&lt;uchar>&amp; data_) Constructor</h4>
+        <h4 id="constructor_DomCDataSection_21A8F4462D9EA214BEDDD2AC7C0AD09A1CC34403">DomCDataSection(const String&lt;uchar>&amp; data_) Constructor</h4>
         <h5>Syntax</h5>
         <table>
             <tr>
                 <td>
-                    <span class="mono">public nothrow DomCDataSection(const String&lt;uchar>&amp; data_);</span>
+                    <span class="mono">public nothrow explicit DomCDataSection(const String&lt;uchar>&amp; data_);</span>
                 </td>
             </tr>
         </table>
@@ -657,7 +662,7 @@
         <table>
             <tr>
                 <td>
-                    <a href="#constructor_DomCharacterData_16CDDBEA833B8DC263BD961DA0A9978A1E632FA1">DomCharacterData(const String&lt;uchar>&amp; name_)</a>
+                    <a href="#constructor_DomCharacterData_0D2ED50FD9C542E4989FC83F182A400A992C5279">DomCharacterData(const String&lt;uchar>&amp; name_)</a>
                 </td>
             </tr>
             <tr>
@@ -686,12 +691,12 @@
         </table>
         <br/>
         <hr/>
-        <h4 id="constructor_DomCharacterData_16CDDBEA833B8DC263BD961DA0A9978A1E632FA1">DomCharacterData(const String&lt;uchar>&amp; name_) Constructor</h4>
+        <h4 id="constructor_DomCharacterData_0D2ED50FD9C542E4989FC83F182A400A992C5279">DomCharacterData(const String&lt;uchar>&amp; name_) Constructor</h4>
         <h5>Syntax</h5>
         <table>
             <tr>
                 <td>
-                    <span class="mono">public nothrow DomCharacterData(const String&lt;uchar>&amp; name_);</span>
+                    <span class="mono">public nothrow explicit DomCharacterData(const String&lt;uchar>&amp; name_);</span>
                 </td>
             </tr>
         </table>
@@ -862,7 +867,7 @@
             </tr>
             <tr>
                 <td>
-                    <a href="#constructor_DomComment_FBC179D5B0D7C34BE90232E7B091723ED14BD80D">DomComment(const String&lt;uchar>&amp; data_)</a>
+                    <a href="#constructor_DomComment_8F2626E5AF8513C847915CAFDD203F610AA91A3E">DomComment(const String&lt;uchar>&amp; data_)</a>
                 </td>
             </tr>
         </table>
@@ -897,12 +902,12 @@
         </table>
         <br/>
         <hr/>
-        <h4 id="constructor_DomComment_FBC179D5B0D7C34BE90232E7B091723ED14BD80D">DomComment(const String&lt;uchar>&amp; data_) Constructor</h4>
+        <h4 id="constructor_DomComment_8F2626E5AF8513C847915CAFDD203F610AA91A3E">DomComment(const String&lt;uchar>&amp; data_) Constructor</h4>
         <h5>Syntax</h5>
         <table>
             <tr>
                 <td>
-                    <span class="mono">public nothrow DomComment(const String&lt;uchar>&amp; data_);</span>
+                    <span class="mono">public nothrow explicit DomComment(const String&lt;uchar>&amp; data_);</span>
                 </td>
             </tr>
         </table>
@@ -1024,6 +1029,11 @@
             </tr>
             <tr>
                 <td>
+                    <a href="#member_function_AppendChild_DomDocument_79F3A44DE896CD5FAA80F311288965B7FF1A7E85">AppendChild(UniquePtr&lt;System.Dom.DomNode>&amp;&amp; newChild)</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
                     <a href="#member_function_CloneNode_DomDocument_E87D6EE8F706AE697F6C95869C4933882AD49EB0">CloneNode(bool deep) const</a>
                 </td>
             </tr>
@@ -1119,6 +1129,37 @@
                 <td class="params">
                     <a href="#class_Visitor_9325C9B633E34A075869657A28EB269260004DBC">Visitor</a>
                     &amp;</td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h4 id="member_function_AppendChild_DomDocument_79F3A44DE896CD5FAA80F311288965B7FF1A7E85">AppendChild(UniquePtr&lt;System.Dom.DomNode>&amp;&amp; newChild) Member Function</h4>
+        <h5>Syntax</h5>
+        <table>
+            <tr>
+                <td>
+                    <span class="mono">public override DomNode* AppendChild(UniquePtr&lt;System.Dom.DomNode>&amp;&amp; newChild);</span>
+                </td>
+            </tr>
+        </table>
+        <h5>Parameters</h5>
+        <table class="params">
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">newChild</span>
+                </td>
+                <td class="params">
+                    <a href="../System.Base/System.Base.html#class_UniquePtr_T_793F841C13E9DD3A6869243C74F1D948C0E04009">UniquePtr</a>
+                    &lt;<a href="#class_DomNode_AAD27BD01107131DCBD7D66B91A6A861C7C23509">DomNode</a>
+                    >&amp;&amp;</td>
+            </tr>
+        </table>
+        <h5>Return Type</h5>
+        <table>
+            <tr>
+                <td>
+                    <a href="#class_DomNode_AAD27BD01107131DCBD7D66B91A6A861C7C23509">DomNode</a>
+                    *</td>
             </tr>
         </table>
         <br/>
@@ -1480,6 +1521,11 @@
         <table>
             <tr>
                 <td>
+                    <a href="#member_function_CDataSection_DomDocumentBuilder_C9C6C3454EE2A21538686310C908DFC265907934">CDataSection(const String&lt;uchar>&amp; cdata)</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
                     <a href="#member_function_Comment_DomDocumentBuilder_082FFD95DC14A5AB475CB65318CC235650A57DAA">Comment(const String&lt;uchar>&amp; comment)</a>
                 </td>
             </tr>
@@ -1548,6 +1594,30 @@
                 <td>
                     <span class="mono">public DomDocumentBuilder();</span>
                 </td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h4 id="member_function_CDataSection_DomDocumentBuilder_C9C6C3454EE2A21538686310C908DFC265907934">CDataSection(const String&lt;uchar>&amp; cdata) Member Function</h4>
+        <h5>Syntax</h5>
+        <table>
+            <tr>
+                <td>
+                    <span class="mono">public override void CDataSection(const String&lt;uchar>&amp; cdata);</span>
+                </td>
+            </tr>
+        </table>
+        <h5>Parameters</h5>
+        <table class="params">
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">cdata</span>
+                </td>
+                <td class="params">
+                    <span class="kw">const </span>
+                    <a href="../System.Base/System.Base.html#class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC">String</a>
+                    &lt;<span class="kw">uchar</span>
+                    >&amp;</td>
             </tr>
         </table>
         <br/>
@@ -1953,7 +2023,7 @@
         <table>
             <tr>
                 <td>
-                    <a href="#constructor_DomElement_72E8FC8D9147AD8500AC2600BAA8CFE0D052D4E6">DomElement(const String&lt;uchar>&amp; name_)</a>
+                    <a href="#constructor_DomElement_186B1B1F0883B010030F370B2A79FE1306D9FFD9">DomElement(const String&lt;uchar>&amp; name_)</a>
                 </td>
             </tr>
             <tr>
@@ -1964,6 +2034,11 @@
         </table>
         <h4>Member Functions</h4>
         <table>
+            <tr>
+                <td>
+                    <a href="#member_function_AddAttribute_DomElement_35F28C40B3AF25749FFE7E3857BD6A6A71244A96">AddAttribute(UniquePtr&lt;System.Dom.DomAttr>&amp;&amp; attr)</a>
+                </td>
+            </tr>
             <tr>
                 <td>
                     <a href="#member_function_CloneNode_DomElement_BEA193FB092CFFC0973D2E84DA0205A1CB679EDA">CloneNode(bool deep) const</a>
@@ -2022,12 +2097,12 @@
         </table>
         <br/>
         <hr/>
-        <h4 id="constructor_DomElement_72E8FC8D9147AD8500AC2600BAA8CFE0D052D4E6">DomElement(const String&lt;uchar>&amp; name_) Constructor</h4>
+        <h4 id="constructor_DomElement_186B1B1F0883B010030F370B2A79FE1306D9FFD9">DomElement(const String&lt;uchar>&amp; name_) Constructor</h4>
         <h5>Syntax</h5>
         <table>
             <tr>
                 <td>
-                    <span class="mono">public DomElement(const String&lt;uchar>&amp; name_);</span>
+                    <span class="mono">public explicit DomElement(const String&lt;uchar>&amp; name_);</span>
                 </td>
             </tr>
         </table>
@@ -2090,6 +2165,29 @@
                     &lt;<a href="../System.Base/System.Base.html#class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC">String</a>
                     &lt;<span class="kw">uchar</span>
                     >>>&amp;&amp;</td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h4 id="member_function_AddAttribute_DomElement_35F28C40B3AF25749FFE7E3857BD6A6A71244A96">AddAttribute(UniquePtr&lt;System.Dom.DomAttr>&amp;&amp; attr) Member Function</h4>
+        <h5>Syntax</h5>
+        <table>
+            <tr>
+                <td>
+                    <span class="mono">public void AddAttribute(UniquePtr&lt;System.Dom.DomAttr>&amp;&amp; attr);</span>
+                </td>
+            </tr>
+        </table>
+        <h5>Parameters</h5>
+        <table class="params">
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">attr</span>
+                </td>
+                <td class="params">
+                    <a href="../System.Base/System.Base.html#class_UniquePtr_T_793F841C13E9DD3A6869243C74F1D948C0E04009">UniquePtr</a>
+                    &lt;<a href="#class_DomAttr_9E6E1B42DF1CBDED3278FE00CE0A15F354369845">DomAttr</a>
+                    >&amp;&amp;</td>
             </tr>
         </table>
         <br/>
@@ -2434,7 +2532,7 @@
         <table>
             <tr>
                 <td>
-                    <a href="#constructor_DomNode_1BE96FF0CEF8ECAB452B0B671B84DC2CC3337AB3">DomNode(const String&lt;uchar>&amp; name_)</a>
+                    <a href="#constructor_DomNode_DEF6FCBFFA6705BF64FC558B4793E0504D78D924">DomNode(const String&lt;uchar>&amp; name_)</a>
                 </td>
             </tr>
         </table>
@@ -2618,12 +2716,12 @@
         </table>
         <br/>
         <hr/>
-        <h4 id="constructor_DomNode_1BE96FF0CEF8ECAB452B0B671B84DC2CC3337AB3">DomNode(const String&lt;uchar>&amp; name_) Constructor</h4>
+        <h4 id="constructor_DomNode_DEF6FCBFFA6705BF64FC558B4793E0504D78D924">DomNode(const String&lt;uchar>&amp; name_) Constructor</h4>
         <h5>Syntax</h5>
         <table>
             <tr>
                 <td>
-                    <span class="mono">public nothrow DomNode(const String&lt;uchar>&amp; name_);</span>
+                    <span class="mono">public nothrow explicit DomNode(const String&lt;uchar>&amp; name_);</span>
                 </td>
             </tr>
         </table>
@@ -3105,7 +3203,7 @@
                     <span class="param" id="">axis</span>
                 </td>
                 <td class="params">
-                    <a href="#5457844">Axis</a>
+                    <a href="#enumerated_type_Axis_8D4FE5B83262A122798FD80A5636BA4533BD15EB">Axis</a>
                 </td>
             </tr>
         </table>
@@ -3412,7 +3510,7 @@
         <table>
             <tr>
                 <td>
-                    <a href="#constructor_DomParentNode_1331C5F51C95B04325CB87DE266C205EDAEAC77F">DomParentNode(const String&lt;uchar>&amp; name_)</a>
+                    <a href="#constructor_DomParentNode_2EDAC20B45AD0B1A87C3482C3E5B254E7956735E">DomParentNode(const String&lt;uchar>&amp; name_)</a>
                 </td>
             </tr>
         </table>
@@ -3501,12 +3599,12 @@
         </table>
         <br/>
         <hr/>
-        <h4 id="constructor_DomParentNode_1331C5F51C95B04325CB87DE266C205EDAEAC77F">DomParentNode(const String&lt;uchar>&amp; name_) Constructor</h4>
+        <h4 id="constructor_DomParentNode_2EDAC20B45AD0B1A87C3482C3E5B254E7956735E">DomParentNode(const String&lt;uchar>&amp; name_) Constructor</h4>
         <h5>Syntax</h5>
         <table>
             <tr>
                 <td>
-                    <span class="mono">public nothrow DomParentNode(const String&lt;uchar>&amp; name_);</span>
+                    <span class="mono">public nothrow explicit DomParentNode(const String&lt;uchar>&amp; name_);</span>
                 </td>
             </tr>
         </table>
@@ -4210,7 +4308,7 @@
             </tr>
             <tr>
                 <td>
-                    <a href="#constructor_DomText_68E15A09AC697A860475394BA0802C5D2CE1CCD3">DomText(const String&lt;uchar>&amp; name_)</a>
+                    <a href="#constructor_DomText_B3E3835B94AD0A4CE92A3F8AFA7BFD3D2A5606B0">DomText(const String&lt;uchar>&amp; name_)</a>
                 </td>
             </tr>
             <tr>
@@ -4245,12 +4343,12 @@
         </table>
         <br/>
         <hr/>
-        <h4 id="constructor_DomText_68E15A09AC697A860475394BA0802C5D2CE1CCD3">DomText(const String&lt;uchar>&amp; name_) Constructor</h4>
+        <h4 id="constructor_DomText_B3E3835B94AD0A4CE92A3F8AFA7BFD3D2A5606B0">DomText(const String&lt;uchar>&amp; name_) Constructor</h4>
         <h5>Syntax</h5>
         <table>
             <tr>
                 <td>
-                    <span class="mono">public nothrow DomText(const String&lt;uchar>&amp; name_);</span>
+                    <span class="mono">public nothrow explicit DomText(const String&lt;uchar>&amp; name_);</span>
                 </td>
             </tr>
         </table>
@@ -4919,6 +5017,37 @@
         </table>
         <br/>
         <hr/>
+        <h3 id="function_AxisName_D89A234F6060B307C3C9DADFF0CBDE9BF2CA2312">AxisName(Axis axis) Function</h3>
+        <h4>Syntax</h4>
+        <table>
+            <tr>
+                <td>
+                    <span class="mono">public nothrow String&lt;uchar> AxisName(Axis axis);</span>
+                </td>
+            </tr>
+        </table>
+        <h4>Parameters</h4>
+        <table class="params">
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">axis</span>
+                </td>
+                <td class="params">
+                    <a href="#enumerated_type_Axis_8D4FE5B83262A122798FD80A5636BA4533BD15EB">Axis</a>
+                </td>
+            </tr>
+        </table>
+        <h4>Return Type</h4>
+        <table>
+            <tr>
+                <td>
+                    <a href="../System.Base/System.Base.html#class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC">String</a>
+                    &lt;<span class="kw">uchar</span>
+                    ></td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
         <h3 id="function_MakeXmlAttrValue_EF82DEEB8B524A7E6BE0F669B376D42D9ED4A48A">MakeXmlAttrValue(const String&lt;uchar>&amp; attrValue) Function</h3>
         <h4>Syntax</h4>
         <table>
@@ -5184,7 +5313,7 @@
                     <span class="param" id="">left</span>
                 </td>
                 <td class="params">
-                    <a href="#5457844">Axis</a>
+                    <a href="#enumerated_type_Axis_8D4FE5B83262A122798FD80A5636BA4533BD15EB">Axis</a>
                 </td>
             </tr>
             <tr class="params">
@@ -5192,7 +5321,7 @@
                     <span class="param" id="">right</span>
                 </td>
                 <td class="params">
-                    <a href="#5457844">Axis</a>
+                    <a href="#enumerated_type_Axis_8D4FE5B83262A122798FD80A5636BA4533BD15EB">Axis</a>
                 </td>
             </tr>
         </table>
@@ -5206,7 +5335,7 @@
         </table>
         <br/>
         <hr/>
-        <h3 id="5457844">Axis Enumeration</h3>
+        <h3 id="enumerated_type_Axis_8D4FE5B83262A122798FD80A5636BA4533BD15EB">Axis Enumeration</h3>
         <h4>Syntax</h4>
         <table>
             <tr>
@@ -5309,7 +5438,7 @@
             </tr>
             <tr>
                 <td>
-                    <span class="var">descendant_or_self</span>
+                    <span class="var">descendantOrSelf</span>
                 </td>
                 <td>
                     <span class="var">11</span>
@@ -5317,7 +5446,7 @@
             </tr>
             <tr>
                 <td>
-                    <span class="var">ancestor_or_self</span>
+                    <span class="var">ancestorOrSelf</span>
                 </td>
                 <td>
                     <span class="var">12</span>

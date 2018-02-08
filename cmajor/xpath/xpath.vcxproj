@@ -165,6 +165,7 @@
     <ClCompile Include="InitDone.cpp" />
     <ClCompile Include="XPath.cpp" />
     <ClCompile Include="XPathContext.cpp" />
+    <ClCompile Include="XPathDebug.cpp" />
     <ClCompile Include="XPathEvaluate.cpp" />
     <ClCompile Include="XPathExpr.cpp" />
     <ClCompile Include="XPathFunction.cpp" />
@@ -174,6 +175,7 @@
     <ClInclude Include="InitDone.hpp" />
     <ClInclude Include="XPath.hpp" />
     <ClInclude Include="XPathContext.hpp" />
+    <ClInclude Include="XPathDebug.hpp" />
     <ClInclude Include="XPathEvaluate.hpp" />
     <ClInclude Include="XPathExpr.hpp" />
     <ClInclude Include="XPathFunction.hpp" />

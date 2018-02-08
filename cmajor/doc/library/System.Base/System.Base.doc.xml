@@ -1,13 +1,231 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <docs>
-  <doc id="System.Console">
+  <doc id="class_Console_41891B146EC51CAB04451732257B28BD18CAE52B">
     Represents the standard input, output and error streams.
   </doc>
-  <doc id="System.Collections.List&lt;T>">
+  <doc id="class_RandomAccessIter_T_R_P_E5BB3CAC7F9DBE190F290EC17E5DCE3406706484">
+    RandomAccessIter is a <a href="#concept_RandomAccessIterator_A5A1B6A4EC8E181A67C733002B3BE437554D3484">RandomAccessIterator</a>.
+  </doc>
+  <doc id="class_RedBlackTreeNodeIterator_T_R_P_6B55278500271829D7E5F7BCD5A22DABD182EF92">
+    RedBlackTreeNodeIterator is a <a href="#concept_BidirectionalIterator_96C10B73881A17B6DC9C0804E7DF2141C2E58DA6">BidirectionalIterator</a>.
+  </doc>
+  <doc id="class_ForwardListNodeIterator_T_R_P_F664F07C33DBAABDB2487D2FBE1538C3E6F42EBA">
+    ForwardListNodeIterator is a <a href="#concept_ForwardIterator_4C777D423CF589B8535F29F910C025990ED656D4">ForwardIterator</a>.
+  </doc>
+  <doc id="class_LinkedListNodeIterator_T_R_P_1B6A4ECB2747EF21647DCDFB3EA5E3CFB23B08EF">
+    LinkedListNodeIterator is a <a href="#concept_BidirectionalIterator_96C10B73881A17B6DC9C0804E7DF2141C2E58DA6">BidirectionalIterator</a>.
+  </doc>
+  <doc id="class_HashtableIterator_T_R_P_H_096790EBD70A9327536FC43A710AF00FB8221CA1">
+    HashtableIterator is a <a href="#concept_ForwardIterator_4C777D423CF589B8535F29F910C025990ED656D4">ForwardIterator</a>.
+  </doc>
+  <doc id="member_function_op_apply_Less_T_8C16DA6B5C03289B1ACDC73FA5A7BE72C2529F1F">
+    Returns left <span class="mono">&lt;</span> right.
+  </doc>
+  <doc id="member_function_op_apply_Greater_T_959E41D9E1F9F0EEA007A88D1E3CA23189FE5CC7">
+    Returns left <span class="mono">></span> right.
+  </doc>
+  <doc id="member_function_op_apply_LessOrEqualTo_T_CEA6B34FB7D9A3566721602B815DF0F8442DE2E2">
+    Returns left <span class="mono">&lt;=</span> right.
+  </doc>
+  <doc id="member_function_op_apply_GreaterOrEqualTo_T_97DD6B043962EF378CA20DAEE5909D139DD94022">
+    Returns left <span class="mono">>=</span> right.
+  </doc>
+  <doc id="member_function_op_apply_EqualTo_T_8C6C4E80167CF2288BCDC097EA03BB199CA69C76">
+    Returns left <span class="mono">==</span> right.
+  </doc>
+  <doc id="member_function_op_apply_BitAnd_T_125FB1560925572FBE43BB149B29CC47A4F7636B">
+    Returns left <span class="mono">&amp;</span> right.
+  </doc>
+  <doc id="member_function_op_apply_BitNot_T_78C439136E97CAF9FC85DE5F98BD29CD48AE3C19">
+    Returns <span class="mono">~</span>operand.
+  </doc>
+  <doc id="member_function_op_apply_BitOr_T_80EDE8BAF952389AD848DDF530B1E1CCB2F24F5C">
+    Returns left <span class="mono">|</span> right.
+  </doc>
+  <doc id="member_function_op_apply_BitXor_T_E1EAEA558776E8E7E857541C7F9F476FA7E46902">
+    Returns left <span class="mono">^</span> right.
+  </doc>
+  <doc id="member_function_op_apply_Divides_T_9A5E78D0EAD1D68B1F4863A624BED8F056585C84">
+    Returns a <span class="mono">/</span> b.
+  </doc>
+  <doc id="member_function_op_apply_Identity_T_42E164CADBD884CF0CD70FC93FE378A71150977F">
+    Returns x.
+  </doc>
+  <doc id="member_function_op_apply_LogicalAnd_T_EF241E9479DA8E0319F6610A8FF97251F517A470">
+    Returns left <span class="mono">&amp;&amp;</span> right.
+  </doc>
+  <doc id="member_function_op_apply_LogicalNot_T_7863084655A0BCE91E861E1919854031471C83ED">
+    Returns <span class="mono">!</span>operand.
+  </doc>
+  <doc id="member_function_op_apply_LogicalOr_T_96E0D8CF97F7F38B2DF3EFDA2358E4C80E53D888">
+    Returns left <span class="mono">||</span> right.
+  </doc>
+  <doc id="member_function_op_apply_Minus_T_EE33C25A5093AB70B79C5AC9C9F52DB39999762F">
+    Returns a <span class="mono">-</span> b.
+  </doc>
+  <doc id="member_function_op_apply_Multiplies_T_DEBCDEB20BE65AD22C76E2C35B9969FA7E67F136">
+    Returns left <span class="mono">*</span> right.
+  </doc>
+  <doc id="member_function_op_apply_Negate_T_A6657661CE7013CCD484CC3922D5A7CCAA8A8A02">
+    Returns <span class="mono">-</span>a.
+  </doc>
+  <doc id="member_function_op_apply_NotEqualTo_T_33A58B99A662A88EB62E2EEF270DEB55BD84917E">
+    Returns left <span class="mono">!=</span> right.
+  </doc>
+  <doc id="member_function_op_apply_Plus_T_F3A329DD0ACCC2FB307228498C72A0D6B6369528">
+    Returns a <span class="mono">+</span> b.
+  </doc>
+  <doc id="member_function_op_apply_Remainder_T_E4B5769D152D337977344B0963D56E46A5B9EE85">
+    Returns a <span class="mono">%</span> b.
+  </doc>
+  <doc id="member_function_op_apply_ShiftLeft_T_9D6EF7465ABAB41348B261A402E313E059EC11A6">
+    Returns left <span class="mono">&lt;&lt;</span> right.
+  </doc>
+  <doc id="member_function_op_apply_ShiftRight_T_F72DF4B7B74EC89C3F1BC7F65327469E61A9D43A">
+    Returns left <span class="mono">>></span> right.
+  </doc>
+  <doc id="member_function_op_apply_SelectFirst_T_U_6E585742FFA14E0DBC2331BF947D8D1223508410">
+    Returns <span class="mono">p.first</span>.
+  </doc>
+  <doc id="member_function_op_apply_SelectSecond_T_U_38899BF9E4BB8BF266B0500E8282C1B7F3E14C51">
+    Returns <span class="mono">p.second</span>.
+  </doc>
+  <doc id="class_List_T_579A89BF19B54042190CDE2A7E54E1DFAAFDB31C">
     List is a compact container whose elements are laid out side by side in memory.
     List grows as needed when new elements are added to it.
   </doc>
-  <doc id="System.Collections.List&lt;T>.T">
+  <doc id="class_List_T_579A89BF19B54042190CDE2A7E54E1DFAAFDB31C.T">
     The type of the element contained by the list.
+  </doc>
+  <doc id="function_group_Add_F4638F3DD74085EFC3B45FB3D7770BFD75CB7F32">
+    Adds an element to the end of the list.
+  </doc>
+  <doc id="member_function_Add_List_T_1242E85AAD4D8369255E6BB57F2A841ED245BACD">
+    Adds an element to the end of the list by moving.
+  </doc>
+  <doc id="member_function_Add_List_T_0CEB0F989B58359D06357C988DF595C83DA28430">
+    Adds an element to the end of the list by copying.
+  </doc>
+  <doc id="class_Set_T_C_47F8F0E0607A1F93AC7712B5B29065BB126D924F">
+    Set is a sorted container of unique elements.
+  </doc>
+  <doc id="class_Set_T_C_47F8F0E0607A1F93AC7712B5B29065BB126D924F.T">
+    The type of the contained element.
+  </doc>
+  <doc id="class_Set_T_C_47F8F0E0607A1F93AC7712B5B29065BB126D924F.C">
+    The element sorting criteria. Default is <a href="#class_Less_T_F840BD6533DFD3706784C819E04FA4FE41C4F3D2">Less&lt;T></a>.
+  </doc>
+  <doc id="member_function_Insert_Set_T_C_CDB4ED63121A2DE63471B2223D29011064AC0ECD">
+    Inserts an element to the set if it's not already there.
+    If the element was inserted to the set, returns a pair consisting of an iterator to it and true,
+    otherwise an equal element was already in the set, so return a pair consisting of an iterator to an existing element and false.
+  </doc>
+  <doc id="class_Map_Key_Value_KeyCompare_530B43B96CDA5DBA8045A4DA0691BBB50DE2DB3D">
+    Map is an associative array of key-value pairs sorted by the keys.
+  </doc>
+  <doc id="class_Map_Key_Value_KeyCompare_530B43B96CDA5DBA8045A4DA0691BBB50DE2DB3D.Key">
+    The type of the key.
+  </doc>
+  <doc id="class_Map_Key_Value_KeyCompare_530B43B96CDA5DBA8045A4DA0691BBB50DE2DB3D.Value">
+    The type of the value.
+  </doc>
+  <doc id="class_Map_Key_Value_KeyCompare_530B43B96CDA5DBA8045A4DA0691BBB50DE2DB3D.KeyCompare">
+    The key sorting criteria. Default is <a href="#class_Less_T_F840BD6533DFD3706784C819E04FA4FE41C4F3D2">Less&lt;Key></a>.
+  </doc>
+  <doc id="member_function_Insert_Map_Key_Value_KeyCompare_695995241FEDB6131B95FF146878B500A42F4B4C">
+    Inserts a key-value pair to the map if the key is not already found from the map.
+    If the key-value pair was inserted to the map, returns a pair consisting of an iterator to it and true,
+    otherwise a key-value pair with an equal key was already in the map, so return a pair consisting of an iterator 
+    to an existing key-value pair and false.
+  </doc>
+  <doc id="member_function_op_index_Map_Key_Value_KeyCompare_8BBCC8433D3DAA68F452754E1FDF45FA25C3E126">
+    If there is a key-value pair already in the map, returns a reference to the existing value,
+    otherwise inserts a new key-value pair to the map, and returns a reference to the inserted value.
+  </doc>
+  <doc id="class_HashSet_T_H_C_6247CEC2AE0E22CFEFEC71837C21FA087B7840DC">
+    HashSet is a container of unique elements that are organized in a hashtable.
+    The elements do not need to be ordered.
+  </doc>
+  <doc id="class_HashSet_T_H_C_6247CEC2AE0E22CFEFEC71837C21FA087B7840DC.T">
+    The type of the contained element.
+  </doc>
+  <doc id="class_HashSet_T_H_C_6247CEC2AE0E22CFEFEC71837C21FA087B7840DC.H">
+    The hash function. Default is <a href="#class_Hasher_T_9E06FCD9B56B8B3B7E7F8286BE8179D3B1CB8325">Hasher&lt;T></a>.
+  </doc>
+  <doc id="class_HashSet_T_H_C_6247CEC2AE0E22CFEFEC71837C21FA087B7840DC.C">
+    The element comparison operation. Default is <a href="#class_EqualTo_T_483B326DC1355EE905B9A0F4E9331F702788D28E">EqualTo&lt;T></a>.
+  </doc>
+  <doc id="member_function_Insert_HashSet_T_H_C_023D88D53E8113FB84BD2440048FBBB05709F018">
+    Inserts an element to the hash set if it's not already there.
+    If the element was inserted to the hash set, returns a pair consisting of an iterator to it and true,
+    otherwise an equal element was already in the hash set, so return a pair consisting of an iterator to an existing element and false.
+  </doc>
+  <doc id="class_HashMap_K_T_H_C_925D53DF947742545E7EC07D3487F3EA8C8D1D36">
+    HashMap is a container of key-value pairs that are organized in a hashtable.
+    The keys need not to be ordered.
+  </doc>
+  <doc id="class_HashMap_K_T_H_C_925D53DF947742545E7EC07D3487F3EA8C8D1D36.K">
+    The type of the key.
+  </doc>
+  <doc id="class_HashMap_K_T_H_C_925D53DF947742545E7EC07D3487F3EA8C8D1D36.T">
+    The type of the value.
+  </doc>
+  <doc id="class_HashMap_K_T_H_C_925D53DF947742545E7EC07D3487F3EA8C8D1D36.H">
+    The hash function. Default is <a href="#class_Hasher_T_9E06FCD9B56B8B3B7E7F8286BE8179D3B1CB8325">Hasher&lt;K></a>.
+  </doc>
+  <doc id="class_HashMap_K_T_H_C_925D53DF947742545E7EC07D3487F3EA8C8D1D36.C">
+    The key comparioson operation. Default is <a href="#class_EqualTo_T_483B326DC1355EE905B9A0F4E9331F702788D28E">EqualTo&lt;K></a>.
+  </doc>
+  <doc id="member_function_op_index_HashMap_K_T_H_C_15EA563ECDE51290B34A56BDA501BDC2F5DC5815">
+    If there is a key-value pair already in the hash map, returns a reference to the existing value,
+    otherwise inserts a new key-value pair to the hash map, and returns a reference to the inserted value.
+  </doc>
+  <doc id="class_ForwardList_T_49B88E2B81E13ED03DA3835C7A074DB98CBE7051">
+    ForwardList is a singly linked list of elements.
+  </doc>
+  <doc id="class_ForwardList_T_49B88E2B81E13ED03DA3835C7A074DB98CBE7051.T">
+    The type of the element.
+  </doc>
+  <doc id="class_Hasher_T_9E06FCD9B56B8B3B7E7F8286BE8179D3B1CB8325">
+    Default hash function object.
+  </doc>
+  <doc id="class_Hasher_T_9E06FCD9B56B8B3B7E7F8286BE8179D3B1CB8325.T">
+    The type of the operand.
+  </doc>
+  <doc id="member_function_op_apply_Hasher_T_80FA5E906D500DD677F0624ACED427AC96570BD4">
+    Delegates computation of the hash function to the <a href="#function_group_GetHashCode_6A3EAD743D91EFDE396FB5407DAE9791C10C8B40">GetHashCode</a> function.
+  </doc>
+  <doc id="class_LinkedList_T_1596EFE994FFA67F5471B17D62A2A8C45B9A2B20">
+    Doubly linked list of elements.
+  </doc>
+  <doc id="class_LinkedList_T_1596EFE994FFA67F5471B17D62A2A8C45B9A2B20.T">
+    The type of the element.
+  </doc>
+  <doc id="class_Queue_T_1C9B1484040D488EB9F21C531882DC9EB5B8CA02">
+    A first-in-first-out container of elements.
+  </doc>
+  <doc id="class_Queue_T_1C9B1484040D488EB9F21C531882DC9EB5B8CA02.T">
+    The type of the element.
+  </doc>
+  <doc id="member_function_Get_Queue_T_1B10A1BA349DF1ABECB8536F0879686DB7DF3599">
+    Removes and returns an element from the start of the queue.
+  </doc>
+  <doc id="function_group_Put_BEC6CE8D550ABFB9168DE81CE981DC3667FAEA9A">
+    Appends an element to the end of the queue.
+  </doc>
+  <doc id="class_Stack_T_44313E678C6CD0E8DB3743953B65AA105D55A963">
+    A last-in-first-out container of elements.
+  </doc>
+  <doc id="class_Stack_T_44313E678C6CD0E8DB3743953B65AA105D55A963.T">
+    The type of the contained element.
+  </doc>
+  <doc id="function_group_Push_AB2E6EAB2355AB98CBE08320F59009CE95E8F8A6">
+    Adds an element to the top of the stack.
+  </doc>
+  <doc id="member_function_Pop_Stack_T_127A46B6601B486623579A4074F699ED5633B56E">
+    Removes and returns an element from the top of the stack.
+  </doc>
+  <doc id="function_group_Top_1E17725355C7D2E620B554AA52E1DCDE0040CEF5">
+    Returns a reference to the element on the top of the stack.
   </doc>
 </docs>

@@ -8,6 +8,7 @@
 #include <cmajor/rt/Error.hpp>
 #include <cmajor/rt/InitDone.hpp>
 #include <cmajor/util/Error.hpp>
+#include <cmajor/util/TextUtils.hpp>
 #include <memory>
 #include <vector>
 #include <atomic>
@@ -16,8 +17,21 @@
 #include <winsock2.h>
 #include <ws2tcpip.h>    
 #include <Windows.h>
+#include <gnutls/gnutls.h>
 
 namespace cmajor { namespace rt {
+
+using namespace cmajor::util;
+
+struct SocketData
+{
+    SocketData() : socket(INVALID_SOCKET), session(), credentials(), tlsSession(false) {}
+    SocketData(SOCKET socket_) : socket(socket_), session(), credentials(), tlsSession(false) {}
+    SOCKET socket;
+    bool tlsSession;
+    gnutls_session_t session;
+    gnutls_certificate_credentials_t credentials;
+};
 
 class SocketTable
 {
@@ -32,14 +46,14 @@ public:
     int32_t AcceptSocket(int32_t socketHandle);
     int32_t CloseSocket(int32_t socketHandle);
     int32_t ShutdownSocket(int32_t socketHandle, ShutdownMode mode);
-    int32_t ConnectSocket(const std::string& node, const std::string& service);
+    int32_t ConnectSocket(const std::string& node, const std::string& service, ConnectOptions options);
     int32_t SendSocket(int32_t socketHandle, uint8_t* buf, int32_t len, int32_t flags);
     int32_t ReceiveSocket(int32_t socketHandle, uint8_t* buf, int32_t len, int32_t flags);
 private:
     static std::unique_ptr<SocketTable> instance;
     const int32_t maxNoLockSocketHandles = 256;
-    std::vector<SOCKET> sockets;
-    std::unordered_map<int32_t, SOCKET> socketMap;
+    std::vector<std::unique_ptr<SocketData>> sockets;
+    std::unordered_map<int32_t, std::unique_ptr<SocketData>> socketMap;
     std::atomic<int32_t> nextSocketHandle;
     std::mutex mtx;
     SocketTable();
@@ -85,6 +99,7 @@ SocketTable::SocketTable() : nextSocketHandle(1)
 
 SocketTable::~SocketTable()
 {
+    gnutls_global_deinit();
     WSACleanup();
 }
 
@@ -100,12 +115,12 @@ int32_t SocketTable::CreateSocket()
     int32_t socketHandle = nextSocketHandle++;
     if (socketHandle < maxNoLockSocketHandles)
     {
-        sockets[socketHandle] = s;
+        sockets[socketHandle] = std::unique_ptr<SocketData>(new SocketData(s));
     }
     else
     {
         std::lock_guard<std::mutex> lock(mtx);
-        socketMap[socketHandle] = s;
+        socketMap[socketHandle] = std::unique_ptr<SocketData>(new SocketData(s));
     }
     return socketHandle;
 }
@@ -119,7 +134,15 @@ int32_t SocketTable::BindSocket(int32_t socketHandle, int32_t port)
     }
     else if (socketHandle < maxNoLockSocketHandles)
     {
-        SOCKET s = sockets[socketHandle];
+        if (!sockets[socketHandle])
+        {
+            return InstallError("invalid socket handle " + std::to_string(socketHandle));
+        }
+        SOCKET s = sockets[socketHandle]->socket;
+        if (s == INVALID_SOCKET)
+        {
+            return InstallError("invalid socket handle " + std::to_string(socketHandle));
+        }
         struct sockaddr_in addr;
         addr.sin_family = AF_INET;
         addr.sin_addr.s_addr = inet_addr("127.0.0.1");
@@ -132,7 +155,15 @@ int32_t SocketTable::BindSocket(int32_t socketHandle, int32_t port)
         auto it = socketMap.find(socketHandle);
         if (it != socketMap.cend())
         {
-            SOCKET s = it->second;
+            if (!it->second)
+            {
+                return InstallError("invalid socket handle " + std::to_string(socketHandle));
+            }
+            SOCKET s = it->second->socket;
+            if (s == INVALID_SOCKET)
+            {
+                return InstallError("invalid socket handle " + std::to_string(socketHandle));
+            }
             struct sockaddr_in addr;
             addr.sin_family = AF_INET;
             addr.sin_addr.s_addr = inet_addr("127.0.0.1");
@@ -162,7 +193,15 @@ int32_t SocketTable::ListenSocket(int32_t socketHandle, int32_t backlog)
     }
     else if (socketHandle < maxNoLockSocketHandles)
     {
-        SOCKET s = sockets[socketHandle];
+        if (!sockets[socketHandle])
+        {
+            return InstallError("invalid socket handle " + std::to_string(socketHandle));
+        }
+        SOCKET s = sockets[socketHandle]->socket;
+        if (s == INVALID_SOCKET)
+        {
+            return InstallError("invalid socket handle " + std::to_string(socketHandle));
+        }
         result = listen(s, backlog);
     }
     else
@@ -171,7 +210,15 @@ int32_t SocketTable::ListenSocket(int32_t socketHandle, int32_t backlog)
         auto it = socketMap.find(socketHandle);
         if (it != socketMap.cend())
         {
-            SOCKET s = it->second;
+            if (!it->second)
+            {
+                return InstallError("invalid socket handle " + std::to_string(socketHandle));
+            }
+            SOCKET s = it->second->socket;
+            if (s == INVALID_SOCKET)
+            {
+                return InstallError("invalid socket handle " + std::to_string(socketHandle));
+            }
             result = listen(s, backlog);
         }
         else
@@ -197,7 +244,15 @@ int32_t SocketTable::AcceptSocket(int32_t socketHandle)
     }
     else if (socketHandle < maxNoLockSocketHandles)
     {
-        SOCKET s = sockets[socketHandle];
+        if (!sockets[socketHandle])
+        {
+            return InstallError("invalid socket handle " + std::to_string(socketHandle));
+        }
+        SOCKET s = sockets[socketHandle]->socket;
+        if (s == INVALID_SOCKET)
+        {
+            return InstallError("invalid socket handle " + std::to_string(socketHandle));
+        }
         a = accept(s, NULL, NULL);
         if (a == INVALID_SOCKET)
         {
@@ -208,12 +263,12 @@ int32_t SocketTable::AcceptSocket(int32_t socketHandle)
         int32_t acceptedSocketHandle = nextSocketHandle++;
         if (acceptedSocketHandle < maxNoLockSocketHandles)
         {
-            sockets[acceptedSocketHandle] = a;
+            sockets[acceptedSocketHandle] = std::unique_ptr<SocketData>(new SocketData(a));
         }
         else
         {
             std::lock_guard<std::mutex> lock(mtx);
-            socketMap[acceptedSocketHandle] = a;
+            socketMap[acceptedSocketHandle] = std::unique_ptr<SocketData>(new SocketData(a));
         }
         return acceptedSocketHandle;
     }
@@ -223,7 +278,15 @@ int32_t SocketTable::AcceptSocket(int32_t socketHandle)
         auto it = socketMap.find(socketHandle);
         if (it != socketMap.cend())
         {
-            SOCKET s = it->second;
+            if (!it->second)
+            {
+                return InstallError("invalid socket handle " + std::to_string(socketHandle));
+            }
+            SOCKET s = it->second->socket;
+            if (s == INVALID_SOCKET)
+            {
+                return InstallError("invalid socket handle " + std::to_string(socketHandle));
+            }
             a = accept(s, NULL, NULL);
             if (a == INVALID_SOCKET)
             {
@@ -234,11 +297,11 @@ int32_t SocketTable::AcceptSocket(int32_t socketHandle)
             int32_t acceptedSocketHandle = nextSocketHandle++;
             if (acceptedSocketHandle < maxNoLockSocketHandles)
             {
-                sockets[acceptedSocketHandle] = a;
+                sockets[acceptedSocketHandle] = std::unique_ptr<SocketData>(new SocketData(a));
             }
             else
             {
-                socketMap[acceptedSocketHandle] = a;
+                socketMap[acceptedSocketHandle] = std::unique_ptr<SocketData>(new SocketData(a));
             }
             return acceptedSocketHandle;
         }
@@ -258,8 +321,22 @@ int32_t SocketTable::CloseSocket(int32_t socketHandle)
     }
     else if (socketHandle < maxNoLockSocketHandles)
     {
-        SOCKET s = sockets[socketHandle];
+        SocketData* socketData = sockets[socketHandle].get();
+        if (!socketData)
+        {
+            return InstallError("invalid socket handle " + std::to_string(socketHandle));
+        }
+        if (socketData->tlsSession)
+        {
+            gnutls_bye(socketData->session, GNUTLS_SHUT_RDWR);
+        }
+        SOCKET s = socketData->socket;
         result = closesocket(s);
+        if (socketData->tlsSession)
+        {
+            gnutls_deinit(socketData->session);
+            gnutls_certificate_free_credentials(socketData->credentials);
+        }
     }
     else
     {
@@ -267,8 +344,22 @@ int32_t SocketTable::CloseSocket(int32_t socketHandle)
         auto it = socketMap.find(socketHandle);
         if (it != socketMap.cend())
         {
-            SOCKET s = it->second;
+            SocketData* socketData = it->second.get();
+            if (!socketData)
+            {
+                return InstallError("invalid socket handle " + std::to_string(socketHandle));
+            }
+            if (socketData->tlsSession)
+            {
+                gnutls_bye(socketData->session, GNUTLS_SHUT_RDWR);
+            }
+            SOCKET s = socketData->socket;
             result = closesocket(s);
+            if (socketData->tlsSession)
+            {
+                gnutls_deinit(socketData->session);
+                gnutls_certificate_free_credentials(socketData->credentials);
+            }
         }
         else
         {
@@ -300,7 +391,23 @@ int32_t SocketTable::ShutdownSocket(int32_t socketHandle, ShutdownMode mode)
     }
     else if (socketHandle < maxNoLockSocketHandles)
     {
-        SOCKET s = sockets[socketHandle];
+        SocketData* socketData = sockets[socketHandle].get();
+        if (!socketData)
+        {
+            return InstallError("invalid socket handle " + std::to_string(socketHandle));
+        }
+        if (socketData->tlsSession)
+        {
+            if (how == SD_BOTH)
+            {
+                gnutls_bye(socketData->session, GNUTLS_SHUT_RDWR);
+            }
+            else
+            {
+                gnutls_bye(socketData->session, GNUTLS_SHUT_WR);
+            }
+        }
+        SOCKET s = socketData->socket;
         result = shutdown(s, how);
     }
     else
@@ -309,7 +416,23 @@ int32_t SocketTable::ShutdownSocket(int32_t socketHandle, ShutdownMode mode)
         auto it = socketMap.find(socketHandle);
         if (it != socketMap.cend())
         {
-            SOCKET s = it->second;
+            SocketData* socketData = it->second.get();
+            if (!socketData)
+            {
+                return InstallError("invalid socket handle " + std::to_string(socketHandle));
+            }
+            if (socketData->tlsSession)
+            {
+                if (how == SD_BOTH)
+                {
+                    gnutls_bye(socketData->session, GNUTLS_SHUT_RDWR);
+                }
+                else
+                {
+                    gnutls_bye(socketData->session, GNUTLS_SHUT_WR);
+                }
+            }
+            SOCKET s = socketData->socket;
             result = shutdown(s, how);
         }
         else
@@ -326,8 +449,57 @@ int32_t SocketTable::ShutdownSocket(int32_t socketHandle, ShutdownMode mode)
     return 0;
 }
 
-int32_t SocketTable::ConnectSocket(const std::string& node, const std::string& service)
+int32_t SocketTable::ConnectSocket(const std::string& node, const std::string& service, ConnectOptions options)
 {
+    std::unique_ptr<SocketData> socketData(new SocketData());
+    bool createTlsSession = false;
+    if ((ToLower(service) == "https") || (service == std::to_string(443)) || ((options & ConnectOptions::useTls) != ConnectOptions::none))
+    {
+        createTlsSession = true;
+        int result = gnutls_certificate_allocate_credentials(&socketData->credentials);
+        if (result < 0)
+        {
+            int errorCode = GetLastSocketError();
+            std::string errorMessage = GetSocketErrorMessage(errorCode);
+            return InstallError(errorMessage);
+        }
+        result = gnutls_certificate_set_x509_system_trust(socketData->credentials);
+        if (result < 0)
+        {
+            int errorCode = GetLastSocketError();
+            std::string errorMessage = GetSocketErrorMessage(errorCode);
+            return InstallError(errorMessage);
+        }
+        result = gnutls_init(&socketData->session, GNUTLS_CLIENT);
+        if (result < 0)
+        {
+            int errorCode = GetLastSocketError();
+            std::string errorMessage = GetSocketErrorMessage(errorCode);
+            return InstallError(errorMessage);
+        }
+        result = gnutls_server_name_set(socketData->session, GNUTLS_NAME_DNS, node.c_str(), node.length());
+        if (result < 0)
+        {
+            int errorCode = GetLastSocketError();
+            std::string errorMessage = GetSocketErrorMessage(errorCode);
+            return InstallError(errorMessage);
+        }
+        result = gnutls_set_default_priority(socketData->session);
+        if (result < 0)
+        {
+            int errorCode = GetLastSocketError();
+            std::string errorMessage = GetSocketErrorMessage(errorCode);
+            return InstallError(errorMessage);
+        }
+        result = gnutls_credentials_set(socketData->session, GNUTLS_CRD_CERTIFICATE, socketData->credentials);
+        if (result < 0)
+        {
+            int errorCode = GetLastSocketError();
+            std::string errorMessage = GetSocketErrorMessage(errorCode);
+            return InstallError(errorMessage);
+        }
+        gnutls_session_set_verify_cert(socketData->session, node.c_str(), 0);
+    }
     struct addrinfo hint;
     struct addrinfo* rp;
     struct addrinfo* res;
@@ -363,12 +535,44 @@ int32_t SocketTable::ConnectSocket(const std::string& node, const std::string& s
                 int32_t connectedSocketHandle = nextSocketHandle++;
                 if (connectedSocketHandle < maxNoLockSocketHandles)
                 {
-                    sockets[connectedSocketHandle] = s;
+                    if (createTlsSession)
+                    {
+                        socketData->socket = s;
+                        sockets[connectedSocketHandle] = std::move(socketData);
+                        gnutls_transport_set_int(sockets[connectedSocketHandle]->session, s);
+                        gnutls_handshake_set_timeout(sockets[connectedSocketHandle]->session, GNUTLS_DEFAULT_HANDSHAKE_TIMEOUT);
+                        do
+                        {
+                            result = gnutls_handshake(sockets[connectedSocketHandle]->session);
+                        } 
+                        while (result < 0 && gnutls_error_is_fatal(result) == 0);
+                        sockets[connectedSocketHandle]->tlsSession = true;
+                    }
+                    else
+                    {
+                        sockets[connectedSocketHandle] = std::unique_ptr<SocketData>(new SocketData(s));
+                    }
                 }
                 else
                 {
                     std::lock_guard<std::mutex> lock(mtx);
-                    socketMap[connectedSocketHandle] = s;
+                    if (createTlsSession)
+                    {
+                        socketData->socket = s;
+                        socketMap[connectedSocketHandle] = std::move(socketData);
+                        gnutls_transport_set_int(socketMap[connectedSocketHandle]->session, s);
+                        gnutls_handshake_set_timeout(socketMap[connectedSocketHandle]->session, GNUTLS_DEFAULT_HANDSHAKE_TIMEOUT);
+                        do
+                        {
+                            result = gnutls_handshake(socketMap[connectedSocketHandle]->session);
+                        } 
+                        while (result < 0 && gnutls_error_is_fatal(result) == 0);
+                        socketMap[connectedSocketHandle]->tlsSession = true;
+                    }
+                    else
+                    {
+                        socketMap[connectedSocketHandle] = std::unique_ptr<SocketData>(new SocketData(s));
+                    }
                 }
                 return connectedSocketHandle;
             }
@@ -394,8 +598,20 @@ int32_t SocketTable::SendSocket(int32_t socketHandle, uint8_t* buf, int32_t len,
     }
     else if (socketHandle < maxNoLockSocketHandles)
     {
-        SOCKET s = sockets[socketHandle];
-        result = send(s, (const char*)buf, len, flags);
+        SocketData* socketData = sockets[socketHandle].get();
+        if (!socketData)
+        {
+            return InstallError("invalid socket handle " + std::to_string(socketHandle));
+        }
+        if (socketData->tlsSession)
+        {
+            result = gnutls_record_send(socketData->session, reinterpret_cast<const void*>(buf), len);
+        }
+        else
+        {
+            SOCKET s = socketData->socket;
+            result = send(s, (const char*)buf, len, flags);
+        }
     }
     else
     {
@@ -403,8 +619,20 @@ int32_t SocketTable::SendSocket(int32_t socketHandle, uint8_t* buf, int32_t len,
         auto it = socketMap.find(socketHandle);
         if (it != socketMap.cend())
         {
-            SOCKET s = it->second;
-            result = send(s, (const char*)buf, len, flags);
+            SocketData* socketData = it->second.get();
+            if (!socketData)
+            {
+                return InstallError("invalid socket handle " + std::to_string(socketHandle));
+            }
+            if (socketData->tlsSession)
+            {
+                result = gnutls_record_send(socketData->session, reinterpret_cast<const void*>(buf), len);
+            }
+            else
+            {
+                SOCKET s = socketData->socket;
+                result = send(s, (const char*)buf, len, flags);
+            }
         }
         else
         {
@@ -429,8 +657,20 @@ int32_t SocketTable::ReceiveSocket(int32_t socketHandle, uint8_t* buf, int32_t l
     }
     else if (socketHandle < maxNoLockSocketHandles)
     {
-        SOCKET s = sockets[socketHandle];
-        result = recv(s, (char*)buf, len, flags);
+        SocketData* socketData = sockets[socketHandle].get();
+        if (!socketData)
+        {
+            return InstallError("invalid socket handle " + std::to_string(socketHandle));
+        }
+        if (socketData->tlsSession)
+        {
+            result = gnutls_record_recv(socketData->session, reinterpret_cast<void*>(buf), len);
+        }
+        else
+        {
+            SOCKET s = socketData->socket;
+            result = recv(s, (char*)buf, len, flags);
+        }
     }
     else
     {
@@ -438,8 +678,20 @@ int32_t SocketTable::ReceiveSocket(int32_t socketHandle, uint8_t* buf, int32_t l
         auto it = socketMap.find(socketHandle);
         if (it != socketMap.cend())
         {
-            SOCKET s = it->second;
-            result = recv(s, (char*)buf, len, flags);
+            SocketData* socketData = it->second.get();
+            if (!socketData)
+            {
+                return InstallError("invalid socket handle " + std::to_string(socketHandle));
+            }
+            if (socketData->tlsSession)
+            {
+                result = gnutls_record_recv(socketData->session, reinterpret_cast<void*>(buf), len);
+            }
+            else
+            {
+                SOCKET s = socketData->socket;
+                result = recv(s, (char*)buf, len, flags);
+            }
         }
         else
         {
@@ -497,9 +749,9 @@ extern "C" RT_API int32_t RtShutdownSocket(int32_t socketHandle, ShutdownMode mo
     return cmajor::rt::SocketTable::Instance().ShutdownSocket(socketHandle, mode);
 }
 
-extern "C" RT_API int32_t RtConnectSocket(const char* node, const char* service)
+extern "C" RT_API int32_t RtConnectSocket(const char* node, const char* service, ConnectOptions options)
 {
-    return cmajor::rt::SocketTable::Instance().ConnectSocket(node, service);
+    return cmajor::rt::SocketTable::Instance().ConnectSocket(node, service, options);
 }
 
 extern "C" RT_API int32_t RtSendSocket(int32_t socketHandle, uint8_t* buf, int32_t len, int32_t flags)
@@ -511,3 +763,4 @@ extern "C" RT_API int32_t RtReceiveSocket(int32_t socketHandle, uint8_t* buf, in
 {
     return cmajor::rt::SocketTable::Instance().ReceiveSocket(socketHandle, buf, len, flags);
 }
+

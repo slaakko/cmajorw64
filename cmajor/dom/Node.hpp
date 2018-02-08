@@ -51,8 +51,10 @@ public:
 
 enum class Axis
 {
-    child, descendant, parent, ancestor, followingSibling, precedingSibling, following, preceding, attribute, ns, self, descendant_or_self, ancestor_or_self
+    child, descendant, parent, ancestor, followingSibling, precedingSibling, following, preceding, attribute, ns, self, descendantOrSelf, ancestorOrSelf
 };
+
+std::u32string AxisName(Axis axis);
 
 class Node
 {

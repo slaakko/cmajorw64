@@ -1,0 +1,31 @@
+using System;
+using System.IO;
+using System.IO.Compression;
+
+int main()
+{
+    try
+    {
+        string testFilePath = "System.Json.xml";
+        string compressedFilePath = "compressed.bin";
+        string decompressedFilePath = "decompressed.bin";
+        {
+            FileByteStream in(testFilePath , cast<OpenMode>(OpenMode.read | OpenMode.binary));
+            SharedPtr<ByteStream> out(new FileByteStream(compressedFilePath, cast<OpenMode>(OpenMode.write | OpenMode.binary)));
+            DeflateStream compressStream(out, CompressionMode.compress);
+            in.CopyTo(compressStream);
+        }
+        {
+            SharedPtr<ByteStream> in(new FileByteStream(compressedFilePath, cast<OpenMode>(OpenMode.read | OpenMode.binary)));
+            DeflateStream decompressStream(in, CompressionMode.decompress);
+            FileByteStream out(decompressedFilePath, cast<OpenMode>(OpenMode.write | OpenMode.binary));
+            decompressStream.CopyTo(out);
+        }
+    }
+    catch (const Exception& ex)
+    {
+        Console.Error() << ex.ToString() << endl();
+        return 1;
+    }
+    return 0;
+}

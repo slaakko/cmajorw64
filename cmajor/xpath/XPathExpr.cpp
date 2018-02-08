@@ -58,6 +58,14 @@ std::unique_ptr<XPathObject> XPathOrExpr::Evaluate(XPathContext& context)
     return rightAsBoolean;
 }
 
+std::unique_ptr<dom::Node> XPathOrExpr::ToDom() const
+{
+    std::unique_ptr<dom::Element> element(new dom::Element(U"or"));
+    element->AppendChild(Left()->ToDom());
+    element->AppendChild(Right()->ToDom());
+    return std::unique_ptr<dom::Node>(element.release());
+}
+
 XPathAndExpr::XPathAndExpr(XPathExpr* left_, XPathExpr* right_) : XPathBinaryExpr(left_, right_)
 {
 }
@@ -88,6 +96,14 @@ std::unique_ptr<XPathObject> XPathAndExpr::Evaluate(XPathContext& context)
     return rightAsBoolean;
 }
 
+std::unique_ptr<dom::Node> XPathAndExpr::ToDom() const
+{
+    std::unique_ptr<dom::Element> element(new dom::Element(U"and"));
+    element->AppendChild(Left()->ToDom());
+    element->AppendChild(Right()->ToDom());
+    return std::unique_ptr<dom::Node>(element.release());
+}
+
 std::unique_ptr<XPathObject> CompareNodeSets(XPathContext& context, XPathObject* left, XPathObject* right, Operator comparisonOp)
 {
     if (left->Type() == XPathObjectType::nodeSet && right->Type() == XPathObjectType::nodeSet)
@@ -113,11 +129,6 @@ std::unique_ptr<XPathObject> CompareNodeSets(XPathContext& context, XPathObject*
                             std::unique_ptr<XPathObject> result(new XPathBoolean(true));
                             return result;
                         }
-                        else
-                        {
-                            std::unique_ptr<XPathObject> result(new XPathBoolean(false));
-                            return result;
-                        }
                         break;
                     }
                     case Operator::notEqual:
@@ -125,11 +136,6 @@ std::unique_ptr<XPathObject> CompareNodeSets(XPathContext& context, XPathObject*
                         if (leftStr != rightStr)
                         {
                             std::unique_ptr<XPathObject> result(new XPathBoolean(true));
-                            return result;
-                        }
-                        else
-                        {
-                            std::unique_ptr<XPathObject> result(new XPathBoolean(false));
                             return result;
                         }
                         break;
@@ -141,11 +147,6 @@ std::unique_ptr<XPathObject> CompareNodeSets(XPathContext& context, XPathObject*
                             std::unique_ptr<XPathObject> result(new XPathBoolean(true));
                             return result;
                         }
-                        else
-                        {
-                            std::unique_ptr<XPathObject> result(new XPathBoolean(false));
-                            return result;
-                        }
                         break;
                     }
                     case Operator::greater:
@@ -153,11 +154,6 @@ std::unique_ptr<XPathObject> CompareNodeSets(XPathContext& context, XPathObject*
                         if (leftStr > rightStr)
                         {
                             std::unique_ptr<XPathObject> result(new XPathBoolean(true));
-                            return result;
-                        }
-                        else
-                        {
-                            std::unique_ptr<XPathObject> result(new XPathBoolean(false));
                             return result;
                         }
                         break;
@@ -169,11 +165,6 @@ std::unique_ptr<XPathObject> CompareNodeSets(XPathContext& context, XPathObject*
                             std::unique_ptr<XPathObject> result(new XPathBoolean(true));
                             return result;
                         }
-                        else
-                        {
-                            std::unique_ptr<XPathObject> result(new XPathBoolean(false));
-                            return result;
-                        }
                         break;
                     }
                     case Operator::greaterOrEqual:
@@ -181,11 +172,6 @@ std::unique_ptr<XPathObject> CompareNodeSets(XPathContext& context, XPathObject*
                         if (leftStr >= rightStr)
                         {
                             std::unique_ptr<XPathObject> result(new XPathBoolean(true));
-                            return result;
-                        }
-                        else
-                        {
-                            std::unique_ptr<XPathObject> result(new XPathBoolean(false));
                             return result;
                         }
                         break;
@@ -719,6 +705,14 @@ std::unique_ptr<XPathObject> XPathEqualExpr::Evaluate(XPathContext& context)
     return CompareEquality(context, left.get(), right.get());
 }
 
+std::unique_ptr<dom::Node> XPathEqualExpr::ToDom() const
+{
+    std::unique_ptr<dom::Element> element(new dom::Element(U"equal"));
+    element->AppendChild(Left()->ToDom());
+    element->AppendChild(Right()->ToDom());
+    return std::unique_ptr<dom::Node>(element.release());
+}
+
 XPathNotEqualExpr::XPathNotEqualExpr(XPathExpr* left_, XPathExpr* right_) : XPathBinaryExpr(left_, right_)
 {
 }
@@ -733,6 +727,14 @@ std::unique_ptr<XPathObject> XPathNotEqualExpr::Evaluate(XPathContext& context)
         throw std::runtime_error("boolean result expected");
     }
     return std::unique_ptr<XPathObject>(new XPathBoolean(!static_cast<XPathBoolean*>(equal.get())->Value()));
+}
+
+std::unique_ptr<dom::Node> XPathNotEqualExpr::ToDom() const
+{
+    std::unique_ptr<dom::Element> element(new dom::Element(U"notEqual"));
+    element->AppendChild(Left()->ToDom());
+    element->AppendChild(Right()->ToDom());
+    return std::unique_ptr<dom::Node>(element.release());
 }
 
 std::unique_ptr<XPathObject> Compare(XPathContext& context, XPathObject* left, XPathObject* right, Operator comparisonOp)
@@ -835,6 +837,14 @@ std::unique_ptr<XPathObject> XPathLessExpr::Evaluate(XPathContext& context)
     return Compare(context, left.get(), right.get(), Operator::less);
 }
 
+std::unique_ptr<dom::Node> XPathLessExpr::ToDom() const
+{
+    std::unique_ptr<dom::Element> element(new dom::Element(U"less"));
+    element->AppendChild(Left()->ToDom());
+    element->AppendChild(Right()->ToDom());
+    return std::unique_ptr<dom::Node>(element.release());
+}
+
 XPathGreaterExpr::XPathGreaterExpr(XPathExpr* left_, XPathExpr* right_) : XPathBinaryExpr(left_, right_)
 {
 }
@@ -844,6 +854,14 @@ std::unique_ptr<XPathObject> XPathGreaterExpr::Evaluate(XPathContext& context)
     std::unique_ptr<XPathObject> left = Left()->Evaluate(context);
     std::unique_ptr<XPathObject> right = Right()->Evaluate(context);
     return Compare(context, left.get(), right.get(), Operator::greater);
+}
+
+std::unique_ptr<dom::Node> XPathGreaterExpr::ToDom() const
+{
+    std::unique_ptr<dom::Element> element(new dom::Element(U"greater"));
+    element->AppendChild(Left()->ToDom());
+    element->AppendChild(Right()->ToDom());
+    return std::unique_ptr<dom::Node>(element.release());
 }
 
 XPathLessOrEqualExpr::XPathLessOrEqualExpr(XPathExpr* left_, XPathExpr* right_) : XPathBinaryExpr(left_, right_)
@@ -857,6 +875,14 @@ std::unique_ptr<XPathObject> XPathLessOrEqualExpr::Evaluate(XPathContext& contex
     return Compare(context, left.get(), right.get(), Operator::lessOrEqual);
 }
 
+std::unique_ptr<dom::Node> XPathLessOrEqualExpr::ToDom() const
+{
+    std::unique_ptr<dom::Element> element(new dom::Element(U"lessOrEqual"));
+    element->AppendChild(Left()->ToDom());
+    element->AppendChild(Right()->ToDom());
+    return std::unique_ptr<dom::Node>(element.release());
+}
+
 XPathGreaterOrEqualExpr::XPathGreaterOrEqualExpr(XPathExpr* left_, XPathExpr* right_) : XPathBinaryExpr(left_, right_)
 {
 }
@@ -866,6 +892,14 @@ std::unique_ptr<XPathObject> XPathGreaterOrEqualExpr::Evaluate(XPathContext& con
     std::unique_ptr<XPathObject> left = Left()->Evaluate(context);
     std::unique_ptr<XPathObject> right = Right()->Evaluate(context);
     return Compare(context, left.get(), right.get(), Operator::greaterOrEqual);
+}
+
+std::unique_ptr<dom::Node> XPathGreaterOrEqualExpr::ToDom() const
+{
+    std::unique_ptr<dom::Element> element(new dom::Element(U"greaterOrEqual"));
+    element->AppendChild(Left()->ToDom());
+    element->AppendChild(Right()->ToDom());
+    return std::unique_ptr<dom::Node>(element.release());
 }
 
 XPathAddExpr::XPathAddExpr(XPathExpr* left_, XPathExpr* right_) : XPathBinaryExpr(left_, right_)
@@ -896,6 +930,14 @@ std::unique_ptr<XPathObject> XPathAddExpr::Evaluate(XPathContext& context)
     return std::unique_ptr<XPathObject>(new XPathNumber(leftNumber + rightNumber));
 }
 
+std::unique_ptr<dom::Node> XPathAddExpr::ToDom() const
+{
+    std::unique_ptr<dom::Element> element(new dom::Element(U"add"));
+    element->AppendChild(Left()->ToDom());
+    element->AppendChild(Right()->ToDom());
+    return std::unique_ptr<dom::Node>(element.release());
+}
+
 XPathSubExpr::XPathSubExpr(XPathExpr* left_, XPathExpr* right_) : XPathBinaryExpr(left_, right_)
 {
 }
@@ -922,6 +964,14 @@ std::unique_ptr<XPathObject> XPathSubExpr::Evaluate(XPathContext& context)
     }
     double rightNumber = static_cast<XPathNumber*>(rightAsNumber.get())->Value();
     return std::unique_ptr<XPathObject>(new XPathNumber(leftNumber - rightNumber));
+}
+
+std::unique_ptr<dom::Node> XPathSubExpr::ToDom() const
+{
+    std::unique_ptr<dom::Element> element(new dom::Element(U"sub"));
+    element->AppendChild(Left()->ToDom());
+    element->AppendChild(Right()->ToDom());
+    return std::unique_ptr<dom::Node>(element.release());
 }
 
 XPathMulExpr::XPathMulExpr(XPathExpr* left_, XPathExpr* right_) : XPathBinaryExpr(left_, right_)
@@ -952,6 +1002,14 @@ std::unique_ptr<XPathObject> XPathMulExpr::Evaluate(XPathContext& context)
     return std::unique_ptr<XPathObject>(new XPathNumber(leftNumber * rightNumber));
 }
 
+std::unique_ptr<dom::Node> XPathMulExpr::ToDom() const
+{
+    std::unique_ptr<dom::Element> element(new dom::Element(U"mul"));
+    element->AppendChild(Left()->ToDom());
+    element->AppendChild(Right()->ToDom());
+    return std::unique_ptr<dom::Node>(element.release());
+}
+
 XPathDivExpr::XPathDivExpr(XPathExpr* left_, XPathExpr* right_) : XPathBinaryExpr(left_, right_)
 {
 }
@@ -978,6 +1036,14 @@ std::unique_ptr<XPathObject> XPathDivExpr::Evaluate(XPathContext& context)
     }
     double rightNumber = static_cast<XPathNumber*>(rightAsNumber.get())->Value();
     return std::unique_ptr<XPathObject>(new XPathNumber(leftNumber / rightNumber));
+}
+
+std::unique_ptr<dom::Node> XPathDivExpr::ToDom() const
+{
+    std::unique_ptr<dom::Element> element(new dom::Element(U"div"));
+    element->AppendChild(Left()->ToDom());
+    element->AppendChild(Right()->ToDom());
+    return std::unique_ptr<dom::Node>(element.release());
 }
 
 XPathModExpr::XPathModExpr(XPathExpr* left_, XPathExpr* right_) : XPathBinaryExpr(left_, right_)
@@ -1008,6 +1074,14 @@ std::unique_ptr<XPathObject> XPathModExpr::Evaluate(XPathContext& context)
     return std::unique_ptr<XPathObject>(new XPathNumber(double(leftNumber % rightNumber)));
 }
 
+std::unique_ptr<dom::Node> XPathModExpr::ToDom() const
+{
+    std::unique_ptr<dom::Element> element(new dom::Element(U"mod"));
+    element->AppendChild(Left()->ToDom());
+    element->AppendChild(Right()->ToDom());
+    return std::unique_ptr<dom::Node>(element.release());
+}
+
 XPathUnaryMinusExpr::XPathUnaryMinusExpr(XPathExpr* operand_) : XPathUnaryExpr(operand_)
 {
 }
@@ -1025,6 +1099,13 @@ std::unique_ptr<XPathObject> XPathUnaryMinusExpr::Evaluate(XPathContext& context
     }
     double operandNumber = static_cast<XPathNumber*>(operandAsNumber.get())->Value();
     return std::unique_ptr<XPathObject>(new XPathNumber(-operandNumber));
+}
+
+std::unique_ptr<dom::Node> XPathUnaryMinusExpr::ToDom() const
+{
+    std::unique_ptr<dom::Element> element(new dom::Element(U"unaryMinus"));
+    element->AppendChild(Operand()->ToDom());
+    return std::unique_ptr<dom::Node>(element.release());
 }
 
 XPathUnionExpr::XPathUnionExpr(XPathExpr* left_, XPathExpr* right_) : XPathBinaryExpr(left_, right_)
@@ -1057,6 +1138,14 @@ std::unique_ptr<XPathObject> XPathUnionExpr::Evaluate(XPathContext& context)
         result->Add((*rightNodeSet)[i]);
     }
     return result;
+}
+
+std::unique_ptr<dom::Node> XPathUnionExpr::ToDom() const
+{
+    std::unique_ptr<dom::Element> element(new dom::Element(U"union"));
+    element->AppendChild(Left()->ToDom());
+    element->AppendChild(Right()->ToDom());
+    return std::unique_ptr<dom::Node>(element.release());
 }
 
 XPathCombineStepExpr::XPathCombineStepExpr(XPathExpr* left_, XPathExpr* right_) : XPathBinaryExpr(left_, right_)
@@ -1093,6 +1182,14 @@ std::unique_ptr<XPathObject> XPathCombineStepExpr::Evaluate(XPathContext& contex
     return result;
 }
 
+std::unique_ptr<dom::Node> XPathCombineStepExpr::ToDom() const
+{
+    std::unique_ptr<dom::Element> element(new dom::Element(U"combineStep"));
+    element->AppendChild(Left()->ToDom());
+    element->AppendChild(Right()->ToDom());
+    return std::unique_ptr<dom::Node>(element.release());
+}
+
 XPathRootNodeExpr::XPathRootNodeExpr()
 {
 }
@@ -1111,13 +1208,14 @@ std::unique_ptr<XPathObject> XPathRootNodeExpr::Evaluate(XPathContext& context)
     return nodeSet;
 }
 
-XPathFilterExpr::XPathFilterExpr(XPathExpr* expr_) : XPathUnaryExpr(expr_)
+std::unique_ptr<dom::Node> XPathRootNodeExpr::ToDom() const
 {
+    std::unique_ptr<dom::Element> element(new dom::Element(U"root"));
+    return std::unique_ptr<dom::Node>(element.release());
 }
 
-void XPathFilterExpr::AddPredicate(XPathExpr* predicate)
+XPathFilterExpr::XPathFilterExpr(XPathExpr* expr_, XPathExpr* predicate_) : XPathUnaryExpr(expr_), predicate(predicate_)
 {
-    predicates.push_back(std::unique_ptr<XPathExpr>(predicate));
 }
 
 std::unique_ptr<XPathObject> XPathFilterExpr::Evaluate(XPathContext& context)
@@ -1128,40 +1226,47 @@ std::unique_ptr<XPathObject> XPathFilterExpr::Evaluate(XPathContext& context)
         throw std::runtime_error("node-set expected");
     }
     std::unique_ptr<XPathNodeSet> nodeSet(static_cast<XPathNodeSet*>(result.release()));
-    for (const std::unique_ptr<XPathExpr>& predicate : predicates)
+    std::unique_ptr<XPathNodeSet> filteredNodeSet(new XPathNodeSet());
+    int n = nodeSet->Length();
+    for (int i = 0; i < n; ++i)
     {
-        std::unique_ptr<XPathNodeSet> filteredNodeSet(new XPathNodeSet());
-        int n = nodeSet->Length();
-        for (int i = 0; i < n; ++i)
+        cmajor::dom::Node* node = (*nodeSet)[i];
+        XPathContext context(node, i + 1, n);
+        std::unique_ptr<XPathObject> result = predicate->Evaluate(context);
+        bool booleanResult = false;
+        if (result->Type() == XPathObjectType::number)
         {
-            cmajor::dom::Node* node = (*nodeSet)[i];
-            XPathContext context(node, i + 1, n);
-            std::unique_ptr<XPathObject> result = predicate->Evaluate(context);
-            bool booleanResult = false;
-            if (result->Type() == XPathObjectType::number)
+            XPathNumber* number = static_cast<XPathNumber*>(result.get());
+            if (number->Value() == context.Position())
             {
-                XPathNumber* number = static_cast<XPathNumber*>(result.get());
-                if (number->Value() == context.Position())
-                {
-                    booleanResult = true;
-                }
-            }
-            else
-            {
-                XPathFunction* boolean = GetXPathLibraryFunction(U"boolean");
-                std::vector<XPathObject*> args;
-                args.push_back(result.get());
-                std::unique_ptr<XPathObject> resultAsBoolean = boolean->Evaluate(context, args);
-                booleanResult = static_cast<XPathBoolean*>(resultAsBoolean.get())->Value();
-            }
-            if (booleanResult)
-            {
-                filteredNodeSet->Add(node);
+                booleanResult = true;
             }
         }
-        std::swap(nodeSet, filteredNodeSet);
+        else
+        {
+            XPathFunction* boolean = GetXPathLibraryFunction(U"boolean");
+            std::vector<XPathObject*> args;
+            args.push_back(result.get());
+            std::unique_ptr<XPathObject> resultAsBoolean = boolean->Evaluate(context, args);
+            booleanResult = static_cast<XPathBoolean*>(resultAsBoolean.get())->Value();
+        }
+        if (booleanResult)
+        {
+            filteredNodeSet->Add(node);
+        }
     }
+    std::swap(nodeSet, filteredNodeSet);
     return nodeSet;
+}
+
+std::unique_ptr<dom::Node> XPathFilterExpr::ToDom() const
+{
+    std::unique_ptr<dom::Element> element(new dom::Element(U"filter"));
+    element->AppendChild(Operand()->ToDom());
+    std::unique_ptr<dom::Element> predicateElement(new dom::Element(U"predicate"));
+    predicateElement->AppendChild(predicate->ToDom());
+    element->AppendChild(std::unique_ptr<dom::Node>(predicateElement.release()));
+    return std::unique_ptr<dom::Node>(element.release());
 }
 
 class NodeSelectionOp : public cmajor::dom::NodeOp
@@ -1237,6 +1342,25 @@ std::unique_ptr<XPathObject> XPathLocationStepExpr::Evaluate(XPathContext& conte
     return nodeSet;
 }
 
+std::unique_ptr<dom::Node> XPathLocationStepExpr::ToDom() const
+{
+    std::unique_ptr<dom::Element> element(new dom::Element(U"locationStep"));
+    dom::Element* axisElement = new dom::Element(U"axis");
+    std::u32string axisName = AxisName(axis);
+    axisElement->SetAttribute(U"name", axisName);
+    element->AppendChild(std::unique_ptr<dom::Node>(axisElement));
+    dom::Element* nodeTestElement = new dom::Element(U"nodeTest");
+    nodeTestElement->AppendChild(nodeTest->ToDom());
+    element->AppendChild(std::unique_ptr<dom::Node>(nodeTestElement));
+    std::unique_ptr<dom::Element> predicatesElement(new dom::Element(U"predicates"));
+    for (const std::unique_ptr<XPathExpr>& predicate : predicates)
+    {
+        predicatesElement->AppendChild(predicate->ToDom());
+    }
+    element->AppendChild(std::unique_ptr<dom::Node>(predicatesElement.release()));
+    return std::unique_ptr<dom::Node>(element.release());
+}
+
 class AxisMap
 {
 public:
@@ -1249,11 +1373,11 @@ private:
 AxisMap::AxisMap()
 {
     axisMap[U"ancestor"] = Axis::ancestor;
-    axisMap[U"ancestor-or-self"] = Axis::ancestor_or_self;
+    axisMap[U"ancestor-or-self"] = Axis::ancestorOrSelf;
     axisMap[U"attribute"] = Axis::attribute;
     axisMap[U"child"] = Axis::child;
     axisMap[U"descendant"] = Axis::descendant;
-    axisMap[U"descendant-or-self"] = Axis::descendant_or_self;
+    axisMap[U"descendant-or-self"] = Axis::descendantOrSelf;
     axisMap[U"following"] = Axis::following;
     axisMap[U"following-sibling"] = Axis::followingSibling;
     axisMap[U"namespace"] = Axis::ns;
@@ -1300,9 +1424,22 @@ bool XPathPILiteralTest::Select(cmajor::dom::Node* node, Axis axis) const
     return false;
 }
 
+std::unique_ptr<dom::Node> XPathPILiteralTest::ToDom() const
+{
+    std::unique_ptr<dom::Element> element(new dom::Element(U"piLiteralTest"));
+    element->AppendChild(literal->ToDom());
+    return std::unique_ptr<dom::Node>(element.release());
+}
+
 bool XPathCommentNodeTest::Select(cmajor::dom::Node* node, Axis axis) const
 {
     return node->GetNodeType() == cmajor::dom::NodeType::commentNode;
+}
+
+std::unique_ptr<dom::Node> XPathCommentNodeTest::ToDom() const
+{
+    std::unique_ptr<dom::Element> element(new dom::Element(U"commentNodeTest"));
+    return std::unique_ptr<dom::Node>(element.release());
 }
 
 bool XPathTextNodeTest::Select(cmajor::dom::Node* node, Axis axis) const
@@ -1310,9 +1447,21 @@ bool XPathTextNodeTest::Select(cmajor::dom::Node* node, Axis axis) const
     return node->GetNodeType() == cmajor::dom::NodeType::textNode;
 }
 
+std::unique_ptr<dom::Node> XPathTextNodeTest::ToDom() const
+{
+    std::unique_ptr<dom::Element> element(new dom::Element(U"textNodeTest"));
+    return std::unique_ptr<dom::Node>(element.release());
+}
+
 bool XPathPINodeTest::Select(cmajor::dom::Node* node, Axis axis) const
 {
     return node->GetNodeType() == cmajor::dom::NodeType::processingInstructionNode;
+}
+
+std::unique_ptr<dom::Node> XPathPINodeTest::ToDom() const
+{
+    std::unique_ptr<dom::Element> element(new dom::Element(U"piNodeTest"));
+    return std::unique_ptr<dom::Node>(element.release());
 }
 
 bool XPathPrincipalNodeTest::Select(cmajor::dom::Node* node, Axis axis) const
@@ -1331,9 +1480,21 @@ bool XPathPrincipalNodeTest::Select(cmajor::dom::Node* node, Axis axis) const
     }
 }
 
+std::unique_ptr<dom::Node> XPathPrincipalNodeTest::ToDom() const
+{
+    std::unique_ptr<dom::Element> element(new dom::Element(U"principalNodeTest"));
+    return std::unique_ptr<dom::Node>(element.release());
+}
+
 bool XPathAnyNodeTest::Select(cmajor::dom::Node* node, Axis axis) const
 {
     return true;
+}
+
+std::unique_ptr<dom::Node> XPathAnyNodeTest::ToDom() const
+{
+    std::unique_ptr<dom::Element> element(new dom::Element(U"anyNodeTest"));
+    return std::unique_ptr<dom::Node>(element.release());
 }
 
 XPathPrefixTest::XPathPrefixTest(const std::u32string& name_) : name(name_)
@@ -1369,6 +1530,13 @@ bool XPathPrefixTest::Select(cmajor::dom::Node* node, Axis axis) const
     return false;
 }
 
+std::unique_ptr<dom::Node> XPathPrefixTest::ToDom() const
+{
+    std::unique_ptr<dom::Element> element(new dom::Element(U"prefixTest"));
+    element->SetAttribute(U"prefix", name);
+    return std::unique_ptr<dom::Node>(element.release());
+}
+
 XPathNameTest::XPathNameTest(const std::u32string& name_) : name(name_)
 {
 }
@@ -1400,8 +1568,22 @@ bool XPathNameTest::Select(cmajor::dom::Node* node, Axis axis) const
     return false;
 }
 
+std::unique_ptr<dom::Node> XPathNameTest::ToDom() const
+{
+    std::unique_ptr<dom::Element> element(new dom::Element(U"nameTest"));
+    element->SetAttribute(U"name", name);
+    return std::unique_ptr<dom::Node>(element.release());
+}
+
 XPathVariableReference::XPathVariableReference(const std::u32string& name_) : name(name_)
 {
+}
+
+std::unique_ptr<dom::Node> XPathVariableReference::ToDom() const
+{
+    std::unique_ptr<dom::Element> element(new dom::Element(U"variableReference"));
+    element->SetAttribute(U"name", name);
+    return std::unique_ptr<dom::Node>(element.release());
 }
 
 XPathLiteral::XPathLiteral(const std::u32string& value_) : value(value_)
@@ -1411,6 +1593,13 @@ XPathLiteral::XPathLiteral(const std::u32string& value_) : value(value_)
 std::unique_ptr<XPathObject> XPathLiteral::Evaluate(XPathContext& context)
 {
     return std::unique_ptr<XPathObject>(new XPathString(value));
+}
+
+std::unique_ptr<dom::Node> XPathLiteral::ToDom() const
+{
+    std::unique_ptr<dom::Element> element(new dom::Element(U"literal"));
+    element->SetAttribute(U"value", value);
+    return std::unique_ptr<dom::Node>(element.release());
 }
 
 XPathNumberExpr::XPathNumberExpr(const std::u32string& value_)
@@ -1428,6 +1617,13 @@ XPathNumberExpr::XPathNumberExpr(double value_) : value(value_)
 std::unique_ptr<XPathObject> XPathNumberExpr::Evaluate(XPathContext& context)
 {
     return std::unique_ptr<XPathObject>(new XPathNumber(value));
+}
+
+std::unique_ptr<dom::Node> XPathNumberExpr::ToDom() const
+{
+    std::unique_ptr<dom::Element> element(new dom::Element(U"number"));
+    element->SetAttribute(U"value", ToUtf32(std::to_string(value)));
+    return std::unique_ptr<dom::Node>(element.release());
 }
 
 XPathFunctionCall::XPathFunctionCall(const std::u32string& functionName_) : functionName(functionName_)
@@ -1457,6 +1653,19 @@ std::unique_ptr<XPathObject> XPathFunctionCall::Evaluate(XPathContext& context)
     }
     std::unique_ptr<XPathObject> result = function->Evaluate(context, args);
     return result;
+}
+
+std::unique_ptr<dom::Node> XPathFunctionCall::ToDom() const
+{
+    std::unique_ptr<dom::Element> element(new dom::Element(U"functionCall"));
+    element->AppendChild(std::unique_ptr<dom::Node>(new dom::Element(functionName)));
+    std::unique_ptr<dom::Element> argumentsElement(new dom::Element(U"arguments"));
+    for (const std::unique_ptr<XPathExpr>& argument : arguments)
+    {
+        argumentsElement->AppendChild(argument->ToDom());
+    }
+    element->AppendChild(std::unique_ptr<dom::Node>(argumentsElement.release()));
+    return std::unique_ptr<dom::Node>(element.release());
 }
 
 } } // namespace cmajor::xpath

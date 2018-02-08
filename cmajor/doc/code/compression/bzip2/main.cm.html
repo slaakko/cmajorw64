@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8"/>
+    <title>main.cm</title>
+    <link rel="stylesheet" type="text/css" href="../../../style/code.css"/>
+</head>
+<body>
+<pre>
+<div class="code">
+<span class="keyword">using</span> <span class="identifier">System</span><span class="other">;</span>
+<span class="keyword">using</span> <span class="identifier">System.IO</span><span class="other">;</span>
+<span class="keyword">using</span> <span class="identifier">System.IO.Compression</span><span class="other">;</span>
+
+<span class="keyword">int</span> <span class="identifier">main</span><span class="other">(</span><span class="other">)</span>
+<span class="other">{</span>
+    <span class="keyword">try</span>
+    <span class="other">{</span>
+        <span class="identifier">string</span> <span class="identifier">testFilePath</span> <span class="other">=</span> <span class="string">&quot;System.Json.xml&quot;</span><span class="other">;</span>
+        <span class="identifier">string</span> <span class="identifier">compressedFilePath</span> <span class="other">=</span> <span class="string">&quot;compressed.bin&quot;</span><span class="other">;</span>
+        <span class="identifier">string</span> <span class="identifier">decompressedFilePath</span> <span class="other">=</span> <span class="string">&quot;decompressed.bin&quot;</span><span class="other">;</span>
+        <span class="other">{</span>
+            <span class="identifier">FileByteStream</span> <span class="identifier">in</span><span class="other">(</span><span class="identifier">testFilePath</span><span class="other">,</span> <span class="keyword">cast</span><span class="other">&lt;</span><span class="identifier">OpenMode</span><span class="other">&gt;</span><span class="other">(</span><span class="identifier">OpenMode.read</span> <span class="other">|</span> <span class="identifier">OpenMode.binary</span><span class="other">)</span><span class="other">)</span><span class="other">;</span>
+            <span class="identifier">SharedPtr</span><span class="other">&lt;</span><span class="identifier">ByteStream</span><span class="other">&gt;</span> <span class="identifier">out</span><span class="other">(</span><span class="keyword">new</span> <span class="identifier">FileByteStream</span><span class="other">(</span><span class="identifier">compressedFilePath</span><span class="other">,</span> <span class="keyword">cast</span><span class="other">&lt;</span><span class="identifier">OpenMode</span><span class="other">&gt;</span><span class="other">(</span><span class="identifier">OpenMode.write</span> <span class="other">|</span> <span class="identifier">OpenMode.binary</span><span class="other">)</span><span class="other">)</span><span class="other">)</span><span class="other">;</span>
+            <span class="identifier">BZip2Stream</span> <span class="identifier">compressStream</span><span class="other">(</span><span class="identifier">out</span><span class="other">,</span> <span class="identifier">CompressionMode.compress</span><span class="other">)</span><span class="other">;</span>
+            <span class="identifier">in.CopyTo</span><span class="other">(</span><span class="identifier">compressStream</span><span class="other">)</span><span class="other">;</span>
+        <span class="other">}</span>
+        <span class="other">{</span>
+            <span class="identifier">SharedPtr</span><span class="other">&lt;</span><span class="identifier">ByteStream</span><span class="other">&gt;</span> <span class="identifier">in</span><span class="other">(</span><span class="keyword">new</span> <span class="identifier">FileByteStream</span><span class="other">(</span><span class="identifier">compressedFilePath</span><span class="other">,</span> <span class="keyword">cast</span><span class="other">&lt;</span><span class="identifier">OpenMode</span><span class="other">&gt;</span><span class="other">(</span><span class="identifier">OpenMode.read</span> <span class="other">|</span> <span class="identifier">OpenMode.binary</span><span class="other">)</span><span class="other">)</span><span class="other">)</span><span class="other">;</span>
+            <span class="identifier">BZip2Stream</span> <span class="identifier">decompressStream</span><span class="other">(</span><span class="identifier">in</span><span class="other">,</span> <span class="identifier">CompressionMode.decompress</span><span class="other">)</span><span class="other">;</span>
+            <span class="identifier">FileByteStream</span> <span class="identifier">out</span><span class="other">(</span><span class="identifier">decompressedFilePath</span><span class="other">,</span> <span class="keyword">cast</span><span class="other">&lt;</span><span class="identifier">OpenMode</span><span class="other">&gt;</span><span class="other">(</span><span class="identifier">OpenMode.write</span> <span class="other">|</span> <span class="identifier">OpenMode.binary</span><span class="other">)</span><span class="other">)</span><span class="other">;</span>
+            <span class="identifier">decompressStream.CopyTo</span><span class="other">(</span><span class="identifier">out</span><span class="other">)</span><span class="other">;</span>
+        <span class="other">}</span>
+    <span class="other">}</span>
+    <span class="keyword">catch</span> <span class="other">(</span><span class="keyword">const</span> <span class="identifier">Exception</span><span class="other">&amp;</span> <span class="identifier">ex</span><span class="other">)</span>
+    <span class="other">{</span>
+        <span class="identifier">Console.Error</span><span class="other">(</span><span class="other">)</span> <span class="other">&lt;</span><span class="other">&lt;</span> <span class="identifier">ex.ToString</span><span class="other">(</span><span class="other">)</span> <span class="other">&lt;</span><span class="other">&lt;</span> <span class="identifier">endl</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>
+        <span class="keyword">return</span> <span class="number">1</span><span class="other">;</span>
+    <span class="other">}</span>
+    <span class="keyword">return</span> <span class="number">0</span><span class="other">;</span>
+<span class="other">}</span>
+</div
+</pre>
+</body>
+</html>

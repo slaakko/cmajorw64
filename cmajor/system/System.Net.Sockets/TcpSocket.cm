@@ -12,6 +12,11 @@ namespace System.Net.Sockets
         receive = 0, send = 1, both = 2
     }
     
+    public enum ConnectOptions : int
+    {
+        none = 0, useTls = 1 << 0
+    }
+    
     public class SocketException : Exception
     {
         public nothrow SocketException(const string& message_) : base(message_)
@@ -21,7 +26,7 @@ namespace System.Net.Sockets
     
     public class TcpSocket
     {
-        public TcpSocket() : handle(RtCreateSocket())
+        public TcpSocket() : handle(RtCreateSocket()), connected(false), shutdown(false)
         {
             if (handle < 0)
             {
@@ -30,7 +35,11 @@ namespace System.Net.Sockets
                 throw SocketException(errorMessage);
             }
         }
-        public TcpSocket(const string& node_, const string& service_) : handle(RtConnectSocket(node_.Chars(), service_.Chars()))
+        public TcpSocket(const string& node_, const string& service_) : this(node_, service_, ConnectOptions.none)
+        {
+        }
+        public TcpSocket(const string& node_, const string& service_, ConnectOptions options_) : 
+            handle(RtConnectSocket(node_.Chars(), service_.Chars(), cast<int>(options_))), connected(false), shutdown(false)
         {
             if (handle < 0)
             {
@@ -38,6 +47,10 @@ namespace System.Net.Sockets
                 RtDisposeError(handle);
                 throw SocketException(errorMessage);
             }
+            else
+            {
+                connected = true;
+            }            
         }
         public nothrow TcpSocket(int handle_) : handle(handle_)
         {
@@ -47,6 +60,8 @@ namespace System.Net.Sockets
         public nothrow TcpSocket(TcpSocket&& that) : handle(that.handle)
         {
             that.handle = -1;
+            that.connected = false;
+            that.shutdown = false;
         }
         public nothrow void operator=(TcpSocket&& that) 
         {
@@ -56,6 +71,16 @@ namespace System.Net.Sockets
         {
             if (handle > 0)
             {
+                if (connected && !shutdown)
+                {
+                    try
+                    {
+                        Shutdown(ShutdownMode.both);
+                    }                
+                    catch (const Exception& ex)
+                    {
+                    }                
+                }
                 RtCloseSocket(handle);
             }
         }
@@ -63,6 +88,10 @@ namespace System.Net.Sockets
         {
             if (handle > 0)
             {
+                if (connected && !shutdown)
+                {
+                    Shutdown(ShutdownMode.both);
+                }
                 int result = RtCloseSocket(handle);
                 if (result < 0)
                 {
@@ -71,17 +100,26 @@ namespace System.Net.Sockets
                     throw SocketException(errorMessage);
                 }
                 handle = -1;
+                connected = false;
             }
         }
-        public void Connect(const string& node, const string& service)
+        public void Connect(const string& node, const string& service) 
+        {
+            Connect(node, service, ConnectOptions.none);
+        }
+        public void Connect(const string& node, const string& service, ConnectOptions options)
         {
             Close();
-            handle = RtConnectSocket(node.Chars(), service.Chars());
+            handle = RtConnectSocket(node.Chars(), service.Chars(), cast<int>(options));
             if (handle < 0)
             {
                 string errorMessage = RtGetError(handle);
                 RtDisposeError(handle);
                 throw SocketException(errorMessage);
+            }
+            else
+            {
+                connected = true;                
             }
         }
         public void Bind(int port)
@@ -117,6 +155,7 @@ namespace System.Net.Sockets
         }
         public void Shutdown(ShutdownMode mode)
         {
+            shutdown = true;
             int result = RtShutdownSocket(handle, cast<int>(mode));
             if (result < 0)
             {
@@ -148,5 +187,7 @@ namespace System.Net.Sockets
             return result;
         }
         private int handle;
+        private bool connected;
+        private bool shutdown;
     }
 }

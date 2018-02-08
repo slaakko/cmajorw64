@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8"/>
+    <title>xpath.cm</title>
+    <link rel="stylesheet" type="text/css" href="../../../style/code.css"/>
+</head>
+<body>
+<pre>
+<div class="code">
+<span class="keyword">using</span> <span class="identifier">System</span><span class="other">;</span>
+<span class="keyword">using</span> <span class="identifier">System.Dom</span><span class="other">;</span>
+<span class="keyword">using</span> <span class="identifier">System.Text</span><span class="other">;</span>
+<span class="keyword">using</span> <span class="identifier">System.XPath</span><span class="other">;</span>
+
+<span class="keyword">void</span> <span class="identifier">main</span><span class="other">(</span><span class="other">)</span>
+<span class="other">{</span>
+    <span class="keyword">try</span>
+    <span class="other">{</span>
+        <span class="identifier">UniquePtr</span><span class="other">&lt;</span><span class="identifier">DomDocument</span><span class="other">&gt;</span> <span class="identifier">doc</span> <span class="other">=</span> <span class="identifier">ParseXmlFileToDomDocument</span><span class="other">(</span><span class="string">&quot;test.xml&quot;</span><span class="other">)</span><span class="other">;</span>
+        <span class="identifier">UniquePtr</span><span class="other">&lt;</span><span class="identifier">XPathObject</span><span class="other">&gt;</span> <span class="identifier">result</span> <span class="other">=</span> <span class="identifier">Evaluate</span><span class="other">(</span><span class="identifier">u</span><span class="string">&quot;/test/alpha[@a=\&quot;1\&quot;]/beta/gamma/text()&quot;</span><span class="other">,</span> <span class="identifier">doc.Get</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span>
+        <span class="identifier">UniquePtr</span><span class="other">&lt;</span><span class="identifier">DomNode</span><span class="other">&gt;</span> <span class="identifier">resultAsDom</span> <span class="other">=</span> <span class="identifier">result</span><span class="other">-</span><span class="other">&gt;</span><span class="identifier">ToDom</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>
+        <span class="identifier">CodeFormatter</span> <span class="identifier">formatter</span><span class="other">(</span><span class="identifier">Console.Out</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span>
+        <span class="identifier">resultAsDom</span><span class="other">-</span><span class="other">&gt;</span><span class="identifier">Write</span><span class="other">(</span><span class="identifier">formatter</span><span class="other">)</span><span class="other">;</span>
+    <span class="other">}</span>
+    <span class="keyword">catch</span> <span class="other">(</span><span class="keyword">const</span> <span class="identifier">Exception</span><span class="other">&amp;</span> <span class="identifier">ex</span><span class="other">)</span>
+    <span class="other">{</span>
+        <span class="identifier">Console.Error</span><span class="other">(</span><span class="other">)</span> <span class="other">&lt;</span><span class="other">&lt;</span> <span class="identifier">ex.ToString</span><span class="other">(</span><span class="other">)</span> <span class="other">&lt;</span><span class="other">&lt;</span> <span class="identifier">endl</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>
+    <span class="other">}</span>
+<span class="other">}</span>
+</div
+</pre>
+</body>
+</html>

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8"/>
+    <title>xmlstats.cm</title>
+    <link rel="stylesheet" type="text/css" href="../../../style/code.css"/>
+</head>
+<body>
+<pre>
+<div class="code">
+<span class="keyword">using</span> <span class="identifier">System</span><span class="other">;</span>
+<span class="keyword">using</span> <span class="identifier">System.Xml</span><span class="other">;</span>
+
+<span class="keyword">class</span> <span class="identifier">XmlStats</span> <span class="other">:</span> <span class="identifier">XmlContentHandler</span>
+<span class="other">{</span>
+    <span class="keyword">public</span> <span class="identifier">XmlStats</span><span class="other">(</span><span class="keyword">const</span> <span class="identifier">string</span><span class="other">&amp;</span> <span class="identifier">xmlFileName_</span><span class="other">)</span> <span class="other">:</span> <span class="identifier">xmlFileName</span><span class="other">(</span><span class="identifier">xmlFileName_</span><span class="other">)</span>
+    <span class="other">{</span>
+    <span class="other">}</span>
+    <span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="identifier">StartElement</span><span class="other">(</span><span class="keyword">const</span> <span class="identifier">ustring</span><span class="other">&amp;</span> <span class="identifier">namespaceUri</span><span class="other">,</span> <span class="keyword">const</span> <span class="identifier">ustring</span><span class="other">&amp;</span> <span class="identifier">localName</span><span class="other">,</span> <span class="keyword">const</span> <span class="identifier">ustring</span><span class="other">&amp;</span> <span class="identifier">qualifiedName</span><span class="other">,</span> <span class="keyword">const</span> <span class="identifier">Attributes</span><span class="other">&amp;</span> <span class="identifier">attributes</span><span class="other">)</span>
+    <span class="other">{</span>
+        <span class="other">+</span><span class="other">+</span><span class="identifier">numElements</span><span class="other">;</span>
+        <span class="identifier">numAttributes</span> <span class="other">=</span> <span class="identifier">numAttributes</span> <span class="other">+</span> <span class="identifier">attributes.Count</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>
+    <span class="other">}</span>
+    <span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="identifier">PI</span><span class="other">(</span><span class="keyword">const</span> <span class="identifier">ustring</span><span class="other">&amp;</span> <span class="identifier">target</span><span class="other">,</span> <span class="keyword">const</span> <span class="identifier">ustring</span><span class="other">&amp;</span> <span class="identifier">data</span><span class="other">)</span>
+    <span class="other">{</span>
+        <span class="other">+</span><span class="other">+</span><span class="identifier">numProcessingInstructions</span><span class="other">;</span>
+    <span class="other">}</span>
+    <span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="identifier">Comment</span><span class="other">(</span><span class="keyword">const</span> <span class="identifier">ustring</span><span class="other">&amp;</span> <span class="identifier">comment</span><span class="other">)</span>
+    <span class="other">{</span>
+        <span class="other">+</span><span class="other">+</span><span class="identifier">numComments</span><span class="other">;</span>
+    <span class="other">}</span>
+    <span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="identifier">CDataSection</span><span class="other">(</span><span class="keyword">const</span> <span class="identifier">ustring</span><span class="other">&amp;</span> <span class="identifier">cdata</span><span class="other">)</span>
+    <span class="other">{</span>
+        <span class="identifier">numCharacters</span> <span class="other">=</span> <span class="identifier">numCharacters</span> <span class="other">+</span> <span class="identifier">cdata.Length</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>
+    <span class="other">}</span>
+    <span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="identifier">Text</span><span class="other">(</span><span class="keyword">const</span> <span class="identifier">ustring</span><span class="other">&amp;</span> <span class="identifier">text</span><span class="other">)</span>
+    <span class="other">{</span>
+        <span class="identifier">numCharacters</span> <span class="other">=</span> <span class="identifier">numCharacters</span> <span class="other">+</span> <span class="identifier">text.Length</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>
+    <span class="other">}</span>
+    <span class="keyword">public</span> <span class="keyword">void</span> <span class="identifier">Print</span><span class="other">(</span><span class="other">)</span>
+    <span class="other">{</span>
+        <span class="identifier">Console.Out</span><span class="other">(</span><span class="other">)</span> <span class="other">&lt;</span><span class="other">&lt;</span> <span class="identifier">xmlFileName</span> <span class="other">&lt;</span><span class="other">&lt;</span> <span class="string">&quot; contains:&quot;</span> <span class="other">&lt;</span><span class="other">&lt;</span> <span class="identifier">endl</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>
+        <span class="identifier">Console.Out</span><span class="other">(</span><span class="other">)</span> <span class="other">&lt;</span><span class="other">&lt;</span> <span class="identifier">numElements</span> <span class="other">&lt;</span><span class="other">&lt;</span> <span class="string">&quot; elements&quot;</span> <span class="other">&lt;</span><span class="other">&lt;</span> <span class="identifier">endl</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>
+        <span class="identifier">Console.Out</span><span class="other">(</span><span class="other">)</span> <span class="other">&lt;</span><span class="other">&lt;</span> <span class="identifier">numAttributes</span> <span class="other">&lt;</span><span class="other">&lt;</span> <span class="string">&quot; attributes&quot;</span> <span class="other">&lt;</span><span class="other">&lt;</span> <span class="identifier">endl</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>
+        <span class="identifier">Console.Out</span><span class="other">(</span><span class="other">)</span> <span class="other">&lt;</span><span class="other">&lt;</span> <span class="identifier">numProcessingInstructions</span> <span class="other">&lt;</span><span class="other">&lt;</span> <span class="string">&quot; processing instructions&quot;</span> <span class="other">&lt;</span><span class="other">&lt;</span> <span class="identifier">endl</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>
+        <span class="identifier">Console.Out</span><span class="other">(</span><span class="other">)</span> <span class="other">&lt;</span><span class="other">&lt;</span> <span class="identifier">numComments</span> <span class="other">&lt;</span><span class="other">&lt;</span> <span class="string">&quot; comments&quot;</span> <span class="other">&lt;</span><span class="other">&lt;</span> <span class="identifier">endl</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>
+        <span class="identifier">Console.Out</span><span class="other">(</span><span class="other">)</span> <span class="other">&lt;</span><span class="other">&lt;</span> <span class="identifier">numCharacters</span> <span class="other">&lt;</span><span class="other">&lt;</span> <span class="string">&quot; characters&quot;</span> <span class="other">&lt;</span><span class="other">&lt;</span> <span class="identifier">endl</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>
+    <span class="other">}</span>
+    <span class="keyword">private</span> <span class="identifier">string</span> <span class="identifier">xmlFileName</span><span class="other">;</span>
+    <span class="keyword">private</span> <span class="keyword">long</span> <span class="identifier">numElements</span><span class="other">;</span>
+    <span class="keyword">private</span> <span class="keyword">long</span> <span class="identifier">numAttributes</span><span class="other">;</span>
+    <span class="keyword">private</span> <span class="keyword">long</span> <span class="identifier">numProcessingInstructions</span><span class="other">;</span>
+    <span class="keyword">private</span> <span class="keyword">long</span> <span class="identifier">numComments</span><span class="other">;</span>
+    <span class="keyword">private</span> <span class="keyword">long</span> <span class="identifier">numCharacters</span><span class="other">;</span>
+<span class="other">}</span>
+
+<span class="keyword">void</span> <span class="identifier">main</span><span class="other">(</span><span class="other">)</span>
+<span class="other">{</span>
+    <span class="identifier">string</span> <span class="identifier">xmlFileName</span> <span class="other">=</span> <span class="string">&quot;System.Json.xml&quot;</span><span class="other">;</span>
+    <span class="identifier">XmlStats</span> <span class="identifier">stats</span><span class="other">(</span><span class="identifier">xmlFileName</span><span class="other">)</span><span class="other">;</span>
+    <span class="identifier">ParseXmlFile</span><span class="other">(</span><span class="identifier">xmlFileName</span><span class="other">,</span> <span class="other">&amp;</span><span class="identifier">stats</span><span class="other">)</span><span class="other">;</span>
+    <span class="identifier">stats.Print</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>
+<span class="other">}</span>
+</div
+</pre>
+</body>
+</html>

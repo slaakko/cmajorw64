@@ -5,7 +5,8 @@ namespace cmajor.xpath
 {
     grammar XPathGrammar
     {
-        using cmajor.xml.XmlGrammar.Name;
+        using cmajor.xml.XmlGrammar.NameStartChar;
+        using cmajor.xml.XmlGrammar.NameChar;
         using stdlib.identifier;
         using stdlib.spaces;
         skip spaces;
@@ -81,21 +82,21 @@ namespace cmajor.xpath
             ::= PathExpr:left{ value = left; } ('|' PathExpr:right{ value = new XPathUnionExpr(value, right); })*
             ;
 
-        PathExpr(var Operator op) : XPathExpr*
-            ::= LocationPath{ value = LocationPath; }
-            |   FilterExpr{ value = FilterExpr; } (('/'{ op = Operator::slash; } | "//"{ op = Operator::slashSlash; }) RelativeLocationPath:right
+        PathExpr(var Operator op, var std::unique_ptr<XPathExpr> fnc) : XPathExpr*
+            ::= (LocationPath - FunctionCall{ fnc.reset(FunctionCall); }){ value = LocationPath; }
+            |   FilterExpr{ value = FilterExpr; } (("//"{ op = Operator::slashSlash; } | '/'{ op = Operator::slash; }) RelativeLocationPath:right
                 {
                     switch (op)
                     {
                         case Operator::slash: value = new XPathCombineStepExpr(value, right); break;
-                        case Operator::slashSlash: value = new XPathCombineStepExpr(value, new XPathCombineStepExpr(new XPathLocationStepExpr(Axis::descendant_or_self, new XPathAnyNodeTest()), right)); break;
+                        case Operator::slashSlash: value = new XPathCombineStepExpr(value, new XPathCombineStepExpr(new XPathLocationStepExpr(Axis::descendantOrSelf, new XPathAnyNodeTest()), right)); break;
                     }
                 }
                 )?
             ;
 
-        FilterExpr : XPathFilterExpr*
-            ::= PrimaryExpr:primary{ value = new XPathFilterExpr(primary); } (Predicate:predicate{ value->AddPredicate(predicate); })*
+        FilterExpr : XPathExpr*
+            ::= PrimaryExpr:primary{ value = primary; } (Predicate:predicate{ value = new XPathFilterExpr(value, predicate); })*
             ;
 
         LocationPath : XPathExpr*
@@ -104,24 +105,24 @@ namespace cmajor.xpath
             ;
 
         AbsoluteLocationPath : XPathExpr*
-            ::= '/'{ value = new XPathRootNodeExpr(); } (RelativeLocationPath:right{ value = new XPathCombineStepExpr(value, right); })?
-            |   AbbreviatedAbsoluteLocationPath
+            ::= AbbreviatedAbsoluteLocationPath{ value = AbbreviatedAbsoluteLocationPath; }
+            |   '/'{ value = new XPathRootNodeExpr(); } (RelativeLocationPath:right{ value = new XPathCombineStepExpr(value, right); })?
             ;
 
         RelativeLocationPath(var Operator op) : XPathExpr*
-            ::= Step:left{ value = left; } (('/'{ op = Operator::slash; } | "//"{ op = Operator::slashSlash; }) Step:right
+            ::= Step:left{ value = left; } (("//"{ op = Operator::slashSlash; } | '/'{ op = Operator::slash; }) Step:right
                 {
                     switch (op)
                     {
                         case Operator::slash: value = new XPathCombineStepExpr(value, right); break;
-                        case Operator::slashSlash: value = new XPathCombineStepExpr(value, new XPathCombineStepExpr(new XPathLocationStepExpr(Axis::descendant_or_self, new XPathAnyNodeTest()), right)); break;
+                        case Operator::slashSlash: value = new XPathCombineStepExpr(value, new XPathCombineStepExpr(new XPathLocationStepExpr(Axis::descendantOrSelf, new XPathAnyNodeTest()), right)); break;
                     }
                 }
                 )*
             ;
 
         AbbreviatedAbsoluteLocationPath : XPathExpr*
-            ::= "//" RelativeLocationPath:right{ value = new XPathCombineStepExpr(new XPathRootNodeExpr(), new XPathCombineStepExpr(new XPathLocationStepExpr(Axis::descendant_or_self, new XPathAnyNodeTest()), right)); }
+            ::= "//" RelativeLocationPath:right{ value = new XPathCombineStepExpr(new XPathRootNodeExpr(), new XPathCombineStepExpr(new XPathLocationStepExpr(Axis::descendantOrSelf, new XPathAnyNodeTest()), right)); }
             ;
 
         Step : XPathLocationStepExpr*
@@ -179,11 +180,11 @@ namespace cmajor.xpath
             ;
 
         PrimaryExpr : XPathExpr*
-            ::= VariableReference{ value = VariableReference; }
+            ::= FunctionCall{ value = FunctionCall; }
+            |   VariableReference{ value = VariableReference; }
             |   '(' Expr ')'{ value = Expr; }
             |   Literal{ value = Literal; }
             |   Number{ value = Number; }
-            |   FunctionCall{ value = FunctionCall; }
             ;
 
         VariableReference : XPathExpr*
@@ -238,7 +239,7 @@ namespace cmajor.xpath
             ;
 
         NCName : std::u32string
-            ::= token(Name - ":"){ value = std::u32string(matchBegin, matchEnd); }
+            ::= token((NameStartChar - ':') (NameChar - ':')*){ value = std::u32string(matchBegin, matchEnd); }
             ;
     }
 }

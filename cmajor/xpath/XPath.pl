@@ -11,8 +11,8 @@ namespace cmajor.xpath
         MultiplicativeExpr(var Operator op): XPathExpr*;
         UnaryExpr: XPathExpr*;
         UnionExpr: XPathExpr*;
-        PathExpr(var Operator op): XPathExpr*;
-        FilterExpr: XPathFilterExpr*;
+        PathExpr(var Operator op, var std::unique_ptr<XPathExpr> fnc): XPathExpr*;
+        FilterExpr: XPathExpr*;
         LocationPath: XPathExpr*;
         AbsoluteLocationPath: XPathExpr*;
         RelativeLocationPath(var Operator op): XPathExpr*;

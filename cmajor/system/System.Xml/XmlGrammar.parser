@@ -93,8 +93,8 @@ namespace System.Xml
             ::= "<!--" (((Char - '-') | ('-' (Char - '-')))*){ processor->Comment(ustring(matchBegin, matchEnd)); } "-->"
             ;
 
-        PI(XmlProcessor* processor)
-            ::= "<?" PITarget:target ((S (Char* - (Char* "?>" Char*)))?){ processor->PI(target, ustring(matchBegin, matchEnd)); } "?>"
+        PI(XmlProcessor* processor, var ustring data)
+            ::= "<?" (PITarget:target (S ((Char - "?>")*){ data = ustring(matchBegin, matchEnd); })?){ processor->PI(target, data); } "?>"
             ;
 
         PITarget : ustring
@@ -102,7 +102,7 @@ namespace System.Xml
             ;
 
         CDSect(XmlProcessor* processor)
-            ::= CDStart CData{ processor->Text(CData); } CDEnd
+            ::= CDStart CData{ processor->CDataSection(CData); } CDEnd
             ;
 
         CDStart
@@ -110,7 +110,7 @@ namespace System.Xml
             ;
 
         CData : ustring
-            ::= (Char* - (Char* "]]>" Char*)){ value = ustring(matchBegin, matchEnd); }
+            ::= ((Char - "]]>")*){ value = ustring(matchBegin, matchEnd); }
             ;
             
         CDEnd
