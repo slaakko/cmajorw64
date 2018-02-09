@@ -171,6 +171,7 @@ public:
     bool IsLvalueExpression() const override { return true; }
     std::string TypeString() const override { return "temporary"; }
     std::unique_ptr<Value> ToValue(BoundCompileUnit& boundCompileUnit) const override;
+    bool ContainsExceptionCapture() const override;
 private:
     std::unique_ptr<BoundExpression> rvalueExpr;
     std::unique_ptr<BoundLocalVariable> backingStore;
@@ -200,6 +201,7 @@ public:
     std::string TypeString() const override { return "address of expression"; }
     std::unique_ptr<BoundExpression>& Subject() { return subject; }
     std::unique_ptr<Value> ToValue(BoundCompileUnit& boundCompileUnit) const override;
+    bool ContainsExceptionCapture() const override;
 private:
     std::unique_ptr<BoundExpression> subject;
 };
@@ -215,6 +217,7 @@ public:
     std::string TypeString() const override { return "deference expression"; }
     bool IsLvalueExpression() const override { return true; }
     std::unique_ptr<BoundExpression>& Subject() { return subject; }
+    bool ContainsExceptionCapture() const override;
 private:
     std::unique_ptr<BoundExpression> subject;
 };
@@ -228,6 +231,7 @@ public:
     void Store(Emitter& emitter, OperationFlags flags) override;
     void Accept(BoundNodeVisitor& visitor) override;
     std::string TypeString() const override { return "reference to pointer expression"; }
+    bool ContainsExceptionCapture() const override;
 private:
     std::unique_ptr<BoundExpression> subject;
 };
@@ -402,6 +406,7 @@ public:
     void Store(Emitter& emitter, OperationFlags flags) override;
     void Accept(BoundNodeVisitor& visitor) override;
     bool HasValue() const override { return true; }
+    bool ContainsExceptionCapture() const override;
 private:
     std::unique_ptr<BoundExpression> classPtr;
 };
@@ -415,6 +420,7 @@ public:
     void Store(Emitter& emitter, OperationFlags flags) override;
     void Accept(BoundNodeVisitor& visitor) override;
     bool HasValue() const override { return true; }
+    bool ContainsExceptionCapture() const override;
 private:
     std::unique_ptr<BoundExpression> expr;
 };

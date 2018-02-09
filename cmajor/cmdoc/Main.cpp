@@ -355,10 +355,6 @@ void ConstraintHyperTextGenerator::Visit(ArrayNode& arrayNode)
 void ConstraintHyperTextGenerator::Visit(IdentifierNode& identifierNode)
 {
     const std::u32string& name = identifierNode.Str();
-    if (name == U"string")
-    {
-        int x = 0;
-    }
     bool resolved = false;
     for (ContainerScope* containerScope : containerScopes)
     {

@@ -501,6 +501,19 @@ std::unique_ptr<Value> BoundTemporary::ToValue(BoundCompileUnit& boundCompileUni
     return rvalueExpr->ToValue(boundCompileUnit);
 }
 
+bool BoundTemporary::ContainsExceptionCapture() const
+{
+    if (BoundExpression::ContainsExceptionCapture())
+    {
+        return true;
+    }
+    if (rvalueExpr->ContainsExceptionCapture())
+    {
+        return true;
+    }
+    return false;
+}
+
 BoundSizeOfExpression::BoundSizeOfExpression(const Span& span_, TypeSymbol* type_, TypeSymbol* pointerType_) : 
     BoundExpression(span_, BoundNodeType::boundSizeOfExpression, type_), pointerType(pointerType_)
 {
@@ -592,6 +605,19 @@ std::unique_ptr<Value> BoundAddressOfExpression::ToValue(BoundCompileUnit& bound
     return subject->ToValue(boundCompileUnit);
 }
 
+bool BoundAddressOfExpression::ContainsExceptionCapture() const
+{
+    if (BoundExpression::ContainsExceptionCapture())
+    {
+        return true;
+    }
+    if (subject->ContainsExceptionCapture())
+    {
+        return true;
+    }
+    return false;
+}
+
 BoundDereferenceExpression::BoundDereferenceExpression(std::unique_ptr<BoundExpression>&& subject_, TypeSymbol* type_) :
     BoundExpression(subject_->GetSpan(), BoundNodeType::boundDereferenceExpression, type_), subject(std::move(subject_))
 {
@@ -645,6 +671,19 @@ void BoundDereferenceExpression::Accept(BoundNodeVisitor& visitor)
     visitor.Visit(*this);
 }
 
+bool BoundDereferenceExpression::ContainsExceptionCapture() const
+{
+    if (BoundExpression::ContainsExceptionCapture())
+    {
+        return true;
+    }
+    if (subject->ContainsExceptionCapture())
+    {
+        return true;
+    }
+    return false;
+}
+
 BoundReferenceToPointerExpression::BoundReferenceToPointerExpression(std::unique_ptr<BoundExpression>&& subject_, TypeSymbol* type_) :
     BoundExpression(subject_->GetSpan(), BoundNodeType::boundReferenceToPointerExpression, type_), subject(std::move(subject_))
 {
@@ -673,6 +712,19 @@ void BoundReferenceToPointerExpression::Store(Emitter& emitter, OperationFlags f
 void BoundReferenceToPointerExpression::Accept(BoundNodeVisitor& visitor)
 {
     visitor.Visit(*this);
+}
+
+bool BoundReferenceToPointerExpression::ContainsExceptionCapture() const
+{
+    if (BoundExpression::ContainsExceptionCapture())
+    {
+        return true;
+    }
+    if (subject->ContainsExceptionCapture())
+    {
+        return true;
+    }
+    return false;
 }
 
 BoundFunctionCall::BoundFunctionCall(const Span& span_, FunctionSymbol* functionSymbol_) : BoundExpression(span_, BoundNodeType::boundFunctionCall, functionSymbol_->ReturnType()), functionSymbol(functionSymbol_)
@@ -1525,6 +1577,15 @@ void BoundTypeNameExpression::Accept(BoundNodeVisitor& visitor)
     visitor.Visit(*this);
 }
 
+bool BoundTypeNameExpression::ContainsExceptionCapture() const
+{
+    if (BoundExpression::ContainsExceptionCapture())
+    {
+        return true;
+    }
+    return classPtr->ContainsExceptionCapture();
+}
+
 BoundBitCast::BoundBitCast(std::unique_ptr<BoundExpression>&& expr_, TypeSymbol* type_) : BoundExpression(expr_->GetSpan(), BoundNodeType::boundBitCast, type_), expr(std::move(expr_))
 {
     expr->MoveTemporaryDestructorCallsTo(*this);
@@ -1552,6 +1613,15 @@ void BoundBitCast::Store(Emitter& emitter, OperationFlags flags)
 void BoundBitCast::Accept(BoundNodeVisitor& visitor)
 {
     visitor.Visit(*this);
+}
+
+bool BoundBitCast::ContainsExceptionCapture() const
+{
+    if (BoundExpression::ContainsExceptionCapture())
+    {
+        return true;
+    }
+    return expr->ContainsExceptionCapture();
 }
 
 BoundFunctionPtr::BoundFunctionPtr(const Span& span_, FunctionSymbol* function_, TypeSymbol* type_) : BoundExpression(span_, BoundNodeType::boundFunctionPtr, type_), function(function_)

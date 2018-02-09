@@ -7,32 +7,35 @@ body.index
 {
     background-image: url("../image/mount_everest.jpg");
     background-repeat: no-repeat;
+    margin-left: 16px;
 }
 
-h1.index, h2.index
+h1.index, h2.index, h3.index
 {
     color: lightgray;
+    margin-left: 16px;
 }
 
-a.index 
+a.index
 {
     color: lightgray;
 }
 
 p
 {
-    margin-left: 20px;
+    margin-left: 16px;
 }
 
 h1, h2, h3
 {
     color: #005ab4;
     font-family: sans-serif;
+    margin-left: 16px;
 }
 
 h4.code
 {
-    margin-left: 20px;
+    margin-left: 16px;
     font-family: monospace;
 }
 

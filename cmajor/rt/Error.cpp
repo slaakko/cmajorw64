@@ -143,11 +143,11 @@ extern "C" RT_API void RtThrowException(void* exception, uint32_t exceptionTypeI
     throw cmajor::rt::Exception();
 }
 
-extern "C" RT_API void RtCaptureException(void*& exception, uint64_t& exceptionClassId)
+extern "C" RT_API void RtCaptureException(void** exception, uint64_t* exceptionClassId)
 {
-    exception = cmajor::rt::currentException;
+    *exception = cmajor::rt::currentException;
     cmajor::rt::currentException = nullptr;
-    exceptionClassId = cmajor::rt::currentExceptionClassId;
+    *exceptionClassId = cmajor::rt::currentExceptionClassId;
     cmajor::rt::currentExceptionClassId = 0;
 }
 
