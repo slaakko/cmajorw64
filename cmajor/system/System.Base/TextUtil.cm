@@ -266,7 +266,7 @@ namespace System
         }
         return result;
     }
-    
+
     public nothrow string MakeStringLiteral(const string& s)
     {
         string result = "\"";

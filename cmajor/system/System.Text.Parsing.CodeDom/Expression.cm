@@ -578,6 +578,10 @@ namespace System.Text.Parsing.CodeDom
         public Indexing(DomObject* subject_, DomObject* index_) : base(u"[]", 11), subject(subject_), index(index_)
         {
         }
+        public nothrow override ustring Name() const 
+        {
+            return subject->Name() + u"[" + index->Name() + u"]";
+        }
         public override void Print(CodeFormatter& formatter)
         {
             if (Parens())

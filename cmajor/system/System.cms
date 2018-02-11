@@ -5,6 +5,7 @@ project <System.Core/System.Core.cmp>;
 project <System.Dom/System.Dom.cmp>;
 project <System.IO.Compression/System.IO.Compression.cmp>;
 project <System.Json/System.Json.cmp>;
+project <System.Net.Http/System.Net.Http.cmp>;
 project <System.Net.Sockets/System.Net.Sockets.cmp>;
 project <System.Numerics.Multiprecision/System.Numerics.Multiprecision.cmp>;
 project <System.Runtime/System.Runtime.cmp>;

@@ -645,6 +645,14 @@ void TypeBinder::Visit(MemberVariableNode& memberVariableNode)
     }
     TypeSymbol* memberVariableType = ResolveType(memberVariableNode.TypeExpr(), boundCompileUnit, containerScope);
     memberVariableSymbol->SetType(memberVariableType);
+    if (memberVariableType->IsClassTypeSymbol() && memberVariableType->IsProject() && !memberVariableType->IsBound() && !GetGlobalFlag(GlobalFlags::info))
+    {
+        ClassTypeSymbol* memberVariableClassType = static_cast<ClassTypeSymbol*>(memberVariableType);
+        Node* node = symbolTable.GetNode(memberVariableClassType);
+        Assert(node->GetNodeType() == NodeType::classNode, "class node expected");
+        ClassNode* classNode = static_cast<ClassNode*>(node);
+        BindClass(memberVariableClassType, classNode, false);
+    }
 }
 
 void TypeBinder::Visit(InterfaceNode& interfaceNode)
