@@ -37,7 +37,7 @@ namespace System.Net.Sockets
         }
         public SharedPtr<ByteStream> GetStream()
         {
-            return SharedPtr<ByteStream>(new BufferedByteStream(SharedPtr<ByteStream>(new NetworkByteStream(Rvalue(socket))))); // moves socket to the stream!
+            return SharedPtr<ByteStream>(new BufferedByteStream(SharedPtr<ByteStream>(new NetworkByteStream(Rvalue(socket)))));
         }
         public TcpSocket& ContainedSocket() 
         {

@@ -803,7 +803,7 @@ namespace System.Collections
         private void CopyFrom(const Self& that) 
             where ValueType is Copyable
         {
-            if (that.root != null)
+            if (that.Root() != null)
             {
                 SetRoot(Copy(that.Root(), header.Get()));
                 SetLeftmost(cast<RedBlackTreeNode<ValueType>*>(RedBlackTreeNodeBase.Min(Root())));

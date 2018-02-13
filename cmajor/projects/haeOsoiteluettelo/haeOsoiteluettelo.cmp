@@ -1,0 +1,3 @@
+project haeOsoiteluettelo;
+target=program;
+source <haeOsoiteluettelo.cm>;

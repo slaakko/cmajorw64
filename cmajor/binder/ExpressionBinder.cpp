@@ -813,6 +813,7 @@ void ExpressionBinder::Visit(DotNode& dotNode)
             if (symbol)
             {
                 std::unique_ptr<BoundExpression> classPtr;
+                BoundExpression* plainClassPtr = expression.get();
                 if (expression->GetType()->IsClassTypeSymbol())
                 {
                     TypeSymbol* type = expression->GetType()->AddPointer(dotNode.GetSpan());
@@ -852,9 +853,9 @@ void ExpressionBinder::Visit(DotNode& dotNode)
                             }
                         }
                     }
-                    if (classPtr->GetBoundNodeType() == BoundNodeType::boundTypeExpression)
+                    if (plainClassPtr->GetBoundNodeType() == BoundNodeType::boundTypeExpression)
                     {
-                        BoundTypeExpression* bte = static_cast<BoundTypeExpression*>(classPtr.get());
+                        BoundTypeExpression* bte = static_cast<BoundTypeExpression*>(plainClassPtr);
                         bfg->SetScopeQualified();
                         bfg->SetQualifiedScope(bte->GetType()->GetContainerScope());
                     }
