@@ -87,7 +87,14 @@ namespace System.IO
             }
             result.Append(components[i]);
         }
-        return result;
+        if (result.IsEmpty())
+        {
+            return "/";
+        }
+        else
+        {
+            return result;
+        }            
     }
     
     public static class Path

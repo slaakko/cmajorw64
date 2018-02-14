@@ -296,7 +296,14 @@ namespace System.Net.Http
                 }
                 result.Append(components[i]);
             }
-            return result;
+            if (result.IsEmpty())
+            {
+                return u"/";
+            }
+            else
+            {
+                return result;
+            }            
         }
     }
     

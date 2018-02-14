@@ -108,6 +108,11 @@ namespace System.IO
             Write(x);
             WriteLine();
         }
+        public void WriteLine(bool x)
+        {
+            Write(x);
+            WriteLine();
+        }
         public void WriteLine(sbyte x)
         {
             Write(x);
