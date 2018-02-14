@@ -5,8 +5,8 @@
     <infoDelaySecs>10</infoDelaySecs>
     <formSizeX>1770</formSizeX>
     <formSizeY>948</formSizeY>
-    <formTop>51</formTop>
-    <formLeft>26</formLeft>
+    <formTop>0</formTop>
+    <formLeft>0</formLeft>
     <textVisX>78</textVisX>
     <textVisY>78</textVisY>
     <textVisW>1259</textVisW>
@@ -28,6 +28,18 @@
     <maxRecentProjects>10</maxRecentProjects>
     <recentProjects>
         <recentProject>
+            <path>C:\Users\Seppo\cmajorw64\cmajor\system\System.cms</path>
+            <openFiles />
+        </recentProject>
+        <recentProject>
+            <path>C:\Users\Seppo\cmajorw64\cmajor\test\foo\foo.cms</path>
+            <openFiles />
+        </recentProject>
+        <recentProject>
+            <path>C:\Users\Seppo\cmajorw64\cmajor\projects\haeOsoiteluettelo\haeOsoiteluettelo.cms</path>
+            <openFiles />
+        </recentProject>
+        <recentProject>
             <path>C:/Users/Seppo/cmajorw64/cmajor/doc/code/compression/deflate/deflate.cms</path>
             <openFiles />
         </recentProject>
@@ -36,19 +48,7 @@
             <openFiles />
         </recentProject>
         <recentProject>
-            <path>C:\Users\Seppo\cmajorw64\cmajor\projects\haeOsoiteluettelo\haeOsoiteluettelo.cms</path>
-            <openFiles />
-        </recentProject>
-        <recentProject>
-            <path>C:\Users\Seppo\cmajorw64\cmajor\system\System.cms</path>
-            <openFiles />
-        </recentProject>
-        <recentProject>
             <path>C:\Users\Seppo\cmajorw64\cmajor\projects\httpTest\httpTest.cms</path>
-            <openFiles />
-        </recentProject>
-        <recentProject>
-            <path>C:\Users\Seppo\cmajorw64\cmajor\test\foo\foo.cms</path>
             <openFiles />
         </recentProject>
         <recentProject>

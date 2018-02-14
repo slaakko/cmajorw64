@@ -36,6 +36,18 @@
       <style>../../style/cmdoc.css</style>
     </library>
     <library>
+      <moduleFilePath>../../system/System.Net.Http/lib/debug/System.Net.Http.cmm</moduleFilePath>
+      <libraryXmlFilePath>System.Net.Http/System.Net.Http.xml</libraryXmlFilePath>
+      <docXmlFilePath>System.Net.Http/System.Net.Http.doc.xml</docXmlFilePath>
+      <references>
+        <reference>../System.Base/System.Base.xml</reference>
+        <reference>../System.Net.Sockets/System.Net.Sockets.xml</reference>
+        <reference>../System.Text.Parsing.CodeDom/System.Text.Parsing.CodeDom.xml</reference>
+        <reference>../System.Text.Parsing/System.Text.Parsing.xml</reference>
+      </references>
+      <style>../../style/cmdoc.css</style>
+    </library>
+    <library>
       <moduleFilePath>../../system/System.Json/lib/debug/System.Json.cmm</moduleFilePath>
       <libraryXmlFilePath>System.Json/System.Json.xml</libraryXmlFilePath>
       <docXmlFilePath>System.Json/System.Json.doc.xml</docXmlFilePath>

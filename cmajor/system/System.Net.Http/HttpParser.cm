@@ -35,12 +35,26 @@ namespace System.Net.Http
         {
             fieldValueGrammar->Parse(fieldValue.Chars(), fieldValue.Chars() + fieldValue.Length(), 0, "", values);
         }
+        public MimeType ParseMediaType(const ustring& fieldValue)
+        {
+            MimeType mediaType;
+            mediaTypeGrammar->Parse(fieldValue.Chars(), fieldValue.Chars() + fieldValue.Length(), 0, "", &mediaType);
+            return mediaType;
+        }
+        public DateTime ParseDate(const ustring& fieldValue)
+        {
+            DateTime date;
+            dateGrammar->Parse(fieldValue.Chars(), fieldValue.Chars() + fieldValue.Length(), 0, "", &date);
+            return date;
+        }
         private HttpParser() : 
             httpGrammar(new HttpGrammar()), 
             headerGrammar(new HttpHeaderGrammar(httpGrammar->Domain())), 
             statusLineGrammar(new HttpStatusLineGrammar(httpGrammar->Domain())),
             chunkHeaderGrammar(new HttpChunkHeaderGrammar(httpGrammar->Domain())),
-            fieldValueGrammar(new HttpFieldValueGrammar(httpGrammar->Domain()))
+            fieldValueGrammar(new HttpFieldValueGrammar(httpGrammar->Domain())),
+            mediaTypeGrammar(new HttpMediaTypeGrammar(httpGrammar->Domain())),
+            dateGrammar(new HttpDateGrammar(httpGrammar->Domain()))
         {
         }
         private static UniquePtr<HttpParser> instance;
@@ -49,5 +63,7 @@ namespace System.Net.Http
         private HttpStatusLineGrammar* statusLineGrammar;
         private HttpChunkHeaderGrammar* chunkHeaderGrammar;
         private HttpFieldValueGrammar* fieldValueGrammar;
+        private HttpMediaTypeGrammar* mediaTypeGrammar;
+        private HttpDateGrammar* dateGrammar;
     }
 }

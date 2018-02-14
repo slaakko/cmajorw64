@@ -686,10 +686,6 @@ int32_t SocketTable::ReceiveSocket(int32_t socketHandle, uint8_t* buf, int32_t l
         if (socketData->tlsSession)
         {
             result = gnutls_record_recv(socketData->session, reinterpret_cast<void*>(buf), len);
-            if (result == -110)
-            {
-                return 0;
-            }
             if (result < 0)
             {
                 std::string errorMessage = "gnutls_record_recv failed with error code " + ToString(result) + " : " + gnutls_strerror(result);

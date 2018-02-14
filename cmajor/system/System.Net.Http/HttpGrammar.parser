@@ -46,6 +46,26 @@ namespace System.Net.Http
             ;
     }
     
+    grammar HttpMediaTypeGrammar
+    {
+        using HttpGrammar.mediaType;
+        using HttpGrammar.LWS;
+        skip LWS;
+        
+        mediaTypeValue(MimeType* mediaType)
+            ::= mediaType(mediaType)
+            ;
+    }
+    
+    grammar HttpDateGrammar
+    {
+        using HttpGrammar.dateValue;
+        
+        date(DateTime* date)
+            ::= dateValue(date)
+            ;
+    }
+    
     grammar HttpGrammar
     {
         statusLine(HttpStatus* httpStatus)
@@ -85,7 +105,7 @@ namespace System.Net.Http
             ;
             
         generalParameter(HttpFieldValue* fieldValue)
-            ::= (attribute ('=' value)?){ fieldValue->SetParameter(attribute, value); }
+            ::= (attribute ('=' attrval)?){ fieldValue->SetParameter(attribute, attrval); }
             ;
             
         chunkHeader(ulong* chunkSize, ChunkExtensionAdder* adder)
@@ -108,28 +128,28 @@ namespace System.Net.Http
             ::= httpToken (';' parameter)*
             ;
             
-        parameter
-            ::= attribute '=' value
+        parameter : Pair<ustring, ustring>
+            ::= (attribute '=' attrval){ value = MakePair(attribute, attrval); }
             ;
             
         attribute : ustring
             ::= httpToken{ value = httpToken; }
             ;
             
-        value : ustring
+        attrval : ustring
             ::= httpToken{ value = httpToken; } | quotedString{ value = quotedString; }
             ;
             
-        mediaType
-            ::= type '/' subtype (';' parameter)*
+        mediaType(MimeType* mediaType)
+            ::= (type '/' subtype){ mediaType->SetValue(type, subtype); } (';' parameter{ mediaType->SetParameter(parameter.first, parameter.second); })*
             ;
             
-        type
-            ::= httpToken
+        type : ustring
+            ::= httpToken{ value = httpToken; }
             ;
             
-        subtype
-            ::= httpToken
+        subtype : ustring
+            ::= httpToken{ value = httpToken; }
             ;
             
         httpHeader : HttpHeader
@@ -142,6 +162,10 @@ namespace System.Net.Http
             
         fieldValue : ustring
             ::= (anychar*){ value = ustring(matchBegin, matchEnd); }
+            ;
+            
+        dateValue(DateTime* date)
+            ::= httpDate{ *date = httpDate; }
             ;
             
         httpDate : DateTime

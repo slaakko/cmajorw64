@@ -4,6 +4,10 @@ namespace System.Net.Http
     {
         header : HttpHeader;
     }
+    grammar HttpMediaTypeGrammar
+    {
+        mediaTypeValue(MimeType* mediaType);
+    }
     grammar HttpFieldValueGrammar
     {
         csvFieldValue(List<HttpFieldValue>* values);
@@ -25,15 +29,16 @@ namespace System.Net.Http
         chunkExtName : ustring;
         chunkExtVal : ustring;
         transferExtension;
-        parameter;
+        parameter : Pair<ustring, ustring>;
         attribute : ustring;
-        value : ustring;
-        mediaType;
-        type;
-        subtype;
+        attrval : ustring;
+        mediaType(MimeType* mediaType);
+        type : ustring;
+        subtype : ustring;
         httpHeader : HttpHeader;
         fieldName : ustring;
         fieldValue : ustring;
+        dateValue(DateTime* date);
         httpDate : DateTime;
         rfc1123Date : DateTime;
         rfc850Date : DateTime;
@@ -124,6 +129,10 @@ namespace System.Net.Http
         UpperAlpha;
         LowerAlpha;
         Digit;
+    }
+    grammar HttpDateGrammar
+    {
+        date(DateTime* date);
     }
     grammar HttpChunkHeaderGrammar
     {

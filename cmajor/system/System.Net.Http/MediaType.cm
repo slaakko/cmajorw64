@@ -10,6 +10,9 @@ namespace System.Net.Http
 {
     public class MediaType
     {
+        public nothrow MediaType() : name()
+        {
+        }
         public nothrow MediaType(const ustring& name_) : name(name_)
         {
         }
@@ -17,6 +20,10 @@ namespace System.Net.Http
         public nothrow inline const ustring& Name() const
         {
             return name;
+        }
+        public nothrow void SetName(const ustring& name_) 
+        {
+            name = name_;
         }
         private ustring name;
     }
@@ -30,6 +37,9 @@ namespace System.Net.Http
     
     public class Subtype 
     {
+        public nothrow Subtype() : name()
+        {
+        }
         public nothrow Subtype(const ustring& name_) : name(name_)
         {
         }
@@ -37,6 +47,10 @@ namespace System.Net.Http
         public nothrow inline const ustring& Name() const
         {
             return name;
+        }
+        public nothrow void SetName(const ustring& name_) 
+        {
+            name = name_;
         }
         private ustring name;
     }
@@ -171,10 +185,36 @@ namespace System.Net.Http
         public MimeType(UniquePtr<MediaType>&& mediaType_, UniquePtr<Subtype>&& subtype_) : mediaType(mediaType_), subtype(subtype_)
         {
         }
-        public Map<ustring, ustring>& Parameters()
+        public nothrow inline MediaType* GetMediaType() const 
+        {
+            return mediaType.Get();
+        }
+        public nothrow inline Subtype* GetSubtype() const
+        {
+            return subtype.Get();
+        }
+        public void SetValue(const ustring& mediaType_, const ustring& subtype_)
+        {
+            mediaType.Reset(new MediaType(mediaType_));
+            subtype.Reset(new Subtype(subtype_));
+        }
+        public nothrow inline const Map<ustring, ustring>& Parameters() const
         {
             return parameters;
         }
+        public ustring GetParameter(const ustring& paramName) const
+        {
+            Map<ustring, ustring>.ConstIterator it = parameters.CFind(paramName);
+            if (it != parameters.CEnd())
+            {
+                return it->second;
+            }
+            return ustring();
+        }
+        public void SetParameter(const ustring& paramName, const ustring& paramValue)
+        {
+            parameters[paramName] = paramValue;
+        }    
         public ustring ToString() const
         {
             if (parameters.IsEmpty())

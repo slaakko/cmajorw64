@@ -114,6 +114,110 @@ namespace System.Net.Http
 } // System.Net.Http
 namespace System.Net.Http
 {
+    public class HttpDateGrammar : System.Text.Parsing.Grammar
+    {
+        public HttpDateGrammar() : this(new ParsingDomain())
+        {
+        }
+        public HttpDateGrammar(ParsingDomain* parsingDomain) : base(ToUtf32("HttpDateGrammar"), parsingDomain->GetNamespaceScope(ToUtf32("System.Net.Http")), parsingDomain)
+        {
+            SetOwner(0);
+            RegisterParsingDomain(parsingDomain);
+            parsingDomain->AddGrammar(this);
+            CreateRules();
+            Link();
+        }
+        public void Parse(const uchar* start, const uchar* end, int fileIndex, const string& fileName, DateTime* date)
+        {
+            Scanner scanner(start, end, fileName, fileIndex, SkipRule());
+            UniquePtr<XmlLog> xmlLog;
+            if (Log() != null)
+            {
+                xmlLog.Reset(new XmlLog(*Log(), MaxLogLineLength()));
+                scanner.SetLog(xmlLog.Get());
+                xmlLog->WriteBeginRule(u"parse");
+                xmlLog->IncIndent();
+            }
+            Stack<UniquePtr<Object>> stack;
+            UniquePtr<ParsingData> parsingData(new ParsingData(Domain()->NumRules()));
+            scanner.SetParsingData(parsingData.Get());
+            stack.Push(UniquePtr<Object>(new ValueObject<DateTime*>(date)));
+            Match match = base->Parse(scanner, stack, parsingData.Get());
+            Span stop = scanner.GetSpan();
+            if (Log() != null)
+            {
+                xmlLog->DecIndent();
+                xmlLog->WriteEndRule(u"parse");
+            }
+            if (!match.Hit() || stop.start != cast<int>(end - start))
+            {
+                if (StartRule() != null)
+                {
+                    throw ExpectationFailure(StartRule()->Info(), fileName, stop, start, end);
+                }
+                else
+                {
+                    throw ParsingException("grammar '" + ToUtf8(Name()) + "' has no start rule", fileName, scanner.GetSpan(), start, end);
+                }
+            }
+        }
+
+        public class dateRule : System.Text.Parsing.RuleParser
+        {
+            public dateRule(const ustring& name_, Scope* enclosingScope_, int id_, Parser* definition_) : base(name_, enclosingScope_, id_, definition_)
+            {
+                AddInheritedAttribute(AttrOrVar(ToUtf32("DateTime*"), ToUtf32("date")));
+            }
+            public override void Enter(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
+            {
+                parsingData->PushContext(Id(), new Context());
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                UniquePtr<Object> date_value = stack.Pop();
+                context->date = *cast<ValueObject<DateTime*>*>(date_value.Get());
+            }
+            public override void Leave(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
+            {
+                parsingData->PopContext(Id());
+            }
+            public override void Link()
+            {
+                NonterminalParser* dateValueNonterminalParser = GetNonterminal(ToUtf32("dateValue"));
+                dateValueNonterminalParser->SetPre(PredateValue);
+            }
+            public void PredateValue(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                stack.Push(UniquePtr<Object>(new ValueObject<DateTime*>(context->date)));
+            }
+            public class Context : System.Text.Parsing.Context
+            {
+                public Context() : date()
+                {
+                }
+                public DateTime* date;
+            }
+        }
+
+        public override void GetReferencedGrammars()
+        {
+            ParsingDomain* pd = Domain();
+            Grammar* grammar0 = pd->GetGrammar(ToUtf32("System.Net.Http.HttpGrammar"));
+            if (grammar0 == null)
+            {
+                grammar0 = new System.Net.Http.HttpGrammar(pd);
+            }
+            AddGrammarReference(grammar0);
+        }
+        public override void CreateRules()
+        {
+            AddRuleLink(new System.Text.Parsing.RuleLink(ToUtf32("dateValue"), this, ToUtf32("HttpGrammar.dateValue")));
+            AddRule(new dateRule(ToUtf32("date"), GetScope(), Domain()->GetNextRuleId(),
+                new System.Text.Parsing.NonterminalParser(ToUtf32("dateValue"), ToUtf32("dateValue"), 1)));
+        }
+    }
+} // System.Net.Http
+namespace System.Net.Http
+{
     public class HttpStatusLineGrammar : System.Text.Parsing.Grammar
     {
         public HttpStatusLineGrammar() : this(new ParsingDomain())
@@ -578,13 +682,13 @@ namespace System.Net.Http
                 a0ActionParser->SetAction(A0Action);
                 NonterminalParser* attributeNonterminalParser = GetNonterminal(ToUtf32("attribute"));
                 attributeNonterminalParser->SetPost(Postattribute);
-                NonterminalParser* valueNonterminalParser = GetNonterminal(ToUtf32("value"));
-                valueNonterminalParser->SetPost(Postvalue);
+                NonterminalParser* attrvalNonterminalParser = GetNonterminal(ToUtf32("attrval"));
+                attrvalNonterminalParser->SetPost(Postattrval);
             }
             public void A0Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->fieldValue->SetParameter(context->fromattribute, context->fromvalue);
+                context->fieldValue->SetParameter(context->fromattribute, context->fromattrval);
             }
             public void Postattribute(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
             {
@@ -595,23 +699,23 @@ namespace System.Net.Http
                     context->fromattribute = *cast<ValueObject<ustring>*>(fromattribute_value.Get());
                 }
             }
-            public void Postvalue(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
+            public void Postattrval(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
                 if (matched)
                 {
-                    UniquePtr<Object> fromvalue_value = stack.Pop();
-                    context->fromvalue = *cast<ValueObject<ustring>*>(fromvalue_value.Get());
+                    UniquePtr<Object> fromattrval_value = stack.Pop();
+                    context->fromattrval = *cast<ValueObject<ustring>*>(fromattrval_value.Get());
                 }
             }
             public class Context : System.Text.Parsing.Context
             {
-                public Context() : fieldValue(), fromattribute(), fromvalue()
+                public Context() : fieldValue(), fromattribute(), fromattrval()
                 {
                 }
                 public HttpFieldValue* fieldValue;
                 public ustring fromattribute;
-                public ustring fromvalue;
+                public ustring fromattrval;
             }
         }
 
@@ -843,6 +947,69 @@ namespace System.Net.Http
             }
         }
 
+        public class parameterRule : System.Text.Parsing.RuleParser
+        {
+            public parameterRule(const ustring& name_, Scope* enclosingScope_, int id_, Parser* definition_) : base(name_, enclosingScope_, id_, definition_)
+            {
+                SetValueTypeName(ToUtf32("Pair<ustring, ustring>"));
+            }
+            public override void Enter(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
+            {
+                parsingData->PushContext(Id(), new Context());
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+            }
+            public override void Leave(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                if (matched)
+                {
+                    stack.Push(UniquePtr<Object>(new ValueObject<Pair<ustring, ustring>>(context->value)));
+                }
+                parsingData->PopContext(Id());
+            }
+            public override void Link()
+            {
+                ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
+                a0ActionParser->SetAction(A0Action);
+                NonterminalParser* attributeNonterminalParser = GetNonterminal(ToUtf32("attribute"));
+                attributeNonterminalParser->SetPost(Postattribute);
+                NonterminalParser* attrvalNonterminalParser = GetNonterminal(ToUtf32("attrval"));
+                attrvalNonterminalParser->SetPost(Postattrval);
+            }
+            public void A0Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                context->value = MakePair(context->fromattribute, context->fromattrval);
+            }
+            public void Postattribute(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                if (matched)
+                {
+                    UniquePtr<Object> fromattribute_value = stack.Pop();
+                    context->fromattribute = *cast<ValueObject<ustring>*>(fromattribute_value.Get());
+                }
+            }
+            public void Postattrval(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                if (matched)
+                {
+                    UniquePtr<Object> fromattrval_value = stack.Pop();
+                    context->fromattrval = *cast<ValueObject<ustring>*>(fromattrval_value.Get());
+                }
+            }
+            public class Context : System.Text.Parsing.Context
+            {
+                public Context() : value(), fromattribute(), fromattrval()
+                {
+                }
+                public Pair<ustring, ustring> value;
+                public ustring fromattribute;
+                public ustring fromattrval;
+            }
+        }
+
         public class attributeRule : System.Text.Parsing.RuleParser
         {
             public attributeRule(const ustring& name_, Scope* enclosingScope_, int id_, Parser* definition_) : base(name_, enclosingScope_, id_, definition_)
@@ -894,9 +1061,9 @@ namespace System.Net.Http
             }
         }
 
-        public class valueRule : System.Text.Parsing.RuleParser
+        public class attrvalRule : System.Text.Parsing.RuleParser
         {
-            public valueRule(const ustring& name_, Scope* enclosingScope_, int id_, Parser* definition_) : base(name_, enclosingScope_, id_, definition_)
+            public attrvalRule(const ustring& name_, Scope* enclosingScope_, int id_, Parser* definition_) : base(name_, enclosingScope_, id_, definition_)
             {
                 SetValueTypeName(ToUtf32("ustring"));
             }
@@ -961,6 +1128,187 @@ namespace System.Net.Http
                 public ustring value;
                 public ustring fromhttpToken;
                 public ustring fromquotedString;
+            }
+        }
+
+        public class mediaTypeRule : System.Text.Parsing.RuleParser
+        {
+            public mediaTypeRule(const ustring& name_, Scope* enclosingScope_, int id_, Parser* definition_) : base(name_, enclosingScope_, id_, definition_)
+            {
+                AddInheritedAttribute(AttrOrVar(ToUtf32("MimeType*"), ToUtf32("mediaType")));
+            }
+            public override void Enter(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
+            {
+                parsingData->PushContext(Id(), new Context());
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                UniquePtr<Object> mediaType_value = stack.Pop();
+                context->mediaType = *cast<ValueObject<MimeType*>*>(mediaType_value.Get());
+            }
+            public override void Leave(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
+            {
+                parsingData->PopContext(Id());
+            }
+            public override void Link()
+            {
+                ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
+                a0ActionParser->SetAction(A0Action);
+                ActionParser* a1ActionParser = GetAction(ToUtf32("A1"));
+                a1ActionParser->SetAction(A1Action);
+                NonterminalParser* typeNonterminalParser = GetNonterminal(ToUtf32("type"));
+                typeNonterminalParser->SetPost(Posttype);
+                NonterminalParser* subtypeNonterminalParser = GetNonterminal(ToUtf32("subtype"));
+                subtypeNonterminalParser->SetPost(Postsubtype);
+                NonterminalParser* parameterNonterminalParser = GetNonterminal(ToUtf32("parameter"));
+                parameterNonterminalParser->SetPost(Postparameter);
+            }
+            public void A0Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                context->mediaType->SetValue(context->fromtype, context->fromsubtype);
+            }
+            public void A1Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                context->mediaType->SetParameter(context->fromparameter.first, context->fromparameter.second);
+            }
+            public void Posttype(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                if (matched)
+                {
+                    UniquePtr<Object> fromtype_value = stack.Pop();
+                    context->fromtype = *cast<ValueObject<ustring>*>(fromtype_value.Get());
+                }
+            }
+            public void Postsubtype(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                if (matched)
+                {
+                    UniquePtr<Object> fromsubtype_value = stack.Pop();
+                    context->fromsubtype = *cast<ValueObject<ustring>*>(fromsubtype_value.Get());
+                }
+            }
+            public void Postparameter(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                if (matched)
+                {
+                    UniquePtr<Object> fromparameter_value = stack.Pop();
+                    context->fromparameter = *cast<ValueObject<Pair<ustring, ustring>>*>(fromparameter_value.Get());
+                }
+            }
+            public class Context : System.Text.Parsing.Context
+            {
+                public Context() : mediaType(), fromtype(), fromsubtype(), fromparameter()
+                {
+                }
+                public MimeType* mediaType;
+                public ustring fromtype;
+                public ustring fromsubtype;
+                public Pair<ustring, ustring> fromparameter;
+            }
+        }
+
+        public class typeRule : System.Text.Parsing.RuleParser
+        {
+            public typeRule(const ustring& name_, Scope* enclosingScope_, int id_, Parser* definition_) : base(name_, enclosingScope_, id_, definition_)
+            {
+                SetValueTypeName(ToUtf32("ustring"));
+            }
+            public override void Enter(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
+            {
+                parsingData->PushContext(Id(), new Context());
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+            }
+            public override void Leave(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                if (matched)
+                {
+                    stack.Push(UniquePtr<Object>(new ValueObject<ustring>(context->value)));
+                }
+                parsingData->PopContext(Id());
+            }
+            public override void Link()
+            {
+                ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
+                a0ActionParser->SetAction(A0Action);
+                NonterminalParser* httpTokenNonterminalParser = GetNonterminal(ToUtf32("httpToken"));
+                httpTokenNonterminalParser->SetPost(PosthttpToken);
+            }
+            public void A0Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                context->value = context->fromhttpToken;
+            }
+            public void PosthttpToken(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                if (matched)
+                {
+                    UniquePtr<Object> fromhttpToken_value = stack.Pop();
+                    context->fromhttpToken = *cast<ValueObject<ustring>*>(fromhttpToken_value.Get());
+                }
+            }
+            public class Context : System.Text.Parsing.Context
+            {
+                public Context() : value(), fromhttpToken()
+                {
+                }
+                public ustring value;
+                public ustring fromhttpToken;
+            }
+        }
+
+        public class subtypeRule : System.Text.Parsing.RuleParser
+        {
+            public subtypeRule(const ustring& name_, Scope* enclosingScope_, int id_, Parser* definition_) : base(name_, enclosingScope_, id_, definition_)
+            {
+                SetValueTypeName(ToUtf32("ustring"));
+            }
+            public override void Enter(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
+            {
+                parsingData->PushContext(Id(), new Context());
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+            }
+            public override void Leave(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                if (matched)
+                {
+                    stack.Push(UniquePtr<Object>(new ValueObject<ustring>(context->value)));
+                }
+                parsingData->PopContext(Id());
+            }
+            public override void Link()
+            {
+                ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
+                a0ActionParser->SetAction(A0Action);
+                NonterminalParser* httpTokenNonterminalParser = GetNonterminal(ToUtf32("httpToken"));
+                httpTokenNonterminalParser->SetPost(PosthttpToken);
+            }
+            public void A0Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                context->value = context->fromhttpToken;
+            }
+            public void PosthttpToken(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                if (matched)
+                {
+                    UniquePtr<Object> fromhttpToken_value = stack.Pop();
+                    context->fromhttpToken = *cast<ValueObject<ustring>*>(fromhttpToken_value.Get());
+                }
+            }
+            public class Context : System.Text.Parsing.Context
+            {
+                public Context() : value(), fromhttpToken()
+                {
+                }
+                public ustring value;
+                public ustring fromhttpToken;
             }
         }
 
@@ -1114,6 +1462,54 @@ namespace System.Net.Http
                 {
                 }
                 public ustring value;
+            }
+        }
+
+        public class dateValueRule : System.Text.Parsing.RuleParser
+        {
+            public dateValueRule(const ustring& name_, Scope* enclosingScope_, int id_, Parser* definition_) : base(name_, enclosingScope_, id_, definition_)
+            {
+                AddInheritedAttribute(AttrOrVar(ToUtf32("DateTime*"), ToUtf32("date")));
+            }
+            public override void Enter(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
+            {
+                parsingData->PushContext(Id(), new Context());
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                UniquePtr<Object> date_value = stack.Pop();
+                context->date = *cast<ValueObject<DateTime*>*>(date_value.Get());
+            }
+            public override void Leave(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
+            {
+                parsingData->PopContext(Id());
+            }
+            public override void Link()
+            {
+                ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
+                a0ActionParser->SetAction(A0Action);
+                NonterminalParser* httpDateNonterminalParser = GetNonterminal(ToUtf32("httpDate"));
+                httpDateNonterminalParser->SetPost(PosthttpDate);
+            }
+            public void A0Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                *context->date = context->fromhttpDate;
+            }
+            public void PosthttpDate(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                if (matched)
+                {
+                    UniquePtr<Object> fromhttpDate_value = stack.Pop();
+                    context->fromhttpDate = *cast<ValueObject<DateTime>*>(fromhttpDate_value.Get());
+                }
+            }
+            public class Context : System.Text.Parsing.Context
+            {
+                public Context() : date(), fromhttpDate()
+                {
+                }
+                public DateTime* date;
+                public DateTime fromhttpDate;
             }
         }
 
@@ -2530,7 +2926,7 @@ namespace System.Net.Http
                         new System.Text.Parsing.OptionalParser(
                             new System.Text.Parsing.SequenceParser(
                                 new System.Text.Parsing.CharParser('='),
-                                new System.Text.Parsing.NonterminalParser(ToUtf32("value"), ToUtf32("value"), 0)))))));
+                                new System.Text.Parsing.NonterminalParser(ToUtf32("attrval"), ToUtf32("attrval"), 0)))))));
             AddRule(new chunkHeaderRule(ToUtf32("chunkHeader"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.SequenceParser(
                     new System.Text.Parsing.ActionParser(ToUtf32("A0"),
@@ -2565,36 +2961,41 @@ namespace System.Net.Http
                         new System.Text.Parsing.SequenceParser(
                             new System.Text.Parsing.CharParser(';'),
                             new System.Text.Parsing.NonterminalParser(ToUtf32("parameter"), ToUtf32("parameter"), 0))))));
-            AddRule(new System.Text.Parsing.RuleParser(ToUtf32("parameter"), GetScope(), Domain()->GetNextRuleId(),
-                new System.Text.Parsing.SequenceParser(
+            AddRule(new parameterRule(ToUtf32("parameter"), GetScope(), Domain()->GetNextRuleId(),
+                new System.Text.Parsing.ActionParser(ToUtf32("A0"),
                     new System.Text.Parsing.SequenceParser(
-                        new System.Text.Parsing.NonterminalParser(ToUtf32("attribute"), ToUtf32("attribute"), 0),
-                        new System.Text.Parsing.CharParser('=')),
-                    new System.Text.Parsing.NonterminalParser(ToUtf32("value"), ToUtf32("value"), 0))));
+                        new System.Text.Parsing.SequenceParser(
+                            new System.Text.Parsing.NonterminalParser(ToUtf32("attribute"), ToUtf32("attribute"), 0),
+                            new System.Text.Parsing.CharParser('=')),
+                        new System.Text.Parsing.NonterminalParser(ToUtf32("attrval"), ToUtf32("attrval"), 0)))));
             AddRule(new attributeRule(ToUtf32("attribute"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.ActionParser(ToUtf32("A0"),
                     new System.Text.Parsing.NonterminalParser(ToUtf32("httpToken"), ToUtf32("httpToken"), 0))));
-            AddRule(new valueRule(ToUtf32("value"), GetScope(), Domain()->GetNextRuleId(),
+            AddRule(new attrvalRule(ToUtf32("attrval"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.AlternativeParser(
                     new System.Text.Parsing.ActionParser(ToUtf32("A0"),
                         new System.Text.Parsing.NonterminalParser(ToUtf32("httpToken"), ToUtf32("httpToken"), 0)),
                     new System.Text.Parsing.ActionParser(ToUtf32("A1"),
                         new System.Text.Parsing.NonterminalParser(ToUtf32("quotedString"), ToUtf32("quotedString"), 0)))));
-            AddRule(new System.Text.Parsing.RuleParser(ToUtf32("mediaType"), GetScope(), Domain()->GetNextRuleId(),
+            AddRule(new mediaTypeRule(ToUtf32("mediaType"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.SequenceParser(
-                    new System.Text.Parsing.SequenceParser(
+                    new System.Text.Parsing.ActionParser(ToUtf32("A0"),
                         new System.Text.Parsing.SequenceParser(
-                            new System.Text.Parsing.NonterminalParser(ToUtf32("type"), ToUtf32("type"), 0),
-                            new System.Text.Parsing.CharParser('/')),
-                        new System.Text.Parsing.NonterminalParser(ToUtf32("subtype"), ToUtf32("subtype"), 0)),
+                            new System.Text.Parsing.SequenceParser(
+                                new System.Text.Parsing.NonterminalParser(ToUtf32("type"), ToUtf32("type"), 0),
+                                new System.Text.Parsing.CharParser('/')),
+                            new System.Text.Parsing.NonterminalParser(ToUtf32("subtype"), ToUtf32("subtype"), 0))),
                     new System.Text.Parsing.KleeneStarParser(
                         new System.Text.Parsing.SequenceParser(
                             new System.Text.Parsing.CharParser(';'),
-                            new System.Text.Parsing.NonterminalParser(ToUtf32("parameter"), ToUtf32("parameter"), 0))))));
-            AddRule(new System.Text.Parsing.RuleParser(ToUtf32("type"), GetScope(), Domain()->GetNextRuleId(),
-                new System.Text.Parsing.NonterminalParser(ToUtf32("httpToken"), ToUtf32("httpToken"), 0)));
-            AddRule(new System.Text.Parsing.RuleParser(ToUtf32("subtype"), GetScope(), Domain()->GetNextRuleId(),
-                new System.Text.Parsing.NonterminalParser(ToUtf32("httpToken"), ToUtf32("httpToken"), 0)));
+                            new System.Text.Parsing.ActionParser(ToUtf32("A1"),
+                                new System.Text.Parsing.NonterminalParser(ToUtf32("parameter"), ToUtf32("parameter"), 0)))))));
+            AddRule(new typeRule(ToUtf32("type"), GetScope(), Domain()->GetNextRuleId(),
+                new System.Text.Parsing.ActionParser(ToUtf32("A0"),
+                    new System.Text.Parsing.NonterminalParser(ToUtf32("httpToken"), ToUtf32("httpToken"), 0))));
+            AddRule(new subtypeRule(ToUtf32("subtype"), GetScope(), Domain()->GetNextRuleId(),
+                new System.Text.Parsing.ActionParser(ToUtf32("A0"),
+                    new System.Text.Parsing.NonterminalParser(ToUtf32("httpToken"), ToUtf32("httpToken"), 0))));
             AddRule(new httpHeaderRule(ToUtf32("httpHeader"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.ActionParser(ToUtf32("A0"),
                     new System.Text.Parsing.SequenceParser(
@@ -2609,6 +3010,9 @@ namespace System.Net.Http
                 new System.Text.Parsing.ActionParser(ToUtf32("A0"),
                     new System.Text.Parsing.KleeneStarParser(
                         new System.Text.Parsing.AnyCharParser()))));
+            AddRule(new dateValueRule(ToUtf32("dateValue"), GetScope(), Domain()->GetNextRuleId(),
+                new System.Text.Parsing.ActionParser(ToUtf32("A0"),
+                    new System.Text.Parsing.NonterminalParser(ToUtf32("httpDate"), ToUtf32("httpDate"), 0))));
             AddRule(new httpDateRule(ToUtf32("httpDate"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.AlternativeParser(
                     new System.Text.Parsing.AlternativeParser(
@@ -3031,6 +3435,112 @@ namespace System.Net.Http
             AddRuleLink(new System.Text.Parsing.RuleLink(ToUtf32("LWS"), this, ToUtf32("HttpGrammar.LWS")));
             AddRule(new csvFieldValueRule(ToUtf32("csvFieldValue"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.NonterminalParser(ToUtf32("commaSeparatedFieldValue"), ToUtf32("commaSeparatedFieldValue"), 1)));
+            SetSkipRuleName(ToUtf32("LWS"));
+        }
+    }
+} // System.Net.Http
+namespace System.Net.Http
+{
+    public class HttpMediaTypeGrammar : System.Text.Parsing.Grammar
+    {
+        public HttpMediaTypeGrammar() : this(new ParsingDomain())
+        {
+        }
+        public HttpMediaTypeGrammar(ParsingDomain* parsingDomain) : base(ToUtf32("HttpMediaTypeGrammar"), parsingDomain->GetNamespaceScope(ToUtf32("System.Net.Http")), parsingDomain)
+        {
+            SetOwner(0);
+            RegisterParsingDomain(parsingDomain);
+            parsingDomain->AddGrammar(this);
+            CreateRules();
+            Link();
+        }
+        public void Parse(const uchar* start, const uchar* end, int fileIndex, const string& fileName, MimeType* mediaType)
+        {
+            Scanner scanner(start, end, fileName, fileIndex, SkipRule());
+            UniquePtr<XmlLog> xmlLog;
+            if (Log() != null)
+            {
+                xmlLog.Reset(new XmlLog(*Log(), MaxLogLineLength()));
+                scanner.SetLog(xmlLog.Get());
+                xmlLog->WriteBeginRule(u"parse");
+                xmlLog->IncIndent();
+            }
+            Stack<UniquePtr<Object>> stack;
+            UniquePtr<ParsingData> parsingData(new ParsingData(Domain()->NumRules()));
+            scanner.SetParsingData(parsingData.Get());
+            stack.Push(UniquePtr<Object>(new ValueObject<MimeType*>(mediaType)));
+            Match match = base->Parse(scanner, stack, parsingData.Get());
+            Span stop = scanner.GetSpan();
+            if (Log() != null)
+            {
+                xmlLog->DecIndent();
+                xmlLog->WriteEndRule(u"parse");
+            }
+            if (!match.Hit() || stop.start != cast<int>(end - start))
+            {
+                if (StartRule() != null)
+                {
+                    throw ExpectationFailure(StartRule()->Info(), fileName, stop, start, end);
+                }
+                else
+                {
+                    throw ParsingException("grammar '" + ToUtf8(Name()) + "' has no start rule", fileName, scanner.GetSpan(), start, end);
+                }
+            }
+        }
+
+        public class mediaTypeValueRule : System.Text.Parsing.RuleParser
+        {
+            public mediaTypeValueRule(const ustring& name_, Scope* enclosingScope_, int id_, Parser* definition_) : base(name_, enclosingScope_, id_, definition_)
+            {
+                AddInheritedAttribute(AttrOrVar(ToUtf32("MimeType*"), ToUtf32("mediaType")));
+            }
+            public override void Enter(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
+            {
+                parsingData->PushContext(Id(), new Context());
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                UniquePtr<Object> mediaType_value = stack.Pop();
+                context->mediaType = *cast<ValueObject<MimeType*>*>(mediaType_value.Get());
+            }
+            public override void Leave(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
+            {
+                parsingData->PopContext(Id());
+            }
+            public override void Link()
+            {
+                NonterminalParser* mediaTypeNonterminalParser = GetNonterminal(ToUtf32("mediaType"));
+                mediaTypeNonterminalParser->SetPre(PremediaType);
+            }
+            public void PremediaType(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                stack.Push(UniquePtr<Object>(new ValueObject<MimeType*>(context->mediaType)));
+            }
+            public class Context : System.Text.Parsing.Context
+            {
+                public Context() : mediaType()
+                {
+                }
+                public MimeType* mediaType;
+            }
+        }
+
+        public override void GetReferencedGrammars()
+        {
+            ParsingDomain* pd = Domain();
+            Grammar* grammar0 = pd->GetGrammar(ToUtf32("System.Net.Http.HttpGrammar"));
+            if (grammar0 == null)
+            {
+                grammar0 = new System.Net.Http.HttpGrammar(pd);
+            }
+            AddGrammarReference(grammar0);
+        }
+        public override void CreateRules()
+        {
+            AddRuleLink(new System.Text.Parsing.RuleLink(ToUtf32("mediaType"), this, ToUtf32("HttpGrammar.mediaType")));
+            AddRuleLink(new System.Text.Parsing.RuleLink(ToUtf32("LWS"), this, ToUtf32("HttpGrammar.LWS")));
+            AddRule(new mediaTypeValueRule(ToUtf32("mediaTypeValue"), GetScope(), Domain()->GetNextRuleId(),
+                new System.Text.Parsing.NonterminalParser(ToUtf32("mediaType"), ToUtf32("mediaType"), 1)));
             SetSkipRuleName(ToUtf32("LWS"));
         }
     }

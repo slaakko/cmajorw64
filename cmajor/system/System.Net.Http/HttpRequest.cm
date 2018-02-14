@@ -79,7 +79,7 @@ namespace System.Net.Http
     public const ushort statusInfoSwitchingProtocols = 101u;
     
     public const ushort statusSuccessStart = 200u;
-    public const ushort statusSuccessSEnd = 299u;
+    public const ushort statusSuccessEnd = 299u;
     public const ushort statusSuccessOK = 200u;
     public const ushort statusSuccessCreated = 201u;
     public const ushort statusSuccessAccepted = 202u;
@@ -282,6 +282,46 @@ namespace System.Net.Http
         public nothrow inline const List<UniquePtr<HttpHeader>>& Headers() const
         {
             return headers;
+        }
+        public nothrow void Clear()
+        {
+            headers.Clear();
+            headerMap.Clear();
+        }
+        public ulong GetContentLength() const
+        {
+            HttpHeader* contentLengthHeader = GetHeader(u"content-length");
+            if (contentLengthHeader != null)
+            {
+                string contentLength = ToUtf8(contentLengthHeader->SingleFieldValue().FieldValue());
+                if (!contentLength.IsEmpty())
+                {
+                    return ParseULong(contentLength);
+                }
+            }
+            return 0u;
+        }
+        public MimeType GetContentType() const
+        {
+            HttpHeader* contentTypeHeader = GetHeader(u"content-type");
+            if (contentTypeHeader != null)
+            {
+                ustring fieldValue = contentTypeHeader->SingleFieldValue().FieldValue();
+                MimeType mimeType = HttpParser.Instance().ParseMediaType(fieldValue);
+                return mimeType;
+            }
+            return MimeType();
+        }
+        public DateTime GetDate() const
+        {
+            HttpHeader* dateHeader = GetHeader(u"date");
+            if (dateHeader != null)
+            {
+                ustring fieldValue = dateHeader->SingleFieldValue().FieldValue();
+                DateTime date = HttpParser.Instance().ParseDate(fieldValue);
+                return date;
+            }
+            return DateTime();
         }
         private List<UniquePtr<HttpHeader>> headers;
         private HashMap<ustring, HttpHeader*> headerMap;
