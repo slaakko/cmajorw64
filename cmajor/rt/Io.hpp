@@ -46,6 +46,7 @@ extern "C" RT_API int32_t RtSeek(int32_t fileHandle, int64_t pos,  Origin origin
 extern "C" RT_API int64_t RtTell(int32_t fileHandle);
 extern "C" RT_API bool RtFileExists(const char* filePath);
 extern "C" RT_API bool RtLastWriteTimeLess(const char* filePath1, const char* filePath2);
+extern "C" RT_API int32_t RtGetFileSize(const char* filePath, uint64_t* fileSize);
 
 namespace cmajor { namespace rt {
 

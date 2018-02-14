@@ -38,15 +38,19 @@ namespace cmdevenv
                     {
                         SelectionStart = Text.Length;
                         string line = Text.Substring(inputStartPos, SelectionStart - inputStartPos);
+                        SelectionStart = inputStartPos;
+                        SelectionLength = Text.Length - inputStartPos;
+                        SelectedText = "";
                         inputLines.Add(line);
                         inputLineIndex = inputLines.Count;
-                        executor.WriteLineToProcessStandardInput(line);
+                        string bufferedOutput = executor.WriteLineToProcessStandardInput(line);
+                        Write(bufferedOutput + line);
                         inputStartPos = GetFirstCharIndexOfCurrentLine();
                     }
                     else if (e.KeyCode == Keys.Z && e.Control)
                     {
-                        Text = Text + "<EOF>";
-                        executor.CloseProcessStandardInput();
+                        string bufferedOutput = executor.CloseProcessStandardInput();
+                        Text = Text + bufferedOutput + "<EOF>\n";
                     }
                     else if (e.KeyCode == Keys.Home)
                     {

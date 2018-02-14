@@ -1,5 +1,7 @@
 solution Examples;
 project <args/Args.cmp>;
+project <Calculator/Calculator.cmp>;
+project <HexDump/hexdump.cmp>;
 project <rex/rex.cmp>;
 project <xpq/xpq.cmp>;
-activeProject Args;
+activeProject HexDump;

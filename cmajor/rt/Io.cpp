@@ -32,6 +32,7 @@ public:
     int32_t ReadByte(int32_t fileHandle);
     void SeekFile(int32_t fileHandle, int64_t pos, Origin origin);
     int64_t TellFile(int32_t fileHandle);
+    void FlushStdoutAndStderr();
 private:
     static std::unique_ptr<FileTable> instance;
     const int32_t maxNoLockFileHandles = 256;
@@ -399,6 +400,10 @@ void FileTable::WriteByte(int32_t fileHandle, int8_t x)
 
 int64_t FileTable::ReadFile(int32_t fileHandle, uint8_t* buffer, int64_t bufferSize)
 {
+    if (fileHandle == 0)
+    {
+        FlushStdoutAndStderr();
+    }
     FILE* file = nullptr;
     if (fileHandle < 0)
     {
@@ -481,6 +486,10 @@ int64_t FileTable::ReadFile(int32_t fileHandle, uint8_t* buffer, int64_t bufferS
 
 int32_t FileTable::ReadByte(int32_t fileHandle)
 {
+    if (fileHandle == 0)
+    {
+        FlushStdoutAndStderr();
+    }
     FILE* file = nullptr;
     if (fileHandle < 0)
     {
@@ -669,6 +678,12 @@ int64_t FileTable::TellFile(int32_t fileHandle)
     return result;
 }
 
+void FileTable::FlushStdoutAndStderr()
+{
+    std::fflush(stdout);
+    std::fflush(stderr);
+}
+
 FileSystemError::FileSystemError(const std::string& message_) : std::runtime_error(message_)
 {
 }
@@ -807,4 +822,21 @@ extern "C" RT_API bool RtLastWriteTimeLess(const char* filePath1, const char* fi
         return true;
     }
     return false;
+}
+
+extern "C" RT_API int32_t RtGetFileSize(const char* filePath, uint64_t* fileSize)
+{
+    try
+    {
+        *fileSize = boost::filesystem::file_size(filePath);
+    }
+    catch (boost::filesystem::filesystem_error& ex)
+    {
+        return cmajor::rt::InstallError(ex.what());
+    }
+    catch (const std::exception& ex)
+    {
+        return cmajor::rt::InstallError(ex.what());
+    }
+    return 0;
 }

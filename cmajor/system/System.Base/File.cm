@@ -14,6 +14,21 @@ namespace System.IO
         {
             return RtFileExists(filePath.Chars());
         }
+        public static ulong Size(const string& filePath)
+        {
+            ulong fileSize = 0u;
+            int result = RtGetFileSize(filePath.Chars(), &fileSize);
+            if (result < 0)
+            {
+                string errorMessage = RtGetError(result);
+                RtDisposeError(result);
+                throw FileSystemException("could not get size of file '" + filePath + "': " + errorMessage);
+            }
+            else
+            {
+                return fileSize;
+            }
+        }
         public static nothrow bool LastWriteTimeLess(const string& filePath1, const string& filePath2)
         {
             return RtLastWriteTimeLess(filePath1.Chars(), filePath2.Chars());

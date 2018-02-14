@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8"/>
+    <title>httpClient.cm</title>
+    <link rel="stylesheet" type="text/css" href="../../style/code.css"/>
+</head>
+<body>
+<pre>
+<div class="code">
+<span class="keyword">using</span> <span class="identifier">System</span><span class="other">;</span>
+<span class="keyword">using</span> <span class="identifier">System.Net.Http</span><span class="other">;</span>
+<span class="keyword">using</span> <span class="identifier">System.IO</span><span class="other">;</span>
+
+<span class="keyword">int</span> <span class="identifier">main</span><span class="other">(</span><span class="other">)</span>
+<span class="other">{</span>
+    <span class="keyword">try</span>
+    <span class="other">{</span>
+        <span class="identifier">HttpClient</span> <span class="identifier">httpClient</span><span class="other">(</span><span class="identifier">UriReference</span><span class="other">(</span><span class="identifier">u</span><span class="string">&quot;https://tools.ietf.org/&quot;</span><span class="other">)</span><span class="other">,</span> <span class="other">&amp;</span><span class="identifier">Console.Out</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span>
+        <span class="identifier">HttpHeaderCollection</span> <span class="identifier">responseHeaders</span><span class="other">;</span>
+        <span class="identifier">SharedPtr</span><span class="other">&lt;</span><span class="identifier">ByteStream</span><span class="other">&gt;</span> <span class="identifier">body</span><span class="other">;</span>
+        <span class="identifier">UriReference</span> <span class="identifier">uri</span> <span class="other">=</span> <span class="identifier">u</span><span class="string">&quot;/html/rfc2616&quot;</span><span class="other">;</span>
+        <span class="identifier">HttpStatus</span> <span class="identifier">status</span> <span class="other">=</span> <span class="identifier">httpClient.Get</span><span class="other">(</span><span class="identifier">uri</span><span class="other">,</span> <span class="identifier">responseHeaders</span><span class="other">,</span> <span class="identifier">body</span><span class="other">)</span><span class="other">;</span>
+        <span class="keyword">if</span> <span class="other">(</span><span class="identifier">status.StatusCode</span><span class="other">(</span><span class="other">)</span> <span class="other">=</span><span class="other">=</span> <span class="identifier">statusSuccessOK</span><span class="other">)</span>
+        <span class="other">{</span>
+            <span class="identifier">Console.WriteLine</span><span class="other">(</span><span class="string">&quot;==========================================================&quot;</span><span class="other">)</span><span class="other">;</span>
+            <span class="keyword">ulong</span> <span class="identifier">contentLength</span> <span class="other">=</span> <span class="identifier">responseHeaders.GetContentLength</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>
+            <span class="identifier">Console.WriteLine</span><span class="other">(</span><span class="string">&quot;content length : &quot;</span> <span class="other">+</span> <span class="identifier">ToString</span><span class="other">(</span><span class="identifier">contentLength</span><span class="other">)</span><span class="other">)</span><span class="other">;</span>
+            <span class="identifier">MimeType</span> <span class="identifier">contentType</span> <span class="other">=</span> <span class="identifier">responseHeaders.GetContentType</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>
+            <span class="identifier">Console.WriteLine</span><span class="other">(</span><span class="string">&quot;content type   : &quot;</span> <span class="other">+</span> <span class="identifier">ToUtf8</span><span class="other">(</span><span class="identifier">contentType.ToString</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">)</span><span class="other">;</span>
+            <span class="identifier">DateTime</span> <span class="identifier">date</span> <span class="other">=</span> <span class="identifier">responseHeaders.GetDate</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>
+            <span class="identifier">Console.WriteLine</span><span class="other">(</span><span class="string">&quot;date           : &quot;</span> <span class="other">+</span> <span class="identifier">date.ToString</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span>
+            <span class="keyword">if</span> <span class="other">(</span><span class="identifier">ToLower</span><span class="other">(</span><span class="identifier">contentType.GetMediaType</span><span class="other">(</span><span class="other">)</span><span class="other">-</span><span class="other">&gt;</span><span class="identifier">Name</span><span class="other">(</span><span class="other">)</span><span class="other">)</span> <span class="other">=</span><span class="other">=</span> <span class="identifier">u</span><span class="string">&quot;text&quot;</span> <span class="other">&amp;</span><span class="other">&amp;</span> <span class="identifier">ToLower</span><span class="other">(</span><span class="identifier">contentType.GetSubtype</span><span class="other">(</span><span class="other">)</span><span class="other">-</span><span class="other">&gt;</span><span class="identifier">Name</span><span class="other">(</span><span class="other">)</span><span class="other">)</span> <span class="other">=</span><span class="other">=</span> <span class="identifier">u</span><span class="string">&quot;html&quot;</span><span class="other">)</span>
+            <span class="other">{</span>
+                <span class="identifier">StreamReader</span> <span class="identifier">reader</span><span class="other">(</span><span class="identifier">body</span><span class="other">)</span><span class="other">;</span>
+                <span class="identifier">string</span> <span class="identifier">content</span> <span class="other">=</span> <span class="identifier">reader.ReadToEnd</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>
+                <span class="comment">// process content</span>
+            <span class="other">}</span>
+            <span class="keyword">else</span>
+            <span class="other">{</span>
+                <span class="keyword">throw</span> <span class="identifier">Exception</span><span class="other">(</span><span class="string">&quot;text/html content type expected&quot;</span><span class="other">)</span><span class="other">;</span>
+            <span class="other">}</span>
+            <span class="identifier">Console.WriteLine</span><span class="other">(</span><span class="string">&quot;==========================================================&quot;</span><span class="other">)</span><span class="other">;</span>
+        <span class="other">}</span>
+        <span class="keyword">else</span>
+        <span class="other">{</span>
+            <span class="keyword">throw</span> <span class="identifier">HttpException</span><span class="other">(</span><span class="identifier">status</span><span class="other">)</span><span class="other">;</span>
+        <span class="other">}</span>
+    <span class="other">}</span>
+    <span class="keyword">catch</span> <span class="other">(</span><span class="keyword">const</span> <span class="identifier">Exception</span><span class="other">&amp;</span> <span class="identifier">ex</span><span class="other">)</span>
+    <span class="other">{</span>
+        <span class="identifier">Console.Error</span><span class="other">(</span><span class="other">)</span> <span class="other">&lt;</span><span class="other">&lt;</span> <span class="identifier">ex.ToString</span><span class="other">(</span><span class="other">)</span> <span class="other">&lt;</span><span class="other">&lt;</span> <span class="identifier">endl</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>
+        <span class="keyword">return</span> <span class="number">1</span><span class="other">;</span>
+    <span class="other">}</span>
+    <span class="keyword">return</span> <span class="number">0</span><span class="other">;</span>
+<span class="other">}</span>
+</div
+</pre>
+</body>
+</html>
