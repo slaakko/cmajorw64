@@ -13,14 +13,19 @@ ClassNode::ClassNode(const Span& span_) : Node(NodeType::classNode, span_), spec
 {
 }
 
-ClassNode::ClassNode(const Span& span_, Specifiers specifiers_, IdentifierNode* id_) :
-    Node(NodeType::classNode, span_), specifiers(specifiers_), id(id_), templateParameters(), baseClassOrInterfaces(), members()
+ClassNode::ClassNode(const Span& span_, Specifiers specifiers_, IdentifierNode* id_, Attributes* attributes_) :
+    Node(NodeType::classNode, span_), specifiers(specifiers_), id(id_), templateParameters(), baseClassOrInterfaces(), members(), attributes(attributes_)
 {
 }
 
 Node* ClassNode::Clone(CloneContext& cloneContext) const
 {
-    ClassNode* clone = new ClassNode(GetSpan(), specifiers, static_cast<IdentifierNode*>(id->Clone(cloneContext)));
+    Attributes* clonedAttributes = nullptr;
+    if (attributes)
+    {
+        clonedAttributes = attributes->Clone();
+    }
+    ClassNode* clone = new ClassNode(GetSpan(), specifiers, static_cast<IdentifierNode*>(id->Clone(cloneContext)), clonedAttributes);
     if (!cloneContext.InstantiateClassNode())
     {
         int tn = templateParameters.Count();
@@ -54,6 +59,12 @@ void ClassNode::Accept(Visitor& visitor)
 void ClassNode::Write(AstWriter& writer)
 {
     Node::Write(writer);
+    bool hasAttributes = attributes != nullptr;
+    writer.GetBinaryWriter().Write(hasAttributes);
+    if (hasAttributes)
+    {
+        attributes->Write(writer);
+    }
     writer.Write(specifiers);
     writer.Write(id.get());
     templateParameters.Write(writer);
@@ -64,6 +75,12 @@ void ClassNode::Write(AstWriter& writer)
 void ClassNode::Read(AstReader& reader)
 {
     Node::Read(reader);
+    bool hasAttributes = reader.GetBinaryReader().ReadBool();
+    if (hasAttributes)
+    {
+        attributes.reset(new Attributes());
+        attributes->Read(reader);
+    }
     specifiers = reader.ReadSpecifiers();
     id.reset(reader.ReadIdentifierNode());
     id->SetParent(this);
@@ -200,18 +217,18 @@ void MemberInitializerNode::Read(AstReader& reader)
     memberId->SetParent(this);
 }
 
-StaticConstructorNode::StaticConstructorNode(const Span& span_) : FunctionNode(NodeType::staticConstructorNode, span_, Specifiers::none, nullptr, U"@static_constructor"), initializers()
+StaticConstructorNode::StaticConstructorNode(const Span& span_) : FunctionNode(NodeType::staticConstructorNode, span_, Specifiers::none, nullptr, U"@static_constructor", nullptr), initializers()
 {
 }
 
-StaticConstructorNode::StaticConstructorNode(const Span& span_, Specifiers specifiers_) : 
-    FunctionNode(NodeType::staticConstructorNode, span_, specifiers_, nullptr, U"@static_constructor"), initializers()
+StaticConstructorNode::StaticConstructorNode(const Span& span_, Specifiers specifiers_, Attributes* attributes_) :
+    FunctionNode(NodeType::staticConstructorNode, span_, specifiers_, nullptr, U"@static_constructor", attributes_), initializers()
 {
 }
 
 Node* StaticConstructorNode::Clone(CloneContext& cloneContext) const
 {
-    StaticConstructorNode* clone = new StaticConstructorNode(GetSpan());
+    StaticConstructorNode* clone = new StaticConstructorNode(GetSpan(), GetSpecifiers(), nullptr);
     int n = initializers.Count();
     for (int i = 0; i < n; ++i)
     {
@@ -245,17 +262,17 @@ void StaticConstructorNode::AddInitializer(InitializerNode* initializer)
     initializers.Add(initializer);
 }
 
-ConstructorNode::ConstructorNode(const Span& span_) : FunctionNode(NodeType::constructorNode, span_, Specifiers::none, nullptr, U"@constructor"), initializers()
+ConstructorNode::ConstructorNode(const Span& span_) : FunctionNode(NodeType::constructorNode, span_, Specifiers::none, nullptr, U"@constructor", nullptr), initializers()
 {
 }
 
-ConstructorNode::ConstructorNode(const Span& span_, Specifiers specifiers_) : FunctionNode(NodeType::constructorNode, span_, specifiers_, nullptr, U"@constructor"), initializers()
+ConstructorNode::ConstructorNode(const Span& span_, Specifiers specifiers_, Attributes* attributes_) : FunctionNode(NodeType::constructorNode, span_, specifiers_, nullptr, U"@constructor", attributes_), initializers()
 {
 }
 
 Node* ConstructorNode::Clone(CloneContext& cloneContext) const
 {
-    ConstructorNode* clone = new ConstructorNode(GetSpan(), GetSpecifiers());
+    ConstructorNode* clone = new ConstructorNode(GetSpan(), GetSpecifiers(), nullptr);
     int n = initializers.Count();
     for (int i = 0; i < n; ++i)
     {
@@ -293,13 +310,13 @@ DestructorNode::DestructorNode(const Span& span_) : FunctionNode(NodeType::destr
 {
 }
 
-DestructorNode::DestructorNode(const Span& span_, Specifiers specifiers_) : FunctionNode(NodeType::destructorNode, span_, specifiers_, nullptr, U"@destructor")
+DestructorNode::DestructorNode(const Span& span_, Specifiers specifiers_, Attributes* attributes_) : FunctionNode(NodeType::destructorNode, span_, specifiers_, nullptr, U"@destructor", attributes_)
 {
 }
 
 Node* DestructorNode::Clone(CloneContext& cloneContext) const
 {
-    DestructorNode* clone = new DestructorNode(GetSpan(), GetSpecifiers());
+    DestructorNode* clone = new DestructorNode(GetSpan(), GetSpecifiers(), nullptr);
     CloneContent(clone, cloneContext);
     return clone;
 }
@@ -313,8 +330,8 @@ MemberFunctionNode::MemberFunctionNode(const Span& span_) : FunctionNode(NodeTyp
 {
 }
 
-MemberFunctionNode::MemberFunctionNode(const Span& span_, Specifiers specifiers_, Node* returnTypeExpr_, const std::u32string& groupId_) :
-    FunctionNode(NodeType::memberFunctionNode, span_, specifiers_, returnTypeExpr_, groupId_)
+MemberFunctionNode::MemberFunctionNode(const Span& span_, Specifiers specifiers_, Node* returnTypeExpr_, const std::u32string& groupId_, Attributes* attributes_) :
+    FunctionNode(NodeType::memberFunctionNode, span_, specifiers_, returnTypeExpr_, groupId_, attributes_)
 {
 }
 
@@ -338,8 +355,8 @@ ConversionFunctionNode::ConversionFunctionNode(const Span& span_) : FunctionNode
 {
 }
 
-ConversionFunctionNode::ConversionFunctionNode(const Span& span_, Specifiers specifiers_, Node* returnTypeExpr_) :
-    FunctionNode(NodeType::conversionFunctionNode, span_, specifiers_, returnTypeExpr_, U"@operator_conv")
+ConversionFunctionNode::ConversionFunctionNode(const Span& span_, Specifiers specifiers_, Node* returnTypeExpr_, Attributes* attributes_) :
+    FunctionNode(NodeType::conversionFunctionNode, span_, specifiers_, returnTypeExpr_, U"@operator_conv", attributes_)
 {
 }
 
@@ -363,8 +380,8 @@ MemberVariableNode::MemberVariableNode(const Span& span_) : Node(NodeType::membe
 {
 }
 
-MemberVariableNode::MemberVariableNode(const Span& span_, Specifiers specifiers_, Node* typeExpr_, IdentifierNode* id_) :
-    Node(NodeType::memberVariableNode, span_), specifiers(specifiers_), typeExpr(typeExpr_), id(id_)
+MemberVariableNode::MemberVariableNode(const Span& span_, Specifiers specifiers_, Node* typeExpr_, IdentifierNode* id_, Attributes* attributes_) :
+    Node(NodeType::memberVariableNode, span_), specifiers(specifiers_), typeExpr(typeExpr_), id(id_), attributes(attributes_)
 {
     typeExpr->SetParent(this);
     id->SetParent(this);
@@ -372,7 +389,12 @@ MemberVariableNode::MemberVariableNode(const Span& span_, Specifiers specifiers_
 
 Node* MemberVariableNode::Clone(CloneContext& cloneContext) const
 {
-    return new MemberVariableNode(GetSpan(), specifiers, typeExpr->Clone(cloneContext), static_cast<IdentifierNode*>(id->Clone(cloneContext)));
+    Attributes* clonedAttributes = nullptr;
+    if (attributes)
+    {
+        clonedAttributes = attributes->Clone();
+    }
+    return new MemberVariableNode(GetSpan(), specifiers, typeExpr->Clone(cloneContext), static_cast<IdentifierNode*>(id->Clone(cloneContext)), clonedAttributes);
 }
 
 void MemberVariableNode::Accept(Visitor& visitor)
@@ -383,6 +405,12 @@ void MemberVariableNode::Accept(Visitor& visitor)
 void MemberVariableNode::Write(AstWriter& writer)
 {
     Node::Write(writer);
+    bool hasAttributes = attributes != nullptr;
+    writer.GetBinaryWriter().Write(hasAttributes);
+    if (hasAttributes)
+    {
+        attributes->Write(writer);
+    }
     writer.Write(specifiers);
     writer.Write(typeExpr.get());
     writer.Write(id.get());
@@ -391,6 +419,12 @@ void MemberVariableNode::Write(AstWriter& writer)
 void MemberVariableNode::Read(AstReader& reader)
 {
     Node::Read(reader);
+    bool hasAttributes = reader.GetBinaryReader().ReadBool();
+    if (hasAttributes)
+    {
+        attributes.reset(new Attributes());
+        attributes->Read(reader);
+    }
     specifiers = reader.ReadSpecifiers();
     typeExpr.reset(reader.ReadNode());
     typeExpr->SetParent(this);

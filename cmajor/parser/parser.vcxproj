@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <None Include="Attribute.parser" />
     <None Include="BasicType.parser" />
     <None Include="Class.parser" />
     <None Include="CommandLine.parser" />
@@ -46,6 +47,7 @@
     <None Include="TypeExpr.parser" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Attribute.cpp" />
     <ClCompile Include="BasicType.cpp" />
     <ClCompile Include="Class.cpp" />
     <ClCompile Include="CommandLine.cpp" />
@@ -74,6 +76,7 @@
     <ClCompile Include="TypeExpr.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Attribute.hpp" />
     <ClInclude Include="BasicType.hpp" />
     <ClInclude Include="Class.hpp" />
     <ClInclude Include="CommandLine.hpp" />

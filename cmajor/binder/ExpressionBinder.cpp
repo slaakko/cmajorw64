@@ -2097,6 +2097,7 @@ void ExpressionBinder::Visit(SizeOfNode& sizeOfNode)
 
 void ExpressionBinder::Visit(TypeNameNode& typeNameNode) 
 {
+    bool staticTypeName = typeNameNode.Static();
     std::unique_ptr<BoundExpression> expr = BindExpression(typeNameNode.Expression(), boundCompileUnit, boundFunction, containerScope, statementBinder, false, false, true, false);
     TypeSymbol* type = expr->GetType();
     if (type->GetSymbolType() == SymbolType::classGroupTypeSymbol)
@@ -2109,11 +2110,12 @@ void ExpressionBinder::Visit(TypeNameNode& typeNameNode)
         }
         expr.reset(new BoundTypeExpression(span, classTypeSymbol));
         type = classTypeSymbol;
+        staticTypeName = true;
     }
     if (expr->GetType()->PlainType(typeNameNode.GetSpan())->IsClassTypeSymbol())
     {
         ClassTypeSymbol* classType = static_cast<ClassTypeSymbol*>(expr->GetType()->BaseType());
-        if (!typeNameNode.Static() && classType->IsPolymorphic())
+        if (!staticTypeName && classType->IsPolymorphic())
         {
             if (expr->GetBoundNodeType() == BoundNodeType::boundDereferenceExpression)
             {

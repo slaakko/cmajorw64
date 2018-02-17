@@ -25,11 +25,12 @@ using namespace cmajor::symbols;
 
 class BoundExpression;
 struct ArgumentMatch;
+class AttributeBinder;
 
 class BoundCompileUnit : public BoundNode
 {
 public:
-    BoundCompileUnit(Module& module_, CompileUnitNode* compileUnitNode_);
+    BoundCompileUnit(Module& module_, CompileUnitNode* compileUnitNode_, AttributeBinder* attributeBinder_);
     void Load(Emitter& emitter, OperationFlags flags) override;
     void Store(Emitter& emitter, OperationFlags flags) override;
     void Accept(BoundNodeVisitor& visitor) override;
@@ -77,10 +78,12 @@ public:
     void PopBindingTypes();
     bool BindingTypes() const { return bindingTypes; }
     void FinalizeBinding(ClassTypeSymbol* classType);
+    AttributeBinder* GetAttributeBinder() const { return attributeBinder; }
 private:
     Module& module;
     SymbolTable& symbolTable;
     CompileUnitNode* compileUnitNode;
+    AttributeBinder* attributeBinder;
     std::string llFilePath;
     std::string optLLFilePath;
     std::string objectFilePath;

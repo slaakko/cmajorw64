@@ -1,10 +1,11 @@
-#ifndef Function_hpp_391
-#define Function_hpp_391
+#ifndef Function_hpp_23579
+#define Function_hpp_23579
 
 #include <cmajor/parsing/Grammar.hpp>
 #include <cmajor/parsing/Keyword.hpp>
 #include <cmajor/ast/Function.hpp>
 #include <cmajor/parser/ParsingContext.hpp>
+#include <cmajor/parser/Attribute.hpp>
 
 namespace cmajor { namespace parser {
 
@@ -26,4 +27,4 @@ private:
 
 } } // namespace cmajor.parser
 
-#endif // Function_hpp_391
+#endif // Function_hpp_23579

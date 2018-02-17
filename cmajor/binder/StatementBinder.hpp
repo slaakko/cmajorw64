@@ -65,12 +65,18 @@ public:
     void Visit(ConditionalCompilationPrimaryNode& conditionalCompilationPrimaryNode) override;
     void Visit(ConditionalCompilationStatementNode& conditionalCompilationStatementNode) override;
     void CompileStatement(Node* statementNode, bool setPostfix);
+    BoundCompileUnit& GetBoundCompileUnit() { return boundCompileUnit; }
     void SetCurrentClass(BoundClass* currentClass_) { currentClass = currentClass_; }
+    BoundClass* CurrentClass() const { return currentClass;  }
+    ContainerScope* GetContainerScope() { return containerScope; }
+    void SetContainerScope(ContainerScope* containerScope_) { containerScope = containerScope_; }
+    BoundFunction* CurrentFunction() { return currentFunction; }
     void SetCurrentFunction(BoundFunction* currentFunction_) { currentFunction = currentFunction_; }
     void SetCurrentConstructor(ConstructorSymbol* currentConstructorSymbol_, ConstructorNode* currentConstructorNode_);
+    ConstructorSymbol* CurrentConstructorSymbol() { return currentConstructorSymbol; }
+    ConstructorNode* CurrentConstructorNode() { return currentConstructorNode; }
     void SetCurrentDestructor(DestructorSymbol* currentDestructorSymbol_, DestructorNode* currentDestructorNode_);
     void SetCurrentMemberFunction(MemberFunctionSymbol* currentMemberFunctionSymbol_, MemberFunctionNode* currentMemberFunctionNode_);
-    void SetContainerScope(ContainerScope* containerScope_) { containerScope = containerScope_; }
     BoundStatement* ReleaseStatement() { return statement.release(); }
     bool CompilingThrow() const { return compilingThrow; }
     bool InsideCatch() const { return insideCatch; }

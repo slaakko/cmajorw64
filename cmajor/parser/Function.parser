@@ -5,6 +5,7 @@
 
 [hpp]#include <cmajor/ast/Function.hpp>
 [hpp]#include <cmajor/parser/ParsingContext.hpp>
+[hpp]#include <cmajor/parser/Attribute.hpp>
 [cpp]#include <cmajor/parser/Specifier.hpp>
 [cpp]#include <cmajor/parser/TypeExpr.hpp>
 [cpp]#include <cmajor/parser/Concept.hpp>
@@ -19,6 +20,7 @@ namespace cmajor.parser
 
     grammar FunctionGrammar
     {
+        using AttributeGrammar.Attributes;
         using SpecifierGrammar.Specifiers;
         using TypeExprGrammar.TypeExpr;
         using TemplateGrammar.TemplateParameterList;
@@ -27,8 +29,8 @@ namespace cmajor.parser
         using IdentifierGrammar.Identifier;
         using StatementGrammar.CompoundStatement;
         
-        Function(ParsingContext* ctx, var std::unique_ptr<FunctionNode> fun, var Span s) : FunctionNode*
-            ::= (Specifiers TypeExpr(ctx) FunctionGroupId(ctx){ fun.reset(new FunctionNode(span, Specifiers, TypeExpr, FunctionGroupId)); } 
+        Function(ParsingContext* ctx, var std::unique_ptr<FunctionNode> fun, var Span s, var std::unique_ptr<Attributes> attributes) : FunctionNode*
+            ::= ((Attributes{ attributes.reset(Attributes); })? Specifiers TypeExpr(ctx) FunctionGroupId(ctx){ fun.reset(new FunctionNode(span, Specifiers, TypeExpr, FunctionGroupId, attributes.release())); } 
                 TemplateParameterList(ctx, fun.get())?
                 ParameterList(ctx, fun.get()){ s = span; }
                 (WhereConstraint(ctx){ fun->SetConstraint(WhereConstraint); })?

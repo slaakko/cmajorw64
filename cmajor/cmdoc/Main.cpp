@@ -1,3 +1,4 @@
+#include <cmajor/binder/AttributeBinder.hpp>
 #include <cmajor/binder/ModuleBinder.hpp>
 #include <cmajor/ast/InitDone.hpp>
 #include <cmajor/ast/Visitor.hpp>
@@ -1774,7 +1775,8 @@ std::unique_ptr<Document> GenerateLibraryXmlFile(const std::string& moduleFilePa
     }
     std::unique_ptr<ModuleBinder> moduleBinder;
     CompileUnitNode compileUnit(Span(), "foo");
-    moduleBinder.reset(new ModuleBinder(module, &compileUnit));
+    AttributeBinder attributeBinder;
+    moduleBinder.reset(new ModuleBinder(module, &compileUnit, &attributeBinder));
     moduleBinder->SetBindingTypes();
     module.GetSymbolTable().AddClassTemplateSpecializationsToClassTemplateSpecializationMap(classTemplateSpecializations);
     for (ClassTemplateSpecializationSymbol* classTemplateSpecialization : classTemplateSpecializations)

@@ -17,6 +17,7 @@
 #include <cmajor/binder/BoundStatement.hpp>
 #include <cmajor/binder/ModuleBinder.hpp>
 #include <cmajor/binder/ControlFlowAnalyzer.hpp>
+#include <cmajor/binder/AttributeBinder.hpp>
 #include <cmajor/symbols/GlobalFlags.hpp>
 #include <cmajor/symbols/Warning.hpp>
 #include <cmajor/symbols/Module.hpp>
@@ -24,6 +25,7 @@
 #include <cmajor/symbols/SymbolReader.hpp>
 #include <cmajor/symbols/SymbolCreatorVisitor.hpp>
 #include <cmajor/symbols/Meta.hpp>
+#include <cmajor/ast/Attribute.hpp>
 #include <cmajor/ast/Function.hpp>
 #include <cmajor/ast/BasicType.hpp>
 #include <cmajor/ast/Identifier.hpp>
@@ -208,14 +210,21 @@ std::vector<std::unique_ptr<CompileUnitNode>> ParseSourcesConcurrently(const std
 
 std::vector<std::unique_ptr<CompileUnitNode>> ParseSources(const std::vector<std::string>& sourceFilePaths)
 {
-    int numCores = std::thread::hardware_concurrency();
-    if (numCores == 0 || sourceFilePaths.size() < numCores || GetGlobalFlag(GlobalFlags::debugParsing))
+    try
     {
-        return ParseSourcesInMainThread(sourceFilePaths);
+        int numCores = std::thread::hardware_concurrency();
+        if (numCores == 0 || sourceFilePaths.size() < numCores || GetGlobalFlag(GlobalFlags::debugParsing))
+        {
+            return ParseSourcesInMainThread(sourceFilePaths);
+        }
+        else
+        {
+            return ParseSourcesConcurrently(sourceFilePaths, numCores);
+        }
     }
-    else
+    catch (const AttributeNotUniqueException& ex)
     {
-        return ParseSourcesConcurrently(sourceFilePaths, numCores);
+        throw Exception(ex.what(), ex.GetSpan(), ex.PrevSpan());
     }
 }
 
@@ -229,12 +238,12 @@ void CreateSymbols(SymbolTable& symbolTable, const std::vector<std::unique_ptr<C
     }
 }
 
-std::vector<std::unique_ptr<BoundCompileUnit>> BindTypes(Module& module, const std::vector<std::unique_ptr<CompileUnitNode>>& compileUnits)
+std::vector<std::unique_ptr<BoundCompileUnit>> BindTypes(Module& module, const std::vector<std::unique_ptr<CompileUnitNode>>& compileUnits, AttributeBinder* attributeBinder)
 {
     std::vector<std::unique_ptr<BoundCompileUnit>> boundCompileUnits;
     for (const std::unique_ptr<CompileUnitNode>& compileUnit : compileUnits)
     {
-        std::unique_ptr<BoundCompileUnit> boundCompileUnit(new BoundCompileUnit(module, compileUnit.get()));
+        std::unique_ptr<BoundCompileUnit> boundCompileUnit(new BoundCompileUnit(module, compileUnit.get(), attributeBinder));
         boundCompileUnit->PushBindingTypes();
         TypeBinder typeBinder(*boundCompileUnit);
         compileUnit->Accept(typeBinder);
@@ -498,11 +507,47 @@ void CheckMainFunctionSymbol(Module& module)
     }
 }
 
-void CreateMainUnit(std::vector<std::string>& objectFilePaths, Module& module, EmittingContext& emittingContext)
+void CreateJsonRegistrationUnit(std::vector<std::string>& objectFilePaths, Module& module, EmittingContext& emittingContext, AttributeBinder* attributeBinder)
+{
+    CompileUnitNode jsonRegistrationCompileUnit(Span(), boost::filesystem::path(module.OriginalFilePath()).parent_path().append("__json__.cm").generic_string());
+    jsonRegistrationCompileUnit.GlobalNs()->AddMember(new NamespaceImportNode(Span(), new IdentifierNode(Span(), U"System")));
+    jsonRegistrationCompileUnit.GlobalNs()->AddMember(new NamespaceImportNode(Span(), new IdentifierNode(Span(), U"System.Json")));
+    FunctionNode* jsonRegistrationFunction(new FunctionNode(Span(), Specifiers::public_, new IntNode(Span()), U"RegisterJsonClasses", nullptr));
+    jsonRegistrationFunction->SetReturnTypeExpr(new VoidNode(Span()));
+    CompoundStatementNode* jsonRegistrationFunctionBody = new CompoundStatementNode(Span());
+    const std::unordered_set<std::u32string>& jsonClasses = module.GetSymbolTable().JsonClasses();
+    for (const std::u32string& jsonClass : jsonClasses)
+    {
+        InvokeNode* invokeRegisterJsonClass = new InvokeNode(Span(), new IdentifierNode(Span(), U"RegisterJsonClass"));
+        invokeRegisterJsonClass->AddArgument(new TypeNameNode(Span(), new IdentifierNode(Span(), jsonClass)));
+        invokeRegisterJsonClass->AddArgument(new DotNode(Span(), new IdentifierNode(Span(), jsonClass), new IdentifierNode(Span(), U"Create")));
+        ExpressionStatementNode* registerStatement = new ExpressionStatementNode(Span(), invokeRegisterJsonClass);
+        jsonRegistrationFunctionBody->AddStatement(registerStatement);
+    }
+    jsonRegistrationFunction->SetBody(jsonRegistrationFunctionBody);
+    jsonRegistrationCompileUnit.GlobalNs()->AddMember(jsonRegistrationFunction);
+    SymbolCreatorVisitor symbolCreator(module.GetSymbolTable());
+    jsonRegistrationCompileUnit.Accept(symbolCreator);
+    BoundCompileUnit boundJsonCompileUnit(module, &jsonRegistrationCompileUnit, attributeBinder);
+    boundJsonCompileUnit.PushBindingTypes();
+    TypeBinder typeBinder(boundJsonCompileUnit);
+    jsonRegistrationCompileUnit.Accept(typeBinder);
+    boundJsonCompileUnit.PopBindingTypes();
+    StatementBinder statementBinder(boundJsonCompileUnit);
+    jsonRegistrationCompileUnit.Accept(statementBinder);
+    if (boundJsonCompileUnit.HasGotos())
+    {
+        AnalyzeControlFlow(boundJsonCompileUnit);
+    }
+    GenerateCode(emittingContext, boundJsonCompileUnit);
+    objectFilePaths.push_back(boundJsonCompileUnit.ObjectFilePath());
+}
+
+void CreateMainUnit(std::vector<std::string>& objectFilePaths, Module& module, EmittingContext& emittingContext, AttributeBinder* attributeBinder)
 {
     CompileUnitNode mainCompileUnit(Span(), boost::filesystem::path(module.OriginalFilePath()).parent_path().append("__main__.cm").generic_string());
     mainCompileUnit.GlobalNs()->AddMember(new NamespaceImportNode(Span(), new IdentifierNode(Span(), U"System")));
-    FunctionNode* mainFunction(new FunctionNode(Span(), Specifiers::public_, new IntNode(Span()), U"main"));
+    FunctionNode* mainFunction(new FunctionNode(Span(), Specifiers::public_, new IntNode(Span()), U"main", nullptr));
     mainFunction->SetProgramMain();
     CompoundStatementNode* mainFunctionBody = new CompoundStatementNode(Span());
     ConstructionStatementNode* constructExitCode = new ConstructionStatementNode(Span(), new IntNode(Span()), new IdentifierNode(Span(), U"exitCode"));
@@ -516,6 +561,11 @@ void CreateMainUnit(std::vector<std::string>& objectFilePaths, Module& module, E
     argv->AddArgument(new InvokeNode(Span(), new IdentifierNode(Span(), U"RtArgv")));
     mainFunctionBody->AddStatement(argv);
     CompoundStatementNode* tryBlock = new CompoundStatementNode(Span());
+    if (!module.GetSymbolTable().JsonClasses().empty())
+    {
+        ExpressionStatementNode* registerJsonClassesCall = new ExpressionStatementNode(Span(), new InvokeNode(Span(), new IdentifierNode(Span(), U"RegisterJsonClasses")));
+        tryBlock->AddStatement(registerJsonClassesCall);
+    }
     FunctionSymbol* userMain = module.GetSymbolTable().MainFunctionSymbol();
     InvokeNode* invokeMain = new InvokeNode(Span(), new IdentifierNode(Span(), userMain->GroupName()));
     if (!userMain->Parameters().empty())
@@ -559,7 +609,7 @@ void CreateMainUnit(std::vector<std::string>& objectFilePaths, Module& module, E
     mainCompileUnit.GlobalNs()->AddMember(mainFunction);
     SymbolCreatorVisitor symbolCreator(module.GetSymbolTable());
     mainCompileUnit.Accept(symbolCreator);
-    BoundCompileUnit boundMainCompileUnit(module, &mainCompileUnit);
+    BoundCompileUnit boundMainCompileUnit(module, &mainCompileUnit, attributeBinder);
     boundMainCompileUnit.PushBindingTypes();
     TypeBinder typeBinder(boundMainCompileUnit);
     mainCompileUnit.Accept(typeBinder);
@@ -628,10 +678,11 @@ void BuildProject(Project* project)
     {
         FileRegistry::Instance().PopObtainSystemFileIndeces();
     }
+    AttributeBinder attributeBinder;
     std::unique_ptr<ModuleBinder> moduleBinder;
     if (!compileUnits.empty())
     {
-        moduleBinder.reset(new ModuleBinder(module, compileUnits[0].get()));
+        moduleBinder.reset(new ModuleBinder(module, compileUnits[0].get(), &attributeBinder));
     }
     std::vector<ClassTypeSymbol*> classTypes;
     std::vector<ClassTemplateSpecializationSymbol*> classTemplateSpecializations;
@@ -650,7 +701,7 @@ void BuildProject(Project* project)
             classType->CreateLayouts();
         }
     }
-    std::vector<std::unique_ptr<BoundCompileUnit>> boundCompileUnits = BindTypes(module, compileUnits);
+    std::vector<std::unique_ptr<BoundCompileUnit>> boundCompileUnits = BindTypes(module, compileUnits, &attributeBinder);
     EmittingContext emittingContext;
     std::vector<std::string> objectFilePaths;
     if (GetGlobalFlag(GlobalFlags::verbose))
@@ -675,7 +726,11 @@ void BuildProject(Project* project)
     if (project->GetTarget() == Target::program)
     {
         CheckMainFunctionSymbol(module);
-        CreateMainUnit(objectFilePaths, module, emittingContext);
+        if (!module.GetSymbolTable().JsonClasses().empty())
+        {
+            CreateJsonRegistrationUnit(objectFilePaths, module, emittingContext, &attributeBinder);
+        }
+        CreateMainUnit(objectFilePaths, module, emittingContext, &attributeBinder);
     }
     GenerateLibrary(objectFilePaths, project->LibraryFilePath());
     if (project->GetTarget() == Target::program)

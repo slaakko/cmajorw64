@@ -1,5 +1,5 @@
-#ifndef Interface_hpp_391
-#define Interface_hpp_391
+#ifndef Interface_hpp_24967
+#define Interface_hpp_24967
 
 #include <cmajor/parsing/Grammar.hpp>
 #include <cmajor/parsing/Keyword.hpp>
@@ -27,4 +27,4 @@ private:
 
 } } // namespace cmajor.parser
 
-#endif // Interface_hpp_391
+#endif // Interface_hpp_24967

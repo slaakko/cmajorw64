@@ -22,6 +22,7 @@
 #include <cmajor/symbols/Exception.hpp>
 #include <cmajor/symbols/TemplateSymbol.hpp>
 #include <cmajor/symbols/ConceptSymbol.hpp>
+#include <cmajor/symbols/FunctionSymbol.hpp>
 #include <cmajor/util/Unicode.hpp>
 #include <cmajor/util/Sha1.hpp>
 
@@ -114,6 +115,12 @@ void Symbol::Write(SymbolWriter& writer)
     SymbolFlags f = flags & ~(SymbolFlags::project | SymbolFlags::bound | SymbolFlags::export_ | SymbolFlags::exportComputed);
     writer.GetBinaryWriter().Write(static_cast<uint8_t>(f));
     writer.GetBinaryWriter().Write(mangledName);
+    bool hasAttributes = attributes != nullptr;
+    writer.GetBinaryWriter().Write(hasAttributes);
+    if (hasAttributes)
+    {
+        attributes->Write(writer.GetAstWriter());
+    }
 }
 
 void Symbol::Read(SymbolReader& reader)
@@ -124,6 +131,12 @@ void Symbol::Read(SymbolReader& reader)
         flags = flags | SymbolFlags::project;
     }
     mangledName = reader.GetBinaryReader().ReadUtf32String();
+    bool hasAttributes = reader.GetBinaryReader().ReadBool();
+    if (hasAttributes)
+    {
+        attributes.reset(new Attributes());
+        attributes->Read(reader.GetAstReader());
+    }
 }
 
 const ContainerScope* Symbol::GetContainerScope() const 
@@ -468,6 +481,10 @@ const ContainerSymbol* Symbol::ClassInterfaceEnumDelegateOrNsNoThrow() const
     {
         return static_cast<const ClassDelegateTypeSymbol*>(this);
     }
+    else if (symbolType == SymbolType::memberExpressionTypeSymbol)
+    {
+        return static_cast<const MemberExpressionTypeSymbol*>(this);
+    }
     else if (IsClassTypeSymbol())
     {
         return static_cast<const ClassTypeSymbol*>(this);
@@ -506,6 +523,10 @@ ContainerSymbol* Symbol::ClassInterfaceEnumDelegateOrNsNoThrow()
     else if (symbolType == SymbolType::classDelegateTypeSymbol)
     {
         return static_cast<ClassDelegateTypeSymbol*>(this);
+    }
+    else if (symbolType == SymbolType::memberExpressionTypeSymbol)
+    {
+        return static_cast<MemberExpressionTypeSymbol*>(this);
     }
     else if (IsClassTypeSymbol())
     {
@@ -800,6 +821,11 @@ ContainerScope* Symbol::ClassInterfaceEnumDelegateOrNsScope()
     {
         throw Exception("class, interface, enumeration, delegate, class delegate or namespace scope not found", GetSpan());
     }
+}
+
+void Symbol::SetAttributes(std::unique_ptr<Attributes>&& attributes_)
+{
+    attributes = std::move(attributes_);
 }
 
 SymbolCreator::~SymbolCreator()

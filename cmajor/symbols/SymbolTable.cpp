@@ -143,6 +143,12 @@ void SymbolTable::Write(SymbolWriter& writer)
     {
         writer.Write(classTemplateSpecialization);
     }
+    uint32_t nj = jsonClasses.size();
+    writer.GetBinaryWriter().WriteEncodedUInt(nj);
+    for (const std::u32string& jsonClass : jsonClasses)
+    {
+        writer.GetBinaryWriter().Write(jsonClass);
+    }
 }
 
 void SymbolTable::Read(SymbolReader& reader)
@@ -167,6 +173,12 @@ void SymbolTable::Read(SymbolReader& reader)
         ClassTemplateSpecializationSymbol* classTemplateSpecialization = reader.ReadClassTemplateSpecializationSymbol(&globalNs);
         classTemplateSpecializations.push_back(std::unique_ptr<ClassTemplateSpecializationSymbol>(classTemplateSpecialization));
         reader.AddClassTemplateSpecialization(classTemplateSpecialization);
+    }
+    uint32_t nj = reader.GetBinaryReader().ReadEncodedUInt();
+    for (uint32_t i = 0; i < nj; ++i)
+    {
+        std::u32string jsonClass = reader.GetBinaryReader().ReadUtf32String();
+        jsonClasses.insert(jsonClass);
     }
     ProcessTypeConceptAndFunctionRequests();
     for (FunctionSymbol* conversion : reader.Conversions())
@@ -263,6 +275,10 @@ void SymbolTable::Import(SymbolTable& symbolTable)
     for (ClassTypeSymbol* classHavingStaticConstructor : symbolTable.ClassesHavingStaticConstructor())
     {
         AddClassHavingStaticConstructor(classHavingStaticConstructor);
+    }
+    for (const std::u32string& jsonClass : symbolTable.JsonClasses())
+    {
+        AddJsonClass(jsonClass);
     }
     symbolTable.Clear();
 }
@@ -1291,6 +1307,11 @@ void SymbolTable::AddClassHavingStaticConstructor(ClassTypeSymbol* classHavingSt
         throw Exception("not having static constructor", classHavingStaticConstructor->GetSpan());
     }
     classesHavingStaticConstructor.insert(classHavingStaticConstructor);
+}
+
+void SymbolTable::AddJsonClass(const std::u32string& jsonClass)
+{
+    jsonClasses.insert(jsonClass);
 }
 
 std::vector<TypeSymbol*> SymbolTable::Types() const

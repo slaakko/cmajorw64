@@ -19,6 +19,7 @@ using namespace cmajor::ast;
 using namespace cmajor::symbols;
 
 class BoundCompileUnit;
+class AttributeBinder;
 
 class TypeBinder : public Visitor
 {

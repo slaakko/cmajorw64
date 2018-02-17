@@ -15,6 +15,7 @@
 #include <cmajor/binder/Evaluator.hpp>
 #include <cmajor/binder/TypeBinder.hpp>
 #include <cmajor/binder/TypeResolver.hpp>
+#include <cmajor/binder/AttributeBinder.hpp>
 #include <cmajor/symbols/FunctionSymbol.hpp>
 #include <cmajor/symbols/Exception.hpp>
 #include <cmajor/symbols/GlobalFlags.hpp>
@@ -253,6 +254,7 @@ void StatementBinder::Visit(ClassNode& classNode)
         Node* classMember = classNode.Members()[i];
         classMember->Accept(*this);
     }
+    boundCompileUnit.GetAttributeBinder()->GenerateImplementation(classNode.GetAttributes(), symbol, this);
     boundCompileUnit.AddBoundNode(std::move(boundClass));
     DestructorSymbol* destructorSymbol = classTypeSymbol->Destructor();
     if (destructorSymbol && !GetGlobalFlag(GlobalFlags::info))
@@ -292,6 +294,7 @@ void StatementBinder::Visit(FunctionNode& functionNode)
         CheckFunctionReturnPaths(functionSymbol, functionNode, containerScope, boundCompileUnit);
         boundCompileUnit.AddBoundNode(std::move(boundFunction));
     }
+    boundCompileUnit.GetAttributeBinder()->GenerateImplementation(functionNode.GetAttributes(), symbol, this);
     currentFunction = prevFunction;
     containerScope = prevContainerScope;
 }
@@ -322,6 +325,7 @@ void StatementBinder::Visit(StaticConstructorNode& staticConstructorNode)
         CheckFunctionReturnPaths(staticConstructorSymbol, staticConstructorNode, containerScope, boundCompileUnit);
         currentClass->AddMember(std::move(boundFunction));
     }
+    boundCompileUnit.GetAttributeBinder()->GenerateImplementation(staticConstructorNode.GetAttributes(), symbol, this);
     currentFunction = prevFunction;
     containerScope = prevContainerScope;
     currentStaticConstructorSymbol = prevStaticConstructorSymbol;
@@ -365,6 +369,7 @@ void StatementBinder::Visit(ConstructorNode& constructorNode)
         CheckFunctionReturnPaths(constructorSymbol, constructorNode, containerScope, boundCompileUnit);
         currentClass->AddMember(std::move(boundFunction));
     }
+    boundCompileUnit.GetAttributeBinder()->GenerateImplementation(constructorNode.GetAttributes(), symbol, this);
     currentFunction = prevFunction;
     containerScope = prevContainerScope;
     currentConstructorSymbol = prevConstructorSymbol;
@@ -408,6 +413,7 @@ void StatementBinder::Visit(DestructorNode& destructorNode)
         CheckFunctionReturnPaths(destructorSymbol, destructorNode, containerScope, boundCompileUnit);
         currentClass->AddMember(std::move(boundFunction));
     }
+    boundCompileUnit.GetAttributeBinder()->GenerateImplementation(destructorNode.GetAttributes(), symbol, this);
     currentFunction = prevFunction;
     containerScope = prevContainerScope;
     currentDestructorSymbol = prevDestructorSymbol;
@@ -452,6 +458,7 @@ void StatementBinder::Visit(MemberFunctionNode& memberFunctionNode)
         CheckFunctionReturnPaths(memberFunctionSymbol, memberFunctionNode, containerScope, boundCompileUnit);
         currentClass->AddMember(std::move(boundFunction));
     }
+    boundCompileUnit.GetAttributeBinder()->GenerateImplementation(memberFunctionNode.GetAttributes(), symbol, this);
     currentFunction = prevFunction;
     containerScope = prevContainerScope;
     currentMemberFunctionSymbol = prevMemberFunctionSymbol;
@@ -478,6 +485,7 @@ void StatementBinder::Visit(ConversionFunctionNode& conversionFunctionNode)
         CheckFunctionReturnPaths(conversionFunctionSymbol, conversionFunctionNode, containerScope, boundCompileUnit);
         currentClass->AddMember(std::move(boundFunction));
     }
+    boundCompileUnit.GetAttributeBinder()->GenerateImplementation(conversionFunctionNode.GetAttributes(), symbol, this);
     currentFunction = prevFunction;
     containerScope = prevContainerScope;
 }

@@ -1,5 +1,6 @@
 project Parser;
 reference <StdLib.pl>;
+source <Attribute.parser>;
 source <BasicType.parser>;
 source <Class.parser>;
 source <CommandLine.parser>;

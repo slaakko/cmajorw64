@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Access.hpp" />
+    <ClInclude Include="AttributeBinder.hpp" />
     <ClInclude Include="BoundClass.hpp" />
     <ClInclude Include="BoundCompileUnit.hpp" />
     <ClInclude Include="BoundConstraint.hpp" />
@@ -39,6 +40,7 @@
     <ClInclude Include="ExpressionBinder.hpp" />
     <ClInclude Include="FunctionTemplateRepository.hpp" />
     <ClInclude Include="InlineFunctionRepository.hpp" />
+    <ClInclude Include="JsonAttributeProcessor.hpp" />
     <ClInclude Include="ModuleBinder.hpp" />
     <ClInclude Include="OperationRepository.hpp" />
     <ClInclude Include="OverloadResolution.hpp" />
@@ -49,6 +51,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Access.cpp" />
+    <ClCompile Include="AttributeBinder.cpp" />
     <ClCompile Include="BoundClass.cpp" />
     <ClCompile Include="BoundCompileUnit.cpp" />
     <ClCompile Include="BoundConstraint.cpp" />
@@ -68,6 +71,7 @@
     <ClCompile Include="ExpressionBinder.cpp" />
     <ClCompile Include="FunctionTemplateRepository.cpp" />
     <ClCompile Include="InlineFunctionRepository.cpp" />
+    <ClCompile Include="JsonAttributeProcessor.cpp" />
     <ClCompile Include="ModuleBinder.cpp" />
     <ClCompile Include="OperationRepository.cpp" />
     <ClCompile Include="OverloadResolution.cpp" />

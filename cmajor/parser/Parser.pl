@@ -1,31 +1,9 @@
 namespace cmajor.parser
 {
-    grammar ExpressionGrammar
+    grammar AttributeGrammar
     {
-        Expression(ParsingContext* ctx): Node*;
-        Equivalence(ParsingContext* ctx, var std::unique_ptr<Node> expr, var Span s): Node*;
-        Implication(ParsingContext* ctx, var std::unique_ptr<Node> expr, var Span s): Node*;
-        Disjunction(ParsingContext* ctx, var std::unique_ptr<Node> expr, var Span s): Node*;
-        Conjunction(ParsingContext* ctx, var std::unique_ptr<Node> expr, var Span s): Node*;
-        BitOr(ParsingContext* ctx, var std::unique_ptr<Node> expr, var Span s): Node*;
-        BitXor(ParsingContext* ctx, var std::unique_ptr<Node> expr, var Span s): Node*;
-        BitAnd(ParsingContext* ctx, var std::unique_ptr<Node> expr, var Span s): Node*;
-        Equality(ParsingContext* ctx, var std::unique_ptr<Node> expr, var Span s, var Operator op): Node*;
-        Relational(ParsingContext* ctx, var std::unique_ptr<Node> expr, var Span s, var Operator op): Node*;
-        Shift(ParsingContext* ctx, var std::unique_ptr<Node> expr, var Span s, var Operator op): Node*;
-        Additive(ParsingContext* ctx, var std::unique_ptr<Node> expr, var Span s, var Operator op): Node*;
-        Multiplicative(ParsingContext* ctx, var std::unique_ptr<Node> expr, var Span s, var Operator op): Node*;
-        Prefix(ParsingContext* ctx, var Span s, var Operator op): Node*;
-        Postfix(ParsingContext* ctx, var std::unique_ptr<Node> expr, var Span s): Node*;
-        Primary(ParsingContext* ctx): Node*;
-        SizeOfExpr(ParsingContext* ctx): Node*;
-        TypeNameExpr(ParsingContext* ctx): Node*;
-        CastExpr(ParsingContext* ctx): Node*;
-        ConstructExpr(ParsingContext* ctx): Node*;
-        NewExpr(ParsingContext* ctx): Node*;
-        ArgumentList(ParsingContext* ctx, Node* node);
-        ExpressionList(ParsingContext* ctx, Node* node);
-        InvokeExpr(ParsingContext* ctx, var std::unique_ptr<Node> expr, var Span s): Node*;
+        Attributes: cmajor::ast::Attributes*;
+        Attribute(cmajor::ast::Attributes* attributes);
     }
     grammar BasicTypeGrammar
     {
@@ -37,18 +15,18 @@ namespace cmajor.parser
     }
     grammar ClassGrammar
     {
-        Class(ParsingContext* ctx): ClassNode*;
+        Class(ParsingContext* ctx, var std::unique_ptr<Attributes> attributes): ClassNode*;
         InheritanceAndInterfaces(ParsingContext* ctx, ClassNode* classNode);
         BaseClassOrInterface(ParsingContext* ctx): Node*;
         ClassContent(ParsingContext* ctx, ClassNode* classNode);
         ClassMember(ParsingContext* ctx, ClassNode* classNode): Node*;
-        StaticConstructor(ParsingContext* ctx, ClassNode* classNode, var std::unique_ptr<IdentifierNode> id): StaticConstructorNode*;
-        Constructor(ParsingContext* ctx, ClassNode* classNode, var std::unique_ptr<IdentifierNode> id, var std::unique_ptr<ConstructorNode> ctor): Node*;
-        Destructor(ParsingContext* ctx, ClassNode* classNode, var std::unique_ptr<IdentifierNode> id, var std::unique_ptr<DestructorNode> dtor): Node*;
+        StaticConstructor(ParsingContext* ctx, ClassNode* classNode, var std::unique_ptr<IdentifierNode> id, var std::unique_ptr<Attributes> attributes): StaticConstructorNode*;
+        Constructor(ParsingContext* ctx, ClassNode* classNode, var std::unique_ptr<IdentifierNode> id, var std::unique_ptr<ConstructorNode> ctor, var std::unique_ptr<Attributes> attributes): Node*;
+        Destructor(ParsingContext* ctx, ClassNode* classNode, var std::unique_ptr<IdentifierNode> id, var std::unique_ptr<DestructorNode> dtor, var std::unique_ptr<Attributes> attributes): Node*;
         Initializer(ParsingContext* ctx): InitializerNode*;
-        MemberFunction(ParsingContext* ctx, var std::unique_ptr<MemberFunctionNode> memFun, var std::unique_ptr<IdentifierNode> qid): Node*;
-        ConversionFunction(ParsingContext* ctx, var std::unique_ptr<ConversionFunctionNode> conversionFun): Node*;
-        MemberVariable(ParsingContext* ctx): Node*;
+        MemberFunction(ParsingContext* ctx, var std::unique_ptr<MemberFunctionNode> memFun, var std::unique_ptr<IdentifierNode> qid, var std::unique_ptr<Attributes> attributes): Node*;
+        ConversionFunction(ParsingContext* ctx, var std::unique_ptr<ConversionFunctionNode> conversionFun, var std::unique_ptr<Attributes> attributes): Node*;
+        MemberVariable(ParsingContext* ctx, var std::unique_ptr<Attributes> attributes): Node*;
     }
     grammar SolutionGrammar
     {
@@ -128,9 +106,36 @@ namespace cmajor.parser
         AxiomBody(ParsingContext* ctx, AxiomNode* axiom);
         AxiomStatement(ParsingContext* ctx): AxiomStatementNode*;
     }
+    grammar ExpressionGrammar
+    {
+        Expression(ParsingContext* ctx): Node*;
+        Equivalence(ParsingContext* ctx, var std::unique_ptr<Node> expr, var Span s): Node*;
+        Implication(ParsingContext* ctx, var std::unique_ptr<Node> expr, var Span s): Node*;
+        Disjunction(ParsingContext* ctx, var std::unique_ptr<Node> expr, var Span s): Node*;
+        Conjunction(ParsingContext* ctx, var std::unique_ptr<Node> expr, var Span s): Node*;
+        BitOr(ParsingContext* ctx, var std::unique_ptr<Node> expr, var Span s): Node*;
+        BitXor(ParsingContext* ctx, var std::unique_ptr<Node> expr, var Span s): Node*;
+        BitAnd(ParsingContext* ctx, var std::unique_ptr<Node> expr, var Span s): Node*;
+        Equality(ParsingContext* ctx, var std::unique_ptr<Node> expr, var Span s, var Operator op): Node*;
+        Relational(ParsingContext* ctx, var std::unique_ptr<Node> expr, var Span s, var Operator op): Node*;
+        Shift(ParsingContext* ctx, var std::unique_ptr<Node> expr, var Span s, var Operator op): Node*;
+        Additive(ParsingContext* ctx, var std::unique_ptr<Node> expr, var Span s, var Operator op): Node*;
+        Multiplicative(ParsingContext* ctx, var std::unique_ptr<Node> expr, var Span s, var Operator op): Node*;
+        Prefix(ParsingContext* ctx, var Span s, var Operator op): Node*;
+        Postfix(ParsingContext* ctx, var std::unique_ptr<Node> expr, var Span s): Node*;
+        Primary(ParsingContext* ctx): Node*;
+        SizeOfExpr(ParsingContext* ctx): Node*;
+        TypeNameExpr(ParsingContext* ctx): Node*;
+        CastExpr(ParsingContext* ctx): Node*;
+        ConstructExpr(ParsingContext* ctx): Node*;
+        NewExpr(ParsingContext* ctx): Node*;
+        ArgumentList(ParsingContext* ctx, Node* node);
+        ExpressionList(ParsingContext* ctx, Node* node);
+        InvokeExpr(ParsingContext* ctx, var std::unique_ptr<Node> expr, var Span s): Node*;
+    }
     grammar FunctionGrammar
     {
-        Function(ParsingContext* ctx, var std::unique_ptr<FunctionNode> fun, var Span s): FunctionNode*;
+        Function(ParsingContext* ctx, var std::unique_ptr<FunctionNode> fun, var Span s, var std::unique_ptr<Attributes> attributes): FunctionNode*;
         FunctionGroupId(ParsingContext* ctx, var std::unique_ptr<IdentifierNode> id): std::u32string;
         OperatorFunctionGroupId(ParsingContext* ctx, var std::unique_ptr<Node> typeExpr): std::u32string;
     }
@@ -141,9 +146,9 @@ namespace cmajor.parser
     }
     grammar InterfaceGrammar
     {
-        Interface(ParsingContext* ctx): InterfaceNode*;
+        Interface(ParsingContext* ctx, var std::unique_ptr<Attributes> attributes): InterfaceNode*;
         InterfaceContent(ParsingContext* ctx, InterfaceNode* intf);
-        InterfaceMemFun(ParsingContext* ctx, var std::unique_ptr<MemberFunctionNode> memFun): Node*;
+        InterfaceMemFun(ParsingContext* ctx, var std::unique_ptr<MemberFunctionNode> memFun, var std::unique_ptr<Attributes> attributes): Node*;
         InterfaceFunctionGroupId(var std::unique_ptr<IdentifierNode> id): std::u32string;
     }
     grammar JsonGrammar

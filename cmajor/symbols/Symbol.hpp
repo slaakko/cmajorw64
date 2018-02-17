@@ -5,6 +5,7 @@
 
 #ifndef CMAJOR_SYMBOLS_SYMBOL_INCLUDED
 #define CMAJOR_SYMBOLS_SYMBOL_INCLUDED
+#include <cmajor/ast/Attribute.hpp>
 #include <cmajor/ast/Specifier.hpp>
 #include <cmajor/ast/CompileUnit.hpp>
 #include <cmajor/parsing/Scanner.hpp>
@@ -199,6 +200,8 @@ public:
     void SetCompileUnit(CompileUnitNode* compileUnit_) { compileUnit = compileUnit_; }
     void SetIrObject(llvm::Value* irObject_) { irObject = irObject_; }
     const std::u32string& MangledName() const { return mangledName; }
+    void SetAttributes(std::unique_ptr<Attributes>&& attributes_);
+    Attributes* GetAttributes() const { return attributes.get(); }
 private:
     SymbolType symbolType;
     Span span;
@@ -210,6 +213,7 @@ private:
     Module* module;
     CompileUnitNode* compileUnit;
     llvm::Value* irObject;
+    std::unique_ptr<Attributes> attributes;
 };
 
 class SymbolCreator

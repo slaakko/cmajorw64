@@ -5,6 +5,7 @@
 
 [hpp]#include <cmajor/ast/Interface.hpp>
 [hpp]#include <cmajor/parser/ParsingContext.hpp>
+[cpp]#include <cmajor/parser/Attribute.hpp>
 [cpp]#include <cmajor/parser/Specifier.hpp>
 [cpp]#include <cmajor/parser/Identifier.hpp>
 [cpp]#include <cmajor/parser/TypeExpr.hpp>
@@ -17,21 +18,24 @@ namespace cmajor.parser
 
     grammar InterfaceGrammar
     {
+        using AttributeGrammar.Attributes;
         using SpecifierGrammar.Specifiers;
         using IdentifierGrammar.Identifier;
         using TypeExprGrammar.TypeExpr;
         using ParameterGrammar.ParameterList;
 
-        Interface(ParsingContext* ctx) : InterfaceNode*
-            ::= (Specifiers keyword("interface") Identifier!){ value = new InterfaceNode(span, Specifiers, Identifier); } '{'! InterfaceContent(ctx, value) '}'!
+        Interface(ParsingContext* ctx, var std::unique_ptr<Attributes> attributes) : InterfaceNode*
+            ::= ((Attributes{ attributes.reset(Attributes); })? Specifiers keyword("interface") Identifier!){ value = new InterfaceNode(span, Specifiers, Identifier, attributes.release()); } 
+                '{'! InterfaceContent(ctx, value) '}'!
             ;
 
         InterfaceContent(ParsingContext* ctx, InterfaceNode* intf)
             ::= (InterfaceMemFun(ctx){ intf->AddMember(InterfaceMemFun); })*
             ;
 
-        InterfaceMemFun(ParsingContext* ctx, var std::unique_ptr<MemberFunctionNode> memFun) : Node*
-            ::= (TypeExpr(ctx):returnTypeExpr InterfaceFunctionGroupId:groupId!{ memFun.reset(new MemberFunctionNode(span, Specifiers(), returnTypeExpr, groupId)); }
+        InterfaceMemFun(ParsingContext* ctx, var std::unique_ptr<MemberFunctionNode> memFun, var std::unique_ptr<Attributes> attributes) : Node*
+            ::= ((Attributes{ attributes.reset(Attributes); })? TypeExpr(ctx):returnTypeExpr InterfaceFunctionGroupId:groupId!
+                { memFun.reset(new MemberFunctionNode(span, Specifiers(), returnTypeExpr, groupId, attributes.release())); }
                 ParameterList(ctx, memFun.get())! ';'!){ value = memFun.release(); }
             ;
 

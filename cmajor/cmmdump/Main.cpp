@@ -6,6 +6,7 @@
 #include <cmajor/ast/InitDone.hpp>
 #include <cmajor/parsing/InitDone.hpp>
 #include <cmajor/util/InitDone.hpp>
+#include <cmajor/binder/AttributeBinder.hpp>
 #include <cmajor/binder/ModuleBinder.hpp>
 #include <cmajor/symbols/InitDone.hpp>
 #include <cmajor/symbols/Exception.hpp>
@@ -103,7 +104,8 @@ int main(int argc, const char** argv)
             }
             std::unique_ptr<ModuleBinder> moduleBinder;
             CompileUnitNode compileUnit(Span(), "foo");
-            moduleBinder.reset(new ModuleBinder(module, &compileUnit));
+            AttributeBinder attributeBinder;
+            moduleBinder.reset(new ModuleBinder(module, &compileUnit, &attributeBinder));
             moduleBinder->SetBindingTypes();
             module.GetSymbolTable().AddClassTemplateSpecializationsToClassTemplateSpecializationMap(classTemplateSpecializations);
             for (ClassTemplateSpecializationSymbol* classTemplateSpecialization : classTemplateSpecializations)

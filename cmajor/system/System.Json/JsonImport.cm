@@ -336,7 +336,94 @@ namespace System.Json
     {
         field = T(value);
     }
-
+    
+    public void FromJson<T>(JsonValue* value, UniquePtr<T>& field)
+        where T is JsonConstructible
+    {
+        if (value is JsonNull*)
+        {
+            field.Reset();
+        }
+        else if (value is JsonObject*)
+        {
+            JsonObject* object = cast<JsonObject*>(value);
+            JsonValue* classValue = object->GetField("class");
+            if (classValue != null)
+            {
+                if (classValue is JsonString*)
+                {
+                    JsonString* jsonClassString = cast<JsonString*>(classValue);
+                    ustring jsonClassName = jsonClassString->Value();
+                    JsonValue* objectValue = object->GetField("object");
+                    if (objectValue != null)
+                    {
+                        void* jsonClassValue = JsonClassFactory.Instance().CreateJsonClass(jsonClassName, objectValue);
+                        field.Reset(cast<T*>(jsonClassValue));
+                    }                
+                    else
+                    {
+                        throw JsonImportException("JSON 'object' field not found");
+                    }
+                }
+                else
+                {
+                    throw JsonImportException("JSON string expected");
+                }
+            }            
+            else
+            {
+                throw JsonImportException("JSON 'class' field not found");
+            }
+        }
+        else
+        {
+            throw JsonImportException("null or JSON object expected");
+        }
+    }
+    
+    public void FromJson<T>(JsonValue* value, SharedPtr<T>& field)
+        where T is JsonConstructible
+    {
+        if (value is JsonNull*)
+        {
+            field.Reset();
+        }
+        else if (value is JsonObject*)
+        {
+            JsonObject* object = cast<JsonObject*>(value);
+            JsonValue* classValue = object->GetField("class");
+            if (classValue != null)
+            {
+                if (classValue is JsonString*)
+                {
+                    JsonString* jsonClassString = cast<JsonString*>(classValue);
+                    ustring jsonClassName = jsonClassString->Value();
+                    JsonValue* objectValue = object->GetField("object");
+                    if (objectValue != null)
+                    {
+                        void* jsonClassValue = JsonClassFactory.Instance().CreateJsonClass(jsonClassName, objectValue);
+                        field.Reset(cast<T*>(jsonClassValue));
+                    }                
+                    else
+                    {
+                        throw JsonImportException("JSON 'object' field not found");
+                    }
+                }
+                else
+                {
+                    throw JsonImportException("JSON string expected");
+                }
+            }            
+            else
+            {
+                throw JsonImportException("JSON 'class' field not found");
+            }
+        }
+        else
+        {
+            throw JsonImportException("null or JSON object expected");
+        }
+    }    
     public void FromJson(JsonValue* container, const string& fieldName, int& field)
     {   
         FromJson(container, ToUtf32(fieldName), field);
@@ -638,6 +725,50 @@ namespace System.Json
     }
         
     public void FromJson<T>(JsonValue* container, const ustring& fieldName, T& field)
+        where T is JsonConstructible
+    {
+        if (container is JsonObject*)
+        {
+            JsonObject* object = cast<JsonObject*>(container);
+            JsonValue* value = object->GetField(fieldName);
+            if (value != null)
+            {
+                FromJson(value, field);
+            }
+            else
+            {
+                throw JsonImportException("field '" + ToUtf8(fieldName) + "' not found");
+            }
+        }
+        else
+        {
+            throw JsonImportException("JSON object expected");
+        }
+    }
+    
+    public void FromJson<T>(JsonValue* container, const ustring& fieldName, UniquePtr<T>& field)
+        where T is JsonConstructible
+    {
+        if (container is JsonObject*)
+        {
+            JsonObject* object = cast<JsonObject*>(container);
+            JsonValue* value = object->GetField(fieldName);
+            if (value != null)
+            {
+                FromJson(value, field);
+            }
+            else
+            {
+                throw JsonImportException("field '" + ToUtf8(fieldName) + "' not found");
+            }
+        }
+        else
+        {
+            throw JsonImportException("JSON object expected");
+        }
+    }
+
+    public void FromJson<T>(JsonValue* container, const ustring& fieldName, SharedPtr<T>& field)
         where T is JsonConstructible
     {
         if (container is JsonObject*)

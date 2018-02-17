@@ -21,6 +21,7 @@
   <ItemGroup>
     <ClInclude Include="AstReader.hpp" />
     <ClInclude Include="AstWriter.hpp" />
+    <ClInclude Include="Attribute.hpp" />
     <ClInclude Include="BasicType.hpp" />
     <ClInclude Include="Class.hpp" />
     <ClInclude Include="Clone.hpp" />
@@ -53,6 +54,7 @@
   <ItemGroup>
     <ClCompile Include="AstReader.cpp" />
     <ClCompile Include="AstWriter.cpp" />
+    <ClCompile Include="Attribute.cpp" />
     <ClCompile Include="BasicType.cpp" />
     <ClCompile Include="Class.cpp" />
     <ClCompile Include="Clone.cpp" />

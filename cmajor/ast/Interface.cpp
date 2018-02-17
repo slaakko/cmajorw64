@@ -13,14 +13,20 @@ InterfaceNode::InterfaceNode(const Span& span_) : Node(NodeType::interfaceNode, 
 {
 }
 
-InterfaceNode::InterfaceNode(const Span& span_, Specifiers specifiers_, IdentifierNode* id_) : Node(NodeType::interfaceNode, span_), specifiers(specifiers_), id(id_), members()
+InterfaceNode::InterfaceNode(const Span& span_, Specifiers specifiers_, IdentifierNode* id_, Attributes* attributes_) : 
+    Node(NodeType::interfaceNode, span_), specifiers(specifiers_), id(id_), members(), attributes(attributes_)
 {
     id->SetParent(this);
 }
 
 Node* InterfaceNode::Clone(CloneContext& cloneContext) const
 {
-    InterfaceNode* clone = new InterfaceNode(GetSpan(), specifiers, static_cast<IdentifierNode*>(id->Clone(cloneContext)));
+    Attributes* clonedAttributes = nullptr;
+    if (attributes)
+    {
+        clonedAttributes = attributes->Clone();
+    }
+    InterfaceNode* clone = new InterfaceNode(GetSpan(), specifiers, static_cast<IdentifierNode*>(id->Clone(cloneContext)), clonedAttributes);
     int n = members.Count();
     for (int i = 0; i < n; ++i)
     {
@@ -37,6 +43,12 @@ void InterfaceNode::Accept(Visitor& visitor)
 void InterfaceNode::Write(AstWriter& writer)
 {
     Node::Write(writer);
+    bool hasAttributes = attributes != nullptr;
+    writer.GetBinaryWriter().Write(hasAttributes);
+    if (hasAttributes)
+    {
+        attributes->Write(writer);
+    }
     writer.Write(id.get());
     members.Write(writer);
 }
@@ -44,6 +56,12 @@ void InterfaceNode::Write(AstWriter& writer)
 void InterfaceNode::Read(AstReader& reader)
 {
     Node::Read(reader);
+    bool hasAttributes = reader.GetBinaryReader().ReadBool();
+    if (hasAttributes)
+    {
+        attributes.reset(new Attributes());
+        attributes->Read(reader);
+    }
     id.reset(reader.ReadIdentifierNode());
     id->SetParent(this);
     members.Read(reader);

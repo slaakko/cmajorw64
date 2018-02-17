@@ -5,6 +5,7 @@
 
 #ifndef CMAJOR_AST_FUNCTION_INCLUDED
 #define CMAJOR_AST_FUNCTION_INCLUDED
+#include <cmajor/ast/Attribute.hpp>
 #include <cmajor/ast/Specifier.hpp>
 #include <cmajor/ast/Template.hpp>
 #include <cmajor/ast/Concept.hpp>
@@ -18,8 +19,8 @@ class FunctionNode : public Node
 public:
     FunctionNode(const Span& span_);
     FunctionNode(NodeType nodeType_, const Span& span_);
-    FunctionNode(const Span& span_, Specifiers specifiers_, Node* returnTypeExpr_, const std::u32string& groupId_);
-    FunctionNode(NodeType nodeType_, const Span& span_, Specifiers specifiers_, Node* returnTypeExpr_, const std::u32string& groupId_);
+    FunctionNode(const Span& span_, Specifiers specifiers_, Node* returnTypeExpr_, const std::u32string& groupId_, Attributes* attributes_);
+    FunctionNode(NodeType nodeType_, const Span& span_, Specifiers specifiers_, Node* returnTypeExpr_, const std::u32string& groupId_, Attributes* attributes_);
     Node* Clone(CloneContext& cloneContext) const override;
     bool IsFunctionNode() const override { return true; }
     void CloneContent(FunctionNode* clone, CloneContext& cloneContext) const;
@@ -47,6 +48,7 @@ public:
     void SetBodySource(CompoundStatementNode* bodySource_);
     bool IsProgramMain() const { return programMain; }
     void SetProgramMain() { programMain = true; }
+    Attributes* GetAttributes() const { return attributes.get(); }
 private:
     Specifiers specifiers;
     std::unique_ptr<Node> returnTypeExpr;
@@ -56,6 +58,7 @@ private:
     std::unique_ptr<WhereConstraintNode> whereConstraint;
     std::unique_ptr<CompoundStatementNode> body;
     std::unique_ptr<CompoundStatementNode> bodySource;
+    std::unique_ptr<Attributes> attributes;
     bool programMain;
 };
 

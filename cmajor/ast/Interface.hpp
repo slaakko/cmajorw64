@@ -13,7 +13,7 @@ class InterfaceNode : public Node
 {
 public:
     InterfaceNode(const Span& span_);
-    InterfaceNode(const Span& span_, Specifiers specifiers_, IdentifierNode* id_);
+    InterfaceNode(const Span& span_, Specifiers specifiers_, IdentifierNode* id_, Attributes* attributes_);
     Node* Clone(CloneContext& cloneContext) const override;
     void Accept(Visitor& visitor) override;
     void Write(AstWriter& writer) override;
@@ -22,10 +22,12 @@ public:
     IdentifierNode* Id() const { return id.get(); }
     const NodeList<Node>& Members() const { return members; }
     void AddMember(Node* member);
+    Attributes* GetAttributes() const { return attributes.get(); }
 private:
     Specifiers specifiers;
     std::unique_ptr<IdentifierNode> id;
     NodeList<Node> members;
+    std::unique_ptr<Attributes> attributes;
 };
 
 } } // namespace cmajor::ast

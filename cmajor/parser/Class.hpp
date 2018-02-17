@@ -1,5 +1,5 @@
-#ifndef Class_hpp_391
-#define Class_hpp_391
+#ifndef Class_hpp_27684
+#define Class_hpp_27684
 
 #include <cmajor/parsing/Grammar.hpp>
 #include <cmajor/parsing/Keyword.hpp>
@@ -35,4 +35,4 @@ private:
 
 } } // namespace cmajor.parser
 
-#endif // Class_hpp_391
+#endif // Class_hpp_27684

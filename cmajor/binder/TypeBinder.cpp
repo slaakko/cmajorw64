@@ -8,6 +8,7 @@
 #include <cmajor/binder/TypeResolver.hpp>
 #include <cmajor/binder/Concept.hpp>
 #include <cmajor/binder/Evaluator.hpp>
+#include <cmajor/binder/AttributeBinder.hpp>
 #include <cmajor/ast/CompileUnit.hpp>
 #include <cmajor/ast/Identifier.hpp>
 #include <cmajor/symbols/FunctionSymbol.hpp>
@@ -191,6 +192,7 @@ void TypeBinder::Visit(FunctionNode& functionNode)
             throw Exception("function has no body", functionSymbol->GetSpan());
         }
     }
+    boundCompileUnit.GetAttributeBinder()->BindAttributes(functionNode.GetAttributes(), symbol, boundCompileUnit, containerScope);
     containerScope = prevContainerScope;
     currentFunctionSymbol = prevFunctionSymbol;
 }
@@ -302,6 +304,7 @@ void TypeBinder::BindClass(ClassTypeSymbol* classTypeSymbol, ClassNode* classNod
     {
         classTypeSymbol->GetContainerScope()->SetBase(classTypeSymbol->BaseClass()->GetContainerScope());
     }
+    boundCompileUnit.GetAttributeBinder()->BindAttributes(classNode->GetAttributes(), classTypeSymbol, boundCompileUnit, containerScope);
     classTypeSymbol->InitVmt();
     classTypeSymbol->InitImts();
     classTypeSymbol->CreateLayouts();
@@ -352,6 +355,7 @@ void TypeBinder::Visit(StaticConstructorNode& staticConstructorNode)
             throw Exception("static constructor has no body", staticConstructorSymbol->GetSpan());
         }
     }
+    boundCompileUnit.GetAttributeBinder()->BindAttributes(staticConstructorNode.GetAttributes(), symbol, boundCompileUnit, containerScope);
     containerScope = prevContainerScope;
     currentFunctionSymbol = prevFunctionSymbol;
 }
@@ -436,6 +440,7 @@ void TypeBinder::Visit(ConstructorNode& constructorNode)
             throw Exception("constructor has no body", constructorSymbol->GetSpan());
         }
     }
+    boundCompileUnit.GetAttributeBinder()->BindAttributes(constructorNode.GetAttributes(), symbol, boundCompileUnit, containerScope);
     containerScope = prevContainerScope;
     currentFunctionSymbol = prevFunctionSymbol;
 }
@@ -481,6 +486,7 @@ void TypeBinder::Visit(DestructorNode& destructorNode)
             throw Exception("destructor has no body", destructorSymbol->GetSpan());
         }
     }
+    boundCompileUnit.GetAttributeBinder()->BindAttributes(destructorNode.GetAttributes(), symbol, boundCompileUnit, containerScope);
     containerScope = prevContainerScope;
     currentFunctionSymbol = prevFunctionSymbol;
 }
@@ -568,6 +574,7 @@ void TypeBinder::Visit(MemberFunctionNode& memberFunctionNode)
             throw Exception("member function has no body", memberFunctionSymbol->GetSpan());
         }
     }
+    boundCompileUnit.GetAttributeBinder()->BindAttributes(memberFunctionNode.GetAttributes(), symbol, boundCompileUnit, containerScope);
     containerScope = prevContainerScope;
     currentFunctionSymbol = prevFunctionSymbol;
 }
@@ -627,6 +634,7 @@ void TypeBinder::Visit(ConversionFunctionNode& conversionFunctionNode)
             throw Exception("conversion function has no body", conversionFunctionSymbol->GetSpan());
         }
     }
+    boundCompileUnit.GetAttributeBinder()->BindAttributes(conversionFunctionNode.GetAttributes(), symbol, boundCompileUnit, containerScope);
     containerScope = prevContainerScope;
     currentFunctionSymbol = prevFunctionSymbol;
 }
@@ -653,6 +661,7 @@ void TypeBinder::Visit(MemberVariableNode& memberVariableNode)
         ClassNode* classNode = static_cast<ClassNode*>(node);
         BindClass(memberVariableClassType, classNode, false);
     }
+    boundCompileUnit.GetAttributeBinder()->BindAttributes(memberVariableNode.GetAttributes(), symbol, boundCompileUnit, containerScope);
 }
 
 void TypeBinder::Visit(InterfaceNode& interfaceNode)
@@ -680,6 +689,7 @@ void TypeBinder::BindInterface(InterfaceTypeSymbol* interfaceTypeSymbol, Interfa
         Node* member = interfaceNode->Members()[i];
         member->Accept(*this);
     }
+    boundCompileUnit.GetAttributeBinder()->BindAttributes(interfaceNode->GetAttributes(), interfaceTypeSymbol, boundCompileUnit, containerScope);
     containerScope = prevContainerScope;
 }
 

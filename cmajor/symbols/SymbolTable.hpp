@@ -203,6 +203,8 @@ public:
     const std::unordered_set<ClassTypeSymbol*>& PolymorphicClasses() const { return polymorphicClasses; }
     void AddClassHavingStaticConstructor(ClassTypeSymbol* classHavingStaticConstructor);
     const std::unordered_set<ClassTypeSymbol*>& ClassesHavingStaticConstructor() const { return classesHavingStaticConstructor; }
+    void AddJsonClass(const std::u32string& jsonClass);
+    const std::unordered_set<std::u32string>& JsonClasses() const { return jsonClasses; }
     std::vector<TypeSymbol*> Types() const;
     void Copy(const SymbolTable& that);
 private:
@@ -233,6 +235,7 @@ private:
     ConversionTable conversionTable;
     std::unordered_set<ClassTypeSymbol*> polymorphicClasses;
     std::unordered_set<ClassTypeSymbol*> classesHavingStaticConstructor;
+    std::unordered_set<std::u32string> jsonClasses;
     int GetNextDeclarationBlockIndex() { return declarationBlockIndex++; }
     void ResetDeclarationBlockIndex() { declarationBlockIndex = 0; }
     void EmplaceTypeOrConceptRequest(Symbol* forSymbol, uint32_t typeId, int index);

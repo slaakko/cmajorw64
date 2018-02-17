@@ -15,7 +15,7 @@ using namespace cmajor::symbols;
 class ModuleBinder 
 {
 public:
-    ModuleBinder(Module& module_, CompileUnitNode* compileUnitNode_);
+    ModuleBinder(Module& module_, CompileUnitNode* compileUnitNode_, AttributeBinder* attributeBinder_);
     void BindClassTemplateSpecialization(ClassTemplateSpecializationSymbol* classTemplateSpecialization);
     void SetBindingTypes();
 private:

@@ -8,8 +8,8 @@
 
 namespace cmajor { namespace binder {
 
-ModuleBinder::ModuleBinder(Module& module_, CompileUnitNode* compileUnitNode_) : 
-    boundCompileUnit(module_, compileUnitNode_), containerScope(module_.GetSymbolTable().GlobalNs().GetContainerScope()), span(compileUnitNode_->GetSpan())
+ModuleBinder::ModuleBinder(Module& module_, CompileUnitNode* compileUnitNode_, AttributeBinder* attributeBinder_) : 
+    boundCompileUnit(module_, compileUnitNode_, attributeBinder_), containerScope(module_.GetSymbolTable().GlobalNs().GetContainerScope()), span(compileUnitNode_->GetSpan())
 {
 }
 

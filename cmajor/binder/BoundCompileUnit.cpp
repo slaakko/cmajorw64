@@ -183,8 +183,8 @@ void PtrToULongConversion::GenerateCall(Emitter& emitter, std::vector<GenObject*
     emitter.Stack().Push(emitter.Builder().CreatePtrToInt(value, ulongType->IrType(emitter)));
 }
 
-BoundCompileUnit::BoundCompileUnit(Module& module_, CompileUnitNode* compileUnitNode_) : 
-    BoundNode(Span(), BoundNodeType::boundCompileUnit), module(module_), symbolTable(module.GetSymbolTable()), compileUnitNode(compileUnitNode_), hasGotos(false), 
+BoundCompileUnit::BoundCompileUnit(Module& module_, CompileUnitNode* compileUnitNode_, AttributeBinder* attributeBinder_) :
+    BoundNode(Span(), BoundNodeType::boundCompileUnit), module(module_), symbolTable(module.GetSymbolTable()), compileUnitNode(compileUnitNode_), attributeBinder(attributeBinder_), hasGotos(false),
     operationRepository(*this), functionTemplateRepository(*this), classTemplateRepository(*this), inlineFunctionRepository(*this), constExprFunctionRepository(*this), bindingTypes(false)
 {
     boost::filesystem::path fileName = boost::filesystem::path(compileUnitNode->FilePath()).filename();

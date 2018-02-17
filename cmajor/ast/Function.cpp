@@ -16,8 +16,8 @@ FunctionNode::FunctionNode(NodeType nodeType_, const Span& span_) : Node(nodeTyp
 {
 }
 
-FunctionNode::FunctionNode(const Span& span_, Specifiers specifiers_, Node* returnTypeExpr_, const std::u32string& groupId_) :
-    Node(NodeType::functionNode, span_), specifiers(specifiers_), returnTypeExpr(returnTypeExpr_), groupId(groupId_), templateParameters(), parameters(), body(), bodySource(), programMain(false)
+FunctionNode::FunctionNode(const Span& span_, Specifiers specifiers_, Node* returnTypeExpr_, const std::u32string& groupId_, Attributes* attributes_) :
+    Node(NodeType::functionNode, span_), specifiers(specifiers_), returnTypeExpr(returnTypeExpr_), groupId(groupId_), templateParameters(), parameters(), body(), bodySource(), attributes(attributes_), programMain(false)
 {
     if (returnTypeExpr)
     {
@@ -25,8 +25,8 @@ FunctionNode::FunctionNode(const Span& span_, Specifiers specifiers_, Node* retu
     }
 }
 
-FunctionNode::FunctionNode(NodeType nodeType_, const Span& span_, Specifiers specifiers_, Node* returnTypeExpr_, const std::u32string& groupId_) : 
-    Node(nodeType_, span_), specifiers(specifiers_), returnTypeExpr(returnTypeExpr_), groupId(groupId_), templateParameters(), parameters(), body(), bodySource(), programMain(false)
+FunctionNode::FunctionNode(NodeType nodeType_, const Span& span_, Specifiers specifiers_, Node* returnTypeExpr_, const std::u32string& groupId_, Attributes* attributes_) :
+    Node(nodeType_, span_), specifiers(specifiers_), returnTypeExpr(returnTypeExpr_), groupId(groupId_), templateParameters(), parameters(), body(), bodySource(), attributes(attributes_), programMain(false)
 {
     if (returnTypeExpr)
     {
@@ -36,12 +36,17 @@ FunctionNode::FunctionNode(NodeType nodeType_, const Span& span_, Specifiers spe
 
 Node* FunctionNode::Clone(CloneContext& cloneContext) const
 {
+    Attributes* clonedAttributes = nullptr;
+    if (attributes)
+    {
+        clonedAttributes = attributes->Clone();
+    }
     Node* clonedReturnTypeExpr = nullptr;
     if (returnTypeExpr)
     {
         clonedReturnTypeExpr = returnTypeExpr->Clone(cloneContext);
     }
-    FunctionNode* clone = new FunctionNode(GetSpan(), specifiers, clonedReturnTypeExpr, groupId);
+    FunctionNode* clone = new FunctionNode(GetSpan(), specifiers, clonedReturnTypeExpr, groupId, clonedAttributes);
     if (!cloneContext.InstantiateFunctionNode())
     {
         int nt = templateParameters.Count();
@@ -76,6 +81,10 @@ Node* FunctionNode::Clone(CloneContext& cloneContext) const
 
 void FunctionNode::CloneContent(FunctionNode* clone, CloneContext& cloneContext) const
 {
+    if (attributes)
+    {
+        clone->attributes.reset(attributes->Clone());
+    }
     clone->specifiers = specifiers;
     Node* clonedReturnTypeExpr = nullptr;
     if (returnTypeExpr)
@@ -119,6 +128,12 @@ void FunctionNode::Accept(Visitor& visitor)
 void FunctionNode::Write(AstWriter& writer)
 {
     Node::Write(writer);
+    bool hasAttributes = attributes != nullptr;
+    writer.GetBinaryWriter().Write(hasAttributes);
+    if (hasAttributes)
+    {
+        attributes->Write(writer);
+    }
     writer.Write(specifiers);
     bool hasReturnTypeExpr = returnTypeExpr != nullptr;
     writer.GetBinaryWriter().Write(hasReturnTypeExpr);
@@ -152,6 +167,12 @@ void FunctionNode::Write(AstWriter& writer)
 void FunctionNode::Read(AstReader& reader)
 {
     Node::Read(reader);
+    bool hasAttributes = reader.GetBinaryReader().ReadBool();
+    if (hasAttributes)
+    {
+        attributes.reset(new Attributes());
+        attributes->Read(reader);
+    }
     specifiers = reader.ReadSpecifiers();
     bool hasReturnTypeExpr = reader.GetBinaryReader().ReadBool();
     if (hasReturnTypeExpr)
