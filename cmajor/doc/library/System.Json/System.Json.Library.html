@@ -11,8 +11,8 @@
     <h1>System.Json Library</h1>
 
     <p>
-        <a href="System.Json.html">System.Json</a> library has basic support for exporting and importing <a href="http://www.json.org/">JSON</a>.
-        The library supports exporting JSON by converting application objects to JSON library objects and then serialization them to JSON text.
+        The <a href="System.Json.html">System.Json</a> library provides basic support for exporting and importing <a href="http://www.json.org/">JSON</a>.
+        The library and the compiler supports exporting JSON by converting application objects to JSON library objects and then serialization them to JSON text.
         Importing JSON consists of parsing JSON text to back to JSON library objects and then constructing application objects from them.
     </p>
 
@@ -21,7 +21,8 @@
     </h2>
 
     <p>
-        A class that has a <b>json</b> <a href="../../langref/langref.html#attributes">attribute</a> with a value "true" or with no attribute value, can be exported to a JSON library objects that can further be converted to
+        A class that has a <b>json</b> <a href="../../langref/langref.html#attributes">attribute</a> with a value "true" or with no attribute value, can be converted
+        to a <a href="System.Json.html#class_JsonObject_1ACA524ABF05C4E15B709275F66F3BF5C165B69D">JsonObject</a> that can further be converted to
         a UTF-8 encoded JSON text by calling the <a href="System.Json.html#member_function_ToString_JsonValue_0E8D02CC91EA26B2A9A8AF1C11DF12FD5FE86F31">ToString()</a> member function of the
         <a href="System.Json.html#class_JsonValue_B86942C2856CC5758E1FB19BBBE97E4002D4008A">JsonValue</a> class.
         Here's an example of such a <a href="../../code/json/exportable/jsonExportable.cm.html">JSON exportable class</a>.
