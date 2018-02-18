@@ -16,6 +16,7 @@ using namespace cmajor::ir;
 struct TypeDerivationRec;
 enum class ValueType : uint8_t;
 class Value;
+class TemplateParameterSymbol;
 
 class TypeSymbol : public ContainerSymbol
 {
@@ -65,6 +66,7 @@ public:
     virtual const TypeDerivationRec& DerivationRec() const;
     virtual TypeSymbol* RemoveDerivations(const TypeDerivationRec& sourceDerivationRec, const Span& span);
     virtual TypeSymbol* Unify(TypeSymbol* that, const Span& span) { return nullptr; }
+    virtual TypeSymbol* UnifyTemplateArgumentType(SymbolTable& symbolTable, const std::unordered_map<TemplateParameterSymbol*, TypeSymbol*>& templateParameterMap, const Span& span) { return nullptr; }
     virtual bool IsRecursive(TypeSymbol* type, std::unordered_set<TypeSymbol*>& tested);
     virtual ValueType GetValueType() const;
     virtual Value* MakeValue() const { return nullptr; }

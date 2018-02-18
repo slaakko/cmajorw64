@@ -24,6 +24,7 @@ public:
     void SetHasDefault() { hasDefault = true; }
     void SetDefaultStr(const std::string& defaultStr_);
     const std::string& DefaultStr() const { return defaultStr; }
+    TypeSymbol* TemplateParameterSymbol::UnifyTemplateArgumentType(SymbolTable& symbolTable, const std::unordered_map<TemplateParameterSymbol*, TypeSymbol*>& templateParameterMap, const Span& span) override;
 private:
     bool hasDefault;
     std::string defaultStr;

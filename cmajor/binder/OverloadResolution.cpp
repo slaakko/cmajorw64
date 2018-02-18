@@ -356,7 +356,15 @@ bool FindClassTemplateSpecializationMatch(TypeSymbol* sourceType, TypeSymbol* ta
         {
             TypeSymbol* sourceArgumentType = sourceClassTemplateSpecialization->TemplateArgumentTypes()[i];
             TypeSymbol* targetArgumentType = targetClassTemplateSpecialization->TemplateArgumentTypes()[i];
-            if (!FindTemplateParameterMatch(sourceArgumentType, targetArgumentType, conversionType, argument, boundCompileUnit, functionMatch, containerScope, currentFunction, span))
+            if (FindTemplateParameterMatch(sourceArgumentType, targetArgumentType, conversionType, argument, boundCompileUnit, functionMatch, containerScope, currentFunction, span))
+            {
+                continue;
+            }
+            else if (FindClassTemplateSpecializationMatch(sourceArgumentType, targetArgumentType, conversionType, argument, boundCompileUnit, functionMatch, containerScope, currentFunction, span))
+            {
+                continue;
+            }
+            else
             {
                 return false;
             }
@@ -366,11 +374,9 @@ bool FindClassTemplateSpecializationMatch(TypeSymbol* sourceType, TypeSymbol* ta
     std::vector<TypeSymbol*> targetTemplateArguments;
     for (int i = 0; i < n; ++i)
     {
-        TemplateParameterSymbol* templateParameter = static_cast<TemplateParameterSymbol*>(targetClassTemplateSpecialization->TemplateArgumentTypes()[i]->BaseType());
-        auto it = functionMatch.templateParameterMap.find(templateParameter);
-        if (it != functionMatch.templateParameterMap.cend())
+        TypeSymbol* templateArgumentType = targetClassTemplateSpecialization->TemplateArgumentTypes()[i]->BaseType()->UnifyTemplateArgumentType(boundCompileUnit.GetSymbolTable(), functionMatch.templateParameterMap, span);
+        if (templateArgumentType)
         {
-            TypeSymbol* templateArgumentType = it->second;
             targetTemplateArguments.push_back(templateArgumentType);
         }
         else

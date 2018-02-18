@@ -21,7 +21,7 @@
     </h2>
 
     <p>
-        A class that has a <b>json</b> <a href="../../langref/langref.html#attributes">attribute</a> with a value "true" or with no value, can be exported to a JSON library objects that can further be converted to
+        A class that has a <b>json</b> <a href="../../langref/langref.html#attributes">attribute</a> with a value "true" or with no attribute value, can be exported to a JSON library objects that can further be converted to
         a UTF-8 encoded JSON text by calling the <a href="System.Json.html#member_function_ToString_JsonValue_0E8D02CC91EA26B2A9A8AF1C11DF12FD5FE86F31">ToString()</a> member function of the
         <a href="System.Json.html#class_JsonValue_B86942C2856CC5758E1FB19BBBE97E4002D4008A">JsonValue</a> class.
         Here's an example of such a <a href="../../code/json/exportable/jsonExportable.cm.html">JSON exportable class</a>.
@@ -29,10 +29,10 @@
     </p>
 
     <p>
-        For each class having the <b>json</b> attribute equal to "true", 
+        For each class having the <b>json</b> attribute equal to "true" or with no attribute value, 
         the compiler generates a virtual member function named <b>ToJson</b> that returns a unique pointer to a <a href="System.Json.html#class_JsonValue_B86942C2856CC5758E1FB19BBBE97E4002D4008A">JsonValue</a>.
-        The <em>JsonValue</em> pointer points in fact to an instance of a <a href="System.Json.html#class_JsonObject_1ACA524ABF05C4E15B709275F66F3BF5C165B69D">JsonObject</a> 
-        Each member variable that either has no <b>json</b> attribute, or has a <b>json</b> attribute with value "true", will be serialized by adding it to the generated <em>JsonObject</em>
+        The <em>JsonValue</em> pointer points in fact to an instance of a <a href="System.Json.html#class_JsonObject_1ACA524ABF05C4E15B709275F66F3BF5C165B69D">JsonObject</a>. 
+        Each member variable that either has no <b>json</b> attribute, or has a <b>json</b> attribute with value "true" or with no attribute value, will be serialized by adding it to the generated <em>JsonObject</em>
         by calling the <a href="System.Json.html#function_group_AddField_9C28B5737E68F5B7F6EFF0734E146A93E593F379">AddField</a> member function.
         The field name of the member variable in the serialized JSON object will have value equal to a <b>jsonFieldName</b> attribute of the member variable, if given,
         or equal to the name of the member variable, if the member variable has no <b>jsonFieldName</b> attribute.
@@ -68,8 +68,8 @@
                 by calling its virtual <b>ToJson</b> member function.
             </li>
             <li>
-                A <a href="../System.Base/System.Base.html#class_UniquePtr_T_793F841C13E9DD3A6869243C74F1D948C0E04009">unique pointer</a> or a
-                <a href="../System.Base/System.Base.html#class_SharedPtr_T_E2198BEF58335A9A782FD48D7E8DFFD1A2D8865F">shared pointer</a> that is null 
+                A null (empty) <a href="../System.Base/System.Base.html#class_UniquePtr_T_793F841C13E9DD3A6869243C74F1D948C0E04009">unique pointer</a> or a
+                <a href="../System.Base/System.Base.html#class_SharedPtr_T_E2198BEF58335A9A782FD48D7E8DFFD1A2D8865F">shared pointer</a> 
                 will be converted to a <a href="System.Json.html#class_JsonNull_E0746AE6880508740D5FFC8AF4E0FB0A7AE20ED2">JSON null</a>.
             </li>
             <li>
@@ -84,9 +84,9 @@
 
     <p>
         If a <a href="../System.Json/System.Json.html#concept_JsonExportable_380A04F1C16289D6FC8DB54C68F467C83E565340">JSON exportable</a> class derives from a class that has no
-        explicit <b>json</b> attribute value, that base class will not be serialized, and the compiler will give of warning.
+        <b>json</b> attribute, that base class will not be serialized, and the compiler will give of warning.
         If a base class has a <b>json</b> attribute that is equal to "false", the base class will not be serialized, and no warning is given.
-        If a base class has a <b>json</b> attribute that is equal to "true" the compiler serializes the base class inside of the top level JSON object.
+        If a base class has a <b>json</b> attribute that is equal to "true" or with no attribute value, the compiler serializes the base class inside of the top level JSON object.
         In this case the JSON field names must be unique among the top level class and its base class and ancestor classes.
         The JSON field name of a member variable can be changed by giving it a <b>jsonFieldName</b> attribute with a non-empty value.
     </p>
@@ -94,12 +94,14 @@
     <h2>Importing JSON</h2>
 
     <p>
-        A class that has a <b>json</b> <a href="../../langref/langref.html#attributes">attribute</a> with a value "true" or with no value, can import JSON.
+        A class that has a <b>json</b> <a href="../../langref/langref.html#attributes">attribute</a> with a value "true" or with no attribute value, can import JSON.
         For each such a class the compiler generates two member functions:
         <ul>
-            <li>an explicit <b>constructor</b> taking a pointer to a <a href="System.Json.html#class_JsonValue_B86942C2856CC5758E1FB19BBBE97E4002D4008A">JsonValue</a> class, and</li>
+            <li>a <b>constructor</b> taking a pointer to a <a href="System.Json.html#class_JsonValue_B86942C2856CC5758E1FB19BBBE97E4002D4008A">JsonValue</a> class, and</li>
             <li>a static <b>Create</b> member function that calls the constructor.</li>
         </ul>
+        The constructor contains calls to <a href="System.Json.html#function_group_FromJson_22997B691ACDD99EB254F19DD18F75F989FE89EF">FromJson</a> function for each member variable that 
+        either has no <b>json</b> attribute, or has a <b>json</b> attribute with value equal to "true" or with no attribute value.
     </p>
 
     <p>
@@ -166,11 +168,61 @@
     </p>
 
     <h2>
+        Vehicles
+    </h2>
+
+    <p>
+        <a href="../../code/json/vehicles/vehicles.cm.html">Vehicles</a> is an example of polymorphic classes that are serialized to and parsed from JSON.
+    </p>
+
+    <p>
+        The program generates the following output:
+        <blockquote>
+            <pre>
+Vehicles.Car:
+speed: 200
+model: Porsche
+registrationNumber: ABC-123
+{"class":"Vehicles.Car", "object":{"model":"Porsche", "registrationNumber":"ABC-123", "speed":200}}
+Vehicles.Car:
+speed: 200
+model: Porsche
+registrationNumber: ABC-123
+Vehicles.Truck:
+speed: 100
+model: Volvo
+registrationNumber: XYZ-987
+weight: 1000
+Vehicles.Car:
+speed: 150
+model: Peugeot
+registrationNumber: PRQ-567
+Vehicles.Bicycle:
+speed: 30
+brand: Pegoretti
+[{"class":"Vehicles.Truck", "object":{"model":"Volvo", "registrationNumber":"XYZ-987", "speed":100, "weight":1000}}, {"class":"Vehicles.Car", "object":{"model":"Peugeot", "registrationNumber":"PRQ-567", "speed":150}}, {"class":"Vehicles.Bicycle", "object":{"brand":"Pegoretti", "speed":30}}]
+Vehicles.Truck:
+speed: 100
+model: Volvo
+registrationNumber: XYZ-987
+weight: 1000
+Vehicles.Car:
+speed: 150
+model: Peugeot
+registrationNumber: PRQ-567
+Vehicles.Bicycle:
+speed: 30
+brand: Pegoretti
+            </pre>
+        </blockquote>
+    </p>
+
+    <h2>
         Example
     </h2>
 
     <p>
-        Here's an <a href="../../code/json/all/json.cm.html">example</a> of classes that support exporting and importing JSON.
+        Here's another <a href="../../code/json/all/json.cm.html">example</a> of classes that support exporting and importing JSON.
     </p>
 
     <p>

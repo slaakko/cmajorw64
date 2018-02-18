@@ -51,6 +51,7 @@ public:
     bool IsConstraintChecked() { return GetFlag(ClassTemplateSpecializationFlags::constraintChecked); }
     void SetFlag(ClassTemplateSpecializationFlags flag) { flags = flags | flag; }
     bool GetFlag(ClassTemplateSpecializationFlags flag) const { return (flags & flag) != ClassTemplateSpecializationFlags::none;  }
+    TypeSymbol* UnifyTemplateArgumentType(SymbolTable& symbolTable, const std::unordered_map<TemplateParameterSymbol*, TypeSymbol*>& templateParameterMap, const Span& span) override;
     std::u32string Id() const override;
 private:
     ClassTypeSymbol* classTemplate;

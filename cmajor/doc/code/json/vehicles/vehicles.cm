@@ -1,0 +1,124 @@
+using System;
+using System.Collections;
+using System.Json;
+using Vehicles;
+
+namespace Vehicles
+{
+    [json]
+    public abstract class Vehicle
+    {
+        public nothrow Vehicle(double speed_) : speed(speed_)
+        {
+        }
+        public default virtual ~Vehicle();
+        public virtual void Dump()
+        {
+            Console.Out() << typename(*this) << ":" << endl();
+            Console.Out() << "speed: " << speed << endl();
+        }
+        private double speed;
+    }
+    
+    [json]
+    public class Bicycle : Vehicle
+    {
+        public nothrow Bicycle(const string& brand_, double speed_) : base(speed_), brand(brand_)
+        {
+        }
+        public override void Dump()
+        {
+            base->Dump();
+            Console.Out() << "brand: " << brand << endl();
+        }
+        private string brand;
+    }
+    
+    [json]
+    public class Car : Vehicle
+    {
+        public nothrow Car(const string& model_, const string& registrationNumber_, double speed_) : base(speed_), model(model_), registrationNumber(registrationNumber_)
+        {
+        }
+        public override void Dump()
+        {
+            base->Dump();
+            Console.Out() << "model: " << model << endl();
+            Console.Out() << "registrationNumber: " << registrationNumber << endl();
+        }
+        private string model;
+        private string registrationNumber;
+    }
+    
+    [json]
+    public class Truck : Car
+    {
+        public nothrow Truck(const string& model_, const string& registrationNumber_, double speed_, int weight_) : base(model_, registrationNumber_, speed_), weight(weight_)
+        {
+        }
+        public override void Dump()
+        {
+            base->Dump();
+            Console.Out() << "weight: " << weight << endl();
+        }
+        private int weight;
+    }
+    
+    public string VehicleToJson(const UniquePtr<Vehicle>& vehicle)
+    {
+        UniquePtr<JsonValue> jsonValue = ToJson(vehicle);
+        return jsonValue->ToString();
+    }
+    
+    public UniquePtr<Vehicle> JsonToVehicle(const string& str)
+    {
+        UniquePtr<JsonValue> jsonValue = ParseJson(str);
+        UniquePtr<Vehicle> vehicle;
+        FromJson(jsonValue.Get(), vehicle);
+        return vehicle;
+    }
+    
+    public void Dump(const List<UniquePtr<Vehicle>>& vehicles)
+    {
+        for (const UniquePtr<Vehicle>& vehicle : vehicles)
+        {
+            vehicle->Dump();
+        }
+    }
+    
+    public string VehiclesToJson(const List<UniquePtr<Vehicle>>& vehicles)
+    {
+        UniquePtr<JsonValue> jsonValue = ToJson(vehicles);
+        return jsonValue->ToString();
+    }
+    
+    public List<UniquePtr<Vehicle>> JsonToVehicles(const string& str)
+    {
+        UniquePtr<JsonValue> jsonValue = ParseJson(str);
+        List<UniquePtr<Vehicle>> vehicles;
+        FromJson(jsonValue.Get(), vehicles);
+        return vehicles;
+    }
+}
+
+public void main()
+{
+    UniquePtr<Vehicle> vehicle(new Car("Porsche", "ABC-123", 200));
+    vehicle->Dump();
+    string str = VehicleToJson(vehicle);
+    Console.WriteLine(str);
+    
+    UniquePtr<Vehicle> parsedVehicle = JsonToVehicle(str);
+    parsedVehicle->Dump();
+    
+    List<UniquePtr<Vehicle>> vehicles;
+    vehicles.Add(UniquePtr<Vehicle>(new Truck("Volvo", "XYZ-987", 100, 1000)));
+    vehicles.Add(UniquePtr<Vehicle>(new Car("Peugeot", "PRQ-567", 150)));
+    vehicles.Add(UniquePtr<Vehicle>(new Bicycle("Pegoretti", 30)));
+    Dump(vehicles);
+    string vstr = VehiclesToJson(vehicles);
+    Console.WriteLine(vstr);
+    
+    List<UniquePtr<Vehicle>> parsedVehicles = JsonToVehicles(vstr);
+    Dump(parsedVehicles);
+}

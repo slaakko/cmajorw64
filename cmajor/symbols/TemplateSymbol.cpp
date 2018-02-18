@@ -48,6 +48,19 @@ void TemplateParameterSymbol::SetDefaultStr(const std::string& defaultStr_)
     defaultStr = defaultStr_;
 }
 
+TypeSymbol* TemplateParameterSymbol::UnifyTemplateArgumentType(SymbolTable& symbolTable, const std::unordered_map<TemplateParameterSymbol*, TypeSymbol*>& templateParameterMap, const Span& span) 
+{
+    auto it = templateParameterMap.find(this);
+    if (it != templateParameterMap.cend())
+    {
+        return it->second;
+    }
+    else
+    {
+        return nullptr;
+    }
+}
+
 BoundTemplateParameterSymbol::BoundTemplateParameterSymbol(const Span& span_, const std::u32string& name_) : Symbol(SymbolType::boundTemplateParameterSymbol, span_, name_), type(nullptr)
 {
 }

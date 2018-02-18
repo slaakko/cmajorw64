@@ -150,6 +150,24 @@ FileScope* ClassTemplateSpecializationSymbol::ReleaseFileScope()
     return fileScope.release();
 }
 
+TypeSymbol* ClassTemplateSpecializationSymbol::UnifyTemplateArgumentType(SymbolTable& symbolTable, const std::unordered_map<TemplateParameterSymbol*, TypeSymbol*>& templateParameterMap, const Span& span)
+{
+    std::vector<TypeSymbol*> targetTemplateArgumentTypes;
+    for (int i = 0; i < templateArgumentTypes.size(); ++i)
+    {
+        TypeSymbol* templateArgumentType = templateArgumentTypes[i]->UnifyTemplateArgumentType(symbolTable, templateParameterMap, span);
+        if (templateArgumentType)
+        {
+            targetTemplateArgumentTypes.push_back(templateArgumentType);
+        }
+        else
+        {
+            return nullptr;
+        }
+    }
+    return symbolTable.MakeClassTemplateSpecialization(classTemplate, targetTemplateArgumentTypes, span);
+}
+
 std::u32string ClassTemplateSpecializationSymbol::Id() const
 {
     if (IsPrototype())

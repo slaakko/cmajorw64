@@ -52,7 +52,7 @@ namespace System.Json
             return UniquePtr<JsonValue>(object.Release());
         }
     }
-
+    
     public nothrow UniquePtr<JsonValue> ToJson(double value)
     {
         return UniquePtr<JsonValue>(new JsonNumber(value));

@@ -14,7 +14,7 @@ namespace System.Json
         public nothrow JsonImportException(const string& message_) : base(message_)
         {
         }
-    }    
+    }
     
     public concept JsonConstructible<T>
     {
@@ -144,7 +144,49 @@ namespace System.Json
             throw JsonImportException("JSON array expected");
         }
     }
-        
+
+    public void FromJson<T>(JsonValue* value, List<UniquePtr<T>>& field) 
+        where T is JsonConstructible
+    {
+        if (value is JsonArray*)
+        {
+            JsonArray* array = cast<JsonArray*>(value);
+            long n = array->Count();
+            for (long i = 0; i < n; ++i)
+            {
+                JsonValue* itemValue = (*array)[i];
+                UniquePtr<T> item;
+                FromJson(itemValue, item);
+                field.Add(Rvalue(item));
+            }
+        }
+        else
+        {
+            throw JsonImportException("JSON array expected");
+        }
+    }
+
+    public void FromJson<T>(JsonValue* value, List<SharedPtr<T>>& field) 
+        where T is JsonConstructible
+    {
+        if (value is JsonArray*)
+        {
+            JsonArray* array = cast<JsonArray*>(value);
+            long n = array->Count();
+            for (long i = 0; i < n; ++i)
+            {
+                JsonValue* itemValue = (*array)[i];
+                SharedPtr<T> item;
+                FromJson(itemValue, item);
+                field.Add(item);
+            }
+        }
+        else
+        {
+            throw JsonImportException("JSON array expected");
+        }
+    }
+
     public void FromJson<Key, Value, KeyCompare>(JsonValue* value, Map<Key, Value, KeyCompare>& field) 
         where Key is ustring and Value is JsonValueType
     {
@@ -624,6 +666,74 @@ namespace System.Json
     
     public void FromJson<T>(JsonValue* container, const ustring& fieldName, List<T>& field) 
         where T is JsonValueType or T is JsonConstructible
+    {
+        if (container is JsonObject*)
+        {
+            JsonObject* object = cast<JsonObject*>(container);
+            JsonValue* value = object->GetField(fieldName);
+            if (value != null)
+            {
+                FromJson(value, field);
+            }
+            else
+            {
+                throw JsonImportException("field '" + ToUtf8(fieldName) + "' not found");
+            }
+        }
+        else
+        {
+            throw JsonImportException("JSON object expected");
+        }
+    }
+
+    public void FromJson<T>(JsonValue* container, const string& fieldName, List<UniquePtr<T>>& field) 
+        where T is JsonConstructible
+    {   
+        FromJson(container, ToUtf32(fieldName), field);
+    }
+    
+    public void FromJson<T>(JsonValue* container, const wstring& fieldName, List<UniquePtr<T>>& field) 
+        where T is JsonConstructible
+    {
+        FromJson(container, ToUtf32(fieldName), field);
+    }
+    
+    public void FromJson<T>(JsonValue* container, const ustring& fieldName, List<UniquePtr<T>>& field) 
+        where T is JsonConstructible
+    {
+        if (container is JsonObject*)
+        {
+            JsonObject* object = cast<JsonObject*>(container);
+            JsonValue* value = object->GetField(fieldName);
+            if (value != null)
+            {
+                FromJson(value, field);
+            }
+            else
+            {
+                throw JsonImportException("field '" + ToUtf8(fieldName) + "' not found");
+            }
+        }
+        else
+        {
+            throw JsonImportException("JSON object expected");
+        }
+    }
+
+    public void FromJson<T>(JsonValue* container, const string& fieldName, List<SharedPtr<T>>& field) 
+        where T is JsonConstructible
+    {   
+        FromJson(container, ToUtf32(fieldName), field);
+    }
+    
+    public void FromJson<T>(JsonValue* container, const wstring& fieldName, List<SharedPtr<T>>& field) 
+        where T is JsonConstructible
+    {
+        FromJson(container, ToUtf32(fieldName), field);
+    }
+    
+    public void FromJson<T>(JsonValue* container, const ustring& fieldName, List<SharedPtr<T>>& field) 
+        where T is JsonConstructible
     {
         if (container is JsonObject*)
         {
