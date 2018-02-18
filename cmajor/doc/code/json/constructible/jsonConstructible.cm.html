@@ -14,15 +14,9 @@
 
 <span class="keyword">namespace</span> <span class="identifier">MyNs</span>
 <span class="other">{</span>
+    <span class="other">[</span><span class="identifier">json</span><span class="other">]</span>
     <span class="keyword">public</span> <span class="keyword">class</span> <span class="identifier">MyJsonConstructibleClass</span>
     <span class="other">{</span>
-        <span class="keyword">public</span> <span class="keyword">explicit</span> <span class="identifier">MyJsonConstructibleClass</span><span class="other">(</span><span class="identifier">JsonValue</span><span class="other">*</span> <span class="identifier">value</span><span class="other">)</span>
-        <span class="other">{</span>
-            <span class="identifier">FromJson</span><span class="other">(</span><span class="identifier">value</span><span class="other">,</span> <span class="string">&quot;i&quot;</span><span class="other">,</span> <span class="identifier">i</span><span class="other">)</span><span class="other">;</span>
-            <span class="identifier">FromJson</span><span class="other">(</span><span class="identifier">value</span><span class="other">,</span> <span class="string">&quot;d&quot;</span><span class="other">,</span> <span class="identifier">d</span><span class="other">)</span><span class="other">;</span>
-            <span class="identifier">FromJson</span><span class="other">(</span><span class="identifier">value</span><span class="other">,</span> <span class="string">&quot;b&quot;</span><span class="other">,</span> <span class="identifier">b</span><span class="other">)</span><span class="other">;</span>
-            <span class="identifier">FromJson</span><span class="other">(</span><span class="identifier">value</span><span class="other">,</span> <span class="string">&quot;s&quot;</span><span class="other">,</span> <span class="identifier">s</span><span class="other">)</span><span class="other">;</span>
-        <span class="other">}</span>
         <span class="keyword">public</span> <span class="keyword">void</span> <span class="identifier">Dump</span><span class="other">(</span><span class="other">)</span>
         <span class="other">{</span>
             <span class="identifier">Console.WriteLine</span><span class="other">(</span><span class="string">&quot;i : &quot;</span> <span class="other">+</span> <span class="identifier">ToString</span><span class="other">(</span><span class="identifier">i</span><span class="other">)</span><span class="other">)</span><span class="other">;</span>

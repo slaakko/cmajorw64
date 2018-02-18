@@ -174,21 +174,24 @@
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;15.3.6 <a href="#is-constraint-expression">Is-Constraint Expression</a><br />
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;15.3.7 <a href="#multiparam-constraint-expression">Multiparam-Constraint Expression</a><br />
         &nbsp;&nbsp;&nbsp;&nbsp;15.4 <a href="#axioms">Axioms</a><br />
-        16 <a href="#compile-units">Compile Units</a><br />
-        &nbsp;&nbsp;&nbsp;&nbsp;16.1 <a href="#compile-units-syntax">Syntax</a><br />
-        &nbsp;&nbsp;&nbsp;&nbsp;16.2 <a href="#using-directives">Using Directives</a><br />
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;16.2.1 <a href="#using-alias-directive">Using-Alias Directives</a><br />
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;16.2.2 <a href="#using-namespace-directive">Using-Namespace Directives</a><br />
-        &nbsp;&nbsp;&nbsp;&nbsp;16.3 <a href="#definitions">Definitions</a><br />
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;16.3.1 <a href="#namespace">Namespaces</a><br />
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;16.3.2 <a href="#namespace-level-definitions">Namespace-level Definitions</a><br />
-        17 <a href="#projects">Projects</a><br />
-        &nbsp;&nbsp;&nbsp;&nbsp;17.1 <a href="#projects-syntax">Syntax</a><br />
-        &nbsp;&nbsp;&nbsp;&nbsp;17.2 <a href="#projects-example">Example</a><br />
-        &nbsp;&nbsp;&nbsp;&nbsp;17.3 <a href="#projects-programs">Programs</a><br />
-        18 <a href="#solutions">Solutions</a><br />
-        &nbsp;&nbsp;&nbsp;&nbsp;18.1 <a href="#solutions-syntax">Syntax</a><br />
-        &nbsp;&nbsp;&nbsp;&nbsp;18.2 <a href="#solutions-example">Example</a><br />
+        16 <a href="#attributes">Attributes</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;16.1 <a href="#attributes-syntax">Syntax</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;16.2 <a href="#attributes-usage">Usage</a><br />
+        17 <a href="#compile-units">Compile Units</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;17.1 <a href="#compile-units-syntax">Syntax</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;17.2 <a href="#using-directives">Using Directives</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;17.2.1 <a href="#using-alias-directive">Using-Alias Directives</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;17.2.2 <a href="#using-namespace-directive">Using-Namespace Directives</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;17.3 <a href="#definitions">Definitions</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;17.3.1 <a href="#namespace">Namespaces</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;17.3.2 <a href="#namespace-level-definitions">Namespace-level Definitions</a><br />
+        18 <a href="#projects">Projects</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;18.1 <a href="#projects-syntax">Syntax</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;18.2 <a href="#projects-example">Example</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;18.3 <a href="#projects-programs">Programs</a><br />
+        19 <a href="#solutions">Solutions</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;19.1 <a href="#solutions-syntax">Syntax</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;19.2 <a href="#solutions-example">Example</a><br />
         Appendix A <a href="#appendix-a">Terms</a> <br />
         Appendix B <a href="#appendix-b">Syntax Notation</a> <br />
     </div>
@@ -3051,6 +3054,7 @@
             <td class="rule" id="rule.function">function</td>
             <td class="sep">&rarr;</td>
             <td class="rcontent">
+                <span class="rule"><a href="#rule.attributes">attributes</a></span>?<br />
                 <span class="rule"><a href="#rule.function-specifiers">function&#8209;specifiers</a></span>
                 <span class="rule"><a href="#rule.return-type">return&#8209;type</a></span>
                 <span class="rule"><a href="#rule.function-group-id">function&#8209;group&#8209;id</a></span>
@@ -3315,7 +3319,7 @@
 
     <p>
         Functions in <a href="../library/System.Base/System.Base.html#System.Meta">System.Meta</a> namespace are <em>intrinsic functions</em>.
-        Intrinsic functions can be called just like regular functions, but they are special in the sense that they are not compiled from source code as regular functions are, 
+        Intrinsic functions can be called just like regular functions, but they are special in the sense that they are not compiled from source code as regular functions are,
         but they are implemented internally inside of the compiler.
     </p>
 
@@ -3437,6 +3441,7 @@
             <td class="rule" id="rule.class">class</td>
             <td class="sep">&rarr;</td>
             <td class="rcontent">
+                <span class="rule"><a href="#rule.attributes">attributes</a></span>?<br />
                 <span class="rule"><a href="#rule.class-specifiers">class&#8209;specifiers</a></span>
                 <span class="kw">class</span>
                 <span class="rule"><a href="#rule.class-name">class&#8209;name</a></span>
@@ -3511,6 +3516,7 @@
             <td class="rule" id="rule.static-constructor">static&#8209;constructor</td>
             <td class="sep">&rarr;</td>
             <td class="rcontent">
+                <span class="rule"><a href="#rule.attributes">attributes</a></span>?<br />
                 <span class="kw">static</span>
                 <span class="rule"><a href="#rule.class-name">class&#8209;name</a></span>
                 <span class="mono">()</span>
@@ -3579,6 +3585,7 @@
             <td class="rule" id="rule.constructor">constructor</td>
             <td class="sep">&rarr;</td>
             <td class="rcontent">
+                <span class="rule"><a href="#rule.attributes">attributes</a></span>?<br />
                 <span class="rule"><a href="#rule.constructor-specifiers">constructor&#8209;specifiers</a></span>
                 <span class="rule"><a href="#rule.class-name">class&#8209;name</a></span>
                 <span class="rule"><a href="#rule.parameters">parameters</a></span>
@@ -3606,6 +3613,7 @@
             <td class="rule" id="rule.destructor">destructor</td>
             <td class="sep">&rarr;</td>
             <td class="rcontent">
+                <span class="rule"><a href="#rule.attributes">attributes</a></span>?<br />
                 <span class="rule"><a href="#rule.destructor-specifiers">destructor&#8209;specifiers</a></span>
                 <span class="mono">~</span>
                 <span class="rule"><a href="#rule.class-name">class&#8209;name</a></span>
@@ -3629,6 +3637,7 @@
             <td class="rule" id="rule.member-function">member&#8209;function</td>
             <td class="sep">&rarr;</td>
             <td class="rcontent">
+                <span class="rule"><a href="#rule.attributes">attributes</a></span>?<br />
                 <span class="rule"><a href="#rule.member-function-specifiers">member&#8209;function&#8209;specifiers</a></span>
                 <span class="rule"><a href="#rule.return-type">return&#8209;type</a></span>
                 <span class="rule"><a href="#rule.function-group-id">function&#8209;group&#8209;id</a></span>
@@ -3661,6 +3670,7 @@
             <td class="rule" id="rule.conversion-function">conversion&#8209;function</td>
             <td class="sep">&rarr;</td>
             <td class="rcontent">
+                <span class="rule"><a href="#rule.attributes">attributes</a></span>?<br />
                 <span class="rule"><a href="#rule.conversion-function-specifiers">conversion&#8209;function&#8209;specifiers</a></span>
                 <span class="rule"><a href="#rule.return-type">return&#8209;type</a></span>
                 <span class="mono">()</span>
@@ -3685,6 +3695,7 @@
             <td class="rule" id="rule.member-variable">member&#8209;variable</td>
             <td class="sep">&rarr;</td>
             <td class="rcontent">
+                <span class="rule"><a href="#rule.attributes">attributes</a></span>?<br />
                 <span class="rule"><a href="#rule.member-variable-specifiers">member&#8209;variable&#8209;specifiers</a></span>
                 <span class="rule"><a href="#rule.member-variable-type">member&#8209;variable&#8209;type</a></span>
                 <span class="rule"><a href="#rule.member-variable-name">member&#8209;variable&#8209;name</a></span>
@@ -4253,6 +4264,7 @@
             <td class="rule" id="rule.interface">interface</td>
             <td class="sep">&rarr;</td>
             <td class="rcontent">
+                <span class="rule"><a href="#rule.attributes">attributes</a></span>?<br />
                 <span class="rule"><a href="#rule.access-specifier">access&#8209;specifier</a></span>?
                 <span class="kw">interface</span>
                 <span class="rule"><a href="#rule.interface-name">interface&#8209;name</a></span>
@@ -4902,14 +4914,94 @@
         </blockquote>
     </p>
 
-    <h2 id="compile-units">16 Compile Units</h2>
+    <h2 id="attributes">16 Attributes</h2>
+
+    <p>
+        Functions, classes, member functions, member variables and interfaces can have <em>attributes</em>.
+    </p>
+
+    <h3 id="attributes-syntax">16.1 Syntax</h3>
+    
+    <table class="grammar">
+        <tr>
+            <td class="rule" id="rule.attributes">attributes</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="mono">[</span>
+                (   <span class="rule"><a href="#rule.attributes">attribute</a></span>
+                (   <span class="mono">,</span>
+                <span class="rule"><a href="#rule.attributes">attribute</a></span>
+                )*
+                )?
+                <span class="mono">]</span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.attribute">attribute</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.attribute-name">attribute&#8209;name</a></span>
+                (   <span class="mono">=</span>
+                <span class="rule"><a href="#rule.attribute-value">attribute&#8209;value</a></span>
+                )?
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.attribute-name">attribute&#8209;name</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.id-char-sequence">id&#8209;char&#8209;sequence</a></span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.attribute-value">attribute&#8209;value</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="mono">"</span>
+                (   <span class="op">[^"\\\r\n]</span> |
+                <span class="rule"><a href="#rule.char-escape">char&#8209;escape</a></span>
+                )*
+                <span class="mono">"</span>
+            </td>
+        </tr>
+    </table>
+
+    <h3 id="attributes-usage">16.2 Usage</h3>
+
+    <p>
+        Attributes are name-value pairs that can be attached to programming constructs.
+        Attribute name is an identifier recognized by the compiler or a compiling tool and attribute value is a string.
+        If the value of an attribute is not explicitly given, it will have implicitly value "true".
+        Attributes can be used for example to generate serialization code or for a similar task.
+    </p>
+    
+    <p>
+        Currently Cmajor compiler recognizes two attributes:
+        <ul>
+            <li>
+                <b>json</b> attribute can have value "true" or "false".
+                It can be attached to classes and member variables.
+                It is used to generate JSON serialization code for a class.
+            </li>
+            <li>
+                <b>jsonFieldName</b> attribute can have any string value.
+                It can be attached to member variables.
+                It is used to give a member variable a serialization field name.
+                If the serialization field name is not explitly given, it will be
+                implicitly equal to the name of the member variable.
+            </li>
+        </ul>
+        See <a href="../library/System.Json/System.Json.Library.html">System.Json</a> library for an example of using these attributes.
+    </p>
+
+    <h2 id="compile-units">17 Compile Units</h2>
 
     <p>
         Cmajor projects consist of source files that are also called <a href="#rule.compile-unit"><em>compile unit</em>s</a>.
         Each compile unit contains a possibly empty sequence of <a href="#using-directives">using directives</a> followed by a possibly empty sequence of <a href="#definitions">definitions</a>.
     </p>
 
-    <h3 id="compile-units-syntax">16.1 Syntax</h3>
+    <h3 id="compile-units-syntax">17.1 Syntax</h3>
 
     <table class="grammar">
         <tr>
@@ -5061,13 +5153,13 @@
         </tr>
     </table>
 
-    <h3 id="using-directives">16.2 Using Directives</h3>
+    <h3 id="using-directives">17.2 Using Directives</h3>
 
     <p>
         There are two kinds of using directives: <a href="#using-alias-directive">using-alias</a> directives and <a href="#using-namespace-directive">using-namespace</a> directives.
     </p>
 
-    <h4 id="using-alias-directive">16.2.1 Using-Alias Directives</h4>
+    <h4 id="using-alias-directive">17.2.1 Using-Alias Directives</h4>
 
     <p>
         A <a href="#rule.using-alias-directive">using-alias</a> directive introduces an alternate name, a simple identifier, for a <a href="#namespace-level-entity">namespace-level entity</a>
@@ -5079,7 +5171,7 @@
         makes it possible to refer to <em>System.Console</em> class as bare <em>Console</em> instead of its fully qualified name <em>System.Console</em>, for example.
     </p>
 
-    <h4 id="using-namespace-directive">16.2.2 Using-Namespace Directives</h4>
+    <h4 id="using-namespace-directive">17.2.2 Using-Namespace Directives</h4>
 
     <p>
         A <a href="#rule.using-namespace-directive">using-namespace</a> directive makes contents of a namespace available in a compile unit using simple identifiers of
@@ -5099,13 +5191,13 @@
         one must refer to <em>Foo</em> using its fully qualified name, <em>Alpha.Foo</em>, for example.
     </p>
 
-    <h3 id="definitions">16.3 Definitions</h3>
+    <h3 id="definitions">17.3 Definitions</h3>
 
     <p>
         Definitions can appear inside a <a href="#namespace">namespace</a>, or at the global namespace level, outside any other namespace.
     </p>
 
-    <h4 id="namespace">16.3.1 Namespaces</h4>
+    <h4 id="namespace">17.3.1 Namespaces</h4>
 
     <p>
         A <a href="#rule.namespace-definition">namespace</a> definition consists of a keyword <span class="kw">namespace</span> followed by the name of the namespace followed by its
@@ -5136,7 +5228,7 @@
         Namespaces are <em>open</em>: many compile units can add definitions to the same namespace.
     </p>
 
-    <h4 id="namespace-level-definitions">16.3.2 Namespace-level Definitions</h4>
+    <h4 id="namespace-level-definitions">17.3.2 Namespace-level Definitions</h4>
 
     <p>
         A namespace, including the global namespace, can contain the following:
@@ -5153,7 +5245,7 @@
         </ul>
     </p>
 
-    <h2 id="projects">17 Projects</h2>
+    <h2 id="projects">18 Projects</h2>
 
     <p>
         There is one project for each Cmajor program and library. By convention each project should be in its own directory and have
@@ -5161,7 +5253,7 @@
         A project can <em>reference</em> another project. Reference dependencies must be acyclic.
     </p>
 
-    <h3 id="projects-syntax">17.1 Syntax</h3>
+    <h3 id="projects-syntax">18.1 Syntax</h3>
 
     <table class="grammar">
         <tr>
@@ -5254,14 +5346,14 @@
         </tr>
     </table>
 
-    <h3 id="projects-example">17.2 Example</h3>
+    <h3 id="projects-example">18.2 Example</h3>
 
     <p>
         Here's a project file <span class="mono">alpha.cmp</span> for a project named <em>Alpha</em> that references two library projects <em>Beta</em> and <em>Gamma</em>:
     </p>
 
     <blockquote>
-        <span class="kw">project</span> <em>Alpha</em><span class="mono">;</span><br/>
+        <span class="kw">project</span> <em>Alpha</em><span class="mono">;</span><br />
         <span class="kw">target</span><span class="mono">=</span><span class="kw">program</span><span class="mono">;</span><br />
         <span class="kw">reference</span> <span class="mono">&lt;../beta/beta.cmp&gt;</span><span class="mono">;</span><br />
         <span class="kw">reference</span> <span class="mono">&lt;../gamma/gamma.cmp&gt;</span><span class="mono">;</span><br />
@@ -5312,13 +5404,13 @@
     </pre>
 
     <p>
-        Here's the contents of the source files: 
-        <a href="../code/solution/alpha/main.cm.html">alpha/main.cm</a>, 
-        <a href="../code/solution/beta/beta.cm.html">beta/beta.cm</a>, and 
+        Here's the contents of the source files:
+        <a href="../code/solution/alpha/main.cm.html">alpha/main.cm</a>,
+        <a href="../code/solution/beta/beta.cm.html">beta/beta.cm</a>, and
         <a href="../code/solution/gamma/gamma.cm.html">gamma/gamma.cm</a>
     </p>
 
-    <h3 id="projects-programs">17.3 Programs</h3>
+    <h3 id="projects-programs">18.3 Programs</h3>
 
     <p>
         Each valid Cmajor program must have a <em>main</em> function where the execution of the program starts. The possible signatures of the <em>main</em> function are:
@@ -5336,7 +5428,7 @@
     </p>
 
     <p>
-        If the return type of the <em>main</em> function is <span class="kw">int</span>, the <em>main</em> function must explicitly <a href="#return-statement">return</a> 
+        If the return type of the <em>main</em> function is <span class="kw">int</span>, the <em>main</em> function must explicitly <a href="#return-statement">return</a>
         a value that is then returned to the caller of the program at the end of a normal program execution.
     </p>
 
@@ -5345,7 +5437,7 @@
         By convention <em>argv</em>[0] is the name of the program and <em>argv</em>[1], <em>argv</em>[2], ..., <em>argv</em>[<em>argc</em> &minus; 1] are program arguments.
     </p>
 
-    <h2 id="solutions">18 Solutions</h2>
+    <h2 id="solutions">19 Solutions</h2>
 
     <p>
         A solution is a group of related projects that can be built as a unit. By convention a solution has a <a href="#rule.solution-file">solution file</a> that ends with <span class="mono">.cms</span> extension.
@@ -5353,7 +5445,7 @@
         If project <em>A</em> references a project <em>B</em>, project <em>B</em> is built before project <em>A</em>.
     </p>
 
-    <h3 id="solutions-syntax">18.1 Syntax</h3>
+    <h3 id="solutions-syntax">19.1 Syntax</h3>
 
     <table class="grammar">
         <tr>
@@ -5408,7 +5500,7 @@
         </tr>
     </table>
 
-    <h3 id="solutions-example">18.2 Example</h3>
+    <h3 id="solutions-example">19.2 Example</h3>
 
     <p>
         Here's a solution file <span class="mono">solution.cms</span> that contains three projects <em>Alpha</em>, <em>Beta</em> and <em>Gamma</em>:
@@ -5452,14 +5544,14 @@
     <div id="alignment">
         <b>ALIGNMENT</b>
         <p>
-            Size of a class <em>c</em> may be <em>aligned</em> to <em>a</em>, or rounded to the smallest multiple of the <em>a</em> that is equal to or greater 
+            Size of a class <em>c</em> may be <em>aligned</em> to <em>a</em>, or rounded to the smallest multiple of the <em>a</em> that is equal to or greater
             than the size of <em>c</em> before the alignment has taken place.
         </p>
         <p>
             For example, given class <em>Foo</em>
             <blockquote>
-                <span class="kw">class</span> <em>Foo</em><br/>
-                <span class="mono">{</span><br/>
+                <span class="kw">class</span> <em>Foo</em><br />
+                <span class="mono">{</span><br />
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">int</span> <em>x</em><span class="mono">;</span><br />
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">byte</span> <em>y</em><span class="mono">;</span><br />
                 <span class="mono">}</span><br />
@@ -5938,7 +6030,7 @@
     <h2 id="appendix-b">Appendix B Syntax Notation</h2>
 
     <p>
-        Syntax of the Cmajor programming language is described in this text using a kind of <a href="http://en.wikipedia.org/wiki/Context-free_grammar">context-free grammar</a> called 
+        Syntax of the Cmajor programming language is described in this text using a kind of <a href="http://en.wikipedia.org/wiki/Context-free_grammar">context-free grammar</a> called
         <a href="http://en.wikipedia.org/wiki/Parsing_expression_grammar">Parsing Expression Grammar</a> or PEG.
         The notation used is not exaxtly same as PEG notation, but a slightly modified version of it.
     </p>
@@ -5963,7 +6055,7 @@
         <blockquote>
             <span class="kw">void</span> <em>main</em><span class="mono">()</span><br />
             <span class="mono">{</span><br />
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1 = <em>a</em><span class="mono">;</span><br/>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1 = <em>a</em><span class="mono">;</span><br />
             <span class="mono">}</span><br />
         </blockquote>
         is syntactically valid but meaningless because one cannot assign to a literal.
@@ -6019,9 +6111,9 @@
     <h3 id="character-class-expression">Character Classes</h3>
 
     <p>
-        A <em>character class </em> is a parsing expression that produces one character that is in the character class. A character class represented using <span class="var">serif</span> font and 
+        A <em>character class </em> is a parsing expression that produces one character that is in the character class. A character class represented using <span class="var">serif</span> font and
         it is enclosed in square brackets.
-        For example, rule <em><a href="#rule.latin-letter">latin&#8209;letter</a></em> produces a language that contains strings that consist of a single 
+        For example, rule <em><a href="#rule.latin-letter">latin&#8209;letter</a></em> produces a language that contains strings that consist of a single
         <a href="http://en.wikipedia.org/wiki/ISO_basic_Latin_alphabet">Latin letter</a>:
 
         <table class="grammar">
@@ -6095,9 +6187,9 @@
     <h4 id="union">Union</h4>
 
     <p>
-        If <em>e<sub>1</sub></em> and <em>e<sub>2</sub></em> are parsing expressions, <em>e<sub>1</sub></em> | <em>e<sub>2</sub></em> produces the set of strings that is union of 
+        If <em>e<sub>1</sub></em> and <em>e<sub>2</sub></em> are parsing expressions, <em>e<sub>1</sub></em> | <em>e<sub>2</sub></em> produces the set of strings that is union of
         the set of strings that <em>e<sub>1</sub></em> produces and the set of strings that <em>e<sub>2</sub></em> produces.
-        Another way of thinking it is that the bar character (|) operator means <em>alternatives</em>. 
+        Another way of thinking it is that the bar character (|) operator means <em>alternatives</em>.
         Unlike in general context-free grammars, in Parsing Expression Grammars the first alternative that matches an input always wins, so Parsing Expression Grammars cannot be ambiguous
         as general context-free grammars can.
     </p>
@@ -6158,7 +6250,7 @@
     <h4 id="difference">Difference</h4>
 
     <p>
-        If <em>e<sub>1</sub></em> and <em>e<sub>2</sub></em> are parsing expressions, <em>e<sub>1</sub></em> &minus; <em>e<sub>2</sub></em> produces the set of strings that is 
+        If <em>e<sub>1</sub></em> and <em>e<sub>2</sub></em> are parsing expressions, <em>e<sub>1</sub></em> &minus; <em>e<sub>2</sub></em> produces the set of strings that is
         difference of the strings that <em>e<sub>1</sub></em> produces and the strings that <em>e<sub>2</sub></em> produces.
         Another way of thinking it is that <em>e<sub>1</sub></em> occurs but <em>e<sub>2</sub></em> does not occur.
     </p>
@@ -6182,8 +6274,8 @@
                 <td class="sep">&rarr;</td>
                 <td class="rcontent">
                     (<span class="rule"><a href="#rule.letter">letter</a></span> | <span class="mono">_</span>)
-                    (<span class="rule"><a href="#rule.letter">letter</a></span> | 
-                    <span class="rule"><a href="#rule.digit">digit</a></span> | 
+                    (<span class="rule"><a href="#rule.letter">letter</a></span> |
+                    <span class="rule"><a href="#rule.digit">digit</a></span> |
                     <span class="mono">_</span>)*
                 </td>
             </tr>

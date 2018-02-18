@@ -3,12 +3,12 @@
     <cmc>cmc.exe</cmc>
     <tabSize>4</tabSize>
     <infoDelaySecs>10</infoDelaySecs>
-    <formSizeX>1770</formSizeX>
-    <formSizeY>948</formSizeY>
+    <formSizeX>1778</formSizeX>
+    <formSizeY>968</formSizeY>
     <formTop>0</formTop>
     <formLeft>0</formLeft>
-    <textVisX>78</textVisX>
-    <textVisY>78</textVisY>
+    <textVisX>130</textVisX>
+    <textVisY>130</textVisY>
     <textVisW>1259</textVisW>
     <textVisH>482</textVisH>
     <toolColWidth>80</toolColWidth>
@@ -22,17 +22,25 @@
     <findLineColWidth>85</findLineColWidth>
     <findProjectColWidth>183</findProjectColWidth>
     <findTextColWidth>738</findTextColWidth>
-    <horizontalSplitterPos>1337</horizontalSplitterPos>
+    <horizontalSplitterPos>1343</horizontalSplitterPos>
     <verticalSplitterPos>547</verticalSplitterPos>
     <windowState>Normal</windowState>
     <maxRecentProjects>10</maxRecentProjects>
     <recentProjects>
         <recentProject>
+            <path>C:\Users\Seppo\cmajorw64\cmajor\projects\attrTest\attrTest.cms</path>
+            <openFiles />
+        </recentProject>
+        <recentProject>
             <path>C:\Users\Seppo\cmajorw64\cmajor\system\System.cms</path>
             <openFiles />
         </recentProject>
         <recentProject>
-            <path>C:\Users\Seppo\cmajorw64\cmajor\test\foo\foo.cms</path>
+            <path>C:\Users\Seppo\cmajorw64\cmajor\projects\examples\examples.cms</path>
+            <openFiles />
+        </recentProject>
+        <recentProject>
+            <path>C:\Users\Seppo\cmajorw64\cmajor\projects\parseToDom\parseToDom.cms</path>
             <openFiles />
         </recentProject>
         <recentProject>
@@ -40,11 +48,11 @@
             <openFiles />
         </recentProject>
         <recentProject>
-            <path>C:/Users/Seppo/cmajorw64/cmajor/doc/code/compression/deflate/deflate.cms</path>
+            <path>C:\Users\Seppo\cmajorw64\cmajor\test\foo\foo.cms</path>
             <openFiles />
         </recentProject>
         <recentProject>
-            <path>C:\Users\Seppo\cmajorw64\cmajor\projects\examples\examples.cms</path>
+            <path>C:/Users/Seppo/cmajorw64/cmajor/doc/code/compression/deflate/deflate.cms</path>
             <openFiles />
         </recentProject>
         <recentProject>
@@ -57,14 +65,6 @@
         </recentProject>
         <recentProject>
             <path>C:/Users/Seppo/cmajorw64/cmajor/doc/code/xml/xpath/xpath.cms</path>
-            <openFiles />
-        </recentProject>
-        <recentProject>
-            <path>C:/Users/Seppo/cmajorw64/cmajor/doc/code/socket/client/socketClient.cms</path>
-            <openFiles />
-        </recentProject>
-        <recentProject>
-            <path>C:\Users\Seppo\cmajorw64\cmajor\test\xpq\xpq.cms</path>
             <openFiles />
         </recentProject>
     </recentProjects>

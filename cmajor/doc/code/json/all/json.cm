@@ -4,6 +4,7 @@ using System.Text;
 using System.IO;
 using System.Json;
 
+[json]
 public class Member
 {
     public nothrow Member() : x(0)
@@ -12,26 +13,54 @@ public class Member
     public explicit nothrow Member(int x_) : x(x_)
     {
     }
-    public explicit Member(JsonValue* value)
-    {
-        FromJson(value, "x", x);
-    }
-    public UniquePtr<JsonValue> ToJson() const
-    {
-        UniquePtr<JsonObject> object = new JsonObject();
-        object->AddField("x", ToJson(x));
-        return UniquePtr<JsonValue>(object.Release());
-    }
-    public void Dump(CodeFormatter& formatter)
+    public default virtual ~Member(); // base class must be polymorphic
+    public virtual void Dump(CodeFormatter& formatter)
     {
         formatter.WriteLine("member : x = " + ToString(x));
     }
     private int x;
 }
 
-public class Alpha
+[json]
+public class DerivedMember : Member
 {
-    public Alpha() : i(1), d(2.0), b(true), s("foo"), w(w"bar"), u(u"öhkömömmö"), member()
+    public nothrow DerivedMember() : base(), d(0)
+    {
+    }
+    public nothrow DerivedMember(int x_, double d_) : base(x_), d(d_)
+    {
+    }
+    public override void Dump(CodeFormatter& formatter)
+    {
+        base->Dump(formatter);
+        formatter.WriteLine("derived member : d = " + ToString(d));
+    }
+    private double d;
+}
+
+[json]
+public class Beta
+{
+    Beta() : b(false), s("xyzzy")
+    {
+    }
+    public default virtual ~Beta(); // base class must be polymorphic
+    public void Dump(CodeFormatter& formatter)
+    {
+        formatter.WriteLine("beta:");
+        formatter.WriteLine("b : " + ToString(b));
+        formatter.WriteLine("s : " + s);
+    }
+    [json="false"]
+    private bool b; // not serialized
+    [jsonFieldName="beta.s"]
+    private string s; // changed conflicting field name
+}
+
+[json]
+public class Alpha : Beta
+{
+    public Alpha() : i(1), d(2.0), b(true), s("foo"), w(w"bar"), u(u"öhkömömmö"), member(), memberPtr(new DerivedMember(10, 3.14))
     {
         l.Add(1);
         l.Add(2);
@@ -42,38 +71,9 @@ public class Alpha
         memberList.Add(Member(1));
         memberList.Add(Member(2));
     }
-    public explicit Alpha(JsonValue* value)
-    {
-        FromJson(value, "i", i);
-        FromJson(value, "d", d);
-        FromJson(value, "b", b);
-        FromJson(value, "s", s);
-        FromJson(value, "w", w);
-        FromJson(value, "u", u);
-        FromJson(value, "l", l);
-        FromJson(value, "m", m);
-        FromJson(value, "h", h);
-        FromJson(value, "member", member);
-        FromJson(value, "memberList", memberList);
-    }
-    public UniquePtr<JsonValue> ToJson() const
-    {
-        UniquePtr<JsonObject> object = new JsonObject();
-        object->AddField("i", ToJson(i));
-        object->AddField("d", ToJson(d));
-        object->AddField("b", ToJson(b));
-        object->AddField("s", ToJson(s));
-        object->AddField("w", ToJson(w));
-        object->AddField("u", ToJson(u));
-        object->AddField("l", ToJson(l));
-        object->AddField("m", ToJson(m));
-        object->AddField("h", ToJson(h));
-        object->AddField("member", ToJson(member));
-        object->AddField("memberList", ToJson(memberList));
-        return UniquePtr<JsonValue>(object.Release());
-    }
     public void Dump(CodeFormatter& formatter)
     {
+        base->Dump(formatter);
         formatter.WriteLine("alpha:");
         formatter.WriteLine("i : " + ToString(i));
         formatter.WriteLine("d : " + ToString(d));
@@ -109,6 +109,14 @@ public class Alpha
         {
             x.Dump(formatter);
         }
+        if (memberPtr.IsNull())
+        {
+            formatter.WriteLine("memberPtr : null");
+        }
+        else
+        {
+            memberPtr->Dump(formatter);
+        }
         formatter.DecIndent();
     }
     private int i;
@@ -122,6 +130,7 @@ public class Alpha
     private HashMap<string, double> h;
     private Member member;
     private List<Member> memberList;
+    private UniquePtr<Member> memberPtr;
 }
 
 void main()
@@ -131,13 +140,12 @@ void main()
         CodeFormatter formatter(Console.Out());
         Alpha alpha;
         alpha.Dump(formatter);
-        UniquePtr<JsonValue> value = ToJson(alpha);
+        UniquePtr<JsonValue> value = alpha.ToJson();
         string jsonText = value->ToString();
         Console.WriteLine("alpha as JSON:");
         Console.WriteLine(jsonText);
         UniquePtr<JsonValue> jsonValue = ParseJson(jsonText);
-        Alpha alphaFromJson;
-        FromJson(jsonValue.Get(), alphaFromJson);
+        Alpha alphaFromJson(jsonValue.Get());
         alphaFromJson.Dump(formatter);
     }
     catch (const Exception& ex)

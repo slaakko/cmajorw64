@@ -31,6 +31,11 @@
             </tr>
             <tr>
                 <td>
+                    <a href="#class_JsonClassFactory_07F3FE1559307E1B17EEBEAFBAA8C9DBAA71924E">JsonClassFactory</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
                     <a href="#class_JsonGrammar_35AA9FF722AADCE4D0495A1DD9EF9B19479BF318">JsonGrammar</a>
                 </td>
             </tr>
@@ -84,7 +89,17 @@
             </tr>
             <tr>
                 <td>
+                    <a href="#function_group_RegisterJsonClass_9F196AC1276E724F3E7E8FF1338696EA5D4B6DBA">RegisterJsonClass</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
                     <a href="#function_group_ToJson_80373CB69AD5A80A6592CC2418A5282FCB2D0F14">ToJson</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="#function_op_eq_A5531519537EF9A3672EFF09CFA3994163F6008D">operator==(JsonClassCreatorDelegate left, JsonClassCreatorDelegate right)</a>
                 </td>
             </tr>
         </table>
@@ -103,6 +118,14 @@
             <tr>
                 <td>
                     <a href="#concept_JsonValueType_6519CA3F247A823EA53E9BBD4C42E505C0A78F5D">JsonValueType&lt;T></a>
+                </td>
+            </tr>
+        </table>
+        <h3>Delegates</h3>
+        <table>
+            <tr>
+                <td>
+                    <a href="#9342920">JsonClassCreatorDelegate</a>
                 </td>
             </tr>
         </table>
@@ -389,6 +412,129 @@
                 <td>
                     <span class="kw">bool</span>
                 </td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h3 id="class_JsonClassFactory_07F3FE1559307E1B17EEBEAFBAA8C9DBAA71924E">JsonClassFactory Class</h3>
+        <h4>Syntax</h4>
+        <table>
+            <tr>
+                <td>
+                    <span class="mono"> public class JsonClassFactory;</span>
+                </td>
+            </tr>
+        </table>
+        <h4>Member Functions</h4>
+        <table>
+            <tr>
+                <td>
+                    <a href="#member_function_CreateJsonClass_JsonClassFactory_BF574F7BB5506F6308DE0A8473F81F40BA047ACC">CreateJsonClass(const String&lt;uchar>&amp; jsonClassName, JsonValue* value)</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="#member_function_RegisterJsonClass_JsonClassFactory_C3CEBA73260CF15D9C8F3CBA161BDCE1F5A417E9">RegisterJsonClass(const String&lt;uchar>&amp; jsonClassName, JsonClassCreatorDelegate creator)</a>
+                </td>
+            </tr>
+        </table>
+        <h4>Static Member Functions</h4>
+        <table>
+            <tr>
+                <td>
+                    <a href="#member_function_Instance_JsonClassFactory_D38F97BAC91B814118DAFA2C3E655F501E7D3CD9">Instance()</a>
+                </td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h4 id="member_function_CreateJsonClass_JsonClassFactory_BF574F7BB5506F6308DE0A8473F81F40BA047ACC">CreateJsonClass(const String&lt;uchar>&amp; jsonClassName, JsonValue* value) Member Function</h4>
+        <h5>Syntax</h5>
+        <table>
+            <tr>
+                <td>
+                    <span class="mono">public void* CreateJsonClass(const String&lt;uchar>&amp; jsonClassName, JsonValue* value);</span>
+                </td>
+            </tr>
+        </table>
+        <h5>Parameters</h5>
+        <table class="params">
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">jsonClassName</span>
+                </td>
+                <td class="params">
+                    <span class="kw">const </span>
+                    <a href="../System.Base/System.Base.html#class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC">String</a>
+                    &lt;<span class="kw">uchar</span>
+                    >&amp;</td>
+            </tr>
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">value</span>
+                </td>
+                <td class="params">
+                    <a href="#class_JsonValue_B86942C2856CC5758E1FB19BBBE97E4002D4008A">JsonValue</a>
+                    *</td>
+            </tr>
+        </table>
+        <h5>Return Type</h5>
+        <table>
+            <tr>
+                <td>
+                    <span class="kw">void</span>
+                    *</td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h4 id="member_function_RegisterJsonClass_JsonClassFactory_C3CEBA73260CF15D9C8F3CBA161BDCE1F5A417E9">RegisterJsonClass(const String&lt;uchar>&amp; jsonClassName, JsonClassCreatorDelegate creator) Member Function</h4>
+        <h5>Syntax</h5>
+        <table>
+            <tr>
+                <td>
+                    <span class="mono">public void RegisterJsonClass(const String&lt;uchar>&amp; jsonClassName, JsonClassCreatorDelegate creator);</span>
+                </td>
+            </tr>
+        </table>
+        <h5>Parameters</h5>
+        <table class="params">
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">jsonClassName</span>
+                </td>
+                <td class="params">
+                    <span class="kw">const </span>
+                    <a href="../System.Base/System.Base.html#class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC">String</a>
+                    &lt;<span class="kw">uchar</span>
+                    >&amp;</td>
+            </tr>
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">creator</span>
+                </td>
+                <td class="params">
+                    <a href="#9342920">JsonClassCreatorDelegate</a>
+                </td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h4 id="member_function_Instance_JsonClassFactory_D38F97BAC91B814118DAFA2C3E655F501E7D3CD9">Instance() Static Member Function</h4>
+        <h5>Syntax</h5>
+        <table>
+            <tr>
+                <td>
+                    <span class="mono">public static JsonClassFactory&amp; Instance();</span>
+                </td>
+            </tr>
+        </table>
+        <h5>Return Type</h5>
+        <table>
+            <tr>
+                <td>
+                    <a href="#class_JsonClassFactory_07F3FE1559307E1B17EEBEAFBAA8C9DBAA71924E">JsonClassFactory</a>
+                    &amp;</td>
             </tr>
         </table>
         <br/>
@@ -1660,17 +1806,17 @@
             </tr>
             <tr>
                 <td>
-                    <a href="#function_FromJson_F0AB8F8B2A3CAB4709E73C0B40ADEC76D5381496">FromJson&lt;K, T, H, C>(JsonValue* value, HashMap&lt;K, T, H, C>&amp; field) where K is ustring and T is JsonValueType</a>
-                </td>
-            </tr>
-            <tr>
-                <td>
                     <a href="#function_FromJson_CA66F53A4B7279D7819C28DF759545627929AC07">FromJson&lt;K, T, H, C>(JsonValue* value, HashMap&lt;K, T, H, C>&amp; field) where K is wstring and T is JsonValueType</a>
                 </td>
             </tr>
             <tr>
                 <td>
                     <a href="#function_FromJson_9CEA6C1C5DCE40E3C08ED971B107560C25A2BD58">FromJson&lt;K, T, H, C>(JsonValue* value, HashMap&lt;K, T, H, C>&amp; field) where K is string and T is JsonValueType</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="#function_FromJson_F0AB8F8B2A3CAB4709E73C0B40ADEC76D5381496">FromJson&lt;K, T, H, C>(JsonValue* value, HashMap&lt;K, T, H, C>&amp; field) where K is ustring and T is JsonValueType</a>
                 </td>
             </tr>
             <tr>
@@ -1690,11 +1836,6 @@
             </tr>
             <tr>
                 <td>
-                    <a href="#function_FromJson_F0428D168859D23AC8741373B4D4CE9BD7E604BF">FromJson&lt;Key, Value, KeyCompare>(JsonValue* value, Map&lt;Key, Value, KeyCompare>&amp; field) where Key is wstring and Value is JsonValueType</a>
-                </td>
-            </tr>
-            <tr>
-                <td>
                     <a href="#function_FromJson_5549A8B6E26ED0527CDEAD71A05C23A4AAE3F70F">FromJson&lt;Key, Value, KeyCompare>(JsonValue* value, Map&lt;Key, Value, KeyCompare>&amp; field) where Key is ustring and Value is JsonConstructible</a>
                 </td>
             </tr>
@@ -1710,12 +1851,17 @@
             </tr>
             <tr>
                 <td>
-                    <a href="#function_FromJson_325A8C52C7395B16BC61FCDE988845CF3900DD30">FromJson&lt;Key, Value, KeyCompare>(JsonValue* value, Map&lt;Key, Value, KeyCompare>&amp; field) where Key is string and Value is JsonValueType</a>
+                    <a href="#function_FromJson_293CA650CEA60428E41363EF452297EA636E2B53">FromJson&lt;Key, Value, KeyCompare>(JsonValue* value, Map&lt;Key, Value, KeyCompare>&amp; field) where Key is ustring and Value is JsonValueType</a>
                 </td>
             </tr>
             <tr>
                 <td>
-                    <a href="#function_FromJson_293CA650CEA60428E41363EF452297EA636E2B53">FromJson&lt;Key, Value, KeyCompare>(JsonValue* value, Map&lt;Key, Value, KeyCompare>&amp; field) where Key is ustring and Value is JsonValueType</a>
+                    <a href="#function_FromJson_F0428D168859D23AC8741373B4D4CE9BD7E604BF">FromJson&lt;Key, Value, KeyCompare>(JsonValue* value, Map&lt;Key, Value, KeyCompare>&amp; field) where Key is wstring and Value is JsonValueType</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="#function_FromJson_325A8C52C7395B16BC61FCDE988845CF3900DD30">FromJson&lt;Key, Value, KeyCompare>(JsonValue* value, Map&lt;Key, Value, KeyCompare>&amp; field) where Key is string and Value is JsonValueType</a>
                 </td>
             </tr>
             <tr>
@@ -1735,7 +1881,17 @@
             </tr>
             <tr>
                 <td>
+                    <a href="#function_FromJson_81D5153F2F4A29AEE9BCF03163C9DA49BD818293">FromJson&lt;T>(JsonValue* container, const String&lt;uchar>&amp; fieldName, SharedPtr&lt;T>&amp; field) where T is JsonConstructible</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
                     <a href="#function_FromJson_95041BE10F45478E45EE3508DCFE9BF440E370C6">FromJson&lt;T>(JsonValue* container, const String&lt;uchar>&amp; fieldName, T&amp; field) where T is JsonConstructible</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="#function_FromJson_70EE2D3B1295C9C06D9783A1F0BC443E999DCF09">FromJson&lt;T>(JsonValue* container, const String&lt;uchar>&amp; fieldName, UniquePtr&lt;T>&amp; field) where T is JsonConstructible</a>
                 </td>
             </tr>
             <tr>
@@ -1760,7 +1916,17 @@
             </tr>
             <tr>
                 <td>
+                    <a href="#function_FromJson_B5BA065DFD8F981C687FCC85E634D2BEC7B5F534">FromJson&lt;T>(JsonValue* value, SharedPtr&lt;T>&amp; field) where T is JsonConstructible</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
                     <a href="#function_FromJson_E078F94C43EA1E961A54E8B518B61B936C577B8C">FromJson&lt;T>(JsonValue* value, T&amp; field) where T is JsonConstructible</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="#function_FromJson_97B0CE17747A8F5A6697880760B61937E269F734">FromJson&lt;T>(JsonValue* value, UniquePtr&lt;T>&amp; field) where T is JsonConstructible</a>
                 </td>
             </tr>
         </table>
@@ -2691,31 +2857,31 @@
         <table class="params">
             <tr class="params">
                 <td class="params">
-                    <span class="param" id="8712923">K</span>
+                    <span class="param" id="9343043">K</span>
                 </td>
             </tr>
             <tr class="params">
                 <td class="params">
-                    <span class="param" id="8712924">T</span>
+                    <span class="param" id="9343044">T</span>
                 </td>
             </tr>
             <tr class="params">
                 <td class="params">
-                    <span class="param" id="8712925">H</span>
+                    <span class="param" id="9343045">H</span>
                 </td>
             </tr>
             <tr class="params">
                 <td class="params">
-                    <span class="param" id="8712926">C</span>
+                    <span class="param" id="9343046">C</span>
                 </td>
             </tr>
         </table>
         <h5>Constraint</h5>
-        <a href="#8712924">T</a>
+        <a href="#9343044">T</a>
         <span class="kw"> is </span>
         <a href="#concept_JsonValueType_6519CA3F247A823EA53E9BBD4C42E505C0A78F5D">JsonValueType</a>
         <span class="kw"> or </span>
-        <a href="#8712924">T</a>
+        <a href="#9343044">T</a>
         <span class="kw"> is </span>
         <a href="#concept_JsonConstructible_FDF8EB5A6050ED39397E14EF89FACCA63F29DDF2">JsonConstructible</a>
         <table>
@@ -2749,10 +2915,10 @@
                 </td>
                 <td class="params">
                     <a href="../System.Base/System.Base.html#class_HashMap_K_T_H_C_925D53DF947742545E7EC07D3487F3EA8C8D1D36">HashMap</a>
-                    &lt;<a href="#8712898">K</a>
-                    , <a href="#8712899">T</a>
-                    , <a href="#8712900">H</a>
-                    , <a href="#8712901">C</a>
+                    &lt;<a href="#9343020">K</a>
+                    , <a href="#9343021">T</a>
+                    , <a href="#9343022">H</a>
+                    , <a href="#9343023">C</a>
                     >&amp;</td>
             </tr>
         </table>
@@ -2771,31 +2937,31 @@
         <table class="params">
             <tr class="params">
                 <td class="params">
-                    <span class="param" id="8712931">K</span>
+                    <span class="param" id="9343051">K</span>
                 </td>
             </tr>
             <tr class="params">
                 <td class="params">
-                    <span class="param" id="8712932">T</span>
+                    <span class="param" id="9343052">T</span>
                 </td>
             </tr>
             <tr class="params">
                 <td class="params">
-                    <span class="param" id="8712933">H</span>
+                    <span class="param" id="9343053">H</span>
                 </td>
             </tr>
             <tr class="params">
                 <td class="params">
-                    <span class="param" id="8712934">C</span>
+                    <span class="param" id="9343054">C</span>
                 </td>
             </tr>
         </table>
         <h5>Constraint</h5>
-        <a href="#8712932">T</a>
+        <a href="#9343052">T</a>
         <span class="kw"> is </span>
         <a href="#concept_JsonValueType_6519CA3F247A823EA53E9BBD4C42E505C0A78F5D">JsonValueType</a>
         <span class="kw"> or </span>
-        <a href="#8712932">T</a>
+        <a href="#9343052">T</a>
         <span class="kw"> is </span>
         <a href="#concept_JsonConstructible_FDF8EB5A6050ED39397E14EF89FACCA63F29DDF2">JsonConstructible</a>
         <table>
@@ -2829,10 +2995,10 @@
                 </td>
                 <td class="params">
                     <a href="../System.Base/System.Base.html#class_HashMap_K_T_H_C_925D53DF947742545E7EC07D3487F3EA8C8D1D36">HashMap</a>
-                    &lt;<a href="#8712898">K</a>
-                    , <a href="#8712899">T</a>
-                    , <a href="#8712900">H</a>
-                    , <a href="#8712901">C</a>
+                    &lt;<a href="#9343020">K</a>
+                    , <a href="#9343021">T</a>
+                    , <a href="#9343022">H</a>
+                    , <a href="#9343023">C</a>
                     >&amp;</td>
             </tr>
         </table>
@@ -2851,31 +3017,31 @@
         <table class="params">
             <tr class="params">
                 <td class="params">
-                    <span class="param" id="8712927">K</span>
+                    <span class="param" id="9343047">K</span>
                 </td>
             </tr>
             <tr class="params">
                 <td class="params">
-                    <span class="param" id="8712928">T</span>
+                    <span class="param" id="9343048">T</span>
                 </td>
             </tr>
             <tr class="params">
                 <td class="params">
-                    <span class="param" id="8712929">H</span>
+                    <span class="param" id="9343049">H</span>
                 </td>
             </tr>
             <tr class="params">
                 <td class="params">
-                    <span class="param" id="8712930">C</span>
+                    <span class="param" id="9343050">C</span>
                 </td>
             </tr>
         </table>
         <h5>Constraint</h5>
-        <a href="#8712928">T</a>
+        <a href="#9343048">T</a>
         <span class="kw"> is </span>
         <a href="#concept_JsonValueType_6519CA3F247A823EA53E9BBD4C42E505C0A78F5D">JsonValueType</a>
         <span class="kw"> or </span>
-        <a href="#8712928">T</a>
+        <a href="#9343048">T</a>
         <span class="kw"> is </span>
         <a href="#concept_JsonConstructible_FDF8EB5A6050ED39397E14EF89FACCA63F29DDF2">JsonConstructible</a>
         <table>
@@ -2909,81 +3075,10 @@
                 </td>
                 <td class="params">
                     <a href="../System.Base/System.Base.html#class_HashMap_K_T_H_C_925D53DF947742545E7EC07D3487F3EA8C8D1D36">HashMap</a>
-                    &lt;<a href="#8712898">K</a>
-                    , <a href="#8712899">T</a>
-                    , <a href="#8712900">H</a>
-                    , <a href="#8712901">C</a>
-                    >&amp;</td>
-            </tr>
-        </table>
-        <br/>
-        <hr/>
-        <h4 id="function_FromJson_F0AB8F8B2A3CAB4709E73C0B40ADEC76D5381496">FromJson&lt;K, T, H, C>(JsonValue* value, HashMap&lt;K, T, H, C>&amp; field) where K is ustring and T is JsonValueType Overload</h4>
-        <h5>Syntax</h5>
-        <table>
-            <tr>
-                <td>
-                    <span class="mono">public void FromJson&lt;K, T, H, C>(JsonValue* value, HashMap&lt;K, T, H, C>&amp; field);</span>
-                </td>
-            </tr>
-        </table>
-        <h5>Template Parameters</h5>
-        <table class="params">
-            <tr class="params">
-                <td class="params">
-                    <span class="param" id="8712898">K</span>
-                </td>
-            </tr>
-            <tr class="params">
-                <td class="params">
-                    <span class="param" id="8712899">T</span>
-                </td>
-            </tr>
-            <tr class="params">
-                <td class="params">
-                    <span class="param" id="8712900">H</span>
-                </td>
-            </tr>
-            <tr class="params">
-                <td class="params">
-                    <span class="param" id="8712901">C</span>
-                </td>
-            </tr>
-        </table>
-        <h5>Constraint</h5>
-        <a href="#8712898">K</a>
-        <span class="kw"> is </span>
-        <a href="../System.Base/System.Base.html#class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC">String</a>
-        &lt;<span class="kw">uchar</span>
-        ><span class="kw"> and </span>
-        <a href="#8712899">T</a>
-        <span class="kw"> is </span>
-        <a href="#concept_JsonValueType_6519CA3F247A823EA53E9BBD4C42E505C0A78F5D">JsonValueType</a>
-        <table>
-            <tr>
-                <td/>
-            </tr>
-        </table>
-        <h5>Parameters</h5>
-        <table class="params">
-            <tr class="params">
-                <td class="params">
-                    <span class="param" id="">value</span>
-                </td>
-                <td class="params">
-                    <a href="#class_JsonValue_B86942C2856CC5758E1FB19BBBE97E4002D4008A">JsonValue</a>
-                    *</td>
-            </tr>
-            <tr class="params">
-                <td class="params">
-                    <span class="param" id="">field</span>
-                </td>
-                <td class="params">
-                    <a href="../System.Base/System.Base.html#class_HashMap_K_T_H_C_925D53DF947742545E7EC07D3487F3EA8C8D1D36">HashMap</a>
-                    &lt;<a href="#8712898">K</a>
-                    , <a href="#8712899">T</a>
-                    , <a href="#8712900">H</a>
-                    , <a href="#8712901">C</a>
+                    &lt;<a href="#9343020">K</a>
+                    , <a href="#9343021">T</a>
+                    , <a href="#9343022">H</a>
+                    , <a href="#9343023">C</a>
                     >&amp;</td>
             </tr>
         </table>
@@ -3002,32 +3097,32 @@
         <table class="params">
             <tr class="params">
                 <td class="params">
-                    <span class="param" id="8712902">K</span>
+                    <span class="param" id="9343020">K</span>
                 </td>
             </tr>
             <tr class="params">
                 <td class="params">
-                    <span class="param" id="8712903">T</span>
+                    <span class="param" id="9343021">T</span>
                 </td>
             </tr>
             <tr class="params">
                 <td class="params">
-                    <span class="param" id="8712904">H</span>
+                    <span class="param" id="9343022">H</span>
                 </td>
             </tr>
             <tr class="params">
                 <td class="params">
-                    <span class="param" id="8712905">C</span>
+                    <span class="param" id="9343023">C</span>
                 </td>
             </tr>
         </table>
         <h5>Constraint</h5>
-        <a href="#8712902">K</a>
+        <a href="#9343020">K</a>
         <span class="kw"> is </span>
         <a href="../System.Base/System.Base.html#class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC">String</a>
         &lt;<span class="kw">wchar</span>
         ><span class="kw"> and </span>
-        <a href="#8712903">T</a>
+        <a href="#9343021">T</a>
         <span class="kw"> is </span>
         <a href="#concept_JsonValueType_6519CA3F247A823EA53E9BBD4C42E505C0A78F5D">JsonValueType</a>
         <table>
@@ -3051,10 +3146,10 @@
                 </td>
                 <td class="params">
                     <a href="../System.Base/System.Base.html#class_HashMap_K_T_H_C_925D53DF947742545E7EC07D3487F3EA8C8D1D36">HashMap</a>
-                    &lt;<a href="#8712898">K</a>
-                    , <a href="#8712899">T</a>
-                    , <a href="#8712900">H</a>
-                    , <a href="#8712901">C</a>
+                    &lt;<a href="#9343020">K</a>
+                    , <a href="#9343021">T</a>
+                    , <a href="#9343022">H</a>
+                    , <a href="#9343023">C</a>
                     >&amp;</td>
             </tr>
         </table>
@@ -3073,32 +3168,32 @@
         <table class="params">
             <tr class="params">
                 <td class="params">
-                    <span class="param" id="8712906">K</span>
+                    <span class="param" id="9343024">K</span>
                 </td>
             </tr>
             <tr class="params">
                 <td class="params">
-                    <span class="param" id="8712907">T</span>
+                    <span class="param" id="9343025">T</span>
                 </td>
             </tr>
             <tr class="params">
                 <td class="params">
-                    <span class="param" id="8712908">H</span>
+                    <span class="param" id="9343026">H</span>
                 </td>
             </tr>
             <tr class="params">
                 <td class="params">
-                    <span class="param" id="8712909">C</span>
+                    <span class="param" id="9343027">C</span>
                 </td>
             </tr>
         </table>
         <h5>Constraint</h5>
-        <a href="#8712906">K</a>
+        <a href="#9343024">K</a>
         <span class="kw"> is </span>
         <a href="../System.Base/System.Base.html#class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC">String</a>
         &lt;<span class="kw">char</span>
         ><span class="kw"> and </span>
-        <a href="#8712907">T</a>
+        <a href="#9343025">T</a>
         <span class="kw"> is </span>
         <a href="#concept_JsonValueType_6519CA3F247A823EA53E9BBD4C42E505C0A78F5D">JsonValueType</a>
         <table>
@@ -3122,10 +3217,81 @@
                 </td>
                 <td class="params">
                     <a href="../System.Base/System.Base.html#class_HashMap_K_T_H_C_925D53DF947742545E7EC07D3487F3EA8C8D1D36">HashMap</a>
-                    &lt;<a href="#8712898">K</a>
-                    , <a href="#8712899">T</a>
-                    , <a href="#8712900">H</a>
-                    , <a href="#8712901">C</a>
+                    &lt;<a href="#9343020">K</a>
+                    , <a href="#9343021">T</a>
+                    , <a href="#9343022">H</a>
+                    , <a href="#9343023">C</a>
+                    >&amp;</td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h4 id="function_FromJson_F0AB8F8B2A3CAB4709E73C0B40ADEC76D5381496">FromJson&lt;K, T, H, C>(JsonValue* value, HashMap&lt;K, T, H, C>&amp; field) where K is ustring and T is JsonValueType Overload</h4>
+        <h5>Syntax</h5>
+        <table>
+            <tr>
+                <td>
+                    <span class="mono">public void FromJson&lt;K, T, H, C>(JsonValue* value, HashMap&lt;K, T, H, C>&amp; field);</span>
+                </td>
+            </tr>
+        </table>
+        <h5>Template Parameters</h5>
+        <table class="params">
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="9343016">K</span>
+                </td>
+            </tr>
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="9343017">T</span>
+                </td>
+            </tr>
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="9343018">H</span>
+                </td>
+            </tr>
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="9343019">C</span>
+                </td>
+            </tr>
+        </table>
+        <h5>Constraint</h5>
+        <a href="#9343016">K</a>
+        <span class="kw"> is </span>
+        <a href="../System.Base/System.Base.html#class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC">String</a>
+        &lt;<span class="kw">uchar</span>
+        ><span class="kw"> and </span>
+        <a href="#9343017">T</a>
+        <span class="kw"> is </span>
+        <a href="#concept_JsonValueType_6519CA3F247A823EA53E9BBD4C42E505C0A78F5D">JsonValueType</a>
+        <table>
+            <tr>
+                <td/>
+            </tr>
+        </table>
+        <h5>Parameters</h5>
+        <table class="params">
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">value</span>
+                </td>
+                <td class="params">
+                    <a href="#class_JsonValue_B86942C2856CC5758E1FB19BBBE97E4002D4008A">JsonValue</a>
+                    *</td>
+            </tr>
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">field</span>
+                </td>
+                <td class="params">
+                    <a href="../System.Base/System.Base.html#class_HashMap_K_T_H_C_925D53DF947742545E7EC07D3487F3EA8C8D1D36">HashMap</a>
+                    &lt;<a href="#9343020">K</a>
+                    , <a href="#9343021">T</a>
+                    , <a href="#9343022">H</a>
+                    , <a href="#9343023">C</a>
                     >&amp;</td>
             </tr>
         </table>
@@ -3144,26 +3310,26 @@
         <table class="params">
             <tr class="params">
                 <td class="params">
-                    <span class="param" id="8712914">Key</span>
+                    <span class="param" id="9343034">Key</span>
                 </td>
             </tr>
             <tr class="params">
                 <td class="params">
-                    <span class="param" id="8712915">Value</span>
+                    <span class="param" id="9343035">Value</span>
                 </td>
             </tr>
             <tr class="params">
                 <td class="params">
-                    <span class="param" id="8712916">KeyCompare</span>
+                    <span class="param" id="9343036">KeyCompare</span>
                 </td>
             </tr>
         </table>
         <h5>Constraint</h5>
-        <a href="#8712915">Value</a>
+        <a href="#9343035">Value</a>
         <span class="kw"> is </span>
         <a href="#concept_JsonValueType_6519CA3F247A823EA53E9BBD4C42E505C0A78F5D">JsonValueType</a>
         <span class="kw"> or </span>
-        <a href="#8712915">Value</a>
+        <a href="#9343035">Value</a>
         <span class="kw"> is </span>
         <a href="#concept_JsonConstructible_FDF8EB5A6050ED39397E14EF89FACCA63F29DDF2">JsonConstructible</a>
         <table>
@@ -3197,9 +3363,9 @@
                 </td>
                 <td class="params">
                     <a href="../System.Base/System.Base.html#class_Map_Key_Value_KeyCompare_530B43B96CDA5DBA8045A4DA0691BBB50DE2DB3D">Map</a>
-                    &lt;<a href="#8712886">Key</a>
-                    , <a href="#8712887">Value</a>
-                    , <a href="#8712888">KeyCompare</a>
+                    &lt;<a href="#9342933">Key</a>
+                    , <a href="#9342934">Value</a>
+                    , <a href="#9342935">KeyCompare</a>
                     >&amp;</td>
             </tr>
         </table>
@@ -3218,26 +3384,26 @@
         <table class="params">
             <tr class="params">
                 <td class="params">
-                    <span class="param" id="8712920">Key</span>
+                    <span class="param" id="9343040">Key</span>
                 </td>
             </tr>
             <tr class="params">
                 <td class="params">
-                    <span class="param" id="8712921">Value</span>
+                    <span class="param" id="9343041">Value</span>
                 </td>
             </tr>
             <tr class="params">
                 <td class="params">
-                    <span class="param" id="8712922">KeyCompare</span>
+                    <span class="param" id="9343042">KeyCompare</span>
                 </td>
             </tr>
         </table>
         <h5>Constraint</h5>
-        <a href="#8712921">Value</a>
+        <a href="#9343041">Value</a>
         <span class="kw"> is </span>
         <a href="#concept_JsonValueType_6519CA3F247A823EA53E9BBD4C42E505C0A78F5D">JsonValueType</a>
         <span class="kw"> or </span>
-        <a href="#8712921">Value</a>
+        <a href="#9343041">Value</a>
         <span class="kw"> is </span>
         <a href="#concept_JsonConstructible_FDF8EB5A6050ED39397E14EF89FACCA63F29DDF2">JsonConstructible</a>
         <table>
@@ -3271,9 +3437,9 @@
                 </td>
                 <td class="params">
                     <a href="../System.Base/System.Base.html#class_Map_Key_Value_KeyCompare_530B43B96CDA5DBA8045A4DA0691BBB50DE2DB3D">Map</a>
-                    &lt;<a href="#8712886">Key</a>
-                    , <a href="#8712887">Value</a>
-                    , <a href="#8712888">KeyCompare</a>
+                    &lt;<a href="#9342933">Key</a>
+                    , <a href="#9342934">Value</a>
+                    , <a href="#9342935">KeyCompare</a>
                     >&amp;</td>
             </tr>
         </table>
@@ -3292,26 +3458,26 @@
         <table class="params">
             <tr class="params">
                 <td class="params">
-                    <span class="param" id="8712917">Key</span>
+                    <span class="param" id="9343037">Key</span>
                 </td>
             </tr>
             <tr class="params">
                 <td class="params">
-                    <span class="param" id="8712918">Value</span>
+                    <span class="param" id="9343038">Value</span>
                 </td>
             </tr>
             <tr class="params">
                 <td class="params">
-                    <span class="param" id="8712919">KeyCompare</span>
+                    <span class="param" id="9343039">KeyCompare</span>
                 </td>
             </tr>
         </table>
         <h5>Constraint</h5>
-        <a href="#8712918">Value</a>
+        <a href="#9343038">Value</a>
         <span class="kw"> is </span>
         <a href="#concept_JsonValueType_6519CA3F247A823EA53E9BBD4C42E505C0A78F5D">JsonValueType</a>
         <span class="kw"> or </span>
-        <a href="#8712918">Value</a>
+        <a href="#9343038">Value</a>
         <span class="kw"> is </span>
         <a href="#concept_JsonConstructible_FDF8EB5A6050ED39397E14EF89FACCA63F29DDF2">JsonConstructible</a>
         <table>
@@ -3345,74 +3511,9 @@
                 </td>
                 <td class="params">
                     <a href="../System.Base/System.Base.html#class_Map_Key_Value_KeyCompare_530B43B96CDA5DBA8045A4DA0691BBB50DE2DB3D">Map</a>
-                    &lt;<a href="#8712886">Key</a>
-                    , <a href="#8712887">Value</a>
-                    , <a href="#8712888">KeyCompare</a>
-                    >&amp;</td>
-            </tr>
-        </table>
-        <br/>
-        <hr/>
-        <h4 id="function_FromJson_F0428D168859D23AC8741373B4D4CE9BD7E604BF">FromJson&lt;Key, Value, KeyCompare>(JsonValue* value, Map&lt;Key, Value, KeyCompare>&amp; field) where Key is wstring and Value is JsonValueType Overload</h4>
-        <h5>Syntax</h5>
-        <table>
-            <tr>
-                <td>
-                    <span class="mono">public void FromJson&lt;Key, Value, KeyCompare>(JsonValue* value, Map&lt;Key, Value, KeyCompare>&amp; field);</span>
-                </td>
-            </tr>
-        </table>
-        <h5>Template Parameters</h5>
-        <table class="params">
-            <tr class="params">
-                <td class="params">
-                    <span class="param" id="8712883">Key</span>
-                </td>
-            </tr>
-            <tr class="params">
-                <td class="params">
-                    <span class="param" id="8712884">Value</span>
-                </td>
-            </tr>
-            <tr class="params">
-                <td class="params">
-                    <span class="param" id="8712885">KeyCompare</span>
-                </td>
-            </tr>
-        </table>
-        <h5>Constraint</h5>
-        <a href="#8712883">Key</a>
-        <span class="kw"> is </span>
-        <a href="../System.Base/System.Base.html#class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC">String</a>
-        &lt;<span class="kw">wchar</span>
-        ><span class="kw"> and </span>
-        <a href="#8712884">Value</a>
-        <span class="kw"> is </span>
-        <a href="#concept_JsonValueType_6519CA3F247A823EA53E9BBD4C42E505C0A78F5D">JsonValueType</a>
-        <table>
-            <tr>
-                <td/>
-            </tr>
-        </table>
-        <h5>Parameters</h5>
-        <table class="params">
-            <tr class="params">
-                <td class="params">
-                    <span class="param" id="">value</span>
-                </td>
-                <td class="params">
-                    <a href="#class_JsonValue_B86942C2856CC5758E1FB19BBBE97E4002D4008A">JsonValue</a>
-                    *</td>
-            </tr>
-            <tr class="params">
-                <td class="params">
-                    <span class="param" id="">field</span>
-                </td>
-                <td class="params">
-                    <a href="../System.Base/System.Base.html#class_Map_Key_Value_KeyCompare_530B43B96CDA5DBA8045A4DA0691BBB50DE2DB3D">Map</a>
-                    &lt;<a href="#8712886">Key</a>
-                    , <a href="#8712887">Value</a>
-                    , <a href="#8712888">KeyCompare</a>
+                    &lt;<a href="#9342933">Key</a>
+                    , <a href="#9342934">Value</a>
+                    , <a href="#9342935">KeyCompare</a>
                     >&amp;</td>
             </tr>
         </table>
@@ -3431,27 +3532,27 @@
         <table class="params">
             <tr class="params">
                 <td class="params">
-                    <span class="param" id="8712889">Key</span>
+                    <span class="param" id="9343007">Key</span>
                 </td>
             </tr>
             <tr class="params">
                 <td class="params">
-                    <span class="param" id="8712890">Value</span>
+                    <span class="param" id="9343008">Value</span>
                 </td>
             </tr>
             <tr class="params">
                 <td class="params">
-                    <span class="param" id="8712891">KeyCompare</span>
+                    <span class="param" id="9343009">KeyCompare</span>
                 </td>
             </tr>
         </table>
         <h5>Constraint</h5>
-        <a href="#8712889">Key</a>
+        <a href="#9343007">Key</a>
         <span class="kw"> is </span>
         <a href="../System.Base/System.Base.html#class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC">String</a>
         &lt;<span class="kw">uchar</span>
         ><span class="kw"> and </span>
-        <a href="#8712890">Value</a>
+        <a href="#9343008">Value</a>
         <span class="kw"> is </span>
         <a href="#concept_JsonConstructible_FDF8EB5A6050ED39397E14EF89FACCA63F29DDF2">JsonConstructible</a>
         <table>
@@ -3475,9 +3576,9 @@
                 </td>
                 <td class="params">
                     <a href="../System.Base/System.Base.html#class_Map_Key_Value_KeyCompare_530B43B96CDA5DBA8045A4DA0691BBB50DE2DB3D">Map</a>
-                    &lt;<a href="#8712886">Key</a>
-                    , <a href="#8712887">Value</a>
-                    , <a href="#8712888">KeyCompare</a>
+                    &lt;<a href="#9342933">Key</a>
+                    , <a href="#9342934">Value</a>
+                    , <a href="#9342935">KeyCompare</a>
                     >&amp;</td>
             </tr>
         </table>
@@ -3496,27 +3597,27 @@
         <table class="params">
             <tr class="params">
                 <td class="params">
-                    <span class="param" id="8712892">Key</span>
+                    <span class="param" id="9343010">Key</span>
                 </td>
             </tr>
             <tr class="params">
                 <td class="params">
-                    <span class="param" id="8712893">Value</span>
+                    <span class="param" id="9343011">Value</span>
                 </td>
             </tr>
             <tr class="params">
                 <td class="params">
-                    <span class="param" id="8712894">KeyCompare</span>
+                    <span class="param" id="9343012">KeyCompare</span>
                 </td>
             </tr>
         </table>
         <h5>Constraint</h5>
-        <a href="#8712892">Key</a>
+        <a href="#9343010">Key</a>
         <span class="kw"> is </span>
         <a href="../System.Base/System.Base.html#class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC">String</a>
         &lt;<span class="kw">wchar</span>
         ><span class="kw"> and </span>
-        <a href="#8712893">Value</a>
+        <a href="#9343011">Value</a>
         <span class="kw"> is </span>
         <a href="#concept_JsonConstructible_FDF8EB5A6050ED39397E14EF89FACCA63F29DDF2">JsonConstructible</a>
         <table>
@@ -3540,9 +3641,9 @@
                 </td>
                 <td class="params">
                     <a href="../System.Base/System.Base.html#class_Map_Key_Value_KeyCompare_530B43B96CDA5DBA8045A4DA0691BBB50DE2DB3D">Map</a>
-                    &lt;<a href="#8712886">Key</a>
-                    , <a href="#8712887">Value</a>
-                    , <a href="#8712888">KeyCompare</a>
+                    &lt;<a href="#9342933">Key</a>
+                    , <a href="#9342934">Value</a>
+                    , <a href="#9342935">KeyCompare</a>
                     >&amp;</td>
             </tr>
         </table>
@@ -3561,27 +3662,27 @@
         <table class="params">
             <tr class="params">
                 <td class="params">
-                    <span class="param" id="8712895">Key</span>
+                    <span class="param" id="9343013">Key</span>
                 </td>
             </tr>
             <tr class="params">
                 <td class="params">
-                    <span class="param" id="8712896">Value</span>
+                    <span class="param" id="9343014">Value</span>
                 </td>
             </tr>
             <tr class="params">
                 <td class="params">
-                    <span class="param" id="8712897">KeyCompare</span>
+                    <span class="param" id="9343015">KeyCompare</span>
                 </td>
             </tr>
         </table>
         <h5>Constraint</h5>
-        <a href="#8712895">Key</a>
+        <a href="#9343013">Key</a>
         <span class="kw"> is </span>
         <a href="../System.Base/System.Base.html#class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC">String</a>
         &lt;<span class="kw">char</span>
         ><span class="kw"> and </span>
-        <a href="#8712896">Value</a>
+        <a href="#9343014">Value</a>
         <span class="kw"> is </span>
         <a href="#concept_JsonConstructible_FDF8EB5A6050ED39397E14EF89FACCA63F29DDF2">JsonConstructible</a>
         <table>
@@ -3605,74 +3706,9 @@
                 </td>
                 <td class="params">
                     <a href="../System.Base/System.Base.html#class_Map_Key_Value_KeyCompare_530B43B96CDA5DBA8045A4DA0691BBB50DE2DB3D">Map</a>
-                    &lt;<a href="#8712886">Key</a>
-                    , <a href="#8712887">Value</a>
-                    , <a href="#8712888">KeyCompare</a>
-                    >&amp;</td>
-            </tr>
-        </table>
-        <br/>
-        <hr/>
-        <h4 id="function_FromJson_325A8C52C7395B16BC61FCDE988845CF3900DD30">FromJson&lt;Key, Value, KeyCompare>(JsonValue* value, Map&lt;Key, Value, KeyCompare>&amp; field) where Key is string and Value is JsonValueType Overload</h4>
-        <h5>Syntax</h5>
-        <table>
-            <tr>
-                <td>
-                    <span class="mono">public void FromJson&lt;Key, Value, KeyCompare>(JsonValue* value, Map&lt;Key, Value, KeyCompare>&amp; field);</span>
-                </td>
-            </tr>
-        </table>
-        <h5>Template Parameters</h5>
-        <table class="params">
-            <tr class="params">
-                <td class="params">
-                    <span class="param" id="8712886">Key</span>
-                </td>
-            </tr>
-            <tr class="params">
-                <td class="params">
-                    <span class="param" id="8712887">Value</span>
-                </td>
-            </tr>
-            <tr class="params">
-                <td class="params">
-                    <span class="param" id="8712888">KeyCompare</span>
-                </td>
-            </tr>
-        </table>
-        <h5>Constraint</h5>
-        <a href="#8712886">Key</a>
-        <span class="kw"> is </span>
-        <a href="../System.Base/System.Base.html#class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC">String</a>
-        &lt;<span class="kw">char</span>
-        ><span class="kw"> and </span>
-        <a href="#8712887">Value</a>
-        <span class="kw"> is </span>
-        <a href="#concept_JsonValueType_6519CA3F247A823EA53E9BBD4C42E505C0A78F5D">JsonValueType</a>
-        <table>
-            <tr>
-                <td/>
-            </tr>
-        </table>
-        <h5>Parameters</h5>
-        <table class="params">
-            <tr class="params">
-                <td class="params">
-                    <span class="param" id="">value</span>
-                </td>
-                <td class="params">
-                    <a href="#class_JsonValue_B86942C2856CC5758E1FB19BBBE97E4002D4008A">JsonValue</a>
-                    *</td>
-            </tr>
-            <tr class="params">
-                <td class="params">
-                    <span class="param" id="">field</span>
-                </td>
-                <td class="params">
-                    <a href="../System.Base/System.Base.html#class_Map_Key_Value_KeyCompare_530B43B96CDA5DBA8045A4DA0691BBB50DE2DB3D">Map</a>
-                    &lt;<a href="#8712886">Key</a>
-                    , <a href="#8712887">Value</a>
-                    , <a href="#8712888">KeyCompare</a>
+                    &lt;<a href="#9342933">Key</a>
+                    , <a href="#9342934">Value</a>
+                    , <a href="#9342935">KeyCompare</a>
                     >&amp;</td>
             </tr>
         </table>
@@ -3691,27 +3727,27 @@
         <table class="params">
             <tr class="params">
                 <td class="params">
-                    <span class="param" id="8712880">Key</span>
+                    <span class="param" id="9342998">Key</span>
                 </td>
             </tr>
             <tr class="params">
                 <td class="params">
-                    <span class="param" id="8712881">Value</span>
+                    <span class="param" id="9342999">Value</span>
                 </td>
             </tr>
             <tr class="params">
                 <td class="params">
-                    <span class="param" id="8712882">KeyCompare</span>
+                    <span class="param" id="9343000">KeyCompare</span>
                 </td>
             </tr>
         </table>
         <h5>Constraint</h5>
-        <a href="#8712880">Key</a>
+        <a href="#9342998">Key</a>
         <span class="kw"> is </span>
         <a href="../System.Base/System.Base.html#class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC">String</a>
         &lt;<span class="kw">uchar</span>
         ><span class="kw"> and </span>
-        <a href="#8712881">Value</a>
+        <a href="#9342999">Value</a>
         <span class="kw"> is </span>
         <a href="#concept_JsonValueType_6519CA3F247A823EA53E9BBD4C42E505C0A78F5D">JsonValueType</a>
         <table>
@@ -3735,9 +3771,139 @@
                 </td>
                 <td class="params">
                     <a href="../System.Base/System.Base.html#class_Map_Key_Value_KeyCompare_530B43B96CDA5DBA8045A4DA0691BBB50DE2DB3D">Map</a>
-                    &lt;<a href="#8712886">Key</a>
-                    , <a href="#8712887">Value</a>
-                    , <a href="#8712888">KeyCompare</a>
+                    &lt;<a href="#9342933">Key</a>
+                    , <a href="#9342934">Value</a>
+                    , <a href="#9342935">KeyCompare</a>
+                    >&amp;</td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h4 id="function_FromJson_F0428D168859D23AC8741373B4D4CE9BD7E604BF">FromJson&lt;Key, Value, KeyCompare>(JsonValue* value, Map&lt;Key, Value, KeyCompare>&amp; field) where Key is wstring and Value is JsonValueType Overload</h4>
+        <h5>Syntax</h5>
+        <table>
+            <tr>
+                <td>
+                    <span class="mono">public void FromJson&lt;Key, Value, KeyCompare>(JsonValue* value, Map&lt;Key, Value, KeyCompare>&amp; field);</span>
+                </td>
+            </tr>
+        </table>
+        <h5>Template Parameters</h5>
+        <table class="params">
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="9343001">Key</span>
+                </td>
+            </tr>
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="9343002">Value</span>
+                </td>
+            </tr>
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="9343003">KeyCompare</span>
+                </td>
+            </tr>
+        </table>
+        <h5>Constraint</h5>
+        <a href="#9343001">Key</a>
+        <span class="kw"> is </span>
+        <a href="../System.Base/System.Base.html#class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC">String</a>
+        &lt;<span class="kw">wchar</span>
+        ><span class="kw"> and </span>
+        <a href="#9343002">Value</a>
+        <span class="kw"> is </span>
+        <a href="#concept_JsonValueType_6519CA3F247A823EA53E9BBD4C42E505C0A78F5D">JsonValueType</a>
+        <table>
+            <tr>
+                <td/>
+            </tr>
+        </table>
+        <h5>Parameters</h5>
+        <table class="params">
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">value</span>
+                </td>
+                <td class="params">
+                    <a href="#class_JsonValue_B86942C2856CC5758E1FB19BBBE97E4002D4008A">JsonValue</a>
+                    *</td>
+            </tr>
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">field</span>
+                </td>
+                <td class="params">
+                    <a href="../System.Base/System.Base.html#class_Map_Key_Value_KeyCompare_530B43B96CDA5DBA8045A4DA0691BBB50DE2DB3D">Map</a>
+                    &lt;<a href="#9342933">Key</a>
+                    , <a href="#9342934">Value</a>
+                    , <a href="#9342935">KeyCompare</a>
+                    >&amp;</td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h4 id="function_FromJson_325A8C52C7395B16BC61FCDE988845CF3900DD30">FromJson&lt;Key, Value, KeyCompare>(JsonValue* value, Map&lt;Key, Value, KeyCompare>&amp; field) where Key is string and Value is JsonValueType Overload</h4>
+        <h5>Syntax</h5>
+        <table>
+            <tr>
+                <td>
+                    <span class="mono">public void FromJson&lt;Key, Value, KeyCompare>(JsonValue* value, Map&lt;Key, Value, KeyCompare>&amp; field);</span>
+                </td>
+            </tr>
+        </table>
+        <h5>Template Parameters</h5>
+        <table class="params">
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="9343004">Key</span>
+                </td>
+            </tr>
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="9343005">Value</span>
+                </td>
+            </tr>
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="9343006">KeyCompare</span>
+                </td>
+            </tr>
+        </table>
+        <h5>Constraint</h5>
+        <a href="#9343004">Key</a>
+        <span class="kw"> is </span>
+        <a href="../System.Base/System.Base.html#class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC">String</a>
+        &lt;<span class="kw">char</span>
+        ><span class="kw"> and </span>
+        <a href="#9343005">Value</a>
+        <span class="kw"> is </span>
+        <a href="#concept_JsonValueType_6519CA3F247A823EA53E9BBD4C42E505C0A78F5D">JsonValueType</a>
+        <table>
+            <tr>
+                <td/>
+            </tr>
+        </table>
+        <h5>Parameters</h5>
+        <table class="params">
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">value</span>
+                </td>
+                <td class="params">
+                    <a href="#class_JsonValue_B86942C2856CC5758E1FB19BBBE97E4002D4008A">JsonValue</a>
+                    *</td>
+            </tr>
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">field</span>
+                </td>
+                <td class="params">
+                    <a href="../System.Base/System.Base.html#class_Map_Key_Value_KeyCompare_530B43B96CDA5DBA8045A4DA0691BBB50DE2DB3D">Map</a>
+                    &lt;<a href="#9342933">Key</a>
+                    , <a href="#9342934">Value</a>
+                    , <a href="#9342935">KeyCompare</a>
                     >&amp;</td>
             </tr>
         </table>
@@ -3756,16 +3922,16 @@
         <table class="params">
             <tr class="params">
                 <td class="params">
-                    <span class="param" id="8712911">T</span>
+                    <span class="param" id="9343031">T</span>
                 </td>
             </tr>
         </table>
         <h5>Constraint</h5>
-        <a href="#8712911">T</a>
+        <a href="#9343031">T</a>
         <span class="kw"> is </span>
         <a href="#concept_JsonValueType_6519CA3F247A823EA53E9BBD4C42E505C0A78F5D">JsonValueType</a>
         <span class="kw"> or </span>
-        <a href="#8712911">T</a>
+        <a href="#9343031">T</a>
         <span class="kw"> is </span>
         <a href="#concept_JsonConstructible_FDF8EB5A6050ED39397E14EF89FACCA63F29DDF2">JsonConstructible</a>
         <table>
@@ -3799,7 +3965,7 @@
                 </td>
                 <td class="params">
                     <a href="../System.Base/System.Base.html#class_List_T_579A89BF19B54042190CDE2A7E54E1DFAAFDB31C">List</a>
-                    &lt;<a href="#8712911">T</a>
+                    &lt;<a href="#9342997">T</a>
                     >&amp;</td>
             </tr>
         </table>
@@ -3818,12 +3984,12 @@
         <table class="params">
             <tr class="params">
                 <td class="params">
-                    <span class="param" id="8712935">T</span>
+                    <span class="param" id="9343055">T</span>
                 </td>
             </tr>
         </table>
         <h5>Constraint</h5>
-        <a href="#8712935">T</a>
+        <a href="#9343055">T</a>
         <span class="kw"> is </span>
         <a href="#concept_JsonConstructible_FDF8EB5A6050ED39397E14EF89FACCA63F29DDF2">JsonConstructible</a>
         <table>
@@ -3856,7 +4022,7 @@
                     <span class="param" id="">field</span>
                 </td>
                 <td class="params">
-                    <a href="#8712935">T</a>
+                    <a href="#9343055">T</a>
                     &amp;</td>
             </tr>
         </table>
@@ -3875,16 +4041,16 @@
         <table class="params">
             <tr class="params">
                 <td class="params">
-                    <span class="param" id="8712913">T</span>
+                    <span class="param" id="9343033">T</span>
                 </td>
             </tr>
         </table>
         <h5>Constraint</h5>
-        <a href="#8712913">T</a>
+        <a href="#9343033">T</a>
         <span class="kw"> is </span>
         <a href="#concept_JsonValueType_6519CA3F247A823EA53E9BBD4C42E505C0A78F5D">JsonValueType</a>
         <span class="kw"> or </span>
-        <a href="#8712913">T</a>
+        <a href="#9343033">T</a>
         <span class="kw"> is </span>
         <a href="#concept_JsonConstructible_FDF8EB5A6050ED39397E14EF89FACCA63F29DDF2">JsonConstructible</a>
         <table>
@@ -3918,7 +4084,65 @@
                 </td>
                 <td class="params">
                     <a href="../System.Base/System.Base.html#class_List_T_579A89BF19B54042190CDE2A7E54E1DFAAFDB31C">List</a>
-                    &lt;<a href="#8712911">T</a>
+                    &lt;<a href="#9342997">T</a>
+                    >&amp;</td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h4 id="function_FromJson_81D5153F2F4A29AEE9BCF03163C9DA49BD818293">FromJson&lt;T>(JsonValue* container, const String&lt;uchar>&amp; fieldName, SharedPtr&lt;T>&amp; field) where T is JsonConstructible Overload</h4>
+        <h5>Syntax</h5>
+        <table>
+            <tr>
+                <td>
+                    <span class="mono">public void FromJson&lt;T>(JsonValue* container, const String&lt;uchar>&amp; fieldName, SharedPtr&lt;T>&amp; field);</span>
+                </td>
+            </tr>
+        </table>
+        <h5>Template Parameters</h5>
+        <table class="params">
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="9343059">T</span>
+                </td>
+            </tr>
+        </table>
+        <h5>Constraint</h5>
+        <a href="#9343059">T</a>
+        <span class="kw"> is </span>
+        <a href="#concept_JsonConstructible_FDF8EB5A6050ED39397E14EF89FACCA63F29DDF2">JsonConstructible</a>
+        <table>
+            <tr>
+                <td/>
+            </tr>
+        </table>
+        <h5>Parameters</h5>
+        <table class="params">
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">container</span>
+                </td>
+                <td class="params">
+                    <a href="#class_JsonValue_B86942C2856CC5758E1FB19BBBE97E4002D4008A">JsonValue</a>
+                    *</td>
+            </tr>
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">fieldName</span>
+                </td>
+                <td class="params">
+                    <span class="kw">const </span>
+                    <a href="../System.Base/System.Base.html#class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC">String</a>
+                    &lt;<span class="kw">uchar</span>
+                    >&amp;</td>
+            </tr>
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">field</span>
+                </td>
+                <td class="params">
+                    <a href="../System.Base/System.Base.html#class_SharedPtr_T_E2198BEF58335A9A782FD48D7E8DFFD1A2D8865F">SharedPtr</a>
+                    &lt;<a href="../System.Base/System.Base.html#9329972">T</a>
                     >&amp;</td>
             </tr>
         </table>
@@ -3937,12 +4161,12 @@
         <table class="params">
             <tr class="params">
                 <td class="params">
-                    <span class="param" id="8712937">T</span>
+                    <span class="param" id="9343057">T</span>
                 </td>
             </tr>
         </table>
         <h5>Constraint</h5>
-        <a href="#8712937">T</a>
+        <a href="#9343057">T</a>
         <span class="kw"> is </span>
         <a href="#concept_JsonConstructible_FDF8EB5A6050ED39397E14EF89FACCA63F29DDF2">JsonConstructible</a>
         <table>
@@ -3975,8 +4199,66 @@
                     <span class="param" id="">field</span>
                 </td>
                 <td class="params">
-                    <a href="#8712937">T</a>
+                    <a href="#9343057">T</a>
                     &amp;</td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h4 id="function_FromJson_70EE2D3B1295C9C06D9783A1F0BC443E999DCF09">FromJson&lt;T>(JsonValue* container, const String&lt;uchar>&amp; fieldName, UniquePtr&lt;T>&amp; field) where T is JsonConstructible Overload</h4>
+        <h5>Syntax</h5>
+        <table>
+            <tr>
+                <td>
+                    <span class="mono">public void FromJson&lt;T>(JsonValue* container, const String&lt;uchar>&amp; fieldName, UniquePtr&lt;T>&amp; field);</span>
+                </td>
+            </tr>
+        </table>
+        <h5>Template Parameters</h5>
+        <table class="params">
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="9343058">T</span>
+                </td>
+            </tr>
+        </table>
+        <h5>Constraint</h5>
+        <a href="#9343058">T</a>
+        <span class="kw"> is </span>
+        <a href="#concept_JsonConstructible_FDF8EB5A6050ED39397E14EF89FACCA63F29DDF2">JsonConstructible</a>
+        <table>
+            <tr>
+                <td/>
+            </tr>
+        </table>
+        <h5>Parameters</h5>
+        <table class="params">
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">container</span>
+                </td>
+                <td class="params">
+                    <a href="#class_JsonValue_B86942C2856CC5758E1FB19BBBE97E4002D4008A">JsonValue</a>
+                    *</td>
+            </tr>
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">fieldName</span>
+                </td>
+                <td class="params">
+                    <span class="kw">const </span>
+                    <a href="../System.Base/System.Base.html#class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC">String</a>
+                    &lt;<span class="kw">uchar</span>
+                    >&amp;</td>
+            </tr>
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">field</span>
+                </td>
+                <td class="params">
+                    <a href="../System.Base/System.Base.html#class_UniquePtr_T_793F841C13E9DD3A6869243C74F1D948C0E04009">UniquePtr</a>
+                    &lt;<a href="#9343029">T</a>
+                    >&amp;</td>
             </tr>
         </table>
         <br/>
@@ -3994,16 +4276,16 @@
         <table class="params">
             <tr class="params">
                 <td class="params">
-                    <span class="param" id="8712912">T</span>
+                    <span class="param" id="9343032">T</span>
                 </td>
             </tr>
         </table>
         <h5>Constraint</h5>
-        <a href="#8712912">T</a>
+        <a href="#9343032">T</a>
         <span class="kw"> is </span>
         <a href="#concept_JsonValueType_6519CA3F247A823EA53E9BBD4C42E505C0A78F5D">JsonValueType</a>
         <span class="kw"> or </span>
-        <a href="#8712912">T</a>
+        <a href="#9343032">T</a>
         <span class="kw"> is </span>
         <a href="#concept_JsonConstructible_FDF8EB5A6050ED39397E14EF89FACCA63F29DDF2">JsonConstructible</a>
         <table>
@@ -4037,7 +4319,7 @@
                 </td>
                 <td class="params">
                     <a href="../System.Base/System.Base.html#class_List_T_579A89BF19B54042190CDE2A7E54E1DFAAFDB31C">List</a>
-                    &lt;<a href="#8712911">T</a>
+                    &lt;<a href="#9342997">T</a>
                     >&amp;</td>
             </tr>
         </table>
@@ -4056,12 +4338,12 @@
         <table class="params">
             <tr class="params">
                 <td class="params">
-                    <span class="param" id="8712936">T</span>
+                    <span class="param" id="9343056">T</span>
                 </td>
             </tr>
         </table>
         <h5>Constraint</h5>
-        <a href="#8712936">T</a>
+        <a href="#9343056">T</a>
         <span class="kw"> is </span>
         <a href="#concept_JsonConstructible_FDF8EB5A6050ED39397E14EF89FACCA63F29DDF2">JsonConstructible</a>
         <table>
@@ -4094,7 +4376,7 @@
                     <span class="param" id="">field</span>
                 </td>
                 <td class="params">
-                    <a href="#8712936">T</a>
+                    <a href="#9343056">T</a>
                     &amp;</td>
             </tr>
         </table>
@@ -4113,12 +4395,12 @@
         <table class="params">
             <tr class="params">
                 <td class="params">
-                    <span class="param" id="8712879">T</span>
+                    <span class="param" id="9342997">T</span>
                 </td>
             </tr>
         </table>
         <h5>Constraint</h5>
-        <a href="#8712879">T</a>
+        <a href="#9342997">T</a>
         <span class="kw"> is </span>
         <a href="#concept_JsonConstructible_FDF8EB5A6050ED39397E14EF89FACCA63F29DDF2">JsonConstructible</a>
         <table>
@@ -4142,7 +4424,7 @@
                 </td>
                 <td class="params">
                     <a href="../System.Base/System.Base.html#class_List_T_579A89BF19B54042190CDE2A7E54E1DFAAFDB31C">List</a>
-                    &lt;<a href="#8712911">T</a>
+                    &lt;<a href="#9342997">T</a>
                     >&amp;</td>
             </tr>
         </table>
@@ -4161,12 +4443,12 @@
         <table class="params">
             <tr class="params">
                 <td class="params">
-                    <span class="param" id="8712878">T</span>
+                    <span class="param" id="9342996">T</span>
                 </td>
             </tr>
         </table>
         <h5>Constraint</h5>
-        <a href="#8712878">T</a>
+        <a href="#9342996">T</a>
         <span class="kw"> is </span>
         <a href="#concept_JsonValueType_6519CA3F247A823EA53E9BBD4C42E505C0A78F5D">JsonValueType</a>
         <table>
@@ -4190,18 +4472,18 @@
                 </td>
                 <td class="params">
                     <a href="../System.Base/System.Base.html#class_List_T_579A89BF19B54042190CDE2A7E54E1DFAAFDB31C">List</a>
-                    &lt;<a href="#8712911">T</a>
+                    &lt;<a href="#9342997">T</a>
                     >&amp;</td>
             </tr>
         </table>
         <br/>
         <hr/>
-        <h4 id="function_FromJson_E078F94C43EA1E961A54E8B518B61B936C577B8C">FromJson&lt;T>(JsonValue* value, T&amp; field) where T is JsonConstructible Overload</h4>
+        <h4 id="function_FromJson_B5BA065DFD8F981C687FCC85E634D2BEC7B5F534">FromJson&lt;T>(JsonValue* value, SharedPtr&lt;T>&amp; field) where T is JsonConstructible Overload</h4>
         <h5>Syntax</h5>
         <table>
             <tr>
                 <td>
-                    <span class="mono">public void FromJson&lt;T>(JsonValue* value, T&amp; field);</span>
+                    <span class="mono">public void FromJson&lt;T>(JsonValue* value, SharedPtr&lt;T>&amp; field);</span>
                 </td>
             </tr>
         </table>
@@ -4209,12 +4491,12 @@
         <table class="params">
             <tr class="params">
                 <td class="params">
-                    <span class="param" id="8712910">T</span>
+                    <span class="param" id="9343030">T</span>
                 </td>
             </tr>
         </table>
         <h5>Constraint</h5>
-        <a href="#8712910">T</a>
+        <a href="#9343030">T</a>
         <span class="kw"> is </span>
         <a href="#concept_JsonConstructible_FDF8EB5A6050ED39397E14EF89FACCA63F29DDF2">JsonConstructible</a>
         <table>
@@ -4237,8 +4519,104 @@
                     <span class="param" id="">field</span>
                 </td>
                 <td class="params">
-                    <a href="#8712910">T</a>
+                    <a href="../System.Base/System.Base.html#class_SharedPtr_T_E2198BEF58335A9A782FD48D7E8DFFD1A2D8865F">SharedPtr</a>
+                    &lt;<a href="../System.Base/System.Base.html#9329972">T</a>
+                    >&amp;</td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h4 id="function_FromJson_E078F94C43EA1E961A54E8B518B61B936C577B8C">FromJson&lt;T>(JsonValue* value, T&amp; field) where T is JsonConstructible Overload</h4>
+        <h5>Syntax</h5>
+        <table>
+            <tr>
+                <td>
+                    <span class="mono">public void FromJson&lt;T>(JsonValue* value, T&amp; field);</span>
+                </td>
+            </tr>
+        </table>
+        <h5>Template Parameters</h5>
+        <table class="params">
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="9343028">T</span>
+                </td>
+            </tr>
+        </table>
+        <h5>Constraint</h5>
+        <a href="#9343028">T</a>
+        <span class="kw"> is </span>
+        <a href="#concept_JsonConstructible_FDF8EB5A6050ED39397E14EF89FACCA63F29DDF2">JsonConstructible</a>
+        <table>
+            <tr>
+                <td/>
+            </tr>
+        </table>
+        <h5>Parameters</h5>
+        <table class="params">
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">value</span>
+                </td>
+                <td class="params">
+                    <a href="#class_JsonValue_B86942C2856CC5758E1FB19BBBE97E4002D4008A">JsonValue</a>
+                    *</td>
+            </tr>
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">field</span>
+                </td>
+                <td class="params">
+                    <a href="#9343028">T</a>
                     &amp;</td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h4 id="function_FromJson_97B0CE17747A8F5A6697880760B61937E269F734">FromJson&lt;T>(JsonValue* value, UniquePtr&lt;T>&amp; field) where T is JsonConstructible Overload</h4>
+        <h5>Syntax</h5>
+        <table>
+            <tr>
+                <td>
+                    <span class="mono">public void FromJson&lt;T>(JsonValue* value, UniquePtr&lt;T>&amp; field);</span>
+                </td>
+            </tr>
+        </table>
+        <h5>Template Parameters</h5>
+        <table class="params">
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="9343029">T</span>
+                </td>
+            </tr>
+        </table>
+        <h5>Constraint</h5>
+        <a href="#9343029">T</a>
+        <span class="kw"> is </span>
+        <a href="#concept_JsonConstructible_FDF8EB5A6050ED39397E14EF89FACCA63F29DDF2">JsonConstructible</a>
+        <table>
+            <tr>
+                <td/>
+            </tr>
+        </table>
+        <h5>Parameters</h5>
+        <table class="params">
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">value</span>
+                </td>
+                <td class="params">
+                    <a href="#class_JsonValue_B86942C2856CC5758E1FB19BBBE97E4002D4008A">JsonValue</a>
+                    *</td>
+            </tr>
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">field</span>
+                </td>
+                <td class="params">
+                    <a href="../System.Base/System.Base.html#class_UniquePtr_T_793F841C13E9DD3A6869243C74F1D948C0E04009">UniquePtr</a>
+                    &lt;<a href="#9343029">T</a>
+                    >&amp;</td>
             </tr>
         </table>
         <br/>
@@ -4363,6 +4741,123 @@
         </table>
         <br/>
         <hr/>
+        <h3 id="function_group_RegisterJsonClass_9F196AC1276E724F3E7E8FF1338696EA5D4B6DBA">RegisterJsonClass Function</h3>
+        <h4>Overloads</h4>
+        <table>
+            <tr>
+                <td>
+                    <a href="#function_RegisterJsonClass_2FBE4E8832266A3352BF1717BFB867612A99D471">RegisterJsonClass(const String&lt;char>&amp; jsonClassName, JsonClassCreatorDelegate creator)</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="#function_RegisterJsonClass_A3D18EABE8AD1F9D0C4A42DF133AD4E9CC2F8B98">RegisterJsonClass(const String&lt;uchar>&amp; jsonClassName, JsonClassCreatorDelegate creator)</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="#function_RegisterJsonClass_F2E6271DBF6A1478AD929ED54A519E0D2BCBD5AE">RegisterJsonClass(const String&lt;wchar>&amp; jsonClassName, JsonClassCreatorDelegate creator)</a>
+                </td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h4 id="function_RegisterJsonClass_2FBE4E8832266A3352BF1717BFB867612A99D471">RegisterJsonClass(const String&lt;char>&amp; jsonClassName, JsonClassCreatorDelegate creator) Overload</h4>
+        <h5>Syntax</h5>
+        <table>
+            <tr>
+                <td>
+                    <span class="mono">public void RegisterJsonClass(const String&lt;char>&amp; jsonClassName, JsonClassCreatorDelegate creator);</span>
+                </td>
+            </tr>
+        </table>
+        <h5>Parameters</h5>
+        <table class="params">
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">jsonClassName</span>
+                </td>
+                <td class="params">
+                    <span class="kw">const </span>
+                    <a href="../System.Base/System.Base.html#class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC">String</a>
+                    &lt;<span class="kw">char</span>
+                    >&amp;</td>
+            </tr>
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">creator</span>
+                </td>
+                <td class="params">
+                    <a href="#9342920">JsonClassCreatorDelegate</a>
+                </td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h4 id="function_RegisterJsonClass_A3D18EABE8AD1F9D0C4A42DF133AD4E9CC2F8B98">RegisterJsonClass(const String&lt;uchar>&amp; jsonClassName, JsonClassCreatorDelegate creator) Overload</h4>
+        <h5>Syntax</h5>
+        <table>
+            <tr>
+                <td>
+                    <span class="mono">public void RegisterJsonClass(const String&lt;uchar>&amp; jsonClassName, JsonClassCreatorDelegate creator);</span>
+                </td>
+            </tr>
+        </table>
+        <h5>Parameters</h5>
+        <table class="params">
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">jsonClassName</span>
+                </td>
+                <td class="params">
+                    <span class="kw">const </span>
+                    <a href="../System.Base/System.Base.html#class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC">String</a>
+                    &lt;<span class="kw">uchar</span>
+                    >&amp;</td>
+            </tr>
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">creator</span>
+                </td>
+                <td class="params">
+                    <a href="#9342920">JsonClassCreatorDelegate</a>
+                </td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h4 id="function_RegisterJsonClass_F2E6271DBF6A1478AD929ED54A519E0D2BCBD5AE">RegisterJsonClass(const String&lt;wchar>&amp; jsonClassName, JsonClassCreatorDelegate creator) Overload</h4>
+        <h5>Syntax</h5>
+        <table>
+            <tr>
+                <td>
+                    <span class="mono">public void RegisterJsonClass(const String&lt;wchar>&amp; jsonClassName, JsonClassCreatorDelegate creator);</span>
+                </td>
+            </tr>
+        </table>
+        <h5>Parameters</h5>
+        <table class="params">
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">jsonClassName</span>
+                </td>
+                <td class="params">
+                    <span class="kw">const </span>
+                    <a href="../System.Base/System.Base.html#class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC">String</a>
+                    &lt;<span class="kw">wchar</span>
+                    >&amp;</td>
+            </tr>
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">creator</span>
+                </td>
+                <td class="params">
+                    <a href="#9342920">JsonClassCreatorDelegate</a>
+                </td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
         <h3 id="function_group_ToJson_80373CB69AD5A80A6592CC2418A5282FCB2D0F14">ToJson Function</h3>
         <h4>Overloads</h4>
         <table>
@@ -4393,12 +4888,12 @@
             </tr>
             <tr>
                 <td>
-                    <a href="#function_ToJson_91FBDD8DFFF0BEB6D6C29EC753DF3D9249916F3C">ToJson&lt;K, T, H, C>(const HashMap&lt;K, T, H, C>&amp; value) where K is wstring or K is string</a>
+                    <a href="#function_ToJson_D41D6D0DCA6C2F2E779486F47F8BFD91D47426EA">ToJson&lt;K, T, H, C>(const HashMap&lt;K, T, H, C>&amp; value) where K is ustring</a>
                 </td>
             </tr>
             <tr>
                 <td>
-                    <a href="#function_ToJson_D41D6D0DCA6C2F2E779486F47F8BFD91D47426EA">ToJson&lt;K, T, H, C>(const HashMap&lt;K, T, H, C>&amp; value) where K is ustring</a>
+                    <a href="#function_ToJson_91FBDD8DFFF0BEB6D6C29EC753DF3D9249916F3C">ToJson&lt;K, T, H, C>(const HashMap&lt;K, T, H, C>&amp; value) where K is wstring or K is string</a>
                 </td>
             </tr>
             <tr>
@@ -4418,7 +4913,17 @@
             </tr>
             <tr>
                 <td>
+                    <a href="#function_ToJson_644044BAF600DEEDF2C36244ACC2EA1E2C07DAD6">ToJson&lt;T>(const SharedPtr&lt;T>&amp; ptr) where T is JsonExportable</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
                     <a href="#function_ToJson_D4341533DFEB06925268DB024A00F44A7044154D">ToJson&lt;T>(const T&amp; object) where T is JsonExportable</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="#function_ToJson_14356EE699F7663903DB09AB9EFE1B206802DDE8">ToJson&lt;T>(const UniquePtr&lt;T>&amp; ptr) where T is JsonExportable</a>
                 </td>
             </tr>
         </table>
@@ -4585,80 +5090,6 @@
         </table>
         <br/>
         <hr/>
-        <h4 id="function_ToJson_91FBDD8DFFF0BEB6D6C29EC753DF3D9249916F3C">ToJson&lt;K, T, H, C>(const HashMap&lt;K, T, H, C>&amp; value) where K is wstring or K is string Overload</h4>
-        <h5>Syntax</h5>
-        <table>
-            <tr>
-                <td>
-                    <span class="mono">public UniquePtr&lt;System.Json.JsonValue> ToJson&lt;K, T, H, C>(const HashMap&lt;K, T, H, C>&amp; value);</span>
-                </td>
-            </tr>
-        </table>
-        <h5>Template Parameters</h5>
-        <table class="params">
-            <tr class="params">
-                <td class="params">
-                    <span class="param" id="8712822">K</span>
-                </td>
-            </tr>
-            <tr class="params">
-                <td class="params">
-                    <span class="param" id="8712823">T</span>
-                </td>
-            </tr>
-            <tr class="params">
-                <td class="params">
-                    <span class="param" id="8712824">H</span>
-                </td>
-            </tr>
-            <tr class="params">
-                <td class="params">
-                    <span class="param" id="8712825">C</span>
-                </td>
-            </tr>
-        </table>
-        <h5>Constraint</h5>
-        <a href="#8712822">K</a>
-        <span class="kw"> is </span>
-        <a href="../System.Base/System.Base.html#class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC">String</a>
-        &lt;<span class="kw">wchar</span>
-        ><span class="kw"> or </span>
-        <a href="#8712822">K</a>
-        <span class="kw"> is </span>
-        <a href="../System.Base/System.Base.html#class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC">String</a>
-        &lt;<span class="kw">char</span>
-        ><table>
-            <tr>
-                <td/>
-            </tr>
-        </table>
-        <h5>Parameters</h5>
-        <table class="params">
-            <tr class="params">
-                <td class="params">
-                    <span class="param" id="">value</span>
-                </td>
-                <td class="params">
-                    <span class="kw">const </span>
-                    <a href="../System.Base/System.Base.html#class_HashMap_K_T_H_C_925D53DF947742545E7EC07D3487F3EA8C8D1D36">HashMap</a>
-                    &lt;<a href="#8712898">K</a>
-                    , <a href="#8712899">T</a>
-                    , <a href="#8712900">H</a>
-                    , <a href="#8712901">C</a>
-                    >&amp;</td>
-            </tr>
-        </table>
-        <h5>Return Type</h5>
-        <table>
-            <tr>
-                <td>
-                    <a href="../System.Base/System.Base.html#class_UniquePtr_T_793F841C13E9DD3A6869243C74F1D948C0E04009">UniquePtr</a>
-                    &lt;<a href="#class_JsonValue_B86942C2856CC5758E1FB19BBBE97E4002D4008A">JsonValue</a>
-                    ></td>
-            </tr>
-        </table>
-        <br/>
-        <hr/>
         <h4 id="function_ToJson_D41D6D0DCA6C2F2E779486F47F8BFD91D47426EA">ToJson&lt;K, T, H, C>(const HashMap&lt;K, T, H, C>&amp; value) where K is ustring Overload</h4>
         <h5>Syntax</h5>
         <table>
@@ -4672,27 +5103,27 @@
         <table class="params">
             <tr class="params">
                 <td class="params">
-                    <span class="param" id="8712818">K</span>
+                    <span class="param" id="9342936">K</span>
                 </td>
             </tr>
             <tr class="params">
                 <td class="params">
-                    <span class="param" id="8712819">T</span>
+                    <span class="param" id="9342937">T</span>
                 </td>
             </tr>
             <tr class="params">
                 <td class="params">
-                    <span class="param" id="8712820">H</span>
+                    <span class="param" id="9342938">H</span>
                 </td>
             </tr>
             <tr class="params">
                 <td class="params">
-                    <span class="param" id="8712821">C</span>
+                    <span class="param" id="9342939">C</span>
                 </td>
             </tr>
         </table>
         <h5>Constraint</h5>
-        <a href="#8712818">K</a>
+        <a href="#9342936">K</a>
         <span class="kw"> is </span>
         <a href="../System.Base/System.Base.html#class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC">String</a>
         &lt;<span class="kw">uchar</span>
@@ -4710,10 +5141,84 @@
                 <td class="params">
                     <span class="kw">const </span>
                     <a href="../System.Base/System.Base.html#class_HashMap_K_T_H_C_925D53DF947742545E7EC07D3487F3EA8C8D1D36">HashMap</a>
-                    &lt;<a href="#8712898">K</a>
-                    , <a href="#8712899">T</a>
-                    , <a href="#8712900">H</a>
-                    , <a href="#8712901">C</a>
+                    &lt;<a href="#9343020">K</a>
+                    , <a href="#9343021">T</a>
+                    , <a href="#9343022">H</a>
+                    , <a href="#9343023">C</a>
+                    >&amp;</td>
+            </tr>
+        </table>
+        <h5>Return Type</h5>
+        <table>
+            <tr>
+                <td>
+                    <a href="../System.Base/System.Base.html#class_UniquePtr_T_793F841C13E9DD3A6869243C74F1D948C0E04009">UniquePtr</a>
+                    &lt;<a href="#class_JsonValue_B86942C2856CC5758E1FB19BBBE97E4002D4008A">JsonValue</a>
+                    ></td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h4 id="function_ToJson_91FBDD8DFFF0BEB6D6C29EC753DF3D9249916F3C">ToJson&lt;K, T, H, C>(const HashMap&lt;K, T, H, C>&amp; value) where K is wstring or K is string Overload</h4>
+        <h5>Syntax</h5>
+        <table>
+            <tr>
+                <td>
+                    <span class="mono">public UniquePtr&lt;System.Json.JsonValue> ToJson&lt;K, T, H, C>(const HashMap&lt;K, T, H, C>&amp; value);</span>
+                </td>
+            </tr>
+        </table>
+        <h5>Template Parameters</h5>
+        <table class="params">
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="9342940">K</span>
+                </td>
+            </tr>
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="9342941">T</span>
+                </td>
+            </tr>
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="9342942">H</span>
+                </td>
+            </tr>
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="9342943">C</span>
+                </td>
+            </tr>
+        </table>
+        <h5>Constraint</h5>
+        <a href="#9342940">K</a>
+        <span class="kw"> is </span>
+        <a href="../System.Base/System.Base.html#class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC">String</a>
+        &lt;<span class="kw">wchar</span>
+        ><span class="kw"> or </span>
+        <a href="#9342940">K</a>
+        <span class="kw"> is </span>
+        <a href="../System.Base/System.Base.html#class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC">String</a>
+        &lt;<span class="kw">char</span>
+        ><table>
+            <tr>
+                <td/>
+            </tr>
+        </table>
+        <h5>Parameters</h5>
+        <table class="params">
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">value</span>
+                </td>
+                <td class="params">
+                    <span class="kw">const </span>
+                    <a href="../System.Base/System.Base.html#class_HashMap_K_T_H_C_925D53DF947742545E7EC07D3487F3EA8C8D1D36">HashMap</a>
+                    &lt;<a href="#9343020">K</a>
+                    , <a href="#9343021">T</a>
+                    , <a href="#9343022">H</a>
+                    , <a href="#9343023">C</a>
                     >&amp;</td>
             </tr>
         </table>
@@ -4741,22 +5246,22 @@
         <table class="params">
             <tr class="params">
                 <td class="params">
-                    <span class="param" id="8712812">Key</span>
+                    <span class="param" id="9342930">Key</span>
                 </td>
             </tr>
             <tr class="params">
                 <td class="params">
-                    <span class="param" id="8712813">Value</span>
+                    <span class="param" id="9342931">Value</span>
                 </td>
             </tr>
             <tr class="params">
                 <td class="params">
-                    <span class="param" id="8712814">KeyCompare</span>
+                    <span class="param" id="9342932">KeyCompare</span>
                 </td>
             </tr>
         </table>
         <h5>Constraint</h5>
-        <a href="#8712812">Key</a>
+        <a href="#9342930">Key</a>
         <span class="kw"> is </span>
         <a href="../System.Base/System.Base.html#class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC">String</a>
         &lt;<span class="kw">uchar</span>
@@ -4774,9 +5279,9 @@
                 <td class="params">
                     <span class="kw">const </span>
                     <a href="../System.Base/System.Base.html#class_Map_Key_Value_KeyCompare_530B43B96CDA5DBA8045A4DA0691BBB50DE2DB3D">Map</a>
-                    &lt;<a href="#8712886">Key</a>
-                    , <a href="#8712887">Value</a>
-                    , <a href="#8712888">KeyCompare</a>
+                    &lt;<a href="#9342933">Key</a>
+                    , <a href="#9342934">Value</a>
+                    , <a href="#9342935">KeyCompare</a>
                     >&amp;</td>
             </tr>
         </table>
@@ -4804,27 +5309,27 @@
         <table class="params">
             <tr class="params">
                 <td class="params">
-                    <span class="param" id="8712815">Key</span>
+                    <span class="param" id="9342933">Key</span>
                 </td>
             </tr>
             <tr class="params">
                 <td class="params">
-                    <span class="param" id="8712816">Value</span>
+                    <span class="param" id="9342934">Value</span>
                 </td>
             </tr>
             <tr class="params">
                 <td class="params">
-                    <span class="param" id="8712817">KeyCompare</span>
+                    <span class="param" id="9342935">KeyCompare</span>
                 </td>
             </tr>
         </table>
         <h5>Constraint</h5>
-        <a href="#8712815">Key</a>
+        <a href="#9342933">Key</a>
         <span class="kw"> is </span>
         <a href="../System.Base/System.Base.html#class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC">String</a>
         &lt;<span class="kw">wchar</span>
         ><span class="kw"> or </span>
-        <a href="#8712815">Key</a>
+        <a href="#9342933">Key</a>
         <span class="kw"> is </span>
         <a href="../System.Base/System.Base.html#class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC">String</a>
         &lt;<span class="kw">char</span>
@@ -4842,9 +5347,9 @@
                 <td class="params">
                     <span class="kw">const </span>
                     <a href="../System.Base/System.Base.html#class_Map_Key_Value_KeyCompare_530B43B96CDA5DBA8045A4DA0691BBB50DE2DB3D">Map</a>
-                    &lt;<a href="#8712886">Key</a>
-                    , <a href="#8712887">Value</a>
-                    , <a href="#8712888">KeyCompare</a>
+                    &lt;<a href="#9342933">Key</a>
+                    , <a href="#9342934">Value</a>
+                    , <a href="#9342935">KeyCompare</a>
                     >&amp;</td>
             </tr>
         </table>
@@ -4872,7 +5377,7 @@
         <table class="params">
             <tr class="params">
                 <td class="params">
-                    <span class="param" id="8712811">T</span>
+                    <span class="param" id="9342929">T</span>
                 </td>
             </tr>
         </table>
@@ -4885,7 +5390,57 @@
                 <td class="params">
                     <span class="kw">const </span>
                     <a href="../System.Base/System.Base.html#class_List_T_579A89BF19B54042190CDE2A7E54E1DFAAFDB31C">List</a>
-                    &lt;<a href="#8712911">T</a>
+                    &lt;<a href="#9342997">T</a>
+                    >&amp;</td>
+            </tr>
+        </table>
+        <h5>Return Type</h5>
+        <table>
+            <tr>
+                <td>
+                    <a href="../System.Base/System.Base.html#class_UniquePtr_T_793F841C13E9DD3A6869243C74F1D948C0E04009">UniquePtr</a>
+                    &lt;<a href="#class_JsonValue_B86942C2856CC5758E1FB19BBBE97E4002D4008A">JsonValue</a>
+                    ></td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h4 id="function_ToJson_644044BAF600DEEDF2C36244ACC2EA1E2C07DAD6">ToJson&lt;T>(const SharedPtr&lt;T>&amp; ptr) where T is JsonExportable Overload</h4>
+        <h5>Syntax</h5>
+        <table>
+            <tr>
+                <td>
+                    <span class="mono">public UniquePtr&lt;System.Json.JsonValue> ToJson&lt;T>(const SharedPtr&lt;T>&amp; ptr);</span>
+                </td>
+            </tr>
+        </table>
+        <h5>Template Parameters</h5>
+        <table class="params">
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="9342928">T</span>
+                </td>
+            </tr>
+        </table>
+        <h5>Constraint</h5>
+        <a href="#9342928">T</a>
+        <span class="kw"> is </span>
+        <a href="#concept_JsonExportable_380A04F1C16289D6FC8DB54C68F467C83E565340">JsonExportable</a>
+        <table>
+            <tr>
+                <td/>
+            </tr>
+        </table>
+        <h5>Parameters</h5>
+        <table class="params">
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">ptr</span>
+                </td>
+                <td class="params">
+                    <span class="kw">const </span>
+                    <a href="../System.Base/System.Base.html#class_SharedPtr_T_E2198BEF58335A9A782FD48D7E8DFFD1A2D8865F">SharedPtr</a>
+                    &lt;<a href="../System.Base/System.Base.html#9329972">T</a>
                     >&amp;</td>
             </tr>
         </table>
@@ -4913,12 +5468,12 @@
         <table class="params">
             <tr class="params">
                 <td class="params">
-                    <span class="param" id="8712810">T</span>
+                    <span class="param" id="9342926">T</span>
                 </td>
             </tr>
         </table>
         <h5>Constraint</h5>
-        <a href="#8712810">T</a>
+        <a href="#9342926">T</a>
         <span class="kw"> is </span>
         <a href="#concept_JsonExportable_380A04F1C16289D6FC8DB54C68F467C83E565340">JsonExportable</a>
         <table>
@@ -4934,7 +5489,7 @@
                 </td>
                 <td class="params">
                     <span class="kw">const </span>
-                    <a href="#8712810">T</a>
+                    <a href="#9342926">T</a>
                     &amp;</td>
             </tr>
         </table>
@@ -4945,6 +5500,94 @@
                     <a href="../System.Base/System.Base.html#class_UniquePtr_T_793F841C13E9DD3A6869243C74F1D948C0E04009">UniquePtr</a>
                     &lt;<a href="#class_JsonValue_B86942C2856CC5758E1FB19BBBE97E4002D4008A">JsonValue</a>
                     ></td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h4 id="function_ToJson_14356EE699F7663903DB09AB9EFE1B206802DDE8">ToJson&lt;T>(const UniquePtr&lt;T>&amp; ptr) where T is JsonExportable Overload</h4>
+        <h5>Syntax</h5>
+        <table>
+            <tr>
+                <td>
+                    <span class="mono">public UniquePtr&lt;System.Json.JsonValue> ToJson&lt;T>(const UniquePtr&lt;T>&amp; ptr);</span>
+                </td>
+            </tr>
+        </table>
+        <h5>Template Parameters</h5>
+        <table class="params">
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="9342927">T</span>
+                </td>
+            </tr>
+        </table>
+        <h5>Constraint</h5>
+        <a href="#9342927">T</a>
+        <span class="kw"> is </span>
+        <a href="#concept_JsonExportable_380A04F1C16289D6FC8DB54C68F467C83E565340">JsonExportable</a>
+        <table>
+            <tr>
+                <td/>
+            </tr>
+        </table>
+        <h5>Parameters</h5>
+        <table class="params">
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">ptr</span>
+                </td>
+                <td class="params">
+                    <span class="kw">const </span>
+                    <a href="../System.Base/System.Base.html#class_UniquePtr_T_793F841C13E9DD3A6869243C74F1D948C0E04009">UniquePtr</a>
+                    &lt;<a href="#9343029">T</a>
+                    >&amp;</td>
+            </tr>
+        </table>
+        <h5>Return Type</h5>
+        <table>
+            <tr>
+                <td>
+                    <a href="../System.Base/System.Base.html#class_UniquePtr_T_793F841C13E9DD3A6869243C74F1D948C0E04009">UniquePtr</a>
+                    &lt;<a href="#class_JsonValue_B86942C2856CC5758E1FB19BBBE97E4002D4008A">JsonValue</a>
+                    ></td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h3 id="function_op_eq_A5531519537EF9A3672EFF09CFA3994163F6008D">operator==(JsonClassCreatorDelegate left, JsonClassCreatorDelegate right) Function</h3>
+        <h4>Syntax</h4>
+        <table>
+            <tr>
+                <td>
+                    <span class="mono">public bool operator==(JsonClassCreatorDelegate left, JsonClassCreatorDelegate right);</span>
+                </td>
+            </tr>
+        </table>
+        <h4>Parameters</h4>
+        <table class="params">
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">left</span>
+                </td>
+                <td class="params">
+                    <a href="#9342920">JsonClassCreatorDelegate</a>
+                </td>
+            </tr>
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">right</span>
+                </td>
+                <td class="params">
+                    <a href="#9342920">JsonClassCreatorDelegate</a>
+                </td>
+            </tr>
+        </table>
+        <h4>Return Type</h4>
+        <table>
+            <tr>
+                <td>
+                    <span class="kw">bool</span>
+                </td>
             </tr>
         </table>
         <br/>
@@ -4962,7 +5605,7 @@
         <table class="params">
             <tr class="params">
                 <td class="params">
-                    <span class="param" id="8712875">T</span>
+                    <span class="param" id="9342993">T</span>
                 </td>
             </tr>
         </table>
@@ -4987,7 +5630,7 @@
         <table class="params">
             <tr class="params">
                 <td class="params">
-                    <span class="param" id="8712809">T</span>
+                    <span class="param" id="9342925">T</span>
                 </td>
             </tr>
         </table>
@@ -5012,7 +5655,7 @@
         <table class="params">
             <tr class="params">
                 <td class="params">
-                    <span class="param" id="8712877">T</span>
+                    <span class="param" id="9342995">T</span>
                 </td>
             </tr>
         </table>
@@ -5021,21 +5664,51 @@
             <tr>
                 <td>
                     System.Meta.IsBasicType&lt;T>()<span class="kw"> or </span>
-                    <a href="#8712877">T</a>
+                    <a href="#9342995">T</a>
                     <span class="kw"> is </span>
                     <a href="../System.Base/System.Base.html#class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC">String</a>
                     &lt;<span class="kw">char</span>
                     ><span class="kw"> or </span>
-                    <a href="#8712877">T</a>
+                    <a href="#9342995">T</a>
                     <span class="kw"> is </span>
                     <a href="../System.Base/System.Base.html#class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC">String</a>
                     &lt;<span class="kw">wchar</span>
                     ><span class="kw"> or </span>
-                    <a href="#8712877">T</a>
+                    <a href="#9342995">T</a>
                     <span class="kw"> is </span>
                     <a href="../System.Base/System.Base.html#class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC">String</a>
                     &lt;<span class="kw">uchar</span>
                     ></td>
+            </tr>
+        </table>
+        <br/>
+        <hr/>
+        <h3 id="9342920">JsonClassCreatorDelegate Delegate</h3>
+        <h4>Syntax</h4>
+        <table>
+            <tr>
+                <td>
+                    <span class="mono">public delegate void* JsonClassCreatorDelegate(JsonValue* value);</span>
+                </td>
+            </tr>
+        </table>
+        <h4>Parameters</h4>
+        <table class="params">
+            <tr class="params">
+                <td class="params">
+                    <span class="param" id="">value</span>
+                </td>
+                <td class="params">
+                    <a href="#class_JsonValue_B86942C2856CC5758E1FB19BBBE97E4002D4008A">JsonValue</a>
+                    *</td>
+            </tr>
+        </table>
+        <h4>Return Type</h4>
+        <table>
+            <tr>
+                <td>
+                    <span class="kw">void</span>
+                    *</td>
             </tr>
         </table>
     </body>

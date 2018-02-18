@@ -14,17 +14,9 @@
 
 <span class="keyword">namespace</span> <span class="identifier">MyNs</span>
 <span class="other">{</span>
+    <span class="other">[</span><span class="identifier">json</span><span class="other">]</span>
     <span class="keyword">public</span> <span class="keyword">class</span> <span class="identifier">MyJsonExportableClass</span>
     <span class="other">{</span>
-        <span class="keyword">public</span> <span class="identifier">UniquePtr</span><span class="other">&lt;</span><span class="identifier">JsonValue</span><span class="other">&gt;</span> <span class="identifier">ToJson</span><span class="other">(</span><span class="other">)</span> <span class="keyword">const</span>
-        <span class="other">{</span>
-            <span class="identifier">UniquePtr</span><span class="other">&lt;</span><span class="identifier">JsonObject</span><span class="other">&gt;</span> <span class="identifier">object</span> <span class="other">=</span> <span class="keyword">new</span> <span class="identifier">JsonObject</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>
-            <span class="identifier">object</span><span class="other">-</span><span class="other">&gt;</span><span class="identifier">AddField</span><span class="other">(</span><span class="string">&quot;i&quot;</span><span class="other">,</span> <span class="identifier">ToJson</span><span class="other">(</span><span class="identifier">i</span><span class="other">)</span><span class="other">)</span><span class="other">;</span>
-            <span class="identifier">object</span><span class="other">-</span><span class="other">&gt;</span><span class="identifier">AddField</span><span class="other">(</span><span class="string">&quot;d&quot;</span><span class="other">,</span> <span class="identifier">ToJson</span><span class="other">(</span><span class="identifier">d</span><span class="other">)</span><span class="other">)</span><span class="other">;</span>
-            <span class="identifier">object</span><span class="other">-</span><span class="other">&gt;</span><span class="identifier">AddField</span><span class="other">(</span><span class="string">&quot;b&quot;</span><span class="other">,</span> <span class="identifier">ToJson</span><span class="other">(</span><span class="identifier">b</span><span class="other">)</span><span class="other">)</span><span class="other">;</span>
-            <span class="identifier">object</span><span class="other">-</span><span class="other">&gt;</span><span class="identifier">AddField</span><span class="other">(</span><span class="string">&quot;s&quot;</span><span class="other">,</span> <span class="identifier">ToJson</span><span class="other">(</span><span class="identifier">s</span><span class="other">)</span><span class="other">)</span><span class="other">;</span>
-            <span class="keyword">return</span> <span class="identifier">UniquePtr</span><span class="other">&lt;</span><span class="identifier">JsonValue</span><span class="other">&gt;</span><span class="other">(</span><span class="identifier">object.Release</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span>
-        <span class="other">}</span>
         <span class="keyword">private</span> <span class="keyword">int</span> <span class="identifier">i</span><span class="other">;</span>
         <span class="keyword">private</span> <span class="keyword">double</span> <span class="identifier">d</span><span class="other">;</span>
         <span class="keyword">private</span> <span class="keyword">bool</span> <span class="identifier">b</span><span class="other">;</span>

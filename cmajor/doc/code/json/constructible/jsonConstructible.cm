@@ -4,15 +4,9 @@ using MyNs;
 
 namespace MyNs
 {
+    [json]
     public class MyJsonConstructibleClass
     {
-        public explicit MyJsonConstructibleClass(JsonValue* value)
-        {
-            FromJson(value, "i", i);
-            FromJson(value, "d", d);
-            FromJson(value, "b", b);
-            FromJson(value, "s", s);
-        }
         public void Dump()
         {
             Console.WriteLine("i : " + ToString(i));

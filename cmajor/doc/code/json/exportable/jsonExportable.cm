@@ -4,17 +4,9 @@ using MyNs;
 
 namespace MyNs
 {
+    [json]
     public class MyJsonExportableClass
     {
-        public UniquePtr<JsonValue> ToJson() const
-        {
-            UniquePtr<JsonObject> object = new JsonObject();
-            object->AddField("i", ToJson(i));
-            object->AddField("d", ToJson(d));
-            object->AddField("b", ToJson(b));
-            object->AddField("s", ToJson(s));
-            return UniquePtr<JsonValue>(object.Release());
-        }
         private int i;
         private double d;
         private bool b;
