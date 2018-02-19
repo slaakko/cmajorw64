@@ -33,6 +33,7 @@
     <ClCompile Include="Sha1.cpp" />
     <ClCompile Include="System.cpp" />
     <ClCompile Include="TextUtils.cpp" />
+    <ClCompile Include="Time.cpp" />
     <ClCompile Include="Unicode.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -54,6 +55,7 @@
     <ClInclude Include="String.hpp" />
     <ClInclude Include="System.hpp" />
     <ClInclude Include="TextUtils.hpp" />
+    <ClInclude Include="Time.hpp" />
     <ClInclude Include="Unicode.hpp" />
     <ClInclude Include="Util.hpp" />
   </ItemGroup>

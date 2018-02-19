@@ -1013,7 +1013,10 @@ void FunctionSymbol::SetSpecifiers(Specifiers specifiers)
     }
     if ((specifiers & Specifiers::unit_test_) != Specifiers::none)
     {
-        throw Exception("function symbol cannot be unit_test", GetSpan());
+        if (!GetGlobalFlag(GlobalFlags::unitTest))
+        {
+            throw Exception("function symbol cannot be unit_test", GetSpan());
+        }
     }
 }
 

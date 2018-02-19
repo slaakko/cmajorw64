@@ -158,3 +158,7 @@ public extern cdecl nothrow void RtSetInputBZip2(void* inChunk, uint inAvail, vo
 public extern cdecl nothrow int RtCompressBZip2(void* outChunk, uint outChunkSize, uint* have, uint* outAvail, void* handle, int action);
 public extern cdecl nothrow int RtDecompressBZip2(void* outChunk, uint outChunkSize, uint* have, uint* outAvail, uint* inAvail, void* handle);
 public extern cdecl nothrow const char* RtRetvalStrBZip2(int retVal);
+public extern cdecl nothrow void RtStartUnitTest(int numAssertions, const char* unitTestFilePath);
+public extern cdecl nothrow void RtEndUnitTest(const char* testName, int exitCode);
+public extern cdecl nothrow void RtSetUnitTestAssertionResult(int assertionIndex, bool assertionResult, int lineNumber);
+public extern cdecl nothrow void RtSetUnitTestException(const char* exceptionStr);

@@ -1580,30 +1580,54 @@ void StatementBinder::Visit(CatchNode& catchNode)
 
 void StatementBinder::Visit(AssertStatementNode& assertStatementNode)
 {
-    if (GetGlobalFlag(GlobalFlags::release))
+    if (GetGlobalFlag(GlobalFlags::unitTest) && InUnitTest())
     {
-        AddStatement(new BoundEmptyStatement(assertStatementNode.GetSpan()));
+        int32_t assertionLineNumber = assertStatementNode.GetSpan().LineNumber();
+        int32_t assertionIndex = GetNextUnitTestAssertionNumber();
+        AddAssertionLineNumber(assertionLineNumber);
+        InvokeNode* invokeSetUnitTestAssertionResult = new InvokeNode(assertStatementNode.GetSpan(), new IdentifierNode(assertStatementNode.GetSpan(), U"RtSetUnitTestAssertionResult"));
+        invokeSetUnitTestAssertionResult->AddArgument(new IntLiteralNode(assertStatementNode.GetSpan(), assertionIndex));
+        CloneContext cloneContext;
+        invokeSetUnitTestAssertionResult->AddArgument(assertStatementNode.AssertExpr()->Clone(cloneContext));
+        invokeSetUnitTestAssertionResult->AddArgument(new IntLiteralNode(assertStatementNode.GetSpan(), assertionLineNumber));
+        ExpressionStatementNode setUnitTestAssertionResult(assertStatementNode.GetSpan(), invokeSetUnitTestAssertionResult);
+        symbolTable.BeginContainer(containerScope->Container());
+        SymbolCreatorVisitor symbolCreatorVisitor(symbolTable);
+        setUnitTestAssertionResult.Accept(symbolCreatorVisitor);
+        symbolTable.EndContainer();
+        TypeBinder typeBinder(boundCompileUnit);
+        typeBinder.SetContainerScope(containerScope);
+        typeBinder.SetCurrentFunctionSymbol(currentFunction->GetFunctionSymbol());
+        setUnitTestAssertionResult.Accept(typeBinder);
+        setUnitTestAssertionResult.Accept(*this);
     }
     else
     {
-        std::vector<FunctionScopeLookup> lookups;
-        lookups.push_back(FunctionScopeLookup(ScopeLookup::this_and_base_and_parent, symbolTable.GlobalNs().GetContainerScope()));
-        std::vector<std::unique_ptr<BoundExpression>> arguments;
-        TypeSymbol* constCharPtrType = symbolTable.GetTypeByName(U"char")->AddConst(assertStatementNode.GetSpan())->AddPointer(assertStatementNode.GetSpan());
-        arguments.push_back(std::unique_ptr<BoundExpression>(new BoundLiteral(std::unique_ptr<Value>(new StringValue(assertStatementNode.GetSpan(),
-            boundCompileUnit.Install(assertStatementNode.AssertExpr()->ToString()))), constCharPtrType)));
-        arguments.push_back(std::unique_ptr<BoundExpression>(new BoundLiteral(std::unique_ptr<Value>(new StringValue(assertStatementNode.GetSpan(),
-            boundCompileUnit.Install(ToUtf8(currentFunction->GetFunctionSymbol()->FullName())))), constCharPtrType)));
-        arguments.push_back(std::unique_ptr<BoundExpression>(new BoundLiteral(std::unique_ptr<Value>(new StringValue(assertStatementNode.GetSpan(),
-            boundCompileUnit.Install(FileRegistry::Instance().GetFilePath(assertStatementNode.GetSpan().FileIndex())))), constCharPtrType)));
-        arguments.push_back(std::unique_ptr<BoundExpression>(new BoundLiteral(std::unique_ptr<Value>(new IntValue(assertStatementNode.GetSpan(), 
-            assertStatementNode.GetSpan().LineNumber())), symbolTable.GetTypeByName(U"int"))));
-        std::unique_ptr<BoundExpression> assertExpression = BindExpression(assertStatementNode.AssertExpr(), boundCompileUnit, currentFunction, containerScope, this);
-        std::unique_ptr<BoundStatement> ifStatement(new BoundIfStatement(assertStatementNode.GetSpan(), std::move(assertExpression),
-            std::unique_ptr<BoundStatement>(new BoundEmptyStatement(assertStatementNode.GetSpan())),
-            std::unique_ptr<BoundStatement>(new BoundExpressionStatement(ResolveOverload(U"RtFailAssertion", containerScope, lookups, arguments, boundCompileUnit, currentFunction,
-                assertStatementNode.GetSpan())))));
-        AddStatement(ifStatement.release());
+        if (GetGlobalFlag(GlobalFlags::release))
+        {
+            AddStatement(new BoundEmptyStatement(assertStatementNode.GetSpan()));
+        }
+        else
+        {
+            std::vector<FunctionScopeLookup> lookups;
+            lookups.push_back(FunctionScopeLookup(ScopeLookup::this_and_base_and_parent, symbolTable.GlobalNs().GetContainerScope()));
+            std::vector<std::unique_ptr<BoundExpression>> arguments;
+            TypeSymbol* constCharPtrType = symbolTable.GetTypeByName(U"char")->AddConst(assertStatementNode.GetSpan())->AddPointer(assertStatementNode.GetSpan());
+            arguments.push_back(std::unique_ptr<BoundExpression>(new BoundLiteral(std::unique_ptr<Value>(new StringValue(assertStatementNode.GetSpan(),
+                boundCompileUnit.Install(assertStatementNode.AssertExpr()->ToString()))), constCharPtrType)));
+            arguments.push_back(std::unique_ptr<BoundExpression>(new BoundLiteral(std::unique_ptr<Value>(new StringValue(assertStatementNode.GetSpan(),
+                boundCompileUnit.Install(ToUtf8(currentFunction->GetFunctionSymbol()->FullName())))), constCharPtrType)));
+            arguments.push_back(std::unique_ptr<BoundExpression>(new BoundLiteral(std::unique_ptr<Value>(new StringValue(assertStatementNode.GetSpan(),
+                boundCompileUnit.Install(FileRegistry::Instance().GetFilePath(assertStatementNode.GetSpan().FileIndex())))), constCharPtrType)));
+            arguments.push_back(std::unique_ptr<BoundExpression>(new BoundLiteral(std::unique_ptr<Value>(new IntValue(assertStatementNode.GetSpan(),
+                assertStatementNode.GetSpan().LineNumber())), symbolTable.GetTypeByName(U"int"))));
+            std::unique_ptr<BoundExpression> assertExpression = BindExpression(assertStatementNode.AssertExpr(), boundCompileUnit, currentFunction, containerScope, this);
+            std::unique_ptr<BoundStatement> ifStatement(new BoundIfStatement(assertStatementNode.GetSpan(), std::move(assertExpression),
+                std::unique_ptr<BoundStatement>(new BoundEmptyStatement(assertStatementNode.GetSpan())),
+                std::unique_ptr<BoundStatement>(new BoundExpressionStatement(ResolveOverload(U"RtFailAssertion", containerScope, lookups, arguments, boundCompileUnit, currentFunction,
+                    assertStatementNode.GetSpan())))));
+            AddStatement(ifStatement.release());
+        }
     }
 }
 

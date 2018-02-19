@@ -6,6 +6,7 @@
 #include <cmajor/ast/Namespace.hpp>
 #include <cmajor/ast/Identifier.hpp>
 #include <cmajor/ast/Visitor.hpp>
+#include <cmajor/ast/Function.hpp>
 
 namespace cmajor { namespace ast {
 
@@ -24,7 +25,17 @@ Node* NamespaceNode::Clone(CloneContext& cloneContext) const
     int n = members.Count();
     for (int i = 0; i < n; ++i)
     {
-        clone->AddMember(members[i]->Clone(cloneContext));
+        Node* member = members[i];
+        if (cloneContext.MakeTestUnits() && member->GetNodeType() == NodeType::functionNode && (static_cast<FunctionNode*>(member)->GetSpecifiers() & Specifiers::unit_test_) != Specifiers::none)
+        {
+            FunctionNode* unitTestFunction = static_cast<FunctionNode*>(member->Clone(cloneContext));
+            unitTestFunction->SetParent(const_cast<NamespaceNode*>(this));
+            cloneContext.AddUnitTestFunction(std::unique_ptr<FunctionNode>(unitTestFunction));
+        }
+        else
+        {
+            clone->AddMember(member->Clone(cloneContext));
+        }
     }
     return clone;
 }

@@ -131,4 +131,55 @@ bool IsSymbolDefined(const std::u32string& symbol)
     }
 }
 
+bool inUnitTest = false;
+
+bool BeginUnitTest()
+{
+    bool prevUnitTest = inUnitTest;
+    inUnitTest = true;
+    return prevUnitTest;
+}
+
+bool InUnitTest()
+{
+    return inUnitTest;
+}
+
+int32_t unitTestAssertionNumber = 0;
+
+void ResetUnitTestAssertionNumber()
+{
+    unitTestAssertionNumber = 0;
+}
+
+int32_t GetNextUnitTestAssertionNumber()
+{
+    return unitTestAssertionNumber++;
+}
+
+int32_t GetNumUnitTestAssertions()
+{
+    return unitTestAssertionNumber;
+}
+
+void EndUnitTest(bool prevUnitTest)
+{
+    inUnitTest = prevUnitTest;
+}
+
+std::vector<int32_t>* assertionLineNumberVector = nullptr;
+
+void SetAssertionLineNumberVector(std::vector<int32_t>* assertionLineNumberVector_)
+{
+    assertionLineNumberVector = assertionLineNumberVector_;
+}
+
+void AddAssertionLineNumber(int32_t lineNumber)
+{
+    if (assertionLineNumberVector)
+    {
+        assertionLineNumberVector->push_back(lineNumber);
+    }
+}
+
 } } // namespace cmajor::symbols

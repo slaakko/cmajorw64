@@ -4,6 +4,7 @@
 // =================================
 
 #include <cmajor/ast/Visitor.hpp>
+#include <cmajor/ast/Function.hpp>
 
 namespace cmajor { namespace ast {
 

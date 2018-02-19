@@ -6,6 +6,7 @@
 #ifndef CMAJOR_SYMBOLS_GLOBAL_FLAGS_INCLUDED
 #define CMAJOR_SYMBOLS_GLOBAL_FLAGS_INCLUDED
 #include <string>
+#include <vector>
 #include <stdint.h>
 
 namespace cmajor { namespace symbols {
@@ -25,7 +26,8 @@ enum class GlobalFlags : uint16_t
     ide = 1 << 9,
     strictNothrow = 1 << 10,
     time = 1 << 11,
-    info = 1 << 12
+    info = 1 << 12,
+    unitTest = 1 << 13
 };
 
 void SetGlobalFlag(GlobalFlags flag);
@@ -46,6 +48,15 @@ void DefineCommandLineConditionalSymbol(const std::u32string& symbol);
 void ClearDefines();
 void DefineSymbol(const std::u32string& symbol);
 bool IsSymbolDefined(const std::u32string& symbol);
+
+bool BeginUnitTest();
+bool InUnitTest();
+void ResetUnitTestAssertionNumber();
+int32_t GetNextUnitTestAssertionNumber();
+int32_t GetNumUnitTestAssertions();
+void EndUnitTest(bool prevUnitTest);
+void SetAssertionLineNumberVector(std::vector<int32_t>* assertionLineNumberVector_);
+void AddAssertionLineNumber(int32_t lineNumber);
 
 } } // namespace cmajor::symbols
 

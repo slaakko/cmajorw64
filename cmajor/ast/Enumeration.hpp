@@ -5,7 +5,7 @@
 
 #ifndef CMAJOR_AST_ENUMERATION_INCLUDED
 #define CMAJOR_AST_ENUMERATION_INCLUDED
-#include <cmajor/ast/Node.hpp>
+#include <cmajor/ast/Function.hpp>
 #include <cmajor/ast/NodeList.hpp>
 #include <cmajor/ast/Specifier.hpp>
 
