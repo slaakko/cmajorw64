@@ -11,6 +11,7 @@
 #include <cmajor/symbols/GlobalFlags.hpp>
 #include <cmajor/symbols/Module.hpp>
 #include <cmajor/symbols/SymbolCreatorVisitor.hpp>
+#include <cmajor/symbols/Warning.hpp>
 #include <cmajor/binder/BoundStatement.hpp>
 #include <cmajor/binder/ModuleBinder.hpp>
 #include <cmajor/binder/AttributeBinder.hpp>
@@ -197,6 +198,12 @@ struct UnitTest
     bool prevUnitTest;
 };
 
+int RunUnitTest(Project* project)
+{
+    int exitCode = system(project->ExecutableFilePath().c_str());
+    return exitCode;
+}
+
 void TestUnit(Project* project, CompileUnitNode* testUnit, const std::string& testName, Element* sourceFileElement)
 {
     bool compileError = false;
@@ -211,13 +218,16 @@ void TestUnit(Project* project, CompileUnitNode* testUnit, const std::string& te
         ReadTypeIdCounter(config);
         ReadFunctionIdCounter(config);
         ReadSystemFileIndex(config);
+        CompileWarningCollection::Instance().SetCurrentProjectName(project->Name());
+        SetCurrentTooName(U"cmc");
         Module module(project->Name(), project->ModuleFilePath());
+        AttributeBinder attributeBinder;
+        ModuleBinder moduleBinder(module, testUnit, &attributeBinder);
+        moduleBinder.SetBindingTypes();
         std::vector<ClassTypeSymbol*> classTypes;
         std::vector<ClassTemplateSpecializationSymbol*> classTemplateSpecializations;
         module.PrepareForCompilation(project->References(), project->SourceFilePaths(), classTypes, classTemplateSpecializations);
         cmajor::symbols::MetaInit(module.GetSymbolTable());
-        AttributeBinder attributeBinder;
-        ModuleBinder moduleBinder(module, testUnit, &attributeBinder);
         CreateSymbols(module.GetSymbolTable(), testUnit);
         for (ClassTemplateSpecializationSymbol* classTemplateSpecialization : classTemplateSpecializations)
         {
@@ -249,7 +259,7 @@ void TestUnit(Project* project, CompileUnitNode* testUnit, const std::string& te
         WriteTypeIdCounter(config);
         WriteFunctionIdCounter(config);
         boost::filesystem::remove(unitTestFilePath);
-        int exitCode = system(project->ExecutableFilePath().c_str());
+        int exitCode = RunUnitTest(project);
         if (FileExists(unitTestFilePath))
         {
             std::unique_ptr<Document> testResultDoc = ReadDocument(unitTestFilePath);
@@ -473,18 +483,95 @@ std::unique_ptr<cmajor::dom::Document> GenerateHtmlReport(cmajor::dom::Document*
     std::unique_ptr<cmajor::dom::Element> h1Element(new cmajor::dom::Element(U"h1"));
     h1Element->AppendChild(std::unique_ptr<cmajor::dom::Node>(new cmajor::dom::Text(U"Unit Test Report")));
     bodyElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(h1Element.release()));
-    std::unique_ptr<cmajor::dom::Element> p1Element(new cmajor::dom::Element(U"p"));
     cmajor::dom::Element* cmunitElement = testDoc->DocumentElement();
+
+    std::unique_ptr<cmajor::dom::Element> paramTableElement(new cmajor::dom::Element(U"table"));
+
+    std::u32string configuration = cmunitElement->GetAttribute(U"config");
+    std::unique_ptr<cmajor::dom::Element> trConfigElement(new cmajor::dom::Element(U"tr"));
+    std::unique_ptr<cmajor::dom::Element> thConfigElement(new cmajor::dom::Element(U"th"));
+    thConfigElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new cmajor::dom::Text(U"configuration")));
+    trConfigElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(thConfigElement.release()));
+    std::unique_ptr<cmajor::dom::Element> tdConfigElement(new cmajor::dom::Element(U"td"));
+    tdConfigElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new cmajor::dom::Text(configuration)));
+    trConfigElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(tdConfigElement.release()));
+    paramTableElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(trConfigElement.release()));
+
     std::u32string start = cmunitElement->GetAttribute(U"start");
-    p1Element->AppendChild(std::unique_ptr<cmajor::dom::Node>(new cmajor::dom::Text(U"start: " + start)));
-    p1Element->AppendChild(std::unique_ptr<cmajor::dom::Node>(new cmajor::dom::Element(U"br")));
+    std::unique_ptr<cmajor::dom::Element> trStartElement(new cmajor::dom::Element(U"tr"));
+    std::unique_ptr<cmajor::dom::Element> thStartElement(new cmajor::dom::Element(U"th"));
+    thStartElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new cmajor::dom::Text(U"start")));
+    trStartElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(thStartElement.release()));
+    std::unique_ptr<cmajor::dom::Element> tdStartElement(new cmajor::dom::Element(U"td"));
+    tdStartElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new cmajor::dom::Text(start)));
+    trStartElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(tdStartElement.release()));
+    paramTableElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(trStartElement.release()));
+
     std::u32string end = cmunitElement->GetAttribute(U"end");
-    p1Element->AppendChild(std::unique_ptr<cmajor::dom::Node>(new cmajor::dom::Text(U"end: " + end)));
-    p1Element->AppendChild(std::unique_ptr<cmajor::dom::Node>(new cmajor::dom::Element(U"br")));
+    std::unique_ptr<cmajor::dom::Element> trEndElement(new cmajor::dom::Element(U"tr"));
+    std::unique_ptr<cmajor::dom::Element> thEndElement(new cmajor::dom::Element(U"th"));
+    thEndElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new cmajor::dom::Text(U"end")));
+    trEndElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(thEndElement.release()));
+    std::unique_ptr<cmajor::dom::Element> tdEndElement(new cmajor::dom::Element(U"td"));
+    tdEndElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new cmajor::dom::Text(end)));
+    trEndElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(tdEndElement.release()));
+    paramTableElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(trEndElement.release()));
+
     std::u32string duration = cmunitElement->GetAttribute(U"duration");
-    p1Element->AppendChild(std::unique_ptr<cmajor::dom::Node>(new cmajor::dom::Text(U"duration: " + duration)));
-    p1Element->AppendChild(std::unique_ptr<cmajor::dom::Node>(new cmajor::dom::Element(U"br")));
-    bodyElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(p1Element.release()));
+    std::unique_ptr<cmajor::dom::Element> trDurationElement(new cmajor::dom::Element(U"tr"));
+    std::unique_ptr<cmajor::dom::Element> thDurationElement(new cmajor::dom::Element(U"th"));
+    thDurationElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new cmajor::dom::Text(U"duration")));
+    trDurationElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(thDurationElement.release()));
+    std::unique_ptr<cmajor::dom::Element> tdDurationElement(new cmajor::dom::Element(U"td"));
+    tdDurationElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new cmajor::dom::Text(duration)));
+    trDurationElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(tdDurationElement.release()));
+    paramTableElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(trDurationElement.release()));
+
+    std::u32string file = cmunitElement->GetAttribute(U"file");
+    std::unique_ptr<cmajor::dom::Element> trFileElement(new cmajor::dom::Element(U"tr"));
+    std::unique_ptr<cmajor::dom::Element> thFileElement(new cmajor::dom::Element(U"th"));
+    thFileElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new cmajor::dom::Text(U"file")));
+    trFileElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(thFileElement.release()));
+    std::unique_ptr<cmajor::dom::Element> tdFileElement(new cmajor::dom::Element(U"td"));
+    tdFileElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new cmajor::dom::Text(file)));
+    trFileElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(tdFileElement.release()));
+    paramTableElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(trFileElement.release()));
+
+    std::u32string test = cmunitElement->GetAttribute(U"test");
+    std::unique_ptr<cmajor::dom::Element> trTestElement(new cmajor::dom::Element(U"tr"));
+    std::unique_ptr<cmajor::dom::Element> thTestElement(new cmajor::dom::Element(U"th"));
+    thTestElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new cmajor::dom::Text(U"test")));
+    trTestElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(thTestElement.release()));
+    std::unique_ptr<cmajor::dom::Element> tdTestElement(new cmajor::dom::Element(U"td"));
+    tdTestElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new cmajor::dom::Text(test)));
+    trTestElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(tdTestElement.release()));
+    paramTableElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(trTestElement.release()));
+
+    bodyElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(paramTableElement.release()));
+
+    std::unique_ptr<cmajor::dom::Element> h2ComponentsElement(new cmajor::dom::Element(U"h2"));
+    h2ComponentsElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new cmajor::dom::Text(U"Components")));
+    bodyElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(h2ComponentsElement.release()));
+
+    std::unique_ptr<cmajor::dom::Element> ulElement(new cmajor::dom::Element(U"ul"));
+    std::unique_ptr<XPathObject> components = Evaluate(U"cmunit/components/component/text()", testDoc);
+    if (components && components->Type() == cmajor::xpath::XPathObjectType::nodeSet)
+    {
+        XPathNodeSet* componentsSet = static_cast<XPathNodeSet*>(components.get());
+        int n = componentsSet->Length();
+        for (int i = 0; i < n; ++i)
+        {
+            cmajor::dom::Node* componentNode = (*componentsSet)[i];
+            if (componentNode->GetNodeType() == cmajor::dom::NodeType::textNode)
+            {
+                cmajor::dom::Text* component = static_cast<cmajor::dom::Text*>(componentNode);
+                std::unique_ptr<cmajor::dom::Element> liElement(new cmajor::dom::Element(U"li"));
+                liElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new cmajor::dom::Text(component->Data())));
+                ulElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(liElement.release()));
+            }
+        }
+    }
+    bodyElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(ulElement.release()));
 
     std::unique_ptr<cmajor::dom::Element> h2Element(new cmajor::dom::Element(U"h2"));
     h2Element->AppendChild(std::unique_ptr<cmajor::dom::Node>(new cmajor::dom::Text(U"Results")));
@@ -739,6 +826,7 @@ int main(int argc, const char** argv)
         InitDone initDone;
         std::unique_ptr<cmajor::dom::Element> cmunitElement(new cmajor::dom::Element(U"cmunit"));
         cmunitElement->SetAttribute(U"start", ToUtf32(GetCurrentDateTime().ToString()));
+        std::unique_ptr<cmajor::dom::Element> componentsElement(new cmajor::dom::Element(U"components"));
         std::chrono::time_point<std::chrono::steady_clock> start = std::chrono::steady_clock::now();
         SetGlobalFlag(GlobalFlags::unitTest);
         std::vector<std::string> projectsAndSolutions;
@@ -803,6 +891,14 @@ int main(int argc, const char** argv)
                 projectsAndSolutions.push_back(arg);
             }
         }
+        if (GetGlobalFlag(GlobalFlags::release))
+        {
+            cmunitElement->SetAttribute(U"config", U"release");
+        }
+        else
+        {
+            cmunitElement->SetAttribute(U"config", U"debug");
+        }
         if (projectsAndSolutions.empty())
         {
             PrintHelp();
@@ -810,6 +906,22 @@ int main(int argc, const char** argv)
         }
         else
         {
+            if (onlySourceFile.empty())
+            {
+                cmunitElement->SetAttribute(U"file", U"*");
+            }
+            else
+            {
+                cmunitElement->SetAttribute(U"file", ToUtf32(onlySourceFile));
+            }
+            if (onlyTest.empty())
+            {
+                cmunitElement->SetAttribute(U"test", U"*");
+            }
+            else
+            {
+                cmunitElement->SetAttribute(U"test", ToUtf32(onlyTest));
+            }
             int n = projectsAndSolutions.size();
             for (int i = 0; i < n; ++i)
             {
@@ -823,7 +935,11 @@ int main(int argc, const char** argv)
                     }
                     else
                     {
-                        TestSolution(GetFullPath(fp.generic_string()), onlySourceFile, onlyTest, cmunitElement.get());
+                        std::string solutionFileName = GetFullPath(fp.generic_string());
+                        std::unique_ptr<cmajor::dom::Element> componentElement(new cmajor::dom::Element(U"component"));
+                        componentElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new cmajor::dom::Text(ToUtf32(Path::GetFileName(solutionFileName)))));
+                        componentsElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(componentElement.release()));
+                        TestSolution(solutionFileName, onlySourceFile, onlyTest, cmunitElement.get());
                     }
                 }
                 else if (fp.extension() == ".cmp")
@@ -834,7 +950,11 @@ int main(int argc, const char** argv)
                     }
                     else
                     {
-                        TestProject(GetFullPath(fp.generic_string()), onlySourceFile, onlyTest, cmunitElement.get());
+                        std::string projectFileName = GetFullPath(fp.generic_string());
+                        std::unique_ptr<cmajor::dom::Element> componentElement(new cmajor::dom::Element(U"component"));
+                        componentElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new cmajor::dom::Text(ToUtf32(Path::GetFileName(projectFileName)))));
+                        componentsElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(componentElement.release()));
+                        TestProject(projectFileName, onlySourceFile, onlyTest, cmunitElement.get());
                     }
                 }
                 else
@@ -844,6 +964,7 @@ int main(int argc, const char** argv)
             }
         }
         cmunitElement->SetAttribute(U"end", ToUtf32(GetCurrentDateTime().ToString()));
+        cmunitElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(componentsElement.release()));
         std::chrono::time_point<std::chrono::steady_clock> end = std::chrono::steady_clock::now();
         int durationSecs = std::chrono::duration_cast<std::chrono::seconds>(end - start).count();
         int hours = durationSecs / 3600;

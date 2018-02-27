@@ -4,6 +4,7 @@ reference <../System.Runtime/System.Runtime.cmp>;
 source <Algorithm.cm>;
 source <Ascii.cm>;
 source <AsciiChar.cm>;
+source <BackInsertIterator.cm>;
 source <BinaryReader.cm>;
 source <BinaryWriter.cm>;
 source <Bitset.cm>;

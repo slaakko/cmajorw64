@@ -106,19 +106,22 @@ void UnitTestEngine::EndUnitTest(const char* testName, int32_t exitCode)
 }
 
 void UnitTestEngine::SetUnitTestAssertionResult(int32_t assertionIndex, bool assertionResult, int32_t line)
-{
-    if (assertionIndex >= 0 && assertionIndex < numAssertions)
+{ 
+    AssertionResult& ar = assertionResults[assertionIndex];
+    if (assertionResult)
     {
-        int32_t result = assertionResultEmpty;     
-        if (assertionResult)
+        if (ar.result == assertionResultEmpty || ar.result == assertionResultPassed)
         {
-            result = assertionResultPassed;
+            assertionResults[assertionIndex] = AssertionResult(assertionResultPassed, line);
         }
         else
         {
-            result = assertionResulFailed;
+            assertionResults[assertionIndex] = AssertionResult(assertionResulFailed, line);
         }
-        assertionResults[assertionIndex] = AssertionResult(result, line);
+    }
+    else
+    {
+        assertionResults[assertionIndex] = AssertionResult(assertionResulFailed, line);
     }
 }
 

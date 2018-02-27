@@ -5,6 +5,7 @@
 
 #ifndef CMAJOR_BINDER_TYPE_BINDER_INCLUDED
 #define CMAJOR_BINDER_TYPE_BINDER_INCLUDED
+#include <cmajor/binder/TypeResolver.hpp>
 #include <cmajor/ast/Visitor.hpp>
 #include <cmajor/symbols/Scope.hpp>
 #include <cmajor/symbols/ClassTypeSymbol.hpp>
@@ -73,6 +74,7 @@ public:
 
     void SetContainerScope(ContainerScope* containerScope_) { containerScope = containerScope_; }
     void SetCurrentFunctionSymbol(FunctionSymbol* currentFunctionSymbol_) { currentFunctionSymbol = currentFunctionSymbol_; }
+    void BindPrototype();
 private:
     BoundCompileUnit& boundCompileUnit;
     SymbolTable& symbolTable;
@@ -81,6 +83,7 @@ private:
     EnumTypeSymbol* enumType;
     FunctionSymbol* currentFunctionSymbol;
     std::stack<bool> conditionalCompilationStack;
+    TypeResolverFlags typeResolverFlags;
 };
 
 } } // namespace cmajor::binder

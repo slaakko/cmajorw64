@@ -2461,7 +2461,8 @@ void ClassCopyAssignmentOperation::CollectViableFunctions(ContainerScope* contai
         exception.reset(new Exception("cannot assign an instance of a static class", span, classType->GetSpan()));
         return;
     }
-    if (!TypesEqual(arguments[1]->GetType(), classType->AddRvalueReference(span)) && !arguments[1]->GetFlag(BoundExpressionFlags::bindToRvalueReference))
+    if (!TypesEqual(arguments[1]->GetType(), classType->AddRvalueReference(span)) && !arguments[1]->GetFlag(BoundExpressionFlags::bindToRvalueReference) &&
+        TypesEqual(arguments[1]->GetType()->PlainType(span), classType))
     {
         if (classType->CopyAssignment())
         {

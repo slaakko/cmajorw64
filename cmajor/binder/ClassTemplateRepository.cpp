@@ -177,6 +177,10 @@ void ClassTemplateRepository::BindClassTemplateSpecialization(ClassTemplateSpeci
     symbolCreatorVisitor.SetClassTemplateSpecialization(classTemplateSpecialization);
     globalNs->Accept(symbolCreatorVisitor);
     TypeBinder typeBinder(boundCompileUnit);
+    if (templateParameterBinding)
+    {
+        typeBinder.BindPrototype();
+    }
     globalNs->Accept(typeBinder);
     if (templateParameterBinding)
     {
@@ -281,9 +285,13 @@ void ClassTemplateRepository::Instantiate(FunctionSymbol* memberFunction, Contai
         {
             std::unique_ptr<BoundConstraint> boundConstraint;
             std::unique_ptr<Exception> conceptCheckException;
+            FileScope* classTemplateScope = new FileScope();
+            classTemplateScope->AddContainerScope(classTemplateSpecialization->GetContainerScope());
+            boundCompileUnit.AddFileScope(classTemplateScope);
             if (!CheckConstraint(functionInstanceNode->WhereConstraint(), classTemplate->UsingNodes(), boundCompileUnit, containerScope, currentFunction, classTemplate->TemplateParameters(),
                 templateParameterMap, boundConstraint, span, memberFunction, conceptCheckException))
             {
+                boundCompileUnit.RemoveLastFileScope();
                 if (conceptCheckException)
                 {
                     std::vector<Span> references;
@@ -295,6 +303,10 @@ void ClassTemplateRepository::Instantiate(FunctionSymbol* memberFunction, Contai
                 {
                     throw Exception("concept check of class template template member function '" + ToUtf8(memberFunction->FullName()) + "' failed.", span);
                 }
+            }
+            else
+            {
+                boundCompileUnit.RemoveLastFileScope();
             }
         }
         symbolTable.SetCurrentCompileUnit(boundCompileUnit.GetCompileUnitNode());

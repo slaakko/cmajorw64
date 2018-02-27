@@ -90,4 +90,16 @@ namespace System.Collections
         }
         private TreeType tree;
     }
+
+    public inline nothrow bool operator==<Key, Value, KeyCompare>(const Map<Key, Value, KeyCompare>& left, const Map<Key, Value, KeyCompare>& right) 
+        where Key is Regular and Value is Regular and KeyCompare is Relation and KeyCompare.Domain is Key
+    {
+        return left.Count() == right.Count() && Equal(left.CBegin(), left.CEnd(), right.CBegin(), right.CEnd(), EqualTo<Pair<Key, Value>>());
+    }
+
+    public inline nothrow bool operator<<Key, Value, KeyCompare>(const Map<Key, Value, KeyCompare>& left, const Map<Key, Value, KeyCompare>& right) 
+        where Key is TotallyOrdered and Value is TotallyOrdered and KeyCompare is Relation and KeyCompare.Domain is Key
+    {
+        return LexicographicalCompare(left.CBegin(), left.CEnd(), right.CBegin(), right.CEnd(), Less<Pair<Key, Value>>());
+    }
 }

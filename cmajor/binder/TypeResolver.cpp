@@ -28,7 +28,7 @@ NamespaceTypeSymbol::NamespaceTypeSymbol(NamespaceSymbol* ns_) : TypeSymbol(Symb
 class TypeResolver : public Visitor
 {
 public:
-    TypeResolver(BoundCompileUnit& boundCompileUnit_, ContainerScope* containerScope_);
+    TypeResolver(BoundCompileUnit& boundCompileUnit_, ContainerScope* containerScope_, TypeResolverFlags flags_);
     TypeSymbol* GetType() { return type; }
     const TypeDerivationRec& DerivationRec() const { return derivationRec; }
     void Visit(BoolNode& boolNode) override;
@@ -62,12 +62,13 @@ private:
     TypeSymbol* type;
     TypeDerivationRec derivationRec;
     std::unique_ptr<NamespaceTypeSymbol> nsTypeSymbol;
+    TypeResolverFlags flags;
     void ResolveSymbol(Node& node, Symbol* symbol);
 };
 
-TypeResolver::TypeResolver(BoundCompileUnit& boundCompileUnit_, ContainerScope* containerScope_) :
+TypeResolver::TypeResolver(BoundCompileUnit& boundCompileUnit_, ContainerScope* containerScope_, TypeResolverFlags flags_) :
     boundCompileUnit(boundCompileUnit_), symbolTable(boundCompileUnit.GetSymbolTable()), classTemplateRepository(boundCompileUnit.GetClassTemplateRepository()), containerScope(containerScope_),
-    type(nullptr), derivationRec(), nsTypeSymbol()
+    type(nullptr), derivationRec(), nsTypeSymbol(), flags(flags_)
 {
 }
 
@@ -280,7 +281,7 @@ void TypeResolver::Visit(IdentifierNode& identifierNode)
 void TypeResolver::Visit(TemplateIdNode& templateIdNode)
 {
     int arity = templateIdNode.TemplateArguments().Count();
-    TypeSymbol* primaryTemplateType = ResolveType(templateIdNode.Primary(), boundCompileUnit, containerScope, true);
+    TypeSymbol* primaryTemplateType = ResolveType(templateIdNode.Primary(), boundCompileUnit, containerScope, TypeResolverFlags::resolveClassGroup);
     if (primaryTemplateType->GetSymbolType() == SymbolType::classGroupTypeSymbol)
     {
         ClassGroupTypeSymbol* classGroup = static_cast<ClassGroupTypeSymbol*>(primaryTemplateType);
@@ -333,7 +334,7 @@ void TypeResolver::Visit(DotNode& dotNode)
         NamespaceTypeSymbol* nsType = static_cast<NamespaceTypeSymbol*>(type);
         scope = nsType->Ns()->GetContainerScope();
     }
-    else if (type->IsClassTypeSymbol() || type->IsArrayType())
+    else if (type->IsClassTypeSymbol() || type->IsArrayType() || (flags & TypeResolverFlags::createMemberSymbols) != TypeResolverFlags::none && type->GetSymbolType() == SymbolType::templateParameterSymbol)
     {
         scope = type->GetContainerScope();
     }
@@ -349,18 +350,29 @@ void TypeResolver::Visit(DotNode& dotNode)
     }
     else
     {
-        throw Exception("type symbol '" + ToUtf8(name) + "' not found", dotNode.GetSpan());
+        if ((flags & TypeResolverFlags::createMemberSymbols) != TypeResolverFlags::none && type->GetSymbolType() == SymbolType::templateParameterSymbol)
+        {
+            TemplateParameterSymbol* templateParameterSymbol = new TemplateParameterSymbol(dotNode.GetSpan(), name);
+            symbolTable.SetTypeIdFor(templateParameterSymbol);
+            type->AddMember(templateParameterSymbol);
+            ResolveSymbol(dotNode, templateParameterSymbol);
+        }
+        else
+        {
+            throw Exception("type symbol '" + ToUtf8(name) + "' not found", dotNode.GetSpan());
+        }
     }
 }
 
 TypeSymbol* ResolveType(Node* typeExprNode, BoundCompileUnit& boundCompileUnit, ContainerScope* containerScope)
 {
-    return ResolveType(typeExprNode, boundCompileUnit, containerScope, false);
+    return ResolveType(typeExprNode, boundCompileUnit, containerScope, TypeResolverFlags::none);
 }
 
-TypeSymbol* ResolveType(Node* typeExprNode, BoundCompileUnit& boundCompileUnit, ContainerScope* containerScope, bool resolveClassGroup)
+TypeSymbol* ResolveType(Node* typeExprNode, BoundCompileUnit& boundCompileUnit, ContainerScope* containerScope, TypeResolverFlags flags)
 {
-    TypeResolver typeResolver(boundCompileUnit, containerScope);
+    bool resolveClassGroup = (flags & TypeResolverFlags::resolveClassGroup) != TypeResolverFlags::none;
+    TypeResolver typeResolver(boundCompileUnit, containerScope, flags);
     typeExprNode->Accept(typeResolver);
     TypeSymbol* type = typeResolver.GetType();
     if (resolveClassGroup && type && type->GetSymbolType() == SymbolType::classGroupTypeSymbol)

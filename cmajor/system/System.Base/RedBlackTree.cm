@@ -558,11 +558,13 @@ namespace System.Collections
         public nothrow RedBlackTree(Self&& that) : header(Rvalue(that.header)), count(that.count), keyOf(that.keyOf), comp(that.comp)
             where ValueType is Movable
         {
+            that.count = 0;
         }
         public void operator=(const Self& that) 
             where ValueType is Copyable
         {
             Clear();
+            Init();
             CopyFrom(that);
         }
         public nothrow void operator=(Self&& that) 
@@ -579,15 +581,36 @@ namespace System.Collections
         }
         public inline nothrow ConstIterator Begin() const
         {
-            return ConstIterator(Leftmost());
+            if (header.IsNull())
+            {
+                return CEnd();
+            }
+            else
+            {
+                return ConstIterator(Leftmost());
+            }            
         }
         public inline nothrow Iterator Begin()
         {
-            return Iterator(Leftmost());
+            if (header.IsNull())
+            {
+                return End();
+            }
+            else
+            {
+                return Iterator(Leftmost());
+            }            
         }
         public inline nothrow ConstIterator CBegin() const
         {
-            return ConstIterator(Leftmost());
+            if (header.IsNull())
+            {
+                return CEnd();
+            }
+            else
+            {
+                return ConstIterator(Leftmost());
+            }            
         }
         public inline nothrow ConstIterator End() const
         {
@@ -615,7 +638,7 @@ namespace System.Collections
         {
             if (header.IsNull())
             {
-                return;
+                return;        
             }
             RedBlackTreeNode<ValueType>* root = Root();
             if (root != null)
@@ -629,6 +652,10 @@ namespace System.Collections
         }
         public nothrow Iterator Find(const KeyType& key)
         {
+            if (IsEmpty())
+            {
+                return End();
+            }
             RedBlackTreeNode<ValueType>* x = Root();
             while (x != null)
             {
@@ -649,6 +676,10 @@ namespace System.Collections
         }
         public nothrow ConstIterator Find(const KeyType& key) const
         {
+            if (IsEmpty())
+            {                
+                return CEnd();
+            }
             RedBlackTreeNode<ValueType>* x = Root();
             while (x != null)
             {
@@ -669,6 +700,10 @@ namespace System.Collections
         }
         public nothrow ConstIterator CFind(const KeyType& key) const
         {
+            if (IsEmpty())
+            {
+                return CEnd();
+            }
             RedBlackTreeNode<ValueType>* x = Root();
             while (x != null)
             {
@@ -690,6 +725,10 @@ namespace System.Collections
         public Pair<Iterator, bool> Insert(const ValueType& value) 
             where ValueType is Copyable
         {
+            if (header.IsNull())
+            {
+                Init();
+            }
             RedBlackTreeNode<ValueType>* x = Root();
             RedBlackTreeNode<ValueType>* p = header.Get();
             bool comp = true;
@@ -727,6 +766,10 @@ namespace System.Collections
         private Iterator Insert(RedBlackTreeNode<ValueType>* x, RedBlackTreeNode<ValueType>* p, const ValueType& value) 
             where ValueType is Copyable
         {
+            if (header.IsNull())
+            {
+                Init();
+            }
             RedBlackTreeNode<ValueType>* n = new RedBlackTreeNode<ValueType>(value, p);
             if (p == header.Get() || x != null || Comp(KeyOf(value), KeyOf(p->Value())))
             {
@@ -755,6 +798,10 @@ namespace System.Collections
         }
         public nothrow bool Remove(const KeyType& key)
         {
+            if (IsEmpty())
+            {
+                return false;
+            }
             RedBlackTreeNode<ValueType>* n = Root();
             while (n != null)
             {

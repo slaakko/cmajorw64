@@ -202,6 +202,7 @@ namespace System.Collections
         public nothrow Hashtable(Self&& that) : 
             buckets(Rvalue(that.buckets)), count(that.count), loadFactor(that.loadFactor), maxLoadFactor(that.maxLoadFactor), keyOf(that.keyOf), hash(that.hash), equal(that.equal)
         {
+            that.count = 0;
         }
         public void operator=(const Self& that)
         {

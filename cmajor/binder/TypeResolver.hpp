@@ -29,8 +29,25 @@ private:
     NamespaceSymbol* ns;
 };
 
+enum class TypeResolverFlags : uint8_t
+{
+    none = 0,
+    resolveClassGroup = 1 << 0,
+    createMemberSymbols = 1 << 1
+};
+
+inline TypeResolverFlags operator&(TypeResolverFlags left, TypeResolverFlags right)
+{
+    return TypeResolverFlags(uint8_t(left) & uint8_t(right));
+}
+
+inline TypeResolverFlags operator|(TypeResolverFlags left, TypeResolverFlags right)
+{
+    return TypeResolverFlags(uint8_t(left) | uint8_t(right));
+}
+
 TypeSymbol* ResolveType(Node* typeExprNode, BoundCompileUnit& boundCompileUnit, ContainerScope* containerScope);
-TypeSymbol* ResolveType(Node* typeExprNode, BoundCompileUnit& boundCompileUnit, ContainerScope* containerScope, bool resolveClassGroup);
+TypeSymbol* ResolveType(Node* typeExprNode, BoundCompileUnit& boundCompileUnit, ContainerScope* containerScope, TypeResolverFlags flags);
 
 } } // namespace cmajor::binder
 

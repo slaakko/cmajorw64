@@ -1580,7 +1580,25 @@ void StatementBinder::Visit(CatchNode& catchNode)
 
 void StatementBinder::Visit(AssertStatementNode& assertStatementNode)
 {
-    if (GetGlobalFlag(GlobalFlags::unitTest) && InUnitTest())
+    bool unitTesting = GetGlobalFlag(GlobalFlags::unitTest) && InUnitTest();
+    bool unitTestAssertion = false;
+    if (unitTesting)
+    {
+        FunctionSymbol* functionSymbol = currentFunction->GetFunctionSymbol();
+        Node* node = symbolTable.GetNodeNoThrow(functionSymbol);
+        if (node)
+        {
+            if (node->GetNodeType() == NodeType::functionNode)
+            {
+                FunctionNode* functionNode = static_cast<FunctionNode*>(node);
+                if ((functionNode->GetSpecifiers() & Specifiers::unit_test_) != Specifiers::none)
+                {
+                    unitTestAssertion = true;
+                }
+            }
+        }
+    }
+    if (unitTestAssertion)
     {
         int32_t assertionLineNumber = assertStatementNode.GetSpan().LineNumber();
         int32_t assertionIndex = GetNextUnitTestAssertionNumber();

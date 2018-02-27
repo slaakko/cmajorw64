@@ -69,7 +69,7 @@ void UsingNodeAdder::Visit(NamespaceImportNode& namespaceImportNode)
 }
 
 TypeBinder::TypeBinder(BoundCompileUnit& boundCompileUnit_) : 
-    boundCompileUnit(boundCompileUnit_), symbolTable(boundCompileUnit.GetSymbolTable()), containerScope(), enumType(nullptr), currentFunctionSymbol(nullptr)
+    boundCompileUnit(boundCompileUnit_), symbolTable(boundCompileUnit.GetSymbolTable()), containerScope(), enumType(nullptr), currentFunctionSymbol(nullptr), typeResolverFlags(TypeResolverFlags::none)
 {
 }
 
@@ -156,13 +156,13 @@ void TypeBinder::Visit(FunctionNode& functionNode)
     for (int i = 0; i < n; ++i)
     {
         ParameterNode* parameterNode = functionNode.Parameters()[i];
-        TypeSymbol* parameterType = ResolveType(parameterNode->TypeExpr(), boundCompileUnit, containerScope);
+        TypeSymbol* parameterType = ResolveType(parameterNode->TypeExpr(), boundCompileUnit, containerScope, typeResolverFlags);
         Symbol* symbol = symbolTable.GetSymbol(parameterNode);
         Assert(symbol->GetSymbolType() == SymbolType::parameterSymbol, "parameter symbol expected");
         ParameterSymbol* parameterSymbol = static_cast<ParameterSymbol*>(symbol);
         parameterSymbol->SetType(parameterType);
     }
-    TypeSymbol* returnType = ResolveType(functionNode.ReturnTypeExpr(), boundCompileUnit, containerScope);
+    TypeSymbol* returnType = ResolveType(functionNode.ReturnTypeExpr(), boundCompileUnit, containerScope, typeResolverFlags);
     functionSymbol->SetReturnType(returnType);
     if (!functionSymbol->Constraint() && functionNode.WhereConstraint())
     {
@@ -253,7 +253,7 @@ void TypeBinder::BindClass(ClassTypeSymbol* classTypeSymbol, ClassNode* classNod
     for (int i = 0; i < nb; ++i)
     {
         Node* baseOrInterfaceNode = classNode->BaseClassOrInterfaces()[i];
-        TypeSymbol* baseOrInterfaceSymbol = ResolveType(baseOrInterfaceNode, boundCompileUnit, containerScope);
+        TypeSymbol* baseOrInterfaceSymbol = ResolveType(baseOrInterfaceNode, boundCompileUnit, containerScope, typeResolverFlags);
         if (baseOrInterfaceSymbol->IsClassTypeSymbol())
         {
             ClassTypeSymbol* baseClassSymbol = static_cast<ClassTypeSymbol*>(baseOrInterfaceSymbol);
@@ -392,7 +392,7 @@ void TypeBinder::Visit(ConstructorNode& constructorNode)
     for (int i = 0; i < n; ++i)
     {
         ParameterNode* parameterNode = constructorNode.Parameters()[i];
-        TypeSymbol* parameterType = ResolveType(parameterNode->TypeExpr(), boundCompileUnit, containerScope);
+        TypeSymbol* parameterType = ResolveType(parameterNode->TypeExpr(), boundCompileUnit, containerScope, typeResolverFlags);
         Symbol* symbol = symbolTable.GetSymbol(parameterNode);
         Assert(symbol->GetSymbolType() == SymbolType::parameterSymbol, "parameter symbol expected");
         ParameterSymbol* parameterSymbol = static_cast<ParameterSymbol*>(symbol);
@@ -521,13 +521,13 @@ void TypeBinder::Visit(MemberFunctionNode& memberFunctionNode)
     for (int i = 0; i < n; ++i)
     {
         ParameterNode* parameterNode = memberFunctionNode.Parameters()[i];
-        TypeSymbol* parameterType = ResolveType(parameterNode->TypeExpr(), boundCompileUnit, containerScope);
+        TypeSymbol* parameterType = ResolveType(parameterNode->TypeExpr(), boundCompileUnit, containerScope, typeResolverFlags);
         Symbol* symbol = symbolTable.GetSymbol(parameterNode);
         Assert(symbol->GetSymbolType() == SymbolType::parameterSymbol, "parameter symbol expected");
         ParameterSymbol* parameterSymbol = static_cast<ParameterSymbol*>(symbol);
         parameterSymbol->SetType(parameterType);
     }
-    TypeSymbol* returnType = ResolveType(memberFunctionNode.ReturnTypeExpr(), boundCompileUnit, containerScope);
+    TypeSymbol* returnType = ResolveType(memberFunctionNode.ReturnTypeExpr(), boundCompileUnit, containerScope, typeResolverFlags);
     memberFunctionSymbol->SetReturnType(returnType);
     if (!memberFunctionSymbol->Constraint() && memberFunctionNode.WhereConstraint())
     {
@@ -607,7 +607,7 @@ void TypeBinder::Visit(ConversionFunctionNode& conversionFunctionNode)
         conversionFunctionSymbol->SetLinkOnceOdrLinkage();
         requireBody = false;
     }
-    TypeSymbol* returnType = ResolveType(conversionFunctionNode.ReturnTypeExpr(), boundCompileUnit, containerScope);
+    TypeSymbol* returnType = ResolveType(conversionFunctionNode.ReturnTypeExpr(), boundCompileUnit, containerScope, typeResolverFlags);
     conversionFunctionSymbol->SetReturnType(returnType);
     if (!conversionFunctionSymbol->Constraint() && conversionFunctionNode.WhereConstraint())
     {
@@ -651,7 +651,7 @@ void TypeBinder::Visit(MemberVariableNode& memberVariableNode)
     {
         throw Exception("static class cannot contain instance variables", memberVariableSymbol->GetSpan(), parent->GetSpan());
     }
-    TypeSymbol* memberVariableType = ResolveType(memberVariableNode.TypeExpr(), boundCompileUnit, containerScope);
+    TypeSymbol* memberVariableType = ResolveType(memberVariableNode.TypeExpr(), boundCompileUnit, containerScope, typeResolverFlags);
     memberVariableSymbol->SetType(memberVariableType);
     if (memberVariableType->IsClassTypeSymbol() && memberVariableType->IsProject() && !memberVariableType->IsBound() && !GetGlobalFlag(GlobalFlags::info))
     {
@@ -703,13 +703,13 @@ void TypeBinder::Visit(DelegateNode& delegateNode)
     for (int i = 0; i < n; ++i)
     {
         ParameterNode* parameterNode = delegateNode.Parameters()[i];
-        TypeSymbol* parameterType = ResolveType(parameterNode->TypeExpr(), boundCompileUnit, containerScope);
+        TypeSymbol* parameterType = ResolveType(parameterNode->TypeExpr(), boundCompileUnit, containerScope, typeResolverFlags);
         Symbol* symbol = symbolTable.GetSymbol(parameterNode);
         Assert(symbol->GetSymbolType() == SymbolType::parameterSymbol, "parameter symbol expected");
         ParameterSymbol* parameterSymbol = static_cast<ParameterSymbol*>(symbol);
         parameterSymbol->SetType(parameterType);
     }
-    TypeSymbol* returnType = ResolveType(delegateNode.ReturnTypeExpr(), boundCompileUnit, containerScope);
+    TypeSymbol* returnType = ResolveType(delegateNode.ReturnTypeExpr(), boundCompileUnit, containerScope, typeResolverFlags);
     delegateTypeSymbol->SetReturnType(returnType);
     if (delegateTypeSymbol->ReturnsClassInterfaceOrClassDelegateByValue())
     {
@@ -761,7 +761,7 @@ void TypeBinder::Visit(ClassDelegateNode& classDelegateNode)
     for (int i = 0; i < n; ++i)
     {
         ParameterNode* parameterNode = classDelegateNode.Parameters()[i];
-        TypeSymbol* parameterType = ResolveType(parameterNode->TypeExpr(), boundCompileUnit, containerScope);
+        TypeSymbol* parameterType = ResolveType(parameterNode->TypeExpr(), boundCompileUnit, containerScope, typeResolverFlags);
         Symbol* symbol = symbolTable.GetSymbol(parameterNode);
         Assert(symbol->GetSymbolType() == SymbolType::parameterSymbol, "parameter symbol expected");
         ParameterSymbol* parameterSymbol = static_cast<ParameterSymbol*>(symbol);
@@ -770,7 +770,7 @@ void TypeBinder::Visit(ClassDelegateNode& classDelegateNode)
         memberParam->SetType(parameterType);
         memberDelegateType->AddMember(memberParam);
     }
-    TypeSymbol* returnType = ResolveType(classDelegateNode.ReturnTypeExpr(), boundCompileUnit, containerScope);
+    TypeSymbol* returnType = ResolveType(classDelegateNode.ReturnTypeExpr(), boundCompileUnit, containerScope, typeResolverFlags);
     classDelegateTypeSymbol->SetReturnType(returnType);
     if (classDelegateTypeSymbol->ReturnsClassInterfaceOrClassDelegateByValue())
     {
@@ -900,7 +900,7 @@ void TypeBinder::Visit(ConstructionStatementNode& constructionStatementNode)
     Symbol* symbol = symbolTable.GetSymbol(&constructionStatementNode);
     Assert(symbol->GetSymbolType() == SymbolType::localVariableSymbol, "local variable symbol expected");
     LocalVariableSymbol* localVariableSymbol = static_cast<LocalVariableSymbol*>(symbol);
-    TypeSymbol* type = ResolveType(constructionStatementNode.TypeExpr(), boundCompileUnit, containerScope);
+    TypeSymbol* type = ResolveType(constructionStatementNode.TypeExpr(), boundCompileUnit, containerScope, typeResolverFlags);
     localVariableSymbol->SetType(type);
 }
 
@@ -962,12 +962,12 @@ void TypeBinder::Visit(CatchNode& catchNode)
         Symbol* symbol = symbolTable.GetSymbol(catchNode.Id()); 
         Assert(symbol->GetSymbolType() == SymbolType::localVariableSymbol, "local variable symbol expected");
         LocalVariableSymbol* exceptionVarSymbol = static_cast<LocalVariableSymbol*>(symbol);
-        TypeSymbol* type = ResolveType(catchNode.TypeExpr(), boundCompileUnit, containerScope);
+        TypeSymbol* type = ResolveType(catchNode.TypeExpr(), boundCompileUnit, containerScope, typeResolverFlags);
         if (type->BaseType()->IsClassTypeSymbol())
         {
             ClassTypeSymbol* exceptionVarClassType = static_cast<ClassTypeSymbol*>(type->BaseType());
             IdentifierNode systemExceptionNode(catchNode.GetSpan(), U"System.Exception");
-            TypeSymbol* systemExceptionType = ResolveType(&systemExceptionNode, boundCompileUnit, containerScope);
+            TypeSymbol* systemExceptionType = ResolveType(&systemExceptionNode, boundCompileUnit, containerScope, typeResolverFlags);
             Assert(systemExceptionType->IsClassTypeSymbol(), "System.Exception not of class type");
             ClassTypeSymbol* systemExceptionClassType = static_cast<ClassTypeSymbol*>(systemExceptionType);
             if (exceptionVarClassType->IsProject())
@@ -1106,7 +1106,7 @@ void TypeBinder::BindTypedef(TypedefSymbol* typedefSymbol, TypedefNode* typedefN
     {
         AddUsingNodesToCurrentCompileUnit(typedefNode);
     }
-    TypeSymbol* typeSymbol = ResolveType(typedefNode->TypeExpr(), boundCompileUnit, containerScope);
+    TypeSymbol* typeSymbol = ResolveType(typedefNode->TypeExpr(), boundCompileUnit, containerScope, typeResolverFlags);
     typedefSymbol->SetType(typeSymbol);
 }
 
@@ -1117,7 +1117,7 @@ void TypeBinder::Visit(ConstantNode& constantNode)
     ConstantSymbol* constantSymbol = static_cast<ConstantSymbol*>(symbol);
     constantSymbol->SetSpecifiers(constantNode.GetSpecifiers());
     constantSymbol->ComputeMangledName();
-    TypeSymbol* typeSymbol = ResolveType(constantNode.TypeExpr(), boundCompileUnit, containerScope);
+    TypeSymbol* typeSymbol = ResolveType(constantNode.TypeExpr(), boundCompileUnit, containerScope, typeResolverFlags);
     constantSymbol->SetType(typeSymbol);
     constantSymbol->SetEvaluating();
     std::unique_ptr<Value> value = Evaluate(constantNode.Value(), typeSymbol, containerScope, boundCompileUnit, false, nullptr, constantNode.GetSpan());
@@ -1152,7 +1152,7 @@ void TypeBinder::Visit(EnumTypeNode& enumTypeNode)
     TypeSymbol* underlyingType = symbolTable.GetTypeByName(U"int");
     if (enumTypeNode.GetUnderlyingType())
     {
-        underlyingType = ResolveType(enumTypeNode.GetUnderlyingType(), boundCompileUnit, containerScope);
+        underlyingType = ResolveType(enumTypeNode.GetUnderlyingType(), boundCompileUnit, containerScope, typeResolverFlags);
     }
     enumTypeSymbol->SetUnderlyingType(underlyingType);
     ContainerScope* prevContainerScope = containerScope;
@@ -1206,6 +1206,11 @@ void TypeBinder::Visit(EnumConstantNode& enumConstantNode)
     std::unique_ptr<Value> value = Evaluate(enumConstantNode.GetValue(), enumType->UnderlyingType(), containerScope, boundCompileUnit, false, nullptr, enumConstantNode.GetSpan());
     enumConstantSymbol->SetValue(value.release());
     enumConstantSymbol->ResetEvaluating();
+}
+
+void TypeBinder::BindPrototype()
+{
+    typeResolverFlags = typeResolverFlags | TypeResolverFlags::createMemberSymbols;
 }
 
 } } // namespace cmajor::binder
