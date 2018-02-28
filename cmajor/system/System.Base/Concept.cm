@@ -111,10 +111,8 @@ namespace System.Concepts
         typename T.ValueType;
         where T.ValueType is Semiregular;
         typename T.ReferenceType;
-        where T.ReferenceType is T.ValueType&;
         T.ReferenceType operator*();
         typename T.PointerType;
-        where T.PointerType is T.ValueType*;
         T.PointerType operator->();
     }
 

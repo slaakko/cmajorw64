@@ -348,7 +348,7 @@ namespace System
         return count;
     }
 
-    public nothrow O RemoveCopy<I, O, P>(I begin, I end, O result, P p) where I is InputIterator and O is OutputIterator and O.ValueType is I.ValueType and P is UnaryPredicate and P.ArgumentType is I.ValueType
+    public O RemoveCopy<I, O, P>(I begin, I end, O result, P p) where I is InputIterator and O is OutputIterator and O.ValueType is I.ValueType and P is UnaryPredicate and P.ArgumentType is I.ValueType
     {
         while (begin != end)
         {
@@ -362,7 +362,7 @@ namespace System
         return result;
     }
 
-    public nothrow I Remove<I, P>(I begin, I end, P p) where I is ForwardIterator and P is UnaryPredicate and P.ArgumentType is I.ValueType
+    public I Remove<I, P>(I begin, I end, P p) where I is ForwardIterator and P is UnaryPredicate and P.ArgumentType is I.ValueType
     {
         begin = Find(begin, end, p);
         if (begin == end)
@@ -377,7 +377,7 @@ namespace System
         }
     }
 
-    public nothrow O RemoveCopy<I, O, T>(I begin, I end, O result, const T& value) 
+    public O RemoveCopy<I, O, T>(I begin, I end, O result, const T& value) 
         where T is Semiregular and I is InputIterator and O is OutputIterator and O.ValueType is I.ValueType and EqualityComparable<T, I.ValueType>
     {
         while (begin != end)
@@ -392,7 +392,7 @@ namespace System
         return result;
     }
 
-    public nothrow I Remove<I, T>(I begin, I end, const T& value) where I is ForwardIterator and T is Semiregular and EqualityComparable<T, I.ValueType>
+    public I Remove<I, T>(I begin, I end, const T& value) where I is ForwardIterator and T is Semiregular and EqualityComparable<T, I.ValueType>
     {
         begin = Find(begin, end, value);
         if (begin == end)

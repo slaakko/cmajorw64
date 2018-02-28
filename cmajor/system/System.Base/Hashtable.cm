@@ -101,7 +101,7 @@ namespace System.Collections
     {
         public typedef T ValueType;
         
-        public Bucket(const ValueType& value_, Bucket<ValueType>* next_): value(value_), next(next_)
+        public Bucket(const ValueType& value_, Bucket<ValueType>* next_) : value(value_), next(next_)
         {
         }
         public inline nothrow const ValueType& Value() const 
@@ -195,7 +195,7 @@ namespace System.Collections
         public nothrow Hashtable() : buckets(), count(0), loadFactor(0.0), maxLoadFactor(0.8), keyOf(), hash(), equal()
         {
         }
-        public Hashtable(const Self& that)
+        public Hashtable(const Self& that) : buckets(), count(0), loadFactor(that.loadFactor), maxLoadFactor(that.maxLoadFactor), keyOf(that.keyOf), hash(that.hash), equal(that.equal)
         {
             CopyFrom(that);
         }

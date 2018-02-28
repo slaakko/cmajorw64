@@ -29,7 +29,7 @@ namespace System
     {
         private typedef BackInsertIterator<C> Self;
         private typedef BackInsertProxy<C> Proxy;
-        public typedef Proxy ValueType;
+        public typedef C.ValueType ValueType;
         public typedef Proxy& ReferenceType;
         public typedef Proxy* PointerType;
 
@@ -39,11 +39,11 @@ namespace System
         public inline nothrow BackInsertIterator(C& c) : proxy(&c)
         {
         }
-        public inline nothrow ReferenceType operator*() 
+        public inline nothrow Proxy& operator*() 
         {
             return proxy;
         }
-        public inline nothrow PointerType operator->()
+        public inline nothrow Proxy* operator->()
         {
             return &proxy;
         }

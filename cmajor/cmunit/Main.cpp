@@ -846,6 +846,14 @@ int main(int argc, const char** argv)
                 {
                     SetGlobalFlag(GlobalFlags::verbose);
                 }
+                else if (arg == "--link-with-debug-runtime" || arg == "-d")
+                {
+                    SetGlobalFlag(GlobalFlags::linkWithDebugRuntime);
+                }
+                else if (arg == "--link-using-ms-link" || arg == "-m")
+                {
+                    SetGlobalFlag(GlobalFlags::linkUsingMsLink);
+                }
                 else if (arg.find('=') != std::string::npos)
                 {
                     std::vector<std::string> components = Split(arg, '=');

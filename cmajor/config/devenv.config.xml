@@ -3,7 +3,7 @@
     <cmc>cmc.exe</cmc>
     <tabSize>4</tabSize>
     <infoDelaySecs>10</infoDelaySecs>
-    <formSizeX>1778</formSizeX>
+    <formSizeX>1787</formSizeX>
     <formSizeY>968</formSizeY>
     <formTop>0</formTop>
     <formLeft>0</formLeft>
@@ -22,17 +22,17 @@
     <findLineColWidth>85</findLineColWidth>
     <findProjectColWidth>183</findProjectColWidth>
     <findTextColWidth>738</findTextColWidth>
-    <horizontalSplitterPos>1343</horizontalSplitterPos>
+    <horizontalSplitterPos>1349</horizontalSplitterPos>
     <verticalSplitterPos>547</verticalSplitterPos>
     <windowState>Normal</windowState>
     <maxRecentProjects>10</maxRecentProjects>
     <recentProjects>
         <recentProject>
-            <path>C:\Users\Seppo\cmajorw64\cmajor\test\foo\foo.cms</path>
+            <path>C:\Users\Seppo\cmajorw64\cmajor\system\System.cms</path>
             <openFiles />
         </recentProject>
         <recentProject>
-            <path>C:\Users\Seppo\cmajorw64\cmajor\system\System.cms</path>
+            <path>C:\Users\Seppo\cmajorw64\cmajor\test\foo\foo.cms</path>
             <openFiles />
         </recentProject>
         <recentProject>
