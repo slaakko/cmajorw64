@@ -91,7 +91,7 @@ bool operator!=(const ArrayKey& left, const ArrayKey& right)
 }
 
 SymbolTable::SymbolTable() : 
-    globalNs(Span(), std::u32string()), currentCompileUnit(nullptr), container(&globalNs), currentClass(nullptr), currentInterface(nullptr), mainFunctionSymbol(nullptr), 
+    globalNs(Span(), std::u32string()), currentCompileUnit(nullptr), container(&globalNs), currentClass(nullptr), currentInterface(nullptr), mainFunctionSymbol(nullptr), currentFunctionSymbol(nullptr),
     parameterIndex(0), declarationBlockIndex(0)
 {
     globalNs.SetSymbolTable(this);
@@ -149,6 +149,16 @@ void SymbolTable::Write(SymbolWriter& writer)
     {
         writer.GetBinaryWriter().Write(jsonClass);
     }
+    if (GetGlobalFlag(GlobalFlags::profile))
+    {
+        uint32_t n = profiledFunctionNameMap.size();
+        writer.GetBinaryWriter().Write(n);
+        for (const auto& p : profiledFunctionNameMap)
+        {
+            writer.GetBinaryWriter().Write(p.first);
+            writer.GetBinaryWriter().Write(p.second);
+        }
+    }
 }
 
 void SymbolTable::Read(SymbolReader& reader)
@@ -179,6 +189,16 @@ void SymbolTable::Read(SymbolReader& reader)
     {
         std::u32string jsonClass = reader.GetBinaryReader().ReadUtf32String();
         jsonClasses.insert(jsonClass);
+    }
+    if (GetGlobalFlag(GlobalFlags::profile))
+    {
+        uint32_t n = reader.GetBinaryReader().ReadUInt();
+        for (uint32_t i = 0; i < n; ++i)
+        {
+            uint32_t functionId = reader.GetBinaryReader().ReadUInt();
+            std::u32string profiledFunctionName = reader.GetBinaryReader().ReadUtf32String();
+            MapProfiledFunction(functionId, profiledFunctionName);
+        }
     }
     ProcessTypeConceptAndFunctionRequests();
     for (FunctionSymbol* conversion : reader.Conversions())
@@ -280,6 +300,15 @@ void SymbolTable::Import(SymbolTable& symbolTable)
     {
         AddJsonClass(jsonClass);
     }
+    if (GetGlobalFlag(GlobalFlags::profile))
+    {
+        for (const auto& p : symbolTable.profiledFunctionNameMap)
+        {
+            uint32_t functionId = p.first;
+            const std::u32string& profiledFunctionName = p.second;
+            MapProfiledFunction(functionId, profiledFunctionName);
+        }
+    }
     symbolTable.Clear();
 }
 
@@ -289,6 +318,7 @@ void SymbolTable::Clear()
     typeIdMap.clear();
     functionIdMap.clear();
     typeNameMap.clear();
+    profiledFunctionNameMap.clear();
 }
 
 void SymbolTable::BeginContainer(ContainerSymbol* container_)
@@ -824,6 +854,17 @@ void SymbolTable::EndDeclarationBlock()
 
 void SymbolTable::AddLocalVariable(ConstructionStatementNode& constructionStatementNode)
 {
+    if (GetGlobalFlag(GlobalFlags::profile) && constructionStatementNode.Id()->Str() == U"@functionProfiler")
+    {
+        for (LocalVariableSymbol* localVariableSymbol : currentFunctionSymbol->LocalVariables())
+        {
+            if (localVariableSymbol->Name() == U"@functionProfiler")
+            {
+                MapNode(&constructionStatementNode, localVariableSymbol);
+                return;
+            }
+        }
+    }
     LocalVariableSymbol* localVariableSymbol = new LocalVariableSymbol(constructionStatementNode.GetSpan(), constructionStatementNode.Id()->Str());
     localVariableSymbol->SetCompileUnit(currentCompileUnit);
     localVariableSymbol->SetSymbolTable(this);
@@ -999,6 +1040,19 @@ void SymbolTable::SetTypeIdFor(ConceptSymbol* conceptSymbol)
 void SymbolTable::SetFunctionIdFor(FunctionSymbol* functionSymbol)
 {
     functionSymbol->SetFunctionId(FunctionIdCounter::Instance().GetNextFunctionId());
+}
+
+FunctionSymbol* SymbolTable::GetFunctionById(uint32_t functionId) const
+{
+    auto it = functionIdMap.find(functionId);
+    if (it != functionIdMap.cend())
+    {
+        return it->second;
+    }
+    else
+    {
+        return nullptr;
+    }
 }
 
 void SymbolTable::EmplaceTypeRequest(Symbol* forSymbol, uint32_t typeId, int index)
@@ -1343,6 +1397,21 @@ void SymbolTable::Copy(const SymbolTable& that)
     {
         functionIdMap[p.first] = p.second;
     }
+}
+
+void SymbolTable::MapProfiledFunction(uint32_t functionId, const std::u32string& profiledFunctionName)
+{
+    profiledFunctionNameMap[functionId] = profiledFunctionName;
+}
+
+std::u32string SymbolTable::GetProfiledFunctionName(uint32_t functionId) const
+{
+    auto it = profiledFunctionNameMap.find(functionId);
+    if (it != profiledFunctionNameMap.cend())
+    {
+        return it->second;
+    }
+    return std::u32string();
 }
 
 class IntrinsicConcepts

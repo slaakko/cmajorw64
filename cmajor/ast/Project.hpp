@@ -85,6 +85,7 @@ public:
     const std::string& LibraryFilePath() const { return libraryFilePath; }
     const std::string& ExecutableFilePath() const { return executableFilePath; }
     const std::vector<std::string>& References() const { return references; }
+    const std::vector<std::string>& ReferencedProjectFilePaths() const { return referencedProjectFilePaths; }
     const std::vector<std::string>& SourceFilePaths() const { return sourceFilePaths; }
     Target GetTarget() const { return target; }
     bool DependsOn(Project* that) const;
@@ -92,6 +93,7 @@ public:
     void SetSystemProject() { isSystemProject = true; }
     void SetModuleFilePath(const std::string& moduleFilePath_);
     void SetLibraryFilePath(const std::string& libraryFilePath_);
+    bool IsUpToDate() const;
 private:
     std::u32string name;
     std::string filePath;
@@ -104,6 +106,7 @@ private:
     std::string libraryFilePath;
     std::string executableFilePath;
     std::vector<std::string> references;
+    std::vector<std::string> referencedProjectFilePaths;
     std::vector<std::string> sourceFilePaths;
     bool isSystemProject;
 };

@@ -321,24 +321,24 @@ namespace Syntax
                     formatter.WriteLine("public class Context : System.Text.Parsing.Context");
                     formatter.WriteLine("{");
                     formatter.IncIndent();
-                    formatter.Write("public Context() : ");
+                    formatter.Write("public Context()");
                     bool first = true;
                     m = rule->InheritedAttributes().Count();
                     for (long j = 0; j < m; ++j)
                     {
-                        if (first) { first = false; } else { formatter.Write(", "); }
+                        if (first) { first = false; formatter.Write(" : "); } else { formatter.Write(", "); }
                         const AttrOrVar& attr = rule->InheritedAttributes()[j];
                         formatter.Write(ToUtf8(attr.Name()) + "()");
                     }
                     if (!rule->ValueTypeName().IsEmpty())
                     {
-                        if (first) { first = false; } else { formatter.Write(", "); }
+                        if (first) { first = false; formatter.Write(" : "); } else { formatter.Write(", "); }
                         formatter.Write("value()");
                     }
                     m = rule->LocalVariables().Count();
                     for (long j = 0; j < m; ++j)
                     {
-                        if (first) { first = false; } else { formatter.Write(", "); }
+                        if (first) { first = false; formatter.Write(" : "); } else { formatter.Write(", "); }
                         const AttrOrVar& var = rule->LocalVariables()[j];
                         formatter.Write(ToUtf8(var.Name()) + "()");
                     }
@@ -348,7 +348,7 @@ namespace Syntax
                         NonterminalParser* nonterminal = rule->Nonterminals()[j];
                         if (!nonterminal->Rule()->ValueTypeName().IsEmpty())
                         {
-                            if (first) { first = false; } else { formatter.Write(", "); }
+                            if (first) { first = false; formatter.Write(" : "); } else { formatter.Write(", "); }
                             formatter.Write(ToUtf8(nonterminal->ValueFieldName()) + "()");
                         }
                     }
@@ -476,7 +476,7 @@ namespace Syntax
         }
         public override void Visit(RangeParser& parser)
         {
-            formatter.Write("new System.Text.Parsing.RangeParser(" + ToString(parser.Start()) + ", " + ToString(parser.End()) + ")");
+            formatter.Write("new System.Text.Parsing.RangeParser(" + ToString(parser.Start()) + "u, " + ToString(parser.End()) + "u)");
         }
         public override void Visit(EmptyParser& parser)
         {

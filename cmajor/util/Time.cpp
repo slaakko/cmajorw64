@@ -80,6 +80,28 @@ std::string DateTime::ToString(bool omitDashes, bool omitColons, bool omitMins, 
     return dateTime;
 }
 
+std::string FormatTimeMs(int32_t milliseconds)
+{
+    int32_t hh = milliseconds / 3600000;
+    int32_t mm = milliseconds / 60000 % 60;
+    int32_t ss = milliseconds / 1000 % 60;
+    int32_t ms = milliseconds % 1000;
+    std::string time;
+    time.append(1, static_cast<char>(static_cast<int32_t>('0') + ((hh / 10) % 10)));
+    time.append(1, static_cast<char>(static_cast<int32_t>('0') + (hh % 10)));
+    time.append(1, ':');
+    time.append(1, static_cast<char>(static_cast<int32_t>('0') + ((mm / 10) % 10)));
+    time.append(1, static_cast<char>(static_cast<int>('0') + (mm % 10)));
+    time.append(1, ':');
+    time.append(1, static_cast<char>(static_cast<int32_t>('0') + ((ss / 10) % 10)));
+    time.append(1, static_cast<char>(static_cast<int32_t>('0') + (ss % 10)));
+    time.append(1, '.');
+    time.append(1, static_cast<char>(static_cast<int32_t>('0') + ((ms / 100) % 10)));
+    time.append(1, static_cast<char>(static_cast<int32_t>('0') + ((ms / 10) % 10)));
+    time.append(1, static_cast<char>(static_cast<int32_t>('0') + (ms % 10)));
+    return time;
+}
+
 DateTime GetCurrentDateTime()
 {
     std::time_t currentTime;

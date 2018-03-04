@@ -46,7 +46,14 @@ std::string GetConfig()
     std::string config = "debug";
     if (GetGlobalFlag(GlobalFlags::release))
     {
-        config = "release";
+        if (GetGlobalFlag(GlobalFlags::profile))
+        {
+            config = "profile";
+        }
+        else
+        {
+            config = "release";
+        }
     }
     return config;
 }

@@ -100,6 +100,15 @@ void Project::ResolveDeclarations()
             {
                 ReferenceDeclaration* reference = static_cast<ReferenceDeclaration*>(declaration.get());
                 boost::filesystem::path rp(reference->FilePath());
+                if (rp.is_absolute())
+                {
+                    referencedProjectFilePaths.push_back(GetFullPath(rp.generic_string()));
+                }
+                else
+                {
+                    boost::filesystem::path ar = basePath / rp;
+                    referencedProjectFilePaths.push_back(GetFullPath(ar.generic_string()));
+                }
                 boost::filesystem::path fn = rp.filename();
                 rp.remove_filename();
                 if (rp.is_relative())
@@ -196,6 +205,22 @@ void Project::SetModuleFilePath(const std::string& moduleFilePath_)
 void Project::SetLibraryFilePath(const std::string& libraryFilePath_)
 {
     libraryFilePath = libraryFilePath_;
+}
+
+bool Project::IsUpToDate() const
+{
+    if (!boost::filesystem::exists(moduleFilePath))
+    {
+        return false;
+    }
+    for (const std::string& sourceFilePath : sourceFilePaths)
+    {
+        if (boost::filesystem::last_write_time(sourceFilePath) > boost::filesystem::last_write_time(moduleFilePath))
+        {
+            return false;
+        }
+    }
+    return true;
 }
 
 } } // namespace cmajor::ast

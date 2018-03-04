@@ -500,6 +500,37 @@ void StatementBinder::Visit(CompoundStatementNode& compoundStatementNode)
     std::unique_ptr<BoundCompoundStatement> boundCompoundStatement(new BoundCompoundStatement(compoundStatementNode.GetSpan()));
     if (compoundLevel == 0)
     {
+        if (GetGlobalFlag(GlobalFlags::profile))
+        {
+            bool profile = true;
+            if (currentFunction->GetFunctionSymbol()->IsProgramMain())
+            {
+                profile = false;
+            }
+            else if (currentClass && currentClass->GetClassTypeSymbol()->FullName() == U"System.Runtime.FunctionProfiler")
+            {
+                profile = false;
+            }
+            if (profile)
+            {
+                uint32_t functionId = currentFunction->GetFunctionSymbol()->FunctionId();
+                symbolTable.MapProfiledFunction(functionId, currentFunction->GetFunctionSymbol()->FullName());
+                ConstructionStatementNode constructFunctionProfiler(compoundStatementNode.GetSpan(), new IdentifierNode(compoundStatementNode.GetSpan(), U"System.Runtime.FunctionProfiler"),
+                    new IdentifierNode(compoundStatementNode.GetSpan(), U"@functionProfiler"));
+                constructFunctionProfiler.AddArgument(new UIntLiteralNode(compoundStatementNode.GetSpan(), functionId));
+                symbolTable.SetCurrentFunctionSymbol(currentFunction->GetFunctionSymbol());
+                symbolTable.BeginContainer(containerScope->Container());
+                SymbolCreatorVisitor symbolCreatorVisitor(symbolTable);
+                constructFunctionProfiler.Accept(symbolCreatorVisitor);
+                symbolTable.EndContainer();
+                TypeBinder typeBinder(boundCompileUnit);
+                typeBinder.SetContainerScope(containerScope);
+                typeBinder.SetCurrentFunctionSymbol(currentFunction->GetFunctionSymbol());
+                constructFunctionProfiler.Accept(typeBinder);
+                constructFunctionProfiler.Accept(*this);
+                boundCompoundStatement->AddStatement(std::unique_ptr<BoundStatement>(ReleaseStatement()));
+            }
+        }
         if (currentStaticConstructorSymbol && currentStaticConstructorNode)
         {
             GenerateStaticClassInitialization(currentStaticConstructorSymbol, currentStaticConstructorNode, boundCompileUnit, boundCompoundStatement.get(), currentFunction, containerScope, this);

@@ -6,10 +6,14 @@
 #ifndef CMAJOR_BUILD_BUILD_INCLUDED
 #define CMAJOR_BUILD_BUILD_INCLUDED
 #include <cmajor/symbols/Module.hpp>
+#include <cmajor/ast/Project.hpp>
 
 namespace cmajor { namespace build {
 
+using namespace cmajor::ast;
+
 void BuildProject(const std::string& projectFilePath);
+void BuildProject(Project* project);
 void BuildSolution(const std::string& solutionFilePath);
 void GenerateLibrary(const std::vector<std::string>& objectFilePaths, const std::string& libraryFilePath);
 void Link(const std::string& executableFilePath, const std::string& libraryFilePath, const std::vector<std::string>& libraryFilePaths, cmajor::symbols::Module& module);

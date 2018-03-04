@@ -304,16 +304,16 @@ namespace Syntax
         public override void GetReferencedGrammars()
         {
             ParsingDomain* pd = Domain();
-            Grammar* grammar0 = pd->GetGrammar(ToUtf32("Syntax.ElementGrammar"));
+            Grammar* grammar0 = pd->GetGrammar(ToUtf32("Syntax.RuleGrammar"));
             if (grammar0 == null)
             {
-                grammar0 = new Syntax.ElementGrammar(pd);
+                grammar0 = new Syntax.RuleGrammar(pd);
             }
             AddGrammarReference(grammar0);
-            Grammar* grammar1 = pd->GetGrammar(ToUtf32("Syntax.RuleGrammar"));
+            Grammar* grammar1 = pd->GetGrammar(ToUtf32("Syntax.ElementGrammar"));
             if (grammar1 == null)
             {
-                grammar1 = new Syntax.RuleGrammar(pd);
+                grammar1 = new Syntax.ElementGrammar(pd);
             }
             AddGrammarReference(grammar1);
         }

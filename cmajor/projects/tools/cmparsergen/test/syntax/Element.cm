@@ -695,16 +695,16 @@ namespace Syntax
         public override void GetReferencedGrammars()
         {
             ParsingDomain* pd = Domain();
-            Grammar* grammar0 = pd->GetGrammar(ToUtf32("Code.IdentifierGrammar"));
+            Grammar* grammar0 = pd->GetGrammar(ToUtf32("Code.TypeExprGrammar"));
             if (grammar0 == null)
             {
-                grammar0 = new Code.IdentifierGrammar(pd);
+                grammar0 = new Code.TypeExprGrammar(pd);
             }
             AddGrammarReference(grammar0);
-            Grammar* grammar1 = pd->GetGrammar(ToUtf32("Code.TypeExprGrammar"));
+            Grammar* grammar1 = pd->GetGrammar(ToUtf32("Code.IdentifierGrammar"));
             if (grammar1 == null)
             {
-                grammar1 = new Code.TypeExprGrammar(pd);
+                grammar1 = new Code.IdentifierGrammar(pd);
             }
             AddGrammarReference(grammar1);
             Grammar* grammar2 = pd->GetGrammar(ToUtf32("System.Text.Parsing.stdlib"));

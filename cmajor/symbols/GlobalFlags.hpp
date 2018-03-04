@@ -27,7 +27,8 @@ enum class GlobalFlags : uint16_t
     strictNothrow = 1 << 10,
     time = 1 << 11,
     info = 1 << 12,
-    unitTest = 1 << 13
+    unitTest = 1 << 13,
+    profile = 1 << 14
 };
 
 void SetGlobalFlag(GlobalFlags flag);

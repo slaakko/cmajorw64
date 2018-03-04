@@ -75,6 +75,10 @@ bool SystemModuleSet::IsSystemModule(const std::u32string& moduleName) const
     }
     return false;
 }
+bool IsSystemModule(const std::u32string& moduleName) 
+{
+    return SystemModuleSet::Instance().IsSystemModule(moduleName);
+}
 
 const char* cmajorModuleTag = "CMM";
 
@@ -455,7 +459,7 @@ void Module::ImportModules(const std::vector<std::string>& references, std::unor
     std::unordered_map<std::string, ModuleDependency*>& moduleDependencyMap, std::unordered_map<std::string, Module*>& readMap)
 {
     std::vector<std::string> allReferences = references;
-    if (!IsSystemModule())
+    if (!IsSystemModule() && !GetGlobalFlag(GlobalFlags::profile))
     {
         allReferences.push_back(CmajorSystemModuleFilePath(GetConfig()));
     }

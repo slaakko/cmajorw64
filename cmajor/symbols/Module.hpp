@@ -10,6 +10,8 @@
 
 namespace cmajor { namespace symbols {
 
+bool IsSystemModule(const std::u32string& moduleName);
+
 extern const char* cmajorModuleTag;
 
 struct ModuleTag

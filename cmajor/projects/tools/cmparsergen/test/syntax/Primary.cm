@@ -700,34 +700,34 @@ namespace Syntax
         public override void GetReferencedGrammars()
         {
             ParsingDomain* pd = Domain();
-            Grammar* grammar0 = pd->GetGrammar(ToUtf32("Syntax.ElementGrammar"));
+            Grammar* grammar0 = pd->GetGrammar(ToUtf32("Syntax.CompositeGrammar"));
             if (grammar0 == null)
             {
-                grammar0 = new Syntax.ElementGrammar(pd);
+                grammar0 = new Syntax.CompositeGrammar(pd);
             }
             AddGrammarReference(grammar0);
-            Grammar* grammar1 = pd->GetGrammar(ToUtf32("Syntax.CompositeGrammar"));
+            Grammar* grammar1 = pd->GetGrammar(ToUtf32("Syntax.PrimitiveGrammar"));
             if (grammar1 == null)
             {
-                grammar1 = new Syntax.CompositeGrammar(pd);
+                grammar1 = new Syntax.PrimitiveGrammar(pd);
             }
             AddGrammarReference(grammar1);
-            Grammar* grammar2 = pd->GetGrammar(ToUtf32("Code.ExpressionGrammar"));
+            Grammar* grammar2 = pd->GetGrammar(ToUtf32("Syntax.ElementGrammar"));
             if (grammar2 == null)
             {
-                grammar2 = new Code.ExpressionGrammar(pd);
+                grammar2 = new Syntax.ElementGrammar(pd);
             }
             AddGrammarReference(grammar2);
-            Grammar* grammar3 = pd->GetGrammar(ToUtf32("Code.StatementGrammar"));
+            Grammar* grammar3 = pd->GetGrammar(ToUtf32("Code.ExpressionGrammar"));
             if (grammar3 == null)
             {
-                grammar3 = new Code.StatementGrammar(pd);
+                grammar3 = new Code.ExpressionGrammar(pd);
             }
             AddGrammarReference(grammar3);
-            Grammar* grammar4 = pd->GetGrammar(ToUtf32("Syntax.PrimitiveGrammar"));
+            Grammar* grammar4 = pd->GetGrammar(ToUtf32("Code.StatementGrammar"));
             if (grammar4 == null)
             {
-                grammar4 = new Syntax.PrimitiveGrammar(pd);
+                grammar4 = new Code.StatementGrammar(pd);
             }
             AddGrammarReference(grammar4);
         }

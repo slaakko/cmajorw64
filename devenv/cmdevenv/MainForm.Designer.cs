@@ -593,8 +593,7 @@ namespace cmdevenv
             this.configComboBox.FormattingEnabled = true;
             this.configComboBox.Items.AddRange(new object[] {
             "debug",
-            "release",
-            "profile"});
+            "release"});
             this.configComboBox.Location = new System.Drawing.Point(255, 28);
             this.configComboBox.Name = "configComboBox";
             this.configComboBox.Size = new System.Drawing.Size(121, 21);

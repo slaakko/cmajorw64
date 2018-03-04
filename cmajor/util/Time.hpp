@@ -83,6 +83,8 @@ private:
 
 DateTime GetCurrentDateTime();
 
+std::string FormatTimeMs(int32_t milliseconds);
+
 } } // namespace cmajor::util
 
 #endif // CMAJOR_UTIL_TIME_INCLUDED

@@ -552,7 +552,15 @@ void CreateMainUnit(std::vector<std::string>& objectFilePaths, Module& module, E
     CompoundStatementNode* mainFunctionBody = new CompoundStatementNode(Span());
     ConstructionStatementNode* constructExitCode = new ConstructionStatementNode(Span(), new IntNode(Span()), new IdentifierNode(Span(), U"exitCode"));
     mainFunctionBody->AddStatement(constructExitCode);
-    ExpressionStatementNode* rtInitCall = new ExpressionStatementNode(Span(), new InvokeNode(Span(), new IdentifierNode(Span(), U"RtInit")));
+    ExpressionStatementNode* rtInitCall = nullptr;
+    if (GetGlobalFlag(GlobalFlags::profile))
+    {
+        rtInitCall = new ExpressionStatementNode(Span(), new InvokeNode(Span(), new IdentifierNode(Span(), U"RtStartProfiling")));
+    }
+    else
+    {
+        rtInitCall = new ExpressionStatementNode(Span(), new InvokeNode(Span(), new IdentifierNode(Span(), U"RtInit")));
+    }
     mainFunctionBody->AddStatement(rtInitCall);
     ConstructionStatementNode* argc = new ConstructionStatementNode(Span(), new IntNode(Span()), new IdentifierNode(Span(), U"argc"));
     argc->AddArgument(new InvokeNode(Span(), new IdentifierNode(Span(), U"RtArgc")));
@@ -597,7 +605,15 @@ void CreateMainUnit(std::vector<std::string>& objectFilePaths, Module& module, E
     CatchNode* catchAll = new CatchNode(Span(), new ConstNode(Span(), new LValueRefNode(Span(), new IdentifierNode(Span(), U"System.Exception"))), new IdentifierNode(Span(), U"ex"), catchBlock);
     tryStatement->AddCatch(catchAll);
     mainFunctionBody->AddStatement(tryStatement);
-    ExpressionStatementNode* rtDoneCall = new ExpressionStatementNode(Span(), new InvokeNode(Span(), new IdentifierNode(Span(), U"RtDone")));
+    ExpressionStatementNode* rtDoneCall = nullptr;
+    if (GetGlobalFlag(GlobalFlags::profile))
+    {
+        rtDoneCall = new ExpressionStatementNode(Span(), new InvokeNode(Span(), new IdentifierNode(Span(), U"RtEndProfiling")));
+    }
+    else
+    {
+        rtDoneCall = new ExpressionStatementNode(Span(), new InvokeNode(Span(), new IdentifierNode(Span(), U"RtDone")));
+    }
     mainFunctionBody->AddStatement(rtDoneCall);
     InvokeNode* exitCall = new InvokeNode(Span(), new IdentifierNode(Span(), U"RtExit"));
     exitCall->AddArgument(new IdentifierNode(Span(), U"exitCode"));

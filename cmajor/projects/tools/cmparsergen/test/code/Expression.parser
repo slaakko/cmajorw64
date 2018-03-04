@@ -244,7 +244,7 @@ namespace Code
                 |   "->" Identifier:arrowMemberId{ id.Reset(arrowMemberId); expr.Reset(new Arrow(expr.Release(), arrowMemberId->Name())); }
                 |   ('['{ ctx->PushParsingLvalue(false); ctx->PushParsingExpressionStatement(false); }
                         Expression(ctx):index{ ctx->PopParsingLvalue(); ctx->PopParsingExpressionStatement(); } / { ctx->PopParsingLvalue(); ctx->PopParsingExpressionStatement(); }
-                     ']'!)
+                     ']'!){ expr.Reset(new Indexing(expr.Release(), index)); }
                 |   ('('{ expr.Reset(new Invoke(expr.Release())); } ArgumentList(ctx, expr.Get()) ')'!)
                 )*
             )

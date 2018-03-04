@@ -183,6 +183,7 @@ public:
     void SetTypeIdFor(TypeSymbol* typeSymbol);
     void SetTypeIdFor(ConceptSymbol* conceptSymbol);
     void SetFunctionIdFor(FunctionSymbol* functionSymbol);
+    FunctionSymbol* GetFunctionById(uint32_t functionId) const;
     void AddTypeOrConceptSymbolToTypeIdMap(Symbol* typeOrConceptSymbol);
     void AddFunctionSymbolToFunctionIdMap(FunctionSymbol* functionSymbol);
     void EmplaceTypeRequest(Symbol* forSymbol, uint32_t typeId, int index);
@@ -207,6 +208,9 @@ public:
     const std::unordered_set<std::u32string>& JsonClasses() const { return jsonClasses; }
     std::vector<TypeSymbol*> Types() const;
     void Copy(const SymbolTable& that);
+    void SetCurrentFunctionSymbol(FunctionSymbol* currentFunctionSymbol_) { currentFunctionSymbol = currentFunctionSymbol_; }
+    void MapProfiledFunction(uint32_t functionId, const std::u32string& profiledFunctionName);
+    std::u32string GetProfiledFunctionName(uint32_t functionId) const;
 private:
     NamespaceSymbol globalNs;
     CompileUnitNode* currentCompileUnit;
@@ -217,6 +221,7 @@ private:
     std::stack<InterfaceTypeSymbol*> currentInterfaceStack;
     std::stack<ContainerSymbol*> containerStack;
     FunctionSymbol* mainFunctionSymbol;
+    FunctionSymbol* currentFunctionSymbol;
     int parameterIndex;
     int declarationBlockIndex;
     std::unordered_map<Node*, Symbol*> nodeSymbolMap;
@@ -224,6 +229,7 @@ private:
     std::unordered_map<uint32_t, Symbol*> typeIdMap;
     std::unordered_map<uint32_t, FunctionSymbol*> functionIdMap;
     std::unordered_map<std::u32string, TypeSymbol*> typeNameMap;
+    std::unordered_map<uint32_t, std::u32string> profiledFunctionNameMap;
     std::unordered_map<TypeSymbol*, std::vector<DerivedTypeSymbol*>> derivedTypeMap; 
     std::vector<std::unique_ptr<DerivedTypeSymbol>> derivedTypes;
     std::unordered_map<ClassTemplateSpecializationKey, ClassTemplateSpecializationSymbol*, ClassTemplateSpecializationKeyHash> classTemplateSpecializationMap;

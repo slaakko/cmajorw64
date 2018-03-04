@@ -162,3 +162,7 @@ public extern cdecl nothrow void RtStartUnitTest(int numAssertions, const char* 
 public extern cdecl nothrow void RtEndUnitTest(const char* testName, int exitCode);
 public extern cdecl nothrow void RtSetUnitTestAssertionResult(int assertionIndex, bool assertionResult, int lineNumber);
 public extern cdecl nothrow void RtSetUnitTestException(const char* exceptionStr);
+public extern cdecl nothrow void RtProfileStartFunction(uint functionId);
+public extern cdecl nothrow void RtProfileEndFunction(uint functionId);
+public extern cdecl nothrow void RtStartProfiling();
+public extern cdecl nothrow void RtEndProfiling();

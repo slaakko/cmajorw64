@@ -1619,9 +1619,11 @@ namespace Code
                 a6ActionParser->SetAction(A6Action);
                 ActionParser* a7ActionParser = GetAction(ToUtf32("A7"));
                 a7ActionParser->SetAction(A7Action);
-                a7ActionParser->SetFailure(A7ActionFail);
                 ActionParser* a8ActionParser = GetAction(ToUtf32("A8"));
                 a8ActionParser->SetAction(A8Action);
+                a8ActionParser->SetFailure(A8ActionFail);
+                ActionParser* a9ActionParser = GetAction(ToUtf32("A9"));
+                a9ActionParser->SetAction(A9Action);
                 NonterminalParser* primaryNonterminalParser = GetNonterminal(ToUtf32("Primary"));
                 primaryNonterminalParser->SetPre(PrePrimary);
                 primaryNonterminalParser->SetPost(PostPrimary);
@@ -1670,22 +1672,27 @@ namespace Code
             public void A6Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->ctx->PushParsingLvalue(false);
-                context->ctx->PushParsingExpressionStatement(false);
+                context->expr.Reset(new Indexing(context->expr.Release(), context->fromindex));
             }
             public void A7Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->ctx->PopParsingLvalue();
-                context->ctx->PopParsingExpressionStatement();
+                context->ctx->PushParsingLvalue(false);
+                context->ctx->PushParsingExpressionStatement(false);
             }
-            public void A7ActionFail(ParsingData* parsingData)
+            public void A8Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
                 context->ctx->PopParsingLvalue();
                 context->ctx->PopParsingExpressionStatement();
             }
-            public void A8Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
+            public void A8ActionFail(ParsingData* parsingData)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                context->ctx->PopParsingLvalue();
+                context->ctx->PopParsingExpressionStatement();
+            }
+            public void A9Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
                 context->expr.Reset(new Invoke(context->expr.Release()));
@@ -2501,10 +2508,10 @@ namespace Code
         public override void GetReferencedGrammars()
         {
             ParsingDomain* pd = Domain();
-            Grammar* grammar0 = pd->GetGrammar(ToUtf32("Code.LiteralGrammar"));
+            Grammar* grammar0 = pd->GetGrammar(ToUtf32("Code.BasicTypeGrammar"));
             if (grammar0 == null)
             {
-                grammar0 = new Code.LiteralGrammar(pd);
+                grammar0 = new Code.BasicTypeGrammar(pd);
             }
             AddGrammarReference(grammar0);
             Grammar* grammar1 = pd->GetGrammar(ToUtf32("Code.IdentifierGrammar"));
@@ -2519,10 +2526,10 @@ namespace Code
                 grammar2 = new Code.TypeExprGrammar(pd);
             }
             AddGrammarReference(grammar2);
-            Grammar* grammar3 = pd->GetGrammar(ToUtf32("Code.BasicTypeGrammar"));
+            Grammar* grammar3 = pd->GetGrammar(ToUtf32("Code.LiteralGrammar"));
             if (grammar3 == null)
             {
-                grammar3 = new Code.BasicTypeGrammar(pd);
+                grammar3 = new Code.LiteralGrammar(pd);
             }
             AddGrammarReference(grammar3);
         }
@@ -2759,17 +2766,18 @@ namespace Code
                                             new System.Text.Parsing.StringParser(ToUtf32("->")),
                                             new System.Text.Parsing.ActionParser(ToUtf32("A5"),
                                                 new System.Text.Parsing.NonterminalParser(ToUtf32("arrowMemberId"), ToUtf32("Identifier"), 0)))),
-                                    new System.Text.Parsing.SequenceParser(
+                                    new System.Text.Parsing.ActionParser(ToUtf32("A6"),
                                         new System.Text.Parsing.SequenceParser(
-                                            new System.Text.Parsing.ActionParser(ToUtf32("A6"),
-                                                new System.Text.Parsing.CharParser('[')),
-                                            new System.Text.Parsing.ActionParser(ToUtf32("A7"),
-                                                new System.Text.Parsing.NonterminalParser(ToUtf32("index"), ToUtf32("Expression"), 1))),
-                                        new System.Text.Parsing.ExpectationParser(
-                                            new System.Text.Parsing.CharParser(']')))),
+                                            new System.Text.Parsing.SequenceParser(
+                                                new System.Text.Parsing.ActionParser(ToUtf32("A7"),
+                                                    new System.Text.Parsing.CharParser('[')),
+                                                new System.Text.Parsing.ActionParser(ToUtf32("A8"),
+                                                    new System.Text.Parsing.NonterminalParser(ToUtf32("index"), ToUtf32("Expression"), 1))),
+                                            new System.Text.Parsing.ExpectationParser(
+                                                new System.Text.Parsing.CharParser(']'))))),
                                 new System.Text.Parsing.SequenceParser(
                                     new System.Text.Parsing.SequenceParser(
-                                        new System.Text.Parsing.ActionParser(ToUtf32("A8"),
+                                        new System.Text.Parsing.ActionParser(ToUtf32("A9"),
                                             new System.Text.Parsing.CharParser('(')),
                                         new System.Text.Parsing.NonterminalParser(ToUtf32("ArgumentList"), ToUtf32("ArgumentList"), 2)),
                                     new System.Text.Parsing.ExpectationParser(
