@@ -60,6 +60,7 @@ namespace cmdevenv
             this.toolStripMenuItem16 = new System.Windows.Forms.ToolStripSeparator();
             this.buildActiveProjectToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.cleanActiveProjectToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.profileActiveProjectToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem12 = new System.Windows.Forms.ToolStripSeparator();
             this.batchBuildToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem4 = new System.Windows.Forms.ToolStripSeparator();
@@ -120,6 +121,7 @@ namespace cmdevenv
             this.projectContextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.buildToolStripMenuItem2 = new System.Windows.Forms.ToolStripMenuItem();
             this.cleanProjectToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.profileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem8 = new System.Windows.Forms.ToolStripSeparator();
             this.addToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.newSourceFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -382,6 +384,7 @@ namespace cmdevenv
             this.toolStripMenuItem16,
             this.buildActiveProjectToolStripMenuItem,
             this.cleanActiveProjectToolStripMenuItem,
+            this.profileActiveProjectToolStripMenuItem,
             this.toolStripMenuItem12,
             this.batchBuildToolStripMenuItem,
             this.toolStripMenuItem4,
@@ -426,6 +429,13 @@ namespace cmdevenv
             this.cleanActiveProjectToolStripMenuItem.Size = new System.Drawing.Size(228, 22);
             this.cleanActiveProjectToolStripMenuItem.Text = "Clean Active Project";
             this.cleanActiveProjectToolStripMenuItem.Click += new System.EventHandler(this.cleanActiveProjectToolStripMenuItem_Click);
+            // 
+            // profileActiveProjectToolStripMenuItem
+            // 
+            this.profileActiveProjectToolStripMenuItem.Name = "profileActiveProjectToolStripMenuItem";
+            this.profileActiveProjectToolStripMenuItem.Size = new System.Drawing.Size(228, 22);
+            this.profileActiveProjectToolStripMenuItem.Text = "Profile Active Project...";
+            this.profileActiveProjectToolStripMenuItem.Click += new System.EventHandler(this.profileActiveProjectToolStripMenuItem_Click);
             // 
             // toolStripMenuItem12
             // 
@@ -891,6 +901,7 @@ namespace cmdevenv
             this.projectContextMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.buildToolStripMenuItem2,
             this.cleanProjectToolStripMenuItem,
+            this.profileToolStripMenuItem,
             this.toolStripMenuItem8,
             this.addToolStripMenuItem1,
             this.toolStripMenuItem9,
@@ -905,7 +916,8 @@ namespace cmdevenv
             this.toolStripSeparator5,
             this.viewProjectToolStripMenuItem});
             this.projectContextMenuStrip.Name = "projectContextMenuStrip";
-            this.projectContextMenuStrip.Size = new System.Drawing.Size(181, 238);
+            this.projectContextMenuStrip.Size = new System.Drawing.Size(181, 282);
+            this.projectContextMenuStrip.Opening += new System.ComponentModel.CancelEventHandler(this.projectContextMenuStrip_Opening);
             // 
             // buildToolStripMenuItem2
             // 
@@ -920,6 +932,13 @@ namespace cmdevenv
             this.cleanProjectToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.cleanProjectToolStripMenuItem.Text = "Clean";
             this.cleanProjectToolStripMenuItem.Click += new System.EventHandler(this.cleanProjectToolStripMenuItem_Click);
+            // 
+            // profileToolStripMenuItem
+            // 
+            this.profileToolStripMenuItem.Name = "profileToolStripMenuItem";
+            this.profileToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.profileToolStripMenuItem.Text = "Profile...";
+            this.profileToolStripMenuItem.Click += new System.EventHandler(this.profileToolStripMenuItem_Click);
             // 
             // toolStripMenuItem8
             // 
@@ -1375,6 +1394,8 @@ namespace cmdevenv
         private System.Windows.Forms.ToolStripMenuItem libraryDocumentationToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem addExistingTextFileToolStripMenuItem;
         private System.Windows.Forms.OpenFileDialog addExistingTextFileDialog;
+        private System.Windows.Forms.ToolStripMenuItem profileToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem profileActiveProjectToolStripMenuItem;
     }
 }
 

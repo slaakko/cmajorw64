@@ -31,7 +31,7 @@
             this.profileButton = new System.Windows.Forms.Button();
             this.topComboBox = new System.Windows.Forms.ComboBox();
             this.label1 = new System.Windows.Forms.Label();
-            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.argumentsTextBox = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.executionCountCheckBox = new System.Windows.Forms.CheckBox();
@@ -39,8 +39,8 @@
             this.elapsedTimeInclusiveCheckBox = new System.Windows.Forms.CheckBox();
             this.cancelButton = new System.Windows.Forms.Button();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
-            this.checkBox2 = new System.Windows.Forms.CheckBox();
-            this.checkBox3 = new System.Windows.Forms.CheckBox();
+            this.rebuildAppCheckBox = new System.Windows.Forms.CheckBox();
+            this.rebuildSysCheckBox = new System.Windows.Forms.CheckBox();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.SuspendLayout();
@@ -53,6 +53,7 @@
             this.profileButton.TabIndex = 0;
             this.profileButton.Text = "Profile";
             this.profileButton.UseVisualStyleBackColor = true;
+            this.profileButton.Click += new System.EventHandler(this.profileButton_Click);
             // 
             // topComboBox
             // 
@@ -81,12 +82,12 @@
             this.label1.TabIndex = 5;
             this.label1.Text = "Show:";
             // 
-            // textBox1
+            // argumentsTextBox
             // 
-            this.textBox1.Location = new System.Drawing.Point(77, 181);
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(215, 20);
-            this.textBox1.TabIndex = 6;
+            this.argumentsTextBox.Location = new System.Drawing.Point(77, 181);
+            this.argumentsTextBox.Name = "argumentsTextBox";
+            this.argumentsTextBox.Size = new System.Drawing.Size(215, 20);
+            this.argumentsTextBox.TabIndex = 6;
             // 
             // label2
             // 
@@ -154,11 +155,12 @@
             this.cancelButton.TabIndex = 9;
             this.cancelButton.Text = "Cancel";
             this.cancelButton.UseVisualStyleBackColor = true;
+            this.cancelButton.Click += new System.EventHandler(this.cancelButton_Click);
             // 
             // groupBox2
             // 
-            this.groupBox2.Controls.Add(this.checkBox2);
-            this.groupBox2.Controls.Add(this.checkBox3);
+            this.groupBox2.Controls.Add(this.rebuildAppCheckBox);
+            this.groupBox2.Controls.Add(this.rebuildSysCheckBox);
             this.groupBox2.Location = new System.Drawing.Point(12, 105);
             this.groupBox2.Name = "groupBox2";
             this.groupBox2.Size = new System.Drawing.Size(280, 68);
@@ -166,25 +168,25 @@
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Rebuild";
             // 
-            // checkBox2
+            // rebuildAppCheckBox
             // 
-            this.checkBox2.AutoSize = true;
-            this.checkBox2.Location = new System.Drawing.Point(6, 42);
-            this.checkBox2.Name = "checkBox2";
-            this.checkBox2.Size = new System.Drawing.Size(78, 17);
-            this.checkBox2.TabIndex = 5;
-            this.checkBox2.Text = "Application";
-            this.checkBox2.UseVisualStyleBackColor = true;
+            this.rebuildAppCheckBox.AutoSize = true;
+            this.rebuildAppCheckBox.Location = new System.Drawing.Point(6, 42);
+            this.rebuildAppCheckBox.Name = "rebuildAppCheckBox";
+            this.rebuildAppCheckBox.Size = new System.Drawing.Size(78, 17);
+            this.rebuildAppCheckBox.TabIndex = 5;
+            this.rebuildAppCheckBox.Text = "Application";
+            this.rebuildAppCheckBox.UseVisualStyleBackColor = true;
             // 
-            // checkBox3
+            // rebuildSysCheckBox
             // 
-            this.checkBox3.AutoSize = true;
-            this.checkBox3.Location = new System.Drawing.Point(6, 19);
-            this.checkBox3.Name = "checkBox3";
-            this.checkBox3.Size = new System.Drawing.Size(60, 17);
-            this.checkBox3.TabIndex = 4;
-            this.checkBox3.Text = "System";
-            this.checkBox3.UseVisualStyleBackColor = true;
+            this.rebuildSysCheckBox.AutoSize = true;
+            this.rebuildSysCheckBox.Location = new System.Drawing.Point(6, 19);
+            this.rebuildSysCheckBox.Name = "rebuildSysCheckBox";
+            this.rebuildSysCheckBox.Size = new System.Drawing.Size(60, 17);
+            this.rebuildSysCheckBox.TabIndex = 4;
+            this.rebuildSysCheckBox.Text = "System";
+            this.rebuildSysCheckBox.UseVisualStyleBackColor = true;
             // 
             // ProfileDialog
             // 
@@ -197,7 +199,7 @@
             this.Controls.Add(this.cancelButton);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.label2);
-            this.Controls.Add(this.textBox1);
+            this.Controls.Add(this.argumentsTextBox);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.topComboBox);
             this.Controls.Add(this.profileButton);
@@ -220,7 +222,7 @@
         private System.Windows.Forms.Button profileButton;
         private System.Windows.Forms.ComboBox topComboBox;
         private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.TextBox argumentsTextBox;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.CheckBox executionCountCheckBox;
@@ -228,7 +230,7 @@
         private System.Windows.Forms.CheckBox elapsedTimeInclusiveCheckBox;
         private System.Windows.Forms.Button cancelButton;
         private System.Windows.Forms.GroupBox groupBox2;
-        private System.Windows.Forms.CheckBox checkBox2;
-        private System.Windows.Forms.CheckBox checkBox3;
+        private System.Windows.Forms.CheckBox rebuildAppCheckBox;
+        private System.Windows.Forms.CheckBox rebuildSysCheckBox;
     }
 }

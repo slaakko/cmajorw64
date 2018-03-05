@@ -17,7 +17,7 @@ namespace cmdevenv
 {
     public enum State
     {
-        editing, compiling, running, debugging
+        editing, compiling, running, debugging, profiling
     }
 
     public partial class MainForm : Form, IMessageFilter
@@ -42,6 +42,9 @@ namespace cmdevenv
             compiler.CmcPath = Configuration.Instance.CmcPath;
             compiler.SetWriteMethod(this, WriteOutputLine);
             compiler.SetHandleCompileResultMethod(this, HandleCompileResult);
+            profiler = new Profiler();
+            profiler.SetWriteMethod(this, WriteOutputLine);
+            profiler.SetHandleProfileResultMethod(this, HandleProfileResult);
             executor = new Executor();
             executor.SetWriteMethod(this, WriteToConsole);
             executor.SetExecuteReadyMethod(this, ProjectRun);
@@ -50,6 +53,7 @@ namespace cmdevenv
             processRunning = false;
             buildInProgress = false;
             compileAborted = false;
+            profileAborted = false;
             strictNothrow = Configuration.Instance.StrictNothrow;
             emitLlvm = Configuration.Instance.EmitLlvm; 
             emitOptLlvm = Configuration.Instance.EmitOptLlvm;
@@ -252,6 +256,7 @@ namespace cmdevenv
             buildSolutionToolStripMenuItem.Enabled = editing && solutionHasProjects;
             buildToolStripMenuItem1.Enabled = editing && solutionHasProjects;
             buildActiveProjectToolStripMenuItem.Enabled = editing && activeProjectSet;
+            profileActiveProjectToolStripMenuItem.Enabled = editing && activeProjectSet && solution.ActiveProject.Target == Target.program;
             buildSolutionToolStripMenuItem.Enabled = editing && solutionHasProjects;
             cleanSolutionToolStripMenuItem.Enabled = editing && solutionHasProjects;
             cleanSolutionToolStripMenuItem2.Enabled = editing && solutionHasProjects;
@@ -749,6 +754,8 @@ namespace cmdevenv
                 compiler.WaitForExit();
                 executor.DoExit();
                 executor.WaitForExit();
+                profiler.DoExit();
+                profiler.WaitForExit();
             }
             catch (Exception ex)
             {
@@ -978,6 +985,7 @@ namespace cmdevenv
                 buildSolutionToolStripMenuItem.Enabled = false;
                 buildToolStripMenuItem1.Enabled = false;
                 buildActiveProjectToolStripMenuItem.Enabled = false;
+                profileActiveProjectToolStripMenuItem.Enabled = false;
                 outputTabControl.SelectedTab = outputTabPage;
                 if (solution != null && solution.Projects.Count > 0)
                 {
@@ -1017,6 +1025,7 @@ namespace cmdevenv
                 buildSolutionToolStripMenuItem.Enabled = false;
                 buildToolStripMenuItem1.Enabled = false;
                 buildActiveProjectToolStripMenuItem.Enabled = false;
+                profileActiveProjectToolStripMenuItem.Enabled = false;
                 outputTabControl.SelectedTab = outputTabPage;
                 string config = configComboBox.Text;
                 compileStartTime = DateTime.Now;
@@ -1204,6 +1213,80 @@ namespace cmdevenv
             }
             infoTimer.Start();
             SetState(State.editing);
+        }
+        private void ProfileProject(Project project)
+        {
+            try
+            {
+                if (processRunning)
+                {
+                    throw new Exception("Cannot profile while process is running");
+                }
+                SaveAll();
+                ProfileDialog profileDialog = new ProfileDialog();
+                DialogResult dialogResult = profileDialog.ShowDialog();
+                if (dialogResult == DialogResult.OK)
+                {
+                    buildActiveProjectToolStripMenuItem.Enabled = false;
+                    profileActiveProjectToolStripMenuItem.Enabled = false;
+                    progressTimer.Start();
+                    outputRichTextBox.Clear();
+                    outputTabControl.SelectedTab = outputTabPage;
+                    SetState(State.profiling);
+                    profileOutFile = Path.Combine(Path.GetDirectoryName(project.FilePath), "cmprof-" + DateTime.Now.ToString("yyyyMMddTHHmmss") + ".html");
+                    cancelToolStripMenuItem.Enabled = true;
+                    profiler.DoProfile(profileDialog.RebuildSys, profileDialog.RebuildApp, profileDialog.Inclusive, profileDialog.Exclusive, profileDialog.Count, emitLlvm, emitOptLlvm, linkWithDebugRuntime,
+                        linkUsingMsLink, profileDialog.Top, profileOutFile, profileDialog.Arguments, project.FilePath);
+                    infoLabel.Text = "Profiling";
+                }
+            }
+            catch (Exception ex)
+            {
+                SetState(State.editing);
+                MessageBox.Show(ex.Message);
+            }
+        }
+        private void HandleProfileResult(string errorMessage, int exitCode)
+        {
+            cancelToolStripMenuItem.Enabled = false;
+            progressTimer.Stop();
+            progressLabel.Text = "";
+            if (profileAborted)
+            {
+                profileAborted = false;
+                infoLabel.Text = "Profile aborted";
+            }
+            if (exitCode == 0)
+            {
+                infoLabel.Text = "Profile succeeded";
+                System.Diagnostics.Process.Start(profileOutFile);
+            }
+            else
+            {
+                infoLabel.Text = "Profile failed";
+                WriteOutputLine(errorMessage);
+                WriteOutputLine("exit code = " + exitCode.ToString());
+            }
+            infoTimer.Start();
+            SetState(State.editing);
+        }
+        private void profileActiveProjectToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                if (solution.ActiveProject.Target == Target.program)
+                {
+                    ProfileProject(solution.ActiveProject);
+                }
+                else
+                {
+                    throw new Exception("project '" + solution.ActiveProject.Name + "' is not a program");
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
         }
         private void showErrorDescriptionInTextWindowToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -1454,6 +1537,7 @@ namespace cmdevenv
                 buildSolutionToolStripMenuItem.Enabled = false;
                 buildToolStripMenuItem1.Enabled = false;
                 buildActiveProjectToolStripMenuItem.Enabled = false;
+                profileActiveProjectToolStripMenuItem.Enabled = false;
                 outputTabControl.SelectedTab = outputTabPage;
                 cleaning = true;
                 cancelToolStripMenuItem.Enabled = true;
@@ -1800,6 +1884,12 @@ namespace cmdevenv
                 compileAborted = true;
                 HandleCompileResult(null);
             }
+            else if (state == State.profiling)
+            {
+                profiler.AbortProfile();
+                profileAborted = true;
+                HandleProfileResult("profile aborted", 1);
+            }
         }
         private void cancelToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -1813,6 +1903,12 @@ namespace cmdevenv
                 compiler.AbortCompile();
                 compileAborted = true;
                 HandleCompileResult(null);
+            }
+            else if (state == State.profiling)
+            {
+                profiler.AbortProfile();
+                profileAborted = true;
+                HandleProfileResult("profile aborted", 1);
             }
         }
         private async void closeToolStripMenuItem1_Click(object sender, EventArgs e)
@@ -2093,11 +2189,54 @@ namespace cmdevenv
                 MessageBox.Show(ex.Message);
             }
         }
+        private void profileToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                TreeNode selectedNode = solutionExplorerTreeView.SelectedNode;
+                if (selectedNode != null)
+                {
+                    Project selectedProject = selectedNode.Tag as Project;
+                    if (selectedProject != null)
+                    {
+                        if (selectedProject.Target == Target.program)
+                        {
+                            ProfileProject(selectedProject);
+                        }
+                        else
+                        {
+                            throw new Exception("project '" + selectedProject.Name + "' is not a program");
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+        private void projectContextMenuStrip_Opening(object sender, CancelEventArgs e)
+        {
+            profileToolStripMenuItem.Enabled = false;
+            TreeNode selectedNode = solutionExplorerTreeView.SelectedNode;
+            if (selectedNode != null)
+            {
+                Project selectedProject = selectedNode.Tag as Project;
+                if (selectedProject != null)
+                {
+                    if (selectedProject.Target == Target.program)
+                    {
+                        profileToolStripMenuItem.Enabled = true;
+                    }
+                }
+            }
+        }
         private Solution solution;
         private XTabControl editorTabControl;
         private State state;
         private bool alterConfig;
         private Compiler compiler;
+        private Profiler profiler;
         private Executor executor;
         private ConsoleWindow console;
         private bool buildInProgress;
@@ -2107,6 +2246,7 @@ namespace cmdevenv
         private bool processRunning;
         private bool compileAborted;
         private bool compiling;
+        private bool profileAborted;
         private bool cleaning;
         private bool strictNothrow;
         private bool emitLlvm;
@@ -2119,6 +2259,7 @@ namespace cmdevenv
         private bool matchCase;
         private bool matchWholeWord;
         private bool useRegularExpression;
+        private string profileOutFile;
     }
 
     public static class KeyboardUtil

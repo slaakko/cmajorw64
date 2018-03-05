@@ -14,6 +14,7 @@ namespace server
         public virtual void HandleExitRequest(ExitRequest request) { }
         public virtual void HandleCleanRequest(CleanRequest request) { }
         public virtual void HandleExecuteRequest(ExecuteRequest request) { }
+        public virtual void HandleProfileRequest(ProfileRequest request) { }
     }
 
     public abstract class Request
@@ -132,5 +133,43 @@ namespace server
         }
         private string executablePath;
         private string arguments;
+    }
+
+    public class ProfileRequest : Request
+    {
+        public ProfileRequest(bool rebuildSys, bool rebuildApp, bool inclusive, bool exclusive, bool count, bool emitLlvm, bool emitOptLlvm, bool linkWithDebugRuntime, bool linkUsingMsLink, int top, 
+            string outFile, string args, string project)
+        {
+            this.rebuildSys = rebuildSys;
+            this.rebuildApp = rebuildApp;
+            this.inclusive = inclusive;
+            this.exclusive = exclusive;
+            this.count = count;
+            this.emitLlvm = emitLlvm;
+            this.emitOptLlvm = emitOptLlvm;
+            this.linkWithDebugRuntime = linkWithDebugRuntime;
+            this.linkUsingMsLink = linkUsingMsLink;
+            this.top = top;
+            this.outFile = outFile;
+            this.args = args;
+            this.project = project;
+        }
+        public override void Process(RequestHandler handler)
+        {
+            handler.HandleProfileRequest(this);
+        }
+        public bool rebuildSys;
+        public bool rebuildApp;
+        public bool inclusive;
+        public bool exclusive;
+        public bool count;
+        public bool emitLlvm;
+        public bool emitOptLlvm;
+        public bool linkWithDebugRuntime;
+        public bool linkUsingMsLink;
+        public int top;
+        public string outFile;
+        public string args;
+        public string project;
     }
 }
