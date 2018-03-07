@@ -60,6 +60,18 @@ table.type
     max-width: 800px;
 }
 
+table.opt
+{
+    boder-collapse: collapse;
+}
+
+table.opt, th.opt, td.opt 
+{
+    text-align: left;
+    border: 1px solid #dddddd;
+    padding: 8px;
+}
+
 th.type
 {
     border-bottom: 1px solid black

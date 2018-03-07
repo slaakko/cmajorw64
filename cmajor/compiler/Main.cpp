@@ -43,7 +43,7 @@ struct InitDone
     }
 };
 
-const char* version = "2.0.0 beta-8";
+const char* version = "2.0.0";
 
 void PrintHelp()
 {
@@ -53,8 +53,8 @@ void PrintHelp()
     std::cout << "Options:\n" <<
         "--help (-h)\n" <<
         "   print this help message\n" <<
-        "--config=CONFIG (c=CONFIG)\n" <<
-        "   set configuration to CONFIG (debug | release | profile)\n" <<
+        "--config=CONFIG (-c=CONFIG)\n" <<
+        "   set configuration to CONFIG (debug | release)\n" <<
         "   default is debug\n" <<
         "--optimization-level=LEVEL (-O=LEVEL)\n" <<
         "   set optimization level to LEVEL=0-3\n" <<
@@ -64,7 +64,7 @@ void PrintHelp()
         "--quiet (-q)\n" <<
         "   print no messages\n" <<
         "--strict-nothrow (-s)\n" <<
-        "   treat nothrow violation as error\n" <<
+        "   treat nothrow violation as an error\n" <<
         "--time (-t)\n" <<
         "   print duration of compilation\n" <<
         "--emit-llvm (-l)\n" <<
