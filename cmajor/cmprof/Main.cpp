@@ -674,11 +674,12 @@ void ProfileProject(const std::string& projectFilePath, bool rebuildSys, bool re
     std::set<std::u32string> readProjects;
     ReadProject(projectFilePath, solution, requireProgram, readProjects);
     std::vector<Project*> projects = solution.CreateBuildOrder();
+    std::string systemModuleFilePath;
     for (Project* project : projects)
     {
         if (project->IsSystemProject())
         {
-            if (rebuildSys || !project->IsUpToDate())
+            if (rebuildSys || !project->IsUpToDate(systemModuleFilePath))
             {
                 rebuildSys = true;
                 BuildProject(project);
@@ -687,10 +688,14 @@ void ProfileProject(const std::string& projectFilePath, bool rebuildSys, bool re
             {
                 std::cout << "project '" << ToUtf8(project->Name()) << "' is up-to-date" << std::endl;
             }
+            if (project->Name() == U"System")
+            {
+                systemModuleFilePath = project->ModuleFilePath();
+            }
         }
         else
         {
-            if (rebuildApp || rebuildSys || !project->IsUpToDate())
+            if (rebuildApp || rebuildSys || !project->IsUpToDate(systemModuleFilePath))
             {
                 rebuildApp = true;
                 BuildProject(project);
@@ -954,6 +959,10 @@ int main(int argc, const char** argv)
         if (report == Report::none)
         {
             report = Report::all;
+        }
+        if (GetGlobalFlag(GlobalFlags::verbose))
+        {
+            std::cout << "Cmajor profiler version " << version << std::endl;
         }
         for (const std::string& project : projects)
         {

@@ -207,7 +207,7 @@ void Project::SetLibraryFilePath(const std::string& libraryFilePath_)
     libraryFilePath = libraryFilePath_;
 }
 
-bool Project::IsUpToDate() const
+bool Project::IsUpToDate(const std::string& systemModuleFilePath) const
 {
     if (!boost::filesystem::exists(moduleFilePath))
     {
@@ -216,6 +216,13 @@ bool Project::IsUpToDate() const
     for (const std::string& sourceFilePath : sourceFilePaths)
     {
         if (boost::filesystem::last_write_time(sourceFilePath) > boost::filesystem::last_write_time(moduleFilePath))
+        {
+            return false;
+        }
+    }
+    if (!systemModuleFilePath.empty() && !IsSystemProject() && boost::filesystem::exists(systemModuleFilePath))
+    {
+        if (boost::filesystem::last_write_time(systemModuleFilePath) > boost::filesystem::last_write_time(moduleFilePath))
         {
             return false;
         }

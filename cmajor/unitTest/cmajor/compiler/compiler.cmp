@@ -1,5 +1,5 @@
 project compiler;
-target=library;
+target=unitTest;
 source <bool.cm>;
 source <char.cm>;
 source <charPtr.cm>;

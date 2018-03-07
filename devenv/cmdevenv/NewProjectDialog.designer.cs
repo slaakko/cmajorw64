@@ -31,6 +31,7 @@
             this.components = new System.ComponentModel.Container();
             System.Windows.Forms.ListViewItem listViewItem1 = new System.Windows.Forms.ListViewItem("Console Application", 0);
             System.Windows.Forms.ListViewItem listViewItem2 = new System.Windows.Forms.ListViewItem("Library", 0);
+            System.Windows.Forms.ListViewItem listViewItem3 = new System.Windows.Forms.ListViewItem("Unit Test Project", 0);
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(NewProjectDialog));
             this.projectItemsListView = new System.Windows.Forms.ListView();
             this.cmajImageList = new System.Windows.Forms.ImageList(this.components);
@@ -57,7 +58,8 @@
             this.projectItemsListView.HideSelection = false;
             this.projectItemsListView.Items.AddRange(new System.Windows.Forms.ListViewItem[] {
             listViewItem1,
-            listViewItem2});
+            listViewItem2,
+            listViewItem3});
             this.projectItemsListView.LargeImageList = this.cmajImageList;
             this.projectItemsListView.Location = new System.Drawing.Point(0, 0);
             this.projectItemsListView.MultiSelect = false;

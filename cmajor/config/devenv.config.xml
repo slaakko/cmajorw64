@@ -5,8 +5,8 @@
     <infoDelaySecs>10</infoDelaySecs>
     <formSizeX>1704</formSizeX>
     <formSizeY>899</formSizeY>
-    <formTop>0</formTop>
-    <formLeft>0</formLeft>
+    <formTop>88</formTop>
+    <formLeft>28</formLeft>
     <textVisX>156</textVisX>
     <textVisY>156</textVisY>
     <textVisW>1259</textVisW>
@@ -28,11 +28,31 @@
     <maxRecentProjects>10</maxRecentProjects>
     <recentProjects>
         <recentProject>
-            <path>C:\Users\Seppo\cmajorw64\cmajor\test\foo\foo.cms</path>
+            <path>C:/Users/Seppo/cmajorw64/cmajor/projects/unitTests\koe\koe.cms</path>
+            <openFiles />
+        </recentProject>
+        <recentProject>
+            <path>C:\Users\Seppo\cmajorw64\cmajor\projects\unitTests\unitTests.cms</path>
             <openFiles />
         </recentProject>
         <recentProject>
             <path>C:\Users\Seppo\cmajorw64\cmajor\system\System.cms</path>
+            <openFiles />
+        </recentProject>
+        <recentProject>
+            <path>C:\Users\Seppo\cmajorw64\cmajor\projects\examples\examples.cms</path>
+            <openFiles />
+        </recentProject>
+        <recentProject>
+            <path>C:\Users\Seppo\cmajorw64\cmajor\unitTest\cmajor\cmajor.cms</path>
+            <openFiles />
+        </recentProject>
+        <recentProject>
+            <path>C:\Users\Seppo\cmajorw64\cmajor\test\execute\execute.cms</path>
+            <openFiles />
+        </recentProject>
+        <recentProject>
+            <path>C:\Users\Seppo\cmajorw64\cmajor\test\foo\foo.cms</path>
             <openFiles />
         </recentProject>
         <recentProject>
@@ -44,33 +64,13 @@
             <openFiles />
         </recentProject>
         <recentProject>
-            <path>C:\Users\Seppo\cmajorw64\cmajor\projects\examples\examples.cms</path>
-            <openFiles />
-        </recentProject>
-        <recentProject>
             <path>C:\Users\Seppo\cmajorw64\cmajor\projects\parseToDom\parseToDom.cms</path>
-            <openFiles />
-        </recentProject>
-        <recentProject>
-            <path>C:\Users\Seppo\cmajorw64\cmajor\projects\haeOsoiteluettelo\haeOsoiteluettelo.cms</path>
-            <openFiles />
-        </recentProject>
-        <recentProject>
-            <path>C:/Users/Seppo/cmajorw64/cmajor/doc/code/compression/deflate/deflate.cms</path>
-            <openFiles />
-        </recentProject>
-        <recentProject>
-            <path>C:\Users\Seppo\cmajorw64\cmajor\projects\httpTest\httpTest.cms</path>
-            <openFiles />
-        </recentProject>
-        <recentProject>
-            <path>C:\Users\Seppo\cmajorw64\cmajor\projects\tools\cmparsergen\cmparsergen.cms</path>
             <openFiles />
         </recentProject>
     </recentProjects>
     <strictNothrow>false</strictNothrow>
     <emitLlvm>true</emitLlvm>
     <emitOptLlvm>true</emitOptLlvm>
-    <linkWithDebugRuntime>true</linkWithDebugRuntime>
-    <linkUsingMsLink>true</linkUsingMsLink>
+    <linkWithDebugRuntime>false</linkWithDebugRuntime>
+    <linkUsingMsLink>false</linkUsingMsLink>
 </cmdevenv.configuration>

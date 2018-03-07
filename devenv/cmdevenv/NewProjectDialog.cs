@@ -12,7 +12,7 @@ namespace cmdevenv
 {
     public enum ProjectType
     {
-        consoleApp, library, blankSolution
+        consoleApp, library, unitTestProject, blankSolution
     }
 
     public partial class NewProjectDialog : Form

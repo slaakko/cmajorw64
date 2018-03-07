@@ -60,7 +60,7 @@ private:
 
 enum class Target
 {
-    program, library
+    program, library, unitTest
 };
 
 class TargetDeclaration : public ProjectDeclaration
@@ -93,7 +93,7 @@ public:
     void SetSystemProject() { isSystemProject = true; }
     void SetModuleFilePath(const std::string& moduleFilePath_);
     void SetLibraryFilePath(const std::string& libraryFilePath_);
-    bool IsUpToDate() const;
+    bool IsUpToDate(const std::string& systemModuleFilePath) const;
 private:
     std::u32string name;
     std::string filePath;

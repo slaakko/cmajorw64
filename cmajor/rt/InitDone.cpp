@@ -18,6 +18,7 @@
 #include <cmajor/rt/Memory.hpp>
 #include <cmajor/rt/CommandLine.hpp>
 #include <cmajor/rt/Socket.hpp>
+#include <cmajor/rt/Environment.hpp>
 #include <csignal>
 
 extern "C" RT_API void RtInit()
@@ -49,6 +50,7 @@ void Init()
     InitConditionVariable();
     InitThread();
     InitSocket();
+    InitEnvironment();
     InitStatics();
     InitClasses();
     InitCommandLine();
@@ -59,6 +61,7 @@ void Done()
     DoneCommandLine();
     DoneClasses();
     DoneStatics();
+    DoneEnvironment();
     DoneSocket();
     DoneThread();
     DoneConditionVariable();

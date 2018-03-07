@@ -97,10 +97,13 @@ namespace parser
                             new ExpectationParser(
                                 new CharParser('='))),
                         new AlternativeParser(
-                            new ActionParser("A0",
-                                new KeywordParser("program")),
-                            new ActionParser("A1",
-                                new KeywordParser("library")))),
+                            new AlternativeParser(
+                                new ActionParser("A0",
+                                    new KeywordParser("program")),
+                                new ActionParser("A1",
+                                    new KeywordParser("library"))),
+                            new ActionParser("A2",
+                                new KeywordParser("unitTest")))),
                     new ExpectationParser(
                         new CharParser(';')))));
             AddRule(new ProjectReferenceRuleParser("ProjectReference", "parser.ProjectFile.ProjectReference",
@@ -383,6 +386,8 @@ namespace parser
                 a0ActionParser.Action = A0Action;
                 ActionParser a1ActionParser = GetAction("A1");
                 a1ActionParser.Action = A1Action;
+                ActionParser a2ActionParser = GetAction("A2");
+                a2ActionParser.Action = A2Action;
             }
             public override void Enter(Stack<object> stack)
             {
@@ -404,6 +409,10 @@ namespace parser
             private void A1Action(string match, string content, Position position, string fileName, ref bool pass)
             {
                 context.value = Target.library;
+            }
+            private void A2Action(string match, string content, Position position, string fileName, ref bool pass)
+            {
+                context.value = Target.unitTest;
             }
             private Context context;
             private Stack<Context> contextStack;

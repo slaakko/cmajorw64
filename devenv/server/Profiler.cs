@@ -69,7 +69,7 @@ namespace server
             {
                 if (writeControl != null && writeDelegate != null)
                 {
-                    writeControl.Invoke(writeDelegate, "Abort profile pending...");
+                    writeControl.Invoke(writeDelegate, "Abort profile pending...\n");
                 }
                 profileProcess.Kill();
                 profileAborted = true;
@@ -207,10 +207,10 @@ namespace server
                     stderrBytes.Add((byte)stderrReadResult);
                     stderrReadResult = cmprof.StandardError.BaseStream.ReadByte();
                 }
-                string compileResultString = UTF8.Decode(stderrBytes.ToArray());
+                string profileResultString = UTF8.Decode(stderrBytes.ToArray());
                 if (profileResultHandler != null && profileReady != null)
                 {
-                    profileResultHandler.Invoke(profileReady, "", cmprof.ExitCode);
+                    profileResultHandler.Invoke(profileReady, profileResultString, cmprof.ExitCode);
                 }
             }
             catch (Exception ex)

@@ -17,7 +17,7 @@ namespace cmdevenv
 {
     public enum State
     {
-        editing, compiling, running, debugging, profiling
+        editing, compiling, running, debugging, profiling, unitTesting
     }
 
     public partial class MainForm : Form, IMessageFilter
@@ -45,6 +45,9 @@ namespace cmdevenv
             profiler = new Profiler();
             profiler.SetWriteMethod(this, WriteOutputLine);
             profiler.SetHandleProfileResultMethod(this, HandleProfileResult);
+            unitTester = new UnitTester();
+            unitTester.SetWriteMethod(this, WriteOutputLine);
+            unitTester.SetHandleUnitTestingResultMethod(this, HandleUnitTestingResult);
             executor = new Executor();
             executor.SetWriteMethod(this, WriteToConsole);
             executor.SetExecuteReadyMethod(this, ProjectRun);
@@ -54,6 +57,7 @@ namespace cmdevenv
             buildInProgress = false;
             compileAborted = false;
             profileAborted = false;
+            unitTestingAborted = false;
             strictNothrow = Configuration.Instance.StrictNothrow;
             emitLlvm = Configuration.Instance.EmitLlvm; 
             emitOptLlvm = Configuration.Instance.EmitOptLlvm;
@@ -248,15 +252,17 @@ namespace cmdevenv
             bool solutionOpen = solution != null;
             bool activeProjectSet = solution != null && solution.ActiveProject != null;
             bool solutionHasProjects = solution != null && solution.Projects.Count > 0;
+            runActiveProjectToolStripMenuItem.Enabled = activeProjectSet;
             closeToolStripMenuItem.Enabled = editing && editorOpen;
             closeSolutionToolStripMenuItem.Enabled = editing && solutionOpen;
             saveToolStripMenuItem.Enabled = editing && editorOpen;
             saveAllToolStripMenuItem.Enabled = editing && solutionOpen;
-            batchBuildToolStripMenuItem.Enabled = editing && solutionHasProjects;
             buildSolutionToolStripMenuItem.Enabled = editing && solutionHasProjects;
             buildToolStripMenuItem1.Enabled = editing && solutionHasProjects;
-            buildActiveProjectToolStripMenuItem.Enabled = editing && activeProjectSet;
-            profileActiveProjectToolStripMenuItem.Enabled = editing && activeProjectSet && solution.ActiveProject.Target == Target.program;
+            buildActiveProjectToolStripMenuItem.Enabled = editing && activeProjectSet && (solution.ActiveProject.Target == Target.program || solution.ActiveProject.Target == Target.library);
+            runUnitTestsInCurrentSolutionToolStripMenuItem.Enabled = editing && solutionHasProjects;
+            profileActiveProjectToolStripMenuItem1.Enabled = editing && activeProjectSet && solution.ActiveProject.Target == Target.program;
+            runUnitTestsInActiveProjectToolStripMenuItem.Enabled = editing && activeProjectSet && solution.ActiveProject.Target == Target.unitTest;
             buildSolutionToolStripMenuItem.Enabled = editing && solutionHasProjects;
             cleanSolutionToolStripMenuItem.Enabled = editing && solutionHasProjects;
             cleanSolutionToolStripMenuItem2.Enabled = editing && solutionHasProjects;
@@ -756,6 +762,8 @@ namespace cmdevenv
                 executor.WaitForExit();
                 profiler.DoExit();
                 profiler.WaitForExit();
+                unitTester.DoExit();
+                unitTester.WaitForExit();
             }
             catch (Exception ex)
             {
@@ -844,6 +852,10 @@ namespace cmdevenv
                         else if (dialog.SelectedProjectType == ProjectType.library)
                         {
                             project.Target = Target.library;
+                        }
+                        else if (dialog.SelectedProjectType == ProjectType.unitTestProject)
+                        {
+                            project.Target = Target.unitTest;
                         }
                         solution.AddProject(project);
                         TreeNode solutionNode = solutionExplorerTreeView.Nodes[0];
@@ -985,7 +997,9 @@ namespace cmdevenv
                 buildSolutionToolStripMenuItem.Enabled = false;
                 buildToolStripMenuItem1.Enabled = false;
                 buildActiveProjectToolStripMenuItem.Enabled = false;
-                profileActiveProjectToolStripMenuItem.Enabled = false;
+                profileActiveProjectToolStripMenuItem1.Enabled = false;
+                runUnitTestsInActiveProjectToolStripMenuItem.Enabled = false;
+                runUnitTestsInCurrentSolutionToolStripMenuItem.Enabled = false;
                 outputTabControl.SelectedTab = outputTabPage;
                 if (solution != null && solution.Projects.Count > 0)
                 {
@@ -1025,7 +1039,9 @@ namespace cmdevenv
                 buildSolutionToolStripMenuItem.Enabled = false;
                 buildToolStripMenuItem1.Enabled = false;
                 buildActiveProjectToolStripMenuItem.Enabled = false;
-                profileActiveProjectToolStripMenuItem.Enabled = false;
+                profileActiveProjectToolStripMenuItem1.Enabled = false;
+                runUnitTestsInActiveProjectToolStripMenuItem.Enabled = false;
+                runUnitTestsInCurrentSolutionToolStripMenuItem.Enabled = false;
                 outputTabControl.SelectedTab = outputTabPage;
                 string config = configComboBox.Text;
                 compileStartTime = DateTime.Now;
@@ -1228,7 +1244,9 @@ namespace cmdevenv
                 if (dialogResult == DialogResult.OK)
                 {
                     buildActiveProjectToolStripMenuItem.Enabled = false;
-                    profileActiveProjectToolStripMenuItem.Enabled = false;
+                    profileActiveProjectToolStripMenuItem1.Enabled = false;
+                    runUnitTestsInActiveProjectToolStripMenuItem.Enabled = false;
+                    runUnitTestsInCurrentSolutionToolStripMenuItem.Enabled = false;
                     progressTimer.Start();
                     outputRichTextBox.Clear();
                     outputTabControl.SelectedTab = outputTabPage;
@@ -1264,6 +1282,92 @@ namespace cmdevenv
             else
             {
                 infoLabel.Text = "Profile failed";
+                WriteOutputLine(errorMessage);
+                WriteOutputLine("exit code = " + exitCode.ToString());
+            }
+            infoTimer.Start();
+            SetState(State.editing);
+        }
+        private void RunUnitTests(Solution solution)
+        {
+            try
+            {
+                if (processRunning)
+                {
+                    throw new Exception("Cannot unit test while process is running");
+                }
+                SaveAll();
+                buildActiveProjectToolStripMenuItem.Enabled = false;
+                profileActiveProjectToolStripMenuItem1.Enabled = false;
+                runUnitTestsInActiveProjectToolStripMenuItem.Enabled = false;
+                runUnitTestsInCurrentSolutionToolStripMenuItem.Enabled = false;
+                progressTimer.Start();
+                outputRichTextBox.Clear();
+                outputTabControl.SelectedTab = outputTabPage;
+                SetState(State.unitTesting);
+                unitTestOutFile = Path.Combine(Path.GetDirectoryName(solution.FilePath), "cmunit-" + DateTime.Now.ToString("yyyyMMddTHHmmss") + ".html");
+                cancelToolStripMenuItem.Enabled = true;
+                infoLabel.Text = "Unit testing";
+                string config = configComboBox.Text;
+                unitTester.DoUnitTest(solution.FilePath, config, null, linkWithDebugRuntime, linkUsingMsLink, unitTestOutFile);
+            }
+            catch (Exception ex)
+            {
+                SetState(State.editing);
+                MessageBox.Show(ex.Message);
+            }
+        }
+        private void RunUnitTests(Project project, string file)
+        {
+            try
+            {
+                if (processRunning)
+                {
+                    throw new Exception("Cannot unit test while process is running");
+                }
+                if (project.Target != Target.unitTest)
+                {
+                    throw new Exception("Project '" + project.Name + "' is not a unit test project");
+                }
+                SaveAll();
+                buildActiveProjectToolStripMenuItem.Enabled = false;
+                profileActiveProjectToolStripMenuItem1.Enabled = false;
+                runUnitTestsInActiveProjectToolStripMenuItem.Enabled = false;
+                runUnitTestsInCurrentSolutionToolStripMenuItem.Enabled = false;
+                progressTimer.Start();
+                outputRichTextBox.Clear();
+                outputTabControl.SelectedTab = outputTabPage;
+                SetState(State.unitTesting);
+                unitTestOutFile = Path.Combine(Path.GetDirectoryName(project.FilePath), "cmunit-" + DateTime.Now.ToString("yyyyMMddTHHmmss") + ".html");
+                cancelToolStripMenuItem.Enabled = true;
+                infoLabel.Text = "Unit testing";
+                string config = configComboBox.Text;
+                unitTester.DoUnitTest(project.FilePath, config, file, linkWithDebugRuntime, linkUsingMsLink, unitTestOutFile);
+            }
+            catch (Exception ex)
+            {
+                SetState(State.editing);
+                MessageBox.Show(ex.Message);
+            }
+        }
+        private void HandleUnitTestingResult(string errorMessage, int exitCode)
+        {
+            cancelToolStripMenuItem.Enabled = false;
+            progressTimer.Stop();
+            progressLabel.Text = "";
+            if (unitTestingAborted)
+            {
+                unitTestingAborted = false;
+                infoLabel.Text = "Unit testing aborted";
+            }
+            if (exitCode == 0)
+            {
+                infoLabel.Text = "Unit testing succeeded";
+                System.Diagnostics.Process.Start(unitTestOutFile);
+            }
+            else
+            {
+                infoLabel.Text = "Unit testing failed";
                 WriteOutputLine(errorMessage);
                 WriteOutputLine("exit code = " + exitCode.ToString());
             }
@@ -1537,7 +1641,9 @@ namespace cmdevenv
                 buildSolutionToolStripMenuItem.Enabled = false;
                 buildToolStripMenuItem1.Enabled = false;
                 buildActiveProjectToolStripMenuItem.Enabled = false;
-                profileActiveProjectToolStripMenuItem.Enabled = false;
+                profileActiveProjectToolStripMenuItem1.Enabled = false;
+                runUnitTestsInActiveProjectToolStripMenuItem.Enabled = false;
+                runUnitTestsInCurrentSolutionToolStripMenuItem.Enabled = false;
                 outputTabControl.SelectedTab = outputTabPage;
                 cleaning = true;
                 cancelToolStripMenuItem.Enabled = true;
@@ -1662,6 +1768,10 @@ namespace cmdevenv
                     else if (dialog.SelectedProjectType == ProjectType.library)
                     {
                         project.Target = Target.library;
+                    }
+                    else if (dialog.SelectedProjectType == ProjectType.unitTestProject)
+                    {
+                        project.Target = Target.unitTest;
                     }
                     solution.AddProject(project);
                     TreeNode solutionNode = solutionExplorerTreeView.Nodes[0];
@@ -1842,28 +1952,35 @@ namespace cmdevenv
                 {
                     throw new Exception("cannot run while build is in progress");
                 }
-                Project activeProject = solution.ActiveProject;
-                if (activeProject != null)
+                if (solution != null)
                 {
-                    if (activeProject.Target != Target.program)
+                    Project activeProject = solution.ActiveProject;
+                    if (activeProject != null)
                     {
-                        throw new Exception("cannot execute: active project is a library");
+                        if (activeProject.Target != Target.program)
+                        {
+                            throw new Exception("cannot execute: active project is not a program");
+                        }
+                        console.ReadOnly = false;
+                        console.Clear();
+                        outputTabControl.SelectedTab = consoleTabPage;
+                        console.Focus();
+                        ProjectConfig config = ProjectConfigurations.Instance.GetProjectConfig(activeProject.GetConfigurationFilePath());
+                        string arguments = config.GetCommandLineArguments(configComboBox.Text);
+                        string executablePath = activeProject.GetExecutablePath(configComboBox.Text);
+                        if (!File.Exists(executablePath))
+                        {
+                            throw new Exception("executable '" + executablePath + "' not found");
+                        }
+                        abortToolStripMenuItem.Enabled = true;
+                        processRunning = true;
+                        SetState(State.running);
+                        executor.DoExecute(executablePath, arguments);
                     }
-                    console.ReadOnly = false;
-                    console.Clear();
-                    outputTabControl.SelectedTab = consoleTabPage;
-                    console.Focus();
-                    ProjectConfig config = ProjectConfigurations.Instance.GetProjectConfig(activeProject.GetConfigurationFilePath());
-                    string arguments = config.GetCommandLineArguments(configComboBox.Text);
-                    string executablePath = activeProject.GetExecutablePath(configComboBox.Text);
-                    if (!File.Exists(executablePath))
-                    {
-                        throw new Exception("executable '" + executablePath + "' not found");
-                    }
-                    abortToolStripMenuItem.Enabled = true;
-                    processRunning = true;
-                    SetState(State.running);
-                    executor.DoExecute(executablePath, arguments);
+                }
+                else
+                {
+                    throw new Exception("no solution open");
                 }
             }
             catch (Exception ex)
@@ -1890,6 +2007,12 @@ namespace cmdevenv
                 profileAborted = true;
                 HandleProfileResult("profile aborted", 1);
             }
+            else if (state == State.unitTesting)
+            {
+                unitTester.AbortUnitTesting();
+                unitTestingAborted = true;
+                HandleUnitTestingResult("unit testing aborted", 1);
+            }
         }
         private void cancelToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -1909,6 +2032,12 @@ namespace cmdevenv
                 profiler.AbortProfile();
                 profileAborted = true;
                 HandleProfileResult("profile aborted", 1);
+            }
+            else if (state == State.unitTesting)
+            {
+                unitTester.AbortUnitTesting();
+                unitTestingAborted = true;
+                HandleUnitTestingResult("unit testing aborted", 1);
             }
         }
         private async void closeToolStripMenuItem1_Click(object sender, EventArgs e)
@@ -2079,6 +2208,7 @@ namespace cmdevenv
                         await SetupSolutionExplorer(project);
                     }
                 }
+                SetMenuItemStatus();
             }
             catch (Exception ex)
             {
@@ -2218,6 +2348,8 @@ namespace cmdevenv
         private void projectContextMenuStrip_Opening(object sender, CancelEventArgs e)
         {
             profileToolStripMenuItem.Enabled = false;
+            runUnitTestsToolStripMenuItem1.Enabled = false;
+            buildToolStripMenuItem2.Enabled = false;
             TreeNode selectedNode = solutionExplorerTreeView.SelectedNode;
             if (selectedNode != null)
             {
@@ -2228,7 +2360,135 @@ namespace cmdevenv
                     {
                         profileToolStripMenuItem.Enabled = true;
                     }
+                    else if (selectedProject.Target == Target.unitTest)
+                    {
+                        runUnitTestsToolStripMenuItem1.Enabled = true;
+                    }
+                    if (selectedProject.Target == Target.program || selectedProject.Target == Target.library)
+                    {
+                        buildToolStripMenuItem2.Enabled = true;
+                    }
                 }
+            }
+        }
+        private async void unitTestsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                string cmajorRootDir = Environment.GetEnvironmentVariable("CMAJOR_ROOT");
+                await OpenProjectOrSolution(Path.Combine(Path.Combine(Path.Combine(cmajorRootDir, "unitTest"), "cmajor"), "cmajor.cms"));
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+        private void runUnitTestsToolStripMenuItem2_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                SourceFile sourceFile = (SourceFile)solutionExplorerTreeView.SelectedNode.Tag;
+                if (sourceFile != null)
+                {
+                    string file = sourceFile.FilePath;
+                    Project project = sourceFile.Project;
+                    if (project != null)
+                    {
+                        RunUnitTests(project, file);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+        private void runUnitTestsToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                TreeNode selectedNode = solutionExplorerTreeView.SelectedNode;
+                if (selectedNode != null)
+                {
+                    Project selectedProject = selectedNode.Tag as Project;
+                    if (selectedProject != null)
+                    {
+                        RunUnitTests(selectedProject, null);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+        private void runUnitTestsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                if (solution != null)
+                {
+                    RunUnitTests(solution);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+        private void runUnitTestsInSolutionToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                if (solution != null)
+                {
+                    RunUnitTests(solution);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+        private void runUnitTestsIsActiveProjectToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                if (solution != null && solution.ActiveProject != null)
+                {
+                    RunUnitTests(solution.ActiveProject, null);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+        private void sourceFileContextMenuStrip_Opening(object sender, CancelEventArgs e)
+        {
+            try
+            {
+                runUnitTestsToolStripMenuItem2.Enabled = false;
+                TreeNode selectedNode = solutionExplorerTreeView.SelectedNode;
+                if (selectedNode != null)
+                {
+                    SourceFile selectedSourceFile = selectedNode.Tag as SourceFile;
+                    if (selectedSourceFile != null)
+                    {
+                        Project selectedProject = selectedSourceFile.Project;
+                        if (selectedProject != null)
+                        {
+                            if (selectedProject.Target == Target.unitTest)
+                            {
+                                runUnitTestsToolStripMenuItem2.Enabled = true;
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
             }
         }
         private Solution solution;
@@ -2238,6 +2498,7 @@ namespace cmdevenv
         private Compiler compiler;
         private Profiler profiler;
         private Executor executor;
+        private UnitTester unitTester;
         private ConsoleWindow console;
         private bool buildInProgress;
         private bool batchBuilding;
@@ -2247,6 +2508,7 @@ namespace cmdevenv
         private bool compileAborted;
         private bool compiling;
         private bool profileAborted;
+        private bool unitTestingAborted;
         private bool cleaning;
         private bool strictNothrow;
         private bool emitLlvm;
@@ -2260,6 +2522,7 @@ namespace cmdevenv
         private bool matchWholeWord;
         private bool useRegularExpression;
         private string profileOutFile;
+        private string unitTestOutFile;
     }
 
     public static class KeyboardUtil

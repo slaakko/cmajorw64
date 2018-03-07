@@ -46,6 +46,7 @@ namespace cmajor.parser
         Target : Target
             ::= keyword("program"){ value = Target::program; }
             |   keyword("library"){ value = Target::library; }
+            |   keyword("unitTest"){ value = Target::unitTest; }
             ;
 
         FilePath: std::string

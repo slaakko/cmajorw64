@@ -48,7 +48,7 @@ namespace parser
         }
         public override void CreateRules()
         {
-            AddRule(new KeywordRuleParser("Keyword", "Parsers.SourceToken.Keyword",
+            AddRule(new KeywordRuleParser("Keyword", "parser.SourceToken.Keyword",
                 new ActionParser("A0",
                     new AlternativeParser(
                         new SequenceParser(
@@ -77,9 +77,10 @@ namespace parser
                             "continue", "goto", "typedef", "typename", "const", 
                             "null", "this", "base", "construct", "destroy", 
                             "new", "delete", "sizeof", "try", "catch", "throw", 
-                            "concept", "where", "axiom", "and", "or", "not"})
+                            "concept", "where", "axiom", "and", "or", "not", 
+                            "unit_test"})
                         ))));
-            AddRule(new QualifiedIdRuleParser("QualifiedId", "Parsers.SourceToken.QualifiedId",
+            AddRule(new QualifiedIdRuleParser("QualifiedId", "parser.SourceToken.QualifiedId",
                 new ActionParser("A0",
                     new SequenceParser(
                         new NonTerminalParser("Identifier", "Identifier", "Identifier", 0),
@@ -87,11 +88,11 @@ namespace parser
                             new SequenceParser(
                                 new CharParser('.'),
                                 new NonTerminalParser("Identifier", "Identifier", "Identifier", 0)))))));
-            AddRule(new RuleParser("Identifier", "Parsers.SourceToken.Identifier",
+            AddRule(new RuleParser("Identifier", "parser.SourceToken.Identifier",
                 new DifferenceParser(
                     new NonTerminalParser("identifier", "identifier", "identifier", 0),
                     new NonTerminalParser("Keyword", "Keyword", "Keyword", 0))));
-            AddRule(new CharRuleParser("Char", "Parsers.SourceToken.Char",
+            AddRule(new CharRuleParser("Char", "parser.SourceToken.Char",
                 new ActionParser("A0",
                     new TokenParser(
                         new SequenceParser(
@@ -101,7 +102,7 @@ namespace parser
                                     new CharSetParser("\n\r\'\\", true),
                                     new NonTerminalParser("escape", "escape", "escape", 0))),
                             new CharParser('\''))))));
-            AddRule(new StringRuleParser("String", "Parsers.SourceToken.String",
+            AddRule(new StringRuleParser("String", "parser.SourceToken.String",
                 new ActionParser("A0",
                     new TokenParser(
                         new SequenceParser(
@@ -113,20 +114,20 @@ namespace parser
                                             new CharSetParser("\n\r\"", true)),
                                         new NonTerminalParser("escape", "escape", "escape", 0)))),
                             new CharParser('\"'))))));
-            AddRule(new NumberRuleParser("Number", "Parsers.SourceToken.Number",
+            AddRule(new NumberRuleParser("Number", "parser.SourceToken.Number",
                 new ActionParser("A0",
                     new NonTerminalParser("number", "number", "number", 0))));
-            AddRule(new SpacesRuleParser("Spaces", "Parsers.SourceToken.Spaces",
+            AddRule(new SpacesRuleParser("Spaces", "parser.SourceToken.Spaces",
                 new ActionParser("A0",
                     new PositiveParser(
                         new CharSetParser("\t ")))));
-            AddRule(new LineCommentRuleParser("LineComment", "Parsers.SourceToken.LineComment",
+            AddRule(new LineCommentRuleParser("LineComment", "parser.SourceToken.LineComment",
                 new ActionParser("A0",
                     new SequenceParser(
                         new StringParser("//"),
                         new KleeneStarParser(
                             new CharSetParser("\n\r", true))))));
-            AddRule(new BlockCommentRuleParser("BlockComment", "Parsers.SourceToken.BlockComment",
+            AddRule(new BlockCommentRuleParser("BlockComment", "parser.SourceToken.BlockComment",
                 new ActionParser("A0",
                     new SequenceParser(
                         new SequenceParser(
@@ -141,7 +142,7 @@ namespace parser
                                         new StringParser("*/"))))),
                         new OptionalParser(
                             new StringParser("*/"))))));
-            AddRule(new OtherRuleParser("Other", "Parsers.SourceToken.Other",
+            AddRule(new OtherRuleParser("Other", "parser.SourceToken.Other",
                 new ActionParser("A0",
                     new CharSetParser("\n\r", true))));
         }

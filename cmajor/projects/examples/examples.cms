@@ -4,4 +4,4 @@ project <Calculator/Calculator.cmp>;
 project <HexDump/hexdump.cmp>;
 project <rex/rex.cmp>;
 project <xpq/xpq.cmp>;
-activeProject HexDump;
+activeProject Args;

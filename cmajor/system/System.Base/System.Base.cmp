@@ -16,6 +16,7 @@ source <ConditionVariable.cm>;
 source <Console.cm>;
 source <Conversion.cm>;
 source <Exception.cm>;
+source <Execute.cm>;
 source <File.cm>;
 source <FileByteStream.cm>;
 source <FileStream.cm>;

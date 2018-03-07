@@ -15,6 +15,7 @@ namespace server
         public virtual void HandleCleanRequest(CleanRequest request) { }
         public virtual void HandleExecuteRequest(ExecuteRequest request) { }
         public virtual void HandleProfileRequest(ProfileRequest request) { }
+        public virtual void HandleUnitTestRequest(UnitTestRequest request) { }
     }
 
     public abstract class Request
@@ -171,5 +172,28 @@ namespace server
         public string outFile;
         public string args;
         public string project;
+    }
+
+    public class UnitTestRequest : Request
+    {
+        public UnitTestRequest(string projectOrSolutionFilePath, string config, string file, bool linkWithDebugRuntime, bool linkUsingMsLink, string outFile)
+        {
+            this.projectOrSolutionFilePath = projectOrSolutionFilePath;
+            this.config = config;
+            this.file = file;
+            this.linkWithDebugRuntime = linkWithDebugRuntime;
+            this.linkUsingMsLink = linkUsingMsLink;
+            this.outFile = outFile;
+        }
+        public override void Process(RequestHandler handler)
+        {
+            handler.HandleUnitTestRequest(this);
+        }
+        public string projectOrSolutionFilePath;
+        public string config;
+        public string file;
+        public bool linkWithDebugRuntime;
+        public bool linkUsingMsLink;
+        public string outFile;
     }
 }

@@ -11,7 +11,7 @@ namespace devcore
 {
     public enum Target
     {
-        program, library
+        program, library, unitTest
     }
 
     public class Project : IComparable<Project>
@@ -36,7 +36,16 @@ namespace devcore
             using (StreamWriter writer = File.CreateText(filePath))
             {
                 writer.WriteLine("project " + name + ";");
-                writer.WriteLine("target=" + (target == Target.program ? "program" : "library") + ";");
+                string targetStr = "program";
+                if (target == Target.library)
+                {
+                    targetStr = "library";
+                }
+                else if (target == Target.unitTest)
+                {
+                    targetStr = "unitTest";
+                }
+                writer.WriteLine("target=" + targetStr + ";");
                 foreach (string reference in references)
                 {
                     string referenceFilePath = Path.IsPathRooted(reference) ? reference : PathUtil.GetRelativePath(Path.GetFullPath(Path.Combine(basePath, reference)), basePath);

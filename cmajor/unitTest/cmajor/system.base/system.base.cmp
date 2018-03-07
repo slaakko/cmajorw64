@@ -1,5 +1,5 @@
 project system.base;
-target=program;
+target=unitTest;
 source <algorithm.cm>;
 source <intForwardList.cm>;
 source <intHashMap.cm>;

@@ -504,6 +504,8 @@ public:
         a0ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<TargetRule>(this, &TargetRule::A0Action));
         cmajor::parsing::ActionParser* a1ActionParser = GetAction(ToUtf32("A1"));
         a1ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<TargetRule>(this, &TargetRule::A1Action));
+        cmajor::parsing::ActionParser* a2ActionParser = GetAction(ToUtf32("A2"));
+        a2ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<TargetRule>(this, &TargetRule::A2Action));
     }
     void A0Action(const char32_t* matchBegin, const char32_t* matchEnd, const Span& span, const std::string& fileName, ParsingData* parsingData, bool& pass)
     {
@@ -514,6 +516,11 @@ public:
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
         context->value = Target::library;
+    }
+    void A2Action(const char32_t* matchBegin, const char32_t* matchEnd, const Span& span, const std::string& fileName, ParsingData* parsingData, bool& pass)
+    {
+        Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
+        context->value = Target::unitTest;
     }
 private:
     struct Context : cmajor::parsing::Context
@@ -576,8 +583,8 @@ void ProjectGrammar::GetReferencedGrammars()
 
 void ProjectGrammar::CreateRules()
 {
-    AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("spaces_and_comments"), this, ToUtf32("cmajor.parsing.stdlib.spaces_and_comments")));
     AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("qualified_id"), this, ToUtf32("cmajor.parsing.stdlib.qualified_id")));
+    AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("spaces_and_comments"), this, ToUtf32("cmajor.parsing.stdlib.spaces_and_comments")));
     AddRule(new ProjectRule(ToUtf32("Project"), GetScope(), GetParsingDomain()->GetNextRuleId(),
         new cmajor::parsing::SequenceParser(
             new cmajor::parsing::SequenceParser(
@@ -642,10 +649,13 @@ void ProjectGrammar::CreateRules()
                     new cmajor::parsing::CharParser(';'))))));
     AddRule(new TargetRule(ToUtf32("Target"), GetScope(), GetParsingDomain()->GetNextRuleId(),
         new cmajor::parsing::AlternativeParser(
-            new cmajor::parsing::ActionParser(ToUtf32("A0"),
-                new cmajor::parsing::KeywordParser(ToUtf32("program"))),
-            new cmajor::parsing::ActionParser(ToUtf32("A1"),
-                new cmajor::parsing::KeywordParser(ToUtf32("library"))))));
+            new cmajor::parsing::AlternativeParser(
+                new cmajor::parsing::ActionParser(ToUtf32("A0"),
+                    new cmajor::parsing::KeywordParser(ToUtf32("program"))),
+                new cmajor::parsing::ActionParser(ToUtf32("A1"),
+                    new cmajor::parsing::KeywordParser(ToUtf32("library")))),
+            new cmajor::parsing::ActionParser(ToUtf32("A2"),
+                new cmajor::parsing::KeywordParser(ToUtf32("unitTest"))))));
     AddRule(new FilePathRule(ToUtf32("FilePath"), GetScope(), GetParsingDomain()->GetNextRuleId(),
         new cmajor::parsing::TokenParser(
             new cmajor::parsing::SequenceParser(

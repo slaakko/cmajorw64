@@ -23,7 +23,7 @@ namespace parser
                         "internal", "virtual", "abstract", "override", "suppress", "default", "operator", "class", 
                         "return", "if", "else", "switch", "case", "default", "while", "do", "for", "break", "continue", 
                         "goto", "typedef", "typename", "const", "null", "this", "base", "construct", "destroy", "new", 
-                        "delete", "sizeof", "try", "catch", "throw", "concept", "where", "axiom", "and", "or", "not"]))
+                        "delete", "sizeof", "try", "catch", "throw", "concept", "where", "axiom", "and", "or", "not", "unit_test"]))
                     { 
                         value = match; 
                     }

@@ -261,7 +261,7 @@ void BindStatements(BoundCompileUnit& boundCompileUnit)
 
 void GenerateLibrary(const std::vector<std::string>& objectFilePaths, const std::string& libraryFilePath)
 {
-    if (GetGlobalFlag(GlobalFlags::verbose))
+    if (GetGlobalFlag(GlobalFlags::verbose) && !GetGlobalFlag(GlobalFlags::unitTest))
     {
         std::cout << "Creating library..." << std::endl;
     }
@@ -290,7 +290,7 @@ void GenerateLibrary(const std::vector<std::string>& objectFilePaths, const std:
         std::string errors = ReadFile(libErrorFilePath);
         throw std::runtime_error("generating library '" + libraryFilePath + "' failed: " + ex.what() + ":\nerrors:\n" + errors);
     }
-    if (GetGlobalFlag(GlobalFlags::verbose))
+    if (GetGlobalFlag(GlobalFlags::verbose) && !GetGlobalFlag(GlobalFlags::unitTest))
     {
         std::cout << "==> " << libraryFilePath << std::endl;
     }
@@ -322,7 +322,7 @@ void CreateDefFile(const std::string& defFilePath, Module& module)
 
 void Link(const std::string& executableFilePath, const std::string& libraryFilePath, const std::vector<std::string>& libraryFilePaths, Module& module)
 {
-    if (GetGlobalFlag(GlobalFlags::verbose))
+    if (GetGlobalFlag(GlobalFlags::verbose) && !GetGlobalFlag(GlobalFlags::unitTest))
     {
         std::cout << "Linking..." << std::endl;
     }
@@ -385,7 +385,7 @@ void Link(const std::string& executableFilePath, const std::string& libraryFileP
         std::string errors = ReadFile(linkErrorFilePath);
         throw std::runtime_error("linking executable '" + executableFilePath + "' failed: " + ex.what() + ":\nerrors:\n" + errors);
     }
-    if (GetGlobalFlag(GlobalFlags::verbose))
+    if (GetGlobalFlag(GlobalFlags::verbose) && !GetGlobalFlag(GlobalFlags::unitTest))
     {
         std::cout << "==> " << executableFilePath << std::endl;
     }
@@ -669,6 +669,10 @@ void SetDefines(const std::string& definesFilePath)
 
 void BuildProject(Project* project)
 {
+    if (project->GetTarget() == Target::unitTest)
+    {
+        throw std::runtime_error("cannot build unit test project '" + ToUtf8(project->Name()) + "' using cmc, use cmunit.");
+    }
     std::string config = GetConfig();
     if (GetGlobalFlag(GlobalFlags::verbose))
     {
@@ -872,6 +876,14 @@ void BuildSolution(const std::string& solutionFilePath)
     bool isSystemSolution = false;
     for (Project* project : buildOrder)
     {
+        if (project->GetTarget() == Target::unitTest)
+        {
+            if (GetGlobalFlag(GlobalFlags::verbose))
+            {
+                std::cout << "skipping unit test project '" << ToUtf8(project->Name()) << "'" << std::endl;
+            }
+            continue;
+        }
         if (GetGlobalFlag(GlobalFlags::clean))
         {
             CleanProject(project);

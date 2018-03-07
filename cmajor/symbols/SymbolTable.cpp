@@ -1502,7 +1502,7 @@ void InitCoreSymbolTable(SymbolTable& symbolTable)
 
 void CreateClassFile(const std::string& executableFilePath, const SymbolTable& symbolTable)
 {
-    if (GetGlobalFlag(GlobalFlags::verbose))
+    if (GetGlobalFlag(GlobalFlags::verbose) && !GetGlobalFlag(GlobalFlags::unitTest))
     {
         std::cout << "Generating class file..." << std::endl;
     }
@@ -1538,7 +1538,7 @@ void CreateClassFile(const std::string& executableFilePath, const SymbolTable& s
         uint32_t typeId = classHavingStaticConstructor->TypeId();
         writer.Write(typeId);
     }
-    if (GetGlobalFlag(GlobalFlags::verbose))
+    if (GetGlobalFlag(GlobalFlags::verbose) && !GetGlobalFlag(GlobalFlags::unitTest))
     {
         std::cout << "==> " << classFilePath << std::endl;
     }

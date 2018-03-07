@@ -94,6 +94,8 @@ void PrintHelp()
 
 CompileUnitGrammar* compileUnitGrammar = nullptr;
 
+bool unitTestsFound = false;
+
 void CreateSymbols(SymbolTable& symbolTable, CompileUnitNode* testUnit)
 {
     SymbolCreatorVisitor symbolCreator(symbolTable);
@@ -200,6 +202,7 @@ struct UnitTest
 
 int RunUnitTest(Project* project)
 {
+    unitTestsFound = true;
     int exitCode = system(project->ExecutableFilePath().c_str());
     return exitCode;
 }
@@ -259,6 +262,10 @@ void TestUnit(Project* project, CompileUnitNode* testUnit, const std::string& te
         WriteTypeIdCounter(config);
         WriteFunctionIdCounter(config);
         boost::filesystem::remove(unitTestFilePath);
+        if (GetGlobalFlag(GlobalFlags::verbose))
+        {
+            std::cout << ">> " << testName << std::endl;
+        }
         int exitCode = RunUnitTest(project);
         if (FileExists(unitTestFilePath))
         {
@@ -343,7 +350,7 @@ std::vector<std::pair<std::unique_ptr<CompileUnitNode>, std::string>> SplitIntoT
     return testUnits;
 }
 
-void TestSourceFile(Project* project, const std::string& sourceFilePath, const std::string& onlyTest, cmajor::dom::Element* projectElement)
+void TestSourceFile(bool& first, Project* project, const std::string& sourceFilePath, const std::string& onlyTest, cmajor::dom::Element* projectElement)
 {
     std::unique_ptr<cmajor::dom::Element> sourceFileElement(new cmajor::dom::Element(U"sourceFile"));
     sourceFileElement->SetAttribute(U"name", ToUtf32(Path::GetFileNameWithoutExtension(sourceFilePath)));
@@ -351,16 +358,24 @@ void TestSourceFile(Project* project, const std::string& sourceFilePath, const s
     {
         compileUnitGrammar = CompileUnitGrammar::Create();
     }
-    if (GetGlobalFlag(GlobalFlags::verbose))
-    {
-        std::cout << "> " << sourceFilePath << std::endl;
-    }
     MappedInputFile sourceFile(sourceFilePath);
     int fileIndex = FileRegistry::Instance().RegisterFile(sourceFilePath);
     ParsingContext parsingContext;
     std::u32string s(ToUtf32(std::string(sourceFile.Begin(), sourceFile.End())));
     std::unique_ptr<CompileUnitNode> compileUnit(compileUnitGrammar->Parse(&s[0], &s[0] + s.length(), fileIndex, sourceFilePath, &parsingContext));
     std::vector<std::pair<std::unique_ptr<CompileUnitNode>, std::string>> testUnits = SplitIntoTestUnits(compileUnit.get());
+    if (!testUnits.empty())
+    {
+        if (GetGlobalFlag(GlobalFlags::verbose))
+        {
+            if (first)
+            {
+                first = false;
+                std::cout << ToUtf8(project->Name()) << " : " << GetConfig() << std::endl;
+            }
+            std::cout << "> " << sourceFilePath << std::endl;
+        }
+    }
     for (const auto& p : testUnits)
     {
         if (!onlyTest.empty())
@@ -392,13 +407,14 @@ bool SourceFileNameEquals(const std::string& fileName, const std::string& source
 
 void TestProject(Project* project, const std::string& onlySourceFile, const std::string& onlyTest, cmajor::dom::Element* parentElement)
 {
+    if (project->GetTarget() != Target::unitTest)
+    {
+        throw std::runtime_error("project '" + ToUtf8(project->Name()) + "' is not a unit testing project");
+    }
+    bool first = true;
     std::unique_ptr<cmajor::dom::Element> projectElement(new cmajor::dom::Element(U"project"));
     projectElement->SetAttribute(U"name", project->Name());
     std::string config = GetConfig();
-    if (GetGlobalFlag(GlobalFlags::verbose))
-    {
-        std::cout << "Testing project '" << ToUtf8(project->Name()) << "' (" << project->FilePath() << ") using " << config << " configuration." << std::endl;
-    }
     SetCurrentProjectName(project->Name());
     SetCurrentTooName(U"cmc");
     for (const std::string& sourceFilePath : project->SourceFilePaths())
@@ -410,11 +426,7 @@ void TestProject(Project* project, const std::string& onlySourceFile, const std:
                 continue;
             }
         }
-        TestSourceFile(project, sourceFilePath, onlyTest, projectElement.get());
-    }
-    if (GetGlobalFlag(GlobalFlags::verbose))
-    {
-        std::cout << "Project '" << ToUtf8(project->Name()) << "' (" << project->FilePath() << ") tested using " << config << " configuration." << std::endl;
+        TestSourceFile(first, project, sourceFilePath, onlyTest, projectElement.get());
     }
     parentElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(projectElement.release()));
 }
@@ -422,7 +434,7 @@ void TestProject(Project* project, const std::string& onlySourceFile, const std:
 SolutionGrammar* solutionGrammar = nullptr;
 ProjectGrammar* projectGrammar = nullptr;
 
-void TestProject(const std::string& projectFileName, const std::string& onlySourceFile, const std::string& onlyTest, cmajor::dom::Element* parentElement)
+bool TestProject(const std::string& projectFileName, const std::string& onlySourceFile, const std::string& onlyTest, cmajor::dom::Element* parentElement)
 {
     std::string config = GetConfig();
     if (!projectGrammar)
@@ -433,10 +445,15 @@ void TestProject(const std::string& projectFileName, const std::string& onlySour
     std::u32string p(ToUtf32(std::string(projectFile.Begin(), projectFile.End())));
     std::unique_ptr<Project> project(projectGrammar->Parse(&p[0], &p[0] + p.length(), 0, projectFileName, config));
     project->ResolveDeclarations();
+    if (project->GetTarget() != Target::unitTest)
+    {
+        return false;
+    }
     TestProject(project.get(), onlySourceFile, onlyTest, parentElement);
+    return true;
 }
 
-void TestSolution(const std::string& solutionFileName, const std::string& onlySourceFile, const std::string& onlyTest, cmajor::dom::Element* cmunitElement)
+bool TestSolution(const std::string& solutionFileName, const std::string& onlySourceFile, const std::string& onlyTest, cmajor::dom::Element* cmunitElement)
 {
     std::unique_ptr<cmajor::dom::Element> solutionElement(new cmajor::dom::Element(U"solution"));
     if (!solutionGrammar)
@@ -453,19 +470,20 @@ void TestSolution(const std::string& solutionFileName, const std::string& onlySo
     solutionElement->SetAttribute(U"name", solution->Name());
     solution->ResolveDeclarations();
     std::string config = GetConfig();
-    if (GetGlobalFlag(GlobalFlags::verbose))
-    {
-        std::cout << "Testing solution '" << ToUtf8(solution->Name()) << "' (" << solution->FilePath() << ") using " << config << " configuration." << std::endl;
-    }
+    bool containsUnitTestProject = false;
     for (const std::string& projectFilePath : solution->ProjectFilePaths())
     {
-        TestProject(projectFilePath, onlySourceFile, onlyTest, solutionElement.get());
+        bool unitTestProject = TestProject(projectFilePath, onlySourceFile, onlyTest, solutionElement.get());
+        if (unitTestProject)
+        {
+            containsUnitTestProject = true;
+        }
     }
-    if (GetGlobalFlag(GlobalFlags::verbose))
+    if (containsUnitTestProject)
     {
-        std::cout << "Solution '" << ToUtf8(solution->Name()) << "' (" << solution->FilePath() << ") tested using " << config << " configuration." << std::endl;
+        cmunitElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(solutionElement.release()));
     }
-    cmunitElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(solutionElement.release()));
+    return containsUnitTestProject;
 }
 
 std::unique_ptr<cmajor::dom::Document> GenerateHtmlReport(cmajor::dom::Document* testDoc)
@@ -832,6 +850,8 @@ int main(int argc, const char** argv)
         std::vector<std::string> projectsAndSolutions;
         std::string onlySourceFile;
         std::string onlyTest;
+        std::string outFile;
+        bool unitTestProjectsFound = false;
         for (int i = 1; i < argc; ++i)
         {
             std::string arg = argv[i];
@@ -883,6 +903,14 @@ int main(int argc, const char** argv)
                         {
                             onlyTest = components[1];
                         }
+                        else if (components[0] == "--out" || components[0] == "-o")
+                        {
+                            outFile = components[1];
+                        }
+                        else
+                        {
+                            throw std::runtime_error("unknown option '" + arg + "'");
+                        }
                     }
                     else
                     {
@@ -914,6 +942,10 @@ int main(int argc, const char** argv)
         }
         else
         {
+            if (GetGlobalFlag(GlobalFlags::verbose))
+            {
+                std::cout << "Cmajor unit test engine version " << version << std::endl;
+            }
             if (onlySourceFile.empty())
             {
                 cmunitElement->SetAttribute(U"file", U"*");
@@ -947,7 +979,11 @@ int main(int argc, const char** argv)
                         std::unique_ptr<cmajor::dom::Element> componentElement(new cmajor::dom::Element(U"component"));
                         componentElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new cmajor::dom::Text(ToUtf32(Path::GetFileName(solutionFileName)))));
                         componentsElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(componentElement.release()));
-                        TestSolution(solutionFileName, onlySourceFile, onlyTest, cmunitElement.get());
+                        bool solutionContainsUnitTestProject = TestSolution(solutionFileName, onlySourceFile, onlyTest, cmunitElement.get());
+                        if (solutionContainsUnitTestProject)
+                        {
+                            unitTestProjectsFound = true;
+                        }
                     }
                 }
                 else if (fp.extension() == ".cmp")
@@ -962,13 +998,25 @@ int main(int argc, const char** argv)
                         std::unique_ptr<cmajor::dom::Element> componentElement(new cmajor::dom::Element(U"component"));
                         componentElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new cmajor::dom::Text(ToUtf32(Path::GetFileName(projectFileName)))));
                         componentsElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(componentElement.release()));
-                        TestProject(projectFileName, onlySourceFile, onlyTest, cmunitElement.get());
+                        bool projectIsUnitTestProject = TestProject(projectFileName, onlySourceFile, onlyTest, cmunitElement.get());
+                        if (projectIsUnitTestProject)
+                        {
+                            unitTestProjectsFound = true;
+                        }
                     }
                 }
                 else
                 {
                     throw std::runtime_error("Argument '" + fp.generic_string() + "' has invalid extension. Not Cmajor solution (.cms) or project (.cmp) file.");
                 }
+            }
+            if (!unitTestProjectsFound)
+            {
+                throw std::runtime_error("given solutions/projects contain no unit test projects");
+            }
+            if (!unitTestsFound)
+            {
+                throw std::runtime_error("no unit tests found in given solutions/projects/files");
             }
         }
         cmunitElement->SetAttribute(U"end", ToUtf32(GetCurrentDateTime().ToString()));
@@ -990,18 +1038,30 @@ int main(int argc, const char** argv)
         cmunitElement->SetAttribute(U"duration", ToUtf32(durationStr));
         cmajor::dom::Document testDoc;
         testDoc.AppendChild(std::unique_ptr<cmajor::dom::Node>(cmunitElement.release()));
-        std::string cmunitFileName = "cmunit";
-        cmunitFileName.append("-").append(GetCurrentDateTime().ToString(true, true, false, false)).append(".xml");
+        if (outFile.empty())
+        {
+            outFile = "cmunit";
+            outFile.append("-").append(GetCurrentDateTime().ToString(true, true, false, false));
+        }
+        std::string cmunitFileName = GetFullPath(boost::filesystem::path(outFile).replace_extension(".xml").generic_string());
         std::ofstream cmunitXmlFile(cmunitFileName);
         cmajor::util::CodeFormatter formatter(cmunitXmlFile);
         formatter.SetIndentSize(2);
         testDoc.Write(formatter);
+        if (GetGlobalFlag(GlobalFlags::verbose))
+        {
+            std::cout << "==> " << cmunitFileName << std::endl;
+        }
         std::unique_ptr<cmajor::dom::Document> reportDoc = GenerateHtmlReport(&testDoc);
         std::string cmunitReportFileName = Path::ChangeExtension(cmunitFileName, ".html");
         std::ofstream cmunitHtmlFile(cmunitReportFileName);
         cmajor::util::CodeFormatter htmlFormatter(cmunitHtmlFile);
         htmlFormatter.SetIndentSize(2);
         reportDoc->Write(htmlFormatter);
+        if (GetGlobalFlag(GlobalFlags::verbose))
+        {
+            std::cout << "==> " << cmunitReportFileName << std::endl;
+        }
     }
     catch (const ParsingException& ex)
     {

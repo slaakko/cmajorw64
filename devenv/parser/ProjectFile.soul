@@ -43,7 +43,7 @@ namespace parser
                     ;
 
         TargetDeclaration: Target
-                    ::= keyword("target") '='! (keyword("program"){ value = Target.program; } | keyword("library"){ value = Target.library; }) ';'!
+                    ::= keyword("target") '='! (keyword("program"){ value = Target.program; } | keyword("library"){ value = Target.library; } | keyword("unitTest"){ value = Target.unitTest; }) ';'!
                     ;
                 
         ProjectReference: string
