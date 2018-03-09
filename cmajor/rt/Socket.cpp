@@ -14,9 +14,16 @@
 #include <atomic>
 #include <mutex>
 #include <unordered_map>
+#ifdef _WIN32
 #include <winsock2.h>
 #include <ws2tcpip.h>    
 #include <Windows.h>
+#else
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netdb.h>
+#include <string.h>
+#endif
 #include <gnutls/gnutls.h>
 
 namespace cmajor { namespace rt {
@@ -71,6 +78,8 @@ void SocketTable::Done()
     instance.reset();
 }
 
+#ifdef _WIN32
+
 std::string GetSocketErrorMessage(int errorCode)
 {
     char buf[1024];
@@ -83,9 +92,24 @@ int GetLastSocketError()
     return WSAGetLastError();
 }
 
+#else
+
+std::string GetSocketErrorMessage(int errorCode)
+{
+    return strerror(errorCode);
+}
+
+int GetLastSocketError()
+{
+    return errno;
+}
+
+#endif
+
 SocketTable::SocketTable() : nextSocketHandle(1)
 {
     sockets.resize(maxNoLockSocketHandles);
+#ifdef _WIN32
     WORD ver = MAKEWORD(2, 2);
     WSADATA wsaData;
     if (WSAStartup(ver, &wsaData) != 0)
@@ -95,6 +119,7 @@ SocketTable::SocketTable() : nextSocketHandle(1)
         RtWrite(2, (const uint8_t*)errorMessage.c_str(), errorMessage.length());
         RtExit(exitCodeSocketInitializationFailed);
     }
+#endif
     int result = gnutls_global_init();
     if (result < 0)
     {
@@ -107,7 +132,9 @@ SocketTable::SocketTable() : nextSocketHandle(1)
 SocketTable::~SocketTable()
 {
     gnutls_global_deinit();
+#ifdef _WIN32
     WSACleanup();
+#endif
 }
 
 int32_t SocketTable::CreateSocket()
@@ -338,7 +365,11 @@ int32_t SocketTable::CloseSocket(int32_t socketHandle)
             gnutls_bye(socketData->session, GNUTLS_SHUT_RDWR);
         }
         SOCKET s = socketData->socket;
+#ifdef _WIN32
         result = closesocket(s);
+#else
+        result = close(s);
+#endif
         if (socketData->tlsSession)
         {
             gnutls_deinit(socketData->session);
@@ -361,7 +392,11 @@ int32_t SocketTable::CloseSocket(int32_t socketHandle)
                 gnutls_bye(socketData->session, GNUTLS_SHUT_RDWR);
             }
             SOCKET s = socketData->socket;
+#ifdef _WIN32
             result = closesocket(s);
+#else
+            result = close(s);
+#endif
             if (socketData->tlsSession)
             {
                 gnutls_deinit(socketData->session);
@@ -516,8 +551,12 @@ int32_t SocketTable::ConnectSocket(const std::string& node, const std::string& s
     int result = getaddrinfo(node.c_str(), service.c_str(), &hint, &res);
     if (result != 0)
     {
+#ifdef _WIN32
         int errorCode = GetLastSocketError();
         std::string errorMessage = GetSocketErrorMessage(errorCode);
+#else
+        std::string errorMessage = gai_strerror(result);
+#endif
         return InstallError(errorMessage);
     }
     else
@@ -794,4 +833,3 @@ extern "C" RT_API int32_t RtReceiveSocket(int32_t socketHandle, uint8_t* buf, in
 {
     return cmajor::rt::SocketTable::Instance().ReceiveSocket(socketHandle, buf, len, flags);
 }
-

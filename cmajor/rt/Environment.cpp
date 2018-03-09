@@ -14,9 +14,16 @@
 #include <mutex>
 #include <cstdlib>
 #include <cerrno>
+#ifdef _WIN32
 #include <direct.h>
 #include <io.h>
 #include <process.h>
+#else
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#endif
 
 namespace cmajor { namespace rt {
 
@@ -127,6 +134,8 @@ int32_t Executor::EndExecute(int32_t execHandle)
     }
 }
 
+#ifdef _WIN32
+
 int32_t Executor::Execute(Exec* exec)
 {
     std::vector<std::pair<int, Handle>> toRestore;
@@ -155,6 +164,39 @@ int32_t Executor::Execute(Exec* exec)
     }
     return exitCode;
 }
+
+#else
+
+int32_t Executor::Execute(Exec* exec)
+{
+    std::vector<std::pair<int, Handle>> toRestore;
+    for (const std::pair<int, std::string>& p : exec->redirections)
+    {
+        int handle = p.first;
+        std::string file = p.second;
+        Handle oldHandle = dup(handle);
+        if (oldHandle != -1)
+        {
+            toRestore.push_back(std::make_pair(handle, std::move(oldHandle)));
+            int pmode = S_IRUSR | S_IWUSR | S_IRGRP;
+            Handle fd = creat(file.c_str(), pmode);
+            if (fd != -1)
+            {
+                dup2(fd, handle);
+            }
+        }
+    }
+    int32_t exitCode = system(exec->command.c_str());
+    for (std::pair<int, Handle>& p : toRestore)
+    {
+        int handle = p.first;
+        Handle old = std::move(p.second);
+        dup2(old, handle);
+    }
+    return exitCode;
+}
+
+#endif
 
 void InitEnvironment()
 {

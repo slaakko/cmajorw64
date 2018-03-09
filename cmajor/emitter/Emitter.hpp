@@ -6,22 +6,11 @@
 #ifndef CMAJOR_EMITTER_EMITTER_INCLUDED
 #define CMAJOR_EMITTER_EMITTER_INCLUDED
 #include <cmajor/binder/BoundCompileUnit.hpp>
+#include <cmajor/emitter/EmittingContext.hpp>
 
 namespace cmajor { namespace emitter {
 
 using namespace cmajor::binder;
-
-class EmittingContextImpl;
-
-class EmittingContext
-{
-public:
-    EmittingContext();
-    ~EmittingContext();
-    EmittingContextImpl* GetEmittingContextImpl() { return emittingContextImpl; }
-private:
-    EmittingContextImpl* emittingContextImpl;
-};
 
 void GenerateCode(EmittingContext& emittingContext, BoundCompileUnit& boundCompileUnit);
 

@@ -13,7 +13,9 @@
 #include <boost/lexical_cast.hpp>
 #include <memory>
 #include <string>
+#ifdef _WIN32
 #include <Windows.h>
+#endif
 
 namespace cmajor { namespace rt {
 

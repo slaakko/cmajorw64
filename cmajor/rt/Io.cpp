@@ -10,8 +10,13 @@
 #include <boost/filesystem.hpp>
 #include <atomic>
 #include <mutex>
+#ifdef _WIN32
 #include <io.h>
 #include <fcntl.h>
+#else 
+#include <sys/types.h>
+#include <unistd.h>
+#endif
 
 namespace cmajor { namespace rt {
 
@@ -73,6 +78,7 @@ FileTable::FileTable() : stdinInUtf16Mode(false), stdoutInUtf16Mode(false), stde
     files[2] = stderr;
     std::fflush(stdout);
     std::fflush(stderr);
+#ifdef _WIN32
     if (_isatty(0))
     {
         _setmode(0, _O_U16TEXT);
@@ -88,12 +94,14 @@ FileTable::FileTable() : stdinInUtf16Mode(false), stdoutInUtf16Mode(false), stde
         _setmode(2, _O_U16TEXT);
         stderrInUtf16Mode = true;
     }
+#endif
 }
 
 FileTable::~FileTable()
 {
     std::fflush(stdout);
     std::fflush(stderr);
+#ifdef _WIN32
     if (stdinInUtf16Mode)
     {
         _setmode(0, _O_TEXT);
@@ -106,6 +114,7 @@ FileTable::~FileTable()
     {
         _setmode(2, _O_TEXT);
     }
+#endif
 }
 
 int32_t FileTable::OpenFile(const char* filePath, OpenMode openMode)
@@ -617,7 +626,11 @@ void FileTable::SeekFile(int32_t fileHandle, int64_t pos, Origin origin)
         case Origin::seekCur: o = SEEK_CUR; break;
         case Origin::seekEnd: o = SEEK_END; break;
     }
+#ifdef _WIN32
     int32_t result = _fseeki64(file, pos, o);
+#else
+    int32_t result = fseek(file, pos, o);
+#endif
     if (result != 0)
     {
         std::string filePath;
@@ -661,7 +674,11 @@ int64_t FileTable::TellFile(int32_t fileHandle)
     {
         throw FileSystemError("invalid file handle " + std::to_string(fileHandle));
     }
+#ifdef _WIN32
     int64_t result = _ftelli64(file);
+#else
+    int64_t result = ftell(file);
+#endif
     if (result == -1)
     {
         std::string filePath;

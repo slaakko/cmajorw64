@@ -159,7 +159,7 @@ void HtmlSourceTokenFormatter::Other(const std::u32string& token)
     formatter->Write("<span class=\"other\">" + HtmlEscape(ToUtf8(token)) + "</span>");
 }
 
-const char* version = "2.0.0";
+const char* version = "2.1.0";
 
 void PrintHelp()
 {

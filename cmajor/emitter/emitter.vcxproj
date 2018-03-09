@@ -19,10 +19,20 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="BasicEmitter.hpp" />
     <ClInclude Include="Emitter.hpp" />
+    <ClInclude Include="EmittingContext.hpp" />
+    <ClInclude Include="EmittingContextImpl.hpp" />
+    <ClInclude Include="LinuxEmitter.hpp" />
+    <ClInclude Include="WindowsEmitter.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="BasicEmitter.cpp" />
     <ClCompile Include="Emitter.cpp" />
+    <ClCompile Include="EmittingContext.cpp" />
+    <ClCompile Include="EmittingContextImpl.cpp" />
+    <ClCompile Include="LinuxEmitter.cpp" />
+    <ClCompile Include="WindowsEmitter.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>

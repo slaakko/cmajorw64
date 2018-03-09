@@ -16,7 +16,9 @@
 #include <cmajor/rt/ConditionVariable.hpp>
 #include <cmajor/rt/Thread.hpp>
 #include <cmajor/rt/Memory.hpp>
+#ifdef _WIN32
 #include <cmajor/rt/CommandLine.hpp>
+#endif
 #include <cmajor/rt/Socket.hpp>
 #include <cmajor/rt/Environment.hpp>
 #include <csignal>
@@ -53,12 +55,16 @@ void Init()
     InitEnvironment();
     InitStatics();
     InitClasses();
+#ifdef _WIN32
     InitCommandLine();
+#endif
 }
 
 void Done()
 {
+#ifdef _WIN32
     DoneCommandLine();
+#endif
     DoneClasses();
     DoneStatics();
     DoneEnvironment();

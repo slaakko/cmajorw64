@@ -4,14 +4,21 @@
 // =================================
 
 #include <cmajor/rt/Random.hpp>
+#ifdef _WIN32
 #define _CRT_RAND_S
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
+#else
+#include <unistd.h>
+#include <sys/types.h>
+#endif
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
 
 namespace cmajor { namespace rt {
+
+#ifdef _WIN32
 
 unsigned int get_random_seed_from_system()
 {
@@ -24,6 +31,28 @@ unsigned int get_random_seed_from_system()
     }
     return seed;
 }
+
+#else
+
+unsigned int get_random_seed_from_system()
+{
+    unsigned int seed = 0;
+    int fn = open("/dev/urandom", O_RDONLY);
+    if (fn == -1)
+    {
+        perror("get_random_seed_from_system() failed");
+        exit(1);
+    }
+    if (read(fn, &seed, 4) != 4)
+    {
+        perror("get_random_seed_from_system() failed");
+        exit(1);
+    }
+    close(fn);
+    return seed;
+}
+
+#endif
 
 class MT
 {
@@ -93,7 +122,15 @@ MT::MT() : initialized(false), mti(0), mt(), mag()
 {
 }
 
+#ifdef _WIN32
+
 __declspec(thread) MT* mt = nullptr;
+
+#else
+
+__thread MT* mt = nullptr;
+
+#endif
 
 void InitMt(uint32_t seed)
 {
