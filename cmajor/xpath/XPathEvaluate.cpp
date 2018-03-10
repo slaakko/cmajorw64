@@ -6,7 +6,7 @@
 #include <cmajor/xpath/XPathEvaluate.hpp>
 #include <cmajor/xpath/XPathContext.hpp>
 #include <cmajor/xpath/XPath.hpp>
-#include <cmajor/xpath/XpathDebug.hpp>
+#include <cmajor/xpath/XPathDebug.hpp>
 #include <cmajor/dom/Document.hpp>
 #include <iostream>
 #include <chrono>

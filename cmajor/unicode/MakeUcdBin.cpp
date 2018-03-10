@@ -343,7 +343,7 @@ int main(int argc, const char** argv)
         }
         if (cmajor_root.empty())
         {
-            std::cerr << "please set 'CMAJOR_ROOT' environment variable to contain /path/to/cmajorw64/cmajor directory." << std::endl;
+            std::cerr << "please set 'CMAJOR_ROOT' environment variable to contain /path/to/cmajor directory." << std::endl;
             return 2;
         }
         std::string xmlFileName = (boost::filesystem::path(cmajor_root) / boost::filesystem::path("unicode") / boost::filesystem::path("ucd.all.flat.xml")).generic_string();

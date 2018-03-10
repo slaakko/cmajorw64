@@ -15,7 +15,7 @@ std::string CmajorRootDir()
     char* e = getenv("CMAJOR_ROOT");
     if (e == nullptr || !*e)
     {
-        throw std::runtime_error("please set 'CMAJOR_ROOT' environment variable to contain /path/to/cmajorw64/cmajor directory.");
+        throw std::runtime_error("please set 'CMAJOR_ROOT' environment variable to contain /path/to/cmajor directory.");
     }
     return std::string(e);
 }

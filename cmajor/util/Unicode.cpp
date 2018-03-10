@@ -2002,7 +2002,7 @@ std::string CmajorRoot()
     }
     if (cmajorRoot.empty())
     {
-        throw UnicodeException("please set 'CMAJOR_ROOT' environment variable to contain /path/to/cmajorw64/cmajor directory.");
+        throw UnicodeException("please set 'CMAJOR_ROOT' environment variable to contain /path/to/cmajor directory.");
     }
     return cmajorRoot;
 }
