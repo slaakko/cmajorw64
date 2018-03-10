@@ -139,7 +139,7 @@ std::unique_ptr<JsonValue> Exception::ToJson() const
         }
     }
     json->AddField(U"references", std::move(refs));
-    return json;
+    return std::unique_ptr<JsonValue>(json.release());
 }
 
 CastOverloadException::CastOverloadException(const std::string& message_, const Span& defined_) : Exception(message_, defined_)

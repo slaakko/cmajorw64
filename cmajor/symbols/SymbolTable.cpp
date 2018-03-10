@@ -431,7 +431,7 @@ void SymbolTable::EndFunction()
 
 void SymbolTable::AddParameter(ParameterNode& parameterNode)
 {
-    std::u32string& parameterName = ToUtf32("@p" + std::to_string(parameterIndex));
+    std::u32string parameterName = ToUtf32("@p" + std::to_string(parameterIndex));
     if (parameterNode.Id())
     {
         parameterName = parameterNode.Id()->Str();
@@ -1264,8 +1264,9 @@ ClassTemplateSpecializationSymbol* SymbolTable::MakeClassTemplateSpecialization(
     }
     else
     {
+        std::u32string classTemplateSpecializationName = MakeClassTemplateSpecializationName(classTemplate, templateArgumentTypes);
         ClassTemplateSpecializationSymbol* classTemplateSpecialization = new ClassTemplateSpecializationSymbol(span,
-            MakeClassTemplateSpecializationName(classTemplate, templateArgumentTypes), classTemplate, templateArgumentTypes);
+            classTemplateSpecializationName, classTemplate, templateArgumentTypes);
         classTemplateSpecialization->SetGroupName(classTemplate->GroupName());
         classTemplateSpecializationMap[key] = classTemplateSpecialization;
         classTemplateSpecialization->SetParent(&globalNs);

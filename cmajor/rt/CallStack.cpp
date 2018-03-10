@@ -53,7 +53,7 @@ __declspec(thread) std::string* stackTrace = nullptr;
 
 #else
 
-__thread CallStack* std::string* stackTrace = nullptr;
+__thread std::string* stackTrace = nullptr;
 
 #endif
 

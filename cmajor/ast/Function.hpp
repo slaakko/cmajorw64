@@ -11,6 +11,7 @@
 #include <cmajor/ast/Concept.hpp>
 #include <cmajor/ast/Parameter.hpp>
 #include <cmajor/ast/Statement.hpp>
+#include <cmajor/ast/Identifier.hpp>
 
 namespace cmajor { namespace ast {
 

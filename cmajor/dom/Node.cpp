@@ -7,6 +7,7 @@
 #include <cmajor/dom/Document.hpp>
 #include <cmajor/dom/DocumentFragment.hpp>
 #include <cmajor/dom/Exception.hpp>
+#include <algorithm>
 
 namespace cmajor { namespace dom {
 

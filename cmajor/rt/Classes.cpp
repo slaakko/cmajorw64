@@ -19,6 +19,7 @@
 #include <Windows.h>
 #else
 #include <unistd.h>
+#include <dlfcn.h>
 #endif
 
 namespace cmajor { namespace rt {

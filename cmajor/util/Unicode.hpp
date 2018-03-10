@@ -128,6 +128,14 @@ private:
     std::string longName;
 };
 
+struct BinaryPropertyIdHash
+{
+    size_t operator()(BinaryPropertyId id) const
+    {
+        return std::hash<uint8_t>()(static_cast<uint8_t>(id));
+    }
+};
+
 class BinaryPropertyTable
 {
 public:
@@ -142,7 +150,7 @@ public:
 private:
     BinaryPropertyTable();
     static std::unique_ptr<BinaryPropertyTable> instance;
-    std::unordered_map<BinaryPropertyId, const BinaryProperty*> binaryPropertyIdMap;
+    std::unordered_map<BinaryPropertyId, const BinaryProperty*, BinaryPropertyIdHash> binaryPropertyIdMap;
     std::unordered_map<std::string, const BinaryProperty*> shortNameMap;
     std::unordered_map<std::string, const BinaryProperty*> longNameMap;
     std::vector<BinaryProperty> binaryProperties;
@@ -196,6 +204,14 @@ enum class BlockId : uint16_t
     ucas, ucasExt, ugaritic, vai, vedicExt, verticalForms, vs, vsSup, warangCiti, yiRadicals, yiSyllables, yijing
 };
 
+struct BlockIdHash
+{
+    size_t operator()(BlockId id) const
+    {
+        return std::hash<uint16_t>()(static_cast<uint16_t>(id));
+    }
+};
+
 class Block
 {
 public:
@@ -226,7 +242,7 @@ public:
 private:
     BlockTable();
     static std::unique_ptr<BlockTable> instance;
-    std::unordered_map<BlockId, const Block*> blockIdMap;
+    std::unordered_map<BlockId, const Block*, BlockIdHash> blockIdMap;
     std::unordered_map<std::string, const Block*> shortNameMap;
     std::unordered_map<std::string, const Block*> longNameMap;
     std::vector<Block> blocks;
@@ -279,6 +295,14 @@ inline GeneralCategoryId operator|(GeneralCategoryId left, GeneralCategoryId rig
     return GeneralCategoryId(uint32_t(left) | uint32_t(right));
 }
 
+struct GeneralCategoryIdHash
+{
+    size_t operator()(GeneralCategoryId id) const
+    {
+        return std::hash<uint32_t>()(static_cast<uint32_t>(id));
+    }
+};
+
 class GeneralCategory
 {
 public:
@@ -305,7 +329,7 @@ public:
 private:
     GeneralCategoryTable();
     static std::unique_ptr<GeneralCategoryTable> instance;
-    std::unordered_map<GeneralCategoryId, const GeneralCategory*> generalCategoryIdMap;
+    std::unordered_map<GeneralCategoryId, const GeneralCategory*, GeneralCategoryIdHash> generalCategoryIdMap;
     std::unordered_map<std::string, const GeneralCategory*> shortNameMap;
     std::unordered_map<std::string, const GeneralCategory*> longNameMap;
     std::vector<GeneralCategory> generalCategories;
@@ -340,6 +364,14 @@ enum class AgeId : uint8_t
     age_9_0
 };
 
+struct AgeIdHash
+{
+    size_t operator()(AgeId id) const
+    {
+        return std::hash<uint8_t>()(static_cast<uint8_t>(id));
+    }
+};
+
 class Age
 {
 public:
@@ -363,7 +395,7 @@ public:
 private:
     static std::unique_ptr<AgeTable> instance;
     AgeTable();
-    std::unordered_map<AgeId, const Age*> ageIdMap;
+    std::unordered_map<AgeId, const Age*, AgeIdHash> ageIdMap;
     std::unordered_map<std::string, const Age*> versionMap;
     std::vector<Age> ages;
 };
@@ -408,6 +440,14 @@ enum class ScriptId : uint8_t
     zinh, zyyy, zzzz
 };
 
+struct ScriptIdHash
+{
+    size_t operator()(ScriptId id) const
+    {
+        return std::hash<uint8_t>()(static_cast<uint8_t>(id));
+    }
+};
+
 class Script
 {
 public:
@@ -435,7 +475,7 @@ private:
     static std::unique_ptr<ScriptTable> instance;
     ScriptTable();
     std::vector<Script> scripts;
-    std::unordered_map<ScriptId, const Script*> scriptIdMap;
+    std::unordered_map<ScriptId, const Script*, ScriptIdHash> scriptIdMap;
     std::unordered_map<std::string, const Script*> shortNameMap;
     std::unordered_map<std::string, const Script*> longNameMap;
 };
@@ -569,6 +609,14 @@ enum class NumericTypeId : uint8_t
     de, di, nu
 };
 
+struct NumericTypeIdHash
+{
+    size_t operator()(NumericTypeId id) const
+    {
+        return std::hash<uint8_t>()(static_cast<uint8_t>(id));
+    }
+};
+
 class NumericType
 {
 public:
@@ -596,7 +644,7 @@ private:
     static std::unique_ptr<NumericTypeTable> instance;
     NumericTypeTable();
     std::vector<NumericType> numericTypes;
-    std::unordered_map<NumericTypeId, const NumericType*> numericTypeMap;
+    std::unordered_map<NumericTypeId, const NumericType*, NumericTypeIdHash> numericTypeMap;
     std::unordered_map<std::string, const NumericType*> shortNameMap;
     std::unordered_map<std::string, const NumericType*> longNameMap;
 };
@@ -620,6 +668,14 @@ enum class BidiClassId : uint8_t
 {
     none = 0,
     al, an, b, bn, cs, en, es, et, fsi, l, lre, lri, lro, nsm, on, pdf, pdi, r, rle, rli, rlo, s, ws
+};
+
+struct BidiClassIdHash
+{
+    size_t operator()(BidiClassId id) const
+    {
+        return std::hash<uint8_t>()(static_cast<uint8_t>(id));
+    }
 };
 
 class BidiClass
@@ -649,7 +705,7 @@ private:
     static std::unique_ptr<BidiClassTable> instance;
     BidiClassTable();
     std::vector<BidiClass> bidiClasses;
-    std::unordered_map<BidiClassId, const BidiClass*> bidiClassMap;
+    std::unordered_map<BidiClassId, const BidiClass*, BidiClassIdHash> bidiClassMap;
     std::unordered_map<std::string, const BidiClass*> shortNameMap;
     std::unordered_map<std::string, const BidiClass*> longNameMap;
 };
@@ -673,6 +729,14 @@ enum class BidiPairedBracketTypeId : uint8_t
 {
     none = 0,
     o, c
+};
+
+struct BidiPairedBracketTypeIdHash
+{
+    size_t operator()(BidiPairedBracketTypeId id) const
+    {
+        return std::hash<uint8_t>()(static_cast<uint8_t>(id));
+    }
 };
 
 class BidiPairedBracketType
@@ -702,7 +766,7 @@ private:
     static std::unique_ptr<BidiPairedBracketTypeTable> instance;
     BidiPairedBracketTypeTable();
     std::vector<BidiPairedBracketType> bidiPairedBracketTypes;
-    std::unordered_map<BidiPairedBracketTypeId, const BidiPairedBracketType*> typeMap;
+    std::unordered_map<BidiPairedBracketTypeId, const BidiPairedBracketType*, BidiPairedBracketTypeIdHash> typeMap;
     std::unordered_map<std::string, const BidiPairedBracketType*> shortNameMap;
     std::unordered_map<std::string, const BidiPairedBracketType*> longNameMap;
 };
@@ -726,6 +790,14 @@ enum class AliasTypeId : uint8_t
 {
     none = 0,
     correction, control, alternate, figment, abbreviation
+};
+
+struct AliasTypeIdHash
+{
+    size_t operator()(AliasTypeId id) const
+    {
+        return std::hash<uint8_t>()(static_cast<uint8_t>(id));
+    }
 };
 
 class AliasType
@@ -752,7 +824,7 @@ private:
     static std::unique_ptr<AliasTypeTable> instance;
     AliasTypeTable();
     std::vector<AliasType> aliasTypes;
-    std::unordered_map<AliasTypeId, const AliasType*> aliasTypeMap;
+    std::unordered_map<AliasTypeId, const AliasType*, AliasTypeIdHash> aliasTypeMap;
     std::unordered_map<std::string, const AliasType*> typeNameMap;
 };
 

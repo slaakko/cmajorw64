@@ -14,6 +14,7 @@
 #include <mutex>
 #include <cstdlib>
 #include <cerrno>
+#include <string.h>
 #ifdef _WIN32
 #include <direct.h>
 #include <io.h>
@@ -232,7 +233,7 @@ extern "C" RT_API int32_t RtGetCurrentWorkingDirectoryHandle()
     }
     else
     {
-        return cmajor::rt::InstallError(std::string("could not get current working directory: ") + std::strerror(errno));
+        return cmajor::rt::InstallError(std::string("could not get current working directory: ") + strerror(errno));
     }
 }
 

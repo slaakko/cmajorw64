@@ -1137,7 +1137,7 @@ std::unique_ptr<XPathObject> XPathUnionExpr::Evaluate(XPathContext& context)
     {
         result->Add((*rightNodeSet)[i]);
     }
-    return result;
+    return std::unique_ptr<XPathObject>(result.release());
 }
 
 std::unique_ptr<dom::Node> XPathUnionExpr::ToDom() const
@@ -1179,7 +1179,7 @@ std::unique_ptr<XPathObject> XPathCombineStepExpr::Evaluate(XPathContext& contex
             result->Add(node);
         }
     }
-    return result;
+    return std::unique_ptr<XPathObject>(result.release());
 }
 
 std::unique_ptr<dom::Node> XPathCombineStepExpr::ToDom() const
@@ -1205,7 +1205,7 @@ std::unique_ptr<XPathObject> XPathRootNodeExpr::Evaluate(XPathContext& context)
     {
         nodeSet->Add(context.Node()->OwnerDocument());
     }
-    return nodeSet;
+    return std::unique_ptr<XPathObject>(nodeSet.release());
 }
 
 std::unique_ptr<dom::Node> XPathRootNodeExpr::ToDom() const
@@ -1256,7 +1256,7 @@ std::unique_ptr<XPathObject> XPathFilterExpr::Evaluate(XPathContext& context)
         }
     }
     std::swap(nodeSet, filteredNodeSet);
-    return nodeSet;
+    return std::unique_ptr<XPathObject>(nodeSet.release());
 }
 
 std::unique_ptr<dom::Node> XPathFilterExpr::ToDom() const
@@ -1339,7 +1339,7 @@ std::unique_ptr<XPathObject> XPathLocationStepExpr::Evaluate(XPathContext& conte
         }
         std::swap(nodeSet, filteredNodeSet);
     }
-    return nodeSet;
+    return std::unique_ptr<XPathObject>(nodeSet.release());
 }
 
 std::unique_ptr<dom::Node> XPathLocationStepExpr::ToDom() const

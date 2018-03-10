@@ -166,5 +166,6 @@ std::mutex destructionListMutex;
 extern "C" RT_API void RtEnqueueDestruction(void* destructor, void* arg)
 {
     std::lock_guard<std::mutex> lock(destructionListMutex);
-    cmajor::rt::destructionList = new cmajor::rt::Destruction(static_cast<cmajor::rt::destructor_ptr>(destructor), arg, cmajor::rt::destructionList);
+    cmajor::rt::destructionList = new cmajor::rt::Destruction(reinterpret_cast<cmajor::rt::destructor_ptr>(destructor), arg, cmajor::rt::destructionList);
 }
+

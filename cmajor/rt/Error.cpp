@@ -12,6 +12,7 @@
 #include <sstream>
 #include <unordered_map>
 #include <stdlib.h>
+#include <memory>
 
 namespace cmajor { namespace rt {
 

@@ -498,10 +498,19 @@ UnaryOperatorFun logicalNot[uint8_t(ValueType::maxValue)] =
     NotSupported, NotSupported, NotSupported, NotSupported, NotSupported, NotSupported, NotSupported
 };
 
+template<typename T>
+struct Identity
+{
+    const T& operator()(const T& value) const
+    {
+        return value;
+    }
+};
+
 template<typename ValueT>
 Value* UnaryPlus(Value* subject, const Span& span, bool dontThrow)
 {
-    return UnaryEvaluate<ValueT>(subject, std::identity<typename ValueT::OperandType>(), span);
+    return UnaryEvaluate<ValueT>(subject, Identity<typename ValueT::OperandType>(), span);
 }
 
 UnaryOperatorFun unaryPlus[uint8_t(ValueType::maxValue)] =
@@ -524,10 +533,19 @@ UnaryOperatorFun unaryMinus[uint8_t(ValueType::maxValue)] =
     NotSupported, NotSupported, NotSupported, NotSupported, NotSupported, NotSupported, NotSupported
 };
 
+template <typename T>
+struct BitNot
+{
+    T operator()(const T& x) const
+    {
+        return ~x;
+    }
+};
+
 template<typename ValueT>
 Value* Complement(Value* subject, const Span& span, bool dontThrow)
 {
-    return UnaryEvaluate<ValueT>(subject, std::bit_not<typename ValueT::OperandType>(), span);
+    return UnaryEvaluate<ValueT>(subject, BitNot<typename ValueT::OperandType>(), span);
 }
 
 UnaryOperatorFun complement[uint8_t(ValueType::maxValue)] =

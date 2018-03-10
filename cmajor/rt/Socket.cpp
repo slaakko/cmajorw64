@@ -19,10 +19,18 @@
 #include <ws2tcpip.h>    
 #include <Windows.h>
 #else
+#include <unistd.h>
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
 #include <netdb.h>
 #include <string.h>
+#define SOCKET int
+#define SD_RECEIVE SHUT_RD
+#define SD_SEND SHUT_WR
+#define SD_BOTH SHUT_RDWR
+#define INVALID_SOCKET -1
 #endif
 #include <gnutls/gnutls.h>
 
@@ -534,7 +542,9 @@ int32_t SocketTable::ConnectSocket(const std::string& node, const std::string& s
             std::string errorMessage = "gnutls_credentials_set failed with error code " + ToString(result) + " : " + gnutls_strerror(result);
             return InstallError(errorMessage);
         }
+#if GNUTLS_VERSION_NUMBER >= 0x030600
         gnutls_session_set_verify_cert(socketData->session, node.c_str(), 0);
+#endif
     }
     struct addrinfo hint;
     struct addrinfo* rp;

@@ -6,6 +6,7 @@
 #ifndef CMAJOR_SYMBOLS_FUNCTION_SYMBOL_INCLUDED
 #define CMAJOR_SYMBOLS_FUNCTION_SYMBOL_INCLUDED
 #include <cmajor/symbols/TypeSymbol.hpp>
+#include <cmajor/symbols/VariableSymbol.hpp>
 #include <cmajor/symbols/Meta.hpp>
 #include <cmajor/ast/Function.hpp>
 #include <cmajor/ir/GenObject.hpp>

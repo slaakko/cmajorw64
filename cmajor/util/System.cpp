@@ -408,10 +408,10 @@ std::string GetPathToExecutable()
 
 #elif defined(__linux) || defined(__unix) || defined(__posix)
 
-    int result = readlink("/proc/self/exe", buf, bufSize);
+    int result = readlink("/proc/self/exe", buf, sizeof(buf));
     if (result == -1)
     {
-        throw std::runtime_error("could not get path to current executable: " + strerror(errno));
+        throw std::runtime_error("could not get path to current executable: " + std::string(strerror(errno)));
     }
     return std::string(buf);
 #else

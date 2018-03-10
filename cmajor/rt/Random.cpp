@@ -11,6 +11,8 @@
 #else
 #include <unistd.h>
 #include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 #endif
 #include <stdlib.h>
 #include <string.h>

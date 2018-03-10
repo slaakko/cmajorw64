@@ -63,4 +63,5 @@ private:
 
 } } // namespace cmajor::ast
 
-#endif CMAJOR_AST_ATTRIBUTE_INCLUDED
+#endif // CMAJOR_AST_ATTRIBUTE_INCLUDED
+

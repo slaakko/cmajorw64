@@ -5,8 +5,8 @@
 
 #ifndef CMAJOR_XPATH_XPATH_EXPR
 #define CMAJOR_XPATH_XPATH_EXPR
-#include <cmajor/XPath/XPathObject.hpp>
-#include <cmajor/XPath/XPathContext.hpp>
+#include <cmajor/xpath/XPathObject.hpp>
+#include <cmajor/xpath/XPathContext.hpp>
 #include <string>
 #include <memory>
 #include <vector>

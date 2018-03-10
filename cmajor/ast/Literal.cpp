@@ -9,6 +9,7 @@
 #include <cmajor/ast/AstReader.hpp>
 #include <cmajor/util/TextUtils.hpp>
 #include <cmajor/util/Unicode.hpp>
+#include <limits>
 
 namespace cmajor { namespace ast {
 

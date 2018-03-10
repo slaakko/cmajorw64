@@ -7,6 +7,7 @@
 #define CMAJOR_BINDER_STRING_REPOSITORY_INCLUDED
 #include <cmajor/util/Error.hpp>
 #include <unordered_map>
+#include <vector>
 
 namespace cmajor { namespace binder {
 

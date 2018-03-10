@@ -829,7 +829,7 @@ std::unique_ptr<Value> BasicTypeImplicitConversion<ConversionOp>::ConvertValue(c
 {
     if (value)
     {
-        TypeSymbol* targetType = ConversionTargetType();
+        TypeSymbol* targetType = BasicTypeConversion<ConversionOp>::ConversionTargetType();
         return std::unique_ptr<Value>(value->As(targetType, false, value->GetSpan(), true));
     }
     return std::unique_ptr<Value>();
@@ -860,7 +860,7 @@ std::unique_ptr<Value> BasicTypeExplicitConversion<ConversionOp>::ConvertValue(c
 {
     if (value)
     {
-        TypeSymbol* targetType = ConversionTargetType();
+        TypeSymbol* targetType = BasicTypeConversion<ConversionOp>::ConversionTargetType();
         return std::unique_ptr<Value>(value->As(targetType, true, value->GetSpan(), true));
     }
     return std::unique_ptr<Value>();

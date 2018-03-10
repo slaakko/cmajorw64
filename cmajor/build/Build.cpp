@@ -42,6 +42,7 @@
 #include <stdexcept>
 #include <mutex>
 #include <chrono>
+#include <thread>
 
 using namespace cmajor::emitter;
 using namespace cmajor::parser;
