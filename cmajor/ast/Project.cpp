@@ -74,7 +74,11 @@ Project::Project(const std::u32string& name_, const std::string& filePath_, cons
     mfp.replace_extension(".cmm");
     moduleFilePath = GetFullPath(mfp.generic_string());
     boost::filesystem::path lfp(mfp);
+#ifdef _WIN32
     lfp.replace_extension(".lib");
+#else
+    lfp.replace_extension(".a");
+#endif
     libraryFilePath = GetFullPath(lfp.generic_string());
     boost::filesystem::path efp(filePath);
     efp.remove_filename();

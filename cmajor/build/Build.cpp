@@ -453,10 +453,10 @@ void Link(const std::string& executableFilePath, const std::string& libraryFileP
     std::vector<std::string> args;
     args.push_back("-o " + QuotedPath(executableFilePath));
     boost::filesystem::path out = executableFilePath;
-    std::string cmrtLibName = "cmrt.2.1.0.so";
+    std::string cmrtLibName = "libcmrt.2.1.0.so";
     if (GetGlobalFlag(GlobalFlags::linkWithDebugRuntime))
     {
-        cmrtLibName = "cmrtd.2.1.0.so";
+        cmrtLibName = "libcmrtd.2.1.0.so";
     }
     args.push_back(cmrtLibName);
     int n = libraryFilePaths.size();

@@ -234,7 +234,11 @@ Module::Module(const std::string& filePath, std::vector<ClassTypeSymbol*>& class
     std::vector<Module*> finishReadOrder = CreateFinishReadOrder(modules, dependencyMap, rootModule);
     if (!sourceFilePaths.empty())
     {
+#ifdef _WIN32
         libraryFilePath = GetFullPath(boost::filesystem::path(originalFilePath).replace_extension(".lib").generic_string());
+#else
+        libraryFilePath = GetFullPath(boost::filesystem::path(originalFilePath).replace_extension(".a").generic_string());
+#endif
     }
     for (Module* module : finishReadOrder)
     {
@@ -294,7 +298,11 @@ void Module::PrepareForCompilation(const std::vector<std::string>& references, c
     std::vector<Module*> finishReadOrder = CreateFinishReadOrder(modules, dependencyMap, rootModule);
     if (!sourceFilePaths.empty())
     {
+#ifdef _WIN32
         libraryFilePath = GetFullPath(boost::filesystem::path(originalFilePath).replace_extension(".lib").generic_string());
+#else
+        libraryFilePath = GetFullPath(boost::filesystem::path(originalFilePath).replace_extension(".a").generic_string());
+#endif
     }
     for (Module* module : finishReadOrder)
     {
@@ -395,7 +403,11 @@ void Module::ReadHeader(SymbolReader& reader, Module* rootModule, std::unordered
     }
     if (!sourceFilePaths.empty())
     {
+#ifdef _WIN32
         libraryFilePath = GetFullPath(boost::filesystem::path(filePathReadFrom).replace_extension(".lib").generic_string());
+#else
+        libraryFilePath = GetFullPath(boost::filesystem::path(filePathReadFrom).replace_extension(".a").generic_string());
+#endif
     }
     uint32_t efn = reader.GetBinaryReader().ReadEncodedUInt();
     for (uint32_t i = 0; i < efn; ++i)
@@ -736,7 +748,11 @@ void Module::CheckUpToDate()
         }
         if (boost::filesystem::exists(sfp))
         {
+#ifdef _WIN32
             boost::filesystem::path objectFilePath = libDirPath / sfp.filename().replace_extension(".obj");
+#else
+            boost::filesystem::path objectFilePath = libDirPath / sfp.filename().replace_extension(".o");
+#endif
             if (boost::filesystem::exists(objectFilePath))
             {
                 if (boost::filesystem::last_write_time(sfp) > boost::filesystem::last_write_time(objectFilePath))
