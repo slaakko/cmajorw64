@@ -87,6 +87,8 @@ Project::Project(const std::u32string& name_, const std::string& filePath_, cons
     efp /= fn;
 #ifdef _WIN32
     efp.replace_extension(".exe");
+#else
+    efp.replace_extension();
 #endif
     executableFilePath = GetFullPath(efp.generic_string());
 }

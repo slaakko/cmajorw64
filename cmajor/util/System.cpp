@@ -413,7 +413,12 @@ std::string GetPathToExecutable()
     {
         throw std::runtime_error("could not get path to current executable: " + std::string(strerror(errno)));
     }
-    return std::string(buf);
+    std::string s;
+    for (int i = 0; i < result; ++i)
+    {
+        s.append(1, buf[i]);
+    }
+    return s;
 #else
 
 #error unknown platform

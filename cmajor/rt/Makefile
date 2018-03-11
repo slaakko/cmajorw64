@@ -21,8 +21,7 @@ else
 endif
 
 ../lib/$(soname): $(OBJECTS) $(LIBRARIES)
-	$(CXX) $(CXXFLAGS) -shared -o $@  $(OBJECTS) -lsymbols -lparser -last -lxpath -ldom -lxml -lparsing -lcodedom -lutil \
--lgmpintf -ldl -ltinfo -lgnutls
+	$(CXX) $(CXXFLAGS) -shared -o $@  $(OBJECTS) -lsymbols -lparser -last -lxpath -ldom -lxml -lparsing -lcodedom -lutil -ldl -ltinfo -lgnutls
 	ln -f ../lib/$(soname) ../lib/$(sobasename).so.2
 	ln -f ../lib/$(soname) ../lib/$(sobasename).so
 

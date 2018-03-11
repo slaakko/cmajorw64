@@ -231,10 +231,12 @@ void* GetSymbolAddess(const std::string& symbolName)
     }
     void* symbolAddress = dlsym(exeHandle, symbolName.c_str());
     dlclose(exeHandle);
+/*
     if (!symbolAddress)
     {
         throw std::runtime_error("error assigning class id's: could not resolve address of a symbol '" + symbolName);
     }
+*/
     return symbolAddress;
 }
 
@@ -245,7 +247,10 @@ void SetClassIdsToVmts(const std::vector<ClassInfo*>& classesByPriority)
     for (ClassInfo* cls : classesByPriority)
     {
         void* vmtObjectAddress = GetSymbolAddess(cls->vmtObjectName);
-        *reinterpret_cast<uint64_t*>(vmtObjectAddress) = cls->id;   // class id field is the first field of vmt so it's address is the same as the address of the vmt
+        if (vmtObjectAddress)
+        {
+            *reinterpret_cast<uint64_t*>(vmtObjectAddress) = cls->id;   // class id field is the first field of vmt so it's address is the same as the address of the vmt
+        }
     }
 }
 

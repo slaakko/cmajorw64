@@ -447,20 +447,21 @@ void CreateDynamicListFile(const std::string& dynamicListFilePath, Module& modul
     formatter.IncIndent();
     for (const std::string& fun : module.AllExportedFunctions())
     {
-        formatter.WriteLine(fun);
+        formatter.WriteLine(fun + ";");
     }
     for (const std::string& fun : module.ExportedFunctions())
     {
-        formatter.WriteLine(fun);
+        formatter.WriteLine(fun + ";");
     }
     for (const std::string& data : module.AllExportedData())
     {
-        formatter.WriteLine(data);
+        formatter.WriteLine(data + ";");
     }
     for (const std::string& data : module.ExportedData())
     {
-        formatter.WriteLine(data);
+        formatter.WriteLine(data + ";");
     }
+    formatter.DecIndent();
     formatter.WriteLine("};");
 }
 
@@ -491,6 +492,7 @@ void Link(const std::string& executableFilePath, const std::string& libraryFileP
         cmrtLibName = "libcmrtd.so.2.1.0";
     }
     args.push_back(QuotedPath(Path::Combine(Path::Combine(CmajorRootDir(), "lib"), cmrtLibName)));
+    args.push_back(QuotedPath(Path::Combine(Path::Combine(CmajorRootDir(), "lib"), "libgmpintf.a")));
     args.push_back("-lboost_filesystem -lboost_iostreams -lboost_system -lgmp -lbz2 -lz");
     args.push_back("-Xlinker --end-group");
     args.push_back("-o " + QuotedPath(executableFilePath));
