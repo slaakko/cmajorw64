@@ -1,5 +1,6 @@
 #include <cmajor/rt/ZlibInterface.h>
 #include <cmajor/system/ext/zlib-1.2.11/zlib.h>
+#include <errno.h>
 #include <string.h>
 #include <stdlib.h>
 

@@ -2,8 +2,12 @@
 #define __GMP_INTF_H__
 #include <stdint.h>
 
+#ifdef __WIN32
 #ifndef CMRT_IMPORT
 #define GMP_API __declspec(dllexport)
+#else
+#define GMP_API
+#endif
 #else
 #define GMP_API
 #endif

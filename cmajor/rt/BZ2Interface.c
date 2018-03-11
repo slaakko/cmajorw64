@@ -5,6 +5,7 @@
 
 #include <cmajor/rt/BZ2Interface.h>
 #include <cmajor/system/ext/bzip2-1.0.6/bzlib.h>
+#include <errno.h>
 #include <string.h>
 #include <stdlib.h>
 

@@ -242,7 +242,7 @@ Module::Module(const std::string& filePath, std::vector<ClassTypeSymbol*>& class
     }
     for (Module* module : finishReadOrder)
     {
-        if (!module->LibraryFilePath().empty())
+        if (!module->LibraryFilePath().empty() && !module->sourceFilePaths.empty())
         {
             libraryFilePaths.push_back(module->LibraryFilePath());
         }

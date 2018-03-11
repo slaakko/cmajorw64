@@ -26,6 +26,7 @@ build:
 	$(MAKE) -C cmmdump
 	$(MAKE) -C cmprof
 	$(MAKE) -C cmunit
+	$(MAKE) -C system/ext/gmp
 	$(MAKE) -C rt
 
 prefix := /usr
@@ -67,5 +68,6 @@ clean:
 	$(MAKE) -C cmmdump clean
 	$(MAKE) -C cmprof clean
 	$(MAKE) -C cmunit clean
+	$(MAKE) -C system/ext/gmp clean
 	$(MAKE) -C rt clean
 
