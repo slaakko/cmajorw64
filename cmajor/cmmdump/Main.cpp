@@ -40,7 +40,11 @@ const char* version = "2.1.0";
 
 void PrintHelp()
 {
+#ifdef _WIN32
     std::cout << "Cmajor Module Dump " << version << " for Windows x64" << std::endl;
+#else
+    std::cout << "Cmajor Module Dump " << version << std::endl;
+#endif
 }
 
 using namespace cmajor::symbols;

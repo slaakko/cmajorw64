@@ -260,6 +260,8 @@ void BindStatements(BoundCompileUnit& boundCompileUnit)
     boundCompileUnit.GetCompileUnitNode()->Accept(statementBinder);
 }
 
+#ifdef _WIN32
+
 void GenerateLibrary(const std::vector<std::string>& objectFilePaths, const std::string& libraryFilePath)
 {
     if (GetGlobalFlag(GlobalFlags::verbose) && !GetGlobalFlag(GlobalFlags::unitTest))
@@ -296,6 +298,50 @@ void GenerateLibrary(const std::vector<std::string>& objectFilePaths, const std:
         std::cout << "==> " << libraryFilePath << std::endl;
     }
 }
+
+#else
+
+void GenerateLibrary(const std::vector<std::string>& objectFilePaths, const std::string& libraryFilePath)
+{
+    if (GetGlobalFlag(GlobalFlags::verbose) && !GetGlobalFlag(GlobalFlags::unitTest))
+    {
+        std::cout << "Creating library..." << std::endl;
+    }
+    boost::filesystem::remove(libraryFilePath);
+    SetCurrentTooName(U"ar");
+    std::vector<std::string> args;
+    args.push_back("-o " + QuotedPath(libraryFilePath));
+    int n = objectFilePaths.size();
+    for (int i = 0; i < n; ++i)
+    {
+        args.push_back(QuotedPath(objectFilePaths[i]));
+    }
+    std::string libCommandLine = "ar";
+    for (const std::string& arg : args)
+    {
+        libCommandLine.append(1, ' ').append(arg);
+    }
+    std::string libErrorFilePath = Path::Combine(Path::GetDirectoryName(libraryFilePath), "llvm-lib.error");
+    int redirectHandle = 2; // stderr
+    try
+    {
+        System(libCommandLine, redirectHandle, libErrorFilePath);
+        boost::filesystem::remove(boost::filesystem::path(libErrorFilePath));
+    }
+    catch (const std::exception& ex)
+    {
+        std::string errors = ReadFile(libErrorFilePath);
+        throw std::runtime_error("generating library '" + libraryFilePath + "' failed: " + ex.what() + ":\nerrors:\n" + errors);
+    }
+    if (GetGlobalFlag(GlobalFlags::verbose) && !GetGlobalFlag(GlobalFlags::unitTest))
+    {
+        std::cout << "==> " << libraryFilePath << std::endl;
+    }
+}
+
+#endif
+
+#ifdef _WIN32
 
 void CreateDefFile(const std::string& defFilePath, Module& module)
 {
@@ -391,6 +437,59 @@ void Link(const std::string& executableFilePath, const std::string& libraryFileP
         std::cout << "==> " << executableFilePath << std::endl;
     }
 }
+
+#else
+
+void Link(const std::string& executableFilePath, const std::string& libraryFilePath, const std::vector<std::string>& libraryFilePaths, Module& module)
+{
+    if (GetGlobalFlag(GlobalFlags::verbose) && !GetGlobalFlag(GlobalFlags::unitTest))
+    {
+        std::cout << "Linking..." << std::endl;
+    }
+    SetCurrentTooName(U"gcc");
+    boost::filesystem::path bdp = executableFilePath;
+    bdp.remove_filename();
+    boost::filesystem::create_directories(bdp);
+    std::vector<std::string> args;
+    args.push_back("-o " + QuotedPath(executableFilePath));
+    boost::filesystem::path out = executableFilePath;
+    std::string cmrtLibName = "cmrt.2.1.0.so";
+    if (GetGlobalFlag(GlobalFlags::linkWithDebugRuntime))
+    {
+        cmrtLibName = "cmrtd.2.1.0.so";
+    }
+    args.push_back(cmrtLibName);
+    int n = libraryFilePaths.size();
+    for (int i = 0; i < n; ++i)
+    {
+        args.push_back(QuotedPath(libraryFilePaths[i]));
+    }
+    std::string linkCommandLine;
+    std::string linkErrorFilePath;
+    linkCommandLine = "gcc";
+    linkErrorFilePath = Path::Combine(Path::GetDirectoryName(executableFilePath), "gcc.error");
+    for (const std::string& arg : args)
+    {
+        linkCommandLine.append(1, ' ').append(arg);
+    }
+    int redirectHandle = 2; // stderr
+    try
+    {
+        System(linkCommandLine, redirectHandle, linkErrorFilePath);
+        boost::filesystem::remove(boost::filesystem::path(linkErrorFilePath));
+    }
+    catch (const std::exception& ex)
+    {
+        std::string errors = ReadFile(linkErrorFilePath);
+        throw std::runtime_error("linking executable '" + executableFilePath + "' failed: " + ex.what() + ":\nerrors:\n" + errors);
+    }
+    if (GetGlobalFlag(GlobalFlags::verbose) && !GetGlobalFlag(GlobalFlags::unitTest))
+    {
+        std::cout << "==> " << executableFilePath << std::endl;
+    }
+}
+
+#endif
 
 void CleanProject(Project* project)
 {

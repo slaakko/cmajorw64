@@ -47,7 +47,11 @@ const char* version = "2.1.0";
 
 void PrintHelp()
 {
+#ifdef _WIN32
     std::cout << "Cmajor compiler version " << version << " for Windows x64" << std::endl; 
+#else
+    std::cout << "Cmajor compiler version " << version << std::endl;
+#endif
     std::cout << "Usage: cmc [options] { project.cmp | solution.cms }" << std::endl;
     std::cout << "Compiles given Cmajor solutions and projects." << std::endl;
     std::cout << "Options:\n" <<
@@ -223,7 +227,11 @@ int main(int argc, const char** argv)
             }
             if (GetGlobalFlag(GlobalFlags::verbose))
             {
+#ifdef _WIN32
                 std::cout << "Cmajor compiler version " << version << " for Windows x64" << std::endl;
+#else
+                std::cout << "Cmajor compiler version " << version << std::endl;
+#endif
             }
             for (const std::string& projectOrSolution : projectsAndSolutions)
             {
