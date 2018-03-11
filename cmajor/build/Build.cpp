@@ -316,12 +316,12 @@ void GenerateLibrary(const std::vector<std::string>& objectFilePaths, const std:
     {
         args.push_back(QuotedPath(objectFilePaths[i]));
     }
-    std::string libCommandLine = "ar";
+    std::string libCommandLine = "ar q";
     for (const std::string& arg : args)
     {
         libCommandLine.append(1, ' ').append(arg);
     }
-    std::string libErrorFilePath = Path::Combine(Path::GetDirectoryName(libraryFilePath), "llvm-lib.error");
+    std::string libErrorFilePath = Path::Combine(Path::GetDirectoryName(libraryFilePath), "ar.error");
     int redirectHandle = 2; // stderr
     try
     {
@@ -446,28 +446,31 @@ void Link(const std::string& executableFilePath, const std::string& libraryFileP
     {
         std::cout << "Linking..." << std::endl;
     }
-    SetCurrentTooName(U"gcc");
+    SetCurrentTooName(U"clang++");
     boost::filesystem::path bdp = executableFilePath;
     bdp.remove_filename();
     boost::filesystem::create_directories(bdp);
     std::vector<std::string> args;
     args.push_back("-o " + QuotedPath(executableFilePath));
     boost::filesystem::path out = executableFilePath;
-    std::string cmrtLibName = "libcmrt.2.1.0.so";
-    if (GetGlobalFlag(GlobalFlags::linkWithDebugRuntime))
-    {
-        cmrtLibName = "libcmrtd.2.1.0.so";
-    }
-    args.push_back(cmrtLibName);
     int n = libraryFilePaths.size();
-    for (int i = 0; i < n; ++i)
+    args.push_back(QuotedPath(libraryFilePaths.back()));
+    for (int i = 0; i < n - 1; ++i)
     {
         args.push_back(QuotedPath(libraryFilePaths[i]));
     }
+    std::string cmrtLibName = "libcmrt.so.2.1.0";
+    if (GetGlobalFlag(GlobalFlags::linkWithDebugRuntime))
+    {
+        cmrtLibName = "libcmrtd.so.2.1.0";
+    }
+    args.push_back(QuotedPath(Path::Combine(Path::Combine(CmajorRootDir(), "lib"), cmrtLibName)));
+    args.push_back(QuotedPath(Path::Combine(Path::Combine(CmajorRootDir(), "lib"), "libutil.a")));
+    args.push_back("-lgnutls -lgmp -lbz2 -lz");
     std::string linkCommandLine;
     std::string linkErrorFilePath;
-    linkCommandLine = "gcc";
-    linkErrorFilePath = Path::Combine(Path::GetDirectoryName(executableFilePath), "gcc.error");
+    linkCommandLine = "clang++";
+    linkErrorFilePath = Path::Combine(Path::GetDirectoryName(executableFilePath), "clang++.error");
     for (const std::string& arg : args)
     {
         linkCommandLine.append(1, ' ').append(arg);
@@ -648,6 +651,10 @@ void CreateMainUnit(std::vector<std::string>& objectFilePaths, Module& module, E
     CompileUnitNode mainCompileUnit(Span(), boost::filesystem::path(module.OriginalFilePath()).parent_path().append("__main__.cm").generic_string());
     mainCompileUnit.GlobalNs()->AddMember(new NamespaceImportNode(Span(), new IdentifierNode(Span(), U"System")));
     FunctionNode* mainFunction(new FunctionNode(Span(), Specifiers::public_, new IntNode(Span()), U"main", nullptr));
+#ifndef _WIN32
+    mainFunction->AddParameter(new ParameterNode(Span(), new IntNode(Span()), new IdentifierNode(Span(), U"argc")));
+    mainFunction->AddParameter(new ParameterNode(Span(), new PointerNode(Span(), new PointerNode(Span(), new CharNode(Span()))), new IdentifierNode(Span(), U"argv")));
+#endif
     mainFunction->SetProgramMain();
     CompoundStatementNode* mainFunctionBody = new CompoundStatementNode(Span());
     ConstructionStatementNode* constructExitCode = new ConstructionStatementNode(Span(), new IntNode(Span()), new IdentifierNode(Span(), U"exitCode"));
@@ -662,12 +669,14 @@ void CreateMainUnit(std::vector<std::string>& objectFilePaths, Module& module, E
         rtInitCall = new ExpressionStatementNode(Span(), new InvokeNode(Span(), new IdentifierNode(Span(), U"RtInit")));
     }
     mainFunctionBody->AddStatement(rtInitCall);
+#ifdef _WIN32
     ConstructionStatementNode* argc = new ConstructionStatementNode(Span(), new IntNode(Span()), new IdentifierNode(Span(), U"argc"));
     argc->AddArgument(new InvokeNode(Span(), new IdentifierNode(Span(), U"RtArgc")));
     mainFunctionBody->AddStatement(argc);
     ConstructionStatementNode* argv = new ConstructionStatementNode(Span(), new ConstNode(Span(), new PointerNode(Span(), new PointerNode(Span(), new CharNode(Span())))), new IdentifierNode(Span(), U"argv"));
     argv->AddArgument(new InvokeNode(Span(), new IdentifierNode(Span(), U"RtArgv")));
     mainFunctionBody->AddStatement(argv);
+#endif
     CompoundStatementNode* tryBlock = new CompoundStatementNode(Span());
     if (!module.GetSymbolTable().JsonClasses().empty())
     {
@@ -852,7 +861,10 @@ void BuildProject(Project* project)
         }
         CreateMainUnit(objectFilePaths, module, emittingContext, &attributeBinder);
     }
-    GenerateLibrary(objectFilePaths, project->LibraryFilePath());
+    if (!objectFilePaths.empty())
+    {
+        GenerateLibrary(objectFilePaths, project->LibraryFilePath());
+    }
     if (project->GetTarget() == Target::program)
     {
         Link(project->ExecutableFilePath(), project->LibraryFilePath(), module.LibraryFilePaths(), module);

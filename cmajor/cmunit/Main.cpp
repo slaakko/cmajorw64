@@ -125,6 +125,10 @@ void CreateMainUnit(std::vector<std::string>& objectFilePaths, Module& module, E
     CompileUnitNode mainCompileUnit(Span(), boost::filesystem::path(module.OriginalFilePath()).parent_path().append("__main__.cm").generic_string());
     mainCompileUnit.GlobalNs()->AddMember(new NamespaceImportNode(Span(), new IdentifierNode(Span(), U"System")));
     FunctionNode* mainFunction(new FunctionNode(Span(), Specifiers::public_, new IntNode(Span()), U"main", nullptr));
+#ifndef _WIN32
+    mainFunction->AddParameter(new ParameterNode(Span(), new IntNode(Span()), new IdentifierNode(Span(), U"argc")));
+    mainFunction->AddParameter(new ParameterNode(Span(), new PointerNode(Span(), new PointerNode(Span(), new CharNode(Span()))), new IdentifierNode(Span(), U"argv")));
+#endif
     mainFunction->SetProgramMain();
     CompoundStatementNode* mainFunctionBody = new CompoundStatementNode(Span());
     ConstructionStatementNode* constructExitCode = new ConstructionStatementNode(Span(), new IntNode(Span()), new IdentifierNode(Span(), U"exitCode"));
@@ -134,12 +138,14 @@ void CreateMainUnit(std::vector<std::string>& objectFilePaths, Module& module, E
     invokeStartUnitTest->AddArgument(new StringLiteralNode(Span(), unitTestFilePath));
     ExpressionStatementNode* rtStartUnitTestCall = new ExpressionStatementNode(Span(), invokeStartUnitTest);
     mainFunctionBody->AddStatement(rtStartUnitTestCall);
+#ifdef _WIN32
     ConstructionStatementNode* argc = new ConstructionStatementNode(Span(), new IntNode(Span()), new IdentifierNode(Span(), U"argc"));
     argc->AddArgument(new InvokeNode(Span(), new IdentifierNode(Span(), U"RtArgc")));
     mainFunctionBody->AddStatement(argc);
     ConstructionStatementNode* argv = new ConstructionStatementNode(Span(), new ConstNode(Span(), new PointerNode(Span(), new PointerNode(Span(), new CharNode(Span())))), new IdentifierNode(Span(), U"argv"));
     argv->AddArgument(new InvokeNode(Span(), new IdentifierNode(Span(), U"RtArgv")));
     mainFunctionBody->AddStatement(argv);
+#endif
     CompoundStatementNode* tryBlock = new CompoundStatementNode(Span());
     InvokeNode* invokeTest = new InvokeNode(Span(), new IdentifierNode(Span(), ToUtf32(testName)));
     StatementNode* callMainStatement = new ExpressionStatementNode(Span(), invokeTest);

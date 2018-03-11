@@ -171,7 +171,7 @@ void LinuxEmitter::Visit(BoundTryStatement& boundTryStatement)
     std::vector<llvm::Type*> lpElemTypes;
     lpElemTypes.push_back(builder.getInt8PtrTy());
     lpElemTypes.push_back(builder.getInt8PtrTy());
-    llvm::StructType* lpType = llvm::StructType::create(lpElemTypes);
+    llvm::StructType* lpType = llvm::StructType::get(context, lpElemTypes);
     llvm::LandingPadInst* lp = builder.CreateLandingPad(lpType, 1);
     lp->addClause(llvm::Constant::getNullValue(llvm::PointerType::get(lpType, 0)));
     llvm::BasicBlock* catchTarget = llvm::BasicBlock::Create(context, "catch", function);
@@ -208,6 +208,8 @@ void LinuxEmitter::Visit(BoundTryStatement& boundTryStatement)
     }
     SetCurrentBasicBlock(resumeTarget);
     builder.CreateResume(lp);
+    SetCurrentBasicBlock(nextTarget);
+    basicBlockOpen = true;
 }
 
 void LinuxEmitter::Visit(BoundRethrowStatement& boundRethrowStatement)
@@ -272,7 +274,7 @@ void LinuxEmitter::GenerateCodeForCleanups()
         std::vector<llvm::Type*> lpElemTypes;
         lpElemTypes.push_back(builder.getInt8PtrTy());
         lpElemTypes.push_back(builder.getInt8PtrTy());
-        llvm::StructType* lpType = llvm::StructType::create(lpElemTypes);
+        llvm::StructType* lpType = llvm::StructType::get(context, lpElemTypes);
         llvm::LandingPadInst* lp = builder.CreateLandingPad(lpType, 0);
         lp->setCleanup(true);
         for (const std::unique_ptr<BoundFunctionCall>& destructorCall : cleanup->destructors)
