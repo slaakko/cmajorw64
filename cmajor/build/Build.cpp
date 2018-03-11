@@ -389,7 +389,6 @@ void Link(const std::string& executableFilePath, const std::string& libraryFileP
     args.push_back("/entry:main");
     args.push_back("/debug");
     args.push_back("/out:" + QuotedPath(executableFilePath));
-    boost::filesystem::path out = executableFilePath;
     args.push_back("/stack:16777216");
     std::string defFilePath = GetFullPath(boost::filesystem::path(libraryFilePath).replace_extension(".def").generic_string());
     CreateDefFile(defFilePath, module);
@@ -440,6 +439,31 @@ void Link(const std::string& executableFilePath, const std::string& libraryFileP
 
 #else
 
+void CreateDynamicListFile(const std::string& dynamicListFilePath, Module& module)
+{
+    std::ofstream defFile(dynamicListFilePath);
+    CodeFormatter formatter(defFile);
+    formatter.WriteLine("{");
+    formatter.IncIndent();
+    for (const std::string& fun : module.AllExportedFunctions())
+    {
+        formatter.WriteLine(fun);
+    }
+    for (const std::string& fun : module.ExportedFunctions())
+    {
+        formatter.WriteLine(fun);
+    }
+    for (const std::string& data : module.AllExportedData())
+    {
+        formatter.WriteLine(data);
+    }
+    for (const std::string& data : module.ExportedData())
+    {
+        formatter.WriteLine(data);
+    }
+    formatter.WriteLine("};");
+}
+
 void Link(const std::string& executableFilePath, const std::string& libraryFilePath, const std::vector<std::string>& libraryFilePaths, Module& module)
 {
     if (GetGlobalFlag(GlobalFlags::verbose) && !GetGlobalFlag(GlobalFlags::unitTest))
@@ -451,8 +475,10 @@ void Link(const std::string& executableFilePath, const std::string& libraryFileP
     bdp.remove_filename();
     boost::filesystem::create_directories(bdp);
     std::vector<std::string> args;
-    args.push_back("-o " + QuotedPath(executableFilePath));
-    boost::filesystem::path out = executableFilePath;
+    std::string dynamicListFilePath = GetFullPath(boost::filesystem::path(libraryFilePath).replace_extension(".export").generic_string());
+    CreateDynamicListFile(dynamicListFilePath, module);
+    args.push_back("-Wl,--dynamic-list=" + dynamicListFilePath);
+    args.push_back("-Xlinker --start-group");
     int n = libraryFilePaths.size();
     args.push_back(QuotedPath(libraryFilePaths.back()));
     for (int i = 0; i < n - 1; ++i)
@@ -465,8 +491,9 @@ void Link(const std::string& executableFilePath, const std::string& libraryFileP
         cmrtLibName = "libcmrtd.so.2.1.0";
     }
     args.push_back(QuotedPath(Path::Combine(Path::Combine(CmajorRootDir(), "lib"), cmrtLibName)));
-    args.push_back(QuotedPath(Path::Combine(Path::Combine(CmajorRootDir(), "lib"), "libutil.a")));
-    args.push_back("-lgnutls -lgmp -lbz2 -lz");
+    args.push_back("-lboost_filesystem -lboost_iostreams -lboost_system -lgmp -lbz2 -lz");
+    args.push_back("-Xlinker --end-group");
+    args.push_back("-o " + QuotedPath(executableFilePath));
     std::string linkCommandLine;
     std::string linkErrorFilePath;
     linkCommandLine = "clang++";
