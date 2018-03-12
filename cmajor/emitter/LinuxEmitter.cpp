@@ -59,7 +59,6 @@ void LinuxEmitter::Visit(BoundReturnStatement& boundReturnStatement)
         SetCurrentBasicBlock(nextBlock);
         basicBlockOpen = true;
         lastInstructionWasRet = false;
-    
     }
 }
 
@@ -170,10 +169,23 @@ void LinuxEmitter::Visit(BoundTryStatement& boundTryStatement)
     handlerBlock = prevHandlerBlock;
     std::vector<llvm::Type*> lpElemTypes;
     lpElemTypes.push_back(builder.getInt8PtrTy());
-    lpElemTypes.push_back(builder.getInt8PtrTy());
+    lpElemTypes.push_back(builder.getInt32Ty());
     llvm::StructType* lpType = llvm::StructType::get(context, lpElemTypes);
     llvm::LandingPadInst* lp = builder.CreateLandingPad(lpType, 1);
-    lp->addClause(llvm::Constant::getNullValue(llvm::PointerType::get(lpType, 0)));
+    lp->addClause(llvm::Constant::getNullValue(builder.getInt8PtrTy()));
+    std::vector<unsigned int> exPtrIndex;
+    exPtrIndex.push_back(0);
+    llvm::Value* exPtr = builder.CreateExtractValue(lp, exPtrIndex);
+    std::vector<unsigned int> exIdIndex;
+    exIdIndex.push_back(1);
+    llvm::Value* exId = builder.CreateExtractValue(lp, exIdIndex);
+    std::vector<llvm::Type*> cxaBeginCatchParamTypes;
+    cxaBeginCatchParamTypes.push_back(builder.getInt8PtrTy());
+    llvm::FunctionType* cxaBeginCatchType = llvm::FunctionType::get(builder.getInt8PtrTy(), cxaBeginCatchParamTypes, false);
+    llvm::Function* cxaBeginCatch = llvm::cast<llvm::Function>(compileUnitModule->getOrInsertFunction("__cxa_begin_catch", cxaBeginCatchType));
+    ArgVector cxaBeginCatchArgs;
+    cxaBeginCatchArgs.push_back(exPtr);
+    llvm::Value* cxaBeginCatchValue = builder.CreateCall(cxaBeginCatch, cxaBeginCatchArgs);
     llvm::BasicBlock* catchTarget = llvm::BasicBlock::Create(context, "catch", function);
     llvm::BasicBlock* resumeTarget = llvm::BasicBlock::Create(context, "resume", function);
     builder.CreateBr(catchTarget);
@@ -204,6 +216,11 @@ void LinuxEmitter::Visit(BoundTryStatement& boundTryStatement)
         builder.CreateCondBr(handleThisEx, thisHandlerTarget, nextHandlerTarget);
         SetCurrentBasicBlock(thisHandlerTarget);
         boundCatchStatement->CatchBlock()->Accept(*this);
+        std::vector<llvm::Type*> cxaEndCatchParamTypes;
+        llvm::FunctionType* cxaEndCatchType = llvm::FunctionType::get(builder.getVoidTy(), cxaEndCatchParamTypes, false);
+        llvm::Function* cxaEndCatch = llvm::cast<llvm::Function>(compileUnitModule->getOrInsertFunction("__cxa_end_catch", cxaEndCatchType));
+        ArgVector cxaEndCatchArgs;
+        llvm::Value* cxaEndCatchValue = builder.CreateCall(cxaEndCatch, cxaEndCatchArgs);
         builder.CreateBr(nextTarget);
     }
     SetCurrentBasicBlock(resumeTarget);
@@ -273,7 +290,7 @@ void LinuxEmitter::GenerateCodeForCleanups()
         SetCurrentBasicBlock(cleanup->cleanupBlock);
         std::vector<llvm::Type*> lpElemTypes;
         lpElemTypes.push_back(builder.getInt8PtrTy());
-        lpElemTypes.push_back(builder.getInt8PtrTy());
+        lpElemTypes.push_back(builder.getInt32Ty());
         llvm::StructType* lpType = llvm::StructType::get(context, lpElemTypes);
         llvm::LandingPadInst* lp = builder.CreateLandingPad(lpType, 0);
         lp->setCleanup(true);
