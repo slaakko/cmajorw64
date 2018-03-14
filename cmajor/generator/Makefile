@@ -2,7 +2,7 @@ include ../Makefile.common
 
 OBJECTS = Main.o
 
-LIBRARIES = ../lib/$(config)/libutil.a ../lib/$(config)/libcodedom.a ../lib/$(config)/libparsing.a ../lib/$(config)/libcode.a ../lib/$(config)/libsyntax.a
+LIBRARIES = ../lib/libutil.a ../lib/libcodedom.a ../lib/libparsing.a ../lib/libcode.a ../lib/libsyntax.a
 
 %o: %.cpp
 	$(CXX) -c $(CXXFLAGS) -o $@ $<

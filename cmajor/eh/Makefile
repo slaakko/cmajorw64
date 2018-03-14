@@ -5,10 +5,10 @@ OBJECTS = Exception.o
 %o: %.cpp
 	$(CXX) -c $(CXXFLAGS) -o $@ $<
 
-../lib/$(config)/libeh.a: $(OBJECTS)
+../lib/libeh.a: $(OBJECTS)
 	$(AR) $(ARFLAGS) $@ $(OBJECTS)
 
 clean:
 	rm -f *.o
-	rm -f ../lib/$(config)/libeh.a
+	rm -f ../lib/libeh.a
 

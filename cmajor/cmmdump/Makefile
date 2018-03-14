@@ -2,9 +2,9 @@ include ../Makefile.common
 
 OBJECTS = Main.o
 
-LIBRARIES = ../lib/$(config)/libutil.a ../lib/$(config)/libcodedom.a ../lib/$(config)/libparsing.a ../lib/$(config)/libxpath.a ../lib/$(config)/libdom.a ../lib/$(config)/libxml.a \
-../lib/$(config)/libast.a ../lib/$(config)/libsymbols.a ../lib/$(config)/libparser.a ../lib/$(config)/libbuild.a ../lib/$(config)/libbinder.a ../lib/$(config)/libemitter.a \
-../lib/$(config)/libir.a
+LIBRARIES = ../lib/libutil.a ../lib/libcodedom.a ../lib/libparsing.a ../lib/libxpath.a ../lib/libdom.a ../lib/libxml.a \
+../lib/libast.a ../lib/libsymbols.a ../lib/libparser.a ../lib/libbuild.a ../lib/libbinder.a ../lib/libemitter.a \
+../lib/libir.a
 
 LLVMLIBS = $(shell llvm-config --libs)
 

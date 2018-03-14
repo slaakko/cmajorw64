@@ -8,10 +8,10 @@ JsonAttributeProcessor.o ModuleBinder.o OperationRepository.o OverloadResolution
 %o: %.cpp
 	$(CXX) -c $(CXXFLAGS) -o $@ $<
 
-../lib/$(config)/libbinder.a: $(OBJECTS)
+../lib/libbinder.a: $(OBJECTS)
 	$(AR) $(ARFLAGS) $@ $(OBJECTS)
 
 clean:
 	rm -f *.o
-	rm -f ../lib/$(config)/libbinder.a
+	rm -f ../lib/libbinder.a
 

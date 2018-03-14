@@ -6,10 +6,10 @@ ParserFile.o Primary.o Primitive.o Project.o ProjectFile.o Rule.o
 %o: %.cpp
 	$(CXX) -c $(CXXFLAGS) -o $@ $<
 
-../lib/$(config)/libsyntax.a: $(OBJECTS)
+../lib/libsyntax.a: $(OBJECTS)
 	$(AR) $(ARFLAGS) $@ $(OBJECTS)
 
 clean:
 	rm -f *.o
-	rm -f ../lib/$(config)/libsyntax.a
+	rm -f ../lib/libsyntax.a
 

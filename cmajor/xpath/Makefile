@@ -5,10 +5,10 @@ OBJECTS = InitDone.o XPathContext.o XPath.o XPathDebug.o XPathEvaluate.o XPathEx
 %o: %.cpp
 	$(CXX) -c $(CXXFLAGS) -o $@ $<
 
-../lib/$(config)/libxpath.a: $(OBJECTS)
+../lib/libxpath.a: $(OBJECTS)
 	$(AR) $(ARFLAGS) $@ $(OBJECTS)
 
 clean:
 	rm -f *.o
-	rm -f ../lib/$(config)/libxpath.a
+	rm -f ../lib/libxpath.a
 

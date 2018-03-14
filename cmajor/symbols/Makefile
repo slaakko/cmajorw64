@@ -9,10 +9,10 @@ Warning.o
 %o: %.cpp
 	$(CXX) -c $(CXXFLAGS) -o $@ $<
 
-../lib/$(config)/libsymbols.a: $(OBJECTS)
+../lib/libsymbols.a: $(OBJECTS)
 	$(AR) $(ARFLAGS) $@ $(OBJECTS)
 
 clean:
 	rm -f *.o
-	rm -f ../lib/$(config)/libsymbols.a
+	rm -f ../lib/libsymbols.a
 

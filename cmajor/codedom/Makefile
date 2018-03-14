@@ -5,10 +5,10 @@ OBJECTS = Declaration.o Expression.o InitDone.o Literal.o Object.o Operator.o St
 %o: %.cpp
 	$(CXX) -c $(CXXFLAGS) -o $@ $<
 
-../lib/$(config)/libcodedom.a: $(OBJECTS)
+../lib/libcodedom.a: $(OBJECTS)
 	$(AR) $(ARFLAGS) $@ $(OBJECTS)
 
 clean:
 	rm -f *.o
-	rm -f ../lib/$(config)/libcodedom.a
+	rm -f ../lib/libcodedom.a
 
