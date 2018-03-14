@@ -298,10 +298,6 @@ void BasicEmitter::Visit(BoundFunction& boundFunction)
         llvm::BasicBlock* target = llvm::BasicBlock::Create(context, ToUtf8(labeledStatement->Label()), function);
         labeledStatementMap[labeledStatement] = target;
     }
-    if (functionSymbol->HasTry())
-    {
-        InitializeGlobalVariables();
-    }
     BoundCompoundStatement* body = boundFunction.Body();
     body->Accept(*this);
     BoundStatement* lastStatement = nullptr;
@@ -1103,10 +1099,6 @@ void BasicEmitter::SetLineNumber(int32_t lineNumber)
         bundles.push_back(llvm::OperandBundleDef("funclet", inputs));
         llvm::CallInst::Create(setLineNumberFunction, setLineNumberFunctionArgs, bundles, "", CurrentBasicBlock());
     }
-}
-
-void BasicEmitter::InitializeGlobalVariables()
-{
 }
 
 } } // namespace cmajor::emitter

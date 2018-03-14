@@ -111,7 +111,10 @@ llvm::Type* InterfaceTypeSymbol::IrType(Emitter& emitter)
 {
     if (!irType)
     {
-        irType = llvm::StructType::get(emitter.Builder().getInt8PtrTy(), emitter.Builder().getInt8PtrTy(), nullptr);
+        std::vector<llvm::Type*> elemTypes;
+        elemTypes.push_back(emitter.Builder().getInt8PtrTy());
+        elemTypes.push_back(emitter.Builder().getInt8PtrTy());
+        irType = llvm::StructType::get(emitter.Context(), elemTypes);
     }
     return irType;
 }

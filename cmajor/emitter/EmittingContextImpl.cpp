@@ -36,9 +36,11 @@ EmittingContextImpl::EmittingContextImpl() : targetTriple(), optimizationLevel(0
         throw std::runtime_error("EmittingContext: TargetRegistry::lookupTarget failed: " + error);
     }
     llvm::TargetOptions targetOptions = {};
+#ifdef _WIN32
     targetOptions.ExceptionModel = llvm::ExceptionHandling::WinEH;
+#endif
     llvm::Optional<llvm::Reloc::Model> relocModel;
-    llvm::CodeModel::Model codeModel = llvm::CodeModel::Default;
+    llvm::CodeModel::Model codeModel = llvm::CodeModel::Large;
     llvm::CodeGenOpt::Level codeGenLevel = llvm::CodeGenOpt::None;
     optimizationLevel = GetOptimizationLevel();
     switch (optimizationLevel)

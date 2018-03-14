@@ -160,7 +160,7 @@ void LinuxEmitter::Visit(BoundTryStatement& boundTryStatement)
     SetTarget(&boundTryStatement);
     llvm::BasicBlock* prevHandlerBlock = handlerBlock;
     llvm::BasicBlock* prevCleanupBlock = cleanupBlock;
-    handlerBlock = llvm::BasicBlock::Create(context, "handlers", function);
+    handlerBlock = llvm::BasicBlock::Create(context, "lpad", function);
     cleanupBlock = nullptr;
     boundTryStatement.TryBlock()->Accept(*this);
     llvm::BasicBlock* nextTarget = llvm::BasicBlock::Create(context, "next", function);
@@ -172,30 +172,39 @@ void LinuxEmitter::Visit(BoundTryStatement& boundTryStatement)
     lpElemTypes.push_back(builder.getInt32Ty());
     llvm::StructType* lpType = llvm::StructType::get(context, lpElemTypes);
     llvm::LandingPadInst* lp = builder.CreateLandingPad(lpType, 1);
-    llvm::GlobalVariable* exceptionTypeId = llvm::cast<llvm::GlobalVariable>(compileUnitModule->getOrInsertGlobal("_ZTIN6cmajor2eh9ExceptionE", builder.getInt8PtrTy()));
-    lp->addClause(exceptionTypeId);
-    std::vector<llvm::Type*> llvmEhParamTypes;
-    llvmEhParamTypes.push_back(builder.getInt8PtrTy());
-    llvm::FunctionType* llvmEHTypeIdForType = llvm::FunctionType::get(builder.getInt32Ty(), llvmEhParamTypes, false);
-    llvm::Function* llvmEHTypeIdFor = llvm::cast<llvm::Function>(compileUnitModule->getOrInsertFunction("llvm.eh.typeid.for", llvmEHTypeIdForType));
-    ArgVector llvmEHTypeIdForArgs;
-    llvm::Value* loadedExTypeId = builder.CreateLoad(exceptionTypeId);
-    llvmEHTypeIdForArgs.push_back(loadedExTypeId);
-    llvm::Value* ehSelector = builder.CreateCall(llvmEHTypeIdFor, llvmEHTypeIdForArgs);
+    std::vector<llvm::Type*> exTypeInfoElemTypes;
+    exTypeInfoElemTypes.push_back(builder.getInt8PtrTy());
+    exTypeInfoElemTypes.push_back(builder.getInt8PtrTy());
+    llvm::StructType* exTypeInfoType = llvm::StructType::get(context, exTypeInfoElemTypes);
+    llvm::Constant* exceptionTypeId = compileUnitModule->getOrInsertGlobal("_ZTIN6cmajor2eh9ExceptionE", exTypeInfoType);
+    lp->addClause(llvm::cast<llvm::Constant>(builder.CreateBitCast(exceptionTypeId, builder.getInt8PtrTy())));
     std::vector<unsigned int> exPtrIndex;
     exPtrIndex.push_back(0);
     llvm::Value* exPtr = builder.CreateExtractValue(lp, exPtrIndex);
-    llvm::AllocaInst* exPtrAlloca = new llvm::AllocaInst(builder.getInt8PtrTy());
+    llvm::AllocaInst* exPtrAlloca = new llvm::AllocaInst(builder.getInt8PtrTy(), 0);
     InsertAllocaIntoEntryBlock(exPtrAlloca);
     builder.CreateStore(exPtr, exPtrAlloca);
     std::vector<unsigned int> exIdIndex;
     exIdIndex.push_back(1);
     llvm::Value* exId = builder.CreateExtractValue(lp, exIdIndex);
-    llvm::AllocaInst* exIdAlloca = new llvm::AllocaInst(builder.getInt32Ty());
+    llvm::AllocaInst* exIdAlloca = new llvm::AllocaInst(builder.getInt32Ty(), 0);
     builder.CreateStore(exId, exIdAlloca);
     InsertAllocaIntoEntryBlock(exIdAlloca);
-    llvm::BasicBlock* beginCatchBlock = llvm::BasicBlock::Create(context, "beginCatch", function);
-    builder.CreateBr(beginCatchBlock);
+    llvm::BasicBlock* testBlock = llvm::BasicBlock::Create(context, "test", function);
+    builder.CreateBr(testBlock);
+    SetCurrentBasicBlock(testBlock);
+    llvm::Value* loadedExId = builder.CreateLoad(exIdAlloca);
+    std::vector<llvm::Type*> llvmEhParamTypes;
+    llvmEhParamTypes.push_back(builder.getInt8PtrTy());
+    llvm::FunctionType* llvmEHTypeIdForType = llvm::FunctionType::get(builder.getInt32Ty(), llvmEhParamTypes, false);
+    llvm::Function* llvmEHTypeIdFor = llvm::cast<llvm::Function>(compileUnitModule->getOrInsertFunction("llvm.eh.typeid.for", llvmEHTypeIdForType));
+    ArgVector llvmEHTypeIdForArgs;
+    llvmEHTypeIdForArgs.push_back(llvm::cast<llvm::Constant>(builder.CreateBitCast(exceptionTypeId, builder.getInt8PtrTy())));
+    llvm::Value* ehSelector = builder.CreateCall(llvmEHTypeIdFor, llvmEHTypeIdForArgs);
+    llvm::Value* match = builder.CreateICmpEQ(loadedExId, ehSelector);
+    llvm::BasicBlock* beginCatchBlock = llvm::BasicBlock::Create(context, "handlers", function);
+    llvm::BasicBlock* resumeBlock = llvm::BasicBlock::Create(context, "resume", function);
+    builder.CreateCondBr(match, beginCatchBlock, resumeBlock);
     SetCurrentBasicBlock(beginCatchBlock);
     std::vector<llvm::Type*> cxaBeginCatchParamTypes;
     cxaBeginCatchParamTypes.push_back(builder.getInt8PtrTy());
@@ -205,9 +214,7 @@ void LinuxEmitter::Visit(BoundTryStatement& boundTryStatement)
     llvm::Value* loadedExPtr = builder.CreateLoad(exPtrAlloca);
     cxaBeginCatchArgs.push_back(loadedExPtr);
     llvm::Value* cxaBeginCatchValue = builder.CreateCall(cxaBeginCatch, cxaBeginCatchArgs);
-/*
     llvm::BasicBlock* catchTarget = llvm::BasicBlock::Create(context, "catch", function);
-    llvm::BasicBlock* resumeTarget = llvm::BasicBlock::Create(context, "resume", function);
     builder.CreateBr(catchTarget);
     int n = boundTryStatement.Catches().size();
     for (int i = 0; i < n; ++i)
@@ -230,7 +237,7 @@ void LinuxEmitter::Visit(BoundTryStatement& boundTryStatement)
         }
         else
         {
-            nextHandlerTarget = resumeTarget;
+            nextHandlerTarget = resumeBlock;
         }
         llvm::BasicBlock* thisHandlerTarget = llvm::BasicBlock::Create(context, "handler", function);
         builder.CreateCondBr(handleThisEx, thisHandlerTarget, nextHandlerTarget);
@@ -243,16 +250,12 @@ void LinuxEmitter::Visit(BoundTryStatement& boundTryStatement)
         llvm::Value* cxaEndCatchValue = builder.CreateCall(cxaEndCatch, cxaEndCatchArgs);
         builder.CreateBr(nextTarget);
     }
-    SetCurrentBasicBlock(resumeTarget);
-    builder.CreateResume(lp);
-*/
-    std::vector<llvm::Type*> cxaEndCatchParamTypes;
-    llvm::FunctionType* cxaEndCatchType = llvm::FunctionType::get(builder.getVoidTy(), cxaEndCatchParamTypes, false);
-    llvm::Function* cxaEndCatch = llvm::cast<llvm::Function>(compileUnitModule->getOrInsertFunction("__cxa_end_catch", cxaEndCatchType));
-    ArgVector cxaEndCatchArgs;
-    llvm::Value* cxaEndCatchValue = builder.CreateCall(cxaEndCatch, cxaEndCatchArgs);
-    builder.CreateBr(nextTarget);
-    // todo
+    SetCurrentBasicBlock(resumeBlock);
+    llvm::Value* loadedExPtrForResume = builder.CreateLoad(exPtrAlloca);
+    llvm::Value* loadedExIdForResume = builder.CreateLoad(exIdAlloca);
+    llvm::Value* resume1 = builder.CreateInsertValue(llvm::UndefValue::get(lpType), loadedExPtrForResume, exPtrIndex);
+    llvm::Value* resume2 = builder.CreateInsertValue(resume1, loadedExIdForResume, exIdIndex);
+    builder.CreateResume(resume2);
     SetCurrentBasicBlock(nextTarget);
     basicBlockOpen = true;
 }
@@ -328,15 +331,6 @@ void LinuxEmitter::GenerateCodeForCleanups()
         }
         builder.CreateResume(lp);
     }
-}
-
-void LinuxEmitter::InitializeGlobalVariables()
-{
-    llvm::FunctionType* rtGetExceptionTypeIdType = llvm::FunctionType::get(builder.getInt8PtrTy(), false);
-    llvm::Function* rtGetExceptionTypeId = llvm::cast<llvm::Function>(compileUnitModule->getOrInsertFunction("RtGetExceptionTypeId", rtGetExceptionTypeIdType));
-    ArgVector rtGetExceptionTypeIdArgs;
-    exceptionTypeId = llvm::cast<llvm::GlobalVariable>(compileUnitModule->getOrInsertGlobal("ehExceptionTypeId", builder.getInt8PtrTy()));
-    builder.CreateStore(builder.CreateCall(rtGetExceptionTypeId, rtGetExceptionTypeIdArgs), exceptionTypeId);
 }
 
 } } // namespace cmajor::emitter

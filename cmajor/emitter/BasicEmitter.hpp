@@ -87,7 +87,6 @@ public:
     Pad* CurrentPad() override { return currentPad; }
     virtual llvm::Function* GetPersonalityFunction() const = 0;
     virtual void GenerateCodeForCleanups() = 0;
-    virtual void InitializeGlobalVariables();
 protected:
     EmittingContext & emittingContext;
     SymbolTable* symbolTable;
