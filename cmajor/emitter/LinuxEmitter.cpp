@@ -4,7 +4,6 @@
 // =================================
 
 #include <cmajor/emitter/LinuxEmitter.hpp>
-#include <cmajor/eh/Exception.hpp>
 
 namespace cmajor { namespace emitter {
 
@@ -173,14 +172,15 @@ void LinuxEmitter::Visit(BoundTryStatement& boundTryStatement)
     lpElemTypes.push_back(builder.getInt32Ty());
     llvm::StructType* lpType = llvm::StructType::get(context, lpElemTypes);
     llvm::LandingPadInst* lp = builder.CreateLandingPad(lpType, 1);
-    exceptionTypeId = llvm::cast<llvm::GlobalVariable>(compileUnitModule->getOrInsertGlobal("ehExceptionTypeId", builder.getInt8PtrTy()));
+    llvm::GlobalVariable* exceptionTypeId = llvm::cast<llvm::GlobalVariable>(compileUnitModule->getOrInsertGlobal("_ZTIN6cmajor2eh9ExceptionE", builder.getInt8PtrTy()));
     lp->addClause(exceptionTypeId);
     std::vector<llvm::Type*> llvmEhParamTypes;
     llvmEhParamTypes.push_back(builder.getInt8PtrTy());
     llvm::FunctionType* llvmEHTypeIdForType = llvm::FunctionType::get(builder.getInt32Ty(), llvmEhParamTypes, false);
     llvm::Function* llvmEHTypeIdFor = llvm::cast<llvm::Function>(compileUnitModule->getOrInsertFunction("llvm.eh.typeid.for", llvmEHTypeIdForType));
     ArgVector llvmEHTypeIdForArgs;
-    llvmEHTypeIdForArgs.push_back(exceptionTypeId);
+    llvm::Value* loadedExTypeId = builder.CreateLoad(exceptionTypeId);
+    llvmEHTypeIdForArgs.push_back(loadedExTypeId);
     llvm::Value* ehSelector = builder.CreateCall(llvmEHTypeIdFor, llvmEHTypeIdForArgs);
     std::vector<unsigned int> exPtrIndex;
     exPtrIndex.push_back(0);
@@ -332,11 +332,11 @@ void LinuxEmitter::GenerateCodeForCleanups()
 
 void LinuxEmitter::InitializeGlobalVariables()
 {
-    llvm::FunctionType* ehGetExceptionTypeIdType = llvm::FunctionType::get(builder.getInt8PtrTy(), false);
-    llvm::Function* ehGetExceptionTypeId = llvm::cast<llvm::Function>(compileUnitModule->getOrInsertFunction("EhGetExceptionTypeId", ehGetExceptionTypeIdType));
-    ArgVector ehGetExceptionTypeIdArgs;
-    SetCurrentBasicBlock(entryBasicBlock);
-    builder.CreateStore(builder.CreateCall(ehGetExceptionTypeId, ehGetExceptionTypeIdArgs), exceptionTypeId);
+    llvm::FunctionType* rtGetExceptionTypeIdType = llvm::FunctionType::get(builder.getInt8PtrTy(), false);
+    llvm::Function* rtGetExceptionTypeId = llvm::cast<llvm::Function>(compileUnitModule->getOrInsertFunction("RtGetExceptionTypeId", rtGetExceptionTypeIdType));
+    ArgVector rtGetExceptionTypeIdArgs;
+    exceptionTypeId = llvm::cast<llvm::GlobalVariable>(compileUnitModule->getOrInsertGlobal("ehExceptionTypeId", builder.getInt8PtrTy()));
+    builder.CreateStore(builder.CreateCall(rtGetExceptionTypeId, rtGetExceptionTypeIdArgs), exceptionTypeId);
 }
 
 } } // namespace cmajor::emitter

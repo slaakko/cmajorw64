@@ -298,6 +298,10 @@ void BasicEmitter::Visit(BoundFunction& boundFunction)
         llvm::BasicBlock* target = llvm::BasicBlock::Create(context, ToUtf8(labeledStatement->Label()), function);
         labeledStatementMap[labeledStatement] = target;
     }
+    if (functionSymbol->HasTry())
+    {
+        InitializeGlobalVariables();
+    }
     BoundCompoundStatement* body = boundFunction.Body();
     body->Accept(*this);
     BoundStatement* lastStatement = nullptr;
@@ -324,7 +328,6 @@ void BasicEmitter::Visit(BoundFunction& boundFunction)
     {
         llvm::Function* personalityFunction = GetPersonalityFunction();
         function->setPersonalityFn(llvm::ConstantExpr::getBitCast(personalityFunction, builder.getInt8PtrTy()));
-        InitializeGlobalVariables();
     }
     if (functionSymbol->DontThrow() && !functionSymbol->HasTry() && cleanups.empty())
     {
@@ -1056,10 +1059,6 @@ llvm::Value* BasicEmitter::GetGlobalUStringConstant(int stringId)
     }
 }
 
-void BasicEmitter::InitializeGlobalVariables()
-{
-}
-
 void BasicEmitter::CreateExitFunctionCall()
 {
     if (currentFunction->GetFunctionSymbol()->DontThrow()) return;
@@ -1104,6 +1103,10 @@ void BasicEmitter::SetLineNumber(int32_t lineNumber)
         bundles.push_back(llvm::OperandBundleDef("funclet", inputs));
         llvm::CallInst::Create(setLineNumberFunction, setLineNumberFunctionArgs, bundles, "", CurrentBasicBlock());
     }
+}
+
+void BasicEmitter::InitializeGlobalVariables()
+{
 }
 
 } } // namespace cmajor::emitter

@@ -13,4 +13,3 @@ extern "C" void* EhGetExceptionTypeId()
     return const_cast<void*>(ti);
 }
 
-extern "C" void* ehExceptionTypeId = EhGetExceptionTypeId();

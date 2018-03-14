@@ -25,6 +25,7 @@ extern "C" RT_API void RtCaptureException(void** exception, uint64_t* exceptionC
 extern "C" RT_API void RtThrowCapturedException(void* exception, uint64_t exceptionClassId);
 extern "C" RT_API bool RtHandleException(uint32_t exceptionTypeId);
 extern "C" RT_API void* RtGetException();
+extern "C" RT_API void* RtGetExceptionTypeId();
 
 namespace cmajor { namespace rt {
 

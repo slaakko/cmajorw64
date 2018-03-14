@@ -14,8 +14,6 @@ class Exception
 
 } } // namespace cmajor::eh
 
-extern "C" void* ehExceptionTypeId;
-
 extern "C" void* EhGetExceptionTypeId();
 
 #endif // CMAJOR_EH_EXCEPTION_INCLUDED

@@ -171,3 +171,8 @@ extern "C" RT_API void* RtGetException()
 {
     return cmajor::rt::currentException;
 }
+
+extern "C" RT_API void* RtGetExceptionTypeId()
+{
+    return EhGetExceptionTypeId();
+}
