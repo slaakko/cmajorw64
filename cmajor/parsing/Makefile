@@ -6,10 +6,10 @@ ParsingObject.o Primitive.o Rule.o Scanner.o Scope.o StdLib.o Utility.o XmlLog.o
 %o: %.cpp
 	$(CXX) -c $(CXXFLAGS) -o $@ $<
 
-../lib/libparsing.a: $(OBJECTS)
+../lib/$(config)/libparsing.a: $(OBJECTS)
 	$(AR) $(ARFLAGS) $@ $(OBJECTS)
 
 clean:
 	rm -f *.o
-	rm -f ../lib/libparsing.a
+	rm -f ../lib/$(config)/libparsing.a
 

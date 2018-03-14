@@ -1,3 +1,5 @@
+include Makefile.common
+
 .PHONY : build install clean
 
 all: build
@@ -40,7 +42,7 @@ endif
 install:
 	mkdir -p $(prefix)/bin
 	cp bin/* $(prefix)/bin
-	cp lib/$(cmrtsoname).so.2.1.0 $(prefix)/lib
+	cp lib/$(config)/$(cmrtsoname).so.2.1.0 $(prefix)/lib
 	ln -f $(prefix)/lib/$(cmrtsoname).so.2.1.0 $(prefix)/lib/$(cmrtsoname).so.2
 	ln -f $(prefix)/lib/$(cmrtsoname).so.2.1.0 $(prefix)/lib/$(cmrtsoname).so
 

@@ -8,10 +8,10 @@ OBJECTS = gmpintf.o
 %o: %.c
 	$(C) -c $(CFLAGS) -o $@ $<
 
-../../../lib/libgmpintf.a: $(OBJECTS)
+../../../lib/$(config)/libgmpintf.a: $(OBJECTS)
 	$(AR) $(ARFLAGS) $@ $(OBJECTS)
 
 clean:
 	rm -f *.o
-	rm -f ../../../lib/libgmpintf.a
+	rm -f ../../../lib/$(config)/libgmpintf.a
 

@@ -4,6 +4,7 @@
 // =================================
 
 #include <cmajor/emitter/LinuxEmitter.hpp>
+#include <cmajor/eh/Exception.hpp>
 
 namespace cmajor { namespace emitter {
 
@@ -172,20 +173,39 @@ void LinuxEmitter::Visit(BoundTryStatement& boundTryStatement)
     lpElemTypes.push_back(builder.getInt32Ty());
     llvm::StructType* lpType = llvm::StructType::get(context, lpElemTypes);
     llvm::LandingPadInst* lp = builder.CreateLandingPad(lpType, 1);
-    lp->addClause(llvm::Constant::getNullValue(builder.getInt8PtrTy()));
+    exceptionTypeId = llvm::cast<llvm::GlobalVariable>(compileUnitModule->getOrInsertGlobal("ehExceptionTypeId", builder.getInt8PtrTy()));
+    lp->addClause(exceptionTypeId);
+    std::vector<llvm::Type*> llvmEhParamTypes;
+    llvmEhParamTypes.push_back(builder.getInt8PtrTy());
+    llvm::FunctionType* llvmEHTypeIdForType = llvm::FunctionType::get(builder.getInt32Ty(), llvmEhParamTypes, false);
+    llvm::Function* llvmEHTypeIdFor = llvm::cast<llvm::Function>(compileUnitModule->getOrInsertFunction("llvm.eh.typeid.for", llvmEHTypeIdForType));
+    ArgVector llvmEHTypeIdForArgs;
+    llvmEHTypeIdForArgs.push_back(exceptionTypeId);
+    llvm::Value* ehSelector = builder.CreateCall(llvmEHTypeIdFor, llvmEHTypeIdForArgs);
     std::vector<unsigned int> exPtrIndex;
     exPtrIndex.push_back(0);
     llvm::Value* exPtr = builder.CreateExtractValue(lp, exPtrIndex);
+    llvm::AllocaInst* exPtrAlloca = new llvm::AllocaInst(builder.getInt8PtrTy());
+    InsertAllocaIntoEntryBlock(exPtrAlloca);
+    builder.CreateStore(exPtr, exPtrAlloca);
     std::vector<unsigned int> exIdIndex;
     exIdIndex.push_back(1);
     llvm::Value* exId = builder.CreateExtractValue(lp, exIdIndex);
+    llvm::AllocaInst* exIdAlloca = new llvm::AllocaInst(builder.getInt32Ty());
+    builder.CreateStore(exId, exIdAlloca);
+    InsertAllocaIntoEntryBlock(exIdAlloca);
+    llvm::BasicBlock* beginCatchBlock = llvm::BasicBlock::Create(context, "beginCatch", function);
+    builder.CreateBr(beginCatchBlock);
+    SetCurrentBasicBlock(beginCatchBlock);
     std::vector<llvm::Type*> cxaBeginCatchParamTypes;
     cxaBeginCatchParamTypes.push_back(builder.getInt8PtrTy());
     llvm::FunctionType* cxaBeginCatchType = llvm::FunctionType::get(builder.getInt8PtrTy(), cxaBeginCatchParamTypes, false);
     llvm::Function* cxaBeginCatch = llvm::cast<llvm::Function>(compileUnitModule->getOrInsertFunction("__cxa_begin_catch", cxaBeginCatchType));
     ArgVector cxaBeginCatchArgs;
-    cxaBeginCatchArgs.push_back(exPtr);
+    llvm::Value* loadedExPtr = builder.CreateLoad(exPtrAlloca);
+    cxaBeginCatchArgs.push_back(loadedExPtr);
     llvm::Value* cxaBeginCatchValue = builder.CreateCall(cxaBeginCatch, cxaBeginCatchArgs);
+/*
     llvm::BasicBlock* catchTarget = llvm::BasicBlock::Create(context, "catch", function);
     llvm::BasicBlock* resumeTarget = llvm::BasicBlock::Create(context, "resume", function);
     builder.CreateBr(catchTarget);
@@ -225,6 +245,14 @@ void LinuxEmitter::Visit(BoundTryStatement& boundTryStatement)
     }
     SetCurrentBasicBlock(resumeTarget);
     builder.CreateResume(lp);
+*/
+    std::vector<llvm::Type*> cxaEndCatchParamTypes;
+    llvm::FunctionType* cxaEndCatchType = llvm::FunctionType::get(builder.getVoidTy(), cxaEndCatchParamTypes, false);
+    llvm::Function* cxaEndCatch = llvm::cast<llvm::Function>(compileUnitModule->getOrInsertFunction("__cxa_end_catch", cxaEndCatchType));
+    ArgVector cxaEndCatchArgs;
+    llvm::Value* cxaEndCatchValue = builder.CreateCall(cxaEndCatch, cxaEndCatchArgs);
+    builder.CreateBr(nextTarget);
+    // todo
     SetCurrentBasicBlock(nextTarget);
     basicBlockOpen = true;
 }
@@ -300,6 +328,15 @@ void LinuxEmitter::GenerateCodeForCleanups()
         }
         builder.CreateResume(lp);
     }
+}
+
+void LinuxEmitter::InitializeGlobalVariables()
+{
+    llvm::FunctionType* ehGetExceptionTypeIdType = llvm::FunctionType::get(builder.getInt8PtrTy(), false);
+    llvm::Function* ehGetExceptionTypeId = llvm::cast<llvm::Function>(compileUnitModule->getOrInsertFunction("EhGetExceptionTypeId", ehGetExceptionTypeIdType));
+    ArgVector ehGetExceptionTypeIdArgs;
+    SetCurrentBasicBlock(entryBasicBlock);
+    builder.CreateStore(builder.CreateCall(ehGetExceptionTypeId, ehGetExceptionTypeIdArgs), exceptionTypeId);
 }
 
 } } // namespace cmajor::emitter

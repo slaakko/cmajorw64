@@ -7,10 +7,10 @@ Statement.o Template.o Typedef.o TypeExpr.o
 %o: %.cpp
 	$(CXX) -c $(CXXFLAGS) -o $@ $<
 
-../lib/libparser.a: $(OBJECTS)
+../lib/$(config)/libparser.a: $(OBJECTS)
 	$(AR) $(ARFLAGS) $@ $(OBJECTS)
 
 clean:
 	rm -f *.o
-	rm -f ../lib/libparser.a
+	rm -f ../lib/$(config)/libparser.a
 

@@ -5,10 +5,10 @@ OBJECTS = BasicEmitter.o Emitter.o EmittingContext.o EmittingContextImpl.o Linux
 %o: %.cpp
 	$(CXX) -c $(CXXFLAGS) -o $@ $<
 
-../lib/libemitter.a: $(OBJECTS)
+../lib/$(config)/libemitter.a: $(OBJECTS)
 	$(AR) $(ARFLAGS) $@ $(OBJECTS)
 
 clean:
 	rm -f *.o
-	rm -f ../lib/libemitter.a
+	rm -f ../lib/$(config)/libemitter.a
 

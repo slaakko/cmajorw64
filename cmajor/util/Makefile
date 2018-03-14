@@ -6,10 +6,10 @@ System.o TextUtils.o Time.o Unicode.o
 %o: %.cpp
 	$(CXX) -c $(CXXFLAGS) -o $@ $<
 
-../lib/libutil.a: $(OBJECTS)
+../lib/$(config)/libutil.a: $(OBJECTS)
 	$(AR) $(ARFLAGS) $@ $(OBJECTS)
 
 clean:
 	rm -f *.o
-	rm -f ../lib/libutil.a
+	rm -f ../lib/$(config)/libutil.a
 

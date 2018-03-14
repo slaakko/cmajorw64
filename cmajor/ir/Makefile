@@ -5,10 +5,10 @@ OBJECTS = Emitter.o GenObject.o
 %o: %.cpp
 	$(CXX) -c $(CXXFLAGS) -o $@ $<
 
-../lib/libir.a: $(OBJECTS)
+../lib/$(config)/libir.a: $(OBJECTS)
 	$(AR) $(ARFLAGS) $@ $(OBJECTS)
 
 clean:
 	rm -f *.o
-	rm -f ../lib/libir.a
+	rm -f ../lib/$(config)/libir.a
 

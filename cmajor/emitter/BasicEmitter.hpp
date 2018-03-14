@@ -87,6 +87,7 @@ public:
     Pad* CurrentPad() override { return currentPad; }
     virtual llvm::Function* GetPersonalityFunction() const = 0;
     virtual void GenerateCodeForCleanups() = 0;
+    virtual void InitializeGlobalVariables();
 protected:
     EmittingContext & emittingContext;
     SymbolTable* symbolTable;
@@ -102,6 +103,7 @@ protected:
     llvm::BasicBlock* continueTarget;
     llvm::BasicBlock* handlerBlock;
     llvm::BasicBlock* cleanupBlock;
+    llvm::BasicBlock* entryBasicBlock;
     bool newCleanupNeeded;
     std::vector<std::unique_ptr<Cleanup>> cleanups;
     std::vector<std::unique_ptr<Pad>> pads;
@@ -124,6 +126,7 @@ protected:
     std::unordered_map<int, llvm::Value*> utf16stringMap;
     std::unordered_map<int, llvm::Value*> utf32stringMap;
     int prevLineNumber;
+    llvm::AllocaInst* lastAlloca;
     bool destructorCallGenerated;
     bool lastInstructionWasRet;
     bool basicBlockOpen;
@@ -133,6 +136,7 @@ protected:
     void SetLineNumber(int32_t lineNumber) override;
     void SetTarget(BoundStatement* labeledStatement);
     void ClearFlags();
+    void InsertAllocaIntoEntryBlock(llvm::AllocaInst* allocaInst);
 };
 
 } } // namespace cmajor::emitter

@@ -7,10 +7,10 @@ SystemFileIndex.o Template.o Typedef.o TypeExpr.o Visitor.o
 %o: %.cpp
 	$(CXX) -c $(CXXFLAGS) -o $@ $<
 
-../lib/libast.a: $(OBJECTS)
+../lib/$(config)/libast.a: $(OBJECTS)
 	$(AR) $(ARFLAGS) $@ $(OBJECTS)
 
 clean:
 	rm -f *.o
-	rm -f ../lib/libast.a
+	rm -f ../lib/$(config)/libast.a
 

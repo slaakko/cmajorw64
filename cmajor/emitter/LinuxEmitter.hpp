@@ -24,6 +24,9 @@ public:
     void Visit(BoundRethrowStatement& boundRethrowStatement) override;
     void CreateCleanup() override;
     void GenerateCodeForCleanups() override;
+    void InitializeGlobalVariables() override;
+private:
+    llvm::GlobalVariable* exceptionTypeId;
 };
 
 } } // namespace cmajor::emitter

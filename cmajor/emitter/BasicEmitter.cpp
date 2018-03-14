@@ -21,9 +21,9 @@ BasicEmitter::BasicEmitter(EmittingContext& emittingContext_, const std::string&
     cmajor::ir::Emitter(emittingContext_.GetEmittingContextImpl()->Context()), emittingContext(emittingContext_), symbolTable(nullptr),
     compileUnitModule(new llvm::Module(compileUnitModuleName_, emittingContext.GetEmittingContextImpl()->Context())), symbolsModule(symbolsModule_), builder(Builder()), stack(Stack()),
     context(emittingContext.GetEmittingContextImpl()->Context()), compileUnit(nullptr), function(nullptr), trueBlock(nullptr), falseBlock(nullptr), breakTarget(nullptr), continueTarget(nullptr),
-    handlerBlock(nullptr), cleanupBlock(nullptr), newCleanupNeeded(false), currentPad(nullptr), genJumpingBoolCode(false), currentClass(nullptr), currentFunction(nullptr),
+    handlerBlock(nullptr), cleanupBlock(nullptr), entryBasicBlock(nullptr), newCleanupNeeded(false), currentPad(nullptr), genJumpingBoolCode(false), currentClass(nullptr), currentFunction(nullptr),
     currentBlock(nullptr), breakTargetBlock(nullptr), continueTargetBlock(nullptr), sequenceSecond(nullptr), currentCaseMap(nullptr), defaultDest(nullptr), prevLineNumber(0), destructorCallGenerated(false),
-    lastInstructionWasRet(false), basicBlockOpen(false)
+    lastInstructionWasRet(false), basicBlockOpen(false), lastAlloca(nullptr)
 {
     compileUnitModule->setTargetTriple(emittingContext.GetEmittingContextImpl()->TargetTriple());
     compileUnitModule->setDataLayout(emittingContext.GetEmittingContextImpl()->DataLayout());
@@ -68,6 +68,26 @@ void BasicEmitter::ClearFlags()
     destructorCallGenerated = false;
     lastInstructionWasRet = false;
     basicBlockOpen = false;
+}
+
+void BasicEmitter::InsertAllocaIntoEntryBlock(llvm::AllocaInst* allocaInst)
+{
+    if (lastAlloca)
+    {
+        allocaInst->insertAfter(lastAlloca);
+    }
+    else
+    {
+        if (entryBasicBlock->empty())
+        {
+            entryBasicBlock->getInstList().push_back(allocaInst);
+        }
+        else
+        {
+            entryBasicBlock->getInstList().insert(entryBasicBlock->getInstList().begin(), allocaInst);
+        }
+    }
+    lastAlloca = allocaInst;
 }
 
 void BasicEmitter::Visit(BoundCompileUnit& boundCompileUnit)
@@ -150,6 +170,7 @@ void BasicEmitter::Visit(BoundFunction& boundFunction)
     destructorCallGenerated = false;
     lastInstructionWasRet = false;
     basicBlockOpen = false;
+    lastAlloca = nullptr;
     cleanups.clear();
     pads.clear();
     labeledStatementMap.clear();
@@ -170,6 +191,7 @@ void BasicEmitter::Visit(BoundFunction& boundFunction)
     }
     SetFunction(function);
     llvm::BasicBlock* entryBlock = llvm::BasicBlock::Create(context, "entry", function);
+    entryBasicBlock = entryBlock;
     SetCurrentBasicBlock(entryBlock);
     if (currentClass)
     {
@@ -190,12 +212,14 @@ void BasicEmitter::Visit(BoundFunction& boundFunction)
         ParameterSymbol* parameter = functionSymbol->Parameters()[i];
         llvm::AllocaInst* allocaInst = builder.CreateAlloca(parameter->GetType()->IrType(*this));
         parameter->SetIrObject(allocaInst);
+        lastAlloca = allocaInst;
     }
     if (functionSymbol->ReturnParam())
     {
         ParameterSymbol* parameter = functionSymbol->ReturnParam();
         llvm::AllocaInst* allocaInst = builder.CreateAlloca(parameter->GetType()->IrType(*this));
         parameter->SetIrObject(allocaInst);
+        lastAlloca = allocaInst;
     }
     int nlv = functionSymbol->LocalVariables().size();
     for (int i = 0; i < nlv; ++i)
@@ -203,6 +227,7 @@ void BasicEmitter::Visit(BoundFunction& boundFunction)
         LocalVariableSymbol* localVariable = functionSymbol->LocalVariables()[i];
         llvm::AllocaInst* allocaInst = builder.CreateAlloca(localVariable->GetType()->IrType(*this));
         localVariable->SetIrObject(allocaInst);
+        lastAlloca = allocaInst;
     }
     if (!functionSymbol->DontThrow())
     {
@@ -299,6 +324,7 @@ void BasicEmitter::Visit(BoundFunction& boundFunction)
     {
         llvm::Function* personalityFunction = GetPersonalityFunction();
         function->setPersonalityFn(llvm::ConstantExpr::getBitCast(personalityFunction, builder.getInt8PtrTy()));
+        InitializeGlobalVariables();
     }
     if (functionSymbol->DontThrow() && !functionSymbol->HasTry() && cleanups.empty())
     {
@@ -1028,6 +1054,10 @@ llvm::Value* BasicEmitter::GetGlobalUStringConstant(int stringId)
         utf32stringMap[stringId] = stringValue;
         return stringValue;
     }
+}
+
+void BasicEmitter::InitializeGlobalVariables()
+{
 }
 
 void BasicEmitter::CreateExitFunctionCall()

@@ -3,9 +3,10 @@
 // Distributed under the MIT license
 // =================================
 
-#ifndef CMAJOR_RT_ASSERT_INCLUDED
-#define CMAJOR_RT_ASSERT_INCLUDED
+#ifndef CMAJOR_RT_ERROR_INCLUDED
+#define CMAJOR_RT_ERROR_INCLUDED
 #include <cmajor/rt/RtApi.hpp>
+#include <cmajor/eh/Exception.hpp>
 #include <string>
 #include <stdint.h>
 
@@ -27,10 +28,6 @@ extern "C" RT_API void* RtGetException();
 
 namespace cmajor { namespace rt {
 
-class Exception
-{
-};
-
 int32_t InstallError(const std::string& errorMessage);
 const char* GetError(int32_t errorId);
 void DisposeError(int32_t errorId);
@@ -39,4 +36,4 @@ void DoneError();
 
 } } // namespace cmajor::rt
 
-#endif // CMAJOR_RT_ASSERT_INCLUDED
+#endif // CMAJOR_RT_ERROR_INCLUDED

@@ -486,13 +486,19 @@ void Link(const std::string& executableFilePath, const std::string& libraryFileP
     {
         args.push_back(QuotedPath(libraryFilePaths[i]));
     }
-    std::string cmrtLibName = "libcmrt.so.2.1.0";
+    
     if (GetGlobalFlag(GlobalFlags::linkWithDebugRuntime))
     {
-        cmrtLibName = "libcmrtd.so.2.1.0";
+        std::string cmrtLibName = "libcmrtd.so.2.1.0";
+        args.push_back(QuotedPath(Path::Combine(Path::Combine(CmajorRootDir(), "lib/debug"), cmrtLibName)));
+        args.push_back(QuotedPath(Path::Combine(Path::Combine(CmajorRootDir(), "lib/debug"), "libgmpintf.a")));
     }
-    args.push_back(QuotedPath(Path::Combine(Path::Combine(CmajorRootDir(), "lib"), cmrtLibName)));
-    args.push_back(QuotedPath(Path::Combine(Path::Combine(CmajorRootDir(), "lib"), "libgmpintf.a")));
+    else
+    {
+        std::string cmrtLibName = "libcmrt.so.2.1.0";
+        args.push_back(QuotedPath(Path::Combine(Path::Combine(CmajorRootDir(), "lib/release"), cmrtLibName)));
+        args.push_back(QuotedPath(Path::Combine(Path::Combine(CmajorRootDir(), "lib/release"), "libgmpintf.a")));
+    }
     args.push_back("-lboost_filesystem -lboost_iostreams -lboost_system -lgmp -lbz2 -lz");
     args.push_back("-Xlinker --end-group");
     args.push_back("-o " + QuotedPath(executableFilePath));

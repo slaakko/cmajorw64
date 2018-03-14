@@ -2,8 +2,8 @@ include ../Makefile.common
 
 OBJECTS = Main.o
 
-LIBRARIES = ../lib/libutil.a ../lib/libcodedom.a ../lib/libparsing.a ../lib/libxpath.a ../lib/libdom.a ../lib/libxml.a \
-../lib/libast.a ../lib/libsymbols.a ../lib/libparser.a
+LIBRARIES = ../lib/$(config)/libutil.a ../lib/$(config)/libcodedom.a ../lib/$(config)/libparsing.a ../lib/$(config)/libxpath.a ../lib/$(config)/libdom.a ../lib/$(config)/libxml.a \
+../lib/$(config)/libast.a ../lib/$(config)/libsymbols.a ../lib/$(config)/libparser.a
 
 %o: %.cpp
 	$(CXX) -c $(CXXFLAGS) -o $@ $<
