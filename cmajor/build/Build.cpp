@@ -476,6 +476,12 @@ void Link(const std::string& executableFilePath, const std::string& libraryFileP
     bdp.remove_filename();
     boost::filesystem::create_directories(bdp);
     std::vector<std::string> args;
+    args.push_back("-L" + Path::Combine(CmajorRootDir(), "lib"));
+    char* cmajorLibDir = getenv("CMAJOR_LIB");
+    if (cmajorLibDir && *cmajorLibDir)
+    {
+        args.push_back("-L" + std::string(cmajorLibDir));
+    }
     std::string dynamicListFilePath = GetFullPath(boost::filesystem::path(libraryFilePath).replace_extension(".export").generic_string());
     CreateDynamicListFile(dynamicListFilePath, module);
     args.push_back("-Wl,--dynamic-list=" + dynamicListFilePath);
@@ -486,18 +492,17 @@ void Link(const std::string& executableFilePath, const std::string& libraryFileP
     {
         args.push_back(QuotedPath(libraryFilePaths[i]));
     }
-    
     if (GetGlobalFlag(GlobalFlags::linkWithDebugRuntime))
     {
-        std::string cmrtLibName = "libcmrtd.so.2.1.0";
-        args.push_back(QuotedPath(Path::Combine(Path::Combine(CmajorRootDir(), "lib"), cmrtLibName)));
-        args.push_back(QuotedPath(Path::Combine(Path::Combine(CmajorRootDir(), "lib"), "libgmpintf.a")));
+        std::string cmrtLibName = "cmrtd";
+        args.push_back("-l" + cmrtLibName);
+        args.push_back("-lgmpintf");
     }
     else
     {
-        std::string cmrtLibName = "libcmrt.so.2.1.0";
-        args.push_back(QuotedPath(Path::Combine(Path::Combine(CmajorRootDir(), "lib"), cmrtLibName)));
-        args.push_back(QuotedPath(Path::Combine(Path::Combine(CmajorRootDir(), "lib"), "libgmpintf.a")));
+        std::string cmrtLibName = "cmrt";
+        args.push_back("-l" + cmrtLibName);
+        args.push_back("-lgmpintf");
     }
     args.push_back("-lboost_filesystem -lboost_iostreams -lboost_system -lgmp -lbz2 -lz");
     args.push_back("-Xlinker --end-group");
