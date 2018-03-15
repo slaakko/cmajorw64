@@ -1,4 +1,4 @@
-Cmajor for Windows x64
-======================
+Cmajor for Windows x64 and Linux
+================================
 
-Source code for Cmajor-w64 compiler and tools.
+Source code for Cmajor compiler and tools.
