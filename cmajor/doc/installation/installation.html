@@ -1,0 +1,74 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>Installation</title>
+    <link rel="stylesheet" type="text/css" href="../style/library.css" />
+</head>
+<body>
+    <h1>Installation</h1>
+
+    <h2>
+        Installation on Windows
+    </h2>
+
+    <p>
+        <a href="https://sourceforge.net/projects/cmajor/files/2.1.0/cmajor-2.1.0-win-x64-setup.exe">Download</a> the setup program and run it.
+        You can specify installation directory that is by default <b>C:\cmajor</b>.
+        Note: the compiler needs write access to installation directory and its subdirectories,
+        so C:\Program Files\ is not a good place to install.
+        The setup creates an environment variable CMAJOR_ROOT that points to the installation directory
+        and adds the CMAJOR_ROOT\bin directory to PATH. The setup adds a shortcut to <em>CmajorDevEnv</em> 
+        (IDE) to the desktop.
+    </p>
+
+    <h2>
+        Installation on Linux
+    </h2>
+
+    <p>
+        The Cmajor tools need the following libraries to be installed:
+    </p>
+
+    <ul>
+        <li><a href="https://zlib.net/">ZLib</a> (zlib1g-dev package)</li>
+        <li><a href="http://www.bzip.org/">BZip2</a> (libbz2-dev package)</li>
+        <li><a href="https://www.gnutls.org/">GnuTLS</a> (libgnutls28-dev package)</li>
+        <li><a href="http://www.boost.org/">Boost</a> (libboost-dev package) (only <b>filesystem</b> and <b>iostreams</b> libraries need to be installed)</li>
+        <li><a href="http://releases.llvm.org/download.html#6.0.0">Clang and LLVM version 4.0 or newer</a></li>
+    </ul>
+
+    <p>
+        These libraries can be installed by using the package manager of your distro (for example <b>apt-get</b> on Ubuntu) or built and installed from sources.
+    </p>
+
+    <h4>
+        Installation on x86_64 Ubuntu Linux 14.04
+    </h4>
+
+    <ul>
+        <li><a href="https://sourceforge.net/projects/cmajor/files/2.1.0/cmajor-2.1.0-ubuntu-14.04-x86_64-binaries.bz2">Download</a> pre-built binaries for x86_64 Ubuntu 14.04.</li>
+        <li>Extract the package to the directory of your choice here called <em>cmajor-2.1.0</em>.</li>
+        <li>Create an environment variable named 'CMAJOR_ROOT' and set it to point to <em>/path/to/cmajor-2.1.0</em> directory. You need to add it to your shell script to make it permanent.</li>
+        <li>Insert <em>/path/to/cmajor-2.1.0/<b>bin</b></em> directory to your PATH environment variable.</li>
+        <li>Insert <em>/path/to/cmajor-2.1.0/<b>lib</b></em> directory to your LD_LIBRARY_PATH environment variable.</li>
+    </ul>
+
+    <h4>
+        Installation from sources
+    </h4>
+
+    <ul>
+        <li><a href="https://sourceforge.net/projects/cmajor/files/2.1.0/cmajor-2.1.0-src.bz2">Download</a> Cmajor source code + unicode db.</li>
+        <li>Extract the package to the directory of your choice here called <em>cmajor-2.1.0</em>.</li>
+        <li>Create an environment variable named 'CMAJOR_ROOT' and set it to point to <em>/path/to/cmajor-2.1.0/cmajor</em> directory. You need to add it to your shell script to make it permanent.</li>
+        <li>Change to <em>cmajor-2.1.0/cmajor</em> directory and run <b>make</b> from there.</li>
+        <li>Install the binaries and libraries by running <b>sudo make install</b>. By default binaries are installed to <em>/usr/local/bin</em> and the libraries to <em>/usr/local/lib</em>.
+        You can install to a different location by giving command <b>sudo make prefix=/where/to/install install</b> instead.</li>
+        <li>Insert <em>/where/you/installed/<b>lib</b></em> directory to your LD_LIBRARY_PATH environment variable.</li>
+        <li>Build Cmajor system libraries by giving command <b>make sys</b>.</li>
+</ul>
+
+</body>
+</html>
