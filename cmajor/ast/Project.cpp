@@ -5,6 +5,7 @@
 
 #include <cmajor/ast/Project.hpp>
 #include <cmajor/util/Path.hpp>
+#include <boost/filesystem.hpp>
 
 namespace cmajor { namespace ast {
 
@@ -12,12 +13,31 @@ using namespace cmajor::util;
 
 std::string CmajorRootDir()
 {
+#ifdef _WIN32
     char* e = getenv("CMAJOR_ROOT");
     if (e == nullptr || !*e)
     {
         throw std::runtime_error("please set 'CMAJOR_ROOT' environment variable to contain /path/to/cmajor directory.");
     }
     return std::string(e);
+#else
+    char* e = getenv("CMAJOR_ROOT");
+    if (e && *e)
+    {
+        return std::string(e);
+    }
+    else
+    {
+        if (boost::filesystem::exists("/var/lib/cmajor"))
+        {
+            return "/var/lib/cmajor";
+        }
+        else
+        {
+            throw std::runtime_error("please set 'CMAJOR_ROOT' environment variable to contain /path/to/cmajor directory or reinstall cmajor.");
+        }
+    }
+#endif
 }
 
 std::string CmajorSystemLibDir(const std::string& config)

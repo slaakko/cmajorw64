@@ -477,7 +477,7 @@ void Link(const std::string& executableFilePath, const std::string& libraryFileP
     boost::filesystem::create_directories(bdp);
     std::vector<std::string> args;
     args.push_back("-L" + Path::Combine(CmajorRootDir(), "lib"));
-    char* cmajorLibDir = getenv("CMAJOR_LIB");
+    char* cmajorLibDir = getenv("CMAJOR_LIBDIR");
     if (cmajorLibDir && *cmajorLibDir)
     {
         args.push_back("-L" + std::string(cmajorLibDir));
@@ -805,6 +805,11 @@ void SetDefines(const std::string& definesFilePath)
         DefineSymbol(U"RELEASE");
         DefineSymbol(U"PROFILE");
     }
+#ifdef _WIN32
+    DefineSymbol(U"WINDOWS");
+#else
+    DefineSymbol(U"LINUX");
+#endif
     std::ifstream definesFile(definesFilePath);
     if (definesFile)
     {

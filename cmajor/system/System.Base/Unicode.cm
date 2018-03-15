@@ -27,8 +27,12 @@ namespace System.Unicode
         string cmajorRoot = RtGetEnvironmentVariable("CMAJOR_ROOT");
         if (cmajorRoot.IsEmpty())
         {
+#if (WINDOWS)
             ThrowUnicodeException("CMAJOR_ROOT environment variable not set (set it to /path/to/cmajor directory)");
             return string();
+#else
+            return "/var/lib/cmajor/unicode";
+#endif            
         }
         return Path.Combine(cmajorRoot, "unicode");
     }
@@ -1999,7 +2003,12 @@ namespace System.Unicode
                 LockGuard<Mutex> lock(characterTableLock);
                 if (page == null)
                 {
-                    BinaryReader reader = File.OpenBinary(PathToUcdBinFile());
+                    string pathToUcdBinFile = PathToUcdBinFile();
+                    if (!File.Exists(pathToUcdBinFile))
+                    {
+                        throw UnicodeException("Error: Cmajor Unicode database file '" + pathToUcdBinFile + "' does not exist.");
+                    }
+                    BinaryReader reader = File.OpenBinary(pathToUcdBinFile);
                     if (!headerRead)
                     {
                         ReadHeader(reader);
@@ -2035,7 +2044,12 @@ namespace System.Unicode
                 LockGuard<Mutex> lock(characterTableLock);
                 if (extendedPage == null)
                 {
-                    BinaryReader reader = File.OpenBinary(PathToUcdBinFile());
+                    string pathToUcdBinFile = PathToUcdBinFile();
+                    if (!File.Exists(pathToUcdBinFile))
+                    {
+                        throw UnicodeException("Error: Cmajor Unicode database file '" + pathToUcdBinFile + "' does not exist.");
+                    }
+                    BinaryReader reader = File.OpenBinary(pathToUcdBinFile);
                     if (!headerRead)
                     {
                         ReadHeader(reader);
