@@ -32,7 +32,7 @@ build:
 	$(MAKE) -C eh
 	$(MAKE) -C rt
 
-prefix := /usr
+prefix := /usr/local
 
 ifeq ($(config),debug)
     cmrtsoname=libcmrtd
@@ -45,8 +45,24 @@ install:
 	cp bin/* $(prefix)/bin
 	mkdir -p $(prefix)/lib
 	cp lib/$(cmrtsoname).so.2.1.0 $(prefix)/lib
+	cp lib/libgmpintf.a $(prefix)/lib
 	ln -f $(prefix)/lib/$(cmrtsoname).so.2.1.0 $(prefix)/lib/$(cmrtsoname).so.2
 	ln -f $(prefix)/lib/$(cmrtsoname).so.2.1.0 $(prefix)/lib/$(cmrtsoname).so
+	mkdir -p /var/lib/cmajor
+	mkdir -p /var/lib/cmajor/config
+	mkdir -p /var/lib/cmajor/unicode
+	cp unicode/cmajor_ucd.bin /var/lib/cmajor/unicode
+	chmod -R a+rwx /var/lib/cmajor
+
+sys:
+	cmc --verbose system/System.cms
+	cmc --verbose --config=release system/System.cms
+
+sysinstall:
+	mkdir -p /var/lib/cmajor
+	mkdir -p /var/lib/cmajor/system
+	cp --recursive --verbose system /var/lib/cmajor
+	chmod -R a+rwx /var/lib/cmajor/system
 
 clean:
 	$(MAKE) -C util clean
