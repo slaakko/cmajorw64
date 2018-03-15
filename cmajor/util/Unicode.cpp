@@ -2009,25 +2009,7 @@ std::string CmajorRoot()
 
 std::string CmajorUcdFilePath()
 {
-#ifdef _WIN32
     return (boost::filesystem::path(CmajorRoot()) / boost::filesystem::path("unicode") / boost::filesystem::path("cmajor_ucd.bin")).generic_string();
-#else
-    std::string ucdFilePath;
-    const char* cmajorRootEnv = getenv("CMAJOR_ROOT");
-    if (cmajorRootEnv && *cmajorRootEnv)
-    {
-        ucdFilePath = (boost::filesystem::path(CmajorRoot()) / boost::filesystem::path("unicode") / boost::filesystem::path("cmajor_ucd.bin")).generic_string();
-    }
-    if (!boost::filesystem::exists(ucdFilePath))
-    {
-        ucdFilePath =  "/var/lib/cmajor/unicode/cmajor_ucd.bin";
-        if (!boost::filesystem::exists(ucdFilePath))
-        {
-            throw UnicodeException("cmajor_ucd.bin not found from $CMAJOR_ROOT/unicode directory or from /var/lib/cmajor/unicode directory, please reinstall cmajor.");
-        }
-    }
-    return ucdFilePath;
-#endif
 }
 
 CharacterTable::CharacterTable() : headerRead(false), extendedHeaderStart(0), extendedHeaderEnd(0), extendedHeaderRead(false)

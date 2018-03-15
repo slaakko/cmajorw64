@@ -27,12 +27,8 @@ namespace System.Unicode
         string cmajorRoot = RtGetEnvironmentVariable("CMAJOR_ROOT");
         if (cmajorRoot.IsEmpty())
         {
-#if (WINDOWS)
             ThrowUnicodeException("CMAJOR_ROOT environment variable not set (set it to /path/to/cmajor directory)");
             return string();
-#else
-            return "/var/lib/cmajor/unicode";
-#endif            
         }
         return Path.Combine(cmajorRoot, "unicode");
     }
