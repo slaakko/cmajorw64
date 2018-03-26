@@ -28,6 +28,7 @@ public:
     void Dump(CodeFormatter& formatter) override;
     llvm::Type* IrType(Emitter& emitter) override;
     llvm::Constant* CreateDefaultIrValue(Emitter& emitter) override;
+    //llvm::DIType* CreateDIType(Emitter& emitter) override; todo
     void SetSpecifiers(Specifiers specifiers);
     int Arity() const { return parameters.size(); }
     const std::vector<ParameterSymbol*>& Parameters() const { return parameters; }
@@ -36,7 +37,7 @@ public:
     void SetReturnType(TypeSymbol* returnType_) { returnType = returnType_; }
     bool ReturnsClassInterfaceOrClassDelegateByValue() const;
     void SetReturnParam(ParameterSymbol* returnParam_);
-    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags);
+    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span);
 private:
     TypeSymbol* returnType;
     std::vector<ParameterSymbol*> parameters;
@@ -53,7 +54,7 @@ public:
     void Read(SymbolReader& reader) override;
     void EmplaceType(TypeSymbol* typeSymbol, int index) override;
     SymbolAccess DeclaredAccess() const override { return SymbolAccess::public_; }
-    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags) override;
+    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
     bool IsBasicTypeOperation() const override { return true; }
 private:
     DelegateTypeSymbol* delegateType;
@@ -65,7 +66,7 @@ public:
     DelegateTypeCopyConstructor(const Span& span_, const std::u32string& name_);
     DelegateTypeCopyConstructor(DelegateTypeSymbol* delegateType);
     SymbolAccess DeclaredAccess() const override { return SymbolAccess::public_; }
-    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags) override;
+    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
     bool IsBasicTypeOperation() const override { return true; }
 };
 
@@ -75,7 +76,7 @@ public:
     DelegateTypeMoveConstructor(const Span& span_, const std::u32string& name_);
     DelegateTypeMoveConstructor(DelegateTypeSymbol* delegateType);
     SymbolAccess DeclaredAccess() const override { return SymbolAccess::public_; }
-    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags) override;
+    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
     bool IsBasicTypeOperation() const override { return true; }
 };
 
@@ -85,7 +86,7 @@ public:
     DelegateTypeCopyAssignment(const Span& span_, const std::u32string& name_);
     DelegateTypeCopyAssignment(DelegateTypeSymbol* delegateType, TypeSymbol* voidType);
     SymbolAccess DeclaredAccess() const override { return SymbolAccess::public_; }
-    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags) override;
+    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
     bool IsBasicTypeOperation() const override { return true; }
 };
 
@@ -95,7 +96,7 @@ public:
     DelegateTypeMoveAssignment(const Span& span_, const std::u32string& name_);
     DelegateTypeMoveAssignment(DelegateTypeSymbol* delegateType, TypeSymbol* voidType);
     SymbolAccess DeclaredAccess() const override { return SymbolAccess::public_; }
-    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags) override;
+    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
     bool IsBasicTypeOperation() const override { return true; }
 };
 
@@ -105,7 +106,7 @@ public:
     DelegateTypeReturn(const Span& span_, const std::u32string& name_);
     DelegateTypeReturn(DelegateTypeSymbol* delegateType);
     SymbolAccess DeclaredAccess() const override { return SymbolAccess::public_; }
-    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags) override;
+    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
     bool IsBasicTypeOperation() const override { return true; }
 };
 
@@ -115,7 +116,7 @@ public:
     DelegateTypeEquality(const Span& span_, const std::u32string& name_);
     DelegateTypeEquality(DelegateTypeSymbol* delegateType, TypeSymbol* boolType);
     SymbolAccess DeclaredAccess() const override { return SymbolAccess::public_; }
-    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags) override;
+    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
     bool IsBasicTypeOperation() const override { return true; }
 };
 
@@ -128,7 +129,7 @@ public:
     uint8_t ConversionDistance() const override { return 1; }
     TypeSymbol* ConversionSourceType() const override { return sourceType; }
     TypeSymbol* ConversionTargetType() const override { return targetType; }
-    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags) override;
+    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
     bool IsBasicTypeOperation() const override { return true; }
 private:
     TypeSymbol* sourceType;
@@ -152,6 +153,7 @@ public:
     void Dump(CodeFormatter& formatter) override;
     llvm::Type* IrType(Emitter& emitter) override;
     llvm::Constant* CreateDefaultIrValue(Emitter& emitter) override;
+    //llvm::DIType* CreateDIType(Emitter& emitter) override; todo
     void SetSpecifiers(Specifiers specifiers);
     int Arity() const { return parameters.size(); }
     const std::vector<ParameterSymbol*>& Parameters() const { return parameters; }
@@ -163,7 +165,7 @@ public:
     DelegateTypeSymbol* DelegateType() { return delegateType; }
     ClassTypeSymbol* ObjectDelegatePairType() { Assert(objectDelegatePairType, "object delegate pair type not set");  return objectDelegatePairType; }
     FunctionSymbol* CopyConstructor() { Assert(copyConstructor, "class delegate copy constructor not set");  return copyConstructor; }
-    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags);
+    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span);
 private:
     TypeSymbol* returnType;
     std::vector<ParameterSymbol*> parameters;
@@ -183,7 +185,7 @@ public:
     void Read(SymbolReader& reader) override;
     void EmplaceType(TypeSymbol* typeSymbol, int index) override;
     SymbolAccess DeclaredAccess() const override { return SymbolAccess::public_; }
-    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags) override;
+    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
     bool IsBasicTypeOperation() const override { return true; }
     bool IsConstructorDestructorOrNonstaticMemberFunction() const override { return true; }
 private:
@@ -196,7 +198,7 @@ public:
     ClassDelegateTypeCopyConstructor(const Span& span_, const std::u32string& name_);
     ClassDelegateTypeCopyConstructor(ClassDelegateTypeSymbol* classDelegateType);
     SymbolAccess DeclaredAccess() const override { return SymbolAccess::public_; }
-    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags) override;
+    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
     bool IsBasicTypeOperation() const override { return true; }
     bool IsConstructorDestructorOrNonstaticMemberFunction() const override { return true; }
     bool IsClassDelegateCopyConstructor() const override { return true; }
@@ -208,7 +210,7 @@ public:
     ClassDelegateTypeMoveConstructor(const Span& span_, const std::u32string& name_);
     ClassDelegateTypeMoveConstructor(ClassDelegateTypeSymbol* classDelegateType);
     SymbolAccess DeclaredAccess() const override { return SymbolAccess::public_; }
-    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags) override;
+    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
     bool IsBasicTypeOperation() const override { return true; }
     bool IsConstructorDestructorOrNonstaticMemberFunction() const override { return true; }
 };
@@ -219,7 +221,7 @@ public:
     ClassDelegateTypeCopyAssignment(const Span& span_, const std::u32string& name_);
     ClassDelegateTypeCopyAssignment(ClassDelegateTypeSymbol* classDelegateType, TypeSymbol* voidType);
     SymbolAccess DeclaredAccess() const override { return SymbolAccess::public_; }
-    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags) override;
+    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
     bool IsBasicTypeOperation() const override { return true; }
     bool IsConstructorDestructorOrNonstaticMemberFunction() const override { return true; }
 };
@@ -230,7 +232,7 @@ public:
     ClassDelegateTypeMoveAssignment(const Span& span_, const std::u32string& name_);
     ClassDelegateTypeMoveAssignment(ClassDelegateTypeSymbol* classDelegateType, TypeSymbol* voidType);
     SymbolAccess DeclaredAccess() const override { return SymbolAccess::public_; }
-    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags) override;
+    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
     bool IsBasicTypeOperation() const override { return true; }
     bool IsConstructorDestructorOrNonstaticMemberFunction() const override { return true; }
 };
@@ -241,7 +243,7 @@ public:
     ClassDelegateTypeEquality(const Span& span_, const std::u32string& name_);
     ClassDelegateTypeEquality(ClassDelegateTypeSymbol* classDelegateType, TypeSymbol* boolType);
     SymbolAccess DeclaredAccess() const override { return SymbolAccess::public_; }
-    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags) override;
+    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
     bool IsBasicTypeOperation() const override { return true; }
     bool IsConstructorDestructorOrNonstaticMemberFunction() const override { return true; }
 };
@@ -257,7 +259,7 @@ public:
     TypeSymbol* ConversionSourceType() const override { return sourceType; }
     TypeSymbol* ConversionTargetType() const override { return targetType; }
     bool IsMemberFunctionToClassDelegateConversion() const override { return true; }
-    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags) override;
+    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
     bool IsBasicTypeOperation() const override { return true; }
 private:
     TypeSymbol* sourceType;

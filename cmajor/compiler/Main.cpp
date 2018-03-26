@@ -43,7 +43,7 @@ struct InitDone
     }
 };
 
-const char* version = "2.1.0";
+const char* version = "2.2.0";
 
 void PrintHelp()
 {
@@ -85,6 +85,10 @@ void PrintHelp()
         "   use Microsoft's link.exe as the linker\n" << 
         "--define SYMBOL (-D SYMBOL)\n" <<
         "   define a conditional compilation symbol SYMBOL.\n" <<
+        "--gen-debug-info (-g)\n" <<
+        "   generate debug info (on by default in debug configuration)\n" <<
+        "--no-debug-info (-n)\n" <<
+        "   don't generate debug info even for debug build\n" <<
         std::endl;
 }
 
@@ -107,7 +111,9 @@ int main(int argc, const char** argv)
         }
         else
         {
+            SetCompilerVersion(version);
             bool prevWasDefine = false;
+            bool noDebugInfo = false;
             for (int i = 1; i < argc; ++i)
             {
                 std::string arg = argv[i];
@@ -166,6 +172,14 @@ int main(int argc, const char** argv)
                     else if (arg == "--define" || arg == "-D")
                     {
                         prevWasDefine = true;
+                    }
+                    else if (arg == "--gen-debug-info" || arg == "-g")
+                    {
+                        SetGlobalFlag(GlobalFlags::generateDebugInfo);
+                    }
+                    else if (arg == "--no-debug-info" || arg == "-n")
+                    {
+                        noDebugInfo = true;
                     }
                     else if (arg.find('=') != std::string::npos)
                     {
@@ -232,6 +246,10 @@ int main(int argc, const char** argv)
 #else
                 std::cout << "Cmajor compiler version " << version << std::endl;
 #endif
+            }
+            if (!GetGlobalFlag(GlobalFlags::release) && !noDebugInfo)
+            {
+                SetGlobalFlag(GlobalFlags::generateDebugInfo);
             }
             for (const std::string& projectOrSolution : projectsAndSolutions)
             {

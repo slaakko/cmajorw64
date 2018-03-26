@@ -51,6 +51,7 @@ public:
     std::string TypeString() const override { return "bool"; }
     llvm::Type* IrType(Emitter& emitter) override { return llvm::Type::getInt1Ty(emitter.Context()); }
     llvm::Constant* CreateDefaultIrValue(Emitter& emitter) override { return emitter.Builder().getInt1(false); }
+    llvm::DIType* CreateDIType(Emitter& emitter) override;
     bool IsSwitchConditionType() const override { return true; }
     ValueType GetValueType() const override;
     Value* MakeValue() const override;
@@ -63,6 +64,7 @@ public:
     std::string TypeString() const override { return "sbyte"; }
     llvm::Type* IrType(Emitter& emitter) override { return llvm::Type::getInt8Ty(emitter.Context()); }
     llvm::Constant* CreateDefaultIrValue(Emitter& emitter) override { return emitter.Builder().getInt8(0); }
+    llvm::DIType* CreateDIType(Emitter& emitter) override;
     bool IsIntegralType() const override { return true; }
     bool IsSwitchConditionType() const override { return true; }
     ValueType GetValueType() const override;
@@ -76,6 +78,7 @@ public:
     std::string TypeString() const override { return "byte"; }
     llvm::Type* IrType(Emitter& emitter) override { return llvm::Type::getInt8Ty(emitter.Context()); }
     llvm::Constant* CreateDefaultIrValue(Emitter& emitter) override { return emitter.Builder().getInt8(0); }
+    llvm::DIType* CreateDIType(Emitter& emitter) override;
     bool IsIntegralType() const override { return true; }
     bool IsUnsignedType() const override { return true; }
     bool IsSwitchConditionType() const override { return true; }
@@ -90,6 +93,7 @@ public:
     std::string TypeString() const override { return "short"; }
     llvm::Type* IrType(Emitter& emitter) override { return llvm::Type::getInt16Ty(emitter.Context()); }
     llvm::Constant* CreateDefaultIrValue(Emitter& emitter) override { return emitter.Builder().getInt16(0); }
+    llvm::DIType* CreateDIType(Emitter& emitter) override;
     bool IsIntegralType() const override { return true; }
     bool IsSwitchConditionType() const override { return true; }
     ValueType GetValueType() const override;
@@ -103,6 +107,7 @@ public:
     std::string TypeString() const override { return "ushort"; }
     llvm::Type* IrType(Emitter& emitter) override { return llvm::Type::getInt16Ty(emitter.Context()); }
     llvm::Constant* CreateDefaultIrValue(Emitter& emitter) override { return emitter.Builder().getInt16(0); }
+    llvm::DIType* CreateDIType(Emitter& emitter) override;
     bool IsIntegralType() const override { return true; }
     bool IsUnsignedType() const override { return true; }
     bool IsSwitchConditionType() const override { return true; }
@@ -117,6 +122,7 @@ public:
     std::string TypeString() const override { return "int"; }
     llvm::Type* IrType(Emitter& emitter) override { return llvm::Type::getInt32Ty(emitter.Context()); }
     llvm::Constant* CreateDefaultIrValue(Emitter& emitter) override { return emitter.Builder().getInt32(0); }
+    llvm::DIType* CreateDIType(Emitter& emitter) override;
     bool IsIntegralType() const override { return true; }
     bool IsSwitchConditionType() const override { return true; }
     ValueType GetValueType() const override;
@@ -130,6 +136,7 @@ public:
     std::string TypeString() const override { return "uint"; }
     llvm::Type* IrType(Emitter& emitter) override { return llvm::Type::getInt32Ty(emitter.Context()); }
     llvm::Constant* CreateDefaultIrValue(Emitter& emitter) override { return emitter.Builder().getInt32(0); }
+    llvm::DIType* CreateDIType(Emitter& emitter) override;
     bool IsIntegralType() const override { return true; }
     bool IsUnsignedType() const override { return true; }
     bool IsSwitchConditionType() const override { return true; }
@@ -144,6 +151,7 @@ public:
     std::string TypeString() const override { return "long"; }
     llvm::Type* IrType(Emitter& emitter) override { return llvm::Type::getInt64Ty(emitter.Context()); }
     llvm::Constant* CreateDefaultIrValue(Emitter& emitter) override { return emitter.Builder().getInt64(0); }
+    llvm::DIType* CreateDIType(Emitter& emitter) override;
     bool IsIntegralType() const override { return true; }
     bool IsSwitchConditionType() const override { return true; }
     ValueType GetValueType() const override;
@@ -157,6 +165,7 @@ public:
     std::string TypeString() const override { return "ulong"; }
     llvm::Type* IrType(Emitter& emitter) override { return llvm::Type::getInt64Ty(emitter.Context()); }
     llvm::Constant* CreateDefaultIrValue(Emitter& emitter) override { return emitter.Builder().getInt64(0); }
+    llvm::DIType* CreateDIType(Emitter& emitter) override;
     bool IsIntegralType() const override { return true; }
     bool IsUnsignedType() const override { return true; }
     bool IsSwitchConditionType() const override { return true; }
@@ -171,6 +180,7 @@ public:
     std::string TypeString() const override { return "float"; }
     llvm::Type* IrType(Emitter& emitter) override { return llvm::Type::getFloatTy(emitter.Context()); }
     llvm::Constant* CreateDefaultIrValue(Emitter& emitter) override { return llvm::ConstantFP::get(llvm::Type::getFloatTy(emitter.Context()), 0.0); }
+    llvm::DIType* CreateDIType(Emitter& emitter) override;
     bool IsFloatingPointType() const override { return true; }
     ValueType GetValueType() const override;
     Value* MakeValue() const override;
@@ -183,6 +193,7 @@ public:
     std::string TypeString() const override { return "double"; }
     llvm::Type* IrType(Emitter& emitter) override { return llvm::Type::getDoubleTy(emitter.Context()); }
     llvm::Constant* CreateDefaultIrValue(Emitter& emitter) override { return llvm::ConstantFP::get(llvm::Type::getDoubleTy(emitter.Context()), 0.0); }
+    llvm::DIType* CreateDIType(Emitter& emitter) override;
     bool IsFloatingPointType() const override { return true; }
     ValueType GetValueType() const override;
     Value* MakeValue() const override;
@@ -195,6 +206,7 @@ public:
     std::string TypeString() const override { return "char"; }
     llvm::Type* IrType(Emitter& emitter) override { return llvm::Type::getInt8Ty(emitter.Context()); }
     llvm::Constant* CreateDefaultIrValue(Emitter& emitter) override { return emitter.Builder().getInt8(0); }
+    llvm::DIType* CreateDIType(Emitter& emitter) override;
     bool IsSwitchConditionType() const override { return true; }
     ValueType GetValueType() const override;
     Value* MakeValue() const override;
@@ -207,6 +219,7 @@ public:
     std::string TypeString() const override { return "wchar"; }
     llvm::Type* IrType(Emitter& emitter) override { return llvm::Type::getInt16Ty(emitter.Context()); }
     llvm::Constant* CreateDefaultIrValue(Emitter& emitter) override { return emitter.Builder().getInt16(0); }
+    llvm::DIType* CreateDIType(Emitter& emitter) override;
     bool IsSwitchConditionType() const override { return true; }
     ValueType GetValueType() const override;
     Value* MakeValue() const override;
@@ -219,6 +232,7 @@ public:
     std::string TypeString() const override { return "uchar"; }
     llvm::Type* IrType(Emitter& emitter) override { return llvm::Type::getInt32Ty(emitter.Context()); }
     llvm::Constant* CreateDefaultIrValue(Emitter& emitter) override { return emitter.Builder().getInt32(0); }
+    llvm::DIType* CreateDIType(Emitter& emitter) override;
     bool IsSwitchConditionType() const override { return true; }
     ValueType GetValueType() const override;
     Value* MakeValue() const override;
@@ -231,6 +245,7 @@ public:
     std::string TypeString() const override { return "void"; }
     llvm::Type* IrType(Emitter& emitter) override { return llvm::Type::getVoidTy(emitter.Context()); }
     llvm::Constant* CreateDefaultIrValue(Emitter& emitter) override { Assert(false, "tried to create default value of void"); return llvm::Constant::getNullValue(emitter.Builder().getInt8PtrTy()); }
+    llvm::DIType* CreateDIType(Emitter& emitter) override;
     bool IsVoidType() const override { return true; }
 };
 

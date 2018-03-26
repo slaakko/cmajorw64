@@ -9,7 +9,9 @@
 namespace cmajor { namespace binder {
 
 class BoundCompileUnit;
+class BoundNamespace;
 class BoundClass;
+class BoundEnumTypeDefinition;
 class BoundFunction;
 class BoundSequenceStatement;
 class BoundCompoundStatement;
@@ -70,7 +72,9 @@ class BoundNodeVisitor
 public:
     virtual ~BoundNodeVisitor();
     virtual void Visit(BoundCompileUnit& boundCompileUnit) {}
+    virtual void Visit(BoundNamespace& boundNamespace) {}
     virtual void Visit(BoundClass& boundClass) {}
+    virtual void Visit(BoundEnumTypeDefinition& boundEnumTypeDefinition) {}
     virtual void Visit(BoundFunction& boundFunction) {}
     virtual void Visit(BoundSequenceStatement& boundSequenceStatement) {}
     virtual void Visit(BoundCompoundStatement& boundCompoundStatement) {}

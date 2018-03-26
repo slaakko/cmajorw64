@@ -9,11 +9,13 @@
 #include <cmajor/symbols/SymbolReader.hpp>
 #include <cmajor/symbols/Exception.hpp>
 #include <cmajor/symbols/SymbolCollector.hpp>
+#include <cmajor/parser/FileRegistry.hpp>
 #include <cmajor/util/Unicode.hpp>
 
 namespace cmajor { namespace symbols {
 
 using namespace cmajor::unicode;
+using namespace cmajor::parser;
 
 EnumTypeSymbol::EnumTypeSymbol(const Span& span_, const std::u32string& name_) : TypeSymbol(SymbolType::enumTypeSymbol, span_, name_), underlyingType()
 {
@@ -152,6 +154,13 @@ void EnumTypeSymbol::SetSpecifiers(Specifiers specifiers)
     }
 }
 
+std::vector<EnumConstantSymbol*> EnumTypeSymbol::GetEnumConstants()
+{
+    SymbolCollector collector;
+    TypeSymbol::Accept(&collector);
+    return collector.EnumerationConstants();
+}
+
 ValueType EnumTypeSymbol::GetValueType() const
 {
     return underlyingType->GetValueType();
@@ -165,6 +174,39 @@ Value* EnumTypeSymbol::MakeValue() const
 std::u32string EnumTypeSymbol::Id() const
 {
     return MangledName();
+}
+
+llvm::DIType* EnumTypeSymbol::CreateDIType(Emitter& emitter)
+{
+    uint64_t sizeInBits = SizeInBits(emitter);
+    uint32_t alignInBits = AlignmentInBits(emitter);
+    std::vector<llvm::Metadata*> elements;
+    std::vector<EnumConstantSymbol*> enumConstants = GetEnumConstants();
+    for (EnumConstantSymbol* enumConstant : enumConstants)
+    {
+        int64_t value = 0;
+        if (underlyingType->IsUnsignedType())
+        {
+            Value* val = enumConstant->GetValue()->As(GetSymbolTable()->GetTypeByName(U"ulong"), false, GetSpan(), true);
+            if (val)
+            {
+                ULongValue* ulongValue = static_cast<ULongValue*>(val);
+                value = static_cast<int64_t>(ulongValue->GetValue());
+            }
+        }
+        else
+        {
+            Value* val = enumConstant->GetValue()->As(GetSymbolTable()->GetTypeByName(U"long"), false, GetSpan(), true);
+            if (val)
+            {
+                LongValue* longValue = static_cast<LongValue*>(val);
+                value = longValue->GetValue();
+            }
+        }
+        elements.push_back(emitter.DIBuilder()->createEnumerator(ToUtf8(enumConstant->Name()), value));
+    }
+    return emitter.DIBuilder()->createEnumerationType(nullptr, ToUtf8(Name()), emitter.GetFile(GetSpan().FileIndex()), GetSpan().LineNumber(), sizeInBits, alignInBits, 
+        emitter.DIBuilder()->getOrCreateArray(elements), underlyingType->GetDIType(emitter), ToUtf8(MangledName())); 
 }
 
 EnumConstantSymbol::EnumConstantSymbol(const Span& span_, const std::u32string& name_) : Symbol(SymbolType::enumConstantSymbol, span_, name_), evaluating(false)
@@ -249,10 +291,10 @@ void EnumTypeDefaultConstructor::EmplaceFunction(FunctionSymbol* functionSymbol,
     }
 }
 
-void EnumTypeDefaultConstructor::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags)
+void EnumTypeDefaultConstructor::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span)
 {
     Assert(underlyingTypeDefaultConstructor, "underlying default constructor not set");
-    underlyingTypeDefaultConstructor->GenerateCall(emitter, genObjects, flags);
+    underlyingTypeDefaultConstructor->GenerateCall(emitter, genObjects, flags, span);
 }
 
 EnumTypeCopyConstructor::EnumTypeCopyConstructor(const Span& span_, const std::u32string& name_) : 
@@ -305,10 +347,10 @@ void EnumTypeCopyConstructor::EmplaceFunction(FunctionSymbol* functionSymbol, in
     }
 }
 
-void EnumTypeCopyConstructor::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags)
+void EnumTypeCopyConstructor::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span)
 {
     Assert(underlyingTypeCopyConstructor, "underlying copy constructor not set");
-    underlyingTypeCopyConstructor->GenerateCall(emitter, genObjects, flags);
+    underlyingTypeCopyConstructor->GenerateCall(emitter, genObjects, flags, span);
 }
 
 EnumTypeMoveConstructor::EnumTypeMoveConstructor(const Span& span_, const std::u32string& name_) : 
@@ -361,10 +403,10 @@ void EnumTypeMoveConstructor::EmplaceFunction(FunctionSymbol* functionSymbol, in
     }
 }
 
-void EnumTypeMoveConstructor::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags)
+void EnumTypeMoveConstructor::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span)
 {
     Assert(underlyingTypeMoveConstructor, "underlying move constructor not set");
-    underlyingTypeMoveConstructor->GenerateCall(emitter, genObjects, flags);
+    underlyingTypeMoveConstructor->GenerateCall(emitter, genObjects, flags, span);
 }
 
 EnumTypeCopyAssignment::EnumTypeCopyAssignment(const Span& span_, const std::u32string& name_) : 
@@ -418,10 +460,10 @@ void EnumTypeCopyAssignment::EmplaceFunction(FunctionSymbol* functionSymbol, int
     }
 }
 
-void EnumTypeCopyAssignment::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags)
+void EnumTypeCopyAssignment::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span)
 {
     Assert(underlyingTypeCopyAssignment, "underlying copy assignment not set");
-    underlyingTypeCopyAssignment->GenerateCall(emitter, genObjects, flags);
+    underlyingTypeCopyAssignment->GenerateCall(emitter, genObjects, flags, span);
 }
 
 EnumTypeMoveAssignment::EnumTypeMoveAssignment(const Span& span_, const std::u32string& name_) : 
@@ -475,10 +517,10 @@ void EnumTypeMoveAssignment::EmplaceFunction(FunctionSymbol* functionSymbol, int
     }
 }
 
-void EnumTypeMoveAssignment::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags)
+void EnumTypeMoveAssignment::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span)
 {
     Assert(underlyingTypeMoveAssignment, "underlying move assignment not set");
-    underlyingTypeMoveAssignment->GenerateCall(emitter, genObjects, flags);
+    underlyingTypeMoveAssignment->GenerateCall(emitter, genObjects, flags, span);
 }
 
 EnumTypeReturn::EnumTypeReturn(const Span& span_, const std::u32string& name_) : 
@@ -529,10 +571,10 @@ void EnumTypeReturn::EmplaceFunction(FunctionSymbol* functionSymbol, int index)
     }
 }
 
-void EnumTypeReturn::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags)
+void EnumTypeReturn::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span)
 {
     Assert(underlyingTypeReturn, "underlying return not set");
-    underlyingTypeReturn->GenerateCall(emitter, genObjects, flags);
+    underlyingTypeReturn->GenerateCall(emitter, genObjects, flags, span);
 }
 
 EnumTypeEqualityOp::EnumTypeEqualityOp(const Span& span_, const std::u32string& name_) : 
@@ -586,10 +628,10 @@ void EnumTypeEqualityOp::EmplaceFunction(FunctionSymbol* functionSymbol, int ind
     }
 }
 
-void EnumTypeEqualityOp::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags)
+void EnumTypeEqualityOp::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span)
 {
     Assert(underlyingTypeEquality, "underlying equality not set");
-    underlyingTypeEquality->GenerateCall(emitter, genObjects, flags);
+    underlyingTypeEquality->GenerateCall(emitter, genObjects, flags, span);
 }
 
 EnumTypeToUnderlyingTypeConversion::EnumTypeToUnderlyingTypeConversion(const Span& span_, const std::u32string& name_) :
@@ -635,7 +677,7 @@ void EnumTypeToUnderlyingTypeConversion::EmplaceType(TypeSymbol* typeSymbol, int
     }
 }
 
-void EnumTypeToUnderlyingTypeConversion::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags)
+void EnumTypeToUnderlyingTypeConversion::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span)
 {
 }
 
@@ -682,7 +724,7 @@ void UnderlyingTypeToEnumTypeConversion::EmplaceType(TypeSymbol* typeSymbol, int
     }
 }
 
-void UnderlyingTypeToEnumTypeConversion::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags)
+void UnderlyingTypeToEnumTypeConversion::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span)
 {
 }
 

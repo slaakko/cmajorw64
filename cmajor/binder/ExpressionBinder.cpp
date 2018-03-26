@@ -156,7 +156,7 @@ void ExpressionBinder::BindUnaryOp(BoundExpression* operand, Node& node, const s
     {
         TypeSymbol* type = operatorFunCall->GetFunctionSymbol()->ReturnType();
         temporary = boundFunction->GetFunctionSymbol()->CreateTemporary(type, node.GetSpan());
-        operatorFunCall->AddArgument(std::unique_ptr<BoundExpression>(new BoundAddressOfExpression(std::unique_ptr<BoundExpression>(new BoundLocalVariable(temporary)),
+        operatorFunCall->AddArgument(std::unique_ptr<BoundExpression>(new BoundAddressOfExpression(std::unique_ptr<BoundExpression>(new BoundLocalVariable(span, temporary)),
             type->AddPointer(node.GetSpan()))));
         if (type->IsClassTypeSymbol())
         {
@@ -172,7 +172,7 @@ void ExpressionBinder::BindUnaryOp(BoundExpression* operand, Node& node, const s
     expression.reset(operatorFunCall.release());
     if (temporary)
     {
-        expression.reset(new BoundConstructAndReturnTemporaryExpression(std::move(expression), std::unique_ptr<BoundExpression>(new BoundLocalVariable(temporary))));
+        expression.reset(new BoundConstructAndReturnTemporaryExpression(std::move(expression), std::unique_ptr<BoundExpression>(new BoundLocalVariable(span, temporary))));
         expression->SetFlag(BoundExpressionFlags::bindToRvalueReference);
     }
 }
@@ -244,7 +244,7 @@ void ExpressionBinder::BindBinaryOp(BoundExpression* left, BoundExpression* righ
     {
         TypeSymbol* type = operatorFunCall->GetFunctionSymbol()->ReturnType();
         temporary = boundFunction->GetFunctionSymbol()->CreateTemporary(type, node.GetSpan());
-        operatorFunCall->AddArgument(std::unique_ptr<BoundExpression>(new BoundAddressOfExpression(std::unique_ptr<BoundExpression>(new BoundLocalVariable(temporary)),
+        operatorFunCall->AddArgument(std::unique_ptr<BoundExpression>(new BoundAddressOfExpression(std::unique_ptr<BoundExpression>(new BoundLocalVariable(span, temporary)),
             type->AddPointer(node.GetSpan()))));
         if (type->IsClassTypeSymbol())
         {
@@ -260,7 +260,7 @@ void ExpressionBinder::BindBinaryOp(BoundExpression* left, BoundExpression* righ
     expression.reset(operatorFunCall.release());
     if (temporary)
     {
-        expression.reset(new BoundConstructAndReturnTemporaryExpression(std::move(expression), std::unique_ptr<BoundExpression>(new BoundLocalVariable(temporary))));
+        expression.reset(new BoundConstructAndReturnTemporaryExpression(std::move(expression), std::unique_ptr<BoundExpression>(new BoundLocalVariable(span, temporary))));
         expression->SetFlag(BoundExpressionFlags::bindToRvalueReference);
     }
 }
@@ -276,7 +276,7 @@ void ExpressionBinder::BindSymbol(Symbol* symbol)
             ParameterSymbol* thisParam = boundFunction->GetFunctionSymbol()->GetThisParam();
             if (thisParam)
             {
-                boundFunctionGroupExpression->SetClassPtr(std::unique_ptr<BoundExpression>(new BoundParameter(thisParam)));
+                boundFunctionGroupExpression->SetClassPtr(std::unique_ptr<BoundExpression>(new BoundParameter(span, thisParam)));
             }
             expression.reset(boundFunctionGroupExpression);
             break;
@@ -331,14 +331,14 @@ void ExpressionBinder::BindSymbol(Symbol* symbol)
         {
             ParameterSymbol* parameterSymbol = static_cast<ParameterSymbol*>(symbol);
             CheckAccess(boundFunction->GetFunctionSymbol(), parameterSymbol);
-            expression.reset(new BoundParameter(parameterSymbol));
+            expression.reset(new BoundParameter(span, parameterSymbol));
             break;
         }
         case SymbolType::localVariableSymbol:
         {
             LocalVariableSymbol* localVariableSymbol = static_cast<LocalVariableSymbol*>(symbol);
             CheckAccess(boundFunction->GetFunctionSymbol(), localVariableSymbol);
-            expression.reset(new BoundLocalVariable(localVariableSymbol));
+            expression.reset(new BoundLocalVariable(span, localVariableSymbol));
             break;
         }
         case SymbolType::memberVariableSymbol:
@@ -346,7 +346,7 @@ void ExpressionBinder::BindSymbol(Symbol* symbol)
             MemberVariableSymbol* memberVariableSymbol = static_cast<MemberVariableSymbol*>(symbol);
             FunctionSymbol* currentFuctionSymbol = boundFunction->GetFunctionSymbol();
             CheckAccess(currentFuctionSymbol, memberVariableSymbol);
-            BoundMemberVariable* bmv = new BoundMemberVariable(memberVariableSymbol);
+            BoundMemberVariable* bmv = new BoundMemberVariable(span, memberVariableSymbol);
             bool accessFromOwnScope = false;
             ClassTypeSymbol* currentClass = currentFuctionSymbol->ContainingClassNoThrow();
             if (currentClass)
@@ -377,7 +377,7 @@ void ExpressionBinder::BindSymbol(Symbol* symbol)
                         {
                             thisPointerType = thisPointerType->AddConst(span);
                         }
-                        bmv->SetClassPtr(std::unique_ptr<BoundExpression>(new BoundParameter(thisParam)));
+                        bmv->SetClassPtr(std::unique_ptr<BoundExpression>(new BoundParameter(span, thisParam)));
                     }
                     else
                     {
@@ -398,7 +398,7 @@ void ExpressionBinder::BindSymbol(Symbol* symbol)
                     FunctionSymbol* conversionFun = boundCompileUnit.GetConversion(thisPointerType, containingClassPointerType, containerScope, boundFunction, span, argumentMatch);
                     if (conversionFun)
                     {
-                        bmv->SetClassPtr(std::unique_ptr<BoundExpression>(new BoundConversion(std::unique_ptr<BoundExpression>(new BoundParameter(thisParam)), conversionFun)));
+                        bmv->SetClassPtr(std::unique_ptr<BoundExpression>(new BoundConversion(std::unique_ptr<BoundExpression>(new BoundParameter(span, thisParam)), conversionFun)));
                     }
                 }
             }
@@ -409,7 +409,7 @@ void ExpressionBinder::BindSymbol(Symbol* symbol)
         {
             ConstantSymbol* constantSymbol = static_cast<ConstantSymbol*>(symbol);
             CheckAccess(boundFunction->GetFunctionSymbol(), constantSymbol);
-            expression.reset(new BoundConstant(constantSymbol));
+            expression.reset(new BoundConstant(span, constantSymbol));
             break;
         }
         case SymbolType::enumTypeSymbol:
@@ -422,7 +422,7 @@ void ExpressionBinder::BindSymbol(Symbol* symbol)
         case SymbolType::enumConstantSymbol:
         {
             EnumConstantSymbol* enumConstantSymbol = static_cast<EnumConstantSymbol*>(symbol);
-            expression.reset(new BoundEnumConstant(enumConstantSymbol));
+            expression.reset(new BoundEnumConstant(span, enumConstantSymbol));
             break;
         }
         case SymbolType::namespaceSymbol:
@@ -746,7 +746,7 @@ void ExpressionBinder::Visit(ParameterNode& parameterNode)
         if (symbol->GetSymbolType() == SymbolType::parameterSymbol)
         {
             ParameterSymbol* parameterSymbol = static_cast<ParameterSymbol*>(symbol);
-            expression.reset(new BoundParameter(parameterSymbol));
+            expression.reset(new BoundParameter(span, parameterSymbol));
         }
         else
         {
@@ -1063,7 +1063,7 @@ void ExpressionBinder::BindArrow(Node& node, const std::u32string& name)
         LocalVariableSymbol* temporary = boundFunction->GetFunctionSymbol()->CreateTemporary(type, node.GetSpan());
         Assert(expression->GetBoundNodeType() == BoundNodeType::boundFunctionCall, "function call expected");
         BoundFunctionCall* boundFunctionCall = static_cast<BoundFunctionCall*>(expression.get());
-        boundFunctionCall->AddArgument(std::unique_ptr<BoundExpression>(new BoundAddressOfExpression(std::unique_ptr<BoundExpression>(new BoundLocalVariable(temporary)), pointerType)));
+        boundFunctionCall->AddArgument(std::unique_ptr<BoundExpression>(new BoundAddressOfExpression(std::unique_ptr<BoundExpression>(new BoundLocalVariable(span, temporary)), pointerType)));
         if (type->IsClassTypeSymbol())
         {
             ClassTypeSymbol* classType = static_cast<ClassTypeSymbol*>(type);
@@ -1075,7 +1075,7 @@ void ExpressionBinder::BindArrow(Node& node, const std::u32string& name)
             }
         }
         expression.reset(new BoundAddressOfExpression(std::unique_ptr<BoundExpression>(
-            new BoundConstructAndReturnTemporaryExpression(std::move(expression), std::unique_ptr<BoundExpression>(new BoundLocalVariable(temporary)))), pointerType));
+            new BoundConstructAndReturnTemporaryExpression(std::move(expression), std::unique_ptr<BoundExpression>(new BoundLocalVariable(span, temporary)))), pointerType));
         BindUnaryOp(expression.release(), node, U"operator->");
         BindArrow(node, name);
     }
@@ -1122,7 +1122,7 @@ void ExpressionBinder::Visit(DisjunctionNode& disjunctionNode)
     std::unique_ptr<BoundExpression> right = BindExpression(disjunctionNode.Right(), boundCompileUnit, boundFunction, containerScope, statementBinder);
     BoundDisjunction* boundDisjunction = new BoundDisjunction(disjunctionNode.GetSpan(), std::move(left), std::move(right), symbolTable.GetTypeByName(U"bool"));
     LocalVariableSymbol* temporary = boundFunction->GetFunctionSymbol()->CreateTemporary(symbolTable.GetTypeByName(U"bool"), disjunctionNode.GetSpan());
-    boundDisjunction->SetTemporary(new BoundLocalVariable(temporary));
+    boundDisjunction->SetTemporary(new BoundLocalVariable(span, temporary));
     expression.reset(boundDisjunction);
 }
 
@@ -1132,7 +1132,7 @@ void ExpressionBinder::Visit(ConjunctionNode& conjunctionNode)
     std::unique_ptr<BoundExpression> right = BindExpression(conjunctionNode.Right(), boundCompileUnit, boundFunction, containerScope, statementBinder);
     BoundConjunction* boundConjunction = new BoundConjunction(conjunctionNode.GetSpan(), std::move(left), std::move(right), symbolTable.GetTypeByName(U"bool"));
     LocalVariableSymbol* temporary = boundFunction->GetFunctionSymbol()->CreateTemporary(symbolTable.GetTypeByName(U"bool"), conjunctionNode.GetSpan());
-    boundConjunction->SetTemporary(new BoundLocalVariable(temporary));
+    boundConjunction->SetTemporary(new BoundLocalVariable(span, temporary));
     expression.reset(boundConjunction);
 }
 
@@ -1456,7 +1456,7 @@ void ExpressionBinder::Visit(AsNode& asNode)
                         if (leftClassType->IsPolymorphic())
                         {
                             expression.reset(new BoundAsExpression(std::move(boundExpr), rightClassType,
-                                std::unique_ptr<BoundLocalVariable>(new BoundLocalVariable(boundFunction->GetFunctionSymbol()->CreateTemporary(
+                                std::unique_ptr<BoundLocalVariable>(new BoundLocalVariable(span, boundFunction->GetFunctionSymbol()->CreateTemporary(
                                     rightClassType->AddPointer(asNode.GetSpan()), asNode.GetSpan())))));
                         }
                         else
@@ -1611,7 +1611,7 @@ void ExpressionBinder::Visit(InvokeNode& invokeNode)
             functionScopeLookups.push_back(FunctionScopeLookup(ScopeLookup::this_and_base, type->BaseType()->ClassInterfaceEnumDelegateOrNsScope()));
         }
         temporary = boundFunction->GetFunctionSymbol()->CreateTemporary(type, invokeNode.GetSpan());
-        std::unique_ptr<BoundExpression> addrOfTemporary(new BoundAddressOfExpression(std::unique_ptr<BoundExpression>(new BoundLocalVariable(temporary)), type->AddPointer(invokeNode.GetSpan())));
+        std::unique_ptr<BoundExpression> addrOfTemporary(new BoundAddressOfExpression(std::unique_ptr<BoundExpression>(new BoundLocalVariable(span, temporary)), type->AddPointer(invokeNode.GetSpan())));
         arguments.push_back(std::move(addrOfTemporary));
         groupName = U"@constructor";
         if (type->IsClassTypeSymbol())
@@ -1709,7 +1709,7 @@ void ExpressionBinder::Visit(InvokeNode& invokeNode)
         {
             TypeSymbol* type = delegateTypeSymbol->ReturnType();
             temporary = boundFunction->GetFunctionSymbol()->CreateTemporary(type, invokeNode.GetSpan());
-            delegateCall->AddArgument(std::unique_ptr<BoundExpression>(new BoundAddressOfExpression(std::unique_ptr<BoundExpression>(new BoundLocalVariable(temporary)),
+            delegateCall->AddArgument(std::unique_ptr<BoundExpression>(new BoundAddressOfExpression(std::unique_ptr<BoundExpression>(new BoundLocalVariable(span, temporary)),
                 type->AddPointer(invokeNode.GetSpan()))));
             if (type->IsClassTypeSymbol())
             {
@@ -1725,7 +1725,7 @@ void ExpressionBinder::Visit(InvokeNode& invokeNode)
         expression.reset(delegateCall);
         if (temporary)
         {
-            expression.reset(new BoundConstructAndReturnTemporaryExpression(std::move(expression), std::unique_ptr<BoundExpression>(new BoundLocalVariable(temporary))));
+            expression.reset(new BoundConstructAndReturnTemporaryExpression(std::move(expression), std::unique_ptr<BoundExpression>(new BoundLocalVariable(span, temporary))));
             expression->SetFlag(BoundExpressionFlags::bindToRvalueReference);
         }
         return;
@@ -1798,7 +1798,7 @@ void ExpressionBinder::Visit(InvokeNode& invokeNode)
         {
             TypeSymbol* type = classDelegateTypeSymbol->ReturnType();
             temporary = boundFunction->GetFunctionSymbol()->CreateTemporary(type, invokeNode.GetSpan());
-            classDelegateCall->AddArgument(std::unique_ptr<BoundExpression>(new BoundAddressOfExpression(std::unique_ptr<BoundExpression>(new BoundLocalVariable(temporary)),
+            classDelegateCall->AddArgument(std::unique_ptr<BoundExpression>(new BoundAddressOfExpression(std::unique_ptr<BoundExpression>(new BoundLocalVariable(span, temporary)),
                 type->AddPointer(invokeNode.GetSpan()))));
             if (type->IsClassTypeSymbol())
             {
@@ -1814,7 +1814,7 @@ void ExpressionBinder::Visit(InvokeNode& invokeNode)
         expression.reset(classDelegateCall);
         if (temporary)
         {
-            expression.reset(new BoundConstructAndReturnTemporaryExpression(std::move(expression), std::unique_ptr<BoundExpression>(new BoundLocalVariable(temporary))));
+            expression.reset(new BoundConstructAndReturnTemporaryExpression(std::move(expression), std::unique_ptr<BoundExpression>(new BoundLocalVariable(span, temporary))));
             expression->SetFlag(BoundExpressionFlags::bindToRvalueReference);
         }
         return;
@@ -1853,7 +1853,7 @@ void ExpressionBinder::Visit(InvokeNode& invokeNode)
         bool thisParamInserted = false;
         if (thisParam)
         {
-            BoundParameter* boundThisParam = new BoundParameter(thisParam);
+            BoundParameter* boundThisParam = new BoundParameter(span, thisParam);
             arguments.insert(arguments.begin(), std::unique_ptr<BoundExpression>(boundThisParam));
             thisParamInserted = true;
             functionScopeLookups.push_back(FunctionScopeLookup(ScopeLookup::this_and_base, thisParam->GetType()->BaseType()->ClassInterfaceEnumDelegateOrNsScope()));
@@ -1950,7 +1950,7 @@ void ExpressionBinder::Visit(InvokeNode& invokeNode)
     {
         TypeSymbol* type = functionSymbol->ReturnType();
         temporary = boundFunction->GetFunctionSymbol()->CreateTemporary(type, invokeNode.GetSpan());
-        functionCall->AddArgument(std::unique_ptr<BoundExpression>(new BoundAddressOfExpression(std::unique_ptr<BoundExpression>(new BoundLocalVariable(temporary)), 
+        functionCall->AddArgument(std::unique_ptr<BoundExpression>(new BoundAddressOfExpression(std::unique_ptr<BoundExpression>(new BoundLocalVariable(span, temporary)), 
             type->AddPointer(invokeNode.GetSpan()))));
         if (type->IsClassTypeSymbol())
         {
@@ -1966,7 +1966,7 @@ void ExpressionBinder::Visit(InvokeNode& invokeNode)
     expression.reset(functionCall.release());
     if (temporary)
     {
-        expression.reset(new BoundConstructAndReturnTemporaryExpression(std::move(expression), std::unique_ptr<BoundExpression>(new BoundLocalVariable(temporary))));
+        expression.reset(new BoundConstructAndReturnTemporaryExpression(std::move(expression), std::unique_ptr<BoundExpression>(new BoundLocalVariable(span, temporary))));
         expression->SetFlag(BoundExpressionFlags::bindToRvalueReference);
     }
     if (functionSymbol->IsConstExpr())
@@ -2184,7 +2184,7 @@ void ExpressionBinder::Visit(CastNode& castNode)
             {
                 BoundFunctionCall* constructorCall = new BoundFunctionCall(span, conversionFun);
                 LocalVariableSymbol* temporary = boundFunction->GetFunctionSymbol()->CreateTemporary(conversionFun->ConversionTargetType(), span);
-                constructorCall->AddArgument(std::unique_ptr<BoundExpression>(new BoundAddressOfExpression(std::unique_ptr<BoundExpression>(new BoundLocalVariable(temporary)),
+                constructorCall->AddArgument(std::unique_ptr<BoundExpression>(new BoundAddressOfExpression(std::unique_ptr<BoundExpression>(new BoundLocalVariable(span, temporary)),
                     conversionFun->ConversionTargetType()->AddPointer(span))));
                 TypeSymbol* conversionTargetType = conversionFun->ConversionTargetType();
                 if (conversionTargetType->IsClassTypeSymbol())
@@ -2199,7 +2199,7 @@ void ExpressionBinder::Visit(CastNode& castNode)
                 }
                 constructorCall->AddArgument(std::move(castArguments[0]));
                 BoundConstructAndReturnTemporaryExpression* conversion = new BoundConstructAndReturnTemporaryExpression(std::unique_ptr<BoundExpression>(constructorCall),
-                    std::unique_ptr<BoundExpression>(new BoundLocalVariable(temporary)));
+                    std::unique_ptr<BoundExpression>(new BoundLocalVariable(span, temporary)));
                 castArguments[0].reset(conversion);
             }
             else
@@ -2322,7 +2322,7 @@ void ExpressionBinder::Visit(ThisNode& thisNode)
     ParameterSymbol* thisParam = boundFunction->GetFunctionSymbol()->GetThisParam();
     if (thisParam)
     {
-        expression.reset(new BoundParameter(thisParam));
+        expression.reset(new BoundParameter(span, thisParam));
         expression->SetFlag(BoundExpressionFlags::argIsExplicitThisOrBasePtr);
     }
     else
@@ -2351,7 +2351,7 @@ void ExpressionBinder::Visit(BaseNode& baseNode)
                 FunctionSymbol* thisAsBaseConversionFunction = boundCompileUnit.GetConversion(thisParam->GetType(), basePointerType, containerScope, boundFunction, baseNode.GetSpan(), argumentMatch);
                 if (thisAsBaseConversionFunction)
                 {
-                    expression.reset(new BoundConversion(std::unique_ptr<BoundExpression>(new BoundParameter(thisParam)), thisAsBaseConversionFunction));
+                    expression.reset(new BoundConversion(std::unique_ptr<BoundExpression>(new BoundParameter(span, thisParam)), thisAsBaseConversionFunction));
                     expression->SetFlag(BoundExpressionFlags::argIsExplicitThisOrBasePtr);
                 }
                 else

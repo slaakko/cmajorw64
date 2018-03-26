@@ -20,7 +20,17 @@ void FileRegistry::Init()
     instance.reset(new FileRegistry());
 }
 
-FileRegistry::FileRegistry() : obtainSystemFileIndeces(false)
+void FileRegistry::Clear()
+{
+    fileMap.clear();
+}
+
+void FileRegistry::SetNextUserFileIndex(uint32_t nextUserFileindex_)
+{
+    nextUserFileIndex = nextUserFileindex_;
+}
+
+FileRegistry::FileRegistry() : obtainSystemFileIndeces(false), nextUserFileIndex(1)
 {
 }
 
@@ -36,20 +46,39 @@ void FileRegistry::PopObtainSystemFileIndeces()
     obtainsSystemFileIndecesStack.pop();
 }
 
-uint32_t FileRegistry::RegisterFile(const std::string& filePath)
+uint32_t FileRegistry::RegisterNewFile(const std::string& filePath)
 {
     std::lock_guard<std::mutex> lock(mtx);
     if (obtainSystemFileIndeces)
     {
         uint32_t fileIndex = SystemFileIndex::Instance().RegisterSystemSourceFile(filePath);
+        fileMap[fileIndex] = std::make_pair(true, filePath);
         return fileIndex;
     }
     else
     {
-        uint32_t fileIndex = GetNumberOfFilePaths();
-        filePaths.push_back(filePath);
+        uint32_t fileIndex = nextUserFileIndex++;
+        fileMap[fileIndex] = std::make_pair(true, filePath);
         return fileIndex;
     }
+}
+
+void FileRegistry::RegisterExistingFile(uint32_t fileIndex, const std::string& filePath)
+{
+    fileMap[fileIndex] = std::make_pair(false, filePath);
+}
+
+std::vector<std::pair<uint32_t, std::string>> FileRegistry::GetFileMap()
+{
+    std::vector<std::pair<uint32_t, std::string>> result;
+    for (const std::pair<uint32_t, std::pair<bool, std::string>>& p : fileMap)
+    {
+        if (p.second.first)
+        {
+            result.push_back(std::make_pair(p.first, p.second.second));
+        }
+    }
+    return result;
 }
 
 std::string FileRegistry::GetFilePath(uint32_t filePathIndex)
@@ -61,18 +90,13 @@ std::string FileRegistry::GetFilePath(uint32_t filePathIndex)
     }
     else
     {
-        static std::string emptyFileName;
-        if (filePathIndex >= 0 && filePathIndex < GetNumberOfFilePaths())
+        auto it = fileMap.find(filePathIndex);
+        if (it != fileMap.cend())
         {
-            return filePaths[filePathIndex];
+            return it->second.second;
         }
-        return emptyFileName;
+        return std::string();
     }
-}
-
-uint32_t FileRegistry::GetNumberOfFilePaths()
-{
-    return uint32_t(filePaths.size());
 }
 
 } } // namespace cmajor::parser

@@ -72,7 +72,7 @@ FunctionSymbol* FunctionTemplateRepository::Instantiate(FunctionSymbol* function
     Assert(node->GetNodeType() == NodeType::functionNode, "function node expected");
     instantiated.insert(functionTemplate);
     FunctionNode* functionNode = static_cast<FunctionNode*>(node);
-    std::unique_ptr<NamespaceNode> globalNs(new NamespaceNode(span, new IdentifierNode(span, U"")));
+    std::unique_ptr<NamespaceNode> globalNs(new NamespaceNode(functionTemplate->GetSpan(), new IdentifierNode(functionTemplate->GetSpan(), U"")));
     NamespaceNode* currentNs = globalNs.get();
     CloneContext cloneContext;
     cloneContext.SetInstantiateFunctionNode();
@@ -93,7 +93,7 @@ FunctionSymbol* FunctionTemplateRepository::Instantiate(FunctionSymbol* function
         std::vector<std::u32string> nsComponents = Split(fullNsName, '.');
         for (const std::u32string& nsComponent : nsComponents)
         {
-            NamespaceNode* nsNode = new NamespaceNode(span, new IdentifierNode(span, nsComponent));
+            NamespaceNode* nsNode = new NamespaceNode(functionTemplate->GetSpan(), new IdentifierNode(functionTemplate->GetSpan(), nsComponent));
             currentNs->AddMember(nsNode);
             currentNs = nsNode;
         }

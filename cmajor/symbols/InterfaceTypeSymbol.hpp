@@ -24,7 +24,7 @@ public:
     llvm::Type* IrType(Emitter& emitter) override;
     llvm::Constant* CreateDefaultIrValue(Emitter& emitter) override;
     const std::vector<MemberFunctionSymbol*>& MemberFunctions() const { return memberFunctions; }
-    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, MemberFunctionSymbol* interfaceMemberFunction);
+    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, MemberFunctionSymbol* interfaceMemberFunction, const Span& span);
     void SetCopyConstructor(InterfaceTypeCopyConstructor* copyConstructor_) { copyConstructor = copyConstructor_; }
     InterfaceTypeCopyConstructor* CopyConstructor() { return copyConstructor; }
 private:
@@ -37,7 +37,7 @@ class InterfaceTypeDefaultConstructor : public FunctionSymbol
 {
 public:
     InterfaceTypeDefaultConstructor(InterfaceTypeSymbol* interfaceType_, const Span& span_);
-    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags) override;
+    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
     bool IsBasicTypeOperation() const override { return true; }
 };
 
@@ -45,7 +45,7 @@ class InterfaceTypeCopyConstructor : public FunctionSymbol
 {
 public:
     InterfaceTypeCopyConstructor(InterfaceTypeSymbol* interfaceType_, const Span& span_);
-    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags) override;
+    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
     bool IsBasicTypeOperation() const override { return true; }
 };
 
@@ -53,7 +53,7 @@ class InterfaceTypeMoveConstructor : public FunctionSymbol
 {
 public:
     InterfaceTypeMoveConstructor(InterfaceTypeSymbol* interfaceType_, const Span& span_);
-    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags) override;
+    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
     bool IsBasicTypeOperation() const override { return true; }
 };
 
@@ -61,7 +61,7 @@ class InterfaceTypeCopyAssignment : public FunctionSymbol
 {
 public:
     InterfaceTypeCopyAssignment(InterfaceTypeSymbol* interfaceType_, const Span& span_);
-    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags) override;
+    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
     bool IsBasicTypeOperation() const override { return true; }
 };
 
@@ -69,7 +69,7 @@ class InterfaceTypeMoveAssignment : public FunctionSymbol
 {
 public:
     InterfaceTypeMoveAssignment(InterfaceTypeSymbol* interfaceType_, const Span& span_);
-    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags) override;
+    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
     bool IsBasicTypeOperation() const override { return true; }
 };
 
@@ -81,7 +81,7 @@ public:
     uint8_t ConversionDistance() const override { return 1; }
     TypeSymbol* ConversionSourceType() const override { return sourceClassType->AddLvalueReference(Span()); }
     TypeSymbol* ConversionTargetType() const override { return targetInterfaceType; }
-    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags) override;
+    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
     bool IsBasicTypeOperation() const override { return true; }
     bool IsClassToInterfaceTypeConversion() const override {return true; }
 private:

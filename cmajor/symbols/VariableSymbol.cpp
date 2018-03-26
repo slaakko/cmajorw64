@@ -10,11 +10,13 @@
 #include <cmajor/symbols/SymbolReader.hpp>
 #include <cmajor/symbols/Exception.hpp>
 #include <cmajor/symbols/SymbolCollector.hpp>
+#include <cmajor/parser/FileRegistry.hpp>
 #include <cmajor/util/Unicode.hpp>
 
 namespace cmajor { namespace symbols {
 
 using namespace cmajor::unicode;
+using namespace cmajor::parser;
 
 VariableSymbol::VariableSymbol(SymbolType symbolType_, const Span& span_, const std::u32string& name_) : Symbol(symbolType_, span_, name_), type()
 {
@@ -59,7 +61,7 @@ LocalVariableSymbol::LocalVariableSymbol(const Span& span_, const std::u32string
 {
 }
 
-MemberVariableSymbol::MemberVariableSymbol(const Span& span_, const std::u32string& name_) : VariableSymbol(SymbolType::memberVariableSymbol, span_, name_), layoutIndex(-1)
+MemberVariableSymbol::MemberVariableSymbol(const Span& span_, const std::u32string& name_) : VariableSymbol(SymbolType::memberVariableSymbol, span_, name_), layoutIndex(-1), compileUnitIndex(-1), diMemberType(nullptr)
 {
 }
 
@@ -192,6 +194,27 @@ void MemberVariableSymbol::SetSpecifiers(Specifiers specifiers)
     {
         throw Exception("member variable cannot be unit_test", GetSpan());
     }
+}
+
+llvm::DIDerivedType* MemberVariableSymbol::GetDIMemberType(Emitter& emitter, uint64_t offsetInBits)
+{
+    if (!diMemberType || compileUnitIndex != emitter.CompileUnitIndex())
+    {
+        uint64_t sizeInBits = GetType()->SizeInBits(emitter);
+        uint32_t alignInBits = GetType()->AlignmentInBits(emitter);
+        llvm::DINode::DIFlags flags = llvm::DINode::DIFlags::FlagZero;
+        llvm::DIType* scope = nullptr;
+        Symbol* parent = Parent();
+        if (parent->IsClassTypeSymbol())
+        {
+            ClassTypeSymbol* cls = static_cast<ClassTypeSymbol*>(parent);
+            scope = cls->GetDIType(emitter);
+        }
+        diMemberType = emitter.DIBuilder()->createMemberType(scope, ToUtf8(Name()), emitter.GetFile(GetSpan().FileIndex()), GetSpan().LineNumber(), sizeInBits, alignInBits, offsetInBits, flags, 
+            GetType()->GetDIType(emitter));
+        compileUnitIndex = emitter.CompileUnitIndex();
+    }
+    return diMemberType;
 }
 
 } } // namespace cmajor::symbols

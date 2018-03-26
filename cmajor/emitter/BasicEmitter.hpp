@@ -16,11 +16,14 @@
 #include <cmajor/ir/Emitter.hpp>
 #include <cmajor/symbols/Module.hpp>
 #include <llvm/IR/Module.h>
+#include <llvm/BinaryFormat/Dwarf.h>
 
 namespace cmajor { namespace emitter {
 
 using namespace cmajor::binder;
 using namespace cmajor::symbols;
+
+const unsigned cmajorLanguageTag = llvm::dwarf::DW_LANG_C_plus_plus_11; // closest approximation
 
 struct Cleanup
 {
@@ -36,7 +39,9 @@ class BasicEmitter : public cmajor::ir::Emitter, public cmajor::binder::BoundNod
 public:
     BasicEmitter(EmittingContext& emittingContext_, const std::string& compileUnitModuleName_, cmajor::symbols::Module& symbolsModule_);
     void Visit(BoundCompileUnit& boundCompileUnit) override;
+    void Visit(BoundNamespace& boundNamespace) override;
     void Visit(BoundClass& boundClass) override;
+    void Visit(BoundEnumTypeDefinition& boundEnumTypeDefinition) override;
     void Visit(BoundFunction& boundFunction) override;
     void Visit(BoundSequenceStatement& boundSequenceStatement) override;
     void Visit(BoundCompoundStatement& boundCompoundStatement) override;
@@ -78,6 +83,7 @@ public:
     void Visit(BoundFunctionPtr& boundFunctionPtr) override;
     void Visit(BoundDisjunction& boundDisjunction) override;
     void Visit(BoundConjunction& boundConjunction) override;
+    std::string GetSourceFilePath(int32_t fileIndex) override;
     llvm::Value* GetGlobalStringPtr(int stringId) override;
     llvm::Value* GetGlobalWStringConstant(int stringId) override;
     llvm::Value* GetGlobalUStringConstant(int stringId) override;
@@ -93,6 +99,7 @@ protected:
     std::unique_ptr<llvm::Module> compileUnitModule;
     cmajor::symbols::Module& symbolsModule;
     llvm::IRBuilder<>& builder;
+    std::unique_ptr<llvm::DIBuilder> diBuilder;
     cmajor::ir::ValueStack& stack;
     llvm::LLVMContext& context;
     llvm::Function* function;
@@ -126,6 +133,7 @@ protected:
     std::unordered_map<int, llvm::Value*> utf32stringMap;
     int prevLineNumber;
     llvm::AllocaInst* lastAlloca;
+    int compoundLevel;
     bool destructorCallGenerated;
     bool lastInstructionWasRet;
     bool basicBlockOpen;

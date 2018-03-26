@@ -567,6 +567,38 @@ llvm::Constant* DerivedTypeSymbol::CreateDefaultIrValue(Emitter& emitter)
     }
 }
 
+llvm::DIType* DerivedTypeSymbol::CreateDIType(Emitter& emitter)
+{
+    llvm::DIType* type = baseType->GetDIType(emitter);
+    for (Derivation derivation : derivationRec.derivations)
+    {
+        switch (derivation)
+        {
+            case Derivation::constDerivation:
+            {
+                type = emitter.DIBuilder()->createQualifiedType(llvm::dwarf::DW_TAG_const_type, type);
+                break;
+            }
+            case Derivation::lvalueRefDerivation:
+            {
+                type = emitter.DIBuilder()->createReferenceType(llvm::dwarf::DW_TAG_reference_type, type);
+                break;
+            }
+            case Derivation::rvalueRefDerivation:
+            {
+                type = emitter.DIBuilder()->createReferenceType(llvm::dwarf::DW_TAG_rvalue_reference_type, type);
+                break;
+            }
+            case Derivation::pointerDerivation:
+            {
+                type = emitter.DIBuilder()->createPointerType(type, 64);
+                break;
+            }
+        }
+    }
+    return type;
+}
+
 ValueType DerivedTypeSymbol::GetValueType() const 
 {
     if (HasPointerDerivation(derivationRec.derivations))

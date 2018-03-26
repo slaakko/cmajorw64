@@ -173,7 +173,7 @@ BasicTypeCopyCtor::BasicTypeCopyCtor(const Span& span_, const std::u32string& na
 {
 }
 
-void BasicTypeCopyCtor::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags)
+void BasicTypeCopyCtor::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span)
 {
     Assert(genObjects.size() == 2, "copy constructor needs two objects");
     genObjects[1]->Load(emitter, OperationFlags::none);
@@ -208,7 +208,7 @@ BasicTypeMoveCtor::BasicTypeMoveCtor(const Span& span_, const std::u32string& na
 {
 }
 
-void BasicTypeMoveCtor::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags)
+void BasicTypeMoveCtor::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span)
 {
     Assert(genObjects.size() == 2, "move constructor needs two objects");
     genObjects[1]->Load(emitter, OperationFlags::none);
@@ -246,7 +246,7 @@ BasicTypeCopyAssignment::BasicTypeCopyAssignment(const Span& span_, const std::u
 {
 }
 
-void BasicTypeCopyAssignment::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags)
+void BasicTypeCopyAssignment::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span)
 {
     Assert(genObjects.size() == 2, "copy assignment needs two objects");
     genObjects[1]->Load(emitter, OperationFlags::none);
@@ -276,7 +276,7 @@ BasicTypeMoveAssignment::BasicTypeMoveAssignment(const Span& span_, const std::u
 {
 }
 
-void BasicTypeMoveAssignment::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags)
+void BasicTypeMoveAssignment::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span)
 {
     Assert(genObjects.size() == 2, "move assignment needs two objects");
     genObjects[1]->Load(emitter, OperationFlags::none);
@@ -305,7 +305,7 @@ BasicTypeReturn::BasicTypeReturn(const Span& span_, const std::u32string& name_)
 {
 }
 
-void BasicTypeReturn::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags)
+void BasicTypeReturn::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span)
 {
     Assert(genObjects.size() == 1, "return needs one object");
     genObjects[0]->Load(emitter, OperationFlags::none);

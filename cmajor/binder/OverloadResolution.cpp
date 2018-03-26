@@ -940,7 +940,7 @@ std::unique_ptr<BoundFunctionCall> CreateBoundFunctionCall(FunctionSymbol* bestF
                     BoundLocalVariable* backingStore = nullptr;
                     if (boundFunction)
                     {
-                        backingStore = new BoundLocalVariable(boundFunction->GetFunctionSymbol()->CreateTemporary(argument->GetType(), span));
+                        backingStore = new BoundLocalVariable(span, boundFunction->GetFunctionSymbol()->CreateTemporary(argument->GetType(), span));
                     }
                     argument.reset(new BoundTemporary(std::move(argument), std::unique_ptr<BoundLocalVariable>(backingStore)));
                 }
@@ -975,7 +975,7 @@ std::unique_ptr<BoundFunctionCall> CreateBoundFunctionCall(FunctionSymbol* bestF
                 BoundFunctionCall* constructorCall = new BoundFunctionCall(span, conversionFun);
                 TypeSymbol* conversionTargetType = conversionFun->ConversionTargetType();
                 LocalVariableSymbol* temporary = boundFunction->GetFunctionSymbol()->CreateTemporary(conversionTargetType, span);
-                constructorCall->AddArgument(std::unique_ptr<BoundExpression>(new BoundAddressOfExpression(std::unique_ptr<BoundExpression>(new BoundLocalVariable(temporary)),
+                constructorCall->AddArgument(std::unique_ptr<BoundExpression>(new BoundAddressOfExpression(std::unique_ptr<BoundExpression>(new BoundLocalVariable(span, temporary)),
                     conversionTargetType->AddPointer(span))));
                 if (conversionTargetType->IsClassTypeSymbol())
                 {
@@ -989,7 +989,7 @@ std::unique_ptr<BoundFunctionCall> CreateBoundFunctionCall(FunctionSymbol* bestF
                 }
                 constructorCall->AddArgument(std::move(argument));
                 BoundConstructAndReturnTemporaryExpression* conversion = new BoundConstructAndReturnTemporaryExpression(std::unique_ptr<BoundExpression>(constructorCall),
-                    std::unique_ptr<BoundExpression>(new BoundLocalVariable(temporary)));
+                    std::unique_ptr<BoundExpression>(new BoundLocalVariable(span, temporary)));
                 argument.reset(conversion);
             }
             else if (conversionFun->GetSymbolType() == SymbolType::conversionFunctionSymbol && conversionFun->ReturnsClassInterfaceOrClassDelegateByValue())
@@ -1002,9 +1002,9 @@ std::unique_ptr<BoundFunctionCall> CreateBoundFunctionCall(FunctionSymbol* bestF
                 conversionFunctionCall->AddArgument(std::move(argument));
                 TypeSymbol* conversionTargetType = conversionFun->ConversionTargetType();
                 LocalVariableSymbol* temporary = boundFunction->GetFunctionSymbol()->CreateTemporary(conversionTargetType, span);
-                conversionFunctionCall->AddArgument(std::unique_ptr<BoundExpression>(new BoundAddressOfExpression(std::unique_ptr<BoundExpression>(new BoundLocalVariable(temporary)),
+                conversionFunctionCall->AddArgument(std::unique_ptr<BoundExpression>(new BoundAddressOfExpression(std::unique_ptr<BoundExpression>(new BoundLocalVariable(span, temporary)),
                     conversionTargetType->AddPointer(span))));
-                BoundLocalVariable* conversionResult = new BoundLocalVariable(temporary);
+                BoundLocalVariable* conversionResult = new BoundLocalVariable(span, temporary);
                 if (conversionTargetType->IsClassTypeSymbol())
                 {
                     ClassTypeSymbol* classType = static_cast<ClassTypeSymbol*>(conversionTargetType);
@@ -1035,7 +1035,7 @@ std::unique_ptr<BoundFunctionCall> CreateBoundFunctionCall(FunctionSymbol* bestF
                     BoundLocalVariable* backingStore = nullptr;
                     if (boundFunction)
                     {
-                        backingStore = new BoundLocalVariable(boundFunction->GetFunctionSymbol()->CreateTemporary(argument->GetType(), span));
+                        backingStore = new BoundLocalVariable(span, boundFunction->GetFunctionSymbol()->CreateTemporary(argument->GetType(), span));
                     }
                     argument.reset(new BoundTemporary(std::move(argument), std::unique_ptr<BoundLocalVariable>(backingStore)));
                 }

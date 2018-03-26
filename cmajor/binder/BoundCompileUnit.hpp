@@ -26,6 +26,7 @@ using namespace cmajor::symbols;
 class BoundExpression;
 struct ArgumentMatch;
 class AttributeBinder;
+class BoundNamespace;
 
 class BoundCompileUnit : public BoundNode
 {
@@ -79,11 +80,17 @@ public:
     bool BindingTypes() const { return bindingTypes; }
     void FinalizeBinding(ClassTypeSymbol* classType);
     AttributeBinder* GetAttributeBinder() const { return attributeBinder; }
+    void PushNamespace(BoundNamespace* ns);
+    void PopNamespace();
+    void SetCompileUnitIndex(int32_t compileUnitIndex_) { compileUnitIndex = compileUnitIndex_; }
+    int32_t CompileUnitIndex() const { return compileUnitIndex; }
 private:
     Module& module;
     SymbolTable& symbolTable;
     CompileUnitNode* compileUnitNode;
     AttributeBinder* attributeBinder;
+    std::stack<BoundNamespace*> namespaceStack;
+    BoundNamespace* currentNamespace;
     std::string llFilePath;
     std::string optLLFilePath;
     std::string objectFilePath;
@@ -104,6 +111,7 @@ private:
     ConversionTable conversionTable;
     bool bindingTypes;
     std::stack<bool> bindingTypesStack;
+    int32_t compileUnitIndex;
 };
 
 } } // namespace cmajor::binder

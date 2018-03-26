@@ -79,6 +79,13 @@ llvm::Constant* ArrayTypeSymbol::CreateDefaultIrValue(Emitter& emitter)
     return llvm::ConstantArray::get(llvm::cast<llvm::ArrayType>(irType), arrayOfDefaults);
 }
 
+llvm::DIType* ArrayTypeSymbol::CreateDIType(Emitter& emitter)
+{
+    // todo...
+    std::vector<llvm::Metadata*> elements;
+    return emitter.DIBuilder()->createArrayType(size, 8, elementType->GetDIType(emitter), emitter.DIBuilder()->getOrCreateArray(elements));
+}
+
 ValueType ArrayTypeSymbol::GetValueType() const
 {
     return ValueType::arrayValue;
@@ -132,8 +139,9 @@ void ArrayLengthFunction::EmplaceType(TypeSymbol* typeSymbol, int index)
     }
 }
 
-void ArrayLengthFunction::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags)
+void ArrayLengthFunction::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span)
 {
+    emitter.SetCurrentDebugLocation(span);
     Assert(genObjects.size() == 1, "array length needs one object");
     llvm::Value* size = emitter.Builder().getInt64(arrayType->Size());
     emitter.Stack().Push(size);
@@ -186,10 +194,11 @@ void ArrayBeginFunction::EmplaceType(TypeSymbol* typeSymbol, int index)
     }
 }
 
-void ArrayBeginFunction::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags)
+void ArrayBeginFunction::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span)
 {
     Assert(genObjects.size() == 1, "array begin needs one object");
     genObjects[0]->Load(emitter, OperationFlags::addr);
+    emitter.SetCurrentDebugLocation(span);
     llvm::Value* arrayPtr = emitter.Stack().Pop();
     ArgVector elementIndeces;
     elementIndeces.push_back(emitter.Builder().getInt64(0));
@@ -240,10 +249,11 @@ void ArrayEndFunction::EmplaceType(TypeSymbol* typeSymbol, int index)
     }
 }
 
-void ArrayEndFunction::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags)
+void ArrayEndFunction::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span)
 {
     Assert(genObjects.size() == 1, "array end needs one object");
     genObjects[0]->Load(emitter, OperationFlags::addr);
+    emitter.SetCurrentDebugLocation(span);
     llvm::Value* arrayPtr = emitter.Stack().Pop();
     ArgVector elementIndeces;
     elementIndeces.push_back(emitter.Builder().getInt64(0));
@@ -294,10 +304,11 @@ void ArrayCBeginFunction::EmplaceType(TypeSymbol* typeSymbol, int index)
     }
 }
 
-void ArrayCBeginFunction::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags)
+void ArrayCBeginFunction::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span)
 {
     Assert(genObjects.size() == 1, "array cbegin needs one object");
     genObjects[0]->Load(emitter, OperationFlags::addr);
+    emitter.SetCurrentDebugLocation(span);
     llvm::Value* arrayPtr = emitter.Stack().Pop();
     ArgVector elementIndeces;
     elementIndeces.push_back(emitter.Builder().getInt64(0));
@@ -348,10 +359,11 @@ void ArrayCEndFunction::EmplaceType(TypeSymbol* typeSymbol, int index)
     }
 }
 
-void ArrayCEndFunction::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags)
+void ArrayCEndFunction::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span)
 {
     Assert(genObjects.size() == 1, "array cend needs one object");
     genObjects[0]->Load(emitter, OperationFlags::addr);
+    emitter.SetCurrentDebugLocation(span);
     llvm::Value* arrayPtr = emitter.Stack().Pop();
     ArgVector elementIndeces;
     elementIndeces.push_back(emitter.Builder().getInt64(0));
@@ -371,7 +383,7 @@ ArrayTypeDefaultConstructor::ArrayTypeDefaultConstructor(ArrayTypeSymbol* arrayT
     ComputeName();
 }
 
-void ArrayTypeDefaultConstructor::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags) 
+void ArrayTypeDefaultConstructor::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span)
 {
     Assert(genObjects.size() == 1, "default constructor needs one object");
     genObjects[0]->Load(emitter, OperationFlags::addr);
@@ -394,7 +406,7 @@ void ArrayTypeDefaultConstructor::GenerateCall(Emitter& emitter, std::vector<Gen
     LlvmValue elementPtrValue(elementPtr);
     std::vector<GenObject*> elementGenObjects;
     elementGenObjects.push_back(&elementPtrValue);
-    elementTypeDefaultConstructor->GenerateCall(emitter, elementGenObjects, OperationFlags::none);
+    elementTypeDefaultConstructor->GenerateCall(emitter, elementGenObjects, OperationFlags::none, span);
     llvm::Value* nextI = emitter.Builder().CreateAdd(index, emitter.Builder().getInt64(1));
     emitter.Builder().CreateStore(nextI, loopVar->IrObject());
     emitter.Builder().CreateBr(loop);
@@ -415,7 +427,7 @@ ArrayTypeCopyConstructor::ArrayTypeCopyConstructor(ArrayTypeSymbol* arrayType_, 
     ComputeName();
 }
 
-void ArrayTypeCopyConstructor::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags)
+void ArrayTypeCopyConstructor::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span)
 {
     Assert(genObjects.size() == 2, "copy constructor needs two objects");
     genObjects[0]->Load(emitter, OperationFlags::addr);
@@ -449,7 +461,7 @@ void ArrayTypeCopyConstructor::GenerateCall(Emitter& emitter, std::vector<GenObj
     }
     LlvmValue sourceValue(sourceElementValue);
     elementGenObjects.push_back(&sourceValue);
-    elementTypeCopyConstructor->GenerateCall(emitter, elementGenObjects, OperationFlags::none);
+    elementTypeCopyConstructor->GenerateCall(emitter, elementGenObjects, OperationFlags::none, span);
     llvm::Value* nextI = emitter.Builder().CreateAdd(index, emitter.Builder().getInt64(1));
     emitter.Builder().CreateStore(nextI, loopVar->IrObject());
     emitter.Builder().CreateBr(loop);
@@ -470,7 +482,7 @@ ArrayTypeMoveConstructor::ArrayTypeMoveConstructor(ArrayTypeSymbol* arrayType_, 
     ComputeName();
 }
 
-void ArrayTypeMoveConstructor::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags)
+void ArrayTypeMoveConstructor::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span)
 {
     Assert(genObjects.size() == 2, "move constructor needs two objects");
     genObjects[0]->Load(emitter, OperationFlags::addr);
@@ -498,7 +510,7 @@ void ArrayTypeMoveConstructor::GenerateCall(Emitter& emitter, std::vector<GenObj
     llvm::Value* sourceElementPtr = emitter.Builder().CreateGEP(sourcePtr, elementIndeces);
     LlvmValue sourcePtrValue(sourceElementPtr);
     elementGenObjects.push_back(&sourcePtrValue);
-    elementTypeMoveConstructor->GenerateCall(emitter, elementGenObjects, OperationFlags::none);
+    elementTypeMoveConstructor->GenerateCall(emitter, elementGenObjects, OperationFlags::none, span);
     llvm::Value* nextI = emitter.Builder().CreateAdd(index, emitter.Builder().getInt64(1));
     emitter.Builder().CreateStore(nextI, loopVar->IrObject());
     emitter.Builder().CreateBr(loop);
@@ -521,7 +533,7 @@ ArrayTypeCopyAssignment::ArrayTypeCopyAssignment(ArrayTypeSymbol* arrayType_, Lo
     ComputeName();
 }
 
-void ArrayTypeCopyAssignment::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags)
+void ArrayTypeCopyAssignment::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span)
 {
     Assert(genObjects.size() == 2, "copy assignment needs two objects");
     genObjects[0]->Load(emitter, OperationFlags::addr);
@@ -555,7 +567,7 @@ void ArrayTypeCopyAssignment::GenerateCall(Emitter& emitter, std::vector<GenObje
     }
     LlvmValue sourceValue(sourceElementValue);
     elementGenObjects.push_back(&sourceValue);
-    elementTypeCopyAssignment->GenerateCall(emitter, elementGenObjects, OperationFlags::none);
+    elementTypeCopyAssignment->GenerateCall(emitter, elementGenObjects, OperationFlags::none, span);
     llvm::Value* nextI = emitter.Builder().CreateAdd(index, emitter.Builder().getInt64(1));
     emitter.Builder().CreateStore(nextI, loopVar->IrObject());
     emitter.Builder().CreateBr(loop);
@@ -578,7 +590,7 @@ ArrayTypeMoveAssignment::ArrayTypeMoveAssignment(ArrayTypeSymbol* arrayType_, Lo
     ComputeName();
 }
 
-void ArrayTypeMoveAssignment::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags)
+void ArrayTypeMoveAssignment::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span)
 {
     Assert(genObjects.size() == 2, "move assignment needs two objects");
     genObjects[0]->Load(emitter, OperationFlags::addr);
@@ -607,7 +619,7 @@ void ArrayTypeMoveAssignment::GenerateCall(Emitter& emitter, std::vector<GenObje
     TypeSymbol* elementType = arrayType->ElementType();
     LlvmValue sourcePtrValue(sourceElementPtr);
     elementGenObjects.push_back(&sourcePtrValue);
-    elementTypeMoveAssignment->GenerateCall(emitter, elementGenObjects, OperationFlags::none);
+    elementTypeMoveAssignment->GenerateCall(emitter, elementGenObjects, OperationFlags::none, span);
     llvm::Value* nextI = emitter.Builder().CreateAdd(index, emitter.Builder().getInt64(1));
     emitter.Builder().CreateStore(nextI, loopVar->IrObject());
     emitter.Builder().CreateBr(loop);
@@ -633,12 +645,13 @@ ArrayTypeElementAccess::ArrayTypeElementAccess(ArrayTypeSymbol* arrayType_, cons
     ComputeName();
 }
 
-void ArrayTypeElementAccess::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags)
+void ArrayTypeElementAccess::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span)
 {
     Assert(genObjects.size() == 2, "element access needs two objects");
     genObjects[0]->Load(emitter, OperationFlags::addr);
     llvm::Value* ptr = emitter.Stack().Pop();
     genObjects[1]->Load(emitter, OperationFlags::none);
+    emitter.SetCurrentDebugLocation(span);
     llvm::Value* indexValue = emitter.Stack().Pop();
     ArgVector elementIndeces;
     elementIndeces.push_back(emitter.Builder().getInt64(0));

@@ -78,6 +78,7 @@ public:
     TypeSymbol* AddPointer(const Span& span) override;
     llvm::Type* IrType(Emitter& emitter) override;
     llvm::Constant* CreateDefaultIrValue(Emitter& emitter) override;
+    llvm::DIType* CreateDIType(Emitter& emitter) override;
     bool IsConstType() const override;
     bool IsReferenceType() const override;
     bool IsLvalueReferenceType() const override;

@@ -128,7 +128,7 @@ llvm::Constant* InterfaceTypeSymbol::CreateDefaultIrValue(Emitter& emitter)
     return llvm::ConstantStruct::get(llvm::cast<llvm::StructType>(irType), arrayOfDefaults);
 }
 
-void InterfaceTypeSymbol::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, MemberFunctionSymbol* interfaceMemberFunction)
+void InterfaceTypeSymbol::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, MemberFunctionSymbol* interfaceMemberFunction, const Span& span)
 {
     TypeSymbol* type = static_cast<TypeSymbol*>(genObjects[0]->GetType());
     if (type->GetSymbolType() == SymbolType::interfaceTypeSymbol)
@@ -162,6 +162,7 @@ void InterfaceTypeSymbol::GenerateCall(Emitter& emitter, std::vector<GenObject*>
         GenObject* genObject = genObjects[i];
         genObject->Load(emitter, flags & OperationFlags::functionCallFlags);
     }
+    emitter.SetCurrentDebugLocation(span);
     ArgVector args;
     int n = interfaceMemberFunction->Parameters().size();
     if (interfaceMemberFunction->ReturnsClassInterfaceOrClassDelegateByValue())
@@ -196,7 +197,12 @@ void InterfaceTypeSymbol::GenerateCall(Emitter& emitter, std::vector<GenObject*>
             }
             else
             {
-                emitter.Stack().Push(llvm::CallInst::Create(callee, args, bundles, "", emitter.CurrentBasicBlock()));
+                llvm::CallInst* callInst = llvm::CallInst::Create(callee, args, bundles, "", emitter.CurrentBasicBlock());
+                if (emitter.DIBuilder())
+                {
+                    callInst->setDebugLoc(emitter.GetDebugLocation(span));
+                }
+                emitter.Stack().Push(callInst);
             }
         }
         else
@@ -219,7 +225,12 @@ void InterfaceTypeSymbol::GenerateCall(Emitter& emitter, std::vector<GenObject*>
             }
             else
             {
-                emitter.Stack().Push(llvm::InvokeInst::Create(callee, nextBlock, unwindBlock, args, bundles, "", emitter.CurrentBasicBlock()));
+                llvm::InvokeInst* invokeInst = llvm::InvokeInst::Create(callee, nextBlock, unwindBlock, args, bundles, "", emitter.CurrentBasicBlock());
+                if (emitter.DIBuilder())
+                {
+                    invokeInst->setDebugLoc(emitter.GetDebugLocation(span));
+                }
+                emitter.Stack().Push(invokeInst);
             }
             emitter.SetCurrentBasicBlock(nextBlock);
         }
@@ -234,7 +245,11 @@ void InterfaceTypeSymbol::GenerateCall(Emitter& emitter, std::vector<GenObject*>
             }
             else
             {
-                llvm::CallInst::Create(callee, args, bundles, "", emitter.CurrentBasicBlock());
+                llvm::CallInst* callInst = llvm::CallInst::Create(callee, args, bundles, "", emitter.CurrentBasicBlock());
+                if (emitter.DIBuilder())
+                {
+                    callInst->setDebugLoc(emitter.GetDebugLocation(span));
+                }
             }
         }
         else
@@ -257,7 +272,11 @@ void InterfaceTypeSymbol::GenerateCall(Emitter& emitter, std::vector<GenObject*>
             }
             else
             {
-                llvm::InvokeInst::Create(callee, nextBlock, unwindBlock, args, bundles, "", emitter.CurrentBasicBlock());
+                llvm::InvokeInst* invokeInst = llvm::InvokeInst::Create(callee, nextBlock, unwindBlock, args, bundles, "", emitter.CurrentBasicBlock());
+                if (emitter.DIBuilder())
+                {
+                    invokeInst->setDebugLoc(emitter.GetDebugLocation(span));
+                }
             }
             emitter.SetCurrentBasicBlock(nextBlock);
         }
@@ -274,7 +293,7 @@ InterfaceTypeDefaultConstructor::InterfaceTypeDefaultConstructor(InterfaceTypeSy
     ComputeName();
 }
 
-void InterfaceTypeDefaultConstructor::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags)
+void InterfaceTypeDefaultConstructor::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span)
 {
     TypeSymbol* type = static_cast<TypeSymbol*>(genObjects[0]->GetType());
     if (type->GetSymbolType() == SymbolType::interfaceTypeSymbol)
@@ -311,7 +330,7 @@ InterfaceTypeCopyConstructor::InterfaceTypeCopyConstructor(InterfaceTypeSymbol* 
     ComputeName();
 }
 
-void InterfaceTypeCopyConstructor::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags)
+void InterfaceTypeCopyConstructor::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span)
 {
     TypeSymbol* type = static_cast<TypeSymbol*>(genObjects[0]->GetType());
     if (type->GetSymbolType() == SymbolType::interfaceTypeSymbol)
@@ -354,7 +373,7 @@ InterfaceTypeMoveConstructor::InterfaceTypeMoveConstructor(InterfaceTypeSymbol* 
     ComputeName();
 }
 
-void InterfaceTypeMoveConstructor::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags)
+void InterfaceTypeMoveConstructor::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span)
 {
     TypeSymbol* type = static_cast<TypeSymbol*>(genObjects[0]->GetType());
     if (type->GetSymbolType() == SymbolType::interfaceTypeSymbol)
@@ -399,7 +418,7 @@ InterfaceTypeCopyAssignment::InterfaceTypeCopyAssignment(InterfaceTypeSymbol* in
     ComputeName();
 }
 
-void InterfaceTypeCopyAssignment::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags)
+void InterfaceTypeCopyAssignment::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span)
 {
     TypeSymbol* type = static_cast<TypeSymbol*>(genObjects[0]->GetType());
     if (type->GetSymbolType() == SymbolType::interfaceTypeSymbol)
@@ -444,7 +463,7 @@ InterfaceTypeMoveAssignment::InterfaceTypeMoveAssignment(InterfaceTypeSymbol* in
     ComputeName();
 }
 
-void InterfaceTypeMoveAssignment::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags)
+void InterfaceTypeMoveAssignment::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span)
 {
     TypeSymbol* type = static_cast<TypeSymbol*>(genObjects[0]->GetType());
     if (type->GetSymbolType() == SymbolType::interfaceTypeSymbol)
@@ -481,7 +500,7 @@ ClassToInterfaceConversion::ClassToInterfaceConversion(ClassTypeSymbol* sourceCl
     SetConversion();
 }
 
-void ClassToInterfaceConversion::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags)
+void ClassToInterfaceConversion::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span)
 {
     llvm::Value* classPtr = emitter.Stack().Pop();
     llvm::Value* classPtrAsVoidPtr = emitter.Builder().CreateBitCast(classPtr, emitter.Builder().getInt8PtrTy());

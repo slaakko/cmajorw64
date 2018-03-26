@@ -11,6 +11,7 @@
 #include <cmajor/parsing/Scanner.hpp>
 #include <cmajor/util/CodeFormatter.hpp>
 #include <llvm/IR/Value.h>
+#include <llvm/IR/DIBuilder.h>
 #include <unordered_set>
 #include <stdint.h>
 
@@ -69,6 +70,8 @@ enum class SymbolAccess : uint8_t
 {
     private_ = 0, protected_ = 1, internal_ = 2, public_ = 3
 };
+
+llvm::DINode::DIFlags AccessFlag(SymbolAccess access);
 
 enum class SymbolFlags : uint8_t
 {

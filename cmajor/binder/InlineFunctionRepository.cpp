@@ -51,7 +51,7 @@ void InlineFunctionRepository::Instantiate(FunctionSymbol* inlineFunction, Conta
         Assert(node, "function node not read");
     }
     FunctionNode* functionNode = static_cast<FunctionNode*>(node);
-    std::unique_ptr<NamespaceNode> globalNs(new NamespaceNode(span, new IdentifierNode(span, U"")));
+    std::unique_ptr<NamespaceNode> globalNs(new NamespaceNode(inlineFunction->GetSpan(), new IdentifierNode(inlineFunction->GetSpan(), U"")));
     NamespaceNode* currentNs = globalNs.get();
     CloneContext cloneContext;
     cloneContext.SetInstantiateFunctionNode();
@@ -82,7 +82,7 @@ void InlineFunctionRepository::Instantiate(FunctionSymbol* inlineFunction, Conta
         std::vector<std::u32string> nsComponents = Split(fullNsName, '.');
         for (const std::u32string& nsComponent : nsComponents)
         {
-            NamespaceNode* nsNode = new NamespaceNode(span, new IdentifierNode(span, nsComponent));
+            NamespaceNode* nsNode = new NamespaceNode(inlineFunction->GetSpan(), new IdentifierNode(inlineFunction->GetSpan(), nsComponent));
             currentNs->AddMember(nsNode);
             currentNs = nsNode;
         }

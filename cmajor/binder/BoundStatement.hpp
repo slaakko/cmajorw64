@@ -75,12 +75,15 @@ class BoundCompoundStatement : public BoundStatement
 {
 public:
     BoundCompoundStatement(const Span& span_);
+    BoundCompoundStatement(const Span& span_, const Span& endSpan_);
     void Accept(BoundNodeVisitor& visitor) override;
     void InsertStatementToFront(std::unique_ptr<BoundStatement>&& statement);
     void AddStatement(std::unique_ptr<BoundStatement>&& statement);
     const std::vector<std::unique_ptr<BoundStatement>>& Statements() const { return statements; }
+    const Span& EndSpan() const { return endSpan; }
 private:
     std::vector<std::unique_ptr<BoundStatement>> statements;
+    Span endSpan;
 };
 
 class BoundReturnStatement : public BoundStatement

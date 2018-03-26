@@ -88,17 +88,23 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>../..;C:\Programming\boost_1_64_0;C:\Programming\llvm-4.0.0.src\include;C:\Programming\llvm-4.0.0.src\build\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../..;C:\Programming\boost_1_64_0;C:\Programming\llvm-6.0.0.src\include;C:\Programming\llvm-6.0.0.src\build\include</AdditionalIncludeDirectories>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <DisableSpecificWarnings>4267;4146;4996;4141;4244;4291;4624;4996</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
-      <AdditionalLibraryDirectories>$(OutDir);C:\Programming\boost64;C:\Programming\llvm-4.0.0.src\build\Debug\lib</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(OutDir);C:\Programming\boost64;C:\Programming\llvm-6.0.0.src\build\Debug\lib</AdditionalLibraryDirectories>
       <AdditionalDependencies>eh.lib;xpath.lib;dom.lib;xml.lib;build.lib;emitter.lib;binder.lib;parser.lib;symbols.lib;ir.lib;ast.lib;syntax.lib;code.lib;parsing.lib;codedom.lib;util.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;
 build.lib;emitter.lib;binder.lib;parser.lib;symbols.lib;ir.lib;ast.lib;syntax.lib;code.lib;parsing.lib;codedom.lib;util.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;
-LLVMMCParser.lib;LLVMObject.lib;LLVMAsmParser.lib;LLVMIRReader.lib;LLVMLinker.lib;LLVMipo.lib;LLVMInstrumentation.lib;LLVMVectorize.lib;LLVMX86Disassembler.lib;LLVMX86AsmParser.lib;LLVMX86CodeGen.lib;LLVMGlobalISel.lib;LLVMSelectionDAG.lib;LLVMAsmPrinter.lib;LLVMDebugInfoCodeView.lib;LLVMDebugInfoMSF.lib;LLVMCodeGen.lib;LLVMTarget.lib;LLVMScalarOpts.lib;LLVMInstCombine.lib;LLVMTransformUtils.lib;LLVMBitWriter.lib;LLVMAnalysis.lib;LLVMProfileData.lib;LLVMX86Desc.lib;LLVMObject.lib;LLVMMCParser.lib;LLVMBitReader.lib;LLVMMCDisassembler.lib;LLVMX86Info.lib;LLVMX86AsmPrinter.lib;LLVMMC.lib;LLVMX86Utils.lib;LLVMCore.lib;LLVMSupport.lib;LLVMDemangle.lib;%(AdditionalDependencies)</AdditionalDependencies>
+LLVMMIRParser.lib;LLVMInterpreter.lib;LLVMLibDriver.lib;LLVMDlltoolDriver.lib;LLVMOption.lib;LLVMCoverage.lib;LLVMSymbolize.lib;LLVMDebugInfoPDB.lib;LLVMDebugInfoDWARF.lib;
+LLVMMCJIT.lib;LLVMWindowsManifest.lib;LLVMLineEditor.lib;LLVMLTO.lib;LLVMPasses.lib;LLVMObjCARCOpts.lib;LLVMCoroutines.lib;LLVMipo.lib;LLVMInstrumentation.lib;LLVMVectorize.lib;
+LLVMLinker.lib;LLVMIRReader.lib;LLVMAsmParser.lib;LLVMObjectYAML.lib;LLVMX86Disassembler.lib;LLVMX86AsmParser.lib;LLVMOrcJIT.lib;LLVMExecutionEngine.lib;LLVMRuntimeDyld.lib;
+LLVMX86CodeGen.lib;LLVMGlobalISel.lib;LLVMX86Desc.lib;LLVMX86Info.lib;LLVMMCDisassembler.lib;LLVMX86AsmPrinter.lib;LLVMX86Utils.lib;LLVMSelectionDAG.lib;LLVMAsmPrinter.lib;
+LLVMDebugInfoCodeView.lib;LLVMDebugInfoMSF.lib;LLVMCodeGen.lib;LLVMFuzzMutate.lib;LLVMTarget.lib;LLVMScalarOpts.lib;LLVMInstCombine.lib;LLVMTransformUtils.lib;LLVMBitWriter.lib;
+LLVMAnalysis.lib;LLVMProfileData.lib;LLVMObject.lib;LLVMMCParser.lib;LLVMMC.lib;LLVMBitReader.lib;LLVMCore.lib;LLVMBinaryFormat.lib;LLVMTableGen.lib;LLVMSupport.lib;
+LLVMDemangle.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -137,7 +143,7 @@ LLVMMCParser.lib;LLVMObject.lib;LLVMAsmParser.lib;LLVMIRReader.lib;LLVMLinker.li
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>../..;C:\Programming\boost_1_64_0;C:\Programming\llvm-4.0.0.src\include;C:\Programming\llvm-4.0.0.src\build\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../..;C:\Programming\boost_1_64_0;C:\Programming\llvm-6.0.0.src\include;C:\Programming\llvm-6.0.0.src\build\include</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4267;4146;4996;4141;4244;4291;4624;4996</DisableSpecificWarnings>
     </ClCompile>
     <Link>
@@ -145,10 +151,16 @@ LLVMMCParser.lib;LLVMObject.lib;LLVMAsmParser.lib;LLVMIRReader.lib;LLVMLinker.li
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
-      <AdditionalLibraryDirectories>$(OutDir);C:\Programming\boost64;C:\Programming\llvm-4.0.0.src\build\Release\lib</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(OutDir);C:\Programming\boost64;C:\Programming\llvm-6.0.0.src\build\Release\lib</AdditionalLibraryDirectories>
       <AdditionalDependencies>eh.lib;xpath.lib;dom.lib;xml.lib;build.lib;emitter.lib;binder.lib;parser.lib;symbols.lib;ir.lib;ast.lib;syntax.lib;code.lib;parsing.lib;codedom.lib;util.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;
 build.lib;emitter.lib;binder.lib;parser.lib;symbols.lib;ir.lib;ast.lib;syntax.lib;code.lib;parsing.lib;codedom.lib;util.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;
-LLVMMCParser.lib;LLVMObject.lib;LLVMAsmParser.lib;LLVMIRReader.lib;LLVMLinker.lib;LLVMipo.lib;LLVMInstrumentation.lib;LLVMVectorize.lib;LLVMX86Disassembler.lib;LLVMX86AsmParser.lib;LLVMX86CodeGen.lib;LLVMGlobalISel.lib;LLVMSelectionDAG.lib;LLVMAsmPrinter.lib;LLVMDebugInfoCodeView.lib;LLVMDebugInfoMSF.lib;LLVMCodeGen.lib;LLVMTarget.lib;LLVMScalarOpts.lib;LLVMInstCombine.lib;LLVMTransformUtils.lib;LLVMBitWriter.lib;LLVMAnalysis.lib;LLVMProfileData.lib;LLVMX86Desc.lib;LLVMObject.lib;LLVMMCParser.lib;LLVMBitReader.lib;LLVMMCDisassembler.lib;LLVMX86Info.lib;LLVMX86AsmPrinter.lib;LLVMMC.lib;LLVMX86Utils.lib;LLVMCore.lib;LLVMSupport.lib;LLVMDemangle.lib;%(AdditionalDependencies)</AdditionalDependencies>
+LLVMMIRParser.lib;LLVMInterpreter.lib;LLVMLibDriver.lib;LLVMDlltoolDriver.lib;LLVMOption.lib;LLVMCoverage.lib;LLVMSymbolize.lib;LLVMDebugInfoPDB.lib;LLVMDebugInfoDWARF.lib;
+LLVMMCJIT.lib;LLVMWindowsManifest.lib;LLVMLineEditor.lib;LLVMLTO.lib;LLVMPasses.lib;LLVMObjCARCOpts.lib;LLVMCoroutines.lib;LLVMipo.lib;LLVMInstrumentation.lib;LLVMVectorize.lib;
+LLVMLinker.lib;LLVMIRReader.lib;LLVMAsmParser.lib;LLVMObjectYAML.lib;LLVMX86Disassembler.lib;LLVMX86AsmParser.lib;LLVMOrcJIT.lib;LLVMExecutionEngine.lib;LLVMRuntimeDyld.lib;
+LLVMX86CodeGen.lib;LLVMGlobalISel.lib;LLVMX86Desc.lib;LLVMX86Info.lib;LLVMMCDisassembler.lib;LLVMX86AsmPrinter.lib;LLVMX86Utils.lib;LLVMSelectionDAG.lib;LLVMAsmPrinter.lib;
+LLVMDebugInfoCodeView.lib;LLVMDebugInfoMSF.lib;LLVMCodeGen.lib;LLVMFuzzMutate.lib;LLVMTarget.lib;LLVMScalarOpts.lib;LLVMInstCombine.lib;LLVMTransformUtils.lib;LLVMBitWriter.lib;
+LLVMAnalysis.lib;LLVMProfileData.lib;LLVMObject.lib;LLVMMCParser.lib;LLVMMC.lib;LLVMBitReader.lib;LLVMCore.lib;LLVMBinaryFormat.lib;LLVMTableGen.lib;LLVMSupport.lib;
+LLVMDemangle.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>

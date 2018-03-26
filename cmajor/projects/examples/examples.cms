@@ -5,4 +5,4 @@ project <Hello/Hello.cmp>;
 project <HexDump/hexdump.cmp>;
 project <rex/rex.cmp>;
 project <xpq/xpq.cmp>;
-activeProject Calculator;
+activeProject HexDump;

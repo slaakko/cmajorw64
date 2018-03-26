@@ -153,6 +153,11 @@ Value* BoolTypeSymbol::MakeValue() const
     return new BoolValue(GetSpan(), false);
 }
 
+llvm::DIType* BoolTypeSymbol::CreateDIType(Emitter& emitter) 
+{
+    return emitter.DIBuilder()->createBasicType("bool", 8, llvm::dwarf::DW_ATE_boolean); 
+}
+
 SByteTypeSymbol::SByteTypeSymbol(const Span& span_, const std::u32string& name_) : BasicTypeSymbol(SymbolType::sbyteTypeSymbol, span_, name_)
 {
 }
@@ -165,6 +170,11 @@ ValueType SByteTypeSymbol::GetValueType() const
 Value* SByteTypeSymbol::MakeValue() const
 {
     return new SByteValue(GetSpan(), 0);
+}
+
+llvm::DIType* SByteTypeSymbol::CreateDIType(Emitter& emitter)
+{
+    return emitter.DIBuilder()->createBasicType("sbyte", 8, llvm::dwarf::DW_ATE_signed);
 }
 
 ByteTypeSymbol::ByteTypeSymbol(const Span& span_, const std::u32string& name_) : BasicTypeSymbol(SymbolType::byteTypeSymbol, span_, name_)
@@ -181,6 +191,11 @@ Value* ByteTypeSymbol::MakeValue() const
     return new ByteValue(GetSpan(), 0);
 }
 
+llvm::DIType* ByteTypeSymbol::CreateDIType(Emitter& emitter)
+{
+    return emitter.DIBuilder()->createBasicType("byte", 8, llvm::dwarf::DW_ATE_unsigned);
+}
+
 ShortTypeSymbol::ShortTypeSymbol(const Span& span_, const std::u32string& name_) : BasicTypeSymbol(SymbolType::shortTypeSymbol, span_, name_)
 {
 }
@@ -193,6 +208,11 @@ ValueType ShortTypeSymbol::GetValueType() const
 Value* ShortTypeSymbol::MakeValue() const
 {
     return new ShortValue(GetSpan(), 0);
+}
+
+llvm::DIType* ShortTypeSymbol::CreateDIType(Emitter& emitter)
+{
+    return emitter.DIBuilder()->createBasicType("short", 16, llvm::dwarf::DW_ATE_signed);
 }
 
 UShortTypeSymbol::UShortTypeSymbol(const Span& span_, const std::u32string& name_) : BasicTypeSymbol(SymbolType::ushortTypeSymbol, span_, name_)
@@ -209,6 +229,11 @@ Value* UShortTypeSymbol::MakeValue() const
     return new UShortValue(GetSpan(), 0);
 }
 
+llvm::DIType* UShortTypeSymbol::CreateDIType(Emitter& emitter)
+{
+    return emitter.DIBuilder()->createBasicType("ushort", 16, llvm::dwarf::DW_ATE_unsigned);
+}
+
 IntTypeSymbol::IntTypeSymbol(const Span& span_, const std::u32string& name_) : BasicTypeSymbol(SymbolType::intTypeSymbol, span_, name_)
 {
 }
@@ -221,6 +246,11 @@ ValueType IntTypeSymbol::GetValueType() const
 Value* IntTypeSymbol::MakeValue() const
 {
     return new IntValue(GetSpan(), 0);
+}
+
+llvm::DIType* IntTypeSymbol::CreateDIType(Emitter& emitter)
+{
+    return emitter.DIBuilder()->createBasicType("int", 32, llvm::dwarf::DW_ATE_signed);
 }
 
 UIntTypeSymbol::UIntTypeSymbol(const Span& span_, const std::u32string& name_) : BasicTypeSymbol(SymbolType::uintTypeSymbol, span_, name_)
@@ -237,6 +267,11 @@ Value* UIntTypeSymbol::MakeValue() const
     return new UIntValue(GetSpan(), 0);
 }
 
+llvm::DIType* UIntTypeSymbol::CreateDIType(Emitter& emitter)
+{
+    return emitter.DIBuilder()->createBasicType("uint", 32, llvm::dwarf::DW_ATE_unsigned);
+}
+
 LongTypeSymbol::LongTypeSymbol(const Span& span_, const std::u32string& name_) : BasicTypeSymbol(SymbolType::longTypeSymbol, span_, name_)
 {
 }
@@ -249,6 +284,11 @@ ValueType LongTypeSymbol::GetValueType() const
 Value* LongTypeSymbol::MakeValue() const
 {
     return new LongValue(GetSpan(), 0);
+}
+
+llvm::DIType* LongTypeSymbol::CreateDIType(Emitter& emitter)
+{
+    return emitter.DIBuilder()->createBasicType("long", 64, llvm::dwarf::DW_ATE_signed);
 }
 
 ULongTypeSymbol::ULongTypeSymbol(const Span& span_, const std::u32string& name_) : BasicTypeSymbol(SymbolType::ulongTypeSymbol, span_, name_)
@@ -265,6 +305,11 @@ Value* ULongTypeSymbol::MakeValue() const
     return new ULongValue(GetSpan(), 0);
 }
 
+llvm::DIType* ULongTypeSymbol::CreateDIType(Emitter& emitter)
+{
+    return emitter.DIBuilder()->createBasicType("ulong", 64, llvm::dwarf::DW_ATE_unsigned);
+}
+
 FloatTypeSymbol::FloatTypeSymbol(const Span& span_, const std::u32string& name_) : BasicTypeSymbol(SymbolType::floatTypeSymbol, span_, name_)
 {
 }
@@ -277,6 +322,11 @@ ValueType FloatTypeSymbol::GetValueType() const
 Value* FloatTypeSymbol::MakeValue() const
 {
     return new FloatValue(GetSpan(), 0.0);
+}
+
+llvm::DIType* FloatTypeSymbol::CreateDIType(Emitter& emitter)
+{
+    return emitter.DIBuilder()->createBasicType("float", 32, llvm::dwarf::DW_ATE_float);
 }
 
 DoubleTypeSymbol::DoubleTypeSymbol(const Span& span_, const std::u32string& name_) : BasicTypeSymbol(SymbolType::doubleTypeSymbol, span_, name_)
@@ -293,6 +343,11 @@ Value* DoubleTypeSymbol::MakeValue() const
     return new DoubleValue(GetSpan(), 0.0);
 }
 
+llvm::DIType* DoubleTypeSymbol::CreateDIType(Emitter& emitter)
+{
+    return emitter.DIBuilder()->createBasicType("double", 64, llvm::dwarf::DW_ATE_float);
+}
+
 CharTypeSymbol::CharTypeSymbol(const Span& span_, const std::u32string& name_) : BasicTypeSymbol(SymbolType::charTypeSymbol, span_, name_)
 {
 }
@@ -305,6 +360,11 @@ ValueType CharTypeSymbol::GetValueType() const
 Value* CharTypeSymbol::MakeValue() const
 {
     return new CharValue(GetSpan(), '\0');
+}
+
+llvm::DIType* CharTypeSymbol::CreateDIType(Emitter& emitter)
+{
+    return emitter.DIBuilder()->createBasicType("char", 8, llvm::dwarf::DW_ATE_unsigned_char);
 }
 
 WCharTypeSymbol::WCharTypeSymbol(const Span& span_, const std::u32string& name_) : BasicTypeSymbol(SymbolType::wcharTypeSymbol, span_, name_)
@@ -321,6 +381,11 @@ Value* WCharTypeSymbol::MakeValue() const
     return new WCharValue(GetSpan(), '\0');
 }
 
+llvm::DIType* WCharTypeSymbol::CreateDIType(Emitter& emitter)
+{
+    return emitter.DIBuilder()->createBasicType("wchar", 16, llvm::dwarf::DW_ATE_unsigned_char);
+}
+
 UCharTypeSymbol::UCharTypeSymbol(const Span& span_, const std::u32string& name_) : BasicTypeSymbol(SymbolType::ucharTypeSymbol, span_, name_)
 {
 }
@@ -335,8 +400,18 @@ Value* UCharTypeSymbol::MakeValue() const
     return new UCharValue(GetSpan(), '\0');
 }
 
+llvm::DIType* UCharTypeSymbol::CreateDIType(Emitter& emitter)
+{
+    return emitter.DIBuilder()->createBasicType("uchar", 32, llvm::dwarf::DW_ATE_unsigned_char);
+}
+
 VoidTypeSymbol::VoidTypeSymbol(const Span& span_, const std::u32string& name_) : BasicTypeSymbol(SymbolType::voidTypeSymbol, span_, name_)
 {
+}
+
+llvm::DIType* VoidTypeSymbol::CreateDIType(Emitter& emitter)
+{
+    return emitter.DIBuilder()->createUnspecifiedType("void");
 }
 
 } } // namespace cmajor::symbols

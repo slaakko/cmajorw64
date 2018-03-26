@@ -47,18 +47,19 @@ void BoundExpression::DestroyTemporaries(Emitter& emitter)
     }
 }
 
-BoundParameter::BoundParameter(ParameterSymbol* parameterSymbol_) : 
+BoundParameter::BoundParameter(const Span& span_, ParameterSymbol* parameterSymbol_) : 
     BoundExpression(parameterSymbol_->GetSpan(), BoundNodeType::boundParameter, parameterSymbol_->GetType()), parameterSymbol(parameterSymbol_)
 {
 }
 
 BoundExpression* BoundParameter::Clone()
 {
-    return new BoundParameter(parameterSymbol);
+    return new BoundParameter(GetSpan(), parameterSymbol);
 }
 
 void BoundParameter::Load(Emitter& emitter, OperationFlags flags)
 {
+    emitter.SetCurrentDebugLocation(GetSpan());
     if ((flags & OperationFlags::addr) != OperationFlags::none)
     {
         emitter.Stack().Push(parameterSymbol->IrObject());
@@ -82,6 +83,7 @@ void BoundParameter::Load(Emitter& emitter, OperationFlags flags)
 
 void BoundParameter::Store(Emitter& emitter, OperationFlags flags)
 {
+    emitter.SetCurrentDebugLocation(GetSpan());
     llvm::Value* value = emitter.Stack().Pop();
     if ((flags & OperationFlags::addr) != OperationFlags::none)
     {
@@ -109,18 +111,19 @@ void BoundParameter::Accept(BoundNodeVisitor& visitor)
     visitor.Visit(*this);
 }
 
-BoundLocalVariable::BoundLocalVariable(LocalVariableSymbol* localVariableSymbol_) : 
-    BoundExpression(localVariableSymbol_->GetSpan(), BoundNodeType::boundLocalVariable, localVariableSymbol_->GetType()), localVariableSymbol(localVariableSymbol_)
+BoundLocalVariable::BoundLocalVariable(const Span& span_, LocalVariableSymbol* localVariableSymbol_) :
+    BoundExpression(span_, BoundNodeType::boundLocalVariable, localVariableSymbol_->GetType()), localVariableSymbol(localVariableSymbol_)
 {
 }
 
 BoundExpression* BoundLocalVariable::Clone()
 {
-    return new BoundLocalVariable(localVariableSymbol);
+    return new BoundLocalVariable(GetSpan(), localVariableSymbol);
 }
 
 void BoundLocalVariable::Load(Emitter& emitter, OperationFlags flags)
 {
+    emitter.SetCurrentDebugLocation(GetSpan());
     if ((flags & OperationFlags::addr) != OperationFlags::none)
     {
         emitter.Stack().Push(localVariableSymbol->IrObject());
@@ -144,6 +147,7 @@ void BoundLocalVariable::Load(Emitter& emitter, OperationFlags flags)
 
 void BoundLocalVariable::Store(Emitter& emitter, OperationFlags flags)
 {
+    emitter.SetCurrentDebugLocation(GetSpan());
     llvm::Value* value = emitter.Stack().Pop();
     if ((flags & OperationFlags::addr) != OperationFlags::none)
     {
@@ -171,14 +175,14 @@ void BoundLocalVariable::Accept(BoundNodeVisitor& visitor)
     visitor.Visit(*this);
 }
 
-BoundMemberVariable::BoundMemberVariable(MemberVariableSymbol* memberVariableSymbol_) :
-    BoundExpression(memberVariableSymbol_->GetSpan(), BoundNodeType::boundMemberVariable, memberVariableSymbol_->GetType()), memberVariableSymbol(memberVariableSymbol_), staticInitNeeded(false)
+BoundMemberVariable::BoundMemberVariable(const Span& span_, MemberVariableSymbol* memberVariableSymbol_) :
+    BoundExpression(span_, BoundNodeType::boundMemberVariable, memberVariableSymbol_->GetType()), memberVariableSymbol(memberVariableSymbol_), staticInitNeeded(false)
 {
 }
 
 BoundExpression* BoundMemberVariable::Clone()
 {
-    BoundMemberVariable* clone = new BoundMemberVariable(memberVariableSymbol);
+    BoundMemberVariable* clone = new BoundMemberVariable(GetSpan(), memberVariableSymbol);
     if (classPtr)
     {
         clone->classPtr.reset(classPtr->Clone());
@@ -192,6 +196,7 @@ BoundExpression* BoundMemberVariable::Clone()
 
 void BoundMemberVariable::Load(Emitter& emitter, OperationFlags flags)
 {
+    emitter.SetCurrentDebugLocation(GetSpan());
     Assert(memberVariableSymbol->LayoutIndex() != -1, "layout index of the member variable not set");
     if (memberVariableSymbol->IsStatic())
     {
@@ -238,6 +243,7 @@ void BoundMemberVariable::Load(Emitter& emitter, OperationFlags flags)
 
 void BoundMemberVariable::Store(Emitter& emitter, OperationFlags flags)
 {
+    emitter.SetCurrentDebugLocation(GetSpan());
     Assert(memberVariableSymbol->LayoutIndex() != -1, "layout index of the member variable not set");
     llvm::Value* value = emitter.Stack().Pop();
     if ((flags & OperationFlags::addr) != OperationFlags::none)
@@ -296,17 +302,18 @@ void BoundMemberVariable::SetClassPtr(std::unique_ptr<BoundExpression>&& classPt
     classPtr = std::move(classPtr_);
 }
 
-BoundConstant::BoundConstant(ConstantSymbol* constantSymbol_) : BoundExpression(constantSymbol_->GetSpan(), BoundNodeType::boundConstant, constantSymbol_->GetType()), constantSymbol(constantSymbol_)
+BoundConstant::BoundConstant(const Span& span_, ConstantSymbol* constantSymbol_) : BoundExpression(span_, BoundNodeType::boundConstant, constantSymbol_->GetType()), constantSymbol(constantSymbol_)
 {
 }
 
 BoundExpression* BoundConstant::Clone()
 {
-    return new BoundConstant(constantSymbol);
+    return new BoundConstant(GetSpan(), constantSymbol);
 }
 
 void BoundConstant::Load(Emitter& emitter, OperationFlags flags)
 {
+    emitter.SetCurrentDebugLocation(GetSpan());
     if (constantSymbol->GetValue()->GetValueType() == ValueType::arrayValue && (flags & OperationFlags::addr) != OperationFlags::none)
     {
         emitter.Stack().Push(constantSymbol->ArrayIrObject(emitter, false));
@@ -339,18 +346,19 @@ void BoundConstant::Accept(BoundNodeVisitor& visitor)
     visitor.Visit(*this);
 }
 
-BoundEnumConstant::BoundEnumConstant(EnumConstantSymbol* enumConstantSymbol_) : BoundExpression(enumConstantSymbol_->GetSpan(), BoundNodeType::boundEnumConstant, enumConstantSymbol_->GetType()),
+BoundEnumConstant::BoundEnumConstant(const Span& span_, EnumConstantSymbol* enumConstantSymbol_) : BoundExpression(span_, BoundNodeType::boundEnumConstant, enumConstantSymbol_->GetType()),
     enumConstantSymbol(enumConstantSymbol_)
 {
 }
 
 BoundExpression* BoundEnumConstant::Clone()
 {
-    return new BoundEnumConstant(enumConstantSymbol);
+    return new BoundEnumConstant(GetSpan(), enumConstantSymbol);
 }
 
 void BoundEnumConstant::Load(Emitter& emitter, OperationFlags flags)
 {
+    emitter.SetCurrentDebugLocation(GetSpan());
     if ((flags & OperationFlags::addr) != OperationFlags::none)
     {
         throw Exception("cannot take address of an enumeration constant", GetSpan());
@@ -389,6 +397,7 @@ BoundExpression* BoundLiteral::Clone()
 
 void BoundLiteral::Load(Emitter& emitter, OperationFlags flags)
 {
+    emitter.SetCurrentDebugLocation(GetSpan());
     if ((flags & OperationFlags::addr) != OperationFlags::none)
     {
         throw Exception("cannot take address of a literal", GetSpan());
@@ -780,7 +789,7 @@ void BoundFunctionCall::Load(Emitter& emitter, OperationFlags flags)
                 genObjects.push_back(argument.get());
                 genObjects.back()->SetType(argument->GetType());
             }
-            functionSymbol->GenerateCall(emitter, genObjects, flags);
+            functionSymbol->GenerateCall(emitter, genObjects, flags, GetSpan());
         }
         else
         {
@@ -810,11 +819,11 @@ void BoundFunctionCall::Load(Emitter& emitter, OperationFlags flags)
         {
             InterfaceTypeSymbol* interfaceType = static_cast<InterfaceTypeSymbol*>(functionSymbol->Parent());
             MemberFunctionSymbol* interfaceMemberFunction = static_cast<MemberFunctionSymbol*>(functionSymbol);
-            interfaceType->GenerateCall(emitter, genObjects, callFlags, interfaceMemberFunction);
+            interfaceType->GenerateCall(emitter, genObjects, callFlags, interfaceMemberFunction, GetSpan());
         }
         else
         {
-            functionSymbol->GenerateCall(emitter, genObjects, callFlags);
+            functionSymbol->GenerateCall(emitter, genObjects, callFlags, GetSpan());
         }
         if ((flags & OperationFlags::deref) != OperationFlags::none)
         {
@@ -856,13 +865,13 @@ void BoundFunctionCall::Store(Emitter& emitter, OperationFlags flags)
         }
         if (functionSymbol->IsArrayElementAccess())
         {
-            functionSymbol->GenerateCall(emitter, genObjects, callFlags | OperationFlags::addr);
+            functionSymbol->GenerateCall(emitter, genObjects, callFlags | OperationFlags::addr, GetSpan());
             llvm::Value* ptr = emitter.Stack().Pop();
             emitter.Builder().CreateStore(value, ptr);
         }
         else
         {
-            functionSymbol->GenerateCall(emitter, genObjects, callFlags);
+            functionSymbol->GenerateCall(emitter, genObjects, callFlags, GetSpan());
             llvm::Value* ptr = emitter.Stack().Pop();
             if ((flags & OperationFlags::leaveFirstArg) != OperationFlags::none)
             {
@@ -936,7 +945,7 @@ void BoundDelegateCall::Load(Emitter& emitter, OperationFlags flags)
         {
             emitter.SetLineNumber(GetSpan().LineNumber());
         }
-        delegateTypeSymbol->GenerateCall(emitter, genObjects, callFlags);
+        delegateTypeSymbol->GenerateCall(emitter, genObjects, callFlags, GetSpan());
         if ((flags & OperationFlags::deref) != OperationFlags::none)
         {
             llvm::Value* value = emitter.Stack().Pop();
@@ -975,7 +984,7 @@ void BoundDelegateCall::Store(Emitter& emitter, OperationFlags flags)
         {
             emitter.SetLineNumber(GetSpan().LineNumber());
         }
-        delegateTypeSymbol->GenerateCall(emitter, genObjects, callFlags);
+        delegateTypeSymbol->GenerateCall(emitter, genObjects, callFlags, GetSpan());
         llvm::Value* ptr = emitter.Stack().Pop();
         if ((flags & OperationFlags::leaveFirstArg) != OperationFlags::none)
         {
@@ -1068,7 +1077,7 @@ void BoundClassDelegateCall::Load(Emitter& emitter, OperationFlags flags)
         {
             emitter.SetLineNumber(GetSpan().LineNumber());
         }
-        classDelegateTypeSymbol->GenerateCall(emitter, genObjects, callFlags);
+        classDelegateTypeSymbol->GenerateCall(emitter, genObjects, callFlags, GetSpan());
         if ((flags & OperationFlags::deref) != OperationFlags::none)
         {
             llvm::Value* value = emitter.Stack().Pop();
@@ -1107,7 +1116,7 @@ void BoundClassDelegateCall::Store(Emitter& emitter, OperationFlags flags)
         {
             emitter.SetLineNumber(GetSpan().LineNumber());
         }
-        classDelegateTypeSymbol->GenerateCall(emitter, genObjects, callFlags);
+        classDelegateTypeSymbol->GenerateCall(emitter, genObjects, callFlags, GetSpan());
         llvm::Value* ptr = emitter.Stack().Pop();
         if ((flags & OperationFlags::leaveFirstArg) != OperationFlags::none)
         {
@@ -1341,7 +1350,7 @@ void BoundConversion::Load(Emitter& emitter, OperationFlags flags)
 {
     sourceExpr->Load(emitter, flags);
     std::vector<GenObject*> emptyObjects;
-    conversionFun->GenerateCall(emitter, emptyObjects, OperationFlags::none);
+    conversionFun->GenerateCall(emitter, emptyObjects, OperationFlags::none, GetSpan());
     DestroyTemporaries(emitter);
 }
 

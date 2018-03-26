@@ -13,7 +13,7 @@ namespace cmajor { namespace symbols {
 
 using namespace cmajor::unicode;
 
-TypeSymbol::TypeSymbol(SymbolType symbolType_, const Span& span_, const std::u32string& name_) : ContainerSymbol(symbolType_, span_, name_), typeId(0)
+TypeSymbol::TypeSymbol(SymbolType symbolType_, const Span& span_, const std::u32string& name_) : ContainerSymbol(symbolType_, span_, name_), typeId(0), compileUnitIndex(-1), diType(nullptr)
 {
 }
 
@@ -59,6 +59,11 @@ TypeSymbol* TypeSymbol::AddPointer(const Span& span)
     return GetSymbolTable()->MakeDerivedType(this, typeDerivationRec, span);
 }
 
+llvm::DIType* TypeSymbol::CreateDIType(Emitter& emitter)
+{
+    return emitter.DIBuilder()->createUnspecifiedType(ToUtf8(Name()));
+}
+
 const TypeDerivationRec& TypeSymbol::DerivationRec() const
 {
     static TypeDerivationRec emptyDerivationRec;
@@ -86,6 +91,37 @@ ValueType TypeSymbol::GetValueType() const
 std::u32string TypeSymbol::Id() const 
 { 
     return ToUtf32(std::to_string(TypeId())); 
+}
+
+llvm::DIType* TypeSymbol::GetDIType(Emitter& emitter)
+{
+    if (!diType || compileUnitIndex != emitter.CompileUnitIndex())
+    {
+        compileUnitIndex = emitter.CompileUnitIndex();
+        diType = emitter.GetDIType(this);
+        if (!diType)
+        {
+            if (IsClassTypeSymbol())
+            {
+                ClassTypeSymbol* classTypeSymbol = static_cast<ClassTypeSymbol*>(this);
+                diType = classTypeSymbol->CreateDIForwardDeclaration(emitter);
+                emitter.SetDIType(this, diType);
+            }
+            diType = CreateDIType(emitter);
+            emitter.SetDIType(this, diType);
+        }
+    }
+    return diType;
+}
+
+uint64_t TypeSymbol::SizeInBits(Emitter& emitter) 
+{
+    return emitter.DataLayout()->getTypeSizeInBits(IrType(emitter));
+}
+
+uint32_t TypeSymbol::AlignmentInBits(Emitter& emitter)
+{
+    return 8 * emitter.DataLayout()->getABITypeAlignment(IrType(emitter));
 }
 
 bool CompareTypesForEquality(const TypeSymbol* left, const TypeSymbol* right)

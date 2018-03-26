@@ -10,7 +10,7 @@
 #include <cmajor/symbols/SymbolReader.hpp>
 #include <cmajor/symbols/Exception.hpp>
 #include <cmajor/symbols/SymbolCollector.hpp>
-#include <cmajor/emitter/Emitter.hpp>
+#include <cmajor/ir/Emitter.hpp>
 #include <cmajor/util/Unicode.hpp>
 #include <llvm/IR/Module.h>
 

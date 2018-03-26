@@ -96,7 +96,7 @@ std::u32string GetCurrentProjectName()
 
 std::u32string currentToolName;
 
-void SetCurrentTooName(const std::u32string& currentToolName_)
+void SetCurrentToolName(const std::u32string& currentToolName_)
 {
     currentToolName = currentToolName_;
 }
@@ -104,6 +104,18 @@ void SetCurrentTooName(const std::u32string& currentToolName_)
 std::u32string GetCurrentToolName()
 {
     return currentToolName;
+}
+
+std::string compilerVersion;
+
+void SetCompilerVersion(const std::string& compilerVersion_)
+{
+    compilerVersion = compilerVersion_;
+}
+
+std::string GetCompilerVersion()
+{
+    return compilerVersion;
 }
 
 std::set<std::u32string> commandLineDefines;

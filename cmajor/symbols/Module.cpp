@@ -232,7 +232,7 @@ Module::Module(const std::string& filePath, std::vector<ClassTypeSymbol*>& class
         dependencyMap[p.second->GetModule()] = p.second;
     }
     std::vector<Module*> finishReadOrder = CreateFinishReadOrder(modules, dependencyMap, rootModule);
-    if (!sourceFilePaths.empty())
+    if (!fileMap.empty())
     {
 #ifdef _WIN32
         libraryFilePath = GetFullPath(boost::filesystem::path(originalFilePath).replace_extension(".lib").generic_string());
@@ -242,7 +242,7 @@ Module::Module(const std::string& filePath, std::vector<ClassTypeSymbol*>& class
     }
     for (Module* module : finishReadOrder)
     {
-        if (!module->LibraryFilePath().empty() && !module->sourceFilePaths.empty())
+        if (!module->LibraryFilePath().empty() && !module->fileMap.empty())
         {
             libraryFilePaths.push_back(module->LibraryFilePath());
         }
@@ -270,7 +270,7 @@ Module::Module(const std::u32string& name_, const std::string& filePath_) :
     }
 }
 
-void Module::PrepareForCompilation(const std::vector<std::string>& references, const std::vector<std::string>& sourceFilePaths, 
+void Module::PrepareForCompilation(const std::vector<std::string>& references, std::vector<std::pair<uint32_t, std::string>>&& fileMap, 
     std::vector<ClassTypeSymbol*>& classTypes, std::vector<ClassTemplateSpecializationSymbol*>& classTemplateSpecializations)
 {
     boost::filesystem::path mfd = originalFilePath;
@@ -281,7 +281,7 @@ void Module::PrepareForCompilation(const std::vector<std::string>& references, c
     {
         InitCoreSymbolTable(symbolTable);
     }
-    this->sourceFilePaths = sourceFilePaths;
+    this->fileMap = std::move(fileMap);
     std::unordered_set<std::string> importSet;
     Module* rootModule = this;
     std::vector<Module*> modules;
@@ -296,7 +296,7 @@ void Module::PrepareForCompilation(const std::vector<std::string>& references, c
         dependencyMap[p.second->GetModule()] = p.second;
     }
     std::vector<Module*> finishReadOrder = CreateFinishReadOrder(modules, dependencyMap, rootModule);
-    if (!sourceFilePaths.empty())
+    if (!this->fileMap.empty())
     {
 #ifdef _WIN32
         libraryFilePath = GetFullPath(boost::filesystem::path(originalFilePath).replace_extension(".lib").generic_string());
@@ -328,7 +328,7 @@ void Module::Write(SymbolWriter& writer)
         const std::unique_ptr<Module>& referencedModule = referencedModules[i];
         writer.GetBinaryWriter().Write(referencedModule->OriginalFilePath());
     }
-    uint32_t ns = sourceFilePaths.size();
+    uint32_t ns = fileMap.size();
     writer.GetBinaryWriter().WriteEncodedUInt(ns);
     std::string cmajorRoot;
     if (IsSystemModule())
@@ -337,16 +337,17 @@ void Module::Write(SymbolWriter& writer)
     }
     for (uint32_t i = 0; i < ns; ++i)
     {
-        std::string sfp = sourceFilePaths[i];
+        std::pair<uint32_t, std::string> sfp = fileMap[i];
         if (IsSystemModule())
         {
-            sfp = GetFullPath(sfp);
-            if (sfp.find(cmajorRoot, 0) == 0)
+            sfp.second = GetFullPath(sfp.second);
+            if (sfp.second.find(cmajorRoot, 0) == 0)
             {
-                sfp = sfp.substr(cmajorRoot.size());
+                sfp = std::make_pair(sfp.first, sfp.second.substr(cmajorRoot.size()));
             }
         }
-        writer.GetBinaryWriter().Write(sfp);
+        writer.GetBinaryWriter().Write(sfp.first);
+        writer.GetBinaryWriter().Write(sfp.second);
     }
     uint32_t efn = exportedFunctions.size();
     writer.GetBinaryWriter().WriteEncodedUInt(efn);
@@ -398,10 +399,15 @@ void Module::ReadHeader(SymbolReader& reader, Module* rootModule, std::unordered
     uint32_t ns = reader.GetBinaryReader().ReadEncodedUInt();
     for (uint32_t i = 0; i < ns; ++i)
     {
+        uint32_t fileIndex = reader.GetBinaryReader().ReadUInt();
         std::string sourceFilePath = reader.GetBinaryReader().ReadUtf8String();
-        sourceFilePaths.push_back(sourceFilePath);
+        fileMap.push_back(std::make_pair(fileIndex, sourceFilePath));
     }
-    if (!sourceFilePaths.empty())
+    for (const std::pair<uint32_t, std::string>& sfp : fileMap)
+    {
+        FileRegistry::Instance().RegisterExistingFile(sfp.first, sfp.second);
+    }
+    if (!fileMap.empty())
     {
 #ifdef _WIN32
         libraryFilePath = GetFullPath(boost::filesystem::path(filePathReadFrom).replace_extension(".lib").generic_string());
@@ -613,14 +619,14 @@ void Module::Dump()
         }
         formatter.DecIndent();
     }
-    n = sourceFilePaths.size();
+    n = fileMap.size();
     if (n > 0)
     {
         formatter.WriteLine("source file paths:");
         formatter.IncIndent();
         for (int i = 0; i < n; ++i)
         {
-            formatter.WriteLine(sourceFilePaths[i]);
+            formatter.WriteLine(std::to_string(fileMap[i].first) + ":" + fileMap[i].second);
         }
         formatter.DecIndent();
     }
@@ -736,12 +742,12 @@ void Module::Dump()
 
 void Module::CheckUpToDate()
 {
-    if (sourceFilePaths.empty()) return;
+    if (fileMap.empty()) return;
     std::string cmajorRootDir = GetFullPath(CmajorRootDir());
     boost::filesystem::path libDirPath = boost::filesystem::path(originalFilePath).parent_path();
-    for (const std::string& sourceFilePath : sourceFilePaths)
+    for (const std::pair<uint32_t, std::string>& f : fileMap)
     {
-        boost::filesystem::path sfp(sourceFilePath);
+        boost::filesystem::path sfp(f.second);
         if (IsSystemModule())
         {
             sfp = cmajorRootDir / sfp;

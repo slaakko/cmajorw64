@@ -6,9 +6,12 @@
 #ifndef CMAJOR_SYMBOLS_VARIABLE_SYMBOL_INCLUDED
 #define CMAJOR_SYMBOLS_VARIABLE_SYMBOL_INCLUDED
 #include <cmajor/symbols/Symbol.hpp>
+#include <cmajor/ir/Emitter.hpp>
 #include <llvm/IR/Instructions.h>
 
 namespace cmajor { namespace symbols {
+
+using namespace cmajor::ir;
 
 class VariableSymbol : public Symbol
 {
@@ -56,8 +59,11 @@ public:
     void SetSpecifiers(Specifiers specifiers);
     int32_t LayoutIndex() const { return layoutIndex; }
     void SetLayoutIndex(int32_t layoutIndex_) { layoutIndex = layoutIndex_; }
+    llvm::DIDerivedType* GetDIMemberType(Emitter& emitter, uint64_t offsetInBits);
 private:
     int32_t layoutIndex;
+    int32_t compileUnitIndex;
+    llvm::DIDerivedType* diMemberType;
 };
 
 } } // namespace cmajor::symbols

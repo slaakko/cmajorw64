@@ -253,7 +253,7 @@ void DelegateTypeSymbol::SetReturnParam(ParameterSymbol* returnParam_)
     returnParam.reset(returnParam_);
 }
 
-void DelegateTypeSymbol::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags)
+void DelegateTypeSymbol::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span)
 {
     llvm::Value* callee = nullptr;
     int na = genObjects.size();
@@ -278,6 +278,7 @@ void DelegateTypeSymbol::GenerateCall(Emitter& emitter, std::vector<GenObject*>&
         llvm::Value* arg = emitter.Stack().Pop();
         args[n - i - 1] = arg;
     }
+    emitter.SetCurrentDebugLocation(span);
     llvm::BasicBlock* handlerBlock = emitter.HandlerBlock();
     llvm::BasicBlock* cleanupBlock = emitter.CleanupBlock();
     bool newCleanupNeeded = emitter.NewCleanupNeeded();
@@ -299,7 +300,12 @@ void DelegateTypeSymbol::GenerateCall(Emitter& emitter, std::vector<GenObject*>&
             }
             else
             {
-                emitter.Stack().Push(llvm::CallInst::Create(callee, args, bundles, "", emitter.CurrentBasicBlock()));
+                llvm::CallInst* callInst = llvm::CallInst::Create(callee, args, bundles, "", emitter.CurrentBasicBlock());
+                if (emitter.DIBuilder())
+                {
+                    callInst->setDebugLoc(emitter.GetDebugLocation(span));
+                }
+                emitter.Stack().Push(callInst);
             }
         }
         else
@@ -322,7 +328,12 @@ void DelegateTypeSymbol::GenerateCall(Emitter& emitter, std::vector<GenObject*>&
             }
             else
             {
-                emitter.Stack().Push(llvm::InvokeInst::Create(callee, nextBlock, unwindBlock, args, bundles, "", emitter.CurrentBasicBlock()));
+                llvm::InvokeInst* invokeInst = llvm::InvokeInst::Create(callee, nextBlock, unwindBlock, args, bundles, "", emitter.CurrentBasicBlock());
+                if (emitter.DIBuilder())
+                {
+                    invokeInst->setDebugLoc(emitter.GetDebugLocation(span));
+                }
+                emitter.Stack().Push(invokeInst);
             }
             emitter.SetCurrentBasicBlock(nextBlock);
         }
@@ -337,7 +348,11 @@ void DelegateTypeSymbol::GenerateCall(Emitter& emitter, std::vector<GenObject*>&
             }
             else
             {
-                llvm::CallInst::Create(callee, args, bundles, "", emitter.CurrentBasicBlock());
+                llvm::CallInst* callInst = llvm::CallInst::Create(callee, args, bundles, "", emitter.CurrentBasicBlock());
+                if (emitter.DIBuilder())
+                {
+                    callInst->setDebugLoc(emitter.GetDebugLocation(span));
+                }
             }
         }
         else
@@ -360,7 +375,11 @@ void DelegateTypeSymbol::GenerateCall(Emitter& emitter, std::vector<GenObject*>&
             }
             else
             {
-                llvm::InvokeInst::Create(callee, nextBlock, unwindBlock, args, bundles, "", emitter.CurrentBasicBlock());
+                llvm::InvokeInst* invokeInst = llvm::InvokeInst::Create(callee, nextBlock, unwindBlock, args, bundles, "", emitter.CurrentBasicBlock());
+                if (emitter.DIBuilder())
+                {
+                    invokeInst->setDebugLoc(emitter.GetDebugLocation(span));
+                }
             }
             emitter.SetCurrentBasicBlock(nextBlock);
         }
@@ -408,7 +427,7 @@ void DelegateTypeDefaultConstructor::EmplaceType(TypeSymbol* typeSymbol, int ind
     }
 }
 
-void DelegateTypeDefaultConstructor::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags)
+void DelegateTypeDefaultConstructor::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span)
 {
     Assert(genObjects.size() == 1, "default constructor needs one object");
     emitter.Stack().Push(delegateType->CreateDefaultIrValue(emitter));
@@ -432,7 +451,7 @@ DelegateTypeCopyConstructor::DelegateTypeCopyConstructor(DelegateTypeSymbol* del
     ComputeName();
 }
 
-void DelegateTypeCopyConstructor::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags)
+void DelegateTypeCopyConstructor::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span)
 {
     Assert(genObjects.size() == 2, "copy constructor needs two objects");
     genObjects[1]->Load(emitter, OperationFlags::none);
@@ -456,7 +475,7 @@ DelegateTypeMoveConstructor::DelegateTypeMoveConstructor(DelegateTypeSymbol* del
     ComputeName();
 }
 
-void DelegateTypeMoveConstructor::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags)
+void DelegateTypeMoveConstructor::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span)
 {
     Assert(genObjects.size() == 2, "move constructor needs two objects");
     genObjects[1]->Load(emitter, OperationFlags::none);
@@ -483,7 +502,7 @@ DelegateTypeCopyAssignment::DelegateTypeCopyAssignment(DelegateTypeSymbol* deleg
     ComputeName();
 }
 
-void DelegateTypeCopyAssignment::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags)
+void DelegateTypeCopyAssignment::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span)
 {
     Assert(genObjects.size() == 2, "copy assignment needs two objects");
     genObjects[1]->Load(emitter, OperationFlags::none);
@@ -508,7 +527,7 @@ DelegateTypeMoveAssignment::DelegateTypeMoveAssignment(DelegateTypeSymbol* deleg
     ComputeName();
 }
 
-void DelegateTypeMoveAssignment::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags)
+void DelegateTypeMoveAssignment::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span)
 {
     Assert(genObjects.size() == 2, "move assignment needs two objects");
     genObjects[1]->Load(emitter, OperationFlags::none);
@@ -531,7 +550,7 @@ DelegateTypeReturn::DelegateTypeReturn(DelegateTypeSymbol* delegateType) : Funct
     ComputeName();
 }
 
-void DelegateTypeReturn::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags)
+void DelegateTypeReturn::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span)
 {
     Assert(genObjects.size() == 1, "return needs one object");
     genObjects[0]->Load(emitter, OperationFlags::none);
@@ -555,7 +574,7 @@ DelegateTypeEquality::DelegateTypeEquality(DelegateTypeSymbol* delegateType, Typ
     ComputeName();
 }
 
-void DelegateTypeEquality::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags)
+void DelegateTypeEquality::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span)
 {
     Assert(genObjects.size() == 2, "operator== needs two objects");
     genObjects[0]->Load(emitter, OperationFlags::none);
@@ -575,7 +594,7 @@ FunctionToDelegateConversion::FunctionToDelegateConversion(TypeSymbol* sourceTyp
     SetConversion();
 }
 
-void FunctionToDelegateConversion::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags)
+void FunctionToDelegateConversion::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span)
 {
     emitter.Stack().Pop();
     emitter.Stack().Push(emitter.Module()->getOrInsertFunction(ToUtf8(function->MangledName()), function->IrType(emitter)));
@@ -819,7 +838,7 @@ void ClassDelegateTypeSymbol::SetSpecifiers(Specifiers specifiers)
     }
 }
 
-void ClassDelegateTypeSymbol::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags)
+void ClassDelegateTypeSymbol::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span)
 {
     Assert(!genObjects.empty(), "gen objects is empty");
     genObjects[0]->Load(emitter, flags);
@@ -845,7 +864,7 @@ void ClassDelegateTypeSymbol::GenerateCall(Emitter& emitter, std::vector<GenObje
         GenObject* genObject = genObjects[i];
         classDelegateCallObjects.push_back(genObject);
     }
-    delegateType->GenerateCall(emitter, classDelegateCallObjects, flags);
+    delegateType->GenerateCall(emitter, classDelegateCallObjects, flags, span);
 }
 
 ClassDelegateTypeDefaultConstructor::ClassDelegateTypeDefaultConstructor(const Span& span_, const std::u32string& name_) : 
@@ -890,7 +909,7 @@ void ClassDelegateTypeDefaultConstructor::EmplaceType(TypeSymbol* typeSymbol, in
     }
 }
 
-void ClassDelegateTypeDefaultConstructor::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags)
+void ClassDelegateTypeDefaultConstructor::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span)
 {
     Assert(genObjects.size() == 1, "default constructor needs one object");
     llvm::Value* objectValue = llvm::Constant::getNullValue(emitter.Builder().getInt8PtrTy());
@@ -928,7 +947,7 @@ ClassDelegateTypeCopyConstructor::ClassDelegateTypeCopyConstructor(ClassDelegate
     ComputeName();
 }
 
-void ClassDelegateTypeCopyConstructor::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags)
+void ClassDelegateTypeCopyConstructor::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span)
 {
     ArgVector objectIndeces;
     objectIndeces.push_back(emitter.Builder().getInt32(0));
@@ -969,7 +988,7 @@ ClassDelegateTypeMoveConstructor::ClassDelegateTypeMoveConstructor(ClassDelegate
     ComputeName();
 }
 
-void ClassDelegateTypeMoveConstructor::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags)
+void ClassDelegateTypeMoveConstructor::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span)
 {
     ArgVector objectIndeces;
     objectIndeces.push_back(emitter.Builder().getInt32(0));
@@ -1011,7 +1030,7 @@ ClassDelegateTypeCopyAssignment::ClassDelegateTypeCopyAssignment(ClassDelegateTy
     ComputeName();
 }
 
-void ClassDelegateTypeCopyAssignment::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags)
+void ClassDelegateTypeCopyAssignment::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span)
 {
     ArgVector objectIndeces;
     objectIndeces.push_back(emitter.Builder().getInt32(0));
@@ -1053,7 +1072,7 @@ ClassDelegateTypeMoveAssignment::ClassDelegateTypeMoveAssignment(ClassDelegateTy
     ComputeName();
 }
 
-void ClassDelegateTypeMoveAssignment::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags)
+void ClassDelegateTypeMoveAssignment::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span)
 {
     ArgVector objectIndeces;
     objectIndeces.push_back(emitter.Builder().getInt32(0));
@@ -1095,7 +1114,7 @@ ClassDelegateTypeEquality::ClassDelegateTypeEquality(ClassDelegateTypeSymbol* cl
     ComputeName();
 }
 
-void ClassDelegateTypeEquality::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags)
+void ClassDelegateTypeEquality::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span)
 {
     ArgVector objectIndeces;
     objectIndeces.push_back(emitter.Builder().getInt32(0));
@@ -1134,7 +1153,7 @@ MemberFunctionToClassDelegateConversion::MemberFunctionToClassDelegateConversion
     SetConversion();
 }
 
-void MemberFunctionToClassDelegateConversion::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags)
+void MemberFunctionToClassDelegateConversion::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span)
 {
     llvm::Value* objectValue = emitter.Stack().Pop();
     if (!objectValue)

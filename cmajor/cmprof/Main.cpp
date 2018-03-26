@@ -805,7 +805,7 @@ void ProfileProject(const std::string& projectFilePath, bool rebuildSys, bool re
     }
 }
 
-const char* version = "2.1.0";
+const char* version = "2.2.0";
 
 void PrintHelp()
 {
@@ -847,6 +847,7 @@ int main(int argc, const char** argv)
     try
     { 
         InitDone initDone;
+        SetCompilerVersion(version);
         SetGlobalFlag(GlobalFlags::release);
         SetGlobalFlag(GlobalFlags::profile);
         std::vector<std::string> projects;

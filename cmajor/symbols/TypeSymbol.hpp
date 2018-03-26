@@ -47,6 +47,7 @@ public:
     virtual TypeSymbol* AddPointer(const Span& span);
     virtual llvm::Type* IrType(Emitter& emitter) = 0;
     virtual llvm::Constant* CreateDefaultIrValue(Emitter& emitter) = 0;
+    virtual llvm::DIType* CreateDIType(Emitter& emitter);
     virtual bool IsConstType() const { return false; }
     virtual bool IsReferenceType() const { return false; }
     virtual bool IsLvalueReferenceType() const { return false; }
@@ -71,8 +72,13 @@ public:
     virtual ValueType GetValueType() const;
     virtual Value* MakeValue() const { return nullptr; }
     std::u32string Id() const override;
+    llvm::DIType* GetDIType(Emitter& emitter);
+    uint64_t SizeInBits(Emitter& emitter);
+    uint32_t AlignmentInBits(Emitter& emitter);
 private:
     uint32_t typeId;
+    int32_t compileUnitIndex;
+    llvm::DIType* diType;
 };
 
 bool CompareTypesForEquality(const TypeSymbol* left, const TypeSymbol* right);

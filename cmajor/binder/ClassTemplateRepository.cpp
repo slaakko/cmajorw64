@@ -119,7 +119,7 @@ void ClassTemplateRepository::BindClassTemplateSpecialization(ClassTemplateSpeci
     }
     Assert(node->GetNodeType() == NodeType::classNode, "class node expected");
     ClassNode* classNode = static_cast<ClassNode*>(node);
-    std::unique_ptr<NamespaceNode> globalNs(new NamespaceNode(span, new IdentifierNode(span, U"")));
+    std::unique_ptr<NamespaceNode> globalNs(new NamespaceNode(classTemplate->GetSpan(), new IdentifierNode(classTemplate->GetSpan(), U"")));
     NamespaceNode* currentNs = globalNs.get();
     CloneContext cloneContext;
     cloneContext.SetInstantiateClassNode();
@@ -140,7 +140,7 @@ void ClassTemplateRepository::BindClassTemplateSpecialization(ClassTemplateSpeci
         std::vector<std::u32string> nsComponents = Split(fullNsName, '.');
         for (const std::u32string& nsComponent : nsComponents)
         {
-            NamespaceNode* nsNode = new NamespaceNode(span, new IdentifierNode(span, nsComponent));
+            NamespaceNode* nsNode = new NamespaceNode(classTemplate->GetSpan(), new IdentifierNode(classTemplate->GetSpan(), nsComponent));
             currentNs->AddMember(nsNode);
             currentNs = nsNode;
         }

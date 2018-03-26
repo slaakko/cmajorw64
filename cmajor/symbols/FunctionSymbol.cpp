@@ -589,11 +589,11 @@ std::string FunctionSymbol::Syntax() const
     return syntax;
 }
 
-void FunctionSymbol::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags)
+void FunctionSymbol::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span)
 {
     if ((flags & OperationFlags::virtualCall) != OperationFlags::none)
     {
-        GenerateVirtualCall(emitter, genObjects, flags);
+        GenerateVirtualCall(emitter, genObjects, flags, span);
         return;
     }
     int na = genObjects.size();
@@ -602,6 +602,7 @@ void FunctionSymbol::GenerateCall(Emitter& emitter, std::vector<GenObject*>& gen
         GenObject* genObject = genObjects[i];
         genObject->Load(emitter, flags & OperationFlags::functionCallFlags);
     }
+    emitter.SetCurrentDebugLocation(span);
     llvm::FunctionType* functionType = IrType(emitter);
     llvm::Function* callee = llvm::cast<llvm::Function>(emitter.Module()->getOrInsertFunction(ToUtf8(MangledName()), functionType));
     ArgVector args;
@@ -637,7 +638,12 @@ void FunctionSymbol::GenerateCall(Emitter& emitter, std::vector<GenObject*>& gen
             }
             else
             {
-                emitter.Stack().Push(llvm::CallInst::Create(callee, args, bundles, "", emitter.CurrentBasicBlock()));
+                llvm::CallInst* callInst = llvm::CallInst::Create(callee, args, bundles, "", emitter.CurrentBasicBlock());
+                if (emitter.DIBuilder())
+                {
+                    callInst->setDebugLoc(emitter.GetDebugLocation(span));
+                }
+                emitter.Stack().Push(callInst);;
             }
         }
         else
@@ -660,7 +666,12 @@ void FunctionSymbol::GenerateCall(Emitter& emitter, std::vector<GenObject*>& gen
             }
             else
             {
-                emitter.Stack().Push(llvm::InvokeInst::Create(callee, nextBlock, unwindBlock, args, bundles, "", emitter.CurrentBasicBlock()));
+                llvm::InvokeInst* invokeInst = llvm::InvokeInst::Create(callee, nextBlock, unwindBlock, args, bundles, "", emitter.CurrentBasicBlock());
+                if (emitter.DIBuilder())
+                {
+                    invokeInst->setDebugLoc(emitter.GetDebugLocation(span));
+                }
+                emitter.Stack().Push(invokeInst);
             }
             emitter.SetCurrentBasicBlock(nextBlock);
         }
@@ -675,7 +686,11 @@ void FunctionSymbol::GenerateCall(Emitter& emitter, std::vector<GenObject*>& gen
             }
             else
             {
-                llvm::CallInst::Create(callee, args, bundles, "", emitter.CurrentBasicBlock());
+                llvm::CallInst* callInst = llvm::CallInst::Create(callee, args, bundles, "", emitter.CurrentBasicBlock());
+                if (emitter.DIBuilder())
+                {
+                    callInst->setDebugLoc(emitter.GetDebugLocation(span));
+                }
             }
         }
         else
@@ -698,14 +713,18 @@ void FunctionSymbol::GenerateCall(Emitter& emitter, std::vector<GenObject*>& gen
             }
             else
             {
-                llvm::InvokeInst::Create(callee, nextBlock, unwindBlock, args, bundles, "", emitter.CurrentBasicBlock());
+                llvm::InvokeInst* invokeInst = llvm::InvokeInst::Create(callee, nextBlock, unwindBlock, args, bundles, "", emitter.CurrentBasicBlock());
+                if (emitter.DIBuilder())
+                {
+                    invokeInst->setDebugLoc(emitter.GetDebugLocation(span));
+                }
             }
             emitter.SetCurrentBasicBlock(nextBlock);
         }
     }
 }
 
-void FunctionSymbol::GenerateVirtualCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags)
+void FunctionSymbol::GenerateVirtualCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span)
 {
     int na = genObjects.size();
     Assert(na > 0, "nonempty argument list expected");
@@ -754,6 +773,7 @@ void FunctionSymbol::GenerateVirtualCall(Emitter& emitter, std::vector<GenObject
         llvm::Value* arg = emitter.Stack().Pop();
         args[n - i - 1] = arg;
     }
+    emitter.SetCurrentDebugLocation(span);
     llvm::BasicBlock* handlerBlock = emitter.HandlerBlock();
     llvm::BasicBlock* cleanupBlock = emitter.CleanupBlock();
     bool newCleanupNeeded = emitter.NewCleanupNeeded();
@@ -775,7 +795,12 @@ void FunctionSymbol::GenerateVirtualCall(Emitter& emitter, std::vector<GenObject
             }
             else
             {
-                emitter.Stack().Push(llvm::CallInst::Create(callee, args, bundles, "", emitter.CurrentBasicBlock()));
+                llvm::CallInst* callInst = llvm::CallInst::Create(callee, args, bundles, "", emitter.CurrentBasicBlock());
+                if (emitter.DIBuilder())
+                {
+                    callInst->setDebugLoc(emitter.GetDebugLocation(span));
+                }
+                emitter.Stack().Push(callInst);
             }
         }
         else
@@ -798,7 +823,12 @@ void FunctionSymbol::GenerateVirtualCall(Emitter& emitter, std::vector<GenObject
             }
             else
             {
-                emitter.Stack().Push(llvm::InvokeInst::Create(callee, nextBlock, unwindBlock, args, bundles, "", emitter.CurrentBasicBlock()));
+                llvm::InvokeInst* invokeInst = llvm::InvokeInst::Create(callee, nextBlock, unwindBlock, args, bundles, "", emitter.CurrentBasicBlock());
+                if (emitter.DIBuilder())
+                {
+                    invokeInst->setDebugLoc(emitter.GetDebugLocation(span));
+                }
+                emitter.Stack().Push(invokeInst);
             }
             emitter.SetCurrentBasicBlock(nextBlock);
         }
@@ -813,7 +843,11 @@ void FunctionSymbol::GenerateVirtualCall(Emitter& emitter, std::vector<GenObject
             }
             else
             {
-                llvm::CallInst::Create(callee, args, bundles, "", emitter.CurrentBasicBlock());
+                llvm::CallInst* callInst = llvm::CallInst::Create(callee, args, bundles, "", emitter.CurrentBasicBlock());
+                if (emitter.DIBuilder())
+                {
+                    callInst->setDebugLoc(emitter.GetDebugLocation(span));
+                }
             }
         }
         else
@@ -836,7 +870,11 @@ void FunctionSymbol::GenerateVirtualCall(Emitter& emitter, std::vector<GenObject
             }
             else
             {
-                llvm::InvokeInst::Create(callee, nextBlock, unwindBlock, args, bundles, "", emitter.CurrentBasicBlock());
+                llvm::InvokeInst* invokeInst = llvm::InvokeInst::Create(callee, nextBlock, unwindBlock, args, bundles, "", emitter.CurrentBasicBlock());
+                if (emitter.DIBuilder())
+                {
+                    invokeInst->setDebugLoc(emitter.GetDebugLocation(span));
+                }
             }
             emitter.SetCurrentBasicBlock(nextBlock);
         }

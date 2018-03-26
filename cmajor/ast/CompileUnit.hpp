@@ -19,9 +19,15 @@ public:
     const std::string& FilePath() const { return filePath; }
     const NamespaceNode* GlobalNs() const { return globalNs.get(); }
     NamespaceNode* GlobalNs() { return globalNs.get(); }
+    void ComputeLineStarts(const std::u32string& sourceFileContent);
+    int GetColumn(const Span& span) const;
+    void SetSynthesizedUnit() { isSynthesizedUnit = true; }
+    bool IsSynthesizedUnit() const { return isSynthesizedUnit; }
 private:
     std::string filePath;
     std::unique_ptr<NamespaceNode> globalNs;
+    std::vector<int32_t> lineStarts;
+    bool isSynthesizedUnit;
 };
 
 } } // namespace cmajor::ast

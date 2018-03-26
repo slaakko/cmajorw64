@@ -21,6 +21,7 @@ llvm::Function* LinuxEmitter::GetPersonalityFunction() const
 
 void LinuxEmitter::Visit(BoundReturnStatement& boundReturnStatement)
 {
+    SetCurrentDebugLocation(boundReturnStatement.GetSpan());
     destructorCallGenerated = false;
     lastInstructionWasRet = false;
     basicBlockOpen = false;
@@ -64,6 +65,7 @@ void LinuxEmitter::Visit(BoundReturnStatement& boundReturnStatement)
 
 void LinuxEmitter::Visit(BoundGotoCaseStatement& boundGotoCaseStatement)
 {
+    SetCurrentDebugLocation(boundGotoCaseStatement.GetSpan());
     destructorCallGenerated = false;
     lastInstructionWasRet = false;
     basicBlockOpen = false;
@@ -85,6 +87,7 @@ void LinuxEmitter::Visit(BoundGotoCaseStatement& boundGotoCaseStatement)
 
 void LinuxEmitter::Visit(BoundGotoDefaultStatement& boundGotoDefaultStatement)
 {
+    SetCurrentDebugLocation(boundGotoDefaultStatement.GetSpan());
     destructorCallGenerated = false;
     lastInstructionWasRet = false;
     basicBlockOpen = false;
@@ -103,6 +106,7 @@ void LinuxEmitter::Visit(BoundGotoDefaultStatement& boundGotoDefaultStatement)
 
 void LinuxEmitter::Visit(BoundBreakStatement& boundBreakStatement)
 {
+    SetCurrentDebugLocation(boundBreakStatement.GetSpan());
     destructorCallGenerated = false;
     lastInstructionWasRet = false;
     basicBlockOpen = false;
@@ -120,6 +124,7 @@ void LinuxEmitter::Visit(BoundBreakStatement& boundBreakStatement)
 
 void LinuxEmitter::Visit(BoundContinueStatement& boundContinueStatement)
 {
+    SetCurrentDebugLocation(boundContinueStatement.GetSpan());
     destructorCallGenerated = false;
     lastInstructionWasRet = false;
     basicBlockOpen = false;
@@ -134,6 +139,7 @@ void LinuxEmitter::Visit(BoundContinueStatement& boundContinueStatement)
 
 void LinuxEmitter::Visit(BoundGotoStatement& boundGotoStatement)
 {
+    SetCurrentDebugLocation(boundGotoStatement.GetSpan());
     destructorCallGenerated = false;
     lastInstructionWasRet = false;
     basicBlockOpen = false;
@@ -262,6 +268,7 @@ void LinuxEmitter::Visit(BoundTryStatement& boundTryStatement)
 
 void LinuxEmitter::Visit(BoundRethrowStatement& boundRethrowStatement)
 {
+    SetCurrentDebugLocation(boundRethrowStatement.GetSpan());
     destructorCallGenerated = false;
     lastInstructionWasRet = false;
     basicBlockOpen = false;

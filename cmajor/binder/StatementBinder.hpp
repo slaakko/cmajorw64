@@ -26,6 +26,7 @@ public:
     StatementBinder(BoundCompileUnit& boundCompileUnit_);
     void Visit(CompileUnitNode& compileUnitNode) override;
     void Visit(NamespaceNode& namespaceNode) override;
+    void Visit(EnumTypeNode& enumTypeNode) override;
     void Visit(ClassNode& classNode) override;
     void Visit(FunctionNode& functionNode) override;
     void Visit(StaticConstructorNode& staticConstructorNode) override;

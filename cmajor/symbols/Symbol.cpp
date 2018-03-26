@@ -100,6 +100,25 @@ std::string SymbolFlagStr(SymbolFlags symbolFlags, bool noAccess)
     return s;
 }
 
+llvm::DINode::DIFlags AccessFlag(SymbolAccess access)
+{
+    switch (access)
+    {
+        case SymbolAccess::private_:
+        {
+            return llvm::DINode::DIFlags::FlagPrivate;
+        }
+        case SymbolAccess::protected_:
+        {
+            return llvm::DINode::DIFlags::FlagProtected;
+        }
+        case SymbolAccess::public_:
+        {
+            return llvm::DINode::DIFlags::FlagPublic;
+        }
+    }
+    return llvm::DINode::DIFlags::FlagZero;
+}
 
 Symbol::Symbol(SymbolType symbolType_, const Span& span_, const std::u32string& name_) : 
     symbolType(symbolType_), span(span_), name(name_), flags(SymbolFlags::project), parent(nullptr), symbolTable(nullptr), module(nullptr), compileUnit(nullptr), irObject(nullptr)

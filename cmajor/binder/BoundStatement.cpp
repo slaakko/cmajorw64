@@ -50,7 +50,11 @@ void BoundSequenceStatement::Accept(BoundNodeVisitor& visitor)
     visitor.Visit(*this);
 }
 
-BoundCompoundStatement::BoundCompoundStatement(const Span& span_) : BoundStatement(span_, BoundNodeType::boundCompoundStatement)
+BoundCompoundStatement::BoundCompoundStatement(const Span& span_) : BoundStatement(span_, BoundNodeType::boundCompoundStatement), endSpan()
+{
+}
+
+BoundCompoundStatement::BoundCompoundStatement(const Span& span_, const Span& endSpan_) : BoundStatement(span_, BoundNodeType::boundCompoundStatement), endSpan(endSpan_)
 {
 }
 

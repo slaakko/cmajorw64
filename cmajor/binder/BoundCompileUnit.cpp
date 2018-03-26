@@ -4,6 +4,7 @@
 // =================================
 
 #include <cmajor/binder/BoundCompileUnit.hpp>
+#include <cmajor/binder/BoundNamespace.hpp>
 #include <cmajor/binder/BoundNodeVisitor.hpp>
 #include <cmajor/binder/StatementBinder.hpp>
 #include <cmajor/binder/BoundStatement.hpp>
@@ -31,7 +32,7 @@ public:
     TypeSymbol* ConversionSourceType() const { return sourceType; }
     TypeSymbol* ConversionTargetType() const { return targetType; }
     bool IsBasicTypeOperation() const override { return true; }
-    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags) override;
+    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
 private:
     ConversionType conversionType;
     uint8_t conversionDistance;
@@ -47,8 +48,9 @@ ClassTypeConversion::ClassTypeConversion(const std::u32string& name_, Conversion
     SetAccess(SymbolAccess::public_);
 }
 
-void ClassTypeConversion::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags)
+void ClassTypeConversion::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span)
 {
+    emitter.SetCurrentDebugLocation(span);
     llvm::Value* value = emitter.Stack().Pop();
     emitter.Stack().Push(emitter.Builder().CreateBitCast(value, targetType->IrType(emitter)));
 }
@@ -62,7 +64,7 @@ public:
     TypeSymbol* ConversionSourceType() const { return nullPtrType; }
     TypeSymbol* ConversionTargetType() const { return targetPointerType; }
     bool IsBasicTypeOperation() const override { return true; }
-    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags) override;
+    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
     std::unique_ptr<Value> ConvertValue(const std::unique_ptr<Value>& value) const override;
 private:
     TypeSymbol* nullPtrType;
@@ -77,8 +79,9 @@ NullPtrToPtrConversion::NullPtrToPtrConversion(TypeSymbol* nullPtrType_, TypeSym
     SetAccess(SymbolAccess::public_);
 }
 
-void NullPtrToPtrConversion::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags)
+void NullPtrToPtrConversion::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span)
 {
+    emitter.SetCurrentDebugLocation(span);
     llvm::Value* value = emitter.Stack().Pop();
     emitter.Stack().Push(emitter.Builder().CreateBitCast(value, targetPointerType->IrType(emitter)));
 }
@@ -105,7 +108,7 @@ public:
     TypeSymbol* ConversionSourceType() const { return voidPtrType; }
     TypeSymbol* ConversionTargetType() const { return targetPointerType; }
     bool IsBasicTypeOperation() const override { return true; }
-    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags) override;
+    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
 private:
     TypeSymbol* voidPtrType;
     TypeSymbol* targetPointerType;;
@@ -119,8 +122,9 @@ VoidPtrToPtrConversion::VoidPtrToPtrConversion(TypeSymbol* voidPtrType_, TypeSym
     SetAccess(SymbolAccess::public_);
 }
 
-void VoidPtrToPtrConversion::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags)
+void VoidPtrToPtrConversion::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span)
 {
+    emitter.SetCurrentDebugLocation(span);
     llvm::Value* value = emitter.Stack().Pop();
     emitter.Stack().Push(emitter.Builder().CreateBitCast(value, targetPointerType->IrType(emitter)));
 }
@@ -134,7 +138,7 @@ public:
     TypeSymbol* ConversionSourceType() const { return sourcePtrType; }
     TypeSymbol* ConversionTargetType() const { return voidPtrType; }
     bool IsBasicTypeOperation() const override { return true; }
-    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags) override;
+    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
 private:
     TypeSymbol* sourcePtrType;
     TypeSymbol* voidPtrType;
@@ -148,8 +152,9 @@ PtrToVoidPtrConversion::PtrToVoidPtrConversion(TypeSymbol* sourcePtrType_, TypeS
     SetAccess(SymbolAccess::public_);
 }
 
-void PtrToVoidPtrConversion::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags)
+void PtrToVoidPtrConversion::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span)
 {
+    emitter.SetCurrentDebugLocation(span);
     llvm::Value* value = emitter.Stack().Pop();
     emitter.Stack().Push(emitter.Builder().CreateBitCast(value, voidPtrType->IrType(emitter)));
 }
@@ -163,7 +168,7 @@ public:
     TypeSymbol* ConversionSourceType() const { return ptrType; }
     TypeSymbol* ConversionTargetType() const { return ulongType; }
     bool IsBasicTypeOperation() const override { return true; }
-    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags) override;
+    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
 private:
     TypeSymbol* ptrType;
     TypeSymbol* ulongType;
@@ -177,15 +182,17 @@ PtrToULongConversion::PtrToULongConversion(TypeSymbol* ptrType_, TypeSymbol* ulo
     SetAccess(SymbolAccess::public_);
 }
 
-void PtrToULongConversion::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags)
+void PtrToULongConversion::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span)
 {
+    emitter.SetCurrentDebugLocation(span);
     llvm::Value* value = emitter.Stack().Pop();
     emitter.Stack().Push(emitter.Builder().CreatePtrToInt(value, ulongType->IrType(emitter)));
 }
 
 BoundCompileUnit::BoundCompileUnit(Module& module_, CompileUnitNode* compileUnitNode_, AttributeBinder* attributeBinder_) :
-    BoundNode(Span(), BoundNodeType::boundCompileUnit), module(module_), symbolTable(module.GetSymbolTable()), compileUnitNode(compileUnitNode_), attributeBinder(attributeBinder_), hasGotos(false),
-    operationRepository(*this), functionTemplateRepository(*this), classTemplateRepository(*this), inlineFunctionRepository(*this), constExprFunctionRepository(*this), bindingTypes(false)
+    BoundNode(Span(), BoundNodeType::boundCompileUnit), module(module_), symbolTable(module.GetSymbolTable()), compileUnitNode(compileUnitNode_), attributeBinder(attributeBinder_), currentNamespace(nullptr), 
+    hasGotos(false), operationRepository(*this), functionTemplateRepository(*this), classTemplateRepository(*this), inlineFunctionRepository(*this), constExprFunctionRepository(*this), bindingTypes(false),
+    compileUnitIndex(-2)
 {
     boost::filesystem::path fileName = boost::filesystem::path(compileUnitNode->FilePath()).filename();
     boost::filesystem::path directory = module.DirectoryPath();
@@ -243,7 +250,14 @@ FileScope* BoundCompileUnit::ReleaseLastFileScope()
 
 void BoundCompileUnit::AddBoundNode(std::unique_ptr<BoundNode>&& boundNode)
 {
-    boundNodes.push_back(std::move(boundNode));
+    if (currentNamespace)
+    {
+        currentNamespace->AddMember(std::move(boundNode));
+    }
+    else
+    {
+        boundNodes.push_back(std::move(boundNode));
+    }
 }
 
 FunctionSymbol* BoundCompileUnit::GetConversion(TypeSymbol* sourceType, TypeSymbol* targetType, ContainerScope* containerScope, BoundFunction* currentFunction, const Span& span, ArgumentMatch& argumentMatch)
@@ -618,6 +632,18 @@ void BoundCompileUnit::FinalizeBinding(ClassTypeSymbol* classType)
             RemoveLastFileScope();
         }
     }
+}
+
+void BoundCompileUnit::PushNamespace(BoundNamespace* ns)
+{
+    namespaceStack.push(currentNamespace);
+    currentNamespace = ns;
+}
+
+void BoundCompileUnit::PopNamespace()
+{
+    currentNamespace = namespaceStack.top();
+    namespaceStack.pop();
 }
 
 } } // namespace cmajor::binder

@@ -23,7 +23,8 @@ struct ModuleTag
 };
 
 const uint8_t moduleFormat_1 = uint8_t('1');
-const uint8_t currentModuleFormat = moduleFormat_1;
+const uint8_t moduleFormat_2 = uint8_t('2');
+const uint8_t currentModuleFormat = moduleFormat_2;
 
 enum class ModuleFlags : uint8_t
 {
@@ -69,7 +70,7 @@ public:
     const std::string& OriginalFilePath() const { return originalFilePath; }
     const std::string& FilePathReadFrom() const { return filePathReadFrom; }
     const std::string& LibraryFilePath() const { return libraryFilePath; }
-    void PrepareForCompilation(const std::vector<std::string>& references, const std::vector<std::string>& sourceFilePaths,
+    void PrepareForCompilation(const std::vector<std::string>& references, std::vector<std::pair<uint32_t, std::string>>&& fileMap,
         std::vector<ClassTypeSymbol*>& classTypes, std::vector<ClassTemplateSpecializationSymbol*>& classTemplateSpecializations);
     SymbolTable& GetSymbolTable() { return symbolTable; }
     void Write(SymbolWriter& writer);
@@ -96,7 +97,7 @@ private:
     std::string filePathReadFrom;
     std::string libraryFilePath;
     std::vector<std::string> referenceFilePaths;
-    std::vector<std::string> sourceFilePaths;
+    std::vector<std::pair<uint32_t, std::string>> fileMap;
     std::vector<std::string> exportedFunctions;
     std::vector<std::string> exportedData;
     std::vector<std::string> allExportedFunctions;

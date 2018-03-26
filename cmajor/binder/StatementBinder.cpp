@@ -4,6 +4,7 @@
 // =================================
 
 #include <cmajor/binder/StatementBinder.hpp>
+#include <cmajor/binder/BoundNamespace.hpp>
 #include <cmajor/binder/BoundClass.hpp>
 #include <cmajor/binder/BoundFunction.hpp>
 #include <cmajor/binder/BoundStatement.hpp>
@@ -16,6 +17,7 @@
 #include <cmajor/binder/TypeBinder.hpp>
 #include <cmajor/binder/TypeResolver.hpp>
 #include <cmajor/binder/AttributeBinder.hpp>
+#include <cmajor/binder/BoundEnum.hpp>
 #include <cmajor/symbols/FunctionSymbol.hpp>
 #include <cmajor/symbols/Exception.hpp>
 #include <cmajor/symbols/GlobalFlags.hpp>
@@ -208,7 +210,7 @@ void CheckFunctionReturnPaths(FunctionSymbol* functionSymbol, CompoundStatementN
 
 StatementBinder::StatementBinder(BoundCompileUnit& boundCompileUnit_) :  
     boundCompileUnit(boundCompileUnit_), symbolTable(boundCompileUnit.GetSymbolTable()), containerScope(nullptr), statement(), compoundLevel(0), insideCatch(false), 
-    currentClass(nullptr), currentFunction(nullptr), currentStaticConstructorSymbol(nullptr), currentStaticConstructorNode(nullptr), currentConstructorSymbol(nullptr), 
+    currentClass(nullptr), currentFunction(nullptr), currentStaticConstructorSymbol(nullptr), currentStaticConstructorNode(nullptr), currentConstructorSymbol(nullptr),
     currentConstructorNode(nullptr), currentDestructorSymbol(nullptr), currentDestructorNode(nullptr), currentMemberFunctionSymbol(nullptr), currentMemberFunctionNode(nullptr), 
     switchConditionType(nullptr), currentCaseValueMap(nullptr), currentGotoCaseStatements(nullptr), currentGotoDefaultStatements(nullptr), postfix(false), compilingThrow(false), 
     compilingReleaseExceptionStatement(false)
@@ -222,6 +224,8 @@ void StatementBinder::Visit(CompileUnitNode& compileUnitNode)
 
 void StatementBinder::Visit(NamespaceNode& namespaceNode)
 {
+    std::unique_ptr<BoundNamespace> ns(new BoundNamespace(namespaceNode));
+    boundCompileUnit.PushNamespace(ns.get());
     ContainerScope* prevContainerScope = containerScope;
     Symbol* symbol = boundCompileUnit.GetSymbolTable().GetSymbol(&namespaceNode);
     containerScope = symbol->GetContainerScope();
@@ -232,6 +236,17 @@ void StatementBinder::Visit(NamespaceNode& namespaceNode)
         member->Accept(*this);
     }
     containerScope = prevContainerScope;
+    boundCompileUnit.PopNamespace();
+    boundCompileUnit.AddBoundNode(std::unique_ptr<BoundNode>(ns.release()));
+}
+
+void StatementBinder::Visit(EnumTypeNode& enumTypeNode)
+{
+    Symbol* symbol = boundCompileUnit.GetSymbolTable().GetSymbol(&enumTypeNode);
+    Assert(symbol->GetSymbolType() == SymbolType::enumTypeSymbol, "enum type symbols expected");
+    EnumTypeSymbol* enumTypeSymbol = static_cast<EnumTypeSymbol*>(symbol);
+    std::unique_ptr<BoundEnumTypeDefinition> boundEnum(new BoundEnumTypeDefinition(enumTypeSymbol));
+    boundCompileUnit.AddBoundNode(std::move(boundEnum));
 }
 
 void StatementBinder::Visit(ClassNode& classNode)
@@ -360,7 +375,7 @@ void StatementBinder::Visit(ConstructorNode& constructorNode)
         ConstructorNode* prevConstructorNode = currentConstructorNode;
         currentConstructorNode = &constructorNode;
         std::unique_ptr<BoundCompoundStatement> boundCompoundStatement(new BoundCompoundStatement(constructorNode.GetSpan()));
-        GenerateClassInitialization(currentConstructorSymbol, currentConstructorNode, boundCompoundStatement.get(), currentFunction, boundCompileUnit, containerScope, this, true);
+        GenerateClassInitialization(currentConstructorSymbol, currentConstructorNode, boundCompoundStatement.get(), currentFunction, boundCompileUnit, containerScope, this, true, constructorNode.GetSpan());
         currentConstructorNode = prevConstructorNode;
         boundFunction->SetBody(std::move(boundCompoundStatement));
     }
@@ -404,7 +419,7 @@ void StatementBinder::Visit(DestructorNode& destructorNode)
         DestructorNode* prevDestructorNode = currentDestructorNode;
         currentDestructorNode = &destructorNode;
         std::unique_ptr<BoundCompoundStatement> boundCompoundStatement(new BoundCompoundStatement(destructorNode.GetSpan()));
-        GenerateClassTermination(currentDestructorSymbol, currentDestructorNode, boundCompoundStatement.get(), currentFunction, boundCompileUnit, containerScope, this);
+        GenerateClassTermination(currentDestructorSymbol, currentDestructorNode, boundCompoundStatement.get(), currentFunction, boundCompileUnit, containerScope, this, currentDestructorNode->GetSpan());
         currentDestructorNode = prevDestructorNode;
         boundFunction->SetBody(std::move(boundCompoundStatement));
     }
@@ -449,7 +464,7 @@ void StatementBinder::Visit(MemberFunctionNode& memberFunctionNode)
         MemberFunctionNode* prevMemberFunctionNode = currentMemberFunctionNode;
         currentMemberFunctionNode = &memberFunctionNode;
         std::unique_ptr<BoundCompoundStatement> boundCompoundStatement(new BoundCompoundStatement(memberFunctionNode.GetSpan()));
-        GenerateClassAssignment(currentMemberFunctionSymbol, currentMemberFunctionNode, boundCompoundStatement.get(), currentFunction, boundCompileUnit, containerScope, this, true);
+        GenerateClassAssignment(currentMemberFunctionSymbol, currentMemberFunctionNode, boundCompoundStatement.get(), currentFunction, boundCompileUnit, containerScope, this, true, memberFunctionNode.GetSpan());
         currentMemberFunctionNode = prevMemberFunctionNode;
         boundFunction->SetBody(std::move(boundCompoundStatement));
     }
@@ -497,7 +512,7 @@ void StatementBinder::Visit(CompoundStatementNode& compoundStatementNode)
     Assert(symbol->GetSymbolType() == SymbolType::declarationBlock, "declaration block expected");
     DeclarationBlock* declarationBlock = static_cast<DeclarationBlock*>(symbol);
     containerScope = declarationBlock->GetContainerScope();
-    std::unique_ptr<BoundCompoundStatement> boundCompoundStatement(new BoundCompoundStatement(compoundStatementNode.GetSpan()));
+    std::unique_ptr<BoundCompoundStatement> boundCompoundStatement(new BoundCompoundStatement(compoundStatementNode.GetSpan(), compoundStatementNode.EndBraceSpan()));
     if (compoundLevel == 0)
     {
         if (GetGlobalFlag(GlobalFlags::profile))
@@ -533,22 +548,25 @@ void StatementBinder::Visit(CompoundStatementNode& compoundStatementNode)
         }
         if (currentStaticConstructorSymbol && currentStaticConstructorNode)
         {
-            GenerateStaticClassInitialization(currentStaticConstructorSymbol, currentStaticConstructorNode, boundCompileUnit, boundCompoundStatement.get(), currentFunction, containerScope, this);
+            GenerateStaticClassInitialization(currentStaticConstructorSymbol, currentStaticConstructorNode, boundCompileUnit, boundCompoundStatement.get(), currentFunction, containerScope, this, 
+                boundCompoundStatement->GetSpan());
         }
         else if (currentConstructorSymbol && currentConstructorNode)
         {
-            GenerateClassInitialization(currentConstructorSymbol, currentConstructorNode, boundCompoundStatement.get(), currentFunction, boundCompileUnit, containerScope, this, false);
+            GenerateClassInitialization(currentConstructorSymbol, currentConstructorNode, boundCompoundStatement.get(), currentFunction, boundCompileUnit, containerScope, this, false,
+                boundCompoundStatement->GetSpan());
         }
         else if (currentMemberFunctionSymbol && currentMemberFunctionSymbol->GroupName() == U"operator=" && currentMemberFunctionNode)
         {
-            GenerateClassAssignment(currentMemberFunctionSymbol, currentMemberFunctionNode, boundCompoundStatement.get(), currentFunction, boundCompileUnit, containerScope, this, false);
+            GenerateClassAssignment(currentMemberFunctionSymbol, currentMemberFunctionNode, boundCompoundStatement.get(), currentFunction, boundCompileUnit, containerScope, this, false,
+                boundCompoundStatement->GetSpan());
         }
         else if (currentMemberFunctionSymbol && currentMemberFunctionSymbol->IsStatic() && currentMemberFunctionNode)
         {
             if (currentClass->GetClassTypeSymbol()->StaticConstructor())
             {
                 boundCompoundStatement->AddStatement(std::unique_ptr<BoundStatement>(new BoundExpressionStatement(std::unique_ptr<BoundExpression>(
-                    new BoundFunctionCall(currentMemberFunctionNode->GetSpan(), currentClass->GetClassTypeSymbol()->StaticConstructor())))));
+                    new BoundFunctionCall(boundCompoundStatement->GetSpan(), currentClass->GetClassTypeSymbol()->StaticConstructor())))));
             }
         }
     }
@@ -563,7 +581,7 @@ void StatementBinder::Visit(CompoundStatementNode& compoundStatementNode)
     --compoundLevel;
     if (compoundLevel == 0 && currentDestructorSymbol && currentDestructorNode)
     {
-        GenerateClassTermination(currentDestructorSymbol, currentDestructorNode, boundCompoundStatement.get(), currentFunction, boundCompileUnit, containerScope, this);
+        GenerateClassTermination(currentDestructorSymbol, currentDestructorNode, boundCompoundStatement.get(), currentFunction, boundCompileUnit, containerScope, this, boundCompoundStatement->EndSpan());
     }
     AddStatement(boundCompoundStatement.release());
     if (compoundStatementNode.Label())
@@ -584,7 +602,7 @@ void StatementBinder::Visit(ReturnStatementNode& returnStatementNode)
             classReturnLookups.push_back(FunctionScopeLookup(ScopeLookup::this_and_base_and_parent, currentFunction->GetFunctionSymbol()->ReturnType()->ClassInterfaceEnumDelegateOrNsScope()));
             classReturnLookups.push_back(FunctionScopeLookup(ScopeLookup::fileScopes, nullptr));
             std::vector<std::unique_ptr<BoundExpression>> classReturnArgs;
-            classReturnArgs.push_back(std::unique_ptr<BoundExpression>(new BoundParameter(currentFunction->GetFunctionSymbol()->ReturnParam())));
+            classReturnArgs.push_back(std::unique_ptr<BoundExpression>(new BoundParameter(returnStatementNode.GetSpan(), currentFunction->GetFunctionSymbol()->ReturnParam())));
             TypeSymbol* returnType = currentFunction->GetFunctionSymbol()->ReturnType();
             bool returnClassDelegateType = returnType->GetSymbolType() == SymbolType::classDelegateTypeSymbol;
             std::unique_ptr<BoundExpression> expression = BindExpression(returnStatementNode.Expression(), boundCompileUnit, currentFunction, containerScope, this, false, returnClassDelegateType, 
@@ -683,11 +701,11 @@ void StatementBinder::Visit(ReturnStatementNode& returnStatementNode)
                         {
                             BoundFunctionCall* constructorCall = new BoundFunctionCall(returnStatementNode.GetSpan(), conversionFun);
                             LocalVariableSymbol* temporary = currentFunction->GetFunctionSymbol()->CreateTemporary(conversionFun->ConversionTargetType(), returnStatementNode.GetSpan());
-                            constructorCall->AddArgument(std::unique_ptr<BoundExpression>(new BoundAddressOfExpression(std::unique_ptr<BoundExpression>(new BoundLocalVariable(temporary)),
+                            constructorCall->AddArgument(std::unique_ptr<BoundExpression>(new BoundAddressOfExpression(std::unique_ptr<BoundExpression>(new BoundLocalVariable(returnStatementNode.GetSpan(), temporary)),
                                 conversionFun->ConversionTargetType()->AddPointer(returnStatementNode.GetSpan()))));
                             constructorCall->AddArgument(std::move(returnValueArguments[0]));
                             BoundConstructAndReturnTemporaryExpression* conversion = new BoundConstructAndReturnTemporaryExpression(std::unique_ptr<BoundExpression>(constructorCall),
-                                std::unique_ptr<BoundExpression>(new BoundLocalVariable(temporary)));
+                                std::unique_ptr<BoundExpression>(new BoundLocalVariable(returnStatementNode.GetSpan(), temporary)));
                             returnValueArguments[0].reset(conversion);
                         }
                         else
@@ -998,7 +1016,7 @@ void StatementBinder::Visit(ConstructionStatementNode& constructionStatementNode
     Assert(symbol->GetSymbolType() == SymbolType::localVariableSymbol, "local variable symbol expected");
     LocalVariableSymbol* localVariableSymbol = static_cast<LocalVariableSymbol*>(symbol);
     std::vector<std::unique_ptr<BoundExpression>> arguments;
-    BoundExpression* localVariable = new BoundLocalVariable(localVariableSymbol);
+    BoundExpression* localVariable = new BoundLocalVariable(constructionStatementNode.GetSpan(), localVariableSymbol);
     arguments.push_back(std::unique_ptr<BoundExpression>(new BoundAddressOfExpression(
         std::unique_ptr<BoundExpression>(localVariable), localVariable->GetType()->AddPointer(constructionStatementNode.GetSpan()))));
     bool constructDelegateOrClassDelegateType = 

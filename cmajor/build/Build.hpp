@@ -23,6 +23,8 @@ void ReadTypeIdCounter(const std::string& config);
 void WriteTypeIdCounter(const std::string& config);
 void ReadFunctionIdCounter(const std::string& config);
 void WriteFunctionIdCounter(const std::string& config);
+void ReadUserFileIndexCounter(const std::string& config);
+void WriteUserFiledIndexCounter(const std::string& config);
 
 } } // namespace cmajor::build
 

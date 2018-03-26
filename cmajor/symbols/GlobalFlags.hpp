@@ -28,7 +28,8 @@ enum class GlobalFlags : uint16_t
     time = 1 << 11,
     info = 1 << 12,
     unitTest = 1 << 13,
-    profile = 1 << 14
+    profile = 1 << 14,
+    generateDebugInfo = 1 << 15
 };
 
 void SetGlobalFlag(GlobalFlags flag);
@@ -41,8 +42,10 @@ void SetOptimizationLevel(int optimizationLevel_);
 
 void SetCurrentProjectName(const std::u32string& currentProjectName_);
 std::u32string GetCurrentProjectName();
-void SetCurrentTooName(const std::u32string& currentToolName_);
+void SetCurrentToolName(const std::u32string& currentToolName_);
 std::u32string GetCurrentToolName();
+void SetCompilerVersion(const std::string& compilerVersion_);
+std::string GetCompilerVersion();
 
 void DefineCommandLineConditionalSymbol(const std::u32string& symbol);
 

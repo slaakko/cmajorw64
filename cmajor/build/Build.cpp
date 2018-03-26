@@ -75,7 +75,7 @@ std::vector<std::unique_ptr<CompileUnitNode>> ParseSourcesInMainThread(const std
     for (const std::string& sourceFilePath : sourceFilePaths)
     {
         MappedInputFile sourceFile(sourceFilePath);
-        int fileIndex = FileRegistry::Instance().RegisterFile(sourceFilePath);
+        uint32_t fileIndex = FileRegistry::Instance().RegisterNewFile(sourceFilePath);
         ParsingContext parsingContext;
         if (GetGlobalFlag(GlobalFlags::debugParsing))
         {
@@ -83,6 +83,10 @@ std::vector<std::unique_ptr<CompileUnitNode>> ParseSourcesInMainThread(const std
         }
         std::u32string s(ToUtf32(std::string(sourceFile.Begin(), sourceFile.End())));
         std::unique_ptr<CompileUnitNode> compileUnit(compileUnitGrammar->Parse(&s[0], &s[0] + s.length(), fileIndex, sourceFilePath, &parsingContext));
+        if (GetGlobalFlag(GlobalFlags::generateDebugInfo))
+        {
+            compileUnit->ComputeLineStarts(s);
+        }
         compileUnits.push_back(std::move(compileUnit));
     }
     if (GetGlobalFlag(GlobalFlags::verbose))
@@ -99,13 +103,13 @@ std::vector<std::unique_ptr<CompileUnitNode>> ParseSourcesInMainThread(const std
 
 struct ParserData
 {
-    ParserData(const std::vector<std::string>& sourceFilePaths_, std::vector<std::unique_ptr<CompileUnitNode>>& compileUnits_, const std::vector<int>& fileIndeces_,
+    ParserData(const std::vector<std::string>& sourceFilePaths_, std::vector<std::unique_ptr<CompileUnitNode>>& compileUnits_, const std::vector<uint32_t>& fileIndeces_,
         std::vector<std::exception_ptr>& exceptions_) : sourceFilePaths(sourceFilePaths_), compileUnits(compileUnits_), fileIndeces(fileIndeces_), stop(false), exceptions(exceptions_)
     {
     }
     const std::vector<std::string>& sourceFilePaths;
     std::vector<std::unique_ptr<CompileUnitNode>>& compileUnits;
-    const std::vector<int>& fileIndeces;
+    const std::vector<uint32_t>& fileIndeces;
     std::list<int> indexQueue;
     std::mutex indexQueueMutex;
     std::atomic<bool> stop;
@@ -131,6 +135,10 @@ void ParseSourceFile(ParserData* parserData)
             int fileIndex = parserData->fileIndeces[index];
             std::u32string s(ToUtf32(std::string(sourceFile.Begin(), sourceFile.End())));
             std::unique_ptr<CompileUnitNode> compileUnit(compileUnitGrammar->Parse(&s[0], &s[0] + s.length(), fileIndex, sourceFilePath, &parsingContext));
+            if (GetGlobalFlag(GlobalFlags::generateDebugInfo))
+            {
+                compileUnit->ComputeLineStarts(s);
+            }
             parserData->compileUnits[index].reset(compileUnit.release());
         }
     }
@@ -162,11 +170,11 @@ std::vector<std::unique_ptr<CompileUnitNode>> ParseSourcesConcurrently(const std
     std::vector<std::unique_ptr<CompileUnitNode>> compileUnits;
     int n = int(sourceFilePaths.size());
     compileUnits.resize(n);
-    std::vector<int> fileIndeces;
+    std::vector<uint32_t> fileIndeces;
     for (int i = 0; i < n; ++i)
     {
         const std::string& sourceFilePath = sourceFilePaths[i];
-        int fileIndex = FileRegistry::Instance().RegisterFile(sourceFilePath);
+        uint32_t fileIndex = FileRegistry::Instance().RegisterNewFile(sourceFilePath);
         fileIndeces.push_back(fileIndex);
     }
     std::vector<std::exception_ptr> exceptions;
@@ -209,10 +217,36 @@ std::vector<std::unique_ptr<CompileUnitNode>> ParseSourcesConcurrently(const std
     return compileUnits;
 }
 
+void ReadUserFileIndexCounter(const std::string& config)
+{
+    boost::filesystem::path userFileIndexCounterFile = Path::Combine(Path::Combine(CmajorRootDir(), "config"), "userFileIndexCounter." + config);
+    if (boost::filesystem::exists(userFileIndexCounterFile))
+    {
+        std::ifstream f(userFileIndexCounterFile.generic_string());
+        uint32_t nextUserFileIndex = 1;
+        f >> nextUserFileIndex;
+        FileRegistry::Instance().SetNextUserFileIndex(nextUserFileIndex);
+    }
+}
+
+void WriteUserFiledIndexCounter(const std::string& config)
+{
+    boost::filesystem::path userFileIndexCounterFile = Path::Combine(Path::Combine(CmajorRootDir(), "config"), "userFileIndexCounter." + config);
+    std::ofstream f(userFileIndexCounterFile.generic_string());
+    uint32_t nextUserFileIndex = FileRegistry::Instance().GetNextUserFileIndex();
+    f << nextUserFileIndex << std::endl;
+    if (!f)
+    {
+        throw std::runtime_error("could not write to " + userFileIndexCounterFile.generic_string());
+    }
+}
+
 std::vector<std::unique_ptr<CompileUnitNode>> ParseSources(const std::vector<std::string>& sourceFilePaths)
 {
     try
     {
+        FileRegistry::Instance().Clear();
+        ReadUserFileIndexCounter(GetConfig());
         int numCores = std::thread::hardware_concurrency();
         if (numCores == 0 || sourceFilePaths.size() < numCores || GetGlobalFlag(GlobalFlags::debugParsing))
         {
@@ -268,7 +302,7 @@ void GenerateLibrary(const std::vector<std::string>& objectFilePaths, const std:
     {
         std::cout << "Creating library..." << std::endl;
     }
-    SetCurrentTooName(U"llvm-lib");
+    SetCurrentToolName(U"llvm-lib");
     std::vector<std::string> args;
     args.push_back("/out:" + QuotedPath(libraryFilePath));
     int n = objectFilePaths.size();
@@ -308,7 +342,7 @@ void GenerateLibrary(const std::vector<std::string>& objectFilePaths, const std:
         std::cout << "Creating library..." << std::endl;
     }
     boost::filesystem::remove(libraryFilePath);
-    SetCurrentTooName(U"ar");
+    SetCurrentToolName(U"ar");
     std::vector<std::string> args;
     args.push_back("-o " + QuotedPath(libraryFilePath));
     int n = objectFilePaths.size();
@@ -375,11 +409,11 @@ void Link(const std::string& executableFilePath, const std::string& libraryFileP
     }
     if (GetGlobalFlag(GlobalFlags::linkUsingMsLink))
     {
-        SetCurrentTooName(U"link");
+        SetCurrentToolName(U"link");
     }
     else
     {
-        SetCurrentTooName(U"lld-link");
+        SetCurrentToolName(U"lld-link");
     }
     boost::filesystem::path bdp = executableFilePath;
     bdp.remove_filename();
@@ -471,7 +505,7 @@ void Link(const std::string& executableFilePath, const std::string& libraryFileP
     {
         std::cout << "Linking..." << std::endl;
     }
-    SetCurrentTooName(U"clang++");
+    SetCurrentToolName(U"clang++");
     boost::filesystem::path bdp = executableFilePath;
     bdp.remove_filename();
     boost::filesystem::create_directories(bdp);
@@ -653,6 +687,7 @@ void CheckMainFunctionSymbol(Module& module)
 void CreateJsonRegistrationUnit(std::vector<std::string>& objectFilePaths, Module& module, EmittingContext& emittingContext, AttributeBinder* attributeBinder)
 {
     CompileUnitNode jsonRegistrationCompileUnit(Span(), boost::filesystem::path(module.OriginalFilePath()).parent_path().append("__json__.cm").generic_string());
+    jsonRegistrationCompileUnit.SetSynthesizedUnit();
     jsonRegistrationCompileUnit.GlobalNs()->AddMember(new NamespaceImportNode(Span(), new IdentifierNode(Span(), U"System")));
     jsonRegistrationCompileUnit.GlobalNs()->AddMember(new NamespaceImportNode(Span(), new IdentifierNode(Span(), U"System.Json")));
     FunctionNode* jsonRegistrationFunction(new FunctionNode(Span(), Specifiers::public_, new IntNode(Span()), U"RegisterJsonClasses", nullptr));
@@ -689,6 +724,7 @@ void CreateJsonRegistrationUnit(std::vector<std::string>& objectFilePaths, Modul
 void CreateMainUnit(std::vector<std::string>& objectFilePaths, Module& module, EmittingContext& emittingContext, AttributeBinder* attributeBinder)
 {
     CompileUnitNode mainCompileUnit(Span(), boost::filesystem::path(module.OriginalFilePath()).parent_path().append("__main__.cm").generic_string());
+    mainCompileUnit.SetSynthesizedUnit();
     mainCompileUnit.GlobalNs()->AddMember(new NamespaceImportNode(Span(), new IdentifierNode(Span(), U"System")));
     FunctionNode* mainFunction(new FunctionNode(Span(), Specifiers::public_, new IntNode(Span()), U"main", nullptr));
 #ifndef _WIN32
@@ -837,7 +873,7 @@ void BuildProject(Project* project)
     ReadSystemFileIndex(config);
     CompileWarningCollection::Instance().SetCurrentProjectName(project->Name());
     SetCurrentProjectName(project->Name());
-    SetCurrentTooName(U"cmc");
+    SetCurrentToolName(U"cmc");
     boost::filesystem::path libraryFilePath = project->LibraryFilePath();
     boost::filesystem::path libDir = libraryFilePath.remove_filename();
     std::string definesFilePath = GetFullPath((libDir / boost::filesystem::path("defines.txt")).generic_string());
@@ -860,7 +896,7 @@ void BuildProject(Project* project)
     }
     std::vector<ClassTypeSymbol*> classTypes;
     std::vector<ClassTemplateSpecializationSymbol*> classTemplateSpecializations;
-    module.PrepareForCompilation(project->References(), project->SourceFilePaths(), classTypes, classTemplateSpecializations);
+    module.PrepareForCompilation(project->References(), FileRegistry::Instance().GetFileMap(), classTypes, classTemplateSpecializations);
     cmajor::symbols::MetaInit(module.GetSymbolTable());
     CreateSymbols(module.GetSymbolTable(), compileUnits);
     if (moduleBinder)
@@ -882,8 +918,10 @@ void BuildProject(Project* project)
     {
         std::cout << "Compiling..." << std::endl;
     }
+    int32_t compileUnitIndex = 0;
     for (std::unique_ptr<BoundCompileUnit>& boundCompileUnit : boundCompileUnits)
     {
+        boundCompileUnit->SetCompileUnitIndex(compileUnitIndex);
         if (GetGlobalFlag(GlobalFlags::verbose))
         {
             std::cout << "> " << boost::filesystem::path(boundCompileUnit->GetCompileUnitNode()->FilePath()).filename().generic_string() << std::endl;
@@ -896,6 +934,7 @@ void BuildProject(Project* project)
         GenerateCode(emittingContext, *boundCompileUnit);
         objectFilePaths.push_back(boundCompileUnit->ObjectFilePath());
         boundCompileUnit.reset();
+        ++compileUnitIndex;
     }
     if (project->GetTarget() == Target::program)
     {
@@ -920,6 +959,7 @@ void BuildProject(Project* project)
         std::cout << "Writing module file..." << std::endl;
     }
     SymbolWriter writer(project->ModuleFilePath());
+
     module.Write(writer);
     WriteTypeIdCounter(config);
     WriteFunctionIdCounter(config);
@@ -927,6 +967,7 @@ void BuildProject(Project* project)
     {
         WriteSystemFileIndex(config);
     }
+    WriteUserFiledIndexCounter(config);
     if (GetGlobalFlag(GlobalFlags::verbose))
     {
         std::cout << "==> " << project->ModuleFilePath() << std::endl;

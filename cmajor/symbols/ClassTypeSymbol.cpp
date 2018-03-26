@@ -14,6 +14,7 @@
 #include <cmajor/symbols/TemplateSymbol.hpp>
 #include <cmajor/symbols/Module.hpp>
 #include <cmajor/symbols/SymbolCollector.hpp>
+#include <cmajor/parser/FileRegistry.hpp>
 #include <cmajor/util/Unicode.hpp>
 #include <cmajor/util/Sha1.hpp>
 #include <llvm/IR/Module.h>
@@ -21,6 +22,7 @@
 namespace cmajor { namespace symbols {
 
 using namespace cmajor::unicode;
+using namespace cmajor::parser;
 
 ClassGroupTypeSymbol::ClassGroupTypeSymbol(const Span& span_, const std::u32string& name_) : TypeSymbol(SymbolType::classGroupTypeSymbol, span_, name_)
 {
@@ -1084,6 +1086,56 @@ llvm::Constant* ClassTypeSymbol::CreateDefaultIrValue(Emitter& emitter)
         arrayOfDefaults.push_back(type->CreateDefaultIrValue(emitter));
     }
     return llvm::ConstantStruct::get(llvm::cast<llvm::StructType>(irType), arrayOfDefaults);
+}
+
+llvm::DIType* ClassTypeSymbol::CreateDIType(Emitter& emitter)
+{
+    llvm::DIType* baseClassDIType = nullptr;
+    if (baseClass)
+    {
+        baseClassDIType = baseClass->GetDIType(emitter);
+    }
+    llvm::DIType* vtableHolderClass = nullptr;
+    if (IsPolymorphic() && VmtPtrHolderClass() && VmtPtrHolderClass() != this)
+    {
+        vtableHolderClass = VmtPtrHolderClass()->GetDIType(emitter);
+    }
+    std::vector<llvm::Metadata*> elements;
+    int memberVariableIndex = 0;
+    for (MemberVariableSymbol* memberVariable : memberVariables)
+    {
+        uint64_t offsetInBits = emitter.DataLayout()->getStructLayout(llvm::cast<llvm::StructType>(IrType(emitter)))->getElementOffsetInBits(memberVariableIndex);
+        elements.push_back(memberVariable->GetDIMemberType(emitter, offsetInBits));
+        ++memberVariableIndex;
+    }
+    llvm::MDNode* templateParams = nullptr;
+    uint64_t sizeInBits = emitter.DataLayout()->getStructLayout(llvm::cast<llvm::StructType>(IrType(emitter)))->getSizeInBits();
+    uint32_t alignInBits = 8 * emitter.DataLayout()->getStructLayout(llvm::cast<llvm::StructType>(IrType(emitter)))->getAlignment();
+    uint64_t offsetInBits = 0; // todo?
+    llvm::DINode::DIFlags flags = llvm::DINode::DIFlags::FlagZero;
+    Span classSpan = GetSpan();
+    if (GetSymbolType() == SymbolType::classTemplateSpecializationSymbol)
+    {
+        ClassTemplateSpecializationSymbol* specialization = static_cast<ClassTemplateSpecializationSymbol*>(this);
+        classSpan = specialization->GetClassTemplate()->GetSpan();
+    }
+    return emitter.DIBuilder()->createClassType(nullptr, ToUtf8(Name()), emitter.GetFile(classSpan.FileIndex()), classSpan.LineNumber(), sizeInBits, alignInBits, offsetInBits,
+        flags, baseClassDIType, emitter.DIBuilder()->getOrCreateArray(elements), vtableHolderClass, templateParams, ToUtf8(MangledName()));
+}
+
+llvm::DIType* ClassTypeSymbol::CreateDIForwardDeclaration(Emitter& emitter)
+{
+    Span classSpan = GetSpan();
+    if (GetSymbolType() == SymbolType::classTemplateSpecializationSymbol)
+    {
+        ClassTemplateSpecializationSymbol* specialization = static_cast<ClassTemplateSpecializationSymbol*>(this);
+        classSpan = specialization->GetClassTemplate()->GetSpan();
+    }
+    uint64_t sizeInBits = emitter.DataLayout()->getStructLayout(llvm::cast<llvm::StructType>(IrType(emitter)))->getSizeInBits();
+    uint32_t alignInBits = 8 * emitter.DataLayout()->getStructLayout(llvm::cast<llvm::StructType>(IrType(emitter)))->getAlignment();
+    uint64_t offsetInBits = 0; // todo?
+    return emitter.DIBuilder()->createForwardDecl(llvm::dwarf::DW_TAG_structure_type, ToUtf8(Name()), nullptr, emitter.GetFile(classSpan.FileIndex()), classSpan.LineNumber(),
+        0, sizeInBits, alignInBits, ToUtf8(MangledName()));
 }
 
 const std::string& ClassTypeSymbol::VmtObjectName()

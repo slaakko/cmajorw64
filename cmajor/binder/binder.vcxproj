@@ -24,8 +24,10 @@
     <ClInclude Include="BoundClass.hpp" />
     <ClInclude Include="BoundCompileUnit.hpp" />
     <ClInclude Include="BoundConstraint.hpp" />
+    <ClInclude Include="BoundEnum.hpp" />
     <ClInclude Include="BoundExpression.hpp" />
     <ClInclude Include="BoundFunction.hpp" />
+    <ClInclude Include="BoundNamespace.hpp" />
     <ClInclude Include="BoundNode.hpp" />
     <ClInclude Include="BoundNodeVisitor.hpp" />
     <ClInclude Include="BoundStatement.hpp" />
@@ -55,8 +57,10 @@
     <ClCompile Include="BoundClass.cpp" />
     <ClCompile Include="BoundCompileUnit.cpp" />
     <ClCompile Include="BoundConstraint.cpp" />
+    <ClCompile Include="BoundEnum.cpp" />
     <ClCompile Include="BoundExpression.cpp" />
     <ClCompile Include="BoundFunction.cpp" />
+    <ClCompile Include="BoundNamespace.cpp" />
     <ClCompile Include="BoundNode.cpp" />
     <ClCompile Include="BoundNodeVisitor.cpp" />
     <ClCompile Include="BoundStatement.cpp" />
@@ -140,7 +144,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>../..;C:\Programming\boost_1_64_0;C:\Programming\llvm-4.0.0.src\include;C:\Programming\llvm-4.0.0.src\build\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../..;C:\Programming\boost_1_64_0;C:\Programming\llvm-6.0.0.src\include;C:\Programming\llvm-6.0.0.src\build\include</AdditionalIncludeDirectories>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <DisableSpecificWarnings>4141;4146;4244;4267;4291;4624;4996</DisableSpecificWarnings>
     </ClCompile>
@@ -190,7 +194,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>../..;C:\Programming\boost_1_64_0;C:\Programming\llvm-4.0.0.src\include;C:\Programming\llvm-4.0.0.src\build\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../..;C:\Programming\boost_1_64_0;C:\Programming\llvm-6.0.0.src\include;C:\Programming\llvm-6.0.0.src\build\include</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4141;4146;4244;4267;4291;4624;4996</DisableSpecificWarnings>
     </ClCompile>
     <Link>

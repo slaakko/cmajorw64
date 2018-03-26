@@ -137,6 +137,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "binder", "binder\binder.vcx
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ir", "ir\ir.vcxproj", "{F5CA3B98-CC3A-4924-BE9A-F5E507305C7B}"
+	ProjectSection(ProjectDependencies) = postProject
+		{CE56C110-CB05-4593-97FA-A664D6B67265} = {CE56C110-CB05-4593-97FA-A664D6B67265}
+		{01B04136-057A-4BD1-86A7-6779D1CC8B09} = {01B04136-057A-4BD1-86A7-6779D1CC8B09}
+		{879B25C9-B0B5-4928-B84B-5D212802BD15} = {879B25C9-B0B5-4928-B84B-5D212802BD15}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "emitter", "emitter\emitter.vcxproj", "{A85FB4BA-5F9C-4EA0-9AD8-C994443610A6}"
 	ProjectSection(ProjectDependencies) = postProject

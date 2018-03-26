@@ -74,7 +74,7 @@ using namespace cmajor::emitter;
 using namespace cmajor::dom;
 using namespace cmajor::xpath;
 
-const char* version = "2.1.0";
+const char* version = "2.2.0";
 
 void PrintHelp()
 {
@@ -89,6 +89,10 @@ void PrintHelp()
         "   run only unit tests in file FILE\n" <<
         "--test=TEST | -t=TEST\n" <<
         "   run only unit test TEST\n" <<
+        "--gen-debug-info (-g)\n" <<
+        "   generate debug info (on by default in debug configuration)\n" <<
+        "--no-debug-info (-n)\n" <<
+        "   don't generate debug info even for debug build\n" <<
         std::endl;
 }
 
@@ -123,6 +127,7 @@ void CreateMainUnit(std::vector<std::string>& objectFilePaths, Module& module, E
     int32_t numAssertions, const std::string& unitTestFilePath)
 {
     CompileUnitNode mainCompileUnit(Span(), boost::filesystem::path(module.OriginalFilePath()).parent_path().append("__main__.cm").generic_string());
+    mainCompileUnit.SetSynthesizedUnit();
     mainCompileUnit.GlobalNs()->AddMember(new NamespaceImportNode(Span(), new IdentifierNode(Span(), U"System")));
     FunctionNode* mainFunction(new FunctionNode(Span(), Specifiers::public_, new IntNode(Span()), U"main", nullptr));
 #ifndef _WIN32
@@ -228,14 +233,14 @@ void TestUnit(Project* project, CompileUnitNode* testUnit, const std::string& te
         ReadFunctionIdCounter(config);
         ReadSystemFileIndex(config);
         CompileWarningCollection::Instance().SetCurrentProjectName(project->Name());
-        SetCurrentTooName(U"cmc");
+        SetCurrentToolName(U"cmc");
         Module module(project->Name(), project->ModuleFilePath());
         AttributeBinder attributeBinder;
         ModuleBinder moduleBinder(module, testUnit, &attributeBinder);
         moduleBinder.SetBindingTypes();
         std::vector<ClassTypeSymbol*> classTypes;
         std::vector<ClassTemplateSpecializationSymbol*> classTemplateSpecializations;
-        module.PrepareForCompilation(project->References(), project->SourceFilePaths(), classTypes, classTemplateSpecializations);
+        module.PrepareForCompilation(project->References(), FileRegistry::Instance().GetFileMap(), classTypes, classTemplateSpecializations);
         cmajor::symbols::MetaInit(module.GetSymbolTable());
         CreateSymbols(module.GetSymbolTable(), testUnit);
         for (ClassTemplateSpecializationSymbol* classTemplateSpecialization : classTemplateSpecializations)
@@ -358,6 +363,8 @@ std::vector<std::pair<std::unique_ptr<CompileUnitNode>, std::string>> SplitIntoT
 
 void TestSourceFile(bool& first, Project* project, const std::string& sourceFilePath, const std::string& onlyTest, cmajor::dom::Element* projectElement)
 {
+    FileRegistry::Instance().Clear();
+    ReadUserFileIndexCounter(GetConfig());
     std::unique_ptr<cmajor::dom::Element> sourceFileElement(new cmajor::dom::Element(U"sourceFile"));
     sourceFileElement->SetAttribute(U"name", ToUtf32(Path::GetFileNameWithoutExtension(sourceFilePath)));
     if (!compileUnitGrammar)
@@ -365,7 +372,7 @@ void TestSourceFile(bool& first, Project* project, const std::string& sourceFile
         compileUnitGrammar = CompileUnitGrammar::Create();
     }
     MappedInputFile sourceFile(sourceFilePath);
-    int fileIndex = FileRegistry::Instance().RegisterFile(sourceFilePath);
+    uint32_t fileIndex = FileRegistry::Instance().RegisterNewFile(sourceFilePath);
     ParsingContext parsingContext;
     std::u32string s(ToUtf32(std::string(sourceFile.Begin(), sourceFile.End())));
     std::unique_ptr<CompileUnitNode> compileUnit(compileUnitGrammar->Parse(&s[0], &s[0] + s.length(), fileIndex, sourceFilePath, &parsingContext));
@@ -422,7 +429,7 @@ void TestProject(Project* project, const std::string& onlySourceFile, const std:
     projectElement->SetAttribute(U"name", project->Name());
     std::string config = GetConfig();
     SetCurrentProjectName(project->Name());
-    SetCurrentTooName(U"cmc");
+    SetCurrentToolName(U"cmc");
     for (const std::string& sourceFilePath : project->SourceFilePaths())
     {
         if (!onlySourceFile.empty())
@@ -848,6 +855,7 @@ int main(int argc, const char** argv)
     try
     {
         InitDone initDone;
+        SetCompilerVersion(version);
         std::unique_ptr<cmajor::dom::Element> cmunitElement(new cmajor::dom::Element(U"cmunit"));
         cmunitElement->SetAttribute(U"start", ToUtf32(GetCurrentDateTime().ToString()));
         std::unique_ptr<cmajor::dom::Element> componentsElement(new cmajor::dom::Element(U"components"));
@@ -857,6 +865,7 @@ int main(int argc, const char** argv)
         std::string onlySourceFile;
         std::string onlyTest;
         std::string outFile;
+        bool noDebugInfo = false;
         bool unitTestProjectsFound = false;
         for (int i = 1; i < argc; ++i)
         {
@@ -879,6 +888,18 @@ int main(int argc, const char** argv)
                 else if (arg == "--link-using-ms-link" || arg == "-m")
                 {
                     SetGlobalFlag(GlobalFlags::linkUsingMsLink);
+                }
+                else if (arg == "--emit-llvm")
+                {
+                    SetGlobalFlag(GlobalFlags::emitLlvm);
+                }
+                else if (arg == "--gen-debug-info" || arg == "-g")
+                {
+                    SetGlobalFlag(GlobalFlags::generateDebugInfo);
+                }
+                else if (arg == "--no-debug-info" || arg == "-n")
+                {
+                    noDebugInfo = true;
                 }
                 else if (arg.find('=') != std::string::npos)
                 {
@@ -932,6 +953,10 @@ int main(int argc, const char** argv)
             {
                 projectsAndSolutions.push_back(arg);
             }
+        }
+        if (!GetGlobalFlag(GlobalFlags::release) && !noDebugInfo)
+        {
+            SetGlobalFlag(GlobalFlags::generateDebugInfo);
         }
         if (GetGlobalFlag(GlobalFlags::release))
         {

@@ -21,6 +21,7 @@ llvm::Function* WindowsEmitter::GetPersonalityFunction() const
 
 void WindowsEmitter::Visit(BoundReturnStatement& boundReturnStatement)
 {
+    SetCurrentDebugLocation(boundReturnStatement.GetSpan());
     destructorCallGenerated = false;
     lastInstructionWasRet = false;
     basicBlockOpen = false;
@@ -73,6 +74,7 @@ void WindowsEmitter::Visit(BoundReturnStatement& boundReturnStatement)
 
 void WindowsEmitter::Visit(BoundGotoCaseStatement& boundGotoCaseStatement)
 {
+    SetCurrentDebugLocation(boundGotoCaseStatement.GetSpan());
     destructorCallGenerated = false;
     lastInstructionWasRet = false;
     basicBlockOpen = false;
@@ -108,6 +110,7 @@ void WindowsEmitter::Visit(BoundGotoCaseStatement& boundGotoCaseStatement)
 
 void WindowsEmitter::Visit(BoundGotoDefaultStatement& boundGotoDefaultStatement)
 {
+    SetCurrentDebugLocation(boundGotoDefaultStatement.GetSpan());
     destructorCallGenerated = false;
     lastInstructionWasRet = false;
     basicBlockOpen = false;
@@ -140,6 +143,7 @@ void WindowsEmitter::Visit(BoundGotoDefaultStatement& boundGotoDefaultStatement)
 
 void WindowsEmitter::Visit(BoundBreakStatement& boundBreakStatement)
 {
+    SetCurrentDebugLocation(boundBreakStatement.GetSpan());
     destructorCallGenerated = false;
     lastInstructionWasRet = false;
     basicBlockOpen = false;
@@ -171,6 +175,7 @@ void WindowsEmitter::Visit(BoundBreakStatement& boundBreakStatement)
 
 void WindowsEmitter::Visit(BoundContinueStatement& boundContinueStatement)
 {
+    SetCurrentDebugLocation(boundContinueStatement.GetSpan());
     destructorCallGenerated = false;
     lastInstructionWasRet = false;
     basicBlockOpen = false;
@@ -199,6 +204,7 @@ void WindowsEmitter::Visit(BoundContinueStatement& boundContinueStatement)
 
 void WindowsEmitter::Visit(BoundGotoStatement& boundGotoStatement)
 {
+    SetCurrentDebugLocation(boundGotoStatement.GetSpan());
     destructorCallGenerated = false;
     lastInstructionWasRet = false;
     basicBlockOpen = false;
@@ -297,6 +303,10 @@ void WindowsEmitter::Visit(BoundTryStatement& boundTryStatement)
             inputs.push_back(currentPad->value);
             bundles.push_back(llvm::OperandBundleDef("funclet", inputs));
             handleThisEx = llvm::CallInst::Create(handleException, handleExceptionArgs, bundles, "", CurrentBasicBlock());
+            if (diBuilder)
+            {
+                llvm::cast<llvm::CallInst>(handleThisEx)->setDebugLoc(GetDebugLocation(boundCatchStatement->GetSpan()));
+            }
         }
         llvm::BasicBlock* nextHandlerTarget = nullptr;
         if (i < n - 1)
@@ -315,8 +325,12 @@ void WindowsEmitter::Visit(BoundTryStatement& boundTryStatement)
         builder.CreateCatchRet(llvm::cast<llvm::CatchPadInst>(currentPad->value), nextTarget);
     }
     SetCurrentBasicBlock(resumeTarget);
-    llvm::Function* cxxThrowFunction = llvm::cast<llvm::Function>(compileUnitModule->getOrInsertFunction("_CxxThrowException",
-        builder.getVoidTy(), builder.getInt8PtrTy(), builder.getInt8PtrTy(), nullptr));
+
+    std::vector<llvm::Type*> cxxThrowFunctionParamTypes;
+    cxxThrowFunctionParamTypes.push_back(builder.getInt8PtrTy());
+    cxxThrowFunctionParamTypes.push_back(builder.getInt8PtrTy());
+    llvm::FunctionType* cxxThrowFunctionType = llvm::FunctionType::get(builder.getVoidTy(), cxxThrowFunctionParamTypes, false);
+    llvm::Function* cxxThrowFunction = llvm::cast<llvm::Function>(compileUnitModule->getOrInsertFunction("_CxxThrowException", cxxThrowFunctionType));
     ArgVector rethrowArgs;
     rethrowArgs.push_back(llvm::Constant::getNullValue(builder.getInt8PtrTy()));
     rethrowArgs.push_back(llvm::Constant::getNullValue(builder.getInt8PtrTy()));
@@ -324,7 +338,11 @@ void WindowsEmitter::Visit(BoundTryStatement& boundTryStatement)
     std::vector<llvm::Value*> inputs;
     inputs.push_back(currentPad->value);
     bundles.push_back(llvm::OperandBundleDef("funclet", inputs));
-    llvm::CallInst::Create(cxxThrowFunction, rethrowArgs, bundles, "", resumeTarget);
+    llvm::CallInst* callInst = llvm::CallInst::Create(cxxThrowFunction, rethrowArgs, bundles, "", resumeTarget);
+    if (diBuilder)
+    {
+        callInst->setDebugLoc(GetCurrentDebugLocation());
+    }
     builder.CreateBr(nextTarget);
     currentPad = parentPad;
     SetCurrentBasicBlock(nextTarget);
@@ -334,13 +352,21 @@ void WindowsEmitter::Visit(BoundTryStatement& boundTryStatement)
 
 void WindowsEmitter::Visit(BoundRethrowStatement& boundRethrowStatement)
 {
+    SetCurrentDebugLocation(boundRethrowStatement.GetSpan());
     destructorCallGenerated = false;
     lastInstructionWasRet = false;
     basicBlockOpen = false;
     SetTarget(&boundRethrowStatement);
     boundRethrowStatement.ReleaseCall()->Accept(*this);
-    llvm::Function* cxxThrowFunction = llvm::cast<llvm::Function>(compileUnitModule->getOrInsertFunction("_CxxThrowException",
-        builder.getVoidTy(), builder.getInt8PtrTy(), builder.getInt8PtrTy(), nullptr));
+    if (diBuilder)
+    {
+        SetCurrentDebugLocation(boundRethrowStatement.GetSpan());
+    }
+    std::vector<llvm::Type*> cxxThrowFunctionParamTypes;
+    cxxThrowFunctionParamTypes.push_back(builder.getInt8PtrTy());
+    cxxThrowFunctionParamTypes.push_back(builder.getInt8PtrTy());
+    llvm::FunctionType* cxxThrowFunctionType = llvm::FunctionType::get(builder.getVoidTy(), cxxThrowFunctionParamTypes, false);
+    llvm::Function* cxxThrowFunction = llvm::cast<llvm::Function>(compileUnitModule->getOrInsertFunction("_CxxThrowException", cxxThrowFunctionType));
     ArgVector rethrowArgs;
     rethrowArgs.push_back(llvm::Constant::getNullValue(builder.getInt8PtrTy()));
     rethrowArgs.push_back(llvm::Constant::getNullValue(builder.getInt8PtrTy()));
@@ -348,7 +374,11 @@ void WindowsEmitter::Visit(BoundRethrowStatement& boundRethrowStatement)
     std::vector<llvm::Value*> inputs;
     inputs.push_back(currentPad->value);
     bundles.push_back(llvm::OperandBundleDef("funclet", inputs));
-    llvm::CallInst::Create(cxxThrowFunction, rethrowArgs, bundles, "", CurrentBasicBlock());
+    llvm::CallInst* callInst = llvm::CallInst::Create(cxxThrowFunction, rethrowArgs, bundles, "", CurrentBasicBlock());
+    if (diBuilder)
+    {
+        callInst->setDebugLoc(GetDebugLocation(boundRethrowStatement.GetSpan()));
+    }
 }
 
 void WindowsEmitter::CreateCleanup()

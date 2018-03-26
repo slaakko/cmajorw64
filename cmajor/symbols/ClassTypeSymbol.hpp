@@ -159,6 +159,8 @@ public:
     const std::vector<FunctionSymbol*>& Vmt() const { return vmt; }
     llvm::Type* IrType(Emitter& emitter) override;
     llvm::Constant* CreateDefaultIrValue(Emitter& emitter) override;
+    llvm::DIType* CreateDIType(Emitter& emitter) override; 
+    llvm::DIType* CreateDIForwardDeclaration(Emitter& emitter);
     llvm::Value* VmtObject(Emitter& emitter, bool create);
     llvm::Type* VmtPtrType(Emitter& emitter);
     const std::string& VmtObjectName();

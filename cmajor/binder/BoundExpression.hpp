@@ -67,7 +67,7 @@ private:
 class BoundParameter : public BoundExpression
 {
 public:
-    BoundParameter(ParameterSymbol* parameterSymbol_);
+    BoundParameter(const Span& span_, ParameterSymbol* parameterSymbol_);
     BoundExpression* Clone() override;
     void Load(Emitter& emitter, OperationFlags flags) override;
     void Store(Emitter& emitter, OperationFlags flags) override;
@@ -82,7 +82,7 @@ private:
 class BoundLocalVariable : public BoundExpression
 {
 public:
-    BoundLocalVariable(LocalVariableSymbol* localVariableSymbol_);
+    BoundLocalVariable(const Span& span_, LocalVariableSymbol* localVariableSymbol_);
     BoundExpression* Clone() override;
     void Load(Emitter& emitter, OperationFlags flags) override;
     void Store(Emitter& emitter, OperationFlags flags) override;
@@ -97,7 +97,7 @@ private:
 class BoundMemberVariable : public BoundExpression
 {
 public:
-    BoundMemberVariable(MemberVariableSymbol* memberVariableSymbol_);
+    BoundMemberVariable(const Span& span_, MemberVariableSymbol* memberVariableSymbol_);
     BoundExpression* Clone() override;
     void Load(Emitter& emitter, OperationFlags flags) override;
     void Store(Emitter& emitter, OperationFlags flags) override;
@@ -117,7 +117,7 @@ private:
 class BoundConstant : public BoundExpression
 {
 public:
-    BoundConstant(ConstantSymbol* constantSymbol_);
+    BoundConstant(const Span& span_, ConstantSymbol* constantSymbol_);
     BoundExpression* Clone() override;
     void Load(Emitter& emitter, OperationFlags flags) override;
     void Store(Emitter& emitter, OperationFlags flags) override;
@@ -132,7 +132,7 @@ private:
 class BoundEnumConstant : public BoundExpression
 {
 public:
-    BoundEnumConstant(EnumConstantSymbol* enumConstantSymbol_);
+    BoundEnumConstant(const Span& span_, EnumConstantSymbol* enumConstantSymbol_);
     BoundExpression* Clone() override;
     void Load(Emitter& emitter, OperationFlags flags) override;
     void Store(Emitter& emitter, OperationFlags flags) override;
