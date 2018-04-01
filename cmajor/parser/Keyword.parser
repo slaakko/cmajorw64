@@ -20,7 +20,7 @@ namespace cmajor.parser
                 "switch", "case", "default", "while", "do", "for", 
                 "break", "continue", "goto", "typedef", "typename", "const", "constexpr", "null", "this", "base",
                 "construct", "destroy", "new", "delete", "sizeof", "try", "catch", "throw",
-                "concept", "where", "axiom", "and", "or", "not"])
+                "concept", "where", "axiom", "and", "or", "not", "unit_test"])
             ;
     }
 }

@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <ProjectSystemBase>$(MSBuildThisFileDirectory)</ProjectSystemBase>
+
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x64</Platform>
+    <TargetType Condition=" '$(TargetType)' == '' ">program</TargetType>
+    
+    <DebuggerFlavor>ScriptDebugger</DebuggerFlavor>
+    <RunCommand>$(WinDir)\System32\cscript.exe</RunCommand>
+    <RunWorkingDirectory>$(MSBuildProjectDirectory)</RunWorkingDirectory>
+    <StartItem>Start.cm</StartItem>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
+    <BinDir>bin/debug</BinDir>
+    <LibDif>lib/debug</LibDif>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <BinDir>bin/release</BinDir>
+    <LibDif>lib/release</LibDif>
+  </PropertyGroup>
+</Project>

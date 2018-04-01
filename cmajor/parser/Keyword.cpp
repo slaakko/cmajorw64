@@ -101,6 +101,7 @@ KeywordGrammar::KeywordGrammar(cmajor::parsing::ParsingDomain* parsingDomain_): 
     keywords0.push_back(ToUtf32("uchar"));
     keywords0.push_back(ToUtf32("uint"));
     keywords0.push_back(ToUtf32("ulong"));
+    keywords0.push_back(ToUtf32("unit_test"));
     keywords0.push_back(ToUtf32("ushort"));
     keywords0.push_back(ToUtf32("using"));
     keywords0.push_back(ToUtf32("virtual"));
