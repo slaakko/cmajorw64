@@ -96,7 +96,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <AdditionalLibraryDirectories>$(OutDir);C:\Programming\boost64;C:\Programming\llvm-6.0.0.src\build\Debug\lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>build.lib;emitter.lib;binder.lib;parser.lib;symbols.lib;ir.lib;ast.lib;syntax.lib;code.lib;parsing.lib;codedom.lib;util.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;
+      <AdditionalDependencies>dom.lib;xml.lib;build.lib;emitter.lib;binder.lib;parser.lib;symbols.lib;ir.lib;ast.lib;syntax.lib;code.lib;parsing.lib;codedom.lib;util.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;
 LLVMMIRParser.lib;LLVMInterpreter.lib;LLVMLibDriver.lib;LLVMDlltoolDriver.lib;LLVMOption.lib;LLVMCoverage.lib;LLVMSymbolize.lib;LLVMDebugInfoPDB.lib;LLVMDebugInfoDWARF.lib;
 LLVMMCJIT.lib;LLVMWindowsManifest.lib;LLVMLineEditor.lib;LLVMLTO.lib;LLVMPasses.lib;LLVMObjCARCOpts.lib;LLVMCoroutines.lib;LLVMipo.lib;LLVMInstrumentation.lib;LLVMVectorize.lib;
 LLVMLinker.lib;LLVMIRReader.lib;LLVMAsmParser.lib;LLVMObjectYAML.lib;LLVMX86Disassembler.lib;LLVMX86AsmParser.lib;LLVMOrcJIT.lib;LLVMExecutionEngine.lib;LLVMRuntimeDyld.lib;
@@ -158,7 +158,7 @@ LLVMDemangle.lib;</AdditionalDependencies>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>$(OutDir);C:\Programming\boost64;C:\Programming\llvm-6.0.0.src\build\Release\lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>build.lib;emitter.lib;binder.lib;parser.lib;symbols.lib;ir.lib;ast.lib;syntax.lib;code.lib;parsing.lib;codedom.lib;util.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;
+      <AdditionalDependencies>dom.lib;xml.lib;build.lib;emitter.lib;binder.lib;parser.lib;symbols.lib;ir.lib;ast.lib;syntax.lib;code.lib;parsing.lib;codedom.lib;util.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;
 LLVMMIRParser.lib;LLVMInterpreter.lib;LLVMLibDriver.lib;LLVMDlltoolDriver.lib;LLVMOption.lib;LLVMCoverage.lib;LLVMSymbolize.lib;LLVMDebugInfoPDB.lib;LLVMDebugInfoDWARF.lib;
 LLVMMCJIT.lib;LLVMWindowsManifest.lib;LLVMLineEditor.lib;LLVMLTO.lib;LLVMPasses.lib;LLVMObjCARCOpts.lib;LLVMCoroutines.lib;LLVMipo.lib;LLVMInstrumentation.lib;LLVMVectorize.lib;
 LLVMLinker.lib;LLVMIRReader.lib;LLVMAsmParser.lib;LLVMObjectYAML.lib;LLVMX86Disassembler.lib;LLVMX86AsmParser.lib;LLVMOrcJIT.lib;LLVMExecutionEngine.lib;LLVMRuntimeDyld.lib;

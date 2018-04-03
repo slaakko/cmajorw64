@@ -135,9 +135,16 @@
       <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup%3bBuiltProjectOutputGroupDependencies%3bGetCopyToOutputDirectoryItems%3bSatelliteDllsProjectOutputGroup%3b</IncludeOutputGroupsInVSIX>
       <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup%3b</IncludeOutputGroupsInVSIXLocalOnly>
     </ProjectReference>
-    <ProjectReference Include="..\Cmajor.ProjectTemplate\Cmajor.ProjectTemplate.csproj">
+    <ProjectReference Include="..\Cmajor.LibraryProjectTemplate\Cmajor.LibraryProjectTemplate.csproj">
+      <Project>{F28244D0-1340-4D75-AF72-9BE6F14925D3}</Project>
+      <Name>Cmajor.LibraryProjectTemplate</Name>
+      <VSIXSubPath>ProjectTemplates</VSIXSubPath>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <IncludeOutputGroupsInVSIX>TemplateProjectOutputGroup%3b</IncludeOutputGroupsInVSIX>
+    </ProjectReference>
+    <ProjectReference Include="..\Cmajor.ConsoleAppProjectTemplate\Cmajor.ConsoleAppProjectTemplate.csproj">
       <Project>{b833a376-0da4-416c-b29a-b2e027e49f1f}</Project>
-      <Name>Cmajor.ProjectTemplate</Name>
+      <Name>Cmajor.ConsoleAppProjectTemplate</Name>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
       <IncludeOutputGroupsInVSIX>TemplateProjectOutputGroup%3b</IncludeOutputGroupsInVSIX>
       <VSIXSubPath>ProjectTemplates</VSIXSubPath>
@@ -237,6 +244,12 @@
     <XamlPropertyRule Include="BuildSystem\Rules\Cm.xaml">
       <SubType>Designer</SubType>
     </XamlPropertyRule>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="BuildSystem\Rules\ProjectReference.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(VSToolsPath)\VSSDK\Microsoft.VsSDK.targets" Condition="'$(VSToolsPath)' != ''" />

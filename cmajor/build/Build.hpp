@@ -15,6 +15,8 @@ using namespace cmajor::ast;
 void BuildProject(const std::string& projectFilePath);
 void BuildProject(Project* project);
 void BuildSolution(const std::string& solutionFilePath);
+void BuildMsBuildProject(const std::string& projectName, const std::string& projectDirectory, const std::string& target,
+    const std::vector<std::string>& sourceFiles, const std::vector<std::string>& referenceFiles);
 void GenerateLibrary(const std::vector<std::string>& objectFilePaths, const std::string& libraryFilePath);
 void Link(const std::string& executableFilePath, const std::string& libraryFilePath, const std::vector<std::string>& libraryFilePaths, cmajor::symbols::Module& module);
 void ReadSystemFileIndex(const std::string& config);

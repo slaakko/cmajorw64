@@ -13,6 +13,9 @@
 #include <cmajor/symbols/GlobalFlags.hpp>
 #include <cmajor/symbols/Warning.hpp>
 #include <cmajor/parsing/Exception.hpp>
+#include <cmajor/dom/Document.hpp>
+#include <cmajor/dom/Element.hpp>
+#include <cmajor/dom/CharacterData.hpp>
 #include <cmajor/util/Util.hpp>
 #include <cmajor/util/Path.hpp>
 #include <cmajor/util/Json.hpp>
@@ -89,6 +92,10 @@ void PrintHelp()
         "   generate debug info (on by default in debug configuration)\n" <<
         "--no-debug-info (-n)\n" <<
         "   don't generate debug info even for debug build\n" <<
+        "--ide (-i)\n" <<
+        "   set IDE mode: this mode is for Cmajor Development Environment.\n" <<
+        "--msbuild (-b)\n" <<
+        "   set MSBuild mode: this mode is for Visual Studio and MSBuild.\n" <<
         std::endl;
 }
 
@@ -98,13 +105,62 @@ using namespace cmajor::symbols;
 using namespace cmajor::parsing;
 using namespace cmajor::build;
 
+void AddWarningsTo(cmajor::dom::Element* diagnosticsElement)
+{
+    if (!CompileWarningCollection::Instance().Warnings().empty())
+    {
+        for (const Warning& warning : CompileWarningCollection::Instance().Warnings())
+        {
+            std::unique_ptr<cmajor::dom::Element> diagnosticElement(new cmajor::dom::Element(U"diagnostic"));
+            std::unique_ptr<cmajor::dom::Element> categoryElement(new cmajor::dom::Element(U"category"));
+            std::unique_ptr<cmajor::dom::Text> categoryText(new cmajor::dom::Text(U"warning"));
+            categoryElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(categoryText.release()));
+            std::unique_ptr<cmajor::dom::Element> messageElement(new cmajor::dom::Element(U"message"));
+            std::unique_ptr<cmajor::dom::Text> messageText(new cmajor::dom::Text(ToUtf32(warning.Message())));
+            messageElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(messageText.release()));
+            diagnosticElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(categoryElement.release()));
+            diagnosticElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(messageElement.release()));
+            std::unique_ptr<cmajor::dom::Element> spanElement = SpanToDomElement(warning.Defined());
+            if (spanElement)
+            {
+                diagnosticElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(spanElement.release()));
+            }
+            diagnosticsElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(diagnosticElement.release()));
+            for (const Span& span : warning.References())
+            {
+                if (!span.Valid()) continue;
+                std::unique_ptr<cmajor::dom::Element> diagnosticElement(new cmajor::dom::Element(U"diagnostic"));
+                std::unique_ptr<cmajor::dom::Element> categoryElement(new cmajor::dom::Element(U"category"));
+                std::unique_ptr<cmajor::dom::Text> categoryText(new cmajor::dom::Text(U"info"));
+                categoryElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(categoryText.release()));
+                std::unique_ptr<cmajor::dom::Element> messageElement(new cmajor::dom::Element(U"message"));
+                std::unique_ptr<cmajor::dom::Text> messageText(new cmajor::dom::Text(ToUtf32("see reference to")));
+                messageElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(messageText.release()));
+                diagnosticElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(categoryElement.release()));
+                diagnosticElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(messageElement.release()));
+                std::unique_ptr<cmajor::dom::Element> spanElement = SpanToDomElement(span);
+                if (spanElement)
+                {
+                    diagnosticElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(spanElement.release()));
+                    diagnosticsElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(diagnosticElement.release()));
+                }
+            }
+        }
+    }
+}
+
 int main(int argc, const char** argv)
 {
     try
     {
         std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
         InitDone initDone;
-        std::vector<std::string> projectsAndSolutions;
+        std::string projectName;
+        std::string projectDirectory;
+        std::string target = "program";
+        std::vector<std::string> files;
+        std::vector<std::string> sourceFiles;
+        std::vector<std::string> referenceFiles;
         if (argc < 2)
         {
             PrintHelp();
@@ -139,6 +195,10 @@ int main(int argc, const char** argv)
                     else if (arg == "--ide" || arg == "-i")
                     {
                         SetGlobalFlag(GlobalFlags::ide);
+                    }
+                    else if (arg == "--msbuild" || arg == "-b")
+                    {
+                        SetGlobalFlag(GlobalFlags::msbuild);
                     }
                     else if (arg == "--debug-parse" || arg == "-p")
                     {
@@ -209,6 +269,32 @@ int main(int argc, const char** argv)
                                     throw std::runtime_error("unknown optimization level '" + components[1] + "'");
                                 }
                             }
+                            else if (components[0] == "--reference" || components[0] == "-r")
+                            {
+                                std::string file = components[1];
+                                boost::filesystem::path fp(file);
+                                if (!boost::filesystem::exists(fp))
+                                {
+                                    throw std::runtime_error("referenced project file '" + fp.generic_string() + "' not found");
+                                }
+                                referenceFiles.push_back(file);
+                            }
+                            else if (components[0] == "--target" || components[0] == "-a")
+                            {
+                                target = components[1];
+                                if (target != "program" && target != "library" && target != "unitTest")
+                                {
+                                    throw std::runtime_error("unknown target '" + target + "': not 'program', 'library', or 'unitTest'");
+                                }
+                            }
+                            else if (components[0] == "--name" || components[0] == "-N")
+                            {
+                                projectName = components[1];
+                            }
+                            else if (components[0] == "--dir" || components[0] == "-pd")
+                            {
+                                projectDirectory = components[1];
+                            }
                             else
                             {
                                 throw std::runtime_error("unknown option '" + arg + "'");
@@ -231,10 +317,10 @@ int main(int argc, const char** argv)
                 }
                 else
                 {
-                    projectsAndSolutions.push_back(arg);
+                    files.push_back(arg);
                 }
             }
-            if (projectsAndSolutions.empty())
+            if (files.empty())
             {
                 PrintHelp();
                 return 0;
@@ -251,14 +337,18 @@ int main(int argc, const char** argv)
             {
                 SetGlobalFlag(GlobalFlags::generateDebugInfo);
             }
-            for (const std::string& projectOrSolution : projectsAndSolutions)
+            for (const std::string& file : files)
             {
-                boost::filesystem::path fp(projectOrSolution);
+                boost::filesystem::path fp(file);
                 if (fp.extension() == ".cms")
                 {
-                    if (!boost::filesystem::exists(fp))
+                    if (GetGlobalFlag(GlobalFlags::msbuild))
                     {
-                        throw std::runtime_error("solution file '" + fp.generic_string() + " not found");
+                        throw std::runtime_error("solution file '" + fp.generic_string() + "'  cannot be given in --msbuild mode");
+                    }
+                    else if (!boost::filesystem::exists(fp))
+                    {
+                        throw std::runtime_error("solution file '" + fp.generic_string() + "' not found");
                     }
                     else
                     {
@@ -267,23 +357,58 @@ int main(int argc, const char** argv)
                 }
                 else if (fp.extension() == ".cmp")
                 {
-                    if (!boost::filesystem::exists(fp))
+                    if (GetGlobalFlag(GlobalFlags::msbuild))
                     {
-                        throw std::runtime_error("project file '" + fp.generic_string() + " not found");
+                        throw std::runtime_error("project file '" + fp.generic_string() + "'  cannot be given in --msbuild mode");
+                    }
+                    else if (!boost::filesystem::exists(fp))
+                    {
+                        throw std::runtime_error("project file '" + fp.generic_string() + "' not found");
                     }
                     else
                     {
                         BuildProject(GetFullPath(fp.generic_string()));
                     }
                 }
+                else if (fp.extension() == ".cm")
+                {
+                    if (GetGlobalFlag(GlobalFlags::msbuild))
+                    {
+                        boost::filesystem::path f(projectDirectory);
+                        f /= fp;
+                        if (!boost::filesystem::exists(f))
+                        {
+                            throw std::runtime_error("source file '" + f.generic_string() + "' not found");
+                        }
+                        else
+                        {
+                            sourceFiles.push_back(GetFullPath(f.generic_string()));
+                        }
+                    }
+                    else
+                    {
+                        throw std::runtime_error("single .cm source file '" + fp.generic_string() + "' cannot be given if not in --msbuild mode");
+                    }
+                }
                 else
                 {
-                    throw std::runtime_error("Argument '" + fp.generic_string() + "' has invalid extension. Not Cmajor solution (.cms) or project (.cmp) file.");
+                    if (GetGlobalFlag(GlobalFlags::msbuild))
+                    {
+                        throw std::runtime_error("Argument '" + fp.generic_string() + "' has invalid extension. Not Cmajor source (.cm) file.");
+                    }
+                    else
+                    {
+                        throw std::runtime_error("Argument '" + fp.generic_string() + "' has invalid extension. Not Cmajor solution (.cms) or project (.cmp) file.");
+                    }
                 }
+            }
+            if (GetGlobalFlag(GlobalFlags::msbuild))
+            {
+                BuildMsBuildProject(projectName, projectDirectory, target, sourceFiles, referenceFiles);
             }
             if (!CompileWarningCollection::Instance().Warnings().empty())
             {
-                if (!GetGlobalFlag(GlobalFlags::quiet) && !GetGlobalFlag(GlobalFlags::ide))
+                if (!GetGlobalFlag(GlobalFlags::quiet) && !GetGlobalFlag(GlobalFlags::ide) && !GetGlobalFlag(GlobalFlags::msbuild))
                 {
                     for (const Warning& warning : CompileWarningCollection::Instance().Warnings())
                     {
@@ -318,6 +443,19 @@ int main(int argc, const char** argv)
                 compileResult->AddField(U"success", std::unique_ptr<JsonValue>(new JsonBool(true)));
                 std::cerr << compileResult->ToString() << std::endl;
             }
+            else if (GetGlobalFlag(GlobalFlags::msbuild))
+            {
+                cmajor::dom::Document compileResultDoc;
+                std::unique_ptr<cmajor::dom::Element> compileResultElement(new cmajor::dom::Element(U"compileResult"));
+                std::unique_ptr<cmajor::dom::Element> successElement(new cmajor::dom::Element(U"success"));
+                std::unique_ptr<cmajor::dom::Text> trueValue(new cmajor::dom::Text(U"true"));
+                successElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(trueValue.release()));
+                compileResultElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(successElement.release()));
+                compileResultDoc.AppendChild(std::unique_ptr<cmajor::dom::Node>(compileResultElement.release()));
+                CodeFormatter formatter(std::cerr);
+                formatter.SetIndentSize(1);
+                compileResultDoc.Write(formatter);
+            }
             if (GetGlobalFlag(GlobalFlags::time))
             {
                 std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
@@ -335,7 +473,7 @@ int main(int argc, const char** argv)
     }
     catch (const ParsingException& ex)
     {
-        if (!GetGlobalFlag(GlobalFlags::quiet) && !GetGlobalFlag(GlobalFlags::ide))
+        if (!GetGlobalFlag(GlobalFlags::quiet) && !GetGlobalFlag(GlobalFlags::ide) && !GetGlobalFlag(GlobalFlags::msbuild))
         {
             std::cerr << ex.what() << std::endl;
             for (const Warning& warning : CompileWarningCollection::Instance().Warnings())
@@ -378,11 +516,52 @@ int main(int argc, const char** argv)
             }
             std::cerr << compileResult->ToString() << std::endl;
         }
+        else if (GetGlobalFlag(GlobalFlags::msbuild))
+        {
+            std::cout << ex.what() << std::endl;
+            for (const Warning& warning : CompileWarningCollection::Instance().Warnings())
+            {
+                std::string what = Expand(warning.Message(), warning.Defined(), warning.References(), "Warning");
+                std::cout << what << std::endl;
+            }
+            cmajor::dom::Document compileResultDoc;
+            std::unique_ptr<cmajor::dom::Element> compileResultElement(new cmajor::dom::Element(U"compileResult"));
+            std::unique_ptr<cmajor::dom::Element> successElement(new cmajor::dom::Element(U"success"));
+            std::unique_ptr<cmajor::dom::Text> falseValue(new cmajor::dom::Text(U"false"));
+            successElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(falseValue.release()));
+            compileResultElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(successElement.release()));
+            std::unique_ptr<cmajor::dom::Element> diagnosticsElement(new cmajor::dom::Element(U"diagnostics"));
+            std::unique_ptr<cmajor::dom::Element> diagnosticElement(new cmajor::dom::Element(U"diagnostic"));
+            std::unique_ptr<cmajor::dom::Element> categoryElement(new cmajor::dom::Element(U"category"));
+            std::unique_ptr<cmajor::dom::Text> categoryText(new cmajor::dom::Text(U"error"));
+            categoryElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(categoryText.release()));
+            std::unique_ptr<cmajor::dom::Element> subcategoryElement(new cmajor::dom::Element(U"subcategory"));
+            std::unique_ptr<cmajor::dom::Text> subcategoryText(new cmajor::dom::Text(U"error"));
+            subcategoryElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(subcategoryText.release()));
+            std::unique_ptr<cmajor::dom::Element> messageElement(new cmajor::dom::Element(U"message"));
+            std::unique_ptr<cmajor::dom::Text> messageText(new cmajor::dom::Text(ToUtf32(ex.Message())));
+            messageElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(messageText.release()));
+            diagnosticElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(categoryElement.release()));
+            diagnosticElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(subcategoryElement.release()));
+            diagnosticElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(messageElement.release()));
+            std::unique_ptr<cmajor::dom::Element> spanElement = SpanToDomElement(ex.GetSpan());
+            if (spanElement)
+            {
+                diagnosticElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(spanElement.release()));
+            }
+            diagnosticsElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(diagnosticElement.release()));
+            AddWarningsTo(diagnosticsElement.get());
+            compileResultElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(diagnosticsElement.release()));
+            compileResultDoc.AppendChild(std::unique_ptr<cmajor::dom::Node>(compileResultElement.release()));
+            CodeFormatter formatter(std::cerr);
+            formatter.SetIndentSize(1);
+            compileResultDoc.Write(formatter);
+        }
         return 1;
     }
     catch (const Exception& ex)
     {
-        if (!GetGlobalFlag(GlobalFlags::quiet) && !GetGlobalFlag(GlobalFlags::ide))
+        if (!GetGlobalFlag(GlobalFlags::quiet) && !GetGlobalFlag(GlobalFlags::ide) && !GetGlobalFlag(GlobalFlags::msbuild))
         {
             std::cerr << ex.What() << std::endl;
             for (const Warning& warning : CompileWarningCollection::Instance().Warnings())
@@ -413,11 +592,34 @@ int main(int argc, const char** argv)
             }
             std::cerr << compileResult->ToString() << std::endl;
         }
+        else if (GetGlobalFlag(GlobalFlags::msbuild))
+        {
+            std::cout << ex.What() << std::endl;
+            for (const Warning& warning : CompileWarningCollection::Instance().Warnings())
+            {
+                std::string what = Expand(warning.Message(), warning.Defined(), warning.References(), "Warning");
+                std::cout << what << std::endl;
+            }
+            cmajor::dom::Document compileResultDoc;
+            std::unique_ptr<cmajor::dom::Element> compileResultElement(new cmajor::dom::Element(U"compileResult"));
+            std::unique_ptr<cmajor::dom::Element> successElement(new cmajor::dom::Element(U"success"));
+            std::unique_ptr<cmajor::dom::Text> falseValue(new cmajor::dom::Text(U"false"));
+            successElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(falseValue.release()));
+            compileResultElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(successElement.release()));
+            std::unique_ptr<cmajor::dom::Element> diagnosticsElement(new cmajor::dom::Element(U"diagnostics"));
+            ex.AddToDiagnosticsElement(diagnosticsElement.get());
+            AddWarningsTo(diagnosticsElement.get());
+            compileResultElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(diagnosticsElement.release()));
+            compileResultDoc.AppendChild(std::unique_ptr<cmajor::dom::Node>(compileResultElement.release()));
+            CodeFormatter formatter(std::cerr);
+            formatter.SetIndentSize(1);
+            compileResultDoc.Write(formatter);
+        }
         return 1;
     }
     catch (const std::exception& ex)
     {
-        if (!GetGlobalFlag(GlobalFlags::quiet) && !GetGlobalFlag(GlobalFlags::ide))
+        if (!GetGlobalFlag(GlobalFlags::quiet) && !GetGlobalFlag(GlobalFlags::ide) && !GetGlobalFlag(GlobalFlags::msbuild))
         {
             std::cerr << ex.what() << std::endl;
             for (const Warning& warning : CompileWarningCollection::Instance().Warnings())
@@ -452,6 +654,42 @@ int main(int argc, const char** argv)
                 compileResult->AddField(U"warnings", std::unique_ptr<JsonValue>(warningsArray));
             }
             std::cerr << compileResult->ToString() << std::endl;
+        }
+        else if (GetGlobalFlag(GlobalFlags::msbuild))
+        {
+            std::cout << ex.what() << std::endl;
+            for (const Warning& warning : CompileWarningCollection::Instance().Warnings())
+            {
+                std::string what = Expand(warning.Message(), warning.Defined(), warning.References(), "Warning");
+                std::cout << what << std::endl;
+            }
+            cmajor::dom::Document compileResultDoc;
+            std::unique_ptr<cmajor::dom::Element> compileResultElement(new cmajor::dom::Element(U"compileResult"));
+            std::unique_ptr<cmajor::dom::Element> successElement(new cmajor::dom::Element(U"success"));
+            std::unique_ptr<cmajor::dom::Text> falseValue(new cmajor::dom::Text(U"false"));
+            successElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(falseValue.release()));
+            compileResultElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(successElement.release()));
+            std::unique_ptr<cmajor::dom::Element> diagnosticsElement(new cmajor::dom::Element(U"diagnostics"));
+            std::unique_ptr<cmajor::dom::Element> diagnosticElement(new cmajor::dom::Element(U"diagnostic"));
+            std::unique_ptr<cmajor::dom::Element> categoryElement(new cmajor::dom::Element(U"category"));
+            std::unique_ptr<cmajor::dom::Text> categoryText(new cmajor::dom::Text(U"error"));
+            std::unique_ptr<cmajor::dom::Element> subcategoryElement(new cmajor::dom::Element(U"subcategory"));
+            std::unique_ptr<cmajor::dom::Text> subcategoryText(new cmajor::dom::Text(U"general"));
+            subcategoryElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(subcategoryText.release()));
+            categoryElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(categoryText.release()));
+            std::unique_ptr<cmajor::dom::Element> messageElement(new cmajor::dom::Element(U"message"));
+            std::unique_ptr<cmajor::dom::Text> messageText(new cmajor::dom::Text(ToUtf32(ex.what())));
+            messageElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(messageText.release()));
+            diagnosticElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(categoryElement.release()));
+            diagnosticElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(subcategoryElement.release()));
+            diagnosticElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(messageElement.release()));
+            diagnosticsElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(diagnosticElement.release()));
+            AddWarningsTo(diagnosticsElement.get());
+            compileResultElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(diagnosticsElement.release()));
+            compileResultDoc.AppendChild(std::unique_ptr<cmajor::dom::Node>(compileResultElement.release()));
+            CodeFormatter formatter(std::cerr);
+            formatter.SetIndentSize(1);
+            compileResultDoc.Write(formatter);
         }
         return 1;
     }

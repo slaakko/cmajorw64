@@ -8,6 +8,7 @@
     <ProjectCapability Include="OpenProjectFile" />
     <ProjectCapability Include="HandlesOwnReload" />
     <ProjectCapability Include="ProjectConfigurationsInferredFromUsage" />
+    <ProjectCapability Include="ProjectReferences" />
   </ItemGroup>
 
   <ItemGroup>
@@ -23,6 +24,10 @@
     <PropertyPageSchema Include="
                         $(MSBuildThisFileDirectory)Rules\ProjectItemsSchema.xaml;
                         "/>
+    <PropertyPageSchema Include="$(MSBuildThisFileDirectory)Rules\ProjectReference.xaml">
+      <Context>Project;BrowseObject</Context>
+    </PropertyPageSchema>
+
     <PropertyPageSchema Include="
                         $(MSBuildThisFileDirectory)Rules\debugger_general.xaml;
                         ">
@@ -56,14 +61,24 @@
 
   <Import Project="$(MSBuildProjectFullPath).user" Condition="Exists('$(MSBuildProjectFullPath).user')" />
 
-  <Target Name="Run">
-    <Message Text="$(RunCommandArguments)" />
-    <Exec Command='$(RunCommand) "$(MSBuildProjectDirectory)\$(StartItem)" $(RunCommandArguments)' WorkingDirectory="$(RunWorkingDirectory)" />
+  <UsingTask TaskName="CmajorTasks.Cmc" AssemblyFile="$(CMAJOR_ROOT)\bin\CmajorTasks.dll"/>
+  <UsingTask TaskName="CmajorTasks.ResolveModuleFilePath" AssemblyFile="$(CMAJOR_ROOT)\bin\CmajorTasks.dll"/>
+
+  <Target Name="Clean">
+    <RemoveDir Condition="'$(TargetType)' == 'program'" Directories="$(MSBuildProjectDirectory)\$(BinDir)"/>
+    <RemoveDir Directories="$(MSBuildProjectDirectory)\$(LibDir)"/>
   </Target>
 
-  <Target Name="Build" >
+  <Target Name="ResolveModuleFilePaths">    
+    <ResolveModuleFilePath ProjectDir="$(MSBuildProjectDirectory)" Configuration="$(Configuration)" ProjectReferences="@(ProjectReference)">
+      <Output TaskParameter="ModuleFilePaths" PropertyName="ResolvedModuleFilePaths"></Output>
+    </ResolveModuleFilePath>
+  </Target>
+  
+  <Target Name="Build" Inputs="@(CmCompile);$(ResolvedModuleFilePaths)" Outputs="$(MSBuildProjectDirectory)\$(LibDir)\$(MSBuildProjectName).cmm" DependsOnTargets="ResolveModuleFilePaths">
+    <Cmc Sources="@(CmCompile)" References="@(ProjectReference)" Configuration="$(Configuration)" TargetType="$(TargetType)" ProjectName="$(MSBuildProjectName)" ProjectDir="$(MSBuildProjectDirectory)"/>
   </Target>
 
-  <Target Name="Rebuild">
+  <Target Name="Rebuild" DependsOnTargets="Clean;Build">
   </Target>
 </Project>

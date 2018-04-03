@@ -5,6 +5,7 @@
 
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">x64</Platform>
+    <Platform Condition=" '$(Platform)' == 'AnyCPU' ">x64</Platform>
     <TargetType Condition=" '$(TargetType)' == '' ">program</TargetType>
     
     <DebuggerFlavor>ScriptDebugger</DebuggerFlavor>
@@ -13,11 +14,11 @@
     <StartItem>Start.cm</StartItem>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
-    <BinDir>bin/debug</BinDir>
-    <LibDif>lib/debug</LibDif>
+    <BinDir>bin\debug</BinDir>
+    <LibDir>lib\debug</LibDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)' == 'Release'">
-    <BinDir>bin/release</BinDir>
-    <LibDif>lib/release</LibDif>
+    <BinDir>bin\release</BinDir>
+    <LibDir>lib\release</LibDir>
   </PropertyGroup>
 </Project>

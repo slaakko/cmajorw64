@@ -121,7 +121,7 @@
     <value>Console App</value>
   </data>
   <data name="2" xml:space="preserve">
-    <value>Console App Project Files (*.cmproj);*.cmproj</value>
+    <value>Cmajor Project Files (*.cmproj);*.cmproj</value>
   </data>
   <data name="3" xml:space="preserve">
     <value>Console App Items</value>

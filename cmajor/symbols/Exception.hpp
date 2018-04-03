@@ -6,6 +6,7 @@
 #ifndef CMAJOR_SYMBOLS_EXCEPTION_INCLUDED
 #define CMAJOR_SYMBOLS_EXCEPTION_INCLUDED
 #include <cmajor/parsing/Scanner.hpp>
+#include <cmajor/dom/Element.hpp>
 #include <cmajor/util/Json.hpp>
 
 namespace cmajor { namespace symbols {
@@ -20,6 +21,7 @@ std::string Expand(const std::string& errorMessage, const Span& span, const std:
 std::string Expand(const std::string& errorMessage, const Span& span, const std::vector<Span>& references, const std::string& title);
 
 std::unique_ptr<JsonObject> SpanToJson(const Span& span);
+std::unique_ptr<cmajor::dom::Element> SpanToDomElement(const Span& span);
 
 class Exception
 {
@@ -33,6 +35,7 @@ public:
     const Span& Defined() const { return defined; }
     const std::vector<Span>& References() const { return references; }
     std::unique_ptr<JsonValue> ToJson() const;
+    void AddToDiagnosticsElement(cmajor::dom::Element* diagnosticsElement) const;
 private:
     std::string what;
     std::string message;

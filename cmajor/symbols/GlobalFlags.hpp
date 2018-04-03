@@ -11,7 +11,7 @@
 
 namespace cmajor { namespace symbols {
 
-enum class GlobalFlags : uint16_t
+enum class GlobalFlags : uint32_t
 {
     none = 0,
     verbose = 1 << 0,
@@ -29,7 +29,8 @@ enum class GlobalFlags : uint16_t
     info = 1 << 12,
     unitTest = 1 << 13,
     profile = 1 << 14,
-    generateDebugInfo = 1 << 15
+    generateDebugInfo = 1 << 15,
+    msbuild = 1 << 16
 };
 
 void SetGlobalFlag(GlobalFlags flag);

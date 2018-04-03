@@ -13,17 +13,17 @@ int optimizationLevel = -1;
 
 inline GlobalFlags operator|(GlobalFlags flags, GlobalFlags flag)
 {
-    return GlobalFlags(uint16_t(flags) | uint16_t(flag));
+    return GlobalFlags(uint32_t(flags) | uint32_t(flag));
 }
 
 inline GlobalFlags operator&(GlobalFlags flags, GlobalFlags flag)
 {
-    return GlobalFlags(uint16_t(flags) & uint16_t(flag));
+    return GlobalFlags(uint32_t(flags) & uint32_t(flag));
 }
 
 inline GlobalFlags operator~(GlobalFlags flags)
 {
-    return GlobalFlags(~uint16_t(flags));
+    return GlobalFlags(~uint32_t(flags));
 }
 
 void SetGlobalFlag(GlobalFlags flag)

@@ -31,8 +31,6 @@ TODO: Update the following files with the specified content
         <DataSource Persistence="ProjectFile" HasConfigurationCondition="True" ItemType="CmCompile" />
     </Rule.DataSource>
 
-    <StringProperty Name="MyProperty" DisplayName="My Property" Visible="True" Description="Sample property"/>
-
     <StringProperty Name="Identity" DisplayName="File Name" ReadOnly="true" Category="Misc">
         <StringProperty.DataSource>
             <DataSource Persistence="Intrinsic" ItemType="CmCompile" PersistedName="Identity" />

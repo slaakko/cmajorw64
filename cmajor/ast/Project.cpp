@@ -125,13 +125,13 @@ void Project::ResolveDeclarations()
                     rp = systemLibDir / rp;
                 }
                 rp /= fn;
-                if (rp.extension() == ".cmp")
+                if (rp.extension() == ".cmp" || rp.extension() == ".cmproj")
                 {
                     rp.replace_extension(".cmm");
                 }
                 if (rp.extension() != ".cmm")
                 {
-                    throw std::runtime_error("invalid reference path extension '" + rp.generic_string() + "' (not .cmp or .cmm)");
+                    throw std::runtime_error("invalid reference path extension '" + rp.generic_string() + "' (not .cmp, .cmproj or .cmm)");
                 }
                 if (!boost::filesystem::exists(rp))
                 {
@@ -144,13 +144,13 @@ void Project::ResolveDeclarations()
                     rp /= "lib";
                     rp /= config;
                     rp /= fn;
-                    if (rp.extension() == ".cmp")
+                    if (rp.extension() == ".cmp" || rp.extension() == ".cmproj")
                     {
                         rp.replace_extension(".cmm");
                     }
                     if (rp.extension() != ".cmm")
                     {
-                        throw std::runtime_error("invalid reference path extension '" + rp.generic_string() + "' (not .cmp or .cmm)");
+                        throw std::runtime_error("invalid reference path extension '" + rp.generic_string() + "' (not .cmp, .cmproj or .cmm)");
                     }
                 }
                 std::string referencePath = GetFullPath(rp.generic_string());

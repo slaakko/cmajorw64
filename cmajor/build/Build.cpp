@@ -1112,4 +1112,37 @@ void BuildSolution(const std::string& solutionFilePath)
     }
 }
 
+void BuildMsBuildProject(const std::string& projectName, const std::string& projectDirectory, const std::string& target, 
+    const std::vector<std::string>& sourceFiles, const std::vector<std::string>& referenceFiles)
+{
+    std::string projectFilePath = GetFullPath(Path::Combine(projectDirectory, projectName + ".cmproj"));
+    std::unique_ptr<Project> project(new Project(ToUtf32(projectName), projectFilePath, GetConfig()));
+    if (target == "program")
+    {
+        project->AddDeclaration(new TargetDeclaration(Target::program));
+    }
+    else if (target == "library")
+    {
+        project->AddDeclaration(new TargetDeclaration(Target::library));
+    }
+    else if (target == "unitTest")
+    {
+        project->AddDeclaration(new TargetDeclaration(Target::unitTest));
+    }
+    else
+    {
+        throw std::runtime_error("unsupported target '" + target + "'");
+    }
+    for (const std::string& sourceFile : sourceFiles)
+    {
+        project->AddDeclaration(new SourceFileDeclaration(sourceFile));
+    }
+    for (const std::string& referenceFile : referenceFiles)
+    {
+        project->AddDeclaration(new ReferenceDeclaration(referenceFile));
+    }
+    project->ResolveDeclarations();
+    BuildProject(project.get());
+}
+
 } } // namespace cmajor::build

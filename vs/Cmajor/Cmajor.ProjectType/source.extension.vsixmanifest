@@ -3,7 +3,7 @@
     <Metadata>
         <Identity Id="Cmajor.ProjectType..28d2dbe6-ea6d-4983-84be-ed28343a30a7" Version="1.0" Language="en-US" Publisher="Cmajor.ProjectType" />
         <DisplayName>Cmajor Project Type VSIX</DisplayName>
-        <Description xml:space="preserve">A template for creating a Cmajor Console App project.</Description>
+        <Description xml:space="preserve">A template for creating a Cmajor project.</Description>
     </Metadata>
     <Installation>
         <InstallationTarget Id="Microsoft.VisualStudio.Pro" Version="15.0" />
@@ -15,9 +15,10 @@
     <Assets>
         <Asset Type="Microsoft.VisualStudio.MefComponent" d:Source="Project" d:ProjectName="Cmajor.ProjectType" Path="|Cmajor.ProjectType|"/>
         <Asset Type="Microsoft.VisualStudio.VsPackage" d:Source="Project" d:ProjectName="Cmajor.ProjectType" Path="|Cmajor.ProjectType;PkgdefProjectOutputGroup|" />
-        <Asset Type="Microsoft.VisualStudio.ProjectTemplate" d:Source="Project" d:ProjectName="Cmajor.ProjectTemplate" d:TargetPath="|Cmajor.ProjectTemplate;TemplateProjectOutputGroup|" Path="ProjectTemplates" d:VsixSubPath="ProjectTemplates" />
+        <Asset Type="Microsoft.VisualStudio.ProjectTemplate" d:Source="Project" d:ProjectName="Cmajor.ConsoleAppProjectTemplate" d:TargetPath="|Cmajor.ConsoleAppProjectTemplate;TemplateProjectOutputGroup|" Path="ProjectTemplates" d:VsixSubPath="ProjectTemplates" />
         <Asset Type="Microsoft.VisualStudio.ItemTemplate" d:Source="Project" d:ProjectName="CmItemTemplate" d:TargetPath="|CmItemTemplate;TemplateProjectOutputGroup|" Path="ItemTemplates" d:VsixSubPath="ItemTemplates" />
         <Asset Type="Microsoft.VisualStudio.MefComponent" d:Source="Project" d:ProjectName="Cmajor.Editor" Path="|Cmajor.Editor|" />
+        <Asset Type="Microsoft.VisualStudio.ProjectTemplate" d:Source="Project" d:ProjectName="Cmajor.LibraryProjectTemplate" d:TargetPath="|Cmajor.LibraryProjectTemplate;TemplateProjectOutputGroup|" Path="ProjectTemplates" d:VsixSubPath="ProjectTemplates" />
     </Assets>
     <Prerequisites>
         <Prerequisite Id="Microsoft.VisualStudio.Component.CoreEditor" Version="[15.0,16.0)" DisplayName="Visual Studio core editor" />
