@@ -91,7 +91,6 @@ namespace CmajorTasks
                 int readResult = cmc.StandardOutput.BaseStream.ReadByte();
                 while (readResult != -1)
                 {
-                    readResult = cmc.StandardOutput.BaseStream.ReadByte();
                     if ((char)readResult == '\n')
                     {
                         Log.LogMessage(UTF8.Decode(stdoutBytes.ToArray()));
@@ -101,6 +100,7 @@ namespace CmajorTasks
                     {
                         stdoutBytes.Add((byte)readResult);
                     }
+                    readResult = cmc.StandardOutput.BaseStream.ReadByte();
                 }
                 while (stdoutBytes.Count() > 0)
                 {

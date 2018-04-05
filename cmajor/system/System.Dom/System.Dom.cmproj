@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+ <PropertyGroup Label="Globals">
+  <CustomProjectExtensionsPath>$(LocalAppData)\CustomProjectSystems\Cmajor\</CustomProjectExtensionsPath>
+  <ProjectGuid>d6ca00f6-f172-4e6f-9d56-c9b1525590bd</ProjectGuid>
+ </PropertyGroup>
+ <PropertyGroup>
+  <TargetType>library</TargetType>
+ </PropertyGroup>
+ <ItemGroup>
+  <CmCompile Include="CharData.cm"/>
+  <CmCompile Include="Document.cm"/>
+  <CmCompile Include="DocumentFragment.cm"/>
+  <CmCompile Include="Element.cm"/>
+  <CmCompile Include="Node.cm"/>
+  <CmCompile Include="Parser.cm"/>
+ </ItemGroup>
+ <ItemGroup>
+  <ProjectReference Include="../System.Core/System.Core.cmproj"/>
+  <ProjectReference Include="../System.Runtime/System.Runtime.cmproj"/>
+  <ProjectReference Include="../System.Base/System.Base.cmproj"/>
+  <ProjectReference Include="../System.Text.Parsing.CodeDom/System.Text.Parsing.CodeDom.cmproj"/>
+  <ProjectReference Include="../System.Text.Parsing/System.Text.Parsing.cmproj"/>
+  <ProjectReference Include="../System.Net.Sockets/System.Net.Sockets.cmproj"/>
+  <ProjectReference Include="../System.Numerics.Multiprecision/System.Numerics.Multiprecision.cmproj"/>
+  <ProjectReference Include="../System.IO.Compression/System.IO.Compression.cmproj"/>
+  <ProjectReference Include="../System.Xml/System.Xml.cmproj"/>
+ </ItemGroup>
+ <Import Project="$(CustomProjectExtensionsPath)Cmajor.props"/>
+ <Import Project="$(CustomProjectExtensionsPath)Cmajor.targets"/>
+</Project>

@@ -6,12 +6,24 @@
 #include <cmajor/dom/Document.hpp>
 #include <cmajor/dom/Element.hpp>
 #include <cmajor/dom/Exception.hpp>
+#include <cmajor/util/Unicode.hpp>
 #include <cmajor/util/Error.hpp>
 
 namespace cmajor { namespace dom {
 
+using namespace cmajor::unicode;
+
 Document::Document() : ParentNode(NodeType::documentNode, U"document"), documentElement(nullptr), docType(nullptr), indexValid(false), xmlStandalone(false)
 {
+}
+
+void Document::Write(CodeFormatter& formatter)
+{
+    if (!xmlVersion.empty() && !xmlEncoding.empty())
+    {
+        formatter.WriteLine("<?xml version=\"" + ToUtf8(xmlVersion) + "\" encoding=\"" + ToUtf8(xmlEncoding) + "\"?>");
+    }
+    ParentNode::Write(formatter);
 }
 
 std::unique_ptr<Node> Document::CloneNode(bool deep) 

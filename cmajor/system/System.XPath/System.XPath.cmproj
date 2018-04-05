@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+ <PropertyGroup Label="Globals">
+  <CustomProjectExtensionsPath>$(LocalAppData)\CustomProjectSystems\Cmajor\</CustomProjectExtensionsPath>
+  <ProjectGuid>7417a86d-09f0-485e-bbde-994c3aaefa61</ProjectGuid>
+ </PropertyGroup>
+ <PropertyGroup>
+  <TargetType>library</TargetType>
+ </PropertyGroup>
+ <ItemGroup>
+  <CmCompile Include="XPathContext.cm"/>
+  <CmCompile Include="XPathDebug.cm"/>
+  <CmCompile Include="XPathEvaluate.cm"/>
+  <CmCompile Include="XPathExpr.cm"/>
+  <CmCompile Include="XPathExpressionGrammar.cm"/>
+  <CmCompile Include="XPathFunction.cm"/>
+  <CmCompile Include="XPathObject.cm"/>
+ </ItemGroup>
+ <ItemGroup>
+  <ProjectReference Include="../System.Core/System.Core.cmproj"/>
+  <ProjectReference Include="../System.Runtime/System.Runtime.cmproj"/>
+  <ProjectReference Include="../System.Base/System.Base.cmproj"/>
+  <ProjectReference Include="../System.Text.Parsing.CodeDom/System.Text.Parsing.CodeDom.cmproj"/>
+  <ProjectReference Include="../System.Text.Parsing/System.Text.Parsing.cmproj"/>
+  <ProjectReference Include="../System.Net.Sockets/System.Net.Sockets.cmproj"/>
+  <ProjectReference Include="../System.Numerics.Multiprecision/System.Numerics.Multiprecision.cmproj"/>
+  <ProjectReference Include="../System.IO.Compression/System.IO.Compression.cmproj"/>
+  <ProjectReference Include="../System.Xml/System.Xml.cmproj"/>
+  <ProjectReference Include="../System.Dom/System.Dom.cmproj"/>
+ </ItemGroup>
+ <Import Project="$(CustomProjectExtensionsPath)Cmajor.props"/>
+ <Import Project="$(CustomProjectExtensionsPath)Cmajor.targets"/>
+</Project>

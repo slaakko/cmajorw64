@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+ <PropertyGroup Label="Globals">
+  <CustomProjectExtensionsPath>$(LocalAppData)\CustomProjectSystems\Cmajor\</CustomProjectExtensionsPath>
+  <ProjectGuid>697cb77f-18a8-4e8b-a683-4710e1e68d02</ProjectGuid>
+ </PropertyGroup>
+ <PropertyGroup>
+  <TargetType>library</TargetType>
+ </PropertyGroup>
+ <ItemGroup>
+  <CmCompile Include="Json.cm"/>
+  <CmCompile Include="JsonClassFactory.cm"/>
+  <CmCompile Include="JsonExport.cm"/>
+  <CmCompile Include="JsonGrammar.cm"/>
+  <CmCompile Include="JsonImport.cm"/>
+ </ItemGroup>
+ <ItemGroup>
+  <ProjectReference Include="../System.Core/System.Core.cmproj"/>
+  <ProjectReference Include="../System.Runtime/System.Runtime.cmproj"/>
+  <ProjectReference Include="../System.Base/System.Base.cmproj"/>
+  <ProjectReference Include="../System.Text.Parsing.CodeDom/System.Text.Parsing.CodeDom.cmproj"/>
+  <ProjectReference Include="../System.Text.Parsing/System.Text.Parsing.cmproj"/>
+  <ProjectReference Include="../System.Net.Sockets/System.Net.Sockets.cmproj"/>
+  <ProjectReference Include="../System.Numerics.Multiprecision/System.Numerics.Multiprecision.cmproj"/>
+  <ProjectReference Include="../System.IO.Compression/System.IO.Compression.cmproj"/>
+  <ProjectReference Include="../System.Xml/System.Xml.cmproj"/>
+  <ProjectReference Include="../System.Dom/System.Dom.cmproj"/>
+  <ProjectReference Include="../System.XPath/System.XPath.cmproj"/>
+  <ProjectReference Include="../System.Text.RegularExpressions/System.Text.RegularExpressions.cmproj"/>
+  <ProjectReference Include="../System.Net.Http/System.Net.Http.cmproj"/>
+ </ItemGroup>
+ <Import Project="$(CustomProjectExtensionsPath)Cmajor.props"/>
+ <Import Project="$(CustomProjectExtensionsPath)Cmajor.targets"/>
+</Project>

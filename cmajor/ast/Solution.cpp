@@ -51,6 +51,7 @@ void Solution::ResolveDeclarations()
         if (SolutionProjectDeclaration* solutionProjectDeclaration = dynamic_cast<SolutionProjectDeclaration*>(declaration.get()))
         {
             boost::filesystem::path pp(solutionProjectDeclaration->FilePath());
+            relativeProjectFilePaths.push_back(pp.generic_string());
             if (pp.is_relative())
             {
                 pp = basePath / pp;

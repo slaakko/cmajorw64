@@ -74,20 +74,28 @@ std::vector<std::unique_ptr<CompileUnitNode>> ParseSourcesInMainThread(const std
     std::vector<std::unique_ptr<CompileUnitNode>> compileUnits;
     for (const std::string& sourceFilePath : sourceFilePaths)
     {
-        MappedInputFile sourceFile(sourceFilePath);
-        uint32_t fileIndex = FileRegistry::Instance().RegisterNewFile(sourceFilePath);
-        ParsingContext parsingContext;
-        if (GetGlobalFlag(GlobalFlags::debugParsing))
+        if (boost::filesystem::file_size(sourceFilePath) == 0)
         {
-            compileUnitGrammar->SetLog(&std::cout);
+            std::unique_ptr<CompileUnitNode> compileUnit(new CompileUnitNode(Span(), sourceFilePath));
+            compileUnits.push_back(std::move(compileUnit));
         }
-        std::u32string s(ToUtf32(std::string(sourceFile.Begin(), sourceFile.End())));
-        std::unique_ptr<CompileUnitNode> compileUnit(compileUnitGrammar->Parse(&s[0], &s[0] + s.length(), fileIndex, sourceFilePath, &parsingContext));
-        if (GetGlobalFlag(GlobalFlags::generateDebugInfo))
+        else
         {
-            compileUnit->ComputeLineStarts(s);
+            MappedInputFile sourceFile(sourceFilePath);
+            uint32_t fileIndex = FileRegistry::Instance().RegisterNewFile(sourceFilePath);
+            ParsingContext parsingContext;
+            if (GetGlobalFlag(GlobalFlags::debugParsing))
+            {
+                compileUnitGrammar->SetLog(&std::cout);
+            }
+            std::u32string s(ToUtf32(std::string(sourceFile.Begin(), sourceFile.End())));
+            std::unique_ptr<CompileUnitNode> compileUnit(compileUnitGrammar->Parse(&s[0], &s[0] + s.length(), fileIndex, sourceFilePath, &parsingContext));
+            if (GetGlobalFlag(GlobalFlags::generateDebugInfo))
+            {
+                compileUnit->ComputeLineStarts(s);
+            }
+            compileUnits.push_back(std::move(compileUnit));
         }
-        compileUnits.push_back(std::move(compileUnit));
     }
     if (GetGlobalFlag(GlobalFlags::verbose))
     {
@@ -130,16 +138,24 @@ void ParseSourceFile(ParserData* parserData)
                 parserData->indexQueue.pop_front();
             }
             const std::string& sourceFilePath = parserData->sourceFilePaths[index];
-            MappedInputFile sourceFile(sourceFilePath);
-            ParsingContext parsingContext;
-            int fileIndex = parserData->fileIndeces[index];
-            std::u32string s(ToUtf32(std::string(sourceFile.Begin(), sourceFile.End())));
-            std::unique_ptr<CompileUnitNode> compileUnit(compileUnitGrammar->Parse(&s[0], &s[0] + s.length(), fileIndex, sourceFilePath, &parsingContext));
-            if (GetGlobalFlag(GlobalFlags::generateDebugInfo))
+            if (boost::filesystem::file_size(sourceFilePath) == 0)
             {
-                compileUnit->ComputeLineStarts(s);
+                std::unique_ptr<CompileUnitNode> compileUnit(new CompileUnitNode(Span(), sourceFilePath));
+                parserData->compileUnits[index].reset(compileUnit.release());
             }
-            parserData->compileUnits[index].reset(compileUnit.release());
+            else
+            {
+                MappedInputFile sourceFile(sourceFilePath);
+                ParsingContext parsingContext;
+                int fileIndex = parserData->fileIndeces[index];
+                std::u32string s(ToUtf32(std::string(sourceFile.Begin(), sourceFile.End())));
+                std::unique_ptr<CompileUnitNode> compileUnit(compileUnitGrammar->Parse(&s[0], &s[0] + s.length(), fileIndex, sourceFilePath, &parsingContext));
+                if (GetGlobalFlag(GlobalFlags::generateDebugInfo))
+                {
+                    compileUnit->ComputeLineStarts(s);
+                }
+                parserData->compileUnits[index].reset(compileUnit.release());
+            }
         }
     }
     catch (...)

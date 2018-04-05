@@ -86,7 +86,9 @@ public:
     const std::string& ExecutableFilePath() const { return executableFilePath; }
     const std::vector<std::string>& References() const { return references; }
     const std::vector<std::string>& ReferencedProjectFilePaths() const { return referencedProjectFilePaths; }
+    const std::vector<std::string>& RelativeReferencedProjectFilePaths() const { return relativeReferencedProjectFilePaths; }
     const std::vector<std::string>& SourceFilePaths() const { return sourceFilePaths; }
+    const std::vector<std::string>& RelativeSourceFilePaths() const { return relativeSourceFilePaths; }
     Target GetTarget() const { return target; }
     bool DependsOn(Project* that) const;
     bool IsSystemProject() const { return isSystemProject; }
@@ -108,6 +110,8 @@ private:
     std::vector<std::string> references;
     std::vector<std::string> referencedProjectFilePaths;
     std::vector<std::string> sourceFilePaths;
+    std::vector<std::string> relativeSourceFilePaths;
+    std::vector<std::string> relativeReferencedProjectFilePaths;
     bool isSystemProject;
 };
 

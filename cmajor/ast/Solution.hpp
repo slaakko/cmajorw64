@@ -54,6 +54,7 @@ public:
     const std::string& FilePath() const { return filePath; }
     const boost::filesystem::path& BasePath() const { return basePath; }
     const std::vector<std::string>& ProjectFilePaths() const { return projectFilePaths; }
+    const std::vector<std::string>& RelativeProjectFilePaths() const { return relativeProjectFilePaths; }
     const std::u32string& ActiveProjectName() const { return activeProjectName; }
     void AddProject(std::unique_ptr<Project>&& project);
     std::vector<Project*> CreateBuildOrder();
@@ -65,6 +66,7 @@ private:
     boost::filesystem::path basePath;
     std::vector<std::unique_ptr<SolutionDeclaration>> declarations;
     std::vector<std::string> projectFilePaths;
+    std::vector<std::string> relativeProjectFilePaths;
     std::vector<std::unique_ptr<Project>> projects;
     std::u32string activeProjectName;
     std::vector<std::unique_ptr<ProjectDependencyDeclaration>> additionalDependencyDeclarations;

@@ -109,6 +109,7 @@ void Project::ResolveDeclarations()
             {
                 ReferenceDeclaration* reference = static_cast<ReferenceDeclaration*>(declaration.get());
                 boost::filesystem::path rp(reference->FilePath());
+                relativeReferencedProjectFilePaths.push_back(rp.generic_string());
                 if (rp.is_absolute())
                 {
                     referencedProjectFilePaths.push_back(GetFullPath(rp.generic_string()));
@@ -164,6 +165,7 @@ void Project::ResolveDeclarations()
             {
                 SourceFileDeclaration* sourceFileDeclaration = static_cast<SourceFileDeclaration*>(declaration.get());
                 boost::filesystem::path sfp(sourceFileDeclaration->FilePath());
+                relativeSourceFilePaths.push_back(sfp.generic_string());
                 if (sfp.is_relative())
                 {
                     sfp = basePath / sfp;

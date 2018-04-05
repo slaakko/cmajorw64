@@ -23,6 +23,7 @@ public:
     Document& operator=(Document&&) = delete;
     std::unique_ptr<Node> CloneNode(bool deep) override;
     Element* DocumentElement() { return documentElement; }
+    void Write(CodeFormatter& formatter) override;
     Node* InsertBefore(std::unique_ptr<Node>&& newChild, Node* refChild) override;
     std::unique_ptr<Node> ReplaceChild(std::unique_ptr<Node>&& newChild, Node* oldChild) override;
     std::unique_ptr<Node> RemoveChild(Node* oldChild) override;

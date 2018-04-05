@@ -1,6 +1,10 @@
 project System.Net.Sockets;
 target=library;
+reference <../System.Core/System.Core.cmp>;
+reference <../System.Runtime/System.Runtime.cmp>;
 reference <../System.Base/System.Base.cmp>;
+reference <../System.Text.Parsing.CodeDom/System.Text.Parsing.CodeDom.cmp>;
+reference <../System.Text.Parsing/System.Text.Parsing.cmp>;
 source <NetworkByteStream.cm>;
 source <TcpClient.cm>;
 source <TcpListener.cm>;
