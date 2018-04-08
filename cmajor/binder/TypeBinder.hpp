@@ -78,6 +78,7 @@ public:
 private:
     BoundCompileUnit& boundCompileUnit;
     SymbolTable& symbolTable;
+    Module* module;
     ContainerScope* containerScope;
     std::vector<Node*> usingNodes;
     EnumTypeSymbol* enumType;

@@ -2,7 +2,7 @@
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
  <PropertyGroup Label="Globals">
   <CustomProjectExtensionsPath>$(LocalAppData)\CustomProjectSystems\Cmajor\</CustomProjectExtensionsPath>
-  <ProjectGuid>80b399f7-25d6-41ed-aa9a-cfa7fd740caa</ProjectGuid>
+  <ProjectGuid>9da0e956-4611-40ae-9497-98222390b1a0</ProjectGuid>
  </PropertyGroup>
  <PropertyGroup>
   <TargetType>library</TargetType>
@@ -14,11 +14,7 @@
   <CmCompile Include="TcpSocket.cm"/>
  </ItemGroup>
  <ItemGroup>
-  <ProjectReference Include="../System.Core/System.Core.cmproj"/>
-  <ProjectReference Include="../System.Runtime/System.Runtime.cmproj"/>
   <ProjectReference Include="../System.Base/System.Base.cmproj"/>
-  <ProjectReference Include="../System.Text.Parsing.CodeDom/System.Text.Parsing.CodeDom.cmproj"/>
-  <ProjectReference Include="../System.Text.Parsing/System.Text.Parsing.cmproj"/>
  </ItemGroup>
  <Import Project="$(CustomProjectExtensionsPath)Cmajor.props"/>
  <Import Project="$(CustomProjectExtensionsPath)Cmajor.targets"/>

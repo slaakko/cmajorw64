@@ -84,6 +84,7 @@ public:
 private:
     BoundCompileUnit& boundCompileUnit;
     SymbolTable& symbolTable;
+    Module* module;
     ContainerScope* containerScope;
     std::unique_ptr<BoundStatement> statement;
     int compoundLevel;

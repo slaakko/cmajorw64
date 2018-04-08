@@ -15,7 +15,7 @@ using namespace cmajor::ast;
 class BoundNamespace : public BoundNode
 {
 public:
-    BoundNamespace(NamespaceNode& namespaceNode_);
+    BoundNamespace(Module* module_, NamespaceNode& namespaceNode_);
     void Accept(BoundNodeVisitor& visitor) override;
     void Load(Emitter& emitter, OperationFlags flags) override;
     void Store(Emitter& emitter, OperationFlags flags) override;

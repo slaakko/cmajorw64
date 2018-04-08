@@ -12,7 +12,7 @@
 #include <cmajor/symbols/Exception.hpp>
 #include <cmajor/symbols/Module.hpp>
 #include <cmajor/symbols/GlobalFlags.hpp>
-#include <cmajor/parser/FileRegistry.hpp>
+//#include <cmajor/parser/FileRegistry.hpp>
 #include <boost/filesystem.hpp>
 #include <iostream>
 #include <stdexcept>
@@ -22,7 +22,7 @@ struct InitDone
     InitDone()
     {
         cmajor::ast::Init();
-        cmajor::parser::FileRegistry::Init();
+        //cmajor::parser::FileRegistry::Init();
         cmajor::symbols::Init();
         cmajor::parsing::Init();
         cmajor::util::Init();
@@ -52,6 +52,7 @@ using namespace cmajor::binder;
 
 int main(int argc, const char** argv)
 {
+    std::unique_ptr<Module> rootModule;
     try
     {
         InitDone initDone;
@@ -101,17 +102,17 @@ int main(int argc, const char** argv)
             }
             std::vector<ClassTypeSymbol*> classTypes;
             std::vector<ClassTemplateSpecializationSymbol*> classTemplateSpecializations;
-            Module module(moduleFilePath, classTypes, classTemplateSpecializations);
-            if (module.Name() == U"System.Base")
+            rootModule.reset(new Module(moduleFilePath, classTypes, classTemplateSpecializations));
+            if (rootModule->Name() == U"System.Base")
             {
-                cmajor::symbols::MetaInit(module.GetSymbolTable());
+                cmajor::symbols::MetaInit(rootModule->GetSymbolTable());
             }
             std::unique_ptr<ModuleBinder> moduleBinder;
             CompileUnitNode compileUnit(Span(), "foo");
-            AttributeBinder attributeBinder;
-            moduleBinder.reset(new ModuleBinder(module, &compileUnit, &attributeBinder));
+            AttributeBinder attributeBinder(rootModule.get());
+            moduleBinder.reset(new ModuleBinder(*rootModule, &compileUnit, &attributeBinder));
             moduleBinder->SetBindingTypes();
-            module.GetSymbolTable().AddClassTemplateSpecializationsToClassTemplateSpecializationMap(classTemplateSpecializations);
+            rootModule->GetSymbolTable().AddClassTemplateSpecializationsToClassTemplateSpecializationMap(classTemplateSpecializations);
             for (ClassTemplateSpecializationSymbol* classTemplateSpecialization : classTemplateSpecializations)
             {
                 moduleBinder->BindClassTemplateSpecialization(classTemplateSpecialization);
@@ -121,7 +122,7 @@ int main(int argc, const char** argv)
                 classType->SetSpecialMemberFunctions();
                 classType->CreateLayouts();
             }
-            module.Dump();
+            rootModule->Dump();
         }
     }
     catch (const Exception& ex)

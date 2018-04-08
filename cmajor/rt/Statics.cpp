@@ -7,6 +7,7 @@
 #include <cmajor/rt/Error.hpp>
 #include <cmajor/rt/Io.hpp>
 #include <cmajor/util/Error.hpp>
+#include <boost/functional/hash.hpp>
 #include <memory>
 #include <mutex>
 #include <stdexcept>
@@ -21,13 +22,13 @@ public:
     static void Init();
     static void Done();
     static StaticInitTable& Instance() { return *instance; }
-    void AllocateMutexes(const std::vector<uint32_t>& staticClassIds);
-    void BeginCriticalSection(uint32_t classId);
-    void EndCriticalSection(uint32_t classId);
+    void AllocateMutexes(const std::vector<boost::uuids::uuid>& staticClassIds);
+    void BeginCriticalSection(const boost::uuids::uuid& classId);
+    void EndCriticalSection(const boost::uuids::uuid& classId);
 private:
     static std::unique_ptr<StaticInitTable> instance;
     std::vector<std::unique_ptr<std::recursive_mutex>> mutexes;
-    std::unordered_map<uint32_t, int> mutexMap;
+    std::unordered_map<boost::uuids::uuid, int, boost::hash<boost::uuids::uuid>> mutexMap;
 };
 
 std::unique_ptr<StaticInitTable> StaticInitTable::instance;
@@ -42,18 +43,18 @@ void StaticInitTable::Done()
     instance.reset();
 }
 
-void StaticInitTable::AllocateMutexes(const std::vector<uint32_t>& staticClassIds)
+void StaticInitTable::AllocateMutexes(const std::vector<boost::uuids::uuid>& staticClassIds)
 {
     int n = staticClassIds.size();
     for (int i = 0; i < n; ++i)
     {
-        uint32_t classId = staticClassIds[i];
+        const boost::uuids::uuid& classId = staticClassIds[i];
         mutexMap[classId] = mutexes.size();
         mutexes.push_back(std::unique_ptr<std::recursive_mutex>(new std::recursive_mutex()));
     }
 }
 
-void StaticInitTable::BeginCriticalSection(uint32_t classId)
+void StaticInitTable::BeginCriticalSection(const boost::uuids::uuid& classId)
 {
     auto it = mutexMap.find(classId);
     if (it != mutexMap.cend())
@@ -69,7 +70,7 @@ void StaticInitTable::BeginCriticalSection(uint32_t classId)
     }
 }
 
-void StaticInitTable::EndCriticalSection(uint32_t classId)
+void StaticInitTable::EndCriticalSection(const boost::uuids::uuid& classId)
 {
     auto it = mutexMap.find(classId);
     if (it != mutexMap.cend())
@@ -85,7 +86,7 @@ void StaticInitTable::EndCriticalSection(uint32_t classId)
     }
 }
 
-void AllocateMutexes(const std::vector<uint32_t>& staticClassIds)
+void AllocateMutexes(const std::vector<boost::uuids::uuid>& staticClassIds)
 {
     StaticInitTable::Instance().AllocateMutexes(staticClassIds);
 }
@@ -129,11 +130,12 @@ void DoneStatics()
 
 } }  // namespace cmajor::rt
 
-extern "C" RT_API void RtBeginStaticInitCriticalSection(uint32_t staticClassId)
+extern "C" RT_API void RtBeginStaticInitCriticalSection(void* staticClassId)
 {
     try
     {
-        cmajor::rt::StaticInitTable::Instance().BeginCriticalSection(staticClassId);
+        boost::uuids::uuid* classId = reinterpret_cast<boost::uuids::uuid*>(staticClassId);
+        cmajor::rt::StaticInitTable::Instance().BeginCriticalSection(*classId);
     }
     catch (const std::exception& ex)
     {
@@ -145,11 +147,12 @@ extern "C" RT_API void RtBeginStaticInitCriticalSection(uint32_t staticClassId)
     }
 }
 
-extern "C" RT_API void RtEndStaticInitCriticalSection(uint32_t staticClassId)
+extern "C" RT_API void RtEndStaticInitCriticalSection(void* staticClassId)
 {
     try
     {
-        cmajor::rt::StaticInitTable::Instance().EndCriticalSection(staticClassId);
+        boost::uuids::uuid* classId = reinterpret_cast<boost::uuids::uuid*>(staticClassId);
+        cmajor::rt::StaticInitTable::Instance().EndCriticalSection(*classId);
     }
     catch (const std::exception& ex)
     {

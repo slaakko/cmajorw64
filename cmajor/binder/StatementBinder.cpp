@@ -23,7 +23,7 @@
 #include <cmajor/symbols/GlobalFlags.hpp>
 #include <cmajor/symbols/SymbolCreatorVisitor.hpp>
 #include <cmajor/parser/TypeExpr.hpp>
-#include <cmajor/parser/FileRegistry.hpp>
+//#include <cmajor/parser/FileRegistry.hpp>
 #include <cmajor/ast/Literal.hpp>
 #include <cmajor/ast/Identifier.hpp>
 #include <cmajor/ast/Expression.hpp>
@@ -204,12 +204,12 @@ void CheckFunctionReturnPaths(FunctionSymbol* functionSymbol, CompoundStatementN
             StatementNode* statement = body->Statements()[i];
             if (TerminatesFunction(statement, false, containerScope, boundCompileUnit)) return;
         }
-        throw Exception("not all control paths terminate in return or throw statement", span);
+        throw Exception(&boundCompileUnit.GetModule(), "not all control paths terminate in return or throw statement", span);
     }
 }
 
 StatementBinder::StatementBinder(BoundCompileUnit& boundCompileUnit_) :  
-    boundCompileUnit(boundCompileUnit_), symbolTable(boundCompileUnit.GetSymbolTable()), containerScope(nullptr), statement(), compoundLevel(0), insideCatch(false), 
+    boundCompileUnit(boundCompileUnit_), symbolTable(boundCompileUnit.GetSymbolTable()), module(&boundCompileUnit.GetModule()), containerScope(nullptr), statement(), compoundLevel(0), insideCatch(false),
     currentClass(nullptr), currentFunction(nullptr), currentStaticConstructorSymbol(nullptr), currentStaticConstructorNode(nullptr), currentConstructorSymbol(nullptr),
     currentConstructorNode(nullptr), currentDestructorSymbol(nullptr), currentDestructorNode(nullptr), currentMemberFunctionSymbol(nullptr), currentMemberFunctionNode(nullptr), 
     switchConditionType(nullptr), currentCaseValueMap(nullptr), currentGotoCaseStatements(nullptr), currentGotoDefaultStatements(nullptr), postfix(false), compilingThrow(false), 
@@ -224,7 +224,7 @@ void StatementBinder::Visit(CompileUnitNode& compileUnitNode)
 
 void StatementBinder::Visit(NamespaceNode& namespaceNode)
 {
-    std::unique_ptr<BoundNamespace> ns(new BoundNamespace(namespaceNode));
+    std::unique_ptr<BoundNamespace> ns(new BoundNamespace(module, namespaceNode));
     boundCompileUnit.PushNamespace(ns.get());
     ContainerScope* prevContainerScope = containerScope;
     Symbol* symbol = boundCompileUnit.GetSymbolTable().GetSymbol(&namespaceNode);
@@ -245,7 +245,7 @@ void StatementBinder::Visit(EnumTypeNode& enumTypeNode)
     Symbol* symbol = boundCompileUnit.GetSymbolTable().GetSymbol(&enumTypeNode);
     Assert(symbol->GetSymbolType() == SymbolType::enumTypeSymbol, "enum type symbols expected");
     EnumTypeSymbol* enumTypeSymbol = static_cast<EnumTypeSymbol*>(symbol);
-    std::unique_ptr<BoundEnumTypeDefinition> boundEnum(new BoundEnumTypeDefinition(enumTypeSymbol));
+    std::unique_ptr<BoundEnumTypeDefinition> boundEnum(new BoundEnumTypeDefinition(module, enumTypeSymbol));
     boundCompileUnit.AddBoundNode(std::move(boundEnum));
 }
 
@@ -260,7 +260,7 @@ void StatementBinder::Visit(ClassNode& classNode)
         return;
     }
     containerScope = symbol->GetContainerScope();
-    std::unique_ptr<BoundClass> boundClass(new BoundClass(classTypeSymbol));
+    std::unique_ptr<BoundClass> boundClass(new BoundClass(module, classTypeSymbol));
     BoundClass* prevClass = currentClass;
     currentClass = boundClass.get();
     int n = classNode.Members().Count();
@@ -295,7 +295,7 @@ void StatementBinder::Visit(FunctionNode& functionNode)
         return;
     }
     containerScope = symbol->GetContainerScope();
-    std::unique_ptr<BoundFunction> boundFunction(new BoundFunction(functionSymbol));
+    std::unique_ptr<BoundFunction> boundFunction(new BoundFunction(module, functionSymbol));
     BoundFunction* prevFunction = currentFunction;
     currentFunction = boundFunction.get();
     if (functionNode.Body())
@@ -323,7 +323,7 @@ void StatementBinder::Visit(StaticConstructorNode& staticConstructorNode)
     StaticConstructorSymbol* prevStaticConstructorSymbol = currentStaticConstructorSymbol;
     currentStaticConstructorSymbol = staticConstructorSymbol;
     containerScope = symbol->GetContainerScope();
-    std::unique_ptr<BoundFunction> boundFunction(new BoundFunction(staticConstructorSymbol));
+    std::unique_ptr<BoundFunction> boundFunction(new BoundFunction(module, staticConstructorSymbol));
     BoundFunction* prevFunction = currentFunction;
     currentFunction = boundFunction.get();
     if (staticConstructorNode.Body())
@@ -355,7 +355,7 @@ void StatementBinder::Visit(ConstructorNode& constructorNode)
     ConstructorSymbol* prevConstructorSymbol = currentConstructorSymbol;
     currentConstructorSymbol = constructorSymbol;
     containerScope = symbol->GetContainerScope();
-    std::unique_ptr<BoundFunction> boundFunction(new BoundFunction(constructorSymbol));
+    std::unique_ptr<BoundFunction> boundFunction(new BoundFunction(module, constructorSymbol));
     BoundFunction* prevFunction = currentFunction;
     currentFunction = boundFunction.get();
     if (constructorNode.Body())
@@ -374,7 +374,7 @@ void StatementBinder::Visit(ConstructorNode& constructorNode)
     {
         ConstructorNode* prevConstructorNode = currentConstructorNode;
         currentConstructorNode = &constructorNode;
-        std::unique_ptr<BoundCompoundStatement> boundCompoundStatement(new BoundCompoundStatement(constructorNode.GetSpan()));
+        std::unique_ptr<BoundCompoundStatement> boundCompoundStatement(new BoundCompoundStatement(module, constructorNode.GetSpan()));
         GenerateClassInitialization(currentConstructorSymbol, currentConstructorNode, boundCompoundStatement.get(), currentFunction, boundCompileUnit, containerScope, this, true, constructorNode.GetSpan());
         currentConstructorNode = prevConstructorNode;
         boundFunction->SetBody(std::move(boundCompoundStatement));
@@ -399,7 +399,7 @@ void StatementBinder::Visit(DestructorNode& destructorNode)
     DestructorSymbol* prevDestructorSymbol = currentDestructorSymbol;
     currentDestructorSymbol = destructorSymbol;
     containerScope = symbol->GetContainerScope();
-    std::unique_ptr<BoundFunction> boundFunction(new BoundFunction(destructorSymbol));
+    std::unique_ptr<BoundFunction> boundFunction(new BoundFunction(module, destructorSymbol));
     BoundFunction* prevFunction = currentFunction;
     currentFunction = boundFunction.get();
     if (destructorNode.Body())
@@ -418,7 +418,7 @@ void StatementBinder::Visit(DestructorNode& destructorNode)
     {
         DestructorNode* prevDestructorNode = currentDestructorNode;
         currentDestructorNode = &destructorNode;
-        std::unique_ptr<BoundCompoundStatement> boundCompoundStatement(new BoundCompoundStatement(destructorNode.GetSpan()));
+        std::unique_ptr<BoundCompoundStatement> boundCompoundStatement(new BoundCompoundStatement(module, destructorNode.GetSpan()));
         GenerateClassTermination(currentDestructorSymbol, currentDestructorNode, boundCompoundStatement.get(), currentFunction, boundCompileUnit, containerScope, this, currentDestructorNode->GetSpan());
         currentDestructorNode = prevDestructorNode;
         boundFunction->SetBody(std::move(boundCompoundStatement));
@@ -443,7 +443,7 @@ void StatementBinder::Visit(MemberFunctionNode& memberFunctionNode)
     MemberFunctionSymbol* prevMemberFunctionSymbol = currentMemberFunctionSymbol;
     currentMemberFunctionSymbol = memberFunctionSymbol;
     containerScope = symbol->GetContainerScope();
-    std::unique_ptr<BoundFunction> boundFunction(new BoundFunction(memberFunctionSymbol));
+    std::unique_ptr<BoundFunction> boundFunction(new BoundFunction(module, memberFunctionSymbol));
     BoundFunction* prevFunction = currentFunction;
     currentFunction = boundFunction.get();
     if (memberFunctionNode.Body())
@@ -463,7 +463,7 @@ void StatementBinder::Visit(MemberFunctionNode& memberFunctionNode)
         Assert(memberFunctionSymbol->GroupName() == U"operator=", "operator= expected");
         MemberFunctionNode* prevMemberFunctionNode = currentMemberFunctionNode;
         currentMemberFunctionNode = &memberFunctionNode;
-        std::unique_ptr<BoundCompoundStatement> boundCompoundStatement(new BoundCompoundStatement(memberFunctionNode.GetSpan()));
+        std::unique_ptr<BoundCompoundStatement> boundCompoundStatement(new BoundCompoundStatement(module, memberFunctionNode.GetSpan()));
         GenerateClassAssignment(currentMemberFunctionSymbol, currentMemberFunctionNode, boundCompoundStatement.get(), currentFunction, boundCompileUnit, containerScope, this, true, memberFunctionNode.GetSpan());
         currentMemberFunctionNode = prevMemberFunctionNode;
         boundFunction->SetBody(std::move(boundCompoundStatement));
@@ -486,7 +486,7 @@ void StatementBinder::Visit(ConversionFunctionNode& conversionFunctionNode)
     Assert(symbol->GetSymbolType() == SymbolType::conversionFunctionSymbol, "conversion function symbol expected");
     ConversionFunctionSymbol* conversionFunctionSymbol = static_cast<ConversionFunctionSymbol*>(symbol);
     containerScope = symbol->GetContainerScope();
-    std::unique_ptr<BoundFunction> boundFunction(new BoundFunction(conversionFunctionSymbol));
+    std::unique_ptr<BoundFunction> boundFunction(new BoundFunction(module, conversionFunctionSymbol));
     BoundFunction* prevFunction = currentFunction;
     currentFunction = boundFunction.get();
     if (conversionFunctionNode.Body())
@@ -512,7 +512,7 @@ void StatementBinder::Visit(CompoundStatementNode& compoundStatementNode)
     Assert(symbol->GetSymbolType() == SymbolType::declarationBlock, "declaration block expected");
     DeclarationBlock* declarationBlock = static_cast<DeclarationBlock*>(symbol);
     containerScope = declarationBlock->GetContainerScope();
-    std::unique_ptr<BoundCompoundStatement> boundCompoundStatement(new BoundCompoundStatement(compoundStatementNode.GetSpan(), compoundStatementNode.EndBraceSpan()));
+    std::unique_ptr<BoundCompoundStatement> boundCompoundStatement(new BoundCompoundStatement(module, compoundStatementNode.GetSpan(), compoundStatementNode.EndBraceSpan()));
     if (compoundLevel == 0)
     {
         if (GetGlobalFlag(GlobalFlags::profile))
@@ -528,11 +528,12 @@ void StatementBinder::Visit(CompoundStatementNode& compoundStatementNode)
             }
             if (profile)
             {
-                uint32_t functionId = currentFunction->GetFunctionSymbol()->FunctionId();
+                //uint32_t functionId = currentFunction->GetFunctionSymbol()->FunctionId();
+                boost::uuids::uuid functionId = currentFunction->GetFunctionSymbol()->FunctionId();
                 symbolTable.MapProfiledFunction(functionId, currentFunction->GetFunctionSymbol()->FullName());
                 ConstructionStatementNode constructFunctionProfiler(compoundStatementNode.GetSpan(), new IdentifierNode(compoundStatementNode.GetSpan(), U"System.Runtime.FunctionProfiler"),
                     new IdentifierNode(compoundStatementNode.GetSpan(), U"@functionProfiler"));
-                constructFunctionProfiler.AddArgument(new UIntLiteralNode(compoundStatementNode.GetSpan(), functionId));
+                constructFunctionProfiler.AddArgument(new UuidLiteralNode(compoundStatementNode.GetSpan(), functionId)); 
                 symbolTable.SetCurrentFunctionSymbol(currentFunction->GetFunctionSymbol());
                 symbolTable.BeginContainer(containerScope->Container());
                 SymbolCreatorVisitor symbolCreatorVisitor(symbolTable);
@@ -565,8 +566,8 @@ void StatementBinder::Visit(CompoundStatementNode& compoundStatementNode)
         {
             if (currentClass->GetClassTypeSymbol()->StaticConstructor())
             {
-                boundCompoundStatement->AddStatement(std::unique_ptr<BoundStatement>(new BoundExpressionStatement(std::unique_ptr<BoundExpression>(
-                    new BoundFunctionCall(boundCompoundStatement->GetSpan(), currentClass->GetClassTypeSymbol()->StaticConstructor())))));
+                boundCompoundStatement->AddStatement(std::unique_ptr<BoundStatement>(new BoundExpressionStatement(module, std::unique_ptr<BoundExpression>(
+                    new BoundFunctionCall(module, boundCompoundStatement->GetSpan(), currentClass->GetClassTypeSymbol()->StaticConstructor())))));
             }
         }
     }
@@ -602,7 +603,7 @@ void StatementBinder::Visit(ReturnStatementNode& returnStatementNode)
             classReturnLookups.push_back(FunctionScopeLookup(ScopeLookup::this_and_base_and_parent, currentFunction->GetFunctionSymbol()->ReturnType()->ClassInterfaceEnumDelegateOrNsScope()));
             classReturnLookups.push_back(FunctionScopeLookup(ScopeLookup::fileScopes, nullptr));
             std::vector<std::unique_ptr<BoundExpression>> classReturnArgs;
-            classReturnArgs.push_back(std::unique_ptr<BoundExpression>(new BoundParameter(returnStatementNode.GetSpan(), currentFunction->GetFunctionSymbol()->ReturnParam())));
+            classReturnArgs.push_back(std::unique_ptr<BoundExpression>(new BoundParameter(module, returnStatementNode.GetSpan(), currentFunction->GetFunctionSymbol()->ReturnParam())));
             TypeSymbol* returnType = currentFunction->GetFunctionSymbol()->ReturnType();
             bool returnClassDelegateType = returnType->GetSymbolType() == SymbolType::classDelegateTypeSymbol;
             std::unique_ptr<BoundExpression> expression = BindExpression(returnStatementNode.Expression(), boundCompileUnit, currentFunction, containerScope, this, false, returnClassDelegateType, 
@@ -622,7 +623,7 @@ void StatementBinder::Visit(ReturnStatementNode& returnStatementNode)
                 {
                     TypeSymbol* exprType = expression->GetType();
                     ArgumentMatch argumentMatch;
-                    expression.reset(new BoundConversion(std::move(expression), boundCompileUnit.GetConversion(exprType, returnType, containerScope, currentFunction, returnStatementNode.GetSpan(), argumentMatch)));
+                    expression.reset(new BoundConversion(module, std::move(expression), boundCompileUnit.GetConversion(exprType, returnType, containerScope, currentFunction, returnStatementNode.GetSpan(), argumentMatch)));
                 }
                 rvalueArguments.push_back(std::move(expression));
                 std::unique_ptr<BoundExpression> rvalueExpr = ResolveOverload(U"System.Rvalue", containerScope, rvalueLookups, rvalueArguments, boundCompileUnit, currentFunction,
@@ -632,10 +633,10 @@ void StatementBinder::Visit(ReturnStatementNode& returnStatementNode)
             classReturnArgs.push_back(std::move(expression));
             std::unique_ptr<BoundFunctionCall> constructorCall = ResolveOverload(U"@constructor", containerScope, classReturnLookups, classReturnArgs, boundCompileUnit, currentFunction,
                 returnStatementNode.GetSpan());
-            std::unique_ptr<BoundStatement> constructStatement(new BoundExpressionStatement(std::move(constructorCall)));
+            std::unique_ptr<BoundStatement> constructStatement(new BoundExpressionStatement(module, std::move(constructorCall)));
             AddStatement(constructStatement.release());
             std::unique_ptr<BoundFunctionCall> returnFunctionCall;
-            std::unique_ptr<BoundStatement> returnStatement(new BoundReturnStatement(std::move(returnFunctionCall), returnStatementNode.GetSpan()));
+            std::unique_ptr<BoundStatement> returnStatement(new BoundReturnStatement(module, std::move(returnFunctionCall), returnStatementNode.GetSpan()));
             if (exceptionCapture)
             {
                 AddReleaseExceptionStatement(returnStatementNode.GetSpan());
@@ -656,7 +657,7 @@ void StatementBinder::Visit(ReturnStatementNode& returnStatementNode)
             if (returnType && returnType->GetSymbolType() != SymbolType::voidTypeSymbol)
             {
                 std::vector<std::unique_ptr<BoundExpression>> returnTypeArgs;
-                BoundTypeExpression* boundTypeExpression = new BoundTypeExpression(returnStatementNode.GetSpan(), returnType);
+                BoundTypeExpression* boundTypeExpression = new BoundTypeExpression(module, returnStatementNode.GetSpan(), returnType);
                 returnTypeArgs.push_back(std::unique_ptr<BoundTypeExpression>(boundTypeExpression));
                 std::vector<FunctionScopeLookup> functionScopeLookups;
                 functionScopeLookups.push_back(FunctionScopeLookup(ScopeLookup::this_and_base_and_parent, containerScope));
@@ -684,13 +685,13 @@ void StatementBinder::Visit(ReturnStatementNode& returnStatementNode)
                         if (argumentMatch.preReferenceConversionFlags == OperationFlags::addr)
                         {
                             TypeSymbol* type = returnValueArguments[0]->GetType()->AddLvalueReference(returnStatementNode.GetSpan());
-                            BoundAddressOfExpression* addressOfExpression = new BoundAddressOfExpression(std::move(returnValueArguments[0]), type);
+                            BoundAddressOfExpression* addressOfExpression = new BoundAddressOfExpression(module, std::move(returnValueArguments[0]), type);
                             returnValueArguments[0].reset(addressOfExpression);
                         }
                         else if (argumentMatch.preReferenceConversionFlags == OperationFlags::deref)
                         {
                             TypeSymbol* type = returnValueArguments[0]->GetType()->RemoveReference(returnStatementNode.GetSpan());
-                            BoundDereferenceExpression* dereferenceExpression = new BoundDereferenceExpression(std::move(returnValueArguments[0]), type);
+                            BoundDereferenceExpression* dereferenceExpression = new BoundDereferenceExpression(module, std::move(returnValueArguments[0]), type);
                             returnValueArguments[0].reset(dereferenceExpression);
                         }
                     }
@@ -699,18 +700,18 @@ void StatementBinder::Visit(ReturnStatementNode& returnStatementNode)
                     {
                         if (conversionFun->GetSymbolType() == SymbolType::constructorSymbol)
                         {
-                            BoundFunctionCall* constructorCall = new BoundFunctionCall(returnStatementNode.GetSpan(), conversionFun);
+                            BoundFunctionCall* constructorCall = new BoundFunctionCall(module, returnStatementNode.GetSpan(), conversionFun);
                             LocalVariableSymbol* temporary = currentFunction->GetFunctionSymbol()->CreateTemporary(conversionFun->ConversionTargetType(), returnStatementNode.GetSpan());
-                            constructorCall->AddArgument(std::unique_ptr<BoundExpression>(new BoundAddressOfExpression(std::unique_ptr<BoundExpression>(new BoundLocalVariable(returnStatementNode.GetSpan(), temporary)),
+                            constructorCall->AddArgument(std::unique_ptr<BoundExpression>(new BoundAddressOfExpression(module, std::unique_ptr<BoundExpression>(new BoundLocalVariable(module, returnStatementNode.GetSpan(), temporary)),
                                 conversionFun->ConversionTargetType()->AddPointer(returnStatementNode.GetSpan()))));
                             constructorCall->AddArgument(std::move(returnValueArguments[0]));
-                            BoundConstructAndReturnTemporaryExpression* conversion = new BoundConstructAndReturnTemporaryExpression(std::unique_ptr<BoundExpression>(constructorCall),
-                                std::unique_ptr<BoundExpression>(new BoundLocalVariable(returnStatementNode.GetSpan(), temporary)));
+                            BoundConstructAndReturnTemporaryExpression* conversion = new BoundConstructAndReturnTemporaryExpression(module, std::unique_ptr<BoundExpression>(constructorCall),
+                                std::unique_ptr<BoundExpression>(new BoundLocalVariable(module, returnStatementNode.GetSpan(), temporary)));
                             returnValueArguments[0].reset(conversion);
                         }
                         else
                         {
-                            BoundConversion* boundConversion = new BoundConversion(std::unique_ptr<BoundExpression>(returnValueArguments[0].release()), conversionFun);
+                            BoundConversion* boundConversion = new BoundConversion(module, std::unique_ptr<BoundExpression>(returnValueArguments[0].release()), conversionFun);
                             returnValueArguments[0].reset(boundConversion);
                         }
                     }
@@ -719,13 +720,13 @@ void StatementBinder::Visit(ReturnStatementNode& returnStatementNode)
                         if (argumentMatch.postReferenceConversionFlags == OperationFlags::addr)
                         {
                             TypeSymbol* type = returnValueArguments[0]->GetType()->AddLvalueReference(returnStatementNode.GetSpan());
-                            BoundAddressOfExpression* addressOfExpression = new BoundAddressOfExpression(std::move(returnValueArguments[0]), type);
+                            BoundAddressOfExpression* addressOfExpression = new BoundAddressOfExpression(module, std::move(returnValueArguments[0]), type);
                             returnValueArguments[0].reset(addressOfExpression);
                         }
                         else if (argumentMatch.postReferenceConversionFlags == OperationFlags::deref)
                         {
                             TypeSymbol* type = returnValueArguments[0]->GetType()->RemoveReference(returnStatementNode.GetSpan());
-                            BoundDereferenceExpression* dereferenceExpression = new BoundDereferenceExpression(std::move(returnValueArguments[0]), type);
+                            BoundDereferenceExpression* dereferenceExpression = new BoundDereferenceExpression(module, std::move(returnValueArguments[0]), type);
                             returnValueArguments[0].reset(dereferenceExpression);
                         }
                     }
@@ -733,7 +734,7 @@ void StatementBinder::Visit(ReturnStatementNode& returnStatementNode)
                 }
                 else
                 {
-                    throw Exception("no implicit conversion from '" + ToUtf8(returnValueArguments[0]->GetType()->FullName()) + "' to '" + ToUtf8(returnType->FullName()) + "' exists",
+                    throw Exception(module, "no implicit conversion from '" + ToUtf8(returnValueArguments[0]->GetType()->FullName()) + "' to '" + ToUtf8(returnType->FullName()) + "' exists",
                         returnStatementNode.GetSpan(), currentFunction->GetFunctionSymbol()->GetSpan());
                 }
                 CheckAccess(currentFunction->GetFunctionSymbol(), returnFunctionCall->GetFunctionSymbol());
@@ -741,17 +742,17 @@ void StatementBinder::Visit(ReturnStatementNode& returnStatementNode)
                 {
                     AddReleaseExceptionStatement(returnStatementNode.GetSpan());
                 }
-                AddStatement(new BoundReturnStatement(std::move(returnFunctionCall), returnStatementNode.GetSpan()));
+                AddStatement(new BoundReturnStatement(module, std::move(returnFunctionCall), returnStatementNode.GetSpan()));
             }
             else
             {
                 if (returnType)
                 {
-                    throw Exception("void function cannot return a value", returnStatementNode.Expression()->GetSpan(), currentFunction->GetFunctionSymbol()->GetSpan());
+                    throw Exception(module, "void function cannot return a value", returnStatementNode.Expression()->GetSpan(), currentFunction->GetFunctionSymbol()->GetSpan());
                 }
                 else
                 {
-                    throw Exception("constructor or assignment function cannot return a value", returnStatementNode.Expression()->GetSpan(), currentFunction->GetFunctionSymbol()->GetSpan());
+                    throw Exception(module, "constructor or assignment function cannot return a value", returnStatementNode.Expression()->GetSpan(), currentFunction->GetFunctionSymbol()->GetSpan());
                 }
             }
         }
@@ -762,11 +763,11 @@ void StatementBinder::Visit(ReturnStatementNode& returnStatementNode)
         if (!returnType || returnType->GetSymbolType() == SymbolType::voidTypeSymbol)
         {
             std::unique_ptr<BoundFunctionCall> returnFunctionCall;
-            AddStatement(new BoundReturnStatement(std::move(returnFunctionCall), returnStatementNode.GetSpan()));
+            AddStatement(new BoundReturnStatement(module, std::move(returnFunctionCall), returnStatementNode.GetSpan()));
         }
         else
         {
-            throw Exception("nonvoid function must return a value", returnStatementNode.GetSpan(), currentFunction->GetFunctionSymbol()->GetSpan());
+            throw Exception(module, "nonvoid function must return a value", returnStatementNode.GetSpan(), currentFunction->GetFunctionSymbol()->GetSpan());
         }
     }
     if (returnStatementNode.Label())
@@ -785,7 +786,7 @@ void StatementBinder::Visit(IfStatementNode& ifStatementNode)
     }
     if (!TypesEqual(symbolTable.GetTypeByName(U"bool"), condition->GetType()->PlainType(ifStatementNode.GetSpan())))
     {
-        throw Exception("condition of an if statement must be a Boolean expression", ifStatementNode.Condition()->GetSpan());
+        throw Exception(module, "condition of an if statement must be a Boolean expression", ifStatementNode.Condition()->GetSpan());
     }
     std::unique_ptr<BoundStatement> s;
     if (statement)
@@ -808,7 +809,7 @@ void StatementBinder::Visit(IfStatementNode& ifStatementNode)
     {
         AddReleaseExceptionStatement(ifStatementNode.GetSpan());
     }
-    AddStatement(new BoundIfStatement(ifStatementNode.GetSpan(), std::move(condition), std::unique_ptr<BoundStatement>(thenS), std::unique_ptr<BoundStatement>(elseS)));
+    AddStatement(new BoundIfStatement(module, ifStatementNode.GetSpan(), std::move(condition), std::unique_ptr<BoundStatement>(thenS), std::unique_ptr<BoundStatement>(elseS)));
     if (ifStatementNode.Label())
     {
         statement->SetLabel(ifStatementNode.Label()->Label());
@@ -825,7 +826,7 @@ void StatementBinder::Visit(WhileStatementNode& whileStatementNode)
     }
     if (!TypesEqual(symbolTable.GetTypeByName(U"bool"), condition->GetType()->PlainType(whileStatementNode.GetSpan())))
     {
-        throw Exception("condition of a while statement must be a Boolean expression", whileStatementNode.Condition()->GetSpan());
+        throw Exception(module, "condition of a while statement must be a Boolean expression", whileStatementNode.Condition()->GetSpan());
     }
     std::unique_ptr<BoundStatement> s;
     if (statement)
@@ -842,7 +843,7 @@ void StatementBinder::Visit(WhileStatementNode& whileStatementNode)
     {
         AddReleaseExceptionStatement(whileStatementNode.GetSpan());
     }
-    AddStatement(new BoundWhileStatement(whileStatementNode.GetSpan(), std::move(condition), std::unique_ptr<BoundStatement>(stmt)));
+    AddStatement(new BoundWhileStatement(module, whileStatementNode.GetSpan(), std::move(condition), std::unique_ptr<BoundStatement>(stmt)));
     if (whileStatementNode.Label())
     {
         statement->SetLabel(whileStatementNode.Label()->Label());
@@ -859,7 +860,7 @@ void StatementBinder::Visit(DoStatementNode& doStatementNode)
     }
     if (!TypesEqual(symbolTable.GetTypeByName(U"bool"), condition->GetType()->PlainType(doStatementNode.GetSpan())))
     {
-        throw Exception("condition of a do statement must be a Boolean expression", doStatementNode.Condition()->GetSpan());
+        throw Exception(module, "condition of a do statement must be a Boolean expression", doStatementNode.Condition()->GetSpan());
     }
     std::unique_ptr<BoundStatement> s;
     if (statement)
@@ -876,7 +877,7 @@ void StatementBinder::Visit(DoStatementNode& doStatementNode)
     {
         AddReleaseExceptionStatement(doStatementNode.GetSpan());
     }
-    AddStatement(new BoundDoStatement(doStatementNode.GetSpan(), std::unique_ptr<BoundStatement>(stmt), std::move(condition)));
+    AddStatement(new BoundDoStatement(module, doStatementNode.GetSpan(), std::unique_ptr<BoundStatement>(stmt), std::move(condition)));
     if (doStatementNode.Label())
     {
         statement->SetLabel(doStatementNode.Label()->Label());
@@ -907,7 +908,7 @@ void StatementBinder::Visit(ForStatementNode& forStatementNode)
     }
     if (!TypesEqual(symbolTable.GetTypeByName(U"bool"), condition->GetType()->PlainType(forStatementNode.GetSpan())))
     {
-        throw Exception("condition of a for statement must be a Boolean expression", forStatementNode.Condition()->GetSpan());
+        throw Exception(module, "condition of a for statement must be a Boolean expression", forStatementNode.Condition()->GetSpan());
     }
     std::unique_ptr<BoundStatement> s;
     if (statement)
@@ -928,7 +929,7 @@ void StatementBinder::Visit(ForStatementNode& forStatementNode)
     {
         AddReleaseExceptionStatement(forStatementNode.GetSpan());
     }
-    AddStatement(new BoundForStatement(forStatementNode.GetSpan(), std::unique_ptr<BoundStatement>(initS), std::move(condition), std::unique_ptr<BoundStatement>(loopS),
+    AddStatement(new BoundForStatement(module, forStatementNode.GetSpan(), std::unique_ptr<BoundStatement>(initS), std::move(condition), std::unique_ptr<BoundStatement>(loopS),
         std::unique_ptr<BoundStatement>(actionS)));
     if (forStatementNode.Label())
     {
@@ -959,9 +960,9 @@ void StatementBinder::Visit(BreakStatementNode& breakStatementNode)
     }
     if (!parentStatement)
     {
-        throw Exception("break statement must be enclosed in a while, do, for or switch statement", breakStatementNode.GetSpan());
+        throw Exception(module, "break statement must be enclosed in a while, do, for or switch statement", breakStatementNode.GetSpan());
     }
-    AddStatement(new BoundBreakStatement(breakStatementNode.GetSpan()));
+    AddStatement(new BoundBreakStatement(module, breakStatementNode.GetSpan()));
     if (breakStatementNode.Label())
     {
         statement->SetLabel(breakStatementNode.Label()->Label());
@@ -990,9 +991,9 @@ void StatementBinder::Visit(ContinueStatementNode& continueStatementNode)
     }
     if (!parentStatement)
     {
-        throw Exception("continue statement must be enclosed in a while, do or for statement", continueStatementNode.GetSpan());
+        throw Exception(module, "continue statement must be enclosed in a while, do or for statement", continueStatementNode.GetSpan());
     }
-    AddStatement(new BoundContinueStatement(continueStatementNode.GetSpan()));
+    AddStatement(new BoundContinueStatement(module, continueStatementNode.GetSpan()));
     if (continueStatementNode.Label())
     {
         statement->SetLabel(continueStatementNode.Label()->Label());
@@ -1003,7 +1004,7 @@ void StatementBinder::Visit(GotoStatementNode& gotoStatementNode)
 {
     currentFunction->SetHasGotos();
     boundCompileUnit.SetHasGotos();
-    AddStatement(new BoundGotoStatement(gotoStatementNode.GetSpan(), gotoStatementNode.Target()));
+    AddStatement(new BoundGotoStatement(module, gotoStatementNode.GetSpan(), gotoStatementNode.Target()));
     if (gotoStatementNode.Label())
     {
         statement->SetLabel(gotoStatementNode.Label()->Label());
@@ -1016,8 +1017,8 @@ void StatementBinder::Visit(ConstructionStatementNode& constructionStatementNode
     Assert(symbol->GetSymbolType() == SymbolType::localVariableSymbol, "local variable symbol expected");
     LocalVariableSymbol* localVariableSymbol = static_cast<LocalVariableSymbol*>(symbol);
     std::vector<std::unique_ptr<BoundExpression>> arguments;
-    BoundExpression* localVariable = new BoundLocalVariable(constructionStatementNode.GetSpan(), localVariableSymbol);
-    arguments.push_back(std::unique_ptr<BoundExpression>(new BoundAddressOfExpression(
+    BoundExpression* localVariable = new BoundLocalVariable(module, constructionStatementNode.GetSpan(), localVariableSymbol);
+    arguments.push_back(std::unique_ptr<BoundExpression>(new BoundAddressOfExpression(module,
         std::unique_ptr<BoundExpression>(localVariable), localVariable->GetType()->AddPointer(constructionStatementNode.GetSpan()))));
     bool constructDelegateOrClassDelegateType = 
         localVariableSymbol->GetType()->GetSymbolType() == SymbolType::delegateTypeSymbol|| 
@@ -1045,7 +1046,7 @@ void StatementBinder::Visit(ConstructionStatementNode& constructionStatementNode
     {
         AddReleaseExceptionStatement(constructionStatementNode.GetSpan());
     }
-    AddStatement(new BoundConstructionStatement(std::move(constructorCall)));
+    AddStatement(new BoundConstructionStatement(module, std::move(constructorCall)));
     if (constructionStatementNode.Label())
     {
         statement->SetLabel(constructionStatementNode.Label()->Label());
@@ -1069,7 +1070,7 @@ void StatementBinder::Visit(DeleteStatementNode& deleteStatementNode)
         arguments.push_back(std::move(std::unique_ptr<BoundExpression>(ptr->Clone())));
         std::unique_ptr<BoundFunctionCall> disposeCall = ResolveOverload(U"RtDispose", containerScope, lookups, arguments, boundCompileUnit, currentFunction, deleteStatementNode.GetSpan());
         CheckAccess(currentFunction->GetFunctionSymbol(), disposeCall->GetFunctionSymbol());
-        AddStatement(new BoundExpressionStatement(std::move(disposeCall)));
+        AddStatement(new BoundExpressionStatement(module, std::move(disposeCall)));
     }
     std::unique_ptr<BoundExpression> memFreePtr;
     TypeSymbol* baseType = ptr->GetType()->BaseType();
@@ -1089,7 +1090,7 @@ void StatementBinder::Visit(DeleteStatementNode& deleteStatementNode)
         {
             destructorCall->SetFlag(BoundExpressionFlags::virtualCall);
         }
-        AddStatement(new BoundExpressionStatement(std::move(destructorCall)));
+        AddStatement(new BoundExpressionStatement(module, std::move(destructorCall)));
         memFreePtr = BindExpression(deleteStatementNode.Expression(), boundCompileUnit, currentFunction, containerScope, this);
         if (insideCatch && memFreePtr->ContainsExceptionCapture())
         {
@@ -1111,7 +1112,7 @@ void StatementBinder::Visit(DeleteStatementNode& deleteStatementNode)
     {
         AddReleaseExceptionStatement(deleteStatementNode.GetSpan());
     }
-    AddStatement(new BoundExpressionStatement(std::move(memFreeCall)));
+    AddStatement(new BoundExpressionStatement(module, std::move(memFreeCall)));
     if (deleteStatementNode.Label())
     {
         statement->SetLabel(deleteStatementNode.Label()->Label());
@@ -1128,7 +1129,7 @@ void StatementBinder::Visit(DestroyStatementNode& destroyStatementNode)
     }
     if (!ptr->GetType()->IsPointerType())
     {
-        throw Exception("destroy statement needs pointer type operand", destroyStatementNode.GetSpan());
+        throw Exception(module, "destroy statement needs pointer type operand", destroyStatementNode.GetSpan());
     }
     TypeSymbol* pointeeType = ptr->GetType()->RemovePointer(destroyStatementNode.GetSpan());
     if (pointeeType->HasNontrivialDestructor())
@@ -1151,11 +1152,11 @@ void StatementBinder::Visit(DestroyStatementNode& destroyStatementNode)
         {
             AddReleaseExceptionStatement(destroyStatementNode.GetSpan());
         }
-        AddStatement(new BoundExpressionStatement(std::move(destructorCall)));
+        AddStatement(new BoundExpressionStatement(module, std::move(destructorCall)));
     }
     else
     {
-        AddStatement(new BoundEmptyStatement(destroyStatementNode.GetSpan()));
+        AddStatement(new BoundEmptyStatement(module, destroyStatementNode.GetSpan()));
     }
 }
 
@@ -1171,11 +1172,11 @@ void StatementBinder::Visit(AssignmentStatementNode& assignmentStatementNode)
     if (targetPlainType->IsClassTypeSymbol() && target->GetType()->IsReferenceType())
     {
         TypeSymbol* type = target->GetType()->RemoveReference(assignmentStatementNode.GetSpan())->AddPointer(assignmentStatementNode.GetSpan());
-        target.reset(new BoundReferenceToPointerExpression(std::unique_ptr<BoundExpression>(target.release()), type));
+        target.reset(new BoundReferenceToPointerExpression(module, std::unique_ptr<BoundExpression>(target.release()), type));
     }
     else
     {
-        target.reset(new BoundAddressOfExpression(std::move(target), target->GetType()->AddPointer(assignmentStatementNode.GetSpan())));
+        target.reset(new BoundAddressOfExpression(module, std::move(target), target->GetType()->AddPointer(assignmentStatementNode.GetSpan())));
     }
     TypeSymbol* targetType = target->GetType()->BaseType();
     bool assignDelegateOrClassDelegateType = targetType->GetSymbolType() == SymbolType::delegateTypeSymbol || targetType->GetSymbolType() == SymbolType::classDelegateTypeSymbol;
@@ -1199,7 +1200,7 @@ void StatementBinder::Visit(AssignmentStatementNode& assignmentStatementNode)
     {
         AddReleaseExceptionStatement(assignmentStatementNode.GetSpan());
     }
-    AddStatement(new BoundAssignmentStatement(std::move(assignmentCall)));
+    AddStatement(new BoundAssignmentStatement(module, std::move(assignmentCall)));
     if (assignmentStatementNode.Label())
     {
         statement->SetLabel(assignmentStatementNode.Label()->Label());
@@ -1218,7 +1219,7 @@ void StatementBinder::Visit(ExpressionStatementNode& expressionStatementNode)
     {
         AddReleaseExceptionStatement(expressionStatementNode.GetSpan());
     }
-    AddStatement(new BoundExpressionStatement(std::move(expression)));
+    AddStatement(new BoundExpressionStatement(module, std::move(expression)));
     if (expressionStatementNode.Label())
     {
         statement->SetLabel(expressionStatementNode.Label()->Label());
@@ -1227,7 +1228,7 @@ void StatementBinder::Visit(ExpressionStatementNode& expressionStatementNode)
 
 void StatementBinder::Visit(EmptyStatementNode& emptyStatementNode)
 {
-    AddStatement(new BoundEmptyStatement(emptyStatementNode.GetSpan()));
+    AddStatement(new BoundEmptyStatement(module, emptyStatementNode.GetSpan()));
     if (emptyStatementNode.Label())
     {
         statement->SetLabel(emptyStatementNode.Label()->Label());
@@ -1330,7 +1331,7 @@ void StatementBinder::Visit(SwitchStatementNode& switchStatementNode)
         std::vector<BoundGotoDefaultStatement*>* prevGotoDefaultStatements = currentGotoDefaultStatements;
         std::vector<BoundGotoDefaultStatement*> gotoDefaultStatements;
         currentGotoDefaultStatements = &gotoDefaultStatements;
-        std::unique_ptr<BoundSwitchStatement> boundSwitchStatement(new BoundSwitchStatement(switchStatementNode.GetSpan(), std::move(condition)));
+        std::unique_ptr<BoundSwitchStatement> boundSwitchStatement(new BoundSwitchStatement(module, switchStatementNode.GetSpan(), std::move(condition)));
         int n = switchStatementNode.Cases().Count();
         for (int i = 0; i < n; ++i)
         {
@@ -1352,12 +1353,12 @@ void StatementBinder::Visit(SwitchStatementNode& switchStatementNode)
             auto it = caseValueMap.find(integralCaseValue);
             if (it == caseValueMap.cend())
             {
-                throw Exception("case not found", gotoCaseStatement->GetSpan());
+                throw Exception(module, "case not found", gotoCaseStatement->GetSpan());
             }
         }
         if (!gotoDefaultStatements.empty() && !switchStatementNode.Default())
         {
-            throw Exception("switch does not have a default statement", gotoDefaultStatements.front()->GetSpan());
+            throw Exception(module, "switch does not have a default statement", gotoDefaultStatements.front()->GetSpan());
         }
         currentGotoCaseStatements = prevGotoCaseStatements;
         currentGotoDefaultStatements = prevGotoDefaultStatements;
@@ -1375,13 +1376,13 @@ void StatementBinder::Visit(SwitchStatementNode& switchStatementNode)
     }
     else
     {
-        throw Exception("switch statement condition must be of integer, character, enumerated or Boolean type", switchStatementNode.Condition()->GetSpan());
+        throw Exception(module, "switch statement condition must be of integer, character, enumerated or Boolean type", switchStatementNode.Condition()->GetSpan());
     }
 }
 
 void StatementBinder::Visit(CaseStatementNode& caseStatementNode)
 {
-    std::unique_ptr<BoundCaseStatement> boundCaseStatement(new BoundCaseStatement(caseStatementNode.GetSpan()));
+    std::unique_ptr<BoundCaseStatement> boundCaseStatement(new BoundCaseStatement(module, caseStatementNode.GetSpan()));
     bool terminated = false;
     int n = caseStatementNode.Statements().Count();
     for (int i = 0; i < n; ++i)
@@ -1396,7 +1397,7 @@ void StatementBinder::Visit(CaseStatementNode& caseStatementNode)
     }
     if (!terminated)
     {
-        throw Exception("case must end in break, continue, return, throw, goto, goto case or goto default statement", caseStatementNode.GetSpan());
+        throw Exception(module, "case must end in break, continue, return, throw, goto, goto case or goto default statement", caseStatementNode.GetSpan());
     }
     int ne = caseStatementNode.CaseExprs().Count();
     for (int i = 0; i < ne; ++i)
@@ -1408,7 +1409,7 @@ void StatementBinder::Visit(CaseStatementNode& caseStatementNode)
         auto it = currentCaseValueMap->find(integralCaseValue);
         if (it != currentCaseValueMap->cend())
         {
-            throw Exception("case value already used", caseExprNode->GetSpan());
+            throw Exception(module, "case value already used", caseExprNode->GetSpan());
         }
         (*currentCaseValueMap)[integralCaseValue] = &caseStatementNode;
         boundCaseStatement->AddCaseValue(std::move(caseValue));
@@ -1422,7 +1423,7 @@ void StatementBinder::Visit(CaseStatementNode& caseStatementNode)
 
 void StatementBinder::Visit(DefaultStatementNode& defaultStatementNode)
 {
-    std::unique_ptr<BoundDefaultStatement> boundDefaultStatement(new BoundDefaultStatement(defaultStatementNode.GetSpan()));
+    std::unique_ptr<BoundDefaultStatement> boundDefaultStatement(new BoundDefaultStatement(module, defaultStatementNode.GetSpan()));
     bool terminated = false;
     int n = defaultStatementNode.Statements().Count();
     for (int i = 0; i < n; ++i)
@@ -1437,7 +1438,7 @@ void StatementBinder::Visit(DefaultStatementNode& defaultStatementNode)
     }
     if (!terminated)
     {
-        throw Exception("default must end in break, continue, return, throw, goto, or goto case statement", defaultStatementNode.GetSpan());
+        throw Exception(module, "default must end in break, continue, return, throw, goto, or goto case statement", defaultStatementNode.GetSpan());
     }
     AddStatement(boundDefaultStatement.release());
     if (defaultStatementNode.Label())
@@ -1455,12 +1456,12 @@ void StatementBinder::Visit(GotoCaseStatementNode& gotoCaseStatementNode)
     }
     if (!parent)
     {
-        throw Exception("goto case statement must be enclosed in a case or default statement", gotoCaseStatementNode.GetSpan());
+        throw Exception(module, "goto case statement must be enclosed in a case or default statement", gotoCaseStatementNode.GetSpan());
     }
     Node* caseExprNode = gotoCaseStatementNode.CaseExpr();
     std::unique_ptr<Value> caseValue = Evaluate(caseExprNode, switchConditionType, containerScope, boundCompileUnit, false, currentFunction, gotoCaseStatementNode.GetSpan());
     Value* caseValuePtr = caseValue.get();
-    BoundGotoCaseStatement* boundGotoCaseStatement = new BoundGotoCaseStatement(gotoCaseStatementNode.GetSpan(), std::move(caseValue));
+    BoundGotoCaseStatement* boundGotoCaseStatement = new BoundGotoCaseStatement(module, gotoCaseStatementNode.GetSpan(), std::move(caseValue));
     Assert(currentGotoCaseStatements, "current goto case statement vector not set");
     currentGotoCaseStatements->push_back(std::make_pair(boundGotoCaseStatement, IntegralValue(caseValuePtr)));
     AddStatement(boundGotoCaseStatement);
@@ -1479,9 +1480,9 @@ void StatementBinder::Visit(GotoDefaultStatementNode& gotoDefaultStatementNode)
     }
     if (!parent)
     {
-        throw Exception("goto default statement must be enclosed in a case statement", gotoDefaultStatementNode.GetSpan());
+        throw Exception(module, "goto default statement must be enclosed in a case statement", gotoDefaultStatementNode.GetSpan());
     }
-    BoundGotoDefaultStatement* boundGotoDefaultStatement = new BoundGotoDefaultStatement(gotoDefaultStatementNode.GetSpan());
+    BoundGotoDefaultStatement* boundGotoDefaultStatement = new BoundGotoDefaultStatement(module, gotoDefaultStatementNode.GetSpan());
     Assert(currentGotoDefaultStatements, "current goto default statement vector not set");
     currentGotoDefaultStatements->push_back(boundGotoDefaultStatement);
     AddStatement(boundGotoDefaultStatement);
@@ -1497,7 +1498,7 @@ void StatementBinder::Visit(ThrowStatementNode& throwStatementNode)
     compilingThrow = true;
     if (currentFunction->GetFunctionSymbol()->DontThrow() && !currentFunction->GetFunctionSymbol()->HasTry())
     {
-        throw Exception("a nothrow function cannot contain a throw statement unless it handles exceptions", throwStatementNode.GetSpan(), currentFunction->GetFunctionSymbol()->GetSpan());
+        throw Exception(module, "a nothrow function cannot contain a throw statement unless it handles exceptions", throwStatementNode.GetSpan(), currentFunction->GetFunctionSymbol()->GetSpan());
     }
     Span span = throwStatementNode.GetSpan();
     Node* exceptionExprNode = throwStatementNode.Expression();
@@ -1518,18 +1519,18 @@ void StatementBinder::Visit(ThrowStatementNode& throwStatementNode)
                 newNode->AddArgument(throwStatementNode.Expression()->Clone(cloneContext));
                 InvokeNode invokeNode(span, new IdentifierNode(span, U"RtThrowException"));
                 invokeNode.AddArgument(newNode);
-                invokeNode.AddArgument(new UIntLiteralNode(span, exceptionClassType->TypeId()));
+                invokeNode.AddArgument(new UuidLiteralNode(span, exceptionClassType->TypeId())); 
                 std::unique_ptr<BoundExpression> throwCallExpr = BindExpression(&invokeNode, boundCompileUnit, currentFunction, containerScope, this);
-                AddStatement(new BoundThrowStatement(span, std::move(throwCallExpr)));
+                AddStatement(new BoundThrowStatement(module, span, std::move(throwCallExpr)));
             }
             else
             {
-                throw Exception("exception class must be derived from System.Exception class", throwStatementNode.GetSpan());
+                throw Exception(module, "exception class must be derived from System.Exception class", throwStatementNode.GetSpan());
             }
         }
         else
         {
-            throw Exception("exception not of class type", throwStatementNode.GetSpan());
+            throw Exception(module, "exception not of class type", throwStatementNode.GetSpan());
         }
     }
     else
@@ -1538,11 +1539,11 @@ void StatementBinder::Visit(ThrowStatementNode& throwStatementNode)
         {
             InvokeNode invokeNode(span, new DotNode(span, new IdentifierNode(span, U"@exPtr"), new IdentifierNode(span, U"Release")));
             std::unique_ptr<BoundExpression> releaseCall = BindExpression(&invokeNode, boundCompileUnit, currentFunction, containerScope, this);
-            AddStatement(new BoundRethrowStatement(span, std::move(releaseCall)));
+            AddStatement(new BoundRethrowStatement(module, span, std::move(releaseCall)));
         }
         else
         {
-            throw Exception("rethrow must occur inside a catch clause", throwStatementNode.GetSpan());
+            throw Exception(module, "rethrow must occur inside a catch clause", throwStatementNode.GetSpan());
         }
     }
     if (throwStatementNode.Label())
@@ -1554,7 +1555,7 @@ void StatementBinder::Visit(ThrowStatementNode& throwStatementNode)
 
 void StatementBinder::Visit(TryStatementNode& tryStatementNode)
 {
-    BoundTryStatement* boundTryStatement = new BoundTryStatement(tryStatementNode.GetSpan());
+    BoundTryStatement* boundTryStatement = new BoundTryStatement(module, tryStatementNode.GetSpan());
     tryStatementNode.TryBlock()->Accept(*this);
     boundTryStatement->SetTryBlock(std::move(statement));
     int n = tryStatementNode.Catches().Count();
@@ -1579,9 +1580,10 @@ void StatementBinder::Visit(CatchNode& catchNode)
     bool prevInsideCatch = insideCatch;
     insideCatch = true;
     Span span = catchNode.GetSpan();
-    std::unique_ptr<BoundCatchStatement> boundCatchStatement(new BoundCatchStatement(catchNode.GetSpan()));
+    std::unique_ptr<BoundCatchStatement> boundCatchStatement(new BoundCatchStatement(module, catchNode.GetSpan()));
     TypeSymbol* catchedType = ResolveType(catchNode.TypeExpr(), boundCompileUnit, containerScope);
     boundCatchStatement->SetCatchedType(catchedType);
+    boundCatchStatement->SetCatchedTypeUuidId(boundCompileUnit.Install(catchedType->BaseType()->TypeId()));
     LocalVariableSymbol* catchVar = nullptr;
     if (catchNode.Id())
     {
@@ -1629,6 +1631,10 @@ void StatementBinder::Visit(CatchNode& catchNode)
 
 void StatementBinder::Visit(AssertStatementNode& assertStatementNode)
 {
+    if (!module)
+    {
+        throw std::runtime_error("module not set");
+    }
     bool unitTesting = GetGlobalFlag(GlobalFlags::unitTest) && InUnitTest();
     bool unitTestAssertion = false;
     if (unitTesting)
@@ -1672,7 +1678,7 @@ void StatementBinder::Visit(AssertStatementNode& assertStatementNode)
     {
         if (GetGlobalFlag(GlobalFlags::release))
         {
-            AddStatement(new BoundEmptyStatement(assertStatementNode.GetSpan()));
+            AddStatement(new BoundEmptyStatement(module, assertStatementNode.GetSpan()));
         }
         else
         {
@@ -1680,18 +1686,18 @@ void StatementBinder::Visit(AssertStatementNode& assertStatementNode)
             lookups.push_back(FunctionScopeLookup(ScopeLookup::this_and_base_and_parent, symbolTable.GlobalNs().GetContainerScope()));
             std::vector<std::unique_ptr<BoundExpression>> arguments;
             TypeSymbol* constCharPtrType = symbolTable.GetTypeByName(U"char")->AddConst(assertStatementNode.GetSpan())->AddPointer(assertStatementNode.GetSpan());
-            arguments.push_back(std::unique_ptr<BoundExpression>(new BoundLiteral(std::unique_ptr<Value>(new StringValue(assertStatementNode.GetSpan(),
+            arguments.push_back(std::unique_ptr<BoundExpression>(new BoundLiteral(module, std::unique_ptr<Value>(new StringValue(assertStatementNode.GetSpan(),
                 boundCompileUnit.Install(assertStatementNode.AssertExpr()->ToString()))), constCharPtrType)));
-            arguments.push_back(std::unique_ptr<BoundExpression>(new BoundLiteral(std::unique_ptr<Value>(new StringValue(assertStatementNode.GetSpan(),
+            arguments.push_back(std::unique_ptr<BoundExpression>(new BoundLiteral(module, std::unique_ptr<Value>(new StringValue(assertStatementNode.GetSpan(),
                 boundCompileUnit.Install(ToUtf8(currentFunction->GetFunctionSymbol()->FullName())))), constCharPtrType)));
-            arguments.push_back(std::unique_ptr<BoundExpression>(new BoundLiteral(std::unique_ptr<Value>(new StringValue(assertStatementNode.GetSpan(),
-                boundCompileUnit.Install(FileRegistry::Instance().GetFilePath(assertStatementNode.GetSpan().FileIndex())))), constCharPtrType)));
-            arguments.push_back(std::unique_ptr<BoundExpression>(new BoundLiteral(std::unique_ptr<Value>(new IntValue(assertStatementNode.GetSpan(),
+            arguments.push_back(std::unique_ptr<BoundExpression>(new BoundLiteral(module, std::unique_ptr<Value>(new StringValue(assertStatementNode.GetSpan(),
+                boundCompileUnit.Install(module->GetFilePath(assertStatementNode.GetSpan().FileIndex())))), constCharPtrType)));
+            arguments.push_back(std::unique_ptr<BoundExpression>(new BoundLiteral(module, std::unique_ptr<Value>(new IntValue(assertStatementNode.GetSpan(),
                 assertStatementNode.GetSpan().LineNumber())), symbolTable.GetTypeByName(U"int"))));
             std::unique_ptr<BoundExpression> assertExpression = BindExpression(assertStatementNode.AssertExpr(), boundCompileUnit, currentFunction, containerScope, this);
-            std::unique_ptr<BoundStatement> ifStatement(new BoundIfStatement(assertStatementNode.GetSpan(), std::move(assertExpression),
-                std::unique_ptr<BoundStatement>(new BoundEmptyStatement(assertStatementNode.GetSpan())),
-                std::unique_ptr<BoundStatement>(new BoundExpressionStatement(ResolveOverload(U"RtFailAssertion", containerScope, lookups, arguments, boundCompileUnit, currentFunction,
+            std::unique_ptr<BoundStatement> ifStatement(new BoundIfStatement(module, assertStatementNode.GetSpan(), std::move(assertExpression),
+                std::unique_ptr<BoundStatement>(new BoundEmptyStatement(module, assertStatementNode.GetSpan())),
+                std::unique_ptr<BoundStatement>(new BoundExpressionStatement(module, ResolveOverload(U"RtFailAssertion", containerScope, lookups, arguments, boundCompileUnit, currentFunction,
                     assertStatementNode.GetSpan())))));
             AddStatement(ifStatement.release());
         }
@@ -1735,7 +1741,7 @@ void StatementBinder::Visit(ConditionalCompilationNotNode& conditionalCompilatio
 
 void StatementBinder::Visit(ConditionalCompilationPrimaryNode& conditionalCompilationPrimaryNode)
 {
-    bool defined = IsSymbolDefined(conditionalCompilationPrimaryNode.Symbol());
+    bool defined = module->IsSymbolDefined(conditionalCompilationPrimaryNode.Symbol());
     conditionalCompilationStack.push(defined);
 }
 
@@ -1757,7 +1763,7 @@ void StatementBinder::Visit(ConditionalCompilationStatementNode& conditionalComp
         }
         else
         {
-            AddStatement(new BoundEmptyStatement(conditionalCompilationStatementNode.GetSpan()));
+            AddStatement(new BoundEmptyStatement(module, conditionalCompilationStatementNode.GetSpan()));
         }
     }
     else
@@ -1783,7 +1789,7 @@ void StatementBinder::Visit(ConditionalCompilationStatementNode& conditionalComp
                 }
                 else
                 {
-                    AddStatement(new BoundEmptyStatement(conditionalCompilationStatementNode.GetSpan()));
+                    AddStatement(new BoundEmptyStatement(module, conditionalCompilationStatementNode.GetSpan()));
                 }
                 executed = true;
                 break;
@@ -1805,12 +1811,12 @@ void StatementBinder::Visit(ConditionalCompilationStatementNode& conditionalComp
                 }
                 else
                 {
-                    AddStatement(new BoundEmptyStatement(conditionalCompilationStatementNode.GetSpan()));
+                    AddStatement(new BoundEmptyStatement(module, conditionalCompilationStatementNode.GetSpan()));
                 }
             }
             else
             {
-                AddStatement(new BoundEmptyStatement(conditionalCompilationStatementNode.GetSpan()));
+                AddStatement(new BoundEmptyStatement(module, conditionalCompilationStatementNode.GetSpan()));
             }
         }
     }
@@ -1864,12 +1870,12 @@ void StatementBinder::AddStatement(BoundStatement* boundStatement)
     {
         if (statement->Postfix())
         {
-            BoundSequenceStatement* sequenceStatement = new BoundSequenceStatement(boundStatement->GetSpan(), std::unique_ptr<BoundStatement>(boundStatement), std::move(statement));
+            BoundSequenceStatement* sequenceStatement = new BoundSequenceStatement(module, boundStatement->GetSpan(), std::unique_ptr<BoundStatement>(boundStatement), std::move(statement));
             boundStatement = sequenceStatement;
         }
         else
         {
-            BoundSequenceStatement* sequenceStatement = new BoundSequenceStatement(boundStatement->GetSpan(), std::move(statement), std::unique_ptr<BoundStatement>(boundStatement));
+            BoundSequenceStatement* sequenceStatement = new BoundSequenceStatement(module, boundStatement->GetSpan(), std::move(statement), std::unique_ptr<BoundStatement>(boundStatement));
             boundStatement = sequenceStatement;
         }
         if (postfix)

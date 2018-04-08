@@ -8,7 +8,7 @@
 #include <cmajor/symbols/InitDone.hpp>
 #include <cmajor/symbols/GlobalFlags.hpp>
 #include <cmajor/symbols/SymbolCollector.hpp>
-#include <cmajor/parser/FileRegistry.hpp>
+//#include <cmajor/parser/FileRegistry.hpp>
 #include <cmajor/binder/ModuleBinder.hpp>
 #include <cmajor/dom/Parser.hpp>
 #include <cmajor/dom/Element.hpp>
@@ -1775,7 +1775,7 @@ std::unique_ptr<Document> GenerateLibraryXmlFile(const std::string& moduleFilePa
     }
     std::unique_ptr<ModuleBinder> moduleBinder;
     CompileUnitNode compileUnit(Span(), "foo");
-    AttributeBinder attributeBinder;
+    AttributeBinder attributeBinder(&module);
     moduleBinder.reset(new ModuleBinder(module, &compileUnit, &attributeBinder));
     moduleBinder->SetBindingTypes();
     module.GetSymbolTable().AddClassTemplateSpecializationsToClassTemplateSpecializationMap(classTemplateSpecializations);
@@ -4304,7 +4304,7 @@ struct InitDone
     InitDone()
     {
         cmajor::ast::Init();
-        cmajor::parser::FileRegistry::Init();
+        //cmajor::parser::FileRegistry::Init();
         cmajor::symbols::Init();
         cmajor::util::Init();
         cmajor::parsing::Init();

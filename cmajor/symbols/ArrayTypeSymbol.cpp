@@ -26,7 +26,8 @@ ArrayTypeSymbol::ArrayTypeSymbol(const Span& span_, const std::u32string& name_,
 void ArrayTypeSymbol::Write(SymbolWriter& writer)
 {
     TypeSymbol::Write(writer);
-    uint32_t elementTypeId = elementType->TypeId();
+    //uint32_t elementTypeId = elementType->TypeId();
+    const boost::uuids::uuid& elementTypeId = elementType->TypeId();
     writer.GetBinaryWriter().Write(elementTypeId);
     writer.GetBinaryWriter().Write(size);
 }
@@ -34,7 +35,9 @@ void ArrayTypeSymbol::Write(SymbolWriter& writer)
 void ArrayTypeSymbol::Read(SymbolReader& reader)
 {
     TypeSymbol::Read(reader);
-    uint32_t elementTypeId = reader.GetBinaryReader().ReadUInt();
+    //uint32_t elementTypeId = reader.GetBinaryReader().ReadUInt();
+    boost::uuids::uuid elementTypeId;
+    reader.GetBinaryReader().ReadUuid(elementTypeId);
     GetSymbolTable()->EmplaceTypeRequest(this, elementTypeId, 0);
     size = reader.GetBinaryReader().ReadLong();
 }
@@ -47,7 +50,7 @@ void ArrayTypeSymbol::EmplaceType(TypeSymbol* typeSymbol, int index)
     }
     else
     {
-        throw Exception("internal error: invalid array emplace type index " + std::to_string(index), GetSpan());
+        throw Exception(GetModule(), "internal error: invalid array emplace type index " + std::to_string(index), GetSpan());
     }
 }
 
@@ -55,7 +58,7 @@ llvm::Type* ArrayTypeSymbol::IrType(Emitter& emitter)
 {
     if (size == -1)
     {
-        throw Exception("array '" + ToUtf8(FullName()) + "' size not defined", GetSpan());
+        throw Exception(GetModule(), "array '" + ToUtf8(FullName()) + "' size not defined", GetSpan());
     }
     if (!irType)
     {
@@ -68,7 +71,7 @@ llvm::Constant* ArrayTypeSymbol::CreateDefaultIrValue(Emitter& emitter)
 {
     if (size == -1)
     {
-        throw Exception("array '" + ToUtf8(FullName()) + "' size not defined", GetSpan());
+        throw Exception(GetModule(), "array '" + ToUtf8(FullName()) + "' size not defined", GetSpan());
     }
     llvm::Type* irType = IrType(emitter);
     std::vector<llvm::Constant*> arrayOfDefaults;
@@ -122,7 +125,9 @@ void ArrayLengthFunction::Write(SymbolWriter& writer)
 void ArrayLengthFunction::Read(SymbolReader& reader)
 {
     FunctionSymbol::Read(reader);
-    uint32_t typeId = reader.GetBinaryReader().ReadUInt();
+    //uint32_t typeId = reader.GetBinaryReader().ReadUInt();
+    boost::uuids::uuid typeId;
+    reader.GetBinaryReader().ReadUuid(typeId);
     GetSymbolTable()->EmplaceTypeRequest(this, typeId, 1);
 }
 
@@ -177,7 +182,9 @@ void ArrayBeginFunction::Write(SymbolWriter& writer)
 void ArrayBeginFunction::Read(SymbolReader& reader)
 {
     FunctionSymbol::Read(reader);
-    uint32_t typeId = reader.GetBinaryReader().ReadUInt();
+    //uint32_t typeId = reader.GetBinaryReader().ReadUInt();
+    boost::uuids::uuid typeId;
+    reader.GetBinaryReader().ReadUuid(typeId);
     GetSymbolTable()->EmplaceTypeRequest(this, typeId, 1);
 }
 
@@ -232,7 +239,9 @@ void ArrayEndFunction::Write(SymbolWriter& writer)
 void ArrayEndFunction::Read(SymbolReader& reader)
 {
     FunctionSymbol::Read(reader);
-    uint32_t typeId = reader.GetBinaryReader().ReadUInt();
+    //uint32_t typeId = reader.GetBinaryReader().ReadUInt();
+    boost::uuids::uuid typeId;
+    reader.GetBinaryReader().ReadUuid(typeId);
     GetSymbolTable()->EmplaceTypeRequest(this, typeId, 1);
 }
 
@@ -287,7 +296,9 @@ void ArrayCBeginFunction::Write(SymbolWriter& writer)
 void ArrayCBeginFunction::Read(SymbolReader& reader)
 {
     FunctionSymbol::Read(reader);
-    uint32_t typeId = reader.GetBinaryReader().ReadUInt();
+    //uint32_t typeId = reader.GetBinaryReader().ReadUInt();
+    boost::uuids::uuid typeId;
+    reader.GetBinaryReader().ReadUuid(typeId);
     GetSymbolTable()->EmplaceTypeRequest(this, typeId, 1);
 }
 
@@ -342,7 +353,9 @@ void ArrayCEndFunction::Write(SymbolWriter& writer)
 void ArrayCEndFunction::Read(SymbolReader& reader)
 {
     FunctionSymbol::Read(reader);
-    uint32_t typeId = reader.GetBinaryReader().ReadUInt();
+    //uint32_t typeId = reader.GetBinaryReader().ReadUInt();
+    boost::uuids::uuid typeId;
+    reader.GetBinaryReader().ReadUuid(typeId);
     GetSymbolTable()->EmplaceTypeRequest(this, typeId, 1);
 }
 

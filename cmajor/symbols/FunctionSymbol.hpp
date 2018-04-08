@@ -125,8 +125,8 @@ public:
     bool IsMoveConstructor() const;
     bool IsCopyAssignment() const;
     bool IsMoveAssignment() const;
-    uint32_t FunctionId() const { Assert(functionId != 0, "function id not initialized");  return functionId; }
-    void SetFunctionId(uint32_t functionId_) { functionId = functionId_; }
+    const boost::uuids::uuid& FunctionId() const { Assert(!functionId.is_nil(), "function id not initialized");  return functionId; }
+    void SetFunctionId(const boost::uuids::uuid& functionId_) { functionId = functionId_; }
     const std::u32string& GroupName() const { return groupName; }
     void SetGroupName(const std::u32string& groupName_);
     const std::vector<TemplateParameterSymbol*>& TemplateParameters() const { return templateParameters; }
@@ -195,7 +195,8 @@ public:
     bool IsProgramMain() const { return isProgramMain; }
     void SetProgramMain() { isProgramMain = true; }
 private:
-    uint32_t functionId;
+    //uint32_t functionId;
+    boost::uuids::uuid functionId;
     std::u32string groupName;
     std::vector<TemplateParameterSymbol*> templateParameters;
     std::vector<ParameterSymbol*> parameters;
@@ -229,7 +230,6 @@ public:
     std::u32string FullNameWithSpecifiers() const override;
 };
    
-
 class ConstructorSymbol : public FunctionSymbol
 {
 public:

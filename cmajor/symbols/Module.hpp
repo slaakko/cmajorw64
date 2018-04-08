@@ -6,7 +6,9 @@
 #ifndef CMAJOR_SYMBOLS_MODULE_INCLUDED
 #define CMAJOR_SYMBOLS_MODULE_INCLUDED
 #include <cmajor/symbols/SymbolTable.hpp>
+#include <cmajor/symbols/Warning.hpp>
 #include <cmajor/util/CodeFormatter.hpp>
+#include <set>
 
 namespace cmajor { namespace symbols {
 
@@ -24,7 +26,8 @@ struct ModuleTag
 
 const uint8_t moduleFormat_1 = uint8_t('1');
 const uint8_t moduleFormat_2 = uint8_t('2');
-const uint8_t currentModuleFormat = moduleFormat_2;
+const uint8_t moduleFormat_3 = uint8_t('3');
+const uint8_t currentModuleFormat = moduleFormat_3;
 
 enum class ModuleFlags : uint8_t
 {
@@ -58,6 +61,20 @@ private:
     std::vector<Module*> referencedModules;
 };
 
+class FileTable
+{
+public:
+    int16_t RegisterFilePath(const std::string& filePath);
+    std::string GetFilePath(int16_t fileId) const;
+    int16_t NumFilePaths() const { return filePaths.size(); }
+    bool IsEmpty() const { return filePaths.empty(); }
+    void Write(BinaryWriter& writer, bool systemModule);
+    void Read(BinaryReader& reader, bool systemModule);
+    void Dump(CodeFormatter& formatter);
+private:
+    std::vector<std::string> filePaths;
+};
+
 class Module
 {
 public:
@@ -70,9 +87,12 @@ public:
     const std::string& OriginalFilePath() const { return originalFilePath; }
     const std::string& FilePathReadFrom() const { return filePathReadFrom; }
     const std::string& LibraryFilePath() const { return libraryFilePath; }
-    void PrepareForCompilation(const std::vector<std::string>& references, std::vector<std::pair<uint32_t, std::string>>&& fileMap,
-        std::vector<ClassTypeSymbol*>& classTypes, std::vector<ClassTemplateSpecializationSymbol*>& classTemplateSpecializations);
+    void PrepareForCompilation(const std::vector<std::string>& references, std::vector<ClassTypeSymbol*>& classTypes, 
+        std::vector<ClassTemplateSpecializationSymbol*>& classTemplateSpecializations);
     SymbolTable& GetSymbolTable() { return symbolTable; }
+    FileTable& GetFileTable() { return fileTable; }
+    int16_t RegisterFileTable(FileTable* fileTable);
+    std::string GetFilePath(int32_t fileIndex) const;
     void Write(SymbolWriter& writer);
     void SetDirectoryPath(const std::string& directoryPath_);
     const std::string& DirectoryPath() const { return directoryPath; }
@@ -89,6 +109,19 @@ public:
     const std::vector<std::string>& AllExportedData() const { return allExportedData; }
     void Dump();
     ModuleDependency& GetModuleDependency() { return moduleDependency; }
+    int16_t GetModuleId() const { return moduleId; }
+    Module* RootModule() const { return rootModule; }
+    void SetRootModule(Module* rootModule_) { rootModule = rootModule_; }
+    void SetCurrentProjectName(const std::u32string& currentProjectName_);
+    std::u32string GetCurrentProjectName();
+    void SetCurrentToolName(const std::u32string& currentToolName_);
+    std::u32string GetCurrentToolName();
+    CompileWarningCollection& WarningCollection();
+    void ClearDefines();
+    void DefineSymbol(const std::u32string& symbol);
+    bool IsSymbolDefined(const std::u32string& symbol);
+    void SetLogStreamId(int logStreamId_) { logStreamId = logStreamId_; }
+    int LogStreamId() const { return logStreamId; }
 private:
     uint8_t format;
     ModuleFlags flags;
@@ -97,7 +130,10 @@ private:
     std::string filePathReadFrom;
     std::string libraryFilePath;
     std::vector<std::string> referenceFilePaths;
-    std::vector<std::pair<uint32_t, std::string>> fileMap;
+    FileTable fileTable;
+    std::vector<FileTable*> fileTables;
+    Module* rootModule;
+    int16_t moduleId;
     std::vector<std::string> exportedFunctions;
     std::vector<std::string> exportedData;
     std::vector<std::string> allExportedFunctions;
@@ -108,6 +144,11 @@ private:
     SymbolTable symbolTable;
     std::string directoryPath;
     std::vector<std::string> libraryFilePaths;
+    std::u32string currentProjectName;
+    std::u32string currentToolName;
+    CompileWarningCollection warnings;
+    std::set<std::u32string> defines;
+    int logStreamId;
     void ReadHeader(SymbolReader& reader, Module* rootModule, std::unordered_set<std::string>& importSet, std::vector<Module*>& modules,
         std::unordered_map<std::string, ModuleDependency*>& moduleDependencyMap, std::unordered_map<std::string, Module*>& readMap);
     void FinishReads(Module* rootModule, std::vector<Module*>& finishReadOrder, int prevModuleIndex,

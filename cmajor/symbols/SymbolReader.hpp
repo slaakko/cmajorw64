@@ -35,6 +35,7 @@ public:
     void SetSymbolTable(SymbolTable* symbolTable_) { symbolTable = symbolTable_; }
     SymbolTable* GetSymbolTable() const { return symbolTable; }
     void SetModule(Module* module_) { module = module_; }
+    Module* GetModule() const { return module; }
     void AddConversion(FunctionSymbol* conversion);
     const std::vector<FunctionSymbol*>& Conversions() const { return conversions; }
     void AddClassType(ClassTypeSymbol* classType);

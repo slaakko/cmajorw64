@@ -6,6 +6,7 @@
 #ifndef CMAJOR_UTIL_BINARY_READER_INCLUDED
 #define CMAJOR_UTIL_BINARY_READER_INCLUDED
 #include <cmajor/util/MappedInputFile.hpp>
+#include <boost/uuid/uuid.hpp>
 
 namespace cmajor { namespace util {
 
@@ -33,6 +34,7 @@ public:
     std::u16string ReadUtf16String();
     std::u32string ReadUtf32String();
     uint32_t ReadEncodedUInt();
+    void ReadUuid(boost::uuids::uuid& uuid);
     uint32_t Pos() const { return pos; }
     void Skip(uint32_t size);
 private:

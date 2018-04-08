@@ -147,6 +147,7 @@ void Solution::AddDependencies()
             {
                 if (project->DependsOn(projectToCheck.get()))
                 {
+                    project->AddDependsOnProjects(projectToCheck.get());
                     if (std::find(dependencyDeclaration->DependsOnProjects().cbegin(), dependencyDeclaration->DependsOnProjects().cend(), projectToCheck->Name()) == dependencyDeclaration->DependsOnProjects().cend())
                     {
                         dependencyDeclaration->AddDependency(projectToCheck->Name());

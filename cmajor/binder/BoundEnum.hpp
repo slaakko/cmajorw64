@@ -15,7 +15,7 @@ using namespace cmajor::symbols;
 class BoundEnumTypeDefinition : public BoundNode
 {
 public:
-    BoundEnumTypeDefinition(EnumTypeSymbol* enumTypeSymbol_);
+    BoundEnumTypeDefinition(Module* module_, EnumTypeSymbol* enumTypeSymbol_);
     void Accept(BoundNodeVisitor& visitor) override;
     void Load(Emitter& emitter, OperationFlags flags) override;
     void Store(Emitter& emitter, OperationFlags flags) override;

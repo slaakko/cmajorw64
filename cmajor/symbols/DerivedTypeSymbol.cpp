@@ -356,7 +356,9 @@ void DerivedTypeSymbol::Write(SymbolWriter& writer)
 void DerivedTypeSymbol::Read(SymbolReader& reader)
 {
     TypeSymbol::Read(reader);
-    uint32_t typeId = reader.GetBinaryReader().ReadUInt();
+    //uint32_t typeId = reader.GetBinaryReader().ReadUInt();
+    boost::uuids::uuid typeId;
+    reader.GetBinaryReader().ReadUuid(typeId);
     GetSymbolTable()->EmplaceTypeRequest(this, typeId, 0);
     uint8_t nd = reader.GetBinaryReader().ReadByte();
     for (uint8_t i = 0; i < nd; ++i)

@@ -8,6 +8,7 @@
 #include <cmajor/symbols/ContainerSymbol.hpp>
 #include <cmajor/ir/Emitter.hpp>
 #include <llvm/IR/Type.h>
+#include <boost/uuid/uuid.hpp>
 
 namespace cmajor { namespace symbols {
 
@@ -61,9 +62,9 @@ public:
     virtual int PointerCount() const { return 0; }
     virtual bool HasNontrivialDestructor() const { return false; }
     virtual bool ContainsTemplateParameter() const { return false; }
-    void SetTypeId(uint32_t typeId_) { typeId = typeId_; }
-    uint32_t TypeId() const { Assert(typeId != 0, "type id not initialized");  return typeId; }
-    bool TypeIdNotSet() const { return typeId == 0; }
+    void SetTypeId(const boost::uuids::uuid& typeId_) { typeId = typeId_; }
+    const boost::uuids::uuid& TypeId() const { Assert(!typeId.is_nil(), "type id not initialized");  return typeId; }
+    bool TypeIdNotSet() const { return typeId.is_nil(); }
     virtual const TypeDerivationRec& DerivationRec() const;
     virtual TypeSymbol* RemoveDerivations(const TypeDerivationRec& sourceDerivationRec, const Span& span);
     virtual TypeSymbol* Unify(TypeSymbol* that, const Span& span) { return nullptr; }
@@ -76,7 +77,8 @@ public:
     uint64_t SizeInBits(Emitter& emitter);
     uint32_t AlignmentInBits(Emitter& emitter);
 private:
-    uint32_t typeId;
+    //uint32_t typeId;
+    boost::uuids::uuid typeId;
     int32_t compileUnitIndex;
     llvm::DIType* diType;
 };

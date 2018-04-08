@@ -309,6 +309,21 @@ private:
     NodeList<Node> members;
 };
 
+class UuidLiteralNode : public Node
+{
+public:
+    UuidLiteralNode(const Span& span_);
+    UuidLiteralNode(const Span& span_, const boost::uuids::uuid& uuid_);
+    Node* Clone(CloneContext& cloneContext) const override;
+    void Accept(Visitor& visitor) override;
+    void Write(AstWriter& writer) override;
+    void Read(AstReader& reader) override;
+    std::string ToString() const override { return "uuid"; }
+    const boost::uuids::uuid& Uuid() const { return uuid; }
+private:
+    boost::uuids::uuid uuid;
+};
+
 } } // namespace cmajor::ast
 
 #endif // CMAJOR_AST_LITERAL_INCLUDED

@@ -8,6 +8,7 @@
 #include <string>
 #include <vector>
 #include <stdint.h>
+#include <set>
 
 namespace cmajor { namespace symbols {
 
@@ -41,18 +42,11 @@ std::string GetConfig();
 int GetOptimizationLevel();
 void SetOptimizationLevel(int optimizationLevel_);
 
-void SetCurrentProjectName(const std::u32string& currentProjectName_);
-std::u32string GetCurrentProjectName();
-void SetCurrentToolName(const std::u32string& currentToolName_);
-std::u32string GetCurrentToolName();
 void SetCompilerVersion(const std::string& compilerVersion_);
 std::string GetCompilerVersion();
 
 void DefineCommandLineConditionalSymbol(const std::u32string& symbol);
-
-void ClearDefines();
-void DefineSymbol(const std::u32string& symbol);
-bool IsSymbolDefined(const std::u32string& symbol);
+std::set<std::u32string> GetCommandLineDefines();
 
 bool BeginUnitTest();
 bool InUnitTest();

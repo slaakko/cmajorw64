@@ -52,7 +52,7 @@ FunctionSymbol* FunctionTemplateRepository::Instantiate(FunctionSymbol* function
         }
         else
         {
-            throw Exception("template parameter type not found", span);
+            throw Exception(&boundCompileUnit.GetModule(), "template parameter type not found", span);
         }
     }
     FunctionTemplateKey key(functionTemplate, templateArgumentTypes);
@@ -85,7 +85,7 @@ FunctionSymbol* FunctionTemplateRepository::Instantiate(FunctionSymbol* function
     bool fileScopeAdded = false;
     if (!functionTemplate->Ns()->IsGlobalNamespace())
     {
-        FileScope* primaryFileScope = new FileScope();
+        FileScope* primaryFileScope = new FileScope(&boundCompileUnit.GetModule());
         primaryFileScope->AddContainerScope(functionTemplate->Ns()->GetContainerScope());
         boundCompileUnit.AddFileScope(primaryFileScope);
         fileScopeAdded = true;
@@ -121,7 +121,7 @@ FunctionSymbol* FunctionTemplateRepository::Instantiate(FunctionSymbol* function
         }
         else
         {
-            throw Exception("template parameter type not found", span);
+            throw Exception(&boundCompileUnit.GetModule(), "template parameter type not found", span);
         }
     }
     TypeBinder typeBinder(boundCompileUnit);

@@ -2,7 +2,7 @@
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
  <PropertyGroup Label="Globals">
   <CustomProjectExtensionsPath>$(LocalAppData)\CustomProjectSystems\Cmajor\</CustomProjectExtensionsPath>
-  <ProjectGuid>d6ca00f6-f172-4e6f-9d56-c9b1525590bd</ProjectGuid>
+  <ProjectGuid>3787c003-8b0b-4336-9da2-4224da9504e8</ProjectGuid>
  </PropertyGroup>
  <PropertyGroup>
   <TargetType>library</TargetType>
@@ -16,14 +16,6 @@
   <CmCompile Include="Parser.cm"/>
  </ItemGroup>
  <ItemGroup>
-  <ProjectReference Include="../System.Core/System.Core.cmproj"/>
-  <ProjectReference Include="../System.Runtime/System.Runtime.cmproj"/>
-  <ProjectReference Include="../System.Base/System.Base.cmproj"/>
-  <ProjectReference Include="../System.Text.Parsing.CodeDom/System.Text.Parsing.CodeDom.cmproj"/>
-  <ProjectReference Include="../System.Text.Parsing/System.Text.Parsing.cmproj"/>
-  <ProjectReference Include="../System.Net.Sockets/System.Net.Sockets.cmproj"/>
-  <ProjectReference Include="../System.Numerics.Multiprecision/System.Numerics.Multiprecision.cmproj"/>
-  <ProjectReference Include="../System.IO.Compression/System.IO.Compression.cmproj"/>
   <ProjectReference Include="../System.Xml/System.Xml.cmproj"/>
  </ItemGroup>
  <Import Project="$(CustomProjectExtensionsPath)Cmajor.props"/>

@@ -9,6 +9,8 @@
 #include <cmajor/symbols/SymbolTable.hpp>
 #include <cmajor/symbols/SymbolCollector.hpp>
 #include <cmajor/util/Unicode.hpp>
+#include <boost/uuid/uuid_generators.hpp>
+#include <boost/uuid/uuid_io.hpp>
 
 namespace cmajor { namespace symbols {
 
@@ -20,6 +22,7 @@ BasicTypeSymbol::BasicTypeSymbol(SymbolType symbolType_, const Span& span_, cons
 {
 }
 
+/*
 void BasicTypeSymbol::Write(SymbolWriter& writer)
 {
     TypeSymbol::Write(writer);
@@ -106,6 +109,101 @@ void BasicTypeSymbol::Read(SymbolReader& reader)
         GetSymbolTable()->EmplaceFunctionRequest(this, equalityOpId, 6);
     }
 }
+*/
+
+void BasicTypeSymbol::Write(SymbolWriter& writer)
+{
+    TypeSymbol::Write(writer);
+    boost::uuids::uuid defaultConstructorId = boost::uuids::nil_generator()();
+    if (defaultConstructor)
+    {
+        defaultConstructorId = defaultConstructor->FunctionId();
+    }
+    writer.GetBinaryWriter().Write(defaultConstructorId);
+    boost::uuids::uuid copyConstructorId = boost::uuids::nil_generator()();
+    if (copyConstructor)
+    {
+        copyConstructorId = copyConstructor->FunctionId();
+    }
+    writer.GetBinaryWriter().Write(copyConstructorId);
+    boost::uuids::uuid moveConstructorId = boost::uuids::nil_generator()();
+    if (moveConstructor)
+    {
+        moveConstructorId = moveConstructor->FunctionId();
+    }
+    writer.GetBinaryWriter().Write(moveConstructorId);
+    boost::uuids::uuid copyAssignmentId = boost::uuids::nil_generator()();
+    if (copyAssignment)
+    {
+        copyAssignmentId = copyAssignment->FunctionId();
+    }
+    writer.GetBinaryWriter().Write(copyAssignmentId);
+    boost::uuids::uuid moveAssignmentId = boost::uuids::nil_generator()();
+    if (moveAssignment)
+    {
+        moveAssignmentId = moveAssignment->FunctionId();
+    }
+    writer.GetBinaryWriter().Write(moveAssignmentId);
+    boost::uuids::uuid returnId = boost::uuids::nil_generator()();
+    if (returnFun)
+    {
+        returnId = returnFun->FunctionId();
+    }
+    writer.GetBinaryWriter().Write(returnId);
+    boost::uuids::uuid equalityOpId = boost::uuids::nil_generator()();
+    if (equalityOp)
+    {
+        equalityOpId = equalityOp->FunctionId();
+    }
+    writer.GetBinaryWriter().Write(equalityOpId);
+}
+
+void BasicTypeSymbol::Read(SymbolReader& reader)
+{
+    TypeSymbol::Read(reader);
+    boost::uuids::uuid defaultConstructorId;
+    reader.GetBinaryReader().ReadUuid(defaultConstructorId);
+    if (!defaultConstructorId.is_nil())
+    {
+        GetSymbolTable()->EmplaceFunctionRequest(this, defaultConstructorId, 0);
+    }
+    boost::uuids::uuid copyConstructorId;
+    reader.GetBinaryReader().ReadUuid(copyConstructorId);
+    if (!copyConstructorId.is_nil())
+    {
+        GetSymbolTable()->EmplaceFunctionRequest(this, copyConstructorId, 1);
+    }
+    boost::uuids::uuid moveConstructorId;
+    reader.GetBinaryReader().ReadUuid(moveConstructorId);
+    if (!moveConstructorId.is_nil())
+    {
+        GetSymbolTable()->EmplaceFunctionRequest(this, moveConstructorId, 2);
+    }
+    boost::uuids::uuid copyAssignmentId;
+    reader.GetBinaryReader().ReadUuid(copyAssignmentId);
+    if (!copyAssignmentId.is_nil())
+    {
+        GetSymbolTable()->EmplaceFunctionRequest(this, copyAssignmentId, 3);
+    }
+    boost::uuids::uuid moveAssignmentId;
+    reader.GetBinaryReader().ReadUuid(moveAssignmentId);
+    if (!moveAssignmentId.is_nil())
+    {
+        GetSymbolTable()->EmplaceFunctionRequest(this, moveAssignmentId, 4);
+    }
+    boost::uuids::uuid returnId;
+    reader.GetBinaryReader().ReadUuid(returnId);
+    if (!returnId.is_nil())
+    {
+        GetSymbolTable()->EmplaceFunctionRequest(this, returnId, 5);
+    }
+    boost::uuids::uuid equalityOpId;
+    reader.GetBinaryReader().ReadUuid(equalityOpId);
+    if (!equalityOpId.is_nil())
+    {
+        GetSymbolTable()->EmplaceFunctionRequest(this, equalityOpId, 6);
+    }
+}
 
 void BasicTypeSymbol::EmplaceFunction(FunctionSymbol* functionSymbol, int index)
 {
@@ -136,7 +234,8 @@ void BasicTypeSymbol::Accept(SymbolCollector* collector)
 void BasicTypeSymbol::Dump(CodeFormatter& formatter)
 {
     formatter.WriteLine(ToUtf8(Name()));
-    formatter.WriteLine("typeid: " + std::to_string(TypeId()));
+    //formatter.WriteLine("typeid: " + std::to_string(TypeId()));
+    formatter.WriteLine("typeid: " + boost::uuids::to_string(TypeId()));
 }
 
 BoolTypeSymbol::BoolTypeSymbol(const Span& span_, const std::u32string& name_) : BasicTypeSymbol(SymbolType::boolTypeSymbol, span_, name_)

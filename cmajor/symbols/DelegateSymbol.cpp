@@ -12,6 +12,7 @@
 #include <cmajor/symbols/SymbolCollector.hpp>
 #include <cmajor/util/Unicode.hpp>
 #include <llvm/IR/Module.h>
+#include <boost/uuid/uuid_io.hpp>
 
 namespace cmajor { namespace symbols {
 
@@ -24,7 +25,8 @@ DelegateTypeSymbol::DelegateTypeSymbol(const Span& span_, const std::u32string& 
 void DelegateTypeSymbol::Write(SymbolWriter& writer)
 {
     TypeSymbol::Write(writer);
-    uint32_t returnTypeId = returnType->TypeId();
+    //uint32_t returnTypeId = returnType->TypeId();
+    const boost::uuids::uuid& returnTypeId = returnType->TypeId();
     writer.GetBinaryWriter().Write(returnTypeId);
     bool hasReturnParam = returnParam != nullptr;
     writer.GetBinaryWriter().Write(hasReturnParam);
@@ -37,7 +39,9 @@ void DelegateTypeSymbol::Write(SymbolWriter& writer)
 void DelegateTypeSymbol::Read(SymbolReader& reader)
 {
     TypeSymbol::Read(reader);
-    uint32_t returnTypeId = reader.GetBinaryReader().ReadUInt();
+    //uint32_t returnTypeId = reader.GetBinaryReader().ReadUInt();
+    boost::uuids::uuid returnTypeId;
+    reader.GetBinaryReader().ReadUuid(returnTypeId);
     GetSymbolTable()->EmplaceTypeRequest(this, returnTypeId, 0);
     bool hasReturnParam = reader.GetBinaryReader().ReadBool();
     if (hasReturnParam)
@@ -137,7 +141,8 @@ void DelegateTypeSymbol::Dump(CodeFormatter& formatter)
 {
     formatter.WriteLine(ToUtf8(Name()));
     formatter.WriteLine("full name: " + ToUtf8(FullNameWithSpecifiers()));
-    formatter.WriteLine("typeid: " + std::to_string(TypeId()));
+    //formatter.WriteLine("typeid: " + std::to_string(TypeId()));
+    formatter.WriteLine("typeid: " + boost::uuids::to_string(TypeId()));
 }
 
 llvm::Type* DelegateTypeSymbol::IrType(Emitter& emitter)
@@ -176,47 +181,47 @@ void DelegateTypeSymbol::SetSpecifiers(Specifiers specifiers)
     SetAccess(accessSpecifiers);
     if ((specifiers & Specifiers::static_) != Specifiers::none)
     {
-        throw Exception("delegate cannot be static", GetSpan());
+        throw Exception(GetModule(), "delegate cannot be static", GetSpan());
     }
     if ((specifiers & Specifiers::virtual_) != Specifiers::none)
     {
-        throw Exception("delegate cannot be virtual", GetSpan());
+        throw Exception(GetModule(), "delegate cannot be virtual", GetSpan());
     }
     if ((specifiers & Specifiers::override_) != Specifiers::none)
     {
-        throw Exception("delegate cannot be override", GetSpan());
+        throw Exception(GetModule(), "delegate cannot be override", GetSpan());
     }
     if ((specifiers & Specifiers::abstract_) != Specifiers::none)
     {
-        throw Exception("delegate cannot be abstract", GetSpan());
+        throw Exception(GetModule(), "delegate cannot be abstract", GetSpan());
     }
     if ((specifiers & Specifiers::inline_) != Specifiers::none)
     {
-        throw Exception("delegate cannot be inline", GetSpan());
+        throw Exception(GetModule(), "delegate cannot be inline", GetSpan());
     }
     if ((specifiers & Specifiers::explicit_) != Specifiers::none)
     {
-        throw Exception("delegate cannot be explicit", GetSpan());
+        throw Exception(GetModule(), "delegate cannot be explicit", GetSpan());
     }
     if ((specifiers & Specifiers::external_) != Specifiers::none)
     {
-        throw Exception("delegate cannot be external", GetSpan());
+        throw Exception(GetModule(), "delegate cannot be external", GetSpan());
     }
     if ((specifiers & Specifiers::suppress_) != Specifiers::none)
     {
-        throw Exception("delegate cannot be suppressed", GetSpan());
+        throw Exception(GetModule(), "delegate cannot be suppressed", GetSpan());
     }
     if ((specifiers & Specifiers::default_) != Specifiers::none)
     {
-        throw Exception("delegate cannot be default", GetSpan());
+        throw Exception(GetModule(), "delegate cannot be default", GetSpan());
     }
     if ((specifiers & Specifiers::constexpr_) != Specifiers::none)
     {
-        throw Exception("delegate cannot be constexpr", GetSpan());
+        throw Exception(GetModule(), "delegate cannot be constexpr", GetSpan());
     }
     if ((specifiers & Specifiers::cdecl_) != Specifiers::none)
     {
-        throw Exception("delegate cannot be cdecl", GetSpan());
+        throw Exception(GetModule(), "delegate cannot be cdecl", GetSpan());
     }
     if ((specifiers & Specifiers::nothrow_) != Specifiers::none)
     {
@@ -226,20 +231,20 @@ void DelegateTypeSymbol::SetSpecifiers(Specifiers specifiers)
     {
         if (IsNothrow())
         {
-            throw Exception("delegate cannot be throw and nothrow at the same time", GetSpan());
+            throw Exception(GetModule(), "delegate cannot be throw and nothrow at the same time", GetSpan());
         }
     }
     if ((specifiers & Specifiers::new_) != Specifiers::none)
     {
-        throw Exception("delegate cannot be new", GetSpan());
+        throw Exception(GetModule(), "delegate cannot be new", GetSpan());
     }
     if ((specifiers & Specifiers::const_) != Specifiers::none)
     {
-        throw Exception("delegate cannot be const", GetSpan());
+        throw Exception(GetModule(), "delegate cannot be const", GetSpan());
     }
     if ((specifiers & Specifiers::unit_test_) != Specifiers::none)
     {
-        throw Exception("delegate cannot be unit_test", GetSpan());
+        throw Exception(GetModule(), "delegate cannot be unit_test", GetSpan());
     }
 }
 
@@ -410,7 +415,9 @@ void DelegateTypeDefaultConstructor::Write(SymbolWriter& writer)
 void DelegateTypeDefaultConstructor::Read(SymbolReader& reader)
 {
     FunctionSymbol::Read(reader);
-    uint32_t typeId = reader.GetBinaryReader().ReadUInt();
+    //uint32_t typeId = reader.GetBinaryReader().ReadUInt();
+    boost::uuids::uuid typeId;
+    reader.GetBinaryReader().ReadUuid(typeId);
     GetSymbolTable()->EmplaceTypeRequest(this, typeId, 1);
 }
 
@@ -608,14 +615,17 @@ ClassDelegateTypeSymbol::ClassDelegateTypeSymbol(const Span& span_, const std::u
 void ClassDelegateTypeSymbol::Write(SymbolWriter& writer)
 {
     TypeSymbol::Write(writer);
-    uint32_t returnTypeId = returnType->TypeId();
+    //uint32_t returnTypeId = returnType->TypeId();
+    const boost::uuids::uuid& returnTypeId = returnType->TypeId();
     writer.GetBinaryWriter().Write(returnTypeId);
 }
 
 void ClassDelegateTypeSymbol::Read(SymbolReader& reader)
 {
     TypeSymbol::Read(reader);
-    uint32_t returnTypeId = reader.GetBinaryReader().ReadUInt();
+    //uint32_t returnTypeId = reader.GetBinaryReader().ReadUInt();
+    boost::uuids::uuid returnTypeId;
+    reader.GetBinaryReader().ReadUuid(returnTypeId);
     GetSymbolTable()->EmplaceTypeRequest(this, returnTypeId, -1);
 }
 
@@ -732,7 +742,8 @@ void ClassDelegateTypeSymbol::Dump(CodeFormatter& formatter)
 {
     formatter.WriteLine(ToUtf8(Name()));
     formatter.WriteLine("full name: " + ToUtf8(FullNameWithSpecifiers()));
-    formatter.WriteLine("typeid: " + std::to_string(TypeId()));
+    //formatter.WriteLine("typeid: " + std::to_string(TypeId()));
+    formatter.WriteLine("typeid: " + boost::uuids::to_string(TypeId()));
 }
 
 llvm::Type* ClassDelegateTypeSymbol::IrType(Emitter& emitter)
@@ -771,47 +782,47 @@ void ClassDelegateTypeSymbol::SetSpecifiers(Specifiers specifiers)
     SetAccess(accessSpecifiers);
     if ((specifiers & Specifiers::static_) != Specifiers::none)
     {
-        throw Exception("class delegate cannot be static", GetSpan());
+        throw Exception(GetModule(), "class delegate cannot be static", GetSpan());
     }
     if ((specifiers & Specifiers::virtual_) != Specifiers::none)
     {
-        throw Exception("class delegate cannot be virtual", GetSpan());
+        throw Exception(GetModule(), "class delegate cannot be virtual", GetSpan());
     }
     if ((specifiers & Specifiers::override_) != Specifiers::none)
     {
-        throw Exception("class delegate cannot be override", GetSpan());
+        throw Exception(GetModule(), "class delegate cannot be override", GetSpan());
     }
     if ((specifiers & Specifiers::abstract_) != Specifiers::none)
     {
-        throw Exception("class delegate cannot be abstract", GetSpan());
+        throw Exception(GetModule(), "class delegate cannot be abstract", GetSpan());
     }
     if ((specifiers & Specifiers::inline_) != Specifiers::none)
     {
-        throw Exception("class delegate cannot be inline", GetSpan());
+        throw Exception(GetModule(), "class delegate cannot be inline", GetSpan());
     }
     if ((specifiers & Specifiers::explicit_) != Specifiers::none)
     {
-        throw Exception("class delegate cannot be explicit", GetSpan());
+        throw Exception(GetModule(), "class delegate cannot be explicit", GetSpan());
     }
     if ((specifiers & Specifiers::external_) != Specifiers::none)
     {
-        throw Exception("class delegate cannot be external", GetSpan());
+        throw Exception(GetModule(), "class delegate cannot be external", GetSpan());
     }
     if ((specifiers & Specifiers::suppress_) != Specifiers::none)
     {
-        throw Exception("class delegate cannot be suppressed", GetSpan());
+        throw Exception(GetModule(), "class delegate cannot be suppressed", GetSpan());
     }
     if ((specifiers & Specifiers::default_) != Specifiers::none)
     {
-        throw Exception("class delegate cannot be default", GetSpan());
+        throw Exception(GetModule(), "class delegate cannot be default", GetSpan());
     }
     if ((specifiers & Specifiers::constexpr_) != Specifiers::none)
     {
-        throw Exception("class delegate cannot be constexpr", GetSpan());
+        throw Exception(GetModule(), "class delegate cannot be constexpr", GetSpan());
     }
     if ((specifiers & Specifiers::cdecl_) != Specifiers::none)
     {
-        throw Exception("class delegate cannot be cdecl", GetSpan());
+        throw Exception(GetModule(), "class delegate cannot be cdecl", GetSpan());
     }
     if ((specifiers & Specifiers::nothrow_) != Specifiers::none)
     {
@@ -821,20 +832,20 @@ void ClassDelegateTypeSymbol::SetSpecifiers(Specifiers specifiers)
     {
         if (IsNothrow())
         {
-            throw Exception("class delegate cannot be throw and nothrow at the same time", GetSpan());
+            throw Exception(GetModule(), "class delegate cannot be throw and nothrow at the same time", GetSpan());
         }
     }
     if ((specifiers & Specifiers::new_) != Specifiers::none)
     {
-        throw Exception("class delegate cannot be new", GetSpan());
+        throw Exception(GetModule(), "class delegate cannot be new", GetSpan());
     }
     if ((specifiers & Specifiers::const_) != Specifiers::none)
     {
-        throw Exception("class delegate cannot be const", GetSpan());
+        throw Exception(GetModule(), "class delegate cannot be const", GetSpan());
     }
     if ((specifiers & Specifiers::unit_test_) != Specifiers::none)
     {
-        throw Exception("class delegate cannot be unit_test", GetSpan());
+        throw Exception(GetModule(), "class delegate cannot be unit_test", GetSpan());
     }
 }
 
@@ -892,7 +903,9 @@ void ClassDelegateTypeDefaultConstructor::Write(SymbolWriter& writer)
 void ClassDelegateTypeDefaultConstructor::Read(SymbolReader& reader)
 {
     FunctionSymbol::Read(reader);
-    uint32_t typeId = reader.GetBinaryReader().ReadUInt();
+    //uint32_t typeId = reader.GetBinaryReader().ReadUInt();
+    boost::uuids::uuid typeId;
+    reader.GetBinaryReader().ReadUuid(typeId);
     GetSymbolTable()->EmplaceTypeRequest(this, typeId, 1);
 }
 
@@ -1158,7 +1171,7 @@ void MemberFunctionToClassDelegateConversion::GenerateCall(Emitter& emitter, std
     llvm::Value* objectValue = emitter.Stack().Pop();
     if (!objectValue)
     {
-        throw Exception("cannot construct class delegate because expression has no this pointer", GetSpan());
+        throw Exception(GetModule(), "cannot construct class delegate because expression has no this pointer", GetSpan());
     }
     llvm::Value* objectValueAsVoidPtr = emitter.Builder().CreateBitCast(objectValue, emitter.Builder().getInt8PtrTy());
     llvm::Value* memFunPtrValue = emitter.Module()->getOrInsertFunction(ToUtf8(function->MangledName()), function->IrType(emitter));

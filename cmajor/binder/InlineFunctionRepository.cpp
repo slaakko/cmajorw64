@@ -59,7 +59,7 @@ void InlineFunctionRepository::Instantiate(FunctionSymbol* inlineFunction, Conta
     int n = inlineFunction->UsingNodes().Count();
     if (!inlineFunction->Ns()->IsGlobalNamespace() || n > 0)
     {
-        FileScope* primaryFileScope = new FileScope();
+        FileScope* primaryFileScope = new FileScope(&boundCompileUnit.GetModule());
         if (!inlineFunction->Ns()->IsGlobalNamespace())
         {
             primaryFileScope->AddContainerScope(inlineFunction->Ns()->GetContainerScope());
@@ -99,12 +99,12 @@ void InlineFunctionRepository::Instantiate(FunctionSymbol* inlineFunction, Conta
     functionInstanceNode->Body()->Accept(typeBinder);
     StatementBinder statementBinder(boundCompileUnit);
     std::unique_ptr<BoundClass> boundClass;
-    std::unique_ptr<BoundFunction> boundFunction(new BoundFunction(inlineFunction));
+    std::unique_ptr<BoundFunction> boundFunction(new BoundFunction(&boundCompileUnit.GetModule(), inlineFunction));
     statementBinder.SetCurrentFunction(boundFunction.get());
     if (inlineFunction->GetSymbolType() == SymbolType::constructorSymbol ||
         inlineFunction->GetSymbolType() == SymbolType::memberFunctionSymbol)
     {
-        boundClass.reset(new BoundClass(static_cast<ClassTypeSymbol*>(inlineFunction->Parent())));
+        boundClass.reset(new BoundClass(&boundCompileUnit.GetModule(), static_cast<ClassTypeSymbol*>(inlineFunction->Parent())));
         statementBinder.SetCurrentClass(boundClass.get());
         if (inlineFunction->GetSymbolType() == SymbolType::constructorSymbol)
         {

@@ -268,6 +268,14 @@ uint32_t BinaryReader::ReadEncodedUInt()
     }
 }
 
+void BinaryReader::ReadUuid(boost::uuids::uuid& uuid)
+{
+    for (boost::uuids::uuid::value_type& x : uuid)
+    {
+        x = ReadByte();
+    }
+}
+
 void BinaryReader::Skip(uint32_t size)
 {
     begin += size;

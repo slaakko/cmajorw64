@@ -112,6 +112,11 @@ ParsingException::ParsingException(const std::string& message_, const std::strin
 {
 }
 
+void ParsingException::SetProject(const std::string& project_)
+{
+    project = project_;
+}
+
 ExpectationFailure::ExpectationFailure(const std::u32string& info_, const std::string& fileName_, const Span& span_, const char32_t* start, const char32_t* end):
     ParsingException("parsing failed (" +  ToUtf8(info_) + " expected)", fileName_, span_, start, end), info(info_)
 {

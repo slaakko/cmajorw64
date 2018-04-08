@@ -19,6 +19,7 @@ class Symbol;
 class ContainerSymbol;
 class NamespaceSymbol;
 class FunctionSymbol;
+class Module;
 
 enum class ScopeLookup : uint8_t
 {
@@ -79,6 +80,7 @@ private:
 class FileScope : public Scope
 {
 public:
+    FileScope(Module* module_);
     void InstallAlias(ContainerScope* containerScope, AliasNode* aliasNode);
     void AddContainerScope(ContainerScope* containerScope);
     void InstallNamespaceImport(ContainerScope* containerScope, NamespaceImportNode* namespaceImportNode);
@@ -86,6 +88,7 @@ public:
     Symbol* Lookup(const std::u32string& name, ScopeLookup lookup) const override;
     void CollectViableFunctions(int arity, const std::u32string&  groupName, std::unordered_set<ContainerScope*>& scopesLookedUp, std::unordered_set<FunctionSymbol*>& viableFunctions);
 private:
+    Module* module;
     std::vector<ContainerScope*> containerScopes;
     std::unordered_map<std::u32string, Symbol*> aliasSymbolMap;
 };

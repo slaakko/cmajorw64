@@ -7,6 +7,7 @@
 #define CMAJOR_UTIL_BINARY_WRITER_INCLUDED
 #include <string>
 #include <stdio.h>
+#include <boost/uuid/uuid.hpp>
 
 namespace cmajor { namespace util {
 
@@ -51,6 +52,7 @@ public:
     void Write(const std::u16string& s);
     void Write(const std::u32string& s);
     void WriteEncodedUInt(uint32_t x);
+    void Write(const boost::uuids::uuid& uuid);
     uint32_t Pos() const { return pos; }
     void Seek(uint32_t pos_);
 private:

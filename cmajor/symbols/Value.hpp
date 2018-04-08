@@ -20,7 +20,8 @@ enum class ValueType : uint8_t
 {
     none, boolValue, sbyteValue, byteValue, shortValue, ushortValue, intValue, uintValue, 
     longValue, ulongValue, floatValue, doubleValue, charValue, wcharValue, ucharValue, 
-    stringValue, wstringValue, ustringValue, nullValue, pointerValue, arrayValue, structuredValue,
+    stringValue, wstringValue, ustringValue, nullValue, pointerValue, arrayValue, structuredValue, 
+    uuidValue,
     maxValue
 };
 
@@ -412,6 +413,22 @@ private:
     TypeSymbol* type;
 };
 
+class UuidValue : public Value
+{
+public:
+    UuidValue(const Span& span_, int uuidId_);
+    Value* Clone() const override { return new UuidValue(GetSpan(), uuidId); }
+    llvm::Value* IrValue(Emitter& emitter) override;
+    void Write(BinaryWriter& writer) override;
+    void Read(BinaryReader& reader) override;
+    Value* As(TypeSymbol* targetType, bool cast, const Span& span, bool dontThrow) const override;
+    TypeSymbol* GetType(SymbolTable* symbolTable) override;
+    int UuidId() const { return uuidId; }
+private:
+    int uuidId;
+};
+
+
 template<typename ValueT>
 inline bool ValuesEqual(const ValueT& left, const ValueT& right)
 {
@@ -443,7 +460,7 @@ struct IntegralValueHash
 };
 
 void WriteValue(Value* value, BinaryWriter& writer);
-std::unique_ptr<Value> ReadValue(BinaryReader& reader, const Span& span);
+std::unique_ptr<Value> ReadValue(BinaryReader& reader, const Span& span, Module* module);
 
 } } // namespace cmajor::symbols
 

@@ -12,6 +12,7 @@
 #include <cmajor/binder/InlineFunctionRepository.hpp>
 #include <cmajor/binder/ConstExprFunctionRepository.hpp>
 #include <cmajor/binder/StringRepository.hpp>
+#include <cmajor/binder/UuidRepository.hpp>
 #include <cmajor/binder/ConstantArrayRepository.hpp>
 #include <cmajor/binder/ConstantStructureRepository.hpp>
 #include <cmajor/binder/ConceptRepository.hpp>
@@ -57,12 +58,14 @@ public:
     int Install(const std::string& str);
     int Install(const std::u16string& str);
     int Install(const std::u32string& str);
+    int Install(const boost::uuids::uuid& uuid);
     const std::string& GetUtf8String(int stringId) const;
     const std::u16string& GetUtf16String(int stringId) const;
     const std::u32string& GetUtf32String(int stringId) const;
     const unsigned char* GetUtf8CharPtr(int stringId) const;
     const char16_t* GetUtf16CharPtr(int stringId) const;
     const char32_t* GetUtf32CharPtr(int stringId) const;
+    const boost::uuids::uuid& GetUuid(int uuidId) const;
     void AddConstantArray(ConstantSymbol* constantArraySymbol);
     ConstantArrayRepository& GetConstantArrayRepository() { return constantArrayRepository; }
     void AddConstantStructure(ConstantSymbol* constantStructureSymbol);
@@ -105,6 +108,7 @@ private:
     StringRepository<std::string, const unsigned char*> utf8StringRepository;
     StringRepository<std::u16string, const char16_t*> utf16StringRepository;
     StringRepository<std::u32string, const char32_t*> utf32StringRepository;
+    UuidRepository uuidRepository;
     ConstantArrayRepository constantArrayRepository;
     ConstantStructureRepository constantStructureRepository;
     ConceptRepository conceptRepository;

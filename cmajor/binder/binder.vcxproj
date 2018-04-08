@@ -50,6 +50,7 @@
     <ClInclude Include="StringRepository.hpp" />
     <ClInclude Include="TypeBinder.hpp" />
     <ClInclude Include="TypeResolver.hpp" />
+    <ClInclude Include="UuidRepository.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Access.cpp" />
@@ -83,6 +84,7 @@
     <ClCompile Include="StringRepository.cpp" />
     <ClCompile Include="TypeBinder.cpp" />
     <ClCompile Include="TypeResolver.cpp" />
+    <ClCompile Include="UuidRepository.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>

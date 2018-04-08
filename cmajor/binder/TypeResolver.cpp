@@ -57,6 +57,7 @@ public:
 private:
     BoundCompileUnit& boundCompileUnit;
     SymbolTable& symbolTable;
+    Module* module;
     ContainerScope* containerScope;
     ClassTemplateRepository& classTemplateRepository;
     TypeSymbol* type;
@@ -67,7 +68,7 @@ private:
 };
 
 TypeResolver::TypeResolver(BoundCompileUnit& boundCompileUnit_, ContainerScope* containerScope_, TypeResolverFlags flags_) :
-    boundCompileUnit(boundCompileUnit_), symbolTable(boundCompileUnit.GetSymbolTable()), classTemplateRepository(boundCompileUnit.GetClassTemplateRepository()), containerScope(containerScope_),
+    boundCompileUnit(boundCompileUnit_), symbolTable(boundCompileUnit.GetSymbolTable()), module(&boundCompileUnit.GetModule()), classTemplateRepository(boundCompileUnit.GetClassTemplateRepository()), containerScope(containerScope_),
     type(nullptr), derivationRec(), nsTypeSymbol(), flags(flags_)
 {
 }
@@ -158,7 +159,7 @@ void TypeResolver::Visit(LValueRefNode& lvalueRefNode)
     lvalueRefNode.Subject()->Accept(*this);
     if (HasReferenceDerivation(derivationRec.derivations))
     {
-        throw Exception("cannot have reference to reference type", lvalueRefNode.GetSpan());
+        throw Exception(module, "cannot have reference to reference type", lvalueRefNode.GetSpan());
     }
     derivationRec.derivations.push_back(Derivation::lvalueRefDerivation);
 }
@@ -168,7 +169,7 @@ void TypeResolver::Visit(RValueRefNode& rvalueRefNode)
     rvalueRefNode.Subject()->Accept(*this);
     if (HasReferenceDerivation(derivationRec.derivations))
     {
-        throw Exception("cannot have reference to reference type", rvalueRefNode.GetSpan());
+        throw Exception(module, "cannot have reference to reference type", rvalueRefNode.GetSpan());
     }
     derivationRec.derivations.push_back(Derivation::rvalueRefDerivation);
 }
@@ -178,7 +179,7 @@ void TypeResolver::Visit(PointerNode& pointerNode)
     pointerNode.Subject()->Accept(*this);
     if (HasReferenceDerivation(derivationRec.derivations))
     {
-        throw Exception("cannot have pointer to reference type", pointerNode.GetSpan());
+        throw Exception(module, "cannot have pointer to reference type", pointerNode.GetSpan());
     }
     derivationRec.derivations.push_back(Derivation::pointerDerivation);
 }
@@ -188,7 +189,7 @@ void TypeResolver::Visit(ArrayNode& arrayNode)
     type = ResolveType(arrayNode.Subject(), boundCompileUnit, containerScope);
     if (type->IsReferenceType())
     {
-        throw Exception("cannot have array of reference type", arrayNode.GetSpan());
+        throw Exception(module, "cannot have array of reference type", arrayNode.GetSpan());
     }
     int64_t size = -1;
     if (arrayNode.Size())
@@ -201,7 +202,7 @@ void TypeResolver::Visit(ArrayNode& arrayNode)
         }
         else
         {
-            throw Exception("long type value expected ", arrayNode.Size()->GetSpan());
+            throw Exception(module, "long type value expected ", arrayNode.Size()->GetSpan());
         }
     }
     type = symbolTable.MakeArrayType(type, size, arrayNode.GetSpan());
@@ -247,7 +248,7 @@ void TypeResolver::ResolveSymbol(Node& node, Symbol* symbol)
             }
             default:
             {
-                throw Exception("symbol '" + ToUtf8(symbol->FullName()) + "' does not denote a type", node.GetSpan(), symbol->GetSpan());
+                throw Exception(module, "symbol '" + ToUtf8(symbol->FullName()) + "' does not denote a type", node.GetSpan(), symbol->GetSpan());
             }
         }
     }
@@ -274,7 +275,7 @@ void TypeResolver::Visit(IdentifierNode& identifierNode)
     }
     else
     {
-        throw Exception("type symbol '" + ToUtf8(name) + "' not found", identifierNode.GetSpan());
+        throw Exception(module, "type symbol '" + ToUtf8(name) + "' not found", identifierNode.GetSpan());
     }
 }
 
@@ -289,12 +290,12 @@ void TypeResolver::Visit(TemplateIdNode& templateIdNode)
     }
     if (!primaryTemplateType->IsClassTypeSymbol())
     {
-        throw Exception("class type symbol expected", templateIdNode.Primary()->GetSpan());
+        throw Exception(module, "class type symbol expected", templateIdNode.Primary()->GetSpan());
     }
     ClassTypeSymbol* classTemplate = static_cast<ClassTypeSymbol*>(primaryTemplateType);
     if (!classTemplate->IsClassTemplate())
     {
-        throw Exception("class template expected", templateIdNode.Primary()->GetSpan());
+        throw Exception(module, "class template expected", templateIdNode.Primary()->GetSpan());
     }
     std::vector<TypeSymbol*> templateArgumentTypes;
     int n = arity;
@@ -326,7 +327,7 @@ void TypeResolver::Visit(DotNode& dotNode)
         type = classGroup->GetClass(0);
         if (!type)
         {
-            throw Exception("symbol '" + ToUtf8(type->FullName()) + "' does not denote a class type, an array type or a namespace", dotNode.GetSpan(), type->GetSpan());
+            throw Exception(module, "symbol '" + ToUtf8(type->FullName()) + "' does not denote a class type, an array type or a namespace", dotNode.GetSpan(), type->GetSpan());
         }
     }
     if (type->GetSymbolType() == SymbolType::namespaceTypeSymbol)
@@ -340,7 +341,7 @@ void TypeResolver::Visit(DotNode& dotNode)
     }
     else
     {
-        throw Exception("symbol '" + ToUtf8(type->FullName()) + "' does not denote a class type, an array type or a namespace", dotNode.GetSpan(), type->GetSpan());
+        throw Exception(module, "symbol '" + ToUtf8(type->FullName()) + "' does not denote a class type, an array type or a namespace", dotNode.GetSpan(), type->GetSpan());
     }
     std::u32string name = dotNode.MemberId()->Str();
     Symbol* symbol = scope->Lookup(name, ScopeLookup::this_and_base);
@@ -353,13 +354,15 @@ void TypeResolver::Visit(DotNode& dotNode)
         if ((flags & TypeResolverFlags::createMemberSymbols) != TypeResolverFlags::none && type->GetSymbolType() == SymbolType::templateParameterSymbol)
         {
             TemplateParameterSymbol* templateParameterSymbol = new TemplateParameterSymbol(dotNode.GetSpan(), name);
+            templateParameterSymbol->SetModule(module);
+            templateParameterSymbol->SetSymbolTable(&symbolTable);
             symbolTable.SetTypeIdFor(templateParameterSymbol);
             type->AddMember(templateParameterSymbol);
             ResolveSymbol(dotNode, templateParameterSymbol);
         }
         else
         {
-            throw Exception("type symbol '" + ToUtf8(name) + "' not found", dotNode.GetSpan());
+            throw Exception(module, "type symbol '" + ToUtf8(name) + "' not found", dotNode.GetSpan());
         }
     }
 }
@@ -371,6 +374,7 @@ TypeSymbol* ResolveType(Node* typeExprNode, BoundCompileUnit& boundCompileUnit, 
 
 TypeSymbol* ResolveType(Node* typeExprNode, BoundCompileUnit& boundCompileUnit, ContainerScope* containerScope, TypeResolverFlags flags)
 {
+    Module* module = &boundCompileUnit.GetModule();
     bool resolveClassGroup = (flags & TypeResolverFlags::resolveClassGroup) != TypeResolverFlags::none;
     TypeResolver typeResolver(boundCompileUnit, containerScope, flags);
     typeExprNode->Accept(typeResolver);
@@ -386,7 +390,7 @@ TypeSymbol* ResolveType(Node* typeExprNode, BoundCompileUnit& boundCompileUnit, 
     }
     if (!type || type->IsInComplete())
     {
-        throw Exception("incomplete type expression", typeExprNode->GetSpan());
+        throw Exception(module, "incomplete type expression", typeExprNode->GetSpan());
     }
     TypeDerivationRec derivationRec = UnifyDerivations(typeResolver.DerivationRec(), type->DerivationRec());
     if (!derivationRec.derivations.empty())

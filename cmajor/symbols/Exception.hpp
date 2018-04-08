@@ -14,22 +14,25 @@ namespace cmajor { namespace symbols {
 using namespace cmajor::util;
 using cmajor::parsing::Span;
 
-std::string Expand(const std::string& errorMessage, const Span& span);
-std::string Expand(const std::string& errorMessage, const Span& primarySpan, const Span& referenceSpan);
-std::string Expand(const std::string& errorMessage, const Span& primarySpan, const Span& referenceSpan, const std::string& title);
-std::string Expand(const std::string& errorMessage, const Span& span, const std::vector<Span>& references);
-std::string Expand(const std::string& errorMessage, const Span& span, const std::vector<Span>& references, const std::string& title);
+class Module;
 
-std::unique_ptr<JsonObject> SpanToJson(const Span& span);
-std::unique_ptr<cmajor::dom::Element> SpanToDomElement(const Span& span);
+std::string Expand(Module* module, const std::string& errorMessage, const Span& span);
+std::string Expand(Module* module, const std::string& errorMessage, const Span& primarySpan, const Span& referenceSpan);
+std::string Expand(Module* module, const std::string& errorMessage, const Span& primarySpan, const Span& referenceSpan, const std::string& title);
+std::string Expand(Module* module, const std::string& errorMessage, const Span& span, const std::vector<Span>& references);
+std::string Expand(Module* module, const std::string& errorMessage, const Span& span, const std::vector<Span>& references, const std::string& title);
+
+std::unique_ptr<JsonObject> SpanToJson(Module* module, const Span& span);
+std::unique_ptr<cmajor::dom::Element> SpanToDomElement(Module* module, const Span& span);
 
 class Exception
 {
 public:
-    Exception(const std::string& message_, const Span& defined_);
-    Exception(const std::string& message_, const Span& defined_, const Span& referenced_);
-    Exception(const std::string& message_, const Span& defined_, const std::vector<Span>& references_);
+    Exception(Module* module_, const std::string& message_, const Span& defined_);
+    Exception(Module* module_, const std::string& message_, const Span& defined_, const Span& referenced_);
+    Exception(Module* module_, const std::string& message_, const Span& defined_, const std::vector<Span>& references_);
     virtual ~Exception();
+    Module* GetModule() const { return module; }
     const std::string& What() const { return what; }
     const std::string& Message() const { return message; }
     const Span& Defined() const { return defined; }
@@ -37,6 +40,7 @@ public:
     std::unique_ptr<JsonValue> ToJson() const;
     void AddToDiagnosticsElement(cmajor::dom::Element* diagnosticsElement) const;
 private:
+    Module* module;
     std::string what;
     std::string message;
     Span defined;
@@ -46,33 +50,33 @@ private:
 class CastOverloadException : public Exception
 {
 public:
-    CastOverloadException(const std::string& message_, const Span& defined_);
-    CastOverloadException(const std::string& message_, const Span& defined_, const Span& referenced_);
-    CastOverloadException(const std::string& message_, const Span& defined_, const std::vector<Span>& references_);
+    CastOverloadException(Module* module, const std::string& message_, const Span& defined_);
+    CastOverloadException(Module* module, const std::string& message_, const Span& defined_, const Span& referenced_);
+    CastOverloadException(Module* module, const std::string& message_, const Span& defined_, const std::vector<Span>& references_);
 };
 
 class CannotBindConstToNonconstOverloadException : public Exception
 {
 public:
-    CannotBindConstToNonconstOverloadException(const std::string& message_, const Span& defined_);
-    CannotBindConstToNonconstOverloadException(const std::string& message_, const Span& defined_, const Span& referenced_);
-    CannotBindConstToNonconstOverloadException(const std::string& message_, const Span& defined_, const std::vector<Span>& references_);
+    CannotBindConstToNonconstOverloadException(Module* module, const std::string& message_, const Span& defined_);
+    CannotBindConstToNonconstOverloadException(Module* module, const std::string& message_, const Span& defined_, const Span& referenced_);
+    CannotBindConstToNonconstOverloadException(Module* module, const std::string& message_, const Span& defined_, const std::vector<Span>& references_);
 };
 
 class CannotAssignToConstOverloadException : public Exception
 {
 public:
-    CannotAssignToConstOverloadException(const std::string& message_, const Span& defined_);
-    CannotAssignToConstOverloadException(const std::string& message_, const Span& defined_, const Span& referenced_);
-    CannotAssignToConstOverloadException(const std::string& message_, const Span& defined_, const std::vector<Span>& references_);
+    CannotAssignToConstOverloadException(Module* module, const std::string& message_, const Span& defined_);
+    CannotAssignToConstOverloadException(Module* module, const std::string& message_, const Span& defined_, const Span& referenced_);
+    CannotAssignToConstOverloadException(Module* module, const std::string& message_, const Span& defined_, const std::vector<Span>& references_);
 };
 
 class NoViableFunctionException : public Exception
 {
 public:
-    NoViableFunctionException(const std::string& message_, const Span& defined_);
-    NoViableFunctionException(const std::string& message_, const Span& defined_, const Span& referenced_);
-    NoViableFunctionException(const std::string& message_, const Span& defined_, const std::vector<Span>& references_);
+    NoViableFunctionException(Module* module, const std::string& message_, const Span& defined_);
+    NoViableFunctionException(Module* module, const std::string& message_, const Span& defined_, const Span& referenced_);
+    NoViableFunctionException(Module* module, const std::string& message_, const Span& defined_, const std::vector<Span>& references_);
 };
 
 } } // namespace cmajor::symbols

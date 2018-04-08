@@ -14,15 +14,16 @@
 #include <cmajor/symbols/TemplateSymbol.hpp>
 #include <cmajor/symbols/Module.hpp>
 #include <cmajor/symbols/SymbolCollector.hpp>
-#include <cmajor/parser/FileRegistry.hpp>
+//#include <cmajor/parser/FileRegistry.hpp>
 #include <cmajor/util/Unicode.hpp>
 #include <cmajor/util/Sha1.hpp>
 #include <llvm/IR/Module.h>
+#include <boost/uuid/uuid_generators.hpp>
+#include <boost/uuid/uuid_io.hpp>
 
 namespace cmajor { namespace symbols {
 
 using namespace cmajor::unicode;
-using namespace cmajor::parser;
 
 ClassGroupTypeSymbol::ClassGroupTypeSymbol(const Span& span_, const std::u32string& name_) : TypeSymbol(SymbolType::classGroupTypeSymbol, span_, name_)
 {
@@ -46,7 +47,7 @@ void ClassGroupTypeSymbol::AddClass(ClassTypeSymbol* classTypeSymbol)
     {
         if (arityClassMap.find(arity) != arityClassMap.cend())
         {
-            throw Exception("already has class with arity " + std::to_string(arity) + " in class group '" + ToUtf8(Name()) + "'", GetSpan(), classTypeSymbol->GetSpan());
+            throw Exception(classTypeSymbol->GetModule(), "already has class with arity " + std::to_string(arity) + " in class group '" + ToUtf8(Name()) + "'", GetSpan(), classTypeSymbol->GetSpan());
         }
         arityClassMap[arity] = classTypeSymbol;
     }
@@ -114,7 +115,8 @@ void ClassTypeSymbol::Write(SymbolWriter& writer)
     }
     else if (GetSymbolType() == SymbolType::classTypeSymbol)
     {
-        uint32_t baseClassId = 0;
+        //uint32_t baseClassId = 0;
+        boost::uuids::uuid baseClassId = boost::uuids::nil_generator()();
         if (baseClass)
         {
             baseClassId = baseClass->TypeId();
@@ -125,7 +127,8 @@ void ClassTypeSymbol::Write(SymbolWriter& writer)
         for (uint32_t i = 0; i < n; ++i)
         {
             InterfaceTypeSymbol* intf = implementedInterfaces[i];
-            uint32_t intfTypeId = intf->TypeId();
+            //uint32_t intfTypeId = intf->TypeId();
+            const boost::uuids::uuid& intfTypeId = intf->TypeId();
             writer.GetBinaryWriter().Write(intfTypeId);
         }
         uint32_t vmtSize = vmt.size();
@@ -160,14 +163,18 @@ void ClassTypeSymbol::Read(SymbolReader& reader)
         bool hasPrototype = reader.GetBinaryReader().ReadBool();
         if (hasPrototype)
         {
-            uint32_t prototypeId = reader.GetBinaryReader().ReadUInt();
+            //uint32_t prototypeId = reader.GetBinaryReader().ReadUInt();
+            boost::uuids::uuid prototypeId;
+            reader.GetBinaryReader().ReadUuid(prototypeId);
             GetSymbolTable()->EmplaceTypeRequest(this, prototypeId, 1000000);
         }
     }
     else if (GetSymbolType() == SymbolType::classTypeSymbol)
     {
-        uint32_t baseClassId = reader.GetBinaryReader().ReadUInt();
-        if (baseClassId != 0)
+        //uint32_t baseClassId = reader.GetBinaryReader().ReadUInt();
+        boost::uuids::uuid baseClassId;
+        reader.GetBinaryReader().ReadUuid(baseClassId);
+        if (!baseClassId.is_nil())
         {
             GetSymbolTable()->EmplaceTypeRequest(this, baseClassId, 0);
         }
@@ -175,7 +182,9 @@ void ClassTypeSymbol::Read(SymbolReader& reader)
         implementedInterfaces.resize(n);
         for (uint32_t i = 0; i < n; ++i)
         {
-            uint32_t intfTypeId = reader.GetBinaryReader().ReadUInt();
+            //uint32_t intfTypeId = reader.GetBinaryReader().ReadUInt();
+            boost::uuids::uuid intfTypeId;
+            reader.GetBinaryReader().ReadUuid(intfTypeId);
             GetSymbolTable()->EmplaceTypeRequest(this, intfTypeId, 1 + i);
         }
         uint32_t vmtSize = reader.GetBinaryReader().ReadEncodedUInt();
@@ -292,7 +301,7 @@ void ClassTypeSymbol::AddMember(Symbol* member)
         {
             if (staticConstructor)
             {
-                throw Exception("already has a static constructor", member->GetSpan(), staticConstructor->GetSpan());
+                throw Exception(GetModule(), "already has a static constructor", member->GetSpan(), staticConstructor->GetSpan());
             }
             else
             {
@@ -310,7 +319,7 @@ void ClassTypeSymbol::AddMember(Symbol* member)
         {
             if (destructor)
             {
-                throw Exception("already has a destructor", member->GetSpan(), destructor->GetSpan());
+                throw Exception(GetModule(), "already has a destructor", member->GetSpan(), destructor->GetSpan());
             }
             else
             {
@@ -410,7 +419,8 @@ void ClassTypeSymbol::Dump(CodeFormatter& formatter)
     {
         formatter.WriteLine("constraint: " + constraint->ToString());
     }
-    formatter.WriteLine("typeid: " + std::to_string(TypeId()));
+    //formatter.WriteLine("typeid: " + std::to_string(TypeId()));
+    formatter.WriteLine("typeid: " + boost::uuids::to_string(TypeId()));
     if (IsPolymorphic())
     {
         formatter.WriteLine("vmt object name: " + VmtObjectName());
@@ -543,6 +553,8 @@ void ClassTypeSymbol::CreateDestructorSymbol()
     if (!destructor)
     {
         DestructorSymbol* destructorSymbol = new DestructorSymbol(GetSpan(), U"@destructor");
+        destructorSymbol->SetModule(GetModule());
+        destructorSymbol->SetSymbolTable(GetSymbolTable());
         GetSymbolTable()->SetFunctionIdFor(destructorSymbol);
         destructorSymbol->SetGenerated();
         ParameterSymbol* thisParam = new ParameterSymbol(GetSpan(), U"this");
@@ -606,7 +618,7 @@ void ClassTypeSymbol::AddImplementedInterface(InterfaceTypeSymbol* interfaceType
     {
         if (implementedInterfaces[i] == interfaceTypeSymbol)
         {
-            throw Exception("class cannot implement an interface more than once", GetSpan(), interfaceTypeSymbol->GetSpan());
+            throw Exception(GetModule(), "class cannot implement an interface more than once", GetSpan(), interfaceTypeSymbol->GetSpan());
         }
     }
     implementedInterfaces.push_back(interfaceTypeSymbol);
@@ -631,11 +643,11 @@ void ClassTypeSymbol::SetSpecifiers(Specifiers specifiers)
     }
     if ((specifiers & Specifiers::virtual_) != Specifiers::none)
     {
-        throw Exception("class type symbol cannot be virtual", GetSpan());
+        throw Exception(GetModule(), "class type symbol cannot be virtual", GetSpan());
     }
     if ((specifiers & Specifiers::override_) != Specifiers::none)
     {
-        throw Exception("class type symbol cannot be override", GetSpan());
+        throw Exception(GetModule(), "class type symbol cannot be override", GetSpan());
     }
     if ((specifiers & Specifiers::abstract_) != Specifiers::none)
     {
@@ -644,51 +656,51 @@ void ClassTypeSymbol::SetSpecifiers(Specifiers specifiers)
     }
     if ((specifiers & Specifiers::inline_) != Specifiers::none)
     {
-        throw Exception("class type symbol cannot be inline", GetSpan());
+        throw Exception(GetModule(), "class type symbol cannot be inline", GetSpan());
     }
     if ((specifiers & Specifiers::explicit_) != Specifiers::none)
     {
-        throw Exception("class type symbol cannot be explicit", GetSpan());
+        throw Exception(GetModule(), "class type symbol cannot be explicit", GetSpan());
     }
     if ((specifiers & Specifiers::external_) != Specifiers::none)
     {
-        throw Exception("class type symbol cannot be external", GetSpan());
+        throw Exception(GetModule(), "class type symbol cannot be external", GetSpan());
     }
     if ((specifiers & Specifiers::suppress_) != Specifiers::none)
     {
-        throw Exception("class type symbol cannot be suppressed", GetSpan());
+        throw Exception(GetModule(), "class type symbol cannot be suppressed", GetSpan());
     }
     if ((specifiers & Specifiers::default_) != Specifiers::none)
     {
-        throw Exception("class type symbol cannot be default", GetSpan());
+        throw Exception(GetModule(), "class type symbol cannot be default", GetSpan());
     }
     if ((specifiers & Specifiers::constexpr_) != Specifiers::none)
     {
-        throw Exception("class type symbol cannot be constexpr", GetSpan());
+        throw Exception(GetModule(), "class type symbol cannot be constexpr", GetSpan());
     }
     if ((specifiers & Specifiers::cdecl_) != Specifiers::none)
     {
-        throw Exception("class type symbol cannot be cdecl", GetSpan());
+        throw Exception(GetModule(), "class type symbol cannot be cdecl", GetSpan());
     }
     if ((specifiers & Specifiers::nothrow_) != Specifiers::none)
     {
-        throw Exception("class type symbol cannot be nothrow", GetSpan());
+        throw Exception(GetModule(), "class type symbol cannot be nothrow", GetSpan());
     }
     if ((specifiers & Specifiers::throw_) != Specifiers::none)
     {
-        throw Exception("class type symbol cannot be throw", GetSpan());
+        throw Exception(GetModule(), "class type symbol cannot be throw", GetSpan());
     }
     if ((specifiers & Specifiers::new_) != Specifiers::none)
     {
-        throw Exception("class type symbol cannot be new", GetSpan());
+        throw Exception(GetModule(), "class type symbol cannot be new", GetSpan());
     }
     if ((specifiers & Specifiers::const_) != Specifiers::none)
     {
-        throw Exception("class type symbol cannot be const", GetSpan());
+        throw Exception(GetModule(), "class type symbol cannot be const", GetSpan());
     }
     if ((specifiers & Specifiers::unit_test_) != Specifiers::none)
     {
-        throw Exception("class type symbol cannot be unit_test", GetSpan());
+        throw Exception(GetModule(), "class type symbol cannot be unit_test", GetSpan());
     }
 }
 
@@ -838,7 +850,7 @@ void ClassTypeSymbol::InitVmt()
             {
                 if (!IsAbstract())
                 {
-                    throw Exception("class containing abstract member functions must be declared abstract", GetSpan(), virtualFunction->GetSpan());
+                    throw Exception(GetModule(), "class containing abstract member functions must be declared abstract", GetSpan(), virtualFunction->GetSpan());
                 }
             }
         }
@@ -899,11 +911,11 @@ void ClassTypeSymbol::InitVmt(std::vector<FunctionSymbol*>& vmtToInit)
             {
                 if (!f->IsOverride())
                 {
-                    throw Exception("overriding function should be declared with override specifier", f->GetSpan());
+                    throw Exception(GetModule(), "overriding function should be declared with override specifier", f->GetSpan());
                 }
                 if (f->DontThrow() != v->DontThrow())
                 {
-                    throw Exception("overriding function has conflicting nothrow specification compared to the base class virtual function", f->GetSpan(), v->GetSpan());
+                    throw Exception(GetModule(), "overriding function has conflicting nothrow specification compared to the base class virtual function", f->GetSpan(), v->GetSpan());
                 }
                 f->SetVmtIndex(j);
                 vmtToInit[j] = f;
@@ -915,7 +927,7 @@ void ClassTypeSymbol::InitVmt(std::vector<FunctionSymbol*>& vmtToInit)
         {
             if (f->IsOverride())
             {
-                throw Exception("no suitable function to override ('" + ToUtf8(f->FullName()) + "')", f->GetSpan());
+                throw Exception(GetModule(), "no suitable function to override ('" + ToUtf8(f->FullName()) + "')", f->GetSpan());
             }
             f->SetVmtIndex(m);
             vmtToInit.push_back(f);
@@ -983,7 +995,7 @@ void ClassTypeSymbol::InitImts()
             if (!imt[j])
             {
                 MemberFunctionSymbol* intfMemFun = intf->MemberFunctions()[j];
-                throw Exception("class '" + ToUtf8(FullName()) + "' does not implement interface '" + ToUtf8(intf->FullName()) + "' because implementation of interface function '" +
+                throw Exception(GetModule(), "class '" + ToUtf8(FullName()) + "' does not implement interface '" + ToUtf8(intf->FullName()) + "' because implementation of interface function '" +
                     ToUtf8(intfMemFun->FullName()) + "' is missing", GetSpan(), intfMemFun->GetSpan());
             }
         }
@@ -1165,7 +1177,7 @@ ClassTypeSymbol* ClassTypeSymbol::VmtPtrHolderClass()
 {
     if (!IsPolymorphic())
     {
-        throw Exception("nonpolymorphic class does not contain a vmt ptr", GetSpan());
+        throw Exception(GetModule(), "nonpolymorphic class does not contain a vmt ptr", GetSpan());
     }
     if (vmtPtrIndex != -1)
     {
@@ -1179,7 +1191,7 @@ ClassTypeSymbol* ClassTypeSymbol::VmtPtrHolderClass()
         }
         else
         {
-            throw Exception("vmt ptr holder class not found", GetSpan());
+            throw Exception(GetModule(), "vmt ptr holder class not found", GetSpan());
         }
     }
 }

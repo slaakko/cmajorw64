@@ -11,7 +11,7 @@
 #include <cmajor/symbols/GlobalFlags.hpp>
 #include <cmajor/symbols/InterfaceTypeSymbol.hpp>
 #include <cmajor/symbols/SymbolCollector.hpp>
-#include <cmajor/parser/FileRegistry.hpp>
+//#include <cmajor/parser/FileRegistry.hpp>
 #include <cmajor/util/Unicode.hpp>
 #include <cmajor/util/System.hpp>
 #include <cmajor/util/TextUtils.hpp>
@@ -22,7 +22,6 @@
 namespace cmajor { namespace emitter {
 
 using namespace cmajor::unicode;
-using namespace cmajor::parser;
 
 BasicEmitter::BasicEmitter(EmittingContext& emittingContext_, const std::string& compileUnitModuleName_, cmajor::symbols::Module& symbolsModule_) :
     cmajor::ir::Emitter(emittingContext_.GetEmittingContextImpl()->Context()), emittingContext(emittingContext_), symbolTable(nullptr),
@@ -67,7 +66,7 @@ void BasicEmitter::SetTarget(BoundStatement* labeledStatement)
     }
     else
     {
-        throw Exception("target for labeled statement not found", labeledStatement->GetSpan());
+        throw Exception(&symbolsModule, "target for labeled statement not found", labeledStatement->GetSpan());
     }
 }
 
@@ -985,12 +984,12 @@ void BasicEmitter::Visit(BoundCaseStatement& boundCaseStatement)
         }
         else
         {
-            throw Exception("case not found", boundCaseStatement.GetSpan());
+            throw Exception(&symbolsModule, "case not found", boundCaseStatement.GetSpan());
         }
     }
     else
     {
-        throw Exception("no cases", boundCaseStatement.GetSpan());
+        throw Exception(&symbolsModule, "no cases", boundCaseStatement.GetSpan());
     }
 }
 
@@ -1007,7 +1006,7 @@ void BasicEmitter::Visit(BoundDefaultStatement& boundDefaultStatement)
     }
     else
     {
-        throw Exception("no default destination", boundDefaultStatement.GetSpan());
+        throw Exception(&symbolsModule, "no default destination", boundDefaultStatement.GetSpan());
     }
 }
 
@@ -1034,7 +1033,7 @@ void BasicEmitter::Visit(BoundConstructionStatement& boundConstructionStatement)
                     {
                         newCleanupNeeded = true;
                         std::unique_ptr<BoundExpression> classPtrArgument(firstArgument->Clone());
-                        std::unique_ptr<BoundFunctionCall> destructorCall(new BoundFunctionCall(boundConstructionStatement.GetSpan(), classType->Destructor()));
+                        std::unique_ptr<BoundFunctionCall> destructorCall(new BoundFunctionCall(&symbolsModule, boundConstructionStatement.GetSpan(), classType->Destructor()));
                         destructorCall->AddArgument(std::move(classPtrArgument));
                         Assert(currentBlock, "current block not set");
                         auto it = blockDestructionMap.find(currentBlock);
@@ -1305,7 +1304,7 @@ void BasicEmitter::Visit(BoundConjunction& boundConjunction)
 
 std::string BasicEmitter::GetSourceFilePath(int32_t fileIndex)
 {
-    return FileRegistry::Instance().GetFilePath(fileIndex);
+    return symbolsModule.GetFilePath(fileIndex);
 }
 
 llvm::Value* BasicEmitter::GetGlobalStringPtr(int stringId)
@@ -1376,6 +1375,33 @@ llvm::Value* BasicEmitter::GetGlobalUStringConstant(int stringId)
         llvm::Value* stringValue = stringGlobal;
         utf32stringMap[stringId] = stringValue;
         return stringValue;
+    }
+}
+
+llvm::Value* BasicEmitter::GetGlobalUuidConstant(int uuidId)
+{
+    auto it = uuidMap.find(uuidId);
+    if (it != uuidMap.cend())
+    {
+        return it->second;
+    }
+    else
+    {
+        const boost::uuids::uuid& uuid = compileUnit->GetUuid(uuidId);
+        uint64_t length = uuid.static_size();
+        std::vector<llvm::Constant*> byteConstants;
+        for (boost::uuids::uuid::value_type x : uuid)
+        {
+            byteConstants.push_back(builder.getInt8(static_cast<int8_t>(x)));
+        }
+        llvm::Constant* uuidObject = compileUnitModule->getOrInsertGlobal("uuid" + std::to_string(uuidId), llvm::ArrayType::get(builder.getInt8Ty(), length));
+        llvm::GlobalVariable* uuidGlobal = llvm::cast<llvm::GlobalVariable>(uuidObject);
+        uuidGlobal->setLinkage(llvm::GlobalValue::PrivateLinkage);
+        llvm::Constant* constant = llvm::ConstantArray::get(llvm::ArrayType::get(builder.getInt8Ty(), length), byteConstants);
+        uuidGlobal->setInitializer(constant);
+        llvm::Value* uuidValue = uuidGlobal;
+        uuidMap[uuidId] = uuidValue;
+        return uuidValue;
     }
 }
 

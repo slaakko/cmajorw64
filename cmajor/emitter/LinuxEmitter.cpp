@@ -81,7 +81,7 @@ void LinuxEmitter::Visit(BoundGotoCaseStatement& boundGotoCaseStatement)
     }
     else
     {
-        throw Exception("case not found", boundGotoCaseStatement.GetSpan());
+        throw Exception(&symbolsModule, "case not found", boundGotoCaseStatement.GetSpan());
     }
 }
 
@@ -100,7 +100,7 @@ void LinuxEmitter::Visit(BoundGotoDefaultStatement& boundGotoDefaultStatement)
     }
     else
     {
-        throw Exception("no default destination", boundGotoDefaultStatement.GetSpan());
+        throw Exception(&symbolsModule, "no default destination", boundGotoDefaultStatement.GetSpan());
     }
 }
 
@@ -153,7 +153,7 @@ void LinuxEmitter::Visit(BoundGotoStatement& boundGotoStatement)
     }
     else
     {
-        throw Exception("goto target not found", boundGotoStatement.GetSpan());
+        throw Exception(&symbolsModule, "goto target not found", boundGotoStatement.GetSpan());
     }
     llvm::BasicBlock* nextBlock = llvm::BasicBlock::Create(context, "next", function);
     SetCurrentBasicBlock(nextBlock);
@@ -226,13 +226,14 @@ void LinuxEmitter::Visit(BoundTryStatement& boundTryStatement)
     for (int i = 0; i < n; ++i)
     {
         const std::unique_ptr<BoundCatchStatement>& boundCatchStatement = boundTryStatement.Catches()[i];
-        uint32_t catchTypeId = boundCatchStatement->CatchedType()->BaseType()->TypeId();
         SetCurrentBasicBlock(catchTarget);
         std::vector<llvm::Type*> handleExceptionParamTypes;
-        handleExceptionParamTypes.push_back(builder.getInt32Ty());
+        handleExceptionParamTypes.push_back(builder.getInt8PtrTy());
         llvm::FunctionType* handleExceptionFunctionType = llvm::FunctionType::get(builder.getInt1Ty(), handleExceptionParamTypes, false);
         ArgVector handleExceptionArgs;
-        handleExceptionArgs.push_back(builder.getInt32(catchTypeId));
+        UuidValue uuidValue(boundCatchStatement->GetSpan(), boundCatchStatement->CatchedTypeUuidId());
+        llvm::Value* catchTypeIdValue = uuidValue.IrValue(*this);
+        handleExceptionArgs.push_back(catchTypeIdValue);
         llvm::Function* handleException = llvm::cast<llvm::Function>(compileUnitModule->getOrInsertFunction("RtHandleException", handleExceptionFunctionType));
         llvm::Value* handleThisEx = builder.CreateCall(handleException, handleExceptionArgs);
         llvm::BasicBlock* nextHandlerTarget = nullptr;

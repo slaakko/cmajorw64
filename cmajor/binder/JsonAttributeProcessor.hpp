@@ -7,18 +7,22 @@
 #define CMAJOR_BINDER_JSON_ATTRIBUTE_PROCESSOR_INCLUDED
 #include <cmajor/binder/AttributeBinder.hpp>
 #include <cmajor/symbols/FunctionSymbol.hpp>
+#include <cmajor/symbols/Module.hpp>
 #include <map>
 
 namespace cmajor { namespace binder {
 
+using namespace cmajor::symbols;
+
 class JsonAttributeProcessor : public AttributeProcessor
 {
 public:
-    JsonAttributeProcessor();
+    JsonAttributeProcessor(Module* module_);
     void TypeCheck(Attribute* attribute, Symbol* symbol) override;
     void GenerateSymbols(Attribute* attribute, Symbol* symbol, BoundCompileUnit& boundCompileUnit, ContainerScope* containerScope) override;
     void GenerateImplementation(Attribute* attribute, Symbol* symbol, StatementBinder* statementBinder) override;
 private:
+    Module* module;
     std::unordered_map<Symbol*, MemberFunctionSymbol*> jsonCreatorMap;
     std::unordered_map<Symbol*, ConstructorSymbol*> jsonConstructorMap;
     std::unordered_map<Symbol*, MemberFunctionSymbol*> toJsonJsonObjectMemberFunctionSymbolMap;
@@ -33,14 +37,15 @@ private:
     void GenerateJsonCreatorImplementation(Attribute* attribute, ClassTypeSymbol* classTypeSymbol, MemberFunctionSymbol* jsonCreatorFunctionSymbol, StatementBinder* statementBinder);
     void GenerateToJsonJsonObjectImplementation(Attribute* attribute, ClassTypeSymbol* classTypeSymbol, MemberFunctionSymbol* toJsonJsonObjectMemberFunctionSymbol, StatementBinder* statementBinder);
     void GenerateToJsonImplementation(Attribute* attribute, ClassTypeSymbol* classTypeSymbol, MemberFunctionSymbol* toJsonMemberFunctionSymbol, StatementBinder* statementBinder);
-
 };
 
 class JsonFieldNameAttributeProcessor : public AttributeProcessor
 {
 public:
-    JsonFieldNameAttributeProcessor();
+    JsonFieldNameAttributeProcessor(Module* module_);
     void TypeCheck(Attribute* attribute, Symbol* symbol) override;
+private:
+    Module* module;
 };
 
 } } // namespace cmajor::binder

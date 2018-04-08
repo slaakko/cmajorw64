@@ -55,6 +55,10 @@ void ContainerSymbol::Read(SymbolReader& reader)
 void ContainerSymbol::AddMember(Symbol* member)
 {
     member->SetSymbolTable(GetSymbolTable());
+    if (GetModule())
+    {
+        member->SetModule(GetModule());
+    }
     member->SetParent(this);
     members.push_back(std::unique_ptr<Symbol>(member));
     if (member->IsFunctionSymbol())
@@ -123,6 +127,7 @@ FunctionGroupSymbol* ContainerSymbol::MakeFunctionGroupSymbol(const std::u32stri
     {
         FunctionGroupSymbol* functionGroupSymbol = new FunctionGroupSymbol(span, groupName);
         functionGroupSymbol->SetSymbolTable(GetSymbolTable());
+        functionGroupSymbol->SetModule(GetModule());
         AddMember(functionGroupSymbol);
         return functionGroupSymbol;
     }
@@ -132,7 +137,7 @@ FunctionGroupSymbol* ContainerSymbol::MakeFunctionGroupSymbol(const std::u32stri
     }
     else
     {
-        throw Exception("name of symbol '" + ToUtf8(symbol->FullName()) + "' conflicts with a function group '" + ToUtf8(groupName) + "'", symbol->GetSpan(), span);
+        throw Exception(GetModule(), "name of symbol '" + ToUtf8(symbol->FullName()) + "' conflicts with a function group '" + ToUtf8(groupName) + "'", symbol->GetSpan(), span);
     }
 }
 
@@ -143,6 +148,7 @@ ConceptGroupSymbol* ContainerSymbol::MakeConceptGroupSymbol(const std::u32string
     {
         ConceptGroupSymbol* conceptGroupSymbol = new ConceptGroupSymbol(span, groupName);
         conceptGroupSymbol->SetSymbolTable(GetSymbolTable());
+        conceptGroupSymbol->SetModule(GetModule());
         AddMember(conceptGroupSymbol);
         return conceptGroupSymbol;
     }
@@ -152,7 +158,7 @@ ConceptGroupSymbol* ContainerSymbol::MakeConceptGroupSymbol(const std::u32string
     }
     else
     {
-        throw Exception("name of symbol '" + ToUtf8(symbol->FullName()) + "' conflicts with a concept group '" + ToUtf8(groupName) + "'", symbol->GetSpan(), span);
+        throw Exception(GetModule(), "name of symbol '" + ToUtf8(symbol->FullName()) + "' conflicts with a concept group '" + ToUtf8(groupName) + "'", symbol->GetSpan(), span);
     }
 }
 
@@ -163,6 +169,7 @@ ClassGroupTypeSymbol* ContainerSymbol::MakeClassGroupTypeSymbol(const std::u32st
     {
         ClassGroupTypeSymbol* classGroupTypeSymbol = new ClassGroupTypeSymbol(span, groupName);
         classGroupTypeSymbol->SetSymbolTable(GetSymbolTable());
+        classGroupTypeSymbol->SetModule(GetModule());
         AddMember(classGroupTypeSymbol);
         return classGroupTypeSymbol;
     }
@@ -172,7 +179,7 @@ ClassGroupTypeSymbol* ContainerSymbol::MakeClassGroupTypeSymbol(const std::u32st
     }
     else
     {
-        throw Exception("name of symbol '" + ToUtf8(symbol->FullName()) + "' conflicts with a class group '" + ToUtf8(groupName) + "'", symbol->GetSpan(), span);
+        throw Exception(GetModule(), "name of symbol '" + ToUtf8(symbol->FullName()) + "' conflicts with a class group '" + ToUtf8(groupName) + "'", symbol->GetSpan(), span);
     }
 }
 

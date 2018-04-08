@@ -9,9 +9,12 @@
 
 namespace cmajor { namespace symbols {
 
+class Module;
+
 class IntrinsicFunction
 {
 public:
+    IntrinsicFunction(Module* module_);
     virtual ~IntrinsicFunction();
     virtual int Arity() const = 0;
     virtual const char* GroupName() const = 0;
@@ -19,6 +22,8 @@ public:
     virtual TypeSymbol* ReturnType(SymbolTable& symbolTable) const = 0;
     virtual std::unique_ptr<Value> DoEvaluate(const std::vector<std::unique_ptr<Value>>& arguments, const std::vector<TypeSymbol*>& templateArguments, const Span& span) = 0;
     std::unique_ptr<Value> Evaluate(const std::vector<std::unique_ptr<Value>>& arguments, const std::vector<TypeSymbol*>& templateArguments, const Span& span);
+private:
+    Module* module;
 };
 
 void MetaInit(SymbolTable& symbolTable);

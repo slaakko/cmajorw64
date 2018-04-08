@@ -18,6 +18,7 @@
 #include <cmajor/util/Unicode.hpp>
 #include <cmajor/util/Sha1.hpp>
 #include <llvm/IR/Module.h>
+#include <boost/uuid/uuid_generators.hpp>
 
 namespace cmajor { namespace symbols {
 
@@ -218,13 +219,13 @@ std::string FunctionSymbolFlagStr(FunctionSymbolFlags flags)
 }
 
 FunctionSymbol::FunctionSymbol(const Span& span_, const std::u32string& name_) : 
-    ContainerSymbol(SymbolType::functionSymbol, span_, name_), functionId(0), groupName(), parameters(), localVariables(), returnType(), flags(FunctionSymbolFlags::none), vmtIndex(-1), imtIndex(-1),
+    ContainerSymbol(SymbolType::functionSymbol, span_, name_), functionId(boost::uuids::nil_generator()()), groupName(), parameters(), localVariables(), returnType(), flags(FunctionSymbolFlags::none), vmtIndex(-1), imtIndex(-1),
     irType(nullptr), nextTemporaryIndex(0), functionGroup(nullptr), isProgramMain(false)
 {
 }
 
 FunctionSymbol::FunctionSymbol(SymbolType symbolType_, const Span& span_, const std::u32string& name_) : 
-    ContainerSymbol(symbolType_, span_, name_), functionId(0), groupName(), parameters(), localVariables(), returnType(), flags(FunctionSymbolFlags::none), vmtIndex(-1), imtIndex(-1),
+    ContainerSymbol(symbolType_, span_, name_), functionId(boost::uuids::nil_generator()()), groupName(), parameters(), localVariables(), returnType(), flags(FunctionSymbolFlags::none), vmtIndex(-1), imtIndex(-1),
     irType(nullptr), nextTemporaryIndex(0), sizeOfAstNodes(0), astNodesPos(0), functionGroup(nullptr), isProgramMain(false)
 {
 }
@@ -232,7 +233,7 @@ FunctionSymbol::FunctionSymbol(SymbolType symbolType_, const Span& span_, const 
 void FunctionSymbol::Write(SymbolWriter& writer)
 {
     ContainerSymbol::Write(writer);
-    Assert(functionId != 0, "function id not initialized");
+    Assert(!functionId.is_nil(), "function id not initialized");
     writer.GetBinaryWriter().Write(functionId);
     writer.GetBinaryWriter().Write(groupName);
     writer.GetBinaryWriter().Write(static_cast<uint16_t>(flags));
@@ -251,7 +252,7 @@ void FunctionSymbol::Write(SymbolWriter& writer)
         writer.GetBinaryWriter().Write(sizeOfAstNodes);
         writer.GetBinaryWriter().Seek(endPos);
     }
-    uint32_t returnTypeId = 0;
+    boost::uuids::uuid returnTypeId = boost::uuids::nil_generator()();
     if (returnType)
     {
         returnTypeId = returnType->TypeId();
@@ -279,7 +280,7 @@ void FunctionSymbol::Write(SymbolWriter& writer)
 void FunctionSymbol::Read(SymbolReader& reader)
 {
     ContainerSymbol::Read(reader);
-    functionId = reader.GetBinaryReader().ReadUInt();
+    reader.GetBinaryReader().ReadUuid(functionId);
     GetSymbolTable()->AddFunctionSymbolToFunctionIdMap(this);
     groupName = reader.GetBinaryReader().ReadUtf32String();
     flags = static_cast<FunctionSymbolFlags>(reader.GetBinaryReader().ReadUShort());
@@ -290,8 +291,10 @@ void FunctionSymbol::Read(SymbolReader& reader)
         reader.GetBinaryReader().Skip(sizeOfAstNodes);
         filePathReadFrom = reader.GetBinaryReader().FileName();
     }
-    uint32_t returnTypeId = reader.GetBinaryReader().ReadUInt();
-    if (returnTypeId != 0)
+    //uint32_t returnTypeId = reader.GetBinaryReader().ReadUInt();
+    boost::uuids::uuid returnTypeId;
+    reader.GetBinaryReader().ReadUuid(returnTypeId);
+    if (!returnTypeId.is_nil())
     {
         GetSymbolTable()->EmplaceTypeRequest(this, returnTypeId, 0);
     }
@@ -988,19 +991,19 @@ void FunctionSymbol::SetSpecifiers(Specifiers specifiers)
     SetAccess(accessSpecifiers);
     if ((specifiers & Specifiers::static_) != Specifiers::none)
     {
-        throw Exception("only member functions can be static", GetSpan());
+        throw Exception(GetModule(), "only member functions can be static", GetSpan());
     }
     if ((specifiers & Specifiers::virtual_) != Specifiers::none)
     {
-        throw Exception("only member functions can be virtual", GetSpan());
+        throw Exception(GetModule(), "only member functions can be virtual", GetSpan());
     }
     if ((specifiers & Specifiers::override_) != Specifiers::none)
     {
-        throw Exception("only member functions can be override", GetSpan());
+        throw Exception(GetModule(), "only member functions can be override", GetSpan());
     }
     if ((specifiers & Specifiers::abstract_) != Specifiers::none)
     {
-        throw Exception("only member functions can be abstract", GetSpan());
+        throw Exception(GetModule(), "only member functions can be abstract", GetSpan());
     }
     if ((specifiers & Specifiers::inline_) != Specifiers::none)
     {
@@ -1008,7 +1011,7 @@ void FunctionSymbol::SetSpecifiers(Specifiers specifiers)
     }
     if ((specifiers & Specifiers::explicit_) != Specifiers::none)
     {
-        throw Exception("only constructors can be explicit", GetSpan());
+        throw Exception(GetModule(), "only constructors can be explicit", GetSpan());
     }
     if ((specifiers & Specifiers::external_) != Specifiers::none)
     {
@@ -1016,11 +1019,11 @@ void FunctionSymbol::SetSpecifiers(Specifiers specifiers)
     }
     if ((specifiers & Specifiers::suppress_) != Specifiers::none)
     {
-        throw Exception("only special member functions can be suppressed", GetSpan());
+        throw Exception(GetModule(), "only special member functions can be suppressed", GetSpan());
     }
     if ((specifiers & Specifiers::default_) != Specifiers::none)
     {
-        throw Exception("only special member functions can be default", GetSpan());
+        throw Exception(GetModule(), "only special member functions can be default", GetSpan());
     }
     if ((specifiers & Specifiers::constexpr_) != Specifiers::none)
     {
@@ -1038,22 +1041,22 @@ void FunctionSymbol::SetSpecifiers(Specifiers specifiers)
     {
         if (IsNothrow())
         {
-            throw Exception("function symbol cannot be throw and nothrow at the same time", GetSpan());
+            throw Exception(GetModule(), "function symbol cannot be throw and nothrow at the same time", GetSpan());
         }
     }
     if ((specifiers & Specifiers::new_) != Specifiers::none)
     {
-        throw Exception("only member functions can be new", GetSpan());
+        throw Exception(GetModule(), "only member functions can be new", GetSpan());
     }
     if ((specifiers & Specifiers::const_) != Specifiers::none)
     {
-        throw Exception("only member functions can be const", GetSpan());
+        throw Exception(GetModule(), "only member functions can be const", GetSpan());
     }
     if ((specifiers & Specifiers::unit_test_) != Specifiers::none)
     {
         if (!GetGlobalFlag(GlobalFlags::unitTest))
         {
-            throw Exception("function symbol cannot be unit_test", GetSpan());
+            throw Exception(GetModule(), "function symbol cannot be unit_test", GetSpan());
         }
     }
 }
@@ -1146,43 +1149,43 @@ void StaticConstructorSymbol::SetSpecifiers(Specifiers specifiers)
     SetStatic();
     if ((specifiers & Specifiers::virtual_) != Specifiers::none)
     {
-        throw Exception("static constructor cannot be virtual", GetSpan());
+        throw Exception(GetModule(), "static constructor cannot be virtual", GetSpan());
     }
     if ((specifiers & Specifiers::override_) != Specifiers::none)
     {
-        throw Exception("static constructor cannot be override", GetSpan());
+        throw Exception(GetModule(), "static constructor cannot be override", GetSpan());
     }
     if ((specifiers & Specifiers::abstract_) != Specifiers::none)
     {
-        throw Exception("static constructor cannot be abstract", GetSpan());
+        throw Exception(GetModule(), "static constructor cannot be abstract", GetSpan());
     }
     if ((specifiers & Specifiers::inline_) != Specifiers::none)
     {
-        throw Exception("static constructor cannot be inline", GetSpan());
+        throw Exception(GetModule(), "static constructor cannot be inline", GetSpan());
     }
     if ((specifiers & Specifiers::explicit_) != Specifiers::none)
     {
-        throw Exception("static constructor cannot be explicit", GetSpan());
+        throw Exception(GetModule(), "static constructor cannot be explicit", GetSpan());
     }
     if ((specifiers & Specifiers::external_) != Specifiers::none)
     {
-        throw Exception("static constructor cannot be external", GetSpan());
+        throw Exception(GetModule(), "static constructor cannot be external", GetSpan());
     }
     if ((specifiers & Specifiers::suppress_) != Specifiers::none)
     {
-        throw Exception("static constructor cannot be suppressed", GetSpan());
+        throw Exception(GetModule(), "static constructor cannot be suppressed", GetSpan());
     }
     if ((specifiers & Specifiers::default_) != Specifiers::none)
     {
-        throw Exception("static constructor cannot be default", GetSpan());
+        throw Exception(GetModule(), "static constructor cannot be default", GetSpan());
     }
     if ((specifiers & Specifiers::constexpr_) != Specifiers::none)
     {
-        throw Exception("static constructor cannot be constexpr", GetSpan());
+        throw Exception(GetModule(), "static constructor cannot be constexpr", GetSpan());
     }
     if ((specifiers & Specifiers::cdecl_) != Specifiers::none)
     {
-        throw Exception("static constructor cannot be cdecl", GetSpan());
+        throw Exception(GetModule(), "static constructor cannot be cdecl", GetSpan());
     }
     if ((specifiers & Specifiers::nothrow_) != Specifiers::none)
     {
@@ -1192,20 +1195,20 @@ void StaticConstructorSymbol::SetSpecifiers(Specifiers specifiers)
     {
         if (IsNothrow())
         {
-            throw Exception("static constructor cannot be throw and nothrow at the same time", GetSpan());
+            throw Exception(GetModule(), "static constructor cannot be throw and nothrow at the same time", GetSpan());
         }
     }
     if ((specifiers & Specifiers::new_) != Specifiers::none)
     {
-        throw Exception("static constructor cannot be new", GetSpan());
+        throw Exception(GetModule(), "static constructor cannot be new", GetSpan());
     }
     if ((specifiers & Specifiers::const_) != Specifiers::none)
     {
-        throw Exception("static constructor cannot be const", GetSpan());
+        throw Exception(GetModule(), "static constructor cannot be const", GetSpan());
     }
     if ((specifiers & Specifiers::unit_test_) != Specifiers::none)
     {
-        throw Exception("static constructor cannot be unit_test", GetSpan());
+        throw Exception(GetModule(), "static constructor cannot be unit_test", GetSpan());
     }
 }
 
@@ -1282,19 +1285,19 @@ void ConstructorSymbol::SetSpecifiers(Specifiers specifiers)
     SetAccess(accessSpecifiers);
     if ((specifiers & Specifiers::static_) != Specifiers::none)
     {
-        throw Exception("ordinary constructor cannot be static", GetSpan());
+        throw Exception(GetModule(), "ordinary constructor cannot be static", GetSpan());
     }
     if ((specifiers & Specifiers::virtual_) != Specifiers::none)
     {
-        throw Exception("constructor cannot be virtual", GetSpan());
+        throw Exception(GetModule(), "constructor cannot be virtual", GetSpan());
     }
     if ((specifiers & Specifiers::override_) != Specifiers::none)
     {
-        throw Exception("constructor cannot be override", GetSpan());
+        throw Exception(GetModule(), "constructor cannot be override", GetSpan());
     }
     if ((specifiers & Specifiers::abstract_) != Specifiers::none)
     {
-        throw Exception("constructor cannot be abstract", GetSpan());
+        throw Exception(GetModule(), "constructor cannot be abstract", GetSpan());
     }
     if ((specifiers & Specifiers::inline_) != Specifiers::none)
     {
@@ -1306,13 +1309,13 @@ void ConstructorSymbol::SetSpecifiers(Specifiers specifiers)
     }
     if ((specifiers & Specifiers::external_) != Specifiers::none)
     {
-        throw Exception("constructor cannot be external", GetSpan());
+        throw Exception(GetModule(), "constructor cannot be external", GetSpan());
     }
     if ((specifiers & Specifiers::suppress_) != Specifiers::none)
     {
         if (IsInline())
         {
-            throw Exception("suppressed member function cannot be inline", GetSpan());
+            throw Exception(GetModule(), "suppressed member function cannot be inline", GetSpan());
         }
         SetSuppressed();
     }
@@ -1320,11 +1323,11 @@ void ConstructorSymbol::SetSpecifiers(Specifiers specifiers)
     {
         if (IsSuppressed())
         {
-            throw Exception("constructor cannot be default and suppressed at the same time", GetSpan());
+            throw Exception(GetModule(), "constructor cannot be default and suppressed at the same time", GetSpan());
         }
         if (IsInline())
         {
-            throw Exception("default member function cannot be inline", GetSpan());
+            throw Exception(GetModule(), "default member function cannot be inline", GetSpan());
         }
         SetDefault();
     }
@@ -1334,7 +1337,7 @@ void ConstructorSymbol::SetSpecifiers(Specifiers specifiers)
     }
     if ((specifiers & Specifiers::cdecl_) != Specifiers::none)
     {
-        throw Exception("constructor cannot be cdecl", GetSpan());
+        throw Exception(GetModule(), "constructor cannot be cdecl", GetSpan());
     }
     if ((specifiers & Specifiers::nothrow_) != Specifiers::none)
     {
@@ -1344,20 +1347,20 @@ void ConstructorSymbol::SetSpecifiers(Specifiers specifiers)
     {
         if (IsNothrow())
         {
-            throw Exception("constructor cannot be throw and nothrow at the same time", GetSpan());
+            throw Exception(GetModule(), "constructor cannot be throw and nothrow at the same time", GetSpan());
         }
     }
     if ((specifiers & Specifiers::new_) != Specifiers::none)
     {
-        throw Exception("constructor cannot be new", GetSpan());
+        throw Exception(GetModule(), "constructor cannot be new", GetSpan());
     }
     if ((specifiers & Specifiers::const_) != Specifiers::none)
     {
-        throw Exception("constructor cannot be const", GetSpan());
+        throw Exception(GetModule(), "constructor cannot be const", GetSpan());
     }
     if ((specifiers & Specifiers::unit_test_) != Specifiers::none)
     {
-        throw Exception("constructor cannot be unit_test", GetSpan());
+        throw Exception(GetModule(), "constructor cannot be unit_test", GetSpan());
     }
 }
 
@@ -1397,12 +1400,12 @@ void DestructorSymbol::SetSpecifiers(Specifiers specifiers)
     Specifiers accessSpecifiers = specifiers & Specifiers::access_;
     if (accessSpecifiers != Specifiers::public_)
     {
-        throw Exception("destructor must be public", GetSpan());
+        throw Exception(GetModule(), "destructor must be public", GetSpan());
     }
     SetAccess(accessSpecifiers);
     if ((specifiers & Specifiers::static_) != Specifiers::none)
     {
-        throw Exception("destructor cannot be static", GetSpan());
+        throw Exception(GetModule(), "destructor cannot be static", GetSpan());
     }
     if ((specifiers & Specifiers::virtual_) != Specifiers::none)
     {
@@ -1412,29 +1415,29 @@ void DestructorSymbol::SetSpecifiers(Specifiers specifiers)
     {
         if (IsVirtual())
         {
-            throw Exception("destructor cannot be virtual and override at the same time", GetSpan());
+            throw Exception(GetModule(), "destructor cannot be virtual and override at the same time", GetSpan());
         }
         SetOverride();
     }
     if ((specifiers & Specifiers::abstract_) != Specifiers::none)
     {
-        throw Exception("destructor cannot be abstract", GetSpan());
+        throw Exception(GetModule(), "destructor cannot be abstract", GetSpan());
     }
     if ((specifiers & Specifiers::inline_) != Specifiers::none)
     {
-        throw Exception("destructor cannot be inline", GetSpan());
+        throw Exception(GetModule(), "destructor cannot be inline", GetSpan());
     }
     if ((specifiers & Specifiers::explicit_) != Specifiers::none)
     {
-        throw Exception("destructor cannot be explicit", GetSpan());
+        throw Exception(GetModule(), "destructor cannot be explicit", GetSpan());
     }
     if ((specifiers & Specifiers::external_) != Specifiers::none)
     {
-        throw Exception("destructor cannot be external", GetSpan());
+        throw Exception(GetModule(), "destructor cannot be external", GetSpan());
     }
     if ((specifiers & Specifiers::suppress_) != Specifiers::none)
     {
-        throw Exception("destructor cannot be suppressed", GetSpan());
+        throw Exception(GetModule(), "destructor cannot be suppressed", GetSpan());
     }
     if ((specifiers & Specifiers::default_) != Specifiers::none)
     {
@@ -1442,31 +1445,31 @@ void DestructorSymbol::SetSpecifiers(Specifiers specifiers)
     }
     if ((specifiers & Specifiers::constexpr_) != Specifiers::none)
     {
-        throw Exception("destructor cannot be constexpr", GetSpan());
+        throw Exception(GetModule(), "destructor cannot be constexpr", GetSpan());
     }
     if ((specifiers & Specifiers::cdecl_) != Specifiers::none)
     {
-        throw Exception("destructor cannot be cdecl", GetSpan());
+        throw Exception(GetModule(), "destructor cannot be cdecl", GetSpan());
     }
     if ((specifiers & Specifiers::nothrow_) != Specifiers::none)
     {
-        throw Exception("destructor is implicitly nothrow", GetSpan());
+        throw Exception(GetModule(), "destructor is implicitly nothrow", GetSpan());
     }
     if ((specifiers & Specifiers::throw_) != Specifiers::none)
     {
-        throw Exception("destructor cannot be throw", GetSpan());
+        throw Exception(GetModule(), "destructor cannot be throw", GetSpan());
     }
     if ((specifiers & Specifiers::new_) != Specifiers::none)
     {
-        throw Exception("destructor cannot be new", GetSpan());
+        throw Exception(GetModule(), "destructor cannot be new", GetSpan());
     }
     if ((specifiers & Specifiers::const_) != Specifiers::none)
     {
-        throw Exception("destructor cannot be const", GetSpan());
+        throw Exception(GetModule(), "destructor cannot be const", GetSpan());
     }
     if ((specifiers & Specifiers::unit_test_) != Specifiers::none)
     {
-        throw Exception("destructor cannot be unit_test", GetSpan());
+        throw Exception(GetModule(), "destructor cannot be unit_test", GetSpan());
     }
 }
 
@@ -1557,7 +1560,7 @@ void MemberFunctionSymbol::SetSpecifiers(Specifiers specifiers)
     {
         if (IsVirtual())
         {
-            throw Exception("member function cannot be virtual and override at the same time", GetSpan());
+            throw Exception(GetModule(), "member function cannot be virtual and override at the same time", GetSpan());
         }
         SetOverride();
     }
@@ -1565,7 +1568,7 @@ void MemberFunctionSymbol::SetSpecifiers(Specifiers specifiers)
     {
         if (IsVirtual() || IsOverride())
         {
-            throw Exception("member function cannot be abstract and virtual or override at the same time", GetSpan());
+            throw Exception(GetModule(), "member function cannot be abstract and virtual or override at the same time", GetSpan());
         }
         SetAbstract();
     }
@@ -1575,17 +1578,17 @@ void MemberFunctionSymbol::SetSpecifiers(Specifiers specifiers)
     }
     if ((specifiers & Specifiers::explicit_) != Specifiers::none)
     {
-        throw Exception("member function cannot be explicit", GetSpan());
+        throw Exception(GetModule(), "member function cannot be explicit", GetSpan());
     }
     if ((specifiers & Specifiers::external_) != Specifiers::none)
     {
-        throw Exception("member function cannot be external", GetSpan());
+        throw Exception(GetModule(), "member function cannot be external", GetSpan());
     }
     if ((specifiers & Specifiers::suppress_) != Specifiers::none)
     {
         if (IsInline())
         {
-            throw Exception("suppressed member function cannot be inline", GetSpan());
+            throw Exception(GetModule(), "suppressed member function cannot be inline", GetSpan());
         }
         if (GroupName() == U"operator=")
         {
@@ -1593,18 +1596,18 @@ void MemberFunctionSymbol::SetSpecifiers(Specifiers specifiers)
         }
         else
         {
-            throw Exception("only special member functions can be suppressed", GetSpan());
+            throw Exception(GetModule(), "only special member functions can be suppressed", GetSpan());
         }
     }
     if ((specifiers & Specifiers::default_) != Specifiers::none)
     {
         if (IsSuppressed())
         {
-            throw Exception("member function cannot be default and suppressed at the same time", GetSpan());
+            throw Exception(GetModule(), "member function cannot be default and suppressed at the same time", GetSpan());
         }
         if (IsInline())
         {
-            throw Exception("default member function cannot be inline", GetSpan());
+            throw Exception(GetModule(), "default member function cannot be inline", GetSpan());
         }
         if (GroupName() == U"operator=")
         {
@@ -1612,7 +1615,7 @@ void MemberFunctionSymbol::SetSpecifiers(Specifiers specifiers)
         }
         else
         {
-            throw Exception("only special member functions can be default", GetSpan());
+            throw Exception(GetModule(), "only special member functions can be default", GetSpan());
         }
     }
     if ((specifiers & Specifiers::constexpr_) != Specifiers::none)
@@ -1621,7 +1624,7 @@ void MemberFunctionSymbol::SetSpecifiers(Specifiers specifiers)
     }
     if ((specifiers & Specifiers::cdecl_) != Specifiers::none)
     {
-        throw Exception("member function cannot be cdecl", GetSpan());
+        throw Exception(GetModule(), "member function cannot be cdecl", GetSpan());
     }
     if ((specifiers & Specifiers::nothrow_) != Specifiers::none)
     {
@@ -1631,14 +1634,14 @@ void MemberFunctionSymbol::SetSpecifiers(Specifiers specifiers)
     {
         if (IsNothrow())
         {
-            throw Exception("member function cannot be throw and nothrow at the same time", GetSpan());
+            throw Exception(GetModule(), "member function cannot be throw and nothrow at the same time", GetSpan());
         }
     }
     if ((specifiers & Specifiers::new_) != Specifiers::none)
     {
         if (IsVirtualAbstractOrOverride())
         {
-            throw Exception("member function cannot be new and virtual, abstract or overridden at the same time", GetSpan());
+            throw Exception(GetModule(), "member function cannot be new and virtual, abstract or overridden at the same time", GetSpan());
         }
         SetNew();
     }
@@ -1648,7 +1651,7 @@ void MemberFunctionSymbol::SetSpecifiers(Specifiers specifiers)
     }
     if ((specifiers & Specifiers::unit_test_) != Specifiers::none)
     {
-        throw Exception("member function cannot be unit_test", GetSpan());
+        throw Exception(GetModule(), "member function cannot be unit_test", GetSpan());
     }
 }
 
@@ -1695,19 +1698,19 @@ void ConversionFunctionSymbol::SetSpecifiers(Specifiers specifiers)
     SetAccess(accessSpecifiers);
     if ((specifiers & Specifiers::static_) != Specifiers::none)
     {
-        throw Exception("conversion function cannot be static", GetSpan());
+        throw Exception(GetModule(), "conversion function cannot be static", GetSpan());
     }
     if ((specifiers & Specifiers::virtual_) != Specifiers::none)
     {
-        throw Exception("conversion function cannot be virtual", GetSpan());
+        throw Exception(GetModule(), "conversion function cannot be virtual", GetSpan());
     }
     if ((specifiers & Specifiers::override_) != Specifiers::none)
     {
-        throw Exception("conversion function cannot be override", GetSpan());
+        throw Exception(GetModule(), "conversion function cannot be override", GetSpan());
     }
     if ((specifiers & Specifiers::abstract_) != Specifiers::none)
     {
-        throw Exception("conversion function cannot be abstract", GetSpan());
+        throw Exception(GetModule(), "conversion function cannot be abstract", GetSpan());
     }
     if ((specifiers & Specifiers::inline_) != Specifiers::none)
     {
@@ -1715,19 +1718,19 @@ void ConversionFunctionSymbol::SetSpecifiers(Specifiers specifiers)
     }
     if ((specifiers & Specifiers::explicit_) != Specifiers::none)
     {
-        throw Exception("conversion function cannot be explicit", GetSpan());
+        throw Exception(GetModule(), "conversion function cannot be explicit", GetSpan());
     }
     if ((specifiers & Specifiers::external_) != Specifiers::none)
     {
-        throw Exception("conversion function cannot be external", GetSpan());
+        throw Exception(GetModule(), "conversion function cannot be external", GetSpan());
     }
     if ((specifiers & Specifiers::suppress_) != Specifiers::none)
     {
-        throw Exception("conversion function cannot be suppressed", GetSpan());
+        throw Exception(GetModule(), "conversion function cannot be suppressed", GetSpan());
     }
     if ((specifiers & Specifiers::default_) != Specifiers::none)
     {
-        throw Exception("conversion function cannot be default", GetSpan());
+        throw Exception(GetModule(), "conversion function cannot be default", GetSpan());
     }
     if ((specifiers & Specifiers::constexpr_) != Specifiers::none)
     {
@@ -1735,7 +1738,7 @@ void ConversionFunctionSymbol::SetSpecifiers(Specifiers specifiers)
     }
     if ((specifiers & Specifiers::cdecl_) != Specifiers::none)
     {
-        throw Exception("conversion function cannot be cdecl", GetSpan());
+        throw Exception(GetModule(), "conversion function cannot be cdecl", GetSpan());
     }
     if ((specifiers & Specifiers::nothrow_) != Specifiers::none)
     {
@@ -1745,12 +1748,12 @@ void ConversionFunctionSymbol::SetSpecifiers(Specifiers specifiers)
     {
         if (IsNothrow())
         {
-            throw Exception("conversion function cannot be throw and nothrow at the same time", GetSpan());
+            throw Exception(GetModule(), "conversion function cannot be throw and nothrow at the same time", GetSpan());
         }
     }
     if ((specifiers & Specifiers::new_) != Specifiers::none)
     {
-        throw Exception("conversion function cannot be new", GetSpan());
+        throw Exception(GetModule(), "conversion function cannot be new", GetSpan());
     }
     if ((specifiers & Specifiers::const_) != Specifiers::none)
     {
@@ -1758,13 +1761,15 @@ void ConversionFunctionSymbol::SetSpecifiers(Specifiers specifiers)
     }
     if ((specifiers & Specifiers::unit_test_) != Specifiers::none)
     {
-        throw Exception("conversion function cannot be unit_test", GetSpan());
+        throw Exception(GetModule(), "conversion function cannot be unit_test", GetSpan());
     }
 }
 
 FunctionGroupTypeSymbol::FunctionGroupTypeSymbol(FunctionGroupSymbol* functionGroup_, void* boundFunctionGroup_) : 
     TypeSymbol(SymbolType::functionGroupTypeSymbol, Span(), functionGroup_->Name()), functionGroup(functionGroup_), boundFunctionGroup(boundFunctionGroup_)
 {
+    SetModule(functionGroup->GetModule());
+    SetSymbolTable(functionGroup->GetSymbolTable());
 }
 
 MemberExpressionTypeSymbol::MemberExpressionTypeSymbol(const Span& span_, const std::u32string& name_, void* boundMemberExpression_) :

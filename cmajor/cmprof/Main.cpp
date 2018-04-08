@@ -16,7 +16,7 @@
 #include <cmajor/symbols/InitDone.hpp>
 #include <cmajor/symbols/Exception.hpp>
 #include <cmajor/symbols/GlobalFlags.hpp>
-#include <cmajor/parser/FileRegistry.hpp>
+//#include <cmajor/parser/FileRegistry.hpp>
 #include <cmajor/dom/Parser.hpp>
 #include <cmajor/dom/Element.hpp>
 #include <cmajor/dom/CharacterData.hpp>
@@ -24,6 +24,8 @@
 #include <cmajor/build/Build.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/lexical_cast.hpp>
+#include <boost/uuid/uuid_generators.hpp>
+#include <boost/uuid/uuid_io.hpp>
 #include <iostream>
 #include <stdexcept>
 #include <string>
@@ -36,7 +38,7 @@ struct InitDone
     InitDone()
     {
         cmajor::ast::Init();
-        cmajor::parser::FileRegistry::Init();
+        //cmajor::parser::FileRegistry::Init();
         cmajor::symbols::Init();
         cmajor::parsing::Init();
         cmajor::util::Init();
@@ -83,8 +85,9 @@ inline Report operator&(Report left, Report right)
 
 struct ProfiledFunction
 {
-    ProfiledFunction() : functionId(0), functionName(), recursionCount(0), count(0), elapsedInclusive(0), elapsedExclusive(0), start(), childCalled(false) {}
-    uint32_t functionId;
+    ProfiledFunction() : functionId(boost::uuids::nil_generator()()), functionName(), recursionCount(0), count(0), elapsedInclusive(0), elapsedExclusive(0), start(), childCalled(false) {}
+    //uint32_t functionId;
+    boost::uuids::uuid functionId;
     std::u32string functionName;
     int recursionCount;
     int count;
@@ -520,8 +523,10 @@ std::unique_ptr<cmajor::dom::Document> GenerateReport(Module& module, std::vecto
 const uint8_t startEvent = 0;
 const uint8_t endEvent = 1;
 
-std::unique_ptr<cmajor::dom::Document> AnalyzeProfileData(const std::string& profileDataFileName, Module& module, 
-    std::unordered_map<uint32_t, ProfiledFunction>& functionProfileMap, std::vector<ProfiledFunction*>& profiledFunctions, int64_t& totalInclusive, int64_t& totalExclusive)
+//std::unique_ptr<cmajor::dom::Document> AnalyzeProfileData(const std::string& profileDataFileName, Module& module, 
+    //std::unordered_map<uint32_t, ProfiledFunction>& functionProfileMap, std::vector<ProfiledFunction*>& profiledFunctions, int64_t& totalInclusive, int64_t& totalExclusive)
+std::unique_ptr<cmajor::dom::Document> AnalyzeProfileData(const std::string& profileDataFileName, Module& module,
+    std::unordered_map<boost::uuids::uuid, ProfiledFunction, boost::hash<boost::uuids::uuid>>& functionProfileMap, std::vector<ProfiledFunction*>& profiledFunctions, int64_t& totalInclusive, int64_t& totalExclusive)
 {
     std::unique_ptr<cmajor::dom::Document> analyzedProfileDataDoc(new cmajor::dom::Document());
     std::vector<ProfiledFunction*> functionPath;
@@ -533,7 +538,9 @@ std::unique_ptr<cmajor::dom::Document> AnalyzeProfileData(const std::string& pro
     uint64_t n = reader.ReadULong();
     for (uint64_t i = 0; i < n; ++i)
     {
-        uint32_t functionId = reader.ReadUInt();
+        //uint32_t functionId = reader.ReadUInt();
+        boost::uuids::uuid functionId;
+        reader.ReadUuid(functionId);
         uint64_t timePointCount = reader.ReadULong();
         uint8_t eventKind = reader.ReadByte();
         std::chrono::high_resolution_clock::time_point timePoint{ std::chrono::high_resolution_clock::duration{ timePointCount } };
@@ -550,13 +557,14 @@ std::unique_ptr<cmajor::dom::Document> AnalyzeProfileData(const std::string& pro
             prevTimePoint = timePoint;
         }
         ProfiledFunction& fun = functionProfileMap[functionId];
-        if (!fun.functionId)
+        if (fun.functionId.is_nil())
         {
             fun.functionId = functionId;
             fun.functionName = module.GetSymbolTable().GetProfiledFunctionName(functionId);
             if (fun.functionName.empty())
             {
-                fun.functionName = ToUtf32(std::to_string(functionId));
+                //fun.functionName = ToUtf32(std::to_string(functionId));
+                fun.functionName = ToUtf32(boost::uuids::to_string(functionId));
             }
         }
         if (eventKind == startEvent)
@@ -610,7 +618,8 @@ std::unique_ptr<cmajor::dom::Document> AnalyzeProfileData(const std::string& pro
     for (ProfiledFunction* fun : profiledFunctions)
     {
         cmajor::dom::Element* functionElement = new cmajor::dom::Element(U"function");
-        functionElement->SetAttribute(U"id", ToUtf32(std::to_string(fun->functionId)));
+        //functionElement->SetAttribute(U"id", ToUtf32(std::to_string(fun->functionId)));
+        functionElement->SetAttribute(U"id", ToUtf32(boost::uuids::to_string(fun->functionId)));
         functionElement->SetAttribute(U"name", fun->functionName);
         functionElement->SetAttribute(U"count", ToUtf32(std::to_string(fun->count)));
         functionElement->SetAttribute(U"elapsedInclusive", ToUtf32(std::to_string(fun->elapsedInclusive)));
@@ -663,7 +672,7 @@ void ReadProject(const std::string& projectFilePath, Solution& solution, bool re
     }
 }
 
-void ProfileProject(const std::string& projectFilePath, bool rebuildSys, bool rebuildApp, int top, Report report, std::string& outFile, const std::string& args)
+void ProfileProject(const std::string& projectFilePath, bool rebuildSys, bool rebuildApp, int top, Report report, std::string& outFile, const std::string& args, std::unique_ptr<Module>& rootModule)
 {
     if (GetGlobalFlag(GlobalFlags::verbose))
     {
@@ -682,7 +691,8 @@ void ProfileProject(const std::string& projectFilePath, bool rebuildSys, bool re
             if (rebuildSys || !project->IsUpToDate(systemModuleFilePath))
             {
                 rebuildSys = true;
-                BuildProject(project);
+                bool stop = false;
+                BuildProject(project, rootModule, stop);
             }
             else if (GetGlobalFlag(GlobalFlags::verbose))
             {
@@ -698,7 +708,8 @@ void ProfileProject(const std::string& projectFilePath, bool rebuildSys, bool re
             if (rebuildApp || rebuildSys || !project->IsUpToDate(systemModuleFilePath))
             {
                 rebuildApp = true;
-                BuildProject(project);
+                bool stop = false;
+                BuildProject(project, rootModule, stop);
             }
             else if (GetGlobalFlag(GlobalFlags::verbose))
             {
@@ -718,12 +729,12 @@ void ProfileProject(const std::string& projectFilePath, bool rebuildSys, bool re
     std::string moduleFilePath = mainProject->ModuleFilePath();
     std::vector<ClassTypeSymbol*> classTypes;
     std::vector<ClassTemplateSpecializationSymbol*> classTemplateSpecializations;
-    Module module(moduleFilePath, classTypes, classTemplateSpecializations);
+    rootModule.reset(new Module(moduleFilePath, classTypes, classTemplateSpecializations));
     CompileUnitNode compileUnit(Span(), "foo");
-    AttributeBinder attributeBinder;
-    ModuleBinder moduleBinder(module, &compileUnit, &attributeBinder);
+    AttributeBinder attributeBinder(rootModule.get());
+    ModuleBinder moduleBinder(*rootModule, &compileUnit, &attributeBinder);
     moduleBinder.SetBindingTypes();
-    module.GetSymbolTable().AddClassTemplateSpecializationsToClassTemplateSpecializationMap(classTemplateSpecializations);
+    rootModule->GetSymbolTable().AddClassTemplateSpecializationsToClassTemplateSpecializationMap(classTemplateSpecializations);
     for (ClassTemplateSpecializationSymbol* classTemplateSpecialization : classTemplateSpecializations)
     {
         moduleBinder.BindClassTemplateSpecialization(classTemplateSpecialization);
@@ -760,11 +771,12 @@ void ProfileProject(const std::string& projectFilePath, bool rebuildSys, bool re
     {
         std::cout << "Analyzing profile data..." << std::endl;
     }
-    std::unordered_map<uint32_t, ProfiledFunction> functionProfileMap;
+    //std::unordered_map<uint32_t, ProfiledFunction> functionProfileMap;
+    std::unordered_map<boost::uuids::uuid, ProfiledFunction, boost::hash<boost::uuids::uuid>> functionProfileMap;
     std::vector<ProfiledFunction*> profiledFunctions;
     int64_t totalInclusive = 0;
     int64_t totalExclusive = 0;
-    std::unique_ptr<cmajor::dom::Document> analyzedProfileDataDoc = AnalyzeProfileData(profileDataFileName, module, functionProfileMap, profiledFunctions, totalInclusive, totalExclusive);
+    std::unique_ptr<cmajor::dom::Document> analyzedProfileDataDoc = AnalyzeProfileData(profileDataFileName, *rootModule, functionProfileMap, profiledFunctions, totalInclusive, totalExclusive);
     if (GetGlobalFlag(GlobalFlags::verbose))
     {
         std::cout << "Finished analyzing profile data." << std::endl;
@@ -789,7 +801,7 @@ void ProfileProject(const std::string& projectFilePath, bool rebuildSys, bool re
         std::cout << "Generating report..." << std::endl;
     }
     boost::filesystem::path htmlFilePath = boost::filesystem::path(outFile).replace_extension(".html");
-    std::unique_ptr<cmajor::dom::Document> reportHtmlDoc = GenerateReport(module, profiledFunctions, report, top, totalInclusive, totalExclusive);
+    std::unique_ptr<cmajor::dom::Document> reportHtmlDoc = GenerateReport(*rootModule, profiledFunctions, report, top, totalInclusive, totalExclusive);
     std::string reportHtmlFileName = GetFullPath(htmlFilePath.generic_string());
     std::ofstream reportHtmlFile(reportHtmlFileName);
     cmajor::util::CodeFormatter htmlFormatter(reportHtmlFile);
@@ -844,6 +856,7 @@ void PrintHelp()
 
 int main(int argc, const char** argv)
 {
+    std::unique_ptr<Module> rootModule;
     try
     { 
         InitDone initDone;
@@ -976,7 +989,7 @@ int main(int argc, const char** argv)
                 }
                 else
                 {
-                    ProfileProject(GetFullPath(project), rebuildSys, rebuildApp, top, report, outFile, args);
+                    ProfileProject(GetFullPath(project), rebuildSys, rebuildApp, top, report, outFile, args, rootModule);
                 }
             }
             else

@@ -232,6 +232,14 @@ void BinaryWriter::WriteEncodedUInt(uint32_t x)
     }
 }
 
+void BinaryWriter::Write(const boost::uuids::uuid& uuid)
+{
+    for (boost::uuids::uuid::value_type x : uuid)
+    {
+        Write(x);
+    }
+}
+
 void BinaryWriter::Seek(uint32_t pos_)
 {
     FlushBuffer();

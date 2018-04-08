@@ -136,10 +136,22 @@ extern "C" RT_API void RtDisposeError(int32_t errorId)
     cmajor::rt::DisposeError(errorId);
 }
 
+/*
 extern "C" RT_API void RtThrowException(void* exception, uint32_t exceptionTypeId)
 {
     cmajor::rt::currentException = exception;
     uint64_t exceptionClassId = cmajor::rt::GetClassId(exceptionTypeId);
+    cmajor::rt::currentExceptionClassId = exceptionClassId;
+    throw cmajor::eh::Exception();
+}
+*/
+
+extern "C" RT_API void RtThrowException(void* exception, void* exceptionTypeId)
+{
+    cmajor::rt::currentException = exception;
+    boost::uuids::uuid* exTypeId = reinterpret_cast<boost::uuids::uuid*>(exceptionTypeId);
+    //uint64_t exceptionClassId = cmajor::rt::GetClassId(exceptionTypeId);
+    uint64_t exceptionClassId = cmajor::rt::GetClassId(*exTypeId);
     cmajor::rt::currentExceptionClassId = exceptionClassId;
     throw cmajor::eh::Exception();
 }
@@ -159,10 +171,21 @@ extern "C" RT_API void RtThrowCapturedException(void* exception, uint64_t except
     throw cmajor::eh::Exception();
 }
 
+/*
 extern "C" RT_API bool RtHandleException(uint32_t exceptionTypeId)
 {
     uint64_t currentExceptionClassId = cmajor::rt::currentExceptionClassId;
     uint64_t exceptionClassId = cmajor::rt::GetClassId(exceptionTypeId);
+    bool handle = currentExceptionClassId % exceptionClassId == 0;
+    return handle;
+}
+*/
+
+extern "C" RT_API bool RtHandleException(void* exceptionTypeId)
+{
+    uint64_t currentExceptionClassId = cmajor::rt::currentExceptionClassId;
+    boost::uuids::uuid* exTypeId = reinterpret_cast<boost::uuids::uuid*>(exceptionTypeId);
+    uint64_t exceptionClassId = cmajor::rt::GetClassId(*exTypeId);
     bool handle = currentExceptionClassId % exceptionClassId == 0;
     return handle;
 }

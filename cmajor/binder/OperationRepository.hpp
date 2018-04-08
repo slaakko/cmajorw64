@@ -32,10 +32,12 @@ public:
     int Arity() const { return arity; }
     SymbolTable* GetSymbolTable();
     BoundCompileUnit& GetBoundCompileUnit();
+    Module* GetModule() { return module; }
 private:
     std::u32string groupName;
     int arity;
     BoundCompileUnit& boundCompileUnit;
+    Module* module;
 };
 
 class ArityOperation

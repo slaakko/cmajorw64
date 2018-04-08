@@ -18,7 +18,7 @@ class BoundCompoundStatement;
 class BoundFunction : public BoundNode
 {
 public:
-    BoundFunction(FunctionSymbol* functionSymbol_);
+    BoundFunction(Module* module_, FunctionSymbol* functionSymbol_);
     void Load(Emitter& emitter, OperationFlags flags) override;
     void Store(Emitter& emitter, OperationFlags flags) override;
     void Accept(BoundNodeVisitor& visitor) override;

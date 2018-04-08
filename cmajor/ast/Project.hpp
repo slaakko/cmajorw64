@@ -91,11 +91,20 @@ public:
     const std::vector<std::string>& RelativeSourceFilePaths() const { return relativeSourceFilePaths; }
     Target GetTarget() const { return target; }
     bool DependsOn(Project* that) const;
+    void AddDependsOnProjects(Project* dependsOnProject);
     bool IsSystemProject() const { return isSystemProject; }
     void SetSystemProject() { isSystemProject = true; }
     void SetModuleFilePath(const std::string& moduleFilePath_);
     void SetLibraryFilePath(const std::string& libraryFilePath_);
     bool IsUpToDate(const std::string& systemModuleFilePath) const;
+    int LogStreamId() const { return logStreamId; }
+    void SetLogStreamId(int logStreamId_) { logStreamId = logStreamId_; }
+    void SetIndex(int index_) { index = index_; }
+    int Index() const { return index; }
+    const std::vector<Project*>& DependsOnProjects() { return dependsOn; }
+    bool Built() const { return built; }
+    void SetBuilt() { built = true; }
+    bool Ready() const;
 private:
     std::u32string name;
     std::string filePath;
@@ -112,7 +121,11 @@ private:
     std::vector<std::string> sourceFilePaths;
     std::vector<std::string> relativeSourceFilePaths;
     std::vector<std::string> relativeReferencedProjectFilePaths;
+    std::vector<Project*> dependsOn;
+    bool built;
     bool isSystemProject;
+    int logStreamId;
+    int index;
 };
 
 } } // namespace cmajor::ast

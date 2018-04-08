@@ -665,7 +665,7 @@ std::string MakeOverloadName(const std::u32string& groupName, const std::vector<
     return overloadName;
 }
 
-std::unique_ptr<BoundFunctionCall> FailWithNoViableFunction(const std::u32string& groupName, const std::vector<std::unique_ptr<BoundExpression>>& arguments, 
+std::unique_ptr<BoundFunctionCall> FailWithNoViableFunction(Module* module, const std::u32string& groupName, const std::vector<std::unique_ptr<BoundExpression>>& arguments, 
     const Span& span, OverloadResolutionFlags flags, std::unique_ptr<Exception>& exception)
 {
     std::string overloadName = MakeOverloadName(groupName, arguments, span);
@@ -674,12 +674,12 @@ std::unique_ptr<BoundFunctionCall> FailWithNoViableFunction(const std::u32string
     {
         if ((flags & OverloadResolutionFlags::dontThrow) != OverloadResolutionFlags::none)
         {
-            exception.reset(new NoViableFunctionException("overload resolution failed: '" + overloadName + "' not found. Note: reference must be initialized.", span, arguments[0]->GetSpan()));
+            exception.reset(new NoViableFunctionException(module, "overload resolution failed: '" + overloadName + "' not found. Note: reference must be initialized.", span, arguments[0]->GetSpan()));
             return std::unique_ptr<BoundFunctionCall>();
         }
         else
         {
-            throw NoViableFunctionException("overload resolution failed: '" + overloadName + "' not found. Note: reference must be initialized.", span, arguments[0]->GetSpan());
+            throw NoViableFunctionException(module, "overload resolution failed: '" + overloadName + "' not found. Note: reference must be initialized.", span, arguments[0]->GetSpan());
         }
     }
     else
@@ -691,19 +691,19 @@ std::unique_ptr<BoundFunctionCall> FailWithNoViableFunction(const std::u32string
         }
         if ((flags & OverloadResolutionFlags::dontThrow) != OverloadResolutionFlags::none)
         {
-            exception.reset(new NoViableFunctionException("overload resolution failed: '" + overloadName + "' not found. " +
+            exception.reset(new NoViableFunctionException(module, "overload resolution failed: '" + overloadName + "' not found. " +
                 "No viable functions taking " + std::to_string(arity) + " arguments found in function group '" + ToUtf8(groupName) + "'" + note, span));
             return std::unique_ptr<BoundFunctionCall>();
         }
         else
         {
-            throw NoViableFunctionException("overload resolution failed: '" + overloadName + "' not found. " +
+            throw NoViableFunctionException(module, "overload resolution failed: '" + overloadName + "' not found. " +
                 "No viable functions taking " + std::to_string(arity) + " arguments found in function group '" + ToUtf8(groupName) + "'" + note, span);
         }
     }
 }
 
-std::unique_ptr<BoundFunctionCall> FailWithOverloadNotFound(const std::unordered_set<FunctionSymbol*>& viableFunctions, const std::u32string& groupName, 
+std::unique_ptr<BoundFunctionCall> FailWithOverloadNotFound(Module* module, const std::unordered_set<FunctionSymbol*>& viableFunctions, const std::u32string& groupName, 
     const std::vector<std::unique_ptr<BoundExpression>>& arguments, const std::vector<FunctionMatch>& failedFunctionMatches, const Span& span, 
     OverloadResolutionFlags flags, std::unique_ptr<Exception>& exception)
 {
@@ -793,13 +793,13 @@ std::unique_ptr<BoundFunctionCall> FailWithOverloadNotFound(const std::unordered
         if ((flags & OverloadResolutionFlags::dontThrow) != OverloadResolutionFlags::none)
         {
             references.push_back(arguments[0]->GetSpan());
-            exception.reset(new Exception("overload resolution failed: '" + overloadName + "' not found. Note: reference must be initialized.", span, references));
+            exception.reset(new Exception(module, "overload resolution failed: '" + overloadName + "' not found. Note: reference must be initialized.", span, references));
             return std::unique_ptr<BoundFunctionCall>();
         }
         else
         {
             references.push_back(arguments[0]->GetSpan());
-            throw Exception("overload resolution failed: '" + overloadName + "' not found. Note: reference must be initialized.", span, references);
+            throw Exception(module, "overload resolution failed: '" + overloadName + "' not found. Note: reference must be initialized.", span, references);
         }
     }
     else if (castRequired)
@@ -808,14 +808,14 @@ std::unique_ptr<BoundFunctionCall> FailWithOverloadNotFound(const std::unordered
         Assert(targetType, "target type not set");
         if ((flags & OverloadResolutionFlags::dontThrow) != OverloadResolutionFlags::none)
         {
-            exception.reset(new CastOverloadException("overload resolution failed: '" + overloadName + "' not found, or there are no acceptable conversions for all argument types. " +
+            exception.reset(new CastOverloadException(module, "overload resolution failed: '" + overloadName + "' not found, or there are no acceptable conversions for all argument types. " +
                 std::to_string(viableFunctions.size()) + " viable functions examined. Note: cannot convert implicitly from '" +
                 ToUtf8(sourceType->FullName()) + "' to '" + ToUtf8(targetType->FullName()) + "' but explicit conversion (cast) exists.", span, references));
             return std::unique_ptr<BoundFunctionCall>();
         }
         else
         {
-            throw CastOverloadException("overload resolution failed: '" + overloadName + "' not found, or there are no acceptable conversions for all argument types. " +
+            throw CastOverloadException(module, "overload resolution failed: '" + overloadName + "' not found, or there are no acceptable conversions for all argument types. " +
                 std::to_string(viableFunctions.size()) + " viable functions examined. Note: cannot convert implicitly from '" +
                 ToUtf8(sourceType->FullName()) + "' to '" + ToUtf8(targetType->FullName()) + "' but explicit conversion (cast) exists.", span, references);
         }
@@ -826,7 +826,7 @@ std::unique_ptr<BoundFunctionCall> FailWithOverloadNotFound(const std::unordered
         Assert(targetType, "target type not set");
         if ((flags & OverloadResolutionFlags::dontThrow) != OverloadResolutionFlags::none)
         {
-            exception.reset(new CannotBindConstToNonconstOverloadException("overload resolution failed: '" + overloadName + 
+            exception.reset(new CannotBindConstToNonconstOverloadException(module, "overload resolution failed: '" + overloadName +
                 "' not found, or there are no acceptable conversions for all argument types. " +
                 std::to_string(viableFunctions.size()) + " viable functions examined. Note: cannot bind constant '" + ToUtf8(sourceType->FullName()) + "' argument " 
                 " to nonconstant '" + ToUtf8(targetType->FullName()) +"' parameter", span, references));
@@ -834,7 +834,7 @@ std::unique_ptr<BoundFunctionCall> FailWithOverloadNotFound(const std::unordered
         }
         else
         {
-            throw CannotBindConstToNonconstOverloadException("overload resolution failed: '" + overloadName + "' not found, or there are no acceptable conversions for all argument types. " +
+            throw CannotBindConstToNonconstOverloadException(module, "overload resolution failed: '" + overloadName + "' not found, or there are no acceptable conversions for all argument types. " +
                 std::to_string(viableFunctions.size()) + " viable functions examined. Note: cannot bind constant '" + ToUtf8(sourceType->FullName()) + "' argument "
                 " to nonconstant '" + ToUtf8(targetType->FullName()) + "' parameter", span, references);
         }
@@ -843,14 +843,14 @@ std::unique_ptr<BoundFunctionCall> FailWithOverloadNotFound(const std::unordered
     {
         if ((flags & OverloadResolutionFlags::dontThrow) != OverloadResolutionFlags::none)
         {
-            exception.reset(new CannotAssignToConstOverloadException("overload resolution failed: '" + overloadName +
+            exception.reset(new CannotAssignToConstOverloadException(module, "overload resolution failed: '" + overloadName +
                 "' not found, or there are no acceptable conversions for all argument types. " +
                 std::to_string(viableFunctions.size()) + " viable functions examined. Note: cannot assign to const object.", span, references));
             return std::unique_ptr<BoundFunctionCall>();
         }
         else
         {
-            throw CannotAssignToConstOverloadException("overload resolution failed: '" + overloadName + "' not found, or there are no acceptable conversions for all argument types. " +
+            throw CannotAssignToConstOverloadException(module, "overload resolution failed: '" + overloadName + "' not found, or there are no acceptable conversions for all argument types. " +
                 std::to_string(viableFunctions.size()) + " viable functions examined. Note: cannot assign to const object. ", span, references);
         }
     }
@@ -858,19 +858,19 @@ std::unique_ptr<BoundFunctionCall> FailWithOverloadNotFound(const std::unordered
     {
         if ((flags & OverloadResolutionFlags::dontThrow) != OverloadResolutionFlags::none)
         {
-            exception.reset(new Exception("overload resolution failed: '" + overloadName + "' not found, or there are no acceptable conversions for all argument types. " +
+            exception.reset(new Exception(module, "overload resolution failed: '" + overloadName + "' not found, or there are no acceptable conversions for all argument types. " +
                 std::to_string(viableFunctions.size()) + " viable functions examined." + note, span, references));
             return std::unique_ptr<BoundFunctionCall>();
         }
         else
         {
-            throw Exception("overload resolution failed: '" + overloadName + "' not found, or there are no acceptable conversions for all argument types. " +
+            throw Exception(module, "overload resolution failed: '" + overloadName + "' not found, or there are no acceptable conversions for all argument types. " +
                 std::to_string(viableFunctions.size()) + " viable functions examined." + note, span, references);
         }
     }
 }
 
-std::unique_ptr<BoundFunctionCall> FailWithAmbiguousOverload(const std::u32string& groupName, std::vector<std::unique_ptr<BoundExpression>>& arguments, 
+std::unique_ptr<BoundFunctionCall> FailWithAmbiguousOverload(Module* module, const std::u32string& groupName, std::vector<std::unique_ptr<BoundExpression>>& arguments, 
     const std::vector<FunctionMatch>& functionMatches, const Span& span, OverloadResolutionFlags flags, std::unique_ptr<Exception>& exception)
 {
     std::string overloadName = MakeOverloadName(groupName, arguments, span);
@@ -904,19 +904,20 @@ std::unique_ptr<BoundFunctionCall> FailWithAmbiguousOverload(const std::u32strin
     }
     if ((flags & OverloadResolutionFlags::dontThrow) != OverloadResolutionFlags::none)
     {
-        exception.reset(new Exception("overload resolution for overload name '" + overloadName + "' failed: call is ambiguous: \n" + matchedFunctionNames, span, references));
+        exception.reset(new Exception(module, "overload resolution for overload name '" + overloadName + "' failed: call is ambiguous: \n" + matchedFunctionNames, span, references));
         return std::unique_ptr<BoundFunctionCall>();
     }
     else
     {
-        throw Exception("overload resolution for overload name '" + overloadName + "' failed: call is ambiguous: \n" + matchedFunctionNames, span, references);
+        throw Exception(module, "overload resolution for overload name '" + overloadName + "' failed: call is ambiguous: \n" + matchedFunctionNames, span, references);
     }
 }
 
 std::unique_ptr<BoundFunctionCall> CreateBoundFunctionCall(FunctionSymbol* bestFun, std::vector<std::unique_ptr<BoundExpression>>& arguments, BoundCompileUnit& boundCompileUnit, 
     BoundFunction* boundFunction, const FunctionMatch& bestMatch, ContainerScope* containerScope, const Span& span)
 {
-    std::unique_ptr<BoundFunctionCall> boundFunctionCall(new BoundFunctionCall(span, bestFun));
+    Module* module = &boundCompileUnit.GetModule();
+    std::unique_ptr<BoundFunctionCall> boundFunctionCall(new BoundFunctionCall(module, span, bestFun));
     int arity = arguments.size();
     for (int i = 0; i < arity; ++i)
     {
@@ -940,9 +941,9 @@ std::unique_ptr<BoundFunctionCall> CreateBoundFunctionCall(FunctionSymbol* bestF
                     BoundLocalVariable* backingStore = nullptr;
                     if (boundFunction)
                     {
-                        backingStore = new BoundLocalVariable(span, boundFunction->GetFunctionSymbol()->CreateTemporary(argument->GetType(), span));
+                        backingStore = new BoundLocalVariable(module, span, boundFunction->GetFunctionSymbol()->CreateTemporary(argument->GetType(), span));
                     }
-                    argument.reset(new BoundTemporary(std::move(argument), std::unique_ptr<BoundLocalVariable>(backingStore)));
+                    argument.reset(new BoundTemporary(module, std::move(argument), std::unique_ptr<BoundLocalVariable>(backingStore)));
                 }
                 TypeSymbol* type = nullptr;
                 if (argument->GetType()->IsClassTypeSymbol() && argument->GetFlag(BoundExpressionFlags::bindToRvalueReference))
@@ -953,13 +954,13 @@ std::unique_ptr<BoundFunctionCall> CreateBoundFunctionCall(FunctionSymbol* bestF
                 {
                     type = argument->GetType()->AddLvalueReference(span);
                 }
-                BoundAddressOfExpression* addressOfExpression = new BoundAddressOfExpression(std::move(argument), type);
+                BoundAddressOfExpression* addressOfExpression = new BoundAddressOfExpression(module, std::move(argument), type);
                 argument.reset(addressOfExpression);
             }
             else if (argumentMatch.preReferenceConversionFlags == OperationFlags::deref)
             {
                 TypeSymbol* type = argument->GetType()->RemoveReference(span);
-                BoundDereferenceExpression* dereferenceExpression = new BoundDereferenceExpression(std::move(argument), type);
+                BoundDereferenceExpression* dereferenceExpression = new BoundDereferenceExpression(module, std::move(argument), type);
                 argument.reset(dereferenceExpression);
             }
         }
@@ -972,24 +973,24 @@ std::unique_ptr<BoundFunctionCall> CreateBoundFunctionCall(FunctionSymbol* bestF
                 {
                     return std::unique_ptr<BoundFunctionCall>();
                 }
-                BoundFunctionCall* constructorCall = new BoundFunctionCall(span, conversionFun);
+                BoundFunctionCall* constructorCall = new BoundFunctionCall(module, span, conversionFun);
                 TypeSymbol* conversionTargetType = conversionFun->ConversionTargetType();
                 LocalVariableSymbol* temporary = boundFunction->GetFunctionSymbol()->CreateTemporary(conversionTargetType, span);
-                constructorCall->AddArgument(std::unique_ptr<BoundExpression>(new BoundAddressOfExpression(std::unique_ptr<BoundExpression>(new BoundLocalVariable(span, temporary)),
+                constructorCall->AddArgument(std::unique_ptr<BoundExpression>(new BoundAddressOfExpression(module, std::unique_ptr<BoundExpression>(new BoundLocalVariable(module, span, temporary)),
                     conversionTargetType->AddPointer(span))));
                 if (conversionTargetType->IsClassTypeSymbol())
                 {
                     ClassTypeSymbol* classType = static_cast<ClassTypeSymbol*>(conversionTargetType);
                     if (classType->Destructor())
                     {
-                        std::unique_ptr<BoundFunctionCall> destructorCall(new BoundFunctionCall(span, classType->Destructor()));
+                        std::unique_ptr<BoundFunctionCall> destructorCall(new BoundFunctionCall(module, span, classType->Destructor()));
                         destructorCall->AddArgument(std::unique_ptr<BoundExpression>(constructorCall->Arguments()[0]->Clone()));
                         boundFunction->AddTemporaryDestructorCall(std::move(destructorCall));
                     }
                 }
                 constructorCall->AddArgument(std::move(argument));
-                BoundConstructAndReturnTemporaryExpression* conversion = new BoundConstructAndReturnTemporaryExpression(std::unique_ptr<BoundExpression>(constructorCall),
-                    std::unique_ptr<BoundExpression>(new BoundLocalVariable(span, temporary)));
+                BoundConstructAndReturnTemporaryExpression* conversion = new BoundConstructAndReturnTemporaryExpression(module, std::unique_ptr<BoundExpression>(constructorCall),
+                    std::unique_ptr<BoundExpression>(new BoundLocalVariable(module, span, temporary)));
                 argument.reset(conversion);
             }
             else if (conversionFun->GetSymbolType() == SymbolType::conversionFunctionSymbol && conversionFun->ReturnsClassInterfaceOrClassDelegateByValue())
@@ -998,31 +999,31 @@ std::unique_ptr<BoundFunctionCall> CreateBoundFunctionCall(FunctionSymbol* bestF
                 {
                     return std::unique_ptr<BoundFunctionCall>();
                 }
-                BoundFunctionCall* conversionFunctionCall = new BoundFunctionCall(span, conversionFun);
+                BoundFunctionCall* conversionFunctionCall = new BoundFunctionCall(module, span, conversionFun);
                 conversionFunctionCall->AddArgument(std::move(argument));
                 TypeSymbol* conversionTargetType = conversionFun->ConversionTargetType();
                 LocalVariableSymbol* temporary = boundFunction->GetFunctionSymbol()->CreateTemporary(conversionTargetType, span);
-                conversionFunctionCall->AddArgument(std::unique_ptr<BoundExpression>(new BoundAddressOfExpression(std::unique_ptr<BoundExpression>(new BoundLocalVariable(span, temporary)),
+                conversionFunctionCall->AddArgument(std::unique_ptr<BoundExpression>(new BoundAddressOfExpression(module, std::unique_ptr<BoundExpression>(new BoundLocalVariable(module, span, temporary)),
                     conversionTargetType->AddPointer(span))));
-                BoundLocalVariable* conversionResult = new BoundLocalVariable(span, temporary);
+                BoundLocalVariable* conversionResult = new BoundLocalVariable(module, span, temporary);
                 if (conversionTargetType->IsClassTypeSymbol())
                 {
                     ClassTypeSymbol* classType = static_cast<ClassTypeSymbol*>(conversionTargetType);
                     if (classType->Destructor())
                     {
-                        std::unique_ptr<BoundFunctionCall> destructorCall(new BoundFunctionCall(span, classType->Destructor()));
+                        std::unique_ptr<BoundFunctionCall> destructorCall(new BoundFunctionCall(module, span, classType->Destructor()));
                         TypeSymbol* type = conversionResult->GetType()->AddPointer(span);
-                        destructorCall->AddArgument(std::unique_ptr<BoundExpression>(new BoundAddressOfExpression(std::unique_ptr<BoundExpression>(conversionResult->Clone()), type)));
+                        destructorCall->AddArgument(std::unique_ptr<BoundExpression>(new BoundAddressOfExpression(module, std::unique_ptr<BoundExpression>(conversionResult->Clone()), type)));
                         boundFunction->AddTemporaryDestructorCall(std::move(destructorCall));
                     }
                 }
-                BoundClassOrClassDelegateConversionResult* conversion = new BoundClassOrClassDelegateConversionResult(std::unique_ptr<BoundExpression>(conversionResult),
+                BoundClassOrClassDelegateConversionResult* conversion = new BoundClassOrClassDelegateConversionResult(module, std::unique_ptr<BoundExpression>(conversionResult),
                     std::unique_ptr<BoundFunctionCall>(conversionFunctionCall));
                 argument.reset(conversion);
             }
             else
             {
-                BoundConversion* conversion = new BoundConversion(std::move(argument), conversionFun);
+                BoundConversion* conversion = new BoundConversion(module, std::move(argument), conversionFun);
                 argument.reset(conversion);
             }
         }
@@ -1035,9 +1036,9 @@ std::unique_ptr<BoundFunctionCall> CreateBoundFunctionCall(FunctionSymbol* bestF
                     BoundLocalVariable* backingStore = nullptr;
                     if (boundFunction)
                     {
-                        backingStore = new BoundLocalVariable(span, boundFunction->GetFunctionSymbol()->CreateTemporary(argument->GetType(), span));
+                        backingStore = new BoundLocalVariable(module, span, boundFunction->GetFunctionSymbol()->CreateTemporary(argument->GetType(), span));
                     }
-                    argument.reset(new BoundTemporary(std::move(argument), std::unique_ptr<BoundLocalVariable>(backingStore)));
+                    argument.reset(new BoundTemporary(module, std::move(argument), std::unique_ptr<BoundLocalVariable>(backingStore)));
                 }
                 TypeSymbol* type = nullptr;
                 if (argument->GetType()->IsClassTypeSymbol() && argument->GetFlag(BoundExpressionFlags::bindToRvalueReference))
@@ -1048,13 +1049,13 @@ std::unique_ptr<BoundFunctionCall> CreateBoundFunctionCall(FunctionSymbol* bestF
                 {
                     type = argument->GetType()->AddLvalueReference(span);
                 }
-                BoundAddressOfExpression* addressOfExpression = new BoundAddressOfExpression(std::move(argument), type);
+                BoundAddressOfExpression* addressOfExpression = new BoundAddressOfExpression(module, std::move(argument), type);
                 argument.reset(addressOfExpression);
             }
             else if (argumentMatch.postReferenceConversionFlags == OperationFlags::deref)
             {
                 TypeSymbol* type = argument->GetType()->RemoveReference(span);
-                BoundDereferenceExpression* dereferenceExpression = new BoundDereferenceExpression(std::move(argument), type);
+                BoundDereferenceExpression* dereferenceExpression = new BoundDereferenceExpression(module, std::move(argument), type);
                 argument.reset(dereferenceExpression);
             }
         }
@@ -1074,16 +1075,16 @@ std::unique_ptr<BoundFunctionCall> CreateBoundFunctionCall(FunctionSymbol* bestF
                         std::vector<Span> references;
                         references.push_back(ex.Defined());
                         references.insert(references.end(), ex.References().begin(), ex.References().end());
-                        throw Exception("cannot pass class '" + ToUtf8(classType->FullName()) + "' by value because: " + ex.Message(), argument->GetSpan(), references);
+                        throw Exception(module, "cannot pass class '" + ToUtf8(classType->FullName()) + "' by value because: " + ex.Message(), argument->GetSpan(), references);
                     }
                 }
                 TypeSymbol* type = classType->AddConst(span)->AddLvalueReference(span);
-                argument.reset(new BoundAddressOfExpression(std::move(argument), type));
+                argument.reset(new BoundAddressOfExpression(module, std::move(argument), type));
             }
             else if (argument->GetType()->GetSymbolType() == SymbolType::classDelegateTypeSymbol)
             {
                 TypeSymbol* type = argument->GetType()->AddConst(span)->AddLvalueReference(span);
-                argument.reset(new BoundAddressOfExpression(std::move(argument), type));
+                argument.reset(new BoundAddressOfExpression(module, std::move(argument), type));
             }
             else if (argument->GetType()->GetSymbolType() == SymbolType::interfaceTypeSymbol)
             {
@@ -1093,7 +1094,7 @@ std::unique_ptr<BoundFunctionCall> CreateBoundFunctionCall(FunctionSymbol* bestF
                     boundCompileUnit.GenerateCopyConstructorFor(interfaceTypeSymbol, containerScope, boundFunction, span);
                 }
                 TypeSymbol* type = argument->GetType()->AddConst(span)->AddLvalueReference(span);
-                argument.reset(new BoundAddressOfExpression(std::move(argument), type));
+                argument.reset(new BoundAddressOfExpression(module, std::move(argument), type));
             }
         }
         boundFunctionCall->AddArgument(std::move(argument));
@@ -1105,6 +1106,7 @@ std::unique_ptr<BoundFunctionCall> SelectViableFunction(const std::unordered_set
     std::vector<std::unique_ptr<BoundExpression>>& arguments, ContainerScope* containerScope, BoundCompileUnit& boundCompileUnit, BoundFunction* boundFunction, const Span& span,
     OverloadResolutionFlags flags, std::vector<TypeSymbol*>& templateArgumentTypes, std::unique_ptr<Exception>& exception)
 {
+    Module* module = &boundCompileUnit.GetModule();
     std::vector<FunctionMatch> functionMatches;
     std::vector<FunctionMatch> failedFunctionMatches;
     std::vector<std::unique_ptr<Exception>> conceptCheckExceptions;
@@ -1221,7 +1223,7 @@ std::unique_ptr<BoundFunctionCall> SelectViableFunction(const std::unordered_set
     }
     if (functionMatches.empty())
     {
-        return FailWithOverloadNotFound(viableFunctions, groupName, arguments, failedFunctionMatches, span, flags, exception);
+        return FailWithOverloadNotFound(module, viableFunctions, groupName, arguments, failedFunctionMatches, span, flags, exception);
     }
     else if (functionMatches.size() > 1)
     {
@@ -1234,12 +1236,12 @@ std::unique_ptr<BoundFunctionCall> SelectViableFunction(const std::unordered_set
             {
                 if ((flags & OverloadResolutionFlags::dontThrow) != OverloadResolutionFlags::none)
                 {
-                    exception.reset(new Exception("cannot call a suppressed member function '" + ToUtf8(bestFun->FullName()) + "'", span, bestFun->GetSpan()));
+                    exception.reset(new Exception(module, "cannot call a suppressed member function '" + ToUtf8(bestFun->FullName()) + "'", span, bestFun->GetSpan()));
                     return std::unique_ptr<BoundFunctionCall>();
                 }
                 else
                 {
-                    throw Exception("cannot call a suppressed member function '" + ToUtf8(bestFun->FullName()) + "'", span, bestFun->GetSpan());
+                    throw Exception(module, "cannot call a suppressed member function '" + ToUtf8(bestFun->FullName()) + "'", span, bestFun->GetSpan());
                 }
             }
             bool instantiate = (flags & OverloadResolutionFlags::dontInstantiate) == OverloadResolutionFlags::none;
@@ -1286,27 +1288,27 @@ std::unique_ptr<BoundFunctionCall> SelectViableFunction(const std::unordered_set
                 {
                     if ((flags & OverloadResolutionFlags::dontThrow) != OverloadResolutionFlags::none)
                     {
-                        exception.reset(new Exception("a nothrow function cannot call a function that can throw unless it handles exceptions (compiled with --strict-nothrow)", span, references));
+                        exception.reset(new Exception(module, "a nothrow function cannot call a function that can throw unless it handles exceptions (compiled with --strict-nothrow)", span, references));
                         return std::unique_ptr<BoundFunctionCall>();
                     }
                     else
                     {
-                        throw Exception("a nothrow function cannot call a function that can throw unless it handles exceptions (compiled with --strict-nothrow)", span, references);
+                        throw Exception(module, "a nothrow function cannot call a function that can throw unless it handles exceptions (compiled with --strict-nothrow)", span, references);
                     }
                 }
                 else
                 {
-                    Warning warning(CompileWarningCollection::Instance().GetCurrentProjectName(), "a nothrow function calls a function that can throw and does not handle exceptions");
+                    Warning warning(module->GetCurrentProjectName(), "a nothrow function calls a function that can throw and does not handle exceptions");
                     warning.SetDefined(span);
                     warning.SetReferences(references);
-                    CompileWarningCollection::Instance().AddWarning(warning);
+                    module->WarningCollection().AddWarning(warning);
                 }
             }
             return CreateBoundFunctionCall(bestFun, arguments, boundCompileUnit, boundFunction, bestMatch, containerScope, span);
         }
         else
         {
-            return FailWithAmbiguousOverload(groupName, arguments, functionMatches, span, flags, exception);
+            return FailWithAmbiguousOverload(module, groupName, arguments, functionMatches, span, flags, exception);
         }
     }
     else
@@ -1317,12 +1319,12 @@ std::unique_ptr<BoundFunctionCall> SelectViableFunction(const std::unordered_set
         {
             if ((flags & OverloadResolutionFlags::dontThrow) != OverloadResolutionFlags::none)
             {
-                exception.reset(new Exception("cannot call a suppressed member function '" + ToUtf8(singleBest->FullName()) + "'", span, singleBest->GetSpan()));
+                exception.reset(new Exception(module, "cannot call a suppressed member function '" + ToUtf8(singleBest->FullName()) + "'", span, singleBest->GetSpan()));
                 return std::unique_ptr<BoundFunctionCall>();
             }
             else
             {
-                throw Exception("cannot call a suppressed member function '" + ToUtf8(singleBest->FullName()) + "'", span, singleBest->GetSpan());
+                throw Exception(module, "cannot call a suppressed member function '" + ToUtf8(singleBest->FullName()) + "'", span, singleBest->GetSpan());
             }
         }
         bool instantiate = (flags & OverloadResolutionFlags::dontInstantiate) == OverloadResolutionFlags::none;
@@ -1369,20 +1371,20 @@ std::unique_ptr<BoundFunctionCall> SelectViableFunction(const std::unordered_set
             {
                 if ((flags & OverloadResolutionFlags::dontThrow) != OverloadResolutionFlags::none)
                 {
-                    exception.reset(new Exception("a nothrow function cannot call a function that can throw unless it handles exceptions (compiled with --strict-nothrow)", span, references));
+                    exception.reset(new Exception(module, "a nothrow function cannot call a function that can throw unless it handles exceptions (compiled with --strict-nothrow)", span, references));
                     return std::unique_ptr<BoundFunctionCall>();
                 }
                 else
                 {
-                    throw Exception("a nothrow function cannot call a function that can throw unless it handles exceptions (compiled with --strict-nothrow)", span, references);
+                    throw Exception(module, "a nothrow function cannot call a function that can throw unless it handles exceptions (compiled with --strict-nothrow)", span, references);
                 }
             }
             else
             {
-                Warning warning(CompileWarningCollection::Instance().GetCurrentProjectName(), "a nothrow function calls a function that can throw and does not handle exceptions");
+                Warning warning(module->GetCurrentProjectName(), "a nothrow function calls a function that can throw and does not handle exceptions");
                 warning.SetDefined(span);
                 warning.SetReferences(references);
-                CompileWarningCollection::Instance().AddWarning(warning);
+                module->WarningCollection().AddWarning(warning);
             }
         }
         return CreateBoundFunctionCall(singleBest, arguments, boundCompileUnit, boundFunction, bestMatch, containerScope, span);
@@ -1423,6 +1425,7 @@ std::unique_ptr<BoundFunctionCall> ResolveOverload(const std::u32string& groupNa
     std::vector<std::unique_ptr<BoundExpression>>& arguments, BoundCompileUnit& boundCompileUnit, BoundFunction* currentFunction, const Span& span, 
     OverloadResolutionFlags flags, std::vector<TypeSymbol*>& templateArgumentTypes, std::unique_ptr<Exception>& exception)
 {
+    Module* module = &boundCompileUnit.GetModule();
     int arity = arguments.size();
     std::unordered_set<FunctionSymbol*> viableFunctions;
     if (currentFunction)
@@ -1439,7 +1442,7 @@ std::unique_ptr<BoundFunctionCall> ResolveOverload(const std::u32string& groupNa
     }
     if (viableFunctions.empty())
     {
-        return FailWithNoViableFunction(groupName, arguments, span, flags, exception);
+        return FailWithNoViableFunction(module, groupName, arguments, span, flags, exception);
     }
     else
     {

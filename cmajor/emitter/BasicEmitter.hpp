@@ -87,6 +87,7 @@ public:
     llvm::Value* GetGlobalStringPtr(int stringId) override;
     llvm::Value* GetGlobalWStringConstant(int stringId) override;
     llvm::Value* GetGlobalUStringConstant(int stringId) override;
+    llvm::Value* GetGlobalUuidConstant(int uuidId) override;
     llvm::BasicBlock* HandlerBlock() override { return handlerBlock; }
     llvm::BasicBlock* CleanupBlock() override { return cleanupBlock; }
     bool NewCleanupNeeded() override { return newCleanupNeeded; }
@@ -131,6 +132,7 @@ protected:
     std::unordered_map<int, llvm::Value*> utf8stringMap;
     std::unordered_map<int, llvm::Value*> utf16stringMap;
     std::unordered_map<int, llvm::Value*> utf32stringMap;
+    std::unordered_map<int, llvm::Value*> uuidMap;
     int prevLineNumber;
     llvm::AllocaInst* lastAlloca;
     int compoundLevel;

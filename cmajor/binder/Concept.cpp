@@ -52,7 +52,7 @@ void ConceptIdResolver::Visit(ConceptIdNode& conceptIdNode)
     }
     else
     {
-        throw Exception("concept symbol '" + conceptIdNode.Id()->ToString() + "' not found", conceptIdNode.GetSpan());
+        throw Exception(&boundCompileUnit.GetModule(), "concept symbol '" + conceptIdNode.Id()->ToString() + "' not found", conceptIdNode.GetSpan());
     }
 }
 
@@ -83,12 +83,12 @@ void ConceptIdResolver::Visit(IdentifierNode& identifierNode)
         }
         else
         {
-            throw Exception("symbol '" + ToUtf8(name) + "' does not denote a concept", identifierNode.GetSpan());
+            throw Exception(&boundCompileUnit.GetModule(), "symbol '" + ToUtf8(name) + "' does not denote a concept", identifierNode.GetSpan());
         }
     }
     else
     {
-        throw Exception("concept symbol '" + ToUtf8(name) + "' not found", identifierNode.GetSpan());
+        throw Exception(&boundCompileUnit.GetModule(), "concept symbol '" + ToUtf8(name) + "' not found", identifierNode.GetSpan());
     }
 }
 
@@ -97,7 +97,7 @@ void ConceptIdResolver::Visit(DotNode& dotNode)
     dotNode.Subject()->Accept(*this);
     if (!ns)
     {
-        throw Exception("concept symbol '" + dotNode.ToString() + "' not found", dotNode.GetSpan());
+        throw Exception(&boundCompileUnit.GetModule(), "concept symbol '" + dotNode.ToString() + "' not found", dotNode.GetSpan());
     }
     ContainerScope* containerScope = ns->GetContainerScope();
     const std::u32string& name = dotNode.MemberId()->Str();
@@ -114,12 +114,12 @@ void ConceptIdResolver::Visit(DotNode& dotNode)
         }
         else
         {
-            throw Exception("symbol '" + ToUtf8(name) + "' does not denote a concept", dotNode.GetSpan());
+            throw Exception(&boundCompileUnit.GetModule(), "symbol '" + ToUtf8(name) + "' does not denote a concept", dotNode.GetSpan());
         }
     }
     else
     {
-        throw Exception("concept symbol '" + ToUtf8(name) + "' not found", dotNode.GetSpan());
+        throw Exception(&boundCompileUnit.GetModule(), "concept symbol '" + ToUtf8(name) + "' not found", dotNode.GetSpan());
     }
 }
 
@@ -134,7 +134,7 @@ ConceptSymbol* ResolveConceptId(ConceptIdNode* conceptIdNode, BoundCompileUnit& 
     }
     else
     {
-        throw Exception("concept symbol '" + conceptIdNode->Id()->ToString() + "' not found", conceptIdNode->GetSpan());
+        throw Exception(&boundCompileUnit.GetModule(), "concept symbol '" + conceptIdNode->Id()->ToString() + "' not found", conceptIdNode->GetSpan());
     }
 }
 
@@ -341,7 +341,7 @@ void ConstraintChecker::Visit(LValueRefNode& lvalueRefNode)
     lvalueRefNode.Subject()->Accept(*this);
     if (HasReferenceDerivation(derivationRec.derivations))
     {
-        throw Exception("cannot have reference to reference type", lvalueRefNode.GetSpan());
+        throw Exception(&boundCompileUnit.GetModule(), "cannot have reference to reference type", lvalueRefNode.GetSpan());
     }
     derivationRec.derivations.push_back(Derivation::lvalueRefDerivation);
 }
@@ -351,7 +351,7 @@ void ConstraintChecker::Visit(RValueRefNode& rvalueRefNode)
     rvalueRefNode.Subject()->Accept(*this);
     if (HasReferenceDerivation(derivationRec.derivations))
     {
-        throw Exception("cannot have reference to reference type", rvalueRefNode.GetSpan());
+        throw Exception(&boundCompileUnit.GetModule(), "cannot have reference to reference type", rvalueRefNode.GetSpan());
     }
     derivationRec.derivations.push_back(Derivation::rvalueRefDerivation);
 }
@@ -361,7 +361,7 @@ void ConstraintChecker::Visit(PointerNode& pointerNode)
     pointerNode.Subject()->Accept(*this);
     if (HasReferenceDerivation(derivationRec.derivations))
     {
-        throw Exception("cannot have pointer to reference type", pointerNode.GetSpan());
+        throw Exception(&boundCompileUnit.GetModule(), "cannot have pointer to reference type", pointerNode.GetSpan());
     }
     derivationRec.derivations.push_back(Derivation::pointerDerivation);
 }
@@ -371,7 +371,7 @@ void ConstraintChecker::Visit(ArrayNode& arrayNode)
     arrayNode.Subject()->Accept(*this);
     if (HasReferenceDerivation(derivationRec.derivations))
     {
-        throw Exception("cannot have array of reference type", arrayNode.GetSpan());
+        throw Exception(&boundCompileUnit.GetModule(), "cannot have array of reference type", arrayNode.GetSpan());
     }
     // todo: evaluate size
 }
@@ -425,7 +425,7 @@ void ConstraintChecker::Visit(IdentifierNode& identifierNode)
                     NamespaceTypeSymbol* namespaceTypeSymbol = new NamespaceTypeSymbol(ns);
                     namespaceTypeSymbols.push_back(std::unique_ptr<NamespaceTypeSymbol>(namespaceTypeSymbol));
                     type = namespaceTypeSymbol;
-                    FileScope* fileScope = new FileScope();
+                    FileScope* fileScope = new FileScope(&boundCompileUnit.GetModule());
                     NamespaceImportNode importNode(span, new IdentifierNode(span, ns->FullName()));
                     fileScope->InstallNamespaceImport(containerScope, &importNode);
                     boundCompileUnit.AddFileScope(fileScope);
@@ -434,14 +434,14 @@ void ConstraintChecker::Visit(IdentifierNode& identifierNode)
                 }
                 default:
                 {
-                    throw Exception("symbol '" + ToUtf8(symbol->FullName()) + "' does not denote a type or a concept", symbol->GetSpan());
+                    throw Exception(&boundCompileUnit.GetModule(), "symbol '" + ToUtf8(symbol->FullName()) + "' does not denote a type or a concept", symbol->GetSpan());
                 }
             }
         }
     }
     else
     {
-        throw Exception("type or concept symbol '" + ToUtf8(name) + "' not found", identifierNode.GetSpan());
+        throw Exception(&boundCompileUnit.GetModule(), "type or concept symbol '" + ToUtf8(name) + "' not found", identifierNode.GetSpan());
     }
 }
 
@@ -457,7 +457,7 @@ void ConstraintChecker::Visit(DotNode& dotNode)
     TypeSymbol* subjectType = GetType();
     if (!subjectType)
     {
-        throw Exception("symbol '" + dotNode.Subject()->ToString() + "' does not denote a type", dotNode.Subject()->GetSpan());
+        throw Exception(&boundCompileUnit.GetModule(), "symbol '" + dotNode.Subject()->ToString() + "' does not denote a type", dotNode.Subject()->GetSpan());
     }
     Scope* typeContainerScope = nullptr;
     if (subjectType->IsPointerType())
@@ -503,7 +503,7 @@ void ConstraintChecker::Visit(DotNode& dotNode)
                 NamespaceTypeSymbol* namespaceTypeSymbol = new NamespaceTypeSymbol(ns);
                 namespaceTypeSymbols.push_back(std::unique_ptr<NamespaceTypeSymbol>(namespaceTypeSymbol));
                 type = namespaceTypeSymbol;
-                FileScope* fileScope = new FileScope();
+                FileScope* fileScope = new FileScope(&boundCompileUnit.GetModule());
                 NamespaceImportNode importNode(span, new IdentifierNode(span, ns->FullName()));
                 fileScope->InstallNamespaceImport(containerScope, &importNode);
                 boundCompileUnit.AddFileScope(fileScope);
@@ -512,13 +512,13 @@ void ConstraintChecker::Visit(DotNode& dotNode)
             }
             default:
             {
-                throw Exception("symbol '" + ToUtf8(symbol->FullName()) + "' does not denote a type or a concept", symbol->GetSpan());
+                throw Exception(&boundCompileUnit.GetModule(), "symbol '" + ToUtf8(symbol->FullName()) + "' does not denote a type or a concept", symbol->GetSpan());
             }
         }
     }
     else
     {
-        throw Exception("type or concept symbol '" + ToUtf8(name) + "' not found", dotNode.GetSpan());
+        throw Exception(&boundCompileUnit.GetModule(), "type or concept symbol '" + ToUtf8(name) + "' not found", dotNode.GetSpan());
     }
 }
 
@@ -539,7 +539,7 @@ void ConstraintChecker::Visit(DisjunctiveConstraintNode& disjunctiveConstraintNo
     catch (const Exception& ex)
     {
         left = false;
-        leftBoundConstraint.reset(new BoundAtomicConstraint(span, false));
+        leftBoundConstraint.reset(new BoundAtomicConstraint(&boundCompileUnit.GetModule(), span, false));
         if (!exception)
         {
             exception.reset(new Exception(ex));
@@ -548,7 +548,7 @@ void ConstraintChecker::Visit(DisjunctiveConstraintNode& disjunctiveConstraintNo
     catch (...)
     {
         left = false;
-        leftBoundConstraint.reset(new BoundAtomicConstraint(span, false));
+        leftBoundConstraint.reset(new BoundAtomicConstraint(&boundCompileUnit.GetModule(), span, false));
     }
     Reset();
     try
@@ -560,7 +560,7 @@ void ConstraintChecker::Visit(DisjunctiveConstraintNode& disjunctiveConstraintNo
     catch (const Exception& ex)
     {
         right = false;
-        rightBoundConstraint.reset(new BoundAtomicConstraint(span, false));
+        rightBoundConstraint.reset(new BoundAtomicConstraint(&boundCompileUnit.GetModule(), span, false));
         if (!exception)
         {
             exception.reset(new Exception(ex));
@@ -569,10 +569,10 @@ void ConstraintChecker::Visit(DisjunctiveConstraintNode& disjunctiveConstraintNo
     catch (...)
     {
         right = false;
-        rightBoundConstraint.reset(new BoundAtomicConstraint(span, false));
+        rightBoundConstraint.reset(new BoundAtomicConstraint(&boundCompileUnit.GetModule(), span, false));
     }
     result = left || right;
-    boundConstraint.reset(new BoundDisjunctiveConstraint(span, leftBoundConstraint.release(), rightBoundConstraint.release()));
+    boundConstraint.reset(new BoundDisjunctiveConstraint(&boundCompileUnit.GetModule(), span, leftBoundConstraint.release(), rightBoundConstraint.release()));
     if (result && !exceptionWasSet)
     {
         exception.reset();
@@ -595,7 +595,7 @@ void ConstraintChecker::Visit(ConjunctiveConstraintNode& conjunctiveConstraintNo
     catch (const Exception& ex)
     {
         left = false;
-        leftBoundConstraint.reset(new BoundAtomicConstraint(span, false));
+        leftBoundConstraint.reset(new BoundAtomicConstraint(&boundCompileUnit.GetModule(), span, false));
         if (!exception)
         {
             exception.reset(new Exception(ex));
@@ -604,7 +604,7 @@ void ConstraintChecker::Visit(ConjunctiveConstraintNode& conjunctiveConstraintNo
     catch (...)
     {
         left = false;
-        leftBoundConstraint.reset(new BoundAtomicConstraint(span, false));
+        leftBoundConstraint.reset(new BoundAtomicConstraint(&boundCompileUnit.GetModule(), span, false));
     }
     Reset();
     try
@@ -616,7 +616,7 @@ void ConstraintChecker::Visit(ConjunctiveConstraintNode& conjunctiveConstraintNo
     catch (const Exception& ex)
     {
         right = false;
-        rightBoundConstraint.reset(new BoundAtomicConstraint(span, false));
+        rightBoundConstraint.reset(new BoundAtomicConstraint(&boundCompileUnit.GetModule(), span, false));
         if (!exception)
         {
             exception.reset(new Exception(ex));
@@ -625,10 +625,10 @@ void ConstraintChecker::Visit(ConjunctiveConstraintNode& conjunctiveConstraintNo
     catch (...)
     {
         right = false;
-        rightBoundConstraint.reset(new BoundAtomicConstraint(span, false));
+        rightBoundConstraint.reset(new BoundAtomicConstraint(&boundCompileUnit.GetModule(), span, false));
     }
     result = left && right;
-    boundConstraint.reset(new BoundConjunctiveConstraint(span, leftBoundConstraint.release(), rightBoundConstraint.release()));
+    boundConstraint.reset(new BoundConjunctiveConstraint(&boundCompileUnit.GetModule(), span, leftBoundConstraint.release(), rightBoundConstraint.release()));
 }
 
 void ConstraintChecker::Visit(WhereConstraintNode& whereConstraintNode)
@@ -644,7 +644,7 @@ void ConstraintChecker::Visit(PredicateConstraintNode& predicateConstraintNode)
     std::unique_ptr<Value> evaluationResult = Evaluate(invokeExprNode, symbolTable.GetTypeByName(U"bool"), containerScope, boundCompileUnit, false, currentFunction, predicateConstraintNode.GetSpan());
     BoolValue* boolResult = static_cast<BoolValue*>(evaluationResult.get());
     result = boolResult->GetValue();
-    boundConstraint.reset(new BoundAtomicConstraint(predicateConstraintNode.GetSpan(), result));
+    boundConstraint.reset(new BoundAtomicConstraint(&boundCompileUnit.GetModule(), predicateConstraintNode.GetSpan(), result));
 }
 
 void ConstraintChecker::Visit(IsConstraintNode& isConstraintNode)
@@ -654,7 +654,7 @@ void ConstraintChecker::Visit(IsConstraintNode& isConstraintNode)
     TypeSymbol* leftType = GetType();
     if (!leftType)
     {
-        throw Exception("left operand of 'is' must be a type", isConstraintNode.TypeExpr()->GetSpan());
+        throw Exception(&boundCompileUnit.GetModule(), "left operand of 'is' must be a type", isConstraintNode.TypeExpr()->GetSpan());
     }
     Reset();
     isConstraintNode.ConceptOrTypeName()->Accept(*this);
@@ -666,12 +666,12 @@ void ConstraintChecker::Visit(IsConstraintNode& isConstraintNode)
         if (TypesEqual(leftPlainType, rightPlainType))
         {
             result = true;
-            boundConstraint.reset(new BoundAtomicConstraint(span, true));
+            boundConstraint.reset(new BoundAtomicConstraint(&boundCompileUnit.GetModule(), span, true));
         }
         else
         {
             result = false;
-            boundConstraint.reset(new BoundAtomicConstraint(span, false));
+            boundConstraint.reset(new BoundAtomicConstraint(&boundCompileUnit.GetModule(), span, false));
         }
     }
     else if (conceptGroup)
@@ -706,7 +706,7 @@ void ConstraintChecker::Visit(IsConstraintNode& isConstraintNode)
             else
             {
                 result = false;
-                boundConstraint.reset(new BoundAtomicConstraint(span, false));
+                boundConstraint.reset(new BoundAtomicConstraint(&boundCompileUnit.GetModule(), span, false));
             }
         }
     }
@@ -733,7 +733,7 @@ void ConstraintChecker::Visit(MultiParamConstraintNode& multiParamConstraintNode
             }
             else
             {
-                throw Exception("type parameter '" + typeExprNode->ToString() + "' is not bound to a type", typeExprNode->GetSpan());
+                throw Exception(&boundCompileUnit.GetModule(), "type parameter '" + typeExprNode->ToString() + "' is not bound to a type", typeExprNode->GetSpan());
             }
         }
         BoundConceptKey key(conceptSymbol, typeArguments);
@@ -763,13 +763,13 @@ void ConstraintChecker::Visit(MultiParamConstraintNode& multiParamConstraintNode
             else
             {
                 result = false;
-                boundConstraint.reset(new BoundAtomicConstraint(span, false));
+                boundConstraint.reset(new BoundAtomicConstraint(&boundCompileUnit.GetModule(), span, false));
             }
         }
     }
     else
     {
-        throw Exception("symbol '" + multiParamConstraintNode.ConceptId()->ToString() + "' does not denote a concept", multiParamConstraintNode.ConceptId()->GetSpan());
+        throw Exception(&boundCompileUnit.GetModule(), "symbol '" + multiParamConstraintNode.ConceptId()->ToString() + "' does not denote a concept", multiParamConstraintNode.ConceptId()->GetSpan());
     }
 }
 
@@ -779,13 +779,13 @@ void ConstraintChecker::Visit(TypeNameConstraintNode& typeNameConstraintNode)
     typeNameConstraintNode.TypeId()->Accept(*this);
     TypeSymbol* resolvedType = GetType();
     result = resolvedType != nullptr;
-    boundConstraint.reset(new BoundAtomicConstraint(span, result));
+    boundConstraint.reset(new BoundAtomicConstraint(&boundCompileUnit.GetModule(), span, result));
 }
 
 void ConstraintChecker::Visit(ConstructorConstraintNode& constructorConstraintNode)
 {
     std::vector<std::unique_ptr<BoundExpression>> arguments;
-    arguments.push_back(std::unique_ptr<BoundExpression>(new BoundTypeExpression(span, firstTypeArgument->AddPointer(span))));
+    arguments.push_back(std::unique_ptr<BoundExpression>(new BoundTypeExpression(&boundCompileUnit.GetModule(), span, firstTypeArgument->AddPointer(span))));
     std::vector<TypeSymbol*> parameterTypes;
     int n = constructorConstraintNode.Parameters().Count();
     for (int i = 0; i < n; ++i)
@@ -793,7 +793,7 @@ void ConstraintChecker::Visit(ConstructorConstraintNode& constructorConstraintNo
         ParameterNode* parameterNode = constructorConstraintNode.Parameters()[i];
         TypeSymbol* parameterType = ResolveType(parameterNode->TypeExpr(), boundCompileUnit, containerScope);
         parameterTypes.push_back(parameterType);
-        arguments.push_back(std::unique_ptr<BoundExpression>(new BoundTypeExpression(span, parameterType)));
+        arguments.push_back(std::unique_ptr<BoundExpression>(new BoundTypeExpression(&boundCompileUnit.GetModule(), span, parameterType)));
     }
     std::vector<FunctionScopeLookup> lookups;
     lookups.push_back(FunctionScopeLookup(ScopeLookup::this_and_base_and_parent, containerScope));
@@ -828,19 +828,19 @@ void ConstraintChecker::Visit(ConstructorConstraintNode& constructorConstraintNo
             references.push_back(exception->Defined());
             references.insert(references.end(), exception->References().begin(), exception->References().end());
         }
-        throw Exception(message, span, references);
+        throw Exception(&boundCompileUnit.GetModule(), message, span, references);
     }
     else
     {
         result = true;
-        boundConstraint.reset(new BoundAtomicConstraint(span, true));
+        boundConstraint.reset(new BoundAtomicConstraint(&boundCompileUnit.GetModule(), span, true));
     }
 }
 
 void ConstraintChecker::Visit(DestructorConstraintNode& destructorConstraintNode)
 {
     result = true;
-    boundConstraint.reset(new BoundAtomicConstraint(span, true));
+    boundConstraint.reset(new BoundAtomicConstraint(&boundCompileUnit.GetModule(), span, true));
 }
 
 void ConstraintChecker::Visit(MemberFunctionConstraintNode& memberFunctionConstraintNode)
@@ -849,7 +849,7 @@ void ConstraintChecker::Visit(MemberFunctionConstraintNode& memberFunctionConstr
     memberFunctionConstraintNode.TypeParamId()->Accept(*this);
     TypeSymbol* firstType = GetType();
     std::vector<std::unique_ptr<BoundExpression>> arguments;
-    arguments.push_back(std::unique_ptr<BoundExpression>(new BoundTypeExpression(span, firstType->AddPointer(span))));
+    arguments.push_back(std::unique_ptr<BoundExpression>(new BoundTypeExpression(&boundCompileUnit.GetModule(), span, firstType->AddPointer(span))));
     std::vector<TypeSymbol*> parameterTypes;
     int n = memberFunctionConstraintNode.Parameters().Count();
     for (int i = 0; i < n; ++i)
@@ -857,7 +857,7 @@ void ConstraintChecker::Visit(MemberFunctionConstraintNode& memberFunctionConstr
         ParameterNode* parameterNode = memberFunctionConstraintNode.Parameters()[i];
         TypeSymbol* parameterType = ResolveType(parameterNode->TypeExpr(), boundCompileUnit, containerScope);
         parameterTypes.push_back(parameterType);
-        arguments.push_back(std::unique_ptr<BoundExpression>(new BoundTypeExpression(span, parameterType)));
+        arguments.push_back(std::unique_ptr<BoundExpression>(new BoundTypeExpression(&boundCompileUnit.GetModule(), span, parameterType)));
     }
     std::vector<FunctionScopeLookup> lookups;
     lookups.push_back(FunctionScopeLookup(ScopeLookup::this_and_base_and_parent, containerScope));
@@ -892,19 +892,19 @@ void ConstraintChecker::Visit(MemberFunctionConstraintNode& memberFunctionConstr
             references.push_back(exception->Defined());
             references.insert(references.end(), exception->References().begin(), exception->References().end());
         }
-        throw Exception(message, span, references);
+        throw Exception(&boundCompileUnit.GetModule(), message, span, references);
     }
     else
     {
         result = true;
-        boundConstraint.reset(new BoundAtomicConstraint(span, true));
+        boundConstraint.reset(new BoundAtomicConstraint(&boundCompileUnit.GetModule(), span, true));
     }
 }
 
 void ConstraintChecker::Visit(FunctionConstraintNode& functionConstraintNode)
 {
     std::vector<std::unique_ptr<BoundExpression>> arguments;
-    arguments.push_back(std::unique_ptr<BoundExpression>(new BoundTypeExpression(span, firstTypeArgument->AddPointer(span))));
+    arguments.push_back(std::unique_ptr<BoundExpression>(new BoundTypeExpression(&boundCompileUnit.GetModule(), span, firstTypeArgument->AddPointer(span))));
     std::vector<TypeSymbol*> parameterTypes;
     std::vector<FunctionScopeLookup> lookups;
     lookups.push_back(FunctionScopeLookup(ScopeLookup::this_and_base_and_parent, containerScope));
@@ -919,7 +919,7 @@ void ConstraintChecker::Visit(FunctionConstraintNode& functionConstraintNode)
             functionConstraintNode.GroupId() == U"operator[]")))
     {
         result = true;
-        boundConstraint.reset(new BoundAtomicConstraint(span, true));
+        boundConstraint.reset(new BoundAtomicConstraint(&boundCompileUnit.GetModule(), span, true));
         return;
     }
     for (int i = 0; i < n; ++i)
@@ -928,7 +928,7 @@ void ConstraintChecker::Visit(FunctionConstraintNode& functionConstraintNode)
         TypeSymbol* parameterType = ResolveType(parameterNode->TypeExpr(), boundCompileUnit, containerScope);
         lookups.push_back(FunctionScopeLookup(ScopeLookup::this_and_base_and_parent, containerScope));
         parameterTypes.push_back(parameterType);
-        arguments.push_back(std::unique_ptr<BoundExpression>(new BoundTypeExpression(span, parameterType)));
+        arguments.push_back(std::unique_ptr<BoundExpression>(new BoundTypeExpression(&boundCompileUnit.GetModule(), span, parameterType)));
     }
     std::vector<TypeSymbol*> templateArgumentTypes;
     std::unique_ptr<Exception> exception;
@@ -938,7 +938,7 @@ void ConstraintChecker::Visit(FunctionConstraintNode& functionConstraintNode)
     {
         arguments.clear();
         parameterTypes.clear();
-        arguments.push_back(std::unique_ptr<BoundExpression>(new BoundTypeExpression(span, firstTypeArgument->AddPointer(span))));
+        arguments.push_back(std::unique_ptr<BoundExpression>(new BoundTypeExpression(&boundCompileUnit.GetModule(), span, firstTypeArgument->AddPointer(span))));
         std::vector<TypeSymbol*> parameterTypes;
         int n = functionConstraintNode.Parameters().Count();
         for (int i = 1; i < n; ++i)
@@ -946,7 +946,7 @@ void ConstraintChecker::Visit(FunctionConstraintNode& functionConstraintNode)
             ParameterNode* parameterNode = functionConstraintNode.Parameters()[i];
             TypeSymbol* parameterType = ResolveType(parameterNode->TypeExpr(), boundCompileUnit, containerScope);
             parameterTypes.push_back(parameterType);
-            arguments.push_back(std::unique_ptr<BoundExpression>(new BoundTypeExpression(span, parameterType)));
+            arguments.push_back(std::unique_ptr<BoundExpression>(new BoundTypeExpression(&boundCompileUnit.GetModule(), span, parameterType)));
         }
         std::vector<TypeSymbol*> templateArgumentTypes;
         std::unique_ptr<Exception> exception;
@@ -965,7 +965,7 @@ void ConstraintChecker::Visit(FunctionConstraintNode& functionConstraintNode)
                 TypeSymbol* parameterType = ResolveType(parameterNode->TypeExpr(), boundCompileUnit, containerScope);
                 lookups.push_back(FunctionScopeLookup(ScopeLookup::this_and_base_and_parent, parameterType->BaseType()->ClassInterfaceEnumDelegateOrNsScope()));
                 parameterTypes.push_back(parameterType);
-                arguments.push_back(std::unique_ptr<BoundExpression>(new BoundTypeExpression(span, parameterType)));
+                arguments.push_back(std::unique_ptr<BoundExpression>(new BoundTypeExpression(&boundCompileUnit.GetModule(), span, parameterType)));
             }
             std::vector<TypeSymbol*> templateArgumentTypes;
             std::unique_ptr<Exception> exception;
@@ -997,24 +997,24 @@ void ConstraintChecker::Visit(FunctionConstraintNode& functionConstraintNode)
                     references.push_back(exception->Defined());
                     references.insert(references.end(), exception->References().begin(), exception->References().end());
                 }
-                throw Exception(message, span, references);
+                throw Exception(&boundCompileUnit.GetModule(), message, span, references);
             }
             else
             {
                 result = true;
-                boundConstraint.reset(new BoundAtomicConstraint(span, true));
+                boundConstraint.reset(new BoundAtomicConstraint(&boundCompileUnit.GetModule(), span, true));
             }
         }
         else
         {
             result = true;
-            boundConstraint.reset(new BoundAtomicConstraint(span, true));
+            boundConstraint.reset(new BoundAtomicConstraint(&boundCompileUnit.GetModule(), span, true));
         }
     }
     else
     {
         result = true;
-        boundConstraint.reset(new BoundAtomicConstraint(span, true));
+        boundConstraint.reset(new BoundAtomicConstraint(&boundCompileUnit.GetModule(), span, true));
     }
 }
 
@@ -1039,7 +1039,7 @@ void ConstraintChecker::Visit(ConceptIdNode& conceptIdNode)
             }
             else
             {
-                throw Exception("type parameter " + std::to_string(i) + " does not denote a type", span, conceptIdNode.GetSpan());
+                throw Exception(&boundCompileUnit.GetModule(), "type parameter " + std::to_string(i) + " does not denote a type", span, conceptIdNode.GetSpan());
             }
         }
         BoundConceptKey key(conceptSymbol, typeArguments);
@@ -1069,13 +1069,13 @@ void ConstraintChecker::Visit(ConceptIdNode& conceptIdNode)
             else
             {
                 result = false;
-                boundConstraint.reset(new BoundAtomicConstraint(span, false));
+                boundConstraint.reset(new BoundAtomicConstraint(&boundCompileUnit.GetModule(), span, false));
             }
         }
     }
     else
     {
-        throw Exception(conceptIdNode.Id()->ToString() + " does not denote a concept", conceptIdNode.Id()->GetSpan());
+        throw Exception(&boundCompileUnit.GetModule(), conceptIdNode.Id()->ToString() + " does not denote a concept", conceptIdNode.Id()->GetSpan());
     }
 }
 
@@ -1085,7 +1085,7 @@ void ConstraintChecker::Visit(ConceptNode& conceptNode)
     conceptNode.Id()->Accept(*this);
     if (!conceptGroup)
     {
-        throw Exception("symbol '" + conceptNode.Id()->ToString() + "' does not denote a concept", conceptNode.Id()->GetSpan());
+        throw Exception(&boundCompileUnit.GetModule(), "symbol '" + conceptNode.Id()->ToString() + "' does not denote a concept", conceptNode.Id()->GetSpan());
     }
     int arity = conceptNode.Arity();
     ConceptSymbol* conceptSymbol = conceptGroup->GetConcept(arity);
@@ -1104,7 +1104,7 @@ void ConstraintChecker::Visit(ConceptNode& conceptNode)
         if (!result) return;
     }
     result = true;
-    BoundAtomicConstraint* atomicConstraint = new BoundAtomicConstraint(span, true);
+    BoundAtomicConstraint* atomicConstraint = new BoundAtomicConstraint(&boundCompileUnit.GetModule(), span, true);
     atomicConstraint->SetConcept(conceptSymbol);
     boundConstraint.reset(atomicConstraint);
 }
@@ -1116,17 +1116,17 @@ void ConstraintChecker::Visit(SameConstraintNode& sameConstraintNode)
         bool same = TypesEqual(firstTypeArgument, secondTypeArgument);
         if (!same)
         {
-            throw Exception("type '" + ToUtf8(firstTypeArgument->FullName()) + "' is not same type as '" + ToUtf8(secondTypeArgument->FullName()) + "'", span);
+            throw Exception(&boundCompileUnit.GetModule(), "type '" + ToUtf8(firstTypeArgument->FullName()) + "' is not same type as '" + ToUtf8(secondTypeArgument->FullName()) + "'", span);
         }
         else
         {
             result = true;
-            boundConstraint.reset(new BoundAtomicConstraint(span, true));
+            boundConstraint.reset(new BoundAtomicConstraint(&boundCompileUnit.GetModule(), span, true));
         }
     }
     else
     {
-        throw Exception("the same type constraint needs two type arguments", span);
+        throw Exception(&boundCompileUnit.GetModule(), "the same type constraint needs two type arguments", span);
     }
 }
 
@@ -1143,17 +1143,17 @@ void ConstraintChecker::Visit(DerivedConstraintNode& derivedConstraintNode)
         }
         if (!derived)
         {
-            throw Exception("type '" + ToUtf8(firstTypeArgument->FullName()) + "' is not derived from '" + ToUtf8(secondTypeArgument->FullName()) + "'", span);
+            throw Exception(&boundCompileUnit.GetModule(), "type '" + ToUtf8(firstTypeArgument->FullName()) + "' is not derived from '" + ToUtf8(secondTypeArgument->FullName()) + "'", span);
         }
         else
         {
             result = true;
-            boundConstraint.reset(new BoundAtomicConstraint(span, true));
+            boundConstraint.reset(new BoundAtomicConstraint(&boundCompileUnit.GetModule(), span, true));
         }
     }
     else
     {
-        throw Exception("the derivded type constraint needs two type arguments", span);
+        throw Exception(&boundCompileUnit.GetModule(), "the derivded type constraint needs two type arguments", span);
     }
 }
 
@@ -1165,17 +1165,17 @@ void ConstraintChecker::Visit(ConvertibleConstraintNode& convertibleConstraintNo
         FunctionSymbol* conversion = boundCompileUnit.GetConversion(firstTypeArgument, secondTypeArgument, containerScope, currentFunction, span, argumentMatch);
         if (!conversion || conversion->GetConversionType() == ConversionType::explicit_)
         {
-            throw Exception("type '" + ToUtf8(firstTypeArgument->FullName()) + "' is not implicitly convertible to '" + ToUtf8(secondTypeArgument->FullName()) + "'", span);
+            throw Exception(&boundCompileUnit.GetModule(), "type '" + ToUtf8(firstTypeArgument->FullName()) + "' is not implicitly convertible to '" + ToUtf8(secondTypeArgument->FullName()) + "'", span);
         }
         else
         {
             result = true;
-            boundConstraint.reset(new BoundAtomicConstraint(span, true));
+            boundConstraint.reset(new BoundAtomicConstraint(&boundCompileUnit.GetModule(), span, true));
         }
     }
     else
     {
-        throw Exception("the convertible constraint needs two type arguments", span);
+        throw Exception(&boundCompileUnit.GetModule(), "the convertible constraint needs two type arguments", span);
     }
 }
 
@@ -1187,17 +1187,17 @@ void ConstraintChecker::Visit(ExplicitlyConvertibleConstraintNode& explicitlyCon
         FunctionSymbol* conversion = boundCompileUnit.GetConversion(firstTypeArgument, secondTypeArgument, containerScope, currentFunction, span, argumentMatch);
         if (!conversion || conversion->GetConversionType() != ConversionType::explicit_)
         {
-            throw Exception("type '" + ToUtf8(firstTypeArgument->FullName()) + "' is not explicitly convertible to '" + ToUtf8(secondTypeArgument->FullName()) + "'", span);
+            throw Exception(&boundCompileUnit.GetModule(), "type '" + ToUtf8(firstTypeArgument->FullName()) + "' is not explicitly convertible to '" + ToUtf8(secondTypeArgument->FullName()) + "'", span);
         }
         else
         {
             result = true;
-            boundConstraint.reset(new BoundAtomicConstraint(span, true));
+            boundConstraint.reset(new BoundAtomicConstraint(&boundCompileUnit.GetModule(), span, true));
         }
     }
     else
     {
-        throw Exception("the explicitly convertible constraint needs two type arguments", span);
+        throw Exception(&boundCompileUnit.GetModule(), "the explicitly convertible constraint needs two type arguments", span);
     }
 }
 
@@ -1229,18 +1229,18 @@ void ConstraintChecker::Visit(CommonConstraintNode& commonConstraintNode)
                 }
                 else
                 {
-                    throw Exception("type '" + ToUtf8(firstTypeArgument->FullName()) + "' is not same or convertible to type '" + ToUtf8(secondTypeArgument->FullName()) + "' or vice versa", span);
+                    throw Exception(&boundCompileUnit.GetModule(), "type '" + ToUtf8(firstTypeArgument->FullName()) + "' is not same or convertible to type '" + ToUtf8(secondTypeArgument->FullName()) + "' or vice versa", span);
                 }
             }
         }
         containerScope->Install(commonType);
         boundTemplateParameters.push_back(std::unique_ptr<BoundTemplateParameterSymbol>(commonType));
         result = true;
-        boundConstraint.reset(new BoundAtomicConstraint(span, true));
+        boundConstraint.reset(new BoundAtomicConstraint(&boundCompileUnit.GetModule(), span, true));
     }
     else
     {
-        throw Exception("the common constraint needs two type arguments", span);
+        throw Exception(&boundCompileUnit.GetModule(), "the common constraint needs two type arguments", span);
     }
 }
 
@@ -1251,17 +1251,17 @@ void ConstraintChecker::Visit(NonreferenceTypeConstraintNode& nonreferenceTypeCo
         bool referenceType = firstTypeArgument->IsReferenceType();
         if (referenceType)
         {
-            throw Exception("type '" + ToUtf8(firstTypeArgument->FullName()) + "' is a reference type", span);
+            throw Exception(&boundCompileUnit.GetModule(), "type '" + ToUtf8(firstTypeArgument->FullName()) + "' is a reference type", span);
         }
         else
         {
             result = true;
-            boundConstraint.reset(new BoundAtomicConstraint(span, true));
+            boundConstraint.reset(new BoundAtomicConstraint(&boundCompileUnit.GetModule(), span, true));
         }
     }
     else
     {
-        throw Exception("the nonreference type constraint needs one type argument", span);
+        throw Exception(&boundCompileUnit.GetModule(), "the nonreference type constraint needs one type argument", span);
     }
 }
 
@@ -1278,7 +1278,7 @@ std::unique_ptr<BoundConcept> Instantiate(ConceptSymbol* conceptSymbol, const st
     int n = conceptSymbol->Arity();
     if (n != typeArguments.size())
     {
-        throw Exception("number of type arguments does not match number of template parameters of concept symbol", span, conceptSymbol->GetSpan());
+        throw Exception(&boundCompileUnit.GetModule(), "number of type arguments does not match number of template parameters of concept symbol", span, conceptSymbol->GetSpan());
     }
     ContainerScope instantiationScope;
     instantiationScope.SetParent(containerScope);
@@ -1314,14 +1314,14 @@ std::unique_ptr<BoundConcept> Instantiate(ConceptSymbol* conceptSymbol, const st
         boundConstraint = std::move(checker.GetBoundConstraint());
         if (result)
         {
-            BoundConcept* boundConcept = new BoundConcept(conceptSymbol, typeArguments, span);
+            BoundConcept* boundConcept = new BoundConcept(&boundCompileUnit.GetModule(), conceptSymbol, typeArguments, span);
             boundConcept->SetBoundConstraint(std::unique_ptr<BoundConstraint>(boundConstraint->Clone()));
             Symbol* commonTypeSymbol = instantiationScope.Lookup(U"CommonType");
             if (commonTypeSymbol)
             {
                 if (commonTypeSymbol->GetSymbolType() != SymbolType::boundTemplateParameterSymbol)
                 {
-                    throw Exception("'CommonType' symbol found from concept instantiation scope is not bound template parameter", span, commonTypeSymbol->GetSpan());
+                    throw Exception(&boundCompileUnit.GetModule(), "'CommonType' symbol found from concept instantiation scope is not bound template parameter", span, commonTypeSymbol->GetSpan());
                 }
                 BoundTemplateParameterSymbol* commonType = static_cast<BoundTemplateParameterSymbol*>(commonTypeSymbol);
                 BoundTemplateParameterSymbol* commonTypeClone = new BoundTemplateParameterSymbol(span, U"CommonType");
@@ -1368,7 +1368,7 @@ std::unique_ptr<BoundConcept> Instantiate(ConceptSymbol* conceptSymbol, const st
         references.push_back(conceptSymbol->GetSpan());
         references.push_back(ex.Defined());
         references.insert(references.end(), ex.References().begin(), ex.References().end());
-        throw Exception(message, span, references);
+        throw Exception(&boundCompileUnit.GetModule(), message, span, references);
     }
 }
 
@@ -1379,7 +1379,7 @@ bool CheckConstraint(ConstraintNode* constraint, const NodeList<Node>& usingNode
     bool fileScopeAdded = false;
     try
     {
-        std::unique_ptr<FileScope> fileScope(new FileScope());
+        std::unique_ptr<FileScope> fileScope(new FileScope(&boundCompileUnit.GetModule()));
         int nu = usingNodes.Count();
         for (int i = 0; i < nu; ++i)
         {
@@ -1400,7 +1400,7 @@ bool CheckConstraint(ConstraintNode* constraint, const NodeList<Node>& usingNode
                 }
                 default:
                 {
-                    throw Exception("unknown using node type", usingNode->GetSpan());
+                    throw Exception(&boundCompileUnit.GetModule(), "unknown using node type", usingNode->GetSpan());
                 }
             }
         }
@@ -1432,7 +1432,7 @@ bool CheckConstraint(ConstraintNode* constraint, const NodeList<Node>& usingNode
             }
             else
             {
-                throw Exception("template parameter symbol '" + ToUtf8(templateParameterSymbol->Name()) + "' not found from template parameter map", span, viableFunction->GetSpan());
+                throw Exception(&boundCompileUnit.GetModule(), "template parameter symbol '" + ToUtf8(templateParameterSymbol->Name()) + "' not found from template parameter map", span, viableFunction->GetSpan());
             }
         }
         boundCompileUnit.AddFileScope(fileScope.release());

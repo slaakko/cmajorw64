@@ -23,6 +23,7 @@
 #include <cmajor/symbols/TemplateSymbol.hpp>
 #include <cmajor/symbols/ConceptSymbol.hpp>
 #include <cmajor/symbols/FunctionSymbol.hpp>
+#include <cmajor/symbols/Module.hpp>
 #include <cmajor/util/Unicode.hpp>
 #include <cmajor/util/Sha1.hpp>
 
@@ -257,7 +258,7 @@ void Symbol::SetAccess(Specifiers accessSpecifiers)
         }
         else
         {
-            throw Exception("only class members can have protected access", GetSpan());
+            throw Exception(GetModule(), "only class members can have protected access", GetSpan());
         }
     }
     else if (accessSpecifiers == Specifiers::internal_)
@@ -272,12 +273,12 @@ void Symbol::SetAccess(Specifiers accessSpecifiers)
         }
         else
         {
-            throw Exception("only class members can have private access", GetSpan());
+            throw Exception(GetModule(), "only class members can have private access", GetSpan());
         }
     }
     else if (accessSpecifiers != Specifiers::none)
     {
-        throw Exception("invalid combination of access specifiers: " + SpecifierStr(accessSpecifiers), GetSpan());
+        throw Exception(GetModule(), "invalid combination of access specifiers: " + SpecifierStr(accessSpecifiers), GetSpan());
     }
     SetAccess(access);
 }
@@ -316,7 +317,7 @@ const NamespaceSymbol* Symbol::Ns() const
         }
         else
         {
-            throw Exception("namespace symbol not found", GetSpan());
+            throw Exception(GetModule(), "namespace symbol not found", GetSpan());
         }
     }
 }
@@ -335,7 +336,7 @@ NamespaceSymbol* Symbol::Ns()
         }
         else
         {
-            throw Exception("namespace symbol not found", GetSpan());
+            throw Exception(GetModule(), "namespace symbol not found", GetSpan());
         }
     }
 }
@@ -573,7 +574,7 @@ const ClassTypeSymbol* Symbol::Class() const
     }
     else
     {
-        throw Exception("class type symbol not found", GetSpan());
+        throw Exception(GetModule(), "class type symbol not found", GetSpan());
     }
 }
 
@@ -586,7 +587,7 @@ ClassTypeSymbol* Symbol::Class()
     }
     else
     {
-        throw Exception("class type symbol not found", GetSpan());
+        throw Exception(GetModule(), "class type symbol not found", GetSpan());
     }
 }
 
@@ -723,7 +724,7 @@ const FunctionSymbol* Symbol::Function() const
     }
     else
     {
-        throw Exception("function symbol not found", GetSpan());
+        throw Exception(GetModule(), "function symbol not found", GetSpan());
     }
 }
 
@@ -736,7 +737,7 @@ FunctionSymbol* Symbol::Function()
     }
     else
     {
-        throw Exception("function symbol not found", GetSpan());
+        throw Exception(GetModule(), "function symbol not found", GetSpan());
     }
 }
 
@@ -773,7 +774,7 @@ const ContainerScope* Symbol::ClassOrNsScope() const
     }
     else
     {
-        throw Exception("class or namespace scope not found", GetSpan());
+        throw Exception(GetModule(), "class or namespace scope not found", GetSpan());
     }
 }
 
@@ -786,7 +787,7 @@ ContainerScope* Symbol::ClassOrNsScope()
     }
     else
     {
-        throw Exception("class or namespace scope not found", GetSpan());
+        throw Exception(GetModule(), "class or namespace scope not found", GetSpan());
     }
 }
 
@@ -799,7 +800,7 @@ const ContainerScope* Symbol::ClassInterfaceOrNsScope() const
     }
     else
     {
-        throw Exception("class, interface or namespace scope not found", GetSpan());
+        throw Exception(GetModule(), "class, interface or namespace scope not found", GetSpan());
     }
 }
 
@@ -812,7 +813,7 @@ ContainerScope* Symbol::ClassInterfaceOrNsScope()
     }
     else
     {
-        throw Exception("class, interface or namespace scope not found", GetSpan());
+        throw Exception(GetModule(), "class, interface or namespace scope not found", GetSpan());
     }
 }
 
@@ -825,7 +826,7 @@ const ContainerScope* Symbol::ClassInterfaceEnumDelegateOrNsScope() const
     }
     else
     {
-        throw Exception("class, interface, enumeration, delegate, class delegate or namespace scope not found", GetSpan());
+        throw Exception(GetModule(), "class, interface, enumeration, delegate, class delegate or namespace scope not found", GetSpan());
     }
 }
 
@@ -838,7 +839,7 @@ ContainerScope* Symbol::ClassInterfaceEnumDelegateOrNsScope()
     }
     else
     {
-        throw Exception("class, interface, enumeration, delegate, class delegate or namespace scope not found", GetSpan());
+        throw Exception(GetModule(), "class, interface, enumeration, delegate, class delegate or namespace scope not found", GetSpan());
     }
 }
 

@@ -10,7 +10,9 @@
 
 extern "C" RT_API void RtStartProfiling();
 extern "C" RT_API void RtEndProfiling();
-extern "C" RT_API void RtProfileStartFunction(uint32_t functionId);
-extern "C" RT_API void RtProfileEndFunction(uint32_t functionId);
+//extern "C" RT_API void RtProfileStartFunction(uint32_t functionId);
+extern "C" RT_API void RtProfileStartFunction(void* functionId);
+//extern "C" RT_API void RtProfileEndFunction(uint32_t functionId);
+extern "C" RT_API void RtProfileEndFunction(void* functionId);
 
 #endif // CMAJOR_RT_PROFILE_INCLUDED

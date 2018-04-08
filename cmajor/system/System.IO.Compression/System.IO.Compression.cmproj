@@ -2,7 +2,7 @@
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
  <PropertyGroup Label="Globals">
   <CustomProjectExtensionsPath>$(LocalAppData)\CustomProjectSystems\Cmajor\</CustomProjectExtensionsPath>
-  <ProjectGuid>ff74775c-1a8f-4f01-a53a-e26b7d6067a1</ProjectGuid>
+  <ProjectGuid>a0cae209-9fcd-4781-9dc1-b9a8f435f41d</ProjectGuid>
  </PropertyGroup>
  <PropertyGroup>
   <TargetType>library</TargetType>
@@ -12,13 +12,7 @@
   <CmCompile Include="DeflateStream.cm"/>
  </ItemGroup>
  <ItemGroup>
-  <ProjectReference Include="../System.Core/System.Core.cmproj"/>
-  <ProjectReference Include="../System.Runtime/System.Runtime.cmproj"/>
   <ProjectReference Include="../System.Base/System.Base.cmproj"/>
-  <ProjectReference Include="../System.Text.Parsing.CodeDom/System.Text.Parsing.CodeDom.cmproj"/>
-  <ProjectReference Include="../System.Text.Parsing/System.Text.Parsing.cmproj"/>
-  <ProjectReference Include="../System.Net.Sockets/System.Net.Sockets.cmproj"/>
-  <ProjectReference Include="../System.Numerics.Multiprecision/System.Numerics.Multiprecision.cmproj"/>
  </ItemGroup>
  <Import Project="$(CustomProjectExtensionsPath)Cmajor.props"/>
  <Import Project="$(CustomProjectExtensionsPath)Cmajor.targets"/>

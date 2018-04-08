@@ -776,9 +776,13 @@ void BasicTypeConversion<ConversionOp>::Read(SymbolReader& reader)
     FunctionSymbol::Read(reader);
     conversionType = static_cast<ConversionType>(reader.GetBinaryReader().ReadByte());
     conversionDistance = reader.GetBinaryReader().ReadByte();
-    uint32_t sourceTypeId = reader.GetBinaryReader().ReadUInt();
+    //uint32_t sourceTypeId = reader.GetBinaryReader().ReadUInt();
+    boost::uuids::uuid sourceTypeId;
+    reader.GetBinaryReader().ReadUuid(sourceTypeId);
     GetSymbolTable()->EmplaceTypeRequest(this, sourceTypeId, 1);
-    uint32_t targetTypeId = reader.GetBinaryReader().ReadUInt();
+    boost::uuids::uuid targetTypeId;
+    //uint32_t targetTypeId = reader.GetBinaryReader().ReadUInt();
+    reader.GetBinaryReader().ReadUuid(targetTypeId);
     GetSymbolTable()->EmplaceTypeRequest(this, targetTypeId, 2);
 }
 

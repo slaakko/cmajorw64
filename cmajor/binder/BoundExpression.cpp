@@ -21,7 +21,8 @@ namespace cmajor { namespace binder {
 
 using namespace cmajor::unicode;
  
-BoundExpression::BoundExpression(const Span& span_, BoundNodeType boundNodeType_, TypeSymbol* type_) : BoundNode(span_, boundNodeType_), type(type_), flags(BoundExpressionFlags::none)
+BoundExpression::BoundExpression(Module* module_, const Span& span_, BoundNodeType boundNodeType_, TypeSymbol* type_) : 
+    BoundNode(module_, span_, boundNodeType_), type(type_), flags(BoundExpressionFlags::none)
 {
 }
 
@@ -47,14 +48,14 @@ void BoundExpression::DestroyTemporaries(Emitter& emitter)
     }
 }
 
-BoundParameter::BoundParameter(const Span& span_, ParameterSymbol* parameterSymbol_) : 
-    BoundExpression(parameterSymbol_->GetSpan(), BoundNodeType::boundParameter, parameterSymbol_->GetType()), parameterSymbol(parameterSymbol_)
+BoundParameter::BoundParameter(Module* module_, const Span& span_, ParameterSymbol* parameterSymbol_) :
+    BoundExpression(module_, parameterSymbol_->GetSpan(), BoundNodeType::boundParameter, parameterSymbol_->GetType()), parameterSymbol(parameterSymbol_)
 {
 }
 
 BoundExpression* BoundParameter::Clone()
 {
-    return new BoundParameter(GetSpan(), parameterSymbol);
+    return new BoundParameter(GetModule(), GetSpan(), parameterSymbol);
 }
 
 void BoundParameter::Load(Emitter& emitter, OperationFlags flags)
@@ -87,7 +88,7 @@ void BoundParameter::Store(Emitter& emitter, OperationFlags flags)
     llvm::Value* value = emitter.Stack().Pop();
     if ((flags & OperationFlags::addr) != OperationFlags::none)
     {
-        throw Exception("cannot take address of a parameter", GetSpan());
+        throw Exception(GetModule(), "cannot take address of a parameter", GetSpan());
     }
     else if ((flags & OperationFlags::deref) != OperationFlags::none)
     {
@@ -111,14 +112,14 @@ void BoundParameter::Accept(BoundNodeVisitor& visitor)
     visitor.Visit(*this);
 }
 
-BoundLocalVariable::BoundLocalVariable(const Span& span_, LocalVariableSymbol* localVariableSymbol_) :
-    BoundExpression(span_, BoundNodeType::boundLocalVariable, localVariableSymbol_->GetType()), localVariableSymbol(localVariableSymbol_)
+BoundLocalVariable::BoundLocalVariable(Module* module_, const Span& span_, LocalVariableSymbol* localVariableSymbol_) :
+    BoundExpression(module_, span_, BoundNodeType::boundLocalVariable, localVariableSymbol_->GetType()), localVariableSymbol(localVariableSymbol_)
 {
 }
 
 BoundExpression* BoundLocalVariable::Clone()
 {
-    return new BoundLocalVariable(GetSpan(), localVariableSymbol);
+    return new BoundLocalVariable(GetModule(), GetSpan(), localVariableSymbol);
 }
 
 void BoundLocalVariable::Load(Emitter& emitter, OperationFlags flags)
@@ -151,7 +152,7 @@ void BoundLocalVariable::Store(Emitter& emitter, OperationFlags flags)
     llvm::Value* value = emitter.Stack().Pop();
     if ((flags & OperationFlags::addr) != OperationFlags::none)
     {
-        throw Exception("cannot store to address of a local variable", GetSpan());
+        throw Exception(GetModule(), "cannot store to address of a local variable", GetSpan());
     }
     else if ((flags & OperationFlags::deref) != OperationFlags::none)
     {
@@ -175,14 +176,14 @@ void BoundLocalVariable::Accept(BoundNodeVisitor& visitor)
     visitor.Visit(*this);
 }
 
-BoundMemberVariable::BoundMemberVariable(const Span& span_, MemberVariableSymbol* memberVariableSymbol_) :
-    BoundExpression(span_, BoundNodeType::boundMemberVariable, memberVariableSymbol_->GetType()), memberVariableSymbol(memberVariableSymbol_), staticInitNeeded(false)
+BoundMemberVariable::BoundMemberVariable(Module* module_, const Span& span_, MemberVariableSymbol* memberVariableSymbol_) :
+    BoundExpression(module_, span_, BoundNodeType::boundMemberVariable, memberVariableSymbol_->GetType()), memberVariableSymbol(memberVariableSymbol_), staticInitNeeded(false)
 {
 }
 
 BoundExpression* BoundMemberVariable::Clone()
 {
-    BoundMemberVariable* clone = new BoundMemberVariable(GetSpan(), memberVariableSymbol);
+    BoundMemberVariable* clone = new BoundMemberVariable(GetModule(), GetSpan(), memberVariableSymbol);
     if (classPtr)
     {
         clone->classPtr.reset(classPtr->Clone());
@@ -205,7 +206,7 @@ void BoundMemberVariable::Load(Emitter& emitter, OperationFlags flags)
         {
             if (classType->StaticConstructor())
             {
-                BoundFunctionCall staticConstructorCall(GetSpan(), classType->StaticConstructor());
+                BoundFunctionCall staticConstructorCall(GetModule(), GetSpan(), classType->StaticConstructor());
                 staticConstructorCall.Load(emitter, OperationFlags::none);
             }
         }
@@ -248,7 +249,7 @@ void BoundMemberVariable::Store(Emitter& emitter, OperationFlags flags)
     llvm::Value* value = emitter.Stack().Pop();
     if ((flags & OperationFlags::addr) != OperationFlags::none)
     {
-        throw Exception("cannot store to the address of a member variable", GetSpan());
+        throw Exception(GetModule(), "cannot store to the address of a member variable", GetSpan());
     }
     else 
     {
@@ -259,7 +260,7 @@ void BoundMemberVariable::Store(Emitter& emitter, OperationFlags flags)
             {
                 if (classType->StaticConstructor())
                 {
-                    BoundFunctionCall staticConstructorCall(GetSpan(), classType->StaticConstructor());
+                    BoundFunctionCall staticConstructorCall(GetModule(), GetSpan(), classType->StaticConstructor());
                     staticConstructorCall.Load(emitter, OperationFlags::none);
                 }
             }
@@ -302,13 +303,14 @@ void BoundMemberVariable::SetClassPtr(std::unique_ptr<BoundExpression>&& classPt
     classPtr = std::move(classPtr_);
 }
 
-BoundConstant::BoundConstant(const Span& span_, ConstantSymbol* constantSymbol_) : BoundExpression(span_, BoundNodeType::boundConstant, constantSymbol_->GetType()), constantSymbol(constantSymbol_)
+BoundConstant::BoundConstant(Module* module_, const Span& span_, ConstantSymbol* constantSymbol_) : 
+    BoundExpression(module_, span_, BoundNodeType::boundConstant, constantSymbol_->GetType()), constantSymbol(constantSymbol_)
 {
 }
 
 BoundExpression* BoundConstant::Clone()
 {
-    return new BoundConstant(GetSpan(), constantSymbol);
+    return new BoundConstant(GetModule(), GetSpan(), constantSymbol);
 }
 
 void BoundConstant::Load(Emitter& emitter, OperationFlags flags)
@@ -322,11 +324,11 @@ void BoundConstant::Load(Emitter& emitter, OperationFlags flags)
     {
         if ((flags & OperationFlags::addr) != OperationFlags::none)
         {
-            throw Exception("cannot take address of a constant", GetSpan());
+            throw Exception(GetModule(), "cannot take address of a constant", GetSpan());
         }
         else if ((flags & OperationFlags::deref) != OperationFlags::none)
         {
-            throw Exception("cannot dereference a constant", GetSpan());
+            throw Exception(GetModule(), "cannot dereference a constant", GetSpan());
         }
         else
         {
@@ -338,7 +340,7 @@ void BoundConstant::Load(Emitter& emitter, OperationFlags flags)
 
 void BoundConstant::Store(Emitter& emitter, OperationFlags flags)
 {
-    throw Exception("cannot store to a constant", GetSpan());
+    throw Exception(GetModule(), "cannot store to a constant", GetSpan());
 }
 
 void BoundConstant::Accept(BoundNodeVisitor& visitor)
@@ -346,14 +348,14 @@ void BoundConstant::Accept(BoundNodeVisitor& visitor)
     visitor.Visit(*this);
 }
 
-BoundEnumConstant::BoundEnumConstant(const Span& span_, EnumConstantSymbol* enumConstantSymbol_) : BoundExpression(span_, BoundNodeType::boundEnumConstant, enumConstantSymbol_->GetType()),
-    enumConstantSymbol(enumConstantSymbol_)
+BoundEnumConstant::BoundEnumConstant(Module* module_, const Span& span_, EnumConstantSymbol* enumConstantSymbol_) : 
+    BoundExpression(module_, span_, BoundNodeType::boundEnumConstant, enumConstantSymbol_->GetType()), enumConstantSymbol(enumConstantSymbol_)
 {
 }
 
 BoundExpression* BoundEnumConstant::Clone()
 {
-    return new BoundEnumConstant(GetSpan(), enumConstantSymbol);
+    return new BoundEnumConstant(GetModule(), GetSpan(), enumConstantSymbol);
 }
 
 void BoundEnumConstant::Load(Emitter& emitter, OperationFlags flags)
@@ -361,11 +363,11 @@ void BoundEnumConstant::Load(Emitter& emitter, OperationFlags flags)
     emitter.SetCurrentDebugLocation(GetSpan());
     if ((flags & OperationFlags::addr) != OperationFlags::none)
     {
-        throw Exception("cannot take address of an enumeration constant", GetSpan());
+        throw Exception(GetModule(), "cannot take address of an enumeration constant", GetSpan());
     }
     else if ((flags & OperationFlags::deref) != OperationFlags::none)
     {
-        throw Exception("cannot dereference an enumeration constant", GetSpan());
+        throw Exception(GetModule(), "cannot dereference an enumeration constant", GetSpan());
     }
     else
     {
@@ -376,7 +378,7 @@ void BoundEnumConstant::Load(Emitter& emitter, OperationFlags flags)
 
 void BoundEnumConstant::Store(Emitter& emitter, OperationFlags flags)
 {
-    throw Exception("cannot store to an enumeration constant", GetSpan());
+    throw Exception(GetModule(), "cannot store to an enumeration constant", GetSpan());
 }
 
 void BoundEnumConstant::Accept(BoundNodeVisitor& visitor)
@@ -384,7 +386,8 @@ void BoundEnumConstant::Accept(BoundNodeVisitor& visitor)
     visitor.Visit(*this);
 }
 
-BoundLiteral::BoundLiteral(std::unique_ptr<Value>&& value_, TypeSymbol* type_) : BoundExpression(value_->GetSpan(), BoundNodeType::boundLiteral, type_), value(std::move(value_))
+BoundLiteral::BoundLiteral(Module* module_, std::unique_ptr<Value>&& value_, TypeSymbol* type_) : 
+    BoundExpression(module_, value_->GetSpan(), BoundNodeType::boundLiteral, type_), value(std::move(value_))
 {
 }
 
@@ -392,7 +395,7 @@ BoundExpression* BoundLiteral::Clone()
 {
     std::unique_ptr<Value> clonedValue;
     clonedValue.reset(value->Clone());
-    return new BoundLiteral(std::move(clonedValue), GetType());
+    return new BoundLiteral(GetModule(), std::move(clonedValue), GetType());
 }
 
 void BoundLiteral::Load(Emitter& emitter, OperationFlags flags)
@@ -400,11 +403,11 @@ void BoundLiteral::Load(Emitter& emitter, OperationFlags flags)
     emitter.SetCurrentDebugLocation(GetSpan());
     if ((flags & OperationFlags::addr) != OperationFlags::none)
     {
-        throw Exception("cannot take address of a literal", GetSpan());
+        throw Exception(GetModule(), "cannot take address of a literal", GetSpan());
     }
     else if ((flags & OperationFlags::deref) != OperationFlags::none)
     {
-        throw Exception("cannot dereference a literal", GetSpan());
+        throw Exception(GetModule(), "cannot dereference a literal", GetSpan());
     }
     else
     {
@@ -415,7 +418,7 @@ void BoundLiteral::Load(Emitter& emitter, OperationFlags flags)
 
 void BoundLiteral::Store(Emitter& emitter, OperationFlags flags)
 {
-    throw Exception("cannot store to a literal", GetSpan());
+    throw Exception(GetModule(), "cannot store to a literal", GetSpan());
 }
 
 void BoundLiteral::Accept(BoundNodeVisitor& visitor)
@@ -450,8 +453,8 @@ std::unique_ptr<Value> BoundLiteral::ToValue(BoundCompileUnit& boundCompileUnit)
     return std::unique_ptr<Value>();
 }
 
-BoundTemporary::BoundTemporary(std::unique_ptr<BoundExpression>&& rvalueExpr_, std::unique_ptr<BoundLocalVariable>&& backingStore_) :
-    BoundExpression(rvalueExpr_->GetSpan(), BoundNodeType::boundTemporary, rvalueExpr_->GetType()), rvalueExpr(std::move(rvalueExpr_)), backingStore(std::move(backingStore_))
+BoundTemporary::BoundTemporary(Module* module_, std::unique_ptr<BoundExpression>&& rvalueExpr_, std::unique_ptr<BoundLocalVariable>&& backingStore_) :
+    BoundExpression(module_, rvalueExpr_->GetSpan(), BoundNodeType::boundTemporary, rvalueExpr_->GetType()), rvalueExpr(std::move(rvalueExpr_)), backingStore(std::move(backingStore_))
 {
     rvalueExpr->MoveTemporaryDestructorCallsTo(*this);
     if (backingStore)
@@ -469,7 +472,7 @@ BoundExpression* BoundTemporary::Clone()
     {
         clonedBackingStore.reset(static_cast<BoundLocalVariable*>(backingStore->Clone()));
     }
-    return new BoundTemporary(std::move(clonedRvalueExpr), std::move(clonedBackingStore));
+    return new BoundTemporary(GetModule(), std::move(clonedRvalueExpr), std::move(clonedBackingStore));
 }
 
 void BoundTemporary::Load(Emitter& emitter, OperationFlags flags)
@@ -477,7 +480,7 @@ void BoundTemporary::Load(Emitter& emitter, OperationFlags flags)
     rvalueExpr->Load(emitter, OperationFlags::none);
     if (!backingStore)
     {
-        throw Exception("backing store of temporary not set", GetSpan());
+        throw Exception(GetModule(), "backing store of temporary not set", GetSpan());
     }
     backingStore->Store(emitter, OperationFlags::none);
     if ((flags & OperationFlags::addr) != OperationFlags::none)
@@ -497,7 +500,7 @@ void BoundTemporary::Load(Emitter& emitter, OperationFlags flags)
 
 void BoundTemporary::Store(Emitter& emitter, OperationFlags flags)
 {
-    throw Exception("cannot store to a temporary", GetSpan());
+    throw Exception(GetModule(), "cannot store to a temporary", GetSpan());
 }
 
 void BoundTemporary::Accept(BoundNodeVisitor& visitor)
@@ -523,25 +526,25 @@ bool BoundTemporary::ContainsExceptionCapture() const
     return false;
 }
 
-BoundSizeOfExpression::BoundSizeOfExpression(const Span& span_, TypeSymbol* type_, TypeSymbol* pointerType_) : 
-    BoundExpression(span_, BoundNodeType::boundSizeOfExpression, type_), pointerType(pointerType_)
+BoundSizeOfExpression::BoundSizeOfExpression(Module* module_, const Span& span_, TypeSymbol* type_, TypeSymbol* pointerType_) :
+    BoundExpression(module_, span_, BoundNodeType::boundSizeOfExpression, type_), pointerType(pointerType_)
 {
 }
 
 BoundExpression* BoundSizeOfExpression::Clone()
 {
-    return new BoundSizeOfExpression(GetSpan(), GetType(), pointerType);
+    return new BoundSizeOfExpression(GetModule(), GetSpan(), GetType(), pointerType);
 }
 
 void BoundSizeOfExpression::Load(Emitter& emitter, OperationFlags flags)
 {
     if ((flags & OperationFlags::addr) != OperationFlags::none)
     {
-        throw Exception("cannot take address of a sizeof expression", GetSpan());
+        throw Exception(GetModule(), "cannot take address of a sizeof expression", GetSpan());
     }
     else if ((flags & OperationFlags::deref) != OperationFlags::none)
     {
-        throw Exception("cannot dereference a sizeof expression", GetSpan());
+        throw Exception(GetModule(), "cannot dereference a sizeof expression", GetSpan());
     }
     else
     {
@@ -555,7 +558,7 @@ void BoundSizeOfExpression::Load(Emitter& emitter, OperationFlags flags)
 
 void BoundSizeOfExpression::Store(Emitter& emitter, OperationFlags flags)
 {
-    throw Exception("cannot store to a sizeof expression", GetSpan());
+    throw Exception(GetModule(), "cannot store to a sizeof expression", GetSpan());
 }
 
 void BoundSizeOfExpression::Accept(BoundNodeVisitor& visitor)
@@ -563,8 +566,8 @@ void BoundSizeOfExpression::Accept(BoundNodeVisitor& visitor)
     visitor.Visit(*this);
 }
 
-BoundAddressOfExpression::BoundAddressOfExpression(std::unique_ptr<BoundExpression>&& subject_, TypeSymbol* type_)  : 
-    BoundExpression(subject_->GetSpan(), BoundNodeType::boundAddressOfExpression, type_), subject(std::move(subject_))
+BoundAddressOfExpression::BoundAddressOfExpression(Module* module_, std::unique_ptr<BoundExpression>&& subject_, TypeSymbol* type_)  :
+    BoundExpression(module_, subject_->GetSpan(), BoundNodeType::boundAddressOfExpression, type_), subject(std::move(subject_))
 {
     subject->MoveTemporaryDestructorCallsTo(*this);
 }
@@ -573,7 +576,7 @@ BoundExpression* BoundAddressOfExpression::Clone()
 {
     std::unique_ptr<BoundExpression> clonedSubject;
     clonedSubject.reset(subject->Clone());
-    return new BoundAddressOfExpression(std::move(clonedSubject), GetType());
+    return new BoundAddressOfExpression(GetModule(), std::move(clonedSubject), GetType());
 }
 
 void BoundAddressOfExpression::Load(Emitter& emitter, OperationFlags flags)
@@ -627,8 +630,8 @@ bool BoundAddressOfExpression::ContainsExceptionCapture() const
     return false;
 }
 
-BoundDereferenceExpression::BoundDereferenceExpression(std::unique_ptr<BoundExpression>&& subject_, TypeSymbol* type_) :
-    BoundExpression(subject_->GetSpan(), BoundNodeType::boundDereferenceExpression, type_), subject(std::move(subject_))
+BoundDereferenceExpression::BoundDereferenceExpression(Module* module_, std::unique_ptr<BoundExpression>&& subject_, TypeSymbol* type_) :
+    BoundExpression(module_, subject_->GetSpan(), BoundNodeType::boundDereferenceExpression, type_), subject(std::move(subject_))
 {
     subject->MoveTemporaryDestructorCallsTo(*this);
 }
@@ -637,7 +640,7 @@ BoundExpression* BoundDereferenceExpression::Clone()
 {
     std::unique_ptr<BoundExpression> clonedSubject;
     clonedSubject.reset(subject->Clone());
-    return new BoundDereferenceExpression(std::move(clonedSubject), GetType());
+    return new BoundDereferenceExpression(GetModule(), std::move(clonedSubject), GetType());
 }
 
 void BoundDereferenceExpression::Load(Emitter& emitter, OperationFlags flags)
@@ -693,8 +696,8 @@ bool BoundDereferenceExpression::ContainsExceptionCapture() const
     return false;
 }
 
-BoundReferenceToPointerExpression::BoundReferenceToPointerExpression(std::unique_ptr<BoundExpression>&& subject_, TypeSymbol* type_) :
-    BoundExpression(subject_->GetSpan(), BoundNodeType::boundReferenceToPointerExpression, type_), subject(std::move(subject_))
+BoundReferenceToPointerExpression::BoundReferenceToPointerExpression(Module* module_, std::unique_ptr<BoundExpression>&& subject_, TypeSymbol* type_) :
+    BoundExpression(module_, subject_->GetSpan(), BoundNodeType::boundReferenceToPointerExpression, type_), subject(std::move(subject_))
 {
     subject->MoveTemporaryDestructorCallsTo(*this);
 }
@@ -703,7 +706,7 @@ BoundExpression* BoundReferenceToPointerExpression::Clone()
 {
     std::unique_ptr<BoundExpression> clonedSubject;
     clonedSubject.reset(subject->Clone());
-    return new BoundReferenceToPointerExpression(std::move(clonedSubject), GetType());
+    return new BoundReferenceToPointerExpression(GetModule(), std::move(clonedSubject), GetType());
 }
 
 void BoundReferenceToPointerExpression::Load(Emitter& emitter, OperationFlags flags)
@@ -736,13 +739,14 @@ bool BoundReferenceToPointerExpression::ContainsExceptionCapture() const
     return false;
 }
 
-BoundFunctionCall::BoundFunctionCall(const Span& span_, FunctionSymbol* functionSymbol_) : BoundExpression(span_, BoundNodeType::boundFunctionCall, functionSymbol_->ReturnType()), functionSymbol(functionSymbol_)
+BoundFunctionCall::BoundFunctionCall(Module* module_, const Span& span_, FunctionSymbol* functionSymbol_) : 
+    BoundExpression(module_, span_, BoundNodeType::boundFunctionCall, functionSymbol_->ReturnType()), functionSymbol(functionSymbol_)
 {
 }
 
 BoundExpression* BoundFunctionCall::Clone()
 {
-    BoundFunctionCall* clone = new BoundFunctionCall(GetSpan(), functionSymbol);
+    BoundFunctionCall* clone = new BoundFunctionCall(GetModule(), GetSpan(), functionSymbol);
     for (std::unique_ptr<BoundExpression>& argument : arguments)
     {
         clone->AddArgument(std::unique_ptr<BoundExpression>(argument->Clone()));
@@ -793,7 +797,7 @@ void BoundFunctionCall::Load(Emitter& emitter, OperationFlags flags)
         }
         else
         {
-            throw Exception("cannot take address of a function call", GetSpan());
+            throw Exception(GetModule(), "cannot take address of a function call", GetSpan());
         }
     }
     else
@@ -843,7 +847,7 @@ void BoundFunctionCall::Store(Emitter& emitter, OperationFlags flags)
 {
     if ((flags & OperationFlags::addr) != OperationFlags::none)
     {
-        throw Exception("cannot take address of a function call", GetSpan());
+        throw Exception(GetModule(), "cannot take address of a function call", GetSpan());
     }
     else
     {
@@ -916,21 +920,21 @@ bool BoundFunctionCall::IsLvalueExpression() const
     return false;
 }
 
-BoundDelegateCall::BoundDelegateCall(const Span& span_, DelegateTypeSymbol* delegateType_) :
-    BoundExpression(span_, BoundNodeType::boundDelegateCall, delegateType_->ReturnType()), delegateTypeSymbol(delegateType_), arguments()
+BoundDelegateCall::BoundDelegateCall(Module* module_, const Span& span_, DelegateTypeSymbol* delegateType_) :
+    BoundExpression(module_, span_, BoundNodeType::boundDelegateCall, delegateType_->ReturnType()), delegateTypeSymbol(delegateType_), arguments()
 {
 }
 
 BoundExpression* BoundDelegateCall::Clone()
 {
-    return new BoundDelegateCall(GetSpan(), delegateTypeSymbol);
+    return new BoundDelegateCall(GetModule(), GetSpan(), delegateTypeSymbol);
 }
 
 void BoundDelegateCall::Load(Emitter& emitter, OperationFlags flags)
 {
     if ((flags & OperationFlags::addr) != OperationFlags::none)
     {
-        throw Exception("cannot take address of a delegate call", GetSpan());
+        throw Exception(GetModule(), "cannot take address of a delegate call", GetSpan());
     }
     else
     {
@@ -964,7 +968,7 @@ void BoundDelegateCall::Store(Emitter& emitter, OperationFlags flags)
 {
     if ((flags & OperationFlags::addr) != OperationFlags::none)
     {
-        throw Exception("cannot take address of a function call", GetSpan());
+        throw Exception(GetModule(), "cannot take address of a function call", GetSpan());
     }
     else
     {
@@ -1048,21 +1052,21 @@ bool BoundDelegateCall::ContainsExceptionCapture() const
     return false;
 }
 
-BoundClassDelegateCall::BoundClassDelegateCall(const Span& span_, ClassDelegateTypeSymbol* classDelegateType_) :
-    BoundExpression(span_, BoundNodeType::boundClassDelegateCall, classDelegateType_->ReturnType()), classDelegateTypeSymbol(classDelegateType_), arguments()
+BoundClassDelegateCall::BoundClassDelegateCall(Module* module_, const Span& span_, ClassDelegateTypeSymbol* classDelegateType_) :
+    BoundExpression(module_, span_, BoundNodeType::boundClassDelegateCall, classDelegateType_->ReturnType()), classDelegateTypeSymbol(classDelegateType_), arguments()
 {
 }
 
 BoundExpression* BoundClassDelegateCall::Clone()
 {
-    return new BoundClassDelegateCall(GetSpan(), classDelegateTypeSymbol);
+    return new BoundClassDelegateCall(GetModule(), GetSpan(), classDelegateTypeSymbol);
 }
 
 void BoundClassDelegateCall::Load(Emitter& emitter, OperationFlags flags)
 {
     if ((flags & OperationFlags::addr) != OperationFlags::none)
     {
-        throw Exception("cannot take address of a delegate call", GetSpan());
+        throw Exception(GetModule(), "cannot take address of a delegate call", GetSpan());
     }
     else
     {
@@ -1096,7 +1100,7 @@ void BoundClassDelegateCall::Store(Emitter& emitter, OperationFlags flags)
 {
     if ((flags & OperationFlags::addr) != OperationFlags::none)
     {
-        throw Exception("cannot take address of a function call", GetSpan());
+        throw Exception(GetModule(), "cannot take address of a function call", GetSpan());
     }
     else
     {
@@ -1180,8 +1184,8 @@ bool BoundClassDelegateCall::ContainsExceptionCapture() const
     return false;
 }
 
-BoundConstructExpression::BoundConstructExpression(std::unique_ptr<BoundExpression>&& constructorCall_, TypeSymbol* resultType_) :
-    BoundExpression(constructorCall_->GetSpan(), BoundNodeType::boundConstructExpression, resultType_), constructorCall(std::move(constructorCall_))
+BoundConstructExpression::BoundConstructExpression(Module* module_, std::unique_ptr<BoundExpression>&& constructorCall_, TypeSymbol* resultType_) :
+    BoundExpression(module_, constructorCall_->GetSpan(), BoundNodeType::boundConstructExpression, resultType_), constructorCall(std::move(constructorCall_))
 {
     constructorCall->MoveTemporaryDestructorCallsTo(*this);
 }
@@ -1190,7 +1194,7 @@ BoundExpression* BoundConstructExpression::Clone()
 {
     std::unique_ptr<BoundExpression> clonedConstructorCall;
     clonedConstructorCall.reset(constructorCall->Clone());
-    return new BoundConstructExpression(std::move(clonedConstructorCall), GetType());
+    return new BoundConstructExpression(GetModule(), std::move(clonedConstructorCall), GetType());
 }
 
 void BoundConstructExpression::Load(Emitter& emitter, OperationFlags flags)
@@ -1199,7 +1203,7 @@ void BoundConstructExpression::Load(Emitter& emitter, OperationFlags flags)
     emitter.SetObjectPointer(nullptr);
     if ((flags & OperationFlags::addr) != OperationFlags::none)
     {
-        throw Exception("cannot take address of a construct expression", GetSpan());
+        throw Exception(GetModule(), "cannot take address of a construct expression", GetSpan());
     }
     else
     {
@@ -1207,7 +1211,7 @@ void BoundConstructExpression::Load(Emitter& emitter, OperationFlags flags)
         llvm::Value* objectPointer = emitter.GetObjectPointer();
         if (!objectPointer)
         {
-            throw Exception("do not have object pointer", GetSpan());
+            throw Exception(GetModule(), "do not have object pointer", GetSpan());
         }
         else
         {
@@ -1220,7 +1224,7 @@ void BoundConstructExpression::Load(Emitter& emitter, OperationFlags flags)
 
 void BoundConstructExpression::Store(Emitter& emitter, OperationFlags flags)
 {
-    throw Exception("cannot store to construct expression", GetSpan());
+    throw Exception(GetModule(), "cannot store to construct expression", GetSpan());
 }
 
 void BoundConstructExpression::Accept(BoundNodeVisitor& visitor)
@@ -1237,8 +1241,8 @@ bool BoundConstructExpression::ContainsExceptionCapture() const
     return constructorCall->ContainsExceptionCapture();
 }
 
-BoundConstructAndReturnTemporaryExpression::BoundConstructAndReturnTemporaryExpression(std::unique_ptr<BoundExpression>&& constructorCall_, std::unique_ptr<BoundExpression>&& boundTemporary_) : 
-    BoundExpression(constructorCall_->GetSpan(), BoundNodeType::boundConstructAndReturnTemporary, boundTemporary_->GetType()), constructorCall(std::move(constructorCall_)), 
+BoundConstructAndReturnTemporaryExpression::BoundConstructAndReturnTemporaryExpression(Module* module_, std::unique_ptr<BoundExpression>&& constructorCall_, std::unique_ptr<BoundExpression>&& boundTemporary_) :
+    BoundExpression(module_, constructorCall_->GetSpan(), BoundNodeType::boundConstructAndReturnTemporary, boundTemporary_->GetType()), constructorCall(std::move(constructorCall_)), 
     boundTemporary(std::move(boundTemporary_))
 {
     constructorCall->MoveTemporaryDestructorCallsTo(*this);
@@ -1247,7 +1251,7 @@ BoundConstructAndReturnTemporaryExpression::BoundConstructAndReturnTemporaryExpr
 
 BoundExpression* BoundConstructAndReturnTemporaryExpression::Clone()
 {
-    return new BoundConstructAndReturnTemporaryExpression(std::unique_ptr<BoundExpression>(constructorCall->Clone()), std::unique_ptr<BoundExpression>(boundTemporary->Clone()));
+    return new BoundConstructAndReturnTemporaryExpression(GetModule(), std::unique_ptr<BoundExpression>(constructorCall->Clone()), std::unique_ptr<BoundExpression>(boundTemporary->Clone()));
 }
 
 void BoundConstructAndReturnTemporaryExpression::Load(Emitter& emitter, OperationFlags flags)
@@ -1263,7 +1267,7 @@ void BoundConstructAndReturnTemporaryExpression::Load(Emitter& emitter, Operatio
 
 void BoundConstructAndReturnTemporaryExpression::Store(Emitter& emitter, OperationFlags flags)
 {
-    throw Exception("cannot store to construct and return temporary expression", GetSpan());
+    throw Exception(GetModule(), "cannot store to construct and return temporary expression", GetSpan());
 }
 
 void BoundConstructAndReturnTemporaryExpression::Accept(BoundNodeVisitor& visitor)
@@ -1288,15 +1292,15 @@ bool BoundConstructAndReturnTemporaryExpression::ContainsExceptionCapture() cons
     return false;
 }
 
-BoundClassOrClassDelegateConversionResult::BoundClassOrClassDelegateConversionResult(std::unique_ptr<BoundExpression>&& conversionResult_, std::unique_ptr<BoundFunctionCall>&& conversionFunctionCall_) :
-    BoundExpression(conversionResult_->GetSpan(), BoundNodeType::boundClassOrClassDelegateConversionResult, conversionResult_->GetType()),
+BoundClassOrClassDelegateConversionResult::BoundClassOrClassDelegateConversionResult(Module* module_, std::unique_ptr<BoundExpression>&& conversionResult_, std::unique_ptr<BoundFunctionCall>&& conversionFunctionCall_) :
+    BoundExpression(module_, conversionResult_->GetSpan(), BoundNodeType::boundClassOrClassDelegateConversionResult, conversionResult_->GetType()),
     conversionResult(std::move(conversionResult_)), conversionFunctionCall(std::move(conversionFunctionCall_))
 {
 }
 
 BoundExpression* BoundClassOrClassDelegateConversionResult::Clone()
 {
-    return new BoundClassOrClassDelegateConversionResult(std::unique_ptr<BoundExpression>(conversionResult->Clone()),
+    return new BoundClassOrClassDelegateConversionResult(GetModule(), std::unique_ptr<BoundExpression>(conversionResult->Clone()),
         std::unique_ptr<BoundFunctionCall>(static_cast<BoundFunctionCall*>(conversionFunctionCall->Clone())));
 }
 
@@ -1308,7 +1312,7 @@ void BoundClassOrClassDelegateConversionResult::Load(Emitter& emitter, Operation
 
 void BoundClassOrClassDelegateConversionResult::Store(Emitter& emitter, OperationFlags flags)
 {
-    throw Exception("cannot store to class conversion result", GetSpan());
+    throw Exception(GetModule(), "cannot store to class conversion result", GetSpan());
 }
 
 void BoundClassOrClassDelegateConversionResult::Accept(BoundNodeVisitor& visitor)
@@ -1333,8 +1337,8 @@ bool BoundClassOrClassDelegateConversionResult::ContainsExceptionCapture() const
     return false;
 }
 
-BoundConversion::BoundConversion(std::unique_ptr<BoundExpression>&& sourceExpr_, FunctionSymbol* conversionFun_) :
-    BoundExpression(sourceExpr_->GetSpan(), BoundNodeType::boundConversion, conversionFun_->ConversionTargetType()), sourceExpr(std::move(sourceExpr_)), conversionFun(conversionFun_)
+BoundConversion::BoundConversion(Module* module_, std::unique_ptr<BoundExpression>&& sourceExpr_, FunctionSymbol* conversionFun_) :
+    BoundExpression(module_, sourceExpr_->GetSpan(), BoundNodeType::boundConversion, conversionFun_->ConversionTargetType()), sourceExpr(std::move(sourceExpr_)), conversionFun(conversionFun_)
 {
     sourceExpr->MoveTemporaryDestructorCallsTo(*this);
 }
@@ -1343,7 +1347,7 @@ BoundExpression* BoundConversion::Clone()
 {
     std::unique_ptr<BoundExpression> clonedSourceExpr;
     clonedSourceExpr.reset(sourceExpr->Clone());
-    return new BoundConversion(std::move(clonedSourceExpr), conversionFun);
+    return new BoundConversion(GetModule(), std::move(clonedSourceExpr), conversionFun);
 }
 
 void BoundConversion::Load(Emitter& emitter, OperationFlags flags)
@@ -1356,7 +1360,7 @@ void BoundConversion::Load(Emitter& emitter, OperationFlags flags)
 
 void BoundConversion::Store(Emitter& emitter, OperationFlags flags)
 {
-    throw Exception("cannot store to a conversion", GetSpan());
+    throw Exception(GetModule(), "cannot store to a conversion", GetSpan());
 }
 
 bool BoundConversion::IsLvalueExpression() const
@@ -1391,8 +1395,8 @@ bool BoundConversion::ContainsExceptionCapture() const
     return sourceExpr->ContainsExceptionCapture();
 }
 
-BoundIsExpression::BoundIsExpression(std::unique_ptr<BoundExpression>&& expr_, ClassTypeSymbol* rightClassType_, TypeSymbol* boolType_) :
-    BoundExpression(expr_->GetSpan(), BoundNodeType::boundIsExpression, boolType_), expr(std::move(expr_)), rightClassType(rightClassType_)
+BoundIsExpression::BoundIsExpression(Module* module_, std::unique_ptr<BoundExpression>&& expr_, ClassTypeSymbol* rightClassType_, TypeSymbol* boolType_) :
+    BoundExpression(module_, expr_->GetSpan(), BoundNodeType::boundIsExpression, boolType_), expr(std::move(expr_)), rightClassType(rightClassType_)
 {
 }
 
@@ -1400,7 +1404,7 @@ BoundExpression* BoundIsExpression::Clone()
 {
     std::unique_ptr<BoundExpression> clonedExpr;
     clonedExpr.reset(expr->Clone());
-    return new BoundIsExpression(std::move(clonedExpr), rightClassType, GetType());
+    return new BoundIsExpression(GetModule(), std::move(clonedExpr), rightClassType, GetType());
 }
 
 void BoundIsExpression::Load(Emitter& emitter, OperationFlags flags)
@@ -1438,7 +1442,7 @@ void BoundIsExpression::Load(Emitter& emitter, OperationFlags flags)
 
 void BoundIsExpression::Store(Emitter& emitter, OperationFlags flags)
 {
-    throw Exception("cannot store to a 'is' expression", GetSpan());
+    throw Exception(GetModule(), "cannot store to a 'is' expression", GetSpan());
 }
 
 void BoundIsExpression::Accept(BoundNodeVisitor& visitor)
@@ -1455,8 +1459,8 @@ bool BoundIsExpression::ContainsExceptionCapture() const
     return expr->ContainsExceptionCapture();
 }
 
-BoundAsExpression::BoundAsExpression(std::unique_ptr<BoundExpression>&& expr_, ClassTypeSymbol* rightClassType_, std::unique_ptr<BoundLocalVariable>&& variable_) :
-    BoundExpression(expr_->GetSpan(), BoundNodeType::boundAsExpression, rightClassType_->AddPointer(expr_->GetSpan())), 
+BoundAsExpression::BoundAsExpression(Module* module_, std::unique_ptr<BoundExpression>&& expr_, ClassTypeSymbol* rightClassType_, std::unique_ptr<BoundLocalVariable>&& variable_) :
+    BoundExpression(module_, expr_->GetSpan(), BoundNodeType::boundAsExpression, rightClassType_->AddPointer(expr_->GetSpan())), 
     expr(std::move(expr_)), rightClassType(rightClassType_), variable(std::move(variable_))
 {
 }
@@ -1467,7 +1471,7 @@ BoundExpression* BoundAsExpression::Clone()
     clonedExpr.reset(expr->Clone());
     std::unique_ptr<BoundLocalVariable> clonedVariable;
     clonedVariable.reset(static_cast<BoundLocalVariable*>(variable->Clone()));
-    return new BoundAsExpression(std::move(clonedExpr), rightClassType, std::move(clonedVariable));
+    return new BoundAsExpression(GetModule(), std::move(clonedExpr), rightClassType, std::move(clonedVariable));
 }
 
 void BoundAsExpression::Load(Emitter& emitter, OperationFlags flags)
@@ -1518,7 +1522,7 @@ void BoundAsExpression::Load(Emitter& emitter, OperationFlags flags)
 
 void BoundAsExpression::Store(Emitter& emitter, OperationFlags flags)
 {
-    throw Exception("cannot store to an 'as' expression", GetSpan());
+    throw Exception(GetModule(), "cannot store to an 'as' expression", GetSpan());
 }
 
 void BoundAsExpression::Accept(BoundNodeVisitor& visitor)
@@ -1535,8 +1539,8 @@ bool BoundAsExpression::ContainsExceptionCapture() const
     return expr->ContainsExceptionCapture();
 }
 
-BoundTypeNameExpression::BoundTypeNameExpression(std::unique_ptr<BoundExpression>&& classPtr_, TypeSymbol* constCharPtrType_) :
-    BoundExpression(classPtr_->GetSpan(), BoundNodeType::boundTypeNameExpression, constCharPtrType_), classPtr(std::move(classPtr_))
+BoundTypeNameExpression::BoundTypeNameExpression(Module* module_, std::unique_ptr<BoundExpression>&& classPtr_, TypeSymbol* constCharPtrType_) :
+    BoundExpression(module_, classPtr_->GetSpan(), BoundNodeType::boundTypeNameExpression, constCharPtrType_), classPtr(std::move(classPtr_))
 {
     classPtr->MoveTemporaryDestructorCallsTo(*this);
 }
@@ -1545,7 +1549,7 @@ BoundExpression* BoundTypeNameExpression::Clone()
 {
     std::unique_ptr<BoundExpression> clonedClassPtr;
     clonedClassPtr.reset(classPtr->Clone());
-    return new BoundTypeNameExpression(std::move(clonedClassPtr), GetType());
+    return new BoundTypeNameExpression(GetModule(), std::move(clonedClassPtr), GetType());
 }
 
 void BoundTypeNameExpression::Load(Emitter& emitter, OperationFlags flags)
@@ -1578,7 +1582,7 @@ void BoundTypeNameExpression::Load(Emitter& emitter, OperationFlags flags)
 
 void BoundTypeNameExpression::Store(Emitter& emitter, OperationFlags flags)
 {
-    throw Exception("cannot store to typename expression", GetSpan());
+    throw Exception(GetModule(), "cannot store to typename expression", GetSpan());
 }
 
 void BoundTypeNameExpression::Accept(BoundNodeVisitor& visitor)
@@ -1595,14 +1599,15 @@ bool BoundTypeNameExpression::ContainsExceptionCapture() const
     return classPtr->ContainsExceptionCapture();
 }
 
-BoundBitCast::BoundBitCast(std::unique_ptr<BoundExpression>&& expr_, TypeSymbol* type_) : BoundExpression(expr_->GetSpan(), BoundNodeType::boundBitCast, type_), expr(std::move(expr_))
+BoundBitCast::BoundBitCast(Module* module_, std::unique_ptr<BoundExpression>&& expr_, TypeSymbol* type_) : 
+    BoundExpression(module_, expr_->GetSpan(), BoundNodeType::boundBitCast, type_), expr(std::move(expr_))
 {
     expr->MoveTemporaryDestructorCallsTo(*this);
 }
 
 BoundExpression* BoundBitCast::Clone()
 {
-    return new BoundBitCast(std::unique_ptr<BoundExpression>(expr->Clone()), GetType());
+    return new BoundBitCast(GetModule(), std::unique_ptr<BoundExpression>(expr->Clone()), GetType());
 }
 
 void BoundBitCast::Load(Emitter& emitter, OperationFlags flags)
@@ -1616,7 +1621,7 @@ void BoundBitCast::Load(Emitter& emitter, OperationFlags flags)
 
 void BoundBitCast::Store(Emitter& emitter, OperationFlags flags)
 {
-    throw Exception("cannot store to bit cast", GetSpan());
+    throw Exception(GetModule(), "cannot store to bit cast", GetSpan());
 }
 
 void BoundBitCast::Accept(BoundNodeVisitor& visitor)
@@ -1633,13 +1638,14 @@ bool BoundBitCast::ContainsExceptionCapture() const
     return expr->ContainsExceptionCapture();
 }
 
-BoundFunctionPtr::BoundFunctionPtr(const Span& span_, FunctionSymbol* function_, TypeSymbol* type_) : BoundExpression(span_, BoundNodeType::boundFunctionPtr, type_), function(function_)
+BoundFunctionPtr::BoundFunctionPtr(Module* module_, const Span& span_, FunctionSymbol* function_, TypeSymbol* type_) : 
+    BoundExpression(module_, span_, BoundNodeType::boundFunctionPtr, type_), function(function_)
 {
 }
 
 BoundExpression* BoundFunctionPtr::Clone()
 {
-    return new BoundFunctionPtr(GetSpan(), function, GetType());
+    return new BoundFunctionPtr(GetModule(), GetSpan(), function, GetType());
 }
 
 void BoundFunctionPtr::Load(Emitter& emitter, OperationFlags flags)
@@ -1651,7 +1657,7 @@ void BoundFunctionPtr::Load(Emitter& emitter, OperationFlags flags)
 
 void BoundFunctionPtr::Store(Emitter& emitter, OperationFlags flags)
 {
-    throw Exception("cannot store to function ptr expression", GetSpan());
+    throw Exception(GetModule(), "cannot store to function ptr expression", GetSpan());
 }
 
 void BoundFunctionPtr::Accept(BoundNodeVisitor& visitor)
@@ -1659,14 +1665,14 @@ void BoundFunctionPtr::Accept(BoundNodeVisitor& visitor)
     visitor.Visit(*this);
 }
 
-BoundDisjunction::BoundDisjunction(const Span& span_, std::unique_ptr<BoundExpression>&& left_, std::unique_ptr<BoundExpression>&& right_, TypeSymbol* boolType_) :
-    BoundExpression(span_, BoundNodeType::boundDisjunction, boolType_), left(std::move(left_)), right(std::move(right_))
+BoundDisjunction::BoundDisjunction(Module* module_, const Span& span_, std::unique_ptr<BoundExpression>&& left_, std::unique_ptr<BoundExpression>&& right_, TypeSymbol* boolType_) :
+    BoundExpression(module_, span_, BoundNodeType::boundDisjunction, boolType_), left(std::move(left_)), right(std::move(right_))
 {
 }
 
 BoundExpression* BoundDisjunction::Clone()
 {
-    return new BoundDisjunction(GetSpan(), std::unique_ptr<BoundExpression>(left->Clone()), std::unique_ptr<BoundExpression>(right->Clone()), GetType());
+    return new BoundDisjunction(GetModule(), GetSpan(), std::unique_ptr<BoundExpression>(left->Clone()), std::unique_ptr<BoundExpression>(right->Clone()), GetType());
 }
 
 void BoundDisjunction::Load(Emitter& emitter, OperationFlags flags)
@@ -1698,7 +1704,7 @@ void BoundDisjunction::Load(Emitter& emitter, OperationFlags flags)
 
 void BoundDisjunction::Store(Emitter& emitter, OperationFlags flags)
 {
-    throw Exception("cannot store to disjunction", GetSpan());
+    throw Exception(GetModule(), "cannot store to disjunction", GetSpan());
 }
 
 void BoundDisjunction::Accept(BoundNodeVisitor& visitor)
@@ -1728,14 +1734,14 @@ bool BoundDisjunction::ContainsExceptionCapture() const
     return false;
 }
 
-BoundConjunction::BoundConjunction(const Span& span_, std::unique_ptr<BoundExpression>&& left_, std::unique_ptr<BoundExpression>&& right_, TypeSymbol* boolType_) :
-    BoundExpression(span_, BoundNodeType::boundConjunction, boolType_), left(std::move(left_)), right(std::move(right_))
+BoundConjunction::BoundConjunction(Module* module_, const Span& span_, std::unique_ptr<BoundExpression>&& left_, std::unique_ptr<BoundExpression>&& right_, TypeSymbol* boolType_) :
+    BoundExpression(module_, span_, BoundNodeType::boundConjunction, boolType_), left(std::move(left_)), right(std::move(right_))
 {
 }
 
 BoundExpression* BoundConjunction::Clone()
 {
-    return new BoundConjunction(GetSpan(), std::unique_ptr<BoundExpression>(left->Clone()), std::unique_ptr<BoundExpression>(right->Clone()), GetType());
+    return new BoundConjunction(GetModule(), GetSpan(), std::unique_ptr<BoundExpression>(left->Clone()), std::unique_ptr<BoundExpression>(right->Clone()), GetType());
 }
 
 void BoundConjunction::Load(Emitter& emitter, OperationFlags flags)
@@ -1767,7 +1773,7 @@ void BoundConjunction::Load(Emitter& emitter, OperationFlags flags)
 
 void BoundConjunction::Store(Emitter& emitter, OperationFlags flags)
 {
-    throw Exception("cannot store to conjunction", GetSpan());
+    throw Exception(GetModule(), "cannot store to conjunction", GetSpan());
 }
 
 void BoundConjunction::Accept(BoundNodeVisitor& visitor)
@@ -1797,57 +1803,75 @@ bool BoundConjunction::ContainsExceptionCapture() const
     return false;
 }
 
-BoundTypeExpression::BoundTypeExpression(const Span& span_, TypeSymbol* type_) : BoundExpression(span_, BoundNodeType::boundTypeExpression, type_)
+BoundTypeExpression::BoundTypeExpression(Module* module_, const Span& span_, TypeSymbol* type_) : 
+    BoundExpression(module_, span_, BoundNodeType::boundTypeExpression, type_)
 {
 }
 
 BoundExpression* BoundTypeExpression::Clone()
 {
-    return new BoundTypeExpression(GetSpan(), GetType());
+    return new BoundTypeExpression(GetModule(), GetSpan(), GetType());
 }
 
 void BoundTypeExpression::Load(Emitter& emitter, OperationFlags flags)
 {
-    throw Exception("cannot load from a type", GetSpan());
+    throw Exception(GetModule(),"cannot load from a type", GetSpan());
 }
 
 void BoundTypeExpression::Store(Emitter& emitter, OperationFlags flags)
 {
-    throw Exception("cannot store to a type", GetSpan());
+    throw Exception(GetModule(), "cannot store to a type", GetSpan());
 }
 
 void BoundTypeExpression::Accept(BoundNodeVisitor& visitor)
 {
-    throw Exception("cannot visit a type", GetSpan());
+    throw Exception(GetModule(), "cannot visit a type", GetSpan());
 }
 
-BoundNamespaceExpression::BoundNamespaceExpression(const Span& span_, NamespaceSymbol* ns_) : BoundExpression(span_, BoundNodeType::boundNamespaceExpression, new NamespaceTypeSymbol(ns_)), ns(ns_)
+TypeSymbol* CreateNamespaceTypeSymbol(NamespaceSymbol* ns, Module* module)
+{
+    TypeSymbol* nsTypeSymbol = new NamespaceTypeSymbol(ns);
+    nsTypeSymbol->SetModule(module);
+    nsTypeSymbol->SetSymbolTable(&module->GetSymbolTable());
+    return nsTypeSymbol;
+}
+
+BoundNamespaceExpression::BoundNamespaceExpression(Module* module_, const Span& span_, NamespaceSymbol* ns_) : 
+    BoundExpression(module_, span_, BoundNodeType::boundNamespaceExpression, CreateNamespaceTypeSymbol(ns_, module_)), ns(ns_)
 {
     nsType.reset(GetType());
 }
 
 BoundExpression* BoundNamespaceExpression::Clone()
 {
-    return new BoundNamespaceExpression(GetSpan(), ns);
+    return new BoundNamespaceExpression(GetModule(), GetSpan(), ns);
 }
 
 void BoundNamespaceExpression::Load(Emitter& emitter, OperationFlags flags)
 {
-    throw Exception("cannot load from a namespace", GetSpan());
+    throw Exception(GetModule(), "cannot load from a namespace", GetSpan());
 }
 
 void BoundNamespaceExpression::Store(Emitter& emitter, OperationFlags flags)
 {
-    throw Exception("cannot store to a namespace", GetSpan());
+    throw Exception(GetModule(), "cannot store to a namespace", GetSpan());
 }
 
 void BoundNamespaceExpression::Accept(BoundNodeVisitor& visitor)
 {
-    throw Exception("cannot visit a namespace", GetSpan());
+    throw Exception(GetModule(), "cannot visit a namespace", GetSpan());
 }
 
-BoundFunctionGroupExpression::BoundFunctionGroupExpression(const Span& span_, FunctionGroupSymbol* functionGroupSymbol_) : 
-    BoundExpression(span_, BoundNodeType::boundFunctionGroupExpression, new FunctionGroupTypeSymbol(functionGroupSymbol_, this)), 
+TypeSymbol* CreateFunctionGroupTypeSymbol(FunctionGroupSymbol* functionGroupSymbol, void* boundFunctionGroupExpression, Module* module)
+{
+    TypeSymbol* functionGroupTypeSymbol = new FunctionGroupTypeSymbol(functionGroupSymbol, boundFunctionGroupExpression);
+    functionGroupTypeSymbol->SetModule(module);
+    functionGroupTypeSymbol->SetSymbolTable(&module->GetSymbolTable());
+    return functionGroupTypeSymbol;
+}
+
+BoundFunctionGroupExpression::BoundFunctionGroupExpression(Module* module_, const Span& span_, FunctionGroupSymbol* functionGroupSymbol_) :
+    BoundExpression(module_, span_, BoundNodeType::boundFunctionGroupExpression, CreateFunctionGroupTypeSymbol(functionGroupSymbol_, this, module_)), 
     functionGroupSymbol(functionGroupSymbol_), scopeQualified(false), qualifiedScope(nullptr)
 {
     functionGroupType.reset(GetType());
@@ -1855,7 +1879,7 @@ BoundFunctionGroupExpression::BoundFunctionGroupExpression(const Span& span_, Fu
 
 BoundExpression* BoundFunctionGroupExpression::Clone()
 {
-    BoundFunctionGroupExpression* clone = new BoundFunctionGroupExpression(GetSpan(), functionGroupSymbol);
+    BoundFunctionGroupExpression* clone = new BoundFunctionGroupExpression(GetModule(), GetSpan(), functionGroupSymbol);
     if (classPtr)
     {
         clone->classPtr.reset(classPtr->Clone());
@@ -1879,12 +1903,12 @@ void BoundFunctionGroupExpression::Load(Emitter& emitter, OperationFlags flags)
 
 void BoundFunctionGroupExpression::Store(Emitter& emitter, OperationFlags flags)
 {
-    throw Exception("cannot store to a function group", GetSpan());
+    throw Exception(GetModule(), "cannot store to a function group", GetSpan());
 }
 
 void BoundFunctionGroupExpression::Accept(BoundNodeVisitor& visitor)
 {
-    throw Exception("cannot visit a function group", GetSpan());
+    throw Exception(GetModule(), "cannot visit a function group", GetSpan());
 }
 
 void BoundFunctionGroupExpression::SetClassPtr(std::unique_ptr<BoundExpression>&& classPtr_)
@@ -1897,8 +1921,16 @@ void BoundFunctionGroupExpression::SetTemplateArgumentTypes(const std::vector<Ty
     templateArgumentTypes = templateArgumentTypes_;
 }
 
-BoundMemberExpression::BoundMemberExpression(const Span& span_, std::unique_ptr<BoundExpression>&& classPtr_, std::unique_ptr<BoundExpression>&& member_) :
-    BoundExpression(span_, BoundNodeType::boundMemberExpression, new MemberExpressionTypeSymbol(span_, member_->GetType()->Name(), this)), classPtr(std::move(classPtr_)), member(std::move(member_))
+TypeSymbol* CreateMemberExpressionTypeSymbol(const Span& span, const std::u32string& name, void* boundMemberExpression, Module* module)
+{
+    TypeSymbol* memberExpressionTypeSymbol = new MemberExpressionTypeSymbol(span, name, boundMemberExpression);
+    memberExpressionTypeSymbol->SetModule(module);
+    memberExpressionTypeSymbol->SetSymbolTable(&module->GetSymbolTable());
+    return memberExpressionTypeSymbol;
+}
+
+BoundMemberExpression::BoundMemberExpression(Module* module_, const Span& span_, std::unique_ptr<BoundExpression>&& classPtr_, std::unique_ptr<BoundExpression>&& member_) :
+    BoundExpression(module_, span_, BoundNodeType::boundMemberExpression, CreateMemberExpressionTypeSymbol(span_, member_->GetType()->Name(), this, module_)), classPtr(std::move(classPtr_)), member(std::move(member_))
 {
     memberExpressionType.reset(GetType());
     classPtr->MoveTemporaryDestructorCallsTo(*this);
@@ -1906,7 +1938,7 @@ BoundMemberExpression::BoundMemberExpression(const Span& span_, std::unique_ptr<
 
 BoundExpression* BoundMemberExpression::Clone()
 {
-    return new BoundMemberExpression(GetSpan(), std::unique_ptr<BoundExpression>(classPtr->Clone()), std::unique_ptr<BoundExpression>(member->Clone()));
+    return new BoundMemberExpression(GetModule(), GetSpan(), std::unique_ptr<BoundExpression>(classPtr->Clone()), std::unique_ptr<BoundExpression>(member->Clone()));
 }
 
 void BoundMemberExpression::Load(Emitter& emitter, OperationFlags flags)
@@ -1923,12 +1955,12 @@ void BoundMemberExpression::Load(Emitter& emitter, OperationFlags flags)
 
 void BoundMemberExpression::Store(Emitter& emitter, OperationFlags flags)
 {
-    throw Exception("cannot store to a member expression", GetSpan());
+    throw Exception(GetModule(), "cannot store to a member expression", GetSpan());
 }
 
 void BoundMemberExpression::Accept(BoundNodeVisitor& visitor)
 {
-    throw Exception("cannot visit a member expression", GetSpan());
+    throw Exception(GetModule(), "cannot visit a member expression", GetSpan());
 }
 
 } } // namespace cmajor::binder

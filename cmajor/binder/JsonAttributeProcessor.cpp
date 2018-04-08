@@ -26,7 +26,7 @@ namespace cmajor { namespace binder {
 using namespace cmajor::unicode;
 using namespace cmajor::symbols;
 
-JsonAttributeProcessor::JsonAttributeProcessor() : AttributeProcessor(U"json")
+JsonAttributeProcessor::JsonAttributeProcessor(Module* module_) : AttributeProcessor(U"json"), module(module_)
 {
 }
 
@@ -56,13 +56,13 @@ void JsonAttributeProcessor::TypeCheck(Attribute* attribute, Symbol* symbol)
                         }
                         if (!baseClassHasJsonAttribute)
                         {
-                            Warning warning(CompileWarningCollection::Instance().GetCurrentProjectName(), "base class '" + ToUtf8(baseClass->FullName()) + "' of json-attributed class '" + 
+                            Warning warning(module->GetCurrentProjectName(), "base class '" + ToUtf8(baseClass->FullName()) + "' of json-attributed class '" + 
                                 ToUtf8(classTypeSymbol->FullName()) + "' does not explicitly declare 'json' attribute value to \"true\" or \"false\"");
                             warning.SetDefined(classTypeSymbol->GetSpan());
                             std::vector<Span> references;
                             references.push_back(baseClass->GetSpan());
                             warning.SetReferences(references);
-                            CompileWarningCollection::Instance().AddWarning(warning);
+                            module->WarningCollection().AddWarning(warning);
                         }
                     }
                 }
@@ -70,7 +70,7 @@ void JsonAttributeProcessor::TypeCheck(Attribute* attribute, Symbol* symbol)
             }
             else
             {
-                throw Exception("unknown attribute value '" + ToUtf8(attribute->Value()) + "' for attribute '" + ToUtf8(attribute->Name()) + "'", attribute->GetSpan());
+                throw Exception(module, "unknown attribute value '" + ToUtf8(attribute->Value()) + "' for attribute '" + ToUtf8(attribute->Name()) + "'", attribute->GetSpan());
             }
         }
     }
@@ -121,19 +121,19 @@ void JsonAttributeProcessor::CheckMemberVariableJsonFieldNames(ClassTypeSymbol* 
                 if (it != memberVariableFieldNames.cend())
                 {
                     Attribute* prev = it->second;
-                    throw Exception("error in JSON field name generation: 'jsonFieldName' attribute not unique among member variable names of the current class and its base classes", 
+                    throw Exception(module, "error in JSON field name generation: 'jsonFieldName' attribute not unique among member variable names of the current class and its base classes",
                         jsonFieldNameAttribute->GetSpan(), prev->GetSpan());
                 }
                 memberVariableFieldNames[jsonFieldNameAttribute->Value()] = jsonFieldNameAttribute;
             }
             else
             {
-                throw Exception("internal error in JSON field name generation: 'jsonFieldName' attribute not found", memberVariableSymbol->GetSpan());
+                throw Exception(module, "internal error in JSON field name generation: 'jsonFieldName' attribute not found", memberVariableSymbol->GetSpan());
             }
         }
         else
         {
-            throw Exception("internal error in JSON field name generation: attributes not found", memberVariableSymbol->GetSpan());
+            throw Exception(module, "internal error in JSON field name generation: attributes not found", memberVariableSymbol->GetSpan());
         }
     }
 }
@@ -176,19 +176,21 @@ void JsonAttributeProcessor::GenerateJsonCreatorFunctionSymbol(Attribute* attrib
 {
     MemberFunctionSymbol* jsonCreatorFunctionSymbol = new MemberFunctionSymbol(attribute->GetSpan(), U"Create");
     jsonCreatorFunctionSymbol->SetGroupName(U"Create");
-    classTypeSymbol->GetSymbolTable()->SetFunctionIdFor(jsonCreatorFunctionSymbol);
+    jsonCreatorFunctionSymbol->SetSymbolTable(&module->GetSymbolTable());
+    jsonCreatorFunctionSymbol->SetModule(module);
+    module->GetSymbolTable().SetFunctionIdFor(jsonCreatorFunctionSymbol);
     jsonCreatorFunctionSymbol->SetAccess(SymbolAccess::public_);
     jsonCreatorFunctionSymbol->SetStatic();
     Symbol* jsonValue = classTypeSymbol->GetSymbolTable()->GlobalNs().GetContainerScope()->Lookup(U"System.Json.JsonValue");
     if (!jsonValue || jsonValue->GetSymbolType() != SymbolType::classGroupTypeSymbol)
     {
-        throw Exception("System.Json.JsonValue class not found from the symbol table", attribute->GetSpan(), classTypeSymbol->GetSpan());
+        throw Exception(module, "System.Json.JsonValue class not found from the symbol table", attribute->GetSpan(), classTypeSymbol->GetSpan());
     }
     ClassGroupTypeSymbol* jsonValueGroup = static_cast<ClassGroupTypeSymbol*>(jsonValue);
     ClassTypeSymbol* jsonValueClass = jsonValueGroup->GetClass(0);
     if (!jsonValueClass)
     {
-        throw Exception("System.Json.JsonValue class not found from the symbol table", attribute->GetSpan(), classTypeSymbol->GetSpan());
+        throw Exception(module, "System.Json.JsonValue class not found from the symbol table", attribute->GetSpan(), classTypeSymbol->GetSpan());
     }
     ParameterSymbol* jsonValueParam = new ParameterSymbol(attribute->GetSpan(), U"@value");
     jsonValueParam->SetType(jsonValueClass->AddPointer(attribute->GetSpan()));
@@ -202,20 +204,22 @@ void JsonAttributeProcessor::GenerateJsonCreatorFunctionSymbol(Attribute* attrib
 void JsonAttributeProcessor::GenerateJsonConstructorSymbol(Attribute* attribute, ClassTypeSymbol* classTypeSymbol)
 {
     ConstructorSymbol* jsonConstructorSymbol = new ConstructorSymbol(attribute->GetSpan(), U"@constructor");
-    classTypeSymbol->GetSymbolTable()->SetFunctionIdFor(jsonConstructorSymbol);
+    jsonConstructorSymbol->SetSymbolTable(&module->GetSymbolTable());
+    jsonConstructorSymbol->SetModule(module);
+    module->GetSymbolTable().SetFunctionIdFor(jsonConstructorSymbol);
     ParameterSymbol* thisParam = new ParameterSymbol(attribute->GetSpan(), U"this");
     thisParam->SetType(classTypeSymbol->AddPointer(attribute->GetSpan()));
     ParameterSymbol* jsonValueParam = new ParameterSymbol(attribute->GetSpan(), U"@value");
     Symbol* jsonValue = classTypeSymbol->GetSymbolTable()->GlobalNs().GetContainerScope()->Lookup(U"System.Json.JsonValue");
     if (!jsonValue || jsonValue->GetSymbolType() != SymbolType::classGroupTypeSymbol)
     {
-        throw Exception("System.Json.JsonValue class not found from the symbol table", attribute->GetSpan(), classTypeSymbol->GetSpan());
+        throw Exception(module, "System.Json.JsonValue class not found from the symbol table", attribute->GetSpan(), classTypeSymbol->GetSpan());
     }
     ClassGroupTypeSymbol* jsonValueGroup = static_cast<ClassGroupTypeSymbol*>(jsonValue);
     ClassTypeSymbol* jsonValueClass = jsonValueGroup->GetClass(0);
     if (!jsonValueClass)
     {
-        throw Exception("System.Json.JsonValue class not found from the symbol table", attribute->GetSpan(), classTypeSymbol->GetSpan());
+        throw Exception(module, "System.Json.JsonValue class not found from the symbol table", attribute->GetSpan(), classTypeSymbol->GetSpan());
     }
     jsonValueParam->SetType(jsonValueClass->AddPointer(attribute->GetSpan()));
     jsonConstructorSymbol->SetAccess(SymbolAccess::public_);
@@ -230,6 +234,8 @@ void JsonAttributeProcessor::GenerateJsonConstructorSymbol(Attribute* attribute,
 void JsonAttributeProcessor::GenerateToJsonJsonObjectSymbol(Attribute* attribute, ClassTypeSymbol* classTypeSymbol)
 {
     MemberFunctionSymbol* toJsonJsonObjectMemberFunctionSymbol = new MemberFunctionSymbol(attribute->GetSpan(), U"ToJson");
+    toJsonJsonObjectMemberFunctionSymbol->SetModule(module);
+    toJsonJsonObjectMemberFunctionSymbol->SetSymbolTable(&module->GetSymbolTable());
     toJsonJsonObjectMemberFunctionSymbol->SetGroupName(U"ToJson");
     ClassTypeSymbol* baseClass = classTypeSymbol->BaseClass();
     bool jsonBase = false;
@@ -263,13 +269,13 @@ void JsonAttributeProcessor::GenerateToJsonJsonObjectSymbol(Attribute* attribute
     Symbol* jsonObject = classTypeSymbol->GetSymbolTable()->GlobalNs().GetContainerScope()->Lookup(U"System.Json.JsonObject");
     if (!jsonObject || jsonObject->GetSymbolType() != SymbolType::classGroupTypeSymbol)
     {
-        throw Exception("System.Json.JsonObject class not found from the symbol table", attribute->GetSpan(), classTypeSymbol->GetSpan());
+        throw Exception(module, "System.Json.JsonObject class not found from the symbol table", attribute->GetSpan(), classTypeSymbol->GetSpan());
     }
     ClassGroupTypeSymbol* jsonObjectGroup = static_cast<ClassGroupTypeSymbol*>(jsonObject);
     ClassTypeSymbol* jsonObjectClass = jsonObjectGroup->GetClass(0);
     if (!jsonObjectClass)
     {
-        throw Exception("System.Json.JsonObject class not found from the symbol table", attribute->GetSpan(), classTypeSymbol->GetSpan());
+        throw Exception(module, "System.Json.JsonObject class not found from the symbol table", attribute->GetSpan(), classTypeSymbol->GetSpan());
     }
     jsonObjectParam->SetType(jsonObjectClass->AddPointer(attribute->GetSpan()));
     toJsonJsonObjectMemberFunctionSymbol->SetReturnType(classTypeSymbol->GetSymbolTable()->GetTypeByName(U"void"));
@@ -284,6 +290,8 @@ void JsonAttributeProcessor::GenerateToJsonJsonObjectSymbol(Attribute* attribute
 void JsonAttributeProcessor::GenerateToJsonSymbol(Attribute* attribute, ClassTypeSymbol* classTypeSymbol, BoundCompileUnit& boundCompileUnit, ContainerScope* containerScope)
 {
     MemberFunctionSymbol* toJsonMemberFunctionSymbol = new MemberFunctionSymbol(attribute->GetSpan(), U"ToJson");
+    toJsonMemberFunctionSymbol->SetModule(module);
+    toJsonMemberFunctionSymbol->SetSymbolTable(&module->GetSymbolTable());
     toJsonMemberFunctionSymbol->SetGroupName(U"ToJson");
     ClassTypeSymbol* baseClass = classTypeSymbol->BaseClass();
     bool jsonBase = false;
@@ -341,7 +349,7 @@ void JsonAttributeProcessor::GenerateImplementation(Attribute* attribute, Symbol
         }
         else
         {
-            throw Exception("internal error in JSON attribute implementation: constructor symbol for symbol '" + ToUtf8(symbol->FullName()) + "' not found", attribute->GetSpan());
+            throw Exception(module, "internal error in JSON attribute implementation: constructor symbol for symbol '" + ToUtf8(symbol->FullName()) + "' not found", attribute->GetSpan());
         }
         auto it1 = jsonCreatorMap.find(symbol);
         if (it1 != jsonCreatorMap.cend())
@@ -351,7 +359,7 @@ void JsonAttributeProcessor::GenerateImplementation(Attribute* attribute, Symbol
         }
         else
         {
-            throw Exception("internal error in JSON attribute implementation: Creator function symbol for symbol '" + ToUtf8(symbol->FullName()) + "' not found", attribute->GetSpan());
+            throw Exception(module, "internal error in JSON attribute implementation: Creator function symbol for symbol '" + ToUtf8(symbol->FullName()) + "' not found", attribute->GetSpan());
         }
         auto it2 = toJsonJsonObjectMemberFunctionSymbolMap.find(symbol);
         if (it2 != toJsonJsonObjectMemberFunctionSymbolMap.cend())
@@ -361,7 +369,7 @@ void JsonAttributeProcessor::GenerateImplementation(Attribute* attribute, Symbol
         }
         else
         {
-            throw Exception("internal error in JSON attribute implementation: member function 'ToJson' symbol for symbol '" + ToUtf8(symbol->FullName()) + "' not found", attribute->GetSpan());
+            throw Exception(module, "internal error in JSON attribute implementation: member function 'ToJson' symbol for symbol '" + ToUtf8(symbol->FullName()) + "' not found", attribute->GetSpan());
         }
         auto it3 = toJsonObjectMemberFunctionSymbolMap.find(symbol);
         if (it3 != toJsonObjectMemberFunctionSymbolMap.cend())
@@ -371,7 +379,7 @@ void JsonAttributeProcessor::GenerateImplementation(Attribute* attribute, Symbol
         }
         else
         {
-            throw Exception("internal error in JSON attribute implementation: member function 'ToJson' symbol for symbol '" + ToUtf8(symbol->FullName()) + "' not found", attribute->GetSpan());
+            throw Exception(module, "internal error in JSON attribute implementation: member function 'ToJson' symbol for symbol '" + ToUtf8(symbol->FullName()) + "' not found", attribute->GetSpan());
         }
         SymbolTable* symbolTable = classTypeSymbol->GetSymbolTable();
         symbolTable->AddJsonClass(classTypeSymbol->FullName());
@@ -382,14 +390,14 @@ void JsonAttributeProcessor::GenerateJsonCreatorImplementation(Attribute* attrib
 {
     try
     {
-        FileScope* fileScope = new FileScope();
+        FileScope* fileScope = new FileScope(&statementBinder->GetBoundCompileUnit().GetModule());
         Symbol* jsonValue = classTypeSymbol->GetSymbolTable()->GlobalNs().GetContainerScope()->Lookup(U"System.Json.JsonValue");
         if (jsonValue)
         {
             fileScope->AddContainerScope(jsonValue->Ns()->GetContainerScope());
         }
         statementBinder->GetBoundCompileUnit().AddFileScope(fileScope);
-        std::unique_ptr<BoundFunction> boundFunction(new BoundFunction(jsonCreatorFunctionSymbol));
+        std::unique_ptr<BoundFunction> boundFunction(new BoundFunction(module, jsonCreatorFunctionSymbol));
         const Span& span = attribute->GetSpan();
         CompoundStatementNode compoundStatementNode(span);
         NewNode* newNode = new NewNode(span, new IdentifierNode(span, classTypeSymbol->FullName()));
@@ -424,7 +432,7 @@ void JsonAttributeProcessor::GenerateJsonCreatorImplementation(Attribute* attrib
         std::vector<Span> references;
         references.push_back(ex.Defined());
         references.insert(references.end(), ex.References().begin(), ex.References().end());
-        throw Exception("error in JSON attribute generation: could not create JSON Create() function for class '" + ToUtf8(classTypeSymbol->FullName()) + "': " + ex.Message(),
+        throw Exception(module, "error in JSON attribute generation: could not create JSON Create() function for class '" + ToUtf8(classTypeSymbol->FullName()) + "': " + ex.Message(),
             classTypeSymbol->GetSpan(), references);
     }
 }
@@ -433,14 +441,14 @@ void JsonAttributeProcessor::GenerateJsonConstructorImplementation(Attribute* at
 {
     try
     {
-        FileScope* fileScope = new FileScope();
+        FileScope* fileScope = new FileScope(&statementBinder->GetBoundCompileUnit().GetModule());
         Symbol* jsonValue = classTypeSymbol->GetSymbolTable()->GlobalNs().GetContainerScope()->Lookup(U"System.Json.JsonValue");
         if (jsonValue)
         {
             fileScope->AddContainerScope(jsonValue->Ns()->GetContainerScope());
         }
         statementBinder->GetBoundCompileUnit().AddFileScope(fileScope);
-        std::unique_ptr<BoundFunction> boundFunction(new BoundFunction(jsonConstructorSymbol));
+        std::unique_ptr<BoundFunction> boundFunction(new BoundFunction(module, jsonConstructorSymbol));
         const Span& span = attribute->GetSpan();
         ConstructorNode constructorNode(span);
         CompoundStatementNode compoundStatementNode(span);
@@ -521,7 +529,7 @@ void JsonAttributeProcessor::GenerateJsonConstructorImplementation(Attribute* at
         std::vector<Span> references;
         references.push_back(ex.Defined());
         references.insert(references.end(), ex.References().begin(), ex.References().end());
-        throw Exception("error in JSON attribute generation: could not create JSON constructor for class '" + ToUtf8(classTypeSymbol->FullName()) + "': " + ex.Message(),
+        throw Exception(module, "error in JSON attribute generation: could not create JSON constructor for class '" + ToUtf8(classTypeSymbol->FullName()) + "': " + ex.Message(),
             classTypeSymbol->GetSpan(), references);
     }
 }
@@ -530,14 +538,14 @@ void JsonAttributeProcessor::GenerateToJsonJsonObjectImplementation(Attribute* a
 {
     try
     {
-        FileScope* fileScope = new FileScope();
+        FileScope* fileScope = new FileScope(&statementBinder->GetBoundCompileUnit().GetModule());
         Symbol* jsonObject = classTypeSymbol->GetSymbolTable()->GlobalNs().GetContainerScope()->Lookup(U"System.Json.JsonObject");
         if (jsonObject)
         {
             fileScope->AddContainerScope(jsonObject->Ns()->GetContainerScope());
         }
         statementBinder->GetBoundCompileUnit().AddFileScope(fileScope);
-        std::unique_ptr<BoundFunction> boundFunction(new BoundFunction(toJsonJsonObjectMemberFunctionSymbol));
+        std::unique_ptr<BoundFunction> boundFunction(new BoundFunction(module, toJsonJsonObjectMemberFunctionSymbol));
         const Span& span = attribute->GetSpan();
         CompoundStatementNode compoundStatementNode(span);
         ClassTypeSymbol* baseClass = classTypeSymbol->BaseClass();
@@ -618,7 +626,7 @@ void JsonAttributeProcessor::GenerateToJsonJsonObjectImplementation(Attribute* a
         std::vector<Span> references;
         references.push_back(ex.Defined());
         references.insert(references.end(), ex.References().begin(), ex.References().end());
-        throw Exception("error in JSON attribute generation: could not create 'void ToJson(JsobObject*)' member function for class '" + ToUtf8(classTypeSymbol->FullName()) + "': " + ex.Message(),
+        throw Exception(module, "error in JSON attribute generation: could not create 'void ToJson(JsobObject*)' member function for class '" + ToUtf8(classTypeSymbol->FullName()) + "': " + ex.Message(),
             classTypeSymbol->GetSpan(), references);
     }
 }
@@ -627,14 +635,14 @@ void JsonAttributeProcessor::GenerateToJsonImplementation(Attribute* attribute, 
 {
     try
     {
-        FileScope* fileScope = new FileScope();
+        FileScope* fileScope = new FileScope(&statementBinder->GetBoundCompileUnit().GetModule());
         Symbol* jsonObject = classTypeSymbol->GetSymbolTable()->GlobalNs().GetContainerScope()->Lookup(U"System.Json.JsonObject");
         if (jsonObject)
         {
             fileScope->AddContainerScope(jsonObject->Ns()->GetContainerScope());
         }
         statementBinder->GetBoundCompileUnit().AddFileScope(fileScope);
-        std::unique_ptr<BoundFunction> boundFunction(new BoundFunction(toJsonMemberFunctionSymbol));
+        std::unique_ptr<BoundFunction> boundFunction(new BoundFunction(module, toJsonMemberFunctionSymbol));
         const Span& span = attribute->GetSpan();
         CompoundStatementNode compoundStatementNode(span);
         TemplateIdNode* uniquePtrJsonObject = new TemplateIdNode(span, new IdentifierNode(span, U"UniquePtr"));
@@ -680,12 +688,12 @@ void JsonAttributeProcessor::GenerateToJsonImplementation(Attribute* attribute, 
         std::vector<Span> references;
         references.push_back(ex.Defined());
         references.insert(references.end(), ex.References().begin(), ex.References().end());
-        throw Exception("error in JSON attribute generation: could not create 'UniquePtr<JsonValue> ToJson()' member function for class '" + ToUtf8(classTypeSymbol->FullName()) + "': " + ex.Message(),
+        throw Exception(module, "error in JSON attribute generation: could not create 'UniquePtr<JsonValue> ToJson()' member function for class '" + ToUtf8(classTypeSymbol->FullName()) + "': " + ex.Message(),
             classTypeSymbol->GetSpan(), references);
     }
 }
 
-JsonFieldNameAttributeProcessor::JsonFieldNameAttributeProcessor() : AttributeProcessor(U"jsonFieldName")
+JsonFieldNameAttributeProcessor::JsonFieldNameAttributeProcessor(Module* module_) : AttributeProcessor(U"jsonFieldName"), module(module_)
 {
 }
 
@@ -695,7 +703,7 @@ void JsonFieldNameAttributeProcessor::TypeCheck(Attribute* attribute, Symbol* sy
     {
         if (attribute->Value().empty())
         {
-            throw Exception("attribute value '" + ToUtf8(attribute->Value()) + "' for attribute '" + ToUtf8(attribute->Name()) + "' cannot be empty string", attribute->GetSpan());
+            throw Exception(module, "attribute value '" + ToUtf8(attribute->Value()) + "' for attribute '" + ToUtf8(attribute->Name()) + "' cannot be empty string", attribute->GetSpan());
         }
         return;
     }

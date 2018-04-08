@@ -10,7 +10,8 @@
 
 namespace cmajor { namespace binder {
 
-BoundStatement::BoundStatement(const Span& span_, BoundNodeType boundNodeType_) : BoundNode(span_, boundNodeType_), parent(nullptr), flags(BoundStatementFlags::none)
+BoundStatement::BoundStatement(Module* module_, const Span& span_, BoundNodeType boundNodeType_) : 
+    BoundNode(module_, span_, boundNodeType_), parent(nullptr), flags(BoundStatementFlags::none)
 {
 }
 
@@ -25,12 +26,12 @@ BoundCompoundStatement* BoundStatement::Block()
 
 void BoundStatement::Load(Emitter& emitter, OperationFlags flags)
 {
-    throw Exception("cannot load from statement", GetSpan());
+    throw Exception(GetModule(), "cannot load from statement", GetSpan());
 }
 
 void BoundStatement::Store(Emitter& emitter, OperationFlags flags)
 {
-    throw Exception("cannot store to statement", GetSpan());
+    throw Exception(GetModule(), "cannot store to statement", GetSpan());
 }
 
 void BoundStatement::SetLabel(const std::u32string& label_)
@@ -38,8 +39,8 @@ void BoundStatement::SetLabel(const std::u32string& label_)
     label = label_;
 }
 
-BoundSequenceStatement::BoundSequenceStatement(const Span& span_, std::unique_ptr<BoundStatement>&& first_, std::unique_ptr<BoundStatement>&& second_) : 
-    BoundStatement(span_, BoundNodeType::boundSequenceStatement), first(std::move(first_)), second(std::move(second_))
+BoundSequenceStatement::BoundSequenceStatement(Module* module_, const Span& span_, std::unique_ptr<BoundStatement>&& first_, std::unique_ptr<BoundStatement>&& second_) :
+    BoundStatement(module_, span_, BoundNodeType::boundSequenceStatement), first(std::move(first_)), second(std::move(second_))
 {
     first->SetParent(this);
     second->SetParent(this);
@@ -50,11 +51,11 @@ void BoundSequenceStatement::Accept(BoundNodeVisitor& visitor)
     visitor.Visit(*this);
 }
 
-BoundCompoundStatement::BoundCompoundStatement(const Span& span_) : BoundStatement(span_, BoundNodeType::boundCompoundStatement), endSpan()
+BoundCompoundStatement::BoundCompoundStatement(Module* module_, const Span& span_) : BoundStatement(module_, span_, BoundNodeType::boundCompoundStatement), endSpan()
 {
 }
 
-BoundCompoundStatement::BoundCompoundStatement(const Span& span_, const Span& endSpan_) : BoundStatement(span_, BoundNodeType::boundCompoundStatement), endSpan(endSpan_)
+BoundCompoundStatement::BoundCompoundStatement(Module* module_, const Span& span_, const Span& endSpan_) : BoundStatement(module_, span_, BoundNodeType::boundCompoundStatement), endSpan(endSpan_)
 {
 }
 
@@ -75,8 +76,8 @@ void BoundCompoundStatement::AddStatement(std::unique_ptr<BoundStatement>&& stat
     statements.push_back(std::move(statement));
 }
 
-BoundReturnStatement::BoundReturnStatement(std::unique_ptr<BoundFunctionCall>&& returnFunctionCall_, const Span& span_) : 
-    BoundStatement(span_, BoundNodeType::boundReturnStatement), returnFunctionCall(std::move(returnFunctionCall_))
+BoundReturnStatement::BoundReturnStatement(Module* module_, std::unique_ptr<BoundFunctionCall>&& returnFunctionCall_, const Span& span_) :
+    BoundStatement(module_, span_, BoundNodeType::boundReturnStatement), returnFunctionCall(std::move(returnFunctionCall_))
 {
 }
 
@@ -85,8 +86,8 @@ void BoundReturnStatement::Accept(BoundNodeVisitor& visitor)
     visitor.Visit(*this);
 }
 
-BoundIfStatement::BoundIfStatement(const Span& span_, std::unique_ptr<BoundExpression>&& condition_, std::unique_ptr<BoundStatement>&& thenS_, std::unique_ptr<BoundStatement>&& elseS_) :
-    BoundStatement(span_, BoundNodeType::boundIfStatement), condition(std::move(condition_)), thenS(std::move(thenS_)), elseS(std::move(elseS_))
+BoundIfStatement::BoundIfStatement(Module* module_, const Span& span_, std::unique_ptr<BoundExpression>&& condition_, std::unique_ptr<BoundStatement>&& thenS_, std::unique_ptr<BoundStatement>&& elseS_) :
+    BoundStatement(module_, span_, BoundNodeType::boundIfStatement), condition(std::move(condition_)), thenS(std::move(thenS_)), elseS(std::move(elseS_))
 {
     thenS->SetParent(this);
     if (elseS)
@@ -100,8 +101,8 @@ void BoundIfStatement::Accept(BoundNodeVisitor& visitor)
     visitor.Visit(*this);
 }
 
-BoundWhileStatement::BoundWhileStatement(const Span& span_, std::unique_ptr<BoundExpression>&& condition_, std::unique_ptr<BoundStatement>&& statement_) : 
-    BoundStatement(span_, BoundNodeType::boundWhileStatement), condition(std::move(condition_)), statement(std::move(statement_))
+BoundWhileStatement::BoundWhileStatement(Module* module_, const Span& span_, std::unique_ptr<BoundExpression>&& condition_, std::unique_ptr<BoundStatement>&& statement_) :
+    BoundStatement(module_, span_, BoundNodeType::boundWhileStatement), condition(std::move(condition_)), statement(std::move(statement_))
 {
     statement->SetParent(this);
 }
@@ -111,8 +112,8 @@ void BoundWhileStatement::Accept(BoundNodeVisitor& visitor)
     visitor.Visit(*this);
 }
 
-BoundDoStatement::BoundDoStatement(const Span& span_, std::unique_ptr<BoundStatement>&& statement_, std::unique_ptr<BoundExpression>&& condition_) :
-    BoundStatement(span_, BoundNodeType::boundDoStatement), statement(std::move(statement_)), condition(std::move(condition_))
+BoundDoStatement::BoundDoStatement(Module* module_, const Span& span_, std::unique_ptr<BoundStatement>&& statement_, std::unique_ptr<BoundExpression>&& condition_) :
+    BoundStatement(module_, span_, BoundNodeType::boundDoStatement), statement(std::move(statement_)), condition(std::move(condition_))
 {
     statement->SetParent(this);
 }
@@ -122,8 +123,8 @@ void BoundDoStatement::Accept(BoundNodeVisitor& visitor)
     visitor.Visit(*this);
 }
 
-BoundForStatement::BoundForStatement(const Span& span_, std::unique_ptr<BoundStatement>&& initS_, std::unique_ptr<BoundExpression>&& condition_, std::unique_ptr<BoundStatement>&& loopS_,
-    std::unique_ptr<BoundStatement>&& actionS_) : BoundStatement(span_, BoundNodeType::boundForStatement), initS(std::move(initS_)), condition(std::move(condition_)), loopS(std::move(loopS_)), 
+BoundForStatement::BoundForStatement(Module* module_, const Span& span_, std::unique_ptr<BoundStatement>&& initS_, std::unique_ptr<BoundExpression>&& condition_, std::unique_ptr<BoundStatement>&& loopS_,
+    std::unique_ptr<BoundStatement>&& actionS_) : BoundStatement(module_, span_, BoundNodeType::boundForStatement), initS(std::move(initS_)), condition(std::move(condition_)), loopS(std::move(loopS_)), 
     actionS(std::move(actionS_))
 {
     initS->SetParent(this);
@@ -136,8 +137,8 @@ void BoundForStatement::Accept(BoundNodeVisitor& visitor)
     visitor.Visit(*this);
 }
 
-BoundSwitchStatement::BoundSwitchStatement(const Span& span_, std::unique_ptr<BoundExpression>&& condition_) : 
-    BoundStatement(span_, BoundNodeType::boundSwitchStatement), condition(std::move(condition_))
+BoundSwitchStatement::BoundSwitchStatement(Module* module_, const Span& span_, std::unique_ptr<BoundExpression>&& condition_) :
+    BoundStatement(module_, span_, BoundNodeType::boundSwitchStatement), condition(std::move(condition_))
 {
 }
 
@@ -158,7 +159,8 @@ void BoundSwitchStatement::Accept(BoundNodeVisitor& visitor)
     visitor.Visit(*this);
 }
 
-BoundCaseStatement::BoundCaseStatement(const Span& span_) : BoundStatement(span_, BoundNodeType::boundCaseStatement), compoundStatement(span_)
+BoundCaseStatement::BoundCaseStatement(Module* module_, const Span& span_) : 
+    BoundStatement(module_, span_, BoundNodeType::boundCaseStatement), compoundStatement(module_, span_)
 {
 }
 
@@ -177,7 +179,8 @@ void BoundCaseStatement::Accept(BoundNodeVisitor& visitor)
     visitor.Visit(*this);
 }
 
-BoundDefaultStatement::BoundDefaultStatement(const Span& span_) : BoundStatement(span_, BoundNodeType::boundDefaultStatement), compoundStatement(span_)
+BoundDefaultStatement::BoundDefaultStatement(Module* module_, const Span& span_) : 
+    BoundStatement(module_, span_, BoundNodeType::boundDefaultStatement), compoundStatement(module_, span_)
 {
 }
 
@@ -191,8 +194,8 @@ void BoundDefaultStatement::Accept(BoundNodeVisitor& visitor)
     visitor.Visit(*this);
 }
 
-BoundGotoCaseStatement::BoundGotoCaseStatement(const Span& span_, std::unique_ptr<Value>&& caseValue_) : 
-    BoundStatement(span_, BoundNodeType::boundGotoCaseStatement), caseValue(std::move(caseValue_))
+BoundGotoCaseStatement::BoundGotoCaseStatement(Module* module_, const Span& span_, std::unique_ptr<Value>&& caseValue_) :
+    BoundStatement(module_, span_, BoundNodeType::boundGotoCaseStatement), caseValue(std::move(caseValue_))
 {
 }
 
@@ -201,7 +204,7 @@ void BoundGotoCaseStatement::Accept(BoundNodeVisitor& visitor)
     visitor.Visit(*this);
 }
 
-BoundGotoDefaultStatement::BoundGotoDefaultStatement(const Span& span_) : BoundStatement(span_, BoundNodeType::boundGotoDefaultStatement)
+BoundGotoDefaultStatement::BoundGotoDefaultStatement(Module* module_, const Span& span_) : BoundStatement(module_, span_, BoundNodeType::boundGotoDefaultStatement)
 {
 }
 
@@ -210,7 +213,7 @@ void BoundGotoDefaultStatement::Accept(BoundNodeVisitor& visitor)
     visitor.Visit(*this);
 }
 
-BoundBreakStatement::BoundBreakStatement(const Span& span_) : BoundStatement(span_, BoundNodeType::boundBreakStatement)
+BoundBreakStatement::BoundBreakStatement(Module* module_, const Span& span_) : BoundStatement(module_, span_, BoundNodeType::boundBreakStatement)
 {
 }
 
@@ -219,7 +222,7 @@ void BoundBreakStatement::Accept(BoundNodeVisitor& visitor)
     visitor.Visit(*this);
 }
 
-BoundContinueStatement::BoundContinueStatement(const Span& span_) : BoundStatement(span_, BoundNodeType::boundContinueStatement)
+BoundContinueStatement::BoundContinueStatement(Module* module_, const Span& span_) : BoundStatement(module_, span_, BoundNodeType::boundContinueStatement)
 {
 }
 
@@ -228,8 +231,8 @@ void BoundContinueStatement::Accept(BoundNodeVisitor& visitor)
     visitor.Visit(*this);
 }
 
-BoundGotoStatement::BoundGotoStatement(const Span& span_, const std::u32string& target_) : 
-    BoundStatement(span_, BoundNodeType::boundGotoStatement), target(target_), targetStatement(nullptr), targetBlock(nullptr)
+BoundGotoStatement::BoundGotoStatement(Module* module_, const Span& span_, const std::u32string& target_) :
+    BoundStatement(module_, span_, BoundNodeType::boundGotoStatement), target(target_), targetStatement(nullptr), targetBlock(nullptr)
 {
 }
 
@@ -238,8 +241,8 @@ void BoundGotoStatement::Accept(BoundNodeVisitor& visitor)
     visitor.Visit(*this);
 }
 
-BoundConstructionStatement::BoundConstructionStatement(std::unique_ptr<BoundFunctionCall>&& constructorCall_) : 
-    BoundStatement(constructorCall_->GetSpan(), BoundNodeType::boundConstructionStatement), constructorCall(std::move(constructorCall_))
+BoundConstructionStatement::BoundConstructionStatement(Module* module_, std::unique_ptr<BoundFunctionCall>&& constructorCall_) :
+    BoundStatement(module_, constructorCall_->GetSpan(), BoundNodeType::boundConstructionStatement), constructorCall(std::move(constructorCall_))
 {
 }
 
@@ -248,8 +251,8 @@ void BoundConstructionStatement::Accept(BoundNodeVisitor& visitor)
     visitor.Visit(*this);
 }
 
-BoundAssignmentStatement::BoundAssignmentStatement(std::unique_ptr<BoundFunctionCall>&& assignmentCall_) :
-    BoundStatement(assignmentCall_->GetSpan(), BoundNodeType::boundAssignmentStatement), assignmentCall(std::move(assignmentCall_))
+BoundAssignmentStatement::BoundAssignmentStatement(Module* module_, std::unique_ptr<BoundFunctionCall>&& assignmentCall_) :
+    BoundStatement(module_, assignmentCall_->GetSpan(), BoundNodeType::boundAssignmentStatement), assignmentCall(std::move(assignmentCall_))
 {
 }
 
@@ -258,8 +261,8 @@ void BoundAssignmentStatement::Accept(BoundNodeVisitor& visitor)
     visitor.Visit(*this);
 }
 
-BoundExpressionStatement::BoundExpressionStatement(std::unique_ptr<BoundExpression>&& expression_) : 
-    BoundStatement(expression_->GetSpan(), BoundNodeType::boundExpressionStatement), expression(std::move(expression_))
+BoundExpressionStatement::BoundExpressionStatement(Module* module_, std::unique_ptr<BoundExpression>&& expression_) :
+    BoundStatement(module_, expression_->GetSpan(), BoundNodeType::boundExpressionStatement), expression(std::move(expression_))
 { 
 }
 
@@ -268,7 +271,7 @@ void BoundExpressionStatement::Accept(BoundNodeVisitor& visitor)
     visitor.Visit(*this);
 }
 
-BoundEmptyStatement::BoundEmptyStatement(const Span& span_) : BoundStatement(span_, BoundNodeType::boundEmptyStatement)
+BoundEmptyStatement::BoundEmptyStatement(Module* module_, const Span& span_) : BoundStatement(module_, span_, BoundNodeType::boundEmptyStatement)
 {
 }
 
@@ -277,8 +280,8 @@ void BoundEmptyStatement::Accept(BoundNodeVisitor& visitor)
     visitor.Visit(*this);
 }
 
-BoundSetVmtPtrStatement::BoundSetVmtPtrStatement(std::unique_ptr<BoundExpression>&& classPtr_, ClassTypeSymbol* classType_) :
-    BoundStatement(classPtr_->GetSpan(), BoundNodeType::boundSetVmtPtrStatement), classPtr(std::move(classPtr_)), classType(classType_)
+BoundSetVmtPtrStatement::BoundSetVmtPtrStatement(Module* module_, std::unique_ptr<BoundExpression>&& classPtr_, ClassTypeSymbol* classType_) :
+    BoundStatement(module_, classPtr_->GetSpan(), BoundNodeType::boundSetVmtPtrStatement), classPtr(std::move(classPtr_)), classType(classType_)
 {
 }
 
@@ -287,7 +290,8 @@ void BoundSetVmtPtrStatement::Accept(BoundNodeVisitor& visitor)
     visitor.Visit(*this);
 }
 
-BoundThrowStatement::BoundThrowStatement(const Span& span_, std::unique_ptr<BoundExpression>&& throwCallExpr_) : BoundStatement(span_, BoundNodeType::boundThrowStatement), throwCallExpr(std::move(throwCallExpr_))
+BoundThrowStatement::BoundThrowStatement(Module* module_, const Span& span_, std::unique_ptr<BoundExpression>&& throwCallExpr_) : 
+    BoundStatement(module_, span_, BoundNodeType::boundThrowStatement), throwCallExpr(std::move(throwCallExpr_))
 {
 }
 
@@ -296,8 +300,8 @@ void BoundThrowStatement::Accept(BoundNodeVisitor& visitor)
     visitor.Visit(*this);
 }
 
-BoundRethrowStatement::BoundRethrowStatement(const Span& span_, std::unique_ptr<BoundExpression>&& releaseCall_) :
-    BoundStatement(span_, BoundNodeType::boundRethrowStatement), releaseCall(std::move(releaseCall_))
+BoundRethrowStatement::BoundRethrowStatement(Module* module_, const Span& span_, std::unique_ptr<BoundExpression>&& releaseCall_) :
+    BoundStatement(module_, span_, BoundNodeType::boundRethrowStatement), releaseCall(std::move(releaseCall_))
 {
 }
 
@@ -306,7 +310,7 @@ void BoundRethrowStatement::Accept(BoundNodeVisitor& visitor)
     visitor.Visit(*this);
 }
 
-BoundTryStatement::BoundTryStatement(const Span& span_) : BoundStatement(span_, BoundNodeType::boundTryStatement)
+BoundTryStatement::BoundTryStatement(Module* module_, const Span& span_) : BoundStatement(module_, span_, BoundNodeType::boundTryStatement)
 {
 }
 
@@ -327,7 +331,8 @@ void BoundTryStatement::Accept(BoundNodeVisitor& visitor)
     visitor.Visit(*this);
 }
 
-BoundCatchStatement::BoundCatchStatement(const Span& span_) : BoundStatement(span_, BoundNodeType::boundCatchStatement), catchedType(nullptr)
+BoundCatchStatement::BoundCatchStatement(Module* module_, const Span& span_) : 
+    BoundStatement(module_, span_, BoundNodeType::boundCatchStatement), catchedType(nullptr), catchTypeUuidId(-1)
 {
 }
 

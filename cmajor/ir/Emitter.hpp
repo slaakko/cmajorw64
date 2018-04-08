@@ -53,6 +53,7 @@ public:
     virtual llvm::Value* GetGlobalStringPtr(int stringId) = 0;
     virtual llvm::Value* GetGlobalWStringConstant(int stringId) = 0;
     virtual llvm::Value* GetGlobalUStringConstant(int stringId) = 0;
+    virtual llvm::Value* GetGlobalUuidConstant(int uuidId) = 0;
     virtual void SetLineNumber(int32_t lineNumber) = 0;
     virtual llvm::BasicBlock* HandlerBlock() = 0;
     virtual llvm::BasicBlock* CleanupBlock() = 0;

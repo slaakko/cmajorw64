@@ -21,20 +21,20 @@ void Warning::SetReferences(const std::vector<Span>& references_)
     references = references_;
 }
 
-std::unique_ptr<JsonValue> Warning::ToJson() const
+std::unique_ptr<JsonValue> Warning::ToJson(Module* module) const
 {
     JsonObject* o = new JsonObject();
     o->AddField(U"project", std::unique_ptr<JsonValue>(new JsonString(project)));
     o->AddField(U"message", std::unique_ptr<JsonValue>(new JsonString(ToUtf32(message))));
     JsonArray* referencesArray = new JsonArray();
-    std::unique_ptr<JsonValue> def = SpanToJson(defined);
+    std::unique_ptr<JsonValue> def = SpanToJson(module, defined);
     if (def)
     {
         referencesArray->AddItem(std::move(def));
     }
     for (const Span& span : references)
     {
-        std::unique_ptr<JsonValue> ref = SpanToJson(span);
+        std::unique_ptr<JsonValue> ref = SpanToJson(module, span);
         if (ref)
         {
             referencesArray->AddItem(std::move(ref));
@@ -48,41 +48,9 @@ CompileWarningCollection::CompileWarningCollection()
 {
 }
 
-void CompileWarningCollection::Init()
-{
-    instance.reset(new CompileWarningCollection());
-}
-
-void CompileWarningCollection::Done()
-{
-    instance.reset();
-}
-
-CompileWarningCollection& CompileWarningCollection::Instance()
-{
-    return *instance;
-}
-
-void CompileWarningCollection::SetCurrentProjectName(const std::u32string& currentProjectName_)
-{
-    currentProjectName = currentProjectName_;
-}
-
-std::unique_ptr<CompileWarningCollection> CompileWarningCollection::instance;
-
 void CompileWarningCollection::AddWarning(const Warning& warning)
 {
     warnings.push_back(warning);
-}
-
-void InitWarning()
-{
-    CompileWarningCollection::Init();
-}
-
-void DoneWarning()
-{
-    CompileWarningCollection::Done();
 }
 
 } } // namespace cmajor::symbols

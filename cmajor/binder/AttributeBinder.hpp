@@ -33,7 +33,7 @@ private:
 class AttributeBinder
 {
 public:
-    AttributeBinder();
+    AttributeBinder(Module* module);
     void BindAttributes(Attributes* attrs, Symbol* symbol, BoundCompileUnit& boundCompileUnit, ContainerScope* containerScope);
     void GenerateImplementation(Attributes* attrs, Symbol* symbol, StatementBinder* statementBinder);
 private:

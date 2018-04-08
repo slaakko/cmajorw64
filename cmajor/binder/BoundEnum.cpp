@@ -9,7 +9,7 @@
 
 namespace cmajor { namespace binder {
 
-BoundEnumTypeDefinition::BoundEnumTypeDefinition(EnumTypeSymbol* enumTypeSymbol_) : BoundNode(enumTypeSymbol_->GetSpan(), BoundNodeType::boundEnumTypeDefinition), enumTypeSymbol(enumTypeSymbol_)
+BoundEnumTypeDefinition::BoundEnumTypeDefinition(Module* module_, EnumTypeSymbol* enumTypeSymbol_) : BoundNode(module_, enumTypeSymbol_->GetSpan(), BoundNodeType::boundEnumTypeDefinition), enumTypeSymbol(enumTypeSymbol_)
 {
 }
 
@@ -20,12 +20,12 @@ void BoundEnumTypeDefinition::Accept(BoundNodeVisitor& visitor)
 
 void BoundEnumTypeDefinition::Load(Emitter& emitter, OperationFlags flags)
 {
-    throw Exception("cannot load from enum type", GetSpan());
+    throw Exception(GetModule(), "cannot load from enum type", GetSpan());
 }
 
 void BoundEnumTypeDefinition::Store(Emitter& emitter, OperationFlags flags)
 {
-    throw Exception("cannot store to enum type", GetSpan());
+    throw Exception(GetModule(), "cannot store to enum type", GetSpan());
 }
 
 } } // namespace cmajor::binder

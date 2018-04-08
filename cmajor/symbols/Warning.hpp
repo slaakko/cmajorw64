@@ -12,6 +12,7 @@ namespace cmajor { namespace symbols {
 
 using cmajor::parsing::Span;
 using cmajor::util::JsonValue;
+class Module;
 
 class Warning
 {
@@ -23,7 +24,7 @@ public:
     void SetDefined(const Span& defined_) { defined = defined_; }
     const std::vector<Span>& References() const { return references; }
     void SetReferences(const std::vector<Span>& references_);
-    std::unique_ptr<JsonValue> ToJson() const;
+    std::unique_ptr<JsonValue> ToJson(Module* module) const;
 private:
     std::u32string project;
     std::string message;
@@ -34,22 +35,12 @@ private:
 class CompileWarningCollection
 {
 public:
-    static void Init();
-    static void Done();
-    static CompileWarningCollection& Instance();
-    void SetCurrentProjectName(const std::u32string& currentProjectName_);
-    const std::u32string& GetCurrentProjectName() const { return currentProjectName; }
+    CompileWarningCollection();
     void AddWarning(const Warning& warning);
     const std::vector<Warning>& Warnings() const { return warnings; }
 private:
-    static std::unique_ptr<CompileWarningCollection> instance;
-    CompileWarningCollection();
-    std::u32string currentProjectName;
     std::vector<Warning> warnings;
 };
-
-void InitWarning();
-void DoneWarning();
 
 } } // namespace cmajor::symbols
 

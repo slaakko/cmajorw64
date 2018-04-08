@@ -5,7 +5,8 @@
 
 #include <cmajor/symbols/Exception.hpp>
 #include <cmajor/symbols/GlobalFlags.hpp>
-#include <cmajor/parser/FileRegistry.hpp>
+#include <cmajor/symbols/Module.hpp>
+//#include <cmajor/parser/FileRegistry.hpp>
 #include <cmajor/parsing/Exception.hpp>
 #include <cmajor/dom/CharacterData.hpp>
 #include <cmajor/util/MappedInputFile.hpp>
@@ -14,41 +15,44 @@
 
 namespace cmajor { namespace symbols {
 
-using namespace cmajor::parser;
 using namespace cmajor::util;
 using namespace cmajor::unicode;
 
-std::string Expand(const std::string& errorMessage, const Span& span)
+std::string Expand(Module* module, const std::string& errorMessage, const Span& span)
 {
     std::vector<Span> references;
-    return Expand(errorMessage, span, references);
+    return Expand(module, errorMessage, span, references);
 }
 
-std::string Expand(const std::string& errorMessage, const Span& primarySpan, const Span& referenceSpan)
+std::string Expand(Module* module, const std::string& errorMessage, const Span& primarySpan, const Span& referenceSpan)
 {
     std::vector<Span> references(1, referenceSpan);
-    return Expand(errorMessage, primarySpan, references, "Error");
+    return Expand(module, errorMessage, primarySpan, references, "Error");
 }
 
-std::string Expand(const std::string& errorMessage, const Span& primarySpan, const Span& referenceSpan, const std::string& title)
+std::string Expand(Module* module, const std::string& errorMessage, const Span& primarySpan, const Span& referenceSpan, const std::string& title)
 {
     std::vector<Span> references(1, referenceSpan);
-    return Expand(errorMessage, primarySpan, references, title);
+    return Expand(module, errorMessage, primarySpan, references, title);
 }
 
-std::string Expand(const std::string& errorMessage, const Span& span, const std::vector<Span>& references)
+std::string Expand(Module* module, const std::string& errorMessage, const Span& span, const std::vector<Span>& references)
 {
-    return Expand(errorMessage, span, references, "Error");
+    return Expand(module, errorMessage, span, references, "Error");
 }
 
-std::string Expand(const std::string& errorMessage, const Span& span, const std::vector<Span>& references, const std::string& title)
+std::string Expand(Module* module, const std::string& errorMessage, const Span& span, const std::vector<Span>& references, const std::string& title)
 {
     std::vector<Span> referenceSpans = references;
     referenceSpans.erase(std::unique(referenceSpans.begin(), referenceSpans.end()), referenceSpans.end());
     std::string expandedMessage = title + ": " + errorMessage;
     if (span.Valid())
     {
-        std::string fileName = FileRegistry::Instance().GetFilePath(span.FileIndex());
+        if (!module)
+        {
+            throw std::runtime_error("module not set");
+        }
+        std::string fileName = module->GetFilePath(span.FileIndex());
         if (!fileName.empty())
         {
             expandedMessage.append(" (file '" + fileName + "', line " + std::to_string(span.LineNumber()) + ")");
@@ -62,7 +66,11 @@ std::string Expand(const std::string& errorMessage, const Span& span, const std:
     {
         if (!referenceSpan.Valid()) continue;
         if (referenceSpan == span) continue;
-        std::string fileName = FileRegistry::Instance().GetFilePath(referenceSpan.FileIndex());
+        if (!module)
+        {
+            throw std::runtime_error("module not set");
+        }
+        std::string fileName = module->GetFilePath(referenceSpan.FileIndex());
         if (!fileName.empty())
         {
             expandedMessage.append("\nsee reference to file '" + fileName + "', line " + std::to_string(referenceSpan.LineNumber()));
@@ -75,10 +83,14 @@ std::string Expand(const std::string& errorMessage, const Span& span, const std:
     return expandedMessage;
 }
 
-std::unique_ptr<JsonObject> SpanToJson(const Span& span)
+std::unique_ptr<JsonObject> SpanToJson(Module* module, const Span& span)
 {
     if (!span.Valid()) return std::unique_ptr<JsonObject>();
-    const std::string& fileName = FileRegistry::Instance().GetFilePath(span.FileIndex());
+    if (!module)
+    {
+        throw std::runtime_error("module not set");
+    }
+    const std::string& fileName = module->GetFilePath(span.FileIndex());
     if (fileName.empty()) return std::unique_ptr<JsonObject>();
     std::unique_ptr<JsonObject> json(new JsonObject());
     json->AddField(U"file", std::unique_ptr<JsonValue>(new JsonString(ToUtf32(fileName))));
@@ -96,10 +108,14 @@ std::unique_ptr<JsonObject> SpanToJson(const Span& span)
     return json;
 }
 
-std::unique_ptr<cmajor::dom::Element> SpanToDomElement(const Span& span)
+std::unique_ptr<cmajor::dom::Element> SpanToDomElement(Module* module, const Span& span)
 {
     if (!span.Valid()) return std::unique_ptr<cmajor::dom::Element>();
-    const std::string& fileName = FileRegistry::Instance().GetFilePath(span.FileIndex());
+    if (!module)
+    {
+        throw std::runtime_error("module not set");
+    }
+    const std::string& fileName = module->GetFilePath(span.FileIndex());
     if (fileName.empty()) return std::unique_ptr<cmajor::dom::Element>();
     std::unique_ptr<cmajor::dom::Element> spanElement(new cmajor::dom::Element(U"span"));
     std::unique_ptr<cmajor::dom::Element> fileElement(new cmajor::dom::Element(U"file"));
@@ -132,17 +148,17 @@ std::unique_ptr<cmajor::dom::Element> SpanToDomElement(const Span& span)
     return spanElement;
 }
 
-Exception::Exception(const std::string& message_, const Span& defined_) : what(Expand(message_, defined_)), message(message_), defined(defined_)
+Exception::Exception(Module* module_, const std::string& message_, const Span& defined_) : module(module_), what(Expand(module, message_, defined_)), message(message_), defined(defined_)
 {
 }
 
-Exception::Exception(const std::string& message_, const Span& defined_, const Span& referenced_) : what(Expand(message_, defined_, referenced_)), message(message_), defined(defined_)
+Exception::Exception(Module* module_, const std::string& message_, const Span& defined_, const Span& referenced_) : module(module_), what(Expand(module, message_, defined_, referenced_)), message(message_), defined(defined_)
 {
     references.push_back(referenced_);
 }
 
-Exception::Exception(const std::string& message_, const Span& defined_, const std::vector<Span>& references_) :
-    what(Expand(message_, defined_, references_)), message(message_), defined(defined_), references(references_)
+Exception::Exception(Module* module_, const std::string& message_, const Span& defined_, const std::vector<Span>& references_) :
+    module(module_), what(Expand(module, message_, defined_, references_)), message(message_), defined(defined_), references(references_)
 {
 }
 
@@ -153,12 +169,12 @@ Exception::~Exception()
 std::unique_ptr<JsonValue> Exception::ToJson() const
 {
     std::unique_ptr<JsonObject> json(new JsonObject());
-    json->AddField(U"tool", std::unique_ptr<JsonValue>(new JsonString(GetCurrentToolName())));
+    json->AddField(U"tool", std::unique_ptr<JsonValue>(new JsonString(module->GetCurrentToolName())));
     json->AddField(U"kind", std::unique_ptr<JsonValue>(new JsonString(U"error")));
-    json->AddField(U"project", std::unique_ptr<JsonValue>(new JsonString(GetCurrentProjectName())));
+    json->AddField(U"project", std::unique_ptr<JsonValue>(new JsonString(module->GetCurrentProjectName())));
     json->AddField(U"message", std::unique_ptr<JsonValue>(new JsonString(ToUtf32(message))));
     std::unique_ptr<JsonArray> refs(new JsonArray());
-    std::unique_ptr<JsonObject> ref = SpanToJson(defined);
+    std::unique_ptr<JsonObject> ref = SpanToJson(module, defined);
     if (ref)
     {
         refs->AddItem(std::move(ref));
@@ -169,7 +185,7 @@ std::unique_ptr<JsonValue> Exception::ToJson() const
     {
         if (!referenceSpan.Valid()) continue;
         if (referenceSpan == defined) continue;
-        std::unique_ptr<JsonObject> ref = SpanToJson(referenceSpan);
+        std::unique_ptr<JsonObject> ref = SpanToJson(module, referenceSpan);
         if (ref)
         {
             refs->AddItem(std::move(ref));
@@ -194,7 +210,7 @@ void Exception::AddToDiagnosticsElement(cmajor::dom::Element* diagnosticsElement
     diagnosticElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(categoryElement.release()));
     diagnosticElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(subcategoryElement.release()));
     diagnosticElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(messageElement.release()));
-    std::unique_ptr<cmajor::dom::Element> spanElement = SpanToDomElement(defined);
+    std::unique_ptr<cmajor::dom::Element> spanElement = SpanToDomElement(module, defined);
     if (spanElement)
     {
         diagnosticElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(spanElement.release()));
@@ -212,7 +228,7 @@ void Exception::AddToDiagnosticsElement(cmajor::dom::Element* diagnosticsElement
         messageElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(messageText.release()));
         diagnosticElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(categoryElement.release()));
         diagnosticElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(messageElement.release()));
-        std::unique_ptr<cmajor::dom::Element> spanElement = SpanToDomElement(span);
+        std::unique_ptr<cmajor::dom::Element> spanElement = SpanToDomElement(module, span);
         if (spanElement)
         {
             diagnosticElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(spanElement.release()));
@@ -222,57 +238,57 @@ void Exception::AddToDiagnosticsElement(cmajor::dom::Element* diagnosticsElement
 
 }
 
-CastOverloadException::CastOverloadException(const std::string& message_, const Span& defined_) : Exception(message_, defined_)
+CastOverloadException::CastOverloadException(Module* module, const std::string& message_, const Span& defined_) : Exception(module, message_, defined_)
 {
 }
 
-CastOverloadException::CastOverloadException(const std::string& message_, const Span& defined_, const Span& referenced_) : Exception(message_, defined_, referenced_)
+CastOverloadException::CastOverloadException(Module* module, const std::string& message_, const Span& defined_, const Span& referenced_) : Exception(module, message_, defined_, referenced_)
 {
 }
 
-CastOverloadException::CastOverloadException(const std::string& message_, const Span& defined_, const std::vector<Span>& references_) : Exception(message_, defined_, references_)
+CastOverloadException::CastOverloadException(Module* module, const std::string& message_, const Span& defined_, const std::vector<Span>& references_) : Exception(module, message_, defined_, references_)
 {
 }
 
-CannotBindConstToNonconstOverloadException::CannotBindConstToNonconstOverloadException(const std::string& message_, const Span& defined_) : Exception(message_, defined_)
+CannotBindConstToNonconstOverloadException::CannotBindConstToNonconstOverloadException(Module* module, const std::string& message_, const Span& defined_) : Exception(module, message_, defined_)
 {
 }
 
-CannotBindConstToNonconstOverloadException::CannotBindConstToNonconstOverloadException(const std::string& message_, const Span& defined_, const Span& referenced_) :
-    Exception(message_, defined_, referenced_)
+CannotBindConstToNonconstOverloadException::CannotBindConstToNonconstOverloadException(Module* module, const std::string& message_, const Span& defined_, const Span& referenced_) :
+    Exception(module, message_, defined_, referenced_)
 {
 }
 
-CannotBindConstToNonconstOverloadException::CannotBindConstToNonconstOverloadException(const std::string& message_, const Span& defined_, const std::vector<Span>& references_) :
-    Exception(message_, defined_, references_)
+CannotBindConstToNonconstOverloadException::CannotBindConstToNonconstOverloadException(Module* module, const std::string& message_, const Span& defined_, const std::vector<Span>& references_) :
+    Exception(module, message_, defined_, references_)
 {
 }
 
-CannotAssignToConstOverloadException::CannotAssignToConstOverloadException(const std::string& message_, const Span& defined_) : Exception(message_, defined_)
+CannotAssignToConstOverloadException::CannotAssignToConstOverloadException(Module* module, const std::string& message_, const Span& defined_) : Exception(module, message_, defined_)
 {
 }
 
-CannotAssignToConstOverloadException::CannotAssignToConstOverloadException(const std::string& message_, const Span& defined_, const Span& referenced_) :
-    Exception(message_, defined_, referenced_)
+CannotAssignToConstOverloadException::CannotAssignToConstOverloadException(Module* module, const std::string& message_, const Span& defined_, const Span& referenced_) :
+    Exception(module, message_, defined_, referenced_)
 {
 }
 
-CannotAssignToConstOverloadException::CannotAssignToConstOverloadException(const std::string& message_, const Span& defined_, const std::vector<Span>& references_) :
-    Exception(message_, defined_, references_)
+CannotAssignToConstOverloadException::CannotAssignToConstOverloadException(Module* module, const std::string& message_, const Span& defined_, const std::vector<Span>& references_) :
+    Exception(module, message_, defined_, references_)
 {
 }
 
-NoViableFunctionException::NoViableFunctionException(const std::string& message_, const Span& defined_) : Exception(message_, defined_)
+NoViableFunctionException::NoViableFunctionException(Module* module, const std::string& message_, const Span& defined_) : Exception(module, message_, defined_)
 {
 }
 
-NoViableFunctionException::NoViableFunctionException(const std::string& message_, const Span& defined_, const Span& referenced_) :
-    Exception(message_, defined_, referenced_)
+NoViableFunctionException::NoViableFunctionException(Module* module, const std::string& message_, const Span& defined_, const Span& referenced_) :
+    Exception(module, message_, defined_, referenced_)
 {
 }
 
-NoViableFunctionException::NoViableFunctionException(const std::string& message_, const Span& defined_, const std::vector<Span>& references_) :
-    Exception(message_, defined_, references_)
+NoViableFunctionException::NoViableFunctionException(Module* module, const std::string& message_, const Span& defined_, const std::vector<Span>& references_) :
+    Exception(module, message_, defined_, references_)
 {
 }
 

@@ -12,6 +12,8 @@
 #include <cmajor/util/Path.hpp>
 #include <cmajor/util/Prime.hpp>
 #include <boost/filesystem.hpp>
+#include <boost/uuid/uuid_io.hpp>
+#include <boost/functional/hash.hpp>
 #include <unordered_map>
 #include <sstream>
 #ifdef _WIN32
@@ -26,6 +28,7 @@ namespace cmajor { namespace rt {
 
 using namespace cmajor::util;
 
+/*
 class ClassIdMap
 {
 public:
@@ -37,6 +40,20 @@ public:
 private:
     static std::unique_ptr<ClassIdMap> instance;
     std::unordered_map<uint32_t, uint64_t> classIdMap;
+};
+*/
+
+class ClassIdMap
+{
+public:
+    static void Init();
+    static void Done();
+    static ClassIdMap& Instance() { return *instance; }
+    void SetClassId(const boost::uuids::uuid& typeId, uint64_t classId);
+    uint64_t GetClassId(const boost::uuids::uuid& typeId) const;
+private:
+    static std::unique_ptr<ClassIdMap> instance;
+    std::unordered_map<boost::uuids::uuid, uint64_t, boost::hash<boost::uuids::uuid>> classIdMap;
 };
 
 std::unique_ptr<ClassIdMap> ClassIdMap::instance;
@@ -51,11 +68,19 @@ void ClassIdMap::Done()
     instance.reset();
 }
 
+/*
 void ClassIdMap::SetClassId(uint32_t typeId, uint64_t classId)
 {
     classIdMap[typeId] = classId;
 }
+*/
 
+void ClassIdMap::SetClassId(const boost::uuids::uuid& typeId, uint64_t classId)
+{
+    classIdMap[typeId] = classId;
+}
+
+/*
 uint64_t ClassIdMap::GetClassId(uint32_t typeId) const
 {
     auto it = classIdMap.find(typeId);
@@ -72,7 +97,26 @@ uint64_t ClassIdMap::GetClassId(uint32_t typeId) const
         exit(exitCodeInternalError);
     }
 }
+*/
 
+uint64_t ClassIdMap::GetClassId(const boost::uuids::uuid& typeId) const
+{
+    auto it = classIdMap.find(typeId);
+    if (it != classIdMap.cend())
+    {
+        return it->second;
+    }
+    else
+    {
+        std::stringstream s;
+        s << "internal error : class id for type id " << typeId << " not found.\n";
+        std::string str = s.str();
+        RtWrite(stdErrFileHandle, reinterpret_cast<const uint8_t*>(str.c_str()), str.length());
+        exit(exitCodeInternalError);
+    }
+}
+
+/*
 struct ClassInfo
 {
     ClassInfo(uint32_t typeId_, const std::string& vmtObjectName_, uint32_t baseTypeId_) : 
@@ -85,36 +129,56 @@ struct ClassInfo
     uint64_t key;
     uint64_t id;
 };
+*/
+struct ClassInfo
+{
+    ClassInfo(const boost::uuids::uuid& typeId_, const std::string& vmtObjectName_, const boost::uuids::uuid& baseTypeId_) :
+        typeId(typeId_), vmtObjectName(vmtObjectName_), baseTypeId(baseTypeId_), baseClass(nullptr), level(0), key(0), id(0) {}
+    boost::uuids::uuid typeId;
+    std::string vmtObjectName;
+    boost::uuids::uuid  baseTypeId;
+    ClassInfo* baseClass;
+    int level;
+    uint64_t key;
+    uint64_t id;
+};
 
-void ReadClasses(const std::string& classFilePath, std::vector<std::unique_ptr<ClassInfo>>& classInfos, std::vector<uint32_t>& staticClassIds)
+void ReadClasses(const std::string& classFilePath, std::vector<std::unique_ptr<ClassInfo>>& classInfos, std::vector<boost::uuids::uuid>& staticClassIds)
 {
     BinaryReader reader(classFilePath);
     uint32_t n = reader.ReadEncodedUInt();
     for (uint32_t i = 0; i < n; ++i)
     {
-        uint32_t typeId = reader.ReadUInt();
+        //uint32_t typeId = reader.ReadUInt();
+        boost::uuids::uuid typeId;
+        reader.ReadUuid(typeId);
         std::string vmtObjectName = reader.ReadUtf8String();
-        uint32_t baseTypeId = reader.ReadUInt();
+        //uint32_t baseTypeId = reader.ReadUInt();
+        boost::uuids::uuid baseTypeId;
+        reader.ReadUuid(baseTypeId);
         classInfos.push_back(std::unique_ptr<ClassInfo>(new ClassInfo(typeId, vmtObjectName, baseTypeId)));
     }
     uint32_t ns = reader.ReadEncodedUInt();
     for (uint32_t i = 0; i < ns; ++i)
     {
-        uint32_t typeId = reader.ReadUInt();
+        boost::uuids::uuid typeId;
+        reader.ReadUuid(typeId);
         staticClassIds.push_back(typeId);
     }
 }
 
 void ResolveBaseClasses(const std::vector<std::unique_ptr<ClassInfo>>& classes)
 {
-    std::unordered_map<uint32_t, ClassInfo*> classMap;
+    //std::unordered_map<uint32_t, ClassInfo*> classMap;
+    std::unordered_map<boost::uuids::uuid, ClassInfo*, boost::hash<boost::uuids::uuid>> classMap;
     for (const std::unique_ptr<ClassInfo>& cls : classes)
     {
         classMap[cls->typeId] = cls.get();
     }
     for (const std::unique_ptr<ClassInfo>& cls : classes)
     {
-        if (cls->baseTypeId != 0)
+        //if (cls->baseTypeId != 0)
+        if (!cls->baseTypeId.is_nil())
         {
             auto it = classMap.find(cls->baseTypeId);
             if (it != classMap.cend())
@@ -123,7 +187,8 @@ void ResolveBaseClasses(const std::vector<std::unique_ptr<ClassInfo>>& classes)
             }
             else
             {
-                throw std::runtime_error("error assigning class id's: class with id " + std::to_string(cls->baseTypeId) + " not found");
+                //throw std::runtime_error("error assigning class id's: class with id " + std::to_string(cls->baseTypeId) + " not found");
+                throw std::runtime_error("error assigning class id's: class with id " + boost::uuids::to_string(cls->baseTypeId) + " not found");
             }
         }
     }
@@ -262,7 +327,14 @@ void SetClassIdsToClassIdMap(const std::vector<ClassInfo*>& classesByPriority)
     }
 }
 
+/*
 uint64_t GetClassId(uint32_t typeId)
+{
+    return ClassIdMap::Instance().GetClassId(typeId);
+}
+*/
+
+uint64_t GetClassId(const boost::uuids::uuid& typeId)
 {
     return ClassIdMap::Instance().GetClassId(typeId);
 }
@@ -279,7 +351,7 @@ void InitClasses()
             throw std::runtime_error("error assigning class id's: class file '" + GetFullPath(classFilePath.generic_string()) + "' does not exist");
         }
         std::vector<std::unique_ptr<ClassInfo>> polyMorphicClasses;
-        std::vector<uint32_t> staticClassIds;
+        std::vector<boost::uuids::uuid> staticClassIds;
         ReadClasses(GetFullPath(classFilePath.generic_string()), polyMorphicClasses, staticClassIds);
         ResolveBaseClasses(polyMorphicClasses);
         AssignLevels(polyMorphicClasses);

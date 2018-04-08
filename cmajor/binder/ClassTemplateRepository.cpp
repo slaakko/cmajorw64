@@ -46,7 +46,7 @@ void ClassTemplateRepository::ResolveDefaultTemplateArguments(std::vector<TypeSy
     int nu = classTemplate->UsingNodes().Count();
     if (nu > 0)
     {
-        FileScope* fileScope = new FileScope();
+        FileScope* fileScope = new FileScope(&boundCompileUnit.GetModule());
         for (int i = 0; i < nu; ++i)
         {
             Node* usingNode = classTemplate->UsingNodes()[i];
@@ -66,7 +66,7 @@ void ClassTemplateRepository::ResolveDefaultTemplateArguments(std::vector<TypeSy
     }
     if (!classTemplate->Ns()->IsGlobalNamespace())
     {
-        FileScope* primaryFileScope = new FileScope();
+        FileScope* primaryFileScope = new FileScope(&boundCompileUnit.GetModule());
         primaryFileScope->AddContainerScope(classTemplate->Ns()->GetContainerScope());
         boundCompileUnit.AddFileScope(primaryFileScope);
         ++numFileScopeAdded;
@@ -88,12 +88,12 @@ void ClassTemplateRepository::ResolveDefaultTemplateArguments(std::vector<TypeSy
         {
             if (i >= classNode->TemplateParameters().Count())
             {
-                throw Exception("too few template arguments", span);
+                throw Exception(&boundCompileUnit.GetModule(), "too few template arguments", span);
             }
             Node* defaultTemplateArgumentNode = classNode->TemplateParameters()[i]->DefaultTemplateArgument();
             if (!defaultTemplateArgumentNode)
             {
-                throw Exception("too few template arguments", span);
+                throw Exception(&boundCompileUnit.GetModule(), "too few template arguments", span);
             }
             TypeSymbol* templateArgumentType = ResolveType(defaultTemplateArgumentNode, boundCompileUnit, &resolveScope);
             templateArgumentTypes.push_back(templateArgumentType);
@@ -132,7 +132,7 @@ void ClassTemplateRepository::BindClassTemplateSpecialization(ClassTemplateSpeci
     bool fileScopeAdded = false;
     if (!classTemplate->Ns()->IsGlobalNamespace())
     {
-        FileScope* primaryFileScope = new FileScope();
+        FileScope* primaryFileScope = new FileScope(&boundCompileUnit.GetModule());
         primaryFileScope->AddContainerScope(classTemplate->Ns()->GetContainerScope());
         boundCompileUnit.AddFileScope(primaryFileScope);
         fileScopeAdded = true;
@@ -151,7 +151,7 @@ void ClassTemplateRepository::BindClassTemplateSpecialization(ClassTemplateSpeci
     int m = classTemplateSpecialization->TemplateArgumentTypes().size();
     if (n != m)
     {
-        throw Exception("wrong number of template arguments", span);
+        throw Exception(&boundCompileUnit.GetModule(), "wrong number of template arguments", span);
     }
     bool markedExport = classTemplateSpecialization->MarkedExport();
     bool templateParameterBinding = false;
@@ -244,17 +244,17 @@ void ClassTemplateRepository::Instantiate(FunctionSymbol* memberFunction, Contai
                 {
                     if (conceptCheckException)
                     {
-                        throw Exception("concept check of class template specialization '" + ToUtf8(classTemplateSpecialization->FullName()) + "' failed: " + conceptCheckException->Message(), span,
+                        throw Exception(&boundCompileUnit.GetModule(), "concept check of class template specialization '" + ToUtf8(classTemplateSpecialization->FullName()) + "' failed: " + conceptCheckException->Message(), span,
                             conceptCheckException->References());
                     }
                     else
                     {
-                        throw Exception("concept check of class template specialization '" + ToUtf8(classTemplateSpecialization->FullName()) + "' failed.", span);
+                        throw Exception(&boundCompileUnit.GetModule(), "concept check of class template specialization '" + ToUtf8(classTemplateSpecialization->FullName()) + "' failed.", span);
                     }
                 }
             }
         }
-        FileScope* fileScope = new FileScope();
+        FileScope* fileScope = new FileScope(&boundCompileUnit.GetModule());
         int nu = classTemplate->UsingNodes().Count();
         for (int i = 0; i < nu; ++i)
         {
@@ -285,7 +285,7 @@ void ClassTemplateRepository::Instantiate(FunctionSymbol* memberFunction, Contai
         {
             std::unique_ptr<BoundConstraint> boundConstraint;
             std::unique_ptr<Exception> conceptCheckException;
-            FileScope* classTemplateScope = new FileScope();
+            FileScope* classTemplateScope = new FileScope(&boundCompileUnit.GetModule());
             classTemplateScope->AddContainerScope(classTemplateSpecialization->GetContainerScope());
             boundCompileUnit.AddFileScope(classTemplateScope);
             if (!CheckConstraint(functionInstanceNode->WhereConstraint(), classTemplate->UsingNodes(), boundCompileUnit, containerScope, currentFunction, classTemplate->TemplateParameters(),
@@ -297,11 +297,11 @@ void ClassTemplateRepository::Instantiate(FunctionSymbol* memberFunction, Contai
                     std::vector<Span> references;
                     references.push_back(conceptCheckException->Defined());
                     references.insert(references.end(), conceptCheckException->References().begin(), conceptCheckException->References().end());
-                    throw Exception("concept check of class template member function '" + ToUtf8(memberFunction->FullName()) + "' failed: " + conceptCheckException->Message(), span, references);
+                    throw Exception(&boundCompileUnit.GetModule(), "concept check of class template member function '" + ToUtf8(memberFunction->FullName()) + "' failed: " + conceptCheckException->Message(), span, references);
                 }
                 else
                 {
-                    throw Exception("concept check of class template template member function '" + ToUtf8(memberFunction->FullName()) + "' failed.", span);
+                    throw Exception(&boundCompileUnit.GetModule(), "concept check of class template template member function '" + ToUtf8(memberFunction->FullName()) + "' failed.", span);
                 }
             }
             else
@@ -318,9 +318,9 @@ void ClassTemplateRepository::Instantiate(FunctionSymbol* memberFunction, Contai
         typeBinder.SetContainerScope(memberFunction->GetContainerScope());
         functionInstanceNode->Body()->Accept(typeBinder);
         StatementBinder statementBinder(boundCompileUnit);
-        std::unique_ptr<BoundClass> boundClass(new BoundClass(classTemplateSpecialization));
+        std::unique_ptr<BoundClass> boundClass(new BoundClass(&boundCompileUnit.GetModule(), classTemplateSpecialization));
         statementBinder.SetCurrentClass(boundClass.get());
-        std::unique_ptr<BoundFunction> boundFunction(new BoundFunction(memberFunction));
+        std::unique_ptr<BoundFunction> boundFunction(new BoundFunction(&boundCompileUnit.GetModule(), memberFunction));
         statementBinder.SetCurrentFunction(boundFunction.get());
         statementBinder.SetContainerScope(memberFunction->GetContainerScope());
         if (memberFunction->GetSymbolType() == SymbolType::constructorSymbol)
@@ -363,7 +363,7 @@ void ClassTemplateRepository::Instantiate(FunctionSymbol* memberFunction, Contai
         references.push_back(memberFunction->GetSpan());
         references.push_back(ex.Defined());
         references.insert(references.end(), ex.References().begin(), ex.References().end());
-        throw Exception("could not instantiate member function '" + ToUtf8(memberFunction->FullName()) + "'. Reason: " + ex.Message(), span, references);
+        throw Exception(&boundCompileUnit.GetModule(), "could not instantiate member function '" + ToUtf8(memberFunction->FullName()) + "'. Reason: " + ex.Message(), span, references);
     }
 }
 

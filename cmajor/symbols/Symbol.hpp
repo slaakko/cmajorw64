@@ -196,7 +196,7 @@ public:
     const SymbolTable* GetSymbolTable() const { return symbolTable; }
     SymbolTable* GetSymbolTable() { return symbolTable; }
     void SetSymbolTable(SymbolTable* symbolTable_) { symbolTable = symbolTable_; }
-    const Module* GetModule() const { return module; }
+    Module* GetModule() const { return module; }
     Module* GetModule() { return module; }
     void SetModule(Module* module_) { module = module_; }
     const CompileUnitNode* GetCompileUnit() const { return compileUnit; }

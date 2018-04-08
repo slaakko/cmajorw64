@@ -12,14 +12,26 @@ class MappedInputFileImpl
 {
 public:
     MappedInputFileImpl(const std::string& fileName_);
-    const char* Data() const { return mappedFile.data(); }
+    const char* Data() const { return mappedFile.const_data(); }
     boost::iostreams::mapped_file_source::size_type Size() const { return mappedFile.size(); }
 private:
-    boost::iostreams::mapped_file_source mappedFile;
+    boost::iostreams::mapped_file mappedFile;
 };
 
-MappedInputFileImpl::MappedInputFileImpl(const std::string& fileName_) : mappedFile(fileName_)
+MappedInputFileImpl::MappedInputFileImpl(const std::string& fileName_) : mappedFile()
 {
+    try
+    {
+        mappedFile.open(fileName_, boost::iostreams::mapped_file::mapmode::readonly);
+    }
+    catch (std::exception& ex)
+    {
+        throw std::runtime_error("error opening mapped file '" + fileName_ + "': " + ex.what());
+    }
+    catch (...)
+    {
+        throw std::runtime_error("error opening mapped file '" + fileName_ + "'");
+    }
 }
 
 MappedInputFile::MappedInputFile(const std::string& fileName_) : impl(new MappedInputFileImpl(fileName_))

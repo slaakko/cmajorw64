@@ -9,6 +9,7 @@
 #include <cmajor/binder/BoundFunction.hpp>
 #include <cmajor/binder/BoundStatement.hpp>
 #include <cmajor/binder/BoundNodeVisitor.hpp>
+#include <cmajor/symbols/Module.hpp>
 #include <cmajor/util/Unicode.hpp>
 
 namespace cmajor { namespace binder {
@@ -47,6 +48,7 @@ public:
     void Visit(BoundTryStatement& boundTryStatement) override;
     void Visit(BoundCatchStatement& boundCatchStatement) override;
 private:
+    Module* module;
     BoundFunction* currentFunction;
     bool collectLabels;
     bool resolveGotos;
@@ -55,7 +57,7 @@ private:
     void ResolveGoto(BoundGotoStatement& boundGotoStatement);
 };
 
-ControlFlowAnalyzer::ControlFlowAnalyzer() : currentFunction(nullptr), collectLabels(false), resolveGotos(false)
+ControlFlowAnalyzer::ControlFlowAnalyzer() : module(nullptr), currentFunction(nullptr), collectLabels(false), resolveGotos(false)
 {
 }
 
@@ -71,7 +73,7 @@ void ControlFlowAnalyzer::CollectLabel(BoundStatement& statement)
         }
         else
         {
-            throw Exception("duplicate label '" + ToUtf8(statement.Label()) + "'", statement.GetSpan(), it->second->GetSpan());
+            throw Exception(module, "duplicate label '" + ToUtf8(statement.Label()) + "'", statement.GetSpan(), it->second->GetSpan());
         }
     }
 }
@@ -102,17 +104,18 @@ void ControlFlowAnalyzer::ResolveGoto(BoundGotoStatement& boundGotoStatement)
         }
         if (!gotoBlock)
         {
-            throw Exception("goto target '" + ToUtf8(target) + "' not in enclosing block", boundGotoStatement.GetSpan(), targetStatement->GetSpan());
+            throw Exception(module, "goto target '" + ToUtf8(target) + "' not in enclosing block", boundGotoStatement.GetSpan(), targetStatement->GetSpan());
         }
     }
     else
     {
-        throw Exception("goto target '" + ToUtf8(target) + "' not found", boundGotoStatement.GetSpan());
+        throw Exception(module, "goto target '" + ToUtf8(target) + "' not found", boundGotoStatement.GetSpan());
     }
 }
 
 void ControlFlowAnalyzer::Visit(BoundCompileUnit& boundCompileUnit)
 {
+    module = &boundCompileUnit.GetModule();
     int n = boundCompileUnit.BoundNodes().size();
     for (int i = 0; i < n; ++i)
     {

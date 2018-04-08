@@ -10,18 +10,19 @@
 
 namespace cmajor { namespace binder {
 
-BoundFunction::BoundFunction(FunctionSymbol* functionSymbol_) : BoundNode(functionSymbol_->GetSpan(), BoundNodeType::boundFunction), functionSymbol(functionSymbol_), hasGotos(false)
+BoundFunction::BoundFunction(Module* module_, FunctionSymbol* functionSymbol_) : 
+    BoundNode(module_, functionSymbol_->GetSpan(), BoundNodeType::boundFunction), functionSymbol(functionSymbol_), hasGotos(false)
 {
 }
 
 void BoundFunction::Load(Emitter& emitter, OperationFlags flags)
 {
-    throw Exception("cannot load from function", GetSpan());
+    throw Exception(GetModule(), "cannot load from function", GetSpan());
 }
 
 void BoundFunction::Store(Emitter& emitter, OperationFlags flags)
 {
-    throw Exception("cannot store to function", GetSpan());
+    throw Exception(GetModule(), "cannot store to function", GetSpan());
 }
 
 void BoundFunction::Accept(BoundNodeVisitor& visitor)

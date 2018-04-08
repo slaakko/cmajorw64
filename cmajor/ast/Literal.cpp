@@ -9,6 +9,7 @@
 #include <cmajor/ast/AstReader.hpp>
 #include <cmajor/util/TextUtils.hpp>
 #include <cmajor/util/Unicode.hpp>
+#include <boost/uuid/uuid_generators.hpp>
 #include <limits>
 
 namespace cmajor { namespace ast {
@@ -734,6 +735,36 @@ void StructuredLiteralNode::AddMember(Node* member)
 {
     member->SetParent(this);
     members.Add(member);
+}
+
+UuidLiteralNode::UuidLiteralNode(const Span& span_) : Node(NodeType::uuidLiteralNode, span_), uuid(boost::uuids::nil_generator()())
+{
+}
+
+UuidLiteralNode::UuidLiteralNode(const Span& span_, const boost::uuids::uuid& uuid_): Node(NodeType::uuidLiteralNode, span_), uuid(uuid_)
+{
+}
+
+Node* UuidLiteralNode::Clone(CloneContext& cloneContext) const
+{
+    return new UuidLiteralNode(GetSpan(), uuid);
+}
+
+void UuidLiteralNode::Accept(Visitor& visitor)
+{
+    visitor.Visit(*this);
+}
+
+void UuidLiteralNode::Write(AstWriter& writer)
+{
+    Node::Write(writer);
+    writer.GetBinaryWriter().Write(uuid);
+}
+
+void UuidLiteralNode::Read(AstReader& reader)
+{
+    Node::Read(reader);
+    reader.GetBinaryReader().ReadUuid(uuid);
 }
 
 } } // namespace cmajor::ast

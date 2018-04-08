@@ -6,6 +6,7 @@
 #include <cmajor/symbols/SymbolCreatorVisitor.hpp>
 #include <cmajor/symbols/SymbolTable.hpp>
 #include <cmajor/symbols/GlobalFlags.hpp>
+#include <cmajor/symbols/Module.hpp>
 #include <cmajor/ast/CompileUnit.hpp>
 #include <cmajor/ast/Class.hpp>
 #include <cmajor/ast/Interface.hpp>
@@ -359,7 +360,7 @@ void SymbolCreatorVisitor::Visit(ConditionalCompilationNotNode& conditionalCompi
 
 void SymbolCreatorVisitor::Visit(ConditionalCompilationPrimaryNode& conditionalCompilationPrimaryNode)
 {
-    bool defined = IsSymbolDefined(conditionalCompilationPrimaryNode.Symbol());
+    bool defined = symbolTable.GetModule()->IsSymbolDefined(conditionalCompilationPrimaryNode.Symbol());
     conditionalCompilationStack.push(defined);
 }
 

@@ -7,11 +7,13 @@
 #define CMAJOR_BINDER_BOUND_NODE_INCLUDED
 #include <cmajor/parsing/Scanner.hpp>
 #include <cmajor/ir/GenObject.hpp>
+#include <cmajor/symbols/Module.hpp>
 
 namespace cmajor { namespace binder {
 
 using cmajor::parsing::Span;
 using namespace cmajor::ir;
+using namespace cmajor::symbols;
 
 enum class BoundNodeType : uint8_t
 {
@@ -34,11 +36,13 @@ class BoundNodeVisitor;
 class BoundNode : public GenObject
 {
 public:
-    BoundNode(const Span& span_, BoundNodeType boundNodeType_);
+    BoundNode(Module* module_, const Span& span_, BoundNodeType boundNodeType_);
     virtual void Accept(BoundNodeVisitor& visitor) = 0;
     const Span& GetSpan() const { return span; }
     BoundNodeType GetBoundNodeType() const { return boundNodeType; }
+    Module* GetModule() const { return module; }
 private:
+    Module* module;
     Span span;
     BoundNodeType boundNodeType;
 };

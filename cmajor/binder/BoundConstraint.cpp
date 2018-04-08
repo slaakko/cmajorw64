@@ -9,21 +9,21 @@
 
 namespace cmajor { namespace binder {
 
-BoundConstraint::BoundConstraint(const Span& span_, BoundNodeType boundNodeType_) : BoundNode(span_, boundNodeType_)
+BoundConstraint::BoundConstraint(Module* module_, const Span& span_, BoundNodeType boundNodeType_) : BoundNode(module_, span_, boundNodeType_)
 {
 }
 
 void BoundConstraint::Load(Emitter& emitter, OperationFlags flags)
 {
-    throw Exception("cannot load constraint", GetSpan());
+    throw Exception(GetModule(),  "cannot load constraint", GetSpan());
 }
 
 void BoundConstraint::Store(Emitter& emitter, OperationFlags flags)
 {
-    throw Exception("cannot store constraint", GetSpan());
+    throw Exception(GetModule(), "cannot store constraint", GetSpan());
 }
 
-BoundAtomicConstraint::BoundAtomicConstraint(const Span& span_, bool satisfied_) : BoundConstraint(span_, BoundNodeType::boundAtomicConstraint), satisfied(satisfied_), concept(nullptr)
+BoundAtomicConstraint::BoundAtomicConstraint(Module* module_, const Span& span_, bool satisfied_) : BoundConstraint(module_, span_, BoundNodeType::boundAtomicConstraint), satisfied(satisfied_), concept(nullptr)
 {
 }
 
@@ -113,8 +113,8 @@ BoundConstraint* BoundAtomicConstraint::Clone() const
     return new BoundAtomicConstraint(*this);
 }
 
-BoundBinaryConstraint::BoundBinaryConstraint(const Span& span_, BoundNodeType boundNodeType_, BoundConstraint* left_, BoundConstraint* right_) :
-    BoundConstraint(span_, boundNodeType_), left(left_), right(right_)
+BoundBinaryConstraint::BoundBinaryConstraint(Module* module_, const Span& span_, BoundNodeType boundNodeType_, BoundConstraint* left_, BoundConstraint* right_) :
+    BoundConstraint(module_, span_, boundNodeType_), left(left_), right(right_)
 {
 }
 
@@ -122,8 +122,8 @@ BoundBinaryConstraint::BoundBinaryConstraint(const BoundBinaryConstraint& that) 
 {
 }
 
-BoundDisjunctiveConstraint::BoundDisjunctiveConstraint(const Span& span_, BoundConstraint* left_, BoundConstraint* right_) : 
-    BoundBinaryConstraint(span_, BoundNodeType::boundDisjunctiveConstraint, left_, right_)
+BoundDisjunctiveConstraint::BoundDisjunctiveConstraint(Module* module_, const Span& span_, BoundConstraint* left_, BoundConstraint* right_) : 
+    BoundBinaryConstraint(module_, span_, BoundNodeType::boundDisjunctiveConstraint, left_, right_)
 {
 }
 
@@ -178,8 +178,8 @@ BoundConstraint* BoundDisjunctiveConstraint::Clone() const
     return new BoundDisjunctiveConstraint(*this);
 }
 
-BoundConjunctiveConstraint::BoundConjunctiveConstraint(const Span& span_, BoundConstraint* left_, BoundConstraint* right_) :
-    BoundBinaryConstraint(span_, BoundNodeType::boundConjunctiveConstraint, left_, right_)
+BoundConjunctiveConstraint::BoundConjunctiveConstraint(Module* module_, const Span& span_, BoundConstraint* left_, BoundConstraint* right_) :
+    BoundBinaryConstraint(module_, span_, BoundNodeType::boundConjunctiveConstraint, left_, right_)
 {
 }
 
@@ -252,24 +252,24 @@ std::u32string MakeBoundConceptName(ConceptSymbol* conceptSymbol, const std::vec
     return s;
 }
 
-BoundConcept::BoundConcept(ConceptSymbol* conceptSymbol_, const std::vector<TypeSymbol*>& typeArguments_, const Span& span_) :
-    BoundNode(span_, BoundNodeType::boundConcept), name(MakeBoundConceptName(conceptSymbol_, typeArguments_)), conceptSymbol(conceptSymbol_), typeArguments(typeArguments_), commonType(nullptr)
+BoundConcept::BoundConcept(Module* module_, ConceptSymbol* conceptSymbol_, const std::vector<TypeSymbol*>& typeArguments_, const Span& span_) :
+    BoundNode(module_, span_, BoundNodeType::boundConcept), name(MakeBoundConceptName(conceptSymbol_, typeArguments_)), conceptSymbol(conceptSymbol_), typeArguments(typeArguments_), commonType(nullptr)
 {
 }
 
 void BoundConcept::Load(Emitter& emitter, OperationFlags flags)
 {
-    throw Exception("cannot load bound concept", GetSpan());
+    throw Exception(GetModule(), "cannot load bound concept", GetSpan());
 }
 
 void BoundConcept::Store(Emitter& emitter, OperationFlags flags)
 {
-    throw Exception("cannot store bound concept", GetSpan());
+    throw Exception(GetModule(), "cannot store bound concept", GetSpan());
 }
 
 void BoundConcept::Accept(BoundNodeVisitor& visitor)
 {
-    throw std::runtime_error("cannot visit bound concept");
+    throw Exception(GetModule(), "cannot visit bound concept", GetSpan());
 }
 
 void BoundConcept::SetBoundConstraint(std::unique_ptr<BoundConstraint>&& boundConstraint_)

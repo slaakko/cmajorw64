@@ -21,7 +21,7 @@
 #include <cmajor/build/Build.hpp>
 #include <cmajor/emitter/Emitter.hpp>
 #include <cmajor/build/Build.hpp>
-#include <cmajor/parser/FileRegistry.hpp>
+//#include <cmajor/parser/FileRegistry.hpp>
 #include <cmajor/parser/Project.hpp>
 #include <cmajor/parser/Solution.hpp>
 #include <cmajor/parser/CompileUnit.hpp>
@@ -46,7 +46,7 @@ struct InitDone
     InitDone()
     {
         cmajor::ast::Init();
-        cmajor::parser::FileRegistry::Init();
+        //cmajor::parser::FileRegistry::Init();
         cmajor::symbols::Init();
         cmajor::parsing::Init();
         cmajor::util::Init();
@@ -218,7 +218,7 @@ int RunUnitTest(Project* project)
     return exitCode;
 }
 
-void TestUnit(Project* project, CompileUnitNode* testUnit, const std::string& testName, Element* sourceFileElement)
+void TestUnit(FileTable* fileTable, Project* project, CompileUnitNode* testUnit, const std::string& testName, Element* sourceFileElement, std::unique_ptr<Module>& rootModule)
 {
     bool compileError = false;
     std::string compileErrorMessage;
@@ -229,20 +229,25 @@ void TestUnit(Project* project, CompileUnitNode* testUnit, const std::string& te
     try
     {
         std::string config = GetConfig();
-        ReadTypeIdCounter(config);
-        ReadFunctionIdCounter(config);
-        ReadSystemFileIndex(config);
-        CompileWarningCollection::Instance().SetCurrentProjectName(project->Name());
-        SetCurrentToolName(U"cmc");
-        Module module(project->Name(), project->ModuleFilePath());
-        AttributeBinder attributeBinder;
-        ModuleBinder moduleBinder(module, testUnit, &attributeBinder);
+        //ReadTypeIdCounter(config); todo
+        //ReadFunctionIdCounter(config); todo
+        //ReadSystemFileIndex(config);
+        rootModule.reset(new Module(project->Name(), project->ModuleFilePath()));
+        rootModule->SetCurrentToolName(U"cmc");
+        rootModule->SetCurrentProjectName(project->Name());
+        int16_t numFiles = fileTable->NumFilePaths();
+        for (int16_t i = 0; i < numFiles; ++i)
+        {
+            rootModule->GetFileTable().RegisterFilePath(fileTable->GetFilePath(i));
+        }
+        AttributeBinder attributeBinder(rootModule.get());
+        ModuleBinder moduleBinder(*rootModule, testUnit, &attributeBinder);
         moduleBinder.SetBindingTypes();
         std::vector<ClassTypeSymbol*> classTypes;
         std::vector<ClassTemplateSpecializationSymbol*> classTemplateSpecializations;
-        module.PrepareForCompilation(project->References(), FileRegistry::Instance().GetFileMap(), classTypes, classTemplateSpecializations);
-        cmajor::symbols::MetaInit(module.GetSymbolTable());
-        CreateSymbols(module.GetSymbolTable(), testUnit);
+        rootModule->PrepareForCompilation(project->References(), classTypes, classTemplateSpecializations);
+        cmajor::symbols::MetaInit(rootModule->GetSymbolTable());
+        CreateSymbols(rootModule->GetSymbolTable(), testUnit);
         for (ClassTemplateSpecializationSymbol* classTemplateSpecialization : classTemplateSpecializations)
         {
             moduleBinder.BindClassTemplateSpecialization(classTemplateSpecialization);
@@ -256,7 +261,7 @@ void TestUnit(Project* project, CompileUnitNode* testUnit, const std::string& te
         EmittingContext emittingContext;
         {
             UnitTest unitTest;
-            std::unique_ptr<BoundCompileUnit> boundCompileUnit = BindTypes(module, testUnit, &attributeBinder);
+            std::unique_ptr<BoundCompileUnit> boundCompileUnit = BindTypes(*rootModule, testUnit, &attributeBinder);
             BindStatements(*boundCompileUnit);
             if (boundCompileUnit->HasGotos())
             {
@@ -266,12 +271,12 @@ void TestUnit(Project* project, CompileUnitNode* testUnit, const std::string& te
             objectFilePaths.push_back(boundCompileUnit->ObjectFilePath());
         }
         int32_t numUnitTestAssertions = GetNumUnitTestAssertions();
-        CreateMainUnit(objectFilePaths, module, emittingContext, &attributeBinder, testName, numUnitTestAssertions, unitTestFilePath);
-        GenerateLibrary(objectFilePaths, project->LibraryFilePath());
-        Link(project->ExecutableFilePath(), project->LibraryFilePath(), module.LibraryFilePaths(), module);
-        CreateClassFile(project->ExecutableFilePath(), module.GetSymbolTable());
-        WriteTypeIdCounter(config);
-        WriteFunctionIdCounter(config);
+        CreateMainUnit(objectFilePaths, *rootModule, emittingContext, &attributeBinder, testName, numUnitTestAssertions, unitTestFilePath);
+        GenerateLibrary(rootModule.get(), objectFilePaths, project->LibraryFilePath());
+        Link(project->ExecutableFilePath(), project->LibraryFilePath(), rootModule->LibraryFilePaths(), *rootModule);
+        CreateClassFile(project->ExecutableFilePath(), rootModule->GetSymbolTable());
+        // WriteTypeIdCounter(config); todo
+        // WriteFunctionIdCounter(config); todo
         boost::filesystem::remove(unitTestFilePath);
         if (GetGlobalFlag(GlobalFlags::verbose))
         {
@@ -361,10 +366,11 @@ std::vector<std::pair<std::unique_ptr<CompileUnitNode>, std::string>> SplitIntoT
     return testUnits;
 }
 
-void TestSourceFile(bool& first, Project* project, const std::string& sourceFilePath, const std::string& onlyTest, cmajor::dom::Element* projectElement)
+void TestSourceFile(bool& first, Project* project, const std::string& sourceFilePath, const std::string& onlyTest, cmajor::dom::Element* projectElement, 
+    std::unique_ptr<Module>& rootModule)
 {
-    FileRegistry::Instance().Clear();
-    ReadUserFileIndexCounter(GetConfig());
+    //FileRegistry::Instance().Clear();
+    //ReadUserFileIndexCounter(GetConfig());
     std::unique_ptr<cmajor::dom::Element> sourceFileElement(new cmajor::dom::Element(U"sourceFile"));
     sourceFileElement->SetAttribute(U"name", ToUtf32(Path::GetFileNameWithoutExtension(sourceFilePath)));
     if (!compileUnitGrammar)
@@ -372,7 +378,9 @@ void TestSourceFile(bool& first, Project* project, const std::string& sourceFile
         compileUnitGrammar = CompileUnitGrammar::Create();
     }
     MappedInputFile sourceFile(sourceFilePath);
-    uint32_t fileIndex = FileRegistry::Instance().RegisterNewFile(sourceFilePath);
+    //uint32_t fileIndex = FileRegistry::Instance().RegisterNewFile(sourceFilePath);
+    FileTable fileTable;
+    uint32_t fileIndex = fileTable.RegisterFilePath(sourceFilePath);
     ParsingContext parsingContext;
     std::u32string s(ToUtf32(std::string(sourceFile.Begin(), sourceFile.End())));
     std::unique_ptr<CompileUnitNode> compileUnit(compileUnitGrammar->Parse(&s[0], &s[0] + s.length(), fileIndex, sourceFilePath, &parsingContext));
@@ -398,7 +406,7 @@ void TestSourceFile(bool& first, Project* project, const std::string& sourceFile
                 continue;
             }
         }
-        TestUnit(project, p.first.get(), p.second, sourceFileElement.get());
+        TestUnit(&fileTable, project, p.first.get(), p.second, sourceFileElement.get(), rootModule);
     }
     projectElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(sourceFileElement.release()));
 }
@@ -418,7 +426,7 @@ bool SourceFileNameEquals(const std::string& fileName, const std::string& source
     return true;
 }
 
-void TestProject(Project* project, const std::string& onlySourceFile, const std::string& onlyTest, cmajor::dom::Element* parentElement)
+void TestProject(Project* project, const std::string& onlySourceFile, const std::string& onlyTest, cmajor::dom::Element* parentElement, std::unique_ptr<Module>& rootModule)
 {
     if (project->GetTarget() != Target::unitTest)
     {
@@ -428,8 +436,6 @@ void TestProject(Project* project, const std::string& onlySourceFile, const std:
     std::unique_ptr<cmajor::dom::Element> projectElement(new cmajor::dom::Element(U"project"));
     projectElement->SetAttribute(U"name", project->Name());
     std::string config = GetConfig();
-    SetCurrentProjectName(project->Name());
-    SetCurrentToolName(U"cmc");
     for (const std::string& sourceFilePath : project->SourceFilePaths())
     {
         if (!onlySourceFile.empty())
@@ -439,7 +445,7 @@ void TestProject(Project* project, const std::string& onlySourceFile, const std:
                 continue;
             }
         }
-        TestSourceFile(first, project, sourceFilePath, onlyTest, projectElement.get());
+        TestSourceFile(first, project, sourceFilePath, onlyTest, projectElement.get(), rootModule);
     }
     parentElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(projectElement.release()));
 }
@@ -447,7 +453,8 @@ void TestProject(Project* project, const std::string& onlySourceFile, const std:
 SolutionGrammar* solutionGrammar = nullptr;
 ProjectGrammar* projectGrammar = nullptr;
 
-bool TestProject(const std::string& projectFileName, const std::string& onlySourceFile, const std::string& onlyTest, cmajor::dom::Element* parentElement)
+bool TestProject(const std::string& projectFileName, const std::string& onlySourceFile, const std::string& onlyTest, cmajor::dom::Element* parentElement, 
+    std::unique_ptr<Module>& rootModule)
 {
     std::string config = GetConfig();
     if (!projectGrammar)
@@ -462,11 +469,12 @@ bool TestProject(const std::string& projectFileName, const std::string& onlySour
     {
         return false;
     }
-    TestProject(project.get(), onlySourceFile, onlyTest, parentElement);
+    TestProject(project.get(), onlySourceFile, onlyTest, parentElement, rootModule);
     return true;
 }
 
-bool TestSolution(const std::string& solutionFileName, const std::string& onlySourceFile, const std::string& onlyTest, cmajor::dom::Element* cmunitElement)
+bool TestSolution(const std::string& solutionFileName, const std::string& onlySourceFile, const std::string& onlyTest, cmajor::dom::Element* cmunitElement,
+    std::unique_ptr<Module>& rootModule)
 {
     std::unique_ptr<cmajor::dom::Element> solutionElement(new cmajor::dom::Element(U"solution"));
     if (!solutionGrammar)
@@ -486,7 +494,7 @@ bool TestSolution(const std::string& solutionFileName, const std::string& onlySo
     bool containsUnitTestProject = false;
     for (const std::string& projectFilePath : solution->ProjectFilePaths())
     {
-        bool unitTestProject = TestProject(projectFilePath, onlySourceFile, onlyTest, solutionElement.get());
+        bool unitTestProject = TestProject(projectFilePath, onlySourceFile, onlyTest, solutionElement.get(), rootModule);
         if (unitTestProject)
         {
             containsUnitTestProject = true;
@@ -852,6 +860,7 @@ std::unique_ptr<cmajor::dom::Document> GenerateHtmlReport(cmajor::dom::Document*
 
 int main(int argc, const char** argv)
 {
+    std::unique_ptr<Module> rootModule;
     try
     {
         InitDone initDone;
@@ -1010,7 +1019,7 @@ int main(int argc, const char** argv)
                         std::unique_ptr<cmajor::dom::Element> componentElement(new cmajor::dom::Element(U"component"));
                         componentElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new cmajor::dom::Text(ToUtf32(Path::GetFileName(solutionFileName)))));
                         componentsElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(componentElement.release()));
-                        bool solutionContainsUnitTestProject = TestSolution(solutionFileName, onlySourceFile, onlyTest, cmunitElement.get());
+                        bool solutionContainsUnitTestProject = TestSolution(solutionFileName, onlySourceFile, onlyTest, cmunitElement.get(), rootModule);
                         if (solutionContainsUnitTestProject)
                         {
                             unitTestProjectsFound = true;
@@ -1029,7 +1038,7 @@ int main(int argc, const char** argv)
                         std::unique_ptr<cmajor::dom::Element> componentElement(new cmajor::dom::Element(U"component"));
                         componentElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new cmajor::dom::Text(ToUtf32(Path::GetFileName(projectFileName)))));
                         componentsElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(componentElement.release()));
-                        bool projectIsUnitTestProject = TestProject(projectFileName, onlySourceFile, onlyTest, cmunitElement.get());
+                        bool projectIsUnitTestProject = TestProject(projectFileName, onlySourceFile, onlyTest, cmunitElement.get(), rootModule);
                         if (projectIsUnitTestProject)
                         {
                             unitTestProjectsFound = true;

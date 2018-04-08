@@ -82,28 +82,16 @@ void SetOptimizationLevel(int optimizationLevel_)
     optimizationLevel = optimizationLevel_;
 }
 
-std::u32string currentProjectName;
+std::set<std::u32string> commandLineDefines;
 
-void SetCurrentProjectName(const std::u32string& currentProjectName_)
+void DefineCommandLineConditionalSymbol(const std::u32string& symbol)
 {
-    currentProjectName = currentProjectName_;
+    commandLineDefines.insert(symbol);
 }
 
-std::u32string GetCurrentProjectName()
+std::set<std::u32string> GetCommandLineDefines()
 {
-    return currentProjectName;
-}
-
-std::u32string currentToolName;
-
-void SetCurrentToolName(const std::u32string& currentToolName_)
-{
-    currentToolName = currentToolName_;
-}
-
-std::u32string GetCurrentToolName()
-{
-    return currentToolName;
+    return commandLineDefines;
 }
 
 std::string compilerVersion;
@@ -116,38 +104,6 @@ void SetCompilerVersion(const std::string& compilerVersion_)
 std::string GetCompilerVersion()
 {
     return compilerVersion;
-}
-
-std::set<std::u32string> commandLineDefines;
-
-void DefineCommandLineConditionalSymbol(const std::u32string& symbol)
-{
-    commandLineDefines.insert(symbol);
-}
-
-std::set<std::u32string> defines;
-
-void ClearDefines()
-{
-    defines = commandLineDefines;
-}
-
-void DefineSymbol(const std::u32string& symbol)
-{
-    defines.insert(symbol);
-}
-
-bool IsSymbolDefined(const std::u32string& symbol)
-{
-    auto it = defines.find(symbol);
-    if (it != defines.cend())
-    {
-        return true;
-    }
-    else
-    {
-        return false;
-    }
 }
 
 bool inUnitTest = false;

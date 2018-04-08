@@ -70,7 +70,7 @@ void CheckAccess(FunctionSymbol* fromFunction, Symbol* toSymbol)
             break;
         }
     }
-    throw Exception(toSymbol->TypeString() + " '" + ToUtf8(toSymbol->FullName()) + "' is inaccessible due to its protection level", fromFunction->GetSpan(), toSymbol->GetSpan());
+    throw Exception(toSymbol->GetModule(), toSymbol->TypeString() + " '" + ToUtf8(toSymbol->FullName()) + "' is inaccessible due to its protection level", fromFunction->GetSpan(), toSymbol->GetSpan());
 }
 
 } } // namespace cmajor::binder

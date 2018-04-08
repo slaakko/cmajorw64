@@ -62,7 +62,7 @@ TargetDeclaration::TargetDeclaration(Target target_) : ProjectDeclaration(Projec
 }
 
 Project::Project(const std::u32string& name_, const std::string& filePath_, const std::string& config_) :
-    name(name_), filePath(filePath_), config(config_), target(Target::program), basePath(filePath), isSystemProject(false)
+    name(name_), filePath(filePath_), config(config_), target(Target::program), basePath(filePath), isSystemProject(false), logStreamId(0), built(false)
 {
     basePath.remove_filename();
     systemLibDir = CmajorSystemLibDir(config);
@@ -208,6 +208,11 @@ bool Project::DependsOn(Project* that) const
     return std::find(references.cbegin(), references.cend(), that->moduleFilePath) != references.cend();
 }
 
+void Project::AddDependsOnProjects(Project* dependsOnProject)
+{
+    dependsOn.push_back(dependsOnProject);
+}
+
 void Project::SetModuleFilePath(const std::string& moduleFilePath_)
 {
     moduleFilePath = moduleFilePath_;
@@ -234,6 +239,18 @@ bool Project::IsUpToDate(const std::string& systemModuleFilePath) const
     if (!systemModuleFilePath.empty() && !IsSystemProject() && boost::filesystem::exists(systemModuleFilePath))
     {
         if (boost::filesystem::last_write_time(systemModuleFilePath) > boost::filesystem::last_write_time(moduleFilePath))
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
+bool Project::Ready() const
+{
+    for (Project* dependOn : dependsOn)
+    {
+        if (!dependOn->Built())
         {
             return false;
         }

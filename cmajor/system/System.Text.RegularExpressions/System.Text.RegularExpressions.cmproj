@@ -2,7 +2,7 @@
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
  <PropertyGroup Label="Globals">
   <CustomProjectExtensionsPath>$(LocalAppData)\CustomProjectSystems\Cmajor\</CustomProjectExtensionsPath>
-  <ProjectGuid>d8733a0d-6d78-4afc-ba24-51d6b79af2fd</ProjectGuid>
+  <ProjectGuid>75cd35bc-daef-4a1b-9602-b27899844e68</ProjectGuid>
  </PropertyGroup>
  <PropertyGroup>
   <TargetType>library</TargetType>
@@ -18,17 +18,7 @@
   <CmCompile Include="RegExGrammar.cm"/>
  </ItemGroup>
  <ItemGroup>
-  <ProjectReference Include="../System.Core/System.Core.cmproj"/>
-  <ProjectReference Include="../System.Runtime/System.Runtime.cmproj"/>
-  <ProjectReference Include="../System.Base/System.Base.cmproj"/>
-  <ProjectReference Include="../System.Text.Parsing.CodeDom/System.Text.Parsing.CodeDom.cmproj"/>
   <ProjectReference Include="../System.Text.Parsing/System.Text.Parsing.cmproj"/>
-  <ProjectReference Include="../System.Net.Sockets/System.Net.Sockets.cmproj"/>
-  <ProjectReference Include="../System.Numerics.Multiprecision/System.Numerics.Multiprecision.cmproj"/>
-  <ProjectReference Include="../System.IO.Compression/System.IO.Compression.cmproj"/>
-  <ProjectReference Include="../System.Xml/System.Xml.cmproj"/>
-  <ProjectReference Include="../System.Dom/System.Dom.cmproj"/>
-  <ProjectReference Include="../System.XPath/System.XPath.cmproj"/>
  </ItemGroup>
  <Import Project="$(CustomProjectExtensionsPath)Cmajor.props"/>
  <Import Project="$(CustomProjectExtensionsPath)Cmajor.targets"/>

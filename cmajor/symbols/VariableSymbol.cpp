@@ -10,13 +10,12 @@
 #include <cmajor/symbols/SymbolReader.hpp>
 #include <cmajor/symbols/Exception.hpp>
 #include <cmajor/symbols/SymbolCollector.hpp>
-#include <cmajor/parser/FileRegistry.hpp>
+//#include <cmajor/parser/FileRegistry.hpp>
 #include <cmajor/util/Unicode.hpp>
 
 namespace cmajor { namespace symbols {
 
 using namespace cmajor::unicode;
-using namespace cmajor::parser;
 
 VariableSymbol::VariableSymbol(SymbolType symbolType_, const Span& span_, const std::u32string& name_) : Symbol(symbolType_, span_, name_), type()
 {
@@ -31,7 +30,9 @@ void VariableSymbol::Write(SymbolWriter& writer)
 void VariableSymbol::Read(SymbolReader& reader)
 {
     Symbol::Read(reader);
-    uint32_t typeId = reader.GetBinaryReader().ReadUInt();
+    //uint32_t typeId = reader.GetBinaryReader().ReadUInt();
+    boost::uuids::uuid typeId;
+    reader.GetBinaryReader().ReadUuid(typeId);
     GetSymbolTable()->EmplaceTypeRequest(this, typeId, 0);
 }
 
@@ -136,63 +137,63 @@ void MemberVariableSymbol::SetSpecifiers(Specifiers specifiers)
     }
     if ((specifiers & Specifiers::virtual_) != Specifiers::none)
     {
-        throw Exception("member variable cannot be virtual", GetSpan());
+        throw Exception(GetModule(), "member variable cannot be virtual", GetSpan());
     }
     if ((specifiers & Specifiers::override_) != Specifiers::none)
     {
-        throw Exception("member variable cannot be override", GetSpan());
+        throw Exception(GetModule(), "member variable cannot be override", GetSpan());
     }
     if ((specifiers & Specifiers::abstract_) != Specifiers::none)
     {
-        throw Exception("member variable cannot be abstract", GetSpan());
+        throw Exception(GetModule(), "member variable cannot be abstract", GetSpan());
     }
     if ((specifiers & Specifiers::inline_) != Specifiers::none)
     {
-        throw Exception("member variable cannot be inline", GetSpan());
+        throw Exception(GetModule(), "member variable cannot be inline", GetSpan());
     }
     if ((specifiers & Specifiers::explicit_) != Specifiers::none)
     {
-        throw Exception("member variable cannot be explicit", GetSpan());
+        throw Exception(GetModule(), "member variable cannot be explicit", GetSpan());
     }
     if ((specifiers & Specifiers::external_) != Specifiers::none)
     {
-        throw Exception("member variable cannot be external", GetSpan());
+        throw Exception(GetModule(), "member variable cannot be external", GetSpan());
     }
     if ((specifiers & Specifiers::suppress_) != Specifiers::none)
     {
-        throw Exception("member variable cannot be suppressed", GetSpan());
+        throw Exception(GetModule(), "member variable cannot be suppressed", GetSpan());
     }
     if ((specifiers & Specifiers::default_) != Specifiers::none)
     {
-        throw Exception("member variable cannot be default", GetSpan());
+        throw Exception(GetModule(), "member variable cannot be default", GetSpan());
     }
     if ((specifiers & Specifiers::constexpr_) != Specifiers::none)
     {
-        throw Exception("member variable cannot be constexpr", GetSpan());
+        throw Exception(GetModule(), "member variable cannot be constexpr", GetSpan());
     }
     if ((specifiers & Specifiers::cdecl_) != Specifiers::none)
     {
-        throw Exception("member variable cannot be cdecl", GetSpan());
+        throw Exception(GetModule(), "member variable cannot be cdecl", GetSpan());
     }
     if ((specifiers & Specifiers::nothrow_) != Specifiers::none)
     {
-        throw Exception("member variable cannot be nothrow", GetSpan());
+        throw Exception(GetModule(), "member variable cannot be nothrow", GetSpan());
     }
     if ((specifiers & Specifiers::throw_) != Specifiers::none)
     {
-        throw Exception("member variable cannot be throw", GetSpan());
+        throw Exception(GetModule(), "member variable cannot be throw", GetSpan());
     }
     if ((specifiers & Specifiers::new_) != Specifiers::none)
     {
-        throw Exception("member variable cannot be new", GetSpan());
+        throw Exception(GetModule(), "member variable cannot be new", GetSpan());
     }
     if ((specifiers & Specifiers::const_) != Specifiers::none)
     {
-        throw Exception("member variable cannot be const", GetSpan());
+        throw Exception(GetModule(), "member variable cannot be const", GetSpan());
     }
     if ((specifiers & Specifiers::unit_test_) != Specifiers::none)
     {
-        throw Exception("member variable cannot be unit_test", GetSpan());
+        throw Exception(GetModule(), "member variable cannot be unit_test", GetSpan());
     }
 }
 

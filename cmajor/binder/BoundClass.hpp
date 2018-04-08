@@ -15,7 +15,7 @@ using namespace cmajor::symbols;
 class BoundClass : public BoundNode
 {
 public:
-    BoundClass(ClassTypeSymbol* classTypeSymbol_);
+    BoundClass(Module* module_, ClassTypeSymbol* classTypeSymbol_);
     void Accept(BoundNodeVisitor& visitor) override;
     void Load(Emitter& emitter, OperationFlags flags) override;
     void Store(Emitter& emitter, OperationFlags flags) override;

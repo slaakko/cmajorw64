@@ -69,7 +69,8 @@ void UsingNodeAdder::Visit(NamespaceImportNode& namespaceImportNode)
 }
 
 TypeBinder::TypeBinder(BoundCompileUnit& boundCompileUnit_) : 
-    boundCompileUnit(boundCompileUnit_), symbolTable(boundCompileUnit.GetSymbolTable()), containerScope(), enumType(nullptr), currentFunctionSymbol(nullptr), typeResolverFlags(TypeResolverFlags::none)
+    boundCompileUnit(boundCompileUnit_), symbolTable(boundCompileUnit.GetSymbolTable()), module(&boundCompileUnit.GetModule()), 
+    containerScope(), enumType(nullptr), currentFunctionSymbol(nullptr), typeResolverFlags(TypeResolverFlags::none)
 {
 }
 
@@ -87,7 +88,7 @@ void TypeBinder::AddUsingNodesToCurrentCompileUnit(Node* node)
     }
     if (!namespaceNode)
     {
-        throw Exception("global namespace parent not found for node", node->GetSpan());
+        throw Exception(module, "global namespace parent not found for node", node->GetSpan());
     }
     UsingNodeAdder usingNodeAdder(boundCompileUnit, containerScope);
     namespaceNode->Accept(usingNodeAdder);
@@ -95,7 +96,7 @@ void TypeBinder::AddUsingNodesToCurrentCompileUnit(Node* node)
 
 void TypeBinder::Visit(CompileUnitNode& compileUnitNode)
 {
-    boundCompileUnit.AddFileScope(new FileScope());
+    boundCompileUnit.AddFileScope(new FileScope(&boundCompileUnit.GetModule()));
     compileUnitNode.GlobalNs()->Accept(*this);
 }
 
@@ -189,7 +190,7 @@ void TypeBinder::Visit(FunctionNode& functionNode)
     {
         if (!functionSymbol->IsExternal() && !functionSymbol->IsFunctionTemplate())
         {
-            throw Exception("function has no body", functionSymbol->GetSpan());
+            throw Exception(module, "function has no body", functionSymbol->GetSpan());
         }
     }
     boundCompileUnit.GetAttributeBinder()->BindAttributes(functionNode.GetAttributes(), symbol, boundCompileUnit, containerScope);
@@ -266,11 +267,11 @@ void TypeBinder::BindClass(ClassTypeSymbol* classTypeSymbol, ClassNode* classNod
             }
             if (classTypeSymbol->BaseClass())
             {
-                throw Exception("class type can have at most one base class", classTypeSymbol->GetSpan(), baseClassSymbol->GetSpan());
+                throw Exception(module, "class type can have at most one base class", classTypeSymbol->GetSpan(), baseClassSymbol->GetSpan());
             }
             else if (baseClassSymbol == classTypeSymbol)
             {
-                throw Exception("class cannot derive from itself", classTypeSymbol->GetSpan());
+                throw Exception(module, "class cannot derive from itself", classTypeSymbol->GetSpan());
             }
             else
             {
@@ -291,7 +292,7 @@ void TypeBinder::BindClass(ClassTypeSymbol* classTypeSymbol, ClassNode* classNod
         }
         else
         {
-            throw Exception("symbol '" + ToUtf8(baseOrInterfaceSymbol->FullName()) + "' is not a class or interface type symbol", baseOrInterfaceNode->GetSpan(), baseOrInterfaceSymbol->GetSpan());
+            throw Exception(module, "symbol '" + ToUtf8(baseOrInterfaceSymbol->FullName()) + "' is not a class or interface type symbol", baseOrInterfaceNode->GetSpan(), baseOrInterfaceSymbol->GetSpan());
         }
     }
     int nm = classNode->Members().Count();
@@ -352,7 +353,7 @@ void TypeBinder::Visit(StaticConstructorNode& staticConstructorNode)
     {
         if (!staticConstructorSymbol->IsTemplateSpecialization())
         {
-            throw Exception("static constructor has no body", staticConstructorSymbol->GetSpan());
+            throw Exception(module, "static constructor has no body", staticConstructorSymbol->GetSpan());
         }
     }
     boundCompileUnit.GetAttributeBinder()->BindAttributes(staticConstructorNode.GetAttributes(), symbol, boundCompileUnit, containerScope);
@@ -379,7 +380,7 @@ void TypeBinder::Visit(ConstructorNode& constructorNode)
     Symbol* parent = constructorSymbol->Parent();
     if (parent->IsStatic())
     {
-        throw Exception("static class cannot contain instance constructors", constructorSymbol->GetSpan(), parent->GetSpan());
+        throw Exception(module, "static class cannot contain instance constructors", constructorSymbol->GetSpan(), parent->GetSpan());
     }
     if (parent->GetSymbolType() == SymbolType::classTemplateSpecializationSymbol)
     {
@@ -429,7 +430,7 @@ void TypeBinder::Visit(ConstructorNode& constructorNode)
     {
         if (constructorSymbol->IsDefault() || constructorSymbol->IsSuppressed())
         {
-            throw Exception("default or suppressed constructor cannot have a body", constructorSymbol->GetSpan());
+            throw Exception(module, "default or suppressed constructor cannot have a body", constructorSymbol->GetSpan());
         }
         constructorNode.Body()->Accept(*this);
     }
@@ -437,7 +438,7 @@ void TypeBinder::Visit(ConstructorNode& constructorNode)
     {
         if (!constructorSymbol->IsDefault() && !constructorSymbol->IsSuppressed() && !constructorSymbol->IsTemplateSpecialization())
         {
-            throw Exception("constructor has no body", constructorSymbol->GetSpan());
+            throw Exception(module, "constructor has no body", constructorSymbol->GetSpan());
         }
     }
     boundCompileUnit.GetAttributeBinder()->BindAttributes(constructorNode.GetAttributes(), symbol, boundCompileUnit, containerScope);
@@ -458,7 +459,7 @@ void TypeBinder::Visit(DestructorNode& destructorNode)
     const Symbol* parent = destructorSymbol->Parent();
     if (parent->IsStatic())
     {
-        throw Exception("static class cannot contain a destructor", destructorSymbol->GetSpan(), parent->GetSpan());
+        throw Exception(module, "static class cannot contain a destructor", destructorSymbol->GetSpan(), parent->GetSpan());
     }
     if (parent->GetSymbolType() == SymbolType::classTemplateSpecializationSymbol)
     {
@@ -475,7 +476,7 @@ void TypeBinder::Visit(DestructorNode& destructorNode)
     {
         if (destructorSymbol->IsDefault())
         {
-            throw Exception("default destructor cannot have a body", destructorSymbol->GetSpan());
+            throw Exception(module, "default destructor cannot have a body", destructorSymbol->GetSpan());
         }
         destructorNode.Body()->Accept(*this);
     }
@@ -483,7 +484,7 @@ void TypeBinder::Visit(DestructorNode& destructorNode)
     {
         if (!destructorSymbol->IsDefault() && !destructorSymbol->IsTemplateSpecialization())
         {
-            throw Exception("destructor has no body", destructorSymbol->GetSpan());
+            throw Exception(module, "destructor has no body", destructorSymbol->GetSpan());
         }
     }
     boundCompileUnit.GetAttributeBinder()->BindAttributes(destructorNode.GetAttributes(), symbol, boundCompileUnit, containerScope);
@@ -510,7 +511,7 @@ void TypeBinder::Visit(MemberFunctionNode& memberFunctionNode)
     Symbol* parent = memberFunctionSymbol->Parent();
     if (parent->IsStatic() && !memberFunctionSymbol->IsStatic())
     {
-        throw Exception("static class cannot contain nonstatic member functions", memberFunctionSymbol->GetSpan(), parent->GetSpan());
+        throw Exception(module, "static class cannot contain nonstatic member functions", memberFunctionSymbol->GetSpan(), parent->GetSpan());
     }
     if (parent->GetSymbolType() == SymbolType::classTemplateSpecializationSymbol)
     {
@@ -559,7 +560,7 @@ void TypeBinder::Visit(MemberFunctionNode& memberFunctionNode)
     {
         if (memberFunctionSymbol->IsDefault() || memberFunctionSymbol->IsSuppressed())
         {
-            throw Exception("default or suppressed member function cannot have a body", memberFunctionSymbol->GetSpan());
+            throw Exception(module, "default or suppressed member function cannot have a body", memberFunctionSymbol->GetSpan());
         }
         memberFunctionNode.Body()->Accept(*this);
     }
@@ -571,7 +572,7 @@ void TypeBinder::Visit(MemberFunctionNode& memberFunctionNode)
             !memberFunctionSymbol->IsSuppressed() && 
             !memberFunctionSymbol->IsTemplateSpecialization())
         {
-            throw Exception("member function has no body", memberFunctionSymbol->GetSpan());
+            throw Exception(module, "member function has no body", memberFunctionSymbol->GetSpan());
         }
     }
     boundCompileUnit.GetAttributeBinder()->BindAttributes(memberFunctionNode.GetAttributes(), symbol, boundCompileUnit, containerScope);
@@ -598,7 +599,7 @@ void TypeBinder::Visit(ConversionFunctionNode& conversionFunctionNode)
     const Symbol* parent = conversionFunctionSymbol->Parent();
     if (parent->IsStatic())
     {
-        throw Exception("static class cannot contain conversion functions", conversionFunctionSymbol->GetSpan(), parent->GetSpan());
+        throw Exception(module, "static class cannot contain conversion functions", conversionFunctionSymbol->GetSpan(), parent->GetSpan());
     }
     bool requireBody = true;
     if (parent->GetSymbolType() == SymbolType::classTemplateSpecializationSymbol)
@@ -631,7 +632,7 @@ void TypeBinder::Visit(ConversionFunctionNode& conversionFunctionNode)
     {
         if (requireBody)
         {
-            throw Exception("conversion function has no body", conversionFunctionSymbol->GetSpan());
+            throw Exception(module, "conversion function has no body", conversionFunctionSymbol->GetSpan());
         }
     }
     boundCompileUnit.GetAttributeBinder()->BindAttributes(conversionFunctionNode.GetAttributes(), symbol, boundCompileUnit, containerScope);
@@ -649,7 +650,7 @@ void TypeBinder::Visit(MemberVariableNode& memberVariableNode)
     const Symbol* parent = memberVariableSymbol->Parent();
     if (parent->IsStatic() && !memberVariableSymbol->IsStatic())
     {
-        throw Exception("static class cannot contain instance variables", memberVariableSymbol->GetSpan(), parent->GetSpan());
+        throw Exception(module, "static class cannot contain instance variables", memberVariableSymbol->GetSpan(), parent->GetSpan());
     }
     TypeSymbol* memberVariableType = ResolveType(memberVariableNode.TypeExpr(), boundCompileUnit, containerScope, typeResolverFlags);
     memberVariableSymbol->SetType(memberVariableType);
@@ -752,6 +753,8 @@ void TypeBinder::Visit(ClassDelegateNode& classDelegateNode)
     ClassDelegateTypeSymbol* classDelegateTypeSymbol = static_cast<ClassDelegateTypeSymbol*>(symbol);
     classDelegateTypeSymbol->SetSpecifiers(classDelegateNode.GetSpecifiers());
     DelegateTypeSymbol* memberDelegateType = new DelegateTypeSymbol(classDelegateNode.GetSpan(), U"@dlg_type");
+    memberDelegateType->SetSymbolTable(&symbolTable);
+    memberDelegateType->SetModule(module);
     symbolTable.SetTypeIdFor(memberDelegateType);
     ParameterSymbol* objectParam = new ParameterSymbol(classDelegateNode.GetSpan(), U"@obj");
     TypeSymbol* voidPtrType = symbolTable.GetTypeByName(U"void")->AddPointer(classDelegateNode.GetSpan());
@@ -983,12 +986,12 @@ void TypeBinder::Visit(CatchNode& catchNode)
             }
             else
             {
-                throw Exception("exception variable must be of class type equal to System.Exception class or derive from it", catchNode.TypeExpr()->GetSpan());
+                throw Exception(module, "exception variable must be of class type equal to System.Exception class or derive from it", catchNode.TypeExpr()->GetSpan());
             }
         }
         else
         {
-            throw Exception("exception variable must be of class type equal to System.Exception class or derive from it", catchNode.TypeExpr()->GetSpan());
+            throw Exception(module, "exception variable must be of class type equal to System.Exception class or derive from it", catchNode.TypeExpr()->GetSpan());
         }
     }
     catchNode.CatchBlock()->Accept(*this);
@@ -1032,7 +1035,7 @@ void TypeBinder::Visit(ConditionalCompilationNotNode& conditionalCompilationNotN
 
 void TypeBinder::Visit(ConditionalCompilationPrimaryNode& conditionalCompilationPrimaryNode)
 {
-    bool defined = IsSymbolDefined(conditionalCompilationPrimaryNode.Symbol());
+    bool defined = module->IsSymbolDefined(conditionalCompilationPrimaryNode.Symbol());
     conditionalCompilationStack.push(defined);
 }
 

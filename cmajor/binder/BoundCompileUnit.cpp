@@ -190,7 +190,7 @@ void PtrToULongConversion::GenerateCall(Emitter& emitter, std::vector<GenObject*
 }
 
 BoundCompileUnit::BoundCompileUnit(Module& module_, CompileUnitNode* compileUnitNode_, AttributeBinder* attributeBinder_) :
-    BoundNode(Span(), BoundNodeType::boundCompileUnit), module(module_), symbolTable(module.GetSymbolTable()), compileUnitNode(compileUnitNode_), attributeBinder(attributeBinder_), currentNamespace(nullptr), 
+    BoundNode(&module_, Span(), BoundNodeType::boundCompileUnit), module(module_), symbolTable(module.GetSymbolTable()), compileUnitNode(compileUnitNode_), attributeBinder(attributeBinder_), currentNamespace(nullptr), 
     hasGotos(false), operationRepository(*this), functionTemplateRepository(*this), classTemplateRepository(*this), inlineFunctionRepository(*this), constExprFunctionRepository(*this), bindingTypes(false),
     compileUnitIndex(-2)
 {
@@ -210,12 +210,12 @@ BoundCompileUnit::BoundCompileUnit(Module& module_, CompileUnitNode* compileUnit
 
 void BoundCompileUnit::Load(Emitter& emitter, OperationFlags flags)
 {
-    throw Exception("cannot load from compile unit", GetSpan());
+    throw Exception(&GetModule(), "cannot load from compile unit", GetSpan());
 }
 
 void BoundCompileUnit::Store(Emitter& emitter, OperationFlags flags)
 {
-    throw Exception("cannot store to compile unit", GetSpan());
+    throw Exception(&GetModule(), "cannot store to compile unit", GetSpan());
 }
 
 void BoundCompileUnit::Accept(BoundNodeVisitor& visitor)
@@ -232,7 +232,7 @@ void BoundCompileUnit::RemoveLastFileScope()
 {
     if (fileScopes.empty())
     {
-        throw Exception("file scopes of bound compile unit is empty", GetSpan());
+        throw Exception(&GetModule(), "file scopes of bound compile unit is empty", GetSpan());
     }
     fileScopes.erase(fileScopes.end() - 1);
 }
@@ -241,7 +241,7 @@ FileScope* BoundCompileUnit::ReleaseLastFileScope()
 {
     if (fileScopes.empty())
     {
-        throw Exception("file scopes of bound compile unit is empty", GetSpan());
+        throw Exception(&GetModule(), "file scopes of bound compile unit is empty", GetSpan());
     }
     FileScope* fileScope = fileScopes.back().release();
     RemoveLastFileScope();
@@ -483,6 +483,8 @@ FunctionSymbol* BoundCompileUnit::GetConversion(TypeSymbol* sourceType, TypeSymb
                         {
                             LocalVariableSymbol* temporaryInterfaceObjectVar = currentFunction->GetFunctionSymbol()->CreateTemporary(targetInterfaceType, span);
                             std::unique_ptr<FunctionSymbol> classToInterfaceConversion(new ClassToInterfaceConversion(sourceClassType, targetInterfaceType, temporaryInterfaceObjectVar, i, span));
+                            classToInterfaceConversion->SetModule(&GetModule());
+                            classToInterfaceConversion->SetSymbolTable(&symbolTable);
                             conversion = classToInterfaceConversion.get();
                             conversionTable.AddConversion(conversion);
                             conversionTable.AddGeneratedConversion(std::move(classToInterfaceConversion));
@@ -559,6 +561,11 @@ int BoundCompileUnit::Install(const std::u32string& str)
     return utf32StringRepository.Install(str);
 }
 
+int BoundCompileUnit::Install(const boost::uuids::uuid& uuid)
+{
+    return uuidRepository.Install(uuid);
+}
+
 const std::string& BoundCompileUnit::GetUtf8String(int stringId) const
 {
     return utf8StringRepository.GetString(stringId);
@@ -587,6 +594,11 @@ const char16_t* BoundCompileUnit::GetUtf16CharPtr(int stringId) const
 const char32_t* BoundCompileUnit::GetUtf32CharPtr(int stringId) const
 {
     return utf32StringRepository.CharPtr(stringId);
+}
+
+const boost::uuids::uuid& BoundCompileUnit::GetUuid(int uuidId) const
+{
+    return uuidRepository.GetUuid(uuidId);
 }
 
 void BoundCompileUnit::AddConstantArray(ConstantSymbol* constantArraySymbol)

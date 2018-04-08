@@ -8,26 +8,29 @@
 #include <cmajor/symbols/SymbolWriter.hpp>
 #include <cmajor/symbols/SymbolReader.hpp>
 #include <cmajor/util/Unicode.hpp>
+#include <boost/uuid/uuid_generators.hpp>
+#include <boost/uuid/uuid_io.hpp>
 
 namespace cmajor { namespace symbols {
 
 using namespace cmajor::unicode;
 
-TypeSymbol::TypeSymbol(SymbolType symbolType_, const Span& span_, const std::u32string& name_) : ContainerSymbol(symbolType_, span_, name_), typeId(0), compileUnitIndex(-1), diType(nullptr)
+TypeSymbol::TypeSymbol(SymbolType symbolType_, const Span& span_, const std::u32string& name_) :
+    ContainerSymbol(symbolType_, span_, name_), typeId(boost::uuids::nil_generator()()), compileUnitIndex(-1), diType(nullptr)
 {
 }
 
 void TypeSymbol::Write(SymbolWriter& writer)
 {
     ContainerSymbol::Write(writer);
-    Assert(typeId != 0, "type id not initialized");
+    Assert(!typeId.is_nil(), "type id not set");
     writer.GetBinaryWriter().Write(typeId);
 }
 
 void TypeSymbol::Read(SymbolReader& reader)
 {
     ContainerSymbol::Read(reader);
-    typeId = reader.GetBinaryReader().ReadUInt();
+    reader.GetBinaryReader().ReadUuid(typeId);
     GetSymbolTable()->AddTypeOrConceptSymbolToTypeIdMap(this);
 }
 
@@ -90,7 +93,7 @@ ValueType TypeSymbol::GetValueType() const
 
 std::u32string TypeSymbol::Id() const 
 { 
-    return ToUtf32(std::to_string(TypeId())); 
+    return ToUtf32(boost::uuids::to_string(TypeId())); 
 }
 
 llvm::DIType* TypeSymbol::GetDIType(Emitter& emitter)

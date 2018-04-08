@@ -9,6 +9,7 @@
 #include <cmajor/symbols/SymbolTable.hpp>
 #include <cmajor/util/Unicode.hpp>
 #include <cmajor/util/Sha1.hpp>
+#include <boost/uuid/uuid_io.hpp>
 
 namespace cmajor { namespace symbols {
 
@@ -55,14 +56,16 @@ std::u32string ClassTemplateSpecializationSymbol::SimpleName() const
 void ClassTemplateSpecializationSymbol::Write(SymbolWriter& writer)
 {
     ClassTypeSymbol::Write(writer);
-    uint32_t classTemplateId = classTemplate->TypeId();
+    //uint32_t classTemplateId = classTemplate->TypeId();
+    const boost::uuids::uuid& classTemplateId = classTemplate->TypeId();
     writer.GetBinaryWriter().Write(classTemplateId);
     uint32_t n = templateArgumentTypes.size();
     writer.GetBinaryWriter().WriteEncodedUInt(n);
     for (uint32_t i = 0; i < n; ++i)
     {
         TypeSymbol* templateArgumentType = templateArgumentTypes[i];
-        uint32_t templateArgumentTypeId = templateArgumentType->TypeId();
+        //uint32_t templateArgumentTypeId = templateArgumentType->TypeId();
+        const boost::uuids::uuid& templateArgumentTypeId = templateArgumentType->TypeId();
         writer.GetBinaryWriter().Write(templateArgumentTypeId);
     }
     writer.GetBinaryWriter().Write(uint8_t(flags));
@@ -71,13 +74,17 @@ void ClassTemplateSpecializationSymbol::Write(SymbolWriter& writer)
 void ClassTemplateSpecializationSymbol::Read(SymbolReader& reader)
 {
     ClassTypeSymbol::Read(reader);
-    uint32_t classTemplateId = reader.GetBinaryReader().ReadUInt();
+    //uint32_t classTemplateId = reader.GetBinaryReader().ReadUInt();
+    boost::uuids::uuid classTemplateId;
+    reader.GetBinaryReader().ReadUuid(classTemplateId);
     GetSymbolTable()->EmplaceTypeRequest(this, classTemplateId, -1);
     uint32_t n = reader.GetBinaryReader().ReadEncodedUInt();
     templateArgumentTypes.resize(n);
     for (uint32_t i = 0; i < n; ++i)
     {
-        uint32_t typeArgumentId = reader.GetBinaryReader().ReadUInt();
+        //uint32_t typeArgumentId = reader.GetBinaryReader().ReadUInt();
+        boost::uuids::uuid typeArgumentId;
+        reader.GetBinaryReader().ReadUuid(typeArgumentId);
         GetSymbolTable()->EmplaceTypeRequest(this, typeArgumentId, -2 - i);
     }
     flags = ClassTemplateSpecializationFlags(reader.GetBinaryReader().ReadByte());
@@ -176,7 +183,8 @@ std::u32string ClassTemplateSpecializationSymbol::Id() const
     }
     else
     {
-        return ToUtf32(std::to_string(TypeId()));
+        //return ToUtf32(std::to_string(TypeId()));
+        return ToUtf32(boost::uuids::to_string(TypeId()));
     }
 }
 

@@ -33,7 +33,7 @@ FunctionNode* ConstExprFunctionRepository::GetFunctionNodeFor(FunctionSymbol* co
     }
     else
     {
-        throw Exception("internal error: function node expected", constExprFunctionSymbol->GetSpan());
+        throw Exception(&boundCompileUnit.GetModule(), "internal error: function node expected", constExprFunctionSymbol->GetSpan());
     }
 }
 
