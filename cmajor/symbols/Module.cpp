@@ -163,7 +163,7 @@ std::string FileTable::GetFilePath(int16_t fileId) const
 void FileTable::Write(BinaryWriter& writer, bool systemModule)
 {
     uint32_t n = filePaths.size();
-    writer.WriteEncodedUInt(n);
+    writer.WriteULEB128UInt(n);
     std::string cmajorRoot;
     if (systemModule)
     {
@@ -199,7 +199,7 @@ void FileTable::Read(BinaryReader& reader, bool systemModule)
             cmajorRoot.append("/");
         }
     }
-    uint32_t n = reader.ReadEncodedUInt();
+    uint32_t n = reader.ReadULEB128UInt();
     for (uint32_t i = 0; i < n; ++i)
     {
         if (systemModule)
@@ -439,7 +439,7 @@ void Module::Write(SymbolWriter& writer)
     writer.GetBinaryWriter().Write(name);
     writer.GetBinaryWriter().Write(originalFilePath);
     uint32_t nr = referencedModules.size();
-    writer.GetBinaryWriter().WriteEncodedUInt(nr);
+    writer.GetBinaryWriter().WriteULEB128UInt(nr);
     for (uint32_t i = 0; i < nr; ++i)
     {
         const std::unique_ptr<Module>& referencedModule = referencedModules[i];
@@ -447,13 +447,13 @@ void Module::Write(SymbolWriter& writer)
     }
     fileTable.Write(writer.GetBinaryWriter(), IsSystemModule());
     uint32_t efn = exportedFunctions.size();
-    writer.GetBinaryWriter().WriteEncodedUInt(efn);
+    writer.GetBinaryWriter().WriteULEB128UInt(efn);
     for (uint32_t i = 0; i < efn; ++i)
     {
         writer.GetBinaryWriter().Write(exportedFunctions[i]);
     }
     uint32_t edn = exportedData.size();
-    writer.GetBinaryWriter().WriteEncodedUInt(edn);
+    writer.GetBinaryWriter().WriteULEB128UInt(edn);
     for (uint32_t i = 0; i < edn; ++i)
     {
         writer.GetBinaryWriter().Write(exportedData[i]);
@@ -489,7 +489,7 @@ void Module::ReadHeader(SymbolReader& reader, Module* rootModule, std::unordered
         dependencyMap[originalFilePath] = &moduleDependency;
     }
     filePathReadFrom = GetFullPath(reader.GetBinaryReader().FileName());
-    uint32_t nr = reader.GetBinaryReader().ReadEncodedUInt();
+    uint32_t nr = reader.GetBinaryReader().ReadULEB128UInt();
     for (uint32_t i = 0; i < nr; ++i)
     {
         referenceFilePaths.push_back(reader.GetBinaryReader().ReadUtf8String());
@@ -503,7 +503,7 @@ void Module::ReadHeader(SymbolReader& reader, Module* rootModule, std::unordered
         libraryFilePath = GetFullPath(boost::filesystem::path(filePathReadFrom).replace_extension(".a").generic_string());
 #endif
     }
-    uint32_t efn = reader.GetBinaryReader().ReadEncodedUInt();
+    uint32_t efn = reader.GetBinaryReader().ReadULEB128UInt();
     for (uint32_t i = 0; i < efn; ++i)
     {
         exportedFunctions.push_back(reader.GetBinaryReader().ReadUtf8String());
@@ -512,7 +512,7 @@ void Module::ReadHeader(SymbolReader& reader, Module* rootModule, std::unordered
     {
         rootModule->allExportedFunctions.push_back(exportedFunction);
     }
-    uint32_t edn = reader.GetBinaryReader().ReadEncodedUInt();
+    uint32_t edn = reader.GetBinaryReader().ReadULEB128UInt();
     for (uint32_t i = 0; i < edn; ++i)
     {
         exportedData.push_back(reader.GetBinaryReader().ReadUtf8String());

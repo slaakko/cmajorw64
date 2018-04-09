@@ -123,7 +123,7 @@ void ClassTypeSymbol::Write(SymbolWriter& writer)
         }
         writer.GetBinaryWriter().Write(baseClassId);
         uint32_t n = uint32_t(implementedInterfaces.size());
-        writer.GetBinaryWriter().WriteEncodedUInt(n);
+        writer.GetBinaryWriter().WriteULEB128UInt(n);
         for (uint32_t i = 0; i < n; ++i)
         {
             InterfaceTypeSymbol* intf = implementedInterfaces[i];
@@ -132,7 +132,7 @@ void ClassTypeSymbol::Write(SymbolWriter& writer)
             writer.GetBinaryWriter().Write(intfTypeId);
         }
         uint32_t vmtSize = vmt.size();
-        writer.GetBinaryWriter().WriteEncodedUInt(vmtSize);
+        writer.GetBinaryWriter().WriteULEB128UInt(vmtSize);
         writer.GetBinaryWriter().Write(vmtPtrIndex);
         bool hasConstraint = constraint != nullptr;
         writer.GetBinaryWriter().Write(hasConstraint);
@@ -178,7 +178,7 @@ void ClassTypeSymbol::Read(SymbolReader& reader)
         {
             GetSymbolTable()->EmplaceTypeRequest(this, baseClassId, 0);
         }
-        uint32_t n = reader.GetBinaryReader().ReadEncodedUInt();
+        uint32_t n = reader.GetBinaryReader().ReadULEB128UInt();
         implementedInterfaces.resize(n);
         for (uint32_t i = 0; i < n; ++i)
         {
@@ -187,7 +187,7 @@ void ClassTypeSymbol::Read(SymbolReader& reader)
             reader.GetBinaryReader().ReadUuid(intfTypeId);
             GetSymbolTable()->EmplaceTypeRequest(this, intfTypeId, 1 + i);
         }
-        uint32_t vmtSize = reader.GetBinaryReader().ReadEncodedUInt();
+        uint32_t vmtSize = reader.GetBinaryReader().ReadULEB128UInt();
         vmt.resize(vmtSize);
         vmtPtrIndex = reader.GetBinaryReader().ReadInt();
         bool hasConstraint = reader.GetBinaryReader().ReadBool();

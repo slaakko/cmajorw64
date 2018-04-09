@@ -78,7 +78,7 @@ Attributes* Attributes::Clone() const
 
 void Attributes::Write(AstWriter& writer)
 {
-    writer.GetBinaryWriter().WriteEncodedUInt(attributes.size());
+    writer.GetBinaryWriter().WriteULEB128UInt(attributes.size());
     for (const std::unique_ptr<Attribute>& attribute : attributes)
     {
         attribute->Write(writer);
@@ -87,7 +87,7 @@ void Attributes::Write(AstWriter& writer)
 
 void Attributes::Read(AstReader& reader)
 {
-    uint32_t n = reader.GetBinaryReader().ReadEncodedUInt();
+    uint32_t n = reader.GetBinaryReader().ReadULEB128UInt();
     for (uint32_t i = 0; i < n; ++i)
     {
         Attribute* attribute = new Attribute();

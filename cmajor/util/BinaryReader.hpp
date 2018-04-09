@@ -33,7 +33,8 @@ public:
     std::string ReadUtf8String();
     std::u16string ReadUtf16String();
     std::u32string ReadUtf32String();
-    uint32_t ReadEncodedUInt();
+    uint32_t ReadULEB128UInt();
+    uint64_t ReadULEB128ULong();
     void ReadUuid(boost::uuids::uuid& uuid);
     uint32_t Pos() const { return pos; }
     void Skip(uint32_t size);

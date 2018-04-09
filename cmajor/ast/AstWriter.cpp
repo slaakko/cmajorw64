@@ -33,10 +33,10 @@ void AstWriter::Write(const Span& span)
     else
     {
         binaryWriter.Write(true);
-        binaryWriter.WriteEncodedUInt(span.FileIndex());
-        binaryWriter.WriteEncodedUInt(span.LineNumber());
-        binaryWriter.WriteEncodedUInt(span.Start());
-        binaryWriter.WriteEncodedUInt(span.End());
+        binaryWriter.WriteULEB128UInt(span.FileIndex());
+        binaryWriter.WriteULEB128UInt(span.LineNumber());
+        binaryWriter.WriteULEB128UInt(span.Start());
+        binaryWriter.WriteULEB128UInt(span.End());
     }
 }
 

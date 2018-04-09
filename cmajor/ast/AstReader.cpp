@@ -181,15 +181,15 @@ Span AstReader::ReadSpan()
     }
     else
     {
-        uint32_t fileIndex = binaryReader.ReadEncodedUInt();
+        uint32_t fileIndex = binaryReader.ReadULEB128UInt();
         if (moduleId != -1)
         {
             int16_t fileId = GetFileId(fileIndex);
             fileIndex = static_cast<uint32_t>(MakeFileIndex(moduleId, fileId));
         }
-        uint32_t lineNumber = binaryReader.ReadEncodedUInt();
-        uint32_t start = binaryReader.ReadEncodedUInt();
-        uint32_t end = binaryReader.ReadEncodedUInt();
+        uint32_t lineNumber = binaryReader.ReadULEB128UInt();
+        uint32_t start = binaryReader.ReadULEB128UInt();
+        uint32_t end = binaryReader.ReadULEB128UInt();
         return Span(fileIndex, lineNumber, start, end);
     }
 }

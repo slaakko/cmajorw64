@@ -146,7 +146,7 @@ struct ClassInfo
 void ReadClasses(const std::string& classFilePath, std::vector<std::unique_ptr<ClassInfo>>& classInfos, std::vector<boost::uuids::uuid>& staticClassIds)
 {
     BinaryReader reader(classFilePath);
-    uint32_t n = reader.ReadEncodedUInt();
+    uint32_t n = reader.ReadULEB128UInt();
     for (uint32_t i = 0; i < n; ++i)
     {
         //uint32_t typeId = reader.ReadUInt();
@@ -158,7 +158,7 @@ void ReadClasses(const std::string& classFilePath, std::vector<std::unique_ptr<C
         reader.ReadUuid(baseTypeId);
         classInfos.push_back(std::unique_ptr<ClassInfo>(new ClassInfo(typeId, vmtObjectName, baseTypeId)));
     }
-    uint32_t ns = reader.ReadEncodedUInt();
+    uint32_t ns = reader.ReadULEB128UInt();
     for (uint32_t i = 0; i < ns; ++i)
     {
         boost::uuids::uuid typeId;

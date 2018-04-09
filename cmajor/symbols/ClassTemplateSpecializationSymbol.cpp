@@ -60,7 +60,7 @@ void ClassTemplateSpecializationSymbol::Write(SymbolWriter& writer)
     const boost::uuids::uuid& classTemplateId = classTemplate->TypeId();
     writer.GetBinaryWriter().Write(classTemplateId);
     uint32_t n = templateArgumentTypes.size();
-    writer.GetBinaryWriter().WriteEncodedUInt(n);
+    writer.GetBinaryWriter().WriteULEB128UInt(n);
     for (uint32_t i = 0; i < n; ++i)
     {
         TypeSymbol* templateArgumentType = templateArgumentTypes[i];
@@ -78,7 +78,7 @@ void ClassTemplateSpecializationSymbol::Read(SymbolReader& reader)
     boost::uuids::uuid classTemplateId;
     reader.GetBinaryReader().ReadUuid(classTemplateId);
     GetSymbolTable()->EmplaceTypeRequest(this, classTemplateId, -1);
-    uint32_t n = reader.GetBinaryReader().ReadEncodedUInt();
+    uint32_t n = reader.GetBinaryReader().ReadULEB128UInt();
     templateArgumentTypes.resize(n);
     for (uint32_t i = 0; i < n; ++i)
     {

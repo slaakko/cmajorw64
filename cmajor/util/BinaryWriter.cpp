@@ -148,88 +148,34 @@ void BinaryWriter::Write(const std::u32string& s)
     Write(utf8_str);
 }
 
-void BinaryWriter::WriteEncodedUInt(uint32_t x)
+void BinaryWriter::WriteULEB128UInt(uint32_t x)
 {
-    if (x < 0x80u)
+    do
     {
-        Write(static_cast<uint8_t>(x & 0x7Fu));
-    }
-    else if (x < 0x800u)
+        uint8_t b = x & 0x7F;
+        x >>= 7;
+        if (x != 0)
+        {
+            b |= 0x80;
+        }
+        Write(b);
+    } 
+    while (x != 0);
+}
+
+void BinaryWriter::WriteULEB128ULong(uint64_t x)
+{
+    do
     {
-        uint8_t b1 = 0x80u;
-        for (uint8_t i = 0u; i < 6u; ++i)
+        uint8_t b = x & 0x7F;
+        x >>= 7;
+        if (x != 0)
         {
-            b1 = b1 | (static_cast<uint8_t>(x & 1u) << i);
-            x = x >> 1u;
+            b |= 0x80;
         }
-        uint8_t b0 = 0xC0u;
-        for (uint8_t i = 0u; i < 5u; ++i)
-        {
-            b0 = b0 | (static_cast<uint8_t>(x & 1u) << i);
-            x = x >> 1u;
-        }
-        Write(b0);
-        Write(b1);
-    }
-    else if (x < 0x10000u)
-    {
-        uint8_t b2 = 0x80u;
-        for (uint8_t i = 0u; i < 6u; ++i)
-        {
-            b2 = b2 | (static_cast<uint8_t>(x & 1u) << i);
-            x = x >> 1u;
-        }
-        uint8_t b1 = 0x80u;
-        for (uint8_t i = 0u; i < 6u; ++i)
-        {
-            b1 = b1 | (static_cast<uint8_t>(x & 1u) << i);
-            x = x >> 1u;
-        }
-        uint8_t b0 = 0xE0u;
-        for (uint8_t i = 0u; i < 4u; ++i)
-        {
-            b0 = b0 | (static_cast<uint8_t>(x & 1u) << i);
-            x = x >> 1u;
-        }
-        Write(b0);
-        Write(b1);
-        Write(b2);
-    }
-    else if (x < 0x110000u)
-    {
-        uint8_t b3 = 0x80u;
-        for (uint8_t i = 0u; i < 6u; ++i)
-        {
-            b3 = b3 | (static_cast<uint8_t>(x & 1u) << i);
-            x = x >> 1u;
-        }
-        uint8_t b2 = 0x80u;
-        for (uint8_t i = 0u; i < 6u; ++i)
-        {
-            b2 = b2 | (static_cast<uint8_t>(x & 1u) << i);
-            x = x >> 1u;
-        }
-        uint8_t b1 = 0x80u;
-        for (uint8_t i = 0u; i < 6u; ++i)
-        {
-            b1 = b1 | (static_cast<uint8_t>(x & 1u) << i);
-            x = x >> 1u;
-        }
-        uint8_t b0 = 0xF0u;
-        for (uint8_t i = 0u; i < 3u; ++i)
-        {
-            b0 = b0 | (static_cast<uint8_t>(x & 1u) << i);
-            x = x >> 1u;
-        }
-        Write(b0);
-        Write(b1);
-        Write(b2);
-        Write(b3);
-    }
-    else
-    {
-        throw std::runtime_error("could not encode " + std::to_string(x));
-    }
+        Write(b);
+    } 
+    while (x != 0);
 }
 
 void BinaryWriter::Write(const boost::uuids::uuid& uuid)

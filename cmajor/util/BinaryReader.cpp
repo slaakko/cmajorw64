@@ -141,131 +141,32 @@ std::u32string BinaryReader::ReadUtf32String()
     return ToUtf32(s);
 }
 
-uint32_t BinaryReader::ReadEncodedUInt()
+uint32_t BinaryReader::ReadULEB128UInt()
 {
-    uint8_t x = ReadByte();
-    if ((x & 0x80u) == 0u)
+    uint32_t result = 0;
+    uint32_t shift = 0;
+    while (true)
     {
-        return x;
+        uint8_t b = ReadByte();
+        result |= ((b & 0x7F) << shift);
+        if ((b & 0x80) == 0) break;
+        shift += 7;
     }
-    else if ((x & 0xE0u) == 0xC0u)
+    return result;
+}
+
+uint64_t BinaryReader::ReadULEB128ULong()
+{
+    uint64_t result = 0;
+    uint64_t shift = 0;
+    while (true)
     {
-        uint32_t result = 0;
-        uint8_t b1 = ReadByte();
-        if ((b1 & 0xC0u) != 0x80u)
-        {
-            throw std::runtime_error("could not decode: invalid byte sequence");
-        }
-        uint8_t shift = 0u;
-        for (uint8_t i = 0u; i < 6u; ++i)
-        {
-            uint8_t bit = b1 & 1u;
-            b1 = b1 >> 1u;
-            result = result | static_cast<uint32_t>(bit) << shift;
-            ++shift;
-        }
-        uint8_t b0 = x;
-        for (uint8_t i = 0u; i < 5u; ++i)
-        {
-            uint8_t bit = b0 & 1u;
-            b0 = b0 >> 1u;
-            result = result | static_cast<uint32_t>(bit) << shift;
-            ++shift;
-        }
-        return result;
+        uint8_t b = ReadByte();
+        result |= ((b & 0x7F) << shift);
+        if ((b & 0x80) == 0) break;
+        shift += 7;
     }
-    else if ((x & 0xF0u) == 0xE0u)
-    {
-        uint32_t result = 0;
-        uint8_t b1 = ReadByte();
-        uint8_t b2 = ReadByte();
-        if ((b2 & 0xC0u) != 0x80u)
-        {
-            throw std::runtime_error("could not decode: invalid byte sequence");
-        }
-        uint8_t shift = 0u;
-        for (uint8_t i = 0u; i < 6u; ++i)
-        {
-            uint8_t bit = b2 & 1u;
-            b2 = b2 >> 1u;
-            result = result | static_cast<uint32_t>(bit) << shift;
-            ++shift;
-        }
-        if ((b1 & 0xC0u) != 0x80u)
-        {
-            throw std::runtime_error("could not decode: invalid byte sequence");
-        }
-        for (uint8_t i = 0u; i < 6u; ++i)
-        {
-            uint8_t bit = b1 & 1u;
-            b1 = b1 >> 1u;
-            result = result | static_cast<uint32_t>(bit) << shift;
-            ++shift;
-        }
-        uint8_t b0 = x;
-        for (uint8_t i = 0u; i < 4u; ++i)
-        {
-            uint8_t bit = b0 & 1u;
-            b0 = b0 >> 1u;
-            result = result | static_cast<uint32_t>(bit) << shift;
-            ++shift;
-        }
-        return result;
-    }
-    else if ((x & 0xF8u) == 0xF0u)
-    {
-        uint32_t result = 0;
-        uint8_t b1 = ReadByte();
-        uint8_t b2 = ReadByte();
-        uint8_t b3 = ReadByte();
-        if ((b3 & 0xC0u) != 0x80u)
-        {
-            throw std::runtime_error("could not decode: invalid byte sequence");
-        }
-        uint8_t shift = 0u;
-        for (uint8_t i = 0u; i < 6u; ++i)
-        {
-            uint8_t bit = b3 & 1u;
-            b3 = b3 >> 1u;
-            result = result | static_cast<uint32_t>(bit) << shift;
-            ++shift;
-        }
-        if ((b2 & 0xC0u) != 0x80u)
-        {
-            throw std::runtime_error("could not decode: invalid byte sequence");
-        }
-        for (uint8_t i = 0u; i < 6u; ++i)
-        {
-            uint8_t bit = b2 & 1u;
-            b2 = b2 >> 1u;
-            result = result | static_cast<uint32_t>(bit) << shift;
-            ++shift;
-        }
-        if ((b1 & 0xC0u) != 0x80u)
-        {
-            throw std::runtime_error("could not decode: invalid byte sequence");
-        }
-        for (uint8_t i = 0u; i < 6u; ++i)
-        {
-            uint8_t bit = b1 & 1u;
-            b1 = b1 >> 1u;
-            result = result | static_cast<uint32_t>(bit) << shift;
-            ++shift;
-        }
-        uint8_t b0 = x;
-        for (uint8_t i = 0u; i < 3u; ++i)
-        {
-            uint8_t bit = b0 & 1u;
-            b0 = b0 >> 1u;
-            result = result | static_cast<uint32_t>(bit) << shift;
-            ++shift;
-        }
-        return result;
-    }
-    else
-    {
-        throw std::runtime_error("could not decode: invalid byte sequence");
-    }
+    return result;
 }
 
 void BinaryReader::ReadUuid(boost::uuids::uuid& uuid)

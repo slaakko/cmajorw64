@@ -115,7 +115,7 @@ void SymbolTable::Write(SymbolWriter& writer)
         }
     }
     uint32_t na = exportedArrayTypes.size();
-    writer.GetBinaryWriter().WriteEncodedUInt(na);
+    writer.GetBinaryWriter().WriteULEB128UInt(na);
     for (ArrayTypeSymbol* exportedArrayType : exportedArrayTypes)
     {
         writer.Write(exportedArrayType);
@@ -130,7 +130,7 @@ void SymbolTable::Write(SymbolWriter& writer)
         }
     }
     uint32_t ned = exportedDerivedTypes.size();
-    writer.GetBinaryWriter().WriteEncodedUInt(ned);
+    writer.GetBinaryWriter().WriteULEB128UInt(ned);
     for (TypeSymbol* exportedDerivedType : exportedDerivedTypes)
     {
         writer.Write(exportedDerivedType);
@@ -144,13 +144,13 @@ void SymbolTable::Write(SymbolWriter& writer)
         }
     }
     uint32_t nec = exportedClassTemplateSpecializations.size();
-    writer.GetBinaryWriter().WriteEncodedUInt(nec);
+    writer.GetBinaryWriter().WriteULEB128UInt(nec);
     for (TypeSymbol* classTemplateSpecialization : exportedClassTemplateSpecializations)
     {
         writer.Write(classTemplateSpecialization);
     }
     uint32_t nj = jsonClasses.size();
-    writer.GetBinaryWriter().WriteEncodedUInt(nj);
+    writer.GetBinaryWriter().WriteULEB128UInt(nj);
     for (const std::u32string& jsonClass : jsonClasses)
     {
         writer.GetBinaryWriter().Write(jsonClass);
@@ -158,7 +158,7 @@ void SymbolTable::Write(SymbolWriter& writer)
     if (GetGlobalFlag(GlobalFlags::profile))
     {
         uint32_t n = profiledFunctionNameMap.size();
-        writer.GetBinaryWriter().Write(n);
+        writer.GetBinaryWriter().WriteULEB128UInt(n);
         for (const auto& p : profiledFunctionNameMap)
         {
             writer.GetBinaryWriter().Write(p.first);
@@ -172,26 +172,26 @@ void SymbolTable::Read(SymbolReader& reader)
     reader.SetSymbolTable(this);
     reader.GetAstReader().SetModuleId(reader.GetModule()->GetModuleId());
     globalNs.Read(reader);
-    uint32_t na = reader.GetBinaryReader().ReadEncodedUInt();
+    uint32_t na = reader.GetBinaryReader().ReadULEB128UInt();
     for (uint32_t i = 0; i < na; ++i)
     {
         ArrayTypeSymbol* arrayTypeSymbol = reader.ReadArrayTypeSymbol(&globalNs);
         arrayTypes.push_back(std::unique_ptr<ArrayTypeSymbol>(arrayTypeSymbol));
     }
-    uint32_t nd = reader.GetBinaryReader().ReadEncodedUInt();
+    uint32_t nd = reader.GetBinaryReader().ReadULEB128UInt();
     for (uint32_t i = 0; i < nd; ++i)
     {
         DerivedTypeSymbol* derivedTypeSymbol = reader.ReadDerivedTypeSymbol(&globalNs);
         derivedTypes.push_back(std::unique_ptr<DerivedTypeSymbol>(derivedTypeSymbol));
     }
-    uint32_t nc = reader.GetBinaryReader().ReadEncodedUInt();
+    uint32_t nc = reader.GetBinaryReader().ReadULEB128UInt();
     for (uint32_t i = 0; i < nc; ++i)
     {
         ClassTemplateSpecializationSymbol* classTemplateSpecialization = reader.ReadClassTemplateSpecializationSymbol(&globalNs);
         classTemplateSpecializations.push_back(std::unique_ptr<ClassTemplateSpecializationSymbol>(classTemplateSpecialization));
         reader.AddClassTemplateSpecialization(classTemplateSpecialization);
     }
-    uint32_t nj = reader.GetBinaryReader().ReadEncodedUInt();
+    uint32_t nj = reader.GetBinaryReader().ReadULEB128UInt();
     for (uint32_t i = 0; i < nj; ++i)
     {
         std::u32string jsonClass = reader.GetBinaryReader().ReadUtf32String();
@@ -199,7 +199,7 @@ void SymbolTable::Read(SymbolReader& reader)
     }
     if (GetGlobalFlag(GlobalFlags::profile))
     {
-        uint32_t n = reader.GetBinaryReader().ReadUInt();
+        uint32_t n = reader.GetBinaryReader().ReadULEB128UInt();
         for (uint32_t i = 0; i < n; ++i)
         {
             //uint32_t functionId = reader.GetBinaryReader().ReadUInt();
@@ -1664,7 +1664,7 @@ void CreateClassFile(const std::string& executableFilePath, SymbolTable& symbolT
         ++n;
     }
     BinaryWriter writer(classFilePath);
-    writer.WriteEncodedUInt(n);
+    writer.WriteULEB128UInt(n);
     for (ClassTypeSymbol* polymorphicClass : polymorphicClasses)
     {
         if (!polymorphicClass->IsVmtObjectCreated()) continue;
@@ -1683,7 +1683,7 @@ void CreateClassFile(const std::string& executableFilePath, SymbolTable& symbolT
     }
     const std::unordered_set<ClassTypeSymbol*>& classesHavingStaticConstructor = symbolTable.ClassesHavingStaticConstructor();
     uint32_t ns = classesHavingStaticConstructor.size();
-    writer.WriteEncodedUInt(ns);
+    writer.WriteULEB128UInt(ns);
     for (ClassTypeSymbol* classHavingStaticConstructor : classesHavingStaticConstructor)
     {
         //uint32_t typeId = classHavingStaticConstructor->TypeId();

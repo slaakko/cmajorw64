@@ -34,7 +34,7 @@ void ContainerSymbol::Write(SymbolWriter& writer)
         }
     }
     uint32_t n = uint32_t(exportSymbols.size());
-    writer.GetBinaryWriter().WriteEncodedUInt(n);
+    writer.GetBinaryWriter().WriteULEB128UInt(n);
     for (uint32_t i = 0; i < n; ++i)
     {
         writer.Write(exportSymbols[i]);
@@ -44,7 +44,7 @@ void ContainerSymbol::Write(SymbolWriter& writer)
 void ContainerSymbol::Read(SymbolReader& reader)
 {
     Symbol::Read(reader);
-    uint32_t n = reader.GetBinaryReader().ReadEncodedUInt();
+    uint32_t n = reader.GetBinaryReader().ReadULEB128UInt();
     for (uint32_t i = 0; i < n; ++i)
     {
         Symbol* symbol = reader.ReadSymbol(this);

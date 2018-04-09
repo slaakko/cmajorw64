@@ -36,7 +36,7 @@ public:
     void Write(AstWriter& writer)
     {
         uint32_t n = static_cast<uint32_t>(nodes.size());
-        writer.GetBinaryWriter().WriteEncodedUInt(n);
+        writer.GetBinaryWriter().WriteULEB128UInt(n);
         for (uint32_t i = 0; i < n; ++i)
         {
             writer.Write(nodes[i].get());
@@ -44,7 +44,7 @@ public:
     }
     void Read(AstReader& reader)
     {
-        uint32_t n = reader.GetBinaryReader().ReadEncodedUInt();
+        uint32_t n = reader.GetBinaryReader().ReadULEB128UInt();
         for (uint32_t i = 0; i < n; ++i)
         {
             Node* node = reader.ReadNode();
