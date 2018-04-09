@@ -352,16 +352,15 @@ void GenerateLibrary(Module* module, const std::vector<std::string>& objectFileP
     {
         args.push_back(QuotedPath(objectFilePaths[i]));
     }
-    std::string libCommandLine = "llvm-lib";
+    std::string libErrorFilePath = Path::Combine(Path::GetDirectoryName(libraryFilePath), "llvm-lib.error");
+    std::string libCommandLine = "cmfileredirector -2 " + libErrorFilePath + " llvm-lib";
     for (const std::string& arg : args)
     {
         libCommandLine.append(1, ' ').append(arg);
     }
-    std::string libErrorFilePath = Path::Combine(Path::GetDirectoryName(libraryFilePath), "llvm-lib.error");
-    int redirectHandle = 2; // stderr
     try
     {
-        System(libCommandLine, redirectHandle, libErrorFilePath);
+        System(libCommandLine);
         boost::filesystem::remove(boost::filesystem::path(libErrorFilePath));
     }
     catch (const std::exception& ex)
@@ -392,16 +391,16 @@ void GenerateLibrary(Module* module, const std::vector<std::string>& objectFileP
     {
         args.push_back(QuotedPath(objectFilePaths[i]));
     }
-    std::string libCommandLine = "ar q";
+    std::string libErrorFilePath = Path::Combine(Path::GetDirectoryName(libraryFilePath), "llvm-lib.error");
+    std::string libCommandLine = "cmfileredirector -2 " + libErrorFilePath + " ar q";
     for (const std::string& arg : args)
     {
         libCommandLine.append(1, ' ').append(arg);
     }
     std::string libErrorFilePath = Path::Combine(Path::GetDirectoryName(libraryFilePath), "ar.error");
-    int redirectHandle = 2; // stderr
     try
     {
-        System(libCommandLine, redirectHandle, libErrorFilePath);
+        System(libCommandLine);
         boost::filesystem::remove(boost::filesystem::path(libErrorFilePath));
     }
     catch (const std::exception& ex)
@@ -484,22 +483,21 @@ void Link(const std::string& executableFilePath, const std::string& libraryFileP
     std::string linkErrorFilePath;
     if (GetGlobalFlag(GlobalFlags::linkUsingMsLink))
     {
-        linkCommandLine = "link";
         linkErrorFilePath = Path::Combine(Path::GetDirectoryName(executableFilePath), "link.error");
+        linkCommandLine = "cmfileredirector -2 " + linkErrorFilePath + " link";
     }
     else
     {
-        linkCommandLine = "lld-link";
         linkErrorFilePath = Path::Combine(Path::GetDirectoryName(executableFilePath), "lld-link.error");
+        linkCommandLine = "cmfileredirector -2 " + linkErrorFilePath + " lld-link";
     }
     for (const std::string& arg : args)
     {
         linkCommandLine.append(1, ' ').append(arg);
     }
-    int redirectHandle = 2; // stderr
     try
     {
-        System(linkCommandLine, redirectHandle, linkErrorFilePath);
+        System(linkCommandLine);
         boost::filesystem::remove(boost::filesystem::path(linkErrorFilePath));
     }
     catch (const std::exception& ex)
@@ -585,16 +583,15 @@ void Link(const std::string& executableFilePath, const std::string& libraryFileP
     args.push_back("-o " + QuotedPath(executableFilePath));
     std::string linkCommandLine;
     std::string linkErrorFilePath;
-    linkCommandLine = "clang++";
     linkErrorFilePath = Path::Combine(Path::GetDirectoryName(executableFilePath), "clang++.error");
+    linkCommandLine = "cmfileredirector -2 " + linkErrorFilePath + " clang++";
     for (const std::string& arg : args)
     {
         linkCommandLine.append(1, ' ').append(arg);
     }
-    int redirectHandle = 2; // stderr
     try
     {
-        System(linkCommandLine, redirectHandle, linkErrorFilePath);
+        System(linkCommandLine);
         boost::filesystem::remove(boost::filesystem::path(linkErrorFilePath));
     }
     catch (const std::exception& ex)
@@ -901,8 +898,6 @@ void SetDefines(Module* module, const std::string& definesFilePath)
     }
 }
 
-std::mutex processWideLibGenMtx;
-
 void BuildProject(Project* project, std::unique_ptr<Module>& rootModule, bool& stop)
 {
     if (project->GetTarget() == Target::unitTest)
@@ -918,137 +913,138 @@ void BuildProject(Project* project, std::unique_ptr<Module>& rootModule, bool& s
     //ReadFunctionIdCounter(config); todo
     //ReadSystemFileIndex(config);
     rootModule.reset(new Module(project->Name(), project->ModuleFilePath()));
-    rootModule->SetLogStreamId(project->LogStreamId());
-    rootModule->SetCurrentProjectName(project->Name());
-    rootModule->SetCurrentToolName(U"cmc");
-    boost::filesystem::path libraryFilePath = project->LibraryFilePath();
-    boost::filesystem::path libDir = libraryFilePath.remove_filename();
-    std::string definesFilePath = GetFullPath((libDir / boost::filesystem::path("defines.txt")).generic_string());
-    SetDefines(rootModule.get(), definesFilePath);
-    /*/
-        if (module.IsSystemModule())
-        {
-            FileRegistry::Instance().PushObtainSystemFileIndeces();
-        }
-    */
-    std::vector<std::unique_ptr<CompileUnitNode>> compileUnits = ParseSources(rootModule.get(), project->SourceFilePaths(), stop);
-    /*
-        if (module.IsSystemModule())
-        {
-            FileRegistry::Instance().PopObtainSystemFileIndeces();
-        }
-    */
-    AttributeBinder attributeBinder(rootModule.get());
-    std::unique_ptr<ModuleBinder> moduleBinder;
-    if (!compileUnits.empty())
     {
-        moduleBinder.reset(new ModuleBinder(*rootModule, compileUnits[0].get(), &attributeBinder));
-    }
-    std::vector<ClassTypeSymbol*> classTypes;
-    std::vector<ClassTemplateSpecializationSymbol*> classTemplateSpecializations;
-    rootModule->PrepareForCompilation(project->References(), classTypes, classTemplateSpecializations);
-    cmajor::symbols::MetaInit(rootModule->GetSymbolTable());
-    CreateSymbols(rootModule->GetSymbolTable(), compileUnits, stop);
-    if (moduleBinder)
-    {
-        for (ClassTemplateSpecializationSymbol* classTemplateSpecialization : classTemplateSpecializations)
-        {
-            if (stop)
+        rootModule->SetLogStreamId(project->LogStreamId());
+        rootModule->SetCurrentProjectName(project->Name());
+        rootModule->SetCurrentToolName(U"cmc");
+        boost::filesystem::path libraryFilePath = project->LibraryFilePath();
+        boost::filesystem::path libDir = libraryFilePath.remove_filename();
+        std::string definesFilePath = GetFullPath((libDir / boost::filesystem::path("defines.txt")).generic_string());
+        SetDefines(rootModule.get(), definesFilePath);
+        /*/
+            if (module.IsSystemModule())
             {
-                return;
+                FileRegistry::Instance().PushObtainSystemFileIndeces();
             }
-            moduleBinder->BindClassTemplateSpecialization(classTemplateSpecialization);
-        }
-        for (ClassTypeSymbol* classType : classTypes)
-        {
-            if (stop)
+        */
+        std::vector<std::unique_ptr<CompileUnitNode>> compileUnits = ParseSources(rootModule.get(), project->SourceFilePaths(), stop);
+        /*
+            if (module.IsSystemModule())
             {
-                return;
+                FileRegistry::Instance().PopObtainSystemFileIndeces();
             }
-            classType->SetSpecialMemberFunctions();
-            classType->CreateLayouts();
+        */
+        AttributeBinder attributeBinder(rootModule.get());
+        std::unique_ptr<ModuleBinder> moduleBinder;
+        if (!compileUnits.empty())
+        {
+            moduleBinder.reset(new ModuleBinder(*rootModule, compileUnits[0].get(), &attributeBinder));
         }
-    }
-    std::vector<std::unique_ptr<BoundCompileUnit>> boundCompileUnits = BindTypes(*rootModule, compileUnits, &attributeBinder, stop);
-    if (stop)
-    {
-        return;
-    }
-    EmittingContext emittingContext;
-    std::vector<std::string> objectFilePaths;
-    if (GetGlobalFlag(GlobalFlags::verbose))
-    {
-        LogMessage(project->LogStreamId(), "Compiling...");
-    }
-    int32_t compileUnitIndex = 0;
-    for (std::unique_ptr<BoundCompileUnit>& boundCompileUnit : boundCompileUnits)
-    {
+        std::vector<ClassTypeSymbol*> classTypes;
+        std::vector<ClassTemplateSpecializationSymbol*> classTemplateSpecializations;
+        rootModule->PrepareForCompilation(project->References(), classTypes, classTemplateSpecializations);
+        cmajor::symbols::MetaInit(rootModule->GetSymbolTable());
+        CreateSymbols(rootModule->GetSymbolTable(), compileUnits, stop);
+        if (moduleBinder)
+        {
+            for (ClassTemplateSpecializationSymbol* classTemplateSpecialization : classTemplateSpecializations)
+            {
+                if (stop)
+                {
+                    return;
+                }
+                moduleBinder->BindClassTemplateSpecialization(classTemplateSpecialization);
+            }
+            for (ClassTypeSymbol* classType : classTypes)
+            {
+                if (stop)
+                {
+                    return;
+                }
+                classType->SetSpecialMemberFunctions();
+                classType->CreateLayouts();
+            }
+        }
+        std::vector<std::unique_ptr<BoundCompileUnit>> boundCompileUnits = BindTypes(*rootModule, compileUnits, &attributeBinder, stop);
         if (stop)
         {
             return;
         }
-        boundCompileUnit->SetCompileUnitIndex(compileUnitIndex);
+        EmittingContext emittingContext;
+        std::vector<std::string> objectFilePaths;
         if (GetGlobalFlag(GlobalFlags::verbose))
         {
-            LogMessage(project->LogStreamId(), "> " + boost::filesystem::path(boundCompileUnit->GetCompileUnitNode()->FilePath()).filename().generic_string());
+            LogMessage(project->LogStreamId(), "Compiling...");
         }
-        BindStatements(*boundCompileUnit);
-        if (boundCompileUnit->HasGotos())
+        int32_t compileUnitIndex = 0;
+        for (std::unique_ptr<BoundCompileUnit>& boundCompileUnit : boundCompileUnits)
         {
-            AnalyzeControlFlow(*boundCompileUnit);
+            if (stop)
+            {
+                return;
+            }
+            boundCompileUnit->SetCompileUnitIndex(compileUnitIndex);
+            if (GetGlobalFlag(GlobalFlags::verbose))
+            {
+                LogMessage(project->LogStreamId(), "> " + boost::filesystem::path(boundCompileUnit->GetCompileUnitNode()->FilePath()).filename().generic_string());
+            }
+            BindStatements(*boundCompileUnit);
+            if (boundCompileUnit->HasGotos())
+            {
+                AnalyzeControlFlow(*boundCompileUnit);
+            }
+            GenerateCode(emittingContext, *boundCompileUnit);
+            objectFilePaths.push_back(boundCompileUnit->ObjectFilePath());
+            boundCompileUnit.reset();
+            ++compileUnitIndex;
         }
-        GenerateCode(emittingContext, *boundCompileUnit);
-        objectFilePaths.push_back(boundCompileUnit->ObjectFilePath());
-        boundCompileUnit.reset();
-        ++compileUnitIndex;
-    }
-    if (project->GetTarget() == Target::program)
-    {
-        CheckMainFunctionSymbol(*rootModule);
-        if (!rootModule->GetSymbolTable().JsonClasses().empty())
+        if (project->GetTarget() == Target::program)
         {
-            CreateJsonRegistrationUnit(objectFilePaths, *rootModule, emittingContext, &attributeBinder);
+            CheckMainFunctionSymbol(*rootModule);
+            if (!rootModule->GetSymbolTable().JsonClasses().empty())
+            {
+                CreateJsonRegistrationUnit(objectFilePaths, *rootModule, emittingContext, &attributeBinder);
+            }
+            CreateMainUnit(objectFilePaths, *rootModule, emittingContext, &attributeBinder);
         }
-        CreateMainUnit(objectFilePaths, *rootModule, emittingContext, &attributeBinder);
-    }
-    std::lock_guard<std::mutex> lock(processWideLibGenMtx);
-    if (!objectFilePaths.empty())
-    {
-        GenerateLibrary(rootModule.get(), objectFilePaths, project->LibraryFilePath());
-    }
-    if (project->GetTarget() == Target::program)
-    {
-        Link(project->ExecutableFilePath(), project->LibraryFilePath(), rootModule->LibraryFilePaths(), *rootModule);
-        CreateClassFile(project->ExecutableFilePath(), rootModule->GetSymbolTable());
-    }
-    if (GetGlobalFlag(GlobalFlags::verbose))
-    {
-        LogMessage(project->LogStreamId(), "Writing module file...");
-    }
-    SymbolWriter writer(project->ModuleFilePath());
-    rootModule->Write(writer);
-    //WriteTypeIdCounter(config); todo
-    //WriteFunctionIdCounter(config); todo
-    /*
-    if (module.IsSystemModule())
-    {
-        WriteSystemFileIndex(config);
-    }
-    */
-    //WriteUserFiledIndexCounter(config);
-    if (GetGlobalFlag(GlobalFlags::verbose))
-    {
-        LogMessage(project->LogStreamId(), "==> " + project->ModuleFilePath());
-    }
-    if (GetGlobalFlag(GlobalFlags::verbose))
-    {
-        LogMessage(project->LogStreamId(), "Project '" + ToUtf8(project->Name()) + "' built successfully.");
-    }
-    project->SetModuleFilePath(rootModule->OriginalFilePath());
-    project->SetLibraryFilePath(rootModule->LibraryFilePath());
-    if (rootModule->IsSystemModule())
-    {
-        project->SetSystemProject();
+        if (!objectFilePaths.empty())
+        {
+            GenerateLibrary(rootModule.get(), objectFilePaths, project->LibraryFilePath());
+        }
+        if (project->GetTarget() == Target::program)
+        {
+            Link(project->ExecutableFilePath(), project->LibraryFilePath(), rootModule->LibraryFilePaths(), *rootModule);
+            CreateClassFile(project->ExecutableFilePath(), rootModule->GetSymbolTable());
+        }
+        if (GetGlobalFlag(GlobalFlags::verbose))
+        {
+            LogMessage(project->LogStreamId(), "Writing module file...");
+        }
+        SymbolWriter writer(project->ModuleFilePath());
+        rootModule->Write(writer);
+        //WriteTypeIdCounter(config); todo
+        //WriteFunctionIdCounter(config); todo
+        /*
+        if (module.IsSystemModule())
+        {
+            WriteSystemFileIndex(config);
+        }
+        */
+        //WriteUserFiledIndexCounter(config);
+        if (GetGlobalFlag(GlobalFlags::verbose))
+        {
+            LogMessage(project->LogStreamId(), "==> " + project->ModuleFilePath());
+        }
+        if (GetGlobalFlag(GlobalFlags::verbose))
+        {
+            LogMessage(project->LogStreamId(), "Project '" + ToUtf8(project->Name()) + "' built successfully.");
+        }
+        project->SetModuleFilePath(rootModule->OriginalFilePath());
+        project->SetLibraryFilePath(rootModule->LibraryFilePath());
+        if (rootModule->IsSystemModule())
+        {
+            project->SetSystemProject();
+        }
     }
     rootModule.reset();
 }

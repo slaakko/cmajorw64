@@ -27,19 +27,22 @@ namespace CmajorTasks
             {
                 n = ProjectReferences.Length;
             }
-            ModuleFilePaths = new ITaskItem[n];
+            string config = "debug";
+            if (Configuration == "Release")
+            {
+                config = "release";
+            }
+            ModuleFilePaths = new ITaskItem[n + 1];
+            string cmajorRoot = Environment.GetEnvironmentVariable("CMAJOR_ROOT");
+            string systemModuleFilePath = Path.GetFullPath(Path.Combine(Path.Combine(Path.Combine(Path.Combine(cmajorRoot, "system"), "lib"), config), "System.cmm"));
+            ModuleFilePaths[0] = new TaskItem(systemModuleFilePath);
             for (int i = 0; i < n; ++i)
             {
                 ITaskItem projectReferenceTaskITem = ProjectReferences[i];
                 string projectReferencePath = projectReferenceTaskITem.ItemSpec;
-                string config = "debug";
-                if (Configuration == "Release")
-                {
-                    config = "release";
-                }
                 string moduleFilePath = Path.GetFullPath(Path.Combine(Path.Combine(Path.Combine(Path.Combine(ProjectDir, Path.GetDirectoryName(projectReferencePath)), "lib"), config), 
                     Path.GetFileNameWithoutExtension(projectReferencePath) + ".cmm"));
-                ModuleFilePaths[i] = new TaskItem(moduleFilePath);
+                ModuleFilePaths[i + 1] = new TaskItem(moduleFilePath);
             }
             return true;
         }

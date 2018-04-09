@@ -24,6 +24,7 @@
 
 namespace cmajor { namespace util {
 
+
 ProcessFailure::ProcessFailure(const std::string& errorMessage_, int exitCode_) : std::runtime_error(errorMessage_), exitCode(exitCode_)
 {
 }

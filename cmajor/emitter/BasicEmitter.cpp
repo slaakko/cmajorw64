@@ -17,6 +17,7 @@
 #include <cmajor/util/TextUtils.hpp>
 #include <cmajor/util/Path.hpp>
 #include <cmajor/util/Util.hpp>
+#include <mutex>
 #include <fstream>
 
 namespace cmajor { namespace emitter {
