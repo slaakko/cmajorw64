@@ -2,20 +2,22 @@
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
  <PropertyGroup Label="Globals">
   <CustomProjectExtensionsPath>$(LocalAppData)\CustomProjectSystems\Cmajor\</CustomProjectExtensionsPath>
-  <ProjectGuid>9e910f51-e70b-4f15-bbba-c14c5885dc92</ProjectGuid>
+  <ProjectGuid>e0fee522-2e00-403a-b21c-edeedb52c958</ProjectGuid>
  </PropertyGroup>
  <PropertyGroup>
   <TargetType>library</TargetType>
  </PropertyGroup>
  <ItemGroup>
-  <CmCompile Include="XmlContentHandler.cm"/>
-  <CmCompile Include="XmlGrammar.cm"/>
-  <CmCompile Include="XmlParser.cm"/>
-  <CmCompile Include="XmlProcessor.cm"/>
+  <CmCompile Include="BasicType.cm"/>
+  <CmCompile Include="Expression.cm"/>
+  <CmCompile Include="Identifier.cm"/>
+  <CmCompile Include="Keyword.cm"/>
+  <CmCompile Include="Literal.cm"/>
+  <CmCompile Include="ParsingContext.cm"/>
+  <CmCompile Include="Statement.cm"/>
+  <CmCompile Include="TypeExpr.cm"/>
  </ItemGroup>
- <ItemGroup>
-  <ProjectReference Include="../System.Text.Parsing/System.Text.Parsing.cmproj"/>
- </ItemGroup>
+ <ItemGroup/>
  <Import Project="$(CustomProjectExtensionsPath)Cmajor.props"/>
  <Import Project="$(CustomProjectExtensionsPath)Cmajor.targets"/>
 </Project>

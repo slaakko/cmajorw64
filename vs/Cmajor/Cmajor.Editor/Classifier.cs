@@ -36,14 +36,49 @@ namespace Cmajor.Editor
             this.buffer = buffer;
             this.aggregator = aggregator;
             this.dictionary = new Dictionary<CmajorTokenType, IClassificationType>();
-            dictionary[CmajorTokenType.keyword] = typeService.GetClassificationType("keyword");
-            dictionary[CmajorTokenType.identifier] = typeService.GetClassificationType("identifier");
-            dictionary[CmajorTokenType.number] = typeService.GetClassificationType("number");
-            dictionary[CmajorTokenType.charLiteral] = typeService.GetClassificationType("char");
-            dictionary[CmajorTokenType.stringLiteral] = typeService.GetClassificationType("string");
-            dictionary[CmajorTokenType.comment] = typeService.GetClassificationType("comment");
-            dictionary[CmajorTokenType.preprocessingDirective] = typeService.GetClassificationType("preprocessor keyword");
-            dictionary[CmajorTokenType.whitespace] = typeService.GetClassificationType("whitespace");
+            IClassificationType keywordClassificationType = typeService.GetClassificationType("keyword");
+            if (keywordClassificationType == null)
+            {
+                throw new Exception("keyword classification type is null");
+            }
+            dictionary[CmajorTokenType.keyword] = keywordClassificationType;
+            IClassificationType identifierClassificationType = typeService.GetClassificationType("identifier");
+            if (identifierClassificationType == null)
+            {
+                throw new Exception("identifier classification type is null");
+            }
+            dictionary[CmajorTokenType.identifier] = identifierClassificationType;
+            IClassificationType numberClassificationType = typeService.GetClassificationType("number");
+            if (numberClassificationType == null)
+            {
+                throw new Exception("number classification type is null"); 
+            }
+            dictionary[CmajorTokenType.number] = numberClassificationType;
+            IClassificationType stringClassificationType = typeService.GetClassificationType("string"); 
+            if (stringClassificationType == null)
+            {
+                throw new Exception("string classification type is null");
+            }
+            dictionary[CmajorTokenType.charLiteral] = stringClassificationType;
+            dictionary[CmajorTokenType.stringLiteral] = stringClassificationType;
+            IClassificationType commentClassificationType = typeService.GetClassificationType("comment");
+            if (commentClassificationType == null)
+            {
+                throw new Exception("comment classification type is null");
+            }
+            dictionary[CmajorTokenType.comment] = commentClassificationType;
+            IClassificationType preprocessorKeywordClassificationType = typeService.GetClassificationType("preprocessor keyword");
+            if (preprocessorKeywordClassificationType == null)
+            {
+                throw new Exception("preprocessor keyword classification type is null");
+            }
+            dictionary[CmajorTokenType.preprocessingDirective] = preprocessorKeywordClassificationType;
+            IClassificationType whitespaceClassificationType = typeService.GetClassificationType("whitespace");
+            if (whitespaceClassificationType == null)
+            {
+                throw new Exception("whitespace classification type is null");
+            }
+            dictionary[CmajorTokenType.whitespace] = whitespaceClassificationType;
         }
         public event EventHandler<SnapshotSpanEventArgs> TagsChanged
         {
@@ -216,7 +251,7 @@ namespace Cmajor.Editor
                                 {
                                     yield return tagSpan;
                                 }
-                                GotoStartState(ref state, ref pos, ref index);
+                                state = 0;
                             }
                             break;
                         }
@@ -246,7 +281,7 @@ namespace Cmajor.Editor
                                 {
                                     yield return tagSpan;
                                 }
-                                GotoStartState(ref state, ref pos, ref index);
+                                state = 0;
                             }
                             break;
                         }
@@ -264,7 +299,7 @@ namespace Cmajor.Editor
                                 {
                                     yield return tagSpan;
                                 }
-                                GotoStartState(ref state, ref pos, ref index);
+                                state = 0;
                             }
                             break;
                         }
@@ -300,12 +335,12 @@ namespace Cmajor.Editor
                         {
                             if (c == '/')
                             {
-                                TagSpan<CmajorTokenTag> tagSpan = MakeComment(startPos, pos, span);
+                                TagSpan<CmajorTokenTag> tagSpan = MakeComment(startPos, pos + 1, span);
                                 if (tagSpan != null)
                                 {
                                     yield return tagSpan;
                                 }
-                                GotoStartState(ref state, ref pos, ref index);
+                                state = 0;
                             }
                             else if (c != '*')
                             {
@@ -464,7 +499,7 @@ namespace Cmajor.Editor
         }
         private TagSpan<CmajorTokenTag> MakeCharLiteral(int startPos, int pos, SnapshotSpan span)
         {
-            Span spn = new Span(startPos, pos - startPos);
+            Span spn = new Span(startPos, pos - startPos + 1);
             SnapshotSpan snapshotSpan = new SnapshotSpan(span.Snapshot, spn);
             if (snapshotSpan.IntersectsWith(span))
             {
@@ -477,7 +512,7 @@ namespace Cmajor.Editor
         }
         private TagSpan<CmajorTokenTag> MakeStringLiteral(int startPos, int pos, SnapshotSpan span)
         {
-            Span spn = new Span(startPos, pos - startPos);
+            Span spn = new Span(startPos, pos - startPos + 1);
             SnapshotSpan snapshotSpan = new SnapshotSpan(span.Snapshot, spn);
             if (snapshotSpan.IntersectsWith(span))
             {

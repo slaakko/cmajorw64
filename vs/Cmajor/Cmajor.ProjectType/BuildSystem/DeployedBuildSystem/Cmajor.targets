@@ -70,7 +70,7 @@
   </Target>
 
   <Target Name="ResolveModuleFilePaths">    
-    <ResolveModuleFilePath ProjectDir="$(MSBuildProjectDirectory)" Configuration="$(Configuration)" ProjectReferences="@(ProjectReference)">
+    <ResolveModuleFilePath ProjectName="$(MSBuildProjectName)" ProjectDir="$(MSBuildProjectDirectory)" Configuration="$(Configuration)" ProjectReferences="@(ProjectReference)">
       <Output TaskParameter="ModuleFilePaths" PropertyName="ResolvedModuleFilePaths"></Output>
     </ResolveModuleFilePath>
   </Target>
