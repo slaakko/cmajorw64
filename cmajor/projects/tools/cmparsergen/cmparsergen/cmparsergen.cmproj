@@ -2,7 +2,7 @@
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
  <PropertyGroup Label="Globals">
   <CustomProjectExtensionsPath>$(LocalAppData)\CustomProjectSystems\Cmajor\</CustomProjectExtensionsPath>
-  <ProjectGuid>c411e1a5-9ffd-438f-8d88-b6514df1cb61</ProjectGuid>
+  <ProjectGuid>e0813644-892a-47e5-8b9d-b6f3302eabe3</ProjectGuid>
  </PropertyGroup>
  <PropertyGroup>
   <TargetType>program</TargetType>
@@ -10,6 +10,7 @@
  <ItemGroup>
   <CmCompile Include="Main.cm"/>
  </ItemGroup>
+ <ItemGroup/>
  <ItemGroup>
   <ProjectReference Include="../code/Code.cmproj"/>
   <ProjectReference Include="../syntax/Syntax.cmproj"/>

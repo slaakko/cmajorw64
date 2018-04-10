@@ -2,7 +2,7 @@
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
  <PropertyGroup Label="Globals">
   <CustomProjectExtensionsPath>$(LocalAppData)\CustomProjectSystems\Cmajor\</CustomProjectExtensionsPath>
-  <ProjectGuid>349409eb-b5ef-410b-857f-3b485eb8703c</ProjectGuid>
+  <ProjectGuid>48be5214-1a6c-403a-9d32-a12b5559b7f2</ProjectGuid>
  </PropertyGroup>
  <PropertyGroup>
   <TargetType>library</TargetType>
@@ -17,6 +17,7 @@
   <CmCompile Include="TypeExpr.cm"/>
   <CmCompile Include="Visitor.cm"/>
  </ItemGroup>
+ <ItemGroup/>
  <ItemGroup>
   <ProjectReference Include="../System.Base/System.Base.cmproj"/>
  </ItemGroup>

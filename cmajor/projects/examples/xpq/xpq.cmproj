@@ -2,13 +2,16 @@
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
  <PropertyGroup Label="Globals">
   <CustomProjectExtensionsPath>$(LocalAppData)\CustomProjectSystems\Cmajor\</CustomProjectExtensionsPath>
-  <ProjectGuid>5cb3441a-b237-4b82-ac73-c0762ebf8fb6</ProjectGuid>
+  <ProjectGuid>5272c84a-efc7-483a-a0a0-0439f264e137</ProjectGuid>
  </PropertyGroup>
  <PropertyGroup>
   <TargetType>program</TargetType>
  </PropertyGroup>
  <ItemGroup>
   <CmCompile Include="main.cm"/>
+ </ItemGroup>
+ <ItemGroup>
+  <None Include="test.xml"/>
  </ItemGroup>
  <ItemGroup/>
  <Import Project="$(CustomProjectExtensionsPath)Cmajor.props"/>

@@ -2,7 +2,7 @@
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
  <PropertyGroup Label="Globals">
   <CustomProjectExtensionsPath>$(LocalAppData)\CustomProjectSystems\Cmajor\</CustomProjectExtensionsPath>
-  <ProjectGuid>3559e9a3-670b-4ae6-ac3d-a8173b7946ad</ProjectGuid>
+  <ProjectGuid>a3113857-79d8-440c-84a7-5abcf3a24d57</ProjectGuid>
  </PropertyGroup>
  <PropertyGroup>
   <TargetType>library</TargetType>
@@ -16,6 +16,11 @@
   <CmCompile Include="PtrNfa.cm"/>
   <CmCompile Include="RegEx.cm"/>
   <CmCompile Include="RegExGrammar.cm"/>
+ </ItemGroup>
+ <ItemGroup>
+  <None Include="RegExGrammar.parser"/>
+  <None Include="RegExGrammar.pl"/>
+  <None Include="RegExGrammar.pp"/>
  </ItemGroup>
  <ItemGroup>
   <ProjectReference Include="../System.Text.Parsing/System.Text.Parsing.cmproj"/>

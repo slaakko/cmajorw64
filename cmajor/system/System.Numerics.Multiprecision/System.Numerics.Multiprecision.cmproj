@@ -2,7 +2,7 @@
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
  <PropertyGroup Label="Globals">
   <CustomProjectExtensionsPath>$(LocalAppData)\CustomProjectSystems\Cmajor\</CustomProjectExtensionsPath>
-  <ProjectGuid>495efe90-ea7c-4555-8c95-ae2b798bfe97</ProjectGuid>
+  <ProjectGuid>e476af9a-86d0-4730-a6f7-6713cb37db31</ProjectGuid>
  </PropertyGroup>
  <PropertyGroup>
   <TargetType>library</TargetType>
@@ -12,6 +12,7 @@
   <CmCompile Include="BigInt.cm"/>
   <CmCompile Include="BigRational.cm"/>
  </ItemGroup>
+ <ItemGroup/>
  <ItemGroup>
   <ProjectReference Include="../System.Base/System.Base.cmproj"/>
  </ItemGroup>

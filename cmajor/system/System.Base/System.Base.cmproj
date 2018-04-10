@@ -2,7 +2,7 @@
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
  <PropertyGroup Label="Globals">
   <CustomProjectExtensionsPath>$(LocalAppData)\CustomProjectSystems\Cmajor\</CustomProjectExtensionsPath>
-  <ProjectGuid>0af85ae7-05dd-43c8-b3da-28e1908aacbc</ProjectGuid>
+  <ProjectGuid>b7313b9d-a276-4d00-8dd8-b0e7380b4160</ProjectGuid>
  </PropertyGroup>
  <PropertyGroup>
   <TargetType>library</TargetType>
@@ -62,6 +62,7 @@
   <CmCompile Include="UniquePtr.cm"/>
   <CmCompile Include="Utility.cm"/>
  </ItemGroup>
+ <ItemGroup/>
  <ItemGroup>
   <ProjectReference Include="../System.Runtime/System.Runtime.cmproj"/>
  </ItemGroup>

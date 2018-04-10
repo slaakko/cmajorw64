@@ -58,6 +58,14 @@ void ConvertProject(Project* project, const std::string& cmprojFilePath, const s
         compileItemGroupElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(compileElement.release()));
     }
     projectElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(compileItemGroupElement.release()));
+    std::unique_ptr<cmajor::dom::Element> textItemGroupElement(new cmajor::dom::Element(U"ItemGroup"));
+    for (const std::string& textFilePath : project->RelativeTextFilePaths())
+    {
+        std::unique_ptr<cmajor::dom::Element> textElement(new cmajor::dom::Element(U"None"));
+        textElement->SetAttribute(U"Include", ToUtf32(textFilePath));
+        textItemGroupElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(textElement.release()));
+    }
+    projectElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(textItemGroupElement.release()));
     std::unique_ptr<cmajor::dom::Element> referenceItemGroupElement(new cmajor::dom::Element(U"ItemGroup"));
     for (const std::string& referenceFilePath : project->RelativeReferencedProjectFilePaths())
     {

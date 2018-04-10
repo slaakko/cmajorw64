@@ -2,7 +2,7 @@
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
  <PropertyGroup Label="Globals">
   <CustomProjectExtensionsPath>$(LocalAppData)\CustomProjectSystems\Cmajor\</CustomProjectExtensionsPath>
-  <ProjectGuid>077cfad7-c8a4-4572-9543-03a91933a9cd</ProjectGuid>
+  <ProjectGuid>d5dd05c3-dd00-42eb-a21b-613610fdc530</ProjectGuid>
  </PropertyGroup>
  <PropertyGroup>
   <TargetType>program</TargetType>
@@ -10,6 +10,7 @@
  <ItemGroup>
   <CmCompile Include="Hello.cm"/>
  </ItemGroup>
+ <ItemGroup/>
  <ItemGroup/>
  <Import Project="$(CustomProjectExtensionsPath)Cmajor.props"/>
  <Import Project="$(CustomProjectExtensionsPath)Cmajor.targets"/>

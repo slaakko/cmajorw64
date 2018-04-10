@@ -2,7 +2,7 @@
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
  <PropertyGroup Label="Globals">
   <CustomProjectExtensionsPath>$(LocalAppData)\CustomProjectSystems\Cmajor\</CustomProjectExtensionsPath>
-  <ProjectGuid>08fab8cb-6b20-4359-9c2a-e2c5fa04cc88</ProjectGuid>
+  <ProjectGuid>0f6fd0e9-f859-4c87-b044-a62d00182f78</ProjectGuid>
  </PropertyGroup>
  <PropertyGroup>
   <TargetType>library</TargetType>
@@ -11,6 +11,7 @@
   <CmCompile Include="BZip2Stream.cm"/>
   <CmCompile Include="DeflateStream.cm"/>
  </ItemGroup>
+ <ItemGroup/>
  <ItemGroup>
   <ProjectReference Include="../System.Base/System.Base.cmproj"/>
  </ItemGroup>

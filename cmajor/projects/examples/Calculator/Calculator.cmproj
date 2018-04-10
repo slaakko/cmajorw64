@@ -2,7 +2,7 @@
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
  <PropertyGroup Label="Globals">
   <CustomProjectExtensionsPath>$(LocalAppData)\CustomProjectSystems\Cmajor\</CustomProjectExtensionsPath>
-  <ProjectGuid>e7e521d7-ef87-43f1-8ce6-45ce0eec3711</ProjectGuid>
+  <ProjectGuid>029d67cb-d18b-49cd-9d24-0a96532e872f</ProjectGuid>
  </PropertyGroup>
  <PropertyGroup>
   <TargetType>program</TargetType>
@@ -15,6 +15,7 @@
   <CmCompile Include="SymbolTable.cm"/>
   <CmCompile Include="Token.cm"/>
  </ItemGroup>
+ <ItemGroup/>
  <ItemGroup/>
  <Import Project="$(CustomProjectExtensionsPath)Cmajor.props"/>
  <Import Project="$(CustomProjectExtensionsPath)Cmajor.targets"/>

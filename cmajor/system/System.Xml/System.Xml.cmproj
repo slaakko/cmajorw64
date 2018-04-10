@@ -2,7 +2,7 @@
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
  <PropertyGroup Label="Globals">
   <CustomProjectExtensionsPath>$(LocalAppData)\CustomProjectSystems\Cmajor\</CustomProjectExtensionsPath>
-  <ProjectGuid>9e910f51-e70b-4f15-bbba-c14c5885dc92</ProjectGuid>
+  <ProjectGuid>89cfbabf-3334-4ac9-8f87-2f2460d68bbb</ProjectGuid>
  </PropertyGroup>
  <PropertyGroup>
   <TargetType>library</TargetType>
@@ -12,6 +12,11 @@
   <CmCompile Include="XmlGrammar.cm"/>
   <CmCompile Include="XmlParser.cm"/>
   <CmCompile Include="XmlProcessor.cm"/>
+ </ItemGroup>
+ <ItemGroup>
+  <None Include="XmlGrammar.parser"/>
+  <None Include="XmlGrammar.pl"/>
+  <None Include="XmlGrammar.pp"/>
  </ItemGroup>
  <ItemGroup>
   <ProjectReference Include="../System.Text.Parsing/System.Text.Parsing.cmproj"/>

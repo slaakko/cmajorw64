@@ -2,7 +2,7 @@
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
  <PropertyGroup Label="Globals">
   <CustomProjectExtensionsPath>$(LocalAppData)\CustomProjectSystems\Cmajor\</CustomProjectExtensionsPath>
-  <ProjectGuid>15aeae42-d732-4ff8-a7fa-2ad55f606a78</ProjectGuid>
+  <ProjectGuid>43da68dc-7673-4a83-a1f6-35e462e7ce78</ProjectGuid>
  </PropertyGroup>
  <PropertyGroup>
   <TargetType>library</TargetType>
@@ -17,6 +17,12 @@
   <CmCompile Include="MediaType.cm"/>
   <CmCompile Include="UriGrammar.cm"/>
   <CmCompile Include="UriReference.cm"/>
+ </ItemGroup>
+ <ItemGroup>
+  <None Include="HttpGrammar.parser"/>
+  <None Include="Parsers.pl"/>
+  <None Include="Parsers.pp"/>
+  <None Include="UriGrammar.parser"/>
  </ItemGroup>
  <ItemGroup>
   <ProjectReference Include="../System.Net.Sockets/System.Net.Sockets.cmproj"/>

@@ -193,6 +193,9 @@ void Project::ResolveDeclarations()
             }
             case ProjectDeclarationType::textFileDeclaration:
             {
+                TextFileDeclaration* textFileDeclaration = static_cast<TextFileDeclaration*>(declaration.get());
+                boost::filesystem::path tfp(textFileDeclaration->FilePath());
+                relativeTextFilePaths.push_back(tfp.generic_string());
                 break;
             }
             default:

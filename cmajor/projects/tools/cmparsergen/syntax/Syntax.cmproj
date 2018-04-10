@@ -2,7 +2,7 @@
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
  <PropertyGroup Label="Globals">
   <CustomProjectExtensionsPath>$(LocalAppData)\CustomProjectSystems\Cmajor\</CustomProjectExtensionsPath>
-  <ProjectGuid>7105d8f3-f26d-47b9-a772-e8b55ae90386</ProjectGuid>
+  <ProjectGuid>a7365ccf-b9eb-4c22-b0c1-eec658bd29e4</ProjectGuid>
  </PropertyGroup>
  <PropertyGroup>
   <TargetType>library</TargetType>
@@ -24,6 +24,19 @@
   <CmCompile Include="Project.cm"/>
   <CmCompile Include="ProjectFile.cm"/>
   <CmCompile Include="Rule.cm"/>
+ </ItemGroup>
+ <ItemGroup>
+  <None Include="Composite.parser"/>
+  <None Include="Element.parser"/>
+  <None Include="Grammar.parser"/>
+  <None Include="LibraryFile.parser"/>
+  <None Include="ParserFile.parser"/>
+  <None Include="Primary.parser"/>
+  <None Include="Primitive.parser"/>
+  <None Include="ProjectFile.parser"/>
+  <None Include="Rule.parser"/>
+  <None Include="Syntax.pl"/>
+  <None Include="Syntax.pp"/>
  </ItemGroup>
  <ItemGroup>
   <ProjectReference Include="../code/Code.cmproj"/>

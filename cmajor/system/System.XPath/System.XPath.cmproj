@@ -2,7 +2,7 @@
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
  <PropertyGroup Label="Globals">
   <CustomProjectExtensionsPath>$(LocalAppData)\CustomProjectSystems\Cmajor\</CustomProjectExtensionsPath>
-  <ProjectGuid>7c70ffb2-616a-4aec-9e7a-1bb6baffa7c2</ProjectGuid>
+  <ProjectGuid>277248ff-7c14-411f-bc08-4ddb1b4c2b92</ProjectGuid>
  </PropertyGroup>
  <PropertyGroup>
   <TargetType>library</TargetType>
@@ -15,6 +15,11 @@
   <CmCompile Include="XPathExpressionGrammar.cm"/>
   <CmCompile Include="XPathFunction.cm"/>
   <CmCompile Include="XPathObject.cm"/>
+ </ItemGroup>
+ <ItemGroup>
+  <None Include="XPathExpressionGrammar.parser"/>
+  <None Include="XPathExpressionGrammar.pl"/>
+  <None Include="XPathExpressionGrammar.pp"/>
  </ItemGroup>
  <ItemGroup>
   <ProjectReference Include="../System.Dom/System.Dom.cmproj"/>
