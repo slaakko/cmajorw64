@@ -66,6 +66,7 @@ SystemModuleSet::SystemModuleSet()
     systemModuleNames.insert(U"System.Text.RegularExpressions");
     systemModuleNames.insert(U"System.XPath");
     systemModuleNames.insert(U"System");
+    systemModuleNames.insert(U"System.Install");
 }
 
 bool SystemModuleSet::IsSystemModule(const std::u32string& moduleName) const
@@ -582,6 +583,7 @@ void Module::Import(const std::vector<std::string>& references, std::unordered_s
             importSet.insert(reference);
             std::unique_ptr<Module> referencedModule(new Module());
             referencedModule->SetRootModule(rootModule);
+            rootModule->allRefModules.push_back(referencedModule.get());
             std::string config = GetConfig();
             boost::filesystem::path mfn = boost::filesystem::path(reference).filename();
             boost::filesystem::path mfp;

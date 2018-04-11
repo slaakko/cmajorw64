@@ -87,6 +87,7 @@ public:
     const std::string& OriginalFilePath() const { return originalFilePath; }
     const std::string& FilePathReadFrom() const { return filePathReadFrom; }
     const std::string& LibraryFilePath() const { return libraryFilePath; }
+    const std::vector<Module*> AllReferencedModules() const { return allRefModules; }
     void PrepareForCompilation(const std::vector<std::string>& references, std::vector<ClassTypeSymbol*>& classTypes, 
         std::vector<ClassTemplateSpecializationSymbol*>& classTemplateSpecializations);
     SymbolTable& GetSymbolTable() { return symbolTable; }
@@ -140,6 +141,7 @@ private:
     std::vector<std::string> allExportedData;
     ModuleDependency moduleDependency;
     std::vector<std::unique_ptr<Module>> referencedModules;
+    std::vector<Module*> allRefModules;
     uint32_t symbolTablePos;
     SymbolTable symbolTable;
     std::string directoryPath;

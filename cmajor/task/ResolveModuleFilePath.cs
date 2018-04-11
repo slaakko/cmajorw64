@@ -28,6 +28,7 @@ namespace CmajorTasks
             systemModules.Add("System.Text.RegularExpressions");
             systemModules.Add("System.XPath");
             systemModules.Add("System");
+            systemModules.Add("System.Install");
         }
         public static bool Contains(string projectName)
         {

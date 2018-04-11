@@ -898,6 +898,48 @@ void SetDefines(Module* module, const std::string& definesFilePath)
     }
 }
 
+void InstallSystemLibraries(Module* systemInstallModule)
+{
+    if (GetGlobalFlag(GlobalFlags::verbose))
+    {
+        LogMessage(systemInstallModule->LogStreamId(), "Installing system libraries...");
+    }
+    boost::filesystem::path systemLibDir = CmajorSystemLibDir(GetConfig());
+    boost::filesystem::create_directories(systemLibDir);
+    for (Module* systemModule : systemInstallModule->AllReferencedModules())
+    {
+        boost::filesystem::path from = systemModule->OriginalFilePath();
+        boost::filesystem::path to = systemLibDir / from.filename();
+        if (boost::filesystem::exists(to))
+        {
+            boost::filesystem::remove(to);
+        }
+        boost::filesystem::copy(from, to);
+        if (GetGlobalFlag(GlobalFlags::verbose))
+        {
+            LogMessage(systemInstallModule->LogStreamId(), from.generic_string() + " -> " + to.generic_string());
+        }
+        if (!systemModule->LibraryFilePath().empty())
+        {
+            from = systemModule->LibraryFilePath();
+            to = systemLibDir / from.filename();
+            if (boost::filesystem::exists(to))
+            {
+                boost::filesystem::remove(to);
+            }
+            boost::filesystem::copy(from, to);
+            if (GetGlobalFlag(GlobalFlags::verbose))
+            {
+                LogMessage(systemInstallModule->LogStreamId(), from.generic_string() + " -> " + to.generic_string());
+            }
+        }
+    }
+    if (GetGlobalFlag(GlobalFlags::verbose))
+    {
+        LogMessage(systemInstallModule->LogStreamId(), "System libraries installed.");
+    }
+}
+
 void BuildProject(Project* project, std::unique_ptr<Module>& rootModule, bool& stop)
 {
     if (project->GetTarget() == Target::unitTest)
@@ -1044,6 +1086,10 @@ void BuildProject(Project* project, std::unique_ptr<Module>& rootModule, bool& s
         if (rootModule->IsSystemModule())
         {
             project->SetSystemProject();
+        }
+        if (rootModule->Name() == U"System.Install")
+        {
+            InstallSystemLibraries(rootModule.get());
         }
     }
     rootModule.reset();
@@ -1309,10 +1355,12 @@ void BuildSolution(const std::string& solutionFilePath, std::vector<std::unique_
         {
             std::rethrow_exception(buildData.exceptions.front());
         }
+/*
         if (isSystemSolution)
         {
             CopySystemFiles(buildOrder);
         }
+*/
     }
     if (GetGlobalFlag(GlobalFlags::verbose))
     {
