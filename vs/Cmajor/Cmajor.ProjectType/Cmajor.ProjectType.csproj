@@ -170,6 +170,7 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CmDebuggerLaunchProvider.cs" />
     <Compile Include="MyConfiguredProject.cs" />
     <Compile Include="MyUnconfiguredProject.cs" />
     <Compile Include="ProjectProperties.cs" />
@@ -246,6 +247,9 @@
     </XamlPropertyRule>
   </ItemGroup>
   <ItemGroup>
+    <XamlPropertyRule Include="BuildSystem\Rules\CmDebugger.xaml">
+      <SubType>Designer</SubType>
+    </XamlPropertyRule>
     <Page Include="BuildSystem\Rules\ProjectReference.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

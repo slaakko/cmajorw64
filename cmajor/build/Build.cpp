@@ -8,7 +8,6 @@
 #include <cmajor/parser/Project.hpp>
 #include <cmajor/parser/Solution.hpp>
 #include <cmajor/parser/CompileUnit.hpp>
-//#include <cmajor/parser/FileRegistry.hpp>
 #include <cmajor/parsing/Exception.hpp>
 #include <cmajor/binder/BoundCompileUnit.hpp>
 #include <cmajor/binder/BoundFunction.hpp>
@@ -243,38 +242,10 @@ std::vector<std::unique_ptr<CompileUnitNode>> ParseSourcesConcurrently(Module* m
     return compileUnits;
 }
 
-/*
-void ReadUserFileIndexCounter(const std::string& config)
-{
-    boost::filesystem::path userFileIndexCounterFile = Path::Combine(Path::Combine(CmajorRootDir(), "config"), "userFileIndexCounter." + config);
-    if (boost::filesystem::exists(userFileIndexCounterFile))
-    {
-        std::ifstream f(userFileIndexCounterFile.generic_string());
-        uint32_t nextUserFileIndex = 1;
-        f >> nextUserFileIndex;
-        FileRegistry::Instance().SetNextUserFileIndex(nextUserFileIndex);
-    }
-}
-
-void WriteUserFiledIndexCounter(const std::string& config)
-{
-    boost::filesystem::path userFileIndexCounterFile = Path::Combine(Path::Combine(CmajorRootDir(), "config"), "userFileIndexCounter." + config);
-    std::ofstream f(userFileIndexCounterFile.generic_string());
-    uint32_t nextUserFileIndex = FileRegistry::Instance().GetNextUserFileIndex();
-    f << nextUserFileIndex << std::endl;
-    if (!f)
-    {
-        throw std::runtime_error("could not write to " + userFileIndexCounterFile.generic_string());
-    }
-}
-*/
-
 std::vector<std::unique_ptr<CompileUnitNode>> ParseSources(Module* module, const std::vector<std::string>& sourceFilePaths, bool& stop)
 {
     try
     {
-        //FileRegistry::Instance().Clear();
-        //ReadUserFileIndexCounter(GetConfig());
         int numCores = std::thread::hardware_concurrency();
         if (numCores == 0 || sourceFilePaths.size() < numCores || GetGlobalFlag(GlobalFlags::debugParsing))
         {
@@ -629,71 +600,6 @@ void CleanProject(Project* project)
     }
 }
 
-/*
-void ReadTypeIdCounter(const std::string& config)
-{
-    boost::filesystem::path typeIdCounterFile = Path::Combine(Path::Combine(CmajorRootDir(), "config"), "typeIdCounter." + config);
-    if (boost::filesystem::exists(typeIdCounterFile))
-    {
-        std::ifstream f(typeIdCounterFile.generic_string());
-        int nextTypeId = 1;
-        f >> nextTypeId;
-        TypeIdCounter::Instance().SetNextTypeId(nextTypeId);
-    }
-}
-
-void WriteTypeIdCounter(const std::string& config)
-{
-    boost::filesystem::path typeIdCounterFile = Path::Combine(Path::Combine(CmajorRootDir(), "config"), "typeIdCounter." + config);
-    std::ofstream f(typeIdCounterFile.generic_string());
-    int nextTypeId = TypeIdCounter::Instance().GetNextTypeId();
-    f << nextTypeId << std::endl;
-    if (!f)
-    {
-        throw std::runtime_error("could not write to " + typeIdCounterFile.generic_string());
-    }
-}
-
-void ReadFunctionIdCounter(const std::string& config)
-{
-    boost::filesystem::path functionIdCounterFile = Path::Combine(Path::Combine(CmajorRootDir(), "config"), "functionIdCounter." + config);
-    if (boost::filesystem::exists(functionIdCounterFile))
-    {
-        std::ifstream f(functionIdCounterFile.generic_string());
-        int nextFunctionId = 1;
-        f >> nextFunctionId;
-        FunctionIdCounter::Instance().SetNextFunctionId(nextFunctionId);
-    }
-}
-
-void WriteFunctionIdCounter(const std::string& config)
-{
-    boost::filesystem::path functionIdCounterFile = Path::Combine(Path::Combine(CmajorRootDir(), "config"), "functionIdCounter." + config);
-    std::ofstream f(functionIdCounterFile.generic_string());
-    int nextFunctionId = FunctionIdCounter::Instance().GetNextFunctionId();
-    f << nextFunctionId << std::endl;
-    if (!f)
-    {
-        throw std::runtime_error("could not write to " + functionIdCounterFile.generic_string());
-    }
-}
-
-void ReadSystemFileIndex(const std::string& config)
-{
-    boost::filesystem::path systemFileIndexFile = Path::Combine(Path::Combine(CmajorRootDir(), "config"), "systemFileIndex." + config);
-    if (boost::filesystem::exists(systemFileIndexFile))
-    {
-        SystemFileIndex::Instance().Read(GetFullPath(systemFileIndexFile.generic_string()));
-    }
-}
-
-void WriteSystemFileIndex(const std::string& config)
-{
-    boost::filesystem::path systemFileIndexFile = Path::Combine(Path::Combine(CmajorRootDir(), "config"), "systemFileIndex." + config);
-    SystemFileIndex::Instance().Write(GetFullPath(systemFileIndexFile.generic_string()));
-}
-*/
-
 void CheckMainFunctionSymbol(Module& module)
 {
     FunctionSymbol* userMain = module.GetSymbolTable().MainFunctionSymbol();
@@ -951,9 +857,6 @@ void BuildProject(Project* project, std::unique_ptr<Module>& rootModule, bool& s
     {
         LogMessage(project->LogStreamId(), "===== Building project '" + ToUtf8(project->Name()) + "' (" + project->FilePath() + ") using " + config + " configuration.");
     }
-    //ReadTypeIdCounter(config); todo
-    //ReadFunctionIdCounter(config); todo
-    //ReadSystemFileIndex(config);
     rootModule.reset(new Module(project->Name(), project->ModuleFilePath()));
     {
         rootModule->SetLogStreamId(project->LogStreamId());
@@ -963,19 +866,7 @@ void BuildProject(Project* project, std::unique_ptr<Module>& rootModule, bool& s
         boost::filesystem::path libDir = libraryFilePath.remove_filename();
         std::string definesFilePath = GetFullPath((libDir / boost::filesystem::path("defines.txt")).generic_string());
         SetDefines(rootModule.get(), definesFilePath);
-        /*/
-            if (module.IsSystemModule())
-            {
-                FileRegistry::Instance().PushObtainSystemFileIndeces();
-            }
-        */
         std::vector<std::unique_ptr<CompileUnitNode>> compileUnits = ParseSources(rootModule.get(), project->SourceFilePaths(), stop);
-        /*
-            if (module.IsSystemModule())
-            {
-                FileRegistry::Instance().PopObtainSystemFileIndeces();
-            }
-        */
         AttributeBinder attributeBinder(rootModule.get());
         std::unique_ptr<ModuleBinder> moduleBinder;
         if (!compileUnits.empty())
@@ -1064,15 +955,6 @@ void BuildProject(Project* project, std::unique_ptr<Module>& rootModule, bool& s
         }
         SymbolWriter writer(project->ModuleFilePath());
         rootModule->Write(writer);
-        //WriteTypeIdCounter(config); todo
-        //WriteFunctionIdCounter(config); todo
-        /*
-        if (module.IsSystemModule())
-        {
-            WriteSystemFileIndex(config);
-        }
-        */
-        //WriteUserFiledIndexCounter(config);
         if (GetGlobalFlag(GlobalFlags::verbose))
         {
             LogMessage(project->LogStreamId(), "==> " + project->ModuleFilePath());
@@ -1116,32 +998,6 @@ void BuildProject(const std::string& projectFilePath, std::unique_ptr<Module>& r
     {
         bool stop = false;
         BuildProject(project.get(), rootModule, stop);
-    }
-}
-
-void CopySystemFiles(std::vector<Project*>& projects)
-{
-    boost::filesystem::path systemLibDir = CmajorSystemLibDir(GetConfig());
-    boost::filesystem::create_directories(systemLibDir);
-    for (Project* project : projects)
-    {
-        boost::filesystem::path from = project->ModuleFilePath();
-        boost::filesystem::path to = systemLibDir / from.filename();
-        if (boost::filesystem::exists(to))
-        {
-            boost::filesystem::remove(to);
-        }
-        boost::filesystem::copy(from, to);
-        if (!project->LibraryFilePath().empty())
-        {
-            from = project->LibraryFilePath();
-            to = systemLibDir / from.filename();
-            if (boost::filesystem::exists(to))
-            {
-                boost::filesystem::remove(to);
-            }
-            boost::filesystem::copy(from, to);
-        }
     }
 }
 
@@ -1355,12 +1211,6 @@ void BuildSolution(const std::string& solutionFilePath, std::vector<std::unique_
         {
             std::rethrow_exception(buildData.exceptions.front());
         }
-/*
-        if (isSystemSolution)
-        {
-            CopySystemFiles(buildOrder);
-        }
-*/
     }
     if (GetGlobalFlag(GlobalFlags::verbose))
     {

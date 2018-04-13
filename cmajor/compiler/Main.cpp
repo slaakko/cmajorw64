@@ -7,7 +7,6 @@
 #include <cmajor/parsing/InitDone.hpp>
 #include <cmajor/util/InitDone.hpp>
 #include <cmajor/build/Build.hpp>
-//#include <cmajor/parser/FileRegistry.hpp>
 #include <cmajor/symbols/Exception.hpp>
 #include <cmajor/symbols/InitDone.hpp>
 #include <cmajor/symbols/GlobalFlags.hpp>

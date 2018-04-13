@@ -23,7 +23,6 @@
 #include <cmajor/symbols/GlobalFlags.hpp>
 #include <cmajor/symbols/SymbolCreatorVisitor.hpp>
 #include <cmajor/parser/TypeExpr.hpp>
-//#include <cmajor/parser/FileRegistry.hpp>
 #include <cmajor/ast/Literal.hpp>
 #include <cmajor/ast/Identifier.hpp>
 #include <cmajor/ast/Expression.hpp>
@@ -528,7 +527,6 @@ void StatementBinder::Visit(CompoundStatementNode& compoundStatementNode)
             }
             if (profile)
             {
-                //uint32_t functionId = currentFunction->GetFunctionSymbol()->FunctionId();
                 boost::uuids::uuid functionId = currentFunction->GetFunctionSymbol()->FunctionId();
                 symbolTable.MapProfiledFunction(functionId, currentFunction->GetFunctionSymbol()->FullName());
                 ConstructionStatementNode constructFunctionProfiler(compoundStatementNode.GetSpan(), new IdentifierNode(compoundStatementNode.GetSpan(), U"System.Runtime.FunctionProfiler"),

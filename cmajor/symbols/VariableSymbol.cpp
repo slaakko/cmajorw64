@@ -10,7 +10,6 @@
 #include <cmajor/symbols/SymbolReader.hpp>
 #include <cmajor/symbols/Exception.hpp>
 #include <cmajor/symbols/SymbolCollector.hpp>
-//#include <cmajor/parser/FileRegistry.hpp>
 #include <cmajor/util/Unicode.hpp>
 
 namespace cmajor { namespace symbols {
@@ -30,7 +29,6 @@ void VariableSymbol::Write(SymbolWriter& writer)
 void VariableSymbol::Read(SymbolReader& reader)
 {
     Symbol::Read(reader);
-    //uint32_t typeId = reader.GetBinaryReader().ReadUInt();
     boost::uuids::uuid typeId;
     reader.GetBinaryReader().ReadUuid(typeId);
     GetSymbolTable()->EmplaceTypeRequest(this, typeId, 0);

@@ -1,6 +1,5 @@
 #include <cmajor/ast/InitDone.hpp>
 #include <cmajor/ast/SourceToken.hpp>
-//#include <cmajor/parser/FileRegistry.hpp>
 #include <cmajor/parser/SourceToken.hpp>
 #include <cmajor/parsing/InitDone.hpp>
 #include <cmajor/util/InitDone.hpp>
@@ -23,7 +22,6 @@ struct InitDone
     InitDone()
     {
         cmajor::ast::Init();
-        //cmajor::parser::FileRegistry::Init();
         cmajor::parsing::Init();
         cmajor::util::Init();
     }

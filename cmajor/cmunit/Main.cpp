@@ -21,7 +21,6 @@
 #include <cmajor/build/Build.hpp>
 #include <cmajor/emitter/Emitter.hpp>
 #include <cmajor/build/Build.hpp>
-//#include <cmajor/parser/FileRegistry.hpp>
 #include <cmajor/parser/Project.hpp>
 #include <cmajor/parser/Solution.hpp>
 #include <cmajor/parser/CompileUnit.hpp>
@@ -46,7 +45,6 @@ struct InitDone
     InitDone()
     {
         cmajor::ast::Init();
-        //cmajor::parser::FileRegistry::Init();
         cmajor::symbols::Init();
         cmajor::parsing::Init();
         cmajor::util::Init();
@@ -229,9 +227,6 @@ void TestUnit(FileTable* fileTable, Project* project, CompileUnitNode* testUnit,
     try
     {
         std::string config = GetConfig();
-        //ReadTypeIdCounter(config); todo
-        //ReadFunctionIdCounter(config); todo
-        //ReadSystemFileIndex(config);
         rootModule.reset(new Module(project->Name(), project->ModuleFilePath()));
         rootModule->SetCurrentToolName(U"cmc");
         rootModule->SetCurrentProjectName(project->Name());
@@ -275,8 +270,6 @@ void TestUnit(FileTable* fileTable, Project* project, CompileUnitNode* testUnit,
         GenerateLibrary(rootModule.get(), objectFilePaths, project->LibraryFilePath());
         Link(project->ExecutableFilePath(), project->LibraryFilePath(), rootModule->LibraryFilePaths(), *rootModule);
         CreateClassFile(project->ExecutableFilePath(), rootModule->GetSymbolTable());
-        // WriteTypeIdCounter(config); todo
-        // WriteFunctionIdCounter(config); todo
         boost::filesystem::remove(unitTestFilePath);
         if (GetGlobalFlag(GlobalFlags::verbose))
         {
@@ -369,8 +362,6 @@ std::vector<std::pair<std::unique_ptr<CompileUnitNode>, std::string>> SplitIntoT
 void TestSourceFile(bool& first, Project* project, const std::string& sourceFilePath, const std::string& onlyTest, cmajor::dom::Element* projectElement, 
     std::unique_ptr<Module>& rootModule)
 {
-    //FileRegistry::Instance().Clear();
-    //ReadUserFileIndexCounter(GetConfig());
     std::unique_ptr<cmajor::dom::Element> sourceFileElement(new cmajor::dom::Element(U"sourceFile"));
     sourceFileElement->SetAttribute(U"name", ToUtf32(Path::GetFileNameWithoutExtension(sourceFilePath)));
     if (!compileUnitGrammar)
@@ -378,7 +369,6 @@ void TestSourceFile(bool& first, Project* project, const std::string& sourceFile
         compileUnitGrammar = CompileUnitGrammar::Create();
     }
     MappedInputFile sourceFile(sourceFilePath);
-    //uint32_t fileIndex = FileRegistry::Instance().RegisterNewFile(sourceFilePath);
     FileTable fileTable;
     uint32_t fileIndex = fileTable.RegisterFilePath(sourceFilePath);
     ParsingContext parsingContext;

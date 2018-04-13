@@ -8,7 +8,7 @@
     <Platform Condition=" '$(Platform)' == 'AnyCPU' ">x64</Platform>
     <TargetType Condition=" '$(TargetType)' == '' ">program</TargetType>
     
-    <DebuggerFlavor>ScriptDebugger</DebuggerFlavor>
+    <DebuggerFlavor>CmDebugger</DebuggerFlavor>
     <RunCommand>$(WinDir)\System32\cscript.exe</RunCommand>
     <RunWorkingDirectory>$(MSBuildProjectDirectory)</RunWorkingDirectory>
     <StartItem>Start.cm</StartItem>

@@ -11,7 +11,6 @@
 #include <cmajor/symbols/GlobalFlags.hpp>
 #include <cmajor/symbols/InterfaceTypeSymbol.hpp>
 #include <cmajor/symbols/SymbolCollector.hpp>
-//#include <cmajor/parser/FileRegistry.hpp>
 #include <cmajor/util/Unicode.hpp>
 #include <cmajor/util/System.hpp>
 #include <cmajor/util/TextUtils.hpp>

@@ -9,7 +9,6 @@
 #include <cmajor/symbols/SymbolReader.hpp>
 #include <cmajor/symbols/Exception.hpp>
 #include <cmajor/symbols/SymbolCollector.hpp>
-//#include <cmajor/parser/FileRegistry.hpp>
 #include <cmajor/util/Unicode.hpp>
 #include <boost/uuid/uuid_io.hpp>
 
@@ -30,7 +29,6 @@ void EnumTypeSymbol::Write(SymbolWriter& writer)
 void EnumTypeSymbol::Read(SymbolReader& reader)
 {
     TypeSymbol::Read(reader);
-    //uint32_t underlyingTypeId = reader.GetBinaryReader().ReadUInt();
     boost::uuids::uuid underlyingTypeId;
     reader.GetBinaryReader().ReadUuid(underlyingTypeId);
     GetSymbolTable()->EmplaceTypeRequest(this, underlyingTypeId, 0);
@@ -73,7 +71,6 @@ void EnumTypeSymbol::Dump(CodeFormatter& formatter)
     formatter.WriteLine(ToUtf8(Name()));
     formatter.WriteLine("full name: " + ToUtf8(FullNameWithSpecifiers()));
     formatter.WriteLine("underlying type: " + ToUtf8(underlyingType->FullName()));
-    //formatter.WriteLine("typeid: " + std::to_string(TypeId()));
     formatter.WriteLine("typeid: " + boost::uuids::to_string(TypeId()));
     formatter.WriteLine("enumeration constants:");
     formatter.IncIndent();
@@ -271,7 +268,6 @@ void EnumTypeDefaultConstructor::Write(SymbolWriter& writer)
 {
     FunctionSymbol::Write(writer);
     Assert(underlyingTypeDefaultConstructor, "underlying default constructor not set");
-    //uint32_t defaultConstructorId = underlyingTypeDefaultConstructor->FunctionId();
     const boost::uuids::uuid& defaultConstructorId = underlyingTypeDefaultConstructor->FunctionId();
     writer.GetBinaryWriter().Write(defaultConstructorId);
 }
@@ -279,7 +275,6 @@ void EnumTypeDefaultConstructor::Write(SymbolWriter& writer)
 void EnumTypeDefaultConstructor::Read(SymbolReader& reader)
 {
     FunctionSymbol::Read(reader);
-    //uint32_t defaultConstructorId = reader.GetBinaryReader().ReadUInt();
     boost::uuids::uuid defaultConstructorId;
     reader.GetBinaryReader().ReadUuid(defaultConstructorId);
     GetSymbolTable()->EmplaceFunctionRequest(this, defaultConstructorId, 0);
@@ -330,7 +325,6 @@ void EnumTypeCopyConstructor::Write(SymbolWriter& writer)
 {
     FunctionSymbol::Write(writer);
     Assert(underlyingTypeCopyConstructor, "underlying copy constructor not set");
-    //uint32_t copyConstructorId = underlyingTypeCopyConstructor->FunctionId();
     const boost::uuids::uuid& copyConstructorId = underlyingTypeCopyConstructor->FunctionId();
     writer.GetBinaryWriter().Write(copyConstructorId);
 }
@@ -338,7 +332,6 @@ void EnumTypeCopyConstructor::Write(SymbolWriter& writer)
 void EnumTypeCopyConstructor::Read(SymbolReader& reader)
 {
     FunctionSymbol::Read(reader);
-    //uint32_t copyConstructorId = reader.GetBinaryReader().ReadUInt();
     boost::uuids::uuid copyConstructorId;
     reader.GetBinaryReader().ReadUuid(copyConstructorId);
     GetSymbolTable()->EmplaceFunctionRequest(this, copyConstructorId, 0);
@@ -389,7 +382,6 @@ void EnumTypeMoveConstructor::Write(SymbolWriter& writer)
 {
     FunctionSymbol::Write(writer);
     Assert(underlyingTypeMoveConstructor, "underlying move constructor not set");
-    //uint32_t moveConstructorId = underlyingTypeMoveConstructor->FunctionId();
     const boost::uuids::uuid& moveConstructorId = underlyingTypeMoveConstructor->FunctionId();
     writer.GetBinaryWriter().Write(moveConstructorId);
 }
@@ -397,7 +389,6 @@ void EnumTypeMoveConstructor::Write(SymbolWriter& writer)
 void EnumTypeMoveConstructor::Read(SymbolReader& reader)
 {
     FunctionSymbol::Read(reader);
-    //uint32_t moveConstructorId = reader.GetBinaryReader().ReadUInt();
     boost::uuids::uuid moveConstructorId;
     reader.GetBinaryReader().ReadUuid(moveConstructorId);
     GetSymbolTable()->EmplaceFunctionRequest(this, moveConstructorId, 0);
@@ -449,7 +440,6 @@ void EnumTypeCopyAssignment::Write(SymbolWriter& writer)
 {
     FunctionSymbol::Write(writer);
     Assert(underlyingTypeCopyAssignment, "underlying copy assignment not set");
-    //uint32_t copyAssignmentId = underlyingTypeCopyAssignment->FunctionId();
     const boost::uuids::uuid& copyAssignmentId = underlyingTypeCopyAssignment->FunctionId();
     writer.GetBinaryWriter().Write(copyAssignmentId);
 }
@@ -457,7 +447,6 @@ void EnumTypeCopyAssignment::Write(SymbolWriter& writer)
 void EnumTypeCopyAssignment::Read(SymbolReader& reader)
 {
     FunctionSymbol::Read(reader);
-    //uint32_t copyAssignmentId = reader.GetBinaryReader().ReadUInt();
     boost::uuids::uuid copyAssignmentId;
     reader.GetBinaryReader().ReadUuid(copyAssignmentId);
     GetSymbolTable()->EmplaceFunctionRequest(this, copyAssignmentId, 0);
@@ -509,7 +498,6 @@ void EnumTypeMoveAssignment::Write(SymbolWriter& writer)
 {
     FunctionSymbol::Write(writer);
     Assert(underlyingTypeMoveAssignment, "underlying move assignment not set");
-    //uint32_t moveAssignmentId = underlyingTypeMoveAssignment->FunctionId();
     const boost::uuids::uuid& moveAssignmentId = underlyingTypeMoveAssignment->FunctionId();
     writer.GetBinaryWriter().Write(moveAssignmentId);
 }
@@ -517,7 +505,6 @@ void EnumTypeMoveAssignment::Write(SymbolWriter& writer)
 void EnumTypeMoveAssignment::Read(SymbolReader& reader)
 {
     FunctionSymbol::Read(reader);
-    //uint32_t moveAssignmentId = reader.GetBinaryReader().ReadUInt();
     boost::uuids::uuid moveAssignmentId;
     reader.GetBinaryReader().ReadUuid(moveAssignmentId);
     GetSymbolTable()->EmplaceFunctionRequest(this, moveAssignmentId, 0);
@@ -566,7 +553,6 @@ void EnumTypeReturn::Write(SymbolWriter& writer)
 {
     FunctionSymbol::Write(writer);
     Assert(underlyingTypeReturn, "underlying return not set");
-    //uint32_t returnId = underlyingTypeReturn->FunctionId();
     const boost::uuids::uuid& returnId = underlyingTypeReturn->FunctionId();
     writer.GetBinaryWriter().Write(returnId);
 }
@@ -574,7 +560,6 @@ void EnumTypeReturn::Write(SymbolWriter& writer)
 void EnumTypeReturn::Read(SymbolReader& reader)
 {
     FunctionSymbol::Read(reader);
-    //uint32_t returnId = reader.GetBinaryReader().ReadUInt();
     boost::uuids::uuid returnId;
     reader.GetBinaryReader().ReadUuid(returnId);
     GetSymbolTable()->EmplaceFunctionRequest(this, returnId, 0);
@@ -626,7 +611,6 @@ void EnumTypeEqualityOp::Write(SymbolWriter& writer)
 {
     FunctionSymbol::Write(writer);
     Assert(underlyingTypeEquality, "underlying equality not set");
-    //uint32_t equalityId = underlyingTypeEquality->FunctionId();
     const boost::uuids::uuid& equalityId = underlyingTypeEquality->FunctionId();
     writer.GetBinaryWriter().Write(equalityId);
 }
@@ -634,7 +618,6 @@ void EnumTypeEqualityOp::Write(SymbolWriter& writer)
 void EnumTypeEqualityOp::Read(SymbolReader& reader)
 {
     FunctionSymbol::Read(reader);
-    //uint32_t equalityId = reader.GetBinaryReader().ReadUInt();
     boost::uuids::uuid equalityId;
     reader.GetBinaryReader().ReadUuid(equalityId);
     GetSymbolTable()->EmplaceFunctionRequest(this, equalityId, 0);
@@ -679,11 +662,9 @@ void EnumTypeToUnderlyingTypeConversion::Write(SymbolWriter& writer)
 void EnumTypeToUnderlyingTypeConversion::Read(SymbolReader& reader)
 {
     FunctionSymbol::Read(reader);
-    //uint32_t sourceTypeId = reader.GetBinaryReader().ReadUInt();
     boost::uuids::uuid sourceTypeId;
     reader.GetBinaryReader().ReadUuid(sourceTypeId);
     GetSymbolTable()->EmplaceTypeRequest(this, sourceTypeId, 1);
-    //uint32_t targetTypeId = reader.GetBinaryReader().ReadUInt();
     boost::uuids::uuid targetTypeId;
     reader.GetBinaryReader().ReadUuid(targetTypeId);
     GetSymbolTable()->EmplaceTypeRequest(this, targetTypeId, 2);
@@ -730,11 +711,9 @@ void UnderlyingTypeToEnumTypeConversion::Write(SymbolWriter& writer)
 void UnderlyingTypeToEnumTypeConversion::Read(SymbolReader& reader)
 {
     FunctionSymbol::Read(reader);
-    //uint32_t sourceTypeId = reader.GetBinaryReader().ReadUInt();
     boost::uuids::uuid sourceTypeId;
     reader.GetBinaryReader().ReadUuid(sourceTypeId);
     GetSymbolTable()->EmplaceTypeRequest(this, sourceTypeId, 1);
-    //uint32_t targetTypeId = reader.GetBinaryReader().ReadUInt();
     boost::uuids::uuid targetTypeId;
     reader.GetBinaryReader().ReadUuid(targetTypeId);
     GetSymbolTable()->EmplaceTypeRequest(this, targetTypeId, 2);

@@ -9,7 +9,6 @@
 #include <cmajor/symbols/GlobalFlags.hpp>
 #include <cmajor/symbols/SymbolCollector.hpp>
 #include <cmajor/symbols/Warning.hpp>
-//#include <cmajor/parser/FileRegistry.hpp>
 #include <cmajor/ast/Project.hpp>
 #include <cmajor/ast/AstReader.hpp>
 #include <cmajor/util/CodeFormatter.hpp>

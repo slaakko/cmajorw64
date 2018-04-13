@@ -6,7 +6,6 @@
 #include <cmajor/symbols/Exception.hpp>
 #include <cmajor/symbols/GlobalFlags.hpp>
 #include <cmajor/symbols/Module.hpp>
-//#include <cmajor/parser/FileRegistry.hpp>
 #include <cmajor/parsing/Exception.hpp>
 #include <cmajor/dom/CharacterData.hpp>
 #include <cmajor/util/MappedInputFile.hpp>

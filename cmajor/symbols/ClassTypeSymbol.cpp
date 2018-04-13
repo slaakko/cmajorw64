@@ -14,7 +14,6 @@
 #include <cmajor/symbols/TemplateSymbol.hpp>
 #include <cmajor/symbols/Module.hpp>
 #include <cmajor/symbols/SymbolCollector.hpp>
-//#include <cmajor/parser/FileRegistry.hpp>
 #include <cmajor/util/Unicode.hpp>
 #include <cmajor/util/Sha1.hpp>
 #include <llvm/IR/Module.h>
@@ -127,7 +126,6 @@ void ClassTypeSymbol::Write(SymbolWriter& writer)
         for (uint32_t i = 0; i < n; ++i)
         {
             InterfaceTypeSymbol* intf = implementedInterfaces[i];
-            //uint32_t intfTypeId = intf->TypeId();
             const boost::uuids::uuid& intfTypeId = intf->TypeId();
             writer.GetBinaryWriter().Write(intfTypeId);
         }
@@ -163,7 +161,6 @@ void ClassTypeSymbol::Read(SymbolReader& reader)
         bool hasPrototype = reader.GetBinaryReader().ReadBool();
         if (hasPrototype)
         {
-            //uint32_t prototypeId = reader.GetBinaryReader().ReadUInt();
             boost::uuids::uuid prototypeId;
             reader.GetBinaryReader().ReadUuid(prototypeId);
             GetSymbolTable()->EmplaceTypeRequest(this, prototypeId, 1000000);
@@ -171,7 +168,6 @@ void ClassTypeSymbol::Read(SymbolReader& reader)
     }
     else if (GetSymbolType() == SymbolType::classTypeSymbol)
     {
-        //uint32_t baseClassId = reader.GetBinaryReader().ReadUInt();
         boost::uuids::uuid baseClassId;
         reader.GetBinaryReader().ReadUuid(baseClassId);
         if (!baseClassId.is_nil())
@@ -182,7 +178,6 @@ void ClassTypeSymbol::Read(SymbolReader& reader)
         implementedInterfaces.resize(n);
         for (uint32_t i = 0; i < n; ++i)
         {
-            //uint32_t intfTypeId = reader.GetBinaryReader().ReadUInt();
             boost::uuids::uuid intfTypeId;
             reader.GetBinaryReader().ReadUuid(intfTypeId);
             GetSymbolTable()->EmplaceTypeRequest(this, intfTypeId, 1 + i);
@@ -419,7 +414,6 @@ void ClassTypeSymbol::Dump(CodeFormatter& formatter)
     {
         formatter.WriteLine("constraint: " + constraint->ToString());
     }
-    //formatter.WriteLine("typeid: " + std::to_string(TypeId()));
     formatter.WriteLine("typeid: " + boost::uuids::to_string(TypeId()));
     if (IsPolymorphic())
     {

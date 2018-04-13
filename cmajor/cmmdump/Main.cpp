@@ -12,7 +12,6 @@
 #include <cmajor/symbols/Exception.hpp>
 #include <cmajor/symbols/Module.hpp>
 #include <cmajor/symbols/GlobalFlags.hpp>
-//#include <cmajor/parser/FileRegistry.hpp>
 #include <boost/filesystem.hpp>
 #include <iostream>
 #include <stdexcept>
@@ -22,7 +21,6 @@ struct InitDone
     InitDone()
     {
         cmajor::ast::Init();
-        //cmajor::parser::FileRegistry::Init();
         cmajor::symbols::Init();
         cmajor::parsing::Init();
         cmajor::util::Init();

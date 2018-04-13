@@ -16,7 +16,6 @@
 #include <cmajor/symbols/InitDone.hpp>
 #include <cmajor/symbols/Exception.hpp>
 #include <cmajor/symbols/GlobalFlags.hpp>
-//#include <cmajor/parser/FileRegistry.hpp>
 #include <cmajor/dom/Parser.hpp>
 #include <cmajor/dom/Element.hpp>
 #include <cmajor/dom/CharacterData.hpp>
@@ -38,7 +37,6 @@ struct InitDone
     InitDone()
     {
         cmajor::ast::Init();
-        //cmajor::parser::FileRegistry::Init();
         cmajor::symbols::Init();
         cmajor::parsing::Init();
         cmajor::util::Init();
@@ -86,7 +84,6 @@ inline Report operator&(Report left, Report right)
 struct ProfiledFunction
 {
     ProfiledFunction() : functionId(boost::uuids::nil_generator()()), functionName(), recursionCount(0), count(0), elapsedInclusive(0), elapsedExclusive(0), start(), childCalled(false) {}
-    //uint32_t functionId;
     boost::uuids::uuid functionId;
     std::u32string functionName;
     int recursionCount;
@@ -523,8 +520,6 @@ std::unique_ptr<cmajor::dom::Document> GenerateReport(Module& module, std::vecto
 const uint8_t startEvent = 0;
 const uint8_t endEvent = 1;
 
-//std::unique_ptr<cmajor::dom::Document> AnalyzeProfileData(const std::string& profileDataFileName, Module& module, 
-    //std::unordered_map<uint32_t, ProfiledFunction>& functionProfileMap, std::vector<ProfiledFunction*>& profiledFunctions, int64_t& totalInclusive, int64_t& totalExclusive)
 std::unique_ptr<cmajor::dom::Document> AnalyzeProfileData(const std::string& profileDataFileName, Module& module,
     std::unordered_map<boost::uuids::uuid, ProfiledFunction, boost::hash<boost::uuids::uuid>>& functionProfileMap, std::vector<ProfiledFunction*>& profiledFunctions, int64_t& totalInclusive, int64_t& totalExclusive)
 {
@@ -538,7 +533,6 @@ std::unique_ptr<cmajor::dom::Document> AnalyzeProfileData(const std::string& pro
     uint64_t n = reader.ReadULong();
     for (uint64_t i = 0; i < n; ++i)
     {
-        //uint32_t functionId = reader.ReadUInt();
         boost::uuids::uuid functionId;
         reader.ReadUuid(functionId);
         uint64_t timePointCount = reader.ReadULong();
@@ -618,7 +612,6 @@ std::unique_ptr<cmajor::dom::Document> AnalyzeProfileData(const std::string& pro
     for (ProfiledFunction* fun : profiledFunctions)
     {
         cmajor::dom::Element* functionElement = new cmajor::dom::Element(U"function");
-        //functionElement->SetAttribute(U"id", ToUtf32(std::to_string(fun->functionId)));
         functionElement->SetAttribute(U"id", ToUtf32(boost::uuids::to_string(fun->functionId)));
         functionElement->SetAttribute(U"name", fun->functionName);
         functionElement->SetAttribute(U"count", ToUtf32(std::to_string(fun->count)));
@@ -771,7 +764,6 @@ void ProfileProject(const std::string& projectFilePath, bool rebuildSys, bool re
     {
         std::cout << "Analyzing profile data..." << std::endl;
     }
-    //std::unordered_map<uint32_t, ProfiledFunction> functionProfileMap;
     std::unordered_map<boost::uuids::uuid, ProfiledFunction, boost::hash<boost::uuids::uuid>> functionProfileMap;
     std::vector<ProfiledFunction*> profiledFunctions;
     int64_t totalInclusive = 0;
