@@ -108,6 +108,7 @@ llvm::DIType* TypeSymbol::GetDIType(Emitter& emitter)
             {
                 ClassTypeSymbol* classTypeSymbol = static_cast<ClassTypeSymbol*>(this);
                 diType = classTypeSymbol->CreateDIForwardDeclaration(emitter);
+                emitter.MapFwdDeclaration(diType, this);
                 emitter.SetDIType(this, diType);
             }
             diType = CreateDIType(emitter);

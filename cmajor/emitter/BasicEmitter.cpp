@@ -136,6 +136,7 @@ void BasicEmitter::Visit(BoundCompileUnit& boundCompileUnit)
     }
     if (diBuilder)
     {
+        ReplaceForwardDeclarations();
         diBuilder->finalize();
     }
     if (GetGlobalFlag(GlobalFlags::emitLlvm))
@@ -238,9 +239,10 @@ void BasicEmitter::Visit(BoundClass& boundClass)
                 baseClass = currentClass->GetClassTypeSymbol()->BaseClass()->GetDIType(*this);
             }
             llvm::DIType* vtableHolderClass = nullptr;
-            if (currentClass->GetClassTypeSymbol()->IsPolymorphic() && currentClass->GetClassTypeSymbol()->VmtPtrHolderClass() && currentClass->GetClassTypeSymbol()->VmtPtrHolderClass() != currentClass->GetClassTypeSymbol())
+            if (currentClass->GetClassTypeSymbol()->IsPolymorphic() && currentClass->GetClassTypeSymbol()->VmtPtrHolderClass())
             {
-                vtableHolderClass = currentClass->GetClassTypeSymbol()->VmtPtrHolderClass()->GetDIType(*this);
+                vtableHolderClass = currentClass->GetClassTypeSymbol()->VmtPtrHolderClass()->CreateDIForwardDeclaration(*this);
+                MapFwdDeclaration(vtableHolderClass, currentClass->GetClassTypeSymbol()->VmtPtrHolderClass());
             }
             llvm::MDNode* templateParams = nullptr;
             uint64_t sizeInBits = DataLayout()->getStructLayout(llvm::cast<llvm::StructType>(currentClass->GetClassTypeSymbol()->IrType(*this)))->getSizeInBits();
@@ -253,21 +255,22 @@ void BasicEmitter::Visit(BoundClass& boundClass)
                 ClassTemplateSpecializationSymbol* specialization = static_cast<ClassTemplateSpecializationSymbol*>(currentClass->GetClassTypeSymbol());
                 classSpan = specialization->GetClassTemplate()->GetSpan();
             }
-            llvm::DIType* forwardDeclaration = diBuilder->createForwardDecl(llvm::dwarf::DW_TAG_structure_type, ToUtf8(currentClass->GetClassTypeSymbol()->Name()), CurrentScope(), 
-                GetFile(classSpan.FileIndex()), classSpan.LineNumber());
+            llvm::DIType* forwardDeclaration = diBuilder->createReplaceableCompositeType(llvm::dwarf::DW_TAG_class_type, ToUtf8(currentClass->GetClassTypeSymbol()->Name()), 
+                CurrentScope(), GetFile(classSpan.FileIndex()), classSpan.LineNumber(),
+                0, sizeInBits, alignInBits, llvm::DINode::DIFlags::FlagZero, ToUtf8(currentClass->GetClassTypeSymbol()->MangledName()));
             SetDIType(currentClass->GetClassTypeSymbol(), forwardDeclaration);
             std::vector<llvm::Metadata*> elements;
-            int memberVariableIndex = 0;
             for (MemberVariableSymbol* memberVariable : currentClass->GetClassTypeSymbol()->MemberVariables())
             {
-                uint64_t offsetInBits = DataLayout()->getStructLayout(llvm::cast<llvm::StructType>(currentClass->GetClassTypeSymbol()->IrType(*this)))->getElementOffsetInBits(memberVariableIndex);
+                int memberVariableLayoutIndex = memberVariable->LayoutIndex();
+                uint64_t offsetInBits = DataLayout()->getStructLayout(llvm::cast<llvm::StructType>(currentClass->GetClassTypeSymbol()->IrType(*this)))->getElementOffsetInBits(memberVariableLayoutIndex);
                 elements.push_back(memberVariable->GetDIMemberType(*this, offsetInBits));
-                ++memberVariableIndex;
             }
             llvm::DICompositeType* cls = diBuilder->createClassType(CurrentScope(), ToUtf8(currentClass->GetClassTypeSymbol()->Name()),
                 GetFile(classSpan.FileIndex()),
                 classSpan.LineNumber(), sizeInBits, alignInBits, offsetInBits, flags, baseClass, diBuilder->getOrCreateArray(elements), vtableHolderClass, templateParams, 
                 ToUtf8(currentClass->GetClassTypeSymbol()->MangledName()));
+            MapFwdDeclaration(forwardDeclaration, currentClass->GetClassTypeSymbol());
             SetDIType(currentClass->GetClassTypeSymbol(), cls);
             PushScope(cls);
         }
@@ -1033,7 +1036,7 @@ void BasicEmitter::Visit(BoundConstructionStatement& boundConstructionStatement)
                     {
                         newCleanupNeeded = true;
                         std::unique_ptr<BoundExpression> classPtrArgument(firstArgument->Clone());
-                        std::unique_ptr<BoundFunctionCall> destructorCall(new BoundFunctionCall(&symbolsModule, boundConstructionStatement.GetSpan(), classType->Destructor()));
+                        std::unique_ptr<BoundFunctionCall> destructorCall(new BoundFunctionCall(&symbolsModule, currentBlock->EndSpan(), classType->Destructor()));
                         destructorCall->AddArgument(std::move(classPtrArgument));
                         Assert(currentBlock, "current block not set");
                         auto it = blockDestructionMap.find(currentBlock);
@@ -1461,6 +1464,12 @@ void BasicEmitter::SetLineNumber(int32_t lineNumber)
             callInst->setDebugLoc(GetCurrentDebugLocation());
         }
     }
+}
+
+llvm::DIType* BasicEmitter::CreateDIType(void* forType) 
+{
+    TypeSymbol* type = static_cast<TypeSymbol*>(forType);
+    return type->GetDIType(*this);
 }
 
 } } // namespace cmajor::emitter

@@ -1102,17 +1102,17 @@ llvm::DIType* ClassTypeSymbol::CreateDIType(Emitter& emitter)
         baseClassDIType = baseClass->GetDIType(emitter);
     }
     llvm::DIType* vtableHolderClass = nullptr;
-    if (IsPolymorphic() && VmtPtrHolderClass() && VmtPtrHolderClass() != this)
+    if (IsPolymorphic() && VmtPtrHolderClass())
     {
-        vtableHolderClass = VmtPtrHolderClass()->GetDIType(emitter);
+        vtableHolderClass = VmtPtrHolderClass()->CreateDIForwardDeclaration(emitter);
+        emitter.MapFwdDeclaration(vtableHolderClass, VmtPtrHolderClass());
     }
     std::vector<llvm::Metadata*> elements;
-    int memberVariableIndex = 0;
     for (MemberVariableSymbol* memberVariable : memberVariables)
     {
-        uint64_t offsetInBits = emitter.DataLayout()->getStructLayout(llvm::cast<llvm::StructType>(IrType(emitter)))->getElementOffsetInBits(memberVariableIndex);
+        int memberVariableLayoutIndex = memberVariable->LayoutIndex();
+        uint64_t offsetInBits = emitter.DataLayout()->getStructLayout(llvm::cast<llvm::StructType>(IrType(emitter)))->getElementOffsetInBits(memberVariableLayoutIndex);
         elements.push_back(memberVariable->GetDIMemberType(emitter, offsetInBits));
-        ++memberVariableIndex;
     }
     llvm::MDNode* templateParams = nullptr;
     uint64_t sizeInBits = emitter.DataLayout()->getStructLayout(llvm::cast<llvm::StructType>(IrType(emitter)))->getSizeInBits();
@@ -1140,8 +1140,8 @@ llvm::DIType* ClassTypeSymbol::CreateDIForwardDeclaration(Emitter& emitter)
     uint64_t sizeInBits = emitter.DataLayout()->getStructLayout(llvm::cast<llvm::StructType>(IrType(emitter)))->getSizeInBits();
     uint32_t alignInBits = 8 * emitter.DataLayout()->getStructLayout(llvm::cast<llvm::StructType>(IrType(emitter)))->getAlignment();
     uint64_t offsetInBits = 0; // todo?
-    return emitter.DIBuilder()->createForwardDecl(llvm::dwarf::DW_TAG_structure_type, ToUtf8(Name()), nullptr, emitter.GetFile(classSpan.FileIndex()), classSpan.LineNumber(),
-        0, sizeInBits, alignInBits, ToUtf8(MangledName()));
+    return emitter.DIBuilder()->createReplaceableCompositeType(llvm::dwarf::DW_TAG_class_type, ToUtf8(Name()), nullptr, emitter.GetFile(classSpan.FileIndex()), classSpan.LineNumber(),
+        0, sizeInBits, alignInBits, llvm::DINode::DIFlags::FlagZero, ToUtf8(MangledName()));
 }
 
 const std::string& ClassTypeSymbol::VmtObjectName()

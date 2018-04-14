@@ -92,6 +92,7 @@ public:
     llvm::BasicBlock* CleanupBlock() override { return cleanupBlock; }
     bool NewCleanupNeeded() override { return newCleanupNeeded; }
     Pad* CurrentPad() override { return currentPad; }
+    llvm::DIType* CreateDIType(void* forType) override;
     virtual llvm::Function* GetPersonalityFunction() const = 0;
     virtual void GenerateCodeForCleanups() = 0;
 protected:

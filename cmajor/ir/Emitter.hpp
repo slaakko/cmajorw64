@@ -76,6 +76,9 @@ public:
     int32_t CompileUnitIndex() const { return compileUnitIndex; }
     llvm::DIType* GetDIType(void* symbol) const;
     void SetDIType(void* symbol, llvm::DIType* diType);
+    virtual llvm::DIType* CreateDIType(void* forType) = 0;
+    void MapFwdDeclaration(llvm::DIType* fwdDeclaration, void* type);
+    void ReplaceForwardDeclarations();
 private:
     llvm::LLVMContext& context;
     llvm::IRBuilder<> builder;
@@ -95,6 +98,7 @@ private:
     bool inPrologue;
     std::unordered_map<int32_t, llvm::DIFile*> fileMap;
     std::unordered_map<void*, llvm::DIType*> diTypeMap;
+    std::unordered_map<llvm::DIType*, void*> fwdDeclarationMap;
 };
 
 } } // namespace cmajor::ir

@@ -121,4 +121,31 @@ void Emitter::SetDIType(void* symbol, llvm::DIType* diType)
     diTypeMap[symbol] = diType;
 }
 
+void Emitter::MapFwdDeclaration(llvm::DIType* fwdDeclaration, void* type)
+{
+    fwdDeclarationMap[fwdDeclaration] = type;
+}
+
+void Emitter::ReplaceForwardDeclarations()
+{
+    std::unordered_map<llvm::DIType*, void*> currentFwdDeclarationMap;
+    std::swap(currentFwdDeclarationMap, fwdDeclarationMap);
+    while (!currentFwdDeclarationMap.empty())
+    {
+        for (const auto& p : currentFwdDeclarationMap)
+        {
+            llvm::DIType* fwdDeclaration = p.first;
+            void* type = p.second;
+            llvm::DIType* diType = GetDIType(type);
+            if (!diType)
+            {
+                diType = CreateDIType(type);
+            }
+            fwdDeclaration->replaceAllUsesWith(diType);
+        }
+        currentFwdDeclarationMap.clear();
+        std::swap(currentFwdDeclarationMap, fwdDeclarationMap);
+    }
+}
+
 } } // namespace cmajor::ir
