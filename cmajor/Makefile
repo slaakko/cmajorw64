@@ -18,6 +18,7 @@ build:
 	$(MAKE) -C ast
 	$(MAKE) -C parser
 	$(MAKE) -C symbols
+	$(MAKE) -C cmproj
 	$(MAKE) -C ir
 	$(MAKE) -C emitter
 	$(MAKE) -C binder
@@ -26,6 +27,9 @@ build:
 	$(MAKE) -C cm2html
 	$(MAKE) -C cmdoc
 	$(MAKE) -C cmmdump
+	$(MAKE) -C cmp2cmproj
+	$(MAKE) -C cms2sln
+	$(MAKE) -C cmfileredirector
 	$(MAKE) -C cmprof
 	$(MAKE) -C cmunit
 	$(MAKE) -C system/ext/gmp
@@ -67,6 +71,7 @@ clean:
 	$(MAKE) -C ast clean
 	$(MAKE) -C parser clean
 	$(MAKE) -C symbols clean
+	$(MAKE) -C cmproj clean
 	$(MAKE) -C ir clean
 	$(MAKE) -C emitter clean
 	$(MAKE) -C binder clean
@@ -75,6 +80,9 @@ clean:
 	$(MAKE) -C cm2html clean
 	$(MAKE) -C cmdoc clean
 	$(MAKE) -C cmmdump clean
+	$(MAKE) -C cmp2cmproj clean
+	$(MAKE) -C cms2sln clean
+	$(MAKE) -C cmfileredirector clean
 	$(MAKE) -C cmprof clean
 	$(MAKE) -C cmunit clean
 	$(MAKE) -C system/ext/gmp clean

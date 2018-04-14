@@ -354,7 +354,7 @@ void GenerateLibrary(Module* module, const std::vector<std::string>& objectFileP
         LogMessage(module->LogStreamId(), "Creating library...");
     }
     boost::filesystem::remove(libraryFilePath);
-    SetCurrentToolName(U"ar");
+    module->SetCurrentToolName(U"ar");
     std::vector<std::string> args;
     args.push_back("-o " + QuotedPath(libraryFilePath));
     int n = objectFilePaths.size();
@@ -362,13 +362,12 @@ void GenerateLibrary(Module* module, const std::vector<std::string>& objectFileP
     {
         args.push_back(QuotedPath(objectFilePaths[i]));
     }
-    std::string libErrorFilePath = Path::Combine(Path::GetDirectoryName(libraryFilePath), "llvm-lib.error");
+    std::string libErrorFilePath = Path::Combine(Path::GetDirectoryName(libraryFilePath), "ar.error");
     std::string libCommandLine = "cmfileredirector -2 " + libErrorFilePath + " ar q";
     for (const std::string& arg : args)
     {
         libCommandLine.append(1, ' ').append(arg);
     }
-    std::string libErrorFilePath = Path::Combine(Path::GetDirectoryName(libraryFilePath), "ar.error");
     try
     {
         System(libCommandLine);
@@ -516,7 +515,7 @@ void Link(const std::string& executableFilePath, const std::string& libraryFileP
     {
         LogMessage(module.LogStreamId(), "Linking...");
     }
-    SetCurrentToolName(U"clang++");
+    module.SetCurrentToolName(U"clang++");
     boost::filesystem::path bdp = executableFilePath;
     bdp.remove_filename();
     boost::filesystem::create_directories(bdp);
