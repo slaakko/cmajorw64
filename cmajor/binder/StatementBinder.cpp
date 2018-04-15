@@ -1258,6 +1258,15 @@ void StatementBinder::Visit(RangeForStatementNode& rangeForStatementNode)
     }
     CloneContext cloneContext;
     std::unique_ptr<CompoundStatementNode> compoundStatementNode(new CompoundStatementNode(span));
+    if (rangeForStatementNode.Action()->GetNodeType() == NodeType::compoundStatementNode)
+    {
+        CompoundStatementNode* action = static_cast<CompoundStatementNode*>(rangeForStatementNode.Action());
+        compoundStatementNode->SetEndBraceSpan(action->EndBraceSpan());
+    }
+    else
+    {
+        compoundStatementNode->SetEndBraceSpan(span);
+    }
     compoundStatementNode->SetParent(rangeForStatementNode.Parent());
     ConstructionStatementNode* constructEndIteratorStatement = new ConstructionStatementNode(span, 
         new DotNode(span, containerTypeNode->Clone(cloneContext), static_cast<IdentifierNode*>(iteratorTypeNode->Clone(cloneContext))), new IdentifierNode(span, U"@end"));
@@ -1283,6 +1292,15 @@ void StatementBinder::Visit(RangeForStatementNode& rangeForStatementNode)
     Node* itNotEndCond = new NotEqualNode(span, new IdentifierNode(span, U"@it"), new IdentifierNode(span, U"@end"));
     StatementNode* incrementItStatement = new ExpressionStatementNode(span, new PrefixIncrementNode(span, new IdentifierNode(span, U"@it")));
     CompoundStatementNode* actionStatement = new CompoundStatementNode(span);
+    if (rangeForStatementNode.Action()->GetNodeType() == NodeType::compoundStatementNode)
+    {
+        CompoundStatementNode* action = static_cast<CompoundStatementNode*>(rangeForStatementNode.Action());
+        actionStatement->SetEndBraceSpan(action->EndBraceSpan());
+    }
+    else
+    {
+        actionStatement->SetEndBraceSpan(span);
+    }
     ConstructionStatementNode* constructLoopVarStatement = new ConstructionStatementNode(span,
         rangeForStatementNode.TypeExpr()->Clone(cloneContext), static_cast<IdentifierNode*>(rangeForStatementNode.Id()->Clone(cloneContext)));
     constructLoopVarStatement->AddArgument(new DerefNode(span, new IdentifierNode(span, U"@it")));
@@ -1592,6 +1610,7 @@ void StatementBinder::Visit(CatchNode& catchNode)
         currentFunction->GetFunctionSymbol()->AddLocalVariable(catchVar);
     }
     CompoundStatementNode handlerBlock(span);
+    handlerBlock.SetEndBraceSpan(catchNode.CatchBlock()->EndBraceSpan());
     handlerBlock.SetParent(catchNode.Parent());
     ConstructionStatementNode* getExceptionAddr = new ConstructionStatementNode(span, new PointerNode(span, new IdentifierNode(span, U"void")), new IdentifierNode(span, U"@exceptionAddr"));
     getExceptionAddr->AddArgument(new InvokeNode(span, new IdentifierNode(span, U"RtGetException")));

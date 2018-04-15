@@ -311,6 +311,7 @@ public:
     const Node* Container() const { return container.get(); }
     Node* Container() { return container.get(); }
     const StatementNode* Action() const { return action.get(); }
+    StatementNode* Action() { return action.get(); }
 private:
     std::unique_ptr<Node> typeExpr;
     std::unique_ptr<IdentifierNode> id;
