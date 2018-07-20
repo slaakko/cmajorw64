@@ -87,7 +87,7 @@ void PrintHelp()
         "--bdt2xml (-bd)\n" <<
         "   output bound tree as xml\n" <<
         "--link-with-debug-runtime (-d)\n" <<
-        "   link with the debug version of the runtime library cmrt210(d).dll\n" <<
+        "   link with the debug version of the runtime library cmrt220(d).dll\n" <<
         "--link-using-ms-link (-m)\n" <<
         "   use Microsoft's link.exe as the linker\n" << 
         "--define SYMBOL (-D SYMBOL)\n" <<

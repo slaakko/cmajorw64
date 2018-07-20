@@ -1,4 +1,4 @@
-; dlltool --verbose --output-def cmrt210gmp.def gmpintf.o
+; dlltool --verbose --output-def cmrt220gmp.def gmpintf.o
 EXPORTS
 	abs_mpf @ 1
 	abs_mpq @ 2
