@@ -1,5 +1,5 @@
-#ifndef Statement_hpp_19453
-#define Statement_hpp_19453
+#ifndef Statement_hpp_5555
+#define Statement_hpp_5555
 
 #include <cmajor/parsing/Grammar.hpp>
 #include <cmajor/parsing/Keyword.hpp>
@@ -7,16 +7,16 @@
 
 namespace cmajor { namespace code {
 
-class StatementGrammar : public cmajor::parsing::Grammar
+class Statement : public cmajor::parsing::Grammar
 {
 public:
-    static StatementGrammar* Create();
-    static StatementGrammar* Create(cmajor::parsing::ParsingDomain* parsingDomain);
+    static Statement* Create();
+    static Statement* Create(cmajor::parsing::ParsingDomain* parsingDomain);
     cmajor::codedom::CompoundStatement* Parse(const char32_t* start, const char32_t* end, int fileIndex, const std::string& fileName);
 private:
-    StatementGrammar(cmajor::parsing::ParsingDomain* parsingDomain_);
-    virtual void CreateRules();
-    virtual void GetReferencedGrammars();
+    Statement(cmajor::parsing::ParsingDomain* parsingDomain_);
+    void CreateRules() override;
+    void GetReferencedGrammars() override;
     class StatementRule;
     class LabeledStatementRule;
     class LabelRule;
@@ -47,4 +47,4 @@ private:
 
 } } // namespace cmajor.code
 
-#endif // Statement_hpp_19453
+#endif // Statement_hpp_5555

@@ -1,5 +1,5 @@
-#ifndef TypeExpr_hpp_391
-#define TypeExpr_hpp_391
+#ifndef TypeExpr_hpp_8344
+#define TypeExpr_hpp_8344
 
 #include <cmajor/parsing/Grammar.hpp>
 #include <cmajor/parsing/Keyword.hpp>
@@ -9,16 +9,16 @@
 namespace cmajor { namespace parser {
 
 using namespace cmajor::ast;
-class TypeExprGrammar : public cmajor::parsing::Grammar
+class TypeExpr : public cmajor::parsing::Grammar
 {
 public:
-    static TypeExprGrammar* Create();
-    static TypeExprGrammar* Create(cmajor::parsing::ParsingDomain* parsingDomain);
+    static TypeExpr* Create();
+    static TypeExpr* Create(cmajor::parsing::ParsingDomain* parsingDomain);
     Node* Parse(const char32_t* start, const char32_t* end, int fileIndex, const std::string& fileName, ParsingContext* ctx);
 private:
-    TypeExprGrammar(cmajor::parsing::ParsingDomain* parsingDomain_);
-    virtual void CreateRules();
-    virtual void GetReferencedGrammars();
+    TypeExpr(cmajor::parsing::ParsingDomain* parsingDomain_);
+    void CreateRules() override;
+    void GetReferencedGrammars() override;
     class TypeExprRule;
     class PrefixTypeExprRule;
     class PostfixTypeExprRule;
@@ -27,4 +27,4 @@ private:
 
 } } // namespace cmajor.parser
 
-#endif // TypeExpr_hpp_391
+#endif // TypeExpr_hpp_8344

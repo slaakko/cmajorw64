@@ -1,5 +1,5 @@
-#ifndef XPath_hpp_4275
-#define XPath_hpp_4275
+#ifndef XPath_hpp_6600
+#define XPath_hpp_6600
 
 #include <cmajor/parsing/Grammar.hpp>
 #include <cmajor/parsing/Keyword.hpp>
@@ -8,17 +8,17 @@
 
 namespace cmajor { namespace xpath {
 
-class XPathGrammar : public cmajor::parsing::Grammar
+class XPath : public cmajor::parsing::Grammar
 {
 public:
-    static XPathGrammar* Create();
-    static XPathGrammar* Create(cmajor::parsing::ParsingDomain* parsingDomain);
+    static XPath* Create();
+    static XPath* Create(cmajor::parsing::ParsingDomain* parsingDomain);
     XPathExpr* Parse(const char32_t* start, const char32_t* end, int fileIndex, const std::string& fileName);
 private:
     std::vector<std::u32string> keywords0;
-    XPathGrammar(cmajor::parsing::ParsingDomain* parsingDomain_);
-    virtual void CreateRules();
-    virtual void GetReferencedGrammars();
+    XPath(cmajor::parsing::ParsingDomain* parsingDomain_);
+    void CreateRules() override;
+    void GetReferencedGrammars() override;
     class ExprRule;
     class OrExprRule;
     class AndExprRule;
@@ -61,4 +61,4 @@ private:
 
 } } // namespace cmajor.xpath
 
-#endif // XPath_hpp_4275
+#endif // XPath_hpp_6600

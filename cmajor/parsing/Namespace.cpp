@@ -9,7 +9,7 @@
 
 namespace cmajor { namespace parsing {
 
-Namespace::Namespace(const std::u32string& name_, Scope* enclosingScope_): ParsingObject(name_, enclosingScope_)
+Namespace::Namespace(const std::u32string& name_, Scope* enclosingScope_) : ParsingObject(name_, enclosingScope_, ObjectKind::ns)
 {
     SetScope(new Scope(Name(), EnclosingScope())); 
 }
@@ -21,7 +21,8 @@ void Namespace::Accept(Visitor& visitor)
     visitor.EndVisit(*this);
 }
 
-UsingObject::UsingObject(cmajor::codedom::UsingObject* subject_, Scope* enclosingScope_): ParsingObject(subject_->Name(), enclosingScope_), subject(subject_)
+UsingObject::UsingObject(cmajor::codedom::UsingObject* subject_, Scope* enclosingScope_) : 
+    ParsingObject(subject_->Name(), enclosingScope_, ObjectKind::usingObject), subject(subject_)
 {
     if (!subject->IsOwned())
     {

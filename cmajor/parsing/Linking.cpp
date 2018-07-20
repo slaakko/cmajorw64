@@ -50,7 +50,7 @@ void LinkerVisitor::Visit(RuleLink& link)
 {
     if (currentGrammar)
     {
-        ParsingObject* object = currentGrammar->GetScope()->Get(link.LinkedRuleName());
+        ParsingObject* object = currentGrammar->GetScope()->Get(link.LinkedRuleName(), ObjectKind::rule);
         if (object)
         {
             if (object->IsRule())

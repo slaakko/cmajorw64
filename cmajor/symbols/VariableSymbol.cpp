@@ -56,8 +56,34 @@ void ParameterSymbol::ComputeExportClosure()
     }
 }
 
+std::unique_ptr<dom::Element> ParameterSymbol::CreateDomElement(TypeMap& typeMap) 
+{
+    std::unique_ptr<dom::Element> element(new dom::Element(U"ParameterSymbol"));
+    if (GetType())
+    {
+        std::unique_ptr<dom::Element> typeElement(new dom::Element(U"type"));
+        int typeId = typeMap.GetOrInsertType(GetType());
+        typeElement->SetAttribute(U"ref", U"type_" + ToUtf32(std::to_string(typeId)));
+        element->AppendChild(std::unique_ptr<dom::Node>(typeElement.release()));
+    }
+    return element;
+}
+
 LocalVariableSymbol::LocalVariableSymbol(const Span& span_, const std::u32string& name_) : VariableSymbol(SymbolType::localVariableSymbol, span_, name_)
 {
+}
+
+std::unique_ptr<dom::Element> LocalVariableSymbol::CreateDomElement(TypeMap& typeMap)
+{
+    std::unique_ptr<dom::Element> element(new dom::Element(U"LocalVariableSymbol"));
+    if (GetType())
+    {
+        std::unique_ptr<dom::Element> typeElement(new dom::Element(U"type"));
+        int typeId = typeMap.GetOrInsertType(GetType());
+        typeElement->SetAttribute(U"ref", U"type_" + ToUtf32(std::to_string(typeId)));
+        element->AppendChild(std::unique_ptr<dom::Node>(typeElement.release()));
+    }
+    return element;
 }
 
 MemberVariableSymbol::MemberVariableSymbol(const Span& span_, const std::u32string& name_) : VariableSymbol(SymbolType::memberVariableSymbol, span_, name_), layoutIndex(-1), compileUnitIndex(-1), diMemberType(nullptr)
@@ -214,6 +240,19 @@ llvm::DIDerivedType* MemberVariableSymbol::GetDIMemberType(Emitter& emitter, uin
         compileUnitIndex = emitter.CompileUnitIndex();
     }
     return diMemberType;
+}
+
+std::unique_ptr<dom::Element> MemberVariableSymbol::CreateDomElement(TypeMap& typeMap)
+{
+    std::unique_ptr<dom::Element> element(new dom::Element(U"MemberVariableSymbol"));
+    if (GetType())
+    {
+        std::unique_ptr<dom::Element> typeElement(new dom::Element(U"type"));
+        int typeId = typeMap.GetOrInsertType(GetType());
+        typeElement->SetAttribute(U"ref", U"type_" + ToUtf32(std::to_string(typeId)));
+        element->AppendChild(std::unique_ptr<dom::Node>(typeElement.release()));
+    }
+    return element;
 }
 
 } } // namespace cmajor::symbols

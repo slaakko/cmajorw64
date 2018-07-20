@@ -28,21 +28,6 @@ namespace cmajor { namespace rt {
 
 using namespace cmajor::util;
 
-/*
-class ClassIdMap
-{
-public:
-    static void Init();
-    static void Done();
-    static ClassIdMap& Instance() { return *instance; }
-    void SetClassId(uint32_t typeId, uint64_t classId);
-    uint64_t GetClassId(uint32_t typeId) const;
-private:
-    static std::unique_ptr<ClassIdMap> instance;
-    std::unordered_map<uint32_t, uint64_t> classIdMap;
-};
-*/
-
 class ClassIdMap
 {
 public:
@@ -68,36 +53,11 @@ void ClassIdMap::Done()
     instance.reset();
 }
 
-/*
-void ClassIdMap::SetClassId(uint32_t typeId, uint64_t classId)
-{
-    classIdMap[typeId] = classId;
-}
-*/
 
 void ClassIdMap::SetClassId(const boost::uuids::uuid& typeId, uint64_t classId)
 {
     classIdMap[typeId] = classId;
 }
-
-/*
-uint64_t ClassIdMap::GetClassId(uint32_t typeId) const
-{
-    auto it = classIdMap.find(typeId);
-    if (it != classIdMap.cend())
-    {
-        return it->second;
-    }
-    else
-    {
-        std::stringstream s;
-        s << "internal error : class id for type id " << typeId << " not found.\n";
-        std::string str = s.str();
-        RtWrite(stdErrFileHandle, reinterpret_cast<const uint8_t*>(str.c_str()), str.length());
-        exit(exitCodeInternalError);
-    }
-}
-*/
 
 uint64_t ClassIdMap::GetClassId(const boost::uuids::uuid& typeId) const
 {
@@ -116,20 +76,6 @@ uint64_t ClassIdMap::GetClassId(const boost::uuids::uuid& typeId) const
     }
 }
 
-/*
-struct ClassInfo
-{
-    ClassInfo(uint32_t typeId_, const std::string& vmtObjectName_, uint32_t baseTypeId_) : 
-        typeId(typeId_), vmtObjectName(vmtObjectName_), baseTypeId(baseTypeId_), baseClass(nullptr), level(0), key(0), id(0) {}
-    uint32_t typeId;
-    std::string vmtObjectName;
-    uint32_t baseTypeId;
-    ClassInfo* baseClass;
-    int level;
-    uint64_t key;
-    uint64_t id;
-};
-*/
 struct ClassInfo
 {
     ClassInfo(const boost::uuids::uuid& typeId_, const std::string& vmtObjectName_, const boost::uuids::uuid& baseTypeId_) :
@@ -149,11 +95,9 @@ void ReadClasses(const std::string& classFilePath, std::vector<std::unique_ptr<C
     uint32_t n = reader.ReadULEB128UInt();
     for (uint32_t i = 0; i < n; ++i)
     {
-        //uint32_t typeId = reader.ReadUInt();
         boost::uuids::uuid typeId;
         reader.ReadUuid(typeId);
         std::string vmtObjectName = reader.ReadUtf8String();
-        //uint32_t baseTypeId = reader.ReadUInt();
         boost::uuids::uuid baseTypeId;
         reader.ReadUuid(baseTypeId);
         classInfos.push_back(std::unique_ptr<ClassInfo>(new ClassInfo(typeId, vmtObjectName, baseTypeId)));
@@ -169,7 +113,6 @@ void ReadClasses(const std::string& classFilePath, std::vector<std::unique_ptr<C
 
 void ResolveBaseClasses(const std::vector<std::unique_ptr<ClassInfo>>& classes)
 {
-    //std::unordered_map<uint32_t, ClassInfo*> classMap;
     std::unordered_map<boost::uuids::uuid, ClassInfo*, boost::hash<boost::uuids::uuid>> classMap;
     for (const std::unique_ptr<ClassInfo>& cls : classes)
     {
@@ -177,7 +120,6 @@ void ResolveBaseClasses(const std::vector<std::unique_ptr<ClassInfo>>& classes)
     }
     for (const std::unique_ptr<ClassInfo>& cls : classes)
     {
-        //if (cls->baseTypeId != 0)
         if (!cls->baseTypeId.is_nil())
         {
             auto it = classMap.find(cls->baseTypeId);
@@ -187,7 +129,6 @@ void ResolveBaseClasses(const std::vector<std::unique_ptr<ClassInfo>>& classes)
             }
             else
             {
-                //throw std::runtime_error("error assigning class id's: class with id " + std::to_string(cls->baseTypeId) + " not found");
                 throw std::runtime_error("error assigning class id's: class with id " + boost::uuids::to_string(cls->baseTypeId) + " not found");
             }
         }
@@ -326,13 +267,6 @@ void SetClassIdsToClassIdMap(const std::vector<ClassInfo*>& classesByPriority)
         ClassIdMap::Instance().SetClassId(cls->typeId, cls->id);
     }
 }
-
-/*
-uint64_t GetClassId(uint32_t typeId)
-{
-    return ClassIdMap::Instance().GetClassId(typeId);
-}
-*/
 
 uint64_t GetClassId(const boost::uuids::uuid& typeId)
 {

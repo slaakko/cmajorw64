@@ -76,8 +76,8 @@ public:
     llvm::DIType* GetDIType(Emitter& emitter);
     uint64_t SizeInBits(Emitter& emitter);
     uint32_t AlignmentInBits(Emitter& emitter);
+    const char* ClassName() const override { return "TypeSymbol"; }
 private:
-    //uint32_t typeId;
     boost::uuids::uuid typeId;
     int32_t compileUnitIndex;
     llvm::DIType* diType;

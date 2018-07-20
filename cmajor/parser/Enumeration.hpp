@@ -1,5 +1,5 @@
-#ifndef Enumeration_hpp_391
-#define Enumeration_hpp_391
+#ifndef Enumeration_hpp_8344
+#define Enumeration_hpp_8344
 
 #include <cmajor/parsing/Grammar.hpp>
 #include <cmajor/parsing/Keyword.hpp>
@@ -9,16 +9,16 @@
 namespace cmajor { namespace parser {
 
 using namespace cmajor::ast;
-class EnumerationGrammar : public cmajor::parsing::Grammar
+class Enumeration : public cmajor::parsing::Grammar
 {
 public:
-    static EnumerationGrammar* Create();
-    static EnumerationGrammar* Create(cmajor::parsing::ParsingDomain* parsingDomain);
+    static Enumeration* Create();
+    static Enumeration* Create(cmajor::parsing::ParsingDomain* parsingDomain);
     EnumTypeNode* Parse(const char32_t* start, const char32_t* end, int fileIndex, const std::string& fileName, ParsingContext* ctx);
 private:
-    EnumerationGrammar(cmajor::parsing::ParsingDomain* parsingDomain_);
-    virtual void CreateRules();
-    virtual void GetReferencedGrammars();
+    Enumeration(cmajor::parsing::ParsingDomain* parsingDomain_);
+    void CreateRules() override;
+    void GetReferencedGrammars() override;
     class EnumTypeRule;
     class UnderlyingTypeRule;
     class EnumConstantsRule;
@@ -27,4 +27,4 @@ private:
 
 } } // namespace cmajor.parser
 
-#endif // Enumeration_hpp_391
+#endif // Enumeration_hpp_8344

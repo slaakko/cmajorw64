@@ -166,6 +166,22 @@ void TokenParser::Accept(Visitor& visitor)
     visitor.EndVisit(*this);
 }
 
+GroupingParser::GroupingParser(Parser* child_) : UnaryParser(U"grouping", child_, child_->Info())
+{
+}
+
+Match GroupingParser::Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData)
+{
+    return Child()->Parse(scanner, stack, parsingData);
+}
+
+void GroupingParser::Accept(Visitor& visitor)
+{
+    visitor.BeginVisit(*this);
+    Child()->Accept(visitor);
+    visitor.EndVisit(*this);
+}
+
 BinaryParser::BinaryParser(const std::u32string& name_, Parser* left_, Parser* right_, const std::u32string& info_): Parser(name_, info_), left(left_), right(right_) 
 {
     Own(left);

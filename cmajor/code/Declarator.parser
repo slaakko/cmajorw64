@@ -14,15 +14,15 @@ namespace cmajor.code
     [cpp]using cmajor::util::Trim;
     [cpp]using namespace cmajor::codedom;
 
-    grammar DeclaratorGrammar
+    grammar Declarator
     {
-        using ExpressionGrammar.ConstantExpression;
-        using ExpressionGrammar.IdExpression;
-        using ExpressionGrammar.ExpressionList;
-        using ExpressionGrammar.AssignmentExpression;
-        using DeclarationGrammar.TypeName;
-        using DeclarationGrammar.TypeSpecifier;
-        using DeclarationGrammar.CVQualifier;
+        using Expression.ConstantExpression;
+        using Expression.IdExpression;
+        using Expression.ExpressionList;
+        using Expression.AssignmentExpression;
+        using Declaration.TypeName;
+        using Declaration.TypeSpecifier;
+        using Declaration.CVQualifier;
 
         InitDeclaratorList(var std::unique_ptr<InitDeclaratorList> idl): cmajor::codedom::InitDeclaratorList*
                         ::= empty{ idl.reset(new InitDeclaratorList()); }

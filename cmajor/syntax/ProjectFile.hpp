@@ -1,5 +1,5 @@
-#ifndef ProjectFile_hpp_20364
-#define ProjectFile_hpp_20364
+#ifndef ProjectFile_hpp_5581
+#define ProjectFile_hpp_5581
 
 #include <cmajor/parsing/Grammar.hpp>
 #include <cmajor/parsing/Keyword.hpp>
@@ -7,16 +7,16 @@
 
 namespace cmajor { namespace syntax {
 
-class ProjectFileGrammar : public cmajor::parsing::Grammar
+class ProjectFile : public cmajor::parsing::Grammar
 {
 public:
-    static ProjectFileGrammar* Create();
-    static ProjectFileGrammar* Create(cmajor::parsing::ParsingDomain* parsingDomain);
+    static ProjectFile* Create();
+    static ProjectFile* Create(cmajor::parsing::ParsingDomain* parsingDomain);
     Project* Parse(const char32_t* start, const char32_t* end, int fileIndex, const std::string& fileName);
 private:
-    ProjectFileGrammar(cmajor::parsing::ParsingDomain* parsingDomain_);
-    virtual void CreateRules();
-    virtual void GetReferencedGrammars();
+    ProjectFile(cmajor::parsing::ParsingDomain* parsingDomain_);
+    void CreateRules() override;
+    void GetReferencedGrammars() override;
     class ProjectFileRule;
     class ProjectFileContentRule;
     class SourceRule;
@@ -26,4 +26,4 @@ private:
 
 } } // namespace cmajor.syntax
 
-#endif // ProjectFile_hpp_20364
+#endif // ProjectFile_hpp_5581

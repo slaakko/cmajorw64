@@ -16,22 +16,22 @@ using namespace cmajor::parsing;
 using namespace cmajor::util;
 using namespace cmajor::unicode;
 
-KeywordGrammar* KeywordGrammar::Create()
+Keyword* Keyword::Create()
 {
     return Create(new cmajor::parsing::ParsingDomain());
 }
 
-KeywordGrammar* KeywordGrammar::Create(cmajor::parsing::ParsingDomain* parsingDomain)
+Keyword* Keyword::Create(cmajor::parsing::ParsingDomain* parsingDomain)
 {
     RegisterParsingDomain(parsingDomain);
-    KeywordGrammar* grammar(new KeywordGrammar(parsingDomain));
+    Keyword* grammar(new Keyword(parsingDomain));
     parsingDomain->AddGrammar(grammar);
     grammar->CreateRules();
     grammar->Link();
     return grammar;
 }
 
-KeywordGrammar::KeywordGrammar(cmajor::parsing::ParsingDomain* parsingDomain_): cmajor::parsing::Grammar(ToUtf32("KeywordGrammar"), parsingDomain_->GetNamespaceScope(ToUtf32("cmajor.code")), parsingDomain_)
+Keyword::Keyword(cmajor::parsing::ParsingDomain* parsingDomain_): cmajor::parsing::Grammar(ToUtf32("Keyword"), parsingDomain_->GetNamespaceScope(ToUtf32("cmajor.code")), parsingDomain_)
 {
     SetOwner(0);
     keywords0.push_back(ToUtf32("alignas"));
@@ -107,7 +107,7 @@ KeywordGrammar::KeywordGrammar(cmajor::parsing::ParsingDomain* parsingDomain_): 
     keywords0.push_back(ToUtf32("while"));
 }
 
-void KeywordGrammar::GetReferencedGrammars()
+void Keyword::GetReferencedGrammars()
 {
     cmajor::parsing::ParsingDomain* pd = GetParsingDomain();
     cmajor::parsing::Grammar* grammar0 = pd->GetGrammar(ToUtf32("cmajor.parsing.stdlib"));
@@ -118,7 +118,7 @@ void KeywordGrammar::GetReferencedGrammars()
     AddGrammarReference(grammar0);
 }
 
-void KeywordGrammar::CreateRules()
+void Keyword::CreateRules()
 {
     AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("identifier"), this, ToUtf32("cmajor.parsing.stdlib.identifier")));
     AddRule(new cmajor::parsing::Rule(ToUtf32("Keyword"), GetScope(), GetParsingDomain()->GetNextRuleId(),

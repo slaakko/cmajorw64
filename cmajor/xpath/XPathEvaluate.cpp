@@ -13,13 +13,13 @@
 
 namespace cmajor { namespace xpath {
 
-XPathGrammar* xpathGrammar = nullptr;
+XPath* xpathGrammar = nullptr;
 
 std::unique_ptr<XPathObject> Evaluate(const std::u32string& xpathExpression, cmajor::dom::Node* node)
 {
     if (!xpathGrammar)
     {
-        xpathGrammar = XPathGrammar::Create();
+        xpathGrammar = XPath::Create();
     }
     if (XPathDebugParsing())
     {

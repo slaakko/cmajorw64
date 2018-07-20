@@ -28,7 +28,7 @@ public:
     Namespace* GlobalNamespace() const { return globalNamespace; }
     Namespace* CurrentNamespace() const { return currentNamespace; }
     Scope* CurrentScope() const;
-    virtual void Accept(Visitor& visitor);
+    void Accept(Visitor& visitor) override;
     int GetNextRuleId() { return nextRuleId++; }
     int GetNumRules() const { return nextRuleId; }
 private:

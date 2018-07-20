@@ -25,6 +25,7 @@ public:
     NamespaceSymbol* Ns() { return ns; }
     llvm::Type* IrType(Emitter& emitter) override { Assert(false, "tried to get ir type of namespace type"); return nullptr; }
     llvm::Constant* CreateDefaultIrValue(Emitter& emitter) override { Assert(false, "tried to create default ir value of namespace type"); return nullptr; }
+    const char* ClassName() const override { return "NamespaceTypeSymbol"; }
 private:
     NamespaceSymbol* ns;
 };

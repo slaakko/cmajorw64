@@ -8,6 +8,7 @@
 #include <cmajor/symbols/NamespaceSymbol.hpp>
 #include <cmajor/symbols/FunctionSymbol.hpp>
 #include <cmajor/symbols/Exception.hpp>
+#include <cmajor/symbols/GlobalFlags.hpp>
 #include <cmajor/ast/Identifier.hpp>
 #include <cmajor/util/Unicode.hpp>
 #include <cmajor/util/Util.hpp>
@@ -359,27 +360,34 @@ void FileScope::AddContainerScope(ContainerScope* containerScope)
 
 void FileScope::InstallNamespaceImport(ContainerScope* containerScope, NamespaceImportNode* namespaceImportNode)
 {
-    Assert(containerScope, "container scope is null");
-    std::u32string importedNamespaceName = namespaceImportNode->Ns()->Str();
-    Symbol* symbol = containerScope->Lookup(importedNamespaceName, ScopeLookup::this_and_parent);
-    if (symbol)
+    try
     {
-        if (symbol->GetSymbolType() == SymbolType::namespaceSymbol)
+        Assert(containerScope, "container scope is null");
+        std::u32string importedNamespaceName = namespaceImportNode->Ns()->Str();
+        Symbol* symbol = containerScope->Lookup(importedNamespaceName, ScopeLookup::this_and_parent);
+        if (symbol)
         {
-            ContainerScope* symbolContainerScope = symbol->GetContainerScope();
-            if (std::find(containerScopes.cbegin(), containerScopes.cend(), symbolContainerScope) == containerScopes.cend())
+            if (symbol->GetSymbolType() == SymbolType::namespaceSymbol)
             {
-                containerScopes.push_back(symbolContainerScope);
+                ContainerScope* symbolContainerScope = symbol->GetContainerScope();
+                if (std::find(containerScopes.cbegin(), containerScopes.cend(), symbolContainerScope) == containerScopes.cend())
+                {
+                    containerScopes.push_back(symbolContainerScope);
+                }
+            }
+            else
+            {
+                throw Exception(module, "'" + ToUtf8(namespaceImportNode->Ns()->Str()) + "' does not denote a namespace", namespaceImportNode->Ns()->GetSpan());
             }
         }
         else
         {
-            throw Exception(module, "'" + ToUtf8(namespaceImportNode->Ns()->Str()) + "' does not denote a namespace", namespaceImportNode->Ns()->GetSpan());
+            throw Exception(module, "referred namespace symbol '" + ToUtf8(namespaceImportNode->Ns()->Str()) + "' not found", namespaceImportNode->Ns()->GetSpan());
         }
     }
-    else
+    catch (const Exception&)
     {
-        throw Exception(module, "referred namespace symbol '" + ToUtf8(namespaceImportNode->Ns()->Str()) + "' not found", namespaceImportNode->Ns()->GetSpan());
+        throw;
     }
 }
 

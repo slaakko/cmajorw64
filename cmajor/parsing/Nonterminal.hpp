@@ -36,9 +36,9 @@ public:
     std::u32string ValueFieldName() const { return U"from" + name; }
     std::u32string VariableName() const { return (!name.empty() ? std::u32string(1, std::tolower(name[0])) + name.substr(1) : name) + U"NonterminalParser"; }
     bool Specialized() const;
-    virtual Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData);
-    virtual void Accept(Visitor& visitor);
-    virtual bool IsNonterminalParser() const { return true; }
+    Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData) override;
+    void Accept(Visitor& visitor) override;
+    bool IsNonterminalParser() const override { return true; }
 private:
     std::u32string name;
     std::u32string ruleName;

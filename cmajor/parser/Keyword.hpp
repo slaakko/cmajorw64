@@ -1,23 +1,24 @@
-#ifndef Keyword_hpp_19780
-#define Keyword_hpp_19780
+#ifndef Keyword_hpp_32388
+#define Keyword_hpp_32388
 
 #include <cmajor/parsing/Grammar.hpp>
 #include <cmajor/parsing/Keyword.hpp>
 
 namespace cmajor { namespace parser {
 
-class KeywordGrammar : public cmajor::parsing::Grammar
+class Keyword : public cmajor::parsing::Grammar
 {
 public:
-    static KeywordGrammar* Create();
-    static KeywordGrammar* Create(cmajor::parsing::ParsingDomain* parsingDomain);
+    static Keyword* Create();
+    static Keyword* Create(cmajor::parsing::ParsingDomain* parsingDomain);
 private:
     std::vector<std::u32string> keywords0;
-    KeywordGrammar(cmajor::parsing::ParsingDomain* parsingDomain_);
-    virtual void CreateRules();
-    virtual void GetReferencedGrammars();
+    std::vector<std::u32string> keywords1;
+    Keyword(cmajor::parsing::ParsingDomain* parsingDomain_);
+    void CreateRules() override;
+    void GetReferencedGrammars() override;
 };
 
 } } // namespace cmajor.parser
 
-#endif // Keyword_hpp_19780
+#endif // Keyword_hpp_32388

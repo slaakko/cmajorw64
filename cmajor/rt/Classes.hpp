@@ -12,7 +12,6 @@ namespace cmajor { namespace rt {
 
 void InitClasses();
 void DoneClasses();
-//uint64_t GetClassId(uint32_t typeId);
 uint64_t GetClassId(const boost::uuids::uuid& typeId);
 
 } } // namespace cmajor::rt

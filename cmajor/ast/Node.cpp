@@ -52,7 +52,7 @@ const char* nodeTypeStr[] =
     "addNode", "subNode", "mulNode", "divNode", "remNode", "notNode", "unaryPlusNode", "unaryMinusNode", "prefixIncrementNode", "prefixDecrementNode", "complementNode", "derefNode", "addrOfNode",
     "isNode", "asNode", "indexingNode", "invokeNode", "postfixIncrementNode", "postfixDecrementNode", "sizeOfNode", "typeNameNode", "castNode", "constructNode", "newNode", "thisNode", "baseNode",
     "conditionalCompilationDisjunctionNode", "conditionalCompilationConjunctionNode", "conditionalCompilationNotNode", "conditionalCompilationPrimaryNode", "conditionalCompilationPartNode", 
-    "conditionalCompilationStatementNode", "uuidLiteralNode",
+    "conditionalCompilationStatementNode", "uuidLiteralNode", "cursorIdNode",
     "maxNode"
 };
 
@@ -330,6 +330,7 @@ NodeFactory::NodeFactory()
     Register(NodeType::conditionalCompilationPartNode, new ConcreteNodeCreator<ConditionalCompilationPartNode>());
     Register(NodeType::conditionalCompilationStatementNode, new ConcreteNodeCreator<ConditionalCompilationStatementNode>());
     Register(NodeType::uuidLiteralNode, new ConcreteNodeCreator<UuidLiteralNode>());
+    Register(NodeType::cursorIdNode, new ConcreteNodeCreator<CursorIdNode>());
 }
 
 void NodeFactory::Register(NodeType nodeType, NodeCreator* creator)

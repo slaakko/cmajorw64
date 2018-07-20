@@ -1,0 +1,10 @@
+using System;
+
+void main()
+{
+#if (LINUX)
+    Console.WriteLine("Linux");
+#else
+    Console.WriteLine("not Linux");
+#endif
+}

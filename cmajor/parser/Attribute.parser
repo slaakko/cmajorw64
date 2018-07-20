@@ -7,7 +7,7 @@
 
 namespace cmajor.parser
 {
-    grammar AttributeGrammar
+    grammar Attribute
     {
         using stdlib.identifier;
         using stdlib.string;

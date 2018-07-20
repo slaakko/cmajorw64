@@ -92,6 +92,8 @@ public:
     TypeSymbol* Unify(TypeSymbol* sourceType, const Span& span) override;
     bool IsRecursive(TypeSymbol* type, std::unordered_set<TypeSymbol*>& tested) override;
     ValueType GetValueType() const override;
+    std::u32string Info() const override { return Name(); }
+    const char* ClassName() const override { return "DerivedTypeSymbol"; }
 private:
     TypeSymbol* baseType;
     TypeDerivationRec derivationRec;
@@ -108,6 +110,8 @@ public:
     llvm::Type* IrType(Emitter& emitter) override;
     llvm::Constant* CreateDefaultIrValue(Emitter& emitter) override;
     ValueType GetValueType() const override;
+    std::u32string Info() const override { return Name(); }
+    const char* ClassName() const override { return "NullPtrTypeSymbol"; }
 };
 
 } } // namespace cmajor::symbols

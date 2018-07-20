@@ -246,6 +246,14 @@ Value::~Value()
 {
 }
 
+std::unique_ptr<dom::Element> Value::ToDomElement()
+{
+    std::u32string className = ToUtf32(ClassName());
+    std::unique_ptr<dom::Element> element(new dom::Element(className));
+    element->SetAttribute(U"info", ToUtf32(ToString()));
+    return element;
+}
+
 BoolValue::BoolValue(const Span& span_, bool value_) : Value(span_, ValueType::boolValue), value(value_)
 {
 }

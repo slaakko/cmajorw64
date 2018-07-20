@@ -13,7 +13,7 @@ namespace cmajor { namespace util {
 class CodeFormatter
 {
 public:
-    CodeFormatter(std::ostream& stream_) : stream(stream_), indent(0), indentSize(4), atBeginningOfLine(true), line(1), start(false) {}
+    CodeFormatter(std::ostream& stream_) : stream(stream_), indent(0), indentSize(4), atBeginningOfLine(true), line(1), start(false), preserveSpace(false) {}
     int Indent() const { return indent; }
     int IndentSize() const { return indentSize; }
     void SetIndentSize(int indentSize_) { indentSize = indentSize_; }
@@ -37,6 +37,8 @@ public:
     void ResetStart() { start = false; }
     void SetStartText(const std::string& startText_) { startText = startText_; }
     const std::string& StartText() const { return startText; }
+    bool PreserveSpace() const { return preserveSpace; }
+    void SetPreserveSpace(bool preserveSpace_) { preserveSpace = preserveSpace_; }
 private:
     std::ostream& stream;
     int indent;
@@ -45,6 +47,7 @@ private:
     int line;
     bool start;
     std::string startText;
+    bool preserveSpace;
 };
 
 } } // namespace cmajor::util

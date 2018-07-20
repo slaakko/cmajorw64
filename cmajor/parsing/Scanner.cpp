@@ -27,7 +27,7 @@ std::u32string NarrowString(const char32_t* start, const char32_t* end)
     return s;
 }
 
-bool countSourceLines = false;;
+bool countSourceLines = false;
 int numParsedSourceLines = 0;
 
 void SetCountSourceLines(bool count)

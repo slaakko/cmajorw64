@@ -17,13 +17,13 @@ namespace cmajor.syntax
 {
     [cpp]using namespace cmajor::code;
 
-    grammar PrimaryGrammar
+    grammar Primary
     {
-        using PrimitiveGrammar.Primitive;
-        using ElementGrammar.Identifier;
-        using CompositeGrammar.Alternative;
-        using cmajor.code.ExpressionGrammar.ExpressionList;
-        using cmajor.code.StatementGrammar.CompoundStatement;
+        using Primitive.Primitive;
+        using Element.Identifier;
+        using Composite.Alternative;
+        using cmajor.code.Expression.ExpressionList;
+        using cmajor.code.Statement.CompoundStatement;
 
         Primary(cmajor::parsing::Scope* enclosingScope): cmajor::parsing::Parser*
                     ::=
@@ -69,7 +69,7 @@ namespace cmajor.syntax
                     ;
 
         Grouping(cmajor::parsing::Scope* enclosingScope): cmajor::parsing::Parser*
-                    ::= '(' Alternative(enclosingScope)! ')'!{ value = Alternative; }
+                    ::= '(' Alternative(enclosingScope)! ')'!{ value = new GroupingParser(Alternative); }
                     ;
 
         Token(cmajor::parsing::Scope* enclosingScope): cmajor::parsing::Parser*

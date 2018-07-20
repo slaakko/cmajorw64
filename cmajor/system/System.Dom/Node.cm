@@ -515,6 +515,9 @@ namespace System.Dom
         public virtual void Visit(DomText* text)
         {
         }
+        public virtual void Visit(DomEntityReference* entityRef)
+        {
+        }
         public virtual void Visit(DomCDataSection* cdataSection)
         {
         }

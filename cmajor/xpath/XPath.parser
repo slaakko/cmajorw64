@@ -3,10 +3,10 @@
 
 namespace cmajor.xpath
 {
-    grammar XPathGrammar
+    grammar XPath
     {
-        using cmajor.xml.XmlGrammar.NameStartChar;
-        using cmajor.xml.XmlGrammar.NameChar;
+        using cmajor.xml.Xml.NameStartChar;
+        using cmajor.xml.Xml.NameChar;
         using stdlib.identifier;
         using stdlib.spaces;
         skip spaces;

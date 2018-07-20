@@ -11,11 +11,11 @@ namespace cmajor.syntax
 {
     grammar GrammarGrammar
     {
-        using ElementGrammar.Identifier;
-        using ElementGrammar.QualifiedId;
-        using ElementGrammar.Signature;
-        using ElementGrammar.RuleLink;
-        using RuleGrammar.Rule;
+        using Element.Identifier;
+        using Element.QualifiedId;
+        using Element.Signature;
+        using Element.RuleLink;
+        using Rule.Rule;
         using stdlib.char;
 
         Grammar(cmajor::parsing::Scope* enclosingScope): cmajor::parsing::Grammar*

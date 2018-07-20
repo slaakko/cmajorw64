@@ -156,6 +156,7 @@ public:
     void Read(AstReader& reader) override;
     void AddParameter(ParameterNode* parameter) override;
     const IdentifierNode* TypeParamId() const { return typeParamId.get(); }
+    IdentifierNode* TypeParamId() { return typeParamId.get(); }
     const NodeList<ParameterNode>& Parameters() const { return parameters; }
     std::string ToString() const override;
 private:
@@ -172,6 +173,7 @@ public:
     void Accept(Visitor& visitor) override;
     void Write(AstWriter& writer) override;
     void Read(AstReader& reader) override;
+    IdentifierNode* TypeParamId() { return typeParamId.get(); }
     std::string ToString() const override;
 private:
     std::unique_ptr<IdentifierNode> typeParamId;
@@ -230,6 +232,7 @@ public:
     void Write(AstWriter& writer) override;
     void Read(AstReader& reader) override;
     const Node* Expression() const { return expression.get(); }
+    Node* Expression() { return expression.get(); }
     const std::u32string& Text() const { return text; }
     std::string ToString() const override;
 private:
@@ -249,6 +252,7 @@ public:
     void AddParameter(ParameterNode* parameter) override;
     void AddStatement(AxiomStatementNode* statement);
     const IdentifierNode* Id() const { return id.get(); }
+    IdentifierNode* Id() { return id.get(); }
     const NodeList<ParameterNode>& Parameters() const { return parameters; }
     const NodeList<AxiomStatementNode>& Statements() const { return statements; }
 private:

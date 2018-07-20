@@ -179,7 +179,7 @@ void Project::ResolveDeclarations()
                     throw std::runtime_error("source file path '" + GetFullPath(sfp.generic_string()) + "' not found");
                 }
                 std::string sourceFilePath = GetFullPath(sfp.generic_string());
-                if (std::find(sourceFilePaths.cbegin(), sourceFilePaths.cend(), sourceFilePath) == sourceFilePaths.cend())
+                if (std::find(sourceFilePaths.cbegin(), sourceFilePaths.cend(), sourceFilePath) == sourceFilePaths.cend() && sourceFilePath != excludeSourceFilePath)
                 {
                     sourceFilePaths.push_back(sourceFilePath);
                 }
@@ -259,6 +259,11 @@ bool Project::Ready() const
         }
     }
     return true;
+}
+
+void Project::SetExcludeSourceFilePath(const std::string& excludeSourceFilePath_)
+{
+    excludeSourceFilePath = excludeSourceFilePath_;
 }
 
 } } // namespace cmajor::ast

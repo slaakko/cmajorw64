@@ -1,5 +1,5 @@
-#ifndef Template_hpp_391
-#define Template_hpp_391
+#ifndef Template_hpp_8344
+#define Template_hpp_8344
 
 #include <cmajor/parsing/Grammar.hpp>
 #include <cmajor/parsing/Keyword.hpp>
@@ -9,16 +9,16 @@
 namespace cmajor { namespace parser {
 
 using namespace cmajor::ast;
-class TemplateGrammar : public cmajor::parsing::Grammar
+class Template : public cmajor::parsing::Grammar
 {
 public:
-    static TemplateGrammar* Create();
-    static TemplateGrammar* Create(cmajor::parsing::ParsingDomain* parsingDomain);
+    static Template* Create();
+    static Template* Create(cmajor::parsing::ParsingDomain* parsingDomain);
     Node* Parse(const char32_t* start, const char32_t* end, int fileIndex, const std::string& fileName, ParsingContext* ctx);
 private:
-    TemplateGrammar(cmajor::parsing::ParsingDomain* parsingDomain_);
-    virtual void CreateRules();
-    virtual void GetReferencedGrammars();
+    Template(cmajor::parsing::ParsingDomain* parsingDomain_);
+    void CreateRules() override;
+    void GetReferencedGrammars() override;
     class TemplateIdRule;
     class TemplateParameterRule;
     class TemplateParameterListRule;
@@ -26,4 +26,4 @@ private:
 
 } } // namespace cmajor.parser
 
-#endif // Template_hpp_391
+#endif // Template_hpp_8344

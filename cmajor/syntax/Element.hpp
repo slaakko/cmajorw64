@@ -1,5 +1,5 @@
-#ifndef Element_hpp_20364
-#define Element_hpp_20364
+#ifndef Element_hpp_5581
+#define Element_hpp_5581
 
 #include <cmajor/parsing/Grammar.hpp>
 #include <cmajor/parsing/Keyword.hpp>
@@ -8,17 +8,17 @@
 
 namespace cmajor { namespace syntax {
 
-class ElementGrammar : public cmajor::parsing::Grammar
+class Element : public cmajor::parsing::Grammar
 {
 public:
-    static ElementGrammar* Create();
-    static ElementGrammar* Create(cmajor::parsing::ParsingDomain* parsingDomain);
+    static Element* Create();
+    static Element* Create(cmajor::parsing::ParsingDomain* parsingDomain);
     void Parse(const char32_t* start, const char32_t* end, int fileIndex, const std::string& fileName, cmajor::parsing::Grammar* grammar);
 private:
     std::vector<std::u32string> keywords0;
-    ElementGrammar(cmajor::parsing::ParsingDomain* parsingDomain_);
-    virtual void CreateRules();
-    virtual void GetReferencedGrammars();
+    Element(cmajor::parsing::ParsingDomain* parsingDomain_);
+    void CreateRules() override;
+    void GetReferencedGrammars() override;
     class RuleLinkRule;
     class SignatureRule;
     class ParameterListRule;
@@ -32,4 +32,4 @@ private:
 
 } } // namespace cmajor.syntax
 
-#endif // Element_hpp_20364
+#endif // Element_hpp_5581

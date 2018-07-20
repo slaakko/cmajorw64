@@ -5,7 +5,7 @@
 
 namespace cmajor.parser
 {
-    grammar KeywordGrammar
+    grammar Keyword
     {
         using stdlib.identifier;
         
@@ -21,6 +21,14 @@ namespace cmajor.parser
                 "break", "continue", "goto", "typedef", "typename", "const", "constexpr", "null", "this", "base",
                 "construct", "destroy", "new", "delete", "sizeof", "try", "catch", "throw",
                 "concept", "where", "axiom", "and", "or", "not", "unit_test"])
+            ;
+
+        PPKeyword
+            ::= S? '#' S? keyword_list(identifier, ["assert", "if", "elif", "else", "endif"])
+            ;
+
+        S
+            ::= [ \t]+
             ;
     }
 }

@@ -1233,7 +1233,7 @@ void StatementBinder::Visit(EmptyStatementNode& emptyStatementNode)
     }
 }
 
-TypeExprGrammar* typeExprGrammar = nullptr;
+TypeExpr* typeExprGrammar = nullptr;
 
 void StatementBinder::Visit(RangeForStatementNode& rangeForStatementNode)
 {
@@ -1243,7 +1243,7 @@ void StatementBinder::Visit(RangeForStatementNode& rangeForStatementNode)
     std::u32string plainContainerTypeFullName = plainContainerType->FullName();
     if (!typeExprGrammar)
     {
-        typeExprGrammar = TypeExprGrammar::Create();
+        typeExprGrammar = TypeExpr::Create();
     }
     ParsingContext parsingContext;
     std::unique_ptr<Node> containerTypeNode(typeExprGrammar->Parse(&plainContainerTypeFullName[0], &plainContainerTypeFullName[plainContainerTypeFullName.length()], 0, "", &parsingContext));

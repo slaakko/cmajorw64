@@ -34,6 +34,7 @@ public:
     void SetReturnFun(FunctionSymbol* returnFun_) { returnFun = returnFun_; }
     FunctionSymbol* EqualityOp() { return equalityOp; }
     void SetEqualityOp(FunctionSymbol* equalityOp_) { equalityOp = equalityOp_; }
+    const char* ClassName() const override { return "BasicTypeSymbol"; }
 private:
     FunctionSymbol* defaultConstructor;
     FunctionSymbol* copyConstructor;
@@ -55,6 +56,7 @@ public:
     bool IsSwitchConditionType() const override { return true; }
     ValueType GetValueType() const override;
     Value* MakeValue() const override;
+    const char* ClassName() const override { return "BoolTypeSymbol"; }
 };
 
 class SByteTypeSymbol : public BasicTypeSymbol
@@ -69,6 +71,7 @@ public:
     bool IsSwitchConditionType() const override { return true; }
     ValueType GetValueType() const override;
     Value* MakeValue() const override;
+    const char* ClassName() const override { return "SByteTypeSymbol"; }
 };
 
 class ByteTypeSymbol : public BasicTypeSymbol
@@ -84,6 +87,7 @@ public:
     bool IsSwitchConditionType() const override { return true; }
     ValueType GetValueType() const override;
     Value* MakeValue() const override;
+    const char* ClassName() const override { return "ByteTypeSymbol"; }
 };
 
 class ShortTypeSymbol : public BasicTypeSymbol
@@ -98,6 +102,7 @@ public:
     bool IsSwitchConditionType() const override { return true; }
     ValueType GetValueType() const override;
     Value* MakeValue() const override;
+    const char* ClassName() const override { return "ShortTypeSymbol"; }
 };
 
 class UShortTypeSymbol : public BasicTypeSymbol
@@ -113,6 +118,7 @@ public:
     bool IsSwitchConditionType() const override { return true; }
     ValueType GetValueType() const override;
     Value* MakeValue() const override;
+    const char* ClassName() const override { return "UShortTypeSymbol"; }
 };
 
 class IntTypeSymbol : public BasicTypeSymbol
@@ -127,6 +133,7 @@ public:
     bool IsSwitchConditionType() const override { return true; }
     ValueType GetValueType() const override;
     Value* MakeValue() const override;
+    const char* ClassName() const override { return "IntTypeSymbol"; }
 };
 
 class UIntTypeSymbol : public BasicTypeSymbol
@@ -142,6 +149,7 @@ public:
     bool IsSwitchConditionType() const override { return true; }
     ValueType GetValueType() const override;
     Value* MakeValue() const override;
+    const char* ClassName() const override { return "UIntTypeSymbol"; }
 };
 
 class LongTypeSymbol : public BasicTypeSymbol
@@ -156,6 +164,7 @@ public:
     bool IsSwitchConditionType() const override { return true; }
     ValueType GetValueType() const override;
     Value* MakeValue() const override;
+    const char* ClassName() const override { return "LongTypeSymbol"; }
 };
 
 class ULongTypeSymbol : public BasicTypeSymbol
@@ -171,6 +180,7 @@ public:
     bool IsSwitchConditionType() const override { return true; }
     ValueType GetValueType() const override;
     Value* MakeValue() const override;
+    const char* ClassName() const override { return "ULongTypeSymbol"; }
 };
 
 class FloatTypeSymbol : public BasicTypeSymbol
@@ -184,6 +194,7 @@ public:
     bool IsFloatingPointType() const override { return true; }
     ValueType GetValueType() const override;
     Value* MakeValue() const override;
+    const char* ClassName() const override { return "FloatTypeSymbol"; }
 };
 
 class DoubleTypeSymbol : public BasicTypeSymbol
@@ -197,6 +208,7 @@ public:
     bool IsFloatingPointType() const override { return true; }
     ValueType GetValueType() const override;
     Value* MakeValue() const override;
+    const char* ClassName() const override { return "DoubleTypeSymbol"; }
 };
 
 class CharTypeSymbol : public BasicTypeSymbol
@@ -210,6 +222,7 @@ public:
     bool IsSwitchConditionType() const override { return true; }
     ValueType GetValueType() const override;
     Value* MakeValue() const override;
+    const char* ClassName() const override { return "CharTypeSymbol"; }
 };
 
 class WCharTypeSymbol : public BasicTypeSymbol
@@ -223,6 +236,7 @@ public:
     bool IsSwitchConditionType() const override { return true; }
     ValueType GetValueType() const override;
     Value* MakeValue() const override;
+    const char* ClassName() const override { return "WCharTypeSymbol"; }
 };
 
 class UCharTypeSymbol : public BasicTypeSymbol
@@ -236,6 +250,7 @@ public:
     bool IsSwitchConditionType() const override { return true; }
     ValueType GetValueType() const override;
     Value* MakeValue() const override;
+    const char* ClassName() const override { return "UCharTypeSymbol"; }
 };
 
 class VoidTypeSymbol : public BasicTypeSymbol
@@ -247,6 +262,7 @@ public:
     llvm::Constant* CreateDefaultIrValue(Emitter& emitter) override { Assert(false, "tried to create default value of void"); return llvm::Constant::getNullValue(emitter.Builder().getInt8PtrTy()); }
     llvm::DIType* CreateDIType(Emitter& emitter) override;
     bool IsVoidType() const override { return true; }
+    const char* ClassName() const override { return "VoidTypeSymbol"; }
 };
 
 } } // namespace cmajor::symbols

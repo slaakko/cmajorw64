@@ -64,6 +64,34 @@ namespace System.Dom
         }
     }
     
+    public class DomEntityReference : DomCharacterData
+    {
+        public nothrow DomEntityReference() : base(u"entity_reference")
+        {
+        }
+        public nothrow explicit DomEntityReference(const ustring& entityRef_) : base(u"entity_reference", entityRef_)
+        {
+        }
+        suppress DomEntityReference(const DomEntityReference&);
+        suppress void operator=(const DomEntityReference&);
+        suppress DomEntityReference(DomEntityReference&&);
+        suppress void operator=(DomEntityReference&&);
+        public override void Write(CodeFormatter& formatter)
+        {
+            formatter.Write('&');
+            formatter.Write(ToUtf8(Data()));
+            formatter.Write(';');
+        }
+        public override UniquePtr<DomNode> CloneNode(bool deep) const
+        {
+            return UniquePtr<DomNode>(new DomEntityReference(Data()));
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(this);
+        }
+    }
+    
     public class DomCDataSection : DomText
     {
         public nothrow DomCDataSection() : base(u"cdata_section")

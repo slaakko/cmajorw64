@@ -1,5 +1,5 @@
-#ifndef Function_hpp_23579
-#define Function_hpp_23579
+#ifndef Function_hpp_8344
+#define Function_hpp_8344
 
 #include <cmajor/parsing/Grammar.hpp>
 #include <cmajor/parsing/Keyword.hpp>
@@ -10,16 +10,16 @@
 namespace cmajor { namespace parser {
 
 using namespace cmajor::ast;
-class FunctionGrammar : public cmajor::parsing::Grammar
+class Function : public cmajor::parsing::Grammar
 {
 public:
-    static FunctionGrammar* Create();
-    static FunctionGrammar* Create(cmajor::parsing::ParsingDomain* parsingDomain);
+    static Function* Create();
+    static Function* Create(cmajor::parsing::ParsingDomain* parsingDomain);
     FunctionNode* Parse(const char32_t* start, const char32_t* end, int fileIndex, const std::string& fileName, ParsingContext* ctx);
 private:
-    FunctionGrammar(cmajor::parsing::ParsingDomain* parsingDomain_);
-    virtual void CreateRules();
-    virtual void GetReferencedGrammars();
+    Function(cmajor::parsing::ParsingDomain* parsingDomain_);
+    void CreateRules() override;
+    void GetReferencedGrammars() override;
     class FunctionRule;
     class FunctionGroupIdRule;
     class OperatorFunctionGroupIdRule;
@@ -27,4 +27,4 @@ private:
 
 } } // namespace cmajor.parser
 
-#endif // Function_hpp_23579
+#endif // Function_hpp_8344

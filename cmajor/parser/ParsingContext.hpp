@@ -5,6 +5,7 @@
 
 #ifndef CMAJOR_PARSER_PARSING_CONTEXT_INCLUDED
 #define CMAJOR_PARSER_PARSING_CONTEXT_INCLUDED
+#include <stdint.h>
 #include <stack>
 
 namespace cmajor { namespace parser {

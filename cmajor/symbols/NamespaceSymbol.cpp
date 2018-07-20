@@ -32,4 +32,16 @@ void NamespaceSymbol::Import(NamespaceSymbol* that, SymbolTable& symbolTable)
     symbolTable.EndNamespace();
 }
 
+std::unique_ptr<dom::Element> NamespaceSymbol::CreateDomElement(TypeMap& typeMap)
+{
+    if (HasProjectMembers())
+    {
+        return std::unique_ptr<dom::Element>(new dom::Element(U"NamespaceSymbol"));
+    }
+    else
+    {
+        return std::unique_ptr<dom::Element>();
+    }
+}
+
 } } // namespace cmajor::symbols

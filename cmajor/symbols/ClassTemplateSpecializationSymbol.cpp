@@ -56,7 +56,6 @@ std::u32string ClassTemplateSpecializationSymbol::SimpleName() const
 void ClassTemplateSpecializationSymbol::Write(SymbolWriter& writer)
 {
     ClassTypeSymbol::Write(writer);
-    //uint32_t classTemplateId = classTemplate->TypeId();
     const boost::uuids::uuid& classTemplateId = classTemplate->TypeId();
     writer.GetBinaryWriter().Write(classTemplateId);
     uint32_t n = templateArgumentTypes.size();
@@ -64,7 +63,6 @@ void ClassTemplateSpecializationSymbol::Write(SymbolWriter& writer)
     for (uint32_t i = 0; i < n; ++i)
     {
         TypeSymbol* templateArgumentType = templateArgumentTypes[i];
-        //uint32_t templateArgumentTypeId = templateArgumentType->TypeId();
         const boost::uuids::uuid& templateArgumentTypeId = templateArgumentType->TypeId();
         writer.GetBinaryWriter().Write(templateArgumentTypeId);
     }
@@ -74,7 +72,6 @@ void ClassTemplateSpecializationSymbol::Write(SymbolWriter& writer)
 void ClassTemplateSpecializationSymbol::Read(SymbolReader& reader)
 {
     ClassTypeSymbol::Read(reader);
-    //uint32_t classTemplateId = reader.GetBinaryReader().ReadUInt();
     boost::uuids::uuid classTemplateId;
     reader.GetBinaryReader().ReadUuid(classTemplateId);
     GetSymbolTable()->EmplaceTypeRequest(this, classTemplateId, -1);
@@ -82,7 +79,6 @@ void ClassTemplateSpecializationSymbol::Read(SymbolReader& reader)
     templateArgumentTypes.resize(n);
     for (uint32_t i = 0; i < n; ++i)
     {
-        //uint32_t typeArgumentId = reader.GetBinaryReader().ReadUInt();
         boost::uuids::uuid typeArgumentId;
         reader.GetBinaryReader().ReadUuid(typeArgumentId);
         GetSymbolTable()->EmplaceTypeRequest(this, typeArgumentId, -2 - i);
@@ -183,7 +179,6 @@ std::u32string ClassTemplateSpecializationSymbol::Id() const
     }
     else
     {
-        //return ToUtf32(std::to_string(TypeId()));
         return ToUtf32(boost::uuids::to_string(TypeId()));
     }
 }

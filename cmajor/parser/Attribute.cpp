@@ -16,27 +16,27 @@ using namespace cmajor::parsing;
 using namespace cmajor::util;
 using namespace cmajor::unicode;
 
-AttributeGrammar* AttributeGrammar::Create()
+Attribute* Attribute::Create()
 {
     return Create(new cmajor::parsing::ParsingDomain());
 }
 
-AttributeGrammar* AttributeGrammar::Create(cmajor::parsing::ParsingDomain* parsingDomain)
+Attribute* Attribute::Create(cmajor::parsing::ParsingDomain* parsingDomain)
 {
     RegisterParsingDomain(parsingDomain);
-    AttributeGrammar* grammar(new AttributeGrammar(parsingDomain));
+    Attribute* grammar(new Attribute(parsingDomain));
     parsingDomain->AddGrammar(grammar);
     grammar->CreateRules();
     grammar->Link();
     return grammar;
 }
 
-AttributeGrammar::AttributeGrammar(cmajor::parsing::ParsingDomain* parsingDomain_): cmajor::parsing::Grammar(ToUtf32("AttributeGrammar"), parsingDomain_->GetNamespaceScope(ToUtf32("cmajor.parser")), parsingDomain_)
+Attribute::Attribute(cmajor::parsing::ParsingDomain* parsingDomain_): cmajor::parsing::Grammar(ToUtf32("Attribute"), parsingDomain_->GetNamespaceScope(ToUtf32("cmajor.parser")), parsingDomain_)
 {
     SetOwner(0);
 }
 
-cmajor::ast::Attributes* AttributeGrammar::Parse(const char32_t* start, const char32_t* end, int fileIndex, const std::string& fileName)
+cmajor::ast::Attributes* Attribute::Parse(const char32_t* start, const char32_t* end, int fileIndex, const std::string& fileName)
 {
     cmajor::parsing::Scanner scanner(start, end, fileName, fileIndex, SkipRule());
     std::unique_ptr<cmajor::parsing::XmlLog> xmlLog;
@@ -72,7 +72,7 @@ cmajor::ast::Attributes* AttributeGrammar::Parse(const char32_t* start, const ch
     return result;
 }
 
-class AttributeGrammar::AttributesRule : public cmajor::parsing::Rule
+class Attribute::AttributesRule : public cmajor::parsing::Rule
 {
 public:
     AttributesRule(const std::u32string& name_, Scope* enclosingScope_, int id_, Parser* definition_):
@@ -80,12 +80,12 @@ public:
     {
         SetValueTypeName(ToUtf32("cmajor::ast::Attributes*"));
     }
-    virtual void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData)
+    void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData) override
     {
         parsingData->PushContext(Id(), new Context());
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
     }
-    virtual void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched)
+    void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched) override
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
         if (matched)
@@ -94,7 +94,7 @@ public:
         }
         parsingData->PopContext(Id());
     }
-    virtual void Link()
+    void Link() override
     {
         cmajor::parsing::ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
         a0ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<AttributesRule>(this, &AttributesRule::A0Action));
@@ -119,7 +119,7 @@ private:
     };
 };
 
-class AttributeGrammar::AttributeRule : public cmajor::parsing::Rule
+class Attribute::AttributeRule : public cmajor::parsing::Rule
 {
 public:
     AttributeRule(const std::u32string& name_, Scope* enclosingScope_, int id_, Parser* definition_):
@@ -127,7 +127,7 @@ public:
     {
         AddInheritedAttribute(AttrOrVariable(ToUtf32("cmajor::ast::Attributes*"), ToUtf32("attributes")));
     }
-    virtual void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData)
+    void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData) override
     {
         parsingData->PushContext(Id(), new Context());
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
@@ -135,11 +135,11 @@ public:
         context->attributes = *static_cast<cmajor::parsing::ValueObject<cmajor::ast::Attributes*>*>(attributes_value.get());
         stack.pop();
     }
-    virtual void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched)
+    void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched) override
     {
         parsingData->PopContext(Id());
     }
-    virtual void Link()
+    void Link() override
     {
         cmajor::parsing::ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
         a0ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<AttributeRule>(this, &AttributeRule::A0Action));
@@ -190,7 +190,7 @@ private:
     };
 };
 
-void AttributeGrammar::GetReferencedGrammars()
+void Attribute::GetReferencedGrammars()
 {
     cmajor::parsing::ParsingDomain* pd = GetParsingDomain();
     cmajor::parsing::Grammar* grammar0 = pd->GetGrammar(ToUtf32("cmajor.parsing.stdlib"));
@@ -201,7 +201,7 @@ void AttributeGrammar::GetReferencedGrammars()
     AddGrammarReference(grammar0);
 }
 
-void AttributeGrammar::CreateRules()
+void Attribute::CreateRules()
 {
     AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("identifier"), this, ToUtf32("cmajor.parsing.stdlib.identifier")));
     AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("string"), this, ToUtf32("cmajor.parsing.stdlib.string")));
@@ -211,20 +211,22 @@ void AttributeGrammar::CreateRules()
                 new cmajor::parsing::ActionParser(ToUtf32("A0"),
                     new cmajor::parsing::CharParser('[')),
                 new cmajor::parsing::OptionalParser(
-                    new cmajor::parsing::ListParser(
-                        new cmajor::parsing::NonterminalParser(ToUtf32("Attribute"), ToUtf32("Attribute"), 1),
-                        new cmajor::parsing::CharParser(',')))),
+                    new cmajor::parsing::GroupingParser(
+                        new cmajor::parsing::ListParser(
+                            new cmajor::parsing::NonterminalParser(ToUtf32("Attribute"), ToUtf32("Attribute"), 1),
+                            new cmajor::parsing::CharParser(','))))),
             new cmajor::parsing::CharParser(']'))));
     AddRule(new AttributeRule(ToUtf32("Attribute"), GetScope(), GetParsingDomain()->GetNextRuleId(),
         new cmajor::parsing::SequenceParser(
             new cmajor::parsing::NonterminalParser(ToUtf32("name"), ToUtf32("identifier"), 0),
-            new cmajor::parsing::AlternativeParser(
-                new cmajor::parsing::SequenceParser(
-                    new cmajor::parsing::CharParser('='),
-                    new cmajor::parsing::ActionParser(ToUtf32("A0"),
-                        new cmajor::parsing::NonterminalParser(ToUtf32("val"), ToUtf32("string"), 0))),
-                new cmajor::parsing::ActionParser(ToUtf32("A1"),
-                    new cmajor::parsing::EmptyParser())))));
+            new cmajor::parsing::GroupingParser(
+                new cmajor::parsing::AlternativeParser(
+                    new cmajor::parsing::SequenceParser(
+                        new cmajor::parsing::CharParser('='),
+                        new cmajor::parsing::ActionParser(ToUtf32("A0"),
+                            new cmajor::parsing::NonterminalParser(ToUtf32("val"), ToUtf32("string"), 0))),
+                    new cmajor::parsing::ActionParser(ToUtf32("A1"),
+                        new cmajor::parsing::EmptyParser()))))));
 }
 
 } } // namespace cmajor.parser

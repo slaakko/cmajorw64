@@ -31,6 +31,7 @@ public:
     SymbolAccess DeclaredAccess() const override { return SymbolAccess::public_; }
     void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
     bool IsBasicTypeOperation() const override { return true; }
+    const char* ClassName() const override { return "PointerDefaultCtor"; }
 private:
     TypeSymbol* type;
     llvm::Value* nullValue;
@@ -98,6 +99,7 @@ public:
     SymbolAccess DeclaredAccess() const override { return SymbolAccess::public_; }
     void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
     bool IsBasicTypeOperation() const override { return true; }
+    const char* ClassName() const override { return "PointerCopyCtor"; }
 private:
     TypeSymbol* type;
 };
@@ -172,6 +174,7 @@ public:
     SymbolAccess DeclaredAccess() const override { return SymbolAccess::public_; }
     void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
     bool IsBasicTypeOperation() const override { return true; }
+    const char* ClassName() const override { return "PointerMoveCtor"; }
 private:
     TypeSymbol* type;
 };
@@ -248,6 +251,7 @@ public:
     SymbolAccess DeclaredAccess() const override { return SymbolAccess::public_; }
     void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
     bool IsBasicTypeOperation() const override { return true; }
+    const char* ClassName() const override { return "PointerCopyAssignment"; }
 private:
     TypeSymbol* type;
 };
@@ -317,6 +321,7 @@ public:
     SymbolAccess DeclaredAccess() const override { return SymbolAccess::public_; }
     void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
     bool IsBasicTypeOperation() const override { return true; }
+    const char* ClassName() const override { return "PointerMoveAssignment"; }
 private:
     TypeSymbol* type;
 };
@@ -388,6 +393,7 @@ public:
     SymbolAccess DeclaredAccess() const override { return SymbolAccess::public_; }
     void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
     bool IsBasicTypeOperation() const override { return true; }
+    const char* ClassName() const override { return "PointerReturn"; }
 private:
     TypeSymbol* type;
 };
@@ -455,6 +461,7 @@ public:
     SymbolAccess DeclaredAccess() const override { return SymbolAccess::public_; }
     void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
     bool IsBasicTypeOperation() const override { return true; }
+    const char* ClassName() const override { return "PointerPlusOffset"; }
 };
 
 PointerPlusOffset::PointerPlusOffset(TypeSymbol* pointerType_, TypeSymbol* longType_, const Span& span) : FunctionSymbol(span, U"operator+")
@@ -529,6 +536,7 @@ public:
     SymbolAccess DeclaredAccess() const override { return SymbolAccess::public_; }
     void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
     bool IsBasicTypeOperation() const override { return true; }
+    const char* ClassName() const override { return "OffsetPlusPointer"; }
 };
 
 OffsetPlusPointer::OffsetPlusPointer(TypeSymbol* longType_, TypeSymbol* pointerType_, const Span& span) : FunctionSymbol(span, U"operator+")
@@ -604,6 +612,7 @@ public:
     SymbolAccess DeclaredAccess() const override { return SymbolAccess::public_; }
     void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
     bool IsBasicTypeOperation() const override { return true; }
+    const char* ClassName() const override { return "PointerMinusOffset"; }
 };
 
 PointerMinusOffset::PointerMinusOffset(TypeSymbol* pointerType_, TypeSymbol* longType_, const Span& span) : FunctionSymbol(span, U"operator-")
@@ -679,6 +688,7 @@ public:
     SymbolAccess DeclaredAccess() const override { return SymbolAccess::public_; }
     void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
     bool IsBasicTypeOperation() const override { return true; }
+    const char* ClassName() const override { return "PointerMinusPointer"; }
 };
 
 PointerMinusPointer::PointerMinusPointer(TypeSymbol* pointerType_, TypeSymbol* longType_, const Span& span) : FunctionSymbol(span, U"operator-")
@@ -746,6 +756,7 @@ public:
     SymbolAccess DeclaredAccess() const override { return SymbolAccess::public_; }
     void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
     bool IsBasicTypeOperation() const override { return true; }
+    const char* ClassName() const override { return "PointerEqual"; }
 };
 
 PointerEqual::PointerEqual(TypeSymbol* pointerType_, TypeSymbol* boolType_, const Span& span) : FunctionSymbol(span, U"operator==")
@@ -817,6 +828,7 @@ public:
     SymbolAccess DeclaredAccess() const override { return SymbolAccess::public_; }
     void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
     bool IsBasicTypeOperation() const override { return true; }
+    const char* ClassName() const override { return "PointerLess"; }
 };
 
 PointerLess::PointerLess(TypeSymbol* pointerType_, TypeSymbol* boolType_, const Span& span) : FunctionSymbol(span, U"operator<")
@@ -884,6 +896,7 @@ public:
     SymbolAccess DeclaredAccess() const override { return SymbolAccess::public_; }
     void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
     bool IsBasicTypeOperation() const override { return true; }
+    const char* ClassName() const override { return "PointerArrow"; }
 private:
     TypeSymbol* type;
 };
@@ -945,6 +958,7 @@ public:
     SymbolAccess DeclaredAccess() const override { return SymbolAccess::public_; }
     void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
     bool IsBasicTypeOperation() const override { return true; }
+    const char* ClassName() const override { return "LvalueRefefenceCopyCtor"; }
 private:
     TypeSymbol* type;
 };
@@ -1010,6 +1024,7 @@ public:
     void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
     bool IsBasicTypeOperation() const override { return true; }
     bool IsLvalueReferenceCopyAssignment() const { return true; }
+    const char* ClassName() const override { return "LvalueReferenceCopyAssignment"; }
 private:
     TypeSymbol* type;
 };
@@ -1079,6 +1094,7 @@ public:
     SymbolAccess DeclaredAccess() const override { return SymbolAccess::public_; }
     void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
     bool IsBasicTypeOperation() const override { return true; }
+    const char* ClassName() const override { return "LvalueReferenceMoveAssignment"; }
 private:
     TypeSymbol* type;
 };
@@ -1150,6 +1166,7 @@ public:
     SymbolAccess DeclaredAccess() const override { return SymbolAccess::public_; }
     void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
     bool IsBasicTypeOperation() const override { return true; }
+    const char* ClassName() const override { return "LvalueReferenceReturn"; }
 private:
     TypeSymbol* type;
 };
@@ -1210,6 +1227,7 @@ public:
     SymbolAccess DeclaredAccess() const override { return SymbolAccess::public_; }
     void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
     bool IsBasicTypeOperation() const override { return true; }
+    const char* ClassName() const override { return "RvalueRefefenceCopyCtor"; }
 private:
     TypeSymbol* type;
 };
@@ -1275,6 +1293,7 @@ public:
     SymbolAccess DeclaredAccess() const override { return SymbolAccess::public_; }
     void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
     bool IsBasicTypeOperation() const override { return true; }
+    const char* ClassName() const override { return "RvalueReferenceCopyAssignment"; }
 private:
     TypeSymbol* type;
 };
@@ -1343,6 +1362,7 @@ public:
     SymbolAccess DeclaredAccess() const override { return SymbolAccess::public_; }
     void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
     bool IsBasicTypeOperation() const override { return true; }
+    const char* ClassName() const override { return "RvalueReferenceReturn"; }
 private:
     TypeSymbol* type;
 };
@@ -1854,6 +1874,7 @@ public:
     SymbolAccess DeclaredAccess() const override { return SymbolAccess::public_; }
     bool IsGeneratedFunction() const override { return true; }
     ClassTypeSymbol* ClassType() { return classType; }
+    const char* ClassName() const override { return "ClassDefaultConstructor"; }
 private:
     ClassTypeSymbol* classType;
 };
@@ -2027,6 +2048,7 @@ public:
     SymbolAccess DeclaredAccess() const override { return SymbolAccess::public_; }
     bool IsGeneratedFunction() const override { return true; }
     ClassTypeSymbol* ClassType() { return classType; }
+    const char* ClassName() const override { return "ClassCopyConstructor"; }
 private:
     ClassTypeSymbol* classType;
 };
@@ -2221,6 +2243,7 @@ public:
     SymbolAccess DeclaredAccess() const override { return SymbolAccess::public_; }
     bool IsGeneratedFunction() const override { return true; }
     ClassTypeSymbol* ClassType() { return classType; }
+    const char* ClassName() const override { return "ClassMoveConstructor"; }
 private:
     ClassTypeSymbol* classType;
 };
@@ -2419,6 +2442,7 @@ public:
     SymbolAccess DeclaredAccess() const override { return SymbolAccess::public_; }
     bool IsGeneratedFunction() const override { return true; }
     ClassTypeSymbol* ClassType() { return classType; }
+    const char* ClassName() const override { return "ClassCopyAssignment"; }
 private:
     ClassTypeSymbol* classType;
 };
@@ -2588,6 +2612,7 @@ public:
     SymbolAccess DeclaredAccess() const override { return SymbolAccess::public_; }
     bool IsGeneratedFunction() const override { return true; }
     ClassTypeSymbol* ClassType() { return classType; }
+    const char* ClassName() const override { return "ClassMoveAssignment"; }
 private:
     ClassTypeSymbol* classType;
 };

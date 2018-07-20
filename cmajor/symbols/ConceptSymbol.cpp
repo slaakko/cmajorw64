@@ -46,6 +46,32 @@ ConceptSymbol* ConceptGroupSymbol::GetConcept(int arity)
     }
 }
 
+bool ConceptGroupSymbol::HasProjectMembers() const
+{
+    for (const auto& p : arityConceptMap)
+    {
+        ConceptSymbol* concept = p.second;
+        if (concept->IsProject())
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+void ConceptGroupSymbol::AppendChildElements(dom::Element* element, TypeMap& typeMap) const
+{
+    for (const auto& p : arityConceptMap)
+    {
+        ConceptSymbol* concept = p.second;
+        if (concept->IsProject())
+        {
+            std::unique_ptr<dom::Element> conceptElement = concept->ToDomElement(typeMap);
+            element->AppendChild(std::unique_ptr<dom::Node>(conceptElement.release()));
+        }
+    }
+}
+
 ConceptSymbol::ConceptSymbol(const Span& span_, const std::u32string& name_) : ContainerSymbol(SymbolType::conceptSymbol, span_, name_), refinedConcept(nullptr), 
     typeId(boost::uuids::nil_generator()())
 {
@@ -57,7 +83,6 @@ void ConceptSymbol::Write(SymbolWriter& writer)
     Assert(!typeId.is_nil(), "type id not initialized");
     writer.GetBinaryWriter().Write(typeId);
     writer.GetBinaryWriter().Write(groupName);
-    //uint32_t refineConceptId = 0;
     boost::uuids::uuid refineConceptId = boost::uuids::nil_generator()();
     if (refinedConcept)
     {
@@ -72,11 +97,9 @@ void ConceptSymbol::Write(SymbolWriter& writer)
 void ConceptSymbol::Read(SymbolReader& reader)
 {
     ContainerSymbol::Read(reader);
-    //typeId = reader.GetBinaryReader().ReadUInt();
     reader.GetBinaryReader().ReadUuid(typeId);
     GetSymbolTable()->AddTypeOrConceptSymbolToTypeIdMap(this);
     groupName = reader.GetBinaryReader().ReadUtf32String();
-    //uint32_t refinedConcepId = reader.GetBinaryReader().ReadUInt();
     boost::uuids::uuid refinedConcepId;
     reader.GetBinaryReader().ReadUuid(refinedConcepId);
     if (!refinedConcepId.is_nil())

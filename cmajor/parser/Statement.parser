@@ -14,14 +14,14 @@ namespace cmajor.parser
 {
     [hpp]using namespace cmajor::ast;
 
-    grammar StatementGrammar
+    grammar Statement
     {
         using stdlib.identifier;
-        using KeywordGrammar.Keyword;
-        using ExpressionGrammar.Expression;
-        using TypeExprGrammar.TypeExpr;
-        using IdentifierGrammar.Identifier;
-        using ExpressionGrammar.ArgumentList;
+        using Keyword.Keyword;
+        using Expression.Expression;
+        using TypeExpr.TypeExpr;
+        using Identifier.Identifier;
+        using Expression.ArgumentList;
 
         Statement(ParsingContext* ctx) : StatementNode*
             ::= LabeledStatement(ctx){ value = LabeledStatement; }

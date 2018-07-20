@@ -24,25 +24,25 @@ namespace cmajor.parser
 {
     [hpp]using namespace cmajor::ast;
 
-    grammar ClassGrammar
+    grammar Class
     {
-        using AttributeGrammar.Attributes;
-        using SpecifierGrammar.Specifiers;
-        using IdentifierGrammar.Identifier;
-        using IdentifierGrammar.QualifiedId;
-        using TypeExprGrammar.TypeExpr;
-        using ConceptGrammar.WhereConstraint;
-        using ExpressionGrammar.ArgumentList;
-        using StatementGrammar.CompoundStatement;
-        using ParameterGrammar.ParameterList;
-        using FunctionGrammar.FunctionGroupId;
-        using TemplateGrammar.TemplateId;
-        using TemplateGrammar.TemplateParameterList;
-        using TypedefGrammar.Typedef;
-        using EnumerationGrammar.EnumType;
-        using ConstantGrammar.Constant;
-        using DelegateGrammar.Delegate;
-        using DelegateGrammar.ClassDelegate;
+        using Attribute.Attributes;
+        using Specifier.Specifiers;
+        using Identifier.Identifier;
+        using Identifier.QualifiedId;
+        using TypeExpr.TypeExpr;
+        using Concept.WhereConstraint;
+        using Expression.ArgumentList;
+        using Statement.CompoundStatement;
+        using Parameter.ParameterList;
+        using Function.FunctionGroupId;
+        using Template.TemplateId;
+        using Template.TemplateParameterList;
+        using Typedef.Typedef;
+        using Enumeration.EnumType;
+        using Constant.Constant;
+        using Delegate.Delegate;
+        using Delegate.ClassDelegate;
 
         Class(ParsingContext* ctx, var std::unique_ptr<Attributes> attributes) : ClassNode*
             ::= (Attributes{ attributes.reset(Attributes); })?

@@ -38,6 +38,7 @@ class Parser: public ParsingObject
 {
 public:
     Parser(const std::u32string& name_, const std::u32string& info_);
+    Parser(const std::u32string& name_, const std::u32string& info_, ObjectKind kind_);
     const std::u32string& Info() const { return info; }
     virtual Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData) = 0;
 private:

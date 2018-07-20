@@ -1,5 +1,5 @@
-#ifndef SourceToken_hpp_391
-#define SourceToken_hpp_391
+#ifndef SourceToken_hpp_32388
+#define SourceToken_hpp_32388
 
 #include <cmajor/parsing/Grammar.hpp>
 #include <cmajor/parsing/Keyword.hpp>
@@ -8,16 +8,16 @@
 namespace cmajor { namespace parser {
 
 using namespace cmajor::ast;
-class SourceTokenGrammar : public cmajor::parsing::Grammar
+class SourceToken : public cmajor::parsing::Grammar
 {
 public:
-    static SourceTokenGrammar* Create();
-    static SourceTokenGrammar* Create(cmajor::parsing::ParsingDomain* parsingDomain);
+    static SourceToken* Create();
+    static SourceToken* Create(cmajor::parsing::ParsingDomain* parsingDomain);
     void Parse(const char32_t* start, const char32_t* end, int fileIndex, const std::string& fileName, SourceTokenFormatter* formatter);
 private:
-    SourceTokenGrammar(cmajor::parsing::ParsingDomain* parsingDomain_);
-    virtual void CreateRules();
-    virtual void GetReferencedGrammars();
+    SourceToken(cmajor::parsing::ParsingDomain* parsingDomain_);
+    void CreateRules() override;
+    void GetReferencedGrammars() override;
     class SourceTokensRule;
     class SourceTokenRule;
     class SpacesRule;
@@ -26,4 +26,4 @@ private:
 
 } } // namespace cmajor.parser
 
-#endif // SourceToken_hpp_391
+#endif // SourceToken_hpp_32388

@@ -14,8 +14,8 @@ class Namespace: public ParsingObject
 {
 public:
     Namespace(const std::u32string& name_, Scope* enclosingScope_);
-    virtual void Accept(Visitor& visitor);
-    virtual bool IsNamespace() const { return true; }
+    void Accept(Visitor& visitor) override;
+    bool IsNamespace() const override { return true; }
 };
 
 class Scope;
@@ -24,7 +24,7 @@ class UsingObject: public ParsingObject
 {
 public:
     UsingObject(cmajor::codedom::UsingObject* subject_, Scope* enclosingScope_);
-    virtual void Accept(Visitor& visitor);
+    void Accept(Visitor& visitor) override;
     cmajor::codedom::UsingObject* Subject() const { return subject; }
 private:
     cmajor::codedom::UsingObject* subject;

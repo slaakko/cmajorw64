@@ -31,7 +31,6 @@ struct InitDone
     InitDone()
     {
         cmajor::ast::Init();
-        //cmajor::parser::FileRegistry::Init();
         cmajor::symbols::Init();
         cmajor::parsing::Init();
         cmajor::util::Init();
@@ -81,6 +80,12 @@ void PrintHelp()
         "   clean given solutions and projects\n" <<
         "--debug-parse (-p)\n" <<
         "   debug parsing to stdout\n" <<
+        "--ast2xml (-x)\n" <<
+        "   output AST of each source file as xml\n" <<
+        "--sym2xml (-y)\n" <<
+        "   output symbol table as xml\n" <<
+        "--bdt2xml (-bd)\n" <<
+        "   output bound tree as xml\n" <<
         "--link-with-debug-runtime (-d)\n" <<
         "   link with the debug version of the runtime library cmrt210(d).dll\n" <<
         "--link-using-ms-link (-m)\n" <<
@@ -204,6 +209,18 @@ int main(int argc, const char** argv)
                     else if (arg == "--debug-parse" || arg == "-p")
                     {
                         SetGlobalFlag(GlobalFlags::debugParsing);
+                    }
+                    else if (arg == "--ast2xml" || arg == "-x")
+                    {
+                        SetGlobalFlag(GlobalFlags::ast2xml);
+                    }
+                    else if (arg == "--sym2xml" || arg == "-y")
+                    {
+                        SetGlobalFlag(GlobalFlags::sym2xml);
+                    }
+                    else if (arg == "--bdt2xml" || arg == "-bd")
+                    {
+                        SetGlobalFlag(GlobalFlags::bdt2xml);
                     }
                     else if (arg == "--strict-nothrow" || arg == "-s")
                     {

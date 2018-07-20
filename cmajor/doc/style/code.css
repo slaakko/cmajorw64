@@ -4,7 +4,7 @@
     font-size: small;
 }
 
-.keyword 
+.keyword
 {
     font-weight: bold;
     color: blue;
@@ -12,7 +12,7 @@
 
 .identifier
 {
-    color : blue;
+    color : black;
 }
 
 .number

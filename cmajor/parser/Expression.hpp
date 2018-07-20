@@ -1,5 +1,5 @@
-#ifndef Expression_hpp_391
-#define Expression_hpp_391
+#ifndef Expression_hpp_8344
+#define Expression_hpp_8344
 
 #include <cmajor/parsing/Grammar.hpp>
 #include <cmajor/parsing/Keyword.hpp>
@@ -9,16 +9,16 @@
 namespace cmajor { namespace parser {
 
 using namespace cmajor::ast;
-class ExpressionGrammar : public cmajor::parsing::Grammar
+class Expression : public cmajor::parsing::Grammar
 {
 public:
-    static ExpressionGrammar* Create();
-    static ExpressionGrammar* Create(cmajor::parsing::ParsingDomain* parsingDomain);
+    static Expression* Create();
+    static Expression* Create(cmajor::parsing::ParsingDomain* parsingDomain);
     Node* Parse(const char32_t* start, const char32_t* end, int fileIndex, const std::string& fileName, ParsingContext* ctx);
 private:
-    ExpressionGrammar(cmajor::parsing::ParsingDomain* parsingDomain_);
-    virtual void CreateRules();
-    virtual void GetReferencedGrammars();
+    Expression(cmajor::parsing::ParsingDomain* parsingDomain_);
+    void CreateRules() override;
+    void GetReferencedGrammars() override;
     class ExpressionRule;
     class EquivalenceRule;
     class ImplicationRule;
@@ -47,4 +47,4 @@ private:
 
 } } // namespace cmajor.parser
 
-#endif // Expression_hpp_391
+#endif // Expression_hpp_8344

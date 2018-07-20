@@ -23,27 +23,27 @@ using namespace cmajor::parsing;
 using namespace cmajor::util;
 using namespace cmajor::unicode;
 
-ConceptGrammar* ConceptGrammar::Create()
+Concept* Concept::Create()
 {
     return Create(new cmajor::parsing::ParsingDomain());
 }
 
-ConceptGrammar* ConceptGrammar::Create(cmajor::parsing::ParsingDomain* parsingDomain)
+Concept* Concept::Create(cmajor::parsing::ParsingDomain* parsingDomain)
 {
     RegisterParsingDomain(parsingDomain);
-    ConceptGrammar* grammar(new ConceptGrammar(parsingDomain));
+    Concept* grammar(new Concept(parsingDomain));
     parsingDomain->AddGrammar(grammar);
     grammar->CreateRules();
     grammar->Link();
     return grammar;
 }
 
-ConceptGrammar::ConceptGrammar(cmajor::parsing::ParsingDomain* parsingDomain_): cmajor::parsing::Grammar(ToUtf32("ConceptGrammar"), parsingDomain_->GetNamespaceScope(ToUtf32("cmajor.parser")), parsingDomain_)
+Concept::Concept(cmajor::parsing::ParsingDomain* parsingDomain_): cmajor::parsing::Grammar(ToUtf32("Concept"), parsingDomain_->GetNamespaceScope(ToUtf32("cmajor.parser")), parsingDomain_)
 {
     SetOwner(0);
 }
 
-ConceptNode* ConceptGrammar::Parse(const char32_t* start, const char32_t* end, int fileIndex, const std::string& fileName, ParsingContext* ctx)
+ConceptNode* Concept::Parse(const char32_t* start, const char32_t* end, int fileIndex, const std::string& fileName, ParsingContext* ctx)
 {
     cmajor::parsing::Scanner scanner(start, end, fileName, fileIndex, SkipRule());
     std::unique_ptr<cmajor::parsing::XmlLog> xmlLog;
@@ -80,7 +80,7 @@ ConceptNode* ConceptGrammar::Parse(const char32_t* start, const char32_t* end, i
     return result;
 }
 
-class ConceptGrammar::ConceptRule : public cmajor::parsing::Rule
+class Concept::ConceptRule : public cmajor::parsing::Rule
 {
 public:
     ConceptRule(const std::u32string& name_, Scope* enclosingScope_, int id_, Parser* definition_):
@@ -89,7 +89,7 @@ public:
         AddInheritedAttribute(AttrOrVariable(ToUtf32("ParsingContext*"), ToUtf32("ctx")));
         SetValueTypeName(ToUtf32("ConceptNode*"));
     }
-    virtual void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData)
+    void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData) override
     {
         parsingData->PushContext(Id(), new Context());
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
@@ -97,7 +97,7 @@ public:
         context->ctx = *static_cast<cmajor::parsing::ValueObject<ParsingContext*>*>(ctx_value.get());
         stack.pop();
     }
-    virtual void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched)
+    void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched) override
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
         if (matched)
@@ -106,7 +106,7 @@ public:
         }
         parsingData->PopContext(Id());
     }
-    virtual void Link()
+    void Link() override
     {
         cmajor::parsing::ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
         a0ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<ConceptRule>(this, &ConceptRule::A0Action));
@@ -252,7 +252,7 @@ private:
     };
 };
 
-class ConceptGrammar::RefinementRule : public cmajor::parsing::Rule
+class Concept::RefinementRule : public cmajor::parsing::Rule
 {
 public:
     RefinementRule(const std::u32string& name_, Scope* enclosingScope_, int id_, Parser* definition_):
@@ -260,12 +260,12 @@ public:
     {
         SetValueTypeName(ToUtf32("ConceptIdNode*"));
     }
-    virtual void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData)
+    void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData) override
     {
         parsingData->PushContext(Id(), new Context());
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
     }
-    virtual void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched)
+    void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched) override
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
         if (matched)
@@ -274,7 +274,7 @@ public:
         }
         parsingData->PopContext(Id());
     }
-    virtual void Link()
+    void Link() override
     {
         cmajor::parsing::ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
         a0ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<RefinementRule>(this, &RefinementRule::A0Action));
@@ -332,7 +332,7 @@ private:
     };
 };
 
-class ConceptGrammar::ConceptBodyRule : public cmajor::parsing::Rule
+class Concept::ConceptBodyRule : public cmajor::parsing::Rule
 {
 public:
     ConceptBodyRule(const std::u32string& name_, Scope* enclosingScope_, int id_, Parser* definition_):
@@ -341,7 +341,7 @@ public:
         AddInheritedAttribute(AttrOrVariable(ToUtf32("ParsingContext*"), ToUtf32("ctx")));
         AddInheritedAttribute(AttrOrVariable(ToUtf32("ConceptNode*"), ToUtf32("concept")));
     }
-    virtual void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData)
+    void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData) override
     {
         parsingData->PushContext(Id(), new Context());
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
@@ -352,11 +352,11 @@ public:
         context->ctx = *static_cast<cmajor::parsing::ValueObject<ParsingContext*>*>(ctx_value.get());
         stack.pop();
     }
-    virtual void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched)
+    void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched) override
     {
         parsingData->PopContext(Id());
     }
-    virtual void Link()
+    void Link() override
     {
         cmajor::parsing::NonterminalParser* conceptBodyConstraintNonterminalParser = GetNonterminal(ToUtf32("ConceptBodyConstraint"));
         conceptBodyConstraintNonterminalParser->SetPreCall(new cmajor::parsing::MemberPreCall<ConceptBodyRule>(this, &ConceptBodyRule::PreConceptBodyConstraint));
@@ -384,7 +384,7 @@ private:
     };
 };
 
-class ConceptGrammar::ConceptBodyConstraintRule : public cmajor::parsing::Rule
+class Concept::ConceptBodyConstraintRule : public cmajor::parsing::Rule
 {
 public:
     ConceptBodyConstraintRule(const std::u32string& name_, Scope* enclosingScope_, int id_, Parser* definition_):
@@ -393,7 +393,7 @@ public:
         AddInheritedAttribute(AttrOrVariable(ToUtf32("ParsingContext*"), ToUtf32("ctx")));
         AddInheritedAttribute(AttrOrVariable(ToUtf32("ConceptNode*"), ToUtf32("concept")));
     }
-    virtual void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData)
+    void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData) override
     {
         parsingData->PushContext(Id(), new Context());
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
@@ -404,11 +404,11 @@ public:
         context->ctx = *static_cast<cmajor::parsing::ValueObject<ParsingContext*>*>(ctx_value.get());
         stack.pop();
     }
-    virtual void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched)
+    void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched) override
     {
         parsingData->PopContext(Id());
     }
-    virtual void Link()
+    void Link() override
     {
         cmajor::parsing::ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
         a0ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<ConceptBodyConstraintRule>(this, &ConceptBodyConstraintRule::A0Action));
@@ -499,7 +499,7 @@ private:
     };
 };
 
-class ConceptGrammar::TypeNameConstraintRule : public cmajor::parsing::Rule
+class Concept::TypeNameConstraintRule : public cmajor::parsing::Rule
 {
 public:
     TypeNameConstraintRule(const std::u32string& name_, Scope* enclosingScope_, int id_, Parser* definition_):
@@ -508,7 +508,7 @@ public:
         AddInheritedAttribute(AttrOrVariable(ToUtf32("ParsingContext*"), ToUtf32("ctx")));
         SetValueTypeName(ToUtf32("ConstraintNode*"));
     }
-    virtual void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData)
+    void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData) override
     {
         parsingData->PushContext(Id(), new Context());
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
@@ -516,7 +516,7 @@ public:
         context->ctx = *static_cast<cmajor::parsing::ValueObject<ParsingContext*>*>(ctx_value.get());
         stack.pop();
     }
-    virtual void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched)
+    void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched) override
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
         if (matched)
@@ -525,7 +525,7 @@ public:
         }
         parsingData->PopContext(Id());
     }
-    virtual void Link()
+    void Link() override
     {
         cmajor::parsing::ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
         a0ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<TypeNameConstraintRule>(this, &TypeNameConstraintRule::A0Action));
@@ -563,7 +563,7 @@ private:
     };
 };
 
-class ConceptGrammar::SignatureConstraintRule : public cmajor::parsing::Rule
+class Concept::SignatureConstraintRule : public cmajor::parsing::Rule
 {
 public:
     SignatureConstraintRule(const std::u32string& name_, Scope* enclosingScope_, int id_, Parser* definition_):
@@ -573,7 +573,7 @@ public:
         AddInheritedAttribute(AttrOrVariable(ToUtf32("IdentifierNode*"), ToUtf32("firstTypeParameter")));
         SetValueTypeName(ToUtf32("ConstraintNode*"));
     }
-    virtual void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData)
+    void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData) override
     {
         parsingData->PushContext(Id(), new Context());
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
@@ -584,7 +584,7 @@ public:
         context->ctx = *static_cast<cmajor::parsing::ValueObject<ParsingContext*>*>(ctx_value.get());
         stack.pop();
     }
-    virtual void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched)
+    void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched) override
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
         if (matched)
@@ -593,7 +593,7 @@ public:
         }
         parsingData->PopContext(Id());
     }
-    virtual void Link()
+    void Link() override
     {
         cmajor::parsing::ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
         a0ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<SignatureConstraintRule>(this, &SignatureConstraintRule::A0Action));
@@ -712,7 +712,7 @@ private:
     };
 };
 
-class ConceptGrammar::ConstructorConstraintRule : public cmajor::parsing::Rule
+class Concept::ConstructorConstraintRule : public cmajor::parsing::Rule
 {
 public:
     ConstructorConstraintRule(const std::u32string& name_, Scope* enclosingScope_, int id_, Parser* definition_):
@@ -724,7 +724,7 @@ public:
         AddLocalVariable(AttrOrVariable(ToUtf32("std::unique_ptr<IdentifierNode>"), ToUtf32("id")));
         AddLocalVariable(AttrOrVariable(ToUtf32("std::unique_ptr<ConstraintNode>"), ToUtf32("ctorConstraint")));
     }
-    virtual void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData)
+    void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData) override
     {
         parsingData->PushContext(Id(), new Context());
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
@@ -735,7 +735,7 @@ public:
         context->ctx = *static_cast<cmajor::parsing::ValueObject<ParsingContext*>*>(ctx_value.get());
         stack.pop();
     }
-    virtual void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched)
+    void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched) override
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
         if (matched)
@@ -744,7 +744,7 @@ public:
         }
         parsingData->PopContext(Id());
     }
-    virtual void Link()
+    void Link() override
     {
         cmajor::parsing::ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
         a0ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<ConstructorConstraintRule>(this, &ConstructorConstraintRule::A0Action));
@@ -797,7 +797,7 @@ private:
     };
 };
 
-class ConceptGrammar::DestructorConstraintRule : public cmajor::parsing::Rule
+class Concept::DestructorConstraintRule : public cmajor::parsing::Rule
 {
 public:
     DestructorConstraintRule(const std::u32string& name_, Scope* enclosingScope_, int id_, Parser* definition_):
@@ -808,7 +808,7 @@ public:
         SetValueTypeName(ToUtf32("ConstraintNode*"));
         AddLocalVariable(AttrOrVariable(ToUtf32("std::unique_ptr<IdentifierNode>"), ToUtf32("id")));
     }
-    virtual void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData)
+    void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData) override
     {
         parsingData->PushContext(Id(), new Context());
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
@@ -819,7 +819,7 @@ public:
         context->ctx = *static_cast<cmajor::parsing::ValueObject<ParsingContext*>*>(ctx_value.get());
         stack.pop();
     }
-    virtual void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched)
+    void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched) override
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
         if (matched)
@@ -828,7 +828,7 @@ public:
         }
         parsingData->PopContext(Id());
     }
-    virtual void Link()
+    void Link() override
     {
         cmajor::parsing::ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
         a0ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<DestructorConstraintRule>(this, &DestructorConstraintRule::A0Action));
@@ -870,7 +870,7 @@ private:
     };
 };
 
-class ConceptGrammar::MemberFunctionConstraintRule : public cmajor::parsing::Rule
+class Concept::MemberFunctionConstraintRule : public cmajor::parsing::Rule
 {
 public:
     MemberFunctionConstraintRule(const std::u32string& name_, Scope* enclosingScope_, int id_, Parser* definition_):
@@ -881,7 +881,7 @@ public:
         AddLocalVariable(AttrOrVariable(ToUtf32("std::unique_ptr<Node>"), ToUtf32("returnType")));
         AddLocalVariable(AttrOrVariable(ToUtf32("std::unique_ptr<IdentifierNode>"), ToUtf32("typeParam")));
     }
-    virtual void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData)
+    void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData) override
     {
         parsingData->PushContext(Id(), new Context());
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
@@ -889,7 +889,7 @@ public:
         context->ctx = *static_cast<cmajor::parsing::ValueObject<ParsingContext*>*>(ctx_value.get());
         stack.pop();
     }
-    virtual void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched)
+    void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched) override
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
         if (matched)
@@ -898,7 +898,7 @@ public:
         }
         parsingData->PopContext(Id());
     }
-    virtual void Link()
+    void Link() override
     {
         cmajor::parsing::ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
         a0ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<MemberFunctionConstraintRule>(this, &MemberFunctionConstraintRule::A0Action));
@@ -999,7 +999,7 @@ private:
     };
 };
 
-class ConceptGrammar::FunctionConstraintRule : public cmajor::parsing::Rule
+class Concept::FunctionConstraintRule : public cmajor::parsing::Rule
 {
 public:
     FunctionConstraintRule(const std::u32string& name_, Scope* enclosingScope_, int id_, Parser* definition_):
@@ -1008,7 +1008,7 @@ public:
         AddInheritedAttribute(AttrOrVariable(ToUtf32("ParsingContext*"), ToUtf32("ctx")));
         SetValueTypeName(ToUtf32("ConstraintNode*"));
     }
-    virtual void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData)
+    void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData) override
     {
         parsingData->PushContext(Id(), new Context());
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
@@ -1016,7 +1016,7 @@ public:
         context->ctx = *static_cast<cmajor::parsing::ValueObject<ParsingContext*>*>(ctx_value.get());
         stack.pop();
     }
-    virtual void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched)
+    void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched) override
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
         if (matched)
@@ -1025,7 +1025,7 @@ public:
         }
         parsingData->PopContext(Id());
     }
-    virtual void Link()
+    void Link() override
     {
         cmajor::parsing::ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
         a0ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<FunctionConstraintRule>(this, &FunctionConstraintRule::A0Action));
@@ -1097,7 +1097,7 @@ private:
     };
 };
 
-class ConceptGrammar::EmbeddedConstraintRule : public cmajor::parsing::Rule
+class Concept::EmbeddedConstraintRule : public cmajor::parsing::Rule
 {
 public:
     EmbeddedConstraintRule(const std::u32string& name_, Scope* enclosingScope_, int id_, Parser* definition_):
@@ -1106,7 +1106,7 @@ public:
         AddInheritedAttribute(AttrOrVariable(ToUtf32("ParsingContext*"), ToUtf32("ctx")));
         SetValueTypeName(ToUtf32("ConstraintNode*"));
     }
-    virtual void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData)
+    void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData) override
     {
         parsingData->PushContext(Id(), new Context());
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
@@ -1114,7 +1114,7 @@ public:
         context->ctx = *static_cast<cmajor::parsing::ValueObject<ParsingContext*>*>(ctx_value.get());
         stack.pop();
     }
-    virtual void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched)
+    void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched) override
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
         if (matched)
@@ -1123,7 +1123,7 @@ public:
         }
         parsingData->PopContext(Id());
     }
-    virtual void Link()
+    void Link() override
     {
         cmajor::parsing::ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
         a0ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<EmbeddedConstraintRule>(this, &EmbeddedConstraintRule::A0Action));
@@ -1161,7 +1161,7 @@ private:
     };
 };
 
-class ConceptGrammar::WhereConstraintRule : public cmajor::parsing::Rule
+class Concept::WhereConstraintRule : public cmajor::parsing::Rule
 {
 public:
     WhereConstraintRule(const std::u32string& name_, Scope* enclosingScope_, int id_, Parser* definition_):
@@ -1170,7 +1170,7 @@ public:
         AddInheritedAttribute(AttrOrVariable(ToUtf32("ParsingContext*"), ToUtf32("ctx")));
         SetValueTypeName(ToUtf32("WhereConstraintNode*"));
     }
-    virtual void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData)
+    void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData) override
     {
         parsingData->PushContext(Id(), new Context());
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
@@ -1178,7 +1178,7 @@ public:
         context->ctx = *static_cast<cmajor::parsing::ValueObject<ParsingContext*>*>(ctx_value.get());
         stack.pop();
     }
-    virtual void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched)
+    void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched) override
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
         if (matched)
@@ -1187,7 +1187,7 @@ public:
         }
         parsingData->PopContext(Id());
     }
-    virtual void Link()
+    void Link() override
     {
         cmajor::parsing::ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
         a0ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<WhereConstraintRule>(this, &WhereConstraintRule::A0Action));
@@ -1225,7 +1225,7 @@ private:
     };
 };
 
-class ConceptGrammar::ConstraintExprRule : public cmajor::parsing::Rule
+class Concept::ConstraintExprRule : public cmajor::parsing::Rule
 {
 public:
     ConstraintExprRule(const std::u32string& name_, Scope* enclosingScope_, int id_, Parser* definition_):
@@ -1234,7 +1234,7 @@ public:
         AddInheritedAttribute(AttrOrVariable(ToUtf32("ParsingContext*"), ToUtf32("ctx")));
         SetValueTypeName(ToUtf32("ConstraintNode*"));
     }
-    virtual void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData)
+    void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData) override
     {
         parsingData->PushContext(Id(), new Context());
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
@@ -1242,7 +1242,7 @@ public:
         context->ctx = *static_cast<cmajor::parsing::ValueObject<ParsingContext*>*>(ctx_value.get());
         stack.pop();
     }
-    virtual void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched)
+    void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched) override
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
         if (matched)
@@ -1251,7 +1251,7 @@ public:
         }
         parsingData->PopContext(Id());
     }
-    virtual void Link()
+    void Link() override
     {
         cmajor::parsing::ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
         a0ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<ConstraintExprRule>(this, &ConstraintExprRule::A0Action));
@@ -1289,7 +1289,7 @@ private:
     };
 };
 
-class ConceptGrammar::DisjunctiveConstraintExprRule : public cmajor::parsing::Rule
+class Concept::DisjunctiveConstraintExprRule : public cmajor::parsing::Rule
 {
 public:
     DisjunctiveConstraintExprRule(const std::u32string& name_, Scope* enclosingScope_, int id_, Parser* definition_):
@@ -1299,7 +1299,7 @@ public:
         SetValueTypeName(ToUtf32("ConstraintNode*"));
         AddLocalVariable(AttrOrVariable(ToUtf32("Span"), ToUtf32("s")));
     }
-    virtual void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData)
+    void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData) override
     {
         parsingData->PushContext(Id(), new Context());
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
@@ -1307,7 +1307,7 @@ public:
         context->ctx = *static_cast<cmajor::parsing::ValueObject<ParsingContext*>*>(ctx_value.get());
         stack.pop();
     }
-    virtual void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched)
+    void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched) override
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
         if (matched)
@@ -1316,7 +1316,7 @@ public:
         }
         parsingData->PopContext(Id());
     }
-    virtual void Link()
+    void Link() override
     {
         cmajor::parsing::ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
         a0ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<DisjunctiveConstraintExprRule>(this, &DisjunctiveConstraintExprRule::A0Action));
@@ -1383,7 +1383,7 @@ private:
     };
 };
 
-class ConceptGrammar::ConjunctiveConstraintExprRule : public cmajor::parsing::Rule
+class Concept::ConjunctiveConstraintExprRule : public cmajor::parsing::Rule
 {
 public:
     ConjunctiveConstraintExprRule(const std::u32string& name_, Scope* enclosingScope_, int id_, Parser* definition_):
@@ -1393,7 +1393,7 @@ public:
         SetValueTypeName(ToUtf32("ConstraintNode*"));
         AddLocalVariable(AttrOrVariable(ToUtf32("Span"), ToUtf32("s")));
     }
-    virtual void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData)
+    void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData) override
     {
         parsingData->PushContext(Id(), new Context());
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
@@ -1401,7 +1401,7 @@ public:
         context->ctx = *static_cast<cmajor::parsing::ValueObject<ParsingContext*>*>(ctx_value.get());
         stack.pop();
     }
-    virtual void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched)
+    void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched) override
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
         if (matched)
@@ -1410,7 +1410,7 @@ public:
         }
         parsingData->PopContext(Id());
     }
-    virtual void Link()
+    void Link() override
     {
         cmajor::parsing::ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
         a0ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<ConjunctiveConstraintExprRule>(this, &ConjunctiveConstraintExprRule::A0Action));
@@ -1477,7 +1477,7 @@ private:
     };
 };
 
-class ConceptGrammar::PrimaryConstraintExprRule : public cmajor::parsing::Rule
+class Concept::PrimaryConstraintExprRule : public cmajor::parsing::Rule
 {
 public:
     PrimaryConstraintExprRule(const std::u32string& name_, Scope* enclosingScope_, int id_, Parser* definition_):
@@ -1486,7 +1486,7 @@ public:
         AddInheritedAttribute(AttrOrVariable(ToUtf32("ParsingContext*"), ToUtf32("ctx")));
         SetValueTypeName(ToUtf32("ConstraintNode*"));
     }
-    virtual void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData)
+    void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData) override
     {
         parsingData->PushContext(Id(), new Context());
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
@@ -1494,7 +1494,7 @@ public:
         context->ctx = *static_cast<cmajor::parsing::ValueObject<ParsingContext*>*>(ctx_value.get());
         stack.pop();
     }
-    virtual void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched)
+    void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched) override
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
         if (matched)
@@ -1503,7 +1503,7 @@ public:
         }
         parsingData->PopContext(Id());
     }
-    virtual void Link()
+    void Link() override
     {
         cmajor::parsing::ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
         a0ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<PrimaryConstraintExprRule>(this, &PrimaryConstraintExprRule::A0Action));
@@ -1567,7 +1567,7 @@ private:
     };
 };
 
-class ConceptGrammar::AtomicConstraintExprRule : public cmajor::parsing::Rule
+class Concept::AtomicConstraintExprRule : public cmajor::parsing::Rule
 {
 public:
     AtomicConstraintExprRule(const std::u32string& name_, Scope* enclosingScope_, int id_, Parser* definition_):
@@ -1576,7 +1576,7 @@ public:
         AddInheritedAttribute(AttrOrVariable(ToUtf32("ParsingContext*"), ToUtf32("ctx")));
         SetValueTypeName(ToUtf32("ConstraintNode*"));
     }
-    virtual void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData)
+    void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData) override
     {
         parsingData->PushContext(Id(), new Context());
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
@@ -1584,7 +1584,7 @@ public:
         context->ctx = *static_cast<cmajor::parsing::ValueObject<ParsingContext*>*>(ctx_value.get());
         stack.pop();
     }
-    virtual void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched)
+    void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched) override
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
         if (matched)
@@ -1593,7 +1593,7 @@ public:
         }
         parsingData->PopContext(Id());
     }
-    virtual void Link()
+    void Link() override
     {
         cmajor::parsing::ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
         a0ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<AtomicConstraintExprRule>(this, &AtomicConstraintExprRule::A0Action));
@@ -1683,7 +1683,7 @@ private:
     };
 };
 
-class ConceptGrammar::PredicateConstraintRule : public cmajor::parsing::Rule
+class Concept::PredicateConstraintRule : public cmajor::parsing::Rule
 {
 public:
     PredicateConstraintRule(const std::u32string& name_, Scope* enclosingScope_, int id_, Parser* definition_):
@@ -1692,7 +1692,7 @@ public:
         AddInheritedAttribute(AttrOrVariable(ToUtf32("ParsingContext*"), ToUtf32("ctx")));
         SetValueTypeName(ToUtf32("ConstraintNode*"));
     }
-    virtual void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData)
+    void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData) override
     {
         parsingData->PushContext(Id(), new Context());
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
@@ -1700,7 +1700,7 @@ public:
         context->ctx = *static_cast<cmajor::parsing::ValueObject<ParsingContext*>*>(ctx_value.get());
         stack.pop();
     }
-    virtual void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched)
+    void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched) override
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
         if (matched)
@@ -1709,7 +1709,7 @@ public:
         }
         parsingData->PopContext(Id());
     }
-    virtual void Link()
+    void Link() override
     {
         cmajor::parsing::ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
         a0ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<PredicateConstraintRule>(this, &PredicateConstraintRule::A0Action));
@@ -1747,7 +1747,7 @@ private:
     };
 };
 
-class ConceptGrammar::IsConstraintRule : public cmajor::parsing::Rule
+class Concept::IsConstraintRule : public cmajor::parsing::Rule
 {
 public:
     IsConstraintRule(const std::u32string& name_, Scope* enclosingScope_, int id_, Parser* definition_):
@@ -1757,7 +1757,7 @@ public:
         SetValueTypeName(ToUtf32("ConstraintNode*"));
         AddLocalVariable(AttrOrVariable(ToUtf32("std::unique_ptr<Node>"), ToUtf32("typeExpr")));
     }
-    virtual void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData)
+    void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData) override
     {
         parsingData->PushContext(Id(), new Context());
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
@@ -1765,7 +1765,7 @@ public:
         context->ctx = *static_cast<cmajor::parsing::ValueObject<ParsingContext*>*>(ctx_value.get());
         stack.pop();
     }
-    virtual void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched)
+    void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched) override
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
         if (matched)
@@ -1774,7 +1774,7 @@ public:
         }
         parsingData->PopContext(Id());
     }
-    virtual void Link()
+    void Link() override
     {
         cmajor::parsing::ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
         a0ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<IsConstraintRule>(this, &IsConstraintRule::A0Action));
@@ -1839,7 +1839,7 @@ private:
     };
 };
 
-class ConceptGrammar::ConceptOrTypeNameRule : public cmajor::parsing::Rule
+class Concept::ConceptOrTypeNameRule : public cmajor::parsing::Rule
 {
 public:
     ConceptOrTypeNameRule(const std::u32string& name_, Scope* enclosingScope_, int id_, Parser* definition_):
@@ -1848,7 +1848,7 @@ public:
         AddInheritedAttribute(AttrOrVariable(ToUtf32("ParsingContext*"), ToUtf32("ctx")));
         SetValueTypeName(ToUtf32("Node*"));
     }
-    virtual void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData)
+    void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData) override
     {
         parsingData->PushContext(Id(), new Context());
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
@@ -1856,7 +1856,7 @@ public:
         context->ctx = *static_cast<cmajor::parsing::ValueObject<ParsingContext*>*>(ctx_value.get());
         stack.pop();
     }
-    virtual void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched)
+    void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched) override
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
         if (matched)
@@ -1865,7 +1865,7 @@ public:
         }
         parsingData->PopContext(Id());
     }
-    virtual void Link()
+    void Link() override
     {
         cmajor::parsing::ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
         a0ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<ConceptOrTypeNameRule>(this, &ConceptOrTypeNameRule::A0Action));
@@ -1903,7 +1903,7 @@ private:
     };
 };
 
-class ConceptGrammar::MultiParamConstraintRule : public cmajor::parsing::Rule
+class Concept::MultiParamConstraintRule : public cmajor::parsing::Rule
 {
 public:
     MultiParamConstraintRule(const std::u32string& name_, Scope* enclosingScope_, int id_, Parser* definition_):
@@ -1913,7 +1913,7 @@ public:
         SetValueTypeName(ToUtf32("ConstraintNode*"));
         AddLocalVariable(AttrOrVariable(ToUtf32("std::unique_ptr<MultiParamConstraintNode>"), ToUtf32("constraint")));
     }
-    virtual void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData)
+    void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData) override
     {
         parsingData->PushContext(Id(), new Context());
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
@@ -1921,7 +1921,7 @@ public:
         context->ctx = *static_cast<cmajor::parsing::ValueObject<ParsingContext*>*>(ctx_value.get());
         stack.pop();
     }
-    virtual void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched)
+    void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched) override
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
         if (matched)
@@ -1930,7 +1930,7 @@ public:
         }
         parsingData->PopContext(Id());
     }
-    virtual void Link()
+    void Link() override
     {
         cmajor::parsing::ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
         a0ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<MultiParamConstraintRule>(this, &MultiParamConstraintRule::A0Action));
@@ -1997,7 +1997,7 @@ private:
     };
 };
 
-class ConceptGrammar::AxiomRule : public cmajor::parsing::Rule
+class Concept::AxiomRule : public cmajor::parsing::Rule
 {
 public:
     AxiomRule(const std::u32string& name_, Scope* enclosingScope_, int id_, Parser* definition_):
@@ -2007,7 +2007,7 @@ public:
         AddInheritedAttribute(AttrOrVariable(ToUtf32("ConceptNode*"), ToUtf32("concept")));
         AddLocalVariable(AttrOrVariable(ToUtf32("std::unique_ptr<AxiomNode>"), ToUtf32("axiom")));
     }
-    virtual void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData)
+    void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData) override
     {
         parsingData->PushContext(Id(), new Context());
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
@@ -2018,11 +2018,11 @@ public:
         context->ctx = *static_cast<cmajor::parsing::ValueObject<ParsingContext*>*>(ctx_value.get());
         stack.pop();
     }
-    virtual void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched)
+    void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched) override
     {
         parsingData->PopContext(Id());
     }
-    virtual void Link()
+    void Link() override
     {
         cmajor::parsing::ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
         a0ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<AxiomRule>(this, &AxiomRule::A0Action));
@@ -2085,7 +2085,7 @@ private:
     };
 };
 
-class ConceptGrammar::AxiomBodyRule : public cmajor::parsing::Rule
+class Concept::AxiomBodyRule : public cmajor::parsing::Rule
 {
 public:
     AxiomBodyRule(const std::u32string& name_, Scope* enclosingScope_, int id_, Parser* definition_):
@@ -2094,7 +2094,7 @@ public:
         AddInheritedAttribute(AttrOrVariable(ToUtf32("ParsingContext*"), ToUtf32("ctx")));
         AddInheritedAttribute(AttrOrVariable(ToUtf32("AxiomNode*"), ToUtf32("axiom")));
     }
-    virtual void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData)
+    void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData) override
     {
         parsingData->PushContext(Id(), new Context());
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
@@ -2105,11 +2105,11 @@ public:
         context->ctx = *static_cast<cmajor::parsing::ValueObject<ParsingContext*>*>(ctx_value.get());
         stack.pop();
     }
-    virtual void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched)
+    void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched) override
     {
         parsingData->PopContext(Id());
     }
-    virtual void Link()
+    void Link() override
     {
         cmajor::parsing::ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
         a0ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<AxiomBodyRule>(this, &AxiomBodyRule::A0Action));
@@ -2147,7 +2147,7 @@ private:
     };
 };
 
-class ConceptGrammar::AxiomStatementRule : public cmajor::parsing::Rule
+class Concept::AxiomStatementRule : public cmajor::parsing::Rule
 {
 public:
     AxiomStatementRule(const std::u32string& name_, Scope* enclosingScope_, int id_, Parser* definition_):
@@ -2156,7 +2156,7 @@ public:
         AddInheritedAttribute(AttrOrVariable(ToUtf32("ParsingContext*"), ToUtf32("ctx")));
         SetValueTypeName(ToUtf32("AxiomStatementNode*"));
     }
-    virtual void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData)
+    void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData) override
     {
         parsingData->PushContext(Id(), new Context());
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
@@ -2164,7 +2164,7 @@ public:
         context->ctx = *static_cast<cmajor::parsing::ValueObject<ParsingContext*>*>(ctx_value.get());
         stack.pop();
     }
-    virtual void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched)
+    void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched) override
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
         if (matched)
@@ -2173,7 +2173,7 @@ public:
         }
         parsingData->PopContext(Id());
     }
-    virtual void Link()
+    void Link() override
     {
         cmajor::parsing::ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
         a0ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<AxiomStatementRule>(this, &AxiomStatementRule::A0Action));
@@ -2211,121 +2211,130 @@ private:
     };
 };
 
-void ConceptGrammar::GetReferencedGrammars()
+void Concept::GetReferencedGrammars()
 {
     cmajor::parsing::ParsingDomain* pd = GetParsingDomain();
-    cmajor::parsing::Grammar* grammar0 = pd->GetGrammar(ToUtf32("cmajor.parser.SpecifierGrammar"));
+    cmajor::parsing::Grammar* grammar0 = pd->GetGrammar(ToUtf32("cmajor.parser.TypeExpr"));
     if (!grammar0)
     {
-        grammar0 = cmajor::parser::SpecifierGrammar::Create(pd);
+        grammar0 = cmajor::parser::TypeExpr::Create(pd);
     }
     AddGrammarReference(grammar0);
-    cmajor::parsing::Grammar* grammar1 = pd->GetGrammar(ToUtf32("cmajor.parser.FunctionGrammar"));
+    cmajor::parsing::Grammar* grammar1 = pd->GetGrammar(ToUtf32("cmajor.parser.Identifier"));
     if (!grammar1)
     {
-        grammar1 = cmajor::parser::FunctionGrammar::Create(pd);
+        grammar1 = cmajor::parser::Identifier::Create(pd);
     }
     AddGrammarReference(grammar1);
-    cmajor::parsing::Grammar* grammar2 = pd->GetGrammar(ToUtf32("cmajor.parser.ParameterGrammar"));
+    cmajor::parsing::Grammar* grammar2 = pd->GetGrammar(ToUtf32("cmajor.parser.Specifier"));
     if (!grammar2)
     {
-        grammar2 = cmajor::parser::ParameterGrammar::Create(pd);
+        grammar2 = cmajor::parser::Specifier::Create(pd);
     }
     AddGrammarReference(grammar2);
-    cmajor::parsing::Grammar* grammar3 = pd->GetGrammar(ToUtf32("cmajor.parser.ExpressionGrammar"));
+    cmajor::parsing::Grammar* grammar3 = pd->GetGrammar(ToUtf32("cmajor.parser.Expression"));
     if (!grammar3)
     {
-        grammar3 = cmajor::parser::ExpressionGrammar::Create(pd);
+        grammar3 = cmajor::parser::Expression::Create(pd);
     }
     AddGrammarReference(grammar3);
-    cmajor::parsing::Grammar* grammar4 = pd->GetGrammar(ToUtf32("cmajor.parser.IdentifierGrammar"));
+    cmajor::parsing::Grammar* grammar4 = pd->GetGrammar(ToUtf32("cmajor.parser.Parameter"));
     if (!grammar4)
     {
-        grammar4 = cmajor::parser::IdentifierGrammar::Create(pd);
+        grammar4 = cmajor::parser::Parameter::Create(pd);
     }
     AddGrammarReference(grammar4);
-    cmajor::parsing::Grammar* grammar5 = pd->GetGrammar(ToUtf32("cmajor.parser.TypeExprGrammar"));
+    cmajor::parsing::Grammar* grammar5 = pd->GetGrammar(ToUtf32("cmajor.parser.Function"));
     if (!grammar5)
     {
-        grammar5 = cmajor::parser::TypeExprGrammar::Create(pd);
+        grammar5 = cmajor::parser::Function::Create(pd);
     }
     AddGrammarReference(grammar5);
 }
 
-void ConceptGrammar::CreateRules()
+void Concept::CreateRules()
 {
-    AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("Specifiers"), this, ToUtf32("SpecifierGrammar.Specifiers")));
-    AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("FunctionGroupId"), this, ToUtf32("FunctionGrammar.FunctionGroupId")));
-    AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("InvokeExpr"), this, ToUtf32("ExpressionGrammar.InvokeExpr")));
-    AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("Identifier"), this, ToUtf32("IdentifierGrammar.Identifier")));
-    AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("QualifiedId"), this, ToUtf32("IdentifierGrammar.QualifiedId")));
-    AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("ParameterList"), this, ToUtf32("ParameterGrammar.ParameterList")));
-    AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("Expression"), this, ToUtf32("ExpressionGrammar.Expression")));
-    AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("TypeExpr"), this, ToUtf32("TypeExprGrammar.TypeExpr")));
+    AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("Specifiers"), this, ToUtf32("Specifier.Specifiers")));
+    AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("Identifier"), this, ToUtf32("Identifier.Identifier")));
+    AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("InvokeExpr"), this, ToUtf32("Expression.InvokeExpr")));
+    AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("QualifiedId"), this, ToUtf32("Identifier.QualifiedId")));
+    AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("Expression"), this, ToUtf32("Expression.Expression")));
+    AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("ParameterList"), this, ToUtf32("Parameter.ParameterList")));
+    AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("TypeExpr"), this, ToUtf32("TypeExpr.TypeExpr")));
+    AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("FunctionGroupId"), this, ToUtf32("Function.FunctionGroupId")));
     AddRule(new ConceptRule(ToUtf32("Concept"), GetScope(), GetParsingDomain()->GetNextRuleId(),
         new cmajor::parsing::SequenceParser(
             new cmajor::parsing::ActionParser(ToUtf32("A0"),
                 new cmajor::parsing::EmptyParser()),
             new cmajor::parsing::ActionParser(ToUtf32("A1"),
-                new cmajor::parsing::SequenceParser(
+                new cmajor::parsing::GroupingParser(
                     new cmajor::parsing::SequenceParser(
                         new cmajor::parsing::SequenceParser(
                             new cmajor::parsing::SequenceParser(
                                 new cmajor::parsing::SequenceParser(
                                     new cmajor::parsing::SequenceParser(
                                         new cmajor::parsing::SequenceParser(
-                                            new cmajor::parsing::ActionParser(ToUtf32("A2"),
-                                                new cmajor::parsing::SequenceParser(
-                                                    new cmajor::parsing::SequenceParser(
-                                                        new cmajor::parsing::NonterminalParser(ToUtf32("Specifiers"), ToUtf32("Specifiers"), 0),
-                                                        new cmajor::parsing::KeywordParser(ToUtf32("concept"))),
-                                                    new cmajor::parsing::ExpectationParser(
-                                                        new cmajor::parsing::NonterminalParser(ToUtf32("conceptName"), ToUtf32("Identifier"), 0)))),
-                                            new cmajor::parsing::ExpectationParser(
-                                                new cmajor::parsing::CharParser('<'))),
-                                        new cmajor::parsing::ListParser(
-                                            new cmajor::parsing::ActionParser(ToUtf32("A3"),
-                                                new cmajor::parsing::NonterminalParser(ToUtf32("typeParameter"), ToUtf32("Identifier"), 0)),
-                                            new cmajor::parsing::CharParser(','))),
-                                    new cmajor::parsing::ExpectationParser(
-                                        new cmajor::parsing::CharParser('>'))),
-                                new cmajor::parsing::ActionParser(ToUtf32("A4"),
-                                    new cmajor::parsing::SequenceParser(
-                                        new cmajor::parsing::OptionalParser(
-                                            new cmajor::parsing::ActionParser(ToUtf32("A5"),
-                                                new cmajor::parsing::NonterminalParser(ToUtf32("Refinement"), ToUtf32("Refinement"), 0))),
-                                        new cmajor::parsing::OptionalParser(
-                                            new cmajor::parsing::ActionParser(ToUtf32("A6"),
-                                                new cmajor::parsing::NonterminalParser(ToUtf32("WhereConstraint"), ToUtf32("WhereConstraint"), 1)))))),
+                                            new cmajor::parsing::SequenceParser(
+                                                new cmajor::parsing::ActionParser(ToUtf32("A2"),
+                                                    new cmajor::parsing::GroupingParser(
+                                                        new cmajor::parsing::SequenceParser(
+                                                            new cmajor::parsing::SequenceParser(
+                                                                new cmajor::parsing::NonterminalParser(ToUtf32("Specifiers"), ToUtf32("Specifiers"), 0),
+                                                                new cmajor::parsing::KeywordParser(ToUtf32("concept"))),
+                                                            new cmajor::parsing::ExpectationParser(
+                                                                new cmajor::parsing::NonterminalParser(ToUtf32("conceptName"), ToUtf32("Identifier"), 0))))),
+                                                new cmajor::parsing::ExpectationParser(
+                                                    new cmajor::parsing::CharParser('<'))),
+                                            new cmajor::parsing::GroupingParser(
+                                                new cmajor::parsing::ListParser(
+                                                    new cmajor::parsing::ActionParser(ToUtf32("A3"),
+                                                        new cmajor::parsing::NonterminalParser(ToUtf32("typeParameter"), ToUtf32("Identifier"), 0)),
+                                                    new cmajor::parsing::CharParser(',')))),
+                                        new cmajor::parsing::ExpectationParser(
+                                            new cmajor::parsing::CharParser('>'))),
+                                    new cmajor::parsing::ActionParser(ToUtf32("A4"),
+                                        new cmajor::parsing::GroupingParser(
+                                            new cmajor::parsing::SequenceParser(
+                                                new cmajor::parsing::OptionalParser(
+                                                    new cmajor::parsing::GroupingParser(
+                                                        new cmajor::parsing::ActionParser(ToUtf32("A5"),
+                                                            new cmajor::parsing::NonterminalParser(ToUtf32("Refinement"), ToUtf32("Refinement"), 0)))),
+                                                new cmajor::parsing::OptionalParser(
+                                                    new cmajor::parsing::GroupingParser(
+                                                        new cmajor::parsing::ActionParser(ToUtf32("A6"),
+                                                            new cmajor::parsing::NonterminalParser(ToUtf32("WhereConstraint"), ToUtf32("WhereConstraint"), 1)))))))),
+                                new cmajor::parsing::ExpectationParser(
+                                    new cmajor::parsing::CharParser('{'))),
                             new cmajor::parsing::ExpectationParser(
-                                new cmajor::parsing::CharParser('{'))),
+                                new cmajor::parsing::NonterminalParser(ToUtf32("ConceptBody"), ToUtf32("ConceptBody"), 2))),
                         new cmajor::parsing::ExpectationParser(
-                            new cmajor::parsing::NonterminalParser(ToUtf32("ConceptBody"), ToUtf32("ConceptBody"), 2))),
-                    new cmajor::parsing::ExpectationParser(
-                        new cmajor::parsing::CharParser('}')))))));
+                            new cmajor::parsing::CharParser('}'))))))));
     AddRule(new RefinementRule(ToUtf32("Refinement"), GetScope(), GetParsingDomain()->GetNextRuleId(),
         new cmajor::parsing::ActionParser(ToUtf32("A0"),
-            new cmajor::parsing::SequenceParser(
+            new cmajor::parsing::GroupingParser(
                 new cmajor::parsing::SequenceParser(
                     new cmajor::parsing::SequenceParser(
                         new cmajor::parsing::SequenceParser(
-                            new cmajor::parsing::CharParser(':'),
-                            new cmajor::parsing::ActionParser(ToUtf32("A1"),
-                                new cmajor::parsing::ExpectationParser(
-                                    new cmajor::parsing::NonterminalParser(ToUtf32("QualifiedId"), ToUtf32("QualifiedId"), 0)))),
-                        new cmajor::parsing::ExpectationParser(
-                            new cmajor::parsing::CharParser('<'))),
-                    new cmajor::parsing::ListParser(
-                        new cmajor::parsing::ActionParser(ToUtf32("A2"),
-                            new cmajor::parsing::NonterminalParser(ToUtf32("Identifier"), ToUtf32("Identifier"), 0)),
-                        new cmajor::parsing::CharParser(','))),
-                new cmajor::parsing::ExpectationParser(
-                    new cmajor::parsing::CharParser('>'))))));
+                            new cmajor::parsing::SequenceParser(
+                                new cmajor::parsing::CharParser(':'),
+                                new cmajor::parsing::ActionParser(ToUtf32("A1"),
+                                    new cmajor::parsing::ExpectationParser(
+                                        new cmajor::parsing::NonterminalParser(ToUtf32("QualifiedId"), ToUtf32("QualifiedId"), 0)))),
+                            new cmajor::parsing::ExpectationParser(
+                                new cmajor::parsing::CharParser('<'))),
+                        new cmajor::parsing::GroupingParser(
+                            new cmajor::parsing::ListParser(
+                                new cmajor::parsing::ActionParser(ToUtf32("A2"),
+                                    new cmajor::parsing::NonterminalParser(ToUtf32("Identifier"), ToUtf32("Identifier"), 0)),
+                                new cmajor::parsing::CharParser(',')))),
+                    new cmajor::parsing::ExpectationParser(
+                        new cmajor::parsing::CharParser('>')))))));
     AddRule(new ConceptBodyRule(ToUtf32("ConceptBody"), GetScope(), GetParsingDomain()->GetNextRuleId(),
         new cmajor::parsing::KleeneStarParser(
-            new cmajor::parsing::AlternativeParser(
-                new cmajor::parsing::NonterminalParser(ToUtf32("ConceptBodyConstraint"), ToUtf32("ConceptBodyConstraint"), 2),
-                new cmajor::parsing::NonterminalParser(ToUtf32("Axiom"), ToUtf32("Axiom"), 2)))));
+            new cmajor::parsing::GroupingParser(
+                new cmajor::parsing::AlternativeParser(
+                    new cmajor::parsing::NonterminalParser(ToUtf32("ConceptBodyConstraint"), ToUtf32("ConceptBodyConstraint"), 2),
+                    new cmajor::parsing::NonterminalParser(ToUtf32("Axiom"), ToUtf32("Axiom"), 2))))));
     AddRule(new ConceptBodyConstraintRule(ToUtf32("ConceptBodyConstraint"), GetScope(), GetParsingDomain()->GetNextRuleId(),
         new cmajor::parsing::AlternativeParser(
             new cmajor::parsing::AlternativeParser(
@@ -2337,12 +2346,13 @@ void ConceptGrammar::CreateRules()
                 new cmajor::parsing::NonterminalParser(ToUtf32("EmbeddedConstraint"), ToUtf32("EmbeddedConstraint"), 1)))));
     AddRule(new TypeNameConstraintRule(ToUtf32("TypeNameConstraint"), GetScope(), GetParsingDomain()->GetNextRuleId(),
         new cmajor::parsing::ActionParser(ToUtf32("A0"),
-            new cmajor::parsing::SequenceParser(
+            new cmajor::parsing::GroupingParser(
                 new cmajor::parsing::SequenceParser(
-                    new cmajor::parsing::KeywordParser(ToUtf32("typename")),
-                    new cmajor::parsing::ExpectationParser(
-                        new cmajor::parsing::NonterminalParser(ToUtf32("TypeExpr"), ToUtf32("TypeExpr"), 1))),
-                new cmajor::parsing::CharParser(';')))));
+                    new cmajor::parsing::SequenceParser(
+                        new cmajor::parsing::KeywordParser(ToUtf32("typename")),
+                        new cmajor::parsing::ExpectationParser(
+                            new cmajor::parsing::NonterminalParser(ToUtf32("TypeExpr"), ToUtf32("TypeExpr"), 1))),
+                    new cmajor::parsing::CharParser(';'))))));
     AddRule(new SignatureConstraintRule(ToUtf32("SignatureConstraint"), GetScope(), GetParsingDomain()->GetNextRuleId(),
         new cmajor::parsing::AlternativeParser(
             new cmajor::parsing::AlternativeParser(
@@ -2357,75 +2367,81 @@ void ConceptGrammar::CreateRules()
                 new cmajor::parsing::NonterminalParser(ToUtf32("FunctionConstraint"), ToUtf32("FunctionConstraint"), 1)))));
     AddRule(new ConstructorConstraintRule(ToUtf32("ConstructorConstraint"), GetScope(), GetParsingDomain()->GetNextRuleId(),
         new cmajor::parsing::ActionParser(ToUtf32("A0"),
-            new cmajor::parsing::SequenceParser(
-                new cmajor::parsing::SequenceParser(
-                    new cmajor::parsing::SequenceParser(
-                        new cmajor::parsing::OptionalParser(
-                            new cmajor::parsing::KeywordParser(ToUtf32("explicit"))),
-                        new cmajor::parsing::ActionParser(ToUtf32("A1"),
-                            new cmajor::parsing::NonterminalParser(ToUtf32("Identifier"), ToUtf32("Identifier"), 0))),
-                    new cmajor::parsing::NonterminalParser(ToUtf32("ParameterList"), ToUtf32("ParameterList"), 2)),
-                new cmajor::parsing::ExpectationParser(
-                    new cmajor::parsing::CharParser(';'))))));
-    AddRule(new DestructorConstraintRule(ToUtf32("DestructorConstraint"), GetScope(), GetParsingDomain()->GetNextRuleId(),
-        new cmajor::parsing::ActionParser(ToUtf32("A0"),
-            new cmajor::parsing::SequenceParser(
+            new cmajor::parsing::GroupingParser(
                 new cmajor::parsing::SequenceParser(
                     new cmajor::parsing::SequenceParser(
                         new cmajor::parsing::SequenceParser(
-                            new cmajor::parsing::CharParser('~'),
+                            new cmajor::parsing::OptionalParser(
+                                new cmajor::parsing::KeywordParser(ToUtf32("explicit"))),
                             new cmajor::parsing::ActionParser(ToUtf32("A1"),
                                 new cmajor::parsing::NonterminalParser(ToUtf32("Identifier"), ToUtf32("Identifier"), 0))),
-                        new cmajor::parsing::ExpectationParser(
-                            new cmajor::parsing::CharParser('('))),
+                        new cmajor::parsing::NonterminalParser(ToUtf32("ParameterList"), ToUtf32("ParameterList"), 2)),
                     new cmajor::parsing::ExpectationParser(
-                        new cmajor::parsing::CharParser(')'))),
-                new cmajor::parsing::ExpectationParser(
-                    new cmajor::parsing::CharParser(';'))))));
-    AddRule(new MemberFunctionConstraintRule(ToUtf32("MemberFunctionConstraint"), GetScope(), GetParsingDomain()->GetNextRuleId(),
+                        new cmajor::parsing::CharParser(';')))))));
+    AddRule(new DestructorConstraintRule(ToUtf32("DestructorConstraint"), GetScope(), GetParsingDomain()->GetNextRuleId(),
         new cmajor::parsing::ActionParser(ToUtf32("A0"),
-            new cmajor::parsing::SequenceParser(
+            new cmajor::parsing::GroupingParser(
                 new cmajor::parsing::SequenceParser(
                     new cmajor::parsing::SequenceParser(
                         new cmajor::parsing::SequenceParser(
                             new cmajor::parsing::SequenceParser(
+                                new cmajor::parsing::CharParser('~'),
                                 new cmajor::parsing::ActionParser(ToUtf32("A1"),
-                                    new cmajor::parsing::NonterminalParser(ToUtf32("TypeExpr"), ToUtf32("TypeExpr"), 1)),
-                                new cmajor::parsing::ActionParser(ToUtf32("A2"),
                                     new cmajor::parsing::NonterminalParser(ToUtf32("Identifier"), ToUtf32("Identifier"), 0))),
-                            new cmajor::parsing::CharParser('.')),
-                        new cmajor::parsing::ActionParser(ToUtf32("A3"),
                             new cmajor::parsing::ExpectationParser(
-                                new cmajor::parsing::NonterminalParser(ToUtf32("FunctionGroupId"), ToUtf32("FunctionGroupId"), 1)))),
+                                new cmajor::parsing::CharParser('('))),
+                        new cmajor::parsing::ExpectationParser(
+                            new cmajor::parsing::CharParser(')'))),
                     new cmajor::parsing::ExpectationParser(
-                        new cmajor::parsing::NonterminalParser(ToUtf32("ParameterList"), ToUtf32("ParameterList"), 2))),
-                new cmajor::parsing::ExpectationParser(
-                    new cmajor::parsing::CharParser(';'))))));
-    AddRule(new FunctionConstraintRule(ToUtf32("FunctionConstraint"), GetScope(), GetParsingDomain()->GetNextRuleId(),
+                        new cmajor::parsing::CharParser(';')))))));
+    AddRule(new MemberFunctionConstraintRule(ToUtf32("MemberFunctionConstraint"), GetScope(), GetParsingDomain()->GetNextRuleId(),
         new cmajor::parsing::ActionParser(ToUtf32("A0"),
-            new cmajor::parsing::SequenceParser(
+            new cmajor::parsing::GroupingParser(
                 new cmajor::parsing::SequenceParser(
                     new cmajor::parsing::SequenceParser(
-                        new cmajor::parsing::NonterminalParser(ToUtf32("TypeExpr"), ToUtf32("TypeExpr"), 1),
-                        new cmajor::parsing::ActionParser(ToUtf32("A1"),
-                            new cmajor::parsing::ExpectationParser(
-                                new cmajor::parsing::NonterminalParser(ToUtf32("FunctionGroupId"), ToUtf32("FunctionGroupId"), 1)))),
+                        new cmajor::parsing::SequenceParser(
+                            new cmajor::parsing::SequenceParser(
+                                new cmajor::parsing::SequenceParser(
+                                    new cmajor::parsing::ActionParser(ToUtf32("A1"),
+                                        new cmajor::parsing::NonterminalParser(ToUtf32("TypeExpr"), ToUtf32("TypeExpr"), 1)),
+                                    new cmajor::parsing::ActionParser(ToUtf32("A2"),
+                                        new cmajor::parsing::NonterminalParser(ToUtf32("Identifier"), ToUtf32("Identifier"), 0))),
+                                new cmajor::parsing::CharParser('.')),
+                            new cmajor::parsing::ActionParser(ToUtf32("A3"),
+                                new cmajor::parsing::ExpectationParser(
+                                    new cmajor::parsing::NonterminalParser(ToUtf32("FunctionGroupId"), ToUtf32("FunctionGroupId"), 1)))),
+                        new cmajor::parsing::ExpectationParser(
+                            new cmajor::parsing::NonterminalParser(ToUtf32("ParameterList"), ToUtf32("ParameterList"), 2))),
                     new cmajor::parsing::ExpectationParser(
-                        new cmajor::parsing::NonterminalParser(ToUtf32("ParameterList"), ToUtf32("ParameterList"), 2))),
-                new cmajor::parsing::ExpectationParser(
-                    new cmajor::parsing::CharParser(';'))))));
+                        new cmajor::parsing::CharParser(';')))))));
+    AddRule(new FunctionConstraintRule(ToUtf32("FunctionConstraint"), GetScope(), GetParsingDomain()->GetNextRuleId(),
+        new cmajor::parsing::ActionParser(ToUtf32("A0"),
+            new cmajor::parsing::GroupingParser(
+                new cmajor::parsing::SequenceParser(
+                    new cmajor::parsing::SequenceParser(
+                        new cmajor::parsing::SequenceParser(
+                            new cmajor::parsing::NonterminalParser(ToUtf32("TypeExpr"), ToUtf32("TypeExpr"), 1),
+                            new cmajor::parsing::ActionParser(ToUtf32("A1"),
+                                new cmajor::parsing::ExpectationParser(
+                                    new cmajor::parsing::NonterminalParser(ToUtf32("FunctionGroupId"), ToUtf32("FunctionGroupId"), 1)))),
+                        new cmajor::parsing::ExpectationParser(
+                            new cmajor::parsing::NonterminalParser(ToUtf32("ParameterList"), ToUtf32("ParameterList"), 2))),
+                    new cmajor::parsing::ExpectationParser(
+                        new cmajor::parsing::CharParser(';')))))));
     AddRule(new EmbeddedConstraintRule(ToUtf32("EmbeddedConstraint"), GetScope(), GetParsingDomain()->GetNextRuleId(),
         new cmajor::parsing::ActionParser(ToUtf32("A0"),
-            new cmajor::parsing::SequenceParser(
-                new cmajor::parsing::NonterminalParser(ToUtf32("WhereConstraint"), ToUtf32("WhereConstraint"), 1),
-                new cmajor::parsing::ExpectationParser(
-                    new cmajor::parsing::CharParser(';'))))));
+            new cmajor::parsing::GroupingParser(
+                new cmajor::parsing::SequenceParser(
+                    new cmajor::parsing::NonterminalParser(ToUtf32("WhereConstraint"), ToUtf32("WhereConstraint"), 1),
+                    new cmajor::parsing::ExpectationParser(
+                        new cmajor::parsing::CharParser(';')))))));
     AddRule(new WhereConstraintRule(ToUtf32("WhereConstraint"), GetScope(), GetParsingDomain()->GetNextRuleId(),
         new cmajor::parsing::ActionParser(ToUtf32("A0"),
-            new cmajor::parsing::SequenceParser(
-                new cmajor::parsing::KeywordParser(ToUtf32("where")),
-                new cmajor::parsing::ExpectationParser(
-                    new cmajor::parsing::NonterminalParser(ToUtf32("ConstraintExpr"), ToUtf32("ConstraintExpr"), 1))))));
+            new cmajor::parsing::GroupingParser(
+                new cmajor::parsing::SequenceParser(
+                    new cmajor::parsing::KeywordParser(ToUtf32("where")),
+                    new cmajor::parsing::ExpectationParser(
+                        new cmajor::parsing::NonterminalParser(ToUtf32("ConstraintExpr"), ToUtf32("ConstraintExpr"), 1)))))));
     AddRule(new ConstraintExprRule(ToUtf32("ConstraintExpr"), GetScope(), GetParsingDomain()->GetNextRuleId(),
         new cmajor::parsing::ActionParser(ToUtf32("A0"),
             new cmajor::parsing::NonterminalParser(ToUtf32("DisjunctiveConstraintExpr"), ToUtf32("DisjunctiveConstraintExpr"), 1))));
@@ -2434,28 +2450,31 @@ void ConceptGrammar::CreateRules()
             new cmajor::parsing::ActionParser(ToUtf32("A0"),
                 new cmajor::parsing::NonterminalParser(ToUtf32("left"), ToUtf32("ConjunctiveConstraintExpr"), 1)),
             new cmajor::parsing::KleeneStarParser(
-                new cmajor::parsing::SequenceParser(
-                    new cmajor::parsing::KeywordParser(ToUtf32("or")),
-                    new cmajor::parsing::ActionParser(ToUtf32("A1"),
-                        new cmajor::parsing::NonterminalParser(ToUtf32("right"), ToUtf32("ConjunctiveConstraintExpr"), 1)))))));
+                new cmajor::parsing::GroupingParser(
+                    new cmajor::parsing::SequenceParser(
+                        new cmajor::parsing::KeywordParser(ToUtf32("or")),
+                        new cmajor::parsing::ActionParser(ToUtf32("A1"),
+                            new cmajor::parsing::NonterminalParser(ToUtf32("right"), ToUtf32("ConjunctiveConstraintExpr"), 1))))))));
     AddRule(new ConjunctiveConstraintExprRule(ToUtf32("ConjunctiveConstraintExpr"), GetScope(), GetParsingDomain()->GetNextRuleId(),
         new cmajor::parsing::SequenceParser(
             new cmajor::parsing::ActionParser(ToUtf32("A0"),
                 new cmajor::parsing::NonterminalParser(ToUtf32("left"), ToUtf32("PrimaryConstraintExpr"), 1)),
             new cmajor::parsing::KleeneStarParser(
-                new cmajor::parsing::SequenceParser(
-                    new cmajor::parsing::KeywordParser(ToUtf32("and")),
-                    new cmajor::parsing::ActionParser(ToUtf32("A1"),
-                        new cmajor::parsing::NonterminalParser(ToUtf32("right"), ToUtf32("PrimaryConstraintExpr"), 1)))))));
+                new cmajor::parsing::GroupingParser(
+                    new cmajor::parsing::SequenceParser(
+                        new cmajor::parsing::KeywordParser(ToUtf32("and")),
+                        new cmajor::parsing::ActionParser(ToUtf32("A1"),
+                            new cmajor::parsing::NonterminalParser(ToUtf32("right"), ToUtf32("PrimaryConstraintExpr"), 1))))))));
     AddRule(new PrimaryConstraintExprRule(ToUtf32("PrimaryConstraintExpr"), GetScope(), GetParsingDomain()->GetNextRuleId(),
         new cmajor::parsing::AlternativeParser(
             new cmajor::parsing::ActionParser(ToUtf32("A0"),
-                new cmajor::parsing::SequenceParser(
+                new cmajor::parsing::GroupingParser(
                     new cmajor::parsing::SequenceParser(
-                        new cmajor::parsing::CharParser('('),
-                        new cmajor::parsing::NonterminalParser(ToUtf32("ConstraintExpr"), ToUtf32("ConstraintExpr"), 1)),
-                    new cmajor::parsing::ExpectationParser(
-                        new cmajor::parsing::CharParser(')')))),
+                        new cmajor::parsing::SequenceParser(
+                            new cmajor::parsing::CharParser('('),
+                            new cmajor::parsing::NonterminalParser(ToUtf32("ConstraintExpr"), ToUtf32("ConstraintExpr"), 1)),
+                        new cmajor::parsing::ExpectationParser(
+                            new cmajor::parsing::CharParser(')'))))),
             new cmajor::parsing::ActionParser(ToUtf32("A1"),
                 new cmajor::parsing::NonterminalParser(ToUtf32("AtomicConstraintExpr"), ToUtf32("AtomicConstraintExpr"), 1)))));
     AddRule(new AtomicConstraintExprRule(ToUtf32("AtomicConstraintExpr"), GetScope(), GetParsingDomain()->GetNextRuleId(),
@@ -2472,62 +2491,69 @@ void ConceptGrammar::CreateRules()
             new cmajor::parsing::NonterminalParser(ToUtf32("InvokeExpr"), ToUtf32("InvokeExpr"), 1))));
     AddRule(new IsConstraintRule(ToUtf32("IsConstraint"), GetScope(), GetParsingDomain()->GetNextRuleId(),
         new cmajor::parsing::ActionParser(ToUtf32("A0"),
-            new cmajor::parsing::SequenceParser(
+            new cmajor::parsing::GroupingParser(
                 new cmajor::parsing::SequenceParser(
-                    new cmajor::parsing::ActionParser(ToUtf32("A1"),
-                        new cmajor::parsing::NonterminalParser(ToUtf32("TypeExpr"), ToUtf32("TypeExpr"), 1)),
-                    new cmajor::parsing::KeywordParser(ToUtf32("is"))),
-                new cmajor::parsing::ExpectationParser(
-                    new cmajor::parsing::NonterminalParser(ToUtf32("ConceptOrTypeName"), ToUtf32("ConceptOrTypeName"), 1))))));
+                    new cmajor::parsing::SequenceParser(
+                        new cmajor::parsing::ActionParser(ToUtf32("A1"),
+                            new cmajor::parsing::NonterminalParser(ToUtf32("TypeExpr"), ToUtf32("TypeExpr"), 1)),
+                        new cmajor::parsing::KeywordParser(ToUtf32("is"))),
+                    new cmajor::parsing::ExpectationParser(
+                        new cmajor::parsing::NonterminalParser(ToUtf32("ConceptOrTypeName"), ToUtf32("ConceptOrTypeName"), 1)))))));
     AddRule(new ConceptOrTypeNameRule(ToUtf32("ConceptOrTypeName"), GetScope(), GetParsingDomain()->GetNextRuleId(),
         new cmajor::parsing::ActionParser(ToUtf32("A0"),
             new cmajor::parsing::NonterminalParser(ToUtf32("TypeExpr"), ToUtf32("TypeExpr"), 1))));
     AddRule(new MultiParamConstraintRule(ToUtf32("MultiParamConstraint"), GetScope(), GetParsingDomain()->GetNextRuleId(),
         new cmajor::parsing::ActionParser(ToUtf32("A0"),
-            new cmajor::parsing::SequenceParser(
+            new cmajor::parsing::GroupingParser(
                 new cmajor::parsing::SequenceParser(
                     new cmajor::parsing::SequenceParser(
-                        new cmajor::parsing::ActionParser(ToUtf32("A1"),
-                            new cmajor::parsing::NonterminalParser(ToUtf32("QualifiedId"), ToUtf32("QualifiedId"), 0)),
-                        new cmajor::parsing::CharParser('<')),
-                    new cmajor::parsing::ListParser(
-                        new cmajor::parsing::ActionParser(ToUtf32("A2"),
-                            new cmajor::parsing::NonterminalParser(ToUtf32("TypeExpr"), ToUtf32("TypeExpr"), 1)),
-                        new cmajor::parsing::CharParser(','))),
-                new cmajor::parsing::ExpectationParser(
-                    new cmajor::parsing::CharParser('>'))))));
+                        new cmajor::parsing::SequenceParser(
+                            new cmajor::parsing::ActionParser(ToUtf32("A1"),
+                                new cmajor::parsing::NonterminalParser(ToUtf32("QualifiedId"), ToUtf32("QualifiedId"), 0)),
+                            new cmajor::parsing::CharParser('<')),
+                        new cmajor::parsing::GroupingParser(
+                            new cmajor::parsing::ListParser(
+                                new cmajor::parsing::ActionParser(ToUtf32("A2"),
+                                    new cmajor::parsing::NonterminalParser(ToUtf32("TypeExpr"), ToUtf32("TypeExpr"), 1)),
+                                new cmajor::parsing::CharParser(',')))),
+                    new cmajor::parsing::ExpectationParser(
+                        new cmajor::parsing::CharParser('>')))))));
     AddRule(new AxiomRule(ToUtf32("Axiom"), GetScope(), GetParsingDomain()->GetNextRuleId(),
         new cmajor::parsing::ActionParser(ToUtf32("A0"),
-            new cmajor::parsing::SequenceParser(
+            new cmajor::parsing::GroupingParser(
                 new cmajor::parsing::SequenceParser(
                     new cmajor::parsing::SequenceParser(
-                        new cmajor::parsing::ActionParser(ToUtf32("A1"),
-                            new cmajor::parsing::SequenceParser(
-                                new cmajor::parsing::SequenceParser(
+                        new cmajor::parsing::SequenceParser(
+                            new cmajor::parsing::ActionParser(ToUtf32("A1"),
+                                new cmajor::parsing::GroupingParser(
                                     new cmajor::parsing::SequenceParser(
-                                        new cmajor::parsing::KeywordParser(ToUtf32("axiom")),
+                                        new cmajor::parsing::SequenceParser(
+                                            new cmajor::parsing::SequenceParser(
+                                                new cmajor::parsing::KeywordParser(ToUtf32("axiom")),
+                                                new cmajor::parsing::OptionalParser(
+                                                    new cmajor::parsing::NonterminalParser(ToUtf32("Identifier"), ToUtf32("Identifier"), 0))),
+                                            new cmajor::parsing::ActionParser(ToUtf32("A2"),
+                                                new cmajor::parsing::EmptyParser())),
                                         new cmajor::parsing::OptionalParser(
-                                            new cmajor::parsing::NonterminalParser(ToUtf32("Identifier"), ToUtf32("Identifier"), 0))),
-                                    new cmajor::parsing::ActionParser(ToUtf32("A2"),
-                                        new cmajor::parsing::EmptyParser())),
-                                new cmajor::parsing::OptionalParser(
-                                    new cmajor::parsing::NonterminalParser(ToUtf32("ParameterList"), ToUtf32("ParameterList"), 2)))),
+                                            new cmajor::parsing::NonterminalParser(ToUtf32("ParameterList"), ToUtf32("ParameterList"), 2))))),
+                            new cmajor::parsing::ExpectationParser(
+                                new cmajor::parsing::CharParser('{'))),
                         new cmajor::parsing::ExpectationParser(
-                            new cmajor::parsing::CharParser('{'))),
+                            new cmajor::parsing::NonterminalParser(ToUtf32("AxiomBody"), ToUtf32("AxiomBody"), 2))),
                     new cmajor::parsing::ExpectationParser(
-                        new cmajor::parsing::NonterminalParser(ToUtf32("AxiomBody"), ToUtf32("AxiomBody"), 2))),
-                new cmajor::parsing::ExpectationParser(
-                    new cmajor::parsing::CharParser('}'))))));
+                        new cmajor::parsing::CharParser('}')))))));
     AddRule(new AxiomBodyRule(ToUtf32("AxiomBody"), GetScope(), GetParsingDomain()->GetNextRuleId(),
         new cmajor::parsing::KleeneStarParser(
-            new cmajor::parsing::ActionParser(ToUtf32("A0"),
-                new cmajor::parsing::NonterminalParser(ToUtf32("AxiomStatement"), ToUtf32("AxiomStatement"), 1)))));
+            new cmajor::parsing::GroupingParser(
+                new cmajor::parsing::ActionParser(ToUtf32("A0"),
+                    new cmajor::parsing::NonterminalParser(ToUtf32("AxiomStatement"), ToUtf32("AxiomStatement"), 1))))));
     AddRule(new AxiomStatementRule(ToUtf32("AxiomStatement"), GetScope(), GetParsingDomain()->GetNextRuleId(),
         new cmajor::parsing::ActionParser(ToUtf32("A0"),
-            new cmajor::parsing::SequenceParser(
-                new cmajor::parsing::NonterminalParser(ToUtf32("Expression"), ToUtf32("Expression"), 1),
-                new cmajor::parsing::ExpectationParser(
-                    new cmajor::parsing::CharParser(';'))))));
+            new cmajor::parsing::GroupingParser(
+                new cmajor::parsing::SequenceParser(
+                    new cmajor::parsing::NonterminalParser(ToUtf32("Expression"), ToUtf32("Expression"), 1),
+                    new cmajor::parsing::ExpectationParser(
+                        new cmajor::parsing::CharParser(';')))))));
 }
 
 } } // namespace cmajor.parser

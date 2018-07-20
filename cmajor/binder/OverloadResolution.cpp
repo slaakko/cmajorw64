@@ -828,14 +828,14 @@ std::unique_ptr<BoundFunctionCall> FailWithOverloadNotFound(Module* module, cons
         {
             exception.reset(new CannotBindConstToNonconstOverloadException(module, "overload resolution failed: '" + overloadName +
                 "' not found, or there are no acceptable conversions for all argument types. " +
-                std::to_string(viableFunctions.size()) + " viable functions examined. Note: cannot bind constant '" + ToUtf8(sourceType->FullName()) + "' argument " 
-                " to nonconstant '" + ToUtf8(targetType->FullName()) +"' parameter", span, references));
+                std::to_string(viableFunctions.size()) + " viable functions examined. Note: cannot bind constant '" + ToUtf8(sourceType->FullName()) + "' argument " +
+                " to nonconstant '" + ToUtf8(targetType->FullName()) + "' parameter", span, references));
             return std::unique_ptr<BoundFunctionCall>();
         }
         else
         {
             throw CannotBindConstToNonconstOverloadException(module, "overload resolution failed: '" + overloadName + "' not found, or there are no acceptable conversions for all argument types. " +
-                std::to_string(viableFunctions.size()) + " viable functions examined. Note: cannot bind constant '" + ToUtf8(sourceType->FullName()) + "' argument "
+                std::to_string(viableFunctions.size()) + " viable functions examined. Note: cannot bind constant '" + ToUtf8(sourceType->FullName()) + "' argument " +
                 " to nonconstant '" + ToUtf8(targetType->FullName()) + "' parameter", span, references);
         }
     }

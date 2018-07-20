@@ -1,5 +1,5 @@
-#ifndef StdLib_hpp_18303
-#define StdLib_hpp_18303
+#ifndef StdLib_hpp_5529
+#define StdLib_hpp_5529
 
 #include <cmajor/parsing/Grammar.hpp>
 #include <cmajor/parsing/Keyword.hpp>
@@ -14,8 +14,8 @@ public:
     static stdlib* Create(cmajor::parsing::ParsingDomain* parsingDomain);
 private:
     stdlib(cmajor::parsing::ParsingDomain* parsingDomain_);
-    virtual void CreateRules();
-    virtual void GetReferencedGrammars();
+    void CreateRules() override;
+    void GetReferencedGrammars() override;
     class intRule;
     class uintRule;
     class longRule;
@@ -36,4 +36,4 @@ private:
 
 } } // namespace cmajor.parsing
 
-#endif // StdLib_hpp_18303
+#endif // StdLib_hpp_5529

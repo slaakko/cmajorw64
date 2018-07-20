@@ -17,16 +17,16 @@ namespace cmajor.parser
 {
     [hpp]using namespace cmajor::ast;
 
-    grammar ConceptGrammar
+    grammar Concept
     {
-        using SpecifierGrammar.Specifiers;
-        using IdentifierGrammar.Identifier;
-        using IdentifierGrammar.QualifiedId;
-        using ParameterGrammar.ParameterList;
-        using ExpressionGrammar.Expression;
-        using ExpressionGrammar.InvokeExpr;
-        using TypeExprGrammar.TypeExpr;
-        using FunctionGrammar.FunctionGroupId;
+        using Specifier.Specifiers;
+        using Identifier.Identifier;
+        using Identifier.QualifiedId;
+        using Parameter.ParameterList;
+        using Expression.Expression;
+        using Expression.InvokeExpr;
+        using TypeExpr.TypeExpr;
+        using Function.FunctionGroupId;
 
         Concept(ParsingContext* ctx) : ConceptNode*
             ::= empty{ ctx->BeginParsingConcept(); }

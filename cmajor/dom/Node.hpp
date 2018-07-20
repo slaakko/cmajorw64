@@ -25,6 +25,7 @@ class Document;
 class NodeList;
 class Element;
 class Text;
+class EntityReference;
 class CDataSection;
 class Comment;
 class ProcessingInstruction;
@@ -39,6 +40,7 @@ public:
     virtual void Visit(Text* text) {}
     virtual void Visit(CDataSection* cdataSection) {}
     virtual void Visit(Comment* comment) {}
+    virtual void Visit(EntityReference* entityReference) {}
     virtual void Visit(ProcessingInstruction* processingInstruction) {}
 };
 

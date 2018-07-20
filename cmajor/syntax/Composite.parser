@@ -10,9 +10,9 @@
 
 namespace cmajor.syntax
 {
-    grammar CompositeGrammar
+    grammar Composite
     {
-        using PrimaryGrammar.Primary;
+        using Primary.Primary;
 
         Alternative(cmajor::parsing::Scope* enclosingScope): cmajor::parsing::Parser*
                         ::= Sequence(enclosingScope):left{ value = left; } ('|' Sequence(enclosingScope):right!{ value = new AlternativeParser(value, right); })*

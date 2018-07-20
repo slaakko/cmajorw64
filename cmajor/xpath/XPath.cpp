@@ -16,22 +16,22 @@ using namespace cmajor::parsing;
 using namespace cmajor::util;
 using namespace cmajor::unicode;
 
-XPathGrammar* XPathGrammar::Create()
+XPath* XPath::Create()
 {
     return Create(new cmajor::parsing::ParsingDomain());
 }
 
-XPathGrammar* XPathGrammar::Create(cmajor::parsing::ParsingDomain* parsingDomain)
+XPath* XPath::Create(cmajor::parsing::ParsingDomain* parsingDomain)
 {
     RegisterParsingDomain(parsingDomain);
-    XPathGrammar* grammar(new XPathGrammar(parsingDomain));
+    XPath* grammar(new XPath(parsingDomain));
     parsingDomain->AddGrammar(grammar);
     grammar->CreateRules();
     grammar->Link();
     return grammar;
 }
 
-XPathGrammar::XPathGrammar(cmajor::parsing::ParsingDomain* parsingDomain_): cmajor::parsing::Grammar(ToUtf32("XPathGrammar"), parsingDomain_->GetNamespaceScope(ToUtf32("cmajor.xpath")), parsingDomain_)
+XPath::XPath(cmajor::parsing::ParsingDomain* parsingDomain_): cmajor::parsing::Grammar(ToUtf32("XPath"), parsingDomain_->GetNamespaceScope(ToUtf32("cmajor.xpath")), parsingDomain_)
 {
     SetOwner(0);
     keywords0.push_back(ToUtf32("ancestor"));
@@ -49,7 +49,7 @@ XPathGrammar::XPathGrammar(cmajor::parsing::ParsingDomain* parsingDomain_): cmaj
     keywords0.push_back(ToUtf32("self"));
 }
 
-XPathExpr* XPathGrammar::Parse(const char32_t* start, const char32_t* end, int fileIndex, const std::string& fileName)
+XPathExpr* XPath::Parse(const char32_t* start, const char32_t* end, int fileIndex, const std::string& fileName)
 {
     cmajor::parsing::Scanner scanner(start, end, fileName, fileIndex, SkipRule());
     std::unique_ptr<cmajor::parsing::XmlLog> xmlLog;
@@ -85,7 +85,7 @@ XPathExpr* XPathGrammar::Parse(const char32_t* start, const char32_t* end, int f
     return result;
 }
 
-class XPathGrammar::ExprRule : public cmajor::parsing::Rule
+class XPath::ExprRule : public cmajor::parsing::Rule
 {
 public:
     ExprRule(const std::u32string& name_, Scope* enclosingScope_, int id_, Parser* definition_):
@@ -93,12 +93,12 @@ public:
     {
         SetValueTypeName(ToUtf32("XPathExpr*"));
     }
-    virtual void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData)
+    void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData) override
     {
         parsingData->PushContext(Id(), new Context());
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
     }
-    virtual void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched)
+    void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched) override
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
         if (matched)
@@ -107,7 +107,7 @@ public:
         }
         parsingData->PopContext(Id());
     }
-    virtual void Link()
+    void Link() override
     {
         cmajor::parsing::ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
         a0ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<ExprRule>(this, &ExprRule::A0Action));
@@ -138,7 +138,7 @@ private:
     };
 };
 
-class XPathGrammar::OrExprRule : public cmajor::parsing::Rule
+class XPath::OrExprRule : public cmajor::parsing::Rule
 {
 public:
     OrExprRule(const std::u32string& name_, Scope* enclosingScope_, int id_, Parser* definition_):
@@ -146,12 +146,12 @@ public:
     {
         SetValueTypeName(ToUtf32("XPathExpr*"));
     }
-    virtual void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData)
+    void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData) override
     {
         parsingData->PushContext(Id(), new Context());
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
     }
-    virtual void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched)
+    void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched) override
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
         if (matched)
@@ -160,7 +160,7 @@ public:
         }
         parsingData->PopContext(Id());
     }
-    virtual void Link()
+    void Link() override
     {
         cmajor::parsing::ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
         a0ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<OrExprRule>(this, &OrExprRule::A0Action));
@@ -211,7 +211,7 @@ private:
     };
 };
 
-class XPathGrammar::AndExprRule : public cmajor::parsing::Rule
+class XPath::AndExprRule : public cmajor::parsing::Rule
 {
 public:
     AndExprRule(const std::u32string& name_, Scope* enclosingScope_, int id_, Parser* definition_):
@@ -219,12 +219,12 @@ public:
     {
         SetValueTypeName(ToUtf32("XPathExpr*"));
     }
-    virtual void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData)
+    void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData) override
     {
         parsingData->PushContext(Id(), new Context());
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
     }
-    virtual void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched)
+    void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched) override
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
         if (matched)
@@ -233,7 +233,7 @@ public:
         }
         parsingData->PopContext(Id());
     }
-    virtual void Link()
+    void Link() override
     {
         cmajor::parsing::ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
         a0ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<AndExprRule>(this, &AndExprRule::A0Action));
@@ -284,7 +284,7 @@ private:
     };
 };
 
-class XPathGrammar::EqualityExprRule : public cmajor::parsing::Rule
+class XPath::EqualityExprRule : public cmajor::parsing::Rule
 {
 public:
     EqualityExprRule(const std::u32string& name_, Scope* enclosingScope_, int id_, Parser* definition_):
@@ -293,12 +293,12 @@ public:
         SetValueTypeName(ToUtf32("XPathExpr*"));
         AddLocalVariable(AttrOrVariable(ToUtf32("Operator"), ToUtf32("op")));
     }
-    virtual void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData)
+    void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData) override
     {
         parsingData->PushContext(Id(), new Context());
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
     }
-    virtual void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched)
+    void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched) override
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
         if (matched)
@@ -307,7 +307,7 @@ public:
         }
         parsingData->PopContext(Id());
     }
-    virtual void Link()
+    void Link() override
     {
         cmajor::parsing::ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
         a0ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<EqualityExprRule>(this, &EqualityExprRule::A0Action));
@@ -379,7 +379,7 @@ private:
     };
 };
 
-class XPathGrammar::RelationalExprRule : public cmajor::parsing::Rule
+class XPath::RelationalExprRule : public cmajor::parsing::Rule
 {
 public:
     RelationalExprRule(const std::u32string& name_, Scope* enclosingScope_, int id_, Parser* definition_):
@@ -388,12 +388,12 @@ public:
         SetValueTypeName(ToUtf32("XPathExpr*"));
         AddLocalVariable(AttrOrVariable(ToUtf32("Operator"), ToUtf32("op")));
     }
-    virtual void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData)
+    void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData) override
     {
         parsingData->PushContext(Id(), new Context());
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
     }
-    virtual void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched)
+    void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched) override
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
         if (matched)
@@ -402,7 +402,7 @@ public:
         }
         parsingData->PopContext(Id());
     }
-    virtual void Link()
+    void Link() override
     {
         cmajor::parsing::ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
         a0ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<RelationalExprRule>(this, &RelationalExprRule::A0Action));
@@ -492,7 +492,7 @@ private:
     };
 };
 
-class XPathGrammar::AdditiveExprRule : public cmajor::parsing::Rule
+class XPath::AdditiveExprRule : public cmajor::parsing::Rule
 {
 public:
     AdditiveExprRule(const std::u32string& name_, Scope* enclosingScope_, int id_, Parser* definition_):
@@ -501,12 +501,12 @@ public:
         SetValueTypeName(ToUtf32("XPathExpr*"));
         AddLocalVariable(AttrOrVariable(ToUtf32("Operator"), ToUtf32("op")));
     }
-    virtual void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData)
+    void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData) override
     {
         parsingData->PushContext(Id(), new Context());
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
     }
-    virtual void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched)
+    void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched) override
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
         if (matched)
@@ -515,7 +515,7 @@ public:
         }
         parsingData->PopContext(Id());
     }
-    virtual void Link()
+    void Link() override
     {
         cmajor::parsing::ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
         a0ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<AdditiveExprRule>(this, &AdditiveExprRule::A0Action));
@@ -587,7 +587,7 @@ private:
     };
 };
 
-class XPathGrammar::MultiplicativeExprRule : public cmajor::parsing::Rule
+class XPath::MultiplicativeExprRule : public cmajor::parsing::Rule
 {
 public:
     MultiplicativeExprRule(const std::u32string& name_, Scope* enclosingScope_, int id_, Parser* definition_):
@@ -596,12 +596,12 @@ public:
         SetValueTypeName(ToUtf32("XPathExpr*"));
         AddLocalVariable(AttrOrVariable(ToUtf32("Operator"), ToUtf32("op")));
     }
-    virtual void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData)
+    void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData) override
     {
         parsingData->PushContext(Id(), new Context());
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
     }
-    virtual void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched)
+    void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched) override
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
         if (matched)
@@ -610,7 +610,7 @@ public:
         }
         parsingData->PopContext(Id());
     }
-    virtual void Link()
+    void Link() override
     {
         cmajor::parsing::ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
         a0ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<MultiplicativeExprRule>(this, &MultiplicativeExprRule::A0Action));
@@ -691,7 +691,7 @@ private:
     };
 };
 
-class XPathGrammar::UnaryExprRule : public cmajor::parsing::Rule
+class XPath::UnaryExprRule : public cmajor::parsing::Rule
 {
 public:
     UnaryExprRule(const std::u32string& name_, Scope* enclosingScope_, int id_, Parser* definition_):
@@ -699,12 +699,12 @@ public:
     {
         SetValueTypeName(ToUtf32("XPathExpr*"));
     }
-    virtual void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData)
+    void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData) override
     {
         parsingData->PushContext(Id(), new Context());
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
     }
-    virtual void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched)
+    void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched) override
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
         if (matched)
@@ -713,7 +713,7 @@ public:
         }
         parsingData->PopContext(Id());
     }
-    virtual void Link()
+    void Link() override
     {
         cmajor::parsing::ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
         a0ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<UnaryExprRule>(this, &UnaryExprRule::A0Action));
@@ -764,7 +764,7 @@ private:
     };
 };
 
-class XPathGrammar::UnionExprRule : public cmajor::parsing::Rule
+class XPath::UnionExprRule : public cmajor::parsing::Rule
 {
 public:
     UnionExprRule(const std::u32string& name_, Scope* enclosingScope_, int id_, Parser* definition_):
@@ -772,12 +772,12 @@ public:
     {
         SetValueTypeName(ToUtf32("XPathExpr*"));
     }
-    virtual void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData)
+    void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData) override
     {
         parsingData->PushContext(Id(), new Context());
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
     }
-    virtual void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched)
+    void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched) override
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
         if (matched)
@@ -786,7 +786,7 @@ public:
         }
         parsingData->PopContext(Id());
     }
-    virtual void Link()
+    void Link() override
     {
         cmajor::parsing::ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
         a0ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<UnionExprRule>(this, &UnionExprRule::A0Action));
@@ -837,7 +837,7 @@ private:
     };
 };
 
-class XPathGrammar::PathExprRule : public cmajor::parsing::Rule
+class XPath::PathExprRule : public cmajor::parsing::Rule
 {
 public:
     PathExprRule(const std::u32string& name_, Scope* enclosingScope_, int id_, Parser* definition_):
@@ -847,12 +847,12 @@ public:
         AddLocalVariable(AttrOrVariable(ToUtf32("Operator"), ToUtf32("op")));
         AddLocalVariable(AttrOrVariable(ToUtf32("std::unique_ptr<XPathExpr>"), ToUtf32("fnc")));
     }
-    virtual void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData)
+    void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData) override
     {
         parsingData->PushContext(Id(), new Context());
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
     }
-    virtual void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched)
+    void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched) override
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
         if (matched)
@@ -861,7 +861,7 @@ public:
         }
         parsingData->PopContext(Id());
     }
-    virtual void Link()
+    void Link() override
     {
         cmajor::parsing::ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
         a0ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<PathExprRule>(this, &PathExprRule::A0Action));
@@ -974,7 +974,7 @@ private:
     };
 };
 
-class XPathGrammar::FilterExprRule : public cmajor::parsing::Rule
+class XPath::FilterExprRule : public cmajor::parsing::Rule
 {
 public:
     FilterExprRule(const std::u32string& name_, Scope* enclosingScope_, int id_, Parser* definition_):
@@ -982,12 +982,12 @@ public:
     {
         SetValueTypeName(ToUtf32("XPathExpr*"));
     }
-    virtual void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData)
+    void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData) override
     {
         parsingData->PushContext(Id(), new Context());
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
     }
-    virtual void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched)
+    void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched) override
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
         if (matched)
@@ -996,7 +996,7 @@ public:
         }
         parsingData->PopContext(Id());
     }
-    virtual void Link()
+    void Link() override
     {
         cmajor::parsing::ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
         a0ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<FilterExprRule>(this, &FilterExprRule::A0Action));
@@ -1047,7 +1047,7 @@ private:
     };
 };
 
-class XPathGrammar::LocationPathRule : public cmajor::parsing::Rule
+class XPath::LocationPathRule : public cmajor::parsing::Rule
 {
 public:
     LocationPathRule(const std::u32string& name_, Scope* enclosingScope_, int id_, Parser* definition_):
@@ -1055,12 +1055,12 @@ public:
     {
         SetValueTypeName(ToUtf32("XPathExpr*"));
     }
-    virtual void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData)
+    void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData) override
     {
         parsingData->PushContext(Id(), new Context());
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
     }
-    virtual void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched)
+    void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched) override
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
         if (matched)
@@ -1069,7 +1069,7 @@ public:
         }
         parsingData->PopContext(Id());
     }
-    virtual void Link()
+    void Link() override
     {
         cmajor::parsing::ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
         a0ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<LocationPathRule>(this, &LocationPathRule::A0Action));
@@ -1120,7 +1120,7 @@ private:
     };
 };
 
-class XPathGrammar::AbsoluteLocationPathRule : public cmajor::parsing::Rule
+class XPath::AbsoluteLocationPathRule : public cmajor::parsing::Rule
 {
 public:
     AbsoluteLocationPathRule(const std::u32string& name_, Scope* enclosingScope_, int id_, Parser* definition_):
@@ -1128,12 +1128,12 @@ public:
     {
         SetValueTypeName(ToUtf32("XPathExpr*"));
     }
-    virtual void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData)
+    void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData) override
     {
         parsingData->PushContext(Id(), new Context());
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
     }
-    virtual void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched)
+    void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched) override
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
         if (matched)
@@ -1142,7 +1142,7 @@ public:
         }
         parsingData->PopContext(Id());
     }
-    virtual void Link()
+    void Link() override
     {
         cmajor::parsing::ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
         a0ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<AbsoluteLocationPathRule>(this, &AbsoluteLocationPathRule::A0Action));
@@ -1200,7 +1200,7 @@ private:
     };
 };
 
-class XPathGrammar::RelativeLocationPathRule : public cmajor::parsing::Rule
+class XPath::RelativeLocationPathRule : public cmajor::parsing::Rule
 {
 public:
     RelativeLocationPathRule(const std::u32string& name_, Scope* enclosingScope_, int id_, Parser* definition_):
@@ -1209,12 +1209,12 @@ public:
         SetValueTypeName(ToUtf32("XPathExpr*"));
         AddLocalVariable(AttrOrVariable(ToUtf32("Operator"), ToUtf32("op")));
     }
-    virtual void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData)
+    void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData) override
     {
         parsingData->PushContext(Id(), new Context());
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
     }
-    virtual void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched)
+    void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched) override
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
         if (matched)
@@ -1223,7 +1223,7 @@ public:
         }
         parsingData->PopContext(Id());
     }
-    virtual void Link()
+    void Link() override
     {
         cmajor::parsing::ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
         a0ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<RelativeLocationPathRule>(this, &RelativeLocationPathRule::A0Action));
@@ -1295,7 +1295,7 @@ private:
     };
 };
 
-class XPathGrammar::AbbreviatedAbsoluteLocationPathRule : public cmajor::parsing::Rule
+class XPath::AbbreviatedAbsoluteLocationPathRule : public cmajor::parsing::Rule
 {
 public:
     AbbreviatedAbsoluteLocationPathRule(const std::u32string& name_, Scope* enclosingScope_, int id_, Parser* definition_):
@@ -1303,12 +1303,12 @@ public:
     {
         SetValueTypeName(ToUtf32("XPathExpr*"));
     }
-    virtual void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData)
+    void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData) override
     {
         parsingData->PushContext(Id(), new Context());
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
     }
-    virtual void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched)
+    void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched) override
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
         if (matched)
@@ -1317,7 +1317,7 @@ public:
         }
         parsingData->PopContext(Id());
     }
-    virtual void Link()
+    void Link() override
     {
         cmajor::parsing::ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
         a0ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<AbbreviatedAbsoluteLocationPathRule>(this, &AbbreviatedAbsoluteLocationPathRule::A0Action));
@@ -1348,7 +1348,7 @@ private:
     };
 };
 
-class XPathGrammar::StepRule : public cmajor::parsing::Rule
+class XPath::StepRule : public cmajor::parsing::Rule
 {
 public:
     StepRule(const std::u32string& name_, Scope* enclosingScope_, int id_, Parser* definition_):
@@ -1356,12 +1356,12 @@ public:
     {
         SetValueTypeName(ToUtf32("XPathLocationStepExpr*"));
     }
-    virtual void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData)
+    void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData) override
     {
         parsingData->PushContext(Id(), new Context());
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
     }
-    virtual void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched)
+    void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched) override
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
         if (matched)
@@ -1370,7 +1370,7 @@ public:
         }
         parsingData->PopContext(Id());
     }
-    virtual void Link()
+    void Link() override
     {
         cmajor::parsing::ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
         a0ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<StepRule>(this, &StepRule::A0Action));
@@ -1454,7 +1454,7 @@ private:
     };
 };
 
-class XPathGrammar::AbbreviatedStepRule : public cmajor::parsing::Rule
+class XPath::AbbreviatedStepRule : public cmajor::parsing::Rule
 {
 public:
     AbbreviatedStepRule(const std::u32string& name_, Scope* enclosingScope_, int id_, Parser* definition_):
@@ -1462,12 +1462,12 @@ public:
     {
         SetValueTypeName(ToUtf32("XPathLocationStepExpr*"));
     }
-    virtual void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData)
+    void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData) override
     {
         parsingData->PushContext(Id(), new Context());
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
     }
-    virtual void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched)
+    void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched) override
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
         if (matched)
@@ -1476,7 +1476,7 @@ public:
         }
         parsingData->PopContext(Id());
     }
-    virtual void Link()
+    void Link() override
     {
         cmajor::parsing::ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
         a0ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<AbbreviatedStepRule>(this, &AbbreviatedStepRule::A0Action));
@@ -1501,7 +1501,7 @@ private:
     };
 };
 
-class XPathGrammar::AxisSpecifierRule : public cmajor::parsing::Rule
+class XPath::AxisSpecifierRule : public cmajor::parsing::Rule
 {
 public:
     AxisSpecifierRule(const std::u32string& name_, Scope* enclosingScope_, int id_, Parser* definition_):
@@ -1509,12 +1509,12 @@ public:
     {
         SetValueTypeName(ToUtf32("Axis"));
     }
-    virtual void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData)
+    void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData) override
     {
         parsingData->PushContext(Id(), new Context());
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
     }
-    virtual void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched)
+    void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched) override
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
         if (matched)
@@ -1523,7 +1523,7 @@ public:
         }
         parsingData->PopContext(Id());
     }
-    virtual void Link()
+    void Link() override
     {
         cmajor::parsing::ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
         a0ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<AxisSpecifierRule>(this, &AxisSpecifierRule::A0Action));
@@ -1574,7 +1574,7 @@ private:
     };
 };
 
-class XPathGrammar::AxisNameRule : public cmajor::parsing::Rule
+class XPath::AxisNameRule : public cmajor::parsing::Rule
 {
 public:
     AxisNameRule(const std::u32string& name_, Scope* enclosingScope_, int id_, Parser* definition_):
@@ -1582,12 +1582,12 @@ public:
     {
         SetValueTypeName(ToUtf32("Axis"));
     }
-    virtual void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData)
+    void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData) override
     {
         parsingData->PushContext(Id(), new Context());
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
     }
-    virtual void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched)
+    void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched) override
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
         if (matched)
@@ -1596,7 +1596,7 @@ public:
         }
         parsingData->PopContext(Id());
     }
-    virtual void Link()
+    void Link() override
     {
         cmajor::parsing::ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
         a0ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<AxisNameRule>(this, &AxisNameRule::A0Action));
@@ -1614,7 +1614,7 @@ private:
     };
 };
 
-class XPathGrammar::AbbreviatedAxisSpecifierRule : public cmajor::parsing::Rule
+class XPath::AbbreviatedAxisSpecifierRule : public cmajor::parsing::Rule
 {
 public:
     AbbreviatedAxisSpecifierRule(const std::u32string& name_, Scope* enclosingScope_, int id_, Parser* definition_):
@@ -1622,12 +1622,12 @@ public:
     {
         SetValueTypeName(ToUtf32("Axis"));
     }
-    virtual void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData)
+    void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData) override
     {
         parsingData->PushContext(Id(), new Context());
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
     }
-    virtual void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched)
+    void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched) override
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
         if (matched)
@@ -1636,7 +1636,7 @@ public:
         }
         parsingData->PopContext(Id());
     }
-    virtual void Link()
+    void Link() override
     {
         cmajor::parsing::ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
         a0ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<AbbreviatedAxisSpecifierRule>(this, &AbbreviatedAxisSpecifierRule::A0Action));
@@ -1661,7 +1661,7 @@ private:
     };
 };
 
-class XPathGrammar::PredicateRule : public cmajor::parsing::Rule
+class XPath::PredicateRule : public cmajor::parsing::Rule
 {
 public:
     PredicateRule(const std::u32string& name_, Scope* enclosingScope_, int id_, Parser* definition_):
@@ -1669,12 +1669,12 @@ public:
     {
         SetValueTypeName(ToUtf32("XPathExpr*"));
     }
-    virtual void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData)
+    void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData) override
     {
         parsingData->PushContext(Id(), new Context());
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
     }
-    virtual void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched)
+    void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched) override
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
         if (matched)
@@ -1683,7 +1683,7 @@ public:
         }
         parsingData->PopContext(Id());
     }
-    virtual void Link()
+    void Link() override
     {
         cmajor::parsing::ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
         a0ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<PredicateRule>(this, &PredicateRule::A0Action));
@@ -1714,7 +1714,7 @@ private:
     };
 };
 
-class XPathGrammar::PredicateExprRule : public cmajor::parsing::Rule
+class XPath::PredicateExprRule : public cmajor::parsing::Rule
 {
 public:
     PredicateExprRule(const std::u32string& name_, Scope* enclosingScope_, int id_, Parser* definition_):
@@ -1722,12 +1722,12 @@ public:
     {
         SetValueTypeName(ToUtf32("XPathExpr*"));
     }
-    virtual void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData)
+    void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData) override
     {
         parsingData->PushContext(Id(), new Context());
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
     }
-    virtual void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched)
+    void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched) override
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
         if (matched)
@@ -1736,7 +1736,7 @@ public:
         }
         parsingData->PopContext(Id());
     }
-    virtual void Link()
+    void Link() override
     {
         cmajor::parsing::ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
         a0ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<PredicateExprRule>(this, &PredicateExprRule::A0Action));
@@ -1767,7 +1767,7 @@ private:
     };
 };
 
-class XPathGrammar::NodeTestRule : public cmajor::parsing::Rule
+class XPath::NodeTestRule : public cmajor::parsing::Rule
 {
 public:
     NodeTestRule(const std::u32string& name_, Scope* enclosingScope_, int id_, Parser* definition_):
@@ -1775,12 +1775,12 @@ public:
     {
         SetValueTypeName(ToUtf32("XPathNodeTestExpr*"));
     }
-    virtual void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData)
+    void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData) override
     {
         parsingData->PushContext(Id(), new Context());
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
     }
-    virtual void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched)
+    void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched) override
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
         if (matched)
@@ -1789,7 +1789,7 @@ public:
         }
         parsingData->PopContext(Id());
     }
-    virtual void Link()
+    void Link() override
     {
         cmajor::parsing::ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
         a0ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<NodeTestRule>(this, &NodeTestRule::A0Action));
@@ -1860,7 +1860,7 @@ private:
     };
 };
 
-class XPathGrammar::NameTestRule : public cmajor::parsing::Rule
+class XPath::NameTestRule : public cmajor::parsing::Rule
 {
 public:
     NameTestRule(const std::u32string& name_, Scope* enclosingScope_, int id_, Parser* definition_):
@@ -1868,12 +1868,12 @@ public:
     {
         SetValueTypeName(ToUtf32("XPathNodeTestExpr*"));
     }
-    virtual void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData)
+    void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData) override
     {
         parsingData->PushContext(Id(), new Context());
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
     }
-    virtual void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched)
+    void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched) override
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
         if (matched)
@@ -1882,7 +1882,7 @@ public:
         }
         parsingData->PopContext(Id());
     }
-    virtual void Link()
+    void Link() override
     {
         cmajor::parsing::ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
         a0ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<NameTestRule>(this, &NameTestRule::A0Action));
@@ -1940,7 +1940,7 @@ private:
     };
 };
 
-class XPathGrammar::NodeTypeRule : public cmajor::parsing::Rule
+class XPath::NodeTypeRule : public cmajor::parsing::Rule
 {
 public:
     NodeTypeRule(const std::u32string& name_, Scope* enclosingScope_, int id_, Parser* definition_):
@@ -1948,12 +1948,12 @@ public:
     {
         SetValueTypeName(ToUtf32("XPathNodeTestExpr*"));
     }
-    virtual void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData)
+    void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData) override
     {
         parsingData->PushContext(Id(), new Context());
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
     }
-    virtual void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched)
+    void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched) override
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
         if (matched)
@@ -1962,7 +1962,7 @@ public:
         }
         parsingData->PopContext(Id());
     }
-    virtual void Link()
+    void Link() override
     {
         cmajor::parsing::ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
         a0ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<NodeTypeRule>(this, &NodeTypeRule::A0Action));
@@ -2001,7 +2001,7 @@ private:
     };
 };
 
-class XPathGrammar::PrimaryExprRule : public cmajor::parsing::Rule
+class XPath::PrimaryExprRule : public cmajor::parsing::Rule
 {
 public:
     PrimaryExprRule(const std::u32string& name_, Scope* enclosingScope_, int id_, Parser* definition_):
@@ -2009,12 +2009,12 @@ public:
     {
         SetValueTypeName(ToUtf32("XPathExpr*"));
     }
-    virtual void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData)
+    void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData) override
     {
         parsingData->PushContext(Id(), new Context());
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
     }
-    virtual void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched)
+    void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched) override
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
         if (matched)
@@ -2023,7 +2023,7 @@ public:
         }
         parsingData->PopContext(Id());
     }
-    virtual void Link()
+    void Link() override
     {
         cmajor::parsing::ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
         a0ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<PrimaryExprRule>(this, &PrimaryExprRule::A0Action));
@@ -2134,7 +2134,7 @@ private:
     };
 };
 
-class XPathGrammar::VariableReferenceRule : public cmajor::parsing::Rule
+class XPath::VariableReferenceRule : public cmajor::parsing::Rule
 {
 public:
     VariableReferenceRule(const std::u32string& name_, Scope* enclosingScope_, int id_, Parser* definition_):
@@ -2142,12 +2142,12 @@ public:
     {
         SetValueTypeName(ToUtf32("XPathExpr*"));
     }
-    virtual void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData)
+    void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData) override
     {
         parsingData->PushContext(Id(), new Context());
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
     }
-    virtual void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched)
+    void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched) override
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
         if (matched)
@@ -2156,7 +2156,7 @@ public:
         }
         parsingData->PopContext(Id());
     }
-    virtual void Link()
+    void Link() override
     {
         cmajor::parsing::ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
         a0ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<VariableReferenceRule>(this, &VariableReferenceRule::A0Action));
@@ -2187,7 +2187,7 @@ private:
     };
 };
 
-class XPathGrammar::LiteralRule : public cmajor::parsing::Rule
+class XPath::LiteralRule : public cmajor::parsing::Rule
 {
 public:
     LiteralRule(const std::u32string& name_, Scope* enclosingScope_, int id_, Parser* definition_):
@@ -2195,12 +2195,12 @@ public:
     {
         SetValueTypeName(ToUtf32("XPathExpr*"));
     }
-    virtual void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData)
+    void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData) override
     {
         parsingData->PushContext(Id(), new Context());
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
     }
-    virtual void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched)
+    void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched) override
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
         if (matched)
@@ -2209,7 +2209,7 @@ public:
         }
         parsingData->PopContext(Id());
     }
-    virtual void Link()
+    void Link() override
     {
         cmajor::parsing::ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
         a0ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<LiteralRule>(this, &LiteralRule::A0Action));
@@ -2234,7 +2234,7 @@ private:
     };
 };
 
-class XPathGrammar::NumberRule : public cmajor::parsing::Rule
+class XPath::NumberRule : public cmajor::parsing::Rule
 {
 public:
     NumberRule(const std::u32string& name_, Scope* enclosingScope_, int id_, Parser* definition_):
@@ -2242,12 +2242,12 @@ public:
     {
         SetValueTypeName(ToUtf32("XPathExpr*"));
     }
-    virtual void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData)
+    void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData) override
     {
         parsingData->PushContext(Id(), new Context());
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
     }
-    virtual void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched)
+    void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched) override
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
         if (matched)
@@ -2256,7 +2256,7 @@ public:
         }
         parsingData->PopContext(Id());
     }
-    virtual void Link()
+    void Link() override
     {
         cmajor::parsing::ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
         a0ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<NumberRule>(this, &NumberRule::A0Action));
@@ -2281,7 +2281,7 @@ private:
     };
 };
 
-class XPathGrammar::FunctionCallRule : public cmajor::parsing::Rule
+class XPath::FunctionCallRule : public cmajor::parsing::Rule
 {
 public:
     FunctionCallRule(const std::u32string& name_, Scope* enclosingScope_, int id_, Parser* definition_):
@@ -2289,12 +2289,12 @@ public:
     {
         SetValueTypeName(ToUtf32("XPathFunctionCall*"));
     }
-    virtual void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData)
+    void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData) override
     {
         parsingData->PushContext(Id(), new Context());
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
     }
-    virtual void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched)
+    void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched) override
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
         if (matched)
@@ -2303,7 +2303,7 @@ public:
         }
         parsingData->PopContext(Id());
     }
-    virtual void Link()
+    void Link() override
     {
         cmajor::parsing::ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
         a0ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<FunctionCallRule>(this, &FunctionCallRule::A0Action));
@@ -2374,7 +2374,7 @@ private:
     };
 };
 
-class XPathGrammar::ArgumentRule : public cmajor::parsing::Rule
+class XPath::ArgumentRule : public cmajor::parsing::Rule
 {
 public:
     ArgumentRule(const std::u32string& name_, Scope* enclosingScope_, int id_, Parser* definition_):
@@ -2382,12 +2382,12 @@ public:
     {
         SetValueTypeName(ToUtf32("XPathExpr*"));
     }
-    virtual void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData)
+    void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData) override
     {
         parsingData->PushContext(Id(), new Context());
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
     }
-    virtual void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched)
+    void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched) override
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
         if (matched)
@@ -2396,7 +2396,7 @@ public:
         }
         parsingData->PopContext(Id());
     }
-    virtual void Link()
+    void Link() override
     {
         cmajor::parsing::ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
         a0ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<ArgumentRule>(this, &ArgumentRule::A0Action));
@@ -2427,7 +2427,7 @@ private:
     };
 };
 
-class XPathGrammar::FunctionNameRule : public cmajor::parsing::Rule
+class XPath::FunctionNameRule : public cmajor::parsing::Rule
 {
 public:
     FunctionNameRule(const std::u32string& name_, Scope* enclosingScope_, int id_, Parser* definition_):
@@ -2436,12 +2436,12 @@ public:
         SetValueTypeName(ToUtf32("std::u32string"));
         AddLocalVariable(AttrOrVariable(ToUtf32("std::unique_ptr<XPathExpr>"), ToUtf32("nodeType")));
     }
-    virtual void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData)
+    void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData) override
     {
         parsingData->PushContext(Id(), new Context());
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
     }
-    virtual void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched)
+    void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched) override
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
         if (matched)
@@ -2450,7 +2450,7 @@ public:
         }
         parsingData->PopContext(Id());
     }
-    virtual void Link()
+    void Link() override
     {
         cmajor::parsing::ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
         a0ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<FunctionNameRule>(this, &FunctionNameRule::A0Action));
@@ -2502,7 +2502,7 @@ private:
     };
 };
 
-class XPathGrammar::QNameRule : public cmajor::parsing::Rule
+class XPath::QNameRule : public cmajor::parsing::Rule
 {
 public:
     QNameRule(const std::u32string& name_, Scope* enclosingScope_, int id_, Parser* definition_):
@@ -2510,12 +2510,12 @@ public:
     {
         SetValueTypeName(ToUtf32("std::u32string"));
     }
-    virtual void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData)
+    void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData) override
     {
         parsingData->PushContext(Id(), new Context());
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
     }
-    virtual void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched)
+    void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched) override
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
         if (matched)
@@ -2524,7 +2524,7 @@ public:
         }
         parsingData->PopContext(Id());
     }
-    virtual void Link()
+    void Link() override
     {
         cmajor::parsing::ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
         a0ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<QNameRule>(this, &QNameRule::A0Action));
@@ -2575,7 +2575,7 @@ private:
     };
 };
 
-class XPathGrammar::PrefixedNameRule : public cmajor::parsing::Rule
+class XPath::PrefixedNameRule : public cmajor::parsing::Rule
 {
 public:
     PrefixedNameRule(const std::u32string& name_, Scope* enclosingScope_, int id_, Parser* definition_):
@@ -2583,12 +2583,12 @@ public:
     {
         SetValueTypeName(ToUtf32("std::u32string"));
     }
-    virtual void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData)
+    void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData) override
     {
         parsingData->PushContext(Id(), new Context());
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
     }
-    virtual void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched)
+    void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched) override
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
         if (matched)
@@ -2597,7 +2597,7 @@ public:
         }
         parsingData->PopContext(Id());
     }
-    virtual void Link()
+    void Link() override
     {
         cmajor::parsing::ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
         a0ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<PrefixedNameRule>(this, &PrefixedNameRule::A0Action));
@@ -2641,7 +2641,7 @@ private:
     };
 };
 
-class XPathGrammar::UnprefixedNameRule : public cmajor::parsing::Rule
+class XPath::UnprefixedNameRule : public cmajor::parsing::Rule
 {
 public:
     UnprefixedNameRule(const std::u32string& name_, Scope* enclosingScope_, int id_, Parser* definition_):
@@ -2649,12 +2649,12 @@ public:
     {
         SetValueTypeName(ToUtf32("std::u32string"));
     }
-    virtual void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData)
+    void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData) override
     {
         parsingData->PushContext(Id(), new Context());
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
     }
-    virtual void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched)
+    void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched) override
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
         if (matched)
@@ -2663,7 +2663,7 @@ public:
         }
         parsingData->PopContext(Id());
     }
-    virtual void Link()
+    void Link() override
     {
         cmajor::parsing::ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
         a0ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<UnprefixedNameRule>(this, &UnprefixedNameRule::A0Action));
@@ -2694,7 +2694,7 @@ private:
     };
 };
 
-class XPathGrammar::PrefixRule : public cmajor::parsing::Rule
+class XPath::PrefixRule : public cmajor::parsing::Rule
 {
 public:
     PrefixRule(const std::u32string& name_, Scope* enclosingScope_, int id_, Parser* definition_):
@@ -2702,12 +2702,12 @@ public:
     {
         SetValueTypeName(ToUtf32("std::u32string"));
     }
-    virtual void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData)
+    void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData) override
     {
         parsingData->PushContext(Id(), new Context());
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
     }
-    virtual void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched)
+    void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched) override
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
         if (matched)
@@ -2716,7 +2716,7 @@ public:
         }
         parsingData->PopContext(Id());
     }
-    virtual void Link()
+    void Link() override
     {
         cmajor::parsing::ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
         a0ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<PrefixRule>(this, &PrefixRule::A0Action));
@@ -2747,7 +2747,7 @@ private:
     };
 };
 
-class XPathGrammar::LocalPartRule : public cmajor::parsing::Rule
+class XPath::LocalPartRule : public cmajor::parsing::Rule
 {
 public:
     LocalPartRule(const std::u32string& name_, Scope* enclosingScope_, int id_, Parser* definition_):
@@ -2755,12 +2755,12 @@ public:
     {
         SetValueTypeName(ToUtf32("std::u32string"));
     }
-    virtual void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData)
+    void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData) override
     {
         parsingData->PushContext(Id(), new Context());
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
     }
-    virtual void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched)
+    void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched) override
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
         if (matched)
@@ -2769,7 +2769,7 @@ public:
         }
         parsingData->PopContext(Id());
     }
-    virtual void Link()
+    void Link() override
     {
         cmajor::parsing::ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
         a0ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<LocalPartRule>(this, &LocalPartRule::A0Action));
@@ -2800,7 +2800,7 @@ private:
     };
 };
 
-class XPathGrammar::NCNameRule : public cmajor::parsing::Rule
+class XPath::NCNameRule : public cmajor::parsing::Rule
 {
 public:
     NCNameRule(const std::u32string& name_, Scope* enclosingScope_, int id_, Parser* definition_):
@@ -2808,12 +2808,12 @@ public:
     {
         SetValueTypeName(ToUtf32("std::u32string"));
     }
-    virtual void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData)
+    void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData) override
     {
         parsingData->PushContext(Id(), new Context());
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
     }
-    virtual void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched)
+    void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched) override
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
         if (matched)
@@ -2822,7 +2822,7 @@ public:
         }
         parsingData->PopContext(Id());
     }
-    virtual void Link()
+    void Link() override
     {
         cmajor::parsing::ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
         a0ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<NCNameRule>(this, &NCNameRule::A0Action));
@@ -2840,13 +2840,13 @@ private:
     };
 };
 
-void XPathGrammar::GetReferencedGrammars()
+void XPath::GetReferencedGrammars()
 {
     cmajor::parsing::ParsingDomain* pd = GetParsingDomain();
-    cmajor::parsing::Grammar* grammar0 = pd->GetGrammar(ToUtf32("cmajor.xml.XmlGrammar"));
+    cmajor::parsing::Grammar* grammar0 = pd->GetGrammar(ToUtf32("cmajor.xml.Xml"));
     if (!grammar0)
     {
-        grammar0 = cmajor::xml::XmlGrammar::Create(pd);
+        grammar0 = cmajor::xml::Xml::Create(pd);
     }
     AddGrammarReference(grammar0);
     cmajor::parsing::Grammar* grammar1 = pd->GetGrammar(ToUtf32("cmajor.parsing.stdlib"));
@@ -2857,10 +2857,10 @@ void XPathGrammar::GetReferencedGrammars()
     AddGrammarReference(grammar1);
 }
 
-void XPathGrammar::CreateRules()
+void XPath::CreateRules()
 {
-    AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("NameStartChar"), this, ToUtf32("cmajor.xml.XmlGrammar.NameStartChar")));
-    AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("NameChar"), this, ToUtf32("cmajor.xml.XmlGrammar.NameChar")));
+    AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("NameStartChar"), this, ToUtf32("cmajor.xml.Xml.NameStartChar")));
+    AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("NameChar"), this, ToUtf32("cmajor.xml.Xml.NameChar")));
     AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("identifier"), this, ToUtf32("cmajor.parsing.stdlib.identifier")));
     AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("spaces"), this, ToUtf32("cmajor.parsing.stdlib.spaces")));
     AddRule(new ExprRule(ToUtf32("Expr"), GetScope(), GetParsingDomain()->GetNextRuleId(),
@@ -2871,80 +2871,90 @@ void XPathGrammar::CreateRules()
             new cmajor::parsing::ActionParser(ToUtf32("A0"),
                 new cmajor::parsing::NonterminalParser(ToUtf32("left"), ToUtf32("AndExpr"), 0)),
             new cmajor::parsing::KleeneStarParser(
-                new cmajor::parsing::SequenceParser(
-                    new cmajor::parsing::KeywordParser(ToUtf32("or")),
-                    new cmajor::parsing::ActionParser(ToUtf32("A1"),
-                        new cmajor::parsing::NonterminalParser(ToUtf32("right"), ToUtf32("AndExpr"), 0)))))));
+                new cmajor::parsing::GroupingParser(
+                    new cmajor::parsing::SequenceParser(
+                        new cmajor::parsing::KeywordParser(ToUtf32("or")),
+                        new cmajor::parsing::ActionParser(ToUtf32("A1"),
+                            new cmajor::parsing::NonterminalParser(ToUtf32("right"), ToUtf32("AndExpr"), 0))))))));
     AddRule(new AndExprRule(ToUtf32("AndExpr"), GetScope(), GetParsingDomain()->GetNextRuleId(),
         new cmajor::parsing::SequenceParser(
             new cmajor::parsing::ActionParser(ToUtf32("A0"),
                 new cmajor::parsing::NonterminalParser(ToUtf32("left"), ToUtf32("EqualityExpr"), 0)),
             new cmajor::parsing::KleeneStarParser(
-                new cmajor::parsing::SequenceParser(
-                    new cmajor::parsing::KeywordParser(ToUtf32("and")),
-                    new cmajor::parsing::ActionParser(ToUtf32("A1"),
-                        new cmajor::parsing::NonterminalParser(ToUtf32("right"), ToUtf32("EqualityExpr"), 0)))))));
+                new cmajor::parsing::GroupingParser(
+                    new cmajor::parsing::SequenceParser(
+                        new cmajor::parsing::KeywordParser(ToUtf32("and")),
+                        new cmajor::parsing::ActionParser(ToUtf32("A1"),
+                            new cmajor::parsing::NonterminalParser(ToUtf32("right"), ToUtf32("EqualityExpr"), 0))))))));
     AddRule(new EqualityExprRule(ToUtf32("EqualityExpr"), GetScope(), GetParsingDomain()->GetNextRuleId(),
         new cmajor::parsing::SequenceParser(
             new cmajor::parsing::ActionParser(ToUtf32("A0"),
                 new cmajor::parsing::NonterminalParser(ToUtf32("left"), ToUtf32("RelationalExpr"), 0)),
             new cmajor::parsing::KleeneStarParser(
-                new cmajor::parsing::SequenceParser(
-                    new cmajor::parsing::AlternativeParser(
-                        new cmajor::parsing::ActionParser(ToUtf32("A1"),
-                            new cmajor::parsing::CharParser('=')),
-                        new cmajor::parsing::ActionParser(ToUtf32("A2"),
-                            new cmajor::parsing::StringParser(ToUtf32("!=")))),
-                    new cmajor::parsing::ActionParser(ToUtf32("A3"),
-                        new cmajor::parsing::NonterminalParser(ToUtf32("right"), ToUtf32("RelationalExpr"), 0)))))));
+                new cmajor::parsing::GroupingParser(
+                    new cmajor::parsing::SequenceParser(
+                        new cmajor::parsing::GroupingParser(
+                            new cmajor::parsing::AlternativeParser(
+                                new cmajor::parsing::ActionParser(ToUtf32("A1"),
+                                    new cmajor::parsing::CharParser('=')),
+                                new cmajor::parsing::ActionParser(ToUtf32("A2"),
+                                    new cmajor::parsing::StringParser(ToUtf32("!="))))),
+                        new cmajor::parsing::ActionParser(ToUtf32("A3"),
+                            new cmajor::parsing::NonterminalParser(ToUtf32("right"), ToUtf32("RelationalExpr"), 0))))))));
     AddRule(new RelationalExprRule(ToUtf32("RelationalExpr"), GetScope(), GetParsingDomain()->GetNextRuleId(),
         new cmajor::parsing::SequenceParser(
             new cmajor::parsing::ActionParser(ToUtf32("A0"),
                 new cmajor::parsing::NonterminalParser(ToUtf32("left"), ToUtf32("AdditiveExpr"), 0)),
             new cmajor::parsing::KleeneStarParser(
-                new cmajor::parsing::SequenceParser(
-                    new cmajor::parsing::AlternativeParser(
-                        new cmajor::parsing::AlternativeParser(
+                new cmajor::parsing::GroupingParser(
+                    new cmajor::parsing::SequenceParser(
+                        new cmajor::parsing::GroupingParser(
                             new cmajor::parsing::AlternativeParser(
-                                new cmajor::parsing::ActionParser(ToUtf32("A1"),
-                                    new cmajor::parsing::StringParser(ToUtf32("<="))),
-                                new cmajor::parsing::ActionParser(ToUtf32("A2"),
-                                    new cmajor::parsing::StringParser(ToUtf32(">=")))),
-                            new cmajor::parsing::ActionParser(ToUtf32("A3"),
-                                new cmajor::parsing::CharParser('<'))),
-                        new cmajor::parsing::ActionParser(ToUtf32("A4"),
-                            new cmajor::parsing::CharParser('>'))),
-                    new cmajor::parsing::ActionParser(ToUtf32("A5"),
-                        new cmajor::parsing::NonterminalParser(ToUtf32("right"), ToUtf32("AdditiveExpr"), 0)))))));
+                                new cmajor::parsing::AlternativeParser(
+                                    new cmajor::parsing::AlternativeParser(
+                                        new cmajor::parsing::ActionParser(ToUtf32("A1"),
+                                            new cmajor::parsing::StringParser(ToUtf32("<="))),
+                                        new cmajor::parsing::ActionParser(ToUtf32("A2"),
+                                            new cmajor::parsing::StringParser(ToUtf32(">=")))),
+                                    new cmajor::parsing::ActionParser(ToUtf32("A3"),
+                                        new cmajor::parsing::CharParser('<'))),
+                                new cmajor::parsing::ActionParser(ToUtf32("A4"),
+                                    new cmajor::parsing::CharParser('>')))),
+                        new cmajor::parsing::ActionParser(ToUtf32("A5"),
+                            new cmajor::parsing::NonterminalParser(ToUtf32("right"), ToUtf32("AdditiveExpr"), 0))))))));
     AddRule(new AdditiveExprRule(ToUtf32("AdditiveExpr"), GetScope(), GetParsingDomain()->GetNextRuleId(),
         new cmajor::parsing::SequenceParser(
             new cmajor::parsing::ActionParser(ToUtf32("A0"),
                 new cmajor::parsing::NonterminalParser(ToUtf32("left"), ToUtf32("MultiplicativeExpr"), 0)),
             new cmajor::parsing::KleeneStarParser(
-                new cmajor::parsing::SequenceParser(
-                    new cmajor::parsing::AlternativeParser(
-                        new cmajor::parsing::ActionParser(ToUtf32("A1"),
-                            new cmajor::parsing::CharParser('+')),
-                        new cmajor::parsing::ActionParser(ToUtf32("A2"),
-                            new cmajor::parsing::CharParser('-'))),
-                    new cmajor::parsing::ActionParser(ToUtf32("A3"),
-                        new cmajor::parsing::NonterminalParser(ToUtf32("right"), ToUtf32("MultiplicativeExpr"), 0)))))));
+                new cmajor::parsing::GroupingParser(
+                    new cmajor::parsing::SequenceParser(
+                        new cmajor::parsing::GroupingParser(
+                            new cmajor::parsing::AlternativeParser(
+                                new cmajor::parsing::ActionParser(ToUtf32("A1"),
+                                    new cmajor::parsing::CharParser('+')),
+                                new cmajor::parsing::ActionParser(ToUtf32("A2"),
+                                    new cmajor::parsing::CharParser('-')))),
+                        new cmajor::parsing::ActionParser(ToUtf32("A3"),
+                            new cmajor::parsing::NonterminalParser(ToUtf32("right"), ToUtf32("MultiplicativeExpr"), 0))))))));
     AddRule(new MultiplicativeExprRule(ToUtf32("MultiplicativeExpr"), GetScope(), GetParsingDomain()->GetNextRuleId(),
         new cmajor::parsing::SequenceParser(
             new cmajor::parsing::ActionParser(ToUtf32("A0"),
                 new cmajor::parsing::NonterminalParser(ToUtf32("left"), ToUtf32("UnaryExpr"), 0)),
             new cmajor::parsing::KleeneStarParser(
-                new cmajor::parsing::SequenceParser(
-                    new cmajor::parsing::AlternativeParser(
-                        new cmajor::parsing::AlternativeParser(
-                            new cmajor::parsing::ActionParser(ToUtf32("A1"),
-                                new cmajor::parsing::CharParser('*')),
-                            new cmajor::parsing::ActionParser(ToUtf32("A2"),
-                                new cmajor::parsing::StringParser(ToUtf32("div")))),
-                        new cmajor::parsing::ActionParser(ToUtf32("A3"),
-                            new cmajor::parsing::StringParser(ToUtf32("mod")))),
-                    new cmajor::parsing::ActionParser(ToUtf32("A4"),
-                        new cmajor::parsing::NonterminalParser(ToUtf32("right"), ToUtf32("UnaryExpr"), 0)))))));
+                new cmajor::parsing::GroupingParser(
+                    new cmajor::parsing::SequenceParser(
+                        new cmajor::parsing::GroupingParser(
+                            new cmajor::parsing::AlternativeParser(
+                                new cmajor::parsing::AlternativeParser(
+                                    new cmajor::parsing::ActionParser(ToUtf32("A1"),
+                                        new cmajor::parsing::CharParser('*')),
+                                    new cmajor::parsing::ActionParser(ToUtf32("A2"),
+                                        new cmajor::parsing::StringParser(ToUtf32("div")))),
+                                new cmajor::parsing::ActionParser(ToUtf32("A3"),
+                                    new cmajor::parsing::StringParser(ToUtf32("mod"))))),
+                        new cmajor::parsing::ActionParser(ToUtf32("A4"),
+                            new cmajor::parsing::NonterminalParser(ToUtf32("right"), ToUtf32("UnaryExpr"), 0))))))));
     AddRule(new UnaryExprRule(ToUtf32("UnaryExpr"), GetScope(), GetParsingDomain()->GetNextRuleId(),
         new cmajor::parsing::AlternativeParser(
             new cmajor::parsing::SequenceParser(
@@ -2958,36 +2968,41 @@ void XPathGrammar::CreateRules()
             new cmajor::parsing::ActionParser(ToUtf32("A0"),
                 new cmajor::parsing::NonterminalParser(ToUtf32("left"), ToUtf32("PathExpr"), 0)),
             new cmajor::parsing::KleeneStarParser(
-                new cmajor::parsing::SequenceParser(
-                    new cmajor::parsing::CharParser('|'),
-                    new cmajor::parsing::ActionParser(ToUtf32("A1"),
-                        new cmajor::parsing::NonterminalParser(ToUtf32("right"), ToUtf32("PathExpr"), 0)))))));
+                new cmajor::parsing::GroupingParser(
+                    new cmajor::parsing::SequenceParser(
+                        new cmajor::parsing::CharParser('|'),
+                        new cmajor::parsing::ActionParser(ToUtf32("A1"),
+                            new cmajor::parsing::NonterminalParser(ToUtf32("right"), ToUtf32("PathExpr"), 0))))))));
     AddRule(new PathExprRule(ToUtf32("PathExpr"), GetScope(), GetParsingDomain()->GetNextRuleId(),
         new cmajor::parsing::AlternativeParser(
             new cmajor::parsing::ActionParser(ToUtf32("A0"),
-                new cmajor::parsing::DifferenceParser(
-                    new cmajor::parsing::NonterminalParser(ToUtf32("LocationPath"), ToUtf32("LocationPath"), 0),
-                    new cmajor::parsing::ActionParser(ToUtf32("A1"),
-                        new cmajor::parsing::NonterminalParser(ToUtf32("FunctionCall"), ToUtf32("FunctionCall"), 0)))),
+                new cmajor::parsing::GroupingParser(
+                    new cmajor::parsing::DifferenceParser(
+                        new cmajor::parsing::NonterminalParser(ToUtf32("LocationPath"), ToUtf32("LocationPath"), 0),
+                        new cmajor::parsing::ActionParser(ToUtf32("A1"),
+                            new cmajor::parsing::NonterminalParser(ToUtf32("FunctionCall"), ToUtf32("FunctionCall"), 0))))),
             new cmajor::parsing::SequenceParser(
                 new cmajor::parsing::ActionParser(ToUtf32("A2"),
                     new cmajor::parsing::NonterminalParser(ToUtf32("FilterExpr"), ToUtf32("FilterExpr"), 0)),
                 new cmajor::parsing::OptionalParser(
-                    new cmajor::parsing::SequenceParser(
-                        new cmajor::parsing::AlternativeParser(
-                            new cmajor::parsing::ActionParser(ToUtf32("A3"),
-                                new cmajor::parsing::StringParser(ToUtf32("//"))),
-                            new cmajor::parsing::ActionParser(ToUtf32("A4"),
-                                new cmajor::parsing::CharParser('/'))),
-                        new cmajor::parsing::ActionParser(ToUtf32("A5"),
-                            new cmajor::parsing::NonterminalParser(ToUtf32("right"), ToUtf32("RelativeLocationPath"), 0))))))));
+                    new cmajor::parsing::GroupingParser(
+                        new cmajor::parsing::SequenceParser(
+                            new cmajor::parsing::GroupingParser(
+                                new cmajor::parsing::AlternativeParser(
+                                    new cmajor::parsing::ActionParser(ToUtf32("A3"),
+                                        new cmajor::parsing::StringParser(ToUtf32("//"))),
+                                    new cmajor::parsing::ActionParser(ToUtf32("A4"),
+                                        new cmajor::parsing::CharParser('/')))),
+                            new cmajor::parsing::ActionParser(ToUtf32("A5"),
+                                new cmajor::parsing::NonterminalParser(ToUtf32("right"), ToUtf32("RelativeLocationPath"), 0)))))))));
     AddRule(new FilterExprRule(ToUtf32("FilterExpr"), GetScope(), GetParsingDomain()->GetNextRuleId(),
         new cmajor::parsing::SequenceParser(
             new cmajor::parsing::ActionParser(ToUtf32("A0"),
                 new cmajor::parsing::NonterminalParser(ToUtf32("primary"), ToUtf32("PrimaryExpr"), 0)),
             new cmajor::parsing::KleeneStarParser(
-                new cmajor::parsing::ActionParser(ToUtf32("A1"),
-                    new cmajor::parsing::NonterminalParser(ToUtf32("predicate"), ToUtf32("Predicate"), 0))))));
+                new cmajor::parsing::GroupingParser(
+                    new cmajor::parsing::ActionParser(ToUtf32("A1"),
+                        new cmajor::parsing::NonterminalParser(ToUtf32("predicate"), ToUtf32("Predicate"), 0)))))));
     AddRule(new LocationPathRule(ToUtf32("LocationPath"), GetScope(), GetParsingDomain()->GetNextRuleId(),
         new cmajor::parsing::AlternativeParser(
             new cmajor::parsing::ActionParser(ToUtf32("A0"),
@@ -3002,21 +3017,24 @@ void XPathGrammar::CreateRules()
                 new cmajor::parsing::ActionParser(ToUtf32("A1"),
                     new cmajor::parsing::CharParser('/')),
                 new cmajor::parsing::OptionalParser(
-                    new cmajor::parsing::ActionParser(ToUtf32("A2"),
-                        new cmajor::parsing::NonterminalParser(ToUtf32("right"), ToUtf32("RelativeLocationPath"), 0)))))));
+                    new cmajor::parsing::GroupingParser(
+                        new cmajor::parsing::ActionParser(ToUtf32("A2"),
+                            new cmajor::parsing::NonterminalParser(ToUtf32("right"), ToUtf32("RelativeLocationPath"), 0))))))));
     AddRule(new RelativeLocationPathRule(ToUtf32("RelativeLocationPath"), GetScope(), GetParsingDomain()->GetNextRuleId(),
         new cmajor::parsing::SequenceParser(
             new cmajor::parsing::ActionParser(ToUtf32("A0"),
                 new cmajor::parsing::NonterminalParser(ToUtf32("left"), ToUtf32("Step"), 0)),
             new cmajor::parsing::KleeneStarParser(
-                new cmajor::parsing::SequenceParser(
-                    new cmajor::parsing::AlternativeParser(
-                        new cmajor::parsing::ActionParser(ToUtf32("A1"),
-                            new cmajor::parsing::StringParser(ToUtf32("//"))),
-                        new cmajor::parsing::ActionParser(ToUtf32("A2"),
-                            new cmajor::parsing::CharParser('/'))),
-                    new cmajor::parsing::ActionParser(ToUtf32("A3"),
-                        new cmajor::parsing::NonterminalParser(ToUtf32("right"), ToUtf32("Step"), 0)))))));
+                new cmajor::parsing::GroupingParser(
+                    new cmajor::parsing::SequenceParser(
+                        new cmajor::parsing::GroupingParser(
+                            new cmajor::parsing::AlternativeParser(
+                                new cmajor::parsing::ActionParser(ToUtf32("A1"),
+                                    new cmajor::parsing::StringParser(ToUtf32("//"))),
+                                new cmajor::parsing::ActionParser(ToUtf32("A2"),
+                                    new cmajor::parsing::CharParser('/')))),
+                        new cmajor::parsing::ActionParser(ToUtf32("A3"),
+                            new cmajor::parsing::NonterminalParser(ToUtf32("right"), ToUtf32("Step"), 0))))))));
     AddRule(new AbbreviatedAbsoluteLocationPathRule(ToUtf32("AbbreviatedAbsoluteLocationPath"), GetScope(), GetParsingDomain()->GetNextRuleId(),
         new cmajor::parsing::SequenceParser(
             new cmajor::parsing::StringParser(ToUtf32("//")),
@@ -3030,8 +3048,9 @@ void XPathGrammar::CreateRules()
                     new cmajor::parsing::ActionParser(ToUtf32("A0"),
                         new cmajor::parsing::NonterminalParser(ToUtf32("nodeTest"), ToUtf32("NodeTest"), 0))),
                 new cmajor::parsing::KleeneStarParser(
-                    new cmajor::parsing::ActionParser(ToUtf32("A1"),
-                        new cmajor::parsing::NonterminalParser(ToUtf32("predicate"), ToUtf32("Predicate"), 0)))),
+                    new cmajor::parsing::GroupingParser(
+                        new cmajor::parsing::ActionParser(ToUtf32("A1"),
+                            new cmajor::parsing::NonterminalParser(ToUtf32("predicate"), ToUtf32("Predicate"), 0))))),
             new cmajor::parsing::ActionParser(ToUtf32("A2"),
                 new cmajor::parsing::NonterminalParser(ToUtf32("AbbreviatedStep"), ToUtf32("AbbreviatedStep"), 0)))));
     AddRule(new AbbreviatedStepRule(ToUtf32("AbbreviatedStep"), GetScope(), GetParsingDomain()->GetNextRuleId(),
@@ -3043,9 +3062,10 @@ void XPathGrammar::CreateRules()
     AddRule(new AxisSpecifierRule(ToUtf32("AxisSpecifier"), GetScope(), GetParsingDomain()->GetNextRuleId(),
         new cmajor::parsing::AlternativeParser(
             new cmajor::parsing::ActionParser(ToUtf32("A0"),
-                new cmajor::parsing::SequenceParser(
-                    new cmajor::parsing::NonterminalParser(ToUtf32("AxisName"), ToUtf32("AxisName"), 0),
-                    new cmajor::parsing::StringParser(ToUtf32("::")))),
+                new cmajor::parsing::GroupingParser(
+                    new cmajor::parsing::SequenceParser(
+                        new cmajor::parsing::NonterminalParser(ToUtf32("AxisName"), ToUtf32("AxisName"), 0),
+                        new cmajor::parsing::StringParser(ToUtf32("::"))))),
             new cmajor::parsing::ActionParser(ToUtf32("A1"),
                 new cmajor::parsing::NonterminalParser(ToUtf32("AbbreviatedAxisSpecifier"), ToUtf32("AbbreviatedAxisSpecifier"), 0)))));
     AddRule(new AxisNameRule(ToUtf32("AxisName"), GetScope(), GetParsingDomain()->GetNextRuleId(),
@@ -3071,19 +3091,21 @@ void XPathGrammar::CreateRules()
         new cmajor::parsing::AlternativeParser(
             new cmajor::parsing::AlternativeParser(
                 new cmajor::parsing::ActionParser(ToUtf32("A0"),
-                    new cmajor::parsing::SequenceParser(
+                    new cmajor::parsing::GroupingParser(
                         new cmajor::parsing::SequenceParser(
                             new cmajor::parsing::SequenceParser(
-                                new cmajor::parsing::KeywordParser(ToUtf32("processing-instruction")),
-                                new cmajor::parsing::CharParser('(')),
-                            new cmajor::parsing::NonterminalParser(ToUtf32("Literal"), ToUtf32("Literal"), 0)),
-                        new cmajor::parsing::CharParser(')'))),
+                                new cmajor::parsing::SequenceParser(
+                                    new cmajor::parsing::KeywordParser(ToUtf32("processing-instruction")),
+                                    new cmajor::parsing::CharParser('(')),
+                                new cmajor::parsing::NonterminalParser(ToUtf32("Literal"), ToUtf32("Literal"), 0)),
+                            new cmajor::parsing::CharParser(')')))),
                 new cmajor::parsing::ActionParser(ToUtf32("A1"),
-                    new cmajor::parsing::SequenceParser(
+                    new cmajor::parsing::GroupingParser(
                         new cmajor::parsing::SequenceParser(
-                            new cmajor::parsing::NonterminalParser(ToUtf32("NodeType"), ToUtf32("NodeType"), 0),
-                            new cmajor::parsing::CharParser('(')),
-                        new cmajor::parsing::CharParser(')')))),
+                            new cmajor::parsing::SequenceParser(
+                                new cmajor::parsing::NonterminalParser(ToUtf32("NodeType"), ToUtf32("NodeType"), 0),
+                                new cmajor::parsing::CharParser('(')),
+                            new cmajor::parsing::CharParser(')'))))),
             new cmajor::parsing::ActionParser(ToUtf32("A2"),
                 new cmajor::parsing::NonterminalParser(ToUtf32("NameTest"), ToUtf32("NameTest"), 0)))));
     AddRule(new NameTestRule(ToUtf32("NameTest"), GetScope(), GetParsingDomain()->GetNextRuleId(),
@@ -3092,11 +3114,12 @@ void XPathGrammar::CreateRules()
                 new cmajor::parsing::ActionParser(ToUtf32("A0"),
                     new cmajor::parsing::CharParser('*')),
                 new cmajor::parsing::ActionParser(ToUtf32("A1"),
-                    new cmajor::parsing::SequenceParser(
+                    new cmajor::parsing::GroupingParser(
                         new cmajor::parsing::SequenceParser(
-                            new cmajor::parsing::NonterminalParser(ToUtf32("NCName"), ToUtf32("NCName"), 0),
-                            new cmajor::parsing::CharParser(':')),
-                        new cmajor::parsing::CharParser('*')))),
+                            new cmajor::parsing::SequenceParser(
+                                new cmajor::parsing::NonterminalParser(ToUtf32("NCName"), ToUtf32("NCName"), 0),
+                                new cmajor::parsing::CharParser(':')),
+                            new cmajor::parsing::CharParser('*'))))),
             new cmajor::parsing::ActionParser(ToUtf32("A2"),
                 new cmajor::parsing::NonterminalParser(ToUtf32("QName"), ToUtf32("QName"), 0)))));
     AddRule(new NodeTypeRule(ToUtf32("NodeType"), GetScope(), GetParsingDomain()->GetNextRuleId(),
@@ -3143,16 +3166,18 @@ void XPathGrammar::CreateRules()
                     new cmajor::parsing::SequenceParser(
                         new cmajor::parsing::CharParser('\"'),
                         new cmajor::parsing::ActionParser(ToUtf32("A0"),
-                            new cmajor::parsing::KleeneStarParser(
-                                new cmajor::parsing::CharSetParser(ToUtf32("\""), true)))),
+                            new cmajor::parsing::GroupingParser(
+                                new cmajor::parsing::KleeneStarParser(
+                                    new cmajor::parsing::CharSetParser(ToUtf32("\""), true))))),
                     new cmajor::parsing::CharParser('\"'))),
             new cmajor::parsing::TokenParser(
                 new cmajor::parsing::SequenceParser(
                     new cmajor::parsing::SequenceParser(
                         new cmajor::parsing::CharParser('\''),
                         new cmajor::parsing::ActionParser(ToUtf32("A1"),
-                            new cmajor::parsing::KleeneStarParser(
-                                new cmajor::parsing::CharSetParser(ToUtf32("\'"), true)))),
+                            new cmajor::parsing::GroupingParser(
+                                new cmajor::parsing::KleeneStarParser(
+                                    new cmajor::parsing::CharSetParser(ToUtf32("\'"), true))))),
                     new cmajor::parsing::CharParser('\''))))));
     AddRule(new NumberRule(ToUtf32("Number"), GetScope(), GetParsingDomain()->GetNextRuleId(),
         new cmajor::parsing::AlternativeParser(
@@ -3161,10 +3186,11 @@ void XPathGrammar::CreateRules()
                     new cmajor::parsing::SequenceParser(
                         new cmajor::parsing::NonterminalParser(ToUtf32("Digits"), ToUtf32("Digits"), 0),
                         new cmajor::parsing::OptionalParser(
-                            new cmajor::parsing::SequenceParser(
-                                new cmajor::parsing::CharParser('.'),
-                                new cmajor::parsing::OptionalParser(
-                                    new cmajor::parsing::NonterminalParser(ToUtf32("Digits"), ToUtf32("Digits"), 0))))))),
+                            new cmajor::parsing::GroupingParser(
+                                new cmajor::parsing::SequenceParser(
+                                    new cmajor::parsing::CharParser('.'),
+                                    new cmajor::parsing::OptionalParser(
+                                        new cmajor::parsing::NonterminalParser(ToUtf32("Digits"), ToUtf32("Digits"), 0)))))))),
             new cmajor::parsing::ActionParser(ToUtf32("A1"),
                 new cmajor::parsing::TokenParser(
                     new cmajor::parsing::SequenceParser(
@@ -3183,24 +3209,27 @@ void XPathGrammar::CreateRules()
                             new cmajor::parsing::NonterminalParser(ToUtf32("FunctionName"), ToUtf32("FunctionName"), 0)),
                         new cmajor::parsing::CharParser('('))),
                 new cmajor::parsing::OptionalParser(
-                    new cmajor::parsing::SequenceParser(
-                        new cmajor::parsing::ActionParser(ToUtf32("A1"),
-                            new cmajor::parsing::NonterminalParser(ToUtf32("first"), ToUtf32("Argument"), 0)),
-                        new cmajor::parsing::KleeneStarParser(
-                            new cmajor::parsing::SequenceParser(
-                                new cmajor::parsing::CharParser(','),
-                                new cmajor::parsing::ActionParser(ToUtf32("A2"),
-                                    new cmajor::parsing::NonterminalParser(ToUtf32("next"), ToUtf32("Argument"), 0))))))),
+                    new cmajor::parsing::GroupingParser(
+                        new cmajor::parsing::SequenceParser(
+                            new cmajor::parsing::ActionParser(ToUtf32("A1"),
+                                new cmajor::parsing::NonterminalParser(ToUtf32("first"), ToUtf32("Argument"), 0)),
+                            new cmajor::parsing::KleeneStarParser(
+                                new cmajor::parsing::GroupingParser(
+                                    new cmajor::parsing::SequenceParser(
+                                        new cmajor::parsing::CharParser(','),
+                                        new cmajor::parsing::ActionParser(ToUtf32("A2"),
+                                            new cmajor::parsing::NonterminalParser(ToUtf32("next"), ToUtf32("Argument"), 0))))))))),
             new cmajor::parsing::CharParser(')'))));
     AddRule(new ArgumentRule(ToUtf32("Argument"), GetScope(), GetParsingDomain()->GetNextRuleId(),
         new cmajor::parsing::ActionParser(ToUtf32("A0"),
             new cmajor::parsing::NonterminalParser(ToUtf32("Expr"), ToUtf32("Expr"), 0))));
     AddRule(new FunctionNameRule(ToUtf32("FunctionName"), GetScope(), GetParsingDomain()->GetNextRuleId(),
         new cmajor::parsing::ActionParser(ToUtf32("A0"),
-            new cmajor::parsing::DifferenceParser(
-                new cmajor::parsing::NonterminalParser(ToUtf32("QName"), ToUtf32("QName"), 0),
-                new cmajor::parsing::ActionParser(ToUtf32("A1"),
-                    new cmajor::parsing::NonterminalParser(ToUtf32("NodeType"), ToUtf32("NodeType"), 0))))));
+            new cmajor::parsing::GroupingParser(
+                new cmajor::parsing::DifferenceParser(
+                    new cmajor::parsing::NonterminalParser(ToUtf32("QName"), ToUtf32("QName"), 0),
+                    new cmajor::parsing::ActionParser(ToUtf32("A1"),
+                        new cmajor::parsing::NonterminalParser(ToUtf32("NodeType"), ToUtf32("NodeType"), 0)))))));
     AddRule(new QNameRule(ToUtf32("QName"), GetScope(), GetParsingDomain()->GetNextRuleId(),
         new cmajor::parsing::AlternativeParser(
             new cmajor::parsing::ActionParser(ToUtf32("A0"),
@@ -3228,13 +3257,15 @@ void XPathGrammar::CreateRules()
         new cmajor::parsing::ActionParser(ToUtf32("A0"),
             new cmajor::parsing::TokenParser(
                 new cmajor::parsing::SequenceParser(
-                    new cmajor::parsing::DifferenceParser(
-                        new cmajor::parsing::NonterminalParser(ToUtf32("NameStartChar"), ToUtf32("NameStartChar"), 0),
-                        new cmajor::parsing::CharParser(':')),
-                    new cmajor::parsing::KleeneStarParser(
+                    new cmajor::parsing::GroupingParser(
                         new cmajor::parsing::DifferenceParser(
-                            new cmajor::parsing::NonterminalParser(ToUtf32("NameChar"), ToUtf32("NameChar"), 0),
-                            new cmajor::parsing::CharParser(':'))))))));
+                            new cmajor::parsing::NonterminalParser(ToUtf32("NameStartChar"), ToUtf32("NameStartChar"), 0),
+                            new cmajor::parsing::CharParser(':'))),
+                    new cmajor::parsing::KleeneStarParser(
+                        new cmajor::parsing::GroupingParser(
+                            new cmajor::parsing::DifferenceParser(
+                                new cmajor::parsing::NonterminalParser(ToUtf32("NameChar"), ToUtf32("NameChar"), 0),
+                                new cmajor::parsing::CharParser(':')))))))));
     SetSkipRuleName(ToUtf32("spaces"));
 }
 

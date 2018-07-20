@@ -17,27 +17,27 @@ using namespace cmajor::parsing;
 using namespace cmajor::util;
 using namespace cmajor::unicode;
 
-LiteralGrammar* LiteralGrammar::Create()
+Literal* Literal::Create()
 {
     return Create(new cmajor::parsing::ParsingDomain());
 }
 
-LiteralGrammar* LiteralGrammar::Create(cmajor::parsing::ParsingDomain* parsingDomain)
+Literal* Literal::Create(cmajor::parsing::ParsingDomain* parsingDomain)
 {
     RegisterParsingDomain(parsingDomain);
-    LiteralGrammar* grammar(new LiteralGrammar(parsingDomain));
+    Literal* grammar(new Literal(parsingDomain));
     parsingDomain->AddGrammar(grammar);
     grammar->CreateRules();
     grammar->Link();
     return grammar;
 }
 
-LiteralGrammar::LiteralGrammar(cmajor::parsing::ParsingDomain* parsingDomain_): cmajor::parsing::Grammar(ToUtf32("LiteralGrammar"), parsingDomain_->GetNamespaceScope(ToUtf32("cmajor.code")), parsingDomain_)
+Literal::Literal(cmajor::parsing::ParsingDomain* parsingDomain_): cmajor::parsing::Grammar(ToUtf32("Literal"), parsingDomain_->GetNamespaceScope(ToUtf32("cmajor.code")), parsingDomain_)
 {
     SetOwner(0);
 }
 
-cmajor::codedom::Literal* LiteralGrammar::Parse(const char32_t* start, const char32_t* end, int fileIndex, const std::string& fileName)
+cmajor::codedom::Literal* Literal::Parse(const char32_t* start, const char32_t* end, int fileIndex, const std::string& fileName)
 {
     cmajor::parsing::Scanner scanner(start, end, fileName, fileIndex, SkipRule());
     std::unique_ptr<cmajor::parsing::XmlLog> xmlLog;
@@ -73,7 +73,7 @@ cmajor::codedom::Literal* LiteralGrammar::Parse(const char32_t* start, const cha
     return result;
 }
 
-class LiteralGrammar::LiteralRule : public cmajor::parsing::Rule
+class Literal::LiteralRule : public cmajor::parsing::Rule
 {
 public:
     LiteralRule(const std::u32string& name_, Scope* enclosingScope_, int id_, Parser* definition_):
@@ -81,12 +81,12 @@ public:
     {
         SetValueTypeName(ToUtf32("cmajor::codedom::Literal*"));
     }
-    virtual void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData)
+    void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData) override
     {
         parsingData->PushContext(Id(), new Context());
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
     }
-    virtual void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched)
+    void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched) override
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
         if (matched)
@@ -95,7 +95,7 @@ public:
         }
         parsingData->PopContext(Id());
     }
-    virtual void Link()
+    void Link() override
     {
         cmajor::parsing::ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
         a0ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<LiteralRule>(this, &LiteralRule::A0Action));
@@ -226,7 +226,7 @@ private:
     };
 };
 
-class LiteralGrammar::IntegerLiteralRule : public cmajor::parsing::Rule
+class Literal::IntegerLiteralRule : public cmajor::parsing::Rule
 {
 public:
     IntegerLiteralRule(const std::u32string& name_, Scope* enclosingScope_, int id_, Parser* definition_):
@@ -234,12 +234,12 @@ public:
     {
         SetValueTypeName(ToUtf32("cmajor::codedom::Literal*"));
     }
-    virtual void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData)
+    void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData) override
     {
         parsingData->PushContext(Id(), new Context());
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
     }
-    virtual void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched)
+    void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched) override
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
         if (matched)
@@ -248,7 +248,7 @@ public:
         }
         parsingData->PopContext(Id());
     }
-    virtual void Link()
+    void Link() override
     {
         cmajor::parsing::ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
         a0ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<IntegerLiteralRule>(this, &IntegerLiteralRule::A0Action));
@@ -260,17 +260,17 @@ public:
     void A0Action(const char32_t* matchBegin, const char32_t* matchEnd, const Span& span, const std::string& fileName, ParsingData* parsingData, bool& pass)
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
-        context->value = new Literal(std::u32string(matchBegin, matchEnd));
+        context->value = new cmajor::codedom::Literal(std::u32string(matchBegin, matchEnd));
     }
     void A1Action(const char32_t* matchBegin, const char32_t* matchEnd, const Span& span, const std::string& fileName, ParsingData* parsingData, bool& pass)
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
-        context->value = new Literal(std::u32string(matchBegin, matchEnd));
+        context->value = new cmajor::codedom::Literal(std::u32string(matchBegin, matchEnd));
     }
     void A2Action(const char32_t* matchBegin, const char32_t* matchEnd, const Span& span, const std::string& fileName, ParsingData* parsingData, bool& pass)
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
-        context->value = new Literal(std::u32string(matchBegin, matchEnd));
+        context->value = new cmajor::codedom::Literal(std::u32string(matchBegin, matchEnd));
     }
 private:
     struct Context : cmajor::parsing::Context
@@ -280,7 +280,7 @@ private:
     };
 };
 
-class LiteralGrammar::CharacterLiteralRule : public cmajor::parsing::Rule
+class Literal::CharacterLiteralRule : public cmajor::parsing::Rule
 {
 public:
     CharacterLiteralRule(const std::u32string& name_, Scope* enclosingScope_, int id_, Parser* definition_):
@@ -288,12 +288,12 @@ public:
     {
         SetValueTypeName(ToUtf32("cmajor::codedom::Literal*"));
     }
-    virtual void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData)
+    void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData) override
     {
         parsingData->PushContext(Id(), new Context());
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
     }
-    virtual void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched)
+    void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched) override
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
         if (matched)
@@ -302,7 +302,7 @@ public:
         }
         parsingData->PopContext(Id());
     }
-    virtual void Link()
+    void Link() override
     {
         cmajor::parsing::ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
         a0ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<CharacterLiteralRule>(this, &CharacterLiteralRule::A0Action));
@@ -314,17 +314,17 @@ public:
     void A0Action(const char32_t* matchBegin, const char32_t* matchEnd, const Span& span, const std::string& fileName, ParsingData* parsingData, bool& pass)
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
-        context->value = new Literal(std::u32string(matchBegin, matchEnd));
+        context->value = new cmajor::codedom::Literal(std::u32string(matchBegin, matchEnd));
     }
     void A1Action(const char32_t* matchBegin, const char32_t* matchEnd, const Span& span, const std::string& fileName, ParsingData* parsingData, bool& pass)
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
-        context->value = new Literal(std::u32string(matchBegin, matchEnd));
+        context->value = new cmajor::codedom::Literal(std::u32string(matchBegin, matchEnd));
     }
     void A2Action(const char32_t* matchBegin, const char32_t* matchEnd, const Span& span, const std::string& fileName, ParsingData* parsingData, bool& pass)
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
-        context->value = new Literal(std::u32string(matchBegin, matchEnd));
+        context->value = new cmajor::codedom::Literal(std::u32string(matchBegin, matchEnd));
     }
 private:
     struct Context : cmajor::parsing::Context
@@ -334,7 +334,7 @@ private:
     };
 };
 
-class LiteralGrammar::CCharSequenceRule : public cmajor::parsing::Rule
+class Literal::CCharSequenceRule : public cmajor::parsing::Rule
 {
 public:
     CCharSequenceRule(const std::u32string& name_, Scope* enclosingScope_, int id_, Parser* definition_):
@@ -342,12 +342,12 @@ public:
     {
         SetValueTypeName(ToUtf32("std::u32string"));
     }
-    virtual void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData)
+    void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData) override
     {
         parsingData->PushContext(Id(), new Context());
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
     }
-    virtual void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched)
+    void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched) override
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
         if (matched)
@@ -356,7 +356,7 @@ public:
         }
         parsingData->PopContext(Id());
     }
-    virtual void Link()
+    void Link() override
     {
         cmajor::parsing::ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
         a0ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<CCharSequenceRule>(this, &CCharSequenceRule::A0Action));
@@ -374,7 +374,7 @@ private:
     };
 };
 
-class LiteralGrammar::FloatingLiteralRule : public cmajor::parsing::Rule
+class Literal::FloatingLiteralRule : public cmajor::parsing::Rule
 {
 public:
     FloatingLiteralRule(const std::u32string& name_, Scope* enclosingScope_, int id_, Parser* definition_):
@@ -382,12 +382,12 @@ public:
     {
         SetValueTypeName(ToUtf32("cmajor::codedom::Literal*"));
     }
-    virtual void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData)
+    void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData) override
     {
         parsingData->PushContext(Id(), new Context());
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
     }
-    virtual void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched)
+    void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched) override
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
         if (matched)
@@ -396,7 +396,7 @@ public:
         }
         parsingData->PopContext(Id());
     }
-    virtual void Link()
+    void Link() override
     {
         cmajor::parsing::ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
         a0ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<FloatingLiteralRule>(this, &FloatingLiteralRule::A0Action));
@@ -406,12 +406,12 @@ public:
     void A0Action(const char32_t* matchBegin, const char32_t* matchEnd, const Span& span, const std::string& fileName, ParsingData* parsingData, bool& pass)
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
-        context->value = new Literal(std::u32string(matchBegin, matchEnd));
+        context->value = new cmajor::codedom::Literal(std::u32string(matchBegin, matchEnd));
     }
     void A1Action(const char32_t* matchBegin, const char32_t* matchEnd, const Span& span, const std::string& fileName, ParsingData* parsingData, bool& pass)
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
-        context->value = new Literal(std::u32string(matchBegin, matchEnd));
+        context->value = new cmajor::codedom::Literal(std::u32string(matchBegin, matchEnd));
     }
 private:
     struct Context : cmajor::parsing::Context
@@ -421,7 +421,7 @@ private:
     };
 };
 
-class LiteralGrammar::StringLiteralRule : public cmajor::parsing::Rule
+class Literal::StringLiteralRule : public cmajor::parsing::Rule
 {
 public:
     StringLiteralRule(const std::u32string& name_, Scope* enclosingScope_, int id_, Parser* definition_):
@@ -429,12 +429,12 @@ public:
     {
         SetValueTypeName(ToUtf32("cmajor::codedom::Literal*"));
     }
-    virtual void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData)
+    void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData) override
     {
         parsingData->PushContext(Id(), new Context());
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
     }
-    virtual void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched)
+    void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched) override
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
         if (matched)
@@ -443,7 +443,7 @@ public:
         }
         parsingData->PopContext(Id());
     }
-    virtual void Link()
+    void Link() override
     {
         cmajor::parsing::ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
         a0ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<StringLiteralRule>(this, &StringLiteralRule::A0Action));
@@ -451,7 +451,7 @@ public:
     void A0Action(const char32_t* matchBegin, const char32_t* matchEnd, const Span& span, const std::string& fileName, ParsingData* parsingData, bool& pass)
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
-        context->value = new Literal(std::u32string(matchBegin, matchEnd));
+        context->value = new cmajor::codedom::Literal(std::u32string(matchBegin, matchEnd));
     }
 private:
     struct Context : cmajor::parsing::Context
@@ -461,7 +461,7 @@ private:
     };
 };
 
-class LiteralGrammar::BooleanLiteralRule : public cmajor::parsing::Rule
+class Literal::BooleanLiteralRule : public cmajor::parsing::Rule
 {
 public:
     BooleanLiteralRule(const std::u32string& name_, Scope* enclosingScope_, int id_, Parser* definition_):
@@ -469,12 +469,12 @@ public:
     {
         SetValueTypeName(ToUtf32("cmajor::codedom::Literal*"));
     }
-    virtual void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData)
+    void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData) override
     {
         parsingData->PushContext(Id(), new Context());
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
     }
-    virtual void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched)
+    void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched) override
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
         if (matched)
@@ -483,7 +483,7 @@ public:
         }
         parsingData->PopContext(Id());
     }
-    virtual void Link()
+    void Link() override
     {
         cmajor::parsing::ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
         a0ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<BooleanLiteralRule>(this, &BooleanLiteralRule::A0Action));
@@ -493,12 +493,12 @@ public:
     void A0Action(const char32_t* matchBegin, const char32_t* matchEnd, const Span& span, const std::string& fileName, ParsingData* parsingData, bool& pass)
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
-        context->value = new Literal(U"true");
+        context->value = new cmajor::codedom::Literal(U"true");
     }
     void A1Action(const char32_t* matchBegin, const char32_t* matchEnd, const Span& span, const std::string& fileName, ParsingData* parsingData, bool& pass)
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
-        context->value = new Literal(U"false");
+        context->value = new cmajor::codedom::Literal(U"false");
     }
 private:
     struct Context : cmajor::parsing::Context
@@ -508,7 +508,7 @@ private:
     };
 };
 
-class LiteralGrammar::PointerLiteralRule : public cmajor::parsing::Rule
+class Literal::PointerLiteralRule : public cmajor::parsing::Rule
 {
 public:
     PointerLiteralRule(const std::u32string& name_, Scope* enclosingScope_, int id_, Parser* definition_):
@@ -516,12 +516,12 @@ public:
     {
         SetValueTypeName(ToUtf32("cmajor::codedom::Literal*"));
     }
-    virtual void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData)
+    void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData) override
     {
         parsingData->PushContext(Id(), new Context());
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
     }
-    virtual void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched)
+    void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched) override
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
         if (matched)
@@ -530,7 +530,7 @@ public:
         }
         parsingData->PopContext(Id());
     }
-    virtual void Link()
+    void Link() override
     {
         cmajor::parsing::ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
         a0ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<PointerLiteralRule>(this, &PointerLiteralRule::A0Action));
@@ -548,11 +548,11 @@ private:
     };
 };
 
-void LiteralGrammar::GetReferencedGrammars()
+void Literal::GetReferencedGrammars()
 {
 }
 
-void LiteralGrammar::CreateRules()
+void Literal::CreateRules()
 {
     AddRule(new LiteralRule(ToUtf32("Literal"), GetScope(), GetParsingDomain()->GetNextRuleId(),
         new cmajor::parsing::AlternativeParser(
@@ -610,11 +610,13 @@ void LiteralGrammar::CreateRules()
     AddRule(new cmajor::parsing::Rule(ToUtf32("HexadecimalLiteral"), GetScope(), GetParsingDomain()->GetNextRuleId(),
         new cmajor::parsing::TokenParser(
             new cmajor::parsing::SequenceParser(
-                new cmajor::parsing::AlternativeParser(
-                    new cmajor::parsing::StringParser(ToUtf32("0x")),
-                    new cmajor::parsing::StringParser(ToUtf32("0X"))),
-                new cmajor::parsing::PositiveParser(
-                    new cmajor::parsing::HexDigitParser())))));
+                new cmajor::parsing::GroupingParser(
+                    new cmajor::parsing::AlternativeParser(
+                        new cmajor::parsing::StringParser(ToUtf32("0x")),
+                        new cmajor::parsing::StringParser(ToUtf32("0X")))),
+                new cmajor::parsing::GroupingParser(
+                    new cmajor::parsing::PositiveParser(
+                        new cmajor::parsing::HexDigitParser()))))));
     AddRule(new cmajor::parsing::Rule(ToUtf32("IntegerSuffix"), GetScope(), GetParsingDomain()->GetNextRuleId(),
         new cmajor::parsing::AlternativeParser(
             new cmajor::parsing::AlternativeParser(
@@ -622,9 +624,10 @@ void LiteralGrammar::CreateRules()
                     new cmajor::parsing::SequenceParser(
                         new cmajor::parsing::NonterminalParser(ToUtf32("UnsignedSuffix"), ToUtf32("UnsignedSuffix"), 0),
                         new cmajor::parsing::OptionalParser(
-                            new cmajor::parsing::AlternativeParser(
-                                new cmajor::parsing::NonterminalParser(ToUtf32("LongLongSuffix"), ToUtf32("LongLongSuffix"), 0),
-                                new cmajor::parsing::NonterminalParser(ToUtf32("LongSuffix"), ToUtf32("LongSuffix"), 0))))),
+                            new cmajor::parsing::GroupingParser(
+                                new cmajor::parsing::AlternativeParser(
+                                    new cmajor::parsing::NonterminalParser(ToUtf32("LongLongSuffix"), ToUtf32("LongLongSuffix"), 0),
+                                    new cmajor::parsing::NonterminalParser(ToUtf32("LongSuffix"), ToUtf32("LongSuffix"), 0)))))),
                 new cmajor::parsing::TokenParser(
                     new cmajor::parsing::SequenceParser(
                         new cmajor::parsing::NonterminalParser(ToUtf32("LongLongSuffix"), ToUtf32("LongLongSuffix"), 0),
@@ -778,9 +781,10 @@ void LiteralGrammar::CreateRules()
     AddRule(new cmajor::parsing::Rule(ToUtf32("ExponentPart"), GetScope(), GetParsingDomain()->GetNextRuleId(),
         new cmajor::parsing::SequenceParser(
             new cmajor::parsing::SequenceParser(
-                new cmajor::parsing::AlternativeParser(
-                    new cmajor::parsing::CharParser('e'),
-                    new cmajor::parsing::CharParser('E')),
+                new cmajor::parsing::GroupingParser(
+                    new cmajor::parsing::AlternativeParser(
+                        new cmajor::parsing::CharParser('e'),
+                        new cmajor::parsing::CharParser('E'))),
                 new cmajor::parsing::OptionalParser(
                     new cmajor::parsing::NonterminalParser(ToUtf32("Sign"), ToUtf32("Sign"), 0))),
             new cmajor::parsing::NonterminalParser(ToUtf32("DigitSequence"), ToUtf32("DigitSequence"), 0))));
@@ -811,8 +815,9 @@ void LiteralGrammar::CreateRules()
                 new cmajor::parsing::CharParser('U')),
             new cmajor::parsing::CharParser('L'))));
     AddRule(new cmajor::parsing::Rule(ToUtf32("SCharSequence"), GetScope(), GetParsingDomain()->GetNextRuleId(),
-        new cmajor::parsing::PositiveParser(
-            new cmajor::parsing::NonterminalParser(ToUtf32("SChar"), ToUtf32("SChar"), 0))));
+        new cmajor::parsing::GroupingParser(
+            new cmajor::parsing::PositiveParser(
+                new cmajor::parsing::NonterminalParser(ToUtf32("SChar"), ToUtf32("SChar"), 0)))));
     AddRule(new cmajor::parsing::Rule(ToUtf32("SChar"), GetScope(), GetParsingDomain()->GetNextRuleId(),
         new cmajor::parsing::AlternativeParser(
             new cmajor::parsing::CharSetParser(ToUtf32("\"\\\n"), true),

@@ -53,7 +53,7 @@ void PrintHelp()
         std::endl;
 }
 
-ProjectGrammar* projectGrammar = nullptr;
+cmajor::parser::Project* projectGrammar = nullptr;
 
 int main(int argc, const char** argv)
 {
@@ -62,7 +62,7 @@ int main(int argc, const char** argv)
         InitDone initDone;
         if (!projectGrammar)
         {
-            projectGrammar = ProjectGrammar::Create();
+            projectGrammar = cmajor::parser::Project::Create();
         }
         bool verbose = false;
         std::vector<std::string> projectFilePaths;
@@ -102,7 +102,7 @@ int main(int argc, const char** argv)
         {
             MappedInputFile projectFile(projectFilePath);
             std::u32string p(ToUtf32(std::string(projectFile.Begin(), projectFile.End())));
-            std::unique_ptr<Project> project(projectGrammar->Parse(&p[0], &p[0] + p.length(), 0, projectFilePath, "debug"));
+            std::unique_ptr<cmajor::ast::Project> project(projectGrammar->Parse(&p[0], &p[0] + p.length(), 0, projectFilePath, "debug"));
             project->ResolveDeclarations();
             std::string cmprojFilePath = GetFullPath(Path::ChangeExtension(projectFilePath, ".cmproj"));
             boost::uuids::uuid guid = boost::uuids::random_generator()();

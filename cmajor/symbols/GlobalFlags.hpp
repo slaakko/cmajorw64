@@ -31,7 +31,10 @@ enum class GlobalFlags : uint32_t
     unitTest = 1 << 13,
     profile = 1 << 14,
     generateDebugInfo = 1 << 15,
-    msbuild = 1 << 16
+    msbuild = 1 << 16,
+    ast2xml = 1 << 17,
+    sym2xml = 1 << 18,
+    bdt2xml = 1 << 19
 };
 
 void SetGlobalFlag(GlobalFlags flag);

@@ -1,5 +1,5 @@
-#ifndef Grammar_hpp_20364
-#define Grammar_hpp_20364
+#ifndef Grammar_hpp_5581
+#define Grammar_hpp_5581
 
 #include <cmajor/parsing/Grammar.hpp>
 #include <cmajor/parsing/Keyword.hpp>
@@ -15,8 +15,8 @@ public:
     cmajor::parsing::Grammar* Parse(const char32_t* start, const char32_t* end, int fileIndex, const std::string& fileName, cmajor::parsing::Scope* enclosingScope);
 private:
     GrammarGrammar(cmajor::parsing::ParsingDomain* parsingDomain_);
-    virtual void CreateRules();
-    virtual void GetReferencedGrammars();
+    void CreateRules() override;
+    void GetReferencedGrammars() override;
     class GrammarRule;
     class GrammarContentRule;
     class StartClauseRule;
@@ -25,4 +25,4 @@ private:
 
 } } // namespace cmajor.syntax
 
-#endif // Grammar_hpp_20364
+#endif // Grammar_hpp_5581

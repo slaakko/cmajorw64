@@ -14,12 +14,12 @@ namespace cmajor.parser
 {
     [hpp]using namespace cmajor::ast;
 
-    grammar ConstantGrammar
+    grammar Constant
     {
-        using SpecifierGrammar.Specifiers;
-        using TypeExprGrammar.TypeExpr;
-        using IdentifierGrammar.Identifier;
-        using ExpressionGrammar.Expression;
+        using Specifier.Specifiers;
+        using TypeExpr.TypeExpr;
+        using Identifier.Identifier;
+        using Expression.Expression;
 
         Constant(ParsingContext* ctx) : ConstantNode*
             ::= (Specifiers keyword("const") TypeExpr(ctx)! Identifier! '='! Expression(ctx)! ';'!){ value = new ConstantNode(span, Specifiers, TypeExpr, Identifier, Expression); }

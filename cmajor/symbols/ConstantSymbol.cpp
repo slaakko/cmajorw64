@@ -50,7 +50,6 @@ void ConstantSymbol::Write(SymbolWriter& writer)
 void ConstantSymbol::Read(SymbolReader& reader)
 {
     Symbol::Read(reader);
-    //uint32_t typeId = reader.GetBinaryReader().ReadUInt();
     boost::uuids::uuid typeId;
     reader.GetBinaryReader().ReadUuid(typeId);
     GetSymbolTable()->EmplaceTypeRequest(this, typeId, 0);

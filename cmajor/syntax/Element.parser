@@ -11,13 +11,13 @@
 
 namespace cmajor.syntax
 {
-    grammar ElementGrammar
+    grammar Element
     {
         using stdlib.qualified_id;
         using stdlib.identifier;
         using stdlib.string;
-        using cmajor.code.DeclaratorGrammar.TypeId;
-        using cmajor.code.DeclaratorGrammar.Declarator;
+        using cmajor.code.Declarator.TypeId;
+        using cmajor.code.Declarator.Declarator;
 
         RuleLink(cmajor::parsing::Grammar* grammar)
                             ::= (keyword("using") identifier:aliasName '=' qualified_id:ruleName ';')
@@ -65,7 +65,7 @@ namespace cmajor.syntax
                                     "symbol", "math_symbol", "currency_symbol", "modifier_symbol", "other_symbol",
                                     "separator", "space_separator", "line_separator", "paragraph_separator", 
                                     "other", "control", "format", "surrogate", "private_use", "unassigned",
-                                    "graphic", "basechar", "alphabetic", "idstart", "idcont"
+                                    "graphic", "basechar", "alphabetic", "idstart", "idcont", "value"
                                 ])
                             ;
 

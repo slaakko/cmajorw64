@@ -23,7 +23,7 @@ enum class BoundStatementFlags : uint8_t
 {
     none = 0,
     postfix = 1 << 0,
-    generated = 1 << 1,
+    generated = 1 << 1
 };
 
 inline BoundStatementFlags operator|(BoundStatementFlags left, BoundStatementFlags right)

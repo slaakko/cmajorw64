@@ -19,19 +19,19 @@ namespace cmajor.parser
 {
     [hpp]using namespace cmajor::ast;
 
-    grammar CompileUnitGrammar
+    grammar CompileUnit
     {
-        using IdentifierGrammar.Identifier;
-        using IdentifierGrammar.QualifiedId;
-        using ConceptGrammar.Concept;
-        using FunctionGrammar.Function;
-        using ClassGrammar.Class;
-        using InterfaceGrammar.Interface;
-        using TypedefGrammar.Typedef;
-        using EnumerationGrammar.EnumType;
-        using ConstantGrammar.Constant;
-        using DelegateGrammar.Delegate;
-        using DelegateGrammar.ClassDelegate;
+        using Identifier.Identifier;
+        using Identifier.QualifiedId;
+        using Concept.Concept;
+        using Function.Function;
+        using Class.Class;
+        using Interface.Interface;
+        using Typedef.Typedef;
+        using Enumeration.EnumType;
+        using Constant.Constant;
+        using Delegate.Delegate;
+        using Delegate.ClassDelegate;
         using stdlib.spaces_and_comments;
         skip spaces_and_comments;
         

@@ -15,3 +15,13 @@ bin
 lib
 Debug
 Release
+install
+install.bat
+cmajor_ucd.bin
+unicode.zip
+Express
+deployment
+cmajor/unitTest
+cmajor/test
+packages
+ucd.all.flat.xml

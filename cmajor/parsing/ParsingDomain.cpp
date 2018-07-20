@@ -66,7 +66,7 @@ ParsingDomainRepository& ParsingDomainRepository::Instance()
 
 std::unique_ptr<ParsingDomainRepository> ParsingDomainRepository::instance;
 
-ParsingDomain::ParsingDomain(): ParsingObject(U"parsingDomain"), 
+ParsingDomain::ParsingDomain(): ParsingObject(U"parsingDomain", ObjectKind::parsingDomain), 
     globalNamespace(new Namespace(U"", nullptr)), globalScope(globalNamespace->GetScope()), currentNamespace(globalNamespace), nextRuleId(0)
 {
     Own(globalNamespace);

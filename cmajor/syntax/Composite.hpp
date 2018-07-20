@@ -1,5 +1,5 @@
-#ifndef Composite_hpp_20364
-#define Composite_hpp_20364
+#ifndef Composite_hpp_5581
+#define Composite_hpp_5581
 
 #include <cmajor/parsing/Grammar.hpp>
 #include <cmajor/parsing/Keyword.hpp>
@@ -8,16 +8,16 @@
 
 namespace cmajor { namespace syntax {
 
-class CompositeGrammar : public cmajor::parsing::Grammar
+class Composite : public cmajor::parsing::Grammar
 {
 public:
-    static CompositeGrammar* Create();
-    static CompositeGrammar* Create(cmajor::parsing::ParsingDomain* parsingDomain);
+    static Composite* Create();
+    static Composite* Create(cmajor::parsing::ParsingDomain* parsingDomain);
     cmajor::parsing::Parser* Parse(const char32_t* start, const char32_t* end, int fileIndex, const std::string& fileName, cmajor::parsing::Scope* enclosingScope);
 private:
-    CompositeGrammar(cmajor::parsing::ParsingDomain* parsingDomain_);
-    virtual void CreateRules();
-    virtual void GetReferencedGrammars();
+    Composite(cmajor::parsing::ParsingDomain* parsingDomain_);
+    void CreateRules() override;
+    void GetReferencedGrammars() override;
     class AlternativeRule;
     class SequenceRule;
     class DifferenceRule;
@@ -29,4 +29,4 @@ private:
 
 } } // namespace cmajor.syntax
 
-#endif // Composite_hpp_20364
+#endif // Composite_hpp_5581

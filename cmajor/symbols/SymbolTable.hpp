@@ -10,6 +10,7 @@
 #include <cmajor/symbols/ClassTemplateSpecializationSymbol.hpp>
 #include <cmajor/symbols/ArrayTypeSymbol.hpp>
 #include <cmajor/symbols/ConversionTable.hpp>
+#include <cmajor/dom/Document.hpp>
 #include <cmajor/ast/Namespace.hpp>
 #include <cmajor/ast/Function.hpp>
 #include <cmajor/ast/Class.hpp>
@@ -44,52 +45,6 @@ struct FunctionRequest
     boost::uuids::uuid functionId;
     int index;
 };
-
-/*
-struct TypeOrConceptRequest
-{
-    TypeOrConceptRequest(Symbol* symbol_, uint32_t typeId_, int index_) : symbol(symbol_), typeId(typeId_), index(index_) {}
-    Symbol* symbol;
-    uint32_t typeId;
-    int index;
-};
-
-struct FunctionRequest
-{
-    FunctionRequest(Symbol* symbol_, uint32_t functionId_, int index_) : symbol(symbol_), functionId(functionId_), index(index_) {}
-    Symbol* symbol;
-    uint32_t functionId;
-    int index;
-};
-
-class TypeIdCounter
-{
-public:
-    static void Init();
-    static void Done();
-    static TypeIdCounter& Instance() { Assert(instance, "type id counter not initialized"); return *instance; }
-    int GetNextTypeId() { return nextTypeId++;  }
-    void SetNextTypeId(int nextTypeId_) { nextTypeId = nextTypeId_; }
-private:
-    static std::unique_ptr<TypeIdCounter> instance;
-    TypeIdCounter();
-    int nextTypeId;
-};
-
-class FunctionIdCounter
-{
-public:
-    static void Init();
-    static void Done();
-    static FunctionIdCounter& Instance() { Assert(instance, "function id counter not initialized"); return *instance; }
-    int GetNextFunctionId() { return nextFunctionId++; }
-    void SetNextFunctionId(int nextFunctionId_) { nextFunctionId = nextFunctionId_; }
-private:
-    static std::unique_ptr<FunctionIdCounter> instance;
-    FunctionIdCounter();
-    int nextFunctionId;
-};
-*/
 
 struct ClassTemplateSpecializationKey
 {
@@ -203,15 +158,11 @@ public:
     void SetTypeIdFor(TypeSymbol* typeSymbol);
     void SetTypeIdFor(ConceptSymbol* conceptSymbol);
     void SetFunctionIdFor(FunctionSymbol* functionSymbol);
-    //FunctionSymbol* GetFunctionById(uint32_t functionId) const;
     FunctionSymbol* GetFunctionById(const boost::uuids::uuid& functionId) const;
     void AddTypeOrConceptSymbolToTypeIdMap(Symbol* typeOrConceptSymbol);
     void AddFunctionSymbolToFunctionIdMap(FunctionSymbol* functionSymbol);
-    //void EmplaceTypeRequest(Symbol* forSymbol, uint32_t typeId, int index);
     void EmplaceTypeRequest(Symbol* forSymbol, const boost::uuids::uuid& typeId, int index);
-    //void EmplaceConceptRequest(Symbol* forSymbol, uint32_t typeId);
     void EmplaceConceptRequest(Symbol* forSymbol, const boost::uuids::uuid& typeId);
-    //void EmplaceFunctionRequest(Symbol* forSymbol, uint32_t functionId, int index);
     void EmplaceFunctionRequest(Symbol* forSymbol, const boost::uuids::uuid& functionId, int index);
     void ProcessTypeConceptAndFunctionRequests();
     TypeSymbol* GetTypeByNameNoThrow(const std::u32string& typeName) const;
@@ -233,11 +184,10 @@ public:
     std::vector<TypeSymbol*> Types() const;
     void Copy(const SymbolTable& that);
     void SetCurrentFunctionSymbol(FunctionSymbol* currentFunctionSymbol_) { currentFunctionSymbol = currentFunctionSymbol_; }
-    //void MapProfiledFunction(uint32_t functionId, const std::u32string& profiledFunctionName);
     void MapProfiledFunction(const boost::uuids::uuid& functionId, const std::u32string& profiledFunctionName);
-    //std::u32string GetProfiledFunctionName(uint32_t functionId) const;
     std::u32string GetProfiledFunctionName(const boost::uuids::uuid& functionId) const;
     Module* GetModule() { return module; }
+    std::unique_ptr<dom::Document> ToDomDocument();
 private:
     Module* module;
     NamespaceSymbol globalNs;
@@ -254,12 +204,9 @@ private:
     int declarationBlockIndex;
     std::unordered_map<Node*, Symbol*> nodeSymbolMap;
     std::unordered_map<Symbol*, Node*> symbolNodeMap;
-    //std::unordered_map<uint32_t, Symbol*> typeIdMap;
     std::unordered_map<boost::uuids::uuid, Symbol*, boost::hash<boost::uuids::uuid>> typeIdMap;
-    //std::unordered_map<uint32_t, FunctionSymbol*> functionIdMap;
     std::unordered_map<boost::uuids::uuid, FunctionSymbol*, boost::hash<boost::uuids::uuid>> functionIdMap;
     std::unordered_map<std::u32string, TypeSymbol*> typeNameMap;
-    //std::unordered_map<uint32_t, std::u32string> profiledFunctionNameMap;
     std::unordered_map<boost::uuids::uuid, std::u32string, boost::hash<boost::uuids::uuid>> profiledFunctionNameMap;
     std::unordered_map<TypeSymbol*, std::vector<DerivedTypeSymbol*>> derivedTypeMap; 
     std::vector<std::unique_ptr<DerivedTypeSymbol>> derivedTypes;
@@ -275,7 +222,6 @@ private:
     std::unordered_set<std::u32string> jsonClasses;
     int GetNextDeclarationBlockIndex() { return declarationBlockIndex++; }
     void ResetDeclarationBlockIndex() { declarationBlockIndex = 0; }
-    //void EmplaceTypeOrConceptRequest(Symbol* forSymbol, uint32_t typeId, int index);
     void EmplaceTypeOrConceptRequest(Symbol* forSymbol, const boost::uuids::uuid& typeId, int index);
 };
 

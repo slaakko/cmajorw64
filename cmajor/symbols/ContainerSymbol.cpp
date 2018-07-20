@@ -183,6 +183,53 @@ ClassGroupTypeSymbol* ContainerSymbol::MakeClassGroupTypeSymbol(const std::u32st
     }
 }
 
+void ContainerSymbol::AppendChildElements(dom::Element* element, TypeMap& typeMap) const
+{
+    for (const std::unique_ptr<Symbol>& member : members)
+    {
+        if (member->IsFunctionSymbol()) continue;
+        if (member->IsClassTypeSymbol()) continue;
+        if (member->GetSymbolType() == SymbolType::conceptSymbol) continue;
+        if (member->GetSymbolType() != SymbolType::namespaceSymbol && !member->IsProject()) continue;
+        if (member->GetSymbolType() == SymbolType::namespaceSymbol ||
+            member->GetSymbolType() == SymbolType::classGroupTypeSymbol ||
+            member->GetSymbolType() == SymbolType::functionGroupSymbol ||
+            member->GetSymbolType() == SymbolType::conceptGroupSymbol)
+        {
+            if (!member->HasProjectMembers()) continue;
+        }
+        std::unique_ptr<dom::Element> memberElement = member->ToDomElement(typeMap);
+        if (memberElement)
+        {
+            element->AppendChild(std::unique_ptr<dom::Node>(memberElement.release()));
+        }
+    }
+}
+bool ContainerSymbol::HasProjectMembers() const
+{
+    if (FullName() == U"System.Meta") return false;
+    for (const std::unique_ptr<Symbol>& member : members)
+    { 
+        if (member->GetSymbolType() == SymbolType::namespaceSymbol || 
+            member->GetSymbolType() == SymbolType::classGroupTypeSymbol || 
+            member->GetSymbolType() == SymbolType::functionGroupSymbol || 
+            member->GetSymbolType() == SymbolType::conceptGroupSymbol)
+        {
+            if (member->HasProjectMembers()) return true;
+        }
+        else
+        {
+            if (member->IsFunctionSymbol())
+            {
+                FunctionSymbol* fun = static_cast<FunctionSymbol*>(member.get());
+                if (fun->IsTemplateSpecialization()) continue;
+            }
+            if (member->IsProject()) return true;
+        }
+    }
+    return false;
+}
+
 DeclarationBlock::DeclarationBlock(const Span& span_, const std::u32string& name_) : ContainerSymbol(SymbolType::declarationBlock, span_, name_)
 {
 }

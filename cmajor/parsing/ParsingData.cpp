@@ -11,7 +11,7 @@ Context::~Context()
 {
 }
 
-ParsingData::ParsingData(int numRules)
+ParsingData::ParsingData(int numRules) 
 {
     ruleData.resize(numRules);
 }

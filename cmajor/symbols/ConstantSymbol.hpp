@@ -32,6 +32,8 @@ public:
     Value* GetValue();
     llvm::Value* ArrayIrObject(Emitter& emitter, bool create);
     llvm::Value* StructureIrObject(Emitter& emitter, bool create);
+    std::u32string Info() const override { return Name(); }
+    const char* ClassName() const override { return "ConstantSymbol"; }
 private:
     TypeSymbol* type;
     std::unique_ptr<Value> value;

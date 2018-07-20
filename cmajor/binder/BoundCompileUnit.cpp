@@ -33,6 +33,7 @@ public:
     TypeSymbol* ConversionTargetType() const { return targetType; }
     bool IsBasicTypeOperation() const override { return true; }
     void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
+    const char* ClassName() const override { return "ClassTypeConversion"; }
 private:
     ConversionType conversionType;
     uint8_t conversionDistance;
@@ -66,9 +67,10 @@ public:
     bool IsBasicTypeOperation() const override { return true; }
     void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
     std::unique_ptr<Value> ConvertValue(const std::unique_ptr<Value>& value) const override;
+    const char* ClassName() const override { return "NullPtrToPtrConversion"; }
 private:
     TypeSymbol* nullPtrType;
-    TypeSymbol* targetPointerType;;
+    TypeSymbol* targetPointerType;
 };
 
 NullPtrToPtrConversion::NullPtrToPtrConversion(TypeSymbol* nullPtrType_, TypeSymbol* targetPointerType_) :
@@ -109,9 +111,10 @@ public:
     TypeSymbol* ConversionTargetType() const { return targetPointerType; }
     bool IsBasicTypeOperation() const override { return true; }
     void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
+    const char* ClassName() const override { return "VoidPtrToPtrConversion"; }
 private:
     TypeSymbol* voidPtrType;
-    TypeSymbol* targetPointerType;;
+    TypeSymbol* targetPointerType;
 };
 
 VoidPtrToPtrConversion::VoidPtrToPtrConversion(TypeSymbol* voidPtrType_, TypeSymbol* targetPointerType_) :
@@ -139,6 +142,7 @@ public:
     TypeSymbol* ConversionTargetType() const { return voidPtrType; }
     bool IsBasicTypeOperation() const override { return true; }
     void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
+    const char* ClassName() const override { return "PtrToVoidPtrConversion"; }
 private:
     TypeSymbol* sourcePtrType;
     TypeSymbol* voidPtrType;
@@ -169,6 +173,7 @@ public:
     TypeSymbol* ConversionTargetType() const { return ulongType; }
     bool IsBasicTypeOperation() const override { return true; }
     void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
+    const char* ClassName() const override { return "PtrToULongConversion"; }
 private:
     TypeSymbol* ptrType;
     TypeSymbol* ulongType;

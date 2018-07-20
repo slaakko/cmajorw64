@@ -16,22 +16,22 @@ using namespace cmajor::parsing;
 using namespace cmajor::util;
 using namespace cmajor::unicode;
 
-KeywordGrammar* KeywordGrammar::Create()
+Keyword* Keyword::Create()
 {
     return Create(new cmajor::parsing::ParsingDomain());
 }
 
-KeywordGrammar* KeywordGrammar::Create(cmajor::parsing::ParsingDomain* parsingDomain)
+Keyword* Keyword::Create(cmajor::parsing::ParsingDomain* parsingDomain)
 {
     RegisterParsingDomain(parsingDomain);
-    KeywordGrammar* grammar(new KeywordGrammar(parsingDomain));
+    Keyword* grammar(new Keyword(parsingDomain));
     parsingDomain->AddGrammar(grammar);
     grammar->CreateRules();
     grammar->Link();
     return grammar;
 }
 
-KeywordGrammar::KeywordGrammar(cmajor::parsing::ParsingDomain* parsingDomain_): cmajor::parsing::Grammar(ToUtf32("KeywordGrammar"), parsingDomain_->GetNamespaceScope(ToUtf32("cmajor.parser")), parsingDomain_)
+Keyword::Keyword(cmajor::parsing::ParsingDomain* parsingDomain_): cmajor::parsing::Grammar(ToUtf32("Keyword"), parsingDomain_->GetNamespaceScope(ToUtf32("cmajor.parser")), parsingDomain_)
 {
     SetOwner(0);
     keywords0.push_back(ToUtf32("abstract"));
@@ -109,9 +109,14 @@ KeywordGrammar::KeywordGrammar(cmajor::parsing::ParsingDomain* parsingDomain_): 
     keywords0.push_back(ToUtf32("wchar"));
     keywords0.push_back(ToUtf32("where"));
     keywords0.push_back(ToUtf32("while"));
+    keywords1.push_back(ToUtf32("assert"));
+    keywords1.push_back(ToUtf32("elif"));
+    keywords1.push_back(ToUtf32("else"));
+    keywords1.push_back(ToUtf32("endif"));
+    keywords1.push_back(ToUtf32("if"));
 }
 
-void KeywordGrammar::GetReferencedGrammars()
+void Keyword::GetReferencedGrammars()
 {
     cmajor::parsing::ParsingDomain* pd = GetParsingDomain();
     cmajor::parsing::Grammar* grammar0 = pd->GetGrammar(ToUtf32("cmajor.parsing.stdlib"));
@@ -122,11 +127,24 @@ void KeywordGrammar::GetReferencedGrammars()
     AddGrammarReference(grammar0);
 }
 
-void KeywordGrammar::CreateRules()
+void Keyword::CreateRules()
 {
     AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("identifier"), this, ToUtf32("cmajor.parsing.stdlib.identifier")));
     AddRule(new cmajor::parsing::Rule(ToUtf32("Keyword"), GetScope(), GetParsingDomain()->GetNextRuleId(),
         new cmajor::parsing::KeywordListParser(ToUtf32("identifier"), keywords0)));
+    AddRule(new cmajor::parsing::Rule(ToUtf32("PPKeyword"), GetScope(), GetParsingDomain()->GetNextRuleId(),
+        new cmajor::parsing::SequenceParser(
+            new cmajor::parsing::SequenceParser(
+                new cmajor::parsing::SequenceParser(
+                    new cmajor::parsing::OptionalParser(
+                        new cmajor::parsing::NonterminalParser(ToUtf32("S"), ToUtf32("S"), 0)),
+                    new cmajor::parsing::CharParser('#')),
+                new cmajor::parsing::OptionalParser(
+                    new cmajor::parsing::NonterminalParser(ToUtf32("S"), ToUtf32("S"), 0))),
+            new cmajor::parsing::KeywordListParser(ToUtf32("identifier"), keywords1))));
+    AddRule(new cmajor::parsing::Rule(ToUtf32("S"), GetScope(), GetParsingDomain()->GetNextRuleId(),
+        new cmajor::parsing::PositiveParser(
+            new cmajor::parsing::CharSetParser(ToUtf32(" \t")))));
 }
 
 } } // namespace cmajor.parser

@@ -63,6 +63,32 @@ ClassTypeSymbol* ClassGroupTypeSymbol::GetClass(int arity) const
     return nullptr;
 }
 
+bool ClassGroupTypeSymbol::HasProjectMembers() const
+{
+    for (const auto& p : arityClassMap)
+    {
+        ClassTypeSymbol* cls = p.second;
+        if (cls->IsProject())
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+void ClassGroupTypeSymbol::AppendChildElements(dom::Element* element, TypeMap& typeMap) const
+{
+    for (const auto& p : arityClassMap)
+    {
+        ClassTypeSymbol* cls = p.second;
+        std::unique_ptr<dom::Element> classElement = cls->ToDomElement(typeMap);
+        if (cls->IsProject())
+        {
+            element->AppendChild(std::unique_ptr<dom::Node>(classElement.release()));
+        }
+    }
+}
+
 ClassTypeSymbol::ClassTypeSymbol(const Span& span_, const std::u32string& name_) : 
     TypeSymbol(SymbolType::classTypeSymbol, span_, name_), 
     minArity(0), baseClass(), flags(ClassTypeSymbolFlags::none), implementedInterfaces(), templateParameters(), memberVariables(), staticMemberVariables(),
@@ -114,7 +140,6 @@ void ClassTypeSymbol::Write(SymbolWriter& writer)
     }
     else if (GetSymbolType() == SymbolType::classTypeSymbol)
     {
-        //uint32_t baseClassId = 0;
         boost::uuids::uuid baseClassId = boost::uuids::nil_generator()();
         if (baseClass)
         {
@@ -1108,15 +1133,16 @@ llvm::DIType* ClassTypeSymbol::CreateDIType(Emitter& emitter)
         emitter.MapFwdDeclaration(vtableHolderClass, VmtPtrHolderClass());
     }
     std::vector<llvm::Metadata*> elements;
+    const llvm::StructLayout* structLayout = emitter.DataLayout()->getStructLayout(llvm::cast<llvm::StructType>(IrType(emitter)));
     for (MemberVariableSymbol* memberVariable : memberVariables)
     {
         int memberVariableLayoutIndex = memberVariable->LayoutIndex();
-        uint64_t offsetInBits = emitter.DataLayout()->getStructLayout(llvm::cast<llvm::StructType>(IrType(emitter)))->getElementOffsetInBits(memberVariableLayoutIndex);
+        uint64_t offsetInBits = structLayout->getElementOffsetInBits(memberVariableLayoutIndex);
         elements.push_back(memberVariable->GetDIMemberType(emitter, offsetInBits));
     }
     llvm::MDNode* templateParams = nullptr;
-    uint64_t sizeInBits = emitter.DataLayout()->getStructLayout(llvm::cast<llvm::StructType>(IrType(emitter)))->getSizeInBits();
-    uint32_t alignInBits = 8 * emitter.DataLayout()->getStructLayout(llvm::cast<llvm::StructType>(IrType(emitter)))->getAlignment();
+    uint64_t sizeInBits = structLayout->getSizeInBits();
+    uint32_t alignInBits = 8 * structLayout->getAlignment();
     uint64_t offsetInBits = 0; // todo?
     llvm::DINode::DIFlags flags = llvm::DINode::DIFlags::FlagZero;
     Span classSpan = GetSpan();

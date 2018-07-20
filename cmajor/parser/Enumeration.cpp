@@ -20,27 +20,27 @@ using namespace cmajor::parsing;
 using namespace cmajor::util;
 using namespace cmajor::unicode;
 
-EnumerationGrammar* EnumerationGrammar::Create()
+Enumeration* Enumeration::Create()
 {
     return Create(new cmajor::parsing::ParsingDomain());
 }
 
-EnumerationGrammar* EnumerationGrammar::Create(cmajor::parsing::ParsingDomain* parsingDomain)
+Enumeration* Enumeration::Create(cmajor::parsing::ParsingDomain* parsingDomain)
 {
     RegisterParsingDomain(parsingDomain);
-    EnumerationGrammar* grammar(new EnumerationGrammar(parsingDomain));
+    Enumeration* grammar(new Enumeration(parsingDomain));
     parsingDomain->AddGrammar(grammar);
     grammar->CreateRules();
     grammar->Link();
     return grammar;
 }
 
-EnumerationGrammar::EnumerationGrammar(cmajor::parsing::ParsingDomain* parsingDomain_): cmajor::parsing::Grammar(ToUtf32("EnumerationGrammar"), parsingDomain_->GetNamespaceScope(ToUtf32("cmajor.parser")), parsingDomain_)
+Enumeration::Enumeration(cmajor::parsing::ParsingDomain* parsingDomain_): cmajor::parsing::Grammar(ToUtf32("Enumeration"), parsingDomain_->GetNamespaceScope(ToUtf32("cmajor.parser")), parsingDomain_)
 {
     SetOwner(0);
 }
 
-EnumTypeNode* EnumerationGrammar::Parse(const char32_t* start, const char32_t* end, int fileIndex, const std::string& fileName, ParsingContext* ctx)
+EnumTypeNode* Enumeration::Parse(const char32_t* start, const char32_t* end, int fileIndex, const std::string& fileName, ParsingContext* ctx)
 {
     cmajor::parsing::Scanner scanner(start, end, fileName, fileIndex, SkipRule());
     std::unique_ptr<cmajor::parsing::XmlLog> xmlLog;
@@ -77,7 +77,7 @@ EnumTypeNode* EnumerationGrammar::Parse(const char32_t* start, const char32_t* e
     return result;
 }
 
-class EnumerationGrammar::EnumTypeRule : public cmajor::parsing::Rule
+class Enumeration::EnumTypeRule : public cmajor::parsing::Rule
 {
 public:
     EnumTypeRule(const std::u32string& name_, Scope* enclosingScope_, int id_, Parser* definition_):
@@ -86,7 +86,7 @@ public:
         AddInheritedAttribute(AttrOrVariable(ToUtf32("ParsingContext*"), ToUtf32("ctx")));
         SetValueTypeName(ToUtf32("EnumTypeNode*"));
     }
-    virtual void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData)
+    void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData) override
     {
         parsingData->PushContext(Id(), new Context());
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
@@ -94,7 +94,7 @@ public:
         context->ctx = *static_cast<cmajor::parsing::ValueObject<ParsingContext*>*>(ctx_value.get());
         stack.pop();
     }
-    virtual void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched)
+    void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched) override
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
         if (matched)
@@ -103,7 +103,7 @@ public:
         }
         parsingData->PopContext(Id());
     }
-    virtual void Link()
+    void Link() override
     {
         cmajor::parsing::ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
         a0ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<EnumTypeRule>(this, &EnumTypeRule::A0Action));
@@ -189,7 +189,7 @@ private:
     };
 };
 
-class EnumerationGrammar::UnderlyingTypeRule : public cmajor::parsing::Rule
+class Enumeration::UnderlyingTypeRule : public cmajor::parsing::Rule
 {
 public:
     UnderlyingTypeRule(const std::u32string& name_, Scope* enclosingScope_, int id_, Parser* definition_):
@@ -198,7 +198,7 @@ public:
         AddInheritedAttribute(AttrOrVariable(ToUtf32("ParsingContext*"), ToUtf32("ctx")));
         SetValueTypeName(ToUtf32("Node*"));
     }
-    virtual void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData)
+    void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData) override
     {
         parsingData->PushContext(Id(), new Context());
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
@@ -206,7 +206,7 @@ public:
         context->ctx = *static_cast<cmajor::parsing::ValueObject<ParsingContext*>*>(ctx_value.get());
         stack.pop();
     }
-    virtual void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched)
+    void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched) override
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
         if (matched)
@@ -215,7 +215,7 @@ public:
         }
         parsingData->PopContext(Id());
     }
-    virtual void Link()
+    void Link() override
     {
         cmajor::parsing::ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
         a0ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<UnderlyingTypeRule>(this, &UnderlyingTypeRule::A0Action));
@@ -253,7 +253,7 @@ private:
     };
 };
 
-class EnumerationGrammar::EnumConstantsRule : public cmajor::parsing::Rule
+class Enumeration::EnumConstantsRule : public cmajor::parsing::Rule
 {
 public:
     EnumConstantsRule(const std::u32string& name_, Scope* enclosingScope_, int id_, Parser* definition_):
@@ -262,7 +262,7 @@ public:
         AddInheritedAttribute(AttrOrVariable(ToUtf32("ParsingContext*"), ToUtf32("ctx")));
         AddInheritedAttribute(AttrOrVariable(ToUtf32("EnumTypeNode*"), ToUtf32("enumType")));
     }
-    virtual void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData)
+    void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData) override
     {
         parsingData->PushContext(Id(), new Context());
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
@@ -273,11 +273,11 @@ public:
         context->ctx = *static_cast<cmajor::parsing::ValueObject<ParsingContext*>*>(ctx_value.get());
         stack.pop();
     }
-    virtual void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched)
+    void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched) override
     {
         parsingData->PopContext(Id());
     }
-    virtual void Link()
+    void Link() override
     {
         cmajor::parsing::ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
         a0ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<EnumConstantsRule>(this, &EnumConstantsRule::A0Action));
@@ -316,7 +316,7 @@ private:
     };
 };
 
-class EnumerationGrammar::EnumConstantRule : public cmajor::parsing::Rule
+class Enumeration::EnumConstantRule : public cmajor::parsing::Rule
 {
 public:
     EnumConstantRule(const std::u32string& name_, Scope* enclosingScope_, int id_, Parser* definition_):
@@ -327,7 +327,7 @@ public:
         SetValueTypeName(ToUtf32("EnumConstantNode*"));
         AddLocalVariable(AttrOrVariable(ToUtf32("Span"), ToUtf32("s")));
     }
-    virtual void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData)
+    void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData) override
     {
         parsingData->PushContext(Id(), new Context());
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
@@ -338,7 +338,7 @@ public:
         context->ctx = *static_cast<cmajor::parsing::ValueObject<ParsingContext*>*>(ctx_value.get());
         stack.pop();
     }
-    virtual void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched)
+    void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched) override
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
         if (matched)
@@ -347,7 +347,7 @@ public:
         }
         parsingData->PopContext(Id());
     }
-    virtual void Link()
+    void Link() override
     {
         cmajor::parsing::ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
         a0ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<EnumConstantRule>(this, &EnumConstantRule::A0Action));
@@ -416,41 +416,41 @@ private:
     };
 };
 
-void EnumerationGrammar::GetReferencedGrammars()
+void Enumeration::GetReferencedGrammars()
 {
     cmajor::parsing::ParsingDomain* pd = GetParsingDomain();
-    cmajor::parsing::Grammar* grammar0 = pd->GetGrammar(ToUtf32("cmajor.parser.TypeExprGrammar"));
+    cmajor::parsing::Grammar* grammar0 = pd->GetGrammar(ToUtf32("cmajor.parser.TypeExpr"));
     if (!grammar0)
     {
-        grammar0 = cmajor::parser::TypeExprGrammar::Create(pd);
+        grammar0 = cmajor::parser::TypeExpr::Create(pd);
     }
     AddGrammarReference(grammar0);
-    cmajor::parsing::Grammar* grammar1 = pd->GetGrammar(ToUtf32("cmajor.parser.SpecifierGrammar"));
+    cmajor::parsing::Grammar* grammar1 = pd->GetGrammar(ToUtf32("cmajor.parser.Specifier"));
     if (!grammar1)
     {
-        grammar1 = cmajor::parser::SpecifierGrammar::Create(pd);
+        grammar1 = cmajor::parser::Specifier::Create(pd);
     }
     AddGrammarReference(grammar1);
-    cmajor::parsing::Grammar* grammar2 = pd->GetGrammar(ToUtf32("cmajor.parser.IdentifierGrammar"));
+    cmajor::parsing::Grammar* grammar2 = pd->GetGrammar(ToUtf32("cmajor.parser.Identifier"));
     if (!grammar2)
     {
-        grammar2 = cmajor::parser::IdentifierGrammar::Create(pd);
+        grammar2 = cmajor::parser::Identifier::Create(pd);
     }
     AddGrammarReference(grammar2);
-    cmajor::parsing::Grammar* grammar3 = pd->GetGrammar(ToUtf32("cmajor.parser.ExpressionGrammar"));
+    cmajor::parsing::Grammar* grammar3 = pd->GetGrammar(ToUtf32("cmajor.parser.Expression"));
     if (!grammar3)
     {
-        grammar3 = cmajor::parser::ExpressionGrammar::Create(pd);
+        grammar3 = cmajor::parser::Expression::Create(pd);
     }
     AddGrammarReference(grammar3);
 }
 
-void EnumerationGrammar::CreateRules()
+void Enumeration::CreateRules()
 {
-    AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("TypeExpr"), this, ToUtf32("TypeExprGrammar.TypeExpr")));
-    AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("Specifiers"), this, ToUtf32("SpecifierGrammar.Specifiers")));
-    AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("Identifier"), this, ToUtf32("IdentifierGrammar.Identifier")));
-    AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("Expression"), this, ToUtf32("ExpressionGrammar.Expression")));
+    AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("Identifier"), this, ToUtf32("Identifier.Identifier")));
+    AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("Specifiers"), this, ToUtf32("Specifier.Specifiers")));
+    AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("TypeExpr"), this, ToUtf32("TypeExpr.TypeExpr")));
+    AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("Expression"), this, ToUtf32("Expression.Expression")));
     AddRule(new EnumTypeRule(ToUtf32("EnumType"), GetScope(), GetParsingDomain()->GetNextRuleId(),
         new cmajor::parsing::SequenceParser(
             new cmajor::parsing::SequenceParser(
@@ -464,8 +464,9 @@ void EnumerationGrammar::CreateRules()
                                 new cmajor::parsing::ExpectationParser(
                                     new cmajor::parsing::NonterminalParser(ToUtf32("enumTypeId"), ToUtf32("Identifier"), 0)))),
                         new cmajor::parsing::OptionalParser(
-                            new cmajor::parsing::ActionParser(ToUtf32("A1"),
-                                new cmajor::parsing::NonterminalParser(ToUtf32("UnderlyingType"), ToUtf32("UnderlyingType"), 1)))),
+                            new cmajor::parsing::GroupingParser(
+                                new cmajor::parsing::ActionParser(ToUtf32("A1"),
+                                    new cmajor::parsing::NonterminalParser(ToUtf32("UnderlyingType"), ToUtf32("UnderlyingType"), 1))))),
                     new cmajor::parsing::ExpectationParser(
                         new cmajor::parsing::CharParser('{'))),
                 new cmajor::parsing::NonterminalParser(ToUtf32("EnumConstants"), ToUtf32("EnumConstants"), 2)),
@@ -488,13 +489,14 @@ void EnumerationGrammar::CreateRules()
             new cmajor::parsing::ActionParser(ToUtf32("A0"),
                 new cmajor::parsing::ExpectationParser(
                     new cmajor::parsing::NonterminalParser(ToUtf32("constantId"), ToUtf32("Identifier"), 0))),
-            new cmajor::parsing::AlternativeParser(
-                new cmajor::parsing::SequenceParser(
-                    new cmajor::parsing::CharParser('='),
-                    new cmajor::parsing::ActionParser(ToUtf32("A1"),
-                        new cmajor::parsing::NonterminalParser(ToUtf32("constantValue"), ToUtf32("Expression"), 1))),
-                new cmajor::parsing::ActionParser(ToUtf32("A2"),
-                    new cmajor::parsing::EmptyParser())))));
+            new cmajor::parsing::GroupingParser(
+                new cmajor::parsing::AlternativeParser(
+                    new cmajor::parsing::SequenceParser(
+                        new cmajor::parsing::CharParser('='),
+                        new cmajor::parsing::ActionParser(ToUtf32("A1"),
+                            new cmajor::parsing::NonterminalParser(ToUtf32("constantValue"), ToUtf32("Expression"), 1))),
+                    new cmajor::parsing::ActionParser(ToUtf32("A2"),
+                        new cmajor::parsing::EmptyParser()))))));
 }
 
 } } // namespace cmajor.parser

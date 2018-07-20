@@ -16,13 +16,13 @@ namespace cmajor.parser
 {
     [hpp]using namespace cmajor::ast;
 
-    grammar ExpressionGrammar
+    grammar Expression
     {
-        using LiteralGrammar.Literal;
-        using BasicTypeGrammar.BasicType;
-        using TemplateGrammar.TemplateId;
-        using IdentifierGrammar.Identifier;
-        using TypeExprGrammar.TypeExpr;
+        using Literal.Literal;
+        using BasicType.BasicType;
+        using Template.TemplateId;
+        using Identifier.Identifier;
+        using TypeExpr.TypeExpr;
         using stdlib.identifier;
 
         Expression(ParsingContext* ctx) : Node*

@@ -25,6 +25,8 @@
 #include <cmajor/symbols/SymbolReader.hpp>
 #include <cmajor/symbols/SymbolCreatorVisitor.hpp>
 #include <cmajor/symbols/Meta.hpp>
+#include <cmajor/ast2dom/Ast2Dom.hpp>
+#include <cmajor/bdt2dom/Bdt2Dom.hpp>
 #include <cmajor/ast/Attribute.hpp>
 #include <cmajor/ast/Function.hpp>
 #include <cmajor/ast/BasicType.hpp>
@@ -38,6 +40,7 @@
 #include <cmajor/util/System.hpp>
 #include <cmajor/util/TextUtils.hpp>
 #include <cmajor/util/Log.hpp>
+#include <algorithm>
 #include <iostream>
 #include <fstream>
 #include <stdexcept>
@@ -58,13 +61,13 @@ using namespace cmajor::unicode;
 
 namespace cmajor { namespace build {
 
-CompileUnitGrammar* compileUnitGrammar = nullptr;
+CompileUnit* compileUnitGrammar = nullptr;
 
 std::vector<std::unique_ptr<CompileUnitNode>> ParseSourcesInMainThread(Module* module, const std::vector<std::string>& sourceFilePaths, bool& stop)
 {
     if (!compileUnitGrammar)
     {
-        compileUnitGrammar = CompileUnitGrammar::Create();
+        compileUnitGrammar = CompileUnit::Create();
     }
     if (GetGlobalFlag(GlobalFlags::verbose))
     {
@@ -98,6 +101,15 @@ std::vector<std::unique_ptr<CompileUnitNode>> ParseSourcesInMainThread(Module* m
             }
             std::u32string s(ToUtf32(std::string(sourceFile.Begin(), sourceFile.End())));
             std::unique_ptr<CompileUnitNode> compileUnit(compileUnitGrammar->Parse(&s[0], &s[0] + s.length(), fileIndex, sourceFilePath, &parsingContext));
+            if (GetGlobalFlag(GlobalFlags::ast2xml))
+            {
+                std::unique_ptr<dom::Document> ast2xmlDoc = cmajor::ast2dom::GenerateAstDocument(compileUnit.get());
+                std::string ast2xmlFilePath = Path::ChangeExtension(sourceFilePath, ".ast.xml");
+                std::ofstream ast2xmlFile(ast2xmlFilePath);
+                CodeFormatter formatter(ast2xmlFile);
+                formatter.SetIndentSize(1);
+                ast2xmlDoc->Write(formatter);
+            }
             if (GetGlobalFlag(GlobalFlags::generateDebugInfo))
             {
                 compileUnit->ComputeLineStarts(s);
@@ -159,6 +171,15 @@ void ParseSourceFile(ParserData* parserData)
                 int fileIndex = parserData->fileIndeces[index];
                 std::u32string s(ToUtf32(std::string(sourceFile.Begin(), sourceFile.End())));
                 std::unique_ptr<CompileUnitNode> compileUnit(compileUnitGrammar->Parse(&s[0], &s[0] + s.length(), fileIndex, sourceFilePath, &parsingContext));
+                if (GetGlobalFlag(GlobalFlags::ast2xml))
+                {
+                    std::unique_ptr<dom::Document> ast2xmlDoc = cmajor::ast2dom::GenerateAstDocument(compileUnit.get());
+                    std::string ast2xmlFilePath = Path::ChangeExtension(sourceFilePath, ".ast.xml");
+                    std::ofstream ast2xmlFile(ast2xmlFilePath);
+                    CodeFormatter formatter(ast2xmlFile);
+                    formatter.SetIndentSize(1);
+                    ast2xmlDoc->Write(formatter);
+                }
                 if (GetGlobalFlag(GlobalFlags::generateDebugInfo))
                 {
                     compileUnit->ComputeLineStarts(s);
@@ -181,7 +202,7 @@ std::vector<std::unique_ptr<CompileUnitNode>> ParseSourcesConcurrently(Module* m
 {
     if (!compileUnitGrammar)
     {
-        compileUnitGrammar = CompileUnitGrammar::Create();
+        compileUnitGrammar = CompileUnit::Create();
     }
     if (GetGlobalFlag(GlobalFlags::verbose))
     {
@@ -845,7 +866,7 @@ void InstallSystemLibraries(Module* systemInstallModule)
     }
 }
 
-void BuildProject(Project* project, std::unique_ptr<Module>& rootModule, bool& stop)
+void BuildProject(Project* project, std::unique_ptr<Module>& rootModule, bool& stop, bool resetRootModule)
 {
     if (project->GetTarget() == Target::unitTest)
     {
@@ -877,6 +898,15 @@ void BuildProject(Project* project, std::unique_ptr<Module>& rootModule, bool& s
         rootModule->PrepareForCompilation(project->References(), classTypes, classTemplateSpecializations);
         cmajor::symbols::MetaInit(rootModule->GetSymbolTable());
         CreateSymbols(rootModule->GetSymbolTable(), compileUnits, stop);
+        if (GetGlobalFlag(GlobalFlags::sym2xml))
+        {
+            std::unique_ptr<dom::Document> symbolTableDoc = rootModule->GetSymbolTable().ToDomDocument();
+            std::string symbolTableXmlFilePath = Path::ChangeExtension(project->FilePath(), ".sym0.xml");
+            std::ofstream symbolTableXmlFile(symbolTableXmlFilePath);
+            CodeFormatter formatter(symbolTableXmlFile);
+            formatter.SetIndentSize(1);
+            symbolTableDoc->Write(formatter);
+        }
         if (moduleBinder)
         {
             for (ClassTemplateSpecializationSymbol* classTemplateSpecialization : classTemplateSpecializations)
@@ -902,6 +932,15 @@ void BuildProject(Project* project, std::unique_ptr<Module>& rootModule, bool& s
         {
             return;
         }
+        if (GetGlobalFlag(GlobalFlags::sym2xml))
+        {
+            std::unique_ptr<dom::Document> symbolTableDoc = rootModule->GetSymbolTable().ToDomDocument();
+            std::string symbolTableXmlFilePath = Path::ChangeExtension(project->FilePath(), ".sym1.xml");
+            std::ofstream symbolTableXmlFile(symbolTableXmlFilePath);
+            CodeFormatter formatter(symbolTableXmlFile);
+            formatter.SetIndentSize(1);
+            symbolTableDoc->Write(formatter);
+        }
         EmittingContext emittingContext;
         std::vector<std::string> objectFilePaths;
         if (GetGlobalFlag(GlobalFlags::verbose))
@@ -925,10 +964,28 @@ void BuildProject(Project* project, std::unique_ptr<Module>& rootModule, bool& s
             {
                 AnalyzeControlFlow(*boundCompileUnit);
             }
+            if (GetGlobalFlag(GlobalFlags::bdt2xml))
+            {
+                std::unique_ptr<dom::Document> bdtDoc = cmajor::bdt2dom::GenerateBdtDocument(boundCompileUnit.get());
+                std::string bdtXmlFilePath = Path::ChangeExtension(boundCompileUnit->GetCompileUnitNode()->FilePath(), ".bdt.xml");
+                std::ofstream bdtXmlFile(bdtXmlFilePath);
+                CodeFormatter formatter(bdtXmlFile);
+                formatter.SetIndentSize(1);
+                bdtDoc->Write(formatter);
+            }
             GenerateCode(emittingContext, *boundCompileUnit);
             objectFilePaths.push_back(boundCompileUnit->ObjectFilePath());
             boundCompileUnit.reset();
             ++compileUnitIndex;
+        }
+        if (GetGlobalFlag(GlobalFlags::sym2xml))
+        {
+            std::unique_ptr<dom::Document> symbolTableDoc = rootModule->GetSymbolTable().ToDomDocument();
+            std::string symbolTableXmlFilePath = Path::ChangeExtension(project->FilePath(), ".sym2.xml");
+            std::ofstream symbolTableXmlFile(symbolTableXmlFilePath);
+            CodeFormatter formatter(symbolTableXmlFile);
+            formatter.SetIndentSize(1);
+            symbolTableDoc->Write(formatter);
         }
         if (project->GetTarget() == Target::program)
         {
@@ -973,16 +1030,19 @@ void BuildProject(Project* project, std::unique_ptr<Module>& rootModule, bool& s
             InstallSystemLibraries(rootModule.get());
         }
     }
-    rootModule.reset();
+    if (resetRootModule)
+    {
+        rootModule.reset();
+    }
 }
 
-ProjectGrammar* projectGrammar = nullptr;
+cmajor::parser::Project* projectGrammar = nullptr;
 
 void BuildProject(const std::string& projectFilePath, std::unique_ptr<Module>& rootModule)
 {
     if (!projectGrammar)
     {
-        projectGrammar = ProjectGrammar::Create();
+        projectGrammar = cmajor::parser::Project::Create();
     }
     std::string config = GetConfig();
     MappedInputFile projectFile(projectFilePath);
@@ -996,7 +1056,7 @@ void BuildProject(const std::string& projectFilePath, std::unique_ptr<Module>& r
     else
     {
         bool stop = false;
-        BuildProject(project.get(), rootModule, stop);
+        BuildProject(project.get(), rootModule, stop, false);
     }
 }
 
@@ -1072,7 +1132,7 @@ void ProjectBuilder(BuildData* buildData)
         Project* toBuild = buildData->buildQueue.Get(1, false);
         while (toBuild && !buildData->stop)
         {
-            BuildProject(toBuild, buildData->rootModules[toBuild->Index()], buildData->stop);
+            BuildProject(toBuild, buildData->rootModules[toBuild->Index()], buildData->stop, false);
             if (toBuild->IsSystemProject())
             {
                 buildData->isSystemSolution = true;
@@ -1090,17 +1150,17 @@ void ProjectBuilder(BuildData* buildData)
     }
 }
 
-SolutionGrammar* solutionGrammar = nullptr;
+cmajor::parser::Solution* solutionGrammar = nullptr;
 
 void BuildSolution(const std::string& solutionFilePath, std::vector<std::unique_ptr<Module>>& rootModules)
 {
     if (!solutionGrammar)
     {
-        solutionGrammar = SolutionGrammar::Create();
+        solutionGrammar = cmajor::parser::Solution::Create();
     }
     if (!projectGrammar)
     {
-        projectGrammar = ProjectGrammar::Create();
+        projectGrammar = cmajor::parser::Project::Create();
     }
     MappedInputFile solutionFile(solutionFilePath);
     std::u32string s(ToUtf32(std::string(solutionFile.Begin(), solutionFile.End())));
@@ -1155,7 +1215,7 @@ void BuildSolution(const std::string& solutionFilePath, std::vector<std::unique_
     if (!projectsToBuild.empty())
     {
         int numProjectsToBuild = projectsToBuild.size();
-        int numThreads = std::thread::hardware_concurrency() * 2;
+        int numThreads = std::min(numProjectsToBuild, int(std::thread::hardware_concurrency() * 2)); 
         rootModules.resize(numProjectsToBuild);
         if (GetGlobalFlag(GlobalFlags::verbose))
         {
@@ -1256,7 +1316,7 @@ void BuildMsBuildProject(const std::string& projectName, const std::string& proj
     project->ResolveDeclarations();
     project->SetLogStreamId(-1);
     bool stop = false;
-    BuildProject(project.get(), rootModule, stop);
+    BuildProject(project.get(), rootModule, stop, false);
 }
 
 } } // namespace cmajor::build

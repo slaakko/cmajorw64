@@ -33,7 +33,7 @@ public:
     Rule(const std::u32string& name_, Scope* enclosingScope_, int id_, Parser* definition_);
     Rule(const std::u32string& name_, Scope* enclosingScope_, Parser* definition_);
     Rule(const std::u32string& name_, Scope* enclosingScope_);
-    virtual bool IsRule() const { return true; }
+    bool IsRule() const override { return true; }
     Grammar* GetGrammar() const { return grammar; }
     void SetGrammar(Grammar* grammar_) { grammar = grammar_; }
     Parser* Definition() const { return definition; }
@@ -56,12 +56,12 @@ public:
     std::u32string SpecializedTypeName() const { return Specialized() ? Name() + U"Rule" : U"Rule"; }
     virtual void Link() {}
     void ExpandCode();
-    virtual Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData);
+    Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData) override;
     virtual void Enter(ObjectStack& stack) {}
     virtual void Leave(ObjectStack& stack, bool matched) {}
     virtual void Enter(ObjectStack& stack, ParsingData* parsingData) {}
     virtual void Leave(ObjectStack& stack, ParsingData* parsingData, bool matched) {}
-    virtual void Accept(Visitor& visitor);
+    void Accept(Visitor& visitor) override;
     int Id() const { return id; }
 private:
     int id;
@@ -79,9 +79,9 @@ class RuleLink: public ParsingObject
 public:
     RuleLink(const std::u32string& name_, Grammar* grammar_, const std::u32string& linkedRuleName_);
     RuleLink(Grammar* grammar_, const std::u32string& linkedRuleName_);
-    virtual bool IsRuleLink() const { return true; }
-    virtual void Accept(Visitor& visitor);
-    virtual void AddToScope();
+    bool IsRuleLink() const override { return true; }
+    void Accept(Visitor& visitor) override;
+    void AddToScope() override;
     const std::u32string& LinkedRuleName() const { return linkedRuleName; }
     void SetRule(Rule* rule_) { rule = rule_; }
     Rule* GetRule() const { return rule; }

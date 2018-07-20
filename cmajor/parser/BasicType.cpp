@@ -16,27 +16,27 @@ using namespace cmajor::parsing;
 using namespace cmajor::util;
 using namespace cmajor::unicode;
 
-BasicTypeGrammar* BasicTypeGrammar::Create()
+BasicType* BasicType::Create()
 {
     return Create(new cmajor::parsing::ParsingDomain());
 }
 
-BasicTypeGrammar* BasicTypeGrammar::Create(cmajor::parsing::ParsingDomain* parsingDomain)
+BasicType* BasicType::Create(cmajor::parsing::ParsingDomain* parsingDomain)
 {
     RegisterParsingDomain(parsingDomain);
-    BasicTypeGrammar* grammar(new BasicTypeGrammar(parsingDomain));
+    BasicType* grammar(new BasicType(parsingDomain));
     parsingDomain->AddGrammar(grammar);
     grammar->CreateRules();
     grammar->Link();
     return grammar;
 }
 
-BasicTypeGrammar::BasicTypeGrammar(cmajor::parsing::ParsingDomain* parsingDomain_): cmajor::parsing::Grammar(ToUtf32("BasicTypeGrammar"), parsingDomain_->GetNamespaceScope(ToUtf32("cmajor.parser")), parsingDomain_)
+BasicType::BasicType(cmajor::parsing::ParsingDomain* parsingDomain_): cmajor::parsing::Grammar(ToUtf32("BasicType"), parsingDomain_->GetNamespaceScope(ToUtf32("cmajor.parser")), parsingDomain_)
 {
     SetOwner(0);
 }
 
-Node* BasicTypeGrammar::Parse(const char32_t* start, const char32_t* end, int fileIndex, const std::string& fileName)
+Node* BasicType::Parse(const char32_t* start, const char32_t* end, int fileIndex, const std::string& fileName)
 {
     cmajor::parsing::Scanner scanner(start, end, fileName, fileIndex, SkipRule());
     std::unique_ptr<cmajor::parsing::XmlLog> xmlLog;
@@ -72,7 +72,7 @@ Node* BasicTypeGrammar::Parse(const char32_t* start, const char32_t* end, int fi
     return result;
 }
 
-class BasicTypeGrammar::BasicTypeRule : public cmajor::parsing::Rule
+class BasicType::BasicTypeRule : public cmajor::parsing::Rule
 {
 public:
     BasicTypeRule(const std::u32string& name_, Scope* enclosingScope_, int id_, Parser* definition_):
@@ -80,12 +80,12 @@ public:
     {
         SetValueTypeName(ToUtf32("Node*"));
     }
-    virtual void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData)
+    void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData) override
     {
         parsingData->PushContext(Id(), new Context());
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
     }
-    virtual void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched)
+    void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched) override
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
         if (matched)
@@ -94,7 +94,7 @@ public:
         }
         parsingData->PopContext(Id());
     }
-    virtual void Link()
+    void Link() override
     {
         cmajor::parsing::ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
         a0ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<BasicTypeRule>(this, &BasicTypeRule::A0Action));
@@ -210,11 +210,11 @@ private:
     };
 };
 
-void BasicTypeGrammar::GetReferencedGrammars()
+void BasicType::GetReferencedGrammars()
 {
 }
 
-void BasicTypeGrammar::CreateRules()
+void BasicType::CreateRules()
 {
     AddRule(new BasicTypeRule(ToUtf32("BasicType"), GetScope(), GetParsingDomain()->GetNextRuleId(),
         new cmajor::parsing::AlternativeParser(

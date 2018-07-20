@@ -31,40 +31,6 @@ namespace cmajor { namespace symbols {
 
 using namespace cmajor::unicode;
 
-/*
-void TypeIdCounter::Init()
-{
-    instance.reset(new TypeIdCounter());
-}
-
-void TypeIdCounter::Done()
-{
-    instance.reset();
-}
-
-std::unique_ptr<TypeIdCounter> TypeIdCounter::instance;
-
-TypeIdCounter::TypeIdCounter() : nextTypeId(1)
-{
-}
-
-void FunctionIdCounter::Init()
-{
-    instance.reset(new FunctionIdCounter());
-}
-
-void FunctionIdCounter::Done()
-{
-    instance.reset();
-}
-
-std::unique_ptr<FunctionIdCounter> FunctionIdCounter::instance;
-
-FunctionIdCounter::FunctionIdCounter() : nextFunctionId(1)
-{
-}
-*/
-
 bool operator==(const ClassTemplateSpecializationKey& left, const ClassTemplateSpecializationKey& right)
 {
     if (!TypesEqual(left.classTemplate, right.classTemplate)) return false;
@@ -202,7 +168,6 @@ void SymbolTable::Read(SymbolReader& reader)
         uint32_t n = reader.GetBinaryReader().ReadULEB128UInt();
         for (uint32_t i = 0; i < n; ++i)
         {
-            //uint32_t functionId = reader.GetBinaryReader().ReadUInt();
             boost::uuids::uuid functionId;
             reader.GetBinaryReader().ReadUuid(functionId);
             std::u32string profiledFunctionName = reader.GetBinaryReader().ReadUtf32String();
@@ -322,7 +287,6 @@ void SymbolTable::Import(SymbolTable& symbolTable)
     {
         for (const auto& p : symbolTable.profiledFunctionNameMap)
         {
-            //uint32_t functionId = p.first;
             const boost::uuids::uuid& functionId = p.first;
             const std::u32string& profiledFunctionName = p.second;
             MapProfiledFunction(functionId, profiledFunctionName);
@@ -1070,36 +1034,18 @@ void SymbolTable::AddFunctionSymbolToFunctionIdMap(FunctionSymbol* functionSymbo
 
 void SymbolTable::SetTypeIdFor(TypeSymbol* typeSymbol)
 {
-    //typeSymbol->SetTypeId(TypeIdCounter::Instance().GetNextTypeId());
     typeSymbol->SetTypeId(boost::uuids::random_generator()()); 
 }
 
 void SymbolTable::SetTypeIdFor(ConceptSymbol* conceptSymbol)
 {
-    //conceptSymbol->SetTypeId(TypeIdCounter::Instance().GetNextTypeId());
     conceptSymbol->SetTypeId(boost::uuids::random_generator()());
 }
 
 void SymbolTable::SetFunctionIdFor(FunctionSymbol* functionSymbol)
 {
-    //functionSymbol->SetFunctionId(FunctionIdCounter::Instance().GetNextFunctionId());
     functionSymbol->SetFunctionId(boost::uuids::random_generator()());
 }
-
-/*
-FunctionSymbol* SymbolTable::GetFunctionById(uint32_t functionId) const
-{
-    auto it = functionIdMap.find(functionId);
-    if (it != functionIdMap.cend())
-    {
-        return it->second;
-    }
-    else
-    {
-        return nullptr;
-    }
-}
-*/
 
 FunctionSymbol* SymbolTable::GetFunctionById(const boost::uuids::uuid& functionId) const
 {
@@ -1114,13 +1060,6 @@ FunctionSymbol* SymbolTable::GetFunctionById(const boost::uuids::uuid& functionI
     }
 }
 
-/*
-void SymbolTable::EmplaceTypeRequest(Symbol* forSymbol, uint32_t typeId, int index)
-{
-    EmplaceTypeOrConceptRequest(forSymbol, typeId, index);
-}
-*/
-
 void SymbolTable::EmplaceTypeRequest(Symbol* forSymbol, const boost::uuids::uuid& typeId, int index)
 {
     EmplaceTypeOrConceptRequest(forSymbol, typeId, index);
@@ -1128,54 +1067,10 @@ void SymbolTable::EmplaceTypeRequest(Symbol* forSymbol, const boost::uuids::uuid
 
 const int conceptRequestIndex = std::numeric_limits<int>::max();
 
-/*
-void SymbolTable::EmplaceConceptRequest(Symbol* forSymbol, uint32_t typeId)
-{
-    EmplaceTypeOrConceptRequest(forSymbol, typeId, conceptRequestIndex);
-}
-*/
-
 void SymbolTable::EmplaceConceptRequest(Symbol* forSymbol, const boost::uuids::uuid& typeId)
 {
     EmplaceTypeOrConceptRequest(forSymbol, typeId, conceptRequestIndex);
 }
-
-/*
-void SymbolTable::EmplaceTypeOrConceptRequest(Symbol* forSymbol, uint32_t typeId, int index)
-{
-    auto it = typeIdMap.find(typeId);
-    if (it != typeIdMap.cend())
-    {
-        Symbol* typeOrConceptSymbol = it->second;
-        if (typeOrConceptSymbol->IsTypeSymbol())
-        {
-            if (index == conceptRequestIndex)
-            {
-                throw Exception("internal error: invalid concept request (id denotes a type)", forSymbol->GetSpan());
-            }
-            TypeSymbol* typeSymbol = static_cast<TypeSymbol*>(typeOrConceptSymbol);
-            forSymbol->EmplaceType(typeSymbol, index);
-        }
-        else if (typeOrConceptSymbol->GetSymbolType() == SymbolType::conceptSymbol)
-        {
-            if (index != conceptRequestIndex)
-            {
-                throw Exception("internal error: invalid type request (id denotes a concept)", forSymbol->GetSpan());
-            }
-            ConceptSymbol* conceptSymbol = static_cast<ConceptSymbol*>(typeOrConceptSymbol);
-            forSymbol->EmplaceConcept(conceptSymbol);
-        }
-        else
-        {
-            Assert(false, "internal error: type or concept symbol expected");
-        }
-    }
-    else
-    {
-        typeAndConceptRequests.push_back(TypeOrConceptRequest(forSymbol, typeId, index));
-    }
-}
-*/
 
 void SymbolTable::EmplaceTypeOrConceptRequest(Symbol* forSymbol, const boost::uuids::uuid& typeId, int index)
 {
@@ -1211,22 +1106,6 @@ void SymbolTable::EmplaceTypeOrConceptRequest(Symbol* forSymbol, const boost::uu
         typeAndConceptRequests.push_back(TypeOrConceptRequest(forSymbol, typeId, index));
     }
 }
-
-/*
-void SymbolTable::EmplaceFunctionRequest(Symbol* forSymbol, uint32_t functionId, int index)
-{
-    auto it = functionIdMap.find(functionId);
-    if (it != functionIdMap.cend())
-    {
-        FunctionSymbol* functionSymbol = it->second;
-        forSymbol->EmplaceFunction(functionSymbol, index);
-    }
-    else
-    {
-        functionRequests.push_back(FunctionRequest(forSymbol, functionId, index));
-    }
-}
-*/
 
 void SymbolTable::EmplaceFunctionRequest(Symbol* forSymbol, const::boost::uuids::uuid& functionId, int index)
 {
@@ -1359,9 +1238,10 @@ TypeSymbol* SymbolTable::MakeDerivedType(TypeSymbol* baseType, const TypeDerivat
         valueType->SetModule(module);
         valueType->SetAccess(SymbolAccess::public_);
         valueType->SetType(derivedType->RemovePointer(span));
-        if (valueType->GetType()->RemoveConst(span)->IsBasicTypeSymbol())
+        TypeSymbol* withoutConst = valueType->GetType()->RemoveConst(span);
+        if (withoutConst->IsBasicTypeSymbol())
         {
-            valueType->SetType(valueType->GetType()->RemoveConst(span));
+            valueType->SetType(withoutConst);
         }
         valueType->SetBound();
         valueType->GetType()->MarkExport();
@@ -1546,13 +1426,11 @@ void SymbolTable::Copy(const SymbolTable& that)
     }
 }
 
-//void SymbolTable::MapProfiledFunction(uint32_t functionId, const std::u32string& profiledFunctionName)
 void SymbolTable::MapProfiledFunction(const boost::uuids::uuid& functionId, const std::u32string& profiledFunctionName)
 {
     profiledFunctionNameMap[functionId] = profiledFunctionName;
 }
 
-//std::u32string SymbolTable::GetProfiledFunctionName(uint32_t functionId) const
 std::u32string SymbolTable::GetProfiledFunctionName(const boost::uuids::uuid& functionId) const
 {
     auto it = profiledFunctionNameMap.find(functionId);
@@ -1561,6 +1439,28 @@ std::u32string SymbolTable::GetProfiledFunctionName(const boost::uuids::uuid& fu
         return it->second;
     }
     return std::u32string();
+}
+
+std::unique_ptr<dom::Document> SymbolTable::ToDomDocument() 
+{
+    TypeMap typeMap;
+    std::unique_ptr<dom::Document> doc(new dom::Document());
+    std::unique_ptr<dom::Element> st(new dom::Element(U"symbolTable"));
+    std::unique_ptr<dom::Element> globalNsElement = globalNs.ToDomElement(typeMap);
+    std::unique_ptr<dom::Element> symbols(new dom::Element(U"symbols"));
+    symbols->AppendChild(std::unique_ptr<dom::Node>(globalNsElement.release()));
+    st->AppendChild(std::unique_ptr<dom::Node>(symbols.release()));
+    std::unique_ptr<dom::Element> types(new dom::Element(U"types"));
+    std::vector<std::unique_ptr<dom::Element>> typeElements = typeMap.TypeElements();
+    int n = typeElements.size();
+    for (int i = 0; i < n; ++i)
+    {
+        std::unique_ptr<dom::Element> typeElement(std::move(typeElements[i]));
+        types->AppendChild(std::unique_ptr<dom::Node>(typeElement.release()));
+    }
+    st->AppendChild(std::unique_ptr<dom::Node>(types.release()));
+    doc->AppendChild(std::unique_ptr<dom::Node>(st.release()));
+    return doc;
 }
 
 class IntrinsicConcepts
@@ -1655,7 +1555,8 @@ void CreateClassFile(const std::string& executableFilePath, SymbolTable& symbolT
     {
         LogMessage(symbolTable.GetModule()->LogStreamId(), "Generating class file...");
     }
-    std::string classFilePath = boost::filesystem::path(executableFilePath).replace_extension(".cls").generic_string();
+    boost::filesystem::path cfp = boost::filesystem::path(executableFilePath).replace_extension(".cls");
+    std::string classFilePath = cfp.generic_string();
     const std::unordered_set<ClassTypeSymbol*>& polymorphicClasses = symbolTable.PolymorphicClasses();
     uint32_t n = 0;
     for (ClassTypeSymbol* polymorphicClass : polymorphicClasses)
@@ -1668,10 +1569,8 @@ void CreateClassFile(const std::string& executableFilePath, SymbolTable& symbolT
     for (ClassTypeSymbol* polymorphicClass : polymorphicClasses)
     {
         if (!polymorphicClass->IsVmtObjectCreated()) continue;
-        //uint32_t typeId = polymorphicClass->TypeId();
         const boost::uuids::uuid& typeId = polymorphicClass->TypeId();
         const std::string& vmtObjectName = polymorphicClass->VmtObjectName();
-        //uint32_t baseClassTypeId = 0;
         boost::uuids::uuid baseClassTypeId = boost::uuids::nil_generator()();
         if (polymorphicClass->BaseClass())
         {
@@ -1686,7 +1585,6 @@ void CreateClassFile(const std::string& executableFilePath, SymbolTable& symbolT
     writer.WriteULEB128UInt(ns);
     for (ClassTypeSymbol* classHavingStaticConstructor : classesHavingStaticConstructor)
     {
-        //uint32_t typeId = classHavingStaticConstructor->TypeId();
         const boost::uuids::uuid& typeId = classHavingStaticConstructor->TypeId();
         writer.Write(typeId);
     }
@@ -1699,14 +1597,10 @@ void CreateClassFile(const std::string& executableFilePath, SymbolTable& symbolT
 void InitSymbolTable()
 {
     IntrinsicConcepts::Init();
-    //TypeIdCounter::Init();
-    //FunctionIdCounter::Init();
 }
 
 void DoneSymbolTable()
 {
-    //FunctionIdCounter::Done();
-    //TypeIdCounter::Done();
     IntrinsicConcepts::Done();
 }
 

@@ -20,8 +20,8 @@ public:
     const std::u32string& Keyword() const { return keyword; }
     const std::u32string& ContinuationRuleName() const { return continuationRuleName; }
     void SetContinuationRule(Rule* continuationRule_);
-    virtual Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData);
-    virtual void Accept(Visitor& visitor);
+    Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData) override;
+    void Accept(Visitor& visitor) override;
 private:
     std::u32string keyword;
     std::u32string continuationRuleName;
@@ -42,8 +42,8 @@ public:
     std::u32string& KeywordVecName() { return keywordVecName; }
     const KeywordSet& Keywords() const { return keywords; }
     void SetSelectorRule(Rule* selectorRule_) { selectorRule = selectorRule_; }
-    virtual Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData);
-    virtual void Accept(Visitor& visitor);
+    Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData) override;
+    void Accept(Visitor& visitor) override;
 private:
     std::u32string selectorRuleName;
     std::u32string keywordVecName;

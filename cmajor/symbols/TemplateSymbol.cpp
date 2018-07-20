@@ -65,4 +65,17 @@ BoundTemplateParameterSymbol::BoundTemplateParameterSymbol(const Span& span_, co
 {
 }
 
+std::unique_ptr<dom::Element> BoundTemplateParameterSymbol::CreateDomElement(TypeMap& typeMap)
+{
+    std::unique_ptr<dom::Element> element(new dom::Element(U"BoundTemplateParameterSymbol"));
+    if (type)
+    {
+        std::unique_ptr<dom::Element> typeElement(new dom::Element(U"type"));
+        int typeId = typeMap.GetOrInsertType(type);
+        typeElement->SetAttribute(U"ref", U"type_" + ToUtf32(std::to_string(typeId)));
+        element->AppendChild(std::unique_ptr<dom::Node>(typeElement.release()));
+    }
+    return element;
+}
+
 } } // namespace cmajor::symbols

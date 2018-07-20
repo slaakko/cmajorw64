@@ -22,16 +22,16 @@ class ThisAccess : public Expression
 {
 public:
     ThisAccess();
-    virtual void Accept(Visitor& visitor);
-    virtual int Rank() const { return 25; }
+    void Accept(Visitor& visitor) override;
+    int Rank() const override { return 25; }
 };
 
 class IdExpr : public Expression
 {
 public:
     IdExpr(const std::u32string& value_);
-    virtual void Accept(Visitor& visitor);
-    virtual int Rank() const { return 26; }
+    void Accept(Visitor& visitor) override;
+    int Rank() const override { return 26; }
 };
 
 class UnaryExpression : public Expression
@@ -54,9 +54,9 @@ class IndexExpr : public PostfixExpression
 public:
     IndexExpr(CppObject* child_, CppObject* index_);
     CppObject* Index() const { return index; }
-    virtual void Print(CodeFormatter& formatter);
-    virtual void Accept(Visitor& visitor);
-    virtual int Rank() const { return 18; }
+    void Print(CodeFormatter& formatter) override;
+    void Accept(Visitor& visitor) override;
+    int Rank() const override { return 18; }
 private:
     CppObject* index;
 };
@@ -65,9 +65,9 @@ class InvokeExpr : public PostfixExpression
 {
 public:
     InvokeExpr(CppObject* child_, const std::vector<CppObject*>& arguments_);
-    virtual void Print(CodeFormatter& formatter);
-    virtual void Accept(Visitor& visitor);
-    virtual int Rank() const { return 19; }
+    void Print(CodeFormatter& formatter) override;
+    void Accept(Visitor& visitor) override;
+    int Rank() const override { return 19; }
 private:
     std::vector<CppObject*> arguments;
 };
@@ -76,9 +76,9 @@ class MemberAccessExpr : public PostfixExpression
 {
 public:
     MemberAccessExpr(CppObject* child_, CppObject* member_);
-    virtual void Print(CodeFormatter& formatter);
-    virtual void Accept(Visitor& visitor);
-    virtual int Rank() const { return 20; }
+    void Print(CodeFormatter& formatter) override;
+    void Accept(Visitor& visitor) override;
+    int Rank() const override { return 20; }
 private:
     CppObject* member;
 };
@@ -87,9 +87,9 @@ class PtrMemberAccessExpr : public PostfixExpression
 {
 public:
     PtrMemberAccessExpr(CppObject* child_, CppObject* member_);
-    virtual void Print(CodeFormatter& formatter);
-    virtual void Accept(Visitor& visitor);
-    virtual int Rank() const { return 21; }
+    void Print(CodeFormatter& formatter) override;
+    void Accept(Visitor& visitor) override;
+    int Rank() const override { return 21; }
 private:
     CppObject* member;
 };
@@ -98,27 +98,27 @@ class PostIncrementExpr : public PostfixExpression
 {
 public:
     PostIncrementExpr(CppObject* child_);
-    virtual void Print(CodeFormatter& formatter);
-    virtual void Accept(Visitor& visitor);
-    virtual int Rank() const { return 22; }
+    void Print(CodeFormatter& formatter) override;
+    void Accept(Visitor& visitor) override;
+    int Rank() const override { return 22; }
 };
 
 class PostDecrementExpr : public PostfixExpression
 {
 public:
     PostDecrementExpr(CppObject* child_);
-    virtual void Print(CodeFormatter& formatter);
-    virtual void Accept(Visitor& visitor);
-    virtual int Rank() const { return 22; }
+    void Print(CodeFormatter& formatter) override;
+    void Accept(Visitor& visitor) override;
+    int Rank() const override { return 22; }
 };
 
 class PostCastExpr: public PostfixExpression
 {
 public:
     PostCastExpr(const std::u32string& name_, CppObject* type_, CppObject* child_);
-    virtual void Print(CodeFormatter& formatter);
-    virtual void Accept(Visitor& visitor);
-    virtual int Rank() const { return 23; }
+    void Print(CodeFormatter& formatter) override;
+    void Accept(Visitor& visitor) override;
+    int Rank() const override { return 23; }
 private:
     CppObject* type;
 };
@@ -127,37 +127,37 @@ class TypeIdExpr : public PostfixExpression
 {
 public:
     TypeIdExpr(CppObject* child_);
-    virtual void Print(CodeFormatter& formatter);
-    virtual void Accept(Visitor& visitor);
-    virtual int Rank() const { return 24; }
+    void Print(CodeFormatter& formatter) override;
+    void Accept(Visitor& visitor) override;
+    int Rank() const override { return 24; }
 };
 
 class PreIncrementExpr : public UnaryExpression
 {
 public:
     PreIncrementExpr(CppObject* child_);
-    virtual void Print(CodeFormatter& formatter);
-    virtual void Accept(Visitor& visitor);
-    virtual int Rank() const { return 14; }
+    void Print(CodeFormatter& formatter) override;
+    void Accept(Visitor& visitor) override;
+    int Rank() const override { return 14; }
 };
 
 class PreDecrementExpr : public UnaryExpression
 {
 public:
     PreDecrementExpr(CppObject* child_);
-    virtual void Print(CodeFormatter& formatter);
-    virtual void Accept(Visitor& visitor);
-    virtual int Rank() const { return 14; }
+    void Print(CodeFormatter& formatter) override;
+    void Accept(Visitor& visitor) override;
+    int Rank() const override { return 14; }
 };
 
 class UnaryOpExpr : public UnaryExpression
 {
 public:
     UnaryOpExpr(Operator op_, CppObject* child_);
-    virtual void Print(CodeFormatter& formatter);
-    virtual void Accept(Visitor& visitor);
+    void Print(CodeFormatter& formatter) override;
+    void Accept(Visitor& visitor) override;
     Operator Op() const { return op; }
-    virtual int Rank() const { return 15; }
+    int Rank() const override { return 15; }
 private:
     Operator op;
 };
@@ -166,9 +166,9 @@ class SizeOfExpr : public UnaryExpression
 {
 public:
     SizeOfExpr(CppObject* child_, bool parens_);
-    virtual void Print(CodeFormatter& formatter);
-    virtual void Accept(Visitor& visitor);
-    virtual int Rank() const { return 16; }
+    void Print(CodeFormatter& formatter) override;
+    void Accept(Visitor& visitor) override;
+    int Rank() const override { return 16; }
 private:
     bool parens;
 };
@@ -177,9 +177,9 @@ class CastExpr : public Expression
 {
 public:
     CastExpr(CppObject* typeId_, CppObject* expr_);
-    virtual void Print(CodeFormatter& formatter);
-    virtual void Accept(Visitor& visitor);
-    virtual int Rank() const { return 13; }
+    void Print(CodeFormatter& formatter) override;
+    void Accept(Visitor& visitor) override;
+    int Rank() const override { return 13; }
 private:
     CppObject* typeId;
     CppObject* expr;
@@ -200,10 +200,10 @@ class BinaryOpExpr : public BinaryExpression
 {
 public:
     BinaryOpExpr(CppObject* left_, Operator op_, int rank_, CppObject* right_);
-    virtual void Print(CodeFormatter& formatter);
-    virtual void Accept(Visitor& visitor);
+    void Print(CodeFormatter& formatter) override;
+    void Accept(Visitor& visitor) override;
     Operator Op() const { return op; }
-    virtual int Rank() const { return rank; }
+    int Rank() const override { return rank; }
 private:
     Operator op;
     int rank;
@@ -213,8 +213,8 @@ class ConditionalExpr : public Expression
 {
 public:
     ConditionalExpr(CppObject* condition_, CppObject* thenExpr_, CppObject* elseExpr_);
-    virtual void Print(CodeFormatter& formatter);
-    virtual void Accept(Visitor& visitor);
+    void Print(CodeFormatter& formatter) override;
+    void Accept(Visitor& visitor) override;
 private:
     CppObject* condition;
     CppObject* thenExpr;
@@ -225,8 +225,8 @@ class ThrowExpr : public Expression
 {
 public:
     ThrowExpr(CppObject* exception_);
-    virtual void Print(CodeFormatter& formatter);
-    virtual void Accept(Visitor& visitor);
+    void Print(CodeFormatter& formatter) override;
+    void Accept(Visitor& visitor) override;
 private:
     CppObject* exception;
 };
@@ -237,9 +237,9 @@ class NewExpr : public Expression
 {
 public:
     NewExpr(bool global_, const std::vector<CppObject*>& placement_, TypeId* typeId_, bool parens_, const std::vector<CppObject*>& initializer_);
-    virtual void Print(CodeFormatter& formatter);
-    virtual void Accept(Visitor& visitor);
-    virtual int Rank() const { return 17; }
+    void Print(CodeFormatter& formatter) override;
+    void Accept(Visitor& visitor) override;
+    int Rank() const override { return 17; }
 private:
     bool global;
     std::vector<CppObject*> placement;
@@ -252,9 +252,9 @@ class DeleteExpr : public Expression
 {
 public:
     DeleteExpr(bool global_, bool isArray_, CppObject* expr_);
-    virtual void Print(CodeFormatter& formatter);
-    virtual void Accept(Visitor& visitor);
-    virtual int Rank() const { return 17; }
+    void Print(CodeFormatter& formatter) override;
+    void Accept(Visitor& visitor) override;
+    int Rank() const override { return 17; }
 private:
     bool global;
     bool isArray;

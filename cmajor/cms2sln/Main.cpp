@@ -39,9 +39,9 @@ using namespace cmajor::util;
 using namespace cmajor::unicode;
 using namespace cmajor::cmproj;
 
-ProjectGrammar* projectGrammar = nullptr;
+cmajor::parser::Project* projectGrammar = nullptr;
 
-void ConvertSolution(Solution* solution, const std::string& slnFilePath, const std::string& guidStr, bool verbose)
+void ConvertSolution(cmajor::ast::Solution* solution, const std::string& slnFilePath, const std::string& guidStr, bool verbose)
 {
     std::ofstream slnFile(slnFilePath);
     CodeFormatter formatter(slnFile);
@@ -57,7 +57,7 @@ void ConvertSolution(Solution* solution, const std::string& slnFilePath, const s
         std::string projectFilePath = solution->ProjectFilePaths()[i];
         MappedInputFile projectFile(projectFilePath);
         std::u32string p(ToUtf32(std::string(projectFile.Begin(), projectFile.End())));
-        std::unique_ptr<Project> project(projectGrammar->Parse(&p[0], &p[0] + p.length(), 0, projectFilePath, "debug"));
+        std::unique_ptr<cmajor::ast::Project> project(projectGrammar->Parse(&p[0], &p[0] + p.length(), 0, projectFilePath, "debug"));
         project->ResolveDeclarations();
         std::string cmprojFilePath = Path::ChangeExtension(projectFilePath, ".cmproj");
         boost::uuids::uuid guid = boost::uuids::random_generator()();
@@ -125,7 +125,7 @@ void PrintHelp()
         std::endl;
 }
 
-SolutionGrammar* solutionGrammar = nullptr;
+cmajor::parser::Solution* solutionGrammar = nullptr;
 
 int main(int argc, const char** argv)
 {
@@ -134,11 +134,11 @@ int main(int argc, const char** argv)
         InitDone initDone;
         if (!projectGrammar)
         {
-            projectGrammar = ProjectGrammar::Create();
+            projectGrammar = cmajor::parser::Project::Create();
         }
         if (!solutionGrammar)
         {
-            solutionGrammar = SolutionGrammar::Create();
+            solutionGrammar = cmajor::parser::Solution::Create();
         }
         bool verbose = false;
         std::vector<std::string> solutionFilePaths;
@@ -178,7 +178,7 @@ int main(int argc, const char** argv)
         {
             MappedInputFile solutionFile(solutionFilePath);
             std::u32string s(ToUtf32(std::string(solutionFile.Begin(), solutionFile.End())));
-            std::unique_ptr<Solution> solution(solutionGrammar->Parse(&s[0], &s[0] + s.length(), 0, solutionFilePath));
+            std::unique_ptr<cmajor::ast::Solution> solution(solutionGrammar->Parse(&s[0], &s[0] + s.length(), 0, solutionFilePath));
             solution->ResolveDeclarations();
             std::string slnFilePath = GetFullPath(Path::ChangeExtension(solutionFilePath, ".sln"));
             boost::uuids::uuid guid = boost::uuids::random_generator()();

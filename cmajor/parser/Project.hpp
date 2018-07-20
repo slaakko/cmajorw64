@@ -1,5 +1,5 @@
-#ifndef Project_hpp_4751
-#define Project_hpp_4751
+#ifndef Project_hpp_8344
+#define Project_hpp_8344
 
 #include <cmajor/parsing/Grammar.hpp>
 #include <cmajor/parsing/Keyword.hpp>
@@ -8,16 +8,16 @@
 namespace cmajor { namespace parser {
 
 using namespace cmajor::ast;
-class ProjectGrammar : public cmajor::parsing::Grammar
+class Project : public cmajor::parsing::Grammar
 {
 public:
-    static ProjectGrammar* Create();
-    static ProjectGrammar* Create(cmajor::parsing::ParsingDomain* parsingDomain);
-    Project* Parse(const char32_t* start, const char32_t* end, int fileIndex, const std::string& fileName, std::string config);
+    static Project* Create();
+    static Project* Create(cmajor::parsing::ParsingDomain* parsingDomain);
+    cmajor::ast::Project* Parse(const char32_t* start, const char32_t* end, int fileIndex, const std::string& fileName, std::string config);
 private:
-    ProjectGrammar(cmajor::parsing::ParsingDomain* parsingDomain_);
-    virtual void CreateRules();
-    virtual void GetReferencedGrammars();
+    Project(cmajor::parsing::ParsingDomain* parsingDomain_);
+    void CreateRules() override;
+    void GetReferencedGrammars() override;
     class ProjectRule;
     class DeclarationRule;
     class ReferenceDeclarationRule;
@@ -30,4 +30,4 @@ private:
 
 } } // namespace cmajor.parser
 
-#endif // Project_hpp_4751
+#endif // Project_hpp_8344

@@ -16,27 +16,27 @@ using namespace cmajor::parsing;
 using namespace cmajor::util;
 using namespace cmajor::unicode;
 
-JsonGrammar* JsonGrammar::Create()
+Json* Json::Create()
 {
     return Create(new cmajor::parsing::ParsingDomain());
 }
 
-JsonGrammar* JsonGrammar::Create(cmajor::parsing::ParsingDomain* parsingDomain)
+Json* Json::Create(cmajor::parsing::ParsingDomain* parsingDomain)
 {
     RegisterParsingDomain(parsingDomain);
-    JsonGrammar* grammar(new JsonGrammar(parsingDomain));
+    Json* grammar(new Json(parsingDomain));
     parsingDomain->AddGrammar(grammar);
     grammar->CreateRules();
     grammar->Link();
     return grammar;
 }
 
-JsonGrammar::JsonGrammar(cmajor::parsing::ParsingDomain* parsingDomain_): cmajor::parsing::Grammar(ToUtf32("JsonGrammar"), parsingDomain_->GetNamespaceScope(ToUtf32("cmajor.parser")), parsingDomain_)
+Json::Json(cmajor::parsing::ParsingDomain* parsingDomain_): cmajor::parsing::Grammar(ToUtf32("Json"), parsingDomain_->GetNamespaceScope(ToUtf32("cmajor.parser")), parsingDomain_)
 {
     SetOwner(0);
 }
 
-JsonValue* JsonGrammar::Parse(const char32_t* start, const char32_t* end, int fileIndex, const std::string& fileName)
+JsonValue* Json::Parse(const char32_t* start, const char32_t* end, int fileIndex, const std::string& fileName)
 {
     cmajor::parsing::Scanner scanner(start, end, fileName, fileIndex, SkipRule());
     std::unique_ptr<cmajor::parsing::XmlLog> xmlLog;
@@ -72,7 +72,7 @@ JsonValue* JsonGrammar::Parse(const char32_t* start, const char32_t* end, int fi
     return result;
 }
 
-class JsonGrammar::ValueRule : public cmajor::parsing::Rule
+class Json::ValueRule : public cmajor::parsing::Rule
 {
 public:
     ValueRule(const std::u32string& name_, Scope* enclosingScope_, int id_, Parser* definition_):
@@ -80,12 +80,12 @@ public:
     {
         SetValueTypeName(ToUtf32("JsonValue*"));
     }
-    virtual void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData)
+    void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData) override
     {
         parsingData->PushContext(Id(), new Context());
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
     }
-    virtual void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched)
+    void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched) override
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
         if (matched)
@@ -94,7 +94,7 @@ public:
         }
         parsingData->PopContext(Id());
     }
-    virtual void Link()
+    void Link() override
     {
         cmajor::parsing::ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
         a0ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<ValueRule>(this, &ValueRule::A0Action));
@@ -206,7 +206,7 @@ private:
     };
 };
 
-class JsonGrammar::StringRule : public cmajor::parsing::Rule
+class Json::StringRule : public cmajor::parsing::Rule
 {
 public:
     StringRule(const std::u32string& name_, Scope* enclosingScope_, int id_, Parser* definition_):
@@ -214,12 +214,12 @@ public:
     {
         SetValueTypeName(ToUtf32("JsonString*"));
     }
-    virtual void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData)
+    void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData) override
     {
         parsingData->PushContext(Id(), new Context());
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
     }
-    virtual void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched)
+    void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched) override
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
         if (matched)
@@ -228,7 +228,7 @@ public:
         }
         parsingData->PopContext(Id());
     }
-    virtual void Link()
+    void Link() override
     {
         cmajor::parsing::ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
         a0ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<StringRule>(this, &StringRule::A0Action));
@@ -284,7 +284,7 @@ private:
     };
 };
 
-class JsonGrammar::NumberRule : public cmajor::parsing::Rule
+class Json::NumberRule : public cmajor::parsing::Rule
 {
 public:
     NumberRule(const std::u32string& name_, Scope* enclosingScope_, int id_, Parser* definition_):
@@ -292,12 +292,12 @@ public:
     {
         SetValueTypeName(ToUtf32("JsonNumber*"));
     }
-    virtual void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData)
+    void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData) override
     {
         parsingData->PushContext(Id(), new Context());
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
     }
-    virtual void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched)
+    void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched) override
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
         if (matched)
@@ -306,7 +306,7 @@ public:
         }
         parsingData->PopContext(Id());
     }
-    virtual void Link()
+    void Link() override
     {
         cmajor::parsing::ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
         a0ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<NumberRule>(this, &NumberRule::A0Action));
@@ -337,7 +337,7 @@ private:
     };
 };
 
-class JsonGrammar::ObjectRule : public cmajor::parsing::Rule
+class Json::ObjectRule : public cmajor::parsing::Rule
 {
 public:
     ObjectRule(const std::u32string& name_, Scope* enclosingScope_, int id_, Parser* definition_):
@@ -347,12 +347,12 @@ public:
         AddLocalVariable(AttrOrVariable(ToUtf32("std::unique_ptr<JsonString>"), ToUtf32("js")));
         AddLocalVariable(AttrOrVariable(ToUtf32("std::unique_ptr<JsonValue>"), ToUtf32("jv")));
     }
-    virtual void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData)
+    void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData) override
     {
         parsingData->PushContext(Id(), new Context());
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
     }
-    virtual void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched)
+    void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched) override
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
         if (matched)
@@ -361,7 +361,7 @@ public:
         }
         parsingData->PopContext(Id());
     }
-    virtual void Link()
+    void Link() override
     {
         cmajor::parsing::ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
         a0ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<ObjectRule>(this, &ObjectRule::A0Action));
@@ -428,7 +428,7 @@ private:
     };
 };
 
-class JsonGrammar::ArrayRule : public cmajor::parsing::Rule
+class Json::ArrayRule : public cmajor::parsing::Rule
 {
 public:
     ArrayRule(const std::u32string& name_, Scope* enclosingScope_, int id_, Parser* definition_):
@@ -437,12 +437,12 @@ public:
         SetValueTypeName(ToUtf32("JsonArray*"));
         AddLocalVariable(AttrOrVariable(ToUtf32("std::unique_ptr<JsonValue>"), ToUtf32("item")));
     }
-    virtual void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData)
+    void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData) override
     {
         parsingData->PushContext(Id(), new Context());
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
     }
-    virtual void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched)
+    void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched) override
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
         if (matched)
@@ -451,7 +451,7 @@ public:
         }
         parsingData->PopContext(Id());
     }
-    virtual void Link()
+    void Link() override
     {
         cmajor::parsing::ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
         a0ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<ArrayRule>(this, &ArrayRule::A0Action));
@@ -491,7 +491,7 @@ private:
     };
 };
 
-void JsonGrammar::GetReferencedGrammars()
+void Json::GetReferencedGrammars()
 {
     cmajor::parsing::ParsingDomain* pd = GetParsingDomain();
     cmajor::parsing::Grammar* grammar0 = pd->GetGrammar(ToUtf32("cmajor.parsing.stdlib"));
@@ -502,7 +502,7 @@ void JsonGrammar::GetReferencedGrammars()
     AddGrammarReference(grammar0);
 }
 
-void JsonGrammar::CreateRules()
+void Json::CreateRules()
 {
     AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("spaces"), this, ToUtf32("cmajor.parsing.stdlib.spaces")));
     AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("escape"), this, ToUtf32("cmajor.parsing.stdlib.escape")));
@@ -535,22 +535,25 @@ void JsonGrammar::CreateRules()
                     new cmajor::parsing::ActionParser(ToUtf32("A0"),
                         new cmajor::parsing::CharParser('\"')),
                     new cmajor::parsing::KleeneStarParser(
-                        new cmajor::parsing::AlternativeParser(
+                        new cmajor::parsing::GroupingParser(
                             new cmajor::parsing::AlternativeParser(
-                                new cmajor::parsing::ActionParser(ToUtf32("A1"),
-                                    new cmajor::parsing::CharSetParser(ToUtf32("\"\\"), true)),
-                                new cmajor::parsing::SequenceParser(
-                                    new cmajor::parsing::StringParser(ToUtf32("\\u")),
-                                    new cmajor::parsing::ActionParser(ToUtf32("A2"),
+                                new cmajor::parsing::AlternativeParser(
+                                    new cmajor::parsing::ActionParser(ToUtf32("A1"),
+                                        new cmajor::parsing::CharSetParser(ToUtf32("\"\\"), true)),
+                                    new cmajor::parsing::GroupingParser(
                                         new cmajor::parsing::SequenceParser(
-                                            new cmajor::parsing::SequenceParser(
-                                                new cmajor::parsing::SequenceParser(
-                                                    new cmajor::parsing::HexDigitParser(),
-                                                    new cmajor::parsing::HexDigitParser()),
-                                                new cmajor::parsing::HexDigitParser()),
-                                            new cmajor::parsing::HexDigitParser())))),
-                            new cmajor::parsing::ActionParser(ToUtf32("A3"),
-                                new cmajor::parsing::NonterminalParser(ToUtf32("escape"), ToUtf32("escape"), 0))))),
+                                            new cmajor::parsing::StringParser(ToUtf32("\\u")),
+                                            new cmajor::parsing::ActionParser(ToUtf32("A2"),
+                                                new cmajor::parsing::GroupingParser(
+                                                    new cmajor::parsing::SequenceParser(
+                                                        new cmajor::parsing::SequenceParser(
+                                                            new cmajor::parsing::SequenceParser(
+                                                                new cmajor::parsing::HexDigitParser(),
+                                                                new cmajor::parsing::HexDigitParser()),
+                                                            new cmajor::parsing::HexDigitParser()),
+                                                        new cmajor::parsing::HexDigitParser())))))),
+                                new cmajor::parsing::ActionParser(ToUtf32("A3"),
+                                    new cmajor::parsing::NonterminalParser(ToUtf32("escape"), ToUtf32("escape"), 0)))))),
                 new cmajor::parsing::CharParser('\"')))));
     AddRule(new NumberRule(ToUtf32("Number"), GetScope(), GetParsingDomain()->GetNextRuleId(),
         new cmajor::parsing::ActionParser(ToUtf32("A0"),
@@ -561,16 +564,18 @@ void JsonGrammar::CreateRules()
                 new cmajor::parsing::ActionParser(ToUtf32("A0"),
                     new cmajor::parsing::CharParser('{')),
                 new cmajor::parsing::OptionalParser(
-                    new cmajor::parsing::ListParser(
-                        new cmajor::parsing::ActionParser(ToUtf32("A1"),
-                            new cmajor::parsing::SequenceParser(
-                                new cmajor::parsing::SequenceParser(
-                                    new cmajor::parsing::ActionParser(ToUtf32("A2"),
-                                        new cmajor::parsing::NonterminalParser(ToUtf32("s"), ToUtf32("String"), 0)),
-                                    new cmajor::parsing::CharParser(':')),
-                                new cmajor::parsing::ActionParser(ToUtf32("A3"),
-                                    new cmajor::parsing::NonterminalParser(ToUtf32("v"), ToUtf32("Value"), 0)))),
-                        new cmajor::parsing::CharParser(',')))),
+                    new cmajor::parsing::GroupingParser(
+                        new cmajor::parsing::ListParser(
+                            new cmajor::parsing::ActionParser(ToUtf32("A1"),
+                                new cmajor::parsing::GroupingParser(
+                                    new cmajor::parsing::SequenceParser(
+                                        new cmajor::parsing::SequenceParser(
+                                            new cmajor::parsing::ActionParser(ToUtf32("A2"),
+                                                new cmajor::parsing::NonterminalParser(ToUtf32("s"), ToUtf32("String"), 0)),
+                                            new cmajor::parsing::CharParser(':')),
+                                        new cmajor::parsing::ActionParser(ToUtf32("A3"),
+                                            new cmajor::parsing::NonterminalParser(ToUtf32("v"), ToUtf32("Value"), 0))))),
+                            new cmajor::parsing::CharParser(','))))),
             new cmajor::parsing::CharParser('}'))));
     AddRule(new ArrayRule(ToUtf32("Array"), GetScope(), GetParsingDomain()->GetNextRuleId(),
         new cmajor::parsing::SequenceParser(
@@ -578,10 +583,11 @@ void JsonGrammar::CreateRules()
                 new cmajor::parsing::ActionParser(ToUtf32("A0"),
                     new cmajor::parsing::CharParser('[')),
                 new cmajor::parsing::OptionalParser(
-                    new cmajor::parsing::ListParser(
-                        new cmajor::parsing::ActionParser(ToUtf32("A1"),
-                            new cmajor::parsing::NonterminalParser(ToUtf32("i"), ToUtf32("Value"), 0)),
-                        new cmajor::parsing::CharParser(',')))),
+                    new cmajor::parsing::GroupingParser(
+                        new cmajor::parsing::ListParser(
+                            new cmajor::parsing::ActionParser(ToUtf32("A1"),
+                                new cmajor::parsing::NonterminalParser(ToUtf32("i"), ToUtf32("Value"), 0)),
+                            new cmajor::parsing::CharParser(','))))),
             new cmajor::parsing::CharParser(']'))));
     SetSkipRuleName(ToUtf32("spaces"));
 }

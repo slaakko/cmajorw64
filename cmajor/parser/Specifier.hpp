@@ -1,5 +1,5 @@
-#ifndef Specifier_hpp_391
-#define Specifier_hpp_391
+#ifndef Specifier_hpp_8344
+#define Specifier_hpp_8344
 
 #include <cmajor/parsing/Grammar.hpp>
 #include <cmajor/parsing/Keyword.hpp>
@@ -8,20 +8,20 @@
 namespace cmajor { namespace parser {
 
 using namespace cmajor::ast;
-class SpecifierGrammar : public cmajor::parsing::Grammar
+class Specifier : public cmajor::parsing::Grammar
 {
 public:
-    static SpecifierGrammar* Create();
-    static SpecifierGrammar* Create(cmajor::parsing::ParsingDomain* parsingDomain);
+    static Specifier* Create();
+    static Specifier* Create(cmajor::parsing::ParsingDomain* parsingDomain);
     Specifiers Parse(const char32_t* start, const char32_t* end, int fileIndex, const std::string& fileName);
 private:
-    SpecifierGrammar(cmajor::parsing::ParsingDomain* parsingDomain_);
-    virtual void CreateRules();
-    virtual void GetReferencedGrammars();
+    Specifier(cmajor::parsing::ParsingDomain* parsingDomain_);
+    void CreateRules() override;
+    void GetReferencedGrammars() override;
     class SpecifiersRule;
     class SpecifierRule;
 };
 
 } } // namespace cmajor.parser
 
-#endif // Specifier_hpp_391
+#endif // Specifier_hpp_8344

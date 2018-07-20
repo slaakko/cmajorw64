@@ -1,5 +1,5 @@
-#ifndef CompileUnit_hpp_391
-#define CompileUnit_hpp_391
+#ifndef CompileUnit_hpp_8344
+#define CompileUnit_hpp_8344
 
 #include <cmajor/parsing/Grammar.hpp>
 #include <cmajor/parsing/Keyword.hpp>
@@ -9,16 +9,16 @@
 namespace cmajor { namespace parser {
 
 using namespace cmajor::ast;
-class CompileUnitGrammar : public cmajor::parsing::Grammar
+class CompileUnit : public cmajor::parsing::Grammar
 {
 public:
-    static CompileUnitGrammar* Create();
-    static CompileUnitGrammar* Create(cmajor::parsing::ParsingDomain* parsingDomain);
+    static CompileUnit* Create();
+    static CompileUnit* Create(cmajor::parsing::ParsingDomain* parsingDomain);
     CompileUnitNode* Parse(const char32_t* start, const char32_t* end, int fileIndex, const std::string& fileName, ParsingContext* ctx);
 private:
-    CompileUnitGrammar(cmajor::parsing::ParsingDomain* parsingDomain_);
-    virtual void CreateRules();
-    virtual void GetReferencedGrammars();
+    CompileUnit(cmajor::parsing::ParsingDomain* parsingDomain_);
+    void CreateRules() override;
+    void GetReferencedGrammars() override;
     class CompileUnitRule;
     class NamespaceContentRule;
     class UsingDirectivesRule;
@@ -41,4 +41,4 @@ private:
 
 } } // namespace cmajor.parser
 
-#endif // CompileUnit_hpp_391
+#endif // CompileUnit_hpp_8344

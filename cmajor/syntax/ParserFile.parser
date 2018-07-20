@@ -12,15 +12,15 @@
 
 namespace cmajor.syntax
 {
-    grammar ParserFileGrammar
+    grammar ParserFile
     {
         using stdlib.spaces_and_comments;
         using stdlib.newline;
         using stdlib.qualified_id;
         using GrammarGrammar.Grammar;
-        using cmajor.code.DeclarationGrammar.UsingDeclaration;
-        using cmajor.code.DeclarationGrammar.UsingDirective;
-        using cmajor.code.DeclarationGrammar.NamespaceAliasDefinition;
+        using cmajor.code.Declaration.UsingDeclaration;
+        using cmajor.code.Declaration.UsingDirective;
+        using cmajor.code.Declaration.NamespaceAliasDefinition;
 
         skip spaces_and_comments;
 

@@ -35,14 +35,14 @@ const char* symbolTypeStr[uint8_t(SymbolType::maxSymbol)] =
 {
     "boolTypeSymbol", "sbyteTypeSymbol", "byteTypeSymbol", "shortTypeSymbol", "ushortTypeSymbol", "intTypeSymbol", "uintTypeSymbol", "longTypeSymbol", "ulongTypeSymbol", "floatTypeSymbol", "doubleTypeSymbol",
     "charTypeSymbol", "wcharTypeSymbol", "ucharTypeSymbol", "voidTypeSymbol", "nullPtrTypeSymbol",
-    "arrayTypeSymbol", "derivedTypeSymbol"
+    "arrayTypeSymbol", "derivedTypeSymbol",
     "namespaceSymbol", "functionSymbol", "staticConstructorSymbol", "constructorSymbol", "destructorSymbol", "memberFunctionSymbol", "conversionFunctionSymbol", "functionGroupSymbol",
     "classGroupTypeSymbol", "classTypeSymbol", "interfaceTypeSymbol", "conceptGroupSymbol", "conceptSymbol",
     "delegateTypeSymbol", "classDelegateTypeSymbol", "declarationBlock", "typedefSymbol", "constantSymbol", "enumTypeSymbol", "enumConstantSymbol",
     "templateParameterSymbol", "boundTemplateParameterSymbol", "parameterSymbol", "localVariableSymbol", "memberVariableSymbol",
     "basicTypeUnaryPlus", "basicTypeIntUnaryMinus", "basicTypeFloatUnaryMinus", "basicTypeComplement", "basicTypeAdd", "basicTypeFAdd", "basicTypeSub", "basicTypeFSub", "basicTypeMul", "basicTypeFMul",
     "basicTypeSDiv", "basicTypeUDiv", "basicTypeFDiv", "basicTypeSRem", "basicTypeURem", "basicTypeAnd", "basicTypeOr", "basicTypeXor", "basicTypeShl", "basicTypeAShr", "basicTypeLShr",
-    "basicTypeNot", "basicTypeIntegerEquality", "basicTypeUnsignedIntegerLessThan", "basicTypeSignedIntegerLessThan", "basicTypeFloatingEquality"", basicTypeFloatingLessThan",
+    "basicTypeNot", "basicTypeIntegerEquality", "basicTypeUnsignedIntegerLessThan", "basicTypeSignedIntegerLessThan", "basicTypeFloatingEquality", "basicTypeFloatingLessThan",
     "defaultInt1", "defaultInt8", "defaultInt16", "defaultInt32", "defaultInt64", "defaultFloat", "defaultDouble", "basicTypeCopyCtor", "basicTypeMoveCtor",
     "basicTypeCopyAssignment", "basicTypeMoveAssignment", "basicTypeReturn",
     "basicTypeImplicitSignExtension", "basicTypeImplicitZeroExtension", "basicTypeExplicitSignExtension", "basicTypeExplicitZeroExtension", "basicTypeTruncation", "basicTypeBitCast",
@@ -848,6 +848,26 @@ void Symbol::SetAttributes(std::unique_ptr<Attributes>&& attributes_)
     attributes = std::move(attributes_);
 }
 
+std::unique_ptr<dom::Element> Symbol::ToDomElement(TypeMap& typeMap) 
+{
+    std::unique_ptr<dom::Element> element = CreateDomElement(typeMap);
+    if (element)
+    {
+        std::u32string info = Info();
+        if (!info.empty())
+        {
+            element->SetAttribute(U"info", info);
+        }
+        AppendChildElements(element.get(), typeMap);
+    }
+    return element;
+}
+
+std::unique_ptr<dom::Element> Symbol::CreateDomElement(TypeMap& typeMap)
+{
+    return std::unique_ptr<dom::Element>(new dom::Element(ToUtf32(ClassName())));
+}
+
 SymbolCreator::~SymbolCreator()
 {
 }
@@ -856,7 +876,7 @@ template<typename SymbolT>
 class ConcreteSymbolCreator : public SymbolCreator
 {
 public:
-    Symbol* CreateSymbol(const Span& span, const std::u32string& name)
+    Symbol* CreateSymbol(const Span& span, const std::u32string& name) override
     {
         return new SymbolT(span, name);
     }

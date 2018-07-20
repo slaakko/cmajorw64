@@ -1,5 +1,5 @@
-#ifndef Interface_hpp_24967
-#define Interface_hpp_24967
+#ifndef Interface_hpp_8344
+#define Interface_hpp_8344
 
 #include <cmajor/parsing/Grammar.hpp>
 #include <cmajor/parsing/Keyword.hpp>
@@ -9,16 +9,16 @@
 namespace cmajor { namespace parser {
 
 using namespace cmajor::ast;
-class InterfaceGrammar : public cmajor::parsing::Grammar
+class Interface : public cmajor::parsing::Grammar
 {
 public:
-    static InterfaceGrammar* Create();
-    static InterfaceGrammar* Create(cmajor::parsing::ParsingDomain* parsingDomain);
+    static Interface* Create();
+    static Interface* Create(cmajor::parsing::ParsingDomain* parsingDomain);
     InterfaceNode* Parse(const char32_t* start, const char32_t* end, int fileIndex, const std::string& fileName, ParsingContext* ctx);
 private:
-    InterfaceGrammar(cmajor::parsing::ParsingDomain* parsingDomain_);
-    virtual void CreateRules();
-    virtual void GetReferencedGrammars();
+    Interface(cmajor::parsing::ParsingDomain* parsingDomain_);
+    void CreateRules() override;
+    void GetReferencedGrammars() override;
     class InterfaceRule;
     class InterfaceContentRule;
     class InterfaceMemFunRule;
@@ -27,4 +27,4 @@ private:
 
 } } // namespace cmajor.parser
 
-#endif // Interface_hpp_24967
+#endif // Interface_hpp_8344

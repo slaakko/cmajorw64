@@ -45,12 +45,12 @@ public:
     {
         SetValueTypeName(ToUtf32("int32_t"));
     }
-    virtual void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData)
+    void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData) override
     {
         parsingData->PushContext(Id(), new Context());
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
     }
-    virtual void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched)
+    void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched) override
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
         if (matched)
@@ -59,7 +59,7 @@ public:
         }
         parsingData->PopContext(Id());
     }
-    virtual void Link()
+    void Link() override
     {
         cmajor::parsing::ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
         a0ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<intRule>(this, &intRule::A0Action));
@@ -87,12 +87,12 @@ public:
     {
         SetValueTypeName(ToUtf32("uint32_t"));
     }
-    virtual void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData)
+    void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData) override
     {
         parsingData->PushContext(Id(), new Context());
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
     }
-    virtual void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched)
+    void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched) override
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
         if (matched)
@@ -101,7 +101,7 @@ public:
         }
         parsingData->PopContext(Id());
     }
-    virtual void Link()
+    void Link() override
     {
         cmajor::parsing::ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
         a0ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<uintRule>(this, &uintRule::A0Action));
@@ -129,12 +129,12 @@ public:
     {
         SetValueTypeName(ToUtf32("int64_t"));
     }
-    virtual void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData)
+    void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData) override
     {
         parsingData->PushContext(Id(), new Context());
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
     }
-    virtual void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched)
+    void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched) override
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
         if (matched)
@@ -143,7 +143,7 @@ public:
         }
         parsingData->PopContext(Id());
     }
-    virtual void Link()
+    void Link() override
     {
         cmajor::parsing::ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
         a0ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<longRule>(this, &longRule::A0Action));
@@ -171,12 +171,12 @@ public:
     {
         SetValueTypeName(ToUtf32("uint64_t"));
     }
-    virtual void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData)
+    void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData) override
     {
         parsingData->PushContext(Id(), new Context());
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
     }
-    virtual void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched)
+    void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched) override
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
         if (matched)
@@ -185,7 +185,7 @@ public:
         }
         parsingData->PopContext(Id());
     }
-    virtual void Link()
+    void Link() override
     {
         cmajor::parsing::ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
         a0ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<ulongRule>(this, &ulongRule::A0Action));
@@ -213,12 +213,12 @@ public:
     {
         SetValueTypeName(ToUtf32("uint32_t"));
     }
-    virtual void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData)
+    void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData) override
     {
         parsingData->PushContext(Id(), new Context());
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
     }
-    virtual void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched)
+    void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched) override
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
         if (matched)
@@ -227,7 +227,7 @@ public:
         }
         parsingData->PopContext(Id());
     }
-    virtual void Link()
+    void Link() override
     {
         cmajor::parsing::ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
         a0ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<hexuintRule>(this, &hexuintRule::A0Action));
@@ -255,12 +255,12 @@ public:
     {
         SetValueTypeName(ToUtf32("uint64_t"));
     }
-    virtual void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData)
+    void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData) override
     {
         parsingData->PushContext(Id(), new Context());
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
     }
-    virtual void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched)
+    void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched) override
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
         if (matched)
@@ -269,7 +269,7 @@ public:
         }
         parsingData->PopContext(Id());
     }
-    virtual void Link()
+    void Link() override
     {
         cmajor::parsing::ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
         a0ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<hexRule>(this, &hexRule::A0Action));
@@ -297,12 +297,12 @@ public:
     {
         SetValueTypeName(ToUtf32("uint64_t"));
     }
-    virtual void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData)
+    void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData) override
     {
         parsingData->PushContext(Id(), new Context());
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
     }
-    virtual void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched)
+    void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched) override
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
         if (matched)
@@ -311,7 +311,7 @@ public:
         }
         parsingData->PopContext(Id());
     }
-    virtual void Link()
+    void Link() override
     {
         cmajor::parsing::ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
         a0ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<hex_literalRule>(this, &hex_literalRule::A0Action));
@@ -350,12 +350,12 @@ public:
     {
         SetValueTypeName(ToUtf32("double"));
     }
-    virtual void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData)
+    void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData) override
     {
         parsingData->PushContext(Id(), new Context());
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
     }
-    virtual void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched)
+    void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched) override
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
         if (matched)
@@ -364,7 +364,7 @@ public:
         }
         parsingData->PopContext(Id());
     }
-    virtual void Link()
+    void Link() override
     {
         cmajor::parsing::ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
         a0ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<realRule>(this, &realRule::A0Action));
@@ -392,12 +392,12 @@ public:
     {
         SetValueTypeName(ToUtf32("double"));
     }
-    virtual void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData)
+    void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData) override
     {
         parsingData->PushContext(Id(), new Context());
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
     }
-    virtual void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched)
+    void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched) override
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
         if (matched)
@@ -406,7 +406,7 @@ public:
         }
         parsingData->PopContext(Id());
     }
-    virtual void Link()
+    void Link() override
     {
         cmajor::parsing::ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
         a0ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<urealRule>(this, &urealRule::A0Action));
@@ -434,12 +434,12 @@ public:
     {
         SetValueTypeName(ToUtf32("double"));
     }
-    virtual void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData)
+    void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData) override
     {
         parsingData->PushContext(Id(), new Context());
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
     }
-    virtual void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched)
+    void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched) override
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
         if (matched)
@@ -448,7 +448,7 @@ public:
         }
         parsingData->PopContext(Id());
     }
-    virtual void Link()
+    void Link() override
     {
         cmajor::parsing::ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
         a0ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<numRule>(this, &numRule::A0Action));
@@ -507,12 +507,12 @@ public:
     {
         SetValueTypeName(ToUtf32("bool"));
     }
-    virtual void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData)
+    void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData) override
     {
         parsingData->PushContext(Id(), new Context());
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
     }
-    virtual void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched)
+    void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched) override
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
         if (matched)
@@ -521,7 +521,7 @@ public:
         }
         parsingData->PopContext(Id());
     }
-    virtual void Link()
+    void Link() override
     {
         cmajor::parsing::ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
         a0ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<boolRule>(this, &boolRule::A0Action));
@@ -554,12 +554,12 @@ public:
     {
         SetValueTypeName(ToUtf32("std::u32string"));
     }
-    virtual void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData)
+    void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData) override
     {
         parsingData->PushContext(Id(), new Context());
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
     }
-    virtual void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched)
+    void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched) override
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
         if (matched)
@@ -568,7 +568,7 @@ public:
         }
         parsingData->PopContext(Id());
     }
-    virtual void Link()
+    void Link() override
     {
         cmajor::parsing::ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
         a0ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<identifierRule>(this, &identifierRule::A0Action));
@@ -594,12 +594,12 @@ public:
     {
         SetValueTypeName(ToUtf32("std::u32string"));
     }
-    virtual void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData)
+    void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData) override
     {
         parsingData->PushContext(Id(), new Context());
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
     }
-    virtual void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched)
+    void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched) override
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
         if (matched)
@@ -608,7 +608,7 @@ public:
         }
         parsingData->PopContext(Id());
     }
-    virtual void Link()
+    void Link() override
     {
         cmajor::parsing::ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
         a0ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<qualified_idRule>(this, &qualified_idRule::A0Action));
@@ -660,12 +660,12 @@ public:
     {
         SetValueTypeName(ToUtf32("char32_t"));
     }
-    virtual void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData)
+    void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData) override
     {
         parsingData->PushContext(Id(), new Context());
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
     }
-    virtual void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched)
+    void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched) override
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
         if (matched)
@@ -674,7 +674,7 @@ public:
         }
         parsingData->PopContext(Id());
     }
-    virtual void Link()
+    void Link() override
     {
         cmajor::parsing::ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
         a0ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<escapeRule>(this, &escapeRule::A0Action));
@@ -761,12 +761,12 @@ public:
     {
         SetValueTypeName(ToUtf32("char32_t"));
     }
-    virtual void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData)
+    void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData) override
     {
         parsingData->PushContext(Id(), new Context());
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
     }
-    virtual void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched)
+    void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched) override
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
         if (matched)
@@ -775,7 +775,7 @@ public:
         }
         parsingData->PopContext(Id());
     }
-    virtual void Link()
+    void Link() override
     {
         cmajor::parsing::ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
         a0ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<charRule>(this, &charRule::A0Action));
@@ -821,12 +821,12 @@ public:
     {
         SetValueTypeName(ToUtf32("std::u32string"));
     }
-    virtual void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData)
+    void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData) override
     {
         parsingData->PushContext(Id(), new Context());
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
     }
-    virtual void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched)
+    void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched) override
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
         if (matched)
@@ -835,7 +835,7 @@ public:
         }
         parsingData->PopContext(Id());
     }
-    virtual void Link()
+    void Link() override
     {
         cmajor::parsing::ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
         a0ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<stringRule>(this, &stringRule::A0Action));
@@ -904,19 +904,22 @@ void stdlib::CreateRules()
             new cmajor::parsing::SequenceParser(
                 new cmajor::parsing::StringParser(ToUtf32("/*")),
                 new cmajor::parsing::KleeneStarParser(
-                    new cmajor::parsing::AlternativeParser(
+                    new cmajor::parsing::GroupingParser(
                         new cmajor::parsing::AlternativeParser(
-                            new cmajor::parsing::NonterminalParser(ToUtf32("string"), ToUtf32("string"), 0),
-                            new cmajor::parsing::NonterminalParser(ToUtf32("char"), ToUtf32("char"), 0)),
-                        new cmajor::parsing::DifferenceParser(
-                            new cmajor::parsing::AnyCharParser(),
-                            new cmajor::parsing::StringParser(ToUtf32("*/")))))),
+                            new cmajor::parsing::AlternativeParser(
+                                new cmajor::parsing::NonterminalParser(ToUtf32("string"), ToUtf32("string"), 0),
+                                new cmajor::parsing::NonterminalParser(ToUtf32("char"), ToUtf32("char"), 0)),
+                            new cmajor::parsing::GroupingParser(
+                                new cmajor::parsing::DifferenceParser(
+                                    new cmajor::parsing::AnyCharParser(),
+                                    new cmajor::parsing::StringParser(ToUtf32("*/")))))))),
             new cmajor::parsing::StringParser(ToUtf32("*/")))));
     AddRule(new cmajor::parsing::Rule(ToUtf32("spaces_and_comments"), GetScope(), GetParsingDomain()->GetNextRuleId(),
         new cmajor::parsing::PositiveParser(
-            new cmajor::parsing::AlternativeParser(
-                new cmajor::parsing::SpaceParser(),
-                new cmajor::parsing::NonterminalParser(ToUtf32("comment"), ToUtf32("comment"), 0)))));
+            new cmajor::parsing::GroupingParser(
+                new cmajor::parsing::AlternativeParser(
+                    new cmajor::parsing::SpaceParser(),
+                    new cmajor::parsing::NonterminalParser(ToUtf32("comment"), ToUtf32("comment"), 0))))));
     AddRule(new cmajor::parsing::Rule(ToUtf32("digit_sequence"), GetScope(), GetParsingDomain()->GetNextRuleId(),
         new cmajor::parsing::TokenParser(
             new cmajor::parsing::PositiveParser(
@@ -959,9 +962,10 @@ void stdlib::CreateRules()
         new cmajor::parsing::ActionParser(ToUtf32("A0"),
             new cmajor::parsing::TokenParser(
                 new cmajor::parsing::SequenceParser(
-                    new cmajor::parsing::AlternativeParser(
-                        new cmajor::parsing::StringParser(ToUtf32("0x")),
-                        new cmajor::parsing::StringParser(ToUtf32("0X"))),
+                    new cmajor::parsing::GroupingParser(
+                        new cmajor::parsing::AlternativeParser(
+                            new cmajor::parsing::StringParser(ToUtf32("0x")),
+                            new cmajor::parsing::StringParser(ToUtf32("0X")))),
                     new cmajor::parsing::ExpectationParser(
                         new cmajor::parsing::NonterminalParser(ToUtf32("hex"), ToUtf32("hex"), 0)))))));
     AddRule(new realRule(ToUtf32("real"), GetScope(), GetParsingDomain()->GetNextRuleId(),
@@ -970,14 +974,16 @@ void stdlib::CreateRules()
                 new cmajor::parsing::SequenceParser(
                     new cmajor::parsing::OptionalParser(
                         new cmajor::parsing::NonterminalParser(ToUtf32("sign"), ToUtf32("sign"), 0)),
-                    new cmajor::parsing::AlternativeParser(
-                        new cmajor::parsing::NonterminalParser(ToUtf32("fractional_real"), ToUtf32("fractional_real"), 0),
-                        new cmajor::parsing::NonterminalParser(ToUtf32("exponent_real"), ToUtf32("exponent_real"), 0)))))));
+                    new cmajor::parsing::GroupingParser(
+                        new cmajor::parsing::AlternativeParser(
+                            new cmajor::parsing::NonterminalParser(ToUtf32("fractional_real"), ToUtf32("fractional_real"), 0),
+                            new cmajor::parsing::NonterminalParser(ToUtf32("exponent_real"), ToUtf32("exponent_real"), 0))))))));
     AddRule(new urealRule(ToUtf32("ureal"), GetScope(), GetParsingDomain()->GetNextRuleId(),
         new cmajor::parsing::ActionParser(ToUtf32("A0"),
-            new cmajor::parsing::AlternativeParser(
-                new cmajor::parsing::NonterminalParser(ToUtf32("fractional_real"), ToUtf32("fractional_real"), 0),
-                new cmajor::parsing::NonterminalParser(ToUtf32("exponent_real"), ToUtf32("exponent_real"), 0)))));
+            new cmajor::parsing::GroupingParser(
+                new cmajor::parsing::AlternativeParser(
+                    new cmajor::parsing::NonterminalParser(ToUtf32("fractional_real"), ToUtf32("fractional_real"), 0),
+                    new cmajor::parsing::NonterminalParser(ToUtf32("exponent_real"), ToUtf32("exponent_real"), 0))))));
     AddRule(new cmajor::parsing::Rule(ToUtf32("fractional_real"), GetScope(), GetParsingDomain()->GetNextRuleId(),
         new cmajor::parsing::AlternativeParser(
             new cmajor::parsing::TokenParser(
@@ -1032,35 +1038,38 @@ void stdlib::CreateRules()
                 new cmajor::parsing::SequenceParser(
                     new cmajor::parsing::NonterminalParser(ToUtf32("first"), ToUtf32("identifier"), 0),
                     new cmajor::parsing::KleeneStarParser(
-                        new cmajor::parsing::SequenceParser(
-                            new cmajor::parsing::CharParser('.'),
-                            new cmajor::parsing::NonterminalParser(ToUtf32("rest"), ToUtf32("identifier"), 0))))))));
+                        new cmajor::parsing::GroupingParser(
+                            new cmajor::parsing::SequenceParser(
+                                new cmajor::parsing::CharParser('.'),
+                                new cmajor::parsing::NonterminalParser(ToUtf32("rest"), ToUtf32("identifier"), 0)))))))));
     AddRule(new escapeRule(ToUtf32("escape"), GetScope(), GetParsingDomain()->GetNextRuleId(),
         new cmajor::parsing::TokenParser(
             new cmajor::parsing::SequenceParser(
                 new cmajor::parsing::CharParser('\\'),
-                new cmajor::parsing::AlternativeParser(
+                new cmajor::parsing::GroupingParser(
                     new cmajor::parsing::AlternativeParser(
-                        new cmajor::parsing::SequenceParser(
-                            new cmajor::parsing::CharSetParser(ToUtf32("xX")),
-                            new cmajor::parsing::ActionParser(ToUtf32("A0"),
-                                new cmajor::parsing::NonterminalParser(ToUtf32("x"), ToUtf32("hex"), 0))),
-                        new cmajor::parsing::SequenceParser(
-                            new cmajor::parsing::CharSetParser(ToUtf32("dD")),
-                            new cmajor::parsing::ActionParser(ToUtf32("A1"),
-                                new cmajor::parsing::NonterminalParser(ToUtf32("decimalEscape"), ToUtf32("uint"), 0)))),
-                    new cmajor::parsing::ActionParser(ToUtf32("A2"),
-                        new cmajor::parsing::CharSetParser(ToUtf32("dDxX"), true)))))));
+                        new cmajor::parsing::AlternativeParser(
+                            new cmajor::parsing::SequenceParser(
+                                new cmajor::parsing::CharSetParser(ToUtf32("xX")),
+                                new cmajor::parsing::ActionParser(ToUtf32("A0"),
+                                    new cmajor::parsing::NonterminalParser(ToUtf32("x"), ToUtf32("hex"), 0))),
+                            new cmajor::parsing::SequenceParser(
+                                new cmajor::parsing::CharSetParser(ToUtf32("dD")),
+                                new cmajor::parsing::ActionParser(ToUtf32("A1"),
+                                    new cmajor::parsing::NonterminalParser(ToUtf32("decimalEscape"), ToUtf32("uint"), 0)))),
+                        new cmajor::parsing::ActionParser(ToUtf32("A2"),
+                            new cmajor::parsing::CharSetParser(ToUtf32("dDxX"), true))))))));
     AddRule(new charRule(ToUtf32("char"), GetScope(), GetParsingDomain()->GetNextRuleId(),
         new cmajor::parsing::TokenParser(
             new cmajor::parsing::SequenceParser(
                 new cmajor::parsing::SequenceParser(
                     new cmajor::parsing::CharParser('\''),
-                    new cmajor::parsing::AlternativeParser(
-                        new cmajor::parsing::ActionParser(ToUtf32("A0"),
-                            new cmajor::parsing::CharSetParser(ToUtf32("\\\r\n"), true)),
-                        new cmajor::parsing::ActionParser(ToUtf32("A1"),
-                            new cmajor::parsing::NonterminalParser(ToUtf32("escape"), ToUtf32("escape"), 0)))),
+                    new cmajor::parsing::GroupingParser(
+                        new cmajor::parsing::AlternativeParser(
+                            new cmajor::parsing::ActionParser(ToUtf32("A0"),
+                                new cmajor::parsing::CharSetParser(ToUtf32("\\\r\n"), true)),
+                            new cmajor::parsing::ActionParser(ToUtf32("A1"),
+                                new cmajor::parsing::NonterminalParser(ToUtf32("escape"), ToUtf32("escape"), 0))))),
                 new cmajor::parsing::ExpectationParser(
                     new cmajor::parsing::CharParser('\''))))));
     AddRule(new stringRule(ToUtf32("string"), GetScope(), GetParsingDomain()->GetNextRuleId(),
@@ -1069,12 +1078,14 @@ void stdlib::CreateRules()
                 new cmajor::parsing::SequenceParser(
                     new cmajor::parsing::CharParser('\"'),
                     new cmajor::parsing::KleeneStarParser(
-                        new cmajor::parsing::AlternativeParser(
-                            new cmajor::parsing::ActionParser(ToUtf32("A0"),
-                                new cmajor::parsing::PositiveParser(
-                                    new cmajor::parsing::CharSetParser(ToUtf32("\"\\\r\n"), true))),
-                            new cmajor::parsing::ActionParser(ToUtf32("A1"),
-                                new cmajor::parsing::NonterminalParser(ToUtf32("escape"), ToUtf32("escape"), 0))))),
+                        new cmajor::parsing::GroupingParser(
+                            new cmajor::parsing::AlternativeParser(
+                                new cmajor::parsing::ActionParser(ToUtf32("A0"),
+                                    new cmajor::parsing::GroupingParser(
+                                        new cmajor::parsing::PositiveParser(
+                                            new cmajor::parsing::CharSetParser(ToUtf32("\"\\\r\n"), true)))),
+                                new cmajor::parsing::ActionParser(ToUtf32("A1"),
+                                    new cmajor::parsing::NonterminalParser(ToUtf32("escape"), ToUtf32("escape"), 0)))))),
                 new cmajor::parsing::ExpectationParser(
                     new cmajor::parsing::CharParser('\"'))))));
 }

@@ -1,5 +1,5 @@
-#ifndef XmlGrammar_hpp_12276
-#define XmlGrammar_hpp_12276
+#ifndef XmlGrammar_hpp_6352
+#define XmlGrammar_hpp_6352
 
 #include <cmajor/parsing/Grammar.hpp>
 #include <cmajor/parsing/Keyword.hpp>
@@ -7,16 +7,16 @@
 
 namespace cmajor { namespace xml {
 
-class XmlGrammar : public cmajor::parsing::Grammar
+class Xml : public cmajor::parsing::Grammar
 {
 public:
-    static XmlGrammar* Create();
-    static XmlGrammar* Create(cmajor::parsing::ParsingDomain* parsingDomain);
+    static Xml* Create();
+    static Xml* Create(cmajor::parsing::ParsingDomain* parsingDomain);
     void Parse(const char32_t* start, const char32_t* end, int fileIndex, const std::string& fileName, XmlProcessor* processor);
 private:
-    XmlGrammar(cmajor::parsing::ParsingDomain* parsingDomain_);
-    virtual void CreateRules();
-    virtual void GetReferencedGrammars();
+    Xml(cmajor::parsing::ParsingDomain* parsingDomain_);
+    void CreateRules() override;
+    void GetReferencedGrammars() override;
     class DocumentRule;
     class NameRule;
     class EntityValueRule;
@@ -68,4 +68,4 @@ private:
 
 } } // namespace cmajor.xml
 
-#endif // XmlGrammar_hpp_12276
+#endif // XmlGrammar_hpp_6352

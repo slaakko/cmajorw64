@@ -29,7 +29,6 @@ void TypedefSymbol::Write(SymbolWriter& writer)
 void TypedefSymbol::Read(SymbolReader& reader)
 {
     Symbol::Read(reader);
-    //uint32_t typeId = reader.GetBinaryReader().ReadUInt();
     boost::uuids::uuid typeId;
     reader.GetBinaryReader().ReadUuid(typeId);
     GetSymbolTable()->EmplaceTypeRequest(this, typeId, 0);
@@ -158,6 +157,19 @@ void TypedefSymbol::SetSpecifiers(Specifiers specifiers)
     {
         throw Exception(GetModule(), "typedef cannot be unit_test", GetSpan());
     }
+}
+
+std::unique_ptr<dom::Element> TypedefSymbol::CreateDomElement(TypeMap& typeMap)
+{
+    std::unique_ptr<dom::Element> element(new dom::Element(U"TypedefSymbol"));
+    if (type)
+    {
+        std::unique_ptr<dom::Element> typeElement(new dom::Element(U"type"));
+        int typeId = typeMap.GetOrInsertType(type);
+        typeElement->SetAttribute(U"ref", U"type_" + ToUtf32(std::to_string(typeId)));
+        element->AppendChild(std::unique_ptr<dom::Node>(typeElement.release()));
+    }
+    return element;
 }
 
 } } // namespace cmajor::symbols

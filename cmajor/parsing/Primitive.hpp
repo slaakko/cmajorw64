@@ -19,8 +19,8 @@ class CharParser : public Parser
 public:
     CharParser(char32_t c_);
     char32_t GetChar() const { return c; }
-    virtual Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData);
-    virtual void Accept(Visitor& visitor);
+    Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData) override;
+    void Accept(Visitor& visitor) override;
 private:
     char32_t c;
 };
@@ -30,8 +30,8 @@ class StringParser : public Parser
 public:
     StringParser(const std::u32string& s_);
     const std::u32string& GetString() const { return s; }
-    virtual Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData);
-    virtual void Accept(Visitor& visitor);
+    Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData) override;
+    void Accept(Visitor& visitor) override;
 private:
     std::u32string s;
 };
@@ -51,8 +51,8 @@ public:
     CharSetParser(const std::u32string& s_, bool inverse_);
     const std::u32string& Set() const { return s; }
     bool Inverse() const { return inverse; }
-    virtual Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData);
-    virtual void Accept(Visitor& visitor);
+    Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData) override;
+    void Accept(Visitor& visitor) override;
 private:
     std::u32string s;
     bool inverse;
@@ -64,392 +64,392 @@ class EmptyParser : public Parser
 {
 public:
     EmptyParser();
-    virtual Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData);
-    virtual void Accept(Visitor& visitor);
+    Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData) override;
+    void Accept(Visitor& visitor) override;
 };
 
 class SpaceParser : public Parser
 {
 public:
     SpaceParser();
-    virtual Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData);
-    virtual void Accept(Visitor& visitor);
+    Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData) override;
+    void Accept(Visitor& visitor) override;
 };
 
 class LetterParser : public Parser
 {
 public:
     LetterParser();
-    virtual Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData);
-    virtual void Accept(Visitor& visitor);
+    Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData) override;
+    void Accept(Visitor& visitor) override;
 };
 
 class UpperLetterParser : public Parser
 {
 public:
     UpperLetterParser();
-    virtual Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData);
-    virtual void Accept(Visitor& visitor);
+    Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData) override;
+    void Accept(Visitor& visitor) override;
 };
 
 class LowerLetterParser : public Parser
 {
 public:
     LowerLetterParser();
-    virtual Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData);
-    virtual void Accept(Visitor& visitor);
+    Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData) override;
+    void Accept(Visitor& visitor) override;
 };
 
 class TitleLetterParser : public Parser
 {
 public:
     TitleLetterParser();
-    virtual Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData);
-    virtual void Accept(Visitor& visitor);
+    Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData) override;
+    void Accept(Visitor& visitor) override;
 };
 
 class ModifierLetterParser : public Parser
 {
 public:
     ModifierLetterParser();
-    virtual Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData);
-    virtual void Accept(Visitor& visitor);
+    Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData) override;
+    void Accept(Visitor& visitor) override;
 };
 
 class OtherLetterParser : public Parser
 {
 public:
     OtherLetterParser();
-    virtual Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData);
-    virtual void Accept(Visitor& visitor);
+    Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData) override;
+    void Accept(Visitor& visitor) override;
 };
 
 class CasedLetterParser : public Parser
 {
 public:
     CasedLetterParser();
-    virtual Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData);
-    virtual void Accept(Visitor& visitor);
+    Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData) override;
+    void Accept(Visitor& visitor) override;
 };
 
 class DigitParser : public Parser
 {
 public:
     DigitParser();
-    virtual Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData);
-    virtual void Accept(Visitor& visitor);
+    Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData) override;
+    void Accept(Visitor& visitor) override;
 };
 
 class HexDigitParser : public Parser
 {
 public:
     HexDigitParser();
-    virtual Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData);
-    virtual void Accept(Visitor& visitor);
+    Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData) override;
+    void Accept(Visitor& visitor) override;
 };
 
 class MarkParser : public Parser
 {
 public:
     MarkParser();
-    virtual Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData);
-    virtual void Accept(Visitor& visitor);
+    Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData) override;
+    void Accept(Visitor& visitor) override;
 };
 
 class NonspacingMarkParser : public Parser
 {
 public:
     NonspacingMarkParser();
-    virtual Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData);
-    virtual void Accept(Visitor& visitor);
+    Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData) override;
+    void Accept(Visitor& visitor) override;
 };
 
 class SpacingMarkParser : public Parser
 {
 public:
     SpacingMarkParser();
-    virtual Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData);
-    virtual void Accept(Visitor& visitor);
+    Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData) override;
+    void Accept(Visitor& visitor) override;
 };
 
 class EnclosingMarkParser : public Parser
 {
 public:
     EnclosingMarkParser();
-    virtual Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData);
-    virtual void Accept(Visitor& visitor);
+    Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData) override;
+    void Accept(Visitor& visitor) override;
 };
 
 class NumberParser : public Parser
 {
 public:
     NumberParser();
-    virtual Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData);
-    virtual void Accept(Visitor& visitor);
+    Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData) override;
+    void Accept(Visitor& visitor) override;
 };
 
 class DecimalNumberParser : public Parser
 {
 public:
     DecimalNumberParser();
-    virtual Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData);
-    virtual void Accept(Visitor& visitor);
+    Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData) override;
+    void Accept(Visitor& visitor) override;
 };
 
 class LetterNumberParser : public Parser
 {
 public:
     LetterNumberParser();
-    virtual Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData);
-    virtual void Accept(Visitor& visitor);
+    Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData) override;
+    void Accept(Visitor& visitor) override;
 };
 
 class OtherNumberParser : public Parser
 {
 public:
     OtherNumberParser();
-    virtual Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData);
-    virtual void Accept(Visitor& visitor);
+    Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData) override;
+    void Accept(Visitor& visitor) override;
 };
 
 class PunctuationParser : public Parser
 {
 public:
     PunctuationParser();
-    virtual Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData);
-    virtual void Accept(Visitor& visitor);
+    Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData) override;
+    void Accept(Visitor& visitor) override;
 };
 
 class ConnectorPunctuationParser : public Parser
 {
 public:
     ConnectorPunctuationParser();
-    virtual Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData);
-    virtual void Accept(Visitor& visitor);
+    Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData) override;
+    void Accept(Visitor& visitor) override;
 };
 
 class DashPunctuationParser : public Parser
 {
 public:
     DashPunctuationParser();
-    virtual Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData);
-    virtual void Accept(Visitor& visitor);
+    Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData) override;
+    void Accept(Visitor& visitor) override;
 };
 
 class OpenPunctuationParser : public Parser
 {
 public:
     OpenPunctuationParser();
-    virtual Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData);
-    virtual void Accept(Visitor& visitor);
+    Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData) override;
+    void Accept(Visitor& visitor) override;
 };
 
 class ClosePunctuationParser : public Parser
 {
 public:
     ClosePunctuationParser();
-    virtual Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData);
-    virtual void Accept(Visitor& visitor);
+    Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData) override;
+    void Accept(Visitor& visitor) override;
 };
 
 class InitialPunctuationParser : public Parser
 {
 public:
     InitialPunctuationParser();
-    virtual Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData);
-    virtual void Accept(Visitor& visitor);
+    Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData) override;
+    void Accept(Visitor& visitor) override;
 };
 
 class FinalPunctuationParser : public Parser
 {
 public:
     FinalPunctuationParser();
-    virtual Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData);
-    virtual void Accept(Visitor& visitor);
+    Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData) override;
+    void Accept(Visitor& visitor) override;
 };
 
 class OtherPunctuationParser : public Parser
 {
 public:
     OtherPunctuationParser();
-    virtual Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData);
-    virtual void Accept(Visitor& visitor);
+    Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData) override;
+    void Accept(Visitor& visitor) override;
 };
 
 class SymbolParser : public Parser
 {
 public:
     SymbolParser();
-    virtual Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData);
-    virtual void Accept(Visitor& visitor);
+    Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData) override;
+    void Accept(Visitor& visitor) override;
 };
 
 class MathSymbolParser : public Parser
 {
 public:
     MathSymbolParser();
-    virtual Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData);
-    virtual void Accept(Visitor& visitor);
+    Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData) override;
+    void Accept(Visitor& visitor) override;
 };
 
 class CurrencySymbolParser : public Parser
 {
 public:
     CurrencySymbolParser();
-    virtual Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData);
-    virtual void Accept(Visitor& visitor);
+    Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData) override;
+    void Accept(Visitor& visitor) override;
 };
 
 class ModifierSymbolParser : public Parser
 {
 public:
     ModifierSymbolParser();
-    virtual Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData);
-    virtual void Accept(Visitor& visitor);
+    Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData) override;
+    void Accept(Visitor& visitor) override;
 };
 
 class OtherSymbolParser : public Parser
 {
 public:
     OtherSymbolParser();
-    virtual Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData);
-    virtual void Accept(Visitor& visitor);
+    Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData) override;
+    void Accept(Visitor& visitor) override;
 };
 
 class SeparatorParser : public Parser
 {
 public:
     SeparatorParser();
-    virtual Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData);
-    virtual void Accept(Visitor& visitor);
+    Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData) override;
+    void Accept(Visitor& visitor) override;
 };
 
 class SpaceSeparatorParser : public Parser
 {
 public:
     SpaceSeparatorParser();
-    virtual Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData);
-    virtual void Accept(Visitor& visitor);
+    Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData) override;
+    void Accept(Visitor& visitor) override;
 };
 
 class LineSeparatorParser : public Parser
 {
 public:
     LineSeparatorParser();
-    virtual Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData);
-    virtual void Accept(Visitor& visitor);
+    Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData) override;
+    void Accept(Visitor& visitor) override;
 };
 
 class ParagraphSeparatorParser : public Parser
 {
 public:
     ParagraphSeparatorParser();
-    virtual Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData);
-    virtual void Accept(Visitor& visitor);
+    Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData) override;
+    void Accept(Visitor& visitor) override;
 };
 
 class OtherParser : public Parser
 {
 public:
     OtherParser();
-    virtual Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData);
-    virtual void Accept(Visitor& visitor);
+    Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData) override;
+    void Accept(Visitor& visitor) override;
 };
 
 class ControlParser : public Parser
 {
 public:
     ControlParser();
-    virtual Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData);
-    virtual void Accept(Visitor& visitor);
+    Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData) override;
+    void Accept(Visitor& visitor) override;
 };
 
 class FormatParser : public Parser
 {
 public:
     FormatParser();
-    virtual Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData);
-    virtual void Accept(Visitor& visitor);
+    Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData) override;
+    void Accept(Visitor& visitor) override;
 };
 
 class SurrogateParser : public Parser
 {
 public:
     SurrogateParser();
-    virtual Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData);
-    virtual void Accept(Visitor& visitor);
+    Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData) override;
+    void Accept(Visitor& visitor) override;
 };
 
 class PrivateUseParser : public Parser
 {
 public:
     PrivateUseParser();
-    virtual Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData);
-    virtual void Accept(Visitor& visitor);
+    Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData) override;
+    void Accept(Visitor& visitor) override;
 };
 
 class UnassignedParser : public Parser
 {
 public:
     UnassignedParser();
-    virtual Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData);
-    virtual void Accept(Visitor& visitor);
+    Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData) override;
+    void Accept(Visitor& visitor) override;
 };
 
 class GraphicParser : public Parser
 {
 public:
     GraphicParser();
-    virtual Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData);
-    virtual void Accept(Visitor& visitor);
+    Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData) override;
+    void Accept(Visitor& visitor) override;
 };
 
 class BaseCharParser : public Parser
 {
 public:
     BaseCharParser();
-    virtual Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData);
-    virtual void Accept(Visitor& visitor);
+    Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData) override;
+    void Accept(Visitor& visitor) override;
 };
 
 class AlphabeticParser : public Parser
 {
 public:
     AlphabeticParser();
-    virtual Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData);
-    virtual void Accept(Visitor& visitor);
+    Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData) override;
+    void Accept(Visitor& visitor) override;
 };
 
 class IdStartParser : public Parser
 {
 public:
     IdStartParser();
-    virtual Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData);
-    virtual void Accept(Visitor& visitor);
+    Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData) override;
+    void Accept(Visitor& visitor) override;
 };
 
 class IdContParser : public Parser
 {
 public:
     IdContParser();
-    virtual Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData);
-    virtual void Accept(Visitor& visitor);
+    Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData) override;
+    void Accept(Visitor& visitor) override;
 };
 
 class AnyCharParser : public Parser
 {
 public:
     AnyCharParser();
-    virtual Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData);
-    virtual void Accept(Visitor& visitor);
+    Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData) override;
+    void Accept(Visitor& visitor) override;
 };
 
 class RangeParser : public Parser
 {
 public:
     RangeParser(uint32_t start_, uint32_t end_);
-    virtual Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData);
-    virtual void Accept(Visitor& visitor);
+    Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData) override;
+    void Accept(Visitor& visitor) override;
     uint32_t Start() const { return start; }
     uint32_t End() const { return end; }
 private:

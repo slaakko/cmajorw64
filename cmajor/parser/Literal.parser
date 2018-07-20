@@ -13,9 +13,9 @@ namespace cmajor.parser
     [hpp]using namespace cmajor::ast;
     [cpp]using namespace cmajor::util;
 
-    grammar LiteralGrammar
+    grammar Literal
     {
-        using ExpressionGrammar.Expression;
+        using Expression.Expression;
 
         Literal(ParsingContext* ctx) : Node*
             ::= BooleanLiteral{ value = BooleanLiteral; }

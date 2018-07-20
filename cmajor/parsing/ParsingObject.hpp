@@ -13,12 +13,36 @@ namespace cmajor { namespace parsing {
 class Visitor;
 class Scope;
 
+enum class ObjectKind : uint8_t
+{
+    none = 0,
+    grammar = 1 << 0, 
+    ns = 1 << 1, 
+    usingObject = 1 << 2, 
+    parser = 1 << 3, 
+    parsingDomain = 1 << 4, 
+    rule = 1 << 5, 
+    ruleLink = 1 << 6, 
+    scope = 1 << 7,
+    parent = grammar | ns | scope
+};
+
+constexpr inline ObjectKind operator|(ObjectKind left, ObjectKind right)
+{
+    return  ObjectKind(uint8_t(left) | uint8_t(right));
+}
+
+constexpr inline ObjectKind operator&(ObjectKind left, ObjectKind right)
+{
+    return  ObjectKind(uint8_t(left) & uint8_t(right));
+}
+
 class ParsingObject
 {
 public:
     static const int external = -1;
-    ParsingObject(const std::u32string& name_);
-    ParsingObject(const std::u32string& name_, Scope* enclosingScope_);
+    ParsingObject(const std::u32string& name_, ObjectKind kind_);
+    ParsingObject(const std::u32string& name_, Scope* enclosingScope_, ObjectKind kind_);
     virtual ~ParsingObject();
     virtual void Accept(Visitor& visitor) = 0;
     void Own(ParsingObject* object);
@@ -44,7 +68,9 @@ public:
     virtual void AddToScope();
     void SetSpan(const Span& span_) { span = span_; }
     const Span& GetSpan() const { return span; }
+    ObjectKind Kind() const { return kind; }
 private:
+    ObjectKind kind;
     std::u32string name;
     std::vector<std::unique_ptr<ParsingObject>> ownedObjects;
     int owner;

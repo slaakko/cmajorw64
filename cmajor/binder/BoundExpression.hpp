@@ -69,6 +69,7 @@ class BoundParameter : public BoundExpression
 public:
     BoundParameter(Module* module_, const Span& span_, ParameterSymbol* parameterSymbol_);
     BoundExpression* Clone() override;
+    ParameterSymbol* GetParameterSymbol() { return parameterSymbol; }
     void Load(Emitter& emitter, OperationFlags flags) override;
     void Store(Emitter& emitter, OperationFlags flags) override;
     void Accept(BoundNodeVisitor& visitor) override;
@@ -84,6 +85,7 @@ class BoundLocalVariable : public BoundExpression
 public:
     BoundLocalVariable(Module* module_, const Span& span_, LocalVariableSymbol* localVariableSymbol_);
     BoundExpression* Clone() override;
+    LocalVariableSymbol* GetLocalVariableSymbol() { return localVariableSymbol; }
     void Load(Emitter& emitter, OperationFlags flags) override;
     void Store(Emitter& emitter, OperationFlags flags) override;
     void Accept(BoundNodeVisitor& visitor) override;
@@ -125,6 +127,7 @@ public:
     bool HasValue() const override { return true; }
     std::string TypeString() const override { return "constant"; }
     std::unique_ptr<Value> ToValue(BoundCompileUnit& boundCompileUnit) const override { return std::unique_ptr<Value>(constantSymbol->GetValue()->Clone()); }
+    ConstantSymbol* GetConstantSymbol() { return constantSymbol; }
 private:
     ConstantSymbol* constantSymbol;
 };
@@ -140,6 +143,7 @@ public:
     bool HasValue() const override { return true; }
     std::string TypeString() const override { return "enumeration constant"; }
     std::unique_ptr<Value> ToValue(BoundCompileUnit& boundCompileUnit) const override { return std::unique_ptr<Value>(enumConstantSymbol->GetValue()->Clone()); }
+    EnumConstantSymbol* GetEnumConstantSymbol() { return enumConstantSymbol; }
 private:
     EnumConstantSymbol* enumConstantSymbol;
 };
@@ -155,6 +159,7 @@ public:
     std::string TypeString() const override { return "literal"; }
     bool HasValue() const override { return true; }
     std::unique_ptr<Value> ToValue(BoundCompileUnit& boundCompileUnit) const override;
+    Value* GetValue() { return value.get(); }
 private:
     std::unique_ptr<Value> value;
 };
@@ -172,6 +177,8 @@ public:
     std::string TypeString() const override { return "temporary"; }
     std::unique_ptr<Value> ToValue(BoundCompileUnit& boundCompileUnit) const override;
     bool ContainsExceptionCapture() const override;
+    BoundExpression* RvalueExpr() { return rvalueExpr.get(); }
+    BoundLocalVariable* BackingStore() { return backingStore.get(); }
 private:
     std::unique_ptr<BoundExpression> rvalueExpr;
     std::unique_ptr<BoundLocalVariable> backingStore;
@@ -186,6 +193,7 @@ public:
     void Store(Emitter& emitter, OperationFlags flags) override;
     void Accept(BoundNodeVisitor& visitor) override;
     std::string TypeString() const override { return "sizeof"; }
+    TypeSymbol* PointerType() { return pointerType; }
 private:
     TypeSymbol* pointerType;
 };
@@ -232,6 +240,7 @@ public:
     void Accept(BoundNodeVisitor& visitor) override;
     std::string TypeString() const override { return "reference to pointer expression"; }
     bool ContainsExceptionCapture() const override;
+    std::unique_ptr<BoundExpression>& Subject() { return subject; }
 private:
     std::unique_ptr<BoundExpression> subject;
 };
@@ -269,6 +278,7 @@ public:
     bool HasValue() const override;
     std::string TypeString() const override { return "delegate call"; }
     bool IsLvalueExpression() const override;
+    DelegateTypeSymbol* GetDelegateSymbol() { return delegateTypeSymbol; }
     void AddArgument(std::unique_ptr<BoundExpression>&& argument);
     const std::vector<std::unique_ptr<BoundExpression>>& Arguments() const { return arguments; }
     bool ContainsExceptionCapture() const override;
@@ -288,6 +298,7 @@ public:
     bool HasValue() const override;
     std::string TypeString() const override { return "class delegate call"; }
     bool IsLvalueExpression() const override;
+    ClassDelegateTypeSymbol* GetClassDelegateSymbol() { return classDelegateTypeSymbol; }
     void AddArgument(std::unique_ptr<BoundExpression>&& argument);
     const std::vector<std::unique_ptr<BoundExpression>>& Arguments() const { return arguments; }
     bool ContainsExceptionCapture() const override;
@@ -307,6 +318,7 @@ public:
     bool HasValue() const override { return true; }
     std::string TypeString() const override { return "construct expression"; }
     bool ContainsExceptionCapture() const override;
+    BoundExpression* ConstructorCall() { return constructorCall.get(); }
 private:
     std::unique_ptr<BoundExpression> constructorCall;
 };
@@ -323,6 +335,8 @@ public:
     bool IsLvalueExpression() const override { return true; }
     std::string TypeString() const override { return "construct and return temporary expression"; }
     bool ContainsExceptionCapture() const override;
+    BoundExpression* ConstructorCall() { return constructorCall.get(); }
+    BoundExpression* BoundTemporary() { return boundTemporary.get(); }
 private:
     std::unique_ptr<BoundExpression> constructorCall;
     std::unique_ptr<BoundExpression> boundTemporary;
@@ -340,6 +354,8 @@ public:
     bool IsLvalueExpression() const override { return true; }
     std::string TypeString() const override { return "class conversion result"; }
     bool ContainsExceptionCapture() const override;
+    BoundExpression* ConversionResult() { return conversionResult.get(); }
+    BoundFunctionCall* ConversionFunctionCall() { return conversionFunctionCall.get(); }
 private:
     std::unique_ptr<BoundExpression> conversionResult;
     std::unique_ptr<BoundFunctionCall> conversionFunctionCall;
@@ -356,6 +372,7 @@ public:
     bool HasValue() const override { return true; }
     bool IsLvalueExpression() const override;
     std::string TypeString() const override { return "conversion"; }
+    BoundExpression* SourceExpr() { return sourceExpr.get(); }
     FunctionSymbol* ConversionFun() { return conversionFun; }
     std::unique_ptr<Value> ToValue(BoundCompileUnit& boundCompileUnit) const override;
     bool ContainsExceptionCapture() const override;
@@ -375,6 +392,8 @@ public:
     bool HasValue() const override { return true; }
     std::string TypeString() const override { return "is expression"; }
     bool ContainsExceptionCapture() const override;
+    BoundExpression* Expr() { return expr.get(); }
+    ClassTypeSymbol* RightClassType() { return rightClassType; }
 private:
     std::unique_ptr<BoundExpression> expr;
     ClassTypeSymbol* rightClassType;
@@ -391,6 +410,9 @@ public:
     bool HasValue() const override { return true; }
     std::string TypeString() const override { return "as expression"; }
     bool ContainsExceptionCapture() const override;
+    BoundExpression* Expr() { return expr.get(); }
+    BoundLocalVariable* Variable() { return variable.get(); }
+    ClassTypeSymbol* RightClassType() { return rightClassType; }
 private:
     std::unique_ptr<BoundExpression> expr;
     ClassTypeSymbol* rightClassType;
@@ -407,6 +429,7 @@ public:
     void Accept(BoundNodeVisitor& visitor) override;
     bool HasValue() const override { return true; }
     bool ContainsExceptionCapture() const override;
+    BoundExpression* ClassPtr() { return classPtr.get(); }
 private:
     std::unique_ptr<BoundExpression> classPtr;
 };
@@ -421,6 +444,7 @@ public:
     void Accept(BoundNodeVisitor& visitor) override;
     bool HasValue() const override { return true; }
     bool ContainsExceptionCapture() const override;
+    BoundExpression* Expr() { return expr.get(); }
 private:
     std::unique_ptr<BoundExpression> expr;
 };
@@ -434,6 +458,7 @@ public:
     void Store(Emitter& emitter, OperationFlags flags) override;
     void Accept(BoundNodeVisitor& visitor) override;
     bool HasValue() const override { return true; }
+    FunctionSymbol* Function() { return function; }
 private:
     FunctionSymbol* function;
 };

@@ -171,6 +171,7 @@ namespace cmdevenv
             this.addExistingProjectFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.addProjectReferenceDialog = new System.Windows.Forms.OpenFileDialog();
             this.addExistingTextFileDialog = new System.Windows.Forms.OpenFileDialog();
+            this.sccTimer = new System.Windows.Forms.Timer(this.components);
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.editorSplitContainer)).BeginInit();
             this.editorSplitContainer.Panel2.SuspendLayout();
@@ -1273,6 +1274,10 @@ namespace cmdevenv
             this.addExistingTextFileDialog.DefaultExt = "txt";
             this.addExistingTextFileDialog.Filter = "Text files|*.txt|All files|*.*";
             // 
+            // sccTimer
+            // 
+            this.sccTimer.Interval = 1000;
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1456,6 +1461,7 @@ namespace cmdevenv
         private System.Windows.Forms.ToolStripMenuItem runUnitTestsInCurrentSolutionToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripMenuItem15;
         private System.Windows.Forms.ToolStripSeparator toolStripMenuItem18;
+        private System.Windows.Forms.Timer sccTimer;
     }
 }
 

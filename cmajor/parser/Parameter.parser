@@ -12,10 +12,10 @@ namespace cmajor.parser
 {
     [hpp]using namespace cmajor::ast;
 
-    grammar ParameterGrammar
+    grammar Parameter
     {
-        using TypeExprGrammar.TypeExpr;
-        using IdentifierGrammar.Identifier;
+        using TypeExpr.TypeExpr;
+        using Identifier.Identifier;
         
         ParameterList(ParsingContext* ctx, Node* owner)
             ::= '(' (Parameter(ctx){ owner->AddParameter(Parameter); } % ',')? ')'!

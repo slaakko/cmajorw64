@@ -26,6 +26,7 @@ public:
     int64_t Size() const { return size; }
     ValueType GetValueType() const override;
     Value* MakeValue() const override;
+    const char* ClassName() const override { return "ArrayTypeSymbol"; }
 private:
     TypeSymbol* elementType;
     int64_t size;
@@ -44,6 +45,7 @@ public:
     std::unique_ptr<Value> ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span) const override;
     bool IsBasicTypeOperation() const override { return true; }
     bool IsCompileTimePrimitiveFunction() const override { return true; }
+    const char* ClassName() const override { return "ArrayLengthFunction"; }
 private:
     ArrayTypeSymbol* arrayType;
 };
@@ -58,6 +60,7 @@ public:
     void EmplaceType(TypeSymbol* typeSymbol, int index) override;
     void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
     bool IsBasicTypeOperation() const override { return true; }
+    const char* ClassName() const override { return "ArrayBeginFunction"; }
 private:
     ArrayTypeSymbol* arrayType;
 };
@@ -72,6 +75,7 @@ public:
     void EmplaceType(TypeSymbol* typeSymbol, int index) override;
     void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
     bool IsBasicTypeOperation() const override { return true; }
+    const char* ClassName() const override { return "ArrayEndFunction"; }
 private:
     ArrayTypeSymbol* arrayType;
 };
@@ -86,6 +90,7 @@ public:
     void EmplaceType(TypeSymbol* typeSymbol, int index) override;
     void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
     bool IsBasicTypeOperation() const override { return true; }
+    const char* ClassName() const override { return "ArrayCBeginFunction"; }
 private:
     ArrayTypeSymbol* arrayType;
 };
@@ -100,6 +105,7 @@ public:
     void EmplaceType(TypeSymbol* typeSymbol, int index) override;
     void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
     bool IsBasicTypeOperation() const override { return true; }
+    const char* ClassName() const override { return "ArrayCEndFunction"; }
 private:
     ArrayTypeSymbol* arrayType;
 };
@@ -110,6 +116,7 @@ public:
     ArrayTypeDefaultConstructor(ArrayTypeSymbol* arrayType_, LocalVariableSymbol* loopVar_, FunctionSymbol* elementTypeDefaultConstructor_, const Span& span_);
     void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flag, const Span& spans) override;
     bool IsBasicTypeOperation() const override { return true; }
+    const char* ClassName() const override { return "ArrayTypeDefaultConstructor"; }
 private:
     ArrayTypeSymbol* arrayType;
     LocalVariableSymbol* loopVar;
@@ -122,6 +129,7 @@ public:
     ArrayTypeCopyConstructor(ArrayTypeSymbol* arrayType_, LocalVariableSymbol* loopVar_, FunctionSymbol* elementTypeCopyConstructor_, const Span& span_);
     void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
     bool IsBasicTypeOperation() const override { return true; }
+    const char* ClassName() const override { return "ArrayTypeCopyConstructor"; }
 private:
     ArrayTypeSymbol* arrayType;
     LocalVariableSymbol* loopVar;
@@ -134,6 +142,7 @@ public:
     ArrayTypeMoveConstructor(ArrayTypeSymbol* arrayType_, LocalVariableSymbol* loopVar_, FunctionSymbol* elementTypeMoveConstructor_, const Span& span_);
     void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
     bool IsBasicTypeOperation() const override { return true; }
+    const char* ClassName() const override { return "ArrayTypeMoveConstructor"; }
 private:
     ArrayTypeSymbol* arrayType;
     LocalVariableSymbol* loopVar;
@@ -146,6 +155,7 @@ public:
     ArrayTypeCopyAssignment(ArrayTypeSymbol* arrayType_, LocalVariableSymbol* loopVar_, FunctionSymbol* elementTypeCopyAssignment_, const Span& span_);
     void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
     bool IsBasicTypeOperation() const override { return true; }
+    const char* ClassName() const override { return "ArrayTypeCopyAssignment"; }
 private:
     ArrayTypeSymbol* arrayType;
     LocalVariableSymbol* loopVar;
@@ -158,6 +168,7 @@ public:
     ArrayTypeMoveAssignment(ArrayTypeSymbol* arrayType_, LocalVariableSymbol* loopVar_, FunctionSymbol* elementTypeMoveAssignment_, const Span& span_);
     void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
     bool IsBasicTypeOperation() const override { return true; }
+    const char* ClassName() const override { return "ArrayTypeMoveAssignment"; }
 private:
     ArrayTypeSymbol* arrayType;
     LocalVariableSymbol* loopVar;
@@ -171,6 +182,7 @@ public:
     void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
     bool IsBasicTypeOperation() const override { return true; }
     bool IsArrayElementAccess() const override { return true; }
+    const char* ClassName() const override { return "ArrayTypeElementAccess"; }
 private:
     ArrayTypeSymbol* arrayType;
 };

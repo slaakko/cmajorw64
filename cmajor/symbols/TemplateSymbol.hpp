@@ -25,6 +25,8 @@ public:
     void SetDefaultStr(const std::string& defaultStr_);
     const std::string& DefaultStr() const { return defaultStr; }
     TypeSymbol* UnifyTemplateArgumentType(SymbolTable& symbolTable, const std::unordered_map<TemplateParameterSymbol*, TypeSymbol*>& templateParameterMap, const Span& span) override;
+    std::u32string Info() const override { return Name(); }
+    const char* ClassName() const override { return "TemplateParameterSymbol"; }
 private:
     bool hasDefault;
     std::string defaultStr;
@@ -38,6 +40,9 @@ public:
     bool IsExportSymbol() const override { return false; }
     TypeSymbol* GetType() const { return type; }
     void SetType(TypeSymbol* type_) { type = type_; }
+    std::unique_ptr<dom::Element> CreateDomElement(TypeMap& typeMap) override;
+    std::u32string Info() const override { return Name(); }
+    const char* ClassName() const override { return "BoundTemplateParameterSymbol"; }
 private:
     TypeSymbol* type;
 };

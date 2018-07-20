@@ -54,7 +54,7 @@ public:
     void Visit(VoidNode& voidNode) override;
 
     void Visit(BooleanLiteralNode& booleanLiteralNode) override;
-    void Visit(SByteLiteralNode& sbyteLiteralBode) override;
+    void Visit(SByteLiteralNode& sbyteLiteralNode) override;
     void Visit(ByteLiteralNode& byteLiteralNode) override;
     void Visit(ShortLiteralNode& shortLiteralNode) override;
     void Visit(UShortLiteralNode& ushortLiteralNode) override;
@@ -520,9 +520,9 @@ void ExpressionBinder::Visit(BooleanLiteralNode& booleanLiteralNode)
     expression.reset(new BoundLiteral(module, std::unique_ptr<Value>(new BoolValue(booleanLiteralNode.GetSpan(), booleanLiteralNode.Value())), symbolTable.GetTypeByName(U"bool")));
 }
 
-void ExpressionBinder::Visit(SByteLiteralNode& sbyteLiteralBode)
+void ExpressionBinder::Visit(SByteLiteralNode& sbyteLiteralNode)
 {
-    expression.reset(new BoundLiteral(module, std::unique_ptr<Value>(new SByteValue(sbyteLiteralBode.GetSpan(), sbyteLiteralBode.Value())), symbolTable.GetTypeByName(U"sbyte")));
+    expression.reset(new BoundLiteral(module, std::unique_ptr<Value>(new SByteValue(sbyteLiteralNode.GetSpan(), sbyteLiteralNode.Value())), symbolTable.GetTypeByName(U"sbyte")));
 }
 
 void ExpressionBinder::Visit(ByteLiteralNode& byteLiteralNode)

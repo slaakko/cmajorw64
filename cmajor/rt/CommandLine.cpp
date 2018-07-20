@@ -32,7 +32,7 @@ public:
     const char** Argv() const { return argv.get();  }
 private:
     static std::unique_ptr<CommandLineProcessor> instance;
-    cmajor::parser::CommandLineGrammar* grammar;
+    cmajor::parser::CommandLine* grammar;
     std::u32string commandLine;
     std::vector<std::string> args;
     int32_t argc;
@@ -59,7 +59,7 @@ bool ContainsWildCard(const std::string& filePath)
     return filePath.find('*') != std::string::npos || filePath.find('?') != std::string::npos;
 }
 
-CommandLineProcessor::CommandLineProcessor() : grammar(cmajor::parser::CommandLineGrammar::Create()), commandLine(ToUtf32(GetCommandLine())), argc(0), argv(nullptr)
+CommandLineProcessor::CommandLineProcessor() : grammar(cmajor::parser::CommandLine::Create()), commandLine(ToUtf32(GetCommandLine())), argc(0), argv(nullptr)
 {
     args = grammar->Parse(&commandLine[0], &commandLine[0] + commandLine.length(), 0, ""); 
     std::vector<std::string> newArgs;

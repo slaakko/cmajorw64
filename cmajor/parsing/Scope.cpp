@@ -15,7 +15,7 @@ namespace cmajor { namespace parsing {
 using namespace cmajor::util;
 using namespace cmajor::unicode;
 
-Scope::Scope(const std::u32string& name_, Scope* enclosingScope_): ParsingObject(name_, enclosingScope_), fullNameComputed(false)
+Scope::Scope(const std::u32string& name_, Scope* enclosingScope_) : ParsingObject(name_, enclosingScope_, ObjectKind::scope), fullNameComputed(false), ns(nullptr)
 {
 }
 
@@ -50,11 +50,17 @@ void Scope::Add(ParsingObject* object)
         std::u32string msg = U"object '" + objectFullName + U"' already exists (detected in scope '" + FullName() + U"')";
         throw std::runtime_error(ToUtf8(msg));
     }
-    if (!shortNameMap.insert(std::make_pair(object->Name(), object)).second)
+    std::vector<ParsingObject*>& objects = shortNameMap[object->Name()];
+    for (ParsingObject* o : objects)
     {
-        std::u32string msg = U"object '" + objectFullName + U"' already exists (detected in scope '" + FullName() + U"')";
-        throw std::runtime_error(ToUtf8(msg));
+        if (o == object) return;
+        if ((o->Kind() & object->Kind()) != ObjectKind::none)
+        {
+            std::u32string msg = U"object '" + objectFullName + U"' already exists (detected in scope '" + FullName() + U"')";
+            throw std::runtime_error(ToUtf8(msg));
+        }
     }
+    objects.push_back(object);
 }
 
 Scope* Scope::GetGlobalScope() const
@@ -81,7 +87,7 @@ void Scope::AddNamespace(Namespace* nsToAdd)
     {
         const std::u32string& namespaceName = nameComponents[i];
         Scope* parentScope = parent->GetScope();
-        ParsingObject* object = parentScope->Get(namespaceName);
+        ParsingObject* object = parentScope->Get(namespaceName, ObjectKind::ns);
         if (object)
         {
             if (object->IsNamespace())
@@ -110,7 +116,7 @@ void Scope::AddNamespace(Namespace* nsToAdd)
     parent->GetScope()->Add(nsToAdd);
 }
 
-ParsingObject* Scope::GetQualifiedObject(const std::u32string& qualifiedObjectName) const
+ParsingObject* Scope::GetQualifiedObject(const std::u32string& qualifiedObjectName, ObjectKind kind) const
 {
     std::vector<std::u32string> components = cmajor::util::Split(qualifiedObjectName, '.');
     int n = int(components.size());
@@ -122,21 +128,42 @@ ParsingObject* Scope::GetQualifiedObject(const std::u32string& qualifiedObjectNa
         ShortNameMapIt it = subScope->shortNameMap.find(components[i]);
         while (it != subScope->shortNameMap.end())
         {
-            ParsingObject* object = it->second;
             if (i == n - 1)
             {
-                return object;
+                for (ParsingObject* object : it->second)
+                {
+                    if ((object->Kind() & kind) != ObjectKind::none)
+                    {
+                        return object;
+                    }
+                }
             }
-            ++i;
-            subScope = object->GetScope();
-            it = subScope->shortNameMap.find(components[i]);
+            else
+            {
+                bool found = false;
+                for (ParsingObject* object : it->second)
+                {
+                    if ((object->Kind() & ObjectKind::parent) != ObjectKind::none)
+                    {
+                        ++i;
+                        subScope = object->GetScope();
+                        it = subScope->shortNameMap.find(components[i]);
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found)
+                {
+                    it = subScope->shortNameMap.end();
+                }
+            }
         }
         s = s->EnclosingScope();
     }
     return nullptr;
 }
 
-ParsingObject* Scope::Get(const std::u32string& objectName) const
+ParsingObject* Scope::Get(const std::u32string& objectName, ObjectKind kind) const
 {
     if (objectName.find('.') != std::string::npos)
     {
@@ -147,7 +174,7 @@ ParsingObject* Scope::Get(const std::u32string& objectName) const
         }
         else
         {
-            ParsingObject* object = GetQualifiedObject(objectName);
+            ParsingObject* object = GetQualifiedObject(objectName, kind);
             if (object)
             {
                 return object;
@@ -159,7 +186,13 @@ ParsingObject* Scope::Get(const std::u32string& objectName) const
         ShortNameMapIt i = shortNameMap.find(objectName);
         if (i != shortNameMap.end())
         {
-            return i->second;
+            for (ParsingObject* object : i->second)
+            {
+                if ((object->Kind() & kind) != ObjectKind::none)
+                {
+                    return object;
+                }
+            }
         }
     }
     return nullptr;
@@ -167,7 +200,7 @@ ParsingObject* Scope::Get(const std::u32string& objectName) const
 
 Namespace* Scope::GetNamespace(const std::u32string& fullNamespaceName) const
 {
-    ParsingObject* object = GetQualifiedObject(fullNamespaceName);
+    ParsingObject* object = GetQualifiedObject(fullNamespaceName, ObjectKind::ns);
     if (object)
     {
         if (object->IsNamespace())

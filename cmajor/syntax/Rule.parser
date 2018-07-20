@@ -9,11 +9,11 @@
 
 namespace cmajor.syntax
 {
-    grammar RuleGrammar
+    grammar Rule
     {
-        using ElementGrammar.Identifier;
-        using ElementGrammar.Signature;
-        using CompositeGrammar.Alternative;
+        using Element.Identifier;
+        using Element.Signature;
+        using Composite.Alternative;
         using stdlib.string;
 
         Rule(cmajor::parsing::Scope* enclosingScope): cmajor::parsing::Rule*

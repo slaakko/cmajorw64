@@ -12,11 +12,11 @@ namespace cmajor.parser
 {
     [hpp]using namespace cmajor::ast;
 
-    grammar TemplateGrammar
+    grammar Template
     {
-        using IdentifierGrammar.QualifiedId;
-        using IdentifierGrammar.Identifier;
-        using TypeExprGrammar.TypeExpr;
+        using Identifier.QualifiedId;
+        using Identifier.Identifier;
+        using TypeExpr.TypeExpr;
 
         TemplateId(ParsingContext* ctx, var std::unique_ptr<TemplateIdNode> templateId) : Node*
             ::= empty{ ctx->BeginParsingTemplateId(); }

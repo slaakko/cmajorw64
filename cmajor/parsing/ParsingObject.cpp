@@ -9,11 +9,13 @@
 
 namespace cmajor { namespace parsing {
 
-ParsingObject::ParsingObject(const std::u32string& name_): name(name_), owner(external), isOwned(false), enclosingScope(nullptr), scope(nullptr)
+ParsingObject::ParsingObject(const std::u32string& name_, ObjectKind kind_) : 
+    kind(kind_), name(name_), owner(external), isOwned(false), enclosingScope(nullptr), scope(nullptr)
 {
 }
 
-ParsingObject::ParsingObject(const std::u32string& name_, Scope* enclosingScope_): name(name_), owner(external), isOwned(false), enclosingScope(enclosingScope_), scope(nullptr)
+ParsingObject::ParsingObject(const std::u32string& name_, Scope* enclosingScope_, ObjectKind kind_) : 
+    kind(kind_), name(name_), owner(external), isOwned(false), enclosingScope(enclosingScope_), scope(nullptr)
 {
 }
 

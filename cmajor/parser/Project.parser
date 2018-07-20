@@ -9,14 +9,14 @@ namespace cmajor.parser
 {
     [hpp]using namespace cmajor::ast;
 
-    grammar ProjectGrammar
+    grammar Project
     {
         using stdlib.qualified_id;
         using stdlib.spaces_and_comments;
         skip spaces_and_comments;
 
-        Project(std::string config) : Project*
-            ::= keyword("project") qualified_id ';'{ value = new Project(qualified_id, fileName, config); }
+        Project(std::string config) : cmajor::ast::Project*
+            ::= keyword("project") qualified_id ';'{ value = new cmajor::ast::Project(qualified_id, fileName, config); }
                 (Declaration{ value->AddDeclaration(Declaration); })*
             ;
 

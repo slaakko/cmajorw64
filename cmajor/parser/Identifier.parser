@@ -10,10 +10,10 @@ namespace cmajor.parser
 {
     [hpp]using cmajor::ast::IdentifierNode;
 
-    grammar IdentifierGrammar
+    grammar Identifier
     {
         using stdlib.identifier;
-        using KeywordGrammar.Keyword;
+        using Keyword.Keyword;
 
         Identifier : IdentifierNode*
             ::= token(identifier - Keyword){ value = new IdentifierNode(span, identifier); }

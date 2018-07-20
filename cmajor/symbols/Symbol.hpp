@@ -5,9 +5,11 @@
 
 #ifndef CMAJOR_SYMBOLS_SYMBOL_INCLUDED
 #define CMAJOR_SYMBOLS_SYMBOL_INCLUDED
+#include <cmajor/symbols/TypeMap.hpp>
 #include <cmajor/ast/Attribute.hpp>
 #include <cmajor/ast/Specifier.hpp>
 #include <cmajor/ast/CompileUnit.hpp>
+#include <cmajor/dom/Element.hpp>
 #include <cmajor/parsing/Scanner.hpp>
 #include <cmajor/util/CodeFormatter.hpp>
 #include <llvm/IR/Value.h>
@@ -205,6 +207,12 @@ public:
     const std::u32string& MangledName() const { return mangledName; }
     void SetAttributes(std::unique_ptr<Attributes>&& attributes_);
     Attributes* GetAttributes() const { return attributes.get(); }
+    std::unique_ptr<dom::Element> ToDomElement(TypeMap& typeMap);
+    virtual std::unique_ptr<dom::Element> CreateDomElement(TypeMap& typeMap);
+    virtual std::u32string Info() const { return std::u32string(); }
+    virtual void AppendChildElements(dom::Element* element, TypeMap& typeMap) const {}
+    virtual bool HasProjectMembers() const { return false; }
+    virtual const char* ClassName() const { return "Symbol"; }
 private:
     SymbolType symbolType;
     Span span;

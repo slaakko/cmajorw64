@@ -49,6 +49,7 @@
     <ClInclude Include="SymbolWriter.hpp" />
     <ClInclude Include="TemplateSymbol.hpp" />
     <ClInclude Include="TypedefSymbol.hpp" />
+    <ClInclude Include="TypeMap.hpp" />
     <ClInclude Include="TypeSymbol.hpp" />
     <ClInclude Include="Value.hpp" />
     <ClInclude Include="VariableSymbol.hpp" />
@@ -85,6 +86,7 @@
     <ClCompile Include="SymbolWriter.cpp" />
     <ClCompile Include="TemplateSymbol.cpp" />
     <ClCompile Include="TypedefSymbol.cpp" />
+    <ClCompile Include="TypeMap.cpp" />
     <ClCompile Include="TypeSymbol.cpp" />
     <ClCompile Include="Value.cpp" />
     <ClCompile Include="VariableSymbol.cpp" />

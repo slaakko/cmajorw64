@@ -625,18 +625,18 @@ std::unique_ptr<cmajor::dom::Document> AnalyzeProfileData(const std::string& pro
     return analyzedProfileDataDoc;
 }
 
-ProjectGrammar* projectGrammar = nullptr;
+cmajor::parser::Project* projectGrammar = nullptr;
 
-void ReadProject(const std::string& projectFilePath, Solution& solution, bool requireProgram, std::set<std::u32string>& readProjects)
+void ReadProject(const std::string& projectFilePath, cmajor::ast::Solution& solution, bool requireProgram, std::set<std::u32string>& readProjects)
 {
     if (!projectGrammar)
     {
-        projectGrammar = ProjectGrammar::Create();
+        projectGrammar = cmajor::parser::Project::Create();
     }
     MappedInputFile projectFile(projectFilePath);
     std::u32string p(ToUtf32(std::string(projectFile.Begin(), projectFile.End())));
     std::string config = "profile";
-    std::unique_ptr<Project> project(projectGrammar->Parse(&p[0], &p[0] + p.length(), 0, projectFilePath, config));
+    std::unique_ptr<cmajor::ast::Project> project(projectGrammar->Parse(&p[0], &p[0] + p.length(), 0, projectFilePath, config));
     if (!IsSystemModule(project->Name()))
     {
         std::string systemProjectFilePath = Path::Combine(Path::Combine(Path::Combine(CmajorRootDir(), "system"), "System"), "System.cmp");
@@ -654,7 +654,7 @@ void ReadProject(const std::string& projectFilePath, Solution& solution, bool re
             throw std::runtime_error("project '" + ToUtf8(project->Name()) + "' is not a program project");
         }
     }
-    Project* proj = project.get();
+    cmajor::ast::Project* proj = project.get();
     if (readProjects.find(proj->Name()) == readProjects.cend())
     {
         solution.AddProject(std::move(project));
@@ -675,9 +675,9 @@ void ProfileProject(const std::string& projectFilePath, bool rebuildSys, bool re
     bool requireProgram = true;
     std::set<std::u32string> readProjects;
     ReadProject(projectFilePath, solution, requireProgram, readProjects);
-    std::vector<Project*> projects = solution.CreateBuildOrder();
+    std::vector<cmajor::ast::Project*> projects = solution.CreateBuildOrder();
     std::string systemModuleFilePath;
-    for (Project* project : projects)
+    for (cmajor::ast::Project* project : projects)
     {
         if (project->IsSystemProject())
         {
@@ -685,7 +685,7 @@ void ProfileProject(const std::string& projectFilePath, bool rebuildSys, bool re
             {
                 rebuildSys = true;
                 bool stop = false;
-                BuildProject(project, rootModule, stop);
+                BuildProject(project, rootModule, stop, false);
             }
             else if (GetGlobalFlag(GlobalFlags::verbose))
             {
@@ -702,7 +702,7 @@ void ProfileProject(const std::string& projectFilePath, bool rebuildSys, bool re
             {
                 rebuildApp = true;
                 bool stop = false;
-                BuildProject(project, rootModule, stop);
+                BuildProject(project, rootModule, stop, false);
             }
             else if (GetGlobalFlag(GlobalFlags::verbose))
             {
@@ -718,7 +718,7 @@ void ProfileProject(const std::string& projectFilePath, bool rebuildSys, bool re
     {
         std::cout << "Reading main module..." << std::endl;
     }
-    Project* mainProject = projects.back();
+    cmajor::ast::Project* mainProject = projects.back();
     std::string moduleFilePath = mainProject->ModuleFilePath();
     std::vector<ClassTypeSymbol*> classTypes;
     std::vector<ClassTemplateSpecializationSymbol*> classTemplateSpecializations;

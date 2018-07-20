@@ -40,6 +40,7 @@ public:
     void Write(AstWriter& writer) override;
     void Read(AstReader& reader) override;
     const IdentifierNode* Id() const { return id.get(); }
+    IdentifierNode* Id() { return id.get(); }
     const Node* DefaultTemplateArgument() const { return defaultTemplateArgument.get(); }
     Node* DefaultTemplateArgument() { return defaultTemplateArgument.get(); }
 private:

@@ -17,6 +17,9 @@ public:
     std::u32string Id() const override { return FullName(); }
     void Import(NamespaceSymbol* that, SymbolTable& symbolTable);
     bool IsGlobalNamespace() const { return Name().empty(); }
+    std::unique_ptr<dom::Element> CreateDomElement(TypeMap& typeMap) override;
+    std::u32string Info() const override { return Name(); }
+    const char* ClassName() const override { return "NamespaceSymbol"; }
 };
 
 } } // namespace cmajor::symbols

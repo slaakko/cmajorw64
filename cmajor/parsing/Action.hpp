@@ -26,7 +26,7 @@ public:
         type(type_), memfun(pm)
     {
     }
-    virtual void operator()(const char32_t* matchBegin, const char32_t* matchEnd, const Span& span, const std::string& fileName, ParsingData* parsingData, bool& pass) const
+    void operator()(const char32_t* matchBegin, const char32_t* matchEnd, const Span& span, const std::string& fileName, ParsingData* parsingData, bool& pass) const override
     {
         (type->*memfun)(matchBegin, matchEnd, span, fileName, parsingData, pass);
     }
@@ -50,7 +50,7 @@ public:
         type(type_), memfun(pm)
     {
     }
-    virtual void operator()(ParsingData* parsingData) const
+    void operator()(ParsingData* parsingData) const override
     {
         (type->*memfun)(parsingData);
     }
@@ -74,7 +74,7 @@ public:
         type(type_), memfun(pm)
     {
     }
-    virtual void operator()(ObjectStack& stack, ParsingData* parsingData) const
+    void operator()(ObjectStack& stack, ParsingData* parsingData) const override
     {
         (type->*memfun)(stack, parsingData);
     }
@@ -98,7 +98,7 @@ public:
         type(type_), memfun(pm)
     {
     }
-    virtual void operator()(ObjectStack& stack, ParsingData* parsingData, bool matched) const
+    void operator()(ObjectStack& stack, ParsingData* parsingData, bool matched) const override
     {
         (type->*memfun)(stack, parsingData, matched);
     }
@@ -114,15 +114,15 @@ public:
     ActionParser(const std::u32string& name_, cmajor::codedom::CompoundStatement* successCode_, Parser* child_);
     ActionParser(const std::u32string& name_, cmajor::codedom::CompoundStatement* successCode_, cmajor::codedom::CompoundStatement* failCode_, 
         Parser* child_);
-    virtual bool IsActionParser() const { return true; }
+    bool IsActionParser() const override { return true; }
     std::u32string MethodName() const;
     std::u32string VariableName() const;
     cmajor::codedom::CompoundStatement* SuccessCode() const { return successCode.get(); }
     cmajor::codedom::CompoundStatement* FailCode() const { return failCode.get(); }
     void SetAction(ParsingAction* action_) { action = std::unique_ptr<ParsingAction>(action_); }
     void SetFailureAction(FailureAction* failureAction_) { failureAction = std::unique_ptr<FailureAction>(failureAction_); }
-    virtual Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData);
-    virtual void Accept(Visitor& visitor);
+    Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData) override;
+    void Accept(Visitor& visitor) override;
 private:
     std::unique_ptr<cmajor::codedom::CompoundStatement> successCode;
     std::unique_ptr<cmajor::codedom::CompoundStatement> failCode;

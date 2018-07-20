@@ -1,5 +1,5 @@
-#ifndef Declaration_hpp_19449
-#define Declaration_hpp_19449
+#ifndef Declaration_hpp_5555
+#define Declaration_hpp_5555
 
 #include <cmajor/parsing/Grammar.hpp>
 #include <cmajor/parsing/Keyword.hpp>
@@ -7,18 +7,18 @@
 
 namespace cmajor { namespace code {
 
-class DeclarationGrammar : public cmajor::parsing::Grammar
+class Declaration : public cmajor::parsing::Grammar
 {
 public:
-    static DeclarationGrammar* Create();
-    static DeclarationGrammar* Create(cmajor::parsing::ParsingDomain* parsingDomain);
+    static Declaration* Create();
+    static Declaration* Create(cmajor::parsing::ParsingDomain* parsingDomain);
     cmajor::codedom::CppObject* Parse(const char32_t* start, const char32_t* end, int fileIndex, const std::string& fileName);
 private:
     std::vector<std::u32string> keywords0;
     std::vector<std::u32string> keywords1;
-    DeclarationGrammar(cmajor::parsing::ParsingDomain* parsingDomain_);
-    virtual void CreateRules();
-    virtual void GetReferencedGrammars();
+    Declaration(cmajor::parsing::ParsingDomain* parsingDomain_);
+    void CreateRules() override;
+    void GetReferencedGrammars() override;
     class BlockDeclarationRule;
     class SimpleDeclarationRule;
     class DeclSpecifierSeqRule;
@@ -38,4 +38,4 @@ private:
 
 } } // namespace cmajor.code
 
-#endif // Declaration_hpp_19449
+#endif // Declaration_hpp_5555

@@ -36,6 +36,8 @@ namespace cmdevenv
             editorTabControl.Size = new System.Drawing.Size(400, 325);
             editorTabControl.TabIndex = 0;
             editorTabControl.TabClosing += editorTabControl_TabClosing;
+            editorTabControl.Selected += EditorTabControl_Selected;
+            editModuleBuilt = false;
             editorSplitContainer.Panel1.Controls.Add(editorTabControl);
             configComboBox.SelectedIndex = 0;
             compiler = new Compiler();
@@ -53,23 +55,75 @@ namespace cmdevenv
             executor.SetExecuteReadyMethod(this, ProjectRun);
             console = new ConsoleWindow(executor);
             consoleTabPage.Controls.Add(console);
+            csscc.SccCompiler.Init();
             processRunning = false;
             buildInProgress = false;
             compileAborted = false;
             profileAborted = false;
             unitTestingAborted = false;
             strictNothrow = Configuration.Instance.StrictNothrow;
-            emitLlvm = Configuration.Instance.EmitLlvm; 
+            emitLlvm = Configuration.Instance.EmitLlvm;
             emitOptLlvm = Configuration.Instance.EmitOptLlvm;
             linkWithDebugRuntime = Configuration.Instance.LinkWithDebugRuntime;
             linkUsingMsLink = Configuration.Instance.LinkUsingMsLink;
             optimizationLevel = -1;
             errorListView.ContextMenuStrip = errorsListViewContextMenuStrip;
             string[] args = Environment.GetCommandLineArgs();
+            sccTimer.Tick += SccTimer_Tick;
             if (args.Length > 1)
             {
                 OpenProjectOrSolution(args[1]);
             }
+        }
+
+        private void EditorTabControl_Selected(object sender, TabControlEventArgs e)
+        {
+            try
+            {
+                TabPage selectedTab = editorTabControl.SelectedTab;
+                Editor editor = (Editor)selectedTab.Tag;
+                string projectFilePath = editor.SourceFile.Project.FilePath;
+                string sourceFilePath = editor.SourceFile.FilePath;
+                BuildEditModule(projectFilePath, sourceFilePath);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+
+        }
+
+        private void SccTimer_Tick(object sender, EventArgs e)
+        {
+            int code = csscc.SccCompiler.EditModuleBuilt();
+            switch (code)
+            {
+                case 1:
+                {
+                    editModuleBuilt = true;
+                    sccTimer.Stop();
+                    infoTimer.Stop();
+                    infoLabel.Text = "Edit module built.";
+                    infoTimer.Start();
+                    break;
+                }
+                case 2:
+                {
+                    sccTimer.Stop();
+                    infoTimer.Stop();
+                    infoLabel.Text = "Could not build edit module: " + csscc.SccCompiler.GetErrorMessage();
+                    infoTimer.Start();
+                    break;
+                }
+            }
+        }
+        private void BuildEditModule(string projectFilePath, string sourceFilePath)
+        {
+            editModuleBuilt = false;
+            csscc.SccCompiler.BuildEditModule(projectFilePath, sourceFilePath);
+            infoTimer.Stop();
+            infoLabel.Text = "Building edit module...";
+            sccTimer.Start();
         }
         public bool PreFilterMessage(ref Message m)
         {
@@ -495,6 +549,7 @@ namespace cmdevenv
             editorTabControl.SelectedTab = editorTab;
             SetMenuItemStatus();
             editor.Focus();
+            BuildEditModule(sourceFile.Project.FilePath, sourceFile.FilePath);
             return editor;
         }
         void editor_PositionChanged(object sender, PositionEventArgs e)
@@ -764,6 +819,7 @@ namespace cmdevenv
                 profiler.WaitForExit();
                 unitTester.DoExit();
                 unitTester.WaitForExit();
+                csscc.SccCompiler.Done();
             }
             catch (Exception ex)
             {
@@ -1014,6 +1070,7 @@ namespace cmdevenv
                         SetDefinesFor(project, config);
                     }
                     compiler.DoCompile(solution.FilePath, config, strictNothrow, emitLlvm, emitOptLlvm, linkWithDebugRuntime, linkUsingMsLink, optimizationLevel);
+                    infoTimer.Stop();
                     infoLabel.Text = "Building";
                 }
             }
@@ -1051,6 +1108,7 @@ namespace cmdevenv
                 SetState(State.compiling);
                 SetDefinesFor(project, config);
                 compiler.DoCompile(project.FilePath, config, strictNothrow, emitLlvm, emitOptLlvm, linkWithDebugRuntime, linkUsingMsLink, optimizationLevel);
+                infoTimer.Stop();
                 infoLabel.Text = "Building";
             }
             catch (Exception ex)
@@ -1081,15 +1139,18 @@ namespace cmdevenv
                     if (compiling)
                     {
                         compiling = false;
+                        infoTimer.Stop();
                         infoLabel.Text = "Compile failed";
                     }
                     else if (cleaning)
                     {
                         cleaning = false;
+                        infoTimer.Stop();
                         infoLabel.Text = "Clean failed";
                     }
                     else
                     {
+                        infoTimer.Stop();
                         infoLabel.Text = "Build failed";
                     }
                 }
@@ -1098,20 +1159,24 @@ namespace cmdevenv
                     if (compileAborted)
                     {
                         compileAborted = false;
+                        infoTimer.Stop();
                         infoLabel.Text = "Compile aborted";
                     }
                     else if (compiling)
                     {
                         compiling = false;
+                        infoTimer.Stop();
                         infoLabel.Text = "Compile succeeded";
                     }
                     else if (cleaning)
                     {
                         cleaning = false;
+                        infoTimer.Stop();
                         infoLabel.Text = "Clean succeeded";
                     }
                     else
                     {
+                        infoTimer.Stop();
                         infoLabel.Text = "Build succeeded";
                     }
                 }
@@ -1210,20 +1275,24 @@ namespace cmdevenv
                 if (compileAborted)
                 {
                     compileAborted = false;
+                    infoTimer.Stop();
                     infoLabel.Text = "Compile aborted";
                 }
                 else if (compiling)
                 {
                     compiling = false;
+                    infoTimer.Stop();
                     infoLabel.Text = "Compile succeeded";
                 }
                 else if (cleaning)
                 {
                     cleaning = false;
+                    infoTimer.Stop();
                     infoLabel.Text = "Clean succeeded";
                 }
                 else
                 {
+                    infoTimer.Stop();
                     infoLabel.Text = "Build succeeded";
                 }
             }
@@ -1255,6 +1324,7 @@ namespace cmdevenv
                     cancelToolStripMenuItem.Enabled = true;
                     profiler.DoProfile(profileDialog.RebuildSys, profileDialog.RebuildApp, profileDialog.Inclusive, profileDialog.Exclusive, profileDialog.Count, emitLlvm, emitOptLlvm, linkWithDebugRuntime,
                         linkUsingMsLink, profileDialog.Top, profileOutFile, profileDialog.Arguments, project.FilePath);
+                    infoTimer.Stop();
                     infoLabel.Text = "Profiling";
                 }
             }
@@ -1272,15 +1342,18 @@ namespace cmdevenv
             if (profileAborted)
             {
                 profileAborted = false;
+                infoTimer.Stop();
                 infoLabel.Text = "Profile aborted";
             }
             if (exitCode == 0)
             {
+                infoTimer.Stop();
                 infoLabel.Text = "Profile succeeded";
                 System.Diagnostics.Process.Start(profileOutFile);
             }
             else
             {
+                infoTimer.Stop();
                 infoLabel.Text = "Profile failed";
                 WriteOutputLine(errorMessage);
                 WriteOutputLine("exit code = " + exitCode.ToString());
@@ -1307,6 +1380,7 @@ namespace cmdevenv
                 SetState(State.unitTesting);
                 unitTestOutFile = Path.Combine(Path.GetDirectoryName(solution.FilePath), "cmunit-" + DateTime.Now.ToString("yyyyMMddTHHmmss") + ".html");
                 cancelToolStripMenuItem.Enabled = true;
+                infoTimer.Stop();
                 infoLabel.Text = "Unit testing";
                 string config = configComboBox.Text;
                 unitTester.DoUnitTest(solution.FilePath, config, null, linkWithDebugRuntime, linkUsingMsLink, unitTestOutFile);
@@ -1340,6 +1414,7 @@ namespace cmdevenv
                 SetState(State.unitTesting);
                 unitTestOutFile = Path.Combine(Path.GetDirectoryName(project.FilePath), "cmunit-" + DateTime.Now.ToString("yyyyMMddTHHmmss") + ".html");
                 cancelToolStripMenuItem.Enabled = true;
+                infoTimer.Stop();
                 infoLabel.Text = "Unit testing";
                 string config = configComboBox.Text;
                 unitTester.DoUnitTest(project.FilePath, config, file, linkWithDebugRuntime, linkUsingMsLink, unitTestOutFile);
@@ -1358,15 +1433,18 @@ namespace cmdevenv
             if (unitTestingAborted)
             {
                 unitTestingAborted = false;
+                infoTimer.Stop();
                 infoLabel.Text = "Unit testing aborted";
             }
             if (exitCode == 0)
             {
+                infoTimer.Stop();
                 infoLabel.Text = "Unit testing succeeded";
                 System.Diagnostics.Process.Start(unitTestOutFile);
             }
             else
             {
+                infoTimer.Stop();
                 infoLabel.Text = "Unit testing failed";
                 WriteOutputLine(errorMessage);
                 WriteOutputLine("exit code = " + exitCode.ToString());
@@ -1650,6 +1728,7 @@ namespace cmdevenv
                 buildInProgress = true;
                 SetState(State.compiling);
                 compiler.DoClean(solutionOrProjectFilePath, config);
+                infoTimer.Stop();
                 infoLabel.Text = "Cleaning";
             }
             catch (Exception ex)
@@ -2114,6 +2193,7 @@ namespace cmdevenv
                     {
                         Cursor.Current = Cursors.WaitCursor;
                         findResultsListView.Items.Clear();
+                        infoTimer.Stop();
                         infoLabel.Text = "Searching '" + findWhatText + "'...";
                         List<FindResult> results = Finder.Find(findSolution, findProject, findSourceFile, findDialog.MatchCase, findDialog.MatchWholeWord, findDialog.UseRegularExpression, findWhatText);
                         foreach (FindResult result in results)
@@ -2288,7 +2368,7 @@ namespace cmdevenv
                         dialog.ShowDialog();
                     }
                 }
-                    
+
             }
             catch (Exception ex)
             {
@@ -2491,6 +2571,10 @@ namespace cmdevenv
                 MessageBox.Show(ex.Message);
             }
         }
+        public bool EditModuleBuilt
+        {
+            get { return editModuleBuilt; }
+        }
         private Solution solution;
         private XTabControl editorTabControl;
         private State state;
@@ -2523,6 +2607,7 @@ namespace cmdevenv
         private bool useRegularExpression;
         private string profileOutFile;
         private string unitTestOutFile;
+        private bool editModuleBuilt;
     }
 
     public static class KeyboardUtil
@@ -2534,5 +2619,4 @@ namespace cmdevenv
             return (GetKeyState(virtualKey) & 0x8000) != 0;
         }
     }
-
 }

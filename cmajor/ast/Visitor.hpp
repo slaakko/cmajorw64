@@ -51,6 +51,7 @@ class NamespaceNode;
 class AliasNode;
 class NamespaceImportNode;
 class IdentifierNode;
+class CursorIdNode;
 class TemplateIdNode;
 class FunctionNode;
 class ClassNode;
@@ -201,7 +202,7 @@ public:
     virtual void Visit(VoidNode& voidNode) {}
 
     virtual void Visit(BooleanLiteralNode& booleanLiteralNode) {}
-    virtual void Visit(SByteLiteralNode& sbyteLiteralBode) {}
+    virtual void Visit(SByteLiteralNode& sbyteLiteralNode) {}
     virtual void Visit(ByteLiteralNode& byteLiteralNode) {}
     virtual void Visit(ShortLiteralNode& shortLiteralNode) {}
     virtual void Visit(UShortLiteralNode& ushortLiteralNode) {}
@@ -227,6 +228,7 @@ public:
     virtual void Visit(AliasNode& aliasNode) {}
     virtual void Visit(NamespaceImportNode& namespaceImportNode) {}
     virtual void Visit(IdentifierNode& identifierNode) {}
+    virtual void Visit(CursorIdNode& cursorIdNode) {}
     virtual void Visit(TemplateIdNode& templateIdNode) {}
     virtual void Visit(FunctionNode& functionNode) {}
     virtual void Visit(ClassNode& classNode) {}

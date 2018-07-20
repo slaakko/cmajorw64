@@ -1,0 +1,3 @@
+solution attrTest;
+project <attrTest.cmp>;
+activeProject attrTest;

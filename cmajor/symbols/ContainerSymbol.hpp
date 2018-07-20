@@ -30,6 +30,9 @@ public:
     ContainerScope* GetContainerScope() override { return &containerScope; }
     const std::vector<std::unique_ptr<Symbol>>& Members() const { return members; }
     std::vector<std::unique_ptr<Symbol>>& Members() { return members; }
+    void AppendChildElements(dom::Element* element, TypeMap& typeMap) const override;
+    bool HasProjectMembers() const override;
+    const char* ClassName() const override { return "ContainerSymbol"; }
 private:
     std::vector<std::unique_ptr<Symbol>> members;
     ContainerScope containerScope;
@@ -43,6 +46,7 @@ class DeclarationBlock : public ContainerSymbol
 public:
     DeclarationBlock(const Span& span_, const std::u32string& name_);
     void AddMember(Symbol* member) override;
+    const char* ClassName() const override { return "DeclarationBlock"; }
 };
 
 } } // namespace cmajor::symbols

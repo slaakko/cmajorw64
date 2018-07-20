@@ -28,6 +28,10 @@ public:
     void AddFunction(FunctionSymbol* function);
     void RemoveFunction(FunctionSymbol* function);
     void CollectViableFunctions(int arity, std::unordered_set<FunctionSymbol*>& viableFunctions);
+    bool HasProjectMembers() const override;
+    void AppendChildElements(dom::Element* element, TypeMap& typeMap) const override;
+    std::u32string Info() const override { return Name(); }
+    const char* ClassName() const override { return "FunctionGroupSymbol"; }
 private:
     std::unordered_map<int, std::vector<FunctionSymbol*>> arityFunctionListMap;
 };
@@ -194,8 +198,11 @@ public:
     void SetIntrinsic(IntrinsicFunction* intrinsic_) { intrinsic.reset(intrinsic_); }
     bool IsProgramMain() const { return isProgramMain; }
     void SetProgramMain() { isProgramMain = true; }
+    std::unique_ptr<dom::Element> CreateDomElement(TypeMap& typeMap) override;
+    std::u32string Info() const override { return groupName; }
+    const char* ClassName() const override { return "FunctionSymbol"; }
+    virtual int ClassArity() const { return 0; }
 private:
-    //uint32_t functionId;
     boost::uuids::uuid functionId;
     std::u32string groupName;
     std::vector<TemplateParameterSymbol*> templateParameters;
@@ -228,6 +235,8 @@ public:
     void Accept(SymbolCollector* collector) override {}
     void SetSpecifiers(Specifiers specifiers);
     std::u32string FullNameWithSpecifiers() const override;
+    std::u32string Info() const override { return std::u32string(); }
+    const char* ClassName() const override { return "StaticConstructorSymbol"; }
 };
    
 class ConstructorSymbol : public FunctionSymbol
@@ -242,6 +251,8 @@ public:
     uint8_t ConversionDistance() const override;
     TypeSymbol* ConversionSourceType() const override;
     TypeSymbol* ConversionTargetType() const override;
+    std::u32string Info() const override { return std::u32string(); }
+    const char* ClassName() const override { return "ConstructorSymbol"; }
 };
 
 class DestructorSymbol : public FunctionSymbol
@@ -259,6 +270,8 @@ public:
     bool DontThrow() const override { return true; }
     void SetSpecifiers(Specifiers specifiers);
     void SetGenerated() { generated = true; }
+    std::u32string Info() const override { return std::u32string(); }
+    const char* ClassName() const override { return "DestructorSymbol"; }
 private:
     bool generated;
 };
@@ -272,6 +285,7 @@ public:
     ParameterSymbol* GetThisParam() const override { if (IsStatic()) return nullptr; else return Parameters()[0]; }
     bool IsConstructorDestructorOrNonstaticMemberFunction() const override { return !IsStatic(); }
     void SetSpecifiers(Specifiers specifiers);
+    const char* ClassName() const override { return "MemberFunctionSymbol"; }
 };
 
 class ConversionFunctionSymbol : public FunctionSymbol
@@ -287,6 +301,9 @@ public:
     TypeSymbol* ConversionSourceType() const override;
     TypeSymbol* ConversionTargetType() const override;
     void SetSpecifiers(Specifiers specifiers);
+    std::unique_ptr<dom::Element> CreateDomElement(TypeMap& typeMap) override;
+    std::u32string Info() const override { return std::u32string(); }
+    const char* ClassName() const override { return "ConversionFunctionSymbol"; }
 };
 
 class FunctionGroupTypeSymbol : public TypeSymbol
@@ -299,6 +316,7 @@ public:
     const FunctionGroupSymbol* FunctionGroup() const { return functionGroup; }
     FunctionGroupSymbol* FunctionGroup() { return functionGroup; }
     void* BoundFunctionGroup() const { return boundFunctionGroup; }
+    const char* ClassName() const override { return "FunctionGroupTypeSymbol"; }
 private:
     FunctionGroupSymbol* functionGroup;
     void* boundFunctionGroup;
@@ -313,6 +331,7 @@ public:
     llvm::Constant* CreateDefaultIrValue(Emitter& emitter) override { Assert(false, "tried to get default ir value of member expression type"); return nullptr; }
     std::string TypeString() const override { return "member_expression_type"; }
     void* BoundMemberExpression() const { return boundMemberExpression; }
+    const char* ClassName() const override { return "MemberExpressionTypeSymbol"; }
 private:
     void* boundMemberExpression;
 };

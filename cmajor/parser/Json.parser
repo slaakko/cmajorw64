@@ -10,7 +10,7 @@ namespace cmajor.parser
 {
     [hpp]using namespace cmajor::util;
 
-    grammar JsonGrammar
+    grammar Json
     {
         using stdlib.spaces;
         using stdlib.escape;

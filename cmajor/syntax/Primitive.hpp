@@ -1,5 +1,5 @@
-#ifndef Primitive_hpp_20364
-#define Primitive_hpp_20364
+#ifndef Primitive_hpp_5581
+#define Primitive_hpp_5581
 
 #include <cmajor/parsing/Grammar.hpp>
 #include <cmajor/parsing/Keyword.hpp>
@@ -8,16 +8,16 @@
 
 namespace cmajor { namespace syntax {
 
-class PrimitiveGrammar : public cmajor::parsing::Grammar
+class Primitive : public cmajor::parsing::Grammar
 {
 public:
-    static PrimitiveGrammar* Create();
-    static PrimitiveGrammar* Create(cmajor::parsing::ParsingDomain* parsingDomain);
+    static Primitive* Create();
+    static Primitive* Create(cmajor::parsing::ParsingDomain* parsingDomain);
     cmajor::parsing::Parser* Parse(const char32_t* start, const char32_t* end, int fileIndex, const std::string& fileName);
 private:
-    PrimitiveGrammar(cmajor::parsing::ParsingDomain* parsingDomain_);
-    virtual void CreateRules();
-    virtual void GetReferencedGrammars();
+    Primitive(cmajor::parsing::ParsingDomain* parsingDomain_);
+    void CreateRules() override;
+    void GetReferencedGrammars() override;
     class PrimitiveRule;
     class CharRule;
     class StringRule;
@@ -82,4 +82,4 @@ private:
 
 } } // namespace cmajor.syntax
 
-#endif // Primitive_hpp_20364
+#endif // Primitive_hpp_5581

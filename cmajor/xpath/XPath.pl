@@ -1,6 +1,6 @@
 namespace cmajor.xpath
 {
-    grammar XPathGrammar
+    grammar XPath
     {
         Expr: XPathExpr*;
         OrExpr: XPathExpr*;

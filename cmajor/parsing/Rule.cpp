@@ -26,7 +26,7 @@ AttrOrVariable::AttrOrVariable(const std::u32string& typeName_, const std::u32st
 }
 
 Rule::Rule(const std::u32string& name_, Scope* enclosingScope_, int id_, Parser* definition_) :
-    Parser(name_, U"<" + name_ + U">"),
+    Parser(name_, U"<" + name_ + U">", ObjectKind::rule),
     id(id_),
     grammar(nullptr),
     definition(definition_),
@@ -41,7 +41,7 @@ Rule::Rule(const std::u32string& name_, Scope* enclosingScope_, int id_, Parser*
 }
 
 Rule::Rule(const std::u32string& name_, Scope* enclosingScope_, Parser* definition_) :
-    Parser(name_, U"<" + name_ + U">"),
+    Parser(name_, U"<" + name_ + U">", ObjectKind::rule),
     id(-1),
     grammar(nullptr),
     definition(definition_),
@@ -56,7 +56,7 @@ Rule::Rule(const std::u32string& name_, Scope* enclosingScope_, Parser* definiti
 }
 
 Rule::Rule(const std::u32string& name_, Scope* enclosingScope_) : 
-    Parser(name_, U"<" + name_ + U">"), 
+    Parser(name_, U"<" + name_ + U">", ObjectKind::rule),
     id(-1),
     grammar(nullptr),
     definition(),
@@ -85,7 +85,7 @@ void Rule::AddAction(ActionParser* action)
 
 ActionParser* Rule::GetAction(const std::u32string& actionName) const
 {
-    ParsingObject* object = GetScope()->Get(actionName);
+    ParsingObject* object = GetScope()->Get(actionName, ObjectKind::parser);
     if (!object)
     {
         ThrowException("action '" + ToUtf8(actionName) + "' not found in rule '" + ToUtf8(FullName()) + "'", GetSpan());
@@ -111,7 +111,7 @@ void Rule::AddNonterminal(NonterminalParser* nonterminal)
 
 NonterminalParser* Rule::GetNonterminal(const std::u32string& nonterminalName) const
 {
-    ParsingObject* object = GetScope()->Get(nonterminalName);
+    ParsingObject* object = GetScope()->Get(nonterminalName, ObjectKind::parser);
     if (!object)
     {
         ThrowException("nonterminal '" + ToUtf8(nonterminalName) + "' not found", GetSpan());
@@ -257,7 +257,7 @@ std::u32string GetCommonName(const std::u32string& qualifiedId)
 }
 
 RuleLink::RuleLink(const std::u32string& name_, Grammar* grammar_, const std::u32string& linkedRuleName_): 
-    ParsingObject(name_, grammar_->GetScope()), linkedRuleName(linkedRuleName_), grammar(grammar_)
+    ParsingObject(name_, grammar_->GetScope(), ObjectKind::ruleLink), linkedRuleName(linkedRuleName_), grammar(grammar_)
 {
     std::u32string prefix = GetPrefix(linkedRuleName);
     if (prefix == U"stdlib")
@@ -266,7 +266,8 @@ RuleLink::RuleLink(const std::u32string& name_, Grammar* grammar_, const std::u3
     }
 }
 
-RuleLink::RuleLink(Grammar* grammar_, const std::u32string& linkedRuleName_): ParsingObject(GetCommonName(linkedRuleName_), grammar_->GetScope()), linkedRuleName(linkedRuleName_), grammar(grammar_)
+RuleLink::RuleLink(Grammar* grammar_, const std::u32string& linkedRuleName_) : 
+    ParsingObject(GetCommonName(linkedRuleName_), grammar_->GetScope(), ObjectKind::ruleLink), linkedRuleName(linkedRuleName_), grammar(grammar_)
 {
     std::u32string prefix = GetPrefix(linkedRuleName);
     if (prefix == U"stdlib")

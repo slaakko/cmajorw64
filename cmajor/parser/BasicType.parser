@@ -9,7 +9,7 @@ namespace cmajor.parser
 {
     [hpp]using namespace cmajor::ast;
 
-    grammar BasicTypeGrammar
+    grammar BasicType
     {
         BasicType : Node*
             ::= keyword("bool"){ value = new BoolNode(span); }

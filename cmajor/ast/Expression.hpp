@@ -21,6 +21,7 @@ public:
     void Read(AstReader& reader) override;
     std::string ToString() const override;
     const IdentifierNode* MemberId() const { return memberId.get(); }
+    IdentifierNode* MemberId() { return memberId.get(); }
 private:
     std::unique_ptr<IdentifierNode> memberId;
 };
@@ -36,6 +37,7 @@ public:
     void Read(AstReader& reader) override;
     std::string ToString() const override;
     const IdentifierNode* MemberId() const { return memberId.get(); }
+    IdentifierNode* MemberId() { return memberId.get(); }
 private:
     std::unique_ptr<IdentifierNode> memberId;
 };
@@ -481,6 +483,7 @@ public:
     void Read(AstReader& reader) override;
     void AddArgument(Node* argument) override;
     const Node* TypeExpr() const { return typeExpr.get(); }
+    Node* TypeExpr() { return typeExpr.get(); }
     const NodeList<Node>& Arguments() const { return arguments; }
     std::string ToString() const override;
 private:

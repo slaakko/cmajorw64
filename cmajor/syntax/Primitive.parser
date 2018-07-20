@@ -9,7 +9,7 @@
 
 namespace cmajor.syntax
 {
-    grammar PrimitiveGrammar
+    grammar Primitive
     {
         using stdlib.char;
         using stdlib.string;
@@ -17,8 +17,8 @@ namespace cmajor.syntax
         using stdlib.int;
         using stdlib.uint;
         using stdlib.hexuint;
-        using ElementGrammar.QualifiedId;
-        using ElementGrammar.StringArray;
+        using Element.QualifiedId;
+        using Element.StringArray;
 
         Primitive: cmajor::parsing::Parser*
                         ::= Char{ value = Char; }
@@ -205,7 +205,7 @@ namespace cmajor.syntax
                             ;
 
         Number: cmajor::parsing::Parser*
-                            ::= keyword("numbr"){ value = new NumberParser(); }
+                            ::= keyword("number"){ value = new NumberParser(); }
                             ;
 
         DecimalNumber: cmajor::parsing::Parser*

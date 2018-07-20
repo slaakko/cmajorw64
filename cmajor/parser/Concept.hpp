@@ -1,5 +1,5 @@
-#ifndef Concept_hpp_391
-#define Concept_hpp_391
+#ifndef Concept_hpp_8344
+#define Concept_hpp_8344
 
 #include <cmajor/parsing/Grammar.hpp>
 #include <cmajor/parsing/Keyword.hpp>
@@ -9,16 +9,16 @@
 namespace cmajor { namespace parser {
 
 using namespace cmajor::ast;
-class ConceptGrammar : public cmajor::parsing::Grammar
+class Concept : public cmajor::parsing::Grammar
 {
 public:
-    static ConceptGrammar* Create();
-    static ConceptGrammar* Create(cmajor::parsing::ParsingDomain* parsingDomain);
+    static Concept* Create();
+    static Concept* Create(cmajor::parsing::ParsingDomain* parsingDomain);
     ConceptNode* Parse(const char32_t* start, const char32_t* end, int fileIndex, const std::string& fileName, ParsingContext* ctx);
 private:
-    ConceptGrammar(cmajor::parsing::ParsingDomain* parsingDomain_);
-    virtual void CreateRules();
-    virtual void GetReferencedGrammars();
+    Concept(cmajor::parsing::ParsingDomain* parsingDomain_);
+    void CreateRules() override;
+    void GetReferencedGrammars() override;
     class ConceptRule;
     class RefinementRule;
     class ConceptBodyRule;
@@ -47,4 +47,4 @@ private:
 
 } } // namespace cmajor.parser
 
-#endif // Concept_hpp_391
+#endif // Concept_hpp_8344

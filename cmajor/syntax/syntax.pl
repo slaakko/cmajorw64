@@ -1,6 +1,6 @@
 namespace cmajor.syntax
 {
-    grammar CompositeGrammar
+    grammar Composite
     {
         Alternative(cmajor::parsing::Scope* enclosingScope): cmajor::parsing::Parser*;
         Sequence(cmajor::parsing::Scope* enclosingScope): cmajor::parsing::Parser*;
@@ -10,13 +10,13 @@ namespace cmajor.syntax
         List(cmajor::parsing::Scope* enclosingScope): cmajor::parsing::Parser*;
         Postfix(cmajor::parsing::Scope* enclosingScope): cmajor::parsing::Parser*;
     }
-    grammar RuleGrammar
+    grammar Rule
     {
         Rule(cmajor::parsing::Scope* enclosingScope): cmajor::parsing::Rule*;
         RuleHeader(cmajor::parsing::Scope* enclosingScope): cmajor::parsing::Rule*;
         RuleBody(cmajor::parsing::Rule* rule);
     }
-    grammar ElementGrammar
+    grammar Element
     {
         RuleLink(cmajor::parsing::Grammar* grammar);
         Signature(cmajor::parsing::Rule* rule);
@@ -36,7 +36,7 @@ namespace cmajor.syntax
         StartClause(cmajor::parsing::Grammar* grammar);
         SkipClause(cmajor::parsing::Grammar* grammar);
     }
-    grammar PrimitiveGrammar
+    grammar Primitive
     {
         Primitive: cmajor::parsing::Parser*;
         Char: cmajor::parsing::Parser*;
@@ -99,7 +99,7 @@ namespace cmajor.syntax
         IdStart: cmajor::parsing::Parser*;
         IdCont: cmajor::parsing::Parser*;
     }
-    grammar ParserFileGrammar
+    grammar ParserFile
     {
         ParserFile(int id_, cmajor::parsing::ParsingDomain* parsingDomain_): ParserFileContent*;
         IncludeDirectives(ParserFileContent* parserFileContent);
@@ -109,7 +109,7 @@ namespace cmajor.syntax
         NamespaceContent(ParserFileContent* parserFileContent);
         Namespace(ParserFileContent* parserFileContent);
     }
-    grammar LibraryFileGrammar
+    grammar LibraryFile
     {
         LibraryFile(cmajor::parsing::ParsingDomain* parsingDomain);
         NamespaceContent(cmajor::parsing::ParsingDomain* parsingDomain);
@@ -118,7 +118,7 @@ namespace cmajor.syntax
         GrammarContent(cmajor::parsing::Grammar* grammar);
         Rule(cmajor::parsing::Scope* enclosingScope): cmajor::parsing::Rule*;
     }
-    grammar PrimaryGrammar
+    grammar Primary
     {
         Primary(cmajor::parsing::Scope* enclosingScope): cmajor::parsing::Parser*;
         RuleCall: cmajor::parsing::Parser*;
@@ -129,7 +129,7 @@ namespace cmajor.syntax
         Expectation(cmajor::parsing::Parser* child): cmajor::parsing::Parser*;
         Action(cmajor::parsing::Parser* child): cmajor::parsing::Parser*;
     }
-    grammar ProjectFileGrammar
+    grammar ProjectFile
     {
         ProjectFile: Project*;
         ProjectFileContent(Project* project);

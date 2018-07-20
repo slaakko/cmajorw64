@@ -29,7 +29,7 @@ public:
         cppFormatter(cppFormatter_), hppFormatter(hppFormatter_), keywordListNumber(0), keywordRuleListNumber(0)
     {
     }
-    virtual void Visit(KeywordListParser& parser)
+    void Visit(KeywordListParser& parser) override
     {
         std::string keywordVecName = "keywords" + std::to_string(keywordListNumber);
         ++keywordListNumber;
@@ -227,7 +227,7 @@ void CodeGeneratorVisitor::BeginVisit(Grammar& grammar)
             cppFormatter.WriteLine("}");
 
             // enter:
-            cppFormatter.WriteLine("virtual void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData)");
+            cppFormatter.WriteLine("void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData) override");
             cppFormatter.WriteLine("{");
             cppFormatter.IncIndent();
             cppFormatter.WriteLine("parsingData->PushContext(Id(), new Context());");
@@ -243,7 +243,7 @@ void CodeGeneratorVisitor::BeginVisit(Grammar& grammar)
             cppFormatter.DecIndent();
             cppFormatter.WriteLine("}");
             // leave:
-            cppFormatter.WriteLine("virtual void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched)");
+            cppFormatter.WriteLine("void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched) override");
             cppFormatter.WriteLine("{");
             cppFormatter.IncIndent();
             if (!rule->ValueTypeName().empty())
@@ -261,7 +261,7 @@ void CodeGeneratorVisitor::BeginVisit(Grammar& grammar)
             cppFormatter.WriteLine("}");
 
             // link:
-            cppFormatter.WriteLine("virtual void Link()");
+            cppFormatter.WriteLine("void Link() override");
             cppFormatter.WriteLine("{");
             cppFormatter.IncIndent();
             m = int(rule->Actions().size());
@@ -483,8 +483,8 @@ void CodeGeneratorVisitor::EndVisit(Grammar& grammar)
     cppFormatter.WriteLine();
 
     hppFormatter.WriteLine(ToUtf8(grammar.Name()) + "(cmajor::parsing::ParsingDomain* parsingDomain_);");
-    hppFormatter.WriteLine("virtual void CreateRules();");
-    hppFormatter.WriteLine("virtual void GetReferencedGrammars();");
+    hppFormatter.WriteLine("void CreateRules() override;");
+    hppFormatter.WriteLine("void GetReferencedGrammars() override;");
 
     int n = int(grammar.Rules().size());
     for (int i = 0; i < n; ++i)
@@ -893,6 +893,19 @@ void CodeGeneratorVisitor::BeginVisit(TokenParser& parser)
 }
 
 void CodeGeneratorVisitor::EndVisit(TokenParser& parser)
+{
+    cppFormatter.Write(")");
+    cppFormatter.DecIndent();
+}
+
+void CodeGeneratorVisitor::BeginVisit(GroupingParser& parser)
+{
+    cppFormatter.Write("new cmajor::parsing::GroupingParser(");
+    cppFormatter.IncIndent();
+    cppFormatter.NewLine();
+}
+
+void CodeGeneratorVisitor::EndVisit(GroupingParser& parser)
 {
     cppFormatter.Write(")");
     cppFormatter.DecIndent();

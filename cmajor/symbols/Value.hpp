@@ -51,6 +51,8 @@ public:
     virtual TypeSymbol* GetType(SymbolTable* symbolTable) = 0;
     const Span& GetSpan() const { return span; }
     ValueType GetValueType() const { return valueType; }
+    std::unique_ptr<dom::Element> ToDomElement();
+    virtual const char* ClassName() const { return "Value";  }
 private:
     Span span;
     ValueType valueType;
@@ -69,6 +71,7 @@ public:
     std::string ToString() const override { return value ? "true" : "false"; }
     TypeSymbol* GetType(SymbolTable* symbolTable) override;
     bool GetValue() const { return value; }
+    const char* ClassName() const override { return "BoolValue"; }
 private:
     bool value;
 };
@@ -86,6 +89,7 @@ public:
     std::string ToString() const override { return std::to_string(value); }
     TypeSymbol* GetType(SymbolTable* symbolTable) override;
     int8_t GetValue() const { return value; }
+    const char* ClassName() const override { return "SByteValue"; }
 private:
     int8_t value;
 };
@@ -103,6 +107,7 @@ public:
     std::string ToString() const override { return std::to_string(value); }
     TypeSymbol* GetType(SymbolTable* symbolTable) override;
     uint8_t GetValue() const { return value; }
+    const char* ClassName() const override { return "ByteValue"; }
 private:
     uint8_t value;
 };
@@ -120,6 +125,7 @@ public:
     std::string ToString() const override { return std::to_string(value); }
     TypeSymbol* GetType(SymbolTable* symbolTable) override;
     int16_t GetValue() const { return value; }
+    const char* ClassName() const override { return "ShortValue"; }
 private:
     int16_t value;
 };
@@ -137,6 +143,7 @@ public:
     std::string ToString() const override { return std::to_string(value); }
     TypeSymbol* GetType(SymbolTable* symbolTable) override;
     uint16_t GetValue() const { return value; }
+    const char* ClassName() const override { return "UShortValue"; }
 private:
     uint16_t value;
 };
@@ -154,6 +161,7 @@ public:
     std::string ToString() const override { return std::to_string(value); }
     TypeSymbol* GetType(SymbolTable* symbolTable) override;
     int32_t GetValue() const { return value; }
+    const char* ClassName() const override { return "IntValue"; }
 private:
     int32_t value;
 };
@@ -171,6 +179,7 @@ public:
     std::string ToString() const override { return std::to_string(value); }
     TypeSymbol* GetType(SymbolTable* symbolTable) override;
     uint32_t GetValue() const { return value; }
+    const char* ClassName() const override { return "UIntValue"; }
 private:
     uint32_t value;
 };
@@ -188,6 +197,7 @@ public:
     std::string ToString() const override { return std::to_string(value); }
     TypeSymbol* GetType(SymbolTable* symbolTable) override;
     int64_t GetValue() const { return value; }
+    const char* ClassName() const override { return "LongValue"; }
 private:
     int64_t value;
 };
@@ -205,6 +215,7 @@ public:
     std::string ToString() const override { return std::to_string(value); }
     TypeSymbol* GetType(SymbolTable* symbolTable) override;
     uint64_t GetValue() const { return value; }
+    const char* ClassName() const override { return "ULongValue"; }
 private:
     uint64_t value;
 };
@@ -222,6 +233,7 @@ public:
     std::string ToString() const override { return std::to_string(value); }
     TypeSymbol* GetType(SymbolTable* symbolTable) override;
     float GetValue() const { return value; }
+    const char* ClassName() const override { return "FloatValue"; }
 private:
     float value;
 };
@@ -239,6 +251,7 @@ public:
     std::string ToString() const override { return std::to_string(value); }
     TypeSymbol* GetType(SymbolTable* symbolTable) override;
     double GetValue() const { return value; }
+    const char* ClassName() const override { return "DoubleValue"; }
 private:
     double value;
 };
@@ -256,6 +269,7 @@ public:
     std::string ToString() const override { return std::to_string(value); }
     TypeSymbol* GetType(SymbolTable* symbolTable) override;
     unsigned char GetValue() const { return value; }
+    const char* ClassName() const override { return "CharValue"; }
 private:
     unsigned char value;
 };
@@ -273,6 +287,7 @@ public:
     std::string ToString() const override { return std::to_string(value); }
     TypeSymbol* GetType(SymbolTable* symbolTable) override;
     char16_t GetValue() const { return value; }
+    const char* ClassName() const override { return "WCharValue"; }
 private:
     char16_t value;
 };
@@ -290,6 +305,7 @@ public:
     std::string ToString() const override { return std::to_string(value); }
     TypeSymbol* GetType(SymbolTable* symbolTable) override;
     char32_t GetValue() const { return value; }
+    const char* ClassName() const override { return "UCharValue"; }
 private:
     char32_t value;
 };
@@ -305,6 +321,7 @@ public:
     Value* As(TypeSymbol* targetType, bool cast, const Span& span, bool dontThrow) const override;
     TypeSymbol* GetType(SymbolTable* symbolTable) override;
     int StringId() const { return stringId; }
+    const char* ClassName() const override { return "StringValue"; }
 private:
     int stringId;
 };
@@ -320,6 +337,7 @@ public:
     Value* As(TypeSymbol* targetType, bool cast, const Span& span, bool dontThrow) const override;
     TypeSymbol* GetType(SymbolTable* symbolTable) override;
     int StringId() const { return stringId; }
+    const char* ClassName() const override { return "WStringValue"; }
 private:
     int stringId;
 };
@@ -335,6 +353,7 @@ public:
     Value* As(TypeSymbol* targetType, bool cast, const Span& span, bool dontThrow) const override;
     TypeSymbol* GetType(SymbolTable* symbolTable) override;
     int StringId() const { return stringId; }
+    const char* ClassName() const override { return "UStringValue"; }
 private:
     int stringId;
 };
@@ -350,6 +369,7 @@ public:
     Value* As(TypeSymbol* targetType, bool cast, const Span& span, bool dontThrow) const override;
     std::string ToString() const override { return "null"; }
     TypeSymbol* GetType(SymbolTable* symbolTable) override;
+    const char* ClassName() const override { return "NullValue"; }
 private:
     TypeSymbol* nullPtrType;
 };
@@ -371,6 +391,7 @@ public:
     Value* Sub(int64_t offset) const;
     Value* Sub(const void* thatPtr) const;
     Value* Deref() const;
+    const char* ClassName() const override { return "PointerValue"; }
 private:
     TypeSymbol* type;
     const void* ptr;
@@ -389,6 +410,7 @@ public:
     TypeSymbol* GetType(SymbolTable* symbolTable) override { return type; }
     const std::vector<std::unique_ptr<Value>>& Elements() const { return elementValues; }
     std::vector<std::unique_ptr<Value>>& Elements() { return elementValues; }
+    const char* ClassName() const override { return "ArrayValue"; }
 private:
     std::vector<std::unique_ptr<Value>> elementValues;
     TypeSymbol* type;
@@ -408,6 +430,7 @@ public:
     TypeSymbol* GetType(SymbolTable* symbolTable) override { return type; }
     const std::vector<std::unique_ptr<Value>>& Members() const { return memberValues; }
     std::vector<std::unique_ptr<Value>>& Members() { return memberValues; }
+    const char* ClassName() const override { return "StructuredValue"; }
 private:
     std::vector<std::unique_ptr<Value>> memberValues;
     TypeSymbol* type;
@@ -424,6 +447,7 @@ public:
     Value* As(TypeSymbol* targetType, bool cast, const Span& span, bool dontThrow) const override;
     TypeSymbol* GetType(SymbolTable* symbolTable) override;
     int UuidId() const { return uuidId; }
+    const char* ClassName() const override { return "UuidValue"; }
 private:
     int uuidId;
 };

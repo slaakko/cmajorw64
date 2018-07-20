@@ -1,0 +1,73 @@
+using System;
+using System.Json;
+using System.Text;
+
+[json]
+public class Base
+{
+    public nothrow Base() : b(false)
+    {
+    }
+    public Base(bool b_) : b(b_)
+    {
+    }
+    public default virtual ~Base();
+    public virtual void Dump(CodeFormatter& formatter)
+    {
+        formatter.WriteLine("Base");
+    }
+    private bool b;
+}
+
+[json]
+public class Bar : Base
+{
+    public nothrow Bar() : base(), i(0)
+    {
+    }
+    public Bar(int i_) : base(true), i(i_)
+    {
+    }
+    public override void Dump(CodeFormatter& formatter)
+    {
+        formatter.WriteLine("Bar");
+    }
+    private int i;
+}
+
+[json]
+public class Foo 
+{
+    public nothrow Foo()
+    {
+    }
+    public void Dump(CodeFormatter& formatter)
+    {
+        if (bse.IsNull())
+        {
+            formatter.Write("bse : null");
+        }
+        else
+        {
+            bse->Dump(formatter);
+        }
+    }
+    public void SetB(Base* base_)
+    {
+        bse.Reset(base_);
+    }
+    private UniquePtr<Base> bse;
+}
+
+void main()
+{
+    Foo foo;
+    foo.SetB(new Bar(10));
+    UniquePtr<JsonValue> json = foo.ToJson();
+    string s = json->ToString();
+    Console.WriteLine(s);
+    UniquePtr<JsonValue> parsed = ParseJson(s);
+    Foo f(parsed.Get());
+    CodeFormatter formatter(Console.Out());
+    f.Dump(formatter);
+}

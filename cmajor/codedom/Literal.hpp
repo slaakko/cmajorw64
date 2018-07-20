@@ -13,8 +13,8 @@ class Literal: public CppObject
 {
 public:
     Literal(const std::u32string& name_);
-    virtual int Rank() const { return 24; }
-    virtual void Accept(Visitor& visitor);
+    int Rank() const override { return 24; }
+    void Accept(Visitor& visitor) override;
 };
 
 } } // namespace cmajor::codedom

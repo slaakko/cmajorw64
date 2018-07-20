@@ -106,6 +106,7 @@ public:
     bool Built() const { return built; }
     void SetBuilt() { built = true; }
     bool Ready() const;
+    void SetExcludeSourceFilePath(const std::string& excludeSourceFilePath_);
 private:
     std::u32string name;
     std::string filePath;
@@ -117,6 +118,7 @@ private:
     std::string moduleFilePath;
     std::string libraryFilePath;
     std::string executableFilePath;
+    std::string excludeSourceFilePath;
     std::vector<std::string> references;
     std::vector<std::string> referencedProjectFilePaths;
     std::vector<std::string> sourceFilePaths;

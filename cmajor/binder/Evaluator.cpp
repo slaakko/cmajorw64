@@ -136,6 +136,7 @@ public:
     VariableValueSymbol(const Span& span_, const std::u32string& name_, std::unique_ptr<Value>&& value_);
     Value* GetValue() { return value.get(); }
     void SetValue(Value* value_) { value.reset(value_); }
+    const char* ClassName() const override { return "VariableValueSymbol"; }
 private:
     std::unique_ptr<Value> value;
 };
@@ -630,7 +631,7 @@ public:
     void Visit(VoidNode& voidNode) override;
 
     void Visit(BooleanLiteralNode& booleanLiteralNode) override;
-    void Visit(SByteLiteralNode& sbyteLiteralBode) override;
+    void Visit(SByteLiteralNode& sbyteLiteralNode) override;
     void Visit(ByteLiteralNode& byteLiteralNode) override;
     void Visit(ShortLiteralNode& shortLiteralNode) override;
     void Visit(UShortLiteralNode& ushortLiteralNode) override;
@@ -2634,9 +2635,9 @@ void Evaluator::Visit(BooleanLiteralNode& booleanLiteralNode)
     value.reset(new BoolValue(booleanLiteralNode.GetSpan(), booleanLiteralNode.Value()));
 }
 
-void Evaluator::Visit(SByteLiteralNode& sbyteLiteralBode)
+void Evaluator::Visit(SByteLiteralNode& sbyteLiteralNode)
 {
-    value.reset(new SByteValue(sbyteLiteralBode.GetSpan(), sbyteLiteralBode.Value()));
+    value.reset(new SByteValue(sbyteLiteralNode.GetSpan(), sbyteLiteralNode.Value()));
 }
 
 void Evaluator::Visit(ByteLiteralNode& byteLiteralNode)

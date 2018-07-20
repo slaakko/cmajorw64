@@ -19,14 +19,14 @@ class Typedef : public DeclSpecifier
 {
 public:
     Typedef();
-    virtual void Accept(Visitor& visitor);
+    void Accept(Visitor& visitor) override;
 };
 
 class TypeSpecifier : public DeclSpecifier
 {
 public:
     TypeSpecifier(const std::u32string& name_);
-    virtual void Accept(Visitor& visitor);
+    void Accept(Visitor& visitor) override;
 };
 
 class Const : public TypeSpecifier
@@ -48,9 +48,9 @@ public:
     void AddTemplateArgument(CppObject* templateArgument);
     bool IsTemplate() const { return isTemplate; }
     bool& IsTemplate() { return isTemplate; }
-    virtual std::u32string ToString() const;
-    virtual void Print(CodeFormatter& formatter);
-    virtual void Accept(Visitor& visitor);
+    std::u32string ToString() const override;
+    void Print(CodeFormatter& formatter) override;
+    void Accept(Visitor& visitor) override;
 private:
     bool isTemplate;
     std::vector<CppObject*> templateArguments;
@@ -61,9 +61,9 @@ class Type : public CppObject
 public:
     Type();
     void Add(TypeSpecifier* typeSpecifier);
-    virtual std::u32string ToString() const;
-    virtual void Print(CodeFormatter& formatter);
-    virtual void Accept(Visitor& visitor);
+    std::u32string ToString() const override;
+    void Print(CodeFormatter& formatter) override;
+    void Accept(Visitor& visitor) override;
 private:
     std::vector<TypeSpecifier*> typeSpecifiers;
 };
@@ -80,9 +80,9 @@ public:
     TypeSpecifierVec& TypeSpecifiers() { return typeSpecifiers; }
     const std::u32string& Declarator() const { return declarator; }
     std::u32string& Declarator() { return declarator; }
-    virtual std::u32string ToString() const;
-    virtual void Print(CodeFormatter& formatter);
-    virtual void Accept(Visitor& visitor);
+    std::u32string ToString() const override;
+    void Print(CodeFormatter& formatter) override;
+    void Accept(Visitor& visitor) override;
 private:
     TypeSpecifierVec typeSpecifiers;
     std::u32string declarator;
@@ -92,7 +92,7 @@ class StorageClassSpecifier : public DeclSpecifier
 {
 public:
     StorageClassSpecifier(const std::u32string& name_): DeclSpecifier(name_) {}
-    virtual void Accept(Visitor& visitor);
+    void Accept(Visitor& visitor) override;
 };
 
 } } // namespace cmajor::codedom

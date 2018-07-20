@@ -22,6 +22,10 @@ public:
     SymbolAccess DeclaredAccess() const override { return SymbolAccess::public_; }
     void AddConcept(ConceptSymbol* concept);
     ConceptSymbol* GetConcept(int arity);
+    bool HasProjectMembers() const override;
+    void AppendChildElements(dom::Element* element, TypeMap& typeMap) const override;
+    std::u32string Info() const override { return Name(); }
+    const char* ClassName() const override { return "ConceptGroupSymbol"; }
 private:
     std::unordered_map<int, ConceptSymbol*> arityConceptMap;
 };
@@ -40,9 +44,7 @@ public:
     std::u32string SimpleName() const override { return groupName; }
     void ComputeName();
     void SetSpecifiers(Specifiers specifiers);
-    //void SetTypeId(uint32_t typeId_) { typeId = typeId_; }
     void SetTypeId(const boost::uuids::uuid& typeId_) { typeId = typeId_; }
-    //uint32_t TypeId() const { return typeId; }
     const boost::uuids::uuid& TypeId() const { return typeId; }
     const std::u32string& GroupName() const { return groupName; }
     void SetGroupName(const std::u32string& groupName_) { groupName = groupName_; }
@@ -51,8 +53,9 @@ public:
     ConceptSymbol* RefinedConcept() const { return refinedConcept; }
     void SetRefinedConcept(ConceptSymbol* refinedConcept_) { refinedConcept = refinedConcept_; }
     const std::vector<TemplateParameterSymbol*>& TemplateParameters() const { return templateParameters; }
+    std::u32string Info() const override { return groupName; }
+    const char* ClassName() const override { return "ConceptSymbol"; }
 private:
-    //uint32_t typeId;
     boost::uuids::uuid typeId;
     std::u32string groupName;
     std::vector<TemplateParameterSymbol*> templateParameters;

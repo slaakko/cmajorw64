@@ -117,18 +117,32 @@ void Element::Write(CodeFormatter& formatter)
             WriteAttributes(formatter);
             formatter.Write(">");
         }
-        bool hasMultilineContent = HasMultilineContent();
-        if (hasMultilineContent)
+        bool prevPreserveSpace = formatter.PreserveSpace();
+        if (GetAttribute(U"xml:space") == U"preserve")
+        {
+            formatter.SetPreserveSpace(true);
+        }
+        bool preserveSpace = formatter.PreserveSpace() || !HasMultilineContent();
+        if (!preserveSpace)
         {
             formatter.WriteLine();
             formatter.IncIndent();
         }
         ParentNode::Write(formatter);
-        if (hasMultilineContent)
+        if (!preserveSpace)
         {
             formatter.DecIndent();
+            formatter.WriteLine("</" + ToUtf8(Name()) + ">");
         }
-        formatter.WriteLine("</" + ToUtf8(Name()) + ">");
+        else if (prevPreserveSpace)
+        {
+            formatter.Write("</" + ToUtf8(Name()) + ">");
+        }
+        else
+        {
+            formatter.WriteLine("</" + ToUtf8(Name()) + ">");
+        }
+        formatter.SetPreserveSpace(prevPreserveSpace);
     }
     else
     {

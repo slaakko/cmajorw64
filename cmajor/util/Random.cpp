@@ -13,47 +13,47 @@
 #include <string.h>
 #include <stdio.h>
 
+namespace cmajor { namespace util {
+
 #if defined(_WIN32)
 
-unsigned int get_random_seed_from_system()
-{
-    unsigned int seed = 0;
-    errno_t retval = rand_s(&seed);
-    if (retval != 0)
+    unsigned int get_random_seed_from_system()
     {
-        perror("get_random_seed_from_system() failed");
-        exit(1);
+        unsigned int seed = 0;
+        errno_t retval = rand_s(&seed);
+        if (retval != 0)
+        {
+            perror("get_random_seed_from_system() failed");
+            exit(1);
+        }
+        return seed;
     }
-    return seed;
-}
 
 #elif defined(__linux) || defined(__unix) || defined(__posix)
 
-unsigned int get_random_seed_from_system()
-{
-    unsigned int seed = 0;
-    int fn = open("/dev/urandom", O_RDONLY);
-    if (fn == -1)
+    unsigned int get_random_seed_from_system()
     {
-        perror("get_random_seed_from_system() failed");
-        exit(1);
+        unsigned int seed = 0;
+        int fn = open("/dev/urandom", O_RDONLY);
+        if (fn == -1)
+        {
+            perror("get_random_seed_from_system() failed");
+            exit(1);
+        }
+        if (read(fn, &seed, 4) != 4)
+        {
+            perror("get_random_seed_from_system() failed");
+            exit(1);
+        }
+        close(fn);
+        return seed;
     }
-    if (read(fn, &seed, 4) != 4)
-    {
-        perror("get_random_seed_from_system() failed");
-        exit(1);
-    }
-    close(fn);
-    return seed;
-}
 
 #else
 
 #error unknown platform
 
 #endif
-
-namespace cmajor { namespace util {
 
 class MT
 {

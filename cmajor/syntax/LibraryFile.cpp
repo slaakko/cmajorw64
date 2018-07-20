@@ -19,27 +19,27 @@ using namespace cmajor::parsing;
 using namespace cmajor::util;
 using namespace cmajor::unicode;
 
-LibraryFileGrammar* LibraryFileGrammar::Create()
+LibraryFile* LibraryFile::Create()
 {
     return Create(new cmajor::parsing::ParsingDomain());
 }
 
-LibraryFileGrammar* LibraryFileGrammar::Create(cmajor::parsing::ParsingDomain* parsingDomain)
+LibraryFile* LibraryFile::Create(cmajor::parsing::ParsingDomain* parsingDomain)
 {
     RegisterParsingDomain(parsingDomain);
-    LibraryFileGrammar* grammar(new LibraryFileGrammar(parsingDomain));
+    LibraryFile* grammar(new LibraryFile(parsingDomain));
     parsingDomain->AddGrammar(grammar);
     grammar->CreateRules();
     grammar->Link();
     return grammar;
 }
 
-LibraryFileGrammar::LibraryFileGrammar(cmajor::parsing::ParsingDomain* parsingDomain_): cmajor::parsing::Grammar(ToUtf32("LibraryFileGrammar"), parsingDomain_->GetNamespaceScope(ToUtf32("cmajor.syntax")), parsingDomain_)
+LibraryFile::LibraryFile(cmajor::parsing::ParsingDomain* parsingDomain_): cmajor::parsing::Grammar(ToUtf32("LibraryFile"), parsingDomain_->GetNamespaceScope(ToUtf32("cmajor.syntax")), parsingDomain_)
 {
     SetOwner(0);
 }
 
-void LibraryFileGrammar::Parse(const char32_t* start, const char32_t* end, int fileIndex, const std::string& fileName, cmajor::parsing::ParsingDomain* parsingDomain)
+void LibraryFile::Parse(const char32_t* start, const char32_t* end, int fileIndex, const std::string& fileName, cmajor::parsing::ParsingDomain* parsingDomain)
 {
     cmajor::parsing::Scanner scanner(start, end, fileName, fileIndex, SkipRule());
     std::unique_ptr<cmajor::parsing::XmlLog> xmlLog;
@@ -72,7 +72,7 @@ void LibraryFileGrammar::Parse(const char32_t* start, const char32_t* end, int f
     }
 }
 
-class LibraryFileGrammar::LibraryFileRule : public cmajor::parsing::Rule
+class LibraryFile::LibraryFileRule : public cmajor::parsing::Rule
 {
 public:
     LibraryFileRule(const std::u32string& name_, Scope* enclosingScope_, int id_, Parser* definition_):
@@ -80,7 +80,7 @@ public:
     {
         AddInheritedAttribute(AttrOrVariable(ToUtf32("cmajor::parsing::ParsingDomain*"), ToUtf32("parsingDomain")));
     }
-    virtual void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData)
+    void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData) override
     {
         parsingData->PushContext(Id(), new Context());
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
@@ -88,11 +88,11 @@ public:
         context->parsingDomain = *static_cast<cmajor::parsing::ValueObject<cmajor::parsing::ParsingDomain*>*>(parsingDomain_value.get());
         stack.pop();
     }
-    virtual void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched)
+    void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched) override
     {
         parsingData->PopContext(Id());
     }
-    virtual void Link()
+    void Link() override
     {
         cmajor::parsing::NonterminalParser* namespaceContentNonterminalParser = GetNonterminal(ToUtf32("NamespaceContent"));
         namespaceContentNonterminalParser->SetPreCall(new cmajor::parsing::MemberPreCall<LibraryFileRule>(this, &LibraryFileRule::PreNamespaceContent));
@@ -110,7 +110,7 @@ private:
     };
 };
 
-class LibraryFileGrammar::NamespaceContentRule : public cmajor::parsing::Rule
+class LibraryFile::NamespaceContentRule : public cmajor::parsing::Rule
 {
 public:
     NamespaceContentRule(const std::u32string& name_, Scope* enclosingScope_, int id_, Parser* definition_):
@@ -118,7 +118,7 @@ public:
     {
         AddInheritedAttribute(AttrOrVariable(ToUtf32("cmajor::parsing::ParsingDomain*"), ToUtf32("parsingDomain")));
     }
-    virtual void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData)
+    void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData) override
     {
         parsingData->PushContext(Id(), new Context());
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
@@ -126,11 +126,11 @@ public:
         context->parsingDomain = *static_cast<cmajor::parsing::ValueObject<cmajor::parsing::ParsingDomain*>*>(parsingDomain_value.get());
         stack.pop();
     }
-    virtual void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched)
+    void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched) override
     {
         parsingData->PopContext(Id());
     }
-    virtual void Link()
+    void Link() override
     {
         cmajor::parsing::ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
         a0ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<NamespaceContentRule>(this, &NamespaceContentRule::A0Action));
@@ -174,7 +174,7 @@ private:
     };
 };
 
-class LibraryFileGrammar::NamespaceRule : public cmajor::parsing::Rule
+class LibraryFile::NamespaceRule : public cmajor::parsing::Rule
 {
 public:
     NamespaceRule(const std::u32string& name_, Scope* enclosingScope_, int id_, Parser* definition_):
@@ -182,7 +182,7 @@ public:
     {
         AddInheritedAttribute(AttrOrVariable(ToUtf32("cmajor::parsing::ParsingDomain*"), ToUtf32("parsingDomain")));
     }
-    virtual void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData)
+    void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData) override
     {
         parsingData->PushContext(Id(), new Context());
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
@@ -190,11 +190,11 @@ public:
         context->parsingDomain = *static_cast<cmajor::parsing::ValueObject<cmajor::parsing::ParsingDomain*>*>(parsingDomain_value.get());
         stack.pop();
     }
-    virtual void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched)
+    void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched) override
     {
         parsingData->PopContext(Id());
     }
-    virtual void Link()
+    void Link() override
     {
         cmajor::parsing::ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
         a0ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<NamespaceRule>(this, &NamespaceRule::A0Action));
@@ -239,7 +239,7 @@ private:
     };
 };
 
-class LibraryFileGrammar::GrammarRule : public cmajor::parsing::Rule
+class LibraryFile::GrammarRule : public cmajor::parsing::Rule
 {
 public:
     GrammarRule(const std::u32string& name_, Scope* enclosingScope_, int id_, Parser* definition_):
@@ -248,7 +248,7 @@ public:
         AddInheritedAttribute(AttrOrVariable(ToUtf32("cmajor::parsing::Scope*"), ToUtf32("enclosingScope")));
         SetValueTypeName(ToUtf32("cmajor::parsing::Grammar*"));
     }
-    virtual void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData)
+    void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData) override
     {
         parsingData->PushContext(Id(), new Context());
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
@@ -256,7 +256,7 @@ public:
         context->enclosingScope = *static_cast<cmajor::parsing::ValueObject<cmajor::parsing::Scope*>*>(enclosingScope_value.get());
         stack.pop();
     }
-    virtual void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched)
+    void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched) override
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
         if (matched)
@@ -265,7 +265,7 @@ public:
         }
         parsingData->PopContext(Id());
     }
-    virtual void Link()
+    void Link() override
     {
         cmajor::parsing::ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
         a0ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<GrammarRule>(this, &GrammarRule::A0Action));
@@ -305,7 +305,7 @@ private:
     };
 };
 
-class LibraryFileGrammar::GrammarContentRule : public cmajor::parsing::Rule
+class LibraryFile::GrammarContentRule : public cmajor::parsing::Rule
 {
 public:
     GrammarContentRule(const std::u32string& name_, Scope* enclosingScope_, int id_, Parser* definition_):
@@ -313,7 +313,7 @@ public:
     {
         AddInheritedAttribute(AttrOrVariable(ToUtf32("cmajor::parsing::Grammar*"), ToUtf32("grammar")));
     }
-    virtual void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData)
+    void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData) override
     {
         parsingData->PushContext(Id(), new Context());
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
@@ -321,11 +321,11 @@ public:
         context->grammar = *static_cast<cmajor::parsing::ValueObject<cmajor::parsing::Grammar*>*>(grammar_value.get());
         stack.pop();
     }
-    virtual void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched)
+    void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched) override
     {
         parsingData->PopContext(Id());
     }
-    virtual void Link()
+    void Link() override
     {
         cmajor::parsing::ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
         a0ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<GrammarContentRule>(this, &GrammarContentRule::A0Action));
@@ -362,7 +362,7 @@ private:
     };
 };
 
-class LibraryFileGrammar::RuleRule : public cmajor::parsing::Rule
+class LibraryFile::RuleRule : public cmajor::parsing::Rule
 {
 public:
     RuleRule(const std::u32string& name_, Scope* enclosingScope_, int id_, Parser* definition_):
@@ -371,7 +371,7 @@ public:
         AddInheritedAttribute(AttrOrVariable(ToUtf32("cmajor::parsing::Scope*"), ToUtf32("enclosingScope")));
         SetValueTypeName(ToUtf32("cmajor::parsing::Rule*"));
     }
-    virtual void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData)
+    void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData) override
     {
         parsingData->PushContext(Id(), new Context());
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
@@ -379,7 +379,7 @@ public:
         context->enclosingScope = *static_cast<cmajor::parsing::ValueObject<cmajor::parsing::Scope*>*>(enclosingScope_value.get());
         stack.pop();
     }
-    virtual void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched)
+    void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched) override
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
         if (matched)
@@ -388,7 +388,7 @@ public:
         }
         parsingData->PopContext(Id());
     }
-    virtual void Link()
+    void Link() override
     {
         cmajor::parsing::ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
         a0ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<RuleRule>(this, &RuleRule::A0Action));
@@ -427,7 +427,7 @@ private:
     };
 };
 
-void LibraryFileGrammar::GetReferencedGrammars()
+void LibraryFile::GetReferencedGrammars()
 {
     cmajor::parsing::ParsingDomain* pd = GetParsingDomain();
     cmajor::parsing::Grammar* grammar0 = pd->GetGrammar(ToUtf32("cmajor.parsing.stdlib"));
@@ -436,29 +436,30 @@ void LibraryFileGrammar::GetReferencedGrammars()
         grammar0 = cmajor::parsing::stdlib::Create(pd);
     }
     AddGrammarReference(grammar0);
-    cmajor::parsing::Grammar* grammar1 = pd->GetGrammar(ToUtf32("cmajor.syntax.ElementGrammar"));
+    cmajor::parsing::Grammar* grammar1 = pd->GetGrammar(ToUtf32("cmajor.syntax.Element"));
     if (!grammar1)
     {
-        grammar1 = cmajor::syntax::ElementGrammar::Create(pd);
+        grammar1 = cmajor::syntax::Element::Create(pd);
     }
     AddGrammarReference(grammar1);
 }
 
-void LibraryFileGrammar::CreateRules()
+void LibraryFile::CreateRules()
 {
     AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("identifier"), this, ToUtf32("cmajor.parsing.stdlib.identifier")));
-    AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("Signature"), this, ToUtf32("ElementGrammar.Signature")));
     AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("qualified_id"), this, ToUtf32("cmajor.parsing.stdlib.qualified_id")));
     AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("spaces_and_comments"), this, ToUtf32("cmajor.parsing.stdlib.spaces_and_comments")));
-    AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("Identifier"), this, ToUtf32("ElementGrammar.Identifier")));
+    AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("Identifier"), this, ToUtf32("Element.Identifier")));
+    AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("Signature"), this, ToUtf32("Element.Signature")));
     AddRule(new LibraryFileRule(ToUtf32("LibraryFile"), GetScope(), GetParsingDomain()->GetNextRuleId(),
         new cmajor::parsing::NonterminalParser(ToUtf32("NamespaceContent"), ToUtf32("NamespaceContent"), 1)));
     AddRule(new NamespaceContentRule(ToUtf32("NamespaceContent"), GetScope(), GetParsingDomain()->GetNextRuleId(),
         new cmajor::parsing::KleeneStarParser(
-            new cmajor::parsing::AlternativeParser(
-                new cmajor::parsing::ActionParser(ToUtf32("A0"),
-                    new cmajor::parsing::NonterminalParser(ToUtf32("Grammar"), ToUtf32("Grammar"), 1)),
-                new cmajor::parsing::NonterminalParser(ToUtf32("Namespace"), ToUtf32("Namespace"), 1)))));
+            new cmajor::parsing::GroupingParser(
+                new cmajor::parsing::AlternativeParser(
+                    new cmajor::parsing::ActionParser(ToUtf32("A0"),
+                        new cmajor::parsing::NonterminalParser(ToUtf32("Grammar"), ToUtf32("Grammar"), 1)),
+                    new cmajor::parsing::NonterminalParser(ToUtf32("Namespace"), ToUtf32("Namespace"), 1))))));
     AddRule(new NamespaceRule(ToUtf32("Namespace"), GetScope(), GetParsingDomain()->GetNextRuleId(),
         new cmajor::parsing::SequenceParser(
             new cmajor::parsing::SequenceParser(
@@ -490,8 +491,9 @@ void LibraryFileGrammar::CreateRules()
                 new cmajor::parsing::CharParser('}')))));
     AddRule(new GrammarContentRule(ToUtf32("GrammarContent"), GetScope(), GetParsingDomain()->GetNextRuleId(),
         new cmajor::parsing::KleeneStarParser(
-            new cmajor::parsing::ActionParser(ToUtf32("A0"),
-                new cmajor::parsing::NonterminalParser(ToUtf32("Rule"), ToUtf32("Rule"), 1)))));
+            new cmajor::parsing::GroupingParser(
+                new cmajor::parsing::ActionParser(ToUtf32("A0"),
+                    new cmajor::parsing::NonterminalParser(ToUtf32("Rule"), ToUtf32("Rule"), 1))))));
     AddRule(new RuleRule(ToUtf32("Rule"), GetScope(), GetParsingDomain()->GetNextRuleId(),
         new cmajor::parsing::SequenceParser(
             new cmajor::parsing::SequenceParser(

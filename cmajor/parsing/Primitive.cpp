@@ -1123,7 +1123,7 @@ Match IdStartParser::Parse(Scanner& scanner, ObjectStack& stack, ParsingData* pa
 {
     if (!scanner.AtEnd())
     {
-        if (IsIdStart(scanner.GetChar()))
+        if (IsIdStart(scanner.GetChar()) || scanner.GetChar() == '_')
         {
             ++scanner;
             return Match::One();
@@ -1145,7 +1145,7 @@ Match IdContParser::Parse(Scanner& scanner, ObjectStack& stack, ParsingData* par
 {
     if (!scanner.AtEnd())
     {
-        if (IsIdCont(scanner.GetChar()))
+        if (IsIdCont(scanner.GetChar()) || scanner.GetChar() == '_')
         {
             ++scanner;
             return Match::One();

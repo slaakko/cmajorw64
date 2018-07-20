@@ -51,9 +51,9 @@ void Generate(const std::string& projectFilePath, const std::vector<std::string>
     std::cout << "Parsing project file " << projectFilePath << "...\n";
     std::unique_ptr<cmajor::parsing::ParsingDomain> projectParsingDomain(new cmajor::parsing::ParsingDomain());
     projectParsingDomain->SetOwned();
-    ProjectFileGrammar* projectFileGrammar = ProjectFileGrammar::Create(projectParsingDomain.get());
-    LibraryFileGrammar* libraryFileGrammar = LibraryFileGrammar::Create(projectParsingDomain.get());
-    ParserFileGrammar* parserFileGrammar = ParserFileGrammar::Create(projectParsingDomain.get());
+    ProjectFile* projectFileGrammar = ProjectFile::Create(projectParsingDomain.get());
+    LibraryFile* libraryFileGrammar = LibraryFile::Create(projectParsingDomain.get());
+    ParserFile* parserFileGrammar = ParserFile::Create(projectParsingDomain.get());
     std::u32string projectFileContent = ToUtf32(ReadFile(projectFilePath));
     std::unique_ptr<Project> project(projectFileGrammar->Parse(&projectFileContent[0], &projectFileContent[0] + projectFileContent.length(), 0, projectFilePath));
     std::cout << "Compiling project '" << project->Name() << "'...\n";

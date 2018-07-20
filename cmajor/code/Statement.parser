@@ -14,18 +14,18 @@ namespace cmajor.code
 {
     [cpp]using namespace cmajor::codedom;
     
-    grammar StatementGrammar
+    grammar Statement
     {
-        using ExpressionGrammar.Expression;
-        using ExpressionGrammar.ConstantExpression;
-        using ExpressionGrammar.AssignmentExpression;
-        using DeclaratorGrammar.TypeId;
-        using DeclaratorGrammar.Declarator;
-        using DeclaratorGrammar.TypeSpecifierSeq;
-        using DeclaratorGrammar.AbstractDeclarator;
-        using IdentifierGrammar.Identifier;
-        using DeclarationGrammar.SimpleDeclaration;
-        using DeclarationGrammar.BlockDeclaration;
+        using Expression.Expression;
+        using Expression.ConstantExpression;
+        using Expression.AssignmentExpression;
+        using Declarator.TypeId;
+        using Declarator.Declarator;
+        using Declarator.TypeSpecifierSeq;
+        using Declarator.AbstractDeclarator;
+        using Identifier.Identifier;
+        using Declaration.SimpleDeclaration;
+        using Declaration.BlockDeclaration;
         using stdlib.spaces_and_comments;
         skip spaces_and_comments;
         start CompoundStatement;

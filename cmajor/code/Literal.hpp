@@ -1,5 +1,5 @@
-#ifndef Literal_hpp_19453
-#define Literal_hpp_19453
+#ifndef Literal_hpp_5555
+#define Literal_hpp_5555
 
 #include <cmajor/parsing/Grammar.hpp>
 #include <cmajor/parsing/Keyword.hpp>
@@ -7,16 +7,16 @@
 
 namespace cmajor { namespace code {
 
-class LiteralGrammar : public cmajor::parsing::Grammar
+class Literal : public cmajor::parsing::Grammar
 {
 public:
-    static LiteralGrammar* Create();
-    static LiteralGrammar* Create(cmajor::parsing::ParsingDomain* parsingDomain);
+    static Literal* Create();
+    static Literal* Create(cmajor::parsing::ParsingDomain* parsingDomain);
     cmajor::codedom::Literal* Parse(const char32_t* start, const char32_t* end, int fileIndex, const std::string& fileName);
 private:
-    LiteralGrammar(cmajor::parsing::ParsingDomain* parsingDomain_);
-    virtual void CreateRules();
-    virtual void GetReferencedGrammars();
+    Literal(cmajor::parsing::ParsingDomain* parsingDomain_);
+    void CreateRules() override;
+    void GetReferencedGrammars() override;
     class LiteralRule;
     class IntegerLiteralRule;
     class CharacterLiteralRule;
@@ -29,4 +29,4 @@ private:
 
 } } // namespace cmajor.code
 
-#endif // Literal_hpp_19453
+#endif // Literal_hpp_5555

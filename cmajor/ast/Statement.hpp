@@ -217,6 +217,7 @@ public:
     const Node* TypeExpr() const { return typeExpr.get(); }
     Node* TypeExpr() { return typeExpr.get(); }
     const IdentifierNode* Id() const { return id.get(); }
+    IdentifierNode* Id() { return id.get(); }
     const NodeList<Node>& Arguments() const { return arguments; }
 private:
     std::unique_ptr<Node> typeExpr;
@@ -307,7 +308,9 @@ public:
     bool IsBreakEnclosingStatementNode() const override { return true; }
     bool IsContinueEnclosingStatementNode() const override { return true; }
     const Node* TypeExpr() const { return typeExpr.get(); }
+    Node* TypeExpr() { return typeExpr.get(); }
     const IdentifierNode* Id() const { return id.get(); }
+    IdentifierNode* Id() { return id.get(); }
     const Node* Container() const { return container.get(); }
     Node* Container() { return container.get(); }
     const StatementNode* Action() const { return action.get(); }

@@ -13,14 +13,14 @@ namespace cmajor.code
 {
     [cpp]using namespace cmajor::codedom;
 
-    grammar DeclarationGrammar
+    grammar Declaration
     {
         using stdlib.identifier;
-        using DeclaratorGrammar.InitDeclaratorList;
-        using DeclaratorGrammar.TypeId;
-        using IdentifierGrammar.Identifier;
-        using IdentifierGrammar.QualifiedId;
-        using ExpressionGrammar.AssignmentExpression;
+        using Declarator.InitDeclaratorList;
+        using Declarator.TypeId;
+        using Identifier.Identifier;
+        using Identifier.QualifiedId;
+        using Expression.AssignmentExpression;
         
         BlockDeclaration: cmajor::codedom::CppObject*
                         ::= NamespaceAliasDefinition{ value = NamespaceAliasDefinition; }

@@ -24,7 +24,7 @@ void ParseXmlContent(const std::string& xmlContent, const std::string& systemId,
     ParseXmlContent(ToUtf32(xmlContent), systemId, contentHandler);
 }
 
-XmlGrammar* xmlGrammar = nullptr;
+Xml* xmlGrammar = nullptr;
 
 void ParseXmlContent(const std::u32string& xmlContent, const std::string& systemId, XmlContentHandler* contentHandler)
 {
@@ -33,7 +33,7 @@ void ParseXmlContent(const std::u32string& xmlContent, const std::string& system
     XmlProcessor xmlProcessor(contentStart, contentEnd, contentHandler);
     if (xmlGrammar == nullptr)
     {
-        xmlGrammar = XmlGrammar::Create();
+        xmlGrammar = Xml::Create();
     }
     xmlGrammar->Parse(contentStart, contentEnd, 0, systemId, &xmlProcessor);
 }

@@ -94,7 +94,7 @@ void PrintHelp()
         std::endl;
 }
 
-CompileUnitGrammar* compileUnitGrammar = nullptr;
+CompileUnit* compileUnitGrammar = nullptr;
 
 bool unitTestsFound = false;
 
@@ -209,14 +209,14 @@ struct UnitTest
     bool prevUnitTest;
 };
 
-int RunUnitTest(Project* project)
+int RunUnitTest(cmajor::ast::Project* project)
 {
     unitTestsFound = true;
     int exitCode = system(project->ExecutableFilePath().c_str());
     return exitCode;
 }
 
-void TestUnit(FileTable* fileTable, Project* project, CompileUnitNode* testUnit, const std::string& testName, Element* sourceFileElement, std::unique_ptr<Module>& rootModule)
+void TestUnit(FileTable* fileTable, cmajor::ast::Project* project, CompileUnitNode* testUnit, const std::string& testName, Element* sourceFileElement, std::unique_ptr<Module>& rootModule)
 {
     bool compileError = false;
     std::string compileErrorMessage;
@@ -359,14 +359,14 @@ std::vector<std::pair<std::unique_ptr<CompileUnitNode>, std::string>> SplitIntoT
     return testUnits;
 }
 
-void TestSourceFile(bool& first, Project* project, const std::string& sourceFilePath, const std::string& onlyTest, cmajor::dom::Element* projectElement, 
+void TestSourceFile(bool& first, cmajor::ast::Project* project, const std::string& sourceFilePath, const std::string& onlyTest, cmajor::dom::Element* projectElement, 
     std::unique_ptr<Module>& rootModule)
 {
     std::unique_ptr<cmajor::dom::Element> sourceFileElement(new cmajor::dom::Element(U"sourceFile"));
     sourceFileElement->SetAttribute(U"name", ToUtf32(Path::GetFileNameWithoutExtension(sourceFilePath)));
     if (!compileUnitGrammar)
     {
-        compileUnitGrammar = CompileUnitGrammar::Create();
+        compileUnitGrammar = CompileUnit::Create();
     }
     MappedInputFile sourceFile(sourceFilePath);
     FileTable fileTable;
@@ -416,7 +416,7 @@ bool SourceFileNameEquals(const std::string& fileName, const std::string& source
     return true;
 }
 
-void TestProject(Project* project, const std::string& onlySourceFile, const std::string& onlyTest, cmajor::dom::Element* parentElement, std::unique_ptr<Module>& rootModule)
+void TestProject(cmajor::ast::Project* project, const std::string& onlySourceFile, const std::string& onlyTest, cmajor::dom::Element* parentElement, std::unique_ptr<Module>& rootModule)
 {
     if (project->GetTarget() != Target::unitTest)
     {
@@ -440,8 +440,8 @@ void TestProject(Project* project, const std::string& onlySourceFile, const std:
     parentElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(projectElement.release()));
 }
 
-SolutionGrammar* solutionGrammar = nullptr;
-ProjectGrammar* projectGrammar = nullptr;
+cmajor::parser::Solution* solutionGrammar = nullptr;
+cmajor::parser::Project* projectGrammar = nullptr;
 
 bool TestProject(const std::string& projectFileName, const std::string& onlySourceFile, const std::string& onlyTest, cmajor::dom::Element* parentElement, 
     std::unique_ptr<Module>& rootModule)
@@ -449,11 +449,11 @@ bool TestProject(const std::string& projectFileName, const std::string& onlySour
     std::string config = GetConfig();
     if (!projectGrammar)
     {
-        projectGrammar = ProjectGrammar::Create();
+        projectGrammar = cmajor::parser::Project::Create();
     }
     MappedInputFile projectFile(projectFileName);
     std::u32string p(ToUtf32(std::string(projectFile.Begin(), projectFile.End())));
-    std::unique_ptr<Project> project(projectGrammar->Parse(&p[0], &p[0] + p.length(), 0, projectFileName, config));
+    std::unique_ptr<cmajor::ast::Project> project(projectGrammar->Parse(&p[0], &p[0] + p.length(), 0, projectFileName, config));
     project->ResolveDeclarations();
     if (project->GetTarget() != Target::unitTest)
     {
@@ -469,15 +469,15 @@ bool TestSolution(const std::string& solutionFileName, const std::string& onlySo
     std::unique_ptr<cmajor::dom::Element> solutionElement(new cmajor::dom::Element(U"solution"));
     if (!solutionGrammar)
     {
-        solutionGrammar = SolutionGrammar::Create();
+        solutionGrammar = cmajor::parser::Solution::Create();
     }
     if (!projectGrammar)
     {
-        projectGrammar = ProjectGrammar::Create();
+        projectGrammar = cmajor::parser::Project::Create();
     }
     MappedInputFile solutionFile(solutionFileName);
     std::u32string s(ToUtf32(std::string(solutionFile.Begin(), solutionFile.End())));
-    std::unique_ptr<Solution> solution(solutionGrammar->Parse(&s[0], &s[0] + s.length(), 0, solutionFileName));
+    std::unique_ptr<cmajor::ast::Solution> solution(solutionGrammar->Parse(&s[0], &s[0] + s.length(), 0, solutionFileName));
     solutionElement->SetAttribute(U"name", solution->Name());
     solution->ResolveDeclarations();
     std::string config = GetConfig();

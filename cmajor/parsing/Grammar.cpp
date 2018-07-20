@@ -19,14 +19,16 @@ namespace cmajor { namespace parsing {
 using namespace cmajor::util;
 using namespace cmajor::unicode;
 
-Grammar::Grammar(const std::u32string& name_, Scope* enclosingScope_): ParsingObject(name_, enclosingScope_), parsingDomain(new ParsingDomain()), ns(nullptr),
+Grammar::Grammar(const std::u32string& name_, Scope* enclosingScope_) :
+    ParsingObject(name_, enclosingScope_, ObjectKind::grammar), parsingDomain(new ParsingDomain()), ns(nullptr),
     linking(false), linked(false), contentParser(nullptr), startRule(nullptr), skipRule(nullptr), log(0), maxLogLineLength(80)
 {
     RegisterParsingDomain(parsingDomain);
     SetScope(new Scope(Name(), EnclosingScope()));
 }
 
-Grammar::Grammar(const std::u32string& name_, Scope* enclosingScope_, ParsingDomain* parsingDomain_): ParsingObject(name_, enclosingScope_), parsingDomain(parsingDomain_), ns(nullptr), 
+Grammar::Grammar(const std::u32string& name_, Scope* enclosingScope_, ParsingDomain* parsingDomain_) : 
+    ParsingObject(name_, enclosingScope_, ObjectKind::grammar), parsingDomain(parsingDomain_), ns(nullptr),
     linking(false), linked(false), contentParser(nullptr), startRule(nullptr), skipRule(nullptr), log(0), maxLogLineLength(80)
 {
     SetScope(new Scope(Name(), EnclosingScope()));
@@ -51,7 +53,7 @@ void Grammar::AddRule(Rule* rule)
 
 Rule* Grammar::GetRule(const std::u32string& ruleName) const
 {
-    ParsingObject* object = GetScope()->Get(ruleName);
+    ParsingObject* object = GetScope()->Get(ruleName, ObjectKind::rule | ObjectKind::ruleLink);
     if (!object)
     {
         ThrowException("rule '" + ToUtf8(ruleName) + "' not found in grammar '" + ToUtf8(FullName()) + "'", GetSpan());

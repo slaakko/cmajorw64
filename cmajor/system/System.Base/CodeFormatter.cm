@@ -10,7 +10,8 @@ namespace System.Text
 {
     public class CodeFormatter
     {
-        public nothrow CodeFormatter(StreamWriter& writer_) : writer(writer_), indent(0), indentSize(4), atBeginningOfLine(true), line(1), start(false), startText()
+        public nothrow CodeFormatter(StreamWriter& writer_) : 
+            writer(writer_), indent(0), indentSize(4), atBeginningOfLine(true), line(1), start(false), startText(), preserveSpace(false)
         {
         }
         public void Write(const string& text)
@@ -92,6 +93,14 @@ namespace System.Text
         {
             return writer;
         }           
+        public nothrow inline bool PreserveSpace() const 
+        { 
+            return preserveSpace; 
+        }
+        public nothrow inline void SetPreserveSpace(bool preserveSpace_) 
+        { 
+            preserveSpace = preserveSpace_; 
+        }
         private StreamWriter& writer;
         private int indent;
         private int indentSize;
@@ -99,5 +108,6 @@ namespace System.Text
         private int line;
         private bool start;
         private string startText;
+        private bool preserveSpace;
     }
 }

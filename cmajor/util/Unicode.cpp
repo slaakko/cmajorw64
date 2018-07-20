@@ -1394,15 +1394,15 @@ const Script& ScriptTable::GetScript(ScriptId id) const
 
 const Script& ScriptTable::GetScriptByShortName(const std::string& shortName) const
 {
-auto it = shortNameMap.find(MakeCanonicalPropertyName(shortName));
-if (it != shortNameMap.cend())
-{
-    return *it->second;
-}
-else
-{
-    throw UnicodeException("script '" + shortName + "' not found");
-}
+    auto it = shortNameMap.find(MakeCanonicalPropertyName(shortName));
+    if (it != shortNameMap.cend())
+    {
+        return *it->second;
+    }
+    else
+    {
+        throw UnicodeException("script '" + shortName + "' not found");
+    }
 }
 
 const Script& ScriptTable::GetScriptByLongName(const std::string& longName) const

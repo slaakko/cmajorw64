@@ -1,19 +1,19 @@
 namespace cmajor.parser
 {
-    grammar AttributeGrammar
+    grammar Attribute
     {
         Attributes: cmajor::ast::Attributes*;
         Attribute(cmajor::ast::Attributes* attributes);
     }
-    grammar BasicTypeGrammar
+    grammar BasicType
     {
         BasicType: Node*;
     }
-    grammar ConstantGrammar
+    grammar Constant
     {
         Constant(ParsingContext* ctx): ConstantNode*;
     }
-    grammar ClassGrammar
+    grammar Class
     {
         Class(ParsingContext* ctx, var std::unique_ptr<Attributes> attributes): ClassNode*;
         InheritanceAndInterfaces(ParsingContext* ctx, ClassNode* classNode);
@@ -28,22 +28,22 @@ namespace cmajor.parser
         ConversionFunction(ParsingContext* ctx, var std::unique_ptr<ConversionFunctionNode> conversionFun, var std::unique_ptr<Attributes> attributes): Node*;
         MemberVariable(ParsingContext* ctx, var std::unique_ptr<Attributes> attributes): Node*;
     }
-    grammar SolutionGrammar
+    grammar Solution
     {
-        Solution: Solution*;
+        Solution: cmajor::ast::Solution*;
         Declaration: SolutionDeclaration*;
         SolutionProjectDeclaration: SolutionDeclaration*;
         ActiveProjectDeclaration: SolutionDeclaration*;
         FilePath: std::string;
     }
-    grammar EnumerationGrammar
+    grammar Enumeration
     {
         EnumType(ParsingContext* ctx): EnumTypeNode*;
         UnderlyingType(ParsingContext* ctx): Node*;
         EnumConstants(ParsingContext* ctx, EnumTypeNode* enumType);
         EnumConstant(ParsingContext* ctx, EnumTypeNode* enumType, var Span s): EnumConstantNode*;
     }
-    grammar CommandLineGrammar
+    grammar CommandLine
     {
         CommandLine: std::vector<std::string>;
         Spaces;
@@ -53,12 +53,12 @@ namespace cmajor.parser
         EvenBackslashesAndQuotationMark: std::string;
         StringChar: std::string;
     }
-    grammar DelegateGrammar
+    grammar Delegate
     {
         Delegate(ParsingContext* ctx): DelegateNode*;
         ClassDelegate(ParsingContext* ctx): ClassDelegateNode*;
     }
-    grammar CompileUnitGrammar
+    grammar CompileUnit
     {
         CompileUnit(ParsingContext* ctx): CompileUnitNode*;
         NamespaceContent(ParsingContext* ctx, NamespaceNode* ns);
@@ -79,7 +79,7 @@ namespace cmajor.parser
         DelegateDefinition(ParsingContext* ctx): DelegateNode*;
         ClassDelegateDefinition(ParsingContext* ctx): ClassDelegateNode*;
     }
-    grammar ConceptGrammar
+    grammar Concept
     {
         Concept(ParsingContext* ctx): ConceptNode*;
         Refinement: ConceptIdNode*;
@@ -106,7 +106,7 @@ namespace cmajor.parser
         AxiomBody(ParsingContext* ctx, AxiomNode* axiom);
         AxiomStatement(ParsingContext* ctx): AxiomStatementNode*;
     }
-    grammar ExpressionGrammar
+    grammar Expression
     {
         Expression(ParsingContext* ctx): Node*;
         Equivalence(ParsingContext* ctx, var std::unique_ptr<Node> expr, var Span s): Node*;
@@ -133,25 +133,25 @@ namespace cmajor.parser
         ExpressionList(ParsingContext* ctx, Node* node);
         InvokeExpr(ParsingContext* ctx, var std::unique_ptr<Node> expr, var Span s): Node*;
     }
-    grammar FunctionGrammar
+    grammar Function
     {
         Function(ParsingContext* ctx, var std::unique_ptr<FunctionNode> fun, var Span s, var std::unique_ptr<Attributes> attributes): FunctionNode*;
         FunctionGroupId(ParsingContext* ctx, var std::unique_ptr<IdentifierNode> id): std::u32string;
         OperatorFunctionGroupId(ParsingContext* ctx, var std::unique_ptr<Node> typeExpr): std::u32string;
     }
-    grammar IdentifierGrammar
+    grammar Identifier
     {
         Identifier: IdentifierNode*;
         QualifiedId: IdentifierNode*;
     }
-    grammar InterfaceGrammar
+    grammar Interface
     {
         Interface(ParsingContext* ctx, var std::unique_ptr<Attributes> attributes): InterfaceNode*;
         InterfaceContent(ParsingContext* ctx, InterfaceNode* intf);
         InterfaceMemFun(ParsingContext* ctx, var std::unique_ptr<MemberFunctionNode> memFun, var std::unique_ptr<Attributes> attributes): Node*;
         InterfaceFunctionGroupId(var std::unique_ptr<IdentifierNode> id): std::u32string;
     }
-    grammar JsonGrammar
+    grammar Json
     {
         Value: JsonValue*;
         String: JsonString*;
@@ -159,11 +159,13 @@ namespace cmajor.parser
         Object(var std::unique_ptr<JsonString> js, var std::unique_ptr<JsonValue> jv): JsonObject*;
         Array(var std::unique_ptr<JsonValue> item): JsonArray*;
     }
-    grammar KeywordGrammar
+    grammar Keyword
     {
         Keyword;
+        PPKeyword;
+        S;
     }
-    grammar LiteralGrammar
+    grammar Literal
     {
         Literal(ParsingContext* ctx): Node*;
         BooleanLiteral: Node*;
@@ -189,14 +191,14 @@ namespace cmajor.parser
         OctalDigitSequence: uint64_t;
         Sign;
     }
-    grammar ParameterGrammar
+    grammar Parameter
     {
         ParameterList(ParsingContext* ctx, Node* owner);
         Parameter(ParsingContext* ctx): ParameterNode*;
     }
-    grammar ProjectGrammar
+    grammar Project
     {
-        Project(std::string config): Project*;
+        Project(std::string config): cmajor::ast::Project*;
         Declaration: ProjectDeclaration*;
         ReferenceDeclaration: ProjectDeclaration*;
         SourceFileDeclaration: ProjectDeclaration*;
@@ -205,19 +207,19 @@ namespace cmajor.parser
         Target: Target;
         FilePath: std::string;
     }
-    grammar SourceTokenGrammar
+    grammar SourceToken
     {
         SourceTokens(SourceTokenFormatter* formatter);
         SourceToken(SourceTokenFormatter* formatter);
         Spaces: std::u32string;
         Other: std::u32string;
     }
-    grammar SpecifierGrammar
+    grammar Specifier
     {
         Specifiers: Specifiers;
         Specifier: Specifiers;
     }
-    grammar StatementGrammar
+    grammar Statement
     {
         Statement(ParsingContext* ctx): StatementNode*;
         LabelId: std::u32string;
@@ -260,17 +262,17 @@ namespace cmajor.parser
         ConditionalCompilationPrimary: ConditionalCompilationExpressionNode*;
         Symbol: std::u32string;
     }
-    grammar TemplateGrammar
+    grammar Template
     {
         TemplateId(ParsingContext* ctx, var std::unique_ptr<TemplateIdNode> templateId): Node*;
         TemplateParameter(ParsingContext* ctx): TemplateParameterNode*;
         TemplateParameterList(ParsingContext* ctx, Node* owner);
     }
-    grammar TypedefGrammar
+    grammar Typedef
     {
         Typedef(ParsingContext* ctx): TypedefNode*;
     }
-    grammar TypeExprGrammar
+    grammar TypeExpr
     {
         TypeExpr(ParsingContext* ctx): Node*;
         PrefixTypeExpr(ParsingContext* ctx): Node*;

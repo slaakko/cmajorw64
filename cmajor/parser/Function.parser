@@ -18,16 +18,16 @@ namespace cmajor.parser
 {
     [hpp]using namespace cmajor::ast;
 
-    grammar FunctionGrammar
+    grammar Function
     {
-        using AttributeGrammar.Attributes;
-        using SpecifierGrammar.Specifiers;
-        using TypeExprGrammar.TypeExpr;
-        using TemplateGrammar.TemplateParameterList;
-        using ConceptGrammar.WhereConstraint;
-        using ParameterGrammar.ParameterList;
-        using IdentifierGrammar.Identifier;
-        using StatementGrammar.CompoundStatement;
+        using Attribute.Attributes;
+        using Specifier.Specifiers;
+        using TypeExpr.TypeExpr;
+        using Template.TemplateParameterList;
+        using Concept.WhereConstraint;
+        using Parameter.ParameterList;
+        using Identifier.Identifier;
+        using Statement.CompoundStatement;
         
         Function(ParsingContext* ctx, var std::unique_ptr<FunctionNode> fun, var Span s, var std::unique_ptr<Attributes> attributes) : FunctionNode*
             ::= ((Attributes{ attributes.reset(Attributes); })? Specifiers TypeExpr(ctx) FunctionGroupId(ctx){ fun.reset(new FunctionNode(span, Specifiers, TypeExpr, FunctionGroupId, attributes.release())); } 

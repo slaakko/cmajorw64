@@ -67,8 +67,8 @@ class PositiveParser;
 class KleeneStarParser;
 class ActionParser;
 class ExpectationParser;
-class CCOptParser;
 class TokenParser;
+class GroupingParser;
 class SequenceParser;
 class AlternativeParser;
 class DifferenceParser;
@@ -147,10 +147,10 @@ public:
     virtual void EndVisit(ActionParser& parser) {}
     virtual void BeginVisit(ExpectationParser& parser) {}
     virtual void EndVisit(ExpectationParser& parser) {}
-    virtual void BeginVisit(CCOptParser& parser) {}
-    virtual void EndVisit(CCOptParser& parser) {}
     virtual void BeginVisit(TokenParser& parser) {}
     virtual void EndVisit(TokenParser& parser) {}
+    virtual void BeginVisit(GroupingParser& parser) {}
+    virtual void EndVisit(GroupingParser& parser) {}
     virtual void BeginVisit(SequenceParser& parser) {}
     virtual void Visit(SequenceParser& parser) {}
     virtual void EndVisit(SequenceParser& parser) {}

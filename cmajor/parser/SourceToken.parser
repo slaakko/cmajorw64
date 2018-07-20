@@ -12,14 +12,15 @@ namespace cmajor.parser
 {
     [hpp]using namespace cmajor::ast;
 
-    grammar SourceTokenGrammar
+    grammar SourceToken
     {
-        using KeywordGrammar.Keyword;
-        using IdentifierGrammar.QualifiedId;
-        using LiteralGrammar.FloatingLiteral;
-        using LiteralGrammar.IntegerLiteral;
-        using LiteralGrammar.CharLiteral;
-        using LiteralGrammar.StringLiteral;
+        using Keyword.Keyword;
+        using Keyword.PPKeyword;
+        using Identifier.QualifiedId;
+        using Literal.FloatingLiteral;
+        using Literal.IntegerLiteral;
+        using Literal.CharLiteral;
+        using Literal.StringLiteral;
         using stdlib.line_comment;
         using stdlib.block_comment;
         using stdlib.newline;
@@ -31,7 +32,8 @@ namespace cmajor.parser
             ;
 
         SourceToken(SourceTokenFormatter* formatter)
-            ::= Keyword{ formatter->Keyword(std::u32string(matchBegin, matchEnd)); }
+            ::= PPKeyword{ formatter->Keyword(std::u32string(matchBegin, matchEnd)); }
+            |   Keyword{ formatter->Keyword(std::u32string(matchBegin, matchEnd)); }
             |   QualifiedId{ formatter->Identifier(std::u32string(matchBegin, matchEnd)); }
             |   (FloatingLiteral | IntegerLiteral){ formatter->Number(std::u32string(matchBegin, matchEnd)); }
             |   CharLiteral{ formatter->Char(std::u32string(matchBegin, matchEnd)); }

@@ -27,7 +27,7 @@ public:
     void SetOwned() { isOwned = true; }
     void ResetOwned() { isOwned = false; }
     virtual std::u32string ToString() const;
-    virtual void Print(CodeFormatter& formatter);
+    virtual void Print(CodeFormatter& formatter) ;
     virtual void Accept(Visitor& visitor) = 0;
     virtual int Rank() const { return 100; }
 private:

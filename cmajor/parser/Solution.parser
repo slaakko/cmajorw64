@@ -9,14 +9,14 @@ namespace cmajor.parser
 {
     [hpp]using namespace cmajor::ast;
 
-    grammar SolutionGrammar
+    grammar Solution
     {
         using stdlib.qualified_id;
         using stdlib.spaces_and_comments;
         skip spaces_and_comments;
 
-        Solution : Solution*
-            ::= keyword("solution") qualified_id ';'{ value = new Solution(qualified_id, fileName); }
+        Solution : cmajor::ast::Solution*
+            ::= keyword("solution") qualified_id ';'{ value = new cmajor::ast::Solution(qualified_id, fileName); }
                 (Declaration{ value->AddDeclaration(Declaration); })*
             ;
 

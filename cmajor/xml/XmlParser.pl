@@ -1,6 +1,6 @@
 namespace cmajor.xml
 {
-    grammar XmlGrammar
+    grammar Xml
     {
         Document(XmlProcessor* processor);
         Char;

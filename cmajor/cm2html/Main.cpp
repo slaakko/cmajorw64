@@ -180,7 +180,7 @@ int main(int argc, const char** argv)
             PrintHelp();
             return 0;
         }
-        SourceTokenGrammar* grammar = SourceTokenGrammar::Create();
+        SourceToken* grammar = SourceToken::Create();
         std::vector<std::string> sourceFiles;
         std::string styleSheetPath = "code.css";
         bool prevWasStyle = false;

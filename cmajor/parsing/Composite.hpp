@@ -24,40 +24,48 @@ class OptionalParser : public UnaryParser
 {
 public:
     OptionalParser(Parser* child_);
-    virtual Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData);
-    virtual void Accept(Visitor& visitor);
+    Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData) override;
+    void Accept(Visitor& visitor) override;
 };
 
 class PositiveParser : public UnaryParser
 {
 public:
     PositiveParser(Parser* child_);
-    virtual Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData);
-    virtual void Accept(Visitor& visitor);
+    Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData) override;
+    void Accept(Visitor& visitor) override;
 };
 
 class KleeneStarParser : public UnaryParser
 {
 public:
     KleeneStarParser(Parser* child_);
-    virtual Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData);
-    virtual void Accept(Visitor& visitor);
+    Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData) override;
+    void Accept(Visitor& visitor) override;
 };
 
 class ExpectationParser : public UnaryParser
 {
 public:
     ExpectationParser(Parser* child_);
-    virtual Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData);
-    virtual void Accept(Visitor& visitor);
+    Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData) override;
+    void Accept(Visitor& visitor) override;
 };
 
 class TokenParser : public UnaryParser
 {
 public:
     TokenParser(Parser* child_);
-    virtual Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData);
-    virtual void Accept(Visitor& visitor);
+    Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData) override;
+    void Accept(Visitor& visitor) override;
+};
+
+class GroupingParser : public UnaryParser
+{
+public:
+    GroupingParser(Parser* child_);
+    Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData) override;
+    void Accept(Visitor& visitor) override;
 };
 
 class BinaryParser : public Parser
@@ -75,48 +83,48 @@ class SequenceParser : public BinaryParser
 {
 public:
     SequenceParser(Parser* left_, Parser* right_);
-    virtual Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData);
-    virtual void Accept(Visitor& visitor);
+    Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData) override;
+    void Accept(Visitor& visitor) override;
 };
 
 class AlternativeParser : public BinaryParser
 {
 public:
     AlternativeParser(Parser* left_, Parser* right_);
-    virtual Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData);
-    virtual void Accept(Visitor& visitor);
+    Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData) override;
+    void Accept(Visitor& visitor) override;
 };
 
 class DifferenceParser : public BinaryParser
 {
 public:
     DifferenceParser(Parser* left_, Parser* right_);
-    virtual Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData);
-    virtual void Accept(Visitor& visitor);
+    Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData) override;
+    void Accept(Visitor& visitor) override;
 };
 
 class ExclusiveOrParser : public BinaryParser
 {
 public:
     ExclusiveOrParser(Parser* left_, Parser* right_);
-    virtual Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData);
-    virtual void Accept(Visitor& visitor);
+    Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData) override;
+    void Accept(Visitor& visitor) override;
 };
 
 class IntersectionParser : public BinaryParser
 {
 public:
     IntersectionParser(Parser* left_, Parser* right_);
-    virtual Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData);
-    virtual void Accept(Visitor& visitor);
+    Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData) override;
+    void Accept(Visitor& visitor) override;
 };
 
 class ListParser : public UnaryParser
 {
 public:
     ListParser(Parser* left_, Parser* right_);
-    virtual Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData);
-    virtual void Accept(Visitor& visitor);
+    Match Parse(Scanner& scanner, ObjectStack& stack, ParsingData* parsingData) override;
+    void Accept(Visitor& visitor) override;
 private:
     Parser* left;
     Parser* right;

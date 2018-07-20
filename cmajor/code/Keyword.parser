@@ -5,7 +5,7 @@
 
 namespace cmajor.code
 {
-    grammar KeywordGrammar
+    grammar Keyword
     {
         using stdlib.identifier;
         

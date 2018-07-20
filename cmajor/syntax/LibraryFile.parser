@@ -10,13 +10,13 @@
 
 namespace cmajor.syntax
 {
-    grammar LibraryFileGrammar
+    grammar LibraryFile
     {
         using stdlib.identifier;
         using stdlib.qualified_id;
         using stdlib.spaces_and_comments;
-        using ElementGrammar.Identifier;
-        using ElementGrammar.Signature;
+        using Element.Identifier;
+        using Element.Signature;
 
         skip spaces_and_comments;
 

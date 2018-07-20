@@ -25,7 +25,6 @@ DelegateTypeSymbol::DelegateTypeSymbol(const Span& span_, const std::u32string& 
 void DelegateTypeSymbol::Write(SymbolWriter& writer)
 {
     TypeSymbol::Write(writer);
-    //uint32_t returnTypeId = returnType->TypeId();
     const boost::uuids::uuid& returnTypeId = returnType->TypeId();
     writer.GetBinaryWriter().Write(returnTypeId);
     bool hasReturnParam = returnParam != nullptr;
@@ -39,7 +38,6 @@ void DelegateTypeSymbol::Write(SymbolWriter& writer)
 void DelegateTypeSymbol::Read(SymbolReader& reader)
 {
     TypeSymbol::Read(reader);
-    //uint32_t returnTypeId = reader.GetBinaryReader().ReadUInt();
     boost::uuids::uuid returnTypeId;
     reader.GetBinaryReader().ReadUuid(returnTypeId);
     GetSymbolTable()->EmplaceTypeRequest(this, returnTypeId, 0);
@@ -415,7 +413,6 @@ void DelegateTypeDefaultConstructor::Write(SymbolWriter& writer)
 void DelegateTypeDefaultConstructor::Read(SymbolReader& reader)
 {
     FunctionSymbol::Read(reader);
-    //uint32_t typeId = reader.GetBinaryReader().ReadUInt();
     boost::uuids::uuid typeId;
     reader.GetBinaryReader().ReadUuid(typeId);
     GetSymbolTable()->EmplaceTypeRequest(this, typeId, 1);
@@ -615,7 +612,6 @@ ClassDelegateTypeSymbol::ClassDelegateTypeSymbol(const Span& span_, const std::u
 void ClassDelegateTypeSymbol::Write(SymbolWriter& writer)
 {
     TypeSymbol::Write(writer);
-    //uint32_t returnTypeId = returnType->TypeId();
     const boost::uuids::uuid& returnTypeId = returnType->TypeId();
     writer.GetBinaryWriter().Write(returnTypeId);
 }
@@ -623,7 +619,6 @@ void ClassDelegateTypeSymbol::Write(SymbolWriter& writer)
 void ClassDelegateTypeSymbol::Read(SymbolReader& reader)
 {
     TypeSymbol::Read(reader);
-    //uint32_t returnTypeId = reader.GetBinaryReader().ReadUInt();
     boost::uuids::uuid returnTypeId;
     reader.GetBinaryReader().ReadUuid(returnTypeId);
     GetSymbolTable()->EmplaceTypeRequest(this, returnTypeId, -1);
@@ -742,7 +737,6 @@ void ClassDelegateTypeSymbol::Dump(CodeFormatter& formatter)
 {
     formatter.WriteLine(ToUtf8(Name()));
     formatter.WriteLine("full name: " + ToUtf8(FullNameWithSpecifiers()));
-    //formatter.WriteLine("typeid: " + std::to_string(TypeId()));
     formatter.WriteLine("typeid: " + boost::uuids::to_string(TypeId()));
 }
 
@@ -903,7 +897,6 @@ void ClassDelegateTypeDefaultConstructor::Write(SymbolWriter& writer)
 void ClassDelegateTypeDefaultConstructor::Read(SymbolReader& reader)
 {
     FunctionSymbol::Read(reader);
-    //uint32_t typeId = reader.GetBinaryReader().ReadUInt();
     boost::uuids::uuid typeId;
     reader.GetBinaryReader().ReadUuid(typeId);
     GetSymbolTable()->EmplaceTypeRequest(this, typeId, 1);

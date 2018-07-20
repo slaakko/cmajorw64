@@ -136,6 +136,38 @@ void FunctionGroupSymbol::CollectViableFunctions(int arity, std::unordered_set<F
     }
 }
 
+bool FunctionGroupSymbol::HasProjectMembers() const
+{
+    for (const auto& p : arityFunctionListMap)
+    {
+        for (FunctionSymbol* fun : p.second)
+        {
+            if (fun->IsTemplateSpecialization()) continue;
+            if (fun->IsProject())
+            {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+void FunctionGroupSymbol::AppendChildElements(dom::Element* element, TypeMap& typeMap) const
+{
+    for (const auto& p : arityFunctionListMap)
+    {
+        for (FunctionSymbol* fun : p.second)
+        {
+            if (fun->IsTemplateSpecialization()) continue;
+            if (fun->IsProject())
+            {
+                std::unique_ptr<dom::Element> functionElement = fun->ToDomElement(typeMap);
+                element->AppendChild(std::unique_ptr<dom::Node>(functionElement.release()));
+            }
+        }
+    }
+}
+
 std::string FunctionSymbolFlagStr(FunctionSymbolFlags flags)
 {
     std::string s;
@@ -291,7 +323,6 @@ void FunctionSymbol::Read(SymbolReader& reader)
         reader.GetBinaryReader().Skip(sizeOfAstNodes);
         filePathReadFrom = reader.GetBinaryReader().FileName();
     }
-    //uint32_t returnTypeId = reader.GetBinaryReader().ReadUInt();
     boost::uuids::uuid returnTypeId;
     reader.GetBinaryReader().ReadUuid(returnTypeId);
     if (!returnTypeId.is_nil())
@@ -1117,6 +1148,20 @@ llvm::FunctionType* FunctionSymbol::IrType(Emitter& emitter)
     return irType;
 }
 
+std::unique_ptr<dom::Element> FunctionSymbol::CreateDomElement(TypeMap& typeMap)
+{
+    if (IsTemplateSpecialization()) return std::unique_ptr<dom::Element>();
+    std::unique_ptr<dom::Element> element(new dom::Element(U"FunctionSymbol"));
+    if (returnType)
+    {
+        std::unique_ptr<dom::Element> returnTypeElement(new dom::Element(U"returnType"));
+        int typeId = typeMap.GetOrInsertType(returnType);
+        returnTypeElement->SetAttribute(U"ref", U"type_" + ToUtf32(std::to_string(typeId)));
+        element->AppendChild(std::unique_ptr<dom::Node>(returnTypeElement.release()));
+    }
+    return element;
+}
+
 StaticConstructorSymbol::StaticConstructorSymbol(const Span& span_, const std::u32string& name_) : FunctionSymbol(SymbolType::staticConstructorSymbol, span_, name_)
 {
     SetGroupName(U"@static_constructor");
@@ -1763,6 +1808,19 @@ void ConversionFunctionSymbol::SetSpecifiers(Specifiers specifiers)
     {
         throw Exception(GetModule(), "conversion function cannot be unit_test", GetSpan());
     }
+}
+
+std::unique_ptr<dom::Element> ConversionFunctionSymbol::CreateDomElement(TypeMap& typeMap)
+{
+    std::unique_ptr<dom::Element> element(new dom::Element(U"ConversionFunctionSymbol"));
+    if (ReturnType())
+    {
+        std::unique_ptr<dom::Element> returnTypeElement(new dom::Element(U"returnType"));
+        int typeId = typeMap.GetOrInsertType(ReturnType());
+        returnTypeElement->SetAttribute(U"ref", U"type_" + ToUtf32(std::to_string(typeId)));
+        element->AppendChild(std::unique_ptr<dom::Node>(returnTypeElement.release()));
+    }
+    return element;
 }
 
 FunctionGroupTypeSymbol::FunctionGroupTypeSymbol(FunctionGroupSymbol* functionGroup_, void* boundFunctionGroup_) : 

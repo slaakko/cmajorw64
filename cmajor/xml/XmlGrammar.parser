@@ -2,7 +2,7 @@
 
 namespace cmajor.xml
 {
-    grammar XmlGrammar
+    grammar Xml
     {
         using stdlib.uint;
         using stdlib.hexuint;

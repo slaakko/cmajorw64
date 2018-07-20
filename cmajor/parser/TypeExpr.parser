@@ -14,12 +14,12 @@ namespace cmajor.parser
 {
     [hpp]using namespace cmajor::ast;
 
-    grammar TypeExprGrammar
+    grammar TypeExpr
     {
-        using TemplateGrammar.TemplateId;
-        using IdentifierGrammar.Identifier;
-        using BasicTypeGrammar.BasicType;
-        using ExpressionGrammar.Expression;
+        using Template.TemplateId;
+        using Identifier.Identifier;
+        using BasicType.BasicType;
+        using Expression.Expression;
         using stdlib.spaces;
         skip spaces;
         

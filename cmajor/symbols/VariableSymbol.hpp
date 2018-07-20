@@ -6,6 +6,7 @@
 #ifndef CMAJOR_SYMBOLS_VARIABLE_SYMBOL_INCLUDED
 #define CMAJOR_SYMBOLS_VARIABLE_SYMBOL_INCLUDED
 #include <cmajor/symbols/Symbol.hpp>
+#include <cmajor/symbols/TypeMap.hpp>
 #include <cmajor/ir/Emitter.hpp>
 #include <llvm/IR/Instructions.h>
 
@@ -23,6 +24,8 @@ public:
     const TypeSymbol* GetType() const { return type; }
     TypeSymbol* GetType() { return type; }
     void SetType(TypeSymbol* typeSymbol) { type = typeSymbol; }
+    std::u32string Info() const override { return Name(); }
+    const char* ClassName() const override { return "VariableSymbol"; }
 private:
     TypeSymbol* type;
 };
@@ -34,6 +37,8 @@ public:
     SymbolAccess DeclaredAccess() const override { return SymbolAccess::public_; }
     std::string TypeString() const override { return "parameter"; }
     void ComputeExportClosure() override;
+    std::unique_ptr<dom::Element> CreateDomElement(TypeMap& typeMap) override;
+    const char* ClassName() const override { return "ParameterSymbol"; }
 };
 
 class LocalVariableSymbol : public VariableSymbol
@@ -42,6 +47,8 @@ public:
     LocalVariableSymbol(const Span& span_, const std::u32string& name_);
     SymbolAccess DeclaredAccess() const override { return SymbolAccess::public_; }
     bool IsExportSymbol() const override { return false; }
+    std::unique_ptr<dom::Element> CreateDomElement(TypeMap& typeMap) override;
+    const char* ClassName() const override { return "LocalVariableSymbol"; }
 };
 
 class MemberVariableSymbol : public VariableSymbol
@@ -60,6 +67,8 @@ public:
     int32_t LayoutIndex() const { return layoutIndex; }
     void SetLayoutIndex(int32_t layoutIndex_) { layoutIndex = layoutIndex_; }
     llvm::DIDerivedType* GetDIMemberType(Emitter& emitter, uint64_t offsetInBits);
+    std::unique_ptr<dom::Element> CreateDomElement(TypeMap& typeMap) override;
+    const char* ClassName() const override { return "MemberVariableSymbol"; }
 private:
     int32_t layoutIndex;
     int32_t compileUnitIndex;

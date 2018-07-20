@@ -1,6 +1,6 @@
 namespace cmajor.code
 {
-    grammar DeclarationGrammar
+    grammar Declaration
     {
         BlockDeclaration: cmajor::codedom::CppObject*;
         SimpleDeclaration(var std::unique_ptr<SimpleDeclaration> sd): cmajor::codedom::SimpleDeclaration*;
@@ -18,7 +18,7 @@ namespace cmajor.code
         UsingDeclaration: cmajor::codedom::UsingObject*;
         UsingDirective: cmajor::codedom::UsingObject*;
     }
-    grammar StatementGrammar
+    grammar Statement
     {
         Statement: cmajor::codedom::Statement*;
         LabeledStatement: cmajor::codedom::Statement*;
@@ -47,7 +47,7 @@ namespace cmajor.code
         Handler: cmajor::codedom::Handler*;
         ExceptionDeclaration(var std::unique_ptr<ExceptionDeclaration> ed): cmajor::codedom::ExceptionDeclaration*;
     }
-    grammar DeclaratorGrammar
+    grammar Declarator
     {
         InitDeclaratorList(var std::unique_ptr<InitDeclaratorList> idl): cmajor::codedom::InitDeclaratorList*;
         InitDeclarator: cmajor::codedom::InitDeclarator*;
@@ -65,7 +65,7 @@ namespace cmajor.code
         InitializerClause: cmajor::codedom::AssignInit*;
         InitializerList(cmajor::codedom::AssignInit* init);
     }
-    grammar ExpressionGrammar
+    grammar Expression
     {
         Expression: cmajor::codedom::CppObject*;
         ConstantExpression: cmajor::codedom::CppObject*;
@@ -109,7 +109,7 @@ namespace cmajor.code
         OperatorFunctionId;
         Operator;
     }
-    grammar LiteralGrammar
+    grammar Literal
     {
         Literal: cmajor::codedom::Literal*;
         IntegerLiteral: cmajor::codedom::Literal*;
@@ -144,12 +144,12 @@ namespace cmajor.code
         BooleanLiteral: cmajor::codedom::Literal*;
         PointerLiteral: cmajor::codedom::Literal*;
     }
-    grammar IdentifierGrammar
+    grammar Identifier
     {
         Identifier: std::u32string;
         QualifiedId: std::u32string;
     }
-    grammar KeywordGrammar
+    grammar Keyword
     {
         Keyword;
     }

@@ -23,27 +23,27 @@ using namespace cmajor::parsing;
 using namespace cmajor::util;
 using namespace cmajor::unicode;
 
-FunctionGrammar* FunctionGrammar::Create()
+Function* Function::Create()
 {
     return Create(new cmajor::parsing::ParsingDomain());
 }
 
-FunctionGrammar* FunctionGrammar::Create(cmajor::parsing::ParsingDomain* parsingDomain)
+Function* Function::Create(cmajor::parsing::ParsingDomain* parsingDomain)
 {
     RegisterParsingDomain(parsingDomain);
-    FunctionGrammar* grammar(new FunctionGrammar(parsingDomain));
+    Function* grammar(new Function(parsingDomain));
     parsingDomain->AddGrammar(grammar);
     grammar->CreateRules();
     grammar->Link();
     return grammar;
 }
 
-FunctionGrammar::FunctionGrammar(cmajor::parsing::ParsingDomain* parsingDomain_): cmajor::parsing::Grammar(ToUtf32("FunctionGrammar"), parsingDomain_->GetNamespaceScope(ToUtf32("cmajor.parser")), parsingDomain_)
+Function::Function(cmajor::parsing::ParsingDomain* parsingDomain_): cmajor::parsing::Grammar(ToUtf32("Function"), parsingDomain_->GetNamespaceScope(ToUtf32("cmajor.parser")), parsingDomain_)
 {
     SetOwner(0);
 }
 
-FunctionNode* FunctionGrammar::Parse(const char32_t* start, const char32_t* end, int fileIndex, const std::string& fileName, ParsingContext* ctx)
+FunctionNode* Function::Parse(const char32_t* start, const char32_t* end, int fileIndex, const std::string& fileName, ParsingContext* ctx)
 {
     cmajor::parsing::Scanner scanner(start, end, fileName, fileIndex, SkipRule());
     std::unique_ptr<cmajor::parsing::XmlLog> xmlLog;
@@ -80,7 +80,7 @@ FunctionNode* FunctionGrammar::Parse(const char32_t* start, const char32_t* end,
     return result;
 }
 
-class FunctionGrammar::FunctionRule : public cmajor::parsing::Rule
+class Function::FunctionRule : public cmajor::parsing::Rule
 {
 public:
     FunctionRule(const std::u32string& name_, Scope* enclosingScope_, int id_, Parser* definition_):
@@ -92,7 +92,7 @@ public:
         AddLocalVariable(AttrOrVariable(ToUtf32("Span"), ToUtf32("s")));
         AddLocalVariable(AttrOrVariable(ToUtf32("std::unique_ptr<Attributes>"), ToUtf32("attributes")));
     }
-    virtual void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData)
+    void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData) override
     {
         parsingData->PushContext(Id(), new Context());
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
@@ -100,7 +100,7 @@ public:
         context->ctx = *static_cast<cmajor::parsing::ValueObject<ParsingContext*>*>(ctx_value.get());
         stack.pop();
     }
-    virtual void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched)
+    void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched) override
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
         if (matched)
@@ -109,7 +109,7 @@ public:
         }
         parsingData->PopContext(Id());
     }
-    virtual void Link()
+    void Link() override
     {
         cmajor::parsing::ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
         a0ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<FunctionRule>(this, &FunctionRule::A0Action));
@@ -285,7 +285,7 @@ private:
     };
 };
 
-class FunctionGrammar::FunctionGroupIdRule : public cmajor::parsing::Rule
+class Function::FunctionGroupIdRule : public cmajor::parsing::Rule
 {
 public:
     FunctionGroupIdRule(const std::u32string& name_, Scope* enclosingScope_, int id_, Parser* definition_):
@@ -295,7 +295,7 @@ public:
         SetValueTypeName(ToUtf32("std::u32string"));
         AddLocalVariable(AttrOrVariable(ToUtf32("std::unique_ptr<IdentifierNode>"), ToUtf32("id")));
     }
-    virtual void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData)
+    void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData) override
     {
         parsingData->PushContext(Id(), new Context());
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
@@ -303,7 +303,7 @@ public:
         context->ctx = *static_cast<cmajor::parsing::ValueObject<ParsingContext*>*>(ctx_value.get());
         stack.pop();
     }
-    virtual void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched)
+    void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched) override
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
         if (matched)
@@ -312,7 +312,7 @@ public:
         }
         parsingData->PopContext(Id());
     }
-    virtual void Link()
+    void Link() override
     {
         cmajor::parsing::ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
         a0ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<FunctionGroupIdRule>(this, &FunctionGroupIdRule::A0Action));
@@ -372,7 +372,7 @@ private:
     };
 };
 
-class FunctionGrammar::OperatorFunctionGroupIdRule : public cmajor::parsing::Rule
+class Function::OperatorFunctionGroupIdRule : public cmajor::parsing::Rule
 {
 public:
     OperatorFunctionGroupIdRule(const std::u32string& name_, Scope* enclosingScope_, int id_, Parser* definition_):
@@ -382,7 +382,7 @@ public:
         SetValueTypeName(ToUtf32("std::u32string"));
         AddLocalVariable(AttrOrVariable(ToUtf32("std::unique_ptr<Node>"), ToUtf32("typeExpr")));
     }
-    virtual void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData)
+    void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData) override
     {
         parsingData->PushContext(Id(), new Context());
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
@@ -390,7 +390,7 @@ public:
         context->ctx = *static_cast<cmajor::parsing::ValueObject<ParsingContext*>*>(ctx_value.get());
         stack.pop();
     }
-    virtual void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched)
+    void Leave(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData, bool matched) override
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
         if (matched)
@@ -399,7 +399,7 @@ public:
         }
         parsingData->PopContext(Id());
     }
-    virtual void Link()
+    void Link() override
     {
         cmajor::parsing::ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
         a0ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<OperatorFunctionGroupIdRule>(this, &OperatorFunctionGroupIdRule::A0Action));
@@ -578,96 +578,100 @@ private:
     };
 };
 
-void FunctionGrammar::GetReferencedGrammars()
+void Function::GetReferencedGrammars()
 {
     cmajor::parsing::ParsingDomain* pd = GetParsingDomain();
-    cmajor::parsing::Grammar* grammar0 = pd->GetGrammar(ToUtf32("cmajor.parser.AttributeGrammar"));
+    cmajor::parsing::Grammar* grammar0 = pd->GetGrammar(ToUtf32("cmajor.parser.TypeExpr"));
     if (!grammar0)
     {
-        grammar0 = cmajor::parser::AttributeGrammar::Create(pd);
+        grammar0 = cmajor::parser::TypeExpr::Create(pd);
     }
     AddGrammarReference(grammar0);
-    cmajor::parsing::Grammar* grammar1 = pd->GetGrammar(ToUtf32("cmajor.parser.ParameterGrammar"));
+    cmajor::parsing::Grammar* grammar1 = pd->GetGrammar(ToUtf32("cmajor.parser.Identifier"));
     if (!grammar1)
     {
-        grammar1 = cmajor::parser::ParameterGrammar::Create(pd);
+        grammar1 = cmajor::parser::Identifier::Create(pd);
     }
     AddGrammarReference(grammar1);
-    cmajor::parsing::Grammar* grammar2 = pd->GetGrammar(ToUtf32("cmajor.parser.ConceptGrammar"));
+    cmajor::parsing::Grammar* grammar2 = pd->GetGrammar(ToUtf32("cmajor.parser.Specifier"));
     if (!grammar2)
     {
-        grammar2 = cmajor::parser::ConceptGrammar::Create(pd);
+        grammar2 = cmajor::parser::Specifier::Create(pd);
     }
     AddGrammarReference(grammar2);
-    cmajor::parsing::Grammar* grammar3 = pd->GetGrammar(ToUtf32("cmajor.parser.SpecifierGrammar"));
+    cmajor::parsing::Grammar* grammar3 = pd->GetGrammar(ToUtf32("cmajor.parser.Attribute"));
     if (!grammar3)
     {
-        grammar3 = cmajor::parser::SpecifierGrammar::Create(pd);
+        grammar3 = cmajor::parser::Attribute::Create(pd);
     }
     AddGrammarReference(grammar3);
-    cmajor::parsing::Grammar* grammar4 = pd->GetGrammar(ToUtf32("cmajor.parser.TemplateGrammar"));
+    cmajor::parsing::Grammar* grammar4 = pd->GetGrammar(ToUtf32("cmajor.parser.Template"));
     if (!grammar4)
     {
-        grammar4 = cmajor::parser::TemplateGrammar::Create(pd);
+        grammar4 = cmajor::parser::Template::Create(pd);
     }
     AddGrammarReference(grammar4);
-    cmajor::parsing::Grammar* grammar5 = pd->GetGrammar(ToUtf32("cmajor.parser.IdentifierGrammar"));
+    cmajor::parsing::Grammar* grammar5 = pd->GetGrammar(ToUtf32("cmajor.parser.Statement"));
     if (!grammar5)
     {
-        grammar5 = cmajor::parser::IdentifierGrammar::Create(pd);
+        grammar5 = cmajor::parser::Statement::Create(pd);
     }
     AddGrammarReference(grammar5);
-    cmajor::parsing::Grammar* grammar6 = pd->GetGrammar(ToUtf32("cmajor.parser.StatementGrammar"));
+    cmajor::parsing::Grammar* grammar6 = pd->GetGrammar(ToUtf32("cmajor.parser.Concept"));
     if (!grammar6)
     {
-        grammar6 = cmajor::parser::StatementGrammar::Create(pd);
+        grammar6 = cmajor::parser::Concept::Create(pd);
     }
     AddGrammarReference(grammar6);
-    cmajor::parsing::Grammar* grammar7 = pd->GetGrammar(ToUtf32("cmajor.parser.TypeExprGrammar"));
+    cmajor::parsing::Grammar* grammar7 = pd->GetGrammar(ToUtf32("cmajor.parser.Parameter"));
     if (!grammar7)
     {
-        grammar7 = cmajor::parser::TypeExprGrammar::Create(pd);
+        grammar7 = cmajor::parser::Parameter::Create(pd);
     }
     AddGrammarReference(grammar7);
 }
 
-void FunctionGrammar::CreateRules()
+void Function::CreateRules()
 {
-    AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("ParameterList"), this, ToUtf32("ParameterGrammar.ParameterList")));
-    AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("Attributes"), this, ToUtf32("AttributeGrammar.Attributes")));
-    AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("Specifiers"), this, ToUtf32("SpecifierGrammar.Specifiers")));
-    AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("Identifier"), this, ToUtf32("IdentifierGrammar.Identifier")));
-    AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("TemplateParameterList"), this, ToUtf32("TemplateGrammar.TemplateParameterList")));
-    AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("TypeExpr"), this, ToUtf32("TypeExprGrammar.TypeExpr")));
-    AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("WhereConstraint"), this, ToUtf32("ConceptGrammar.WhereConstraint")));
-    AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("CompoundStatement"), this, ToUtf32("StatementGrammar.CompoundStatement")));
+    AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("Attributes"), this, ToUtf32("Attribute.Attributes")));
+    AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("TemplateParameterList"), this, ToUtf32("Template.TemplateParameterList")));
+    AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("Specifiers"), this, ToUtf32("Specifier.Specifiers")));
+    AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("CompoundStatement"), this, ToUtf32("Statement.CompoundStatement")));
+    AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("Identifier"), this, ToUtf32("Identifier.Identifier")));
+    AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("WhereConstraint"), this, ToUtf32("Concept.WhereConstraint")));
+    AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("TypeExpr"), this, ToUtf32("TypeExpr.TypeExpr")));
+    AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("ParameterList"), this, ToUtf32("Parameter.ParameterList")));
     AddRule(new FunctionRule(ToUtf32("Function"), GetScope(), GetParsingDomain()->GetNextRuleId(),
         new cmajor::parsing::ActionParser(ToUtf32("A0"),
-            new cmajor::parsing::SequenceParser(
+            new cmajor::parsing::GroupingParser(
                 new cmajor::parsing::SequenceParser(
                     new cmajor::parsing::SequenceParser(
                         new cmajor::parsing::SequenceParser(
                             new cmajor::parsing::SequenceParser(
                                 new cmajor::parsing::SequenceParser(
                                     new cmajor::parsing::SequenceParser(
-                                        new cmajor::parsing::OptionalParser(
-                                            new cmajor::parsing::ActionParser(ToUtf32("A1"),
-                                                new cmajor::parsing::NonterminalParser(ToUtf32("Attributes"), ToUtf32("Attributes"), 0))),
-                                        new cmajor::parsing::NonterminalParser(ToUtf32("Specifiers"), ToUtf32("Specifiers"), 0)),
-                                    new cmajor::parsing::NonterminalParser(ToUtf32("TypeExpr"), ToUtf32("TypeExpr"), 1)),
-                                new cmajor::parsing::ActionParser(ToUtf32("A2"),
-                                    new cmajor::parsing::NonterminalParser(ToUtf32("FunctionGroupId"), ToUtf32("FunctionGroupId"), 1))),
-                            new cmajor::parsing::OptionalParser(
-                                new cmajor::parsing::NonterminalParser(ToUtf32("TemplateParameterList"), ToUtf32("TemplateParameterList"), 2))),
-                        new cmajor::parsing::ActionParser(ToUtf32("A3"),
-                            new cmajor::parsing::NonterminalParser(ToUtf32("ParameterList"), ToUtf32("ParameterList"), 2))),
-                    new cmajor::parsing::OptionalParser(
-                        new cmajor::parsing::ActionParser(ToUtf32("A4"),
-                            new cmajor::parsing::NonterminalParser(ToUtf32("WhereConstraint"), ToUtf32("WhereConstraint"), 1)))),
-                new cmajor::parsing::AlternativeParser(
-                    new cmajor::parsing::ActionParser(ToUtf32("A5"),
-                        new cmajor::parsing::NonterminalParser(ToUtf32("CompoundStatement"), ToUtf32("CompoundStatement"), 1)),
-                    new cmajor::parsing::CharParser(';'))))));
+                                        new cmajor::parsing::SequenceParser(
+                                            new cmajor::parsing::OptionalParser(
+                                                new cmajor::parsing::GroupingParser(
+                                                    new cmajor::parsing::ActionParser(ToUtf32("A1"),
+                                                        new cmajor::parsing::NonterminalParser(ToUtf32("Attributes"), ToUtf32("Attributes"), 0)))),
+                                            new cmajor::parsing::NonterminalParser(ToUtf32("Specifiers"), ToUtf32("Specifiers"), 0)),
+                                        new cmajor::parsing::NonterminalParser(ToUtf32("TypeExpr"), ToUtf32("TypeExpr"), 1)),
+                                    new cmajor::parsing::ActionParser(ToUtf32("A2"),
+                                        new cmajor::parsing::NonterminalParser(ToUtf32("FunctionGroupId"), ToUtf32("FunctionGroupId"), 1))),
+                                new cmajor::parsing::OptionalParser(
+                                    new cmajor::parsing::NonterminalParser(ToUtf32("TemplateParameterList"), ToUtf32("TemplateParameterList"), 2))),
+                            new cmajor::parsing::ActionParser(ToUtf32("A3"),
+                                new cmajor::parsing::NonterminalParser(ToUtf32("ParameterList"), ToUtf32("ParameterList"), 2))),
+                        new cmajor::parsing::OptionalParser(
+                            new cmajor::parsing::GroupingParser(
+                                new cmajor::parsing::ActionParser(ToUtf32("A4"),
+                                    new cmajor::parsing::NonterminalParser(ToUtf32("WhereConstraint"), ToUtf32("WhereConstraint"), 1))))),
+                    new cmajor::parsing::GroupingParser(
+                        new cmajor::parsing::AlternativeParser(
+                            new cmajor::parsing::ActionParser(ToUtf32("A5"),
+                                new cmajor::parsing::NonterminalParser(ToUtf32("CompoundStatement"), ToUtf32("CompoundStatement"), 1)),
+                            new cmajor::parsing::CharParser(';'))))))));
     AddRule(new FunctionGroupIdRule(ToUtf32("FunctionGroupId"), GetScope(), GetParsingDomain()->GetNextRuleId(),
         new cmajor::parsing::AlternativeParser(
             new cmajor::parsing::ActionParser(ToUtf32("A0"),
@@ -677,7 +681,7 @@ void FunctionGrammar::CreateRules()
     AddRule(new OperatorFunctionGroupIdRule(ToUtf32("OperatorFunctionGroupId"), GetScope(), GetParsingDomain()->GetNextRuleId(),
         new cmajor::parsing::SequenceParser(
             new cmajor::parsing::KeywordParser(ToUtf32("operator")),
-            new cmajor::parsing::AlternativeParser(
+            new cmajor::parsing::GroupingParser(
                 new cmajor::parsing::AlternativeParser(
                     new cmajor::parsing::AlternativeParser(
                         new cmajor::parsing::AlternativeParser(
@@ -696,61 +700,67 @@ void FunctionGrammar::CreateRules()
                                                                             new cmajor::parsing::AlternativeParser(
                                                                                 new cmajor::parsing::AlternativeParser(
                                                                                     new cmajor::parsing::AlternativeParser(
-                                                                                        new cmajor::parsing::ActionParser(ToUtf32("A0"),
-                                                                                            new cmajor::parsing::DifferenceParser(
-                                                                                                new cmajor::parsing::StringParser(ToUtf32("<<")),
-                                                                                                new cmajor::parsing::SequenceParser(
-                                                                                                    new cmajor::parsing::SequenceParser(
-                                                                                                        new cmajor::parsing::SequenceParser(
-                                                                                                            new cmajor::parsing::CharParser('<'),
-                                                                                                            new cmajor::parsing::CharParser('<')),
-                                                                                                        new cmajor::parsing::ListParser(
-                                                                                                            new cmajor::parsing::ActionParser(ToUtf32("A1"),
-                                                                                                                new cmajor::parsing::NonterminalParser(ToUtf32("TypeExpr"), ToUtf32("TypeExpr"), 1)),
-                                                                                                            new cmajor::parsing::CharParser(','))),
-                                                                                                    new cmajor::parsing::CharParser('>')))),
-                                                                                        new cmajor::parsing::ActionParser(ToUtf32("A2"),
-                                                                                            new cmajor::parsing::StringParser(ToUtf32(">>")))),
-                                                                                    new cmajor::parsing::ActionParser(ToUtf32("A3"),
-                                                                                        new cmajor::parsing::StringParser(ToUtf32("==")))),
-                                                                                new cmajor::parsing::ActionParser(ToUtf32("A4"),
-                                                                                    new cmajor::parsing::CharParser('='))),
-                                                                            new cmajor::parsing::ActionParser(ToUtf32("A5"),
-                                                                                new cmajor::parsing::CharParser('<'))),
-                                                                        new cmajor::parsing::ActionParser(ToUtf32("A6"),
-                                                                            new cmajor::parsing::StringParser(ToUtf32("->")))),
-                                                                    new cmajor::parsing::ActionParser(ToUtf32("A7"),
-                                                                        new cmajor::parsing::StringParser(ToUtf32("++")))),
-                                                                new cmajor::parsing::ActionParser(ToUtf32("A8"),
-                                                                    new cmajor::parsing::StringParser(ToUtf32("--")))),
-                                                            new cmajor::parsing::ActionParser(ToUtf32("A9"),
-                                                                new cmajor::parsing::CharParser('+'))),
-                                                        new cmajor::parsing::ActionParser(ToUtf32("A10"),
-                                                            new cmajor::parsing::CharParser('-'))),
-                                                    new cmajor::parsing::ActionParser(ToUtf32("A11"),
-                                                        new cmajor::parsing::CharParser('*'))),
-                                                new cmajor::parsing::ActionParser(ToUtf32("A12"),
-                                                    new cmajor::parsing::CharParser('/'))),
-                                            new cmajor::parsing::ActionParser(ToUtf32("A13"),
-                                                new cmajor::parsing::CharParser('%'))),
-                                        new cmajor::parsing::ActionParser(ToUtf32("A14"),
-                                            new cmajor::parsing::CharParser('&'))),
-                                    new cmajor::parsing::ActionParser(ToUtf32("A15"),
-                                        new cmajor::parsing::CharParser('|'))),
-                                new cmajor::parsing::ActionParser(ToUtf32("A16"),
-                                    new cmajor::parsing::CharParser('^'))),
-                            new cmajor::parsing::ActionParser(ToUtf32("A17"),
-                                new cmajor::parsing::CharParser('!'))),
-                        new cmajor::parsing::ActionParser(ToUtf32("A18"),
-                            new cmajor::parsing::CharParser('~'))),
-                    new cmajor::parsing::ActionParser(ToUtf32("A19"),
-                        new cmajor::parsing::SequenceParser(
-                            new cmajor::parsing::CharParser('['),
-                            new cmajor::parsing::CharParser(']')))),
-                new cmajor::parsing::ActionParser(ToUtf32("A20"),
-                    new cmajor::parsing::SequenceParser(
-                        new cmajor::parsing::CharParser('('),
-                        new cmajor::parsing::CharParser(')')))))));
+                                                                                        new cmajor::parsing::AlternativeParser(
+                                                                                            new cmajor::parsing::ActionParser(ToUtf32("A0"),
+                                                                                                new cmajor::parsing::GroupingParser(
+                                                                                                    new cmajor::parsing::DifferenceParser(
+                                                                                                        new cmajor::parsing::StringParser(ToUtf32("<<")),
+                                                                                                        new cmajor::parsing::GroupingParser(
+                                                                                                            new cmajor::parsing::SequenceParser(
+                                                                                                                new cmajor::parsing::SequenceParser(
+                                                                                                                    new cmajor::parsing::SequenceParser(
+                                                                                                                        new cmajor::parsing::CharParser('<'),
+                                                                                                                        new cmajor::parsing::CharParser('<')),
+                                                                                                                    new cmajor::parsing::GroupingParser(
+                                                                                                                        new cmajor::parsing::ListParser(
+                                                                                                                            new cmajor::parsing::ActionParser(ToUtf32("A1"),
+                                                                                                                                new cmajor::parsing::NonterminalParser(ToUtf32("TypeExpr"), ToUtf32("TypeExpr"), 1)),
+                                                                                                                            new cmajor::parsing::CharParser(',')))),
+                                                                                                                new cmajor::parsing::CharParser('>')))))),
+                                                                                            new cmajor::parsing::ActionParser(ToUtf32("A2"),
+                                                                                                new cmajor::parsing::StringParser(ToUtf32(">>")))),
+                                                                                        new cmajor::parsing::ActionParser(ToUtf32("A3"),
+                                                                                            new cmajor::parsing::StringParser(ToUtf32("==")))),
+                                                                                    new cmajor::parsing::ActionParser(ToUtf32("A4"),
+                                                                                        new cmajor::parsing::CharParser('='))),
+                                                                                new cmajor::parsing::ActionParser(ToUtf32("A5"),
+                                                                                    new cmajor::parsing::CharParser('<'))),
+                                                                            new cmajor::parsing::ActionParser(ToUtf32("A6"),
+                                                                                new cmajor::parsing::StringParser(ToUtf32("->")))),
+                                                                        new cmajor::parsing::ActionParser(ToUtf32("A7"),
+                                                                            new cmajor::parsing::StringParser(ToUtf32("++")))),
+                                                                    new cmajor::parsing::ActionParser(ToUtf32("A8"),
+                                                                        new cmajor::parsing::StringParser(ToUtf32("--")))),
+                                                                new cmajor::parsing::ActionParser(ToUtf32("A9"),
+                                                                    new cmajor::parsing::CharParser('+'))),
+                                                            new cmajor::parsing::ActionParser(ToUtf32("A10"),
+                                                                new cmajor::parsing::CharParser('-'))),
+                                                        new cmajor::parsing::ActionParser(ToUtf32("A11"),
+                                                            new cmajor::parsing::CharParser('*'))),
+                                                    new cmajor::parsing::ActionParser(ToUtf32("A12"),
+                                                        new cmajor::parsing::CharParser('/'))),
+                                                new cmajor::parsing::ActionParser(ToUtf32("A13"),
+                                                    new cmajor::parsing::CharParser('%'))),
+                                            new cmajor::parsing::ActionParser(ToUtf32("A14"),
+                                                new cmajor::parsing::CharParser('&'))),
+                                        new cmajor::parsing::ActionParser(ToUtf32("A15"),
+                                            new cmajor::parsing::CharParser('|'))),
+                                    new cmajor::parsing::ActionParser(ToUtf32("A16"),
+                                        new cmajor::parsing::CharParser('^'))),
+                                new cmajor::parsing::ActionParser(ToUtf32("A17"),
+                                    new cmajor::parsing::CharParser('!'))),
+                            new cmajor::parsing::ActionParser(ToUtf32("A18"),
+                                new cmajor::parsing::CharParser('~'))),
+                        new cmajor::parsing::ActionParser(ToUtf32("A19"),
+                            new cmajor::parsing::GroupingParser(
+                                new cmajor::parsing::SequenceParser(
+                                    new cmajor::parsing::CharParser('['),
+                                    new cmajor::parsing::CharParser(']'))))),
+                    new cmajor::parsing::ActionParser(ToUtf32("A20"),
+                        new cmajor::parsing::GroupingParser(
+                            new cmajor::parsing::SequenceParser(
+                                new cmajor::parsing::CharParser('('),
+                                new cmajor::parsing::CharParser(')')))))))));
 }
 
 } } // namespace cmajor.parser

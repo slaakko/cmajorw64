@@ -43,6 +43,20 @@ public:
     void Accept(Visitor& visitor) override;
 };
 
+class EntityReference : public CharacterData
+{
+public:
+    EntityReference();
+    EntityReference(const std::u32string& entityRef_);
+    EntityReference(const EntityReference&) = delete;
+    EntityReference& operator=(const EntityReference&) = delete;
+    EntityReference(EntityReference&&) = delete;
+    EntityReference& operator=(EntityReference&&) = delete;
+    void Write(CodeFormatter& formatter) override;
+    std::unique_ptr<Node> CloneNode(bool deep) override;
+    void Accept(Visitor& visitor) override;
+};
+
 class CDataSection : public Text
 {
 public:

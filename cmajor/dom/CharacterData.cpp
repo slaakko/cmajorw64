@@ -69,6 +69,31 @@ void Text::Accept(Visitor& visitor)
     visitor.Visit(this);
 }
 
+EntityReference::EntityReference() : CharacterData(NodeType::entityReferenceNode, U"entity_refefrence")
+{
+}
+
+EntityReference::EntityReference(const std::u32string& entityRef_) : CharacterData(NodeType::entityReferenceNode, U"entity_refefrence", entityRef_)
+{
+}
+
+void EntityReference::Write(CodeFormatter& formatter)
+{
+    formatter.Write("&");
+    formatter.Write(ToUtf8(Data()));
+    formatter.Write(";");
+}
+
+std::unique_ptr<Node> EntityReference::CloneNode(bool deep)
+{
+    return std::unique_ptr<Node>(new EntityReference(Data()));
+}
+
+void EntityReference::Accept(Visitor& visitor)
+{
+    visitor.Visit(this);
+}
+
 CDataSection::CDataSection() : Text(NodeType::cdataSectionNode, U"cdata_section")
 {
 }

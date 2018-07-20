@@ -26,7 +26,6 @@ ArrayTypeSymbol::ArrayTypeSymbol(const Span& span_, const std::u32string& name_,
 void ArrayTypeSymbol::Write(SymbolWriter& writer)
 {
     TypeSymbol::Write(writer);
-    //uint32_t elementTypeId = elementType->TypeId();
     const boost::uuids::uuid& elementTypeId = elementType->TypeId();
     writer.GetBinaryWriter().Write(elementTypeId);
     writer.GetBinaryWriter().Write(size);
@@ -35,7 +34,6 @@ void ArrayTypeSymbol::Write(SymbolWriter& writer)
 void ArrayTypeSymbol::Read(SymbolReader& reader)
 {
     TypeSymbol::Read(reader);
-    //uint32_t elementTypeId = reader.GetBinaryReader().ReadUInt();
     boost::uuids::uuid elementTypeId;
     reader.GetBinaryReader().ReadUuid(elementTypeId);
     GetSymbolTable()->EmplaceTypeRequest(this, elementTypeId, 0);
@@ -125,7 +123,6 @@ void ArrayLengthFunction::Write(SymbolWriter& writer)
 void ArrayLengthFunction::Read(SymbolReader& reader)
 {
     FunctionSymbol::Read(reader);
-    //uint32_t typeId = reader.GetBinaryReader().ReadUInt();
     boost::uuids::uuid typeId;
     reader.GetBinaryReader().ReadUuid(typeId);
     GetSymbolTable()->EmplaceTypeRequest(this, typeId, 1);
@@ -182,7 +179,6 @@ void ArrayBeginFunction::Write(SymbolWriter& writer)
 void ArrayBeginFunction::Read(SymbolReader& reader)
 {
     FunctionSymbol::Read(reader);
-    //uint32_t typeId = reader.GetBinaryReader().ReadUInt();
     boost::uuids::uuid typeId;
     reader.GetBinaryReader().ReadUuid(typeId);
     GetSymbolTable()->EmplaceTypeRequest(this, typeId, 1);
@@ -239,7 +235,6 @@ void ArrayEndFunction::Write(SymbolWriter& writer)
 void ArrayEndFunction::Read(SymbolReader& reader)
 {
     FunctionSymbol::Read(reader);
-    //uint32_t typeId = reader.GetBinaryReader().ReadUInt();
     boost::uuids::uuid typeId;
     reader.GetBinaryReader().ReadUuid(typeId);
     GetSymbolTable()->EmplaceTypeRequest(this, typeId, 1);
@@ -296,7 +291,6 @@ void ArrayCBeginFunction::Write(SymbolWriter& writer)
 void ArrayCBeginFunction::Read(SymbolReader& reader)
 {
     FunctionSymbol::Read(reader);
-    //uint32_t typeId = reader.GetBinaryReader().ReadUInt();
     boost::uuids::uuid typeId;
     reader.GetBinaryReader().ReadUuid(typeId);
     GetSymbolTable()->EmplaceTypeRequest(this, typeId, 1);
@@ -353,7 +347,6 @@ void ArrayCEndFunction::Write(SymbolWriter& writer)
 void ArrayCEndFunction::Read(SymbolReader& reader)
 {
     FunctionSymbol::Read(reader);
-    //uint32_t typeId = reader.GetBinaryReader().ReadUInt();
     boost::uuids::uuid typeId;
     reader.GetBinaryReader().ReadUuid(typeId);
     GetSymbolTable()->EmplaceTypeRequest(this, typeId, 1);

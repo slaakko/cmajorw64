@@ -16,15 +16,15 @@ namespace cmajor.code
     [cpp]using namespace cmajor::codedom;
     [cpp]using cmajor::util::Trim;
 
-    grammar ExpressionGrammar
+    grammar Expression
     {
-        using LiteralGrammar.Literal;
-        using DeclaratorGrammar.TypeId;
-        using DeclaratorGrammar.TypeSpecifierSeq;
-        using DeclaratorGrammar.PtrOperator;
-        using IdentifierGrammar.QualifiedId;
-        using DeclarationGrammar.SimpleTypeSpecifier;
-        using DeclarationGrammar.TypeName;
+        using Literal.Literal;
+        using Declarator.TypeId;
+        using Declarator.TypeSpecifierSeq;
+        using Declarator.PtrOperator;
+        using Identifier.QualifiedId;
+        using Declaration.SimpleTypeSpecifier;
+        using Declaration.TypeName;
 
         Expression: cmajor::codedom::CppObject*
                             ::= AssignmentExpression:left{ value = left; } (',' AssignmentExpression:right{ value = new BinaryOpExpr(value, Operator::comma, 0, right); })*

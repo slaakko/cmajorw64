@@ -5,7 +5,7 @@
 
 namespace cmajor.parser
 {
-    grammar CommandLineGrammar
+    grammar CommandLine
     {
         CommandLine : std::vector<std::string>
             ::= Spaces? Argument:first{ value.push_back(first); } (Spaces Argument:next{ value.push_back(next); })* Spaces?

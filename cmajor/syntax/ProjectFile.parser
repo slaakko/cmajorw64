@@ -7,7 +7,7 @@
 
 namespace cmajor.syntax
 {
-    grammar ProjectFileGrammar
+    grammar ProjectFile
     {
         using stdlib.qualified_id;
         using stdlib.spaces_and_comments;

@@ -1,5 +1,5 @@
-#ifndef BasicType_hpp_391
-#define BasicType_hpp_391
+#ifndef BasicType_hpp_8344
+#define BasicType_hpp_8344
 
 #include <cmajor/parsing/Grammar.hpp>
 #include <cmajor/parsing/Keyword.hpp>
@@ -8,19 +8,19 @@
 namespace cmajor { namespace parser {
 
 using namespace cmajor::ast;
-class BasicTypeGrammar : public cmajor::parsing::Grammar
+class BasicType : public cmajor::parsing::Grammar
 {
 public:
-    static BasicTypeGrammar* Create();
-    static BasicTypeGrammar* Create(cmajor::parsing::ParsingDomain* parsingDomain);
+    static BasicType* Create();
+    static BasicType* Create(cmajor::parsing::ParsingDomain* parsingDomain);
     Node* Parse(const char32_t* start, const char32_t* end, int fileIndex, const std::string& fileName);
 private:
-    BasicTypeGrammar(cmajor::parsing::ParsingDomain* parsingDomain_);
-    virtual void CreateRules();
-    virtual void GetReferencedGrammars();
+    BasicType(cmajor::parsing::ParsingDomain* parsingDomain_);
+    void CreateRules() override;
+    void GetReferencedGrammars() override;
     class BasicTypeRule;
 };
 
 } } // namespace cmajor.parser
 
-#endif // BasicType_hpp_391
+#endif // BasicType_hpp_8344

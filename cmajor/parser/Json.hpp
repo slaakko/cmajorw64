@@ -1,5 +1,5 @@
-#ifndef Json_hpp_391
-#define Json_hpp_391
+#ifndef Json_hpp_8344
+#define Json_hpp_8344
 
 #include <cmajor/parsing/Grammar.hpp>
 #include <cmajor/parsing/Keyword.hpp>
@@ -9,16 +9,16 @@
 namespace cmajor { namespace parser {
 
 using namespace cmajor::util;
-class JsonGrammar : public cmajor::parsing::Grammar
+class Json : public cmajor::parsing::Grammar
 {
 public:
-    static JsonGrammar* Create();
-    static JsonGrammar* Create(cmajor::parsing::ParsingDomain* parsingDomain);
+    static Json* Create();
+    static Json* Create(cmajor::parsing::ParsingDomain* parsingDomain);
     JsonValue* Parse(const char32_t* start, const char32_t* end, int fileIndex, const std::string& fileName);
 private:
-    JsonGrammar(cmajor::parsing::ParsingDomain* parsingDomain_);
-    virtual void CreateRules();
-    virtual void GetReferencedGrammars();
+    Json(cmajor::parsing::ParsingDomain* parsingDomain_);
+    void CreateRules() override;
+    void GetReferencedGrammars() override;
     class ValueRule;
     class StringRule;
     class NumberRule;
@@ -28,4 +28,4 @@ private:
 
 } } // namespace cmajor.parser
 
-#endif // Json_hpp_391
+#endif // Json_hpp_8344

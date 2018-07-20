@@ -25,16 +25,6 @@ enum class TimePointKind : uint8_t
     start = 0, end = 1
 };
 
-/*
-struct FunctionProfileData
-{
-    FunctionProfileData(TimePointKind kind_, uint32_t functionId_) : timePoint(std::chrono::high_resolution_clock::now()), functionId(functionId_), kind(kind_) {}
-    std::chrono::high_resolution_clock::time_point timePoint;
-    uint32_t functionId;
-    TimePointKind kind;
-};
-*/
-
 struct FunctionProfileData
 {
     FunctionProfileData(TimePointKind kind_, const boost::uuids::uuid& functionId_) : 
@@ -43,24 +33,6 @@ struct FunctionProfileData
     boost::uuids::uuid functionId;
     TimePointKind kind;
 };
-
-/*
-class Profiler
-{
-public:
-    static void Init();
-    static void Done();
-    static Profiler& Instance() { return *instance; }
-    void StartFunction(uint32_t functionId);
-    void EndFunction(uint32_t functionId);
-    std::vector<FunctionProfileData>* CreateFunctionProfileData();
-    void WriteData();
-private:
-    static std::unique_ptr<Profiler> instance;
-    std::vector<std::unique_ptr<std::vector<FunctionProfileData>>> profileData;
-    std::mutex mtx;
-};
-*/
 
 class Profiler
 {
@@ -125,7 +97,6 @@ __declspec(thread) std::vector<FunctionProfileData>* functionProfileData = nullp
 __thread std::vector<FunctionProfileData>* functionProfileData = nullptr;
 #endif
 
-//void Profiler::StartFunction(uint32_t functionId)
 void Profiler::StartFunction(const boost::uuids::uuid& functionId)
 {
     if (!functionProfileData)
@@ -135,7 +106,6 @@ void Profiler::StartFunction(const boost::uuids::uuid& functionId)
     functionProfileData->push_back(FunctionProfileData(TimePointKind::start, functionId));
 }
 
-//void Profiler::EndFunction(uint32_t functionId)
 void Profiler::EndFunction(const boost::uuids::uuid& functionId)
 {
     if (!functionProfileData)
@@ -170,14 +140,12 @@ extern "C" RT_API void RtEndProfiling()
     cmajor::rt::DoneProfiler();
 }
 
-//extern "C" RT_API void RtProfileStartFunction(uint32_t functionId)
 extern "C" RT_API void RtProfileStartFunction(void* functionId)
 {
     boost::uuids::uuid* funId = reinterpret_cast<boost::uuids::uuid*>(functionId);
     cmajor::rt::Profiler::Instance().StartFunction(*funId);
 }
 
-//extern "C" RT_API void RtProfileEndFunction(uint32_t functionId)
 extern "C" RT_API void RtProfileEndFunction(void* functionId)
 {
     boost::uuids::uuid* funId = reinterpret_cast<boost::uuids::uuid*>(functionId);

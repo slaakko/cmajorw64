@@ -12,10 +12,13 @@
 #include <cmajor/symbols/SymbolWriter.hpp>
 #include <cmajor/symbols/SymbolReader.hpp>
 #include <cmajor/symbols/Value.hpp>
+#include <cmajor/util/Unicode.hpp>
 #include <cmajor/ir/Emitter.hpp>
 #include <llvm/IR/Constants.h>
 
 namespace cmajor { namespace symbols {
+
+using namespace cmajor::unicode;
 
 struct BasicTypeNot
 {
@@ -327,6 +330,8 @@ public:
     SymbolAccess DeclaredAccess() const override { return SymbolAccess::public_; }
     void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
     bool IsBasicTypeOperation() const override { return true; }
+    const char* ClassName() const override { return "BasicTypeUnaryOperation"; }
+    int ClassArity() const override { return 1; }
 };
 
 template<typename UnOp>
@@ -395,6 +400,8 @@ public:
     SymbolAccess DeclaredAccess() const override { return SymbolAccess::public_; }
     void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
     bool IsBasicTypeOperation() const override { return true; }
+    const char* ClassName() const override { return "BasicTypeBinaryOperation"; }
+    int ClassArity() const override { return 1; }
 };
 
 template<typename BinOp>
@@ -542,6 +549,8 @@ public:
     bool IsBasicTypeOperation() const override { return true; }
     std::unique_ptr<Value> ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span) const override;
     bool IsCompileTimePrimitiveFunction() const override { return true; }
+    const char* ClassName() const override { return "BasicTypeDefaultCtor"; }
+    int ClassArity() const override { return 1; }
 };
 
 template<typename DefaultOp>
@@ -674,6 +683,8 @@ public:
     std::unique_ptr<Value> ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span) const override;
     bool IsBasicTypeOperation() const override { return true; }
     bool IsCompileTimePrimitiveFunction() const override { return true; }
+    const char* ClassName() const override { return "BasicTypeCopyCtor"; }
+    std::u32string Info() const override { return std::u32string(); }
 };
 
 class BasicTypeMoveCtor : public FunctionSymbol
@@ -686,6 +697,8 @@ public:
     std::unique_ptr<Value> ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span) const override;
     bool IsBasicTypeOperation() const override { return true; }
     bool IsCompileTimePrimitiveFunction() const override { return true; }
+    const char* ClassName() const override { return "BasicTypeMoveCtor"; }
+    std::u32string Info() const override { return std::u32string(); }
 };
 
 class BasicTypeCopyAssignment : public FunctionSymbol
@@ -697,6 +710,8 @@ public:
     void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
     bool IsBasicTypeOperation() const override { return true; }
     bool IsCompileTimePrimitiveFunction() const override { return true; }
+    const char* ClassName() const override { return "BasicTypeCopyAssignment"; }
+    std::u32string Info() const override { return std::u32string(); }
 };
 
 class BasicTypeMoveAssignment : public FunctionSymbol
@@ -707,6 +722,8 @@ public:
     SymbolAccess DeclaredAccess() const override { return SymbolAccess::public_; }
     void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
     bool IsBasicTypeOperation() const override { return true; }
+    const char* ClassName() const override { return "BasicTypeMoveAssignment"; }
+    std::u32string Info() const override { return std::u32string(); }
 };
 
 class BasicTypeReturn : public FunctionSymbol
@@ -717,6 +734,8 @@ public:
     SymbolAccess DeclaredAccess() const override { return SymbolAccess::public_; }
     void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
     bool IsBasicTypeOperation() const override { return true; }
+    const char* ClassName() const override { return "BasicTypeReturn"; }
+    std::u32string Info() const override { return std::u32string(); }
 };
 
 template <typename ConversionOp>
@@ -735,6 +754,9 @@ public:
     uint8_t ConversionDistance() const override { return conversionDistance; }
     TypeSymbol* ConversionSourceType() const override { return sourceType; }
     TypeSymbol* ConversionTargetType() const override { return targetType; }
+    const char* ClassName() const override { return "BasicTypeConversion"; }
+    int ClassArity() const override { return 1; }
+    std::u32string Info() const override;
 private:
     ConversionType conversionType;
     uint8_t conversionDistance;
@@ -776,12 +798,10 @@ void BasicTypeConversion<ConversionOp>::Read(SymbolReader& reader)
     FunctionSymbol::Read(reader);
     conversionType = static_cast<ConversionType>(reader.GetBinaryReader().ReadByte());
     conversionDistance = reader.GetBinaryReader().ReadByte();
-    //uint32_t sourceTypeId = reader.GetBinaryReader().ReadUInt();
     boost::uuids::uuid sourceTypeId;
     reader.GetBinaryReader().ReadUuid(sourceTypeId);
     GetSymbolTable()->EmplaceTypeRequest(this, sourceTypeId, 1);
     boost::uuids::uuid targetTypeId;
-    //uint32_t targetTypeId = reader.GetBinaryReader().ReadUInt();
     reader.GetBinaryReader().ReadUuid(targetTypeId);
     GetSymbolTable()->EmplaceTypeRequest(this, targetTypeId, 2);
 }
@@ -809,6 +829,15 @@ void BasicTypeConversion<ConversionOp>::GenerateCall(Emitter& emitter, std::vect
     llvm::Value* value = emitter.Stack().Pop();
     emitter.SetCurrentDebugLocation(span);
     emitter.Stack().Push(ConversionOp::Generate(emitter.Builder(), value, targetType->IrType(emitter)));
+}
+
+template <typename ConversionOp>
+std::u32string BasicTypeConversion<ConversionOp>::Info() const
+{
+    std::u32string info;
+    info.append(U"sourceType=").append(ToUtf32(ConversionSourceType()->ClassName())).append(1, ',');
+    info.append(U"targetType=").append(ToUtf32(ConversionTargetType()->ClassName()));
+    return info;
 }
 
 template <typename ConversionOp>
@@ -966,6 +995,8 @@ public:
     SymbolAccess DeclaredAccess() const override { return SymbolAccess::public_; }
     void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
     bool IsBasicTypeOperation() const override { return true; }
+    const char* ClassName() const override { return "BasicTypeComparisonOperation"; }
+    int ClassArity() const override { return 1; }
 };
 
 template<typename ComparisonOp>
