@@ -9,7 +9,28 @@
 <body>
     <h1>Implementation of the Cmajor Compiler</h1>
 
-    <h2>The Structure of the Compiler</h2>
+    <h2>Table of contents</h2>
+
+    <div class="toc">
+        1 <a href="#structure-of-the-compiler">Structure of the Compiler</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;1.1 <a href="#compiler">Compiler</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;1.2 <a href="#builder">Builder</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;1.3 <a href="#parser">Parser</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;1.4 <a href="#ast">Abstract Syntax Tree</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1.4.1 <a href="#visitor">Visitor</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1.4.2 <a href="#ast-example">Example</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;1.5 <a href="#symbol-table">Symbol Table</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1.5.1 <a href="#symbol-table-example">Example</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;1.6 <a href="#binder">Binder</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1.6.1 <a href="#binder-binding-types">Binding Types</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1.6.2 <a href="#binder-binding-statements">Binding Statements and Expressions</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;1.7 <a href="#emitter">Emitter</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1.7.1 <a href="#emitter-example">Example</a><br />
+        2 <a href="#specific-features">Implementation of Specific Features</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;2.1 <a href="#is-and-as-expressions">Is and As Expressions</a><br />
+    </div>
+
+    <h2 id="structure-of-the-compiler">1 The Structure of the Compiler</h2>
 
     <p>
         The compiler has a component-based <a href="gendoc/html/index.html">layered</a> architecture.
@@ -33,7 +54,7 @@
         The components are described in the order they appear in the compilation process.
     </p>
 
-    <h3>Compiler</h3>
+    <h3 id="compiler">1.1 Compiler</h3>
 
     <p>
         The <a href="gendoc/html/content/component_compiler.html">compiler</a> component constitutes the main program of the compiler.
@@ -41,7 +62,7 @@
         component to build given Cmajor projects and solutions. The main program also reports errors.
     </p>
 
-    <h3>Builder</h3>
+    <h3 id="builder">1.2 Builder</h3>
 
     <p>
         The main tasks of the <a href="gendoc/html/content/component_build.html">builder</a> component are
@@ -105,7 +126,7 @@
         </ul>
     </p>
 
-    <h3>Parser</h3>
+    <h3 id="parser">1.3 Parser</h3>
 
     <p>
         The <a href="gendoc/html/content/component_parser.html">parser</a> component contains all the parsers used in the compiler.
@@ -128,7 +149,7 @@
         <em>abstract syntax tree</em> from the linear character representation of a source file.
     </p>
 
-    <h3>Abstract Syntax Tree</h3>
+    <h3 id="ast">1.4 Abstract Syntax Tree</h3>
 
     <p>
         The <a href="gendoc/html/content/component_ast.html">abstract syntax tree</a> component contains classes from which an object hierarchy representing a source file
@@ -169,7 +190,7 @@
         In addition each node class implements operations for adding and accessing information contained in the node.
     </p>
 
-    <h4>Visitor</h4>
+    <h4 id="visitor">1.4.1 Visitor</h4>
 
     <p>
         The abstract syntax tree node classes do <em>not</em> themselves contain actual compilation algorithms other than file serialization and cloning subtrees.
@@ -240,7 +261,7 @@
         </ul>
     </p>
 
-    <h4>Example</h4>
+    <h4 id="ast-example">1.4.2 Example</h4>
 
     <p>
         Take a look at the following <a href="../code/quickSort/QuickSort.cm.html">quick sort</a> program.
@@ -266,7 +287,7 @@ Process returned exit code 0.
         When the compiler parses the program, it produces the following <a href="gendoc/html/content/ast.html">abstract syntax tree</a>.
     </p>
 
-    <h3>Symbol Table</h3>
+    <h3 id="symbol-table">1.5 Symbol Table</h3>
 
     <p>
         The next stage of compilation is to build initial <a href="gendoc/html/content/class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html">symbol table</a>
@@ -288,7 +309,7 @@ Process returned exit code 0.
         <a href="gendoc/html/content/class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html">symbols</a> and vice versa.
     </p>
 
-    <h4>Example</h4>
+    <h4 id="symbol-table-example">1.5.1 Example</h4>
 
     <p>
         When symbols are created for the <a href="../code/quickSort/QuickSort.cm.html">quick sort</a> program, the symbol table looks like <a href="gendoc/html/content/sym0.html">this</a>.
@@ -297,7 +318,7 @@ Process returned exit code 0.
         symbol that contains symbols for the <a href="gendoc/html/content/class_LocalVariableSymbol_F5A9F74EEFC0001129616C5EEBCFE3B2DFC74FCF.html">local variables</a> of a block.
     </p>
 
-    <h3 id="binder">Binder</h3>
+    <h3 id="binder">1.6 Binder</h3>
 
     <p>
         The <a href="gendoc/html/content/component_binder.html">binder</a> component contains facilities for binding type expressions to
@@ -308,7 +329,7 @@ Process returned exit code 0.
         <a href="gendoc/html/content/class_FunctionSymbol_5AC1C26A9572181B3E31247997BF40453B22EDEF.html">function symbol</a> that is used to generate intermediate code for that operation.
     </p>
 
-    <h4>Binding Types</h4>
+    <h4 id="binder-binding-types">1.6.1 Binding Types</h4>
 
     <p>
         The <a href="gendoc/html/content/class_TypeBinder_197D6C7822958FE5DD6F6B43DDE787A9FA490EEA.html">type binder</a> visits an abstract syntax tree and binds each type expression
@@ -324,7 +345,7 @@ Process returned exit code 0.
         <a href="gendoc/html/content/class_ClassTemplateSpecializationSymbol_F0BC1A28739F39F0DA3BC5C1405A607BF1DFC8EA.html">class template specialization</a> symbols.
     </p>
 
-    <h4>Binding Statements and Expressions</h4>
+    <h4 id="binder-binding-statements">1.6.2 Binding Statements and Expressions</h4>
 
     <p>
         The <a href="gendoc/html/content/class_StatementBinder_9ABCC30A844E1A4C1BE61777BAAE98FBBA33A6BD.html">statement binder</a> visits bodies of functions and
@@ -346,20 +367,20 @@ Process returned exit code 0.
         The binding stage produces the following <a href="gendoc/html/content/bdt.html">bound tree</a>. Instantiated class templates and function templates are not shown.
     </p>
 
-    <h3 id="emitter">Emitter</h3>
+    <h3 id="emitter">1.7 Emitter</h3>
 
     <p>
-        The <a href="gendoc/html/content/component_emitter.html">emitter</a> component contains two 
-        <a href="gendoc/html/content/class_BasicEmitter_ADBC5CA76E0CFA156325CCEFB69E7DB1412045E9.html">emitters</a> for generating intermediate 
+        The <a href="gendoc/html/content/component_emitter.html">emitter</a> component contains two
+        <a href="gendoc/html/content/class_BasicEmitter_ADBC5CA76E0CFA156325CCEFB69E7DB1412045E9.html">emitters</a> for generating intermediate
         <a href="https://llvm.org/docs/LangRef.html">LLVM</a> code
-        from the bound trees. The <a href="gendoc/html/content/class_WindowsEmitter_C789C6A843FA60D027555BB6C24B32362F257F98.html">Windows emitter</a> 
+        from the bound trees. The <a href="gendoc/html/content/class_WindowsEmitter_C789C6A843FA60D027555BB6C24B32362F257F98.html">Windows emitter</a>
         generates LLVM code compatible with Visual C++ exception handling ABI. The <a href="gendoc/html/content/class_LinuxEmitter_0D6C8F1D40184D7E33A54EFC6DCC19251B9A9F32.html">Linux emitter</a>
         implements exception handling using LLVM landing pads that are compatible with Itanium exception handling ABI.
     </p>
 
     <p>
         The emitters are <a href="gendoc/html/content/class_BoundNodeVisitor_CE5CFDED99644DA4EABDD18A7FDFBE5548A49675.html">bound node visitors</a>.
-        For example, visitation of control statements generate <a href="http://llvm.org/doxygen/classllvm_1_1BasicBlock.html">llvm::BasicBlocks</a>, 
+        For example, visitation of control statements generate <a href="http://llvm.org/doxygen/classllvm_1_1BasicBlock.html">llvm::BasicBlocks</a>,
         and <a href="http://llvm.org/doxygen/classllvm_1_1BranchInst.html">jumps</a> between them.
         Visitation of a <a href="gendoc/html/content/class_BoundExpression_6C13A7CD518141FC69CADA397796946086EEA452.html">bound expression</a> type generally calls the load operation
         of that bound expression type.
@@ -371,54 +392,54 @@ Process returned exit code 0.
         <ul>
             <li>
                 <a href="gendoc/html/content/class_GenObject_58B5CE43FA7DE3F0DCCA4882DA8ADB648134410A.html#function_Load_37FB0A624148292BBE2942A54704D35B0D57B640">Load</a>,
-                that <a href="http://llvm.org/doxygen/classllvm_1_1IRBuilder.html#a2eb8f45a8523e9f1df1b1d0fae233306">loads</a> an 
-                <a href="http://llvm.org/doxygen/classllvm_1_1Value.html">llvm::Value</a> and pushes it on top of the  
+                that <a href="http://llvm.org/doxygen/classllvm_1_1IRBuilder.html#a2eb8f45a8523e9f1df1b1d0fae233306">loads</a> an
+                <a href="http://llvm.org/doxygen/classllvm_1_1Value.html">llvm::Value</a> and pushes it on top of the
                 <a href="gendoc/html/content/class_ValueStack_0032454A09E37AB037BC01A9EA549EFC362C7CDA.html">value stack</a> of the emitter, and
             </li>
             <li>
                 <a href="gendoc/html/content/class_GenObject_58B5CE43FA7DE3F0DCCA4882DA8ADB648134410A.html#function_Store_6ECA628A422850D73724CA62F3D7E441245E0121">Store</a>,
-                that pops an <a href="http://llvm.org/doxygen/classllvm_1_1Value.html">llvm::Value</a> from the value stack and 
+                that pops an <a href="http://llvm.org/doxygen/classllvm_1_1Value.html">llvm::Value</a> from the value stack and
                 <a href="http://llvm.org/doxygen/classllvm_1_1IRBuilder.html#a867941d6f2e653fa0fc1004602fa9fb3">creates a store</a>.
             </li>
         </ul>
 
         If the store operation is not applicable to a specific bound expression type, the operation throws an exception.
-        For example, trying to store to a <a href="gendoc/html/content/class_BoundConstant_4F99952EEB608967A62DFA4EB371782CD2C2C305.html">constant</a> or 
+        For example, trying to store to a <a href="gendoc/html/content/class_BoundConstant_4F99952EEB608967A62DFA4EB371782CD2C2C305.html">constant</a> or
         <a href="gendoc/html/content/class_BoundLiteral_DF1E22194FB48EAFA2C4993DC33E08DF24AF2F68.html">literal</a> generates an error.
     </p>
 
     <p>
         The <a href="gendoc/html/content/class_BoundFunctionCall_3B6FF42595EC5C47E14802245CBCB5F47F5F3EAC.html#function_Load_DAE00517845253A62A2030636821370ADE2D966C">load</a>
-        operation of the <a href="gendoc/html/content/class_BoundFunctionCall_3B6FF42595EC5C47E14802245CBCB5F47F5F3EAC.html">bound function call</a> places the bound argument nodes to a vector of 
-        <a href="gendoc/html/content/class_GenObject_58B5CE43FA7DE3F0DCCA4882DA8ADB648134410A.html">GenObjects</a>, and then calls the virtual 
+        operation of the <a href="gendoc/html/content/class_BoundFunctionCall_3B6FF42595EC5C47E14802245CBCB5F47F5F3EAC.html">bound function call</a> places the bound argument nodes to a vector of
+        <a href="gendoc/html/content/class_GenObject_58B5CE43FA7DE3F0DCCA4882DA8ADB648134410A.html">GenObjects</a>, and then calls the virtual
         <a href="gendoc/html/content/class_FunctionSymbol_5AC1C26A9572181B3E31247997BF40453B22EDEF.html#function_GenerateCall_293D37422EF78DB6E55C6B278678CB45E6611E16">GenerateCall</a>
         member function of the function symbol that is bound to the function call operation.
         The GenerateCall member function loads the arguments to a <a href="gendoc/html/content/class_ValueStack_0032454A09E37AB037BC01A9EA549EFC362C7CDA.html">value stack</a>
         by calling the <a href="gendoc/html/content/class_GenObject_58B5CE43FA7DE3F0DCCA4882DA8ADB648134410A.html#function_Load_37FB0A624148292BBE2942A54704D35B0D57B640">Load</a> operation
         for each of them, then pops the arguments from the value stack, places them to a vector of arguments,
         generates a <a href="http://llvm.org/doxygen/classllvm_1_1IRBuilder.html#a2027869f25dfc6b4bbaff07808b4e234">call</a> instruction, and finally
-        pushes the generated <a href="http://llvm.org/doxygen/classllvm_1_1Value.html">llvm::Value</a> to the 
+        pushes the generated <a href="http://llvm.org/doxygen/classllvm_1_1Value.html">llvm::Value</a> to the
         <a href="gendoc/html/content/class_ValueStack_0032454A09E37AB037BC01A9EA549EFC362C7CDA.html">value stack</a>.
     </p>
 
     <p>
         The abstract <a href="gendoc/html/content/class_GenObject_58B5CE43FA7DE3F0DCCA4882DA8ADB648134410A.html">GenObject</a> base class and the abstract
-        <a href="gendoc/html/content/class_Emitter_154396B281E1F2C3ECA7612F1A3AD2E408E7D595.html">Emitter</a> base class that are defined in the 
-        <a href="gendoc/html/content/component_ir.html">ir</a> component are there for 
-        calling virtual member functions implemented in the <a href="gendoc/html/content/component_emitter.html">emitter</a> component from the 
+        <a href="gendoc/html/content/class_Emitter_154396B281E1F2C3ECA7612F1A3AD2E408E7D595.html">Emitter</a> base class that are defined in the
+        <a href="gendoc/html/content/component_ir.html">ir</a> component are there for
+        calling virtual member functions implemented in the <a href="gendoc/html/content/component_emitter.html">emitter</a> component from the
         <a href="gendoc/html/content/component_symbols.html">symbols</a> component without producing a cyclic dependency between the symbols and emitter components.
     </p>
 
-    <h4>Example</h4>
+    <h4 id="emitter-example">1.7.1 Example</h4>
 
     <p>
-        When compiling the <a href="../code/quickSort/QuickSort.cm.html">quick sort</a> program, the emitter produces the following 
+        When compiling the <a href="../code/quickSort/QuickSort.cm.html">quick sort</a> program, the emitter produces the following
         <a href="../code/quickSort/QuickSort.ll">intermediate code</a> by means of the <a href="https://llvm.org/">LLVM</a> library.
     </p>
 
-    <h2>Implementation of Specific Features</h2>
+    <h2 id="specific-features">2 Implementation of Specific Features</h2>
 
-    <h3 id="is-and-as-expressions">Is and As Expressions</h3>
+    <h3 id="is-and-as-expressions">2.1 Is and As Expressions</h3>
 
     <p>
         The implementation of <b>is</b> and <b>as</b> expressions is based on a scheme invented by Michael Gibbs and Bjarne Stroustrup
