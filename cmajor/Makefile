@@ -16,6 +16,8 @@ build:
 	$(MAKE) -C xpath
 	$(MAKE) -C xpq
 	$(MAKE) -C ast
+	$(MAKE) -C ast2dom
+	$(MAKE) -C bdt2dom
 	$(MAKE) -C parser
 	$(MAKE) -C symbols
 	$(MAKE) -C cmproj
@@ -48,10 +50,10 @@ install:
 	mkdir -p $(prefix)/bin
 	cp bin/* $(prefix)/bin
 	mkdir -p $(prefix)/lib
-	cp lib/$(cmrtsoname).so.2.1.0 $(prefix)/lib
+	cp lib/$(cmrtsoname).so.2.2.0 $(prefix)/lib
 	cp lib/libgmpintf.a $(prefix)/lib
-	ln -f $(prefix)/lib/$(cmrtsoname).so.2.1.0 $(prefix)/lib/$(cmrtsoname).so.2
-	ln -f $(prefix)/lib/$(cmrtsoname).so.2.1.0 $(prefix)/lib/$(cmrtsoname).so
+	ln -f $(prefix)/lib/$(cmrtsoname).so.2.2.0 $(prefix)/lib/$(cmrtsoname).so.2
+	ln -f $(prefix)/lib/$(cmrtsoname).so.2.2.0 $(prefix)/lib/$(cmrtsoname).so
 
 sys:
 	cmc --verbose system/System.cms
@@ -69,6 +71,8 @@ clean:
 	$(MAKE) -C xpath clean
 	$(MAKE) -C xpq clean
 	$(MAKE) -C ast clean
+	$(MAKE) -C ast2dom clean
+	$(MAKE) -C bdt2dom clean
 	$(MAKE) -C parser clean
 	$(MAKE) -C symbols clean
 	$(MAKE) -C cmproj clean
