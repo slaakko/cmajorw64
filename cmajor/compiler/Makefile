@@ -3,7 +3,7 @@ include ../Makefile.common
 OBJECTS = Main.o
 
 LIBRARIES = ../lib/libutil.a ../lib/libcodedom.a ../lib/libparsing.a ../lib/libxpath.a ../lib/libdom.a ../lib/libxml.a \
-../lib/libast.a ../lib/libast2dom ../lib/libbdt2dom ../lib/libsymbols.a ../lib/libparser.a ../lib/libbinder.a ../lib/libbuild.a ../lib/libemitter.a \
+../lib/libast.a ../lib/libast2dom.a ../lib/libbdt2dom.a ../lib/libsymbols.a ../lib/libparser.a ../lib/libbinder.a ../lib/libbuild.a ../lib/libemitter.a \
 ../lib/libir.a
 
 LLVMLIBS = $(shell llvm-config --libs)
