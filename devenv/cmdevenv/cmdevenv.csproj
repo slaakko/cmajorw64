@@ -207,10 +207,6 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\cmajor\csscc\csscc.csproj">
-      <Project>{7662cdb6-dec9-4141-a668-9e009cb5c1bc}</Project>
-      <Name>csscc</Name>
-    </ProjectReference>
     <ProjectReference Include="..\devcore\devcore.csproj">
       <Project>{ea053551-4b88-449d-9e24-2b7da446f5a5}</Project>
       <Name>devcore</Name>

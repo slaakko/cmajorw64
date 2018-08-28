@@ -55,7 +55,6 @@ namespace cmdevenv
             executor.SetExecuteReadyMethod(this, ProjectRun);
             console = new ConsoleWindow(executor);
             consoleTabPage.Controls.Add(console);
-            csscc.SccCompiler.Init();
             processRunning = false;
             buildInProgress = false;
             compileAborted = false;
@@ -66,10 +65,10 @@ namespace cmdevenv
             emitOptLlvm = Configuration.Instance.EmitOptLlvm;
             linkWithDebugRuntime = Configuration.Instance.LinkWithDebugRuntime;
             linkUsingMsLink = Configuration.Instance.LinkUsingMsLink;
+            numBuildThreads = Configuration.Instance.NumBuildThreads;
             optimizationLevel = -1;
             errorListView.ContextMenuStrip = errorsListViewContextMenuStrip;
             string[] args = Environment.GetCommandLineArgs();
-            sccTimer.Tick += SccTimer_Tick;
             if (args.Length > 1)
             {
                 OpenProjectOrSolution(args[1]);
@@ -81,49 +80,21 @@ namespace cmdevenv
             try
             {
                 TabPage selectedTab = editorTabControl.SelectedTab;
-                Editor editor = (Editor)selectedTab.Tag;
-                string projectFilePath = editor.SourceFile.Project.FilePath;
-                string sourceFilePath = editor.SourceFile.FilePath;
-                BuildEditModule(projectFilePath, sourceFilePath);
+                if (selectedTab != null)
+                {
+                    Editor editor = (Editor)selectedTab.Tag;
+                    if (editor.SourceFile.Project != null)
+                    {
+                        string projectFilePath = editor.SourceFile.Project.FilePath;
+                        string sourceFilePath = editor.SourceFile.FilePath;
+                    }
+                }
             }
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message);
             }
 
-        }
-
-        private void SccTimer_Tick(object sender, EventArgs e)
-        {
-            int code = csscc.SccCompiler.EditModuleBuilt();
-            switch (code)
-            {
-                case 1:
-                {
-                    editModuleBuilt = true;
-                    sccTimer.Stop();
-                    infoTimer.Stop();
-                    infoLabel.Text = "Edit module built.";
-                    infoTimer.Start();
-                    break;
-                }
-                case 2:
-                {
-                    sccTimer.Stop();
-                    infoTimer.Stop();
-                    infoLabel.Text = "Could not build edit module: " + csscc.SccCompiler.GetErrorMessage();
-                    infoTimer.Start();
-                    break;
-                }
-            }
-        }
-        private void BuildEditModule(string projectFilePath, string sourceFilePath)
-        {
-            editModuleBuilt = false;
-            csscc.SccCompiler.BuildEditModule(projectFilePath, sourceFilePath);
-            infoTimer.Stop();
-            infoLabel.Text = "Building edit module...";
-            sccTimer.Start();
         }
         public bool PreFilterMessage(ref Message m)
         {
@@ -549,7 +520,6 @@ namespace cmdevenv
             editorTabControl.SelectedTab = editorTab;
             SetMenuItemStatus();
             editor.Focus();
-            BuildEditModule(sourceFile.Project.FilePath, sourceFile.FilePath);
             return editor;
         }
         void editor_PositionChanged(object sender, PositionEventArgs e)
@@ -819,7 +789,6 @@ namespace cmdevenv
                 profiler.WaitForExit();
                 unitTester.DoExit();
                 unitTester.WaitForExit();
-                csscc.SccCompiler.Done();
             }
             catch (Exception ex)
             {
@@ -1069,7 +1038,7 @@ namespace cmdevenv
                     {
                         SetDefinesFor(project, config);
                     }
-                    compiler.DoCompile(solution.FilePath, config, strictNothrow, emitLlvm, emitOptLlvm, linkWithDebugRuntime, linkUsingMsLink, optimizationLevel);
+                    compiler.DoCompile(solution.FilePath, config, strictNothrow, emitLlvm, emitOptLlvm, linkWithDebugRuntime, linkUsingMsLink, optimizationLevel, numBuildThreads);
                     infoTimer.Stop();
                     infoLabel.Text = "Building";
                 }
@@ -1107,7 +1076,7 @@ namespace cmdevenv
                 buildInProgress = true;
                 SetState(State.compiling);
                 SetDefinesFor(project, config);
-                compiler.DoCompile(project.FilePath, config, strictNothrow, emitLlvm, emitOptLlvm, linkWithDebugRuntime, linkUsingMsLink, optimizationLevel);
+                compiler.DoCompile(project.FilePath, config, strictNothrow, emitLlvm, emitOptLlvm, linkWithDebugRuntime, linkUsingMsLink, optimizationLevel, numBuildThreads);
                 infoTimer.Stop();
                 infoLabel.Text = "Building";
             }
@@ -1628,11 +1597,13 @@ namespace cmdevenv
                 emitOptLlvm = Configuration.Instance.EmitOptLlvm;
                 linkWithDebugRuntime = Configuration.Instance.LinkWithDebugRuntime;
                 linkUsingMsLink = Configuration.Instance.LinkUsingMsLink;
+                numBuildThreads = Configuration.Instance.NumBuildThreads;
                 dialog.StrictNothrow = strictNothrow;
                 dialog.EmitLlvm = emitLlvm;
                 dialog.EmitOptLlvm = emitOptLlvm;
                 dialog.LinkWithDebugRuntime = linkWithDebugRuntime;
                 dialog.LinkUsingMsLink = linkUsingMsLink;
+                dialog.NumBuildThreads = numBuildThreads;
                 if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                 {
                     strictNothrow = dialog.StrictNothrow;
@@ -1640,11 +1611,13 @@ namespace cmdevenv
                     emitOptLlvm = dialog.EmitOptLlvm;
                     linkWithDebugRuntime = dialog.LinkWithDebugRuntime;
                     linkUsingMsLink = dialog.LinkUsingMsLink;
+                    numBuildThreads = dialog.NumBuildThreads;
                     Configuration.Instance.StrictNothrow = strictNothrow;
                     Configuration.Instance.EmitLlvm = emitLlvm;
                     Configuration.Instance.EmitOptLlvm = emitOptLlvm;
                     Configuration.Instance.LinkWithDebugRuntime = linkWithDebugRuntime;
                     Configuration.Instance.LinkUsingMsLink = linkUsingMsLink;
+                    Configuration.Instance.NumBuildThreads = numBuildThreads;
                     Configuration.Instance.Save();
                 }
             }
@@ -2599,6 +2572,7 @@ namespace cmdevenv
         private bool emitOptLlvm;
         private bool linkWithDebugRuntime;
         private bool linkUsingMsLink;
+        private int numBuildThreads;
         private int optimizationLevel;
         private DateTime compileStartTime;
         private string findWhatText;

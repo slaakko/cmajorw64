@@ -90,6 +90,8 @@ namespace cmdevenv
                 linkWithDebugRuntime.Value = false;
                 linkUsingMsLink = new BooleanField("linkUsingMsLink", Fields);
                 linkUsingMsLink.Value = false;
+                numBuildThreads = new IntField("numBuildThreads", Fields);
+                numBuildThreads.Value = 0;
             }
             public string CmcPath
             {
@@ -250,6 +252,11 @@ namespace cmdevenv
                 get { return linkUsingMsLink.Value; }
                 set { linkUsingMsLink.Value = value; }
             }
+            public int NumBuildThreads
+            {
+                get { return numBuildThreads.Value; }
+                set { numBuildThreads.Value = value; }
+            }
             private StringField cmc;
             private IntField tabSize;
             private IntField infoDelaySecs;
@@ -282,6 +289,7 @@ namespace cmdevenv
             private BooleanField emitOptLlvm;
             private BooleanField linkWithDebugRuntime;
             private BooleanField linkUsingMsLink;
+            private IntField numBuildThreads;
         }
         public Configuration()
         {
@@ -458,6 +466,11 @@ namespace cmdevenv
         {
             get { return config.LinkUsingMsLink; }
             set { config.LinkUsingMsLink = value; }
+        }
+        public int NumBuildThreads
+        {
+            get { return config.NumBuildThreads; }
+            set { config.NumBuildThreads = value; }
         }
         public void RemoveRecentProjectPath(string recentProjectPath)
         {

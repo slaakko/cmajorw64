@@ -33,7 +33,8 @@ namespace server
 
     public class CompileRequest : Request
     {
-        public CompileRequest(string filePath, string config, bool strictNothrow, bool emitLlvm, bool emitOptLlvm, bool linkWithDebugRuntime, bool linkUsingMsLink, int optimizationLevel)
+        public CompileRequest(string filePath, string config, bool strictNothrow, bool emitLlvm, bool emitOptLlvm, bool linkWithDebugRuntime, bool linkUsingMsLink, 
+            int optimizationLevel, int numBuildThreads)
         {
             this.filePath = filePath;
             this.config = config;
@@ -43,6 +44,7 @@ namespace server
             this.linkWithDebugRuntime = linkWithDebugRuntime;
             this.linkUsingMsLink = linkUsingMsLink;
             this.optimizationLevel = optimizationLevel;
+            this.numBuildThreads = numBuildThreads;
         }
         public override void Process(RequestHandler handler)
         {
@@ -80,6 +82,10 @@ namespace server
         {
             get { return optimizationLevel; }
         }
+        public int NumBuildThreads
+        {
+            get { return numBuildThreads; }
+        }
         private string filePath;
         private string config;
         private bool strictNothrow;
@@ -88,6 +94,7 @@ namespace server
         private bool linkWithDebugRuntime;
         private bool linkUsingMsLink;
         private int optimizationLevel;
+        private int numBuildThreads;
     }
 
     public class CleanRequest : Request

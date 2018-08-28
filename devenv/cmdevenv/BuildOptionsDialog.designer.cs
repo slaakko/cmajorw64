@@ -38,12 +38,14 @@
             this.linkUsingMsLinkCheckBox = new System.Windows.Forms.CheckBox();
             this.strictNothrowCheckBox = new System.Windows.Forms.CheckBox();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
+            this.buildThreadsComboBox = new System.Windows.Forms.ComboBox();
+            this.label1 = new System.Windows.Forms.Label();
             this.groupBox3.SuspendLayout();
             this.SuspendLayout();
             // 
             // okButton
             // 
-            this.okButton.Location = new System.Drawing.Point(94, 184);
+            this.okButton.Location = new System.Drawing.Point(94, 201);
             this.okButton.Name = "okButton";
             this.okButton.Size = new System.Drawing.Size(75, 23);
             this.okButton.TabIndex = 6;
@@ -54,7 +56,7 @@
             // cancelButton
             // 
             this.cancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.cancelButton.Location = new System.Drawing.Point(175, 184);
+            this.cancelButton.Location = new System.Drawing.Point(175, 201);
             this.cancelButton.Name = "cancelButton";
             this.cancelButton.Size = new System.Drawing.Size(75, 23);
             this.cancelButton.TabIndex = 7;
@@ -103,7 +105,7 @@
             this.groupBox3.Controls.Add(this.emitLlvmCheckBox);
             this.groupBox3.Location = new System.Drawing.Point(14, 13);
             this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(236, 156);
+            this.groupBox3.Size = new System.Drawing.Size(236, 155);
             this.groupBox3.TabIndex = 14;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Compiling options";
@@ -131,13 +133,56 @@
             this.toolTip1.SetToolTip(this.strictNothrowCheckBox, "Treat calling a function that can throw from a nothrow function as an error.\r\n");
             this.strictNothrowCheckBox.UseVisualStyleBackColor = true;
             // 
+            // toolTip1
+            // 
+            this.toolTip1.ShowAlways = true;
+            // 
+            // buildThreadsComboBox
+            // 
+            this.buildThreadsComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.buildThreadsComboBox.FormattingEnabled = true;
+            this.buildThreadsComboBox.Items.AddRange(new object[] {
+            "Default",
+            "1",
+            "2",
+            "3",
+            "4",
+            "5",
+            "6",
+            "7",
+            "8",
+            "9",
+            "10",
+            "11",
+            "12",
+            "13",
+            "14",
+            "15",
+            "16"});
+            this.buildThreadsComboBox.Location = new System.Drawing.Point(137, 174);
+            this.buildThreadsComboBox.Name = "buildThreadsComboBox";
+            this.buildThreadsComboBox.Size = new System.Drawing.Size(113, 21);
+            this.buildThreadsComboBox.TabIndex = 3;
+            this.toolTip1.SetToolTip(this.buildThreadsComboBox, "Default is 2 x number of cores");
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(12, 177);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(122, 13);
+            this.label1.TabIndex = 15;
+            this.label1.Text = "Number of build threads:";
+            // 
             // BuildOptionsDialog
             // 
             this.AcceptButton = this.okButton;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.cancelButton;
-            this.ClientSize = new System.Drawing.Size(260, 221);
+            this.ClientSize = new System.Drawing.Size(260, 233);
+            this.Controls.Add(this.label1);
+            this.Controls.Add(this.buildThreadsComboBox);
             this.Controls.Add(this.groupBox3);
             this.Controls.Add(this.cancelButton);
             this.Controls.Add(this.okButton);
@@ -149,6 +194,7 @@
             this.groupBox3.ResumeLayout(false);
             this.groupBox3.PerformLayout();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -163,5 +209,7 @@
         private System.Windows.Forms.CheckBox strictNothrowCheckBox;
         private System.Windows.Forms.CheckBox linkUsingMsLinkCheckBox;
         private System.Windows.Forms.ToolTip toolTip1;
+        private System.Windows.Forms.ComboBox buildThreadsComboBox;
+        private System.Windows.Forms.Label label1;
     }
 }

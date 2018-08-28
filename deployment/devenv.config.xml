@@ -3,27 +3,27 @@
     <cmc>cmc.exe</cmc>
     <tabSize>4</tabSize>
     <infoDelaySecs>10</infoDelaySecs>
-    <formSizeX>1840</formSizeX>
-    <formSizeY>985</formSizeY>
-    <formTop>23</formTop>
-    <formLeft>29</formLeft>
-    <textVisX>52</textVisX>
-    <textVisY>52</textVisY>
+    <formSizeX>1698</formSizeX>
+    <formSizeY>995</formSizeY>
+    <formTop>39</formTop>
+    <formLeft>44</formLeft>
+    <textVisX>234</textVisX>
+    <textVisY>234</textVisY>
     <textVisW>1259</textVisW>
     <textVisH>482</textVisH>
-    <toolColWidth>80</toolColWidth>
+    <toolColWidth>97</toolColWidth>
     <categoryColWidth>80</categoryColWidth>
-    <descriptionColWidth>1003</descriptionColWidth>
+    <descriptionColWidth>876</descriptionColWidth>
     <fileColWidth>340</fileColWidth>
     <lineColWidth>60</lineColWidth>
     <projectColWidth>80</projectColWidth>
     <textColWidth>308</textColWidth>
-    <findFileColWidth>442</findFileColWidth>
+    <findFileColWidth>688</findFileColWidth>
     <findLineColWidth>85</findLineColWidth>
     <findProjectColWidth>183</findProjectColWidth>
     <findTextColWidth>738</findTextColWidth>
-    <horizontalSplitterPos>1386</horizontalSplitterPos>
-    <verticalSplitterPos>630</verticalSplitterPos>
+    <horizontalSplitterPos>1278</horizontalSplitterPos>
+    <verticalSplitterPos>607</verticalSplitterPos>
     <windowState>Normal</windowState>
     <maxRecentProjects>10</maxRecentProjects>
     <recentProjects />
@@ -32,4 +32,5 @@
     <emitOptLlvm>false</emitOptLlvm>
     <linkWithDebugRuntime>false</linkWithDebugRuntime>
     <linkUsingMsLink>false</linkUsingMsLink>
+    <numBuildThreads>0</numBuildThreads>
 </cmdevenv.configuration>

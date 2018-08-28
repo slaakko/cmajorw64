@@ -367,7 +367,8 @@ namespace server
         }
         public override void HandleCompileRequest(CompileRequest request)
         {
-            Compile(request.FilePath, request.Config, request.StrictNothrow, request.EmitLlvm, request.EmitOptLlvm, request.LinkWithDebugRuntime, request.LinkUsingMsLink, request.OptimizationLevel);
+            Compile(request.FilePath, request.Config, request.StrictNothrow, request.EmitLlvm, request.EmitOptLlvm, request.LinkWithDebugRuntime, request.LinkUsingMsLink, 
+                request.OptimizationLevel, request.NumBuildThreads);
         }
         public void SetWriteMethod(Control writer, WriteLineToOutputWindow writeMethod)
         {
@@ -397,16 +398,19 @@ namespace server
         {
             exit.WaitOne();
         }
-        public void DoCompile(string filePath, string config, bool strictNothrow, bool emitLlvm, bool emitOptLlvm, bool linkWithDebugRuntime, bool linkUsingMsLink, int optimizationLevel)
+        public void DoCompile(string filePath, string config, bool strictNothrow, bool emitLlvm, bool emitOptLlvm, bool linkWithDebugRuntime, bool linkUsingMsLink, 
+            int optimizationLevel, int numBuildThreads)
         {
-            Request request = new CompileRequest(filePath, config, strictNothrow, emitLlvm, emitOptLlvm, linkWithDebugRuntime, linkUsingMsLink, optimizationLevel);
+            Request request = new CompileRequest(filePath, config, strictNothrow, emitLlvm, emitOptLlvm, linkWithDebugRuntime, linkUsingMsLink, optimizationLevel,
+                numBuildThreads);
             lock (requestQueue)
             {
                 requestQueue.Enqueue(request);
             }
             requestWaiting.Set();
         }
-        private void Compile(string filePath, string config, bool strictNothrow, bool emitLlvm, bool emitOptLlvm, bool linkWithDebugRuntime, bool linkUsingMsLink, int optimizationLevel)
+        private void Compile(string filePath, string config, bool strictNothrow, bool emitLlvm, bool emitOptLlvm, bool linkWithDebugRuntime, bool linkUsingMsLink, 
+            int optimizationLevel, int numBuildThreads)
         {
             try
             {
@@ -438,6 +442,10 @@ namespace server
                 if (optimizationLevel != -1)
                 {
                     arguments.Append(" --optimization-level=" + optimizationLevel.ToString());
+                }
+                if (numBuildThreads != 0)
+                {
+                    arguments.Append(" --build-threads=" + numBuildThreads.ToString());
                 }
                 arguments.Append(" \"").Append(filePath + "\"");
                 ProcessStartInfo startInfo = new ProcessStartInfo(cmcPath, arguments.ToString());
