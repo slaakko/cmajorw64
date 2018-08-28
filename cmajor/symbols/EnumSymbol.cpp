@@ -236,12 +236,14 @@ void EnumConstantSymbol::Write(SymbolWriter& writer)
 {
     Symbol::Write(writer);
     WriteValue(value.get(), writer.GetBinaryWriter());
+    writer.GetBinaryWriter().Write(strValue);
 }
 
 void EnumConstantSymbol::Read(SymbolReader& reader)
 {
     Symbol::Read(reader);
     value = ReadValue(reader.GetBinaryReader(), GetSpan(), GetModule());
+    strValue = reader.GetBinaryReader().ReadUtf32String();
 }
 
 EnumTypeDefaultConstructor::EnumTypeDefaultConstructor(const Span& span_, const std::u32string& name_) : 

@@ -45,6 +45,7 @@ void ConstantSymbol::Write(SymbolWriter& writer)
     {
         WriteValue(value.get(), writer.GetBinaryWriter());
     }
+    writer.GetBinaryWriter().Write(strValue);
 }
 
 void ConstantSymbol::Read(SymbolReader& reader)
@@ -65,6 +66,7 @@ void ConstantSymbol::Read(SymbolReader& reader)
     {
         value = ReadValue(reader.GetBinaryReader(), GetSpan(), GetModule());
     }
+    strValue = reader.GetBinaryReader().ReadUtf32String();
 }
 
 Value* ConstantSymbol::GetValue() 

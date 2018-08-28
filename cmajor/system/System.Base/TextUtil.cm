@@ -266,12 +266,37 @@ namespace System
         }
         return result;
     }
+    
+    public nothrow ustring StringStr(const ustring& s)
+    {
+        ustring result;
+        for (uchar c : s)
+        {
+            if (c == u'\'')
+            {
+                result.Append(c);
+            }
+            else
+            {
+                result.Append(CharStr(c));
+            }
+        }
+        return result;
+    }
 
     public nothrow string MakeStringLiteral(const string& s)
     {
         string result = "\"";
         result.Append(StringStr(s));
         result.Append('"');
+        return result;
+    }
+    
+    public nothrow ustring MakeStringLiteral(const ustring& s)
+    {
+        ustring result = u"\"";
+        result.Append(StringStr(s));
+        result.Append(u'"');
         return result;
     }
 }

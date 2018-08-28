@@ -528,6 +528,18 @@ public:
     std::string ToString() const override;
 };
 
+class ParenthesizedExpressionNode : public UnaryNode
+{
+public:
+    ParenthesizedExpressionNode(const Span& span_);
+    ParenthesizedExpressionNode(const Span& span_, Node* child_);
+    Node* Clone(CloneContext& cloneContext) const override;
+    void Write(AstWriter& writer) override;
+    void Read(AstReader& reader) override;
+    void Accept(Visitor& visitor) override;
+    std::string ToString() const override;
+};
+
 } } // namespace cmajor::ast
 
 #endif // CMAJOR_AST_EXPRESSION_INCLUDED

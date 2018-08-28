@@ -9,6 +9,7 @@
 #include <cmajor/binder/Concept.hpp>
 #include <cmajor/binder/Evaluator.hpp>
 #include <cmajor/binder/AttributeBinder.hpp>
+#include <cmajor/cmdoclib/Constraint.hpp>
 #include <cmajor/ast/CompileUnit.hpp>
 #include <cmajor/ast/Identifier.hpp>
 #include <cmajor/symbols/FunctionSymbol.hpp>
@@ -135,8 +136,16 @@ void TypeBinder::Visit(FunctionNode& functionNode)
     FunctionSymbol* functionSymbol = static_cast<FunctionSymbol*>(symbol);
     if (functionSymbol->IsBound()) return;
     functionSymbol->SetBound();
+    if (GetGlobalFlag(GlobalFlags::cmdoc))
+    {
+        symbolTable.MapSymbol(&functionNode, functionSymbol);
+    }
     FunctionSymbol* prevFunctionSymbol = currentFunctionSymbol;
     currentFunctionSymbol = functionSymbol;
+    if (GetGlobalFlag(GlobalFlags::cmdoc) && functionNode.WhereConstraint())
+    {
+        cmdoclib::BindConstraintSymbols(functionNode.WhereConstraint(), containerScope, boundCompileUnit);
+    }
     if (functionSymbol->IsFunctionTemplate())
     {
         functionSymbol->CloneUsingNodes(usingNodes);
@@ -145,6 +154,10 @@ void TypeBinder::Visit(FunctionNode& functionNode)
             CloneContext cloneContext;
             functionSymbol->SetConstraint(static_cast<WhereConstraintNode*>(functionNode.WhereConstraint()->Clone(cloneContext)));
         }
+    }
+    if (GetGlobalFlag(GlobalFlags::cmdoc) && functionSymbol->Constraint())
+    {
+        cmdoclib::BindConstraintSymbols(functionSymbol->Constraint(), functionSymbol->GetContainerScope(), boundCompileUnit);
     }
     containerScope = functionSymbol->GetContainerScope();
     Specifiers specifiers = functionNode.GetSpecifiers();
@@ -213,6 +226,10 @@ void TypeBinder::BindClassTemplate(ClassTypeSymbol* classTemplate, ClassNode* cl
     {
         CloneContext cloneContext;
         classTemplate->SetConstraint(static_cast<ConstraintNode*>(classNode->WhereConstraint()->Clone(cloneContext)));
+        if (GetGlobalFlag(GlobalFlags::cmdoc))
+        {
+            cmdoclib::BindConstraintSymbols(classNode->WhereConstraint(), classTemplate->GetContainerScope(), boundCompileUnit);
+        }
     }
     classTemplate->SetAccess(classNode->GetSpecifiers() & Specifiers::access_);
     classTemplate->ComputeName();
@@ -222,16 +239,25 @@ void TypeBinder::BindClassTemplate(ClassTypeSymbol* classTemplate, ClassNode* cl
         templateArgumentTypes.push_back(templateParam);
     }
     ClassTemplateSpecializationSymbol* prototype = symbolTable.MakeClassTemplateSpecialization(classTemplate, templateArgumentTypes, classTemplate->GetSpan());
+    prototype->SetPrototype();
     prototype->MarkExport();
     prototype->SetAccess(SymbolAccess::public_);
     boundCompileUnit.GetClassTemplateRepository().BindClassTemplateSpecialization(prototype, containerScope, classTemplate->GetSpan());
     classTemplate->SetPrototype(prototype);
+    if (GetGlobalFlag(GlobalFlags::cmdoc) && prototype->Constraint())
+    {
+        cmdoclib::BindConstraintSymbols(prototype->Constraint(), prototype->GetContainerScope(), boundCompileUnit);
+    }
 }
 
 void TypeBinder::BindClass(ClassTypeSymbol* classTypeSymbol, ClassNode* classNode, bool fromOwnCompileUnit)
 {
     if (classTypeSymbol->IsBound()) return;
     classTypeSymbol->SetBound();
+    if (GetGlobalFlag(GlobalFlags::cmdoc))
+    {
+        symbolTable.MapSymbol(classNode->Id(), classTypeSymbol);
+    }
     if (!fromOwnCompileUnit)
     {
         AddUsingNodesToCurrentCompileUnit(classNode);
@@ -248,6 +274,10 @@ void TypeBinder::BindClass(ClassTypeSymbol* classTypeSymbol, ClassNode* classNod
     {
         CloneContext cloneContext;
         classTypeSymbol->SetConstraint(static_cast<ConstraintNode*>(classNode->WhereConstraint()->Clone(cloneContext)));
+        if (GetGlobalFlag(GlobalFlags::cmdoc))
+        {
+            cmdoclib::BindConstraintSymbols(classNode->WhereConstraint(), containerScope, boundCompileUnit);
+        }
     }
     classTypeSymbol->ComputeName();
     int nb = classNode->BaseClassOrInterfaces().Count();
@@ -329,6 +359,10 @@ void TypeBinder::Visit(StaticConstructorNode& staticConstructorNode)
     Symbol* symbol = symbolTable.GetSymbol(&staticConstructorNode);
     Assert(symbol->GetSymbolType() == SymbolType::staticConstructorSymbol, "static constructor symbol expected");
     StaticConstructorSymbol* staticConstructorSymbol = static_cast<StaticConstructorSymbol*>(symbol);
+    if (GetGlobalFlag(GlobalFlags::cmdoc))
+    {
+        symbolTable.MapSymbol(staticConstructorNode.ClassId(), staticConstructorSymbol);
+    }
     FunctionSymbol* prevFunctionSymbol = currentFunctionSymbol;
     currentFunctionSymbol = staticConstructorSymbol;
     ContainerScope* prevContainerScope = containerScope;
@@ -345,6 +379,14 @@ void TypeBinder::Visit(StaticConstructorNode& staticConstructorNode)
         staticConstructorSymbol->SetConstraint(static_cast<WhereConstraintNode*>(staticConstructorNode.WhereConstraint()->Clone(cloneContext)));
     }
     staticConstructorSymbol->ComputeName();
+    if (GetGlobalFlag(GlobalFlags::cmdoc) && staticConstructorNode.WhereConstraint())
+    {
+        cmdoclib::BindConstraintSymbols(staticConstructorNode.WhereConstraint(), containerScope, boundCompileUnit);
+    }
+    if (GetGlobalFlag(GlobalFlags::cmdoc) && staticConstructorSymbol->Constraint())
+    {
+        cmdoclib::BindConstraintSymbols(staticConstructorSymbol->Constraint(), containerScope, boundCompileUnit);
+    }
     if (staticConstructorNode.Body())
     {
         staticConstructorNode.Body()->Accept(*this);
@@ -368,6 +410,10 @@ void TypeBinder::Visit(ConstructorNode& constructorNode)
     ConstructorSymbol* constructorSymbol = static_cast<ConstructorSymbol*>(symbol);
     if (constructorSymbol->IsBound()) return;
     constructorSymbol->SetBound();
+    if (GetGlobalFlag(GlobalFlags::cmdoc))
+    {
+        symbolTable.MapSymbol(constructorNode.ClassId(), constructorSymbol);
+    }
     FunctionSymbol* prevFunctionSymbol = currentFunctionSymbol;
     currentFunctionSymbol = constructorSymbol;
     ContainerScope* prevContainerScope = containerScope;
@@ -399,12 +445,23 @@ void TypeBinder::Visit(ConstructorNode& constructorNode)
         ParameterSymbol* parameterSymbol = static_cast<ParameterSymbol*>(symbol);
         parameterSymbol->SetType(parameterType);
     }
+    if (constructorNode.WhereConstraint())
+    {
+    }
     if (!constructorSymbol->Constraint() && constructorNode.WhereConstraint())
     {
         CloneContext cloneContext;
         constructorSymbol->SetConstraint(static_cast<WhereConstraintNode*>(constructorNode.WhereConstraint()->Clone(cloneContext)));
     }
     constructorSymbol->ComputeName();
+    if (GetGlobalFlag(GlobalFlags::cmdoc) && constructorNode.WhereConstraint())
+    {
+        cmdoclib::BindConstraintSymbols(constructorNode.WhereConstraint(), containerScope, boundCompileUnit);
+    }
+    if (GetGlobalFlag(GlobalFlags::cmdoc) && constructorSymbol->Constraint())
+    {
+        cmdoclib::BindConstraintSymbols(constructorSymbol->Constraint(), containerScope, boundCompileUnit);
+    }
     for (ParameterSymbol* parameterSymbol : constructorSymbol->Parameters())
     {
         parameterSymbol->ComputeMangledName();
@@ -451,6 +508,10 @@ void TypeBinder::Visit(DestructorNode& destructorNode)
     Symbol* symbol = symbolTable.GetSymbol(&destructorNode);
     Assert(symbol->GetSymbolType() == SymbolType::destructorSymbol, "destructor symbol expected");
     DestructorSymbol* destructorSymbol = static_cast<DestructorSymbol*>(symbol);
+    if (GetGlobalFlag(GlobalFlags::cmdoc))
+    {
+        symbolTable.MapSymbol(destructorNode.ClassId(), destructorSymbol);
+    }
     FunctionSymbol* prevFunctionSymbol = currentFunctionSymbol;
     currentFunctionSymbol = destructorSymbol;
     ContainerScope* prevContainerScope = containerScope;
@@ -472,6 +533,14 @@ void TypeBinder::Visit(DestructorNode& destructorNode)
         destructorSymbol->SetConstraint(static_cast<WhereConstraintNode*>(destructorNode.WhereConstraint()->Clone(cloneContext)));
     }
     destructorSymbol->ComputeName();
+    if (GetGlobalFlag(GlobalFlags::cmdoc) && destructorNode.WhereConstraint())
+    {
+        cmdoclib::BindConstraintSymbols(destructorNode.WhereConstraint(), containerScope, boundCompileUnit);
+    }
+    if (GetGlobalFlag(GlobalFlags::cmdoc) && destructorSymbol->Constraint())
+    {
+        cmdoclib::BindConstraintSymbols(destructorSymbol->Constraint(), containerScope, boundCompileUnit);
+    }
     if (destructorNode.Body())
     {
         if (destructorSymbol->IsDefault())
@@ -499,6 +568,10 @@ void TypeBinder::Visit(MemberFunctionNode& memberFunctionNode)
     MemberFunctionSymbol* memberFunctionSymbol = static_cast<MemberFunctionSymbol*>(symbol);
     if (memberFunctionSymbol->IsBound()) return;
     memberFunctionSymbol->SetBound();
+    if (GetGlobalFlag(GlobalFlags::cmdoc))
+    {
+        symbolTable.MapSymbol(&memberFunctionNode, memberFunctionSymbol);
+    }
     FunctionSymbol* prevFunctionSymbol = currentFunctionSymbol;
     currentFunctionSymbol = memberFunctionSymbol;
     ContainerScope* prevContainerScope = containerScope;
@@ -536,6 +609,14 @@ void TypeBinder::Visit(MemberFunctionNode& memberFunctionNode)
         memberFunctionSymbol->SetConstraint(static_cast<WhereConstraintNode*>(memberFunctionNode.WhereConstraint()->Clone(cloneContext)));
     }
     memberFunctionSymbol->ComputeName();
+    if (GetGlobalFlag(GlobalFlags::cmdoc) && memberFunctionNode.WhereConstraint())
+    {
+        cmdoclib::BindConstraintSymbols(memberFunctionNode.WhereConstraint(), containerScope, boundCompileUnit);
+    }
+    if (GetGlobalFlag(GlobalFlags::cmdoc) && memberFunctionSymbol->Constraint())
+    {
+        cmdoclib::BindConstraintSymbols(memberFunctionSymbol->Constraint(), containerScope, boundCompileUnit);
+    }
     for (ParameterSymbol* parameterSymbol : memberFunctionSymbol->Parameters())
     {
         parameterSymbol->ComputeMangledName();
@@ -616,6 +697,14 @@ void TypeBinder::Visit(ConversionFunctionNode& conversionFunctionNode)
         conversionFunctionSymbol->SetConstraint(static_cast<WhereConstraintNode*>(conversionFunctionNode.WhereConstraint()->Clone(cloneContext)));
     }
     conversionFunctionSymbol->ComputeName();
+    if (GetGlobalFlag(GlobalFlags::cmdoc) && conversionFunctionNode.WhereConstraint())
+    {
+        cmdoclib::BindConstraintSymbols(conversionFunctionNode.WhereConstraint(), containerScope, boundCompileUnit);
+    }
+    if (GetGlobalFlag(GlobalFlags::cmdoc) && conversionFunctionSymbol->Constraint())
+    {
+        cmdoclib::BindConstraintSymbols(conversionFunctionSymbol->Constraint(), containerScope, boundCompileUnit);
+    }
     if (conversionFunctionSymbol->ReturnsClassInterfaceOrClassDelegateByValue())
     {
         ParameterSymbol* returnParam = new ParameterSymbol(conversionFunctionNode.ReturnTypeExpr()->GetSpan(), U"@return");
@@ -699,7 +788,12 @@ void TypeBinder::Visit(DelegateNode& delegateNode)
     Symbol* symbol = symbolTable.GetSymbol(&delegateNode);
     Assert(symbol->GetSymbolType() == SymbolType::delegateTypeSymbol, "delegate type symbol expected");
     DelegateTypeSymbol* delegateTypeSymbol = static_cast<DelegateTypeSymbol*>(symbol);
+    if (GetGlobalFlag(GlobalFlags::cmdoc))
+    {
+        symbolTable.MapSymbol(delegateNode.Id(), delegateTypeSymbol);
+    }
     delegateTypeSymbol->SetSpecifiers(delegateNode.GetSpecifiers());
+    delegateTypeSymbol->ComputeMangledName();
     int n = delegateNode.Parameters().Count();
     for (int i = 0; i < n; ++i)
     {
@@ -751,10 +845,16 @@ void TypeBinder::Visit(ClassDelegateNode& classDelegateNode)
     Symbol* symbol = symbolTable.GetSymbol(&classDelegateNode);
     Assert(symbol->GetSymbolType() == SymbolType::classDelegateTypeSymbol, "class delegate type symbol expected");
     ClassDelegateTypeSymbol* classDelegateTypeSymbol = static_cast<ClassDelegateTypeSymbol*>(symbol);
+    if (GetGlobalFlag(GlobalFlags::cmdoc))
+    {
+        symbolTable.MapSymbol(classDelegateNode.Id(), classDelegateTypeSymbol);
+    }
     classDelegateTypeSymbol->SetSpecifiers(classDelegateNode.GetSpecifiers());
+    classDelegateTypeSymbol->ComputeMangledName();
     DelegateTypeSymbol* memberDelegateType = new DelegateTypeSymbol(classDelegateNode.GetSpan(), U"@dlg_type");
     memberDelegateType->SetSymbolTable(&symbolTable);
     memberDelegateType->SetModule(module);
+    memberDelegateType->SetOriginalModule(module);
     symbolTable.SetTypeIdFor(memberDelegateType);
     ParameterSymbol* objectParam = new ParameterSymbol(classDelegateNode.GetSpan(), U"@obj");
     TypeSymbol* voidPtrType = symbolTable.GetTypeByName(U"void")->AddPointer(classDelegateNode.GetSpan());
@@ -834,6 +934,18 @@ void TypeBinder::BindConcept(ConceptSymbol* conceptSymbol, ConceptNode* conceptN
 {
     if (conceptSymbol->IsBound()) return;
     conceptSymbol->SetBound();
+    ContainerScope* prevContainerScope = containerScope;
+    containerScope = conceptSymbol->GetContainerScope();
+    if (GetGlobalFlag(GlobalFlags::cmdoc))
+    {
+        symbolTable.MapSymbol(conceptNode->Id(), conceptSymbol);
+        int n = conceptNode->TypeParameters().Count();
+        for (int i = 0; i < n; ++i)
+        {
+            symbolTable.MapSymbol(conceptNode->TypeParameters()[i], conceptSymbol->TemplateParameters()[i]);
+        }
+        cmdoclib::BindConstraintSymbols(conceptNode, containerScope, boundCompileUnit);
+    }
     conceptSymbol->SetSpecifiers(conceptNode->GetSpecifiers());
     conceptSymbol->ComputeName();
     if (conceptNode->Refinement())
@@ -849,6 +961,7 @@ void TypeBinder::BindConcept(ConceptSymbol* conceptSymbol, ConceptNode* conceptN
         }
         conceptSymbol->SetRefinedConcept(refinedConceptSymbol);
     }
+    containerScope = prevContainerScope;
 }
 
 void TypeBinder::Visit(CompoundStatementNode& compoundStatementNode)
@@ -1103,6 +1216,10 @@ void TypeBinder::BindTypedef(TypedefSymbol* typedefSymbol, TypedefNode* typedefN
 {
     if (typedefSymbol->IsBound()) return;
     typedefSymbol->SetBound();
+    if (GetGlobalFlag(GlobalFlags::cmdoc))
+    {
+        symbolTable.MapSymbol(typedefNode->Id(), typedefSymbol);
+    }
     typedefSymbol->SetSpecifiers(typedefNode->GetSpecifiers());
     typedefSymbol->ComputeMangledName();
     if (!fromOwnCompileUnit)
@@ -1118,6 +1235,10 @@ void TypeBinder::Visit(ConstantNode& constantNode)
     Symbol* symbol = symbolTable.GetSymbol(&constantNode);
     Assert(symbol->GetSymbolType() == SymbolType::constantSymbol, "constant symbol expected");
     ConstantSymbol* constantSymbol = static_cast<ConstantSymbol*>(symbol);
+    if (GetGlobalFlag(GlobalFlags::cmdoc))
+    {
+        symbolTable.MapSymbol(constantNode.Id(), constantSymbol);
+    }
     constantSymbol->SetSpecifiers(constantNode.GetSpecifiers());
     constantSymbol->ComputeMangledName();
     TypeSymbol* typeSymbol = ResolveType(constantNode.TypeExpr(), boundCompileUnit, containerScope, typeResolverFlags);
@@ -1148,6 +1269,10 @@ void TypeBinder::Visit(EnumTypeNode& enumTypeNode)
     EnumTypeSymbol* enumTypeSymbol = static_cast<EnumTypeSymbol*>(symbol);
     if (enumTypeSymbol->IsBound()) return;
     enumTypeSymbol->SetBound();
+    if (GetGlobalFlag(GlobalFlags::cmdoc))
+    {
+        symbolTable.MapSymbol(enumTypeNode.Id(), enumTypeSymbol);
+    }
     EnumTypeSymbol* prevEnumType = enumType;
     enumType = enumTypeSymbol;
     enumTypeSymbol->SetSpecifiers(enumTypeNode.GetSpecifiers());
@@ -1211,7 +1336,7 @@ void TypeBinder::Visit(EnumConstantNode& enumConstantNode)
     enumConstantSymbol->ResetEvaluating();
 }
 
-void TypeBinder::BindPrototype()
+void TypeBinder::CreateMemberSymbols()
 {
     typeResolverFlags = typeResolverFlags | TypeResolverFlags::createMemberSymbols;
 }

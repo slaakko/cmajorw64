@@ -41,7 +41,7 @@ enum class ConversionType : uint8_t
     implicit_, explicit_
 };
 
-enum class FunctionSymbolFlags : uint16_t
+enum class FunctionSymbolFlags : uint32_t
 {
     none = 0,
     inline_ = 1 << 0,
@@ -59,17 +59,19 @@ enum class FunctionSymbolFlags : uint16_t
     conversion = 1 << 12,
     linkOnceOdrLinkage = 1 << 13,
     templateSpecialization = 1 << 14,
-    hasTry = 1 << 15
+    hasTry = 1 << 15,
+    hasSource = 1 << 16,
+    includeConstraint = 1 << 17
 };
 
 inline FunctionSymbolFlags operator|(FunctionSymbolFlags left, FunctionSymbolFlags right)
 {
-    return FunctionSymbolFlags(uint16_t(left) | uint16_t(right));
+    return FunctionSymbolFlags(uint32_t(left) | uint32_t(right));
 }
 
 inline FunctionSymbolFlags operator&(FunctionSymbolFlags left, FunctionSymbolFlags right)
 {
-    return FunctionSymbolFlags(uint16_t(left) & uint16_t(right));
+    return FunctionSymbolFlags(uint32_t(left) & uint32_t(right));
 }
 
 std::string FunctionSymbolFlagStr(FunctionSymbolFlags flags);
@@ -87,6 +89,7 @@ public:
     FunctionSymbol(SymbolType symbolType_, const Span& span_, const std::u32string& name_);
     void Write(SymbolWriter& writer) override;
     void Read(SymbolReader& reader) override;
+    void EmplaceFunction(FunctionSymbol* functionSymbol, int index) override;
     void ComputeExportClosure() override;
     void Accept(SymbolCollector* collector) override;
     void ReadAstNodes();
@@ -103,8 +106,11 @@ public:
     std::u32string FullName() const override;
     std::u32string FullNameWithSpecifiers() const override;
     std::u32string DocName() const override;
+    std::u32string CodeName() const override { return groupName; }
     std::string GetSpecifierStr() const override;
     std::string Syntax() const override;
+    int32_t GetIndex() const { return index; }
+    void SetIndex(int32_t index_) { index = index_; }
     virtual ConversionType GetConversionType() const { return ConversionType::implicit_; }
     virtual uint8_t ConversionDistance() const { return 0; }
     virtual TypeSymbol* ConversionSourceType() const { return nullptr; }
@@ -202,15 +208,24 @@ public:
     std::u32string Info() const override { return groupName; }
     const char* ClassName() const override { return "FunctionSymbol"; }
     virtual int ClassArity() const { return 0; }
+    bool HasSource() const { return GetFlag(FunctionSymbolFlags::hasSource); }
+    void SetHasSource() { SetFlag(FunctionSymbolFlags::hasSource); }
+    std::u32string Id() const override;
+    FunctionSymbol* FunctionTemplate() { return functionTemplate; }
+    void SetFunctionTemplate(FunctionSymbol* functionTemplate_) { functionTemplate = functionTemplate_; }
+    void SetTemplateArgumentTypes(const std::vector<TypeSymbol*>& templateArgumentTypes_);
 private:
+    FunctionSymbol* functionTemplate;
     boost::uuids::uuid functionId;
     std::u32string groupName;
     std::vector<TemplateParameterSymbol*> templateParameters;
+    std::vector<TypeSymbol*> templateArgumentTypes;
     std::vector<ParameterSymbol*> parameters;
     std::unique_ptr<ParameterSymbol> returnParam;
     std::vector<LocalVariableSymbol*> localVariables;
     TypeSymbol* returnType;
     FunctionSymbolFlags flags;
+    int32_t index;
     int32_t vmtIndex;
     int32_t imtIndex;
     NodeList<Node> usingNodes;
@@ -235,6 +250,7 @@ public:
     void Accept(SymbolCollector* collector) override {}
     void SetSpecifiers(Specifiers specifiers);
     std::u32string FullNameWithSpecifiers() const override;
+    std::u32string CodeName() const override;
     std::u32string Info() const override { return std::u32string(); }
     const char* ClassName() const override { return "StaticConstructorSymbol"; }
 };
@@ -245,6 +261,7 @@ public:
     ConstructorSymbol(const Span& span_, const std::u32string& name_);
     std::string TypeString() const override;
     std::u32string DocName() const override;
+    std::u32string CodeName() const override;
     ParameterSymbol* GetThisParam() const override { return Parameters()[0]; }
     bool IsConstructorDestructorOrNonstaticMemberFunction() const override { return true; }
     void SetSpecifiers(Specifiers specifiers);
@@ -265,6 +282,7 @@ public:
     void Accept(SymbolCollector* collector) override {}
     std::string TypeString() const override { return "destructor"; }
     ParameterSymbol* GetThisParam() const override { return Parameters()[0]; }
+    std::u32string CodeName() const override;
     bool IsConstructorDestructorOrNonstaticMemberFunction() const override { return true; }
     bool IsGeneratedFunction() const { return generated; }
     bool DontThrow() const override { return true; }

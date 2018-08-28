@@ -109,7 +109,7 @@ void ConvertSolution(cmajor::ast::Solution* solution, const std::string& slnFile
     }
 }
 
-const char* version = "2.2.0";
+const char* version = "2.3.0-RC1";
 
 void PrintHelp()
 {

@@ -3,6 +3,8 @@ using System.Collections;
 using System.Text.Parsing;
 using ParsingContext = Code.ParsingContext;
 
+// this source file has been automatically generated from 'LibraryFile.parser' using cmparsergen version 2.0.0.
+
 namespace Syntax
 {
     public class LibraryFileGrammar : System.Text.Parsing.Grammar
@@ -426,16 +428,16 @@ namespace Syntax
         public override void GetReferencedGrammars()
         {
             ParsingDomain* pd = Domain();
-            Grammar* grammar0 = pd->GetGrammar(ToUtf32("Syntax.ElementGrammar"));
+            Grammar* grammar0 = pd->GetGrammar(ToUtf32("System.Text.Parsing.stdlib"));
             if (grammar0 == null)
             {
-                grammar0 = new Syntax.ElementGrammar(pd);
+                grammar0 = new System.Text.Parsing.stdlib(pd);
             }
             AddGrammarReference(grammar0);
-            Grammar* grammar1 = pd->GetGrammar(ToUtf32("System.Text.Parsing.stdlib"));
+            Grammar* grammar1 = pd->GetGrammar(ToUtf32("Syntax.ElementGrammar"));
             if (grammar1 == null)
             {
-                grammar1 = new System.Text.Parsing.stdlib(pd);
+                grammar1 = new Syntax.ElementGrammar(pd);
             }
             AddGrammarReference(grammar1);
         }
@@ -449,10 +451,11 @@ namespace Syntax
                 new System.Text.Parsing.NonterminalParser(ToUtf32("NamespaceContent"), ToUtf32("NamespaceContent"), 2)));
             AddRule(new NamespaceContentRule(ToUtf32("NamespaceContent"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.KleeneStarParser(
-                    new System.Text.Parsing.AlternativeParser(
-                        new System.Text.Parsing.ActionParser(ToUtf32("A0"),
-                            new System.Text.Parsing.NonterminalParser(ToUtf32("Grammar"), ToUtf32("Grammar"), 2)),
-                        new System.Text.Parsing.NonterminalParser(ToUtf32("Namespace"), ToUtf32("Namespace"), 2)))));
+                    new System.Text.Parsing.GroupingParser(
+                        new System.Text.Parsing.AlternativeParser(
+                            new System.Text.Parsing.ActionParser(ToUtf32("A0"),
+                                new System.Text.Parsing.NonterminalParser(ToUtf32("Grammar"), ToUtf32("Grammar"), 2)),
+                            new System.Text.Parsing.NonterminalParser(ToUtf32("Namespace"), ToUtf32("Namespace"), 2))))));
             AddRule(new NamespaceRule(ToUtf32("Namespace"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.SequenceParser(
                     new System.Text.Parsing.SequenceParser(
@@ -484,8 +487,9 @@ namespace Syntax
                         new System.Text.Parsing.CharParser('}')))));
             AddRule(new GrammarContentRule(ToUtf32("GrammarContent"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.KleeneStarParser(
-                    new System.Text.Parsing.ActionParser(ToUtf32("A0"),
-                        new System.Text.Parsing.NonterminalParser(ToUtf32("Rule"), ToUtf32("Rule"), 2)))));
+                    new System.Text.Parsing.GroupingParser(
+                        new System.Text.Parsing.ActionParser(ToUtf32("A0"),
+                            new System.Text.Parsing.NonterminalParser(ToUtf32("Rule"), ToUtf32("Rule"), 2))))));
             AddRule(new RuleRule(ToUtf32("Rule"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.SequenceParser(
                     new System.Text.Parsing.SequenceParser(

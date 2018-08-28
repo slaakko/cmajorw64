@@ -122,7 +122,8 @@ llvm::DINode::DIFlags AccessFlag(SymbolAccess access)
 }
 
 Symbol::Symbol(SymbolType symbolType_, const Span& span_, const std::u32string& name_) : 
-    symbolType(symbolType_), span(span_), name(name_), flags(SymbolFlags::project), parent(nullptr), symbolTable(nullptr), module(nullptr), compileUnit(nullptr), irObject(nullptr)
+    symbolType(symbolType_), span(span_), name(name_), flags(SymbolFlags::project), parent(nullptr), symbolTable(nullptr), module(nullptr), originalModule(nullptr), 
+    compileUnit(nullptr), irObject(nullptr)
 {
 }
 

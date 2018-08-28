@@ -251,13 +251,15 @@ std::string FunctionSymbolFlagStr(FunctionSymbolFlags flags)
 }
 
 FunctionSymbol::FunctionSymbol(const Span& span_, const std::u32string& name_) : 
-    ContainerSymbol(SymbolType::functionSymbol, span_, name_), functionId(boost::uuids::nil_generator()()), groupName(), parameters(), localVariables(), returnType(), flags(FunctionSymbolFlags::none), vmtIndex(-1), imtIndex(-1),
+    ContainerSymbol(SymbolType::functionSymbol, span_, name_), functionTemplate(nullptr), functionId(boost::uuids::nil_generator()()), groupName(), parameters(), localVariables(), 
+    returnType(), flags(FunctionSymbolFlags::none), index(-1), vmtIndex(-1), imtIndex(-1),
     irType(nullptr), nextTemporaryIndex(0), functionGroup(nullptr), isProgramMain(false)
 {
 }
 
 FunctionSymbol::FunctionSymbol(SymbolType symbolType_, const Span& span_, const std::u32string& name_) : 
-    ContainerSymbol(symbolType_, span_, name_), functionId(boost::uuids::nil_generator()()), groupName(), parameters(), localVariables(), returnType(), flags(FunctionSymbolFlags::none), vmtIndex(-1), imtIndex(-1),
+    ContainerSymbol(symbolType_, span_, name_), functionTemplate(nullptr), functionId(boost::uuids::nil_generator()()), groupName(), parameters(), localVariables(), 
+    returnType(), flags(FunctionSymbolFlags::none), index(-1), vmtIndex(-1), imtIndex(-1),
     irType(nullptr), nextTemporaryIndex(0), sizeOfAstNodes(0), astNodesPos(0), functionGroup(nullptr), isProgramMain(false)
 {
 }
@@ -267,8 +269,15 @@ void FunctionSymbol::Write(SymbolWriter& writer)
     ContainerSymbol::Write(writer);
     Assert(!functionId.is_nil(), "function id not initialized");
     writer.GetBinaryWriter().Write(functionId);
+    writer.GetBinaryWriter().Write(index);
     writer.GetBinaryWriter().Write(groupName);
-    writer.GetBinaryWriter().Write(static_cast<uint16_t>(flags));
+    writer.GetBinaryWriter().Write(static_cast<uint32_t>(flags));
+    boost::uuids::uuid functionTemplateId = boost::uuids::nil_generator()();
+    if (functionTemplate)
+    {
+        functionTemplateId = functionTemplate->FunctionId();
+    }
+    writer.GetBinaryWriter().Write(functionTemplateId);
     if (IsFunctionTemplate() || (GetGlobalFlag(GlobalFlags::release) && IsInline()) || IsConstExpr())
     {
         uint32_t sizePos = writer.GetBinaryWriter().Pos();
@@ -307,15 +316,29 @@ void FunctionSymbol::Write(SymbolWriter& writer)
     {
         writer.GetBinaryWriter().Write(false);
     }
+    uint32_t n = templateArgumentTypes.size();
+    writer.GetBinaryWriter().WriteULEB128UInt(n);
+    for (uint32_t i = 0; i < n; ++i)
+    {
+        TypeSymbol* templateArgumentType = templateArgumentTypes[i];
+        writer.GetBinaryWriter().Write(templateArgumentType->TypeId());
+    }
 }
 
 void FunctionSymbol::Read(SymbolReader& reader)
 {
     ContainerSymbol::Read(reader);
     reader.GetBinaryReader().ReadUuid(functionId);
+    index = reader.GetBinaryReader().ReadInt();
     GetSymbolTable()->AddFunctionSymbolToFunctionIdMap(this);
     groupName = reader.GetBinaryReader().ReadUtf32String();
-    flags = static_cast<FunctionSymbolFlags>(reader.GetBinaryReader().ReadUShort());
+    flags = static_cast<FunctionSymbolFlags>(reader.GetBinaryReader().ReadUInt());
+    boost::uuids::uuid functionTemplateId;
+    reader.GetBinaryReader().ReadUuid(functionTemplateId);
+    if (!functionTemplateId.is_nil())
+    {
+        GetSymbolTable()->EmplaceFunctionRequest(this, functionTemplateId, 0);
+    }
     if (IsFunctionTemplate() || (GetGlobalFlag(GlobalFlags::release) && IsInline()) || IsConstExpr())
     {
         sizeOfAstNodes = reader.GetBinaryReader().ReadUInt();
@@ -344,6 +367,26 @@ void FunctionSymbol::Read(SymbolReader& reader)
     if (IsConversion())
     {
         reader.AddConversion(this);
+    }
+    uint32_t n = reader.GetBinaryReader().ReadULEB128UInt();
+    templateArgumentTypes.resize(n);
+    for (uint32_t i = 0; i < n; ++i)
+    {
+        boost::uuids::uuid templateArgumentId;
+        reader.GetBinaryReader().ReadUuid(templateArgumentId);
+        GetSymbolTable()->EmplaceTypeRequest(this, templateArgumentId, -1 - i);
+    }
+}
+
+void FunctionSymbol::EmplaceFunction(FunctionSymbol* functionSymbol, int index)
+{
+    if (index == 0)
+    {
+        functionTemplate = functionSymbol;
+    }
+    else
+    {
+        Assert(false, "invalid emplace function index");
     }
 }
 
@@ -399,8 +442,23 @@ void FunctionSymbol::ReadAstNodes()
 
 void FunctionSymbol::EmplaceType(TypeSymbol* typeSymbol, int index)
 {
-    Assert(index == 0, "invalid emplace type index");
-    returnType = typeSymbol;
+    if (index == 0)
+    {
+        returnType = typeSymbol;
+    }
+    else if (index < 0)
+    {
+        int templateArgumentIndex = -(index + 1);
+        if (templateArgumentIndex < 0 || templateArgumentIndex > templateArgumentTypes.size())
+        {
+            throw Exception(GetModule(), "invalid emplace template argument index '" + std::to_string(index) + "'", GetSpan());
+        }
+        templateArgumentTypes[templateArgumentIndex] = typeSymbol;
+    }
+    else
+    {
+        throw Exception(GetModule(), "invalid emplace type index '" + std::to_string(index) + "'", GetSpan());
+    }
 }
 
 void FunctionSymbol::AddMember(Symbol* member)
@@ -486,12 +544,17 @@ void FunctionSymbol::ComputeMangledName()
             mangledName.append(1, U'_').append(parentClass->SimpleName());
         }
     }
+    std::string templateArgumentString;
+    for (TypeSymbol* templateArgumentType : templateArgumentTypes)
+    {
+        templateArgumentString.append("_").append(ToUtf8(templateArgumentType->FullName()));
+    }
     std::string constraintString;
     if (Constraint())
     {
         constraintString = " " + Constraint()->ToString();
     }
-    mangledName.append(1, U'_').append(ToUtf32(GetSha1MessageDigest(ToUtf8(FullNameWithSpecifiers()) + constraintString)));
+    mangledName.append(1, U'_').append(ToUtf32(GetSha1MessageDigest(ToUtf8(FullNameWithSpecifiers()) + templateArgumentString + constraintString)));
     SetMangledName(mangledName);
 }
 
@@ -1162,6 +1225,64 @@ std::unique_ptr<dom::Element> FunctionSymbol::CreateDomElement(TypeMap& typeMap)
     return element;
 }
 
+std::u32string FunctionSymbol::Id() const
+{
+    if (IsFunctionTemplate())
+    {
+        return ContainerSymbol::Id();
+    }
+    else if (IsTemplateSpecialization())
+    {
+        if (Parent()->GetSymbolType() == SymbolType::classTemplateSpecializationSymbol)
+        {
+            Symbol* parent = const_cast<Symbol*>(Parent());
+            ClassTemplateSpecializationSymbol* parentSpecialization = static_cast<ClassTemplateSpecializationSymbol*>(parent);
+            if (parentSpecialization->IsPrototype())
+            {
+                return ContainerSymbol::Id();
+            }
+            else
+            {
+                ClassTypeSymbol* classTemplate = parentSpecialization->GetClassTemplate();
+                ClassTemplateSpecializationSymbol* prototype = classTemplate->Prototype();
+                if (prototype)
+                {
+                    FunctionSymbol* functionSymbol = prototype->GetFunctionByIndex(index);
+                    if (functionSymbol)
+                    {
+                        return functionSymbol->Id();
+                    }
+                    else
+                    {
+                        throw Exception(GetModule(), "function symbol " + std::to_string(index) + " not found", GetSpan());
+                    }
+                }
+                else
+                {
+                    throw Exception(GetModule(), "prototype not found", GetSpan());
+                }
+            }
+        }
+        else if (functionTemplate)
+        {
+            return functionTemplate->Id();
+        }
+        else
+        {
+            throw Exception(GetModule(), "function template expected", GetSpan());
+        }
+    }
+    else
+    {
+        return ContainerSymbol::Id();
+    }
+}
+
+void FunctionSymbol::SetTemplateArgumentTypes(const std::vector<TypeSymbol*>& templateArgumentTypes_)
+{
+    templateArgumentTypes = templateArgumentTypes_;
+}
+
 StaticConstructorSymbol::StaticConstructorSymbol(const Span& span_, const std::u32string& name_) : FunctionSymbol(SymbolType::staticConstructorSymbol, span_, name_)
 {
     SetGroupName(U"@static_constructor");
@@ -1185,6 +1306,11 @@ std::u32string StaticConstructorSymbol::FullNameWithSpecifiers() const
     }
     fullNameWithSpecifiers.append(FullName());
     return fullNameWithSpecifiers;
+}
+
+std::u32string StaticConstructorSymbol::CodeName() const
+{
+    return Parent()->CodeName();
 }
 
 void StaticConstructorSymbol::SetSpecifiers(Specifiers specifiers)
@@ -1307,6 +1433,11 @@ std::u32string ConstructorSymbol::DocName() const
     }
     docName.append(1, ')');
     return docName;
+}
+
+std::u32string ConstructorSymbol::CodeName() const
+{
+    return Parent()->CodeName();
 }
 
 uint8_t ConstructorSymbol::ConversionDistance() const
@@ -1516,6 +1647,11 @@ void DestructorSymbol::SetSpecifiers(Specifiers specifiers)
     {
         throw Exception(GetModule(), "destructor cannot be unit_test", GetSpan());
     }
+}
+
+std::u32string DestructorSymbol::CodeName() const
+{
+    return U"~" + Parent()->CodeName();
 }
 
 MemberFunctionSymbol::MemberFunctionSymbol(const Span& span_, const std::u32string& name_) : FunctionSymbol(SymbolType::memberFunctionSymbol, span_, name_)
@@ -1827,6 +1963,7 @@ FunctionGroupTypeSymbol::FunctionGroupTypeSymbol(FunctionGroupSymbol* functionGr
     TypeSymbol(SymbolType::functionGroupTypeSymbol, Span(), functionGroup_->Name()), functionGroup(functionGroup_), boundFunctionGroup(boundFunctionGroup_)
 {
     SetModule(functionGroup->GetModule());
+    SetOriginalModule(functionGroup->GetOriginalModule());
     SetSymbolTable(functionGroup->GetSymbolTable());
 }
 

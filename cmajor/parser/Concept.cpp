@@ -88,6 +88,8 @@ public:
     {
         AddInheritedAttribute(AttrOrVariable(ToUtf32("ParsingContext*"), ToUtf32("ctx")));
         SetValueTypeName(ToUtf32("ConceptNode*"));
+        AddLocalVariable(AttrOrVariable(ToUtf32("Span"), ToUtf32("beginBraceSpan")));
+        AddLocalVariable(AttrOrVariable(ToUtf32("Span"), ToUtf32("endBraceSpan")));
     }
     void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData) override
     {
@@ -123,6 +125,10 @@ public:
         a5ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<ConceptRule>(this, &ConceptRule::A5Action));
         cmajor::parsing::ActionParser* a6ActionParser = GetAction(ToUtf32("A6"));
         a6ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<ConceptRule>(this, &ConceptRule::A6Action));
+        cmajor::parsing::ActionParser* a7ActionParser = GetAction(ToUtf32("A7"));
+        a7ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<ConceptRule>(this, &ConceptRule::A7Action));
+        cmajor::parsing::ActionParser* a8ActionParser = GetAction(ToUtf32("A8"));
+        a8ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<ConceptRule>(this, &ConceptRule::A8Action));
         cmajor::parsing::NonterminalParser* specifiersNonterminalParser = GetNonterminal(ToUtf32("Specifiers"));
         specifiersNonterminalParser->SetPostCall(new cmajor::parsing::MemberPostCall<ConceptRule>(this, &ConceptRule::PostSpecifiers));
         cmajor::parsing::NonterminalParser* conceptNameNonterminalParser = GetNonterminal(ToUtf32("conceptName"));
@@ -146,6 +152,8 @@ public:
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
         context->ctx->EndParsingConcept();
+        context->value->SetBeginBraceSpan(context->beginBraceSpan);
+        context->value->SetEndBraceSpan(context->endBraceSpan);
     }
     void A1ActionFail(ParsingData* parsingData)
     {
@@ -175,7 +183,18 @@ public:
     void A6Action(const char32_t* matchBegin, const char32_t* matchEnd, const Span& span, const std::string& fileName, ParsingData* parsingData, bool& pass)
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
+        context->fromWhereConstraint->SetHeaderConstraint();
         context->value->AddConstraint(context->fromWhereConstraint);
+    }
+    void A7Action(const char32_t* matchBegin, const char32_t* matchEnd, const Span& span, const std::string& fileName, ParsingData* parsingData, bool& pass)
+    {
+        Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
+        context->beginBraceSpan = span;
+    }
+    void A8Action(const char32_t* matchBegin, const char32_t* matchEnd, const Span& span, const std::string& fileName, ParsingData* parsingData, bool& pass)
+    {
+        Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
+        context->endBraceSpan = span;
     }
     void PostSpecifiers(cmajor::parsing::ObjectStack& stack, ParsingData* parsingData, bool matched)
     {
@@ -241,9 +260,11 @@ public:
 private:
     struct Context : cmajor::parsing::Context
     {
-        Context(): ctx(), value(), fromSpecifiers(), fromconceptName(), fromtypeParameter(), fromRefinement(), fromWhereConstraint() {}
+        Context(): ctx(), value(), beginBraceSpan(), endBraceSpan(), fromSpecifiers(), fromconceptName(), fromtypeParameter(), fromRefinement(), fromWhereConstraint() {}
         ParsingContext* ctx;
         ConceptNode* value;
+        Span beginBraceSpan;
+        Span endBraceSpan;
         Specifiers fromSpecifiers;
         IdentifierNode* fromconceptName;
         IdentifierNode* fromtypeParameter;
@@ -483,7 +504,7 @@ public:
         if (matched)
         {
             std::unique_ptr<cmajor::parsing::Object> fromEmbeddedConstraint_value = std::move(stack.top());
-            context->fromEmbeddedConstraint = *static_cast<cmajor::parsing::ValueObject<ConstraintNode*>*>(fromEmbeddedConstraint_value.get());
+            context->fromEmbeddedConstraint = *static_cast<cmajor::parsing::ValueObject<WhereConstraintNode*>*>(fromEmbeddedConstraint_value.get());
             stack.pop();
         }
     }
@@ -495,7 +516,7 @@ private:
         ConceptNode* concept;
         ConstraintNode* fromTypeNameConstraint;
         ConstraintNode* fromSignatureConstraint;
-        ConstraintNode* fromEmbeddedConstraint;
+        WhereConstraintNode* fromEmbeddedConstraint;
     };
 };
 
@@ -759,7 +780,7 @@ public:
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
         context->value = context->ctorConstraint.release();
-        context->value->GetSpan().SetEnd(span.End());
+        context->value->GetSpan() = span;
     }
     void A1Action(const char32_t* matchBegin, const char32_t* matchEnd, const Span& span, const std::string& fileName, ParsingData* parsingData, bool& pass)
     {
@@ -922,7 +943,7 @@ public:
     void A0Action(const char32_t* matchBegin, const char32_t* matchEnd, const Span& span, const std::string& fileName, ParsingData* parsingData, bool& pass)
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
-        context->value->GetSpan().SetEnd(span.End());
+        context->value->GetSpan() = span;
     }
     void A1Action(const char32_t* matchBegin, const char32_t* matchEnd, const Span& span, const std::string& fileName, ParsingData* parsingData, bool& pass)
     {
@@ -1043,7 +1064,7 @@ public:
     void A0Action(const char32_t* matchBegin, const char32_t* matchEnd, const Span& span, const std::string& fileName, ParsingData* parsingData, bool& pass)
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
-        context->value->GetSpan().SetEnd(span.End());
+        context->value->GetSpan() = span;
     }
     void A1Action(const char32_t* matchBegin, const char32_t* matchEnd, const Span& span, const std::string& fileName, ParsingData* parsingData, bool& pass)
     {
@@ -1104,7 +1125,7 @@ public:
         cmajor::parsing::Rule(name_, enclosingScope_, id_, definition_)
     {
         AddInheritedAttribute(AttrOrVariable(ToUtf32("ParsingContext*"), ToUtf32("ctx")));
-        SetValueTypeName(ToUtf32("ConstraintNode*"));
+        SetValueTypeName(ToUtf32("WhereConstraintNode*"));
     }
     void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData) override
     {
@@ -1119,7 +1140,7 @@ public:
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
         if (matched)
         {
-            stack.push(std::unique_ptr<cmajor::parsing::Object>(new cmajor::parsing::ValueObject<ConstraintNode*>(context->value)));
+            stack.push(std::unique_ptr<cmajor::parsing::Object>(new cmajor::parsing::ValueObject<WhereConstraintNode*>(context->value)));
         }
         parsingData->PopContext(Id());
     }
@@ -1135,6 +1156,7 @@ public:
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
         context->value = context->fromWhereConstraint;
+        context->value->SetSemicolon();
     }
     void PreWhereConstraint(cmajor::parsing::ObjectStack& stack, ParsingData* parsingData)
     {
@@ -1156,7 +1178,7 @@ private:
     {
         Context(): ctx(), value(), fromWhereConstraint() {}
         ParsingContext* ctx;
-        ConstraintNode* value;
+        WhereConstraintNode* value;
         WhereConstraintNode* fromWhereConstraint;
     };
 };
@@ -1519,7 +1541,7 @@ public:
     void A0Action(const char32_t* matchBegin, const char32_t* matchEnd, const Span& span, const std::string& fileName, ParsingData* parsingData, bool& pass)
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
-        context->value = context->fromConstraintExpr;
+        context->value = new ParenthesizedConstraintNode(span, context->fromConstraintExpr);
     }
     void A1Action(const char32_t* matchBegin, const char32_t* matchEnd, const Span& span, const std::string& fileName, ParsingData* parsingData, bool& pass)
     {
@@ -2006,6 +2028,9 @@ public:
         AddInheritedAttribute(AttrOrVariable(ToUtf32("ParsingContext*"), ToUtf32("ctx")));
         AddInheritedAttribute(AttrOrVariable(ToUtf32("ConceptNode*"), ToUtf32("concept")));
         AddLocalVariable(AttrOrVariable(ToUtf32("std::unique_ptr<AxiomNode>"), ToUtf32("axiom")));
+        AddLocalVariable(AttrOrVariable(ToUtf32("Span"), ToUtf32("axiomSpan")));
+        AddLocalVariable(AttrOrVariable(ToUtf32("Span"), ToUtf32("beginBraceSpan")));
+        AddLocalVariable(AttrOrVariable(ToUtf32("Span"), ToUtf32("endBraceSpan")));
     }
     void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData) override
     {
@@ -2030,6 +2055,12 @@ public:
         a1ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<AxiomRule>(this, &AxiomRule::A1Action));
         cmajor::parsing::ActionParser* a2ActionParser = GetAction(ToUtf32("A2"));
         a2ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<AxiomRule>(this, &AxiomRule::A2Action));
+        cmajor::parsing::ActionParser* a3ActionParser = GetAction(ToUtf32("A3"));
+        a3ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<AxiomRule>(this, &AxiomRule::A3Action));
+        cmajor::parsing::ActionParser* a4ActionParser = GetAction(ToUtf32("A4"));
+        a4ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<AxiomRule>(this, &AxiomRule::A4Action));
+        cmajor::parsing::ActionParser* a5ActionParser = GetAction(ToUtf32("A5"));
+        a5ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<AxiomRule>(this, &AxiomRule::A5Action));
         cmajor::parsing::NonterminalParser* identifierNonterminalParser = GetNonterminal(ToUtf32("Identifier"));
         identifierNonterminalParser->SetPostCall(new cmajor::parsing::MemberPostCall<AxiomRule>(this, &AxiomRule::PostIdentifier));
         cmajor::parsing::NonterminalParser* parameterListNonterminalParser = GetNonterminal(ToUtf32("ParameterList"));
@@ -2040,6 +2071,8 @@ public:
     void A0Action(const char32_t* matchBegin, const char32_t* matchEnd, const Span& span, const std::string& fileName, ParsingData* parsingData, bool& pass)
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
+        context->axiom->SetBeginBraceSpan(context->beginBraceSpan);
+        context->axiom->SetEndBraceSpan(context->endBraceSpan);
         context->concept->AddAxiom(context->axiom.release());
     }
     void A1Action(const char32_t* matchBegin, const char32_t* matchEnd, const Span& span, const std::string& fileName, ParsingData* parsingData, bool& pass)
@@ -2050,7 +2083,22 @@ public:
     void A2Action(const char32_t* matchBegin, const char32_t* matchEnd, const Span& span, const std::string& fileName, ParsingData* parsingData, bool& pass)
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
-        context->axiom.reset(new AxiomNode(span, context->fromIdentifier));
+        context->axiomSpan = span;
+    }
+    void A3Action(const char32_t* matchBegin, const char32_t* matchEnd, const Span& span, const std::string& fileName, ParsingData* parsingData, bool& pass)
+    {
+        Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
+        context->axiom.reset(new AxiomNode(context->axiomSpan, context->fromIdentifier));
+    }
+    void A4Action(const char32_t* matchBegin, const char32_t* matchEnd, const Span& span, const std::string& fileName, ParsingData* parsingData, bool& pass)
+    {
+        Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
+        context->beginBraceSpan = span;
+    }
+    void A5Action(const char32_t* matchBegin, const char32_t* matchEnd, const Span& span, const std::string& fileName, ParsingData* parsingData, bool& pass)
+    {
+        Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
+        context->endBraceSpan = span;
     }
     void PostIdentifier(cmajor::parsing::ObjectStack& stack, ParsingData* parsingData, bool matched)
     {
@@ -2077,10 +2125,13 @@ public:
 private:
     struct Context : cmajor::parsing::Context
     {
-        Context(): ctx(), concept(), axiom(), fromIdentifier() {}
+        Context(): ctx(), concept(), axiom(), axiomSpan(), beginBraceSpan(), endBraceSpan(), fromIdentifier() {}
         ParsingContext* ctx;
         ConceptNode* concept;
         std::unique_ptr<AxiomNode> axiom;
+        Span axiomSpan;
+        Span beginBraceSpan;
+        Span endBraceSpan;
         IdentifierNode* fromIdentifier;
     };
 };
@@ -2214,16 +2265,16 @@ private:
 void Concept::GetReferencedGrammars()
 {
     cmajor::parsing::ParsingDomain* pd = GetParsingDomain();
-    cmajor::parsing::Grammar* grammar0 = pd->GetGrammar(ToUtf32("cmajor.parser.TypeExpr"));
+    cmajor::parsing::Grammar* grammar0 = pd->GetGrammar(ToUtf32("cmajor.parser.Expression"));
     if (!grammar0)
     {
-        grammar0 = cmajor::parser::TypeExpr::Create(pd);
+        grammar0 = cmajor::parser::Expression::Create(pd);
     }
     AddGrammarReference(grammar0);
-    cmajor::parsing::Grammar* grammar1 = pd->GetGrammar(ToUtf32("cmajor.parser.Identifier"));
+    cmajor::parsing::Grammar* grammar1 = pd->GetGrammar(ToUtf32("cmajor.parser.Parameter"));
     if (!grammar1)
     {
-        grammar1 = cmajor::parser::Identifier::Create(pd);
+        grammar1 = cmajor::parser::Parameter::Create(pd);
     }
     AddGrammarReference(grammar1);
     cmajor::parsing::Grammar* grammar2 = pd->GetGrammar(ToUtf32("cmajor.parser.Specifier"));
@@ -2232,16 +2283,16 @@ void Concept::GetReferencedGrammars()
         grammar2 = cmajor::parser::Specifier::Create(pd);
     }
     AddGrammarReference(grammar2);
-    cmajor::parsing::Grammar* grammar3 = pd->GetGrammar(ToUtf32("cmajor.parser.Expression"));
+    cmajor::parsing::Grammar* grammar3 = pd->GetGrammar(ToUtf32("cmajor.parser.Identifier"));
     if (!grammar3)
     {
-        grammar3 = cmajor::parser::Expression::Create(pd);
+        grammar3 = cmajor::parser::Identifier::Create(pd);
     }
     AddGrammarReference(grammar3);
-    cmajor::parsing::Grammar* grammar4 = pd->GetGrammar(ToUtf32("cmajor.parser.Parameter"));
+    cmajor::parsing::Grammar* grammar4 = pd->GetGrammar(ToUtf32("cmajor.parser.TypeExpr"));
     if (!grammar4)
     {
-        grammar4 = cmajor::parser::Parameter::Create(pd);
+        grammar4 = cmajor::parser::TypeExpr::Create(pd);
     }
     AddGrammarReference(grammar4);
     cmajor::parsing::Grammar* grammar5 = pd->GetGrammar(ToUtf32("cmajor.parser.Function"));
@@ -2254,12 +2305,12 @@ void Concept::GetReferencedGrammars()
 
 void Concept::CreateRules()
 {
+    AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("InvokeExpr"), this, ToUtf32("Expression.InvokeExpr")));
     AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("Specifiers"), this, ToUtf32("Specifier.Specifiers")));
     AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("Identifier"), this, ToUtf32("Identifier.Identifier")));
-    AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("InvokeExpr"), this, ToUtf32("Expression.InvokeExpr")));
+    AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("ParameterList"), this, ToUtf32("Parameter.ParameterList")));
     AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("QualifiedId"), this, ToUtf32("Identifier.QualifiedId")));
     AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("Expression"), this, ToUtf32("Expression.Expression")));
-    AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("ParameterList"), this, ToUtf32("Parameter.ParameterList")));
     AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("TypeExpr"), this, ToUtf32("TypeExpr.TypeExpr")));
     AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("FunctionGroupId"), this, ToUtf32("Function.FunctionGroupId")));
     AddRule(new ConceptRule(ToUtf32("Concept"), GetScope(), GetParsingDomain()->GetNextRuleId(),
@@ -2303,12 +2354,14 @@ void Concept::CreateRules()
                                                     new cmajor::parsing::GroupingParser(
                                                         new cmajor::parsing::ActionParser(ToUtf32("A6"),
                                                             new cmajor::parsing::NonterminalParser(ToUtf32("WhereConstraint"), ToUtf32("WhereConstraint"), 1)))))))),
-                                new cmajor::parsing::ExpectationParser(
-                                    new cmajor::parsing::CharParser('{'))),
+                                new cmajor::parsing::ActionParser(ToUtf32("A7"),
+                                    new cmajor::parsing::ExpectationParser(
+                                        new cmajor::parsing::CharParser('{')))),
                             new cmajor::parsing::ExpectationParser(
                                 new cmajor::parsing::NonterminalParser(ToUtf32("ConceptBody"), ToUtf32("ConceptBody"), 2))),
-                        new cmajor::parsing::ExpectationParser(
-                            new cmajor::parsing::CharParser('}'))))))));
+                        new cmajor::parsing::ActionParser(ToUtf32("A8"),
+                            new cmajor::parsing::ExpectationParser(
+                                new cmajor::parsing::CharParser('}')))))))));
     AddRule(new RefinementRule(ToUtf32("Refinement"), GetScope(), GetParsingDomain()->GetNextRuleId(),
         new cmajor::parsing::ActionParser(ToUtf32("A0"),
             new cmajor::parsing::GroupingParser(
@@ -2529,19 +2582,22 @@ void Concept::CreateRules()
                                     new cmajor::parsing::SequenceParser(
                                         new cmajor::parsing::SequenceParser(
                                             new cmajor::parsing::SequenceParser(
-                                                new cmajor::parsing::KeywordParser(ToUtf32("axiom")),
+                                                new cmajor::parsing::ActionParser(ToUtf32("A2"),
+                                                    new cmajor::parsing::KeywordParser(ToUtf32("axiom"))),
                                                 new cmajor::parsing::OptionalParser(
                                                     new cmajor::parsing::NonterminalParser(ToUtf32("Identifier"), ToUtf32("Identifier"), 0))),
-                                            new cmajor::parsing::ActionParser(ToUtf32("A2"),
+                                            new cmajor::parsing::ActionParser(ToUtf32("A3"),
                                                 new cmajor::parsing::EmptyParser())),
                                         new cmajor::parsing::OptionalParser(
                                             new cmajor::parsing::NonterminalParser(ToUtf32("ParameterList"), ToUtf32("ParameterList"), 2))))),
-                            new cmajor::parsing::ExpectationParser(
-                                new cmajor::parsing::CharParser('{'))),
+                            new cmajor::parsing::ActionParser(ToUtf32("A4"),
+                                new cmajor::parsing::ExpectationParser(
+                                    new cmajor::parsing::CharParser('{')))),
                         new cmajor::parsing::ExpectationParser(
                             new cmajor::parsing::NonterminalParser(ToUtf32("AxiomBody"), ToUtf32("AxiomBody"), 2))),
-                    new cmajor::parsing::ExpectationParser(
-                        new cmajor::parsing::CharParser('}')))))));
+                    new cmajor::parsing::ActionParser(ToUtf32("A5"),
+                        new cmajor::parsing::ExpectationParser(
+                            new cmajor::parsing::CharParser('}'))))))));
     AddRule(new AxiomBodyRule(ToUtf32("AxiomBody"), GetScope(), GetParsingDomain()->GetNextRuleId(),
         new cmajor::parsing::KleeneStarParser(
             new cmajor::parsing::GroupingParser(

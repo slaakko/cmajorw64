@@ -444,4 +444,34 @@ std::string ToHexString(uint64_t x)
     return s;
 }
 
+int Log10(int n)
+{
+    int log10 = 1;
+    int m = n / 10;
+    while (m > 0)
+    {
+        ++log10;
+        m = m / 10;
+    }
+    return log10;
+}
+
+std::u32string FormatNumber(int n, int numDigits)
+{
+    std::u32string s(numDigits, ' ');
+    int k = numDigits - 1;
+    while (n > 0)
+    {
+        if (k < 0)
+        {
+            throw std::runtime_error("invalid number of digits");
+        }
+        int digit = n % 10;
+        s[k] = digit + '0';
+        --k;
+        n = n / 10;
+    }
+    return s;
+}
+
 } } // namespace cmajor::util

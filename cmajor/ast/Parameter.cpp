@@ -11,11 +11,11 @@
 
 namespace cmajor { namespace ast {
 
-ParameterNode::ParameterNode(const Span& span_) : Node(NodeType::parameterNode, span_), typeExpr(), id()
+ParameterNode::ParameterNode(const Span& span_) : Node(NodeType::parameterNode, span_), typeExpr(), id(), artificialId(false)
 {
 }
 
-ParameterNode::ParameterNode(const Span& span_, Node* typeExpr_, IdentifierNode* id_) : Node(NodeType::parameterNode, span_), typeExpr(typeExpr_), id(id_)
+ParameterNode::ParameterNode(const Span& span_, Node* typeExpr_, IdentifierNode* id_) : Node(NodeType::parameterNode, span_), typeExpr(typeExpr_), id(id_), artificialId(false)
 {
     typeExpr->SetParent(this);
     if (id)
@@ -31,7 +31,12 @@ Node* ParameterNode::Clone(CloneContext& cloneContext) const
     {
         clonedId = static_cast<IdentifierNode*>(id->Clone(cloneContext));
     }
-    return new ParameterNode(GetSpan(), typeExpr->Clone(cloneContext), clonedId);
+    ParameterNode* clone = new ParameterNode(GetSpan(), typeExpr->Clone(cloneContext), clonedId);
+    if (artificialId)
+    {
+        clone->artificialId = true;
+    }
+    return clone;
 }
 
 void ParameterNode::Accept(Visitor& visitor)
@@ -49,6 +54,7 @@ void ParameterNode::Write(AstWriter& writer)
     {
         writer.Write(id.get());
     }
+    writer.GetBinaryWriter().Write(artificialId);
 }
 
 void ParameterNode::Read(AstReader& reader)
@@ -62,12 +68,14 @@ void ParameterNode::Read(AstReader& reader)
         id.reset(reader.ReadIdentifierNode());
         id->SetParent(this);
     }
+    artificialId = reader.GetBinaryReader().ReadBool();
 }
 
 void ParameterNode::SetId(IdentifierNode* id_)
 {
     id.reset(id_);
     id->SetParent(this);
+    artificialId = true;
 }
 
 } } // namespace cmajor::ast

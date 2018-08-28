@@ -44,13 +44,19 @@ namespace cmajor.parser
         using Delegate.Delegate;
         using Delegate.ClassDelegate;
 
-        Class(ParsingContext* ctx, var std::unique_ptr<Attributes> attributes) : ClassNode*
-            ::= (Attributes{ attributes.reset(Attributes); })?
-                Specifiers keyword("class") Identifier{ value = new ClassNode(span, Specifiers, Identifier, attributes.release()); }
-                TemplateParameterList(ctx, value)?
+        Class(ParsingContext* ctx, var std::unique_ptr<Attributes> attributes, var Span specifierSpan, var Span classSpan, var Span beginBraceSpan, var Span endBraceSpan) : ClassNode*
+            ::= ((Attributes{ attributes.reset(Attributes); })?
+                Specifiers{ specifierSpan = span; } keyword("class"){ classSpan = span; } 
+                Identifier
+                { 
+                    value = new ClassNode(span, Specifiers, Identifier, attributes.release()); 
+                    value->SetSpecifierSpan(specifierSpan); 
+                    value->SetClassSpan(classSpan);
+                }
+                TemplateParameterList(ctx, value)?){ value->GetSpan() = span; }
                 InheritanceAndInterfaces(ctx, value)? 
-                (WhereConstraint(ctx){ value->SetConstraint(WhereConstraint); value->GetSpan().SetEnd(span.End()); })?
-                '{'! ClassContent(ctx, value) '}'!
+                (WhereConstraint(ctx){ value->SetConstraint(WhereConstraint); })?
+                '{'!{ beginBraceSpan = span; } ClassContent(ctx, value) '}'!{ endBraceSpan = span; value->SetBeginBraceSpan(beginBraceSpan); value->SetEndBraceSpan(endBraceSpan); }
             ;
 
         InheritanceAndInterfaces(ParsingContext* ctx, ClassNode* classNode)
@@ -84,29 +90,37 @@ namespace cmajor.parser
             |   ClassDelegate(ctx){ value = ClassDelegate; }
             ;
 
-        StaticConstructor(ParsingContext* ctx, ClassNode* classNode, var std::unique_ptr<IdentifierNode> id, var std::unique_ptr<Attributes> attributes) : StaticConstructorNode*
-            ::= ((Attributes{ attributes.reset(Attributes); })? Specifiers:specifiers Identifier{ id.reset(Identifier); } '(' ')')
+        StaticConstructor(ParsingContext* ctx, ClassNode* classNode, var std::unique_ptr<IdentifierNode> id, var std::unique_ptr<Attributes> attributes, 
+            var Span specifierSpan) : StaticConstructorNode*
+            ::= ((Attributes{ attributes.reset(Attributes); })? Specifiers:specifiers{ specifierSpan = span; } Identifier{ id.reset(Identifier); } '(' ')')
                 { 
                     if (id->Str() != classNode->Id()->Str()) pass = false; else if (!StaticConstructorSpecifiers(specifiers)) pass = false; 
-                    else { value = new StaticConstructorNode(span, specifiers, attributes.release()); }
+                    else { value = new StaticConstructorNode(span, specifiers, attributes.release()); value->SetClassId(id.release()); value->SetSpecifierSpan(specifierSpan); }
                 }
                 (':' (Initializer(ctx){ value->AddInitializer(Initializer); } % ','))?
                 (WhereConstraint(ctx){ value->SetConstraint(WhereConstraint); })?
                 (CompoundStatement(ctx){ value->SetBody(CompoundStatement); } | ';' )
             ;
 
-        Constructor(ParsingContext* ctx, ClassNode* classNode, var std::unique_ptr<IdentifierNode> id, var std::unique_ptr<ConstructorNode> ctor, var std::unique_ptr<Attributes> attributes) : Node*
-            ::= ((Attributes{ attributes.reset(Attributes); })? Specifiers Identifier{ id.reset(Identifier); })
-                { if (id->Str() != classNode->Id()->Str()) pass = false; else { ctor.reset(new ConstructorNode(span, Specifiers, attributes.release())); } }
-                ParameterList(ctx, ctor.get()) 
+        Constructor(ParsingContext* ctx, ClassNode* classNode, var std::unique_ptr<IdentifierNode> id, var std::unique_ptr<ConstructorNode> ctor, var std::unique_ptr<Attributes> attributes,
+            var Span specifierSpan) : Node*
+            ::= (((Attributes{ attributes.reset(Attributes); })? Specifiers{ specifierSpan = span; } Identifier{ id.reset(Identifier); })
+                { 
+                    if (id->Str() != classNode->Id()->Str()) pass = false; else 
+                    { ctor.reset(new ConstructorNode(span, Specifiers, attributes.release())); ctor->SetClassId(id.release()); ctor->SetSpecifierSpan(specifierSpan); } 
+                }
+                ParameterList(ctx, ctor.get())){ ctor->GetSpan() = span; }
                 (':' (Initializer(ctx){ ctor->AddInitializer(Initializer); } % ','))?
                 (WhereConstraint(ctx){ ctor->SetConstraint(WhereConstraint); })?
                 (CompoundStatement(ctx){ ctor->SetBody(CompoundStatement); } | ';' ){ value = ctor.release(); }
             ;
 
-        Destructor(ParsingContext* ctx, ClassNode* classNode, var std::unique_ptr<IdentifierNode> id, var std::unique_ptr<DestructorNode> dtor, var std::unique_ptr<Attributes> attributes) : Node*
-            ::= ((Attributes{ attributes.reset(Attributes); })? Specifiers '~' Identifier{ id.reset(Identifier); } '(' ')')
-                { if (id->Str() != classNode->Id()->Str()) pass = false; else { dtor.reset(new DestructorNode(span, Specifiers, attributes.release())); } }
+        Destructor(ParsingContext* ctx, ClassNode* classNode, var std::unique_ptr<IdentifierNode> id, var std::unique_ptr<DestructorNode> dtor, var std::unique_ptr<Attributes> attributes,
+            var Span specifierSpan) : Node*
+            ::= ((Attributes{ attributes.reset(Attributes); })? Specifiers{ specifierSpan = span; } '~' Identifier{ id.reset(Identifier); } '(' ')')
+                {   if (id->Str() != classNode->Id()->Str()) pass = false; else 
+                    { dtor.reset(new DestructorNode(span, Specifiers, attributes.release())); dtor->SetClassId(id.release()); dtor->SetSpecifierSpan(specifierSpan); } 
+                }
                 (WhereConstraint(ctx){ dtor->SetConstraint(WhereConstraint); })?
                 (CompoundStatement(ctx){ dtor->SetBody(CompoundStatement); } | ';' ){ value = dtor.release(); }
             ;
@@ -117,25 +131,34 @@ namespace cmajor.parser
             |   Identifier{ value = new MemberInitializerNode(span, Identifier); } '('! ArgumentList(ctx, value):memberArgs! ')'!
             ;
 
-        MemberFunction(ParsingContext* ctx, var std::unique_ptr<MemberFunctionNode> memFun, var std::unique_ptr<IdentifierNode> qid, var std::unique_ptr<Attributes> attributes) : Node*
-            ::= ((Attributes{ attributes.reset(Attributes); })? Specifiers TypeExpr(ctx) FunctionGroupId(ctx))
+        MemberFunction(ParsingContext* ctx, var std::unique_ptr<MemberFunctionNode> memFun, var std::unique_ptr<IdentifierNode> qid, var std::unique_ptr<Attributes> attributes,
+            var Span specifierSpan, var Span groupIdSpan) : Node*
+            ::= (((Attributes{ attributes.reset(Attributes); })? Specifiers{ specifierSpan = span; } TypeExpr(ctx) FunctionGroupId(ctx){ groupIdSpan = span; })
                 { 
                     memFun.reset(new MemberFunctionNode(span, Specifiers, TypeExpr, FunctionGroupId, attributes.release())); 
+                    memFun->SetSpecifierSpan(specifierSpan);
+                    memFun->SetGroupIdSpan(groupIdSpan);
                 } 
-                ParameterList(ctx, memFun.get()) (keyword("const"){ memFun->SetConst(); })?
+                ParameterList(ctx, memFun.get()) (keyword("const"){ memFun->SetConst(); })?){ memFun->GetSpan() = span; }
                 (WhereConstraint(ctx){ memFun->SetConstraint(WhereConstraint); })?
                 (CompoundStatement(ctx){ memFun->SetBody(CompoundStatement); } | ';' ){ value = memFun.release(); }
             ;
 
-        ConversionFunction(ParsingContext* ctx, var std::unique_ptr<ConversionFunctionNode> conversionFun, var std::unique_ptr<Attributes> attributes) : Node*
-            ::= ((Attributes{ attributes.reset(Attributes); })? Specifiers keyword("operator") TypeExpr(ctx) '('! ')'!){ conversionFun.reset(new ConversionFunctionNode(span, Specifiers, TypeExpr, attributes.release())); }
-                (keyword("const"){ conversionFun->SetConst(); })? 
+        ConversionFunction(ParsingContext* ctx, var std::unique_ptr<ConversionFunctionNode> conversionFun, var std::unique_ptr<Attributes> attributes,
+            var Span specifierSpan) : Node*
+            ::= (((Attributes{ attributes.reset(Attributes); })? Specifiers{ specifierSpan = span; } keyword("operator") TypeExpr(ctx) '('! ')'!)
+                    { conversionFun.reset(new ConversionFunctionNode(span, Specifiers, TypeExpr, attributes.release())); conversionFun->SetSpecifierSpan(specifierSpan); }
+                (keyword("const"){ conversionFun->SetConst(); })?){ conversionFun->GetSpan() = span; }
                 (WhereConstraint(ctx){ conversionFun->SetConstraint(WhereConstraint); })?
                 (CompoundStatement(ctx){ conversionFun->SetBody(CompoundStatement); } | ';'){ value = conversionFun.release(); }
             ;
 
-        MemberVariable(ParsingContext* ctx, var std::unique_ptr<Attributes> attributes) : Node*
-            ::= ((Attributes{ attributes.reset(Attributes); })? Specifiers TypeExpr(ctx) Identifier ';'){ value = new MemberVariableNode(span, Specifiers, TypeExpr, Identifier, attributes.release()); }
+        MemberVariable(ParsingContext* ctx, var std::unique_ptr<Attributes> attributes, var Span specifierSpan) : MemberVariableNode*
+            ::= ((Attributes{ attributes.reset(Attributes); })? Specifiers{ specifierSpan = span; } TypeExpr(ctx) Identifier ';')
+            { 
+                value = new MemberVariableNode(span, Specifiers, TypeExpr, Identifier, attributes.release()); 
+                value->SetSpecifierSpan(specifierSpan);
+            }
             ;
 
     }

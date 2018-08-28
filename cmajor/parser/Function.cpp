@@ -90,6 +90,8 @@ public:
         SetValueTypeName(ToUtf32("FunctionNode*"));
         AddLocalVariable(AttrOrVariable(ToUtf32("std::unique_ptr<FunctionNode>"), ToUtf32("fun")));
         AddLocalVariable(AttrOrVariable(ToUtf32("Span"), ToUtf32("s")));
+        AddLocalVariable(AttrOrVariable(ToUtf32("Span"), ToUtf32("specifierSpan")));
+        AddLocalVariable(AttrOrVariable(ToUtf32("Span"), ToUtf32("groupIdSpan")));
         AddLocalVariable(AttrOrVariable(ToUtf32("std::unique_ptr<Attributes>"), ToUtf32("attributes")));
     }
     void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData) override
@@ -123,6 +125,8 @@ public:
         a4ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<FunctionRule>(this, &FunctionRule::A4Action));
         cmajor::parsing::ActionParser* a5ActionParser = GetAction(ToUtf32("A5"));
         a5ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<FunctionRule>(this, &FunctionRule::A5Action));
+        cmajor::parsing::ActionParser* a6ActionParser = GetAction(ToUtf32("A6"));
+        a6ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<FunctionRule>(this, &FunctionRule::A6Action));
         cmajor::parsing::NonterminalParser* attributesNonterminalParser = GetNonterminal(ToUtf32("Attributes"));
         attributesNonterminalParser->SetPostCall(new cmajor::parsing::MemberPostCall<FunctionRule>(this, &FunctionRule::PostAttributes));
         cmajor::parsing::NonterminalParser* specifiersNonterminalParser = GetNonterminal(ToUtf32("Specifiers"));
@@ -152,28 +156,35 @@ public:
     void A1Action(const char32_t* matchBegin, const char32_t* matchEnd, const Span& span, const std::string& fileName, ParsingData* parsingData, bool& pass)
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
-        context->attributes.reset(context->fromAttributes);
+        context->fun->GetSpan() = span;
     }
     void A2Action(const char32_t* matchBegin, const char32_t* matchEnd, const Span& span, const std::string& fileName, ParsingData* parsingData, bool& pass)
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
-        context->fun.reset(new FunctionNode(span, context->fromSpecifiers, context->fromTypeExpr, context->fromFunctionGroupId, context->attributes.release()));
+        context->attributes.reset(context->fromAttributes);
     }
     void A3Action(const char32_t* matchBegin, const char32_t* matchEnd, const Span& span, const std::string& fileName, ParsingData* parsingData, bool& pass)
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
-        context->s = span;
+        context->specifierSpan = span;
     }
     void A4Action(const char32_t* matchBegin, const char32_t* matchEnd, const Span& span, const std::string& fileName, ParsingData* parsingData, bool& pass)
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
-        context->fun->SetConstraint(context->fromWhereConstraint);
+        context->groupIdSpan = span;
+        context->fun.reset(new FunctionNode(span, context->fromSpecifiers, context->fromTypeExpr, context->fromFunctionGroupId, context->attributes.release()));
+        context->fun->SetSpecifierSpan(context->specifierSpan);
+        context->fun->SetGroupIdSpan(context->groupIdSpan);
     }
     void A5Action(const char32_t* matchBegin, const char32_t* matchEnd, const Span& span, const std::string& fileName, ParsingData* parsingData, bool& pass)
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
+        context->fun->SetConstraint(context->fromWhereConstraint);
+    }
+    void A6Action(const char32_t* matchBegin, const char32_t* matchEnd, const Span& span, const std::string& fileName, ParsingData* parsingData, bool& pass)
+    {
+        Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
         context->fun->SetBody(context->fromCompoundStatement);
-        context->fun->GetSpan().SetEnd(context->s.End());
     }
     void PostAttributes(cmajor::parsing::ObjectStack& stack, ParsingData* parsingData, bool matched)
     {
@@ -270,11 +281,13 @@ public:
 private:
     struct Context : cmajor::parsing::Context
     {
-        Context(): ctx(), value(), fun(), s(), attributes(), fromAttributes(), fromSpecifiers(), fromTypeExpr(), fromFunctionGroupId(), fromWhereConstraint(), fromCompoundStatement() {}
+        Context(): ctx(), value(), fun(), s(), specifierSpan(), groupIdSpan(), attributes(), fromAttributes(), fromSpecifiers(), fromTypeExpr(), fromFunctionGroupId(), fromWhereConstraint(), fromCompoundStatement() {}
         ParsingContext* ctx;
         FunctionNode* value;
         std::unique_ptr<FunctionNode> fun;
         Span s;
+        Span specifierSpan;
+        Span groupIdSpan;
         std::unique_ptr<Attributes> attributes;
         cmajor::ast::Attributes* fromAttributes;
         Specifiers fromSpecifiers;
@@ -581,95 +594,97 @@ private:
 void Function::GetReferencedGrammars()
 {
     cmajor::parsing::ParsingDomain* pd = GetParsingDomain();
-    cmajor::parsing::Grammar* grammar0 = pd->GetGrammar(ToUtf32("cmajor.parser.TypeExpr"));
+    cmajor::parsing::Grammar* grammar0 = pd->GetGrammar(ToUtf32("cmajor.parser.Parameter"));
     if (!grammar0)
     {
-        grammar0 = cmajor::parser::TypeExpr::Create(pd);
+        grammar0 = cmajor::parser::Parameter::Create(pd);
     }
     AddGrammarReference(grammar0);
-    cmajor::parsing::Grammar* grammar1 = pd->GetGrammar(ToUtf32("cmajor.parser.Identifier"));
+    cmajor::parsing::Grammar* grammar1 = pd->GetGrammar(ToUtf32("cmajor.parser.Concept"));
     if (!grammar1)
     {
-        grammar1 = cmajor::parser::Identifier::Create(pd);
+        grammar1 = cmajor::parser::Concept::Create(pd);
     }
     AddGrammarReference(grammar1);
-    cmajor::parsing::Grammar* grammar2 = pd->GetGrammar(ToUtf32("cmajor.parser.Specifier"));
+    cmajor::parsing::Grammar* grammar2 = pd->GetGrammar(ToUtf32("cmajor.parser.Attribute"));
     if (!grammar2)
     {
-        grammar2 = cmajor::parser::Specifier::Create(pd);
+        grammar2 = cmajor::parser::Attribute::Create(pd);
     }
     AddGrammarReference(grammar2);
-    cmajor::parsing::Grammar* grammar3 = pd->GetGrammar(ToUtf32("cmajor.parser.Attribute"));
+    cmajor::parsing::Grammar* grammar3 = pd->GetGrammar(ToUtf32("cmajor.parser.Specifier"));
     if (!grammar3)
     {
-        grammar3 = cmajor::parser::Attribute::Create(pd);
+        grammar3 = cmajor::parser::Specifier::Create(pd);
     }
     AddGrammarReference(grammar3);
-    cmajor::parsing::Grammar* grammar4 = pd->GetGrammar(ToUtf32("cmajor.parser.Template"));
+    cmajor::parsing::Grammar* grammar4 = pd->GetGrammar(ToUtf32("cmajor.parser.TypeExpr"));
     if (!grammar4)
     {
-        grammar4 = cmajor::parser::Template::Create(pd);
+        grammar4 = cmajor::parser::TypeExpr::Create(pd);
     }
     AddGrammarReference(grammar4);
-    cmajor::parsing::Grammar* grammar5 = pd->GetGrammar(ToUtf32("cmajor.parser.Statement"));
+    cmajor::parsing::Grammar* grammar5 = pd->GetGrammar(ToUtf32("cmajor.parser.Identifier"));
     if (!grammar5)
     {
-        grammar5 = cmajor::parser::Statement::Create(pd);
+        grammar5 = cmajor::parser::Identifier::Create(pd);
     }
     AddGrammarReference(grammar5);
-    cmajor::parsing::Grammar* grammar6 = pd->GetGrammar(ToUtf32("cmajor.parser.Concept"));
+    cmajor::parsing::Grammar* grammar6 = pd->GetGrammar(ToUtf32("cmajor.parser.Template"));
     if (!grammar6)
     {
-        grammar6 = cmajor::parser::Concept::Create(pd);
+        grammar6 = cmajor::parser::Template::Create(pd);
     }
     AddGrammarReference(grammar6);
-    cmajor::parsing::Grammar* grammar7 = pd->GetGrammar(ToUtf32("cmajor.parser.Parameter"));
+    cmajor::parsing::Grammar* grammar7 = pd->GetGrammar(ToUtf32("cmajor.parser.Statement"));
     if (!grammar7)
     {
-        grammar7 = cmajor::parser::Parameter::Create(pd);
+        grammar7 = cmajor::parser::Statement::Create(pd);
     }
     AddGrammarReference(grammar7);
 }
 
 void Function::CreateRules()
 {
-    AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("Attributes"), this, ToUtf32("Attribute.Attributes")));
-    AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("TemplateParameterList"), this, ToUtf32("Template.TemplateParameterList")));
-    AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("Specifiers"), this, ToUtf32("Specifier.Specifiers")));
-    AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("CompoundStatement"), this, ToUtf32("Statement.CompoundStatement")));
-    AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("Identifier"), this, ToUtf32("Identifier.Identifier")));
     AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("WhereConstraint"), this, ToUtf32("Concept.WhereConstraint")));
-    AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("TypeExpr"), this, ToUtf32("TypeExpr.TypeExpr")));
+    AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("Attributes"), this, ToUtf32("Attribute.Attributes")));
     AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("ParameterList"), this, ToUtf32("Parameter.ParameterList")));
+    AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("Specifiers"), this, ToUtf32("Specifier.Specifiers")));
+    AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("TypeExpr"), this, ToUtf32("TypeExpr.TypeExpr")));
+    AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("TemplateParameterList"), this, ToUtf32("Template.TemplateParameterList")));
+    AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("Identifier"), this, ToUtf32("Identifier.Identifier")));
+    AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("CompoundStatement"), this, ToUtf32("Statement.CompoundStatement")));
     AddRule(new FunctionRule(ToUtf32("Function"), GetScope(), GetParsingDomain()->GetNextRuleId(),
         new cmajor::parsing::ActionParser(ToUtf32("A0"),
             new cmajor::parsing::GroupingParser(
                 new cmajor::parsing::SequenceParser(
                     new cmajor::parsing::SequenceParser(
-                        new cmajor::parsing::SequenceParser(
-                            new cmajor::parsing::SequenceParser(
+                        new cmajor::parsing::ActionParser(ToUtf32("A1"),
+                            new cmajor::parsing::GroupingParser(
                                 new cmajor::parsing::SequenceParser(
                                     new cmajor::parsing::SequenceParser(
                                         new cmajor::parsing::SequenceParser(
-                                            new cmajor::parsing::OptionalParser(
-                                                new cmajor::parsing::GroupingParser(
-                                                    new cmajor::parsing::ActionParser(ToUtf32("A1"),
-                                                        new cmajor::parsing::NonterminalParser(ToUtf32("Attributes"), ToUtf32("Attributes"), 0)))),
-                                            new cmajor::parsing::NonterminalParser(ToUtf32("Specifiers"), ToUtf32("Specifiers"), 0)),
-                                        new cmajor::parsing::NonterminalParser(ToUtf32("TypeExpr"), ToUtf32("TypeExpr"), 1)),
-                                    new cmajor::parsing::ActionParser(ToUtf32("A2"),
-                                        new cmajor::parsing::NonterminalParser(ToUtf32("FunctionGroupId"), ToUtf32("FunctionGroupId"), 1))),
-                                new cmajor::parsing::OptionalParser(
-                                    new cmajor::parsing::NonterminalParser(ToUtf32("TemplateParameterList"), ToUtf32("TemplateParameterList"), 2))),
-                            new cmajor::parsing::ActionParser(ToUtf32("A3"),
-                                new cmajor::parsing::NonterminalParser(ToUtf32("ParameterList"), ToUtf32("ParameterList"), 2))),
+                                            new cmajor::parsing::SequenceParser(
+                                                new cmajor::parsing::SequenceParser(
+                                                    new cmajor::parsing::OptionalParser(
+                                                        new cmajor::parsing::GroupingParser(
+                                                            new cmajor::parsing::ActionParser(ToUtf32("A2"),
+                                                                new cmajor::parsing::NonterminalParser(ToUtf32("Attributes"), ToUtf32("Attributes"), 0)))),
+                                                    new cmajor::parsing::ActionParser(ToUtf32("A3"),
+                                                        new cmajor::parsing::NonterminalParser(ToUtf32("Specifiers"), ToUtf32("Specifiers"), 0))),
+                                                new cmajor::parsing::NonterminalParser(ToUtf32("TypeExpr"), ToUtf32("TypeExpr"), 1)),
+                                            new cmajor::parsing::ActionParser(ToUtf32("A4"),
+                                                new cmajor::parsing::NonterminalParser(ToUtf32("FunctionGroupId"), ToUtf32("FunctionGroupId"), 1))),
+                                        new cmajor::parsing::OptionalParser(
+                                            new cmajor::parsing::NonterminalParser(ToUtf32("TemplateParameterList"), ToUtf32("TemplateParameterList"), 2))),
+                                    new cmajor::parsing::NonterminalParser(ToUtf32("ParameterList"), ToUtf32("ParameterList"), 2)))),
                         new cmajor::parsing::OptionalParser(
                             new cmajor::parsing::GroupingParser(
-                                new cmajor::parsing::ActionParser(ToUtf32("A4"),
+                                new cmajor::parsing::ActionParser(ToUtf32("A5"),
                                     new cmajor::parsing::NonterminalParser(ToUtf32("WhereConstraint"), ToUtf32("WhereConstraint"), 1))))),
                     new cmajor::parsing::GroupingParser(
                         new cmajor::parsing::AlternativeParser(
-                            new cmajor::parsing::ActionParser(ToUtf32("A5"),
+                            new cmajor::parsing::ActionParser(ToUtf32("A6"),
                                 new cmajor::parsing::NonterminalParser(ToUtf32("CompoundStatement"), ToUtf32("CompoundStatement"), 1)),
                             new cmajor::parsing::CharParser(';'))))))));
     AddRule(new FunctionGroupIdRule(ToUtf32("FunctionGroupId"), GetScope(), GetParsingDomain()->GetNextRuleId(),

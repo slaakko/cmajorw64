@@ -23,6 +23,7 @@ public:
     std::string TypeString() const override { return "enumerated_type"; }
     std::string Syntax() const override;
     bool IsEnumeratedType() const override { return true; }
+    bool IsParentSymbol() const override { return true; }
     void Accept(SymbolCollector* collector) override;
     void CollectMembers(SymbolCollector* collector);
     void Dump(CodeFormatter& formatter) override;
@@ -64,9 +65,12 @@ public:
     Value* GetValue() { return value.get(); }
     std::u32string Info() const override { return Name(); }
     const char* ClassName() const override { return "EnumConstantSymbol"; }
+    void SetStrValue(const std::u32string& strValue_) { strValue = strValue_; }
+    const std::u32string& StrValue() const { return strValue; }
 private:
     std::unique_ptr<Value> value;
     bool evaluating;
+    std::u32string strValue;
 };
 
 class EnumTypeDefaultConstructor : public FunctionSymbol

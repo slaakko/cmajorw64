@@ -3,6 +3,8 @@ using System.Collections;
 using System.Text.Parsing;
 using ParsingContext = Code.ParsingContext;
 
+// this source file has been automatically generated from 'Composite.parser' using cmparsergen version 2.0.0.
+
 namespace Syntax
 {
     public class CompositeGrammar : System.Text.Parsing.Grammar
@@ -672,71 +674,78 @@ namespace Syntax
                     new System.Text.Parsing.ActionParser(ToUtf32("A0"),
                         new System.Text.Parsing.NonterminalParser(ToUtf32("left"), ToUtf32("Sequence"), 1)),
                     new System.Text.Parsing.KleeneStarParser(
-                        new System.Text.Parsing.SequenceParser(
-                            new System.Text.Parsing.CharParser('|'),
-                            new System.Text.Parsing.ActionParser(ToUtf32("A1"),
-                                new System.Text.Parsing.ExpectationParser(
-                                    new System.Text.Parsing.NonterminalParser(ToUtf32("right"), ToUtf32("Sequence"), 1))))))));
+                        new System.Text.Parsing.GroupingParser(
+                            new System.Text.Parsing.SequenceParser(
+                                new System.Text.Parsing.CharParser('|'),
+                                new System.Text.Parsing.ActionParser(ToUtf32("A1"),
+                                    new System.Text.Parsing.ExpectationParser(
+                                        new System.Text.Parsing.NonterminalParser(ToUtf32("right"), ToUtf32("Sequence"), 1)))))))));
             AddRule(new SequenceRule(ToUtf32("Sequence"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.SequenceParser(
                     new System.Text.Parsing.ActionParser(ToUtf32("A0"),
                         new System.Text.Parsing.NonterminalParser(ToUtf32("left"), ToUtf32("Difference"), 1)),
                     new System.Text.Parsing.KleeneStarParser(
-                        new System.Text.Parsing.ActionParser(ToUtf32("A1"),
-                            new System.Text.Parsing.NonterminalParser(ToUtf32("right"), ToUtf32("Difference"), 1))))));
+                        new System.Text.Parsing.GroupingParser(
+                            new System.Text.Parsing.ActionParser(ToUtf32("A1"),
+                                new System.Text.Parsing.NonterminalParser(ToUtf32("right"), ToUtf32("Difference"), 1)))))));
             AddRule(new DifferenceRule(ToUtf32("Difference"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.SequenceParser(
                     new System.Text.Parsing.ActionParser(ToUtf32("A0"),
                         new System.Text.Parsing.NonterminalParser(ToUtf32("left"), ToUtf32("ExclusiveOr"), 1)),
                     new System.Text.Parsing.KleeneStarParser(
-                        new System.Text.Parsing.SequenceParser(
-                            new System.Text.Parsing.CharParser('-'),
-                            new System.Text.Parsing.ActionParser(ToUtf32("A1"),
-                                new System.Text.Parsing.ExpectationParser(
-                                    new System.Text.Parsing.NonterminalParser(ToUtf32("right"), ToUtf32("ExclusiveOr"), 1))))))));
+                        new System.Text.Parsing.GroupingParser(
+                            new System.Text.Parsing.SequenceParser(
+                                new System.Text.Parsing.CharParser('-'),
+                                new System.Text.Parsing.ActionParser(ToUtf32("A1"),
+                                    new System.Text.Parsing.ExpectationParser(
+                                        new System.Text.Parsing.NonterminalParser(ToUtf32("right"), ToUtf32("ExclusiveOr"), 1)))))))));
             AddRule(new ExclusiveOrRule(ToUtf32("ExclusiveOr"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.SequenceParser(
                     new System.Text.Parsing.ActionParser(ToUtf32("A0"),
                         new System.Text.Parsing.NonterminalParser(ToUtf32("left"), ToUtf32("Intersection"), 1)),
                     new System.Text.Parsing.KleeneStarParser(
-                        new System.Text.Parsing.SequenceParser(
-                            new System.Text.Parsing.CharParser('^'),
-                            new System.Text.Parsing.ActionParser(ToUtf32("A1"),
-                                new System.Text.Parsing.ExpectationParser(
-                                    new System.Text.Parsing.NonterminalParser(ToUtf32("right"), ToUtf32("Intersection"), 1))))))));
+                        new System.Text.Parsing.GroupingParser(
+                            new System.Text.Parsing.SequenceParser(
+                                new System.Text.Parsing.CharParser('^'),
+                                new System.Text.Parsing.ActionParser(ToUtf32("A1"),
+                                    new System.Text.Parsing.ExpectationParser(
+                                        new System.Text.Parsing.NonterminalParser(ToUtf32("right"), ToUtf32("Intersection"), 1)))))))));
             AddRule(new IntersectionRule(ToUtf32("Intersection"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.SequenceParser(
                     new System.Text.Parsing.ActionParser(ToUtf32("A0"),
                         new System.Text.Parsing.NonterminalParser(ToUtf32("left"), ToUtf32("List"), 1)),
                     new System.Text.Parsing.KleeneStarParser(
-                        new System.Text.Parsing.SequenceParser(
-                            new System.Text.Parsing.CharParser('&'),
-                            new System.Text.Parsing.ActionParser(ToUtf32("A1"),
-                                new System.Text.Parsing.ExpectationParser(
-                                    new System.Text.Parsing.NonterminalParser(ToUtf32("right"), ToUtf32("List"), 1))))))));
+                        new System.Text.Parsing.GroupingParser(
+                            new System.Text.Parsing.SequenceParser(
+                                new System.Text.Parsing.CharParser('&'),
+                                new System.Text.Parsing.ActionParser(ToUtf32("A1"),
+                                    new System.Text.Parsing.ExpectationParser(
+                                        new System.Text.Parsing.NonterminalParser(ToUtf32("right"), ToUtf32("List"), 1)))))))));
             AddRule(new ListRule(ToUtf32("List"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.SequenceParser(
                     new System.Text.Parsing.ActionParser(ToUtf32("A0"),
                         new System.Text.Parsing.NonterminalParser(ToUtf32("left"), ToUtf32("Postfix"), 1)),
                     new System.Text.Parsing.OptionalParser(
-                        new System.Text.Parsing.SequenceParser(
-                            new System.Text.Parsing.CharParser('%'),
-                            new System.Text.Parsing.ActionParser(ToUtf32("A1"),
-                                new System.Text.Parsing.ExpectationParser(
-                                    new System.Text.Parsing.NonterminalParser(ToUtf32("right"), ToUtf32("Postfix"), 1))))))));
+                        new System.Text.Parsing.GroupingParser(
+                            new System.Text.Parsing.SequenceParser(
+                                new System.Text.Parsing.CharParser('%'),
+                                new System.Text.Parsing.ActionParser(ToUtf32("A1"),
+                                    new System.Text.Parsing.ExpectationParser(
+                                        new System.Text.Parsing.NonterminalParser(ToUtf32("right"), ToUtf32("Postfix"), 1)))))))));
             AddRule(new PostfixRule(ToUtf32("Postfix"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.SequenceParser(
                     new System.Text.Parsing.ActionParser(ToUtf32("A0"),
                         new System.Text.Parsing.NonterminalParser(ToUtf32("Primary"), ToUtf32("Primary"), 1)),
                     new System.Text.Parsing.OptionalParser(
-                        new System.Text.Parsing.AlternativeParser(
+                        new System.Text.Parsing.GroupingParser(
                             new System.Text.Parsing.AlternativeParser(
-                                new System.Text.Parsing.ActionParser(ToUtf32("A1"),
-                                    new System.Text.Parsing.CharParser('*')),
-                                new System.Text.Parsing.ActionParser(ToUtf32("A2"),
-                                    new System.Text.Parsing.CharParser('+'))),
-                            new System.Text.Parsing.ActionParser(ToUtf32("A3"),
-                                new System.Text.Parsing.CharParser('?')))))));
+                                new System.Text.Parsing.AlternativeParser(
+                                    new System.Text.Parsing.ActionParser(ToUtf32("A1"),
+                                        new System.Text.Parsing.CharParser('*')),
+                                    new System.Text.Parsing.ActionParser(ToUtf32("A2"),
+                                        new System.Text.Parsing.CharParser('+'))),
+                                new System.Text.Parsing.ActionParser(ToUtf32("A3"),
+                                    new System.Text.Parsing.CharParser('?'))))))));
         }
     }
 } // Syntax

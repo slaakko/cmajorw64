@@ -139,11 +139,11 @@ namespace System.Concepts
 
     public concept RandomAccessIterator<T> : BidirectionalIterator<T>
     {
-        T.ReferenceType operator[](int index);
-        T operator+(T, int);
-        T operator+(int, T);
-        T operator-(T, int);
-        int operator-(T, T);
+        T.ReferenceType operator[](long index);
+        T operator+(T, long);
+        T operator+(long, T);
+        T operator-(T, long);
+        long operator-(T, T);
         where T is LessThanComparable;
     }
 
@@ -216,7 +216,7 @@ namespace System.Concepts
         T.ConstIterator T.CBegin();
         T.Iterator T.End();
         T.ConstIterator T.CEnd();
-        int T.Count();
+        long T.Count();
         bool T.IsEmpty();
     }
 
@@ -325,16 +325,16 @@ namespace System.Concepts
     public concept AdditiveGroup<T> : AdditiveMonoid<T>
     {
         T operator-(T);
-        axiom unaryMinusIsInverseOp(T a) { a + (-a) == 0 && (-a) + a == 0; }
         T operator-(T, T);
+        axiom unaryMinusIsInverseOp(T a) { a + (-a) == 0 && (-a) + a == 0; }
         axiom subtract(T a, T b) { a - b == a + (-b); }
     }
 
     public concept MultiplicativeGroup<T> : MultiplicativeMonoid<T>
     {
+        T operator/(T, T);
         // 1/a is multiplicative inverse
         axiom multiplicativeInverseIsInverseOp(T a) { a * (1/a) == 1 && (1/a) * a == 1; }
-        T operator/(T, T);
         axiom division(T a, T b) { a / b == a * (1/b); }
     }
 

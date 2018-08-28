@@ -28,11 +28,14 @@ public:
     IdentifierNode* Id() { return id.get(); }
     const Node* Value() const { return value.get(); }
     Node* Value() { return value.get(); }
+    void SetStrValue(const std::u32string& strValue_) { strValue = strValue_; }
+    const std::u32string& StrValue() const { return strValue; }
 private:
     Specifiers specifiers;
     std::unique_ptr<Node> typeExpr;
     std::unique_ptr<IdentifierNode> id;
     std::unique_ptr<Node> value;
+    std::u32string strValue;
 };
 
 } } // namespace cmajor::ast

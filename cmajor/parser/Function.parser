@@ -29,12 +29,18 @@ namespace cmajor.parser
         using Identifier.Identifier;
         using Statement.CompoundStatement;
         
-        Function(ParsingContext* ctx, var std::unique_ptr<FunctionNode> fun, var Span s, var std::unique_ptr<Attributes> attributes) : FunctionNode*
-            ::= ((Attributes{ attributes.reset(Attributes); })? Specifiers TypeExpr(ctx) FunctionGroupId(ctx){ fun.reset(new FunctionNode(span, Specifiers, TypeExpr, FunctionGroupId, attributes.release())); } 
+        Function(ParsingContext* ctx, var std::unique_ptr<FunctionNode> fun, var Span s, var Span specifierSpan, var Span groupIdSpan, var std::unique_ptr<Attributes> attributes) : FunctionNode*
+            ::= (((Attributes{ attributes.reset(Attributes); })? Specifiers{ specifierSpan = span; } TypeExpr(ctx) FunctionGroupId(ctx)
+                { 
+                    groupIdSpan = span;
+                    fun.reset(new FunctionNode(span, Specifiers, TypeExpr, FunctionGroupId, attributes.release())); 
+                    fun->SetSpecifierSpan(specifierSpan);
+                    fun->SetGroupIdSpan(groupIdSpan);
+                }
                 TemplateParameterList(ctx, fun.get())?
-                ParameterList(ctx, fun.get()){ s = span; }
+                ParameterList(ctx, fun.get())){ fun->GetSpan() = span; }
                 (WhereConstraint(ctx){ fun->SetConstraint(WhereConstraint); })?
-                (CompoundStatement(ctx){ fun->SetBody(CompoundStatement); fun->GetSpan().SetEnd(s.End()); } | ';')){ value = fun.release(); }
+                (CompoundStatement(ctx){ fun->SetBody(CompoundStatement); } | ';')){ value = fun.release(); }
             ;
 
         FunctionGroupId(ParsingContext* ctx, var std::unique_ptr<IdentifierNode> id) : std::u32string

@@ -74,7 +74,7 @@ public:
 
     void SetContainerScope(ContainerScope* containerScope_) { containerScope = containerScope_; }
     void SetCurrentFunctionSymbol(FunctionSymbol* currentFunctionSymbol_) { currentFunctionSymbol = currentFunctionSymbol_; }
-    void BindPrototype();
+    void CreateMemberSymbols();
 private:
     BoundCompileUnit& boundCompileUnit;
     SymbolTable& symbolTable;

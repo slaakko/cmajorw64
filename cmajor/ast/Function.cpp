@@ -76,6 +76,8 @@ Node* FunctionNode::Clone(CloneContext& cloneContext) const
     {
         clone->SetConstraint(static_cast<WhereConstraintNode*>(whereConstraint->Clone(cloneContext)));
     }
+    clone->SetGroupIdSpan(groupIdSpan);
+    clone->SetSpecifierSpan(specifierSpan);
     return clone;
 }
 
@@ -118,6 +120,8 @@ void FunctionNode::CloneContent(FunctionNode* clone, CloneContext& cloneContext)
     { 
         clone->SetConstraint(static_cast<WhereConstraintNode*>(whereConstraint->Clone(cloneContext)));
     }
+    clone->SetGroupIdSpan(groupIdSpan);
+    clone->SetSpecifierSpan(specifierSpan);
 }
 
 void FunctionNode::Accept(Visitor& visitor)
@@ -162,6 +166,8 @@ void FunctionNode::Write(AstWriter& writer)
     {
         writer.Write(bodySource.get());
     }
+    writer.Write(groupIdSpan);
+    writer.Write(specifierSpan);
 }
 
 void FunctionNode::Read(AstReader& reader)
@@ -202,6 +208,8 @@ void FunctionNode::Read(AstReader& reader)
         bodySource.reset(reader.ReadCompoundStatementNode());
         bodySource->SetParent(this);
     }
+    groupIdSpan = reader.ReadSpan();
+    specifierSpan = reader.ReadSpan();
 }
 
 void FunctionNode::AddTemplateParameter(TemplateParameterNode* templateParameter)

@@ -1,5 +1,6 @@
 solution Examples;
 project <args/Args.cmp>;
+project <BigNumCalc/BigNumCalc.cmp>;
 project <Calculator/Calculator.cmp>;
 project <Hello/Hello.cmp>;
 project <HexDump/hexdump.cmp>;

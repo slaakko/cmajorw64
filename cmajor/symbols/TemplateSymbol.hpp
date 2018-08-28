@@ -16,20 +16,22 @@ public:
     std::u32string FullName() const override { return Name(); }
     void Write(SymbolWriter& writer);
     void Read(SymbolReader& reader);
+    void EmplaceType(TypeSymbol* typeSymbol, int index) override;
+    void ComputeExportClosure() override;
     llvm::Type* IrType(Emitter& emitter) override { Assert(false, "tried to get ir type of template parameter"); return nullptr; }
     llvm::Constant* CreateDefaultIrValue(Emitter& emitter) override { Assert(false, "tried to create defualt ir value of template parameter"); return nullptr; }
     TypeSymbol* Unify(TypeSymbol* type, const Span& span) override;
     bool ContainsTemplateParameter() const override { return true; }
     bool HasDefault() const { return hasDefault; }
     void SetHasDefault() { hasDefault = true; }
-    void SetDefaultStr(const std::string& defaultStr_);
-    const std::string& DefaultStr() const { return defaultStr; }
+    void SetDefaultType(TypeSymbol* defaultType_) { defaultType = defaultType_; }
+    TypeSymbol* DefaultType() { return defaultType; }
     TypeSymbol* UnifyTemplateArgumentType(SymbolTable& symbolTable, const std::unordered_map<TemplateParameterSymbol*, TypeSymbol*>& templateParameterMap, const Span& span) override;
     std::u32string Info() const override { return Name(); }
     const char* ClassName() const override { return "TemplateParameterSymbol"; }
 private:
     bool hasDefault;
-    std::string defaultStr;
+    TypeSymbol* defaultType;
 };
 
 class BoundTemplateParameterSymbol : public Symbol

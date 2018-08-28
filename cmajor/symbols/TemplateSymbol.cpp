@@ -9,12 +9,14 @@
 #include <cmajor/symbols/SymbolReader.hpp>
 #include <cmajor/util/Unicode.hpp>
 #include <cmajor/util/Sha1.hpp>
+#include <boost/uuid/uuid_generators.hpp>
 
 namespace cmajor { namespace symbols {
 
 using namespace cmajor::unicode;
 
-TemplateParameterSymbol::TemplateParameterSymbol(const Span& span_, const std::u32string& name_) : TypeSymbol(SymbolType::templateParameterSymbol, span_, name_), hasDefault(false)
+TemplateParameterSymbol::TemplateParameterSymbol(const Span& span_, const std::u32string& name_) : 
+    TypeSymbol(SymbolType::templateParameterSymbol, span_, name_), hasDefault(false), defaultType(nullptr)
 {
 }
 
@@ -24,7 +26,12 @@ void TemplateParameterSymbol::Write(SymbolWriter& writer)
     writer.GetBinaryWriter().Write(hasDefault);
     if (hasDefault)
     {
-        writer.GetBinaryWriter().Write(defaultStr);
+        boost::uuids::uuid defaultTypeId = boost::uuids::nil_generator()();
+        if (defaultType != nullptr)
+        {
+            defaultTypeId = defaultType->TypeId();
+        }
+        writer.GetBinaryWriter().Write(defaultTypeId);
     }
 }
 
@@ -34,18 +41,40 @@ void TemplateParameterSymbol::Read(SymbolReader& reader)
     hasDefault = reader.GetBinaryReader().ReadBool();
     if (hasDefault)
     {
-        defaultStr = reader.GetBinaryReader().ReadUtf8String();
+        boost::uuids::uuid defaultTypeId;
+        reader.GetBinaryReader().ReadUuid(defaultTypeId);
+        if (!defaultTypeId.is_nil())
+        {
+            GetSymbolTable()->EmplaceTypeRequest(this, defaultTypeId, 0);
+        }
+    }
+}
+
+void TemplateParameterSymbol::EmplaceType(TypeSymbol* typeSymbol, int index)
+{
+    Assert(index == 0, "invalid emplace type index");
+    defaultType = typeSymbol;
+}
+
+void TemplateParameterSymbol::ComputeExportClosure()
+{
+    if (IsProject())
+    {
+        TypeSymbol::ComputeExportClosure();
+        if (defaultType)
+        {
+            if (!defaultType->ExportComputed())
+            {
+                defaultType->SetExportComputed();
+                defaultType->ComputeExportClosure();
+            }
+        }
     }
 }
 
 TypeSymbol* TemplateParameterSymbol::Unify(TypeSymbol* type, const Span& span)
 {
     return type;
-}
-
-void TemplateParameterSymbol::SetDefaultStr(const std::string& defaultStr_)
-{
-    defaultStr = defaultStr_;
 }
 
 TypeSymbol* TemplateParameterSymbol::UnifyTemplateArgumentType(SymbolTable& symbolTable, const std::unordered_map<TemplateParameterSymbol*, TypeSymbol*>& templateParameterMap, const Span& span) 

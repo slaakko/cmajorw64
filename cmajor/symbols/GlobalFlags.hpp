@@ -34,7 +34,9 @@ enum class GlobalFlags : uint32_t
     msbuild = 1 << 16,
     ast2xml = 1 << 17,
     sym2xml = 1 << 18,
-    bdt2xml = 1 << 19
+    bdt2xml = 1 << 19,
+    cmdoc = 1 << 20,
+    optimizeCmDoc = 1 << 21
 };
 
 void SetGlobalFlag(GlobalFlags flag);
@@ -44,6 +46,8 @@ bool GetGlobalFlag(GlobalFlags flag);
 std::string GetConfig();
 int GetOptimizationLevel();
 void SetOptimizationLevel(int optimizationLevel_);
+int GetNumBuildThreads();
+void SetNumBuildThreads(int numBuildThreads_);
 
 void SetCompilerVersion(const std::string& compilerVersion_);
 std::string GetCompilerVersion();

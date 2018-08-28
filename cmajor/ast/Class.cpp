@@ -48,6 +48,10 @@ Node* ClassNode::Clone(CloneContext& cloneContext) const
     {
         clone->AddMember(members[i]->Clone(cloneContext));
     }
+    clone->SetSpecifierSpan(specifierSpan);
+    clone->SetClassSpan(classSpan);
+    clone->SetBeginBraceSpan(beginBraceSpan);
+    clone->SetEndBraceSpan(endBraceSpan);
     return clone;
 }
 
@@ -70,6 +74,10 @@ void ClassNode::Write(AstWriter& writer)
     templateParameters.Write(writer);
     baseClassOrInterfaces.Write(writer);
     members.Write(writer);
+    writer.Write(specifierSpan);
+    writer.Write(classSpan);
+    writer.Write(beginBraceSpan);
+    writer.Write(endBraceSpan);
 }
 
 void ClassNode::Read(AstReader& reader)
@@ -90,6 +98,10 @@ void ClassNode::Read(AstReader& reader)
     baseClassOrInterfaces.SetParent(this);
     members.Read(reader);
     members.SetParent(this);
+    specifierSpan = reader.ReadSpan();
+    classSpan = reader.ReadSpan();
+    beginBraceSpan = reader.ReadSpan();
+    endBraceSpan = reader.ReadSpan();
 }
 
 void ClassNode::AddTemplateParameter(TemplateParameterNode* templateParameter)
@@ -394,7 +406,9 @@ Node* MemberVariableNode::Clone(CloneContext& cloneContext) const
     {
         clonedAttributes = attributes->Clone();
     }
-    return new MemberVariableNode(GetSpan(), specifiers, typeExpr->Clone(cloneContext), static_cast<IdentifierNode*>(id->Clone(cloneContext)), clonedAttributes);
+    MemberVariableNode* clone =  new MemberVariableNode(GetSpan(), specifiers, typeExpr->Clone(cloneContext), static_cast<IdentifierNode*>(id->Clone(cloneContext)), clonedAttributes);
+    clone->SetSpecifierSpan(specifierSpan);
+    return clone;
 }
 
 void MemberVariableNode::Accept(Visitor& visitor)
@@ -414,6 +428,7 @@ void MemberVariableNode::Write(AstWriter& writer)
     writer.Write(specifiers);
     writer.Write(typeExpr.get());
     writer.Write(id.get());
+    writer.Write(specifierSpan);
 }
 
 void MemberVariableNode::Read(AstReader& reader)
@@ -430,6 +445,7 @@ void MemberVariableNode::Read(AstReader& reader)
     typeExpr->SetParent(this);
     id.reset(reader.ReadIdentifierNode());
     id->SetParent(this);
+    specifierSpan = reader.ReadSpan();
 }
 
 } } // namespace cmajor::ast

@@ -1,3 +1,0 @@
-project parseToDom;
-target=program;
-source <main.cm>;

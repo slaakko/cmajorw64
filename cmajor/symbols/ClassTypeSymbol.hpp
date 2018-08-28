@@ -86,6 +86,7 @@ public:
     void EmplaceType(TypeSymbol* typeSymbol, int index) override;
     void AddMember(Symbol* member) override;
     bool IsClassTypeSymbol() const override { return true; }
+    bool IsParentSymbol() const override { return true; }
     std::string TypeString() const override { return "class"; }
     std::u32string SimpleName() const override { return groupName; }
     std::string GetSpecifierStr() const override;
@@ -98,6 +99,7 @@ public:
     void CreateDestructorSymbol();
     const std::u32string& GroupName() const { return groupName; }
     void SetGroupName(const std::u32string& groupName_);
+    std::u32string CodeName() const override { return groupName; }
     int MinArity() const { return minArity; }
     int MaxArity() const { return templateParameters.size(); }
     void ComputeMinArity();

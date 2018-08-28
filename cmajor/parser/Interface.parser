@@ -24,9 +24,13 @@ namespace cmajor.parser
         using TypeExpr.TypeExpr;
         using Parameter.ParameterList;
 
-        Interface(ParsingContext* ctx, var std::unique_ptr<Attributes> attributes) : InterfaceNode*
-            ::= ((Attributes{ attributes.reset(Attributes); })? Specifiers keyword("interface") Identifier!){ value = new InterfaceNode(span, Specifiers, Identifier, attributes.release()); } 
-                '{'! InterfaceContent(ctx, value) '}'!
+        Interface(ParsingContext* ctx, var std::unique_ptr<Attributes> attributes, var Span specifierSpan, var Span beginBraceSpan, var Span endBraceSpan) : InterfaceNode*
+            ::= ((Attributes{ attributes.reset(Attributes); })? Specifiers{ specifierSpan = span; } keyword("interface") Identifier!)
+                { 
+                    value = new InterfaceNode(span, Specifiers, Identifier, attributes.release()); 
+                    value->SetSpecifierSpan(specifierSpan);
+                } 
+                '{'!{ beginBraceSpan = span; } InterfaceContent(ctx, value) '}'!{ endBraceSpan = span; value->SetBeginBraceSpan(beginBraceSpan); value->SetEndBraceSpan(endBraceSpan); }
             ;
 
         InterfaceContent(ParsingContext* ctx, InterfaceNode* intf)

@@ -164,6 +164,15 @@ void ClassTypeSymbol::Write(SymbolWriter& writer)
             writer.GetAstWriter().Write(constraint.get());
         }
     }
+    else if (GetSymbolType() == SymbolType::classTemplateSpecializationSymbol)
+    {
+        bool hasConstraint = constraint != nullptr;
+        writer.GetBinaryWriter().Write(hasConstraint);
+        if (hasConstraint)
+        {
+            writer.GetAstWriter().Write(constraint.get());
+        }
+    }
 }
 
 void ClassTypeSymbol::Read(SymbolReader& reader)
@@ -240,6 +249,14 @@ void ClassTypeSymbol::Read(SymbolReader& reader)
             GetSymbolTable()->AddClassHavingStaticConstructor(this);
         }
         reader.AddClassType(this);
+    }
+    else if (GetSymbolType() == SymbolType::classTemplateSpecializationSymbol)
+    {
+        bool hasConstraint = reader.GetBinaryReader().ReadBool();
+        if (hasConstraint)
+        {
+            constraint.reset(reader.GetAstReader().ReadConstraintNode());
+        }
     }
 }
 
@@ -573,6 +590,7 @@ void ClassTypeSymbol::CreateDestructorSymbol()
     {
         DestructorSymbol* destructorSymbol = new DestructorSymbol(GetSpan(), U"@destructor");
         destructorSymbol->SetModule(GetModule());
+        destructorSymbol->SetOriginalModule(GetOriginalModule());
         destructorSymbol->SetSymbolTable(GetSymbolTable());
         GetSymbolTable()->SetFunctionIdFor(destructorSymbol);
         destructorSymbol->SetGenerated();
@@ -1366,7 +1384,14 @@ Value* ClassTypeSymbol::MakeValue() const
 
 std::u32string ClassTypeSymbol::Id() const
 {
-    return MangledName();
+    if (prototype)
+    {
+        return prototype->Id();
+    }
+    else
+    {
+        return MangledName();
+    }
 }
 
 } } // namespace cmajor::symbols

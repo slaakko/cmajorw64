@@ -56,7 +56,7 @@ namespace Syntax
             ;
 
         Grouping(ParsingContext* ctx) : System.Text.Parsing.Parser*
-            ::= ('(' Alternative(ctx)! ')'!){ value = Alternative; }
+            ::= ('(' Alternative(ctx)! ')'!){ value = new GroupingParser(Alternative); }
             ;
 
         Token(ParsingContext* ctx) : System.Text.Parsing.Parser*

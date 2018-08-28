@@ -13,7 +13,7 @@
 
 namespace cmajor { namespace symbols {
 
-SymbolCreatorVisitor::SymbolCreatorVisitor(SymbolTable& symbolTable_) : symbolTable(symbolTable_), classInstanceNode(nullptr), classTemplateSpecialization(nullptr)
+SymbolCreatorVisitor::SymbolCreatorVisitor(SymbolTable& symbolTable_) : symbolTable(symbolTable_), classInstanceNode(nullptr), classTemplateSpecialization(nullptr), functionIndex(0)
 {
 }
 
@@ -47,7 +47,7 @@ void SymbolCreatorVisitor::Visit(NamespaceNode& namespaceNode)
 
 void SymbolCreatorVisitor::Visit(FunctionNode& functionNode)
 {
-    symbolTable.BeginFunction(functionNode);
+    symbolTable.BeginFunction(functionNode, functionIndex++);
     int nt = functionNode.TemplateParameters().Count();
     for (int i = 0; i < nt; ++i)
     {
@@ -110,7 +110,7 @@ void SymbolCreatorVisitor::Visit(ClassNode& classNode)
 
 void SymbolCreatorVisitor::Visit(StaticConstructorNode& staticConstructorNode)
 {
-    symbolTable.BeginStaticConstructor(staticConstructorNode);
+    symbolTable.BeginStaticConstructor(staticConstructorNode, functionIndex++);
     if (staticConstructorNode.Body())
     {
         staticConstructorNode.Body()->Accept(*this);
@@ -120,7 +120,7 @@ void SymbolCreatorVisitor::Visit(StaticConstructorNode& staticConstructorNode)
 
 void SymbolCreatorVisitor::Visit(ConstructorNode& constructorNode)
 {
-    symbolTable.BeginConstructor(constructorNode);
+    symbolTable.BeginConstructor(constructorNode, functionIndex++);
     int n = constructorNode.Parameters().Count();
     for (int i = 0; i < n; ++i)
     {
@@ -136,7 +136,7 @@ void SymbolCreatorVisitor::Visit(ConstructorNode& constructorNode)
 
 void SymbolCreatorVisitor::Visit(DestructorNode& destructorNode)
 {
-    symbolTable.BeginDestructor(destructorNode);
+    symbolTable.BeginDestructor(destructorNode, functionIndex++);
     if (destructorNode.Body())
     {
         destructorNode.Body()->Accept(*this);
@@ -146,7 +146,7 @@ void SymbolCreatorVisitor::Visit(DestructorNode& destructorNode)
 
 void SymbolCreatorVisitor::Visit(MemberFunctionNode& memberFunctionNode)
 {
-    symbolTable.BeginMemberFunction(memberFunctionNode);
+    symbolTable.BeginMemberFunction(memberFunctionNode, functionIndex++);
     int n = memberFunctionNode.Parameters().Count();
     for (int i = 0; i < n; ++i)
     {
@@ -162,7 +162,7 @@ void SymbolCreatorVisitor::Visit(MemberFunctionNode& memberFunctionNode)
 
 void SymbolCreatorVisitor::Visit(ConversionFunctionNode& conversionFunctionNode)
 {
-    symbolTable.BeginConversionFunction(conversionFunctionNode);
+    symbolTable.BeginConversionFunction(conversionFunctionNode, functionIndex++);
     if (conversionFunctionNode.Body())
     {
         conversionFunctionNode.Body()->Accept(*this);
@@ -213,7 +213,7 @@ void SymbolCreatorVisitor::Visit(ClassDelegateNode& classDelegateNode)
 
 void SymbolCreatorVisitor::Visit(ConceptNode& conceptNode)
 {
-    symbolTable.BeginConcept(conceptNode);
+    symbolTable.BeginConcept(conceptNode, true);
     int n = conceptNode.TypeParameters().Count();
     for (int i = 0; i < n; ++i)
     {

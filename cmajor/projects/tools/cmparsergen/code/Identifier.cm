@@ -3,6 +3,8 @@ using System.Collections;
 using System.Text.Parsing;
 using System.Text.Parsing.CodeDom;
 
+// this source file has been automatically generated from 'Identifier.parser' using cmparsergen version 2.0.0.
+
 namespace Code
 {
     public class IdentifierGrammar : System.Text.Parsing.Grammar
@@ -413,16 +415,16 @@ namespace Code
                 grammar0 = new Code.TypeExprGrammar(pd);
             }
             AddGrammarReference(grammar0);
-            Grammar* grammar1 = pd->GetGrammar(ToUtf32("Code.KeywordGrammar"));
+            Grammar* grammar1 = pd->GetGrammar(ToUtf32("System.Text.Parsing.stdlib"));
             if (grammar1 == null)
             {
-                grammar1 = new Code.KeywordGrammar(pd);
+                grammar1 = new System.Text.Parsing.stdlib(pd);
             }
             AddGrammarReference(grammar1);
-            Grammar* grammar2 = pd->GetGrammar(ToUtf32("System.Text.Parsing.stdlib"));
+            Grammar* grammar2 = pd->GetGrammar(ToUtf32("Code.KeywordGrammar"));
             if (grammar2 == null)
             {
-                grammar2 = new System.Text.Parsing.stdlib(pd);
+                grammar2 = new Code.KeywordGrammar(pd);
             }
             AddGrammarReference(grammar2);
         }
@@ -441,46 +443,51 @@ namespace Code
                 new System.Text.Parsing.ActionParser(ToUtf32("A0"),
                     new System.Text.Parsing.TokenParser(
                         new System.Text.Parsing.ListParser(
-                            new System.Text.Parsing.DifferenceParser(
-                                new System.Text.Parsing.NonterminalParser(ToUtf32("identifier"), ToUtf32("identifier"), 0),
-                                new System.Text.Parsing.NonterminalParser(ToUtf32("Keyword"), ToUtf32("Keyword"), 0)),
+                            new System.Text.Parsing.GroupingParser(
+                                new System.Text.Parsing.DifferenceParser(
+                                    new System.Text.Parsing.NonterminalParser(ToUtf32("identifier"), ToUtf32("identifier"), 0),
+                                    new System.Text.Parsing.NonterminalParser(ToUtf32("Keyword"), ToUtf32("Keyword"), 0))),
                             new System.Text.Parsing.CharParser('.'))))));
             AddRule(new TemplateIdRule(ToUtf32("TemplateId"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.SequenceParser(
                     new System.Text.Parsing.ActionParser(ToUtf32("A0"),
                         new System.Text.Parsing.EmptyParser()),
                     new System.Text.Parsing.ActionParser(ToUtf32("A1"),
-                        new System.Text.Parsing.SequenceParser(
+                        new System.Text.Parsing.GroupingParser(
                             new System.Text.Parsing.SequenceParser(
                                 new System.Text.Parsing.SequenceParser(
-                                    new System.Text.Parsing.ActionParser(ToUtf32("A2"),
-                                        new System.Text.Parsing.NonterminalParser(ToUtf32("primary"), ToUtf32("QualifiedId"), 0)),
-                                    new System.Text.Parsing.CharParser('<')),
-                                new System.Text.Parsing.ListParser(
-                                    new System.Text.Parsing.ActionParser(ToUtf32("A3"),
-                                        new System.Text.Parsing.NonterminalParser(ToUtf32("templateArg"), ToUtf32("TypeExpr"), 1)),
-                                    new System.Text.Parsing.CharParser(','))),
-                            new System.Text.Parsing.CharParser('>'))))));
+                                    new System.Text.Parsing.SequenceParser(
+                                        new System.Text.Parsing.ActionParser(ToUtf32("A2"),
+                                            new System.Text.Parsing.NonterminalParser(ToUtf32("primary"), ToUtf32("QualifiedId"), 0)),
+                                        new System.Text.Parsing.CharParser('<')),
+                                    new System.Text.Parsing.GroupingParser(
+                                        new System.Text.Parsing.ListParser(
+                                            new System.Text.Parsing.ActionParser(ToUtf32("A3"),
+                                                new System.Text.Parsing.NonterminalParser(ToUtf32("templateArg"), ToUtf32("TypeExpr"), 1)),
+                                            new System.Text.Parsing.CharParser(',')))),
+                                new System.Text.Parsing.CharParser('>')))))));
             AddRule(new UsingAliasRule(ToUtf32("UsingAlias"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.SequenceParser(
                     new System.Text.Parsing.SequenceParser(
                         new System.Text.Parsing.KeywordParser(ToUtf32("using")),
                         new System.Text.Parsing.ActionParser(ToUtf32("A0"),
-                            new System.Text.Parsing.SequenceParser(
+                            new System.Text.Parsing.GroupingParser(
                                 new System.Text.Parsing.SequenceParser(
-                                    new System.Text.Parsing.ActionParser(ToUtf32("A1"),
-                                        new System.Text.Parsing.NonterminalParser(ToUtf32("Identifier"), ToUtf32("Identifier"), 0)),
-                                    new System.Text.Parsing.CharParser('=')),
-                                new System.Text.Parsing.ActionParser(ToUtf32("A2"),
-                                    new System.Text.Parsing.NonterminalParser(ToUtf32("QualifiedId"), ToUtf32("QualifiedId"), 0))))),
+                                    new System.Text.Parsing.SequenceParser(
+                                        new System.Text.Parsing.ActionParser(ToUtf32("A1"),
+                                            new System.Text.Parsing.NonterminalParser(ToUtf32("Identifier"), ToUtf32("Identifier"), 0)),
+                                        new System.Text.Parsing.CharParser('=')),
+                                    new System.Text.Parsing.ActionParser(ToUtf32("A2"),
+                                        new System.Text.Parsing.NonterminalParser(ToUtf32("QualifiedId"), ToUtf32("QualifiedId"), 0)))))),
                     new System.Text.Parsing.CharParser(';'))));
             AddRule(new UsingImportRule(ToUtf32("UsingImport"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.SequenceParser(
                     new System.Text.Parsing.SequenceParser(
                         new System.Text.Parsing.KeywordParser(ToUtf32("using")),
                         new System.Text.Parsing.ActionParser(ToUtf32("A0"),
-                            new System.Text.Parsing.ActionParser(ToUtf32("A1"),
-                                new System.Text.Parsing.NonterminalParser(ToUtf32("QualifiedId"), ToUtf32("QualifiedId"), 0)))),
+                            new System.Text.Parsing.GroupingParser(
+                                new System.Text.Parsing.ActionParser(ToUtf32("A1"),
+                                    new System.Text.Parsing.NonterminalParser(ToUtf32("QualifiedId"), ToUtf32("QualifiedId"), 0))))),
                     new System.Text.Parsing.CharParser(';'))));
         }
     }

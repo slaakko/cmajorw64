@@ -155,21 +155,33 @@ void ClassTemplateRepository::BindClassTemplateSpecialization(ClassTemplateSpeci
     }
     bool markedExport = classTemplateSpecialization->MarkedExport();
     bool templateParameterBinding = false;
+    ContainerScope resolveScope;
+    resolveScope.SetParent(containerScope);
     for (int i = 0; i < n; ++i)
     {
         TemplateParameterSymbol* templateParameter = classTemplate->TemplateParameters()[i];
         BoundTemplateParameterSymbol* boundTemplateParameter = new BoundTemplateParameterSymbol(span, templateParameter->Name());
         TypeSymbol* templateArgumentType = classTemplateSpecialization->TemplateArgumentTypes()[i];
+        boundTemplateParameter->SetType(templateArgumentType);
         if (templateArgumentType->GetSymbolType() == SymbolType::templateParameterSymbol)
         {
             templateParameterBinding = true;
+            if (classTemplateSpecialization->IsPrototype())
+            {
+                if (classTemplateSpecialization->IsProject())
+                {
+                    resolveScope.Install(boundTemplateParameter);
+                    TemplateParameterNode* templateParameterNode = classNode->TemplateParameters()[i];
+                    Node* defaultTemplateArgumentNode = templateParameterNode->DefaultTemplateArgument();
+                    if (defaultTemplateArgumentNode)
+                    {
+                        TypeSymbol* templateArgumentType = ResolveType(defaultTemplateArgumentNode, boundCompileUnit, &resolveScope);
+                        templateParameter->SetDefaultType(templateArgumentType);
+                    }
+                }
+            }
         }
-        boundTemplateParameter->SetType(templateArgumentType);
         classTemplateSpecialization->AddMember(boundTemplateParameter);
-    }
-    if (templateParameterBinding)
-    {
-        classTemplateSpecialization->SetPrototype();
     }
     symbolTable.SetCurrentCompileUnit(boundCompileUnit.GetCompileUnitNode());
     SymbolCreatorVisitor symbolCreatorVisitor(symbolTable);
@@ -179,7 +191,7 @@ void ClassTemplateRepository::BindClassTemplateSpecialization(ClassTemplateSpeci
     TypeBinder typeBinder(boundCompileUnit);
     if (templateParameterBinding)
     {
-        typeBinder.BindPrototype();
+        typeBinder.CreateMemberSymbols();
     }
     globalNs->Accept(typeBinder);
     if (templateParameterBinding)

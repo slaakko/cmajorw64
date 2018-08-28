@@ -178,6 +178,7 @@ void JsonAttributeProcessor::GenerateJsonCreatorFunctionSymbol(Attribute* attrib
     jsonCreatorFunctionSymbol->SetGroupName(U"Create");
     jsonCreatorFunctionSymbol->SetSymbolTable(&module->GetSymbolTable());
     jsonCreatorFunctionSymbol->SetModule(module);
+    jsonCreatorFunctionSymbol->SetOriginalModule(module);
     module->GetSymbolTable().SetFunctionIdFor(jsonCreatorFunctionSymbol);
     jsonCreatorFunctionSymbol->SetAccess(SymbolAccess::public_);
     jsonCreatorFunctionSymbol->SetStatic();
@@ -206,6 +207,7 @@ void JsonAttributeProcessor::GenerateJsonConstructorSymbol(Attribute* attribute,
     ConstructorSymbol* jsonConstructorSymbol = new ConstructorSymbol(attribute->GetSpan(), U"@constructor");
     jsonConstructorSymbol->SetSymbolTable(&module->GetSymbolTable());
     jsonConstructorSymbol->SetModule(module);
+    jsonConstructorSymbol->SetOriginalModule(module);
     module->GetSymbolTable().SetFunctionIdFor(jsonConstructorSymbol);
     ParameterSymbol* thisParam = new ParameterSymbol(attribute->GetSpan(), U"this");
     thisParam->SetType(classTypeSymbol->AddPointer(attribute->GetSpan()));
@@ -235,6 +237,7 @@ void JsonAttributeProcessor::GenerateToJsonJsonObjectSymbol(Attribute* attribute
 {
     MemberFunctionSymbol* toJsonJsonObjectMemberFunctionSymbol = new MemberFunctionSymbol(attribute->GetSpan(), U"ToJson");
     toJsonJsonObjectMemberFunctionSymbol->SetModule(module);
+    toJsonJsonObjectMemberFunctionSymbol->SetOriginalModule(module);
     toJsonJsonObjectMemberFunctionSymbol->SetSymbolTable(&module->GetSymbolTable());
     toJsonJsonObjectMemberFunctionSymbol->SetGroupName(U"ToJson");
     ClassTypeSymbol* baseClass = classTypeSymbol->BaseClass();
@@ -291,6 +294,7 @@ void JsonAttributeProcessor::GenerateToJsonSymbol(Attribute* attribute, ClassTyp
 {
     MemberFunctionSymbol* toJsonMemberFunctionSymbol = new MemberFunctionSymbol(attribute->GetSpan(), U"ToJson");
     toJsonMemberFunctionSymbol->SetModule(module);
+    toJsonMemberFunctionSymbol->SetOriginalModule(module);
     toJsonMemberFunctionSymbol->SetSymbolTable(&module->GetSymbolTable());
     toJsonMemberFunctionSymbol->SetGroupName(U"ToJson");
     ClassTypeSymbol* baseClass = classTypeSymbol->BaseClass();
@@ -400,6 +404,7 @@ void JsonAttributeProcessor::GenerateJsonCreatorImplementation(Attribute* attrib
         std::unique_ptr<BoundFunction> boundFunction(new BoundFunction(module, jsonCreatorFunctionSymbol));
         const Span& span = attribute->GetSpan();
         CompoundStatementNode compoundStatementNode(span);
+        compoundStatementNode.SetEndBraceSpan(span);
         NewNode* newNode = new NewNode(span, new IdentifierNode(span, classTypeSymbol->FullName()));
         newNode->AddArgument(new IdentifierNode(span, U"@value"));
         ReturnStatementNode* returnStatementNode = new ReturnStatementNode(span, newNode);
@@ -452,6 +457,7 @@ void JsonAttributeProcessor::GenerateJsonConstructorImplementation(Attribute* at
         const Span& span = attribute->GetSpan();
         ConstructorNode constructorNode(span);
         CompoundStatementNode compoundStatementNode(span);
+        compoundStatementNode.SetEndBraceSpan(span);
         ClassTypeSymbol* baseClass = classTypeSymbol->BaseClass();
         if (baseClass)
         {
@@ -548,6 +554,7 @@ void JsonAttributeProcessor::GenerateToJsonJsonObjectImplementation(Attribute* a
         std::unique_ptr<BoundFunction> boundFunction(new BoundFunction(module, toJsonJsonObjectMemberFunctionSymbol));
         const Span& span = attribute->GetSpan();
         CompoundStatementNode compoundStatementNode(span);
+        compoundStatementNode.SetEndBraceSpan(span);
         ClassTypeSymbol* baseClass = classTypeSymbol->BaseClass();
         if (baseClass)
         {
@@ -645,6 +652,7 @@ void JsonAttributeProcessor::GenerateToJsonImplementation(Attribute* attribute, 
         std::unique_ptr<BoundFunction> boundFunction(new BoundFunction(module, toJsonMemberFunctionSymbol));
         const Span& span = attribute->GetSpan();
         CompoundStatementNode compoundStatementNode(span);
+        compoundStatementNode.SetEndBraceSpan(span);
         TemplateIdNode* uniquePtrJsonObject = new TemplateIdNode(span, new IdentifierNode(span, U"UniquePtr"));
         uniquePtrJsonObject->AddTemplateArgument(new IdentifierNode(span, U"JsonObject"));
         ConstructionStatementNode* constructJsonObjectStatement = new ConstructionStatementNode(span, uniquePtrJsonObject, new IdentifierNode(span, U"@object"));

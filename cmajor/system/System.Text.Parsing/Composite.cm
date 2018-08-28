@@ -175,6 +175,23 @@ namespace System.Text.Parsing
             visitor.EndVisit(*this);
         }
     }
+    
+    public class GroupingParser : UnaryParser
+    {
+        public GroupingParser(Parser* child_) : base(u"grouping", child_, child_->Info())
+        {
+        }
+        public override Match Parse(Scanner& scanner, Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
+        {
+            return Child()->Parse(scanner, stack, parsingData);
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.BeginVisit(*this);
+            Child()->Accept(visitor);
+            visitor.EndVisit(*this);
+        }
+    }
 
     public abstract class BinaryParser : Parser
     {

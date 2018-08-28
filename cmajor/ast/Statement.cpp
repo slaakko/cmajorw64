@@ -201,6 +201,9 @@ Node* IfStatementNode::Clone(CloneContext& cloneContext) const
     }
     IfStatementNode* clone = new IfStatementNode(GetSpan(), condition->Clone(cloneContext), static_cast<StatementNode*>(thenS->Clone(cloneContext)), clonedElseS);
     CloneLabelTo(clone, cloneContext);
+    clone->SetLeftParenSpan(leftParenSpan);
+    clone->SetRightParenSpan(rightParenSpan);
+    clone->SetElseSpan(elseSpan);
     return clone;
 }
 
@@ -220,6 +223,9 @@ void IfStatementNode::Write(AstWriter& writer)
     {
         writer.Write(elseS.get());
     }
+    writer.Write(leftParenSpan);
+    writer.Write(rightParenSpan);
+    writer.Write(elseSpan);
 }
 
 void IfStatementNode::Read(AstReader& reader)
@@ -235,6 +241,9 @@ void IfStatementNode::Read(AstReader& reader)
         elseS.reset(reader.ReadStatementNode());
         elseS->SetParent(this);
     }
+    leftParenSpan = reader.ReadSpan();
+    rightParenSpan = reader.ReadSpan();
+    elseSpan = reader.ReadSpan();
 }
 
 WhileStatementNode::WhileStatementNode(const Span& span_) : StatementNode(NodeType::whileStatementNode, span_), condition(), statement()
@@ -252,6 +261,8 @@ Node* WhileStatementNode::Clone(CloneContext& cloneContext) const
 {
     WhileStatementNode* clone = new WhileStatementNode(GetSpan(), condition->Clone(cloneContext), static_cast<StatementNode*>(statement->Clone(cloneContext)));
     CloneLabelTo(clone, cloneContext);
+    clone->SetLeftParenSpan(leftParenSpan);
+    clone->SetRightParenSpan(rightParenSpan);
     return clone;
 }
 
@@ -265,6 +276,8 @@ void WhileStatementNode::Write(AstWriter& writer)
     StatementNode::Write(writer);
     writer.Write(condition.get());
     writer.Write(statement.get());
+    writer.Write(leftParenSpan);
+    writer.Write(rightParenSpan);
 }
 
 void WhileStatementNode::Read(AstReader& reader)
@@ -274,6 +287,8 @@ void WhileStatementNode::Read(AstReader& reader)
     condition->SetParent(this);
     statement.reset(reader.ReadStatementNode());
     statement->SetParent(this);
+    leftParenSpan = reader.ReadSpan();
+    rightParenSpan = reader.ReadSpan();
 }
 
 DoStatementNode::DoStatementNode(const Span& span_) : StatementNode(NodeType::doStatementNode, span_), statement(), condition()
@@ -290,6 +305,9 @@ Node* DoStatementNode::Clone(CloneContext& cloneContext) const
 {
     DoStatementNode* clone = new DoStatementNode(GetSpan(), static_cast<StatementNode*>(statement->Clone(cloneContext)), condition->Clone(cloneContext));
     CloneLabelTo(clone, cloneContext);
+    clone->SetWhileSpan(whileSpan);
+    clone->SetLeftParenSpan(leftParenSpan);
+    clone->SetRightParenSpan(rightParenSpan);
     return clone;
 }
 
@@ -303,6 +321,9 @@ void DoStatementNode::Write(AstWriter& writer)
     StatementNode::Write(writer);
     writer.Write(statement.get());
     writer.Write(condition.get());
+    writer.Write(whileSpan);
+    writer.Write(leftParenSpan);
+    writer.Write(rightParenSpan);
 }
 
 void DoStatementNode::Read(AstReader& reader)
@@ -312,6 +333,9 @@ void DoStatementNode::Read(AstReader& reader)
     statement->SetParent(this);
     condition.reset(reader.ReadNode());
     condition->SetParent(this);
+    whileSpan = reader.ReadSpan();
+    leftParenSpan = reader.ReadSpan();
+    rightParenSpan = reader.ReadSpan();
 }
 
 ForStatementNode::ForStatementNode(const Span& span_) : StatementNode(NodeType::forStatementNode, span_), initS(), condition(), loopS(), actionS()
@@ -340,6 +364,8 @@ Node* ForStatementNode::Clone(CloneContext& cloneContext) const
     ForStatementNode* clone = new ForStatementNode(GetSpan(), static_cast<StatementNode*>(initS->Clone(cloneContext)), clonedCondition, static_cast<StatementNode*>(loopS->Clone(cloneContext)),
         static_cast<StatementNode*>(actionS->Clone(cloneContext)));
     CloneLabelTo(clone, cloneContext);
+    clone->SetLeftParenSpan(leftParenSpan);
+    clone->SetRightParenSpan(rightParenSpan);
     return clone;
 }
 
@@ -360,6 +386,8 @@ void ForStatementNode::Write(AstWriter& writer)
     }
     writer.Write(loopS.get());
     writer.Write(actionS.get());
+    writer.Write(leftParenSpan);
+    writer.Write(rightParenSpan);
 }
 
 void ForStatementNode::Read(AstReader& reader)
@@ -377,6 +405,8 @@ void ForStatementNode::Read(AstReader& reader)
     loopS->SetParent(this);
     actionS.reset(reader.ReadStatementNode());
     actionS->SetParent(this);
+    leftParenSpan = reader.ReadSpan();
+    rightParenSpan = reader.ReadSpan();
 }
 
 BreakStatementNode::BreakStatementNode(const Span& span_) : StatementNode(NodeType::breakStatementNode, span_)
@@ -443,12 +473,12 @@ void GotoStatementNode::Read(AstReader& reader)
     target = reader.GetBinaryReader().ReadUtf32String();
 }
 
-ConstructionStatementNode::ConstructionStatementNode(const Span& span_) : StatementNode(NodeType::constructionStatementNode, span_), typeExpr(), id(), arguments()
+ConstructionStatementNode::ConstructionStatementNode(const Span& span_) : StatementNode(NodeType::constructionStatementNode, span_), typeExpr(), id(), arguments(), assignment(false), empty(false)
 {
 }
 
 ConstructionStatementNode::ConstructionStatementNode(const Span& span_, Node* typeExpr_, IdentifierNode* id_) :
-    StatementNode(NodeType::constructionStatementNode, span_), typeExpr(typeExpr_), id(id_), arguments()
+    StatementNode(NodeType::constructionStatementNode, span_), typeExpr(typeExpr_), id(id_), arguments(), assignment(false), empty(false)
 {
     typeExpr->SetParent(this);
     id->SetParent(this);
@@ -463,6 +493,8 @@ Node* ConstructionStatementNode::Clone(CloneContext& cloneContext) const
     {
         clone->AddArgument(arguments[i]->Clone(cloneContext));
     }
+    if (assignment) clone->SetAssignment();
+    if (empty) clone->SetEmpty();
     return clone;
 }
 
@@ -477,6 +509,8 @@ void ConstructionStatementNode::Write(AstWriter& writer)
     writer.Write(typeExpr.get());
     writer.Write(id.get());
     arguments.Write(writer);
+    writer.GetBinaryWriter().Write(assignment);
+    writer.GetBinaryWriter().Write(empty);
 }
 
 void ConstructionStatementNode::Read(AstReader& reader)
@@ -488,6 +522,8 @@ void ConstructionStatementNode::Read(AstReader& reader)
     id->SetParent(this);
     arguments.Read(reader);
     arguments.SetParent(this);
+    assignment = reader.GetBinaryReader().ReadBool();
+    empty = reader.GetBinaryReader().ReadBool();
 }
 
 void ConstructionStatementNode::AddArgument(Node* argument)
@@ -671,6 +707,9 @@ Node* RangeForStatementNode::Clone(CloneContext& cloneContext) const
     RangeForStatementNode* clone = new RangeForStatementNode(GetSpan(), typeExpr->Clone(cloneContext), static_cast<IdentifierNode*>(id->Clone(cloneContext)), container->Clone(cloneContext),
         static_cast<StatementNode*>(action->Clone(cloneContext)));
     CloneLabelTo(clone, cloneContext);
+    clone->SetLeftParenSpan(leftParenSpan);
+    clone->SetRightParenSpan(rightParenSpan);
+    clone->SetColonSpan(colonSpan);
     return clone;
 }
 
@@ -686,6 +725,9 @@ void RangeForStatementNode::Write(AstWriter& writer)
     writer.Write(id.get());
     writer.Write(container.get());
     writer.Write(action.get());
+    writer.Write(leftParenSpan);
+    writer.Write(rightParenSpan);
+    writer.Write(colonSpan);
 }
 
 void RangeForStatementNode::Read(AstReader& reader)
@@ -699,6 +741,9 @@ void RangeForStatementNode::Read(AstReader& reader)
     container->SetParent(this);
     action.reset(reader.ReadStatementNode());
     action->SetParent(this);
+    leftParenSpan = reader.ReadSpan();
+    rightParenSpan = reader.ReadSpan();
+    colonSpan = reader.ReadSpan();
 }
 
 SwitchStatementNode::SwitchStatementNode(const Span& span_) : StatementNode(NodeType::switchStatementNode, span_), condition(), cases(), defaultS()
@@ -723,6 +768,10 @@ Node* SwitchStatementNode::Clone(CloneContext& cloneContext) const
     {
         clone->SetDefault(static_cast<DefaultStatementNode*>(defaultS->Clone(cloneContext)));
     }
+    clone->SetLeftParenSpan(leftParenSpan);
+    clone->SetRightParenSpan(rightParenSpan);
+    clone->SetBeginBraceSpan(beginBraceSpan);
+    clone->SetEndBraceSpan(endBraceSpan);
     return clone;
 }
 
@@ -742,6 +791,10 @@ void SwitchStatementNode::Write(AstWriter& writer)
     {
         writer.Write(defaultS.get());
     }
+    writer.Write(leftParenSpan);
+    writer.Write(rightParenSpan);
+    writer.Write(beginBraceSpan);
+    writer.Write(endBraceSpan);
 }
 
 void SwitchStatementNode::Read(AstReader& reader)
@@ -757,6 +810,10 @@ void SwitchStatementNode::Read(AstReader& reader)
         defaultS.reset(reader.ReadDefaultStatementNode());
         defaultS->SetParent(this);
     }
+    leftParenSpan = reader.ReadSpan();
+    rightParenSpan = reader.ReadSpan();
+    beginBraceSpan = reader.ReadSpan();
+    endBraceSpan = reader.ReadSpan();
 }
 
 void SwitchStatementNode::AddCase(CaseStatementNode* caseS)
@@ -789,6 +846,7 @@ Node* CaseStatementNode::Clone(CloneContext& cloneContext) const
     {
         clone->AddStatement(static_cast<StatementNode*>(statements[i]->Clone(cloneContext)));
     }
+    clone->caseSpans = caseSpans;
     return clone;
 }
 
@@ -802,6 +860,12 @@ void CaseStatementNode::Write(AstWriter& writer)
     StatementNode::Write(writer);
     caseExprs.Write(writer);
     statements.Write(writer);
+    uint32_t n = caseSpans.size();
+    writer.GetBinaryWriter().WriteULEB128UInt(n);
+    for (uint32_t i = 0; i < n; ++i)
+    {
+        writer.Write(caseSpans[i]);
+    }
 }
 
 void CaseStatementNode::Read(AstReader& reader)
@@ -811,12 +875,22 @@ void CaseStatementNode::Read(AstReader& reader)
     caseExprs.SetParent(this);
     statements.Read(reader);
     statements.SetParent(this);
+    uint32_t n = reader.GetBinaryReader().ReadULEB128UInt();
+    for (uint32_t i = 0; i < n; ++i)
+    {
+        caseSpans.push_back(reader.ReadSpan());
+    }
 }
 
 void CaseStatementNode::AddCaseExpr(Node* caseExpr)
 {
     caseExpr->SetParent(this);
     caseExprs.Add(caseExpr);
+}
+
+void CaseStatementNode::AddCaseSpan(const Span& caseSpan)
+{
+    caseSpans.push_back(caseSpan);
 }
 
 void CaseStatementNode::AddStatement(StatementNode* statement)
@@ -987,7 +1061,10 @@ Node* CatchNode::Clone(CloneContext& cloneContext) const
     {
         clonedId = static_cast<IdentifierNode*>(id->Clone(cloneContext));
     }
-    return new CatchNode(GetSpan(), typeExpr->Clone(cloneContext), clonedId, static_cast<CompoundStatementNode*>(catchBlock->Clone(cloneContext)));
+    CatchNode* clone = new CatchNode(GetSpan(), typeExpr->Clone(cloneContext), clonedId, static_cast<CompoundStatementNode*>(catchBlock->Clone(cloneContext)));
+    clone->SetLeftParenSpan(leftParenSpan);
+    clone->SetRightParenSpan(rightParenSpan);
+    return clone;
 }
 
 void CatchNode::Accept(Visitor& visitor)
@@ -1006,6 +1083,8 @@ void CatchNode::Write(AstWriter& writer)
         writer.Write(id.get());
     }
     writer.Write(catchBlock.get());
+    writer.Write(leftParenSpan);
+    writer.Write(rightParenSpan);
 }
 
 void CatchNode::Read(AstReader& reader)
@@ -1021,6 +1100,8 @@ void CatchNode::Read(AstReader& reader)
     }
     catchBlock.reset(reader.ReadCompoundStatementNode());
     catchBlock->SetParent(this);
+    leftParenSpan = reader.ReadSpan();
+    rightParenSpan = reader.ReadSpan();
 }
 
 TryStatementNode::TryStatementNode(const Span& span_) : StatementNode(NodeType::tryStatementNode, span_), tryBlock(), catches()
@@ -1269,6 +1350,9 @@ Node* ConditionalCompilationPartNode::Clone(CloneContext& cloneContext) const
     {
         clone->AddStatement(static_cast<StatementNode*>(statements[i]->Clone(cloneContext)));
     }
+    clone->SetKeywordSpan(keywordSpan);
+    clone->SetLeftParenSpan(leftParenSpan);
+    clone->SetRightParenSpan(rightParenSpan);
     return clone;
 }
 
@@ -1287,6 +1371,9 @@ void ConditionalCompilationPartNode::Write(AstWriter& writer)
         writer.Write(expr.get());
     }
     statements.Write(writer);
+    writer.Write(keywordSpan);
+    writer.Write(leftParenSpan);
+    writer.Write(rightParenSpan);
 }
 
 void ConditionalCompilationPartNode::Read(AstReader& reader)
@@ -1300,6 +1387,9 @@ void ConditionalCompilationPartNode::Read(AstReader& reader)
     }
     statements.Read(reader);
     statements.SetParent(this);
+    keywordSpan = reader.ReadSpan();
+    leftParenSpan = reader.ReadSpan();
+    rightParenSpan = reader.ReadSpan();
 }
 
 ConditionalCompilationStatementNode::ConditionalCompilationStatementNode(const Span& span_) : StatementNode(NodeType::conditionalCompilationStatementNode, span_), ifPart(nullptr)
@@ -1324,6 +1414,21 @@ void ConditionalCompilationStatementNode::AddElifExpr(const Span& span, Conditio
 void ConditionalCompilationStatementNode::AddElifStatement(StatementNode* statement)
 {
     elifParts[elifParts.Count() - 1]->AddStatement(statement);
+}
+
+void ConditionalCompilationStatementNode::SetElifLeftParenSpan(const Span& span)
+{
+    elifParts[elifParts.Count() - 1]->SetLeftParenSpan(span);
+}
+
+void ConditionalCompilationStatementNode::SetElifRightParenSpan(const Span& span)
+{
+    elifParts[elifParts.Count() - 1]->SetRightParenSpan(span);
+}
+
+void ConditionalCompilationStatementNode::SetElifKeywordSpan(const Span& span)
+{
+    elifParts[elifParts.Count() - 1]->SetKeywordSpan(span);
 }
 
 void ConditionalCompilationStatementNode::AddElseStatement(const Span& span, StatementNode* statement)
@@ -1352,6 +1457,7 @@ Node* ConditionalCompilationStatementNode::Clone(CloneContext& cloneContext) con
         ConditionalCompilationPartNode* clonedElsePart = static_cast<ConditionalCompilationPartNode*>(elsePart->Clone(cloneContext));
         clone->elsePart.reset(clonedElsePart);
     }
+    clone->SetEndIfSpan(endifSpan);
     return clone;
 }
 
@@ -1371,6 +1477,7 @@ void ConditionalCompilationStatementNode::Write(AstWriter& writer)
     {
         writer.Write(elsePart.get());
     }
+    writer.Write(endifSpan);
 }
 
 void ConditionalCompilationStatementNode::Read(AstReader& reader)
@@ -1386,6 +1493,7 @@ void ConditionalCompilationStatementNode::Read(AstReader& reader)
         elsePart.reset(reader.ReadConditionalCompilationPartNode());
         elsePart->SetParent(this);
     }
+    endifSpan = reader.ReadSpan();
 }
 
 } } // namespace cmajor::ast

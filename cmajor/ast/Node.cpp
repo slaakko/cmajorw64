@@ -36,7 +36,7 @@ const char* nodeTypeStr[] =
     "classNode", "thisInitializerNode", "baseInitializerNode", "memberInitializerNode", "staticConstructorNode", "constructorNode", "destructorNode", "memberFunctionNode", "conversionFunctionNode",
     "memberVariableNode",
     "interfaceNode", "delegateNode", "classDelegateNode",
-    "disjunctiveConstraintNode", "conjunctiveConstraintNode", "whereConstraintNode", "predicateConstraintNode", "isConstraintNode", "multiParamConstraintNode", "typeNameConstraintNode",
+    "parenthesizedConstraintNode", "disjunctiveConstraintNode", "conjunctiveConstraintNode", "whereConstraintNode", "predicateConstraintNode", "isConstraintNode", "multiParamConstraintNode", "typeNameConstraintNode",
     "constructorConstraintNode", "destructorConstraintNode", "memberFunctionConstraintNode", "functionConstraintNode",
     "sameConstraintNode", "derivedConstraintNode", "convertibleConstraintNode", "explicitlyConvertibleConstraintNode", "commonConstraintNode", "nonreferenceTypeConstraintNode",
     "axiomStatementNode", "axiomNode", "conceptIdNode", "conceptNode", 
@@ -52,7 +52,7 @@ const char* nodeTypeStr[] =
     "addNode", "subNode", "mulNode", "divNode", "remNode", "notNode", "unaryPlusNode", "unaryMinusNode", "prefixIncrementNode", "prefixDecrementNode", "complementNode", "derefNode", "addrOfNode",
     "isNode", "asNode", "indexingNode", "invokeNode", "postfixIncrementNode", "postfixDecrementNode", "sizeOfNode", "typeNameNode", "castNode", "constructNode", "newNode", "thisNode", "baseNode",
     "conditionalCompilationDisjunctionNode", "conditionalCompilationConjunctionNode", "conditionalCompilationNotNode", "conditionalCompilationPrimaryNode", "conditionalCompilationPartNode", 
-    "conditionalCompilationStatementNode", "uuidLiteralNode", "cursorIdNode",
+    "conditionalCompilationStatementNode", "uuidLiteralNode", "cursorIdNode", "parenthesizedExpressionNode",
     "maxNode"
 };
 
@@ -331,6 +331,8 @@ NodeFactory::NodeFactory()
     Register(NodeType::conditionalCompilationStatementNode, new ConcreteNodeCreator<ConditionalCompilationStatementNode>());
     Register(NodeType::uuidLiteralNode, new ConcreteNodeCreator<UuidLiteralNode>());
     Register(NodeType::cursorIdNode, new ConcreteNodeCreator<CursorIdNode>());
+    Register(NodeType::parenthesizedExpressionNode, new ConcreteNodeCreator<ParenthesizedExpressionNode>());
+    Register(NodeType::parenthesizedConstraintNode, new ConcreteNodeCreator<ParenthesizedConstraintNode>());
 }
 
 void NodeFactory::Register(NodeType nodeType, NodeCreator* creator)

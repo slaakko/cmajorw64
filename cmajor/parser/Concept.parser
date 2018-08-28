@@ -28,16 +28,18 @@ namespace cmajor.parser
         using TypeExpr.TypeExpr;
         using Function.FunctionGroupId;
 
-        Concept(ParsingContext* ctx) : ConceptNode*
+        Concept(ParsingContext* ctx, var Span beginBraceSpan, var Span endBraceSpan) : ConceptNode*
             ::= empty{ ctx->BeginParsingConcept(); }
             (   (Specifiers keyword("concept") Identifier:conceptName!){ value = new ConceptNode(span, Specifiers, conceptName); } 
                 '<'! (Identifier:typeParameter{ value->AddTypeParameter(typeParameter); } % ',') '>'!
                 ((Refinement{ value->SetRefinement(Refinement); })? 
-                (WhereConstraint(ctx){ value->AddConstraint(WhereConstraint); })?){ value->GetSpan().SetEnd(span.End()); }
-                '{'! ConceptBody(ctx, value)! '}'!
+                (WhereConstraint(ctx){ WhereConstraint->SetHeaderConstraint(); value->AddConstraint(WhereConstraint); })?){ value->GetSpan().SetEnd(span.End()); }
+                '{'!{ beginBraceSpan = span; } ConceptBody(ctx, value)! '}'!{ endBraceSpan = span; }
             )
             {
                 ctx->EndParsingConcept();
+                value->SetBeginBraceSpan(beginBraceSpan);
+                value->SetEndBraceSpan(endBraceSpan);
             }
             /
             {
@@ -77,7 +79,7 @@ namespace cmajor.parser
                 ParameterList(ctx, ctorConstraint.get()) ';'!)
                 { 
                     value = ctorConstraint.release();
-                    value->GetSpan().SetEnd(span.End());
+                    value->GetSpan() = span;
                 }
             ;
 
@@ -93,7 +95,7 @@ namespace cmajor.parser
                 Identifier{ typeParam.reset(Identifier); } '.' FunctionGroupId(ctx)!{ value = new MemberFunctionConstraintNode(span, returnType.release(), typeParam.release(), FunctionGroupId); }
                 ParameterList(ctx, value)! ';'!)
             {
-                value->GetSpan().SetEnd(span.End());
+                value->GetSpan() = span;
             }
             ;
 
@@ -101,12 +103,12 @@ namespace cmajor.parser
             ::= (TypeExpr(ctx) FunctionGroupId(ctx)!{ value = new FunctionConstraintNode(span, TypeExpr, FunctionGroupId); } 
                 ParameterList(ctx, value)! ';'!)
             {
-                value->GetSpan().SetEnd(span.End());
+                value->GetSpan() = span;
             }
             ;
 
-        EmbeddedConstraint(ParsingContext* ctx) : ConstraintNode*
-            ::= (WhereConstraint(ctx) ';'!){ value = WhereConstraint; }
+        EmbeddedConstraint(ParsingContext* ctx) : WhereConstraintNode*
+            ::= (WhereConstraint(ctx) ';'!){ value = WhereConstraint; value->SetSemicolon(); }
             ;
 
         WhereConstraint(ParsingContext* ctx) : WhereConstraintNode*
@@ -128,7 +130,7 @@ namespace cmajor.parser
             ;
             
         PrimaryConstraintExpr(ParsingContext* ctx) : ConstraintNode*
-            ::= ('(' ConstraintExpr(ctx) ')'!){ value = ConstraintExpr; }
+            ::= ('(' ConstraintExpr(ctx) ')'!){ value = new ParenthesizedConstraintNode(span, ConstraintExpr); }
             |   AtomicConstraintExpr(ctx){ value = AtomicConstraintExpr; }
             ;
 
@@ -159,11 +161,13 @@ namespace cmajor.parser
             }
             ;
 
-        Axiom(ParsingContext* ctx, ConceptNode* concept, var std::unique_ptr<AxiomNode> axiom)
-            ::= ((keyword("axiom") Identifier? empty{ axiom.reset(new AxiomNode(span, Identifier)); }
+        Axiom(ParsingContext* ctx, ConceptNode* concept, var std::unique_ptr<AxiomNode> axiom, var Span axiomSpan, var Span beginBraceSpan, var Span endBraceSpan)
+            ::= ((keyword("axiom"){ axiomSpan = span; } Identifier? empty{ axiom.reset(new AxiomNode(axiomSpan, Identifier)); }
                 ParameterList(ctx, axiom.get())?){ axiom->GetSpan().SetEnd(span.End()); }
-                '{'! AxiomBody(ctx, axiom.get())! '}'!)
+                '{'!{ beginBraceSpan = span; } AxiomBody(ctx, axiom.get())! '}'!{ endBraceSpan = span; })
             {
+                axiom->SetBeginBraceSpan(beginBraceSpan);
+                axiom->SetEndBraceSpan(endBraceSpan);
                 concept->AddAxiom(axiom.release());
             }
             ;

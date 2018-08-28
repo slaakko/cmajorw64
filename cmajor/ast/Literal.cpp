@@ -16,7 +16,28 @@ namespace cmajor { namespace ast {
 
 using namespace cmajor::unicode;
 
-Node* CreateIntegerLiteralNode(const Span& span, uint64_t value, bool unsignedSuffix)
+LiteralNode::LiteralNode(NodeType nodeType_, const Span& span_) : Node(nodeType_, span_)
+{
+}
+
+void LiteralNode::Write(AstWriter& writer)
+{
+    Node::Write(writer);
+    writer.GetBinaryWriter().Write(text);
+}
+
+void LiteralNode::Read(AstReader& reader)
+{
+    Node::Read(reader);
+    text = reader.GetBinaryReader().ReadUtf32String();
+}
+
+void LiteralNode::SetText(const std::u32string& text_)
+{
+    text = text_;
+}
+
+LiteralNode* CreateIntegerLiteralNode(const Span& span, uint64_t value, bool unsignedSuffix)
 {
     if (unsignedSuffix)
     {
@@ -40,7 +61,7 @@ Node* CreateIntegerLiteralNode(const Span& span, uint64_t value, bool unsignedSu
     }
 }
 
-Node* CreateFloatingLiteralNode(const Span& span, double value, bool float_)
+LiteralNode* CreateFloatingLiteralNode(const Span& span, double value, bool float_)
 {
     if (float_)
     {
@@ -52,11 +73,11 @@ Node* CreateFloatingLiteralNode(const Span& span, double value, bool float_)
     }
 }
 
-BooleanLiteralNode::BooleanLiteralNode(const Span& span_) : Node(NodeType::booleanLiteralNode, span_), value(false)
+BooleanLiteralNode::BooleanLiteralNode(const Span& span_) : LiteralNode(NodeType::booleanLiteralNode, span_), value(false)
 {
 }
 
-BooleanLiteralNode::BooleanLiteralNode(const Span& span_, bool value_) : Node(NodeType::booleanLiteralNode, span_), value(value_)
+BooleanLiteralNode::BooleanLiteralNode(const Span& span_, bool value_) : LiteralNode(NodeType::booleanLiteralNode, span_), value(value_)
 {
 }
 
@@ -72,13 +93,13 @@ void BooleanLiteralNode::Accept(Visitor& visitor)
 
 void BooleanLiteralNode::Write(AstWriter& writer)
 {
-    Node::Write(writer);
+    LiteralNode::Write(writer);
     writer.GetBinaryWriter().Write(value);
 }
 
 void BooleanLiteralNode::Read(AstReader& reader)
 {
-    Node::Read(reader);
+    LiteralNode::Read(reader);
     value = reader.GetBinaryReader().ReadBool();
 }
 
@@ -87,11 +108,11 @@ std::string BooleanLiteralNode::ToString() const
     if (value) return "true"; else return "false";
 }
 
-SByteLiteralNode::SByteLiteralNode(const Span& span_) : Node(NodeType::sbyteLiteralNode, span_), value(0)
+SByteLiteralNode::SByteLiteralNode(const Span& span_) : LiteralNode(NodeType::sbyteLiteralNode, span_), value(0)
 {
 }
 
-SByteLiteralNode::SByteLiteralNode(const Span& span_, int8_t value_) : Node(NodeType::sbyteLiteralNode, span_), value(value_)
+SByteLiteralNode::SByteLiteralNode(const Span& span_, int8_t value_) : LiteralNode(NodeType::sbyteLiteralNode, span_), value(value_)
 {
 }
 
@@ -107,13 +128,13 @@ void SByteLiteralNode::Accept(Visitor& visitor)
 
 void SByteLiteralNode::Write(AstWriter& writer)
 {
-    Node::Write(writer);
+    LiteralNode::Write(writer);
     writer.GetBinaryWriter().Write(value);
 }
 
 void SByteLiteralNode::Read(AstReader& reader)
 {
-    Node::Read(reader);
+    LiteralNode::Read(reader);
     value = reader.GetBinaryReader().ReadSByte();
 }
 
@@ -122,11 +143,11 @@ std::string SByteLiteralNode::ToString() const
     return std::to_string(value);
 }
 
-ByteLiteralNode::ByteLiteralNode(const Span& span_) : Node(NodeType::byteLiteralNode, span_), value(0)
+ByteLiteralNode::ByteLiteralNode(const Span& span_) : LiteralNode(NodeType::byteLiteralNode, span_), value(0)
 {
 }
 
-ByteLiteralNode::ByteLiteralNode(const Span& span_, uint8_t value_) : Node(NodeType::byteLiteralNode, span_), value(value_)
+ByteLiteralNode::ByteLiteralNode(const Span& span_, uint8_t value_) : LiteralNode(NodeType::byteLiteralNode, span_), value(value_)
 {
 }
 
@@ -142,13 +163,13 @@ void ByteLiteralNode::Accept(Visitor& visitor)
 
 void ByteLiteralNode::Write(AstWriter& writer)
 {
-    Node::Write(writer);
+    LiteralNode::Write(writer);
     writer.GetBinaryWriter().Write(value);
 }
 
 void ByteLiteralNode::Read(AstReader& reader)
 {
-    Node::Read(reader);
+    LiteralNode::Read(reader);
     value = reader.GetBinaryReader().ReadByte();
 }
 
@@ -157,11 +178,11 @@ std::string ByteLiteralNode::ToString() const
     return std::to_string(value) + "u";
 }
 
-ShortLiteralNode::ShortLiteralNode(const Span& span_) : Node(NodeType::shortLiteralNode, span_), value(0)
+ShortLiteralNode::ShortLiteralNode(const Span& span_) : LiteralNode(NodeType::shortLiteralNode, span_), value(0)
 {
 }
 
-ShortLiteralNode::ShortLiteralNode(const Span& span_, int16_t value_) : Node(NodeType::shortLiteralNode, span_), value(value_)
+ShortLiteralNode::ShortLiteralNode(const Span& span_, int16_t value_) : LiteralNode(NodeType::shortLiteralNode, span_), value(value_)
 {
 }
 
@@ -177,13 +198,13 @@ void ShortLiteralNode::Accept(Visitor& visitor)
 
 void ShortLiteralNode::Write(AstWriter& writer)
 {
-    Node::Write(writer);
+    LiteralNode::Write(writer);
     writer.GetBinaryWriter().Write(value);
 }
 
 void ShortLiteralNode::Read(AstReader& reader)
 {
-    Node::Read(reader);
+    LiteralNode::Read(reader);
     value = reader.GetBinaryReader().ReadShort();
 }
 
@@ -192,11 +213,11 @@ std::string ShortLiteralNode::ToString() const
     return std::to_string(value);
 }
 
-UShortLiteralNode::UShortLiteralNode(const Span& span_) : Node(NodeType::ushortLiteralNode, span_), value(0)
+UShortLiteralNode::UShortLiteralNode(const Span& span_) : LiteralNode(NodeType::ushortLiteralNode, span_), value(0)
 {
 }
 
-UShortLiteralNode::UShortLiteralNode(const Span& span_, uint16_t value_) : Node(NodeType::ushortLiteralNode, span_), value(value_)
+UShortLiteralNode::UShortLiteralNode(const Span& span_, uint16_t value_) : LiteralNode(NodeType::ushortLiteralNode, span_), value(value_)
 {
 }
 
@@ -212,13 +233,13 @@ void UShortLiteralNode::Accept(Visitor& visitor)
 
 void UShortLiteralNode::Write(AstWriter& writer)
 {
-    Node::Write(writer);
+    LiteralNode::Write(writer);
     writer.GetBinaryWriter().Write(value);
 }
 
 void UShortLiteralNode::Read(AstReader& reader)
 {
-    Node::Read(reader);
+    LiteralNode::Read(reader);
     value = reader.GetBinaryReader().ReadUShort();
 }
 
@@ -227,11 +248,11 @@ std::string UShortLiteralNode::ToString() const
     return std::to_string(value) + "u";
 }
 
-IntLiteralNode::IntLiteralNode(const Span& span_) : Node(NodeType::intLiteralNode, span_), value(0)
+IntLiteralNode::IntLiteralNode(const Span& span_) : LiteralNode(NodeType::intLiteralNode, span_), value(0)
 {
 }
 
-IntLiteralNode::IntLiteralNode(const Span& span_, int32_t value_) : Node(NodeType::intLiteralNode, span_), value(value_)
+IntLiteralNode::IntLiteralNode(const Span& span_, int32_t value_) : LiteralNode(NodeType::intLiteralNode, span_), value(value_)
 {
 }
 
@@ -247,13 +268,13 @@ void IntLiteralNode::Accept(Visitor& visitor)
 
 void IntLiteralNode::Write(AstWriter& writer)
 {
-    Node::Write(writer);
+    LiteralNode::Write(writer);
     writer.GetBinaryWriter().Write(value);
 }
 
 void IntLiteralNode::Read(AstReader& reader)
 {
-    Node::Read(reader);
+    LiteralNode::Read(reader);
     value = reader.GetBinaryReader().ReadInt();
 }
 
@@ -262,11 +283,11 @@ std::string IntLiteralNode::ToString() const
     return std::to_string(value);
 }
 
-UIntLiteralNode::UIntLiteralNode(const Span& span_) : Node(NodeType::uintLiteralNode, span_), value(0)
+UIntLiteralNode::UIntLiteralNode(const Span& span_) : LiteralNode(NodeType::uintLiteralNode, span_), value(0)
 {
 }
 
-UIntLiteralNode::UIntLiteralNode(const Span& span_, uint32_t value_) : Node(NodeType::uintLiteralNode, span_), value(value_)
+UIntLiteralNode::UIntLiteralNode(const Span& span_, uint32_t value_) : LiteralNode(NodeType::uintLiteralNode, span_), value(value_)
 {
 }
 
@@ -282,13 +303,13 @@ void UIntLiteralNode::Accept(Visitor& visitor)
 
 void UIntLiteralNode::Write(AstWriter& writer)
 {
-    Node::Write(writer);
+    LiteralNode::Write(writer);
     writer.GetBinaryWriter().Write(value);
 }
 
 void UIntLiteralNode::Read(AstReader& reader)
 {
-    Node::Read(reader);
+    LiteralNode::Read(reader);
     value = reader.GetBinaryReader().ReadUInt();
 }
 
@@ -297,11 +318,11 @@ std::string UIntLiteralNode::ToString() const
     return std::to_string(value) + "u";
 }
 
-LongLiteralNode::LongLiteralNode(const Span& span_) : Node(NodeType::longLiteralNode, span_), value(0)
+LongLiteralNode::LongLiteralNode(const Span& span_) : LiteralNode(NodeType::longLiteralNode, span_), value(0)
 {
 }
 
-LongLiteralNode::LongLiteralNode(const Span& span_, int64_t value_) : Node(NodeType::longLiteralNode, span_), value(value_)
+LongLiteralNode::LongLiteralNode(const Span& span_, int64_t value_) : LiteralNode(NodeType::longLiteralNode, span_), value(value_)
 {
 }
 
@@ -317,13 +338,13 @@ void LongLiteralNode::Accept(Visitor& visitor)
 
 void LongLiteralNode::Write(AstWriter& writer)
 {
-    Node::Write(writer);
+    LiteralNode::Write(writer);
     writer.GetBinaryWriter().Write(value);
 }
 
 void LongLiteralNode::Read(AstReader& reader)
 {
-    Node::Read(reader);
+    LiteralNode::Read(reader);
     value = reader.GetBinaryReader().ReadLong();
 }
 
@@ -332,11 +353,11 @@ std::string LongLiteralNode::ToString() const
     return std::to_string(value);
 }
 
-ULongLiteralNode::ULongLiteralNode(const Span& span_) : Node(NodeType::ulongLiteralNode, span_), value(0)
+ULongLiteralNode::ULongLiteralNode(const Span& span_) : LiteralNode(NodeType::ulongLiteralNode, span_), value(0)
 {
 }
 
-ULongLiteralNode::ULongLiteralNode(const Span& span_, uint64_t value_) : Node(NodeType::ulongLiteralNode, span_), value(value_)
+ULongLiteralNode::ULongLiteralNode(const Span& span_, uint64_t value_) : LiteralNode(NodeType::ulongLiteralNode, span_), value(value_)
 {
 }
 
@@ -352,13 +373,13 @@ void ULongLiteralNode::Accept(Visitor& visitor)
 
 void ULongLiteralNode::Write(AstWriter& writer)
 {
-    Node::Write(writer);
+    LiteralNode::Write(writer);
     writer.GetBinaryWriter().Write(value);
 }
 
 void ULongLiteralNode::Read(AstReader& reader)
 {
-    Node::Read(reader);
+    LiteralNode::Read(reader);
     value = reader.GetBinaryReader().ReadULong();
 }
 
@@ -367,11 +388,11 @@ std::string ULongLiteralNode::ToString() const
     return std::to_string(value) + "u";
 }
 
-FloatLiteralNode::FloatLiteralNode(const Span& span_) : Node(NodeType::floatLiteralNode, span_), value(0)
+FloatLiteralNode::FloatLiteralNode(const Span& span_) : LiteralNode(NodeType::floatLiteralNode, span_), value(0)
 {
 }
 
-FloatLiteralNode::FloatLiteralNode(const Span& span_, float value_) : Node(NodeType::floatLiteralNode, span_), value(value_)
+FloatLiteralNode::FloatLiteralNode(const Span& span_, float value_) : LiteralNode(NodeType::floatLiteralNode, span_), value(value_)
 {
 }
 
@@ -387,13 +408,13 @@ void FloatLiteralNode::Accept(Visitor& visitor)
 
 void FloatLiteralNode::Write(AstWriter& writer)
 {
-    Node::Write(writer);
+    LiteralNode::Write(writer);
     writer.GetBinaryWriter().Write(value);
 }
 
 void FloatLiteralNode::Read(AstReader& reader)
 {
-    Node::Read(reader);
+    LiteralNode::Read(reader);
     value = reader.GetBinaryReader().ReadFloat();
 }
 
@@ -402,11 +423,11 @@ std::string FloatLiteralNode::ToString() const
     return std::to_string(value) + "f";
 }
 
-DoubleLiteralNode::DoubleLiteralNode(const Span& span_) : Node(NodeType::doubleLiteralNode, span_), value(0)
+DoubleLiteralNode::DoubleLiteralNode(const Span& span_) : LiteralNode(NodeType::doubleLiteralNode, span_), value(0)
 {
 }
 
-DoubleLiteralNode::DoubleLiteralNode(const Span& span_, double value_) : Node(NodeType::doubleLiteralNode, span_), value(value_)
+DoubleLiteralNode::DoubleLiteralNode(const Span& span_, double value_) : LiteralNode(NodeType::doubleLiteralNode, span_), value(value_)
 {
 }
 
@@ -422,13 +443,13 @@ void DoubleLiteralNode::Accept(Visitor& visitor)
 
 void DoubleLiteralNode::Write(AstWriter& writer)
 {
-    Node::Write(writer);
+    LiteralNode::Write(writer);
     writer.GetBinaryWriter().Write(value);
 }
 
 void DoubleLiteralNode::Read(AstReader& reader)
 {
-    Node::Read(reader);
+    LiteralNode::Read(reader);
     value = reader.GetBinaryReader().ReadDouble();
 }
 
@@ -437,11 +458,11 @@ std::string DoubleLiteralNode::ToString() const
     return std::to_string(value);
 }
 
-CharLiteralNode::CharLiteralNode(const Span& span_) : Node(NodeType::charLiteralNode, span_), value('\0')
+CharLiteralNode::CharLiteralNode(const Span& span_) : LiteralNode(NodeType::charLiteralNode, span_), value('\0')
 {
 }
 
-CharLiteralNode::CharLiteralNode(const Span& span_, char value_) : Node(NodeType::charLiteralNode, span_), value(value_)
+CharLiteralNode::CharLiteralNode(const Span& span_, char value_) : LiteralNode(NodeType::charLiteralNode, span_), value(value_)
 {
 }
 
@@ -457,13 +478,13 @@ void CharLiteralNode::Accept(Visitor& visitor)
 
 void CharLiteralNode::Write(AstWriter& writer)
 {
-    Node::Write(writer);
+    LiteralNode::Write(writer);
     writer.GetBinaryWriter().Write(value);
 }
 
 void CharLiteralNode::Read(AstReader& reader)
 {
-    Node::Read(reader);
+    LiteralNode::Read(reader);
     value = reader.GetBinaryReader().ReadChar();
 }
 
@@ -472,11 +493,11 @@ std::string CharLiteralNode::ToString() const
     return "'" + CharStr(value) + "'";
 }
 
-WCharLiteralNode::WCharLiteralNode(const Span& span_) : Node(NodeType::wcharLiteralNode, span_), value('\0')
+WCharLiteralNode::WCharLiteralNode(const Span& span_) : LiteralNode(NodeType::wcharLiteralNode, span_), value('\0')
 {
 }
 
-WCharLiteralNode::WCharLiteralNode(const Span& span_, char16_t value_) : Node(NodeType::wcharLiteralNode, span_), value(value_)
+WCharLiteralNode::WCharLiteralNode(const Span& span_, char16_t value_) : LiteralNode(NodeType::wcharLiteralNode, span_), value(value_)
 {
 }
 
@@ -492,13 +513,13 @@ void WCharLiteralNode::Accept(Visitor& visitor)
 
 void WCharLiteralNode::Write(AstWriter& writer)
 {
-    Node::Write(writer);
+    LiteralNode::Write(writer);
     writer.GetBinaryWriter().Write(value);
 }
 
 void WCharLiteralNode::Read(AstReader& reader)
 {
-    Node::Read(reader);
+    LiteralNode::Read(reader);
     value = reader.GetBinaryReader().ReadWChar();
 }
 
@@ -507,11 +528,11 @@ std::string WCharLiteralNode::ToString() const
     return "w'" + ToUtf8(CharStr(char32_t(value))) + "'";
 }
 
-UCharLiteralNode::UCharLiteralNode(const Span& span_) : Node(NodeType::ucharLiteralNode, span_), value('\0')
+UCharLiteralNode::UCharLiteralNode(const Span& span_) : LiteralNode(NodeType::ucharLiteralNode, span_), value('\0')
 {
 }
 
-UCharLiteralNode::UCharLiteralNode(const Span& span_, char32_t value_) : Node(NodeType::ucharLiteralNode, span_), value(value_)
+UCharLiteralNode::UCharLiteralNode(const Span& span_, char32_t value_) : LiteralNode(NodeType::ucharLiteralNode, span_), value(value_)
 {
 }
 
@@ -527,13 +548,13 @@ void UCharLiteralNode::Accept(Visitor& visitor)
 
 void UCharLiteralNode::Write(AstWriter& writer)
 {
-    Node::Write(writer);
+    LiteralNode::Write(writer);
     writer.GetBinaryWriter().Write(value);
 }
 
 void UCharLiteralNode::Read(AstReader& reader)
 {
-    Node::Read(reader);
+    LiteralNode::Read(reader);
     value = reader.GetBinaryReader().ReadUChar();
 }
 
@@ -542,11 +563,11 @@ std::string UCharLiteralNode::ToString() const
     return "u'" + ToUtf8(CharStr(value)) + "'";
 }
 
-StringLiteralNode::StringLiteralNode(const Span& span_) : Node(NodeType::stringLiteralNode, span_), value()
+StringLiteralNode::StringLiteralNode(const Span& span_) : LiteralNode(NodeType::stringLiteralNode, span_), value()
 {
 }
 
-StringLiteralNode::StringLiteralNode(const Span& span_, const std::string& value_) : Node(NodeType::stringLiteralNode, span_), value(value_)
+StringLiteralNode::StringLiteralNode(const Span& span_, const std::string& value_) : LiteralNode(NodeType::stringLiteralNode, span_), value(value_)
 {
 }
 
@@ -562,13 +583,13 @@ void StringLiteralNode::Accept(Visitor& visitor)
 
 void StringLiteralNode::Write(AstWriter& writer)
 {
-    Node::Write(writer);
+    LiteralNode::Write(writer);
     writer.GetBinaryWriter().Write(value);
 }
 
 void StringLiteralNode::Read(AstReader& reader)
 {
-    Node::Read(reader);
+    LiteralNode::Read(reader);
     value = reader.GetBinaryReader().ReadUtf8String();
 }
 
@@ -577,11 +598,11 @@ std::string StringLiteralNode::ToString() const
     return "\"" + StringStr(value) + "\"";
 }
 
-WStringLiteralNode::WStringLiteralNode(const Span& span_) : Node(NodeType::wstringLiteralNode, span_), value()
+WStringLiteralNode::WStringLiteralNode(const Span& span_) : LiteralNode(NodeType::wstringLiteralNode, span_), value()
 {
 }
 
-WStringLiteralNode::WStringLiteralNode(const Span& span_, const std::u16string& value_) : Node(NodeType::wstringLiteralNode, span_), value(value_)
+WStringLiteralNode::WStringLiteralNode(const Span& span_, const std::u16string& value_) : LiteralNode(NodeType::wstringLiteralNode, span_), value(value_)
 {
 }
 
@@ -597,13 +618,13 @@ void WStringLiteralNode::Accept(Visitor& visitor)
 
 void WStringLiteralNode::Write(AstWriter& writer)
 {
-    Node::Write(writer);
+    LiteralNode::Write(writer);
     writer.GetBinaryWriter().Write(value);
 }
 
 void WStringLiteralNode::Read(AstReader& reader)
 {
-    Node::Read(reader);
+    LiteralNode::Read(reader);
     value = reader.GetBinaryReader().ReadUtf16String();
 }
 
@@ -612,11 +633,11 @@ std::string WStringLiteralNode::ToString() const
     return "\"" + StringStr(ToUtf8(value)) + "\"";
 }
 
-UStringLiteralNode::UStringLiteralNode(const Span& span_) : Node(NodeType::ustringLiteralNode, span_), value()
+UStringLiteralNode::UStringLiteralNode(const Span& span_) : LiteralNode(NodeType::ustringLiteralNode, span_), value()
 {
 }
 
-UStringLiteralNode::UStringLiteralNode(const Span& span_, const std::u32string& value_) : Node(NodeType::ustringLiteralNode, span_), value(value_)
+UStringLiteralNode::UStringLiteralNode(const Span& span_, const std::u32string& value_) : LiteralNode(NodeType::ustringLiteralNode, span_), value(value_)
 {
 }
 
@@ -632,13 +653,13 @@ void UStringLiteralNode::Accept(Visitor& visitor)
 
 void UStringLiteralNode::Write(AstWriter& writer)
 {
-    Node::Write(writer);
+    LiteralNode::Write(writer);
     writer.GetBinaryWriter().Write(value);
 }
 
 void UStringLiteralNode::Read(AstReader& reader)
 {
-    Node::Read(reader);
+    LiteralNode::Read(reader);
     value = reader.GetBinaryReader().ReadUtf32String();
 }
 
@@ -647,7 +668,7 @@ std::string UStringLiteralNode::ToString() const
     return "\"" + StringStr(ToUtf8(value)) + "\"";
 }
 
-NullLiteralNode::NullLiteralNode(const Span& span_) : Node(NodeType::nullLiteralNode, span_)
+NullLiteralNode::NullLiteralNode(const Span& span_) : LiteralNode(NodeType::nullLiteralNode, span_)
 {
 }
 
@@ -661,7 +682,7 @@ void NullLiteralNode::Accept(Visitor& visitor)
     visitor.Visit(*this);
 }
 
-ArrayLiteralNode::ArrayLiteralNode(const Span& span_) : Node(NodeType::arrayLiteralNode, span_)
+ArrayLiteralNode::ArrayLiteralNode(const Span& span_) : LiteralNode(NodeType::arrayLiteralNode, span_)
 {
 }
 
@@ -683,13 +704,13 @@ void ArrayLiteralNode::Accept(Visitor& visitor)
 
 void ArrayLiteralNode::Write(AstWriter& writer)
 {
-    Node::Write(writer);
+    LiteralNode::Write(writer);
     values.Write(writer);
 }
 
 void ArrayLiteralNode::Read(AstReader& reader)
 {
-    Node::Read(reader);
+    LiteralNode::Read(reader);
     values.Read(reader);
 }
 
@@ -699,7 +720,7 @@ void ArrayLiteralNode::AddValue(Node* value)
     values.Add(value);
 }
 
-StructuredLiteralNode::StructuredLiteralNode(const Span& span_) : Node(NodeType::structuredLiteralNode, span_)
+StructuredLiteralNode::StructuredLiteralNode(const Span& span_) : LiteralNode(NodeType::structuredLiteralNode, span_)
 {
 }
 
@@ -721,13 +742,13 @@ void StructuredLiteralNode::Accept(Visitor& visitor)
 
 void StructuredLiteralNode::Write(AstWriter& writer)
 {
-    Node::Write(writer);
+    LiteralNode::Write(writer);
     members.Write(writer);
 }
 
 void StructuredLiteralNode::Read(AstReader& reader)
 {
-    Node::Read(reader);
+    LiteralNode::Read(reader);
     members.Read(reader);
 }
 
@@ -737,11 +758,11 @@ void StructuredLiteralNode::AddMember(Node* member)
     members.Add(member);
 }
 
-UuidLiteralNode::UuidLiteralNode(const Span& span_) : Node(NodeType::uuidLiteralNode, span_), uuid(boost::uuids::nil_generator()())
+UuidLiteralNode::UuidLiteralNode(const Span& span_) : LiteralNode(NodeType::uuidLiteralNode, span_), uuid(boost::uuids::nil_generator()())
 {
 }
 
-UuidLiteralNode::UuidLiteralNode(const Span& span_, const boost::uuids::uuid& uuid_): Node(NodeType::uuidLiteralNode, span_), uuid(uuid_)
+UuidLiteralNode::UuidLiteralNode(const Span& span_, const boost::uuids::uuid& uuid_): LiteralNode(NodeType::uuidLiteralNode, span_), uuid(uuid_)
 {
 }
 
@@ -757,13 +778,13 @@ void UuidLiteralNode::Accept(Visitor& visitor)
 
 void UuidLiteralNode::Write(AstWriter& writer)
 {
-    Node::Write(writer);
+    LiteralNode::Write(writer);
     writer.GetBinaryWriter().Write(uuid);
 }
 
 void UuidLiteralNode::Read(AstReader& reader)
 {
-    Node::Read(reader);
+    LiteralNode::Read(reader);
     reader.GetBinaryReader().ReadUuid(uuid);
 }
 

@@ -21,8 +21,12 @@ namespace cmajor.parser
         using Identifier.Identifier;
         using Expression.Expression;
 
-        Constant(ParsingContext* ctx) : ConstantNode*
-            ::= (Specifiers keyword("const") TypeExpr(ctx)! Identifier! '='! Expression(ctx)! ';'!){ value = new ConstantNode(span, Specifiers, TypeExpr, Identifier, Expression); }
+        Constant(ParsingContext* ctx, var std::u32string strValue) : ConstantNode*
+            ::= (Specifiers keyword("const") TypeExpr(ctx)! Identifier! '='! Expression(ctx)!{ strValue = std::u32string(matchBegin, matchEnd); } ';'!)
+                { 
+                    value = new ConstantNode(span, Specifiers, TypeExpr, Identifier, Expression); 
+                    value->SetStrValue(strValue);
+                }
             ;
     }
 }

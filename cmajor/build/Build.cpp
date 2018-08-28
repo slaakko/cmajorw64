@@ -27,6 +27,12 @@
 #include <cmajor/symbols/Meta.hpp>
 #include <cmajor/ast2dom/Ast2Dom.hpp>
 #include <cmajor/bdt2dom/Bdt2Dom.hpp>
+#include <cmajor/cmdoclib/Input.hpp>
+#include <cmajor/cmdoclib/Global.hpp>
+#include <cmajor/cmdoclib/ParserDoc.hpp>
+#include <cmajor/cmdoclib/SourceCodePrinter.hpp>
+#include <cmajor/cmdoclib/SymbolTableXml.hpp>
+#include <cmajor/cmdoclib/File.hpp>
 #include <cmajor/ast/Attribute.hpp>
 #include <cmajor/ast/Function.hpp>
 #include <cmajor/ast/BasicType.hpp>
@@ -110,7 +116,7 @@ std::vector<std::unique_ptr<CompileUnitNode>> ParseSourcesInMainThread(Module* m
                 formatter.SetIndentSize(1);
                 ast2xmlDoc->Write(formatter);
             }
-            if (GetGlobalFlag(GlobalFlags::generateDebugInfo))
+            if (GetGlobalFlag(GlobalFlags::generateDebugInfo) || GetGlobalFlag(GlobalFlags::cmdoc))
             {
                 compileUnit->ComputeLineStarts(s);
             }
@@ -180,7 +186,7 @@ void ParseSourceFile(ParserData* parserData)
                     formatter.SetIndentSize(1);
                     ast2xmlDoc->Write(formatter);
                 }
-                if (GetGlobalFlag(GlobalFlags::generateDebugInfo))
+                if (GetGlobalFlag(GlobalFlags::generateDebugInfo) || GetGlobalFlag(GlobalFlags::cmdoc))
                 {
                     compileUnit->ComputeLineStarts(s);
                 }
@@ -459,10 +465,10 @@ void Link(const std::string& executableFilePath, const std::string& libraryFileP
     std::string defFilePath = GetFullPath(boost::filesystem::path(libraryFilePath).replace_extension(".def").generic_string());
     CreateDefFile(defFilePath, module);
     args.push_back("/def:" + QuotedPath(defFilePath));
-    std::string cmrtLibName = "cmrt220.lib";
+    std::string cmrtLibName = "cmrt230.lib";
     if (GetGlobalFlag(GlobalFlags::linkWithDebugRuntime))
     {
-        cmrtLibName = "cmrt220d.lib";
+        cmrtLibName = "cmrt230d.lib";
     }
     args.push_back(QuotedPath(Path::Combine(Path::Combine(CmajorRootDir(), "lib"), cmrtLibName)));
     int n = libraryFilePaths.size();
@@ -877,6 +883,21 @@ void BuildProject(Project* project, std::unique_ptr<Module>& rootModule, bool& s
     {
         LogMessage(project->LogStreamId(), "===== Building project '" + ToUtf8(project->Name()) + "' (" + project->FilePath() + ") using " + config + " configuration.");
     }
+    if (GetGlobalFlag(GlobalFlags::cmdoc))
+    {
+        cmdoclib::SetEmptyLibraryPrefix(project->Name());
+        if (GetGlobalFlag(GlobalFlags::optimizeCmDoc))
+        {
+            if (cmdoclib::HtmlSourceFilePathsUpToDate(project) && cmdoclib::SymbolTableXmlFilesUpToDate(project))
+            {
+                if (GetGlobalFlag(GlobalFlags::verbose))
+                {
+                    LogMessage(project->LogStreamId(), "Project '" + ToUtf8(project->Name()) + " xml is up-to-date.");
+                }
+                return;
+            }
+        }
+    }
     rootModule.reset(new Module(project->Name(), project->ModuleFilePath()));
     {
         rootModule->SetLogStreamId(project->LogStreamId());
@@ -947,6 +968,7 @@ void BuildProject(Project* project, std::unique_ptr<Module>& rootModule, bool& s
         {
             LogMessage(project->LogStreamId(), "Compiling...");
         }
+        std::unordered_map<int, cmdoclib::File> docFileMap;
         int32_t compileUnitIndex = 0;
         for (std::unique_ptr<BoundCompileUnit>& boundCompileUnit : boundCompileUnits)
         {
@@ -973,61 +995,76 @@ void BuildProject(Project* project, std::unique_ptr<Module>& rootModule, bool& s
                 formatter.SetIndentSize(1);
                 bdtDoc->Write(formatter);
             }
-            GenerateCode(emittingContext, *boundCompileUnit);
-            objectFilePaths.push_back(boundCompileUnit->ObjectFilePath());
+            if (GetGlobalFlag(GlobalFlags::cmdoc))
+            {
+                cmdoclib::GenerateSourceCode(project, boundCompileUnit.get(), docFileMap);
+            }
+            else
+            {
+                GenerateCode(emittingContext, *boundCompileUnit);
+                objectFilePaths.push_back(boundCompileUnit->ObjectFilePath());
+            }
             boundCompileUnit.reset();
             ++compileUnitIndex;
         }
-        if (GetGlobalFlag(GlobalFlags::sym2xml))
+        if (GetGlobalFlag(GlobalFlags::cmdoc))
         {
-            std::unique_ptr<dom::Document> symbolTableDoc = rootModule->GetSymbolTable().ToDomDocument();
-            std::string symbolTableXmlFilePath = Path::ChangeExtension(project->FilePath(), ".sym2.xml");
-            std::ofstream symbolTableXmlFile(symbolTableXmlFilePath);
-            CodeFormatter formatter(symbolTableXmlFile);
-            formatter.SetIndentSize(1);
-            symbolTableDoc->Write(formatter);
+            cmdoclib::GenerateSymbolTableXml(rootModule.get(), docFileMap);
+            cmdoclib::GeneratePPXml(project);
         }
-        if (project->GetTarget() == Target::program)
+        else
         {
-            CheckMainFunctionSymbol(*rootModule);
-            if (!rootModule->GetSymbolTable().JsonClasses().empty())
+            if (GetGlobalFlag(GlobalFlags::sym2xml))
             {
-                CreateJsonRegistrationUnit(objectFilePaths, *rootModule, emittingContext, &attributeBinder);
+                std::unique_ptr<dom::Document> symbolTableDoc = rootModule->GetSymbolTable().ToDomDocument();
+                std::string symbolTableXmlFilePath = Path::ChangeExtension(project->FilePath(), ".sym2.xml");
+                std::ofstream symbolTableXmlFile(symbolTableXmlFilePath);
+                CodeFormatter formatter(symbolTableXmlFile);
+                formatter.SetIndentSize(1);
+                symbolTableDoc->Write(formatter);
             }
-            CreateMainUnit(objectFilePaths, *rootModule, emittingContext, &attributeBinder);
-        }
-        if (!objectFilePaths.empty())
-        {
-            GenerateLibrary(rootModule.get(), objectFilePaths, project->LibraryFilePath());
-        }
-        if (project->GetTarget() == Target::program)
-        {
-            Link(project->ExecutableFilePath(), project->LibraryFilePath(), rootModule->LibraryFilePaths(), *rootModule);
-            CreateClassFile(project->ExecutableFilePath(), rootModule->GetSymbolTable());
-        }
-        if (GetGlobalFlag(GlobalFlags::verbose))
-        {
-            LogMessage(project->LogStreamId(), "Writing module file...");
-        }
-        SymbolWriter writer(project->ModuleFilePath());
-        rootModule->Write(writer);
-        if (GetGlobalFlag(GlobalFlags::verbose))
-        {
-            LogMessage(project->LogStreamId(), "==> " + project->ModuleFilePath());
-        }
-        if (GetGlobalFlag(GlobalFlags::verbose))
-        {
-            LogMessage(project->LogStreamId(), "Project '" + ToUtf8(project->Name()) + "' built successfully.");
-        }
-        project->SetModuleFilePath(rootModule->OriginalFilePath());
-        project->SetLibraryFilePath(rootModule->LibraryFilePath());
-        if (rootModule->IsSystemModule())
-        {
-            project->SetSystemProject();
-        }
-        if (rootModule->Name() == U"System.Install")
-        {
-            InstallSystemLibraries(rootModule.get());
+            if (project->GetTarget() == Target::program)
+            {
+                CheckMainFunctionSymbol(*rootModule);
+                if (!rootModule->GetSymbolTable().JsonClasses().empty())
+                {
+                    CreateJsonRegistrationUnit(objectFilePaths, *rootModule, emittingContext, &attributeBinder);
+                }
+                CreateMainUnit(objectFilePaths, *rootModule, emittingContext, &attributeBinder);
+            }
+            if (!objectFilePaths.empty())
+            {
+                GenerateLibrary(rootModule.get(), objectFilePaths, project->LibraryFilePath());
+            }
+            if (project->GetTarget() == Target::program)
+            {
+                Link(project->ExecutableFilePath(), project->LibraryFilePath(), rootModule->LibraryFilePaths(), *rootModule);
+                CreateClassFile(project->ExecutableFilePath(), rootModule->GetSymbolTable());
+            }
+            if (GetGlobalFlag(GlobalFlags::verbose))
+            {
+                LogMessage(project->LogStreamId(), "Writing module file...");
+            }
+            SymbolWriter writer(project->ModuleFilePath());
+            rootModule->Write(writer);
+            if (GetGlobalFlag(GlobalFlags::verbose))
+            {
+                LogMessage(project->LogStreamId(), "==> " + project->ModuleFilePath());
+            }
+            if (GetGlobalFlag(GlobalFlags::verbose))
+            {
+                LogMessage(project->LogStreamId(), "Project '" + ToUtf8(project->Name()) + "' built successfully.");
+            }
+            project->SetModuleFilePath(rootModule->OriginalFilePath());
+            project->SetLibraryFilePath(rootModule->LibraryFilePath());
+            if (rootModule->IsSystemModule())
+            {
+                project->SetSystemProject();
+            }
+            if (rootModule->Name() == U"System.Install")
+            {
+                InstallSystemLibraries(rootModule.get());
+            }
         }
     }
     if (resetRootModule)
@@ -1132,7 +1169,7 @@ void ProjectBuilder(BuildData* buildData)
         Project* toBuild = buildData->buildQueue.Get(1, false);
         while (toBuild && !buildData->stop)
         {
-            BuildProject(toBuild, buildData->rootModules[toBuild->Index()], buildData->stop, false);
+            BuildProject(toBuild, buildData->rootModules[toBuild->Index()], buildData->stop, true);
             if (toBuild->IsSystemProject())
             {
                 buildData->isSystemSolution = true;
@@ -1154,6 +1191,13 @@ cmajor::parser::Solution* solutionGrammar = nullptr;
 
 void BuildSolution(const std::string& solutionFilePath, std::vector<std::unique_ptr<Module>>& rootModules)
 {
+    std::u32string solutionName;
+    std::vector<std::u32string> moduleNames;
+    BuildSolution(solutionFilePath, rootModules, solutionName, moduleNames);
+}
+
+void BuildSolution(const std::string& solutionFilePath, std::vector<std::unique_ptr<Module>>& rootModules, std::u32string& solutionName, std::vector<std::u32string>& moduleNames)
+{
     if (!solutionGrammar)
     {
         solutionGrammar = cmajor::parser::Solution::Create();
@@ -1166,6 +1210,7 @@ void BuildSolution(const std::string& solutionFilePath, std::vector<std::unique_
     std::u32string s(ToUtf32(std::string(solutionFile.Begin(), solutionFile.End())));
     std::unique_ptr<Solution> solution(solutionGrammar->Parse(&s[0], &s[0] + s.length(), 0, solutionFilePath));
     solution->ResolveDeclarations();
+    solutionName = solution->Name();
     std::string config = GetConfig();
     if (GetGlobalFlag(GlobalFlags::verbose))
     {
@@ -1178,11 +1223,15 @@ void BuildSolution(const std::string& solutionFilePath, std::vector<std::unique_
             LogMessage(-1, "Building solution '" + ToUtf8(solution->Name()) + "' (" + solution->FilePath() + ") using " + config + " configuration.");
         }
     }
-    for (const std::string& projectFilePath : solution->ProjectFilePaths())
+    int np = solution->ProjectFilePaths().size();
+    for (int i = 0; i < np; ++i)
     {
+        const std::string& projectFilePath = solution->ProjectFilePaths()[i];
+        const std::string& relativeProjectFilePath = solution->RelativeProjectFilePaths()[i];
         MappedInputFile projectFile(projectFilePath);
         std::u32string p(ToUtf32(std::string(projectFile.Begin(), projectFile.End())));
         std::unique_ptr<Project> project(projectGrammar->Parse(&p[0], &p[0] + p.length(), 0, projectFilePath, config));
+        project->SetRelativeFilePath(relativeProjectFilePath);
         project->ResolveDeclarations();
         solution->AddProject(std::move(project));
     }
@@ -1214,61 +1263,90 @@ void BuildSolution(const std::string& solutionFilePath, std::vector<std::unique_
     }
     if (!projectsToBuild.empty())
     {
+        for (Project* project : projectsToBuild)
+        {
+            moduleNames.push_back(project->Name());
+        }
+        if (GetGlobalFlag(GlobalFlags::cmdoc) && GetGlobalFlag(GlobalFlags::optimizeCmDoc))
+        {
+            cmdoclib::ReadGlobals(moduleNames);
+        }
         int numProjectsToBuild = projectsToBuild.size();
         int numThreads = std::min(numProjectsToBuild, int(std::thread::hardware_concurrency() * 2)); 
+        int n = GetNumBuildThreads();
+        if (n != -1)
+        {
+            numThreads = std::max(1, n);
+        }
         rootModules.resize(numProjectsToBuild);
-        if (GetGlobalFlag(GlobalFlags::verbose))
+        if (numThreads <= 1)
         {
-            LogMessage(-1, "Building " + std::to_string(numProjectsToBuild) + " projects using " + std::to_string(numThreads) + " threads...");
-        }
-        bool stop = false;
-        ProjectQueue buildQueue(stop);
-        ProjectQueue readyQueue(stop);
-        BuildData buildData(stop, buildQueue, readyQueue, rootModules, isSystemSolution);
-        std::vector<std::thread> threads;
-        for (int i = 0; i < numThreads; ++i)
-        {
-            threads.push_back(std::thread(ProjectBuilder, &buildData));
-            if (buildData.stop) break;
-        }
-        while (numProjectsToBuild > 0 && !stop)
-        {
-            std::vector<Project*> building;
-            for (Project* project : projectsToBuild)
+            if (GetGlobalFlag(GlobalFlags::verbose))
             {
-                if (project->Ready())
+                LogMessage(-1, "Building " + std::to_string(numProjectsToBuild) + " projects in main thread...");
+            }
+            for (int i = 0; i < numProjectsToBuild; ++i)
+            {
+                Project* project = projectsToBuild[i];
+                bool stop = false;
+                BuildProject(project, rootModules[i], stop, true);
+            }
+        }
+        else
+        {
+            if (GetGlobalFlag(GlobalFlags::verbose))
+            {
+                LogMessage(-1, "Building " + std::to_string(numProjectsToBuild) + " projects using " + std::to_string(numThreads) + " threads...");
+            }
+            bool stop = false;
+            ProjectQueue buildQueue(stop);
+            ProjectQueue readyQueue(stop);
+            BuildData buildData(stop, buildQueue, readyQueue, rootModules, isSystemSolution);
+            std::vector<std::thread> threads;
+            for (int i = 0; i < numThreads; ++i)
+            {
+                threads.push_back(std::thread(ProjectBuilder, &buildData));
+                if (buildData.stop) break;
+            }
+            while (numProjectsToBuild > 0 && !stop)
+            {
+                std::vector<Project*> building;
+                for (Project* project : projectsToBuild)
                 {
-                    building.push_back(project);
-                    buildQueue.Put(project);
+                    if (project->Ready())
+                    {
+                        building.push_back(project);
+                        buildQueue.Put(project);
+                    }
+                }
+                for (Project* project : building)
+                {
+                    projectsToBuild.erase(std::remove(projectsToBuild.begin(), projectsToBuild.end(), project), projectsToBuild.end());
+                }
+                Project* ready = readyQueue.Get(1, true);
+                while (ready)
+                {
+                    --numProjectsToBuild;
+                    ready = readyQueue.Get(1, true);
                 }
             }
-            for (Project* project : building)
+            if (stop)
             {
-                projectsToBuild.erase(std::remove(projectsToBuild.begin(), projectsToBuild.end(), project), projectsToBuild.end());
+                LogMessage(-1, "Build stopped.");
             }
-            Project* ready = readyQueue.Get(1, true);
-            while (ready)
+            stop = true;
+            int numStartedThreads = threads.size();
+            for (int i = 0; i < numStartedThreads; ++i)
             {
-                --numProjectsToBuild;
-                ready = readyQueue.Get(1, true); 
+                if (threads[i].joinable())
+                {
+                    threads[i].join();
+                }
             }
-        }
-        if (stop)
-        {
-            LogMessage(-1, "Build stopped.");
-        }
-        stop = true;
-        int numStartedThreads = threads.size();
-        for (int i = 0; i < numStartedThreads; ++i)
-        {
-            if (threads[i].joinable())
+            if (!buildData.exceptions.empty())
             {
-                threads[i].join();
+                std::rethrow_exception(buildData.exceptions.front());
             }
-        }
-        if (!buildData.exceptions.empty())
-        {
-            std::rethrow_exception(buildData.exceptions.front());
         }
     }
     if (GetGlobalFlag(GlobalFlags::verbose))

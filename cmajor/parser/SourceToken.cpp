@@ -406,43 +406,42 @@ private:
 void SourceToken::GetReferencedGrammars()
 {
     cmajor::parsing::ParsingDomain* pd = GetParsingDomain();
-    cmajor::parsing::Grammar* grammar0 = pd->GetGrammar(ToUtf32("cmajor.parsing.stdlib"));
+    cmajor::parsing::Grammar* grammar0 = pd->GetGrammar(ToUtf32("cmajor.parser.Literal"));
     if (!grammar0)
     {
-        grammar0 = cmajor::parsing::stdlib::Create(pd);
+        grammar0 = cmajor::parser::Literal::Create(pd);
     }
     AddGrammarReference(grammar0);
-    cmajor::parsing::Grammar* grammar1 = pd->GetGrammar(ToUtf32("cmajor.parser.Literal"));
+    cmajor::parsing::Grammar* grammar1 = pd->GetGrammar(ToUtf32("cmajor.parser.Keyword"));
     if (!grammar1)
     {
-        grammar1 = cmajor::parser::Literal::Create(pd);
+        grammar1 = cmajor::parser::Keyword::Create(pd);
     }
     AddGrammarReference(grammar1);
-    cmajor::parsing::Grammar* grammar2 = pd->GetGrammar(ToUtf32("cmajor.parser.Keyword"));
+    cmajor::parsing::Grammar* grammar2 = pd->GetGrammar(ToUtf32("cmajor.parser.Identifier"));
     if (!grammar2)
     {
-        grammar2 = cmajor::parser::Keyword::Create(pd);
+        grammar2 = cmajor::parser::Identifier::Create(pd);
     }
     AddGrammarReference(grammar2);
-    cmajor::parsing::Grammar* grammar3 = pd->GetGrammar(ToUtf32("cmajor.parser.Identifier"));
+    cmajor::parsing::Grammar* grammar3 = pd->GetGrammar(ToUtf32("cmajor.parsing.stdlib"));
     if (!grammar3)
     {
-        grammar3 = cmajor::parser::Identifier::Create(pd);
+        grammar3 = cmajor::parsing::stdlib::Create(pd);
     }
     AddGrammarReference(grammar3);
 }
 
 void SourceToken::CreateRules()
 {
-    AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("line_comment"), this, ToUtf32("cmajor.parsing.stdlib.line_comment")));
-    AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("FloatingLiteral"), this, ToUtf32("Literal.FloatingLiteral")));
     AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("Keyword"), this, ToUtf32("Keyword.Keyword")));
-    AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("CharLiteral"), this, ToUtf32("Literal.CharLiteral")));
     AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("PPKeyword"), this, ToUtf32("Keyword.PPKeyword")));
     AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("QualifiedId"), this, ToUtf32("Identifier.QualifiedId")));
+    AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("FloatingLiteral"), this, ToUtf32("Literal.FloatingLiteral")));
     AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("IntegerLiteral"), this, ToUtf32("Literal.IntegerLiteral")));
-    AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("StringLiteral"), this, ToUtf32("Literal.StringLiteral")));
     AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("block_comment"), this, ToUtf32("cmajor.parsing.stdlib.block_comment")));
+    AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("CharLiteral"), this, ToUtf32("Literal.CharLiteral")));
+    AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("StringLiteral"), this, ToUtf32("Literal.StringLiteral")));
     AddRuleLink(new cmajor::parsing::RuleLink(ToUtf32("newline"), this, ToUtf32("cmajor.parsing.stdlib.newline")));
     AddRule(new SourceTokensRule(ToUtf32("SourceTokens"), GetScope(), GetParsingDomain()->GetNextRuleId(),
         new cmajor::parsing::SequenceParser(
@@ -482,7 +481,7 @@ void SourceToken::CreateRules()
                             new cmajor::parsing::ActionParser(ToUtf32("A6"),
                                 new cmajor::parsing::NonterminalParser(ToUtf32("Spaces"), ToUtf32("Spaces"), 0))),
                         new cmajor::parsing::ActionParser(ToUtf32("A7"),
-                            new cmajor::parsing::NonterminalParser(ToUtf32("line_comment"), ToUtf32("line_comment"), 0))),
+                            new cmajor::parsing::NonterminalParser(ToUtf32("LineComment"), ToUtf32("LineComment"), 0))),
                     new cmajor::parsing::ActionParser(ToUtf32("A8"),
                         new cmajor::parsing::NonterminalParser(ToUtf32("block_comment"), ToUtf32("block_comment"), 0))),
                 new cmajor::parsing::ActionParser(ToUtf32("A9"),
@@ -494,6 +493,14 @@ void SourceToken::CreateRules()
             new cmajor::parsing::GroupingParser(
                 new cmajor::parsing::PositiveParser(
                     new cmajor::parsing::CharSetParser(ToUtf32("\t ")))))));
+    AddRule(new cmajor::parsing::Rule(ToUtf32("LineComment"), GetScope(), GetParsingDomain()->GetNextRuleId(),
+        new cmajor::parsing::SequenceParser(
+            new cmajor::parsing::SequenceParser(
+                new cmajor::parsing::StringParser(ToUtf32("//")),
+                new cmajor::parsing::KleeneStarParser(
+                    new cmajor::parsing::CharSetParser(ToUtf32("\r\n"), true))),
+            new cmajor::parsing::OptionalParser(
+                new cmajor::parsing::NonterminalParser(ToUtf32("newline"), ToUtf32("newline"), 0)))));
     AddRule(new OtherRule(ToUtf32("Other"), GetScope(), GetParsingDomain()->GetNextRuleId(),
         new cmajor::parsing::ActionParser(ToUtf32("A0"),
             new cmajor::parsing::CharSetParser(ToUtf32("\r\n"), true))));

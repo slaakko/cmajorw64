@@ -118,6 +118,7 @@ public:
     void Visit(NewNode& newNode) override;
     void Visit(ThisNode& thisNode) override;
     void Visit(BaseNode& baseNode) override;
+    void Visit(ParenthesizedExpressionNode& parenthesizedExpressionNode) override;
     void BindUnaryOp(BoundExpression* operand, Node& node, const std::u32string& groupName);
 private:
     Span span;
@@ -134,7 +135,7 @@ private:
     void BindBinaryOp(BinaryNode& binaryNode, const std::u32string& groupName);
     void BindBinaryOp(BoundExpression* left, BoundExpression* right, Node& node, const std::u32string& groupName);
     void BindDerefExpr(Node& node);
-    void BindSymbol(Symbol* symbol);
+    void BindSymbol(Symbol* symbol, IdentifierNode* idNode);
 };
 
 ExpressionBinder::ExpressionBinder(const Span& span_, BoundCompileUnit& boundCompileUnit_, BoundFunction* boundFunction_, ContainerScope* containerScope_, StatementBinder* statementBinder_, bool lvalue_) :
@@ -151,7 +152,31 @@ void ExpressionBinder::BindUnaryOp(BoundExpression* operand, Node& node, const s
     functionScopeLookups.push_back(FunctionScopeLookup(ScopeLookup::this_and_base_and_parent, containerScope));
     functionScopeLookups.push_back(FunctionScopeLookup(ScopeLookup::this_and_base_and_parent, operand->GetType()->BaseType()->ClassOrNsScope()));
     functionScopeLookups.push_back(FunctionScopeLookup(ScopeLookup::fileScopes, nullptr));
-    std::unique_ptr<BoundFunctionCall> operatorFunCall = ResolveOverload(groupName, containerScope, functionScopeLookups, arguments, boundCompileUnit, boundFunction, node.GetSpan());
+    std::vector<TypeSymbol*> templateArgumentTypes;
+    std::unique_ptr<Exception> exception;
+    std::unique_ptr<BoundFunctionCall> operatorFunCall = ResolveOverload(groupName, containerScope, functionScopeLookups, arguments, boundCompileUnit, boundFunction, node.GetSpan(),
+        OverloadResolutionFlags::dontThrow, templateArgumentTypes, exception);
+    if (!operatorFunCall)
+    {
+        if (arguments[0]->GetType()->PlainType(node.GetSpan())->IsClassTypeSymbol())
+        {
+            if (arguments[0]->GetType()->IsReferenceType())
+            {
+                TypeSymbol* type = arguments[0]->GetType()->RemoveReference(node.GetSpan())->AddPointer(node.GetSpan());
+                arguments[0].reset(new BoundReferenceToPointerExpression(module, std::move(arguments[0]), type));
+            }
+            else
+            {
+                TypeSymbol* type = arguments[0]->GetType()->PlainType(node.GetSpan())->AddPointer(node.GetSpan());
+                arguments[0].reset(new BoundAddressOfExpression(module, std::move(arguments[0]), type));
+            }
+            operatorFunCall = std::move(ResolveOverload(groupName, containerScope, functionScopeLookups, arguments, boundCompileUnit, boundFunction, node.GetSpan()));
+        }
+        else
+        {
+            throw *exception;
+        }
+    }
     CheckAccess(boundFunction->GetFunctionSymbol(), operatorFunCall->GetFunctionSymbol());
     LocalVariableSymbol* temporary = nullptr;
     if (operatorFunCall->GetFunctionSymbol()->ReturnsClassInterfaceOrClassDelegateByValue())
@@ -182,16 +207,6 @@ void ExpressionBinder::BindUnaryOp(BoundExpression* operand, Node& node, const s
 void ExpressionBinder::BindUnaryOp(UnaryNode& unaryNode, const std::u32string& groupName)
 {
     unaryNode.Subject()->Accept(*this);
-    if (expression->GetType()->IsReferenceType() && expression->GetType()->PlainType(unaryNode.GetSpan())->IsClassTypeSymbol())
-    {
-        TypeSymbol* type = expression->GetType()->RemoveReference(unaryNode.GetSpan())->AddPointer(unaryNode.GetSpan());
-        expression.reset(new BoundReferenceToPointerExpression(module, std::move(expression), type));
-    }
-    else if (expression->GetType()->IsClassTypeSymbol())
-    {
-        TypeSymbol* type = expression->GetType()->AddPointer(unaryNode.GetSpan());
-        expression.reset(new BoundAddressOfExpression(module, std::move(expression), type));
-    }
     BoundExpression* operand = expression.release();
     BindUnaryOp(operand, unaryNode, groupName);
 }
@@ -267,7 +282,7 @@ void ExpressionBinder::BindBinaryOp(BoundExpression* left, BoundExpression* righ
     }
 }
 
-void ExpressionBinder::BindSymbol(Symbol* symbol)
+void ExpressionBinder::BindSymbol(Symbol* symbol, IdentifierNode* idNode)
 {
     switch (symbol->GetSymbolType())
     {
@@ -288,18 +303,31 @@ void ExpressionBinder::BindSymbol(Symbol* symbol)
             ClassTypeSymbol* classTypeSymbol = static_cast<ClassTypeSymbol*>(symbol);
             CheckAccess(boundFunction->GetFunctionSymbol(), classTypeSymbol);
             expression.reset(new BoundTypeExpression(module, span, classTypeSymbol));
+            if (idNode && GetGlobalFlag(GlobalFlags::cmdoc))
+            {
+                symbolTable.MapSymbol(idNode, classTypeSymbol);
+            }
             break;
         }
         case SymbolType::classGroupTypeSymbol: 
         {
             ClassGroupTypeSymbol* classGroupTypeSymbol = static_cast<ClassGroupTypeSymbol*>(symbol);
             expression.reset(new BoundTypeExpression(module, span, classGroupTypeSymbol));
+            ClassTypeSymbol* classTypeSymbol = classGroupTypeSymbol->GetClass(0);
+            if (idNode && GetGlobalFlag(GlobalFlags::cmdoc) && classTypeSymbol)
+            {
+                symbolTable.MapSymbol(idNode, classTypeSymbol);
+            }
             break;
         }
         case SymbolType::interfaceTypeSymbol:
         {
             InterfaceTypeSymbol* interfaceTypeSymbol = static_cast<InterfaceTypeSymbol*>(symbol); 
             expression.reset(new BoundTypeExpression(module, span, interfaceTypeSymbol));
+            if (idNode && GetGlobalFlag(GlobalFlags::cmdoc))
+            {
+                symbolTable.MapSymbol(idNode, interfaceTypeSymbol);
+            }
             break;
         }
         case SymbolType::delegateTypeSymbol:
@@ -307,6 +335,10 @@ void ExpressionBinder::BindSymbol(Symbol* symbol)
             DelegateTypeSymbol* delegateTypeSymbol = static_cast<DelegateTypeSymbol*>(symbol);
             CheckAccess(boundFunction->GetFunctionSymbol(), delegateTypeSymbol);
             expression.reset(new BoundTypeExpression(module, span, delegateTypeSymbol));
+            if (idNode && GetGlobalFlag(GlobalFlags::cmdoc))
+            {
+                symbolTable.MapSymbol(idNode, delegateTypeSymbol);
+            }
             break;
         }
         case SymbolType::classDelegateTypeSymbol:
@@ -314,6 +346,10 @@ void ExpressionBinder::BindSymbol(Symbol* symbol)
             ClassDelegateTypeSymbol* classDelegateTypeSymbol = static_cast<ClassDelegateTypeSymbol*>(symbol);
             CheckAccess(boundFunction->GetFunctionSymbol(), classDelegateTypeSymbol);
             expression.reset(new BoundTypeExpression(module, span, classDelegateTypeSymbol));
+            if (idNode && GetGlobalFlag(GlobalFlags::cmdoc))
+            {
+                symbolTable.MapSymbol(idNode, classDelegateTypeSymbol);
+            }
             break;
         }
         case SymbolType::typedefSymbol:
@@ -321,6 +357,10 @@ void ExpressionBinder::BindSymbol(Symbol* symbol)
             TypedefSymbol* typedefSymbol = static_cast<TypedefSymbol*>(symbol);
             CheckAccess(boundFunction->GetFunctionSymbol(), typedefSymbol);
             expression.reset(new BoundTypeExpression(module, span, typedefSymbol->GetType()));
+            if (idNode && GetGlobalFlag(GlobalFlags::cmdoc))
+            {
+                symbolTable.MapSymbol(idNode, typedefSymbol);
+            }
             break;
         }
         case SymbolType::boundTemplateParameterSymbol:
@@ -346,6 +386,10 @@ void ExpressionBinder::BindSymbol(Symbol* symbol)
         case SymbolType::memberVariableSymbol:
         {
             MemberVariableSymbol* memberVariableSymbol = static_cast<MemberVariableSymbol*>(symbol);
+            if (idNode && GetGlobalFlag(GlobalFlags::cmdoc))
+            {
+                symbolTable.MapSymbol(idNode, memberVariableSymbol);
+            }
             FunctionSymbol* currentFuctionSymbol = boundFunction->GetFunctionSymbol();
             CheckAccess(currentFuctionSymbol, memberVariableSymbol);
             BoundMemberVariable* bmv = new BoundMemberVariable(module, span, memberVariableSymbol);
@@ -412,6 +456,10 @@ void ExpressionBinder::BindSymbol(Symbol* symbol)
             ConstantSymbol* constantSymbol = static_cast<ConstantSymbol*>(symbol);
             CheckAccess(boundFunction->GetFunctionSymbol(), constantSymbol);
             expression.reset(new BoundConstant(module, span, constantSymbol));
+            if (idNode && GetGlobalFlag(GlobalFlags::cmdoc))
+            {
+                symbolTable.MapSymbol(idNode, constantSymbol);
+            }
             break;
         }
         case SymbolType::enumTypeSymbol:
@@ -419,12 +467,20 @@ void ExpressionBinder::BindSymbol(Symbol* symbol)
             EnumTypeSymbol* enumTypeSymbol = static_cast<EnumTypeSymbol*>(symbol);
             CheckAccess(boundFunction->GetFunctionSymbol(), enumTypeSymbol);
             expression.reset(new BoundTypeExpression(module, span, enumTypeSymbol));
+            if (idNode && GetGlobalFlag(GlobalFlags::cmdoc))
+            {
+                symbolTable.MapSymbol(idNode, enumTypeSymbol);
+            }
             break;
         }
         case SymbolType::enumConstantSymbol:
         {
             EnumConstantSymbol* enumConstantSymbol = static_cast<EnumConstantSymbol*>(symbol);
             expression.reset(new BoundEnumConstant(module, span, enumConstantSymbol));
+            if (idNode && GetGlobalFlag(GlobalFlags::cmdoc))
+            {
+                symbolTable.MapSymbol(idNode, enumConstantSymbol);
+            }
             break;
         }
         case SymbolType::namespaceSymbol:
@@ -617,6 +673,7 @@ void ExpressionBinder::Visit(UuidLiteralNode& uuidLiteralNode)
 
 void ExpressionBinder::Visit(IdentifierNode& identifierNode)
 {
+    symbolTable.SetLatestIdentifier(&identifierNode);
     std::u32string name = identifierNode.Str();
     Symbol* symbol = containerScope->Lookup(name, ScopeLookup::this_and_base_and_parent);
     if (!symbol)
@@ -632,7 +689,7 @@ void ExpressionBinder::Visit(IdentifierNode& identifierNode)
     }
     if (symbol)
     {
-        BindSymbol(symbol);
+        BindSymbol(symbol, &identifierNode);
     }
     else
     {
@@ -771,6 +828,8 @@ void ExpressionBinder::Visit(DotNode& dotNode)
 {
     ContainerScope* prevContainerScope = containerScope;
     expression = BindExpression(dotNode.Subject(), boundCompileUnit, boundFunction, containerScope, statementBinder, false, true, true, false);
+    IdentifierNode* idNode = symbolTable.GetLatestIdentifier();
+    symbolTable.SetLatestIdentifier(dotNode.MemberId());
     if (expression->GetBoundNodeType() == BoundNodeType::boundTypeExpression)
     {
         TypeSymbol* typeSymbol = expression->GetType();
@@ -778,6 +837,10 @@ void ExpressionBinder::Visit(DotNode& dotNode)
         {
             ClassGroupTypeSymbol* classGroupTypeSymbol = static_cast<ClassGroupTypeSymbol*>(typeSymbol);
             typeSymbol = classGroupTypeSymbol->GetClass(0);
+            if (GetGlobalFlag(GlobalFlags::cmdoc))
+            {
+                symbolTable.MapSymbol(idNode, typeSymbol);
+            }
             if (!typeSymbol)
             {
                 throw Exception(module, "ordinary class not found from class group '" + ToUtf8(classGroupTypeSymbol->FullName()) + "'", span, classGroupTypeSymbol->GetSpan());
@@ -796,7 +859,7 @@ void ExpressionBinder::Visit(DotNode& dotNode)
         Symbol* symbol = containerScope->Lookup(name, ScopeLookup::this_);
         if (symbol)
         {
-            BindSymbol(symbol);
+            BindSymbol(symbol, dotNode.MemberId());
             if (expression->GetBoundNodeType() == BoundNodeType::boundFunctionGroupExpression)
             {
                 BoundFunctionGroupExpression* bfe = static_cast<BoundFunctionGroupExpression*>(expression.get());
@@ -836,7 +899,7 @@ void ExpressionBinder::Visit(DotNode& dotNode)
                 {
                     classPtr.reset(expression.release());
                 }
-                BindSymbol(symbol);
+                BindSymbol(symbol, dotNode.MemberId());
                 if (expression->GetBoundNodeType() == BoundNodeType::boundFunctionGroupExpression)
                 {
                     BoundFunctionGroupExpression* bfg = static_cast<BoundFunctionGroupExpression*>(expression.get());
@@ -916,7 +979,7 @@ void ExpressionBinder::Visit(DotNode& dotNode)
             {
                 std::unique_ptr<BoundExpression> interfacePtr;
                 interfacePtr.reset(expression.release());
-                BindSymbol(symbol);
+                BindSymbol(symbol, dotNode.MemberId());
                 if (expression->GetBoundNodeType() == BoundNodeType::boundFunctionGroupExpression)
                 {
                     BoundFunctionGroupExpression* bfg = static_cast<BoundFunctionGroupExpression*>(expression.get());
@@ -941,7 +1004,7 @@ void ExpressionBinder::Visit(DotNode& dotNode)
             Symbol* symbol = scope->Lookup(name);
             if (symbol)
             {
-                BindSymbol(symbol);
+                BindSymbol(symbol, dotNode.MemberId());
             }
             else
             {
@@ -957,7 +1020,7 @@ void ExpressionBinder::Visit(DotNode& dotNode)
             if (symbol)
             {
                 std::unique_ptr<BoundExpression> receiverPtr = std::move(expression);
-                BindSymbol(symbol);
+                BindSymbol(symbol, dotNode.MemberId());
                 if (expression->GetBoundNodeType() == BoundNodeType::boundFunctionGroupExpression)
                 {
                     BoundFunctionGroupExpression* bfe = static_cast<BoundFunctionGroupExpression*>(expression.get());
@@ -991,7 +1054,7 @@ void ExpressionBinder::BindArrow(Node& node, const std::u32string& name)
             Symbol* symbol = scope->Lookup(name, ScopeLookup::this_and_base);
             if (symbol)
             {
-                BindSymbol(symbol);
+                BindSymbol(symbol, nullptr);
                 if (expression->GetBoundNodeType() == BoundNodeType::boundFunctionGroupExpression)
                 {
                     BoundFunctionGroupExpression* bfg = static_cast<BoundFunctionGroupExpression*>(expression.get());
@@ -1122,6 +1185,7 @@ void ExpressionBinder::Visit(ArrowNode& arrowNode)
     {
         expression->SetFlag(BoundExpressionFlags::argIsExplicitThisOrBasePtr);
     }
+    symbolTable.SetLatestIdentifier(arrowNode.MemberId());
 }
 
 void ExpressionBinder::Visit(DisjunctionNode& disjunctionNode) 
@@ -1534,7 +1598,10 @@ void ExpressionBinder::Visit(IndexingNode& indexingNode)
 
 void ExpressionBinder::Visit(InvokeNode& invokeNode) 
 {
+    IdentifierNode* prevIdentifier = symbolTable.GetLatestIdentifier();
     invokeNode.Subject()->Accept(*this);
+    IdentifierNode* invokeId = symbolTable.GetLatestIdentifier();
+    symbolTable.SetLatestIdentifier(prevIdentifier);
     bool argIsExplicitThisOrBasePtr = expression->GetFlag(BoundExpressionFlags::argIsExplicitThisOrBasePtr);
     std::vector<std::unique_ptr<BoundExpression>> arguments;
     std::vector<FunctionScopeLookup> functionScopeLookups;
@@ -2002,6 +2069,10 @@ void ExpressionBinder::Visit(InvokeNode& invokeNode)
             expression->SetFlag(BoundExpressionFlags::exceptionCapture);
         }
     }
+    if (GetGlobalFlag(GlobalFlags::cmdoc) && functionSymbol->HasSource())
+    {
+        symbolTable.MapInvoke(invokeId, functionSymbol);
+    }
 }
 
 void ExpressionBinder::Visit(PostfixIncrementNode& postfixIncrementNode)
@@ -2381,6 +2452,11 @@ void ExpressionBinder::Visit(BaseNode& baseNode)
     {
         throw Exception(module, "'base' can only be used in member function context", baseNode.GetSpan());
     }
+}
+
+void ExpressionBinder::Visit(ParenthesizedExpressionNode& parenthesizedExpressionNode)
+{
+    parenthesizedExpressionNode.Subject()->Accept(*this);
 }
 
 std::unique_ptr<BoundExpression> BindExpression(Node* node, BoundCompileUnit& boundCompileUnit, BoundFunction* boundFunction, ContainerScope* containerScope, StatementBinder* statementBinder)

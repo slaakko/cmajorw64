@@ -77,22 +77,42 @@ namespace cmajor.parser
             ::= (keyword("return") Expression(ctx)? ';'!){ value = new ReturnStatementNode(span, Expression); }
             ;
 
-        IfStatement(ParsingContext* ctx) : StatementNode*
-            ::= (keyword("if") '(' Expression(ctx) ')' Statement(ctx):thens (keyword("else") Statement(ctx):elses)?){ value = new IfStatementNode(span, Expression, thens, elses); }
+        IfStatement(ParsingContext* ctx, var Span leftParenSpan, var Span rightParenSpan, var Span elseSpan) : IfStatementNode*
+            ::= (keyword("if") '('{ leftParenSpan = span; } Expression(ctx) ')'{ rightParenSpan = span; } 
+                Statement(ctx):thens (keyword("else"){ elseSpan = span; } Statement(ctx):elses)?)
+                { 
+                    value = new IfStatementNode(span, Expression, thens, elses); 
+                    value->SetLeftParenSpan(leftParenSpan);
+                    value->SetRightParenSpan(rightParenSpan);
+                    value->SetElseSpan(elseSpan);
+                }
             ;
 
-        WhileStatement(ParsingContext* ctx) : StatementNode*
-            ::= (keyword("while") '('! Expression(ctx)! ')'! Statement(ctx)!){ value = new WhileStatementNode(span, Expression, Statement); }
+        WhileStatement(ParsingContext* ctx, var Span leftParenSpan, var Span rightParenSpan) : WhileStatementNode*
+            ::= (keyword("while") '('!{ leftParenSpan = span; } Expression(ctx)! ')'!{ rightParenSpan = span; } Statement(ctx)!)
+                { 
+                    value = new WhileStatementNode(span, Expression, Statement); 
+                    value->SetLeftParenSpan(leftParenSpan);
+                    value->SetRightParenSpan(rightParenSpan);
+                }
             ;
 
-        DoStatement(ParsingContext* ctx) : StatementNode*
-            ::= (keyword("do") Statement(ctx)! keyword("while")! '('! Expression(ctx)! ')'! ';'!){ value = new DoStatementNode(span, Statement, Expression); }
+        DoStatement(ParsingContext* ctx, var Span whileSpan, var Span leftParenSpan, var Span rightParenSpan) : DoStatementNode*
+            ::= (keyword("do") Statement(ctx)! keyword("while")!{ whileSpan = span; } '('!{ leftParenSpan = span; } Expression(ctx)! ')'!{ rightParenSpan = span; } ';'!)
+                { 
+                    value = new DoStatementNode(span, Statement, Expression); 
+                    value->SetWhileSpan(whileSpan);
+                    value->SetLeftParenSpan(leftParenSpan);
+                    value->SetRightParenSpan(rightParenSpan);
+                }
             ;
 
-        ForStatement(ParsingContext* ctx) : StatementNode*
-            ::= (keyword("for") '(' ForInitStatement(ctx)! Expression(ctx)? ';'! ForLoopStatementExpr(ctx)! ')'! Statement(ctx)!)
+        ForStatement(ParsingContext* ctx, var Span leftParenSpan, var Span rightParenSpan) : ForStatementNode*
+            ::= (keyword("for") '('{ leftParenSpan = span; } ForInitStatement(ctx)! Expression(ctx)? ';'! ForLoopStatementExpr(ctx)! ')'!{ rightParenSpan = span; } Statement(ctx)!)
             { 
                 value = new ForStatementNode(span, ForInitStatement, Expression, ForLoopStatementExpr, Statement);
+                value->SetLeftParenSpan(leftParenSpan);
+                value->SetRightParenSpan(rightParenSpan);
             }
             ;
 
@@ -108,10 +128,13 @@ namespace cmajor.parser
             |   empty{ value = new EmptyStatementNode(span); }
             ;
 
-        RangeForStatement(ParsingContext* ctx) : StatementNode*
-            ::= (keyword("for") '(' TypeExpr(ctx) Identifier ':' Expression(ctx)! ')'! Statement(ctx)!)
+        RangeForStatement(ParsingContext* ctx, var Span leftParenSpan, var Span rightParenSpan, var Span colonSpan) : RangeForStatementNode*
+            ::= (keyword("for") '('{ leftParenSpan = span; } TypeExpr(ctx) Identifier ':'{ colonSpan = span; } Expression(ctx)! ')'!{ rightParenSpan = span; } Statement(ctx)!)
             { 
                 value = new RangeForStatementNode(span, TypeExpr, Identifier, Expression, Statement); 
+                value->SetLeftParenSpan(leftParenSpan);
+                value->SetRightParenSpan(rightParenSpan);
+                value->SetColonSpan(colonSpan);
             }
             ;
 
@@ -127,13 +150,16 @@ namespace cmajor.parser
             ::= (keyword("goto") Identifier ';'!){ value = new GotoStatementNode(span, Identifier->Str()); }
             ;
 
-        SwitchStatement(ParsingContext* ctx) : SwitchStatementNode*
-            ::= (keyword("switch") '('! Expression(ctx)! ')'!){ value = new SwitchStatementNode(span, Expression); }
-                '{'! (CaseStatement(ctx){ value->AddCase(CaseStatement); } | DefaultStatement(ctx){ value->SetDefault(DefaultStatement); })* '}'!
+        SwitchStatement(ParsingContext* ctx, var Span leftParenSpan, var Span rightParenSpan, var Span beginBraceSpan, var Span endBraceSpan) : SwitchStatementNode*
+            ::= (keyword("switch") '('!{ leftParenSpan = span; } Expression(ctx)! ')'!{ rightParenSpan = span; })
+                { value = new SwitchStatementNode(span, Expression); value->SetLeftParenSpan(leftParenSpan); value->SetRightParenSpan(rightParenSpan); }
+                '{'!{ beginBraceSpan = span; } (CaseStatement(ctx){ value->AddCase(CaseStatement); } | DefaultStatement(ctx){ value->SetDefault(DefaultStatement); })* 
+                '}'!{ endBraceSpan = span; value->SetBeginBraceSpan(beginBraceSpan); value->SetEndBraceSpan(endBraceSpan); }
             ;
 
-        CaseStatement(ParsingContext* ctx, var std::unique_ptr<CaseStatementNode> caseS) : CaseStatementNode*
-            ::= ((empty{ caseS.reset(new CaseStatementNode(span)); } (keyword("case") Expression(ctx){ caseS->AddCaseExpr(Expression); } ':'!)+){ caseS->GetSpan().SetEnd(span.End()); }
+        CaseStatement(ParsingContext* ctx, var std::unique_ptr<CaseStatementNode> caseS, var Span caseSpan) : CaseStatementNode*
+            ::= ((empty{ caseS.reset(new CaseStatementNode(span)); } (keyword("case"){ caseSpan = span; } Expression(ctx){ caseS->AddCaseSpan(caseSpan); caseS->AddCaseExpr(Expression); } ':'!)+)
+                { caseS->GetSpan().SetEnd(span.End()); }
                 (Statement(ctx){ caseS->AddStatement(Statement); })*){ value = caseS.release(); }
             ;
 
@@ -162,10 +188,10 @@ namespace cmajor.parser
             ;
 
         ConstructionStatement(ParsingContext* ctx) : ConstructionStatementNode*
-            ::= TypeExpr(ctx) Identifier!{ value = new ConstructionStatementNode(span, TypeExpr, Identifier); }
-                ('=' Expression(ctx)!{ value->AddArgument(Expression); }
+            ::= (TypeExpr(ctx) Identifier!){ value = new ConstructionStatementNode(span, TypeExpr, Identifier); }
+                ('=' Expression(ctx)!{ value->AddArgument(Expression); value->SetAssignment(); }
                 |    '(' ArgumentList(ctx, value)! ')'!
-                |   empty
+                |   empty{ value->SetEmpty(); }
                 )
                 ';'!{ value->GetSpan().SetEnd(span.End()); }
             ;
@@ -199,27 +225,38 @@ namespace cmajor.parser
             ;
 
         TryStatement(ParsingContext* ctx) : TryStatementNode*
-            ::= keyword("try") CompoundStatement(ctx):tryBlock{ value = new TryStatementNode(span, tryBlock); } 
+            ::= (keyword("try") CompoundStatement(ctx):tryBlock){ value = new TryStatementNode(span, tryBlock); } 
                 (Catch(ctx){ value->AddCatch(Catch); })+
             ;
 
-        Catch(ParsingContext* ctx) : CatchNode*
-            ::= (keyword("catch") '('! TypeExpr(ctx)! Identifier? ')'! CompoundStatement(ctx):catchBlock){ value = new CatchNode(span, TypeExpr, Identifier, catchBlock); }
+        Catch(ParsingContext* ctx, var Span leftParenSpan, var Span rightParenSpan) : CatchNode*
+            ::= (keyword("catch") '('!{ leftParenSpan = span; } TypeExpr(ctx)! Identifier? ')'!{ rightParenSpan = span; } 
+                CompoundStatement(ctx):catchBlock){ value = new CatchNode(span, TypeExpr, Identifier, catchBlock); value->SetLeftParenSpan(leftParenSpan); value->SetRightParenSpan(rightParenSpan); }
             ;
 
         AssertStatement(ParsingContext* ctx) : StatementNode*
             ::= ('#' keyword("assert") Expression(ctx)! ';'!){ value = new AssertStatementNode(span, Expression); }
             ;
 
-        ConditionalCompilationStatement(ParsingContext* ctx) : ConditionalCompilationStatementNode*
-            ::= '#' keyword("if") '('! ConditionalCompilationExpression:ifExpr{ value = new ConditionalCompilationStatementNode(span, ifExpr); } ')'! (Statement(ctx):ifS{ value->AddIfStatement(ifS); })*
+        ConditionalCompilationStatement(ParsingContext* ctx, var Span leftParenSpan, var Span rightParenSpan, var Span keywordSpan) : 
+            ConditionalCompilationStatementNode*
+            ::= ('#'{ keywordSpan = span; } keyword("if") '('!{ leftParenSpan = span; } 
+                ConditionalCompilationExpression:ifExpr{ value = new ConditionalCompilationStatementNode(span, ifExpr); value->IfPart()->SetKeywordSpan(keywordSpan); } ')'!
+                { rightParenSpan = span; value->IfPart()->SetLeftParenSpan(leftParenSpan); value->IfPart()->SetRightParenSpan(rightParenSpan); } 
+                (Statement(ctx):ifS{ value->AddIfStatement(ifS); })*
                 (
-                    '#' keyword("elif") '('! ConditionalCompilationExpression:elifExpr{ value->AddElifExpr(span, elifExpr); } ')'! (Statement(ctx):elifS{ value->AddElifStatement(elifS); })*
+                    '#'{ keywordSpan = span; } keyword("elif") '('!{ leftParenSpan = span; } ConditionalCompilationExpression:elifExpr{ value->AddElifExpr(span, elifExpr); } ')'!
+                    {   rightParenSpan = span; 
+                        value->SetElifLeftParenSpan(leftParenSpan); 
+                        value->SetElifRightParenSpan(rightParenSpan); 
+                        value->SetElifKeywordSpan(keywordSpan); 
+                    }
+                    (Statement(ctx):elifS{ value->AddElifStatement(elifS); })*
                 )*
                 (
-                    '#' keyword("else") (Statement(ctx):elseS{ value->AddElseStatement(span, elseS); })*
+                    '#'{ keywordSpan = span; } keyword("else") (Statement(ctx):elseS{ value->AddElseStatement(span, elseS); })* empty{ value->ElsePart()->SetKeywordSpan(keywordSpan); }
                 )?
-                '#' keyword("endif")!
+                '#'{ value->SetEndIfSpan(span); } keyword("endif")!)
             ;
 
         ConditionalCompilationExpression : ConditionalCompilationExpressionNode*

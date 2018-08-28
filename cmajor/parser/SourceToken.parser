@@ -21,7 +21,6 @@ namespace cmajor.parser
         using Literal.IntegerLiteral;
         using Literal.CharLiteral;
         using Literal.StringLiteral;
-        using stdlib.line_comment;
         using stdlib.block_comment;
         using stdlib.newline;
 
@@ -39,7 +38,7 @@ namespace cmajor.parser
             |   CharLiteral{ formatter->Char(std::u32string(matchBegin, matchEnd)); }
             |   StringLiteral{ formatter->String(std::u32string(matchBegin, matchEnd)); }
             |   Spaces{ formatter->Spaces(Spaces); }
-            |   line_comment{ formatter->Comment(std::u32string(matchBegin, matchEnd)); }
+            |   LineComment{ formatter->Comment(std::u32string(matchBegin, matchEnd)); }
             |   block_comment{ formatter->Comment(std::u32string(matchBegin, matchEnd)); }
             |   newline{ formatter->NewLine(std::u32string(matchBegin, matchEnd)); }
             |   Other{ formatter->Other(Other); }
@@ -47,6 +46,10 @@ namespace cmajor.parser
 
         Spaces : std::u32string
             ::= ([\t ]+){ value = std::u32string(matchBegin, matchEnd); }
+            ;
+
+        LineComment 
+            ::= "//" [^\r\n]* newline?
             ;
 
         Other : std::u32string

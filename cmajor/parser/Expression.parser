@@ -294,7 +294,7 @@ namespace cmajor.parser
             ;
 
         Primary(ParsingContext* ctx) : Node*
-            ::= ('(' Expression(ctx) ')'){ value = Expression; }
+            ::= ('(' Expression(ctx) ')'){ value = new ParenthesizedExpressionNode(span, Expression); }
             |   Literal(ctx){ value = Literal; }
             |   BasicType{ value = BasicType; }
             |   TemplateId(ctx){ value = TemplateId; }
@@ -321,11 +321,11 @@ namespace cmajor.parser
             ;
 
         ConstructExpr(ParsingContext* ctx) : Node*
-            ::= keyword("construct") '<'! TypeExpr(ctx)!{ value = new ConstructNode(span, TypeExpr); } '>'! '('! ExpressionList(ctx, value)! ')'!{ value->GetSpan().SetEnd(span.End()); }
+            ::= (keyword("construct") '<'! TypeExpr(ctx)!){ value = new ConstructNode(span, TypeExpr); } '>'! '('! ExpressionList(ctx, value)! ')'!{ value->GetSpan().SetEnd(span.End()); }
             ;
 
         NewExpr(ParsingContext* ctx) : Node*
-            ::= keyword("new") TypeExpr(ctx)!{ value = new NewNode(span, TypeExpr); } (('(' ArgumentList(ctx, value) ')'){ value->GetSpan().SetEnd(span.End()); })?
+            ::= (keyword("new") TypeExpr(ctx)!){ value = new NewNode(span, TypeExpr); } (('(' ArgumentList(ctx, value) ')'){ value->GetSpan().SetEnd(span.End()); })?
             ;
 
         ArgumentList(ParsingContext* ctx, Node* node)

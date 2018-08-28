@@ -40,6 +40,7 @@ source <RandomAccessIterator.cm>;
 source <RedBlackTree.cm>;
 source <Rvalue.cm>;
 source <Set.cm>;
+source <Sha1.cm>;
 source <SharedPtr.cm>;
 source <Stack.cm>;
 source <Stream.cm>;

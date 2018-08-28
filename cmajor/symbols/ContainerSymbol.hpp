@@ -33,9 +33,11 @@ public:
     void AppendChildElements(dom::Element* element, TypeMap& typeMap) const override;
     bool HasProjectMembers() const override;
     const char* ClassName() const override { return "ContainerSymbol"; }
+    FunctionSymbol* GetFunctionByIndex(int32_t functionIndex) const;
 private:
     std::vector<std::unique_ptr<Symbol>> members;
     ContainerScope containerScope;
+    std::unordered_map<int32_t, FunctionSymbol*> functionIndexMap;
     FunctionGroupSymbol* MakeFunctionGroupSymbol(const std::u32string& groupName, const Span& span);
     ConceptGroupSymbol* MakeConceptGroupSymbol(const std::u32string& groupName, const Span& span);
     ClassGroupTypeSymbol* MakeClassGroupTypeSymbol(const std::u32string& groupName, const Span& span);

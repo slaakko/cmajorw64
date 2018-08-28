@@ -2,6 +2,8 @@ using System;
 using System.Collections;
 using System.Text.Parsing;
 
+// this source file has been automatically generated from 'HttpGrammar.parser' using cmparsergen version 2.0.0.
+
 namespace System.Net.Http
 {
     public class HttpChunkHeaderGrammar : System.Text.Parsing.Grammar
@@ -2861,43 +2863,49 @@ namespace System.Net.Http
         {
             AddRule(new statusLineRule(ToUtf32("statusLine"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.ActionParser(ToUtf32("A0"),
-                    new System.Text.Parsing.SequenceParser(
+                    new System.Text.Parsing.GroupingParser(
                         new System.Text.Parsing.SequenceParser(
                             new System.Text.Parsing.SequenceParser(
                                 new System.Text.Parsing.SequenceParser(
-                                    new System.Text.Parsing.NonterminalParser(ToUtf32("httpVersion"), ToUtf32("httpVersion"), 0),
-                                    new System.Text.Parsing.NonterminalParser(ToUtf32("SP"), ToUtf32("SP"), 0)),
-                                new System.Text.Parsing.NonterminalParser(ToUtf32("statusCode"), ToUtf32("statusCode"), 0)),
-                            new System.Text.Parsing.NonterminalParser(ToUtf32("SP"), ToUtf32("SP"), 0)),
-                        new System.Text.Parsing.NonterminalParser(ToUtf32("reasonPhrase"), ToUtf32("reasonPhrase"), 0)))));
+                                    new System.Text.Parsing.SequenceParser(
+                                        new System.Text.Parsing.NonterminalParser(ToUtf32("httpVersion"), ToUtf32("httpVersion"), 0),
+                                        new System.Text.Parsing.NonterminalParser(ToUtf32("SP"), ToUtf32("SP"), 0)),
+                                    new System.Text.Parsing.NonterminalParser(ToUtf32("statusCode"), ToUtf32("statusCode"), 0)),
+                                new System.Text.Parsing.NonterminalParser(ToUtf32("SP"), ToUtf32("SP"), 0)),
+                            new System.Text.Parsing.NonterminalParser(ToUtf32("reasonPhrase"), ToUtf32("reasonPhrase"), 0))))));
             AddRule(new httpVersionRule(ToUtf32("httpVersion"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.ActionParser(ToUtf32("A0"),
-                    new System.Text.Parsing.SequenceParser(
+                    new System.Text.Parsing.GroupingParser(
                         new System.Text.Parsing.SequenceParser(
                             new System.Text.Parsing.SequenceParser(
                                 new System.Text.Parsing.SequenceParser(
-                                    new System.Text.Parsing.StringParser(ToUtf32("HTTP")),
-                                    new System.Text.Parsing.CharParser('/')),
-                                new System.Text.Parsing.PositiveParser(
-                                    new System.Text.Parsing.NonterminalParser(ToUtf32("DIGIT"), ToUtf32("DIGIT"), 0))),
-                            new System.Text.Parsing.CharParser('.')),
-                        new System.Text.Parsing.PositiveParser(
-                            new System.Text.Parsing.NonterminalParser(ToUtf32("DIGIT"), ToUtf32("DIGIT"), 0))))));
+                                    new System.Text.Parsing.SequenceParser(
+                                        new System.Text.Parsing.StringParser(ToUtf32("HTTP")),
+                                        new System.Text.Parsing.CharParser('/')),
+                                    new System.Text.Parsing.PositiveParser(
+                                        new System.Text.Parsing.NonterminalParser(ToUtf32("DIGIT"), ToUtf32("DIGIT"), 0))),
+                                new System.Text.Parsing.CharParser('.')),
+                            new System.Text.Parsing.PositiveParser(
+                                new System.Text.Parsing.NonterminalParser(ToUtf32("DIGIT"), ToUtf32("DIGIT"), 0)))))));
             AddRule(new statusCodeRule(ToUtf32("statusCode"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.ActionParser(ToUtf32("A0"),
-                    new System.Text.Parsing.SequenceParser(
+                    new System.Text.Parsing.GroupingParser(
                         new System.Text.Parsing.SequenceParser(
-                            new System.Text.Parsing.NonterminalParser(ToUtf32("DIGIT"), ToUtf32("DIGIT"), 0),
-                            new System.Text.Parsing.NonterminalParser(ToUtf32("DIGIT"), ToUtf32("DIGIT"), 0)),
-                        new System.Text.Parsing.NonterminalParser(ToUtf32("DIGIT"), ToUtf32("DIGIT"), 0)))));
+                            new System.Text.Parsing.SequenceParser(
+                                new System.Text.Parsing.NonterminalParser(ToUtf32("DIGIT"), ToUtf32("DIGIT"), 0),
+                                new System.Text.Parsing.NonterminalParser(ToUtf32("DIGIT"), ToUtf32("DIGIT"), 0)),
+                            new System.Text.Parsing.NonterminalParser(ToUtf32("DIGIT"), ToUtf32("DIGIT"), 0))))));
             AddRule(new reasonPhraseRule(ToUtf32("reasonPhrase"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.ActionParser(ToUtf32("A0"),
-                    new System.Text.Parsing.KleeneStarParser(
-                        new System.Text.Parsing.DifferenceParser(
-                            new System.Text.Parsing.NonterminalParser(ToUtf32("TEXT"), ToUtf32("TEXT"), 0),
-                            new System.Text.Parsing.AlternativeParser(
-                                new System.Text.Parsing.NonterminalParser(ToUtf32("CR"), ToUtf32("CR"), 0),
-                                new System.Text.Parsing.NonterminalParser(ToUtf32("LF"), ToUtf32("LF"), 0)))))));
+                    new System.Text.Parsing.GroupingParser(
+                        new System.Text.Parsing.KleeneStarParser(
+                            new System.Text.Parsing.GroupingParser(
+                                new System.Text.Parsing.DifferenceParser(
+                                    new System.Text.Parsing.NonterminalParser(ToUtf32("TEXT"), ToUtf32("TEXT"), 0),
+                                    new System.Text.Parsing.GroupingParser(
+                                        new System.Text.Parsing.AlternativeParser(
+                                            new System.Text.Parsing.NonterminalParser(ToUtf32("CR"), ToUtf32("CR"), 0),
+                                            new System.Text.Parsing.NonterminalParser(ToUtf32("LF"), ToUtf32("LF"), 0))))))))));
             AddRule(new System.Text.Parsing.RuleParser(ToUtf32("charset"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.NonterminalParser(ToUtf32("httpToken"), ToUtf32("httpToken"), 0)));
             AddRule(new System.Text.Parsing.RuleParser(ToUtf32("contentCoding"), GetScope(), Domain()->GetNextRuleId(),
@@ -2912,39 +2920,47 @@ namespace System.Net.Http
                     new System.Text.Parsing.CharParser(','))));
             AddRule(new generalFieldValueRule(ToUtf32("generalFieldValue"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.ActionParser(ToUtf32("A0"),
-                    new System.Text.Parsing.SequenceParser(
-                        new System.Text.Parsing.ActionParser(ToUtf32("A1"),
-                            new System.Text.Parsing.NonterminalParser(ToUtf32("httpToken"), ToUtf32("httpToken"), 0)),
-                        new System.Text.Parsing.KleeneStarParser(
-                            new System.Text.Parsing.SequenceParser(
-                                new System.Text.Parsing.CharParser(';'),
-                                new System.Text.Parsing.NonterminalParser(ToUtf32("generalParameter"), ToUtf32("generalParameter"), 1)))))));
+                    new System.Text.Parsing.GroupingParser(
+                        new System.Text.Parsing.SequenceParser(
+                            new System.Text.Parsing.ActionParser(ToUtf32("A1"),
+                                new System.Text.Parsing.NonterminalParser(ToUtf32("httpToken"), ToUtf32("httpToken"), 0)),
+                            new System.Text.Parsing.KleeneStarParser(
+                                new System.Text.Parsing.GroupingParser(
+                                    new System.Text.Parsing.SequenceParser(
+                                        new System.Text.Parsing.CharParser(';'),
+                                        new System.Text.Parsing.NonterminalParser(ToUtf32("generalParameter"), ToUtf32("generalParameter"), 1)))))))));
             AddRule(new generalParameterRule(ToUtf32("generalParameter"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.ActionParser(ToUtf32("A0"),
-                    new System.Text.Parsing.SequenceParser(
-                        new System.Text.Parsing.NonterminalParser(ToUtf32("attribute"), ToUtf32("attribute"), 0),
-                        new System.Text.Parsing.OptionalParser(
-                            new System.Text.Parsing.SequenceParser(
-                                new System.Text.Parsing.CharParser('='),
-                                new System.Text.Parsing.NonterminalParser(ToUtf32("attrval"), ToUtf32("attrval"), 0)))))));
+                    new System.Text.Parsing.GroupingParser(
+                        new System.Text.Parsing.SequenceParser(
+                            new System.Text.Parsing.NonterminalParser(ToUtf32("attribute"), ToUtf32("attribute"), 0),
+                            new System.Text.Parsing.OptionalParser(
+                                new System.Text.Parsing.GroupingParser(
+                                    new System.Text.Parsing.SequenceParser(
+                                        new System.Text.Parsing.CharParser('='),
+                                        new System.Text.Parsing.NonterminalParser(ToUtf32("attrval"), ToUtf32("attrval"), 0)))))))));
             AddRule(new chunkHeaderRule(ToUtf32("chunkHeader"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.SequenceParser(
                     new System.Text.Parsing.ActionParser(ToUtf32("A0"),
-                        new System.Text.Parsing.PositiveParser(
-                            new System.Text.Parsing.HexDigitParser())),
+                        new System.Text.Parsing.GroupingParser(
+                            new System.Text.Parsing.PositiveParser(
+                                new System.Text.Parsing.HexDigitParser()))),
                     new System.Text.Parsing.OptionalParser(
                         new System.Text.Parsing.NonterminalParser(ToUtf32("chunkExtensions"), ToUtf32("chunkExtensions"), 1)))));
             AddRule(new chunkExtensionsRule(ToUtf32("chunkExtensions"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.KleeneStarParser(
-                    new System.Text.Parsing.SequenceParser(
-                        new System.Text.Parsing.CharParser(';'),
-                        new System.Text.Parsing.ActionParser(ToUtf32("A0"),
-                            new System.Text.Parsing.SequenceParser(
-                                new System.Text.Parsing.NonterminalParser(ToUtf32("chunkExtName"), ToUtf32("chunkExtName"), 0),
-                                new System.Text.Parsing.OptionalParser(
+                    new System.Text.Parsing.GroupingParser(
+                        new System.Text.Parsing.SequenceParser(
+                            new System.Text.Parsing.CharParser(';'),
+                            new System.Text.Parsing.ActionParser(ToUtf32("A0"),
+                                new System.Text.Parsing.GroupingParser(
                                     new System.Text.Parsing.SequenceParser(
-                                        new System.Text.Parsing.CharParser('='),
-                                        new System.Text.Parsing.NonterminalParser(ToUtf32("chunkExtVal"), ToUtf32("chunkExtVal"), 0)))))))));
+                                        new System.Text.Parsing.NonterminalParser(ToUtf32("chunkExtName"), ToUtf32("chunkExtName"), 0),
+                                        new System.Text.Parsing.OptionalParser(
+                                            new System.Text.Parsing.GroupingParser(
+                                                new System.Text.Parsing.SequenceParser(
+                                                    new System.Text.Parsing.CharParser('='),
+                                                    new System.Text.Parsing.NonterminalParser(ToUtf32("chunkExtVal"), ToUtf32("chunkExtVal"), 0))))))))))));
             AddRule(new chunkExtNameRule(ToUtf32("chunkExtName"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.ActionParser(ToUtf32("A0"),
                     new System.Text.Parsing.NonterminalParser(ToUtf32("httpToken"), ToUtf32("httpToken"), 0))));
@@ -2958,16 +2974,18 @@ namespace System.Net.Http
                 new System.Text.Parsing.SequenceParser(
                     new System.Text.Parsing.NonterminalParser(ToUtf32("httpToken"), ToUtf32("httpToken"), 0),
                     new System.Text.Parsing.KleeneStarParser(
-                        new System.Text.Parsing.SequenceParser(
-                            new System.Text.Parsing.CharParser(';'),
-                            new System.Text.Parsing.NonterminalParser(ToUtf32("parameter"), ToUtf32("parameter"), 0))))));
+                        new System.Text.Parsing.GroupingParser(
+                            new System.Text.Parsing.SequenceParser(
+                                new System.Text.Parsing.CharParser(';'),
+                                new System.Text.Parsing.NonterminalParser(ToUtf32("parameter"), ToUtf32("parameter"), 0)))))));
             AddRule(new parameterRule(ToUtf32("parameter"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.ActionParser(ToUtf32("A0"),
-                    new System.Text.Parsing.SequenceParser(
+                    new System.Text.Parsing.GroupingParser(
                         new System.Text.Parsing.SequenceParser(
-                            new System.Text.Parsing.NonterminalParser(ToUtf32("attribute"), ToUtf32("attribute"), 0),
-                            new System.Text.Parsing.CharParser('=')),
-                        new System.Text.Parsing.NonterminalParser(ToUtf32("attrval"), ToUtf32("attrval"), 0)))));
+                            new System.Text.Parsing.SequenceParser(
+                                new System.Text.Parsing.NonterminalParser(ToUtf32("attribute"), ToUtf32("attribute"), 0),
+                                new System.Text.Parsing.CharParser('=')),
+                            new System.Text.Parsing.NonterminalParser(ToUtf32("attrval"), ToUtf32("attrval"), 0))))));
             AddRule(new attributeRule(ToUtf32("attribute"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.ActionParser(ToUtf32("A0"),
                     new System.Text.Parsing.NonterminalParser(ToUtf32("httpToken"), ToUtf32("httpToken"), 0))));
@@ -2980,16 +2998,18 @@ namespace System.Net.Http
             AddRule(new mediaTypeRule(ToUtf32("mediaType"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.SequenceParser(
                     new System.Text.Parsing.ActionParser(ToUtf32("A0"),
-                        new System.Text.Parsing.SequenceParser(
+                        new System.Text.Parsing.GroupingParser(
                             new System.Text.Parsing.SequenceParser(
-                                new System.Text.Parsing.NonterminalParser(ToUtf32("type"), ToUtf32("type"), 0),
-                                new System.Text.Parsing.CharParser('/')),
-                            new System.Text.Parsing.NonterminalParser(ToUtf32("subtype"), ToUtf32("subtype"), 0))),
+                                new System.Text.Parsing.SequenceParser(
+                                    new System.Text.Parsing.NonterminalParser(ToUtf32("type"), ToUtf32("type"), 0),
+                                    new System.Text.Parsing.CharParser('/')),
+                                new System.Text.Parsing.NonterminalParser(ToUtf32("subtype"), ToUtf32("subtype"), 0)))),
                     new System.Text.Parsing.KleeneStarParser(
-                        new System.Text.Parsing.SequenceParser(
-                            new System.Text.Parsing.CharParser(';'),
-                            new System.Text.Parsing.ActionParser(ToUtf32("A1"),
-                                new System.Text.Parsing.NonterminalParser(ToUtf32("parameter"), ToUtf32("parameter"), 0)))))));
+                        new System.Text.Parsing.GroupingParser(
+                            new System.Text.Parsing.SequenceParser(
+                                new System.Text.Parsing.CharParser(';'),
+                                new System.Text.Parsing.ActionParser(ToUtf32("A1"),
+                                    new System.Text.Parsing.NonterminalParser(ToUtf32("parameter"), ToUtf32("parameter"), 0))))))));
             AddRule(new typeRule(ToUtf32("type"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.ActionParser(ToUtf32("A0"),
                     new System.Text.Parsing.NonterminalParser(ToUtf32("httpToken"), ToUtf32("httpToken"), 0))));
@@ -2998,18 +3018,20 @@ namespace System.Net.Http
                     new System.Text.Parsing.NonterminalParser(ToUtf32("httpToken"), ToUtf32("httpToken"), 0))));
             AddRule(new httpHeaderRule(ToUtf32("httpHeader"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.ActionParser(ToUtf32("A0"),
-                    new System.Text.Parsing.SequenceParser(
+                    new System.Text.Parsing.GroupingParser(
                         new System.Text.Parsing.SequenceParser(
-                            new System.Text.Parsing.NonterminalParser(ToUtf32("fieldName"), ToUtf32("fieldName"), 0),
-                            new System.Text.Parsing.CharParser(':')),
-                        new System.Text.Parsing.NonterminalParser(ToUtf32("fieldValue"), ToUtf32("fieldValue"), 0)))));
+                            new System.Text.Parsing.SequenceParser(
+                                new System.Text.Parsing.NonterminalParser(ToUtf32("fieldName"), ToUtf32("fieldName"), 0),
+                                new System.Text.Parsing.CharParser(':')),
+                            new System.Text.Parsing.NonterminalParser(ToUtf32("fieldValue"), ToUtf32("fieldValue"), 0))))));
             AddRule(new fieldNameRule(ToUtf32("fieldName"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.ActionParser(ToUtf32("A0"),
                     new System.Text.Parsing.NonterminalParser(ToUtf32("httpToken"), ToUtf32("httpToken"), 0))));
             AddRule(new fieldValueRule(ToUtf32("fieldValue"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.ActionParser(ToUtf32("A0"),
-                    new System.Text.Parsing.KleeneStarParser(
-                        new System.Text.Parsing.AnyCharParser()))));
+                    new System.Text.Parsing.GroupingParser(
+                        new System.Text.Parsing.KleeneStarParser(
+                            new System.Text.Parsing.AnyCharParser())))));
             AddRule(new dateValueRule(ToUtf32("dateValue"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.ActionParser(ToUtf32("A0"),
                     new System.Text.Parsing.NonterminalParser(ToUtf32("httpDate"), ToUtf32("httpDate"), 0))));
@@ -3024,7 +3046,43 @@ namespace System.Net.Http
                         new System.Text.Parsing.NonterminalParser(ToUtf32("asctimeDate"), ToUtf32("asctimeDate"), 0)))));
             AddRule(new rfc1123DateRule(ToUtf32("rfc1123Date"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.ActionParser(ToUtf32("A0"),
-                    new System.Text.Parsing.SequenceParser(
+                    new System.Text.Parsing.GroupingParser(
+                        new System.Text.Parsing.SequenceParser(
+                            new System.Text.Parsing.SequenceParser(
+                                new System.Text.Parsing.SequenceParser(
+                                    new System.Text.Parsing.SequenceParser(
+                                        new System.Text.Parsing.SequenceParser(
+                                            new System.Text.Parsing.SequenceParser(
+                                                new System.Text.Parsing.SequenceParser(
+                                                    new System.Text.Parsing.NonterminalParser(ToUtf32("wkday"), ToUtf32("wkday"), 0),
+                                                    new System.Text.Parsing.CharParser(',')),
+                                                new System.Text.Parsing.NonterminalParser(ToUtf32("SP"), ToUtf32("SP"), 0)),
+                                            new System.Text.Parsing.NonterminalParser(ToUtf32("date1"), ToUtf32("date1"), 0)),
+                                        new System.Text.Parsing.NonterminalParser(ToUtf32("SP"), ToUtf32("SP"), 0)),
+                                    new System.Text.Parsing.NonterminalParser(ToUtf32("time"), ToUtf32("time"), 0)),
+                                new System.Text.Parsing.NonterminalParser(ToUtf32("SP"), ToUtf32("SP"), 0)),
+                            new System.Text.Parsing.StringParser(ToUtf32("GMT")))))));
+            AddRule(new rfc850DateRule(ToUtf32("rfc850Date"), GetScope(), Domain()->GetNextRuleId(),
+                new System.Text.Parsing.ActionParser(ToUtf32("A0"),
+                    new System.Text.Parsing.GroupingParser(
+                        new System.Text.Parsing.SequenceParser(
+                            new System.Text.Parsing.SequenceParser(
+                                new System.Text.Parsing.SequenceParser(
+                                    new System.Text.Parsing.SequenceParser(
+                                        new System.Text.Parsing.SequenceParser(
+                                            new System.Text.Parsing.SequenceParser(
+                                                new System.Text.Parsing.SequenceParser(
+                                                    new System.Text.Parsing.NonterminalParser(ToUtf32("weekday"), ToUtf32("weekday"), 0),
+                                                    new System.Text.Parsing.StringParser(ToUtf32(","))),
+                                                new System.Text.Parsing.NonterminalParser(ToUtf32("SP"), ToUtf32("SP"), 0)),
+                                            new System.Text.Parsing.NonterminalParser(ToUtf32("date2"), ToUtf32("date2"), 0)),
+                                        new System.Text.Parsing.NonterminalParser(ToUtf32("SP"), ToUtf32("SP"), 0)),
+                                    new System.Text.Parsing.NonterminalParser(ToUtf32("time"), ToUtf32("time"), 0)),
+                                new System.Text.Parsing.NonterminalParser(ToUtf32("SP"), ToUtf32("SP"), 0)),
+                            new System.Text.Parsing.StringParser(ToUtf32("GMT")))))));
+            AddRule(new asctimeDateRule(ToUtf32("asctimeDate"), GetScope(), Domain()->GetNextRuleId(),
+                new System.Text.Parsing.ActionParser(ToUtf32("A0"),
+                    new System.Text.Parsing.GroupingParser(
                         new System.Text.Parsing.SequenceParser(
                             new System.Text.Parsing.SequenceParser(
                                 new System.Text.Parsing.SequenceParser(
@@ -3032,99 +3090,73 @@ namespace System.Net.Http
                                         new System.Text.Parsing.SequenceParser(
                                             new System.Text.Parsing.SequenceParser(
                                                 new System.Text.Parsing.NonterminalParser(ToUtf32("wkday"), ToUtf32("wkday"), 0),
-                                                new System.Text.Parsing.CharParser(',')),
-                                            new System.Text.Parsing.NonterminalParser(ToUtf32("SP"), ToUtf32("SP"), 0)),
-                                        new System.Text.Parsing.NonterminalParser(ToUtf32("date1"), ToUtf32("date1"), 0)),
-                                    new System.Text.Parsing.NonterminalParser(ToUtf32("SP"), ToUtf32("SP"), 0)),
-                                new System.Text.Parsing.NonterminalParser(ToUtf32("time"), ToUtf32("time"), 0)),
-                            new System.Text.Parsing.NonterminalParser(ToUtf32("SP"), ToUtf32("SP"), 0)),
-                        new System.Text.Parsing.StringParser(ToUtf32("GMT"))))));
-            AddRule(new rfc850DateRule(ToUtf32("rfc850Date"), GetScope(), Domain()->GetNextRuleId(),
-                new System.Text.Parsing.ActionParser(ToUtf32("A0"),
-                    new System.Text.Parsing.SequenceParser(
-                        new System.Text.Parsing.SequenceParser(
-                            new System.Text.Parsing.SequenceParser(
-                                new System.Text.Parsing.SequenceParser(
-                                    new System.Text.Parsing.SequenceParser(
-                                        new System.Text.Parsing.SequenceParser(
-                                            new System.Text.Parsing.SequenceParser(
-                                                new System.Text.Parsing.NonterminalParser(ToUtf32("weekday"), ToUtf32("weekday"), 0),
-                                                new System.Text.Parsing.StringParser(ToUtf32(","))),
-                                            new System.Text.Parsing.NonterminalParser(ToUtf32("SP"), ToUtf32("SP"), 0)),
-                                        new System.Text.Parsing.NonterminalParser(ToUtf32("date2"), ToUtf32("date2"), 0)),
-                                    new System.Text.Parsing.NonterminalParser(ToUtf32("SP"), ToUtf32("SP"), 0)),
-                                new System.Text.Parsing.NonterminalParser(ToUtf32("time"), ToUtf32("time"), 0)),
-                            new System.Text.Parsing.NonterminalParser(ToUtf32("SP"), ToUtf32("SP"), 0)),
-                        new System.Text.Parsing.StringParser(ToUtf32("GMT"))))));
-            AddRule(new asctimeDateRule(ToUtf32("asctimeDate"), GetScope(), Domain()->GetNextRuleId(),
-                new System.Text.Parsing.ActionParser(ToUtf32("A0"),
-                    new System.Text.Parsing.SequenceParser(
-                        new System.Text.Parsing.SequenceParser(
-                            new System.Text.Parsing.SequenceParser(
-                                new System.Text.Parsing.SequenceParser(
-                                    new System.Text.Parsing.SequenceParser(
-                                        new System.Text.Parsing.SequenceParser(
-                                            new System.Text.Parsing.NonterminalParser(ToUtf32("wkday"), ToUtf32("wkday"), 0),
-                                            new System.Text.Parsing.NonterminalParser(ToUtf32("SP"), ToUtf32("SP"), 0)),
-                                        new System.Text.Parsing.ActionParser(ToUtf32("A1"),
-                                            new System.Text.Parsing.NonterminalParser(ToUtf32("date3"), ToUtf32("date3"), 0))),
-                                    new System.Text.Parsing.NonterminalParser(ToUtf32("SP"), ToUtf32("SP"), 0)),
-                                new System.Text.Parsing.NonterminalParser(ToUtf32("time"), ToUtf32("time"), 0)),
-                            new System.Text.Parsing.NonterminalParser(ToUtf32("SP"), ToUtf32("SP"), 0)),
-                        new System.Text.Parsing.NonterminalParser(ToUtf32("Year"), ToUtf32("Year"), 0)))));
+                                                new System.Text.Parsing.NonterminalParser(ToUtf32("SP"), ToUtf32("SP"), 0)),
+                                            new System.Text.Parsing.ActionParser(ToUtf32("A1"),
+                                                new System.Text.Parsing.NonterminalParser(ToUtf32("date3"), ToUtf32("date3"), 0))),
+                                        new System.Text.Parsing.NonterminalParser(ToUtf32("SP"), ToUtf32("SP"), 0)),
+                                    new System.Text.Parsing.NonterminalParser(ToUtf32("time"), ToUtf32("time"), 0)),
+                                new System.Text.Parsing.NonterminalParser(ToUtf32("SP"), ToUtf32("SP"), 0)),
+                            new System.Text.Parsing.NonterminalParser(ToUtf32("Year"), ToUtf32("Year"), 0))))));
             AddRule(new date1Rule(ToUtf32("date1"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.ActionParser(ToUtf32("A0"),
-                    new System.Text.Parsing.SequenceParser(
+                    new System.Text.Parsing.GroupingParser(
                         new System.Text.Parsing.SequenceParser(
                             new System.Text.Parsing.SequenceParser(
                                 new System.Text.Parsing.SequenceParser(
-                                    new System.Text.Parsing.NonterminalParser(ToUtf32("Day"), ToUtf32("Day"), 0),
-                                    new System.Text.Parsing.NonterminalParser(ToUtf32("SP"), ToUtf32("SP"), 0)),
-                                new System.Text.Parsing.NonterminalParser(ToUtf32("month"), ToUtf32("month"), 0)),
-                            new System.Text.Parsing.NonterminalParser(ToUtf32("SP"), ToUtf32("SP"), 0)),
-                        new System.Text.Parsing.NonterminalParser(ToUtf32("Year"), ToUtf32("Year"), 0)))));
+                                    new System.Text.Parsing.SequenceParser(
+                                        new System.Text.Parsing.NonterminalParser(ToUtf32("Day"), ToUtf32("Day"), 0),
+                                        new System.Text.Parsing.NonterminalParser(ToUtf32("SP"), ToUtf32("SP"), 0)),
+                                    new System.Text.Parsing.NonterminalParser(ToUtf32("month"), ToUtf32("month"), 0)),
+                                new System.Text.Parsing.NonterminalParser(ToUtf32("SP"), ToUtf32("SP"), 0)),
+                            new System.Text.Parsing.NonterminalParser(ToUtf32("Year"), ToUtf32("Year"), 0))))));
             AddRule(new date2Rule(ToUtf32("date2"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.ActionParser(ToUtf32("A0"),
-                    new System.Text.Parsing.SequenceParser(
+                    new System.Text.Parsing.GroupingParser(
                         new System.Text.Parsing.SequenceParser(
                             new System.Text.Parsing.SequenceParser(
                                 new System.Text.Parsing.SequenceParser(
-                                    new System.Text.Parsing.NonterminalParser(ToUtf32("Day"), ToUtf32("Day"), 0),
-                                    new System.Text.Parsing.CharParser('-')),
-                                new System.Text.Parsing.NonterminalParser(ToUtf32("month"), ToUtf32("month"), 0)),
-                            new System.Text.Parsing.CharParser('-')),
-                        new System.Text.Parsing.NonterminalParser(ToUtf32("Year2"), ToUtf32("Year2"), 0)))));
+                                    new System.Text.Parsing.SequenceParser(
+                                        new System.Text.Parsing.NonterminalParser(ToUtf32("Day"), ToUtf32("Day"), 0),
+                                        new System.Text.Parsing.CharParser('-')),
+                                    new System.Text.Parsing.NonterminalParser(ToUtf32("month"), ToUtf32("month"), 0)),
+                                new System.Text.Parsing.CharParser('-')),
+                            new System.Text.Parsing.NonterminalParser(ToUtf32("Year2"), ToUtf32("Year2"), 0))))));
             AddRule(new date3Rule(ToUtf32("date3"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.ActionParser(ToUtf32("A0"),
-                    new System.Text.Parsing.SequenceParser(
-                        new System.Text.Parsing.SequenceParser(
-                            new System.Text.Parsing.ActionParser(ToUtf32("A1"),
-                                new System.Text.Parsing.NonterminalParser(ToUtf32("month"), ToUtf32("month"), 0)),
-                            new System.Text.Parsing.NonterminalParser(ToUtf32("SP"), ToUtf32("SP"), 0)),
-                        new System.Text.Parsing.AlternativeParser(
-                            new System.Text.Parsing.ActionParser(ToUtf32("A2"),
-                                new System.Text.Parsing.NonterminalParser(ToUtf32("Day"), ToUtf32("Day"), 0)),
-                            new System.Text.Parsing.ActionParser(ToUtf32("A3"),
-                                new System.Text.Parsing.NonterminalParser(ToUtf32("Day1"), ToUtf32("Day1"), 0)))))));
-            AddRule(new YearRule(ToUtf32("Year"), GetScope(), Domain()->GetNextRuleId(),
-                new System.Text.Parsing.ActionParser(ToUtf32("A0"),
-                    new System.Text.Parsing.SequenceParser(
+                    new System.Text.Parsing.GroupingParser(
                         new System.Text.Parsing.SequenceParser(
                             new System.Text.Parsing.SequenceParser(
-                                new System.Text.Parsing.NonterminalParser(ToUtf32("DIGIT"), ToUtf32("DIGIT"), 0),
+                                new System.Text.Parsing.ActionParser(ToUtf32("A1"),
+                                    new System.Text.Parsing.NonterminalParser(ToUtf32("month"), ToUtf32("month"), 0)),
+                                new System.Text.Parsing.NonterminalParser(ToUtf32("SP"), ToUtf32("SP"), 0)),
+                            new System.Text.Parsing.GroupingParser(
+                                new System.Text.Parsing.AlternativeParser(
+                                    new System.Text.Parsing.ActionParser(ToUtf32("A2"),
+                                        new System.Text.Parsing.NonterminalParser(ToUtf32("Day"), ToUtf32("Day"), 0)),
+                                    new System.Text.Parsing.ActionParser(ToUtf32("A3"),
+                                        new System.Text.Parsing.NonterminalParser(ToUtf32("Day1"), ToUtf32("Day1"), 0)))))))));
+            AddRule(new YearRule(ToUtf32("Year"), GetScope(), Domain()->GetNextRuleId(),
+                new System.Text.Parsing.ActionParser(ToUtf32("A0"),
+                    new System.Text.Parsing.GroupingParser(
+                        new System.Text.Parsing.SequenceParser(
+                            new System.Text.Parsing.SequenceParser(
+                                new System.Text.Parsing.SequenceParser(
+                                    new System.Text.Parsing.NonterminalParser(ToUtf32("DIGIT"), ToUtf32("DIGIT"), 0),
+                                    new System.Text.Parsing.NonterminalParser(ToUtf32("DIGIT"), ToUtf32("DIGIT"), 0)),
                                 new System.Text.Parsing.NonterminalParser(ToUtf32("DIGIT"), ToUtf32("DIGIT"), 0)),
-                            new System.Text.Parsing.NonterminalParser(ToUtf32("DIGIT"), ToUtf32("DIGIT"), 0)),
-                        new System.Text.Parsing.NonterminalParser(ToUtf32("DIGIT"), ToUtf32("DIGIT"), 0)))));
+                            new System.Text.Parsing.NonterminalParser(ToUtf32("DIGIT"), ToUtf32("DIGIT"), 0))))));
             AddRule(new Year2Rule(ToUtf32("Year2"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.ActionParser(ToUtf32("A0"),
-                    new System.Text.Parsing.SequenceParser(
-                        new System.Text.Parsing.NonterminalParser(ToUtf32("DIGIT"), ToUtf32("DIGIT"), 0),
-                        new System.Text.Parsing.NonterminalParser(ToUtf32("DIGIT"), ToUtf32("DIGIT"), 0)))));
+                    new System.Text.Parsing.GroupingParser(
+                        new System.Text.Parsing.SequenceParser(
+                            new System.Text.Parsing.NonterminalParser(ToUtf32("DIGIT"), ToUtf32("DIGIT"), 0),
+                            new System.Text.Parsing.NonterminalParser(ToUtf32("DIGIT"), ToUtf32("DIGIT"), 0))))));
             AddRule(new DayRule(ToUtf32("Day"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.ActionParser(ToUtf32("A0"),
-                    new System.Text.Parsing.SequenceParser(
-                        new System.Text.Parsing.NonterminalParser(ToUtf32("DIGIT"), ToUtf32("DIGIT"), 0),
-                        new System.Text.Parsing.NonterminalParser(ToUtf32("DIGIT"), ToUtf32("DIGIT"), 0)))));
+                    new System.Text.Parsing.GroupingParser(
+                        new System.Text.Parsing.SequenceParser(
+                            new System.Text.Parsing.NonterminalParser(ToUtf32("DIGIT"), ToUtf32("DIGIT"), 0),
+                            new System.Text.Parsing.NonterminalParser(ToUtf32("DIGIT"), ToUtf32("DIGIT"), 0))))));
             AddRule(new Day1Rule(ToUtf32("Day1"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.SequenceParser(
                     new System.Text.Parsing.NonterminalParser(ToUtf32("SP"), ToUtf32("SP"), 0),
@@ -3196,42 +3228,50 @@ namespace System.Net.Http
                         new System.Text.Parsing.StringParser(ToUtf32("Dec"))))));
             AddRule(new timeRule(ToUtf32("time"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.ActionParser(ToUtf32("A0"),
-                    new System.Text.Parsing.SequenceParser(
+                    new System.Text.Parsing.GroupingParser(
                         new System.Text.Parsing.SequenceParser(
                             new System.Text.Parsing.SequenceParser(
                                 new System.Text.Parsing.SequenceParser(
-                                    new System.Text.Parsing.NonterminalParser(ToUtf32("Hour"), ToUtf32("Hour"), 0),
-                                    new System.Text.Parsing.CharParser(':')),
-                                new System.Text.Parsing.NonterminalParser(ToUtf32("Min"), ToUtf32("Min"), 0)),
-                            new System.Text.Parsing.CharParser(':')),
-                        new System.Text.Parsing.NonterminalParser(ToUtf32("Sec"), ToUtf32("Sec"), 0)))));
+                                    new System.Text.Parsing.SequenceParser(
+                                        new System.Text.Parsing.NonterminalParser(ToUtf32("Hour"), ToUtf32("Hour"), 0),
+                                        new System.Text.Parsing.CharParser(':')),
+                                    new System.Text.Parsing.NonterminalParser(ToUtf32("Min"), ToUtf32("Min"), 0)),
+                                new System.Text.Parsing.CharParser(':')),
+                            new System.Text.Parsing.NonterminalParser(ToUtf32("Sec"), ToUtf32("Sec"), 0))))));
             AddRule(new HourRule(ToUtf32("Hour"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.ActionParser(ToUtf32("A0"),
-                    new System.Text.Parsing.SequenceParser(
-                        new System.Text.Parsing.NonterminalParser(ToUtf32("DIGIT"), ToUtf32("DIGIT"), 0),
-                        new System.Text.Parsing.NonterminalParser(ToUtf32("DIGIT"), ToUtf32("DIGIT"), 0)))));
+                    new System.Text.Parsing.GroupingParser(
+                        new System.Text.Parsing.SequenceParser(
+                            new System.Text.Parsing.NonterminalParser(ToUtf32("DIGIT"), ToUtf32("DIGIT"), 0),
+                            new System.Text.Parsing.NonterminalParser(ToUtf32("DIGIT"), ToUtf32("DIGIT"), 0))))));
             AddRule(new MinRule(ToUtf32("Min"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.ActionParser(ToUtf32("A0"),
-                    new System.Text.Parsing.SequenceParser(
-                        new System.Text.Parsing.NonterminalParser(ToUtf32("DIGIT"), ToUtf32("DIGIT"), 0),
-                        new System.Text.Parsing.NonterminalParser(ToUtf32("DIGIT"), ToUtf32("DIGIT"), 0)))));
+                    new System.Text.Parsing.GroupingParser(
+                        new System.Text.Parsing.SequenceParser(
+                            new System.Text.Parsing.NonterminalParser(ToUtf32("DIGIT"), ToUtf32("DIGIT"), 0),
+                            new System.Text.Parsing.NonterminalParser(ToUtf32("DIGIT"), ToUtf32("DIGIT"), 0))))));
             AddRule(new SecRule(ToUtf32("Sec"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.ActionParser(ToUtf32("A0"),
-                    new System.Text.Parsing.SequenceParser(
-                        new System.Text.Parsing.NonterminalParser(ToUtf32("DIGIT"), ToUtf32("DIGIT"), 0),
-                        new System.Text.Parsing.NonterminalParser(ToUtf32("DIGIT"), ToUtf32("DIGIT"), 0)))));
+                    new System.Text.Parsing.GroupingParser(
+                        new System.Text.Parsing.SequenceParser(
+                            new System.Text.Parsing.NonterminalParser(ToUtf32("DIGIT"), ToUtf32("DIGIT"), 0),
+                            new System.Text.Parsing.NonterminalParser(ToUtf32("DIGIT"), ToUtf32("DIGIT"), 0))))));
             AddRule(new deltaSecondsRule(ToUtf32("deltaSeconds"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.ActionParser(ToUtf32("A0"),
-                    new System.Text.Parsing.PositiveParser(
-                        new System.Text.Parsing.NonterminalParser(ToUtf32("DIGIT"), ToUtf32("DIGIT"), 0)))));
+                    new System.Text.Parsing.GroupingParser(
+                        new System.Text.Parsing.PositiveParser(
+                            new System.Text.Parsing.NonterminalParser(ToUtf32("DIGIT"), ToUtf32("DIGIT"), 0))))));
             AddRule(new httpTokenRule(ToUtf32("httpToken"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.ActionParser(ToUtf32("A0"),
-                    new System.Text.Parsing.PositiveParser(
-                        new System.Text.Parsing.DifferenceParser(
-                            new System.Text.Parsing.NonterminalParser(ToUtf32("CHAR"), ToUtf32("CHAR"), 0),
-                            new System.Text.Parsing.AlternativeParser(
-                                new System.Text.Parsing.NonterminalParser(ToUtf32("CTL"), ToUtf32("CTL"), 0),
-                                new System.Text.Parsing.NonterminalParser(ToUtf32("sep"), ToUtf32("sep"), 0)))))));
+                    new System.Text.Parsing.GroupingParser(
+                        new System.Text.Parsing.PositiveParser(
+                            new System.Text.Parsing.GroupingParser(
+                                new System.Text.Parsing.DifferenceParser(
+                                    new System.Text.Parsing.NonterminalParser(ToUtf32("CHAR"), ToUtf32("CHAR"), 0),
+                                    new System.Text.Parsing.GroupingParser(
+                                        new System.Text.Parsing.AlternativeParser(
+                                            new System.Text.Parsing.NonterminalParser(ToUtf32("CTL"), ToUtf32("CTL"), 0),
+                                            new System.Text.Parsing.NonterminalParser(ToUtf32("sep"), ToUtf32("sep"), 0))))))))));
             AddRule(new System.Text.Parsing.RuleParser(ToUtf32("sep"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.AlternativeParser(
                     new System.Text.Parsing.AlternativeParser(
@@ -3243,33 +3283,37 @@ namespace System.Net.Http
                     new System.Text.Parsing.SequenceParser(
                         new System.Text.Parsing.CharParser('('),
                         new System.Text.Parsing.KleeneStarParser(
-                            new System.Text.Parsing.AlternativeParser(
+                            new System.Text.Parsing.GroupingParser(
                                 new System.Text.Parsing.AlternativeParser(
-                                    new System.Text.Parsing.NonterminalParser(ToUtf32("ctext"), ToUtf32("ctext"), 0),
-                                    new System.Text.Parsing.NonterminalParser(ToUtf32("quotedPair"), ToUtf32("quotedPair"), 0)),
-                                new System.Text.Parsing.NonterminalParser(ToUtf32("comment"), ToUtf32("comment"), 0)))),
+                                    new System.Text.Parsing.AlternativeParser(
+                                        new System.Text.Parsing.NonterminalParser(ToUtf32("ctext"), ToUtf32("ctext"), 0),
+                                        new System.Text.Parsing.NonterminalParser(ToUtf32("quotedPair"), ToUtf32("quotedPair"), 0)),
+                                    new System.Text.Parsing.NonterminalParser(ToUtf32("comment"), ToUtf32("comment"), 0))))),
                     new System.Text.Parsing.CharParser(')'))));
             AddRule(new ctextRule(ToUtf32("ctext"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.ActionParser(ToUtf32("A0"),
-                    new System.Text.Parsing.DifferenceParser(
-                        new System.Text.Parsing.NonterminalParser(ToUtf32("TEXT"), ToUtf32("TEXT"), 0),
-                        new System.Text.Parsing.CharSetParser(ToUtf32("()"))))));
+                    new System.Text.Parsing.GroupingParser(
+                        new System.Text.Parsing.DifferenceParser(
+                            new System.Text.Parsing.NonterminalParser(ToUtf32("TEXT"), ToUtf32("TEXT"), 0),
+                            new System.Text.Parsing.CharSetParser(ToUtf32("()")))))));
             AddRule(new quotedStringRule(ToUtf32("quotedString"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.SequenceParser(
                     new System.Text.Parsing.SequenceParser(
                         new System.Text.Parsing.CharParser('\"'),
                         new System.Text.Parsing.KleeneStarParser(
-                            new System.Text.Parsing.AlternativeParser(
-                                new System.Text.Parsing.ActionParser(ToUtf32("A0"),
-                                    new System.Text.Parsing.NonterminalParser(ToUtf32("qdtext"), ToUtf32("qdtext"), 0)),
-                                new System.Text.Parsing.ActionParser(ToUtf32("A1"),
-                                    new System.Text.Parsing.NonterminalParser(ToUtf32("quotedPair"), ToUtf32("quotedPair"), 0))))),
+                            new System.Text.Parsing.GroupingParser(
+                                new System.Text.Parsing.AlternativeParser(
+                                    new System.Text.Parsing.ActionParser(ToUtf32("A0"),
+                                        new System.Text.Parsing.NonterminalParser(ToUtf32("qdtext"), ToUtf32("qdtext"), 0)),
+                                    new System.Text.Parsing.ActionParser(ToUtf32("A1"),
+                                        new System.Text.Parsing.NonterminalParser(ToUtf32("quotedPair"), ToUtf32("quotedPair"), 0)))))),
                     new System.Text.Parsing.CharParser('\"'))));
             AddRule(new qdtextRule(ToUtf32("qdtext"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.ActionParser(ToUtf32("A0"),
-                    new System.Text.Parsing.DifferenceParser(
-                        new System.Text.Parsing.NonterminalParser(ToUtf32("TEXT"), ToUtf32("TEXT"), 0),
-                        new System.Text.Parsing.CharParser('\"')))));
+                    new System.Text.Parsing.GroupingParser(
+                        new System.Text.Parsing.DifferenceParser(
+                            new System.Text.Parsing.NonterminalParser(ToUtf32("TEXT"), ToUtf32("TEXT"), 0),
+                            new System.Text.Parsing.CharParser('\"'))))));
             AddRule(new quotedPairRule(ToUtf32("quotedPair"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.SequenceParser(
                     new System.Text.Parsing.CharParser('\\'),
@@ -3313,17 +3357,19 @@ namespace System.Net.Http
                     new System.Text.Parsing.OptionalParser(
                         new System.Text.Parsing.NonterminalParser(ToUtf32("CRLF"), ToUtf32("CRLF"), 0)),
                     new System.Text.Parsing.PositiveParser(
-                        new System.Text.Parsing.AlternativeParser(
-                            new System.Text.Parsing.NonterminalParser(ToUtf32("SP"), ToUtf32("SP"), 0),
-                            new System.Text.Parsing.NonterminalParser(ToUtf32("HT"), ToUtf32("HT"), 0))))));
+                        new System.Text.Parsing.GroupingParser(
+                            new System.Text.Parsing.AlternativeParser(
+                                new System.Text.Parsing.NonterminalParser(ToUtf32("SP"), ToUtf32("SP"), 0),
+                                new System.Text.Parsing.NonterminalParser(ToUtf32("HT"), ToUtf32("HT"), 0)))))));
             AddRule(new System.Text.Parsing.RuleParser(ToUtf32("TEXT"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.AlternativeParser(
                     new System.Text.Parsing.AlternativeParser(
                         new System.Text.Parsing.AlternativeParser(
                             new System.Text.Parsing.AlternativeParser(
-                                new System.Text.Parsing.DifferenceParser(
-                                    new System.Text.Parsing.NonterminalParser(ToUtf32("OCTET"), ToUtf32("OCTET"), 0),
-                                    new System.Text.Parsing.NonterminalParser(ToUtf32("CTL"), ToUtf32("CTL"), 0)),
+                                new System.Text.Parsing.GroupingParser(
+                                    new System.Text.Parsing.DifferenceParser(
+                                        new System.Text.Parsing.NonterminalParser(ToUtf32("OCTET"), ToUtf32("OCTET"), 0),
+                                        new System.Text.Parsing.NonterminalParser(ToUtf32("CTL"), ToUtf32("CTL"), 0))),
                                 new System.Text.Parsing.NonterminalParser(ToUtf32("CR"), ToUtf32("CR"), 0)),
                             new System.Text.Parsing.NonterminalParser(ToUtf32("LF"), ToUtf32("LF"), 0)),
                         new System.Text.Parsing.NonterminalParser(ToUtf32("SP"), ToUtf32("SP"), 0)),

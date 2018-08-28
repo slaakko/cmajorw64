@@ -11,22 +11,22 @@ namespace cmajor.parser
     }
     grammar Constant
     {
-        Constant(ParsingContext* ctx): ConstantNode*;
+        Constant(ParsingContext* ctx, var std::u32string strValue): ConstantNode*;
     }
     grammar Class
     {
-        Class(ParsingContext* ctx, var std::unique_ptr<Attributes> attributes): ClassNode*;
+        Class(ParsingContext* ctx, var std::unique_ptr<Attributes> attributes, var Span specifierSpan, var Span classSpan, var Span beginBraceSpan, var Span endBraceSpan): ClassNode*;
         InheritanceAndInterfaces(ParsingContext* ctx, ClassNode* classNode);
         BaseClassOrInterface(ParsingContext* ctx): Node*;
         ClassContent(ParsingContext* ctx, ClassNode* classNode);
         ClassMember(ParsingContext* ctx, ClassNode* classNode): Node*;
-        StaticConstructor(ParsingContext* ctx, ClassNode* classNode, var std::unique_ptr<IdentifierNode> id, var std::unique_ptr<Attributes> attributes): StaticConstructorNode*;
-        Constructor(ParsingContext* ctx, ClassNode* classNode, var std::unique_ptr<IdentifierNode> id, var std::unique_ptr<ConstructorNode> ctor, var std::unique_ptr<Attributes> attributes): Node*;
-        Destructor(ParsingContext* ctx, ClassNode* classNode, var std::unique_ptr<IdentifierNode> id, var std::unique_ptr<DestructorNode> dtor, var std::unique_ptr<Attributes> attributes): Node*;
+        StaticConstructor(ParsingContext* ctx, ClassNode* classNode, var std::unique_ptr<IdentifierNode> id, var std::unique_ptr<Attributes> attributes, var Span specifierSpan): StaticConstructorNode*;
+        Constructor(ParsingContext* ctx, ClassNode* classNode, var std::unique_ptr<IdentifierNode> id, var std::unique_ptr<ConstructorNode> ctor, var std::unique_ptr<Attributes> attributes, var Span specifierSpan): Node*;
+        Destructor(ParsingContext* ctx, ClassNode* classNode, var std::unique_ptr<IdentifierNode> id, var std::unique_ptr<DestructorNode> dtor, var std::unique_ptr<Attributes> attributes, var Span specifierSpan): Node*;
         Initializer(ParsingContext* ctx): InitializerNode*;
-        MemberFunction(ParsingContext* ctx, var std::unique_ptr<MemberFunctionNode> memFun, var std::unique_ptr<IdentifierNode> qid, var std::unique_ptr<Attributes> attributes): Node*;
-        ConversionFunction(ParsingContext* ctx, var std::unique_ptr<ConversionFunctionNode> conversionFun, var std::unique_ptr<Attributes> attributes): Node*;
-        MemberVariable(ParsingContext* ctx, var std::unique_ptr<Attributes> attributes): Node*;
+        MemberFunction(ParsingContext* ctx, var std::unique_ptr<MemberFunctionNode> memFun, var std::unique_ptr<IdentifierNode> qid, var std::unique_ptr<Attributes> attributes, var Span specifierSpan, var Span groupIdSpan): Node*;
+        ConversionFunction(ParsingContext* ctx, var std::unique_ptr<ConversionFunctionNode> conversionFun, var std::unique_ptr<Attributes> attributes, var Span specifierSpan): Node*;
+        MemberVariable(ParsingContext* ctx, var std::unique_ptr<Attributes> attributes, var Span specifierSpan): MemberVariableNode*;
     }
     grammar Solution
     {
@@ -38,7 +38,7 @@ namespace cmajor.parser
     }
     grammar Enumeration
     {
-        EnumType(ParsingContext* ctx): EnumTypeNode*;
+        EnumType(ParsingContext* ctx, var Span beginBraceSpan, var Span endBraceSpan): EnumTypeNode*;
         UnderlyingType(ParsingContext* ctx): Node*;
         EnumConstants(ParsingContext* ctx, EnumTypeNode* enumType);
         EnumConstant(ParsingContext* ctx, EnumTypeNode* enumType, var Span s): EnumConstantNode*;
@@ -81,7 +81,7 @@ namespace cmajor.parser
     }
     grammar Concept
     {
-        Concept(ParsingContext* ctx): ConceptNode*;
+        Concept(ParsingContext* ctx, var Span beginBraceSpan, var Span endBraceSpan): ConceptNode*;
         Refinement: ConceptIdNode*;
         ConceptBody(ParsingContext* ctx, ConceptNode* concept);
         ConceptBodyConstraint(ParsingContext* ctx, ConceptNode* concept);
@@ -91,7 +91,7 @@ namespace cmajor.parser
         DestructorConstraint(ParsingContext* ctx, IdentifierNode* firstTypeParameter, var std::unique_ptr<IdentifierNode> id): ConstraintNode*;
         MemberFunctionConstraint(ParsingContext* ctx, var std::unique_ptr<Node> returnType, var std::unique_ptr<IdentifierNode> typeParam): ConstraintNode*;
         FunctionConstraint(ParsingContext* ctx): ConstraintNode*;
-        EmbeddedConstraint(ParsingContext* ctx): ConstraintNode*;
+        EmbeddedConstraint(ParsingContext* ctx): WhereConstraintNode*;
         WhereConstraint(ParsingContext* ctx): WhereConstraintNode*;
         ConstraintExpr(ParsingContext* ctx): ConstraintNode*;
         DisjunctiveConstraintExpr(ParsingContext* ctx, var Span s): ConstraintNode*;
@@ -102,7 +102,7 @@ namespace cmajor.parser
         IsConstraint(ParsingContext* ctx, var std::unique_ptr<Node> typeExpr): ConstraintNode*;
         ConceptOrTypeName(ParsingContext* ctx): Node*;
         MultiParamConstraint(ParsingContext* ctx, var std::unique_ptr<MultiParamConstraintNode> constraint): ConstraintNode*;
-        Axiom(ParsingContext* ctx, ConceptNode* concept, var std::unique_ptr<AxiomNode> axiom);
+        Axiom(ParsingContext* ctx, ConceptNode* concept, var std::unique_ptr<AxiomNode> axiom, var Span axiomSpan, var Span beginBraceSpan, var Span endBraceSpan);
         AxiomBody(ParsingContext* ctx, AxiomNode* axiom);
         AxiomStatement(ParsingContext* ctx): AxiomStatementNode*;
     }
@@ -135,7 +135,7 @@ namespace cmajor.parser
     }
     grammar Function
     {
-        Function(ParsingContext* ctx, var std::unique_ptr<FunctionNode> fun, var Span s, var std::unique_ptr<Attributes> attributes): FunctionNode*;
+        Function(ParsingContext* ctx, var std::unique_ptr<FunctionNode> fun, var Span s, var Span specifierSpan, var Span groupIdSpan, var std::unique_ptr<Attributes> attributes): FunctionNode*;
         FunctionGroupId(ParsingContext* ctx, var std::unique_ptr<IdentifierNode> id): std::u32string;
         OperatorFunctionGroupId(ParsingContext* ctx, var std::unique_ptr<Node> typeExpr): std::u32string;
     }
@@ -146,7 +146,7 @@ namespace cmajor.parser
     }
     grammar Interface
     {
-        Interface(ParsingContext* ctx, var std::unique_ptr<Attributes> attributes): InterfaceNode*;
+        Interface(ParsingContext* ctx, var std::unique_ptr<Attributes> attributes, var Span specifierSpan, var Span beginBraceSpan, var Span endBraceSpan): InterfaceNode*;
         InterfaceContent(ParsingContext* ctx, InterfaceNode* intf);
         InterfaceMemFun(ParsingContext* ctx, var std::unique_ptr<MemberFunctionNode> memFun, var std::unique_ptr<Attributes> attributes): Node*;
         InterfaceFunctionGroupId(var std::unique_ptr<IdentifierNode> id): std::u32string;
@@ -167,20 +167,20 @@ namespace cmajor.parser
     }
     grammar Literal
     {
-        Literal(ParsingContext* ctx): Node*;
-        BooleanLiteral: Node*;
-        FloatingLiteral(var Span s): Node*;
+        Literal(ParsingContext* ctx): LiteralNode*;
+        BooleanLiteral: LiteralNode*;
+        FloatingLiteral(var Span s): LiteralNode*;
         FloatingLiteralValue: double;
         FractionalFloatingLiteral;
         ExponentFloatingLiteral;
         ExponentPart;
-        IntegerLiteral(var Span s): Node*;
+        IntegerLiteral(var Span s): LiteralNode*;
         IntegerLiteralValue: uint64_t;
         HexIntegerLiteral: uint64_t;
         DecIntegerLiteral: uint64_t;
-        CharLiteral(var char32_t litValue): Node*;
-        StringLiteral(var std::u32string s): Node*;
-        NullLiteral: Node*;
+        CharLiteral(var char32_t litValue): LiteralNode*;
+        StringLiteral(var std::u32string s): LiteralNode*;
+        NullLiteral: LiteralNode*;
         ArrayLiteral(ParsingContext* ctx): ArrayLiteralNode*;
         StructuredLiteral(ParsingContext* ctx): StructuredLiteralNode*;
         CharEscape: char32_t;
@@ -212,6 +212,7 @@ namespace cmajor.parser
         SourceTokens(SourceTokenFormatter* formatter);
         SourceToken(SourceTokenFormatter* formatter);
         Spaces: std::u32string;
+        LineComment;
         Other: std::u32string;
     }
     grammar Specifier
@@ -228,18 +229,18 @@ namespace cmajor.parser
         ControlStatement(ParsingContext* ctx): StatementNode*;
         CompoundStatement(ParsingContext* ctx): CompoundStatementNode*;
         ReturnStatement(ParsingContext* ctx): StatementNode*;
-        IfStatement(ParsingContext* ctx): StatementNode*;
-        WhileStatement(ParsingContext* ctx): StatementNode*;
-        DoStatement(ParsingContext* ctx): StatementNode*;
-        ForStatement(ParsingContext* ctx): StatementNode*;
+        IfStatement(ParsingContext* ctx, var Span leftParenSpan, var Span rightParenSpan, var Span elseSpan): IfStatementNode*;
+        WhileStatement(ParsingContext* ctx, var Span leftParenSpan, var Span rightParenSpan): WhileStatementNode*;
+        DoStatement(ParsingContext* ctx, var Span whileSpan, var Span leftParenSpan, var Span rightParenSpan): DoStatementNode*;
+        ForStatement(ParsingContext* ctx, var Span leftParenSpan, var Span rightParenSpan): ForStatementNode*;
         ForInitStatement(ParsingContext* ctx): StatementNode*;
         ForLoopStatementExpr(ParsingContext* ctx): StatementNode*;
-        RangeForStatement(ParsingContext* ctx): StatementNode*;
+        RangeForStatement(ParsingContext* ctx, var Span leftParenSpan, var Span rightParenSpan, var Span colonSpan): RangeForStatementNode*;
         BreakStatement(ParsingContext* ctx): StatementNode*;
         ContinueStatement(ParsingContext* ctx): StatementNode*;
         GotoStatement(ParsingContext* ctx): StatementNode*;
-        SwitchStatement(ParsingContext* ctx): SwitchStatementNode*;
-        CaseStatement(ParsingContext* ctx, var std::unique_ptr<CaseStatementNode> caseS): CaseStatementNode*;
+        SwitchStatement(ParsingContext* ctx, var Span leftParenSpan, var Span rightParenSpan, var Span beginBraceSpan, var Span endBraceSpan): SwitchStatementNode*;
+        CaseStatement(ParsingContext* ctx, var std::unique_ptr<CaseStatementNode> caseS, var Span caseSpan): CaseStatementNode*;
         DefaultStatement(ParsingContext* ctx): DefaultStatementNode*;
         GotoCaseStatement(ParsingContext* ctx): StatementNode*;
         GotoDefaultStatement(ParsingContext* ctx): StatementNode*;
@@ -252,9 +253,9 @@ namespace cmajor.parser
         EmptyStatement(ParsingContext* ctx): StatementNode*;
         ThrowStatement(ParsingContext* ctx): StatementNode*;
         TryStatement(ParsingContext* ctx): TryStatementNode*;
-        Catch(ParsingContext* ctx): CatchNode*;
+        Catch(ParsingContext* ctx, var Span leftParenSpan, var Span rightParenSpan): CatchNode*;
         AssertStatement(ParsingContext* ctx): StatementNode*;
-        ConditionalCompilationStatement(ParsingContext* ctx): ConditionalCompilationStatementNode*;
+        ConditionalCompilationStatement(ParsingContext* ctx, var Span leftParenSpan, var Span rightParenSpan, var Span keywordSpan): ConditionalCompilationStatementNode*;
         ConditionalCompilationExpression: ConditionalCompilationExpressionNode*;
         ConditionalCompilationDisjunction(var Span s): ConditionalCompilationExpressionNode*;
         ConditionalCompilationConjunction(var Span s): ConditionalCompilationExpressionNode*;

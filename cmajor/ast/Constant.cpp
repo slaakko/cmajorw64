@@ -40,6 +40,7 @@ void ConstantNode::Write(AstWriter& writer)
     writer.Write(typeExpr.get());
     writer.Write(id.get());
     writer.Write(value.get());
+    writer.GetBinaryWriter().Write(strValue);
 }
 
 void ConstantNode::Read(AstReader& reader)
@@ -52,6 +53,7 @@ void ConstantNode::Read(AstReader& reader)
     id->SetParent(this);
     value.reset(reader.ReadNode());
     value->SetParent(this);
+    strValue = reader.GetBinaryReader().ReadUtf32String();
 }
 
 } } // namespace cmajor::ast

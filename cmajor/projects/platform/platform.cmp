@@ -1,3 +1,0 @@
-project platform;
-target=program;
-source <main.cm>;

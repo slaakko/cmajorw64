@@ -5,7 +5,7 @@
 
 #include <cmajor/util/BinaryWriter.hpp>
 #include <cmajor/util/Unicode.hpp>
-#include <string.h>
+#include <cstring>
  
 namespace cmajor { namespace util {
 

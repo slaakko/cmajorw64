@@ -40,8 +40,29 @@ void VariableSymbol::EmplaceType(TypeSymbol* typeSymbol, int index)
     type = typeSymbol;
 }
 
-ParameterSymbol::ParameterSymbol(const Span& span_, const std::u32string& name_) : VariableSymbol(SymbolType::parameterSymbol, span_, name_)
+ParameterSymbol::ParameterSymbol(const Span& span_, const std::u32string& name_) : VariableSymbol(SymbolType::parameterSymbol, span_, name_), artificialName(false)
 {
+}
+
+void ParameterSymbol::Write(SymbolWriter& writer)
+{
+    VariableSymbol::Write(writer);
+    writer.GetBinaryWriter().Write(artificialName);
+}
+
+void ParameterSymbol::Read(SymbolReader& reader)
+{
+    VariableSymbol::Read(reader);
+    artificialName = reader.GetBinaryReader().ReadBool();
+}
+
+std::u32string ParameterSymbol::CodeName() const
+{
+    if (artificialName)
+    {
+        return std::u32string();
+    }
+    return VariableSymbol::CodeName();
 }
 
 void ParameterSymbol::ComputeExportClosure()

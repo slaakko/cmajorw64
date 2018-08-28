@@ -1250,4 +1250,38 @@ std::string BaseNode::ToString() const
     return "base";
 }
 
+ParenthesizedExpressionNode::ParenthesizedExpressionNode(const Span& span_) : UnaryNode(NodeType::parenthesizedExpressionNode, span_)
+{
+}
+
+ParenthesizedExpressionNode::ParenthesizedExpressionNode(const Span& span_, Node* child_) : UnaryNode(NodeType::parenthesizedExpressionNode, span_, child_)
+{
+}
+
+Node* ParenthesizedExpressionNode::Clone(CloneContext& cloneContext) const
+{
+    ParenthesizedExpressionNode* clone = new ParenthesizedExpressionNode(GetSpan(), Subject()->Clone(cloneContext));
+    return clone;
+}
+
+void ParenthesizedExpressionNode::Write(AstWriter& writer)
+{
+    UnaryNode::Write(writer);
+}
+
+void ParenthesizedExpressionNode::Read(AstReader& reader)
+{
+    UnaryNode::Read(reader);
+}
+
+void ParenthesizedExpressionNode::Accept(Visitor& visitor)
+{
+    visitor.Visit(*this);
+}
+
+std::string ParenthesizedExpressionNode::ToString() const
+{
+    return "(" + Subject()->ToString() + ")";
+}
+
 } } // namespace cmajor::ast

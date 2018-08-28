@@ -2,6 +2,8 @@ using System;
 using System.Collections;
 using System.Text.Parsing;
 
+// this source file has been automatically generated from 'StdLib.parser' using cmparsergen version 2.0.0.
+
 namespace System.Text.Parsing
 {
     public class stdlib : System.Text.Parsing.Grammar
@@ -1275,19 +1277,22 @@ namespace System.Text.Parsing
                     new System.Text.Parsing.SequenceParser(
                         new System.Text.Parsing.StringParser(ToUtf32("/*")),
                         new System.Text.Parsing.KleeneStarParser(
-                            new System.Text.Parsing.AlternativeParser(
+                            new System.Text.Parsing.GroupingParser(
                                 new System.Text.Parsing.AlternativeParser(
-                                    new System.Text.Parsing.NonterminalParser(ToUtf32("string"), ToUtf32("string"), 0),
-                                    new System.Text.Parsing.NonterminalParser(ToUtf32("char"), ToUtf32("char"), 0)),
-                                new System.Text.Parsing.DifferenceParser(
-                                    new System.Text.Parsing.AnyCharParser(),
-                                    new System.Text.Parsing.StringParser(ToUtf32("*/")))))),
+                                    new System.Text.Parsing.AlternativeParser(
+                                        new System.Text.Parsing.NonterminalParser(ToUtf32("string"), ToUtf32("string"), 0),
+                                        new System.Text.Parsing.NonterminalParser(ToUtf32("char"), ToUtf32("char"), 0)),
+                                    new System.Text.Parsing.GroupingParser(
+                                        new System.Text.Parsing.DifferenceParser(
+                                            new System.Text.Parsing.AnyCharParser(),
+                                            new System.Text.Parsing.StringParser(ToUtf32("*/")))))))),
                     new System.Text.Parsing.StringParser(ToUtf32("*/")))));
             AddRule(new System.Text.Parsing.RuleParser(ToUtf32("spaces_and_comments"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.PositiveParser(
-                    new System.Text.Parsing.AlternativeParser(
-                        new System.Text.Parsing.SpaceParser(),
-                        new System.Text.Parsing.NonterminalParser(ToUtf32("comment"), ToUtf32("comment"), 0)))));
+                    new System.Text.Parsing.GroupingParser(
+                        new System.Text.Parsing.AlternativeParser(
+                            new System.Text.Parsing.SpaceParser(),
+                            new System.Text.Parsing.NonterminalParser(ToUtf32("comment"), ToUtf32("comment"), 0))))));
             AddRule(new System.Text.Parsing.RuleParser(ToUtf32("digit_sequence"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.TokenParser(
                     new System.Text.Parsing.PositiveParser(
@@ -1367,9 +1372,10 @@ namespace System.Text.Parsing
                 new System.Text.Parsing.ActionParser(ToUtf32("A0"),
                     new System.Text.Parsing.TokenParser(
                         new System.Text.Parsing.SequenceParser(
-                            new System.Text.Parsing.AlternativeParser(
-                                new System.Text.Parsing.StringParser(ToUtf32("0x")),
-                                new System.Text.Parsing.StringParser(ToUtf32("0X"))),
+                            new System.Text.Parsing.GroupingParser(
+                                new System.Text.Parsing.AlternativeParser(
+                                    new System.Text.Parsing.StringParser(ToUtf32("0x")),
+                                    new System.Text.Parsing.StringParser(ToUtf32("0X")))),
                             new System.Text.Parsing.ExpectationParser(
                                 new System.Text.Parsing.NonterminalParser(ToUtf32("hex"), ToUtf32("hex"), 0)))))));
             AddRule(new octal_digitRule(ToUtf32("octal_digit"), GetScope(), Domain()->GetNextRuleId(),
@@ -1466,42 +1472,46 @@ namespace System.Text.Parsing
                         new System.Text.Parsing.SequenceParser(
                             new System.Text.Parsing.NonterminalParser(ToUtf32("first"), ToUtf32("identifier"), 0),
                             new System.Text.Parsing.KleeneStarParser(
-                                new System.Text.Parsing.SequenceParser(
-                                    new System.Text.Parsing.CharParser('.'),
-                                    new System.Text.Parsing.NonterminalParser(ToUtf32("rest"), ToUtf32("identifier"), 0))))))));
+                                new System.Text.Parsing.GroupingParser(
+                                    new System.Text.Parsing.SequenceParser(
+                                        new System.Text.Parsing.CharParser('.'),
+                                        new System.Text.Parsing.NonterminalParser(ToUtf32("rest"), ToUtf32("identifier"), 0)))))))));
             AddRule(new escapeRule(ToUtf32("escape"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.TokenParser(
                     new System.Text.Parsing.SequenceParser(
                         new System.Text.Parsing.CharParser('\\'),
-                        new System.Text.Parsing.AlternativeParser(
+                        new System.Text.Parsing.GroupingParser(
                             new System.Text.Parsing.AlternativeParser(
                                 new System.Text.Parsing.AlternativeParser(
-                                    new System.Text.Parsing.SequenceParser(
-                                        new System.Text.Parsing.CharSetParser(ToUtf32("xX")),
-                                        new System.Text.Parsing.ActionParser(ToUtf32("A0"),
-                                            new System.Text.Parsing.NonterminalParser(ToUtf32("x"), ToUtf32("hexdword"), 0))),
-                                    new System.Text.Parsing.ActionParser(ToUtf32("A1"),
+                                    new System.Text.Parsing.AlternativeParser(
                                         new System.Text.Parsing.SequenceParser(
-                                            new System.Text.Parsing.SequenceParser(
-                                                new System.Text.Parsing.NonterminalParser(ToUtf32("o1"), ToUtf32("octal_digit"), 0),
-                                                new System.Text.Parsing.NonterminalParser(ToUtf32("o2"), ToUtf32("octal_digit"), 0)),
-                                            new System.Text.Parsing.NonterminalParser(ToUtf32("o3"), ToUtf32("octal_digit"), 0)))),
-                                new System.Text.Parsing.SequenceParser(
-                                    new System.Text.Parsing.CharSetParser(ToUtf32("dD")),
-                                    new System.Text.Parsing.ActionParser(ToUtf32("A2"),
-                                        new System.Text.Parsing.NonterminalParser(ToUtf32("d"), ToUtf32("uint"), 0)))),
-                            new System.Text.Parsing.ActionParser(ToUtf32("A3"),
-                                new System.Text.Parsing.CharSetParser(ToUtf32("dDxX"), true)))))));
+                                            new System.Text.Parsing.CharSetParser(ToUtf32("xX")),
+                                            new System.Text.Parsing.ActionParser(ToUtf32("A0"),
+                                                new System.Text.Parsing.NonterminalParser(ToUtf32("x"), ToUtf32("hexdword"), 0))),
+                                        new System.Text.Parsing.ActionParser(ToUtf32("A1"),
+                                            new System.Text.Parsing.GroupingParser(
+                                                new System.Text.Parsing.SequenceParser(
+                                                    new System.Text.Parsing.SequenceParser(
+                                                        new System.Text.Parsing.NonterminalParser(ToUtf32("o1"), ToUtf32("octal_digit"), 0),
+                                                        new System.Text.Parsing.NonterminalParser(ToUtf32("o2"), ToUtf32("octal_digit"), 0)),
+                                                    new System.Text.Parsing.NonterminalParser(ToUtf32("o3"), ToUtf32("octal_digit"), 0))))),
+                                    new System.Text.Parsing.SequenceParser(
+                                        new System.Text.Parsing.CharSetParser(ToUtf32("dD")),
+                                        new System.Text.Parsing.ActionParser(ToUtf32("A2"),
+                                            new System.Text.Parsing.NonterminalParser(ToUtf32("d"), ToUtf32("uint"), 0)))),
+                                new System.Text.Parsing.ActionParser(ToUtf32("A3"),
+                                    new System.Text.Parsing.CharSetParser(ToUtf32("dDxX"), true))))))));
             AddRule(new charRule(ToUtf32("char"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.TokenParser(
                     new System.Text.Parsing.SequenceParser(
                         new System.Text.Parsing.SequenceParser(
                             new System.Text.Parsing.CharParser('\''),
-                            new System.Text.Parsing.AlternativeParser(
-                                new System.Text.Parsing.ActionParser(ToUtf32("A0"),
-                                    new System.Text.Parsing.CharSetParser(ToUtf32("\\\r\n"), true)),
-                                new System.Text.Parsing.ActionParser(ToUtf32("A1"),
-                                    new System.Text.Parsing.NonterminalParser(ToUtf32("escape"), ToUtf32("escape"), 0)))),
+                            new System.Text.Parsing.GroupingParser(
+                                new System.Text.Parsing.AlternativeParser(
+                                    new System.Text.Parsing.ActionParser(ToUtf32("A0"),
+                                        new System.Text.Parsing.CharSetParser(ToUtf32("\\\r\n"), true)),
+                                    new System.Text.Parsing.ActionParser(ToUtf32("A1"),
+                                        new System.Text.Parsing.NonterminalParser(ToUtf32("escape"), ToUtf32("escape"), 0))))),
                         new System.Text.Parsing.ExpectationParser(
                             new System.Text.Parsing.CharParser('\''))))));
             AddRule(new stringRule(ToUtf32("string"), GetScope(), Domain()->GetNextRuleId(),
@@ -1510,12 +1520,14 @@ namespace System.Text.Parsing
                         new System.Text.Parsing.SequenceParser(
                             new System.Text.Parsing.CharParser('\"'),
                             new System.Text.Parsing.KleeneStarParser(
-                                new System.Text.Parsing.AlternativeParser(
-                                    new System.Text.Parsing.ActionParser(ToUtf32("A0"),
-                                        new System.Text.Parsing.PositiveParser(
-                                            new System.Text.Parsing.CharSetParser(ToUtf32("\"\\\r\n"), true))),
-                                    new System.Text.Parsing.ActionParser(ToUtf32("A1"),
-                                        new System.Text.Parsing.NonterminalParser(ToUtf32("escape"), ToUtf32("escape"), 0))))),
+                                new System.Text.Parsing.GroupingParser(
+                                    new System.Text.Parsing.AlternativeParser(
+                                        new System.Text.Parsing.ActionParser(ToUtf32("A0"),
+                                            new System.Text.Parsing.GroupingParser(
+                                                new System.Text.Parsing.PositiveParser(
+                                                    new System.Text.Parsing.CharSetParser(ToUtf32("\"\\\r\n"), true)))),
+                                        new System.Text.Parsing.ActionParser(ToUtf32("A1"),
+                                            new System.Text.Parsing.NonterminalParser(ToUtf32("escape"), ToUtf32("escape"), 0)))))),
                         new System.Text.Parsing.ExpectationParser(
                             new System.Text.Parsing.CharParser('\"'))))));
         }

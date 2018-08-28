@@ -50,10 +50,16 @@ public:
     bool IsProgramMain() const { return programMain; }
     void SetProgramMain() { programMain = true; }
     Attributes* GetAttributes() const { return attributes.get(); }
+    void SetSpecifierSpan(const Span& specifierSpan_) { specifierSpan = specifierSpan_; }
+    const Span& SpecifierSpan() const { return specifierSpan; }
+    void SetGroupIdSpan(const Span& groupIdSpan_) { groupIdSpan = groupIdSpan_; }
+    const Span& GroupIdSpan() const { return groupIdSpan; }
 private:
     Specifiers specifiers;
+    Span specifierSpan;
     std::unique_ptr<Node> returnTypeExpr;
     std::u32string groupId;
+    Span groupIdSpan;
     NodeList<TemplateParameterNode> templateParameters;
     NodeList<ParameterNode> parameters;
     std::unique_ptr<WhereConstraintNode> whereConstraint;

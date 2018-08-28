@@ -120,6 +120,8 @@ public:
     virtual bool IsFunctionSymbol() const { return false; }
     virtual bool IsTypeSymbol() const { return false; }
     virtual bool IsClassTypeSymbol() const { return false; }
+    virtual bool IsParentSymbol() const { return false; }
+    virtual bool IsVariableSymbol() const { return false; }
     virtual void Accept(SymbolCollector* collector) {}
     virtual const ContainerScope* GetContainerScope() const;
     virtual ContainerScope* GetContainerScope();
@@ -127,6 +129,7 @@ public:
     virtual std::u32string FullNameWithSpecifiers() const;
     virtual std::u32string SimpleName() const { return Name(); }
     virtual std::u32string DocName() const { return Name(); }
+    virtual std::u32string CodeName() const { return Name(); }
     virtual std::u32string Id() const { return mangledName; }
     virtual SymbolAccess DeclaredAccess() const { return Access(); }
     virtual std::string TypeString() const { return "symbol";  }
@@ -201,6 +204,8 @@ public:
     Module* GetModule() const { return module; }
     Module* GetModule() { return module; }
     void SetModule(Module* module_) { module = module_; }
+    Module* GetOriginalModule() { return originalModule; }
+    void SetOriginalModule(Module* originalModule_) { originalModule = originalModule_; }
     const CompileUnitNode* GetCompileUnit() const { return compileUnit; }
     void SetCompileUnit(CompileUnitNode* compileUnit_) { compileUnit = compileUnit_; }
     void SetIrObject(llvm::Value* irObject_) { irObject = irObject_; }
@@ -222,6 +227,7 @@ private:
     Symbol* parent;
     SymbolTable* symbolTable;
     Module* module;
+    Module* originalModule;
     CompileUnitNode* compileUnit;
     llvm::Value* irObject;
     std::unique_ptr<Attributes> attributes;

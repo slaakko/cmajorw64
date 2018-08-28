@@ -10,6 +10,7 @@ namespace cmajor { namespace symbols {
 
 GlobalFlags globalFlags;
 int optimizationLevel = -1;
+int numBuildThreads = -1;
 
 inline GlobalFlags operator|(GlobalFlags flags, GlobalFlags flag)
 {
@@ -80,6 +81,16 @@ int GetOptimizationLevel()
 void SetOptimizationLevel(int optimizationLevel_)
 {
     optimizationLevel = optimizationLevel_;
+}
+
+int GetNumBuildThreads()
+{
+    return numBuildThreads;
+}
+
+void SetNumBuildThreads(int numBuildThreads_)
+{
+    numBuildThreads = numBuildThreads_;
 }
 
 std::set<std::u32string> commandLineDefines;

@@ -3,6 +3,8 @@
   name="cmajor"
   description="Cmajor Compiler"
   solutionFilePath="C:/Users/Seppo/cmajorw64/cmajor/cmajor.sln"
+  downloadsDir="C:/Users/Seppo/Downloads"
+  svg2pngDir="C:/Users/Seppo/gendoc/svg2png"
   targetDir="C:/Users/Seppo/cmajorw64/cmajor/doc/implementation/gendoc">
 
   <components>

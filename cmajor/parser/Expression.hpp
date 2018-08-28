@@ -1,5 +1,5 @@
-#ifndef Expression_hpp_8344
-#define Expression_hpp_8344
+#ifndef Expression_hpp_22807
+#define Expression_hpp_22807
 
 #include <cmajor/parsing/Grammar.hpp>
 #include <cmajor/parsing/Keyword.hpp>
@@ -47,4 +47,4 @@ private:
 
 } } // namespace cmajor.parser
 
-#endif // Expression_hpp_8344
+#endif // Expression_hpp_22807

@@ -38,7 +38,7 @@ using namespace cmajor::util;
 using namespace cmajor::unicode;
 using namespace cmajor::cmproj;
 
-const char* version = "2.2.0";
+const char* version = "2.3.0-RC1";
 
 void PrintHelp()
 {

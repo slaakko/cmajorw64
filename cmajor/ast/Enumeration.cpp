@@ -30,6 +30,8 @@ Node* EnumTypeNode::Clone(CloneContext& cloneContext) const
     {
         clone->AddConstant(static_cast<EnumConstantNode*>(constants[i]->Clone(cloneContext)));
     }
+    clone->SetBeginBraceSpan(beginBraceSpan);
+    clone->SetEndBraceSpan(endBraceSpan);
     return clone;
 }
 
@@ -50,6 +52,8 @@ void EnumTypeNode::Write(AstWriter& writer)
         writer.Write(underlyingType.get());
     }
     constants.Write(writer);
+    writer.Write(beginBraceSpan);
+    writer.Write(endBraceSpan);
 }
 
 void EnumTypeNode::Read(AstReader& reader)
@@ -64,6 +68,8 @@ void EnumTypeNode::Read(AstReader& reader)
     }
     constants.Read(reader);
     constants.SetParent(this);
+    beginBraceSpan = reader.ReadSpan();
+    endBraceSpan = reader.ReadSpan();
 }
 void EnumTypeNode::AddConstant(EnumConstantNode* constant)
 {
@@ -87,11 +93,11 @@ void EnumTypeNode::SetUnderlyingType(Node* underlyingType_)
     underlyingType->SetParent(this);
 }
 
-EnumConstantNode::EnumConstantNode(const Span& span_) : Node(NodeType::enumConstantNode, span_)
+EnumConstantNode::EnumConstantNode(const Span& span_) : Node(NodeType::enumConstantNode, span_), hasValue(false)
 {
 }
 
-EnumConstantNode::EnumConstantNode(const Span& span_, IdentifierNode* id_, Node* value_) : Node(NodeType::enumConstantNode, span_), id(id_), value(value_)
+EnumConstantNode::EnumConstantNode(const Span& span_, IdentifierNode* id_, Node* value_) : Node(NodeType::enumConstantNode, span_), id(id_), value(value_), hasValue(false)
 {
     id->SetParent(this);
     value->SetParent(this);
@@ -99,7 +105,12 @@ EnumConstantNode::EnumConstantNode(const Span& span_, IdentifierNode* id_, Node*
 
 Node* EnumConstantNode::Clone(CloneContext& cloneContext) const
 {
-    return new EnumConstantNode(GetSpan(), static_cast<IdentifierNode*>(id->Clone(cloneContext)), value->Clone(cloneContext));
+    EnumConstantNode* clone = new EnumConstantNode(GetSpan(), static_cast<IdentifierNode*>(id->Clone(cloneContext)), value->Clone(cloneContext));
+    if (hasValue)
+    {
+        clone->SetHasValue();
+    }
+    return clone;
 }
 
 void EnumConstantNode::Accept(Visitor& visitor)
@@ -112,6 +123,8 @@ void EnumConstantNode::Write(AstWriter& writer)
     Node::Write(writer);
     writer.Write(id.get());
     writer.Write(value.get());
+    writer.GetBinaryWriter().Write(hasValue);
+    writer.GetBinaryWriter().Write(strValue);
 }
 
 void EnumConstantNode::Read(AstReader& reader)
@@ -121,6 +134,8 @@ void EnumConstantNode::Read(AstReader& reader)
     id->SetParent(this);
     value.reset(reader.ReadNode());
     value->SetParent(this);
+    hasValue = reader.GetBinaryReader().ReadBool();
+    strValue = reader.GetBinaryReader().ReadUtf32String();
 }
 
 Node* MakeNextEnumConstantValue(const Span& span, EnumTypeNode* enumType)

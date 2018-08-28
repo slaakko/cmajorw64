@@ -22,6 +22,7 @@ Symbol* SymbolReader::ReadSymbol(Symbol* parent)
     Symbol* symbol = SymbolFactory::Instance().CreateSymbol(symbolType, span, name);
     symbol->SetSymbolTable(symbolTable);
     symbol->SetModule(module);
+    symbol->SetOriginalModule(module);
     symbol->SetParent(parent);
     symbol->Read(*this);
     return symbol;

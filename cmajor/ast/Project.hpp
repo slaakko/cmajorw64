@@ -95,6 +95,8 @@ public:
     void AddDependsOnProjects(Project* dependsOnProject);
     bool IsSystemProject() const { return isSystemProject; }
     void SetSystemProject() { isSystemProject = true; }
+    void SetRelativeFilePath(const std::string& relativeFilePath_) { relativeFilePath = relativeFilePath_; }
+    const std::string& RelativeFilePath() const { return relativeFilePath; }
     void SetModuleFilePath(const std::string& moduleFilePath_);
     void SetLibraryFilePath(const std::string& libraryFilePath_);
     bool IsUpToDate(const std::string& systemModuleFilePath) const;
@@ -115,6 +117,7 @@ private:
     boost::filesystem::path basePath;
     boost::filesystem::path systemLibDir;
     std::vector<std::unique_ptr<ProjectDeclaration>> declarations;
+    std::string relativeFilePath;
     std::string moduleFilePath;
     std::string libraryFilePath;
     std::string executableFilePath;

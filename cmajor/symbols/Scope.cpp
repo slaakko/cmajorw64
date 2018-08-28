@@ -261,7 +261,7 @@ void ContainerScope::Clear()
     symbolMap.clear();
 }
 
-NamespaceSymbol* ContainerScope::CreateNamespace(const std::u32string& qualifiedNsName, const Span& span)
+NamespaceSymbol* ContainerScope::CreateNamespace(const std::u32string& qualifiedNsName, const Span& span, Module* originalModule)
 {
     ContainerScope* scope = this;
     NamespaceSymbol* parentNs = scope->Ns();
@@ -286,6 +286,7 @@ NamespaceSymbol* ContainerScope::CreateNamespace(const std::u32string& qualified
             NamespaceSymbol* newNs = new NamespaceSymbol(span, component);
             newNs->SetSymbolTable(container->GetSymbolTable());
             newNs->SetModule(container->GetModule());
+            newNs->SetOriginalModule(originalModule);
             scope = newNs->GetContainerScope();
             scope->SetParent(parentNs->GetContainerScope());
             parentNs->AddMember(newNs);

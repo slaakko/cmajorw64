@@ -20,6 +20,7 @@ public:
     const NamespaceNode* GlobalNs() const { return globalNs.get(); }
     NamespaceNode* GlobalNs() { return globalNs.get(); }
     void ComputeLineStarts(const std::u32string& sourceFileContent);
+    const std::vector<int32_t>& LineStarts() { return lineStarts; }
     int GetColumn(const Span& span) const;
     void SetSynthesizedUnit() { isSynthesizedUnit = true; }
     bool IsSynthesizedUnit() const { return isSynthesizedUnit; }

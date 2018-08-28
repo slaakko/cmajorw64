@@ -109,9 +109,9 @@ public:
     void BeginContainer(ContainerSymbol* container_);
     void EndContainer();
     void BeginNamespace(NamespaceNode& namespaceNode);
-    void BeginNamespace(const std::u32string& namespaceName, const Span& span);
+    void BeginNamespace(const std::u32string& namespaceName, const Span& span, Module* originalModule);
     void EndNamespace();
-    void BeginFunction(FunctionNode& functionNode);
+    void BeginFunction(FunctionNode& functionNode, int32_t functionIndex);
     void EndFunction();
     void AddParameter(ParameterNode& parameterNode);
     void BeginClass(ClassNode& classNode);
@@ -122,22 +122,22 @@ public:
     void AddTemplateParameter(IdentifierNode& identifierNode);
     void BeginInterface(InterfaceNode& interfaceNode);
     void EndInterface();
-    void BeginStaticConstructor(StaticConstructorNode& staticConstructorNode);
+    void BeginStaticConstructor(StaticConstructorNode& staticConstructorNode, int32_t functionIndex);
     void EndStaticConstructor();
-    void BeginConstructor(ConstructorNode& constructorNode);
+    void BeginConstructor(ConstructorNode& constructorNode, int32_t functionIndex);
     void EndConstructor();
-    void BeginDestructor(DestructorNode& destructorNode);
+    void BeginDestructor(DestructorNode& destructorNode, int32_t functionIndex);
     void EndDestructor();
-    void BeginMemberFunction(MemberFunctionNode& memberFunctionNode);
+    void BeginMemberFunction(MemberFunctionNode& memberFunctionNode, int32_t functionIndex);
     void EndMemberFunction();
-    void BeginConversionFunction(ConversionFunctionNode& conversionFunctionNode);
+    void BeginConversionFunction(ConversionFunctionNode& conversionFunctionNode, int32_t functionIndex);
     void EndConversionFunction();
     void AddMemberVariable(MemberVariableNode& memberVariableNode);
     void BeginDelegate(DelegateNode& delegateNode);
     void EndDelegate();
     void BeginClassDelegate(ClassDelegateNode& classDelegateNode);
     void EndClassDelegate();
-    void BeginConcept(ConceptNode& conceptNode);
+    void BeginConcept(ConceptNode& conceptNode, bool hasSource);
     void EndConcept();
     void BeginDeclarationBlock(Node& node);
     void EndDeclarationBlock();
@@ -188,6 +188,12 @@ public:
     std::u32string GetProfiledFunctionName(const boost::uuids::uuid& functionId) const;
     Module* GetModule() { return module; }
     std::unique_ptr<dom::Document> ToDomDocument();
+    void MapInvoke(IdentifierNode* invokeId, FunctionSymbol* functionSymbol);
+    FunctionSymbol* GetInvoke(IdentifierNode* invokeId) const;
+    void SetLatestIdentifier(IdentifierNode* latestIdentifierNode_) { latestIdentifierNode = latestIdentifierNode_; }
+    IdentifierNode* GetLatestIdentifier() { return latestIdentifierNode; }
+    void MapSymbol(Node* node, Symbol* symbol);
+    Symbol* GetMappedSymbol(Node* node) const;
 private:
     Module* module;
     NamespaceSymbol globalNs;
@@ -216,10 +222,13 @@ private:
     std::vector<std::unique_ptr<ArrayTypeSymbol>> arrayTypes;
     std::vector<TypeOrConceptRequest> typeAndConceptRequests;
     std::vector<FunctionRequest> functionRequests;
+    std::unordered_map<IdentifierNode*, FunctionSymbol*> invokeMap;
+    std::unordered_map<Node*, Symbol*> mappedNodeSymbolMap;
     ConversionTable conversionTable;
     std::unordered_set<ClassTypeSymbol*> polymorphicClasses;
     std::unordered_set<ClassTypeSymbol*> classesHavingStaticConstructor;
     std::unordered_set<std::u32string> jsonClasses;
+    IdentifierNode* latestIdentifierNode;
     int GetNextDeclarationBlockIndex() { return declarationBlockIndex++; }
     void ResetDeclarationBlockIndex() { declarationBlockIndex = 0; }
     void EmplaceTypeOrConceptRequest(Symbol* forSymbol, const boost::uuids::uuid& typeId, int index);

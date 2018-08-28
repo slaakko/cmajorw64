@@ -1,3 +1,0 @@
-project QuickSort;
-target=program;
-source <QuickSort.cm>;

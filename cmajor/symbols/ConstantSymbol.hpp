@@ -34,6 +34,8 @@ public:
     llvm::Value* StructureIrObject(Emitter& emitter, bool create);
     std::u32string Info() const override { return Name(); }
     const char* ClassName() const override { return "ConstantSymbol"; }
+    void SetStrValue(const std::u32string& strValue_) { strValue = strValue_; }
+    const std::u32string& StrValue() const { return strValue; }
 private:
     TypeSymbol* type;
     std::unique_ptr<Value> value;
@@ -41,6 +43,7 @@ private:
     uint32_t sizeOfValue;
     uint32_t valuePos;
     std::string filePathReadFrom;
+    std::u32string strValue;
 };
 
 } } // namespace cmajor::symbols

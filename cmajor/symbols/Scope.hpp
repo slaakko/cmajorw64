@@ -68,7 +68,7 @@ public:
     const NamespaceSymbol* Ns() const;
     NamespaceSymbol* Ns();
     void Clear();
-    NamespaceSymbol* CreateNamespace(const std::u32string& qualifiedNsName, const Span& span);
+    NamespaceSymbol* CreateNamespace(const std::u32string& qualifiedNsName, const Span& span, Module* originalModule);
     void CollectViableFunctions(int arity, const std::u32string& groupName, std::unordered_set<ContainerScope*>& scopesLookedUp, ScopeLookup scopeLookup, std::unordered_set<FunctionSymbol*>& viableFunctions);
 private:
     ContainerScope* base;

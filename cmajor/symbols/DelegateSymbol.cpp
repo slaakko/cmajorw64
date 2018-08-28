@@ -94,6 +94,11 @@ std::string DelegateTypeSymbol::Syntax() const
     return syntax;
 }
 
+std::u32string DelegateTypeSymbol::Id() const
+{
+    return MangledName();
+}
+
 void DelegateTypeSymbol::ComputeExportClosure()
 {
     if (IsProject())
@@ -723,6 +728,11 @@ std::string ClassDelegateTypeSymbol::Syntax() const
     }
     syntax.append(");");
     return syntax;
+}
+
+std::u32string ClassDelegateTypeSymbol::Id() const
+{
+    return MangledName();
 }
 
 void ClassDelegateTypeSymbol::Accept(SymbolCollector* collector)

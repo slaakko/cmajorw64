@@ -1832,6 +1832,7 @@ TypeSymbol* CreateNamespaceTypeSymbol(NamespaceSymbol* ns, Module* module)
 {
     TypeSymbol* nsTypeSymbol = new NamespaceTypeSymbol(ns);
     nsTypeSymbol->SetModule(module);
+    nsTypeSymbol->SetOriginalModule(module);
     nsTypeSymbol->SetSymbolTable(&module->GetSymbolTable());
     return nsTypeSymbol;
 }
@@ -1866,6 +1867,7 @@ TypeSymbol* CreateFunctionGroupTypeSymbol(FunctionGroupSymbol* functionGroupSymb
 {
     TypeSymbol* functionGroupTypeSymbol = new FunctionGroupTypeSymbol(functionGroupSymbol, boundFunctionGroupExpression);
     functionGroupTypeSymbol->SetModule(module);
+    functionGroupTypeSymbol->SetOriginalModule(module);
     functionGroupTypeSymbol->SetSymbolTable(&module->GetSymbolTable());
     return functionGroupTypeSymbol;
 }
@@ -1925,6 +1927,7 @@ TypeSymbol* CreateMemberExpressionTypeSymbol(const Span& span, const std::u32str
 {
     TypeSymbol* memberExpressionTypeSymbol = new MemberExpressionTypeSymbol(span, name, boundMemberExpression);
     memberExpressionTypeSymbol->SetModule(module);
+    memberExpressionTypeSymbol->SetOriginalModule(module);
     memberExpressionTypeSymbol->SetSymbolTable(&module->GetSymbolTable());
     return memberExpressionTypeSymbol;
 }

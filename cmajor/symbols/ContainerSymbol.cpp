@@ -59,6 +59,10 @@ void ContainerSymbol::AddMember(Symbol* member)
     {
         member->SetModule(GetModule());
     }
+    if (!member->GetOriginalModule() && GetOriginalModule())
+    {
+        member->SetOriginalModule(GetOriginalModule());
+    }
     member->SetParent(this);
     members.push_back(std::unique_ptr<Symbol>(member));
     if (member->IsFunctionSymbol())
@@ -67,6 +71,7 @@ void ContainerSymbol::AddMember(Symbol* member)
         FunctionGroupSymbol* functionGroupSymbol = MakeFunctionGroupSymbol(functionSymbol->GroupName(), functionSymbol->GetSpan());
         functionGroupSymbol->AddFunction(functionSymbol);
         functionSymbol->GetContainerScope()->SetParent(GetContainerScope());
+        functionIndexMap[functionSymbol->GetIndex()] = functionSymbol;
     }
     else if (member->GetSymbolType() == SymbolType::conceptSymbol)
     {
@@ -128,6 +133,7 @@ FunctionGroupSymbol* ContainerSymbol::MakeFunctionGroupSymbol(const std::u32stri
         FunctionGroupSymbol* functionGroupSymbol = new FunctionGroupSymbol(span, groupName);
         functionGroupSymbol->SetSymbolTable(GetSymbolTable());
         functionGroupSymbol->SetModule(GetModule());
+        functionGroupSymbol->SetOriginalModule(GetOriginalModule());
         AddMember(functionGroupSymbol);
         return functionGroupSymbol;
     }
@@ -149,6 +155,7 @@ ConceptGroupSymbol* ContainerSymbol::MakeConceptGroupSymbol(const std::u32string
         ConceptGroupSymbol* conceptGroupSymbol = new ConceptGroupSymbol(span, groupName);
         conceptGroupSymbol->SetSymbolTable(GetSymbolTable());
         conceptGroupSymbol->SetModule(GetModule());
+        conceptGroupSymbol->SetOriginalModule(GetOriginalModule());
         AddMember(conceptGroupSymbol);
         return conceptGroupSymbol;
     }
@@ -170,6 +177,8 @@ ClassGroupTypeSymbol* ContainerSymbol::MakeClassGroupTypeSymbol(const std::u32st
         ClassGroupTypeSymbol* classGroupTypeSymbol = new ClassGroupTypeSymbol(span, groupName);
         classGroupTypeSymbol->SetSymbolTable(GetSymbolTable());
         classGroupTypeSymbol->SetModule(GetModule());
+        classGroupTypeSymbol->SetOriginalModule(GetOriginalModule());
+        GetSymbolTable()->SetTypeIdFor(classGroupTypeSymbol);
         AddMember(classGroupTypeSymbol);
         return classGroupTypeSymbol;
     }
@@ -228,6 +237,19 @@ bool ContainerSymbol::HasProjectMembers() const
         }
     }
     return false;
+}
+
+FunctionSymbol* ContainerSymbol::GetFunctionByIndex(int32_t functionIndex) const
+{
+    auto it = functionIndexMap.find(functionIndex);
+    if (it != functionIndexMap.cend())
+    {
+        return it->second;
+    }
+    else
+    {
+        return nullptr;
+    }
 }
 
 DeclarationBlock::DeclarationBlock(const Span& span_, const std::u32string& name_) : ContainerSymbol(SymbolType::declarationBlock, span_, name_)

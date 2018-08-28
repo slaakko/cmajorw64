@@ -85,6 +85,7 @@ public:
     {
         AddInheritedAttribute(AttrOrVariable(ToUtf32("ParsingContext*"), ToUtf32("ctx")));
         SetValueTypeName(ToUtf32("ConstantNode*"));
+        AddLocalVariable(AttrOrVariable(ToUtf32("std::u32string"), ToUtf32("strValue")));
     }
     void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData) override
     {
@@ -107,6 +108,8 @@ public:
     {
         cmajor::parsing::ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
         a0ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<ConstantRule>(this, &ConstantRule::A0Action));
+        cmajor::parsing::ActionParser* a1ActionParser = GetAction(ToUtf32("A1"));
+        a1ActionParser->SetAction(new cmajor::parsing::MemberParsingAction<ConstantRule>(this, &ConstantRule::A1Action));
         cmajor::parsing::NonterminalParser* specifiersNonterminalParser = GetNonterminal(ToUtf32("Specifiers"));
         specifiersNonterminalParser->SetPostCall(new cmajor::parsing::MemberPostCall<ConstantRule>(this, &ConstantRule::PostSpecifiers));
         cmajor::parsing::NonterminalParser* typeExprNonterminalParser = GetNonterminal(ToUtf32("TypeExpr"));
@@ -122,6 +125,12 @@ public:
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
         context->value = new ConstantNode(span, context->fromSpecifiers, context->fromTypeExpr, context->fromIdentifier, context->fromExpression);
+        context->value->SetStrValue(context->strValue);
+    }
+    void A1Action(const char32_t* matchBegin, const char32_t* matchEnd, const Span& span, const std::string& fileName, ParsingData* parsingData, bool& pass)
+    {
+        Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
+        context->strValue = std::u32string(matchBegin, matchEnd);
     }
     void PostSpecifiers(cmajor::parsing::ObjectStack& stack, ParsingData* parsingData, bool matched)
     {
@@ -176,9 +185,10 @@ public:
 private:
     struct Context : cmajor::parsing::Context
     {
-        Context(): ctx(), value(), fromSpecifiers(), fromTypeExpr(), fromIdentifier(), fromExpression() {}
+        Context(): ctx(), value(), strValue(), fromSpecifiers(), fromTypeExpr(), fromIdentifier(), fromExpression() {}
         ParsingContext* ctx;
         ConstantNode* value;
+        std::u32string strValue;
         Specifiers fromSpecifiers;
         Node* fromTypeExpr;
         IdentifierNode* fromIdentifier;
@@ -189,28 +199,28 @@ private:
 void Constant::GetReferencedGrammars()
 {
     cmajor::parsing::ParsingDomain* pd = GetParsingDomain();
-    cmajor::parsing::Grammar* grammar0 = pd->GetGrammar(ToUtf32("cmajor.parser.Identifier"));
+    cmajor::parsing::Grammar* grammar0 = pd->GetGrammar(ToUtf32("cmajor.parser.Expression"));
     if (!grammar0)
     {
-        grammar0 = cmajor::parser::Identifier::Create(pd);
+        grammar0 = cmajor::parser::Expression::Create(pd);
     }
     AddGrammarReference(grammar0);
-    cmajor::parsing::Grammar* grammar1 = pd->GetGrammar(ToUtf32("cmajor.parser.TypeExpr"));
+    cmajor::parsing::Grammar* grammar1 = pd->GetGrammar(ToUtf32("cmajor.parser.Specifier"));
     if (!grammar1)
     {
-        grammar1 = cmajor::parser::TypeExpr::Create(pd);
+        grammar1 = cmajor::parser::Specifier::Create(pd);
     }
     AddGrammarReference(grammar1);
-    cmajor::parsing::Grammar* grammar2 = pd->GetGrammar(ToUtf32("cmajor.parser.Specifier"));
+    cmajor::parsing::Grammar* grammar2 = pd->GetGrammar(ToUtf32("cmajor.parser.TypeExpr"));
     if (!grammar2)
     {
-        grammar2 = cmajor::parser::Specifier::Create(pd);
+        grammar2 = cmajor::parser::TypeExpr::Create(pd);
     }
     AddGrammarReference(grammar2);
-    cmajor::parsing::Grammar* grammar3 = pd->GetGrammar(ToUtf32("cmajor.parser.Expression"));
+    cmajor::parsing::Grammar* grammar3 = pd->GetGrammar(ToUtf32("cmajor.parser.Identifier"));
     if (!grammar3)
     {
-        grammar3 = cmajor::parser::Expression::Create(pd);
+        grammar3 = cmajor::parser::Identifier::Create(pd);
     }
     AddGrammarReference(grammar3);
 }
@@ -238,8 +248,9 @@ void Constant::CreateRules()
                                     new cmajor::parsing::NonterminalParser(ToUtf32("Identifier"), ToUtf32("Identifier"), 0))),
                             new cmajor::parsing::ExpectationParser(
                                 new cmajor::parsing::CharParser('='))),
-                        new cmajor::parsing::ExpectationParser(
-                            new cmajor::parsing::NonterminalParser(ToUtf32("Expression"), ToUtf32("Expression"), 1))),
+                        new cmajor::parsing::ActionParser(ToUtf32("A1"),
+                            new cmajor::parsing::ExpectationParser(
+                                new cmajor::parsing::NonterminalParser(ToUtf32("Expression"), ToUtf32("Expression"), 1)))),
                     new cmajor::parsing::ExpectationParser(
                         new cmajor::parsing::CharParser(';')))))));
 }

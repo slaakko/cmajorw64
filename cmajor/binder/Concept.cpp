@@ -173,6 +173,7 @@ public:
     void Visit(TemplateIdNode& templateIdNode) override;
     void Visit(DotNode& dotNode) override;
 
+    void Visit(ParenthesizedConstraintNode& parenthesizedConstraintNode) override;
     void Visit(DisjunctiveConstraintNode& disjunctiveConstraintNode) override;
     void Visit(ConjunctiveConstraintNode& conjunctiveConstraintNode) override;
     void Visit(WhereConstraintNode& whereConstraintNode) override;
@@ -520,6 +521,12 @@ void ConstraintChecker::Visit(DotNode& dotNode)
     {
         throw Exception(&boundCompileUnit.GetModule(), "type or concept symbol '" + ToUtf8(name) + "' not found", dotNode.GetSpan());
     }
+}
+
+void ConstraintChecker::Visit(ParenthesizedConstraintNode& parenthesizedConstraintNode)
+{
+    Reset();
+    parenthesizedConstraintNode.Constraint()->Accept(*this);
 }
 
 void ConstraintChecker::Visit(DisjunctiveConstraintNode& disjunctiveConstraintNode)

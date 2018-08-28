@@ -764,6 +764,17 @@ namespace Syntax
             formatter.Write(")");
             formatter.DecIndent();
         }
+        public override void BeginVisit(GroupingParser& parser)
+        {
+            formatter.Write("new System.Text.Parsing.GroupingParser(");
+            formatter.IncIndent();
+            formatter.WriteLine();
+        }
+        public override void EndVisit(GroupingParser& parser)
+        {
+            formatter.Write(")");
+            formatter.DecIndent();
+        }
         public override void BeginVisit(SequenceParser& parser)
         {
             formatter.Write("new System.Text.Parsing.SequenceParser(");

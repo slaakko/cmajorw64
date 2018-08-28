@@ -44,7 +44,7 @@ struct InitDone
     }
 };
 
-const char* version = "2.2.0";
+const char* version = "2.3.0-RC1";
 
 void PrintHelp()
 {
@@ -87,7 +87,7 @@ void PrintHelp()
         "--bdt2xml (-bd)\n" <<
         "   output bound tree as xml\n" <<
         "--link-with-debug-runtime (-d)\n" <<
-        "   link with the debug version of the runtime library cmrt220(d).dll\n" <<
+        "   link with the debug version of the runtime library cmrt230(d).dll\n" <<
         "--link-using-ms-link (-m)\n" <<
         "   use Microsoft's link.exe as the linker\n" << 
         "--define SYMBOL (-D SYMBOL)\n" <<
@@ -100,6 +100,8 @@ void PrintHelp()
         "   set IDE mode: this mode is for Cmajor Development Environment.\n" <<
         "--msbuild (-b)\n" <<
         "   set MSBuild mode: this mode is for Visual Studio and MSBuild.\n" <<
+        "--build-threads=N (-bt=N)\n" <<
+        "   set number of build threads to N\n" <<
         std::endl;
 }
 
@@ -312,6 +314,11 @@ int main(int argc, const char** argv)
                             else if (components[0] == "--dir" || components[0] == "-pd")
                             {
                                 projectDirectory = components[1];
+                            }
+                            else if (components[0] == "--build-threads" || components[0] == "-bt")
+                            {
+                                int numBuildThreads = boost::lexical_cast<int>(components[1]);
+                                SetNumBuildThreads(numBuildThreads);
                             }
                             else
                             {

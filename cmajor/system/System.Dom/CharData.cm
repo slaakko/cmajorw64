@@ -44,7 +44,7 @@ namespace System.Dom
         public nothrow DomText() : base(u"text")
         {
         }
-        public nothrow explicit DomText(const ustring& name_) : base(name_)
+        public nothrow explicit DomText(const ustring& data_) : base(u"text", data_)
         {
         }
         public nothrow DomText(const ustring& name_, const ustring& data_) : base(name_, data_)

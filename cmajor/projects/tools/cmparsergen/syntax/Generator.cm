@@ -8,6 +8,20 @@ using Code;
 
 namespace Syntax
 {
+    public class ParserProjectContext
+    {
+        public ParserProjectContext() : parsingDomain(new ParsingDomain()), projectParsingDomain(new ParsingDomain())
+        {
+            parsingDomain->SetOwned();
+            projectParsingDomain->SetOwned();
+        }
+        public UniquePtr<Project> project;
+        public UniquePtr<ParsingDomain> parsingDomain;
+        public UniquePtr<ParsingDomain> projectParsingDomain;
+        public List<UniquePtr<ParserFileContent>> parserFiles;
+        public List<UniquePtr<ParsingDomain>> parsingDomains;
+    }
+    
     public class ParserData
     {
         public ParserData(ParserFileGrammar* parserFileGrammar_, const List<string>& sourceFiles_, List<UniquePtr<ParserFileContent>>& parserFiles_, List<ExceptionPtr>& exceptionPtrs_, 
@@ -170,8 +184,94 @@ namespace Syntax
         throw Exception("library file path '" + relativeReferenceFilePath + "' not found");
     }
     
+    public void ReadProject(const string& projectFilePath, const List<string>& libraryDirectories, ParserProjectContext& context)
+    {
+        bool verbose = Flags.Instance().Verbose();
+        if (verbose)
+        {
+            Console.Out() << "Parsing project file " << projectFilePath << "...\n";
+        }
+        ProjectFileGrammar* projectFileGrammar = new ProjectFileGrammar(context.projectParsingDomain.Get());
+        if (Flags.Instance().DebugProject())
+        {
+            projectFileGrammar->SetLog(&Console.Error());
+        }
+        LibraryFileGrammar* libraryFileGrammar = new LibraryFileGrammar(context.projectParsingDomain.Get());
+        if (Flags.Instance().DebugLibrary())
+        {
+            libraryFileGrammar->SetLog(&Console.Error());
+        }
+        ParserFileGrammar* parserFileGrammar = new ParserFileGrammar(context.projectParsingDomain.Get());
+        if (Flags.Instance().DebugParse())
+        {
+            parserFileGrammar->SetLog(&Console.Error());
+        }
+        ustring projectFileContent = ToUtf32(File.ReadAllText(projectFilePath));
+        context.project = projectFileGrammar->Parse(projectFileContent.Chars(), projectFileContent.Chars() + projectFileContent.Length(), 0, projectFilePath);
+        if (verbose)
+        {
+            Console.Out() << "Reading project " << context.project->Name() << "...\n";
+        }
+        if (verbose)
+        {
+            Console.Out() << "Parsing library files...\n";
+        }
+        long nr = context.project->ReferenceFiles().Count();
+        for (long i = 0; i < nr; ++i)
+        {
+            string relativeReferenceFilePath = context.project->ReferenceFiles()[i];
+            string referenceFilePath = ResolveReferenceFilePath(relativeReferenceFilePath, context.project->BasePath(), libraryDirectories);
+            if (verbose)
+            {
+                Console.Out() << "> " << referenceFilePath << "\n";
+            }
+            ustring libraryFileContent = ToUtf32(File.ReadAllText(referenceFilePath));
+            ParsingContext parsingContext;
+            libraryFileGrammar->Parse(libraryFileContent.Chars(), libraryFileContent.Chars() + libraryFileContent.Length(), cast<int>(i), referenceFilePath, 
+                &parsingContext, context.parsingDomain.Get());
+        }
+        int numThreads = Syntax.Flags.Instance().NumThreads();
+        if (numThreads != 1)
+        {
+            if (numThreads == 0)
+            {
+                numThreads = HardwareConcurrency();
+            }
+            if (verbose)
+            {
+                Console.Out() << "Parsing source files using " + ToString(numThreads) + " threads...\n";
+            }
+            ParseSourcesConcurrently(parserFileGrammar, context.project->SourceFiles(), context.parsingDomain.Get(), numThreads, context.parserFiles, context.parsingDomains);
+        }
+        else
+        {
+            if (verbose)
+            {
+                Console.Out() << "Parsing source files...\n";
+            }
+            long ns = context.project->SourceFiles().Count();
+            for (long i = 0; i < ns; ++i)
+            {
+                string sourceFilePath = context.project->SourceFiles()[i];
+                if (verbose)
+                {
+                    Console.Out() << "> " << sourceFilePath << "\n";
+                }
+                ustring sourceFileContent = ToUtf32(File.ReadAllText(sourceFilePath));
+                ParsingContext parsingContext;
+                UniquePtr<ParserFileContent> parserFileContent = parserFileGrammar->Parse(sourceFileContent.Chars(), sourceFileContent.Chars() + sourceFileContent.Length(), cast<int>(i),
+                    sourceFilePath, &parsingContext, cast<int>(i), context.parsingDomain.Get());
+                context.parserFiles.Add(Rvalue(parserFileContent));
+            }
+        }        
+    }
+    
     public void Generate(const string& projectFilePath, const List<string>& libraryDirectories)
     {
+        bool verbose = Flags.Instance().Verbose();
+        ParserProjectContext context;
+        ReadProject(projectFilePath, libraryDirectories, context);
+/*        
         bool verbose = Flags.Instance().Verbose();
         if (verbose)
         {
@@ -256,25 +356,26 @@ namespace Syntax
                 parserFiles.Add(Rvalue(parserFileContent));
             }
         }        
+*/        
         if (verbose)
         {
             Console.Out() << "Linking...\n";
         }
-        Link(parsingDomain.Get());
+        Link(context.parsingDomain.Get());
         if (verbose)
         {
             Console.Out() << "Expanding code...\n";
         }
-        ExpandCode(parsingDomain.Get());
+        ExpandCode(context.parsingDomain.Get());
         if (verbose)
         {
             Console.Out() << "Generating source code...\n";
         }
-        GenerateCode(parserFiles);
+        GenerateCode(context.parserFiles);
         if (verbose)
         {
             Console.Out() << "Generating library file...\n";
         }
-        GenerateLibraryFile(project.Get(), parsingDomain.Get());
+        GenerateLibraryFile(context.project.Get(), context.parsingDomain.Get());
     }
 }

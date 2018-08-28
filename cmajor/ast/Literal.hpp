@@ -10,10 +10,22 @@
 
 namespace cmajor { namespace ast {
 
-Node* CreateIntegerLiteralNode(const Span& span, uint64_t value, bool unsignedSuffix);
-Node* CreateFloatingLiteralNode(const Span& span, double value, bool float_);
+class LiteralNode : public Node
+{
+public:
+    LiteralNode(NodeType nodeType_, const Span& span_);
+    void Write(AstWriter& writer) override;
+    void Read(AstReader& reader) override;
+    void SetText(const std::u32string& text_);
+    const std::u32string& Text() const { return text; }
+private:
+    std::u32string text;
+};
 
-class BooleanLiteralNode : public Node
+LiteralNode* CreateIntegerLiteralNode(const Span& span, uint64_t value, bool unsignedSuffix);
+LiteralNode* CreateFloatingLiteralNode(const Span& span, double value, bool float_);
+
+class BooleanLiteralNode : public LiteralNode
 {
 public:
     BooleanLiteralNode(const Span& span_);
@@ -28,7 +40,7 @@ private:
     bool value;
 };
 
-class SByteLiteralNode : public Node
+class SByteLiteralNode : public LiteralNode
 {
 public:
     SByteLiteralNode(const Span& span_);
@@ -43,7 +55,7 @@ private:
     int8_t value;
 };
 
-class ByteLiteralNode : public Node
+class ByteLiteralNode : public LiteralNode
 {
 public:
     ByteLiteralNode(const Span& span_);
@@ -58,7 +70,7 @@ private:
     uint8_t value;
 };
 
-class ShortLiteralNode : public Node
+class ShortLiteralNode : public LiteralNode
 {
 public:
     ShortLiteralNode(const Span& span_);
@@ -73,7 +85,7 @@ private:
     int16_t value;
 };
 
-class UShortLiteralNode : public Node
+class UShortLiteralNode : public LiteralNode
 {
 public:
     UShortLiteralNode(const Span& span_);
@@ -88,7 +100,7 @@ private:
     uint16_t value;
 };
 
-class IntLiteralNode : public Node
+class IntLiteralNode : public LiteralNode
 {
 public:
     IntLiteralNode(const Span& span_);
@@ -103,7 +115,7 @@ private:
     int32_t value;
 };
 
-class UIntLiteralNode : public Node
+class UIntLiteralNode : public LiteralNode
 {
 public:
     UIntLiteralNode(const Span& span_);
@@ -118,7 +130,7 @@ private:
     uint32_t value;
 };
 
-class LongLiteralNode : public Node
+class LongLiteralNode : public LiteralNode
 {
 public:
     LongLiteralNode(const Span& span_);
@@ -133,7 +145,7 @@ private:
     int64_t value;
 };
 
-class ULongLiteralNode : public Node
+class ULongLiteralNode : public LiteralNode
 {
 public:
     ULongLiteralNode(const Span& span_);
@@ -148,7 +160,7 @@ private:
     uint64_t value;
 };
 
-class FloatLiteralNode : public Node
+class FloatLiteralNode : public LiteralNode
 {
 public:
     FloatLiteralNode(const Span& span_);
@@ -163,7 +175,7 @@ private:
     float value;
 };
 
-class DoubleLiteralNode : public Node
+class DoubleLiteralNode : public LiteralNode
 {
 public:
     DoubleLiteralNode(const Span& span_);
@@ -178,7 +190,7 @@ private:
     double value;
 };
 
-class CharLiteralNode : public Node
+class CharLiteralNode : public LiteralNode
 {
 public:
     CharLiteralNode(const Span& span_);
@@ -193,7 +205,7 @@ private:
     char value;
 };
 
-class WCharLiteralNode : public Node
+class WCharLiteralNode : public LiteralNode
 {
 public:
     WCharLiteralNode(const Span& span_);
@@ -208,7 +220,7 @@ private:
     char16_t value;
 };
 
-class UCharLiteralNode : public Node
+class UCharLiteralNode : public LiteralNode
 {
 public:
     UCharLiteralNode(const Span& span_);
@@ -223,7 +235,7 @@ private:
     char32_t value;
 };
 
-class StringLiteralNode : public Node
+class StringLiteralNode : public LiteralNode
 {
 public:
     StringLiteralNode(const Span& span_);
@@ -238,7 +250,7 @@ private:
     std::string value;
 };
 
-class WStringLiteralNode : public Node
+class WStringLiteralNode : public LiteralNode
 {
 public:
     WStringLiteralNode(const Span& span_);
@@ -253,7 +265,7 @@ private:
     std::u16string value;
 };
 
-class UStringLiteralNode : public Node
+class UStringLiteralNode : public LiteralNode
 {
 public:
     UStringLiteralNode(const Span& span_);
@@ -268,7 +280,7 @@ private:
     std::u32string value;
 };
 
-class NullLiteralNode : public Node
+class NullLiteralNode : public LiteralNode
 {
 public:
     NullLiteralNode(const Span& span_);
@@ -277,7 +289,7 @@ public:
     std::string ToString() const override { return "null"; }
 };
 
-class ArrayLiteralNode : public Node
+class ArrayLiteralNode : public LiteralNode
 {
 public:
     ArrayLiteralNode(const Span& span_);
@@ -293,7 +305,7 @@ private:
     NodeList<Node> values;
 };
 
-class StructuredLiteralNode : public Node
+class StructuredLiteralNode : public LiteralNode
 {
 public:
     StructuredLiteralNode(const Span& span_);
@@ -309,7 +321,7 @@ private:
     NodeList<Node> members;
 };
 
-class UuidLiteralNode : public Node
+class UuidLiteralNode : public LiteralNode
 {
 public:
     UuidLiteralNode(const Span& span_);

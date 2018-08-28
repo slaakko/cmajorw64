@@ -1,3 +1,0 @@
-project attrTest;
-target=program;
-source <main.cm>;

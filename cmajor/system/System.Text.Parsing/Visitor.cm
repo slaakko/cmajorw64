@@ -29,6 +29,8 @@ namespace System.Text.Parsing
         public virtual void EndVisit(ExpectationParser& expectationParser) {}
         public virtual void BeginVisit(TokenParser& tokenParser) {}
         public virtual void EndVisit(TokenParser& tokenParser) {}
+        public virtual void BeginVisit(GroupingParser& groupingParser) {}
+        public virtual void EndVisit(GroupingParser& groupingParser) {}
         public virtual void BeginVisit(ActionParser& actionParser) {}
         public virtual void EndVisit(ActionParser& actionParser) {}
         public virtual void BeginVisit(SequenceParser& sequenceParser) {}

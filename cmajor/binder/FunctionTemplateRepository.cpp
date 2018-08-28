@@ -108,6 +108,8 @@ FunctionSymbol* FunctionTemplateRepository::Instantiate(FunctionSymbol* function
     FunctionSymbol* functionSymbol = static_cast<FunctionSymbol*>(symbol);
     functionSymbol->SetLinkOnceOdrLinkage();
     functionSymbol->SetTemplateSpecialization();
+    functionSymbol->SetFunctionTemplate(functionTemplate);
+    functionSymbol->SetTemplateArgumentTypes(templateArgumentTypes);
     functionTemplateMap[key] = functionSymbol;
     for (TemplateParameterSymbol* templateParameter : functionTemplate->TemplateParameters())
     {

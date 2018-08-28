@@ -39,7 +39,7 @@ Literal::Literal(cmajor::parsing::ParsingDomain* parsingDomain_): cmajor::parsin
     SetOwner(0);
 }
 
-Node* Literal::Parse(const char32_t* start, const char32_t* end, int fileIndex, const std::string& fileName, ParsingContext* ctx)
+LiteralNode* Literal::Parse(const char32_t* start, const char32_t* end, int fileIndex, const std::string& fileName, ParsingContext* ctx)
 {
     cmajor::parsing::Scanner scanner(start, end, fileName, fileIndex, SkipRule());
     std::unique_ptr<cmajor::parsing::XmlLog> xmlLog;
@@ -71,7 +71,7 @@ Node* Literal::Parse(const char32_t* start, const char32_t* end, int fileIndex, 
         }
     }
     std::unique_ptr<cmajor::parsing::Object> value = std::move(stack.top());
-    Node* result = *static_cast<cmajor::parsing::ValueObject<Node*>*>(value.get());
+    LiteralNode* result = *static_cast<cmajor::parsing::ValueObject<LiteralNode*>*>(value.get());
     stack.pop();
     return result;
 }
@@ -83,7 +83,7 @@ public:
         cmajor::parsing::Rule(name_, enclosingScope_, id_, definition_)
     {
         AddInheritedAttribute(AttrOrVariable(ToUtf32("ParsingContext*"), ToUtf32("ctx")));
-        SetValueTypeName(ToUtf32("Node*"));
+        SetValueTypeName(ToUtf32("LiteralNode*"));
     }
     void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData) override
     {
@@ -98,7 +98,7 @@ public:
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
         if (matched)
         {
-            stack.push(std::unique_ptr<cmajor::parsing::Object>(new cmajor::parsing::ValueObject<Node*>(context->value)));
+            stack.push(std::unique_ptr<cmajor::parsing::Object>(new cmajor::parsing::ValueObject<LiteralNode*>(context->value)));
         }
         parsingData->PopContext(Id());
     }
@@ -143,41 +143,49 @@ public:
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
         context->value = context->fromBooleanLiteral;
+        context->value->SetText(std::u32string(matchBegin, matchEnd));
     }
     void A1Action(const char32_t* matchBegin, const char32_t* matchEnd, const Span& span, const std::string& fileName, ParsingData* parsingData, bool& pass)
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
         context->value = context->fromFloatingLiteral;
+        context->value->SetText(std::u32string(matchBegin, matchEnd));
     }
     void A2Action(const char32_t* matchBegin, const char32_t* matchEnd, const Span& span, const std::string& fileName, ParsingData* parsingData, bool& pass)
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
         context->value = context->fromIntegerLiteral;
+        context->value->SetText(std::u32string(matchBegin, matchEnd));
     }
     void A3Action(const char32_t* matchBegin, const char32_t* matchEnd, const Span& span, const std::string& fileName, ParsingData* parsingData, bool& pass)
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
         context->value = context->fromCharLiteral;
+        context->value->SetText(std::u32string(matchBegin, matchEnd));
     }
     void A4Action(const char32_t* matchBegin, const char32_t* matchEnd, const Span& span, const std::string& fileName, ParsingData* parsingData, bool& pass)
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
         context->value = context->fromStringLiteral;
+        context->value->SetText(std::u32string(matchBegin, matchEnd));
     }
     void A5Action(const char32_t* matchBegin, const char32_t* matchEnd, const Span& span, const std::string& fileName, ParsingData* parsingData, bool& pass)
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
         context->value = context->fromNullLiteral;
+        context->value->SetText(std::u32string(matchBegin, matchEnd));
     }
     void A6Action(const char32_t* matchBegin, const char32_t* matchEnd, const Span& span, const std::string& fileName, ParsingData* parsingData, bool& pass)
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
         context->value = context->fromArrayLiteral;
+        context->value->SetText(std::u32string(matchBegin, matchEnd));
     }
     void A7Action(const char32_t* matchBegin, const char32_t* matchEnd, const Span& span, const std::string& fileName, ParsingData* parsingData, bool& pass)
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
         context->value = context->fromStructuredLiteral;
+        context->value->SetText(std::u32string(matchBegin, matchEnd));
     }
     void PostBooleanLiteral(cmajor::parsing::ObjectStack& stack, ParsingData* parsingData, bool matched)
     {
@@ -185,7 +193,7 @@ public:
         if (matched)
         {
             std::unique_ptr<cmajor::parsing::Object> fromBooleanLiteral_value = std::move(stack.top());
-            context->fromBooleanLiteral = *static_cast<cmajor::parsing::ValueObject<Node*>*>(fromBooleanLiteral_value.get());
+            context->fromBooleanLiteral = *static_cast<cmajor::parsing::ValueObject<LiteralNode*>*>(fromBooleanLiteral_value.get());
             stack.pop();
         }
     }
@@ -195,7 +203,7 @@ public:
         if (matched)
         {
             std::unique_ptr<cmajor::parsing::Object> fromFloatingLiteral_value = std::move(stack.top());
-            context->fromFloatingLiteral = *static_cast<cmajor::parsing::ValueObject<Node*>*>(fromFloatingLiteral_value.get());
+            context->fromFloatingLiteral = *static_cast<cmajor::parsing::ValueObject<LiteralNode*>*>(fromFloatingLiteral_value.get());
             stack.pop();
         }
     }
@@ -205,7 +213,7 @@ public:
         if (matched)
         {
             std::unique_ptr<cmajor::parsing::Object> fromIntegerLiteral_value = std::move(stack.top());
-            context->fromIntegerLiteral = *static_cast<cmajor::parsing::ValueObject<Node*>*>(fromIntegerLiteral_value.get());
+            context->fromIntegerLiteral = *static_cast<cmajor::parsing::ValueObject<LiteralNode*>*>(fromIntegerLiteral_value.get());
             stack.pop();
         }
     }
@@ -215,7 +223,7 @@ public:
         if (matched)
         {
             std::unique_ptr<cmajor::parsing::Object> fromCharLiteral_value = std::move(stack.top());
-            context->fromCharLiteral = *static_cast<cmajor::parsing::ValueObject<Node*>*>(fromCharLiteral_value.get());
+            context->fromCharLiteral = *static_cast<cmajor::parsing::ValueObject<LiteralNode*>*>(fromCharLiteral_value.get());
             stack.pop();
         }
     }
@@ -225,7 +233,7 @@ public:
         if (matched)
         {
             std::unique_ptr<cmajor::parsing::Object> fromStringLiteral_value = std::move(stack.top());
-            context->fromStringLiteral = *static_cast<cmajor::parsing::ValueObject<Node*>*>(fromStringLiteral_value.get());
+            context->fromStringLiteral = *static_cast<cmajor::parsing::ValueObject<LiteralNode*>*>(fromStringLiteral_value.get());
             stack.pop();
         }
     }
@@ -235,7 +243,7 @@ public:
         if (matched)
         {
             std::unique_ptr<cmajor::parsing::Object> fromNullLiteral_value = std::move(stack.top());
-            context->fromNullLiteral = *static_cast<cmajor::parsing::ValueObject<Node*>*>(fromNullLiteral_value.get());
+            context->fromNullLiteral = *static_cast<cmajor::parsing::ValueObject<LiteralNode*>*>(fromNullLiteral_value.get());
             stack.pop();
         }
     }
@@ -274,13 +282,13 @@ private:
     {
         Context(): ctx(), value(), fromBooleanLiteral(), fromFloatingLiteral(), fromIntegerLiteral(), fromCharLiteral(), fromStringLiteral(), fromNullLiteral(), fromArrayLiteral(), fromStructuredLiteral() {}
         ParsingContext* ctx;
-        Node* value;
-        Node* fromBooleanLiteral;
-        Node* fromFloatingLiteral;
-        Node* fromIntegerLiteral;
-        Node* fromCharLiteral;
-        Node* fromStringLiteral;
-        Node* fromNullLiteral;
+        LiteralNode* value;
+        LiteralNode* fromBooleanLiteral;
+        LiteralNode* fromFloatingLiteral;
+        LiteralNode* fromIntegerLiteral;
+        LiteralNode* fromCharLiteral;
+        LiteralNode* fromStringLiteral;
+        LiteralNode* fromNullLiteral;
         ArrayLiteralNode* fromArrayLiteral;
         StructuredLiteralNode* fromStructuredLiteral;
     };
@@ -292,7 +300,7 @@ public:
     BooleanLiteralRule(const std::u32string& name_, Scope* enclosingScope_, int id_, Parser* definition_):
         cmajor::parsing::Rule(name_, enclosingScope_, id_, definition_)
     {
-        SetValueTypeName(ToUtf32("Node*"));
+        SetValueTypeName(ToUtf32("LiteralNode*"));
     }
     void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData) override
     {
@@ -304,7 +312,7 @@ public:
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
         if (matched)
         {
-            stack.push(std::unique_ptr<cmajor::parsing::Object>(new cmajor::parsing::ValueObject<Node*>(context->value)));
+            stack.push(std::unique_ptr<cmajor::parsing::Object>(new cmajor::parsing::ValueObject<LiteralNode*>(context->value)));
         }
         parsingData->PopContext(Id());
     }
@@ -329,7 +337,7 @@ private:
     struct Context : cmajor::parsing::Context
     {
         Context(): value() {}
-        Node* value;
+        LiteralNode* value;
     };
 };
 
@@ -339,7 +347,7 @@ public:
     FloatingLiteralRule(const std::u32string& name_, Scope* enclosingScope_, int id_, Parser* definition_):
         cmajor::parsing::Rule(name_, enclosingScope_, id_, definition_)
     {
-        SetValueTypeName(ToUtf32("Node*"));
+        SetValueTypeName(ToUtf32("LiteralNode*"));
         AddLocalVariable(AttrOrVariable(ToUtf32("Span"), ToUtf32("s")));
     }
     void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData) override
@@ -352,7 +360,7 @@ public:
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
         if (matched)
         {
-            stack.push(std::unique_ptr<cmajor::parsing::Object>(new cmajor::parsing::ValueObject<Node*>(context->value)));
+            stack.push(std::unique_ptr<cmajor::parsing::Object>(new cmajor::parsing::ValueObject<LiteralNode*>(context->value)));
         }
         parsingData->PopContext(Id());
     }
@@ -397,7 +405,7 @@ private:
     struct Context : cmajor::parsing::Context
     {
         Context(): value(), s(), fromFloatingLiteralValue() {}
-        Node* value;
+        LiteralNode* value;
         Span s;
         double fromFloatingLiteralValue;
     };
@@ -451,7 +459,7 @@ public:
     IntegerLiteralRule(const std::u32string& name_, Scope* enclosingScope_, int id_, Parser* definition_):
         cmajor::parsing::Rule(name_, enclosingScope_, id_, definition_)
     {
-        SetValueTypeName(ToUtf32("Node*"));
+        SetValueTypeName(ToUtf32("LiteralNode*"));
         AddLocalVariable(AttrOrVariable(ToUtf32("Span"), ToUtf32("s")));
     }
     void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData) override
@@ -464,7 +472,7 @@ public:
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
         if (matched)
         {
-            stack.push(std::unique_ptr<cmajor::parsing::Object>(new cmajor::parsing::ValueObject<Node*>(context->value)));
+            stack.push(std::unique_ptr<cmajor::parsing::Object>(new cmajor::parsing::ValueObject<LiteralNode*>(context->value)));
         }
         parsingData->PopContext(Id());
     }
@@ -509,7 +517,7 @@ private:
     struct Context : cmajor::parsing::Context
     {
         Context(): value(), s(), fromIntegerLiteralValue() {}
-        Node* value;
+        LiteralNode* value;
         Span s;
         uint64_t fromIntegerLiteralValue;
     };
@@ -700,7 +708,7 @@ public:
     CharLiteralRule(const std::u32string& name_, Scope* enclosingScope_, int id_, Parser* definition_):
         cmajor::parsing::Rule(name_, enclosingScope_, id_, definition_)
     {
-        SetValueTypeName(ToUtf32("Node*"));
+        SetValueTypeName(ToUtf32("LiteralNode*"));
         AddLocalVariable(AttrOrVariable(ToUtf32("char32_t"), ToUtf32("litValue")));
     }
     void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData) override
@@ -713,7 +721,7 @@ public:
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
         if (matched)
         {
-            stack.push(std::unique_ptr<cmajor::parsing::Object>(new cmajor::parsing::ValueObject<Node*>(context->value)));
+            stack.push(std::unique_ptr<cmajor::parsing::Object>(new cmajor::parsing::ValueObject<LiteralNode*>(context->value)));
         }
         parsingData->PopContext(Id());
     }
@@ -829,7 +837,7 @@ private:
     struct Context : cmajor::parsing::Context
     {
         Context(): value(), litValue(), fromec(), fromew(), fromeu() {}
-        Node* value;
+        LiteralNode* value;
         char32_t litValue;
         char32_t fromec;
         char32_t fromew;
@@ -843,7 +851,7 @@ public:
     StringLiteralRule(const std::u32string& name_, Scope* enclosingScope_, int id_, Parser* definition_):
         cmajor::parsing::Rule(name_, enclosingScope_, id_, definition_)
     {
-        SetValueTypeName(ToUtf32("Node*"));
+        SetValueTypeName(ToUtf32("LiteralNode*"));
         AddLocalVariable(AttrOrVariable(ToUtf32("std::u32string"), ToUtf32("s")));
     }
     void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData) override
@@ -856,7 +864,7 @@ public:
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
         if (matched)
         {
-            stack.push(std::unique_ptr<cmajor::parsing::Object>(new cmajor::parsing::ValueObject<Node*>(context->value)));
+            stack.push(std::unique_ptr<cmajor::parsing::Object>(new cmajor::parsing::ValueObject<LiteralNode*>(context->value)));
         }
         parsingData->PopContext(Id());
     }
@@ -1008,7 +1016,7 @@ private:
     struct Context : cmajor::parsing::Context
     {
         Context(): value(), s(), fromec(), fromew(), fromeu() {}
-        Node* value;
+        LiteralNode* value;
         std::u32string s;
         char32_t fromec;
         char32_t fromew;
@@ -1022,7 +1030,7 @@ public:
     NullLiteralRule(const std::u32string& name_, Scope* enclosingScope_, int id_, Parser* definition_):
         cmajor::parsing::Rule(name_, enclosingScope_, id_, definition_)
     {
-        SetValueTypeName(ToUtf32("Node*"));
+        SetValueTypeName(ToUtf32("LiteralNode*"));
     }
     void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData) override
     {
@@ -1034,7 +1042,7 @@ public:
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
         if (matched)
         {
-            stack.push(std::unique_ptr<cmajor::parsing::Object>(new cmajor::parsing::ValueObject<Node*>(context->value)));
+            stack.push(std::unique_ptr<cmajor::parsing::Object>(new cmajor::parsing::ValueObject<LiteralNode*>(context->value)));
         }
         parsingData->PopContext(Id());
     }
@@ -1052,7 +1060,7 @@ private:
     struct Context : cmajor::parsing::Context
     {
         Context(): value() {}
-        Node* value;
+        LiteralNode* value;
     };
 };
 

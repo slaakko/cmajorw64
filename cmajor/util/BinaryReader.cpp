@@ -5,6 +5,8 @@
 
 #include <cmajor/util/BinaryReader.hpp>
 #include <cmajor/util/Unicode.hpp>
+#include <cmajor/util/Error.hpp>
+#include <cstring>
 
 namespace cmajor { namespace util {
 

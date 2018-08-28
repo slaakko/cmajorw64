@@ -30,11 +30,17 @@ public:
     void SetUnderlyingType(Node* underlyingType_);
     Node* GetUnderlyingType() const { return underlyingType.get(); }
     const NodeList<EnumConstantNode>& Constants() const { return constants; }
+    void SetBeginBraceSpan(const Span& beginBraceSpan_) { beginBraceSpan = beginBraceSpan_; }
+    const Span& BeginBraceSpan() const { return beginBraceSpan; }
+    void SetEndBraceSpan(const Span& endBraceSpan_) { endBraceSpan = endBraceSpan_; }
+    const Span& EndBraceSpan() const { return endBraceSpan; }
 private:
     Specifiers specifiers;
     std::unique_ptr<IdentifierNode> id;
     std::unique_ptr<Node> underlyingType;
     NodeList<EnumConstantNode> constants;
+    Span beginBraceSpan;
+    Span endBraceSpan;
 };
 
 class EnumConstantNode : public Node
@@ -48,9 +54,15 @@ public:
     void Read(AstReader& reader) override;
     Node* GetValue() const { return value.get(); }
     IdentifierNode* Id() const { return id.get(); }
+    void SetHasValue() { hasValue = true; }
+    bool HasValue() const { return hasValue; }
+    void SetStrValue(const std::u32string& strValue_) { strValue = strValue_; }
+    const std::u32string& StrValue() const { return strValue; }
 private:
     std::unique_ptr<IdentifierNode> id;
     std::unique_ptr<Node> value;
+    bool hasValue;
+    std::u32string strValue;
 };
 
 Node* MakeNextEnumConstantValue(const Span& span, EnumTypeNode* enumType);

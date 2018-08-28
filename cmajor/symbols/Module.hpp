@@ -27,7 +27,8 @@ struct ModuleTag
 const uint8_t moduleFormat_1 = uint8_t('1');
 const uint8_t moduleFormat_2 = uint8_t('2');
 const uint8_t moduleFormat_3 = uint8_t('3');
-const uint8_t currentModuleFormat = moduleFormat_3;
+const uint8_t moduleFormat_4 = uint8_t('4');
+const uint8_t currentModuleFormat = moduleFormat_4;
 
 enum class ModuleFlags : uint8_t
 {

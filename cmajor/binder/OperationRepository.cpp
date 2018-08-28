@@ -1710,6 +1710,7 @@ void InterfaceDefaultConstructorOperation::CollectViableFunctions(ContainerScope
         function = new InterfaceTypeDefaultConstructor(interfaceType, span);
         function->SetSymbolTable(GetSymbolTable());
         function->SetModule(GetModule());
+        function->SetOriginalModule(GetModule());
         function->SetParent(&GetSymbolTable()->GlobalNs());
         functionMap[interfaceType] = function;
         functions.push_back(std::unique_ptr<FunctionSymbol>(function));
@@ -1747,6 +1748,7 @@ void InterfaceCopyConstructorOperation::CollectViableFunctions(ContainerScope* c
             function = new InterfaceTypeCopyConstructor(interfaceType, span);
             function->SetSymbolTable(GetSymbolTable());
             function->SetModule(GetModule());
+            function->SetOriginalModule(GetModule());
             function->SetParent(&GetSymbolTable()->GlobalNs());
             functionMap[interfaceType] = function;
             functions.push_back(std::unique_ptr<FunctionSymbol>(function));
@@ -1784,6 +1786,7 @@ void InterfaceMoveConstructorOperation::CollectViableFunctions(ContainerScope* c
             function = new InterfaceTypeMoveConstructor(interfaceType, span);
             function->SetSymbolTable(GetSymbolTable());
             function->SetModule(GetModule());
+            function->SetOriginalModule(GetModule());
             function->SetParent(&GetSymbolTable()->GlobalNs());
             functionMap[interfaceType] = function;
             functions.push_back(std::unique_ptr<FunctionSymbol>(function));
@@ -1822,6 +1825,7 @@ void InterfaceCopyAssignmentOperation::CollectViableFunctions(ContainerScope* co
             function = new InterfaceTypeCopyAssignment(interfaceType, span);
             function->SetSymbolTable(GetSymbolTable());
             function->SetModule(GetModule());
+            function->SetOriginalModule(GetModule());
             function->SetParent(&GetSymbolTable()->GlobalNs());
             functionMap[interfaceType] = function;
             functions.push_back(std::unique_ptr<FunctionSymbol>(function));
@@ -1859,6 +1863,7 @@ void InterfaceMoveAssignmentOperation::CollectViableFunctions(ContainerScope* co
             function = new InterfaceTypeMoveAssignment(interfaceType, span);
             function->SetSymbolTable(GetSymbolTable());
             function->SetModule(GetModule());
+            function->SetOriginalModule(GetModule());
             function->SetParent(&GetSymbolTable()->GlobalNs());
             functionMap[interfaceType] = function;
             functions.push_back(std::unique_ptr<FunctionSymbol>(function));
@@ -1927,11 +1932,12 @@ void ClassDefaultConstructorOperation::CollectViableFunctions(ContainerScope* co
     if (!function)
     {
         std::unique_ptr<ClassDefaultConstructor> defaultConstructor(new ClassDefaultConstructor(classType, span));
+        ConstructorSymbol* prevDefaultConstructor = classType->DefaultConstructor();
+        classType->SetDefaultConstructor(defaultConstructor.get());
         defaultConstructor->SetCompileUnit(GetBoundCompileUnit().GetCompileUnitNode());
         defaultConstructor->SetSymbolTable(&GetBoundCompileUnit().GetSymbolTable());
         if (GenerateImplementation(defaultConstructor.get(), containerScope, currentFunction, exception, span))
         {
-            classType->SetDefaultConstructor(defaultConstructor.get());
             function = defaultConstructor.get();
             function->SetSymbolTable(GetSymbolTable());
             function->SetParent(classType);
@@ -1942,6 +1948,7 @@ void ClassDefaultConstructorOperation::CollectViableFunctions(ContainerScope* co
         }
         else
         {
+            classType->SetDefaultConstructor(prevDefaultConstructor);
             return;
         }
     }
@@ -2107,11 +2114,12 @@ void ClassCopyConstructorOperation::CollectViableFunctions(ContainerScope* conta
         if (!function)
         {
             std::unique_ptr<ClassCopyConstructor> copyConstructor(new ClassCopyConstructor(classType, span));
+            ConstructorSymbol* prevCopyConstructor = classType->CopyConstructor();
+            classType->SetCopyConstructor(copyConstructor.get());
             copyConstructor->SetCompileUnit(GetBoundCompileUnit().GetCompileUnitNode());
             copyConstructor->SetSymbolTable(&GetBoundCompileUnit().GetSymbolTable());
             if (GenerateImplementation(copyConstructor.get(), containerScope, currentFunction, exception, span))
             {
-                classType->SetCopyConstructor(copyConstructor.get());
                 function = copyConstructor.get();
                 function->SetSymbolTable(GetSymbolTable());
                 function->SetParent(classType);
@@ -2122,6 +2130,7 @@ void ClassCopyConstructorOperation::CollectViableFunctions(ContainerScope* conta
             }
             else
             {
+                classType->SetCopyConstructor(prevCopyConstructor);
                 return;
             }
         }
@@ -2301,11 +2310,12 @@ void ClassMoveConstructorOperation::CollectViableFunctions(ContainerScope* conta
         if (!function)
         {
             std::unique_ptr<ClassMoveConstructor> moveConstructor(new ClassMoveConstructor(classType, span));
+            ConstructorSymbol* prevMoveConstructor = classType->MoveConstructor();
+            classType->SetMoveConstructor(moveConstructor.get());
             moveConstructor->SetCompileUnit(GetBoundCompileUnit().GetCompileUnitNode());
             moveConstructor->SetSymbolTable(&GetBoundCompileUnit().GetSymbolTable());
             if (GenerateImplementation(moveConstructor.get(), containerScope, currentFunction, exception, span))
             {
-                classType->SetMoveConstructor(moveConstructor.get());
                 function = moveConstructor.get();
                 function->SetSymbolTable(GetSymbolTable());
                 function->SetParent(classType);
@@ -2316,6 +2326,7 @@ void ClassMoveConstructorOperation::CollectViableFunctions(ContainerScope* conta
             }
             else
             {
+                classType->SetMoveConstructor(prevMoveConstructor);
                 return;
             }
         }
@@ -2503,11 +2514,12 @@ void ClassCopyAssignmentOperation::CollectViableFunctions(ContainerScope* contai
         if (!function)
         {
             std::unique_ptr<ClassCopyAssignment> copyAssignment(new ClassCopyAssignment(classType, GetBoundCompileUnit().GetSymbolTable().GetTypeByName(U"void"), span));
+            MemberFunctionSymbol* prevCopyAssignment = classType->CopyAssignment();
+            classType->SetCopyAssignment(copyAssignment.get());
             copyAssignment->SetCompileUnit(GetBoundCompileUnit().GetCompileUnitNode());
             copyAssignment->SetSymbolTable(&GetBoundCompileUnit().GetSymbolTable());
             if (GenerateImplementation(copyAssignment.get(), containerScope, currentFunction, exception, span))
             {
-                classType->SetCopyAssignment(copyAssignment.get());
                 function = copyAssignment.get();
                 function->SetSymbolTable(GetSymbolTable());
                 function->SetParent(classType);
@@ -2518,6 +2530,7 @@ void ClassCopyAssignmentOperation::CollectViableFunctions(ContainerScope* contai
             }
             else
             {
+                classType->SetCopyAssignment(prevCopyAssignment);
                 return;
             }
         }
@@ -2672,11 +2685,12 @@ void ClassMoveAssignmentOperation::CollectViableFunctions(ContainerScope* contai
         if (!function)
         {
             std::unique_ptr<ClassMoveAssignment> moveAssignment(new ClassMoveAssignment(classType, GetBoundCompileUnit().GetSymbolTable().GetTypeByName(U"void"), span));
+            MemberFunctionSymbol* prevMoveAssignment = classType->MoveAssignment();
+            classType->SetMoveAssignment(moveAssignment.get());
             moveAssignment->SetCompileUnit(GetBoundCompileUnit().GetCompileUnitNode());
             moveAssignment->SetSymbolTable(&GetBoundCompileUnit().GetSymbolTable());
             if (GenerateImplementation(moveAssignment.get(), containerScope, currentFunction, exception, span))
             {
-                classType->SetMoveAssignment(moveAssignment.get());
                 function = moveAssignment.get();
                 function->SetSymbolTable(GetSymbolTable());
                 function->SetParent(classType);
@@ -2687,6 +2701,7 @@ void ClassMoveAssignmentOperation::CollectViableFunctions(ContainerScope* contai
             }
             else
             {
+                classType->SetMoveAssignment(prevMoveAssignment);
                 return;
             }
         }
@@ -3709,6 +3724,7 @@ void OperationRepository::GenerateCopyConstructorFor(InterfaceTypeSymbol* interf
     copyConstructor->SetCompileUnit(boundCompileUnit.GetCompileUnitNode());
     copyConstructor->SetSymbolTable(&boundCompileUnit.GetSymbolTable());
     copyConstructor->SetModule(&boundCompileUnit.GetModule());
+    copyConstructor->SetOriginalModule(&boundCompileUnit.GetModule());
     copyConstructor->SetParent(interfaceTypeSymbol);
     interfaceTypeSymbol->SetCopyConstructor(copyConstructor.get());
     interfaceTypeSymbol->AddMember(copyConstructor.release());

@@ -697,6 +697,7 @@ public:
     void Visit(NewNode& newNode) override;
     void Visit(ThisNode& thisNode) override;
     void Visit(BaseNode& baseNode) override;
+    void Visit(ParenthesizedExpressionNode& parenthesizedExpressionNode) override;
 private:
     BoundCompileUnit& boundCompileUnit;
     SymbolTable* symbolTable;
@@ -1508,6 +1509,7 @@ void Evaluator::Visit(MemberFunctionNode& memberFunctionNode)
             ConstantSymbol* constantSymbol = new ConstantSymbol(span, memberVariableSymbol->Name());
             constantSymbol->SetSymbolTable(symbolTable);
             constantSymbol->SetModule(module);
+            constantSymbol->SetOriginalModule(module);
             constantSymbol->SetType(memberVariableSymbol->GetType());
             if (memberValue->GetValueType() == ValueType::arrayValue)
             {
@@ -3978,6 +3980,11 @@ void Evaluator::Visit(BaseNode& baseNode)
     {
         ThrowCannotEvaluateStatically(module, span, baseNode.GetSpan());
     }
+}
+
+void Evaluator::Visit(ParenthesizedExpressionNode& parenthesizedExpressionNode)
+{
+    parenthesizedExpressionNode.Subject()->Accept(*this);
 }
 
 std::unique_ptr<Value> Evaluate(Node* node, TypeSymbol* targetType, ContainerScope* containerScope, BoundCompileUnit& boundCompileUnit, bool dontThrow, BoundFunction* currentFunction, const Span& span)

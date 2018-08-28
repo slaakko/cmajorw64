@@ -24,14 +24,27 @@ public:
     IdentifierNode* Id() const { return id.get(); }
     void AddBaseClassOrInterface(Node* baseClassOrInterface);
     const WhereConstraintNode* WhereConstraint() const { return constraint.get(); }
+    WhereConstraintNode* WhereConstraint() { return constraint.get(); }
     void SetConstraint(WhereConstraintNode* whereConstraint);
     void AddMember(Node* member);
     const NodeList<TemplateParameterNode>& TemplateParameters() const { return templateParameters; }
     const NodeList<Node>& BaseClassOrInterfaces() const { return baseClassOrInterfaces; }
     const NodeList<Node>& Members() const { return members; }
     Attributes* GetAttributes() const { return attributes.get(); }
+    void SetSpecifierSpan(const Span& specifierSpan_) { specifierSpan = specifierSpan_; }
+    const Span& SpecifierSpan() const { return specifierSpan; }
+    void SetClassSpan(const Span& classSpan_) { classSpan = classSpan_; }
+    const Span& ClassSpan() const { return classSpan; }
+    void SetBeginBraceSpan(const Span& beginBraceSpan_) { beginBraceSpan = beginBraceSpan_; }
+    const Span& BeginBraceSpan() const { return beginBraceSpan; }
+    void SetEndBraceSpan(const Span& endBraceSpan_) { endBraceSpan = endBraceSpan_; }
+    const Span& EndBraceSpan() const { return endBraceSpan; }
 private:
     Specifiers specifiers;
+    Span specifierSpan;
+    Span classSpan;
+    Span beginBraceSpan;
+    Span endBraceSpan;
     std::unique_ptr<IdentifierNode> id;
     NodeList<TemplateParameterNode> templateParameters;
     NodeList<Node> baseClassOrInterfaces;
@@ -78,6 +91,7 @@ public:
     void Write(AstWriter& writer) override;
     void Read(AstReader& reader) override;
     const IdentifierNode* MemberId() const { return memberId.get(); }
+    IdentifierNode* MemberId() { return memberId.get(); }
 private:
     std::unique_ptr<IdentifierNode> memberId;
 };
@@ -93,8 +107,11 @@ public:
     void Read(AstReader& reader) override;
     void AddInitializer(InitializerNode* initializer);
     const NodeList<InitializerNode>& Initializers() const { return initializers; }
+    void SetClassId(IdentifierNode* classId_) { classId.reset(classId_); }
+    IdentifierNode* ClassId() { return classId.get(); }
 private:
     NodeList<InitializerNode> initializers;
+    std::unique_ptr<IdentifierNode> classId;
 };
 
 class ConstructorNode : public FunctionNode
@@ -108,8 +125,11 @@ public:
     void Read(AstReader& reader) override;
     void AddInitializer(InitializerNode* initializer);
     const NodeList<InitializerNode>& Initializers() const { return initializers; }
+    void SetClassId(IdentifierNode* classId_) { classId.reset(classId_); }
+    IdentifierNode* ClassId() { return classId.get(); }
 private:
     NodeList<InitializerNode> initializers;
+    std::unique_ptr<IdentifierNode> classId;
 };
 
 class DestructorNode : public FunctionNode
@@ -119,6 +139,10 @@ public:
     DestructorNode(const Span& span_, Specifiers specifiers_, Attributes* attributes_);
     Node* Clone(CloneContext& cloneContext) const override;
     void Accept(Visitor& visitor) override;
+    void SetClassId(IdentifierNode* classId_) { classId.reset(classId_); }
+    IdentifierNode* ClassId() { return classId.get(); }
+private:
+    std::unique_ptr<IdentifierNode> classId;
 };
 
 class MemberFunctionNode : public FunctionNode
@@ -156,8 +180,11 @@ public:
     Node* TypeExpr() const { return typeExpr.get(); }
     IdentifierNode* Id() const { return id.get(); }
     Attributes* GetAttributes() const { return attributes.get(); }
+    void SetSpecifierSpan(const Span& specifierSpan_) { specifierSpan = specifierSpan_; }
+    const Span& SpecifierSpan() const { return specifierSpan; }
 private:
     Specifiers specifiers;
+    Span specifierSpan;
     std::unique_ptr<Node> typeExpr;
     std::unique_ptr<IdentifierNode> id;
     std::unique_ptr<Attributes> attributes;

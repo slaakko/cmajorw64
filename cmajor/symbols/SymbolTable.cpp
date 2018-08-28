@@ -63,7 +63,7 @@ bool operator!=(const ArrayKey& left, const ArrayKey& right)
 SymbolTable::SymbolTable(Module* module_) : 
     module(module_), globalNs(Span(), 
     std::u32string()), currentCompileUnit(nullptr), container(&globalNs), currentClass(nullptr), currentInterface(nullptr), mainFunctionSymbol(nullptr), currentFunctionSymbol(nullptr),
-    parameterIndex(0), declarationBlockIndex(0)
+    parameterIndex(0), declarationBlockIndex(0), latestIdentifierNode(nullptr)
 {
     globalNs.SetModule(module);
     globalNs.SetSymbolTable(this);
@@ -319,11 +319,11 @@ void SymbolTable::EndContainer()
 void SymbolTable::BeginNamespace(NamespaceNode& namespaceNode)
 {
     std::u32string nsName = namespaceNode.Id()->Str();
-    BeginNamespace(nsName, namespaceNode.GetSpan());
+    BeginNamespace(nsName, namespaceNode.GetSpan(), globalNs.GetOriginalModule());
     MapNode(&namespaceNode, container);
 }
 
-void SymbolTable::BeginNamespace(const std::u32string& namespaceName, const Span& span)
+void SymbolTable::BeginNamespace(const std::u32string& namespaceName, const Span& span, Module* originalModule)
 {
     if (namespaceName.empty())
     {
@@ -350,7 +350,7 @@ void SymbolTable::BeginNamespace(const std::u32string& namespaceName, const Span
         }
         else
         {
-            NamespaceSymbol* ns = container->GetContainerScope()->CreateNamespace(namespaceName, span);
+            NamespaceSymbol* ns = container->GetContainerScope()->CreateNamespace(namespaceName, span, originalModule);
             BeginContainer(ns);
         }
     }
@@ -361,17 +361,20 @@ void SymbolTable::EndNamespace()
     EndContainer();
 }
 
-void SymbolTable::BeginFunction(FunctionNode& functionNode)
+void SymbolTable::BeginFunction(FunctionNode& functionNode, int32_t functionIndex)
 {
     FunctionSymbol* functionSymbol = new FunctionSymbol(functionNode.GetSpan(), functionNode.GroupId());
     SetFunctionIdFor(functionSymbol);
+    functionSymbol->SetIndex(functionIndex);
     if ((functionNode.GetSpecifiers() & Specifiers::constexpr_) != Specifiers::none)
     {
         functionSymbol->SetConstExpr();
     }
+    functionSymbol->SetHasSource();
     functionSymbol->SetCompileUnit(currentCompileUnit);
     functionSymbol->SetSymbolTable(this);
     functionSymbol->SetModule(module);
+    functionSymbol->SetOriginalModule(module);
     functionSymbol->SetGroupName(functionNode.GroupId());
     if (functionNode.WhereConstraint())
     {
@@ -415,6 +418,7 @@ void SymbolTable::EndFunction()
 
 void SymbolTable::AddParameter(ParameterNode& parameterNode)
 {
+    bool artificialId = false;
     std::u32string parameterName = ToUtf32("@p" + std::to_string(parameterIndex));
     if (parameterNode.Id())
     {
@@ -423,6 +427,7 @@ void SymbolTable::AddParameter(ParameterNode& parameterNode)
     else
     {
         parameterNode.SetId(new IdentifierNode(parameterNode.GetSpan(), parameterName));
+        artificialId = true;
     }
     ParameterSymbol* parameterSymbol = new ParameterSymbol(parameterNode.GetSpan(), parameterName);
     parameterSymbol->SetCompileUnit(currentCompileUnit);
@@ -430,6 +435,10 @@ void SymbolTable::AddParameter(ParameterNode& parameterNode)
     MapNode(&parameterNode, parameterSymbol);
     container->AddMember(parameterSymbol);
     ++parameterIndex;
+    if (artificialId)
+    {
+        parameterSymbol->SetArtificialName();
+    }
 }
 
 void SymbolTable::BeginClass(ClassNode& classNode)
@@ -441,6 +450,7 @@ void SymbolTable::BeginClass(ClassNode& classNode)
     classTypeSymbol->SetCompileUnit(currentCompileUnit);
     classTypeSymbol->SetSymbolTable(this);
     classTypeSymbol->SetModule(module);
+    classTypeSymbol->SetOriginalModule(module);
     MapNode(&classNode, classTypeSymbol);
     SetTypeIdFor(classTypeSymbol);
     ContainerScope* classScope = classTypeSymbol->GetContainerScope();
@@ -487,11 +497,11 @@ void SymbolTable::AddTemplateParameter(TemplateParameterNode& templateParameterN
     if (templateParameterNode.DefaultTemplateArgument())
     {
         templateParameterSymbol->SetHasDefault();
-        templateParameterSymbol->SetDefaultStr(templateParameterNode.DefaultTemplateArgument()->ToString());
     }
     templateParameterSymbol->SetCompileUnit(currentCompileUnit);
     templateParameterSymbol->SetSymbolTable(this);
     templateParameterSymbol->SetModule(module);
+    templateParameterSymbol->SetOriginalModule(module);
     SetTypeIdFor(templateParameterSymbol);
     MapNode(&templateParameterNode, templateParameterSymbol);
     container->AddMember(templateParameterSymbol);
@@ -503,6 +513,7 @@ void SymbolTable::AddTemplateParameter(IdentifierNode& identifierNode)
     templateParameterSymbol->SetCompileUnit(currentCompileUnit);
     templateParameterSymbol->SetSymbolTable(this);
     templateParameterSymbol->SetModule(module);
+    templateParameterSymbol->SetOriginalModule(module);
     SetTypeIdFor(templateParameterSymbol);
     MapNode(&identifierNode, templateParameterSymbol);
     container->AddMember(templateParameterSymbol);
@@ -516,6 +527,7 @@ void SymbolTable::BeginInterface(InterfaceNode& interfaceNode)
     interfaceTypeSymbol->SetCompileUnit(currentCompileUnit);
     interfaceTypeSymbol->SetSymbolTable(this);
     interfaceTypeSymbol->SetModule(module);
+    interfaceTypeSymbol->SetOriginalModule(module);
     MapNode(&interfaceNode, interfaceTypeSymbol);
     SetTypeIdFor(interfaceTypeSymbol);
     ContainerScope* interfaceScope = interfaceTypeSymbol->GetContainerScope();
@@ -532,13 +544,16 @@ void SymbolTable::EndInterface()
     EndContainer();
 }
 
-void SymbolTable::BeginStaticConstructor(StaticConstructorNode& staticConstructorNode)
+void SymbolTable::BeginStaticConstructor(StaticConstructorNode& staticConstructorNode, int32_t functionIndex)
 {
     StaticConstructorSymbol* staticConstructorSymbol = new StaticConstructorSymbol(staticConstructorNode.GetSpan(), U"@static_constructor");
+    staticConstructorSymbol->SetIndex(functionIndex);
     SetFunctionIdFor(staticConstructorSymbol);
+    staticConstructorSymbol->SetHasSource();
     staticConstructorSymbol->SetCompileUnit(currentCompileUnit);
     staticConstructorSymbol->SetSymbolTable(this);
     staticConstructorSymbol->SetModule(module);
+    staticConstructorSymbol->SetOriginalModule(module);
     if (staticConstructorNode.WhereConstraint())
     {
         CloneContext cloneContext;
@@ -559,17 +574,20 @@ void SymbolTable::EndStaticConstructor()
     container->AddMember(staticConstructorSymbol);
 }
 
-void SymbolTable::BeginConstructor(ConstructorNode& constructorNode)
+void SymbolTable::BeginConstructor(ConstructorNode& constructorNode, int32_t functionIndex)
 {
     ConstructorSymbol* constructorSymbol = new ConstructorSymbol(constructorNode.GetSpan(), U"@constructor");
+    constructorSymbol->SetIndex(functionIndex);
     SetFunctionIdFor(constructorSymbol);
     if ((constructorNode.GetSpecifiers() & Specifiers::constexpr_) != Specifiers::none)
     {
         constructorSymbol->SetConstExpr();
     }
+    constructorSymbol->SetHasSource();
     constructorSymbol->SetCompileUnit(currentCompileUnit);
     constructorSymbol->SetSymbolTable(this);
     constructorSymbol->SetModule(module);
+    constructorSymbol->SetOriginalModule(module);
     if (constructorNode.WhereConstraint())
     {
         CloneContext cloneContext;
@@ -605,13 +623,16 @@ void SymbolTable::EndConstructor()
     container->AddMember(constructorSymbol);
 }
 
-void SymbolTable::BeginDestructor(DestructorNode& destructorNode)
+void SymbolTable::BeginDestructor(DestructorNode& destructorNode, int32_t functionIndex)
 {
     DestructorSymbol* destructorSymbol = new DestructorSymbol(destructorNode.GetSpan(), U"@destructor");
+    destructorSymbol->SetIndex(functionIndex);
     SetFunctionIdFor(destructorSymbol);
+    destructorSymbol->SetHasSource();
     destructorSymbol->SetCompileUnit(currentCompileUnit);
     destructorSymbol->SetSymbolTable(this);
     destructorSymbol->SetModule(module);
+    destructorSymbol->SetOriginalModule(module);
     if (destructorNode.WhereConstraint())
     {
         CloneContext cloneContext;
@@ -646,17 +667,20 @@ void SymbolTable::EndDestructor()
     container->AddMember(destructorSymbol);
 }
 
-void SymbolTable::BeginMemberFunction(MemberFunctionNode& memberFunctionNode)
+void SymbolTable::BeginMemberFunction(MemberFunctionNode& memberFunctionNode, int32_t functionIndex)
 {
     MemberFunctionSymbol* memberFunctionSymbol = new MemberFunctionSymbol(memberFunctionNode.GetSpan(), memberFunctionNode.GroupId());
+    memberFunctionSymbol->SetIndex(functionIndex);
     SetFunctionIdFor(memberFunctionSymbol);
     if ((memberFunctionNode.GetSpecifiers() & Specifiers::constexpr_) != Specifiers::none)
     {
         memberFunctionSymbol->SetConstExpr();
     }
+    memberFunctionSymbol->SetHasSource();
     memberFunctionSymbol->SetCompileUnit(currentCompileUnit);
     memberFunctionSymbol->SetSymbolTable(this);
     memberFunctionSymbol->SetModule(module);
+    memberFunctionSymbol->SetOriginalModule(module);
     memberFunctionSymbol->SetGroupName(memberFunctionNode.GroupId());
     if (memberFunctionNode.WhereConstraint())
     {
@@ -707,17 +731,20 @@ void SymbolTable::EndMemberFunction()
     container->AddMember(memberFunctionSymbol);
 }
 
-void SymbolTable::BeginConversionFunction(ConversionFunctionNode& conversionFunctionNode)
+void SymbolTable::BeginConversionFunction(ConversionFunctionNode& conversionFunctionNode, int32_t functionIndex)
 {
     ConversionFunctionSymbol* conversionFunctionSymbol = new ConversionFunctionSymbol(conversionFunctionNode.GetSpan(), U"@conversion");
+    conversionFunctionSymbol->SetIndex(functionIndex);
     SetFunctionIdFor(conversionFunctionSymbol);
     if ((conversionFunctionNode.GetSpecifiers() & Specifiers::constexpr_) != Specifiers::none)
     {
         conversionFunctionSymbol->SetConstExpr();
     }
+    conversionFunctionSymbol->SetHasSource();
     conversionFunctionSymbol->SetCompileUnit(currentCompileUnit);
     conversionFunctionSymbol->SetSymbolTable(this);
     conversionFunctionSymbol->SetModule(module);
+    conversionFunctionSymbol->SetOriginalModule(module);
     conversionFunctionSymbol->SetGroupName(U"@operator_conv");
     if (conversionFunctionNode.WhereConstraint())
     {
@@ -772,6 +799,7 @@ void SymbolTable::BeginDelegate(DelegateNode& delegateNode)
     delegateTypeSymbol->SetCompileUnit(currentCompileUnit);
     delegateTypeSymbol->SetSymbolTable(this);
     delegateTypeSymbol->SetModule(module);
+    delegateTypeSymbol->SetOriginalModule(module);
     MapNode(&delegateNode, delegateTypeSymbol);
     SetTypeIdFor(delegateTypeSymbol);
     ContainerScope* delegateScope = delegateTypeSymbol->GetContainerScope();
@@ -793,6 +821,7 @@ void SymbolTable::BeginClassDelegate(ClassDelegateNode& classDelegateNode)
     classDelegateTypeSymbol->SetCompileUnit(currentCompileUnit);
     classDelegateTypeSymbol->SetSymbolTable(this);
     classDelegateTypeSymbol->SetModule(module);
+    classDelegateTypeSymbol->SetOriginalModule(module);
     MapNode(&classDelegateNode, classDelegateTypeSymbol);
     SetTypeIdFor(classDelegateTypeSymbol);
     ContainerScope* classDelegateScope = classDelegateTypeSymbol->GetContainerScope();
@@ -808,13 +837,18 @@ void SymbolTable::EndClassDelegate()
     EndContainer();
 }
 
-void SymbolTable::BeginConcept(ConceptNode& conceptNode)
+void SymbolTable::BeginConcept(ConceptNode& conceptNode, bool hasSource)
 {
     ConceptSymbol* conceptSymbol = new ConceptSymbol(conceptNode.GetSpan(), conceptNode.Id()->Str());
+    if (hasSource)
+    {
+        conceptSymbol->SetHasSource();
+    }
     conceptSymbol->SetGroupName(conceptNode.Id()->Str());
     conceptSymbol->SetCompileUnit(currentCompileUnit);
     conceptSymbol->SetSymbolTable(this);
     conceptSymbol->SetModule(module);
+    conceptSymbol->SetOriginalModule(module);
     MapNode(&conceptNode, conceptSymbol);
     SetTypeIdFor(conceptSymbol);
     ContainerScope* conceptScope = conceptSymbol->GetContainerScope();
@@ -836,6 +870,7 @@ void SymbolTable::BeginDeclarationBlock(Node& node)
     declarationBlock->SetCompileUnit(currentCompileUnit);
     declarationBlock->SetSymbolTable(this);
     declarationBlock->SetModule(module);
+    declarationBlock->SetOriginalModule(module);
     MapNode(&node, declarationBlock);
     ContainerScope* declarationBlockScope = declarationBlock->GetContainerScope();
     ContainerScope* containerScope = container->GetContainerScope();
@@ -866,6 +901,7 @@ void SymbolTable::AddLocalVariable(ConstructionStatementNode& constructionStatem
     localVariableSymbol->SetCompileUnit(currentCompileUnit);
     localVariableSymbol->SetSymbolTable(this);
     localVariableSymbol->SetModule(module);
+    localVariableSymbol->SetOriginalModule(module);
     MapNode(&constructionStatementNode, localVariableSymbol);
     container->AddMember(localVariableSymbol);
 }
@@ -876,6 +912,7 @@ void SymbolTable::AddLocalVariable(IdentifierNode& identifierNode)
     localVariableSymbol->SetCompileUnit(currentCompileUnit);
     localVariableSymbol->SetSymbolTable(this);
     localVariableSymbol->SetModule(module);
+    localVariableSymbol->SetOriginalModule(module);
     MapNode(&identifierNode, localVariableSymbol);
     container->AddMember(localVariableSymbol);
 }
@@ -886,6 +923,7 @@ void SymbolTable::AddTypedef(TypedefNode& typedefNode)
     typedefSymbol->SetCompileUnit(currentCompileUnit);
     typedefSymbol->SetSymbolTable(this);
     typedefSymbol->SetModule(module);
+    typedefSymbol->SetOriginalModule(module);
     MapNode(&typedefNode, typedefSymbol);
     container->AddMember(typedefSymbol);
 }
@@ -896,6 +934,8 @@ void SymbolTable::AddConstant(ConstantNode& constantNode)
     constantSymbol->SetCompileUnit(currentCompileUnit);
     constantSymbol->SetSymbolTable(this);
     constantSymbol->SetModule(module);
+    constantSymbol->SetOriginalModule(module);
+    constantSymbol->SetStrValue(constantNode.StrValue());
     MapNode(&constantNode, constantSymbol);
     container->AddMember(constantSymbol);
 }
@@ -906,6 +946,7 @@ void SymbolTable::BeginEnumType(EnumTypeNode& enumTypeNode)
     enumTypeSymbol->SetCompileUnit(currentCompileUnit);
     enumTypeSymbol->SetSymbolTable(this);
     enumTypeSymbol->SetModule(module);
+    enumTypeSymbol->SetOriginalModule(module);
     MapNode(&enumTypeNode, enumTypeSymbol);
     SetTypeIdFor(enumTypeSymbol);
     ContainerScope* enumTypeScope = enumTypeSymbol->GetContainerScope();
@@ -926,6 +967,8 @@ void SymbolTable::AddEnumConstant(EnumConstantNode& enumConstantNode)
     enumConstantSymbol->SetCompileUnit(currentCompileUnit);
     enumConstantSymbol->SetSymbolTable(this);
     enumConstantSymbol->SetModule(module);
+    enumConstantSymbol->SetOriginalModule(module);
+    enumConstantSymbol->SetStrValue(enumConstantNode.StrValue());
     MapNode(&enumConstantNode, enumConstantSymbol);
     container->AddMember(enumConstantSymbol);
 }
@@ -934,6 +977,7 @@ void SymbolTable::AddTypeSymbolToGlobalScope(TypeSymbol* typeSymbol)
 {
     typeSymbol->SetSymbolTable(this);
     typeSymbol->SetModule(module);
+    typeSymbol->SetOriginalModule(module);
     globalNs.AddMember(typeSymbol);
     SetTypeIdFor(typeSymbol);
     typeNameMap[typeSymbol->FullName()] = typeSymbol;
@@ -944,6 +988,7 @@ void SymbolTable::AddFunctionSymbolToGlobalScope(FunctionSymbol* functionSymbol)
     SetFunctionIdFor(functionSymbol);
     functionSymbol->SetSymbolTable(this);
     functionSymbol->SetModule(module);
+    functionSymbol->SetOriginalModule(module);
     globalNs.AddMember(functionSymbol);
     if (functionSymbol->IsConversion())
     {
@@ -1228,6 +1273,7 @@ TypeSymbol* SymbolTable::MakeDerivedType(TypeSymbol* baseType, const TypeDerivat
     derivedType->SetParent(&globalNs);
     derivedType->SetSymbolTable(this);
     derivedType->SetModule(module);
+    derivedType->SetOriginalModule(module);
     SetTypeIdFor(derivedType);
     mappedDerivedTypes.push_back(derivedType);
     derivedTypes.push_back(std::unique_ptr<DerivedTypeSymbol>(derivedType));
@@ -1236,6 +1282,7 @@ TypeSymbol* SymbolTable::MakeDerivedType(TypeSymbol* baseType, const TypeDerivat
         TypedefSymbol* valueType = new TypedefSymbol(span, U"ValueType");
         valueType->SetSymbolTable(this);
         valueType->SetModule(module);
+        valueType->SetOriginalModule(module);
         valueType->SetAccess(SymbolAccess::public_);
         valueType->SetType(derivedType->RemovePointer(span));
         TypeSymbol* withoutConst = valueType->GetType()->RemoveConst(span);
@@ -1249,6 +1296,7 @@ TypeSymbol* SymbolTable::MakeDerivedType(TypeSymbol* baseType, const TypeDerivat
         TypedefSymbol* referenceType = new TypedefSymbol(span, U"ReferenceType");
         referenceType->SetSymbolTable(this);
         referenceType->SetModule(module);
+        referenceType->SetOriginalModule(module);
         referenceType->SetAccess(SymbolAccess::public_);
         referenceType->SetType(valueType->GetType()->AddLvalueReference(span));
         referenceType->SetBound();
@@ -1257,6 +1305,7 @@ TypeSymbol* SymbolTable::MakeDerivedType(TypeSymbol* baseType, const TypeDerivat
         TypedefSymbol* pointerType = new TypedefSymbol(span, U"PointerType");
         pointerType->SetSymbolTable(this);
         pointerType->SetModule(module);
+        pointerType->SetOriginalModule(module);
         pointerType->SetAccess(SymbolAccess::public_);
         pointerType->SetType(derivedType);
         pointerType->SetBound();
@@ -1285,6 +1334,7 @@ ClassTemplateSpecializationSymbol* SymbolTable::MakeClassTemplateSpecialization(
         classTemplateSpecialization->SetParent(&globalNs);
         classTemplateSpecialization->SetSymbolTable(this);
         classTemplateSpecialization->SetModule(module);
+        classTemplateSpecialization->SetOriginalModule(module);
         classTemplateSpecializations.push_back(std::unique_ptr<ClassTemplateSpecializationSymbol>(classTemplateSpecialization));
         return classTemplateSpecialization;
     }
@@ -1307,6 +1357,7 @@ ArrayTypeSymbol* SymbolTable::MakeArrayType(TypeSymbol* elementType, int64_t siz
         arrayType->SetParent(&globalNs); 
         arrayType->SetSymbolTable(this);
         arrayType->SetModule(module);
+        arrayType->SetOriginalModule(module);
         ArrayLengthFunction* arrayLengthFunction = new ArrayLengthFunction(arrayType);
         SetFunctionIdFor(arrayLengthFunction);
         arrayType->AddMember(arrayLengthFunction);
@@ -1325,6 +1376,7 @@ ArrayTypeSymbol* SymbolTable::MakeArrayType(TypeSymbol* elementType, int64_t siz
         TypedefSymbol* iterator = new TypedefSymbol(span, U"Iterator");
         iterator->SetSymbolTable(this);
         iterator->SetModule(module);
+        iterator->SetOriginalModule(module);
         iterator->SetAccess(SymbolAccess::public_);
         iterator->SetType(arrayType->ElementType()->AddPointer(span));
         iterator->SetBound();
@@ -1332,6 +1384,7 @@ ArrayTypeSymbol* SymbolTable::MakeArrayType(TypeSymbol* elementType, int64_t siz
         TypedefSymbol* constIterator = new TypedefSymbol(span, U"ConstIterator");
         constIterator->SetSymbolTable(this);
         constIterator->SetModule(module);
+        constIterator->SetOriginalModule(module);
         constIterator->SetAccess(SymbolAccess::public_);
         constIterator->SetType(arrayType->ElementType()->AddConst(span)->AddPointer(span));
         constIterator->SetBound();
@@ -1463,6 +1516,42 @@ std::unique_ptr<dom::Document> SymbolTable::ToDomDocument()
     return doc;
 }
 
+void SymbolTable::MapInvoke(IdentifierNode* invokeId, FunctionSymbol* functionSymbol)
+{
+    invokeMap[invokeId] = functionSymbol;
+}
+
+FunctionSymbol* SymbolTable::GetInvoke(IdentifierNode* invokeId) const
+{
+    auto it = invokeMap.find(invokeId);
+    if (it != invokeMap.cend())
+    {
+        return it->second;
+    }
+    else
+    {
+        return nullptr;
+    }
+}
+
+void SymbolTable::MapSymbol(Node* node, Symbol* symbol)
+{
+    mappedNodeSymbolMap[node] = symbol;
+}
+
+Symbol* SymbolTable::GetMappedSymbol(Node* node) const
+{
+    auto it = mappedNodeSymbolMap.find(node);
+    if (it != mappedNodeSymbolMap.cend())
+    {
+        return it->second;
+    }
+    else
+    {
+        return nullptr;
+    }
+}
+
 class IntrinsicConcepts
 {
 public:
@@ -1535,7 +1624,7 @@ void InitCoreSymbolTable(SymbolTable& symbolTable)
     IntrinsicConcepts::Instance().AddIntrinsicConcept(new NonreferenceTypeConceptNode());
     for (const std::unique_ptr<ConceptNode>& conceptNode : IntrinsicConcepts::Instance().GetIntrinsicConcepts())
     {
-        symbolTable.BeginConcept(*conceptNode);
+        symbolTable.BeginConcept(*conceptNode, false);
         ConceptSymbol* conceptSymbol = static_cast<ConceptSymbol*>(symbolTable.Container());
         conceptSymbol->SetAccess(SymbolAccess::public_);
         int n = conceptNode->TypeParameters().Count();

@@ -2,6 +2,8 @@ using System;
 using System.Collections;
 using System.Text.Parsing;
 
+// this source file has been automatically generated from 'RegExGrammar.parser' using cmparsergen version 2.0.0.
+
 namespace System.Text.RegularExpressions
 {
     public class RegularExpressionGrammar : System.Text.Parsing.Grammar
@@ -910,30 +912,33 @@ namespace System.Text.RegularExpressions
                     new System.Text.Parsing.ActionParser(ToUtf32("A0"),
                         new System.Text.Parsing.NonterminalParser(ToUtf32("left"), ToUtf32("SequenceExpression"), 0)),
                     new System.Text.Parsing.KleeneStarParser(
-                        new System.Text.Parsing.SequenceParser(
-                            new System.Text.Parsing.CharParser('|'),
-                            new System.Text.Parsing.ActionParser(ToUtf32("A1"),
-                                new System.Text.Parsing.NonterminalParser(ToUtf32("right"), ToUtf32("SequenceExpression"), 0)))))));
+                        new System.Text.Parsing.GroupingParser(
+                            new System.Text.Parsing.SequenceParser(
+                                new System.Text.Parsing.CharParser('|'),
+                                new System.Text.Parsing.ActionParser(ToUtf32("A1"),
+                                    new System.Text.Parsing.NonterminalParser(ToUtf32("right"), ToUtf32("SequenceExpression"), 0))))))));
             AddRule(new SequenceExpressionRule(ToUtf32("SequenceExpression"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.SequenceParser(
                     new System.Text.Parsing.ActionParser(ToUtf32("A0"),
                         new System.Text.Parsing.NonterminalParser(ToUtf32("left"), ToUtf32("PostfixExpression"), 0)),
                     new System.Text.Parsing.KleeneStarParser(
-                        new System.Text.Parsing.ActionParser(ToUtf32("A1"),
-                            new System.Text.Parsing.NonterminalParser(ToUtf32("right"), ToUtf32("PostfixExpression"), 0))))));
+                        new System.Text.Parsing.GroupingParser(
+                            new System.Text.Parsing.ActionParser(ToUtf32("A1"),
+                                new System.Text.Parsing.NonterminalParser(ToUtf32("right"), ToUtf32("PostfixExpression"), 0)))))));
             AddRule(new PostfixExpressionRule(ToUtf32("PostfixExpression"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.SequenceParser(
                     new System.Text.Parsing.ActionParser(ToUtf32("A0"),
                         new System.Text.Parsing.NonterminalParser(ToUtf32("primary"), ToUtf32("PrimaryExpression"), 0)),
                     new System.Text.Parsing.OptionalParser(
-                        new System.Text.Parsing.AlternativeParser(
+                        new System.Text.Parsing.GroupingParser(
                             new System.Text.Parsing.AlternativeParser(
-                                new System.Text.Parsing.ActionParser(ToUtf32("A1"),
-                                    new System.Text.Parsing.CharParser('*')),
-                                new System.Text.Parsing.ActionParser(ToUtf32("A2"),
-                                    new System.Text.Parsing.CharParser('+'))),
-                            new System.Text.Parsing.ActionParser(ToUtf32("A3"),
-                                new System.Text.Parsing.CharParser('?')))))));
+                                new System.Text.Parsing.AlternativeParser(
+                                    new System.Text.Parsing.ActionParser(ToUtf32("A1"),
+                                        new System.Text.Parsing.CharParser('*')),
+                                    new System.Text.Parsing.ActionParser(ToUtf32("A2"),
+                                        new System.Text.Parsing.CharParser('+'))),
+                                new System.Text.Parsing.ActionParser(ToUtf32("A3"),
+                                    new System.Text.Parsing.CharParser('?'))))))));
             AddRule(new PrimaryExpressionRule(ToUtf32("PrimaryExpression"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.AlternativeParser(
                     new System.Text.Parsing.AlternativeParser(
@@ -956,11 +961,12 @@ namespace System.Text.RegularExpressions
                                                                     new System.Text.Parsing.ActionParser(ToUtf32("A2"),
                                                                         new System.Text.Parsing.NonterminalParser(ToUtf32("cls"), ToUtf32("CharClass"), 0))),
                                                                 new System.Text.Parsing.ActionParser(ToUtf32("A3"),
-                                                                    new System.Text.Parsing.SequenceParser(
+                                                                    new System.Text.Parsing.GroupingParser(
                                                                         new System.Text.Parsing.SequenceParser(
-                                                                            new System.Text.Parsing.CharParser('('),
-                                                                            new System.Text.Parsing.NonterminalParser(ToUtf32("alt"), ToUtf32("AlternativeExpression"), 0)),
-                                                                        new System.Text.Parsing.CharParser(')')))),
+                                                                            new System.Text.Parsing.SequenceParser(
+                                                                                new System.Text.Parsing.CharParser('('),
+                                                                                new System.Text.Parsing.NonterminalParser(ToUtf32("alt"), ToUtf32("AlternativeExpression"), 0)),
+                                                                            new System.Text.Parsing.CharParser(')'))))),
                                                             new System.Text.Parsing.ActionParser(ToUtf32("A4"),
                                                                 new System.Text.Parsing.StringParser(ToUtf32("\\d")))),
                                                         new System.Text.Parsing.ActionParser(ToUtf32("A5"),
@@ -985,26 +991,30 @@ namespace System.Text.RegularExpressions
                         new System.Text.Parsing.NonterminalParser(ToUtf32("escape"), ToUtf32("escape"), 0)))));
             AddRule(new CharRule(ToUtf32("Char"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.ActionParser(ToUtf32("A0"),
-                    new System.Text.Parsing.DifferenceParser(
-                        new System.Text.Parsing.AnyCharParser(),
-                        new System.Text.Parsing.CharSetParser(ToUtf32("()\\[*+?|."))))));
+                    new System.Text.Parsing.GroupingParser(
+                        new System.Text.Parsing.DifferenceParser(
+                            new System.Text.Parsing.AnyCharParser(),
+                            new System.Text.Parsing.CharSetParser(ToUtf32("()\\[*+?|.")))))));
             AddRule(new CharClassRule(ToUtf32("CharClass"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.ActionParser(ToUtf32("A0"),
-                    new System.Text.Parsing.SequenceParser(
+                    new System.Text.Parsing.GroupingParser(
                         new System.Text.Parsing.SequenceParser(
                             new System.Text.Parsing.SequenceParser(
-                                new System.Text.Parsing.CharParser('['),
-                                new System.Text.Parsing.OptionalParser(
-                                    new System.Text.Parsing.ActionParser(ToUtf32("A1"),
-                                        new System.Text.Parsing.CharParser('^')))),
-                            new System.Text.Parsing.KleeneStarParser(
-                                new System.Text.Parsing.AlternativeParser(
-                                    new System.Text.Parsing.ActionParser(ToUtf32("A2"),
-                                        new System.Text.Parsing.NonterminalParser(ToUtf32("Class"), ToUtf32("Class"), 0)),
-                                    new System.Text.Parsing.ActionParser(ToUtf32("A3"),
-                                        new System.Text.Parsing.NonterminalParser(ToUtf32("CharRange"), ToUtf32("CharRange"), 0))))),
-                        new System.Text.Parsing.ExpectationParser(
-                            new System.Text.Parsing.CharParser(']'))))));
+                                new System.Text.Parsing.SequenceParser(
+                                    new System.Text.Parsing.CharParser('['),
+                                    new System.Text.Parsing.OptionalParser(
+                                        new System.Text.Parsing.GroupingParser(
+                                            new System.Text.Parsing.ActionParser(ToUtf32("A1"),
+                                                new System.Text.Parsing.CharParser('^'))))),
+                                new System.Text.Parsing.KleeneStarParser(
+                                    new System.Text.Parsing.GroupingParser(
+                                        new System.Text.Parsing.AlternativeParser(
+                                            new System.Text.Parsing.ActionParser(ToUtf32("A2"),
+                                                new System.Text.Parsing.NonterminalParser(ToUtf32("Class"), ToUtf32("Class"), 0)),
+                                            new System.Text.Parsing.ActionParser(ToUtf32("A3"),
+                                                new System.Text.Parsing.NonterminalParser(ToUtf32("CharRange"), ToUtf32("CharRange"), 0)))))),
+                            new System.Text.Parsing.ExpectationParser(
+                                new System.Text.Parsing.CharParser(']')))))));
             AddRule(new ClassRule(ToUtf32("Class"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.AlternativeParser(
                     new System.Text.Parsing.AlternativeParser(
@@ -1050,13 +1060,14 @@ namespace System.Text.RegularExpressions
             AddRule(new CharRangeRule(ToUtf32("CharRange"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.SequenceParser(
                     new System.Text.Parsing.NonterminalParser(ToUtf32("first"), ToUtf32("CharClassChar"), 0),
-                    new System.Text.Parsing.AlternativeParser(
-                        new System.Text.Parsing.SequenceParser(
-                            new System.Text.Parsing.CharParser('-'),
-                            new System.Text.Parsing.ActionParser(ToUtf32("A0"),
-                                new System.Text.Parsing.NonterminalParser(ToUtf32("last"), ToUtf32("CharClassChar"), 0))),
-                        new System.Text.Parsing.ActionParser(ToUtf32("A1"),
-                            new System.Text.Parsing.EmptyParser())))));
+                    new System.Text.Parsing.GroupingParser(
+                        new System.Text.Parsing.AlternativeParser(
+                            new System.Text.Parsing.SequenceParser(
+                                new System.Text.Parsing.CharParser('-'),
+                                new System.Text.Parsing.ActionParser(ToUtf32("A0"),
+                                    new System.Text.Parsing.NonterminalParser(ToUtf32("last"), ToUtf32("CharClassChar"), 0))),
+                            new System.Text.Parsing.ActionParser(ToUtf32("A1"),
+                                new System.Text.Parsing.EmptyParser()))))));
             AddRule(new CharClassCharRule(ToUtf32("CharClassChar"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.AlternativeParser(
                     new System.Text.Parsing.ActionParser(ToUtf32("A0"),

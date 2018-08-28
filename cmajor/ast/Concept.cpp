@@ -16,6 +16,41 @@ ConstraintNode::ConstraintNode(NodeType nodeType_, const Span& span_) : Node(nod
 {
 }
 
+ParenthesizedConstraintNode::ParenthesizedConstraintNode(const Span& span_) : ConstraintNode(NodeType::parenthesizedConstraintNode, span_)
+{
+}
+
+ParenthesizedConstraintNode::ParenthesizedConstraintNode(const Span& span_, ConstraintNode* constraint_) : ConstraintNode(NodeType::parenthesizedConstraintNode, span_), constraint(constraint_)
+{
+}
+
+Node* ParenthesizedConstraintNode::Clone(CloneContext& cloneContext) const
+{
+    return new ParenthesizedConstraintNode(GetSpan(), static_cast<ConstraintNode*>(constraint->Clone(cloneContext)));
+}
+
+void ParenthesizedConstraintNode::Accept(Visitor& visitor)
+{
+    visitor.Visit(*this);
+}
+
+void ParenthesizedConstraintNode::Write(AstWriter& writer)
+{
+    ConstraintNode::Write(writer);
+    writer.Write(constraint.get());
+}
+
+void ParenthesizedConstraintNode::Read(AstReader& reader)
+{
+    ConstraintNode::Read(reader);
+    constraint.reset(reader.ReadConstraintNode());
+}
+
+std::string ParenthesizedConstraintNode::ToString() const
+{
+    return "(" + constraint->ToString() + ")";
+}
+
 BinaryConstraintNode::BinaryConstraintNode(NodeType nodeType_, const Span& span_) : ConstraintNode(nodeType_, span_), left(), right()
 {
 }
@@ -91,18 +126,28 @@ std::string ConjunctiveConstraintNode::ToString() const
 }
 
 
-WhereConstraintNode::WhereConstraintNode(const Span& span_) : ConstraintNode(NodeType::whereConstraintNode, span_), constraint()
+WhereConstraintNode::WhereConstraintNode(const Span& span_) : ConstraintNode(NodeType::whereConstraintNode, span_), constraint(), headerConstraint(false), semicolon(false)
 {
 }
 
-WhereConstraintNode::WhereConstraintNode(const Span& span_, ConstraintNode* constraint_) : ConstraintNode(NodeType::whereConstraintNode, span_), constraint(constraint_)
+WhereConstraintNode::WhereConstraintNode(const Span& span_, ConstraintNode* constraint_) : 
+    ConstraintNode(NodeType::whereConstraintNode, span_), constraint(constraint_), headerConstraint(false), semicolon(false)
 {
     constraint->SetParent(this);
 }
 
 Node* WhereConstraintNode::Clone(CloneContext& cloneContext) const
 {
-    return new WhereConstraintNode(GetSpan(), static_cast<ConstraintNode*>(constraint->Clone(cloneContext)));
+    WhereConstraintNode* clone = new WhereConstraintNode(GetSpan(), static_cast<ConstraintNode*>(constraint->Clone(cloneContext)));
+    if (headerConstraint)
+    {
+        clone->SetHeaderConstraint();
+    }
+    if (semicolon)
+    {
+        clone->SetSemicolon();
+    }
+    return clone;
 }
 
 void WhereConstraintNode::Accept(Visitor& visitor)
@@ -114,6 +159,8 @@ void WhereConstraintNode::Write(AstWriter& writer)
 {
     ConstraintNode::Write(writer);
     writer.Write(constraint.get());
+    writer.GetBinaryWriter().Write(headerConstraint);
+    writer.GetBinaryWriter().Write(semicolon);
 }
 
 void WhereConstraintNode::Read(AstReader& reader)
@@ -121,6 +168,8 @@ void WhereConstraintNode::Read(AstReader& reader)
     ConstraintNode::Read(reader);
     constraint.reset(reader.ReadConstraintNode());
     constraint->SetParent(this);
+    headerConstraint = reader.GetBinaryReader().ReadBool();
+    semicolon = reader.GetBinaryReader().ReadBool();
 }
 
 std::string WhereConstraintNode::ToString() const
@@ -629,6 +678,8 @@ Node* AxiomNode::Clone(CloneContext& cloneContext) const
     {
         clone->AddStatement(static_cast<AxiomStatementNode*>(statements[i]->Clone(cloneContext)));
     }
+    clone->SetBeginBraceSpan(beginBraceSpan);
+    clone->SetEndBraceSpan(endBraceSpan);
     return clone;
 }
 
@@ -643,6 +694,8 @@ void AxiomNode::Write(AstWriter& writer)
     writer.Write(id.get());
     parameters.Write(writer);
     statements.Write(writer);
+    writer.Write(beginBraceSpan);
+    writer.Write(endBraceSpan);
 }
 
 void AxiomNode::Read(AstReader& reader)
@@ -654,6 +707,8 @@ void AxiomNode::Read(AstReader& reader)
     parameters.SetParent(this);
     statements.Read(reader);
     statements.SetParent(this);
+    beginBraceSpan = reader.ReadSpan();
+    endBraceSpan = reader.ReadSpan();
 }
 
 void AxiomNode::AddParameter(ParameterNode* parameter)
@@ -774,6 +829,8 @@ Node* ConceptNode::Clone(CloneContext& cloneContext) const
     {
         clone->AddAxiom(static_cast<AxiomNode*>(axioms[i]->Clone(cloneContext)));
     }
+    clone->SetBeginBraceSpan(beginBraceSpan);
+    clone->SetEndBraceSpan(endBraceSpan);
     return clone;
 }
 
@@ -796,6 +853,8 @@ void ConceptNode::Write(AstWriter& writer)
     }
     constraints.Write(writer);
     axioms.Write(writer);
+    writer.Write(beginBraceSpan);
+    writer.Write(endBraceSpan);
 }
 
 void ConceptNode::Read(AstReader& reader)
@@ -816,6 +875,8 @@ void ConceptNode::Read(AstReader& reader)
     constraints.SetParent(this);
     axioms.Read(reader);
     axioms.SetParent(this);
+    beginBraceSpan = reader.ReadSpan();
+    endBraceSpan = reader.ReadSpan();
 }
 
 void ConceptNode::AddTypeParameter(IdentifierNode* typeParameter)

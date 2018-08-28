@@ -95,6 +95,7 @@ public:
     void Visit(DelegateNode& delegateNode) override;
     void Visit(ClassDelegateNode& classDelegateNode) override;
 
+    void Visit(ParenthesizedConstraintNode& parenthesizedConstraintNode) override;
     void Visit(DisjunctiveConstraintNode& disjunctiveConstraintNode) override;
     void Visit(ConjunctiveConstraintNode& conjunctiveConstraintNode) override;
     void Visit(WhereConstraintNode& whereConstraintNode) override;
@@ -207,6 +208,7 @@ public:
     void Visit(NewNode& newNode) override;
     void Visit(ThisNode& thisNode) override;
     void Visit(BaseNode& baseNode) override;
+    void Visit(ParenthesizedExpressionNode& parenthesizedExpressionNode) override;
 private:
     std::unique_ptr<dom::Element> compileUnitElement;
     dom::Element* currentElement;
@@ -852,6 +854,17 @@ void Ast2DomVisitor::Visit(ClassDelegateNode& classDelegateNode)
         parameter->Accept(*this);
     }
     prevElement->AppendChild(std::unique_ptr<dom::Node>(classDelegateElement.release()));
+    currentElement = prevElement;
+}
+
+void Ast2DomVisitor::Visit(ParenthesizedConstraintNode& parenthesizedConstraintNode)
+{
+    CheckCurrentElement();
+    std::unique_ptr<dom::Element> parenthesizedConstraintElement(new dom::Element(U"ParenthesizedConstraintNode"));
+    dom::Element* prevElement = currentElement;
+    currentElement = parenthesizedConstraintElement.get();
+    parenthesizedConstraintNode.Constraint()->Accept(*this);
+    prevElement->AppendChild(std::unique_ptr<dom::Node>(parenthesizedConstraintElement.release()));
     currentElement = prevElement;
 }
 
@@ -2190,6 +2203,17 @@ void Ast2DomVisitor::Visit(BaseNode& baseNode)
 {
     CheckCurrentElement();
     currentElement->AppendChild(std::unique_ptr<dom::Node>(new dom::Element(U"BaseNode")));
+}
+
+void Ast2DomVisitor::Visit(ParenthesizedExpressionNode& parenthesizedExpressionNode)
+{
+    CheckCurrentElement();
+    std::unique_ptr<dom::Element> parenElement(new dom::Element(U"ParenthesizedExpressionNode"));
+    dom::Element* prevElement = currentElement;
+    currentElement = parenElement.get();
+    parenthesizedExpressionNode.Subject()->Accept(*this);
+    prevElement->AppendChild(std::unique_ptr<dom::Node>(parenElement.release()));
+    currentElement = prevElement;
 }
 
 std::unique_ptr<dom::Document> GenerateAstDocument(cmajor::ast::Node* node)

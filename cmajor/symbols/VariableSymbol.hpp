@@ -18,6 +18,7 @@ class VariableSymbol : public Symbol
 {
 public:
     VariableSymbol(SymbolType symbolType_, const Span& span_, const std::u32string& name_);
+    bool IsVariableSymbol() const override { return true; }
     void Write(SymbolWriter& writer) override;
     void Read(SymbolReader& reader) override;
     void EmplaceType(TypeSymbol* typeSymbol, int index) override;
@@ -34,11 +35,18 @@ class ParameterSymbol : public VariableSymbol
 {
 public:    
     ParameterSymbol(const Span& span_, const std::u32string& name_);
+    void Write(SymbolWriter& writer) override;
+    void Read(SymbolReader& reader) override;
     SymbolAccess DeclaredAccess() const override { return SymbolAccess::public_; }
     std::string TypeString() const override { return "parameter"; }
     void ComputeExportClosure() override;
     std::unique_ptr<dom::Element> CreateDomElement(TypeMap& typeMap) override;
     const char* ClassName() const override { return "ParameterSymbol"; }
+    bool ArtificialName() const { return artificialName; }
+    void SetArtificialName() { artificialName = true; }
+    std::u32string CodeName() const override;
+private:
+    bool artificialName;
 };
 
 class LocalVariableSymbol : public VariableSymbol

@@ -43,6 +43,7 @@ public:
         --start;
         --end;
     }
+    void SetStart(int32_t start_) { start = start_; }
     void SetEnd(int32_t end_) { end = end_; }
     bool IsNull() const { return fileIndex == 0 && lineNumber == 0 && start == 0 && end == 0; }
 private:

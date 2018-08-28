@@ -32,6 +32,9 @@ Node* InterfaceNode::Clone(CloneContext& cloneContext) const
     {
         clone->AddMember(members[i]->Clone(cloneContext));
     }
+    clone->SetSpecifierSpan(specifierSpan);
+    clone->SetBeginBraceSpan(beginBraceSpan);
+    clone->SetEndBraceSpan(endBraceSpan);
     return clone;
 }
 
@@ -51,6 +54,9 @@ void InterfaceNode::Write(AstWriter& writer)
     }
     writer.Write(id.get());
     members.Write(writer);
+    writer.Write(specifierSpan);
+    writer.Write(beginBraceSpan);
+    writer.Write(endBraceSpan);
 }
 
 void InterfaceNode::Read(AstReader& reader)
@@ -66,6 +72,9 @@ void InterfaceNode::Read(AstReader& reader)
     id->SetParent(this);
     members.Read(reader);
     members.SetParent(this);
+    specifierSpan = reader.ReadSpan();
+    beginBraceSpan = reader.ReadSpan();
+    endBraceSpan = reader.ReadSpan();
 }
 
 void InterfaceNode::AddMember(Node* member)

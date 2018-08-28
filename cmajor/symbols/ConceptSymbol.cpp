@@ -73,7 +73,7 @@ void ConceptGroupSymbol::AppendChildElements(dom::Element* element, TypeMap& typ
 }
 
 ConceptSymbol::ConceptSymbol(const Span& span_, const std::u32string& name_) : ContainerSymbol(SymbolType::conceptSymbol, span_, name_), refinedConcept(nullptr), 
-    typeId(boost::uuids::nil_generator()())
+    typeId(boost::uuids::nil_generator()()), hasSource(false)
 {
 }
 
@@ -89,9 +89,18 @@ void ConceptSymbol::Write(SymbolWriter& writer)
         refineConceptId = refinedConcept->TypeId();
     }
     writer.GetBinaryWriter().Write(refineConceptId);
+    uint32_t n = templateParameters.size();
+    writer.GetBinaryWriter().WriteULEB128UInt(n);
+    for (uint32_t i = 0; i < n; ++i)
+    {
+        TemplateParameterSymbol* templateParameter = templateParameters[i];
+        Assert(!templateParameter->TypeId().is_nil(), "type id not initialized");
+        writer.GetBinaryWriter().Write(templateParameter->TypeId());
+    }
     Node* node = GetSymbolTable()->GetNode(this);
     Assert(node->IsConceptNode(), "concept node expected");
     writer.GetAstWriter().Write(node);
+    writer.GetBinaryWriter().Write(hasSource);
 }
 
 void ConceptSymbol::Read(SymbolReader& reader)
@@ -106,12 +115,41 @@ void ConceptSymbol::Read(SymbolReader& reader)
     {
         GetSymbolTable()->EmplaceConceptRequest(this, refinedConcepId);
     }
+    uint32_t n = reader.GetBinaryReader().ReadULEB128UInt();
+    templateParameters.resize(n);
+    for (uint32_t i = 0; i < n; ++i)
+    {
+        boost::uuids::uuid templateParameterId;
+        reader.GetBinaryReader().ReadUuid(templateParameterId);
+        GetSymbolTable()->EmplaceTypeRequest(this, templateParameterId, i);
+    }
     conceptNode.reset(reader.GetAstReader().ReadConceptNode());
+    hasSource = reader.GetBinaryReader().ReadBool();
 }
 
 void ConceptSymbol::EmplaceConcept(ConceptSymbol* concept)
 {
     refinedConcept = concept;
+}
+
+void ConceptSymbol::EmplaceType(TypeSymbol* typeSymbol, int index)
+{
+    if (index >= 0 && index < templateParameters.size())
+    {
+        if (typeSymbol->GetSymbolType() == SymbolType::templateParameterSymbol)
+        {
+            TemplateParameterSymbol* templateParameter = static_cast<TemplateParameterSymbol*>(typeSymbol);
+            templateParameters[index] = templateParameter;
+        }
+        else
+        {
+            throw Exception(GetModule(), "invalid emplace type", GetSpan());
+        }
+    }
+    else
+    {
+        throw Exception(GetModule(), "invalid emplace type index", GetSpan());
+    }
 }
 
 void ConceptSymbol::Accept(SymbolCollector* collector)
@@ -128,7 +166,6 @@ void ConceptSymbol::Dump(CodeFormatter& formatter)
     formatter.WriteLine("group name: " + ToUtf8(groupName));
     formatter.WriteLine("full name: " + ToUtf8(FullNameWithSpecifiers()));
     formatter.WriteLine("mangled name: " + ToUtf8(MangledName()));
-    //formatter.WriteLine("typeid: " + std::to_string(typeId));
     formatter.WriteLine("typeid: " + boost::uuids::to_string(typeId));
     if (refinedConcept)
     {

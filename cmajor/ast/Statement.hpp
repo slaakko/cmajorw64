@@ -41,6 +41,7 @@ public:
     void SetLabelNode(LabelNode* labelNode_);
     void CloneLabelTo(StatementNode* clone, CloneContext& cloneContext) const;
     const LabelNode* Label() const { return labelNode.get(); }
+    LabelNode* Label() { return labelNode.get(); }
 private:
     std::unique_ptr<LabelNode> labelNode;
 };
@@ -98,10 +99,19 @@ public:
     StatementNode* ThenS() { return thenS.get(); }
     const StatementNode* ElseS() const { return elseS.get(); }
     StatementNode* ElseS() { return elseS.get(); }
+    void SetLeftParenSpan(const Span& leftParenSpan_) { leftParenSpan = leftParenSpan_; }
+    const Span& LeftParenSpan() const { return leftParenSpan; }
+    void SetRightParenSpan(const Span& rightParenSpan_) { rightParenSpan = rightParenSpan_; }
+    const Span& RightParenSpan() const { return rightParenSpan; }
+    void SetElseSpan(const Span& elseSpan_) { elseSpan = elseSpan_; }
+    const Span& ElseSpan() const { return elseSpan; }
 private:
     std::unique_ptr<Node> condition;
     std::unique_ptr<StatementNode> thenS;
     std::unique_ptr<StatementNode> elseS;
+    Span leftParenSpan;
+    Span rightParenSpan;
+    Span elseSpan;
 };
 
 class WhileStatementNode : public StatementNode
@@ -119,9 +129,15 @@ public:
     Node* Condition() { return condition.get(); }
     const StatementNode* Statement() const { return statement.get(); }
     StatementNode* Statement() { return statement.get(); }
+    void SetLeftParenSpan(const Span& leftParenSpan_) { leftParenSpan = leftParenSpan_; }
+    const Span& LeftParenSpan() const { return leftParenSpan; }
+    void SetRightParenSpan(const Span& rightParenSpan_) { rightParenSpan = rightParenSpan_; }
+    const Span& RightParenSpan() const { return rightParenSpan; }
 private:
     std::unique_ptr<Node> condition;
     std::unique_ptr<StatementNode> statement;
+    Span leftParenSpan;
+    Span rightParenSpan;
 };
 
 class DoStatementNode : public StatementNode
@@ -139,9 +155,18 @@ public:
     StatementNode* Statement() { return statement.get(); }
     const Node* Condition() const { return condition.get(); }
     Node* Condition() { return condition.get(); }
+    void SetWhileSpan(const Span& whileSpan_) { whileSpan = whileSpan_; }
+    const Span& WhileSpan() const { return whileSpan; }
+    void SetLeftParenSpan(const Span& leftParenSpan_) { leftParenSpan = leftParenSpan_; }
+    const Span& LeftParenSpan() const { return leftParenSpan; }
+    void SetRightParenSpan(const Span& rightParenSpan_) { rightParenSpan = rightParenSpan_; }
+    const Span& RightParenSpan() const { return rightParenSpan; }
 private:
     std::unique_ptr<StatementNode> statement;
     std::unique_ptr<Node> condition;
+    Span whileSpan;
+    Span leftParenSpan;
+    Span rightParenSpan;
 };
 
 class ForStatementNode : public StatementNode
@@ -163,11 +188,17 @@ public:
     StatementNode* LoopS() { return loopS.get(); }
     const StatementNode* ActionS() const { return actionS.get(); }
     StatementNode* ActionS() { return actionS.get(); }
+    void SetLeftParenSpan(const Span& leftParenSpan_) { leftParenSpan = leftParenSpan_; }
+    const Span& LeftParenSpan() const { return leftParenSpan; }
+    void SetRightParenSpan(const Span& rightParenSpan_) { rightParenSpan = rightParenSpan_; }
+    const Span& RightParenSpan() const { return rightParenSpan; }
 private:
     std::unique_ptr<StatementNode> initS;
     std::unique_ptr<Node> condition;
     std::unique_ptr<StatementNode> loopS;
     std::unique_ptr<StatementNode> actionS;
+    Span leftParenSpan;
+    Span rightParenSpan;
 };
 
 class BreakStatementNode : public StatementNode
@@ -219,10 +250,16 @@ public:
     const IdentifierNode* Id() const { return id.get(); }
     IdentifierNode* Id() { return id.get(); }
     const NodeList<Node>& Arguments() const { return arguments; }
+    void SetAssignment() { assignment = true; }
+    bool Assignment() const { return assignment; }
+    void SetEmpty() { empty = true; }
+    bool Empty() const { return empty; }
 private:
     std::unique_ptr<Node> typeExpr;
     std::unique_ptr<IdentifierNode> id;
     NodeList<Node> arguments;
+    bool assignment;
+    bool empty;
 };
 
 class DeleteStatementNode : public StatementNode
@@ -315,11 +352,20 @@ public:
     Node* Container() { return container.get(); }
     const StatementNode* Action() const { return action.get(); }
     StatementNode* Action() { return action.get(); }
+    void SetLeftParenSpan(const Span& leftParenSpan_) { leftParenSpan = leftParenSpan_; }
+    const Span& LeftParenSpan() const { return leftParenSpan; }
+    void SetRightParenSpan(const Span& rightParenSpan_) { rightParenSpan = rightParenSpan_; }
+    const Span& RightParenSpan() const { return rightParenSpan; }
+    void SetColonSpan(const Span& colonSpan_) { colonSpan = colonSpan_; }
+    const Span& ColonSpan() const { return colonSpan; }
 private:
     std::unique_ptr<Node> typeExpr;
     std::unique_ptr<IdentifierNode> id;
     std::unique_ptr<Node> container;
     std::unique_ptr<StatementNode> action;
+    Span leftParenSpan;
+    Span rightParenSpan;
+    Span colonSpan;
 };
 
 class CaseStatementNode;
@@ -342,10 +388,22 @@ public:
     void SetDefault(DefaultStatementNode* defaultS_);
     const DefaultStatementNode* Default() const { return defaultS.get(); }
     DefaultStatementNode* Default() { return defaultS.get(); }
+    void SetLeftParenSpan(const Span& leftParenSpan_) { leftParenSpan = leftParenSpan_; }
+    const Span& LeftParenSpan() const { return leftParenSpan; }
+    void SetRightParenSpan(const Span& rightParenSpan_) { rightParenSpan = rightParenSpan_; }
+    const Span& RightParenSpan() const { return rightParenSpan; }
+    void SetBeginBraceSpan(const Span& beginBraceSpan_) { beginBraceSpan = beginBraceSpan_; }
+    const Span& BeginBraceSpan() const { return beginBraceSpan; }
+    void SetEndBraceSpan(const Span& endBraceSpan_) { endBraceSpan = endBraceSpan_; }
+    const Span& EndBraceSpan() const { return endBraceSpan; }
 private:
     std::unique_ptr<Node> condition;
     NodeList<CaseStatementNode> cases;
     std::unique_ptr<DefaultStatementNode> defaultS;
+    Span leftParenSpan;
+    Span rightParenSpan;
+    Span beginBraceSpan;
+    Span endBraceSpan;
 };
 
 class CaseStatementNode : public StatementNode
@@ -360,9 +418,12 @@ public:
     const NodeList<Node>& CaseExprs() const { return caseExprs; }
     void AddStatement(StatementNode* statement);
     const NodeList<StatementNode>& Statements() const { return statements; }
+    void AddCaseSpan(const Span& caseSpan);
+    const std::vector<Span>& CaseSpans() const { return caseSpans; }
 private:
     NodeList<Node> caseExprs;
     NodeList<StatementNode> statements;
+    std::vector<Span> caseSpans;
 };
 
 class DefaultStatementNode : public StatementNode
@@ -458,10 +519,16 @@ public:
     IdentifierNode* Id() { return id.get(); }
     const CompoundStatementNode* CatchBlock() const { return catchBlock.get(); }
     CompoundStatementNode* CatchBlock() { return catchBlock.get(); }
+    void SetLeftParenSpan(const Span& leftParenSpan_) { leftParenSpan = leftParenSpan_; }
+    const Span& LeftParenSpan() const { return leftParenSpan; }
+    void SetRightParenSpan(const Span& rightParenSpan_) { rightParenSpan = rightParenSpan_; }
+    const Span& RightParenSpan() const { return rightParenSpan; }
 private:
     std::unique_ptr<Node> typeExpr;
     std::unique_ptr<IdentifierNode> id;
     std::unique_ptr<CompoundStatementNode> catchBlock;
+    Span leftParenSpan;
+    Span rightParenSpan;
 };
 
 class AssertStatementNode : public StatementNode
@@ -558,9 +625,18 @@ public:
     void Read(AstReader& reader) override;
     ConditionalCompilationExpressionNode* Expr() const { return expr.get();  }
     const NodeList<StatementNode>& Statements() const { return statements; }
+    void SetKeywordSpan(const Span& keywordSpan_) { keywordSpan = keywordSpan_; }
+    const Span& KeywordSpan() const { return keywordSpan; }
+    void SetLeftParenSpan(const Span& leftParenSpan_) { leftParenSpan = leftParenSpan_; }
+    const Span& LeftParenSpan() const { return leftParenSpan; }
+    void SetRightParenSpan(const Span& rightParenSpan_) { rightParenSpan = rightParenSpan_; }
+    const Span& RightParenSpan() const { return rightParenSpan; }
 private:
     std::unique_ptr<ConditionalCompilationExpressionNode> expr;
     NodeList<StatementNode> statements;
+    Span keywordSpan;
+    Span leftParenSpan;
+    Span rightParenSpan;
 };
 
 class ConditionalCompilationStatementNode : public StatementNode
@@ -579,10 +655,16 @@ public:
     ConditionalCompilationPartNode* IfPart() { return ifPart.get(); }
     const NodeList<ConditionalCompilationPartNode>& ElifParts() const { return elifParts; }
     ConditionalCompilationPartNode* ElsePart() { return elsePart.get(); }
+    void SetElifLeftParenSpan(const Span& span);
+    void SetElifRightParenSpan(const Span& span);
+    void SetElifKeywordSpan(const Span& span);
+    void SetEndIfSpan(const Span& endifSpan_) { endifSpan = endifSpan_; }
+    const Span& EndIfSpan() const { return endifSpan; }
 private:
     std::unique_ptr<ConditionalCompilationPartNode> ifPart;
     NodeList<ConditionalCompilationPartNode> elifParts;
     std::unique_ptr<ConditionalCompilationPartNode> elsePart;
+    Span endifSpan;
 };
 
 } } // namespace cmajor::ast

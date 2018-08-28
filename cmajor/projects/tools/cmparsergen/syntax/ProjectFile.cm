@@ -2,6 +2,8 @@ using System;
 using System.Collections;
 using System.Text.Parsing;
 
+// this source file has been automatically generated from 'ProjectFile.parser' using cmparsergen version 2.0.0.
+
 namespace Syntax
 {
     public class ProjectFileGrammar : System.Text.Parsing.Grammar
@@ -345,11 +347,12 @@ namespace Syntax
                     new System.Text.Parsing.NonterminalParser(ToUtf32("ProjectFileContent"), ToUtf32("ProjectFileContent"), 1))));
             AddRule(new ProjectFileContentRule(ToUtf32("ProjectFileContent"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.KleeneStarParser(
-                    new System.Text.Parsing.AlternativeParser(
-                        new System.Text.Parsing.ActionParser(ToUtf32("A0"),
-                            new System.Text.Parsing.NonterminalParser(ToUtf32("Source"), ToUtf32("Source"), 0)),
-                        new System.Text.Parsing.ActionParser(ToUtf32("A1"),
-                            new System.Text.Parsing.NonterminalParser(ToUtf32("Reference"), ToUtf32("Reference"), 0))))));
+                    new System.Text.Parsing.GroupingParser(
+                        new System.Text.Parsing.AlternativeParser(
+                            new System.Text.Parsing.ActionParser(ToUtf32("A0"),
+                                new System.Text.Parsing.NonterminalParser(ToUtf32("Source"), ToUtf32("Source"), 0)),
+                            new System.Text.Parsing.ActionParser(ToUtf32("A1"),
+                                new System.Text.Parsing.NonterminalParser(ToUtf32("Reference"), ToUtf32("Reference"), 0)))))));
             AddRule(new SourceRule(ToUtf32("Source"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.SequenceParser(
                     new System.Text.Parsing.SequenceParser(
@@ -370,8 +373,9 @@ namespace Syntax
                         new System.Text.Parsing.SequenceParser(
                             new System.Text.Parsing.CharParser('<'),
                             new System.Text.Parsing.ActionParser(ToUtf32("A0"),
-                                new System.Text.Parsing.PositiveParser(
-                                    new System.Text.Parsing.CharSetParser(ToUtf32(">\r\n"), true)))),
+                                new System.Text.Parsing.GroupingParser(
+                                    new System.Text.Parsing.PositiveParser(
+                                        new System.Text.Parsing.CharSetParser(ToUtf32(">\r\n"), true))))),
                         new System.Text.Parsing.CharParser('>')))));
             SetSkipRuleName(ToUtf32("spaces_and_comments"));
         }

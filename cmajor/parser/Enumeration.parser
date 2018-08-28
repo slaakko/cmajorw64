@@ -21,10 +21,16 @@ namespace cmajor.parser
         using TypeExpr.TypeExpr;
         using Expression.Expression;
 
-        EnumType(ParsingContext* ctx) : EnumTypeNode*
-            ::= Specifiers keyword("enum") Identifier:enumTypeId!{ value = new EnumTypeNode(span, Specifiers, enumTypeId); }
+        EnumType(ParsingContext* ctx, var Span beginBraceSpan, var Span endBraceSpan) : EnumTypeNode*
+            ::= (Specifiers keyword("enum") Identifier:enumTypeId!){ value = new EnumTypeNode(span, Specifiers, enumTypeId); }
                 (UnderlyingType(ctx){ value->SetUnderlyingType(UnderlyingType); })?
-                '{'! EnumConstants(ctx, value) '}'!{ value->GetSpan().SetEnd(span.End()); }
+                '{'!{ beginBraceSpan = span; } EnumConstants(ctx, value) '}'!
+                { 
+                    endBraceSpan = span; 
+                    value->GetSpan().SetEnd(span.End()); 
+                    value->SetBeginBraceSpan(beginBraceSpan); 
+                    value->SetEndBraceSpan(endBraceSpan);
+                }
             ;
 
         UnderlyingType(ParsingContext* ctx) : Node*
@@ -37,7 +43,13 @@ namespace cmajor.parser
 
         EnumConstant(ParsingContext* ctx, EnumTypeNode* enumType, var Span s) : EnumConstantNode*
             ::= Identifier:constantId!{ s = span; } 
-            (   '=' Expression(ctx):constantValue{ s.SetEnd(span.End()); value = new EnumConstantNode(s, constantId, constantValue); }
+            (   '=' Expression(ctx):constantValue
+                    { 
+                        s.SetEnd(span.End()); 
+                        value = new EnumConstantNode(s, constantId, constantValue); 
+                        value->SetHasValue(); 
+                        value->SetStrValue(std::u32string(matchBegin, matchEnd));
+                    }
             |   empty{ s.SetEnd(span.End()); value = new EnumConstantNode(s, constantId, MakeNextEnumConstantValue(s, enumType)); }
             )
             ;

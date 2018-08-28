@@ -4,16 +4,16 @@
     <tabSize>4</tabSize>
     <infoDelaySecs>10</infoDelaySecs>
     <formSizeX>1698</formSizeX>
-    <formSizeY>972</formSizeY>
-    <formTop>0</formTop>
-    <formLeft>0</formLeft>
-    <textVisX>156</textVisX>
-    <textVisY>156</textVisY>
+    <formSizeY>995</formSizeY>
+    <formTop>39</formTop>
+    <formLeft>44</formLeft>
+    <textVisX>234</textVisX>
+    <textVisY>234</textVisY>
     <textVisW>1259</textVisW>
     <textVisH>482</textVisH>
-    <toolColWidth>80</toolColWidth>
+    <toolColWidth>97</toolColWidth>
     <categoryColWidth>80</categoryColWidth>
-    <descriptionColWidth>1003</descriptionColWidth>
+    <descriptionColWidth>876</descriptionColWidth>
     <fileColWidth>340</fileColWidth>
     <lineColWidth>60</lineColWidth>
     <projectColWidth>80</projectColWidth>
@@ -22,55 +22,15 @@
     <findLineColWidth>85</findLineColWidth>
     <findProjectColWidth>183</findProjectColWidth>
     <findTextColWidth>738</findTextColWidth>
-    <horizontalSplitterPos>1280</horizontalSplitterPos>
-    <verticalSplitterPos>547</verticalSplitterPos>
+    <horizontalSplitterPos>1278</horizontalSplitterPos>
+    <verticalSplitterPos>607</verticalSplitterPos>
     <windowState>Normal</windowState>
     <maxRecentProjects>10</maxRecentProjects>
-    <recentProjects>
-        <recentProject>
-            <path>C:\Users\Seppo\cmajorw64\cmajor\system\System.cms</path>
-            <openFiles />
-        </recentProject>
-        <recentProject>
-            <path>C:\Users\Seppo\cmajorw64\cmajor\projects\QuickSort\QuickSort.cms</path>
-            <openFiles />
-        </recentProject>
-        <recentProject>
-            <path>C:\Users\Seppo\cmajorw64\cmajor\projects\examples\examples.cms</path>
-            <openFiles />
-        </recentProject>
-        <recentProject>
-            <path>C:\Users\Seppo\cmajorw64\cmajor\test\foo\foo.cms</path>
-            <openFiles />
-        </recentProject>
-        <recentProject>
-            <path>C:\Users\Seppo\cmajorw64\cmajor\unitTest\cmajor\cmajor.cms</path>
-            <openFiles />
-        </recentProject>
-        <recentProject>
-            <path>C:\Users\Seppo\cmajorw64\cmajor\projects\tools\cmparsergen\cmparsergen.cms</path>
-            <openFiles />
-        </recentProject>
-        <recentProject>
-            <path>C:/Users/Seppo/cmajorw64/cmajor/test/init/init.cms</path>
-            <openFiles />
-        </recentProject>
-        <recentProject>
-            <path>C:/Users/Seppo/cmajorw64/cmajor/test/for/for.cms</path>
-            <openFiles />
-        </recentProject>
-        <recentProject>
-            <path>C:/Users/Seppo/cmajorw64/cmajor/test/foo/foo.cms</path>
-            <openFiles />
-        </recentProject>
-        <recentProject>
-            <path>C:/Users/Seppo/cmajorw64/cmajor/test/execute/execute.cms</path>
-            <openFiles />
-        </recentProject>
-    </recentProjects>
+    <recentProjects />
     <strictNothrow>false</strictNothrow>
-    <emitLlvm>true</emitLlvm>
-    <emitOptLlvm>true</emitOptLlvm>
-    <linkWithDebugRuntime>true</linkWithDebugRuntime>
+    <emitLlvm>false</emitLlvm>
+    <emitOptLlvm>false</emitOptLlvm>
+    <linkWithDebugRuntime>false</linkWithDebugRuntime>
     <linkUsingMsLink>false</linkUsingMsLink>
+    <numBuildThreads>0</numBuildThreads>
 </cmdevenv.configuration>

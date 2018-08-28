@@ -179,7 +179,7 @@ std::u32string ClassTemplateSpecializationSymbol::Id() const
     }
     else
     {
-        return ToUtf32(boost::uuids::to_string(TypeId()));
+        return TypeSymbol::Id();
     }
 }
 

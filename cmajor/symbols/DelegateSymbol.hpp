@@ -23,6 +23,7 @@ public:
     void AddMember(Symbol* member) override;
     std::string TypeString() const override { return "delegate"; }
     std::string Syntax() const override;
+    std::u32string Id() const override;
     bool IsDelegateType() const override { return true; }
     void Accept(SymbolCollector* collector) override;
     void Dump(CodeFormatter& formatter) override;
@@ -158,6 +159,7 @@ public:
     void AddMember(Symbol* member) override;
     std::string TypeString() const override { return "class_delegate"; }
     std::string Syntax() const override;
+    std::u32string Id() const override;
     bool IsClassDelegateType() const override { return true; }
     void Accept(SymbolCollector* collector) override;
     void Dump(CodeFormatter& formatter) override;

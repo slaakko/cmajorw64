@@ -1,5 +1,5 @@
-#ifndef Concept_hpp_8344
-#define Concept_hpp_8344
+#ifndef Concept_hpp_26948
+#define Concept_hpp_26948
 
 #include <cmajor/parsing/Grammar.hpp>
 #include <cmajor/parsing/Keyword.hpp>
@@ -47,4 +47,4 @@ private:
 
 } } // namespace cmajor.parser
 
-#endif // Concept_hpp_8344
+#endif // Concept_hpp_26948

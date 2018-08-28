@@ -96,7 +96,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
       <AdditionalLibraryDirectories>$(OutDir);C:\Programming\boost64;C:\Programming\llvm-6.0.0.src\build\Debug\lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>ast2dom.lib;bdt2dom.lib;eh.lib;xpath.lib;dom.lib;xml.lib;build.lib;emitter.lib;binder.lib;parser.lib;symbols.lib;ir.lib;ast.lib;syntax.lib;code.lib;parsing.lib;codedom.lib;util.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;
+      <AdditionalDependencies>cmdoclib.lib;ast2dom.lib;bdt2dom.lib;eh.lib;xpath.lib;dom.lib;xml.lib;build.lib;emitter.lib;binder.lib;parser.lib;symbols.lib;ir.lib;ast.lib;syntax.lib;code.lib;parsing.lib;codedom.lib;util.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;
 build.lib;emitter.lib;binder.lib;parser.lib;symbols.lib;ir.lib;ast.lib;syntax.lib;code.lib;parsing.lib;codedom.lib;util.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;
 LLVMMIRParser.lib;LLVMInterpreter.lib;LLVMLibDriver.lib;LLVMDlltoolDriver.lib;LLVMOption.lib;LLVMCoverage.lib;LLVMSymbolize.lib;LLVMDebugInfoPDB.lib;LLVMDebugInfoDWARF.lib;
 LLVMMCJIT.lib;LLVMWindowsManifest.lib;LLVMLineEditor.lib;LLVMLTO.lib;LLVMPasses.lib;LLVMObjCARCOpts.lib;LLVMCoroutines.lib;LLVMipo.lib;LLVMInstrumentation.lib;LLVMVectorize.lib;
@@ -152,7 +152,7 @@ LLVMDemangle.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
       <AdditionalLibraryDirectories>$(OutDir);C:\Programming\boost64;C:\Programming\llvm-6.0.0.src\build\Release\lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>ast2dom.lib;bdt2dom.lib;eh.lib;xpath.lib;dom.lib;xml.lib;build.lib;emitter.lib;binder.lib;parser.lib;symbols.lib;ir.lib;ast.lib;syntax.lib;code.lib;parsing.lib;codedom.lib;util.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;
+      <AdditionalDependencies>cmdoclib.lib;ast2dom.lib;bdt2dom.lib;eh.lib;xpath.lib;dom.lib;xml.lib;build.lib;emitter.lib;binder.lib;parser.lib;symbols.lib;ir.lib;ast.lib;syntax.lib;code.lib;parsing.lib;codedom.lib;util.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;
 build.lib;emitter.lib;binder.lib;parser.lib;symbols.lib;ir.lib;ast.lib;syntax.lib;code.lib;parsing.lib;codedom.lib;util.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;
 LLVMMIRParser.lib;LLVMInterpreter.lib;LLVMLibDriver.lib;LLVMDlltoolDriver.lib;LLVMOption.lib;LLVMCoverage.lib;LLVMSymbolize.lib;LLVMDebugInfoPDB.lib;LLVMDebugInfoDWARF.lib;
 LLVMMCJIT.lib;LLVMWindowsManifest.lib;LLVMLineEditor.lib;LLVMLTO.lib;LLVMPasses.lib;LLVMObjCARCOpts.lib;LLVMCoroutines.lib;LLVMipo.lib;LLVMInstrumentation.lib;LLVMVectorize.lib;

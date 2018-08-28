@@ -15,6 +15,23 @@ class ConstraintNode : public Node
 public:
     ConstraintNode(NodeType nodeType_, const Span& span_);
     bool IsConstraintNode() const override { return true; }
+    virtual bool IsHeaderConstraint() const { return false; }
+};
+
+class ParenthesizedConstraintNode : public ConstraintNode
+{
+public:
+    ParenthesizedConstraintNode(const Span& span_);
+    ParenthesizedConstraintNode(const Span& span_, ConstraintNode* constraint_);
+    Node* Clone(CloneContext& cloneContext) const override;
+    void Accept(Visitor& visitor) override;
+    void Write(AstWriter& writer) override;
+    void Read(AstReader& reader) override;
+    const ConstraintNode* Constraint() const { return constraint.get(); }
+    ConstraintNode* Constraint() { return constraint.get(); }
+    std::string ToString() const override;
+private:
+    std::unique_ptr<ConstraintNode> constraint;
 };
 
 class BinaryConstraintNode : public ConstraintNode
@@ -65,8 +82,14 @@ public:
     const ConstraintNode* Constraint() const { return constraint.get(); }
     ConstraintNode* Constraint() { return constraint.get(); }
     std::string ToString() const override;
+    void SetHeaderConstraint() { headerConstraint = true; }
+    bool IsHeaderConstraint() const override { return headerConstraint; }
+    void SetSemicolon() { semicolon = true; }
+    bool Semicolon() const { return semicolon; }
 private:
     std::unique_ptr<ConstraintNode> constraint;
+    bool headerConstraint;
+    bool semicolon;
 };
 
 class PredicateConstraintNode : public ConstraintNode
@@ -190,6 +213,7 @@ public:
     void Read(AstReader& reader) override;
     void AddParameter(ParameterNode* parameter) override;
     const Node* ReturnTypeExpr() const { return returnTypeExpr.get(); }
+    Node* ReturnTypeExpr() { return returnTypeExpr.get(); }
     const IdentifierNode* TypeParamId() const { return typeParamId.get(); }
     IdentifierNode* TypeParamId() { return typeParamId.get(); }
     const std::u32string& GroupId() const { return groupId; }
@@ -213,6 +237,7 @@ public:
     void Read(AstReader& reader) override;
     void AddParameter(ParameterNode* parameter) override;
     const Node* ReturnTypeExpr() const { return returnTypeExpr.get(); }
+    Node* ReturnTypeExpr() { return returnTypeExpr.get(); }
     const std::u32string& GroupId() const { return groupId; }
     const NodeList<ParameterNode>& Parameters() const { return parameters; }
     std::string ToString() const override;
@@ -255,7 +280,13 @@ public:
     IdentifierNode* Id() { return id.get(); }
     const NodeList<ParameterNode>& Parameters() const { return parameters; }
     const NodeList<AxiomStatementNode>& Statements() const { return statements; }
+    void SetBeginBraceSpan(const Span& beginBraceSpan_) { beginBraceSpan = beginBraceSpan_; }
+    const Span& BeginBraceSpan() const { return beginBraceSpan; }
+    void SetEndBraceSpan(const Span& endBraceSpan_) { endBraceSpan = endBraceSpan_; }
+    const Span& EndBraceSpan() const { return endBraceSpan; }
 private:
+    Span beginBraceSpan;
+    Span endBraceSpan;
     std::unique_ptr<IdentifierNode> id;
     NodeList<ParameterNode> parameters;
     NodeList<AxiomStatementNode> statements;
@@ -306,8 +337,14 @@ public:
     void AddAxiom(AxiomNode* axiom);
     const NodeList<AxiomNode>& Axioms() const { return axioms; }
     Specifiers GetSpecifiers() const { return specifiers; }
+    void SetBeginBraceSpan(const Span& beginBraceSpan_) { beginBraceSpan = beginBraceSpan_; }
+    const Span& BeginBraceSpan() const { return beginBraceSpan; }
+    void SetEndBraceSpan(const Span& endBraceSpan_) { endBraceSpan = endBraceSpan_; }
+    const Span& EndBraceSpan() const { return endBraceSpan; }
 private:
     Specifiers specifiers;
+    Span beginBraceSpan;
+    Span endBraceSpan;
     std::unique_ptr<IdentifierNode> id;
     NodeList<IdentifierNode> typeParameters;
     std::unique_ptr<ConceptIdNode> refinement;

@@ -68,6 +68,7 @@ class InterfaceNode;
 class DelegateNode;
 class ClassDelegateNode;
 
+class ParenthesizedConstraintNode;
 class DisjunctiveConstraintNode;
 class ConjunctiveConstraintNode;
 class WhereConstraintNode;
@@ -180,6 +181,7 @@ class ConstructNode;
 class NewNode;
 class ThisNode;
 class BaseNode;
+class ParenthesizedExpressionNode;
 
 class Visitor
 {
@@ -245,6 +247,7 @@ public:
     virtual void Visit(DelegateNode& delegateNode) {}
     virtual void Visit(ClassDelegateNode& classDelegateNode) {}
 
+    virtual void Visit(ParenthesizedConstraintNode& parenthesizedConstraintNode) {}
     virtual void Visit(DisjunctiveConstraintNode& disjunctiveConstraintNode) {}
     virtual void Visit(ConjunctiveConstraintNode& conjunctiveConstraintNode) {}
     virtual void Visit(WhereConstraintNode& whereConstraintNode) {}
@@ -357,6 +360,7 @@ public:
     virtual void Visit(NewNode& newNode) {}
     virtual void Visit(ThisNode& thisNode) {}
     virtual void Visit(BaseNode& baseNode) {}
+    virtual void Visit(ParenthesizedExpressionNode& parenthesizedExpressionNode) {}
 };
 
 } } // namespace cmajor::ast

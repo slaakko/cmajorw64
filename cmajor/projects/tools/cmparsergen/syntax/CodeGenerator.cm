@@ -71,6 +71,8 @@ namespace Syntax
             formatter.WriteLine("using " + ToUtf8(usingAlias) + ";");
         }
         formatter.WriteLine();
+        formatter.WriteLine("// this source file has been automatically generated from '" + Path.GetFileName(parserFile->FilePath()) + "' using cmparsergen version 2.0.0.");
+        formatter.WriteLine();
         ObjectSelectorVisitor selectorVisitor(parserFile->Id());
         parserFile->GetParsingDomain()->GlobalNamespace()->Accept(selectorVisitor);
         const Map<Namespace*, NamespaceContent>& nsContentMap = selectorVisitor.NsContentMap();

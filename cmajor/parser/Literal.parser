@@ -17,23 +17,23 @@ namespace cmajor.parser
     {
         using Expression.Expression;
 
-        Literal(ParsingContext* ctx) : Node*
-            ::= BooleanLiteral{ value = BooleanLiteral; }
-            |   FloatingLiteral{ value = FloatingLiteral; }
-            |   IntegerLiteral{ value = IntegerLiteral; }
-            |   CharLiteral{ value = CharLiteral; }
-            |   StringLiteral{ value = StringLiteral; }
-            |   NullLiteral{ value = NullLiteral; }
-            |   ArrayLiteral(ctx){ value = ArrayLiteral; }
-            |   StructuredLiteral(ctx){ value = StructuredLiteral; }
+        Literal(ParsingContext* ctx) : LiteralNode*
+            ::= BooleanLiteral{ value = BooleanLiteral; value->SetText(std::u32string(matchBegin, matchEnd)); }
+            |   FloatingLiteral{ value = FloatingLiteral; value->SetText(std::u32string(matchBegin, matchEnd)); }
+            |   IntegerLiteral{ value = IntegerLiteral; value->SetText(std::u32string(matchBegin, matchEnd)); }
+            |   CharLiteral{ value = CharLiteral; value->SetText(std::u32string(matchBegin, matchEnd)); }
+            |   StringLiteral{ value = StringLiteral; value->SetText(std::u32string(matchBegin, matchEnd)); }
+            |   NullLiteral{ value = NullLiteral; value->SetText(std::u32string(matchBegin, matchEnd)); }
+            |   ArrayLiteral(ctx){ value = ArrayLiteral; value->SetText(std::u32string(matchBegin, matchEnd)); }
+            |   StructuredLiteral(ctx){ value = StructuredLiteral; value->SetText(std::u32string(matchBegin, matchEnd)); }
             ;
 
-        BooleanLiteral : Node*
+        BooleanLiteral : LiteralNode*
             ::= keyword("true"){ value = new BooleanLiteralNode(span, true); }
             |   keyword("false"){ value = new BooleanLiteralNode(span, false); }
             ;
 
-        FloatingLiteral(var Span s) : Node*
+        FloatingLiteral(var Span s) : LiteralNode*
             ::= token(
                     FloatingLiteralValue{ s = span; }
                     (   [fF]{ s.SetEnd(span.End()); value = CreateFloatingLiteralNode(s, FloatingLiteralValue, true); }
@@ -64,7 +64,7 @@ namespace cmajor.parser
             ::= token([eE] Sign? DecDigitSequence)
             ;
 
-        IntegerLiteral(var Span s) : Node*
+        IntegerLiteral(var Span s) : LiteralNode*
             ::= token(
                     IntegerLiteralValue{ s = span; }
                     (   [uU]{ s.SetEnd(span.End()); value = CreateIntegerLiteralNode(s, IntegerLiteralValue, true); }
@@ -88,7 +88,7 @@ namespace cmajor.parser
             ::= DecDigitSequence{ value = DecDigitSequence; }
             ;
 
-        CharLiteral(var char32_t litValue) : Node*
+        CharLiteral(var char32_t litValue) : LiteralNode*
             ::= token(  '\'' 
                         (   ([^'\\\r\n]+){ std::u32string s = std::u32string(matchBegin, matchEnd); if (s.empty()) pass = false; else litValue = s[0]; } 
                         |   CharEscape:ec{ litValue = ec; }
@@ -109,7 +109,7 @@ namespace cmajor.parser
                     ){ value = new UCharLiteralNode(span, litValue); }
             ;
 
-        StringLiteral(var std::u32string s) : Node*
+        StringLiteral(var std::u32string s) : LiteralNode*
             ::= '@' token('"' ([^"]*){ s = std::u32string(matchBegin, matchEnd); } '"'){ value = new StringLiteralNode(span, ToUtf8(s)); }
             |   'w' '@' token('"' ([^"]*){ s = std::u32string(matchBegin, matchEnd); } '"'){ value = new WStringLiteralNode(span, ToUtf16(s)); }
             |   'u' '@' token('"' ([^"]*){ s = std::u32string(matchBegin, matchEnd); } '"'){ value = new UStringLiteralNode(span, s); }
@@ -133,7 +133,7 @@ namespace cmajor.parser
                 ){ value = new UStringLiteralNode(span, s); }
             ;
 
-        NullLiteral : Node*
+        NullLiteral : LiteralNode*
             ::= keyword("null"){ value = new NullLiteralNode(span); }
             ;
 

@@ -14,7 +14,7 @@ NamespaceSymbol::NamespaceSymbol(const Span& span_, const std::u32string& name_)
 
 void NamespaceSymbol::Import(NamespaceSymbol* that, SymbolTable& symbolTable)
 {
-    symbolTable.BeginNamespace(that->Name(), that->GetSpan());
+    symbolTable.BeginNamespace(that->Name(), that->GetSpan(), that->GetOriginalModule());
     for (std::unique_ptr<Symbol>& symbol : that->Members())
     {
         if (symbol->GetSymbolType() == SymbolType::namespaceSymbol)

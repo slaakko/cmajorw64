@@ -409,6 +409,34 @@ FunctionSymbol* BoundCompileUnit::GetConversion(TypeSymbol* sourceType, TypeSymb
                             {
                                 boundMemberExpression->ResetClassPtr();
                             }
+                            if (viableFunction->IsFunctionTemplate())
+                            {
+                                if (sourceType->GetSymbolType() == SymbolType::functionGroupTypeSymbol)
+                                {
+                                    FunctionGroupTypeSymbol* functionGroupTypeSymbol = static_cast<FunctionGroupTypeSymbol*>(sourceType);
+                                    BoundFunctionGroupExpression* boundFunctionGroupExpression = static_cast<BoundFunctionGroupExpression*>(functionGroupTypeSymbol->BoundFunctionGroup());
+                                    std::unordered_map<TemplateParameterSymbol*, TypeSymbol*> templateParameterMap;
+                                    int n = viableFunction->TemplateParameters().size();
+                                    if (boundFunctionGroupExpression->TemplateArgumentTypes().size() == n)
+                                    {
+                                        for (int i = 0; i < n; ++i)
+                                        {
+                                            TemplateParameterSymbol* templateParameterSymbol = viableFunction->TemplateParameters()[i];
+                                            TypeSymbol* templateArgumentType = boundFunctionGroupExpression->TemplateArgumentTypes()[i];
+                                            templateParameterMap[templateParameterSymbol] = templateArgumentType;
+                                        }
+                                        viableFunction = InstantiateFunctionTemplate(viableFunction, templateParameterMap, span);
+                                    }
+                                    else
+                                    {
+                                        return nullptr;
+                                    }
+                                }
+                                else
+                                {
+                                    return nullptr;
+                                }
+                            }
                             std::unique_ptr<FunctionSymbol> functionToDelegateConversion(new FunctionToDelegateConversion(sourceType, delegateTypeSymbol, viableFunction));
                             conversion = functionToDelegateConversion.get();
                             conversionTable.AddConversion(conversion);
@@ -489,6 +517,7 @@ FunctionSymbol* BoundCompileUnit::GetConversion(TypeSymbol* sourceType, TypeSymb
                             LocalVariableSymbol* temporaryInterfaceObjectVar = currentFunction->GetFunctionSymbol()->CreateTemporary(targetInterfaceType, span);
                             std::unique_ptr<FunctionSymbol> classToInterfaceConversion(new ClassToInterfaceConversion(sourceClassType, targetInterfaceType, temporaryInterfaceObjectVar, i, span));
                             classToInterfaceConversion->SetModule(&GetModule());
+                            classToInterfaceConversion->SetOriginalModule(&GetModule());
                             classToInterfaceConversion->SetSymbolTable(&symbolTable);
                             conversion = classToInterfaceConversion.get();
                             conversionTable.AddConversion(conversion);

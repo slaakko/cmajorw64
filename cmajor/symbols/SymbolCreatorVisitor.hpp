@@ -62,6 +62,7 @@ private:
     ClassNode* classInstanceNode;
     ClassTemplateSpecializationSymbol* classTemplateSpecialization;
     std::stack<bool> conditionalCompilationStack;
+    int32_t functionIndex;
 };
 
 } } // namespace cmajor::symbols
