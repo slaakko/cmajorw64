@@ -16,7 +16,7 @@
             <svg height="0" id="classInheritanceDiagram" version="2.0" width="0" xmlns="http://www.w3.org/2000/svg"/>
         </div>
         <span>
-            Definition at line <a href="file/ast/Statement.hpp_58F0DEEDF613F336E3FE25817ADE03456D7605B2.html#207">207</a>
+            Definition at line <a href="file/ast/Statement.hpp_58F0DEEDF613F336E3FE25817ADE03456D7605B2.html#238">238</a>
              of <a href="file/ast/Statement.hpp_58F0DEEDF613F336E3FE25817ADE03456D7605B2.html">Statement.hpp</a>
         </span>
         <br/>
@@ -44,8 +44,16 @@
                 <td class="functionTableSecondCol" xml:space="preserve"><a href="class_ConstructionStatementNode_F85CF7259E915C8CA4094ADAFEDB2BE0E6FF81AD.html#function_Arguments_D05866B9C4D2663E0F11C944C29B62409BED0193">Arguments</a>() <span class="kw">const</span></td>
             </tr>
             <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">bool</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_ConstructionStatementNode_F85CF7259E915C8CA4094ADAFEDB2BE0E6FF81AD.html#function_Assignment_B5CD971FC8AB78FE719DC8396A9F21A5FD60C8A0">Assignment</a>() <span class="kw">const</span></td>
+            </tr>
+            <tr>
                 <td class="functionTableFirstCol" xml:space="preserve"><a href="class_Node_66FC1D6AD8F487E453CE6E17163479C7C2DAC063.html">Node</a>*</td>
                 <td class="functionTableSecondCol" xml:space="preserve"><a href="class_ConstructionStatementNode_F85CF7259E915C8CA4094ADAFEDB2BE0E6FF81AD.html#function_Clone_B159BD77E568173745295796EB87CF8DC7768B40">Clone</a>(<a href="class_CloneContext_5E55B7AF2C2173E2EA60A2B86069816A9F0FB764.html">CloneContext</a>&amp; cloneContext) <span class="kw">const override</span></td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">bool</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_ConstructionStatementNode_F85CF7259E915C8CA4094ADAFEDB2BE0E6FF81AD.html#function_Empty_36EFB20C0ACBE409FD31A6FCAAD4559A4DF601EE">Empty</a>() <span class="kw">const</span></td>
             </tr>
             <tr>
                 <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">const </span><a href="class_IdentifierNode_4A1A7E3AFB614AEF7ED2B90309B9B619E86EE9E4.html">IdentifierNode</a>*</td>
@@ -58,6 +66,14 @@
             <tr>
                 <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
                 <td class="functionTableSecondCol" xml:space="preserve"><a href="class_ConstructionStatementNode_F85CF7259E915C8CA4094ADAFEDB2BE0E6FF81AD.html#function_Read_E9B4B92EFCE5D7B11AEACA5CA8DAB6CD1DC08B93">Read</a>(<a href="class_AstReader_79D1108F70EAB0D555FDDD074FED033B2DCABCD5.html">AstReader</a>&amp; reader) <span class="kw">override</span></td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_ConstructionStatementNode_F85CF7259E915C8CA4094ADAFEDB2BE0E6FF81AD.html#function_SetAssignment_61140D7FA8C62E78C755C2594B3F43A9F4457B73">SetAssignment</a>()</td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_ConstructionStatementNode_F85CF7259E915C8CA4094ADAFEDB2BE0E6FF81AD.html#function_SetEmpty_DDFF56542A942593096D9065C2E28C65A020276A">SetEmpty</a>()</td>
             </tr>
             <tr>
                 <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">const </span><a href="class_Node_66FC1D6AD8F487E453CE6E17163479C7C2DAC063.html">Node</a>*</td>
@@ -78,6 +94,14 @@
                 <td class="functionTableFirstCol" xml:space="preserve"><a href="class_NodeList_634CD2B65410966280F1AC27B3A570D065505ECD.html">NodeList</a>&lt;<a href="class_Node_66FC1D6AD8F487E453CE6E17163479C7C2DAC063.html">Node</a>></td>
                 <td class="functionTableSecondCol" xml:space="preserve">arguments</td>
             </tr>
+            <tr id="variable_assignment_1952B093BC1DBF4CB07364673C890C12866DD4DA">
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">bool</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve">assignment</td>
+            </tr>
+            <tr id="variable_empty_C0C37BACE31B9E3651E0A4D1199F3CCAE9D0640F">
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">bool</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve">empty</td>
+            </tr>
             <tr id="variable_id_25F9B85992DDC7421AE185AE93C7F18B6EBA525B">
                 <td class="functionTableFirstCol" xml:space="preserve">std::unique_ptr&lt;<a href="class_IdentifierNode_4A1A7E3AFB614AEF7ED2B90309B9B619E86EE9E4.html">IdentifierNode</a>></td>
                 <td class="functionTableSecondCol" xml:space="preserve">id</td>
@@ -95,21 +119,21 @@
             <a href="class_Span_9CED8370AAA8B01E09FBC8A63AD262084B91FD78.html">Span</a>
             &amp; span_)</h4>
         <span>
-            Definition at line <a href="file/ast/Statement.cpp_71F653932FDE7865AF5997870253E50F93D3520C.html#446">446</a>
+            Definition at line <a href="file/ast/Statement.cpp_71F653932FDE7865AF5997870253E50F93D3520C.html#476">476</a>
              of <a href="file/ast/Statement.cpp_71F653932FDE7865AF5997870253E50F93D3520C.html">Statement.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;446</span>&nbsp;<span class="other">:</span>&nbsp;<a href="class_StatementNode_5B30CD05CFBD6FC4DC65F9EB63116552354DEF08.html">StatementNode</a><span class="other">(</span><a href="enum_NodeType_0D66E0D14D03B3151A778BF9E86A029828B6D5F6.html">NodeType</a><span class="other">::</span><a href="enum_NodeType_0D66E0D14D03B3151A778BF9E86A029828B6D5F6.html#enumerator_constructionStatementNode_B2E730F4A837E7876049FAE3996DB5B71F460698">constructionStatementNode</a><span class="other">,&nbsp;</span><span class="identifier">span_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="class_ConstructionStatementNode_F85CF7259E915C8CA4094ADAFEDB2BE0E6FF81AD.html#variable_typeExpr_C60C513AD08CF6D7DB5E2E79462D9E4EFDD41024">typeExpr</a><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="class_ConstructionStatementNode_F85CF7259E915C8CA4094ADAFEDB2BE0E6FF81AD.html#variable_id_25F9B85992DDC7421AE185AE93C7F18B6EBA525B">id</a><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="class_ConstructionStatementNode_F85CF7259E915C8CA4094ADAFEDB2BE0E6FF81AD.html#variable_arguments_4060056F0B87B071A08B76B248313F520773F5DE">arguments</a><span class="other">(</span><span class="other">)</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;476</span>&nbsp;<span class="other">:</span>&nbsp;<a href="class_StatementNode_5B30CD05CFBD6FC4DC65F9EB63116552354DEF08.html">StatementNode</a><span class="other">(</span><a href="enum_NodeType_0D66E0D14D03B3151A778BF9E86A029828B6D5F6.html">NodeType</a><span class="other">::</span><a href="enum_NodeType_0D66E0D14D03B3151A778BF9E86A029828B6D5F6.html#enumerator_constructionStatementNode_B2E730F4A837E7876049FAE3996DB5B71F460698">constructionStatementNode</a><span class="other">,&nbsp;</span><span class="identifier">span_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="class_ConstructionStatementNode_F85CF7259E915C8CA4094ADAFEDB2BE0E6FF81AD.html#variable_typeExpr_C60C513AD08CF6D7DB5E2E79462D9E4EFDD41024">typeExpr</a><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="class_ConstructionStatementNode_F85CF7259E915C8CA4094ADAFEDB2BE0E6FF81AD.html#variable_id_25F9B85992DDC7421AE185AE93C7F18B6EBA525B">id</a><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="class_ConstructionStatementNode_F85CF7259E915C8CA4094ADAFEDB2BE0E6FF81AD.html#variable_arguments_4060056F0B87B071A08B76B248313F520773F5DE">arguments</a><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="class_ConstructionStatementNode_F85CF7259E915C8CA4094ADAFEDB2BE0E6FF81AD.html#variable_assignment_1952B093BC1DBF4CB07364673C890C12866DD4DA">assignment</a><span class="other">(</span><span class="kw">false</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="class_ConstructionStatementNode_F85CF7259E915C8CA4094ADAFEDB2BE0E6FF81AD.html#variable_empty_C0C37BACE31B9E3651E0A4D1199F3CCAE9D0640F">empty</a><span class="other">(</span><span class="kw">false</span><span class="other">)</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;447</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;477</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;448</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;478</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/ast/Statement.hpp_58F0DEEDF613F336E3FE25817ADE03456D7605B2.html#210">210</a>
+            Declaration at line <a href="file/ast/Statement.hpp_58F0DEEDF613F336E3FE25817ADE03456D7605B2.html#241">241</a>
              of <a href="file/ast/Statement.hpp_58F0DEEDF613F336E3FE25817ADE03456D7605B2.html">Statement.hpp</a>
         </span>
         <br/>
@@ -123,27 +147,27 @@
             * typeExpr_, <a href="class_IdentifierNode_4A1A7E3AFB614AEF7ED2B90309B9B619E86EE9E4.html">IdentifierNode</a>
             * id_)</h4>
         <span>
-            Definition at line <a href="file/ast/Statement.cpp_71F653932FDE7865AF5997870253E50F93D3520C.html#450">450</a>
+            Definition at line <a href="file/ast/Statement.cpp_71F653932FDE7865AF5997870253E50F93D3520C.html#480">480</a>
              of <a href="file/ast/Statement.cpp_71F653932FDE7865AF5997870253E50F93D3520C.html">Statement.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;450</span>&nbsp;<span class="other">:</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;480</span>&nbsp;<span class="other">:</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;451</span>&nbsp;<a href="class_StatementNode_5B30CD05CFBD6FC4DC65F9EB63116552354DEF08.html">StatementNode</a><span class="other">(</span><a href="enum_NodeType_0D66E0D14D03B3151A778BF9E86A029828B6D5F6.html">NodeType</a><span class="other">::</span><a href="enum_NodeType_0D66E0D14D03B3151A778BF9E86A029828B6D5F6.html#enumerator_constructionStatementNode_B2E730F4A837E7876049FAE3996DB5B71F460698">constructionStatementNode</a><span class="other">,&nbsp;</span><span class="identifier">span_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="class_ConstructionStatementNode_F85CF7259E915C8CA4094ADAFEDB2BE0E6FF81AD.html#variable_typeExpr_C60C513AD08CF6D7DB5E2E79462D9E4EFDD41024">typeExpr</a><span class="other">(</span><span class="identifier">typeExpr_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="class_ConstructionStatementNode_F85CF7259E915C8CA4094ADAFEDB2BE0E6FF81AD.html#variable_id_25F9B85992DDC7421AE185AE93C7F18B6EBA525B">id</a><span class="other">(</span><span class="identifier">id_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="class_ConstructionStatementNode_F85CF7259E915C8CA4094ADAFEDB2BE0E6FF81AD.html#variable_arguments_4060056F0B87B071A08B76B248313F520773F5DE">arguments</a><span class="other">(</span><span class="other">)</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;481</span>&nbsp;<a href="class_StatementNode_5B30CD05CFBD6FC4DC65F9EB63116552354DEF08.html">StatementNode</a><span class="other">(</span><a href="enum_NodeType_0D66E0D14D03B3151A778BF9E86A029828B6D5F6.html">NodeType</a><span class="other">::</span><a href="enum_NodeType_0D66E0D14D03B3151A778BF9E86A029828B6D5F6.html#enumerator_constructionStatementNode_B2E730F4A837E7876049FAE3996DB5B71F460698">constructionStatementNode</a><span class="other">,&nbsp;</span><span class="identifier">span_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="class_ConstructionStatementNode_F85CF7259E915C8CA4094ADAFEDB2BE0E6FF81AD.html#variable_typeExpr_C60C513AD08CF6D7DB5E2E79462D9E4EFDD41024">typeExpr</a><span class="other">(</span><span class="identifier">typeExpr_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="class_ConstructionStatementNode_F85CF7259E915C8CA4094ADAFEDB2BE0E6FF81AD.html#variable_id_25F9B85992DDC7421AE185AE93C7F18B6EBA525B">id</a><span class="other">(</span><span class="identifier">id_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="class_ConstructionStatementNode_F85CF7259E915C8CA4094ADAFEDB2BE0E6FF81AD.html#variable_arguments_4060056F0B87B071A08B76B248313F520773F5DE">arguments</a><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="class_ConstructionStatementNode_F85CF7259E915C8CA4094ADAFEDB2BE0E6FF81AD.html#variable_assignment_1952B093BC1DBF4CB07364673C890C12866DD4DA">assignment</a><span class="other">(</span><span class="kw">false</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="class_ConstructionStatementNode_F85CF7259E915C8CA4094ADAFEDB2BE0E6FF81AD.html#variable_empty_C0C37BACE31B9E3651E0A4D1199F3CCAE9D0640F">empty</a><span class="other">(</span><span class="kw">false</span><span class="other">)</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;452</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;482</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;453</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="class_ConstructionStatementNode_F85CF7259E915C8CA4094ADAFEDB2BE0E6FF81AD.html#variable_typeExpr_C60C513AD08CF6D7DB5E2E79462D9E4EFDD41024">typeExpr</a><span class="other">-></span><span class="identifier">SetParent</span><span class="other">(</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;483</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="class_ConstructionStatementNode_F85CF7259E915C8CA4094ADAFEDB2BE0E6FF81AD.html#variable_typeExpr_C60C513AD08CF6D7DB5E2E79462D9E4EFDD41024">typeExpr</a><span class="other">-></span><span class="identifier">SetParent</span><span class="other">(</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;454</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="class_ConstructionStatementNode_F85CF7259E915C8CA4094ADAFEDB2BE0E6FF81AD.html#variable_id_25F9B85992DDC7421AE185AE93C7F18B6EBA525B">id</a><span class="other">-></span><span class="identifier">SetParent</span><span class="other">(</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;484</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="class_ConstructionStatementNode_F85CF7259E915C8CA4094ADAFEDB2BE0E6FF81AD.html#variable_id_25F9B85992DDC7421AE185AE93C7F18B6EBA525B">id</a><span class="other">-></span><span class="identifier">SetParent</span><span class="other">(</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;455</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;485</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/ast/Statement.hpp_58F0DEEDF613F336E3FE25817ADE03456D7605B2.html#211">211</a>
+            Declaration at line <a href="file/ast/Statement.hpp_58F0DEEDF613F336E3FE25817ADE03456D7605B2.html#242">242</a>
              of <a href="file/ast/Statement.hpp_58F0DEEDF613F336E3FE25817ADE03456D7605B2.html">Statement.hpp</a>
         </span>
         <br/>
@@ -157,21 +181,21 @@
             &amp; visitor) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/ast/Statement.cpp_71F653932FDE7865AF5997870253E50F93D3520C.html#469">469</a>
+            Definition at line <a href="file/ast/Statement.cpp_71F653932FDE7865AF5997870253E50F93D3520C.html#501">501</a>
              of <a href="file/ast/Statement.cpp_71F653932FDE7865AF5997870253E50F93D3520C.html">Statement.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;470</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;502</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;471</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">visitor</span><span class="other">.</span><a href="class_Visitor_72892152D0864AA2907A1FD60E7A49EB4E071AD6.html#function_Visit_E0525EAE16186F76463728EBF4EED59CB24919F9">Visit</a><span class="other">(</span><span class="other">*</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;503</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">visitor</span><span class="other">.</span><a href="class_Visitor_72892152D0864AA2907A1FD60E7A49EB4E071AD6.html#function_Visit_E0525EAE16186F76463728EBF4EED59CB24919F9">Visit</a><span class="other">(</span><span class="other">*</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;472</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;504</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/ast/Statement.hpp_58F0DEEDF613F336E3FE25817ADE03456D7605B2.html#213">213</a>
+            Declaration at line <a href="file/ast/Statement.hpp_58F0DEEDF613F336E3FE25817ADE03456D7605B2.html#244">244</a>
              of <a href="file/ast/Statement.hpp_58F0DEEDF613F336E3FE25817ADE03456D7605B2.html">Statement.hpp</a>
         </span>
         <br/>
@@ -199,23 +223,23 @@
             * argument) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/ast/Statement.cpp_71F653932FDE7865AF5997870253E50F93D3520C.html#493">493</a>
+            Definition at line <a href="file/ast/Statement.cpp_71F653932FDE7865AF5997870253E50F93D3520C.html#529">529</a>
              of <a href="file/ast/Statement.cpp_71F653932FDE7865AF5997870253E50F93D3520C.html">Statement.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;494</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;530</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;495</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">argument</span><span class="other">-></span><a href="class_Node_66FC1D6AD8F487E453CE6E17163479C7C2DAC063.html#function_SetParent_CD3943AE607DB9AF6545A90A2DD46A81177C36AF">SetParent</a><span class="other">(</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;531</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">argument</span><span class="other">-></span><a href="class_Node_66FC1D6AD8F487E453CE6E17163479C7C2DAC063.html#function_SetParent_CD3943AE607DB9AF6545A90A2DD46A81177C36AF">SetParent</a><span class="other">(</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;496</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="class_ConstructionStatementNode_F85CF7259E915C8CA4094ADAFEDB2BE0E6FF81AD.html#variable_arguments_4060056F0B87B071A08B76B248313F520773F5DE">arguments</a><span class="other">.</span><span class="identifier">Add</span><span class="other">(</span><span class="identifier">argument</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;532</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="class_ConstructionStatementNode_F85CF7259E915C8CA4094ADAFEDB2BE0E6FF81AD.html#variable_arguments_4060056F0B87B071A08B76B248313F520773F5DE">arguments</a><span class="other">.</span><span class="identifier">Add</span><span class="other">(</span><span class="identifier">argument</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;497</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;533</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/ast/Statement.hpp_58F0DEEDF613F336E3FE25817ADE03456D7605B2.html#216">216</a>
+            Declaration at line <a href="file/ast/Statement.hpp_58F0DEEDF613F336E3FE25817ADE03456D7605B2.html#247">247</a>
              of <a href="file/ast/Statement.hpp_58F0DEEDF613F336E3FE25817ADE03456D7605B2.html">Statement.hpp</a>
         </span>
         <br/>
@@ -233,9 +257,9 @@
         <span>
             Called by: <a href="class_ConstructionStatementNode_F85CF7259E915C8CA4094ADAFEDB2BE0E6FF81AD.html#function_Clone_B159BD77E568173745295796EB87CF8DC7768B40">cmajor::ast::ConstructionStatementNode::Clone</a>
             , <a href="class_JsonAttributeProcessor_6AB69FA730ECB6FB3611886BE7DB6C74572DF3DC.html#function_GenerateToJsonImplementation_E0583085702194181521593CE21D9B195FDA6C59">cmajor::binder::JsonAttributeProcessor::GenerateToJsonImplementation</a>
+            , <a href="class_StatementBinder_9ABCC30A844E1A4C1BE61777BAAE98FBBA33A6BD.html#function_Visit_DA01112DECF98A0EBC508B95BEF33D58A8D67935">cmajor::binder::StatementBinder::Visit</a>
             , <a href="class_StatementBinder_9ABCC30A844E1A4C1BE61777BAAE98FBBA33A6BD.html#function_Visit_55E15A29C4EE14DF355CC37DA1961B5F850B892C">cmajor::binder::StatementBinder::Visit</a>
             , <a href="class_StatementBinder_9ABCC30A844E1A4C1BE61777BAAE98FBBA33A6BD.html#function_Visit_C9CEF7092632A24724FA030FC38466F74F34D890">cmajor::binder::StatementBinder::Visit</a>
-            , <a href="class_StatementBinder_9ABCC30A844E1A4C1BE61777BAAE98FBBA33A6BD.html#function_Visit_DA01112DECF98A0EBC508B95BEF33D58A8D67935">cmajor::binder::StatementBinder::Visit</a>
             , <a href="namespace_build_8579CAB238C54EBCD5D162A3B94D6D12FA6E71A5.html#function_CreateMainUnit_BE36D9993BFB0ED8CE69B8E014726D0C66939C9B">cmajor::build::CreateMainUnit</a>
         </span>
         <br/>
@@ -249,11 +273,11 @@
             >&amp; cmajor::ast::ConstructionStatementNode::Arguments() <span class="kw">const</span>
         </h4>
         <span>
-            Definition at line <a href="file/ast/Statement.hpp_58F0DEEDF613F336E3FE25817ADE03456D7605B2.html#221">221</a>
+            Definition at line <a href="file/ast/Statement.hpp_58F0DEEDF613F336E3FE25817ADE03456D7605B2.html#252">252</a>
              of <a href="file/ast/Statement.hpp_58F0DEEDF613F336E3FE25817ADE03456D7605B2.html">Statement.hpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">221</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">arguments</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">252</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">arguments</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
@@ -265,6 +289,22 @@
         <br/>
         <br/>
         <hr/>
+        <h3 id="function_Assignment_B5CD971FC8AB78FE719DC8396A9F21A5FD60C8A0">Assignment Member Function</h3>
+        <h4>
+            <span class="kw">bool</span>
+             cmajor::ast::ConstructionStatementNode::Assignment() <span class="kw">const</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/ast/Statement.hpp_58F0DEEDF613F336E3FE25817ADE03456D7605B2.html#254">254</a>
+             of <a href="file/ast/Statement.hpp_58F0DEEDF613F336E3FE25817ADE03456D7605B2.html">Statement.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">254</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">assignment</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <hr/>
         <h3 id="function_Clone_B159BD77E568173745295796EB87CF8DC7768B40">Clone Member Function</h3>
         <h4>
             <a href="class_Node_66FC1D6AD8F487E453CE6E17163479C7C2DAC063.html">Node</a>
@@ -272,35 +312,12 @@
             &amp; cloneContext) <span class="kw">const override</span>
         </h4>
         <span>
-            Definition at line <a href="file/ast/Statement.cpp_71F653932FDE7865AF5997870253E50F93D3520C.html#457">457</a>
+            Definition at line <a href="file/ast/Statement.cpp_71F653932FDE7865AF5997870253E50F93D3520C.html#487">487</a>
              of <a href="file/ast/Statement.cpp_71F653932FDE7865AF5997870253E50F93D3520C.html">Statement.cpp</a>
-            :<br/>
-            <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;458</span>&nbsp;<span class="other">{</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;459</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="class_ConstructionStatementNode_F85CF7259E915C8CA4094ADAFEDB2BE0E6FF81AD.html">ConstructionStatementNode</a><span class="other">*</span>&nbsp;<span class="identifier">clone</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">new&nbsp;</span><a href="class_ConstructionStatementNode_F85CF7259E915C8CA4094ADAFEDB2BE0E6FF81AD.html">ConstructionStatementNode</a><span class="other">(</span><span class="identifier">GetSpan</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="class_ConstructionStatementNode_F85CF7259E915C8CA4094ADAFEDB2BE0E6FF81AD.html#variable_typeExpr_C60C513AD08CF6D7DB5E2E79462D9E4EFDD41024">typeExpr</a><span class="other">-></span><a href="class_ConstructionStatementNode_F85CF7259E915C8CA4094ADAFEDB2BE0E6FF81AD.html#function_Clone_B159BD77E568173745295796EB87CF8DC7768B40">Clone</a><span class="other">(</span><span class="identifier">cloneContext</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="kw">static_cast</span><span class="other">&lt;</span><a href="class_IdentifierNode_4A1A7E3AFB614AEF7ED2B90309B9B619E86EE9E4.html">IdentifierNode</a><span class="other">*</span><span class="other">></span><span class="other">(</span><a href="class_ConstructionStatementNode_F85CF7259E915C8CA4094ADAFEDB2BE0E6FF81AD.html#variable_id_25F9B85992DDC7421AE185AE93C7F18B6EBA525B">id</a><span class="other">-></span><span class="identifier">Clone</span><span class="other">(</span><span class="identifier">cloneContext</span><span class="other">)</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;460</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="class_StatementNode_5B30CD05CFBD6FC4DC65F9EB63116552354DEF08.html#function_CloneLabelTo_359E9C1662FE403DEC5C932A3CDA67A40618DBD1">CloneLabelTo</a><span class="other">(</span><span class="identifier">clone</span><span class="other">,&nbsp;</span><span class="identifier">cloneContext</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;461</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">int</span>&nbsp;<span class="identifier">n</span>&nbsp;<span class="other">=</span>&nbsp;<a href="class_ConstructionStatementNode_F85CF7259E915C8CA4094ADAFEDB2BE0E6FF81AD.html#variable_arguments_4060056F0B87B071A08B76B248313F520773F5DE">arguments</a><span class="other">.</span><span class="identifier">Count</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;462</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">for&nbsp;</span><span class="other">(</span><span class="kw">int</span>&nbsp;<span class="identifier">i</span>&nbsp;<span class="other">=</span>&nbsp;<span class="other">0</span><span class="other">;</span>&nbsp;<span class="identifier">i</span><span class="other">&nbsp;&lt;&nbsp;</span><span class="identifier">n</span><span class="other">;</span>&nbsp;<span class="other">++</span><span class="identifier">i</span><span class="other">)</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;463</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;464</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">clone</span><span class="other">-></span><a href="class_ConstructionStatementNode_F85CF7259E915C8CA4094ADAFEDB2BE0E6FF81AD.html#function_AddArgument_40BE6DBB035E2796847A9D82DA5B44EBC8A1F301">AddArgument</a><span class="other">(</span><a href="class_ConstructionStatementNode_F85CF7259E915C8CA4094ADAFEDB2BE0E6FF81AD.html#variable_arguments_4060056F0B87B071A08B76B248313F520773F5DE">arguments</a><span class="other">[</span><span class="identifier">i</span><span class="other">]</span><span class="other">-></span><a href="class_ConstructionStatementNode_F85CF7259E915C8CA4094ADAFEDB2BE0E6FF81AD.html#function_Clone_B159BD77E568173745295796EB87CF8DC7768B40">Clone</a><span class="other">(</span><span class="identifier">cloneContext</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;465</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;466</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">clone</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;467</span>&nbsp;<span class="other">}</span></span>
-            </span>
-            <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/ast/Statement.hpp_58F0DEEDF613F336E3FE25817ADE03456D7605B2.html#212">212</a>
+            Declaration at line <a href="file/ast/Statement.hpp_58F0DEEDF613F336E3FE25817ADE03456D7605B2.html#243">243</a>
              of <a href="file/ast/Statement.hpp_58F0DEEDF613F336E3FE25817ADE03456D7605B2.html">Statement.hpp</a>
         </span>
         <br/>
@@ -313,6 +330,8 @@
         <span>
             Calls: <a href="class_ConstructionStatementNode_F85CF7259E915C8CA4094ADAFEDB2BE0E6FF81AD.html#function_AddArgument_40BE6DBB035E2796847A9D82DA5B44EBC8A1F301">cmajor::ast::ConstructionStatementNode::AddArgument</a>
             , <a href="class_ConstructionStatementNode_F85CF7259E915C8CA4094ADAFEDB2BE0E6FF81AD.html#function_Clone_B159BD77E568173745295796EB87CF8DC7768B40">cmajor::ast::ConstructionStatementNode::Clone</a>
+            , <a href="class_ConstructionStatementNode_F85CF7259E915C8CA4094ADAFEDB2BE0E6FF81AD.html#function_SetAssignment_61140D7FA8C62E78C755C2594B3F43A9F4457B73">cmajor::ast::ConstructionStatementNode::SetAssignment</a>
+            , <a href="class_ConstructionStatementNode_F85CF7259E915C8CA4094ADAFEDB2BE0E6FF81AD.html#function_SetEmpty_DDFF56542A942593096D9065C2E28C65A020276A">cmajor::ast::ConstructionStatementNode::SetEmpty</a>
             , <a href="class_StatementNode_5B30CD05CFBD6FC4DC65F9EB63116552354DEF08.html#function_CloneLabelTo_359E9C1662FE403DEC5C932A3CDA67A40618DBD1">cmajor::ast::StatementNode::CloneLabelTo</a>
         </span>
         <br/>
@@ -323,6 +342,22 @@
         <br/>
         <br/>
         <hr/>
+        <h3 id="function_Empty_36EFB20C0ACBE409FD31A6FCAAD4559A4DF601EE">Empty Member Function</h3>
+        <h4>
+            <span class="kw">bool</span>
+             cmajor::ast::ConstructionStatementNode::Empty() <span class="kw">const</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/ast/Statement.hpp_58F0DEEDF613F336E3FE25817ADE03456D7605B2.html#256">256</a>
+             of <a href="file/ast/Statement.hpp_58F0DEEDF613F336E3FE25817ADE03456D7605B2.html">Statement.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">256</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">empty</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <hr/>
         <h3 id="function_Id_353AA026B785FC4C060DE26A91FC4D30629A4367">Id Member Function</h3>
         <h4>
             <span class="kw">const </span>
@@ -330,11 +365,11 @@
             * cmajor::ast::ConstructionStatementNode::Id() <span class="kw">const</span>
         </h4>
         <span>
-            Definition at line <a href="file/ast/Statement.hpp_58F0DEEDF613F336E3FE25817ADE03456D7605B2.html#219">219</a>
+            Definition at line <a href="file/ast/Statement.hpp_58F0DEEDF613F336E3FE25817ADE03456D7605B2.html#250">250</a>
              of <a href="file/ast/Statement.hpp_58F0DEEDF613F336E3FE25817ADE03456D7605B2.html">Statement.hpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">219</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">id</span><span class="other">.</span><span class="identifier">get</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">250</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">id</span><span class="other">.</span><span class="identifier">get</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
@@ -345,11 +380,11 @@
             <a href="class_IdentifierNode_4A1A7E3AFB614AEF7ED2B90309B9B619E86EE9E4.html">IdentifierNode</a>
             * cmajor::ast::ConstructionStatementNode::Id()</h4>
         <span>
-            Definition at line <a href="file/ast/Statement.hpp_58F0DEEDF613F336E3FE25817ADE03456D7605B2.html#220">220</a>
+            Definition at line <a href="file/ast/Statement.hpp_58F0DEEDF613F336E3FE25817ADE03456D7605B2.html#251">251</a>
              of <a href="file/ast/Statement.hpp_58F0DEEDF613F336E3FE25817ADE03456D7605B2.html">Statement.hpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">220</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">id</span><span class="other">.</span><span class="identifier">get</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">251</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">id</span><span class="other">.</span><span class="identifier">get</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
@@ -362,33 +397,12 @@
             &amp; reader) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/ast/Statement.cpp_71F653932FDE7865AF5997870253E50F93D3520C.html#482">482</a>
+            Definition at line <a href="file/ast/Statement.cpp_71F653932FDE7865AF5997870253E50F93D3520C.html#516">516</a>
              of <a href="file/ast/Statement.cpp_71F653932FDE7865AF5997870253E50F93D3520C.html">Statement.cpp</a>
-            :<br/>
-            <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;483</span>&nbsp;<span class="other">{</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;484</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="class_StatementNode_5B30CD05CFBD6FC4DC65F9EB63116552354DEF08.html">StatementNode</a><span class="other">::</span><a href="class_StatementNode_5B30CD05CFBD6FC4DC65F9EB63116552354DEF08.html#function_Read_84F3403585C950F55A4F29F05E7EC09BBC04A64D">Read</a><span class="other">(</span><span class="identifier">reader</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;485</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="class_ConstructionStatementNode_F85CF7259E915C8CA4094ADAFEDB2BE0E6FF81AD.html#variable_typeExpr_C60C513AD08CF6D7DB5E2E79462D9E4EFDD41024">typeExpr</a><span class="other">.</span><span class="identifier">reset</span><span class="other">(</span><span class="identifier">reader</span><span class="other">.</span><a href="class_AstReader_79D1108F70EAB0D555FDDD074FED033B2DCABCD5.html#function_ReadNode_5F7C8493FC716036FA5A915275B80B947DADB823">ReadNode</a><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;486</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="class_ConstructionStatementNode_F85CF7259E915C8CA4094ADAFEDB2BE0E6FF81AD.html#variable_typeExpr_C60C513AD08CF6D7DB5E2E79462D9E4EFDD41024">typeExpr</a><span class="other">-></span><span class="identifier">SetParent</span><span class="other">(</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;487</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="class_ConstructionStatementNode_F85CF7259E915C8CA4094ADAFEDB2BE0E6FF81AD.html#variable_id_25F9B85992DDC7421AE185AE93C7F18B6EBA525B">id</a><span class="other">.</span><span class="identifier">reset</span><span class="other">(</span><span class="identifier">reader</span><span class="other">.</span><a href="class_AstReader_79D1108F70EAB0D555FDDD074FED033B2DCABCD5.html#function_ReadIdentifierNode_5F4F82748C8D922BADC586CD1C2AFD9E0A88B0ED">ReadIdentifierNode</a><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;488</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="class_ConstructionStatementNode_F85CF7259E915C8CA4094ADAFEDB2BE0E6FF81AD.html#variable_id_25F9B85992DDC7421AE185AE93C7F18B6EBA525B">id</a><span class="other">-></span><span class="identifier">SetParent</span><span class="other">(</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;489</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="class_ConstructionStatementNode_F85CF7259E915C8CA4094ADAFEDB2BE0E6FF81AD.html#variable_arguments_4060056F0B87B071A08B76B248313F520773F5DE">arguments</a><span class="other">.</span><span class="identifier">Read</span><span class="other">(</span><span class="identifier">reader</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;490</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="class_ConstructionStatementNode_F85CF7259E915C8CA4094ADAFEDB2BE0E6FF81AD.html#variable_arguments_4060056F0B87B071A08B76B248313F520773F5DE">arguments</a><span class="other">.</span><span class="identifier">SetParent</span><span class="other">(</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;491</span>&nbsp;<span class="other">}</span></span>
-            </span>
-            <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/ast/Statement.hpp_58F0DEEDF613F336E3FE25817ADE03456D7605B2.html#215">215</a>
+            Declaration at line <a href="file/ast/Statement.hpp_58F0DEEDF613F336E3FE25817ADE03456D7605B2.html#246">246</a>
              of <a href="file/ast/Statement.hpp_58F0DEEDF613F336E3FE25817ADE03456D7605B2.html">Statement.hpp</a>
         </span>
         <br/>
@@ -400,9 +414,51 @@
         <br/>
         <br/>
         <span>
-            Calls: <a href="class_AstReader_79D1108F70EAB0D555FDDD074FED033B2DCABCD5.html#function_ReadIdentifierNode_5F4F82748C8D922BADC586CD1C2AFD9E0A88B0ED">cmajor::ast::AstReader::ReadIdentifierNode</a>
+            Calls: <a href="class_AstReader_79D1108F70EAB0D555FDDD074FED033B2DCABCD5.html#function_GetBinaryReader_3D8CDE19882342F28A73C8633B207C19F4CF2903">cmajor::ast::AstReader::GetBinaryReader</a>
+            , <a href="class_AstReader_79D1108F70EAB0D555FDDD074FED033B2DCABCD5.html#function_ReadIdentifierNode_5F4F82748C8D922BADC586CD1C2AFD9E0A88B0ED">cmajor::ast::AstReader::ReadIdentifierNode</a>
             , <a href="class_AstReader_79D1108F70EAB0D555FDDD074FED033B2DCABCD5.html#function_ReadNode_5F7C8493FC716036FA5A915275B80B947DADB823">cmajor::ast::AstReader::ReadNode</a>
             , <a href="class_StatementNode_5B30CD05CFBD6FC4DC65F9EB63116552354DEF08.html#function_Read_84F3403585C950F55A4F29F05E7EC09BBC04A64D">cmajor::ast::StatementNode::Read</a>
+            , <a href="class_BinaryReader_03B69C4712E895798960F755025292754AFB8DDD.html#function_ReadBool_AF9E7BF9BFA9599690F086031FE3AB89ED7F6DEA">cmajor::util::BinaryReader::ReadBool</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_SetAssignment_61140D7FA8C62E78C755C2594B3F43A9F4457B73">SetAssignment Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             cmajor::ast::ConstructionStatementNode::SetAssignment()</h4>
+        <span>
+            Definition at line <a href="file/ast/Statement.hpp_58F0DEEDF613F336E3FE25817ADE03456D7605B2.html#253">253</a>
+             of <a href="file/ast/Statement.hpp_58F0DEEDF613F336E3FE25817ADE03456D7605B2.html">Statement.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">253</span>&nbsp;<span class="other">{</span>&nbsp;<span class="identifier">assignment</span><span class="other">&nbsp;=&nbsp;</span><span class="kw">true</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Called by: <a href="class_ConstructionStatementNode_F85CF7259E915C8CA4094ADAFEDB2BE0E6FF81AD.html#function_Clone_B159BD77E568173745295796EB87CF8DC7768B40">cmajor::ast::ConstructionStatementNode::Clone</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_SetEmpty_DDFF56542A942593096D9065C2E28C65A020276A">SetEmpty Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             cmajor::ast::ConstructionStatementNode::SetEmpty()</h4>
+        <span>
+            Definition at line <a href="file/ast/Statement.hpp_58F0DEEDF613F336E3FE25817ADE03456D7605B2.html#255">255</a>
+             of <a href="file/ast/Statement.hpp_58F0DEEDF613F336E3FE25817ADE03456D7605B2.html">Statement.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">255</span>&nbsp;<span class="other">{</span>&nbsp;<span class="identifier">empty</span><span class="other">&nbsp;=&nbsp;</span><span class="kw">true</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Called by: <a href="class_ConstructionStatementNode_F85CF7259E915C8CA4094ADAFEDB2BE0E6FF81AD.html#function_Clone_B159BD77E568173745295796EB87CF8DC7768B40">cmajor::ast::ConstructionStatementNode::Clone</a>
         </span>
         <br/>
         <br/>
@@ -414,11 +470,11 @@
             * cmajor::ast::ConstructionStatementNode::TypeExpr() <span class="kw">const</span>
         </h4>
         <span>
-            Definition at line <a href="file/ast/Statement.hpp_58F0DEEDF613F336E3FE25817ADE03456D7605B2.html#217">217</a>
+            Definition at line <a href="file/ast/Statement.hpp_58F0DEEDF613F336E3FE25817ADE03456D7605B2.html#248">248</a>
              of <a href="file/ast/Statement.hpp_58F0DEEDF613F336E3FE25817ADE03456D7605B2.html">Statement.hpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">217</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">typeExpr</span><span class="other">.</span><span class="identifier">get</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">248</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">typeExpr</span><span class="other">.</span><span class="identifier">get</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
@@ -429,11 +485,11 @@
             <a href="class_Node_66FC1D6AD8F487E453CE6E17163479C7C2DAC063.html">Node</a>
             * cmajor::ast::ConstructionStatementNode::TypeExpr()</h4>
         <span>
-            Definition at line <a href="file/ast/Statement.hpp_58F0DEEDF613F336E3FE25817ADE03456D7605B2.html#218">218</a>
+            Definition at line <a href="file/ast/Statement.hpp_58F0DEEDF613F336E3FE25817ADE03456D7605B2.html#249">249</a>
              of <a href="file/ast/Statement.hpp_58F0DEEDF613F336E3FE25817ADE03456D7605B2.html">Statement.hpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">218</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">typeExpr</span><span class="other">.</span><span class="identifier">get</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">249</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">typeExpr</span><span class="other">.</span><span class="identifier">get</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
@@ -446,27 +502,31 @@
             &amp; writer) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/ast/Statement.cpp_71F653932FDE7865AF5997870253E50F93D3520C.html#474">474</a>
+            Definition at line <a href="file/ast/Statement.cpp_71F653932FDE7865AF5997870253E50F93D3520C.html#506">506</a>
              of <a href="file/ast/Statement.cpp_71F653932FDE7865AF5997870253E50F93D3520C.html">Statement.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;475</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;507</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;476</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="class_StatementNode_5B30CD05CFBD6FC4DC65F9EB63116552354DEF08.html">StatementNode</a><span class="other">::</span><a href="class_StatementNode_5B30CD05CFBD6FC4DC65F9EB63116552354DEF08.html#function_Write_D4E62B07A51261A8F5B41776E56E36645114CEE0">Write</a><span class="other">(</span><span class="identifier">writer</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;508</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="class_StatementNode_5B30CD05CFBD6FC4DC65F9EB63116552354DEF08.html">StatementNode</a><span class="other">::</span><a href="class_StatementNode_5B30CD05CFBD6FC4DC65F9EB63116552354DEF08.html#function_Write_D4E62B07A51261A8F5B41776E56E36645114CEE0">Write</a><span class="other">(</span><span class="identifier">writer</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;477</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">writer</span><span class="other">.</span><span class="identifier">Write</span><span class="other">(</span><a href="class_ConstructionStatementNode_F85CF7259E915C8CA4094ADAFEDB2BE0E6FF81AD.html#variable_typeExpr_C60C513AD08CF6D7DB5E2E79462D9E4EFDD41024">typeExpr</a><span class="other">.</span><span class="identifier">get</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;509</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">writer</span><span class="other">.</span><span class="identifier">Write</span><span class="other">(</span><a href="class_ConstructionStatementNode_F85CF7259E915C8CA4094ADAFEDB2BE0E6FF81AD.html#variable_typeExpr_C60C513AD08CF6D7DB5E2E79462D9E4EFDD41024">typeExpr</a><span class="other">.</span><span class="identifier">get</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;478</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">writer</span><span class="other">.</span><span class="identifier">Write</span><span class="other">(</span><a href="class_ConstructionStatementNode_F85CF7259E915C8CA4094ADAFEDB2BE0E6FF81AD.html#variable_id_25F9B85992DDC7421AE185AE93C7F18B6EBA525B">id</a><span class="other">.</span><span class="identifier">get</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;510</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">writer</span><span class="other">.</span><span class="identifier">Write</span><span class="other">(</span><a href="class_ConstructionStatementNode_F85CF7259E915C8CA4094ADAFEDB2BE0E6FF81AD.html#variable_id_25F9B85992DDC7421AE185AE93C7F18B6EBA525B">id</a><span class="other">.</span><span class="identifier">get</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;479</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="class_ConstructionStatementNode_F85CF7259E915C8CA4094ADAFEDB2BE0E6FF81AD.html#variable_arguments_4060056F0B87B071A08B76B248313F520773F5DE">arguments</a><span class="other">.</span><span class="identifier">Write</span><span class="other">(</span><span class="identifier">writer</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;511</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="class_ConstructionStatementNode_F85CF7259E915C8CA4094ADAFEDB2BE0E6FF81AD.html#variable_arguments_4060056F0B87B071A08B76B248313F520773F5DE">arguments</a><span class="other">.</span><span class="identifier">Write</span><span class="other">(</span><span class="identifier">writer</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;480</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;512</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">writer</span><span class="other">.</span><a href="class_AstWriter_E913198FD26EB86BE054254E7AA4791401EA149B.html#function_GetBinaryWriter_889E99D5A9549A76BEDCAB1755E1CAC075CBDD71">GetBinaryWriter</a><span class="other">(</span><span class="other">)</span><span class="other">.</span><a href="class_BinaryWriter_C63D48852BF8E92E7FD58CF0C72DEA2D09A302B4.html#function_Write_F862555C93905FC6F4B920FA221EB6ADCA8F0F93">Write</a><span class="other">(</span><a href="class_ConstructionStatementNode_F85CF7259E915C8CA4094ADAFEDB2BE0E6FF81AD.html#variable_assignment_1952B093BC1DBF4CB07364673C890C12866DD4DA">assignment</a><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;513</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">writer</span><span class="other">.</span><a href="class_AstWriter_E913198FD26EB86BE054254E7AA4791401EA149B.html#function_GetBinaryWriter_889E99D5A9549A76BEDCAB1755E1CAC075CBDD71">GetBinaryWriter</a><span class="other">(</span><span class="other">)</span><span class="other">.</span><a href="class_BinaryWriter_C63D48852BF8E92E7FD58CF0C72DEA2D09A302B4.html#function_Write_F862555C93905FC6F4B920FA221EB6ADCA8F0F93">Write</a><span class="other">(</span><a href="class_ConstructionStatementNode_F85CF7259E915C8CA4094ADAFEDB2BE0E6FF81AD.html#variable_empty_C0C37BACE31B9E3651E0A4D1199F3CCAE9D0640F">empty</a><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;514</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/ast/Statement.hpp_58F0DEEDF613F336E3FE25817ADE03456D7605B2.html#214">214</a>
+            Declaration at line <a href="file/ast/Statement.hpp_58F0DEEDF613F336E3FE25817ADE03456D7605B2.html#245">245</a>
              of <a href="file/ast/Statement.hpp_58F0DEEDF613F336E3FE25817ADE03456D7605B2.html">Statement.hpp</a>
         </span>
         <br/>
@@ -478,7 +538,9 @@
         <br/>
         <br/>
         <span>
-            Calls: <a href="class_StatementNode_5B30CD05CFBD6FC4DC65F9EB63116552354DEF08.html#function_Write_D4E62B07A51261A8F5B41776E56E36645114CEE0">cmajor::ast::StatementNode::Write</a>
+            Calls: <a href="class_AstWriter_E913198FD26EB86BE054254E7AA4791401EA149B.html#function_GetBinaryWriter_889E99D5A9549A76BEDCAB1755E1CAC075CBDD71">cmajor::ast::AstWriter::GetBinaryWriter</a>
+            , <a href="class_StatementNode_5B30CD05CFBD6FC4DC65F9EB63116552354DEF08.html#function_Write_D4E62B07A51261A8F5B41776E56E36645114CEE0">cmajor::ast::StatementNode::Write</a>
+            , <a href="class_BinaryWriter_C63D48852BF8E92E7FD58CF0C72DEA2D09A302B4.html#function_Write_F862555C93905FC6F4B920FA221EB6ADCA8F0F93">cmajor::util::BinaryWriter::Write</a>
         </span>
         <br/>
         <br/>

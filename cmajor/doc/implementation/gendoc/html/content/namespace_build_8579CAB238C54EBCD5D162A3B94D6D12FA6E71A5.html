@@ -57,6 +57,10 @@
             </tr>
             <tr>
                 <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="namespace_build_8579CAB238C54EBCD5D162A3B94D6D12FA6E71A5.html#function_BuildSolution_A6218D0324F321C281D3AB3344E06746CC19B124">BuildSolution</a>(<span class="kw">const </span>std::string&amp; solutionFilePath, std::vector&lt;std::unique_ptr&lt;<a href="class_Module_A2BC96D600A4B3135D7F5444EC360BBF9EA9DDF4.html">Module</a>>>&amp; rootModules, std::u32string&amp; solutionName, std::vector&lt;std::u32string>&amp; moduleNames)</td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
                 <td class="functionTableSecondCol" xml:space="preserve"><a href="namespace_build_8579CAB238C54EBCD5D162A3B94D6D12FA6E71A5.html#function_CheckMainFunctionSymbol_ED3DBDB0F0F1AB08166232134D2C3B898FA49A6C">CheckMainFunctionSymbol</a>(<a href="class_Module_A2BC96D600A4B3135D7F5444EC360BBF9EA9DDF4.html">Module</a>&amp; module)</td>
             </tr>
             <tr>
@@ -151,17 +155,17 @@
              cmajor::build::BindStatements(<a href="class_BoundCompileUnit_E99BC7539B5239DF3A33DC3D613FE1D188A0A9E1.html">BoundCompileUnit</a>
             &amp; boundCompileUnit)</h4>
         <span>
-            Definition at line <a href="file/build/Build.cpp_805B45E343428924AFE7558BA38CAD4F38432FEB.html#325">325</a>
+            Definition at line <a href="file/build/Build.cpp_805B45E343428924AFE7558BA38CAD4F38432FEB.html#331">331</a>
              of <a href="file/build/Build.cpp_805B45E343428924AFE7558BA38CAD4F38432FEB.html">Build.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;326</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;332</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;327</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="class_StatementBinder_9ABCC30A844E1A4C1BE61777BAAE98FBBA33A6BD.html">StatementBinder</a>&nbsp;<span class="identifier">statementBinder</span><span class="other">(</span><span class="identifier">boundCompileUnit</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;333</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="class_StatementBinder_9ABCC30A844E1A4C1BE61777BAAE98FBBA33A6BD.html">StatementBinder</a>&nbsp;<span class="identifier">statementBinder</span><span class="other">(</span><span class="identifier">boundCompileUnit</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;328</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">boundCompileUnit</span><span class="other">.</span><a href="class_BoundCompileUnit_E99BC7539B5239DF3A33DC3D613FE1D188A0A9E1.html#function_GetCompileUnitNode_278F90635D6192A44C7A2A27DEBD61EEEF1D6C8C">GetCompileUnitNode</a><span class="other">(</span><span class="other">)</span><span class="other">-></span><a href="class_CompileUnitNode_F6CDC04A745418A00AB314CF086C092721F42A14.html#function_Accept_9BF89244CAFE1201A15A376458715D9AF2C094E5">Accept</a><span class="other">(</span><span class="identifier">statementBinder</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;334</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">boundCompileUnit</span><span class="other">.</span><a href="class_BoundCompileUnit_E99BC7539B5239DF3A33DC3D613FE1D188A0A9E1.html#function_GetCompileUnitNode_278F90635D6192A44C7A2A27DEBD61EEEF1D6C8C">GetCompileUnitNode</a><span class="other">(</span><span class="other">)</span><span class="other">-></span><a href="class_CompileUnitNode_F6CDC04A745418A00AB314CF086C092721F42A14.html#function_Accept_9BF89244CAFE1201A15A376458715D9AF2C094E5">Accept</a><span class="other">(</span><span class="identifier">statementBinder</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;329</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;335</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
@@ -188,7 +192,7 @@
             * attributeBinder, <span class="kw">bool</span>
             &amp; stop)</h4>
         <span>
-            Definition at line <a href="file/build/Build.cpp_805B45E343428924AFE7558BA38CAD4F38432FEB.html#305">305</a>
+            Definition at line <a href="file/build/Build.cpp_805B45E343428924AFE7558BA38CAD4F38432FEB.html#311">311</a>
              of <a href="file/build/Build.cpp_805B45E343428924AFE7558BA38CAD4F38432FEB.html">Build.cpp</a>
         </span>
         <br/>
@@ -210,12 +214,12 @@
             std::vector&lt;std::string>&amp; referenceFiles, std::unique_ptr&lt;<a href="class_Module_A2BC96D600A4B3135D7F5444EC360BBF9EA9DDF4.html">Module</a>
             >&amp; rootModule)</h4>
         <span>
-            Definition at line <a href="file/build/Build.cpp_805B45E343428924AFE7558BA38CAD4F38432FEB.html#1287">1287</a>
+            Definition at line <a href="file/build/Build.cpp_805B45E343428924AFE7558BA38CAD4F38432FEB.html#1365">1365</a>
              of <a href="file/build/Build.cpp_805B45E343428924AFE7558BA38CAD4F38432FEB.html">Build.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/build/Build.hpp_5E57336FE669338418A47DD0D3D52216C1F0F97C.html#19">19</a>
+            Declaration at line <a href="file/build/Build.hpp_5E57336FE669338418A47DD0D3D52216C1F0F97C.html#20">20</a>
              of <a href="file/build/Build.hpp_5E57336FE669338418A47DD0D3D52216C1F0F97C.html">Build.hpp</a>
         </span>
         <br/>
@@ -243,7 +247,7 @@
             &amp; stop, <span class="kw">bool</span>
              resetRootModule)</h4>
         <span>
-            Definition at line <a href="file/build/Build.cpp_805B45E343428924AFE7558BA38CAD4F38432FEB.html#869">869</a>
+            Definition at line <a href="file/build/Build.cpp_805B45E343428924AFE7558BA38CAD4F38432FEB.html#875">875</a>
              of <a href="file/build/Build.cpp_805B45E343428924AFE7558BA38CAD4F38432FEB.html">Build.cpp</a>
         </span>
         <br/>
@@ -276,6 +280,7 @@
         <span>
             Called by: <a href="namespace_build_8579CAB238C54EBCD5D162A3B94D6D12FA6E71A5.html#function_BuildMsBuildProject_C8799B0B43A41B202A07B6E261065744B6BC0EC9">cmajor::build::BuildMsBuildProject</a>
             , <a href="namespace_build_8579CAB238C54EBCD5D162A3B94D6D12FA6E71A5.html#function_BuildProject_CF7CC027600C73904366AF031BCD995BCE2AD7E7">cmajor::build::BuildProject</a>
+            , <a href="namespace_build_8579CAB238C54EBCD5D162A3B94D6D12FA6E71A5.html#function_BuildSolution_A6218D0324F321C281D3AB3344E06746CC19B124">cmajor::build::BuildSolution</a>
             , <a href="namespace_build_8579CAB238C54EBCD5D162A3B94D6D12FA6E71A5.html#function_ProjectBuilder_B8094EA61CC1B8FF420A1C327AA44364574B8AF6">cmajor::build::ProjectBuilder</a>
         </span>
         <br/>
@@ -288,7 +293,7 @@
             std::string&amp; projectFilePath, std::unique_ptr&lt;<a href="class_Module_A2BC96D600A4B3135D7F5444EC360BBF9EA9DDF4.html">Module</a>
             >&amp; rootModule)</h4>
         <span>
-            Definition at line <a href="file/build/Build.cpp_805B45E343428924AFE7558BA38CAD4F38432FEB.html#1041">1041</a>
+            Definition at line <a href="file/build/Build.cpp_805B45E343428924AFE7558BA38CAD4F38432FEB.html#1078">1078</a>
              of <a href="file/build/Build.cpp_805B45E343428924AFE7558BA38CAD4F38432FEB.html">Build.cpp</a>
         </span>
         <br/>
@@ -321,8 +326,21 @@
             std::string&amp; solutionFilePath, std::vector&lt;std::unique_ptr&lt;<a href="class_Module_A2BC96D600A4B3135D7F5444EC360BBF9EA9DDF4.html">Module</a>
             >>&amp; rootModules)</h4>
         <span>
-            Definition at line <a href="file/build/Build.cpp_805B45E343428924AFE7558BA38CAD4F38432FEB.html#1155">1155</a>
+            Definition at line <a href="file/build/Build.cpp_805B45E343428924AFE7558BA38CAD4F38432FEB.html#1192">1192</a>
              of <a href="file/build/Build.cpp_805B45E343428924AFE7558BA38CAD4F38432FEB.html">Build.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">1193</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">1194</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">u32string</span>&nbsp;<span class="identifier">solutionName</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">1195</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">vector</span><span class="other">&lt;</span><span class="identifier">std</span><span class="other">::</span><span class="type">u32string</span><span class="other">></span>&nbsp;<span class="identifier">moduleNames</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">1196</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="namespace_build_8579CAB238C54EBCD5D162A3B94D6D12FA6E71A5.html#function_BuildSolution_A6218D0324F321C281D3AB3344E06746CC19B124">BuildSolution</a><span class="other">(</span><span class="identifier">solutionFilePath</span><span class="other">,&nbsp;</span><span class="identifier">rootModules</span><span class="other">,&nbsp;</span><span class="identifier">solutionName</span><span class="other">,&nbsp;</span><span class="identifier">moduleNames</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">1197</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
         </span>
         <br/>
         <span>
@@ -332,11 +350,41 @@
         <br/>
         <br/>
         <span>
-            Calls: <a href="namespace_build_8579CAB238C54EBCD5D162A3B94D6D12FA6E71A5.html#function_CleanProject_BCE54FC39CCA6A94C4E781FC416684216FA16405">cmajor::build::CleanProject</a>
+            Calls: <a href="namespace_build_8579CAB238C54EBCD5D162A3B94D6D12FA6E71A5.html#function_BuildSolution_A6218D0324F321C281D3AB3344E06746CC19B124">cmajor::build::BuildSolution</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Called by: <a href="namespace__DA39A3EE5E6B4B0D3255BFEF95601890AFD80709.html#function_main_F34600350414C00797F27E099EFB3CEF42735134">main</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_BuildSolution_A6218D0324F321C281D3AB3344E06746CC19B124">BuildSolution Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             cmajor::build::BuildSolution(<span class="kw">const </span>
+            std::string&amp; solutionFilePath, std::vector&lt;std::unique_ptr&lt;<a href="class_Module_A2BC96D600A4B3135D7F5444EC360BBF9EA9DDF4.html">Module</a>
+            >>&amp; rootModules, std::u32string&amp; solutionName, std::vector&lt;std::u32string>&amp; moduleNames)</h4>
+        <span>
+            Definition at line <a href="file/build/Build.cpp_805B45E343428924AFE7558BA38CAD4F38432FEB.html#1199">1199</a>
+             of <a href="file/build/Build.cpp_805B45E343428924AFE7558BA38CAD4F38432FEB.html">Build.cpp</a>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/build/Build.hpp_5E57336FE669338418A47DD0D3D52216C1F0F97C.html#19">19</a>
+             of <a href="file/build/Build.hpp_5E57336FE669338418A47DD0D3D52216C1F0F97C.html">Build.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Calls: <a href="namespace_build_8579CAB238C54EBCD5D162A3B94D6D12FA6E71A5.html#function_BuildProject_8B91C075DE1AB89526CD110571A1A5E284B9DE1F">cmajor::build::BuildProject</a>
+            , <a href="namespace_build_8579CAB238C54EBCD5D162A3B94D6D12FA6E71A5.html#function_CleanProject_BCE54FC39CCA6A94C4E781FC416684216FA16405">cmajor::build::CleanProject</a>
             , <a href="class_ProjectQueue_6FAB8514DAD48B4FB048B96B5C9BD96F2143C677.html#function_Get_62C71ACEFC85C722E651C9988D5C61F326D9BE36">cmajor::build::ProjectQueue::Get</a>
             , <a href="class_ProjectQueue_6FAB8514DAD48B4FB048B96B5C9BD96F2143C677.html#function_Put_82F16FD2F3E371A987129FAB8BB099CCBF47BBCA">cmajor::build::ProjectQueue::Put</a>
             , <a href="namespace_symbols_CED2EBA893BFBF04AA45D2AF9418A2BC23E64ADF.html#function_GetConfig_126EF41637D577B1AF89BF7A6527B40539DA5E3D">cmajor::symbols::GetConfig</a>
             , <a href="namespace_symbols_CED2EBA893BFBF04AA45D2AF9418A2BC23E64ADF.html#function_GetGlobalFlag_3A83AB2D14FB6A5C4D167D2F0C52C84284D2AECC">cmajor::symbols::GetGlobalFlag</a>
+            , <a href="namespace_symbols_CED2EBA893BFBF04AA45D2AF9418A2BC23E64ADF.html#function_GetNumBuildThreads_0AC63F99EBF942691705C406A7F13E8405273C64">cmajor::symbols::GetNumBuildThreads</a>
             , <a href="namespace_util_10CA45893690AF432B785048B4AA3F0E7D4765DF.html#function_LogMessage_0A6C90708F1C70C5068509330383EFE0EB304BE0">cmajor::util::LogMessage</a>
             , <a href="class_MappedInputFile_5B4A7D28764447BCA4C5358F7EAA63EB8EFB2820.html#function_Begin_2BE60ECE44E5C11A1AD7CC91491BD4167B9E7D92">cmajor::util::MappedInputFile::Begin</a>
             , <a href="class_MappedInputFile_5B4A7D28764447BCA4C5358F7EAA63EB8EFB2820.html#function_End_BBEF247FC80CB1365DB5EDDE232A63C4825660E9">cmajor::util::MappedInputFile::End</a>
@@ -344,7 +392,7 @@
         <br/>
         <br/>
         <span>
-            Called by: <a href="namespace__DA39A3EE5E6B4B0D3255BFEF95601890AFD80709.html#function_main_F34600350414C00797F27E099EFB3CEF42735134">main</a>
+            Called by: <a href="namespace_build_8579CAB238C54EBCD5D162A3B94D6D12FA6E71A5.html#function_BuildSolution_7F99791C0DC84BAD0480870DBE88FB69A91430A9">cmajor::build::BuildSolution</a>
         </span>
         <br/>
         <br/>
@@ -355,7 +403,7 @@
              cmajor::build::CheckMainFunctionSymbol(<a href="class_Module_A2BC96D600A4B3135D7F5444EC360BBF9EA9DDF4.html">Module</a>
             &amp; module)</h4>
         <span>
-            Definition at line <a href="file/build/Build.cpp_805B45E343428924AFE7558BA38CAD4F38432FEB.html#623">623</a>
+            Definition at line <a href="file/build/Build.cpp_805B45E343428924AFE7558BA38CAD4F38432FEB.html#629">629</a>
              of <a href="file/build/Build.cpp_805B45E343428924AFE7558BA38CAD4F38432FEB.html">Build.cpp</a>
         </span>
         <br/>
@@ -384,7 +432,7 @@
             <span class="kw">void</span>
              cmajor::build::CleanProject(Project* project)</h4>
         <span>
-            Definition at line <a href="file/build/Build.cpp_805B45E343428924AFE7558BA38CAD4F38432FEB.html#601">601</a>
+            Definition at line <a href="file/build/Build.cpp_805B45E343428924AFE7558BA38CAD4F38432FEB.html#607">607</a>
              of <a href="file/build/Build.cpp_805B45E343428924AFE7558BA38CAD4F38432FEB.html">Build.cpp</a>
         </span>
         <br/>
@@ -398,7 +446,7 @@
         <br/>
         <span>
             Called by: <a href="namespace_build_8579CAB238C54EBCD5D162A3B94D6D12FA6E71A5.html#function_BuildProject_CF7CC027600C73904366AF031BCD995BCE2AD7E7">cmajor::build::BuildProject</a>
-            , <a href="namespace_build_8579CAB238C54EBCD5D162A3B94D6D12FA6E71A5.html#function_BuildSolution_7F99791C0DC84BAD0480870DBE88FB69A91430A9">cmajor::build::BuildSolution</a>
+            , <a href="namespace_build_8579CAB238C54EBCD5D162A3B94D6D12FA6E71A5.html#function_BuildSolution_A6218D0324F321C281D3AB3344E06746CC19B124">cmajor::build::BuildSolution</a>
         </span>
         <br/>
         <br/>
@@ -410,7 +458,7 @@
             std::string&amp; defFilePath, <a href="class_Module_A2BC96D600A4B3135D7F5444EC360BBF9EA9DDF4.html">Module</a>
             &amp; module)</h4>
         <span>
-            Definition at line <a href="file/build/Build.cpp_805B45E343428924AFE7558BA38CAD4F38432FEB.html#412">412</a>
+            Definition at line <a href="file/build/Build.cpp_805B45E343428924AFE7558BA38CAD4F38432FEB.html#418">418</a>
              of <a href="file/build/Build.cpp_805B45E343428924AFE7558BA38CAD4F38432FEB.html">Build.cpp</a>
         </span>
         <br/>
@@ -438,7 +486,7 @@
             std::string&amp; dynamicListFilePath, <a href="class_Module_A2BC96D600A4B3135D7F5444EC360BBF9EA9DDF4.html">Module</a>
             &amp; module)</h4>
         <span>
-            Definition at line <a href="file/build/Build.cpp_805B45E343428924AFE7558BA38CAD4F38432FEB.html#507">507</a>
+            Definition at line <a href="file/build/Build.cpp_805B45E343428924AFE7558BA38CAD4F38432FEB.html#513">513</a>
              of <a href="file/build/Build.cpp_805B45E343428924AFE7558BA38CAD4F38432FEB.html">Build.cpp</a>
         </span>
         <br/>
@@ -468,7 +516,7 @@
             &amp; emittingContext, <a href="class_AttributeBinder_A166E03F4DDEAC28BFA479759072EC6377E33482.html">AttributeBinder</a>
             * attributeBinder)</h4>
         <span>
-            Definition at line <a href="file/build/Build.cpp_805B45E343428924AFE7558BA38CAD4F38432FEB.html#654">654</a>
+            Definition at line <a href="file/build/Build.cpp_805B45E343428924AFE7558BA38CAD4F38432FEB.html#660">660</a>
              of <a href="file/build/Build.cpp_805B45E343428924AFE7558BA38CAD4F38432FEB.html">Build.cpp</a>
         </span>
         <br/>
@@ -504,7 +552,7 @@
             &amp; emittingContext, <a href="class_AttributeBinder_A166E03F4DDEAC28BFA479759072EC6377E33482.html">AttributeBinder</a>
             * attributeBinder)</h4>
         <span>
-            Definition at line <a href="file/build/Build.cpp_805B45E343428924AFE7558BA38CAD4F38432FEB.html#691">691</a>
+            Definition at line <a href="file/build/Build.cpp_805B45E343428924AFE7558BA38CAD4F38432FEB.html#697">697</a>
              of <a href="file/build/Build.cpp_805B45E343428924AFE7558BA38CAD4F38432FEB.html">Build.cpp</a>
         </span>
         <br/>
@@ -548,7 +596,7 @@
             >>&amp; compileUnits, <span class="kw">bool</span>
             &amp; stop)</h4>
         <span>
-            Definition at line <a href="file/build/Build.cpp_805B45E343428924AFE7558BA38CAD4F38432FEB.html#291">291</a>
+            Definition at line <a href="file/build/Build.cpp_805B45E343428924AFE7558BA38CAD4F38432FEB.html#297">297</a>
              of <a href="file/build/Build.cpp_805B45E343428924AFE7558BA38CAD4F38432FEB.html">Build.cpp</a>
         </span>
         <br/>
@@ -572,12 +620,12 @@
             std::vector&lt;std::string>&amp; objectFilePaths, <span class="kw">const </span>
             std::string&amp; libraryFilePath)</h4>
         <span>
-            Definition at line <a href="file/build/Build.cpp_805B45E343428924AFE7558BA38CAD4F38432FEB.html#333">333</a>
+            Definition at line <a href="file/build/Build.cpp_805B45E343428924AFE7558BA38CAD4F38432FEB.html#339">339</a>
              of <a href="file/build/Build.cpp_805B45E343428924AFE7558BA38CAD4F38432FEB.html">Build.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/build/Build.hpp_5E57336FE669338418A47DD0D3D52216C1F0F97C.html#21">21</a>
+            Declaration at line <a href="file/build/Build.hpp_5E57336FE669338418A47DD0D3D52216C1F0F97C.html#22">22</a>
              of <a href="file/build/Build.hpp_5E57336FE669338418A47DD0D3D52216C1F0F97C.html">Build.hpp</a>
         </span>
         <br/>
@@ -604,12 +652,12 @@
             std::vector&lt;std::string>&amp; objectFilePaths, <span class="kw">const </span>
             std::string&amp; libraryFilePath)</h4>
         <span>
-            Definition at line <a href="file/build/Build.cpp_805B45E343428924AFE7558BA38CAD4F38432FEB.html#371">371</a>
+            Definition at line <a href="file/build/Build.cpp_805B45E343428924AFE7558BA38CAD4F38432FEB.html#377">377</a>
              of <a href="file/build/Build.cpp_805B45E343428924AFE7558BA38CAD4F38432FEB.html">Build.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/build/Build.hpp_5E57336FE669338418A47DD0D3D52216C1F0F97C.html#21">21</a>
+            Declaration at line <a href="file/build/Build.hpp_5E57336FE669338418A47DD0D3D52216C1F0F97C.html#22">22</a>
              of <a href="file/build/Build.hpp_5E57336FE669338418A47DD0D3D52216C1F0F97C.html">Build.hpp</a>
         </span>
         <br/>
@@ -634,7 +682,7 @@
              cmajor::build::InstallSystemLibraries(<a href="class_Module_A2BC96D600A4B3135D7F5444EC360BBF9EA9DDF4.html">Module</a>
             * systemInstallModule)</h4>
         <span>
-            Definition at line <a href="file/build/Build.cpp_805B45E343428924AFE7558BA38CAD4F38432FEB.html#827">827</a>
+            Definition at line <a href="file/build/Build.cpp_805B45E343428924AFE7558BA38CAD4F38432FEB.html#833">833</a>
              of <a href="file/build/Build.cpp_805B45E343428924AFE7558BA38CAD4F38432FEB.html">Build.cpp</a>
         </span>
         <br/>
@@ -666,12 +714,12 @@
             std::vector&lt;std::string>&amp; libraryFilePaths, <a href="class_Module_A2BC96D600A4B3135D7F5444EC360BBF9EA9DDF4.html">Module</a>
             &amp; module)</h4>
         <span>
-            Definition at line <a href="file/build/Build.cpp_805B45E343428924AFE7558BA38CAD4F38432FEB.html#436">436</a>
+            Definition at line <a href="file/build/Build.cpp_805B45E343428924AFE7558BA38CAD4F38432FEB.html#442">442</a>
              of <a href="file/build/Build.cpp_805B45E343428924AFE7558BA38CAD4F38432FEB.html">Build.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/build/Build.hpp_5E57336FE669338418A47DD0D3D52216C1F0F97C.html#22">22</a>
+            Declaration at line <a href="file/build/Build.hpp_5E57336FE669338418A47DD0D3D52216C1F0F97C.html#23">23</a>
              of <a href="file/build/Build.hpp_5E57336FE669338418A47DD0D3D52216C1F0F97C.html">Build.hpp</a>
         </span>
         <br/>
@@ -702,12 +750,12 @@
             std::vector&lt;std::string>&amp; libraryFilePaths, <a href="class_Module_A2BC96D600A4B3135D7F5444EC360BBF9EA9DDF4.html">Module</a>
             &amp; module)</h4>
         <span>
-            Definition at line <a href="file/build/Build.cpp_805B45E343428924AFE7558BA38CAD4F38432FEB.html#533">533</a>
+            Definition at line <a href="file/build/Build.cpp_805B45E343428924AFE7558BA38CAD4F38432FEB.html#539">539</a>
              of <a href="file/build/Build.cpp_805B45E343428924AFE7558BA38CAD4F38432FEB.html">Build.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/build/Build.hpp_5E57336FE669338418A47DD0D3D52216C1F0F97C.html#22">22</a>
+            Declaration at line <a href="file/build/Build.hpp_5E57336FE669338418A47DD0D3D52216C1F0F97C.html#23">23</a>
              of <a href="file/build/Build.hpp_5E57336FE669338418A47DD0D3D52216C1F0F97C.html">Build.hpp</a>
         </span>
         <br/>
@@ -735,7 +783,7 @@
              cmajor::build::ParseSourceFile(<a href="struct_ParserData_5F5DA810893A59F31A161A8BF95C2B1F7E7074FB.html">ParserData</a>
             * parserData)</h4>
         <span>
-            Definition at line <a href="file/build/Build.cpp_805B45E343428924AFE7558BA38CAD4F38432FEB.html#148">148</a>
+            Definition at line <a href="file/build/Build.cpp_805B45E343428924AFE7558BA38CAD4F38432FEB.html#154">154</a>
              of <a href="file/build/Build.cpp_805B45E343428924AFE7558BA38CAD4F38432FEB.html">Build.cpp</a>
         </span>
         <br/>
@@ -758,7 +806,7 @@
             std::vector&lt;std::string>&amp; sourceFilePaths, <span class="kw">bool</span>
             &amp; stop)</h4>
         <span>
-            Definition at line <a href="file/build/Build.cpp_805B45E343428924AFE7558BA38CAD4F38432FEB.html#266">266</a>
+            Definition at line <a href="file/build/Build.cpp_805B45E343428924AFE7558BA38CAD4F38432FEB.html#272">272</a>
              of <a href="file/build/Build.cpp_805B45E343428924AFE7558BA38CAD4F38432FEB.html">Build.cpp</a>
         </span>
         <br/>
@@ -790,7 +838,7 @@
              numThreads, <span class="kw">bool</span>
             &amp; stop)</h4>
         <span>
-            Definition at line <a href="file/build/Build.cpp_805B45E343428924AFE7558BA38CAD4F38432FEB.html#201">201</a>
+            Definition at line <a href="file/build/Build.cpp_805B45E343428924AFE7558BA38CAD4F38432FEB.html#207">207</a>
              of <a href="file/build/Build.cpp_805B45E343428924AFE7558BA38CAD4F38432FEB.html">Build.cpp</a>
         </span>
         <br/>
@@ -818,7 +866,7 @@
             std::vector&lt;std::string>&amp; sourceFilePaths, <span class="kw">bool</span>
             &amp; stop)</h4>
         <span>
-            Definition at line <a href="file/build/Build.cpp_805B45E343428924AFE7558BA38CAD4F38432FEB.html#66">66</a>
+            Definition at line <a href="file/build/Build.cpp_805B45E343428924AFE7558BA38CAD4F38432FEB.html#72">72</a>
              of <a href="file/build/Build.cpp_805B45E343428924AFE7558BA38CAD4F38432FEB.html">Build.cpp</a>
         </span>
         <br/>
@@ -848,7 +896,7 @@
              cmajor::build::ProjectBuilder(<a href="struct_BuildData_30F72BBEA305A60F39CB3DEEFC675DED331AEFB3.html">BuildData</a>
             * buildData)</h4>
         <span>
-            Definition at line <a href="file/build/Build.cpp_805B45E343428924AFE7558BA38CAD4F38432FEB.html#1128">1128</a>
+            Definition at line <a href="file/build/Build.cpp_805B45E343428924AFE7558BA38CAD4F38432FEB.html#1165">1165</a>
              of <a href="file/build/Build.cpp_805B45E343428924AFE7558BA38CAD4F38432FEB.html">Build.cpp</a>
         </span>
         <br/>
@@ -868,7 +916,7 @@
             * module, <span class="kw">const </span>
             std::string&amp; definesFilePath)</h4>
         <span>
-            Definition at line <a href="file/build/Build.cpp_805B45E343428924AFE7558BA38CAD4F38432FEB.html#795">795</a>
+            Definition at line <a href="file/build/Build.cpp_805B45E343428924AFE7558BA38CAD4F38432FEB.html#801">801</a>
              of <a href="file/build/Build.cpp_805B45E343428924AFE7558BA38CAD4F38432FEB.html">Build.cpp</a>
         </span>
         <br/>

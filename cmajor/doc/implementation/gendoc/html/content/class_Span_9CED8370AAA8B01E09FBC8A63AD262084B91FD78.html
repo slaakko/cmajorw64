@@ -62,6 +62,10 @@
                 <td class="functionTableSecondCol" xml:space="preserve"><a href="class_Span_9CED8370AAA8B01E09FBC8A63AD262084B91FD78.html#function_SetFileIndex_F7356B5483F7839AE82A9FFFF41656889B84528C">SetFileIndex</a>(int32_t fileIndex_)</td>
             </tr>
             <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_Span_9CED8370AAA8B01E09FBC8A63AD262084B91FD78.html#function_SetStart_58861940C12D4F037449FE4E09621CE780AC025B">SetStart</a>(int32_t start_)</td>
+            </tr>
+            <tr>
                 <td class="functionTableFirstCol" xml:space="preserve">int32_t</td>
                 <td class="functionTableSecondCol" xml:space="preserve"><a href="class_Span_9CED8370AAA8B01E09FBC8A63AD262084B91FD78.html#function_Start_B7DD432B85A0354A10647124A441B637421D89ED">Start</a>() <span class="kw">const</span></td>
             </tr>
@@ -196,11 +200,11 @@
         <br/>
         <span>
             Called by: <a href="class_AstWriter_E913198FD26EB86BE054254E7AA4791401EA149B.html#function_Write_8B396E6426A876580F9A0DB9D9F8BBAC1DE36180">cmajor::ast::AstWriter::Write</a>
+            , <a href="class_BasicEmitter_ADBC5CA76E0CFA156325CCEFB69E7DB1412045E9.html#function_Visit_C058DCC9386751F5FF003BC24AFC7967F1C41199">cmajor::emitter::BasicEmitter::Visit</a>
+            , <a href="class_BasicEmitter_ADBC5CA76E0CFA156325CCEFB69E7DB1412045E9.html#function_Visit_E5213FDD9E88C9A113B241C3A61901A2723AB248">cmajor::emitter::BasicEmitter::Visit</a>
             , <a href="class_BasicEmitter_ADBC5CA76E0CFA156325CCEFB69E7DB1412045E9.html#function_Visit_6FE3C01714F856EAEF275BF00E9078630910D0DC">cmajor::emitter::BasicEmitter::Visit</a>
             , <a href="class_BasicEmitter_ADBC5CA76E0CFA156325CCEFB69E7DB1412045E9.html#function_Visit_863D21DB8A9AD1683D17518E6C4E711C3A87EB07">cmajor::emitter::BasicEmitter::Visit</a>
             , <a href="class_BasicEmitter_ADBC5CA76E0CFA156325CCEFB69E7DB1412045E9.html#function_Visit_912D79981F603AF639FF6682B6A55A3E197D7701">cmajor::emitter::BasicEmitter::Visit</a>
-            , <a href="class_BasicEmitter_ADBC5CA76E0CFA156325CCEFB69E7DB1412045E9.html#function_Visit_E5213FDD9E88C9A113B241C3A61901A2723AB248">cmajor::emitter::BasicEmitter::Visit</a>
-            , <a href="class_BasicEmitter_ADBC5CA76E0CFA156325CCEFB69E7DB1412045E9.html#function_Visit_C058DCC9386751F5FF003BC24AFC7967F1C41199">cmajor::emitter::BasicEmitter::Visit</a>
             , <a href="namespace_parsing_D308EED43E54B87FB52D88ADF3DA7F4E649CD021.html#function_ThrowException_EFCC16DADB9645D50571DF44BC3A6DD20E68A23D">cmajor::parsing::ThrowException</a>
             , <a href="namespace_parsing_D308EED43E54B87FB52D88ADF3DA7F4E649CD021.html#function_operator_equal_C9FCDC10C6EDFD2D82D14243B42A98AF9EDFB4EC">cmajor::parsing::operator==</a>
             , <a href="class_ClassTypeSymbol_706F15CDE917688D403DB002B3816EE91C6F66CB.html#function_CreateDIForwardDeclaration_6D826B32BE5DDBFFADDDA8DC2994904B1A6D67BC">cmajor::symbols::ClassTypeSymbol::CreateDIForwardDeclaration</a>
@@ -240,11 +244,11 @@
              cmajor::parsing::Span::IsNull() <span class="kw">const</span>
         </h4>
         <span>
-            Definition at line <a href="file/parsing/Scanner.hpp_6650DA799830E1F0F8525AE9EC2A12A6712C01D9.html#47">47</a>
+            Definition at line <a href="file/parsing/Scanner.hpp_6650DA799830E1F0F8525AE9EC2A12A6712C01D9.html#48">48</a>
              of <a href="file/parsing/Scanner.hpp_6650DA799830E1F0F8525AE9EC2A12A6712C01D9.html">Scanner.hpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;47</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">fileIndex</span><span class="other">&nbsp;==&nbsp;</span><span class="other">0</span><span class="other">&nbsp;&amp;&amp;&nbsp;</span><span class="identifier">lineNumber</span><span class="other">&nbsp;==&nbsp;</span><span class="other">0</span><span class="other">&nbsp;&amp;&amp;&nbsp;</span><span class="identifier">start</span><span class="other">&nbsp;==&nbsp;</span><span class="other">0</span><span class="other">&nbsp;&amp;&amp;&nbsp;</span><span class="identifier">end</span><span class="other">&nbsp;==&nbsp;</span><span class="other">0</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;48</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">fileIndex</span><span class="other">&nbsp;==&nbsp;</span><span class="other">0</span><span class="other">&nbsp;&amp;&amp;&nbsp;</span><span class="identifier">lineNumber</span><span class="other">&nbsp;==&nbsp;</span><span class="other">0</span><span class="other">&nbsp;&amp;&amp;&nbsp;</span><span class="identifier">start</span><span class="other">&nbsp;==&nbsp;</span><span class="other">0</span><span class="other">&nbsp;&amp;&amp;&nbsp;</span><span class="identifier">end</span><span class="other">&nbsp;==&nbsp;</span><span class="other">0</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
@@ -272,10 +276,10 @@
             , <a href="class_BoundDelegateCall_E0D935F2EC14B697C235FC3CD519F0432213A6DC.html#function_Store_6A44D1BE3E8777F69CE318220413D7A8E012A3AB">cmajor::binder::BoundDelegateCall::Store</a>
             , <a href="class_BoundFunctionCall_3B6FF42595EC5C47E14802245CBCB5F47F5F3EAC.html#function_Load_DAE00517845253A62A2030636821370ADE2D966C">cmajor::binder::BoundFunctionCall::Load</a>
             , <a href="class_BoundFunctionCall_3B6FF42595EC5C47E14802245CBCB5F47F5F3EAC.html#function_Store_4C31C406F1B84E8D1A8CEA36B5A39A910505FF9F">cmajor::binder::BoundFunctionCall::Store</a>
+            , <a href="class_BasicEmitter_ADBC5CA76E0CFA156325CCEFB69E7DB1412045E9.html#function_Visit_C058DCC9386751F5FF003BC24AFC7967F1C41199">cmajor::emitter::BasicEmitter::Visit</a>
+            , <a href="class_BasicEmitter_ADBC5CA76E0CFA156325CCEFB69E7DB1412045E9.html#function_Visit_E5213FDD9E88C9A113B241C3A61901A2723AB248">cmajor::emitter::BasicEmitter::Visit</a>
             , <a href="class_BasicEmitter_ADBC5CA76E0CFA156325CCEFB69E7DB1412045E9.html#function_Visit_863D21DB8A9AD1683D17518E6C4E711C3A87EB07">cmajor::emitter::BasicEmitter::Visit</a>
             , <a href="class_BasicEmitter_ADBC5CA76E0CFA156325CCEFB69E7DB1412045E9.html#function_Visit_912D79981F603AF639FF6682B6A55A3E197D7701">cmajor::emitter::BasicEmitter::Visit</a>
-            , <a href="class_BasicEmitter_ADBC5CA76E0CFA156325CCEFB69E7DB1412045E9.html#function_Visit_E5213FDD9E88C9A113B241C3A61901A2723AB248">cmajor::emitter::BasicEmitter::Visit</a>
-            , <a href="class_BasicEmitter_ADBC5CA76E0CFA156325CCEFB69E7DB1412045E9.html#function_Visit_C058DCC9386751F5FF003BC24AFC7967F1C41199">cmajor::emitter::BasicEmitter::Visit</a>
             , <a href="class_Emitter_154396B281E1F2C3ECA7612F1A3AD2E408E7D595.html#function_GetDebugLocation_C0C98FC1BE3F8A119AD0119789F1F422BCF36EBA">cmajor::ir::Emitter::GetDebugLocation</a>
             , <a href="namespace_parsing_D308EED43E54B87FB52D88ADF3DA7F4E649CD021.html#function_operator_equal_C9FCDC10C6EDFD2D82D14243B42A98AF9EDFB4EC">cmajor::parsing::operator==</a>
             , <a href="class_ClassTypeSymbol_706F15CDE917688D403DB002B3816EE91C6F66CB.html#function_CreateDIForwardDeclaration_6D826B32BE5DDBFFADDDA8DC2994904B1A6D67BC">cmajor::symbols::ClassTypeSymbol::CreateDIForwardDeclaration</a>
@@ -294,11 +298,11 @@
             <span class="kw">void</span>
              cmajor::parsing::Span::SetEnd(int32_t end_)</h4>
         <span>
-            Definition at line <a href="file/parsing/Scanner.hpp_6650DA799830E1F0F8525AE9EC2A12A6712C01D9.html#46">46</a>
+            Definition at line <a href="file/parsing/Scanner.hpp_6650DA799830E1F0F8525AE9EC2A12A6712C01D9.html#47">47</a>
              of <a href="file/parsing/Scanner.hpp_6650DA799830E1F0F8525AE9EC2A12A6712C01D9.html">Scanner.hpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;46</span>&nbsp;<span class="other">{</span>&nbsp;<span class="identifier">end</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">end_</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;47</span>&nbsp;<span class="other">{</span>&nbsp;<span class="identifier">end</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">end_</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
@@ -319,6 +323,21 @@
             :<br/>
             <span class="code">
                 <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;30</span>&nbsp;<span class="other">{</span>&nbsp;<span class="identifier">fileIndex</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">fileIndex_</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <hr/>
+        <h3 id="function_SetStart_58861940C12D4F037449FE4E09621CE780AC025B">SetStart Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             cmajor::parsing::Span::SetStart(int32_t start_)</h4>
+        <span>
+            Definition at line <a href="file/parsing/Scanner.hpp_6650DA799830E1F0F8525AE9EC2A12A6712C01D9.html#46">46</a>
+             of <a href="file/parsing/Scanner.hpp_6650DA799830E1F0F8525AE9EC2A12A6712C01D9.html">Scanner.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;46</span>&nbsp;<span class="other">{</span>&nbsp;<span class="identifier">start</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">start_</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
@@ -381,7 +400,7 @@
             , <a href="namespace_symbols_CED2EBA893BFBF04AA45D2AF9418A2BC23E64ADF.html#function_Expand_413C1ED9A4BBDB96749F1C1352C1D48D58C078E4">cmajor::symbols::Expand</a>
             , <a href="namespace_symbols_CED2EBA893BFBF04AA45D2AF9418A2BC23E64ADF.html#function_SpanToDomElement_D8D4BAC48CA8504AD7075B5B2D6DEA4575EDB577">cmajor::symbols::SpanToDomElement</a>
             , <a href="namespace_symbols_CED2EBA893BFBF04AA45D2AF9418A2BC23E64ADF.html#function_SpanToJson_022C29F3E8F5E7AA8F8CE266C80959213A4DF07D">cmajor::symbols::SpanToJson</a>
-            , <a href="class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_BeginNamespace_69C9A52E5D8EDA3CFBBA4C8054C5002D5469859B">cmajor::symbols::SymbolTable::BeginNamespace</a>
+            , <a href="class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_BeginNamespace_9809CCCC90597C689605DA8371F8C772D0AAC81D">cmajor::symbols::SymbolTable::BeginNamespace</a>
         </span>
         <br/>
         <br/>

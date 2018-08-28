@@ -16,7 +16,7 @@
             <svg height="0" id="classInheritanceDiagram" version="2.0" width="0" xmlns="http://www.w3.org/2000/svg"/>
         </div>
         <span>
-            Definition at line <a href="file/ast/Class.hpp_B6822DB71EE2DFFEBC1F681645DB7C7781324BA2.html#146">146</a>
+            Definition at line <a href="file/ast/Class.hpp_B6822DB71EE2DFFEBC1F681645DB7C7781324BA2.html#170">170</a>
              of <a href="file/ast/Class.hpp_B6822DB71EE2DFFEBC1F681645DB7C7781324BA2.html">Class.hpp</a>
         </span>
         <br/>
@@ -56,6 +56,14 @@
                 <td class="functionTableSecondCol" xml:space="preserve"><a href="class_MemberVariableNode_8ECD03B83E3B0B970C2EFDF682A3FE0CDB8B0D40.html#function_Read_B14D0270CB0B3C28153F5ED1B81134A763C1D24D">Read</a>(<a href="class_AstReader_79D1108F70EAB0D555FDDD074FED033B2DCABCD5.html">AstReader</a>&amp; reader) <span class="kw">override</span></td>
             </tr>
             <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_MemberVariableNode_8ECD03B83E3B0B970C2EFDF682A3FE0CDB8B0D40.html#function_SetSpecifierSpan_170BA6525FFA58CD0CAA07683289B358DE3DBD43">SetSpecifierSpan</a>(<span class="kw">const </span><a href="class_Span_9CED8370AAA8B01E09FBC8A63AD262084B91FD78.html">Span</a>&amp; specifierSpan_)</td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">const </span><a href="class_Span_9CED8370AAA8B01E09FBC8A63AD262084B91FD78.html">Span</a>&amp;</td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_MemberVariableNode_8ECD03B83E3B0B970C2EFDF682A3FE0CDB8B0D40.html#function_SpecifierSpan_7B9824C9CC69A0996D05CB13245CA01D42DF283D">SpecifierSpan</a>() <span class="kw">const</span></td>
+            </tr>
+            <tr>
                 <td class="functionTableFirstCol" xml:space="preserve"><a href="class_Node_66FC1D6AD8F487E453CE6E17163479C7C2DAC063.html">Node</a>*</td>
                 <td class="functionTableSecondCol" xml:space="preserve"><a href="class_MemberVariableNode_8ECD03B83E3B0B970C2EFDF682A3FE0CDB8B0D40.html#function_TypeExpr_363DC6AFB7A3EEBD6482476031859521F8B35755">TypeExpr</a>() <span class="kw">const</span></td>
             </tr>
@@ -74,6 +82,10 @@
                 <td class="functionTableFirstCol" xml:space="preserve">std::unique_ptr&lt;<a href="class_IdentifierNode_4A1A7E3AFB614AEF7ED2B90309B9B619E86EE9E4.html">IdentifierNode</a>></td>
                 <td class="functionTableSecondCol" xml:space="preserve">id</td>
             </tr>
+            <tr id="variable_specifierSpan_26F6AFDD041277FB65D0C8653E1DE3DBCA9B95E9">
+                <td class="functionTableFirstCol" xml:space="preserve"><a href="class_Span_9CED8370AAA8B01E09FBC8A63AD262084B91FD78.html">Span</a></td>
+                <td class="functionTableSecondCol" xml:space="preserve">specifierSpan</td>
+            </tr>
             <tr id="variable_specifiers_40373364541B5413D7B7B4474B26B2FCDD0C3FEB">
                 <td class="functionTableFirstCol" xml:space="preserve"><a href="enum_Specifiers_4B387D5450415DCDFBFDDF7AEC4A29775F161D23.html">Specifiers</a></td>
                 <td class="functionTableSecondCol" xml:space="preserve">specifiers</td>
@@ -91,21 +103,21 @@
             <a href="class_Span_9CED8370AAA8B01E09FBC8A63AD262084B91FD78.html">Span</a>
             &amp; span_)</h4>
         <span>
-            Definition at line <a href="file/ast/Class.cpp_952F8400A974BFF15838298F4511A1694D6329CB.html#379">379</a>
+            Definition at line <a href="file/ast/Class.cpp_952F8400A974BFF15838298F4511A1694D6329CB.html#391">391</a>
              of <a href="file/ast/Class.cpp_952F8400A974BFF15838298F4511A1694D6329CB.html">Class.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">379</span>&nbsp;<span class="other">:</span>&nbsp;<a href="class_Node_66FC1D6AD8F487E453CE6E17163479C7C2DAC063.html">Node</a><span class="other">(</span><a href="enum_NodeType_0D66E0D14D03B3151A778BF9E86A029828B6D5F6.html">NodeType</a><span class="other">::</span><a href="enum_NodeType_0D66E0D14D03B3151A778BF9E86A029828B6D5F6.html#enumerator_memberVariableNode_8672F18DD78902AD942AA144F9212F00EB0E9867">memberVariableNode</a><span class="other">,&nbsp;</span><span class="identifier">span_</span><span class="other">)</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">391</span>&nbsp;<span class="other">:</span>&nbsp;<a href="class_Node_66FC1D6AD8F487E453CE6E17163479C7C2DAC063.html">Node</a><span class="other">(</span><a href="enum_NodeType_0D66E0D14D03B3151A778BF9E86A029828B6D5F6.html">NodeType</a><span class="other">::</span><a href="enum_NodeType_0D66E0D14D03B3151A778BF9E86A029828B6D5F6.html#enumerator_memberVariableNode_8672F18DD78902AD942AA144F9212F00EB0E9867">memberVariableNode</a><span class="other">,&nbsp;</span><span class="identifier">span_</span><span class="other">)</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">380</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">392</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">381</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">393</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/ast/Class.hpp_B6822DB71EE2DFFEBC1F681645DB7C7781324BA2.html#149">149</a>
+            Declaration at line <a href="file/ast/Class.hpp_B6822DB71EE2DFFEBC1F681645DB7C7781324BA2.html#173">173</a>
              of <a href="file/ast/Class.hpp_B6822DB71EE2DFFEBC1F681645DB7C7781324BA2.html">Class.hpp</a>
         </span>
         <br/>
@@ -121,27 +133,27 @@
             * id_, <a href="class_Attributes_12DB624832EB1374F5D6AFCD65464B72AFF201E4.html">Attributes</a>
             * attributes_)</h4>
         <span>
-            Definition at line <a href="file/ast/Class.cpp_952F8400A974BFF15838298F4511A1694D6329CB.html#383">383</a>
+            Definition at line <a href="file/ast/Class.cpp_952F8400A974BFF15838298F4511A1694D6329CB.html#395">395</a>
              of <a href="file/ast/Class.cpp_952F8400A974BFF15838298F4511A1694D6329CB.html">Class.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">383</span>&nbsp;<span class="other">:</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">395</span>&nbsp;<span class="other">:</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">384</span>&nbsp;<a href="class_Node_66FC1D6AD8F487E453CE6E17163479C7C2DAC063.html">Node</a><span class="other">(</span><a href="enum_NodeType_0D66E0D14D03B3151A778BF9E86A029828B6D5F6.html">NodeType</a><span class="other">::</span><a href="enum_NodeType_0D66E0D14D03B3151A778BF9E86A029828B6D5F6.html#enumerator_memberVariableNode_8672F18DD78902AD942AA144F9212F00EB0E9867">memberVariableNode</a><span class="other">,&nbsp;</span><span class="identifier">span_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="class_MemberVariableNode_8ECD03B83E3B0B970C2EFDF682A3FE0CDB8B0D40.html#variable_specifiers_40373364541B5413D7B7B4474B26B2FCDD0C3FEB">specifiers</a><span class="other">(</span><span class="identifier">specifiers_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="class_MemberVariableNode_8ECD03B83E3B0B970C2EFDF682A3FE0CDB8B0D40.html#variable_typeExpr_0A44BFEE3AB215DF3AF29CC8F88936F5DB535A6A">typeExpr</a><span class="other">(</span><span class="identifier">typeExpr_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="class_MemberVariableNode_8ECD03B83E3B0B970C2EFDF682A3FE0CDB8B0D40.html#variable_id_263A95CE9644311553BE9F783A217BD49DE38B7E">id</a><span class="other">(</span><span class="identifier">id_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="class_MemberVariableNode_8ECD03B83E3B0B970C2EFDF682A3FE0CDB8B0D40.html#variable_attributes_A373D66F11B16D3C060A2F21CB6E422F564684B1">attributes</a><span class="other">(</span><span class="identifier">attributes_</span><span class="other">)</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">396</span>&nbsp;<a href="class_Node_66FC1D6AD8F487E453CE6E17163479C7C2DAC063.html">Node</a><span class="other">(</span><a href="enum_NodeType_0D66E0D14D03B3151A778BF9E86A029828B6D5F6.html">NodeType</a><span class="other">::</span><a href="enum_NodeType_0D66E0D14D03B3151A778BF9E86A029828B6D5F6.html#enumerator_memberVariableNode_8672F18DD78902AD942AA144F9212F00EB0E9867">memberVariableNode</a><span class="other">,&nbsp;</span><span class="identifier">span_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="class_MemberVariableNode_8ECD03B83E3B0B970C2EFDF682A3FE0CDB8B0D40.html#variable_specifiers_40373364541B5413D7B7B4474B26B2FCDD0C3FEB">specifiers</a><span class="other">(</span><span class="identifier">specifiers_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="class_MemberVariableNode_8ECD03B83E3B0B970C2EFDF682A3FE0CDB8B0D40.html#variable_typeExpr_0A44BFEE3AB215DF3AF29CC8F88936F5DB535A6A">typeExpr</a><span class="other">(</span><span class="identifier">typeExpr_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="class_MemberVariableNode_8ECD03B83E3B0B970C2EFDF682A3FE0CDB8B0D40.html#variable_id_263A95CE9644311553BE9F783A217BD49DE38B7E">id</a><span class="other">(</span><span class="identifier">id_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="class_MemberVariableNode_8ECD03B83E3B0B970C2EFDF682A3FE0CDB8B0D40.html#variable_attributes_A373D66F11B16D3C060A2F21CB6E422F564684B1">attributes</a><span class="other">(</span><span class="identifier">attributes_</span><span class="other">)</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">385</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">397</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">386</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="class_MemberVariableNode_8ECD03B83E3B0B970C2EFDF682A3FE0CDB8B0D40.html#variable_typeExpr_0A44BFEE3AB215DF3AF29CC8F88936F5DB535A6A">typeExpr</a><span class="other">-></span><span class="identifier">SetParent</span><span class="other">(</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">398</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="class_MemberVariableNode_8ECD03B83E3B0B970C2EFDF682A3FE0CDB8B0D40.html#variable_typeExpr_0A44BFEE3AB215DF3AF29CC8F88936F5DB535A6A">typeExpr</a><span class="other">-></span><span class="identifier">SetParent</span><span class="other">(</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">387</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="class_MemberVariableNode_8ECD03B83E3B0B970C2EFDF682A3FE0CDB8B0D40.html#variable_id_263A95CE9644311553BE9F783A217BD49DE38B7E">id</a><span class="other">-></span><span class="identifier">SetParent</span><span class="other">(</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">399</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="class_MemberVariableNode_8ECD03B83E3B0B970C2EFDF682A3FE0CDB8B0D40.html#variable_id_263A95CE9644311553BE9F783A217BD49DE38B7E">id</a><span class="other">-></span><span class="identifier">SetParent</span><span class="other">(</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">388</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">400</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/ast/Class.hpp_B6822DB71EE2DFFEBC1F681645DB7C7781324BA2.html#150">150</a>
+            Declaration at line <a href="file/ast/Class.hpp_B6822DB71EE2DFFEBC1F681645DB7C7781324BA2.html#174">174</a>
              of <a href="file/ast/Class.hpp_B6822DB71EE2DFFEBC1F681645DB7C7781324BA2.html">Class.hpp</a>
         </span>
         <br/>
@@ -155,21 +167,21 @@
             &amp; visitor) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/ast/Class.cpp_952F8400A974BFF15838298F4511A1694D6329CB.html#400">400</a>
+            Definition at line <a href="file/ast/Class.cpp_952F8400A974BFF15838298F4511A1694D6329CB.html#414">414</a>
              of <a href="file/ast/Class.cpp_952F8400A974BFF15838298F4511A1694D6329CB.html">Class.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">401</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">415</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">402</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">visitor</span><span class="other">.</span><a href="class_Visitor_72892152D0864AA2907A1FD60E7A49EB4E071AD6.html#function_Visit_AFEDD11BE695568EF9BA97C8FA7FEA971ABC661E">Visit</a><span class="other">(</span><span class="other">*</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">416</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">visitor</span><span class="other">.</span><a href="class_Visitor_72892152D0864AA2907A1FD60E7A49EB4E071AD6.html#function_Visit_AFEDD11BE695568EF9BA97C8FA7FEA971ABC661E">Visit</a><span class="other">(</span><span class="other">*</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">403</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">417</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/ast/Class.hpp_B6822DB71EE2DFFEBC1F681645DB7C7781324BA2.html#152">152</a>
+            Declaration at line <a href="file/ast/Class.hpp_B6822DB71EE2DFFEBC1F681645DB7C7781324BA2.html#176">176</a>
              of <a href="file/ast/Class.hpp_B6822DB71EE2DFFEBC1F681645DB7C7781324BA2.html">Class.hpp</a>
         </span>
         <br/>
@@ -192,37 +204,46 @@
             &amp; cloneContext) <span class="kw">const override</span>
         </h4>
         <span>
-            Definition at line <a href="file/ast/Class.cpp_952F8400A974BFF15838298F4511A1694D6329CB.html#390">390</a>
+            Definition at line <a href="file/ast/Class.cpp_952F8400A974BFF15838298F4511A1694D6329CB.html#402">402</a>
              of <a href="file/ast/Class.cpp_952F8400A974BFF15838298F4511A1694D6329CB.html">Class.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">391</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">403</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">392</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="class_Attributes_12DB624832EB1374F5D6AFCD65464B72AFF201E4.html">Attributes</a><span class="other">*</span>&nbsp;<span class="identifier">clonedAttributes</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">nullptr</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">404</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="class_Attributes_12DB624832EB1374F5D6AFCD65464B72AFF201E4.html">Attributes</a><span class="other">*</span>&nbsp;<span class="identifier">clonedAttributes</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">nullptr</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">393</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><a href="class_MemberVariableNode_8ECD03B83E3B0B970C2EFDF682A3FE0CDB8B0D40.html#variable_attributes_A373D66F11B16D3C060A2F21CB6E422F564684B1">attributes</a><span class="other">)</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">405</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><a href="class_MemberVariableNode_8ECD03B83E3B0B970C2EFDF682A3FE0CDB8B0D40.html#variable_attributes_A373D66F11B16D3C060A2F21CB6E422F564684B1">attributes</a><span class="other">)</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">394</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">406</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">395</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">clonedAttributes</span><span class="other">&nbsp;=&nbsp;</span><a href="class_MemberVariableNode_8ECD03B83E3B0B970C2EFDF682A3FE0CDB8B0D40.html#variable_attributes_A373D66F11B16D3C060A2F21CB6E422F564684B1">attributes</a><span class="other">-></span><span class="identifier">Clone</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">407</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">clonedAttributes</span><span class="other">&nbsp;=&nbsp;</span><a href="class_MemberVariableNode_8ECD03B83E3B0B970C2EFDF682A3FE0CDB8B0D40.html#variable_attributes_A373D66F11B16D3C060A2F21CB6E422F564684B1">attributes</a><span class="other">-></span><span class="identifier">Clone</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">396</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">408</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">397</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">new&nbsp;</span><a href="class_MemberVariableNode_8ECD03B83E3B0B970C2EFDF682A3FE0CDB8B0D40.html">MemberVariableNode</a><span class="other">(</span><span class="identifier">GetSpan</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="class_MemberVariableNode_8ECD03B83E3B0B970C2EFDF682A3FE0CDB8B0D40.html#variable_specifiers_40373364541B5413D7B7B4474B26B2FCDD0C3FEB">specifiers</a><span class="other">,&nbsp;</span><a href="class_MemberVariableNode_8ECD03B83E3B0B970C2EFDF682A3FE0CDB8B0D40.html#variable_typeExpr_0A44BFEE3AB215DF3AF29CC8F88936F5DB535A6A">typeExpr</a><span class="other">-></span><span class="identifier">Clone</span><span class="other">(</span><span class="identifier">cloneContext</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="kw">static_cast</span><span class="other">&lt;</span><a href="class_IdentifierNode_4A1A7E3AFB614AEF7ED2B90309B9B619E86EE9E4.html">IdentifierNode</a><span class="other">*</span><span class="other">></span><span class="other">(</span><a href="class_MemberVariableNode_8ECD03B83E3B0B970C2EFDF682A3FE0CDB8B0D40.html#variable_id_263A95CE9644311553BE9F783A217BD49DE38B7E">id</a><span class="other">-></span><span class="identifier">Clone</span><span class="other">(</span><span class="identifier">cloneContext</span><span class="other">)</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">clonedAttributes</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">409</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="class_MemberVariableNode_8ECD03B83E3B0B970C2EFDF682A3FE0CDB8B0D40.html">MemberVariableNode</a><span class="other">*</span>&nbsp;<span class="identifier">clone</span>&nbsp;<span class="other">=</span>&nbsp;&nbsp;<span class="kw">new&nbsp;</span><a href="class_MemberVariableNode_8ECD03B83E3B0B970C2EFDF682A3FE0CDB8B0D40.html">MemberVariableNode</a><span class="other">(</span><span class="identifier">GetSpan</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="class_MemberVariableNode_8ECD03B83E3B0B970C2EFDF682A3FE0CDB8B0D40.html#variable_specifiers_40373364541B5413D7B7B4474B26B2FCDD0C3FEB">specifiers</a><span class="other">,&nbsp;</span><a href="class_MemberVariableNode_8ECD03B83E3B0B970C2EFDF682A3FE0CDB8B0D40.html#variable_typeExpr_0A44BFEE3AB215DF3AF29CC8F88936F5DB535A6A">typeExpr</a><span class="other">-></span><a href="class_MemberVariableNode_8ECD03B83E3B0B970C2EFDF682A3FE0CDB8B0D40.html#function_Clone_FF8815897E7515DF86750F9979971D05E0113C9D">Clone</a><span class="other">(</span><span class="identifier">cloneContext</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="kw">static_cast</span><span class="other">&lt;</span><a href="class_IdentifierNode_4A1A7E3AFB614AEF7ED2B90309B9B619E86EE9E4.html">IdentifierNode</a><span class="other">*</span><span class="other">></span><span class="other">(</span><a href="class_MemberVariableNode_8ECD03B83E3B0B970C2EFDF682A3FE0CDB8B0D40.html#variable_id_263A95CE9644311553BE9F783A217BD49DE38B7E">id</a><span class="other">-></span><span class="identifier">Clone</span><span class="other">(</span><span class="identifier">cloneContext</span><span class="other">)</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">clonedAttributes</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">398</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">410</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">clone</span><span class="other">-></span><a href="class_MemberVariableNode_8ECD03B83E3B0B970C2EFDF682A3FE0CDB8B0D40.html#function_SetSpecifierSpan_170BA6525FFA58CD0CAA07683289B358DE3DBD43">SetSpecifierSpan</a><span class="other">(</span><a href="class_MemberVariableNode_8ECD03B83E3B0B970C2EFDF682A3FE0CDB8B0D40.html#variable_specifierSpan_26F6AFDD041277FB65D0C8653E1DE3DBCA9B95E9">specifierSpan</a><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">411</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">clone</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">412</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/ast/Class.hpp_B6822DB71EE2DFFEBC1F681645DB7C7781324BA2.html#151">151</a>
+            Declaration at line <a href="file/ast/Class.hpp_B6822DB71EE2DFFEBC1F681645DB7C7781324BA2.html#175">175</a>
              of <a href="file/ast/Class.hpp_B6822DB71EE2DFFEBC1F681645DB7C7781324BA2.html">Class.hpp</a>
         </span>
         <br/>
         <br/>
         <span>
             Base class overridden functions: <a href="class_Node_66FC1D6AD8F487E453CE6E17163479C7C2DAC063.html#function_Clone_75E0CB4A29588BDD98958BD3F86C327542EAB424">cmajor::ast::Node::Clone</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Calls: <a href="class_MemberVariableNode_8ECD03B83E3B0B970C2EFDF682A3FE0CDB8B0D40.html#function_SetSpecifierSpan_170BA6525FFA58CD0CAA07683289B358DE3DBD43">cmajor::ast::MemberVariableNode::SetSpecifierSpan</a>
         </span>
         <br/>
         <br/>
@@ -233,11 +254,11 @@
             * cmajor::ast::MemberVariableNode::GetAttributes() <span class="kw">const</span>
         </h4>
         <span>
-            Definition at line <a href="file/ast/Class.hpp_B6822DB71EE2DFFEBC1F681645DB7C7781324BA2.html#158">158</a>
+            Definition at line <a href="file/ast/Class.hpp_B6822DB71EE2DFFEBC1F681645DB7C7781324BA2.html#182">182</a>
              of <a href="file/ast/Class.hpp_B6822DB71EE2DFFEBC1F681645DB7C7781324BA2.html">Class.hpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">158</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">attributes</span><span class="other">.</span><span class="identifier">get</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">182</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">attributes</span><span class="other">.</span><span class="identifier">get</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
@@ -254,11 +275,11 @@
              cmajor::ast::MemberVariableNode::GetSpecifiers() <span class="kw">const</span>
         </h4>
         <span>
-            Definition at line <a href="file/ast/Class.hpp_B6822DB71EE2DFFEBC1F681645DB7C7781324BA2.html#155">155</a>
+            Definition at line <a href="file/ast/Class.hpp_B6822DB71EE2DFFEBC1F681645DB7C7781324BA2.html#179">179</a>
              of <a href="file/ast/Class.hpp_B6822DB71EE2DFFEBC1F681645DB7C7781324BA2.html">Class.hpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">155</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">specifiers</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">179</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">specifiers</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
@@ -275,11 +296,11 @@
             * cmajor::ast::MemberVariableNode::Id() <span class="kw">const</span>
         </h4>
         <span>
-            Definition at line <a href="file/ast/Class.hpp_B6822DB71EE2DFFEBC1F681645DB7C7781324BA2.html#157">157</a>
+            Definition at line <a href="file/ast/Class.hpp_B6822DB71EE2DFFEBC1F681645DB7C7781324BA2.html#181">181</a>
              of <a href="file/ast/Class.hpp_B6822DB71EE2DFFEBC1F681645DB7C7781324BA2.html">Class.hpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">157</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">id</span><span class="other">.</span><span class="identifier">get</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">181</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">id</span><span class="other">.</span><span class="identifier">get</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
@@ -298,12 +319,12 @@
             &amp; reader) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/ast/Class.cpp_952F8400A974BFF15838298F4511A1694D6329CB.html#419">419</a>
+            Definition at line <a href="file/ast/Class.cpp_952F8400A974BFF15838298F4511A1694D6329CB.html#434">434</a>
              of <a href="file/ast/Class.cpp_952F8400A974BFF15838298F4511A1694D6329CB.html">Class.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/ast/Class.hpp_B6822DB71EE2DFFEBC1F681645DB7C7781324BA2.html#154">154</a>
+            Declaration at line <a href="file/ast/Class.hpp_B6822DB71EE2DFFEBC1F681645DB7C7781324BA2.html#178">178</a>
              of <a href="file/ast/Class.hpp_B6822DB71EE2DFFEBC1F681645DB7C7781324BA2.html">Class.hpp</a>
         </span>
         <br/>
@@ -317,11 +338,51 @@
             Calls: <a href="class_AstReader_79D1108F70EAB0D555FDDD074FED033B2DCABCD5.html#function_GetBinaryReader_3D8CDE19882342F28A73C8633B207C19F4CF2903">cmajor::ast::AstReader::GetBinaryReader</a>
             , <a href="class_AstReader_79D1108F70EAB0D555FDDD074FED033B2DCABCD5.html#function_ReadIdentifierNode_5F4F82748C8D922BADC586CD1C2AFD9E0A88B0ED">cmajor::ast::AstReader::ReadIdentifierNode</a>
             , <a href="class_AstReader_79D1108F70EAB0D555FDDD074FED033B2DCABCD5.html#function_ReadNode_5F7C8493FC716036FA5A915275B80B947DADB823">cmajor::ast::AstReader::ReadNode</a>
+            , <a href="class_AstReader_79D1108F70EAB0D555FDDD074FED033B2DCABCD5.html#function_ReadSpan_082ABEE22897732B6B4B9DACAC77278903C88AF6">cmajor::ast::AstReader::ReadSpan</a>
             , <a href="class_AstReader_79D1108F70EAB0D555FDDD074FED033B2DCABCD5.html#function_ReadSpecifiers_AE94D58CC8C5492E36BD7B10FFCE1616FD7871CA">cmajor::ast::AstReader::ReadSpecifiers</a>
             , <a href="class_Node_66FC1D6AD8F487E453CE6E17163479C7C2DAC063.html#function_Read_894C51ECB047DC4A41994462C3E69D94691C3545">cmajor::ast::Node::Read</a>
             , <a href="class_BinaryReader_03B69C4712E895798960F755025292754AFB8DDD.html#function_ReadBool_AF9E7BF9BFA9599690F086031FE3AB89ED7F6DEA">cmajor::util::BinaryReader::ReadBool</a>
         </span>
         <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_SetSpecifierSpan_170BA6525FFA58CD0CAA07683289B358DE3DBD43">SetSpecifierSpan Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             cmajor::ast::MemberVariableNode::SetSpecifierSpan(<span class="kw">const </span>
+            <a href="class_Span_9CED8370AAA8B01E09FBC8A63AD262084B91FD78.html">Span</a>
+            &amp; specifierSpan_)</h4>
+        <span>
+            Definition at line <a href="file/ast/Class.hpp_B6822DB71EE2DFFEBC1F681645DB7C7781324BA2.html#183">183</a>
+             of <a href="file/ast/Class.hpp_B6822DB71EE2DFFEBC1F681645DB7C7781324BA2.html">Class.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">183</span>&nbsp;<span class="other">{</span>&nbsp;<span class="identifier">specifierSpan</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">specifierSpan_</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Called by: <a href="class_MemberVariableNode_8ECD03B83E3B0B970C2EFDF682A3FE0CDB8B0D40.html#function_Clone_FF8815897E7515DF86750F9979971D05E0113C9D">cmajor::ast::MemberVariableNode::Clone</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_SpecifierSpan_7B9824C9CC69A0996D05CB13245CA01D42DF283D">SpecifierSpan Member Function</h3>
+        <h4>
+            <span class="kw">const </span>
+            <a href="class_Span_9CED8370AAA8B01E09FBC8A63AD262084B91FD78.html">Span</a>
+            &amp; cmajor::ast::MemberVariableNode::SpecifierSpan() <span class="kw">const</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/ast/Class.hpp_B6822DB71EE2DFFEBC1F681645DB7C7781324BA2.html#184">184</a>
+             of <a href="file/ast/Class.hpp_B6822DB71EE2DFFEBC1F681645DB7C7781324BA2.html">Class.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">184</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">specifierSpan</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
         <br/>
         <hr/>
         <h3 id="function_TypeExpr_363DC6AFB7A3EEBD6482476031859521F8B35755">TypeExpr Member Function</h3>
@@ -330,11 +391,11 @@
             * cmajor::ast::MemberVariableNode::TypeExpr() <span class="kw">const</span>
         </h4>
         <span>
-            Definition at line <a href="file/ast/Class.hpp_B6822DB71EE2DFFEBC1F681645DB7C7781324BA2.html#156">156</a>
+            Definition at line <a href="file/ast/Class.hpp_B6822DB71EE2DFFEBC1F681645DB7C7781324BA2.html#180">180</a>
              of <a href="file/ast/Class.hpp_B6822DB71EE2DFFEBC1F681645DB7C7781324BA2.html">Class.hpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">156</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">typeExpr</span><span class="other">.</span><span class="identifier">get</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">180</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">typeExpr</span><span class="other">.</span><span class="identifier">get</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
@@ -352,12 +413,12 @@
             &amp; writer) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/ast/Class.cpp_952F8400A974BFF15838298F4511A1694D6329CB.html#405">405</a>
+            Definition at line <a href="file/ast/Class.cpp_952F8400A974BFF15838298F4511A1694D6329CB.html#419">419</a>
              of <a href="file/ast/Class.cpp_952F8400A974BFF15838298F4511A1694D6329CB.html">Class.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/ast/Class.hpp_B6822DB71EE2DFFEBC1F681645DB7C7781324BA2.html#153">153</a>
+            Declaration at line <a href="file/ast/Class.hpp_B6822DB71EE2DFFEBC1F681645DB7C7781324BA2.html#177">177</a>
              of <a href="file/ast/Class.hpp_B6822DB71EE2DFFEBC1F681645DB7C7781324BA2.html">Class.hpp</a>
         </span>
         <br/>
@@ -370,6 +431,7 @@
         <span>
             Calls: <a href="class_AstWriter_E913198FD26EB86BE054254E7AA4791401EA149B.html#function_GetBinaryWriter_889E99D5A9549A76BEDCAB1755E1CAC075CBDD71">cmajor::ast::AstWriter::GetBinaryWriter</a>
             , <a href="class_AstWriter_E913198FD26EB86BE054254E7AA4791401EA149B.html#function_Write_7724E21B291FAE124E86990BBC52046FBA555CF2">cmajor::ast::AstWriter::Write</a>
+            , <a href="class_AstWriter_E913198FD26EB86BE054254E7AA4791401EA149B.html#function_Write_8B396E6426A876580F9A0DB9D9F8BBAC1DE36180">cmajor::ast::AstWriter::Write</a>
             , <a href="class_Node_66FC1D6AD8F487E453CE6E17163479C7C2DAC063.html#function_Write_82DF5FFD8434B1620A45C972CD4DAE4EF72A2CF5">cmajor::ast::Node::Write</a>
             , <a href="class_BinaryWriter_C63D48852BF8E92E7FD58CF0C72DEA2D09A302B4.html#function_Write_F862555C93905FC6F4B920FA221EB6ADCA8F0F93">cmajor::util::BinaryWriter::Write</a>
         </span>

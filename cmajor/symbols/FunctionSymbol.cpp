@@ -513,7 +513,7 @@ void FunctionSymbol::ComputeName()
     }
     name.append(1, U')');
     SetName(name);
-    if (!IsBasicTypeOperation() && !intrinsic)
+    if (!IsBasicTypeOperation())
     {
         ComputeMangledName();
     }

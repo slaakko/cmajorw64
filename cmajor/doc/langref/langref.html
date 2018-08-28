@@ -1385,7 +1385,7 @@
         Shift operators <span class="mono">&lt;&lt;</span> and <span class="mono">&gt;&gt;</span> can be overloaded,
         in which case they take operands of user-defined types and yield a result of some user-defined or built-in type.
         For example, in the system library the <span class="mono">&lt;&lt;</span> operator has
-        <a href="../library/System.Base/System.Base.html#function_group_op_shl_247FCBBC20E82D4A1D0D55C77A382CB9751F0C4C">these</a> overloads.
+        <a href="../system/content/System.Base/doc/ns_System.IO.html#function_op_shl_D9A1F019B44DAFB0E932F2BA7EA5C8A787B9CB83">these</a> overloads.
 
     </p>
 
@@ -1413,7 +1413,7 @@
         Additive operators <span class="mono">+</span> and <span class="mono">&minus;</span> can be overloaded,
         in which case they take operands of user-defined types and yield a result of some user-defined or built-in type.
         For example, in the system library the <span class="mono">+</span> operator has
-        <a href="../library/System.Base/System.Base.html#function_group_op_plus_C9FCFD8E4E0F27EFEFEA982DE2CE2508CDB3F20F">these</a> overloads.
+        <a href="../system/content/System.Base/doc/ns_System.html#function_op_plus_8917F4276AB7E3DA4595E09C7DD5B91436A3B6ED">many</a> overloads.
     </p>
 
     <h3 id="multiplicative-expressions">3.10 Multiplicative Expressions</h3>
@@ -1628,7 +1628,7 @@
         This indirection mechanism, along with overloading the <a href="#dereference-expression">pointer dereference operator</a>,
         makes it possible to implement pointer-like classes, such as "smart pointers" and iterators.
         For example, the system library contains a UniquePtr class having
-        <a href="../library/System.Base/System.Base.html#function_group_op_arrow_1AA165D4000489BF4D95084C086A2565790F8B78">these</a> overloads.
+        <a href="../system/content/System.Base/doc/class_UniquePtr_T_793F841C13E9DD3A6869243C74F1D948C0E04009.html#member_function_op_arrow_UniquePtr_T_36F2F96D911351B4E2F710B5B03DF982A3EEC5D3">these two</a> overloads.
     </p>
 
     <h4 id="subscript-expression">3.12.4 Subscript Expression</h4>
@@ -1690,7 +1690,7 @@
 
     <p>
         Constructed temporary can be bound to an <a href="#rvalue-reference-type">rvalue reference</a> without the need to call
-        <a href="../library/System.Base/System.Base.html#function_Rvalue_FC16F1187C8C3CF8D9182A63AC59041EF4474FA2">Rvalue</a> function for it.
+        <a href="../system/content/System.Base/doc/ns_System.html#function_Rvalue_FC16F1187C8C3CF8D9182A63AC59041EF4474FA2">Rvalue</a> function for it.
     </p>
 
     <h5>Call of a Function Call Operator</h5>
@@ -2323,7 +2323,7 @@
     </p>
 
     <p>
-        Here's an <a href="../code/range_for/range_for.cm.html">example program</a> with various range-for statements.
+        Here's an <a href="../code/cmdoc/content/RangeFor/file/range_for.cm.html">example program</a> with various range-for statements.
     </p>
 
     <p>
@@ -3199,11 +3199,8 @@
     </p>
 
     <p>
-        For an example of a regular function, see <a href="../code/strlen/strlen.cm.html">strlen.cm</a>.
+        For an example of a regular function, see <a href="../code/cmdoc/content/StrLen/file/strlen.cm.html">strlen.cm</a>.
     </p>
-
-    <!-- <iframe src="../code/strlen/strlen.cm.html" height="300px" width="800px" style="border:none;"></iframe>-->
-
     <h3 id="functions-constexpr">9.3 Constexpr Specifier</h3>
 
     <p>
@@ -3233,7 +3230,7 @@
     </p>
 
     <p>
-        For an example of a <span class="kw">constexpr</span> function, see <a href="../code/align/align.cm.html">align.cm</a>.
+        For an example of a <span class="kw">constexpr</span> function, see <a href="../code/cmdoc/content/Align/file/align.cm.html">align.cm</a>.
     </p>
 
     <h3 id="functions-inline">9.4 Inline Specifier</h3>
@@ -3301,26 +3298,28 @@
     </p>
 
     <p>
-        For example, see the <a href="../library/System.Base/System.Base.html#function_group_Next_3F376F15397ED19B4B36DC08482D988F68581D43">Next</a> function templates in the system library.
-        If a <em>Next</em> function is called with a type that satisfies both the <a href="../library/System.Base/System.Base.html#concept_ForwardIterator_4C777D423CF589B8535F29F910C025990ED656D4">
-            ForwardIterator
-        </a> concept and the <a href="../library/System.Base/System.Base.html#concept_RandomAccessIterator_A5A1B6A4EC8E181A67C733002B3BE437554D3484">RandomAccessIterator</a> concept,
+        For example, see the these two <a href="../system/content/System.Base/doc/ns_System.html#function_Next_F02FC54A148D17AAF00ACBAA87EAE3B08F372D91">Next</a> function templates in the system library.
+        If a <em>Next</em> function is called with a type that satisfies both the 
+        <a href="../system/content/System.Base/doc/concept_ForwardIterator_4C777D423CF589B8535F29F910C025990ED656D4.html">ForwardIterator</a> concept 
+        and the <a href="../system/content/System.Base/doc/concept_RandomAccessIterator_A5A1B6A4EC8E181A67C733002B3BE437554D3484.html">RandomAccessIterator</a> concept,
         the random access function overload is called because
-        <a href="../library/System.Base/System.Base.html#concept_RandomAccessIterator_A5A1B6A4EC8E181A67C733002B3BE437554D3484">RandomAccessIterator</a> refines
-        <a href="../library/System.Base/System.Base.html#concept_BidirectionalIterator_96C10B73881A17B6DC9C0804E7DF2141C2E58DA6">BidirectionalIterator</a> concept that refines
-        <a href="../library/System.Base/System.Base.html#concept_ForwardIterator_4C777D423CF589B8535F29F910C025990ED656D4">ForwardIterator</a> concept.
+        <a href="../system/content/System.Base/doc/concept_RandomAccessIterator_A5A1B6A4EC8E181A67C733002B3BE437554D3484.html">RandomAccessIterator</a> refines
+        <a href="../system/content/System.Base/doc/concept_BidirectionalIterator_96C10B73881A17B6DC9C0804E7DF2141C2E58DA6.html">BidirectionalIterator</a> concept that refines
+        <a href="../system/content/System.Base/doc/concept_ForwardIterator_4C777D423CF589B8535F29F910C025990ED656D4.html">ForwardIterator</a> concept.
     </p>
 
     <p>
-        For an example of a function template, see <a href="../code/min/min.cm.html">min.cm</a>.
+        For an example of a function template, see <a href="../code/cmdoc/content/Min/file/min.cm.html">min.cm</a>.
     </p>
 
     <h3 id="intrinsic-function">9.10 Intrinsic Functions</h3>
 
     <p>
-        Functions in <a href="../library/System.Base/System.Base.html#System.Meta">System.Meta</a> namespace are <em>intrinsic functions</em>.
+        The <a href="../system/content/System.Core/doc/ns_System.Meta.html">System.Meta</a> is a special namespace that contains <em>intrinsic functions</em>.
         Intrinsic functions can be called just like regular functions, but they are special in the sense that they are not compiled from source code as regular functions are,
-        but they are implemented internally inside of the compiler.
+        but they are implemented internally inside of the compiler. The intrinsic functions in the <a href="../system/content/System.Core/doc/ns_System.Meta.html">System.Meta</a>
+        namespace take a type parameter and return information about the type supplied. 
+        They can be used in the <a href="#predicate-constraint-expression">predicate constraint expressions</a>.
     </p>
 
     <h3 id="overload-resolution">9.11 Function Overload Resolution</h3>
@@ -3752,7 +3751,7 @@
     </p>
 
     <p>
-        For an example of a static class, see <a href="../code/console/console.cm.html">console.cm</a>.
+        For an example of a static class, see <a href="../code/cmdoc/content/Console/file/console.cm.html">console.cm</a>.
     </p>
 
     <h3 id="class-members">11.5 Class Members</h3>
@@ -3776,7 +3775,7 @@
     </p>
 
     <p>
-        For an example of a singleton class that has a static constructor take a look at <a href="../code/phonebook/phonebook.cm.html">phonebook.cm</a>.
+        For an example of a singleton class that has a static constructor take a look at <a href="../code/cmdoc/content/phonebook/file/phonebook.cm.html">phonebook.cm</a>.
         The singleton is accessed using the static <em>Instance()</em> member function. Before <em>Instance()</em> returns a reference to a static <em>instance</em> member variable,
         the static constructor gets executed if it has not already been executed.
         The static constructor creates an instance of the PhoneBook class that assigns it to a static <em>instance</em> member variable.
@@ -4211,7 +4210,7 @@
     The constructors and member functions of a literal class can be used also when arguments are not constant expressions.
     In that case they behave the same way as regular constructors and member functions.
 
-    For an example of a literal class, see <a href="../code/point/point.cm.html">point.cm</a>.
+    For an example of a literal class, see <a href="../code/cmdoc/content/Point/file/point.cm.html">point.cm</a>.
 
     <h3 id="class-hierarchies">11.7 Class Hierarchies</h3>
 
@@ -4224,7 +4223,7 @@
     </p>
 
     <p>
-        For an example of a class hierarchy, see <a href="../code/vehicles/vehicles.cm.html">vehicles.cm</a>.
+        For an example of a class hierarchy, see <a href="../code/cmdoc/content/Vehicles/file/vehicles.cm.html">vehicles.cm</a>.
         It contains a hierarchy of vehicle classes: bicycle and car are vehicles, and truck is a kind of car.
     </p>
 
@@ -4245,7 +4244,7 @@
     </p>
 
     <p>
-        For an example of a class template, see <a href="../code/unique_ptr/unique_ptr.cm.html">unique_ptr.cm</a>.
+        For an example of a class template, see <a href="../code/cmdoc/content/UniquePtr/file/unique_ptr.cm.html">unique_ptr.cm</a>.
         It's a smart pointer that implements unique ownership.
     </p>
 
@@ -4306,7 +4305,7 @@
         </tr>
     </table>
 
-    For an example of interfaces, see <a href="../code/interface/interface.cm.html">interface.cm</a>.
+    For an example of interfaces, see <a href="../code/cmdoc/content/Interface/file/interface.cm.html">interface.cm</a>.
 
     <h2 id="delegates">13 Delegates</h2>
 
@@ -4350,7 +4349,7 @@
     <p>
         A nonmember function or a static member function can be bound to a delegate.
         An object of a delegate type contains a pointer to a function.
-        For an example of a delegate, see <a href="../code/delegate/delegate.cm.html">delegate.cm</a>.
+        For an example of a delegate, see <a href="../code/cmdoc/content/Delegate/file/delegate.cm.html">delegate.cm</a>.
     </p>
 
     <h2 id="class-delegates">14 Class Delegates</h2>
@@ -4396,7 +4395,7 @@
     <p>
         A nonstatic member function can be bound to a class delegate.
         An object of a class delegate type contains a couple of pointers: a pointer to an object and a pointer to a member function.
-        For an example of a class delegate, see <a href="../code/class_delegate/class_delegate.cm.html">class_delegate.cm</a>.
+        For an example of a class delegate, see <a href="../code/cmdoc/content/ClassDelegate/file/class_delegate.cm.html">class_delegate.cm</a>.
     </p>
 
     <h2 id="concepts">15 Concepts</h2>
@@ -4714,7 +4713,7 @@
     </p>
 
     <p>
-        For examples of typename constraints, see <a href="../library/System.Base/System.Base.html#concept_Container_0A128B13B9494DFD21086D34DFB070EAA26D473A">Container</a>
+        For examples of typename constraints, see <a href="../system/content/System.Base/doc/concept_Container_0A128B13B9494DFD21086D34DFB070EAA26D473A.html">Container</a>
         concept in the system library.
         It contains three typename constraints: <span class="mono">T.ValueType</span>, <span class="mono">T.Iterator</span> and <span class="mono">T.ConstIterator</span>.
         This means that if a type <span class="mono">T</span> satisfies <span class="mono">Container</span> concept it must contain three typedefs named
@@ -4766,7 +4765,7 @@
             <span class="kw">public </span> <span class="kw">concept</span> <span class="var">Container&lt;T&gt;</span><br />
             <span class="mono">{</span><br />
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// ...<br />
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">int</span> <span class="mono">T.Count</span>();<br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">long</span> <span class="mono">T.Count</span>();<br />
             <span class="mono">}</span><br />
         </blockquote>
     </p>
@@ -4991,7 +4990,7 @@
                 implicitly equal to the name of the member variable.
             </li>
         </ul>
-        See <a href="../library/System.Json/System.Json.Library.html">System.Json</a> library for an example of using these attributes.
+        See <a href="../system/content/System.Json/index.html">System.Json</a> library for an example of using these attributes.
     </p>
 
     <h2 id="compile-units">17 Compile Units</h2>
@@ -5403,13 +5402,6 @@
            |
            +--gamma.cm
     </pre>
-
-    <p>
-        Here's the contents of the source files:
-        <a href="../code/solution/alpha/main.cm.html">alpha/main.cm</a>,
-        <a href="../code/solution/beta/beta.cm.html">beta/beta.cm</a>, and
-        <a href="../code/solution/gamma/gamma.cm.html">gamma/gamma.cm</a>
-    </p>
 
     <h3 id="projects-programs">18.3 Programs</h3>
 

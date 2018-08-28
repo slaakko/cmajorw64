@@ -896,7 +896,67 @@
   <br/>
   <span class="code" id="446" xml:space="preserve"><span class="lineNumber">446</span>&nbsp;</span>
   <br/>
-  <span class="code" id="447" xml:space="preserve"><span class="lineNumber">447</span>&nbsp;<span class="other">}</span>&nbsp;<span class="other">}</span>&nbsp;<span class="comment">//&nbsp;namespace&nbsp;cmajor::util</span></span>
+  <span class="code" id="447" xml:space="preserve"><span class="lineNumber">447</span>&nbsp;<span class="kw">int</span>&nbsp;<a href="../../namespace_util_10CA45893690AF432B785048B4AA3F0E7D4765DF.html#function_Log10_E710F1F41982A9029A85DD801FB711F91B23E9C1">Log10</a><span class="other">(</span><span class="kw">int</span>&nbsp;<span class="identifier">n</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="448" xml:space="preserve"><span class="lineNumber">448</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="449" xml:space="preserve"><span class="lineNumber">449</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">int</span>&nbsp;<span class="identifier">log10</span>&nbsp;<span class="other">=</span>&nbsp;<span class="other">1</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="450" xml:space="preserve"><span class="lineNumber">450</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">int</span>&nbsp;<span class="identifier">m</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">n</span><span class="other">&nbsp;/&nbsp;</span><span class="other">10</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="451" xml:space="preserve"><span class="lineNumber">451</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">while&nbsp;</span><span class="other">(</span><span class="identifier">m</span><span class="other">&nbsp;>&nbsp;</span><span class="other">0</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="452" xml:space="preserve"><span class="lineNumber">452</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="453" xml:space="preserve"><span class="lineNumber">453</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">++</span><span class="identifier">log10</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="454" xml:space="preserve"><span class="lineNumber">454</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">m</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">m</span><span class="other">&nbsp;/&nbsp;</span><span class="other">10</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="455" xml:space="preserve"><span class="lineNumber">455</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="456" xml:space="preserve"><span class="lineNumber">456</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">log10</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="457" xml:space="preserve"><span class="lineNumber">457</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="458" xml:space="preserve"><span class="lineNumber">458</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="459" xml:space="preserve"><span class="lineNumber">459</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">u32string</span>&nbsp;<a href="../../namespace_util_10CA45893690AF432B785048B4AA3F0E7D4765DF.html#function_FormatNumber_88158542D50735DAA8D5BF3B155D29CE20D3C131">FormatNumber</a><span class="other">(</span><span class="kw">int</span>&nbsp;<span class="identifier">n</span><span class="other">,&nbsp;</span><span class="kw">int</span>&nbsp;<span class="identifier">numDigits</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="460" xml:space="preserve"><span class="lineNumber">460</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="461" xml:space="preserve"><span class="lineNumber">461</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">u32string</span>&nbsp;<span class="identifier">s</span><span class="other">(</span><span class="identifier">numDigits</span><span class="other">,&nbsp;</span><span class="string">'&nbsp;'</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="462" xml:space="preserve"><span class="lineNumber">462</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">int</span>&nbsp;<span class="identifier">k</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">numDigits</span><span class="other">&nbsp;-&nbsp;</span><span class="other">1</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="463" xml:space="preserve"><span class="lineNumber">463</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">while&nbsp;</span><span class="other">(</span><span class="identifier">n</span><span class="other">&nbsp;>&nbsp;</span><span class="other">0</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="464" xml:space="preserve"><span class="lineNumber">464</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="465" xml:space="preserve"><span class="lineNumber">465</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">k</span><span class="other">&nbsp;&lt;&nbsp;</span><span class="other">0</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="466" xml:space="preserve"><span class="lineNumber">466</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="467" xml:space="preserve"><span class="lineNumber">467</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">throw&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">runtime_error</span><span class="other">(</span><span class="string">"invalid&nbsp;number&nbsp;of&nbsp;digits"</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="468" xml:space="preserve"><span class="lineNumber">468</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="469" xml:space="preserve"><span class="lineNumber">469</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">int</span>&nbsp;<span class="identifier">digit</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">n</span><span class="other">&nbsp;%&nbsp;</span><span class="other">10</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="470" xml:space="preserve"><span class="lineNumber">470</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">s</span><span class="other">[</span><span class="identifier">k</span><span class="other">]</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">digit</span><span class="other">&nbsp;+&nbsp;</span><span class="string">'0'</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="471" xml:space="preserve"><span class="lineNumber">471</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">--</span><span class="identifier">k</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="472" xml:space="preserve"><span class="lineNumber">472</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">n</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">n</span><span class="other">&nbsp;/&nbsp;</span><span class="other">10</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="473" xml:space="preserve"><span class="lineNumber">473</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="474" xml:space="preserve"><span class="lineNumber">474</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">s</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="475" xml:space="preserve"><span class="lineNumber">475</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="476" xml:space="preserve"><span class="lineNumber">476</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="477" xml:space="preserve"><span class="lineNumber">477</span>&nbsp;<span class="other">}</span>&nbsp;<span class="other">}</span>&nbsp;<span class="comment">//&nbsp;namespace&nbsp;cmajor::util</span></span>
   <br/>
  </body>
 </html>

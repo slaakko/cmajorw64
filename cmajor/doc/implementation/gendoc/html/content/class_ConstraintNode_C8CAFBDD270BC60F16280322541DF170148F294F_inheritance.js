@@ -274,10 +274,11 @@ function drawClassInheritanceDiagram() {
         { name: "cmajor::ast::IntrinsicConstraintNode", id: "class_3", level: 2, subject: false, hasDerivedClasses: true, link: "class_IntrinsicConstraintNode_7912E805AD2F86CEC843A80E629A9CD35F097828.html" },
         { name: "cmajor::ast::IsConstraintNode", id: "class_4", level: 2, subject: false, hasDerivedClasses: false, link: "class_IsConstraintNode_8BC8C8FF04656C91C4E774655271A1DFA8DDED9C.html" },
         { name: "cmajor::ast::MultiParamConstraintNode", id: "class_5", level: 2, subject: false, hasDerivedClasses: false, link: "class_MultiParamConstraintNode_65C202F82D3ADD3E12DFFD3DF2F64432EB1527D2.html" },
-        { name: "cmajor::ast::PredicateConstraintNode", id: "class_6", level: 2, subject: false, hasDerivedClasses: false, link: "class_PredicateConstraintNode_C54B4803966DD11832239D66A7EBD688CA1ABAF6.html" },
-        { name: "cmajor::ast::SignatureConstraintNode", id: "class_7", level: 2, subject: false, hasDerivedClasses: true, link: "class_SignatureConstraintNode_370ABC1945EB93FF5ED60A18A77932A4078B135D.html" },
-        { name: "cmajor::ast::TypeNameConstraintNode", id: "class_8", level: 2, subject: false, hasDerivedClasses: false, link: "class_TypeNameConstraintNode_1D5F81408C958EDCEE80F70AD939953007E28D0A.html" },
-        { name: "cmajor::ast::WhereConstraintNode", id: "class_9", level: 2, subject: false, hasDerivedClasses: false, link: "class_WhereConstraintNode_AA388C788BAC7CEDD9807F45022C06F8C50713CC.html" }];
+        { name: "cmajor::ast::ParenthesizedConstraintNode", id: "class_6", level: 2, subject: false, hasDerivedClasses: false, link: "class_ParenthesizedConstraintNode_335F91A931F89910F6A0AFBBF1118A0C35CB68A1.html" },
+        { name: "cmajor::ast::PredicateConstraintNode", id: "class_7", level: 2, subject: false, hasDerivedClasses: false, link: "class_PredicateConstraintNode_C54B4803966DD11832239D66A7EBD688CA1ABAF6.html" },
+        { name: "cmajor::ast::SignatureConstraintNode", id: "class_8", level: 2, subject: false, hasDerivedClasses: true, link: "class_SignatureConstraintNode_370ABC1945EB93FF5ED60A18A77932A4078B135D.html" },
+        { name: "cmajor::ast::TypeNameConstraintNode", id: "class_9", level: 2, subject: false, hasDerivedClasses: false, link: "class_TypeNameConstraintNode_1D5F81408C958EDCEE80F70AD939953007E28D0A.html" },
+        { name: "cmajor::ast::WhereConstraintNode", id: "class_10", level: 2, subject: false, hasDerivedClasses: false, link: "class_WhereConstraintNode_AA388C788BAC7CEDD9807F45022C06F8C50713CC.html" }];
     drawDiagram(classes);
 }
 

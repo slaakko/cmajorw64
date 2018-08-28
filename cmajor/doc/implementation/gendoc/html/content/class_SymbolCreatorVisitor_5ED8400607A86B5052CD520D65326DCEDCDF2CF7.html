@@ -195,6 +195,10 @@
                 <td class="functionTableFirstCol" xml:space="preserve">std::stack&lt;<span class="kw">bool</span>></td>
                 <td class="functionTableSecondCol" xml:space="preserve">conditionalCompilationStack</td>
             </tr>
+            <tr id="variable_functionIndex_D17FCCA9B276F3688613E310B578B777E18F53E6">
+                <td class="functionTableFirstCol" xml:space="preserve">int32_t</td>
+                <td class="functionTableSecondCol" xml:space="preserve">functionIndex</td>
+            </tr>
             <tr id="variable_symbolTable_E727A0967E280F44EE1172E0F6B267DA82A3848C">
                 <td class="functionTableFirstCol" xml:space="preserve"><a href="class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html">SymbolTable</a>&amp;</td>
                 <td class="functionTableSecondCol" xml:space="preserve">symbolTable</td>
@@ -211,7 +215,7 @@
              of <a href="file/symbols/SymbolCreatorVisitor.cpp_A5CC5784D52159237F96050D11A9269352934A6D.html">SymbolCreatorVisitor.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;16</span>&nbsp;<span class="other">:</span>&nbsp;<a href="class_SymbolCreatorVisitor_5ED8400607A86B5052CD520D65326DCEDCDF2CF7.html#variable_symbolTable_E727A0967E280F44EE1172E0F6B267DA82A3848C">symbolTable</a><span class="other">(</span><span class="identifier">symbolTable_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="class_SymbolCreatorVisitor_5ED8400607A86B5052CD520D65326DCEDCDF2CF7.html#variable_classInstanceNode_696D79CEFE52354661F0E55475C660F3C45011AD">classInstanceNode</a><span class="other">(</span><span class="kw">nullptr</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="class_SymbolCreatorVisitor_5ED8400607A86B5052CD520D65326DCEDCDF2CF7.html#variable_classTemplateSpecialization_518542EE86DA2AE0B416B9E8A9E92EDDB7C1EC60">classTemplateSpecialization</a><span class="other">(</span><span class="kw">nullptr</span><span class="other">)</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;16</span>&nbsp;<span class="other">:</span>&nbsp;<a href="class_SymbolCreatorVisitor_5ED8400607A86B5052CD520D65326DCEDCDF2CF7.html#variable_symbolTable_E727A0967E280F44EE1172E0F6B267DA82A3848C">symbolTable</a><span class="other">(</span><span class="identifier">symbolTable_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="class_SymbolCreatorVisitor_5ED8400607A86B5052CD520D65326DCEDCDF2CF7.html#variable_classInstanceNode_696D79CEFE52354661F0E55475C660F3C45011AD">classInstanceNode</a><span class="other">(</span><span class="kw">nullptr</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="class_SymbolCreatorVisitor_5ED8400607A86B5052CD520D65326DCEDCDF2CF7.html#variable_classTemplateSpecialization_518542EE86DA2AE0B416B9E8A9E92EDDB7C1EC60">classTemplateSpecialization</a><span class="other">(</span><span class="kw">nullptr</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="class_SymbolCreatorVisitor_5ED8400607A86B5052CD520D65326DCEDCDF2CF7.html#variable_functionIndex_D17FCCA9B276F3688613E310B578B777E18F53E6">functionIndex</a><span class="other">(</span><span class="other">0</span><span class="other">)</span></span>
                 <br/>
                 <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;17</span>&nbsp;<span class="other">{</span></span>
                 <br/>
@@ -575,7 +579,7 @@
             <span class="code">
                 <span class="code" xml:space="preserve"><span class="lineNumber">215</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">216</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="class_SymbolCreatorVisitor_5ED8400607A86B5052CD520D65326DCEDCDF2CF7.html#variable_symbolTable_E727A0967E280F44EE1172E0F6B267DA82A3848C">symbolTable</a><span class="other">.</span><a href="class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_BeginConcept_353BB68AE6B3F8AEAE9789327690901CF6D8E743">BeginConcept</a><span class="other">(</span><span class="identifier">conceptNode</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">216</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="class_SymbolCreatorVisitor_5ED8400607A86B5052CD520D65326DCEDCDF2CF7.html#variable_symbolTable_E727A0967E280F44EE1172E0F6B267DA82A3848C">symbolTable</a><span class="other">.</span><a href="class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_BeginConcept_F8F9873E482B1BC993682AA53F4B7F89D94B1275">BeginConcept</a><span class="other">(</span><span class="identifier">conceptNode</span><span class="other">,&nbsp;</span><span class="kw">true</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
                 <span class="code" xml:space="preserve"><span class="lineNumber">217</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">int</span>&nbsp;<span class="identifier">n</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">conceptNode</span><span class="other">.</span><a href="class_ConceptNode_8DEFFA82BA4F144471B950B22D8DF80D825881AB.html#function_TypeParameters_58EB7D22E347084F83D86B21D15057DD20D32C03">TypeParameters</a><span class="other">(</span><span class="other">)</span><span class="other">.</span><span class="identifier">Count</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
@@ -610,7 +614,7 @@
         <span>
             Calls: <a href="class_ConceptNode_8DEFFA82BA4F144471B950B22D8DF80D825881AB.html#function_TypeParameters_58EB7D22E347084F83D86B21D15057DD20D32C03">cmajor::ast::ConceptNode::TypeParameters</a>
             , <a href="class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_AddTemplateParameter_44C0643C4E04FDC2C559FD010742DDB7ADB631D5">cmajor::symbols::SymbolTable::AddTemplateParameter</a>
-            , <a href="class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_BeginConcept_353BB68AE6B3F8AEAE9789327690901CF6D8E743">cmajor::symbols::SymbolTable::BeginConcept</a>
+            , <a href="class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_BeginConcept_F8F9873E482B1BC993682AA53F4B7F89D94B1275">cmajor::symbols::SymbolTable::BeginConcept</a>
             , <a href="class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_EndConcept_C03D9D29506672955F8D7ECDF6F7B093F1A584FA">cmajor::symbols::SymbolTable::EndConcept</a>
         </span>
         <br/>
@@ -973,7 +977,7 @@
         <span>
             Calls: <a href="class_FunctionNode_3BCFFC89E645A619641A86E9841D09CB6102AB04.html#function_Parameters_1C58A8D9FA75A50FB9A59453AA3693F1A77162F3">cmajor::ast::FunctionNode::Parameters</a>
             , <a href="class_ParameterNode_6A092C19F0E267DB1C50EC127B93CFC3BD91B2A2.html#function_Accept_94F1781744947F2ECBA8A54CC6E2E07057802EA1">cmajor::ast::ParameterNode::Accept</a>
-            , <a href="class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_BeginConstructor_48A115E5FBD8DF0FFA18353B1DB6E4FCD40AF234">cmajor::symbols::SymbolTable::BeginConstructor</a>
+            , <a href="class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_BeginConstructor_96913CBE05E7D69238E933ED4B33FE7131DCB373">cmajor::symbols::SymbolTable::BeginConstructor</a>
             , <a href="class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_EndConstructor_C95F7C2A7F368195B4DBD5D4E1B1140C8621C554">cmajor::symbols::SymbolTable::EndConstructor</a>
         </span>
         <br/>
@@ -992,7 +996,7 @@
             <span class="code">
                 <span class="code" xml:space="preserve"><span class="lineNumber">164</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">165</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="class_SymbolCreatorVisitor_5ED8400607A86B5052CD520D65326DCEDCDF2CF7.html#variable_symbolTable_E727A0967E280F44EE1172E0F6B267DA82A3848C">symbolTable</a><span class="other">.</span><a href="class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_BeginConversionFunction_13A0765AC25023AF4A09CD07E521CB49BE491DA7">BeginConversionFunction</a><span class="other">(</span><span class="identifier">conversionFunctionNode</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">165</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="class_SymbolCreatorVisitor_5ED8400607A86B5052CD520D65326DCEDCDF2CF7.html#variable_symbolTable_E727A0967E280F44EE1172E0F6B267DA82A3848C">symbolTable</a><span class="other">.</span><a href="class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_BeginConversionFunction_B149ECFB4ACACAC88A34D14B4DE826561D4A87DC">BeginConversionFunction</a><span class="other">(</span><span class="identifier">conversionFunctionNode</span><span class="other">,&nbsp;</span><a href="class_SymbolCreatorVisitor_5ED8400607A86B5052CD520D65326DCEDCDF2CF7.html#variable_functionIndex_D17FCCA9B276F3688613E310B578B777E18F53E6">functionIndex</a><span class="other">++</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
                 <span class="code" xml:space="preserve"><span class="lineNumber">166</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">conversionFunctionNode</span><span class="other">.</span><span class="identifier">Body</span><span class="other">(</span><span class="other">)</span><span class="other">)</span></span>
                 <br/>
@@ -1021,7 +1025,7 @@
         <br/>
         <br/>
         <span>
-            Calls: <a href="class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_BeginConversionFunction_13A0765AC25023AF4A09CD07E521CB49BE491DA7">cmajor::symbols::SymbolTable::BeginConversionFunction</a>
+            Calls: <a href="class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_BeginConversionFunction_B149ECFB4ACACAC88A34D14B4DE826561D4A87DC">cmajor::symbols::SymbolTable::BeginConversionFunction</a>
             , <a href="class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_EndConversionFunction_6596246DD6B3F9E7295C61CE2C60A683B00A17B6">cmajor::symbols::SymbolTable::EndConversionFunction</a>
         </span>
         <br/>
@@ -1142,7 +1146,7 @@
             <span class="code">
                 <span class="code" xml:space="preserve"><span class="lineNumber">138</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">139</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="class_SymbolCreatorVisitor_5ED8400607A86B5052CD520D65326DCEDCDF2CF7.html#variable_symbolTable_E727A0967E280F44EE1172E0F6B267DA82A3848C">symbolTable</a><span class="other">.</span><a href="class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_BeginDestructor_1E011F6AAC505B0DDE27FD8A8E69A84A952062F7">BeginDestructor</a><span class="other">(</span><span class="identifier">destructorNode</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">139</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="class_SymbolCreatorVisitor_5ED8400607A86B5052CD520D65326DCEDCDF2CF7.html#variable_symbolTable_E727A0967E280F44EE1172E0F6B267DA82A3848C">symbolTable</a><span class="other">.</span><a href="class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_BeginDestructor_B8DF368155DEFFC6F3320C9B2AAE8649B39202C5">BeginDestructor</a><span class="other">(</span><span class="identifier">destructorNode</span><span class="other">,&nbsp;</span><a href="class_SymbolCreatorVisitor_5ED8400607A86B5052CD520D65326DCEDCDF2CF7.html#variable_functionIndex_D17FCCA9B276F3688613E310B578B777E18F53E6">functionIndex</a><span class="other">++</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
                 <span class="code" xml:space="preserve"><span class="lineNumber">140</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">destructorNode</span><span class="other">.</span><span class="identifier">Body</span><span class="other">(</span><span class="other">)</span><span class="other">)</span></span>
                 <br/>
@@ -1171,7 +1175,7 @@
         <br/>
         <br/>
         <span>
-            Calls: <a href="class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_BeginDestructor_1E011F6AAC505B0DDE27FD8A8E69A84A952062F7">cmajor::symbols::SymbolTable::BeginDestructor</a>
+            Calls: <a href="class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_BeginDestructor_B8DF368155DEFFC6F3320C9B2AAE8649B39202C5">cmajor::symbols::SymbolTable::BeginDestructor</a>
             , <a href="class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_EndDestructor_C3EE16FB13C6F65C0A200D3CDEDB5F1C7B4C15BE">cmajor::symbols::SymbolTable::EndDestructor</a>
         </span>
         <br/>
@@ -1367,7 +1371,7 @@
             Calls: <a href="class_FunctionNode_3BCFFC89E645A619641A86E9841D09CB6102AB04.html#function_Parameters_1C58A8D9FA75A50FB9A59453AA3693F1A77162F3">cmajor::ast::FunctionNode::Parameters</a>
             , <a href="class_FunctionNode_3BCFFC89E645A619641A86E9841D09CB6102AB04.html#function_TemplateParameters_21A3C2157A00E30B9A50F3982C1091276E4ECB3E">cmajor::ast::FunctionNode::TemplateParameters</a>
             , <a href="class_ParameterNode_6A092C19F0E267DB1C50EC127B93CFC3BD91B2A2.html#function_Accept_94F1781744947F2ECBA8A54CC6E2E07057802EA1">cmajor::ast::ParameterNode::Accept</a>
-            , <a href="class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_BeginFunction_3B25DAE48452065B1B991CCCDA26AC11936752C2">cmajor::symbols::SymbolTable::BeginFunction</a>
+            , <a href="class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_BeginFunction_7DF35938EE8B0CD5ADA352F998D3A5275A3D1813">cmajor::symbols::SymbolTable::BeginFunction</a>
             , <a href="class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_EndFunction_48366BE6E6D590DCF04BFCF6D665F749A35FF715">cmajor::symbols::SymbolTable::EndFunction</a>
         </span>
         <br/>
@@ -1492,7 +1496,7 @@
         <span>
             Calls: <a href="class_FunctionNode_3BCFFC89E645A619641A86E9841D09CB6102AB04.html#function_Parameters_1C58A8D9FA75A50FB9A59453AA3693F1A77162F3">cmajor::ast::FunctionNode::Parameters</a>
             , <a href="class_ParameterNode_6A092C19F0E267DB1C50EC127B93CFC3BD91B2A2.html#function_Accept_94F1781744947F2ECBA8A54CC6E2E07057802EA1">cmajor::ast::ParameterNode::Accept</a>
-            , <a href="class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_BeginMemberFunction_49AB1AE94620A8789041E40FB4CEE2C13FB09B81">cmajor::symbols::SymbolTable::BeginMemberFunction</a>
+            , <a href="class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_BeginMemberFunction_9642D5165A68646180B15C0EE34475874C26FF05">cmajor::symbols::SymbolTable::BeginMemberFunction</a>
             , <a href="class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_EndMemberFunction_9B1D88CE29B86B360FB37CF6040FA175F9C61B08">cmajor::symbols::SymbolTable::EndMemberFunction</a>
         </span>
         <br/>
@@ -1615,7 +1619,7 @@
             <span class="code">
                 <span class="code" xml:space="preserve"><span class="lineNumber">112</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">113</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="class_SymbolCreatorVisitor_5ED8400607A86B5052CD520D65326DCEDCDF2CF7.html#variable_symbolTable_E727A0967E280F44EE1172E0F6B267DA82A3848C">symbolTable</a><span class="other">.</span><a href="class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_BeginStaticConstructor_410A2E4CCBB509DBEC83CA3E21060E2552437553">BeginStaticConstructor</a><span class="other">(</span><span class="identifier">staticConstructorNode</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">113</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="class_SymbolCreatorVisitor_5ED8400607A86B5052CD520D65326DCEDCDF2CF7.html#variable_symbolTable_E727A0967E280F44EE1172E0F6B267DA82A3848C">symbolTable</a><span class="other">.</span><a href="class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_BeginStaticConstructor_1B655D24F3E53FA272061E9548444CC99D27E8D0">BeginStaticConstructor</a><span class="other">(</span><span class="identifier">staticConstructorNode</span><span class="other">,&nbsp;</span><a href="class_SymbolCreatorVisitor_5ED8400607A86B5052CD520D65326DCEDCDF2CF7.html#variable_functionIndex_D17FCCA9B276F3688613E310B578B777E18F53E6">functionIndex</a><span class="other">++</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
                 <span class="code" xml:space="preserve"><span class="lineNumber">114</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">staticConstructorNode</span><span class="other">.</span><span class="identifier">Body</span><span class="other">(</span><span class="other">)</span><span class="other">)</span></span>
                 <br/>
@@ -1644,7 +1648,7 @@
         <br/>
         <br/>
         <span>
-            Calls: <a href="class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_BeginStaticConstructor_410A2E4CCBB509DBEC83CA3E21060E2552437553">cmajor::symbols::SymbolTable::BeginStaticConstructor</a>
+            Calls: <a href="class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_BeginStaticConstructor_1B655D24F3E53FA272061E9548444CC99D27E8D0">cmajor::symbols::SymbolTable::BeginStaticConstructor</a>
             , <a href="class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_EndStaticConstructor_0BE25665BFF238FCA418CD542CA240A2F51E6F02">cmajor::symbols::SymbolTable::EndStaticConstructor</a>
         </span>
         <br/>

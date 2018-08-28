@@ -16,7 +16,7 @@
             <svg height="0" id="classInheritanceDiagram" version="2.0" width="0" xmlns="http://www.w3.org/2000/svg"/>
         </div>
         <span>
-            Definition at line <a href="file/ast/Concept.hpp_8879EA0D5F61FF3566BCBF924584F4B4A31B16AA.html#243">243</a>
+            Definition at line <a href="file/ast/Concept.hpp_8879EA0D5F61FF3566BCBF924584F4B4A31B16AA.html#268">268</a>
              of <a href="file/ast/Concept.hpp_8879EA0D5F61FF3566BCBF924584F4B4A31B16AA.html">Concept.hpp</a>
         </span>
         <br/>
@@ -44,8 +44,16 @@
                 <td class="functionTableSecondCol" xml:space="preserve"><a href="class_AxiomNode_32355B173A9C1B11A7E9B59C08B0FBBA45CAC0BD.html#function_AddStatement_077ABA14DCFB87F7F3136534002D8EDD8B6DB4BD">AddStatement</a>(<a href="class_AxiomStatementNode_9D169B5E38D2D903D070F4DE9B4761FC761B6BA4.html">AxiomStatementNode</a>* statement)</td>
             </tr>
             <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">const </span><a href="class_Span_9CED8370AAA8B01E09FBC8A63AD262084B91FD78.html">Span</a>&amp;</td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_AxiomNode_32355B173A9C1B11A7E9B59C08B0FBBA45CAC0BD.html#function_BeginBraceSpan_8B17EFD1E05EC1E3B1525FF3116B9F76A8644772">BeginBraceSpan</a>() <span class="kw">const</span></td>
+            </tr>
+            <tr>
                 <td class="functionTableFirstCol" xml:space="preserve"><a href="class_Node_66FC1D6AD8F487E453CE6E17163479C7C2DAC063.html">Node</a>*</td>
                 <td class="functionTableSecondCol" xml:space="preserve"><a href="class_AxiomNode_32355B173A9C1B11A7E9B59C08B0FBBA45CAC0BD.html#function_Clone_3D5467548A158D7ACFFA21D5B45ADFB3B4CF26EE">Clone</a>(<a href="class_CloneContext_5E55B7AF2C2173E2EA60A2B86069816A9F0FB764.html">CloneContext</a>&amp; cloneContext) <span class="kw">const override</span></td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">const </span><a href="class_Span_9CED8370AAA8B01E09FBC8A63AD262084B91FD78.html">Span</a>&amp;</td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_AxiomNode_32355B173A9C1B11A7E9B59C08B0FBBA45CAC0BD.html#function_EndBraceSpan_CA89A7E3A83F938432558E00CF7570FCCE6DC95F">EndBraceSpan</a>() <span class="kw">const</span></td>
             </tr>
             <tr>
                 <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">const </span><a href="class_IdentifierNode_4A1A7E3AFB614AEF7ED2B90309B9B619E86EE9E4.html">IdentifierNode</a>*</td>
@@ -64,6 +72,14 @@
                 <td class="functionTableSecondCol" xml:space="preserve"><a href="class_AxiomNode_32355B173A9C1B11A7E9B59C08B0FBBA45CAC0BD.html#function_Read_F9835B0ADB9028E38EE6AB1914F88FC3B224C062">Read</a>(<a href="class_AstReader_79D1108F70EAB0D555FDDD074FED033B2DCABCD5.html">AstReader</a>&amp; reader) <span class="kw">override</span></td>
             </tr>
             <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_AxiomNode_32355B173A9C1B11A7E9B59C08B0FBBA45CAC0BD.html#function_SetBeginBraceSpan_3A53D737B787037D3602D6B7687E9641C4D816DB">SetBeginBraceSpan</a>(<span class="kw">const </span><a href="class_Span_9CED8370AAA8B01E09FBC8A63AD262084B91FD78.html">Span</a>&amp; beginBraceSpan_)</td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_AxiomNode_32355B173A9C1B11A7E9B59C08B0FBBA45CAC0BD.html#function_SetEndBraceSpan_A4CB386FC9767886C662163A4920CAA69F7C7753">SetEndBraceSpan</a>(<span class="kw">const </span><a href="class_Span_9CED8370AAA8B01E09FBC8A63AD262084B91FD78.html">Span</a>&amp; endBraceSpan_)</td>
+            </tr>
+            <tr>
                 <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">const </span><a href="class_NodeList_634CD2B65410966280F1AC27B3A570D065505ECD.html">NodeList</a>&lt;<a href="class_AxiomStatementNode_9D169B5E38D2D903D070F4DE9B4761FC761B6BA4.html">AxiomStatementNode</a>>&amp;</td>
                 <td class="functionTableSecondCol" xml:space="preserve"><a href="class_AxiomNode_32355B173A9C1B11A7E9B59C08B0FBBA45CAC0BD.html#function_Statements_169CEF0D0522AD6E9A312487659EDC0DE37BDB5A">Statements</a>() <span class="kw">const</span></td>
             </tr>
@@ -74,6 +90,14 @@
         </table>
         <h2>Member Variables</h2>
         <table>
+            <tr id="variable_beginBraceSpan_0C92551AF0355B45F64DA67553BF146E389DC338">
+                <td class="functionTableFirstCol" xml:space="preserve"><a href="class_Span_9CED8370AAA8B01E09FBC8A63AD262084B91FD78.html">Span</a></td>
+                <td class="functionTableSecondCol" xml:space="preserve">beginBraceSpan</td>
+            </tr>
+            <tr id="variable_endBraceSpan_AC6E3F269446A1D3856165E4E141306641FB7108">
+                <td class="functionTableFirstCol" xml:space="preserve"><a href="class_Span_9CED8370AAA8B01E09FBC8A63AD262084B91FD78.html">Span</a></td>
+                <td class="functionTableSecondCol" xml:space="preserve">endBraceSpan</td>
+            </tr>
             <tr id="variable_id_6C17E72B3FA609C7775E4E204E404D0C2B35C295">
                 <td class="functionTableFirstCol" xml:space="preserve">std::unique_ptr&lt;<a href="class_IdentifierNode_4A1A7E3AFB614AEF7ED2B90309B9B619E86EE9E4.html">IdentifierNode</a>></td>
                 <td class="functionTableSecondCol" xml:space="preserve">id</td>
@@ -95,21 +119,21 @@
             <a href="class_Span_9CED8370AAA8B01E09FBC8A63AD262084B91FD78.html">Span</a>
             &amp; span_)</h4>
         <span>
-            Definition at line <a href="file/ast/Concept.cpp_3B2A67CF03AABAFD1117DDBACBE383B794184248.html#610">610</a>
+            Definition at line <a href="file/ast/Concept.cpp_3B2A67CF03AABAFD1117DDBACBE383B794184248.html#659">659</a>
              of <a href="file/ast/Concept.cpp_3B2A67CF03AABAFD1117DDBACBE383B794184248.html">Concept.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;610</span>&nbsp;<span class="other">:</span>&nbsp;<a href="class_Node_66FC1D6AD8F487E453CE6E17163479C7C2DAC063.html">Node</a><span class="other">(</span><a href="enum_NodeType_0D66E0D14D03B3151A778BF9E86A029828B6D5F6.html">NodeType</a><span class="other">::</span><a href="enum_NodeType_0D66E0D14D03B3151A778BF9E86A029828B6D5F6.html#enumerator_axiomNode_5C604C9A187634B8CE76080CF5FA62FA0A195014">axiomNode</a><span class="other">,&nbsp;</span><span class="identifier">span_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="class_AxiomNode_32355B173A9C1B11A7E9B59C08B0FBBA45CAC0BD.html#variable_id_6C17E72B3FA609C7775E4E204E404D0C2B35C295">id</a><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="class_AxiomNode_32355B173A9C1B11A7E9B59C08B0FBBA45CAC0BD.html#variable_parameters_DFA6432C0E771E256A99A391D0335BEC3605DB58">parameters</a><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="class_AxiomNode_32355B173A9C1B11A7E9B59C08B0FBBA45CAC0BD.html#variable_statements_63C0E767EC4FF1D199355F6249A9FA6EF28E5CFA">statements</a><span class="other">(</span><span class="other">)</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;659</span>&nbsp;<span class="other">:</span>&nbsp;<a href="class_Node_66FC1D6AD8F487E453CE6E17163479C7C2DAC063.html">Node</a><span class="other">(</span><a href="enum_NodeType_0D66E0D14D03B3151A778BF9E86A029828B6D5F6.html">NodeType</a><span class="other">::</span><a href="enum_NodeType_0D66E0D14D03B3151A778BF9E86A029828B6D5F6.html#enumerator_axiomNode_5C604C9A187634B8CE76080CF5FA62FA0A195014">axiomNode</a><span class="other">,&nbsp;</span><span class="identifier">span_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="class_AxiomNode_32355B173A9C1B11A7E9B59C08B0FBBA45CAC0BD.html#variable_id_6C17E72B3FA609C7775E4E204E404D0C2B35C295">id</a><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="class_AxiomNode_32355B173A9C1B11A7E9B59C08B0FBBA45CAC0BD.html#variable_parameters_DFA6432C0E771E256A99A391D0335BEC3605DB58">parameters</a><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="class_AxiomNode_32355B173A9C1B11A7E9B59C08B0FBBA45CAC0BD.html#variable_statements_63C0E767EC4FF1D199355F6249A9FA6EF28E5CFA">statements</a><span class="other">(</span><span class="other">)</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;611</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;660</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;612</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;661</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/ast/Concept.hpp_8879EA0D5F61FF3566BCBF924584F4B4A31B16AA.html#246">246</a>
+            Declaration at line <a href="file/ast/Concept.hpp_8879EA0D5F61FF3566BCBF924584F4B4A31B16AA.html#271">271</a>
              of <a href="file/ast/Concept.hpp_8879EA0D5F61FF3566BCBF924584F4B4A31B16AA.html">Concept.hpp</a>
         </span>
         <br/>
@@ -122,23 +146,23 @@
             &amp; span_, <a href="class_IdentifierNode_4A1A7E3AFB614AEF7ED2B90309B9B619E86EE9E4.html">IdentifierNode</a>
             * id_)</h4>
         <span>
-            Definition at line <a href="file/ast/Concept.cpp_3B2A67CF03AABAFD1117DDBACBE383B794184248.html#614">614</a>
+            Definition at line <a href="file/ast/Concept.cpp_3B2A67CF03AABAFD1117DDBACBE383B794184248.html#663">663</a>
              of <a href="file/ast/Concept.cpp_3B2A67CF03AABAFD1117DDBACBE383B794184248.html">Concept.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;614</span>&nbsp;<span class="other">:</span>&nbsp;<a href="class_Node_66FC1D6AD8F487E453CE6E17163479C7C2DAC063.html">Node</a><span class="other">(</span><a href="enum_NodeType_0D66E0D14D03B3151A778BF9E86A029828B6D5F6.html">NodeType</a><span class="other">::</span><a href="enum_NodeType_0D66E0D14D03B3151A778BF9E86A029828B6D5F6.html#enumerator_axiomNode_5C604C9A187634B8CE76080CF5FA62FA0A195014">axiomNode</a><span class="other">,&nbsp;</span><span class="identifier">span_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="class_AxiomNode_32355B173A9C1B11A7E9B59C08B0FBBA45CAC0BD.html#variable_id_6C17E72B3FA609C7775E4E204E404D0C2B35C295">id</a><span class="other">(</span><span class="identifier">id_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="class_AxiomNode_32355B173A9C1B11A7E9B59C08B0FBBA45CAC0BD.html#variable_parameters_DFA6432C0E771E256A99A391D0335BEC3605DB58">parameters</a><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="class_AxiomNode_32355B173A9C1B11A7E9B59C08B0FBBA45CAC0BD.html#variable_statements_63C0E767EC4FF1D199355F6249A9FA6EF28E5CFA">statements</a><span class="other">(</span><span class="other">)</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;663</span>&nbsp;<span class="other">:</span>&nbsp;<a href="class_Node_66FC1D6AD8F487E453CE6E17163479C7C2DAC063.html">Node</a><span class="other">(</span><a href="enum_NodeType_0D66E0D14D03B3151A778BF9E86A029828B6D5F6.html">NodeType</a><span class="other">::</span><a href="enum_NodeType_0D66E0D14D03B3151A778BF9E86A029828B6D5F6.html#enumerator_axiomNode_5C604C9A187634B8CE76080CF5FA62FA0A195014">axiomNode</a><span class="other">,&nbsp;</span><span class="identifier">span_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="class_AxiomNode_32355B173A9C1B11A7E9B59C08B0FBBA45CAC0BD.html#variable_id_6C17E72B3FA609C7775E4E204E404D0C2B35C295">id</a><span class="other">(</span><span class="identifier">id_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="class_AxiomNode_32355B173A9C1B11A7E9B59C08B0FBBA45CAC0BD.html#variable_parameters_DFA6432C0E771E256A99A391D0335BEC3605DB58">parameters</a><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="class_AxiomNode_32355B173A9C1B11A7E9B59C08B0FBBA45CAC0BD.html#variable_statements_63C0E767EC4FF1D199355F6249A9FA6EF28E5CFA">statements</a><span class="other">(</span><span class="other">)</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;615</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;664</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;616</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="class_AxiomNode_32355B173A9C1B11A7E9B59C08B0FBBA45CAC0BD.html#variable_id_6C17E72B3FA609C7775E4E204E404D0C2B35C295">id</a><span class="other">-></span><span class="identifier">SetParent</span><span class="other">(</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;665</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="class_AxiomNode_32355B173A9C1B11A7E9B59C08B0FBBA45CAC0BD.html#variable_id_6C17E72B3FA609C7775E4E204E404D0C2B35C295">id</a><span class="other">-></span><span class="identifier">SetParent</span><span class="other">(</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;617</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;666</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/ast/Concept.hpp_8879EA0D5F61FF3566BCBF924584F4B4A31B16AA.html#247">247</a>
+            Declaration at line <a href="file/ast/Concept.hpp_8879EA0D5F61FF3566BCBF924584F4B4A31B16AA.html#272">272</a>
              of <a href="file/ast/Concept.hpp_8879EA0D5F61FF3566BCBF924584F4B4A31B16AA.html">Concept.hpp</a>
         </span>
         <br/>
@@ -152,21 +176,21 @@
             &amp; visitor) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/ast/Concept.cpp_3B2A67CF03AABAFD1117DDBACBE383B794184248.html#635">635</a>
+            Definition at line <a href="file/ast/Concept.cpp_3B2A67CF03AABAFD1117DDBACBE383B794184248.html#686">686</a>
              of <a href="file/ast/Concept.cpp_3B2A67CF03AABAFD1117DDBACBE383B794184248.html">Concept.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;636</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;687</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;637</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">visitor</span><span class="other">.</span><a href="class_Visitor_72892152D0864AA2907A1FD60E7A49EB4E071AD6.html#function_Visit_DBD0E769B587B087ECA31A455D90186AA824D405">Visit</a><span class="other">(</span><span class="other">*</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;688</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">visitor</span><span class="other">.</span><a href="class_Visitor_72892152D0864AA2907A1FD60E7A49EB4E071AD6.html#function_Visit_DBD0E769B587B087ECA31A455D90186AA824D405">Visit</a><span class="other">(</span><span class="other">*</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;638</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;689</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/ast/Concept.hpp_8879EA0D5F61FF3566BCBF924584F4B4A31B16AA.html#249">249</a>
+            Declaration at line <a href="file/ast/Concept.hpp_8879EA0D5F61FF3566BCBF924584F4B4A31B16AA.html#274">274</a>
              of <a href="file/ast/Concept.hpp_8879EA0D5F61FF3566BCBF924584F4B4A31B16AA.html">Concept.hpp</a>
         </span>
         <br/>
@@ -189,23 +213,23 @@
             * parameter) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/ast/Concept.cpp_3B2A67CF03AABAFD1117DDBACBE383B794184248.html#659">659</a>
+            Definition at line <a href="file/ast/Concept.cpp_3B2A67CF03AABAFD1117DDBACBE383B794184248.html#714">714</a>
              of <a href="file/ast/Concept.cpp_3B2A67CF03AABAFD1117DDBACBE383B794184248.html">Concept.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;660</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;715</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;661</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">parameter</span><span class="other">-></span><a href="class_Node_66FC1D6AD8F487E453CE6E17163479C7C2DAC063.html#function_SetParent_CD3943AE607DB9AF6545A90A2DD46A81177C36AF">SetParent</a><span class="other">(</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;716</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">parameter</span><span class="other">-></span><a href="class_Node_66FC1D6AD8F487E453CE6E17163479C7C2DAC063.html#function_SetParent_CD3943AE607DB9AF6545A90A2DD46A81177C36AF">SetParent</a><span class="other">(</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;662</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="class_AxiomNode_32355B173A9C1B11A7E9B59C08B0FBBA45CAC0BD.html#variable_parameters_DFA6432C0E771E256A99A391D0335BEC3605DB58">parameters</a><span class="other">.</span><span class="identifier">Add</span><span class="other">(</span><span class="identifier">parameter</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;717</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="class_AxiomNode_32355B173A9C1B11A7E9B59C08B0FBBA45CAC0BD.html#variable_parameters_DFA6432C0E771E256A99A391D0335BEC3605DB58">parameters</a><span class="other">.</span><span class="identifier">Add</span><span class="other">(</span><span class="identifier">parameter</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;663</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;718</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/ast/Concept.hpp_8879EA0D5F61FF3566BCBF924584F4B4A31B16AA.html#252">252</a>
+            Declaration at line <a href="file/ast/Concept.hpp_8879EA0D5F61FF3566BCBF924584F4B4A31B16AA.html#277">277</a>
              of <a href="file/ast/Concept.hpp_8879EA0D5F61FF3566BCBF924584F4B4A31B16AA.html">Concept.hpp</a>
         </span>
         <br/>
@@ -232,23 +256,23 @@
              cmajor::ast::AxiomNode::AddStatement(<a href="class_AxiomStatementNode_9D169B5E38D2D903D070F4DE9B4761FC761B6BA4.html">AxiomStatementNode</a>
             * statement)</h4>
         <span>
-            Definition at line <a href="file/ast/Concept.cpp_3B2A67CF03AABAFD1117DDBACBE383B794184248.html#665">665</a>
+            Definition at line <a href="file/ast/Concept.cpp_3B2A67CF03AABAFD1117DDBACBE383B794184248.html#720">720</a>
              of <a href="file/ast/Concept.cpp_3B2A67CF03AABAFD1117DDBACBE383B794184248.html">Concept.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;666</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;721</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;667</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">statement</span><span class="other">-></span><a href="class_Node_66FC1D6AD8F487E453CE6E17163479C7C2DAC063.html#function_SetParent_CD3943AE607DB9AF6545A90A2DD46A81177C36AF">SetParent</a><span class="other">(</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;722</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">statement</span><span class="other">-></span><a href="class_Node_66FC1D6AD8F487E453CE6E17163479C7C2DAC063.html#function_SetParent_CD3943AE607DB9AF6545A90A2DD46A81177C36AF">SetParent</a><span class="other">(</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;668</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="class_AxiomNode_32355B173A9C1B11A7E9B59C08B0FBBA45CAC0BD.html#variable_statements_63C0E767EC4FF1D199355F6249A9FA6EF28E5CFA">statements</a><span class="other">.</span><span class="identifier">Add</span><span class="other">(</span><span class="identifier">statement</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;723</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="class_AxiomNode_32355B173A9C1B11A7E9B59C08B0FBBA45CAC0BD.html#variable_statements_63C0E767EC4FF1D199355F6249A9FA6EF28E5CFA">statements</a><span class="other">.</span><span class="identifier">Add</span><span class="other">(</span><span class="identifier">statement</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;669</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;724</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/ast/Concept.hpp_8879EA0D5F61FF3566BCBF924584F4B4A31B16AA.html#253">253</a>
+            Declaration at line <a href="file/ast/Concept.hpp_8879EA0D5F61FF3566BCBF924584F4B4A31B16AA.html#278">278</a>
              of <a href="file/ast/Concept.hpp_8879EA0D5F61FF3566BCBF924584F4B4A31B16AA.html">Concept.hpp</a>
         </span>
         <br/>
@@ -264,6 +288,23 @@
         <br/>
         <br/>
         <hr/>
+        <h3 id="function_BeginBraceSpan_8B17EFD1E05EC1E3B1525FF3116B9F76A8644772">BeginBraceSpan Member Function</h3>
+        <h4>
+            <span class="kw">const </span>
+            <a href="class_Span_9CED8370AAA8B01E09FBC8A63AD262084B91FD78.html">Span</a>
+            &amp; cmajor::ast::AxiomNode::BeginBraceSpan() <span class="kw">const</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/ast/Concept.hpp_8879EA0D5F61FF3566BCBF924584F4B4A31B16AA.html#284">284</a>
+             of <a href="file/ast/Concept.hpp_8879EA0D5F61FF3566BCBF924584F4B4A31B16AA.html">Concept.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">284</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">beginBraceSpan</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <hr/>
         <h3 id="function_Clone_3D5467548A158D7ACFFA21D5B45ADFB3B4CF26EE">Clone Member Function</h3>
         <h4>
             <a href="class_Node_66FC1D6AD8F487E453CE6E17163479C7C2DAC063.html">Node</a>
@@ -271,12 +312,12 @@
             &amp; cloneContext) <span class="kw">const override</span>
         </h4>
         <span>
-            Definition at line <a href="file/ast/Concept.cpp_3B2A67CF03AABAFD1117DDBACBE383B794184248.html#619">619</a>
+            Definition at line <a href="file/ast/Concept.cpp_3B2A67CF03AABAFD1117DDBACBE383B794184248.html#668">668</a>
              of <a href="file/ast/Concept.cpp_3B2A67CF03AABAFD1117DDBACBE383B794184248.html">Concept.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/ast/Concept.hpp_8879EA0D5F61FF3566BCBF924584F4B4A31B16AA.html#248">248</a>
+            Declaration at line <a href="file/ast/Concept.hpp_8879EA0D5F61FF3566BCBF924584F4B4A31B16AA.html#273">273</a>
              of <a href="file/ast/Concept.hpp_8879EA0D5F61FF3566BCBF924584F4B4A31B16AA.html">Concept.hpp</a>
         </span>
         <br/>
@@ -290,6 +331,8 @@
             Calls: <a href="class_AxiomNode_32355B173A9C1B11A7E9B59C08B0FBBA45CAC0BD.html#function_AddParameter_93CD7E5B90E05D86D72F76E12D24659D153B7FE9">cmajor::ast::AxiomNode::AddParameter</a>
             , <a href="class_AxiomNode_32355B173A9C1B11A7E9B59C08B0FBBA45CAC0BD.html#function_AddStatement_077ABA14DCFB87F7F3136534002D8EDD8B6DB4BD">cmajor::ast::AxiomNode::AddStatement</a>
             , <a href="class_AxiomNode_32355B173A9C1B11A7E9B59C08B0FBBA45CAC0BD.html#function_Clone_3D5467548A158D7ACFFA21D5B45ADFB3B4CF26EE">cmajor::ast::AxiomNode::Clone</a>
+            , <a href="class_AxiomNode_32355B173A9C1B11A7E9B59C08B0FBBA45CAC0BD.html#function_SetBeginBraceSpan_3A53D737B787037D3602D6B7687E9641C4D816DB">cmajor::ast::AxiomNode::SetBeginBraceSpan</a>
+            , <a href="class_AxiomNode_32355B173A9C1B11A7E9B59C08B0FBBA45CAC0BD.html#function_SetEndBraceSpan_A4CB386FC9767886C662163A4920CAA69F7C7753">cmajor::ast::AxiomNode::SetEndBraceSpan</a>
         </span>
         <br/>
         <br/>
@@ -299,6 +342,23 @@
         <br/>
         <br/>
         <hr/>
+        <h3 id="function_EndBraceSpan_CA89A7E3A83F938432558E00CF7570FCCE6DC95F">EndBraceSpan Member Function</h3>
+        <h4>
+            <span class="kw">const </span>
+            <a href="class_Span_9CED8370AAA8B01E09FBC8A63AD262084B91FD78.html">Span</a>
+            &amp; cmajor::ast::AxiomNode::EndBraceSpan() <span class="kw">const</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/ast/Concept.hpp_8879EA0D5F61FF3566BCBF924584F4B4A31B16AA.html#286">286</a>
+             of <a href="file/ast/Concept.hpp_8879EA0D5F61FF3566BCBF924584F4B4A31B16AA.html">Concept.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">286</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">endBraceSpan</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <hr/>
         <h3 id="function_Id_72A601D30F00110499BFEF0ADC04C3090F7D8C55">Id Member Function</h3>
         <h4>
             <span class="kw">const </span>
@@ -306,11 +366,11 @@
             * cmajor::ast::AxiomNode::Id() <span class="kw">const</span>
         </h4>
         <span>
-            Definition at line <a href="file/ast/Concept.hpp_8879EA0D5F61FF3566BCBF924584F4B4A31B16AA.html#254">254</a>
+            Definition at line <a href="file/ast/Concept.hpp_8879EA0D5F61FF3566BCBF924584F4B4A31B16AA.html#279">279</a>
              of <a href="file/ast/Concept.hpp_8879EA0D5F61FF3566BCBF924584F4B4A31B16AA.html">Concept.hpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">254</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">id</span><span class="other">.</span><span class="identifier">get</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">279</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">id</span><span class="other">.</span><span class="identifier">get</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
@@ -321,11 +381,11 @@
             <a href="class_IdentifierNode_4A1A7E3AFB614AEF7ED2B90309B9B619E86EE9E4.html">IdentifierNode</a>
             * cmajor::ast::AxiomNode::Id()</h4>
         <span>
-            Definition at line <a href="file/ast/Concept.hpp_8879EA0D5F61FF3566BCBF924584F4B4A31B16AA.html#255">255</a>
+            Definition at line <a href="file/ast/Concept.hpp_8879EA0D5F61FF3566BCBF924584F4B4A31B16AA.html#280">280</a>
              of <a href="file/ast/Concept.hpp_8879EA0D5F61FF3566BCBF924584F4B4A31B16AA.html">Concept.hpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">255</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">id</span><span class="other">.</span><span class="identifier">get</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">280</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">id</span><span class="other">.</span><span class="identifier">get</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
@@ -339,11 +399,11 @@
             >&amp; cmajor::ast::AxiomNode::Parameters() <span class="kw">const</span>
         </h4>
         <span>
-            Definition at line <a href="file/ast/Concept.hpp_8879EA0D5F61FF3566BCBF924584F4B4A31B16AA.html#256">256</a>
+            Definition at line <a href="file/ast/Concept.hpp_8879EA0D5F61FF3566BCBF924584F4B4A31B16AA.html#281">281</a>
              of <a href="file/ast/Concept.hpp_8879EA0D5F61FF3566BCBF924584F4B4A31B16AA.html">Concept.hpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">256</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">parameters</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">281</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">parameters</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
@@ -356,33 +416,12 @@
             &amp; reader) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/ast/Concept.cpp_3B2A67CF03AABAFD1117DDBACBE383B794184248.html#648">648</a>
+            Definition at line <a href="file/ast/Concept.cpp_3B2A67CF03AABAFD1117DDBACBE383B794184248.html#701">701</a>
              of <a href="file/ast/Concept.cpp_3B2A67CF03AABAFD1117DDBACBE383B794184248.html">Concept.cpp</a>
-            :<br/>
-            <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;649</span>&nbsp;<span class="other">{</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;650</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="class_Node_66FC1D6AD8F487E453CE6E17163479C7C2DAC063.html">Node</a><span class="other">::</span><a href="class_Node_66FC1D6AD8F487E453CE6E17163479C7C2DAC063.html#function_Read_894C51ECB047DC4A41994462C3E69D94691C3545">Read</a><span class="other">(</span><span class="identifier">reader</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;651</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="class_AxiomNode_32355B173A9C1B11A7E9B59C08B0FBBA45CAC0BD.html#variable_id_6C17E72B3FA609C7775E4E204E404D0C2B35C295">id</a><span class="other">.</span><span class="identifier">reset</span><span class="other">(</span><span class="identifier">reader</span><span class="other">.</span><a href="class_AstReader_79D1108F70EAB0D555FDDD074FED033B2DCABCD5.html#function_ReadIdentifierNode_5F4F82748C8D922BADC586CD1C2AFD9E0A88B0ED">ReadIdentifierNode</a><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;652</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="class_AxiomNode_32355B173A9C1B11A7E9B59C08B0FBBA45CAC0BD.html#variable_id_6C17E72B3FA609C7775E4E204E404D0C2B35C295">id</a><span class="other">-></span><span class="identifier">SetParent</span><span class="other">(</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;653</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="class_AxiomNode_32355B173A9C1B11A7E9B59C08B0FBBA45CAC0BD.html#variable_parameters_DFA6432C0E771E256A99A391D0335BEC3605DB58">parameters</a><span class="other">.</span><span class="identifier">Read</span><span class="other">(</span><span class="identifier">reader</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;654</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="class_AxiomNode_32355B173A9C1B11A7E9B59C08B0FBBA45CAC0BD.html#variable_parameters_DFA6432C0E771E256A99A391D0335BEC3605DB58">parameters</a><span class="other">.</span><span class="identifier">SetParent</span><span class="other">(</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;655</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="class_AxiomNode_32355B173A9C1B11A7E9B59C08B0FBBA45CAC0BD.html#variable_statements_63C0E767EC4FF1D199355F6249A9FA6EF28E5CFA">statements</a><span class="other">.</span><span class="identifier">Read</span><span class="other">(</span><span class="identifier">reader</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;656</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="class_AxiomNode_32355B173A9C1B11A7E9B59C08B0FBBA45CAC0BD.html#variable_statements_63C0E767EC4FF1D199355F6249A9FA6EF28E5CFA">statements</a><span class="other">.</span><span class="identifier">SetParent</span><span class="other">(</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;657</span>&nbsp;<span class="other">}</span></span>
-            </span>
-            <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/ast/Concept.hpp_8879EA0D5F61FF3566BCBF924584F4B4A31B16AA.html#251">251</a>
+            Declaration at line <a href="file/ast/Concept.hpp_8879EA0D5F61FF3566BCBF924584F4B4A31B16AA.html#276">276</a>
              of <a href="file/ast/Concept.hpp_8879EA0D5F61FF3566BCBF924584F4B4A31B16AA.html">Concept.hpp</a>
         </span>
         <br/>
@@ -394,7 +433,52 @@
         <br/>
         <span>
             Calls: <a href="class_AstReader_79D1108F70EAB0D555FDDD074FED033B2DCABCD5.html#function_ReadIdentifierNode_5F4F82748C8D922BADC586CD1C2AFD9E0A88B0ED">cmajor::ast::AstReader::ReadIdentifierNode</a>
+            , <a href="class_AstReader_79D1108F70EAB0D555FDDD074FED033B2DCABCD5.html#function_ReadSpan_082ABEE22897732B6B4B9DACAC77278903C88AF6">cmajor::ast::AstReader::ReadSpan</a>
             , <a href="class_Node_66FC1D6AD8F487E453CE6E17163479C7C2DAC063.html#function_Read_894C51ECB047DC4A41994462C3E69D94691C3545">cmajor::ast::Node::Read</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_SetBeginBraceSpan_3A53D737B787037D3602D6B7687E9641C4D816DB">SetBeginBraceSpan Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             cmajor::ast::AxiomNode::SetBeginBraceSpan(<span class="kw">const </span>
+            <a href="class_Span_9CED8370AAA8B01E09FBC8A63AD262084B91FD78.html">Span</a>
+            &amp; beginBraceSpan_)</h4>
+        <span>
+            Definition at line <a href="file/ast/Concept.hpp_8879EA0D5F61FF3566BCBF924584F4B4A31B16AA.html#283">283</a>
+             of <a href="file/ast/Concept.hpp_8879EA0D5F61FF3566BCBF924584F4B4A31B16AA.html">Concept.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">283</span>&nbsp;<span class="other">{</span>&nbsp;<span class="identifier">beginBraceSpan</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">beginBraceSpan_</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Called by: <a href="class_AxiomNode_32355B173A9C1B11A7E9B59C08B0FBBA45CAC0BD.html#function_Clone_3D5467548A158D7ACFFA21D5B45ADFB3B4CF26EE">cmajor::ast::AxiomNode::Clone</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_SetEndBraceSpan_A4CB386FC9767886C662163A4920CAA69F7C7753">SetEndBraceSpan Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             cmajor::ast::AxiomNode::SetEndBraceSpan(<span class="kw">const </span>
+            <a href="class_Span_9CED8370AAA8B01E09FBC8A63AD262084B91FD78.html">Span</a>
+            &amp; endBraceSpan_)</h4>
+        <span>
+            Definition at line <a href="file/ast/Concept.hpp_8879EA0D5F61FF3566BCBF924584F4B4A31B16AA.html#285">285</a>
+             of <a href="file/ast/Concept.hpp_8879EA0D5F61FF3566BCBF924584F4B4A31B16AA.html">Concept.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">285</span>&nbsp;<span class="other">{</span>&nbsp;<span class="identifier">endBraceSpan</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">endBraceSpan_</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Called by: <a href="class_AxiomNode_32355B173A9C1B11A7E9B59C08B0FBBA45CAC0BD.html#function_Clone_3D5467548A158D7ACFFA21D5B45ADFB3B4CF26EE">cmajor::ast::AxiomNode::Clone</a>
         </span>
         <br/>
         <br/>
@@ -407,11 +491,11 @@
             >&amp; cmajor::ast::AxiomNode::Statements() <span class="kw">const</span>
         </h4>
         <span>
-            Definition at line <a href="file/ast/Concept.hpp_8879EA0D5F61FF3566BCBF924584F4B4A31B16AA.html#257">257</a>
+            Definition at line <a href="file/ast/Concept.hpp_8879EA0D5F61FF3566BCBF924584F4B4A31B16AA.html#282">282</a>
              of <a href="file/ast/Concept.hpp_8879EA0D5F61FF3566BCBF924584F4B4A31B16AA.html">Concept.hpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">257</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">statements</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">282</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">statements</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
@@ -424,27 +508,31 @@
             &amp; writer) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/ast/Concept.cpp_3B2A67CF03AABAFD1117DDBACBE383B794184248.html#640">640</a>
+            Definition at line <a href="file/ast/Concept.cpp_3B2A67CF03AABAFD1117DDBACBE383B794184248.html#691">691</a>
              of <a href="file/ast/Concept.cpp_3B2A67CF03AABAFD1117DDBACBE383B794184248.html">Concept.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;641</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;692</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;642</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="class_Node_66FC1D6AD8F487E453CE6E17163479C7C2DAC063.html">Node</a><span class="other">::</span><a href="class_Node_66FC1D6AD8F487E453CE6E17163479C7C2DAC063.html#function_Write_82DF5FFD8434B1620A45C972CD4DAE4EF72A2CF5">Write</a><span class="other">(</span><span class="identifier">writer</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;693</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="class_Node_66FC1D6AD8F487E453CE6E17163479C7C2DAC063.html">Node</a><span class="other">::</span><a href="class_Node_66FC1D6AD8F487E453CE6E17163479C7C2DAC063.html#function_Write_82DF5FFD8434B1620A45C972CD4DAE4EF72A2CF5">Write</a><span class="other">(</span><span class="identifier">writer</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;643</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">writer</span><span class="other">.</span><span class="identifier">Write</span><span class="other">(</span><a href="class_AxiomNode_32355B173A9C1B11A7E9B59C08B0FBBA45CAC0BD.html#variable_id_6C17E72B3FA609C7775E4E204E404D0C2B35C295">id</a><span class="other">.</span><span class="identifier">get</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;694</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">writer</span><span class="other">.</span><span class="identifier">Write</span><span class="other">(</span><a href="class_AxiomNode_32355B173A9C1B11A7E9B59C08B0FBBA45CAC0BD.html#variable_id_6C17E72B3FA609C7775E4E204E404D0C2B35C295">id</a><span class="other">.</span><span class="identifier">get</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;644</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="class_AxiomNode_32355B173A9C1B11A7E9B59C08B0FBBA45CAC0BD.html#variable_parameters_DFA6432C0E771E256A99A391D0335BEC3605DB58">parameters</a><span class="other">.</span><span class="identifier">Write</span><span class="other">(</span><span class="identifier">writer</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;695</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="class_AxiomNode_32355B173A9C1B11A7E9B59C08B0FBBA45CAC0BD.html#variable_parameters_DFA6432C0E771E256A99A391D0335BEC3605DB58">parameters</a><span class="other">.</span><span class="identifier">Write</span><span class="other">(</span><span class="identifier">writer</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;645</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="class_AxiomNode_32355B173A9C1B11A7E9B59C08B0FBBA45CAC0BD.html#variable_statements_63C0E767EC4FF1D199355F6249A9FA6EF28E5CFA">statements</a><span class="other">.</span><span class="identifier">Write</span><span class="other">(</span><span class="identifier">writer</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;696</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="class_AxiomNode_32355B173A9C1B11A7E9B59C08B0FBBA45CAC0BD.html#variable_statements_63C0E767EC4FF1D199355F6249A9FA6EF28E5CFA">statements</a><span class="other">.</span><span class="identifier">Write</span><span class="other">(</span><span class="identifier">writer</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;646</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;697</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">writer</span><span class="other">.</span><a href="class_AstWriter_E913198FD26EB86BE054254E7AA4791401EA149B.html#function_Write_8B396E6426A876580F9A0DB9D9F8BBAC1DE36180">Write</a><span class="other">(</span><a href="class_AxiomNode_32355B173A9C1B11A7E9B59C08B0FBBA45CAC0BD.html#variable_beginBraceSpan_0C92551AF0355B45F64DA67553BF146E389DC338">beginBraceSpan</a><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;698</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">writer</span><span class="other">.</span><a href="class_AstWriter_E913198FD26EB86BE054254E7AA4791401EA149B.html#function_Write_8B396E6426A876580F9A0DB9D9F8BBAC1DE36180">Write</a><span class="other">(</span><a href="class_AxiomNode_32355B173A9C1B11A7E9B59C08B0FBBA45CAC0BD.html#variable_endBraceSpan_AC6E3F269446A1D3856165E4E141306641FB7108">endBraceSpan</a><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;699</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/ast/Concept.hpp_8879EA0D5F61FF3566BCBF924584F4B4A31B16AA.html#250">250</a>
+            Declaration at line <a href="file/ast/Concept.hpp_8879EA0D5F61FF3566BCBF924584F4B4A31B16AA.html#275">275</a>
              of <a href="file/ast/Concept.hpp_8879EA0D5F61FF3566BCBF924584F4B4A31B16AA.html">Concept.hpp</a>
         </span>
         <br/>
@@ -455,7 +543,8 @@
         <br/>
         <br/>
         <span>
-            Calls: <a href="class_Node_66FC1D6AD8F487E453CE6E17163479C7C2DAC063.html#function_Write_82DF5FFD8434B1620A45C972CD4DAE4EF72A2CF5">cmajor::ast::Node::Write</a>
+            Calls: <a href="class_AstWriter_E913198FD26EB86BE054254E7AA4791401EA149B.html#function_Write_8B396E6426A876580F9A0DB9D9F8BBAC1DE36180">cmajor::ast::AstWriter::Write</a>
+            , <a href="class_Node_66FC1D6AD8F487E453CE6E17163479C7C2DAC063.html#function_Write_82DF5FFD8434B1620A45C972CD4DAE4EF72A2CF5">cmajor::ast::Node::Write</a>
         </span>
         <br/>
         <br/>

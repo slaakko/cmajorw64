@@ -101,6 +101,10 @@
                 <td class="functionTableSecondCol" xml:space="preserve"><a href="class_Project_490FE99079251779F37F238EB82C55DB138D46F9.html#function_References_069D7CC42C5CEFE2E2A5B7D942872436452A515C">References</a>() <span class="kw">const</span></td>
             </tr>
             <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">const </span>std::string&amp;</td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_Project_490FE99079251779F37F238EB82C55DB138D46F9.html#function_RelativeFilePath_1AB81578E5B569A990F6ACC31A51CF9041540A02">RelativeFilePath</a>() <span class="kw">const</span></td>
+            </tr>
+            <tr>
                 <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">const </span>std::vector&lt;std::string>&amp;</td>
                 <td class="functionTableSecondCol" xml:space="preserve"><a href="class_Project_490FE99079251779F37F238EB82C55DB138D46F9.html#function_RelativeReferencedProjectFilePaths_96E56CC141BA5EAFB46A022B07EAADAC755B3DAB">RelativeReferencedProjectFilePaths</a>() <span class="kw">const</span></td>
             </tr>
@@ -139,6 +143,10 @@
             <tr>
                 <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
                 <td class="functionTableSecondCol" xml:space="preserve"><a href="class_Project_490FE99079251779F37F238EB82C55DB138D46F9.html#function_SetModuleFilePath_68965C07F31161D3336AFFDF7C7556F7836B64B9">SetModuleFilePath</a>(<span class="kw">const </span>std::string&amp; moduleFilePath_)</td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_Project_490FE99079251779F37F238EB82C55DB138D46F9.html#function_SetRelativeFilePath_14D55429090CD9C64BCA2F2E75433D71314D85DF">SetRelativeFilePath</a>(<span class="kw">const </span>std::string&amp; relativeFilePath_)</td>
             </tr>
             <tr>
                 <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
@@ -214,6 +222,10 @@
             <tr id="variable_references_225919D934CBA1ED5F1B7E01DDCC59688BBEFCCA">
                 <td class="functionTableFirstCol" xml:space="preserve">std::vector&lt;std::string></td>
                 <td class="functionTableSecondCol" xml:space="preserve">references</td>
+            </tr>
+            <tr id="variable_relativeFilePath_CF34B06E332D81EDF713B2B44A4FFCD434156B10">
+                <td class="functionTableFirstCol" xml:space="preserve">std::string</td>
+                <td class="functionTableSecondCol" xml:space="preserve">relativeFilePath</td>
             </tr>
             <tr id="variable_relativeReferencedProjectFilePaths_3F8663FFDE82EC3450FD0D503D34616A1F68D14B">
                 <td class="functionTableFirstCol" xml:space="preserve">std::vector&lt;std::string></td>
@@ -335,11 +347,11 @@
              cmajor::ast::Project::Built() <span class="kw">const</span>
         </h4>
         <span>
-            Definition at line <a href="file/ast/Project.hpp_0329D78A323543359FEB2359B4A439DE28CF42BF.html#106">106</a>
+            Definition at line <a href="file/ast/Project.hpp_0329D78A323543359FEB2359B4A439DE28CF42BF.html#108">108</a>
              of <a href="file/ast/Project.hpp_0329D78A323543359FEB2359B4A439DE28CF42BF.html">Project.hpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">106</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">built</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">108</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">built</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
@@ -383,11 +395,11 @@
             std::vector&lt;<a href="class_Project_490FE99079251779F37F238EB82C55DB138D46F9.html">Project</a>
             *>&amp; cmajor::ast::Project::DependsOnProjects()</h4>
         <span>
-            Definition at line <a href="file/ast/Project.hpp_0329D78A323543359FEB2359B4A439DE28CF42BF.html#105">105</a>
+            Definition at line <a href="file/ast/Project.hpp_0329D78A323543359FEB2359B4A439DE28CF42BF.html#107">107</a>
              of <a href="file/ast/Project.hpp_0329D78A323543359FEB2359B4A439DE28CF42BF.html">Project.hpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">105</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">dependsOn</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">107</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">dependsOn</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
@@ -447,11 +459,11 @@
              cmajor::ast::Project::Index() <span class="kw">const</span>
         </h4>
         <span>
-            Definition at line <a href="file/ast/Project.hpp_0329D78A323543359FEB2359B4A439DE28CF42BF.html#104">104</a>
+            Definition at line <a href="file/ast/Project.hpp_0329D78A323543359FEB2359B4A439DE28CF42BF.html#106">106</a>
              of <a href="file/ast/Project.hpp_0329D78A323543359FEB2359B4A439DE28CF42BF.html">Project.hpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">104</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">index</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">106</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">index</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
@@ -490,7 +502,7 @@
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/ast/Project.hpp_0329D78A323543359FEB2359B4A439DE28CF42BF.html#100">100</a>
+            Declaration at line <a href="file/ast/Project.hpp_0329D78A323543359FEB2359B4A439DE28CF42BF.html#102">102</a>
              of <a href="file/ast/Project.hpp_0329D78A323543359FEB2359B4A439DE28CF42BF.html">Project.hpp</a>
         </span>
         <br/>
@@ -523,11 +535,11 @@
              cmajor::ast::Project::LogStreamId() <span class="kw">const</span>
         </h4>
         <span>
-            Definition at line <a href="file/ast/Project.hpp_0329D78A323543359FEB2359B4A439DE28CF42BF.html#101">101</a>
+            Definition at line <a href="file/ast/Project.hpp_0329D78A323543359FEB2359B4A439DE28CF42BF.html#103">103</a>
              of <a href="file/ast/Project.hpp_0329D78A323543359FEB2359B4A439DE28CF42BF.html">Project.hpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">101</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">logStreamId</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">103</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">logStreamId</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
@@ -599,7 +611,7 @@
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/ast/Project.hpp_0329D78A323543359FEB2359B4A439DE28CF42BF.html#108">108</a>
+            Declaration at line <a href="file/ast/Project.hpp_0329D78A323543359FEB2359B4A439DE28CF42BF.html#110">110</a>
              of <a href="file/ast/Project.hpp_0329D78A323543359FEB2359B4A439DE28CF42BF.html">Project.hpp</a>
         </span>
         <br/>
@@ -637,6 +649,22 @@
             :<br/>
             <span class="code">
                 <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;87</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">references</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <hr/>
+        <h3 id="function_RelativeFilePath_1AB81578E5B569A990F6ACC31A51CF9041540A02">RelativeFilePath Member Function</h3>
+        <h4>
+            <span class="kw">const </span>
+            std::string&amp; cmajor::ast::Project::RelativeFilePath() <span class="kw">const</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/ast/Project.hpp_0329D78A323543359FEB2359B4A439DE28CF42BF.html#99">99</a>
+             of <a href="file/ast/Project.hpp_0329D78A323543359FEB2359B4A439DE28CF42BF.html">Project.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;99</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">relativeFilePath</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
@@ -720,11 +748,11 @@
             <span class="kw">void</span>
              cmajor::ast::Project::SetBuilt()</h4>
         <span>
-            Definition at line <a href="file/ast/Project.hpp_0329D78A323543359FEB2359B4A439DE28CF42BF.html#107">107</a>
+            Definition at line <a href="file/ast/Project.hpp_0329D78A323543359FEB2359B4A439DE28CF42BF.html#109">109</a>
              of <a href="file/ast/Project.hpp_0329D78A323543359FEB2359B4A439DE28CF42BF.html">Project.hpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">107</span>&nbsp;<span class="other">{</span>&nbsp;<span class="identifier">built</span><span class="other">&nbsp;=&nbsp;</span><span class="kw">true</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">109</span>&nbsp;<span class="other">{</span>&nbsp;<span class="identifier">built</span><span class="other">&nbsp;=&nbsp;</span><span class="kw">true</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
@@ -750,7 +778,7 @@
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/ast/Project.hpp_0329D78A323543359FEB2359B4A439DE28CF42BF.html#109">109</a>
+            Declaration at line <a href="file/ast/Project.hpp_0329D78A323543359FEB2359B4A439DE28CF42BF.html#111">111</a>
              of <a href="file/ast/Project.hpp_0329D78A323543359FEB2359B4A439DE28CF42BF.html">Project.hpp</a>
         </span>
         <br/>
@@ -762,11 +790,11 @@
              cmajor::ast::Project::SetIndex(<span class="kw">int</span>
              index_)</h4>
         <span>
-            Definition at line <a href="file/ast/Project.hpp_0329D78A323543359FEB2359B4A439DE28CF42BF.html#103">103</a>
+            Definition at line <a href="file/ast/Project.hpp_0329D78A323543359FEB2359B4A439DE28CF42BF.html#105">105</a>
              of <a href="file/ast/Project.hpp_0329D78A323543359FEB2359B4A439DE28CF42BF.html">Project.hpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">103</span>&nbsp;<span class="other">{</span>&nbsp;<span class="identifier">index</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">index_</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">105</span>&nbsp;<span class="other">{</span>&nbsp;<span class="identifier">index</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">index_</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
@@ -792,7 +820,7 @@
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/ast/Project.hpp_0329D78A323543359FEB2359B4A439DE28CF42BF.html#99">99</a>
+            Declaration at line <a href="file/ast/Project.hpp_0329D78A323543359FEB2359B4A439DE28CF42BF.html#101">101</a>
              of <a href="file/ast/Project.hpp_0329D78A323543359FEB2359B4A439DE28CF42BF.html">Project.hpp</a>
         </span>
         <br/>
@@ -804,11 +832,11 @@
              cmajor::ast::Project::SetLogStreamId(<span class="kw">int</span>
              logStreamId_)</h4>
         <span>
-            Definition at line <a href="file/ast/Project.hpp_0329D78A323543359FEB2359B4A439DE28CF42BF.html#102">102</a>
+            Definition at line <a href="file/ast/Project.hpp_0329D78A323543359FEB2359B4A439DE28CF42BF.html#104">104</a>
              of <a href="file/ast/Project.hpp_0329D78A323543359FEB2359B4A439DE28CF42BF.html">Project.hpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">102</span>&nbsp;<span class="other">{</span>&nbsp;<span class="identifier">logStreamId</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">logStreamId_</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">104</span>&nbsp;<span class="other">{</span>&nbsp;<span class="identifier">logStreamId</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">logStreamId_</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
@@ -834,10 +862,26 @@
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/ast/Project.hpp_0329D78A323543359FEB2359B4A439DE28CF42BF.html#98">98</a>
+            Declaration at line <a href="file/ast/Project.hpp_0329D78A323543359FEB2359B4A439DE28CF42BF.html#100">100</a>
              of <a href="file/ast/Project.hpp_0329D78A323543359FEB2359B4A439DE28CF42BF.html">Project.hpp</a>
         </span>
         <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_SetRelativeFilePath_14D55429090CD9C64BCA2F2E75433D71314D85DF">SetRelativeFilePath Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             cmajor::ast::Project::SetRelativeFilePath(<span class="kw">const </span>
+            std::string&amp; relativeFilePath_)</h4>
+        <span>
+            Definition at line <a href="file/ast/Project.hpp_0329D78A323543359FEB2359B4A439DE28CF42BF.html#98">98</a>
+             of <a href="file/ast/Project.hpp_0329D78A323543359FEB2359B4A439DE28CF42BF.html">Project.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;98</span>&nbsp;<span class="other">{</span>&nbsp;<span class="identifier">relativeFilePath</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">relativeFilePath_</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
         <br/>
         <hr/>
         <h3 id="function_SetSystemProject_9F3EA8CD061845936175C50E6B8F4FBDD19FFF70">SetSystemProject Member Function</h3>

@@ -33,6 +33,10 @@
                 <td class="functionTableSecondCol" xml:space="preserve"><a href="class_TemplateParameterSymbol_E40C8C6A1A16CD38F979FFEC21EFECE32E4417BC.html#function_ClassName_9E7C4F4CBAE444866A49BADA9269211D9D76CD42">ClassName</a>() <span class="kw">const override</span></td>
             </tr>
             <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_TemplateParameterSymbol_E40C8C6A1A16CD38F979FFEC21EFECE32E4417BC.html#function_ComputeExportClosure_BA44F65A2AFE8972B412043AE9030072133E9EFD">ComputeExportClosure</a>() <span class="kw">override</span></td>
+            </tr>
+            <tr>
                 <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">bool</span></td>
                 <td class="functionTableSecondCol" xml:space="preserve"><a href="class_TemplateParameterSymbol_E40C8C6A1A16CD38F979FFEC21EFECE32E4417BC.html#function_ContainsTemplateParameter_AE26CE9081132B9C698E35E681E4D0AC59162A5C">ContainsTemplateParameter</a>() <span class="kw">const override</span></td>
             </tr>
@@ -41,8 +45,12 @@
                 <td class="functionTableSecondCol" xml:space="preserve"><a href="class_TemplateParameterSymbol_E40C8C6A1A16CD38F979FFEC21EFECE32E4417BC.html#function_CreateDefaultIrValue_956938E17F2AB109CF1641DEE6A2F2803317024E">CreateDefaultIrValue</a>(<a href="class_Emitter_154396B281E1F2C3ECA7612F1A3AD2E408E7D595.html">Emitter</a>&amp; emitter) <span class="kw">override</span></td>
             </tr>
             <tr>
-                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">const </span>std::string&amp;</td>
-                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_TemplateParameterSymbol_E40C8C6A1A16CD38F979FFEC21EFECE32E4417BC.html#function_DefaultStr_7A6FAE756044D1BEE85444FEF230039204BBC803">DefaultStr</a>() <span class="kw">const</span></td>
+                <td class="functionTableFirstCol" xml:space="preserve"><a href="class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html">TypeSymbol</a>*</td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_TemplateParameterSymbol_E40C8C6A1A16CD38F979FFEC21EFECE32E4417BC.html#function_DefaultType_988E5B0B1568EE3A55BCA3BFC72A001054A84A59">DefaultType</a>()</td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_TemplateParameterSymbol_E40C8C6A1A16CD38F979FFEC21EFECE32E4417BC.html#function_EmplaceType_EE28FADA2EC904955787CFBA148AEC292F0B263C">EmplaceType</a>(<a href="class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html">TypeSymbol</a>* typeSymbol, <span class="kw">int</span> index) <span class="kw">override</span></td>
             </tr>
             <tr>
                 <td class="functionTableFirstCol" xml:space="preserve">std::u32string</td>
@@ -66,7 +74,7 @@
             </tr>
             <tr>
                 <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
-                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_TemplateParameterSymbol_E40C8C6A1A16CD38F979FFEC21EFECE32E4417BC.html#function_SetDefaultStr_C8686EC6C11681FEEDE29E01145F17C879591BE4">SetDefaultStr</a>(<span class="kw">const </span>std::string&amp; defaultStr_)</td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_TemplateParameterSymbol_E40C8C6A1A16CD38F979FFEC21EFECE32E4417BC.html#function_SetDefaultType_2BE333EC3E6175FF1CFBD73E8F1F52F411ABB4B1">SetDefaultType</a>(<a href="class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html">TypeSymbol</a>* defaultType_)</td>
             </tr>
             <tr>
                 <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
@@ -87,9 +95,9 @@
         </table>
         <h2>Member Variables</h2>
         <table>
-            <tr id="variable_defaultStr_E2EDB02EC7A21AC0EF3C8F7134AAD7FDA2224A1C">
-                <td class="functionTableFirstCol" xml:space="preserve">std::string</td>
-                <td class="functionTableSecondCol" xml:space="preserve">defaultStr</td>
+            <tr id="variable_defaultType_CAAB79F8788F36B7121117674041E304E40EF0B4">
+                <td class="functionTableFirstCol" xml:space="preserve"><a href="class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html">TypeSymbol</a>*</td>
+                <td class="functionTableSecondCol" xml:space="preserve">defaultType</td>
             </tr>
             <tr id="variable_hasDefault_B767A4AD83E905355AB348E32A6B0377ABA5F23E">
                 <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">bool</span></td>
@@ -105,15 +113,17 @@
             &amp; span_, <span class="kw">const </span>
             std::u32string&amp; name_)</h4>
         <span>
-            Definition at line <a href="file/symbols/TemplateSymbol.cpp_8E894CC7DE88DEE844CE62F85CE4D1222063F281.html#17">17</a>
+            Definition at line <a href="file/symbols/TemplateSymbol.cpp_8E894CC7DE88DEE844CE62F85CE4D1222063F281.html#18">18</a>
              of <a href="file/symbols/TemplateSymbol.cpp_8E894CC7DE88DEE844CE62F85CE4D1222063F281.html">TemplateSymbol.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">17</span>&nbsp;<span class="other">:</span>&nbsp;<a href="class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html">TypeSymbol</a><span class="other">(</span><a href="enum_SymbolType_0C0BF9091F0459D7D1F67F3504BFA03942CCA1EB.html">SymbolType</a><span class="other">::</span><a href="enum_SymbolType_0C0BF9091F0459D7D1F67F3504BFA03942CCA1EB.html#enumerator_templateParameterSymbol_CBF1561AD92AE76DADCA3351A7DE443CD12A8797">templateParameterSymbol</a><span class="other">,&nbsp;</span><span class="identifier">span_</span><span class="other">,&nbsp;</span><span class="identifier">name_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="class_TemplateParameterSymbol_E40C8C6A1A16CD38F979FFEC21EFECE32E4417BC.html#variable_hasDefault_B767A4AD83E905355AB348E32A6B0377ABA5F23E">hasDefault</a><span class="other">(</span><span class="kw">false</span><span class="other">)</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;18</span>&nbsp;<span class="other">:</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">18</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;19</span>&nbsp;<a href="class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html">TypeSymbol</a><span class="other">(</span><a href="enum_SymbolType_0C0BF9091F0459D7D1F67F3504BFA03942CCA1EB.html">SymbolType</a><span class="other">::</span><a href="enum_SymbolType_0C0BF9091F0459D7D1F67F3504BFA03942CCA1EB.html#enumerator_templateParameterSymbol_CBF1561AD92AE76DADCA3351A7DE443CD12A8797">templateParameterSymbol</a><span class="other">,&nbsp;</span><span class="identifier">span_</span><span class="other">,&nbsp;</span><span class="identifier">name_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="class_TemplateParameterSymbol_E40C8C6A1A16CD38F979FFEC21EFECE32E4417BC.html#variable_hasDefault_B767A4AD83E905355AB348E32A6B0377ABA5F23E">hasDefault</a><span class="other">(</span><span class="kw">false</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="class_TemplateParameterSymbol_E40C8C6A1A16CD38F979FFEC21EFECE32E4417BC.html#variable_defaultType_CAAB79F8788F36B7121117674041E304E40EF0B4">defaultType</a><span class="other">(</span><span class="kw">nullptr</span><span class="other">)</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">19</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;20</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;21</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
@@ -133,11 +143,11 @@
             * cmajor::symbols::TemplateParameterSymbol::ClassName() <span class="kw">const override</span>
         </h4>
         <span>
-            Definition at line <a href="file/symbols/TemplateSymbol.hpp_B707BFE8E5388AED663582828AF5308329BEBCEA.html#29">29</a>
+            Definition at line <a href="file/symbols/TemplateSymbol.hpp_B707BFE8E5388AED663582828AF5308329BEBCEA.html#31">31</a>
              of <a href="file/symbols/TemplateSymbol.hpp_B707BFE8E5388AED663582828AF5308329BEBCEA.html">TemplateSymbol.hpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">29</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="string">"TemplateParameterSymbol"</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">31</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="string">"TemplateParameterSymbol"</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
@@ -150,17 +160,48 @@
         <br/>
         <br/>
         <hr/>
+        <h3 id="function_ComputeExportClosure_BA44F65A2AFE8972B412043AE9030072133E9EFD">ComputeExportClosure Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             cmajor::symbols::TemplateParameterSymbol::ComputeExportClosure() <span class="kw">override</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/symbols/TemplateSymbol.cpp_8E894CC7DE88DEE844CE62F85CE4D1222063F281.html#59">59</a>
+             of <a href="file/symbols/TemplateSymbol.cpp_8E894CC7DE88DEE844CE62F85CE4D1222063F281.html">TemplateSymbol.cpp</a>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/symbols/TemplateSymbol.hpp_B707BFE8E5388AED663582828AF5308329BEBCEA.html#20">20</a>
+             of <a href="file/symbols/TemplateSymbol.hpp_B707BFE8E5388AED663582828AF5308329BEBCEA.html">TemplateSymbol.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Base class overridden functions: <a href="class_ContainerSymbol_4B08BF3CBF422A1BDE2F14FAEAF47E262AA566CC.html#function_ComputeExportClosure_A2C6438D0CA69A2565D91032FCCD43958B181E89">cmajor::symbols::ContainerSymbol::ComputeExportClosure</a>
+            , <a href="class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_ComputeExportClosure_398D1469F062654A027A34749D507806C5E2B923">cmajor::symbols::Symbol::ComputeExportClosure</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Calls: <a href="class_ContainerSymbol_4B08BF3CBF422A1BDE2F14FAEAF47E262AA566CC.html#function_ComputeExportClosure_A2C6438D0CA69A2565D91032FCCD43958B181E89">cmajor::symbols::ContainerSymbol::ComputeExportClosure</a>
+            , <a href="class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_ExportComputed_9E31FD6DD403C876F2DC955068EDDD63EF5A8E77">cmajor::symbols::Symbol::ExportComputed</a>
+            , <a href="class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_IsProject_453946E239F2DB9F43AC5D530F3FE0EE5278836D">cmajor::symbols::Symbol::IsProject</a>
+            , <a href="class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_SetExportComputed_B9A8A7797CECF2C34037851A2D38A02B1DDB04E5">cmajor::symbols::Symbol::SetExportComputed</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
         <h3 id="function_ContainsTemplateParameter_AE26CE9081132B9C698E35E681E4D0AC59162A5C">ContainsTemplateParameter Member Function</h3>
         <h4>
             <span class="kw">bool</span>
              cmajor::symbols::TemplateParameterSymbol::ContainsTemplateParameter() <span class="kw">const override</span>
         </h4>
         <span>
-            Definition at line <a href="file/symbols/TemplateSymbol.hpp_B707BFE8E5388AED663582828AF5308329BEBCEA.html#22">22</a>
+            Definition at line <a href="file/symbols/TemplateSymbol.hpp_B707BFE8E5388AED663582828AF5308329BEBCEA.html#24">24</a>
              of <a href="file/symbols/TemplateSymbol.hpp_B707BFE8E5388AED663582828AF5308329BEBCEA.html">TemplateSymbol.hpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">22</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">true</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">24</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">true</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
@@ -177,11 +218,11 @@
             &amp; emitter) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/symbols/TemplateSymbol.hpp_B707BFE8E5388AED663582828AF5308329BEBCEA.html#20">20</a>
+            Definition at line <a href="file/symbols/TemplateSymbol.hpp_B707BFE8E5388AED663582828AF5308329BEBCEA.html#22">22</a>
              of <a href="file/symbols/TemplateSymbol.hpp_B707BFE8E5388AED663582828AF5308329BEBCEA.html">TemplateSymbol.hpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">20</span>&nbsp;<span class="other">{</span>&nbsp;<span class="identifier">Assert</span><span class="other">(</span><span class="kw">false</span><span class="other">,&nbsp;</span><span class="string">"tried&nbsp;to&nbsp;create&nbsp;defualt&nbsp;ir&nbsp;value&nbsp;of&nbsp;template&nbsp;parameter"</span><span class="other">)</span><span class="other">;</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">nullptr</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">22</span>&nbsp;<span class="other">{</span>&nbsp;<span class="identifier">Assert</span><span class="other">(</span><span class="kw">false</span><span class="other">,&nbsp;</span><span class="string">"tried&nbsp;to&nbsp;create&nbsp;defualt&nbsp;ir&nbsp;value&nbsp;of&nbsp;template&nbsp;parameter"</span><span class="other">)</span><span class="other">;</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">nullptr</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
@@ -192,20 +233,54 @@
         <br/>
         <br/>
         <hr/>
-        <h3 id="function_DefaultStr_7A6FAE756044D1BEE85444FEF230039204BBC803">DefaultStr Member Function</h3>
+        <h3 id="function_DefaultType_988E5B0B1568EE3A55BCA3BFC72A001054A84A59">DefaultType Member Function</h3>
         <h4>
-            <span class="kw">const </span>
-            std::string&amp; cmajor::symbols::TemplateParameterSymbol::DefaultStr() <span class="kw">const</span>
-        </h4>
+            <a href="class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html">TypeSymbol</a>
+            * cmajor::symbols::TemplateParameterSymbol::DefaultType()</h4>
         <span>
-            Definition at line <a href="file/symbols/TemplateSymbol.hpp_B707BFE8E5388AED663582828AF5308329BEBCEA.html#26">26</a>
+            Definition at line <a href="file/symbols/TemplateSymbol.hpp_B707BFE8E5388AED663582828AF5308329BEBCEA.html#28">28</a>
              of <a href="file/symbols/TemplateSymbol.hpp_B707BFE8E5388AED663582828AF5308329BEBCEA.html">TemplateSymbol.hpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">26</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">defaultStr</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">28</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">defaultType</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
+        <br/>
+        <hr/>
+        <h3 id="function_EmplaceType_EE28FADA2EC904955787CFBA148AEC292F0B263C">EmplaceType Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             cmajor::symbols::TemplateParameterSymbol::EmplaceType(<a href="class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html">TypeSymbol</a>
+            * typeSymbol, <span class="kw">int</span>
+             index) <span class="kw">override</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/symbols/TemplateSymbol.cpp_8E894CC7DE88DEE844CE62F85CE4D1222063F281.html#53">53</a>
+             of <a href="file/symbols/TemplateSymbol.cpp_8E894CC7DE88DEE844CE62F85CE4D1222063F281.html">TemplateSymbol.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;54</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;55</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">Assert</span><span class="other">(</span><span class="identifier">index</span><span class="other">&nbsp;==&nbsp;</span><span class="other">0</span><span class="other">,&nbsp;</span><span class="string">"invalid&nbsp;emplace&nbsp;type&nbsp;index"</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;56</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="class_TemplateParameterSymbol_E40C8C6A1A16CD38F979FFEC21EFECE32E4417BC.html#variable_defaultType_CAAB79F8788F36B7121117674041E304E40EF0B4">defaultType</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">typeSymbol</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;57</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/symbols/TemplateSymbol.hpp_B707BFE8E5388AED663582828AF5308329BEBCEA.html#19">19</a>
+             of <a href="file/symbols/TemplateSymbol.hpp_B707BFE8E5388AED663582828AF5308329BEBCEA.html">TemplateSymbol.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Base class overridden functions: <a href="class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_EmplaceType_381EEB3F286AECF197DBEFB609B8ACFB2C763363">cmajor::symbols::Symbol::EmplaceType</a>
+        </span>
+        <br/>
         <br/>
         <hr/>
         <h3 id="function_FullName_925851AB8E6D65C104A0466B8E465341E30CEFA9">FullName Member Function</h3>
@@ -234,11 +309,11 @@
              cmajor::symbols::TemplateParameterSymbol::HasDefault() <span class="kw">const</span>
         </h4>
         <span>
-            Definition at line <a href="file/symbols/TemplateSymbol.hpp_B707BFE8E5388AED663582828AF5308329BEBCEA.html#23">23</a>
+            Definition at line <a href="file/symbols/TemplateSymbol.hpp_B707BFE8E5388AED663582828AF5308329BEBCEA.html#25">25</a>
              of <a href="file/symbols/TemplateSymbol.hpp_B707BFE8E5388AED663582828AF5308329BEBCEA.html">TemplateSymbol.hpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">23</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">hasDefault</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">25</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">hasDefault</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
@@ -254,11 +329,11 @@
             std::u32string cmajor::symbols::TemplateParameterSymbol::Info() <span class="kw">const override</span>
         </h4>
         <span>
-            Definition at line <a href="file/symbols/TemplateSymbol.hpp_B707BFE8E5388AED663582828AF5308329BEBCEA.html#28">28</a>
+            Definition at line <a href="file/symbols/TemplateSymbol.hpp_B707BFE8E5388AED663582828AF5308329BEBCEA.html#30">30</a>
              of <a href="file/symbols/TemplateSymbol.hpp_B707BFE8E5388AED663582828AF5308329BEBCEA.html">TemplateSymbol.hpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">28</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">Name</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">30</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">Name</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
@@ -275,11 +350,11 @@
             &amp; emitter) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/symbols/TemplateSymbol.hpp_B707BFE8E5388AED663582828AF5308329BEBCEA.html#19">19</a>
+            Definition at line <a href="file/symbols/TemplateSymbol.hpp_B707BFE8E5388AED663582828AF5308329BEBCEA.html#21">21</a>
              of <a href="file/symbols/TemplateSymbol.hpp_B707BFE8E5388AED663582828AF5308329BEBCEA.html">TemplateSymbol.hpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">19</span>&nbsp;<span class="other">{</span>&nbsp;<span class="identifier">Assert</span><span class="other">(</span><span class="kw">false</span><span class="other">,&nbsp;</span><span class="string">"tried&nbsp;to&nbsp;get&nbsp;ir&nbsp;type&nbsp;of&nbsp;template&nbsp;parameter"</span><span class="other">)</span><span class="other">;</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">nullptr</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">21</span>&nbsp;<span class="other">{</span>&nbsp;<span class="identifier">Assert</span><span class="other">(</span><span class="kw">false</span><span class="other">,&nbsp;</span><span class="string">"tried&nbsp;to&nbsp;get&nbsp;ir&nbsp;type&nbsp;of&nbsp;template&nbsp;parameter"</span><span class="other">)</span><span class="other">;</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">nullptr</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
@@ -296,27 +371,8 @@
              cmajor::symbols::TemplateParameterSymbol::Read(<a href="class_SymbolReader_EB36ADE3BE82C48FB57873005D5A7206C8D9F6E8.html">SymbolReader</a>
             &amp; reader)</h4>
         <span>
-            Definition at line <a href="file/symbols/TemplateSymbol.cpp_8E894CC7DE88DEE844CE62F85CE4D1222063F281.html#31">31</a>
+            Definition at line <a href="file/symbols/TemplateSymbol.cpp_8E894CC7DE88DEE844CE62F85CE4D1222063F281.html#38">38</a>
              of <a href="file/symbols/TemplateSymbol.cpp_8E894CC7DE88DEE844CE62F85CE4D1222063F281.html">TemplateSymbol.cpp</a>
-            :<br/>
-            <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">32</span>&nbsp;<span class="other">{</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">33</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html">TypeSymbol</a><span class="other">::</span><a href="class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html#function_Read_D9B8DBEE11EC80B0467CD63A91B59813230E76DA">Read</a><span class="other">(</span><span class="identifier">reader</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">34</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="class_TemplateParameterSymbol_E40C8C6A1A16CD38F979FFEC21EFECE32E4417BC.html#variable_hasDefault_B767A4AD83E905355AB348E32A6B0377ABA5F23E">hasDefault</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">reader</span><span class="other">.</span><a href="class_SymbolReader_EB36ADE3BE82C48FB57873005D5A7206C8D9F6E8.html#function_GetBinaryReader_09806EC47DD0DB222D693F04AF043F0FEBBC6EB0">GetBinaryReader</a><span class="other">(</span><span class="other">)</span><span class="other">.</span><a href="class_BinaryReader_03B69C4712E895798960F755025292754AFB8DDD.html#function_ReadBool_AF9E7BF9BFA9599690F086031FE3AB89ED7F6DEA">ReadBool</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">35</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><a href="class_TemplateParameterSymbol_E40C8C6A1A16CD38F979FFEC21EFECE32E4417BC.html#variable_hasDefault_B767A4AD83E905355AB348E32A6B0377ABA5F23E">hasDefault</a><span class="other">)</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">36</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">37</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="class_TemplateParameterSymbol_E40C8C6A1A16CD38F979FFEC21EFECE32E4417BC.html#variable_defaultStr_E2EDB02EC7A21AC0EF3C8F7134AAD7FDA2224A1C">defaultStr</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">reader</span><span class="other">.</span><a href="class_SymbolReader_EB36ADE3BE82C48FB57873005D5A7206C8D9F6E8.html#function_GetBinaryReader_09806EC47DD0DB222D693F04AF043F0FEBBC6EB0">GetBinaryReader</a><span class="other">(</span><span class="other">)</span><span class="other">.</span><a href="class_BinaryReader_03B69C4712E895798960F755025292754AFB8DDD.html#function_ReadUtf8String_CF66D1DB2EC285A3352E4AC37993629AF8A7EC78">ReadUtf8String</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">38</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">39</span>&nbsp;<span class="other">}</span></span>
-            </span>
-            <br/>
         </span>
         <br/>
         <span>
@@ -329,38 +385,28 @@
             Calls: <a href="class_SymbolReader_EB36ADE3BE82C48FB57873005D5A7206C8D9F6E8.html#function_GetBinaryReader_09806EC47DD0DB222D693F04AF043F0FEBBC6EB0">cmajor::symbols::SymbolReader::GetBinaryReader</a>
             , <a href="class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html#function_Read_D9B8DBEE11EC80B0467CD63A91B59813230E76DA">cmajor::symbols::TypeSymbol::Read</a>
             , <a href="class_BinaryReader_03B69C4712E895798960F755025292754AFB8DDD.html#function_ReadBool_AF9E7BF9BFA9599690F086031FE3AB89ED7F6DEA">cmajor::util::BinaryReader::ReadBool</a>
-            , <a href="class_BinaryReader_03B69C4712E895798960F755025292754AFB8DDD.html#function_ReadUtf8String_CF66D1DB2EC285A3352E4AC37993629AF8A7EC78">cmajor::util::BinaryReader::ReadUtf8String</a>
+            , <a href="class_BinaryReader_03B69C4712E895798960F755025292754AFB8DDD.html#function_ReadUuid_A35BC9BB22ACA63C55DB96A29D90FD0C9A0FB89F">cmajor::util::BinaryReader::ReadUuid</a>
         </span>
         <br/>
         <br/>
         <hr/>
-        <h3 id="function_SetDefaultStr_C8686EC6C11681FEEDE29E01145F17C879591BE4">SetDefaultStr Member Function</h3>
+        <h3 id="function_SetDefaultType_2BE333EC3E6175FF1CFBD73E8F1F52F411ABB4B1">SetDefaultType Member Function</h3>
         <h4>
             <span class="kw">void</span>
-             cmajor::symbols::TemplateParameterSymbol::SetDefaultStr(<span class="kw">const </span>
-            std::string&amp; defaultStr_)</h4>
+             cmajor::symbols::TemplateParameterSymbol::SetDefaultType(<a href="class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html">TypeSymbol</a>
+            * defaultType_)</h4>
         <span>
-            Definition at line <a href="file/symbols/TemplateSymbol.cpp_8E894CC7DE88DEE844CE62F85CE4D1222063F281.html#46">46</a>
-             of <a href="file/symbols/TemplateSymbol.cpp_8E894CC7DE88DEE844CE62F85CE4D1222063F281.html">TemplateSymbol.cpp</a>
+            Definition at line <a href="file/symbols/TemplateSymbol.hpp_B707BFE8E5388AED663582828AF5308329BEBCEA.html#27">27</a>
+             of <a href="file/symbols/TemplateSymbol.hpp_B707BFE8E5388AED663582828AF5308329BEBCEA.html">TemplateSymbol.hpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">47</span>&nbsp;<span class="other">{</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">48</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="class_TemplateParameterSymbol_E40C8C6A1A16CD38F979FFEC21EFECE32E4417BC.html#variable_defaultStr_E2EDB02EC7A21AC0EF3C8F7134AAD7FDA2224A1C">defaultStr</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">defaultStr_</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">49</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">27</span>&nbsp;<span class="other">{</span>&nbsp;<span class="identifier">defaultType</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">defaultType_</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/symbols/TemplateSymbol.hpp_B707BFE8E5388AED663582828AF5308329BEBCEA.html#25">25</a>
-             of <a href="file/symbols/TemplateSymbol.hpp_B707BFE8E5388AED663582828AF5308329BEBCEA.html">TemplateSymbol.hpp</a>
-        </span>
-        <br/>
-        <br/>
-        <span>
-            Called by: <a href="class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_AddTemplateParameter_D2EC88CE0BE51B29D6105637EEA7FEA652E5E733">cmajor::symbols::SymbolTable::AddTemplateParameter</a>
+            Called by: <a href="class_ClassTemplateRepository_8091371C094F17B8769F636AA4554A153D57D624.html#function_BindClassTemplateSpecialization_238B5CF0803BF96EA805048B5EB8EDD47E75143B">cmajor::binder::ClassTemplateRepository::BindClassTemplateSpecialization</a>
         </span>
         <br/>
         <br/>
@@ -370,11 +416,11 @@
             <span class="kw">void</span>
              cmajor::symbols::TemplateParameterSymbol::SetHasDefault()</h4>
         <span>
-            Definition at line <a href="file/symbols/TemplateSymbol.hpp_B707BFE8E5388AED663582828AF5308329BEBCEA.html#24">24</a>
+            Definition at line <a href="file/symbols/TemplateSymbol.hpp_B707BFE8E5388AED663582828AF5308329BEBCEA.html#26">26</a>
              of <a href="file/symbols/TemplateSymbol.hpp_B707BFE8E5388AED663582828AF5308329BEBCEA.html">TemplateSymbol.hpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">24</span>&nbsp;<span class="other">{</span>&nbsp;<span class="identifier">hasDefault</span><span class="other">&nbsp;=&nbsp;</span><span class="kw">true</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">26</span>&nbsp;<span class="other">{</span>&nbsp;<span class="identifier">hasDefault</span><span class="other">&nbsp;=&nbsp;</span><span class="kw">true</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
@@ -394,21 +440,21 @@
             &amp; span) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/symbols/TemplateSymbol.cpp_8E894CC7DE88DEE844CE62F85CE4D1222063F281.html#41">41</a>
+            Definition at line <a href="file/symbols/TemplateSymbol.cpp_8E894CC7DE88DEE844CE62F85CE4D1222063F281.html#75">75</a>
              of <a href="file/symbols/TemplateSymbol.cpp_8E894CC7DE88DEE844CE62F85CE4D1222063F281.html">TemplateSymbol.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">42</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;76</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">43</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">type</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;77</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">type</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">44</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;78</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/symbols/TemplateSymbol.hpp_B707BFE8E5388AED663582828AF5308329BEBCEA.html#21">21</a>
+            Declaration at line <a href="file/symbols/TemplateSymbol.hpp_B707BFE8E5388AED663582828AF5308329BEBCEA.html#23">23</a>
              of <a href="file/symbols/TemplateSymbol.hpp_B707BFE8E5388AED663582828AF5308329BEBCEA.html">TemplateSymbol.hpp</a>
         </span>
         <br/>
@@ -431,12 +477,12 @@
             &amp; span) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/symbols/TemplateSymbol.cpp_8E894CC7DE88DEE844CE62F85CE4D1222063F281.html#51">51</a>
+            Definition at line <a href="file/symbols/TemplateSymbol.cpp_8E894CC7DE88DEE844CE62F85CE4D1222063F281.html#80">80</a>
              of <a href="file/symbols/TemplateSymbol.cpp_8E894CC7DE88DEE844CE62F85CE4D1222063F281.html">TemplateSymbol.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/symbols/TemplateSymbol.hpp_B707BFE8E5388AED663582828AF5308329BEBCEA.html#27">27</a>
+            Declaration at line <a href="file/symbols/TemplateSymbol.hpp_B707BFE8E5388AED663582828AF5308329BEBCEA.html#29">29</a>
              of <a href="file/symbols/TemplateSymbol.hpp_B707BFE8E5388AED663582828AF5308329BEBCEA.html">TemplateSymbol.hpp</a>
         </span>
         <br/>
@@ -453,27 +499,8 @@
              cmajor::symbols::TemplateParameterSymbol::Write(<a href="class_SymbolWriter_D66E3D6D7FC4C00C3A549FA3B321F027EF774457.html">SymbolWriter</a>
             &amp; writer)</h4>
         <span>
-            Definition at line <a href="file/symbols/TemplateSymbol.cpp_8E894CC7DE88DEE844CE62F85CE4D1222063F281.html#21">21</a>
+            Definition at line <a href="file/symbols/TemplateSymbol.cpp_8E894CC7DE88DEE844CE62F85CE4D1222063F281.html#23">23</a>
              of <a href="file/symbols/TemplateSymbol.cpp_8E894CC7DE88DEE844CE62F85CE4D1222063F281.html">TemplateSymbol.cpp</a>
-            :<br/>
-            <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">22</span>&nbsp;<span class="other">{</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">23</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html">TypeSymbol</a><span class="other">::</span><a href="class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html#function_Write_94377285E038CE6BA0FDE7EBE4C9667A1D0A6472">Write</a><span class="other">(</span><span class="identifier">writer</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">24</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">writer</span><span class="other">.</span><a href="class_SymbolWriter_D66E3D6D7FC4C00C3A549FA3B321F027EF774457.html#function_GetBinaryWriter_E1AE148B2A718F9C2BB34E5FF9BE4C500E3C9F67">GetBinaryWriter</a><span class="other">(</span><span class="other">)</span><span class="other">.</span><a href="class_BinaryWriter_C63D48852BF8E92E7FD58CF0C72DEA2D09A302B4.html#function_Write_F862555C93905FC6F4B920FA221EB6ADCA8F0F93">Write</a><span class="other">(</span><a href="class_TemplateParameterSymbol_E40C8C6A1A16CD38F979FFEC21EFECE32E4417BC.html#variable_hasDefault_B767A4AD83E905355AB348E32A6B0377ABA5F23E">hasDefault</a><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">25</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><a href="class_TemplateParameterSymbol_E40C8C6A1A16CD38F979FFEC21EFECE32E4417BC.html#variable_hasDefault_B767A4AD83E905355AB348E32A6B0377ABA5F23E">hasDefault</a><span class="other">)</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">26</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">27</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">writer</span><span class="other">.</span><a href="class_SymbolWriter_D66E3D6D7FC4C00C3A549FA3B321F027EF774457.html#function_GetBinaryWriter_E1AE148B2A718F9C2BB34E5FF9BE4C500E3C9F67">GetBinaryWriter</a><span class="other">(</span><span class="other">)</span><span class="other">.</span><a href="class_BinaryWriter_C63D48852BF8E92E7FD58CF0C72DEA2D09A302B4.html#function_Write_2F2F77F867664B2861B21C7832DF74F6845A51D8">Write</a><span class="other">(</span><a href="class_TemplateParameterSymbol_E40C8C6A1A16CD38F979FFEC21EFECE32E4417BC.html#variable_defaultStr_E2EDB02EC7A21AC0EF3C8F7134AAD7FDA2224A1C">defaultStr</a><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">28</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">29</span>&nbsp;<span class="other">}</span></span>
-            </span>
-            <br/>
         </span>
         <br/>
         <span>
@@ -484,9 +511,10 @@
         <br/>
         <span>
             Calls: <a href="class_SymbolWriter_D66E3D6D7FC4C00C3A549FA3B321F027EF774457.html#function_GetBinaryWriter_E1AE148B2A718F9C2BB34E5FF9BE4C500E3C9F67">cmajor::symbols::SymbolWriter::GetBinaryWriter</a>
+            , <a href="class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html#function_TypeId_E2CB67BF95F64693CD008DF2DB02CFAB8C67D033">cmajor::symbols::TypeSymbol::TypeId</a>
             , <a href="class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html#function_Write_94377285E038CE6BA0FDE7EBE4C9667A1D0A6472">cmajor::symbols::TypeSymbol::Write</a>
-            , <a href="class_BinaryWriter_C63D48852BF8E92E7FD58CF0C72DEA2D09A302B4.html#function_Write_2F2F77F867664B2861B21C7832DF74F6845A51D8">cmajor::util::BinaryWriter::Write</a>
             , <a href="class_BinaryWriter_C63D48852BF8E92E7FD58CF0C72DEA2D09A302B4.html#function_Write_F862555C93905FC6F4B920FA221EB6ADCA8F0F93">cmajor::util::BinaryWriter::Write</a>
+            , <a href="class_BinaryWriter_C63D48852BF8E92E7FD58CF0C72DEA2D09A302B4.html#function_Write_004916D9D5290AB2DDD155804720C5544C46FF5E">cmajor::util::BinaryWriter::Write</a>
         </span>
         <br/>
         <br/>

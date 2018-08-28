@@ -46,7 +46,7 @@
             </tr>
             <tr>
                 <td class="functionTableFirstCol" xml:space="preserve"><a href="class_NamespaceSymbol_BCCF6423401B565F4ACE6EB96887A998E2535933.html">NamespaceSymbol</a>*</td>
-                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_ContainerScope_868483F636E19113CC59067DD8B70247AA7D81F2.html#function_CreateNamespace_0BE7229B57AB0A668EAC6CBA22FD19863BF5C604">CreateNamespace</a>(<span class="kw">const </span>std::u32string&amp; qualifiedNsName, <span class="kw">const </span><a href="class_Span_9CED8370AAA8B01E09FBC8A63AD262084B91FD78.html">Span</a>&amp; span)</td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_ContainerScope_868483F636E19113CC59067DD8B70247AA7D81F2.html#function_CreateNamespace_1CCF8ECC3CF5B3104A6A8FB0DB522CE576DB8CF9">CreateNamespace</a>(<span class="kw">const </span>std::u32string&amp; qualifiedNsName, <span class="kw">const </span><a href="class_Span_9CED8370AAA8B01E09FBC8A63AD262084B91FD78.html">Span</a>&amp; span, <a href="class_Module_A2BC96D600A4B3135D7F5444EC360BBF9EA9DDF4.html">Module</a>* originalModule)</td>
             </tr>
             <tr>
                 <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
@@ -191,7 +191,7 @@
              scopeLookup, std::unordered_set&lt;<a href="class_FunctionSymbol_5AC1C26A9572181B3E31247997BF40453B22EDEF.html">FunctionSymbol</a>
             *>&amp; viableFunctions)</h4>
         <span>
-            Definition at line <a href="file/symbols/Scope.cpp_51C3A67B2F631EDB07520DD023C0AB518A3CBE1E.html#298">298</a>
+            Definition at line <a href="file/symbols/Scope.cpp_51C3A67B2F631EDB07520DD023C0AB518A3CBE1E.html#299">299</a>
              of <a href="file/symbols/Scope.cpp_51C3A67B2F631EDB07520DD023C0AB518A3CBE1E.html">Scope.cpp</a>
         </span>
         <br/>
@@ -232,21 +232,22 @@
         </span>
         <br/>
         <span>
-            Called by: <a href="class_StatementBinder_9ABCC30A844E1A4C1BE61777BAAE98FBBA33A6BD.html#function_Visit_55E15A29C4EE14DF355CC37DA1961B5F850B892C">cmajor::binder::StatementBinder::Visit</a>
+            Called by: <a href="class_StatementBinder_9ABCC30A844E1A4C1BE61777BAAE98FBBA33A6BD.html#function_Visit_DA01112DECF98A0EBC508B95BEF33D58A8D67935">cmajor::binder::StatementBinder::Visit</a>
+            , <a href="class_StatementBinder_9ABCC30A844E1A4C1BE61777BAAE98FBBA33A6BD.html#function_Visit_55E15A29C4EE14DF355CC37DA1961B5F850B892C">cmajor::binder::StatementBinder::Visit</a>
             , <a href="class_StatementBinder_9ABCC30A844E1A4C1BE61777BAAE98FBBA33A6BD.html#function_Visit_C9CEF7092632A24724FA030FC38466F74F34D890">cmajor::binder::StatementBinder::Visit</a>
-            , <a href="class_StatementBinder_9ABCC30A844E1A4C1BE61777BAAE98FBBA33A6BD.html#function_Visit_DA01112DECF98A0EBC508B95BEF33D58A8D67935">cmajor::binder::StatementBinder::Visit</a>
             , <a href="class_StatementBinder_9ABCC30A844E1A4C1BE61777BAAE98FBBA33A6BD.html#function_Visit_DF3F4CA03D0DE0E6164D22379254B1323300132A">cmajor::binder::StatementBinder::Visit</a>
         </span>
         <br/>
         <br/>
         <hr/>
-        <h3 id="function_CreateNamespace_0BE7229B57AB0A668EAC6CBA22FD19863BF5C604">CreateNamespace Member Function</h3>
+        <h3 id="function_CreateNamespace_1CCF8ECC3CF5B3104A6A8FB0DB522CE576DB8CF9">CreateNamespace Member Function</h3>
         <h4>
             <a href="class_NamespaceSymbol_BCCF6423401B565F4ACE6EB96887A998E2535933.html">NamespaceSymbol</a>
             * cmajor::symbols::ContainerScope::CreateNamespace(<span class="kw">const </span>
             std::u32string&amp; qualifiedNsName, <span class="kw">const </span>
             <a href="class_Span_9CED8370AAA8B01E09FBC8A63AD262084B91FD78.html">Span</a>
-            &amp; span)</h4>
+            &amp; span, <a href="class_Module_A2BC96D600A4B3135D7F5444EC360BBF9EA9DDF4.html">Module</a>
+            * originalModule)</h4>
         <span>
             Definition at line <a href="file/symbols/Scope.cpp_51C3A67B2F631EDB07520DD023C0AB518A3CBE1E.html#264">264</a>
              of <a href="file/symbols/Scope.cpp_51C3A67B2F631EDB07520DD023C0AB518A3CBE1E.html">Scope.cpp</a>
@@ -266,6 +267,7 @@
             , <a href="class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_GetSymbolType_DC14618DCD6070C58A1E8334ED8F05B32F71404F">cmajor::symbols::Symbol::GetSymbolType</a>
             , <a href="class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_Name_B1480E10752EECD29D1579EE62AEED3A43C9D1D8">cmajor::symbols::Symbol::Name</a>
             , <a href="class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_SetModule_3CF37995B2B9354D6CE23CD89874D94D263A2CC3">cmajor::symbols::Symbol::SetModule</a>
+            , <a href="class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_SetOriginalModule_2822640A6AE91669AD1DCCDB9B06F5A9AB0A9B43">cmajor::symbols::Symbol::SetOriginalModule</a>
             , <a href="class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_SetSymbolTable_959C0BCE2D6378EB4C3999E747E26455FD3F2F09">cmajor::symbols::Symbol::SetSymbolTable</a>
             , <a href="namespace_unicode_D131AC361BE7AF8963CBA33354DF05CBDF4ACED4.html#function_ToUtf8_CE171AFE713714F8EFD0802426E947F0026FCAFF">cmajor::unicode::ToUtf8</a>
         </span>
@@ -300,11 +302,12 @@
         <br/>
         <span>
             Called by: <a href="namespace_binder_C711B7605339DC3A9E128C1E622E7D9A4629C97D.html#function_CheckConstraint_655082791242B4143BE93249845C456A922C95F1">cmajor::binder::CheckConstraint</a>
+            , <a href="class_ClassTemplateRepository_8091371C094F17B8769F636AA4554A153D57D624.html#function_BindClassTemplateSpecialization_238B5CF0803BF96EA805048B5EB8EDD47E75143B">cmajor::binder::ClassTemplateRepository::BindClassTemplateSpecialization</a>
             , <a href="class_ClassTemplateRepository_8091371C094F17B8769F636AA4554A153D57D624.html#function_ResolveDefaultTemplateArguments_C00A91B26920D67E87A12238A458E717A6EF2682">cmajor::binder::ClassTemplateRepository::ResolveDefaultTemplateArguments</a>
             , <a href="class_ConstraintChecker_8FE36C1E71A68A6FE42B5D8757398247B1B2B476.html#function_Visit_5C3A039A13DEFC0C952375ECFDD522713037EDFF">cmajor::binder::ConstraintChecker::Visit</a>
-            , <a href="class_ConstraintChecker_8FE36C1E71A68A6FE42B5D8757398247B1B2B476.html#function_Visit_5B1C6F56565591EE0A70B3610E05B21A9CBE486B">cmajor::binder::ConstraintChecker::Visit</a>
             , <a href="class_ConstraintChecker_8FE36C1E71A68A6FE42B5D8757398247B1B2B476.html#function_Visit_FF2073F2FBAF9C1863FC6F32D811505409B092C3">cmajor::binder::ConstraintChecker::Visit</a>
             , <a href="class_ConstraintChecker_8FE36C1E71A68A6FE42B5D8757398247B1B2B476.html#function_Visit_E5380947D641A0D1D5665C7CB94AB7B60A63B583">cmajor::binder::ConstraintChecker::Visit</a>
+            , <a href="class_ConstraintChecker_8FE36C1E71A68A6FE42B5D8757398247B1B2B476.html#function_Visit_5B1C6F56565591EE0A70B3610E05B21A9CBE486B">cmajor::binder::ConstraintChecker::Visit</a>
             , <a href="namespace_binder_C711B7605339DC3A9E128C1E622E7D9A4629C97D.html#function_Instantiate_B7FA9D881C5330BF6EBCD896BA4A4692D33F1D50">cmajor::binder::Instantiate</a>
             , <a href="class_ContainerSymbol_4B08BF3CBF422A1BDE2F14FAEAF47E262AA566CC.html#function_AddMember_7ED2773A3DF02A27462DB02BB4DC607726862F86">cmajor::symbols::ContainerSymbol::AddMember</a>
         </span>
@@ -352,7 +355,7 @@
             , <a href="class_ExpressionBinder_C0C9CF3C7A3FAD1C9CAD7E66177E8932F8FC37BD.html#function_Visit_EBC8BFA0AF47DC0D2BF617D70130D4485BAA7E79">cmajor::binder::ExpressionBinder::Visit</a>
             , <a href="namespace_binder_C711B7605339DC3A9E128C1E622E7D9A4629C97D.html#function_Instantiate_B7FA9D881C5330BF6EBCD896BA4A4692D33F1D50">cmajor::binder::Instantiate</a>
             , <a href="class_ContainerScope_868483F636E19113CC59067DD8B70247AA7D81F2.html#function_CollectViableFunctions_4A63675C561CEE4EA9269109DFF22587A3A0FDA5">cmajor::symbols::ContainerScope::CollectViableFunctions</a>
-            , <a href="class_ContainerScope_868483F636E19113CC59067DD8B70247AA7D81F2.html#function_CreateNamespace_0BE7229B57AB0A668EAC6CBA22FD19863BF5C604">cmajor::symbols::ContainerScope::CreateNamespace</a>
+            , <a href="class_ContainerScope_868483F636E19113CC59067DD8B70247AA7D81F2.html#function_CreateNamespace_1CCF8ECC3CF5B3104A6A8FB0DB522CE576DB8CF9">cmajor::symbols::ContainerScope::CreateNamespace</a>
             , <a href="class_ContainerSymbol_4B08BF3CBF422A1BDE2F14FAEAF47E262AA566CC.html#function_MakeClassGroupTypeSymbol_1DD485F005A1F651B6394DE34B7ED8B030514394">cmajor::symbols::ContainerSymbol::MakeClassGroupTypeSymbol</a>
             , <a href="class_ContainerSymbol_4B08BF3CBF422A1BDE2F14FAEAF47E262AA566CC.html#function_MakeConceptGroupSymbol_C2313DB6526A94986C642DF2C19B14E88F7B25B3">cmajor::symbols::ContainerSymbol::MakeConceptGroupSymbol</a>
             , <a href="class_ContainerSymbol_4B08BF3CBF422A1BDE2F14FAEAF47E262AA566CC.html#function_MakeFunctionGroupSymbol_0CE52F32609F403C480D245B5452E5C3E329A91D">cmajor::symbols::ContainerSymbol::MakeFunctionGroupSymbol</a>
@@ -392,8 +395,8 @@
         <br/>
         <br/>
         <span>
-            Called by: <a href="class_ConceptIdResolver_8C3A0B51E1DF8684456352D17C0F3D73E3CBD182.html#function_Visit_5C5DC03CCDD1235DDE19083095A39AA543F07EDE">cmajor::binder::ConceptIdResolver::Visit</a>
-            , <a href="class_ConceptIdResolver_8C3A0B51E1DF8684456352D17C0F3D73E3CBD182.html#function_Visit_C88BB47F0D03070C06A90E0577F03F160F7F9049">cmajor::binder::ConceptIdResolver::Visit</a>
+            Called by: <a href="class_ConceptIdResolver_8C3A0B51E1DF8684456352D17C0F3D73E3CBD182.html#function_Visit_C88BB47F0D03070C06A90E0577F03F160F7F9049">cmajor::binder::ConceptIdResolver::Visit</a>
+            , <a href="class_ConceptIdResolver_8C3A0B51E1DF8684456352D17C0F3D73E3CBD182.html#function_Visit_5C5DC03CCDD1235DDE19083095A39AA543F07EDE">cmajor::binder::ConceptIdResolver::Visit</a>
             , <a href="class_ConstraintChecker_8FE36C1E71A68A6FE42B5D8757398247B1B2B476.html#function_Visit_B11715529B9D521B43A9357B07A6F60D40959979">cmajor::binder::ConstraintChecker::Visit</a>
             , <a href="class_Evaluator_4B7670893CEE707FB594A365EDC98F228E04C2F5.html#function_Visit_0210107ED38ECE94DBC980E21895750D93CEB8DA">cmajor::binder::Evaluator::Visit</a>
             , <a href="class_ExpressionBinder_C0C9CF3C7A3FAD1C9CAD7E66177E8932F8FC37BD.html#function_BindArrow_BC06B07568E08920A0EB1BA9974633253B66BD4B">cmajor::binder::ExpressionBinder::BindArrow</a>
@@ -562,24 +565,25 @@
         <br/>
         <span>
             Called by: <a href="namespace_binder_C711B7605339DC3A9E128C1E622E7D9A4629C97D.html#function_CheckConstraint_655082791242B4143BE93249845C456A922C95F1">cmajor::binder::CheckConstraint</a>
+            , <a href="class_ClassTemplateRepository_8091371C094F17B8769F636AA4554A153D57D624.html#function_BindClassTemplateSpecialization_238B5CF0803BF96EA805048B5EB8EDD47E75143B">cmajor::binder::ClassTemplateRepository::BindClassTemplateSpecialization</a>
             , <a href="class_ClassTemplateRepository_8091371C094F17B8769F636AA4554A153D57D624.html#function_ResolveDefaultTemplateArguments_C00A91B26920D67E87A12238A458E717A6EF2682">cmajor::binder::ClassTemplateRepository::ResolveDefaultTemplateArguments</a>
             , <a href="namespace_binder_C711B7605339DC3A9E128C1E622E7D9A4629C97D.html#function_Instantiate_B7FA9D881C5330BF6EBCD896BA4A4692D33F1D50">cmajor::binder::Instantiate</a>
-            , <a href="class_ContainerScope_868483F636E19113CC59067DD8B70247AA7D81F2.html#function_CreateNamespace_0BE7229B57AB0A668EAC6CBA22FD19863BF5C604">cmajor::symbols::ContainerScope::CreateNamespace</a>
+            , <a href="class_ContainerScope_868483F636E19113CC59067DD8B70247AA7D81F2.html#function_CreateNamespace_1CCF8ECC3CF5B3104A6A8FB0DB522CE576DB8CF9">cmajor::symbols::ContainerScope::CreateNamespace</a>
             , <a href="class_ContainerScope_868483F636E19113CC59067DD8B70247AA7D81F2.html#function_Install_140A038AD599797EFE69488B2DB0C26EF7BCB29C">cmajor::symbols::ContainerScope::Install</a>
             , <a href="class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_BeginClass_49BD4B596A2106A75AAF22D992802CEFB4F8BE5B">cmajor::symbols::SymbolTable::BeginClass</a>
             , <a href="class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_BeginClassDelegate_4B514C2138BEFDD3C574E11A9E02ECA3BB7C8A47">cmajor::symbols::SymbolTable::BeginClassDelegate</a>
             , <a href="class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_BeginClassTemplateSpecialization_6768B40C9F35902ACC5C36FD5E2FE14E16B064A4">cmajor::symbols::SymbolTable::BeginClassTemplateSpecialization</a>
-            , <a href="class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_BeginConcept_353BB68AE6B3F8AEAE9789327690901CF6D8E743">cmajor::symbols::SymbolTable::BeginConcept</a>
-            , <a href="class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_BeginConstructor_48A115E5FBD8DF0FFA18353B1DB6E4FCD40AF234">cmajor::symbols::SymbolTable::BeginConstructor</a>
-            , <a href="class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_BeginConversionFunction_13A0765AC25023AF4A09CD07E521CB49BE491DA7">cmajor::symbols::SymbolTable::BeginConversionFunction</a>
+            , <a href="class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_BeginConcept_F8F9873E482B1BC993682AA53F4B7F89D94B1275">cmajor::symbols::SymbolTable::BeginConcept</a>
+            , <a href="class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_BeginConstructor_96913CBE05E7D69238E933ED4B33FE7131DCB373">cmajor::symbols::SymbolTable::BeginConstructor</a>
+            , <a href="class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_BeginConversionFunction_B149ECFB4ACACAC88A34D14B4DE826561D4A87DC">cmajor::symbols::SymbolTable::BeginConversionFunction</a>
             , <a href="class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_BeginDeclarationBlock_B6B09DE777B92C2DB0D428DF5242D7E70F57748A">cmajor::symbols::SymbolTable::BeginDeclarationBlock</a>
             , <a href="class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_BeginDelegate_D639846957EDF5DE9846178405A893F8D1445D03">cmajor::symbols::SymbolTable::BeginDelegate</a>
-            , <a href="class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_BeginDestructor_1E011F6AAC505B0DDE27FD8A8E69A84A952062F7">cmajor::symbols::SymbolTable::BeginDestructor</a>
+            , <a href="class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_BeginDestructor_B8DF368155DEFFC6F3320C9B2AAE8649B39202C5">cmajor::symbols::SymbolTable::BeginDestructor</a>
             , <a href="class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_BeginEnumType_FC2D112CB98B10EB254EE97E2F403FC6DEE7B48C">cmajor::symbols::SymbolTable::BeginEnumType</a>
-            , <a href="class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_BeginFunction_3B25DAE48452065B1B991CCCDA26AC11936752C2">cmajor::symbols::SymbolTable::BeginFunction</a>
+            , <a href="class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_BeginFunction_7DF35938EE8B0CD5ADA352F998D3A5275A3D1813">cmajor::symbols::SymbolTable::BeginFunction</a>
             , <a href="class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_BeginInterface_8EBC0D6CD4221F285CB872AABF800217FE4F6F98">cmajor::symbols::SymbolTable::BeginInterface</a>
-            , <a href="class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_BeginMemberFunction_49AB1AE94620A8789041E40FB4CEE2C13FB09B81">cmajor::symbols::SymbolTable::BeginMemberFunction</a>
-            , <a href="class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_BeginStaticConstructor_410A2E4CCBB509DBEC83CA3E21060E2552437553">cmajor::symbols::SymbolTable::BeginStaticConstructor</a>
+            , <a href="class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_BeginMemberFunction_9642D5165A68646180B15C0EE34475874C26FF05">cmajor::symbols::SymbolTable::BeginMemberFunction</a>
+            , <a href="class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_BeginStaticConstructor_1B655D24F3E53FA272061E9548444CC99D27E8D0">cmajor::symbols::SymbolTable::BeginStaticConstructor</a>
         </span>
         <br/>
         <br/>

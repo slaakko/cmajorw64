@@ -40,12 +40,20 @@
                 <td class="functionTableSecondCol" xml:space="preserve"><a href="class_EnumTypeNode_EB3DCFB03130D09501A26B7E961147E44295542C.html#function_AddConstant_CFCF836C7A6A526D5929F3BACE8957A19D662D30">AddConstant</a>(<a href="class_EnumConstantNode_A8CEDBE294E0416F4002BF72AE276C4803A9FC8F.html">EnumConstantNode</a>* constant)</td>
             </tr>
             <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">const </span><a href="class_Span_9CED8370AAA8B01E09FBC8A63AD262084B91FD78.html">Span</a>&amp;</td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_EnumTypeNode_EB3DCFB03130D09501A26B7E961147E44295542C.html#function_BeginBraceSpan_E634A3E83AE6890B46729626E40064DEE5761D5D">BeginBraceSpan</a>() <span class="kw">const</span></td>
+            </tr>
+            <tr>
                 <td class="functionTableFirstCol" xml:space="preserve"><a href="class_Node_66FC1D6AD8F487E453CE6E17163479C7C2DAC063.html">Node</a>*</td>
                 <td class="functionTableSecondCol" xml:space="preserve"><a href="class_EnumTypeNode_EB3DCFB03130D09501A26B7E961147E44295542C.html#function_Clone_2C9678FDF0ED68B8B2EF8D51140709A438C696AA">Clone</a>(<a href="class_CloneContext_5E55B7AF2C2173E2EA60A2B86069816A9F0FB764.html">CloneContext</a>&amp; cloneContext) <span class="kw">const override</span></td>
             </tr>
             <tr>
                 <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">const </span><a href="class_NodeList_634CD2B65410966280F1AC27B3A570D065505ECD.html">NodeList</a>&lt;<a href="class_EnumConstantNode_A8CEDBE294E0416F4002BF72AE276C4803A9FC8F.html">EnumConstantNode</a>>&amp;</td>
                 <td class="functionTableSecondCol" xml:space="preserve"><a href="class_EnumTypeNode_EB3DCFB03130D09501A26B7E961147E44295542C.html#function_Constants_0E59AB779A9602A4A81AB6B5D69855071164F24B">Constants</a>() <span class="kw">const</span></td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">const </span><a href="class_Span_9CED8370AAA8B01E09FBC8A63AD262084B91FD78.html">Span</a>&amp;</td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_EnumTypeNode_EB3DCFB03130D09501A26B7E961147E44295542C.html#function_EndBraceSpan_E315208869BDF90A8D71D6A64B4BE977995C6836">EndBraceSpan</a>() <span class="kw">const</span></td>
             </tr>
             <tr>
                 <td class="functionTableFirstCol" xml:space="preserve"><a href="class_EnumConstantNode_A8CEDBE294E0416F4002BF72AE276C4803A9FC8F.html">EnumConstantNode</a>*</td>
@@ -69,6 +77,14 @@
             </tr>
             <tr>
                 <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_EnumTypeNode_EB3DCFB03130D09501A26B7E961147E44295542C.html#function_SetBeginBraceSpan_C0EAC63BAFB98E21229730F88B2BC669014CB899">SetBeginBraceSpan</a>(<span class="kw">const </span><a href="class_Span_9CED8370AAA8B01E09FBC8A63AD262084B91FD78.html">Span</a>&amp; beginBraceSpan_)</td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_EnumTypeNode_EB3DCFB03130D09501A26B7E961147E44295542C.html#function_SetEndBraceSpan_815B8232256122371435477ABE99D775CE39FF7E">SetEndBraceSpan</a>(<span class="kw">const </span><a href="class_Span_9CED8370AAA8B01E09FBC8A63AD262084B91FD78.html">Span</a>&amp; endBraceSpan_)</td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
                 <td class="functionTableSecondCol" xml:space="preserve"><a href="class_EnumTypeNode_EB3DCFB03130D09501A26B7E961147E44295542C.html#function_SetUnderlyingType_FFD010C1F1DF0E3BD37356F4FB1210BEF9385BD5">SetUnderlyingType</a>(<a href="class_Node_66FC1D6AD8F487E453CE6E17163479C7C2DAC063.html">Node</a>* underlyingType_)</td>
             </tr>
             <tr>
@@ -78,9 +94,17 @@
         </table>
         <h2>Member Variables</h2>
         <table>
+            <tr id="variable_beginBraceSpan_238B19AB10477DDCB2909B627EC4236157ED9B39">
+                <td class="functionTableFirstCol" xml:space="preserve"><a href="class_Span_9CED8370AAA8B01E09FBC8A63AD262084B91FD78.html">Span</a></td>
+                <td class="functionTableSecondCol" xml:space="preserve">beginBraceSpan</td>
+            </tr>
             <tr id="variable_constants_F4D42FE9FF1DF29F56105568EC242CB6E80A3E6C">
                 <td class="functionTableFirstCol" xml:space="preserve"><a href="class_NodeList_634CD2B65410966280F1AC27B3A570D065505ECD.html">NodeList</a>&lt;<a href="class_EnumConstantNode_A8CEDBE294E0416F4002BF72AE276C4803A9FC8F.html">EnumConstantNode</a>></td>
                 <td class="functionTableSecondCol" xml:space="preserve">constants</td>
+            </tr>
+            <tr id="variable_endBraceSpan_057C9923CD333F997CCFD8BE101031358C348A09">
+                <td class="functionTableFirstCol" xml:space="preserve"><a href="class_Span_9CED8370AAA8B01E09FBC8A63AD262084B91FD78.html">Span</a></td>
+                <td class="functionTableSecondCol" xml:space="preserve">endBraceSpan</td>
             </tr>
             <tr id="variable_id_2B05DF3C282291509CDB7D6AE25100822CA17477">
                 <td class="functionTableFirstCol" xml:space="preserve">std::unique_ptr&lt;<a href="class_IdentifierNode_4A1A7E3AFB614AEF7ED2B90309B9B619E86EE9E4.html">IdentifierNode</a>></td>
@@ -161,15 +185,15 @@
             &amp; visitor) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/ast/Enumeration.cpp_E0E3FE98C7E412E0B64072443F6866A356E29E69.html#36">36</a>
+            Definition at line <a href="file/ast/Enumeration.cpp_E0E3FE98C7E412E0B64072443F6866A356E29E69.html#38">38</a>
              of <a href="file/ast/Enumeration.cpp_E0E3FE98C7E412E0B64072443F6866A356E29E69.html">Enumeration.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;37</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;39</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;38</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">visitor</span><span class="other">.</span><a href="class_Visitor_72892152D0864AA2907A1FD60E7A49EB4E071AD6.html#function_Visit_739DBC3F8F1CEB55BF8FF0B2456A7D37767F79A3">Visit</a><span class="other">(</span><span class="other">*</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;40</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">visitor</span><span class="other">.</span><a href="class_Visitor_72892152D0864AA2907A1FD60E7A49EB4E071AD6.html#function_Visit_739DBC3F8F1CEB55BF8FF0B2456A7D37767F79A3">Visit</a><span class="other">(</span><span class="other">*</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;39</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;41</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
@@ -202,17 +226,17 @@
              cmajor::ast::EnumTypeNode::AddConstant(<a href="class_EnumConstantNode_A8CEDBE294E0416F4002BF72AE276C4803A9FC8F.html">EnumConstantNode</a>
             * constant)</h4>
         <span>
-            Definition at line <a href="file/ast/Enumeration.cpp_E0E3FE98C7E412E0B64072443F6866A356E29E69.html#68">68</a>
+            Definition at line <a href="file/ast/Enumeration.cpp_E0E3FE98C7E412E0B64072443F6866A356E29E69.html#74">74</a>
              of <a href="file/ast/Enumeration.cpp_E0E3FE98C7E412E0B64072443F6866A356E29E69.html">Enumeration.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;69</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;75</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;70</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">constant</span><span class="other">-></span><a href="class_Node_66FC1D6AD8F487E453CE6E17163479C7C2DAC063.html#function_SetParent_CD3943AE607DB9AF6545A90A2DD46A81177C36AF">SetParent</a><span class="other">(</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;76</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">constant</span><span class="other">-></span><a href="class_Node_66FC1D6AD8F487E453CE6E17163479C7C2DAC063.html#function_SetParent_CD3943AE607DB9AF6545A90A2DD46A81177C36AF">SetParent</a><span class="other">(</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;71</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="class_EnumTypeNode_EB3DCFB03130D09501A26B7E961147E44295542C.html#variable_constants_F4D42FE9FF1DF29F56105568EC242CB6E80A3E6C">constants</a><span class="other">.</span><span class="identifier">Add</span><span class="other">(</span><span class="identifier">constant</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;77</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="class_EnumTypeNode_EB3DCFB03130D09501A26B7E961147E44295542C.html#variable_constants_F4D42FE9FF1DF29F56105568EC242CB6E80A3E6C">constants</a><span class="other">.</span><span class="identifier">Add</span><span class="other">(</span><span class="identifier">constant</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;72</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;78</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
@@ -234,6 +258,23 @@
         <br/>
         <br/>
         <hr/>
+        <h3 id="function_BeginBraceSpan_E634A3E83AE6890B46729626E40064DEE5761D5D">BeginBraceSpan Member Function</h3>
+        <h4>
+            <span class="kw">const </span>
+            <a href="class_Span_9CED8370AAA8B01E09FBC8A63AD262084B91FD78.html">Span</a>
+            &amp; cmajor::ast::EnumTypeNode::BeginBraceSpan() <span class="kw">const</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/ast/Enumeration.hpp_F11EC32B1D656F2CA09A8EB8014712EDC5F590CE.html#34">34</a>
+             of <a href="file/ast/Enumeration.hpp_F11EC32B1D656F2CA09A8EB8014712EDC5F590CE.html">Enumeration.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">34</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">beginBraceSpan</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <hr/>
         <h3 id="function_Clone_2C9678FDF0ED68B8B2EF8D51140709A438C696AA">Clone Member Function</h3>
         <h4>
             <a href="class_Node_66FC1D6AD8F487E453CE6E17163479C7C2DAC063.html">Node</a>
@@ -243,27 +284,6 @@
         <span>
             Definition at line <a href="file/ast/Enumeration.cpp_E0E3FE98C7E412E0B64072443F6866A356E29E69.html#25">25</a>
              of <a href="file/ast/Enumeration.cpp_E0E3FE98C7E412E0B64072443F6866A356E29E69.html">Enumeration.cpp</a>
-            :<br/>
-            <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;26</span>&nbsp;<span class="other">{</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;27</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="class_EnumTypeNode_EB3DCFB03130D09501A26B7E961147E44295542C.html">EnumTypeNode</a><span class="other">*</span>&nbsp;<span class="identifier">clone</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">new&nbsp;</span><a href="class_EnumTypeNode_EB3DCFB03130D09501A26B7E961147E44295542C.html">EnumTypeNode</a><span class="other">(</span><span class="identifier">GetSpan</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="class_EnumTypeNode_EB3DCFB03130D09501A26B7E961147E44295542C.html#variable_specifiers_1E3A2E5C6161E89DB3E468A741F88990F91B38F1">specifiers</a><span class="other">,&nbsp;</span><span class="kw">static_cast</span><span class="other">&lt;</span><a href="class_IdentifierNode_4A1A7E3AFB614AEF7ED2B90309B9B619E86EE9E4.html">IdentifierNode</a><span class="other">*</span><span class="other">></span><span class="other">(</span><a href="class_EnumTypeNode_EB3DCFB03130D09501A26B7E961147E44295542C.html#variable_id_2B05DF3C282291509CDB7D6AE25100822CA17477">id</a><span class="other">-></span><a href="class_EnumTypeNode_EB3DCFB03130D09501A26B7E961147E44295542C.html#function_Clone_2C9678FDF0ED68B8B2EF8D51140709A438C696AA">Clone</a><span class="other">(</span><span class="identifier">cloneContext</span><span class="other">)</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;28</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">int</span>&nbsp;<span class="identifier">n</span>&nbsp;<span class="other">=</span>&nbsp;<a href="class_EnumTypeNode_EB3DCFB03130D09501A26B7E961147E44295542C.html#variable_constants_F4D42FE9FF1DF29F56105568EC242CB6E80A3E6C">constants</a><span class="other">.</span><span class="identifier">Count</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;29</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">for&nbsp;</span><span class="other">(</span><span class="kw">int</span>&nbsp;<span class="identifier">i</span>&nbsp;<span class="other">=</span>&nbsp;<span class="other">0</span><span class="other">;</span>&nbsp;<span class="identifier">i</span><span class="other">&nbsp;&lt;&nbsp;</span><span class="identifier">n</span><span class="other">;</span>&nbsp;<span class="other">++</span><span class="identifier">i</span><span class="other">)</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;30</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;31</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">clone</span><span class="other">-></span><a href="class_EnumTypeNode_EB3DCFB03130D09501A26B7E961147E44295542C.html#function_AddConstant_CFCF836C7A6A526D5929F3BACE8957A19D662D30">AddConstant</a><span class="other">(</span><span class="kw">static_cast</span><span class="other">&lt;</span><a href="class_EnumConstantNode_A8CEDBE294E0416F4002BF72AE276C4803A9FC8F.html">EnumConstantNode</a><span class="other">*</span><span class="other">></span><span class="other">(</span><a href="class_EnumTypeNode_EB3DCFB03130D09501A26B7E961147E44295542C.html#variable_constants_F4D42FE9FF1DF29F56105568EC242CB6E80A3E6C">constants</a><span class="other">[</span><span class="identifier">i</span><span class="other">]</span><span class="other">-></span><a href="class_EnumTypeNode_EB3DCFB03130D09501A26B7E961147E44295542C.html#function_Clone_2C9678FDF0ED68B8B2EF8D51140709A438C696AA">Clone</a><span class="other">(</span><span class="identifier">cloneContext</span><span class="other">)</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;32</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;33</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">clone</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;34</span>&nbsp;<span class="other">}</span></span>
-            </span>
-            <br/>
         </span>
         <br/>
         <span>
@@ -280,6 +300,8 @@
         <span>
             Calls: <a href="class_EnumTypeNode_EB3DCFB03130D09501A26B7E961147E44295542C.html#function_AddConstant_CFCF836C7A6A526D5929F3BACE8957A19D662D30">cmajor::ast::EnumTypeNode::AddConstant</a>
             , <a href="class_EnumTypeNode_EB3DCFB03130D09501A26B7E961147E44295542C.html#function_Clone_2C9678FDF0ED68B8B2EF8D51140709A438C696AA">cmajor::ast::EnumTypeNode::Clone</a>
+            , <a href="class_EnumTypeNode_EB3DCFB03130D09501A26B7E961147E44295542C.html#function_SetBeginBraceSpan_C0EAC63BAFB98E21229730F88B2BC669014CB899">cmajor::ast::EnumTypeNode::SetBeginBraceSpan</a>
+            , <a href="class_EnumTypeNode_EB3DCFB03130D09501A26B7E961147E44295542C.html#function_SetEndBraceSpan_815B8232256122371435477ABE99D775CE39FF7E">cmajor::ast::EnumTypeNode::SetEndBraceSpan</a>
         </span>
         <br/>
         <br/>
@@ -313,31 +335,48 @@
         <br/>
         <br/>
         <hr/>
+        <h3 id="function_EndBraceSpan_E315208869BDF90A8D71D6A64B4BE977995C6836">EndBraceSpan Member Function</h3>
+        <h4>
+            <span class="kw">const </span>
+            <a href="class_Span_9CED8370AAA8B01E09FBC8A63AD262084B91FD78.html">Span</a>
+            &amp; cmajor::ast::EnumTypeNode::EndBraceSpan() <span class="kw">const</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/ast/Enumeration.hpp_F11EC32B1D656F2CA09A8EB8014712EDC5F590CE.html#36">36</a>
+             of <a href="file/ast/Enumeration.hpp_F11EC32B1D656F2CA09A8EB8014712EDC5F590CE.html">Enumeration.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">36</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">endBraceSpan</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <hr/>
         <h3 id="function_GetLastConstant_6DC520E6EB492BCE6054503EC6AC518484F9D25E">GetLastConstant Member Function</h3>
         <h4>
             <a href="class_EnumConstantNode_A8CEDBE294E0416F4002BF72AE276C4803A9FC8F.html">EnumConstantNode</a>
             * cmajor::ast::EnumTypeNode::GetLastConstant() <span class="kw">const</span>
         </h4>
         <span>
-            Definition at line <a href="file/ast/Enumeration.cpp_E0E3FE98C7E412E0B64072443F6866A356E29E69.html#74">74</a>
+            Definition at line <a href="file/ast/Enumeration.cpp_E0E3FE98C7E412E0B64072443F6866A356E29E69.html#80">80</a>
              of <a href="file/ast/Enumeration.cpp_E0E3FE98C7E412E0B64072443F6866A356E29E69.html">Enumeration.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;75</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;81</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;76</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">int</span>&nbsp;<span class="identifier">n</span>&nbsp;<span class="other">=</span>&nbsp;<a href="class_EnumTypeNode_EB3DCFB03130D09501A26B7E961147E44295542C.html#variable_constants_F4D42FE9FF1DF29F56105568EC242CB6E80A3E6C">constants</a><span class="other">.</span><span class="identifier">Count</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;82</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">int</span>&nbsp;<span class="identifier">n</span>&nbsp;<span class="other">=</span>&nbsp;<a href="class_EnumTypeNode_EB3DCFB03130D09501A26B7E961147E44295542C.html#variable_constants_F4D42FE9FF1DF29F56105568EC242CB6E80A3E6C">constants</a><span class="other">.</span><span class="identifier">Count</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;77</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">n</span><span class="other">&nbsp;>&nbsp;</span><span class="other">0</span><span class="other">)</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;83</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">n</span><span class="other">&nbsp;>&nbsp;</span><span class="other">0</span><span class="other">)</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;78</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;84</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;79</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<a href="class_EnumTypeNode_EB3DCFB03130D09501A26B7E961147E44295542C.html#variable_constants_F4D42FE9FF1DF29F56105568EC242CB6E80A3E6C">constants</a><span class="other">[</span><span class="identifier">n</span><span class="other">&nbsp;-&nbsp;</span><span class="other">1</span><span class="other">]</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;85</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<a href="class_EnumTypeNode_EB3DCFB03130D09501A26B7E961147E44295542C.html#variable_constants_F4D42FE9FF1DF29F56105568EC242CB6E80A3E6C">constants</a><span class="other">[</span><span class="identifier">n</span><span class="other">&nbsp;-&nbsp;</span><span class="other">1</span><span class="other">]</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;80</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;86</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;81</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">nullptr</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;87</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">nullptr</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;82</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;88</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
@@ -413,7 +452,8 @@
         </span>
         <br/>
         <span>
-            Called by: <a href="class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_BeginEnumType_FC2D112CB98B10EB254EE97E2F403FC6DEE7B48C">cmajor::symbols::SymbolTable::BeginEnumType</a>
+            Called by: <a href="class_TypeBinder_197D6C7822958FE5DD6F6B43DDE787A9FA490EEA.html#function_Visit_CB2C1124E4540296521E0985D1608745AF7D22A7">cmajor::binder::TypeBinder::Visit</a>
+            , <a href="class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_BeginEnumType_FC2D112CB98B10EB254EE97E2F403FC6DEE7B48C">cmajor::symbols::SymbolTable::BeginEnumType</a>
         </span>
         <br/>
         <br/>
@@ -425,7 +465,7 @@
             &amp; reader) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/ast/Enumeration.cpp_E0E3FE98C7E412E0B64072443F6866A356E29E69.html#55">55</a>
+            Definition at line <a href="file/ast/Enumeration.cpp_E0E3FE98C7E412E0B64072443F6866A356E29E69.html#59">59</a>
              of <a href="file/ast/Enumeration.cpp_E0E3FE98C7E412E0B64072443F6866A356E29E69.html">Enumeration.cpp</a>
         </span>
         <br/>
@@ -444,9 +484,54 @@
             Calls: <a href="class_AstReader_79D1108F70EAB0D555FDDD074FED033B2DCABCD5.html#function_GetBinaryReader_3D8CDE19882342F28A73C8633B207C19F4CF2903">cmajor::ast::AstReader::GetBinaryReader</a>
             , <a href="class_AstReader_79D1108F70EAB0D555FDDD074FED033B2DCABCD5.html#function_ReadIdentifierNode_5F4F82748C8D922BADC586CD1C2AFD9E0A88B0ED">cmajor::ast::AstReader::ReadIdentifierNode</a>
             , <a href="class_AstReader_79D1108F70EAB0D555FDDD074FED033B2DCABCD5.html#function_ReadNode_5F7C8493FC716036FA5A915275B80B947DADB823">cmajor::ast::AstReader::ReadNode</a>
+            , <a href="class_AstReader_79D1108F70EAB0D555FDDD074FED033B2DCABCD5.html#function_ReadSpan_082ABEE22897732B6B4B9DACAC77278903C88AF6">cmajor::ast::AstReader::ReadSpan</a>
             , <a href="class_AstReader_79D1108F70EAB0D555FDDD074FED033B2DCABCD5.html#function_ReadSpecifiers_AE94D58CC8C5492E36BD7B10FFCE1616FD7871CA">cmajor::ast::AstReader::ReadSpecifiers</a>
             , <a href="class_Node_66FC1D6AD8F487E453CE6E17163479C7C2DAC063.html#function_Read_894C51ECB047DC4A41994462C3E69D94691C3545">cmajor::ast::Node::Read</a>
             , <a href="class_BinaryReader_03B69C4712E895798960F755025292754AFB8DDD.html#function_ReadBool_AF9E7BF9BFA9599690F086031FE3AB89ED7F6DEA">cmajor::util::BinaryReader::ReadBool</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_SetBeginBraceSpan_C0EAC63BAFB98E21229730F88B2BC669014CB899">SetBeginBraceSpan Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             cmajor::ast::EnumTypeNode::SetBeginBraceSpan(<span class="kw">const </span>
+            <a href="class_Span_9CED8370AAA8B01E09FBC8A63AD262084B91FD78.html">Span</a>
+            &amp; beginBraceSpan_)</h4>
+        <span>
+            Definition at line <a href="file/ast/Enumeration.hpp_F11EC32B1D656F2CA09A8EB8014712EDC5F590CE.html#33">33</a>
+             of <a href="file/ast/Enumeration.hpp_F11EC32B1D656F2CA09A8EB8014712EDC5F590CE.html">Enumeration.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">33</span>&nbsp;<span class="other">{</span>&nbsp;<span class="identifier">beginBraceSpan</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">beginBraceSpan_</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Called by: <a href="class_EnumTypeNode_EB3DCFB03130D09501A26B7E961147E44295542C.html#function_Clone_2C9678FDF0ED68B8B2EF8D51140709A438C696AA">cmajor::ast::EnumTypeNode::Clone</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_SetEndBraceSpan_815B8232256122371435477ABE99D775CE39FF7E">SetEndBraceSpan Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             cmajor::ast::EnumTypeNode::SetEndBraceSpan(<span class="kw">const </span>
+            <a href="class_Span_9CED8370AAA8B01E09FBC8A63AD262084B91FD78.html">Span</a>
+            &amp; endBraceSpan_)</h4>
+        <span>
+            Definition at line <a href="file/ast/Enumeration.hpp_F11EC32B1D656F2CA09A8EB8014712EDC5F590CE.html#35">35</a>
+             of <a href="file/ast/Enumeration.hpp_F11EC32B1D656F2CA09A8EB8014712EDC5F590CE.html">Enumeration.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">35</span>&nbsp;<span class="other">{</span>&nbsp;<span class="identifier">endBraceSpan</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">endBraceSpan_</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Called by: <a href="class_EnumTypeNode_EB3DCFB03130D09501A26B7E961147E44295542C.html#function_Clone_2C9678FDF0ED68B8B2EF8D51140709A438C696AA">cmajor::ast::EnumTypeNode::Clone</a>
         </span>
         <br/>
         <br/>
@@ -457,17 +542,17 @@
              cmajor::ast::EnumTypeNode::SetUnderlyingType(<a href="class_Node_66FC1D6AD8F487E453CE6E17163479C7C2DAC063.html">Node</a>
             * underlyingType_)</h4>
         <span>
-            Definition at line <a href="file/ast/Enumeration.cpp_E0E3FE98C7E412E0B64072443F6866A356E29E69.html#84">84</a>
+            Definition at line <a href="file/ast/Enumeration.cpp_E0E3FE98C7E412E0B64072443F6866A356E29E69.html#90">90</a>
              of <a href="file/ast/Enumeration.cpp_E0E3FE98C7E412E0B64072443F6866A356E29E69.html">Enumeration.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;85</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;91</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;86</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="class_EnumTypeNode_EB3DCFB03130D09501A26B7E961147E44295542C.html#variable_underlyingType_5BB9E3F61F6C47807C268C922FA4BCE9C593293D">underlyingType</a><span class="other">.</span><span class="identifier">reset</span><span class="other">(</span><span class="identifier">underlyingType_</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;92</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="class_EnumTypeNode_EB3DCFB03130D09501A26B7E961147E44295542C.html#variable_underlyingType_5BB9E3F61F6C47807C268C922FA4BCE9C593293D">underlyingType</a><span class="other">.</span><span class="identifier">reset</span><span class="other">(</span><span class="identifier">underlyingType_</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;87</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="class_EnumTypeNode_EB3DCFB03130D09501A26B7E961147E44295542C.html#variable_underlyingType_5BB9E3F61F6C47807C268C922FA4BCE9C593293D">underlyingType</a><span class="other">-></span><span class="identifier">SetParent</span><span class="other">(</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;93</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="class_EnumTypeNode_EB3DCFB03130D09501A26B7E961147E44295542C.html#variable_underlyingType_5BB9E3F61F6C47807C268C922FA4BCE9C593293D">underlyingType</a><span class="other">-></span><span class="identifier">SetParent</span><span class="other">(</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;88</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;94</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
@@ -486,7 +571,7 @@
             &amp; writer) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/ast/Enumeration.cpp_E0E3FE98C7E412E0B64072443F6866A356E29E69.html#41">41</a>
+            Definition at line <a href="file/ast/Enumeration.cpp_E0E3FE98C7E412E0B64072443F6866A356E29E69.html#43">43</a>
              of <a href="file/ast/Enumeration.cpp_E0E3FE98C7E412E0B64072443F6866A356E29E69.html">Enumeration.cpp</a>
         </span>
         <br/>
@@ -504,6 +589,7 @@
         <span>
             Calls: <a href="class_AstWriter_E913198FD26EB86BE054254E7AA4791401EA149B.html#function_GetBinaryWriter_889E99D5A9549A76BEDCAB1755E1CAC075CBDD71">cmajor::ast::AstWriter::GetBinaryWriter</a>
             , <a href="class_AstWriter_E913198FD26EB86BE054254E7AA4791401EA149B.html#function_Write_7724E21B291FAE124E86990BBC52046FBA555CF2">cmajor::ast::AstWriter::Write</a>
+            , <a href="class_AstWriter_E913198FD26EB86BE054254E7AA4791401EA149B.html#function_Write_8B396E6426A876580F9A0DB9D9F8BBAC1DE36180">cmajor::ast::AstWriter::Write</a>
             , <a href="class_Node_66FC1D6AD8F487E453CE6E17163479C7C2DAC063.html#function_Write_82DF5FFD8434B1620A45C972CD4DAE4EF72A2CF5">cmajor::ast::Node::Write</a>
             , <a href="class_BinaryWriter_C63D48852BF8E92E7FD58CF0C72DEA2D09A302B4.html#function_Write_F862555C93905FC6F4B920FA221EB6ADCA8F0F93">cmajor::util::BinaryWriter::Write</a>
         </span>

@@ -269,7 +269,8 @@ function drawDiagram(classes) {
 function drawClassInheritanceDiagram() {
     var classes = [
         { name: "cmajor::ast::Node", id: "class_0", level: 0, subject: false, hasDerivedClasses: true, link: "class_Node_66FC1D6AD8F487E453CE6E17163479C7C2DAC063.html" },
-        { name: "cmajor::ast::IntLiteralNode", id: "class_1", level: 1, subject: true, hasDerivedClasses: false, link: "class_IntLiteralNode_EDEF90AB1D70920360AD54854C5AC511D2C66DC6.html" }];
+        { name: "cmajor::ast::LiteralNode", id: "class_1", level: 1, subject: false, hasDerivedClasses: true, link: "class_LiteralNode_33955D862408948682E1F5E18AC7C76B2C911BCC.html" },
+        { name: "cmajor::ast::IntLiteralNode", id: "class_2", level: 2, subject: true, hasDerivedClasses: false, link: "class_IntLiteralNode_EDEF90AB1D70920360AD54854C5AC511D2C66DC6.html" }];
     drawDiagram(classes);
 }
 

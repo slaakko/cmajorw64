@@ -76,29 +76,35 @@
   <br/>
   <span class="code" id="36" xml:space="preserve"><span class="lineNumber">36</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">const&nbsp;</span><span class="kw">char</span><span class="other">*</span>&nbsp;<a href="../../class_ConstantSymbol_C24F6B6BF615227AB82DFBE1F620EA7AC3355A15.html#function_ClassName_2CF5A5F4048EE82DED3AA1AE6D9286AD2E180922">ClassName</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">override</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="string">"ConstantSymbol"</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
   <br/>
-  <span class="code" id="37" xml:space="preserve"><span class="lineNumber">37</span>&nbsp;<span class="kw">private</span><span class="other">:</span></span>
+  <span class="code" id="37" xml:space="preserve"><span class="lineNumber">37</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../../class_ConstantSymbol_C24F6B6BF615227AB82DFBE1F620EA7AC3355A15.html#function_SetStrValue_2CCB13CC2B29E22517B20EBFF235D637AF18A01B">SetStrValue</a><span class="other">(</span><span class="kw">const&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="type">u32string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">strValue_</span><span class="other">)</span>&nbsp;<span class="other">{</span>&nbsp;<span class="identifier">strValue</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">strValue_</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
   <br/>
-  <span class="code" id="38" xml:space="preserve"><span class="lineNumber">38</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html">TypeSymbol</a><span class="other">*</span>&nbsp;<span class="identifier">type</span><span class="other">;</span></span>
+  <span class="code" id="38" xml:space="preserve"><span class="lineNumber">38</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">const&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="type">u32string</span><span class="other">&amp;</span>&nbsp;<a href="../../class_ConstantSymbol_C24F6B6BF615227AB82DFBE1F620EA7AC3355A15.html#function_StrValue_E9724FEBEB149E2D00D41CDD7EB226CE8D83B3BD">StrValue</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">strValue</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
   <br/>
-  <span class="code" id="39" xml:space="preserve"><span class="lineNumber">39</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><a href="../../class_Value_D656BD8E5EC910AF6747A38C3979A4A9B1E41ED4.html">Value</a><span class="other">></span>&nbsp;<span class="identifier">value</span><span class="other">;</span></span>
+  <span class="code" id="39" xml:space="preserve"><span class="lineNumber">39</span>&nbsp;<span class="kw">private</span><span class="other">:</span></span>
   <br/>
-  <span class="code" id="40" xml:space="preserve"><span class="lineNumber">40</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">bool</span>&nbsp;<span class="identifier">evaluating</span><span class="other">;</span></span>
+  <span class="code" id="40" xml:space="preserve"><span class="lineNumber">40</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html">TypeSymbol</a><span class="other">*</span>&nbsp;<span class="identifier">type</span><span class="other">;</span></span>
   <br/>
-  <span class="code" id="41" xml:space="preserve"><span class="lineNumber">41</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="type">uint32_t</span>&nbsp;<span class="identifier">sizeOfValue</span><span class="other">;</span></span>
+  <span class="code" id="41" xml:space="preserve"><span class="lineNumber">41</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><a href="../../class_Value_D656BD8E5EC910AF6747A38C3979A4A9B1E41ED4.html">Value</a><span class="other">></span>&nbsp;<span class="identifier">value</span><span class="other">;</span></span>
   <br/>
-  <span class="code" id="42" xml:space="preserve"><span class="lineNumber">42</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="type">uint32_t</span>&nbsp;<span class="identifier">valuePos</span><span class="other">;</span></span>
+  <span class="code" id="42" xml:space="preserve"><span class="lineNumber">42</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">bool</span>&nbsp;<span class="identifier">evaluating</span><span class="other">;</span></span>
   <br/>
-  <span class="code" id="43" xml:space="preserve"><span class="lineNumber">43</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">string</span>&nbsp;<span class="identifier">filePathReadFrom</span><span class="other">;</span></span>
+  <span class="code" id="43" xml:space="preserve"><span class="lineNumber">43</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="type">uint32_t</span>&nbsp;<span class="identifier">sizeOfValue</span><span class="other">;</span></span>
   <br/>
-  <span class="code" id="44" xml:space="preserve"><span class="lineNumber">44</span>&nbsp;<span class="other">}</span><span class="other">;</span></span>
+  <span class="code" id="44" xml:space="preserve"><span class="lineNumber">44</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="type">uint32_t</span>&nbsp;<span class="identifier">valuePos</span><span class="other">;</span></span>
   <br/>
-  <span class="code" id="45" xml:space="preserve"><span class="lineNumber">45</span>&nbsp;</span>
+  <span class="code" id="45" xml:space="preserve"><span class="lineNumber">45</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">string</span>&nbsp;<span class="identifier">filePathReadFrom</span><span class="other">;</span></span>
   <br/>
-  <span class="code" id="46" xml:space="preserve"><span class="lineNumber">46</span>&nbsp;<span class="other">}</span>&nbsp;<span class="other">}</span>&nbsp;<span class="comment">//&nbsp;namespace&nbsp;cmajor::symbols</span></span>
+  <span class="code" id="46" xml:space="preserve"><span class="lineNumber">46</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">u32string</span>&nbsp;<span class="identifier">strValue</span><span class="other">;</span></span>
   <br/>
-  <span class="code" id="47" xml:space="preserve"><span class="lineNumber">47</span>&nbsp;</span>
+  <span class="code" id="47" xml:space="preserve"><span class="lineNumber">47</span>&nbsp;<span class="other">}</span><span class="other">;</span></span>
   <br/>
-  <span class="code" id="48" xml:space="preserve"><span class="lineNumber">48</span>&nbsp;<span class="pp">#endif&nbsp;//&nbsp;CMAJOR_SYMBOLS_CONSTANT_SYMBOL_INCLUDED</span></span>
+  <span class="code" id="48" xml:space="preserve"><span class="lineNumber">48</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="49" xml:space="preserve"><span class="lineNumber">49</span>&nbsp;<span class="other">}</span>&nbsp;<span class="other">}</span>&nbsp;<span class="comment">//&nbsp;namespace&nbsp;cmajor::symbols</span></span>
+  <br/>
+  <span class="code" id="50" xml:space="preserve"><span class="lineNumber">50</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="51" xml:space="preserve"><span class="lineNumber">51</span>&nbsp;<span class="pp">#endif&nbsp;//&nbsp;CMAJOR_SYMBOLS_CONSTANT_SYMBOL_INCLUDED</span></span>
   <br/>
  </body>
 </html>

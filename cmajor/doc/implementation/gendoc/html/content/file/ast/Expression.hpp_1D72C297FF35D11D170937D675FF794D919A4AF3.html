@@ -1060,15 +1060,39 @@
   <br/>
   <span class="code" id="528" xml:space="preserve"><span class="lineNumber">528</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">string</span>&nbsp;<a href="../../class_BaseNode_F5CB293E8C32B43BAF3B6028789B049D2BA72B52.html#function_ToString_7E0AC72066FC611F9BF966784EE1B65444C79FCE">ToString</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
   <br/>
-  <span class="code" id="529" xml:space="preserve"><span class="lineNumber">529</span>&nbsp;<span class="other">}</span><span class="other">;</span></span>
+  <span class="code" id="529" xml:space="preserve"><span class="lineNumber">529</span>&nbsp;<span class="other">};</span></span>
   <br/>
   <span class="code" id="530" xml:space="preserve"><span class="lineNumber">530</span>&nbsp;</span>
   <br/>
-  <span class="code" id="531" xml:space="preserve"><span class="lineNumber">531</span>&nbsp;<span class="other">}</span>&nbsp;<span class="other">}</span>&nbsp;<span class="comment">//&nbsp;namespace&nbsp;cmajor::ast</span></span>
+  <span class="code" id="531" xml:space="preserve"><span class="lineNumber">531</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../../class_ParenthesizedExpressionNode_6DCAB17007B6E3590EEF1B15D66CEC31C0A2AA7C.html">ParenthesizedExpressionNode</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<a href="../../class_UnaryNode_C5C127545093E9BD85CF05D482B5C675FCD04A6E.html">UnaryNode</a></span>
   <br/>
-  <span class="code" id="532" xml:space="preserve"><span class="lineNumber">532</span>&nbsp;</span>
+  <span class="code" id="532" xml:space="preserve"><span class="lineNumber">532</span>&nbsp;<span class="other">{</span></span>
   <br/>
-  <span class="code" id="533" xml:space="preserve"><span class="lineNumber">533</span>&nbsp;<span class="pp">#endif&nbsp;//&nbsp;CMAJOR_AST_EXPRESSION_INCLUDED</span></span>
+  <span class="code" id="533" xml:space="preserve"><span class="lineNumber">533</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="534" xml:space="preserve"><span class="lineNumber">534</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../class_ParenthesizedExpressionNode_6DCAB17007B6E3590EEF1B15D66CEC31C0A2AA7C.html#constructor_ParenthesizedExpressionNode_6F76BE513DE81308F7407AB70423BAF2D2B843BE">ParenthesizedExpressionNode</a><span class="other">(</span><span class="kw">const&nbsp;</span><a href="../../class_Span_9CED8370AAA8B01E09FBC8A63AD262084B91FD78.html">Span</a><span class="other">&amp;</span>&nbsp;<span class="identifier">span_</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="535" xml:space="preserve"><span class="lineNumber">535</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../class_ParenthesizedExpressionNode_6DCAB17007B6E3590EEF1B15D66CEC31C0A2AA7C.html#constructor_ParenthesizedExpressionNode_93B983C2CAEC370EF350505E63EB8AA1FF5D53C8">ParenthesizedExpressionNode</a><span class="other">(</span><span class="kw">const&nbsp;</span><a href="../../class_Span_9CED8370AAA8B01E09FBC8A63AD262084B91FD78.html">Span</a><span class="other">&amp;</span>&nbsp;<span class="identifier">span_</span><span class="other">,&nbsp;</span><a href="../../class_Node_66FC1D6AD8F487E453CE6E17163479C7C2DAC063.html">Node</a><span class="other">*</span>&nbsp;<span class="identifier">child_</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="536" xml:space="preserve"><span class="lineNumber">536</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../class_Node_66FC1D6AD8F487E453CE6E17163479C7C2DAC063.html">Node</a><span class="other">*</span>&nbsp;<a href="../../class_ParenthesizedExpressionNode_6DCAB17007B6E3590EEF1B15D66CEC31C0A2AA7C.html#function_Clone_9E9CC5E4DAD91FDB77C5744BABEC1EED532FE022">Clone</a><span class="other">(</span><a href="../../class_CloneContext_5E55B7AF2C2173E2EA60A2B86069816A9F0FB764.html">CloneContext</a><span class="other">&amp;</span>&nbsp;<span class="identifier">cloneContext</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="537" xml:space="preserve"><span class="lineNumber">537</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../../class_ParenthesizedExpressionNode_6DCAB17007B6E3590EEF1B15D66CEC31C0A2AA7C.html#function_Write_D3FF7EE7E7DDF3786ED3C0650D49C79EF64C14F4">Write</a><span class="other">(</span><a href="../../class_AstWriter_E913198FD26EB86BE054254E7AA4791401EA149B.html">AstWriter</a><span class="other">&amp;</span>&nbsp;<span class="identifier">writer</span><span class="other">)</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="538" xml:space="preserve"><span class="lineNumber">538</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../../class_ParenthesizedExpressionNode_6DCAB17007B6E3590EEF1B15D66CEC31C0A2AA7C.html#function_Read_4D7E91F23B1254BD4F8837006AA9AD0B40701034">Read</a><span class="other">(</span><a href="../../class_AstReader_79D1108F70EAB0D555FDDD074FED033B2DCABCD5.html">AstReader</a><span class="other">&amp;</span>&nbsp;<span class="identifier">reader</span><span class="other">)</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="539" xml:space="preserve"><span class="lineNumber">539</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../../class_ParenthesizedExpressionNode_6DCAB17007B6E3590EEF1B15D66CEC31C0A2AA7C.html#function_Accept_F1E57EBC432BC2CC27643E2D48CCB6FC333CA10D">Accept</a><span class="other">(</span><a href="../../class_Visitor_72892152D0864AA2907A1FD60E7A49EB4E071AD6.html">Visitor</a><span class="other">&amp;</span>&nbsp;<span class="identifier">visitor</span><span class="other">)</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="540" xml:space="preserve"><span class="lineNumber">540</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">string</span>&nbsp;<a href="../../class_ParenthesizedExpressionNode_6DCAB17007B6E3590EEF1B15D66CEC31C0A2AA7C.html#function_ToString_2AE5992DD4B57155749D7018E819F0D6581545B4">ToString</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="541" xml:space="preserve"><span class="lineNumber">541</span>&nbsp;<span class="other">}</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="542" xml:space="preserve"><span class="lineNumber">542</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="543" xml:space="preserve"><span class="lineNumber">543</span>&nbsp;<span class="other">}</span>&nbsp;<span class="other">}</span>&nbsp;<span class="comment">//&nbsp;namespace&nbsp;cmajor::ast</span></span>
+  <br/>
+  <span class="code" id="544" xml:space="preserve"><span class="lineNumber">544</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="545" xml:space="preserve"><span class="lineNumber">545</span>&nbsp;<span class="pp">#endif&nbsp;//&nbsp;CMAJOR_AST_EXPRESSION_INCLUDED</span></span>
   <br/>
  </body>
 </html>

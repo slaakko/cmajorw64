@@ -49,6 +49,10 @@
                 <td class="functionTableSecondCol" xml:space="preserve"><a href="class_VariableSymbol_ABBB9BDB6F527FE9F126B38BE55336949B8F964E.html#function_Info_623D1F6C36C46864249247CA24FF15FE6B4C07F9">Info</a>() <span class="kw">const override</span></td>
             </tr>
             <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">bool</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_VariableSymbol_ABBB9BDB6F527FE9F126B38BE55336949B8F964E.html#function_IsVariableSymbol_A2007718B650FDCE73F205EEEFBD2FE0B8EB927B">IsVariableSymbol</a>() <span class="kw">const override</span></td>
+            </tr>
+            <tr>
                 <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
                 <td class="functionTableSecondCol" xml:space="preserve"><a href="class_VariableSymbol_ABBB9BDB6F527FE9F126B38BE55336949B8F964E.html#function_Read_0C91101F73DFD06F1E25B75F333169F5822877F8">Read</a>(<a href="class_SymbolReader_EB36ADE3BE82C48FB57873005D5A7206C8D9F6E8.html">SymbolReader</a>&amp; reader) <span class="kw">override</span></td>
             </tr>
@@ -106,11 +110,11 @@
             * cmajor::symbols::VariableSymbol::ClassName() <span class="kw">const override</span>
         </h4>
         <span>
-            Definition at line <a href="file/symbols/VariableSymbol.hpp_8603A5D068731A11E18D5E5FD772476794802D84.html#28">28</a>
+            Definition at line <a href="file/symbols/VariableSymbol.hpp_8603A5D068731A11E18D5E5FD772476794802D84.html#29">29</a>
              of <a href="file/symbols/VariableSymbol.hpp_8603A5D068731A11E18D5E5FD772476794802D84.html">VariableSymbol.hpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">28</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="string">"VariableSymbol"</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">29</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="string">"VariableSymbol"</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
@@ -153,7 +157,7 @@
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/symbols/VariableSymbol.hpp_8603A5D068731A11E18D5E5FD772476794802D84.html#23">23</a>
+            Declaration at line <a href="file/symbols/VariableSymbol.hpp_8603A5D068731A11E18D5E5FD772476794802D84.html#24">24</a>
              of <a href="file/symbols/VariableSymbol.hpp_8603A5D068731A11E18D5E5FD772476794802D84.html">VariableSymbol.hpp</a>
         </span>
         <br/>
@@ -171,21 +175,6 @@
             * cmajor::symbols::VariableSymbol::GetType() <span class="kw">const</span>
         </h4>
         <span>
-            Definition at line <a href="file/symbols/VariableSymbol.hpp_8603A5D068731A11E18D5E5FD772476794802D84.html#24">24</a>
-             of <a href="file/symbols/VariableSymbol.hpp_8603A5D068731A11E18D5E5FD772476794802D84.html">VariableSymbol.hpp</a>
-            :<br/>
-            <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">24</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">type</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
-            </span>
-            <br/>
-        </span>
-        <br/>
-        <hr/>
-        <h3 id="function_GetType_14C05D793AECFE077753292B1354FD70428B9196">GetType Member Function</h3>
-        <h4>
-            <a href="class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html">TypeSymbol</a>
-            * cmajor::symbols::VariableSymbol::GetType()</h4>
-        <span>
             Definition at line <a href="file/symbols/VariableSymbol.hpp_8603A5D068731A11E18D5E5FD772476794802D84.html#25">25</a>
              of <a href="file/symbols/VariableSymbol.hpp_8603A5D068731A11E18D5E5FD772476794802D84.html">VariableSymbol.hpp</a>
             :<br/>
@@ -196,22 +185,58 @@
         </span>
         <br/>
         <hr/>
+        <h3 id="function_GetType_14C05D793AECFE077753292B1354FD70428B9196">GetType Member Function</h3>
+        <h4>
+            <a href="class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html">TypeSymbol</a>
+            * cmajor::symbols::VariableSymbol::GetType()</h4>
+        <span>
+            Definition at line <a href="file/symbols/VariableSymbol.hpp_8603A5D068731A11E18D5E5FD772476794802D84.html#26">26</a>
+             of <a href="file/symbols/VariableSymbol.hpp_8603A5D068731A11E18D5E5FD772476794802D84.html">VariableSymbol.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">26</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">type</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <hr/>
         <h3 id="function_Info_623D1F6C36C46864249247CA24FF15FE6B4C07F9">Info Member Function</h3>
         <h4>
             std::u32string cmajor::symbols::VariableSymbol::Info() <span class="kw">const override</span>
         </h4>
         <span>
-            Definition at line <a href="file/symbols/VariableSymbol.hpp_8603A5D068731A11E18D5E5FD772476794802D84.html#27">27</a>
+            Definition at line <a href="file/symbols/VariableSymbol.hpp_8603A5D068731A11E18D5E5FD772476794802D84.html#28">28</a>
              of <a href="file/symbols/VariableSymbol.hpp_8603A5D068731A11E18D5E5FD772476794802D84.html">VariableSymbol.hpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">27</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">Name</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">28</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">Name</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
             Base class overridden functions: <a href="class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_Info_4C298F9C10CD52551E26E8A155C24685D4DB6BC1">cmajor::symbols::Symbol::Info</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_IsVariableSymbol_A2007718B650FDCE73F205EEEFBD2FE0B8EB927B">IsVariableSymbol Member Function</h3>
+        <h4>
+            <span class="kw">bool</span>
+             cmajor::symbols::VariableSymbol::IsVariableSymbol() <span class="kw">const override</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/symbols/VariableSymbol.hpp_8603A5D068731A11E18D5E5FD772476794802D84.html#21">21</a>
+             of <a href="file/symbols/VariableSymbol.hpp_8603A5D068731A11E18D5E5FD772476794802D84.html">VariableSymbol.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">21</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">true</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Base class overridden functions: <a href="class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_IsVariableSymbol_4044F457CCB35C785CD5767790A1B709888F606B">cmajor::symbols::Symbol::IsVariableSymbol</a>
         </span>
         <br/>
         <br/>
@@ -243,7 +268,7 @@
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/symbols/VariableSymbol.hpp_8603A5D068731A11E18D5E5FD772476794802D84.html#22">22</a>
+            Declaration at line <a href="file/symbols/VariableSymbol.hpp_8603A5D068731A11E18D5E5FD772476794802D84.html#23">23</a>
              of <a href="file/symbols/VariableSymbol.hpp_8603A5D068731A11E18D5E5FD772476794802D84.html">VariableSymbol.hpp</a>
         </span>
         <br/>
@@ -255,6 +280,7 @@
         <br/>
         <span>
             Derived class overrides: <a href="class_MemberVariableSymbol_F3A4DF7AE6AC421BB6B1CDDC87E16953D310E881.html#function_Read_840A2BD17768DA72D7882CD3BB449957FE6AAA9D">cmajor::symbols::MemberVariableSymbol::Read</a>
+            , <a href="class_ParameterSymbol_EFEA20B84930B4A79D869DA6EFE9F58679F053A6.html#function_Read_AF5071EB15780A1185C66DDDC22B97DE493CB66A">cmajor::symbols::ParameterSymbol::Read</a>
         </span>
         <br/>
         <br/>
@@ -267,6 +293,7 @@
         <br/>
         <span>
             Called by: <a href="class_MemberVariableSymbol_F3A4DF7AE6AC421BB6B1CDDC87E16953D310E881.html#function_Read_840A2BD17768DA72D7882CD3BB449957FE6AAA9D">cmajor::symbols::MemberVariableSymbol::Read</a>
+            , <a href="class_ParameterSymbol_EFEA20B84930B4A79D869DA6EFE9F58679F053A6.html#function_Read_AF5071EB15780A1185C66DDDC22B97DE493CB66A">cmajor::symbols::ParameterSymbol::Read</a>
         </span>
         <br/>
         <br/>
@@ -277,40 +304,40 @@
              cmajor::symbols::VariableSymbol::SetType(<a href="class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html">TypeSymbol</a>
             * typeSymbol)</h4>
         <span>
-            Definition at line <a href="file/symbols/VariableSymbol.hpp_8603A5D068731A11E18D5E5FD772476794802D84.html#26">26</a>
+            Definition at line <a href="file/symbols/VariableSymbol.hpp_8603A5D068731A11E18D5E5FD772476794802D84.html#27">27</a>
              of <a href="file/symbols/VariableSymbol.hpp_8603A5D068731A11E18D5E5FD772476794802D84.html">VariableSymbol.hpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">26</span>&nbsp;<span class="other">{</span>&nbsp;<span class="identifier">type</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">typeSymbol</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">27</span>&nbsp;<span class="other">{</span>&nbsp;<span class="identifier">type</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">typeSymbol</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
             Called by: <a href="class_Evaluator_4B7670893CEE707FB594A365EDC98F228E04C2F5.html#function_Visit_2E3EE57126707422D0CF72574720310D4D61182A">cmajor::binder::Evaluator::Visit</a>
-            , <a href="class_Evaluator_4B7670893CEE707FB594A365EDC98F228E04C2F5.html#function_Visit_E609D1B25E13137174710DE140A4ADDDF6787A5D">cmajor::binder::Evaluator::Visit</a>
             , <a href="class_Evaluator_4B7670893CEE707FB594A365EDC98F228E04C2F5.html#function_Visit_76D3C90A448DCBC78CB098577BF48B45CF1F50E6">cmajor::binder::Evaluator::Visit</a>
             , <a href="class_Evaluator_4B7670893CEE707FB594A365EDC98F228E04C2F5.html#function_Visit_FD07EB7FC7448B604309A65AEE6A74EF25D2A18C">cmajor::binder::Evaluator::Visit</a>
+            , <a href="class_Evaluator_4B7670893CEE707FB594A365EDC98F228E04C2F5.html#function_Visit_E609D1B25E13137174710DE140A4ADDDF6787A5D">cmajor::binder::Evaluator::Visit</a>
             , <a href="class_JsonAttributeProcessor_6AB69FA730ECB6FB3611886BE7DB6C74572DF3DC.html#function_GenerateJsonConstructorSymbol_742E50509DEE5737EC266717E7DB0E85057BE005">cmajor::binder::JsonAttributeProcessor::GenerateJsonConstructorSymbol</a>
             , <a href="class_JsonAttributeProcessor_6AB69FA730ECB6FB3611886BE7DB6C74572DF3DC.html#function_GenerateJsonCreatorFunctionSymbol_58D06B6E55ECE40D86F3EC0526506D59EC98B023">cmajor::binder::JsonAttributeProcessor::GenerateJsonCreatorFunctionSymbol</a>
             , <a href="class_JsonAttributeProcessor_6AB69FA730ECB6FB3611886BE7DB6C74572DF3DC.html#function_GenerateToJsonJsonObjectSymbol_BB7275357F0802EEE80A8F854DDA1CD09D675D90">cmajor::binder::JsonAttributeProcessor::GenerateToJsonJsonObjectSymbol</a>
             , <a href="class_JsonAttributeProcessor_6AB69FA730ECB6FB3611886BE7DB6C74572DF3DC.html#function_GenerateToJsonSymbol_F4C9C2D82BBE663CBE46960EA9C3B3C93ACFA675">cmajor::binder::JsonAttributeProcessor::GenerateToJsonSymbol</a>
-            , <a href="class_TypeBinder_197D6C7822958FE5DD6F6B43DDE787A9FA490EEA.html#function_Visit_752F8EF8DD1445825DD3ABB74B5C179F38E0F14E">cmajor::binder::TypeBinder::Visit</a>
-            , <a href="class_TypeBinder_197D6C7822958FE5DD6F6B43DDE787A9FA490EEA.html#function_Visit_378C94E716B582535EA98EE91617B0D3012CA70A">cmajor::binder::TypeBinder::Visit</a>
-            , <a href="class_TypeBinder_197D6C7822958FE5DD6F6B43DDE787A9FA490EEA.html#function_Visit_B1C11735D0E7021E458B75C07BE2DCF31A3724E3">cmajor::binder::TypeBinder::Visit</a>
-            , <a href="class_TypeBinder_197D6C7822958FE5DD6F6B43DDE787A9FA490EEA.html#function_Visit_06C68BB590BB6685BA5608C81329E0CBD7841B15">cmajor::binder::TypeBinder::Visit</a>
+            , <a href="class_TypeBinder_197D6C7822958FE5DD6F6B43DDE787A9FA490EEA.html#function_Visit_C82E0C38A4F216EDF7F4F1327A47B2CDFC2FD2A4">cmajor::binder::TypeBinder::Visit</a>
+            , <a href="class_TypeBinder_197D6C7822958FE5DD6F6B43DDE787A9FA490EEA.html#function_Visit_343CE1C3A622ED42D63B8D2E44C74137B018A9D9">cmajor::binder::TypeBinder::Visit</a>
             , <a href="class_TypeBinder_197D6C7822958FE5DD6F6B43DDE787A9FA490EEA.html#function_Visit_EB36EF53836A95BB782DAE6D53C66600623DDAA1">cmajor::binder::TypeBinder::Visit</a>
             , <a href="class_TypeBinder_197D6C7822958FE5DD6F6B43DDE787A9FA490EEA.html#function_Visit_17F749DA1FBB382978BEA6EC9D89790657EDE876">cmajor::binder::TypeBinder::Visit</a>
-            , <a href="class_TypeBinder_197D6C7822958FE5DD6F6B43DDE787A9FA490EEA.html#function_Visit_343CE1C3A622ED42D63B8D2E44C74137B018A9D9">cmajor::binder::TypeBinder::Visit</a>
             , <a href="class_TypeBinder_197D6C7822958FE5DD6F6B43DDE787A9FA490EEA.html#function_Visit_4BA74C1B02F56A3A979AA7701E65B1A4E46AE082">cmajor::binder::TypeBinder::Visit</a>
-            , <a href="class_TypeBinder_197D6C7822958FE5DD6F6B43DDE787A9FA490EEA.html#function_Visit_C82E0C38A4F216EDF7F4F1327A47B2CDFC2FD2A4">cmajor::binder::TypeBinder::Visit</a>
+            , <a href="class_TypeBinder_197D6C7822958FE5DD6F6B43DDE787A9FA490EEA.html#function_Visit_06C68BB590BB6685BA5608C81329E0CBD7841B15">cmajor::binder::TypeBinder::Visit</a>
+            , <a href="class_TypeBinder_197D6C7822958FE5DD6F6B43DDE787A9FA490EEA.html#function_Visit_378C94E716B582535EA98EE91617B0D3012CA70A">cmajor::binder::TypeBinder::Visit</a>
+            , <a href="class_TypeBinder_197D6C7822958FE5DD6F6B43DDE787A9FA490EEA.html#function_Visit_752F8EF8DD1445825DD3ABB74B5C179F38E0F14E">cmajor::binder::TypeBinder::Visit</a>
+            , <a href="class_TypeBinder_197D6C7822958FE5DD6F6B43DDE787A9FA490EEA.html#function_Visit_B1C11735D0E7021E458B75C07BE2DCF31A3724E3">cmajor::binder::TypeBinder::Visit</a>
             , <a href="class_ClassTypeSymbol_706F15CDE917688D403DB002B3816EE91C6F66CB.html#function_CreateDestructorSymbol_79F2A2F969ACA6903843345E90D339213AADA4C0">cmajor::symbols::ClassTypeSymbol::CreateDestructorSymbol</a>
             , <a href="class_ClassTypeSymbol_706F15CDE917688D403DB002B3816EE91C6F66CB.html#function_CreateLayouts_8034CE4DF533C22632F3E631B9081752CE91ED27">cmajor::symbols::ClassTypeSymbol::CreateLayouts</a>
             , <a href="class_FunctionSymbol_5AC1C26A9572181B3E31247997BF40453B22EDEF.html#function_CreateTemporary_5A9534B9C2715787CCFD7F5640D7E4C4F35F612B">cmajor::symbols::FunctionSymbol::CreateTemporary</a>
-            , <a href="class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_BeginConstructor_48A115E5FBD8DF0FFA18353B1DB6E4FCD40AF234">cmajor::symbols::SymbolTable::BeginConstructor</a>
-            , <a href="class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_BeginConversionFunction_13A0765AC25023AF4A09CD07E521CB49BE491DA7">cmajor::symbols::SymbolTable::BeginConversionFunction</a>
-            , <a href="class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_BeginDestructor_1E011F6AAC505B0DDE27FD8A8E69A84A952062F7">cmajor::symbols::SymbolTable::BeginDestructor</a>
-            , <a href="class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_BeginMemberFunction_49AB1AE94620A8789041E40FB4CEE2C13FB09B81">cmajor::symbols::SymbolTable::BeginMemberFunction</a>
+            , <a href="class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_BeginConstructor_96913CBE05E7D69238E933ED4B33FE7131DCB373">cmajor::symbols::SymbolTable::BeginConstructor</a>
+            , <a href="class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_BeginConversionFunction_B149ECFB4ACACAC88A34D14B4DE826561D4A87DC">cmajor::symbols::SymbolTable::BeginConversionFunction</a>
+            , <a href="class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_BeginDestructor_B8DF368155DEFFC6F3320C9B2AAE8649B39202C5">cmajor::symbols::SymbolTable::BeginDestructor</a>
+            , <a href="class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_BeginMemberFunction_9642D5165A68646180B15C0EE34475874C26FF05">cmajor::symbols::SymbolTable::BeginMemberFunction</a>
         </span>
         <br/>
         <br/>
@@ -338,7 +365,7 @@
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/symbols/VariableSymbol.hpp_8603A5D068731A11E18D5E5FD772476794802D84.html#21">21</a>
+            Declaration at line <a href="file/symbols/VariableSymbol.hpp_8603A5D068731A11E18D5E5FD772476794802D84.html#22">22</a>
              of <a href="file/symbols/VariableSymbol.hpp_8603A5D068731A11E18D5E5FD772476794802D84.html">VariableSymbol.hpp</a>
         </span>
         <br/>
@@ -350,6 +377,7 @@
         <br/>
         <span>
             Derived class overrides: <a href="class_MemberVariableSymbol_F3A4DF7AE6AC421BB6B1CDDC87E16953D310E881.html#function_Write_D4D888FE7FF2ECCDB97E51427A4983AE9265EE85">cmajor::symbols::MemberVariableSymbol::Write</a>
+            , <a href="class_ParameterSymbol_EFEA20B84930B4A79D869DA6EFE9F58679F053A6.html#function_Write_32C7A97ADF600840C87C5DA19321FAE49B11DAE1">cmajor::symbols::ParameterSymbol::Write</a>
         </span>
         <br/>
         <br/>
@@ -363,6 +391,7 @@
         <br/>
         <span>
             Called by: <a href="class_MemberVariableSymbol_F3A4DF7AE6AC421BB6B1CDDC87E16953D310E881.html#function_Write_D4D888FE7FF2ECCDB97E51427A4983AE9265EE85">cmajor::symbols::MemberVariableSymbol::Write</a>
+            , <a href="class_ParameterSymbol_EFEA20B84930B4A79D869DA6EFE9F58679F053A6.html#function_Write_32C7A97ADF600840C87C5DA19321FAE49B11DAE1">cmajor::symbols::ParameterSymbol::Write</a>
         </span>
         <br/>
         <br/>

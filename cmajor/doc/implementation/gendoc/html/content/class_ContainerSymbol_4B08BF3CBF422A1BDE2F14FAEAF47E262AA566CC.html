@@ -61,6 +61,10 @@
                 <td class="functionTableSecondCol" xml:space="preserve"><a href="class_ContainerSymbol_4B08BF3CBF422A1BDE2F14FAEAF47E262AA566CC.html#function_GetContainerScope_A7A959C541BE4FFBF5757464BE9DD9B4E2CB59DA">GetContainerScope</a>() <span class="kw">override</span></td>
             </tr>
             <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><a href="class_FunctionSymbol_5AC1C26A9572181B3E31247997BF40453B22EDEF.html">FunctionSymbol</a>*</td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_ContainerSymbol_4B08BF3CBF422A1BDE2F14FAEAF47E262AA566CC.html#function_GetFunctionByIndex_FC4F1C8820052E7CCAAB7C10872C87A838F64042">GetFunctionByIndex</a>(int32_t functionIndex) <span class="kw">const</span></td>
+            </tr>
+            <tr>
                 <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">bool</span></td>
                 <td class="functionTableSecondCol" xml:space="preserve"><a href="class_ContainerSymbol_4B08BF3CBF422A1BDE2F14FAEAF47E262AA566CC.html#function_HasProjectMembers_5174C6869826D520EF7E5858E1DDE1CB3FDC384B">HasProjectMembers</a>() <span class="kw">const override</span></td>
             </tr>
@@ -107,6 +111,10 @@
                 <td class="functionTableFirstCol" xml:space="preserve"><a href="class_ContainerScope_868483F636E19113CC59067DD8B70247AA7D81F2.html">ContainerScope</a></td>
                 <td class="functionTableSecondCol" xml:space="preserve">containerScope</td>
             </tr>
+            <tr id="variable_functionIndexMap_340C85B4FEC810F0022524A4EAE263FF07A328AA">
+                <td class="functionTableFirstCol" xml:space="preserve">std::unordered_map&lt;int32_t, <a href="class_FunctionSymbol_5AC1C26A9572181B3E31247997BF40453B22EDEF.html">FunctionSymbol</a>*></td>
+                <td class="functionTableSecondCol" xml:space="preserve">functionIndexMap</td>
+            </tr>
             <tr id="variable_members_800FADD0CEA07455BFDA1863145AAB0212B1A286">
                 <td class="functionTableFirstCol" xml:space="preserve">std::vector&lt;std::unique_ptr&lt;<a href="class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html">Symbol</a>>></td>
                 <td class="functionTableSecondCol" xml:space="preserve">members</td>
@@ -152,27 +160,27 @@
             * collector) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/symbols/ContainerSymbol.cpp_4FADA12533395AB59B076C682EA4BC74D0139A74.html#106">106</a>
+            Definition at line <a href="file/symbols/ContainerSymbol.cpp_4FADA12533395AB59B076C682EA4BC74D0139A74.html#111">111</a>
              of <a href="file/symbols/ContainerSymbol.cpp_4FADA12533395AB59B076C682EA4BC74D0139A74.html">ContainerSymbol.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">107</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">112</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">108</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><a href="class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_IsProject_453946E239F2DB9F43AC5D530F3FE0EE5278836D">IsProject</a><span class="other">(</span><span class="other">)</span><span class="other">)</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">113</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><a href="class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_IsProject_453946E239F2DB9F43AC5D530F3FE0EE5278836D">IsProject</a><span class="other">(</span><span class="other">)</span><span class="other">)</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">109</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">114</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">110</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">for&nbsp;</span><span class="other">(</span><span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><a href="class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html">Symbol</a><span class="other">></span><span class="other">&amp;</span>&nbsp;<span class="identifier">member</span><span class="other">&nbsp;:&nbsp;</span><a href="class_ContainerSymbol_4B08BF3CBF422A1BDE2F14FAEAF47E262AA566CC.html#variable_members_800FADD0CEA07455BFDA1863145AAB0212B1A286">members</a><span class="other">)</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">115</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">for&nbsp;</span><span class="other">(</span><span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><a href="class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html">Symbol</a><span class="other">></span><span class="other">&amp;</span>&nbsp;<span class="identifier">member</span><span class="other">&nbsp;:&nbsp;</span><a href="class_ContainerSymbol_4B08BF3CBF422A1BDE2F14FAEAF47E262AA566CC.html#variable_members_800FADD0CEA07455BFDA1863145AAB0212B1A286">members</a><span class="other">)</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">111</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">116</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">112</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">member</span><span class="other">-></span><span class="identifier">Accept</span><span class="other">(</span><span class="identifier">collector</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">117</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">member</span><span class="other">-></span><span class="identifier">Accept</span><span class="other">(</span><span class="identifier">collector</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">113</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">118</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">114</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">119</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">115</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">120</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
@@ -255,11 +263,14 @@
             , <a href="class_ContainerSymbol_4B08BF3CBF422A1BDE2F14FAEAF47E262AA566CC.html#function_MakeConceptGroupSymbol_C2313DB6526A94986C642DF2C19B14E88F7B25B3">cmajor::symbols::ContainerSymbol::MakeConceptGroupSymbol</a>
             , <a href="class_ContainerSymbol_4B08BF3CBF422A1BDE2F14FAEAF47E262AA566CC.html#function_MakeFunctionGroupSymbol_0CE52F32609F403C480D245B5452E5C3E329A91D">cmajor::symbols::ContainerSymbol::MakeFunctionGroupSymbol</a>
             , <a href="class_FunctionGroupSymbol_ADD9128234E8CBDCA551DECFEB138ABA2C75FD11.html#function_AddFunction_A8FD88C734DC97C772BF75364DA457C0E5835394">cmajor::symbols::FunctionGroupSymbol::AddFunction</a>
+            , <a href="class_FunctionSymbol_5AC1C26A9572181B3E31247997BF40453B22EDEF.html#function_GetIndex_D0E32517E9C6A2AE977F5C2003E1716C0509EDBD">cmajor::symbols::FunctionSymbol::GetIndex</a>
             , <a href="class_FunctionSymbol_5AC1C26A9572181B3E31247997BF40453B22EDEF.html#function_GroupName_4C39C39CD503ECD13442593D1B973C88DDF42592">cmajor::symbols::FunctionSymbol::GroupName</a>
+            , <a href="class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_GetOriginalModule_2CC89AFFD9C0CE607CFC158AFEDB32BAFAAB0B28">cmajor::symbols::Symbol::GetOriginalModule</a>
             , <a href="class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_GetSpan_17D3765039B6ABC988EB1C280F29AF78F5638F6B">cmajor::symbols::Symbol::GetSpan</a>
             , <a href="class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_GetSymbolType_DC14618DCD6070C58A1E8334ED8F05B32F71404F">cmajor::symbols::Symbol::GetSymbolType</a>
             , <a href="class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_IsFunctionSymbol_1192E23A98CB3E1B5107DB07EA208802F28E2419">cmajor::symbols::Symbol::IsFunctionSymbol</a>
             , <a href="class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_SetModule_3CF37995B2B9354D6CE23CD89874D94D263A2CC3">cmajor::symbols::Symbol::SetModule</a>
+            , <a href="class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_SetOriginalModule_2822640A6AE91669AD1DCCDB9B06F5A9AB0A9B43">cmajor::symbols::Symbol::SetOriginalModule</a>
             , <a href="class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_SetParent_5BED33C1AD3A33A09371CDDA4CA373460A330D2F">cmajor::symbols::Symbol::SetParent</a>
             , <a href="class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_SetSymbolTable_959C0BCE2D6378EB4C3999E747E26455FD3F2F09">cmajor::symbols::Symbol::SetSymbolTable</a>
         </span>
@@ -271,7 +282,7 @@
             , <a href="class_ClassDelegateTypeSymbol_128306583C73553FFFA4F5C051CE181C3EC4D435.html#function_AddMember_E3D338CEA39BD9F3D21DFF86D95D8B5581437C7B">cmajor::symbols::ClassDelegateTypeSymbol::AddMember</a>
             , <a href="class_ClassTypeSymbol_706F15CDE917688D403DB002B3816EE91C6F66CB.html#function_AddMember_FF67CA2C9140834FCED77C01C680131E7340DF4C">cmajor::symbols::ClassTypeSymbol::AddMember</a>
             , <a href="class_ConceptSymbol_480671C9D512EFD41CDF07DFD5D4A47F11E07A99.html#function_AddMember_12C7FBF88D71D6870E18E4947583A8333725127B">cmajor::symbols::ConceptSymbol::AddMember</a>
-            , <a href="class_ContainerScope_868483F636E19113CC59067DD8B70247AA7D81F2.html#function_CreateNamespace_0BE7229B57AB0A668EAC6CBA22FD19863BF5C604">cmajor::symbols::ContainerScope::CreateNamespace</a>
+            , <a href="class_ContainerScope_868483F636E19113CC59067DD8B70247AA7D81F2.html#function_CreateNamespace_1CCF8ECC3CF5B3104A6A8FB0DB522CE576DB8CF9">cmajor::symbols::ContainerScope::CreateNamespace</a>
             , <a href="class_ContainerSymbol_4B08BF3CBF422A1BDE2F14FAEAF47E262AA566CC.html#function_MakeClassGroupTypeSymbol_1DD485F005A1F651B6394DE34B7ED8B030514394">cmajor::symbols::ContainerSymbol::MakeClassGroupTypeSymbol</a>
             , <a href="class_ContainerSymbol_4B08BF3CBF422A1BDE2F14FAEAF47E262AA566CC.html#function_MakeConceptGroupSymbol_C2313DB6526A94986C642DF2C19B14E88F7B25B3">cmajor::symbols::ContainerSymbol::MakeConceptGroupSymbol</a>
             , <a href="class_ContainerSymbol_4B08BF3CBF422A1BDE2F14FAEAF47E262AA566CC.html#function_MakeFunctionGroupSymbol_0CE52F32609F403C480D245B5452E5C3E329A91D">cmajor::symbols::ContainerSymbol::MakeFunctionGroupSymbol</a>
@@ -284,12 +295,12 @@
             , <a href="class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_AddConstant_DF21490F6C17B68B5EFC3DB6E821F0A70477641B">cmajor::symbols::SymbolTable::AddConstant</a>
             , <a href="class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_AddEnumConstant_C64C89BA8E1B46E107876802A47F685525CA7C22">cmajor::symbols::SymbolTable::AddEnumConstant</a>
             , <a href="class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_AddFunctionSymbolToGlobalScope_A3FE8FBDAB03B4DA92C42BCA0DFFC1985B6E3432">cmajor::symbols::SymbolTable::AddFunctionSymbolToGlobalScope</a>
-            , <a href="class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_AddLocalVariable_D5B623A2BCE0247387A851BDBD2F1427956D05BB">cmajor::symbols::SymbolTable::AddLocalVariable</a>
             , <a href="class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_AddLocalVariable_46B667DAA5DCC0592820C6EFF2C9D5FDD9075D0C">cmajor::symbols::SymbolTable::AddLocalVariable</a>
+            , <a href="class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_AddLocalVariable_D5B623A2BCE0247387A851BDBD2F1427956D05BB">cmajor::symbols::SymbolTable::AddLocalVariable</a>
             , <a href="class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_AddMemberVariable_69D1AC26180BD407D8EB7D9F52560434AA56CA70">cmajor::symbols::SymbolTable::AddMemberVariable</a>
             , <a href="class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_AddParameter_200A3C3A1E207B5EF369FC0E826713ED12E49FF7">cmajor::symbols::SymbolTable::AddParameter</a>
-            , <a href="class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_AddTemplateParameter_44C0643C4E04FDC2C559FD010742DDB7ADB631D5">cmajor::symbols::SymbolTable::AddTemplateParameter</a>
             , <a href="class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_AddTemplateParameter_D2EC88CE0BE51B29D6105637EEA7FEA652E5E733">cmajor::symbols::SymbolTable::AddTemplateParameter</a>
+            , <a href="class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_AddTemplateParameter_44C0643C4E04FDC2C559FD010742DDB7ADB631D5">cmajor::symbols::SymbolTable::AddTemplateParameter</a>
             , <a href="class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_AddTypeSymbolToGlobalScope_9F83C985A233D033AE96E4344B623C66E69E1B1F">cmajor::symbols::SymbolTable::AddTypeSymbolToGlobalScope</a>
             , <a href="class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_AddTypedef_297242CDE8C657D6AF3B5E3FF7AE7433793A94AD">cmajor::symbols::SymbolTable::AddTypedef</a>
             , <a href="class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_BeginClassDelegate_4B514C2138BEFDD3C574E11A9E02ECA3BB7C8A47">cmajor::symbols::SymbolTable::BeginClassDelegate</a>
@@ -318,7 +329,7 @@
             &amp; typeMap) <span class="kw">const override</span>
         </h4>
         <span>
-            Definition at line <a href="file/symbols/ContainerSymbol.cpp_4FADA12533395AB59B076C682EA4BC74D0139A74.html#186">186</a>
+            Definition at line <a href="file/symbols/ContainerSymbol.cpp_4FADA12533395AB59B076C682EA4BC74D0139A74.html#195">195</a>
              of <a href="file/symbols/ContainerSymbol.cpp_4FADA12533395AB59B076C682EA4BC74D0139A74.html">ContainerSymbol.cpp</a>
         </span>
         <br/>
@@ -491,17 +502,17 @@
             <span class="kw">void</span>
              cmajor::symbols::ContainerSymbol::Clear()</h4>
         <span>
-            Definition at line <a href="file/symbols/ContainerSymbol.cpp_4FADA12533395AB59B076C682EA4BC74D0139A74.html#117">117</a>
+            Definition at line <a href="file/symbols/ContainerSymbol.cpp_4FADA12533395AB59B076C682EA4BC74D0139A74.html#122">122</a>
              of <a href="file/symbols/ContainerSymbol.cpp_4FADA12533395AB59B076C682EA4BC74D0139A74.html">ContainerSymbol.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">118</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">123</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">119</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="class_ContainerSymbol_4B08BF3CBF422A1BDE2F14FAEAF47E262AA566CC.html#variable_containerScope_6D60E9EC934543FA2F9F8987D5122A4CFFDED97F">containerScope</a><span class="other">.</span><a href="class_ContainerScope_868483F636E19113CC59067DD8B70247AA7D81F2.html#function_Clear_8BB41EC94C923CC10FB1E5F6068B7C50ECD10A5D">Clear</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">124</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="class_ContainerSymbol_4B08BF3CBF422A1BDE2F14FAEAF47E262AA566CC.html#variable_containerScope_6D60E9EC934543FA2F9F8987D5122A4CFFDED97F">containerScope</a><span class="other">.</span><a href="class_ContainerScope_868483F636E19113CC59067DD8B70247AA7D81F2.html#function_Clear_8BB41EC94C923CC10FB1E5F6068B7C50ECD10A5D">Clear</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">120</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="class_ContainerSymbol_4B08BF3CBF422A1BDE2F14FAEAF47E262AA566CC.html#variable_members_800FADD0CEA07455BFDA1863145AAB0212B1A286">members</a><span class="other">.</span><span class="identifier">clear</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">125</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="class_ContainerSymbol_4B08BF3CBF422A1BDE2F14FAEAF47E262AA566CC.html#variable_members_800FADD0CEA07455BFDA1863145AAB0212B1A286">members</a><span class="other">.</span><span class="identifier">clear</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">121</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">126</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
@@ -529,7 +540,7 @@
              cmajor::symbols::ContainerSymbol::ComputeExportClosure() <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/symbols/ContainerSymbol.cpp_4FADA12533395AB59B076C682EA4BC74D0139A74.html#91">91</a>
+            Definition at line <a href="file/symbols/ContainerSymbol.cpp_4FADA12533395AB59B076C682EA4BC74D0139A74.html#96">96</a>
              of <a href="file/symbols/ContainerSymbol.cpp_4FADA12533395AB59B076C682EA4BC74D0139A74.html">ContainerSymbol.cpp</a>
         </span>
         <br/>
@@ -551,6 +562,7 @@
             , <a href="class_DelegateTypeSymbol_3FECFD791A79DBF75CEC1BB6ABFDF26828491EDF.html#function_ComputeExportClosure_864414810EE1099CB8FECBB7477BB6ACE6A8F099">cmajor::symbols::DelegateTypeSymbol::ComputeExportClosure</a>
             , <a href="class_DerivedTypeSymbol_F26B99CE4BE262395853B507ABF2858B06F9A216.html#function_ComputeExportClosure_B24053E981BECA7F1C3285814030C47B3E2F614D">cmajor::symbols::DerivedTypeSymbol::ComputeExportClosure</a>
             , <a href="class_FunctionSymbol_5AC1C26A9572181B3E31247997BF40453B22EDEF.html#function_ComputeExportClosure_3629CBAFC5F00480957EB75B3B72F281B8A97769">cmajor::symbols::FunctionSymbol::ComputeExportClosure</a>
+            , <a href="class_TemplateParameterSymbol_E40C8C6A1A16CD38F979FFEC21EFECE32E4417BC.html#function_ComputeExportClosure_BA44F65A2AFE8972B412043AE9030072133E9EFD">cmajor::symbols::TemplateParameterSymbol::ComputeExportClosure</a>
         </span>
         <br/>
         <br/>
@@ -567,6 +579,7 @@
             , <a href="class_DerivedTypeSymbol_F26B99CE4BE262395853B507ABF2858B06F9A216.html#function_ComputeExportClosure_B24053E981BECA7F1C3285814030C47B3E2F614D">cmajor::symbols::DerivedTypeSymbol::ComputeExportClosure</a>
             , <a href="class_FunctionSymbol_5AC1C26A9572181B3E31247997BF40453B22EDEF.html#function_ComputeExportClosure_3629CBAFC5F00480957EB75B3B72F281B8A97769">cmajor::symbols::FunctionSymbol::ComputeExportClosure</a>
             , <a href="class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_Write_D543CD5053E30FD7F185B98CBD2310263DB12791">cmajor::symbols::SymbolTable::Write</a>
+            , <a href="class_TemplateParameterSymbol_E40C8C6A1A16CD38F979FFEC21EFECE32E4417BC.html#function_ComputeExportClosure_BA44F65A2AFE8972B412043AE9030072133E9EFD">cmajor::symbols::TemplateParameterSymbol::ComputeExportClosure</a>
             , <a href="class_TypedefSymbol_82FD12A549DF50DFDBDDB89B0E73DAC6C586BB80.html#function_ComputeExportClosure_4556E41782AEA2A6FCF5CED1766A5A290996BB05">cmajor::symbols::TypedefSymbol::ComputeExportClosure</a>
         </span>
         <br/>
@@ -617,13 +630,35 @@
         <br/>
         <br/>
         <hr/>
+        <h3 id="function_GetFunctionByIndex_FC4F1C8820052E7CCAAB7C10872C87A838F64042">GetFunctionByIndex Member Function</h3>
+        <h4>
+            <a href="class_FunctionSymbol_5AC1C26A9572181B3E31247997BF40453B22EDEF.html">FunctionSymbol</a>
+            * cmajor::symbols::ContainerSymbol::GetFunctionByIndex(int32_t functionIndex) <span class="kw">const</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/symbols/ContainerSymbol.cpp_4FADA12533395AB59B076C682EA4BC74D0139A74.html#242">242</a>
+             of <a href="file/symbols/ContainerSymbol.cpp_4FADA12533395AB59B076C682EA4BC74D0139A74.html">ContainerSymbol.cpp</a>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/symbols/ContainerSymbol.hpp_9C0E08D31E1AF783E40FECFF6A78124A834BDA2C.html#36">36</a>
+             of <a href="file/symbols/ContainerSymbol.hpp_9C0E08D31E1AF783E40FECFF6A78124A834BDA2C.html">ContainerSymbol.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Called by: <a href="class_FunctionSymbol_5AC1C26A9572181B3E31247997BF40453B22EDEF.html#function_Id_4067535CEB439A424C838CF985C5FF82A785DA78">cmajor::symbols::FunctionSymbol::Id</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
         <h3 id="function_HasProjectMembers_5174C6869826D520EF7E5858E1DDE1CB3FDC384B">HasProjectMembers Member Function</h3>
         <h4>
             <span class="kw">bool</span>
              cmajor::symbols::ContainerSymbol::HasProjectMembers() <span class="kw">const override</span>
         </h4>
         <span>
-            Definition at line <a href="file/symbols/ContainerSymbol.cpp_4FADA12533395AB59B076C682EA4BC74D0139A74.html#208">208</a>
+            Definition at line <a href="file/symbols/ContainerSymbol.cpp_4FADA12533395AB59B076C682EA4BC74D0139A74.html#217">217</a>
              of <a href="file/symbols/ContainerSymbol.cpp_4FADA12533395AB59B076C682EA4BC74D0139A74.html">ContainerSymbol.cpp</a>
         </span>
         <br/>
@@ -684,12 +719,12 @@
             <a href="class_Span_9CED8370AAA8B01E09FBC8A63AD262084B91FD78.html">Span</a>
             &amp; span)</h4>
         <span>
-            Definition at line <a href="file/symbols/ContainerSymbol.cpp_4FADA12533395AB59B076C682EA4BC74D0139A74.html#165">165</a>
+            Definition at line <a href="file/symbols/ContainerSymbol.cpp_4FADA12533395AB59B076C682EA4BC74D0139A74.html#172">172</a>
              of <a href="file/symbols/ContainerSymbol.cpp_4FADA12533395AB59B076C682EA4BC74D0139A74.html">ContainerSymbol.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/symbols/ContainerSymbol.hpp_9C0E08D31E1AF783E40FECFF6A78124A834BDA2C.html#41">41</a>
+            Declaration at line <a href="file/symbols/ContainerSymbol.hpp_9C0E08D31E1AF783E40FECFF6A78124A834BDA2C.html#43">43</a>
              of <a href="file/symbols/ContainerSymbol.hpp_9C0E08D31E1AF783E40FECFF6A78124A834BDA2C.html">ContainerSymbol.hpp</a>
         </span>
         <br/>
@@ -698,9 +733,11 @@
             Calls: <a href="class_ContainerScope_868483F636E19113CC59067DD8B70247AA7D81F2.html#function_Lookup_C3D66E6DBB79D7FCB4DE2EF71D6A8AF98987883D">cmajor::symbols::ContainerScope::Lookup</a>
             , <a href="class_ContainerSymbol_4B08BF3CBF422A1BDE2F14FAEAF47E262AA566CC.html#function_AddMember_7ED2773A3DF02A27462DB02BB4DC607726862F86">cmajor::symbols::ContainerSymbol::AddMember</a>
             , <a href="class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_FullName_60D71721B3DBA5E19256E562D0BB6EEFCD2DCF1C">cmajor::symbols::Symbol::FullName</a>
+            , <a href="class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_GetOriginalModule_2CC89AFFD9C0CE607CFC158AFEDB32BAFAAB0B28">cmajor::symbols::Symbol::GetOriginalModule</a>
             , <a href="class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_GetSpan_17D3765039B6ABC988EB1C280F29AF78F5638F6B">cmajor::symbols::Symbol::GetSpan</a>
             , <a href="class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_GetSymbolType_DC14618DCD6070C58A1E8334ED8F05B32F71404F">cmajor::symbols::Symbol::GetSymbolType</a>
             , <a href="class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_SetModule_3CF37995B2B9354D6CE23CD89874D94D263A2CC3">cmajor::symbols::Symbol::SetModule</a>
+            , <a href="class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_SetOriginalModule_2822640A6AE91669AD1DCCDB9B06F5A9AB0A9B43">cmajor::symbols::Symbol::SetOriginalModule</a>
             , <a href="class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_SetSymbolTable_959C0BCE2D6378EB4C3999E747E26455FD3F2F09">cmajor::symbols::Symbol::SetSymbolTable</a>
             , <a href="namespace_unicode_D131AC361BE7AF8963CBA33354DF05CBDF4ACED4.html#function_ToUtf8_CE171AFE713714F8EFD0802426E947F0026FCAFF">cmajor::unicode::ToUtf8</a>
         </span>
@@ -720,12 +757,12 @@
             <a href="class_Span_9CED8370AAA8B01E09FBC8A63AD262084B91FD78.html">Span</a>
             &amp; span)</h4>
         <span>
-            Definition at line <a href="file/symbols/ContainerSymbol.cpp_4FADA12533395AB59B076C682EA4BC74D0139A74.html#144">144</a>
+            Definition at line <a href="file/symbols/ContainerSymbol.cpp_4FADA12533395AB59B076C682EA4BC74D0139A74.html#150">150</a>
              of <a href="file/symbols/ContainerSymbol.cpp_4FADA12533395AB59B076C682EA4BC74D0139A74.html">ContainerSymbol.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/symbols/ContainerSymbol.hpp_9C0E08D31E1AF783E40FECFF6A78124A834BDA2C.html#40">40</a>
+            Declaration at line <a href="file/symbols/ContainerSymbol.hpp_9C0E08D31E1AF783E40FECFF6A78124A834BDA2C.html#42">42</a>
              of <a href="file/symbols/ContainerSymbol.hpp_9C0E08D31E1AF783E40FECFF6A78124A834BDA2C.html">ContainerSymbol.hpp</a>
         </span>
         <br/>
@@ -734,9 +771,11 @@
             Calls: <a href="class_ContainerScope_868483F636E19113CC59067DD8B70247AA7D81F2.html#function_Lookup_C3D66E6DBB79D7FCB4DE2EF71D6A8AF98987883D">cmajor::symbols::ContainerScope::Lookup</a>
             , <a href="class_ContainerSymbol_4B08BF3CBF422A1BDE2F14FAEAF47E262AA566CC.html#function_AddMember_7ED2773A3DF02A27462DB02BB4DC607726862F86">cmajor::symbols::ContainerSymbol::AddMember</a>
             , <a href="class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_FullName_60D71721B3DBA5E19256E562D0BB6EEFCD2DCF1C">cmajor::symbols::Symbol::FullName</a>
+            , <a href="class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_GetOriginalModule_2CC89AFFD9C0CE607CFC158AFEDB32BAFAAB0B28">cmajor::symbols::Symbol::GetOriginalModule</a>
             , <a href="class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_GetSpan_17D3765039B6ABC988EB1C280F29AF78F5638F6B">cmajor::symbols::Symbol::GetSpan</a>
             , <a href="class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_GetSymbolType_DC14618DCD6070C58A1E8334ED8F05B32F71404F">cmajor::symbols::Symbol::GetSymbolType</a>
             , <a href="class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_SetModule_3CF37995B2B9354D6CE23CD89874D94D263A2CC3">cmajor::symbols::Symbol::SetModule</a>
+            , <a href="class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_SetOriginalModule_2822640A6AE91669AD1DCCDB9B06F5A9AB0A9B43">cmajor::symbols::Symbol::SetOriginalModule</a>
             , <a href="class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_SetSymbolTable_959C0BCE2D6378EB4C3999E747E26455FD3F2F09">cmajor::symbols::Symbol::SetSymbolTable</a>
             , <a href="namespace_unicode_D131AC361BE7AF8963CBA33354DF05CBDF4ACED4.html#function_ToUtf8_CE171AFE713714F8EFD0802426E947F0026FCAFF">cmajor::unicode::ToUtf8</a>
         </span>
@@ -756,12 +795,12 @@
             <a href="class_Span_9CED8370AAA8B01E09FBC8A63AD262084B91FD78.html">Span</a>
             &amp; span)</h4>
         <span>
-            Definition at line <a href="file/symbols/ContainerSymbol.cpp_4FADA12533395AB59B076C682EA4BC74D0139A74.html#123">123</a>
+            Definition at line <a href="file/symbols/ContainerSymbol.cpp_4FADA12533395AB59B076C682EA4BC74D0139A74.html#128">128</a>
              of <a href="file/symbols/ContainerSymbol.cpp_4FADA12533395AB59B076C682EA4BC74D0139A74.html">ContainerSymbol.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/symbols/ContainerSymbol.hpp_9C0E08D31E1AF783E40FECFF6A78124A834BDA2C.html#39">39</a>
+            Declaration at line <a href="file/symbols/ContainerSymbol.hpp_9C0E08D31E1AF783E40FECFF6A78124A834BDA2C.html#41">41</a>
              of <a href="file/symbols/ContainerSymbol.hpp_9C0E08D31E1AF783E40FECFF6A78124A834BDA2C.html">ContainerSymbol.hpp</a>
         </span>
         <br/>
@@ -770,9 +809,11 @@
             Calls: <a href="class_ContainerScope_868483F636E19113CC59067DD8B70247AA7D81F2.html#function_Lookup_C3D66E6DBB79D7FCB4DE2EF71D6A8AF98987883D">cmajor::symbols::ContainerScope::Lookup</a>
             , <a href="class_ContainerSymbol_4B08BF3CBF422A1BDE2F14FAEAF47E262AA566CC.html#function_AddMember_7ED2773A3DF02A27462DB02BB4DC607726862F86">cmajor::symbols::ContainerSymbol::AddMember</a>
             , <a href="class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_FullName_60D71721B3DBA5E19256E562D0BB6EEFCD2DCF1C">cmajor::symbols::Symbol::FullName</a>
+            , <a href="class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_GetOriginalModule_2CC89AFFD9C0CE607CFC158AFEDB32BAFAAB0B28">cmajor::symbols::Symbol::GetOriginalModule</a>
             , <a href="class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_GetSpan_17D3765039B6ABC988EB1C280F29AF78F5638F6B">cmajor::symbols::Symbol::GetSpan</a>
             , <a href="class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_GetSymbolType_DC14618DCD6070C58A1E8334ED8F05B32F71404F">cmajor::symbols::Symbol::GetSymbolType</a>
             , <a href="class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_SetModule_3CF37995B2B9354D6CE23CD89874D94D263A2CC3">cmajor::symbols::Symbol::SetModule</a>
+            , <a href="class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_SetOriginalModule_2822640A6AE91669AD1DCCDB9B06F5A9AB0A9B43">cmajor::symbols::Symbol::SetOriginalModule</a>
             , <a href="class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_SetSymbolTable_959C0BCE2D6378EB4C3999E747E26455FD3F2F09">cmajor::symbols::Symbol::SetSymbolTable</a>
             , <a href="namespace_unicode_D131AC361BE7AF8963CBA33354DF05CBDF4ACED4.html#function_ToUtf8_CE171AFE713714F8EFD0802426E947F0026FCAFF">cmajor::unicode::ToUtf8</a>
         </span>

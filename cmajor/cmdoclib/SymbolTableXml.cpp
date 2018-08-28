@@ -120,7 +120,7 @@ struct FileByName
 class SymbolTableXmlBuilder : public Visitor
 {
 public:
-    SymbolTableXmlBuilder(const std::u32string& moduleName, SymbolTable& symbolTable_, std::unordered_map<int, File>& fileMap_, const std::string& modulePrefix_,
+    SymbolTableXmlBuilder(const std::u32string& moduleName_, SymbolTable& symbolTable_, std::unordered_map<int, File>& fileMap_, const std::string& modulePrefix_,
         const std::string& extModulePrefix_);
     void WriteDocument(const std::string& symbolTableXmlFilePath);
     void AddModuleXmlDocument(dom::Document* moduleXmlDocument);
@@ -187,6 +187,7 @@ public:
     void Visit(UCharNode& ucharNode) override;
     void Visit(VoidNode& voidNode) override;
 private:
+    std::u32string moduleName;
     SymbolTable& symbolTable;
     std::unordered_map<int, File>& fileMap;
     std::string modulePrefix;
@@ -199,9 +200,10 @@ private:
     std::vector<TypeSymbol*> types;
 };
 
-SymbolTableXmlBuilder::SymbolTableXmlBuilder(const std::u32string& moduleName, SymbolTable& symbolTable_, std::unordered_map<int, File>& fileMap_, 
+SymbolTableXmlBuilder::SymbolTableXmlBuilder(const std::u32string& moduleName_, SymbolTable& symbolTable_, std::unordered_map<int, File>& fileMap_, 
     const std::string& modulePrefix_, const std::string& extModulePrefix_) :
-    symbolTableXmlDocument(new dom::Document()), symbolTableElement(new dom::Element(U"symbolTable")), currentElement(symbolTableElement.get()), symbolTable(symbolTable_),
+    moduleName(moduleName_), symbolTableXmlDocument(new dom::Document()), 
+    symbolTableElement(new dom::Element(U"symbolTable")), currentElement(symbolTableElement.get()), symbolTable(symbolTable_),
     fileMap(fileMap_), modulePrefix(modulePrefix_), extModulePrefix(extModulePrefix_)
 {
     symbolTableElement->SetAttribute(U"module", moduleName);
@@ -1069,10 +1071,13 @@ void SymbolTableXmlBuilder::AddFunction(FunctionSymbol& function)
         extPath = ToUtf32(Path::Combine(extModulePrefix, "../index.html#" + ToUtf8(function.Id())));
     }
     functionElement->SetAttribute(U"extPath", extPath);
-    File& file = fileMap[function.GetSpan().FileIndex()];
-    functionElement->SetAttribute(U"fileName", file.name);
-    functionElement->SetAttribute(U"filePath", ToUtf32(file.htmlFilePath));
-    functionElement->SetAttribute(U"line", ToUtf32(std::to_string(function.GetSpan().LineNumber())));
+    if (function.HasSource())
+    {
+        File& file = fileMap[function.GetSpan().FileIndex()];
+        functionElement->SetAttribute(U"fileName", file.name);
+        functionElement->SetAttribute(U"filePath", ToUtf32(file.htmlFilePath));
+        functionElement->SetAttribute(U"line", ToUtf32(std::to_string(function.GetSpan().LineNumber())));
+    }
     if (function.GetSymbolType() == SymbolType::functionSymbol)
     {
         functionElement->SetAttribute(U"kind", U"Function");
@@ -1096,15 +1101,18 @@ void SymbolTableXmlBuilder::AddFunction(FunctionSymbol& function)
     {
         functionElement->SetAttribute(U"includeConstraint", U"true");
     }
-    Node* node = symbolTable.GetNodeNoThrow(&function);
-    if (node && node->IsFunctionNode())
+    if (function.HasSource())
     {
-        FunctionNode* functionNode = static_cast<FunctionNode*>(node);
-        functionElement->SetAttribute(U"specifiers", ToUtf32(SpecifierStr(functionNode->GetSpecifiers())));
-    }
-    else
-    {
-        throw std::runtime_error("function node expected");
+        Node* node = symbolTable.GetNodeNoThrow(&function);
+        if (node && node->IsFunctionNode())
+        {
+            FunctionNode* functionNode = static_cast<FunctionNode*>(node);
+            functionElement->SetAttribute(U"specifiers", ToUtf32(SpecifierStr(functionNode->GetSpecifiers())));
+        }
+        else
+        {
+            throw std::runtime_error("function node expected");
+        }
     }
     if (function.IsConst())
     {
@@ -1631,6 +1639,10 @@ std::vector<FunctionSymbol*> SymbolTableXmlBuilder::GetFunctions(ContainerSymbol
                 }
                 functions.push_back(fun);
             }
+            else if (moduleName == U"System.Core" && container.FullName() == U"System.Meta")
+            {
+                functions.push_back(fun);
+            }
         }
     }
     std::sort(functions.begin(), functions.end(), ByCodeName());
@@ -1777,6 +1789,10 @@ dom::Document* GetModuleDocument(Input* input, const std::u32string& moduleName)
 
 void GenerateSymbolTableXml(Module* rootModule, std::unordered_map<int, File>& fileMap)
 {
+    if (rootModule->Name() == U"System.Core")
+    {
+        int x = 0;
+    }
     SymbolTable& symbolTable = rootModule->GetSymbolTable();
     std::string modulePrefix = Path::Combine(Path::Combine("../..", ToUtf8(rootModule->Name())), "doc");
     std::string extModulePrefix = Path::Combine(ToUtf8(rootModule->Name()), "doc");

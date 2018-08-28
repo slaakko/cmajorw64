@@ -63,10 +63,10 @@
           <functions>
            <function docPath="../../System.Text.RegularExpressions/doc/class_Dfa_C0C2BE49FCC3D3B6EA837CF206D1FE18B6C3B39E.html#member_function_AddState_Dfa_26E6A2488835D869B3AB7BDB7C552FA35EEA12DE" extPath="System.Text.RegularExpressions/doc/class_Dfa_C0C2BE49FCC3D3B6EA837CF206D1FE18B6C3B39E.html#member_function_AddState_Dfa_26E6A2488835D869B3AB7BDB7C552FA35EEA12DE" fileName="System.Text.RegularExpressions/Dfa.cm" filePath="../../System.Text.RegularExpressions/file/Dfa.cm.html" id="member_function_AddState_Dfa_26E6A2488835D869B3AB7BDB7C552FA35EEA12DE" kind="Member Function" line="88" name="AddState" returnType="4e959632-b5f2-406d-9402-ec16ab3f3585" specifiers="public">
             <parameters>
-             <parameter id="parameter_state_66CBB39B377311FC1A028FBFADE168E529A1E33C" name="state" type="fb0b7f0c-7713-4afc-91ca-f87e8eabbdef"/>
+             <parameter id="parameter_state_66CBB39B377311FC1A028FBFADE168E529A1E33C" name="state" type="51c176ba-19af-400f-a080-106381f1f18f"/>
             </parameters>
            </function>
-           <function const="true" docPath="../../System.Text.RegularExpressions/doc/class_Dfa_C0C2BE49FCC3D3B6EA837CF206D1FE18B6C3B39E.html#member_function_GetState_Dfa_7254A2BD303B52356723E9DD6869544B191C42B1" extPath="System.Text.RegularExpressions/doc/class_Dfa_C0C2BE49FCC3D3B6EA837CF206D1FE18B6C3B39E.html#member_function_GetState_Dfa_7254A2BD303B52356723E9DD6869544B191C42B1" fileName="System.Text.RegularExpressions/Dfa.cm" filePath="../../System.Text.RegularExpressions/file/Dfa.cm.html" id="member_function_GetState_Dfa_7254A2BD303B52356723E9DD6869544B191C42B1" kind="Member Function" line="92" name="GetState" returnType="fb0b7f0c-7713-4afc-91ca-f87e8eabbdef" specifiers="public inline nothrow">
+           <function const="true" docPath="../../System.Text.RegularExpressions/doc/class_Dfa_C0C2BE49FCC3D3B6EA837CF206D1FE18B6C3B39E.html#member_function_GetState_Dfa_7254A2BD303B52356723E9DD6869544B191C42B1" extPath="System.Text.RegularExpressions/doc/class_Dfa_C0C2BE49FCC3D3B6EA837CF206D1FE18B6C3B39E.html#member_function_GetState_Dfa_7254A2BD303B52356723E9DD6869544B191C42B1" fileName="System.Text.RegularExpressions/Dfa.cm" filePath="../../System.Text.RegularExpressions/file/Dfa.cm.html" id="member_function_GetState_Dfa_7254A2BD303B52356723E9DD6869544B191C42B1" kind="Member Function" line="92" name="GetState" returnType="51c176ba-19af-400f-a080-106381f1f18f" specifiers="public inline nothrow">
             <parameters>
              <parameter id="parameter_i_0E6C0CEBE7648B000DCE817BE669F70ABA4FD15F" name="i" type="cc8ffb50-cac1-4f7e-acae-8b3fb9621c37"/>
             </parameters>
@@ -92,7 +92,7 @@
            </function>
           </functions>
           <variables>
-           <variable docPath="../../System.Text.RegularExpressions/doc/class_Dfa_C0C2BE49FCC3D3B6EA837CF206D1FE18B6C3B39E.html#variable_states_00509FDB2ECCB4CD3D7A4376602B21418FCBC40C" extPath="System.Text.RegularExpressions/doc/class_Dfa_C0C2BE49FCC3D3B6EA837CF206D1FE18B6C3B39E.html#variable_states_00509FDB2ECCB4CD3D7A4376602B21418FCBC40C" id="variable_states_00509FDB2ECCB4CD3D7A4376602B21418FCBC40C" name="states" specifiers="private" type="0ae1463e-1326-4e3f-8776-a85be4486e5d"/>
+           <variable docPath="../../System.Text.RegularExpressions/doc/class_Dfa_C0C2BE49FCC3D3B6EA837CF206D1FE18B6C3B39E.html#variable_states_00509FDB2ECCB4CD3D7A4376602B21418FCBC40C" extPath="System.Text.RegularExpressions/doc/class_Dfa_C0C2BE49FCC3D3B6EA837CF206D1FE18B6C3B39E.html#variable_states_00509FDB2ECCB4CD3D7A4376602B21418FCBC40C" id="variable_states_00509FDB2ECCB4CD3D7A4376602B21418FCBC40C" name="states" specifiers="private" type="faa30660-7973-4524-a799-89155699cafe"/>
           </variables>
          </class>
          <class docPath="../../System.Text.RegularExpressions/doc/class_DfaState_9705397F7C4EF22AB411D3A2CD2F07D838F85228.html" extPath="System.Text.RegularExpressions/doc/class_DfaState_9705397F7C4EF22AB411D3A2CD2F07D838F85228.html" fileName="System.Text.RegularExpressions/Dfa.cm" filePath="../../System.Text.RegularExpressions/file/Dfa.cm.html" id="class_DfaState_9705397F7C4EF22AB411D3A2CD2F07D838F85228" line="12" name="DfaState" specifiers="public">
@@ -123,7 +123,7 @@
           <variables>
            <variable docPath="../../System.Text.RegularExpressions/doc/class_DfaState_9705397F7C4EF22AB411D3A2CD2F07D838F85228.html#variable_accepting_C872C41A59F9B1C0D850CD33C56E01B80BEA01D9" extPath="System.Text.RegularExpressions/doc/class_DfaState_9705397F7C4EF22AB411D3A2CD2F07D838F85228.html#variable_accepting_C872C41A59F9B1C0D850CD33C56E01B80BEA01D9" id="variable_accepting_C872C41A59F9B1C0D850CD33C56E01B80BEA01D9" name="accepting" specifiers="private" type="b53e2ae1-a4b4-4d5b-b75d-06778243ef3d"/>
            <variable docPath="../../System.Text.RegularExpressions/doc/class_DfaState_9705397F7C4EF22AB411D3A2CD2F07D838F85228.html#variable_id_867E6A6E92386F6642F886980E92DC56640C8002" extPath="System.Text.RegularExpressions/doc/class_DfaState_9705397F7C4EF22AB411D3A2CD2F07D838F85228.html#variable_id_867E6A6E92386F6642F886980E92DC56640C8002" id="variable_id_867E6A6E92386F6642F886980E92DC56640C8002" name="id" specifiers="private" type="cc8ffb50-cac1-4f7e-acae-8b3fb9621c37"/>
-           <variable docPath="../../System.Text.RegularExpressions/doc/class_DfaState_9705397F7C4EF22AB411D3A2CD2F07D838F85228.html#variable_next_D5901F97713DBF448997D937726DB0CCF840C122" extPath="System.Text.RegularExpressions/doc/class_DfaState_9705397F7C4EF22AB411D3A2CD2F07D838F85228.html#variable_next_D5901F97713DBF448997D937726DB0CCF840C122" id="variable_next_D5901F97713DBF448997D937726DB0CCF840C122" name="next" specifiers="private" type="edb9a343-9569-48cd-838c-3ee62a5cd86c"/>
+           <variable docPath="../../System.Text.RegularExpressions/doc/class_DfaState_9705397F7C4EF22AB411D3A2CD2F07D838F85228.html#variable_next_D5901F97713DBF448997D937726DB0CCF840C122" extPath="System.Text.RegularExpressions/doc/class_DfaState_9705397F7C4EF22AB411D3A2CD2F07D838F85228.html#variable_next_D5901F97713DBF448997D937726DB0CCF840C122" id="variable_next_D5901F97713DBF448997D937726DB0CCF840C122" name="next" specifiers="private" type="45aa28c4-4a56-4471-9567-5352821d255e"/>
           </variables>
          </class>
          <class docPath="../../System.Text.RegularExpressions/doc/class_Nfa_5E23E7BB511DC9602941611B6CE87476EC3ECB57.html" extPath="System.Text.RegularExpressions/doc/class_Nfa_5E23E7BB511DC9602941611B6CE87476EC3ECB57.html" fileName="System.Text.RegularExpressions/Nfa.cm" filePath="../../System.Text.RegularExpressions/file/Nfa.cm.html" id="class_Nfa_5E23E7BB511DC9602941611B6CE87476EC3ECB57" line="166" name="Nfa" specifiers="public">
@@ -133,19 +133,19 @@
           <functions>
            <function docPath="../../System.Text.RegularExpressions/doc/class_Nfa_5E23E7BB511DC9602941611B6CE87476EC3ECB57.html#member_function_AddState_Nfa_B04784C00A1F38D5975225A1819B2E7F80FC5524" extPath="System.Text.RegularExpressions/doc/class_Nfa_5E23E7BB511DC9602941611B6CE87476EC3ECB57.html#member_function_AddState_Nfa_B04784C00A1F38D5975225A1819B2E7F80FC5524" fileName="System.Text.RegularExpressions/Nfa.cm" filePath="../../System.Text.RegularExpressions/file/Nfa.cm.html" id="member_function_AddState_Nfa_B04784C00A1F38D5975225A1819B2E7F80FC5524" kind="Member Function" line="171" name="AddState" returnType="4e959632-b5f2-406d-9402-ec16ab3f3585" specifiers="public">
             <parameters>
-             <parameter id="parameter_state_6175B1858F1E4127BEFCC1B839FDC4021B2A5314" name="state" type="5a86cabb-4a9f-48bb-8c3b-fefb55cf3d00"/>
+             <parameter id="parameter_state_6175B1858F1E4127BEFCC1B839FDC4021B2A5314" name="state" type="49f0ab60-928d-4815-a2f0-00112003114b"/>
             </parameters>
            </function>
-           <function const="true" docPath="../../System.Text.RegularExpressions/doc/class_Nfa_5E23E7BB511DC9602941611B6CE87476EC3ECB57.html#member_function_GetState_Nfa_69254B598DF5877CA3EEAF6EA75A9E56EB3A641F" extPath="System.Text.RegularExpressions/doc/class_Nfa_5E23E7BB511DC9602941611B6CE87476EC3ECB57.html#member_function_GetState_Nfa_69254B598DF5877CA3EEAF6EA75A9E56EB3A641F" fileName="System.Text.RegularExpressions/Nfa.cm" filePath="../../System.Text.RegularExpressions/file/Nfa.cm.html" id="member_function_GetState_Nfa_69254B598DF5877CA3EEAF6EA75A9E56EB3A641F" kind="Member Function" line="179" name="GetState" returnType="5a86cabb-4a9f-48bb-8c3b-fefb55cf3d00" specifiers="public inline nothrow">
+           <function const="true" docPath="../../System.Text.RegularExpressions/doc/class_Nfa_5E23E7BB511DC9602941611B6CE87476EC3ECB57.html#member_function_GetState_Nfa_69254B598DF5877CA3EEAF6EA75A9E56EB3A641F" extPath="System.Text.RegularExpressions/doc/class_Nfa_5E23E7BB511DC9602941611B6CE87476EC3ECB57.html#member_function_GetState_Nfa_69254B598DF5877CA3EEAF6EA75A9E56EB3A641F" fileName="System.Text.RegularExpressions/Nfa.cm" filePath="../../System.Text.RegularExpressions/file/Nfa.cm.html" id="member_function_GetState_Nfa_69254B598DF5877CA3EEAF6EA75A9E56EB3A641F" kind="Member Function" line="179" name="GetState" returnType="49f0ab60-928d-4815-a2f0-00112003114b" specifiers="public inline nothrow">
             <parameters>
              <parameter id="parameter_i_C26E8964F1A295E60C5232DB9A4DB8BD5F24383B" name="i" type="8edf41dc-c01c-479c-8064-b92f90c315ea"/>
             </parameters>
            </function>
            <function const="true" docPath="../../System.Text.RegularExpressions/doc/class_Nfa_5E23E7BB511DC9602941611B6CE87476EC3ECB57.html#member_function_NumStates_Nfa_36BDB4B847FB98481B3F29F51A81C5BA63A4CA53" extPath="System.Text.RegularExpressions/doc/class_Nfa_5E23E7BB511DC9602941611B6CE87476EC3ECB57.html#member_function_NumStates_Nfa_36BDB4B847FB98481B3F29F51A81C5BA63A4CA53" fileName="System.Text.RegularExpressions/Nfa.cm" filePath="../../System.Text.RegularExpressions/file/Nfa.cm.html" id="member_function_NumStates_Nfa_36BDB4B847FB98481B3F29F51A81C5BA63A4CA53" kind="Member Function" line="183" name="NumStates" returnType="8edf41dc-c01c-479c-8064-b92f90c315ea" specifiers="public inline nothrow"/>
-           <function const="true" docPath="../../System.Text.RegularExpressions/doc/class_Nfa_5E23E7BB511DC9602941611B6CE87476EC3ECB57.html#member_function_States_Nfa_02ACF5CE923C7145CB8872B14A9C917888A0A735" extPath="System.Text.RegularExpressions/doc/class_Nfa_5E23E7BB511DC9602941611B6CE87476EC3ECB57.html#member_function_States_Nfa_02ACF5CE923C7145CB8872B14A9C917888A0A735" fileName="System.Text.RegularExpressions/Nfa.cm" filePath="../../System.Text.RegularExpressions/file/Nfa.cm.html" id="member_function_States_Nfa_02ACF5CE923C7145CB8872B14A9C917888A0A735" kind="Member Function" line="175" name="States" returnType="e86c220b-fbaf-41ff-9ab0-d1582b76b81d" specifiers="public inline nothrow"/>
+           <function const="true" docPath="../../System.Text.RegularExpressions/doc/class_Nfa_5E23E7BB511DC9602941611B6CE87476EC3ECB57.html#member_function_States_Nfa_02ACF5CE923C7145CB8872B14A9C917888A0A735" extPath="System.Text.RegularExpressions/doc/class_Nfa_5E23E7BB511DC9602941611B6CE87476EC3ECB57.html#member_function_States_Nfa_02ACF5CE923C7145CB8872B14A9C917888A0A735" fileName="System.Text.RegularExpressions/Nfa.cm" filePath="../../System.Text.RegularExpressions/file/Nfa.cm.html" id="member_function_States_Nfa_02ACF5CE923C7145CB8872B14A9C917888A0A735" kind="Member Function" line="175" name="States" returnType="13240d83-0695-4d74-af44-c1e17ffcf17d" specifiers="public inline nothrow"/>
           </functions>
           <variables>
-           <variable docPath="../../System.Text.RegularExpressions/doc/class_Nfa_5E23E7BB511DC9602941611B6CE87476EC3ECB57.html#variable_states_AB8239D7FD9022079FF55BC3799210D5C6820D1D" extPath="System.Text.RegularExpressions/doc/class_Nfa_5E23E7BB511DC9602941611B6CE87476EC3ECB57.html#variable_states_AB8239D7FD9022079FF55BC3799210D5C6820D1D" id="variable_states_AB8239D7FD9022079FF55BC3799210D5C6820D1D" name="states" specifiers="private" type="fa274d6b-d2ac-4686-8862-175fa9d3172b"/>
+           <variable docPath="../../System.Text.RegularExpressions/doc/class_Nfa_5E23E7BB511DC9602941611B6CE87476EC3ECB57.html#variable_states_AB8239D7FD9022079FF55BC3799210D5C6820D1D" extPath="System.Text.RegularExpressions/doc/class_Nfa_5E23E7BB511DC9602941611B6CE87476EC3ECB57.html#variable_states_AB8239D7FD9022079FF55BC3799210D5C6820D1D" id="variable_states_AB8239D7FD9022079FF55BC3799210D5C6820D1D" name="states" specifiers="private" type="161cac82-0edb-4ddc-903a-403b9c68ac99"/>
           </variables>
          </class>
          <class docPath="../../System.Text.RegularExpressions/doc/class_NfaState_9D1ED32B9E916097B40ADF566ECF8BF84ACD9662.html" extPath="System.Text.RegularExpressions/doc/class_NfaState_9D1ED32B9E916097B40ADF566ECF8BF84ACD9662.html" fileName="System.Text.RegularExpressions/Nfa.cm" filePath="../../System.Text.RegularExpressions/file/Nfa.cm.html" id="class_NfaState_9D1ED32B9E916097B40ADF566ECF8BF84ACD9662" line="97" name="NfaState" specifiers="public">
@@ -159,9 +159,9 @@
           </ctorsDtors>
           <functions>
            <function docPath="../../System.Text.RegularExpressions/doc/class_NfaState_9D1ED32B9E916097B40ADF566ECF8BF84ACD9662.html#member_function_Accepting_NfaState_AF5C02F9685E4F2B2F518875814539C115F74F16" extPath="System.Text.RegularExpressions/doc/class_NfaState_9D1ED32B9E916097B40ADF566ECF8BF84ACD9662.html#member_function_Accepting_NfaState_AF5C02F9685E4F2B2F518875814539C115F74F16" fileName="System.Text.RegularExpressions/Nfa.cm" filePath="../../System.Text.RegularExpressions/file/Nfa.cm.html" id="member_function_Accepting_NfaState_AF5C02F9685E4F2B2F518875814539C115F74F16" kind="Member Function" line="111" name="Accepting" returnType="b53e2ae1-a4b4-4d5b-b75d-06778243ef3d" specifiers="public inline nothrow"/>
-           <function const="true" docPath="../../System.Text.RegularExpressions/doc/class_NfaState_9D1ED32B9E916097B40ADF566ECF8BF84ACD9662.html#member_function_Epsilon_NfaState_D60F94B16132539AFC860863C4FE7AEF7249B326" extPath="System.Text.RegularExpressions/doc/class_NfaState_9D1ED32B9E916097B40ADF566ECF8BF84ACD9662.html#member_function_Epsilon_NfaState_D60F94B16132539AFC860863C4FE7AEF7249B326" fileName="System.Text.RegularExpressions/Nfa.cm" filePath="../../System.Text.RegularExpressions/file/Nfa.cm.html" id="member_function_Epsilon_NfaState_D60F94B16132539AFC860863C4FE7AEF7249B326" kind="Member Function" line="127" name="Epsilon" returnType="1317c472-532d-48d5-8afc-10c63c33d430" specifiers="public nothrow"/>
+           <function const="true" docPath="../../System.Text.RegularExpressions/doc/class_NfaState_9D1ED32B9E916097B40ADF566ECF8BF84ACD9662.html#member_function_Epsilon_NfaState_D60F94B16132539AFC860863C4FE7AEF7249B326" extPath="System.Text.RegularExpressions/doc/class_NfaState_9D1ED32B9E916097B40ADF566ECF8BF84ACD9662.html#member_function_Epsilon_NfaState_D60F94B16132539AFC860863C4FE7AEF7249B326" fileName="System.Text.RegularExpressions/Nfa.cm" filePath="../../System.Text.RegularExpressions/file/Nfa.cm.html" id="member_function_Epsilon_NfaState_D60F94B16132539AFC860863C4FE7AEF7249B326" kind="Member Function" line="127" name="Epsilon" returnType="4635ddbb-234f-4afb-9016-4c018bc175eb" specifiers="public nothrow"/>
            <function const="true" docPath="../../System.Text.RegularExpressions/doc/class_NfaState_9D1ED32B9E916097B40ADF566ECF8BF84ACD9662.html#member_function_Id_NfaState_1901DF43AE73062A31B45016F07FF2890C6B2D1E" extPath="System.Text.RegularExpressions/doc/class_NfaState_9D1ED32B9E916097B40ADF566ECF8BF84ACD9662.html#member_function_Id_NfaState_1901DF43AE73062A31B45016F07FF2890C6B2D1E" fileName="System.Text.RegularExpressions/Nfa.cm" filePath="../../System.Text.RegularExpressions/file/Nfa.cm.html" id="member_function_Id_NfaState_1901DF43AE73062A31B45016F07FF2890C6B2D1E" kind="Member Function" line="107" name="Id" returnType="cc8ffb50-cac1-4f7e-acae-8b3fb9621c37" specifiers="public inline nothrow"/>
-           <function const="true" docPath="../../System.Text.RegularExpressions/doc/class_NfaState_9D1ED32B9E916097B40ADF566ECF8BF84ACD9662.html#member_function_Next_NfaState_F1C182E26DED97995E45DE94E7A7F66CBF61A74E" extPath="System.Text.RegularExpressions/doc/class_NfaState_9D1ED32B9E916097B40ADF566ECF8BF84ACD9662.html#member_function_Next_NfaState_F1C182E26DED97995E45DE94E7A7F66CBF61A74E" fileName="System.Text.RegularExpressions/Nfa.cm" filePath="../../System.Text.RegularExpressions/file/Nfa.cm.html" id="member_function_Next_NfaState_F1C182E26DED97995E45DE94E7A7F66CBF61A74E" kind="Member Function" line="123" name="Next" returnType="1317c472-532d-48d5-8afc-10c63c33d430" specifiers="public nothrow">
+           <function const="true" docPath="../../System.Text.RegularExpressions/doc/class_NfaState_9D1ED32B9E916097B40ADF566ECF8BF84ACD9662.html#member_function_Next_NfaState_F1C182E26DED97995E45DE94E7A7F66CBF61A74E" extPath="System.Text.RegularExpressions/doc/class_NfaState_9D1ED32B9E916097B40ADF566ECF8BF84ACD9662.html#member_function_Next_NfaState_F1C182E26DED97995E45DE94E7A7F66CBF61A74E" fileName="System.Text.RegularExpressions/Nfa.cm" filePath="../../System.Text.RegularExpressions/file/Nfa.cm.html" id="member_function_Next_NfaState_F1C182E26DED97995E45DE94E7A7F66CBF61A74E" kind="Member Function" line="123" name="Next" returnType="4635ddbb-234f-4afb-9016-4c018bc175eb" specifiers="public nothrow">
             <parameters>
              <parameter id="parameter_c_286114E83040DCFA83E21F7E5998F91612F5BF92" name="c" type="fa042a6a-5c08-46b3-b35b-b955ec35f88c"/>
             </parameters>
@@ -170,14 +170,14 @@
            <function docPath="../../System.Text.RegularExpressions/doc/class_NfaState_9D1ED32B9E916097B40ADF566ECF8BF84ACD9662.html#member_function_SetNext_NfaState_F96A4564E9D4510790B3FC80476BB34DC2701E05" extPath="System.Text.RegularExpressions/doc/class_NfaState_9D1ED32B9E916097B40ADF566ECF8BF84ACD9662.html#member_function_SetNext_NfaState_F96A4564E9D4510790B3FC80476BB34DC2701E05" fileName="System.Text.RegularExpressions/Nfa.cm" filePath="../../System.Text.RegularExpressions/file/Nfa.cm.html" id="member_function_SetNext_NfaState_F96A4564E9D4510790B3FC80476BB34DC2701E05" kind="Member Function" line="119" name="SetNext" returnType="4e959632-b5f2-406d-9402-ec16ab3f3585" specifiers="public">
             <parameters>
              <parameter id="parameter_c_634095BA32A2495159583FE29B3C8444E2290D95" name="c" type="fa042a6a-5c08-46b3-b35b-b955ec35f88c"/>
-             <parameter id="parameter_s_D30455D1D3696D5EF954E2945828B0DFEAFD7383" name="s" type="1317c472-532d-48d5-8afc-10c63c33d430"/>
+             <parameter id="parameter_s_D30455D1D3696D5EF954E2945828B0DFEAFD7383" name="s" type="4635ddbb-234f-4afb-9016-4c018bc175eb"/>
             </parameters>
            </function>
           </functions>
           <variables>
            <variable docPath="../../System.Text.RegularExpressions/doc/class_NfaState_9D1ED32B9E916097B40ADF566ECF8BF84ACD9662.html#variable_accepting_E241586A10F07B920F25F24AF141CACBEE91CCD7" extPath="System.Text.RegularExpressions/doc/class_NfaState_9D1ED32B9E916097B40ADF566ECF8BF84ACD9662.html#variable_accepting_E241586A10F07B920F25F24AF141CACBEE91CCD7" id="variable_accepting_E241586A10F07B920F25F24AF141CACBEE91CCD7" name="accepting" specifiers="private" type="b53e2ae1-a4b4-4d5b-b75d-06778243ef3d"/>
            <variable docPath="../../System.Text.RegularExpressions/doc/class_NfaState_9D1ED32B9E916097B40ADF566ECF8BF84ACD9662.html#variable_id_FC2A605C2AB468E6ECA86889A6112FA1AA247FC7" extPath="System.Text.RegularExpressions/doc/class_NfaState_9D1ED32B9E916097B40ADF566ECF8BF84ACD9662.html#variable_id_FC2A605C2AB468E6ECA86889A6112FA1AA247FC7" id="variable_id_FC2A605C2AB468E6ECA86889A6112FA1AA247FC7" name="id" specifiers="private" type="cc8ffb50-cac1-4f7e-acae-8b3fb9621c37"/>
-           <variable docPath="../../System.Text.RegularExpressions/doc/class_NfaState_9D1ED32B9E916097B40ADF566ECF8BF84ACD9662.html#variable_next_AC22913A7269BDB421D11DCBB55D16434E044360" extPath="System.Text.RegularExpressions/doc/class_NfaState_9D1ED32B9E916097B40ADF566ECF8BF84ACD9662.html#variable_next_AC22913A7269BDB421D11DCBB55D16434E044360" id="variable_next_AC22913A7269BDB421D11DCBB55D16434E044360" name="next" specifiers="private" type="a6d2dccc-c31a-4d3c-b854-e57a17b58388"/>
+           <variable docPath="../../System.Text.RegularExpressions/doc/class_NfaState_9D1ED32B9E916097B40ADF566ECF8BF84ACD9662.html#variable_next_AC22913A7269BDB421D11DCBB55D16434E044360" extPath="System.Text.RegularExpressions/doc/class_NfaState_9D1ED32B9E916097B40ADF566ECF8BF84ACD9662.html#variable_next_AC22913A7269BDB421D11DCBB55D16434E044360" id="variable_next_AC22913A7269BDB421D11DCBB55D16434E044360" name="next" specifiers="private" type="500a2bea-bc23-4bfc-8bf1-f59cc98e07f3"/>
           </variables>
          </class>
          <class docPath="../../System.Text.RegularExpressions/doc/class_NfaStateNumberSet_94283B9E90ECB564FEF4909226A69DC50DFBEAC3.html" extPath="System.Text.RegularExpressions/doc/class_NfaStateNumberSet_94283B9E90ECB564FEF4909226A69DC50DFBEAC3.html" fileName="System.Text.RegularExpressions/Nfa.cm" filePath="../../System.Text.RegularExpressions/file/Nfa.cm.html" id="class_NfaStateNumberSet_94283B9E90ECB564FEF4909226A69DC50DFBEAC3" line="12" name="NfaStateNumberSet" specifiers="public">
@@ -209,14 +209,14 @@
            <function docPath="../../System.Text.RegularExpressions/doc/class_NfaStateNumberSet_94283B9E90ECB564FEF4909226A69DC50DFBEAC3.html#member_function_MakeCanonical_NfaStateNumberSet_C42068B1DC4BA252151DD3777C00E7BE26039A0A" extPath="System.Text.RegularExpressions/doc/class_NfaStateNumberSet_94283B9E90ECB564FEF4909226A69DC50DFBEAC3.html#member_function_MakeCanonical_NfaStateNumberSet_C42068B1DC4BA252151DD3777C00E7BE26039A0A" fileName="System.Text.RegularExpressions/Nfa.cm" filePath="../../System.Text.RegularExpressions/file/Nfa.cm.html" id="member_function_MakeCanonical_NfaStateNumberSet_C42068B1DC4BA252151DD3777C00E7BE26039A0A" kind="Member Function" line="48" name="MakeCanonical" returnType="4e959632-b5f2-406d-9402-ec16ab3f3585" specifiers="public"/>
            <function docPath="../../System.Text.RegularExpressions/doc/class_NfaStateNumberSet_94283B9E90ECB564FEF4909226A69DC50DFBEAC3.html#member_function_Merge_NfaStateNumberSet_767CE8DDFEF6A5C7F29141A28ECA2172FC518E9D" extPath="System.Text.RegularExpressions/doc/class_NfaStateNumberSet_94283B9E90ECB564FEF4909226A69DC50DFBEAC3.html#member_function_Merge_NfaStateNumberSet_767CE8DDFEF6A5C7F29141A28ECA2172FC518E9D" fileName="System.Text.RegularExpressions/Nfa.cm" filePath="../../System.Text.RegularExpressions/file/Nfa.cm.html" id="member_function_Merge_NfaStateNumberSet_767CE8DDFEF6A5C7F29141A28ECA2172FC518E9D" kind="Member Function" line="41" name="Merge" returnType="4e959632-b5f2-406d-9402-ec16ab3f3585" specifiers="public">
             <parameters>
-             <parameter id="parameter_x_6EE0F27AEED179D427791486276C8D7E2C1A9CF4" name="x" type="1317c472-532d-48d5-8afc-10c63c33d430"/>
+             <parameter id="parameter_x_6EE0F27AEED179D427791486276C8D7E2C1A9CF4" name="x" type="4635ddbb-234f-4afb-9016-4c018bc175eb"/>
             </parameters>
            </function>
-           <function const="true" docPath="../../System.Text.RegularExpressions/doc/class_NfaStateNumberSet_94283B9E90ECB564FEF4909226A69DC50DFBEAC3.html#member_function_Rep_NfaStateNumberSet_291560AD89F4F0E7F7A1887C43F7F01374E29171" extPath="System.Text.RegularExpressions/doc/class_NfaStateNumberSet_94283B9E90ECB564FEF4909226A69DC50DFBEAC3.html#member_function_Rep_NfaStateNumberSet_291560AD89F4F0E7F7A1887C43F7F01374E29171" fileName="System.Text.RegularExpressions/Nfa.cm" filePath="../../System.Text.RegularExpressions/file/Nfa.cm.html" id="member_function_Rep_NfaStateNumberSet_291560AD89F4F0E7F7A1887C43F7F01374E29171" kind="Member Function" line="75" name="Rep" returnType="3780c7fe-0a0c-411c-b8f4-47a227841233" specifiers="public nothrow"/>
+           <function const="true" docPath="../../System.Text.RegularExpressions/doc/class_NfaStateNumberSet_94283B9E90ECB564FEF4909226A69DC50DFBEAC3.html#member_function_Rep_NfaStateNumberSet_291560AD89F4F0E7F7A1887C43F7F01374E29171" extPath="System.Text.RegularExpressions/doc/class_NfaStateNumberSet_94283B9E90ECB564FEF4909226A69DC50DFBEAC3.html#member_function_Rep_NfaStateNumberSet_291560AD89F4F0E7F7A1887C43F7F01374E29171" fileName="System.Text.RegularExpressions/Nfa.cm" filePath="../../System.Text.RegularExpressions/file/Nfa.cm.html" id="member_function_Rep_NfaStateNumberSet_291560AD89F4F0E7F7A1887C43F7F01374E29171" kind="Member Function" line="75" name="Rep" returnType="12ffe00a-ab63-402f-bb81-2f81040463ce" specifiers="public nothrow"/>
            <function const="true" docPath="../../System.Text.RegularExpressions/doc/class_NfaStateNumberSet_94283B9E90ECB564FEF4909226A69DC50DFBEAC3.html#member_function_ToString_NfaStateNumberSet_44BA3F2CB44C01913423DABA63C2B2A64E29D293" extPath="System.Text.RegularExpressions/doc/class_NfaStateNumberSet_94283B9E90ECB564FEF4909226A69DC50DFBEAC3.html#member_function_ToString_NfaStateNumberSet_44BA3F2CB44C01913423DABA63C2B2A64E29D293" fileName="System.Text.RegularExpressions/Nfa.cm" filePath="../../System.Text.RegularExpressions/file/Nfa.cm.html" id="member_function_ToString_NfaStateNumberSet_44BA3F2CB44C01913423DABA63C2B2A64E29D293" kind="Member Function" line="56" name="ToString" returnType="c7461d76-d6b8-4a81-baf1-b9e490d8318b" specifiers="public"/>
           </functions>
           <variables>
-           <variable docPath="../../System.Text.RegularExpressions/doc/class_NfaStateNumberSet_94283B9E90ECB564FEF4909226A69DC50DFBEAC3.html#variable_stateNumbers_F1E3A58B02D79B0955FFEC044281DE0A59B6522A" extPath="System.Text.RegularExpressions/doc/class_NfaStateNumberSet_94283B9E90ECB564FEF4909226A69DC50DFBEAC3.html#variable_stateNumbers_F1E3A58B02D79B0955FFEC044281DE0A59B6522A" id="variable_stateNumbers_F1E3A58B02D79B0955FFEC044281DE0A59B6522A" name="stateNumbers" specifiers="private" type="edb9a343-9569-48cd-838c-3ee62a5cd86c"/>
+           <variable docPath="../../System.Text.RegularExpressions/doc/class_NfaStateNumberSet_94283B9E90ECB564FEF4909226A69DC50DFBEAC3.html#variable_stateNumbers_F1E3A58B02D79B0955FFEC044281DE0A59B6522A" extPath="System.Text.RegularExpressions/doc/class_NfaStateNumberSet_94283B9E90ECB564FEF4909226A69DC50DFBEAC3.html#variable_stateNumbers_F1E3A58B02D79B0955FFEC044281DE0A59B6522A" id="variable_stateNumbers_F1E3A58B02D79B0955FFEC044281DE0A59B6522A" name="stateNumbers" specifiers="private" type="45aa28c4-4a56-4471-9567-5352821d255e"/>
           </variables>
          </class>
          <class docPath="../../System.Text.RegularExpressions/doc/class_PtrNfa_5708C8189DEAC0F8CBD3A9DA5094DE3E7536B5FB.html" extPath="System.Text.RegularExpressions/doc/class_PtrNfa_5708C8189DEAC0F8CBD3A9DA5094DE3E7536B5FB.html" fileName="System.Text.RegularExpressions/PtrNfa.cm" filePath="../../System.Text.RegularExpressions/file/PtrNfa.cm.html" id="class_PtrNfa_5708C8189DEAC0F8CBD3A9DA5094DE3E7536B5FB" line="160" name="PtrNfa" specifiers="public">
@@ -224,36 +224,36 @@
            <ctorDtor docPath="../../System.Text.RegularExpressions/doc/class_PtrNfa_5708C8189DEAC0F8CBD3A9DA5094DE3E7536B5FB.html#default_constructor_PtrNfa_71AA850786E0FF72DFAF4F76055420C328B7A1D0" extPath="System.Text.RegularExpressions/doc/class_PtrNfa_5708C8189DEAC0F8CBD3A9DA5094DE3E7536B5FB.html#default_constructor_PtrNfa_71AA850786E0FF72DFAF4F76055420C328B7A1D0" fileName="System.Text.RegularExpressions/PtrNfa.cm" filePath="../../System.Text.RegularExpressions/file/PtrNfa.cm.html" id="default_constructor_PtrNfa_71AA850786E0FF72DFAF4F76055420C328B7A1D0" kind="Constructor" line="162" name="PtrNfa" specifiers="public"/>
            <ctorDtor docPath="../../System.Text.RegularExpressions/doc/class_PtrNfa_5708C8189DEAC0F8CBD3A9DA5094DE3E7536B5FB.html#constructor_PtrNfa_DD413467E32CD13263051E678D94CB3A79B3D1FB" extPath="System.Text.RegularExpressions/doc/class_PtrNfa_5708C8189DEAC0F8CBD3A9DA5094DE3E7536B5FB.html#constructor_PtrNfa_DD413467E32CD13263051E678D94CB3A79B3D1FB" fileName="System.Text.RegularExpressions/PtrNfa.cm" filePath="../../System.Text.RegularExpressions/file/PtrNfa.cm.html" id="constructor_PtrNfa_DD413467E32CD13263051E678D94CB3A79B3D1FB" kind="Constructor" line="165" name="PtrNfa" specifiers="public">
             <parameters>
-             <parameter id="parameter_start__A0C6A177E9EFCE383B828FCA74B36D5E9DC04B44" name="start_" type="9efbfbd2-65e3-44ec-81a2-a8c6e74a2acd"/>
-             <parameter id="parameter_end__BBFBAC5227245C42A99CD3E3DF9195AC18E18D41" name="end_" type="9efbfbd2-65e3-44ec-81a2-a8c6e74a2acd"/>
+             <parameter id="parameter_start__A0C6A177E9EFCE383B828FCA74B36D5E9DC04B44" name="start_" type="e66ff1f1-0da9-42ae-be44-5ff9c2740bc1"/>
+             <parameter id="parameter_end__BBFBAC5227245C42A99CD3E3DF9195AC18E18D41" name="end_" type="e66ff1f1-0da9-42ae-be44-5ff9c2740bc1"/>
             </parameters>
            </ctorDtor>
           </ctorsDtors>
           <functions>
            <function docPath="../../System.Text.RegularExpressions/doc/class_PtrNfa_5708C8189DEAC0F8CBD3A9DA5094DE3E7536B5FB.html#member_function_AddState_PtrNfa_9ACE919104983EE7EE583D8D5896F65CD3A6924C" extPath="System.Text.RegularExpressions/doc/class_PtrNfa_5708C8189DEAC0F8CBD3A9DA5094DE3E7536B5FB.html#member_function_AddState_PtrNfa_9ACE919104983EE7EE583D8D5896F65CD3A6924C" fileName="System.Text.RegularExpressions/PtrNfa.cm" filePath="../../System.Text.RegularExpressions/file/PtrNfa.cm.html" id="member_function_AddState_PtrNfa_9ACE919104983EE7EE583D8D5896F65CD3A6924C" kind="Member Function" line="192" name="AddState" returnType="4e959632-b5f2-406d-9402-ec16ab3f3585" specifiers="public">
             <parameters>
-             <parameter id="parameter_state_CEE64063B4E0BB1AFE640C4B9D87474752A7292F" name="state" type="9efbfbd2-65e3-44ec-81a2-a8c6e74a2acd"/>
+             <parameter id="parameter_state_CEE64063B4E0BB1AFE640C4B9D87474752A7292F" name="state" type="e66ff1f1-0da9-42ae-be44-5ff9c2740bc1"/>
             </parameters>
            </function>
-           <function const="true" docPath="../../System.Text.RegularExpressions/doc/class_PtrNfa_5708C8189DEAC0F8CBD3A9DA5094DE3E7536B5FB.html#member_function_End_PtrNfa_9D0D4AEEB95A05FB49398DCDE44EE409822792A6" extPath="System.Text.RegularExpressions/doc/class_PtrNfa_5708C8189DEAC0F8CBD3A9DA5094DE3E7536B5FB.html#member_function_End_PtrNfa_9D0D4AEEB95A05FB49398DCDE44EE409822792A6" fileName="System.Text.RegularExpressions/PtrNfa.cm" filePath="../../System.Text.RegularExpressions/file/PtrNfa.cm.html" id="member_function_End_PtrNfa_9D0D4AEEB95A05FB49398DCDE44EE409822792A6" kind="Member Function" line="179" name="End" returnType="9efbfbd2-65e3-44ec-81a2-a8c6e74a2acd" specifiers="public inline nothrow"/>
+           <function const="true" docPath="../../System.Text.RegularExpressions/doc/class_PtrNfa_5708C8189DEAC0F8CBD3A9DA5094DE3E7536B5FB.html#member_function_End_PtrNfa_9D0D4AEEB95A05FB49398DCDE44EE409822792A6" extPath="System.Text.RegularExpressions/doc/class_PtrNfa_5708C8189DEAC0F8CBD3A9DA5094DE3E7536B5FB.html#member_function_End_PtrNfa_9D0D4AEEB95A05FB49398DCDE44EE409822792A6" fileName="System.Text.RegularExpressions/PtrNfa.cm" filePath="../../System.Text.RegularExpressions/file/PtrNfa.cm.html" id="member_function_End_PtrNfa_9D0D4AEEB95A05FB49398DCDE44EE409822792A6" kind="Member Function" line="179" name="End" returnType="e66ff1f1-0da9-42ae-be44-5ff9c2740bc1" specifiers="public inline nothrow"/>
            <function docPath="../../System.Text.RegularExpressions/doc/class_PtrNfa_5708C8189DEAC0F8CBD3A9DA5094DE3E7536B5FB.html#member_function_NumberStates_PtrNfa_E15BF6BE88238C33876FB91272D03D3745BC472C" extPath="System.Text.RegularExpressions/doc/class_PtrNfa_5708C8189DEAC0F8CBD3A9DA5094DE3E7536B5FB.html#member_function_NumberStates_PtrNfa_E15BF6BE88238C33876FB91272D03D3745BC472C" fileName="System.Text.RegularExpressions/PtrNfa.cm" filePath="../../System.Text.RegularExpressions/file/PtrNfa.cm.html" id="member_function_NumberStates_PtrNfa_E15BF6BE88238C33876FB91272D03D3745BC472C" kind="Member Function" line="196" name="NumberStates" returnType="4e959632-b5f2-406d-9402-ec16ab3f3585" specifiers="public nothrow"/>
            <function docPath="../../System.Text.RegularExpressions/doc/class_PtrNfa_5708C8189DEAC0F8CBD3A9DA5094DE3E7536B5FB.html#member_function_SetEnd_PtrNfa_A046A4A4455872E5113117EBF6F958DBC5772A92" extPath="System.Text.RegularExpressions/doc/class_PtrNfa_5708C8189DEAC0F8CBD3A9DA5094DE3E7536B5FB.html#member_function_SetEnd_PtrNfa_A046A4A4455872E5113117EBF6F958DBC5772A92" fileName="System.Text.RegularExpressions/PtrNfa.cm" filePath="../../System.Text.RegularExpressions/file/PtrNfa.cm.html" id="member_function_SetEnd_PtrNfa_A046A4A4455872E5113117EBF6F958DBC5772A92" kind="Member Function" line="183" name="SetEnd" returnType="4e959632-b5f2-406d-9402-ec16ab3f3585" specifiers="public inline">
             <parameters>
-             <parameter id="parameter_end__3A29EEBCE84AA068B08B7784081218C1F06C4658" name="end_" type="9efbfbd2-65e3-44ec-81a2-a8c6e74a2acd"/>
+             <parameter id="parameter_end__3A29EEBCE84AA068B08B7784081218C1F06C4658" name="end_" type="e66ff1f1-0da9-42ae-be44-5ff9c2740bc1"/>
             </parameters>
            </function>
            <function docPath="../../System.Text.RegularExpressions/doc/class_PtrNfa_5708C8189DEAC0F8CBD3A9DA5094DE3E7536B5FB.html#member_function_SetStart_PtrNfa_68D8D18EE0BC53CE9761A4F7871A4756CC6CC579" extPath="System.Text.RegularExpressions/doc/class_PtrNfa_5708C8189DEAC0F8CBD3A9DA5094DE3E7536B5FB.html#member_function_SetStart_PtrNfa_68D8D18EE0BC53CE9761A4F7871A4756CC6CC579" fileName="System.Text.RegularExpressions/PtrNfa.cm" filePath="../../System.Text.RegularExpressions/file/PtrNfa.cm.html" id="member_function_SetStart_PtrNfa_68D8D18EE0BC53CE9761A4F7871A4756CC6CC579" kind="Member Function" line="174" name="SetStart" returnType="4e959632-b5f2-406d-9402-ec16ab3f3585" specifiers="public inline">
             <parameters>
-             <parameter id="parameter_start__5CE335123FDAC01F6C8A773C7EB76C8D61B8782C" name="start_" type="9efbfbd2-65e3-44ec-81a2-a8c6e74a2acd"/>
+             <parameter id="parameter_start__5CE335123FDAC01F6C8A773C7EB76C8D61B8782C" name="start_" type="e66ff1f1-0da9-42ae-be44-5ff9c2740bc1"/>
             </parameters>
            </function>
-           <function const="true" docPath="../../System.Text.RegularExpressions/doc/class_PtrNfa_5708C8189DEAC0F8CBD3A9DA5094DE3E7536B5FB.html#member_function_Start_PtrNfa_6B888DEA26A54DC8A3A86CADBB9DFAEA8D6B419C" extPath="System.Text.RegularExpressions/doc/class_PtrNfa_5708C8189DEAC0F8CBD3A9DA5094DE3E7536B5FB.html#member_function_Start_PtrNfa_6B888DEA26A54DC8A3A86CADBB9DFAEA8D6B419C" fileName="System.Text.RegularExpressions/PtrNfa.cm" filePath="../../System.Text.RegularExpressions/file/PtrNfa.cm.html" id="member_function_Start_PtrNfa_6B888DEA26A54DC8A3A86CADBB9DFAEA8D6B419C" kind="Member Function" line="170" name="Start" returnType="9efbfbd2-65e3-44ec-81a2-a8c6e74a2acd" specifiers="public inline nothrow"/>
-           <function const="true" docPath="../../System.Text.RegularExpressions/doc/class_PtrNfa_5708C8189DEAC0F8CBD3A9DA5094DE3E7536B5FB.html#member_function_States_PtrNfa_1C5C73292FB6212598B84B2AFB46BD29214CF42F" extPath="System.Text.RegularExpressions/doc/class_PtrNfa_5708C8189DEAC0F8CBD3A9DA5094DE3E7536B5FB.html#member_function_States_PtrNfa_1C5C73292FB6212598B84B2AFB46BD29214CF42F" fileName="System.Text.RegularExpressions/PtrNfa.cm" filePath="../../System.Text.RegularExpressions/file/PtrNfa.cm.html" id="member_function_States_PtrNfa_1C5C73292FB6212598B84B2AFB46BD29214CF42F" kind="Member Function" line="188" name="States" returnType="855e0445-ca79-46de-a3fd-354e636014a9" specifiers="public nothrow"/>
+           <function const="true" docPath="../../System.Text.RegularExpressions/doc/class_PtrNfa_5708C8189DEAC0F8CBD3A9DA5094DE3E7536B5FB.html#member_function_Start_PtrNfa_6B888DEA26A54DC8A3A86CADBB9DFAEA8D6B419C" extPath="System.Text.RegularExpressions/doc/class_PtrNfa_5708C8189DEAC0F8CBD3A9DA5094DE3E7536B5FB.html#member_function_Start_PtrNfa_6B888DEA26A54DC8A3A86CADBB9DFAEA8D6B419C" fileName="System.Text.RegularExpressions/PtrNfa.cm" filePath="../../System.Text.RegularExpressions/file/PtrNfa.cm.html" id="member_function_Start_PtrNfa_6B888DEA26A54DC8A3A86CADBB9DFAEA8D6B419C" kind="Member Function" line="170" name="Start" returnType="e66ff1f1-0da9-42ae-be44-5ff9c2740bc1" specifiers="public inline nothrow"/>
+           <function const="true" docPath="../../System.Text.RegularExpressions/doc/class_PtrNfa_5708C8189DEAC0F8CBD3A9DA5094DE3E7536B5FB.html#member_function_States_PtrNfa_1C5C73292FB6212598B84B2AFB46BD29214CF42F" extPath="System.Text.RegularExpressions/doc/class_PtrNfa_5708C8189DEAC0F8CBD3A9DA5094DE3E7536B5FB.html#member_function_States_PtrNfa_1C5C73292FB6212598B84B2AFB46BD29214CF42F" fileName="System.Text.RegularExpressions/PtrNfa.cm" filePath="../../System.Text.RegularExpressions/file/PtrNfa.cm.html" id="member_function_States_PtrNfa_1C5C73292FB6212598B84B2AFB46BD29214CF42F" kind="Member Function" line="188" name="States" returnType="14a80648-d135-44f5-ab5d-657c89ca0b70" specifiers="public nothrow"/>
           </functions>
           <variables>
-           <variable docPath="../../System.Text.RegularExpressions/doc/class_PtrNfa_5708C8189DEAC0F8CBD3A9DA5094DE3E7536B5FB.html#variable_end_5EC622ABE933C60E5A4BF653649EED81003F179C" extPath="System.Text.RegularExpressions/doc/class_PtrNfa_5708C8189DEAC0F8CBD3A9DA5094DE3E7536B5FB.html#variable_end_5EC622ABE933C60E5A4BF653649EED81003F179C" id="variable_end_5EC622ABE933C60E5A4BF653649EED81003F179C" name="end" specifiers="private" type="9efbfbd2-65e3-44ec-81a2-a8c6e74a2acd"/>
-           <variable docPath="../../System.Text.RegularExpressions/doc/class_PtrNfa_5708C8189DEAC0F8CBD3A9DA5094DE3E7536B5FB.html#variable_start_8C0DDB72465BBDCD1F5A86E05815B280483A1CDE" extPath="System.Text.RegularExpressions/doc/class_PtrNfa_5708C8189DEAC0F8CBD3A9DA5094DE3E7536B5FB.html#variable_start_8C0DDB72465BBDCD1F5A86E05815B280483A1CDE" id="variable_start_8C0DDB72465BBDCD1F5A86E05815B280483A1CDE" name="start" specifiers="private" type="9efbfbd2-65e3-44ec-81a2-a8c6e74a2acd"/>
-           <variable docPath="../../System.Text.RegularExpressions/doc/class_PtrNfa_5708C8189DEAC0F8CBD3A9DA5094DE3E7536B5FB.html#variable_states_CC0656402ABDBBAE6D9E5BC1367EA077B992AACE" extPath="System.Text.RegularExpressions/doc/class_PtrNfa_5708C8189DEAC0F8CBD3A9DA5094DE3E7536B5FB.html#variable_states_CC0656402ABDBBAE6D9E5BC1367EA077B992AACE" id="variable_states_CC0656402ABDBBAE6D9E5BC1367EA077B992AACE" name="states" specifiers="private" type="221ded1a-ecfa-41d7-8df7-d173149ba556"/>
+           <variable docPath="../../System.Text.RegularExpressions/doc/class_PtrNfa_5708C8189DEAC0F8CBD3A9DA5094DE3E7536B5FB.html#variable_end_5EC622ABE933C60E5A4BF653649EED81003F179C" extPath="System.Text.RegularExpressions/doc/class_PtrNfa_5708C8189DEAC0F8CBD3A9DA5094DE3E7536B5FB.html#variable_end_5EC622ABE933C60E5A4BF653649EED81003F179C" id="variable_end_5EC622ABE933C60E5A4BF653649EED81003F179C" name="end" specifiers="private" type="e66ff1f1-0da9-42ae-be44-5ff9c2740bc1"/>
+           <variable docPath="../../System.Text.RegularExpressions/doc/class_PtrNfa_5708C8189DEAC0F8CBD3A9DA5094DE3E7536B5FB.html#variable_start_8C0DDB72465BBDCD1F5A86E05815B280483A1CDE" extPath="System.Text.RegularExpressions/doc/class_PtrNfa_5708C8189DEAC0F8CBD3A9DA5094DE3E7536B5FB.html#variable_start_8C0DDB72465BBDCD1F5A86E05815B280483A1CDE" id="variable_start_8C0DDB72465BBDCD1F5A86E05815B280483A1CDE" name="start" specifiers="private" type="e66ff1f1-0da9-42ae-be44-5ff9c2740bc1"/>
+           <variable docPath="../../System.Text.RegularExpressions/doc/class_PtrNfa_5708C8189DEAC0F8CBD3A9DA5094DE3E7536B5FB.html#variable_states_CC0656402ABDBBAE6D9E5BC1367EA077B992AACE" extPath="System.Text.RegularExpressions/doc/class_PtrNfa_5708C8189DEAC0F8CBD3A9DA5094DE3E7536B5FB.html#variable_states_CC0656402ABDBBAE6D9E5BC1367EA077B992AACE" id="variable_states_CC0656402ABDBBAE6D9E5BC1367EA077B992AACE" name="states" specifiers="private" type="3d3e451b-095b-4d41-9d64-20a9ae6ef67c"/>
           </variables>
          </class>
          <class docPath="../../System.Text.RegularExpressions/doc/class_PtrNfaEdge_937C7F61A080B689DF3D122F26A5057032EE2DB3.html" extPath="System.Text.RegularExpressions/doc/class_PtrNfaEdge_937C7F61A080B689DF3D122F26A5057032EE2DB3.html" fileName="System.Text.RegularExpressions/PtrNfa.cm" filePath="../../System.Text.RegularExpressions/file/PtrNfa.cm.html" id="class_PtrNfaEdge_937C7F61A080B689DF3D122F26A5057032EE2DB3" line="80" name="PtrNfaEdge" specifiers="public">
@@ -261,18 +261,18 @@
            <ctorDtor docPath="../../System.Text.RegularExpressions/doc/class_PtrNfaEdge_937C7F61A080B689DF3D122F26A5057032EE2DB3.html#default_constructor_PtrNfaEdge_4E5C4C7D81EF9451C225A411124357E80330BB28" extPath="System.Text.RegularExpressions/doc/class_PtrNfaEdge_937C7F61A080B689DF3D122F26A5057032EE2DB3.html#default_constructor_PtrNfaEdge_4E5C4C7D81EF9451C225A411124357E80330BB28" fileName="System.Text.RegularExpressions/PtrNfa.cm" filePath="../../System.Text.RegularExpressions/file/PtrNfa.cm.html" id="default_constructor_PtrNfaEdge_4E5C4C7D81EF9451C225A411124357E80330BB28" kind="Constructor" line="82" name="PtrNfaEdge" specifiers="public"/>
            <ctorDtor docPath="../../System.Text.RegularExpressions/doc/class_PtrNfaEdge_937C7F61A080B689DF3D122F26A5057032EE2DB3.html#constructor_PtrNfaEdge_B54320755C6D76958ED7659B24C92A774C008725" extPath="System.Text.RegularExpressions/doc/class_PtrNfaEdge_937C7F61A080B689DF3D122F26A5057032EE2DB3.html#constructor_PtrNfaEdge_B54320755C6D76958ED7659B24C92A774C008725" fileName="System.Text.RegularExpressions/PtrNfa.cm" filePath="../../System.Text.RegularExpressions/file/PtrNfa.cm.html" id="constructor_PtrNfaEdge_B54320755C6D76958ED7659B24C92A774C008725" kind="Constructor" line="85" name="PtrNfaEdge" specifiers="public">
             <parameters>
-             <parameter id="parameter_cls__EF6DAC9CCA123F5DE2C3AE8F6D158F3EE65317B0" name="cls_" type="891de8bc-ed79-43d0-9624-5e22f80a13b6"/>
-             <parameter id="parameter_next__8354C4C8EE147B7507C0DF3DFE750C669E018DB9" name="next_" type="9efbfbd2-65e3-44ec-81a2-a8c6e74a2acd"/>
+             <parameter id="parameter_cls__EF6DAC9CCA123F5DE2C3AE8F6D158F3EE65317B0" name="cls_" type="dcb5c7ab-129b-4eaf-81ee-c0f951b21a51"/>
+             <parameter id="parameter_next__8354C4C8EE147B7507C0DF3DFE750C669E018DB9" name="next_" type="e66ff1f1-0da9-42ae-be44-5ff9c2740bc1"/>
             </parameters>
            </ctorDtor>
           </ctorsDtors>
           <functions>
-           <function const="true" docPath="../../System.Text.RegularExpressions/doc/class_PtrNfaEdge_937C7F61A080B689DF3D122F26A5057032EE2DB3.html#member_function_Chars_PtrNfaEdge_8DAE9F8CCBF632554AE355DD5114A3CE0362730F" extPath="System.Text.RegularExpressions/doc/class_PtrNfaEdge_937C7F61A080B689DF3D122F26A5057032EE2DB3.html#member_function_Chars_PtrNfaEdge_8DAE9F8CCBF632554AE355DD5114A3CE0362730F" fileName="System.Text.RegularExpressions/PtrNfa.cm" filePath="../../System.Text.RegularExpressions/file/PtrNfa.cm.html" id="member_function_Chars_PtrNfaEdge_8DAE9F8CCBF632554AE355DD5114A3CE0362730F" kind="Member Function" line="88" name="Chars" returnType="891de8bc-ed79-43d0-9624-5e22f80a13b6" specifiers="public inline nothrow"/>
-           <function const="true" docPath="../../System.Text.RegularExpressions/doc/class_PtrNfaEdge_937C7F61A080B689DF3D122F26A5057032EE2DB3.html#member_function_Next_PtrNfaEdge_5C5682B5F4FEE0A942759DD67774745F253CEF68" extPath="System.Text.RegularExpressions/doc/class_PtrNfaEdge_937C7F61A080B689DF3D122F26A5057032EE2DB3.html#member_function_Next_PtrNfaEdge_5C5682B5F4FEE0A942759DD67774745F253CEF68" fileName="System.Text.RegularExpressions/PtrNfa.cm" filePath="../../System.Text.RegularExpressions/file/PtrNfa.cm.html" id="member_function_Next_PtrNfaEdge_5C5682B5F4FEE0A942759DD67774745F253CEF68" kind="Member Function" line="92" name="Next" returnType="9efbfbd2-65e3-44ec-81a2-a8c6e74a2acd" specifiers="public inline nothrow"/>
+           <function const="true" docPath="../../System.Text.RegularExpressions/doc/class_PtrNfaEdge_937C7F61A080B689DF3D122F26A5057032EE2DB3.html#member_function_Chars_PtrNfaEdge_8DAE9F8CCBF632554AE355DD5114A3CE0362730F" extPath="System.Text.RegularExpressions/doc/class_PtrNfaEdge_937C7F61A080B689DF3D122F26A5057032EE2DB3.html#member_function_Chars_PtrNfaEdge_8DAE9F8CCBF632554AE355DD5114A3CE0362730F" fileName="System.Text.RegularExpressions/PtrNfa.cm" filePath="../../System.Text.RegularExpressions/file/PtrNfa.cm.html" id="member_function_Chars_PtrNfaEdge_8DAE9F8CCBF632554AE355DD5114A3CE0362730F" kind="Member Function" line="88" name="Chars" returnType="dcb5c7ab-129b-4eaf-81ee-c0f951b21a51" specifiers="public inline nothrow"/>
+           <function const="true" docPath="../../System.Text.RegularExpressions/doc/class_PtrNfaEdge_937C7F61A080B689DF3D122F26A5057032EE2DB3.html#member_function_Next_PtrNfaEdge_5C5682B5F4FEE0A942759DD67774745F253CEF68" extPath="System.Text.RegularExpressions/doc/class_PtrNfaEdge_937C7F61A080B689DF3D122F26A5057032EE2DB3.html#member_function_Next_PtrNfaEdge_5C5682B5F4FEE0A942759DD67774745F253CEF68" fileName="System.Text.RegularExpressions/PtrNfa.cm" filePath="../../System.Text.RegularExpressions/file/PtrNfa.cm.html" id="member_function_Next_PtrNfaEdge_5C5682B5F4FEE0A942759DD67774745F253CEF68" kind="Member Function" line="92" name="Next" returnType="e66ff1f1-0da9-42ae-be44-5ff9c2740bc1" specifiers="public inline nothrow"/>
           </functions>
           <variables>
            <variable docPath="../../System.Text.RegularExpressions/doc/class_PtrNfaEdge_937C7F61A080B689DF3D122F26A5057032EE2DB3.html#variable_cls_3298B6AAC01C9E0C34EB2BE14A65C32BAD3A82C6" extPath="System.Text.RegularExpressions/doc/class_PtrNfaEdge_937C7F61A080B689DF3D122F26A5057032EE2DB3.html#variable_cls_3298B6AAC01C9E0C34EB2BE14A65C32BAD3A82C6" id="variable_cls_3298B6AAC01C9E0C34EB2BE14A65C32BAD3A82C6" name="cls" specifiers="private" type="class_CharClass_D0839E83F8129D6C4D261748730F5967D1045544"/>
-           <variable docPath="../../System.Text.RegularExpressions/doc/class_PtrNfaEdge_937C7F61A080B689DF3D122F26A5057032EE2DB3.html#variable_next_19959D124F7F59582F8A59C874F7C609545966CF" extPath="System.Text.RegularExpressions/doc/class_PtrNfaEdge_937C7F61A080B689DF3D122F26A5057032EE2DB3.html#variable_next_19959D124F7F59582F8A59C874F7C609545966CF" id="variable_next_19959D124F7F59582F8A59C874F7C609545966CF" name="next" specifiers="private" type="9efbfbd2-65e3-44ec-81a2-a8c6e74a2acd"/>
+           <variable docPath="../../System.Text.RegularExpressions/doc/class_PtrNfaEdge_937C7F61A080B689DF3D122F26A5057032EE2DB3.html#variable_next_19959D124F7F59582F8A59C874F7C609545966CF" extPath="System.Text.RegularExpressions/doc/class_PtrNfaEdge_937C7F61A080B689DF3D122F26A5057032EE2DB3.html#variable_next_19959D124F7F59582F8A59C874F7C609545966CF" id="variable_next_19959D124F7F59582F8A59C874F7C609545966CF" name="next" specifiers="private" type="e66ff1f1-0da9-42ae-be44-5ff9c2740bc1"/>
           </variables>
          </class>
          <class docPath="../../System.Text.RegularExpressions/doc/class_PtrNfaState_828AD9578262913C0B2EE4669E5D88681833D3E8.html" extPath="System.Text.RegularExpressions/doc/class_PtrNfaState_828AD9578262913C0B2EE4669E5D88681833D3E8.html" fileName="System.Text.RegularExpressions/PtrNfa.cm" filePath="../../System.Text.RegularExpressions/file/PtrNfa.cm.html" id="class_PtrNfaState_828AD9578262913C0B2EE4669E5D88681833D3E8" line="14" name="PtrNfaState" specifiers="public">
@@ -280,7 +280,7 @@
            <ctorDtor docPath="../../System.Text.RegularExpressions/doc/class_PtrNfaState_828AD9578262913C0B2EE4669E5D88681833D3E8.html#default_constructor_PtrNfaState_9DA055AE969B06DAD332DFB9B42ED7E157B2F4DD" extPath="System.Text.RegularExpressions/doc/class_PtrNfaState_828AD9578262913C0B2EE4669E5D88681833D3E8.html#default_constructor_PtrNfaState_9DA055AE969B06DAD332DFB9B42ED7E157B2F4DD" fileName="System.Text.RegularExpressions/PtrNfa.cm" filePath="../../System.Text.RegularExpressions/file/PtrNfa.cm.html" id="default_constructor_PtrNfaState_9DA055AE969B06DAD332DFB9B42ED7E157B2F4DD" kind="Constructor" line="16" name="PtrNfaState" specifiers="public"/>
            <ctorDtor docPath="../../System.Text.RegularExpressions/doc/class_PtrNfaState_828AD9578262913C0B2EE4669E5D88681833D3E8.html#copy_constructor_PtrNfaState_55F6992F026A96C0EF1B2B9A8D56948F7B3E7004" extPath="System.Text.RegularExpressions/doc/class_PtrNfaState_828AD9578262913C0B2EE4669E5D88681833D3E8.html#copy_constructor_PtrNfaState_55F6992F026A96C0EF1B2B9A8D56948F7B3E7004" fileName="System.Text.RegularExpressions/PtrNfa.cm" filePath="../../System.Text.RegularExpressions/file/PtrNfa.cm.html" id="copy_constructor_PtrNfaState_55F6992F026A96C0EF1B2B9A8D56948F7B3E7004" kind="Constructor" line="19" name="PtrNfaState" specifiers="suppress">
             <parameters>
-             <parameter id="parameter_@p0_20FCA380AF10FB22156FA57650DE7320F0645D24" name="" type="807f16c6-7fea-41a4-b7d4-cec42f85d694"/>
+             <parameter id="parameter_@p0_20FCA380AF10FB22156FA57650DE7320F0645D24" name="" type="ad815b78-3a1b-425c-8eab-c1455defb459"/>
             </parameters>
            </ctorDtor>
           </ctorsDtors>
@@ -288,18 +288,18 @@
            <function const="true" docPath="../../System.Text.RegularExpressions/doc/class_PtrNfaState_828AD9578262913C0B2EE4669E5D88681833D3E8.html#member_function_Accepting_PtrNfaState_F855D1DD52E08421C0B4A21B3FC920F5D7745D77" extPath="System.Text.RegularExpressions/doc/class_PtrNfaState_828AD9578262913C0B2EE4669E5D88681833D3E8.html#member_function_Accepting_PtrNfaState_F855D1DD52E08421C0B4A21B3FC920F5D7745D77" fileName="System.Text.RegularExpressions/PtrNfa.cm" filePath="../../System.Text.RegularExpressions/file/PtrNfa.cm.html" id="member_function_Accepting_PtrNfaState_F855D1DD52E08421C0B4A21B3FC920F5D7745D77" kind="Member Function" line="63" name="Accepting" returnType="b53e2ae1-a4b4-4d5b-b75d-06778243ef3d" specifiers="public inline nothrow"/>
            <function docPath="../../System.Text.RegularExpressions/doc/class_PtrNfaState_828AD9578262913C0B2EE4669E5D88681833D3E8.html#member_function_AddEdge_PtrNfaState_3A56537C6A7CC3B736C0B5DF95047218F306FFB1" extPath="System.Text.RegularExpressions/doc/class_PtrNfaState_828AD9578262913C0B2EE4669E5D88681833D3E8.html#member_function_AddEdge_PtrNfaState_3A56537C6A7CC3B736C0B5DF95047218F306FFB1" fileName="System.Text.RegularExpressions/PtrNfa.cm" filePath="../../System.Text.RegularExpressions/file/PtrNfa.cm.html" id="member_function_AddEdge_PtrNfaState_3A56537C6A7CC3B736C0B5DF95047218F306FFB1" kind="Member Function" line="33" name="AddEdge" returnType="4e959632-b5f2-406d-9402-ec16ab3f3585" specifiers="public">
             <parameters>
-             <parameter id="parameter_edge_19AE0F52045D583465AFD68DC4446CD30F237536" name="edge" type="6a2bff9d-72f7-496e-ae5d-0556da7ec73c"/>
+             <parameter id="parameter_edge_19AE0F52045D583465AFD68DC4446CD30F237536" name="edge" type="41fe9f5f-c255-4edc-8a8a-fe1ff0cc8685"/>
             </parameters>
            </function>
            <function docPath="../../System.Text.RegularExpressions/doc/class_PtrNfaState_828AD9578262913C0B2EE4669E5D88681833D3E8.html#member_function_AddEdge_PtrNfaState_6265A90DB7DBA58239F893A386EAE44FA6DBA8CD" extPath="System.Text.RegularExpressions/doc/class_PtrNfaState_828AD9578262913C0B2EE4669E5D88681833D3E8.html#member_function_AddEdge_PtrNfaState_6265A90DB7DBA58239F893A386EAE44FA6DBA8CD" fileName="System.Text.RegularExpressions/PtrNfa.cm" filePath="../../System.Text.RegularExpressions/file/PtrNfa.cm.html" id="member_function_AddEdge_PtrNfaState_6265A90DB7DBA58239F893A386EAE44FA6DBA8CD" kind="Member Function" line="29" name="AddEdge" returnType="4e959632-b5f2-406d-9402-ec16ab3f3585" specifiers="public">
             <parameters>
-             <parameter id="parameter_edge_6EBE809CBA57967B7E4AC52EB2CB176501CEAFEB" name="edge" type="951e4157-af66-4631-a9d6-6106dc72e145"/>
+             <parameter id="parameter_edge_6EBE809CBA57967B7E4AC52EB2CB176501CEAFEB" name="edge" type="369c841f-f91c-49ff-b17a-7811770b6959"/>
             </parameters>
            </function>
            <function docPath="../../System.Text.RegularExpressions/doc/class_PtrNfaState_828AD9578262913C0B2EE4669E5D88681833D3E8.html#member_function_Clear_PtrNfaState_DC6DB92F580C0A613488896F73C48108A13070DB" extPath="System.Text.RegularExpressions/doc/class_PtrNfaState_828AD9578262913C0B2EE4669E5D88681833D3E8.html#member_function_Clear_PtrNfaState_DC6DB92F580C0A613488896F73C48108A13070DB" fileName="System.Text.RegularExpressions/PtrNfa.cm" filePath="../../System.Text.RegularExpressions/file/PtrNfa.cm.html" id="member_function_Clear_PtrNfaState_DC6DB92F580C0A613488896F73C48108A13070DB" kind="Member Function" line="57" name="Clear" returnType="4e959632-b5f2-406d-9402-ec16ab3f3585" specifiers="public nothrow"/>
-           <function const="true" docPath="../../System.Text.RegularExpressions/doc/class_PtrNfaState_828AD9578262913C0B2EE4669E5D88681833D3E8.html#member_function_Edges_PtrNfaState_E20B01CFC9AD97DFCF490D9311EC7B565E359234" extPath="System.Text.RegularExpressions/doc/class_PtrNfaState_828AD9578262913C0B2EE4669E5D88681833D3E8.html#member_function_Edges_PtrNfaState_E20B01CFC9AD97DFCF490D9311EC7B565E359234" fileName="System.Text.RegularExpressions/PtrNfa.cm" filePath="../../System.Text.RegularExpressions/file/PtrNfa.cm.html" id="member_function_Edges_PtrNfaState_E20B01CFC9AD97DFCF490D9311EC7B565E359234" kind="Member Function" line="37" name="Edges" returnType="c1a070a5-d1eb-4209-a237-8dd688bce84e" specifiers="public inline nothrow"/>
+           <function const="true" docPath="../../System.Text.RegularExpressions/doc/class_PtrNfaState_828AD9578262913C0B2EE4669E5D88681833D3E8.html#member_function_Edges_PtrNfaState_E20B01CFC9AD97DFCF490D9311EC7B565E359234" extPath="System.Text.RegularExpressions/doc/class_PtrNfaState_828AD9578262913C0B2EE4669E5D88681833D3E8.html#member_function_Edges_PtrNfaState_E20B01CFC9AD97DFCF490D9311EC7B565E359234" fileName="System.Text.RegularExpressions/PtrNfa.cm" filePath="../../System.Text.RegularExpressions/file/PtrNfa.cm.html" id="member_function_Edges_PtrNfaState_E20B01CFC9AD97DFCF490D9311EC7B565E359234" kind="Member Function" line="37" name="Edges" returnType="2d555fc5-6238-4f94-8e1b-0513435a4cad" specifiers="public inline nothrow"/>
            <function const="true" docPath="../../System.Text.RegularExpressions/doc/class_PtrNfaState_828AD9578262913C0B2EE4669E5D88681833D3E8.html#member_function_Id_PtrNfaState_68DE82FBD7784855DE6267B33EF7B2B6698A5384" extPath="System.Text.RegularExpressions/doc/class_PtrNfaState_828AD9578262913C0B2EE4669E5D88681833D3E8.html#member_function_Id_PtrNfaState_68DE82FBD7784855DE6267B33EF7B2B6698A5384" fileName="System.Text.RegularExpressions/PtrNfa.cm" filePath="../../System.Text.RegularExpressions/file/PtrNfa.cm.html" id="member_function_Id_PtrNfaState_68DE82FBD7784855DE6267B33EF7B2B6698A5384" kind="Member Function" line="21" name="Id" returnType="cc8ffb50-cac1-4f7e-acae-8b3fb9621c37" specifiers="public inline nothrow"/>
-           <function docPath="../../System.Text.RegularExpressions/doc/class_PtrNfaState_828AD9578262913C0B2EE4669E5D88681833D3E8.html#member_function_Next_PtrNfaState_A090132D956B94CE56194DD7713206B8BA785B0A" extPath="System.Text.RegularExpressions/doc/class_PtrNfaState_828AD9578262913C0B2EE4669E5D88681833D3E8.html#member_function_Next_PtrNfaState_A090132D956B94CE56194DD7713206B8BA785B0A" fileName="System.Text.RegularExpressions/PtrNfa.cm" filePath="../../System.Text.RegularExpressions/file/PtrNfa.cm.html" id="member_function_Next_PtrNfaState_A090132D956B94CE56194DD7713206B8BA785B0A" kind="Member Function" line="45" name="Next" returnType="221ded1a-ecfa-41d7-8df7-d173149ba556" specifiers="public">
+           <function docPath="../../System.Text.RegularExpressions/doc/class_PtrNfaState_828AD9578262913C0B2EE4669E5D88681833D3E8.html#member_function_Next_PtrNfaState_A090132D956B94CE56194DD7713206B8BA785B0A" extPath="System.Text.RegularExpressions/doc/class_PtrNfaState_828AD9578262913C0B2EE4669E5D88681833D3E8.html#member_function_Next_PtrNfaState_A090132D956B94CE56194DD7713206B8BA785B0A" fileName="System.Text.RegularExpressions/PtrNfa.cm" filePath="../../System.Text.RegularExpressions/file/PtrNfa.cm.html" id="member_function_Next_PtrNfaState_A090132D956B94CE56194DD7713206B8BA785B0A" kind="Member Function" line="45" name="Next" returnType="3d3e451b-095b-4d41-9d64-20a9ae6ef67c" specifiers="public">
             <parameters>
              <parameter id="parameter_c_2BCCF1F60A95CE1D78A6D2FEAE2BAB3CFA61CAC6" name="c" type="fa042a6a-5c08-46b3-b35b-b955ec35f88c"/>
             </parameters>
@@ -308,7 +308,7 @@
            <function docPath="../../System.Text.RegularExpressions/doc/class_PtrNfaState_828AD9578262913C0B2EE4669E5D88681833D3E8.html#member_function_SetAccepting_PtrNfaState_218FCA739C8EE65F4D88C8C0466F2EF6F78CE13D" extPath="System.Text.RegularExpressions/doc/class_PtrNfaState_828AD9578262913C0B2EE4669E5D88681833D3E8.html#member_function_SetAccepting_PtrNfaState_218FCA739C8EE65F4D88C8C0466F2EF6F78CE13D" fileName="System.Text.RegularExpressions/PtrNfa.cm" filePath="../../System.Text.RegularExpressions/file/PtrNfa.cm.html" id="member_function_SetAccepting_PtrNfaState_218FCA739C8EE65F4D88C8C0466F2EF6F78CE13D" kind="Member Function" line="67" name="SetAccepting" returnType="4e959632-b5f2-406d-9402-ec16ab3f3585" specifiers="public inline nothrow"/>
            <function docPath="../../System.Text.RegularExpressions/doc/class_PtrNfaState_828AD9578262913C0B2EE4669E5D88681833D3E8.html#member_function_SetEdges_PtrNfaState_A96C1C104A95EB2D6C269685FF385287FA62D1BC" extPath="System.Text.RegularExpressions/doc/class_PtrNfaState_828AD9578262913C0B2EE4669E5D88681833D3E8.html#member_function_SetEdges_PtrNfaState_A96C1C104A95EB2D6C269685FF385287FA62D1BC" fileName="System.Text.RegularExpressions/PtrNfa.cm" filePath="../../System.Text.RegularExpressions/file/PtrNfa.cm.html" id="member_function_SetEdges_PtrNfaState_A96C1C104A95EB2D6C269685FF385287FA62D1BC" kind="Member Function" line="41" name="SetEdges" returnType="4e959632-b5f2-406d-9402-ec16ab3f3585" specifiers="public">
             <parameters>
-             <parameter id="parameter_edges__26C286994E6BA25301DF04B4CE5208ED1CFEEF14" name="edges_" type="c1a070a5-d1eb-4209-a237-8dd688bce84e"/>
+             <parameter id="parameter_edges__26C286994E6BA25301DF04B4CE5208ED1CFEEF14" name="edges_" type="2d555fc5-6238-4f94-8e1b-0513435a4cad"/>
             </parameters>
            </function>
            <function docPath="../../System.Text.RegularExpressions/doc/class_PtrNfaState_828AD9578262913C0B2EE4669E5D88681833D3E8.html#member_function_SetId_PtrNfaState_532A57EB866393C4A1FC2910F7038BEE855DCA7D" extPath="System.Text.RegularExpressions/doc/class_PtrNfaState_828AD9578262913C0B2EE4669E5D88681833D3E8.html#member_function_SetId_PtrNfaState_532A57EB866393C4A1FC2910F7038BEE855DCA7D" fileName="System.Text.RegularExpressions/PtrNfa.cm" filePath="../../System.Text.RegularExpressions/file/PtrNfa.cm.html" id="member_function_SetId_PtrNfaState_532A57EB866393C4A1FC2910F7038BEE855DCA7D" kind="Member Function" line="25" name="SetId" returnType="4e959632-b5f2-406d-9402-ec16ab3f3585" specifiers="public inline nothrow">
@@ -318,13 +318,13 @@
            </function>
            <function docPath="../../System.Text.RegularExpressions/doc/class_PtrNfaState_828AD9578262913C0B2EE4669E5D88681833D3E8.html#copy_assignment_op_assign_PtrNfaState_7A12F2963AE32FF6DBBBBFD45B94E24EA44C1754" extPath="System.Text.RegularExpressions/doc/class_PtrNfaState_828AD9578262913C0B2EE4669E5D88681833D3E8.html#copy_assignment_op_assign_PtrNfaState_7A12F2963AE32FF6DBBBBFD45B94E24EA44C1754" fileName="System.Text.RegularExpressions/PtrNfa.cm" filePath="../../System.Text.RegularExpressions/file/PtrNfa.cm.html" id="copy_assignment_op_assign_PtrNfaState_7A12F2963AE32FF6DBBBBFD45B94E24EA44C1754" kind="Member Function" line="20" name="operator=" returnType="4e959632-b5f2-406d-9402-ec16ab3f3585" specifiers="suppress">
             <parameters>
-             <parameter id="parameter_@p0_D9E99ACC8B78F7D7F2BD356A43B25269DA2149AE" name="" type="807f16c6-7fea-41a4-b7d4-cec42f85d694"/>
+             <parameter id="parameter_@p0_D9E99ACC8B78F7D7F2BD356A43B25269DA2149AE" name="" type="ad815b78-3a1b-425c-8eab-c1455defb459"/>
             </parameters>
            </function>
           </functions>
           <variables>
            <variable docPath="../../System.Text.RegularExpressions/doc/class_PtrNfaState_828AD9578262913C0B2EE4669E5D88681833D3E8.html#variable_accepting_9D28255F1C073B520F8932EC13F0B58CC412E99C" extPath="System.Text.RegularExpressions/doc/class_PtrNfaState_828AD9578262913C0B2EE4669E5D88681833D3E8.html#variable_accepting_9D28255F1C073B520F8932EC13F0B58CC412E99C" id="variable_accepting_9D28255F1C073B520F8932EC13F0B58CC412E99C" name="accepting" specifiers="private" type="b53e2ae1-a4b4-4d5b-b75d-06778243ef3d"/>
-           <variable docPath="../../System.Text.RegularExpressions/doc/class_PtrNfaState_828AD9578262913C0B2EE4669E5D88681833D3E8.html#variable_edges_C10D6BB4A1B9E28225D1125397CA912466A63E89" extPath="System.Text.RegularExpressions/doc/class_PtrNfaState_828AD9578262913C0B2EE4669E5D88681833D3E8.html#variable_edges_C10D6BB4A1B9E28225D1125397CA912466A63E89" id="variable_edges_C10D6BB4A1B9E28225D1125397CA912466A63E89" name="edges" specifiers="private" type="bc298e30-0ee1-41b8-a9df-3123364e87af"/>
+           <variable docPath="../../System.Text.RegularExpressions/doc/class_PtrNfaState_828AD9578262913C0B2EE4669E5D88681833D3E8.html#variable_edges_C10D6BB4A1B9E28225D1125397CA912466A63E89" extPath="System.Text.RegularExpressions/doc/class_PtrNfaState_828AD9578262913C0B2EE4669E5D88681833D3E8.html#variable_edges_C10D6BB4A1B9E28225D1125397CA912466A63E89" id="variable_edges_C10D6BB4A1B9E28225D1125397CA912466A63E89" name="edges" specifiers="private" type="708ce39f-d801-4e01-9e1d-ad100b519794"/>
            <variable docPath="../../System.Text.RegularExpressions/doc/class_PtrNfaState_828AD9578262913C0B2EE4669E5D88681833D3E8.html#variable_id_4E96E684F39955E6F5D1BF15B45357C33BEC23A3" extPath="System.Text.RegularExpressions/doc/class_PtrNfaState_828AD9578262913C0B2EE4669E5D88681833D3E8.html#variable_id_4E96E684F39955E6F5D1BF15B45357C33BEC23A3" id="variable_id_4E96E684F39955E6F5D1BF15B45357C33BEC23A3" name="id" specifiers="private" type="cc8ffb50-cac1-4f7e-acae-8b3fb9621c37"/>
           </variables>
          </class>
@@ -338,16 +338,16 @@
            <function docPath="../../System.Text.RegularExpressions/doc/class_PtrNfaStateFactory_22C97F4BF85DB777D68618DE9DD3C7D2D3FFB5E2.html#member_function_Clear_PtrNfaStateFactory_B512A7C5924FC729EA3A04EDBAFBD22884889F6F" extPath="System.Text.RegularExpressions/doc/class_PtrNfaStateFactory_22C97F4BF85DB777D68618DE9DD3C7D2D3FFB5E2.html#member_function_Clear_PtrNfaStateFactory_B512A7C5924FC729EA3A04EDBAFBD22884889F6F" fileName="System.Text.RegularExpressions/PtrNfa.cm" filePath="../../System.Text.RegularExpressions/file/PtrNfa.cm.html" id="member_function_Clear_PtrNfaStateFactory_B512A7C5924FC729EA3A04EDBAFBD22884889F6F" kind="Member Function" line="128" name="Clear" returnType="4e959632-b5f2-406d-9402-ec16ab3f3585" specifiers="public"/>
            <function docPath="../../System.Text.RegularExpressions/doc/class_PtrNfaStateFactory_22C97F4BF85DB777D68618DE9DD3C7D2D3FFB5E2.html#member_function_FreeState_PtrNfaStateFactory_75536BA04D6F342070BCFDC70C600BF039030D9E" extPath="System.Text.RegularExpressions/doc/class_PtrNfaStateFactory_22C97F4BF85DB777D68618DE9DD3C7D2D3FFB5E2.html#member_function_FreeState_PtrNfaStateFactory_75536BA04D6F342070BCFDC70C600BF039030D9E" fileName="System.Text.RegularExpressions/PtrNfa.cm" filePath="../../System.Text.RegularExpressions/file/PtrNfa.cm.html" id="member_function_FreeState_PtrNfaStateFactory_75536BA04D6F342070BCFDC70C600BF039030D9E" kind="Member Function" line="150" name="FreeState" returnType="4e959632-b5f2-406d-9402-ec16ab3f3585" specifiers="public">
             <parameters>
-             <parameter id="parameter_state_1687AD68668CE639DD4C4601D80F6F2A2B19628D" name="state" type="9efbfbd2-65e3-44ec-81a2-a8c6e74a2acd"/>
+             <parameter id="parameter_state_1687AD68668CE639DD4C4601D80F6F2A2B19628D" name="state" type="e66ff1f1-0da9-42ae-be44-5ff9c2740bc1"/>
             </parameters>
            </function>
-           <function docPath="../../System.Text.RegularExpressions/doc/class_PtrNfaStateFactory_22C97F4BF85DB777D68618DE9DD3C7D2D3FFB5E2.html#member_function_Instance_PtrNfaStateFactory_FABCA8014FD1A3C260209F93CE0A1FC56DE53015" extPath="System.Text.RegularExpressions/doc/class_PtrNfaStateFactory_22C97F4BF85DB777D68618DE9DD3C7D2D3FFB5E2.html#member_function_Instance_PtrNfaStateFactory_FABCA8014FD1A3C260209F93CE0A1FC56DE53015" fileName="System.Text.RegularExpressions/PtrNfa.cm" filePath="../../System.Text.RegularExpressions/file/PtrNfa.cm.html" id="member_function_Instance_PtrNfaStateFactory_FABCA8014FD1A3C260209F93CE0A1FC56DE53015" kind="Static Member Function" line="136" name="Instance" returnType="bb1b9149-7302-4dbe-9e0f-75abe7a77f79" specifiers="public static"/>
-           <function docPath="../../System.Text.RegularExpressions/doc/class_PtrNfaStateFactory_22C97F4BF85DB777D68618DE9DD3C7D2D3FFB5E2.html#member_function_MakeState_PtrNfaStateFactory_29EB7C55E503DE112D5A16E05EBF1AA6F69D89A2" extPath="System.Text.RegularExpressions/doc/class_PtrNfaStateFactory_22C97F4BF85DB777D68618DE9DD3C7D2D3FFB5E2.html#member_function_MakeState_PtrNfaStateFactory_29EB7C55E503DE112D5A16E05EBF1AA6F69D89A2" fileName="System.Text.RegularExpressions/PtrNfa.cm" filePath="../../System.Text.RegularExpressions/file/PtrNfa.cm.html" id="member_function_MakeState_PtrNfaStateFactory_29EB7C55E503DE112D5A16E05EBF1AA6F69D89A2" kind="Member Function" line="140" name="MakeState" returnType="9efbfbd2-65e3-44ec-81a2-a8c6e74a2acd" specifiers="public"/>
+           <function docPath="../../System.Text.RegularExpressions/doc/class_PtrNfaStateFactory_22C97F4BF85DB777D68618DE9DD3C7D2D3FFB5E2.html#member_function_Instance_PtrNfaStateFactory_FABCA8014FD1A3C260209F93CE0A1FC56DE53015" extPath="System.Text.RegularExpressions/doc/class_PtrNfaStateFactory_22C97F4BF85DB777D68618DE9DD3C7D2D3FFB5E2.html#member_function_Instance_PtrNfaStateFactory_FABCA8014FD1A3C260209F93CE0A1FC56DE53015" fileName="System.Text.RegularExpressions/PtrNfa.cm" filePath="../../System.Text.RegularExpressions/file/PtrNfa.cm.html" id="member_function_Instance_PtrNfaStateFactory_FABCA8014FD1A3C260209F93CE0A1FC56DE53015" kind="Static Member Function" line="136" name="Instance" returnType="0c4d15f8-ed5e-4976-90bc-b571b1ae1235" specifiers="public static"/>
+           <function docPath="../../System.Text.RegularExpressions/doc/class_PtrNfaStateFactory_22C97F4BF85DB777D68618DE9DD3C7D2D3FFB5E2.html#member_function_MakeState_PtrNfaStateFactory_29EB7C55E503DE112D5A16E05EBF1AA6F69D89A2" extPath="System.Text.RegularExpressions/doc/class_PtrNfaStateFactory_22C97F4BF85DB777D68618DE9DD3C7D2D3FFB5E2.html#member_function_MakeState_PtrNfaStateFactory_29EB7C55E503DE112D5A16E05EBF1AA6F69D89A2" fileName="System.Text.RegularExpressions/PtrNfa.cm" filePath="../../System.Text.RegularExpressions/file/PtrNfa.cm.html" id="member_function_MakeState_PtrNfaStateFactory_29EB7C55E503DE112D5A16E05EBF1AA6F69D89A2" kind="Member Function" line="140" name="MakeState" returnType="e66ff1f1-0da9-42ae-be44-5ff9c2740bc1" specifiers="public"/>
           </functions>
           <variables>
-           <variable docPath="../../System.Text.RegularExpressions/doc/class_PtrNfaStateFactory_22C97F4BF85DB777D68618DE9DD3C7D2D3FFB5E2.html#variable_instance_F483F5487B1A5225BCA846DDDF0F6C8DDEC9B18E" extPath="System.Text.RegularExpressions/doc/class_PtrNfaStateFactory_22C97F4BF85DB777D68618DE9DD3C7D2D3FFB5E2.html#variable_instance_F483F5487B1A5225BCA846DDDF0F6C8DDEC9B18E" id="variable_instance_F483F5487B1A5225BCA846DDDF0F6C8DDEC9B18E" name="instance" specifiers="private static" type="dad46251-c393-4380-a957-f117c20f3282"/>
-           <variable docPath="../../System.Text.RegularExpressions/doc/class_PtrNfaStateFactory_22C97F4BF85DB777D68618DE9DD3C7D2D3FFB5E2.html#variable_states_51A5EDEBF07AC6589553B9B2FA91813A5D2B61F2" extPath="System.Text.RegularExpressions/doc/class_PtrNfaStateFactory_22C97F4BF85DB777D68618DE9DD3C7D2D3FFB5E2.html#variable_states_51A5EDEBF07AC6589553B9B2FA91813A5D2B61F2" id="variable_states_51A5EDEBF07AC6589553B9B2FA91813A5D2B61F2" name="states" specifiers="private" type="221ded1a-ecfa-41d7-8df7-d173149ba556"/>
-           <variable docPath="../../System.Text.RegularExpressions/doc/class_PtrNfaStateFactory_22C97F4BF85DB777D68618DE9DD3C7D2D3FFB5E2.html#variable_unused_4877D603E50F4827811EC61C6DC2EAE4DC0C9CD9" extPath="System.Text.RegularExpressions/doc/class_PtrNfaStateFactory_22C97F4BF85DB777D68618DE9DD3C7D2D3FFB5E2.html#variable_unused_4877D603E50F4827811EC61C6DC2EAE4DC0C9CD9" id="variable_unused_4877D603E50F4827811EC61C6DC2EAE4DC0C9CD9" name="unused" specifiers="private" type="83ecf07d-e0b3-4b02-9bed-c27e4fdd69dd"/>
+           <variable docPath="../../System.Text.RegularExpressions/doc/class_PtrNfaStateFactory_22C97F4BF85DB777D68618DE9DD3C7D2D3FFB5E2.html#variable_instance_F483F5487B1A5225BCA846DDDF0F6C8DDEC9B18E" extPath="System.Text.RegularExpressions/doc/class_PtrNfaStateFactory_22C97F4BF85DB777D68618DE9DD3C7D2D3FFB5E2.html#variable_instance_F483F5487B1A5225BCA846DDDF0F6C8DDEC9B18E" id="variable_instance_F483F5487B1A5225BCA846DDDF0F6C8DDEC9B18E" name="instance" specifiers="private static" type="b1fe4c2d-134f-44d7-b084-a8119c6299c8"/>
+           <variable docPath="../../System.Text.RegularExpressions/doc/class_PtrNfaStateFactory_22C97F4BF85DB777D68618DE9DD3C7D2D3FFB5E2.html#variable_states_51A5EDEBF07AC6589553B9B2FA91813A5D2B61F2" extPath="System.Text.RegularExpressions/doc/class_PtrNfaStateFactory_22C97F4BF85DB777D68618DE9DD3C7D2D3FFB5E2.html#variable_states_51A5EDEBF07AC6589553B9B2FA91813A5D2B61F2" id="variable_states_51A5EDEBF07AC6589553B9B2FA91813A5D2B61F2" name="states" specifiers="private" type="3d3e451b-095b-4d41-9d64-20a9ae6ef67c"/>
+           <variable docPath="../../System.Text.RegularExpressions/doc/class_PtrNfaStateFactory_22C97F4BF85DB777D68618DE9DD3C7D2D3FFB5E2.html#variable_unused_4877D603E50F4827811EC61C6DC2EAE4DC0C9CD9" extPath="System.Text.RegularExpressions/doc/class_PtrNfaStateFactory_22C97F4BF85DB777D68618DE9DD3C7D2D3FFB5E2.html#variable_unused_4877D603E50F4827811EC61C6DC2EAE4DC0C9CD9" id="variable_unused_4877D603E50F4827811EC61C6DC2EAE4DC0C9CD9" name="unused" specifiers="private" type="8f27e57f-f476-40d0-9cf2-a23396e68efe"/>
           </variables>
          </class>
          <class docPath="../../System.Text.RegularExpressions/doc/class_RegEx_FF045A8DB810B11A7E1838764E80BDB32C6C837F.html" extPath="System.Text.RegularExpressions/doc/class_RegEx_FF045A8DB810B11A7E1838764E80BDB32C6C837F.html" fileName="System.Text.RegularExpressions/RegEx.cm" filePath="../../System.Text.RegularExpressions/file/RegEx.cm.html" id="class_RegEx_FF045A8DB810B11A7E1838764E80BDB32C6C837F" line="15" name="RegEx" specifiers="public">
@@ -366,8 +366,8 @@
           </ctorsDtors>
           <functions>
            <function const="true" docPath="../../System.Text.RegularExpressions/doc/class_RegEx_FF045A8DB810B11A7E1838764E80BDB32C6C837F.html#member_function_Compiled_RegEx_661D620F09E6D141272FCABE143FE78A56C662EB" extPath="System.Text.RegularExpressions/doc/class_RegEx_FF045A8DB810B11A7E1838764E80BDB32C6C837F.html#member_function_Compiled_RegEx_661D620F09E6D141272FCABE143FE78A56C662EB" fileName="System.Text.RegularExpressions/RegEx.cm" filePath="../../System.Text.RegularExpressions/file/RegEx.cm.html" id="member_function_Compiled_RegEx_661D620F09E6D141272FCABE143FE78A56C662EB" kind="Member Function" line="40" name="Compiled" returnType="b53e2ae1-a4b4-4d5b-b75d-06778243ef3d" specifiers="public inline nothrow"/>
-           <function const="true" docPath="../../System.Text.RegularExpressions/doc/class_RegEx_FF045A8DB810B11A7E1838764E80BDB32C6C837F.html#member_function_GetDfa_RegEx_4827339014C71AE442EEFCFED46D894EC77EA45E" extPath="System.Text.RegularExpressions/doc/class_RegEx_FF045A8DB810B11A7E1838764E80BDB32C6C837F.html#member_function_GetDfa_RegEx_4827339014C71AE442EEFCFED46D894EC77EA45E" fileName="System.Text.RegularExpressions/RegEx.cm" filePath="../../System.Text.RegularExpressions/file/RegEx.cm.html" id="member_function_GetDfa_RegEx_4827339014C71AE442EEFCFED46D894EC77EA45E" kind="Member Function" line="36" name="GetDfa" returnType="29f55988-96a7-4552-9c9f-cd75fa004bcd" specifiers="public inline nothrow"/>
-           <function const="true" docPath="../../System.Text.RegularExpressions/doc/class_RegEx_FF045A8DB810B11A7E1838764E80BDB32C6C837F.html#member_function_GetNfa_RegEx_421BE8C85790708F9013444D8E7847B4887CAE76" extPath="System.Text.RegularExpressions/doc/class_RegEx_FF045A8DB810B11A7E1838764E80BDB32C6C837F.html#member_function_GetNfa_RegEx_421BE8C85790708F9013444D8E7847B4887CAE76" fileName="System.Text.RegularExpressions/RegEx.cm" filePath="../../System.Text.RegularExpressions/file/RegEx.cm.html" id="member_function_GetNfa_RegEx_421BE8C85790708F9013444D8E7847B4887CAE76" kind="Member Function" line="32" name="GetNfa" returnType="9056d28a-2434-4487-bedb-cdf356e8bec7" specifiers="public inline nothrow"/>
+           <function const="true" docPath="../../System.Text.RegularExpressions/doc/class_RegEx_FF045A8DB810B11A7E1838764E80BDB32C6C837F.html#member_function_GetDfa_RegEx_4827339014C71AE442EEFCFED46D894EC77EA45E" extPath="System.Text.RegularExpressions/doc/class_RegEx_FF045A8DB810B11A7E1838764E80BDB32C6C837F.html#member_function_GetDfa_RegEx_4827339014C71AE442EEFCFED46D894EC77EA45E" fileName="System.Text.RegularExpressions/RegEx.cm" filePath="../../System.Text.RegularExpressions/file/RegEx.cm.html" id="member_function_GetDfa_RegEx_4827339014C71AE442EEFCFED46D894EC77EA45E" kind="Member Function" line="36" name="GetDfa" returnType="da777afb-2c51-48dd-9248-07e355fb3d7c" specifiers="public inline nothrow"/>
+           <function const="true" docPath="../../System.Text.RegularExpressions/doc/class_RegEx_FF045A8DB810B11A7E1838764E80BDB32C6C837F.html#member_function_GetNfa_RegEx_421BE8C85790708F9013444D8E7847B4887CAE76" extPath="System.Text.RegularExpressions/doc/class_RegEx_FF045A8DB810B11A7E1838764E80BDB32C6C837F.html#member_function_GetNfa_RegEx_421BE8C85790708F9013444D8E7847B4887CAE76" fileName="System.Text.RegularExpressions/RegEx.cm" filePath="../../System.Text.RegularExpressions/file/RegEx.cm.html" id="member_function_GetNfa_RegEx_421BE8C85790708F9013444D8E7847B4887CAE76" kind="Member Function" line="32" name="GetNfa" returnType="19562df9-412b-411f-84a9-2d6e3ee3d3ed" specifiers="public inline nothrow"/>
            <function docPath="../../System.Text.RegularExpressions/doc/class_RegEx_FF045A8DB810B11A7E1838764E80BDB32C6C837F.html#member_function_Matches_RegEx_59E97BBCEE02267BB93B3A7BDB2A90148DB9D40A" extPath="System.Text.RegularExpressions/doc/class_RegEx_FF045A8DB810B11A7E1838764E80BDB32C6C837F.html#member_function_Matches_RegEx_59E97BBCEE02267BB93B3A7BDB2A90148DB9D40A" fileName="System.Text.RegularExpressions/RegEx.cm" filePath="../../System.Text.RegularExpressions/file/RegEx.cm.html" id="member_function_Matches_RegEx_59E97BBCEE02267BB93B3A7BDB2A90148DB9D40A" kind="Member Function" line="44" name="Matches" returnType="b53e2ae1-a4b4-4d5b-b75d-06778243ef3d" specifiers="public">
             <parameters>
              <parameter id="parameter_s_28B437C574225837F062E5438F01B9C83901D1D9" name="s" type="b14a2675-ade3-4740-b586-48284a4f720d"/>
@@ -388,17 +388,17 @@
            <ctorDtor docPath="../../System.Text.RegularExpressions/doc/class_RegExParser_5B375E7989875C02273BF50888FB982C1735A8DC.html#default_constructor_RegExParser_8140C92D742EBE123151F6886D3472F9C11B1590" extPath="System.Text.RegularExpressions/doc/class_RegExParser_5B375E7989875C02273BF50888FB982C1735A8DC.html#default_constructor_RegExParser_8140C92D742EBE123151F6886D3472F9C11B1590" fileName="System.Text.RegularExpressions/Parser.cm" filePath="../../System.Text.RegularExpressions/file/Parser.cm.html" id="default_constructor_RegExParser_8140C92D742EBE123151F6886D3472F9C11B1590" kind="Constructor" line="130" name="RegExParser" specifiers="public"/>
            <ctorDtor docPath="../../System.Text.RegularExpressions/doc/class_RegExParser_5B375E7989875C02273BF50888FB982C1735A8DC.html#move_constructor_RegExParser_A909FA63E82E2FD680FCD1FB28563F019EFA0093" extPath="System.Text.RegularExpressions/doc/class_RegExParser_5B375E7989875C02273BF50888FB982C1735A8DC.html#move_constructor_RegExParser_A909FA63E82E2FD680FCD1FB28563F019EFA0093" fileName="System.Text.RegularExpressions/Parser.cm" filePath="../../System.Text.RegularExpressions/file/Parser.cm.html" id="move_constructor_RegExParser_A909FA63E82E2FD680FCD1FB28563F019EFA0093" kind="Constructor" line="135" name="RegExParser" specifiers="suppress">
             <parameters>
-             <parameter id="parameter_@p0_79BCFAB2EB073923BAA5B3693FF154E4B7BA8B02" name="" type="83e9df51-64aa-48e2-9156-95fa1bdf3e52"/>
+             <parameter id="parameter_@p0_79BCFAB2EB073923BAA5B3693FF154E4B7BA8B02" name="" type="57182294-37d5-4e9b-b1aa-185667f32623"/>
             </parameters>
            </ctorDtor>
            <ctorDtor docPath="../../System.Text.RegularExpressions/doc/class_RegExParser_5B375E7989875C02273BF50888FB982C1735A8DC.html#copy_constructor_RegExParser_02506EFA3C9C40E130BF37E098C77282BA7B73EF" extPath="System.Text.RegularExpressions/doc/class_RegExParser_5B375E7989875C02273BF50888FB982C1735A8DC.html#copy_constructor_RegExParser_02506EFA3C9C40E130BF37E098C77282BA7B73EF" fileName="System.Text.RegularExpressions/Parser.cm" filePath="../../System.Text.RegularExpressions/file/Parser.cm.html" id="copy_constructor_RegExParser_02506EFA3C9C40E130BF37E098C77282BA7B73EF" kind="Constructor" line="133" name="RegExParser" specifiers="suppress">
             <parameters>
-             <parameter id="parameter_@p0_2E4F907AE4FCBBC304ACAC1C0DDBAA07627F001A" name="" type="3e6dba24-c9aa-4305-a9e5-734c967e4f7d"/>
+             <parameter id="parameter_@p0_2E4F907AE4FCBBC304ACAC1C0DDBAA07627F001A" name="" type="1e465597-fc99-4055-8f2e-c47f3851b6cf"/>
             </parameters>
            </ctorDtor>
           </ctorsDtors>
           <functions>
-           <function docPath="../../System.Text.RegularExpressions/doc/class_RegExParser_5B375E7989875C02273BF50888FB982C1735A8DC.html#member_function_Instance_RegExParser_C24BF2834AEC9A218B0ED4D75F0828032116DA00" extPath="System.Text.RegularExpressions/doc/class_RegExParser_5B375E7989875C02273BF50888FB982C1735A8DC.html#member_function_Instance_RegExParser_C24BF2834AEC9A218B0ED4D75F0828032116DA00" fileName="System.Text.RegularExpressions/Parser.cm" filePath="../../System.Text.RegularExpressions/file/Parser.cm.html" id="member_function_Instance_RegExParser_C24BF2834AEC9A218B0ED4D75F0828032116DA00" kind="Static Member Function" line="137" name="Instance" returnType="f00d16bb-c17c-49be-9c3f-e04a0ff78f90" specifiers="public static"/>
+           <function docPath="../../System.Text.RegularExpressions/doc/class_RegExParser_5B375E7989875C02273BF50888FB982C1735A8DC.html#member_function_Instance_RegExParser_C24BF2834AEC9A218B0ED4D75F0828032116DA00" extPath="System.Text.RegularExpressions/doc/class_RegExParser_5B375E7989875C02273BF50888FB982C1735A8DC.html#member_function_Instance_RegExParser_C24BF2834AEC9A218B0ED4D75F0828032116DA00" fileName="System.Text.RegularExpressions/Parser.cm" filePath="../../System.Text.RegularExpressions/file/Parser.cm.html" id="member_function_Instance_RegExParser_C24BF2834AEC9A218B0ED4D75F0828032116DA00" kind="Static Member Function" line="137" name="Instance" returnType="0dc5d936-e647-4fb0-8b9c-1b7dde8d9a59" specifiers="public static"/>
            <function docPath="../../System.Text.RegularExpressions/doc/class_RegExParser_5B375E7989875C02273BF50888FB982C1735A8DC.html#member_function_Parse_RegExParser_01A06ACE0DC9C2175030CADE47EE763C8A0FA90A" extPath="System.Text.RegularExpressions/doc/class_RegExParser_5B375E7989875C02273BF50888FB982C1735A8DC.html#member_function_Parse_RegExParser_01A06ACE0DC9C2175030CADE47EE763C8A0FA90A" fileName="System.Text.RegularExpressions/Parser.cm" filePath="../../System.Text.RegularExpressions/file/Parser.cm.html" id="member_function_Parse_RegExParser_01A06ACE0DC9C2175030CADE47EE763C8A0FA90A" kind="Member Function" line="141" name="Parse" returnType="class_PtrNfa_5708C8189DEAC0F8CBD3A9DA5094DE3E7536B5FB" specifiers="public">
             <parameters>
              <parameter id="parameter_regEx_ED3C7001FE1FB725E71468FEFD2C98F911F82C2C" name="regEx" type="b14a2675-ade3-4740-b586-48284a4f720d"/>
@@ -406,18 +406,18 @@
            </function>
            <function docPath="../../System.Text.RegularExpressions/doc/class_RegExParser_5B375E7989875C02273BF50888FB982C1735A8DC.html#move_assignment_op_assign_RegExParser_330152514063677342F318BC37AD1BE0A8970224" extPath="System.Text.RegularExpressions/doc/class_RegExParser_5B375E7989875C02273BF50888FB982C1735A8DC.html#move_assignment_op_assign_RegExParser_330152514063677342F318BC37AD1BE0A8970224" fileName="System.Text.RegularExpressions/Parser.cm" filePath="../../System.Text.RegularExpressions/file/Parser.cm.html" id="move_assignment_op_assign_RegExParser_330152514063677342F318BC37AD1BE0A8970224" kind="Member Function" line="136" name="operator=" returnType="4e959632-b5f2-406d-9402-ec16ab3f3585" specifiers="suppress">
             <parameters>
-             <parameter id="parameter_@p0_4E6BB7CA29D0DAA21E4BB05FC29DE9FF83DEFAE7" name="" type="83e9df51-64aa-48e2-9156-95fa1bdf3e52"/>
+             <parameter id="parameter_@p0_4E6BB7CA29D0DAA21E4BB05FC29DE9FF83DEFAE7" name="" type="57182294-37d5-4e9b-b1aa-185667f32623"/>
             </parameters>
            </function>
            <function docPath="../../System.Text.RegularExpressions/doc/class_RegExParser_5B375E7989875C02273BF50888FB982C1735A8DC.html#copy_assignment_op_assign_RegExParser_8D35C417A49D1095BACFD0AC06C5AD1448BA8073" extPath="System.Text.RegularExpressions/doc/class_RegExParser_5B375E7989875C02273BF50888FB982C1735A8DC.html#copy_assignment_op_assign_RegExParser_8D35C417A49D1095BACFD0AC06C5AD1448BA8073" fileName="System.Text.RegularExpressions/Parser.cm" filePath="../../System.Text.RegularExpressions/file/Parser.cm.html" id="copy_assignment_op_assign_RegExParser_8D35C417A49D1095BACFD0AC06C5AD1448BA8073" kind="Member Function" line="134" name="operator=" returnType="4e959632-b5f2-406d-9402-ec16ab3f3585" specifiers="suppress">
             <parameters>
-             <parameter id="parameter_@p0_D4ECF146091EF36F8698D78487A8110EE1965CFC" name="" type="3e6dba24-c9aa-4305-a9e5-734c967e4f7d"/>
+             <parameter id="parameter_@p0_D4ECF146091EF36F8698D78487A8110EE1965CFC" name="" type="1e465597-fc99-4055-8f2e-c47f3851b6cf"/>
             </parameters>
            </function>
           </functions>
           <variables>
-           <variable docPath="../../System.Text.RegularExpressions/doc/class_RegExParser_5B375E7989875C02273BF50888FB982C1735A8DC.html#variable_grammar_1B3A3E71C2110F5F8AE362081784714EC848B5E6" extPath="System.Text.RegularExpressions/doc/class_RegExParser_5B375E7989875C02273BF50888FB982C1735A8DC.html#variable_grammar_1B3A3E71C2110F5F8AE362081784714EC848B5E6" id="variable_grammar_1B3A3E71C2110F5F8AE362081784714EC848B5E6" name="grammar" specifiers="private" type="bf040b09-7e67-4a26-b3f9-910f9e57dc2c"/>
-           <variable docPath="../../System.Text.RegularExpressions/doc/class_RegExParser_5B375E7989875C02273BF50888FB982C1735A8DC.html#variable_instance_16B70806B101492C785901481E5B763AB7DD4FB6" extPath="System.Text.RegularExpressions/doc/class_RegExParser_5B375E7989875C02273BF50888FB982C1735A8DC.html#variable_instance_16B70806B101492C785901481E5B763AB7DD4FB6" id="variable_instance_16B70806B101492C785901481E5B763AB7DD4FB6" name="instance" specifiers="private static" type="1eebf5a8-02a1-4ed8-9417-7e854995de78"/>
+           <variable docPath="../../System.Text.RegularExpressions/doc/class_RegExParser_5B375E7989875C02273BF50888FB982C1735A8DC.html#variable_grammar_1B3A3E71C2110F5F8AE362081784714EC848B5E6" extPath="System.Text.RegularExpressions/doc/class_RegExParser_5B375E7989875C02273BF50888FB982C1735A8DC.html#variable_grammar_1B3A3E71C2110F5F8AE362081784714EC848B5E6" id="variable_grammar_1B3A3E71C2110F5F8AE362081784714EC848B5E6" name="grammar" specifiers="private" type="3a9b3d68-21ec-49f1-8670-88f2a9c485ba"/>
+           <variable docPath="../../System.Text.RegularExpressions/doc/class_RegExParser_5B375E7989875C02273BF50888FB982C1735A8DC.html#variable_instance_16B70806B101492C785901481E5B763AB7DD4FB6" extPath="System.Text.RegularExpressions/doc/class_RegExParser_5B375E7989875C02273BF50888FB982C1735A8DC.html#variable_instance_16B70806B101492C785901481E5B763AB7DD4FB6" id="variable_instance_16B70806B101492C785901481E5B763AB7DD4FB6" name="instance" specifiers="private static" type="22b7d797-7497-423e-9817-00520a93a1fd"/>
           </variables>
          </class>
          <class baseClass="class_Grammar_2180D00808E7A786B21C35D11B36E77EC171A6C6" docPath="../../System.Text.RegularExpressions/doc/class_RegularExpressionGrammar_A84552940D28A3C040AE4E8AD6CF59AF13007B22.html" extPath="System.Text.RegularExpressions/doc/class_RegularExpressionGrammar_A84552940D28A3C040AE4E8AD6CF59AF13007B22.html" fileName="System.Text.RegularExpressions/RegExGrammar.cm" filePath="../../System.Text.RegularExpressions/file/RegExGrammar.cm.html" id="class_RegularExpressionGrammar_A84552940D28A3C040AE4E8AD6CF59AF13007B22" line="9" name="RegularExpressionGrammar" specifiers="public">
@@ -1421,45 +1421,45 @@
          <function docPath="../../System.Text.RegularExpressions/doc/ns_System.Text.RegularExpressions.html#function_AddState_07F1E4FBD352758B79D1E725CC8F92F1D86E6A5F" extPath="System.Text.RegularExpressions/doc/ns_System.Text.RegularExpressions.html#function_AddState_07F1E4FBD352758B79D1E725CC8F92F1D86E6A5F" fileName="System.Text.RegularExpressions/Algorithm.cm" filePath="../../System.Text.RegularExpressions/file/Algorithm.cm.html" id="function_AddState_07F1E4FBD352758B79D1E725CC8F92F1D86E6A5F" kind="Function" line="107" name="AddState" returnType="4e959632-b5f2-406d-9402-ec16ab3f3585" specifiers="public">
           <parameters>
            <parameter id="parameter_s_AF2C5D4C45E1DC50B1EEC16DA399A930D567FF10" name="s" type="cc8ffb50-cac1-4f7e-acae-8b3fb9621c37"/>
-           <parameter id="parameter_newStates_C4CE998EDA3E6FCB05BBB2F833256BA089AA615F" name="newStates" type="ebcd9886-c7c9-4378-bd72-cdc633ae2a41"/>
+           <parameter id="parameter_newStates_C4CE998EDA3E6FCB05BBB2F833256BA089AA615F" name="newStates" type="1745e4ef-fc59-407e-b697-d453e2b61442"/>
            <parameter id="parameter_alreadyOn_259A50686A9F02EF89CBCBEEA1EE9A6B191A4A5C" name="alreadyOn" type="d30649e2-00d5-474d-a95c-06496ffa59de"/>
-           <parameter id="parameter_nfa_404314E9AA074C8BE8F6585CA4047E8E29F98AFD" name="nfa" type="9056d28a-2434-4487-bedb-cdf356e8bec7"/>
+           <parameter id="parameter_nfa_404314E9AA074C8BE8F6585CA4047E8E29F98AFD" name="nfa" type="19562df9-412b-411f-84a9-2d6e3ee3d3ed"/>
           </parameters>
          </function>
          <function docPath="../../System.Text.RegularExpressions/doc/ns_System.Text.RegularExpressions.html#function_Alt_D5524DBAD9A12AD8D723443912874B636A784F1E" extPath="System.Text.RegularExpressions/doc/ns_System.Text.RegularExpressions.html#function_Alt_D5524DBAD9A12AD8D723443912874B636A784F1E" fileName="System.Text.RegularExpressions/Parser.cm" filePath="../../System.Text.RegularExpressions/file/Parser.cm.html" id="function_Alt_D5524DBAD9A12AD8D723443912874B636A784F1E" kind="Function" line="46" name="Alt" returnType="class_PtrNfa_5708C8189DEAC0F8CBD3A9DA5094DE3E7536B5FB" specifiers="public">
           <parameters>
-           <parameter id="parameter_left_998DAACE73EE5B81FD595FC3B960F3A4D92EC109" name="left" type="185c54c6-4bb6-4d60-a987-5a61befbe9a8"/>
-           <parameter id="parameter_right_36F687588F9B3559545BE5C276FD9AD73879DBD2" name="right" type="185c54c6-4bb6-4d60-a987-5a61befbe9a8"/>
+           <parameter id="parameter_left_998DAACE73EE5B81FD595FC3B960F3A4D92EC109" name="left" type="56e642cd-2aef-4505-b650-7354dbe6e4e8"/>
+           <parameter id="parameter_right_36F687588F9B3559545BE5C276FD9AD73879DBD2" name="right" type="56e642cd-2aef-4505-b650-7354dbe6e4e8"/>
           </parameters>
          </function>
          <function docPath="../../System.Text.RegularExpressions/doc/ns_System.Text.RegularExpressions.html#function_Cat_0465226282EC3ABACE56D89A451378945115C788" extPath="System.Text.RegularExpressions/doc/ns_System.Text.RegularExpressions.html#function_Cat_0465226282EC3ABACE56D89A451378945115C788" fileName="System.Text.RegularExpressions/Parser.cm" filePath="../../System.Text.RegularExpressions/file/Parser.cm.html" id="function_Cat_0465226282EC3ABACE56D89A451378945115C788" kind="Function" line="29" name="Cat" returnType="class_PtrNfa_5708C8189DEAC0F8CBD3A9DA5094DE3E7536B5FB" specifiers="public">
           <parameters>
-           <parameter id="parameter_left_77956288C4C3B4C7A70F68AA885750BFF5F3D58F" name="left" type="185c54c6-4bb6-4d60-a987-5a61befbe9a8"/>
-           <parameter id="parameter_right_FC16BF4F139DC7FA46503254549A8F7823775844" name="right" type="185c54c6-4bb6-4d60-a987-5a61befbe9a8"/>
+           <parameter id="parameter_left_77956288C4C3B4C7A70F68AA885750BFF5F3D58F" name="left" type="56e642cd-2aef-4505-b650-7354dbe6e4e8"/>
+           <parameter id="parameter_right_FC16BF4F139DC7FA46503254549A8F7823775844" name="right" type="56e642cd-2aef-4505-b650-7354dbe6e4e8"/>
           </parameters>
          </function>
          <function docPath="../../System.Text.RegularExpressions/doc/ns_System.Text.RegularExpressions.html#function_EpsilonClosure_2920F52FDF4A51BCA9D33B76B0D92C2E57BE1BFC" extPath="System.Text.RegularExpressions/doc/ns_System.Text.RegularExpressions.html#function_EpsilonClosure_2920F52FDF4A51BCA9D33B76B0D92C2E57BE1BFC" fileName="System.Text.RegularExpressions/Algorithm.cm" filePath="../../System.Text.RegularExpressions/file/Algorithm.cm.html" id="function_EpsilonClosure_2920F52FDF4A51BCA9D33B76B0D92C2E57BE1BFC" kind="Function" line="57" name="EpsilonClosure" returnType="class_NfaStateNumberSet_94283B9E90ECB564FEF4909226A69DC50DFBEAC3" specifiers="public">
           <parameters>
-           <parameter id="parameter_states_42F2609E5DC7F908295C10B80F069E8DE62EBC63" name="states" type="1317c472-532d-48d5-8afc-10c63c33d430"/>
-           <parameter id="parameter_nfa_2F0FDC7CD823E7B10E0C41779107E4ED64CC4B18" name="nfa" type="9056d28a-2434-4487-bedb-cdf356e8bec7"/>
+           <parameter id="parameter_states_42F2609E5DC7F908295C10B80F069E8DE62EBC63" name="states" type="4635ddbb-234f-4afb-9016-4c018bc175eb"/>
+           <parameter id="parameter_nfa_2F0FDC7CD823E7B10E0C41779107E4ED64CC4B18" name="nfa" type="19562df9-412b-411f-84a9-2d6e3ee3d3ed"/>
           </parameters>
          </function>
          <function docPath="../../System.Text.RegularExpressions/doc/ns_System.Text.RegularExpressions.html#function_EpsilonClosure_C70736F90888A8A25B5030EDD28F95D54AC08E4A" extPath="System.Text.RegularExpressions/doc/ns_System.Text.RegularExpressions.html#function_EpsilonClosure_C70736F90888A8A25B5030EDD28F95D54AC08E4A" fileName="System.Text.RegularExpressions/Algorithm.cm" filePath="../../System.Text.RegularExpressions/file/Algorithm.cm.html" id="function_EpsilonClosure_C70736F90888A8A25B5030EDD28F95D54AC08E4A" kind="Function" line="83" name="EpsilonClosure" returnType="class_NfaStateNumberSet_94283B9E90ECB564FEF4909226A69DC50DFBEAC3" specifiers="public">
           <parameters>
            <parameter id="parameter_s_6756BD61C5C65E9C78CE2B57AAEFC533DEF7FCC8" name="s" type="cc8ffb50-cac1-4f7e-acae-8b3fb9621c37"/>
-           <parameter id="parameter_nfa_1E24680482B26C24ED5AEE9711BB16C6E034297C" name="nfa" type="9056d28a-2434-4487-bedb-cdf356e8bec7"/>
+           <parameter id="parameter_nfa_1E24680482B26C24ED5AEE9711BB16C6E034297C" name="nfa" type="19562df9-412b-411f-84a9-2d6e3ee3d3ed"/>
           </parameters>
          </function>
          <function docPath="../../System.Text.RegularExpressions/doc/ns_System.Text.RegularExpressions.html#function_FindState_6835210F08F0DAAF90AD37AC594DFE0DCA732DDF" extPath="System.Text.RegularExpressions/doc/ns_System.Text.RegularExpressions.html#function_FindState_6835210F08F0DAAF90AD37AC594DFE0DCA732DDF" fileName="System.Text.RegularExpressions/Dfa.cm" filePath="../../System.Text.RegularExpressions/file/Dfa.cm.html" id="function_FindState_6835210F08F0DAAF90AD37AC594DFE0DCA732DDF" kind="Function" line="136" name="FindState" returnType="cc8ffb50-cac1-4f7e-acae-8b3fb9621c37" specifiers="public">
           <parameters>
-           <parameter id="parameter_begin_FFB30D43280DA1DEC87F4A5353E38AE1340B7C51" name="begin" type="c6b66a62-4478-4cb5-b761-c78944d4c3b6"/>
-           <parameter id="parameter_end_0B4019F517B290B9643DD44EF893A0C87207F8FD" name="end" type="c6b66a62-4478-4cb5-b761-c78944d4c3b6"/>
-           <parameter id="parameter_s_41886F6702AB41312EFDAA05283CBB41195202F4" name="s" type="1317c472-532d-48d5-8afc-10c63c33d430"/>
+           <parameter id="parameter_begin_FFB30D43280DA1DEC87F4A5353E38AE1340B7C51" name="begin" type="f6e7f6ce-f984-48e5-8012-0132d47893d1"/>
+           <parameter id="parameter_end_0B4019F517B290B9643DD44EF893A0C87207F8FD" name="end" type="f6e7f6ce-f984-48e5-8012-0132d47893d1"/>
+           <parameter id="parameter_s_41886F6702AB41312EFDAA05283CBB41195202F4" name="s" type="4635ddbb-234f-4afb-9016-4c018bc175eb"/>
           </parameters>
          </function>
          <function docPath="../../System.Text.RegularExpressions/doc/ns_System.Text.RegularExpressions.html#function_Kleene_7713A26D1A3F54B2092A897249CB5E39E3F1B53F" extPath="System.Text.RegularExpressions/doc/ns_System.Text.RegularExpressions.html#function_Kleene_7713A26D1A3F54B2092A897249CB5E39E3F1B53F" fileName="System.Text.RegularExpressions/Parser.cm" filePath="../../System.Text.RegularExpressions/file/Parser.cm.html" id="function_Kleene_7713A26D1A3F54B2092A897249CB5E39E3F1B53F" kind="Function" line="75" name="Kleene" returnType="class_PtrNfa_5708C8189DEAC0F8CBD3A9DA5094DE3E7536B5FB" specifiers="public">
           <parameters>
-           <parameter id="parameter_subject_B9400C41ADF4A32117952ECEE55CEC6F3DD8F50B" name="subject" type="185c54c6-4bb6-4d60-a987-5a61befbe9a8"/>
+           <parameter id="parameter_subject_B9400C41ADF4A32117952ECEE55CEC6F3DD8F50B" name="subject" type="56e642cd-2aef-4505-b650-7354dbe6e4e8"/>
           </parameters>
          </function>
          <function docPath="../../System.Text.RegularExpressions/doc/ns_System.Text.RegularExpressions.html#function_MakeNfa_D79E15BE6BCAEB816164DD385F247B8F62B07957" extPath="System.Text.RegularExpressions/doc/ns_System.Text.RegularExpressions.html#function_MakeNfa_D79E15BE6BCAEB816164DD385F247B8F62B07957" fileName="System.Text.RegularExpressions/Parser.cm" filePath="../../System.Text.RegularExpressions/file/Parser.cm.html" id="function_MakeNfa_D79E15BE6BCAEB816164DD385F247B8F62B07957" kind="Function" line="11" name="MakeNfa" returnType="class_PtrNfa_5708C8189DEAC0F8CBD3A9DA5094DE3E7536B5FB" specifiers="public">
@@ -1469,37 +1469,37 @@
          </function>
          <function docPath="../../System.Text.RegularExpressions/doc/ns_System.Text.RegularExpressions.html#function_MakeNfa_E488F2099F06822C021374D0EC23DD5E16D26A23" extPath="System.Text.RegularExpressions/doc/ns_System.Text.RegularExpressions.html#function_MakeNfa_E488F2099F06822C021374D0EC23DD5E16D26A23" fileName="System.Text.RegularExpressions/Parser.cm" filePath="../../System.Text.RegularExpressions/file/Parser.cm.html" id="function_MakeNfa_E488F2099F06822C021374D0EC23DD5E16D26A23" kind="Function" line="20" name="MakeNfa" returnType="class_PtrNfa_5708C8189DEAC0F8CBD3A9DA5094DE3E7536B5FB" specifiers="public">
           <parameters>
-           <parameter id="parameter_cls_344FCF727BCAFEBD2F6E1B4A9777205600CADFD1" name="cls" type="891de8bc-ed79-43d0-9624-5e22f80a13b6"/>
+           <parameter id="parameter_cls_344FCF727BCAFEBD2F6E1B4A9777205600CADFD1" name="cls" type="dcb5c7ab-129b-4eaf-81ee-c0f951b21a51"/>
           </parameters>
          </function>
          <function docPath="../../System.Text.RegularExpressions/doc/ns_System.Text.RegularExpressions.html#function_Matches_5ACF03A6FF47E999410B0148CF76C540DE97D0A8" extPath="System.Text.RegularExpressions/doc/ns_System.Text.RegularExpressions.html#function_Matches_5ACF03A6FF47E999410B0148CF76C540DE97D0A8" fileName="System.Text.RegularExpressions/Algorithm.cm" filePath="../../System.Text.RegularExpressions/file/Algorithm.cm.html" id="function_Matches_5ACF03A6FF47E999410B0148CF76C540DE97D0A8" kind="Function" line="211" name="Matches" returnType="b53e2ae1-a4b4-4d5b-b75d-06778243ef3d" specifiers="public nothrow">
           <parameters>
            <parameter id="parameter_s_69CEFE24320510C756E4B39ABD517D795D2E3EFA" name="s" type="b14a2675-ade3-4740-b586-48284a4f720d"/>
-           <parameter id="parameter_dfa_01C02579C00973EADFFD3CEB1FAE3D05086CF717" name="dfa" type="29f55988-96a7-4552-9c9f-cd75fa004bcd"/>
+           <parameter id="parameter_dfa_01C02579C00973EADFFD3CEB1FAE3D05086CF717" name="dfa" type="da777afb-2c51-48dd-9248-07e355fb3d7c"/>
           </parameters>
          </function>
          <function docPath="../../System.Text.RegularExpressions/doc/ns_System.Text.RegularExpressions.html#function_Matches_CABA9735ED4A5D89DEE37FCE1F80C710F4AA7501" extPath="System.Text.RegularExpressions/doc/ns_System.Text.RegularExpressions.html#function_Matches_CABA9735ED4A5D89DEE37FCE1F80C710F4AA7501" fileName="System.Text.RegularExpressions/Algorithm.cm" filePath="../../System.Text.RegularExpressions/file/Algorithm.cm.html" id="function_Matches_CABA9735ED4A5D89DEE37FCE1F80C710F4AA7501" kind="Function" line="145" name="Matches" returnType="b53e2ae1-a4b4-4d5b-b75d-06778243ef3d" specifiers="public">
           <parameters>
            <parameter id="parameter_s_25CB1BDCB38CEF0B54FEB928144000F87078214A" name="s" type="b14a2675-ade3-4740-b586-48284a4f720d"/>
-           <parameter id="parameter_nfa_5CCA4F7DB513664557E2049BE8F80FC054D911C5" name="nfa" type="9056d28a-2434-4487-bedb-cdf356e8bec7"/>
+           <parameter id="parameter_nfa_5CCA4F7DB513664557E2049BE8F80FC054D911C5" name="nfa" type="19562df9-412b-411f-84a9-2d6e3ee3d3ed"/>
           </parameters>
          </function>
          <function docPath="../../System.Text.RegularExpressions/doc/ns_System.Text.RegularExpressions.html#function_MatchesSlow_3283EC27B79209142A1A6F427314AD173B4B526F" extPath="System.Text.RegularExpressions/doc/ns_System.Text.RegularExpressions.html#function_MatchesSlow_3283EC27B79209142A1A6F427314AD173B4B526F" fileName="System.Text.RegularExpressions/Algorithm.cm" filePath="../../System.Text.RegularExpressions/file/Algorithm.cm.html" id="function_MatchesSlow_3283EC27B79209142A1A6F427314AD173B4B526F" kind="Function" line="89" name="MatchesSlow" returnType="b53e2ae1-a4b4-4d5b-b75d-06778243ef3d" specifiers="public">
           <parameters>
            <parameter id="parameter_s_C393005DBA6BEA649404E3C7C5DB146C3B01F1BC" name="s" type="b14a2675-ade3-4740-b586-48284a4f720d"/>
-           <parameter id="parameter_nfa_1D93AC400EB271AA8AD76CB75630CD2F03583DA5" name="nfa" type="9056d28a-2434-4487-bedb-cdf356e8bec7"/>
+           <parameter id="parameter_nfa_1D93AC400EB271AA8AD76CB75630CD2F03583DA5" name="nfa" type="19562df9-412b-411f-84a9-2d6e3ee3d3ed"/>
           </parameters>
          </function>
          <function docPath="../../System.Text.RegularExpressions/doc/ns_System.Text.RegularExpressions.html#function_Move_0EEDAF3B7AAF3C35467317B8AD4D7F35D2412BF0" extPath="System.Text.RegularExpressions/doc/ns_System.Text.RegularExpressions.html#function_Move_0EEDAF3B7AAF3C35467317B8AD4D7F35D2412BF0" fileName="System.Text.RegularExpressions/Algorithm.cm" filePath="../../System.Text.RegularExpressions/file/Algorithm.cm.html" id="function_Move_0EEDAF3B7AAF3C35467317B8AD4D7F35D2412BF0" kind="Function" line="46" name="Move" returnType="class_NfaStateNumberSet_94283B9E90ECB564FEF4909226A69DC50DFBEAC3" specifiers="public">
           <parameters>
-           <parameter id="parameter_states_0CAF56E35FBE084FF191D0EC3349A5349E707985" name="states" type="1317c472-532d-48d5-8afc-10c63c33d430"/>
+           <parameter id="parameter_states_0CAF56E35FBE084FF191D0EC3349A5349E707985" name="states" type="4635ddbb-234f-4afb-9016-4c018bc175eb"/>
            <parameter id="parameter_c_A9F62DF9579348351D57CCE85E8285C46D840DE5" name="c" type="fa042a6a-5c08-46b3-b35b-b955ec35f88c"/>
-           <parameter id="parameter_nfa_8ABC37FEB782B9ABB79228EB40381849F2F0BA7C" name="nfa" type="9056d28a-2434-4487-bedb-cdf356e8bec7"/>
+           <parameter id="parameter_nfa_8ABC37FEB782B9ABB79228EB40381849F2F0BA7C" name="nfa" type="19562df9-412b-411f-84a9-2d6e3ee3d3ed"/>
           </parameters>
          </function>
          <function docPath="../../System.Text.RegularExpressions/doc/ns_System.Text.RegularExpressions.html#function_Optional_A91AD05335DB0478FB38E926766295BAF36AED04" extPath="System.Text.RegularExpressions/doc/ns_System.Text.RegularExpressions.html#function_Optional_A91AD05335DB0478FB38E926766295BAF36AED04" fileName="System.Text.RegularExpressions/Parser.cm" filePath="../../System.Text.RegularExpressions/file/Parser.cm.html" id="function_Optional_A91AD05335DB0478FB38E926766295BAF36AED04" kind="Function" line="118" name="Optional" returnType="class_PtrNfa_5708C8189DEAC0F8CBD3A9DA5094DE3E7536B5FB" specifiers="public">
           <parameters>
-           <parameter id="parameter_subject_00A454465B5DE000350D651568A5E4A41A9E7919" name="subject" type="185c54c6-4bb6-4d60-a987-5a61befbe9a8"/>
+           <parameter id="parameter_subject_00A454465B5DE000350D651568A5E4A41A9E7919" name="subject" type="56e642cd-2aef-4505-b650-7354dbe6e4e8"/>
           </parameters>
          </function>
          <function docPath="../../System.Text.RegularExpressions/doc/ns_System.Text.RegularExpressions.html#function_ParseRegEx_E19FFA4F71A38771F5578C338314BD5F8F10D655" extPath="System.Text.RegularExpressions/doc/ns_System.Text.RegularExpressions.html#function_ParseRegEx_E19FFA4F71A38771F5578C338314BD5F8F10D655" fileName="System.Text.RegularExpressions/Parser.cm" filePath="../../System.Text.RegularExpressions/file/Parser.cm.html" id="function_ParseRegEx_E19FFA4F71A38771F5578C338314BD5F8F10D655" kind="Function" line="152" name="ParseRegEx" returnType="class_PtrNfa_5708C8189DEAC0F8CBD3A9DA5094DE3E7536B5FB" specifiers="public">
@@ -1510,17 +1510,17 @@
          </function>
          <function docPath="../../System.Text.RegularExpressions/doc/ns_System.Text.RegularExpressions.html#function_Positive_EE60205EB0EC73B6B0BE6BCE863DD0D934FC17AA" extPath="System.Text.RegularExpressions/doc/ns_System.Text.RegularExpressions.html#function_Positive_EE60205EB0EC73B6B0BE6BCE863DD0D934FC17AA" fileName="System.Text.RegularExpressions/Parser.cm" filePath="../../System.Text.RegularExpressions/file/Parser.cm.html" id="function_Positive_EE60205EB0EC73B6B0BE6BCE863DD0D934FC17AA" kind="Function" line="97" name="Positive" returnType="class_PtrNfa_5708C8189DEAC0F8CBD3A9DA5094DE3E7536B5FB" specifiers="public">
           <parameters>
-           <parameter id="parameter_subject_94E702B5C082B13C91D3E316F85481944BC3AE25" name="subject" type="185c54c6-4bb6-4d60-a987-5a61befbe9a8"/>
+           <parameter id="parameter_subject_94E702B5C082B13C91D3E316F85481944BC3AE25" name="subject" type="56e642cd-2aef-4505-b650-7354dbe6e4e8"/>
           </parameters>
          </function>
          <function docPath="../../System.Text.RegularExpressions/doc/ns_System.Text.RegularExpressions.html#function_ToDfa_3C137DA5A679038BEAFCE6E395241C01126DC1A7" extPath="System.Text.RegularExpressions/doc/ns_System.Text.RegularExpressions.html#function_ToDfa_3C137DA5A679038BEAFCE6E395241C01126DC1A7" fileName="System.Text.RegularExpressions/Algorithm.cm" filePath="../../System.Text.RegularExpressions/file/Algorithm.cm.html" id="function_ToDfa_3C137DA5A679038BEAFCE6E395241C01126DC1A7" kind="Function" line="166" name="ToDfa" returnType="class_Dfa_C0C2BE49FCC3D3B6EA837CF206D1FE18B6C3B39E" specifiers="public">
           <parameters>
-           <parameter id="parameter_nfa_4778C2E694E9D2490D3777C9311A4543701842C8" name="nfa" type="9056d28a-2434-4487-bedb-cdf356e8bec7"/>
+           <parameter id="parameter_nfa_4778C2E694E9D2490D3777C9311A4543701842C8" name="nfa" type="19562df9-412b-411f-84a9-2d6e3ee3d3ed"/>
           </parameters>
          </function>
          <function docPath="../../System.Text.RegularExpressions/doc/ns_System.Text.RegularExpressions.html#function_ToNfa_47B4C0C904524DB43CFF1A2180CBA8B70F84CA00" extPath="System.Text.RegularExpressions/doc/ns_System.Text.RegularExpressions.html#function_ToNfa_47B4C0C904524DB43CFF1A2180CBA8B70F84CA00" fileName="System.Text.RegularExpressions/Algorithm.cm" filePath="../../System.Text.RegularExpressions/file/Algorithm.cm.html" id="function_ToNfa_47B4C0C904524DB43CFF1A2180CBA8B70F84CA00" kind="Function" line="11" name="ToNfa" returnType="class_Nfa_5E23E7BB511DC9602941611B6CE87476EC3ECB57" specifiers="public">
           <parameters>
-           <parameter id="parameter_ptrNfa_917E35570E840702839524121DBB6E233A3FD18C" name="ptrNfa" type="185c54c6-4bb6-4d60-a987-5a61befbe9a8"/>
+           <parameter id="parameter_ptrNfa_917E35570E840702839524121DBB6E233A3FD18C" name="ptrNfa" type="56e642cd-2aef-4505-b650-7354dbe6e4e8"/>
           </parameters>
          </function>
          <function docPath="../../System.Text.RegularExpressions/doc/ns_System.Text.RegularExpressions.html#function_ToNfa_E93F77CDE077C3E57B1556A7A48371CBB10CD64D" extPath="System.Text.RegularExpressions/doc/ns_System.Text.RegularExpressions.html#function_ToNfa_E93F77CDE077C3E57B1556A7A48371CBB10CD64D" fileName="System.Text.RegularExpressions/Algorithm.cm" filePath="../../System.Text.RegularExpressions/file/Algorithm.cm.html" id="function_ToNfa_E93F77CDE077C3E57B1556A7A48371CBB10CD64D" kind="Function" line="38" name="ToNfa" returnType="class_Nfa_5E23E7BB511DC9602941611B6CE87476EC3ECB57" specifiers="public">
@@ -1537,112 +1537,112 @@
          <function docPath="../../System.Text.RegularExpressions/doc/ns_System.Text.RegularExpressions.html#function_Transform_A221E9D046B37DA540984D0A629132630378DA3C" extPath="System.Text.RegularExpressions/doc/ns_System.Text.RegularExpressions.html#function_Transform_A221E9D046B37DA540984D0A629132630378DA3C" fileName="System.Text.RegularExpressions/Algorithm.cm" filePath="../../System.Text.RegularExpressions/file/Algorithm.cm.html" id="function_Transform_A221E9D046B37DA540984D0A629132630378DA3C" kind="Function" line="121" name="Transform" returnType="4e959632-b5f2-406d-9402-ec16ab3f3585" specifiers="public">
           <parameters>
            <parameter id="parameter_c_87936FB4ADC9456D8D3D6B7A62C88C6034256CEF" name="c" type="fa042a6a-5c08-46b3-b35b-b955ec35f88c"/>
-           <parameter id="parameter_oldStates_08833C97F82D888914380F0C97C288482025B486" name="oldStates" type="ebcd9886-c7c9-4378-bd72-cdc633ae2a41"/>
-           <parameter id="parameter_newStates_39B937FBE2619A84D83AE61E643450953D6EAFE6" name="newStates" type="ebcd9886-c7c9-4378-bd72-cdc633ae2a41"/>
+           <parameter id="parameter_oldStates_08833C97F82D888914380F0C97C288482025B486" name="oldStates" type="1745e4ef-fc59-407e-b697-d453e2b61442"/>
+           <parameter id="parameter_newStates_39B937FBE2619A84D83AE61E643450953D6EAFE6" name="newStates" type="1745e4ef-fc59-407e-b697-d453e2b61442"/>
            <parameter id="parameter_alreadyOn_0DCAFB50FAF827BB939EB338C42FC46496815660" name="alreadyOn" type="d30649e2-00d5-474d-a95c-06496ffa59de"/>
-           <parameter id="parameter_nfa_9957731A6A70F9EA0E8178F0DAA2EF2954FF18F7" name="nfa" type="9056d28a-2434-4487-bedb-cdf356e8bec7"/>
+           <parameter id="parameter_nfa_9957731A6A70F9EA0E8178F0DAA2EF2954FF18F7" name="nfa" type="19562df9-412b-411f-84a9-2d6e3ee3d3ed"/>
           </parameters>
          </function>
          <function docPath="../../System.Text.RegularExpressions/doc/ns_System.Text.RegularExpressions.html#function_op_shl_C1DEC1FF29229F2C2E24F7685ADF587A765B5947" extPath="System.Text.RegularExpressions/doc/ns_System.Text.RegularExpressions.html#function_op_shl_C1DEC1FF29229F2C2E24F7685ADF587A765B5947" fileName="System.Text.RegularExpressions/CharClass.cm" filePath="../../System.Text.RegularExpressions/file/CharClass.cm.html" id="function_op_shl_C1DEC1FF29229F2C2E24F7685ADF587A765B5947" kind="Function" line="135" name="operator&lt;&lt;" returnType="69c1a498-2423-4654-9649-c9f31ad3e459" specifiers="public">
           <parameters>
            <parameter id="parameter_s_E3AAA41123A727E6EDF3B49BDD010F65DDBE0035" name="s" type="69c1a498-2423-4654-9649-c9f31ad3e459"/>
-           <parameter id="parameter_cls_E87B180D6FEB42BCD9B970A9F57967EBAEE7C3FC" name="cls" type="891de8bc-ed79-43d0-9624-5e22f80a13b6"/>
+           <parameter id="parameter_cls_E87B180D6FEB42BCD9B970A9F57967EBAEE7C3FC" name="cls" type="dcb5c7ab-129b-4eaf-81ee-c0f951b21a51"/>
           </parameters>
          </function>
          <function docPath="../../System.Text.RegularExpressions/doc/ns_System.Text.RegularExpressions.html#function_op_shl_529DAA6DAA82E134670BD473AD7269E2F37C94BA" extPath="System.Text.RegularExpressions/doc/ns_System.Text.RegularExpressions.html#function_op_shl_529DAA6DAA82E134670BD473AD7269E2F37C94BA" fileName="System.Text.RegularExpressions/Dfa.cm" filePath="../../System.Text.RegularExpressions/file/Dfa.cm.html" id="function_op_shl_529DAA6DAA82E134670BD473AD7269E2F37C94BA" kind="Function" line="116" name="operator&lt;&lt;" returnType="69c1a498-2423-4654-9649-c9f31ad3e459" specifiers="public">
           <parameters>
            <parameter id="parameter_s_A195E86ACCFABDBDCA4E6DF2C87BE80DC991F2D8" name="s" type="69c1a498-2423-4654-9649-c9f31ad3e459"/>
-           <parameter id="parameter_dfa_B0F47DD9DF519FDB08037B607F3CD9CA875FC5A9" name="dfa" type="29f55988-96a7-4552-9c9f-cd75fa004bcd"/>
+           <parameter id="parameter_dfa_B0F47DD9DF519FDB08037B607F3CD9CA875FC5A9" name="dfa" type="da777afb-2c51-48dd-9248-07e355fb3d7c"/>
           </parameters>
          </function>
          <function docPath="../../System.Text.RegularExpressions/doc/ns_System.Text.RegularExpressions.html#function_op_shl_6FC8187D8A10228A2B234648D5813A2989EE986F" extPath="System.Text.RegularExpressions/doc/ns_System.Text.RegularExpressions.html#function_op_shl_6FC8187D8A10228A2B234648D5813A2989EE986F" fileName="System.Text.RegularExpressions/Dfa.cm" filePath="../../System.Text.RegularExpressions/file/Dfa.cm.html" id="function_op_shl_6FC8187D8A10228A2B234648D5813A2989EE986F" kind="Function" line="45" name="operator&lt;&lt;" returnType="69c1a498-2423-4654-9649-c9f31ad3e459" specifiers="public">
           <parameters>
            <parameter id="parameter_s_043AE66673FF0A42FAD8EF5F2057DCDB10AE1E05" name="s" type="69c1a498-2423-4654-9649-c9f31ad3e459"/>
-           <parameter id="parameter_state_566B2373A6DBE7B2F7EE22841068F437D360EF96" name="state" type="fb0b7f0c-7713-4afc-91ca-f87e8eabbdef"/>
+           <parameter id="parameter_state_566B2373A6DBE7B2F7EE22841068F437D360EF96" name="state" type="51c176ba-19af-400f-a080-106381f1f18f"/>
           </parameters>
          </function>
          <function docPath="../../System.Text.RegularExpressions/doc/ns_System.Text.RegularExpressions.html#function_op_shl_4E5CAC0C1959738EA9F3D41EA8C384D0F55BEB02" extPath="System.Text.RegularExpressions/doc/ns_System.Text.RegularExpressions.html#function_op_shl_4E5CAC0C1959738EA9F3D41EA8C384D0F55BEB02" fileName="System.Text.RegularExpressions/Nfa.cm" filePath="../../System.Text.RegularExpressions/file/Nfa.cm.html" id="function_op_shl_4E5CAC0C1959738EA9F3D41EA8C384D0F55BEB02" kind="Function" line="190" name="operator&lt;&lt;" returnType="69c1a498-2423-4654-9649-c9f31ad3e459" specifiers="public">
           <parameters>
            <parameter id="parameter_s_FD3E8E8A9F8309587F3FCBC196D2ED1DDB634524" name="s" type="69c1a498-2423-4654-9649-c9f31ad3e459"/>
-           <parameter id="parameter_nfa_849FA6FCF78C85E114F6B654AB191F1AF8C8A84A" name="nfa" type="9056d28a-2434-4487-bedb-cdf356e8bec7"/>
+           <parameter id="parameter_nfa_849FA6FCF78C85E114F6B654AB191F1AF8C8A84A" name="nfa" type="19562df9-412b-411f-84a9-2d6e3ee3d3ed"/>
           </parameters>
          </function>
          <function docPath="../../System.Text.RegularExpressions/doc/ns_System.Text.RegularExpressions.html#function_op_shl_F6A1C2C0E02B025CF998B4AF949CC63F52E49A24" extPath="System.Text.RegularExpressions/doc/ns_System.Text.RegularExpressions.html#function_op_shl_F6A1C2C0E02B025CF998B4AF949CC63F52E49A24" fileName="System.Text.RegularExpressions/Nfa.cm" filePath="../../System.Text.RegularExpressions/file/Nfa.cm.html" id="function_op_shl_F6A1C2C0E02B025CF998B4AF949CC63F52E49A24" kind="Function" line="136" name="operator&lt;&lt;" returnType="69c1a498-2423-4654-9649-c9f31ad3e459" specifiers="public">
           <parameters>
            <parameter id="parameter_s_3B572E867481285767B0B9BBFA6076631A88F63C" name="s" type="69c1a498-2423-4654-9649-c9f31ad3e459"/>
-           <parameter id="parameter_state_90AA73E86878D995993DDC8A8D761D76A8D94A41" name="state" type="5a86cabb-4a9f-48bb-8c3b-fefb55cf3d00"/>
+           <parameter id="parameter_state_90AA73E86878D995993DDC8A8D761D76A8D94A41" name="state" type="49f0ab60-928d-4815-a2f0-00112003114b"/>
           </parameters>
          </function>
          <function docPath="../../System.Text.RegularExpressions/doc/ns_System.Text.RegularExpressions.html#function_op_shl_4708DEEF88C9580BCAB388C3AE502A8B4382BEC5" extPath="System.Text.RegularExpressions/doc/ns_System.Text.RegularExpressions.html#function_op_shl_4708DEEF88C9580BCAB388C3AE502A8B4382BEC5" fileName="System.Text.RegularExpressions/Nfa.cm" filePath="../../System.Text.RegularExpressions/file/Nfa.cm.html" id="function_op_shl_4708DEEF88C9580BCAB388C3AE502A8B4382BEC5" kind="Function" line="87" name="operator&lt;&lt;" returnType="69c1a498-2423-4654-9649-c9f31ad3e459" specifiers="public">
           <parameters>
            <parameter id="parameter_s_CCEEAF0F82CA741A14DE2342D478601C81BECE44" name="s" type="69c1a498-2423-4654-9649-c9f31ad3e459"/>
-           <parameter id="parameter_ns_42331A993BB7E8136ACB378FFBE119CF11EA94D2" name="ns" type="1317c472-532d-48d5-8afc-10c63c33d430"/>
+           <parameter id="parameter_ns_42331A993BB7E8136ACB378FFBE119CF11EA94D2" name="ns" type="4635ddbb-234f-4afb-9016-4c018bc175eb"/>
           </parameters>
          </function>
          <function docPath="../../System.Text.RegularExpressions/doc/ns_System.Text.RegularExpressions.html#function_op_shl_0C23222D819AC864A37182196D3EA36958DF633C" extPath="System.Text.RegularExpressions/doc/ns_System.Text.RegularExpressions.html#function_op_shl_0C23222D819AC864A37182196D3EA36958DF633C" fileName="System.Text.RegularExpressions/PtrNfa.cm" filePath="../../System.Text.RegularExpressions/file/PtrNfa.cm.html" id="function_op_shl_0C23222D819AC864A37182196D3EA36958DF633C" kind="Function" line="210" name="operator&lt;&lt;" returnType="69c1a498-2423-4654-9649-c9f31ad3e459" specifiers="public">
           <parameters>
            <parameter id="parameter_s_530B4927146BDA288432D1993874C9304ABF8134" name="s" type="69c1a498-2423-4654-9649-c9f31ad3e459"/>
-           <parameter id="parameter_nfa_794BA3E0C7E93D05F13E294AC5691F5D5D3FFCB8" name="nfa" type="185c54c6-4bb6-4d60-a987-5a61befbe9a8"/>
+           <parameter id="parameter_nfa_794BA3E0C7E93D05F13E294AC5691F5D5D3FFCB8" name="nfa" type="56e642cd-2aef-4505-b650-7354dbe6e4e8"/>
           </parameters>
          </function>
          <function docPath="../../System.Text.RegularExpressions/doc/ns_System.Text.RegularExpressions.html#function_op_shl_51AABFDB519D7C04C6F3C75CAAB1ABDC5313E49F" extPath="System.Text.RegularExpressions/doc/ns_System.Text.RegularExpressions.html#function_op_shl_51AABFDB519D7C04C6F3C75CAAB1ABDC5313E49F" fileName="System.Text.RegularExpressions/PtrNfa.cm" filePath="../../System.Text.RegularExpressions/file/PtrNfa.cm.html" id="function_op_shl_51AABFDB519D7C04C6F3C75CAAB1ABDC5313E49F" kind="Function" line="100" name="operator&lt;&lt;" returnType="69c1a498-2423-4654-9649-c9f31ad3e459" specifiers="public">
           <parameters>
            <parameter id="parameter_s_6191ECD321673D6C7581B0028795AE0A58F2DF6F" name="s" type="69c1a498-2423-4654-9649-c9f31ad3e459"/>
-           <parameter id="parameter_edge_C988E7BC6E352861408C0342CABED6CABABB5743" name="edge" type="951e4157-af66-4631-a9d6-6106dc72e145"/>
+           <parameter id="parameter_edge_C988E7BC6E352861408C0342CABED6CABABB5743" name="edge" type="369c841f-f91c-49ff-b17a-7811770b6959"/>
           </parameters>
          </function>
          <function docPath="../../System.Text.RegularExpressions/doc/ns_System.Text.RegularExpressions.html#function_op_shl_B16D0D64750AB09DA2A841C2F3AB1EDCF83E05A6" extPath="System.Text.RegularExpressions/doc/ns_System.Text.RegularExpressions.html#function_op_shl_B16D0D64750AB09DA2A841C2F3AB1EDCF83E05A6" fileName="System.Text.RegularExpressions/CharClass.cm" filePath="../../System.Text.RegularExpressions/file/CharClass.cm.html" id="function_op_shl_B16D0D64750AB09DA2A841C2F3AB1EDCF83E05A6" kind="Function" line="146" name="operator&lt;&lt;" returnType="cd572791-a5b1-4baa-ae73-88b44d35a261" specifiers="public">
           <parameters>
            <parameter id="parameter_s_30E3840DA22921CF9036AD331E32C893B00C6E6D" name="s" type="cd572791-a5b1-4baa-ae73-88b44d35a261"/>
-           <parameter id="parameter_cls_CB9EDEFFDB1D569436DD35325FD22593810E558C" name="cls" type="891de8bc-ed79-43d0-9624-5e22f80a13b6"/>
+           <parameter id="parameter_cls_CB9EDEFFDB1D569436DD35325FD22593810E558C" name="cls" type="dcb5c7ab-129b-4eaf-81ee-c0f951b21a51"/>
           </parameters>
          </function>
          <function docPath="../../System.Text.RegularExpressions/doc/ns_System.Text.RegularExpressions.html#function_op_shl_39E6DB77B3726EE382A4928DE8B747FCE82D55C9" extPath="System.Text.RegularExpressions/doc/ns_System.Text.RegularExpressions.html#function_op_shl_39E6DB77B3726EE382A4928DE8B747FCE82D55C9" fileName="System.Text.RegularExpressions/Dfa.cm" filePath="../../System.Text.RegularExpressions/file/Dfa.cm.html" id="function_op_shl_39E6DB77B3726EE382A4928DE8B747FCE82D55C9" kind="Function" line="126" name="operator&lt;&lt;" returnType="cd572791-a5b1-4baa-ae73-88b44d35a261" specifiers="public">
           <parameters>
            <parameter id="parameter_s_B711594FFE1E743C9256A43210835BFCB2997A90" name="s" type="cd572791-a5b1-4baa-ae73-88b44d35a261"/>
-           <parameter id="parameter_dfa_6EB7B1223174F6AB9479DEC36DAA22AB23E43FEE" name="dfa" type="29f55988-96a7-4552-9c9f-cd75fa004bcd"/>
+           <parameter id="parameter_dfa_6EB7B1223174F6AB9479DEC36DAA22AB23E43FEE" name="dfa" type="da777afb-2c51-48dd-9248-07e355fb3d7c"/>
           </parameters>
          </function>
          <function docPath="../../System.Text.RegularExpressions/doc/ns_System.Text.RegularExpressions.html#function_op_shl_DDC9181576324064116CCA12EA81F494F4FD7671" extPath="System.Text.RegularExpressions/doc/ns_System.Text.RegularExpressions.html#function_op_shl_DDC9181576324064116CCA12EA81F494F4FD7671" fileName="System.Text.RegularExpressions/Dfa.cm" filePath="../../System.Text.RegularExpressions/file/Dfa.cm.html" id="function_op_shl_DDC9181576324064116CCA12EA81F494F4FD7671" kind="Function" line="64" name="operator&lt;&lt;" returnType="cd572791-a5b1-4baa-ae73-88b44d35a261" specifiers="public">
           <parameters>
            <parameter id="parameter_s_6C5180F3FF0091C620089EBE55B34FE97F60D3BD" name="s" type="cd572791-a5b1-4baa-ae73-88b44d35a261"/>
-           <parameter id="parameter_state_24B5D8B73F8C053B87C4B24398CE15D7B14500EB" name="state" type="fb0b7f0c-7713-4afc-91ca-f87e8eabbdef"/>
+           <parameter id="parameter_state_24B5D8B73F8C053B87C4B24398CE15D7B14500EB" name="state" type="51c176ba-19af-400f-a080-106381f1f18f"/>
           </parameters>
          </function>
          <function docPath="../../System.Text.RegularExpressions/doc/ns_System.Text.RegularExpressions.html#function_op_shl_32B788139992A46133E1128EA68FE9705068391B" extPath="System.Text.RegularExpressions/doc/ns_System.Text.RegularExpressions.html#function_op_shl_32B788139992A46133E1128EA68FE9705068391B" fileName="System.Text.RegularExpressions/Nfa.cm" filePath="../../System.Text.RegularExpressions/file/Nfa.cm.html" id="function_op_shl_32B788139992A46133E1128EA68FE9705068391B" kind="Function" line="199" name="operator&lt;&lt;" returnType="cd572791-a5b1-4baa-ae73-88b44d35a261" specifiers="public">
           <parameters>
            <parameter id="parameter_s_FE27274AC1E5828CF5EFCBF3EF45B2E8A59E037D" name="s" type="cd572791-a5b1-4baa-ae73-88b44d35a261"/>
-           <parameter id="parameter_nfa_B585BE07B519C152E2601062ABB21D90FBDBEA11" name="nfa" type="9056d28a-2434-4487-bedb-cdf356e8bec7"/>
+           <parameter id="parameter_nfa_B585BE07B519C152E2601062ABB21D90FBDBEA11" name="nfa" type="19562df9-412b-411f-84a9-2d6e3ee3d3ed"/>
           </parameters>
          </function>
          <function docPath="../../System.Text.RegularExpressions/doc/ns_System.Text.RegularExpressions.html#function_op_shl_6485B9489611903D001C978ACF890102A19BB472" extPath="System.Text.RegularExpressions/doc/ns_System.Text.RegularExpressions.html#function_op_shl_6485B9489611903D001C978ACF890102A19BB472" fileName="System.Text.RegularExpressions/Nfa.cm" filePath="../../System.Text.RegularExpressions/file/Nfa.cm.html" id="function_op_shl_6485B9489611903D001C978ACF890102A19BB472" kind="Function" line="151" name="operator&lt;&lt;" returnType="cd572791-a5b1-4baa-ae73-88b44d35a261" specifiers="public">
           <parameters>
            <parameter id="parameter_s_F023A8242C03223230A10373DFCF405729180087" name="s" type="cd572791-a5b1-4baa-ae73-88b44d35a261"/>
-           <parameter id="parameter_state_AD6153268767F4862163BEEB159B60AEC952A470" name="state" type="5a86cabb-4a9f-48bb-8c3b-fefb55cf3d00"/>
+           <parameter id="parameter_state_AD6153268767F4862163BEEB159B60AEC952A470" name="state" type="49f0ab60-928d-4815-a2f0-00112003114b"/>
           </parameters>
          </function>
          <function docPath="../../System.Text.RegularExpressions/doc/ns_System.Text.RegularExpressions.html#function_op_shl_1FAFC8A002E684C1701F2045817D6A3F812784C0" extPath="System.Text.RegularExpressions/doc/ns_System.Text.RegularExpressions.html#function_op_shl_1FAFC8A002E684C1701F2045817D6A3F812784C0" fileName="System.Text.RegularExpressions/Nfa.cm" filePath="../../System.Text.RegularExpressions/file/Nfa.cm.html" id="function_op_shl_1FAFC8A002E684C1701F2045817D6A3F812784C0" kind="Function" line="92" name="operator&lt;&lt;" returnType="cd572791-a5b1-4baa-ae73-88b44d35a261" specifiers="public">
           <parameters>
            <parameter id="parameter_writer_6E4C413934FBF62883505A792C053F84E5922911" name="writer" type="cd572791-a5b1-4baa-ae73-88b44d35a261"/>
-           <parameter id="parameter_ns_CD6979BA60F39FEBE14F203BF9C505B5FCEA2011" name="ns" type="1317c472-532d-48d5-8afc-10c63c33d430"/>
+           <parameter id="parameter_ns_CD6979BA60F39FEBE14F203BF9C505B5FCEA2011" name="ns" type="4635ddbb-234f-4afb-9016-4c018bc175eb"/>
           </parameters>
          </function>
          <function docPath="../../System.Text.RegularExpressions/doc/ns_System.Text.RegularExpressions.html#function_op_shl_825C28946705E8199F546560B5918AF74B4DCA0D" extPath="System.Text.RegularExpressions/doc/ns_System.Text.RegularExpressions.html#function_op_shl_825C28946705E8199F546560B5918AF74B4DCA0D" fileName="System.Text.RegularExpressions/PtrNfa.cm" filePath="../../System.Text.RegularExpressions/file/PtrNfa.cm.html" id="function_op_shl_825C28946705E8199F546560B5918AF74B4DCA0D" kind="Function" line="229" name="operator&lt;&lt;" returnType="cd572791-a5b1-4baa-ae73-88b44d35a261" specifiers="public">
           <parameters>
            <parameter id="parameter_s_667B8E7863577DBEF300377E24B362C40559DA17" name="s" type="cd572791-a5b1-4baa-ae73-88b44d35a261"/>
-           <parameter id="parameter_nfa_3882FC80DE93AD183646500BD52D4110429CA0D2" name="nfa" type="185c54c6-4bb6-4d60-a987-5a61befbe9a8"/>
+           <parameter id="parameter_nfa_3882FC80DE93AD183646500BD52D4110429CA0D2" name="nfa" type="56e642cd-2aef-4505-b650-7354dbe6e4e8"/>
           </parameters>
          </function>
          <function docPath="../../System.Text.RegularExpressions/doc/ns_System.Text.RegularExpressions.html#function_op_shl_6F9AF13E509A9C210D030CEDBC6B253DC6568410" extPath="System.Text.RegularExpressions/doc/ns_System.Text.RegularExpressions.html#function_op_shl_6F9AF13E509A9C210D030CEDBC6B253DC6568410" fileName="System.Text.RegularExpressions/PtrNfa.cm" filePath="../../System.Text.RegularExpressions/file/PtrNfa.cm.html" id="function_op_shl_6F9AF13E509A9C210D030CEDBC6B253DC6568410" kind="Function" line="106" name="operator&lt;&lt;" returnType="cd572791-a5b1-4baa-ae73-88b44d35a261" specifiers="public">
           <parameters>
            <parameter id="parameter_s_40181259776C4489BB4E6501403474B7BE335CE1" name="s" type="cd572791-a5b1-4baa-ae73-88b44d35a261"/>
-           <parameter id="parameter_edge_E425486FFFA701D5790D3BEF7C58799C44300F2F" name="edge" type="951e4157-af66-4631-a9d6-6106dc72e145"/>
+           <parameter id="parameter_edge_E425486FFFA701D5790D3BEF7C58799C44300F2F" name="edge" type="369c841f-f91c-49ff-b17a-7811770b6959"/>
           </parameters>
          </function>
          <function docPath="../../System.Text.RegularExpressions/doc/ns_System.Text.RegularExpressions.html#function_op_eq_E167B657AE9463D25B3B65B5090C498284BDC388" extPath="System.Text.RegularExpressions/doc/ns_System.Text.RegularExpressions.html#function_op_eq_E167B657AE9463D25B3B65B5090C498284BDC388" fileName="System.Text.RegularExpressions/Nfa.cm" filePath="../../System.Text.RegularExpressions/file/Nfa.cm.html" id="function_op_eq_E167B657AE9463D25B3B65B5090C498284BDC388" kind="Function" line="82" name="operator==" returnType="b53e2ae1-a4b4-4d5b-b75d-06778243ef3d" specifiers="public nothrow">
           <parameters>
-           <parameter id="parameter_left_BE0A59DC4C6352F63BC9DDEF2D8F32F205252C8B" name="left" type="1317c472-532d-48d5-8afc-10c63c33d430"/>
-           <parameter id="parameter_right_D745ED687934283D01FC4AF89EF97730AD59E625" name="right" type="1317c472-532d-48d5-8afc-10c63c33d430"/>
+           <parameter id="parameter_left_BE0A59DC4C6352F63BC9DDEF2D8F32F205252C8B" name="left" type="4635ddbb-234f-4afb-9016-4c018bc175eb"/>
+           <parameter id="parameter_right_D745ED687934283D01FC4AF89EF97730AD59E625" name="right" type="4635ddbb-234f-4afb-9016-4c018bc175eb"/>
           </parameters>
          </function>
         </functions>
@@ -1689,136 +1689,136 @@
    <derivation baseType="class_Bitset_BA1EE2E68426C5445CB6CAF7F957084ADAFD19CA"/>
    <derivation name="&amp;"/>
   </derivedType>
-  <derivedType id="fb0b7f0c-7713-4afc-91ca-f87e8eabbdef" name="const DfaState&amp;">
+  <derivedType id="51c176ba-19af-400f-a080-106381f1f18f" name="const DfaState&amp;">
    <derivation name="const"/>
    <derivation baseType="class_DfaState_9705397F7C4EF22AB411D3A2CD2F07D838F85228"/>
    <derivation name="&amp;"/>
   </derivedType>
-  <specialization id="0ae1463e-1326-4e3f-8776-a85be4486e5d" name="List" primaryType="class_List_T_4E42CF5913BEB21F5260DEFEC239180C94460B11">
+  <specialization id="faa30660-7973-4524-a799-89155699cafe" name="List" primaryType="class_List_T_4E42CF5913BEB21F5260DEFEC239180C94460B11">
    <templateArgumentTypes>
     <templateArgumentType ref="class_DfaState_9705397F7C4EF22AB411D3A2CD2F07D838F85228"/>
    </templateArgumentTypes>
   </specialization>
-  <specialization id="edb9a343-9569-48cd-838c-3ee62a5cd86c" name="List" primaryType="class_List_T_4E42CF5913BEB21F5260DEFEC239180C94460B11">
+  <specialization id="45aa28c4-4a56-4471-9567-5352821d255e" name="List" primaryType="class_List_T_4E42CF5913BEB21F5260DEFEC239180C94460B11">
    <templateArgumentTypes>
     <templateArgumentType ref="cc8ffb50-cac1-4f7e-acae-8b3fb9621c37"/>
    </templateArgumentTypes>
   </specialization>
-  <derivedType id="5a86cabb-4a9f-48bb-8c3b-fefb55cf3d00" name="const NfaState&amp;">
+  <derivedType id="49f0ab60-928d-4815-a2f0-00112003114b" name="const NfaState&amp;">
    <derivation name="const"/>
    <derivation baseType="class_NfaState_9D1ED32B9E916097B40ADF566ECF8BF84ACD9662"/>
    <derivation name="&amp;"/>
   </derivedType>
-  <specialization id="fa274d6b-d2ac-4686-8862-175fa9d3172b" name="List" primaryType="class_List_T_4E42CF5913BEB21F5260DEFEC239180C94460B11">
+  <specialization id="161cac82-0edb-4ddc-903a-403b9c68ac99" name="List" primaryType="class_List_T_4E42CF5913BEB21F5260DEFEC239180C94460B11">
    <templateArgumentTypes>
     <templateArgumentType ref="class_NfaState_9D1ED32B9E916097B40ADF566ECF8BF84ACD9662"/>
    </templateArgumentTypes>
   </specialization>
-  <derivedType id="e86c220b-fbaf-41ff-9ab0-d1582b76b81d" name="const List&lt;System.Text.RegularExpressions.NfaState>&amp;">
+  <derivedType id="13240d83-0695-4d74-af44-c1e17ffcf17d" name="const List&lt;System.Text.RegularExpressions.NfaState>&amp;">
    <derivation name="const"/>
-   <derivation baseType="fa274d6b-d2ac-4686-8862-175fa9d3172b"/>
+   <derivation baseType="161cac82-0edb-4ddc-903a-403b9c68ac99"/>
    <derivation name="&amp;"/>
   </derivedType>
-  <derivedType id="1317c472-532d-48d5-8afc-10c63c33d430" name="const NfaStateNumberSet&amp;">
+  <derivedType id="4635ddbb-234f-4afb-9016-4c018bc175eb" name="const NfaStateNumberSet&amp;">
    <derivation name="const"/>
    <derivation baseType="class_NfaStateNumberSet_94283B9E90ECB564FEF4909226A69DC50DFBEAC3"/>
    <derivation name="&amp;"/>
   </derivedType>
-  <specialization id="a6d2dccc-c31a-4d3c-b854-e57a17b58388" name="List" primaryType="class_List_T_4E42CF5913BEB21F5260DEFEC239180C94460B11">
+  <specialization id="500a2bea-bc23-4bfc-8bf1-f59cc98e07f3" name="List" primaryType="class_List_T_4E42CF5913BEB21F5260DEFEC239180C94460B11">
    <templateArgumentTypes>
     <templateArgumentType ref="class_NfaStateNumberSet_94283B9E90ECB564FEF4909226A69DC50DFBEAC3"/>
    </templateArgumentTypes>
   </specialization>
-  <derivedType id="3780c7fe-0a0c-411c-b8f4-47a227841233" name="const List&lt;int>&amp;">
+  <derivedType id="12ffe00a-ab63-402f-bb81-2f81040463ce" name="const List&lt;int>&amp;">
    <derivation name="const"/>
-   <derivation baseType="edb9a343-9569-48cd-838c-3ee62a5cd86c"/>
+   <derivation baseType="45aa28c4-4a56-4471-9567-5352821d255e"/>
    <derivation name="&amp;"/>
   </derivedType>
-  <derivedType id="9efbfbd2-65e3-44ec-81a2-a8c6e74a2acd" name="PtrNfaState*">
+  <derivedType id="e66ff1f1-0da9-42ae-be44-5ff9c2740bc1" name="PtrNfaState*">
    <derivation baseType="class_PtrNfaState_828AD9578262913C0B2EE4669E5D88681833D3E8"/>
    <derivation name="*"/>
   </derivedType>
-  <specialization id="221ded1a-ecfa-41d7-8df7-d173149ba556" name="List" primaryType="class_List_T_4E42CF5913BEB21F5260DEFEC239180C94460B11">
+  <specialization id="3d3e451b-095b-4d41-9d64-20a9ae6ef67c" name="List" primaryType="class_List_T_4E42CF5913BEB21F5260DEFEC239180C94460B11">
    <templateArgumentTypes>
-    <templateArgumentType ref="9efbfbd2-65e3-44ec-81a2-a8c6e74a2acd"/>
+    <templateArgumentType ref="e66ff1f1-0da9-42ae-be44-5ff9c2740bc1"/>
    </templateArgumentTypes>
   </specialization>
-  <derivedType id="855e0445-ca79-46de-a3fd-354e636014a9" name="const List&lt;PtrNfaState*>&amp;">
+  <derivedType id="14a80648-d135-44f5-ab5d-657c89ca0b70" name="const List&lt;PtrNfaState*>&amp;">
    <derivation name="const"/>
-   <derivation baseType="221ded1a-ecfa-41d7-8df7-d173149ba556"/>
+   <derivation baseType="3d3e451b-095b-4d41-9d64-20a9ae6ef67c"/>
    <derivation name="&amp;"/>
   </derivedType>
-  <derivedType id="891de8bc-ed79-43d0-9624-5e22f80a13b6" name="const CharClass&amp;">
+  <derivedType id="dcb5c7ab-129b-4eaf-81ee-c0f951b21a51" name="const CharClass&amp;">
    <derivation name="const"/>
    <derivation baseType="class_CharClass_D0839E83F8129D6C4D261748730F5967D1045544"/>
    <derivation name="&amp;"/>
   </derivedType>
-  <derivedType id="807f16c6-7fea-41a4-b7d4-cec42f85d694" name="const PtrNfaState&amp;">
+  <derivedType id="ad815b78-3a1b-425c-8eab-c1455defb459" name="const PtrNfaState&amp;">
    <derivation name="const"/>
    <derivation baseType="class_PtrNfaState_828AD9578262913C0B2EE4669E5D88681833D3E8"/>
    <derivation name="&amp;"/>
   </derivedType>
-  <derivedType id="6a2bff9d-72f7-496e-ae5d-0556da7ec73c" name="PtrNfaEdge&amp;&amp;">
+  <derivedType id="41fe9f5f-c255-4edc-8a8a-fe1ff0cc8685" name="PtrNfaEdge&amp;&amp;">
    <derivation baseType="class_PtrNfaEdge_937C7F61A080B689DF3D122F26A5057032EE2DB3"/>
    <derivation name="&amp;&amp;"/>
   </derivedType>
-  <derivedType id="951e4157-af66-4631-a9d6-6106dc72e145" name="const PtrNfaEdge&amp;">
+  <derivedType id="369c841f-f91c-49ff-b17a-7811770b6959" name="const PtrNfaEdge&amp;">
    <derivation name="const"/>
    <derivation baseType="class_PtrNfaEdge_937C7F61A080B689DF3D122F26A5057032EE2DB3"/>
    <derivation name="&amp;"/>
   </derivedType>
-  <specialization id="bc298e30-0ee1-41b8-a9df-3123364e87af" name="List" primaryType="class_List_T_4E42CF5913BEB21F5260DEFEC239180C94460B11">
+  <specialization id="708ce39f-d801-4e01-9e1d-ad100b519794" name="List" primaryType="class_List_T_4E42CF5913BEB21F5260DEFEC239180C94460B11">
    <templateArgumentTypes>
     <templateArgumentType ref="class_PtrNfaEdge_937C7F61A080B689DF3D122F26A5057032EE2DB3"/>
    </templateArgumentTypes>
   </specialization>
-  <derivedType id="c1a070a5-d1eb-4209-a237-8dd688bce84e" name="const List&lt;System.Text.RegularExpressions.PtrNfaEdge>&amp;">
+  <derivedType id="2d555fc5-6238-4f94-8e1b-0513435a4cad" name="const List&lt;System.Text.RegularExpressions.PtrNfaEdge>&amp;">
    <derivation name="const"/>
-   <derivation baseType="bc298e30-0ee1-41b8-a9df-3123364e87af"/>
+   <derivation baseType="708ce39f-d801-4e01-9e1d-ad100b519794"/>
    <derivation name="&amp;"/>
   </derivedType>
-  <derivedType id="bb1b9149-7302-4dbe-9e0f-75abe7a77f79" name="PtrNfaStateFactory&amp;">
+  <derivedType id="0c4d15f8-ed5e-4976-90bc-b571b1ae1235" name="PtrNfaStateFactory&amp;">
    <derivation baseType="class_PtrNfaStateFactory_22C97F4BF85DB777D68618DE9DD3C7D2D3FFB5E2"/>
    <derivation name="&amp;"/>
   </derivedType>
-  <specialization id="dad46251-c393-4380-a957-f117c20f3282" name="UniquePtr" primaryType="class_UniquePtr_T_793F841C13E9DD3A6869243C74F1D948C0E04009">
+  <specialization id="b1fe4c2d-134f-44d7-b084-a8119c6299c8" name="UniquePtr" primaryType="class_UniquePtr_T_793F841C13E9DD3A6869243C74F1D948C0E04009">
    <templateArgumentTypes>
     <templateArgumentType ref="class_PtrNfaStateFactory_22C97F4BF85DB777D68618DE9DD3C7D2D3FFB5E2"/>
    </templateArgumentTypes>
   </specialization>
-  <specialization id="83ecf07d-e0b3-4b02-9bed-c27e4fdd69dd" name="Stack" primaryType="class_Stack_T_CAB2AD063212443437B477BD815360F469912604">
+  <specialization id="8f27e57f-f476-40d0-9cf2-a23396e68efe" name="Stack" primaryType="class_Stack_T_CAB2AD063212443437B477BD815360F469912604">
    <templateArgumentTypes>
-    <templateArgumentType ref="9efbfbd2-65e3-44ec-81a2-a8c6e74a2acd"/>
+    <templateArgumentType ref="e66ff1f1-0da9-42ae-be44-5ff9c2740bc1"/>
    </templateArgumentTypes>
   </specialization>
-  <derivedType id="29f55988-96a7-4552-9c9f-cd75fa004bcd" name="const Dfa&amp;">
+  <derivedType id="da777afb-2c51-48dd-9248-07e355fb3d7c" name="const Dfa&amp;">
    <derivation name="const"/>
    <derivation baseType="class_Dfa_C0C2BE49FCC3D3B6EA837CF206D1FE18B6C3B39E"/>
    <derivation name="&amp;"/>
   </derivedType>
-  <derivedType id="9056d28a-2434-4487-bedb-cdf356e8bec7" name="const Nfa&amp;">
+  <derivedType id="19562df9-412b-411f-84a9-2d6e3ee3d3ed" name="const Nfa&amp;">
    <derivation name="const"/>
    <derivation baseType="class_Nfa_5E23E7BB511DC9602941611B6CE87476EC3ECB57"/>
    <derivation name="&amp;"/>
   </derivedType>
-  <derivedType id="83e9df51-64aa-48e2-9156-95fa1bdf3e52" name="RegExParser&amp;&amp;">
+  <derivedType id="57182294-37d5-4e9b-b1aa-185667f32623" name="RegExParser&amp;&amp;">
    <derivation baseType="class_RegExParser_5B375E7989875C02273BF50888FB982C1735A8DC"/>
    <derivation name="&amp;&amp;"/>
   </derivedType>
-  <derivedType id="3e6dba24-c9aa-4305-a9e5-734c967e4f7d" name="const RegExParser&amp;">
+  <derivedType id="1e465597-fc99-4055-8f2e-c47f3851b6cf" name="const RegExParser&amp;">
    <derivation name="const"/>
    <derivation baseType="class_RegExParser_5B375E7989875C02273BF50888FB982C1735A8DC"/>
    <derivation name="&amp;"/>
   </derivedType>
-  <derivedType id="f00d16bb-c17c-49be-9c3f-e04a0ff78f90" name="RegExParser&amp;">
+  <derivedType id="0dc5d936-e647-4fb0-8b9c-1b7dde8d9a59" name="RegExParser&amp;">
    <derivation baseType="class_RegExParser_5B375E7989875C02273BF50888FB982C1735A8DC"/>
    <derivation name="&amp;"/>
   </derivedType>
-  <derivedType id="bf040b09-7e67-4a26-b3f9-910f9e57dc2c" name="RegularExpressionGrammar*">
+  <derivedType id="3a9b3d68-21ec-49f1-8670-88f2a9c485ba" name="RegularExpressionGrammar*">
    <derivation baseType="class_RegularExpressionGrammar_A84552940D28A3C040AE4E8AD6CF59AF13007B22"/>
    <derivation name="*"/>
   </derivedType>
-  <specialization id="1eebf5a8-02a1-4ed8-9417-7e854995de78" name="UniquePtr" primaryType="class_UniquePtr_T_793F841C13E9DD3A6869243C74F1D948C0E04009">
+  <specialization id="22b7d797-7497-423e-9817-00520a93a1fd" name="UniquePtr" primaryType="class_UniquePtr_T_793F841C13E9DD3A6869243C74F1D948C0E04009">
    <templateArgumentTypes>
     <templateArgumentType ref="class_RegExParser_5B375E7989875C02273BF50888FB982C1735A8DC"/>
    </templateArgumentTypes>
@@ -1858,29 +1858,29 @@
    <derivation baseType="class_ParsingDomain_DBADEDB24194482080D6E7112DE96AB5FCAD1A87"/>
    <derivation name="*"/>
   </derivedType>
-  <derivedType id="ebcd9886-c7c9-4378-bd72-cdc633ae2a41" name="List&lt;int>&amp;">
-   <derivation baseType="edb9a343-9569-48cd-838c-3ee62a5cd86c"/>
+  <derivedType id="1745e4ef-fc59-407e-b697-d453e2b61442" name="List&lt;int>&amp;">
+   <derivation baseType="45aa28c4-4a56-4471-9567-5352821d255e"/>
    <derivation name="&amp;"/>
   </derivedType>
   <derivedType id="d30649e2-00d5-474d-a95c-06496ffa59de" name="Bitset&amp;">
    <derivation baseType="class_Bitset_BA1EE2E68426C5445CB6CAF7F957084ADAFD19CA"/>
    <derivation name="&amp;"/>
   </derivedType>
-  <derivedType id="185c54c6-4bb6-4d60-a987-5a61befbe9a8" name="const PtrNfa&amp;">
+  <derivedType id="56e642cd-2aef-4505-b650-7354dbe6e4e8" name="const PtrNfa&amp;">
    <derivation name="const"/>
    <derivation baseType="class_PtrNfa_5708C8189DEAC0F8CBD3A9DA5094DE3E7536B5FB"/>
    <derivation name="&amp;"/>
   </derivedType>
-  <derivedType id="006dffa2-6e68-4614-afdf-9c22a2d73134" name="const NfaStateNumberSet*">
+  <derivedType id="97a8357f-8da6-488e-a9b8-74e80573159a" name="const NfaStateNumberSet*">
    <derivation name="const"/>
    <derivation baseType="class_NfaStateNumberSet_94283B9E90ECB564FEF4909226A69DC50DFBEAC3"/>
    <derivation name="*"/>
   </derivedType>
-  <specialization id="c6b66a62-4478-4cb5-b761-c78944d4c3b6" name="RandomAccessIter" primaryType="class_RandomAccessIter_T_R_P_E5BB3CAC7F9DBE190F290EC17E5DCE3406706484">
+  <specialization id="f6e7f6ce-f984-48e5-8012-0132d47893d1" name="RandomAccessIter" primaryType="class_RandomAccessIter_T_R_P_E5BB3CAC7F9DBE190F290EC17E5DCE3406706484">
    <templateArgumentTypes>
     <templateArgumentType ref="class_NfaStateNumberSet_94283B9E90ECB564FEF4909226A69DC50DFBEAC3"/>
-    <templateArgumentType ref="1317c472-532d-48d5-8afc-10c63c33d430"/>
-    <templateArgumentType ref="006dffa2-6e68-4614-afdf-9c22a2d73134"/>
+    <templateArgumentType ref="4635ddbb-234f-4afb-9016-4c018bc175eb"/>
+    <templateArgumentType ref="97a8357f-8da6-488e-a9b8-74e80573159a"/>
    </templateArgumentTypes>
   </specialization>
   <derivedType id="69c1a498-2423-4654-9649-c9f31ad3e459" name="OutputStream&amp;">

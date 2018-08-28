@@ -276,12 +276,13 @@ function drawClassInheritanceDiagram() {
         { name: "cmajor::ast::DerefNode", id: "class_5", level: 2, subject: false, hasDerivedClasses: false, link: "class_DerefNode_21F274EDE6FD4B70491F92D70E2B4F81DB98EE9A.html" },
         { name: "cmajor::ast::DotNode", id: "class_6", level: 2, subject: false, hasDerivedClasses: false, link: "class_DotNode_AFABD70B7BC9DBE06E37AB06EEE0CE3244E8CF49.html" },
         { name: "cmajor::ast::NotNode", id: "class_7", level: 2, subject: false, hasDerivedClasses: false, link: "class_NotNode_A7D7C433F9646D9B9F3A378286A0C27ACDF8E6E2.html" },
-        { name: "cmajor::ast::PostfixDecrementNode", id: "class_8", level: 2, subject: false, hasDerivedClasses: false, link: "class_PostfixDecrementNode_1A238FD0198DB87AEE9BF04FFA52C97E76AD4FAD.html" },
-        { name: "cmajor::ast::PostfixIncrementNode", id: "class_9", level: 2, subject: false, hasDerivedClasses: false, link: "class_PostfixIncrementNode_1D5EA4E5139E16ED8ECA64F4F4270535E7736069.html" },
-        { name: "cmajor::ast::PrefixDecrementNode", id: "class_10", level: 2, subject: false, hasDerivedClasses: false, link: "class_PrefixDecrementNode_32C076A6C89EB91D35747ADD6A37D0EC0A22DBA0.html" },
-        { name: "cmajor::ast::PrefixIncrementNode", id: "class_11", level: 2, subject: false, hasDerivedClasses: false, link: "class_PrefixIncrementNode_19E3D69B6C77A4461F66186950876B256B7C4BE3.html" },
-        { name: "cmajor::ast::UnaryMinusNode", id: "class_12", level: 2, subject: false, hasDerivedClasses: false, link: "class_UnaryMinusNode_D3A241789993A8811CBCF9C9C98DB026BC3F6A85.html" },
-        { name: "cmajor::ast::UnaryPlusNode", id: "class_13", level: 2, subject: false, hasDerivedClasses: false, link: "class_UnaryPlusNode_61F18A5D73BEBBBC9CEE8A1C3A0B47B57D73F9A6.html" }];
+        { name: "cmajor::ast::ParenthesizedExpressionNode", id: "class_8", level: 2, subject: false, hasDerivedClasses: false, link: "class_ParenthesizedExpressionNode_6DCAB17007B6E3590EEF1B15D66CEC31C0A2AA7C.html" },
+        { name: "cmajor::ast::PostfixDecrementNode", id: "class_9", level: 2, subject: false, hasDerivedClasses: false, link: "class_PostfixDecrementNode_1A238FD0198DB87AEE9BF04FFA52C97E76AD4FAD.html" },
+        { name: "cmajor::ast::PostfixIncrementNode", id: "class_10", level: 2, subject: false, hasDerivedClasses: false, link: "class_PostfixIncrementNode_1D5EA4E5139E16ED8ECA64F4F4270535E7736069.html" },
+        { name: "cmajor::ast::PrefixDecrementNode", id: "class_11", level: 2, subject: false, hasDerivedClasses: false, link: "class_PrefixDecrementNode_32C076A6C89EB91D35747ADD6A37D0EC0A22DBA0.html" },
+        { name: "cmajor::ast::PrefixIncrementNode", id: "class_12", level: 2, subject: false, hasDerivedClasses: false, link: "class_PrefixIncrementNode_19E3D69B6C77A4461F66186950876B256B7C4BE3.html" },
+        { name: "cmajor::ast::UnaryMinusNode", id: "class_13", level: 2, subject: false, hasDerivedClasses: false, link: "class_UnaryMinusNode_D3A241789993A8811CBCF9C9C98DB026BC3F6A85.html" },
+        { name: "cmajor::ast::UnaryPlusNode", id: "class_14", level: 2, subject: false, hasDerivedClasses: false, link: "class_UnaryPlusNode_61F18A5D73BEBBBC9CEE8A1C3A0B47B57D73F9A6.html" }];
     drawDiagram(classes);
 }
 

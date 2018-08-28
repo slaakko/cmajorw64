@@ -11,7 +11,7 @@
          | next<hr/>
         <h1>ProjectQueue Class</h1>
         <span>
-            Definition at line <a href="file/build/Build.cpp_805B45E343428924AFE7558BA38CAD4F38432FEB.html#1063">1063</a>
+            Definition at line <a href="file/build/Build.cpp_805B45E343428924AFE7558BA38CAD4F38432FEB.html#1100">1100</a>
              of <a href="file/build/Build.cpp_805B45E343428924AFE7558BA38CAD4F38432FEB.html">Build.cpp</a>
         </span>
         <br/>
@@ -58,21 +58,21 @@
             cmajor::build::ProjectQueue::ProjectQueue(<span class="kw">bool</span>
             &amp; stop_)</h4>
         <span>
-            Definition at line <a href="file/build/Build.cpp_805B45E343428924AFE7558BA38CAD4F38432FEB.html#1076">1076</a>
+            Definition at line <a href="file/build/Build.cpp_805B45E343428924AFE7558BA38CAD4F38432FEB.html#1113">1113</a>
              of <a href="file/build/Build.cpp_805B45E343428924AFE7558BA38CAD4F38432FEB.html">Build.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">1076</span>&nbsp;<span class="other">:</span>&nbsp;<a href="class_ProjectQueue_6FAB8514DAD48B4FB048B96B5C9BD96F2143C677.html#variable_stop_EB5B33D982F99158D0413F93ADFA7EF18C9E909A">stop</a><span class="other">(</span><span class="identifier">stop_</span><span class="other">)</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">1113</span>&nbsp;<span class="other">:</span>&nbsp;<a href="class_ProjectQueue_6FAB8514DAD48B4FB048B96B5C9BD96F2143C677.html#variable_stop_EB5B33D982F99158D0413F93ADFA7EF18C9E909A">stop</a><span class="other">(</span><span class="identifier">stop_</span><span class="other">)</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1077</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">1114</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1078</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">1115</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/build/Build.cpp_805B45E343428924AFE7558BA38CAD4F38432FEB.html#1066">1066</a>
+            Declaration at line <a href="file/build/Build.cpp_805B45E343428924AFE7558BA38CAD4F38432FEB.html#1103">1103</a>
              of <a href="file/build/Build.cpp_805B45E343428924AFE7558BA38CAD4F38432FEB.html">Build.cpp</a>
         </span>
         <br/>
@@ -85,18 +85,18 @@
              secs, <span class="kw">bool</span>
              ret)</h4>
         <span>
-            Definition at line <a href="file/build/Build.cpp_805B45E343428924AFE7558BA38CAD4F38432FEB.html#1087">1087</a>
+            Definition at line <a href="file/build/Build.cpp_805B45E343428924AFE7558BA38CAD4F38432FEB.html#1124">1124</a>
              of <a href="file/build/Build.cpp_805B45E343428924AFE7558BA38CAD4F38432FEB.html">Build.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/build/Build.cpp_805B45E343428924AFE7558BA38CAD4F38432FEB.html#1068">1068</a>
+            Declaration at line <a href="file/build/Build.cpp_805B45E343428924AFE7558BA38CAD4F38432FEB.html#1105">1105</a>
              of <a href="file/build/Build.cpp_805B45E343428924AFE7558BA38CAD4F38432FEB.html">Build.cpp</a>
         </span>
         <br/>
         <br/>
         <span>
-            Called by: <a href="namespace_build_8579CAB238C54EBCD5D162A3B94D6D12FA6E71A5.html#function_BuildSolution_7F99791C0DC84BAD0480870DBE88FB69A91430A9">cmajor::build::BuildSolution</a>
+            Called by: <a href="namespace_build_8579CAB238C54EBCD5D162A3B94D6D12FA6E71A5.html#function_BuildSolution_A6218D0324F321C281D3AB3344E06746CC19B124">cmajor::build::BuildSolution</a>
             , <a href="namespace_build_8579CAB238C54EBCD5D162A3B94D6D12FA6E71A5.html#function_ProjectBuilder_B8094EA61CC1B8FF420A1C327AA44364574B8AF6">cmajor::build::ProjectBuilder</a>
         </span>
         <br/>
@@ -107,31 +107,31 @@
             <span class="kw">void</span>
              cmajor::build::ProjectQueue::Put(Project* project)</h4>
         <span>
-            Definition at line <a href="file/build/Build.cpp_805B45E343428924AFE7558BA38CAD4F38432FEB.html#1080">1080</a>
+            Definition at line <a href="file/build/Build.cpp_805B45E343428924AFE7558BA38CAD4F38432FEB.html#1117">1117</a>
              of <a href="file/build/Build.cpp_805B45E343428924AFE7558BA38CAD4F38432FEB.html">Build.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">1081</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">1118</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1082</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">lock_guard</span><span class="other">&lt;</span><span class="identifier">std</span><span class="other">::</span><span class="type">mutex</span><span class="other">></span>&nbsp;<span class="identifier">lock</span><span class="other">(</span><a href="class_ProjectQueue_6FAB8514DAD48B4FB048B96B5C9BD96F2143C677.html#variable_mtx_F2FFE5424AEA4B37BD1BAAEACD76A6C34F1E26B9">mtx</a><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">1119</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">lock_guard</span><span class="other">&lt;</span><span class="identifier">std</span><span class="other">::</span><span class="type">mutex</span><span class="other">></span>&nbsp;<span class="identifier">lock</span><span class="other">(</span><a href="class_ProjectQueue_6FAB8514DAD48B4FB048B96B5C9BD96F2143C677.html#variable_mtx_F2FFE5424AEA4B37BD1BAAEACD76A6C34F1E26B9">mtx</a><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1083</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="class_ProjectQueue_6FAB8514DAD48B4FB048B96B5C9BD96F2143C677.html#variable_queue_6A3EB7FDC261455A2BF8381AF3361BEEC9EEBAE8">queue</a><span class="other">.</span><span class="identifier">push_back</span><span class="other">(</span><span class="identifier">project</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">1120</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="class_ProjectQueue_6FAB8514DAD48B4FB048B96B5C9BD96F2143C677.html#variable_queue_6A3EB7FDC261455A2BF8381AF3361BEEC9EEBAE8">queue</a><span class="other">.</span><span class="identifier">push_back</span><span class="other">(</span><span class="identifier">project</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1084</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="class_ProjectQueue_6FAB8514DAD48B4FB048B96B5C9BD96F2143C677.html#variable_cond_1AF076DE8A5A37C0190D1CACEABD418DD3033678">cond</a><span class="other">.</span><span class="identifier">notify_all</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">1121</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="class_ProjectQueue_6FAB8514DAD48B4FB048B96B5C9BD96F2143C677.html#variable_cond_1AF076DE8A5A37C0190D1CACEABD418DD3033678">cond</a><span class="other">.</span><span class="identifier">notify_all</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1085</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">1122</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/build/Build.cpp_805B45E343428924AFE7558BA38CAD4F38432FEB.html#1067">1067</a>
+            Declaration at line <a href="file/build/Build.cpp_805B45E343428924AFE7558BA38CAD4F38432FEB.html#1104">1104</a>
              of <a href="file/build/Build.cpp_805B45E343428924AFE7558BA38CAD4F38432FEB.html">Build.cpp</a>
         </span>
         <br/>
         <br/>
         <span>
-            Called by: <a href="namespace_build_8579CAB238C54EBCD5D162A3B94D6D12FA6E71A5.html#function_BuildSolution_7F99791C0DC84BAD0480870DBE88FB69A91430A9">cmajor::build::BuildSolution</a>
+            Called by: <a href="namespace_build_8579CAB238C54EBCD5D162A3B94D6D12FA6E71A5.html#function_BuildSolution_A6218D0324F321C281D3AB3344E06746CC19B124">cmajor::build::BuildSolution</a>
             , <a href="namespace_build_8579CAB238C54EBCD5D162A3B94D6D12FA6E71A5.html#function_ProjectBuilder_B8094EA61CC1B8FF420A1C327AA44364574B8AF6">cmajor::build::ProjectBuilder</a>
         </span>
         <br/>

@@ -16,7 +16,7 @@
             <svg height="0" id="classInheritanceDiagram" version="2.0" width="0" xmlns="http://www.w3.org/2000/svg"/>
         </div>
         <span>
-            Definition at line <a href="file/ast/Statement.hpp_58F0DEEDF613F336E3FE25817ADE03456D7605B2.html#549">549</a>
+            Definition at line <a href="file/ast/Statement.hpp_58F0DEEDF613F336E3FE25817ADE03456D7605B2.html#616">616</a>
              of <a href="file/ast/Statement.hpp_58F0DEEDF613F336E3FE25817ADE03456D7605B2.html">Statement.hpp</a>
         </span>
         <br/>
@@ -48,8 +48,32 @@
                 <td class="functionTableSecondCol" xml:space="preserve"><a href="class_ConditionalCompilationPartNode_83F63E2147A6DF491F0B9D0E960DD1D8A1868545.html#function_Expr_325F98C0F08372D2EB3B3B10295E69F7BDDC5E8A">Expr</a>() <span class="kw">const</span></td>
             </tr>
             <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">const </span><a href="class_Span_9CED8370AAA8B01E09FBC8A63AD262084B91FD78.html">Span</a>&amp;</td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_ConditionalCompilationPartNode_83F63E2147A6DF491F0B9D0E960DD1D8A1868545.html#function_KeywordSpan_B98048135B58B3CFB8499064F175B7DD80FC752A">KeywordSpan</a>() <span class="kw">const</span></td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">const </span><a href="class_Span_9CED8370AAA8B01E09FBC8A63AD262084B91FD78.html">Span</a>&amp;</td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_ConditionalCompilationPartNode_83F63E2147A6DF491F0B9D0E960DD1D8A1868545.html#function_LeftParenSpan_0122F3AE38B13C5A129D31A51F728735906A058E">LeftParenSpan</a>() <span class="kw">const</span></td>
+            </tr>
+            <tr>
                 <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
                 <td class="functionTableSecondCol" xml:space="preserve"><a href="class_ConditionalCompilationPartNode_83F63E2147A6DF491F0B9D0E960DD1D8A1868545.html#function_Read_BC07798526289B6B084B0371F57E24DF1066FDE4">Read</a>(<a href="class_AstReader_79D1108F70EAB0D555FDDD074FED033B2DCABCD5.html">AstReader</a>&amp; reader) <span class="kw">override</span></td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">const </span><a href="class_Span_9CED8370AAA8B01E09FBC8A63AD262084B91FD78.html">Span</a>&amp;</td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_ConditionalCompilationPartNode_83F63E2147A6DF491F0B9D0E960DD1D8A1868545.html#function_RightParenSpan_195F962619011061C9B1F8A72AEFCEC75978DBA9">RightParenSpan</a>() <span class="kw">const</span></td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_ConditionalCompilationPartNode_83F63E2147A6DF491F0B9D0E960DD1D8A1868545.html#function_SetKeywordSpan_17AD3E819622C3D1BB51D1238BC0B5EDA69D86CB">SetKeywordSpan</a>(<span class="kw">const </span><a href="class_Span_9CED8370AAA8B01E09FBC8A63AD262084B91FD78.html">Span</a>&amp; keywordSpan_)</td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_ConditionalCompilationPartNode_83F63E2147A6DF491F0B9D0E960DD1D8A1868545.html#function_SetLeftParenSpan_E202329A688921C085BC46B81BCD3279B9227F1F">SetLeftParenSpan</a>(<span class="kw">const </span><a href="class_Span_9CED8370AAA8B01E09FBC8A63AD262084B91FD78.html">Span</a>&amp; leftParenSpan_)</td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_ConditionalCompilationPartNode_83F63E2147A6DF491F0B9D0E960DD1D8A1868545.html#function_SetRightParenSpan_9E72C34B63F2701FADCA4E1D371448060E1BEE60">SetRightParenSpan</a>(<span class="kw">const </span><a href="class_Span_9CED8370AAA8B01E09FBC8A63AD262084B91FD78.html">Span</a>&amp; rightParenSpan_)</td>
             </tr>
             <tr>
                 <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">const </span><a href="class_NodeList_634CD2B65410966280F1AC27B3A570D065505ECD.html">NodeList</a>&lt;<a href="class_StatementNode_5B30CD05CFBD6FC4DC65F9EB63116552354DEF08.html">StatementNode</a>>&amp;</td>
@@ -66,6 +90,18 @@
                 <td class="functionTableFirstCol" xml:space="preserve">std::unique_ptr&lt;<a href="class_ConditionalCompilationExpressionNode_DBAA5DC9A5996E8ABBA1C693FCF249F5494751E2.html">ConditionalCompilationExpressionNode</a>></td>
                 <td class="functionTableSecondCol" xml:space="preserve">expr</td>
             </tr>
+            <tr id="variable_keywordSpan_5427F2E9DF71A69E5F2E947EBF6D60DAAF201C98">
+                <td class="functionTableFirstCol" xml:space="preserve"><a href="class_Span_9CED8370AAA8B01E09FBC8A63AD262084B91FD78.html">Span</a></td>
+                <td class="functionTableSecondCol" xml:space="preserve">keywordSpan</td>
+            </tr>
+            <tr id="variable_leftParenSpan_AD1CA66EBBBAEF8EB1436DAF15672CB9F991CFC6">
+                <td class="functionTableFirstCol" xml:space="preserve"><a href="class_Span_9CED8370AAA8B01E09FBC8A63AD262084B91FD78.html">Span</a></td>
+                <td class="functionTableSecondCol" xml:space="preserve">leftParenSpan</td>
+            </tr>
+            <tr id="variable_rightParenSpan_C5663634E7CC134E6C17BCA3D6751F746D96A334">
+                <td class="functionTableFirstCol" xml:space="preserve"><a href="class_Span_9CED8370AAA8B01E09FBC8A63AD262084B91FD78.html">Span</a></td>
+                <td class="functionTableSecondCol" xml:space="preserve">rightParenSpan</td>
+            </tr>
             <tr id="variable_statements_7C2568FA8F66781CB59B506D79D9B7E45F52193C">
                 <td class="functionTableFirstCol" xml:space="preserve"><a href="class_NodeList_634CD2B65410966280F1AC27B3A570D065505ECD.html">NodeList</a>&lt;<a href="class_StatementNode_5B30CD05CFBD6FC4DC65F9EB63116552354DEF08.html">StatementNode</a>></td>
                 <td class="functionTableSecondCol" xml:space="preserve">statements</td>
@@ -79,21 +115,21 @@
             <a href="class_Span_9CED8370AAA8B01E09FBC8A63AD262084B91FD78.html">Span</a>
             &amp; span_)</h4>
         <span>
-            Definition at line <a href="file/ast/Statement.cpp_71F653932FDE7865AF5997870253E50F93D3520C.html#1241">1241</a>
+            Definition at line <a href="file/ast/Statement.cpp_71F653932FDE7865AF5997870253E50F93D3520C.html#1322">1322</a>
              of <a href="file/ast/Statement.cpp_71F653932FDE7865AF5997870253E50F93D3520C.html">Statement.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">1241</span>&nbsp;<span class="other">:</span>&nbsp;<a href="class_Node_66FC1D6AD8F487E453CE6E17163479C7C2DAC063.html">Node</a><span class="other">(</span><a href="enum_NodeType_0D66E0D14D03B3151A778BF9E86A029828B6D5F6.html">NodeType</a><span class="other">::</span><a href="enum_NodeType_0D66E0D14D03B3151A778BF9E86A029828B6D5F6.html#enumerator_conditionalCompilationPartNode_867A131171850D112521777B11BFA696CAB8B189">conditionalCompilationPartNode</a><span class="other">,&nbsp;</span><span class="identifier">span_</span><span class="other">)</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">1322</span>&nbsp;<span class="other">:</span>&nbsp;<a href="class_Node_66FC1D6AD8F487E453CE6E17163479C7C2DAC063.html">Node</a><span class="other">(</span><a href="enum_NodeType_0D66E0D14D03B3151A778BF9E86A029828B6D5F6.html">NodeType</a><span class="other">::</span><a href="enum_NodeType_0D66E0D14D03B3151A778BF9E86A029828B6D5F6.html#enumerator_conditionalCompilationPartNode_867A131171850D112521777B11BFA696CAB8B189">conditionalCompilationPartNode</a><span class="other">,&nbsp;</span><span class="identifier">span_</span><span class="other">)</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1242</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">1323</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1243</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">1324</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/ast/Statement.hpp_58F0DEEDF613F336E3FE25817ADE03456D7605B2.html#552">552</a>
+            Declaration at line <a href="file/ast/Statement.hpp_58F0DEEDF613F336E3FE25817ADE03456D7605B2.html#619">619</a>
              of <a href="file/ast/Statement.hpp_58F0DEEDF613F336E3FE25817ADE03456D7605B2.html">Statement.hpp</a>
         </span>
         <br/>
@@ -106,29 +142,29 @@
             &amp; span_, <a href="class_ConditionalCompilationExpressionNode_DBAA5DC9A5996E8ABBA1C693FCF249F5494751E2.html">ConditionalCompilationExpressionNode</a>
             * expr_)</h4>
         <span>
-            Definition at line <a href="file/ast/Statement.cpp_71F653932FDE7865AF5997870253E50F93D3520C.html#1245">1245</a>
+            Definition at line <a href="file/ast/Statement.cpp_71F653932FDE7865AF5997870253E50F93D3520C.html#1326">1326</a>
              of <a href="file/ast/Statement.cpp_71F653932FDE7865AF5997870253E50F93D3520C.html">Statement.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">1245</span>&nbsp;<span class="other">:</span>&nbsp;<a href="class_Node_66FC1D6AD8F487E453CE6E17163479C7C2DAC063.html">Node</a><span class="other">(</span><a href="enum_NodeType_0D66E0D14D03B3151A778BF9E86A029828B6D5F6.html">NodeType</a><span class="other">::</span><a href="enum_NodeType_0D66E0D14D03B3151A778BF9E86A029828B6D5F6.html#enumerator_conditionalCompilationPartNode_867A131171850D112521777B11BFA696CAB8B189">conditionalCompilationPartNode</a><span class="other">,&nbsp;</span><span class="identifier">span_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="class_ConditionalCompilationPartNode_83F63E2147A6DF491F0B9D0E960DD1D8A1868545.html#variable_expr_93E90EFDE516A681FB319D26880686B1A307579D">expr</a><span class="other">(</span><span class="identifier">expr_</span><span class="other">)</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">1326</span>&nbsp;<span class="other">:</span>&nbsp;<a href="class_Node_66FC1D6AD8F487E453CE6E17163479C7C2DAC063.html">Node</a><span class="other">(</span><a href="enum_NodeType_0D66E0D14D03B3151A778BF9E86A029828B6D5F6.html">NodeType</a><span class="other">::</span><a href="enum_NodeType_0D66E0D14D03B3151A778BF9E86A029828B6D5F6.html#enumerator_conditionalCompilationPartNode_867A131171850D112521777B11BFA696CAB8B189">conditionalCompilationPartNode</a><span class="other">,&nbsp;</span><span class="identifier">span_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="class_ConditionalCompilationPartNode_83F63E2147A6DF491F0B9D0E960DD1D8A1868545.html#variable_expr_93E90EFDE516A681FB319D26880686B1A307579D">expr</a><span class="other">(</span><span class="identifier">expr_</span><span class="other">)</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1246</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">1327</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1247</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><a href="class_ConditionalCompilationPartNode_83F63E2147A6DF491F0B9D0E960DD1D8A1868545.html#variable_expr_93E90EFDE516A681FB319D26880686B1A307579D">expr</a><span class="other">)</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">1328</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><a href="class_ConditionalCompilationPartNode_83F63E2147A6DF491F0B9D0E960DD1D8A1868545.html#variable_expr_93E90EFDE516A681FB319D26880686B1A307579D">expr</a><span class="other">)</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1248</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">1329</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1249</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="class_ConditionalCompilationPartNode_83F63E2147A6DF491F0B9D0E960DD1D8A1868545.html#variable_expr_93E90EFDE516A681FB319D26880686B1A307579D">expr</a><span class="other">-></span><span class="identifier">SetParent</span><span class="other">(</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">1330</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="class_ConditionalCompilationPartNode_83F63E2147A6DF491F0B9D0E960DD1D8A1868545.html#variable_expr_93E90EFDE516A681FB319D26880686B1A307579D">expr</a><span class="other">-></span><span class="identifier">SetParent</span><span class="other">(</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1250</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">1331</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1251</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">1332</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/ast/Statement.hpp_58F0DEEDF613F336E3FE25817ADE03456D7605B2.html#553">553</a>
+            Declaration at line <a href="file/ast/Statement.hpp_58F0DEEDF613F336E3FE25817ADE03456D7605B2.html#620">620</a>
              of <a href="file/ast/Statement.hpp_58F0DEEDF613F336E3FE25817ADE03456D7605B2.html">Statement.hpp</a>
         </span>
         <br/>
@@ -142,21 +178,21 @@
             &amp; visitor) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/ast/Statement.cpp_71F653932FDE7865AF5997870253E50F93D3520C.html#1275">1275</a>
+            Definition at line <a href="file/ast/Statement.cpp_71F653932FDE7865AF5997870253E50F93D3520C.html#1359">1359</a>
              of <a href="file/ast/Statement.cpp_71F653932FDE7865AF5997870253E50F93D3520C.html">Statement.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">1276</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">1360</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1277</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">visitor</span><span class="other">.</span><a href="class_Visitor_72892152D0864AA2907A1FD60E7A49EB4E071AD6.html#function_Visit_08219F474121DE0937E5AAB42C2DBD62FFA3DEF7">Visit</a><span class="other">(</span><span class="other">*</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">1361</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">visitor</span><span class="other">.</span><a href="class_Visitor_72892152D0864AA2907A1FD60E7A49EB4E071AD6.html#function_Visit_08219F474121DE0937E5AAB42C2DBD62FFA3DEF7">Visit</a><span class="other">(</span><span class="other">*</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1278</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">1362</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/ast/Statement.hpp_58F0DEEDF613F336E3FE25817ADE03456D7605B2.html#556">556</a>
+            Declaration at line <a href="file/ast/Statement.hpp_58F0DEEDF613F336E3FE25817ADE03456D7605B2.html#623">623</a>
              of <a href="file/ast/Statement.hpp_58F0DEEDF613F336E3FE25817ADE03456D7605B2.html">Statement.hpp</a>
         </span>
         <br/>
@@ -185,23 +221,23 @@
              cmajor::ast::ConditionalCompilationPartNode::AddStatement(<a href="class_StatementNode_5B30CD05CFBD6FC4DC65F9EB63116552354DEF08.html">StatementNode</a>
             * statement)</h4>
         <span>
-            Definition at line <a href="file/ast/Statement.cpp_71F653932FDE7865AF5997870253E50F93D3520C.html#1253">1253</a>
+            Definition at line <a href="file/ast/Statement.cpp_71F653932FDE7865AF5997870253E50F93D3520C.html#1334">1334</a>
              of <a href="file/ast/Statement.cpp_71F653932FDE7865AF5997870253E50F93D3520C.html">Statement.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">1254</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">1335</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1255</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">statement</span><span class="other">-></span><a href="class_Node_66FC1D6AD8F487E453CE6E17163479C7C2DAC063.html#function_SetParent_CD3943AE607DB9AF6545A90A2DD46A81177C36AF">SetParent</a><span class="other">(</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">1336</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">statement</span><span class="other">-></span><a href="class_Node_66FC1D6AD8F487E453CE6E17163479C7C2DAC063.html#function_SetParent_CD3943AE607DB9AF6545A90A2DD46A81177C36AF">SetParent</a><span class="other">(</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1256</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="class_ConditionalCompilationPartNode_83F63E2147A6DF491F0B9D0E960DD1D8A1868545.html#variable_statements_7C2568FA8F66781CB59B506D79D9B7E45F52193C">statements</a><span class="other">.</span><span class="identifier">Add</span><span class="other">(</span><span class="identifier">statement</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">1337</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="class_ConditionalCompilationPartNode_83F63E2147A6DF491F0B9D0E960DD1D8A1868545.html#variable_statements_7C2568FA8F66781CB59B506D79D9B7E45F52193C">statements</a><span class="other">.</span><span class="identifier">Add</span><span class="other">(</span><span class="identifier">statement</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1257</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">1338</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/ast/Statement.hpp_58F0DEEDF613F336E3FE25817ADE03456D7605B2.html#554">554</a>
+            Declaration at line <a href="file/ast/Statement.hpp_58F0DEEDF613F336E3FE25817ADE03456D7605B2.html#621">621</a>
              of <a href="file/ast/Statement.hpp_58F0DEEDF613F336E3FE25817ADE03456D7605B2.html">Statement.hpp</a>
         </span>
         <br/>
@@ -224,12 +260,12 @@
             &amp; cloneContext) <span class="kw">const override</span>
         </h4>
         <span>
-            Definition at line <a href="file/ast/Statement.cpp_71F653932FDE7865AF5997870253E50F93D3520C.html#1259">1259</a>
+            Definition at line <a href="file/ast/Statement.cpp_71F653932FDE7865AF5997870253E50F93D3520C.html#1340">1340</a>
              of <a href="file/ast/Statement.cpp_71F653932FDE7865AF5997870253E50F93D3520C.html">Statement.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/ast/Statement.hpp_58F0DEEDF613F336E3FE25817ADE03456D7605B2.html#555">555</a>
+            Declaration at line <a href="file/ast/Statement.hpp_58F0DEEDF613F336E3FE25817ADE03456D7605B2.html#622">622</a>
              of <a href="file/ast/Statement.hpp_58F0DEEDF613F336E3FE25817ADE03456D7605B2.html">Statement.hpp</a>
         </span>
         <br/>
@@ -242,6 +278,9 @@
         <span>
             Calls: <a href="class_ConditionalCompilationPartNode_83F63E2147A6DF491F0B9D0E960DD1D8A1868545.html#function_AddStatement_D0C01D0443198FA38B3168780C6B465E6600D11D">cmajor::ast::ConditionalCompilationPartNode::AddStatement</a>
             , <a href="class_ConditionalCompilationPartNode_83F63E2147A6DF491F0B9D0E960DD1D8A1868545.html#function_Clone_5869BB55F3CF5456014F3AB08133F0255BC4BCD0">cmajor::ast::ConditionalCompilationPartNode::Clone</a>
+            , <a href="class_ConditionalCompilationPartNode_83F63E2147A6DF491F0B9D0E960DD1D8A1868545.html#function_SetKeywordSpan_17AD3E819622C3D1BB51D1238BC0B5EDA69D86CB">cmajor::ast::ConditionalCompilationPartNode::SetKeywordSpan</a>
+            , <a href="class_ConditionalCompilationPartNode_83F63E2147A6DF491F0B9D0E960DD1D8A1868545.html#function_SetLeftParenSpan_E202329A688921C085BC46B81BCD3279B9227F1F">cmajor::ast::ConditionalCompilationPartNode::SetLeftParenSpan</a>
+            , <a href="class_ConditionalCompilationPartNode_83F63E2147A6DF491F0B9D0E960DD1D8A1868545.html#function_SetRightParenSpan_9E72C34B63F2701FADCA4E1D371448060E1BEE60">cmajor::ast::ConditionalCompilationPartNode::SetRightParenSpan</a>
         </span>
         <br/>
         <br/>
@@ -258,11 +297,11 @@
             * cmajor::ast::ConditionalCompilationPartNode::Expr() <span class="kw">const</span>
         </h4>
         <span>
-            Definition at line <a href="file/ast/Statement.hpp_58F0DEEDF613F336E3FE25817ADE03456D7605B2.html#559">559</a>
+            Definition at line <a href="file/ast/Statement.hpp_58F0DEEDF613F336E3FE25817ADE03456D7605B2.html#626">626</a>
              of <a href="file/ast/Statement.hpp_58F0DEEDF613F336E3FE25817ADE03456D7605B2.html">Statement.hpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">559</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">expr</span><span class="other">.</span><span class="identifier">get</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>&nbsp;&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">626</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">expr</span><span class="other">.</span><span class="identifier">get</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>&nbsp;&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
@@ -275,6 +314,40 @@
         <br/>
         <br/>
         <hr/>
+        <h3 id="function_KeywordSpan_B98048135B58B3CFB8499064F175B7DD80FC752A">KeywordSpan Member Function</h3>
+        <h4>
+            <span class="kw">const </span>
+            <a href="class_Span_9CED8370AAA8B01E09FBC8A63AD262084B91FD78.html">Span</a>
+            &amp; cmajor::ast::ConditionalCompilationPartNode::KeywordSpan() <span class="kw">const</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/ast/Statement.hpp_58F0DEEDF613F336E3FE25817ADE03456D7605B2.html#629">629</a>
+             of <a href="file/ast/Statement.hpp_58F0DEEDF613F336E3FE25817ADE03456D7605B2.html">Statement.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">629</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">keywordSpan</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <hr/>
+        <h3 id="function_LeftParenSpan_0122F3AE38B13C5A129D31A51F728735906A058E">LeftParenSpan Member Function</h3>
+        <h4>
+            <span class="kw">const </span>
+            <a href="class_Span_9CED8370AAA8B01E09FBC8A63AD262084B91FD78.html">Span</a>
+            &amp; cmajor::ast::ConditionalCompilationPartNode::LeftParenSpan() <span class="kw">const</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/ast/Statement.hpp_58F0DEEDF613F336E3FE25817ADE03456D7605B2.html#631">631</a>
+             of <a href="file/ast/Statement.hpp_58F0DEEDF613F336E3FE25817ADE03456D7605B2.html">Statement.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">631</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">leftParenSpan</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <hr/>
         <h3 id="function_Read_BC07798526289B6B084B0371F57E24DF1066FDE4">Read Member Function</h3>
         <h4>
             <span class="kw">void</span>
@@ -282,12 +355,12 @@
             &amp; reader) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/ast/Statement.cpp_71F653932FDE7865AF5997870253E50F93D3520C.html#1292">1292</a>
+            Definition at line <a href="file/ast/Statement.cpp_71F653932FDE7865AF5997870253E50F93D3520C.html#1379">1379</a>
              of <a href="file/ast/Statement.cpp_71F653932FDE7865AF5997870253E50F93D3520C.html">Statement.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/ast/Statement.hpp_58F0DEEDF613F336E3FE25817ADE03456D7605B2.html#558">558</a>
+            Declaration at line <a href="file/ast/Statement.hpp_58F0DEEDF613F336E3FE25817ADE03456D7605B2.html#625">625</a>
              of <a href="file/ast/Statement.hpp_58F0DEEDF613F336E3FE25817ADE03456D7605B2.html">Statement.hpp</a>
         </span>
         <br/>
@@ -300,8 +373,92 @@
         <span>
             Calls: <a href="class_AstReader_79D1108F70EAB0D555FDDD074FED033B2DCABCD5.html#function_GetBinaryReader_3D8CDE19882342F28A73C8633B207C19F4CF2903">cmajor::ast::AstReader::GetBinaryReader</a>
             , <a href="class_AstReader_79D1108F70EAB0D555FDDD074FED033B2DCABCD5.html#function_ReadConditionalCompilationExpressionNode_9ED28211A0FE5AA02B115D870B452F6ED773E74B">cmajor::ast::AstReader::ReadConditionalCompilationExpressionNode</a>
+            , <a href="class_AstReader_79D1108F70EAB0D555FDDD074FED033B2DCABCD5.html#function_ReadSpan_082ABEE22897732B6B4B9DACAC77278903C88AF6">cmajor::ast::AstReader::ReadSpan</a>
             , <a href="class_Node_66FC1D6AD8F487E453CE6E17163479C7C2DAC063.html#function_Read_894C51ECB047DC4A41994462C3E69D94691C3545">cmajor::ast::Node::Read</a>
             , <a href="class_BinaryReader_03B69C4712E895798960F755025292754AFB8DDD.html#function_ReadBool_AF9E7BF9BFA9599690F086031FE3AB89ED7F6DEA">cmajor::util::BinaryReader::ReadBool</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_RightParenSpan_195F962619011061C9B1F8A72AEFCEC75978DBA9">RightParenSpan Member Function</h3>
+        <h4>
+            <span class="kw">const </span>
+            <a href="class_Span_9CED8370AAA8B01E09FBC8A63AD262084B91FD78.html">Span</a>
+            &amp; cmajor::ast::ConditionalCompilationPartNode::RightParenSpan() <span class="kw">const</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/ast/Statement.hpp_58F0DEEDF613F336E3FE25817ADE03456D7605B2.html#633">633</a>
+             of <a href="file/ast/Statement.hpp_58F0DEEDF613F336E3FE25817ADE03456D7605B2.html">Statement.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">633</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">rightParenSpan</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <hr/>
+        <h3 id="function_SetKeywordSpan_17AD3E819622C3D1BB51D1238BC0B5EDA69D86CB">SetKeywordSpan Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             cmajor::ast::ConditionalCompilationPartNode::SetKeywordSpan(<span class="kw">const </span>
+            <a href="class_Span_9CED8370AAA8B01E09FBC8A63AD262084B91FD78.html">Span</a>
+            &amp; keywordSpan_)</h4>
+        <span>
+            Definition at line <a href="file/ast/Statement.hpp_58F0DEEDF613F336E3FE25817ADE03456D7605B2.html#628">628</a>
+             of <a href="file/ast/Statement.hpp_58F0DEEDF613F336E3FE25817ADE03456D7605B2.html">Statement.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">628</span>&nbsp;<span class="other">{</span>&nbsp;<span class="identifier">keywordSpan</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">keywordSpan_</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Called by: <a href="class_ConditionalCompilationPartNode_83F63E2147A6DF491F0B9D0E960DD1D8A1868545.html#function_Clone_5869BB55F3CF5456014F3AB08133F0255BC4BCD0">cmajor::ast::ConditionalCompilationPartNode::Clone</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_SetLeftParenSpan_E202329A688921C085BC46B81BCD3279B9227F1F">SetLeftParenSpan Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             cmajor::ast::ConditionalCompilationPartNode::SetLeftParenSpan(<span class="kw">const </span>
+            <a href="class_Span_9CED8370AAA8B01E09FBC8A63AD262084B91FD78.html">Span</a>
+            &amp; leftParenSpan_)</h4>
+        <span>
+            Definition at line <a href="file/ast/Statement.hpp_58F0DEEDF613F336E3FE25817ADE03456D7605B2.html#630">630</a>
+             of <a href="file/ast/Statement.hpp_58F0DEEDF613F336E3FE25817ADE03456D7605B2.html">Statement.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">630</span>&nbsp;<span class="other">{</span>&nbsp;<span class="identifier">leftParenSpan</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">leftParenSpan_</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Called by: <a href="class_ConditionalCompilationPartNode_83F63E2147A6DF491F0B9D0E960DD1D8A1868545.html#function_Clone_5869BB55F3CF5456014F3AB08133F0255BC4BCD0">cmajor::ast::ConditionalCompilationPartNode::Clone</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_SetRightParenSpan_9E72C34B63F2701FADCA4E1D371448060E1BEE60">SetRightParenSpan Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             cmajor::ast::ConditionalCompilationPartNode::SetRightParenSpan(<span class="kw">const </span>
+            <a href="class_Span_9CED8370AAA8B01E09FBC8A63AD262084B91FD78.html">Span</a>
+            &amp; rightParenSpan_)</h4>
+        <span>
+            Definition at line <a href="file/ast/Statement.hpp_58F0DEEDF613F336E3FE25817ADE03456D7605B2.html#632">632</a>
+             of <a href="file/ast/Statement.hpp_58F0DEEDF613F336E3FE25817ADE03456D7605B2.html">Statement.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">632</span>&nbsp;<span class="other">{</span>&nbsp;<span class="identifier">rightParenSpan</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">rightParenSpan_</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Called by: <a href="class_ConditionalCompilationPartNode_83F63E2147A6DF491F0B9D0E960DD1D8A1868545.html#function_Clone_5869BB55F3CF5456014F3AB08133F0255BC4BCD0">cmajor::ast::ConditionalCompilationPartNode::Clone</a>
         </span>
         <br/>
         <br/>
@@ -314,11 +471,11 @@
             >&amp; cmajor::ast::ConditionalCompilationPartNode::Statements() <span class="kw">const</span>
         </h4>
         <span>
-            Definition at line <a href="file/ast/Statement.hpp_58F0DEEDF613F336E3FE25817ADE03456D7605B2.html#560">560</a>
+            Definition at line <a href="file/ast/Statement.hpp_58F0DEEDF613F336E3FE25817ADE03456D7605B2.html#627">627</a>
              of <a href="file/ast/Statement.hpp_58F0DEEDF613F336E3FE25817ADE03456D7605B2.html">Statement.hpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">560</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">statements</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">627</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">statements</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
@@ -338,35 +495,12 @@
             &amp; writer) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/ast/Statement.cpp_71F653932FDE7865AF5997870253E50F93D3520C.html#1280">1280</a>
+            Definition at line <a href="file/ast/Statement.cpp_71F653932FDE7865AF5997870253E50F93D3520C.html#1364">1364</a>
              of <a href="file/ast/Statement.cpp_71F653932FDE7865AF5997870253E50F93D3520C.html">Statement.cpp</a>
-            :<br/>
-            <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">1281</span>&nbsp;<span class="other">{</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1282</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="class_Node_66FC1D6AD8F487E453CE6E17163479C7C2DAC063.html">Node</a><span class="other">::</span><a href="class_Node_66FC1D6AD8F487E453CE6E17163479C7C2DAC063.html#function_Write_82DF5FFD8434B1620A45C972CD4DAE4EF72A2CF5">Write</a><span class="other">(</span><span class="identifier">writer</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1283</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">bool</span>&nbsp;<span class="identifier">hasExpr</span>&nbsp;<span class="other">=</span>&nbsp;<a href="class_ConditionalCompilationPartNode_83F63E2147A6DF491F0B9D0E960DD1D8A1868545.html#variable_expr_93E90EFDE516A681FB319D26880686B1A307579D">expr</a><span class="other">&nbsp;!=&nbsp;</span><span class="kw">nullptr</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1284</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">writer</span><span class="other">.</span><a href="class_AstWriter_E913198FD26EB86BE054254E7AA4791401EA149B.html#function_GetBinaryWriter_889E99D5A9549A76BEDCAB1755E1CAC075CBDD71">GetBinaryWriter</a><span class="other">(</span><span class="other">)</span><span class="other">.</span><a href="class_BinaryWriter_C63D48852BF8E92E7FD58CF0C72DEA2D09A302B4.html#function_Write_F862555C93905FC6F4B920FA221EB6ADCA8F0F93">Write</a><span class="other">(</span><span class="identifier">hasExpr</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1285</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">hasExpr</span><span class="other">)</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1286</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1287</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">writer</span><span class="other">.</span><span class="identifier">Write</span><span class="other">(</span><a href="class_ConditionalCompilationPartNode_83F63E2147A6DF491F0B9D0E960DD1D8A1868545.html#variable_expr_93E90EFDE516A681FB319D26880686B1A307579D">expr</a><span class="other">.</span><span class="identifier">get</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1288</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1289</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="class_ConditionalCompilationPartNode_83F63E2147A6DF491F0B9D0E960DD1D8A1868545.html#variable_statements_7C2568FA8F66781CB59B506D79D9B7E45F52193C">statements</a><span class="other">.</span><span class="identifier">Write</span><span class="other">(</span><span class="identifier">writer</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1290</span>&nbsp;<span class="other">}</span></span>
-            </span>
-            <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/ast/Statement.hpp_58F0DEEDF613F336E3FE25817ADE03456D7605B2.html#557">557</a>
+            Declaration at line <a href="file/ast/Statement.hpp_58F0DEEDF613F336E3FE25817ADE03456D7605B2.html#624">624</a>
              of <a href="file/ast/Statement.hpp_58F0DEEDF613F336E3FE25817ADE03456D7605B2.html">Statement.hpp</a>
         </span>
         <br/>
@@ -378,6 +512,7 @@
         <br/>
         <span>
             Calls: <a href="class_AstWriter_E913198FD26EB86BE054254E7AA4791401EA149B.html#function_GetBinaryWriter_889E99D5A9549A76BEDCAB1755E1CAC075CBDD71">cmajor::ast::AstWriter::GetBinaryWriter</a>
+            , <a href="class_AstWriter_E913198FD26EB86BE054254E7AA4791401EA149B.html#function_Write_8B396E6426A876580F9A0DB9D9F8BBAC1DE36180">cmajor::ast::AstWriter::Write</a>
             , <a href="class_Node_66FC1D6AD8F487E453CE6E17163479C7C2DAC063.html#function_Write_82DF5FFD8434B1620A45C972CD4DAE4EF72A2CF5">cmajor::ast::Node::Write</a>
             , <a href="class_BinaryWriter_C63D48852BF8E92E7FD58CF0C72DEA2D09A302B4.html#function_Write_F862555C93905FC6F4B920FA221EB6ADCA8F0F93">cmajor::util::BinaryWriter::Write</a>
         </span>

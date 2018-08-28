@@ -71,7 +71,7 @@
             cmajor::binder::OperationRepository::OperationRepository(<a href="class_BoundCompileUnit_E99BC7539B5239DF3A33DC3D613FE1D188A0A9E1.html">BoundCompileUnit</a>
             &amp; boundCompileUnit_)</h4>
         <span>
-            Definition at line <a href="file/binder/OperationRepository.cpp_4F8CDF7C00F0E7B6B904246A3258FFCE76BDE2E6.html#3606">3606</a>
+            Definition at line <a href="file/binder/OperationRepository.cpp_4F8CDF7C00F0E7B6B904246A3258FFCE76BDE2E6.html#3621">3621</a>
              of <a href="file/binder/OperationRepository.cpp_4F8CDF7C00F0E7B6B904246A3258FFCE76BDE2E6.html">OperationRepository.cpp</a>
         </span>
         <br/>
@@ -89,7 +89,7 @@
              cmajor::binder::OperationRepository::Add(<a href="class_Operation_8F65927D68CA006D4A1FCF730CC955646E5C0F2E.html">Operation</a>
             * operation)</h4>
         <span>
-            Definition at line <a href="file/binder/OperationRepository.cpp_4F8CDF7C00F0E7B6B904246A3258FFCE76BDE2E6.html#3647">3647</a>
+            Definition at line <a href="file/binder/OperationRepository.cpp_4F8CDF7C00F0E7B6B904246A3258FFCE76BDE2E6.html#3662">3662</a>
              of <a href="file/binder/OperationRepository.cpp_4F8CDF7C00F0E7B6B904246A3258FFCE76BDE2E6.html">OperationRepository.cpp</a>
         </span>
         <br/>
@@ -123,25 +123,25 @@
             <a href="class_Span_9CED8370AAA8B01E09FBC8A63AD262084B91FD78.html">Span</a>
             &amp; span)</h4>
         <span>
-            Definition at line <a href="file/binder/OperationRepository.cpp_4F8CDF7C00F0E7B6B904246A3258FFCE76BDE2E6.html#3665">3665</a>
+            Definition at line <a href="file/binder/OperationRepository.cpp_4F8CDF7C00F0E7B6B904246A3258FFCE76BDE2E6.html#3680">3680</a>
              of <a href="file/binder/OperationRepository.cpp_4F8CDF7C00F0E7B6B904246A3258FFCE76BDE2E6.html">OperationRepository.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">3667</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">3682</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">3668</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">auto</span>&nbsp;<span class="identifier">it</span>&nbsp;<span class="other">=</span>&nbsp;<a href="class_OperationRepository_C6E4DEF6A11C767444C05F73D5BEB8BA4459F24B.html#variable_operationGroupMap_C94859F6D58A4EED7D464A6E694C5E63C70385DF">operationGroupMap</a><span class="other">.</span><span class="identifier">find</span><span class="other">(</span><span class="identifier">groupName</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">3683</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">auto</span>&nbsp;<span class="identifier">it</span>&nbsp;<span class="other">=</span>&nbsp;<a href="class_OperationRepository_C6E4DEF6A11C767444C05F73D5BEB8BA4459F24B.html#variable_operationGroupMap_C94859F6D58A4EED7D464A6E694C5E63C70385DF">operationGroupMap</a><span class="other">.</span><span class="identifier">find</span><span class="other">(</span><span class="identifier">groupName</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">3669</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">it</span><span class="other">&nbsp;!=&nbsp;</span><a href="class_OperationRepository_C6E4DEF6A11C767444C05F73D5BEB8BA4459F24B.html#variable_operationGroupMap_C94859F6D58A4EED7D464A6E694C5E63C70385DF">operationGroupMap</a><span class="other">.</span><span class="identifier">cend</span><span class="other">(</span><span class="other">)</span><span class="other">)</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">3684</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">it</span><span class="other">&nbsp;!=&nbsp;</span><a href="class_OperationRepository_C6E4DEF6A11C767444C05F73D5BEB8BA4459F24B.html#variable_operationGroupMap_C94859F6D58A4EED7D464A6E694C5E63C70385DF">operationGroupMap</a><span class="other">.</span><span class="identifier">cend</span><span class="other">(</span><span class="other">)</span><span class="other">)</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">3670</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">3685</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">3671</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="class_OperationGroup_1EF1FAB0C8ADEBD26EE189509D491CF81A62A50C.html">OperationGroup</a><span class="other">*</span>&nbsp;<span class="identifier">operationGroup</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">it</span><span class="other">-></span><span class="identifier">second</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">3686</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="class_OperationGroup_1EF1FAB0C8ADEBD26EE189509D491CF81A62A50C.html">OperationGroup</a><span class="other">*</span>&nbsp;<span class="identifier">operationGroup</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">it</span><span class="other">-></span><span class="identifier">second</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">3672</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">operationGroup</span><span class="other">-></span><a href="class_OperationGroup_1EF1FAB0C8ADEBD26EE189509D491CF81A62A50C.html#function_CollectViableFunctions_C5D99DB81F49B5F17015D6E90F99EF0AAE7ABB96">CollectViableFunctions</a><span class="other">(</span><span class="identifier">containerScope</span><span class="other">,&nbsp;</span><span class="identifier">arguments</span><span class="other">,&nbsp;</span><span class="identifier">currentFunction</span><span class="other">,&nbsp;</span><span class="identifier">viableFunctions</span><span class="other">,&nbsp;</span><span class="identifier">exception</span><span class="other">,&nbsp;</span><span class="identifier">span</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">3687</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">operationGroup</span><span class="other">-></span><a href="class_OperationGroup_1EF1FAB0C8ADEBD26EE189509D491CF81A62A50C.html#function_CollectViableFunctions_C5D99DB81F49B5F17015D6E90F99EF0AAE7ABB96">CollectViableFunctions</a><span class="other">(</span><span class="identifier">containerScope</span><span class="other">,&nbsp;</span><span class="identifier">arguments</span><span class="other">,&nbsp;</span><span class="identifier">currentFunction</span><span class="other">,&nbsp;</span><span class="identifier">viableFunctions</span><span class="other">,&nbsp;</span><span class="identifier">exception</span><span class="other">,&nbsp;</span><span class="identifier">span</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">3673</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">3688</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">3674</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">3689</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
@@ -173,7 +173,7 @@
             <a href="class_Span_9CED8370AAA8B01E09FBC8A63AD262084B91FD78.html">Span</a>
             &amp; span)</h4>
         <span>
-            Definition at line <a href="file/binder/OperationRepository.cpp_4F8CDF7C00F0E7B6B904246A3258FFCE76BDE2E6.html#3676">3676</a>
+            Definition at line <a href="file/binder/OperationRepository.cpp_4F8CDF7C00F0E7B6B904246A3258FFCE76BDE2E6.html#3691">3691</a>
              of <a href="file/binder/OperationRepository.cpp_4F8CDF7C00F0E7B6B904246A3258FFCE76BDE2E6.html">OperationRepository.cpp</a>
         </span>
         <br/>
@@ -210,31 +210,8 @@
             <a href="class_Span_9CED8370AAA8B01E09FBC8A63AD262084B91FD78.html">Span</a>
             &amp; span)</h4>
         <span>
-            Definition at line <a href="file/binder/OperationRepository.cpp_4F8CDF7C00F0E7B6B904246A3258FFCE76BDE2E6.html#3705">3705</a>
+            Definition at line <a href="file/binder/OperationRepository.cpp_4F8CDF7C00F0E7B6B904246A3258FFCE76BDE2E6.html#3720">3720</a>
              of <a href="file/binder/OperationRepository.cpp_4F8CDF7C00F0E7B6B904246A3258FFCE76BDE2E6.html">OperationRepository.cpp</a>
-            :<br/>
-            <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">3706</span>&nbsp;<span class="other">{</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">3707</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><a href="class_InterfaceTypeCopyConstructor_1D43C871BC43BB0E814AECB6C6F64C3C8E6A9A7C.html">InterfaceTypeCopyConstructor</a><span class="other">></span>&nbsp;<span class="identifier">copyConstructor</span><span class="other">(</span><span class="kw">new&nbsp;</span><a href="class_InterfaceTypeCopyConstructor_1D43C871BC43BB0E814AECB6C6F64C3C8E6A9A7C.html">InterfaceTypeCopyConstructor</a><span class="other">(</span><span class="identifier">interfaceTypeSymbol</span><span class="other">,&nbsp;</span><span class="identifier">span</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">3708</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="class_OperationRepository_C6E4DEF6A11C767444C05F73D5BEB8BA4459F24B.html#variable_boundCompileUnit_E08CD1F15C7C49188B6A69A892367C1A12984C63">boundCompileUnit</a><span class="other">.</span><a href="class_BoundCompileUnit_E99BC7539B5239DF3A33DC3D613FE1D188A0A9E1.html#function_GetSymbolTable_67A2A0A2C598F97CD8078339C59387139B141ECC">GetSymbolTable</a><span class="other">(</span><span class="other">)</span><span class="other">.</span><a href="class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_SetFunctionIdFor_B90ED37321098F761188B4FBF98D673D99C7AAB7">SetFunctionIdFor</a><span class="other">(</span><span class="identifier">copyConstructor</span><span class="other">.</span><span class="identifier">get</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">3709</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">copyConstructor</span><span class="other">-></span><span class="identifier">SetCompileUnit</span><span class="other">(</span><a href="class_OperationRepository_C6E4DEF6A11C767444C05F73D5BEB8BA4459F24B.html#variable_boundCompileUnit_E08CD1F15C7C49188B6A69A892367C1A12984C63">boundCompileUnit</a><span class="other">.</span><a href="class_BoundCompileUnit_E99BC7539B5239DF3A33DC3D613FE1D188A0A9E1.html#function_GetCompileUnitNode_278F90635D6192A44C7A2A27DEBD61EEEF1D6C8C">GetCompileUnitNode</a><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">3710</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">copyConstructor</span><span class="other">-></span><span class="identifier">SetSymbolTable</span><span class="other">(</span><span class="other">&amp;</span><a href="class_OperationRepository_C6E4DEF6A11C767444C05F73D5BEB8BA4459F24B.html#variable_boundCompileUnit_E08CD1F15C7C49188B6A69A892367C1A12984C63">boundCompileUnit</a><span class="other">.</span><a href="class_BoundCompileUnit_E99BC7539B5239DF3A33DC3D613FE1D188A0A9E1.html#function_GetSymbolTable_67A2A0A2C598F97CD8078339C59387139B141ECC">GetSymbolTable</a><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">3711</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">copyConstructor</span><span class="other">-></span><span class="identifier">SetModule</span><span class="other">(</span><span class="other">&amp;</span><a href="class_OperationRepository_C6E4DEF6A11C767444C05F73D5BEB8BA4459F24B.html#variable_boundCompileUnit_E08CD1F15C7C49188B6A69A892367C1A12984C63">boundCompileUnit</a><span class="other">.</span><a href="class_BoundCompileUnit_E99BC7539B5239DF3A33DC3D613FE1D188A0A9E1.html#function_GetModule_3D1A2B5CC98F2A7EDDF7C0F95FEC80A03A352BDE">GetModule</a><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">3712</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">copyConstructor</span><span class="other">-></span><span class="identifier">SetParent</span><span class="other">(</span><span class="identifier">interfaceTypeSymbol</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">3713</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">interfaceTypeSymbol</span><span class="other">-></span><a href="class_InterfaceTypeSymbol_ACF173EECBCEFCC95D9BE725D3B7256B4E7425B9.html#function_SetCopyConstructor_BB3BEBB60FF27C6A2232403DECFFED41832A74B8">SetCopyConstructor</a><span class="other">(</span><span class="identifier">copyConstructor</span><span class="other">.</span><span class="identifier">get</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">3714</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">interfaceTypeSymbol</span><span class="other">-></span><a href="class_InterfaceTypeSymbol_ACF173EECBCEFCC95D9BE725D3B7256B4E7425B9.html#function_AddMember_E1833FB427881F16B1061012643F3B5600BA4D16">AddMember</a><span class="other">(</span><span class="identifier">copyConstructor</span><span class="other">.</span><span class="identifier">release</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">3715</span>&nbsp;<span class="other">}</span></span>
-            </span>
-            <br/>
         </span>
         <br/>
         <span>

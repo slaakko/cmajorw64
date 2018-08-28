@@ -64,6 +64,10 @@
                 <td class="functionTableSecondCol" xml:space="preserve"><a href="class_CompileUnitNode_F6CDC04A745418A00AB314CF086C092721F42A14.html#function_IsSynthesizedUnit_D936509191AEE4BF6BDC3C5D5C393C7EF7B2D49B">IsSynthesizedUnit</a>() <span class="kw">const</span></td>
             </tr>
             <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">const </span>std::vector&lt;int32_t>&amp;</td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_CompileUnitNode_F6CDC04A745418A00AB314CF086C092721F42A14.html#function_LineStarts_D9E8401B8E0A7FC56251204096BDF052B8D7EA47">LineStarts</a>()</td>
+            </tr>
+            <tr>
                 <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
                 <td class="functionTableSecondCol" xml:space="preserve"><a href="class_CompileUnitNode_F6CDC04A745418A00AB314CF086C092721F42A14.html#function_SetSynthesizedUnit_0BE880BD445CED7057C90735F22A3D8DF24C8D15">SetSynthesizedUnit</a>()</td>
             </tr>
@@ -277,7 +281,7 @@
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/ast/CompileUnit.hpp_F99C93B13031AFF3E4E0D860C9898087A248E42E.html#23">23</a>
+            Declaration at line <a href="file/ast/CompileUnit.hpp_F99C93B13031AFF3E4E0D860C9898087A248E42E.html#24">24</a>
              of <a href="file/ast/CompileUnit.hpp_F99C93B13031AFF3E4E0D860C9898087A248E42E.html">CompileUnit.hpp</a>
         </span>
         <br/>
@@ -332,11 +336,11 @@
              cmajor::ast::CompileUnitNode::IsSynthesizedUnit() <span class="kw">const</span>
         </h4>
         <span>
-            Definition at line <a href="file/ast/CompileUnit.hpp_F99C93B13031AFF3E4E0D860C9898087A248E42E.html#25">25</a>
+            Definition at line <a href="file/ast/CompileUnit.hpp_F99C93B13031AFF3E4E0D860C9898087A248E42E.html#26">26</a>
              of <a href="file/ast/CompileUnit.hpp_F99C93B13031AFF3E4E0D860C9898087A248E42E.html">CompileUnit.hpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">25</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">isSynthesizedUnit</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">26</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">isSynthesizedUnit</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
@@ -347,16 +351,31 @@
         <br/>
         <br/>
         <hr/>
+        <h3 id="function_LineStarts_D9E8401B8E0A7FC56251204096BDF052B8D7EA47">LineStarts Member Function</h3>
+        <h4>
+            <span class="kw">const </span>
+            std::vector&lt;int32_t>&amp; cmajor::ast::CompileUnitNode::LineStarts()</h4>
+        <span>
+            Definition at line <a href="file/ast/CompileUnit.hpp_F99C93B13031AFF3E4E0D860C9898087A248E42E.html#23">23</a>
+             of <a href="file/ast/CompileUnit.hpp_F99C93B13031AFF3E4E0D860C9898087A248E42E.html">CompileUnit.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">23</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">lineStarts</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <hr/>
         <h3 id="function_SetSynthesizedUnit_0BE880BD445CED7057C90735F22A3D8DF24C8D15">SetSynthesizedUnit Member Function</h3>
         <h4>
             <span class="kw">void</span>
              cmajor::ast::CompileUnitNode::SetSynthesizedUnit()</h4>
         <span>
-            Definition at line <a href="file/ast/CompileUnit.hpp_F99C93B13031AFF3E4E0D860C9898087A248E42E.html#24">24</a>
+            Definition at line <a href="file/ast/CompileUnit.hpp_F99C93B13031AFF3E4E0D860C9898087A248E42E.html#25">25</a>
              of <a href="file/ast/CompileUnit.hpp_F99C93B13031AFF3E4E0D860C9898087A248E42E.html">CompileUnit.hpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">24</span>&nbsp;<span class="other">{</span>&nbsp;<span class="identifier">isSynthesizedUnit</span><span class="other">&nbsp;=&nbsp;</span><span class="kw">true</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">25</span>&nbsp;<span class="other">{</span>&nbsp;<span class="identifier">isSynthesizedUnit</span><span class="other">&nbsp;=&nbsp;</span><span class="kw">true</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>

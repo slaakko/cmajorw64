@@ -234,21 +234,6 @@
    <parserSource filePath="C:/Users/Seppo/cmajorw64/cmajor/parser/TypeExpr.parser" relativeFilePath="TypeExpr.parser"/>
   </parserSources>
  </project>
- <project id="f5ca3b98-cc3a-4924-be9a-f5e507305c7b" name="ir">
-  <references>
-   <reference id="ce56c110-cb05-4593-97fa-a664d6b67265"/>
-   <reference id="01b04136-057a-4bd1-86a7-6779d1cc8b09"/>
-   <reference id="879b25c9-b0b5-4928-b84b-5d212802bd15"/>
-  </references>
-  <sources>
-   <source filePath="C:/Users/Seppo/cmajorw64/cmajor/ir/Emitter.hpp" relativeFilePath="Emitter.hpp"/>
-   <source filePath="C:/Users/Seppo/cmajorw64/cmajor/ir/GenObject.hpp" relativeFilePath="GenObject.hpp"/>
-   <source filePath="C:/Users/Seppo/cmajorw64/cmajor/ir/ValueStack.hpp" relativeFilePath="ValueStack.hpp"/>
-   <source filePath="C:/Users/Seppo/cmajorw64/cmajor/ir/Emitter.cpp" relativeFilePath="Emitter.cpp"/>
-   <source filePath="C:/Users/Seppo/cmajorw64/cmajor/ir/GenObject.cpp" relativeFilePath="GenObject.cpp"/>
-  </sources>
-  <parserSources/>
- </project>
  <project id="32e61b8c-4433-4969-9e41-a53494a53c1b" name="xml">
   <references>
    <reference id="01b04136-057a-4bd1-86a7-6779d1cc8b09"/>
@@ -287,6 +272,49 @@
    <source filePath="C:/Users/Seppo/cmajorw64/cmajor/dom/Exception.cpp" relativeFilePath="Exception.cpp"/>
    <source filePath="C:/Users/Seppo/cmajorw64/cmajor/dom/Node.cpp" relativeFilePath="Node.cpp"/>
    <source filePath="C:/Users/Seppo/cmajorw64/cmajor/dom/Parser.cpp" relativeFilePath="Parser.cpp"/>
+  </sources>
+  <parserSources/>
+ </project>
+ <project id="11ee390e-f284-4f92-867c-c8a38013c349" name="xpath">
+  <references>
+   <reference id="01b04136-057a-4bd1-86a7-6779d1cc8b09"/>
+   <reference id="ce8de27d-3b13-4e50-a04e-301585f9f731"/>
+   <reference id="32e61b8c-4433-4969-9e41-a53494a53c1b"/>
+   <reference id="879b25c9-b0b5-4928-b84b-5d212802bd15"/>
+   <reference id="77cce7d1-fa82-4620-9f20-309e671e0609"/>
+  </references>
+  <sources>
+   <source filePath="C:/Users/Seppo/cmajorw64/cmajor/xpath/InitDone.hpp" relativeFilePath="InitDone.hpp"/>
+   <source filePath="C:/Users/Seppo/cmajorw64/cmajor/xpath/XPathContext.hpp" relativeFilePath="XPathContext.hpp"/>
+   <source filePath="C:/Users/Seppo/cmajorw64/cmajor/xpath/XPathDebug.hpp" relativeFilePath="XPathDebug.hpp"/>
+   <source filePath="C:/Users/Seppo/cmajorw64/cmajor/xpath/XPathEvaluate.hpp" relativeFilePath="XPathEvaluate.hpp"/>
+   <source filePath="C:/Users/Seppo/cmajorw64/cmajor/xpath/XPathExpr.hpp" relativeFilePath="XPathExpr.hpp"/>
+   <source filePath="C:/Users/Seppo/cmajorw64/cmajor/xpath/XPathFunction.hpp" relativeFilePath="XPathFunction.hpp"/>
+   <source filePath="C:/Users/Seppo/cmajorw64/cmajor/xpath/XPathObject.hpp" relativeFilePath="XPathObject.hpp"/>
+   <source filePath="C:/Users/Seppo/cmajorw64/cmajor/xpath/InitDone.cpp" relativeFilePath="InitDone.cpp"/>
+   <source filePath="C:/Users/Seppo/cmajorw64/cmajor/xpath/XPathContext.cpp" relativeFilePath="XPathContext.cpp"/>
+   <source filePath="C:/Users/Seppo/cmajorw64/cmajor/xpath/XPathDebug.cpp" relativeFilePath="XPathDebug.cpp"/>
+   <source filePath="C:/Users/Seppo/cmajorw64/cmajor/xpath/XPathEvaluate.cpp" relativeFilePath="XPathEvaluate.cpp"/>
+   <source filePath="C:/Users/Seppo/cmajorw64/cmajor/xpath/XPathExpr.cpp" relativeFilePath="XPathExpr.cpp"/>
+   <source filePath="C:/Users/Seppo/cmajorw64/cmajor/xpath/XPathFunction.cpp" relativeFilePath="XPathFunction.cpp"/>
+   <source filePath="C:/Users/Seppo/cmajorw64/cmajor/xpath/XPathObject.cpp" relativeFilePath="XPathObject.cpp"/>
+  </sources>
+  <parserSources>
+   <parserSource filePath="C:/Users/Seppo/cmajorw64/cmajor/xpath/XPath.parser" relativeFilePath="XPath.parser"/>
+  </parserSources>
+ </project>
+ <project id="f5ca3b98-cc3a-4924-be9a-f5e507305c7b" name="ir">
+  <references>
+   <reference id="ce56c110-cb05-4593-97fa-a664d6b67265"/>
+   <reference id="01b04136-057a-4bd1-86a7-6779d1cc8b09"/>
+   <reference id="879b25c9-b0b5-4928-b84b-5d212802bd15"/>
+  </references>
+  <sources>
+   <source filePath="C:/Users/Seppo/cmajorw64/cmajor/ir/Emitter.hpp" relativeFilePath="Emitter.hpp"/>
+   <source filePath="C:/Users/Seppo/cmajorw64/cmajor/ir/GenObject.hpp" relativeFilePath="GenObject.hpp"/>
+   <source filePath="C:/Users/Seppo/cmajorw64/cmajor/ir/ValueStack.hpp" relativeFilePath="ValueStack.hpp"/>
+   <source filePath="C:/Users/Seppo/cmajorw64/cmajor/ir/Emitter.cpp" relativeFilePath="Emitter.cpp"/>
+   <source filePath="C:/Users/Seppo/cmajorw64/cmajor/ir/GenObject.cpp" relativeFilePath="GenObject.cpp"/>
   </sources>
   <parserSources/>
  </project>
@@ -371,6 +399,43 @@
    <source filePath="C:/Users/Seppo/cmajorw64/cmajor/symbols/Value.cpp" relativeFilePath="Value.cpp"/>
    <source filePath="C:/Users/Seppo/cmajorw64/cmajor/symbols/VariableSymbol.cpp" relativeFilePath="VariableSymbol.cpp"/>
    <source filePath="C:/Users/Seppo/cmajorw64/cmajor/symbols/Warning.cpp" relativeFilePath="Warning.cpp"/>
+  </sources>
+  <parserSources/>
+ </project>
+ <project id="26c18e74-ffb0-4861-8da9-513fe597b4f9" name="cmdoclib">
+  <references>
+   <reference id="11ee390e-f284-4f92-867c-c8a38013c349"/>
+   <reference id="ce56c110-cb05-4593-97fa-a664d6b67265"/>
+   <reference id="01b04136-057a-4bd1-86a7-6779d1cc8b09"/>
+   <reference id="ce8de27d-3b13-4e50-a04e-301585f9f731"/>
+   <reference id="32e61b8c-4433-4969-9e41-a53494a53c1b"/>
+   <reference id="879b25c9-b0b5-4928-b84b-5d212802bd15"/>
+   <reference id="77cce7d1-fa82-4620-9f20-309e671e0609"/>
+   <reference id="b49bf2f4-1622-45da-b497-69329ea37ad0"/>
+  </references>
+  <sources>
+   <source filePath="C:/Users/Seppo/cmajorw64/cmajor/cmdoclib/Constraint.hpp" relativeFilePath="Constraint.hpp"/>
+   <source filePath="C:/Users/Seppo/cmajorw64/cmajor/cmdoclib/Diagram.hpp" relativeFilePath="Diagram.hpp"/>
+   <source filePath="C:/Users/Seppo/cmajorw64/cmajor/cmdoclib/Doc.hpp" relativeFilePath="Doc.hpp"/>
+   <source filePath="C:/Users/Seppo/cmajorw64/cmajor/cmdoclib/File.hpp" relativeFilePath="File.hpp"/>
+   <source filePath="C:/Users/Seppo/cmajorw64/cmajor/cmdoclib/Global.hpp" relativeFilePath="Global.hpp"/>
+   <source filePath="C:/Users/Seppo/cmajorw64/cmajor/cmdoclib/InitDone.hpp" relativeFilePath="InitDone.hpp"/>
+   <source filePath="C:/Users/Seppo/cmajorw64/cmajor/cmdoclib/Input.hpp" relativeFilePath="Input.hpp"/>
+   <source filePath="C:/Users/Seppo/cmajorw64/cmajor/cmdoclib/ParserDoc.hpp" relativeFilePath="ParserDoc.hpp"/>
+   <source filePath="C:/Users/Seppo/cmajorw64/cmajor/cmdoclib/SourceCodePrinter.hpp" relativeFilePath="SourceCodePrinter.hpp"/>
+   <source filePath="C:/Users/Seppo/cmajorw64/cmajor/cmdoclib/Style.hpp" relativeFilePath="Style.hpp"/>
+   <source filePath="C:/Users/Seppo/cmajorw64/cmajor/cmdoclib/SymbolTableXml.hpp" relativeFilePath="SymbolTableXml.hpp"/>
+   <source filePath="C:/Users/Seppo/cmajorw64/cmajor/cmdoclib/Constraint.cpp" relativeFilePath="Constraint.cpp"/>
+   <source filePath="C:/Users/Seppo/cmajorw64/cmajor/cmdoclib/Diagram.cpp" relativeFilePath="Diagram.cpp"/>
+   <source filePath="C:/Users/Seppo/cmajorw64/cmajor/cmdoclib/Doc.cpp" relativeFilePath="Doc.cpp"/>
+   <source filePath="C:/Users/Seppo/cmajorw64/cmajor/cmdoclib/File.cpp" relativeFilePath="File.cpp"/>
+   <source filePath="C:/Users/Seppo/cmajorw64/cmajor/cmdoclib/Global.cpp" relativeFilePath="Global.cpp"/>
+   <source filePath="C:/Users/Seppo/cmajorw64/cmajor/cmdoclib/InitDone.cpp" relativeFilePath="InitDone.cpp"/>
+   <source filePath="C:/Users/Seppo/cmajorw64/cmajor/cmdoclib/Input.cpp" relativeFilePath="Input.cpp"/>
+   <source filePath="C:/Users/Seppo/cmajorw64/cmajor/cmdoclib/ParserDoc.cpp" relativeFilePath="ParserDoc.cpp"/>
+   <source filePath="C:/Users/Seppo/cmajorw64/cmajor/cmdoclib/SourceCodePrinter.cpp" relativeFilePath="SourceCodePrinter.cpp"/>
+   <source filePath="C:/Users/Seppo/cmajorw64/cmajor/cmdoclib/Style.cpp" relativeFilePath="Style.cpp"/>
+   <source filePath="C:/Users/Seppo/cmajorw64/cmajor/cmdoclib/SymbolTableXml.cpp" relativeFilePath="SymbolTableXml.cpp"/>
   </sources>
   <parserSources/>
  </project>
@@ -506,6 +571,7 @@
    <reference id="ce56c110-cb05-4593-97fa-a664d6b67265"/>
    <reference id="a143c01a-ca8f-4a48-ba9a-254b81495ff2"/>
    <reference id="01b04136-057a-4bd1-86a7-6779d1cc8b09"/>
+   <reference id="26c18e74-ffb0-4861-8da9-513fe597b4f9"/>
    <reference id="ce8de27d-3b13-4e50-a04e-301585f9f731"/>
    <reference id="f5ca3b98-cc3a-4924-be9a-f5e507305c7b"/>
    <reference id="f550afa5-4098-46fe-9e84-0ad9698dd25e"/>
@@ -727,50 +793,26 @@
   </sources>
   <parserSources/>
  </project>
- <project id="11ee390e-f284-4f92-867c-c8a38013c349" name="xpath">
-  <references>
-   <reference id="01b04136-057a-4bd1-86a7-6779d1cc8b09"/>
-   <reference id="ce8de27d-3b13-4e50-a04e-301585f9f731"/>
-   <reference id="32e61b8c-4433-4969-9e41-a53494a53c1b"/>
-   <reference id="879b25c9-b0b5-4928-b84b-5d212802bd15"/>
-   <reference id="77cce7d1-fa82-4620-9f20-309e671e0609"/>
-  </references>
-  <sources>
-   <source filePath="C:/Users/Seppo/cmajorw64/cmajor/xpath/InitDone.hpp" relativeFilePath="InitDone.hpp"/>
-   <source filePath="C:/Users/Seppo/cmajorw64/cmajor/xpath/XPathContext.hpp" relativeFilePath="XPathContext.hpp"/>
-   <source filePath="C:/Users/Seppo/cmajorw64/cmajor/xpath/XPathDebug.hpp" relativeFilePath="XPathDebug.hpp"/>
-   <source filePath="C:/Users/Seppo/cmajorw64/cmajor/xpath/XPathEvaluate.hpp" relativeFilePath="XPathEvaluate.hpp"/>
-   <source filePath="C:/Users/Seppo/cmajorw64/cmajor/xpath/XPathExpr.hpp" relativeFilePath="XPathExpr.hpp"/>
-   <source filePath="C:/Users/Seppo/cmajorw64/cmajor/xpath/XPathFunction.hpp" relativeFilePath="XPathFunction.hpp"/>
-   <source filePath="C:/Users/Seppo/cmajorw64/cmajor/xpath/XPathObject.hpp" relativeFilePath="XPathObject.hpp"/>
-   <source filePath="C:/Users/Seppo/cmajorw64/cmajor/xpath/InitDone.cpp" relativeFilePath="InitDone.cpp"/>
-   <source filePath="C:/Users/Seppo/cmajorw64/cmajor/xpath/XPathContext.cpp" relativeFilePath="XPathContext.cpp"/>
-   <source filePath="C:/Users/Seppo/cmajorw64/cmajor/xpath/XPathDebug.cpp" relativeFilePath="XPathDebug.cpp"/>
-   <source filePath="C:/Users/Seppo/cmajorw64/cmajor/xpath/XPathEvaluate.cpp" relativeFilePath="XPathEvaluate.cpp"/>
-   <source filePath="C:/Users/Seppo/cmajorw64/cmajor/xpath/XPathExpr.cpp" relativeFilePath="XPathExpr.cpp"/>
-   <source filePath="C:/Users/Seppo/cmajorw64/cmajor/xpath/XPathFunction.cpp" relativeFilePath="XPathFunction.cpp"/>
-   <source filePath="C:/Users/Seppo/cmajorw64/cmajor/xpath/XPathObject.cpp" relativeFilePath="XPathObject.cpp"/>
-  </sources>
-  <parserSources>
-   <parserSource filePath="C:/Users/Seppo/cmajorw64/cmajor/xpath/XPath.parser" relativeFilePath="XPath.parser"/>
-  </parserSources>
- </project>
  <project id="4a906362-995b-4765-a741-aff30577fe16" name="cmdoc">
   <references>
    <reference id="11ee390e-f284-4f92-867c-c8a38013c349"/>
    <reference id="ce56c110-cb05-4593-97fa-a664d6b67265"/>
    <reference id="a143c01a-ca8f-4a48-ba9a-254b81495ff2"/>
+   <reference id="d78ecd1a-788d-4ce0-9adb-830902a20840"/>
    <reference id="01b04136-057a-4bd1-86a7-6779d1cc8b09"/>
+   <reference id="26c18e74-ffb0-4861-8da9-513fe597b4f9"/>
    <reference id="ce8de27d-3b13-4e50-a04e-301585f9f731"/>
    <reference id="32e61b8c-4433-4969-9e41-a53494a53c1b"/>
    <reference id="f5ca3b98-cc3a-4924-be9a-f5e507305c7b"/>
    <reference id="f550afa5-4098-46fe-9e84-0ad9698dd25e"/>
+   <reference id="a85fb4ba-5f9c-4ea0-9ad8-c994443610a6"/>
    <reference id="879b25c9-b0b5-4928-b84b-5d212802bd15"/>
    <reference id="77cce7d1-fa82-4620-9f20-309e671e0609"/>
    <reference id="b49bf2f4-1622-45da-b497-69329ea37ad0"/>
   </references>
   <sources>
    <source filePath="C:/Users/Seppo/cmajorw64/cmajor/cmdoc/Main.cpp" relativeFilePath="Main.cpp"/>
+   <source filePath="C:/Users/Seppo/cmajorw64/cmajor/cmdoc/MainClassic.cpp" relativeFilePath="MainClassic.cpp"/>
   </sources>
   <parserSources/>
  </project>

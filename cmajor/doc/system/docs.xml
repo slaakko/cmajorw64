@@ -447,7 +447,7 @@
   <doc id="System.IO.Compression">
     <desc>
       The System.IO.Compression module contains data compression/decompression streams.
-      It is implemented by means of <a href="http://www.zlib.net/">zlib</a> and <a href="https://web.archive.org/web/20180801004107/http://www.bzip.org/">bzip2</a> libraries.
+      It is implemented by means of <a href="http://www.zlib.net/">zlib</a> and <a href="http://www.sourceware.org/bzip2/">bzip2</a> libraries.
     </desc>
     <details title="Examples">
       This <a href="../../../code/compression/cmdoc/content/deflate/file/main.cm.html">deflate</a> program compresses a file using 
@@ -1386,7 +1386,7 @@
   
   <doc id="System.Core">
     <desc>
-      The System.Core module contains primitive types, operations for primitive types and intrinsic concepts known by the compiler.
+      The System.Core module contains primitive types, operations for primitive types, intrinsic functions and intrinsic concepts known by the compiler.
       It does not have any source code.
     </desc>>
   </doc>

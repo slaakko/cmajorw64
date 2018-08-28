@@ -47,7 +47,7 @@
           <ctorsDtors>
            <ctorDtor docPath="../../System.Net.Http/doc/class_ChunkExtensionAdder_BF7942FA773504E9A41C944371AB89CC259A8E2A.html#constructor_ChunkExtensionAdder_33A27626986D57CA65A4B7F1DA8825C138BBC8C9" extPath="System.Net.Http/doc/class_ChunkExtensionAdder_BF7942FA773504E9A41C944371AB89CC259A8E2A.html#constructor_ChunkExtensionAdder_33A27626986D57CA65A4B7F1DA8825C138BBC8C9" fileName="System.Net.Http/ChunkedBodyReader.cm" filePath="../../System.Net.Http/file/ChunkedBodyReader.cm.html" id="constructor_ChunkExtensionAdder_33A27626986D57CA65A4B7F1DA8825C138BBC8C9" kind="Constructor" line="15" name="ChunkExtensionAdder" specifiers="public">
             <parameters>
-             <parameter id="parameter_chunkExtensions__B2B527A0129819EC67DFB41646E1ABB32B8B7FDC" name="chunkExtensions_" type="bce959d7-e4ff-409f-8e03-a24760089807"/>
+             <parameter id="parameter_chunkExtensions__B2B527A0129819EC67DFB41646E1ABB32B8B7FDC" name="chunkExtensions_" type="555d4479-efec-4b1b-b3a0-80755a891762"/>
             </parameters>
            </ctorDtor>
           </ctorsDtors>
@@ -60,7 +60,7 @@
            </function>
           </functions>
           <variables>
-           <variable docPath="../../System.Net.Http/doc/class_ChunkExtensionAdder_BF7942FA773504E9A41C944371AB89CC259A8E2A.html#variable_chunkExtensions_9AD6403432CACE5F4AB5581D26A71FED95A235EF" extPath="System.Net.Http/doc/class_ChunkExtensionAdder_BF7942FA773504E9A41C944371AB89CC259A8E2A.html#variable_chunkExtensions_9AD6403432CACE5F4AB5581D26A71FED95A235EF" id="variable_chunkExtensions_9AD6403432CACE5F4AB5581D26A71FED95A235EF" name="chunkExtensions" specifiers="private" type="bce959d7-e4ff-409f-8e03-a24760089807"/>
+           <variable docPath="../../System.Net.Http/doc/class_ChunkExtensionAdder_BF7942FA773504E9A41C944371AB89CC259A8E2A.html#variable_chunkExtensions_9AD6403432CACE5F4AB5581D26A71FED95A235EF" extPath="System.Net.Http/doc/class_ChunkExtensionAdder_BF7942FA773504E9A41C944371AB89CC259A8E2A.html#variable_chunkExtensions_9AD6403432CACE5F4AB5581D26A71FED95A235EF" id="variable_chunkExtensions_9AD6403432CACE5F4AB5581D26A71FED95A235EF" name="chunkExtensions" specifiers="private" type="555d4479-efec-4b1b-b3a0-80755a891762"/>
           </variables>
          </class>
          <class baseClass="class_Coding_E8FCCE92B7E6EBEFC6D036EF36B21BC36BA5A373" docPath="../../System.Net.Http/doc/class_ChunkedTransferCoding_4F0DED3DF51744BAA6AEB3839F21C05614184456.html" extPath="System.Net.Http/doc/class_ChunkedTransferCoding_4F0DED3DF51744BAA6AEB3839F21C05614184456.html" fileName="System.Net.Http/HttpRequest.cm" filePath="../../System.Net.Http/file/HttpRequest.cm.html" id="class_ChunkedTransferCoding_4F0DED3DF51744BAA6AEB3839F21C05614184456" line="432" name="ChunkedTransferCoding" specifiers="public">
@@ -110,12 +110,12 @@
           <ctorsDtors>
            <ctorDtor docPath="../../System.Net.Http/doc/class_HttpAcceptEncodingHeader_E66F194A1531ECCE2064B9268706E0D6EC8180AC.html#constructor_HttpAcceptEncodingHeader_C2F9970C7CB98DED98704C5A653508388938610A" extPath="System.Net.Http/doc/class_HttpAcceptEncodingHeader_E66F194A1531ECCE2064B9268706E0D6EC8180AC.html#constructor_HttpAcceptEncodingHeader_C2F9970C7CB98DED98704C5A653508388938610A" fileName="System.Net.Http/HttpRequest.cm" filePath="../../System.Net.Http/file/HttpRequest.cm.html" id="constructor_HttpAcceptEncodingHeader_C2F9970C7CB98DED98704C5A653508388938610A" kind="Constructor" line="471" name="HttpAcceptEncodingHeader" specifiers="public">
             <parameters>
-             <parameter id="parameter_encoding_6CE53331FCDA1381CD16E6607E763B7021AD0059" name="encoding" type="74bf7155-1278-474d-ac35-2e5e6a86e2e6"/>
+             <parameter id="parameter_encoding_6CE53331FCDA1381CD16E6607E763B7021AD0059" name="encoding" type="781ca9ff-1bc4-4a3e-a423-e8e50deedfb6"/>
             </parameters>
            </ctorDtor>
            <ctorDtor docPath="../../System.Net.Http/doc/class_HttpAcceptEncodingHeader_E66F194A1531ECCE2064B9268706E0D6EC8180AC.html#constructor_HttpAcceptEncodingHeader_CA8D66549A60CFA20F410DE39991D5EACBA05B6E" extPath="System.Net.Http/doc/class_HttpAcceptEncodingHeader_E66F194A1531ECCE2064B9268706E0D6EC8180AC.html#constructor_HttpAcceptEncodingHeader_CA8D66549A60CFA20F410DE39991D5EACBA05B6E" fileName="System.Net.Http/HttpRequest.cm" filePath="../../System.Net.Http/file/HttpRequest.cm.html" id="constructor_HttpAcceptEncodingHeader_CA8D66549A60CFA20F410DE39991D5EACBA05B6E" kind="Constructor" line="474" name="HttpAcceptEncodingHeader" specifiers="public">
             <parameters>
-             <parameter id="parameter_encodings_8483D51347E3A2A0F29103AD47935C1FC30F27B9" name="encodings" type="cd28d2cd-e3aa-4f8d-af95-2a0f9726ab6b"/>
+             <parameter id="parameter_encodings_8483D51347E3A2A0F29103AD47935C1FC30F27B9" name="encodings" type="569b5378-7af3-438d-9766-d5b89c9835e1"/>
             </parameters>
            </ctorDtor>
           </ctorsDtors>
@@ -124,12 +124,12 @@
           <ctorsDtors>
            <ctorDtor docPath="../../System.Net.Http/doc/class_HttpAcceptHeader_8EAB00C53E35B6A3BDEE78ABADE8D17CF00451D6.html#constructor_HttpAcceptHeader_4EB4735DC222197C361810D923DBDBB7F4820351" extPath="System.Net.Http/doc/class_HttpAcceptHeader_8EAB00C53E35B6A3BDEE78ABADE8D17CF00451D6.html#constructor_HttpAcceptHeader_4EB4735DC222197C361810D923DBDBB7F4820351" fileName="System.Net.Http/HttpRequest.cm" filePath="../../System.Net.Http/file/HttpRequest.cm.html" id="constructor_HttpAcceptHeader_4EB4735DC222197C361810D923DBDBB7F4820351" kind="Constructor" line="401" name="HttpAcceptHeader" specifiers="public">
             <parameters>
-             <parameter id="parameter_mediaRanges_59B203E7296C610B33D2B5F22EE84BCD0D24670D" name="mediaRanges" type="ccc1bf25-5bce-43c9-9682-cdc499ef1f0e"/>
+             <parameter id="parameter_mediaRanges_59B203E7296C610B33D2B5F22EE84BCD0D24670D" name="mediaRanges" type="6155b673-9c3d-4167-bd50-b59bf5c81b21"/>
             </parameters>
            </ctorDtor>
            <ctorDtor docPath="../../System.Net.Http/doc/class_HttpAcceptHeader_8EAB00C53E35B6A3BDEE78ABADE8D17CF00451D6.html#constructor_HttpAcceptHeader_B54FB7A619BE8F76B874ABFD58B46389812D45AB" extPath="System.Net.Http/doc/class_HttpAcceptHeader_8EAB00C53E35B6A3BDEE78ABADE8D17CF00451D6.html#constructor_HttpAcceptHeader_B54FB7A619BE8F76B874ABFD58B46389812D45AB" fileName="System.Net.Http/HttpRequest.cm" filePath="../../System.Net.Http/file/HttpRequest.cm.html" id="constructor_HttpAcceptHeader_B54FB7A619BE8F76B874ABFD58B46389812D45AB" kind="Constructor" line="398" name="HttpAcceptHeader" specifiers="public">
             <parameters>
-             <parameter id="parameter_mediaRange_877C75AFB1DDA77BA04E89E6DC1BEF7EABC6BE77" name="mediaRange" type="1ef5d785-338b-4018-ab82-c6cd81a72c1d"/>
+             <parameter id="parameter_mediaRange_877C75AFB1DDA77BA04E89E6DC1BEF7EABC6BE77" name="mediaRange" type="68731ee2-ef3e-41d5-9702-641986e8f272"/>
             </parameters>
            </ctorDtor>
           </ctorsDtors>
@@ -143,7 +143,7 @@
                <ctorDtor docPath="../../System.Net.Http/doc/class_Context_1EC93FB267495306AAC071C3920CFD3BE491A11F.html#default_constructor_Context_4668F0D7A115C6CBFEE243611B096299888DE445" extPath="System.Net.Http/doc/class_Context_1EC93FB267495306AAC071C3920CFD3BE491A11F.html#default_constructor_Context_4668F0D7A115C6CBFEE243611B096299888DE445" fileName="System.Net.Http/HttpGrammar.cm" filePath="../../System.Net.Http/file/HttpGrammar.cm.html" id="default_constructor_Context_4668F0D7A115C6CBFEE243611B096299888DE445" kind="Constructor" line="91" name="Context" specifiers="public"/>
               </ctorsDtors>
               <variables>
-               <variable docPath="../../System.Net.Http/doc/class_Context_1EC93FB267495306AAC071C3920CFD3BE491A11F.html#variable_adder_7C4DD12021B87BA8778DF54384C76239398C79C7" extPath="System.Net.Http/doc/class_Context_1EC93FB267495306AAC071C3920CFD3BE491A11F.html#variable_adder_7C4DD12021B87BA8778DF54384C76239398C79C7" id="variable_adder_7C4DD12021B87BA8778DF54384C76239398C79C7" name="adder" specifiers="public" type="26bf14f3-c858-433c-b92d-f9c69fd6f82f"/>
+               <variable docPath="../../System.Net.Http/doc/class_Context_1EC93FB267495306AAC071C3920CFD3BE491A11F.html#variable_adder_7C4DD12021B87BA8778DF54384C76239398C79C7" extPath="System.Net.Http/doc/class_Context_1EC93FB267495306AAC071C3920CFD3BE491A11F.html#variable_adder_7C4DD12021B87BA8778DF54384C76239398C79C7" id="variable_adder_7C4DD12021B87BA8778DF54384C76239398C79C7" name="adder" specifiers="public" type="a6150b7c-adbd-4430-8512-982b3c3e0467"/>
                <variable docPath="../../System.Net.Http/doc/class_Context_1EC93FB267495306AAC071C3920CFD3BE491A11F.html#variable_chunkSize_89F22D4E22BE1BCBEB984D7B3662BFB000FD424C" extPath="System.Net.Http/doc/class_Context_1EC93FB267495306AAC071C3920CFD3BE491A11F.html#variable_chunkSize_89F22D4E22BE1BCBEB984D7B3662BFB000FD424C" id="variable_chunkSize_89F22D4E22BE1BCBEB984D7B3662BFB000FD424C" name="chunkSize" specifiers="public" type="2b90c215-2beb-476c-80bf-9205cf423699"/>
               </variables>
              </class>
@@ -200,7 +200,7 @@
              <parameter id="parameter_fileIndex_DE4A9B54AE33297532B2517415CC559290978D56" name="fileIndex" type="cc8ffb50-cac1-4f7e-acae-8b3fb9621c37"/>
              <parameter id="parameter_fileName_35819BB1CE7D6D6F5663CE53613E6DC236CEC580" name="fileName" type="b14a2675-ade3-4740-b586-48284a4f720d"/>
              <parameter id="parameter_chunkSize_4D92D5D3B19736C7D1165CAB16827B896CEBE5D6" name="chunkSize" type="2b90c215-2beb-476c-80bf-9205cf423699"/>
-             <parameter id="parameter_adder_15C2C6B375E6A841655B965AB17D2D7D8E1FFA7B" name="adder" type="26bf14f3-c858-433c-b92d-f9c69fd6f82f"/>
+             <parameter id="parameter_adder_15C2C6B375E6A841655B965AB17D2D7D8E1FFA7B" name="adder" type="a6150b7c-adbd-4430-8512-982b3c3e0467"/>
             </parameters>
            </function>
           </functions>
@@ -210,18 +210,18 @@
            <ctorDtor docPath="../../System.Net.Http/doc/class_HttpClient_83C2D3F4BD814B26EED122D5467B7A58D6B02DCB.html#default_constructor_HttpClient_F0272F8A2CCAFB6B4B05ABB5BCBA56C07E64EE31" extPath="System.Net.Http/doc/class_HttpClient_83C2D3F4BD814B26EED122D5467B7A58D6B02DCB.html#default_constructor_HttpClient_F0272F8A2CCAFB6B4B05ABB5BCBA56C07E64EE31" fileName="System.Net.Http/HttpClient.cm" filePath="../../System.Net.Http/file/HttpClient.cm.html" id="default_constructor_HttpClient_F0272F8A2CCAFB6B4B05ABB5BCBA56C07E64EE31" kind="Constructor" line="16" name="HttpClient" specifiers="public"/>
            <ctorDtor docPath="../../System.Net.Http/doc/class_HttpClient_83C2D3F4BD814B26EED122D5467B7A58D6B02DCB.html#constructor_HttpClient_962379D19E7B724DD62557CA2763DE5D599E0009" extPath="System.Net.Http/doc/class_HttpClient_83C2D3F4BD814B26EED122D5467B7A58D6B02DCB.html#constructor_HttpClient_962379D19E7B724DD62557CA2763DE5D599E0009" fileName="System.Net.Http/HttpClient.cm" filePath="../../System.Net.Http/file/HttpClient.cm.html" id="constructor_HttpClient_962379D19E7B724DD62557CA2763DE5D599E0009" kind="Constructor" line="19" name="HttpClient" specifiers="public">
             <parameters>
-             <parameter id="parameter_baseAddress__09DCBF6EF505F119F846FC7471F7C98FEA77A12B" name="baseAddress_" type="e877b192-2c0b-4c65-b230-e109d122799c"/>
+             <parameter id="parameter_baseAddress__09DCBF6EF505F119F846FC7471F7C98FEA77A12B" name="baseAddress_" type="7fb21fde-bde2-4447-9ae4-711459ea84db"/>
             </parameters>
            </ctorDtor>
            <ctorDtor docPath="../../System.Net.Http/doc/class_HttpClient_83C2D3F4BD814B26EED122D5467B7A58D6B02DCB.html#constructor_HttpClient_6AAAE236B0C1C39A6F57B0CCCFEE2068B70973D4" extPath="System.Net.Http/doc/class_HttpClient_83C2D3F4BD814B26EED122D5467B7A58D6B02DCB.html#constructor_HttpClient_6AAAE236B0C1C39A6F57B0CCCFEE2068B70973D4" fileName="System.Net.Http/HttpClient.cm" filePath="../../System.Net.Http/file/HttpClient.cm.html" id="constructor_HttpClient_6AAAE236B0C1C39A6F57B0CCCFEE2068B70973D4" kind="Constructor" line="23" name="HttpClient" specifiers="public">
             <parameters>
-             <parameter id="parameter_baseAddress__79DC1E4BD82BE7ABEAC89C401EBA754112526A96" name="baseAddress_" type="e877b192-2c0b-4c65-b230-e109d122799c"/>
+             <parameter id="parameter_baseAddress__79DC1E4BD82BE7ABEAC89C401EBA754112526A96" name="baseAddress_" type="7fb21fde-bde2-4447-9ae4-711459ea84db"/>
              <parameter id="parameter_log__611A712890A68AD2185782C3476DD537AC7E8FEE" name="log_" type="a4208e1a-e54e-4d84-87ec-6c967691355d"/>
             </parameters>
            </ctorDtor>
           </ctorsDtors>
           <functions>
-           <function const="true" docPath="../../System.Net.Http/doc/class_HttpClient_83C2D3F4BD814B26EED122D5467B7A58D6B02DCB.html#member_function_BaseAddress_HttpClient_400A71958235546DC0040C5D06C83E6E0197E309" extPath="System.Net.Http/doc/class_HttpClient_83C2D3F4BD814B26EED122D5467B7A58D6B02DCB.html#member_function_BaseAddress_HttpClient_400A71958235546DC0040C5D06C83E6E0197E309" fileName="System.Net.Http/HttpClient.cm" filePath="../../System.Net.Http/file/HttpClient.cm.html" id="member_function_BaseAddress_HttpClient_400A71958235546DC0040C5D06C83E6E0197E309" kind="Member Function" line="102" name="BaseAddress" returnType="e877b192-2c0b-4c65-b230-e109d122799c" specifiers="public inline nothrow"/>
+           <function const="true" docPath="../../System.Net.Http/doc/class_HttpClient_83C2D3F4BD814B26EED122D5467B7A58D6B02DCB.html#member_function_BaseAddress_HttpClient_400A71958235546DC0040C5D06C83E6E0197E309" extPath="System.Net.Http/doc/class_HttpClient_83C2D3F4BD814B26EED122D5467B7A58D6B02DCB.html#member_function_BaseAddress_HttpClient_400A71958235546DC0040C5D06C83E6E0197E309" fileName="System.Net.Http/HttpClient.cm" filePath="../../System.Net.Http/file/HttpClient.cm.html" id="member_function_BaseAddress_HttpClient_400A71958235546DC0040C5D06C83E6E0197E309" kind="Member Function" line="102" name="BaseAddress" returnType="7fb21fde-bde2-4447-9ae4-711459ea84db" specifiers="public inline nothrow"/>
            <function docPath="../../System.Net.Http/doc/class_HttpClient_83C2D3F4BD814B26EED122D5467B7A58D6B02DCB.html#member_function_Connect_HttpClient_892820DAF499C547B275FB2A63C1C418D683FEA6" extPath="System.Net.Http/doc/class_HttpClient_83C2D3F4BD814B26EED122D5467B7A58D6B02DCB.html#member_function_Connect_HttpClient_892820DAF499C547B275FB2A63C1C418D683FEA6" fileName="System.Net.Http/HttpClient.cm" filePath="../../System.Net.Http/file/HttpClient.cm.html" id="member_function_Connect_HttpClient_892820DAF499C547B275FB2A63C1C418D683FEA6" kind="Member Function" line="27" name="Connect" returnType="4e959632-b5f2-406d-9402-ec16ab3f3585" specifiers="public"/>
            <function docPath="../../System.Net.Http/doc/class_HttpClient_83C2D3F4BD814B26EED122D5467B7A58D6B02DCB.html#member_function_Connect_HttpClient_39A0AC404A0EC3375F49438D05ED6F2508C571C4" extPath="System.Net.Http/doc/class_HttpClient_83C2D3F4BD814B26EED122D5467B7A58D6B02DCB.html#member_function_Connect_HttpClient_39A0AC404A0EC3375F49438D05ED6F2508C571C4" fileName="System.Net.Http/HttpClient.cm" filePath="../../System.Net.Http/file/HttpClient.cm.html" id="member_function_Connect_HttpClient_39A0AC404A0EC3375F49438D05ED6F2508C571C4" kind="Member Function" line="31" name="Connect" returnType="4e959632-b5f2-406d-9402-ec16ab3f3585" specifiers="public">
             <parameters>
@@ -231,16 +231,16 @@
            </function>
            <function docPath="../../System.Net.Http/doc/class_HttpClient_83C2D3F4BD814B26EED122D5467B7A58D6B02DCB.html#member_function_Get_HttpClient_5140A71DED1318556FFFEEFC8E636F392E456857" extPath="System.Net.Http/doc/class_HttpClient_83C2D3F4BD814B26EED122D5467B7A58D6B02DCB.html#member_function_Get_HttpClient_5140A71DED1318556FFFEEFC8E636F392E456857" fileName="System.Net.Http/HttpClient.cm" filePath="../../System.Net.Http/file/HttpClient.cm.html" id="member_function_Get_HttpClient_5140A71DED1318556FFFEEFC8E636F392E456857" kind="Member Function" line="49" name="Get" returnType="class_HttpStatus_382B537F46BAA81EDF45E14475A2A84756ACAD9A" specifiers="public">
             <parameters>
-             <parameter id="parameter_uri_33F8685415371C3B7B072536EE2A2F260BB35A90" name="uri" type="e877b192-2c0b-4c65-b230-e109d122799c"/>
-             <parameter id="parameter_requestHeaders_450CC1A8169328A0AA4AEC52CA6D8A2C6C7C0A68" name="requestHeaders" type="59bee433-6bbc-4158-877e-026b9eb44b0c"/>
-             <parameter id="parameter_responseHeaders_17385ED6BE11CB866C10CB07E9A9B4AA79C7C9E9" name="responseHeaders" type="59bee433-6bbc-4158-877e-026b9eb44b0c"/>
+             <parameter id="parameter_uri_33F8685415371C3B7B072536EE2A2F260BB35A90" name="uri" type="7fb21fde-bde2-4447-9ae4-711459ea84db"/>
+             <parameter id="parameter_requestHeaders_450CC1A8169328A0AA4AEC52CA6D8A2C6C7C0A68" name="requestHeaders" type="6b1e2082-1e68-4d17-a38f-ca633a6dbe98"/>
+             <parameter id="parameter_responseHeaders_17385ED6BE11CB866C10CB07E9A9B4AA79C7C9E9" name="responseHeaders" type="6b1e2082-1e68-4d17-a38f-ca633a6dbe98"/>
              <parameter id="parameter_body_33531AB4C79207ECAAA5D01FAD529E09A0E740D2" name="body" type="fe7fad66-c8fb-4b41-a3a3-536c58d504bb"/>
             </parameters>
            </function>
            <function docPath="../../System.Net.Http/doc/class_HttpClient_83C2D3F4BD814B26EED122D5467B7A58D6B02DCB.html#member_function_Get_HttpClient_948D7F7A7470C483791FE7C0788E7C3BE4608272" extPath="System.Net.Http/doc/class_HttpClient_83C2D3F4BD814B26EED122D5467B7A58D6B02DCB.html#member_function_Get_HttpClient_948D7F7A7470C483791FE7C0788E7C3BE4608272" fileName="System.Net.Http/HttpClient.cm" filePath="../../System.Net.Http/file/HttpClient.cm.html" id="member_function_Get_HttpClient_948D7F7A7470C483791FE7C0788E7C3BE4608272" kind="Member Function" line="44" name="Get" returnType="class_HttpStatus_382B537F46BAA81EDF45E14475A2A84756ACAD9A" specifiers="public">
             <parameters>
-             <parameter id="parameter_uri_48AD00DF068C06E7E095470863BABB207DDCABE6" name="uri" type="e877b192-2c0b-4c65-b230-e109d122799c"/>
-             <parameter id="parameter_responseHeaders_CE99AC666C9DEC8974CD6BF35593E720A74A9958" name="responseHeaders" type="59bee433-6bbc-4158-877e-026b9eb44b0c"/>
+             <parameter id="parameter_uri_48AD00DF068C06E7E095470863BABB207DDCABE6" name="uri" type="7fb21fde-bde2-4447-9ae4-711459ea84db"/>
+             <parameter id="parameter_responseHeaders_CE99AC666C9DEC8974CD6BF35593E720A74A9958" name="responseHeaders" type="6b1e2082-1e68-4d17-a38f-ca633a6dbe98"/>
              <parameter id="parameter_body_B405965F7857EB5E8588FE33FA502E149C587123" name="body" type="fe7fad66-c8fb-4b41-a3a3-536c58d504bb"/>
             </parameters>
            </function>
@@ -354,12 +354,12 @@
           <ctorsDtors>
            <ctorDtor docPath="../../System.Net.Http/doc/class_HttpException_09FCE3A5BC9FC383F4DA5AC6B226509EAD90AECE.html#constructor_HttpException_FAC92C818AD105079D06AD4B3C50F1346C4BD39B" extPath="System.Net.Http/doc/class_HttpException_09FCE3A5BC9FC383F4DA5AC6B226509EAD90AECE.html#constructor_HttpException_FAC92C818AD105079D06AD4B3C50F1346C4BD39B" fileName="System.Net.Http/HttpRequest.cm" filePath="../../System.Net.Http/file/HttpRequest.cm.html" id="constructor_HttpException_FAC92C818AD105079D06AD4B3C50F1346C4BD39B" kind="Constructor" line="14" name="HttpException" specifiers="public">
             <parameters>
-             <parameter id="parameter_httpStatus__E0748502F8D65195315A16A95EC4E5EA8B3FD139" name="httpStatus_" type="cf995ae2-5e79-4692-bcb0-f9ba0a3849d7"/>
+             <parameter id="parameter_httpStatus__E0748502F8D65195315A16A95EC4E5EA8B3FD139" name="httpStatus_" type="735dd2ec-1497-4159-aa53-246c4b88dee8"/>
             </parameters>
            </ctorDtor>
           </ctorsDtors>
           <functions>
-           <function const="true" docPath="../../System.Net.Http/doc/class_HttpException_09FCE3A5BC9FC383F4DA5AC6B226509EAD90AECE.html#member_function_Status_HttpException_BDA594565471FE4B298E13EC9DA58C264964F14C" extPath="System.Net.Http/doc/class_HttpException_09FCE3A5BC9FC383F4DA5AC6B226509EAD90AECE.html#member_function_Status_HttpException_BDA594565471FE4B298E13EC9DA58C264964F14C" fileName="System.Net.Http/HttpRequest.cm" filePath="../../System.Net.Http/file/HttpRequest.cm.html" id="member_function_Status_HttpException_BDA594565471FE4B298E13EC9DA58C264964F14C" kind="Member Function" line="17" name="Status" returnType="cf995ae2-5e79-4692-bcb0-f9ba0a3849d7" specifiers="public nothrow"/>
+           <function const="true" docPath="../../System.Net.Http/doc/class_HttpException_09FCE3A5BC9FC383F4DA5AC6B226509EAD90AECE.html#member_function_Status_HttpException_BDA594565471FE4B298E13EC9DA58C264964F14C" extPath="System.Net.Http/doc/class_HttpException_09FCE3A5BC9FC383F4DA5AC6B226509EAD90AECE.html#member_function_Status_HttpException_BDA594565471FE4B298E13EC9DA58C264964F14C" fileName="System.Net.Http/HttpRequest.cm" filePath="../../System.Net.Http/file/HttpRequest.cm.html" id="member_function_Status_HttpException_BDA594565471FE4B298E13EC9DA58C264964F14C" kind="Member Function" line="17" name="Status" returnType="735dd2ec-1497-4159-aa53-246c4b88dee8" specifiers="public nothrow"/>
           </functions>
           <variables>
            <variable docPath="../../System.Net.Http/doc/class_HttpException_09FCE3A5BC9FC383F4DA5AC6B226509EAD90AECE.html#variable_httpStatus_7027C77484F01203607161FC404B34EC6B63EDA9" extPath="System.Net.Http/doc/class_HttpException_09FCE3A5BC9FC383F4DA5AC6B226509EAD90AECE.html#variable_httpStatus_7027C77484F01203607161FC404B34EC6B63EDA9" id="variable_httpStatus_7027C77484F01203607161FC404B34EC6B63EDA9" name="httpStatus" specifiers="private" type="class_HttpStatus_382B537F46BAA81EDF45E14475A2A84756ACAD9A"/>
@@ -370,7 +370,7 @@
            <ctorDtor docPath="../../System.Net.Http/doc/class_HttpFieldValue_515D60AEFA3250DFA5795D2CB061BB0E4D1C048B.html#default_constructor_HttpFieldValue_C7B44AB8C7CF04E05251C46A321E1EDCDFD89B11" extPath="System.Net.Http/doc/class_HttpFieldValue_515D60AEFA3250DFA5795D2CB061BB0E4D1C048B.html#default_constructor_HttpFieldValue_C7B44AB8C7CF04E05251C46A321E1EDCDFD89B11" fileName="System.Net.Http/HttpRequest.cm" filePath="../../System.Net.Http/file/HttpRequest.cm.html" id="default_constructor_HttpFieldValue_C7B44AB8C7CF04E05251C46A321E1EDCDFD89B11" kind="Constructor" line="134" name="HttpFieldValue" specifiers="public"/>
            <ctorDtor docPath="../../System.Net.Http/doc/class_HttpFieldValue_515D60AEFA3250DFA5795D2CB061BB0E4D1C048B.html#copy_constructor_HttpFieldValue_0D3B8DC7B5819D5A6787E9B5969A0E377A4CF107" extPath="System.Net.Http/doc/class_HttpFieldValue_515D60AEFA3250DFA5795D2CB061BB0E4D1C048B.html#copy_constructor_HttpFieldValue_0D3B8DC7B5819D5A6787E9B5969A0E377A4CF107" fileName="System.Net.Http/HttpRequest.cm" filePath="../../System.Net.Http/file/HttpRequest.cm.html" id="copy_constructor_HttpFieldValue_0D3B8DC7B5819D5A6787E9B5969A0E377A4CF107" kind="Constructor" line="137" name="HttpFieldValue" specifiers="public default">
             <parameters>
-             <parameter id="parameter_@p0_6C6BED8A871C1D34D555DEFB6DD96066071C8E3F" name="" type="a7ee0306-ac94-4c13-a031-aa047f47fbfe"/>
+             <parameter id="parameter_@p0_6C6BED8A871C1D34D555DEFB6DD96066071C8E3F" name="" type="c95581fb-13b1-4280-aa6a-8b2c5217654c"/>
             </parameters>
            </ctorDtor>
            <ctorDtor docPath="../../System.Net.Http/doc/class_HttpFieldValue_515D60AEFA3250DFA5795D2CB061BB0E4D1C048B.html#constructor_HttpFieldValue_092550BDE9E79031A67474D03CF8FC844242F391" extPath="System.Net.Http/doc/class_HttpFieldValue_515D60AEFA3250DFA5795D2CB061BB0E4D1C048B.html#constructor_HttpFieldValue_092550BDE9E79031A67474D03CF8FC844242F391" fileName="System.Net.Http/HttpRequest.cm" filePath="../../System.Net.Http/file/HttpRequest.cm.html" id="constructor_HttpFieldValue_092550BDE9E79031A67474D03CF8FC844242F391" kind="Constructor" line="139" name="HttpFieldValue" specifiers="public">
@@ -400,13 +400,13 @@
            <function const="true" docPath="../../System.Net.Http/doc/class_HttpFieldValue_515D60AEFA3250DFA5795D2CB061BB0E4D1C048B.html#member_function_ToString_HttpFieldValue_1DAB0E585A09B1C34BD5AF84B1BB5D6B05368510" extPath="System.Net.Http/doc/class_HttpFieldValue_515D60AEFA3250DFA5795D2CB061BB0E4D1C048B.html#member_function_ToString_HttpFieldValue_1DAB0E585A09B1C34BD5AF84B1BB5D6B05368510" fileName="System.Net.Http/HttpRequest.cm" filePath="../../System.Net.Http/file/HttpRequest.cm.html" id="member_function_ToString_HttpFieldValue_1DAB0E585A09B1C34BD5AF84B1BB5D6B05368510" kind="Member Function" line="146" name="ToString" returnType="b6963d46-e09d-4bba-9c23-c6beb90db5a3" specifiers="public"/>
            <function docPath="../../System.Net.Http/doc/class_HttpFieldValue_515D60AEFA3250DFA5795D2CB061BB0E4D1C048B.html#copy_assignment_op_assign_HttpFieldValue_8C714A050D76A69C4388B6EFEAD6E33DD8829BAB" extPath="System.Net.Http/doc/class_HttpFieldValue_515D60AEFA3250DFA5795D2CB061BB0E4D1C048B.html#copy_assignment_op_assign_HttpFieldValue_8C714A050D76A69C4388B6EFEAD6E33DD8829BAB" fileName="System.Net.Http/HttpRequest.cm" filePath="../../System.Net.Http/file/HttpRequest.cm.html" id="copy_assignment_op_assign_HttpFieldValue_8C714A050D76A69C4388B6EFEAD6E33DD8829BAB" kind="Member Function" line="138" name="operator=" returnType="4e959632-b5f2-406d-9402-ec16ab3f3585" specifiers="public default">
             <parameters>
-             <parameter id="parameter_@p0_BA238333C0B77B4A64F7140123E3B352CE964BDF" name="" type="a7ee0306-ac94-4c13-a031-aa047f47fbfe"/>
+             <parameter id="parameter_@p0_BA238333C0B77B4A64F7140123E3B352CE964BDF" name="" type="c95581fb-13b1-4280-aa6a-8b2c5217654c"/>
             </parameters>
            </function>
           </functions>
           <variables>
            <variable docPath="../../System.Net.Http/doc/class_HttpFieldValue_515D60AEFA3250DFA5795D2CB061BB0E4D1C048B.html#variable_fieldValue_966BB2CB721424C3654F0D3B859C68B4FDDE16F4" extPath="System.Net.Http/doc/class_HttpFieldValue_515D60AEFA3250DFA5795D2CB061BB0E4D1C048B.html#variable_fieldValue_966BB2CB721424C3654F0D3B859C68B4FDDE16F4" id="variable_fieldValue_966BB2CB721424C3654F0D3B859C68B4FDDE16F4" name="fieldValue" specifiers="private" type="b6963d46-e09d-4bba-9c23-c6beb90db5a3"/>
-           <variable docPath="../../System.Net.Http/doc/class_HttpFieldValue_515D60AEFA3250DFA5795D2CB061BB0E4D1C048B.html#variable_parameters_8883246B14BC167B8CF2D2B24F8242C71E6297C2" extPath="System.Net.Http/doc/class_HttpFieldValue_515D60AEFA3250DFA5795D2CB061BB0E4D1C048B.html#variable_parameters_8883246B14BC167B8CF2D2B24F8242C71E6297C2" id="variable_parameters_8883246B14BC167B8CF2D2B24F8242C71E6297C2" name="parameters" specifiers="private" type="dd269ccf-c893-466f-8437-fb8c39c23f31"/>
+           <variable docPath="../../System.Net.Http/doc/class_HttpFieldValue_515D60AEFA3250DFA5795D2CB061BB0E4D1C048B.html#variable_parameters_8883246B14BC167B8CF2D2B24F8242C71E6297C2" extPath="System.Net.Http/doc/class_HttpFieldValue_515D60AEFA3250DFA5795D2CB061BB0E4D1C048B.html#variable_parameters_8883246B14BC167B8CF2D2B24F8242C71E6297C2" id="variable_parameters_8883246B14BC167B8CF2D2B24F8242C71E6297C2" name="parameters" specifiers="private" type="43a299a2-a2c2-4b0b-aa50-8e448716a097"/>
           </variables>
          </class>
          <class baseClass="class_Grammar_2180D00808E7A786B21C35D11B36E77EC171A6C6" docPath="../../System.Net.Http/doc/class_HttpFieldValueGrammar_2D1712560A490E63F8F7876D21852153EB66F71B.html" extPath="System.Net.Http/doc/class_HttpFieldValueGrammar_2D1712560A490E63F8F7876D21852153EB66F71B.html" fileName="System.Net.Http/HttpGrammar.cm" filePath="../../System.Net.Http/file/HttpGrammar.cm.html" id="class_HttpFieldValueGrammar_2D1712560A490E63F8F7876D21852153EB66F71B" line="3384" name="HttpFieldValueGrammar" specifiers="public">
@@ -418,7 +418,7 @@
                <ctorDtor docPath="../../System.Net.Http/doc/class_Context_CC30D02335DD7D46A25620EC5D754E01324FADF0.html#default_constructor_Context_E288F54D171BD0C7F3C1296866381303B32FAE09" extPath="System.Net.Http/doc/class_Context_CC30D02335DD7D46A25620EC5D754E01324FADF0.html#default_constructor_Context_E288F54D171BD0C7F3C1296866381303B32FAE09" fileName="System.Net.Http/HttpGrammar.cm" filePath="../../System.Net.Http/file/HttpGrammar.cm.html" id="default_constructor_Context_E288F54D171BD0C7F3C1296866381303B32FAE09" kind="Constructor" line="3461" name="Context" specifiers="public"/>
               </ctorsDtors>
               <variables>
-               <variable docPath="../../System.Net.Http/doc/class_Context_CC30D02335DD7D46A25620EC5D754E01324FADF0.html#variable_values_68771CD5FCF742180CBE7398575D51CEAA32A5C6" extPath="System.Net.Http/doc/class_Context_CC30D02335DD7D46A25620EC5D754E01324FADF0.html#variable_values_68771CD5FCF742180CBE7398575D51CEAA32A5C6" id="variable_values_68771CD5FCF742180CBE7398575D51CEAA32A5C6" name="values" specifiers="public" type="6f8d60c8-2b93-4464-9eaa-cc4abe4b5c31"/>
+               <variable docPath="../../System.Net.Http/doc/class_Context_CC30D02335DD7D46A25620EC5D754E01324FADF0.html#variable_values_68771CD5FCF742180CBE7398575D51CEAA32A5C6" extPath="System.Net.Http/doc/class_Context_CC30D02335DD7D46A25620EC5D754E01324FADF0.html#variable_values_68771CD5FCF742180CBE7398575D51CEAA32A5C6" id="variable_values_68771CD5FCF742180CBE7398575D51CEAA32A5C6" name="values" specifiers="public" type="47199777-4537-4204-b29d-5f0ee0c74ad0"/>
               </variables>
              </class>
             </classes>
@@ -473,7 +473,7 @@
              <parameter id="parameter_end_38A3F0B64526D3E97A9050B9344EF0AEE6E951B6" name="end" type="490a1d6c-c0be-4f48-a2eb-8e4101c8ad0d"/>
              <parameter id="parameter_fileIndex_0D7AF84ED7F3E6794DF467E5331F2C22A57E5764" name="fileIndex" type="cc8ffb50-cac1-4f7e-acae-8b3fb9621c37"/>
              <parameter id="parameter_fileName_80D1C95589D54040D426724A381CEF0B871C95F3" name="fileName" type="b14a2675-ade3-4740-b586-48284a4f720d"/>
-             <parameter id="parameter_values_A671713E5CD5E3238BD046FD8718F59DB011114B" name="values" type="6f8d60c8-2b93-4464-9eaa-cc4abe4b5c31"/>
+             <parameter id="parameter_values_A671713E5CD5E3238BD046FD8718F59DB011114B" name="values" type="47199777-4537-4204-b29d-5f0ee0c74ad0"/>
             </parameters>
            </function>
           </functions>
@@ -1219,7 +1219,7 @@
                <ctorDtor docPath="../../System.Net.Http/doc/class_Context_B1EE6649B800EECF8C972AF75E9AF5DB7F3644F0.html#default_constructor_Context_4922C2F7E6B9F90AE876E072189769BC091B33C6" extPath="System.Net.Http/doc/class_Context_B1EE6649B800EECF8C972AF75E9AF5DB7F3644F0.html#default_constructor_Context_4922C2F7E6B9F90AE876E072189769BC091B33C6" fileName="System.Net.Http/HttpGrammar.cm" filePath="../../System.Net.Http/file/HttpGrammar.cm.html" id="default_constructor_Context_4922C2F7E6B9F90AE876E072189769BC091B33C6" kind="Constructor" line="822" name="Context" specifiers="public"/>
               </ctorsDtors>
               <variables>
-               <variable docPath="../../System.Net.Http/doc/class_Context_B1EE6649B800EECF8C972AF75E9AF5DB7F3644F0.html#variable_adder_5EB3B10EB03AC9BFFF23B8071C279DDECC2AF94F" extPath="System.Net.Http/doc/class_Context_B1EE6649B800EECF8C972AF75E9AF5DB7F3644F0.html#variable_adder_5EB3B10EB03AC9BFFF23B8071C279DDECC2AF94F" id="variable_adder_5EB3B10EB03AC9BFFF23B8071C279DDECC2AF94F" name="adder" specifiers="public" type="26bf14f3-c858-433c-b92d-f9c69fd6f82f"/>
+               <variable docPath="../../System.Net.Http/doc/class_Context_B1EE6649B800EECF8C972AF75E9AF5DB7F3644F0.html#variable_adder_5EB3B10EB03AC9BFFF23B8071C279DDECC2AF94F" extPath="System.Net.Http/doc/class_Context_B1EE6649B800EECF8C972AF75E9AF5DB7F3644F0.html#variable_adder_5EB3B10EB03AC9BFFF23B8071C279DDECC2AF94F" id="variable_adder_5EB3B10EB03AC9BFFF23B8071C279DDECC2AF94F" name="adder" specifiers="public" type="a6150b7c-adbd-4430-8512-982b3c3e0467"/>
                <variable docPath="../../System.Net.Http/doc/class_Context_B1EE6649B800EECF8C972AF75E9AF5DB7F3644F0.html#variable_fromchunkExtName_D4E5A0FDD320F961C50439E46BAF7802532D1FEA" extPath="System.Net.Http/doc/class_Context_B1EE6649B800EECF8C972AF75E9AF5DB7F3644F0.html#variable_fromchunkExtName_D4E5A0FDD320F961C50439E46BAF7802532D1FEA" id="variable_fromchunkExtName_D4E5A0FDD320F961C50439E46BAF7802532D1FEA" name="fromchunkExtName" specifiers="public" type="b6963d46-e09d-4bba-9c23-c6beb90db5a3"/>
                <variable docPath="../../System.Net.Http/doc/class_Context_B1EE6649B800EECF8C972AF75E9AF5DB7F3644F0.html#variable_fromchunkExtVal_EF8AD60AE6D7F2817FE106FDA204942581145284" extPath="System.Net.Http/doc/class_Context_B1EE6649B800EECF8C972AF75E9AF5DB7F3644F0.html#variable_fromchunkExtVal_EF8AD60AE6D7F2817FE106FDA204942581145284" id="variable_fromchunkExtVal_EF8AD60AE6D7F2817FE106FDA204942581145284" name="fromchunkExtVal" specifiers="public" type="b6963d46-e09d-4bba-9c23-c6beb90db5a3"/>
               </variables>
@@ -1283,7 +1283,7 @@
                <ctorDtor docPath="../../System.Net.Http/doc/class_Context_C3E4165139DB2B73C939FB2D920290D6A2B987B9.html#default_constructor_Context_DDFC70005E57A65EDCE6CCEA0085A08514FBE15B" extPath="System.Net.Http/doc/class_Context_C3E4165139DB2B73C939FB2D920290D6A2B987B9.html#default_constructor_Context_DDFC70005E57A65EDCE6CCEA0085A08514FBE15B" fileName="System.Net.Http/HttpGrammar.cm" filePath="../../System.Net.Http/file/HttpGrammar.cm.html" id="default_constructor_Context_DDFC70005E57A65EDCE6CCEA0085A08514FBE15B" kind="Constructor" line="763" name="Context" specifiers="public"/>
               </ctorsDtors>
               <variables>
-               <variable docPath="../../System.Net.Http/doc/class_Context_C3E4165139DB2B73C939FB2D920290D6A2B987B9.html#variable_adder_34F0F04396CF50518D90198488596F686DE9224C" extPath="System.Net.Http/doc/class_Context_C3E4165139DB2B73C939FB2D920290D6A2B987B9.html#variable_adder_34F0F04396CF50518D90198488596F686DE9224C" id="variable_adder_34F0F04396CF50518D90198488596F686DE9224C" name="adder" specifiers="public" type="26bf14f3-c858-433c-b92d-f9c69fd6f82f"/>
+               <variable docPath="../../System.Net.Http/doc/class_Context_C3E4165139DB2B73C939FB2D920290D6A2B987B9.html#variable_adder_34F0F04396CF50518D90198488596F686DE9224C" extPath="System.Net.Http/doc/class_Context_C3E4165139DB2B73C939FB2D920290D6A2B987B9.html#variable_adder_34F0F04396CF50518D90198488596F686DE9224C" id="variable_adder_34F0F04396CF50518D90198488596F686DE9224C" name="adder" specifiers="public" type="a6150b7c-adbd-4430-8512-982b3c3e0467"/>
                <variable docPath="../../System.Net.Http/doc/class_Context_C3E4165139DB2B73C939FB2D920290D6A2B987B9.html#variable_chunkSize_0BB31D3D4A04F1BE96524A2D6B7DE0B35BAC6988" extPath="System.Net.Http/doc/class_Context_C3E4165139DB2B73C939FB2D920290D6A2B987B9.html#variable_chunkSize_0BB31D3D4A04F1BE96524A2D6B7DE0B35BAC6988" id="variable_chunkSize_0BB31D3D4A04F1BE96524A2D6B7DE0B35BAC6988" name="chunkSize" specifiers="public" type="2b90c215-2beb-476c-80bf-9205cf423699"/>
               </variables>
              </class>
@@ -1338,7 +1338,7 @@
                <ctorDtor docPath="../../System.Net.Http/doc/class_Context_2C2D6AA80FB0C2A381DAE35D9CF18E8BFD4BF066.html#default_constructor_Context_FD99696DC1225C86D2057AD160D3339D1735A0C5" extPath="System.Net.Http/doc/class_Context_2C2D6AA80FB0C2A381DAE35D9CF18E8BFD4BF066.html#default_constructor_Context_FD99696DC1225C86D2057AD160D3339D1735A0C5" fileName="System.Net.Http/HttpGrammar.cm" filePath="../../System.Net.Http/file/HttpGrammar.cm.html" id="default_constructor_Context_FD99696DC1225C86D2057AD160D3339D1735A0C5" kind="Constructor" line="593" name="Context" specifiers="public"/>
               </ctorsDtors>
               <variables>
-               <variable docPath="../../System.Net.Http/doc/class_Context_2C2D6AA80FB0C2A381DAE35D9CF18E8BFD4BF066.html#variable_values_E4AD8244F34883D6EA9BB745C2E638AC96CB658D" extPath="System.Net.Http/doc/class_Context_2C2D6AA80FB0C2A381DAE35D9CF18E8BFD4BF066.html#variable_values_E4AD8244F34883D6EA9BB745C2E638AC96CB658D" id="variable_values_E4AD8244F34883D6EA9BB745C2E638AC96CB658D" name="values" specifiers="public" type="6f8d60c8-2b93-4464-9eaa-cc4abe4b5c31"/>
+               <variable docPath="../../System.Net.Http/doc/class_Context_2C2D6AA80FB0C2A381DAE35D9CF18E8BFD4BF066.html#variable_values_E4AD8244F34883D6EA9BB745C2E638AC96CB658D" extPath="System.Net.Http/doc/class_Context_2C2D6AA80FB0C2A381DAE35D9CF18E8BFD4BF066.html#variable_values_E4AD8244F34883D6EA9BB745C2E638AC96CB658D" id="variable_values_E4AD8244F34883D6EA9BB745C2E638AC96CB658D" name="values" specifiers="public" type="47199777-4537-4204-b29d-5f0ee0c74ad0"/>
               </variables>
              </class>
             </classes>
@@ -1888,7 +1888,7 @@
               <variables>
                <variable docPath="../../System.Net.Http/doc/class_Context_8F3404E9709BAA4EBFCB2632461764938B133503.html#variable_fieldValue_F97EF02B8C5B3490249814843B40190C5D942B28" extPath="System.Net.Http/doc/class_Context_8F3404E9709BAA4EBFCB2632461764938B133503.html#variable_fieldValue_F97EF02B8C5B3490249814843B40190C5D942B28" id="variable_fieldValue_F97EF02B8C5B3490249814843B40190C5D942B28" name="fieldValue" specifiers="public" type="class_HttpFieldValue_515D60AEFA3250DFA5795D2CB061BB0E4D1C048B"/>
                <variable docPath="../../System.Net.Http/doc/class_Context_8F3404E9709BAA4EBFCB2632461764938B133503.html#variable_fromhttpToken_4329515F311F423AA5CF5C27621DBF02D13D1294" extPath="System.Net.Http/doc/class_Context_8F3404E9709BAA4EBFCB2632461764938B133503.html#variable_fromhttpToken_4329515F311F423AA5CF5C27621DBF02D13D1294" id="variable_fromhttpToken_4329515F311F423AA5CF5C27621DBF02D13D1294" name="fromhttpToken" specifiers="public" type="b6963d46-e09d-4bba-9c23-c6beb90db5a3"/>
-               <variable docPath="../../System.Net.Http/doc/class_Context_8F3404E9709BAA4EBFCB2632461764938B133503.html#variable_values_9F6A6B4AAEC38A670B6F4E8D571C2C836A54CF90" extPath="System.Net.Http/doc/class_Context_8F3404E9709BAA4EBFCB2632461764938B133503.html#variable_values_9F6A6B4AAEC38A670B6F4E8D571C2C836A54CF90" id="variable_values_9F6A6B4AAEC38A670B6F4E8D571C2C836A54CF90" name="values" specifiers="public" type="6f8d60c8-2b93-4464-9eaa-cc4abe4b5c31"/>
+               <variable docPath="../../System.Net.Http/doc/class_Context_8F3404E9709BAA4EBFCB2632461764938B133503.html#variable_values_9F6A6B4AAEC38A670B6F4E8D571C2C836A54CF90" extPath="System.Net.Http/doc/class_Context_8F3404E9709BAA4EBFCB2632461764938B133503.html#variable_values_9F6A6B4AAEC38A670B6F4E8D571C2C836A54CF90" id="variable_values_9F6A6B4AAEC38A670B6F4E8D571C2C836A54CF90" name="values" specifiers="public" type="47199777-4537-4204-b29d-5f0ee0c74ad0"/>
               </variables>
              </class>
             </classes>
@@ -1959,7 +1959,7 @@
                <ctorDtor docPath="../../System.Net.Http/doc/class_Context_6E35BF9CA6BBBCCF698244145F7BF841290658D6.html#default_constructor_Context_D599C73DC8D9D165F8DF3B5381BAA2726BF37728" extPath="System.Net.Http/doc/class_Context_6E35BF9CA6BBBCCF698244145F7BF841290658D6.html#default_constructor_Context_D599C73DC8D9D165F8DF3B5381BAA2726BF37728" fileName="System.Net.Http/HttpGrammar.cm" filePath="../../System.Net.Http/file/HttpGrammar.cm.html" id="default_constructor_Context_D599C73DC8D9D165F8DF3B5381BAA2726BF37728" kind="Constructor" line="715" name="Context" specifiers="public"/>
               </ctorsDtors>
               <variables>
-               <variable docPath="../../System.Net.Http/doc/class_Context_6E35BF9CA6BBBCCF698244145F7BF841290658D6.html#variable_fieldValue_557756ADF45360CE6A4456C0512AD32F0316FE3D" extPath="System.Net.Http/doc/class_Context_6E35BF9CA6BBBCCF698244145F7BF841290658D6.html#variable_fieldValue_557756ADF45360CE6A4456C0512AD32F0316FE3D" id="variable_fieldValue_557756ADF45360CE6A4456C0512AD32F0316FE3D" name="fieldValue" specifiers="public" type="c221892d-ce61-4444-9894-032ed38ac7ca"/>
+               <variable docPath="../../System.Net.Http/doc/class_Context_6E35BF9CA6BBBCCF698244145F7BF841290658D6.html#variable_fieldValue_557756ADF45360CE6A4456C0512AD32F0316FE3D" extPath="System.Net.Http/doc/class_Context_6E35BF9CA6BBBCCF698244145F7BF841290658D6.html#variable_fieldValue_557756ADF45360CE6A4456C0512AD32F0316FE3D" id="variable_fieldValue_557756ADF45360CE6A4456C0512AD32F0316FE3D" name="fieldValue" specifiers="public" type="8ff6e808-8cf1-4e92-8b62-ddd5bcafde63"/>
                <variable docPath="../../System.Net.Http/doc/class_Context_6E35BF9CA6BBBCCF698244145F7BF841290658D6.html#variable_fromattribute_A48CF8463840D24283F28C5D154E3CC266FDFC47" extPath="System.Net.Http/doc/class_Context_6E35BF9CA6BBBCCF698244145F7BF841290658D6.html#variable_fromattribute_A48CF8463840D24283F28C5D154E3CC266FDFC47" id="variable_fromattribute_A48CF8463840D24283F28C5D154E3CC266FDFC47" name="fromattribute" specifiers="public" type="b6963d46-e09d-4bba-9c23-c6beb90db5a3"/>
                <variable docPath="../../System.Net.Http/doc/class_Context_6E35BF9CA6BBBCCF698244145F7BF841290658D6.html#variable_fromattrval_2996FD065A752F3A40F1F517121C43338D376927" extPath="System.Net.Http/doc/class_Context_6E35BF9CA6BBBCCF698244145F7BF841290658D6.html#variable_fromattrval_2996FD065A752F3A40F1F517121C43338D376927" id="variable_fromattrval_2996FD065A752F3A40F1F517121C43338D376927" name="fromattrval" specifiers="public" type="b6963d46-e09d-4bba-9c23-c6beb90db5a3"/>
               </variables>
@@ -2286,7 +2286,7 @@
                <variable docPath="../../System.Net.Http/doc/class_Context_28A46A841B510E819A1C1EFE1A626C4BAD35822B.html#variable_fromparameter_4D69E99E23364AFB579F77F25035DA3EC45638E0" extPath="System.Net.Http/doc/class_Context_28A46A841B510E819A1C1EFE1A626C4BAD35822B.html#variable_fromparameter_4D69E99E23364AFB579F77F25035DA3EC45638E0" id="variable_fromparameter_4D69E99E23364AFB579F77F25035DA3EC45638E0" name="fromparameter" specifiers="public" type="07aa2071-5a52-4acb-91af-935a3528d327"/>
                <variable docPath="../../System.Net.Http/doc/class_Context_28A46A841B510E819A1C1EFE1A626C4BAD35822B.html#variable_fromsubtype_74DD647B5D90A311000455529B1CDE9ED97BAD2C" extPath="System.Net.Http/doc/class_Context_28A46A841B510E819A1C1EFE1A626C4BAD35822B.html#variable_fromsubtype_74DD647B5D90A311000455529B1CDE9ED97BAD2C" id="variable_fromsubtype_74DD647B5D90A311000455529B1CDE9ED97BAD2C" name="fromsubtype" specifiers="public" type="b6963d46-e09d-4bba-9c23-c6beb90db5a3"/>
                <variable docPath="../../System.Net.Http/doc/class_Context_28A46A841B510E819A1C1EFE1A626C4BAD35822B.html#variable_fromtype_D78FA6B3A5D15CD4E84975D6AC302C5E82501559" extPath="System.Net.Http/doc/class_Context_28A46A841B510E819A1C1EFE1A626C4BAD35822B.html#variable_fromtype_D78FA6B3A5D15CD4E84975D6AC302C5E82501559" id="variable_fromtype_D78FA6B3A5D15CD4E84975D6AC302C5E82501559" name="fromtype" specifiers="public" type="b6963d46-e09d-4bba-9c23-c6beb90db5a3"/>
-               <variable docPath="../../System.Net.Http/doc/class_Context_28A46A841B510E819A1C1EFE1A626C4BAD35822B.html#variable_mediaType_8B59B1D8AED433F34A2AB363F771C9BC6B0E7C36" extPath="System.Net.Http/doc/class_Context_28A46A841B510E819A1C1EFE1A626C4BAD35822B.html#variable_mediaType_8B59B1D8AED433F34A2AB363F771C9BC6B0E7C36" id="variable_mediaType_8B59B1D8AED433F34A2AB363F771C9BC6B0E7C36" name="mediaType" specifiers="public" type="6a32eee6-40d0-4533-b692-84a13d55fbe0"/>
+               <variable docPath="../../System.Net.Http/doc/class_Context_28A46A841B510E819A1C1EFE1A626C4BAD35822B.html#variable_mediaType_8B59B1D8AED433F34A2AB363F771C9BC6B0E7C36" extPath="System.Net.Http/doc/class_Context_28A46A841B510E819A1C1EFE1A626C4BAD35822B.html#variable_mediaType_8B59B1D8AED433F34A2AB363F771C9BC6B0E7C36" id="variable_mediaType_8B59B1D8AED433F34A2AB363F771C9BC6B0E7C36" name="mediaType" specifiers="public" type="269e04c8-43d6-419c-9e53-adb3fa7fc7fb"/>
               </variables>
              </class>
             </classes>
@@ -2992,7 +2992,7 @@
                <variable docPath="../../System.Net.Http/doc/class_Context_723046382F82B9C977BF78AD14060B0DD33E209D.html#variable_fromhttpVersion_9FFC604B9199056C56E06A281D88A5ACE0BB0195" extPath="System.Net.Http/doc/class_Context_723046382F82B9C977BF78AD14060B0DD33E209D.html#variable_fromhttpVersion_9FFC604B9199056C56E06A281D88A5ACE0BB0195" id="variable_fromhttpVersion_9FFC604B9199056C56E06A281D88A5ACE0BB0195" name="fromhttpVersion" specifiers="public" type="b6963d46-e09d-4bba-9c23-c6beb90db5a3"/>
                <variable docPath="../../System.Net.Http/doc/class_Context_723046382F82B9C977BF78AD14060B0DD33E209D.html#variable_fromreasonPhrase_557CCADAC54584828BBAA8CE8E4CE3B10FD8D8DE" extPath="System.Net.Http/doc/class_Context_723046382F82B9C977BF78AD14060B0DD33E209D.html#variable_fromreasonPhrase_557CCADAC54584828BBAA8CE8E4CE3B10FD8D8DE" id="variable_fromreasonPhrase_557CCADAC54584828BBAA8CE8E4CE3B10FD8D8DE" name="fromreasonPhrase" specifiers="public" type="b6963d46-e09d-4bba-9c23-c6beb90db5a3"/>
                <variable docPath="../../System.Net.Http/doc/class_Context_723046382F82B9C977BF78AD14060B0DD33E209D.html#variable_fromstatusCode_B3600D6B79DE1BCC89FD6221919EAC8944882987" extPath="System.Net.Http/doc/class_Context_723046382F82B9C977BF78AD14060B0DD33E209D.html#variable_fromstatusCode_B3600D6B79DE1BCC89FD6221919EAC8944882987" id="variable_fromstatusCode_B3600D6B79DE1BCC89FD6221919EAC8944882987" name="fromstatusCode" specifiers="public" type="951a7382-3f22-4eac-acf9-d2f620bfd96b"/>
-               <variable docPath="../../System.Net.Http/doc/class_Context_723046382F82B9C977BF78AD14060B0DD33E209D.html#variable_httpStatus_2795DF5A949D0B1B9C86A8A1C00852ABF2225F48" extPath="System.Net.Http/doc/class_Context_723046382F82B9C977BF78AD14060B0DD33E209D.html#variable_httpStatus_2795DF5A949D0B1B9C86A8A1C00852ABF2225F48" id="variable_httpStatus_2795DF5A949D0B1B9C86A8A1C00852ABF2225F48" name="httpStatus" specifiers="public" type="c5f2348c-7467-4c9a-9d58-ff090be82748"/>
+               <variable docPath="../../System.Net.Http/doc/class_Context_723046382F82B9C977BF78AD14060B0DD33E209D.html#variable_httpStatus_2795DF5A949D0B1B9C86A8A1C00852ABF2225F48" extPath="System.Net.Http/doc/class_Context_723046382F82B9C977BF78AD14060B0DD33E209D.html#variable_httpStatus_2795DF5A949D0B1B9C86A8A1C00852ABF2225F48" id="variable_httpStatus_2795DF5A949D0B1B9C86A8A1C00852ABF2225F48" name="httpStatus" specifiers="public" type="af8e3416-f934-4086-a215-bb3f030850b7"/>
               </variables>
              </class>
             </classes>
@@ -3256,7 +3256,7 @@
              <parameter id="parameter_end_1C4CF997C862BCF62531DE5168549A8B381AB4B6" name="end" type="490a1d6c-c0be-4f48-a2eb-8e4101c8ad0d"/>
              <parameter id="parameter_fileIndex_1E93DD549B06D5E7AAE8CB416CEE385E47D56565" name="fileIndex" type="cc8ffb50-cac1-4f7e-acae-8b3fb9621c37"/>
              <parameter id="parameter_fileName_333D428768EE7AB8B25277CC0220D4CA07A03DEA" name="fileName" type="b14a2675-ade3-4740-b586-48284a4f720d"/>
-             <parameter id="parameter_httpStatus_47B68426C27358C59E4BA95F631C2213D745BC4C" name="httpStatus" type="c5f2348c-7467-4c9a-9d58-ff090be82748"/>
+             <parameter id="parameter_httpStatus_47B68426C27358C59E4BA95F631C2213D745BC4C" name="httpStatus" type="af8e3416-f934-4086-a215-bb3f030850b7"/>
             </parameters>
            </function>
           </functions>
@@ -3271,19 +3271,19 @@
            <ctorDtor docPath="../../System.Net.Http/doc/class_HttpHeader_579B164F08791FA07CEFA19A0E2858BEAEA4F4B6.html#constructor_HttpHeader_1C7CC0C4DCA219CFA25528F2164872A011FA7288" extPath="System.Net.Http/doc/class_HttpHeader_579B164F08791FA07CEFA19A0E2858BEAEA4F4B6.html#constructor_HttpHeader_1C7CC0C4DCA219CFA25528F2164872A011FA7288" fileName="System.Net.Http/HttpRequest.cm" filePath="../../System.Net.Http/file/HttpRequest.cm.html" id="constructor_HttpHeader_1C7CC0C4DCA219CFA25528F2164872A011FA7288" kind="Constructor" line="193" name="HttpHeader" specifiers="public">
             <parameters>
              <parameter id="parameter_fieldName__B7F43DDD1CC74DEB77254FA7853235082EAF0558" name="fieldName_" type="0b2cb094-cc6d-4299-a074-5eb9b3aa8751"/>
-             <parameter id="parameter_fieldValue__FAC9474A2CEEB6046292445652B4B808DD32E74B" name="fieldValue_" type="c9b701dd-9fed-44ec-8f21-82dc1815f68b"/>
+             <parameter id="parameter_fieldValue__FAC9474A2CEEB6046292445652B4B808DD32E74B" name="fieldValue_" type="38d3c692-31f6-49b8-9aa6-33c8f1df26cf"/>
             </parameters>
            </ctorDtor>
            <ctorDtor docPath="../../System.Net.Http/doc/class_HttpHeader_579B164F08791FA07CEFA19A0E2858BEAEA4F4B6.html#constructor_HttpHeader_CDCB6162AE76A886EBA7AB176D0D1B8BDDA63526" extPath="System.Net.Http/doc/class_HttpHeader_579B164F08791FA07CEFA19A0E2858BEAEA4F4B6.html#constructor_HttpHeader_CDCB6162AE76A886EBA7AB176D0D1B8BDDA63526" fileName="System.Net.Http/HttpRequest.cm" filePath="../../System.Net.Http/file/HttpRequest.cm.html" id="constructor_HttpHeader_CDCB6162AE76A886EBA7AB176D0D1B8BDDA63526" kind="Constructor" line="198" name="HttpHeader" specifiers="public">
             <parameters>
              <parameter id="parameter_fieldName__D1456F28D92DD996327D2EDB34BE4FB5E61F5A03" name="fieldName_" type="0b2cb094-cc6d-4299-a074-5eb9b3aa8751"/>
-             <parameter id="parameter_fieldValueList__58600212D8BBD38807DC5EC60BE1B479DD73EA50" name="fieldValueList_" type="61f9854a-3f3b-4985-a20f-09032fc953ad"/>
+             <parameter id="parameter_fieldValueList__58600212D8BBD38807DC5EC60BE1B479DD73EA50" name="fieldValueList_" type="b6a59e3b-c14a-4279-8801-179963eba95e"/>
             </parameters>
            </ctorDtor>
            <ctorDtor docPath="../../System.Net.Http/doc/class_HttpHeader_579B164F08791FA07CEFA19A0E2858BEAEA4F4B6.html#constructor_HttpHeader_CF9E85C784B7488C84A72ACCE34EE74BDA524046" extPath="System.Net.Http/doc/class_HttpHeader_579B164F08791FA07CEFA19A0E2858BEAEA4F4B6.html#constructor_HttpHeader_CF9E85C784B7488C84A72ACCE34EE74BDA524046" fileName="System.Net.Http/HttpRequest.cm" filePath="../../System.Net.Http/file/HttpRequest.cm.html" id="constructor_HttpHeader_CF9E85C784B7488C84A72ACCE34EE74BDA524046" kind="Constructor" line="202" name="HttpHeader" specifiers="public">
             <parameters>
              <parameter id="parameter_fieldName__8FB130E92BBA4753E7F0D9413200659F967956D7" name="fieldName_" type="0b2cb094-cc6d-4299-a074-5eb9b3aa8751"/>
-             <parameter id="parameter_fieldValueList__C77057F9AD36EF0A17A2207DE31C2C8C205190C8" name="fieldValueList_" type="61f9854a-3f3b-4985-a20f-09032fc953ad"/>
+             <parameter id="parameter_fieldValueList__C77057F9AD36EF0A17A2207DE31C2C8C205190C8" name="fieldValueList_" type="b6a59e3b-c14a-4279-8801-179963eba95e"/>
              <parameter id="parameter_combineWithSpace__CB7A395FE11F2E8BECC6CDC94AE402A533DAC64C" name="combineWithSpace_" type="b53e2ae1-a4b4-4d5b-b75d-06778243ef3d"/>
             </parameters>
            </ctorDtor>
@@ -3298,42 +3298,42 @@
           <functions>
            <function docPath="../../System.Net.Http/doc/class_HttpHeader_579B164F08791FA07CEFA19A0E2858BEAEA4F4B6.html#member_function_AddFieldValue_HttpHeader_C23C5BE68C59933784AAFCEAC53D9A39480D9BD1" extPath="System.Net.Http/doc/class_HttpHeader_579B164F08791FA07CEFA19A0E2858BEAEA4F4B6.html#member_function_AddFieldValue_HttpHeader_C23C5BE68C59933784AAFCEAC53D9A39480D9BD1" fileName="System.Net.Http/HttpRequest.cm" filePath="../../System.Net.Http/file/HttpRequest.cm.html" id="member_function_AddFieldValue_HttpHeader_C23C5BE68C59933784AAFCEAC53D9A39480D9BD1" kind="Member Function" line="245" name="AddFieldValue" returnType="4e959632-b5f2-406d-9402-ec16ab3f3585" specifiers="public">
             <parameters>
-             <parameter id="parameter_fieldValue_0158F8D1E2712AE2F3ED1AD7B1F83959034272CA" name="fieldValue" type="a7ee0306-ac94-4c13-a031-aa047f47fbfe"/>
+             <parameter id="parameter_fieldValue_0158F8D1E2712AE2F3ED1AD7B1F83959034272CA" name="fieldValue" type="c95581fb-13b1-4280-aa6a-8b2c5217654c"/>
             </parameters>
            </function>
            <function const="true" docPath="../../System.Net.Http/doc/class_HttpHeader_579B164F08791FA07CEFA19A0E2858BEAEA4F4B6.html#member_function_CombinedFieldValue_HttpHeader_CD5F956FB77D05339E33027D5BE40A9735D89E0F" extPath="System.Net.Http/doc/class_HttpHeader_579B164F08791FA07CEFA19A0E2858BEAEA4F4B6.html#member_function_CombinedFieldValue_HttpHeader_CD5F956FB77D05339E33027D5BE40A9735D89E0F" fileName="System.Net.Http/HttpRequest.cm" filePath="../../System.Net.Http/file/HttpRequest.cm.html" id="member_function_CombinedFieldValue_HttpHeader_CD5F956FB77D05339E33027D5BE40A9735D89E0F" kind="Member Function" line="207" name="CombinedFieldValue" returnType="b6963d46-e09d-4bba-9c23-c6beb90db5a3" specifiers="public"/>
            <function const="true" docPath="../../System.Net.Http/doc/class_HttpHeader_579B164F08791FA07CEFA19A0E2858BEAEA4F4B6.html#member_function_FieldName_HttpHeader_C1FDF2C78A0C2C1D8C1187609661F2B5F109E263" extPath="System.Net.Http/doc/class_HttpHeader_579B164F08791FA07CEFA19A0E2858BEAEA4F4B6.html#member_function_FieldName_HttpHeader_C1FDF2C78A0C2C1D8C1187609661F2B5F109E263" fileName="System.Net.Http/HttpRequest.cm" filePath="../../System.Net.Http/file/HttpRequest.cm.html" id="member_function_FieldName_HttpHeader_C1FDF2C78A0C2C1D8C1187609661F2B5F109E263" kind="Member Function" line="236" name="FieldName" returnType="b6963d46-e09d-4bba-9c23-c6beb90db5a3" specifiers="public"/>
            <function docPath="../../System.Net.Http/doc/class_HttpHeader_579B164F08791FA07CEFA19A0E2858BEAEA4F4B6.html#member_function_SetCombineWithSpace_HttpHeader_4FF54F0E41F7ADFCE965166F98E5398B8C21CEB5" extPath="System.Net.Http/doc/class_HttpHeader_579B164F08791FA07CEFA19A0E2858BEAEA4F4B6.html#member_function_SetCombineWithSpace_HttpHeader_4FF54F0E41F7ADFCE965166F98E5398B8C21CEB5" fileName="System.Net.Http/HttpRequest.cm" filePath="../../System.Net.Http/file/HttpRequest.cm.html" id="member_function_SetCombineWithSpace_HttpHeader_4FF54F0E41F7ADFCE965166F98E5398B8C21CEB5" kind="Member Function" line="249" name="SetCombineWithSpace" returnType="4e959632-b5f2-406d-9402-ec16ab3f3585" specifiers="public"/>
-           <function const="true" docPath="../../System.Net.Http/doc/class_HttpHeader_579B164F08791FA07CEFA19A0E2858BEAEA4F4B6.html#member_function_SingleFieldValue_HttpHeader_C18501031157C1FDA1100A993AEFC79775677298" extPath="System.Net.Http/doc/class_HttpHeader_579B164F08791FA07CEFA19A0E2858BEAEA4F4B6.html#member_function_SingleFieldValue_HttpHeader_C18501031157C1FDA1100A993AEFC79775677298" fileName="System.Net.Http/HttpRequest.cm" filePath="../../System.Net.Http/file/HttpRequest.cm.html" id="member_function_SingleFieldValue_HttpHeader_C18501031157C1FDA1100A993AEFC79775677298" kind="Member Function" line="240" name="SingleFieldValue" returnType="a7ee0306-ac94-4c13-a031-aa047f47fbfe" specifiers="public inline nothrow"/>
+           <function const="true" docPath="../../System.Net.Http/doc/class_HttpHeader_579B164F08791FA07CEFA19A0E2858BEAEA4F4B6.html#member_function_SingleFieldValue_HttpHeader_C18501031157C1FDA1100A993AEFC79775677298" extPath="System.Net.Http/doc/class_HttpHeader_579B164F08791FA07CEFA19A0E2858BEAEA4F4B6.html#member_function_SingleFieldValue_HttpHeader_C18501031157C1FDA1100A993AEFC79775677298" fileName="System.Net.Http/HttpRequest.cm" filePath="../../System.Net.Http/file/HttpRequest.cm.html" id="member_function_SingleFieldValue_HttpHeader_C18501031157C1FDA1100A993AEFC79775677298" kind="Member Function" line="240" name="SingleFieldValue" returnType="c95581fb-13b1-4280-aa6a-8b2c5217654c" specifiers="public inline nothrow"/>
            <function const="true" docPath="../../System.Net.Http/doc/class_HttpHeader_579B164F08791FA07CEFA19A0E2858BEAEA4F4B6.html#member_function_ToString_HttpHeader_EB58F0E7728EB55563DBB11CBB610D68C164A50C" extPath="System.Net.Http/doc/class_HttpHeader_579B164F08791FA07CEFA19A0E2858BEAEA4F4B6.html#member_function_ToString_HttpHeader_EB58F0E7728EB55563DBB11CBB610D68C164A50C" fileName="System.Net.Http/HttpRequest.cm" filePath="../../System.Net.Http/file/HttpRequest.cm.html" id="member_function_ToString_HttpHeader_EB58F0E7728EB55563DBB11CBB610D68C164A50C" kind="Member Function" line="232" name="ToString" returnType="b6963d46-e09d-4bba-9c23-c6beb90db5a3" specifiers="public"/>
           </functions>
           <variables>
            <variable docPath="../../System.Net.Http/doc/class_HttpHeader_579B164F08791FA07CEFA19A0E2858BEAEA4F4B6.html#variable_combineWithSpace_6965CB523BFB4AA8062C9B1213F5E19DC2EBA010" extPath="System.Net.Http/doc/class_HttpHeader_579B164F08791FA07CEFA19A0E2858BEAEA4F4B6.html#variable_combineWithSpace_6965CB523BFB4AA8062C9B1213F5E19DC2EBA010" id="variable_combineWithSpace_6965CB523BFB4AA8062C9B1213F5E19DC2EBA010" name="combineWithSpace" specifiers="private" type="b53e2ae1-a4b4-4d5b-b75d-06778243ef3d"/>
            <variable docPath="../../System.Net.Http/doc/class_HttpHeader_579B164F08791FA07CEFA19A0E2858BEAEA4F4B6.html#variable_fieldName_CCE74789B757B9B87C56FA3C19579F2E4EC046EC" extPath="System.Net.Http/doc/class_HttpHeader_579B164F08791FA07CEFA19A0E2858BEAEA4F4B6.html#variable_fieldName_CCE74789B757B9B87C56FA3C19579F2E4EC046EC" id="variable_fieldName_CCE74789B757B9B87C56FA3C19579F2E4EC046EC" name="fieldName" specifiers="private" type="b6963d46-e09d-4bba-9c23-c6beb90db5a3"/>
-           <variable docPath="../../System.Net.Http/doc/class_HttpHeader_579B164F08791FA07CEFA19A0E2858BEAEA4F4B6.html#variable_fieldValueList_A1561B30D0FA7C4DCE2CEB792B8B4CE46409A8FB" extPath="System.Net.Http/doc/class_HttpHeader_579B164F08791FA07CEFA19A0E2858BEAEA4F4B6.html#variable_fieldValueList_A1561B30D0FA7C4DCE2CEB792B8B4CE46409A8FB" id="variable_fieldValueList_A1561B30D0FA7C4DCE2CEB792B8B4CE46409A8FB" name="fieldValueList" specifiers="private" type="a4bbf8f6-7862-4068-8152-7db3c244a095"/>
+           <variable docPath="../../System.Net.Http/doc/class_HttpHeader_579B164F08791FA07CEFA19A0E2858BEAEA4F4B6.html#variable_fieldValueList_A1561B30D0FA7C4DCE2CEB792B8B4CE46409A8FB" extPath="System.Net.Http/doc/class_HttpHeader_579B164F08791FA07CEFA19A0E2858BEAEA4F4B6.html#variable_fieldValueList_A1561B30D0FA7C4DCE2CEB792B8B4CE46409A8FB" id="variable_fieldValueList_A1561B30D0FA7C4DCE2CEB792B8B4CE46409A8FB" name="fieldValueList" specifiers="private" type="1565ccf7-2bc3-46d3-891f-e790b4782f9f"/>
           </variables>
          </class>
          <class docPath="../../System.Net.Http/doc/class_HttpHeaderCollection_3842C23118DB927F1943E7359BD822DBC5D282D8.html" extPath="System.Net.Http/doc/class_HttpHeaderCollection_3842C23118DB927F1943E7359BD822DBC5D282D8.html" fileName="System.Net.Http/HttpRequest.cm" filePath="../../System.Net.Http/file/HttpRequest.cm.html" id="class_HttpHeaderCollection_3842C23118DB927F1943E7359BD822DBC5D282D8" line="258" name="HttpHeaderCollection" specifiers="public">
           <functions>
            <function docPath="../../System.Net.Http/doc/class_HttpHeaderCollection_3842C23118DB927F1943E7359BD822DBC5D282D8.html#member_function_Add_HttpHeaderCollection_1B583941137F4FBC5F5420EA0BFCBD69FBB1427A" extPath="System.Net.Http/doc/class_HttpHeaderCollection_3842C23118DB927F1943E7359BD822DBC5D282D8.html#member_function_Add_HttpHeaderCollection_1B583941137F4FBC5F5420EA0BFCBD69FBB1427A" fileName="System.Net.Http/HttpRequest.cm" filePath="../../System.Net.Http/file/HttpRequest.cm.html" id="member_function_Add_HttpHeaderCollection_1B583941137F4FBC5F5420EA0BFCBD69FBB1427A" kind="Member Function" line="260" name="Add" returnType="4e959632-b5f2-406d-9402-ec16ab3f3585" specifiers="public">
             <parameters>
-             <parameter id="parameter_header_4636883A7C8B83F7B2521DCFEDB1161E0B659669" name="header" type="c506060b-86f7-4ee0-b179-be8b7114ce43"/>
+             <parameter id="parameter_header_4636883A7C8B83F7B2521DCFEDB1161E0B659669" name="header" type="73f9d300-20d4-4dbc-ae8a-ae5e5bc4275c"/>
             </parameters>
            </function>
            <function docPath="../../System.Net.Http/doc/class_HttpHeaderCollection_3842C23118DB927F1943E7359BD822DBC5D282D8.html#member_function_Clear_HttpHeaderCollection_A3F8810EEC8AEE4452C4D6E45FB389EE29419CC8" extPath="System.Net.Http/doc/class_HttpHeaderCollection_3842C23118DB927F1943E7359BD822DBC5D282D8.html#member_function_Clear_HttpHeaderCollection_A3F8810EEC8AEE4452C4D6E45FB389EE29419CC8" fileName="System.Net.Http/HttpRequest.cm" filePath="../../System.Net.Http/file/HttpRequest.cm.html" id="member_function_Clear_HttpHeaderCollection_A3F8810EEC8AEE4452C4D6E45FB389EE29419CC8" kind="Member Function" line="286" name="Clear" returnType="4e959632-b5f2-406d-9402-ec16ab3f3585" specifiers="public nothrow"/>
            <function const="true" docPath="../../System.Net.Http/doc/class_HttpHeaderCollection_3842C23118DB927F1943E7359BD822DBC5D282D8.html#member_function_GetContentLength_HttpHeaderCollection_5FD95661DB8E48C512FEDF0DA3E98376E59B3E11" extPath="System.Net.Http/doc/class_HttpHeaderCollection_3842C23118DB927F1943E7359BD822DBC5D282D8.html#member_function_GetContentLength_HttpHeaderCollection_5FD95661DB8E48C512FEDF0DA3E98376E59B3E11" fileName="System.Net.Http/HttpRequest.cm" filePath="../../System.Net.Http/file/HttpRequest.cm.html" id="member_function_GetContentLength_HttpHeaderCollection_5FD95661DB8E48C512FEDF0DA3E98376E59B3E11" kind="Member Function" line="291" name="GetContentLength" returnType="03a19a86-c637-4006-b3da-cd9bd6992357" specifiers="public"/>
            <function const="true" docPath="../../System.Net.Http/doc/class_HttpHeaderCollection_3842C23118DB927F1943E7359BD822DBC5D282D8.html#member_function_GetContentType_HttpHeaderCollection_E9ED25AE256048F1B3D71B9BEC8E05E30BB25CA4" extPath="System.Net.Http/doc/class_HttpHeaderCollection_3842C23118DB927F1943E7359BD822DBC5D282D8.html#member_function_GetContentType_HttpHeaderCollection_E9ED25AE256048F1B3D71B9BEC8E05E30BB25CA4" fileName="System.Net.Http/HttpRequest.cm" filePath="../../System.Net.Http/file/HttpRequest.cm.html" id="member_function_GetContentType_HttpHeaderCollection_E9ED25AE256048F1B3D71B9BEC8E05E30BB25CA4" kind="Member Function" line="304" name="GetContentType" returnType="class_MimeType_8D9E497183EDA2D56440FAB4472E32E2195C8D21" specifiers="public"/>
            <function const="true" docPath="../../System.Net.Http/doc/class_HttpHeaderCollection_3842C23118DB927F1943E7359BD822DBC5D282D8.html#member_function_GetDate_HttpHeaderCollection_39DC9BBBF2BDA8D32FD2F4D64DD1DC69F33DAC3D" extPath="System.Net.Http/doc/class_HttpHeaderCollection_3842C23118DB927F1943E7359BD822DBC5D282D8.html#member_function_GetDate_HttpHeaderCollection_39DC9BBBF2BDA8D32FD2F4D64DD1DC69F33DAC3D" fileName="System.Net.Http/HttpRequest.cm" filePath="../../System.Net.Http/file/HttpRequest.cm.html" id="member_function_GetDate_HttpHeaderCollection_39DC9BBBF2BDA8D32FD2F4D64DD1DC69F33DAC3D" kind="Member Function" line="315" name="GetDate" returnType="class_DateTime_1CCCF400289F734AAAB9BC0562E46C77468B398E" specifiers="public"/>
-           <function const="true" docPath="../../System.Net.Http/doc/class_HttpHeaderCollection_3842C23118DB927F1943E7359BD822DBC5D282D8.html#member_function_GetHeader_HttpHeaderCollection_4A3F5793CCE41825A2664F2D35BD43A171D56327" extPath="System.Net.Http/doc/class_HttpHeaderCollection_3842C23118DB927F1943E7359BD822DBC5D282D8.html#member_function_GetHeader_HttpHeaderCollection_4A3F5793CCE41825A2664F2D35BD43A171D56327" fileName="System.Net.Http/HttpRequest.cm" filePath="../../System.Net.Http/file/HttpRequest.cm.html" id="member_function_GetHeader_HttpHeaderCollection_4A3F5793CCE41825A2664F2D35BD43A171D56327" kind="Member Function" line="273" name="GetHeader" returnType="2e2f568b-d4f9-4987-ae6b-4c9ab827b443" specifiers="public">
+           <function const="true" docPath="../../System.Net.Http/doc/class_HttpHeaderCollection_3842C23118DB927F1943E7359BD822DBC5D282D8.html#member_function_GetHeader_HttpHeaderCollection_4A3F5793CCE41825A2664F2D35BD43A171D56327" extPath="System.Net.Http/doc/class_HttpHeaderCollection_3842C23118DB927F1943E7359BD822DBC5D282D8.html#member_function_GetHeader_HttpHeaderCollection_4A3F5793CCE41825A2664F2D35BD43A171D56327" fileName="System.Net.Http/HttpRequest.cm" filePath="../../System.Net.Http/file/HttpRequest.cm.html" id="member_function_GetHeader_HttpHeaderCollection_4A3F5793CCE41825A2664F2D35BD43A171D56327" kind="Member Function" line="273" name="GetHeader" returnType="3bd92629-68f2-4818-9a39-67e06303f63b" specifiers="public">
             <parameters>
              <parameter id="parameter_fieldName_FEA9ED8D47C46EAD2279E717A306FE367317BDE5" name="fieldName" type="0b2cb094-cc6d-4299-a074-5eb9b3aa8751"/>
             </parameters>
            </function>
-           <function const="true" docPath="../../System.Net.Http/doc/class_HttpHeaderCollection_3842C23118DB927F1943E7359BD822DBC5D282D8.html#member_function_Headers_HttpHeaderCollection_6B48B763BC89C8196946C5FCFC3EA05C36227A46" extPath="System.Net.Http/doc/class_HttpHeaderCollection_3842C23118DB927F1943E7359BD822DBC5D282D8.html#member_function_Headers_HttpHeaderCollection_6B48B763BC89C8196946C5FCFC3EA05C36227A46" fileName="System.Net.Http/HttpRequest.cm" filePath="../../System.Net.Http/file/HttpRequest.cm.html" id="member_function_Headers_HttpHeaderCollection_6B48B763BC89C8196946C5FCFC3EA05C36227A46" kind="Member Function" line="282" name="Headers" returnType="b259eab4-2839-4724-bf40-3dce42d2705e" specifiers="public inline nothrow"/>
+           <function const="true" docPath="../../System.Net.Http/doc/class_HttpHeaderCollection_3842C23118DB927F1943E7359BD822DBC5D282D8.html#member_function_Headers_HttpHeaderCollection_6B48B763BC89C8196946C5FCFC3EA05C36227A46" extPath="System.Net.Http/doc/class_HttpHeaderCollection_3842C23118DB927F1943E7359BD822DBC5D282D8.html#member_function_Headers_HttpHeaderCollection_6B48B763BC89C8196946C5FCFC3EA05C36227A46" fileName="System.Net.Http/HttpRequest.cm" filePath="../../System.Net.Http/file/HttpRequest.cm.html" id="member_function_Headers_HttpHeaderCollection_6B48B763BC89C8196946C5FCFC3EA05C36227A46" kind="Member Function" line="282" name="Headers" returnType="3bf8becf-b938-4a3e-ac77-c6310b34dc9f" specifiers="public inline nothrow"/>
           </functions>
           <variables>
-           <variable docPath="../../System.Net.Http/doc/class_HttpHeaderCollection_3842C23118DB927F1943E7359BD822DBC5D282D8.html#variable_headerMap_B117D280E653B42A00D1CB663227C2105B690A73" extPath="System.Net.Http/doc/class_HttpHeaderCollection_3842C23118DB927F1943E7359BD822DBC5D282D8.html#variable_headerMap_B117D280E653B42A00D1CB663227C2105B690A73" id="variable_headerMap_B117D280E653B42A00D1CB663227C2105B690A73" name="headerMap" specifiers="private" type="4ca459d3-9239-4084-9960-3c30cf9bf5cc"/>
-           <variable docPath="../../System.Net.Http/doc/class_HttpHeaderCollection_3842C23118DB927F1943E7359BD822DBC5D282D8.html#variable_headers_881A035B571C0C42888B33313042D52419B419AE" extPath="System.Net.Http/doc/class_HttpHeaderCollection_3842C23118DB927F1943E7359BD822DBC5D282D8.html#variable_headers_881A035B571C0C42888B33313042D52419B419AE" id="variable_headers_881A035B571C0C42888B33313042D52419B419AE" name="headers" specifiers="private" type="41bee9cb-3be7-4e45-9410-e760fe202b5b"/>
+           <variable docPath="../../System.Net.Http/doc/class_HttpHeaderCollection_3842C23118DB927F1943E7359BD822DBC5D282D8.html#variable_headerMap_B117D280E653B42A00D1CB663227C2105B690A73" extPath="System.Net.Http/doc/class_HttpHeaderCollection_3842C23118DB927F1943E7359BD822DBC5D282D8.html#variable_headerMap_B117D280E653B42A00D1CB663227C2105B690A73" id="variable_headerMap_B117D280E653B42A00D1CB663227C2105B690A73" name="headerMap" specifiers="private" type="d8fe86dc-8847-4098-bf96-3f5841e3a944"/>
+           <variable docPath="../../System.Net.Http/doc/class_HttpHeaderCollection_3842C23118DB927F1943E7359BD822DBC5D282D8.html#variable_headers_881A035B571C0C42888B33313042D52419B419AE" extPath="System.Net.Http/doc/class_HttpHeaderCollection_3842C23118DB927F1943E7359BD822DBC5D282D8.html#variable_headers_881A035B571C0C42888B33313042D52419B419AE" id="variable_headers_881A035B571C0C42888B33313042D52419B419AE" name="headers" specifiers="private" type="6b3a2e93-d79c-42d6-ad95-230307079bdb"/>
           </variables>
          </class>
          <class baseClass="class_Grammar_2180D00808E7A786B21C35D11B36E77EC171A6C6" docPath="../../System.Net.Http/doc/class_HttpHeaderGrammar_7521C89077BF342672401DAB964B619B3AACD902.html" extPath="System.Net.Http/doc/class_HttpHeaderGrammar_7521C89077BF342672401DAB964B619B3AACD902.html" fileName="System.Net.Http/HttpGrammar.cm" filePath="../../System.Net.Http/file/HttpGrammar.cm.html" id="class_HttpHeaderGrammar_7521C89077BF342672401DAB964B619B3AACD902" line="3596" name="HttpHeaderGrammar" specifiers="public">
@@ -3440,7 +3440,7 @@
                <ctorDtor docPath="../../System.Net.Http/doc/class_Context_D2613179E0A00E01DF558A99572C25CE6ED48244.html#default_constructor_Context_96F81ACE7DAEF2F965EEA9D56B9BF3CD1D23C0F2" extPath="System.Net.Http/doc/class_Context_D2613179E0A00E01DF558A99572C25CE6ED48244.html#default_constructor_Context_96F81ACE7DAEF2F965EEA9D56B9BF3CD1D23C0F2" fileName="System.Net.Http/HttpGrammar.cm" filePath="../../System.Net.Http/file/HttpGrammar.cm.html" id="default_constructor_Context_96F81ACE7DAEF2F965EEA9D56B9BF3CD1D23C0F2" kind="Constructor" line="3567" name="Context" specifiers="public"/>
               </ctorsDtors>
               <variables>
-               <variable docPath="../../System.Net.Http/doc/class_Context_D2613179E0A00E01DF558A99572C25CE6ED48244.html#variable_mediaType_07F65A9FC842E9BFF6418C2833D47D662B2525A8" extPath="System.Net.Http/doc/class_Context_D2613179E0A00E01DF558A99572C25CE6ED48244.html#variable_mediaType_07F65A9FC842E9BFF6418C2833D47D662B2525A8" id="variable_mediaType_07F65A9FC842E9BFF6418C2833D47D662B2525A8" name="mediaType" specifiers="public" type="6a32eee6-40d0-4533-b692-84a13d55fbe0"/>
+               <variable docPath="../../System.Net.Http/doc/class_Context_D2613179E0A00E01DF558A99572C25CE6ED48244.html#variable_mediaType_07F65A9FC842E9BFF6418C2833D47D662B2525A8" extPath="System.Net.Http/doc/class_Context_D2613179E0A00E01DF558A99572C25CE6ED48244.html#variable_mediaType_07F65A9FC842E9BFF6418C2833D47D662B2525A8" id="variable_mediaType_07F65A9FC842E9BFF6418C2833D47D662B2525A8" name="mediaType" specifiers="public" type="269e04c8-43d6-419c-9e53-adb3fa7fc7fb"/>
               </variables>
              </class>
             </classes>
@@ -3495,7 +3495,7 @@
              <parameter id="parameter_end_6B9A5E99FA9ED6E02E3FA5C5DC14524C92C57A33" name="end" type="490a1d6c-c0be-4f48-a2eb-8e4101c8ad0d"/>
              <parameter id="parameter_fileIndex_5C6EFDBF0B55FB000FC53FC262BD77F162B017BB" name="fileIndex" type="cc8ffb50-cac1-4f7e-acae-8b3fb9621c37"/>
              <parameter id="parameter_fileName_0C3F7CBFC66C6E9323D95C07ABB945C6B5640657" name="fileName" type="b14a2675-ade3-4740-b586-48284a4f720d"/>
-             <parameter id="parameter_mediaType_208E589B184E43F4C9820B9C462C023BF3406E64" name="mediaType" type="6a32eee6-40d0-4533-b692-84a13d55fbe0"/>
+             <parameter id="parameter_mediaType_208E589B184E43F4C9820B9C462C023BF3406E64" name="mediaType" type="269e04c8-43d6-419c-9e53-adb3fa7fc7fb"/>
             </parameters>
            </function>
           </functions>
@@ -3527,12 +3527,12 @@
            <ctorDtor docPath="../../System.Net.Http/doc/class_HttpParser_7F2D81A3B9537976EE0BC4AFF6401E5DB00ED4A4.html#default_constructor_HttpParser_1E7B43883D0E0958F18CE5C7040426964CD54A9D" extPath="System.Net.Http/doc/class_HttpParser_7F2D81A3B9537976EE0BC4AFF6401E5DB00ED4A4.html#default_constructor_HttpParser_1E7B43883D0E0958F18CE5C7040426964CD54A9D" fileName="System.Net.Http/HttpParser.cm" filePath="../../System.Net.Http/file/HttpParser.cm.html" id="default_constructor_HttpParser_1E7B43883D0E0958F18CE5C7040426964CD54A9D" kind="Constructor" line="50" name="HttpParser" specifiers="private"/>
           </ctorsDtors>
           <functions>
-           <function docPath="../../System.Net.Http/doc/class_HttpParser_7F2D81A3B9537976EE0BC4AFF6401E5DB00ED4A4.html#member_function_Instance_HttpParser_FA0F13B17CEF113F14CC70C4A7D684F0EDFF43C3" extPath="System.Net.Http/doc/class_HttpParser_7F2D81A3B9537976EE0BC4AFF6401E5DB00ED4A4.html#member_function_Instance_HttpParser_FA0F13B17CEF113F14CC70C4A7D684F0EDFF43C3" fileName="System.Net.Http/HttpParser.cm" filePath="../../System.Net.Http/file/HttpParser.cm.html" id="member_function_Instance_HttpParser_FA0F13B17CEF113F14CC70C4A7D684F0EDFF43C3" kind="Static Member Function" line="16" name="Instance" returnType="fb18a51d-304d-4bdc-8aba-1449ba63628c" specifiers="public static"/>
+           <function docPath="../../System.Net.Http/doc/class_HttpParser_7F2D81A3B9537976EE0BC4AFF6401E5DB00ED4A4.html#member_function_Instance_HttpParser_FA0F13B17CEF113F14CC70C4A7D684F0EDFF43C3" extPath="System.Net.Http/doc/class_HttpParser_7F2D81A3B9537976EE0BC4AFF6401E5DB00ED4A4.html#member_function_Instance_HttpParser_FA0F13B17CEF113F14CC70C4A7D684F0EDFF43C3" fileName="System.Net.Http/HttpParser.cm" filePath="../../System.Net.Http/file/HttpParser.cm.html" id="member_function_Instance_HttpParser_FA0F13B17CEF113F14CC70C4A7D684F0EDFF43C3" kind="Static Member Function" line="16" name="Instance" returnType="b06ba118-4740-41e0-9d97-553bd08c2af0" specifiers="public static"/>
            <function docPath="../../System.Net.Http/doc/class_HttpParser_7F2D81A3B9537976EE0BC4AFF6401E5DB00ED4A4.html#member_function_ParseChunkHeader_HttpParser_D00E934EE8F6305B21019F4E1057092665B47BFE" extPath="System.Net.Http/doc/class_HttpParser_7F2D81A3B9537976EE0BC4AFF6401E5DB00ED4A4.html#member_function_ParseChunkHeader_HttpParser_D00E934EE8F6305B21019F4E1057092665B47BFE" fileName="System.Net.Http/HttpParser.cm" filePath="../../System.Net.Http/file/HttpParser.cm.html" id="member_function_ParseChunkHeader_HttpParser_D00E934EE8F6305B21019F4E1057092665B47BFE" kind="Member Function" line="30" name="ParseChunkHeader" returnType="4e959632-b5f2-406d-9402-ec16ab3f3585" specifiers="public">
             <parameters>
              <parameter id="parameter_chunkHeader_C47D93A7BFED831829240ECB1A94BDEC6F8424D4" name="chunkHeader" type="0b2cb094-cc6d-4299-a074-5eb9b3aa8751"/>
              <parameter id="parameter_chunkSize_7153A8AC380C821E26DF527FFC91262D6D3CCE96" name="chunkSize" type="2b90c215-2beb-476c-80bf-9205cf423699"/>
-             <parameter id="parameter_adder_102AC0D98004EB0FC197F3584572B5387EF291BC" name="adder" type="26bf14f3-c858-433c-b92d-f9c69fd6f82f"/>
+             <parameter id="parameter_adder_102AC0D98004EB0FC197F3584572B5387EF291BC" name="adder" type="a6150b7c-adbd-4430-8512-982b3c3e0467"/>
             </parameters>
            </function>
            <function docPath="../../System.Net.Http/doc/class_HttpParser_7F2D81A3B9537976EE0BC4AFF6401E5DB00ED4A4.html#member_function_ParseDate_HttpParser_D301E4D769A1ED76D53DA8AB8325A3997F3F0EEA" extPath="System.Net.Http/doc/class_HttpParser_7F2D81A3B9537976EE0BC4AFF6401E5DB00ED4A4.html#member_function_ParseDate_HttpParser_D301E4D769A1ED76D53DA8AB8325A3997F3F0EEA" fileName="System.Net.Http/HttpParser.cm" filePath="../../System.Net.Http/file/HttpParser.cm.html" id="member_function_ParseDate_HttpParser_D301E4D769A1ED76D53DA8AB8325A3997F3F0EEA" kind="Member Function" line="44" name="ParseDate" returnType="class_DateTime_1CCCF400289F734AAAB9BC0562E46C77468B398E" specifiers="public">
@@ -3543,7 +3543,7 @@
            <function docPath="../../System.Net.Http/doc/class_HttpParser_7F2D81A3B9537976EE0BC4AFF6401E5DB00ED4A4.html#member_function_ParseFieldValue_HttpParser_900CD59E29CF0575105A4F951A4961AD0FF7670F" extPath="System.Net.Http/doc/class_HttpParser_7F2D81A3B9537976EE0BC4AFF6401E5DB00ED4A4.html#member_function_ParseFieldValue_HttpParser_900CD59E29CF0575105A4F951A4961AD0FF7670F" fileName="System.Net.Http/HttpParser.cm" filePath="../../System.Net.Http/file/HttpParser.cm.html" id="member_function_ParseFieldValue_HttpParser_900CD59E29CF0575105A4F951A4961AD0FF7670F" kind="Member Function" line="34" name="ParseFieldValue" returnType="4e959632-b5f2-406d-9402-ec16ab3f3585" specifiers="public">
             <parameters>
              <parameter id="parameter_fieldValue_441A8C77AF1F8087AC3FA9E71831C926F3AD5572" name="fieldValue" type="0b2cb094-cc6d-4299-a074-5eb9b3aa8751"/>
-             <parameter id="parameter_values_F976001383E37E3D20F22C75E2ED8B2E6E7D2FA9" name="values" type="6f8d60c8-2b93-4464-9eaa-cc4abe4b5c31"/>
+             <parameter id="parameter_values_F976001383E37E3D20F22C75E2ED8B2E6E7D2FA9" name="values" type="47199777-4537-4204-b29d-5f0ee0c74ad0"/>
             </parameters>
            </function>
            <function docPath="../../System.Net.Http/doc/class_HttpParser_7F2D81A3B9537976EE0BC4AFF6401E5DB00ED4A4.html#member_function_ParseHeader_HttpParser_B85FF461CA6D1BF2F249B03C8802F36E973BBB04" extPath="System.Net.Http/doc/class_HttpParser_7F2D81A3B9537976EE0BC4AFF6401E5DB00ED4A4.html#member_function_ParseHeader_HttpParser_B85FF461CA6D1BF2F249B03C8802F36E973BBB04" fileName="System.Net.Http/HttpParser.cm" filePath="../../System.Net.Http/file/HttpParser.cm.html" id="member_function_ParseHeader_HttpParser_B85FF461CA6D1BF2F249B03C8802F36E973BBB04" kind="Member Function" line="20" name="ParseHeader" returnType="class_HttpHeader_579B164F08791FA07CEFA19A0E2858BEAEA4F4B6" specifiers="public">
@@ -3563,14 +3563,14 @@
            </function>
           </functions>
           <variables>
-           <variable docPath="../../System.Net.Http/doc/class_HttpParser_7F2D81A3B9537976EE0BC4AFF6401E5DB00ED4A4.html#variable_chunkHeaderGrammar_AFA6C84EFC6CA13C8331357F92B04E95509B19E5" extPath="System.Net.Http/doc/class_HttpParser_7F2D81A3B9537976EE0BC4AFF6401E5DB00ED4A4.html#variable_chunkHeaderGrammar_AFA6C84EFC6CA13C8331357F92B04E95509B19E5" id="variable_chunkHeaderGrammar_AFA6C84EFC6CA13C8331357F92B04E95509B19E5" name="chunkHeaderGrammar" specifiers="private" type="b9f1e3ee-c9cf-4aba-8fed-029798a08296"/>
-           <variable docPath="../../System.Net.Http/doc/class_HttpParser_7F2D81A3B9537976EE0BC4AFF6401E5DB00ED4A4.html#variable_dateGrammar_45896D4C30CFBB3E07329C63E8FCEE710A5C4D99" extPath="System.Net.Http/doc/class_HttpParser_7F2D81A3B9537976EE0BC4AFF6401E5DB00ED4A4.html#variable_dateGrammar_45896D4C30CFBB3E07329C63E8FCEE710A5C4D99" id="variable_dateGrammar_45896D4C30CFBB3E07329C63E8FCEE710A5C4D99" name="dateGrammar" specifiers="private" type="0613d8f4-7979-404c-b665-cd32d0ce1977"/>
-           <variable docPath="../../System.Net.Http/doc/class_HttpParser_7F2D81A3B9537976EE0BC4AFF6401E5DB00ED4A4.html#variable_fieldValueGrammar_EC20545D8D73A6A1893D032CBB7AA25D544D7ABD" extPath="System.Net.Http/doc/class_HttpParser_7F2D81A3B9537976EE0BC4AFF6401E5DB00ED4A4.html#variable_fieldValueGrammar_EC20545D8D73A6A1893D032CBB7AA25D544D7ABD" id="variable_fieldValueGrammar_EC20545D8D73A6A1893D032CBB7AA25D544D7ABD" name="fieldValueGrammar" specifiers="private" type="fe7c34f5-b1a6-4f7d-97ca-c55994d5af4e"/>
-           <variable docPath="../../System.Net.Http/doc/class_HttpParser_7F2D81A3B9537976EE0BC4AFF6401E5DB00ED4A4.html#variable_headerGrammar_697FAF16D89C421FE8FD969D937B689C624BCCC7" extPath="System.Net.Http/doc/class_HttpParser_7F2D81A3B9537976EE0BC4AFF6401E5DB00ED4A4.html#variable_headerGrammar_697FAF16D89C421FE8FD969D937B689C624BCCC7" id="variable_headerGrammar_697FAF16D89C421FE8FD969D937B689C624BCCC7" name="headerGrammar" specifiers="private" type="7eebe62f-660e-446d-be18-a402780f5796"/>
-           <variable docPath="../../System.Net.Http/doc/class_HttpParser_7F2D81A3B9537976EE0BC4AFF6401E5DB00ED4A4.html#variable_httpGrammar_2895FCD62F7A50275F92E6201DFB6E6D980A67A5" extPath="System.Net.Http/doc/class_HttpParser_7F2D81A3B9537976EE0BC4AFF6401E5DB00ED4A4.html#variable_httpGrammar_2895FCD62F7A50275F92E6201DFB6E6D980A67A5" id="variable_httpGrammar_2895FCD62F7A50275F92E6201DFB6E6D980A67A5" name="httpGrammar" specifiers="private" type="df5f67ba-b375-4e9d-9fa4-b6d8a15303b1"/>
-           <variable docPath="../../System.Net.Http/doc/class_HttpParser_7F2D81A3B9537976EE0BC4AFF6401E5DB00ED4A4.html#variable_instance_176F9852E5DFE3CBAA1B4D2EE81297770DB2F659" extPath="System.Net.Http/doc/class_HttpParser_7F2D81A3B9537976EE0BC4AFF6401E5DB00ED4A4.html#variable_instance_176F9852E5DFE3CBAA1B4D2EE81297770DB2F659" id="variable_instance_176F9852E5DFE3CBAA1B4D2EE81297770DB2F659" name="instance" specifiers="private static" type="f514aadc-0438-46d0-a886-e233ae9e9518"/>
-           <variable docPath="../../System.Net.Http/doc/class_HttpParser_7F2D81A3B9537976EE0BC4AFF6401E5DB00ED4A4.html#variable_mediaTypeGrammar_9B037E3DCD6D8805F3F643C86459E3FDFEF15F4D" extPath="System.Net.Http/doc/class_HttpParser_7F2D81A3B9537976EE0BC4AFF6401E5DB00ED4A4.html#variable_mediaTypeGrammar_9B037E3DCD6D8805F3F643C86459E3FDFEF15F4D" id="variable_mediaTypeGrammar_9B037E3DCD6D8805F3F643C86459E3FDFEF15F4D" name="mediaTypeGrammar" specifiers="private" type="3f15841c-cc4e-4597-8cf7-085acb3a67d2"/>
-           <variable docPath="../../System.Net.Http/doc/class_HttpParser_7F2D81A3B9537976EE0BC4AFF6401E5DB00ED4A4.html#variable_statusLineGrammar_A881969B94E7F16F68D0423A272F8E7DBF1998FC" extPath="System.Net.Http/doc/class_HttpParser_7F2D81A3B9537976EE0BC4AFF6401E5DB00ED4A4.html#variable_statusLineGrammar_A881969B94E7F16F68D0423A272F8E7DBF1998FC" id="variable_statusLineGrammar_A881969B94E7F16F68D0423A272F8E7DBF1998FC" name="statusLineGrammar" specifiers="private" type="897c187e-e63e-41ae-a8b9-a64bcad48de6"/>
+           <variable docPath="../../System.Net.Http/doc/class_HttpParser_7F2D81A3B9537976EE0BC4AFF6401E5DB00ED4A4.html#variable_chunkHeaderGrammar_AFA6C84EFC6CA13C8331357F92B04E95509B19E5" extPath="System.Net.Http/doc/class_HttpParser_7F2D81A3B9537976EE0BC4AFF6401E5DB00ED4A4.html#variable_chunkHeaderGrammar_AFA6C84EFC6CA13C8331357F92B04E95509B19E5" id="variable_chunkHeaderGrammar_AFA6C84EFC6CA13C8331357F92B04E95509B19E5" name="chunkHeaderGrammar" specifiers="private" type="0eaaa676-a29d-49c5-8485-6d4ea6faaaad"/>
+           <variable docPath="../../System.Net.Http/doc/class_HttpParser_7F2D81A3B9537976EE0BC4AFF6401E5DB00ED4A4.html#variable_dateGrammar_45896D4C30CFBB3E07329C63E8FCEE710A5C4D99" extPath="System.Net.Http/doc/class_HttpParser_7F2D81A3B9537976EE0BC4AFF6401E5DB00ED4A4.html#variable_dateGrammar_45896D4C30CFBB3E07329C63E8FCEE710A5C4D99" id="variable_dateGrammar_45896D4C30CFBB3E07329C63E8FCEE710A5C4D99" name="dateGrammar" specifiers="private" type="bbc8d16e-83d1-4a08-bd8b-733030b4edb2"/>
+           <variable docPath="../../System.Net.Http/doc/class_HttpParser_7F2D81A3B9537976EE0BC4AFF6401E5DB00ED4A4.html#variable_fieldValueGrammar_EC20545D8D73A6A1893D032CBB7AA25D544D7ABD" extPath="System.Net.Http/doc/class_HttpParser_7F2D81A3B9537976EE0BC4AFF6401E5DB00ED4A4.html#variable_fieldValueGrammar_EC20545D8D73A6A1893D032CBB7AA25D544D7ABD" id="variable_fieldValueGrammar_EC20545D8D73A6A1893D032CBB7AA25D544D7ABD" name="fieldValueGrammar" specifiers="private" type="bfcd5136-ee54-4f95-83a3-aafc61b4a146"/>
+           <variable docPath="../../System.Net.Http/doc/class_HttpParser_7F2D81A3B9537976EE0BC4AFF6401E5DB00ED4A4.html#variable_headerGrammar_697FAF16D89C421FE8FD969D937B689C624BCCC7" extPath="System.Net.Http/doc/class_HttpParser_7F2D81A3B9537976EE0BC4AFF6401E5DB00ED4A4.html#variable_headerGrammar_697FAF16D89C421FE8FD969D937B689C624BCCC7" id="variable_headerGrammar_697FAF16D89C421FE8FD969D937B689C624BCCC7" name="headerGrammar" specifiers="private" type="23582f78-6298-4671-93f5-483f179a00bc"/>
+           <variable docPath="../../System.Net.Http/doc/class_HttpParser_7F2D81A3B9537976EE0BC4AFF6401E5DB00ED4A4.html#variable_httpGrammar_2895FCD62F7A50275F92E6201DFB6E6D980A67A5" extPath="System.Net.Http/doc/class_HttpParser_7F2D81A3B9537976EE0BC4AFF6401E5DB00ED4A4.html#variable_httpGrammar_2895FCD62F7A50275F92E6201DFB6E6D980A67A5" id="variable_httpGrammar_2895FCD62F7A50275F92E6201DFB6E6D980A67A5" name="httpGrammar" specifiers="private" type="a8c79d01-55f9-46a8-8bd2-18571ac37806"/>
+           <variable docPath="../../System.Net.Http/doc/class_HttpParser_7F2D81A3B9537976EE0BC4AFF6401E5DB00ED4A4.html#variable_instance_176F9852E5DFE3CBAA1B4D2EE81297770DB2F659" extPath="System.Net.Http/doc/class_HttpParser_7F2D81A3B9537976EE0BC4AFF6401E5DB00ED4A4.html#variable_instance_176F9852E5DFE3CBAA1B4D2EE81297770DB2F659" id="variable_instance_176F9852E5DFE3CBAA1B4D2EE81297770DB2F659" name="instance" specifiers="private static" type="4e6e958b-4cb7-4031-b4cc-e92cedec5825"/>
+           <variable docPath="../../System.Net.Http/doc/class_HttpParser_7F2D81A3B9537976EE0BC4AFF6401E5DB00ED4A4.html#variable_mediaTypeGrammar_9B037E3DCD6D8805F3F643C86459E3FDFEF15F4D" extPath="System.Net.Http/doc/class_HttpParser_7F2D81A3B9537976EE0BC4AFF6401E5DB00ED4A4.html#variable_mediaTypeGrammar_9B037E3DCD6D8805F3F643C86459E3FDFEF15F4D" id="variable_mediaTypeGrammar_9B037E3DCD6D8805F3F643C86459E3FDFEF15F4D" name="mediaTypeGrammar" specifiers="private" type="77ddc109-d518-4e22-b257-0426b777f57f"/>
+           <variable docPath="../../System.Net.Http/doc/class_HttpParser_7F2D81A3B9537976EE0BC4AFF6401E5DB00ED4A4.html#variable_statusLineGrammar_A881969B94E7F16F68D0423A272F8E7DBF1998FC" extPath="System.Net.Http/doc/class_HttpParser_7F2D81A3B9537976EE0BC4AFF6401E5DB00ED4A4.html#variable_statusLineGrammar_A881969B94E7F16F68D0423A272F8E7DBF1998FC" id="variable_statusLineGrammar_A881969B94E7F16F68D0423A272F8E7DBF1998FC" name="statusLineGrammar" specifiers="private" type="ed975657-0697-43f9-a4d7-fc8265d5c392"/>
           </variables>
          </class>
          <class baseClass="class_HttpMethod_E29E235BC7F31D0A5C161A2A9D99644468180A82" docPath="../../System.Net.Http/doc/class_HttpPostMethod_C06B5756900A892E9F18198124B4299C349DD660.html" extPath="System.Net.Http/doc/class_HttpPostMethod_C06B5756900A892E9F18198124B4299C349DD660.html" fileName="System.Net.Http/HttpRequest.cm" filePath="../../System.Net.Http/file/HttpRequest.cm.html" id="class_HttpPostMethod_C06B5756900A892E9F18198124B4299C349DD660" line="513" name="HttpPostMethod" specifiers="public">
@@ -3587,16 +3587,16 @@
           <ctorsDtors>
            <ctorDtor docPath="../../System.Net.Http/doc/class_HttpRequest_BAB60DC84D088F54A8521F123A4A208F09C81782.html#constructor_HttpRequest_CA46659B3DABABCAC3FF2179CC545E15A597B298" extPath="System.Net.Http/doc/class_HttpRequest_BAB60DC84D088F54A8521F123A4A208F09C81782.html#constructor_HttpRequest_CA46659B3DABABCAC3FF2179CC545E15A597B298" fileName="System.Net.Http/HttpRequest.cm" filePath="../../System.Net.Http/file/HttpRequest.cm.html" id="constructor_HttpRequest_CA46659B3DABABCAC3FF2179CC545E15A597B298" kind="Constructor" line="554" name="HttpRequest" specifiers="public">
             <parameters>
-             <parameter id="parameter_method__CA8A8102EC5FDCD97CBC9197F107B1693770C54E" name="method_" type="9431c37d-c959-406c-a1ae-d59a70f26067"/>
-             <parameter id="parameter_absoluteUri__A241C6BAA889ACBA6CD3230F328C5BEA26674E23" name="absoluteUri_" type="e877b192-2c0b-4c65-b230-e109d122799c"/>
-             <parameter id="parameter_httpVersion__77D530B4390C7A3196C47099375B1058F613F980" name="httpVersion_" type="bf36ff34-fc6d-4ce3-81a8-bb23dd3d46a7"/>
-             <parameter id="parameter_headers__54D4CDE82E46FDECEA90795CC63D8D670AC554A4" name="headers_" type="59bee433-6bbc-4158-877e-026b9eb44b0c"/>
+             <parameter id="parameter_method__CA8A8102EC5FDCD97CBC9197F107B1693770C54E" name="method_" type="4cea4a61-22ed-45cd-910c-de944d9d19b6"/>
+             <parameter id="parameter_absoluteUri__A241C6BAA889ACBA6CD3230F328C5BEA26674E23" name="absoluteUri_" type="7fb21fde-bde2-4447-9ae4-711459ea84db"/>
+             <parameter id="parameter_httpVersion__77D530B4390C7A3196C47099375B1058F613F980" name="httpVersion_" type="fb9cf469-ab2d-4c79-9071-4e0b51704669"/>
+             <parameter id="parameter_headers__54D4CDE82E46FDECEA90795CC63D8D670AC554A4" name="headers_" type="6b1e2082-1e68-4d17-a38f-ca633a6dbe98"/>
             </parameters>
            </ctorDtor>
            <ctorDtor docPath="../../System.Net.Http/doc/class_HttpRequest_BAB60DC84D088F54A8521F123A4A208F09C81782.html#constructor_HttpRequest_2DEB0426229BF9AD72A1598E890D4845BA2DB2D8" extPath="System.Net.Http/doc/class_HttpRequest_BAB60DC84D088F54A8521F123A4A208F09C81782.html#constructor_HttpRequest_2DEB0426229BF9AD72A1598E890D4845BA2DB2D8" fileName="System.Net.Http/HttpRequest.cm" filePath="../../System.Net.Http/file/HttpRequest.cm.html" id="constructor_HttpRequest_2DEB0426229BF9AD72A1598E890D4845BA2DB2D8" kind="Constructor" line="550" name="HttpRequest" specifiers="public">
             <parameters>
-             <parameter id="parameter_absoluteUri__0AB2351B10BF4219A2C5C5FCC254A20076CE02E7" name="absoluteUri_" type="e877b192-2c0b-4c65-b230-e109d122799c"/>
-             <parameter id="parameter_headers__3EA0783A74B27537CCD7B87BDFAED8F3CC7F829E" name="headers_" type="59bee433-6bbc-4158-877e-026b9eb44b0c"/>
+             <parameter id="parameter_absoluteUri__0AB2351B10BF4219A2C5C5FCC254A20076CE02E7" name="absoluteUri_" type="7fb21fde-bde2-4447-9ae4-711459ea84db"/>
+             <parameter id="parameter_headers__3EA0783A74B27537CCD7B87BDFAED8F3CC7F829E" name="headers_" type="6b1e2082-1e68-4d17-a38f-ca633a6dbe98"/>
             </parameters>
            </ctorDtor>
           </ctorsDtors>
@@ -3615,9 +3615,9 @@
           </functions>
           <variables>
            <variable docPath="../../System.Net.Http/doc/class_HttpRequest_BAB60DC84D088F54A8521F123A4A208F09C81782.html#variable_absoluteUri_8912060507F0D2E58461F21A0E1D7BDE4F749442" extPath="System.Net.Http/doc/class_HttpRequest_BAB60DC84D088F54A8521F123A4A208F09C81782.html#variable_absoluteUri_8912060507F0D2E58461F21A0E1D7BDE4F749442" id="variable_absoluteUri_8912060507F0D2E58461F21A0E1D7BDE4F749442" name="absoluteUri" specifiers="private" type="class_UriReference_6E4543DEBAEE63870C6B9BC9C602E2225A228B71"/>
-           <variable docPath="../../System.Net.Http/doc/class_HttpRequest_BAB60DC84D088F54A8521F123A4A208F09C81782.html#variable_headers_9D1FA2775F35988370929007F969139300E07304" extPath="System.Net.Http/doc/class_HttpRequest_BAB60DC84D088F54A8521F123A4A208F09C81782.html#variable_headers_9D1FA2775F35988370929007F969139300E07304" id="variable_headers_9D1FA2775F35988370929007F969139300E07304" name="headers" specifiers="private" type="59bee433-6bbc-4158-877e-026b9eb44b0c"/>
-           <variable docPath="../../System.Net.Http/doc/class_HttpRequest_BAB60DC84D088F54A8521F123A4A208F09C81782.html#variable_httpVersion_06E5BAEAEA0A6D6E750A7E0B4A367C88BAF9BD5B" extPath="System.Net.Http/doc/class_HttpRequest_BAB60DC84D088F54A8521F123A4A208F09C81782.html#variable_httpVersion_06E5BAEAEA0A6D6E750A7E0B4A367C88BAF9BD5B" id="variable_httpVersion_06E5BAEAEA0A6D6E750A7E0B4A367C88BAF9BD5B" name="httpVersion" specifiers="private" type="42a0545f-624c-4b5a-9cd7-c9d97beeca86"/>
-           <variable docPath="../../System.Net.Http/doc/class_HttpRequest_BAB60DC84D088F54A8521F123A4A208F09C81782.html#variable_method_021A627FBF05833D2A83C17BD717D075F1707DA0" extPath="System.Net.Http/doc/class_HttpRequest_BAB60DC84D088F54A8521F123A4A208F09C81782.html#variable_method_021A627FBF05833D2A83C17BD717D075F1707DA0" id="variable_method_021A627FBF05833D2A83C17BD717D075F1707DA0" name="method" specifiers="private" type="722bbe1c-eca9-4f9f-91a6-b6603b8e8823"/>
+           <variable docPath="../../System.Net.Http/doc/class_HttpRequest_BAB60DC84D088F54A8521F123A4A208F09C81782.html#variable_headers_9D1FA2775F35988370929007F969139300E07304" extPath="System.Net.Http/doc/class_HttpRequest_BAB60DC84D088F54A8521F123A4A208F09C81782.html#variable_headers_9D1FA2775F35988370929007F969139300E07304" id="variable_headers_9D1FA2775F35988370929007F969139300E07304" name="headers" specifiers="private" type="6b1e2082-1e68-4d17-a38f-ca633a6dbe98"/>
+           <variable docPath="../../System.Net.Http/doc/class_HttpRequest_BAB60DC84D088F54A8521F123A4A208F09C81782.html#variable_httpVersion_06E5BAEAEA0A6D6E750A7E0B4A367C88BAF9BD5B" extPath="System.Net.Http/doc/class_HttpRequest_BAB60DC84D088F54A8521F123A4A208F09C81782.html#variable_httpVersion_06E5BAEAEA0A6D6E750A7E0B4A367C88BAF9BD5B" id="variable_httpVersion_06E5BAEAEA0A6D6E750A7E0B4A367C88BAF9BD5B" name="httpVersion" specifiers="private" type="b1424032-1ef5-4495-96ac-67356895b310"/>
+           <variable docPath="../../System.Net.Http/doc/class_HttpRequest_BAB60DC84D088F54A8521F123A4A208F09C81782.html#variable_method_021A627FBF05833D2A83C17BD717D075F1707DA0" extPath="System.Net.Http/doc/class_HttpRequest_BAB60DC84D088F54A8521F123A4A208F09C81782.html#variable_method_021A627FBF05833D2A83C17BD717D075F1707DA0" id="variable_method_021A627FBF05833D2A83C17BD717D075F1707DA0" name="method" specifiers="private" type="f0daf03e-0b33-4506-8265-ad65e048c5b9"/>
           </variables>
          </class>
          <class docPath="../../System.Net.Http/doc/class_HttpStatus_382B537F46BAA81EDF45E14475A2A84756ACAD9A.html" extPath="System.Net.Http/doc/class_HttpStatus_382B537F46BAA81EDF45E14475A2A84756ACAD9A.html" fileName="System.Net.Http/HttpRequest.cm" filePath="../../System.Net.Http/file/HttpRequest.cm.html" id="class_HttpStatus_382B537F46BAA81EDF45E14475A2A84756ACAD9A" line="44" name="HttpStatus" specifiers="public">
@@ -3652,7 +3652,7 @@
                <ctorDtor docPath="../../System.Net.Http/doc/class_Context_3DC5CBEE279183505F35022C41CF8CD05B73D12E.html#default_constructor_Context_2E876C0D3DF3C99DF7532BEA0B61C9B6AE4CF065" extPath="System.Net.Http/doc/class_Context_3DC5CBEE279183505F35022C41CF8CD05B73D12E.html#default_constructor_Context_2E876C0D3DF3C99DF7532BEA0B61C9B6AE4CF065" fileName="System.Net.Http/HttpGrammar.cm" filePath="../../System.Net.Http/file/HttpGrammar.cm.html" id="default_constructor_Context_2E876C0D3DF3C99DF7532BEA0B61C9B6AE4CF065" kind="Constructor" line="300" name="Context" specifiers="public"/>
               </ctorsDtors>
               <variables>
-               <variable docPath="../../System.Net.Http/doc/class_Context_3DC5CBEE279183505F35022C41CF8CD05B73D12E.html#variable_httpStatus_6212850B3DA3A6A601ACE1332D60AD86886A70F3" extPath="System.Net.Http/doc/class_Context_3DC5CBEE279183505F35022C41CF8CD05B73D12E.html#variable_httpStatus_6212850B3DA3A6A601ACE1332D60AD86886A70F3" id="variable_httpStatus_6212850B3DA3A6A601ACE1332D60AD86886A70F3" name="httpStatus" specifiers="public" type="c5f2348c-7467-4c9a-9d58-ff090be82748"/>
+               <variable docPath="../../System.Net.Http/doc/class_Context_3DC5CBEE279183505F35022C41CF8CD05B73D12E.html#variable_httpStatus_6212850B3DA3A6A601ACE1332D60AD86886A70F3" extPath="System.Net.Http/doc/class_Context_3DC5CBEE279183505F35022C41CF8CD05B73D12E.html#variable_httpStatus_6212850B3DA3A6A601ACE1332D60AD86886A70F3" id="variable_httpStatus_6212850B3DA3A6A601ACE1332D60AD86886A70F3" name="httpStatus" specifiers="public" type="af8e3416-f934-4086-a215-bb3f030850b7"/>
               </variables>
              </class>
             </classes>
@@ -3707,7 +3707,7 @@
              <parameter id="parameter_end_8FEDFD1C513FCB3735D511BED8D450CD5E97F7AE" name="end" type="490a1d6c-c0be-4f48-a2eb-8e4101c8ad0d"/>
              <parameter id="parameter_fileIndex_D7A430B719805F129EF266FE31C86AA6967C9A09" name="fileIndex" type="cc8ffb50-cac1-4f7e-acae-8b3fb9621c37"/>
              <parameter id="parameter_fileName_8C6FE4D232750C339DB7DF44C09067BA94773E01" name="fileName" type="b14a2675-ade3-4740-b586-48284a4f720d"/>
-             <parameter id="parameter_httpStatus_DA3FC892D8E2B4936A7003D56A56976EDAFD8A6F" name="httpStatus" type="c5f2348c-7467-4c9a-9d58-ff090be82748"/>
+             <parameter id="parameter_httpStatus_DA3FC892D8E2B4936A7003D56A56976EDAFD8A6F" name="httpStatus" type="af8e3416-f934-4086-a215-bb3f030850b7"/>
             </parameters>
            </function>
           </functions>
@@ -3716,12 +3716,12 @@
           <ctorsDtors>
            <ctorDtor docPath="../../System.Net.Http/doc/class_HttpTEHeader_C3CB2E2A71A4025B323FEA4823D5FD897864F7A9.html#constructor_HttpTEHeader_115DE94AACFC89900919DCC0B995261E63EC05FD" extPath="System.Net.Http/doc/class_HttpTEHeader_C3CB2E2A71A4025B323FEA4823D5FD897864F7A9.html#constructor_HttpTEHeader_115DE94AACFC89900919DCC0B995261E63EC05FD" fileName="System.Net.Http/HttpRequest.cm" filePath="../../System.Net.Http/file/HttpRequest.cm.html" id="constructor_HttpTEHeader_115DE94AACFC89900919DCC0B995261E63EC05FD" kind="Constructor" line="461" name="HttpTEHeader" specifiers="public">
             <parameters>
-             <parameter id="parameter_transferCoding_0AD30D60C32E41810419F396D703A2D6B1588F6B" name="transferCoding" type="74bf7155-1278-474d-ac35-2e5e6a86e2e6"/>
+             <parameter id="parameter_transferCoding_0AD30D60C32E41810419F396D703A2D6B1588F6B" name="transferCoding" type="781ca9ff-1bc4-4a3e-a423-e8e50deedfb6"/>
             </parameters>
            </ctorDtor>
            <ctorDtor docPath="../../System.Net.Http/doc/class_HttpTEHeader_C3CB2E2A71A4025B323FEA4823D5FD897864F7A9.html#constructor_HttpTEHeader_8E6FB3AE7A3D17DF19D8F79D967DB3A59C9C6CED" extPath="System.Net.Http/doc/class_HttpTEHeader_C3CB2E2A71A4025B323FEA4823D5FD897864F7A9.html#constructor_HttpTEHeader_8E6FB3AE7A3D17DF19D8F79D967DB3A59C9C6CED" fileName="System.Net.Http/HttpRequest.cm" filePath="../../System.Net.Http/file/HttpRequest.cm.html" id="constructor_HttpTEHeader_8E6FB3AE7A3D17DF19D8F79D967DB3A59C9C6CED" kind="Constructor" line="464" name="HttpTEHeader" specifiers="public">
             <parameters>
-             <parameter id="parameter_transferCodings_20D51BF777A0472A2DB54F127F1E4C4CAC9600EB" name="transferCodings" type="cd28d2cd-e3aa-4f8d-af95-2a0f9726ab6b"/>
+             <parameter id="parameter_transferCodings_20D51BF777A0472A2DB54F127F1E4C4CAC9600EB" name="transferCodings" type="569b5378-7af3-438d-9766-d5b89c9835e1"/>
             </parameters>
            </ctorDtor>
           </ctorsDtors>
@@ -3782,17 +3782,17 @@
            <ctorDtor docPath="../../System.Net.Http/doc/class_MediaRange_497AEAA9A42DB3A472E3AE6FD9AC6BFF4B549DB9.html#default_constructor_MediaRange_1FE087485228596DC7EDA05FF7F1C1270BB304AC" extPath="System.Net.Http/doc/class_MediaRange_497AEAA9A42DB3A472E3AE6FD9AC6BFF4B549DB9.html#default_constructor_MediaRange_1FE087485228596DC7EDA05FF7F1C1270BB304AC" fileName="System.Net.Http/MediaType.cm" filePath="../../System.Net.Http/file/MediaType.cm.html" id="default_constructor_MediaRange_1FE087485228596DC7EDA05FF7F1C1270BB304AC" kind="Constructor" line="246" name="MediaRange" specifiers="public"/>
            <ctorDtor docPath="../../System.Net.Http/doc/class_MediaRange_497AEAA9A42DB3A472E3AE6FD9AC6BFF4B549DB9.html#constructor_MediaRange_5D710F80375F22E528C52895B76395A707616D7A" extPath="System.Net.Http/doc/class_MediaRange_497AEAA9A42DB3A472E3AE6FD9AC6BFF4B549DB9.html#constructor_MediaRange_5D710F80375F22E528C52895B76395A707616D7A" fileName="System.Net.Http/MediaType.cm" filePath="../../System.Net.Http/file/MediaType.cm.html" id="constructor_MediaRange_5D710F80375F22E528C52895B76395A707616D7A" kind="Constructor" line="249" name="MediaRange" specifiers="public">
             <parameters>
-             <parameter id="parameter_mimeType__CE72F0E78EABB29EF4EF3F21C7E61EBC779A7C84" name="mimeType_" type="fcf01e50-008f-4696-a761-2653bae5fa0a"/>
+             <parameter id="parameter_mimeType__CE72F0E78EABB29EF4EF3F21C7E61EBC779A7C84" name="mimeType_" type="7809b85f-0925-42c4-9fff-b5759af00e15"/>
             </parameters>
            </ctorDtor>
           </ctorsDtors>
           <functions>
-           <function docPath="../../System.Net.Http/doc/class_MediaRange_497AEAA9A42DB3A472E3AE6FD9AC6BFF4B549DB9.html#member_function_Params_MediaRange_60C94027DD660957BC9E918BBC24EEC2591EBAB8" extPath="System.Net.Http/doc/class_MediaRange_497AEAA9A42DB3A472E3AE6FD9AC6BFF4B549DB9.html#member_function_Params_MediaRange_60C94027DD660957BC9E918BBC24EEC2591EBAB8" fileName="System.Net.Http/MediaType.cm" filePath="../../System.Net.Http/file/MediaType.cm.html" id="member_function_Params_MediaRange_60C94027DD660957BC9E918BBC24EEC2591EBAB8" kind="Member Function" line="252" name="Params" returnType="bce959d7-e4ff-409f-8e03-a24760089807" specifiers="public"/>
+           <function docPath="../../System.Net.Http/doc/class_MediaRange_497AEAA9A42DB3A472E3AE6FD9AC6BFF4B549DB9.html#member_function_Params_MediaRange_60C94027DD660957BC9E918BBC24EEC2591EBAB8" extPath="System.Net.Http/doc/class_MediaRange_497AEAA9A42DB3A472E3AE6FD9AC6BFF4B549DB9.html#member_function_Params_MediaRange_60C94027DD660957BC9E918BBC24EEC2591EBAB8" fileName="System.Net.Http/MediaType.cm" filePath="../../System.Net.Http/file/MediaType.cm.html" id="member_function_Params_MediaRange_60C94027DD660957BC9E918BBC24EEC2591EBAB8" kind="Member Function" line="252" name="Params" returnType="555d4479-efec-4b1b-b3a0-80755a891762" specifiers="public"/>
            <function const="true" docPath="../../System.Net.Http/doc/class_MediaRange_497AEAA9A42DB3A472E3AE6FD9AC6BFF4B549DB9.html#member_function_ToHttpFieldValue_MediaRange_81970DF1BBAAEB622574C87A352347250046162C" extPath="System.Net.Http/doc/class_MediaRange_497AEAA9A42DB3A472E3AE6FD9AC6BFF4B549DB9.html#member_function_ToHttpFieldValue_MediaRange_81970DF1BBAAEB622574C87A352347250046162C" fileName="System.Net.Http/MediaType.cm" filePath="../../System.Net.Http/file/MediaType.cm.html" id="member_function_ToHttpFieldValue_MediaRange_81970DF1BBAAEB622574C87A352347250046162C" kind="Member Function" line="256" name="ToHttpFieldValue" returnType="class_HttpFieldValue_515D60AEFA3250DFA5795D2CB061BB0E4D1C048B" specifiers="public"/>
           </functions>
           <variables>
            <variable docPath="../../System.Net.Http/doc/class_MediaRange_497AEAA9A42DB3A472E3AE6FD9AC6BFF4B549DB9.html#variable_mimeType_DD43EE3193CB54F7ADAA68B4825070F39F3798C7" extPath="System.Net.Http/doc/class_MediaRange_497AEAA9A42DB3A472E3AE6FD9AC6BFF4B549DB9.html#variable_mimeType_DD43EE3193CB54F7ADAA68B4825070F39F3798C7" id="variable_mimeType_DD43EE3193CB54F7ADAA68B4825070F39F3798C7" name="mimeType" specifiers="private" type="class_MimeType_8D9E497183EDA2D56440FAB4472E32E2195C8D21"/>
-           <variable docPath="../../System.Net.Http/doc/class_MediaRange_497AEAA9A42DB3A472E3AE6FD9AC6BFF4B549DB9.html#variable_params_94B797BC645916967EADC459EFF488D280D37210" extPath="System.Net.Http/doc/class_MediaRange_497AEAA9A42DB3A472E3AE6FD9AC6BFF4B549DB9.html#variable_params_94B797BC645916967EADC459EFF488D280D37210" id="variable_params_94B797BC645916967EADC459EFF488D280D37210" name="params" specifiers="private" type="dd269ccf-c893-466f-8437-fb8c39c23f31"/>
+           <variable docPath="../../System.Net.Http/doc/class_MediaRange_497AEAA9A42DB3A472E3AE6FD9AC6BFF4B549DB9.html#variable_params_94B797BC645916967EADC459EFF488D280D37210" extPath="System.Net.Http/doc/class_MediaRange_497AEAA9A42DB3A472E3AE6FD9AC6BFF4B549DB9.html#variable_params_94B797BC645916967EADC459EFF488D280D37210" id="variable_params_94B797BC645916967EADC459EFF488D280D37210" name="params" specifiers="private" type="43a299a2-a2c2-4b0b-aa50-8e448716a097"/>
            <variable docPath="../../System.Net.Http/doc/class_MediaRange_497AEAA9A42DB3A472E3AE6FD9AC6BFF4B549DB9.html#variable_quality_6E8B4B85A62D6A090ABA4298CF9488199ABC6A25" extPath="System.Net.Http/doc/class_MediaRange_497AEAA9A42DB3A472E3AE6FD9AC6BFF4B549DB9.html#variable_quality_6E8B4B85A62D6A090ABA4298CF9488199ABC6A25" id="variable_quality_6E8B4B85A62D6A090ABA4298CF9488199ABC6A25" name="quality" specifiers="private" type="f097219a-e599-4e02-9b0f-06fbb362d40f"/>
           </variables>
          </class>
@@ -3828,25 +3828,25 @@
            <ctorDtor docPath="../../System.Net.Http/doc/class_MimeType_8D9E497183EDA2D56440FAB4472E32E2195C8D21.html#default_constructor_MimeType_1E99DAA01103BF834C1267E61E185C534D9EA2AC" extPath="System.Net.Http/doc/class_MimeType_8D9E497183EDA2D56440FAB4472E32E2195C8D21.html#default_constructor_MimeType_1E99DAA01103BF834C1267E61E185C534D9EA2AC" fileName="System.Net.Http/MediaType.cm" filePath="../../System.Net.Http/file/MediaType.cm.html" id="default_constructor_MimeType_1E99DAA01103BF834C1267E61E185C534D9EA2AC" kind="Constructor" line="179" name="MimeType" specifiers="public"/>
            <ctorDtor docPath="../../System.Net.Http/doc/class_MimeType_8D9E497183EDA2D56440FAB4472E32E2195C8D21.html#constructor_MimeType_2DF0ED8576B8269078D1E6BE95A67AFAE966F899" extPath="System.Net.Http/doc/class_MimeType_8D9E497183EDA2D56440FAB4472E32E2195C8D21.html#constructor_MimeType_2DF0ED8576B8269078D1E6BE95A67AFAE966F899" fileName="System.Net.Http/MediaType.cm" filePath="../../System.Net.Http/file/MediaType.cm.html" id="constructor_MimeType_2DF0ED8576B8269078D1E6BE95A67AFAE966F899" kind="Constructor" line="182" name="MimeType" specifiers="public">
             <parameters>
-             <parameter id="parameter_mediaType__ECE5108710BAAE1E938F33E7876A00C85D975CD8" name="mediaType_" type="3af0a38d-c5c4-43b9-ad66-074be8224a48"/>
+             <parameter id="parameter_mediaType__ECE5108710BAAE1E938F33E7876A00C85D975CD8" name="mediaType_" type="aea47d9c-f48d-4b2e-a0ec-7dc5aef33eaa"/>
             </parameters>
            </ctorDtor>
            <ctorDtor docPath="../../System.Net.Http/doc/class_MimeType_8D9E497183EDA2D56440FAB4472E32E2195C8D21.html#constructor_MimeType_14697649A8025C29F8577C3B3F66AC92B5BB9882" extPath="System.Net.Http/doc/class_MimeType_8D9E497183EDA2D56440FAB4472E32E2195C8D21.html#constructor_MimeType_14697649A8025C29F8577C3B3F66AC92B5BB9882" fileName="System.Net.Http/MediaType.cm" filePath="../../System.Net.Http/file/MediaType.cm.html" id="constructor_MimeType_14697649A8025C29F8577C3B3F66AC92B5BB9882" kind="Constructor" line="185" name="MimeType" specifiers="public">
             <parameters>
-             <parameter id="parameter_mediaType__C570F45FDA1C89C78C5A3D36106BD7C13F1F48F7" name="mediaType_" type="3af0a38d-c5c4-43b9-ad66-074be8224a48"/>
-             <parameter id="parameter_subtype__15EB30187B73C7068D568C09BFF9BB33AB076DEB" name="subtype_" type="3bbc663a-700f-48a1-bcd7-96f91f46a1f9"/>
+             <parameter id="parameter_mediaType__C570F45FDA1C89C78C5A3D36106BD7C13F1F48F7" name="mediaType_" type="aea47d9c-f48d-4b2e-a0ec-7dc5aef33eaa"/>
+             <parameter id="parameter_subtype__15EB30187B73C7068D568C09BFF9BB33AB076DEB" name="subtype_" type="49d29426-6449-4366-abe5-d6e278fc5692"/>
             </parameters>
            </ctorDtor>
           </ctorsDtors>
           <functions>
-           <function const="true" docPath="../../System.Net.Http/doc/class_MimeType_8D9E497183EDA2D56440FAB4472E32E2195C8D21.html#member_function_GetMediaType_MimeType_5F8B4FB1DB81680AF7F1801BAB501DF6EF877951" extPath="System.Net.Http/doc/class_MimeType_8D9E497183EDA2D56440FAB4472E32E2195C8D21.html#member_function_GetMediaType_MimeType_5F8B4FB1DB81680AF7F1801BAB501DF6EF877951" fileName="System.Net.Http/MediaType.cm" filePath="../../System.Net.Http/file/MediaType.cm.html" id="member_function_GetMediaType_MimeType_5F8B4FB1DB81680AF7F1801BAB501DF6EF877951" kind="Member Function" line="188" name="GetMediaType" returnType="41fa45d5-b4b1-4208-8407-05a1cbcc9e66" specifiers="public inline nothrow"/>
+           <function const="true" docPath="../../System.Net.Http/doc/class_MimeType_8D9E497183EDA2D56440FAB4472E32E2195C8D21.html#member_function_GetMediaType_MimeType_5F8B4FB1DB81680AF7F1801BAB501DF6EF877951" extPath="System.Net.Http/doc/class_MimeType_8D9E497183EDA2D56440FAB4472E32E2195C8D21.html#member_function_GetMediaType_MimeType_5F8B4FB1DB81680AF7F1801BAB501DF6EF877951" fileName="System.Net.Http/MediaType.cm" filePath="../../System.Net.Http/file/MediaType.cm.html" id="member_function_GetMediaType_MimeType_5F8B4FB1DB81680AF7F1801BAB501DF6EF877951" kind="Member Function" line="188" name="GetMediaType" returnType="bfb0227b-7c16-4db6-a684-600103add677" specifiers="public inline nothrow"/>
            <function const="true" docPath="../../System.Net.Http/doc/class_MimeType_8D9E497183EDA2D56440FAB4472E32E2195C8D21.html#member_function_GetParameter_MimeType_7CF84659ADDC71836F03E8AF4FB25272478E1152" extPath="System.Net.Http/doc/class_MimeType_8D9E497183EDA2D56440FAB4472E32E2195C8D21.html#member_function_GetParameter_MimeType_7CF84659ADDC71836F03E8AF4FB25272478E1152" fileName="System.Net.Http/MediaType.cm" filePath="../../System.Net.Http/file/MediaType.cm.html" id="member_function_GetParameter_MimeType_7CF84659ADDC71836F03E8AF4FB25272478E1152" kind="Member Function" line="205" name="GetParameter" returnType="b6963d46-e09d-4bba-9c23-c6beb90db5a3" specifiers="public">
             <parameters>
              <parameter id="parameter_paramName_B895E7B6BFAA8DF867F2EBF650444C014352E820" name="paramName" type="0b2cb094-cc6d-4299-a074-5eb9b3aa8751"/>
             </parameters>
            </function>
-           <function const="true" docPath="../../System.Net.Http/doc/class_MimeType_8D9E497183EDA2D56440FAB4472E32E2195C8D21.html#member_function_GetSubtype_MimeType_1CDE548189B66A039F7FFD2865C38012B56226E3" extPath="System.Net.Http/doc/class_MimeType_8D9E497183EDA2D56440FAB4472E32E2195C8D21.html#member_function_GetSubtype_MimeType_1CDE548189B66A039F7FFD2865C38012B56226E3" fileName="System.Net.Http/MediaType.cm" filePath="../../System.Net.Http/file/MediaType.cm.html" id="member_function_GetSubtype_MimeType_1CDE548189B66A039F7FFD2865C38012B56226E3" kind="Member Function" line="192" name="GetSubtype" returnType="ac6dc1f9-fd2d-4cc8-a48e-9f52bc979836" specifiers="public inline nothrow"/>
-           <function const="true" docPath="../../System.Net.Http/doc/class_MimeType_8D9E497183EDA2D56440FAB4472E32E2195C8D21.html#member_function_Parameters_MimeType_2149552FCA345731420065A65356C348C4EB281E" extPath="System.Net.Http/doc/class_MimeType_8D9E497183EDA2D56440FAB4472E32E2195C8D21.html#member_function_Parameters_MimeType_2149552FCA345731420065A65356C348C4EB281E" fileName="System.Net.Http/MediaType.cm" filePath="../../System.Net.Http/file/MediaType.cm.html" id="member_function_Parameters_MimeType_2149552FCA345731420065A65356C348C4EB281E" kind="Member Function" line="201" name="Parameters" returnType="736dc6c2-873c-43e0-aaff-70f35e0e310b" specifiers="public inline nothrow"/>
+           <function const="true" docPath="../../System.Net.Http/doc/class_MimeType_8D9E497183EDA2D56440FAB4472E32E2195C8D21.html#member_function_GetSubtype_MimeType_1CDE548189B66A039F7FFD2865C38012B56226E3" extPath="System.Net.Http/doc/class_MimeType_8D9E497183EDA2D56440FAB4472E32E2195C8D21.html#member_function_GetSubtype_MimeType_1CDE548189B66A039F7FFD2865C38012B56226E3" fileName="System.Net.Http/MediaType.cm" filePath="../../System.Net.Http/file/MediaType.cm.html" id="member_function_GetSubtype_MimeType_1CDE548189B66A039F7FFD2865C38012B56226E3" kind="Member Function" line="192" name="GetSubtype" returnType="c682bdce-b8ef-45b6-b0fc-c23692205ca8" specifiers="public inline nothrow"/>
+           <function const="true" docPath="../../System.Net.Http/doc/class_MimeType_8D9E497183EDA2D56440FAB4472E32E2195C8D21.html#member_function_Parameters_MimeType_2149552FCA345731420065A65356C348C4EB281E" extPath="System.Net.Http/doc/class_MimeType_8D9E497183EDA2D56440FAB4472E32E2195C8D21.html#member_function_Parameters_MimeType_2149552FCA345731420065A65356C348C4EB281E" fileName="System.Net.Http/MediaType.cm" filePath="../../System.Net.Http/file/MediaType.cm.html" id="member_function_Parameters_MimeType_2149552FCA345731420065A65356C348C4EB281E" kind="Member Function" line="201" name="Parameters" returnType="dba9b1d3-c79a-4439-906e-5c94638f3a38" specifiers="public inline nothrow"/>
            <function docPath="../../System.Net.Http/doc/class_MimeType_8D9E497183EDA2D56440FAB4472E32E2195C8D21.html#member_function_SetParameter_MimeType_32A590981C99269ED50AE34F9BF432674F842937" extPath="System.Net.Http/doc/class_MimeType_8D9E497183EDA2D56440FAB4472E32E2195C8D21.html#member_function_SetParameter_MimeType_32A590981C99269ED50AE34F9BF432674F842937" fileName="System.Net.Http/MediaType.cm" filePath="../../System.Net.Http/file/MediaType.cm.html" id="member_function_SetParameter_MimeType_32A590981C99269ED50AE34F9BF432674F842937" kind="Member Function" line="214" name="SetParameter" returnType="4e959632-b5f2-406d-9402-ec16ab3f3585" specifiers="public">
             <parameters>
              <parameter id="parameter_paramName_4DE87AAA95303E3814BBA0D404227035EC65BB77" name="paramName" type="0b2cb094-cc6d-4299-a074-5eb9b3aa8751"/>
@@ -3862,9 +3862,9 @@
            <function const="true" docPath="../../System.Net.Http/doc/class_MimeType_8D9E497183EDA2D56440FAB4472E32E2195C8D21.html#member_function_ToString_MimeType_40B7EEE2E359084630B0D76D3621005741D7AC6C" extPath="System.Net.Http/doc/class_MimeType_8D9E497183EDA2D56440FAB4472E32E2195C8D21.html#member_function_ToString_MimeType_40B7EEE2E359084630B0D76D3621005741D7AC6C" fileName="System.Net.Http/MediaType.cm" filePath="../../System.Net.Http/file/MediaType.cm.html" id="member_function_ToString_MimeType_40B7EEE2E359084630B0D76D3621005741D7AC6C" kind="Member Function" line="218" name="ToString" returnType="b6963d46-e09d-4bba-9c23-c6beb90db5a3" specifiers="public"/>
           </functions>
           <variables>
-           <variable docPath="../../System.Net.Http/doc/class_MimeType_8D9E497183EDA2D56440FAB4472E32E2195C8D21.html#variable_mediaType_DF49AED7D0BF18FC193EDAB938FEB05490B8527D" extPath="System.Net.Http/doc/class_MimeType_8D9E497183EDA2D56440FAB4472E32E2195C8D21.html#variable_mediaType_DF49AED7D0BF18FC193EDAB938FEB05490B8527D" id="variable_mediaType_DF49AED7D0BF18FC193EDAB938FEB05490B8527D" name="mediaType" specifiers="private" type="9353f356-bce4-4b26-9811-3b2f8403092e"/>
-           <variable docPath="../../System.Net.Http/doc/class_MimeType_8D9E497183EDA2D56440FAB4472E32E2195C8D21.html#variable_parameters_79134E984F20C4926FF715A45BE383839CDD8A99" extPath="System.Net.Http/doc/class_MimeType_8D9E497183EDA2D56440FAB4472E32E2195C8D21.html#variable_parameters_79134E984F20C4926FF715A45BE383839CDD8A99" id="variable_parameters_79134E984F20C4926FF715A45BE383839CDD8A99" name="parameters" specifiers="private" type="dd269ccf-c893-466f-8437-fb8c39c23f31"/>
-           <variable docPath="../../System.Net.Http/doc/class_MimeType_8D9E497183EDA2D56440FAB4472E32E2195C8D21.html#variable_subtype_2FADA50F8BCC7D0EAE7BDDA0D43185CBD570C712" extPath="System.Net.Http/doc/class_MimeType_8D9E497183EDA2D56440FAB4472E32E2195C8D21.html#variable_subtype_2FADA50F8BCC7D0EAE7BDDA0D43185CBD570C712" id="variable_subtype_2FADA50F8BCC7D0EAE7BDDA0D43185CBD570C712" name="subtype" specifiers="private" type="560b1c93-5ec7-4658-bdf0-94bbf8cde74b"/>
+           <variable docPath="../../System.Net.Http/doc/class_MimeType_8D9E497183EDA2D56440FAB4472E32E2195C8D21.html#variable_mediaType_DF49AED7D0BF18FC193EDAB938FEB05490B8527D" extPath="System.Net.Http/doc/class_MimeType_8D9E497183EDA2D56440FAB4472E32E2195C8D21.html#variable_mediaType_DF49AED7D0BF18FC193EDAB938FEB05490B8527D" id="variable_mediaType_DF49AED7D0BF18FC193EDAB938FEB05490B8527D" name="mediaType" specifiers="private" type="b029d269-b3d5-45a2-9b76-ae5dbeb8d602"/>
+           <variable docPath="../../System.Net.Http/doc/class_MimeType_8D9E497183EDA2D56440FAB4472E32E2195C8D21.html#variable_parameters_79134E984F20C4926FF715A45BE383839CDD8A99" extPath="System.Net.Http/doc/class_MimeType_8D9E497183EDA2D56440FAB4472E32E2195C8D21.html#variable_parameters_79134E984F20C4926FF715A45BE383839CDD8A99" id="variable_parameters_79134E984F20C4926FF715A45BE383839CDD8A99" name="parameters" specifiers="private" type="43a299a2-a2c2-4b0b-aa50-8e448716a097"/>
+           <variable docPath="../../System.Net.Http/doc/class_MimeType_8D9E497183EDA2D56440FAB4472E32E2195C8D21.html#variable_subtype_2FADA50F8BCC7D0EAE7BDDA0D43185CBD570C712" extPath="System.Net.Http/doc/class_MimeType_8D9E497183EDA2D56440FAB4472E32E2195C8D21.html#variable_subtype_2FADA50F8BCC7D0EAE7BDDA0D43185CBD570C712" id="variable_subtype_2FADA50F8BCC7D0EAE7BDDA0D43185CBD570C712" name="subtype" specifiers="private" type="48dfea80-fa75-485f-9fa6-db3f06fa24e7"/>
           </variables>
          </class>
          <class baseClass="class_Subtype_476751185581E40C33C4DCD63CBCC4E8BD30234F" docPath="../../System.Net.Http/doc/class_MpegSubtype_2D78E14D08CE2C2EFC901C1621FE2F5D9821EF80.html" extPath="System.Net.Http/doc/class_MpegSubtype_2D78E14D08CE2C2EFC901C1621FE2F5D9821EF80.html" fileName="System.Net.Http/MediaType.cm" filePath="../../System.Net.Http/file/MediaType.cm.html" id="class_MpegSubtype_2D78E14D08CE2C2EFC901C1621FE2F5D9821EF80" line="114" name="MpegSubtype" specifiers="public">
@@ -3947,7 +3947,7 @@
                <ctorDtor docPath="../../System.Net.Http/doc/class_Context_5AAAF1A7FB84CD6C759353BD9F2D14876208DE93.html#default_constructor_Context_E4D45FF6B63FDE2A95D693DD4890835D63B479B9" extPath="System.Net.Http/doc/class_Context_5AAAF1A7FB84CD6C759353BD9F2D14876208DE93.html#default_constructor_Context_E4D45FF6B63FDE2A95D693DD4890835D63B479B9" fileName="System.Net.Http/UriGrammar.cm" filePath="../../System.Net.Http/file/UriGrammar.cm.html" id="default_constructor_Context_E4D45FF6B63FDE2A95D693DD4890835D63B479B9" kind="Constructor" line="143" name="Context" specifiers="public"/>
               </ctorsDtors>
               <variables>
-               <variable docPath="../../System.Net.Http/doc/class_Context_5AAAF1A7FB84CD6C759353BD9F2D14876208DE93.html#variable_uriReference_34F0D2E7BCDF7D73B1AFE5619C003E055A43360D" extPath="System.Net.Http/doc/class_Context_5AAAF1A7FB84CD6C759353BD9F2D14876208DE93.html#variable_uriReference_34F0D2E7BCDF7D73B1AFE5619C003E055A43360D" id="variable_uriReference_34F0D2E7BCDF7D73B1AFE5619C003E055A43360D" name="uriReference" specifiers="public" type="c6d430e1-1c92-4942-a2d9-0c2730defb29"/>
+               <variable docPath="../../System.Net.Http/doc/class_Context_5AAAF1A7FB84CD6C759353BD9F2D14876208DE93.html#variable_uriReference_34F0D2E7BCDF7D73B1AFE5619C003E055A43360D" extPath="System.Net.Http/doc/class_Context_5AAAF1A7FB84CD6C759353BD9F2D14876208DE93.html#variable_uriReference_34F0D2E7BCDF7D73B1AFE5619C003E055A43360D" id="variable_uriReference_34F0D2E7BCDF7D73B1AFE5619C003E055A43360D" name="uriReference" specifiers="public" type="4a27d35a-024f-4dd5-bf65-ed846442bf38"/>
               </variables>
              </class>
             </classes>
@@ -4001,7 +4001,7 @@
                <ctorDtor docPath="../../System.Net.Http/doc/class_Context_0C99C434082D65EDFEDEE5D21F23F87A8759A167.html#default_constructor_Context_B347102639F0455B4FAFFB56E67F3471488AAA4A" extPath="System.Net.Http/doc/class_Context_0C99C434082D65EDFEDEE5D21F23F87A8759A167.html#default_constructor_Context_B347102639F0455B4FAFFB56E67F3471488AAA4A" fileName="System.Net.Http/UriGrammar.cm" filePath="../../System.Net.Http/file/UriGrammar.cm.html" id="default_constructor_Context_B347102639F0455B4FAFFB56E67F3471488AAA4A" kind="Constructor" line="345" name="Context" specifiers="public"/>
               </ctorsDtors>
               <variables>
-               <variable docPath="../../System.Net.Http/doc/class_Context_0C99C434082D65EDFEDEE5D21F23F87A8759A167.html#variable_uriReference_1832D6F505B00A49B95DD9618776DDD0F7F2773F" extPath="System.Net.Http/doc/class_Context_0C99C434082D65EDFEDEE5D21F23F87A8759A167.html#variable_uriReference_1832D6F505B00A49B95DD9618776DDD0F7F2773F" id="variable_uriReference_1832D6F505B00A49B95DD9618776DDD0F7F2773F" name="uriReference" specifiers="public" type="c6d430e1-1c92-4942-a2d9-0c2730defb29"/>
+               <variable docPath="../../System.Net.Http/doc/class_Context_0C99C434082D65EDFEDEE5D21F23F87A8759A167.html#variable_uriReference_1832D6F505B00A49B95DD9618776DDD0F7F2773F" extPath="System.Net.Http/doc/class_Context_0C99C434082D65EDFEDEE5D21F23F87A8759A167.html#variable_uriReference_1832D6F505B00A49B95DD9618776DDD0F7F2773F" id="variable_uriReference_1832D6F505B00A49B95DD9618776DDD0F7F2773F" name="uriReference" specifiers="public" type="4a27d35a-024f-4dd5-bf65-ed846442bf38"/>
               </variables>
              </class>
             </classes>
@@ -4100,7 +4100,7 @@
                <ctorDtor docPath="../../System.Net.Http/doc/class_Context_C328BC4B485A36C66264F55006F3E8BB8F72C071.html#default_constructor_Context_180B73F7D6B5E937CE260E20692E5260379A1B46" extPath="System.Net.Http/doc/class_Context_C328BC4B485A36C66264F55006F3E8BB8F72C071.html#default_constructor_Context_180B73F7D6B5E937CE260E20692E5260379A1B46" fileName="System.Net.Http/UriGrammar.cm" filePath="../../System.Net.Http/file/UriGrammar.cm.html" id="default_constructor_Context_180B73F7D6B5E937CE260E20692E5260379A1B46" kind="Constructor" line="257" name="Context" specifiers="public"/>
               </ctorsDtors>
               <variables>
-               <variable docPath="../../System.Net.Http/doc/class_Context_C328BC4B485A36C66264F55006F3E8BB8F72C071.html#variable_uriReference_3DD0911845FF74A5DD863F42630B1F147DCABA64" extPath="System.Net.Http/doc/class_Context_C328BC4B485A36C66264F55006F3E8BB8F72C071.html#variable_uriReference_3DD0911845FF74A5DD863F42630B1F147DCABA64" id="variable_uriReference_3DD0911845FF74A5DD863F42630B1F147DCABA64" name="uriReference" specifiers="public" type="c6d430e1-1c92-4942-a2d9-0c2730defb29"/>
+               <variable docPath="../../System.Net.Http/doc/class_Context_C328BC4B485A36C66264F55006F3E8BB8F72C071.html#variable_uriReference_3DD0911845FF74A5DD863F42630B1F147DCABA64" extPath="System.Net.Http/doc/class_Context_C328BC4B485A36C66264F55006F3E8BB8F72C071.html#variable_uriReference_3DD0911845FF74A5DD863F42630B1F147DCABA64" id="variable_uriReference_3DD0911845FF74A5DD863F42630B1F147DCABA64" name="uriReference" specifiers="public" type="4a27d35a-024f-4dd5-bf65-ed846442bf38"/>
               </variables>
              </class>
             </classes>
@@ -4223,7 +4223,7 @@
               </ctorsDtors>
               <variables>
                <variable docPath="../../System.Net.Http/doc/class_Context_BE8562A78C0FBEC1441186F2785B02A0EF92E8C4.html#variable_fromport_F26D095214C713F70076ECF816292903E3014338" extPath="System.Net.Http/doc/class_Context_BE8562A78C0FBEC1441186F2785B02A0EF92E8C4.html#variable_fromport_F26D095214C713F70076ECF816292903E3014338" id="variable_fromport_F26D095214C713F70076ECF816292903E3014338" name="fromport" specifiers="public" type="2bb668ad-c00f-4dd7-aded-090a8182d2c9"/>
-               <variable docPath="../../System.Net.Http/doc/class_Context_BE8562A78C0FBEC1441186F2785B02A0EF92E8C4.html#variable_uriReference_830C318C4486EAEF075EB6483D7D85ABBF5024D2" extPath="System.Net.Http/doc/class_Context_BE8562A78C0FBEC1441186F2785B02A0EF92E8C4.html#variable_uriReference_830C318C4486EAEF075EB6483D7D85ABBF5024D2" id="variable_uriReference_830C318C4486EAEF075EB6483D7D85ABBF5024D2" name="uriReference" specifiers="public" type="c6d430e1-1c92-4942-a2d9-0c2730defb29"/>
+               <variable docPath="../../System.Net.Http/doc/class_Context_BE8562A78C0FBEC1441186F2785B02A0EF92E8C4.html#variable_uriReference_830C318C4486EAEF075EB6483D7D85ABBF5024D2" extPath="System.Net.Http/doc/class_Context_BE8562A78C0FBEC1441186F2785B02A0EF92E8C4.html#variable_uriReference_830C318C4486EAEF075EB6483D7D85ABBF5024D2" id="variable_uriReference_830C318C4486EAEF075EB6483D7D85ABBF5024D2" name="uriReference" specifiers="public" type="4a27d35a-024f-4dd5-bf65-ed846442bf38"/>
               </variables>
              </class>
             </classes>
@@ -4288,7 +4288,7 @@
                <ctorDtor docPath="../../System.Net.Http/doc/class_Context_656A3CFF3844F2B32636CB069A2571AD06F798A7.html#default_constructor_Context_F970304C59C64BACAEE049A8E082269048F6AF67" extPath="System.Net.Http/doc/class_Context_656A3CFF3844F2B32636CB069A2571AD06F798A7.html#default_constructor_Context_F970304C59C64BACAEE049A8E082269048F6AF67" fileName="System.Net.Http/UriGrammar.cm" filePath="../../System.Net.Http/file/UriGrammar.cm.html" id="default_constructor_Context_F970304C59C64BACAEE049A8E082269048F6AF67" kind="Constructor" line="300" name="Context" specifiers="public"/>
               </ctorsDtors>
               <variables>
-               <variable docPath="../../System.Net.Http/doc/class_Context_656A3CFF3844F2B32636CB069A2571AD06F798A7.html#variable_uriReference_B3E9D1C2AA680B69DDC44C71C40C2824C1A5D55E" extPath="System.Net.Http/doc/class_Context_656A3CFF3844F2B32636CB069A2571AD06F798A7.html#variable_uriReference_B3E9D1C2AA680B69DDC44C71C40C2824C1A5D55E" id="variable_uriReference_B3E9D1C2AA680B69DDC44C71C40C2824C1A5D55E" name="uriReference" specifiers="public" type="c6d430e1-1c92-4942-a2d9-0c2730defb29"/>
+               <variable docPath="../../System.Net.Http/doc/class_Context_656A3CFF3844F2B32636CB069A2571AD06F798A7.html#variable_uriReference_B3E9D1C2AA680B69DDC44C71C40C2824C1A5D55E" extPath="System.Net.Http/doc/class_Context_656A3CFF3844F2B32636CB069A2571AD06F798A7.html#variable_uriReference_B3E9D1C2AA680B69DDC44C71C40C2824C1A5D55E" id="variable_uriReference_B3E9D1C2AA680B69DDC44C71C40C2824C1A5D55E" name="uriReference" specifiers="public" type="4a27d35a-024f-4dd5-bf65-ed846442bf38"/>
               </variables>
              </class>
             </classes>
@@ -4398,7 +4398,7 @@
                <ctorDtor docPath="../../System.Net.Http/doc/class_Context_1CC44B067C5457D5C13E36169FB8C98B2ECD2A19.html#default_constructor_Context_EAA7FCA6F4A877EF0D50E617DBB3B8B61138E6A0" extPath="System.Net.Http/doc/class_Context_1CC44B067C5457D5C13E36169FB8C98B2ECD2A19.html#default_constructor_Context_EAA7FCA6F4A877EF0D50E617DBB3B8B61138E6A0" fileName="System.Net.Http/UriGrammar.cm" filePath="../../System.Net.Http/file/UriGrammar.cm.html" id="default_constructor_Context_EAA7FCA6F4A877EF0D50E617DBB3B8B61138E6A0" kind="Constructor" line="207" name="Context" specifiers="public"/>
               </ctorsDtors>
               <variables>
-               <variable docPath="../../System.Net.Http/doc/class_Context_1CC44B067C5457D5C13E36169FB8C98B2ECD2A19.html#variable_uriReference_D8E33D0BEDCA15C868FC4EC0ECE9F8EEE9FFA814" extPath="System.Net.Http/doc/class_Context_1CC44B067C5457D5C13E36169FB8C98B2ECD2A19.html#variable_uriReference_D8E33D0BEDCA15C868FC4EC0ECE9F8EEE9FFA814" id="variable_uriReference_D8E33D0BEDCA15C868FC4EC0ECE9F8EEE9FFA814" name="uriReference" specifiers="public" type="c6d430e1-1c92-4942-a2d9-0c2730defb29"/>
+               <variable docPath="../../System.Net.Http/doc/class_Context_1CC44B067C5457D5C13E36169FB8C98B2ECD2A19.html#variable_uriReference_D8E33D0BEDCA15C868FC4EC0ECE9F8EEE9FFA814" extPath="System.Net.Http/doc/class_Context_1CC44B067C5457D5C13E36169FB8C98B2ECD2A19.html#variable_uriReference_D8E33D0BEDCA15C868FC4EC0ECE9F8EEE9FFA814" id="variable_uriReference_D8E33D0BEDCA15C868FC4EC0ECE9F8EEE9FFA814" name="uriReference" specifiers="public" type="4a27d35a-024f-4dd5-bf65-ed846442bf38"/>
               </variables>
              </class>
             </classes>
@@ -4482,7 +4482,7 @@
                <ctorDtor docPath="../../System.Net.Http/doc/class_Context_6905304182DACAE13CF36B3D318062B5F4C52B9B.html#default_constructor_Context_31099B09B444DE665DE2153315F0859519A68CDB" extPath="System.Net.Http/doc/class_Context_6905304182DACAE13CF36B3D318062B5F4C52B9B.html#default_constructor_Context_31099B09B444DE665DE2153315F0859519A68CDB" fileName="System.Net.Http/UriGrammar.cm" filePath="../../System.Net.Http/file/UriGrammar.cm.html" id="default_constructor_Context_31099B09B444DE665DE2153315F0859519A68CDB" kind="Constructor" line="396" name="Context" specifiers="public"/>
               </ctorsDtors>
               <variables>
-               <variable docPath="../../System.Net.Http/doc/class_Context_6905304182DACAE13CF36B3D318062B5F4C52B9B.html#variable_uriReference_9C4F591D12D3DEBA41459B0EA705734BCF7B8241" extPath="System.Net.Http/doc/class_Context_6905304182DACAE13CF36B3D318062B5F4C52B9B.html#variable_uriReference_9C4F591D12D3DEBA41459B0EA705734BCF7B8241" id="variable_uriReference_9C4F591D12D3DEBA41459B0EA705734BCF7B8241" name="uriReference" specifiers="public" type="c6d430e1-1c92-4942-a2d9-0c2730defb29"/>
+               <variable docPath="../../System.Net.Http/doc/class_Context_6905304182DACAE13CF36B3D318062B5F4C52B9B.html#variable_uriReference_9C4F591D12D3DEBA41459B0EA705734BCF7B8241" extPath="System.Net.Http/doc/class_Context_6905304182DACAE13CF36B3D318062B5F4C52B9B.html#variable_uriReference_9C4F591D12D3DEBA41459B0EA705734BCF7B8241" id="variable_uriReference_9C4F591D12D3DEBA41459B0EA705734BCF7B8241" name="uriReference" specifiers="public" type="4a27d35a-024f-4dd5-bf65-ed846442bf38"/>
                <variable docPath="../../System.Net.Http/doc/class_Context_6905304182DACAE13CF36B3D318062B5F4C52B9B.html#variable_userInfo_4630942EDA661ECB4726CE217B101E07CD21D593" extPath="System.Net.Http/doc/class_Context_6905304182DACAE13CF36B3D318062B5F4C52B9B.html#variable_userInfo_4630942EDA661ECB4726CE217B101E07CD21D593" id="variable_userInfo_4630942EDA661ECB4726CE217B101E07CD21D593" name="userInfo" specifiers="public" type="b6963d46-e09d-4bba-9c23-c6beb90db5a3"/>
               </variables>
              </class>
@@ -4592,7 +4592,7 @@
                <ctorDtor docPath="../../System.Net.Http/doc/class_Context_3627C13261443D2FAF69F158244322B7158E8AFF.html#default_constructor_Context_DFDE8B41F926A30BDDB4856A0CC57ABA0F284FED" extPath="System.Net.Http/doc/class_Context_3627C13261443D2FAF69F158244322B7158E8AFF.html#default_constructor_Context_DFDE8B41F926A30BDDB4856A0CC57ABA0F284FED" fileName="System.Net.Http/UriGrammar.cm" filePath="../../System.Net.Http/file/UriGrammar.cm.html" id="default_constructor_Context_DFDE8B41F926A30BDDB4856A0CC57ABA0F284FED" kind="Constructor" line="100" name="Context" specifiers="public"/>
               </ctorsDtors>
               <variables>
-               <variable docPath="../../System.Net.Http/doc/class_Context_3627C13261443D2FAF69F158244322B7158E8AFF.html#variable_uriReference_E4581F81ABFD757954F56E5C311536F83D94A833" extPath="System.Net.Http/doc/class_Context_3627C13261443D2FAF69F158244322B7158E8AFF.html#variable_uriReference_E4581F81ABFD757954F56E5C311536F83D94A833" id="variable_uriReference_E4581F81ABFD757954F56E5C311536F83D94A833" name="uriReference" specifiers="public" type="c6d430e1-1c92-4942-a2d9-0c2730defb29"/>
+               <variable docPath="../../System.Net.Http/doc/class_Context_3627C13261443D2FAF69F158244322B7158E8AFF.html#variable_uriReference_E4581F81ABFD757954F56E5C311536F83D94A833" extPath="System.Net.Http/doc/class_Context_3627C13261443D2FAF69F158244322B7158E8AFF.html#variable_uriReference_E4581F81ABFD757954F56E5C311536F83D94A833" id="variable_uriReference_E4581F81ABFD757954F56E5C311536F83D94A833" name="uriReference" specifiers="public" type="4a27d35a-024f-4dd5-bf65-ed846442bf38"/>
               </variables>
              </class>
             </classes>
@@ -4663,7 +4663,7 @@
              <parameter id="parameter_end_110F10A212AD1E96D4865799246E76E2C1BCCB0E" name="end" type="490a1d6c-c0be-4f48-a2eb-8e4101c8ad0d"/>
              <parameter id="parameter_fileIndex_577072EE36E64E79EAF639C5B7B4095044F9239A" name="fileIndex" type="cc8ffb50-cac1-4f7e-acae-8b3fb9621c37"/>
              <parameter id="parameter_fileName_C64ED531C6968009CE2221B2F86A56F3ADFEA354" name="fileName" type="b14a2675-ade3-4740-b586-48284a4f720d"/>
-             <parameter id="parameter_uriReference_334ABA8953BC4D814387CD85CE0D9BF66E2C37DC" name="uriReference" type="c6d430e1-1c92-4942-a2d9-0c2730defb29"/>
+             <parameter id="parameter_uriReference_334ABA8953BC4D814387CD85CE0D9BF66E2C37DC" name="uriReference" type="4a27d35a-024f-4dd5-bf65-ed846442bf38"/>
             </parameters>
            </function>
           </functions>
@@ -4674,17 +4674,17 @@
            <ctorDtor docPath="../../System.Net.Http/doc/class_UriParser_E68D5FE2B6757B249FA247FEF9654AF9126DF8C3.html#default_constructor_UriParser_76245D388B9D1472C61E61BFFBF1A27E7D3A4B11" extPath="System.Net.Http/doc/class_UriParser_E68D5FE2B6757B249FA247FEF9654AF9126DF8C3.html#default_constructor_UriParser_76245D388B9D1472C61E61BFFBF1A27E7D3A4B11" fileName="System.Net.Http/UriReference.cm" filePath="../../System.Net.Http/file/UriReference.cm.html" id="default_constructor_UriParser_76245D388B9D1472C61E61BFFBF1A27E7D3A4B11" kind="Constructor" line="23" name="UriParser" specifiers="private"/>
           </ctorsDtors>
           <functions>
-           <function docPath="../../System.Net.Http/doc/class_UriParser_E68D5FE2B6757B249FA247FEF9654AF9126DF8C3.html#member_function_Instance_UriParser_61B5D11DC1137C3A9E853944AE0A78A062750D39" extPath="System.Net.Http/doc/class_UriParser_E68D5FE2B6757B249FA247FEF9654AF9126DF8C3.html#member_function_Instance_UriParser_61B5D11DC1137C3A9E853944AE0A78A062750D39" fileName="System.Net.Http/UriReference.cm" filePath="../../System.Net.Http/file/UriReference.cm.html" id="member_function_Instance_UriParser_61B5D11DC1137C3A9E853944AE0A78A062750D39" kind="Static Member Function" line="26" name="Instance" returnType="bae9be81-c148-4894-85a7-1726cd000d01" specifiers="public static"/>
+           <function docPath="../../System.Net.Http/doc/class_UriParser_E68D5FE2B6757B249FA247FEF9654AF9126DF8C3.html#member_function_Instance_UriParser_61B5D11DC1137C3A9E853944AE0A78A062750D39" extPath="System.Net.Http/doc/class_UriParser_E68D5FE2B6757B249FA247FEF9654AF9126DF8C3.html#member_function_Instance_UriParser_61B5D11DC1137C3A9E853944AE0A78A062750D39" fileName="System.Net.Http/UriReference.cm" filePath="../../System.Net.Http/file/UriReference.cm.html" id="member_function_Instance_UriParser_61B5D11DC1137C3A9E853944AE0A78A062750D39" kind="Static Member Function" line="26" name="Instance" returnType="1508549b-a393-4e59-9bb7-54545fd6ab89" specifiers="public static"/>
            <function docPath="../../System.Net.Http/doc/class_UriParser_E68D5FE2B6757B249FA247FEF9654AF9126DF8C3.html#member_function_Parse_UriParser_44E01DA3DB6E37993327C1207AB9B5F5EC981638" extPath="System.Net.Http/doc/class_UriParser_E68D5FE2B6757B249FA247FEF9654AF9126DF8C3.html#member_function_Parse_UriParser_44E01DA3DB6E37993327C1207AB9B5F5EC981638" fileName="System.Net.Http/UriReference.cm" filePath="../../System.Net.Http/file/UriReference.cm.html" id="member_function_Parse_UriParser_44E01DA3DB6E37993327C1207AB9B5F5EC981638" kind="Member Function" line="30" name="Parse" returnType="4e959632-b5f2-406d-9402-ec16ab3f3585" specifiers="public">
             <parameters>
              <parameter id="parameter_uri_F0B9FCA76EE226F3D134BE835B100136E2D2AECA" name="uri" type="0b2cb094-cc6d-4299-a074-5eb9b3aa8751"/>
-             <parameter id="parameter_uriReference_0DFC6189BE93174FAA2D27D29CFBC4AF273B44FC" name="uriReference" type="c6d430e1-1c92-4942-a2d9-0c2730defb29"/>
+             <parameter id="parameter_uriReference_0DFC6189BE93174FAA2D27D29CFBC4AF273B44FC" name="uriReference" type="4a27d35a-024f-4dd5-bf65-ed846442bf38"/>
             </parameters>
            </function>
           </functions>
           <variables>
-           <variable docPath="../../System.Net.Http/doc/class_UriParser_E68D5FE2B6757B249FA247FEF9654AF9126DF8C3.html#variable_grammar_356BFD7C14B62AD448FE50DC319B6F7884F93074" extPath="System.Net.Http/doc/class_UriParser_E68D5FE2B6757B249FA247FEF9654AF9126DF8C3.html#variable_grammar_356BFD7C14B62AD448FE50DC319B6F7884F93074" id="variable_grammar_356BFD7C14B62AD448FE50DC319B6F7884F93074" name="grammar" specifiers="private" type="f9b9c94b-6221-4cd4-8260-af32ba8248e4"/>
-           <variable docPath="../../System.Net.Http/doc/class_UriParser_E68D5FE2B6757B249FA247FEF9654AF9126DF8C3.html#variable_instance_0E5A5ED334BDE257C7C93AE2E6A33AD451E03534" extPath="System.Net.Http/doc/class_UriParser_E68D5FE2B6757B249FA247FEF9654AF9126DF8C3.html#variable_instance_0E5A5ED334BDE257C7C93AE2E6A33AD451E03534" id="variable_instance_0E5A5ED334BDE257C7C93AE2E6A33AD451E03534" name="instance" specifiers="private static" type="877ee050-23b3-4b20-927b-6c015681a00a"/>
+           <variable docPath="../../System.Net.Http/doc/class_UriParser_E68D5FE2B6757B249FA247FEF9654AF9126DF8C3.html#variable_grammar_356BFD7C14B62AD448FE50DC319B6F7884F93074" extPath="System.Net.Http/doc/class_UriParser_E68D5FE2B6757B249FA247FEF9654AF9126DF8C3.html#variable_grammar_356BFD7C14B62AD448FE50DC319B6F7884F93074" id="variable_grammar_356BFD7C14B62AD448FE50DC319B6F7884F93074" name="grammar" specifiers="private" type="32680b79-1c77-4207-b6f9-ff8d4af4cd46"/>
+           <variable docPath="../../System.Net.Http/doc/class_UriParser_E68D5FE2B6757B249FA247FEF9654AF9126DF8C3.html#variable_instance_0E5A5ED334BDE257C7C93AE2E6A33AD451E03534" extPath="System.Net.Http/doc/class_UriParser_E68D5FE2B6757B249FA247FEF9654AF9126DF8C3.html#variable_instance_0E5A5ED334BDE257C7C93AE2E6A33AD451E03534" id="variable_instance_0E5A5ED334BDE257C7C93AE2E6A33AD451E03534" name="instance" specifiers="private static" type="a21bed12-a02e-4538-9ca1-1981f1de911e"/>
           </variables>
          </class>
          <class docPath="../../System.Net.Http/doc/class_UriReference_6E4543DEBAEE63870C6B9BC9C602E2225A228B71.html" extPath="System.Net.Http/doc/class_UriReference_6E4543DEBAEE63870C6B9BC9C602E2225A228B71.html" fileName="System.Net.Http/UriReference.cm" filePath="../../System.Net.Http/file/UriReference.cm.html" id="class_UriReference_6E4543DEBAEE63870C6B9BC9C602E2225A228B71" line="38" name="UriReference" specifiers="public">
@@ -4702,8 +4702,8 @@
            <function docPath="../../System.Net.Http/doc/class_UriReference_6E4543DEBAEE63870C6B9BC9C602E2225A228B71.html#member_function_Clear_UriReference_EB32F5F235335C78CA730D4571C413E22C2EF516" extPath="System.Net.Http/doc/class_UriReference_6E4543DEBAEE63870C6B9BC9C602E2225A228B71.html#member_function_Clear_UriReference_EB32F5F235335C78CA730D4571C413E22C2EF516" fileName="System.Net.Http/UriReference.cm" filePath="../../System.Net.Http/file/UriReference.cm.html" id="member_function_Clear_UriReference_EB32F5F235335C78CA730D4571C413E22C2EF516" kind="Member Function" line="233" name="Clear" returnType="4e959632-b5f2-406d-9402-ec16ab3f3585" specifiers="public nothrow"/>
            <function docPath="../../System.Net.Http/doc/class_UriReference_6E4543DEBAEE63870C6B9BC9C602E2225A228B71.html#member_function_Combine_UriReference_7A4D837BE487FEC903155B3360F5F9462E4B26E8" extPath="System.Net.Http/doc/class_UriReference_6E4543DEBAEE63870C6B9BC9C602E2225A228B71.html#member_function_Combine_UriReference_7A4D837BE487FEC903155B3360F5F9462E4B26E8" fileName="System.Net.Http/UriReference.cm" filePath="../../System.Net.Http/file/UriReference.cm.html" id="member_function_Combine_UriReference_7A4D837BE487FEC903155B3360F5F9462E4B26E8" kind="Static Member Function" line="47" name="Combine" returnType="class_UriReference_6E4543DEBAEE63870C6B9BC9C602E2225A228B71" specifiers="public static">
             <parameters>
-             <parameter id="parameter_baseUri_B688AB0CA295CBE27923BF8BEDF1158B63F31E86" name="baseUri" type="e877b192-2c0b-4c65-b230-e109d122799c"/>
-             <parameter id="parameter_relativeUri_BB4ED97BF490A836B09877E8A3CD9071AC1E5D03" name="relativeUri" type="e877b192-2c0b-4c65-b230-e109d122799c"/>
+             <parameter id="parameter_baseUri_B688AB0CA295CBE27923BF8BEDF1158B63F31E86" name="baseUri" type="7fb21fde-bde2-4447-9ae4-711459ea84db"/>
+             <parameter id="parameter_relativeUri_BB4ED97BF490A836B09877E8A3CD9071AC1E5D03" name="relativeUri" type="7fb21fde-bde2-4447-9ae4-711459ea84db"/>
             </parameters>
            </function>
            <function const="true" docPath="../../System.Net.Http/doc/class_UriReference_6E4543DEBAEE63870C6B9BC9C602E2225A228B71.html#member_function_Fragment_UriReference_24C7A7EDC314841B2AE52D3B7C92734F29F4A450" extPath="System.Net.Http/doc/class_UriReference_6E4543DEBAEE63870C6B9BC9C602E2225A228B71.html#member_function_Fragment_UriReference_24C7A7EDC314841B2AE52D3B7C92734F29F4A450" fileName="System.Net.Http/UriReference.cm" filePath="../../System.Net.Http/file/UriReference.cm.html" id="member_function_Fragment_UriReference_24C7A7EDC314841B2AE52D3B7C92734F29F4A450" kind="Member Function" line="225" name="Fragment" returnType="0b2cb094-cc6d-4299-a074-5eb9b3aa8751" specifiers="public inline nothrow"/>
@@ -4793,9 +4793,9 @@
            <parameter id="parameter_path_D93B3DD7879B19343D84E36DCD0C547691387D35" name="path" type="0b2cb094-cc6d-4299-a074-5eb9b3aa8751"/>
           </parameters>
          </function>
-         <function docPath="../../System.Net.Http/doc/ns_System.Net.Http.html#function_MakeCodingListValue_08D76C237763829F09D20BB38F43B692E10F4FDB" extPath="System.Net.Http/doc/ns_System.Net.Http.html#function_MakeCodingListValue_08D76C237763829F09D20BB38F43B692E10F4FDB" fileName="System.Net.Http/HttpRequest.cm" filePath="../../System.Net.Http/file/HttpRequest.cm.html" id="function_MakeCodingListValue_08D76C237763829F09D20BB38F43B692E10F4FDB" kind="Function" line="449" name="MakeCodingListValue" returnType="a4bbf8f6-7862-4068-8152-7db3c244a095" specifiers="public">
+         <function docPath="../../System.Net.Http/doc/ns_System.Net.Http.html#function_MakeCodingListValue_08D76C237763829F09D20BB38F43B692E10F4FDB" extPath="System.Net.Http/doc/ns_System.Net.Http.html#function_MakeCodingListValue_08D76C237763829F09D20BB38F43B692E10F4FDB" fileName="System.Net.Http/HttpRequest.cm" filePath="../../System.Net.Http/file/HttpRequest.cm.html" id="function_MakeCodingListValue_08D76C237763829F09D20BB38F43B692E10F4FDB" kind="Function" line="449" name="MakeCodingListValue" returnType="1565ccf7-2bc3-46d3-891f-e790b4782f9f" specifiers="public">
           <parameters>
-           <parameter id="parameter_codings_73BD4F5A01C5F69109F667C3A5F5433AED8D6797" name="codings" type="cd28d2cd-e3aa-4f8d-af95-2a0f9726ab6b"/>
+           <parameter id="parameter_codings_73BD4F5A01C5F69109F667C3A5F5433AED8D6797" name="codings" type="569b5378-7af3-438d-9766-d5b89c9835e1"/>
           </parameters>
          </function>
          <function docPath="../../System.Net.Http/doc/ns_System.Net.Http.html#function_MakeHttpHostValue_598911EB64F544EDC749A4493B33E44265423F77" extPath="System.Net.Http/doc/ns_System.Net.Http.html#function_MakeHttpHostValue_598911EB64F544EDC749A4493B33E44265423F77" fileName="System.Net.Http/HttpRequest.cm" filePath="../../System.Net.Http/file/HttpRequest.cm.html" id="function_MakeHttpHostValue_598911EB64F544EDC749A4493B33E44265423F77" kind="Function" line="330" name="MakeHttpHostValue" returnType="b6963d46-e09d-4bba-9c23-c6beb90db5a3" specifiers="public">
@@ -4804,12 +4804,12 @@
            <parameter id="parameter_port_506B4D27DA33DCBE61650B726B2701B2F2EABC27" name="port" type="2bb668ad-c00f-4dd7-aded-090a8182d2c9"/>
           </parameters>
          </function>
-         <function docPath="../../System.Net.Http/doc/ns_System.Net.Http.html#function_MakeMediaRangeListValue_66A932160A42D8C202C4E8C07268FB5FE5178650" extPath="System.Net.Http/doc/ns_System.Net.Http.html#function_MakeMediaRangeListValue_66A932160A42D8C202C4E8C07268FB5FE5178650" fileName="System.Net.Http/HttpRequest.cm" filePath="../../System.Net.Http/file/HttpRequest.cm.html" id="function_MakeMediaRangeListValue_66A932160A42D8C202C4E8C07268FB5FE5178650" kind="Function" line="386" name="MakeMediaRangeListValue" returnType="a4bbf8f6-7862-4068-8152-7db3c244a095" specifiers="public">
+         <function docPath="../../System.Net.Http/doc/ns_System.Net.Http.html#function_MakeMediaRangeListValue_66A932160A42D8C202C4E8C07268FB5FE5178650" extPath="System.Net.Http/doc/ns_System.Net.Http.html#function_MakeMediaRangeListValue_66A932160A42D8C202C4E8C07268FB5FE5178650" fileName="System.Net.Http/HttpRequest.cm" filePath="../../System.Net.Http/file/HttpRequest.cm.html" id="function_MakeMediaRangeListValue_66A932160A42D8C202C4E8C07268FB5FE5178650" kind="Function" line="386" name="MakeMediaRangeListValue" returnType="1565ccf7-2bc3-46d3-891f-e790b4782f9f" specifiers="public">
           <parameters>
-           <parameter id="parameter_mediaRanges_38181608B58272190FDAA9DA3E1ECACB0900943F" name="mediaRanges" type="ccc1bf25-5bce-43c9-9682-cdc499ef1f0e"/>
+           <parameter id="parameter_mediaRanges_38181608B58272190FDAA9DA3E1ECACB0900943F" name="mediaRanges" type="6155b673-9c3d-4167-bd50-b59bf5c81b21"/>
           </parameters>
          </function>
-         <function docPath="../../System.Net.Http/doc/ns_System.Net.Http.html#function_MakeProductListValue_257996894D4D270F661B76EAF6D942B640883CBB" extPath="System.Net.Http/doc/ns_System.Net.Http.html#function_MakeProductListValue_257996894D4D270F661B76EAF6D942B640883CBB" fileName="System.Net.Http/HttpRequest.cm" filePath="../../System.Net.Http/file/HttpRequest.cm.html" id="function_MakeProductListValue_257996894D4D270F661B76EAF6D942B640883CBB" kind="Function" line="363" name="MakeProductListValue" returnType="a4bbf8f6-7862-4068-8152-7db3c244a095" specifiers="public">
+         <function docPath="../../System.Net.Http/doc/ns_System.Net.Http.html#function_MakeProductListValue_257996894D4D270F661B76EAF6D942B640883CBB" extPath="System.Net.Http/doc/ns_System.Net.Http.html#function_MakeProductListValue_257996894D4D270F661B76EAF6D942B640883CBB" fileName="System.Net.Http/HttpRequest.cm" filePath="../../System.Net.Http/file/HttpRequest.cm.html" id="function_MakeProductListValue_257996894D4D270F661B76EAF6D942B640883CBB" kind="Function" line="363" name="MakeProductListValue" returnType="1565ccf7-2bc3-46d3-891f-e790b4782f9f" specifiers="public">
           <parameters>
            <parameter id="parameter_products_95B9F3108AC769B194588CB17466FCE708F28429" name="products" type="592b3353-9b56-4a07-8a52-60a1cf1acc76"/>
           </parameters>
@@ -4822,33 +4822,33 @@
          <function docPath="../../System.Net.Http/doc/ns_System.Net.Http.html#function_ReadChunkHeader_CD66738B6C7CB785EC7C8395F5AAE5876494B68D" extPath="System.Net.Http/doc/ns_System.Net.Http.html#function_ReadChunkHeader_CD66738B6C7CB785EC7C8395F5AAE5876494B68D" fileName="System.Net.Http/ChunkedBodyReader.cm" filePath="../../System.Net.Http/file/ChunkedBodyReader.cm.html" id="function_ReadChunkHeader_CD66738B6C7CB785EC7C8395F5AAE5876494B68D" kind="Function" line="39" name="ReadChunkHeader" returnType="03a19a86-c637-4006-b3da-cd9bd6992357" specifiers="public">
           <parameters>
            <parameter id="parameter_stream_A432559721E8CE7517DFA3A01DE4A685F0542497" name="stream" type="a13adfb2-cb55-4fab-b139-cf1dd81963ae"/>
-           <parameter id="parameter_chunkExtensions_D94281959F96B091D521CF85E3D75EC391A4B780" name="chunkExtensions" type="bce959d7-e4ff-409f-8e03-a24760089807"/>
+           <parameter id="parameter_chunkExtensions_D94281959F96B091D521CF85E3D75EC391A4B780" name="chunkExtensions" type="555d4479-efec-4b1b-b3a0-80755a891762"/>
           </parameters>
          </function>
          <function docPath="../../System.Net.Http/doc/ns_System.Net.Http.html#function_ReadChunkedBody_BD0ED4C0D5B20DF6C5022C01A0A122B74B78AED9" extPath="System.Net.Http/doc/ns_System.Net.Http.html#function_ReadChunkedBody_BD0ED4C0D5B20DF6C5022C01A0A122B74B78AED9" fileName="System.Net.Http/ChunkedBodyReader.cm" filePath="../../System.Net.Http/file/ChunkedBodyReader.cm.html" id="function_ReadChunkedBody_BD0ED4C0D5B20DF6C5022C01A0A122B74B78AED9" kind="Function" line="161" name="ReadChunkedBody" returnType="e266f774-ad56-4922-af51-f6a2707c7506" specifiers="public">
           <parameters>
            <parameter id="parameter_stream_356EC3303E539795A7179FC8E5EEDA9C910EB3FB" name="stream" type="a13adfb2-cb55-4fab-b139-cf1dd81963ae"/>
-           <parameter id="parameter_trailer_C37AD6AD71C554651C3ABDAF9592193AC6AB20BB" name="trailer" type="763851c3-ce86-4b0b-ba8a-6947f3ee66e5"/>
+           <parameter id="parameter_trailer_C37AD6AD71C554651C3ABDAF9592193AC6AB20BB" name="trailer" type="9070682b-4bd5-4217-bebb-1b38a58a2e3a"/>
           </parameters>
          </function>
          <function docPath="../../System.Net.Http/doc/ns_System.Net.Http.html#function_ReadStartOfMessage_360742256B1F6D8BB697233181317A31570D9759" extPath="System.Net.Http/doc/ns_System.Net.Http.html#function_ReadStartOfMessage_360742256B1F6D8BB697233181317A31570D9759" fileName="System.Net.Http/HttpAgent.cm" filePath="../../System.Net.Http/file/HttpAgent.cm.html" id="function_ReadStartOfMessage_360742256B1F6D8BB697233181317A31570D9759" kind="Function" line="12" name="ReadStartOfMessage" returnType="class_HttpStatus_382B537F46BAA81EDF45E14475A2A84756ACAD9A" specifiers="public">
           <parameters>
            <parameter id="parameter_stream_AF52EC5316F8F22612129EF09DF311B1DD883DDB" name="stream" type="a13adfb2-cb55-4fab-b139-cf1dd81963ae"/>
-           <parameter id="parameter_headers_FE802EB7A8CF27C9F1C8285C6CB4E175AD19E284" name="headers" type="59bee433-6bbc-4158-877e-026b9eb44b0c"/>
+           <parameter id="parameter_headers_FE802EB7A8CF27C9F1C8285C6CB4E175AD19E284" name="headers" type="6b1e2082-1e68-4d17-a38f-ca633a6dbe98"/>
            <parameter id="parameter_log_905FC8C839E6C7B293DA05CFDEA749C2AD78E3EA" name="log" type="a4208e1a-e54e-4d84-87ec-6c967691355d"/>
           </parameters>
          </function>
          <function docPath="../../System.Net.Http/doc/ns_System.Net.Http.html#function_ReadStartOfMessageWithStatus_A82BFC290363077B3D5EB0503FF293186D0BD8B8" extPath="System.Net.Http/doc/ns_System.Net.Http.html#function_ReadStartOfMessageWithStatus_A82BFC290363077B3D5EB0503FF293186D0BD8B8" fileName="System.Net.Http/HttpAgent.cm" filePath="../../System.Net.Http/file/HttpAgent.cm.html" id="function_ReadStartOfMessageWithStatus_A82BFC290363077B3D5EB0503FF293186D0BD8B8" kind="Function" line="18" name="ReadStartOfMessageWithStatus" returnType="b6963d46-e09d-4bba-9c23-c6beb90db5a3" specifiers="public">
           <parameters>
            <parameter id="parameter_stream_752A726EC394B919FBBAAD3FCCC5CAE3056A5582" name="stream" type="a13adfb2-cb55-4fab-b139-cf1dd81963ae"/>
-           <parameter id="parameter_headers_2E34DE6D267F9BD324AF445B22566534C7EB9DD0" name="headers" type="59bee433-6bbc-4158-877e-026b9eb44b0c"/>
+           <parameter id="parameter_headers_2E34DE6D267F9BD324AF445B22566534C7EB9DD0" name="headers" type="6b1e2082-1e68-4d17-a38f-ca633a6dbe98"/>
            <parameter id="parameter_log_2AE17C8EF350E3B29C426037AF63F4F7A90AB22E" name="log" type="a4208e1a-e54e-4d84-87ec-6c967691355d"/>
           </parameters>
          </function>
          <function docPath="../../System.Net.Http/doc/ns_System.Net.Http.html#function_ReadTrailer_9849266F83133D5058FABA978E45814D3DEC7FEF" extPath="System.Net.Http/doc/ns_System.Net.Http.html#function_ReadTrailer_9849266F83133D5058FABA978E45814D3DEC7FEF" fileName="System.Net.Http/ChunkedBodyReader.cm" filePath="../../System.Net.Http/file/ChunkedBodyReader.cm.html" id="function_ReadTrailer_9849266F83133D5058FABA978E45814D3DEC7FEF" kind="Function" line="82" name="ReadTrailer" returnType="4e959632-b5f2-406d-9402-ec16ab3f3585" specifiers="public">
           <parameters>
            <parameter id="parameter_stream_61E961EBB70931889C693D41409733FC5F1309C7" name="stream" type="a13adfb2-cb55-4fab-b139-cf1dd81963ae"/>
-           <parameter id="parameter_trailer_374CA8609D6B18C1737DA216850360A2140962BB" name="trailer" type="763851c3-ce86-4b0b-ba8a-6947f3ee66e5"/>
+           <parameter id="parameter_trailer_374CA8609D6B18C1737DA216850360A2140962BB" name="trailer" type="9070682b-4bd5-4217-bebb-1b38a58a2e3a"/>
           </parameters>
          </function>
         </functions>
@@ -4913,53 +4913,53 @@
   </namespaces>
  </namespace>
  <types>
-  <specialization id="85b79029-eb7a-4287-b785-816e4a96e23f" name="Less" primaryType="class_Less_T_8CD4E14D3B6BEACE17051A75B9F36A9125F2842B">
+  <specialization id="8e54093d-6563-4e06-a48e-f5722325abad" name="Less" primaryType="class_Less_T_8CD4E14D3B6BEACE17051A75B9F36A9125F2842B">
    <templateArgumentTypes>
     <templateArgumentType ref="b6963d46-e09d-4bba-9c23-c6beb90db5a3"/>
    </templateArgumentTypes>
   </specialization>
-  <specialization id="dd269ccf-c893-466f-8437-fb8c39c23f31" name="Map" primaryType="class_Map_Key_Value_KeyCompare_734D5EBC9BF418F0903F1E19A7338E2D82C029AE">
+  <specialization id="43a299a2-a2c2-4b0b-aa50-8e448716a097" name="Map" primaryType="class_Map_Key_Value_KeyCompare_734D5EBC9BF418F0903F1E19A7338E2D82C029AE">
    <templateArgumentTypes>
     <templateArgumentType ref="b6963d46-e09d-4bba-9c23-c6beb90db5a3"/>
     <templateArgumentType ref="b6963d46-e09d-4bba-9c23-c6beb90db5a3"/>
-    <templateArgumentType ref="85b79029-eb7a-4287-b785-816e4a96e23f"/>
+    <templateArgumentType ref="8e54093d-6563-4e06-a48e-f5722325abad"/>
    </templateArgumentTypes>
   </specialization>
-  <derivedType id="bce959d7-e4ff-409f-8e03-a24760089807" name="Map&lt;String&lt;uchar>, String&lt;uchar>, Less&lt;String&lt;uchar>>>&amp;">
-   <derivation baseType="dd269ccf-c893-466f-8437-fb8c39c23f31"/>
+  <derivedType id="555d4479-efec-4b1b-b3a0-80755a891762" name="Map&lt;String&lt;uchar>, String&lt;uchar>, Less&lt;String&lt;uchar>>>&amp;">
+   <derivation baseType="43a299a2-a2c2-4b0b-aa50-8e448716a097"/>
    <derivation name="&amp;"/>
   </derivedType>
-  <derivedType id="74bf7155-1278-474d-ac35-2e5e6a86e2e6" name="const Coding&amp;">
+  <derivedType id="781ca9ff-1bc4-4a3e-a423-e8e50deedfb6" name="const Coding&amp;">
    <derivation name="const"/>
    <derivation baseType="class_Coding_E8FCCE92B7E6EBEFC6D036EF36B21BC36BA5A373"/>
    <derivation name="&amp;"/>
   </derivedType>
-  <specialization id="bde2e1ad-ed00-4985-bd79-b8c98bac8a54" name="List" primaryType="class_List_T_4E42CF5913BEB21F5260DEFEC239180C94460B11">
+  <specialization id="1dd01ff4-4bb0-41e9-a559-dc84bffacf12" name="List" primaryType="class_List_T_4E42CF5913BEB21F5260DEFEC239180C94460B11">
    <templateArgumentTypes>
     <templateArgumentType ref="class_Coding_E8FCCE92B7E6EBEFC6D036EF36B21BC36BA5A373"/>
    </templateArgumentTypes>
   </specialization>
-  <derivedType id="cd28d2cd-e3aa-4f8d-af95-2a0f9726ab6b" name="const List&lt;System.Net.Http.Coding>&amp;">
+  <derivedType id="569b5378-7af3-438d-9766-d5b89c9835e1" name="const List&lt;System.Net.Http.Coding>&amp;">
    <derivation name="const"/>
-   <derivation baseType="bde2e1ad-ed00-4985-bd79-b8c98bac8a54"/>
+   <derivation baseType="1dd01ff4-4bb0-41e9-a559-dc84bffacf12"/>
    <derivation name="&amp;"/>
   </derivedType>
-  <specialization id="aed2c689-6161-4f45-a552-e6a676b852ca" name="List" primaryType="class_List_T_4E42CF5913BEB21F5260DEFEC239180C94460B11">
+  <specialization id="358aeca5-0b4d-48e2-87ce-c6064d2a9a2c" name="List" primaryType="class_List_T_4E42CF5913BEB21F5260DEFEC239180C94460B11">
    <templateArgumentTypes>
     <templateArgumentType ref="class_MediaRange_497AEAA9A42DB3A472E3AE6FD9AC6BFF4B549DB9"/>
    </templateArgumentTypes>
   </specialization>
-  <derivedType id="ccc1bf25-5bce-43c9-9682-cdc499ef1f0e" name="const List&lt;System.Net.Http.MediaRange>&amp;">
+  <derivedType id="6155b673-9c3d-4167-bd50-b59bf5c81b21" name="const List&lt;System.Net.Http.MediaRange>&amp;">
    <derivation name="const"/>
-   <derivation baseType="aed2c689-6161-4f45-a552-e6a676b852ca"/>
+   <derivation baseType="358aeca5-0b4d-48e2-87ce-c6064d2a9a2c"/>
    <derivation name="&amp;"/>
   </derivedType>
-  <derivedType id="1ef5d785-338b-4018-ab82-c6cd81a72c1d" name="const MediaRange&amp;">
+  <derivedType id="68731ee2-ef3e-41d5-9702-641986e8f272" name="const MediaRange&amp;">
    <derivation name="const"/>
    <derivation baseType="class_MediaRange_497AEAA9A42DB3A472E3AE6FD9AC6BFF4B549DB9"/>
    <derivation name="&amp;"/>
   </derivedType>
-  <derivedType id="26bf14f3-c858-433c-b92d-f9c69fd6f82f" name="ChunkExtensionAdder*">
+  <derivedType id="a6150b7c-adbd-4430-8512-982b3c3e0467" name="ChunkExtensionAdder*">
    <derivation baseType="class_ChunkExtensionAdder_BF7942FA773504E9A41C944371AB89CC259A8E2A"/>
    <derivation name="*"/>
   </derivedType>
@@ -4993,12 +4993,12 @@
    <derivation baseType="class_ParsingDomain_DBADEDB24194482080D6E7112DE96AB5FCAD1A87"/>
    <derivation name="*"/>
   </derivedType>
-  <derivedType id="e877b192-2c0b-4c65-b230-e109d122799c" name="const UriReference&amp;">
+  <derivedType id="7fb21fde-bde2-4447-9ae4-711459ea84db" name="const UriReference&amp;">
    <derivation name="const"/>
    <derivation baseType="class_UriReference_6E4543DEBAEE63870C6B9BC9C602E2225A228B71"/>
    <derivation name="&amp;"/>
   </derivedType>
-  <derivedType id="59bee433-6bbc-4158-877e-026b9eb44b0c" name="HttpHeaderCollection&amp;">
+  <derivedType id="6b1e2082-1e68-4d17-a38f-ca633a6dbe98" name="HttpHeaderCollection&amp;">
    <derivation baseType="class_HttpHeaderCollection_3842C23118DB927F1943E7359BD822DBC5D282D8"/>
    <derivation name="&amp;"/>
   </derivedType>
@@ -5010,23 +5010,23 @@
    <derivation baseType="class_DateTime_1CCCF400289F734AAAB9BC0562E46C77468B398E"/>
    <derivation name="*"/>
   </derivedType>
-  <derivedType id="cf995ae2-5e79-4692-bcb0-f9ba0a3849d7" name="const HttpStatus&amp;">
+  <derivedType id="735dd2ec-1497-4159-aa53-246c4b88dee8" name="const HttpStatus&amp;">
    <derivation name="const"/>
    <derivation baseType="class_HttpStatus_382B537F46BAA81EDF45E14475A2A84756ACAD9A"/>
    <derivation name="&amp;"/>
   </derivedType>
-  <derivedType id="a7ee0306-ac94-4c13-a031-aa047f47fbfe" name="const HttpFieldValue&amp;">
+  <derivedType id="c95581fb-13b1-4280-aa6a-8b2c5217654c" name="const HttpFieldValue&amp;">
    <derivation name="const"/>
    <derivation baseType="class_HttpFieldValue_515D60AEFA3250DFA5795D2CB061BB0E4D1C048B"/>
    <derivation name="&amp;"/>
   </derivedType>
-  <specialization id="a4bbf8f6-7862-4068-8152-7db3c244a095" name="List" primaryType="class_List_T_4E42CF5913BEB21F5260DEFEC239180C94460B11">
+  <specialization id="1565ccf7-2bc3-46d3-891f-e790b4782f9f" name="List" primaryType="class_List_T_4E42CF5913BEB21F5260DEFEC239180C94460B11">
    <templateArgumentTypes>
     <templateArgumentType ref="class_HttpFieldValue_515D60AEFA3250DFA5795D2CB061BB0E4D1C048B"/>
    </templateArgumentTypes>
   </specialization>
-  <derivedType id="6f8d60c8-2b93-4464-9eaa-cc4abe4b5c31" name="List&lt;System.Net.Http.HttpFieldValue>*">
-   <derivation baseType="a4bbf8f6-7862-4068-8152-7db3c244a095"/>
+  <derivedType id="47199777-4537-4204-b29d-5f0ee0c74ad0" name="List&lt;System.Net.Http.HttpFieldValue>*">
+   <derivation baseType="1565ccf7-2bc3-46d3-891f-e790b4782f9f"/>
    <derivation name="*"/>
   </derivedType>
   <derivedType id="6394df30-555b-45ed-b193-d921f70fc82f" name="const Span&amp;">
@@ -5034,7 +5034,7 @@
    <derivation baseType="class_Span_342F797681C8A26247E86213AFC9204FEF17D2A5"/>
    <derivation name="&amp;"/>
   </derivedType>
-  <derivedType id="c221892d-ce61-4444-9894-032ed38ac7ca" name="HttpFieldValue*">
+  <derivedType id="8ff6e808-8cf1-4e92-8b62-ddd5bcafde63" name="HttpFieldValue*">
    <derivation baseType="class_HttpFieldValue_515D60AEFA3250DFA5795D2CB061BB0E4D1C048B"/>
    <derivation name="*"/>
   </derivedType>
@@ -5044,43 +5044,43 @@
     <templateArgumentType ref="b6963d46-e09d-4bba-9c23-c6beb90db5a3"/>
    </templateArgumentTypes>
   </specialization>
-  <derivedType id="6a32eee6-40d0-4533-b692-84a13d55fbe0" name="MimeType*">
+  <derivedType id="269e04c8-43d6-419c-9e53-adb3fa7fc7fb" name="MimeType*">
    <derivation baseType="class_MimeType_8D9E497183EDA2D56440FAB4472E32E2195C8D21"/>
    <derivation name="*"/>
   </derivedType>
-  <derivedType id="c5f2348c-7467-4c9a-9d58-ff090be82748" name="HttpStatus*">
+  <derivedType id="af8e3416-f934-4086-a215-bb3f030850b7" name="HttpStatus*">
    <derivation baseType="class_HttpStatus_382B537F46BAA81EDF45E14475A2A84756ACAD9A"/>
    <derivation name="*"/>
   </derivedType>
-  <derivedType id="c9b701dd-9fed-44ec-8f21-82dc1815f68b" name="HttpFieldValue&amp;&amp;">
+  <derivedType id="38d3c692-31f6-49b8-9aa6-33c8f1df26cf" name="HttpFieldValue&amp;&amp;">
    <derivation baseType="class_HttpFieldValue_515D60AEFA3250DFA5795D2CB061BB0E4D1C048B"/>
    <derivation name="&amp;&amp;"/>
   </derivedType>
-  <derivedType id="61f9854a-3f3b-4985-a20f-09032fc953ad" name="List&lt;System.Net.Http.HttpFieldValue>&amp;&amp;">
-   <derivation baseType="a4bbf8f6-7862-4068-8152-7db3c244a095"/>
+  <derivedType id="b6a59e3b-c14a-4279-8801-179963eba95e" name="List&lt;System.Net.Http.HttpFieldValue>&amp;&amp;">
+   <derivation baseType="1565ccf7-2bc3-46d3-891f-e790b4782f9f"/>
    <derivation name="&amp;&amp;"/>
   </derivedType>
-  <specialization id="94688ca6-b5a6-4c25-bd3e-135ebdc43dc0" name="UniquePtr" primaryType="class_UniquePtr_T_793F841C13E9DD3A6869243C74F1D948C0E04009">
+  <specialization id="634d5d85-6712-4253-abe0-b62e0a87e195" name="UniquePtr" primaryType="class_UniquePtr_T_793F841C13E9DD3A6869243C74F1D948C0E04009">
    <templateArgumentTypes>
     <templateArgumentType ref="class_HttpHeader_579B164F08791FA07CEFA19A0E2858BEAEA4F4B6"/>
    </templateArgumentTypes>
   </specialization>
-  <derivedType id="c506060b-86f7-4ee0-b179-be8b7114ce43" name="UniquePtr&lt;System.Net.Http.HttpHeader>&amp;&amp;">
-   <derivation baseType="94688ca6-b5a6-4c25-bd3e-135ebdc43dc0"/>
+  <derivedType id="73f9d300-20d4-4dbc-ae8a-ae5e5bc4275c" name="UniquePtr&lt;System.Net.Http.HttpHeader>&amp;&amp;">
+   <derivation baseType="634d5d85-6712-4253-abe0-b62e0a87e195"/>
    <derivation name="&amp;&amp;"/>
   </derivedType>
-  <derivedType id="2e2f568b-d4f9-4987-ae6b-4c9ab827b443" name="HttpHeader*">
+  <derivedType id="3bd92629-68f2-4818-9a39-67e06303f63b" name="HttpHeader*">
    <derivation baseType="class_HttpHeader_579B164F08791FA07CEFA19A0E2858BEAEA4F4B6"/>
    <derivation name="*"/>
   </derivedType>
-  <specialization id="41bee9cb-3be7-4e45-9410-e760fe202b5b" name="List" primaryType="class_List_T_4E42CF5913BEB21F5260DEFEC239180C94460B11">
+  <specialization id="6b3a2e93-d79c-42d6-ad95-230307079bdb" name="List" primaryType="class_List_T_4E42CF5913BEB21F5260DEFEC239180C94460B11">
    <templateArgumentTypes>
-    <templateArgumentType ref="94688ca6-b5a6-4c25-bd3e-135ebdc43dc0"/>
+    <templateArgumentType ref="634d5d85-6712-4253-abe0-b62e0a87e195"/>
    </templateArgumentTypes>
   </specialization>
-  <derivedType id="b259eab4-2839-4724-bf40-3dce42d2705e" name="const List&lt;UniquePtr&lt;System.Net.Http.HttpHeader>>&amp;">
+  <derivedType id="3bf8becf-b938-4a3e-ac77-c6310b34dc9f" name="const List&lt;UniquePtr&lt;System.Net.Http.HttpHeader>>&amp;">
    <derivation name="const"/>
-   <derivation baseType="41bee9cb-3be7-4e45-9410-e760fe202b5b"/>
+   <derivation baseType="6b3a2e93-d79c-42d6-ad95-230307079bdb"/>
    <derivation name="&amp;"/>
   </derivedType>
   <specialization id="e5a0393f-cd22-48e6-9b3d-a9afcfb93727" name="Hasher" primaryType="class_Hasher_T_9E06FCD9B56B8B3B7E7F8286BE8179D3B1CB8325">
@@ -5093,117 +5093,117 @@
     <templateArgumentType ref="b6963d46-e09d-4bba-9c23-c6beb90db5a3"/>
    </templateArgumentTypes>
   </specialization>
-  <specialization id="4ca459d3-9239-4084-9960-3c30cf9bf5cc" name="HashMap" primaryType="class_HashMap_K_T_H_C_D555F9108F5700505E1FCCC02041016E58EE9314">
+  <specialization id="d8fe86dc-8847-4098-bf96-3f5841e3a944" name="HashMap" primaryType="class_HashMap_K_T_H_C_D555F9108F5700505E1FCCC02041016E58EE9314">
    <templateArgumentTypes>
     <templateArgumentType ref="b6963d46-e09d-4bba-9c23-c6beb90db5a3"/>
-    <templateArgumentType ref="2e2f568b-d4f9-4987-ae6b-4c9ab827b443"/>
+    <templateArgumentType ref="3bd92629-68f2-4818-9a39-67e06303f63b"/>
     <templateArgumentType ref="e5a0393f-cd22-48e6-9b3d-a9afcfb93727"/>
     <templateArgumentType ref="1e0fe5ad-d3ac-4108-9d14-50feda6b2f19"/>
    </templateArgumentTypes>
   </specialization>
-  <derivedType id="fb18a51d-304d-4bdc-8aba-1449ba63628c" name="HttpParser&amp;">
+  <derivedType id="b06ba118-4740-41e0-9d97-553bd08c2af0" name="HttpParser&amp;">
    <derivation baseType="class_HttpParser_7F2D81A3B9537976EE0BC4AFF6401E5DB00ED4A4"/>
    <derivation name="&amp;"/>
   </derivedType>
-  <derivedType id="b9f1e3ee-c9cf-4aba-8fed-029798a08296" name="HttpChunkHeaderGrammar*">
+  <derivedType id="0eaaa676-a29d-49c5-8485-6d4ea6faaaad" name="HttpChunkHeaderGrammar*">
    <derivation baseType="class_HttpChunkHeaderGrammar_65E8832774F33C4DA866A2A00160696961A43C82"/>
    <derivation name="*"/>
   </derivedType>
-  <derivedType id="0613d8f4-7979-404c-b665-cd32d0ce1977" name="HttpDateGrammar*">
+  <derivedType id="bbc8d16e-83d1-4a08-bd8b-733030b4edb2" name="HttpDateGrammar*">
    <derivation baseType="class_HttpDateGrammar_D09EDB5967C3CA97D8FAA3AFD9A67ED3852F8B49"/>
    <derivation name="*"/>
   </derivedType>
-  <derivedType id="fe7c34f5-b1a6-4f7d-97ca-c55994d5af4e" name="HttpFieldValueGrammar*">
+  <derivedType id="bfcd5136-ee54-4f95-83a3-aafc61b4a146" name="HttpFieldValueGrammar*">
    <derivation baseType="class_HttpFieldValueGrammar_2D1712560A490E63F8F7876D21852153EB66F71B"/>
    <derivation name="*"/>
   </derivedType>
-  <derivedType id="7eebe62f-660e-446d-be18-a402780f5796" name="HttpHeaderGrammar*">
+  <derivedType id="23582f78-6298-4671-93f5-483f179a00bc" name="HttpHeaderGrammar*">
    <derivation baseType="class_HttpHeaderGrammar_7521C89077BF342672401DAB964B619B3AACD902"/>
    <derivation name="*"/>
   </derivedType>
-  <derivedType id="df5f67ba-b375-4e9d-9fa4-b6d8a15303b1" name="HttpGrammar*">
+  <derivedType id="a8c79d01-55f9-46a8-8bd2-18571ac37806" name="HttpGrammar*">
    <derivation baseType="class_HttpGrammar_6EA9341C3C7F4194B6A7F06D2A0AD2770B6B2EAB"/>
    <derivation name="*"/>
   </derivedType>
-  <specialization id="f514aadc-0438-46d0-a886-e233ae9e9518" name="UniquePtr" primaryType="class_UniquePtr_T_793F841C13E9DD3A6869243C74F1D948C0E04009">
+  <specialization id="4e6e958b-4cb7-4031-b4cc-e92cedec5825" name="UniquePtr" primaryType="class_UniquePtr_T_793F841C13E9DD3A6869243C74F1D948C0E04009">
    <templateArgumentTypes>
     <templateArgumentType ref="class_HttpParser_7F2D81A3B9537976EE0BC4AFF6401E5DB00ED4A4"/>
    </templateArgumentTypes>
   </specialization>
-  <derivedType id="3f15841c-cc4e-4597-8cf7-085acb3a67d2" name="HttpMediaTypeGrammar*">
+  <derivedType id="77ddc109-d518-4e22-b257-0426b777f57f" name="HttpMediaTypeGrammar*">
    <derivation baseType="class_HttpMediaTypeGrammar_41A02821BE252D5F077CBC520DE40C756A9C077A"/>
    <derivation name="*"/>
   </derivedType>
-  <derivedType id="897c187e-e63e-41ae-a8b9-a64bcad48de6" name="HttpStatusLineGrammar*">
+  <derivedType id="ed975657-0697-43f9-a4d7-fc8265d5c392" name="HttpStatusLineGrammar*">
    <derivation baseType="class_HttpStatusLineGrammar_1A2CD34BFF9D3B95262D546D0DB3D638030D99E0"/>
    <derivation name="*"/>
   </derivedType>
-  <specialization id="722bbe1c-eca9-4f9f-91a6-b6603b8e8823" name="UniquePtr" primaryType="class_UniquePtr_T_793F841C13E9DD3A6869243C74F1D948C0E04009">
+  <specialization id="f0daf03e-0b33-4506-8265-ad65e048c5b9" name="UniquePtr" primaryType="class_UniquePtr_T_793F841C13E9DD3A6869243C74F1D948C0E04009">
    <templateArgumentTypes>
     <templateArgumentType ref="class_HttpMethod_E29E235BC7F31D0A5C161A2A9D99644468180A82"/>
    </templateArgumentTypes>
   </specialization>
-  <derivedType id="9431c37d-c959-406c-a1ae-d59a70f26067" name="UniquePtr&lt;System.Net.Http.HttpMethod>&amp;&amp;">
-   <derivation baseType="722bbe1c-eca9-4f9f-91a6-b6603b8e8823"/>
+  <derivedType id="4cea4a61-22ed-45cd-910c-de944d9d19b6" name="UniquePtr&lt;System.Net.Http.HttpMethod>&amp;&amp;">
+   <derivation baseType="f0daf03e-0b33-4506-8265-ad65e048c5b9"/>
    <derivation name="&amp;&amp;"/>
   </derivedType>
-  <specialization id="42a0545f-624c-4b5a-9cd7-c9d97beeca86" name="UniquePtr" primaryType="class_UniquePtr_T_793F841C13E9DD3A6869243C74F1D948C0E04009">
+  <specialization id="b1424032-1ef5-4495-96ac-67356895b310" name="UniquePtr" primaryType="class_UniquePtr_T_793F841C13E9DD3A6869243C74F1D948C0E04009">
    <templateArgumentTypes>
     <templateArgumentType ref="class_HttpVersion_136C62265D84BB226DE6D114350E4BE2CCD77B74"/>
    </templateArgumentTypes>
   </specialization>
-  <derivedType id="bf36ff34-fc6d-4ce3-81a8-bb23dd3d46a7" name="UniquePtr&lt;System.Net.Http.HttpVersion>&amp;&amp;">
-   <derivation baseType="42a0545f-624c-4b5a-9cd7-c9d97beeca86"/>
+  <derivedType id="fb9cf469-ab2d-4c79-9071-4e0b51704669" name="UniquePtr&lt;System.Net.Http.HttpVersion>&amp;&amp;">
+   <derivation baseType="b1424032-1ef5-4495-96ac-67356895b310"/>
    <derivation name="&amp;&amp;"/>
   </derivedType>
-  <derivedType id="fcf01e50-008f-4696-a761-2653bae5fa0a" name="MimeType&amp;&amp;">
+  <derivedType id="7809b85f-0925-42c4-9fff-b5759af00e15" name="MimeType&amp;&amp;">
    <derivation baseType="class_MimeType_8D9E497183EDA2D56440FAB4472E32E2195C8D21"/>
    <derivation name="&amp;&amp;"/>
   </derivedType>
-  <specialization id="9353f356-bce4-4b26-9811-3b2f8403092e" name="UniquePtr" primaryType="class_UniquePtr_T_793F841C13E9DD3A6869243C74F1D948C0E04009">
+  <specialization id="b029d269-b3d5-45a2-9b76-ae5dbeb8d602" name="UniquePtr" primaryType="class_UniquePtr_T_793F841C13E9DD3A6869243C74F1D948C0E04009">
    <templateArgumentTypes>
     <templateArgumentType ref="class_MediaType_63E6771B1EEBFED7CA92F446A43D1954D4E22439"/>
    </templateArgumentTypes>
   </specialization>
-  <derivedType id="3af0a38d-c5c4-43b9-ad66-074be8224a48" name="UniquePtr&lt;System.Net.Http.MediaType>&amp;&amp;">
-   <derivation baseType="9353f356-bce4-4b26-9811-3b2f8403092e"/>
+  <derivedType id="aea47d9c-f48d-4b2e-a0ec-7dc5aef33eaa" name="UniquePtr&lt;System.Net.Http.MediaType>&amp;&amp;">
+   <derivation baseType="b029d269-b3d5-45a2-9b76-ae5dbeb8d602"/>
    <derivation name="&amp;&amp;"/>
   </derivedType>
-  <specialization id="560b1c93-5ec7-4658-bdf0-94bbf8cde74b" name="UniquePtr" primaryType="class_UniquePtr_T_793F841C13E9DD3A6869243C74F1D948C0E04009">
+  <specialization id="48dfea80-fa75-485f-9fa6-db3f06fa24e7" name="UniquePtr" primaryType="class_UniquePtr_T_793F841C13E9DD3A6869243C74F1D948C0E04009">
    <templateArgumentTypes>
     <templateArgumentType ref="class_Subtype_476751185581E40C33C4DCD63CBCC4E8BD30234F"/>
    </templateArgumentTypes>
   </specialization>
-  <derivedType id="3bbc663a-700f-48a1-bcd7-96f91f46a1f9" name="UniquePtr&lt;System.Net.Http.Subtype>&amp;&amp;">
-   <derivation baseType="560b1c93-5ec7-4658-bdf0-94bbf8cde74b"/>
+  <derivedType id="49d29426-6449-4366-abe5-d6e278fc5692" name="UniquePtr&lt;System.Net.Http.Subtype>&amp;&amp;">
+   <derivation baseType="48dfea80-fa75-485f-9fa6-db3f06fa24e7"/>
    <derivation name="&amp;&amp;"/>
   </derivedType>
-  <derivedType id="41fa45d5-b4b1-4208-8407-05a1cbcc9e66" name="MediaType*">
+  <derivedType id="bfb0227b-7c16-4db6-a684-600103add677" name="MediaType*">
    <derivation baseType="class_MediaType_63E6771B1EEBFED7CA92F446A43D1954D4E22439"/>
    <derivation name="*"/>
   </derivedType>
-  <derivedType id="ac6dc1f9-fd2d-4cc8-a48e-9f52bc979836" name="Subtype*">
+  <derivedType id="c682bdce-b8ef-45b6-b0fc-c23692205ca8" name="Subtype*">
    <derivation baseType="class_Subtype_476751185581E40C33C4DCD63CBCC4E8BD30234F"/>
    <derivation name="*"/>
   </derivedType>
-  <derivedType id="736dc6c2-873c-43e0-aaff-70f35e0e310b" name="const Map&lt;String&lt;uchar>, String&lt;uchar>, Less&lt;String&lt;uchar>>>&amp;">
+  <derivedType id="dba9b1d3-c79a-4439-906e-5c94638f3a38" name="const Map&lt;String&lt;uchar>, String&lt;uchar>, Less&lt;String&lt;uchar>>>&amp;">
    <derivation name="const"/>
-   <derivation baseType="dd269ccf-c893-466f-8437-fb8c39c23f31"/>
+   <derivation baseType="43a299a2-a2c2-4b0b-aa50-8e448716a097"/>
    <derivation name="&amp;"/>
   </derivedType>
-  <derivedType id="c6d430e1-1c92-4942-a2d9-0c2730defb29" name="UriReference*">
+  <derivedType id="4a27d35a-024f-4dd5-bf65-ed846442bf38" name="UriReference*">
    <derivation baseType="class_UriReference_6E4543DEBAEE63870C6B9BC9C602E2225A228B71"/>
    <derivation name="*"/>
   </derivedType>
-  <derivedType id="bae9be81-c148-4894-85a7-1726cd000d01" name="UriParser&amp;">
+  <derivedType id="1508549b-a393-4e59-9bb7-54545fd6ab89" name="UriParser&amp;">
    <derivation baseType="class_UriParser_E68D5FE2B6757B249FA247FEF9654AF9126DF8C3"/>
    <derivation name="&amp;"/>
   </derivedType>
-  <derivedType id="f9b9c94b-6221-4cd4-8260-af32ba8248e4" name="UriGrammar*">
+  <derivedType id="32680b79-1c77-4207-b6f9-ff8d4af4cd46" name="UriGrammar*">
    <derivation baseType="class_UriGrammar_D0251466D700C9F5D75D388036FDA8FCD873EE76"/>
    <derivation name="*"/>
   </derivedType>
-  <specialization id="877ee050-23b3-4b20-927b-6c015681a00a" name="UniquePtr" primaryType="class_UniquePtr_T_793F841C13E9DD3A6869243C74F1D948C0E04009">
+  <specialization id="a21bed12-a02e-4538-9ca1-1981f1de911e" name="UniquePtr" primaryType="class_UniquePtr_T_793F841C13E9DD3A6869243C74F1D948C0E04009">
    <templateArgumentTypes>
     <templateArgumentType ref="class_UriParser_E68D5FE2B6757B249FA247FEF9654AF9126DF8C3"/>
    </templateArgumentTypes>
@@ -5212,13 +5212,13 @@
    <derivation baseType="class_ByteStream_3B7A2F3379612ADBD7E416487752A1935AA8B96F"/>
    <derivation name="&amp;"/>
   </derivedType>
-  <specialization id="86387874-73d3-4bd7-afc5-8c50d9d77d5c" name="List" primaryType="class_List_T_4E42CF5913BEB21F5260DEFEC239180C94460B11">
+  <specialization id="fc6cd602-5784-426a-992f-2350e78d303b" name="List" primaryType="class_List_T_4E42CF5913BEB21F5260DEFEC239180C94460B11">
    <templateArgumentTypes>
     <templateArgumentType ref="class_HttpHeader_579B164F08791FA07CEFA19A0E2858BEAEA4F4B6"/>
    </templateArgumentTypes>
   </specialization>
-  <derivedType id="763851c3-ce86-4b0b-ba8a-6947f3ee66e5" name="List&lt;System.Net.Http.HttpHeader>&amp;">
-   <derivation baseType="86387874-73d3-4bd7-afc5-8c50d9d77d5c"/>
+  <derivedType id="9070682b-4bd5-4217-bebb-1b38a58a2e3a" name="List&lt;System.Net.Http.HttpHeader>&amp;">
+   <derivation baseType="fc6cd602-5784-426a-992f-2350e78d303b"/>
    <derivation name="&amp;"/>
   </derivedType>
  </types>

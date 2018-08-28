@@ -184,6 +184,10 @@
                 <td class="functionTableSecondCol" xml:space="preserve"><a href="namespace_util_10CA45893690AF432B785048B4AA3F0E7D4765DF.html#function_FileExists_2FF5E142167EA17A11B1310E9062462962DC6DF3">FileExists</a>(<span class="kw">const </span>std::string&amp; filePath)</td>
             </tr>
             <tr>
+                <td class="functionTableFirstCol" xml:space="preserve">std::u32string</td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="namespace_util_10CA45893690AF432B785048B4AA3F0E7D4765DF.html#function_FormatNumber_88158542D50735DAA8D5BF3B155D29CE20D3C131">FormatNumber</a>(<span class="kw">int</span> n, <span class="kw">int</span> numDigits)</td>
+            </tr>
+            <tr>
                 <td class="functionTableFirstCol" xml:space="preserve">std::string</td>
                 <td class="functionTableSecondCol" xml:space="preserve"><a href="namespace_util_10CA45893690AF432B785048B4AA3F0E7D4765DF.html#function_FormatTimeMs_5EE48E74EAF62D4405D9CA7CAAE1CDF5189FFC4B">FormatTimeMs</a>(int32_t milliseconds)</td>
             </tr>
@@ -242,6 +246,10 @@
             <tr>
                 <td class="functionTableFirstCol" xml:space="preserve">uint32_t</td>
                 <td class="functionTableSecondCol" xml:space="preserve"><a href="namespace_util_10CA45893690AF432B785048B4AA3F0E7D4765DF.html#function_LeftRotate_361C302BFB0311E33178F50CFBE2DF1E321A247A">LeftRotate</a>(uint32_t x, uint32_t n) <span class="kw">inline</span></td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">int</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="namespace_util_10CA45893690AF432B785048B4AA3F0E7D4765DF.html#function_Log10_E710F1F41982A9029A85DD801FB711F91B23E9C1">Log10</a>(<span class="kw">int</span> n)</td>
             </tr>
             <tr>
                 <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
@@ -405,11 +413,11 @@
             </tr>
             <tr>
                 <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">int</span></td>
-                <td class="functionTableSecondCol" xml:space="preserve"><a href="namespace_util_10CA45893690AF432B785048B4AA3F0E7D4765DF.html#function_Wait_5DDBC5275ACEC0ED8591DC01A08A192AA0B49041">Wait</a>(<span class="kw">unsigned long long</span> processHandle)</td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="namespace_util_10CA45893690AF432B785048B4AA3F0E7D4765DF.html#function_Wait_5DDBC5275ACEC0ED8591DC01A08A192AA0B49041">Wait</a>(<span class="kw">unsigned long long</span>)</td>
             </tr>
             <tr>
                 <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">int</span></td>
-                <td class="functionTableSecondCol" xml:space="preserve"><a href="namespace_util_10CA45893690AF432B785048B4AA3F0E7D4765DF.html#function_Wait_5DDBC5275ACEC0ED8591DC01A08A192AA0B49041">Wait</a>(<span class="kw">unsigned long long</span>)</td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="namespace_util_10CA45893690AF432B785048B4AA3F0E7D4765DF.html#function_Wait_5DDBC5275ACEC0ED8591DC01A08A192AA0B49041">Wait</a>(<span class="kw">unsigned long long</span> processHandle)</td>
             </tr>
             <tr>
                 <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">int</span></td>
@@ -637,6 +645,23 @@
         <span>
             Declaration at line <a href="file/util/Path.hpp_1B25244C849773DD357BF10EFB83E0315AE78ECD.html#19">19</a>
              of <a href="file/util/Path.hpp_1B25244C849773DD357BF10EFB83E0315AE78ECD.html">Path.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_FormatNumber_88158542D50735DAA8D5BF3B155D29CE20D3C131">FormatNumber Function</h3>
+        <h4>
+            std::u32string cmajor::util::FormatNumber(<span class="kw">int</span>
+             n, <span class="kw">int</span>
+             numDigits)</h4>
+        <span>
+            Definition at line <a href="file/util/TextUtils.cpp_5B49BDAFD18D5CA9504288E4200C14DCAC8F076B.html#459">459</a>
+             of <a href="file/util/TextUtils.cpp_5B49BDAFD18D5CA9504288E4200C14DCAC8F076B.html">TextUtils.cpp</a>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/util/TextUtils.hpp_35B62A30F7D00FF99F4C7F821AA2D58203B03B41.html#42">42</a>
+             of <a href="file/util/TextUtils.hpp_35B62A30F7D00FF99F4C7F821AA2D58203B03B41.html">TextUtils.hpp</a>
         </span>
         <br/>
         <br/>
@@ -1077,6 +1102,46 @@
         <br/>
         <br/>
         <hr/>
+        <h3 id="function_Log10_E710F1F41982A9029A85DD801FB711F91B23E9C1">Log10 Function</h3>
+        <h4>
+            <span class="kw">int</span>
+             cmajor::util::Log10(<span class="kw">int</span>
+             n)</h4>
+        <span>
+            Definition at line <a href="file/util/TextUtils.cpp_5B49BDAFD18D5CA9504288E4200C14DCAC8F076B.html#447">447</a>
+             of <a href="file/util/TextUtils.cpp_5B49BDAFD18D5CA9504288E4200C14DCAC8F076B.html">TextUtils.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">448</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">449</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">int</span>&nbsp;<span class="identifier">log10</span>&nbsp;<span class="other">=</span>&nbsp;<span class="other">1</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">450</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">int</span>&nbsp;<span class="identifier">m</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">n</span><span class="other">&nbsp;/&nbsp;</span><span class="other">10</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">451</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">while&nbsp;</span><span class="other">(</span><span class="identifier">m</span><span class="other">&nbsp;>&nbsp;</span><span class="other">0</span><span class="other">)</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">452</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">453</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">++</span><span class="identifier">log10</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">454</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">m</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">m</span><span class="other">&nbsp;/&nbsp;</span><span class="other">10</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">455</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">456</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">log10</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">457</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/util/TextUtils.hpp_35B62A30F7D00FF99F4C7F821AA2D58203B03B41.html#41">41</a>
+             of <a href="file/util/TextUtils.hpp_35B62A30F7D00FF99F4C7F821AA2D58203B03B41.html">TextUtils.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
         <h3 id="function_LogMessage_0A6C90708F1C70C5068509330383EFE0EB304BE0">LogMessage Function</h3>
         <h4>
             <span class="kw">void</span>
@@ -1091,7 +1156,7 @@
         <br/>
         <span>
             Called by: <a href="namespace_build_8579CAB238C54EBCD5D162A3B94D6D12FA6E71A5.html#function_BuildProject_8B91C075DE1AB89526CD110571A1A5E284B9DE1F">cmajor::build::BuildProject</a>
-            , <a href="namespace_build_8579CAB238C54EBCD5D162A3B94D6D12FA6E71A5.html#function_BuildSolution_7F99791C0DC84BAD0480870DBE88FB69A91430A9">cmajor::build::BuildSolution</a>
+            , <a href="namespace_build_8579CAB238C54EBCD5D162A3B94D6D12FA6E71A5.html#function_BuildSolution_A6218D0324F321C281D3AB3344E06746CC19B124">cmajor::build::BuildSolution</a>
             , <a href="namespace_build_8579CAB238C54EBCD5D162A3B94D6D12FA6E71A5.html#function_CleanProject_BCE54FC39CCA6A94C4E781FC416684216FA16405">cmajor::build::CleanProject</a>
             , <a href="namespace_build_8579CAB238C54EBCD5D162A3B94D6D12FA6E71A5.html#function_GenerateLibrary_171D6E85DE30CDA10049753AE2DA093320F9570D">cmajor::build::GenerateLibrary</a>
             , <a href="namespace_build_8579CAB238C54EBCD5D162A3B94D6D12FA6E71A5.html#function_GenerateLibrary_171D6E85DE30CDA10049753AE2DA093320F9570D">cmajor::build::GenerateLibrary</a>
@@ -1431,6 +1496,24 @@
             std::string&amp; filename, <span class="kw">const </span>
             std::vector&lt;std::string>&amp; args)</h4>
         <span>
+            Definition at line <a href="file/util/System.cpp_E821D766753C095215E506BAB267E0047BA26ED4.html#239">239</a>
+             of <a href="file/util/System.cpp_E821D766753C095215E506BAB267E0047BA26ED4.html">System.cpp</a>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/util/System.hpp_B9AF0465D35C274C24ABBCF8C9068D443C0DC3C7.html#29">29</a>
+             of <a href="file/util/System.hpp_B9AF0465D35C274C24ABBCF8C9068D443C0DC3C7.html">System.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_Spawn_A7B8D25AFAC94B350481F98D415D2E3FBBD200FC">Spawn Function</h3>
+        <h4>
+            <span class="kw">unsigned long long</span>
+             cmajor::util::Spawn(<span class="kw">const </span>
+            std::string&amp; filename, <span class="kw">const </span>
+            std::vector&lt;std::string>&amp; args)</h4>
+        <span>
             Definition at line <a href="file/util/System.cpp_E821D766753C095215E506BAB267E0047BA26ED4.html#276">276</a>
              of <a href="file/util/System.cpp_E821D766753C095215E506BAB267E0047BA26ED4.html">System.cpp</a>
         </span>
@@ -1443,24 +1526,6 @@
         <br/>
         <span>
             Calls: <a href="namespace_util_10CA45893690AF432B785048B4AA3F0E7D4765DF.html#function_System_C64E2783324F7BE2886FC85DBD3B0BC6F4F5B985">cmajor::util::System</a>
-        </span>
-        <br/>
-        <br/>
-        <hr/>
-        <h3 id="function_Spawn_A7B8D25AFAC94B350481F98D415D2E3FBBD200FC">Spawn Function</h3>
-        <h4>
-            <span class="kw">unsigned long long</span>
-             cmajor::util::Spawn(<span class="kw">const </span>
-            std::string&amp; filename, <span class="kw">const </span>
-            std::vector&lt;std::string>&amp; args)</h4>
-        <span>
-            Definition at line <a href="file/util/System.cpp_E821D766753C095215E506BAB267E0047BA26ED4.html#239">239</a>
-             of <a href="file/util/System.cpp_E821D766753C095215E506BAB267E0047BA26ED4.html">System.cpp</a>
-        </span>
-        <br/>
-        <span>
-            Declaration at line <a href="file/util/System.hpp_B9AF0465D35C274C24ABBCF8C9068D443C0DC3C7.html#29">29</a>
-             of <a href="file/util/System.hpp_B9AF0465D35C274C24ABBCF8C9068D443C0DC3C7.html">System.hpp</a>
         </span>
         <br/>
         <br/>
@@ -2184,9 +2249,9 @@
         <h4>
             <span class="kw">int</span>
              cmajor::util::Wait(<span class="kw">unsigned long long</span>
-             processHandle)</h4>
+            )</h4>
         <span>
-            Definition at line <a href="file/util/System.cpp_E821D766753C095215E506BAB267E0047BA26ED4.html#262">262</a>
+            Definition at line <a href="file/util/System.cpp_E821D766753C095215E506BAB267E0047BA26ED4.html#300">300</a>
              of <a href="file/util/System.cpp_E821D766753C095215E506BAB267E0047BA26ED4.html">System.cpp</a>
             :<br/>
             <span class="code">
@@ -2224,9 +2289,9 @@
         <h4>
             <span class="kw">int</span>
              cmajor::util::Wait(<span class="kw">unsigned long long</span>
-            )</h4>
+             processHandle)</h4>
         <span>
-            Definition at line <a href="file/util/System.cpp_E821D766753C095215E506BAB267E0047BA26ED4.html#300">300</a>
+            Definition at line <a href="file/util/System.cpp_E821D766753C095215E506BAB267E0047BA26ED4.html#262">262</a>
              of <a href="file/util/System.cpp_E821D766753C095215E506BAB267E0047BA26ED4.html">System.cpp</a>
         </span>
         <br/>

@@ -313,6 +313,7 @@
             , <a href="class_BasicEmitter_ADBC5CA76E0CFA156325CCEFB69E7DB1412045E9.html#function_Visit_863D21DB8A9AD1683D17518E6C4E711C3A87EB07">cmajor::emitter::BasicEmitter::Visit</a>
             , <a href="class_ClassTypeSymbol_706F15CDE917688D403DB002B3816EE91C6F66CB.html#function_CreateDIForwardDeclaration_6D826B32BE5DDBFFADDDA8DC2994904B1A6D67BC">cmajor::symbols::ClassTypeSymbol::CreateDIForwardDeclaration</a>
             , <a href="class_ClassTypeSymbol_706F15CDE917688D403DB002B3816EE91C6F66CB.html#function_CreateDIType_D01CC25402FB646403C013AC1FBBC6C2A102BB3B">cmajor::symbols::ClassTypeSymbol::CreateDIType</a>
+            , <a href="class_FunctionSymbol_5AC1C26A9572181B3E31247997BF40453B22EDEF.html#function_Id_4067535CEB439A424C838CF985C5FF82A785DA78">cmajor::symbols::FunctionSymbol::Id</a>
             , <a href="class_MemberFunctionSymbol_3BF2D77D69165719C9D08538201EC0A12DBC5B03.html#function_DocName_8545EBB299777E3AB3D683C86BD213641C60E883">cmajor::symbols::MemberFunctionSymbol::DocName</a>
             , <a href="class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_AddClassTemplateSpecializationsToClassTemplateSpecializationMap_F1E9CB729FA016E49D327CBE9E8A233CF867CF99">cmajor::symbols::SymbolTable::AddClassTemplateSpecializationsToClassTemplateSpecializationMap</a>
             , <a href="class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_Import_DCE4C2722A9838A80D6C6E211B3FFF34345D93F8">cmajor::symbols::SymbolTable::Import</a>
@@ -380,7 +381,7 @@
                 <br/>
                 <span class="code" xml:space="preserve"><span class="lineNumber">181</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">182</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">ToUtf32</span><span class="other">(</span><span class="identifier">boost</span><span class="other">::</span><span class="identifier">uuids</span><span class="other">::</span><span class="identifier">to_string</span><span class="other">(</span><a href="class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html#function_TypeId_E2CB67BF95F64693CD008DF2DB02CFAB8C67D033">TypeId</a><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">182</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<a href="class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html">TypeSymbol</a><span class="other">::</span><a href="class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html#function_Id_8532438CF2FE0D833E285198AEA66E79B1F81253">Id</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
                 <span class="code" xml:space="preserve"><span class="lineNumber">183</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
                 <br/>
@@ -405,7 +406,12 @@
         <span>
             Calls: <a href="class_ClassTemplateSpecializationSymbol_F0BC1A28739F39F0DA3BC5C1405A607BF1DFC8EA.html#function_IsPrototype_19C65CC1E8DDE68533512D1F311A791CD800AF65">cmajor::symbols::ClassTemplateSpecializationSymbol::IsPrototype</a>
             , <a href="class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_MangledName_6F4B3C08E6832F2EF32DD516A461D594D5C9AC64">cmajor::symbols::Symbol::MangledName</a>
-            , <a href="class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html#function_TypeId_E2CB67BF95F64693CD008DF2DB02CFAB8C67D033">cmajor::symbols::TypeSymbol::TypeId</a>
+            , <a href="class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html#function_Id_8532438CF2FE0D833E285198AEA66E79B1F81253">cmajor::symbols::TypeSymbol::Id</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Called by: <a href="class_ClassTypeSymbol_706F15CDE917688D403DB002B3816EE91C6F66CB.html#function_Id_813971E1054C2E132F29A4FDEB20448802B4C274">cmajor::symbols::ClassTypeSymbol::Id</a>
         </span>
         <br/>
         <br/>
@@ -446,9 +452,11 @@
         </span>
         <br/>
         <span>
-            Called by: <a href="class_ClassTemplateSpecializationSymbol_F0BC1A28739F39F0DA3BC5C1405A607BF1DFC8EA.html#function_Id_D9E0E3E124EE48D1DB2007FF3BC4F136E4B4FB54">cmajor::symbols::ClassTemplateSpecializationSymbol::Id</a>
+            Called by: <a href="class_ClassTemplateRepository_8091371C094F17B8769F636AA4554A153D57D624.html#function_BindClassTemplateSpecialization_238B5CF0803BF96EA805048B5EB8EDD47E75143B">cmajor::binder::ClassTemplateRepository::BindClassTemplateSpecialization</a>
+            , <a href="class_ClassTemplateSpecializationSymbol_F0BC1A28739F39F0DA3BC5C1405A607BF1DFC8EA.html#function_Id_D9E0E3E124EE48D1DB2007FF3BC4F136E4B4FB54">cmajor::symbols::ClassTemplateSpecializationSymbol::Id</a>
             , <a href="class_ClassTemplateSpecializationSymbol_F0BC1A28739F39F0DA3BC5C1405A607BF1DFC8EA.html#function_IsPrototypeTemplateSpecialization_3EF13196825F9FF73822F7C7283E8E877DF61BD9">cmajor::symbols::ClassTemplateSpecializationSymbol::IsPrototypeTemplateSpecialization</a>
             , <a href="class_DestructorSymbol_6626180D5ED2C1B180810259C5E3AB2C9CC4E182.html#function_IsExportSymbol_6F0CDB89FA2A408E4D533025EBD7A1DC30A0B063">cmajor::symbols::DestructorSymbol::IsExportSymbol</a>
+            , <a href="class_FunctionSymbol_5AC1C26A9572181B3E31247997BF40453B22EDEF.html#function_Id_4067535CEB439A424C838CF985C5FF82A785DA78">cmajor::symbols::FunctionSymbol::Id</a>
         </span>
         <br/>
         <br/>
@@ -667,7 +675,7 @@
         </span>
         <br/>
         <span>
-            Called by: <a href="class_ClassTemplateRepository_8091371C094F17B8769F636AA4554A153D57D624.html#function_BindClassTemplateSpecialization_238B5CF0803BF96EA805048B5EB8EDD47E75143B">cmajor::binder::ClassTemplateRepository::BindClassTemplateSpecialization</a>
+            Called by: <a href="class_TypeBinder_197D6C7822958FE5DD6F6B43DDE787A9FA490EEA.html#function_BindClassTemplate_DA7BE08E63F6FAAE4F249EB681BCA581B08FC9C7">cmajor::binder::TypeBinder::BindClassTemplate</a>
         </span>
         <br/>
         <br/>

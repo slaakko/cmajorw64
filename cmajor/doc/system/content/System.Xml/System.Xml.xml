@@ -39,17 +39,17 @@
         <functions>
          <function docPath="../../System.Xml/doc/class_Attributes_C4B2B129CAB6BB03A5BC75E44A8C3E96E227069A.html#member_function_Add_Attributes_542213B4F0B9B717828A2EFD3D57A0A6E1C01853" extPath="System.Xml/doc/class_Attributes_C4B2B129CAB6BB03A5BC75E44A8C3E96E227069A.html#member_function_Add_Attributes_542213B4F0B9B717828A2EFD3D57A0A6E1C01853" fileName="System.Xml/XmlContentHandler.cm" filePath="../../System.Xml/file/XmlContentHandler.cm.html" id="member_function_Add_Attributes_542213B4F0B9B717828A2EFD3D57A0A6E1C01853" kind="Member Function" line="67" name="Add" returnType="4e959632-b5f2-406d-9402-ec16ab3f3585" specifiers="public">
           <parameters>
-           <parameter id="parameter_attribute_CAF119C94492854C3E5E817B7334206ADA696C83" name="attribute" type="79cd6f6b-c031-46d4-bd13-a3644bec0d84"/>
+           <parameter id="parameter_attribute_CAF119C94492854C3E5E817B7334206ADA696C83" name="attribute" type="fc4b5a76-988d-4eee-a271-8dfe615b943e"/>
           </parameters>
          </function>
-         <function docPath="../../System.Xml/doc/class_Attributes_C4B2B129CAB6BB03A5BC75E44A8C3E96E227069A.html#member_function_Begin_Attributes_E0FE2B1D836D9A509546ACCA17C436728633AA02" extPath="System.Xml/doc/class_Attributes_C4B2B129CAB6BB03A5BC75E44A8C3E96E227069A.html#member_function_Begin_Attributes_E0FE2B1D836D9A509546ACCA17C436728633AA02" fileName="System.Xml/XmlContentHandler.cm" filePath="../../System.Xml/file/XmlContentHandler.cm.html" id="member_function_Begin_Attributes_E0FE2B1D836D9A509546ACCA17C436728633AA02" kind="Member Function" line="51" name="Begin" returnType="80c36e68-0009-4859-b923-14ab63023322" specifiers="public inline nothrow"/>
-         <function const="true" docPath="../../System.Xml/doc/class_Attributes_C4B2B129CAB6BB03A5BC75E44A8C3E96E227069A.html#member_function_Begin_Attributes_9CBF93B2C57B61C120E6E24178E227328AF17E50" extPath="System.Xml/doc/class_Attributes_C4B2B129CAB6BB03A5BC75E44A8C3E96E227069A.html#member_function_Begin_Attributes_9CBF93B2C57B61C120E6E24178E227328AF17E50" fileName="System.Xml/XmlContentHandler.cm" filePath="../../System.Xml/file/XmlContentHandler.cm.html" id="member_function_Begin_Attributes_9CBF93B2C57B61C120E6E24178E227328AF17E50" kind="Member Function" line="47" name="Begin" returnType="51cf916a-4c8b-4af6-bb8f-2d55ebbf660d" specifiers="public inline nothrow"/>
-         <function const="true" docPath="../../System.Xml/doc/class_Attributes_C4B2B129CAB6BB03A5BC75E44A8C3E96E227069A.html#member_function_CBegin_Attributes_7946E7AA681A002E6AF02D5B650DBD8E454AB29A" extPath="System.Xml/doc/class_Attributes_C4B2B129CAB6BB03A5BC75E44A8C3E96E227069A.html#member_function_CBegin_Attributes_7946E7AA681A002E6AF02D5B650DBD8E454AB29A" fileName="System.Xml/XmlContentHandler.cm" filePath="../../System.Xml/file/XmlContentHandler.cm.html" id="member_function_CBegin_Attributes_7946E7AA681A002E6AF02D5B650DBD8E454AB29A" kind="Member Function" line="43" name="CBegin" returnType="51cf916a-4c8b-4af6-bb8f-2d55ebbf660d" specifiers="public inline nothrow"/>
-         <function const="true" docPath="../../System.Xml/doc/class_Attributes_C4B2B129CAB6BB03A5BC75E44A8C3E96E227069A.html#member_function_CEnd_Attributes_648180E438D133BE44CA40B30849FD9141D1025A" extPath="System.Xml/doc/class_Attributes_C4B2B129CAB6BB03A5BC75E44A8C3E96E227069A.html#member_function_CEnd_Attributes_648180E438D133BE44CA40B30849FD9141D1025A" fileName="System.Xml/XmlContentHandler.cm" filePath="../../System.Xml/file/XmlContentHandler.cm.html" id="member_function_CEnd_Attributes_648180E438D133BE44CA40B30849FD9141D1025A" kind="Member Function" line="55" name="CEnd" returnType="51cf916a-4c8b-4af6-bb8f-2d55ebbf660d" specifiers="public inline nothrow"/>
+         <function docPath="../../System.Xml/doc/class_Attributes_C4B2B129CAB6BB03A5BC75E44A8C3E96E227069A.html#member_function_Begin_Attributes_E0FE2B1D836D9A509546ACCA17C436728633AA02" extPath="System.Xml/doc/class_Attributes_C4B2B129CAB6BB03A5BC75E44A8C3E96E227069A.html#member_function_Begin_Attributes_E0FE2B1D836D9A509546ACCA17C436728633AA02" fileName="System.Xml/XmlContentHandler.cm" filePath="../../System.Xml/file/XmlContentHandler.cm.html" id="member_function_Begin_Attributes_E0FE2B1D836D9A509546ACCA17C436728633AA02" kind="Member Function" line="51" name="Begin" returnType="4c51fbad-d9e4-4da3-860f-b107a4fc4538" specifiers="public inline nothrow"/>
+         <function const="true" docPath="../../System.Xml/doc/class_Attributes_C4B2B129CAB6BB03A5BC75E44A8C3E96E227069A.html#member_function_Begin_Attributes_9CBF93B2C57B61C120E6E24178E227328AF17E50" extPath="System.Xml/doc/class_Attributes_C4B2B129CAB6BB03A5BC75E44A8C3E96E227069A.html#member_function_Begin_Attributes_9CBF93B2C57B61C120E6E24178E227328AF17E50" fileName="System.Xml/XmlContentHandler.cm" filePath="../../System.Xml/file/XmlContentHandler.cm.html" id="member_function_Begin_Attributes_9CBF93B2C57B61C120E6E24178E227328AF17E50" kind="Member Function" line="47" name="Begin" returnType="15f4f9e1-35da-4072-b8fe-4c79c1fd0abf" specifiers="public inline nothrow"/>
+         <function const="true" docPath="../../System.Xml/doc/class_Attributes_C4B2B129CAB6BB03A5BC75E44A8C3E96E227069A.html#member_function_CBegin_Attributes_7946E7AA681A002E6AF02D5B650DBD8E454AB29A" extPath="System.Xml/doc/class_Attributes_C4B2B129CAB6BB03A5BC75E44A8C3E96E227069A.html#member_function_CBegin_Attributes_7946E7AA681A002E6AF02D5B650DBD8E454AB29A" fileName="System.Xml/XmlContentHandler.cm" filePath="../../System.Xml/file/XmlContentHandler.cm.html" id="member_function_CBegin_Attributes_7946E7AA681A002E6AF02D5B650DBD8E454AB29A" kind="Member Function" line="43" name="CBegin" returnType="15f4f9e1-35da-4072-b8fe-4c79c1fd0abf" specifiers="public inline nothrow"/>
+         <function const="true" docPath="../../System.Xml/doc/class_Attributes_C4B2B129CAB6BB03A5BC75E44A8C3E96E227069A.html#member_function_CEnd_Attributes_648180E438D133BE44CA40B30849FD9141D1025A" extPath="System.Xml/doc/class_Attributes_C4B2B129CAB6BB03A5BC75E44A8C3E96E227069A.html#member_function_CEnd_Attributes_648180E438D133BE44CA40B30849FD9141D1025A" fileName="System.Xml/XmlContentHandler.cm" filePath="../../System.Xml/file/XmlContentHandler.cm.html" id="member_function_CEnd_Attributes_648180E438D133BE44CA40B30849FD9141D1025A" kind="Member Function" line="55" name="CEnd" returnType="15f4f9e1-35da-4072-b8fe-4c79c1fd0abf" specifiers="public inline nothrow"/>
          <function docPath="../../System.Xml/doc/class_Attributes_C4B2B129CAB6BB03A5BC75E44A8C3E96E227069A.html#member_function_Clear_Attributes_7ED47594415AB1D01A5DBCB7A1EDA41506FA1D35" extPath="System.Xml/doc/class_Attributes_C4B2B129CAB6BB03A5BC75E44A8C3E96E227069A.html#member_function_Clear_Attributes_7ED47594415AB1D01A5DBCB7A1EDA41506FA1D35" fileName="System.Xml/XmlContentHandler.cm" filePath="../../System.Xml/file/XmlContentHandler.cm.html" id="member_function_Clear_Attributes_7ED47594415AB1D01A5DBCB7A1EDA41506FA1D35" kind="Member Function" line="71" name="Clear" returnType="4e959632-b5f2-406d-9402-ec16ab3f3585" specifiers="public"/>
          <function const="true" docPath="../../System.Xml/doc/class_Attributes_C4B2B129CAB6BB03A5BC75E44A8C3E96E227069A.html#member_function_Count_Attributes_E7B100936A03E120FDBAB70199CA8461DD505BBF" extPath="System.Xml/doc/class_Attributes_C4B2B129CAB6BB03A5BC75E44A8C3E96E227069A.html#member_function_Count_Attributes_E7B100936A03E120FDBAB70199CA8461DD505BBF" fileName="System.Xml/XmlContentHandler.cm" filePath="../../System.Xml/file/XmlContentHandler.cm.html" id="member_function_Count_Attributes_E7B100936A03E120FDBAB70199CA8461DD505BBF" kind="Member Function" line="79" name="Count" returnType="8edf41dc-c01c-479c-8064-b92f90c315ea" specifiers="public inline nothrow"/>
-         <function docPath="../../System.Xml/doc/class_Attributes_C4B2B129CAB6BB03A5BC75E44A8C3E96E227069A.html#member_function_End_Attributes_41BA323D2A593CC9352AD6A14BAC4EBC3DC56AEF" extPath="System.Xml/doc/class_Attributes_C4B2B129CAB6BB03A5BC75E44A8C3E96E227069A.html#member_function_End_Attributes_41BA323D2A593CC9352AD6A14BAC4EBC3DC56AEF" fileName="System.Xml/XmlContentHandler.cm" filePath="../../System.Xml/file/XmlContentHandler.cm.html" id="member_function_End_Attributes_41BA323D2A593CC9352AD6A14BAC4EBC3DC56AEF" kind="Member Function" line="63" name="End" returnType="80c36e68-0009-4859-b923-14ab63023322" specifiers="public inline nothrow"/>
-         <function const="true" docPath="../../System.Xml/doc/class_Attributes_C4B2B129CAB6BB03A5BC75E44A8C3E96E227069A.html#member_function_End_Attributes_46818949DF6DAE4F91795CF04515C87E88F03DC6" extPath="System.Xml/doc/class_Attributes_C4B2B129CAB6BB03A5BC75E44A8C3E96E227069A.html#member_function_End_Attributes_46818949DF6DAE4F91795CF04515C87E88F03DC6" fileName="System.Xml/XmlContentHandler.cm" filePath="../../System.Xml/file/XmlContentHandler.cm.html" id="member_function_End_Attributes_46818949DF6DAE4F91795CF04515C87E88F03DC6" kind="Member Function" line="59" name="End" returnType="51cf916a-4c8b-4af6-bb8f-2d55ebbf660d" specifiers="public inline nothrow"/>
+         <function docPath="../../System.Xml/doc/class_Attributes_C4B2B129CAB6BB03A5BC75E44A8C3E96E227069A.html#member_function_End_Attributes_41BA323D2A593CC9352AD6A14BAC4EBC3DC56AEF" extPath="System.Xml/doc/class_Attributes_C4B2B129CAB6BB03A5BC75E44A8C3E96E227069A.html#member_function_End_Attributes_41BA323D2A593CC9352AD6A14BAC4EBC3DC56AEF" fileName="System.Xml/XmlContentHandler.cm" filePath="../../System.Xml/file/XmlContentHandler.cm.html" id="member_function_End_Attributes_41BA323D2A593CC9352AD6A14BAC4EBC3DC56AEF" kind="Member Function" line="63" name="End" returnType="4c51fbad-d9e4-4da3-860f-b107a4fc4538" specifiers="public inline nothrow"/>
+         <function const="true" docPath="../../System.Xml/doc/class_Attributes_C4B2B129CAB6BB03A5BC75E44A8C3E96E227069A.html#member_function_End_Attributes_46818949DF6DAE4F91795CF04515C87E88F03DC6" extPath="System.Xml/doc/class_Attributes_C4B2B129CAB6BB03A5BC75E44A8C3E96E227069A.html#member_function_End_Attributes_46818949DF6DAE4F91795CF04515C87E88F03DC6" fileName="System.Xml/XmlContentHandler.cm" filePath="../../System.Xml/file/XmlContentHandler.cm.html" id="member_function_End_Attributes_46818949DF6DAE4F91795CF04515C87E88F03DC6" kind="Member Function" line="59" name="End" returnType="15f4f9e1-35da-4072-b8fe-4c79c1fd0abf" specifiers="public inline nothrow"/>
          <function const="true" docPath="../../System.Xml/doc/class_Attributes_C4B2B129CAB6BB03A5BC75E44A8C3E96E227069A.html#member_function_GetAttributeValue_Attributes_28371BD0813B3405B8EADA92DE1A93558ECCC562" extPath="System.Xml/doc/class_Attributes_C4B2B129CAB6BB03A5BC75E44A8C3E96E227069A.html#member_function_GetAttributeValue_Attributes_28371BD0813B3405B8EADA92DE1A93558ECCC562" fileName="System.Xml/XmlContentHandler.cm" filePath="../../System.Xml/file/XmlContentHandler.cm.html" id="member_function_GetAttributeValue_Attributes_28371BD0813B3405B8EADA92DE1A93558ECCC562" kind="Member Function" line="99" name="GetAttributeValue" returnType="26a8daf9-4c30-4c13-b299-071c93d6686f" specifiers="public">
           <parameters>
            <parameter id="parameter_qualifiedName_AD25740736B7B57CA9E83A05C1BD4DEC7087D532" name="qualifiedName" type="0b2cb094-cc6d-4299-a074-5eb9b3aa8751"/>
@@ -62,18 +62,18 @@
           </parameters>
          </function>
          <function const="true" docPath="../../System.Xml/doc/class_Attributes_C4B2B129CAB6BB03A5BC75E44A8C3E96E227069A.html#member_function_IsEmpty_Attributes_BF31A606D8C56A503522EA6421C3BABC9188FDAD" extPath="System.Xml/doc/class_Attributes_C4B2B129CAB6BB03A5BC75E44A8C3E96E227069A.html#member_function_IsEmpty_Attributes_BF31A606D8C56A503522EA6421C3BABC9188FDAD" fileName="System.Xml/XmlContentHandler.cm" filePath="../../System.Xml/file/XmlContentHandler.cm.html" id="member_function_IsEmpty_Attributes_BF31A606D8C56A503522EA6421C3BABC9188FDAD" kind="Member Function" line="75" name="IsEmpty" returnType="b53e2ae1-a4b4-4d5b-b75d-06778243ef3d" specifiers="public inline nothrow"/>
-         <function const="true" docPath="../../System.Xml/doc/class_Attributes_C4B2B129CAB6BB03A5BC75E44A8C3E96E227069A.html#member_function_op_index_Attributes_2A5F48EA47F062D2FAE0A0D890D5689FB275F75C" extPath="System.Xml/doc/class_Attributes_C4B2B129CAB6BB03A5BC75E44A8C3E96E227069A.html#member_function_op_index_Attributes_2A5F48EA47F062D2FAE0A0D890D5689FB275F75C" fileName="System.Xml/XmlContentHandler.cm" filePath="../../System.Xml/file/XmlContentHandler.cm.html" id="member_function_op_index_Attributes_2A5F48EA47F062D2FAE0A0D890D5689FB275F75C" kind="Member Function" line="83" name="operator[]" returnType="79cd6f6b-c031-46d4-bd13-a3644bec0d84" specifiers="public nothrow">
+         <function const="true" docPath="../../System.Xml/doc/class_Attributes_C4B2B129CAB6BB03A5BC75E44A8C3E96E227069A.html#member_function_op_index_Attributes_2A5F48EA47F062D2FAE0A0D890D5689FB275F75C" extPath="System.Xml/doc/class_Attributes_C4B2B129CAB6BB03A5BC75E44A8C3E96E227069A.html#member_function_op_index_Attributes_2A5F48EA47F062D2FAE0A0D890D5689FB275F75C" fileName="System.Xml/XmlContentHandler.cm" filePath="../../System.Xml/file/XmlContentHandler.cm.html" id="member_function_op_index_Attributes_2A5F48EA47F062D2FAE0A0D890D5689FB275F75C" kind="Member Function" line="83" name="operator[]" returnType="fc4b5a76-988d-4eee-a271-8dfe615b943e" specifiers="public nothrow">
           <parameters>
            <parameter id="parameter_index_C8AEBFF6ECEEBB7C77192663FF7EE1A907DFE048" name="index" type="8edf41dc-c01c-479c-8064-b92f90c315ea"/>
           </parameters>
          </function>
         </functions>
         <typedefs>
-         <typedef docPath="../../System.Xml/doc/class_Attributes_C4B2B129CAB6BB03A5BC75E44A8C3E96E227069A.html#typedef_ConstIterator_50480D5EC488FF9C4EE4C168500045C6E79E8AEA" extPath="System.Xml/doc/class_Attributes_C4B2B129CAB6BB03A5BC75E44A8C3E96E227069A.html#typedef_ConstIterator_50480D5EC488FF9C4EE4C168500045C6E79E8AEA" id="typedef_ConstIterator_50480D5EC488FF9C4EE4C168500045C6E79E8AEA" name="ConstIterator" specifiers="public" type="51cf916a-4c8b-4af6-bb8f-2d55ebbf660d"/>
-         <typedef docPath="../../System.Xml/doc/class_Attributes_C4B2B129CAB6BB03A5BC75E44A8C3E96E227069A.html#typedef_Iterator_2FAF61197BC8F7C1F7DD1B984B01D1A35D1560D7" extPath="System.Xml/doc/class_Attributes_C4B2B129CAB6BB03A5BC75E44A8C3E96E227069A.html#typedef_Iterator_2FAF61197BC8F7C1F7DD1B984B01D1A35D1560D7" id="typedef_Iterator_2FAF61197BC8F7C1F7DD1B984B01D1A35D1560D7" name="Iterator" specifiers="public" type="80c36e68-0009-4859-b923-14ab63023322"/>
+         <typedef docPath="../../System.Xml/doc/class_Attributes_C4B2B129CAB6BB03A5BC75E44A8C3E96E227069A.html#typedef_ConstIterator_50480D5EC488FF9C4EE4C168500045C6E79E8AEA" extPath="System.Xml/doc/class_Attributes_C4B2B129CAB6BB03A5BC75E44A8C3E96E227069A.html#typedef_ConstIterator_50480D5EC488FF9C4EE4C168500045C6E79E8AEA" id="typedef_ConstIterator_50480D5EC488FF9C4EE4C168500045C6E79E8AEA" name="ConstIterator" specifiers="public" type="15f4f9e1-35da-4072-b8fe-4c79c1fd0abf"/>
+         <typedef docPath="../../System.Xml/doc/class_Attributes_C4B2B129CAB6BB03A5BC75E44A8C3E96E227069A.html#typedef_Iterator_2FAF61197BC8F7C1F7DD1B984B01D1A35D1560D7" extPath="System.Xml/doc/class_Attributes_C4B2B129CAB6BB03A5BC75E44A8C3E96E227069A.html#typedef_Iterator_2FAF61197BC8F7C1F7DD1B984B01D1A35D1560D7" id="typedef_Iterator_2FAF61197BC8F7C1F7DD1B984B01D1A35D1560D7" name="Iterator" specifiers="public" type="4c51fbad-d9e4-4da3-860f-b107a4fc4538"/>
         </typedefs>
         <variables>
-         <variable docPath="../../System.Xml/doc/class_Attributes_C4B2B129CAB6BB03A5BC75E44A8C3E96E227069A.html#variable_attributes_A0E1859077FD61464F15993C791691983B8C2322" extPath="System.Xml/doc/class_Attributes_C4B2B129CAB6BB03A5BC75E44A8C3E96E227069A.html#variable_attributes_A0E1859077FD61464F15993C791691983B8C2322" id="variable_attributes_A0E1859077FD61464F15993C791691983B8C2322" name="attributes" specifiers="private" type="5157f069-7e6e-457e-97c3-86469900c9c6"/>
+         <variable docPath="../../System.Xml/doc/class_Attributes_C4B2B129CAB6BB03A5BC75E44A8C3E96E227069A.html#variable_attributes_A0E1859077FD61464F15993C791691983B8C2322" extPath="System.Xml/doc/class_Attributes_C4B2B129CAB6BB03A5BC75E44A8C3E96E227069A.html#variable_attributes_A0E1859077FD61464F15993C791691983B8C2322" id="variable_attributes_A0E1859077FD61464F15993C791691983B8C2322" name="attributes" specifiers="private" type="5ff68638-7c72-464d-97ce-201b6ce774dc"/>
         </variables>
        </class>
        <class docPath="../../System.Xml/doc/class_Entity_B2C0C073274EAB165C24D894C32A0320159D96EF.html" extPath="System.Xml/doc/class_Entity_B2C0C073274EAB165C24D894C32A0320159D96EF.html" fileName="System.Xml/XmlProcessor.cm" filePath="../../System.Xml/file/XmlProcessor.cm.html" id="class_Entity_B2C0C073274EAB165C24D894C32A0320159D96EF" line="19" name="Entity" specifiers="public">
@@ -146,7 +146,7 @@
            <parameter id="parameter_namespaceUri_B05B65572F32F87B46AFBA329B31E36A4F6AC08C" name="namespaceUri" type="0b2cb094-cc6d-4299-a074-5eb9b3aa8751"/>
            <parameter id="parameter_localName_E9598FD4B945678062921CE6C20EFFAE0532529B" name="localName" type="0b2cb094-cc6d-4299-a074-5eb9b3aa8751"/>
            <parameter id="parameter_qualifiedName_270EAF3D597369577E38C30DF191835877B4775E" name="qualifiedName" type="0b2cb094-cc6d-4299-a074-5eb9b3aa8751"/>
-           <parameter id="parameter_attributes_66517A4111069219BE5DE91D7F9F5308D2272D67" name="attributes" type="164ad29a-22c2-4a40-b624-af72b6e9aaa3"/>
+           <parameter id="parameter_attributes_66517A4111069219BE5DE91D7F9F5308D2272D67" name="attributes" type="829e1610-09b4-4e01-89d7-43f07c3feb20"/>
           </parameters>
          </function>
          <function docPath="../../System.Xml/doc/class_XmlContentHandler_7429223FCBE3A541F14FD9475F2099B20E248715.html#member_function_Text_XmlContentHandler_839EDB413B6A036C9BD28CC96F077BFD09115252" extPath="System.Xml/doc/class_XmlContentHandler_7429223FCBE3A541F14FD9475F2099B20E248715.html#member_function_Text_XmlContentHandler_839EDB413B6A036C9BD28CC96F077BFD09115252" fileName="System.Xml/XmlContentHandler.cm" filePath="../../System.Xml/file/XmlContentHandler.cm.html" id="member_function_Text_XmlContentHandler_839EDB413B6A036C9BD28CC96F077BFD09115252" kind="Member Function" line="132" name="Text" returnType="4e959632-b5f2-406d-9402-ec16ab3f3585" specifiers="public virtual">
@@ -171,7 +171,7 @@
             </ctorsDtors>
             <variables>
              <variable docPath="../../System.Xml/doc/class_Context_C2BE20376F9E9EFAA7CC4B62ED099EEECFB3DADB.html#variable_fromName_8A1CC31A737EF40AF8BCE9F447870B9C562749BF" extPath="System.Xml/doc/class_Context_C2BE20376F9E9EFAA7CC4B62ED099EEECFB3DADB.html#variable_fromName_8A1CC31A737EF40AF8BCE9F447870B9C562749BF" id="variable_fromName_8A1CC31A737EF40AF8BCE9F447870B9C562749BF" name="fromName" specifiers="public" type="b6963d46-e09d-4bba-9c23-c6beb90db5a3"/>
-             <variable docPath="../../System.Xml/doc/class_Context_C2BE20376F9E9EFAA7CC4B62ED099EEECFB3DADB.html#variable_processor_FE6B1B47E9E2141F7D0329A680C885FB60310673" extPath="System.Xml/doc/class_Context_C2BE20376F9E9EFAA7CC4B62ED099EEECFB3DADB.html#variable_processor_FE6B1B47E9E2141F7D0329A680C885FB60310673" id="variable_processor_FE6B1B47E9E2141F7D0329A680C885FB60310673" name="processor" specifiers="public" type="38e79d07-c68c-4ff4-9a50-8199a5308243"/>
+             <variable docPath="../../System.Xml/doc/class_Context_C2BE20376F9E9EFAA7CC4B62ED099EEECFB3DADB.html#variable_processor_FE6B1B47E9E2141F7D0329A680C885FB60310673" extPath="System.Xml/doc/class_Context_C2BE20376F9E9EFAA7CC4B62ED099EEECFB3DADB.html#variable_processor_FE6B1B47E9E2141F7D0329A680C885FB60310673" id="variable_processor_FE6B1B47E9E2141F7D0329A680C885FB60310673" name="processor" specifiers="public" type="cd66b513-6446-442d-8bfd-27835155a8a5"/>
             </variables>
            </class>
           </classes>
@@ -222,7 +222,7 @@
              <ctorDtor docPath="../../System.Xml/doc/class_Context_2195A12EDAADB8C89F8DE52986EAA1F91FAE088A.html#default_constructor_Context_68F3AF746FA3CF1F3098B75C3E07583C21D903D9" extPath="System.Xml/doc/class_Context_2195A12EDAADB8C89F8DE52986EAA1F91FAE088A.html#default_constructor_Context_68F3AF746FA3CF1F3098B75C3E07583C21D903D9" fileName="System.Xml/XmlGrammar.cm" filePath="../../System.Xml/file/XmlGrammar.cm.html" id="default_constructor_Context_68F3AF746FA3CF1F3098B75C3E07583C21D903D9" kind="Constructor" line="350" name="Context" specifiers="public"/>
             </ctorsDtors>
             <variables>
-             <variable docPath="../../System.Xml/doc/class_Context_2195A12EDAADB8C89F8DE52986EAA1F91FAE088A.html#variable_processor_E5B6E59DB3B3AB3306821EF69B1F44D54DE05FE6" extPath="System.Xml/doc/class_Context_2195A12EDAADB8C89F8DE52986EAA1F91FAE088A.html#variable_processor_E5B6E59DB3B3AB3306821EF69B1F44D54DE05FE6" id="variable_processor_E5B6E59DB3B3AB3306821EF69B1F44D54DE05FE6" name="processor" specifiers="public" type="38e79d07-c68c-4ff4-9a50-8199a5308243"/>
+             <variable docPath="../../System.Xml/doc/class_Context_2195A12EDAADB8C89F8DE52986EAA1F91FAE088A.html#variable_processor_E5B6E59DB3B3AB3306821EF69B1F44D54DE05FE6" extPath="System.Xml/doc/class_Context_2195A12EDAADB8C89F8DE52986EAA1F91FAE088A.html#variable_processor_E5B6E59DB3B3AB3306821EF69B1F44D54DE05FE6" id="variable_processor_E5B6E59DB3B3AB3306821EF69B1F44D54DE05FE6" name="processor" specifiers="public" type="cd66b513-6446-442d-8bfd-27835155a8a5"/>
              <variable docPath="../../System.Xml/doc/class_Context_2195A12EDAADB8C89F8DE52986EAA1F91FAE088A.html#variable_value_1DFE44A2AF1A771DFD6ED377AB1612F68CEA385F" extPath="System.Xml/doc/class_Context_2195A12EDAADB8C89F8DE52986EAA1F91FAE088A.html#variable_value_1DFE44A2AF1A771DFD6ED377AB1612F68CEA385F" id="variable_value_1DFE44A2AF1A771DFD6ED377AB1612F68CEA385F" name="value" specifiers="public" type="b6963d46-e09d-4bba-9c23-c6beb90db5a3"/>
             </variables>
            </class>
@@ -334,7 +334,7 @@
             </ctorsDtors>
             <variables>
              <variable docPath="../../System.Xml/doc/class_Context_12735A043A5F853D886712F850F8D76536927E81.html#variable_fromName_1BA75C7392D7236522195070DD8B9089803857AD" extPath="System.Xml/doc/class_Context_12735A043A5F853D886712F850F8D76536927E81.html#variable_fromName_1BA75C7392D7236522195070DD8B9089803857AD" id="variable_fromName_1BA75C7392D7236522195070DD8B9089803857AD" name="fromName" specifiers="public" type="b6963d46-e09d-4bba-9c23-c6beb90db5a3"/>
-             <variable docPath="../../System.Xml/doc/class_Context_12735A043A5F853D886712F850F8D76536927E81.html#variable_processor_CD963C6544A7ECD9703A4BAA96EADDAC0599CE76" extPath="System.Xml/doc/class_Context_12735A043A5F853D886712F850F8D76536927E81.html#variable_processor_CD963C6544A7ECD9703A4BAA96EADDAC0599CE76" id="variable_processor_CD963C6544A7ECD9703A4BAA96EADDAC0599CE76" name="processor" specifiers="public" type="38e79d07-c68c-4ff4-9a50-8199a5308243"/>
+             <variable docPath="../../System.Xml/doc/class_Context_12735A043A5F853D886712F850F8D76536927E81.html#variable_processor_CD963C6544A7ECD9703A4BAA96EADDAC0599CE76" extPath="System.Xml/doc/class_Context_12735A043A5F853D886712F850F8D76536927E81.html#variable_processor_CD963C6544A7ECD9703A4BAA96EADDAC0599CE76" id="variable_processor_CD963C6544A7ECD9703A4BAA96EADDAC0599CE76" name="processor" specifiers="public" type="cd66b513-6446-442d-8bfd-27835155a8a5"/>
             </variables>
            </class>
           </classes>
@@ -387,7 +387,7 @@
             <variables>
              <variable docPath="../../System.Xml/doc/class_Context_62FD01506832B2455CA068BF7108FE638E455449.html#variable_fromattName_3F4A33FC0E43632D1D35FFE0F650A98AE2ADE4FF" extPath="System.Xml/doc/class_Context_62FD01506832B2455CA068BF7108FE638E455449.html#variable_fromattName_3F4A33FC0E43632D1D35FFE0F650A98AE2ADE4FF" id="variable_fromattName_3F4A33FC0E43632D1D35FFE0F650A98AE2ADE4FF" name="fromattName" specifiers="public" type="b6963d46-e09d-4bba-9c23-c6beb90db5a3"/>
              <variable docPath="../../System.Xml/doc/class_Context_62FD01506832B2455CA068BF7108FE638E455449.html#variable_fromattValue_32297B2B750B975F8C4DEBC9AA04ED2A89266831" extPath="System.Xml/doc/class_Context_62FD01506832B2455CA068BF7108FE638E455449.html#variable_fromattValue_32297B2B750B975F8C4DEBC9AA04ED2A89266831" id="variable_fromattValue_32297B2B750B975F8C4DEBC9AA04ED2A89266831" name="fromattValue" specifiers="public" type="b6963d46-e09d-4bba-9c23-c6beb90db5a3"/>
-             <variable docPath="../../System.Xml/doc/class_Context_62FD01506832B2455CA068BF7108FE638E455449.html#variable_processor_721E4BD03EACD46A617330B73B0806F97C49D4DC" extPath="System.Xml/doc/class_Context_62FD01506832B2455CA068BF7108FE638E455449.html#variable_processor_721E4BD03EACD46A617330B73B0806F97C49D4DC" id="variable_processor_721E4BD03EACD46A617330B73B0806F97C49D4DC" name="processor" specifiers="public" type="38e79d07-c68c-4ff4-9a50-8199a5308243"/>
+             <variable docPath="../../System.Xml/doc/class_Context_62FD01506832B2455CA068BF7108FE638E455449.html#variable_processor_721E4BD03EACD46A617330B73B0806F97C49D4DC" extPath="System.Xml/doc/class_Context_62FD01506832B2455CA068BF7108FE638E455449.html#variable_processor_721E4BD03EACD46A617330B73B0806F97C49D4DC" id="variable_processor_721E4BD03EACD46A617330B73B0806F97C49D4DC" name="processor" specifiers="public" type="cd66b513-6446-442d-8bfd-27835155a8a5"/>
             </variables>
            </class>
           </classes>
@@ -456,7 +456,7 @@
             </ctorsDtors>
             <variables>
              <variable docPath="../../System.Xml/doc/class_Context_7D0127ECCD95748E2144340F1C9A3607C179F680.html#variable_fromCData_20874B27DBC532FF8A6525261525183698995A61" extPath="System.Xml/doc/class_Context_7D0127ECCD95748E2144340F1C9A3607C179F680.html#variable_fromCData_20874B27DBC532FF8A6525261525183698995A61" id="variable_fromCData_20874B27DBC532FF8A6525261525183698995A61" name="fromCData" specifiers="public" type="b6963d46-e09d-4bba-9c23-c6beb90db5a3"/>
-             <variable docPath="../../System.Xml/doc/class_Context_7D0127ECCD95748E2144340F1C9A3607C179F680.html#variable_processor_942F2CBFAEDC903DB37AC954EB3BDDBF0B0CE003" extPath="System.Xml/doc/class_Context_7D0127ECCD95748E2144340F1C9A3607C179F680.html#variable_processor_942F2CBFAEDC903DB37AC954EB3BDDBF0B0CE003" id="variable_processor_942F2CBFAEDC903DB37AC954EB3BDDBF0B0CE003" name="processor" specifiers="public" type="38e79d07-c68c-4ff4-9a50-8199a5308243"/>
+             <variable docPath="../../System.Xml/doc/class_Context_7D0127ECCD95748E2144340F1C9A3607C179F680.html#variable_processor_942F2CBFAEDC903DB37AC954EB3BDDBF0B0CE003" extPath="System.Xml/doc/class_Context_7D0127ECCD95748E2144340F1C9A3607C179F680.html#variable_processor_942F2CBFAEDC903DB37AC954EB3BDDBF0B0CE003" id="variable_processor_942F2CBFAEDC903DB37AC954EB3BDDBF0B0CE003" name="processor" specifiers="public" type="cd66b513-6446-442d-8bfd-27835155a8a5"/>
             </variables>
            </class>
           </classes>
@@ -559,7 +559,7 @@
              <ctorDtor docPath="../../System.Xml/doc/class_Context_C5E4E7CA8E1F0584468BC081BF060D0F2716DD20.html#default_constructor_Context_E5162AFC6D7787AA8A1E8211F85AEC91346E3F37" extPath="System.Xml/doc/class_Context_C5E4E7CA8E1F0584468BC081BF060D0F2716DD20.html#default_constructor_Context_E5162AFC6D7787AA8A1E8211F85AEC91346E3F37" fileName="System.Xml/XmlGrammar.cm" filePath="../../System.Xml/file/XmlGrammar.cm.html" id="default_constructor_Context_E5162AFC6D7787AA8A1E8211F85AEC91346E3F37" kind="Constructor" line="479" name="Context" specifiers="public"/>
             </ctorsDtors>
             <variables>
-             <variable docPath="../../System.Xml/doc/class_Context_C5E4E7CA8E1F0584468BC081BF060D0F2716DD20.html#variable_processor_281DA447801162CE7EC4E749DB69739DB49CE97F" extPath="System.Xml/doc/class_Context_C5E4E7CA8E1F0584468BC081BF060D0F2716DD20.html#variable_processor_281DA447801162CE7EC4E749DB69739DB49CE97F" id="variable_processor_281DA447801162CE7EC4E749DB69739DB49CE97F" name="processor" specifiers="public" type="38e79d07-c68c-4ff4-9a50-8199a5308243"/>
+             <variable docPath="../../System.Xml/doc/class_Context_C5E4E7CA8E1F0584468BC081BF060D0F2716DD20.html#variable_processor_281DA447801162CE7EC4E749DB69739DB49CE97F" extPath="System.Xml/doc/class_Context_C5E4E7CA8E1F0584468BC081BF060D0F2716DD20.html#variable_processor_281DA447801162CE7EC4E749DB69739DB49CE97F" id="variable_processor_281DA447801162CE7EC4E749DB69739DB49CE97F" name="processor" specifiers="public" type="cd66b513-6446-442d-8bfd-27835155a8a5"/>
             </variables>
            </class>
           </classes>
@@ -681,7 +681,7 @@
              <ctorDtor docPath="../../System.Xml/doc/class_Context_84C2EC2BCE26BE24E817A48091FB3D290EC58A80.html#default_constructor_Context_4C66B005911E50E09E0C93AD0AD178033992B58A" extPath="System.Xml/doc/class_Context_84C2EC2BCE26BE24E817A48091FB3D290EC58A80.html#default_constructor_Context_4C66B005911E50E09E0C93AD0AD178033992B58A" fileName="System.Xml/XmlGrammar.cm" filePath="../../System.Xml/file/XmlGrammar.cm.html" id="default_constructor_Context_4C66B005911E50E09E0C93AD0AD178033992B58A" kind="Constructor" line="515" name="Context" specifiers="public"/>
             </ctorsDtors>
             <variables>
-             <variable docPath="../../System.Xml/doc/class_Context_84C2EC2BCE26BE24E817A48091FB3D290EC58A80.html#variable_processor_1948E2F7E2C04ED1CC01499B5C5F8CC11CE5FB66" extPath="System.Xml/doc/class_Context_84C2EC2BCE26BE24E817A48091FB3D290EC58A80.html#variable_processor_1948E2F7E2C04ED1CC01499B5C5F8CC11CE5FB66" id="variable_processor_1948E2F7E2C04ED1CC01499B5C5F8CC11CE5FB66" name="processor" specifiers="public" type="38e79d07-c68c-4ff4-9a50-8199a5308243"/>
+             <variable docPath="../../System.Xml/doc/class_Context_84C2EC2BCE26BE24E817A48091FB3D290EC58A80.html#variable_processor_1948E2F7E2C04ED1CC01499B5C5F8CC11CE5FB66" extPath="System.Xml/doc/class_Context_84C2EC2BCE26BE24E817A48091FB3D290EC58A80.html#variable_processor_1948E2F7E2C04ED1CC01499B5C5F8CC11CE5FB66" id="variable_processor_1948E2F7E2C04ED1CC01499B5C5F8CC11CE5FB66" name="processor" specifiers="public" type="cd66b513-6446-442d-8bfd-27835155a8a5"/>
             </variables>
            </class>
           </classes>
@@ -729,7 +729,7 @@
              <ctorDtor docPath="../../System.Xml/doc/class_Context_CA2711A142C739A7FBDF6D8FBD207514911248A9.html#default_constructor_Context_4D741B4017518188B09A380ECFD8077BE1EDB22D" extPath="System.Xml/doc/class_Context_CA2711A142C739A7FBDF6D8FBD207514911248A9.html#default_constructor_Context_4D741B4017518188B09A380ECFD8077BE1EDB22D" fileName="System.Xml/XmlGrammar.cm" filePath="../../System.Xml/file/XmlGrammar.cm.html" id="default_constructor_Context_4D741B4017518188B09A380ECFD8077BE1EDB22D" kind="Constructor" line="1759" name="Context" specifiers="public"/>
             </ctorsDtors>
             <variables>
-             <variable docPath="../../System.Xml/doc/class_Context_CA2711A142C739A7FBDF6D8FBD207514911248A9.html#variable_processor_1D58848D84D3F9D9D2868DEA5430BEA966179F34" extPath="System.Xml/doc/class_Context_CA2711A142C739A7FBDF6D8FBD207514911248A9.html#variable_processor_1D58848D84D3F9D9D2868DEA5430BEA966179F34" id="variable_processor_1D58848D84D3F9D9D2868DEA5430BEA966179F34" name="processor" specifiers="public" type="38e79d07-c68c-4ff4-9a50-8199a5308243"/>
+             <variable docPath="../../System.Xml/doc/class_Context_CA2711A142C739A7FBDF6D8FBD207514911248A9.html#variable_processor_1D58848D84D3F9D9D2868DEA5430BEA966179F34" extPath="System.Xml/doc/class_Context_CA2711A142C739A7FBDF6D8FBD207514911248A9.html#variable_processor_1D58848D84D3F9D9D2868DEA5430BEA966179F34" id="variable_processor_1D58848D84D3F9D9D2868DEA5430BEA966179F34" name="processor" specifiers="public" type="cd66b513-6446-442d-8bfd-27835155a8a5"/>
             </variables>
            </class>
           </classes>
@@ -773,7 +773,7 @@
              <ctorDtor docPath="../../System.Xml/doc/class_Context_938E8AA60EBE77135FD89824461C0D5073BAB410.html#default_constructor_Context_88570D93E0165440B3C917BEC8113F5393BBB106" extPath="System.Xml/doc/class_Context_938E8AA60EBE77135FD89824461C0D5073BAB410.html#default_constructor_Context_88570D93E0165440B3C917BEC8113F5393BBB106" fileName="System.Xml/XmlGrammar.cm" filePath="../../System.Xml/file/XmlGrammar.cm.html" id="default_constructor_Context_88570D93E0165440B3C917BEC8113F5393BBB106" kind="Constructor" line="1539" name="Context" specifiers="public"/>
             </ctorsDtors>
             <variables>
-             <variable docPath="../../System.Xml/doc/class_Context_938E8AA60EBE77135FD89824461C0D5073BAB410.html#variable_processor_C55B99B1BE3A15E11357F33B34EC14ACE6187DE2" extPath="System.Xml/doc/class_Context_938E8AA60EBE77135FD89824461C0D5073BAB410.html#variable_processor_C55B99B1BE3A15E11357F33B34EC14ACE6187DE2" id="variable_processor_C55B99B1BE3A15E11357F33B34EC14ACE6187DE2" name="processor" specifiers="public" type="38e79d07-c68c-4ff4-9a50-8199a5308243"/>
+             <variable docPath="../../System.Xml/doc/class_Context_938E8AA60EBE77135FD89824461C0D5073BAB410.html#variable_processor_C55B99B1BE3A15E11357F33B34EC14ACE6187DE2" extPath="System.Xml/doc/class_Context_938E8AA60EBE77135FD89824461C0D5073BAB410.html#variable_processor_C55B99B1BE3A15E11357F33B34EC14ACE6187DE2" id="variable_processor_C55B99B1BE3A15E11357F33B34EC14ACE6187DE2" name="processor" specifiers="public" type="cd66b513-6446-442d-8bfd-27835155a8a5"/>
             </variables>
            </class>
           </classes>
@@ -853,7 +853,7 @@
              <ctorDtor docPath="../../System.Xml/doc/class_Context_36E710942B4BCFF4629B33C82DCF197C387E635C.html#default_constructor_Context_97999E55B8DEF5095CD4B61C42C0F8A404595B9E" extPath="System.Xml/doc/class_Context_36E710942B4BCFF4629B33C82DCF197C387E635C.html#default_constructor_Context_97999E55B8DEF5095CD4B61C42C0F8A404595B9E" fileName="System.Xml/XmlGrammar.cm" filePath="../../System.Xml/file/XmlGrammar.cm.html" id="default_constructor_Context_97999E55B8DEF5095CD4B61C42C0F8A404595B9E" kind="Constructor" line="987" name="Context" specifiers="public"/>
             </ctorsDtors>
             <variables>
-             <variable docPath="../../System.Xml/doc/class_Context_36E710942B4BCFF4629B33C82DCF197C387E635C.html#variable_processor_D9A9DB1663DB7C840A1FCBA9C468D892FEEE9CAA" extPath="System.Xml/doc/class_Context_36E710942B4BCFF4629B33C82DCF197C387E635C.html#variable_processor_D9A9DB1663DB7C840A1FCBA9C468D892FEEE9CAA" id="variable_processor_D9A9DB1663DB7C840A1FCBA9C468D892FEEE9CAA" name="processor" specifiers="public" type="38e79d07-c68c-4ff4-9a50-8199a5308243"/>
+             <variable docPath="../../System.Xml/doc/class_Context_36E710942B4BCFF4629B33C82DCF197C387E635C.html#variable_processor_D9A9DB1663DB7C840A1FCBA9C468D892FEEE9CAA" extPath="System.Xml/doc/class_Context_36E710942B4BCFF4629B33C82DCF197C387E635C.html#variable_processor_D9A9DB1663DB7C840A1FCBA9C468D892FEEE9CAA" id="variable_processor_D9A9DB1663DB7C840A1FCBA9C468D892FEEE9CAA" name="processor" specifiers="public" type="cd66b513-6446-442d-8bfd-27835155a8a5"/>
             </variables>
            </class>
           </classes>
@@ -898,7 +898,7 @@
             </ctorsDtors>
             <variables>
              <variable docPath="../../System.Xml/doc/class_Context_8B6BDA9FD8FEE65ACBDF9A189A832E0B607D8E8C.html#variable_fromAttValue_CDA0F080A0E5500DC83A627436ED26E12314124E" extPath="System.Xml/doc/class_Context_8B6BDA9FD8FEE65ACBDF9A189A832E0B607D8E8C.html#variable_fromAttValue_CDA0F080A0E5500DC83A627436ED26E12314124E" id="variable_fromAttValue_CDA0F080A0E5500DC83A627436ED26E12314124E" name="fromAttValue" specifiers="public" type="b6963d46-e09d-4bba-9c23-c6beb90db5a3"/>
-             <variable docPath="../../System.Xml/doc/class_Context_8B6BDA9FD8FEE65ACBDF9A189A832E0B607D8E8C.html#variable_processor_4675BE05BE14D4C91DACB243582AD3790E7FE6CC" extPath="System.Xml/doc/class_Context_8B6BDA9FD8FEE65ACBDF9A189A832E0B607D8E8C.html#variable_processor_4675BE05BE14D4C91DACB243582AD3790E7FE6CC" id="variable_processor_4675BE05BE14D4C91DACB243582AD3790E7FE6CC" name="processor" specifiers="public" type="38e79d07-c68c-4ff4-9a50-8199a5308243"/>
+             <variable docPath="../../System.Xml/doc/class_Context_8B6BDA9FD8FEE65ACBDF9A189A832E0B607D8E8C.html#variable_processor_4675BE05BE14D4C91DACB243582AD3790E7FE6CC" extPath="System.Xml/doc/class_Context_8B6BDA9FD8FEE65ACBDF9A189A832E0B607D8E8C.html#variable_processor_4675BE05BE14D4C91DACB243582AD3790E7FE6CC" id="variable_processor_4675BE05BE14D4C91DACB243582AD3790E7FE6CC" name="processor" specifiers="public" type="cd66b513-6446-442d-8bfd-27835155a8a5"/>
             </variables>
            </class>
           </classes>
@@ -950,7 +950,7 @@
             </ctorsDtors>
             <variables>
              <variable docPath="../../System.Xml/doc/class_Context_4EAEC7EBE2D7AC0F3B33C033D6CB695761FF6769.html#variable_fromrootElementName_07F982293DD7307B53B44942F0CD374E808541AB" extPath="System.Xml/doc/class_Context_4EAEC7EBE2D7AC0F3B33C033D6CB695761FF6769.html#variable_fromrootElementName_07F982293DD7307B53B44942F0CD374E808541AB" id="variable_fromrootElementName_07F982293DD7307B53B44942F0CD374E808541AB" name="fromrootElementName" specifiers="public" type="b6963d46-e09d-4bba-9c23-c6beb90db5a3"/>
-             <variable docPath="../../System.Xml/doc/class_Context_4EAEC7EBE2D7AC0F3B33C033D6CB695761FF6769.html#variable_processor_DDDD1028B2956648D49256C98B8ED3EB49D36889" extPath="System.Xml/doc/class_Context_4EAEC7EBE2D7AC0F3B33C033D6CB695761FF6769.html#variable_processor_DDDD1028B2956648D49256C98B8ED3EB49D36889" id="variable_processor_DDDD1028B2956648D49256C98B8ED3EB49D36889" name="processor" specifiers="public" type="38e79d07-c68c-4ff4-9a50-8199a5308243"/>
+             <variable docPath="../../System.Xml/doc/class_Context_4EAEC7EBE2D7AC0F3B33C033D6CB695761FF6769.html#variable_processor_DDDD1028B2956648D49256C98B8ED3EB49D36889" extPath="System.Xml/doc/class_Context_4EAEC7EBE2D7AC0F3B33C033D6CB695761FF6769.html#variable_processor_DDDD1028B2956648D49256C98B8ED3EB49D36889" id="variable_processor_DDDD1028B2956648D49256C98B8ED3EB49D36889" name="processor" specifiers="public" type="cd66b513-6446-442d-8bfd-27835155a8a5"/>
             </variables>
            </class>
           </classes>
@@ -1001,7 +1001,7 @@
              <ctorDtor docPath="../../System.Xml/doc/class_Context_9FC0D36D9C6EE03B21C8A9BCBC40B16A709E7970.html#default_constructor_Context_2688BE9599E03E6BB1141BC2761A6AFE52CA9A26" extPath="System.Xml/doc/class_Context_9FC0D36D9C6EE03B21C8A9BCBC40B16A709E7970.html#default_constructor_Context_2688BE9599E03E6BB1141BC2761A6AFE52CA9A26" fileName="System.Xml/XmlGrammar.cm" filePath="../../System.Xml/file/XmlGrammar.cm.html" id="default_constructor_Context_2688BE9599E03E6BB1141BC2761A6AFE52CA9A26" kind="Constructor" line="114" name="Context" specifiers="public"/>
             </ctorsDtors>
             <variables>
-             <variable docPath="../../System.Xml/doc/class_Context_9FC0D36D9C6EE03B21C8A9BCBC40B16A709E7970.html#variable_processor_F43BADD86BD29FEA18CCADA1272EAF8CF16DB9B4" extPath="System.Xml/doc/class_Context_9FC0D36D9C6EE03B21C8A9BCBC40B16A709E7970.html#variable_processor_F43BADD86BD29FEA18CCADA1272EAF8CF16DB9B4" id="variable_processor_F43BADD86BD29FEA18CCADA1272EAF8CF16DB9B4" name="processor" specifiers="public" type="38e79d07-c68c-4ff4-9a50-8199a5308243"/>
+             <variable docPath="../../System.Xml/doc/class_Context_9FC0D36D9C6EE03B21C8A9BCBC40B16A709E7970.html#variable_processor_F43BADD86BD29FEA18CCADA1272EAF8CF16DB9B4" extPath="System.Xml/doc/class_Context_9FC0D36D9C6EE03B21C8A9BCBC40B16A709E7970.html#variable_processor_F43BADD86BD29FEA18CCADA1272EAF8CF16DB9B4" id="variable_processor_F43BADD86BD29FEA18CCADA1272EAF8CF16DB9B4" name="processor" specifiers="public" type="cd66b513-6446-442d-8bfd-27835155a8a5"/>
             </variables>
            </class>
           </classes>
@@ -1078,7 +1078,7 @@
             </ctorsDtors>
             <variables>
              <variable docPath="../../System.Xml/doc/class_Context_A5E358867746DE6EFDF46A8C9794A8BD9965B63D.html#variable_fromName_D8D57E6580D48DDC772C877D46C71DB4411791F8" extPath="System.Xml/doc/class_Context_A5E358867746DE6EFDF46A8C9794A8BD9965B63D.html#variable_fromName_D8D57E6580D48DDC772C877D46C71DB4411791F8" id="variable_fromName_D8D57E6580D48DDC772C877D46C71DB4411791F8" name="fromName" specifiers="public" type="b6963d46-e09d-4bba-9c23-c6beb90db5a3"/>
-             <variable docPath="../../System.Xml/doc/class_Context_A5E358867746DE6EFDF46A8C9794A8BD9965B63D.html#variable_processor_FDE9283AAB60534FC172C53F96C7EDC1BFE831D3" extPath="System.Xml/doc/class_Context_A5E358867746DE6EFDF46A8C9794A8BD9965B63D.html#variable_processor_FDE9283AAB60534FC172C53F96C7EDC1BFE831D3" id="variable_processor_FDE9283AAB60534FC172C53F96C7EDC1BFE831D3" name="processor" specifiers="public" type="38e79d07-c68c-4ff4-9a50-8199a5308243"/>
+             <variable docPath="../../System.Xml/doc/class_Context_A5E358867746DE6EFDF46A8C9794A8BD9965B63D.html#variable_processor_FDE9283AAB60534FC172C53F96C7EDC1BFE831D3" extPath="System.Xml/doc/class_Context_A5E358867746DE6EFDF46A8C9794A8BD9965B63D.html#variable_processor_FDE9283AAB60534FC172C53F96C7EDC1BFE831D3" id="variable_processor_FDE9283AAB60534FC172C53F96C7EDC1BFE831D3" name="processor" specifiers="public" type="cd66b513-6446-442d-8bfd-27835155a8a5"/>
             </variables>
            </class>
           </classes>
@@ -1134,7 +1134,7 @@
             </ctorsDtors>
             <variables>
              <variable docPath="../../System.Xml/doc/class_Context_ECFF17CB785E1159980C372DC61DEEC9DB79DC50.html#variable_fromelementName_857DB39D307CAA8FCD42E7D343B2106C3A5EA04D" extPath="System.Xml/doc/class_Context_ECFF17CB785E1159980C372DC61DEEC9DB79DC50.html#variable_fromelementName_857DB39D307CAA8FCD42E7D343B2106C3A5EA04D" id="variable_fromelementName_857DB39D307CAA8FCD42E7D343B2106C3A5EA04D" name="fromelementName" specifiers="public" type="b6963d46-e09d-4bba-9c23-c6beb90db5a3"/>
-             <variable docPath="../../System.Xml/doc/class_Context_ECFF17CB785E1159980C372DC61DEEC9DB79DC50.html#variable_processor_9D0154616B403988AE9640AD8BFCE38A8914EF11" extPath="System.Xml/doc/class_Context_ECFF17CB785E1159980C372DC61DEEC9DB79DC50.html#variable_processor_9D0154616B403988AE9640AD8BFCE38A8914EF11" id="variable_processor_9D0154616B403988AE9640AD8BFCE38A8914EF11" name="processor" specifiers="public" type="38e79d07-c68c-4ff4-9a50-8199a5308243"/>
+             <variable docPath="../../System.Xml/doc/class_Context_ECFF17CB785E1159980C372DC61DEEC9DB79DC50.html#variable_processor_9D0154616B403988AE9640AD8BFCE38A8914EF11" extPath="System.Xml/doc/class_Context_ECFF17CB785E1159980C372DC61DEEC9DB79DC50.html#variable_processor_9D0154616B403988AE9640AD8BFCE38A8914EF11" id="variable_processor_9D0154616B403988AE9640AD8BFCE38A8914EF11" name="processor" specifiers="public" type="cd66b513-6446-442d-8bfd-27835155a8a5"/>
             </variables>
            </class>
           </classes>
@@ -1180,7 +1180,7 @@
             </ctorsDtors>
             <variables>
              <variable docPath="../../System.Xml/doc/class_Context_9F41956F0ACC5D6002F8F42EB3970EC54155C743.html#variable_fromName_9FA95A99A0F004F2DB8339E316A6F6B3BC3DC80F" extPath="System.Xml/doc/class_Context_9F41956F0ACC5D6002F8F42EB3970EC54155C743.html#variable_fromName_9FA95A99A0F004F2DB8339E316A6F6B3BC3DC80F" id="variable_fromName_9FA95A99A0F004F2DB8339E316A6F6B3BC3DC80F" name="fromName" specifiers="public" type="b6963d46-e09d-4bba-9c23-c6beb90db5a3"/>
-             <variable docPath="../../System.Xml/doc/class_Context_9F41956F0ACC5D6002F8F42EB3970EC54155C743.html#variable_processor_C64260507B7D588F61723E6C8D66A5442E73EE2B" extPath="System.Xml/doc/class_Context_9F41956F0ACC5D6002F8F42EB3970EC54155C743.html#variable_processor_C64260507B7D588F61723E6C8D66A5442E73EE2B" id="variable_processor_C64260507B7D588F61723E6C8D66A5442E73EE2B" name="processor" specifiers="public" type="38e79d07-c68c-4ff4-9a50-8199a5308243"/>
+             <variable docPath="../../System.Xml/doc/class_Context_9F41956F0ACC5D6002F8F42EB3970EC54155C743.html#variable_processor_C64260507B7D588F61723E6C8D66A5442E73EE2B" extPath="System.Xml/doc/class_Context_9F41956F0ACC5D6002F8F42EB3970EC54155C743.html#variable_processor_C64260507B7D588F61723E6C8D66A5442E73EE2B" id="variable_processor_C64260507B7D588F61723E6C8D66A5442E73EE2B" name="processor" specifiers="public" type="cd66b513-6446-442d-8bfd-27835155a8a5"/>
              <variable docPath="../../System.Xml/doc/class_Context_9F41956F0ACC5D6002F8F42EB3970EC54155C743.html#variable_tagName_B394A18BABA01F6D7F5AF53336DEC27D6BBEF893" extPath="System.Xml/doc/class_Context_9F41956F0ACC5D6002F8F42EB3970EC54155C743.html#variable_tagName_B394A18BABA01F6D7F5AF53336DEC27D6BBEF893" id="variable_tagName_B394A18BABA01F6D7F5AF53336DEC27D6BBEF893" name="tagName" specifiers="public" type="b6963d46-e09d-4bba-9c23-c6beb90db5a3"/>
             </variables>
            </class>
@@ -1324,7 +1324,7 @@
             <variables>
              <variable docPath="../../System.Xml/doc/class_Context_541E1B589BDF06020A9A4793EBB7BC6F17EA3D5D.html#variable_fromen1_603DC43C573568D0B2DF9BDEAD994D8BE240EDAA" extPath="System.Xml/doc/class_Context_541E1B589BDF06020A9A4793EBB7BC6F17EA3D5D.html#variable_fromen1_603DC43C573568D0B2DF9BDEAD994D8BE240EDAA" id="variable_fromen1_603DC43C573568D0B2DF9BDEAD994D8BE240EDAA" name="fromen1" specifiers="public" type="b6963d46-e09d-4bba-9c23-c6beb90db5a3"/>
              <variable docPath="../../System.Xml/doc/class_Context_541E1B589BDF06020A9A4793EBB7BC6F17EA3D5D.html#variable_fromen2_54DF0E74023B78EEF6F65A77F4DA462B027CC255" extPath="System.Xml/doc/class_Context_541E1B589BDF06020A9A4793EBB7BC6F17EA3D5D.html#variable_fromen2_54DF0E74023B78EEF6F65A77F4DA462B027CC255" id="variable_fromen2_54DF0E74023B78EEF6F65A77F4DA462B027CC255" name="fromen2" specifiers="public" type="b6963d46-e09d-4bba-9c23-c6beb90db5a3"/>
-             <variable docPath="../../System.Xml/doc/class_Context_541E1B589BDF06020A9A4793EBB7BC6F17EA3D5D.html#variable_processor_0792427FE265D6B0580277D87A5400E4FA007CE2" extPath="System.Xml/doc/class_Context_541E1B589BDF06020A9A4793EBB7BC6F17EA3D5D.html#variable_processor_0792427FE265D6B0580277D87A5400E4FA007CE2" id="variable_processor_0792427FE265D6B0580277D87A5400E4FA007CE2" name="processor" specifiers="public" type="38e79d07-c68c-4ff4-9a50-8199a5308243"/>
+             <variable docPath="../../System.Xml/doc/class_Context_541E1B589BDF06020A9A4793EBB7BC6F17EA3D5D.html#variable_processor_0792427FE265D6B0580277D87A5400E4FA007CE2" extPath="System.Xml/doc/class_Context_541E1B589BDF06020A9A4793EBB7BC6F17EA3D5D.html#variable_processor_0792427FE265D6B0580277D87A5400E4FA007CE2" id="variable_processor_0792427FE265D6B0580277D87A5400E4FA007CE2" name="processor" specifiers="public" type="cd66b513-6446-442d-8bfd-27835155a8a5"/>
             </variables>
            </class>
           </classes>
@@ -1396,7 +1396,7 @@
              <ctorDtor docPath="../../System.Xml/doc/class_Context_985FE96EB466F9B6DDCAC11A4ADB3B9892D12FB0.html#default_constructor_Context_0FB8F11AEACC80FACC1FC9A4B20C75F52C3D82C0" extPath="System.Xml/doc/class_Context_985FE96EB466F9B6DDCAC11A4ADB3B9892D12FB0.html#default_constructor_Context_0FB8F11AEACC80FACC1FC9A4B20C75F52C3D82C0" fileName="System.Xml/XmlGrammar.cm" filePath="../../System.Xml/file/XmlGrammar.cm.html" id="default_constructor_Context_0FB8F11AEACC80FACC1FC9A4B20C75F52C3D82C0" kind="Constructor" line="2052" name="Context" specifiers="public"/>
             </ctorsDtors>
             <variables>
-             <variable docPath="../../System.Xml/doc/class_Context_985FE96EB466F9B6DDCAC11A4ADB3B9892D12FB0.html#variable_processor_F4417BBC410E026A9C9F683D2A17F7BBB693FA8A" extPath="System.Xml/doc/class_Context_985FE96EB466F9B6DDCAC11A4ADB3B9892D12FB0.html#variable_processor_F4417BBC410E026A9C9F683D2A17F7BBB693FA8A" id="variable_processor_F4417BBC410E026A9C9F683D2A17F7BBB693FA8A" name="processor" specifiers="public" type="38e79d07-c68c-4ff4-9a50-8199a5308243"/>
+             <variable docPath="../../System.Xml/doc/class_Context_985FE96EB466F9B6DDCAC11A4ADB3B9892D12FB0.html#variable_processor_F4417BBC410E026A9C9F683D2A17F7BBB693FA8A" extPath="System.Xml/doc/class_Context_985FE96EB466F9B6DDCAC11A4ADB3B9892D12FB0.html#variable_processor_F4417BBC410E026A9C9F683D2A17F7BBB693FA8A" id="variable_processor_F4417BBC410E026A9C9F683D2A17F7BBB693FA8A" name="processor" specifiers="public" type="cd66b513-6446-442d-8bfd-27835155a8a5"/>
             </variables>
            </class>
           </classes>
@@ -1448,7 +1448,7 @@
             <variables>
              <variable docPath="../../System.Xml/doc/class_Context_C7CEF09EED2D05C655006481D3E3CF5B18601A74.html#variable_fromEntityValue_2CF1F2FBF9892F113AD5003D018139941FA817F5" extPath="System.Xml/doc/class_Context_C7CEF09EED2D05C655006481D3E3CF5B18601A74.html#variable_fromEntityValue_2CF1F2FBF9892F113AD5003D018139941FA817F5" id="variable_fromEntityValue_2CF1F2FBF9892F113AD5003D018139941FA817F5" name="fromEntityValue" specifiers="public" type="b6963d46-e09d-4bba-9c23-c6beb90db5a3"/>
              <variable docPath="../../System.Xml/doc/class_Context_C7CEF09EED2D05C655006481D3E3CF5B18601A74.html#variable_fromnotation_E2EB82E06A244A81CB3B6C22D7B68FE228AF10DF" extPath="System.Xml/doc/class_Context_C7CEF09EED2D05C655006481D3E3CF5B18601A74.html#variable_fromnotation_E2EB82E06A244A81CB3B6C22D7B68FE228AF10DF" id="variable_fromnotation_E2EB82E06A244A81CB3B6C22D7B68FE228AF10DF" name="fromnotation" specifiers="public" type="b6963d46-e09d-4bba-9c23-c6beb90db5a3"/>
-             <variable docPath="../../System.Xml/doc/class_Context_C7CEF09EED2D05C655006481D3E3CF5B18601A74.html#variable_processor_C2EB567C60AA81BE7EB18EC8B1C76424D8EE1F69" extPath="System.Xml/doc/class_Context_C7CEF09EED2D05C655006481D3E3CF5B18601A74.html#variable_processor_C2EB567C60AA81BE7EB18EC8B1C76424D8EE1F69" id="variable_processor_C2EB567C60AA81BE7EB18EC8B1C76424D8EE1F69" name="processor" specifiers="public" type="38e79d07-c68c-4ff4-9a50-8199a5308243"/>
+             <variable docPath="../../System.Xml/doc/class_Context_C7CEF09EED2D05C655006481D3E3CF5B18601A74.html#variable_processor_C2EB567C60AA81BE7EB18EC8B1C76424D8EE1F69" extPath="System.Xml/doc/class_Context_C7CEF09EED2D05C655006481D3E3CF5B18601A74.html#variable_processor_C2EB567C60AA81BE7EB18EC8B1C76424D8EE1F69" id="variable_processor_C2EB567C60AA81BE7EB18EC8B1C76424D8EE1F69" name="processor" specifiers="public" type="cd66b513-6446-442d-8bfd-27835155a8a5"/>
             </variables>
            </class>
           </classes>
@@ -1507,7 +1507,7 @@
             </ctorsDtors>
             <variables>
              <variable docPath="../../System.Xml/doc/class_Context_6848C0399039250818165D3DA29F62669489F8DF.html#variable_fromName_47B9A41E919ADB4CBED0FA13815BE0BB0B9FE4F8" extPath="System.Xml/doc/class_Context_6848C0399039250818165D3DA29F62669489F8DF.html#variable_fromName_47B9A41E919ADB4CBED0FA13815BE0BB0B9FE4F8" id="variable_fromName_47B9A41E919ADB4CBED0FA13815BE0BB0B9FE4F8" name="fromName" specifiers="public" type="b6963d46-e09d-4bba-9c23-c6beb90db5a3"/>
-             <variable docPath="../../System.Xml/doc/class_Context_6848C0399039250818165D3DA29F62669489F8DF.html#variable_processor_62D0ED8322BEE3BA1097C9612A1A69990071952E" extPath="System.Xml/doc/class_Context_6848C0399039250818165D3DA29F62669489F8DF.html#variable_processor_62D0ED8322BEE3BA1097C9612A1A69990071952E" id="variable_processor_62D0ED8322BEE3BA1097C9612A1A69990071952E" name="processor" specifiers="public" type="38e79d07-c68c-4ff4-9a50-8199a5308243"/>
+             <variable docPath="../../System.Xml/doc/class_Context_6848C0399039250818165D3DA29F62669489F8DF.html#variable_processor_62D0ED8322BEE3BA1097C9612A1A69990071952E" extPath="System.Xml/doc/class_Context_6848C0399039250818165D3DA29F62669489F8DF.html#variable_processor_62D0ED8322BEE3BA1097C9612A1A69990071952E" id="variable_processor_62D0ED8322BEE3BA1097C9612A1A69990071952E" name="processor" specifiers="public" type="cd66b513-6446-442d-8bfd-27835155a8a5"/>
             </variables>
            </class>
           </classes>
@@ -1562,7 +1562,7 @@
              <ctorDtor docPath="../../System.Xml/doc/class_Context_6652360ACEC2F470E296D221BC7B39B6546A0327.html#default_constructor_Context_1CEF29279C07E4EA0FADD3621C0428F5460F2EB1" extPath="System.Xml/doc/class_Context_6652360ACEC2F470E296D221BC7B39B6546A0327.html#default_constructor_Context_1CEF29279C07E4EA0FADD3621C0428F5460F2EB1" fileName="System.Xml/XmlGrammar.cm" filePath="../../System.Xml/file/XmlGrammar.cm.html" id="default_constructor_Context_1CEF29279C07E4EA0FADD3621C0428F5460F2EB1" kind="Constructor" line="258" name="Context" specifiers="public"/>
             </ctorsDtors>
             <variables>
-             <variable docPath="../../System.Xml/doc/class_Context_6652360ACEC2F470E296D221BC7B39B6546A0327.html#variable_processor_D7121B86B413BD71B176E4294034A6521E11DD48" extPath="System.Xml/doc/class_Context_6652360ACEC2F470E296D221BC7B39B6546A0327.html#variable_processor_D7121B86B413BD71B176E4294034A6521E11DD48" id="variable_processor_D7121B86B413BD71B176E4294034A6521E11DD48" name="processor" specifiers="public" type="38e79d07-c68c-4ff4-9a50-8199a5308243"/>
+             <variable docPath="../../System.Xml/doc/class_Context_6652360ACEC2F470E296D221BC7B39B6546A0327.html#variable_processor_D7121B86B413BD71B176E4294034A6521E11DD48" extPath="System.Xml/doc/class_Context_6652360ACEC2F470E296D221BC7B39B6546A0327.html#variable_processor_D7121B86B413BD71B176E4294034A6521E11DD48" id="variable_processor_D7121B86B413BD71B176E4294034A6521E11DD48" name="processor" specifiers="public" type="cd66b513-6446-442d-8bfd-27835155a8a5"/>
              <variable docPath="../../System.Xml/doc/class_Context_6652360ACEC2F470E296D221BC7B39B6546A0327.html#variable_value_76A9775857F3CC89B01249F5D0C53A475878B7C5" extPath="System.Xml/doc/class_Context_6652360ACEC2F470E296D221BC7B39B6546A0327.html#variable_value_76A9775857F3CC89B01249F5D0C53A475878B7C5" id="variable_value_76A9775857F3CC89B01249F5D0C53A475878B7C5" name="value" specifiers="public" type="b6963d46-e09d-4bba-9c23-c6beb90db5a3"/>
             </variables>
            </class>
@@ -1685,7 +1685,7 @@
              <ctorDtor docPath="../../System.Xml/doc/class_Context_4B0E0BA0AECDC3F05BC61143B2E8A42D3C9CB1D0.html#default_constructor_Context_BB43903AA48E738F0679983E15546A4C9113D9A7" extPath="System.Xml/doc/class_Context_4B0E0BA0AECDC3F05BC61143B2E8A42D3C9CB1D0.html#default_constructor_Context_BB43903AA48E738F0679983E15546A4C9113D9A7" fileName="System.Xml/XmlGrammar.cm" filePath="../../System.Xml/file/XmlGrammar.cm.html" id="default_constructor_Context_BB43903AA48E738F0679983E15546A4C9113D9A7" kind="Constructor" line="2391" name="Context" specifiers="public"/>
             </ctorsDtors>
             <variables>
-             <variable docPath="../../System.Xml/doc/class_Context_4B0E0BA0AECDC3F05BC61143B2E8A42D3C9CB1D0.html#variable_processor_7DE97D3EA31278B4985AB80FED82D55428BB79AD" extPath="System.Xml/doc/class_Context_4B0E0BA0AECDC3F05BC61143B2E8A42D3C9CB1D0.html#variable_processor_7DE97D3EA31278B4985AB80FED82D55428BB79AD" id="variable_processor_7DE97D3EA31278B4985AB80FED82D55428BB79AD" name="processor" specifiers="public" type="38e79d07-c68c-4ff4-9a50-8199a5308243"/>
+             <variable docPath="../../System.Xml/doc/class_Context_4B0E0BA0AECDC3F05BC61143B2E8A42D3C9CB1D0.html#variable_processor_7DE97D3EA31278B4985AB80FED82D55428BB79AD" extPath="System.Xml/doc/class_Context_4B0E0BA0AECDC3F05BC61143B2E8A42D3C9CB1D0.html#variable_processor_7DE97D3EA31278B4985AB80FED82D55428BB79AD" id="variable_processor_7DE97D3EA31278B4985AB80FED82D55428BB79AD" name="processor" specifiers="public" type="cd66b513-6446-442d-8bfd-27835155a8a5"/>
             </variables>
            </class>
           </classes>
@@ -1735,7 +1735,7 @@
              <ctorDtor docPath="../../System.Xml/doc/class_Context_C80070A6CFB5A6F476047436CAF1ED5D2CD8BB7A.html#default_constructor_Context_00EFFD3FD2DECA945B663DBCF96CEB46F07F5C12" extPath="System.Xml/doc/class_Context_C80070A6CFB5A6F476047436CAF1ED5D2CD8BB7A.html#default_constructor_Context_00EFFD3FD2DECA945B663DBCF96CEB46F07F5C12" fileName="System.Xml/XmlGrammar.cm" filePath="../../System.Xml/file/XmlGrammar.cm.html" id="default_constructor_Context_00EFFD3FD2DECA945B663DBCF96CEB46F07F5C12" kind="Constructor" line="1194" name="Context" specifiers="public"/>
             </ctorsDtors>
             <variables>
-             <variable docPath="../../System.Xml/doc/class_Context_C80070A6CFB5A6F476047436CAF1ED5D2CD8BB7A.html#variable_processor_97D97C6A29EE377A1B8E2660B18CE3014C82672C" extPath="System.Xml/doc/class_Context_C80070A6CFB5A6F476047436CAF1ED5D2CD8BB7A.html#variable_processor_97D97C6A29EE377A1B8E2660B18CE3014C82672C" id="variable_processor_97D97C6A29EE377A1B8E2660B18CE3014C82672C" name="processor" specifiers="public" type="38e79d07-c68c-4ff4-9a50-8199a5308243"/>
+             <variable docPath="../../System.Xml/doc/class_Context_C80070A6CFB5A6F476047436CAF1ED5D2CD8BB7A.html#variable_processor_97D97C6A29EE377A1B8E2660B18CE3014C82672C" extPath="System.Xml/doc/class_Context_C80070A6CFB5A6F476047436CAF1ED5D2CD8BB7A.html#variable_processor_97D97C6A29EE377A1B8E2660B18CE3014C82672C" id="variable_processor_97D97C6A29EE377A1B8E2660B18CE3014C82672C" name="processor" specifiers="public" type="cd66b513-6446-442d-8bfd-27835155a8a5"/>
             </variables>
            </class>
           </classes>
@@ -1791,7 +1791,7 @@
              <ctorDtor docPath="../../System.Xml/doc/class_Context_51451DC5F938A4160A3AC4951E1A60936BE6C451.html#default_constructor_Context_4E8BFAABA4891B2F32FBC3F9E9A7A634361E5E9A" extPath="System.Xml/doc/class_Context_51451DC5F938A4160A3AC4951E1A60936BE6C451.html#default_constructor_Context_4E8BFAABA4891B2F32FBC3F9E9A7A634361E5E9A" fileName="System.Xml/XmlGrammar.cm" filePath="../../System.Xml/file/XmlGrammar.cm.html" id="default_constructor_Context_4E8BFAABA4891B2F32FBC3F9E9A7A634361E5E9A" kind="Constructor" line="1144" name="Context" specifiers="public"/>
             </ctorsDtors>
             <variables>
-             <variable docPath="../../System.Xml/doc/class_Context_51451DC5F938A4160A3AC4951E1A60936BE6C451.html#variable_processor_B08BFC1224D7A1BCA03E186967F35B535CCF678C" extPath="System.Xml/doc/class_Context_51451DC5F938A4160A3AC4951E1A60936BE6C451.html#variable_processor_B08BFC1224D7A1BCA03E186967F35B535CCF678C" id="variable_processor_B08BFC1224D7A1BCA03E186967F35B535CCF678C" name="processor" specifiers="public" type="38e79d07-c68c-4ff4-9a50-8199a5308243"/>
+             <variable docPath="../../System.Xml/doc/class_Context_51451DC5F938A4160A3AC4951E1A60936BE6C451.html#variable_processor_B08BFC1224D7A1BCA03E186967F35B535CCF678C" extPath="System.Xml/doc/class_Context_51451DC5F938A4160A3AC4951E1A60936BE6C451.html#variable_processor_B08BFC1224D7A1BCA03E186967F35B535CCF678C" id="variable_processor_B08BFC1224D7A1BCA03E186967F35B535CCF678C" name="processor" specifiers="public" type="cd66b513-6446-442d-8bfd-27835155a8a5"/>
             </variables>
            </class>
           </classes>
@@ -1842,7 +1842,7 @@
             </ctorsDtors>
             <variables>
              <variable docPath="../../System.Xml/doc/class_Context_524D1C7ACE6CA3849265F8014F8B5017D97DFF21.html#variable_fromentityName_49F8D6B68C6090175CD635A5678B3C0C76C1E74C" extPath="System.Xml/doc/class_Context_524D1C7ACE6CA3849265F8014F8B5017D97DFF21.html#variable_fromentityName_49F8D6B68C6090175CD635A5678B3C0C76C1E74C" id="variable_fromentityName_49F8D6B68C6090175CD635A5678B3C0C76C1E74C" name="fromentityName" specifiers="public" type="b6963d46-e09d-4bba-9c23-c6beb90db5a3"/>
-             <variable docPath="../../System.Xml/doc/class_Context_524D1C7ACE6CA3849265F8014F8B5017D97DFF21.html#variable_processor_7506184500F861DF7069DEE9679FEC0E218C5238" extPath="System.Xml/doc/class_Context_524D1C7ACE6CA3849265F8014F8B5017D97DFF21.html#variable_processor_7506184500F861DF7069DEE9679FEC0E218C5238" id="variable_processor_7506184500F861DF7069DEE9679FEC0E218C5238" name="processor" specifiers="public" type="38e79d07-c68c-4ff4-9a50-8199a5308243"/>
+             <variable docPath="../../System.Xml/doc/class_Context_524D1C7ACE6CA3849265F8014F8B5017D97DFF21.html#variable_processor_7506184500F861DF7069DEE9679FEC0E218C5238" extPath="System.Xml/doc/class_Context_524D1C7ACE6CA3849265F8014F8B5017D97DFF21.html#variable_processor_7506184500F861DF7069DEE9679FEC0E218C5238" id="variable_processor_7506184500F861DF7069DEE9679FEC0E218C5238" name="processor" specifiers="public" type="cd66b513-6446-442d-8bfd-27835155a8a5"/>
             </variables>
            </class>
           </classes>
@@ -1893,7 +1893,7 @@
              <ctorDtor docPath="../../System.Xml/doc/class_Context_FC59C49868082A2615858709CAC9DCFDB212DFD3.html#default_constructor_Context_BF82BD1EDAB8C8C70ACF86205E62A6EB14061F95" extPath="System.Xml/doc/class_Context_FC59C49868082A2615858709CAC9DCFDB212DFD3.html#default_constructor_Context_BF82BD1EDAB8C8C70ACF86205E62A6EB14061F95" fileName="System.Xml/XmlGrammar.cm" filePath="../../System.Xml/file/XmlGrammar.cm.html" id="default_constructor_Context_BF82BD1EDAB8C8C70ACF86205E62A6EB14061F95" kind="Constructor" line="1795" name="Context" specifiers="public"/>
             </ctorsDtors>
             <variables>
-             <variable docPath="../../System.Xml/doc/class_Context_FC59C49868082A2615858709CAC9DCFDB212DFD3.html#variable_processor_80F41D25DBFB8B0C90D6A68647182B5C16117A1A" extPath="System.Xml/doc/class_Context_FC59C49868082A2615858709CAC9DCFDB212DFD3.html#variable_processor_80F41D25DBFB8B0C90D6A68647182B5C16117A1A" id="variable_processor_80F41D25DBFB8B0C90D6A68647182B5C16117A1A" name="processor" specifiers="public" type="38e79d07-c68c-4ff4-9a50-8199a5308243"/>
+             <variable docPath="../../System.Xml/doc/class_Context_FC59C49868082A2615858709CAC9DCFDB212DFD3.html#variable_processor_80F41D25DBFB8B0C90D6A68647182B5C16117A1A" extPath="System.Xml/doc/class_Context_FC59C49868082A2615858709CAC9DCFDB212DFD3.html#variable_processor_80F41D25DBFB8B0C90D6A68647182B5C16117A1A" id="variable_processor_80F41D25DBFB8B0C90D6A68647182B5C16117A1A" name="processor" specifiers="public" type="cd66b513-6446-442d-8bfd-27835155a8a5"/>
             </variables>
            </class>
           </classes>
@@ -1937,7 +1937,7 @@
              <ctorDtor docPath="../../System.Xml/doc/class_Context_ED3177170817C9FA963C7ED09B9894BBC7EA5C87.html#default_constructor_Context_E8D8AF6B2658EFD3B3A5290BC0AB7A23275C531C" extPath="System.Xml/doc/class_Context_ED3177170817C9FA963C7ED09B9894BBC7EA5C87.html#default_constructor_Context_E8D8AF6B2658EFD3B3A5290BC0AB7A23275C531C" fileName="System.Xml/XmlGrammar.cm" filePath="../../System.Xml/file/XmlGrammar.cm.html" id="default_constructor_Context_E8D8AF6B2658EFD3B3A5290BC0AB7A23275C531C" kind="Constructor" line="1030" name="Context" specifiers="public"/>
             </ctorsDtors>
             <variables>
-             <variable docPath="../../System.Xml/doc/class_Context_ED3177170817C9FA963C7ED09B9894BBC7EA5C87.html#variable_processor_BEF97A7CB4A10D59133B57DD28A213B661B3EC05" extPath="System.Xml/doc/class_Context_ED3177170817C9FA963C7ED09B9894BBC7EA5C87.html#variable_processor_BEF97A7CB4A10D59133B57DD28A213B661B3EC05" id="variable_processor_BEF97A7CB4A10D59133B57DD28A213B661B3EC05" name="processor" specifiers="public" type="38e79d07-c68c-4ff4-9a50-8199a5308243"/>
+             <variable docPath="../../System.Xml/doc/class_Context_ED3177170817C9FA963C7ED09B9894BBC7EA5C87.html#variable_processor_BEF97A7CB4A10D59133B57DD28A213B661B3EC05" extPath="System.Xml/doc/class_Context_ED3177170817C9FA963C7ED09B9894BBC7EA5C87.html#variable_processor_BEF97A7CB4A10D59133B57DD28A213B661B3EC05" id="variable_processor_BEF97A7CB4A10D59133B57DD28A213B661B3EC05" name="processor" specifiers="public" type="cd66b513-6446-442d-8bfd-27835155a8a5"/>
             </variables>
            </class>
           </classes>
@@ -1987,7 +1987,7 @@
              <ctorDtor docPath="../../System.Xml/doc/class_Context_D2FE942CB6BA0E0AF74CB33139EFBEDA3B8EC9BA.html#default_constructor_Context_F2C74905FED950E3B60B37647E10A88377E3DD07" extPath="System.Xml/doc/class_Context_D2FE942CB6BA0E0AF74CB33139EFBEDA3B8EC9BA.html#default_constructor_Context_F2C74905FED950E3B60B37647E10A88377E3DD07" fileName="System.Xml/XmlGrammar.cm" filePath="../../System.Xml/file/XmlGrammar.cm.html" id="default_constructor_Context_F2C74905FED950E3B60B37647E10A88377E3DD07" kind="Constructor" line="1101" name="Context" specifiers="public"/>
             </ctorsDtors>
             <variables>
-             <variable docPath="../../System.Xml/doc/class_Context_D2FE942CB6BA0E0AF74CB33139EFBEDA3B8EC9BA.html#variable_processor_8AB639D795E66BC523A596F68FC03693420D4356" extPath="System.Xml/doc/class_Context_D2FE942CB6BA0E0AF74CB33139EFBEDA3B8EC9BA.html#variable_processor_8AB639D795E66BC523A596F68FC03693420D4356" id="variable_processor_8AB639D795E66BC523A596F68FC03693420D4356" name="processor" specifiers="public" type="38e79d07-c68c-4ff4-9a50-8199a5308243"/>
+             <variable docPath="../../System.Xml/doc/class_Context_D2FE942CB6BA0E0AF74CB33139EFBEDA3B8EC9BA.html#variable_processor_8AB639D795E66BC523A596F68FC03693420D4356" extPath="System.Xml/doc/class_Context_D2FE942CB6BA0E0AF74CB33139EFBEDA3B8EC9BA.html#variable_processor_8AB639D795E66BC523A596F68FC03693420D4356" id="variable_processor_8AB639D795E66BC523A596F68FC03693420D4356" name="processor" specifiers="public" type="cd66b513-6446-442d-8bfd-27835155a8a5"/>
             </variables>
            </class>
           </classes>
@@ -2061,7 +2061,7 @@
              <ctorDtor docPath="../../System.Xml/doc/class_Context_53404E1FB13E1B55FA68B205C98ABC28EF1A5FA6.html#default_constructor_Context_8344205591A636816DFA769AC1D04748FF044826" extPath="System.Xml/doc/class_Context_53404E1FB13E1B55FA68B205C98ABC28EF1A5FA6.html#default_constructor_Context_8344205591A636816DFA769AC1D04748FF044826" fileName="System.Xml/XmlGrammar.cm" filePath="../../System.Xml/file/XmlGrammar.cm.html" id="default_constructor_Context_8344205591A636816DFA769AC1D04748FF044826" kind="Constructor" line="903" name="Context" specifiers="public"/>
             </ctorsDtors>
             <variables>
-             <variable docPath="../../System.Xml/doc/class_Context_53404E1FB13E1B55FA68B205C98ABC28EF1A5FA6.html#variable_processor_AE6C271232157398B98D43816723516BDE93D8E3" extPath="System.Xml/doc/class_Context_53404E1FB13E1B55FA68B205C98ABC28EF1A5FA6.html#variable_processor_AE6C271232157398B98D43816723516BDE93D8E3" id="variable_processor_AE6C271232157398B98D43816723516BDE93D8E3" name="processor" specifiers="public" type="38e79d07-c68c-4ff4-9a50-8199a5308243"/>
+             <variable docPath="../../System.Xml/doc/class_Context_53404E1FB13E1B55FA68B205C98ABC28EF1A5FA6.html#variable_processor_AE6C271232157398B98D43816723516BDE93D8E3" extPath="System.Xml/doc/class_Context_53404E1FB13E1B55FA68B205C98ABC28EF1A5FA6.html#variable_processor_AE6C271232157398B98D43816723516BDE93D8E3" id="variable_processor_AE6C271232157398B98D43816723516BDE93D8E3" name="processor" specifiers="public" type="cd66b513-6446-442d-8bfd-27835155a8a5"/>
             </variables>
            </class>
           </classes>
@@ -2216,7 +2216,7 @@
             </ctorsDtors>
             <variables>
              <variable docPath="../../System.Xml/doc/class_Context_A86E4F1BEB1331C2D808E8EFDDF5460106BE5A9A.html#variable_fromName_582A9AF0D599FE2A8F2249F4789C22C7EBCAE9DB" extPath="System.Xml/doc/class_Context_A86E4F1BEB1331C2D808E8EFDDF5460106BE5A9A.html#variable_fromName_582A9AF0D599FE2A8F2249F4789C22C7EBCAE9DB" id="variable_fromName_582A9AF0D599FE2A8F2249F4789C22C7EBCAE9DB" name="fromName" specifiers="public" type="b6963d46-e09d-4bba-9c23-c6beb90db5a3"/>
-             <variable docPath="../../System.Xml/doc/class_Context_A86E4F1BEB1331C2D808E8EFDDF5460106BE5A9A.html#variable_processor_76E293DFE94427CF4B23D449A5C48AFA738CF248" extPath="System.Xml/doc/class_Context_A86E4F1BEB1331C2D808E8EFDDF5460106BE5A9A.html#variable_processor_76E293DFE94427CF4B23D449A5C48AFA738CF248" id="variable_processor_76E293DFE94427CF4B23D449A5C48AFA738CF248" name="processor" specifiers="public" type="38e79d07-c68c-4ff4-9a50-8199a5308243"/>
+             <variable docPath="../../System.Xml/doc/class_Context_A86E4F1BEB1331C2D808E8EFDDF5460106BE5A9A.html#variable_processor_76E293DFE94427CF4B23D449A5C48AFA738CF248" extPath="System.Xml/doc/class_Context_A86E4F1BEB1331C2D808E8EFDDF5460106BE5A9A.html#variable_processor_76E293DFE94427CF4B23D449A5C48AFA738CF248" id="variable_processor_76E293DFE94427CF4B23D449A5C48AFA738CF248" name="processor" specifiers="public" type="cd66b513-6446-442d-8bfd-27835155a8a5"/>
             </variables>
            </class>
           </classes>
@@ -2262,7 +2262,7 @@
             </ctorsDtors>
             <variables>
              <variable docPath="../../System.Xml/doc/class_Context_33ACC4C37742B99E7E1BC28E05EDC55AA3BD5553.html#variable_frompeName_D2F11C8D9FA2C9DA89314BA19A24F957AB1EC901" extPath="System.Xml/doc/class_Context_33ACC4C37742B99E7E1BC28E05EDC55AA3BD5553.html#variable_frompeName_D2F11C8D9FA2C9DA89314BA19A24F957AB1EC901" id="variable_frompeName_D2F11C8D9FA2C9DA89314BA19A24F957AB1EC901" name="frompeName" specifiers="public" type="b6963d46-e09d-4bba-9c23-c6beb90db5a3"/>
-             <variable docPath="../../System.Xml/doc/class_Context_33ACC4C37742B99E7E1BC28E05EDC55AA3BD5553.html#variable_processor_266D1BE43702319525E483DE7C9AE03A79E4EB72" extPath="System.Xml/doc/class_Context_33ACC4C37742B99E7E1BC28E05EDC55AA3BD5553.html#variable_processor_266D1BE43702319525E483DE7C9AE03A79E4EB72" id="variable_processor_266D1BE43702319525E483DE7C9AE03A79E4EB72" name="processor" specifiers="public" type="38e79d07-c68c-4ff4-9a50-8199a5308243"/>
+             <variable docPath="../../System.Xml/doc/class_Context_33ACC4C37742B99E7E1BC28E05EDC55AA3BD5553.html#variable_processor_266D1BE43702319525E483DE7C9AE03A79E4EB72" extPath="System.Xml/doc/class_Context_33ACC4C37742B99E7E1BC28E05EDC55AA3BD5553.html#variable_processor_266D1BE43702319525E483DE7C9AE03A79E4EB72" id="variable_processor_266D1BE43702319525E483DE7C9AE03A79E4EB72" name="processor" specifiers="public" type="cd66b513-6446-442d-8bfd-27835155a8a5"/>
             </variables>
            </class>
           </classes>
@@ -2314,7 +2314,7 @@
             </ctorsDtors>
             <variables>
              <variable docPath="../../System.Xml/doc/class_Context_353AB67CBBE61A8DB8D86CED70575AEA5B6072F9.html#variable_fromEntityValue_353C338861F3F3C9924DD7042E62278614BA865A" extPath="System.Xml/doc/class_Context_353AB67CBBE61A8DB8D86CED70575AEA5B6072F9.html#variable_fromEntityValue_353C338861F3F3C9924DD7042E62278614BA865A" id="variable_fromEntityValue_353C338861F3F3C9924DD7042E62278614BA865A" name="fromEntityValue" specifiers="public" type="b6963d46-e09d-4bba-9c23-c6beb90db5a3"/>
-             <variable docPath="../../System.Xml/doc/class_Context_353AB67CBBE61A8DB8D86CED70575AEA5B6072F9.html#variable_processor_88CDA068D21FF8F925B3F9315E38D5ECFCD2D735" extPath="System.Xml/doc/class_Context_353AB67CBBE61A8DB8D86CED70575AEA5B6072F9.html#variable_processor_88CDA068D21FF8F925B3F9315E38D5ECFCD2D735" id="variable_processor_88CDA068D21FF8F925B3F9315E38D5ECFCD2D735" name="processor" specifiers="public" type="38e79d07-c68c-4ff4-9a50-8199a5308243"/>
+             <variable docPath="../../System.Xml/doc/class_Context_353AB67CBBE61A8DB8D86CED70575AEA5B6072F9.html#variable_processor_88CDA068D21FF8F925B3F9315E38D5ECFCD2D735" extPath="System.Xml/doc/class_Context_353AB67CBBE61A8DB8D86CED70575AEA5B6072F9.html#variable_processor_88CDA068D21FF8F925B3F9315E38D5ECFCD2D735" id="variable_processor_88CDA068D21FF8F925B3F9315E38D5ECFCD2D735" name="processor" specifiers="public" type="cd66b513-6446-442d-8bfd-27835155a8a5"/>
             </variables>
            </class>
           </classes>
@@ -2366,7 +2366,7 @@
             </ctorsDtors>
             <variables>
              <variable docPath="../../System.Xml/doc/class_Context_7F150263C077241A2B5CC118C6CB3A84E4C73539.html#variable_fromName_E6C1788B39C0C4E3316376A7C94A44F4EEAFBE68" extPath="System.Xml/doc/class_Context_7F150263C077241A2B5CC118C6CB3A84E4C73539.html#variable_fromName_E6C1788B39C0C4E3316376A7C94A44F4EEAFBE68" id="variable_fromName_E6C1788B39C0C4E3316376A7C94A44F4EEAFBE68" name="fromName" specifiers="public" type="b6963d46-e09d-4bba-9c23-c6beb90db5a3"/>
-             <variable docPath="../../System.Xml/doc/class_Context_7F150263C077241A2B5CC118C6CB3A84E4C73539.html#variable_processor_59027F6F3B2F843389747D327227EF9E6CD546A1" extPath="System.Xml/doc/class_Context_7F150263C077241A2B5CC118C6CB3A84E4C73539.html#variable_processor_59027F6F3B2F843389747D327227EF9E6CD546A1" id="variable_processor_59027F6F3B2F843389747D327227EF9E6CD546A1" name="processor" specifiers="public" type="38e79d07-c68c-4ff4-9a50-8199a5308243"/>
+             <variable docPath="../../System.Xml/doc/class_Context_7F150263C077241A2B5CC118C6CB3A84E4C73539.html#variable_processor_59027F6F3B2F843389747D327227EF9E6CD546A1" extPath="System.Xml/doc/class_Context_7F150263C077241A2B5CC118C6CB3A84E4C73539.html#variable_processor_59027F6F3B2F843389747D327227EF9E6CD546A1" id="variable_processor_59027F6F3B2F843389747D327227EF9E6CD546A1" name="processor" specifiers="public" type="cd66b513-6446-442d-8bfd-27835155a8a5"/>
             </variables>
            </class>
           </classes>
@@ -2413,7 +2413,7 @@
             <variables>
              <variable docPath="../../System.Xml/doc/class_Context_0102EDD8F77D0F8A431AF2B58654EE240EC12CEF.html#variable_data_8E648AE6A98AEDEBCACE7F52E5AA5A26A049F08F" extPath="System.Xml/doc/class_Context_0102EDD8F77D0F8A431AF2B58654EE240EC12CEF.html#variable_data_8E648AE6A98AEDEBCACE7F52E5AA5A26A049F08F" id="variable_data_8E648AE6A98AEDEBCACE7F52E5AA5A26A049F08F" name="data" specifiers="public" type="b6963d46-e09d-4bba-9c23-c6beb90db5a3"/>
              <variable docPath="../../System.Xml/doc/class_Context_0102EDD8F77D0F8A431AF2B58654EE240EC12CEF.html#variable_fromtarget_11D1791EDAF9DA0A432B3382CC576573C4C4C442" extPath="System.Xml/doc/class_Context_0102EDD8F77D0F8A431AF2B58654EE240EC12CEF.html#variable_fromtarget_11D1791EDAF9DA0A432B3382CC576573C4C4C442" id="variable_fromtarget_11D1791EDAF9DA0A432B3382CC576573C4C4C442" name="fromtarget" specifiers="public" type="b6963d46-e09d-4bba-9c23-c6beb90db5a3"/>
-             <variable docPath="../../System.Xml/doc/class_Context_0102EDD8F77D0F8A431AF2B58654EE240EC12CEF.html#variable_processor_27F851DBD8F8F5265FFC4CABAEBC8098A9558FCB" extPath="System.Xml/doc/class_Context_0102EDD8F77D0F8A431AF2B58654EE240EC12CEF.html#variable_processor_27F851DBD8F8F5265FFC4CABAEBC8098A9558FCB" id="variable_processor_27F851DBD8F8F5265FFC4CABAEBC8098A9558FCB" name="processor" specifiers="public" type="38e79d07-c68c-4ff4-9a50-8199a5308243"/>
+             <variable docPath="../../System.Xml/doc/class_Context_0102EDD8F77D0F8A431AF2B58654EE240EC12CEF.html#variable_processor_27F851DBD8F8F5265FFC4CABAEBC8098A9558FCB" extPath="System.Xml/doc/class_Context_0102EDD8F77D0F8A431AF2B58654EE240EC12CEF.html#variable_processor_27F851DBD8F8F5265FFC4CABAEBC8098A9558FCB" id="variable_processor_27F851DBD8F8F5265FFC4CABAEBC8098A9558FCB" name="processor" specifiers="public" type="cd66b513-6446-442d-8bfd-27835155a8a5"/>
             </variables>
            </class>
           </classes>
@@ -2534,7 +2534,7 @@
              <ctorDtor docPath="../../System.Xml/doc/class_Context_D0B426996CBBC54A2C05CADA5C065CE47A8777B9.html#default_constructor_Context_5F003CACE5F317672F49F1D75E74EAD48C476DCA" extPath="System.Xml/doc/class_Context_D0B426996CBBC54A2C05CADA5C065CE47A8777B9.html#default_constructor_Context_5F003CACE5F317672F49F1D75E74EAD48C476DCA" fileName="System.Xml/XmlGrammar.cm" filePath="../../System.Xml/file/XmlGrammar.cm.html" id="default_constructor_Context_5F003CACE5F317672F49F1D75E74EAD48C476DCA" kind="Constructor" line="767" name="Context" specifiers="public"/>
             </ctorsDtors>
             <variables>
-             <variable docPath="../../System.Xml/doc/class_Context_D0B426996CBBC54A2C05CADA5C065CE47A8777B9.html#variable_processor_BA16338277B6B152FECBDE973743C391AB82237A" extPath="System.Xml/doc/class_Context_D0B426996CBBC54A2C05CADA5C065CE47A8777B9.html#variable_processor_BA16338277B6B152FECBDE973743C391AB82237A" id="variable_processor_BA16338277B6B152FECBDE973743C391AB82237A" name="processor" specifiers="public" type="38e79d07-c68c-4ff4-9a50-8199a5308243"/>
+             <variable docPath="../../System.Xml/doc/class_Context_D0B426996CBBC54A2C05CADA5C065CE47A8777B9.html#variable_processor_BA16338277B6B152FECBDE973743C391AB82237A" extPath="System.Xml/doc/class_Context_D0B426996CBBC54A2C05CADA5C065CE47A8777B9.html#variable_processor_BA16338277B6B152FECBDE973743C391AB82237A" id="variable_processor_BA16338277B6B152FECBDE973743C391AB82237A" name="processor" specifiers="public" type="cd66b513-6446-442d-8bfd-27835155a8a5"/>
             </variables>
            </class>
           </classes>
@@ -2655,7 +2655,7 @@
             </ctorsDtors>
             <variables>
              <variable docPath="../../System.Xml/doc/class_Context_61D985425EDF94D5236BEEE32968DA9328D7664F.html#variable_fromCharRef_37F09C5102A95BCF4533D5AD92EC63F4597FEB2F" extPath="System.Xml/doc/class_Context_61D985425EDF94D5236BEEE32968DA9328D7664F.html#variable_fromCharRef_37F09C5102A95BCF4533D5AD92EC63F4597FEB2F" id="variable_fromCharRef_37F09C5102A95BCF4533D5AD92EC63F4597FEB2F" name="fromCharRef" specifiers="public" type="d85fb569-0699-4da5-b373-b957a2d86e54"/>
-             <variable docPath="../../System.Xml/doc/class_Context_61D985425EDF94D5236BEEE32968DA9328D7664F.html#variable_processor_67E7890F41AA1954CB2E4A020E007798366A493F" extPath="System.Xml/doc/class_Context_61D985425EDF94D5236BEEE32968DA9328D7664F.html#variable_processor_67E7890F41AA1954CB2E4A020E007798366A493F" id="variable_processor_67E7890F41AA1954CB2E4A020E007798366A493F" name="processor" specifiers="public" type="38e79d07-c68c-4ff4-9a50-8199a5308243"/>
+             <variable docPath="../../System.Xml/doc/class_Context_61D985425EDF94D5236BEEE32968DA9328D7664F.html#variable_processor_67E7890F41AA1954CB2E4A020E007798366A493F" extPath="System.Xml/doc/class_Context_61D985425EDF94D5236BEEE32968DA9328D7664F.html#variable_processor_67E7890F41AA1954CB2E4A020E007798366A493F" id="variable_processor_67E7890F41AA1954CB2E4A020E007798366A493F" name="processor" specifiers="public" type="cd66b513-6446-442d-8bfd-27835155a8a5"/>
             </variables>
            </class>
           </classes>
@@ -2716,7 +2716,7 @@
              <ctorDtor docPath="../../System.Xml/doc/class_Context_E1796F4AB0AD9A6F2BA32BB2665ED7F7DD9CF2A0.html#default_constructor_Context_508523F2BB0904B47567BC7EDED66FE0F358AFE3" extPath="System.Xml/doc/class_Context_E1796F4AB0AD9A6F2BA32BB2665ED7F7DD9CF2A0.html#default_constructor_Context_508523F2BB0904B47567BC7EDED66FE0F358AFE3" fileName="System.Xml/XmlGrammar.cm" filePath="../../System.Xml/file/XmlGrammar.cm.html" id="default_constructor_Context_508523F2BB0904B47567BC7EDED66FE0F358AFE3" kind="Constructor" line="1259" name="Context" specifiers="public"/>
             </ctorsDtors>
             <variables>
-             <variable docPath="../../System.Xml/doc/class_Context_E1796F4AB0AD9A6F2BA32BB2665ED7F7DD9CF2A0.html#variable_processor_0F41B1BCB71F96901A04C5E890BA9F0F3C9986F7" extPath="System.Xml/doc/class_Context_E1796F4AB0AD9A6F2BA32BB2665ED7F7DD9CF2A0.html#variable_processor_0F41B1BCB71F96901A04C5E890BA9F0F3C9986F7" id="variable_processor_0F41B1BCB71F96901A04C5E890BA9F0F3C9986F7" name="processor" specifiers="public" type="38e79d07-c68c-4ff4-9a50-8199a5308243"/>
+             <variable docPath="../../System.Xml/doc/class_Context_E1796F4AB0AD9A6F2BA32BB2665ED7F7DD9CF2A0.html#variable_processor_0F41B1BCB71F96901A04C5E890BA9F0F3C9986F7" extPath="System.Xml/doc/class_Context_E1796F4AB0AD9A6F2BA32BB2665ED7F7DD9CF2A0.html#variable_processor_0F41B1BCB71F96901A04C5E890BA9F0F3C9986F7" id="variable_processor_0F41B1BCB71F96901A04C5E890BA9F0F3C9986F7" name="processor" specifiers="public" type="cd66b513-6446-442d-8bfd-27835155a8a5"/>
              <variable docPath="../../System.Xml/doc/class_Context_E1796F4AB0AD9A6F2BA32BB2665ED7F7DD9CF2A0.html#variable_standalone_9A2C23CE2E85A71BB7722A1A024D043E1F0C0967" extPath="System.Xml/doc/class_Context_E1796F4AB0AD9A6F2BA32BB2665ED7F7DD9CF2A0.html#variable_standalone_9A2C23CE2E85A71BB7722A1A024D043E1F0C0967" id="variable_standalone_9A2C23CE2E85A71BB7722A1A024D043E1F0C0967" name="standalone" specifiers="public" type="b53e2ae1-a4b4-4d5b-b75d-06778243ef3d"/>
             </variables>
            </class>
@@ -2863,7 +2863,7 @@
              <ctorDtor docPath="../../System.Xml/doc/class_Context_D9177563DA196BB22B9B81B8626FD7E99F3412A0.html#default_constructor_Context_64FF03FDF2B11430BB16716C13D62F4A67DAAD14" extPath="System.Xml/doc/class_Context_D9177563DA196BB22B9B81B8626FD7E99F3412A0.html#default_constructor_Context_64FF03FDF2B11430BB16716C13D62F4A67DAAD14" fileName="System.Xml/XmlGrammar.cm" filePath="../../System.Xml/file/XmlGrammar.cm.html" id="default_constructor_Context_64FF03FDF2B11430BB16716C13D62F4A67DAAD14" kind="Constructor" line="2348" name="Context" specifiers="public"/>
             </ctorsDtors>
             <variables>
-             <variable docPath="../../System.Xml/doc/class_Context_D9177563DA196BB22B9B81B8626FD7E99F3412A0.html#variable_processor_CF96C4901C7250937E72F6779C6BACF7F231394D" extPath="System.Xml/doc/class_Context_D9177563DA196BB22B9B81B8626FD7E99F3412A0.html#variable_processor_CF96C4901C7250937E72F6779C6BACF7F231394D" id="variable_processor_CF96C4901C7250937E72F6779C6BACF7F231394D" name="processor" specifiers="public" type="38e79d07-c68c-4ff4-9a50-8199a5308243"/>
+             <variable docPath="../../System.Xml/doc/class_Context_D9177563DA196BB22B9B81B8626FD7E99F3412A0.html#variable_processor_CF96C4901C7250937E72F6779C6BACF7F231394D" extPath="System.Xml/doc/class_Context_D9177563DA196BB22B9B81B8626FD7E99F3412A0.html#variable_processor_CF96C4901C7250937E72F6779C6BACF7F231394D" id="variable_processor_CF96C4901C7250937E72F6779C6BACF7F231394D" name="processor" specifiers="public" type="cd66b513-6446-442d-8bfd-27835155a8a5"/>
             </variables>
            </class>
           </classes>
@@ -2913,7 +2913,7 @@
              <ctorDtor docPath="../../System.Xml/doc/class_Context_CC4430F77930BE8290A883DEBEDB6C152EBFEC49.html#default_constructor_Context_46CC73BB481D42E1379BA324F25EA1ACF813FCEF" extPath="System.Xml/doc/class_Context_CC4430F77930BE8290A883DEBEDB6C152EBFEC49.html#default_constructor_Context_46CC73BB481D42E1379BA324F25EA1ACF813FCEF" fileName="System.Xml/XmlGrammar.cm" filePath="../../System.Xml/file/XmlGrammar.cm.html" id="default_constructor_Context_46CC73BB481D42E1379BA324F25EA1ACF813FCEF" kind="Constructor" line="860" name="Context" specifiers="public"/>
             </ctorsDtors>
             <variables>
-             <variable docPath="../../System.Xml/doc/class_Context_CC4430F77930BE8290A883DEBEDB6C152EBFEC49.html#variable_processor_75C2643FEFFA63D84E5C88871D468D8DE0F4122B" extPath="System.Xml/doc/class_Context_CC4430F77930BE8290A883DEBEDB6C152EBFEC49.html#variable_processor_75C2643FEFFA63D84E5C88871D468D8DE0F4122B" id="variable_processor_75C2643FEFFA63D84E5C88871D468D8DE0F4122B" name="processor" specifiers="public" type="38e79d07-c68c-4ff4-9a50-8199a5308243"/>
+             <variable docPath="../../System.Xml/doc/class_Context_CC4430F77930BE8290A883DEBEDB6C152EBFEC49.html#variable_processor_75C2643FEFFA63D84E5C88871D468D8DE0F4122B" extPath="System.Xml/doc/class_Context_CC4430F77930BE8290A883DEBEDB6C152EBFEC49.html#variable_processor_75C2643FEFFA63D84E5C88871D468D8DE0F4122B" id="variable_processor_75C2643FEFFA63D84E5C88871D468D8DE0F4122B" name="processor" specifiers="public" type="cd66b513-6446-442d-8bfd-27835155a8a5"/>
             </variables>
            </class>
           </classes>
@@ -2971,7 +2971,7 @@
              <ctorDtor docPath="../../System.Xml/doc/class_Context_50BBB0D86091E9CF5F5C6EC5C5E6B787DB99675E.html#default_constructor_Context_00A53F71553B647DF81FAB93F9AEBC7C4CC388DD" extPath="System.Xml/doc/class_Context_50BBB0D86091E9CF5F5C6EC5C5E6B787DB99675E.html#default_constructor_Context_00A53F71553B647DF81FAB93F9AEBC7C4CC388DD" fileName="System.Xml/XmlGrammar.cm" filePath="../../System.Xml/file/XmlGrammar.cm.html" id="default_constructor_Context_00A53F71553B647DF81FAB93F9AEBC7C4CC388DD" kind="Constructor" line="817" name="Context" specifiers="public"/>
             </ctorsDtors>
             <variables>
-             <variable docPath="../../System.Xml/doc/class_Context_50BBB0D86091E9CF5F5C6EC5C5E6B787DB99675E.html#variable_processor_0A38DAD019B1E0E7132F71F80B8753B493545A09" extPath="System.Xml/doc/class_Context_50BBB0D86091E9CF5F5C6EC5C5E6B787DB99675E.html#variable_processor_0A38DAD019B1E0E7132F71F80B8753B493545A09" id="variable_processor_0A38DAD019B1E0E7132F71F80B8753B493545A09" name="processor" specifiers="public" type="38e79d07-c68c-4ff4-9a50-8199a5308243"/>
+             <variable docPath="../../System.Xml/doc/class_Context_50BBB0D86091E9CF5F5C6EC5C5E6B787DB99675E.html#variable_processor_0A38DAD019B1E0E7132F71F80B8753B493545A09" extPath="System.Xml/doc/class_Context_50BBB0D86091E9CF5F5C6EC5C5E6B787DB99675E.html#variable_processor_0A38DAD019B1E0E7132F71F80B8753B493545A09" id="variable_processor_0A38DAD019B1E0E7132F71F80B8753B493545A09" name="processor" specifiers="public" type="cd66b513-6446-442d-8bfd-27835155a8a5"/>
             </variables>
            </class>
           </classes>
@@ -3038,7 +3038,7 @@
            <parameter id="parameter_end_1C4C3591CA30FB299304DB170463EEA9B8ADD5CA" name="end" type="490a1d6c-c0be-4f48-a2eb-8e4101c8ad0d"/>
            <parameter id="parameter_fileIndex_04B7E019FF2DC36A1D987C083E1AB6B92C11CE00" name="fileIndex" type="cc8ffb50-cac1-4f7e-acae-8b3fb9621c37"/>
            <parameter id="parameter_fileName_0B4437F2CC6BEB964136C8F058DFB6618C6A01DB" name="fileName" type="b14a2675-ade3-4740-b586-48284a4f720d"/>
-           <parameter id="parameter_processor_61CBE6AF067256464EBB2D36C4FB759C3CC38A17" name="processor" type="38e79d07-c68c-4ff4-9a50-8199a5308243"/>
+           <parameter id="parameter_processor_61CBE6AF067256464EBB2D36C4FB759C3CC38A17" name="processor" type="cd66b513-6446-442d-8bfd-27835155a8a5"/>
           </parameters>
          </function>
         </functions>
@@ -3049,19 +3049,19 @@
          <ctorDtor docPath="../../System.Xml/doc/class_XmlParser_57E6C3062973C902D7D9AABADA17F1524293CA83.html#default_constructor_XmlParser_5095BA041D400A70596A9C55104851980D6F5472" extPath="System.Xml/doc/class_XmlParser_57E6C3062973C902D7D9AABADA17F1524293CA83.html#default_constructor_XmlParser_5095BA041D400A70596A9C55104851980D6F5472" fileName="System.Xml/XmlParser.cm" filePath="../../System.Xml/file/XmlParser.cm.html" id="default_constructor_XmlParser_5095BA041D400A70596A9C55104851980D6F5472" kind="Constructor" line="20" name="XmlParser" specifiers="private"/>
         </ctorsDtors>
         <functions>
-         <function docPath="../../System.Xml/doc/class_XmlParser_57E6C3062973C902D7D9AABADA17F1524293CA83.html#member_function_Instance_XmlParser_EBE8AA52E4F55503BE22716978C368C130634AD1" extPath="System.Xml/doc/class_XmlParser_57E6C3062973C902D7D9AABADA17F1524293CA83.html#member_function_Instance_XmlParser_EBE8AA52E4F55503BE22716978C368C130634AD1" fileName="System.Xml/XmlParser.cm" filePath="../../System.Xml/file/XmlParser.cm.html" id="member_function_Instance_XmlParser_EBE8AA52E4F55503BE22716978C368C130634AD1" kind="Static Member Function" line="16" name="Instance" returnType="326d0af3-bb33-447c-ab43-53da50eda4c1" specifiers="public static"/>
+         <function docPath="../../System.Xml/doc/class_XmlParser_57E6C3062973C902D7D9AABADA17F1524293CA83.html#member_function_Instance_XmlParser_EBE8AA52E4F55503BE22716978C368C130634AD1" extPath="System.Xml/doc/class_XmlParser_57E6C3062973C902D7D9AABADA17F1524293CA83.html#member_function_Instance_XmlParser_EBE8AA52E4F55503BE22716978C368C130634AD1" fileName="System.Xml/XmlParser.cm" filePath="../../System.Xml/file/XmlParser.cm.html" id="member_function_Instance_XmlParser_EBE8AA52E4F55503BE22716978C368C130634AD1" kind="Static Member Function" line="16" name="Instance" returnType="1196e0ee-58fd-4813-87ec-428813b11945" specifiers="public static"/>
          <function docPath="../../System.Xml/doc/class_XmlParser_57E6C3062973C902D7D9AABADA17F1524293CA83.html#member_function_Parse_XmlParser_210093CFB2FE60223FBC497BD623FAB6EF894B19" extPath="System.Xml/doc/class_XmlParser_57E6C3062973C902D7D9AABADA17F1524293CA83.html#member_function_Parse_XmlParser_210093CFB2FE60223FBC497BD623FAB6EF894B19" fileName="System.Xml/XmlParser.cm" filePath="../../System.Xml/file/XmlParser.cm.html" id="member_function_Parse_XmlParser_210093CFB2FE60223FBC497BD623FAB6EF894B19" kind="Member Function" line="23" name="Parse" returnType="4e959632-b5f2-406d-9402-ec16ab3f3585" specifiers="public">
           <parameters>
            <parameter id="parameter_contentStart_E76EC6BDBE4EFAB3231B234331AB19E75951D7A2" name="contentStart" type="490a1d6c-c0be-4f48-a2eb-8e4101c8ad0d"/>
            <parameter id="parameter_contentEnd_C3F1E6E9D9821408A1016C701F61901F9A7E245D" name="contentEnd" type="490a1d6c-c0be-4f48-a2eb-8e4101c8ad0d"/>
            <parameter id="parameter_systemId_7D4D5589A44FDB52D2878AF88AB34DC24714DFE3" name="systemId" type="b14a2675-ade3-4740-b586-48284a4f720d"/>
-           <parameter id="parameter_processor_77AE556E417B3507867DCF90A1C8F2D2D37D4A1D" name="processor" type="38e79d07-c68c-4ff4-9a50-8199a5308243"/>
+           <parameter id="parameter_processor_77AE556E417B3507867DCF90A1C8F2D2D37D4A1D" name="processor" type="cd66b513-6446-442d-8bfd-27835155a8a5"/>
           </parameters>
          </function>
         </functions>
         <variables>
-         <variable docPath="../../System.Xml/doc/class_XmlParser_57E6C3062973C902D7D9AABADA17F1524293CA83.html#variable_instance_004CEC962529EAB11925556CF694CDECC0CCE8B9" extPath="System.Xml/doc/class_XmlParser_57E6C3062973C902D7D9AABADA17F1524293CA83.html#variable_instance_004CEC962529EAB11925556CF694CDECC0CCE8B9" id="variable_instance_004CEC962529EAB11925556CF694CDECC0CCE8B9" name="instance" specifiers="private static" type="02aaa5d2-3e4f-4eba-8bdf-0da2ac4c6bad"/>
-         <variable docPath="../../System.Xml/doc/class_XmlParser_57E6C3062973C902D7D9AABADA17F1524293CA83.html#variable_xmlGrammar_20D96D874650FB62CC083216EE529D42E3AA5AAE" extPath="System.Xml/doc/class_XmlParser_57E6C3062973C902D7D9AABADA17F1524293CA83.html#variable_xmlGrammar_20D96D874650FB62CC083216EE529D42E3AA5AAE" id="variable_xmlGrammar_20D96D874650FB62CC083216EE529D42E3AA5AAE" name="xmlGrammar" specifiers="private" type="a29be8e4-cc40-4e49-b274-af85f4e9438f"/>
+         <variable docPath="../../System.Xml/doc/class_XmlParser_57E6C3062973C902D7D9AABADA17F1524293CA83.html#variable_instance_004CEC962529EAB11925556CF694CDECC0CCE8B9" extPath="System.Xml/doc/class_XmlParser_57E6C3062973C902D7D9AABADA17F1524293CA83.html#variable_instance_004CEC962529EAB11925556CF694CDECC0CCE8B9" id="variable_instance_004CEC962529EAB11925556CF694CDECC0CCE8B9" name="instance" specifiers="private static" type="160eb304-0f13-42fa-86c4-631a62a3dbeb"/>
+         <variable docPath="../../System.Xml/doc/class_XmlParser_57E6C3062973C902D7D9AABADA17F1524293CA83.html#variable_xmlGrammar_20D96D874650FB62CC083216EE529D42E3AA5AAE" extPath="System.Xml/doc/class_XmlParser_57E6C3062973C902D7D9AABADA17F1524293CA83.html#variable_xmlGrammar_20D96D874650FB62CC083216EE529D42E3AA5AAE" id="variable_xmlGrammar_20D96D874650FB62CC083216EE529D42E3AA5AAE" name="xmlGrammar" specifiers="private" type="dda89d46-0bdc-4a39-b05c-ccb703d7be46"/>
         </variables>
        </class>
        <class baseClass="class_Exception_02AEA5204AD1035A91C2D843597EACBE078C8989" docPath="../../System.Xml/doc/class_XmlProcessingException_38961E809BD4812FD6BEA01B8DDA08229100E6F5.html" extPath="System.Xml/doc/class_XmlProcessingException_38961E809BD4812FD6BEA01B8DDA08229100E6F5.html" fileName="System.Xml/XmlProcessor.cm" filePath="../../System.Xml/file/XmlProcessor.cm.html" id="class_XmlProcessingException_38961E809BD4812FD6BEA01B8DDA08229100E6F5" line="12" name="XmlProcessingException" specifiers="public">
@@ -3079,7 +3079,7 @@
           <parameters>
            <parameter id="parameter_contentStart__26C264C5D2D03DBB6CACBD91579B6E41156A6F36" name="contentStart_" type="490a1d6c-c0be-4f48-a2eb-8e4101c8ad0d"/>
            <parameter id="parameter_contentEnd__D1FA17196BE3329987E6E5EA2266792227523039" name="contentEnd_" type="490a1d6c-c0be-4f48-a2eb-8e4101c8ad0d"/>
-           <parameter id="parameter_contentHandler__5D88A3DC02558A21E6B47AA10E2D59F6637E6735" name="contentHandler_" type="96faccb0-1f62-4fb9-bfa0-f4b6fa4246f1"/>
+           <parameter id="parameter_contentHandler__5D88A3DC02558A21E6B47AA10E2D59F6637E6735" name="contentHandler_" type="4eaace3c-48f6-4099-be40-8ef4fc405c9c"/>
           </parameters>
          </ctorDtor>
         </ctorsDtors>
@@ -3191,20 +3191,20 @@
         </functions>
         <variables>
          <variable docPath="../../System.Xml/doc/class_XmlProcessor_43F8A1739D5D942B02033D1C516D8C6DF1EF8319.html#variable_attValue_8A905D3E859B66C49F0AE61CD0E6C3454FAB6A84" extPath="System.Xml/doc/class_XmlProcessor_43F8A1739D5D942B02033D1C516D8C6DF1EF8319.html#variable_attValue_8A905D3E859B66C49F0AE61CD0E6C3454FAB6A84" id="variable_attValue_8A905D3E859B66C49F0AE61CD0E6C3454FAB6A84" name="attValue" specifiers="private" type="bf9d4148-9e58-4871-9645-e72a10ed1401"/>
-         <variable docPath="../../System.Xml/doc/class_XmlProcessor_43F8A1739D5D942B02033D1C516D8C6DF1EF8319.html#variable_attValueStack_CC0C09C463DBAE19E36455C9C01A6CBF9CB22CA5" extPath="System.Xml/doc/class_XmlProcessor_43F8A1739D5D942B02033D1C516D8C6DF1EF8319.html#variable_attValueStack_CC0C09C463DBAE19E36455C9C01A6CBF9CB22CA5" id="variable_attValueStack_CC0C09C463DBAE19E36455C9C01A6CBF9CB22CA5" name="attValueStack" specifiers="private" type="b60192a8-ed18-4141-84c1-8bb19ba1be97"/>
+         <variable docPath="../../System.Xml/doc/class_XmlProcessor_43F8A1739D5D942B02033D1C516D8C6DF1EF8319.html#variable_attValueStack_CC0C09C463DBAE19E36455C9C01A6CBF9CB22CA5" extPath="System.Xml/doc/class_XmlProcessor_43F8A1739D5D942B02033D1C516D8C6DF1EF8319.html#variable_attValueStack_CC0C09C463DBAE19E36455C9C01A6CBF9CB22CA5" id="variable_attValueStack_CC0C09C463DBAE19E36455C9C01A6CBF9CB22CA5" name="attValueStack" specifiers="private" type="b54bee42-032e-474e-b4c1-f05d1d46605e"/>
          <variable docPath="../../System.Xml/doc/class_XmlProcessor_43F8A1739D5D942B02033D1C516D8C6DF1EF8319.html#variable_attributes_304F56C83E75866E9482DC47ACCE09286986B05A" extPath="System.Xml/doc/class_XmlProcessor_43F8A1739D5D942B02033D1C516D8C6DF1EF8319.html#variable_attributes_304F56C83E75866E9482DC47ACCE09286986B05A" id="variable_attributes_304F56C83E75866E9482DC47ACCE09286986B05A" name="attributes" specifiers="private" type="class_Attributes_C4B2B129CAB6BB03A5BC75E44A8C3E96E227069A"/>
          <variable docPath="../../System.Xml/doc/class_XmlProcessor_43F8A1739D5D942B02033D1C516D8C6DF1EF8319.html#variable_contentEnd_8FE16B81BFB1E4005F2FE03F89AD3E1DBBCFBE52" extPath="System.Xml/doc/class_XmlProcessor_43F8A1739D5D942B02033D1C516D8C6DF1EF8319.html#variable_contentEnd_8FE16B81BFB1E4005F2FE03F89AD3E1DBBCFBE52" id="variable_contentEnd_8FE16B81BFB1E4005F2FE03F89AD3E1DBBCFBE52" name="contentEnd" specifiers="private" type="116795ad-e495-442e-a35b-256abe7666ca"/>
-         <variable docPath="../../System.Xml/doc/class_XmlProcessor_43F8A1739D5D942B02033D1C516D8C6DF1EF8319.html#variable_contentHandler_7CAD58CF70554A71BA902B9837A98273369ACED1" extPath="System.Xml/doc/class_XmlProcessor_43F8A1739D5D942B02033D1C516D8C6DF1EF8319.html#variable_contentHandler_7CAD58CF70554A71BA902B9837A98273369ACED1" id="variable_contentHandler_7CAD58CF70554A71BA902B9837A98273369ACED1" name="contentHandler" specifiers="private" type="96faccb0-1f62-4fb9-bfa0-f4b6fa4246f1"/>
+         <variable docPath="../../System.Xml/doc/class_XmlProcessor_43F8A1739D5D942B02033D1C516D8C6DF1EF8319.html#variable_contentHandler_7CAD58CF70554A71BA902B9837A98273369ACED1" extPath="System.Xml/doc/class_XmlProcessor_43F8A1739D5D942B02033D1C516D8C6DF1EF8319.html#variable_contentHandler_7CAD58CF70554A71BA902B9837A98273369ACED1" id="variable_contentHandler_7CAD58CF70554A71BA902B9837A98273369ACED1" name="contentHandler" specifiers="private" type="4eaace3c-48f6-4099-be40-8ef4fc405c9c"/>
          <variable docPath="../../System.Xml/doc/class_XmlProcessor_43F8A1739D5D942B02033D1C516D8C6DF1EF8319.html#variable_contentStart_B0C0EF4E6404E8FD0ABEB1EE1C41ACE5F74A0621" extPath="System.Xml/doc/class_XmlProcessor_43F8A1739D5D942B02033D1C516D8C6DF1EF8319.html#variable_contentStart_B0C0EF4E6404E8FD0ABEB1EE1C41ACE5F74A0621" id="variable_contentStart_B0C0EF4E6404E8FD0ABEB1EE1C41ACE5F74A0621" name="contentStart" specifiers="private" type="116795ad-e495-442e-a35b-256abe7666ca"/>
          <variable docPath="../../System.Xml/doc/class_XmlProcessor_43F8A1739D5D942B02033D1C516D8C6DF1EF8319.html#variable_currentNamespacePrefix_507EDDB0D7126D2FA974B2B5143C9DAB24A0CF8D" extPath="System.Xml/doc/class_XmlProcessor_43F8A1739D5D942B02033D1C516D8C6DF1EF8319.html#variable_currentNamespacePrefix_507EDDB0D7126D2FA974B2B5143C9DAB24A0CF8D" id="variable_currentNamespacePrefix_507EDDB0D7126D2FA974B2B5143C9DAB24A0CF8D" name="currentNamespacePrefix" specifiers="private" type="b6963d46-e09d-4bba-9c23-c6beb90db5a3"/>
          <variable docPath="../../System.Xml/doc/class_XmlProcessor_43F8A1739D5D942B02033D1C516D8C6DF1EF8319.html#variable_currentNamespaceUri_EC345B1F4DABCDAF683F9D0AA95799AC14AC1EE5" extPath="System.Xml/doc/class_XmlProcessor_43F8A1739D5D942B02033D1C516D8C6DF1EF8319.html#variable_currentNamespaceUri_EC345B1F4DABCDAF683F9D0AA95799AC14AC1EE5" id="variable_currentNamespaceUri_EC345B1F4DABCDAF683F9D0AA95799AC14AC1EE5" name="currentNamespaceUri" specifiers="private" type="b6963d46-e09d-4bba-9c23-c6beb90db5a3"/>
          <variable docPath="../../System.Xml/doc/class_XmlProcessor_43F8A1739D5D942B02033D1C516D8C6DF1EF8319.html#variable_currentTagName_3E7325BB61ED7A0346F4E0B63DD614C9A44F8012" extPath="System.Xml/doc/class_XmlProcessor_43F8A1739D5D942B02033D1C516D8C6DF1EF8319.html#variable_currentTagName_3E7325BB61ED7A0346F4E0B63DD614C9A44F8012" id="variable_currentTagName_3E7325BB61ED7A0346F4E0B63DD614C9A44F8012" name="currentTagName" specifiers="private" type="b6963d46-e09d-4bba-9c23-c6beb90db5a3"/>
-         <variable docPath="../../System.Xml/doc/class_XmlProcessor_43F8A1739D5D942B02033D1C516D8C6DF1EF8319.html#variable_entities_3BA24FDCED549CA4E2709172C1B6F5A29BC878BC" extPath="System.Xml/doc/class_XmlProcessor_43F8A1739D5D942B02033D1C516D8C6DF1EF8319.html#variable_entities_3BA24FDCED549CA4E2709172C1B6F5A29BC878BC" id="variable_entities_3BA24FDCED549CA4E2709172C1B6F5A29BC878BC" name="entities" specifiers="private" type="a5b3252c-fabe-40da-96d9-eacd62116a52"/>
-         <variable docPath="../../System.Xml/doc/class_XmlProcessor_43F8A1739D5D942B02033D1C516D8C6DF1EF8319.html#variable_entityMap_B1FD74C1E3FC0DDFB8EC34EE72C1953AEDC8F6AE" extPath="System.Xml/doc/class_XmlProcessor_43F8A1739D5D942B02033D1C516D8C6DF1EF8319.html#variable_entityMap_B1FD74C1E3FC0DDFB8EC34EE72C1953AEDC8F6AE" id="variable_entityMap_B1FD74C1E3FC0DDFB8EC34EE72C1953AEDC8F6AE" name="entityMap" specifiers="private" type="19c56477-5b46-48ed-a88b-eabfa20a0a2f"/>
+         <variable docPath="../../System.Xml/doc/class_XmlProcessor_43F8A1739D5D942B02033D1C516D8C6DF1EF8319.html#variable_entities_3BA24FDCED549CA4E2709172C1B6F5A29BC878BC" extPath="System.Xml/doc/class_XmlProcessor_43F8A1739D5D942B02033D1C516D8C6DF1EF8319.html#variable_entities_3BA24FDCED549CA4E2709172C1B6F5A29BC878BC" id="variable_entities_3BA24FDCED549CA4E2709172C1B6F5A29BC878BC" name="entities" specifiers="private" type="6c76024f-e320-4c38-9c2f-61fa0fe31292"/>
+         <variable docPath="../../System.Xml/doc/class_XmlProcessor_43F8A1739D5D942B02033D1C516D8C6DF1EF8319.html#variable_entityMap_B1FD74C1E3FC0DDFB8EC34EE72C1953AEDC8F6AE" extPath="System.Xml/doc/class_XmlProcessor_43F8A1739D5D942B02033D1C516D8C6DF1EF8319.html#variable_entityMap_B1FD74C1E3FC0DDFB8EC34EE72C1953AEDC8F6AE" id="variable_entityMap_B1FD74C1E3FC0DDFB8EC34EE72C1953AEDC8F6AE" name="entityMap" specifiers="private" type="3756c0fa-f233-485e-8471-b9d1b393617f"/>
          <variable docPath="../../System.Xml/doc/class_XmlProcessor_43F8A1739D5D942B02033D1C516D8C6DF1EF8319.html#variable_namespacePrefixMap_8CF2F11AE18395CB6789814AB47B71FA83EA1A80" extPath="System.Xml/doc/class_XmlProcessor_43F8A1739D5D942B02033D1C516D8C6DF1EF8319.html#variable_namespacePrefixMap_8CF2F11AE18395CB6789814AB47B71FA83EA1A80" id="variable_namespacePrefixMap_8CF2F11AE18395CB6789814AB47B71FA83EA1A80" name="namespacePrefixMap" specifiers="private" type="7bc9b889-1bb4-41aa-bc2b-8995b45b8547"/>
-         <variable docPath="../../System.Xml/doc/class_XmlProcessor_43F8A1739D5D942B02033D1C516D8C6DF1EF8319.html#variable_namespacePrefixStack_E01FEFF70FCD9F800A66F1B17E5ABCB7835CCFB4" extPath="System.Xml/doc/class_XmlProcessor_43F8A1739D5D942B02033D1C516D8C6DF1EF8319.html#variable_namespacePrefixStack_E01FEFF70FCD9F800A66F1B17E5ABCB7835CCFB4" id="variable_namespacePrefixStack_E01FEFF70FCD9F800A66F1B17E5ABCB7835CCFB4" name="namespacePrefixStack" specifiers="private" type="9b337ed7-28ba-4fd0-91ba-bf1aafd87cb9"/>
-         <variable docPath="../../System.Xml/doc/class_XmlProcessor_43F8A1739D5D942B02033D1C516D8C6DF1EF8319.html#variable_namespaceUriStack_C1D5E4257CAC35AC6904637FEC5673FC11E10B66" extPath="System.Xml/doc/class_XmlProcessor_43F8A1739D5D942B02033D1C516D8C6DF1EF8319.html#variable_namespaceUriStack_C1D5E4257CAC35AC6904637FEC5673FC11E10B66" id="variable_namespaceUriStack_C1D5E4257CAC35AC6904637FEC5673FC11E10B66" name="namespaceUriStack" specifiers="private" type="9b337ed7-28ba-4fd0-91ba-bf1aafd87cb9"/>
-         <variable docPath="../../System.Xml/doc/class_XmlProcessor_43F8A1739D5D942B02033D1C516D8C6DF1EF8319.html#variable_tagStack_809807E5FC4FFD9FC384A00CDABA43D74F72C0C2" extPath="System.Xml/doc/class_XmlProcessor_43F8A1739D5D942B02033D1C516D8C6DF1EF8319.html#variable_tagStack_809807E5FC4FFD9FC384A00CDABA43D74F72C0C2" id="variable_tagStack_809807E5FC4FFD9FC384A00CDABA43D74F72C0C2" name="tagStack" specifiers="private" type="9b337ed7-28ba-4fd0-91ba-bf1aafd87cb9"/>
+         <variable docPath="../../System.Xml/doc/class_XmlProcessor_43F8A1739D5D942B02033D1C516D8C6DF1EF8319.html#variable_namespacePrefixStack_E01FEFF70FCD9F800A66F1B17E5ABCB7835CCFB4" extPath="System.Xml/doc/class_XmlProcessor_43F8A1739D5D942B02033D1C516D8C6DF1EF8319.html#variable_namespacePrefixStack_E01FEFF70FCD9F800A66F1B17E5ABCB7835CCFB4" id="variable_namespacePrefixStack_E01FEFF70FCD9F800A66F1B17E5ABCB7835CCFB4" name="namespacePrefixStack" specifiers="private" type="b969b4f1-0d12-4167-a70a-b4c61da66084"/>
+         <variable docPath="../../System.Xml/doc/class_XmlProcessor_43F8A1739D5D942B02033D1C516D8C6DF1EF8319.html#variable_namespaceUriStack_C1D5E4257CAC35AC6904637FEC5673FC11E10B66" extPath="System.Xml/doc/class_XmlProcessor_43F8A1739D5D942B02033D1C516D8C6DF1EF8319.html#variable_namespaceUriStack_C1D5E4257CAC35AC6904637FEC5673FC11E10B66" id="variable_namespaceUriStack_C1D5E4257CAC35AC6904637FEC5673FC11E10B66" name="namespaceUriStack" specifiers="private" type="b969b4f1-0d12-4167-a70a-b4c61da66084"/>
+         <variable docPath="../../System.Xml/doc/class_XmlProcessor_43F8A1739D5D942B02033D1C516D8C6DF1EF8319.html#variable_tagStack_809807E5FC4FFD9FC384A00CDABA43D74F72C0C2" extPath="System.Xml/doc/class_XmlProcessor_43F8A1739D5D942B02033D1C516D8C6DF1EF8319.html#variable_tagStack_809807E5FC4FFD9FC384A00CDABA43D74F72C0C2" id="variable_tagStack_809807E5FC4FFD9FC384A00CDABA43D74F72C0C2" name="tagStack" specifiers="private" type="b969b4f1-0d12-4167-a70a-b4c61da66084"/>
         </variables>
        </class>
       </classes>
@@ -3213,27 +3213,27 @@
         <parameters>
          <parameter id="parameter_xmlContent_FE567E5041AF76AE116E3D163AE378ABFC3A250E" name="xmlContent" type="b14a2675-ade3-4740-b586-48284a4f720d"/>
          <parameter id="parameter_systemId_B2BA1C5B7F976C1AC4B797D18D93D06B54BC07F5" name="systemId" type="b14a2675-ade3-4740-b586-48284a4f720d"/>
-         <parameter id="parameter_contentHandler_156FA9C3D08EF7B53419DB33E9D71DF669811A41" name="contentHandler" type="96faccb0-1f62-4fb9-bfa0-f4b6fa4246f1"/>
+         <parameter id="parameter_contentHandler_156FA9C3D08EF7B53419DB33E9D71DF669811A41" name="contentHandler" type="4eaace3c-48f6-4099-be40-8ef4fc405c9c"/>
         </parameters>
        </function>
        <function docPath="../../System.Xml/doc/ns_System.Xml.html#function_ParseXmlContent_61335068D4F75C1370C9C52E1DDE3F3C6797D054" extPath="System.Xml/doc/ns_System.Xml.html#function_ParseXmlContent_61335068D4F75C1370C9C52E1DDE3F3C6797D054" fileName="System.Xml/XmlParser.cm" filePath="../../System.Xml/file/XmlParser.cm.html" id="function_ParseXmlContent_61335068D4F75C1370C9C52E1DDE3F3C6797D054" kind="Function" line="47" name="ParseXmlContent" returnType="4e959632-b5f2-406d-9402-ec16ab3f3585" specifiers="public">
         <parameters>
          <parameter id="parameter_xmlContent_BABEECE4DD49309BD6527F14BA356A9648E8C6FD" name="xmlContent" type="0b2cb094-cc6d-4299-a074-5eb9b3aa8751"/>
          <parameter id="parameter_systemId_0A0CC6C0AB6CC70856C1D996B12EAF45088159D1" name="systemId" type="b14a2675-ade3-4740-b586-48284a4f720d"/>
-         <parameter id="parameter_contentHandler_9D7DF01A8711EE4FD0F9E5915654DB3A8B506B34" name="contentHandler" type="96faccb0-1f62-4fb9-bfa0-f4b6fa4246f1"/>
+         <parameter id="parameter_contentHandler_9D7DF01A8711EE4FD0F9E5915654DB3A8B506B34" name="contentHandler" type="4eaace3c-48f6-4099-be40-8ef4fc405c9c"/>
         </parameters>
        </function>
        <function docPath="../../System.Xml/doc/ns_System.Xml.html#function_ParseXmlContent_02CBE0E791587725441F53556A92648D169B81B9" extPath="System.Xml/doc/ns_System.Xml.html#function_ParseXmlContent_02CBE0E791587725441F53556A92648D169B81B9" fileName="System.Xml/XmlParser.cm" filePath="../../System.Xml/file/XmlParser.cm.html" id="function_ParseXmlContent_02CBE0E791587725441F53556A92648D169B81B9" kind="Function" line="42" name="ParseXmlContent" returnType="4e959632-b5f2-406d-9402-ec16ab3f3585" specifiers="public">
         <parameters>
          <parameter id="parameter_xmlContent_3593B086904C1DA240DE87FB7E1B5D9F16CADD48" name="xmlContent" type="166a09d8-dc55-4204-9389-301fdf0f3aae"/>
          <parameter id="parameter_systemId_ED312DF9C1FBF682E837AAF97BC97BE963FE6A8B" name="systemId" type="b14a2675-ade3-4740-b586-48284a4f720d"/>
-         <parameter id="parameter_contentHandler_49D192FAACA5543FD03BCF7A06289579EDCFC008" name="contentHandler" type="96faccb0-1f62-4fb9-bfa0-f4b6fa4246f1"/>
+         <parameter id="parameter_contentHandler_49D192FAACA5543FD03BCF7A06289579EDCFC008" name="contentHandler" type="4eaace3c-48f6-4099-be40-8ef4fc405c9c"/>
         </parameters>
        </function>
        <function docPath="../../System.Xml/doc/ns_System.Xml.html#function_ParseXmlFile_7ED565F7B87DFEA8BE61A14E6C0BDB5D473022BC" extPath="System.Xml/doc/ns_System.Xml.html#function_ParseXmlFile_7ED565F7B87DFEA8BE61A14E6C0BDB5D473022BC" fileName="System.Xml/XmlParser.cm" filePath="../../System.Xml/file/XmlParser.cm.html" id="function_ParseXmlFile_7ED565F7B87DFEA8BE61A14E6C0BDB5D473022BC" kind="Function" line="31" name="ParseXmlFile" returnType="4e959632-b5f2-406d-9402-ec16ab3f3585" specifiers="public">
         <parameters>
          <parameter id="parameter_xmlFileName_5AF2EF4E9AED0A90DE8AFF6D72CE884F39E06812" name="xmlFileName" type="b14a2675-ade3-4740-b586-48284a4f720d"/>
-         <parameter id="parameter_contentHandler_1531BD464A94DAAAA15D90C0B204786DA3BBB1B8" name="contentHandler" type="96faccb0-1f62-4fb9-bfa0-f4b6fa4246f1"/>
+         <parameter id="parameter_contentHandler_1531BD464A94DAAAA15D90C0B204786DA3BBB1B8" name="contentHandler" type="4eaace3c-48f6-4099-be40-8ef4fc405c9c"/>
         </parameters>
        </function>
       </functions>
@@ -3243,36 +3243,36 @@
   </namespaces>
  </namespace>
  <types>
-  <derivedType id="79cd6f6b-c031-46d4-bd13-a3644bec0d84" name="const Attribute&amp;">
+  <derivedType id="fc4b5a76-988d-4eee-a271-8dfe615b943e" name="const Attribute&amp;">
    <derivation name="const"/>
    <derivation baseType="class_Attribute_9F35BBB0DEEF416466DA907C5E20DE343FA23BC6"/>
    <derivation name="&amp;"/>
   </derivedType>
-  <derivedType id="02211abe-6daf-4c7a-9ec6-fbdfba99bfda" name="Attribute&amp;">
+  <derivedType id="641c33f9-478a-4614-9fc5-71a2ad694427" name="Attribute&amp;">
    <derivation baseType="class_Attribute_9F35BBB0DEEF416466DA907C5E20DE343FA23BC6"/>
    <derivation name="&amp;"/>
   </derivedType>
-  <derivedType id="968a9aaa-9347-4537-a5d2-1cbad59408eb" name="Attribute*">
+  <derivedType id="152a9167-faa1-4c82-93fc-335f5329b3f1" name="Attribute*">
    <derivation baseType="class_Attribute_9F35BBB0DEEF416466DA907C5E20DE343FA23BC6"/>
    <derivation name="*"/>
   </derivedType>
-  <specialization id="80c36e68-0009-4859-b923-14ab63023322" name="RandomAccessIter" primaryType="class_RandomAccessIter_T_R_P_E5BB3CAC7F9DBE190F290EC17E5DCE3406706484">
+  <specialization id="4c51fbad-d9e4-4da3-860f-b107a4fc4538" name="RandomAccessIter" primaryType="class_RandomAccessIter_T_R_P_E5BB3CAC7F9DBE190F290EC17E5DCE3406706484">
    <templateArgumentTypes>
     <templateArgumentType ref="class_Attribute_9F35BBB0DEEF416466DA907C5E20DE343FA23BC6"/>
-    <templateArgumentType ref="02211abe-6daf-4c7a-9ec6-fbdfba99bfda"/>
-    <templateArgumentType ref="968a9aaa-9347-4537-a5d2-1cbad59408eb"/>
+    <templateArgumentType ref="641c33f9-478a-4614-9fc5-71a2ad694427"/>
+    <templateArgumentType ref="152a9167-faa1-4c82-93fc-335f5329b3f1"/>
    </templateArgumentTypes>
   </specialization>
-  <derivedType id="8711e817-5a4b-4c9f-87ca-b0c69622b7e6" name="const Attribute*">
+  <derivedType id="4b05f6a2-faa7-45a9-bd60-4d7a1a077b32" name="const Attribute*">
    <derivation name="const"/>
    <derivation baseType="class_Attribute_9F35BBB0DEEF416466DA907C5E20DE343FA23BC6"/>
    <derivation name="*"/>
   </derivedType>
-  <specialization id="51cf916a-4c8b-4af6-bb8f-2d55ebbf660d" name="RandomAccessIter" primaryType="class_RandomAccessIter_T_R_P_E5BB3CAC7F9DBE190F290EC17E5DCE3406706484">
+  <specialization id="15f4f9e1-35da-4072-b8fe-4c79c1fd0abf" name="RandomAccessIter" primaryType="class_RandomAccessIter_T_R_P_E5BB3CAC7F9DBE190F290EC17E5DCE3406706484">
    <templateArgumentTypes>
     <templateArgumentType ref="class_Attribute_9F35BBB0DEEF416466DA907C5E20DE343FA23BC6"/>
-    <templateArgumentType ref="79cd6f6b-c031-46d4-bd13-a3644bec0d84"/>
-    <templateArgumentType ref="8711e817-5a4b-4c9f-87ca-b0c69622b7e6"/>
+    <templateArgumentType ref="fc4b5a76-988d-4eee-a271-8dfe615b943e"/>
+    <templateArgumentType ref="4b05f6a2-faa7-45a9-bd60-4d7a1a077b32"/>
    </templateArgumentTypes>
   </specialization>
   <derivedType id="26a8daf9-4c30-4c13-b299-071c93d6686f" name="const String&lt;uchar>*">
@@ -3280,17 +3280,17 @@
    <derivation baseType="b6963d46-e09d-4bba-9c23-c6beb90db5a3"/>
    <derivation name="*"/>
   </derivedType>
-  <specialization id="5157f069-7e6e-457e-97c3-86469900c9c6" name="List" primaryType="class_List_T_4E42CF5913BEB21F5260DEFEC239180C94460B11">
+  <specialization id="5ff68638-7c72-464d-97ce-201b6ce774dc" name="List" primaryType="class_List_T_4E42CF5913BEB21F5260DEFEC239180C94460B11">
    <templateArgumentTypes>
     <templateArgumentType ref="class_Attribute_9F35BBB0DEEF416466DA907C5E20DE343FA23BC6"/>
    </templateArgumentTypes>
   </specialization>
-  <derivedType id="164ad29a-22c2-4a40-b624-af72b6e9aaa3" name="const Attributes&amp;">
+  <derivedType id="829e1610-09b4-4e01-89d7-43f07c3feb20" name="const Attributes&amp;">
    <derivation name="const"/>
    <derivation baseType="class_Attributes_C4B2B129CAB6BB03A5BC75E44A8C3E96E227069A"/>
    <derivation name="&amp;"/>
   </derivedType>
-  <derivedType id="38e79d07-c68c-4ff4-9a50-8199a5308243" name="XmlProcessor*">
+  <derivedType id="cd66b513-6446-442d-8bfd-27835155a8a5" name="XmlProcessor*">
    <derivation baseType="class_XmlProcessor_43F8A1739D5D942B02033D1C516D8C6DF1EF8319"/>
    <derivation name="*"/>
   </derivedType>
@@ -3329,20 +3329,20 @@
    <derivation baseType="class_ParsingDomain_DBADEDB24194482080D6E7112DE96AB5FCAD1A87"/>
    <derivation name="*"/>
   </derivedType>
-  <derivedType id="326d0af3-bb33-447c-ab43-53da50eda4c1" name="XmlParser&amp;">
+  <derivedType id="1196e0ee-58fd-4813-87ec-428813b11945" name="XmlParser&amp;">
    <derivation baseType="class_XmlParser_57E6C3062973C902D7D9AABADA17F1524293CA83"/>
    <derivation name="&amp;"/>
   </derivedType>
-  <specialization id="02aaa5d2-3e4f-4eba-8bdf-0da2ac4c6bad" name="UniquePtr" primaryType="class_UniquePtr_T_793F841C13E9DD3A6869243C74F1D948C0E04009">
+  <specialization id="160eb304-0f13-42fa-86c4-631a62a3dbeb" name="UniquePtr" primaryType="class_UniquePtr_T_793F841C13E9DD3A6869243C74F1D948C0E04009">
    <templateArgumentTypes>
     <templateArgumentType ref="class_XmlParser_57E6C3062973C902D7D9AABADA17F1524293CA83"/>
    </templateArgumentTypes>
   </specialization>
-  <derivedType id="a29be8e4-cc40-4e49-b274-af85f4e9438f" name="XmlGrammar*">
+  <derivedType id="dda89d46-0bdc-4a39-b05c-ccb703d7be46" name="XmlGrammar*">
    <derivation baseType="class_XmlGrammar_514387B50789C8E470155317F17349CFC3DF6E94"/>
    <derivation name="*"/>
   </derivedType>
-  <derivedType id="96faccb0-1f62-4fb9-bfa0-f4b6fa4246f1" name="XmlContentHandler*">
+  <derivedType id="4eaace3c-48f6-4099-be40-8ef4fc405c9c" name="XmlContentHandler*">
    <derivation baseType="class_XmlContentHandler_7429223FCBE3A541F14FD9475F2099B20E248715"/>
    <derivation name="*"/>
   </derivedType>
@@ -3354,22 +3354,22 @@
    <derivation baseType="b6963d46-e09d-4bba-9c23-c6beb90db5a3"/>
    <derivation name="*"/>
   </derivedType>
-  <specialization id="b60192a8-ed18-4141-84c1-8bb19ba1be97" name="Stack" primaryType="class_Stack_T_CAB2AD063212443437B477BD815360F469912604">
+  <specialization id="b54bee42-032e-474e-b4c1-f05d1d46605e" name="Stack" primaryType="class_Stack_T_CAB2AD063212443437B477BD815360F469912604">
    <templateArgumentTypes>
     <templateArgumentType ref="bf9d4148-9e58-4871-9645-e72a10ed1401"/>
    </templateArgumentTypes>
   </specialization>
-  <specialization id="fb8baed8-c5a9-4359-a851-031f0c985980" name="UniquePtr" primaryType="class_UniquePtr_T_793F841C13E9DD3A6869243C74F1D948C0E04009">
+  <specialization id="05e194e0-8d40-4928-85d9-c52c2039afeb" name="UniquePtr" primaryType="class_UniquePtr_T_793F841C13E9DD3A6869243C74F1D948C0E04009">
    <templateArgumentTypes>
     <templateArgumentType ref="class_Entity_B2C0C073274EAB165C24D894C32A0320159D96EF"/>
    </templateArgumentTypes>
   </specialization>
-  <specialization id="a5b3252c-fabe-40da-96d9-eacd62116a52" name="List" primaryType="class_List_T_4E42CF5913BEB21F5260DEFEC239180C94460B11">
+  <specialization id="6c76024f-e320-4c38-9c2f-61fa0fe31292" name="List" primaryType="class_List_T_4E42CF5913BEB21F5260DEFEC239180C94460B11">
    <templateArgumentTypes>
-    <templateArgumentType ref="fb8baed8-c5a9-4359-a851-031f0c985980"/>
+    <templateArgumentType ref="05e194e0-8d40-4928-85d9-c52c2039afeb"/>
    </templateArgumentTypes>
   </specialization>
-  <derivedType id="f31e2347-fb5e-4a0c-9301-add793017b41" name="Entity*">
+  <derivedType id="8644807d-d0ae-45e6-a9d3-4c4dc16a80c4" name="Entity*">
    <derivation baseType="class_Entity_B2C0C073274EAB165C24D894C32A0320159D96EF"/>
    <derivation name="*"/>
   </derivedType>
@@ -3383,10 +3383,10 @@
     <templateArgumentType ref="b6963d46-e09d-4bba-9c23-c6beb90db5a3"/>
    </templateArgumentTypes>
   </specialization>
-  <specialization id="19c56477-5b46-48ed-a88b-eabfa20a0a2f" name="HashMap" primaryType="class_HashMap_K_T_H_C_D555F9108F5700505E1FCCC02041016E58EE9314">
+  <specialization id="3756c0fa-f233-485e-8471-b9d1b393617f" name="HashMap" primaryType="class_HashMap_K_T_H_C_D555F9108F5700505E1FCCC02041016E58EE9314">
    <templateArgumentTypes>
     <templateArgumentType ref="b6963d46-e09d-4bba-9c23-c6beb90db5a3"/>
-    <templateArgumentType ref="f31e2347-fb5e-4a0c-9301-add793017b41"/>
+    <templateArgumentType ref="8644807d-d0ae-45e6-a9d3-4c4dc16a80c4"/>
     <templateArgumentType ref="e5a0393f-cd22-48e6-9b3d-a9afcfb93727"/>
     <templateArgumentType ref="1e0fe5ad-d3ac-4108-9d14-50feda6b2f19"/>
    </templateArgumentTypes>
@@ -3399,7 +3399,7 @@
     <templateArgumentType ref="1e0fe5ad-d3ac-4108-9d14-50feda6b2f19"/>
    </templateArgumentTypes>
   </specialization>
-  <specialization id="9b337ed7-28ba-4fd0-91ba-bf1aafd87cb9" name="Stack" primaryType="class_Stack_T_CAB2AD063212443437B477BD815360F469912604">
+  <specialization id="b969b4f1-0d12-4167-a70a-b4c61da66084" name="Stack" primaryType="class_Stack_T_CAB2AD063212443437B477BD815360F469912604">
    <templateArgumentTypes>
     <templateArgumentType ref="b6963d46-e09d-4bba-9c23-c6beb90db5a3"/>
    </templateArgumentTypes>
