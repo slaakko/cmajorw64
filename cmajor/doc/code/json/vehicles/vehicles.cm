@@ -12,10 +12,9 @@ namespace Vehicles
         {
         }
         public default virtual ~Vehicle();
-        public virtual void Dump()
+        public inline nothrow double Speed() const 
         {
-            Console.Out() << typename(*this) << ":" << endl();
-            Console.Out() << "speed: " << speed << endl();
+            return speed;
         }
         private double speed;
     }
@@ -26,10 +25,9 @@ namespace Vehicles
         public nothrow Bicycle(const string& brand_, double speed_) : base(speed_), brand(brand_)
         {
         }
-        public override void Dump()
+        public inline nothrow string& Brand() const
         {
-            base->Dump();
-            Console.Out() << "brand: " << brand << endl();
+            return brand;
         }
         private string brand;
     }
@@ -40,11 +38,13 @@ namespace Vehicles
         public nothrow Car(const string& model_, const string& registrationNumber_, double speed_) : base(speed_), model(model_), registrationNumber(registrationNumber_)
         {
         }
-        public override void Dump()
+        public inline nothrow const string& Model() const
         {
-            base->Dump();
-            Console.Out() << "model: " << model << endl();
-            Console.Out() << "registrationNumber: " << registrationNumber << endl();
+            return model;
+        }
+        public inline nothrow const string& RegistrationNumber() const
+        {
+            return registrationNumber;
         }
         private string model;
         private string registrationNumber;
@@ -56,69 +56,90 @@ namespace Vehicles
         public nothrow Truck(const string& model_, const string& registrationNumber_, double speed_, int weight_) : base(model_, registrationNumber_, speed_), weight(weight_)
         {
         }
-        public override void Dump()
+        public inline nothrow int Weight() const
         {
-            base->Dump();
-            Console.Out() << "weight: " << weight << endl();
+            return weight;
         }
         private int weight;
     }
+}
+
+public void SerializeOneVehicle()
+{
+    UniquePtr<Vehicle> porsche(new Car("Porsche", "ABC-123", 200));
+    UniquePtr<JsonValue> porscheJsonValue = ToJson(porsche);
+    string porscheJsonStr = porscheJsonValue->ToString();
+    Console.WriteLine(porscheJsonStr);
     
-    public string VehicleToJson(const UniquePtr<Vehicle>& vehicle)
+    UniquePtr<JsonValue> parsedPorscheJsonValue = ParseJson(porscheJsonStr);
+    UniquePtr<Vehicle> parsedVehicle;
+    FromJson(parsedPorscheJsonValue.Get(), parsedVehicle);
+    Car* parsedPorsche = parsedVehicle.Get() as Car*;
+    if (parsedPorsche != null)
     {
-        UniquePtr<JsonValue> jsonValue = ToJson(vehicle);
-        return jsonValue->ToString();
-    }
-    
-    public UniquePtr<Vehicle> JsonToVehicle(const string& str)
-    {
-        UniquePtr<JsonValue> jsonValue = ParseJson(str);
-        UniquePtr<Vehicle> vehicle;
-        FromJson(jsonValue.Get(), vehicle);
-        return vehicle;
-    }
-    
-    public void Dump(const List<UniquePtr<Vehicle>>& vehicles)
-    {
-        for (const UniquePtr<Vehicle>& vehicle : vehicles)
-        {
-            vehicle->Dump();
-        }
-    }
-    
-    public string VehiclesToJson(const List<UniquePtr<Vehicle>>& vehicles)
-    {
-        UniquePtr<JsonValue> jsonValue = ToJson(vehicles);
-        return jsonValue->ToString();
-    }
-    
-    public List<UniquePtr<Vehicle>> JsonToVehicles(const string& str)
-    {
-        UniquePtr<JsonValue> jsonValue = ParseJson(str);
-        List<UniquePtr<Vehicle>> vehicles;
-        FromJson(jsonValue.Get(), vehicles);
-        return vehicles;
+        Console.Out() << parsedPorsche->Model() << ": " << parsedPorsche->RegistrationNumber() << " " << parsedPorsche->Speed() << endl();
     }
 }
 
-public void main()
+public void SerializeListOfVehicles()
 {
-    UniquePtr<Vehicle> vehicle(new Car("Porsche", "ABC-123", 200));
-    vehicle->Dump();
-    string str = VehicleToJson(vehicle);
-    Console.WriteLine(str);
-    
-    UniquePtr<Vehicle> parsedVehicle = JsonToVehicle(str);
-    parsedVehicle->Dump();
-    
     List<UniquePtr<Vehicle>> vehicles;
     vehicles.Add(UniquePtr<Vehicle>(new Truck("Volvo", "XYZ-987", 100, 1000)));
     vehicles.Add(UniquePtr<Vehicle>(new Car("Peugeot", "PRQ-567", 150)));
     vehicles.Add(UniquePtr<Vehicle>(new Bicycle("Pegoretti", 30)));
-    Dump(vehicles);
-    string vstr = VehiclesToJson(vehicles);
-    Console.WriteLine(vstr);
+    UniquePtr<JsonValue> vehiclesJsonValue = ToJson(vehicles);
+    string vehiclesJsonStr = vehiclesJsonValue->ToString();
+    Console.WriteLine(vehiclesJsonStr);
     
-    List<UniquePtr<Vehicle>> parsedVehicles = JsonToVehicles(vstr);
-    Dump(parsedVehicles);
+    UniquePtr<JsonValue> parsedVehiclesJsonValue = ParseJson(vehiclesJsonStr);
+    List<UniquePtr<Vehicle>> parsedVehicles;
+    FromJson(parsedVehiclesJsonValue.Get(), parsedVehicles);
+    for (const UniquePtr<Vehicle>& vehicle : parsedVehicles)
+    {
+        if (vehicle.Get() is Truck*)
+        {
+            Truck* truck = cast<Truck*>(vehicle.Get());
+            Console.Out() << truck->Model() << ": " << truck->RegistrationNumber() << " " << truck->Speed() << " " << truck->Weight() << endl();
+        }
+        else if (vehicle.Get() is Car*)
+        {
+            Car* car = cast<Car*>(vehicle.Get());
+            Console.Out() << car->Model() << ": " << car->RegistrationNumber() << " " << car->Speed() << endl();
+        }
+        else if (vehicle.Get() is Bicycle*)
+        {
+            Bicycle* bicycle = cast<Bicycle*>(vehicle.Get());
+            Console.Out() << bicycle->Brand() << ": " << bicycle->Speed() << endl();
+        }
+    } 
+}
+
+internal int main(int argc, const char** argv)
+{
+    try
+    {
+        bool one = false;
+        for (int i = 1; i < argc; ++i)
+        {
+            string arg = argv[i];
+            if (arg == "1")
+            {
+                one = true;
+            }
+        }
+        if (one)
+        {
+            SerializeOneVehicle();
+        }        
+        else
+        {
+            SerializeListOfVehicles();
+        }        
+    }
+    catch (const Exception& ex)
+    {
+        Console.Error() << ex.Message() << endl();
+        return 1;
+    }
+    return 0;
 }

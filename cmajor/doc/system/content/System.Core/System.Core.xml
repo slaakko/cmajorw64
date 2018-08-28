@@ -1,0 +1,45 @@
+<symbolTable id="System.Core" module="System.Core">
+ <files>
+  <file name="System.Core/Core.cm" path="file/Core.cm.html"/>
+ </files>
+ <namespace docPath="../../System.Core/doc/ns_.html" extPath="System.Core/doc/ns_.html" id="ns_" name="">
+  <concepts>
+   <concept docPath="../../System.Core/doc/concept_Common_1761C757BC631D15B26D64D830742878B5E7D7F6.html" extPath="System.Core/doc/concept_Common_1761C757BC631D15B26D64D830742878B5E7D7F6.html" id="concept_Common_1761C757BC631D15B26D64D830742878B5E7D7F6" name="Common">
+    <typeParameters>
+     <typeParameter docPath="../../System.Core/doc/concept_Common_1761C757BC631D15B26D64D830742878B5E7D7F6.html#9cda3241-0c7e-4da1-86cc-6155e44ffef6" id="9cda3241-0c7e-4da1-86cc-6155e44ffef6" name="T"/>
+     <typeParameter docPath="../../System.Core/doc/concept_Common_1761C757BC631D15B26D64D830742878B5E7D7F6.html#f9608726-ba60-4229-93d8-0161dab976f1" id="f9608726-ba60-4229-93d8-0161dab976f1" name="U"/>
+    </typeParameters>
+   </concept>
+   <concept docPath="../../System.Core/doc/concept_Convertible_AAB8D8212C044B986438CA17EF4CDDF789ADEB81.html" extPath="System.Core/doc/concept_Convertible_AAB8D8212C044B986438CA17EF4CDDF789ADEB81.html" id="concept_Convertible_AAB8D8212C044B986438CA17EF4CDDF789ADEB81" name="Convertible">
+    <typeParameters>
+     <typeParameter docPath="../../System.Core/doc/concept_Convertible_AAB8D8212C044B986438CA17EF4CDDF789ADEB81.html#912f9b3d-0904-4f60-9442-c131e10fe604" id="912f9b3d-0904-4f60-9442-c131e10fe604" name="T"/>
+     <typeParameter docPath="../../System.Core/doc/concept_Convertible_AAB8D8212C044B986438CA17EF4CDDF789ADEB81.html#75e2a5ce-934a-4b17-a5d9-7ca7b080a6c1" id="75e2a5ce-934a-4b17-a5d9-7ca7b080a6c1" name="U"/>
+    </typeParameters>
+   </concept>
+   <concept docPath="../../System.Core/doc/concept_Derived_1AE2C34004233D6F2058B816173F55CEC6320552.html" extPath="System.Core/doc/concept_Derived_1AE2C34004233D6F2058B816173F55CEC6320552.html" id="concept_Derived_1AE2C34004233D6F2058B816173F55CEC6320552" name="Derived">
+    <typeParameters>
+     <typeParameter docPath="../../System.Core/doc/concept_Derived_1AE2C34004233D6F2058B816173F55CEC6320552.html#62f3880c-667d-43b3-b666-36fb00d0e1af" id="62f3880c-667d-43b3-b666-36fb00d0e1af" name="T"/>
+     <typeParameter docPath="../../System.Core/doc/concept_Derived_1AE2C34004233D6F2058B816173F55CEC6320552.html#9e7393ca-369a-41a7-a85e-3dd4e9b8c539" id="9e7393ca-369a-41a7-a85e-3dd4e9b8c539" name="U"/>
+    </typeParameters>
+   </concept>
+   <concept docPath="../../System.Core/doc/concept_ExplicitlyConvertible_2C98F7453D3880C7655E44A9545F7CD4CDD591FA.html" extPath="System.Core/doc/concept_ExplicitlyConvertible_2C98F7453D3880C7655E44A9545F7CD4CDD591FA.html" id="concept_ExplicitlyConvertible_2C98F7453D3880C7655E44A9545F7CD4CDD591FA" name="ExplicitlyConvertible">
+    <typeParameters>
+     <typeParameter docPath="../../System.Core/doc/concept_ExplicitlyConvertible_2C98F7453D3880C7655E44A9545F7CD4CDD591FA.html#e7032fbd-4469-4def-b5f6-312a988fdb11" id="e7032fbd-4469-4def-b5f6-312a988fdb11" name="T"/>
+     <typeParameter docPath="../../System.Core/doc/concept_ExplicitlyConvertible_2C98F7453D3880C7655E44A9545F7CD4CDD591FA.html#029c0e7f-f776-48cd-a529-e8560368fba8" id="029c0e7f-f776-48cd-a529-e8560368fba8" name="U"/>
+    </typeParameters>
+   </concept>
+   <concept docPath="../../System.Core/doc/concept_NonreferenceType_9BD78EA2665D4260E5514999AD8FCEA945606407.html" extPath="System.Core/doc/concept_NonreferenceType_9BD78EA2665D4260E5514999AD8FCEA945606407.html" id="concept_NonreferenceType_9BD78EA2665D4260E5514999AD8FCEA945606407" name="NonreferenceType">
+    <typeParameters>
+     <typeParameter docPath="../../System.Core/doc/concept_NonreferenceType_9BD78EA2665D4260E5514999AD8FCEA945606407.html#3912387a-7b94-44df-b3e0-ade095f3bb36" id="3912387a-7b94-44df-b3e0-ade095f3bb36" name="T"/>
+    </typeParameters>
+   </concept>
+   <concept docPath="../../System.Core/doc/concept_Same_DBCFA3D7303B9F160493F695D4DCB6973FFF06E3.html" extPath="System.Core/doc/concept_Same_DBCFA3D7303B9F160493F695D4DCB6973FFF06E3.html" id="concept_Same_DBCFA3D7303B9F160493F695D4DCB6973FFF06E3" name="Same">
+    <typeParameters>
+     <typeParameter docPath="../../System.Core/doc/concept_Same_DBCFA3D7303B9F160493F695D4DCB6973FFF06E3.html#3520913c-4cdd-437a-8c31-9e28f4ec6259" id="3520913c-4cdd-437a-8c31-9e28f4ec6259" name="T"/>
+     <typeParameter docPath="../../System.Core/doc/concept_Same_DBCFA3D7303B9F160493F695D4DCB6973FFF06E3.html#fea7e5c8-e1db-465c-b471-36b38fbb5f6f" id="fea7e5c8-e1db-465c-b471-36b38fbb5f6f" name="U"/>
+    </typeParameters>
+   </concept>
+  </concepts>
+ </namespace>
+ <types/>
+</symbolTable>

@@ -1,0 +1,15 @@
+<symbolTable id="Gamma" module="Gamma">
+ <files>
+  <file name="Gamma/gamma.cm" path="file/gamma.cm.html"/>
+ </files>
+ <namespace docPath="../../Gamma/doc/ns_.html" extPath="Gamma/doc/ns_.html" id="ns_" name="">
+  <namespaces>
+   <namespace docPath="../../Gamma/doc/ns_Gamma.html" extPath="Gamma/doc/ns_Gamma.html" id="ns_Gamma" name="Gamma">
+    <functions>
+     <function docPath="../../Gamma/doc/ns_Gamma.html#function_bar_5ED5C94914367FC5F373EB215415B373E9ACB933" extPath="Gamma/doc/ns_Gamma.html#function_bar_5ED5C94914367FC5F373EB215415B373E9ACB933" fileName="Gamma/gamma.cm" filePath="../../Gamma/file/gamma.cm.html" id="function_bar_5ED5C94914367FC5F373EB215415B373E9ACB933" kind="Function" line="5" name="bar" returnType="4e959632-b5f2-406d-9402-ec16ab3f3585" specifiers="public"/>
+    </functions>
+   </namespace>
+  </namespaces>
+ </namespace>
+ <types/>
+</symbolTable>

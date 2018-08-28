@@ -1,0 +1,19 @@
+<symbolTable id="Beta" module="Beta">
+ <files>
+  <file name="Beta/beta.cm" path="file/beta.cm.html"/>
+ </files>
+ <namespace docPath="../../Beta/doc/ns_.html" extPath="Beta/doc/ns_.html" id="ns_" name="">
+  <namespaces>
+   <namespace docPath="../../Beta/doc/ns_Beta.html" extPath="Beta/doc/ns_Beta.html" id="ns_Beta" name="Beta">
+    <classes>
+     <class docPath="../../Beta/doc/class_Class_B13381947AD3D9F2994758209BB2F0A4E32665CA.html" extPath="Beta/doc/class_Class_B13381947AD3D9F2994758209BB2F0A4E32665CA.html" fileName="Beta/beta.cm" filePath="../../Beta/file/beta.cm.html" id="class_Class_B13381947AD3D9F2994758209BB2F0A4E32665CA" line="5" name="Class" specifiers="public">
+      <functions>
+       <function docPath="../../Beta/doc/class_Class_B13381947AD3D9F2994758209BB2F0A4E32665CA.html#member_function_foo_Class_9F8F9554CDEC1E354D88B9D52AF7B7FEB503FD23" extPath="Beta/doc/class_Class_B13381947AD3D9F2994758209BB2F0A4E32665CA.html#member_function_foo_Class_9F8F9554CDEC1E354D88B9D52AF7B7FEB503FD23" fileName="Beta/beta.cm" filePath="../../Beta/file/beta.cm.html" id="member_function_foo_Class_9F8F9554CDEC1E354D88B9D52AF7B7FEB503FD23" kind="Member Function" line="7" name="foo" returnType="4e959632-b5f2-406d-9402-ec16ab3f3585" specifiers="public"/>
+      </functions>
+     </class>
+    </classes>
+   </namespace>
+  </namespaces>
+ </namespace>
+ <types/>
+</symbolTable>

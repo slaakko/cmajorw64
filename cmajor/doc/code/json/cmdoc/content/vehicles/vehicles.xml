@@ -1,0 +1,100 @@
+<symbolTable id="vehicles" module="vehicles">
+ <files>
+  <file name="vehicles/vehicles.cm" path="file/vehicles.cm.html"/>
+ </files>
+ <namespace docPath="../../vehicles/doc/ns_.html" extPath="vehicles/doc/ns_.html" id="ns_" name="">
+  <namespaces>
+   <namespace docPath="../../vehicles/doc/ns_Vehicles.html" extPath="vehicles/doc/ns_Vehicles.html" id="ns_Vehicles" name="Vehicles">
+    <classes>
+     <class baseClass="class_Vehicle_F33E4AC0175FB5F31061C09250EE16C24EE5C9C2" docPath="../../vehicles/doc/class_Bicycle_B65A70868515E793E320BB17C9929171AB802CFB.html" extPath="vehicles/doc/class_Bicycle_B65A70868515E793E320BB17C9929171AB802CFB.html" fileName="vehicles/vehicles.cm" filePath="../../vehicles/file/vehicles.cm.html" id="class_Bicycle_B65A70868515E793E320BB17C9929171AB802CFB" line="22" name="Bicycle" specifiers="public">
+      <ctorsDtors>
+       <ctorDtor docPath="../../vehicles/doc/class_Bicycle_B65A70868515E793E320BB17C9929171AB802CFB.html#constructor_Bicycle_9062D6984F711EFF18B0091AA3F52C9B2D497491" extPath="vehicles/doc/class_Bicycle_B65A70868515E793E320BB17C9929171AB802CFB.html#constructor_Bicycle_9062D6984F711EFF18B0091AA3F52C9B2D497491" fileName="vehicles/vehicles.cm" filePath="../../vehicles/file/vehicles.cm.html" id="constructor_Bicycle_9062D6984F711EFF18B0091AA3F52C9B2D497491" kind="Constructor" line="25" name="Bicycle" specifiers="public nothrow">
+        <parameters>
+         <parameter id="parameter_brand__C4C6BFDAB193C75D70B3F1F53A537CE94F2217C9" name="brand_" type="b14a2675-ade3-4740-b586-48284a4f720d"/>
+         <parameter id="parameter_speed__EA2F76E8215DD6ACD2B6B476406A539309CE8095" name="speed_" type="f097219a-e599-4e02-9b0f-06fbb362d40f"/>
+        </parameters>
+       </ctorDtor>
+      </ctorsDtors>
+      <functions>
+       <function const="true" docPath="../../vehicles/doc/class_Bicycle_B65A70868515E793E320BB17C9929171AB802CFB.html#member_function_Brand_Bicycle_F2A768E581A0E6FA68F48E613802D8EDE67A524D" extPath="vehicles/doc/class_Bicycle_B65A70868515E793E320BB17C9929171AB802CFB.html#member_function_Brand_Bicycle_F2A768E581A0E6FA68F48E613802D8EDE67A524D" fileName="vehicles/vehicles.cm" filePath="../../vehicles/file/vehicles.cm.html" id="member_function_Brand_Bicycle_F2A768E581A0E6FA68F48E613802D8EDE67A524D" kind="Member Function" line="28" name="Brand" returnType="36b87e1c-d98f-4704-bad9-18096f0475cb" specifiers="public inline nothrow"/>
+      </functions>
+      <variables>
+       <variable docPath="../../vehicles/doc/class_Bicycle_B65A70868515E793E320BB17C9929171AB802CFB.html#variable_brand_572DC71700DDE3054A10B4FD35E82C00BA4A04FD" extPath="vehicles/doc/class_Bicycle_B65A70868515E793E320BB17C9929171AB802CFB.html#variable_brand_572DC71700DDE3054A10B4FD35E82C00BA4A04FD" id="variable_brand_572DC71700DDE3054A10B4FD35E82C00BA4A04FD" name="brand" specifiers="private" type="c7461d76-d6b8-4a81-baf1-b9e490d8318b"/>
+      </variables>
+     </class>
+     <class baseClass="class_Vehicle_F33E4AC0175FB5F31061C09250EE16C24EE5C9C2" docPath="../../vehicles/doc/class_Car_7BC5FDF36A25F00035B316A0D6D31D255B1EB5D9.html" extPath="vehicles/doc/class_Car_7BC5FDF36A25F00035B316A0D6D31D255B1EB5D9.html" fileName="vehicles/vehicles.cm" filePath="../../vehicles/file/vehicles.cm.html" id="class_Car_7BC5FDF36A25F00035B316A0D6D31D255B1EB5D9" line="35" name="Car" specifiers="public">
+      <ctorsDtors>
+       <ctorDtor docPath="../../vehicles/doc/class_Car_7BC5FDF36A25F00035B316A0D6D31D255B1EB5D9.html#constructor_Car_944DFDA12B3C4F73626BF49EAF93369E4C431DA3" extPath="vehicles/doc/class_Car_7BC5FDF36A25F00035B316A0D6D31D255B1EB5D9.html#constructor_Car_944DFDA12B3C4F73626BF49EAF93369E4C431DA3" fileName="vehicles/vehicles.cm" filePath="../../vehicles/file/vehicles.cm.html" id="constructor_Car_944DFDA12B3C4F73626BF49EAF93369E4C431DA3" kind="Constructor" line="38" name="Car" specifiers="public nothrow">
+        <parameters>
+         <parameter id="parameter_model__F78D58095037D62490EC6E38422DADFB7C2E3897" name="model_" type="b14a2675-ade3-4740-b586-48284a4f720d"/>
+         <parameter id="parameter_registrationNumber__409EAC73BDB3A1DE1FF59356F35C7E85CA485B58" name="registrationNumber_" type="b14a2675-ade3-4740-b586-48284a4f720d"/>
+         <parameter id="parameter_speed__3110B714892292503C1A5EC688740B6E7E64EF3B" name="speed_" type="f097219a-e599-4e02-9b0f-06fbb362d40f"/>
+        </parameters>
+       </ctorDtor>
+      </ctorsDtors>
+      <functions>
+       <function const="true" docPath="../../vehicles/doc/class_Car_7BC5FDF36A25F00035B316A0D6D31D255B1EB5D9.html#member_function_Model_Car_702E47E6C8EE213CF8006B2B95069DD014C275CE" extPath="vehicles/doc/class_Car_7BC5FDF36A25F00035B316A0D6D31D255B1EB5D9.html#member_function_Model_Car_702E47E6C8EE213CF8006B2B95069DD014C275CE" fileName="vehicles/vehicles.cm" filePath="../../vehicles/file/vehicles.cm.html" id="member_function_Model_Car_702E47E6C8EE213CF8006B2B95069DD014C275CE" kind="Member Function" line="41" name="Model" returnType="b14a2675-ade3-4740-b586-48284a4f720d" specifiers="public inline nothrow"/>
+       <function const="true" docPath="../../vehicles/doc/class_Car_7BC5FDF36A25F00035B316A0D6D31D255B1EB5D9.html#member_function_RegistrationNumber_Car_F4BD3DF655E4B1B090F953E50A00E74985CE6F54" extPath="vehicles/doc/class_Car_7BC5FDF36A25F00035B316A0D6D31D255B1EB5D9.html#member_function_RegistrationNumber_Car_F4BD3DF655E4B1B090F953E50A00E74985CE6F54" fileName="vehicles/vehicles.cm" filePath="../../vehicles/file/vehicles.cm.html" id="member_function_RegistrationNumber_Car_F4BD3DF655E4B1B090F953E50A00E74985CE6F54" kind="Member Function" line="45" name="RegistrationNumber" returnType="b14a2675-ade3-4740-b586-48284a4f720d" specifiers="public inline nothrow"/>
+      </functions>
+      <variables>
+       <variable docPath="../../vehicles/doc/class_Car_7BC5FDF36A25F00035B316A0D6D31D255B1EB5D9.html#variable_model_A55A52F857DD1FACD17F9E4DFC20969F97C275A4" extPath="vehicles/doc/class_Car_7BC5FDF36A25F00035B316A0D6D31D255B1EB5D9.html#variable_model_A55A52F857DD1FACD17F9E4DFC20969F97C275A4" id="variable_model_A55A52F857DD1FACD17F9E4DFC20969F97C275A4" name="model" specifiers="private" type="c7461d76-d6b8-4a81-baf1-b9e490d8318b"/>
+       <variable docPath="../../vehicles/doc/class_Car_7BC5FDF36A25F00035B316A0D6D31D255B1EB5D9.html#variable_registrationNumber_A013D00D13469221EFFF27302DCDCB153F25BD2B" extPath="vehicles/doc/class_Car_7BC5FDF36A25F00035B316A0D6D31D255B1EB5D9.html#variable_registrationNumber_A013D00D13469221EFFF27302DCDCB153F25BD2B" id="variable_registrationNumber_A013D00D13469221EFFF27302DCDCB153F25BD2B" name="registrationNumber" specifiers="private" type="c7461d76-d6b8-4a81-baf1-b9e490d8318b"/>
+      </variables>
+     </class>
+     <class baseClass="class_Car_7BC5FDF36A25F00035B316A0D6D31D255B1EB5D9" docPath="../../vehicles/doc/class_Truck_D5918467D0CB05D8B8FEAD700CC082CBE4ECB938.html" extPath="vehicles/doc/class_Truck_D5918467D0CB05D8B8FEAD700CC082CBE4ECB938.html" fileName="vehicles/vehicles.cm" filePath="../../vehicles/file/vehicles.cm.html" id="class_Truck_D5918467D0CB05D8B8FEAD700CC082CBE4ECB938" line="53" name="Truck" specifiers="public">
+      <ctorsDtors>
+       <ctorDtor docPath="../../vehicles/doc/class_Truck_D5918467D0CB05D8B8FEAD700CC082CBE4ECB938.html#constructor_Truck_AA7A0C8448651082EB3E7F7D2E23387BE1EC49CE" extPath="vehicles/doc/class_Truck_D5918467D0CB05D8B8FEAD700CC082CBE4ECB938.html#constructor_Truck_AA7A0C8448651082EB3E7F7D2E23387BE1EC49CE" fileName="vehicles/vehicles.cm" filePath="../../vehicles/file/vehicles.cm.html" id="constructor_Truck_AA7A0C8448651082EB3E7F7D2E23387BE1EC49CE" kind="Constructor" line="56" name="Truck" specifiers="public nothrow">
+        <parameters>
+         <parameter id="parameter_model__2010F837C407823D5DAE59B613C39F4F5F34B95D" name="model_" type="b14a2675-ade3-4740-b586-48284a4f720d"/>
+         <parameter id="parameter_registrationNumber__A421C91AAA6ECD7C840E92025F0E4AB66ED1C9DB" name="registrationNumber_" type="b14a2675-ade3-4740-b586-48284a4f720d"/>
+         <parameter id="parameter_speed__EFCBF3FCD84DE2B9DC9369B24744F67BC4F9B1EB" name="speed_" type="f097219a-e599-4e02-9b0f-06fbb362d40f"/>
+         <parameter id="parameter_weight__90B2BF5F3F13FDA951DA151A691B4CFCDA8C57A8" name="weight_" type="cc8ffb50-cac1-4f7e-acae-8b3fb9621c37"/>
+        </parameters>
+       </ctorDtor>
+      </ctorsDtors>
+      <functions>
+       <function const="true" docPath="../../vehicles/doc/class_Truck_D5918467D0CB05D8B8FEAD700CC082CBE4ECB938.html#member_function_Weight_Truck_F3D6F5D1962A51C8A15A4AC444928EF2319E0AC0" extPath="vehicles/doc/class_Truck_D5918467D0CB05D8B8FEAD700CC082CBE4ECB938.html#member_function_Weight_Truck_F3D6F5D1962A51C8A15A4AC444928EF2319E0AC0" fileName="vehicles/vehicles.cm" filePath="../../vehicles/file/vehicles.cm.html" id="member_function_Weight_Truck_F3D6F5D1962A51C8A15A4AC444928EF2319E0AC0" kind="Member Function" line="59" name="Weight" returnType="cc8ffb50-cac1-4f7e-acae-8b3fb9621c37" specifiers="public inline nothrow"/>
+      </functions>
+      <variables>
+       <variable docPath="../../vehicles/doc/class_Truck_D5918467D0CB05D8B8FEAD700CC082CBE4ECB938.html#variable_weight_393E76A9ED6624B028BDA90AF09CB9BA20ADE711" extPath="vehicles/doc/class_Truck_D5918467D0CB05D8B8FEAD700CC082CBE4ECB938.html#variable_weight_393E76A9ED6624B028BDA90AF09CB9BA20ADE711" id="variable_weight_393E76A9ED6624B028BDA90AF09CB9BA20ADE711" name="weight" specifiers="private" type="cc8ffb50-cac1-4f7e-acae-8b3fb9621c37"/>
+      </variables>
+     </class>
+     <class docPath="../../vehicles/doc/class_Vehicle_F33E4AC0175FB5F31061C09250EE16C24EE5C9C2.html" extPath="vehicles/doc/class_Vehicle_F33E4AC0175FB5F31061C09250EE16C24EE5C9C2.html" fileName="vehicles/vehicles.cm" filePath="../../vehicles/file/vehicles.cm.html" id="class_Vehicle_F33E4AC0175FB5F31061C09250EE16C24EE5C9C2" line="8" name="Vehicle" specifiers="public abstract">
+      <ctorsDtors>
+       <ctorDtor docPath="../../vehicles/doc/class_Vehicle_F33E4AC0175FB5F31061C09250EE16C24EE5C9C2.html#constructor_Vehicle_783733EC773D712C9D800CBCDEBEC28B0AFA7E33" extPath="vehicles/doc/class_Vehicle_F33E4AC0175FB5F31061C09250EE16C24EE5C9C2.html#constructor_Vehicle_783733EC773D712C9D800CBCDEBEC28B0AFA7E33" fileName="vehicles/vehicles.cm" filePath="../../vehicles/file/vehicles.cm.html" id="constructor_Vehicle_783733EC773D712C9D800CBCDEBEC28B0AFA7E33" kind="Constructor" line="11" name="Vehicle" specifiers="public nothrow">
+        <parameters>
+         <parameter id="parameter_speed__87A25741D29915A5635DCCC03B100BCE73D1C3C5" name="speed_" type="f097219a-e599-4e02-9b0f-06fbb362d40f"/>
+        </parameters>
+       </ctorDtor>
+       <ctorDtor docPath="../../vehicles/doc/class_Vehicle_F33E4AC0175FB5F31061C09250EE16C24EE5C9C2.html#destructor_Vehicle_6EF133D742450156DA4DD24B5CE43BE1421693B2" extPath="vehicles/doc/class_Vehicle_F33E4AC0175FB5F31061C09250EE16C24EE5C9C2.html#destructor_Vehicle_6EF133D742450156DA4DD24B5CE43BE1421693B2" fileName="vehicles/vehicles.cm" filePath="../../vehicles/file/vehicles.cm.html" id="destructor_Vehicle_6EF133D742450156DA4DD24B5CE43BE1421693B2" kind="Destructor" line="14" name="~Vehicle" specifiers="public virtual default"/>
+      </ctorsDtors>
+      <functions>
+       <function const="true" docPath="../../vehicles/doc/class_Vehicle_F33E4AC0175FB5F31061C09250EE16C24EE5C9C2.html#member_function_Speed_Vehicle_1EFDB51B182C465F06B231262599D950F0449BAB" extPath="vehicles/doc/class_Vehicle_F33E4AC0175FB5F31061C09250EE16C24EE5C9C2.html#member_function_Speed_Vehicle_1EFDB51B182C465F06B231262599D950F0449BAB" fileName="vehicles/vehicles.cm" filePath="../../vehicles/file/vehicles.cm.html" id="member_function_Speed_Vehicle_1EFDB51B182C465F06B231262599D950F0449BAB" kind="Member Function" line="15" name="Speed" returnType="f097219a-e599-4e02-9b0f-06fbb362d40f" specifiers="public inline nothrow"/>
+      </functions>
+      <variables>
+       <variable docPath="../../vehicles/doc/class_Vehicle_F33E4AC0175FB5F31061C09250EE16C24EE5C9C2.html#variable_speed_565683B414B27B1739F1B675A391F16773895FB8" extPath="vehicles/doc/class_Vehicle_F33E4AC0175FB5F31061C09250EE16C24EE5C9C2.html#variable_speed_565683B414B27B1739F1B675A391F16773895FB8" id="variable_speed_565683B414B27B1739F1B675A391F16773895FB8" name="speed" specifiers="private" type="f097219a-e599-4e02-9b0f-06fbb362d40f"/>
+      </variables>
+     </class>
+    </classes>
+   </namespace>
+  </namespaces>
+  <functions>
+   <function docPath="../../vehicles/doc/../index.html#function_SerializeListOfVehicles_F7DE49ACAEF1E8328EA8B36191069054C6D72712" extPath="vehicles/doc/../index.html#function_SerializeListOfVehicles_F7DE49ACAEF1E8328EA8B36191069054C6D72712" fileName="vehicles/vehicles.cm" filePath="../../vehicles/file/vehicles.cm.html" id="function_SerializeListOfVehicles_F7DE49ACAEF1E8328EA8B36191069054C6D72712" kind="Function" line="84" name="SerializeListOfVehicles" returnType="4e959632-b5f2-406d-9402-ec16ab3f3585" specifiers="public"/>
+   <function docPath="../../vehicles/doc/../index.html#function_SerializeOneVehicle_711805FAEE28FC7A7ADF44A405595743761A1E6E" extPath="vehicles/doc/../index.html#function_SerializeOneVehicle_711805FAEE28FC7A7ADF44A405595743761A1E6E" fileName="vehicles/vehicles.cm" filePath="../../vehicles/file/vehicles.cm.html" id="function_SerializeOneVehicle_711805FAEE28FC7A7ADF44A405595743761A1E6E" kind="Function" line="67" name="SerializeOneVehicle" returnType="4e959632-b5f2-406d-9402-ec16ab3f3585" specifiers="public"/>
+   <function docPath="../../vehicles/doc/../index.html#function_main_E5E0B7B0E865B79CC09FA4CBA1B819D77DE7CAFC" extPath="vehicles/doc/../index.html#function_main_E5E0B7B0E865B79CC09FA4CBA1B819D77DE7CAFC" fileName="vehicles/vehicles.cm" filePath="../../vehicles/file/vehicles.cm.html" id="function_main_E5E0B7B0E865B79CC09FA4CBA1B819D77DE7CAFC" kind="Function" line="117" name="main" returnType="cc8ffb50-cac1-4f7e-acae-8b3fb9621c37" specifiers="internal">
+    <parameters>
+     <parameter id="parameter_argc_AA11952084E5FEBCC47757F6863509258BF262FF" name="argc" type="cc8ffb50-cac1-4f7e-acae-8b3fb9621c37"/>
+     <parameter id="parameter_argv_A77642CC652C3A88362DD414B9B6D479ADFED46E" name="argv" type="12a8da02-5a16-4ee2-b41a-3dc9edd18f7c"/>
+    </parameters>
+   </function>
+  </functions>
+ </namespace>
+ <types>
+  <derivedType id="12a8da02-5a16-4ee2-b41a-3dc9edd18f7c" name="const char**">
+   <derivation name="const"/>
+   <derivation baseType="fa042a6a-5c08-46b3-b35b-b955ec35f88c"/>
+   <derivation name="*"/>
+   <derivation name="*"/>
+  </derivedType>
+ </types>
+</symbolTable>

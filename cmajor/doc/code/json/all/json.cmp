@@ -1,3 +1,0 @@
-project Json;
-target=program;
-source <json.cm>;

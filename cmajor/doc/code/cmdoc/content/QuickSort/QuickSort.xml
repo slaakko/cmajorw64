@@ -1,0 +1,50 @@
+<symbolTable id="QuickSort" module="QuickSort">
+ <files>
+  <file name="QuickSort/QuickSort.cm" path="file/QuickSort.cm.html"/>
+ </files>
+ <namespace docPath="../../QuickSort/doc/ns_.html" extPath="QuickSort/doc/ns_.html" id="ns_" name="">
+  <functions>
+   <function docPath="../../QuickSort/doc/../index.html#function_Partition_94939B148FB759B7E63D92782C7C6D896158DC03" extPath="QuickSort/doc/../index.html#function_Partition_94939B148FB759B7E63D92782C7C6D896158DC03" fileName="QuickSort/QuickSort.cm" filePath="../../QuickSort/file/QuickSort.cm.html" id="function_Partition_94939B148FB759B7E63D92782C7C6D896158DC03" kind="Function" line="4" name="Partition" returnType="8edf41dc-c01c-479c-8064-b92f90c315ea" specifiers="public">
+    <parameters>
+     <parameter id="parameter_intList_0F743B1D6AE34C855D847DDDC6A3D16502B34416" name="intList" type="de8743b8-38ed-42f9-b1f0-764e3b6581f8"/>
+     <parameter id="parameter_left_10D65DB1344133F829F13F470753411B6F6B5FC0" name="left" type="8edf41dc-c01c-479c-8064-b92f90c315ea"/>
+     <parameter id="parameter_right_4B22E7876036B3D391FD6E328F22D935394E7539" name="right" type="8edf41dc-c01c-479c-8064-b92f90c315ea"/>
+    </parameters>
+   </function>
+   <function docPath="../../QuickSort/doc/../index.html#function_Print_9E323DAA6A735A369F3610A0BD509AFDDBF4CB26" extPath="QuickSort/doc/../index.html#function_Print_9E323DAA6A735A369F3610A0BD509AFDDBF4CB26" fileName="QuickSort/QuickSort.cm" filePath="../../QuickSort/file/QuickSort.cm.html" id="function_Print_9E323DAA6A735A369F3610A0BD509AFDDBF4CB26" kind="Function" line="46" name="Print" returnType="4e959632-b5f2-406d-9402-ec16ab3f3585" specifiers="public">
+    <parameters>
+     <parameter id="parameter_intList_96ADCF01CAB5DCEC565F9482C89DA67FFB46385D" name="intList" type="56ca1792-ec4d-4be6-a412-658d5450544e"/>
+    </parameters>
+   </function>
+   <function docPath="../../QuickSort/doc/../index.html#function_QuickSort_5B938844E7C21A0E589580573EDD8C5FE7933BC7" extPath="QuickSort/doc/../index.html#function_QuickSort_5B938844E7C21A0E589580573EDD8C5FE7933BC7" fileName="QuickSort/QuickSort.cm" filePath="../../QuickSort/file/QuickSort.cm.html" id="function_QuickSort_5B938844E7C21A0E589580573EDD8C5FE7933BC7" kind="Function" line="38" name="QuickSort" returnType="4e959632-b5f2-406d-9402-ec16ab3f3585" specifiers="public">
+    <parameters>
+     <parameter id="parameter_intList_7C96FB944BAAFBA6872940D05AFA2BD6A2A8E23B" name="intList" type="de8743b8-38ed-42f9-b1f0-764e3b6581f8"/>
+    </parameters>
+   </function>
+   <function docPath="../../QuickSort/doc/../index.html#function_QuickSort_F79DAB409EE03CB6814D5429E59EEF7D3D93D53F" extPath="QuickSort/doc/../index.html#function_QuickSort_F79DAB409EE03CB6814D5429E59EEF7D3D93D53F" fileName="QuickSort/QuickSort.cm" filePath="../../QuickSort/file/QuickSort.cm.html" id="function_QuickSort_F79DAB409EE03CB6814D5429E59EEF7D3D93D53F" kind="Function" line="24" name="QuickSort" returnType="4e959632-b5f2-406d-9402-ec16ab3f3585" specifiers="public">
+    <parameters>
+     <parameter id="parameter_intList_E1A05F655C1348762D022BC52A465796CD19395B" name="intList" type="de8743b8-38ed-42f9-b1f0-764e3b6581f8"/>
+     <parameter id="parameter_left_B5C2E866230CC757A0BB7153A3BCAB66AC94381E" name="left" type="8edf41dc-c01c-479c-8064-b92f90c315ea"/>
+     <parameter id="parameter_right_F1D8C188B657DBEA5FB48981C63B1D1E546209FE" name="right" type="8edf41dc-c01c-479c-8064-b92f90c315ea"/>
+    </parameters>
+   </function>
+   <function docPath="../../QuickSort/doc/../index.html#function_main_99F3726C50455B4187460FBE611E3885299323E1" extPath="QuickSort/doc/../index.html#function_main_99F3726C50455B4187460FBE611E3885299323E1" fileName="QuickSort/QuickSort.cm" filePath="../../QuickSort/file/QuickSort.cm.html" id="function_main_99F3726C50455B4187460FBE611E3885299323E1" kind="Function" line="65" name="main" returnType="4e959632-b5f2-406d-9402-ec16ab3f3585" specifiers="internal"/>
+  </functions>
+ </namespace>
+ <types>
+  <specialization id="40723520-dbf7-4145-ace0-a2c521bcd599" name="List" primaryType="class_List_T_4E42CF5913BEB21F5260DEFEC239180C94460B11">
+   <templateArgumentTypes>
+    <templateArgumentType ref="cc8ffb50-cac1-4f7e-acae-8b3fb9621c37"/>
+   </templateArgumentTypes>
+  </specialization>
+  <derivedType id="de8743b8-38ed-42f9-b1f0-764e3b6581f8" name="List&lt;int>&amp;">
+   <derivation baseType="40723520-dbf7-4145-ace0-a2c521bcd599"/>
+   <derivation name="&amp;"/>
+  </derivedType>
+  <derivedType id="56ca1792-ec4d-4be6-a412-658d5450544e" name="const List&lt;int>&amp;">
+   <derivation name="const"/>
+   <derivation baseType="40723520-dbf7-4145-ace0-a2c521bcd599"/>
+   <derivation name="&amp;"/>
+  </derivedType>
+ </types>
+</symbolTable>

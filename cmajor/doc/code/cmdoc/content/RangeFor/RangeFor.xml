@@ -1,0 +1,133 @@
+<symbolTable id="RangeFor" module="RangeFor">
+ <files>
+  <file name="RangeFor/range_for.cm" path="file/range_for.cm.html"/>
+ </files>
+ <namespace docPath="../../RangeFor/doc/ns_.html" extPath="RangeFor/doc/ns_.html" id="ns_" name="">
+  <classes>
+   <class docPath="../../RangeFor/doc/class_Foo_8B12B79C5168277EC4B3BAFF8D94B0D0C1897E44.html" extPath="RangeFor/doc/class_Foo_8B12B79C5168277EC4B3BAFF8D94B0D0C1897E44.html" fileName="RangeFor/range_for.cm" filePath="../../RangeFor/file/range_for.cm.html" id="class_Foo_8B12B79C5168277EC4B3BAFF8D94B0D0C1897E44" line="31" name="Foo" specifiers="public">
+    <ctorsDtors>
+     <ctorDtor docPath="../../RangeFor/doc/class_Foo_8B12B79C5168277EC4B3BAFF8D94B0D0C1897E44.html#constructor_Foo_245018DF29628A55CA02F8DD35D378F3D95C30B0" extPath="RangeFor/doc/class_Foo_8B12B79C5168277EC4B3BAFF8D94B0D0C1897E44.html#constructor_Foo_245018DF29628A55CA02F8DD35D378F3D95C30B0" fileName="RangeFor/range_for.cm" filePath="../../RangeFor/file/range_for.cm.html" id="constructor_Foo_245018DF29628A55CA02F8DD35D378F3D95C30B0" kind="Constructor" line="33" name="Foo" specifiers="public">
+      <parameters>
+       <parameter id="parameter_x__8B46756D6921A55BE4143DD9F665B4D2C1BA0F71" name="x_" type="cc8ffb50-cac1-4f7e-acae-8b3fb9621c37"/>
+      </parameters>
+     </ctorDtor>
+    </ctorsDtors>
+    <functions>
+     <function const="true" docPath="../../RangeFor/doc/class_Foo_8B12B79C5168277EC4B3BAFF8D94B0D0C1897E44.html#member_function_X_Foo_8094608D198E9A283DDA406B6D5076C18F39C0CF" extPath="RangeFor/doc/class_Foo_8B12B79C5168277EC4B3BAFF8D94B0D0C1897E44.html#member_function_X_Foo_8094608D198E9A283DDA406B6D5076C18F39C0CF" fileName="RangeFor/range_for.cm" filePath="../../RangeFor/file/range_for.cm.html" id="member_function_X_Foo_8094608D198E9A283DDA406B6D5076C18F39C0CF" kind="Member Function" line="36" name="X" returnType="cc8ffb50-cac1-4f7e-acae-8b3fb9621c37" specifiers="public"/>
+    </functions>
+    <variables>
+     <variable docPath="../../RangeFor/doc/class_Foo_8B12B79C5168277EC4B3BAFF8D94B0D0C1897E44.html#variable_x_5F80E88821DD9A449D088317274F69BBF27E2838" extPath="RangeFor/doc/class_Foo_8B12B79C5168277EC4B3BAFF8D94B0D0C1897E44.html#variable_x_5F80E88821DD9A449D088317274F69BBF27E2838" id="variable_x_5F80E88821DD9A449D088317274F69BBF27E2838" name="x" specifiers="private" type="cc8ffb50-cac1-4f7e-acae-8b3fb9621c37"/>
+    </variables>
+   </class>
+   <class docPath="../../RangeFor/doc/class_MyCollection_66842F7D32583FAE5E2E605227D833F3A9E273CB.html" extPath="RangeFor/doc/class_MyCollection_66842F7D32583FAE5E2E605227D833F3A9E273CB.html" fileName="RangeFor/range_for.cm" filePath="../../RangeFor/file/range_for.cm.html" id="class_MyCollection_66842F7D32583FAE5E2E605227D833F3A9E273CB" line="48" name="MyCollection" specifiers="public">
+    <functions>
+     <function docPath="../../RangeFor/doc/class_MyCollection_66842F7D32583FAE5E2E605227D833F3A9E273CB.html#member_function_Add_MyCollection_A27DCEB4A77B603EBFBBED1D4C666486B37F563E" extPath="RangeFor/doc/class_MyCollection_66842F7D32583FAE5E2E605227D833F3A9E273CB.html#member_function_Add_MyCollection_A27DCEB4A77B603EBFBBED1D4C666486B37F563E" fileName="RangeFor/range_for.cm" filePath="../../RangeFor/file/range_for.cm.html" id="member_function_Add_MyCollection_A27DCEB4A77B603EBFBBED1D4C666486B37F563E" kind="Member Function" line="76" name="Add" returnType="4e959632-b5f2-406d-9402-ec16ab3f3585" specifiers="public">
+      <parameters>
+       <parameter id="parameter_foo_0734CA6951DFDD306D03A3FF2F9EDD3F972BB4BA" name="foo" type="b5444d99-8a43-4439-bb34-94c1a97b1b55"/>
+      </parameters>
+     </function>
+     <function docPath="../../RangeFor/doc/class_MyCollection_66842F7D32583FAE5E2E605227D833F3A9E273CB.html#member_function_Begin_MyCollection_38AACB7723CDFACF237B6FFC784B15C4B4AC995F" extPath="RangeFor/doc/class_MyCollection_66842F7D32583FAE5E2E605227D833F3A9E273CB.html#member_function_Begin_MyCollection_38AACB7723CDFACF237B6FFC784B15C4B4AC995F" fileName="RangeFor/range_for.cm" filePath="../../RangeFor/file/range_for.cm.html" id="member_function_Begin_MyCollection_38AACB7723CDFACF237B6FFC784B15C4B4AC995F" kind="Member Function" line="60" name="Begin" returnType="554f7ceb-0898-42ac-9501-bc6bf59cd2de" specifiers="public"/>
+     <function const="true" docPath="../../RangeFor/doc/class_MyCollection_66842F7D32583FAE5E2E605227D833F3A9E273CB.html#member_function_Begin_MyCollection_EBC17150F960765868C58C04D3D9FEDDB1A913A6" extPath="RangeFor/doc/class_MyCollection_66842F7D32583FAE5E2E605227D833F3A9E273CB.html#member_function_Begin_MyCollection_EBC17150F960765868C58C04D3D9FEDDB1A913A6" fileName="RangeFor/range_for.cm" filePath="../../RangeFor/file/range_for.cm.html" id="member_function_Begin_MyCollection_EBC17150F960765868C58C04D3D9FEDDB1A913A6" kind="Member Function" line="56" name="Begin" returnType="16d58492-4848-4853-8bc0-735748c4deca" specifiers="public"/>
+     <function const="true" docPath="../../RangeFor/doc/class_MyCollection_66842F7D32583FAE5E2E605227D833F3A9E273CB.html#member_function_CBegin_MyCollection_31B1FFD841CF57D27AA80B543C8E01AAACCF1A84" extPath="RangeFor/doc/class_MyCollection_66842F7D32583FAE5E2E605227D833F3A9E273CB.html#member_function_CBegin_MyCollection_31B1FFD841CF57D27AA80B543C8E01AAACCF1A84" fileName="RangeFor/range_for.cm" filePath="../../RangeFor/file/range_for.cm.html" id="member_function_CBegin_MyCollection_31B1FFD841CF57D27AA80B543C8E01AAACCF1A84" kind="Member Function" line="52" name="CBegin" returnType="16d58492-4848-4853-8bc0-735748c4deca" specifiers="public"/>
+     <function const="true" docPath="../../RangeFor/doc/class_MyCollection_66842F7D32583FAE5E2E605227D833F3A9E273CB.html#member_function_CEnd_MyCollection_79045E383BC18C0B36223B3CEABE70B247B8861C" extPath="RangeFor/doc/class_MyCollection_66842F7D32583FAE5E2E605227D833F3A9E273CB.html#member_function_CEnd_MyCollection_79045E383BC18C0B36223B3CEABE70B247B8861C" fileName="RangeFor/range_for.cm" filePath="../../RangeFor/file/range_for.cm.html" id="member_function_CEnd_MyCollection_79045E383BC18C0B36223B3CEABE70B247B8861C" kind="Member Function" line="64" name="CEnd" returnType="16d58492-4848-4853-8bc0-735748c4deca" specifiers="public"/>
+     <function docPath="../../RangeFor/doc/class_MyCollection_66842F7D32583FAE5E2E605227D833F3A9E273CB.html#member_function_End_MyCollection_453847757632B2224FF37E0D57B18BF1A65EB144" extPath="RangeFor/doc/class_MyCollection_66842F7D32583FAE5E2E605227D833F3A9E273CB.html#member_function_End_MyCollection_453847757632B2224FF37E0D57B18BF1A65EB144" fileName="RangeFor/range_for.cm" filePath="../../RangeFor/file/range_for.cm.html" id="member_function_End_MyCollection_453847757632B2224FF37E0D57B18BF1A65EB144" kind="Member Function" line="72" name="End" returnType="554f7ceb-0898-42ac-9501-bc6bf59cd2de" specifiers="public"/>
+     <function const="true" docPath="../../RangeFor/doc/class_MyCollection_66842F7D32583FAE5E2E605227D833F3A9E273CB.html#member_function_End_MyCollection_5A043915D4047E6EC69D697A846EDE33954F68E7" extPath="RangeFor/doc/class_MyCollection_66842F7D32583FAE5E2E605227D833F3A9E273CB.html#member_function_End_MyCollection_5A043915D4047E6EC69D697A846EDE33954F68E7" fileName="RangeFor/range_for.cm" filePath="../../RangeFor/file/range_for.cm.html" id="member_function_End_MyCollection_5A043915D4047E6EC69D697A846EDE33954F68E7" kind="Member Function" line="68" name="End" returnType="16d58492-4848-4853-8bc0-735748c4deca" specifiers="public"/>
+    </functions>
+    <typedefs>
+     <typedef docPath="../../RangeFor/doc/class_MyCollection_66842F7D32583FAE5E2E605227D833F3A9E273CB.html#typedef_ConstIterator_9AC20ACB6DAC5D6DFA108E1F1679C7EF9A5357BC" extPath="RangeFor/doc/class_MyCollection_66842F7D32583FAE5E2E605227D833F3A9E273CB.html#typedef_ConstIterator_9AC20ACB6DAC5D6DFA108E1F1679C7EF9A5357BC" id="typedef_ConstIterator_9AC20ACB6DAC5D6DFA108E1F1679C7EF9A5357BC" name="ConstIterator" specifiers="public" type="16d58492-4848-4853-8bc0-735748c4deca"/>
+     <typedef docPath="../../RangeFor/doc/class_MyCollection_66842F7D32583FAE5E2E605227D833F3A9E273CB.html#typedef_Iterator_6600A2F38580C611E1057762ADB8CA0A58776C2E" extPath="RangeFor/doc/class_MyCollection_66842F7D32583FAE5E2E605227D833F3A9E273CB.html#typedef_Iterator_6600A2F38580C611E1057762ADB8CA0A58776C2E" id="typedef_Iterator_6600A2F38580C611E1057762ADB8CA0A58776C2E" name="Iterator" specifiers="public" type="554f7ceb-0898-42ac-9501-bc6bf59cd2de"/>
+    </typedefs>
+    <variables>
+     <variable docPath="../../RangeFor/doc/class_MyCollection_66842F7D32583FAE5E2E605227D833F3A9E273CB.html#variable_fooList_6619E3DB42D52907100C38C494513B510884D651" extPath="RangeFor/doc/class_MyCollection_66842F7D32583FAE5E2E605227D833F3A9E273CB.html#variable_fooList_6619E3DB42D52907100C38C494513B510884D651" id="variable_fooList_6619E3DB42D52907100C38C494513B510884D651" name="fooList" specifiers="private" type="4cfa75fd-55b9-4cc2-bf4f-f6f80fd85b06"/>
+    </variables>
+   </class>
+  </classes>
+  <functions>
+   <function docPath="../../RangeFor/doc/../index.html#function_AddOneToAll_5B18398858FC0A110E2FD8227A80CC496C22B374" extPath="RangeFor/doc/../index.html#function_AddOneToAll_5B18398858FC0A110E2FD8227A80CC496C22B374" fileName="RangeFor/range_for.cm" filePath="../../RangeFor/file/range_for.cm.html" id="function_AddOneToAll_5B18398858FC0A110E2FD8227A80CC496C22B374" kind="Function" line="14" name="AddOneToAll" returnType="4e959632-b5f2-406d-9402-ec16ab3f3585" specifiers="public">
+    <parameters>
+     <parameter id="parameter_intList_64DCDDA7F0D1A4B8654C685BCB4D7192EDC57338" name="intList" type="de8743b8-38ed-42f9-b1f0-764e3b6581f8"/>
+    </parameters>
+   </function>
+   <function docPath="../../RangeFor/doc/../index.html#function_PrintIntList_8A5DD319D1C88A98DBA02C76C62AADC0DE02E8D2" extPath="RangeFor/doc/../index.html#function_PrintIntList_8A5DD319D1C88A98DBA02C76C62AADC0DE02E8D2" fileName="RangeFor/range_for.cm" filePath="../../RangeFor/file/range_for.cm.html" id="function_PrintIntList_8A5DD319D1C88A98DBA02C76C62AADC0DE02E8D2" kind="Function" line="5" name="PrintIntList" returnType="4e959632-b5f2-406d-9402-ec16ab3f3585" specifiers="public">
+    <parameters>
+     <parameter id="parameter_intList_1237F4398785ABE4250F34CBD77105569FEE0D73" name="intList" type="56ca1792-ec4d-4be6-a412-658d5450544e"/>
+    </parameters>
+   </function>
+   <function docPath="../../RangeFor/doc/../index.html#function_PrintMyCollection_E41FEBEE55DE16BDD035B5181FF6B936871D154D" extPath="RangeFor/doc/../index.html#function_PrintMyCollection_E41FEBEE55DE16BDD035B5181FF6B936871D154D" fileName="RangeFor/range_for.cm" filePath="../../RangeFor/file/range_for.cm.html" id="function_PrintMyCollection_E41FEBEE55DE16BDD035B5181FF6B936871D154D" kind="Function" line="83" name="PrintMyCollection" returnType="4e959632-b5f2-406d-9402-ec16ab3f3585" specifiers="public">
+    <parameters>
+     <parameter id="parameter_myCollection_087641DAA568D381010F28E3B9EB4F3A682EDA75" name="myCollection" type="ae88596d-829c-4b20-814a-4fbabcc9f097"/>
+    </parameters>
+   </function>
+   <function docPath="../../RangeFor/doc/../index.html#function_PrintStringList_21C4BCBF6B50F1DFE6C0DC0F7984B667759FEBB4" extPath="RangeFor/doc/../index.html#function_PrintStringList_21C4BCBF6B50F1DFE6C0DC0F7984B667759FEBB4" fileName="RangeFor/range_for.cm" filePath="../../RangeFor/file/range_for.cm.html" id="function_PrintStringList_21C4BCBF6B50F1DFE6C0DC0F7984B667759FEBB4" kind="Function" line="22" name="PrintStringList" returnType="4e959632-b5f2-406d-9402-ec16ab3f3585" specifiers="public">
+    <parameters>
+     <parameter id="parameter_stringList_30186F1671429FF4EE329FF94D188E163CDC5830" name="stringList" type="d809877b-899d-4f12-beeb-0b3689ac6740"/>
+    </parameters>
+   </function>
+   <function docPath="../../RangeFor/doc/../index.html#function_main_99F3726C50455B4187460FBE611E3885299323E1" extPath="RangeFor/doc/../index.html#function_main_99F3726C50455B4187460FBE611E3885299323E1" fileName="RangeFor/range_for.cm" filePath="../../RangeFor/file/range_for.cm.html" id="function_main_99F3726C50455B4187460FBE611E3885299323E1" kind="Function" line="92" name="main" returnType="4e959632-b5f2-406d-9402-ec16ab3f3585" specifiers=""/>
+   <function docPath="../../RangeFor/doc/../index.html#function_op_shl_91D96C5380837780C6C1EE47178F6592D0738190" extPath="RangeFor/doc/../index.html#function_op_shl_91D96C5380837780C6C1EE47178F6592D0738190" fileName="RangeFor/range_for.cm" filePath="../../RangeFor/file/range_for.cm.html" id="function_op_shl_91D96C5380837780C6C1EE47178F6592D0738190" kind="Function" line="43" name="operator&lt;&lt;" returnType="cd572791-a5b1-4baa-ae73-88b44d35a261" specifiers="public">
+    <parameters>
+     <parameter id="parameter_writer_DF4455E067516A46A06DB6768F70276935D07945" name="writer" type="cd572791-a5b1-4baa-ae73-88b44d35a261"/>
+     <parameter id="parameter_foo_0336B05DCBA236B1A9ACC51E16528FEF2AD31A0F" name="foo" type="b5444d99-8a43-4439-bb34-94c1a97b1b55"/>
+    </parameters>
+   </function>
+  </functions>
+ </namespace>
+ <types>
+  <derivedType id="b5444d99-8a43-4439-bb34-94c1a97b1b55" name="const Foo&amp;">
+   <derivation name="const"/>
+   <derivation baseType="class_Foo_8B12B79C5168277EC4B3BAFF8D94B0D0C1897E44"/>
+   <derivation name="&amp;"/>
+  </derivedType>
+  <derivedType id="e0e11d77-b350-42a5-866f-6b2fe4e39fb9" name="Foo&amp;">
+   <derivation baseType="class_Foo_8B12B79C5168277EC4B3BAFF8D94B0D0C1897E44"/>
+   <derivation name="&amp;"/>
+  </derivedType>
+  <derivedType id="83dc657d-1b89-46be-810d-186953d70fdf" name="Foo*">
+   <derivation baseType="class_Foo_8B12B79C5168277EC4B3BAFF8D94B0D0C1897E44"/>
+   <derivation name="*"/>
+  </derivedType>
+  <specialization id="554f7ceb-0898-42ac-9501-bc6bf59cd2de" name="RandomAccessIter" primaryType="class_RandomAccessIter_T_R_P_E5BB3CAC7F9DBE190F290EC17E5DCE3406706484">
+   <templateArgumentTypes>
+    <templateArgumentType ref="class_Foo_8B12B79C5168277EC4B3BAFF8D94B0D0C1897E44"/>
+    <templateArgumentType ref="e0e11d77-b350-42a5-866f-6b2fe4e39fb9"/>
+    <templateArgumentType ref="83dc657d-1b89-46be-810d-186953d70fdf"/>
+   </templateArgumentTypes>
+  </specialization>
+  <derivedType id="908c6101-0aa1-4ca9-b00e-07ad7ab5685f" name="const Foo*">
+   <derivation name="const"/>
+   <derivation baseType="class_Foo_8B12B79C5168277EC4B3BAFF8D94B0D0C1897E44"/>
+   <derivation name="*"/>
+  </derivedType>
+  <specialization id="16d58492-4848-4853-8bc0-735748c4deca" name="RandomAccessIter" primaryType="class_RandomAccessIter_T_R_P_E5BB3CAC7F9DBE190F290EC17E5DCE3406706484">
+   <templateArgumentTypes>
+    <templateArgumentType ref="class_Foo_8B12B79C5168277EC4B3BAFF8D94B0D0C1897E44"/>
+    <templateArgumentType ref="b5444d99-8a43-4439-bb34-94c1a97b1b55"/>
+    <templateArgumentType ref="908c6101-0aa1-4ca9-b00e-07ad7ab5685f"/>
+   </templateArgumentTypes>
+  </specialization>
+  <specialization id="4cfa75fd-55b9-4cc2-bf4f-f6f80fd85b06" name="List" primaryType="class_List_T_4E42CF5913BEB21F5260DEFEC239180C94460B11">
+   <templateArgumentTypes>
+    <templateArgumentType ref="class_Foo_8B12B79C5168277EC4B3BAFF8D94B0D0C1897E44"/>
+   </templateArgumentTypes>
+  </specialization>
+  <specialization id="40723520-dbf7-4145-ace0-a2c521bcd599" name="List" primaryType="class_List_T_4E42CF5913BEB21F5260DEFEC239180C94460B11">
+   <templateArgumentTypes>
+    <templateArgumentType ref="cc8ffb50-cac1-4f7e-acae-8b3fb9621c37"/>
+   </templateArgumentTypes>
+  </specialization>
+  <derivedType id="de8743b8-38ed-42f9-b1f0-764e3b6581f8" name="List&lt;int>&amp;">
+   <derivation baseType="40723520-dbf7-4145-ace0-a2c521bcd599"/>
+   <derivation name="&amp;"/>
+  </derivedType>
+  <derivedType id="56ca1792-ec4d-4be6-a412-658d5450544e" name="const List&lt;int>&amp;">
+   <derivation name="const"/>
+   <derivation baseType="40723520-dbf7-4145-ace0-a2c521bcd599"/>
+   <derivation name="&amp;"/>
+  </derivedType>
+  <derivedType id="ae88596d-829c-4b20-814a-4fbabcc9f097" name="const MyCollection&amp;">
+   <derivation name="const"/>
+   <derivation baseType="class_MyCollection_66842F7D32583FAE5E2E605227D833F3A9E273CB"/>
+   <derivation name="&amp;"/>
+  </derivedType>
+ </types>
+</symbolTable>

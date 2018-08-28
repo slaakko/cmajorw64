@@ -1,0 +1,23 @@
+<symbolTable id="Args" module="Args">
+ <files>
+  <file name="Args/Args.cm" path="file/Args.cm.html"/>
+ </files>
+ <namespace docPath="../../Args/doc/ns_.html" extPath="Args/doc/ns_.html" id="ns_" name="">
+  <functions>
+   <function docPath="../../Args/doc/../index.html#function_main_E5E0B7B0E865B79CC09FA4CBA1B819D77DE7CAFC" extPath="Args/doc/../index.html#function_main_E5E0B7B0E865B79CC09FA4CBA1B819D77DE7CAFC" fileName="Args/Args.cm" filePath="../../Args/file/Args.cm.html" id="function_main_E5E0B7B0E865B79CC09FA4CBA1B819D77DE7CAFC" kind="Function" line="3" name="main" returnType="cc8ffb50-cac1-4f7e-acae-8b3fb9621c37" specifiers="">
+    <parameters>
+     <parameter id="parameter_argc_AA11952084E5FEBCC47757F6863509258BF262FF" name="argc" type="cc8ffb50-cac1-4f7e-acae-8b3fb9621c37"/>
+     <parameter id="parameter_argv_A77642CC652C3A88362DD414B9B6D479ADFED46E" name="argv" type="12a8da02-5a16-4ee2-b41a-3dc9edd18f7c"/>
+    </parameters>
+   </function>
+  </functions>
+ </namespace>
+ <types>
+  <derivedType id="12a8da02-5a16-4ee2-b41a-3dc9edd18f7c" name="const char**">
+   <derivation name="const"/>
+   <derivation baseType="fa042a6a-5c08-46b3-b35b-b955ec35f88c"/>
+   <derivation name="*"/>
+   <derivation name="*"/>
+  </derivedType>
+ </types>
+</symbolTable>

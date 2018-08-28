@@ -1,0 +1,15 @@
+<symbolTable id="StrLen" module="StrLen">
+ <files>
+  <file name="StrLen/strlen.cm" path="file/strlen.cm.html"/>
+ </files>
+ <namespace docPath="../../StrLen/doc/ns_.html" extPath="StrLen/doc/ns_.html" id="ns_" name="">
+  <functions>
+   <function docPath="../../StrLen/doc/../index.html#function_StrLen_6ECA89B27F0E4A7FE42F2B2843CDDF977FA73400" extPath="StrLen/doc/../index.html#function_StrLen_6ECA89B27F0E4A7FE42F2B2843CDDF977FA73400" fileName="StrLen/strlen.cm" filePath="../../StrLen/file/strlen.cm.html" id="function_StrLen_6ECA89B27F0E4A7FE42F2B2843CDDF977FA73400" kind="Function" line="1" name="StrLen" returnType="8edf41dc-c01c-479c-8064-b92f90c315ea" specifiers="public">
+    <parameters>
+     <parameter id="parameter_s_AEC798537499BEE109386DB13B08A3B695D770F4" name="s" type="77c8d3c8-52ab-4732-9da7-d141c74d0ecb"/>
+    </parameters>
+   </function>
+  </functions>
+ </namespace>
+ <types/>
+</symbolTable>

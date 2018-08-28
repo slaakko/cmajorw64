@@ -1,3 +1,0 @@
-project BZip2;
-target=program;
-source <main.cm>;
