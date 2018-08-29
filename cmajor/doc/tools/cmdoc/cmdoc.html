@@ -1,0 +1,140 @@
+﻿<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>cmdoc</title>
+    <link rel="stylesheet" type="text/css" href="../../style/langref.css" />
+</head>
+<body>
+    <h1>CmDoc Documentation Generator Tutorial</h1>
+    <p>
+        <strong>cmdoc</strong> is a tool for generating HTML documentation with hyperlinked source code for a Cmajor solution.
+        The source code can be linked with the system library documentation.
+        In this tutorial we go through creating a simple example program and some documentation for it.
+        The documentation can be created with any text editor that can save the text with UTF-8 encoding.
+        In this tutorial we use Windows notepad.
+    </p>
+
+    <ul>
+        <li>
+            <p>
+                Create a new Cmajor console application project under the <strong>C:\cmajor\projects</strong> folder.
+                We create also a new solution for it, because <strong>cmdoc</strong> operates with solutions.
+            </p>
+            <img src="images/00_Project.png" />
+        </li>
+        <li>
+            <p>
+                Add a new source file to it:
+            </p>
+            <img src="images/01_SourceFile.png" />
+        </li>
+        <li>
+            <p>
+                Create some source code, compile and save the project:
+            </p>
+            <img src="images/02_CmDocExample.png" />
+        </li>
+        <li>
+            <p>
+                Create a new folder named <strong>CmDocExample</strong> for the project documentation under the <strong>C:\cmajor\doc\projects</strong> folder,
+                open a command prompt to that folder and create an XML file for the project with name <strong>CmDocExample.cmdoc.xml</strong>:
+            </p>
+            <img src="images/03_Notepad.png" />
+        </li>
+        <li>
+            <p>
+                Create a <strong>cmdoc</strong> element to the XML file, and under it a <strong>solution</strong> element with a <strong>filePath</strong> attribute that points to the <strong>CmDocExample.cms</strong> solution file.
+                Create also a <strong>target</strong> element with a <strong>dir</strong> attribute that points to the current directory.
+                The documentation will be generated to the target directory.
+                Finally create a <strong>libraries/library</strong> element with a <strong>dir</strong> attribute that points to the 
+                <strong>C:\cmajor\doc\system</strong> directory. This links the generated documentation with the system library documentation.
+            </p>
+            <p>
+                So the contents of the XML file is as follows:
+            </p>
+            <img src="images/04_Xml.png" />
+        </li>
+        <li>
+            <p>
+                Run command <strong>cmdoc --verbose CmDocExample.cmdoc.xml</strong> from the <strong>C:\cmajor\doc\projects\CmDocExample</strong> directory:
+            </p>
+            <img src="images/05_Run.png" />
+        </li>
+        <li>
+            <p>
+                The <strong>cmdoc</strong> program creates two directories: <strong>content</strong> and <strong>style</strong>,
+                an <strong>index.html</strong> file that is the root HTML documentation file and some XML files to the target directory:
+            </p>
+            <img src="images/06_Explorer.png" />
+        </li>
+        <li>
+            <p>
+                The generated <strong>index.html</strong> looks now like this:
+            </p>
+            <img src="images/07_Index.png" />
+        </li>
+        <li>
+            <p>
+                Now create an XML file named <strong>docs.xml</strong> to the <strong>C:\cmajor\doc\projects\CmDocExample</strong> directory 
+                that will contain documentation for the example program:
+            </p>
+            <img src="images/08_Docs.png" />
+        </li>
+        <li>
+            <p>
+                Open the <strong>index.html</strong> and click the link for the <strong>CmDocExample</strong> module, then the link for the <strong>main()</strong> function and 
+                then copy the part of the address coming after the '#' from the address line to the clipboard:
+            </p>
+            <img src="images/09_Main.png" />
+        </li>
+        <li>
+            <p>
+                Create a <strong>docs</strong> element to the <strong>docs.xml</strong> file and under it a </strong><strong>doc</strong> element.
+                Then create an <strong>id</strong> attribute for the <strong>doc</strong> element,
+                and paste the id for the <strong>main</strong> function from the clipboard as the value of it.
+                We have created three elements under the <strong>doc</strong> element:
+                the <strong>desc</strong> element contains the description of the <strong>main</strong> function, and any possible <strong>details</strong>
+                elements will contain detail paragraphs for it:
+            </p>
+            <img src="images/10_Docs.png" />
+        </li>
+        <li>
+            <p>
+                Now edit the <strong>CmDocExample.cmdoc.xml</strong> file by adding a <strong>doc</strong> element with a <strong>filePath</strong> attribute 
+                with the value <strong>docs.xml</strong>.
+            </p>
+            <img src="images/11_Changes.png" />
+        </li>
+        <li>
+            <p>
+                Run the <strong>cmdoc</strong> command again:
+            </p>
+            <img src="images/12_RunAgain.png" />
+        </li>
+        <li>
+            <p>
+                Now view the <strong>index.html</strong>. The written documentation appears:
+            </p>
+            <img src="images/13_Final.png" />
+        </li>
+        <li>
+            <p>
+                The source code of <strong>CmDocExample/main.cm</strong> looks like this:
+            </p>
+            <img src="images/14_SourceCode.png" />
+        </li>
+        <li>
+            <p>
+                If you click the <strong>Console</strong> link from the source code, the documentation for the Console class of the system library appears:
+            </p>
+            <img src="images/15_Console.png" />
+        </li>
+        <li>
+            <p>
+                That's the end of this tutorial.
+            </p>
+        </li>
+    </ul>
+</body>
+</html>
