@@ -272,13 +272,13 @@ function drawInheritanceDiagram() {
         { name: "System.Text.Parsing.CodeDom.Expression", id: "diagram_node_1", level: 1, subject: false, hasDerivedNodes: true, link: "../../System.Text.Parsing.CodeDom/doc/class_Expression_63F45770E98CB553F848612A60783A045B1137F7.html" },
         { name: "System.Text.Parsing.CodeDom.PrefixExpression", id: "diagram_node_2", level: 2, subject: true, hasDerivedNodes: true, link: "../../System.Text.Parsing.CodeDom/doc/class_PrefixExpression_54423C4D20F88D06F79420BDBE11404D5B729948.html" },
         { name: "System.Text.Parsing.CodeDom.AddressOf", id: "diagram_node_3", level: 3, subject: false, hasDerivedNodes: false, link: "../../System.Text.Parsing.CodeDom/doc/class_AddressOf_F9F594A9680E5BE9D427D963284931AEB8E52492.html" },
-        { name: "System.Text.Parsing.CodeDom.Complement", id: "diagram_node_5", level: 3, subject: false, hasDerivedNodes: false, link: "../../System.Text.Parsing.CodeDom/doc/class_Complement_E9C39B44C265CC4D19B0EFE97BE0DDAAF5B39DB5.html" },
-        { name: "System.Text.Parsing.CodeDom.Deref", id: "diagram_node_7", level: 3, subject: false, hasDerivedNodes: false, link: "../../System.Text.Parsing.CodeDom/doc/class_Deref_6825EB2BE00B35C10BF9F18A018CADC1F1F12594.html" },
-        { name: "System.Text.Parsing.CodeDom.Not", id: "diagram_node_6", level: 3, subject: false, hasDerivedNodes: false, link: "../../System.Text.Parsing.CodeDom/doc/class_Not_5E324445E5A5F8057BEBD48898C26110CD402187.html" },
+        { name: "System.Text.Parsing.CodeDom.Complement", id: "diagram_node_4", level: 3, subject: false, hasDerivedNodes: false, link: "../../System.Text.Parsing.CodeDom/doc/class_Complement_E9C39B44C265CC4D19B0EFE97BE0DDAAF5B39DB5.html" },
+        { name: "System.Text.Parsing.CodeDom.Deref", id: "diagram_node_6", level: 3, subject: false, hasDerivedNodes: false, link: "../../System.Text.Parsing.CodeDom/doc/class_Deref_6825EB2BE00B35C10BF9F18A018CADC1F1F12594.html" },
+        { name: "System.Text.Parsing.CodeDom.Not", id: "diagram_node_7", level: 3, subject: false, hasDerivedNodes: false, link: "../../System.Text.Parsing.CodeDom/doc/class_Not_5E324445E5A5F8057BEBD48898C26110CD402187.html" },
         { name: "System.Text.Parsing.CodeDom.PrefixDecrement", id: "diagram_node_8", level: 3, subject: false, hasDerivedNodes: false, link: "../../System.Text.Parsing.CodeDom/doc/class_PrefixDecrement_999D7C38861B7D6CED24609E18ACD9197FF478F0.html" },
-        { name: "System.Text.Parsing.CodeDom.PrefixIncrement", id: "diagram_node_4", level: 3, subject: false, hasDerivedNodes: false, link: "../../System.Text.Parsing.CodeDom/doc/class_PrefixIncrement_8035645A064F2FF3F7808392B992A24FA56E9E9D.html" },
-        { name: "System.Text.Parsing.CodeDom.UnaryMinus", id: "diagram_node_10", level: 3, subject: false, hasDerivedNodes: false, link: "../../System.Text.Parsing.CodeDom/doc/class_UnaryMinus_04009179AAFCB4DEE000972E675D4198E1AF838F.html" },
-        { name: "System.Text.Parsing.CodeDom.UnaryPlus", id: "diagram_node_9", level: 3, subject: false, hasDerivedNodes: false, link: "../../System.Text.Parsing.CodeDom/doc/class_UnaryPlus_65EA8B4AEC38C5A830F0C46A73800A840EFCF9C2.html" }];
+        { name: "System.Text.Parsing.CodeDom.PrefixIncrement", id: "diagram_node_5", level: 3, subject: false, hasDerivedNodes: false, link: "../../System.Text.Parsing.CodeDom/doc/class_PrefixIncrement_8035645A064F2FF3F7808392B992A24FA56E9E9D.html" },
+        { name: "System.Text.Parsing.CodeDom.UnaryMinus", id: "diagram_node_9", level: 3, subject: false, hasDerivedNodes: false, link: "../../System.Text.Parsing.CodeDom/doc/class_UnaryMinus_04009179AAFCB4DEE000972E675D4198E1AF838F.html" },
+        { name: "System.Text.Parsing.CodeDom.UnaryPlus", id: "diagram_node_10", level: 3, subject: false, hasDerivedNodes: false, link: "../../System.Text.Parsing.CodeDom/doc/class_UnaryPlus_65EA8B4AEC38C5A830F0C46A73800A840EFCF9C2.html" }];
     drawDiagram(diagramNodes);
 }
 

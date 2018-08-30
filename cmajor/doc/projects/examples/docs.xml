@@ -27,7 +27,7 @@
   </doc>
   <doc id="BigNumCalc">
     <desc>
-      Multiprecision desk calculator whose parser is generated using <a href="../../../cmparsergen/index.html">cmparsergen</a>tool.
+      Multiprecision desk calculator whose parser is generated using <strong>cmparsergen</strong> tool.
     </desc>
   </doc>
   <doc id="Args">

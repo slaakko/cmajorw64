@@ -1,47 +1,50 @@
-body
-{
-    max-width: 1400px;
+body {
+    max-width: 1000px;
 }
 
-body.index
-{
-    background-image: url("../image/mount_everest.jpg");
-    background-repeat: no-repeat;
-    margin-left: 16px;
-}
-
-h1.index, h2.index, h3.index
-{
-    color: lightgray;
-    margin-left: 16px;
-}
-
-a.index
-{
-    color: lightgray;
-}
-
-p
-{
-    margin-left: 16px;
-}
-
-h1, h2, h3
+h1, h2, h3, h4, h5, h6
 {
     color: #005ab4;
     font-family: sans-serif;
-    margin-left: 16px;
 }
 
-h4.code
+.toc
 {
-    margin-left: 16px;
+    font-family: sans-serif;
+}
+
+span.kw
+{
+    font-weight: bold;
+}
+
+span.rule
+{
+    font-family: serif;
+}
+
+span.mono
+{
     font-family: monospace;
 }
 
-span.code
+span.var, span.param
 {
-    font-family: monospace;
+    font-family: serif;
+}
+
+table
+{
+    font-family: sans-serif;
+    border-collapse: collapse;
+}
+
+table, th, td
+{
+    text-align: left;
+    border: 1px solid #dddddd;
+    margin: 20px;
+    padding: 8px;
 }
 
 table.grammar
@@ -52,156 +55,40 @@ table.grammar
     max-width: 800px;
 }
 
-table.type
-{
-    background-color: ghostwhite;
-    margin: 20px;
-    padding: 20px;
-    max-width: 800px;
-}
-
-table.opt
-{
-    boder-collapse: collapse;
-}
-
-table.opt, th.opt, td.opt
-{
-    text-align: left;
-    border: 1px solid #dddddd;
-    padding: 8px;
-}
-
-th.type
-{
-    border-bottom: 1px solid black
-}
-
-td.type
-{
-    border-right: 1px solid black
-}
-
-td.bottom
-{
-    border-bottom: 1px solid black
-}
-
-td.bottommiddle
-{
-    border-right: 1px solid black;
-    border-bottom: 1px solid black
-}
-
-.commands
-{
-    background-color: aliceblue;
-    margin: 20px;
-    padding: 20px;
-    max-width: 800px;
-    font-family: monospace;
-    font-weight: bold;
-}
-
-.options
-{
-    background-color: FloralWhite;
-    margin: 20px;
-    padding: 20px;
-    max-width: 800px;
-    font-family: monospace;
-    font-weight: bold;
-}
-
-td.rulename , td.prodsep, td.rulecontent
+td.rule, td.sep, td.rcontent
 {
     vertical-align: top;
 }
 
-td.rulename
+td.rule
 {
     text-align: right
 }
 
-.rulename
+table.common-type, th.common-type, td.common-type
+{
+    border: 1px solid #dddddd;
+    border-collapse: collapse;
+    padding: 8px;
+}
+
+.rule
 {
     font-style: italic;
 }
 
-.kw
+.var
 {
-    font-weight: bold;
+    font-style: italic;
 }
 
-.terminal
-{
-    font-family: monospace;
-}
-
-.grammarop
+.op
 {
     padding-left: 4pt;
     padding-right: 4pt;
 }
 
-.secnum
+p.indent
 {
-    padding-right: 8px;
-}
-
-.toc1
-{
-    position: relative;
-    left: 1em;
-    padding-bottom: 8px;
-    font-family: sans-serif;
-}
-
-.toc2
-{
-    position: relative;
-    left: 1em;
-    font-family: sans-serif;
-}
-
-.toc3
-{
-    position: relative;
-    left: 2em;
-    font-family: sans-serif;
-}
-
-.notation
-{
-    max-width: 800px;
-}
-
-.note
-{
-    margin: 20px;
-    font-style: italic;
-}
-
-.program
-{
-    border: none;
-    background-color: ghostwhite;
-    margin: 20px;
-    padding: 20px;
-    max-width: 800px;
-}
-
-.project, .solution
-{
-    border: none;
-    background-color: #f8f8f8;
-    margin: 20px;
-    padding: 20px;
-    max-width: 800px;
-}
-
-.projectFileKeyword
-{
-    color: black;
-    font-weight: bold;
+    text-indent: 32px;
 }

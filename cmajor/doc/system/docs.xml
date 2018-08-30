@@ -1,8 +1,8 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <docs>
   <doc id="solution">
     <desc>
-      The Cmajor System Library consists of sixteen modules. 
+      The Cmajor System Library consists of sixteen modules.
       The <a href="content/System.Base/index.html">System.Base</a> module constitutes the major part of the System Library.
     </desc>
   </doc>
@@ -12,14 +12,14 @@
       It contains no source code entities, but references the <ref>System</ref> module.
     </desc>
   </doc>
-  
+
   <doc id="System">
     <desc>
       The System module acts as an umbrella module that references all other System Library modules. It contains no source code entities.
       The System module is implicitly referenced by all user programs and libraries, so an explicit reference for any System Library module is not needed.
     </desc>
   </doc>
-  
+
   <doc id="System.XPath">
     <desc>
       The System.XPath module contains an implementation of the <a href="https://www.w3.org/TR/1999/REC-xpath-19991116/">XML Path Language</a> version 1.0 query engine.
@@ -35,7 +35,7 @@
       </span><br/>
       and the following XPath query string:<br/><br/><span class="string">"/philosophers/philosopher"</span>.<br/><br/>
       <a href="../../../code/xml/cmdoc/content/XPath1/file/xpath1.cm.html">This</a> example program evaluates the previous query and prints
-      the names of all three philosophers: Plato, Aristotle and Socrates. The query selects all child elements having the name 'philosopher' 
+      the names of all three philosophers: Plato, Aristotle and Socrates. The query selects all child elements having the name 'philosopher'
       under the document element having the name 'philosophers' from the given XML document.
     </details>
     <details>
@@ -46,16 +46,16 @@
   </doc>
   <doc id="function_Evaluate_BAADC9F9757ECDA2C151920B9C3805CAD33229D9">
     <desc>
-      Compiles the given XPath 
+      Compiles the given XPath
       <a href="grammar_XPathExpressionGrammar_D814D198200E8CD6C8ED51082723082DF24B5607.html#rule_Expr_35256B60DE19B4D934C20948CE6D8BCE49F1731C">query expression</a>,
       evaluates it with respect to the given <ref>class_DomDocument_975632F3AA8CF3FEC1D51FB0E91F580D6EBA16C8</ref> and returns the resulting
       <ref>class_XPathObject_91D53F03F45FCACE5D10959D030939A3CBB38F3E</ref>.
     </desc>
     <details>
-      The concrete type of the result depends on the supplied XPath expression. If the expression is a 
+      The concrete type of the result depends on the supplied XPath expression. If the expression is a
       <a href="grammar_XPathExpressionGrammar_D814D198200E8CD6C8ED51082723082DF24B5607.html#rule_PathExpr_119171CB9F132FA051BB69B3AF4916B1C4410851">path expression</a>
       the result will be a <ref>class_XPathNodeSet_70D9F2F055A2EAFCF3988BC033AE454E204F643A</ref>.
-      If the expression is a Boolean expression, for example an 
+      If the expression is a Boolean expression, for example an
       <a href="grammar_XPathExpressionGrammar_D814D198200E8CD6C8ED51082723082DF24B5607.html#rule_OrExpr_7DB3F0405E0E1FE54A04A420B05B0AAD7F692390">or expression</a>,
       the result will be a <ref>class_XPathBoolean_62EBEB870905B1B981080A7A18EBBBD98ADD5C4A</ref>, and so on.
       The result of a
@@ -67,7 +67,7 @@
       If the query string is not syntactically valid
       <a href="grammar_XPathExpressionGrammar_D814D198200E8CD6C8ED51082723082DF24B5607.html#rule_Expr_35256B60DE19B4D934C20948CE6D8BCE49F1731C">XPath expression</a>,
       the function throws an <ref>class_ExpectationFailure_EBDBB0FC1DDED5BE7E15008622BB34AFCA7E9A8C</ref> exception.
-      If an error such as type violation is detected when evaluating the query expression, the function 
+      If an error such as type violation is detected when evaluating the query expression, the function
       throws an <ref>class_XPathException_5F5973D81A22230252D5069223C1877CBFBA755A</ref> exception.
     </details>
   </doc>
@@ -85,9 +85,9 @@
       If the expression is a Boolean expression, for example an
       <a href="grammar_XPathExpressionGrammar_D814D198200E8CD6C8ED51082723082DF24B5607.html#rule_OrExpr_7DB3F0405E0E1FE54A04A420B05B0AAD7F692390">or expression</a>,
       the result will be a <ref>class_XPathBoolean_62EBEB870905B1B981080A7A18EBBBD98ADD5C4A</ref>.
-      The result of a 
+      The result of a
       <a href="grammar_XPathExpressionGrammar_D814D198200E8CD6C8ED51082723082DF24B5607.html#rule_FunctionCall_7F14EFF296F2A74BFB4E5605F6E7A0AFE65608B8">function call</a>
-      has a type depending on the function called. The functions implemented are documented under the 
+      has a type depending on the function called. The functions implemented are documented under the
       <ref>class_XPathFunctionLibrary_5044787DDFDAF4AF5701F92F8775A709B4496547</ref>.
     </details>
     <details>
@@ -163,7 +163,7 @@
   </doc>
   <doc id="class_XPathException_5F5973D81A22230252D5069223C1877CBFBA755A">
     <desc>
-      Thrown when there is an error executing an 
+      Thrown when there is an error executing an
       <a href="grammar_XPathExpressionGrammar_D814D198200E8CD6C8ED51082723082DF24B5607.html#rule_Expr_35256B60DE19B4D934C20948CE6D8BCE49F1731C">XPath expression</a>.
     </desc>
   </doc>
@@ -230,7 +230,7 @@
       This <a href="../../../examples/content/BigNumCalc/index.html">BigNumCalc</a> example program contains a multiprecision desk calculator.
     </details>
   </doc>
-  
+
   <doc id="System.Net.Http">
     <desc>
       The System.Net.Http module contains a simple HTTP/1.1 client and URI parser.
@@ -242,7 +242,7 @@
       Support for HTTPS protocol is implemented by means of <a href="http://www.gnutls.org/">GnuTLS</a> library.
     </details>
     <details title="Examples">
-      This <a href="../../../code/http/cmdoc/content/httpClient1/file/httpClient1.cm.html">httpClient1</a> example program 
+      This <a href="../../../code/http/cmdoc/content/httpClient1/file/httpClient1.cm.html">httpClient1</a> example program
       retrieves an XML document using HTTP protocol and prints it to console.
     </details>
     <details>
@@ -265,28 +265,28 @@
       Represents a <a href="https://en.wikipedia.org/wiki/Uniform_Resource_Identifier">URI</a>.
     </desc>
   </doc>
-  
+
   <doc id="System.Net.Sockets">
     <desc>
-      The System.Net.Sockets module provides client and server-side synchronous network socket connections. 
+      The System.Net.Sockets module provides client and server-side synchronous network socket connections.
     </desc>
     <details>
-      A client-side socket has support for HTTPS connections implemented by means of the <a href="http://www.gnutls.org/">GnuTLS</a> library. 
+      A client-side socket has support for HTTPS connections implemented by means of the <a href="http://www.gnutls.org/">GnuTLS</a> library.
       HTTPS support should be considered experimental.
     </details>
     <details>
-      There are limitations with the server-side sockets: they do not support HTTPS connections and they do not scale to thousands of connections 
+      There are limitations with the server-side sockets: they do not support HTTPS connections and they do not scale to thousands of connections
       or more because lack of asynchrony. The programming model is thread per client.
     </details>
     <details title="Examples">
-      This <a href="../../../code/socket/cmdoc/content/socketClient1/file/socketClient1.cm.html">socketClient1</a> example 
-      creates a <ref>class_TcpSocket_B38B3FFF6145E508D0B49BC2B9D97F255711ED1C</ref>, sends a HTTP/1.1 request using the socket, 
+      This <a href="../../../code/socket/cmdoc/content/socketClient1/file/socketClient1.cm.html">socketClient1</a> example
+      creates a <ref>class_TcpSocket_B38B3FFF6145E508D0B49BC2B9D97F255711ED1C</ref>, sends a HTTP/1.1 request using the socket,
       reads the reply into a string using an <ref>class_IOBuffer_7AC61842AD3FCA40A4176E0D72E981B672D7E222</ref> and prints the reply to console.
     </details>
     <details>
       This <a href="../../../code/socket/cmdoc/content/socketClient2/file/socketClient2.cm.html">socketClient2</a> example
-      creates a <ref>class_TcpClient_BEAB95A1A35E77E97DFDF4C9915EEDD66CFDEF21</ref>, 
-      gets a <ref>class_NetworkByteStream_5A7A9D75DF6B7A874E386D849EB0B8F0D28C226D</ref> from it, 
+      creates a <ref>class_TcpClient_BEAB95A1A35E77E97DFDF4C9915EEDD66CFDEF21</ref>,
+      gets a <ref>class_NetworkByteStream_5A7A9D75DF6B7A874E386D849EB0B8F0D28C226D</ref> from it,
       sends a HTTP/1.1 request to the stream, reads the reply from the stream into a string and prints the reply to console.
   </details>
   </doc>
@@ -351,7 +351,7 @@
       by calling the <ref>function_ParseJson_DBF1730C39BEE47518DDF489C3C1CA7CC4D29DFF</ref> library function with a JSON string.
       Then empty unique pointer of a user-defined class is constructed. Then the <ref>function_FromJson_97B0CE17747A8F5A6697880760B61937E269F734</ref>
       library function is called with the <ref>class_JsonValue_B86942C2856CC5758E1FB19BBBE97E4002D4008A</ref> and the constructed user-defined class arguments.
-      This assigns a value to the unique pointer of the user-defined class. Finally the actual type of the object can be queried by <strong>is</strong> or 
+      This assigns a value to the unique pointer of the user-defined class. Finally the actual type of the object can be queried by <strong>is</strong> or
       <strong>as</strong> operators, casted to the right user-defined type and processed.
     </details>
     <details title="Example">
@@ -368,7 +368,7 @@
       </pre>
     </details>
     <details>
-      The <em>SerializeListOfVehicles()</em> function of the example program constructs a <ref>class_List_T_4E42CF5913BEB21F5260DEFEC239180C94460B11</ref> of 
+      The <em>SerializeListOfVehicles()</em> function of the example program constructs a <ref>class_List_T_4E42CF5913BEB21F5260DEFEC239180C94460B11</ref> of
       <strong>Vehicle</strong>s, serializer them to a JSON string, parses them back from the JSON string and writes their data to console.
       The program called with no arguments prints:
       <pre>
@@ -383,7 +383,7 @@
   </doc>
   <doc id="function_ToJson_14356EE699F7663903DB09AB9EFE1B206802DDE8">
     <desc>
-      Converts a <ref>concept_JsonExportable_380A04F1C16289D6FC8DB54C68F467C83E565340</ref> class 
+      Converts a <ref>concept_JsonExportable_380A04F1C16289D6FC8DB54C68F467C83E565340</ref> class
       to a unique pointer of <ref>class_JsonValue_B86942C2856CC5758E1FB19BBBE97E4002D4008A</ref> and returns it.
     </desc>
     <details>
@@ -409,8 +409,8 @@
   </doc>
   <doc id="concept_JsonValueType_6519CA3F247A823EA53E9BBD4C42E505C0A78F5D">
     <desc>
-      Primitive types <strong>int</strong>, <strong>long</strong>, etc. are <strong>JsonValueType</strong>s, as are 
-      <ref>typedef_string_B6DB6B2DEFC437FBF697A2E84F7B7771FC1DDEE3</ref>, <ref>typedef_wstring_EDB6336488DF46A7779AFB4209BAB1DAF59B5DAE</ref> and 
+      Primitive types <strong>int</strong>, <strong>long</strong>, etc. are <strong>JsonValueType</strong>s, as are
+      <ref>typedef_string_B6DB6B2DEFC437FBF697A2E84F7B7771FC1DDEE3</ref>, <ref>typedef_wstring_EDB6336488DF46A7779AFB4209BAB1DAF59B5DAE</ref> and
       <ref>typedef_ustring_1750E1C62AAF5897C1F1DA3C5BC4999982AE9B36</ref>.
     </desc>
   </doc>
@@ -450,8 +450,8 @@
       It is implemented by means of <a href="http://www.zlib.net/">zlib</a> and <a href="http://www.sourceware.org/bzip2/">bzip2</a> libraries.
     </desc>
     <details title="Examples">
-      This <a href="../../../code/compression/cmdoc/content/deflate/file/main.cm.html">deflate</a> program compresses a file using 
-      <ref>class_DeflateStream_050C0EA929943E375A089D8EAE56F631A87D3306</ref> or extracts a file compressed using 
+      This <a href="../../../code/compression/cmdoc/content/deflate/file/main.cm.html">deflate</a> program compresses a file using
+      <ref>class_DeflateStream_050C0EA929943E375A089D8EAE56F631A87D3306</ref> or extracts a file compressed using
       <ref>class_DeflateStream_050C0EA929943E375A089D8EAE56F631A87D3306</ref>.
     </details>
     <details>
@@ -460,18 +460,18 @@
       <ref>class_BZip2Stream_82BE6AC7D0A89DAA12AD1CF0B26FFEAD7D90CF11</ref>.
     </details>
   </doc>
-  
+
   <doc id="System.Dom">
     <desc>
-      The System.Dom module contains basic implementation of the 
-      <a href="https://www.w3.org/TR/2000/REC-DOM-Level-2-Core-20001113/">Document Object Model Core</a> specification. 
+      The System.Dom module contains basic implementation of the
+      <a href="https://www.w3.org/TR/2000/REC-DOM-Level-2-Core-20001113/">Document Object Model Core</a> specification.
     </desc>
     <details>
-      It does not follow strictly W3C DOM naming conventions and many API's take and return 
+      It does not follow strictly W3C DOM naming conventions and many API's take and return
       <ref>class_UniquePtr_T_793F841C13E9DD3A6869243C74F1D948C0E04009</ref>s instead of raw pointers or interfaces.
     </details>
     <details title="Example">
-      <a href="../../../code/xml/cmdoc/content/Dom1/file/dom1.cm.html">This</a> example program creates an in-memory XML document, 
+      <a href="../../../code/xml/cmdoc/content/Dom1/file/dom1.cm.html">This</a> example program creates an in-memory XML document,
       writes it to a UTF-8 encoded text file, reads it back from the text file and writes it to console.
     </details>
   </doc>
@@ -529,23 +529,23 @@
       Returns the value of an attribute if it exists and empty string otherwise.
     </desc>
   </doc>
-  
+
   <doc id="System.Xml">
     <desc>
       The System.Xml module contains an implementation of a non-validating <a href="http://www.w3.org/TR/xml/">XML</a> parser and a
       <a href="http://en.wikipedia.org/wiki/Simple_API_for_XML">SAX</a>-like API to it.
     </desc>
     <details>
-      The parser accepts full XML 1.0 syntax including a DTD (modulo bugs) but does not process contained DTD in any way. 
+      The parser accepts full XML 1.0 syntax including a DTD (modulo bugs) but does not process contained DTD in any way.
       It recognizes only standard XML entities <em>&amp;amp;</em>, <em>&amp;quot;</em>, <em>&amp;apos;</em>, <em>&amp;lt;</em> and <em>&amp;gt;</em>.
-      Other entities are skipped and the <ref>member_function_SkippedEntity_XmlContentHandler_1916387999FBA54A53DA8F7937AFF73F68D85ACF</ref> 
+      Other entities are skipped and the <ref>member_function_SkippedEntity_XmlContentHandler_1916387999FBA54A53DA8F7937AFF73F68D85ACF</ref>
       member function of the content handler is called for each of them.
     </details>
     <details>
       The <ref>function_ParseXmlFile_7ED565F7B87DFEA8BE61A14E6C0BDB5D473022BC</ref> function parses the given XML file with a content handler.
-      As XML file is parsed, the overridden methods of user supplied class derived from the <ref>class_XmlContentHandler_7429223FCBE3A541F14FD9475F2099B20E248715</ref> 
-      class are called. If the XML document need to be manipulated entirely in memory, it can be parsed with the 
-      <ref>function_ParseXmlFileToDomDocument_CDBEF03097E654DC3609B662FEAF72116D01B7CA</ref> function instead. 
+      As XML file is parsed, the overridden methods of user supplied class derived from the <ref>class_XmlContentHandler_7429223FCBE3A541F14FD9475F2099B20E248715</ref>
+      class are called. If the XML document need to be manipulated entirely in memory, it can be parsed with the
+      <ref>function_ParseXmlFileToDomDocument_CDBEF03097E654DC3609B662FEAF72116D01B7CA</ref> function instead.
     </details>
     <details title="Example">
       This <a href="../../../code/xml/cmdoc/content/XmlStats/file/xmlstats.cm.html">xmlstats</a> example program prints statistics of an XML file.
@@ -577,7 +577,7 @@
   </doc>
   <doc id="function_ParseXmlContent_61335068D4F75C1370C9C52E1DDE3F3C6797D054">
     <desc>
-      Parses an UTF-32 encoded XML string with a content handler derived from the <ref>class_XmlContentHandler_7429223FCBE3A541F14FD9475F2099B20E248715</ref> class.
+      Parses a UTF-32 encoded XML string with a content handler derived from the <ref>class_XmlContentHandler_7429223FCBE3A541F14FD9475F2099B20E248715</ref> class.
       The base class content handler does nothing by default.
     </desc>
     <details>
@@ -605,14 +605,14 @@
       User programs and libraries can benefit only little of this module directly.
     </desc>
   </doc>
-  
+
   <doc id="System.Text.Parsing.CodeDom">
     <desc>
       The System.Text.Parsing.CodeDom module provides abstract syntax tree classes to <ref>System.Text.Parsing</ref> module.
       User programs and libraries can benefit only little of this module directly.
     </desc>
   </doc>
-  
+
   <doc id="System.Base">
     <desc>
       The System.Base module contains basic facilities, containers, algorithms, and I/O.
@@ -620,17 +620,17 @@
   </doc>
   <doc id="typedef_string_B6DB6B2DEFC437FBF697A2E84F7B7771FC1DDEE3">
     <desc>
-      Represents an UTF-8 or ASCII encoded string.
+      Represents a UTF-8 or ASCII encoded string.
     </desc>
   </doc>
   <doc id="typedef_wstring_EDB6336488DF46A7779AFB4209BAB1DAF59B5DAE">
     <desc>
-      Represents an UTF-16 encoded string.
+      Represents a UTF-16 encoded string.
     </desc>
   </doc>
   <doc id="typedef_ustring_1750E1C62AAF5897C1F1DA3C5BC4999982AE9B36">
     <desc>
-      Represents an UTF-32 encoded string.
+      Represents a UTF-32 encoded string.
     </desc>
   </doc>
   <doc id="member_function_CreateText_File_2EF9CAB30DD21BABC54A82CCB9FF835510E74DC2">
@@ -661,7 +661,7 @@
   </doc>
   <doc id="member_function_Size_File_D0C8D1E0A218CED6BEA5F44A50BDDFE2468A29CA">
     <desc>
-      Returns the size of the given file. 
+      Returns the size of the given file.
     </desc>
     <details>
       If the file does not exist, or in case of other error a <ref>class_FileSystemException_BB9552A6F8CD7166104BC90F55939797AA006B1A</ref> exception is thrown.
@@ -684,7 +684,7 @@
   </doc>
   <doc id="member_function_ReadAllLines_File_DC86B4CEA779764618F3663F4CC2710BDFCAA04E">
     <desc>
-      Reads all lines of the given UTF-8 encoded text file into a <ref>class_List_T_4E42CF5913BEB21F5260DEFEC239180C94460B11</ref> of 
+      Reads all lines of the given UTF-8 encoded text file into a <ref>class_List_T_4E42CF5913BEB21F5260DEFEC239180C94460B11</ref> of
       <ref>typedef_string_B6DB6B2DEFC437FBF697A2E84F7B7771FC1DDEE3</ref>s and returns the list.
     </desc>
     <details>
@@ -737,7 +737,7 @@
   </doc>
   <doc id="class_ConversionException_968EDA1D00534F82FF78F973855F91349977511B">
     <desc>
-      An exception thrown when 
+      An exception thrown when
         <ul>
           <li>a primitive type cannot be parsed from a string</li>
           <li>a date cannot be parsed from a string</li>
@@ -846,7 +846,7 @@
   <doc id="function_TrimAll_F86F15A4C02B4AC30D37E4FDBE78C555E22A7CB3">
     <desc>
       Returns a copy of string where leading and trailing white space is removed and multiple white space inside the string is replaced with a single space.
-    </desc>    
+    </desc>
   </doc>
   <dod id="function_TrimAll_E5E00E8C8C13010DA073A47CC153B80CF3F6EF1E">
     <desc>
@@ -884,7 +884,7 @@
   </doc>
   <doc id="function_InitRand_FC91A0646CA9E897EC03AF41DE040C0B0315FBE4">
     <desc>
-      Sets the seed value of of the pseudo-random number generator for the calling thread. 
+      Sets the seed value of of the pseudo-random number generator for the calling thread.
       Does not have to be called unless a predetermined sequence of pseudo-random numbers are needed, because the seed is automatically initialized to a random value.
     </desc>
   </doc>
@@ -940,8 +940,8 @@
     <details>
       Elements can be added by copying (<ref>member_function_Add_List_T_0CEB0F989B58359D06357C988DF595C83DA28430</ref>) or by
       moving (<ref>member_function_Add_List_T_1242E85AAD4D8369255E6BB57F2A841ED245BACD</ref>). Adding takes amortized constant time.
-      When moving you may want to use the <ref>function_Rvalue_FC16F1187C8C3CF8D9182A63AC59041EF4474FA2</ref> to convert an argument to an rvalue. 
-      Elements of a list can be accessed by index using the <ref>member_function_op_index_List_T_AA2A1F9532E2BEB527BBEC048E2DF4EB16940F71</ref> or 
+      When moving you may want to use the <ref>function_Rvalue_FC16F1187C8C3CF8D9182A63AC59041EF4474FA2</ref> to convert an argument to an rvalue.
+      Elements of a list can be accessed by index using the <ref>member_function_op_index_List_T_AA2A1F9532E2BEB527BBEC048E2DF4EB16940F71</ref> or
       <ref>member_function_op_index_List_T_539A1A941184F71A7AE8BD827A01B666F3D48830</ref> member functions.
       Element access is <em>O(1)</em> operation.
     </details>
@@ -1039,7 +1039,7 @@
       <ref>class_Hasher_T_9E06FCD9B56B8B3B7E7F8286BE8179D3B1CB8325</ref>.
     </details>
     <details>
-      Adding an element to the hash set depends on the hash function, but can be thought as <em>O(1)</em> operation. 
+      Adding an element to the hash set depends on the hash function, but can be thought as <em>O(1)</em> operation.
       Searching for an element in a hash set depends on the hash function, but can be thought as <em>O(1)</em> operation.
     </details>
     <details>
@@ -1079,7 +1079,7 @@
   </doc>
   <doc id="class_LinkedList_T_C2F07264039DB70F20B67C74602135AACA707210">
     <desc>
-      A doubly linked list of elements. 
+      A doubly linked list of elements.
     </desc>
     <details>
       Inserting an element to the linked list in a known position is <em>O(1)</em> operation.
@@ -1102,7 +1102,7 @@
   </doc>
   <doc id="class_ForwardList_T_ABB97B61A697C29A835977FB389CCB519FC05F4D">
     <desc>
-      A singly linked list of elements. 
+      A singly linked list of elements.
     </desc>
     <details>
       Inserting an element to the forward list in a known position is <em>O(1)</em> operation.
@@ -1139,7 +1139,7 @@
   </doc>
   <doc id="class_Bitset_BA1EE2E68426C5445CB6CAF7F957084ADAFD19CA">
     <desc>
-      A variable length container of bits implemented as a <ref>class_List_T_4E42CF5913BEB21F5260DEFEC239180C94460B11</ref> of ulongs. 
+      A variable length container of bits implemented as a <ref>class_List_T_4E42CF5913BEB21F5260DEFEC239180C94460B11</ref> of ulongs.
     </desc>
     <details>
       Setting, resetting and accessing a bit takes constant time.
@@ -1300,7 +1300,7 @@
       the return type and the parameter type of the function call operator are the same type.
     </desc>
     <details title="Examples">
-      <ref>class_Negate_T_0968FCEADBF1F3ACFE5962D8AA44DA01A314480E</ref>, 
+      <ref>class_Negate_T_0968FCEADBF1F3ACFE5962D8AA44DA01A314480E</ref>,
       <ref>class_Identity_T_88B6920757B097108E06B2CB21F8C2B6DE39E909</ref>.
     </details>
   </doc>
@@ -1355,12 +1355,12 @@
       handling it suffices.
     </details>
     <details>
-      This <a href="../../../../code/threading/cmdoc/content/threadSynchronization/file/threadSynchronization.cm.html">threadSynchronization</a> example 
+      This <a href="../../../../code/threading/cmdoc/content/threadSynchronization/file/threadSynchronization.cm.html">threadSynchronization</a> example
       shows how to use <ref>class_LockGuard_Mtx_71F3BB945476C1B401D53113AACA649C83322BA2</ref>, <ref>class_RecursiveMutex_B9ED5479754BBDDED6A4491348BBD2F20F701D82</ref>
       and a <ref>class_ConditionVariable_019A80625043CF98EC88D8F55238C84CFD4A9C26</ref> to synchronize threads.
-      The main function starts first the <em>Run</em> member function of the 
+      The main function starts first the <em>Run</em> member function of the
       <a href="../../../../code/threading/cmdoc/content/threadSynchronization/doc/class_OutputCollector_F50BD3675C56D181C6A581CCED8948E4B4700615.html">OutputCollector</a>
-      class in a separate thread. Then it queries the number of cores by calling the 
+      class in a separate thread. Then it queries the number of cores by calling the
       <ref>function_HardwareConcurrency_B1B8105140D7AEFC1E753360624D21D1C3947146</ref> function, and starts twice as many output threads.
       The output threads enqueue message lines by calling the <em>EnqueueLine</em> member function of the
       <a href="../../../../code/threading/cmdoc/content/threadSynchronization/doc/class_OutputCollector_F50BD3675C56D181C6A581CCED8948E4B4700615.html">OutputCollector</a>.
@@ -1376,14 +1376,14 @@
         Waits a thread to end. If the thread is not joinable, throws a <ref>class_ThreadingException_4952259FBBDB6BDFCF1A52EABE2C1A61BF601670</ref>.
     </desc>
   </doc>
-  
+
   <doc id="System.Runtime">
     <desc>
-      The System.Runtime module contains symbols for functions that form the lowest level of the Cmajor runtime library. 
+      The System.Runtime module contains symbols for functions that form the lowest level of the Cmajor runtime library.
       The functions themselves are defined in the <a href="https://github.com/slaakko/cmajorw64/tree/master/cmajor/rt">rt</a> library written in C++.
     </desc>
   </doc>
-  
+
   <doc id="System.Core">
     <desc>
       The System.Core module contains primitive types, operations for primitive types, intrinsic functions and intrinsic concepts known by the compiler.
@@ -1392,11 +1392,11 @@
   </doc>
   <doc id="concept_Common_1761C757BC631D15B26D64D830742878B5E7D7F6">
     <desc>
-      Requires type arguments T and U to have a common type. 
+      Requires type arguments T and U to have a common type.
       If they have a common type, that type is bound to <strong>CommonType</strong> symbol that can be used for example in concepts that refine this concept.
     </desc>
     <details>
-      Types T and U have a common type if the types T and U are exactly the same type, 
+      Types T and U have a common type if the types T and U are exactly the same type,
       type T is implicitly convertible to type U, or type U is implicitly convertible to type U.
       In the first case the common type will be T, in the second case it will be U and in the third case it will be T.
     </details>
