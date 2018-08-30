@@ -2320,7 +2320,7 @@ namespace cmdevenv
                 {
                     throw new Exception("CMAJOR_ROOT environment variable not set, please set it to contain /path/to/cmajor directory");
                 }
-                System.Diagnostics.Process.Start(Path.Combine(cmajorRoot, Path.Combine("doc", Path.Combine("library", "index.html"))));
+                System.Diagnostics.Process.Start(Path.Combine(cmajorRoot, Path.Combine("doc", Path.Combine("system", "index.html"))));
             }
             catch (Exception ex)
             {
