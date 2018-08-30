@@ -47,11 +47,11 @@ struct InitDone
     }
 };
 
-const char* version = "2.3.0-RC1";
+const char* version = "2.3.0";
 
 void PrintHelp()
 {
-    std::cout << "Cmajor Documenter version " << version << std::endl;
+    std::cout << "Cmajor Documentation Generator version " << version << std::endl;
     std::cout << "Usage: cmdoc [options] { file.cmdoc.xml }" << std::endl;
     std::cout << "options:" << std::endl;
     std::cout << "--verbose (-v)" << std::endl;
@@ -60,7 +60,7 @@ void PrintHelp()
     std::cout << "  print this help" << std::endl;
     std::cout << "--optimize (-o)" << std::endl;
     std::cout << "  optimize output generation" << std::endl;
-    std::cout << "--build-threads=N (-bt=N)\n" << std::endl;
+    std::cout << "--build-threads=N (-bt=N)" << std::endl;
     std::cout << "  set number of build threads to N\n" << std::endl;
 }
 

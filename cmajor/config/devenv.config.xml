@@ -26,7 +26,12 @@
     <verticalSplitterPos>607</verticalSplitterPos>
     <windowState>Normal</windowState>
     <maxRecentProjects>10</maxRecentProjects>
-    <recentProjects />
+    <recentProjects>
+        <recentProject>
+            <path>C:\Users\Seppo\cmajorw64\cmajor\system\System.cms</path>
+            <openFiles />
+        </recentProject>
+    </recentProjects>
     <strictNothrow>false</strictNothrow>
     <emitLlvm>false</emitLlvm>
     <emitOptLlvm>false</emitOptLlvm>
