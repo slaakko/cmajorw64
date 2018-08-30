@@ -1,10 +1,10 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="utf-8" />
     <title>Compiler</title>
-    <link rel="stylesheet" type="text/css" href="../style/tool.css" />
+    <link rel="stylesheet" type="text/css" href="../../style/tool.css" />
 </head>
 <body>
     <h1>Compiler</h1>
@@ -95,6 +95,24 @@
             <td class="opt">-D SYMBOL</td>
             <td class="opt">Project | Properties | Conditional compilation symbols</td>
             <td class="opt">Define a conditional compilation symbol SYMBOL.</td>
+        </tr>
+        <tr>
+            <td class="opt">--gen-debug-info</td>
+            <td class="opt">-g</td>
+            <td class="opt"></td>
+            <td class="opt">Generate debug info (on by default on debug configuration)</td>
+        </tr>
+        <tr>
+            <td class="opt">--no-debug-info</td>
+            <td class="opt">-n</td>
+            <td class="opt"></td>
+            <td class="opt">don't generate debug info even for debug build</td>
+        </tr>
+        <tr>
+            <td class="opt">--build-threads=N</td>
+            <td class="opt">-bt=N</td>
+            <td class="opt">Build | Options | Number of build threads combo box.</td>
+            <td class="opt">Use N threads for building a solution. Default is 2 x C, where C is the number of cores.</td>
         </tr>
     </table>
 </body>
