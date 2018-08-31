@@ -79,6 +79,8 @@ void PrintHelp()
     std::cout << "Cmajor Unit Test Engine version " << version << std::endl;
     std::cout << "Usage: cmunit [options] { project.cmp | solution.cms }" << std::endl;
     std::cout << "Options:\n" <<
+        "--verbose (-v)\n" <<
+        "   be verbose\n" <<
         "--help (-h)\n" <<
         "   print this help message\n" <<
         "--config=CONFIG | -c=CONFIG\n" <<

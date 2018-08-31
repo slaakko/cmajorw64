@@ -342,7 +342,7 @@ std::unique_ptr<cmajor::dom::Document> GenerateReport(Module& module, std::vecto
         tableElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(trTitlesElement.release()));
 
         std::sort(profiledFunctions.begin(), profiledFunctions.end(), ProfiledFunctionInclusive());
-        int n = top;
+        int n = std::min(top, int(profiledFunctions.size()));
         if (n == 0)
         {
             n = profiledFunctions.size();
@@ -409,7 +409,7 @@ std::unique_ptr<cmajor::dom::Document> GenerateReport(Module& module, std::vecto
         tableElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(trTitlesElement.release()));
 
         std::sort(profiledFunctions.begin(), profiledFunctions.end(), ProfiledFunctionExclusive());
-        int n = top;
+        int n = std::min(top, int(profiledFunctions.size()));
         if (n == 0)
         {
             n = profiledFunctions.size();
@@ -475,7 +475,7 @@ std::unique_ptr<cmajor::dom::Document> GenerateReport(Module& module, std::vecto
         tableElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(trTitlesElement.release()));
 
         std::sort(profiledFunctions.begin(), profiledFunctions.end(), ProfiledFunctionByCount());
-        int n = top;
+        int n = std::min(top, int(profiledFunctions.size()));
         if (n == 0)
         {
             n = profiledFunctions.size();
