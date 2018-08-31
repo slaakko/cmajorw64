@@ -7,6 +7,7 @@
 #define CMAJOR_SYMBOLS_SYMBOL_CREATOR_VISITOR_INCLUDED
 #include <cmajor/ast/Visitor.hpp>
 #include <stack>
+#include <stdint.h>
 
 namespace cmajor { namespace symbols {
 

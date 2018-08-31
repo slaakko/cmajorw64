@@ -25,6 +25,7 @@ build:
 	$(MAKE) -C emitter
 	$(MAKE) -C binder
 	$(MAKE) -C build
+	$(MAKE) -C cmdoclib
 	$(MAKE) -C compiler
 	$(MAKE) -C cm2html
 	$(MAKE) -C cmdoc
@@ -80,6 +81,7 @@ clean:
 	$(MAKE) -C emitter clean
 	$(MAKE) -C binder clean
 	$(MAKE) -C build clean
+	$(MAKE) -C cmdoclib clean
 	$(MAKE) -C compiler clean
 	$(MAKE) -C cm2html clean
 	$(MAKE) -C cmdoc clean
