@@ -4,17 +4,17 @@
  </files>
  <namespace docPath="../../Min/doc/ns_.html" extPath="Min/doc/ns_.html" id="ns_" name="">
   <functions>
-   <function docPath="../../Min/doc/../index.html#function_Min_77CD36F8002397826DC0B2CF6FDB42F0934FF41C" extPath="Min/doc/../index.html#function_Min_77CD36F8002397826DC0B2CF6FDB42F0934FF41C" fileName="Min/min.cm" filePath="../../Min/file/min.cm.html" id="function_Min_77CD36F8002397826DC0B2CF6FDB42F0934FF41C" kind="Function" line="1" name="Min" returnType="e6e1dd65-6968-4d0c-a941-62f0d4f5bf91" specifiers="public inline constexpr nothrow">
+   <function docPath="../../Min/doc/../index.html#function_Min_77CD36F8002397826DC0B2CF6FDB42F0934FF41C" extPath="Min/doc/../index.html#function_Min_77CD36F8002397826DC0B2CF6FDB42F0934FF41C" fileName="Min/min.cm" filePath="../../Min/file/min.cm.html" id="function_Min_77CD36F8002397826DC0B2CF6FDB42F0934FF41C" kind="Function" line="1" name="Min" returnType="943ded2c-ae7b-4d14-a646-9729f534b3a4" specifiers="public inline constexpr nothrow">
     <templateParameters>
-     <templateParameter docPath="../../Min/doc/ns_.html#aef3bc9d-6aeb-4c12-be4e-d90451e6573f" extPath="Min/doc/ns_.html#aef3bc9d-6aeb-4c12-be4e-d90451e6573f" id="aef3bc9d-6aeb-4c12-be4e-d90451e6573f" name="T"/>
+     <templateParameter docPath="../../Min/doc/ns_.html#9aff7de8-f250-4985-98dd-068756982680" extPath="Min/doc/ns_.html#9aff7de8-f250-4985-98dd-068756982680" id="9aff7de8-f250-4985-98dd-068756982680" name="T"/>
     </templateParameters>
     <parameters>
-     <parameter id="parameter_left_A615ADF271969CDDE80A2702870E54A73F8F66C9" name="left" type="e6e1dd65-6968-4d0c-a941-62f0d4f5bf91"/>
-     <parameter id="parameter_right_BB88877C26C58C5F0558FE387DBE7B52B7FBEE69" name="right" type="e6e1dd65-6968-4d0c-a941-62f0d4f5bf91"/>
+     <parameter id="parameter_left_A615ADF271969CDDE80A2702870E54A73F8F66C9" name="left" type="943ded2c-ae7b-4d14-a646-9729f534b3a4"/>
+     <parameter id="parameter_right_BB88877C26C58C5F0558FE387DBE7B52B7FBEE69" name="right" type="943ded2c-ae7b-4d14-a646-9729f534b3a4"/>
     </parameters>
     <where>
      <is>
-      <symbol name="T" ref="aef3bc9d-6aeb-4c12-be4e-d90451e6573f"/>
+      <symbol name="T" ref="9aff7de8-f250-4985-98dd-068756982680"/>
       <dot>
        <dot>
         <symbol name="System" ref="ns_System"/>
@@ -25,13 +25,13 @@
      </is>
     </where>
    </function>
-   <function docPath="../../Min/doc/../index.html#function_main_30D71DA93A80E84640D467E0841F28966485AC6A" extPath="Min/doc/../index.html#function_main_30D71DA93A80E84640D467E0841F28966485AC6A" fileName="Min/min.cm" filePath="../../Min/file/min.cm.html" id="function_main_30D71DA93A80E84640D467E0841F28966485AC6A" kind="Function" line="7" name="main" returnType="4e959632-b5f2-406d-9402-ec16ab3f3585" specifiers="public"/>
+   <function docPath="../../Min/doc/../index.html#function_main_30D71DA93A80E84640D467E0841F28966485AC6A" extPath="Min/doc/../index.html#function_main_30D71DA93A80E84640D467E0841F28966485AC6A" fileName="Min/min.cm" filePath="../../Min/file/min.cm.html" id="function_main_30D71DA93A80E84640D467E0841F28966485AC6A" kind="Function" line="7" name="main" returnType="c7cee213-39ce-41b4-8e6f-6bc43d6a5807" specifiers="public"/>
   </functions>
  </namespace>
  <types>
-  <derivedType id="e6e1dd65-6968-4d0c-a941-62f0d4f5bf91" name="const T&amp;">
+  <derivedType id="943ded2c-ae7b-4d14-a646-9729f534b3a4" name="const T&amp;">
    <derivation name="const"/>
-   <derivation baseType="aef3bc9d-6aeb-4c12-be4e-d90451e6573f"/>
+   <derivation baseType="9aff7de8-f250-4985-98dd-068756982680"/>
    <derivation name="&amp;"/>
   </derivedType>
  </types>

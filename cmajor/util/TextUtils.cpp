@@ -12,6 +12,7 @@
 #include <iterator>
 #include <algorithm>
 #include <stdexcept>
+#include <thread>
 
 namespace cmajor { namespace util {
 
@@ -472,6 +473,13 @@ std::u32string FormatNumber(int n, int numDigits)
         n = n / 10;
     }
     return s;
+}
+
+std::string CurrentThreadIdStr()
+{
+    std::stringstream s;
+    s << std::this_thread::get_id();
+    return s.str();
 }
 
 } } // namespace cmajor::util

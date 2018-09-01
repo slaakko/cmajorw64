@@ -40,6 +40,7 @@ std::string ToHexString(uint32_t x);
 std::string ToHexString(uint64_t x);
 int Log10(int n);
 std::u32string FormatNumber(int n, int numDigits);
+std::string CurrentThreadIdStr();
 
 } } // namespace cmajor::util
 

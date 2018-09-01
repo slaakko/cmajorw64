@@ -46,6 +46,7 @@
 #include <cmajor/util/System.hpp>
 #include <cmajor/util/TextUtils.hpp>
 #include <cmajor/util/Log.hpp>
+#include <cmajor/util/Time.hpp>
 #include <algorithm>
 #include <iostream>
 #include <fstream>
@@ -1097,52 +1098,81 @@ void BuildProject(const std::string& projectFilePath, std::unique_ptr<Module>& r
     }
 }
 
+bool buildDebug = false;
+const int buildGetTimeoutSecs = 3;
+int64_t buildDebugStart = 0;
+
+std::string CurrentMsStr()
+{
+    return FormatTimeMs(static_cast<int32_t>(CurrentMs() - buildDebugStart));
+}
+
 class ProjectQueue
 {
 public:
-    ProjectQueue(bool& stop_);
+    ProjectQueue(bool& stop_, const std::string& name_);
     void Put(Project* project);
-    Project* Get(int secs, bool ret);
+    Project* Get();
 private:
+    std::string name;
     std::list<Project*> queue;
     std::mutex mtx;
     std::condition_variable cond;
     bool& stop;
 };
 
-ProjectQueue::ProjectQueue(bool& stop_) : stop(stop_)
+ProjectQueue::ProjectQueue(bool& stop_, const std::string& name_) : stop(stop_), name(name_)
 {
 }
 
 void ProjectQueue::Put(Project* project)
 {
+    if (buildDebug)
+    {
+        std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
+        LogMessage(-1, CurrentMsStr() + ">ProjectQueue(" + name + ")::Put: " + CurrentThreadIdStr() + " " + ToUtf8(project->Name())); 
+    }
     std::lock_guard<std::mutex> lock(mtx);
     queue.push_back(project);
-    cond.notify_all();
+    cond.notify_one();
+    if (buildDebug)
+    {
+        LogMessage(-1, CurrentMsStr() + "<ProjectQueue(" + name + ")::Put: " + CurrentThreadIdStr() + " " + ToUtf8(project->Name()));
+    }
 }
 
-Project* ProjectQueue::Get(int secs, bool ret)
+Project* ProjectQueue::Get()
 {
     while (!stop)
     {
-        std::unique_lock<std::mutex> lock(mtx);
-        if (cond.wait_for(lock, std::chrono::duration<std::uint64_t>(std::chrono::seconds(secs))) == std::cv_status::no_timeout)
+        if (buildDebug)
         {
-            if (!queue.empty())
-            {
-                Project* project = queue.front();
-                queue.pop_front();
-                return project;
-            }
-            else if (ret)
-            {
-                return nullptr;
-            }
+            LogMessage(-1, CurrentMsStr() + ">ProjectQueue(" + name + ")::Get: " + CurrentThreadIdStr());
         }
-        else if (ret)
+        std::unique_lock<std::mutex> lock(mtx);
+        if (cond.wait_for(lock, std::chrono::duration<std::uint64_t>(std::chrono::seconds(buildGetTimeoutSecs)), [this]{ return stop || !queue.empty(); }))
         {
+            if (stop) return nullptr;
+            Project* project = queue.front();
+            queue.pop_front();
+            if (buildDebug)
+            {
+                LogMessage(-1, CurrentMsStr() + "<ProjectQueue(" + name + ")::Get: " + CurrentThreadIdStr() + " got project " + ToUtf8(project->Name()));
+            }
+            return project;
+        }
+        else
+        {
+            if (buildDebug)
+            {
+                LogMessage(-1, CurrentMsStr() + "<ProjectQueue(" + name + ")::Get: " + CurrentThreadIdStr() + " timeout");
+            }
             return nullptr;
         }
+    }
+    if (buildDebug)
+    {
+        LogMessage(-1, CurrentMsStr() + "<ProjectQueue(" + name + ")::Get: " + CurrentThreadIdStr() + " stop");
     }
     return nullptr;
 }
@@ -1166,24 +1196,35 @@ void ProjectBuilder(BuildData* buildData)
 {
     try
     {
-        Project* toBuild = buildData->buildQueue.Get(1, false);
-        while (toBuild && !buildData->stop)
+        Project* toBuild = buildData->buildQueue.Get();
+        while (!buildData->stop)
         {
-            BuildProject(toBuild, buildData->rootModules[toBuild->Index()], buildData->stop, true);
-            if (toBuild->IsSystemProject())
+            if (toBuild)
             {
-                buildData->isSystemSolution = true;
+                BuildProject(toBuild, buildData->rootModules[toBuild->Index()], buildData->stop, true);
+                if (toBuild->IsSystemProject())
+                {
+                    buildData->isSystemSolution = true;
+                }
+                toBuild->SetBuilt();
+                buildData->readyQueue.Put(toBuild);
             }
-            toBuild->SetBuilt();
-            buildData->readyQueue.Put(toBuild);
-            toBuild = buildData->buildQueue.Get(1, false);
+            toBuild = buildData->buildQueue.Get();
         }
     }
     catch (...)
     {
+        if (buildDebug)
+        {
+            LogMessage(-1, CurrentMsStr() + ">ProjectBuilder()::catch " + CurrentThreadIdStr());
+        }
         std::lock_guard<std::mutex> lock(buildData->exceptionMutex);
         buildData->exceptions.push_back(std::current_exception());
         buildData->stop = true;
+        if (buildDebug)
+        {
+            LogMessage(-1, CurrentMsStr() + "<ProjectBuilder()::catch " + CurrentThreadIdStr());
+        }
     }
 }
 
@@ -1299,8 +1340,18 @@ void BuildSolution(const std::string& solutionFilePath, std::vector<std::unique_
                 LogMessage(-1, "Building " + std::to_string(numProjectsToBuild) + " projects using " + std::to_string(numThreads) + " threads...");
             }
             bool stop = false;
-            ProjectQueue buildQueue(stop);
-            ProjectQueue readyQueue(stop);
+            const char* buildDebugEnvVarDefined = std::getenv("CMAJOR_BUILD_DEBUG");
+            if (buildDebugEnvVarDefined != nullptr && std::string(buildDebugEnvVarDefined) != "")
+            {
+                buildDebugStart = CurrentMs();
+                buildDebug = true;
+            }
+            else
+            {
+                buildDebug = false;
+            }
+            ProjectQueue buildQueue(stop, "build");
+            ProjectQueue readyQueue(stop, "ready");
             BuildData buildData(stop, buildQueue, readyQueue, rootModules, isSystemSolution);
             std::vector<std::thread> threads;
             for (int i = 0; i < numThreads; ++i)
@@ -1323,11 +1374,10 @@ void BuildSolution(const std::string& solutionFilePath, std::vector<std::unique_
                 {
                     projectsToBuild.erase(std::remove(projectsToBuild.begin(), projectsToBuild.end(), project), projectsToBuild.end());
                 }
-                Project* ready = readyQueue.Get(1, true);
-                while (ready)
+                Project* ready = readyQueue.Get();
+                if (ready)
                 {
                     --numProjectsToBuild;
-                    ready = readyQueue.Get(1, true);
                 }
             }
             if (stop)

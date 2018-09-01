@@ -4,13 +4,13 @@
  </files>
  <namespace docPath="../../Align/doc/ns_.html" extPath="Align/doc/ns_.html" id="ns_" name="">
   <functions>
-   <function docPath="../../Align/doc/../index.html#function_Align_2DFC132DC191C7F2B3D1F9B219B99C7974AB7178" extPath="Align/doc/../index.html#function_Align_2DFC132DC191C7F2B3D1F9B219B99C7974AB7178" fileName="Align/align.cm" filePath="../../Align/file/align.cm.html" id="function_Align_2DFC132DC191C7F2B3D1F9B219B99C7974AB7178" kind="Function" line="1" name="Align" returnType="8edf41dc-c01c-479c-8064-b92f90c315ea" specifiers="public inline constexpr nothrow">
+   <function docPath="../../Align/doc/../index.html#function_Align_2DFC132DC191C7F2B3D1F9B219B99C7974AB7178" extPath="Align/doc/../index.html#function_Align_2DFC132DC191C7F2B3D1F9B219B99C7974AB7178" fileName="Align/align.cm" filePath="../../Align/file/align.cm.html" id="function_Align_2DFC132DC191C7F2B3D1F9B219B99C7974AB7178" kind="Function" line="1" name="Align" returnType="c9ed7a28-0c3b-472e-8b0f-96c63ac81cb1" specifiers="public inline constexpr nothrow">
     <parameters>
-     <parameter id="parameter_n_258C724A5910A672B4E9132DB86C00EC8D0B86F1" name="n" type="8edf41dc-c01c-479c-8064-b92f90c315ea"/>
-     <parameter id="parameter_alignment_02A945B16F6F894DD5C9C3144E1B1A217A6F0307" name="alignment" type="8edf41dc-c01c-479c-8064-b92f90c315ea"/>
+     <parameter id="parameter_n_258C724A5910A672B4E9132DB86C00EC8D0B86F1" name="n" type="c9ed7a28-0c3b-472e-8b0f-96c63ac81cb1"/>
+     <parameter id="parameter_alignment_02A945B16F6F894DD5C9C3144E1B1A217A6F0307" name="alignment" type="c9ed7a28-0c3b-472e-8b0f-96c63ac81cb1"/>
     </parameters>
    </function>
-   <function docPath="../../Align/doc/../index.html#function_main_99F3726C50455B4187460FBE611E3885299323E1" extPath="Align/doc/../index.html#function_main_99F3726C50455B4187460FBE611E3885299323E1" fileName="Align/align.cm" filePath="../../Align/file/align.cm.html" id="function_main_99F3726C50455B4187460FBE611E3885299323E1" kind="Function" line="7" name="main" returnType="4e959632-b5f2-406d-9402-ec16ab3f3585" specifiers=""/>
+   <function docPath="../../Align/doc/../index.html#function_main_99F3726C50455B4187460FBE611E3885299323E1" extPath="Align/doc/../index.html#function_main_99F3726C50455B4187460FBE611E3885299323E1" fileName="Align/align.cm" filePath="../../Align/file/align.cm.html" id="function_main_99F3726C50455B4187460FBE611E3885299323E1" kind="Function" line="7" name="main" returnType="c7cee213-39ce-41b4-8e6f-6bc43d6a5807" specifiers=""/>
   </functions>
  </namespace>
  <types/>

@@ -4,23 +4,23 @@
  </files>
  <namespace docPath="../../Dom1/doc/ns_.html" extPath="Dom1/doc/ns_.html" id="ns_" name="">
   <functions>
-   <function docPath="../../Dom1/doc/../index.html#function_CreateDoc_4805948C05D0B50689AA11F217E0E8303975B72C" extPath="Dom1/doc/../index.html#function_CreateDoc_4805948C05D0B50689AA11F217E0E8303975B72C" fileName="Dom1/dom1.cm" filePath="../../Dom1/file/dom1.cm.html" id="function_CreateDoc_4805948C05D0B50689AA11F217E0E8303975B72C" kind="Function" line="6" name="CreateDoc" returnType="eec6adf7-84ef-405d-bb1b-61570abc7d01" specifiers="public"/>
-   <function docPath="../../Dom1/doc/../index.html#function_ReadDocFromFile_8BE1CDDF43A5B3EA7FADCACAE70827DB94044116" extPath="Dom1/doc/../index.html#function_ReadDocFromFile_8BE1CDDF43A5B3EA7FADCACAE70827DB94044116" fileName="Dom1/dom1.cm" filePath="../../Dom1/file/dom1.cm.html" id="function_ReadDocFromFile_8BE1CDDF43A5B3EA7FADCACAE70827DB94044116" kind="Function" line="31" name="ReadDocFromFile" returnType="eec6adf7-84ef-405d-bb1b-61570abc7d01" specifiers="public"/>
-   <function docPath="../../Dom1/doc/../index.html#function_WriteDocToConsole_7B6EF9A17D9FA56854ED347EFA04A6470E6BFB83" extPath="Dom1/doc/../index.html#function_WriteDocToConsole_7B6EF9A17D9FA56854ED347EFA04A6470E6BFB83" fileName="Dom1/dom1.cm" filePath="../../Dom1/file/dom1.cm.html" id="function_WriteDocToConsole_7B6EF9A17D9FA56854ED347EFA04A6470E6BFB83" kind="Function" line="37" name="WriteDocToConsole" returnType="4e959632-b5f2-406d-9402-ec16ab3f3585" specifiers="public">
+   <function docPath="../../Dom1/doc/../index.html#function_CreateDoc_4805948C05D0B50689AA11F217E0E8303975B72C" extPath="Dom1/doc/../index.html#function_CreateDoc_4805948C05D0B50689AA11F217E0E8303975B72C" fileName="Dom1/dom1.cm" filePath="../../Dom1/file/dom1.cm.html" id="function_CreateDoc_4805948C05D0B50689AA11F217E0E8303975B72C" kind="Function" line="6" name="CreateDoc" returnType="0949116c-edf2-494b-8482-a52a50f0b2aa" specifiers="public"/>
+   <function docPath="../../Dom1/doc/../index.html#function_ReadDocFromFile_8BE1CDDF43A5B3EA7FADCACAE70827DB94044116" extPath="Dom1/doc/../index.html#function_ReadDocFromFile_8BE1CDDF43A5B3EA7FADCACAE70827DB94044116" fileName="Dom1/dom1.cm" filePath="../../Dom1/file/dom1.cm.html" id="function_ReadDocFromFile_8BE1CDDF43A5B3EA7FADCACAE70827DB94044116" kind="Function" line="31" name="ReadDocFromFile" returnType="0949116c-edf2-494b-8482-a52a50f0b2aa" specifiers="public"/>
+   <function docPath="../../Dom1/doc/../index.html#function_WriteDocToConsole_7B6EF9A17D9FA56854ED347EFA04A6470E6BFB83" extPath="Dom1/doc/../index.html#function_WriteDocToConsole_7B6EF9A17D9FA56854ED347EFA04A6470E6BFB83" fileName="Dom1/dom1.cm" filePath="../../Dom1/file/dom1.cm.html" id="function_WriteDocToConsole_7B6EF9A17D9FA56854ED347EFA04A6470E6BFB83" kind="Function" line="37" name="WriteDocToConsole" returnType="c7cee213-39ce-41b4-8e6f-6bc43d6a5807" specifiers="public">
     <parameters>
-     <parameter id="parameter_doc_9D7C4EABD111707052C9A77760F7893E746BEE3C" name="doc" type="4156961b-a5ca-4cfc-9b23-5528b1337f90"/>
+     <parameter id="parameter_doc_9D7C4EABD111707052C9A77760F7893E746BEE3C" name="doc" type="da1d94ea-5ac2-4a8b-9650-ac49232d3007"/>
     </parameters>
    </function>
-   <function docPath="../../Dom1/doc/../index.html#function_WriteDocToFile_6B15B80B9CD86F35EDC5B7A91C2BB3B2D3CF4EB9" extPath="Dom1/doc/../index.html#function_WriteDocToFile_6B15B80B9CD86F35EDC5B7A91C2BB3B2D3CF4EB9" fileName="Dom1/dom1.cm" filePath="../../Dom1/file/dom1.cm.html" id="function_WriteDocToFile_6B15B80B9CD86F35EDC5B7A91C2BB3B2D3CF4EB9" kind="Function" line="23" name="WriteDocToFile" returnType="4e959632-b5f2-406d-9402-ec16ab3f3585" specifiers="public">
+   <function docPath="../../Dom1/doc/../index.html#function_WriteDocToFile_6B15B80B9CD86F35EDC5B7A91C2BB3B2D3CF4EB9" extPath="Dom1/doc/../index.html#function_WriteDocToFile_6B15B80B9CD86F35EDC5B7A91C2BB3B2D3CF4EB9" fileName="Dom1/dom1.cm" filePath="../../Dom1/file/dom1.cm.html" id="function_WriteDocToFile_6B15B80B9CD86F35EDC5B7A91C2BB3B2D3CF4EB9" kind="Function" line="23" name="WriteDocToFile" returnType="c7cee213-39ce-41b4-8e6f-6bc43d6a5807" specifiers="public">
     <parameters>
-     <parameter id="parameter_doc_D2261446129A1342E0E377F0517227A950F3A7E4" name="doc" type="4156961b-a5ca-4cfc-9b23-5528b1337f90"/>
+     <parameter id="parameter_doc_D2261446129A1342E0E377F0517227A950F3A7E4" name="doc" type="da1d94ea-5ac2-4a8b-9650-ac49232d3007"/>
     </parameters>
    </function>
-   <function docPath="../../Dom1/doc/../index.html#function_main_99F3726C50455B4187460FBE611E3885299323E1" extPath="Dom1/doc/../index.html#function_main_99F3726C50455B4187460FBE611E3885299323E1" fileName="Dom1/dom1.cm" filePath="../../Dom1/file/dom1.cm.html" id="function_main_99F3726C50455B4187460FBE611E3885299323E1" kind="Function" line="44" name="main" returnType="cc8ffb50-cac1-4f7e-acae-8b3fb9621c37" specifiers=""/>
+   <function docPath="../../Dom1/doc/../index.html#function_main_99F3726C50455B4187460FBE611E3885299323E1" extPath="Dom1/doc/../index.html#function_main_99F3726C50455B4187460FBE611E3885299323E1" fileName="Dom1/dom1.cm" filePath="../../Dom1/file/dom1.cm.html" id="function_main_99F3726C50455B4187460FBE611E3885299323E1" kind="Function" line="44" name="main" returnType="141128e3-e6e4-4bca-89d7-238a956a72d6" specifiers=""/>
   </functions>
  </namespace>
  <types>
-  <specialization id="eec6adf7-84ef-405d-bb1b-61570abc7d01" name="UniquePtr" primaryType="class_UniquePtr_T_793F841C13E9DD3A6869243C74F1D948C0E04009">
+  <specialization id="0949116c-edf2-494b-8482-a52a50f0b2aa" name="UniquePtr" primaryType="class_UniquePtr_T_793F841C13E9DD3A6869243C74F1D948C0E04009">
    <templateArgumentTypes>
     <templateArgumentType ref="class_DomDocument_975632F3AA8CF3FEC1D51FB0E91F580D6EBA16C8"/>
    </templateArgumentTypes>

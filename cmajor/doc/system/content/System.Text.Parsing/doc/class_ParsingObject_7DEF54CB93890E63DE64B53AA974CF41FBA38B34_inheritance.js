@@ -270,10 +270,10 @@ function drawInheritanceDiagram() {
     var diagramNodes = [
         { name: "System.Text.Parsing.ParsingObject", id: "diagram_node_0", level: 0, subject: true, hasDerivedNodes: true, link: "../../System.Text.Parsing/doc/class_ParsingObject_7DEF54CB93890E63DE64B53AA974CF41FBA38B34.html" },
         { name: "System.Text.Parsing.Grammar", id: "diagram_node_1", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Text.Parsing/doc/class_Grammar_2180D00808E7A786B21C35D11B36E77EC171A6C6.html" },
-        { name: "System.Text.Parsing.Namespace", id: "diagram_node_2", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Text.Parsing/doc/class_Namespace_BEC67344A7973E4CF4E380F7983A4A744161BDF4.html" },
-        { name: "System.Text.Parsing.Parser", id: "diagram_node_3", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Text.Parsing/doc/class_Parser_59591398FA427ADC5EC015FB52651571177DB77D.html" },
-        { name: "System.Text.Parsing.ParsingDomain", id: "diagram_node_4", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Text.Parsing/doc/class_ParsingDomain_DBADEDB24194482080D6E7112DE96AB5FCAD1A87.html" },
-        { name: "System.Text.Parsing.RuleLink", id: "diagram_node_5", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Text.Parsing/doc/class_RuleLink_64A59FA646EBEB538A1C8CDCB851A771077C2702.html" },
+        { name: "System.Text.Parsing.Namespace", id: "diagram_node_3", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Text.Parsing/doc/class_Namespace_BEC67344A7973E4CF4E380F7983A4A744161BDF4.html" },
+        { name: "System.Text.Parsing.Parser", id: "diagram_node_2", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Text.Parsing/doc/class_Parser_59591398FA427ADC5EC015FB52651571177DB77D.html" },
+        { name: "System.Text.Parsing.ParsingDomain", id: "diagram_node_5", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Text.Parsing/doc/class_ParsingDomain_DBADEDB24194482080D6E7112DE96AB5FCAD1A87.html" },
+        { name: "System.Text.Parsing.RuleLink", id: "diagram_node_4", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Text.Parsing/doc/class_RuleLink_64A59FA646EBEB538A1C8CDCB851A771077C2702.html" },
         { name: "System.Text.Parsing.Scope", id: "diagram_node_6", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Text.Parsing/doc/class_Scope_AA7DC7FA33AF6D4CD76B37C2ACB091BF3E8BD021.html" }];
     drawDiagram(diagramNodes);
 }

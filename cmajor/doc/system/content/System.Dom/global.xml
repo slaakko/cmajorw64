@@ -1,14 +1,14 @@
 <global>
     <derivedClassMap>
-        <baseClass classId="class_Visitor_9325C9B633E34A075869657A28EB269260004DBC">
-            <derivedClass classId="class_BuildIndexVisitor_2A216A2E67DE23C4749113C859D07166BA8E981B"/>
-            <derivedClass classId="class_ElementsByTagNameVisitor_DBE61B07E819E1EB70C9AEFFF9A22069D47BD652"/>
-            <derivedClass classId="class_ElementAndDocumentStringValueComputer_FECFC54D00B43DD7FFD455FAAAC9A1505830D3B5"/>
-        </baseClass>
         <baseClass classId="class_DomParentNode_F9975590E24BA357F4D6034909932314C990E2E2">
             <derivedClass classId="class_DomDocument_975632F3AA8CF3FEC1D51FB0E91F580D6EBA16C8"/>
             <derivedClass classId="class_DomDocumentFragment_F8F4B9224E04A95DBEE5184849B88CF399A2ABD3"/>
             <derivedClass classId="class_DomElement_2F019E5CBBCF1F9C65CE734BA20F69BEFDC19B3B"/>
+        </baseClass>
+        <baseClass classId="class_Visitor_9325C9B633E34A075869657A28EB269260004DBC">
+            <derivedClass classId="class_BuildIndexVisitor_2A216A2E67DE23C4749113C859D07166BA8E981B"/>
+            <derivedClass classId="class_ElementsByTagNameVisitor_DBE61B07E819E1EB70C9AEFFF9A22069D47BD652"/>
+            <derivedClass classId="class_ElementAndDocumentStringValueComputer_FECFC54D00B43DD7FFD455FAAAC9A1505830D3B5"/>
         </baseClass>
         <baseClass classId="class_DomNode_AAD27BD01107131DCBD7D66B91A6A861C7C23509">
             <derivedClass classId="class_DomAttr_9E6E1B42DF1CBDED3278FE00CE0A15F354369845"/>

@@ -4,20 +4,18 @@
  </files>
  <namespace docPath="../../Args/doc/ns_.html" extPath="Args/doc/ns_.html" id="ns_" name="">
   <functions>
-   <function docPath="../../Args/doc/../index.html#function_main_E5E0B7B0E865B79CC09FA4CBA1B819D77DE7CAFC" extPath="Args/doc/../index.html#function_main_E5E0B7B0E865B79CC09FA4CBA1B819D77DE7CAFC" fileName="Args/Args.cm" filePath="../../Args/file/Args.cm.html" id="function_main_E5E0B7B0E865B79CC09FA4CBA1B819D77DE7CAFC" kind="Function" line="3" name="main" returnType="3ce6525d-4dde-4b69-b0e3-078806987717" specifiers="">
+   <function docPath="../../Args/doc/../index.html#function_main_E5E0B7B0E865B79CC09FA4CBA1B819D77DE7CAFC" extPath="Args/doc/../index.html#function_main_E5E0B7B0E865B79CC09FA4CBA1B819D77DE7CAFC" fileName="Args/Args.cm" filePath="../../Args/file/Args.cm.html" id="function_main_E5E0B7B0E865B79CC09FA4CBA1B819D77DE7CAFC" kind="Function" line="3" name="main" returnType="141128e3-e6e4-4bca-89d7-238a956a72d6" specifiers="">
     <parameters>
-     <parameter id="parameter_argc_AA11952084E5FEBCC47757F6863509258BF262FF" name="argc" type="3ce6525d-4dde-4b69-b0e3-078806987717"/>
-     <parameter id="parameter_argv_A77642CC652C3A88362DD414B9B6D479ADFED46E" name="argv" type="b539aeb4-8053-4271-bf44-7010490b4500"/>
+     <parameter id="parameter_argc_AA11952084E5FEBCC47757F6863509258BF262FF" name="argc" type="141128e3-e6e4-4bca-89d7-238a956a72d6"/>
+     <parameter id="parameter_argv_A77642CC652C3A88362DD414B9B6D479ADFED46E" name="argv" type="117c5065-31bd-404b-9e13-9d5a2a647ebe"/>
     </parameters>
    </function>
   </functions>
  </namespace>
  <types>
-  <basicType id="3ce6525d-4dde-4b69-b0e3-078806987717" name="int"/>
-  <basicType id="810dfd2c-f903-49c2-909b-f03481b3c946" name="char"/>
-  <derivedType id="b539aeb4-8053-4271-bf44-7010490b4500" name="const char**">
+  <derivedType id="117c5065-31bd-404b-9e13-9d5a2a647ebe" name="const char**">
    <derivation name="const"/>
-   <derivation baseType="810dfd2c-f903-49c2-909b-f03481b3c946"/>
+   <derivation baseType="34b92c0a-af7c-4187-ae77-d47430e09189"/>
    <derivation name="*"/>
    <derivation name="*"/>
   </derivedType>

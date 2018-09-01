@@ -5,6 +5,7 @@
 
 #include <cmajor/util/Time.hpp>
 #include <ctime>
+#include <chrono>
 
 namespace cmajor { namespace util {
 
@@ -109,6 +110,11 @@ DateTime GetCurrentDateTime()
     struct tm* localTime = nullptr;
     localTime = std::localtime(&currentTime);
     return DateTime(Date(1900 + localTime->tm_year, static_cast<Month>(1 + localTime->tm_mon), static_cast<int8_t>(localTime->tm_mday)), localTime->tm_hour * 3600 + localTime->tm_min * 60 + localTime->tm_sec);
+}
+
+std::int64_t CurrentMs()
+{
+    return std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - std::chrono::steady_clock::time_point()).count();
 }
 
 } } // namespace cmajor::util

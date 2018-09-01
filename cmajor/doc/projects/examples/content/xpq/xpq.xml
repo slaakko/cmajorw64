@@ -4,46 +4,32 @@
  </files>
  <namespace docPath="../../xpq/doc/ns_.html" extPath="xpq/doc/ns_.html" id="ns_" name="">
   <functions>
-   <function docPath="../../xpq/doc/../index.html#function_Execute_38A0101A9616BA971E158D44C9859C9A6926E226" extPath="xpq/doc/../index.html#function_Execute_38A0101A9616BA971E158D44C9859C9A6926E226" fileName="xpq/main.cm" filePath="../../xpq/file/main.cm.html" id="function_Execute_38A0101A9616BA971E158D44C9859C9A6926E226" kind="Function" line="26" name="Execute" returnType="120e8773-8047-486a-b4e0-a8b3a2474ac2" specifiers="">
+   <function docPath="../../xpq/doc/../index.html#function_Execute_38A0101A9616BA971E158D44C9859C9A6926E226" extPath="xpq/doc/../index.html#function_Execute_38A0101A9616BA971E158D44C9859C9A6926E226" fileName="xpq/main.cm" filePath="../../xpq/file/main.cm.html" id="function_Execute_38A0101A9616BA971E158D44C9859C9A6926E226" kind="Function" line="26" name="Execute" returnType="c7cee213-39ce-41b4-8e6f-6bc43d6a5807" specifiers="">
     <parameters>
-     <parameter id="parameter_xpathQuery_226FEE3000261D96FFD2C4388A5507B6C09A2FD7" name="xpathQuery" type="fae8d79e-7cbd-456a-bc51-ca45bb908fef"/>
-     <parameter id="parameter_xmlFilePath_B4BEAD0E93CED6B6B603A795FE62BED7197B7485" name="xmlFilePath" type="fae8d79e-7cbd-456a-bc51-ca45bb908fef"/>
-     <parameter id="parameter_parsingDuration_4566F7FCFD889C72739C0502553DB66B33B41CDC" name="parsingDuration" type="4854d50d-b5d2-4e68-919e-14948aedcc5c"/>
-     <parameter id="parameter_verbose_4893E64E10177CD989283D904056F1646743F80C" name="verbose" type="2978cece-167a-4e0d-aa4c-d809f1cceb02"/>
+     <parameter id="parameter_xpathQuery_226FEE3000261D96FFD2C4388A5507B6C09A2FD7" name="xpathQuery" type="5245efdc-9847-4d1e-966a-178f6428bf00"/>
+     <parameter id="parameter_xmlFilePath_B4BEAD0E93CED6B6B603A795FE62BED7197B7485" name="xmlFilePath" type="5245efdc-9847-4d1e-966a-178f6428bf00"/>
+     <parameter id="parameter_parsingDuration_4566F7FCFD889C72739C0502553DB66B33B41CDC" name="parsingDuration" type="ba23ce9b-4f6c-4520-80b0-d45fe2e63e9f"/>
+     <parameter id="parameter_verbose_4893E64E10177CD989283D904056F1646743F80C" name="verbose" type="108b962e-a637-48b0-9a82-865ca70d5bee"/>
     </parameters>
    </function>
-   <function docPath="../../xpq/doc/../index.html#function_PrintHelp_F3AFA512C96C0735F4AD8289F9D07605175DC520" extPath="xpq/doc/../index.html#function_PrintHelp_F3AFA512C96C0735F4AD8289F9D07605175DC520" fileName="xpq/main.cm" filePath="../../xpq/file/main.cm.html" id="function_PrintHelp_F3AFA512C96C0735F4AD8289F9D07605175DC520" kind="Function" line="12" name="PrintHelp" returnType="120e8773-8047-486a-b4e0-a8b3a2474ac2" specifiers=""/>
-   <function docPath="../../xpq/doc/../index.html#function_Version_49E5DEDA3895024808383EF2AA540720DC396359" extPath="xpq/doc/../index.html#function_Version_49E5DEDA3895024808383EF2AA540720DC396359" fileName="xpq/main.cm" filePath="../../xpq/file/main.cm.html" id="function_Version_49E5DEDA3895024808383EF2AA540720DC396359" kind="Function" line="7" name="Version" returnType="36109089-fa7a-4921-9e1f-b8480e46fbd8" specifiers="public"/>
-   <function docPath="../../xpq/doc/../index.html#function_main_E5E0B7B0E865B79CC09FA4CBA1B819D77DE7CAFC" extPath="xpq/doc/../index.html#function_main_E5E0B7B0E865B79CC09FA4CBA1B819D77DE7CAFC" fileName="xpq/main.cm" filePath="../../xpq/file/main.cm.html" id="function_main_E5E0B7B0E865B79CC09FA4CBA1B819D77DE7CAFC" kind="Function" line="66" name="main" returnType="3ce6525d-4dde-4b69-b0e3-078806987717" specifiers="">
+   <function docPath="../../xpq/doc/../index.html#function_PrintHelp_F3AFA512C96C0735F4AD8289F9D07605175DC520" extPath="xpq/doc/../index.html#function_PrintHelp_F3AFA512C96C0735F4AD8289F9D07605175DC520" fileName="xpq/main.cm" filePath="../../xpq/file/main.cm.html" id="function_PrintHelp_F3AFA512C96C0735F4AD8289F9D07605175DC520" kind="Function" line="12" name="PrintHelp" returnType="c7cee213-39ce-41b4-8e6f-6bc43d6a5807" specifiers=""/>
+   <function docPath="../../xpq/doc/../index.html#function_Version_49E5DEDA3895024808383EF2AA540720DC396359" extPath="xpq/doc/../index.html#function_Version_49E5DEDA3895024808383EF2AA540720DC396359" fileName="xpq/main.cm" filePath="../../xpq/file/main.cm.html" id="function_Version_49E5DEDA3895024808383EF2AA540720DC396359" kind="Function" line="7" name="Version" returnType="6be20933-e25e-40e1-be61-501c01b65684" specifiers="public"/>
+   <function docPath="../../xpq/doc/../index.html#function_main_E5E0B7B0E865B79CC09FA4CBA1B819D77DE7CAFC" extPath="xpq/doc/../index.html#function_main_E5E0B7B0E865B79CC09FA4CBA1B819D77DE7CAFC" fileName="xpq/main.cm" filePath="../../xpq/file/main.cm.html" id="function_main_E5E0B7B0E865B79CC09FA4CBA1B819D77DE7CAFC" kind="Function" line="66" name="main" returnType="141128e3-e6e4-4bca-89d7-238a956a72d6" specifiers="">
     <parameters>
-     <parameter id="parameter_argc_AA11952084E5FEBCC47757F6863509258BF262FF" name="argc" type="3ce6525d-4dde-4b69-b0e3-078806987717"/>
-     <parameter id="parameter_argv_A77642CC652C3A88362DD414B9B6D479ADFED46E" name="argv" type="b539aeb4-8053-4271-bf44-7010490b4500"/>
+     <parameter id="parameter_argc_AA11952084E5FEBCC47757F6863509258BF262FF" name="argc" type="141128e3-e6e4-4bca-89d7-238a956a72d6"/>
+     <parameter id="parameter_argv_A77642CC652C3A88362DD414B9B6D479ADFED46E" name="argv" type="117c5065-31bd-404b-9e13-9d5a2a647ebe"/>
     </parameters>
    </function>
   </functions>
  </namespace>
  <types>
-  <basicType id="120e8773-8047-486a-b4e0-a8b3a2474ac2" name="void"/>
-  <basicType id="810dfd2c-f903-49c2-909b-f03481b3c946" name="char"/>
-  <specialization id="36109089-fa7a-4921-9e1f-b8480e46fbd8" name="String" primaryType="class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC">
-   <templateArgumentTypes>
-    <templateArgumentType ref="810dfd2c-f903-49c2-909b-f03481b3c946"/>
-   </templateArgumentTypes>
-  </specialization>
-  <derivedType id="fae8d79e-7cbd-456a-bc51-ca45bb908fef" name="const String&lt;char>&amp;">
-   <derivation name="const"/>
-   <derivation baseType="36109089-fa7a-4921-9e1f-b8480e46fbd8"/>
-   <derivation name="&amp;"/>
-  </derivedType>
-  <derivedType id="4854d50d-b5d2-4e68-919e-14948aedcc5c" name="Duration&amp;">
+  <derivedType id="ba23ce9b-4f6c-4520-80b0-d45fe2e63e9f" name="Duration&amp;">
    <derivation baseType="class_Duration_78813FE475939D533DB7A63066BE3D8FEB436151"/>
    <derivation name="&amp;"/>
   </derivedType>
-  <basicType id="2978cece-167a-4e0d-aa4c-d809f1cceb02" name="bool"/>
-  <basicType id="3ce6525d-4dde-4b69-b0e3-078806987717" name="int"/>
-  <derivedType id="b539aeb4-8053-4271-bf44-7010490b4500" name="const char**">
+  <derivedType id="117c5065-31bd-404b-9e13-9d5a2a647ebe" name="const char**">
    <derivation name="const"/>
-   <derivation baseType="810dfd2c-f903-49c2-909b-f03481b3c946"/>
+   <derivation baseType="34b92c0a-af7c-4187-ae77-d47430e09189"/>
    <derivation name="*"/>
    <derivation name="*"/>
   </derivedType>

@@ -4,53 +4,34 @@
  </files>
  <namespace docPath="../../HexDump/doc/ns_.html" extPath="HexDump/doc/ns_.html" id="ns_" name="">
   <functions>
-   <function docPath="../../HexDump/doc/../index.html#function_HexDump_E82DDD4516B017DC4F7F0066FBAD89D5336A6170" extPath="HexDump/doc/../index.html#function_HexDump_E82DDD4516B017DC4F7F0066FBAD89D5336A6170" fileName="HexDump/main.cm" filePath="../../HexDump/file/main.cm.html" id="function_HexDump_E82DDD4516B017DC4F7F0066FBAD89D5336A6170" kind="Function" line="54" name="HexDump" returnType="120e8773-8047-486a-b4e0-a8b3a2474ac2" specifiers="">
+   <function docPath="../../HexDump/doc/../index.html#function_HexDump_E82DDD4516B017DC4F7F0066FBAD89D5336A6170" extPath="HexDump/doc/../index.html#function_HexDump_E82DDD4516B017DC4F7F0066FBAD89D5336A6170" fileName="HexDump/main.cm" filePath="../../HexDump/file/main.cm.html" id="function_HexDump_E82DDD4516B017DC4F7F0066FBAD89D5336A6170" kind="Function" line="54" name="HexDump" returnType="c7cee213-39ce-41b4-8e6f-6bc43d6a5807" specifiers="">
     <parameters>
-     <parameter id="parameter_fileName_563409E2BC6BF5B56FF52BA5AECE1CD6CF651C8C" name="fileName" type="fae8d79e-7cbd-456a-bc51-ca45bb908fef"/>
+     <parameter id="parameter_fileName_563409E2BC6BF5B56FF52BA5AECE1CD6CF651C8C" name="fileName" type="5245efdc-9847-4d1e-966a-178f6428bf00"/>
     </parameters>
    </function>
-   <function docPath="../../HexDump/doc/../index.html#function_HexDumpLine_4AAFA45F3B96D65777E7DF9ADB9C8E4614D9DC09" extPath="HexDump/doc/../index.html#function_HexDumpLine_4AAFA45F3B96D65777E7DF9ADB9C8E4614D9DC09" fileName="HexDump/main.cm" filePath="../../HexDump/file/main.cm.html" id="function_HexDumpLine_4AAFA45F3B96D65777E7DF9ADB9C8E4614D9DC09" kind="Function" line="15" name="HexDumpLine" returnType="36109089-fa7a-4921-9e1f-b8480e46fbd8" specifiers="">
+   <function docPath="../../HexDump/doc/../index.html#function_HexDumpLine_4AAFA45F3B96D65777E7DF9ADB9C8E4614D9DC09" extPath="HexDump/doc/../index.html#function_HexDumpLine_4AAFA45F3B96D65777E7DF9ADB9C8E4614D9DC09" fileName="HexDump/main.cm" filePath="../../HexDump/file/main.cm.html" id="function_HexDumpLine_4AAFA45F3B96D65777E7DF9ADB9C8E4614D9DC09" kind="Function" line="15" name="HexDumpLine" returnType="6be20933-e25e-40e1-be61-501c01b65684" specifiers="">
     <parameters>
-     <parameter id="parameter_addr_E48AF8160440F533C43D455FF33A7C57980078D3" name="addr" type="0d74a798-8fc4-4b51-b9b8-4259e201839e"/>
-     <parameter id="parameter_bytes_334251D57A7E1AD75BBB611D046BAF9F507E91E7" name="bytes" type="8892c191-2fc6-4127-bf7e-8b526947e1e6"/>
-     <parameter id="parameter_numBytes_044B3C0DDD1EDDC1D024FE0C7315174D2F7ACEC8" name="numBytes" type="0d74a798-8fc4-4b51-b9b8-4259e201839e"/>
+     <parameter id="parameter_addr_E48AF8160440F533C43D455FF33A7C57980078D3" name="addr" type="47f756f5-760c-4b98-867a-e79d1e1c3447"/>
+     <parameter id="parameter_bytes_334251D57A7E1AD75BBB611D046BAF9F507E91E7" name="bytes" type="9d3f82dc-274c-4d07-acb2-19448d7abae9"/>
+     <parameter id="parameter_numBytes_044B3C0DDD1EDDC1D024FE0C7315174D2F7ACEC8" name="numBytes" type="47f756f5-760c-4b98-867a-e79d1e1c3447"/>
     </parameters>
    </function>
-   <function docPath="../../HexDump/doc/../index.html#function_PrintHelp_F3AFA512C96C0735F4AD8289F9D07605175DC520" extPath="HexDump/doc/../index.html#function_PrintHelp_F3AFA512C96C0735F4AD8289F9D07605175DC520" fileName="HexDump/main.cm" filePath="../../HexDump/file/main.cm.html" id="function_PrintHelp_F3AFA512C96C0735F4AD8289F9D07605175DC520" kind="Function" line="5" name="PrintHelp" returnType="120e8773-8047-486a-b4e0-a8b3a2474ac2" specifiers=""/>
-   <function docPath="../../HexDump/doc/../index.html#function_main_E5E0B7B0E865B79CC09FA4CBA1B819D77DE7CAFC" extPath="HexDump/doc/../index.html#function_main_E5E0B7B0E865B79CC09FA4CBA1B819D77DE7CAFC" fileName="HexDump/main.cm" filePath="../../HexDump/file/main.cm.html" id="function_main_E5E0B7B0E865B79CC09FA4CBA1B819D77DE7CAFC" kind="Function" line="84" name="main" returnType="3ce6525d-4dde-4b69-b0e3-078806987717" specifiers="">
+   <function docPath="../../HexDump/doc/../index.html#function_PrintHelp_F3AFA512C96C0735F4AD8289F9D07605175DC520" extPath="HexDump/doc/../index.html#function_PrintHelp_F3AFA512C96C0735F4AD8289F9D07605175DC520" fileName="HexDump/main.cm" filePath="../../HexDump/file/main.cm.html" id="function_PrintHelp_F3AFA512C96C0735F4AD8289F9D07605175DC520" kind="Function" line="5" name="PrintHelp" returnType="c7cee213-39ce-41b4-8e6f-6bc43d6a5807" specifiers=""/>
+   <function docPath="../../HexDump/doc/../index.html#function_main_E5E0B7B0E865B79CC09FA4CBA1B819D77DE7CAFC" extPath="HexDump/doc/../index.html#function_main_E5E0B7B0E865B79CC09FA4CBA1B819D77DE7CAFC" fileName="HexDump/main.cm" filePath="../../HexDump/file/main.cm.html" id="function_main_E5E0B7B0E865B79CC09FA4CBA1B819D77DE7CAFC" kind="Function" line="84" name="main" returnType="141128e3-e6e4-4bca-89d7-238a956a72d6" specifiers="">
     <parameters>
-     <parameter id="parameter_argc_AA11952084E5FEBCC47757F6863509258BF262FF" name="argc" type="3ce6525d-4dde-4b69-b0e3-078806987717"/>
-     <parameter id="parameter_argv_A77642CC652C3A88362DD414B9B6D479ADFED46E" name="argv" type="b539aeb4-8053-4271-bf44-7010490b4500"/>
+     <parameter id="parameter_argc_AA11952084E5FEBCC47757F6863509258BF262FF" name="argc" type="141128e3-e6e4-4bca-89d7-238a956a72d6"/>
+     <parameter id="parameter_argv_A77642CC652C3A88362DD414B9B6D479ADFED46E" name="argv" type="117c5065-31bd-404b-9e13-9d5a2a647ebe"/>
     </parameters>
    </function>
   </functions>
   <constants>
-   <constant docPath="../../HexDump/doc/ns_.html#constant_bytesInLine_3BD97F33573D84C77E0D5F7DB2E62A567497C0E9" extPath="HexDump/doc/ns_.html#constant_bytesInLine_3BD97F33573D84C77E0D5F7DB2E62A567497C0E9" id="constant_bytesInLine_3BD97F33573D84C77E0D5F7DB2E62A567497C0E9" name="bytesInLine" specifiers="" type="0d74a798-8fc4-4b51-b9b8-4259e201839e" value="16u"/>
+   <constant docPath="../../HexDump/doc/ns_.html#constant_bytesInLine_3BD97F33573D84C77E0D5F7DB2E62A567497C0E9" extPath="HexDump/doc/ns_.html#constant_bytesInLine_3BD97F33573D84C77E0D5F7DB2E62A567497C0E9" id="constant_bytesInLine_3BD97F33573D84C77E0D5F7DB2E62A567497C0E9" name="bytesInLine" specifiers="" type="47f756f5-760c-4b98-867a-e79d1e1c3447" value="16u"/>
   </constants>
  </namespace>
  <types>
-  <basicType id="120e8773-8047-486a-b4e0-a8b3a2474ac2" name="void"/>
-  <basicType id="810dfd2c-f903-49c2-909b-f03481b3c946" name="char"/>
-  <specialization id="36109089-fa7a-4921-9e1f-b8480e46fbd8" name="String" primaryType="class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC">
-   <templateArgumentTypes>
-    <templateArgumentType ref="810dfd2c-f903-49c2-909b-f03481b3c946"/>
-   </templateArgumentTypes>
-  </specialization>
-  <derivedType id="fae8d79e-7cbd-456a-bc51-ca45bb908fef" name="const String&lt;char>&amp;">
+  <derivedType id="117c5065-31bd-404b-9e13-9d5a2a647ebe" name="const char**">
    <derivation name="const"/>
-   <derivation baseType="36109089-fa7a-4921-9e1f-b8480e46fbd8"/>
-   <derivation name="&amp;"/>
-  </derivedType>
-  <basicType id="0d74a798-8fc4-4b51-b9b8-4259e201839e" name="uint"/>
-  <basicType id="2c4436f2-cec8-4687-b2c4-9368ae17d3cb" name="byte"/>
-  <derivedType id="8892c191-2fc6-4127-bf7e-8b526947e1e6" name="byte*">
-   <derivation baseType="2c4436f2-cec8-4687-b2c4-9368ae17d3cb"/>
-   <derivation name="*"/>
-  </derivedType>
-  <basicType id="3ce6525d-4dde-4b69-b0e3-078806987717" name="int"/>
-  <derivedType id="b539aeb4-8053-4271-bf44-7010490b4500" name="const char**">
-   <derivation name="const"/>
-   <derivation baseType="810dfd2c-f903-49c2-909b-f03481b3c946"/>
+   <derivation baseType="34b92c0a-af7c-4187-ae77-d47430e09189"/>
    <derivation name="*"/>
    <derivation name="*"/>
   </derivedType>
