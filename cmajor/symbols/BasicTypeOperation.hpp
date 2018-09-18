@@ -11,6 +11,8 @@
 #include <cmajor/symbols/SymbolTable.hpp>
 #include <cmajor/symbols/SymbolWriter.hpp>
 #include <cmajor/symbols/SymbolReader.hpp>
+#include <cmajor/symbols/Exception.hpp>
+#include <cmajor/symbols/Module.hpp>
 #include <cmajor/symbols/Value.hpp>
 #include <cmajor/util/Unicode.hpp>
 #include <cmajor/ir/Emitter.hpp>
@@ -240,6 +242,7 @@ struct BasicTypeIntegerEquality
 {
     static const char32_t* GroupName() { return U"operator=="; }
     static bool IsIntegerOpEqual() { return true; }
+    static bool IsFloatingOpEqual() { return false; }
     static llvm::Value* Generate(llvm::IRBuilder<>& builder, llvm::Value* left, llvm::Value* right) { return builder.CreateICmpEQ(left, right); }
 };
 
@@ -247,6 +250,7 @@ struct BasicTypeFloatingEquality
 {
     static const char32_t* GroupName() { return U"operator=="; }
     static bool IsIntegerOpEqual() { return false; }
+    static bool IsFloatingOpEqual() { return true;  }
     static llvm::Value* Generate(llvm::IRBuilder<>& builder, llvm::Value* left, llvm::Value* right) { return builder.CreateFCmpOEQ(left, right); }
 };
 
@@ -254,6 +258,7 @@ struct BasicTypeUnsignedIntegerLessThan
 {
     static const char32_t* GroupName() { return U"operator<"; }
     static bool IsIntegerOpEqual() { return false; }
+    static bool IsFloatingOpEqual() { return false; }
     static llvm::Value* Generate(llvm::IRBuilder<>& builder, llvm::Value* left, llvm::Value* right) { return builder.CreateICmpULT(left, right); }
 };
 
@@ -261,6 +266,7 @@ struct BasicTypeSignedIntegerLessThan
 {
     static const char32_t* GroupName() { return U"operator<"; }
     static bool IsIntegerOpEqual() { return false; }
+    static bool IsFloatingOpEqual() { return false; }
     static llvm::Value* Generate(llvm::IRBuilder<>& builder, llvm::Value* left, llvm::Value* right) { return builder.CreateICmpSLT(left, right); }
 };
 
@@ -268,6 +274,7 @@ struct BasicTypeFloatingLessThan
 {
     static const char32_t* GroupName() { return U"operator<"; }
     static bool IsIntegerOpEqual() { return false; }
+    static bool IsFloatingOpEqual() { return false; }
     static llvm::Value* Generate(llvm::IRBuilder<>& builder, llvm::Value* left, llvm::Value* right) { return builder.CreateFCmpOLT(left, right); }
 };
 
@@ -757,6 +764,7 @@ public:
     const char* ClassName() const override { return "BasicTypeConversion"; }
     int ClassArity() const override { return 1; }
     std::u32string Info() const override;
+    void Check() override;
 private:
     ConversionType conversionType;
     uint8_t conversionDistance;
@@ -800,10 +808,10 @@ void BasicTypeConversion<ConversionOp>::Read(SymbolReader& reader)
     conversionDistance = reader.GetBinaryReader().ReadByte();
     boost::uuids::uuid sourceTypeId;
     reader.GetBinaryReader().ReadUuid(sourceTypeId);
-    GetSymbolTable()->EmplaceTypeRequest(this, sourceTypeId, 1);
+    reader.GetSymbolTable()->EmplaceTypeRequest(reader, this, sourceTypeId, 1);
     boost::uuids::uuid targetTypeId;
     reader.GetBinaryReader().ReadUuid(targetTypeId);
-    GetSymbolTable()->EmplaceTypeRequest(this, targetTypeId, 2);
+    reader.GetSymbolTable()->EmplaceTypeRequest(reader, this, targetTypeId, 2);
 }
 
 template <typename ConversionOp>
@@ -838,6 +846,20 @@ std::u32string BasicTypeConversion<ConversionOp>::Info() const
     info.append(U"sourceType=").append(ToUtf32(ConversionSourceType()->ClassName())).append(1, ',');
     info.append(U"targetType=").append(ToUtf32(ConversionTargetType()->ClassName()));
     return info;
+}
+
+template <typename ConversionOp>
+void BasicTypeConversion<ConversionOp>::Check()
+{
+    FunctionSymbol::Check();
+    if (!sourceType)
+    {
+        throw SymbolCheckException(GetRootModuleForCurrentThread(), "basic type conversion has no conversion source type", GetSpan());
+    }
+    if (!targetType)
+    {
+        throw SymbolCheckException(GetRootModuleForCurrentThread(), "basic type conversion has no conversion target type", GetSpan());
+    }
 }
 
 template <typename ConversionOp>
@@ -1024,6 +1046,11 @@ BasicTypeComparisonOperation<ComparisonOp>::BasicTypeComparisonOperation(SymbolT
             BasicTypeSymbol* basicTypeSymbol = static_cast<BasicTypeSymbol*>(type);
             basicTypeSymbol->SetEqualityOp(this);
         }
+    }
+    else if (ComparisonOp::IsFloatingOpEqual())
+    {
+        BasicTypeSymbol* basicTypeSymbol = static_cast<BasicTypeSymbol*>(type);
+        basicTypeSymbol->SetEqualityOp(this);
     }
 }
 

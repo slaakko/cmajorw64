@@ -90,6 +90,8 @@ namespace cmdevenv
                 linkWithDebugRuntime.Value = false;
                 linkUsingMsLink = new BooleanField("linkUsingMsLink", Fields);
                 linkUsingMsLink.Value = false;
+                doNotUseModuleCache = new BooleanField("doNotUseModuleCache", Fields);
+                doNotUseModuleCache.Value = false;
                 numBuildThreads = new IntField("numBuildThreads", Fields);
                 numBuildThreads.Value = 0;
             }
@@ -252,6 +254,11 @@ namespace cmdevenv
                 get { return linkUsingMsLink.Value; }
                 set { linkUsingMsLink.Value = value; }
             }
+            public bool DoNotUseModuleCache
+            {
+                get { return doNotUseModuleCache.Value; }
+                set { doNotUseModuleCache.Value = value; }
+            }
             public int NumBuildThreads
             {
                 get { return numBuildThreads.Value; }
@@ -289,6 +296,7 @@ namespace cmdevenv
             private BooleanField emitOptLlvm;
             private BooleanField linkWithDebugRuntime;
             private BooleanField linkUsingMsLink;
+            private BooleanField doNotUseModuleCache;
             private IntField numBuildThreads;
         }
         public Configuration()
@@ -466,6 +474,11 @@ namespace cmdevenv
         {
             get { return config.LinkUsingMsLink; }
             set { config.LinkUsingMsLink = value; }
+        }
+        public bool DoNotUseModuleCache
+        {
+            get { return config.DoNotUseModuleCache; }
+            set { config.DoNotUseModuleCache = value; }
         }
         public int NumBuildThreads
         {

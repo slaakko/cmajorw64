@@ -9,6 +9,7 @@
 #include <cmajor/symbols/SymbolReader.hpp>
 #include <cmajor/symbols/SymbolTable.hpp>
 #include <cmajor/symbols/SymbolCollector.hpp>
+#include <cmajor/symbols/Module.hpp>
 #include <cmajor/util/Unicode.hpp>
 #include <boost/uuid/uuid_generators.hpp>
 #include <boost/uuid/uuid_io.hpp>
@@ -28,7 +29,7 @@ void ConceptGroupSymbol::AddConcept(ConceptSymbol* concept)
     auto it = arityConceptMap.find(arity);
     if (it != arityConceptMap.cend())
     {
-        throw Exception(GetModule(), "concept group '" + ToUtf8(FullName()) + "' already has concept with arity " + std::to_string(arity), GetSpan());
+        throw Exception(GetRootModuleForCurrentThread(), "concept group '" + ToUtf8(FullName()) + "' already has concept with arity " + std::to_string(arity), GetSpan());
     }
     arityConceptMap[arity] = concept;
 }
@@ -42,7 +43,7 @@ ConceptSymbol* ConceptGroupSymbol::GetConcept(int arity)
     }
     else
     {
-        throw Exception(GetModule(), "concept with arity " + std::to_string(arity) + " not found from concept group '" + ToUtf8(FullName()) + "'", GetSpan());
+        throw Exception(GetRootModuleForCurrentThread(), "concept with arity " + std::to_string(arity) + " not found from concept group '" + ToUtf8(FullName()) + "'", GetSpan());
     }
 }
 
@@ -72,6 +73,18 @@ void ConceptGroupSymbol::AppendChildElements(dom::Element* element, TypeMap& typ
     }
 }
 
+void ConceptGroupSymbol::Check()
+{
+    Symbol::Check();
+    for (const auto& p : arityConceptMap)
+    {
+        if (!p.second)
+        {
+            throw SymbolCheckException(GetRootModuleForCurrentThread(), "concept group symbol has no concept symbol", GetSpan());
+        }
+    }
+}
+
 ConceptSymbol::ConceptSymbol(const Span& span_, const std::u32string& name_) : ContainerSymbol(SymbolType::conceptSymbol, span_, name_), refinedConcept(nullptr), 
     typeId(boost::uuids::nil_generator()()), hasSource(false)
 {
@@ -97,7 +110,7 @@ void ConceptSymbol::Write(SymbolWriter& writer)
         Assert(!templateParameter->TypeId().is_nil(), "type id not initialized");
         writer.GetBinaryWriter().Write(templateParameter->TypeId());
     }
-    Node* node = GetSymbolTable()->GetNode(this);
+    Node* node = GetRootModuleForCurrentThread()->GetSymbolTable().GetNode(this);
     Assert(node->IsConceptNode(), "concept node expected");
     writer.GetAstWriter().Write(node);
     writer.GetBinaryWriter().Write(hasSource);
@@ -107,13 +120,13 @@ void ConceptSymbol::Read(SymbolReader& reader)
 {
     ContainerSymbol::Read(reader);
     reader.GetBinaryReader().ReadUuid(typeId);
-    GetSymbolTable()->AddTypeOrConceptSymbolToTypeIdMap(this);
+    reader.GetSymbolTable()->AddTypeOrConceptSymbolToTypeIdMap(this);
     groupName = reader.GetBinaryReader().ReadUtf32String();
     boost::uuids::uuid refinedConcepId;
     reader.GetBinaryReader().ReadUuid(refinedConcepId);
     if (!refinedConcepId.is_nil())
     {
-        GetSymbolTable()->EmplaceConceptRequest(this, refinedConcepId);
+        reader.GetSymbolTable()->EmplaceConceptRequest(reader, this, refinedConcepId);
     }
     uint32_t n = reader.GetBinaryReader().ReadULEB128UInt();
     templateParameters.resize(n);
@@ -121,7 +134,7 @@ void ConceptSymbol::Read(SymbolReader& reader)
     {
         boost::uuids::uuid templateParameterId;
         reader.GetBinaryReader().ReadUuid(templateParameterId);
-        GetSymbolTable()->EmplaceTypeRequest(this, templateParameterId, i);
+        reader.GetSymbolTable()->EmplaceTypeRequest(reader, this, templateParameterId, i);
     }
     conceptNode.reset(reader.GetAstReader().ReadConceptNode());
     hasSource = reader.GetBinaryReader().ReadBool();
@@ -143,12 +156,12 @@ void ConceptSymbol::EmplaceType(TypeSymbol* typeSymbol, int index)
         }
         else
         {
-            throw Exception(GetModule(), "invalid emplace type", GetSpan());
+            throw Exception(GetRootModuleForCurrentThread(), "invalid emplace type", GetSpan());
         }
     }
     else
     {
-        throw Exception(GetModule(), "invalid emplace type index", GetSpan());
+        throw Exception(GetRootModuleForCurrentThread(), "invalid emplace type index", GetSpan());
     }
 }
 
@@ -210,67 +223,87 @@ void ConceptSymbol::SetSpecifiers(Specifiers specifiers)
     SetAccess(accessSpecifiers);
     if ((specifiers & Specifiers::static_) != Specifiers::none)
     {
-        throw Exception(GetModule(), "concept symbol cannot be static", GetSpan());
+        throw Exception(GetRootModuleForCurrentThread(), "concept symbol cannot be static", GetSpan());
     }
     if ((specifiers & Specifiers::virtual_) != Specifiers::none)
     {
-        throw Exception(GetModule(), "concept symbol cannot be virtual", GetSpan());
+        throw Exception(GetRootModuleForCurrentThread(), "concept symbol cannot be virtual", GetSpan());
     }
     if ((specifiers & Specifiers::override_) != Specifiers::none)
     {
-        throw Exception(GetModule(), "concept symbol cannot be override", GetSpan());
+        throw Exception(GetRootModuleForCurrentThread(), "concept symbol cannot be override", GetSpan());
     }
     if ((specifiers & Specifiers::abstract_) != Specifiers::none)
     {
-        throw Exception(GetModule(), "concept symbol cannot be abstract", GetSpan());
+        throw Exception(GetRootModuleForCurrentThread(), "concept symbol cannot be abstract", GetSpan());
     }
     if ((specifiers & Specifiers::inline_) != Specifiers::none)
     {
-        throw Exception(GetModule(), "concept symbol cannot be inline", GetSpan());
+        throw Exception(GetRootModuleForCurrentThread(), "concept symbol cannot be inline", GetSpan());
     }
     if ((specifiers & Specifiers::explicit_) != Specifiers::none)
     {
-        throw Exception(GetModule(), "concept symbol cannot be explicit", GetSpan());
+        throw Exception(GetRootModuleForCurrentThread(), "concept symbol cannot be explicit", GetSpan());
     }
     if ((specifiers & Specifiers::external_) != Specifiers::none)
     {
-        throw Exception(GetModule(), "concept symbol cannot be external", GetSpan());
+        throw Exception(GetRootModuleForCurrentThread(), "concept symbol cannot be external", GetSpan());
     }
     if ((specifiers & Specifiers::suppress_) != Specifiers::none)
     {
-        throw Exception(GetModule(), "concept symbol cannot be suppressed", GetSpan());
+        throw Exception(GetRootModuleForCurrentThread(), "concept symbol cannot be suppressed", GetSpan());
     }
     if ((specifiers & Specifiers::default_) != Specifiers::none)
     {
-        throw Exception(GetModule(), "concept symbol cannot be default", GetSpan());
+        throw Exception(GetRootModuleForCurrentThread(), "concept symbol cannot be default", GetSpan());
     }
     if ((specifiers & Specifiers::constexpr_) != Specifiers::none)
     {
-        throw Exception(GetModule(), "concept symbol cannot be constexpr", GetSpan());
+        throw Exception(GetRootModuleForCurrentThread(), "concept symbol cannot be constexpr", GetSpan());
     }
     if ((specifiers & Specifiers::cdecl_) != Specifiers::none)
     {
-        throw Exception(GetModule(), "concept symbol cannot be decl", GetSpan());
+        throw Exception(GetRootModuleForCurrentThread(), "concept symbol cannot be decl", GetSpan());
     }
     if ((specifiers & Specifiers::nothrow_) != Specifiers::none)
     {
-        throw Exception(GetModule(), "concept symbol cannot be nothrow", GetSpan());
+        throw Exception(GetRootModuleForCurrentThread(), "concept symbol cannot be nothrow", GetSpan());
     }
     if ((specifiers & Specifiers::throw_) != Specifiers::none)
     {
-        throw Exception(GetModule(), "concept symbol cannot be throw", GetSpan());
+        throw Exception(GetRootModuleForCurrentThread(), "concept symbol cannot be throw", GetSpan());
     }
     if ((specifiers & Specifiers::new_) != Specifiers::none)
     {
-        throw Exception(GetModule(), "concept symbol cannot be new", GetSpan());
+        throw Exception(GetRootModuleForCurrentThread(), "concept symbol cannot be new", GetSpan());
     }
     if ((specifiers & Specifiers::const_) != Specifiers::none)
     {
-        throw Exception(GetModule(), "concept symbol cannot be const", GetSpan());
+        throw Exception(GetRootModuleForCurrentThread(), "concept symbol cannot be const", GetSpan());
     }
     if ((specifiers & Specifiers::unit_test_) != Specifiers::none)
     {
-        throw Exception(GetModule(), "concept symbol cannot be unit_test", GetSpan());
+        throw Exception(GetRootModuleForCurrentThread(), "concept symbol cannot be unit_test", GetSpan());
+    }
+}
+
+void ConceptSymbol::Check()
+{
+    ContainerSymbol::Check();
+    if (typeId.is_nil())
+    {
+        throw SymbolCheckException(GetRootModuleForCurrentThread(), "concept symbol has empty type id", GetSpan());
+    }
+    if (groupName.empty())
+    {
+        throw SymbolCheckException(GetRootModuleForCurrentThread(), "concept symbol has empty group name", GetSpan());
+    }
+    for (TemplateParameterSymbol* templateParameter : templateParameters)
+    {
+        if (!templateParameter)
+        {
+            throw SymbolCheckException(GetRootModuleForCurrentThread(), "concept symbol has no template parameter", GetSpan());
+        }
     }
 }
 

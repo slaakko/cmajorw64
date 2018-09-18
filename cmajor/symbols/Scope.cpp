@@ -5,10 +5,12 @@
 
 #include <cmajor/symbols/Scope.hpp>
 #include <cmajor/symbols/ContainerSymbol.hpp>
+#include <cmajor/symbols/ClassTypeSymbol.hpp>
 #include <cmajor/symbols/NamespaceSymbol.hpp>
 #include <cmajor/symbols/FunctionSymbol.hpp>
 #include <cmajor/symbols/Exception.hpp>
 #include <cmajor/symbols/GlobalFlags.hpp>
+#include <cmajor/symbols/Module.hpp>
 #include <cmajor/ast/Identifier.hpp>
 #include <cmajor/util/Unicode.hpp>
 #include <cmajor/util/Util.hpp>
@@ -22,31 +24,82 @@ Scope::~Scope()
 {
 }
 
-ContainerScope::ContainerScope() : base(), parent(), container(), symbolMap()
+ContainerScope::ContainerScope() : container(nullptr), parentScope(nullptr), symbolMap()
 {
+}
+
+ContainerScope* ContainerScope::BaseScope() const
+{
+    if (container)
+    {
+        if (container->GetSymbolType() == SymbolType::classTypeSymbol || container->GetSymbolType() == SymbolType::classTemplateSpecializationSymbol)
+        {
+            ClassTypeSymbol* cls = static_cast<ClassTypeSymbol*>(container);
+            ClassTypeSymbol* baseClass = cls->BaseClass();
+            if (baseClass)
+            {
+                return baseClass->GetContainerScope();
+            }
+        }
+    }
+    return nullptr;
+}
+
+ContainerScope* ContainerScope::ParentScope() const
+{
+    if (parentScope)
+    {
+        return parentScope;
+    }
+    if (container)
+    {
+        Symbol* parent = nullptr;
+        if (container->GetSymbolType() == SymbolType::classTemplateSpecializationSymbol)
+        {
+            ClassTemplateSpecializationSymbol* specialization = static_cast<ClassTemplateSpecializationSymbol*>(container);
+            ClassTypeSymbol* classTemplate = specialization->GetClassTemplate();
+            parent = classTemplate->Parent();
+        }
+        else
+        {
+            parent = container->Parent();
+        }
+        if (parent)
+        {
+            if (!parent->GetModule()->IsRootModule() && parent->GetSymbolType() == SymbolType::namespaceSymbol)
+            {
+                NamespaceSymbol* ns = static_cast<NamespaceSymbol*>(parent);
+                Module* rootModule = GetRootModuleForCurrentThread();
+                NamespaceSymbol* mappedNs = rootModule->GetSymbolTable().GetMappedNs(ns);
+                if (mappedNs)
+                {
+                    return mappedNs->GetContainerScope();
+                }
+            }
+            return parent->GetContainerScope();
+        }
+    }
+    return nullptr;
 }
 
 void ContainerScope::Install(Symbol* symbol)
 {
     auto it = symbolMap.find(symbol->Name());
-    if (symbol->GetSymbolType() != SymbolType::namespaceSymbol && symbol->GetSymbolType() != SymbolType::declarationBlock && it != symbolMap.cend())
+    if (symbol->GetSymbolType() != SymbolType::namespaceSymbol && 
+        symbol->GetSymbolType() != SymbolType::declarationBlock && 
+        it != symbolMap.cend())
     {
         Symbol* prev = it->second;
         if (prev != symbol)
         {
             const Span& defined = symbol->GetSpan();
             const Span& referenced = prev->GetSpan();
-            throw Exception(symbol->GetModule(), "symbol '" + ToUtf8(symbol->Name()) + "' already defined", defined, referenced);
+            throw Exception(GetRootModuleForCurrentThread(), "symbol '" + ToUtf8(symbol->Name()) + "' already defined", defined, referenced);
         }
     }
     else
     {
         symbolMap[symbol->Name()] = symbol;
-        if (symbol->IsContainerSymbol())
-        {
-            ContainerSymbol* containerSymbol = static_cast<ContainerSymbol*>(symbol);
-            containerSymbol->GetContainerScope()->SetParent(this);
-        }
     }
 }
 
@@ -183,9 +236,10 @@ Symbol* ContainerScope::Lookup(const std::u32string& name, ScopeLookup lookup) c
         }
         if ((lookup & ScopeLookup::base) != ScopeLookup::none)
         {
-            if (base)
+            ContainerScope* baseScope = BaseScope();
+            if (baseScope)
             {
-                Symbol* s = base->Lookup(name, lookup);
+                Symbol* s = baseScope->Lookup(name, lookup);
                 if (s)
                 {
                     return s;
@@ -194,9 +248,10 @@ Symbol* ContainerScope::Lookup(const std::u32string& name, ScopeLookup lookup) c
         }
         if ((lookup & ScopeLookup::parent) != ScopeLookup::none)
         {
-            if (parent)
+            ContainerScope* parentScope = ParentScope();
+            if (parentScope)
             {
-                Symbol* s = parent->Lookup(name, lookup);
+                Symbol* s = parentScope->Lookup(name, lookup);
                 if (s)
                 {
                     return s;
@@ -233,9 +288,10 @@ Symbol* ContainerScope::LookupQualified(const std::vector<std::u32string>& compo
     {
         if ((lookup & ScopeLookup::parent) != ScopeLookup::none)
         {
-            if (parent)
+            ContainerScope* parentScope = ParentScope();
+            if (parentScope)
             {
-                return parent->LookupQualified(components, lookup);
+                return parentScope->LookupQualified(components, lookup);
             }
             else
             {
@@ -261,7 +317,7 @@ void ContainerScope::Clear()
     symbolMap.clear();
 }
 
-NamespaceSymbol* ContainerScope::CreateNamespace(const std::u32string& qualifiedNsName, const Span& span, Module* originalModule)
+NamespaceSymbol* ContainerScope::CreateNamespace(const std::u32string& qualifiedNsName, const Span& span)
 {
     ContainerScope* scope = this;
     NamespaceSymbol* parentNs = scope->Ns();
@@ -278,17 +334,14 @@ NamespaceSymbol* ContainerScope::CreateNamespace(const std::u32string& qualified
             }
             else
             {
-                throw Exception(s->GetModule(), "symbol '" + ToUtf8(s->Name()) + "' does not denote a namespace", s->GetSpan());
+                throw Exception(GetRootModuleForCurrentThread(), "symbol '" + ToUtf8(s->Name()) + "' does not denote a namespace", s->GetSpan());
             }
         }
         else
         {
             NamespaceSymbol* newNs = new NamespaceSymbol(span, component);
-            newNs->SetSymbolTable(container->GetSymbolTable());
             newNs->SetModule(container->GetModule());
-            newNs->SetOriginalModule(originalModule);
             scope = newNs->GetContainerScope();
-            scope->SetParent(parentNs->GetContainerScope());
             parentNs->AddMember(newNs);
             parentNs = newNs;
         }
@@ -297,7 +350,7 @@ NamespaceSymbol* ContainerScope::CreateNamespace(const std::u32string& qualified
 }
 
 void ContainerScope::CollectViableFunctions(int arity, const std::u32string& groupName, std::unordered_set<ContainerScope*>& scopesLookedUp, ScopeLookup scopeLookup, 
-    std::unordered_set<FunctionSymbol*>& viableFunctions)
+    ViableFunctionSet& viableFunctions, Module* module)
 {
     if ((scopeLookup & ScopeLookup::this_) != ScopeLookup::none)
     {
@@ -310,23 +363,25 @@ void ContainerScope::CollectViableFunctions(int arity, const std::u32string& gro
                 if (symbol->GetSymbolType() == SymbolType::functionGroupSymbol)
                 {
                     FunctionGroupSymbol* functionGroupSymbol = static_cast<FunctionGroupSymbol*>(symbol);
-                    functionGroupSymbol->CollectViableFunctions(arity, viableFunctions);
+                    functionGroupSymbol->CollectViableFunctions(arity, viableFunctions, module);
                 }
             }
         }
     }
     if ((scopeLookup & ScopeLookup::base) != ScopeLookup::none)
     {
-        if (base)
+        ContainerScope* baseScope = BaseScope();
+        if (baseScope)
         {
-            base->CollectViableFunctions(arity, groupName, scopesLookedUp, scopeLookup, viableFunctions);
+            baseScope->CollectViableFunctions(arity, groupName, scopesLookedUp, scopeLookup, viableFunctions, module);
         }
     }
     if ((scopeLookup & ScopeLookup::parent) != ScopeLookup::none)
     {
-        if (parent)
+        ContainerScope* parentScope = ParentScope();
+        if (parentScope)
         {
-            parent->CollectViableFunctions(arity, groupName, scopesLookedUp, scopeLookup, viableFunctions);
+            parentScope->CollectViableFunctions(arity, groupName, scopesLookedUp, scopeLookup, viableFunctions, module);
         }
     }
 }
@@ -451,13 +506,14 @@ Symbol* FileScope::Lookup(const std::u32string& name, ScopeLookup lookup) const
     }
 }
 
-void FileScope::CollectViableFunctions(int arity, const std::u32string&  groupName, std::unordered_set<ContainerScope*>& scopesLookedUp, std::unordered_set<FunctionSymbol*>& viableFunctions) 
+void FileScope::CollectViableFunctions(int arity, const std::u32string&  groupName, std::unordered_set<ContainerScope*>& scopesLookedUp, ViableFunctionSet& viableFunctions, 
+    Module* module)
 {
     for (ContainerScope* containerScope : containerScopes)
     {
         if (scopesLookedUp.find(containerScope) == scopesLookedUp.cend())
         {
-            containerScope->CollectViableFunctions(arity, groupName, scopesLookedUp, ScopeLookup::this_, viableFunctions);
+            containerScope->CollectViableFunctions(arity, groupName, scopesLookedUp, ScopeLookup::this_, viableFunctions, module);
             scopesLookedUp.insert(containerScope);
         }
     }

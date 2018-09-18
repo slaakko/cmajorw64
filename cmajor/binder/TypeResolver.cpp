@@ -258,6 +258,7 @@ void TypeResolver::ResolveSymbol(Node& node, IdentifierNode* idNode, Symbol* sym
             {
                 NamespaceSymbol* ns = static_cast<NamespaceSymbol*>(symbol);
                 nsTypeSymbol.reset(new NamespaceTypeSymbol(ns));
+                symbolTable.SetTypeIdFor(nsTypeSymbol.get());
                 type = nsTypeSymbol.get();
                 break;
             }
@@ -393,8 +394,6 @@ void TypeResolver::Visit(DotNode& dotNode)
         {
             TemplateParameterSymbol* templateParameterSymbol = new TemplateParameterSymbol(dotNode.GetSpan(), name);
             templateParameterSymbol->SetModule(module);
-            templateParameterSymbol->SetOriginalModule(module);
-            templateParameterSymbol->SetSymbolTable(&symbolTable);
             symbolTable.SetTypeIdFor(templateParameterSymbol);
             type->AddMember(templateParameterSymbol);
             ResolveSymbol(dotNode, dotNode.MemberId(), templateParameterSymbol);

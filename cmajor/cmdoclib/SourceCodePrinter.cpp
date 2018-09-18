@@ -115,7 +115,7 @@ public:
     void UseInputLine();
     void WriteRestOfInput();
     std::u32string MakeSymbolRef(Symbol* symbol);
-    std::u32string MakeSymbolRef(Symbol* symbol, Module* module, Module* originalModule);
+    std::u32string MakeSymbolRef(Symbol* symbol, Module* module);
     void WriteToElement(dom::Element* element, const std::u32string& text);
     void WriteSpace(int n);
     void WriteLineNumber(const std::u32string& lineNumberText);
@@ -430,10 +430,10 @@ void SourceCodePrinter::WriteRestOfInput()
 
 std::u32string SourceCodePrinter::MakeSymbolRef(Symbol* symbol)
 {
-    return MakeSymbolRef(symbol, symbol->GetModule(), symbol->GetOriginalModule());
+    return MakeSymbolRef(symbol, symbol->GetModule());
 }
 
-std::u32string SourceCodePrinter::MakeSymbolRef(Symbol* symbol, Module* module, Module* originalModule)
+std::u32string SourceCodePrinter::MakeSymbolRef(Symbol* symbol, Module* module)
 {
     if (!symbol) return std::u32string();
     if (symbol->IsParentSymbol())
@@ -452,35 +452,7 @@ std::u32string SourceCodePrinter::MakeSymbolRef(Symbol* symbol, Module* module, 
                 file = U"index";
                 contentFilePath = "..";
             }
-            if (originalModule)
-            {
-                std::string libraryPrefix;
-                if (originalModule != symbolTable.GetModule())
-                {
-                    auto it = input->libraryPrefixMap.find(originalModule->Name());
-                    if (it != input->libraryPrefixMap.cend())
-                    {
-                        libraryPrefix = it->second;
-                        if (!libraryPrefix.empty())
-                        {
-                            libraryPrefix = Path::Combine("..", libraryPrefix);
-                        }
-                    }
-                    else
-                    {
-                        throw std::runtime_error("module '" + ToUtf8(originalModule->Name()) + "' not found in source code printer");
-                    }
-                    if (file == U"index")
-                    {
-                        contentFilePath = Path::Combine(Path::Combine("../..", libraryPrefix), ToUtf8(originalModule->Name()));
-                    }
-                    else
-                    {
-                        contentFilePath = Path::Combine(Path::Combine("../..", libraryPrefix), ToUtf8(originalModule->Name()) + "/doc");
-                    }
-                }
-            }
-            else if (module)
+            if (module)
             {
                 std::string libraryPrefix;
                 if (module != symbolTable.GetModule())
@@ -518,7 +490,7 @@ std::u32string SourceCodePrinter::MakeSymbolRef(Symbol* symbol, Module* module, 
     }
     else
     {
-        return MakeSymbolRef(symbol->Parent(), module, originalModule) + U"#" + symbol->Id();
+        return MakeSymbolRef(symbol->Parent(), module) + U"#" + symbol->Id();
     }
 }
 

@@ -8,18 +8,19 @@
 #include <cmajor/symbols/SymbolReader.hpp>
 #include <cmajor/symbols/SymbolTable.hpp>
 #include <cmajor/symbols/Exception.hpp>
+#include <cmajor/symbols/Module.hpp>
 #include <cmajor/util/Unicode.hpp>
 
 namespace cmajor { namespace symbols {
 
 using namespace cmajor::unicode;
 
-ArrayTypeSymbol::ArrayTypeSymbol(const Span& span_, const std::u32string& name_) : TypeSymbol(SymbolType::arrayTypeSymbol, span_, name_), elementType(nullptr), size(-1), irType(nullptr)
+ArrayTypeSymbol::ArrayTypeSymbol(const Span& span_, const std::u32string& name_) : TypeSymbol(SymbolType::arrayTypeSymbol, span_, name_), elementType(nullptr), size(-1)
 {
 }
 
 ArrayTypeSymbol::ArrayTypeSymbol(const Span& span_, const std::u32string& name_, TypeSymbol* elementType_, int64_t size_) : 
-    TypeSymbol(SymbolType::arrayTypeSymbol, span_, name_), elementType(elementType_), size(size_), irType(nullptr)
+    TypeSymbol(SymbolType::arrayTypeSymbol, span_, name_), elementType(elementType_), size(size_)
 {
 }
 
@@ -36,7 +37,7 @@ void ArrayTypeSymbol::Read(SymbolReader& reader)
     TypeSymbol::Read(reader);
     boost::uuids::uuid elementTypeId;
     reader.GetBinaryReader().ReadUuid(elementTypeId);
-    GetSymbolTable()->EmplaceTypeRequest(this, elementTypeId, 0);
+    reader.GetSymbolTable()->EmplaceTypeRequest(reader, this, elementTypeId, 0);
     size = reader.GetBinaryReader().ReadLong();
 }
 
@@ -48,7 +49,7 @@ void ArrayTypeSymbol::EmplaceType(TypeSymbol* typeSymbol, int index)
     }
     else
     {
-        throw Exception(GetModule(), "internal error: invalid array emplace type index " + std::to_string(index), GetSpan());
+        throw Exception(GetRootModuleForCurrentThread(), "internal error: invalid array emplace type index " + std::to_string(index), GetSpan());
     }
 }
 
@@ -56,20 +57,22 @@ llvm::Type* ArrayTypeSymbol::IrType(Emitter& emitter)
 {
     if (size == -1)
     {
-        throw Exception(GetModule(), "array '" + ToUtf8(FullName()) + "' size not defined", GetSpan());
+        throw Exception(GetRootModuleForCurrentThread(), "array '" + ToUtf8(FullName()) + "' size not defined", GetSpan());
     }
-    if (!irType)
+    llvm::Type* localIrType = emitter.GetIrType(this);
+    if (!localIrType)
     {
-        irType = llvm::ArrayType::get(elementType->IrType(emitter), size);
+        localIrType = llvm::ArrayType::get(elementType->IrType(emitter), size);
+        emitter.SetIrType(this, localIrType);
     }
-    return irType;
+    return localIrType;
 }
 
 llvm::Constant* ArrayTypeSymbol::CreateDefaultIrValue(Emitter& emitter)
 {
     if (size == -1)
     {
-        throw Exception(GetModule(), "array '" + ToUtf8(FullName()) + "' size not defined", GetSpan());
+        throw Exception(GetRootModuleForCurrentThread(), "array '" + ToUtf8(FullName()) + "' size not defined", GetSpan());
     }
     llvm::Type* irType = IrType(emitter);
     std::vector<llvm::Constant*> arrayOfDefaults;
@@ -98,6 +101,15 @@ Value* ArrayTypeSymbol::MakeValue() const
     return new ArrayValue(GetSpan(), const_cast<TypeSymbol*>(static_cast<const TypeSymbol*>(this)), std::move(elementValues));
 }
 
+void ArrayTypeSymbol::Check()
+{
+    TypeSymbol::Check();
+    if (!elementType)
+    {
+        throw SymbolCheckException(GetRootModuleForCurrentThread(), "array type has no element type", GetSpan());
+    }
+}
+
 ArrayLengthFunction::ArrayLengthFunction(const Span& span_, const std::u32string& name_) : FunctionSymbol(SymbolType::arrayLengthFunctionSymbol, span_, name_), arrayType(nullptr)
 {
 }
@@ -109,7 +121,7 @@ ArrayLengthFunction::ArrayLengthFunction(ArrayTypeSymbol* arrayType_) : Function
     ParameterSymbol* arrayParam = new ParameterSymbol(arrayType->GetSpan(), U"array");
     arrayParam->SetType(arrayType);
     AddMember(arrayParam);
-    TypeSymbol* longType = arrayType->GetSymbolTable()->GetTypeByName(U"long");
+    TypeSymbol* longType = GetRootModuleForCurrentThread()->GetSymbolTable().GetTypeByName(U"long"); 
     SetReturnType(longType);
     ComputeName();
 }
@@ -125,7 +137,7 @@ void ArrayLengthFunction::Read(SymbolReader& reader)
     FunctionSymbol::Read(reader);
     boost::uuids::uuid typeId;
     reader.GetBinaryReader().ReadUuid(typeId);
-    GetSymbolTable()->EmplaceTypeRequest(this, typeId, 1);
+    reader.GetSymbolTable()->EmplaceTypeRequest(reader, this, typeId, 1);
 }
 
 void ArrayLengthFunction::EmplaceType(TypeSymbol* typeSymbol, int index)
@@ -152,6 +164,15 @@ void ArrayLengthFunction::GenerateCall(Emitter& emitter, std::vector<GenObject*>
 std::unique_ptr<Value> ArrayLengthFunction::ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span) const
 {
     return std::unique_ptr<Value>(new LongValue(span, arrayType->Size()));
+}
+
+void ArrayLengthFunction::Check()
+{
+    FunctionSymbol::Check();
+    if (!arrayType)
+    {
+        throw SymbolCheckException(GetRootModuleForCurrentThread(), "array length function has no array type", GetSpan());
+    }
 }
 
 ArrayBeginFunction::ArrayBeginFunction(const Span& span_, const std::u32string& name_) : FunctionSymbol(SymbolType::arrayBeginFunctionSymbol, span_, name_), arrayType(nullptr)
@@ -181,7 +202,7 @@ void ArrayBeginFunction::Read(SymbolReader& reader)
     FunctionSymbol::Read(reader);
     boost::uuids::uuid typeId;
     reader.GetBinaryReader().ReadUuid(typeId);
-    GetSymbolTable()->EmplaceTypeRequest(this, typeId, 1);
+    reader.GetSymbolTable()->EmplaceTypeRequest(reader, this, typeId, 1);
 }
 
 void ArrayBeginFunction::EmplaceType(TypeSymbol* typeSymbol, int index)
@@ -208,6 +229,15 @@ void ArrayBeginFunction::GenerateCall(Emitter& emitter, std::vector<GenObject*>&
     elementIndeces.push_back(emitter.Builder().getInt64(0));
     llvm::Value* beginPtr = emitter.Builder().CreateGEP(arrayPtr, elementIndeces);
     emitter.Stack().Push(beginPtr);
+}
+
+void ArrayBeginFunction::Check()
+{
+    FunctionSymbol::Check();
+    if (!arrayType)
+    {
+        throw SymbolCheckException(GetRootModuleForCurrentThread(), "array begin function has no array type", GetSpan());
+    }
 }
 
 ArrayEndFunction::ArrayEndFunction(const Span& span_, const std::u32string& name_) : FunctionSymbol(SymbolType::arrayEndFunctionSymbol, span_, name_), arrayType(nullptr)
@@ -237,7 +267,7 @@ void ArrayEndFunction::Read(SymbolReader& reader)
     FunctionSymbol::Read(reader);
     boost::uuids::uuid typeId;
     reader.GetBinaryReader().ReadUuid(typeId);
-    GetSymbolTable()->EmplaceTypeRequest(this, typeId, 1);
+    reader.GetSymbolTable()->EmplaceTypeRequest(reader, this, typeId, 1);
 }
 
 void ArrayEndFunction::EmplaceType(TypeSymbol* typeSymbol, int index)
@@ -264,6 +294,15 @@ void ArrayEndFunction::GenerateCall(Emitter& emitter, std::vector<GenObject*>& g
     elementIndeces.push_back(emitter.Builder().getInt64(arrayType->Size()));
     llvm::Value* endPtr = emitter.Builder().CreateGEP(arrayPtr, elementIndeces);
     emitter.Stack().Push(endPtr);
+}
+
+void ArrayEndFunction::Check()
+{
+    FunctionSymbol::Check();
+    if (!arrayType)
+    {
+        throw SymbolCheckException(GetRootModuleForCurrentThread(), "array end function has no array type", GetSpan());
+    }
 }
 
 ArrayCBeginFunction::ArrayCBeginFunction(const Span& span_, const std::u32string& name_) : FunctionSymbol(SymbolType::arrayCBeginFunctionSymbol, span_, name_), arrayType(nullptr)
@@ -293,7 +332,7 @@ void ArrayCBeginFunction::Read(SymbolReader& reader)
     FunctionSymbol::Read(reader);
     boost::uuids::uuid typeId;
     reader.GetBinaryReader().ReadUuid(typeId);
-    GetSymbolTable()->EmplaceTypeRequest(this, typeId, 1);
+    reader.GetSymbolTable()->EmplaceTypeRequest(reader, this, typeId, 1);
 }
 
 void ArrayCBeginFunction::EmplaceType(TypeSymbol* typeSymbol, int index)
@@ -320,6 +359,15 @@ void ArrayCBeginFunction::GenerateCall(Emitter& emitter, std::vector<GenObject*>
     elementIndeces.push_back(emitter.Builder().getInt64(0));
     llvm::Value* beginPtr = emitter.Builder().CreateGEP(arrayPtr, elementIndeces);
     emitter.Stack().Push(beginPtr);
+}
+
+void ArrayCBeginFunction::Check()
+{
+    FunctionSymbol::Check();
+    if (!arrayType)
+    {
+        throw SymbolCheckException(GetRootModuleForCurrentThread(), "array cbegin function has no array type", GetSpan());
+    }
 }
 
 ArrayCEndFunction::ArrayCEndFunction(const Span& span_, const std::u32string& name_) : FunctionSymbol(SymbolType::arrayCEndFunctionSymbol, span_, name_), arrayType(nullptr)
@@ -349,7 +397,7 @@ void ArrayCEndFunction::Read(SymbolReader& reader)
     FunctionSymbol::Read(reader);
     boost::uuids::uuid typeId;
     reader.GetBinaryReader().ReadUuid(typeId);
-    GetSymbolTable()->EmplaceTypeRequest(this, typeId, 1);
+    reader.GetSymbolTable()->EmplaceTypeRequest(reader, this, typeId, 1);
 }
 
 void ArrayCEndFunction::EmplaceType(TypeSymbol* typeSymbol, int index)
@@ -378,6 +426,15 @@ void ArrayCEndFunction::GenerateCall(Emitter& emitter, std::vector<GenObject*>& 
     emitter.Stack().Push(endPtr);
 }
 
+void ArrayCEndFunction::Check()
+{
+    FunctionSymbol::Check();
+    if (!arrayType)
+    {
+        throw SymbolCheckException(GetRootModuleForCurrentThread(), "array cend function has no array type", GetSpan());
+    }
+}
+
 ArrayTypeDefaultConstructor::ArrayTypeDefaultConstructor(ArrayTypeSymbol* arrayType_, LocalVariableSymbol* loopVar_, FunctionSymbol* elementTypeDefaultConstructor_, const Span& span_) :
     FunctionSymbol(arrayType_->GetSpan(), U"@arrayDefaultCtor"), arrayType(arrayType_), loopVar(loopVar_), elementTypeDefaultConstructor(elementTypeDefaultConstructor_)
 {
@@ -394,14 +451,14 @@ void ArrayTypeDefaultConstructor::GenerateCall(Emitter& emitter, std::vector<Gen
     Assert(genObjects.size() == 1, "default constructor needs one object");
     genObjects[0]->Load(emitter, OperationFlags::addr);
     llvm::Value* ptr = emitter.Stack().Pop();
-    emitter.Builder().CreateStore(emitter.Builder().getInt64(0), loopVar->IrObject());
+    emitter.Builder().CreateStore(emitter.Builder().getInt64(0), loopVar->IrObject(emitter));
     llvm::Value* size = emitter.Builder().getInt64(arrayType->Size());
     llvm::BasicBlock* loop = llvm::BasicBlock::Create(emitter.Context(), "loop", emitter.Function());
     llvm::BasicBlock* init = llvm::BasicBlock::Create(emitter.Context(), "init", emitter.Function());
     llvm::BasicBlock* next = llvm::BasicBlock::Create(emitter.Context(), "next", emitter.Function());
     emitter.Builder().CreateBr(loop);
     emitter.SetCurrentBasicBlock(loop);
-    llvm::Value* index = emitter.Builder().CreateLoad(loopVar->IrObject());
+    llvm::Value* index = emitter.Builder().CreateLoad(loopVar->IrObject(emitter));
     llvm::Value* less = emitter.Builder().CreateICmpULT(index, size);
     emitter.Builder().CreateCondBr(less, init, next);
     emitter.SetCurrentBasicBlock(init);
@@ -414,9 +471,26 @@ void ArrayTypeDefaultConstructor::GenerateCall(Emitter& emitter, std::vector<Gen
     elementGenObjects.push_back(&elementPtrValue);
     elementTypeDefaultConstructor->GenerateCall(emitter, elementGenObjects, OperationFlags::none, span);
     llvm::Value* nextI = emitter.Builder().CreateAdd(index, emitter.Builder().getInt64(1));
-    emitter.Builder().CreateStore(nextI, loopVar->IrObject());
+    emitter.Builder().CreateStore(nextI, loopVar->IrObject(emitter));
     emitter.Builder().CreateBr(loop);
     emitter.SetCurrentBasicBlock(next);
+}
+
+void ArrayTypeDefaultConstructor::Check()
+{
+    FunctionSymbol::Check();
+    if (!arrayType)
+    {
+        throw SymbolCheckException(GetRootModuleForCurrentThread(), "array default constructor has no array type", GetSpan());
+    }
+    if (!loopVar)
+    {
+        throw SymbolCheckException(GetRootModuleForCurrentThread(), "array default constructor has no loop variable", GetSpan());
+    }
+    if (!elementTypeDefaultConstructor)
+    {
+        throw SymbolCheckException(GetRootModuleForCurrentThread(), "array default constructor has no element type default constructor", GetSpan());
+    }
 }
 
 ArrayTypeCopyConstructor::ArrayTypeCopyConstructor(ArrayTypeSymbol* arrayType_, LocalVariableSymbol* loopVar_, FunctionSymbol* elementTypeCopyConstructor_, const Span& span_) :
@@ -440,14 +514,14 @@ void ArrayTypeCopyConstructor::GenerateCall(Emitter& emitter, std::vector<GenObj
     llvm::Value* ptr = emitter.Stack().Pop();
     genObjects[1]->Load(emitter, OperationFlags::none);
     llvm::Value* sourcePtr = emitter.Stack().Pop();
-    emitter.Builder().CreateStore(emitter.Builder().getInt64(0), loopVar->IrObject());
+    emitter.Builder().CreateStore(emitter.Builder().getInt64(0), loopVar->IrObject(emitter));
     llvm::Value* size = emitter.Builder().getInt64(arrayType->Size());
     llvm::BasicBlock* loop = llvm::BasicBlock::Create(emitter.Context(), "loop", emitter.Function());
     llvm::BasicBlock* init = llvm::BasicBlock::Create(emitter.Context(), "init", emitter.Function());
     llvm::BasicBlock* next = llvm::BasicBlock::Create(emitter.Context(), "next", emitter.Function());
     emitter.Builder().CreateBr(loop);
     emitter.SetCurrentBasicBlock(loop);
-    llvm::Value* index = emitter.Builder().CreateLoad(loopVar->IrObject());
+    llvm::Value* index = emitter.Builder().CreateLoad(loopVar->IrObject(emitter));
     llvm::Value* less = emitter.Builder().CreateICmpULT(index, size);
     emitter.Builder().CreateCondBr(less, init, next);
     emitter.SetCurrentBasicBlock(init);
@@ -469,9 +543,26 @@ void ArrayTypeCopyConstructor::GenerateCall(Emitter& emitter, std::vector<GenObj
     elementGenObjects.push_back(&sourceValue);
     elementTypeCopyConstructor->GenerateCall(emitter, elementGenObjects, OperationFlags::none, span);
     llvm::Value* nextI = emitter.Builder().CreateAdd(index, emitter.Builder().getInt64(1));
-    emitter.Builder().CreateStore(nextI, loopVar->IrObject());
+    emitter.Builder().CreateStore(nextI, loopVar->IrObject(emitter));
     emitter.Builder().CreateBr(loop);
     emitter.SetCurrentBasicBlock(next);
+}
+
+void ArrayTypeCopyConstructor::Check()
+{
+    FunctionSymbol::Check();
+    if (!arrayType)
+    {
+        throw SymbolCheckException(GetRootModuleForCurrentThread(), "array copy constructor has no array type", GetSpan());
+    }
+    if (!loopVar)
+    {
+        throw SymbolCheckException(GetRootModuleForCurrentThread(), "array copy constructor has no loop variable", GetSpan());
+    }
+    if (!elementTypeCopyConstructor)
+    {
+        throw SymbolCheckException(GetRootModuleForCurrentThread(), "array copy constructor has no element type copy constructor", GetSpan());
+    }
 }
 
 ArrayTypeMoveConstructor::ArrayTypeMoveConstructor(ArrayTypeSymbol* arrayType_, LocalVariableSymbol* loopVar_, FunctionSymbol* elementTypeMoveConstructor_, const Span& span_) :
@@ -495,14 +586,14 @@ void ArrayTypeMoveConstructor::GenerateCall(Emitter& emitter, std::vector<GenObj
     llvm::Value* ptr = emitter.Stack().Pop();
     genObjects[1]->Load(emitter, OperationFlags::none);
     llvm::Value* sourcePtr = emitter.Stack().Pop();
-    emitter.Builder().CreateStore(emitter.Builder().getInt64(0), loopVar->IrObject());
+    emitter.Builder().CreateStore(emitter.Builder().getInt64(0), loopVar->IrObject(emitter));
     llvm::Value* size = emitter.Builder().getInt64(arrayType->Size());
     llvm::BasicBlock* loop = llvm::BasicBlock::Create(emitter.Context(), "loop", emitter.Function());
     llvm::BasicBlock* init = llvm::BasicBlock::Create(emitter.Context(), "init", emitter.Function());
     llvm::BasicBlock* next = llvm::BasicBlock::Create(emitter.Context(), "next", emitter.Function());
     emitter.Builder().CreateBr(loop);
     emitter.SetCurrentBasicBlock(loop);
-    llvm::Value* index = emitter.Builder().CreateLoad(loopVar->IrObject());
+    llvm::Value* index = emitter.Builder().CreateLoad(loopVar->IrObject(emitter));
     llvm::Value* less = emitter.Builder().CreateICmpULT(index, size);
     emitter.Builder().CreateCondBr(less, init, next);
     emitter.SetCurrentBasicBlock(init);
@@ -518,9 +609,26 @@ void ArrayTypeMoveConstructor::GenerateCall(Emitter& emitter, std::vector<GenObj
     elementGenObjects.push_back(&sourcePtrValue);
     elementTypeMoveConstructor->GenerateCall(emitter, elementGenObjects, OperationFlags::none, span);
     llvm::Value* nextI = emitter.Builder().CreateAdd(index, emitter.Builder().getInt64(1));
-    emitter.Builder().CreateStore(nextI, loopVar->IrObject());
+    emitter.Builder().CreateStore(nextI, loopVar->IrObject(emitter));
     emitter.Builder().CreateBr(loop);
     emitter.SetCurrentBasicBlock(next);
+}
+
+void ArrayTypeMoveConstructor::Check()
+{
+    FunctionSymbol::Check();
+    if (!arrayType)
+    {
+        throw SymbolCheckException(GetRootModuleForCurrentThread(), "array move constructor has no array type", GetSpan());
+    }
+    if (!loopVar)
+    {
+        throw SymbolCheckException(GetRootModuleForCurrentThread(), "array move constructor has no loop variable", GetSpan());
+    }
+    if (!elementTypeMoveConstructor)
+    {
+        throw SymbolCheckException(GetRootModuleForCurrentThread(), "array move constructor has no element type move constructor", GetSpan());
+    }
 }
 
 ArrayTypeCopyAssignment::ArrayTypeCopyAssignment(ArrayTypeSymbol* arrayType_, LocalVariableSymbol* loopVar_, FunctionSymbol* elementTypeCopyAssignment_, const Span& span_) :
@@ -534,7 +642,7 @@ ArrayTypeCopyAssignment::ArrayTypeCopyAssignment(ArrayTypeSymbol* arrayType_, Lo
     ParameterSymbol* thatParam = new ParameterSymbol(span_, U"that");
     thatParam->SetType(arrayType->AddConst(span_)->AddLvalueReference(span_));
     AddMember(thatParam);
-    TypeSymbol* voidType = arrayType->GetSymbolTable()->GetTypeByName(U"void");
+    TypeSymbol* voidType = GetRootModuleForCurrentThread()->GetSymbolTable().GetTypeByName(U"void");
     SetReturnType(voidType);
     ComputeName();
 }
@@ -546,14 +654,14 @@ void ArrayTypeCopyAssignment::GenerateCall(Emitter& emitter, std::vector<GenObje
     llvm::Value* ptr = emitter.Stack().Pop();
     genObjects[1]->Load(emitter, OperationFlags::none);
     llvm::Value* sourcePtr = emitter.Stack().Pop();
-    emitter.Builder().CreateStore(emitter.Builder().getInt64(0), loopVar->IrObject());
+    emitter.Builder().CreateStore(emitter.Builder().getInt64(0), loopVar->IrObject(emitter));
     llvm::Value* size = emitter.Builder().getInt64(arrayType->Size());
     llvm::BasicBlock* loop = llvm::BasicBlock::Create(emitter.Context(), "loop", emitter.Function());
     llvm::BasicBlock* init = llvm::BasicBlock::Create(emitter.Context(), "init", emitter.Function());
     llvm::BasicBlock* next = llvm::BasicBlock::Create(emitter.Context(), "next", emitter.Function());
     emitter.Builder().CreateBr(loop);
     emitter.SetCurrentBasicBlock(loop);
-    llvm::Value* index = emitter.Builder().CreateLoad(loopVar->IrObject());
+    llvm::Value* index = emitter.Builder().CreateLoad(loopVar->IrObject(emitter));
     llvm::Value* less = emitter.Builder().CreateICmpULT(index, size);
     emitter.Builder().CreateCondBr(less, init, next);
     emitter.SetCurrentBasicBlock(init);
@@ -575,9 +683,26 @@ void ArrayTypeCopyAssignment::GenerateCall(Emitter& emitter, std::vector<GenObje
     elementGenObjects.push_back(&sourceValue);
     elementTypeCopyAssignment->GenerateCall(emitter, elementGenObjects, OperationFlags::none, span);
     llvm::Value* nextI = emitter.Builder().CreateAdd(index, emitter.Builder().getInt64(1));
-    emitter.Builder().CreateStore(nextI, loopVar->IrObject());
+    emitter.Builder().CreateStore(nextI, loopVar->IrObject(emitter));
     emitter.Builder().CreateBr(loop);
     emitter.SetCurrentBasicBlock(next);
+}
+
+void ArrayTypeCopyAssignment::Check()
+{
+    FunctionSymbol::Check();
+    if (!arrayType)
+    {
+        throw SymbolCheckException(GetRootModuleForCurrentThread(), "array copy assignment has no array type", GetSpan());
+    }
+    if (!loopVar)
+    {
+        throw SymbolCheckException(GetRootModuleForCurrentThread(), "array copy assignment has no loop variable", GetSpan());
+    }
+    if (!elementTypeCopyAssignment)
+    {
+        throw SymbolCheckException(GetRootModuleForCurrentThread(), "array copy assignmet has no element type copy assignment", GetSpan());
+    }
 }
 
 ArrayTypeMoveAssignment::ArrayTypeMoveAssignment(ArrayTypeSymbol* arrayType_, LocalVariableSymbol* loopVar_, FunctionSymbol* elementTypeMoveAssignment_, const Span& span_) :
@@ -591,7 +716,7 @@ ArrayTypeMoveAssignment::ArrayTypeMoveAssignment(ArrayTypeSymbol* arrayType_, Lo
     ParameterSymbol* thatParam = new ParameterSymbol(span_, U"that");
     thatParam->SetType(arrayType->AddRvalueReference(span_));
     AddMember(thatParam);
-    TypeSymbol* voidType = arrayType->GetSymbolTable()->GetTypeByName(U"void");
+    TypeSymbol* voidType = GetRootModuleForCurrentThread()->GetSymbolTable().GetTypeByName(U"void");
     SetReturnType(voidType);
     ComputeName();
 }
@@ -603,14 +728,14 @@ void ArrayTypeMoveAssignment::GenerateCall(Emitter& emitter, std::vector<GenObje
     llvm::Value* ptr = emitter.Stack().Pop();
     genObjects[1]->Load(emitter, OperationFlags::none);
     llvm::Value* sourcePtr = emitter.Stack().Pop();
-    emitter.Builder().CreateStore(emitter.Builder().getInt64(0), loopVar->IrObject());
+    emitter.Builder().CreateStore(emitter.Builder().getInt64(0), loopVar->IrObject(emitter));
     llvm::Value* size = emitter.Builder().getInt64(arrayType->Size());
     llvm::BasicBlock* loop = llvm::BasicBlock::Create(emitter.Context(), "loop", emitter.Function());
     llvm::BasicBlock* init = llvm::BasicBlock::Create(emitter.Context(), "init", emitter.Function());
     llvm::BasicBlock* next = llvm::BasicBlock::Create(emitter.Context(), "next", emitter.Function());
     emitter.Builder().CreateBr(loop);
     emitter.SetCurrentBasicBlock(loop);
-    llvm::Value* index = emitter.Builder().CreateLoad(loopVar->IrObject());
+    llvm::Value* index = emitter.Builder().CreateLoad(loopVar->IrObject(emitter));
     llvm::Value* less = emitter.Builder().CreateICmpULT(index, size);
     emitter.Builder().CreateCondBr(less, init, next);
     emitter.SetCurrentBasicBlock(init);
@@ -627,9 +752,26 @@ void ArrayTypeMoveAssignment::GenerateCall(Emitter& emitter, std::vector<GenObje
     elementGenObjects.push_back(&sourcePtrValue);
     elementTypeMoveAssignment->GenerateCall(emitter, elementGenObjects, OperationFlags::none, span);
     llvm::Value* nextI = emitter.Builder().CreateAdd(index, emitter.Builder().getInt64(1));
-    emitter.Builder().CreateStore(nextI, loopVar->IrObject());
+    emitter.Builder().CreateStore(nextI, loopVar->IrObject(emitter));
     emitter.Builder().CreateBr(loop);
     emitter.SetCurrentBasicBlock(next);
+}
+
+void ArrayTypeMoveAssignment::Check()
+{
+    FunctionSymbol::Check();
+    if (!arrayType)
+    {
+        throw SymbolCheckException(GetRootModuleForCurrentThread(), "array move assignment has no array type", GetSpan());
+    }
+    if (!loopVar)
+    {
+        throw SymbolCheckException(GetRootModuleForCurrentThread(), "array move assignment has no loop variable", GetSpan());
+    }
+    if (!elementTypeMoveAssignment)
+    {
+        throw SymbolCheckException(GetRootModuleForCurrentThread(), "array move assignmet has no element type move assignment", GetSpan());
+    }
 }
 
 ArrayTypeElementAccess::ArrayTypeElementAccess(ArrayTypeSymbol* arrayType_, const Span& span_) : FunctionSymbol(arrayType_->GetSpan(), U"@arrayElementAccess"), arrayType(arrayType_)
@@ -640,7 +782,7 @@ ArrayTypeElementAccess::ArrayTypeElementAccess(ArrayTypeSymbol* arrayType_, cons
     arrayParam->SetType(arrayType);
     AddMember(arrayParam);
     ParameterSymbol* indexParam = new ParameterSymbol(span_, U"index");
-    indexParam->SetType(arrayType->GetSymbolTable()->GetTypeByName(U"long"));
+    indexParam->SetType(GetRootModuleForCurrentThread()->GetSymbolTable().GetTypeByName(U"long"));
     AddMember(indexParam);
     TypeSymbol* returnType = arrayType->ElementType();
     if (!returnType->IsBasicTypeSymbol() && !returnType->IsPointerType() && returnType->GetSymbolType() != SymbolType::delegateTypeSymbol)
@@ -672,6 +814,15 @@ void ArrayTypeElementAccess::GenerateCall(Emitter& emitter, std::vector<GenObjec
     else
     {
         emitter.Stack().Push(elementPtr);
+    }
+}
+
+void ArrayTypeElementAccess::Check()
+{
+    FunctionSymbol::Check();
+    if (!arrayType)
+    {
+        throw SymbolCheckException(GetRootModuleForCurrentThread(), "array type element access has no array type", GetSpan());
     }
 }
 

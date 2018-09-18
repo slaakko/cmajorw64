@@ -10,6 +10,7 @@
 #include <cmajor/symbols/SymbolReader.hpp>
 #include <cmajor/symbols/Exception.hpp>
 #include <cmajor/symbols/SymbolCollector.hpp>
+#include <cmajor/symbols/Module.hpp>
 #include <cmajor/util/Unicode.hpp>
 #include <llvm/IR/Module.h>
 #include <boost/uuid/uuid_io.hpp>
@@ -18,7 +19,7 @@ namespace cmajor { namespace symbols {
 
 using namespace cmajor::unicode;
 
-DelegateTypeSymbol::DelegateTypeSymbol(const Span& span_, const std::u32string& name_) : TypeSymbol(SymbolType::delegateTypeSymbol, span_, name_), returnType(), parameters(), irType(nullptr)
+DelegateTypeSymbol::DelegateTypeSymbol(const Span& span_, const std::u32string& name_) : TypeSymbol(SymbolType::delegateTypeSymbol, span_, name_), returnType(), parameters()
 {
 }
 
@@ -40,7 +41,7 @@ void DelegateTypeSymbol::Read(SymbolReader& reader)
     TypeSymbol::Read(reader);
     boost::uuids::uuid returnTypeId;
     reader.GetBinaryReader().ReadUuid(returnTypeId);
-    GetSymbolTable()->EmplaceTypeRequest(this, returnTypeId, 0);
+    reader.GetSymbolTable()->EmplaceTypeRequest(reader, this, returnTypeId, 0);
     bool hasReturnParam = reader.GetBinaryReader().ReadBool();
     if (hasReturnParam)
     {
@@ -99,39 +100,6 @@ std::u32string DelegateTypeSymbol::Id() const
     return MangledName();
 }
 
-void DelegateTypeSymbol::ComputeExportClosure()
-{
-    if (IsProject())
-    {
-        for (ParameterSymbol* parameter : parameters)
-        {
-            if (!parameter->ExportComputed())
-            {
-                parameter->SetExportComputed();
-                parameter->ComputeExportClosure();
-            }
-        }
-        if (returnParam)
-        {
-            if (!returnParam->ExportComputed())
-            {
-                returnParam->SetExportComputed();
-                returnParam->ComputeExportClosure();
-            }
-        }
-        if (returnType)
-        {
-            if (!returnType->ExportComputed())
-            {
-                returnType->SetExportComputed();
-                returnType->ComputeExportClosure();
-            }
-        }
-        AddConst(GetSpan())->AddLvalueReference(GetSpan())->ComputeExportClosure();
-        AddRvalueReference(GetSpan())->ComputeExportClosure();
-    }
-}
-
 void DelegateTypeSymbol::Accept(SymbolCollector* collector)
 {
     if (IsProject() && Access() == SymbolAccess::public_)
@@ -144,13 +112,13 @@ void DelegateTypeSymbol::Dump(CodeFormatter& formatter)
 {
     formatter.WriteLine(ToUtf8(Name()));
     formatter.WriteLine("full name: " + ToUtf8(FullNameWithSpecifiers()));
-    //formatter.WriteLine("typeid: " + std::to_string(TypeId()));
     formatter.WriteLine("typeid: " + boost::uuids::to_string(TypeId()));
 }
 
 llvm::Type* DelegateTypeSymbol::IrType(Emitter& emitter)
 {
-    if (!irType)
+    llvm::Type* localIrType = emitter.GetIrType(this);
+    if (!localIrType)
     {
         llvm::Type* retType = llvm::Type::getVoidTy(emitter.Context());
         if (!returnType->IsVoidType() && !ReturnsClassInterfaceOrClassDelegateByValue())
@@ -168,9 +136,11 @@ llvm::Type* DelegateTypeSymbol::IrType(Emitter& emitter)
         {
             paramTypes.push_back(returnParam->GetType()->IrType(emitter));
         }
-        irType = llvm::PointerType::get(llvm::FunctionType::get(retType, paramTypes, false), 0);
+        localIrType = llvm::PointerType::get(llvm::FunctionType::get(retType, paramTypes, false), 0);
+        //emitter.SetIrType(TypeId(), localIrType);
+        emitter.SetIrType(this, localIrType);
     }
-    return irType;
+    return localIrType;
 }
 
 llvm::Constant* DelegateTypeSymbol::CreateDefaultIrValue(Emitter& emitter)
@@ -184,47 +154,47 @@ void DelegateTypeSymbol::SetSpecifiers(Specifiers specifiers)
     SetAccess(accessSpecifiers);
     if ((specifiers & Specifiers::static_) != Specifiers::none)
     {
-        throw Exception(GetModule(), "delegate cannot be static", GetSpan());
+        throw Exception(GetRootModuleForCurrentThread(), "delegate cannot be static", GetSpan());
     }
     if ((specifiers & Specifiers::virtual_) != Specifiers::none)
     {
-        throw Exception(GetModule(), "delegate cannot be virtual", GetSpan());
+        throw Exception(GetRootModuleForCurrentThread(), "delegate cannot be virtual", GetSpan());
     }
     if ((specifiers & Specifiers::override_) != Specifiers::none)
     {
-        throw Exception(GetModule(), "delegate cannot be override", GetSpan());
+        throw Exception(GetRootModuleForCurrentThread(), "delegate cannot be override", GetSpan());
     }
     if ((specifiers & Specifiers::abstract_) != Specifiers::none)
     {
-        throw Exception(GetModule(), "delegate cannot be abstract", GetSpan());
+        throw Exception(GetRootModuleForCurrentThread(), "delegate cannot be abstract", GetSpan());
     }
     if ((specifiers & Specifiers::inline_) != Specifiers::none)
     {
-        throw Exception(GetModule(), "delegate cannot be inline", GetSpan());
+        throw Exception(GetRootModuleForCurrentThread(), "delegate cannot be inline", GetSpan());
     }
     if ((specifiers & Specifiers::explicit_) != Specifiers::none)
     {
-        throw Exception(GetModule(), "delegate cannot be explicit", GetSpan());
+        throw Exception(GetRootModuleForCurrentThread(), "delegate cannot be explicit", GetSpan());
     }
     if ((specifiers & Specifiers::external_) != Specifiers::none)
     {
-        throw Exception(GetModule(), "delegate cannot be external", GetSpan());
+        throw Exception(GetRootModuleForCurrentThread(), "delegate cannot be external", GetSpan());
     }
     if ((specifiers & Specifiers::suppress_) != Specifiers::none)
     {
-        throw Exception(GetModule(), "delegate cannot be suppressed", GetSpan());
+        throw Exception(GetRootModuleForCurrentThread(), "delegate cannot be suppressed", GetSpan());
     }
     if ((specifiers & Specifiers::default_) != Specifiers::none)
     {
-        throw Exception(GetModule(), "delegate cannot be default", GetSpan());
+        throw Exception(GetRootModuleForCurrentThread(), "delegate cannot be default", GetSpan());
     }
     if ((specifiers & Specifiers::constexpr_) != Specifiers::none)
     {
-        throw Exception(GetModule(), "delegate cannot be constexpr", GetSpan());
+        throw Exception(GetRootModuleForCurrentThread(), "delegate cannot be constexpr", GetSpan());
     }
     if ((specifiers & Specifiers::cdecl_) != Specifiers::none)
     {
-        throw Exception(GetModule(), "delegate cannot be cdecl", GetSpan());
+        throw Exception(GetRootModuleForCurrentThread(), "delegate cannot be cdecl", GetSpan());
     }
     if ((specifiers & Specifiers::nothrow_) != Specifiers::none)
     {
@@ -234,20 +204,20 @@ void DelegateTypeSymbol::SetSpecifiers(Specifiers specifiers)
     {
         if (IsNothrow())
         {
-            throw Exception(GetModule(), "delegate cannot be throw and nothrow at the same time", GetSpan());
+            throw Exception(GetRootModuleForCurrentThread(), "delegate cannot be throw and nothrow at the same time", GetSpan());
         }
     }
     if ((specifiers & Specifiers::new_) != Specifiers::none)
     {
-        throw Exception(GetModule(), "delegate cannot be new", GetSpan());
+        throw Exception(GetRootModuleForCurrentThread(), "delegate cannot be new", GetSpan());
     }
     if ((specifiers & Specifiers::const_) != Specifiers::none)
     {
-        throw Exception(GetModule(), "delegate cannot be const", GetSpan());
+        throw Exception(GetRootModuleForCurrentThread(), "delegate cannot be const", GetSpan());
     }
     if ((specifiers & Specifiers::unit_test_) != Specifiers::none)
     {
-        throw Exception(GetModule(), "delegate cannot be unit_test", GetSpan());
+        throw Exception(GetRootModuleForCurrentThread(), "delegate cannot be unit_test", GetSpan());
     }
 }
 
@@ -394,6 +364,16 @@ void DelegateTypeSymbol::GenerateCall(Emitter& emitter, std::vector<GenObject*>&
     }
 }
 
+void DelegateTypeSymbol::Check()
+{
+    TypeSymbol::Check();
+    if (!returnType)
+    {
+        throw SymbolCheckException(GetRootModuleForCurrentThread(), "delegate type symbol has no return type", GetSpan());
+    }
+
+}
+
 DelegateTypeDefaultConstructor::DelegateTypeDefaultConstructor(const Span& span_, const std::u32string& name_) : FunctionSymbol(SymbolType::delegateTypeDefaultConstructor, span_, name_)
 {
 }
@@ -420,7 +400,7 @@ void DelegateTypeDefaultConstructor::Read(SymbolReader& reader)
     FunctionSymbol::Read(reader);
     boost::uuids::uuid typeId;
     reader.GetBinaryReader().ReadUuid(typeId);
-    GetSymbolTable()->EmplaceTypeRequest(this, typeId, 1);
+    reader.GetSymbolTable()->EmplaceTypeRequest(reader, this, typeId, 1);
 }
 
 void DelegateTypeDefaultConstructor::EmplaceType(TypeSymbol* typeSymbol, int index)
@@ -441,6 +421,15 @@ void DelegateTypeDefaultConstructor::GenerateCall(Emitter& emitter, std::vector<
     Assert(genObjects.size() == 1, "default constructor needs one object");
     emitter.Stack().Push(delegateType->CreateDefaultIrValue(emitter));
     genObjects[0]->Store(emitter, OperationFlags::none);
+}
+
+void DelegateTypeDefaultConstructor::Check()
+{
+    FunctionSymbol::Check();
+    if (!delegateType)
+    {
+        throw SymbolCheckException(GetRootModuleForCurrentThread(), "delegate type default constructor has no delegate type", GetSpan());
+    }
 }
 
 DelegateTypeCopyConstructor::DelegateTypeCopyConstructor(const Span& span_, const std::u32string& name_) : FunctionSymbol(SymbolType::delegateTypeCopyConstructor, span_, name_)
@@ -609,8 +598,26 @@ void FunctionToDelegateConversion::GenerateCall(Emitter& emitter, std::vector<Ge
     emitter.Stack().Push(emitter.Module()->getOrInsertFunction(ToUtf8(function->MangledName()), function->IrType(emitter)));
 }
 
+void FunctionToDelegateConversion::Check()
+{
+    FunctionSymbol::Check();
+    if (!sourceType)
+    {
+        throw SymbolCheckException(GetRootModuleForCurrentThread(), "function to delegate conversion has no source type", GetSpan());
+    }
+    if (!targetType)
+    {
+        throw SymbolCheckException(GetRootModuleForCurrentThread(), "function to delegate conversion has no target type", GetSpan());
+    }
+    if (!function)
+    {
+        throw SymbolCheckException(GetRootModuleForCurrentThread(), "function to delegate conversion has no function", GetSpan());
+    }
+}
+
 ClassDelegateTypeSymbol::ClassDelegateTypeSymbol(const Span& span_, const std::u32string& name_) : 
-    TypeSymbol(SymbolType::classDelegateTypeSymbol, span_, name_), returnType(nullptr), parameters(), delegateType(nullptr), objectDelegatePairType(nullptr), irType(nullptr), copyConstructor(nullptr)
+    TypeSymbol(SymbolType::classDelegateTypeSymbol, span_, name_), returnType(nullptr), parameters(), delegateType(nullptr), objectDelegatePairType(nullptr), 
+    copyConstructor(nullptr)
 {
 }
 
@@ -626,7 +633,7 @@ void ClassDelegateTypeSymbol::Read(SymbolReader& reader)
     TypeSymbol::Read(reader);
     boost::uuids::uuid returnTypeId;
     reader.GetBinaryReader().ReadUuid(returnTypeId);
-    GetSymbolTable()->EmplaceTypeRequest(this, returnTypeId, -1);
+    reader.GetSymbolTable()->EmplaceTypeRequest(reader, this, returnTypeId, -1);
 }
 
 void ClassDelegateTypeSymbol::EmplaceType(TypeSymbol* typeSymbol, int index)
@@ -638,39 +645,6 @@ void ClassDelegateTypeSymbol::EmplaceType(TypeSymbol* typeSymbol, int index)
     else
     {
         TypeSymbol::EmplaceType(typeSymbol, index);
-    }
-}
-
-void ClassDelegateTypeSymbol::ComputeExportClosure()
-{
-    if (IsProject())
-    {
-        for (ParameterSymbol* parameter : parameters)
-        {
-            if (!parameter->ExportComputed())
-            {
-                parameter->SetExportComputed();
-                parameter->ComputeExportClosure();
-            }
-        }
-        if (returnParam)
-        {
-            if (!returnParam->ExportComputed())
-            {
-                returnParam->SetExportComputed();
-                returnParam->ComputeExportClosure();
-            }
-        }
-        if (returnType)
-        {
-            if (!returnType->ExportComputed())
-            {
-                returnType->SetExportComputed();
-                returnType->ComputeExportClosure();
-            }
-        }
-        AddConst(GetSpan())->AddLvalueReference(GetSpan())->ComputeExportClosure();
-        AddRvalueReference(GetSpan())->ComputeExportClosure();
     }
 }
 
@@ -752,14 +726,16 @@ void ClassDelegateTypeSymbol::Dump(CodeFormatter& formatter)
 
 llvm::Type* ClassDelegateTypeSymbol::IrType(Emitter& emitter)
 {
-    if (!irType)
+    llvm::Type* localIrType = emitter.GetIrType(this);
+    if (!localIrType)
     {
         std::vector<llvm::Type*> elementTypes;
         elementTypes.push_back(emitter.Builder().getInt8PtrTy());
         elementTypes.push_back(delegateType->IrType(emitter));
-        irType = llvm::StructType::get(emitter.Context(), elementTypes);
+        localIrType = llvm::StructType::get(emitter.Context(), elementTypes);
+        emitter.SetIrType(this, localIrType);
     }
-    return irType;
+    return localIrType;
 }
 
 llvm::Constant* ClassDelegateTypeSymbol::CreateDefaultIrValue(Emitter& emitter)
@@ -786,47 +762,47 @@ void ClassDelegateTypeSymbol::SetSpecifiers(Specifiers specifiers)
     SetAccess(accessSpecifiers);
     if ((specifiers & Specifiers::static_) != Specifiers::none)
     {
-        throw Exception(GetModule(), "class delegate cannot be static", GetSpan());
+        throw Exception(GetRootModuleForCurrentThread(), "class delegate cannot be static", GetSpan());
     }
     if ((specifiers & Specifiers::virtual_) != Specifiers::none)
     {
-        throw Exception(GetModule(), "class delegate cannot be virtual", GetSpan());
+        throw Exception(GetRootModuleForCurrentThread(), "class delegate cannot be virtual", GetSpan());
     }
     if ((specifiers & Specifiers::override_) != Specifiers::none)
     {
-        throw Exception(GetModule(), "class delegate cannot be override", GetSpan());
+        throw Exception(GetRootModuleForCurrentThread(), "class delegate cannot be override", GetSpan());
     }
     if ((specifiers & Specifiers::abstract_) != Specifiers::none)
     {
-        throw Exception(GetModule(), "class delegate cannot be abstract", GetSpan());
+        throw Exception(GetRootModuleForCurrentThread(), "class delegate cannot be abstract", GetSpan());
     }
     if ((specifiers & Specifiers::inline_) != Specifiers::none)
     {
-        throw Exception(GetModule(), "class delegate cannot be inline", GetSpan());
+        throw Exception(GetRootModuleForCurrentThread(), "class delegate cannot be inline", GetSpan());
     }
     if ((specifiers & Specifiers::explicit_) != Specifiers::none)
     {
-        throw Exception(GetModule(), "class delegate cannot be explicit", GetSpan());
+        throw Exception(GetRootModuleForCurrentThread(), "class delegate cannot be explicit", GetSpan());
     }
     if ((specifiers & Specifiers::external_) != Specifiers::none)
     {
-        throw Exception(GetModule(), "class delegate cannot be external", GetSpan());
+        throw Exception(GetRootModuleForCurrentThread(), "class delegate cannot be external", GetSpan());
     }
     if ((specifiers & Specifiers::suppress_) != Specifiers::none)
     {
-        throw Exception(GetModule(), "class delegate cannot be suppressed", GetSpan());
+        throw Exception(GetRootModuleForCurrentThread(), "class delegate cannot be suppressed", GetSpan());
     }
     if ((specifiers & Specifiers::default_) != Specifiers::none)
     {
-        throw Exception(GetModule(), "class delegate cannot be default", GetSpan());
+        throw Exception(GetRootModuleForCurrentThread(), "class delegate cannot be default", GetSpan());
     }
     if ((specifiers & Specifiers::constexpr_) != Specifiers::none)
     {
-        throw Exception(GetModule(), "class delegate cannot be constexpr", GetSpan());
+        throw Exception(GetRootModuleForCurrentThread(), "class delegate cannot be constexpr", GetSpan());
     }
     if ((specifiers & Specifiers::cdecl_) != Specifiers::none)
     {
-        throw Exception(GetModule(), "class delegate cannot be cdecl", GetSpan());
+        throw Exception(GetRootModuleForCurrentThread(), "class delegate cannot be cdecl", GetSpan());
     }
     if ((specifiers & Specifiers::nothrow_) != Specifiers::none)
     {
@@ -836,20 +812,20 @@ void ClassDelegateTypeSymbol::SetSpecifiers(Specifiers specifiers)
     {
         if (IsNothrow())
         {
-            throw Exception(GetModule(), "class delegate cannot be throw and nothrow at the same time", GetSpan());
+            throw Exception(GetRootModuleForCurrentThread(), "class delegate cannot be throw and nothrow at the same time", GetSpan());
         }
     }
     if ((specifiers & Specifiers::new_) != Specifiers::none)
     {
-        throw Exception(GetModule(), "class delegate cannot be new", GetSpan());
+        throw Exception(GetRootModuleForCurrentThread(), "class delegate cannot be new", GetSpan());
     }
     if ((specifiers & Specifiers::const_) != Specifiers::none)
     {
-        throw Exception(GetModule(), "class delegate cannot be const", GetSpan());
+        throw Exception(GetRootModuleForCurrentThread(), "class delegate cannot be const", GetSpan());
     }
     if ((specifiers & Specifiers::unit_test_) != Specifiers::none)
     {
-        throw Exception(GetModule(), "class delegate cannot be unit_test", GetSpan());
+        throw Exception(GetRootModuleForCurrentThread(), "class delegate cannot be unit_test", GetSpan());
     }
 }
 
@@ -882,6 +858,27 @@ void ClassDelegateTypeSymbol::GenerateCall(Emitter& emitter, std::vector<GenObje
     delegateType->GenerateCall(emitter, classDelegateCallObjects, flags, span);
 }
 
+void ClassDelegateTypeSymbol::Check()
+{
+    TypeSymbol::Check();
+    if (!returnType)
+    {
+        throw SymbolCheckException(GetRootModuleForCurrentThread(), "class delegate type symbol has no return type", GetSpan());
+    }
+    if (!delegateType)
+    {
+        throw SymbolCheckException(GetRootModuleForCurrentThread(), "class delegate type symbol has no delegate type", GetSpan());
+    }
+    if (!objectDelegatePairType)
+    {
+        throw SymbolCheckException(GetRootModuleForCurrentThread(), "class delegate type symbol has no object delegate pair type", GetSpan());
+    }
+    if (!copyConstructor)
+    {
+        throw SymbolCheckException(GetRootModuleForCurrentThread(), "class delegate type symbol has no copy constructor", GetSpan());
+    }
+}
+
 ClassDelegateTypeDefaultConstructor::ClassDelegateTypeDefaultConstructor(const Span& span_, const std::u32string& name_) : 
     FunctionSymbol(SymbolType::classDelegateTypeDefaultConstructor, span_, name_)
 {
@@ -909,7 +906,7 @@ void ClassDelegateTypeDefaultConstructor::Read(SymbolReader& reader)
     FunctionSymbol::Read(reader);
     boost::uuids::uuid typeId;
     reader.GetBinaryReader().ReadUuid(typeId);
-    GetSymbolTable()->EmplaceTypeRequest(this, typeId, 1);
+    reader.GetSymbolTable()->EmplaceTypeRequest(reader, this, typeId, 1);
 }
 
 void ClassDelegateTypeDefaultConstructor::EmplaceType(TypeSymbol* typeSymbol, int index)
@@ -942,6 +939,15 @@ void ClassDelegateTypeDefaultConstructor::GenerateCall(Emitter& emitter, std::ve
     delegateIndeces.push_back(emitter.Builder().getInt32(1));
     llvm::Value* delegatePtr = emitter.Builder().CreateGEP(ptr, delegateIndeces);
     emitter.Builder().CreateStore(delegateValue, delegatePtr);
+}
+
+void ClassDelegateTypeDefaultConstructor::Check()
+{
+    FunctionSymbol::Check();
+    if (!classDelegateType)
+    {
+        throw SymbolCheckException(GetRootModuleForCurrentThread(), "class delegate type default constructor has no class delegate type", GetSpan());
+    }
 }
 
 ClassDelegateTypeCopyConstructor::ClassDelegateTypeCopyConstructor(const Span& span_, const std::u32string& name_) :
@@ -1174,11 +1180,11 @@ void MemberFunctionToClassDelegateConversion::GenerateCall(Emitter& emitter, std
     llvm::Value* objectValue = emitter.Stack().Pop();
     if (!objectValue)
     {
-        throw Exception(GetModule(), "cannot construct class delegate because expression has no this pointer", GetSpan());
+        throw Exception(GetRootModuleForCurrentThread(), "cannot construct class delegate because expression has no this pointer", GetSpan());
     }
     llvm::Value* objectValueAsVoidPtr = emitter.Builder().CreateBitCast(objectValue, emitter.Builder().getInt8PtrTy());
     llvm::Value* memFunPtrValue = emitter.Module()->getOrInsertFunction(ToUtf8(function->MangledName()), function->IrType(emitter));
-    llvm::Value* ptr = objectDelegatePairVariable->IrObject();
+    llvm::Value* ptr = objectDelegatePairVariable->IrObject(emitter);
     ArgVector objectIndeces;
     objectIndeces.push_back(emitter.Builder().getInt32(0));
     objectIndeces.push_back(emitter.Builder().getInt32(0));
@@ -1191,6 +1197,27 @@ void MemberFunctionToClassDelegateConversion::GenerateCall(Emitter& emitter, std
     llvm::Value* delegateValue = emitter.Builder().CreateBitCast(memFunPtrValue, targetType->DelegateType()->IrType(emitter));
     emitter.Builder().CreateStore(delegateValue, delegatePtr);
     emitter.Stack().Push(ptr);
+}
+
+void MemberFunctionToClassDelegateConversion::Check()
+{
+    FunctionSymbol::Check();
+    if (!sourceType)
+    {
+        throw SymbolCheckException(GetRootModuleForCurrentThread(), "member function to class delegate conversion has no source type", GetSpan());
+    }
+    if (!targetType)
+    {
+        throw SymbolCheckException(GetRootModuleForCurrentThread(), "member function to class delegate conversion has no target type", GetSpan());
+    }
+    if (!function)
+    {
+        throw SymbolCheckException(GetRootModuleForCurrentThread(), "member function to class delegate conversion has no function", GetSpan());
+    }
+    if (!objectDelegatePairVariable)
+    {
+        throw SymbolCheckException(GetRootModuleForCurrentThread(), "member function to class delegate conversion has no object delegate pair", GetSpan());
+    }
 }
 
 } } // namespace cmajor::symbols

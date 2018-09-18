@@ -8,13 +8,14 @@
 #include <cmajor/symbols/Exception.hpp>
 #include <cmajor/symbols/SymbolCollector.hpp>
 #include <cmajor/symbols/SymbolTable.hpp>
+#include <cmajor/symbols/Module.hpp>
 #include <cmajor/util/Unicode.hpp>
 
 namespace cmajor { namespace symbols {
 
 using namespace cmajor::unicode;
 
-InterfaceTypeSymbol::InterfaceTypeSymbol(const Span& span_, const std::u32string& name_) : TypeSymbol(SymbolType::interfaceTypeSymbol, span_, name_), irType(nullptr), copyConstructor(nullptr)
+InterfaceTypeSymbol::InterfaceTypeSymbol(const Span& span_, const std::u32string& name_) : TypeSymbol(SymbolType::interfaceTypeSymbol, span_, name_), copyConstructor(nullptr)
 {
 }
 
@@ -43,80 +44,82 @@ void InterfaceTypeSymbol::SetSpecifiers(Specifiers specifiers)
     SetAccess(accessSpecifiers);
     if ((specifiers & Specifiers::static_) != Specifiers::none)
     {
-        throw Exception(GetModule(), "interface cannot be static", GetSpan());
+        throw Exception(GetRootModuleForCurrentThread(), "interface cannot be static", GetSpan());
     }
     if ((specifiers & Specifiers::virtual_) != Specifiers::none)
     {
-        throw Exception(GetModule(), "interface cannot be virtual", GetSpan());
+        throw Exception(GetRootModuleForCurrentThread(), "interface cannot be virtual", GetSpan());
     }
     if ((specifiers & Specifiers::override_) != Specifiers::none)
     {
-        throw Exception(GetModule(), "interface cannot be override", GetSpan());
+        throw Exception(GetRootModuleForCurrentThread(), "interface cannot be override", GetSpan());
     }
     if ((specifiers & Specifiers::abstract_) != Specifiers::none)
     {
-        throw Exception(GetModule(), "interface cannot be abstract", GetSpan());
+        throw Exception(GetRootModuleForCurrentThread(), "interface cannot be abstract", GetSpan());
     }
     if ((specifiers & Specifiers::inline_) != Specifiers::none)
     {
-        throw Exception(GetModule(), "interface cannot be inline", GetSpan());
+        throw Exception(GetRootModuleForCurrentThread(), "interface cannot be inline", GetSpan());
     }
     if ((specifiers & Specifiers::explicit_) != Specifiers::none)
     {
-        throw Exception(GetModule(), "interface cannot be explicit", GetSpan());
+        throw Exception(GetRootModuleForCurrentThread(), "interface cannot be explicit", GetSpan());
     }
     if ((specifiers & Specifiers::external_) != Specifiers::none)
     {
-        throw Exception(GetModule(), "interface cannot be external", GetSpan());
+        throw Exception(GetRootModuleForCurrentThread(), "interface cannot be external", GetSpan());
     }
     if ((specifiers & Specifiers::suppress_) != Specifiers::none)
     {
-        throw Exception(GetModule(), "interface cannot be suppressed", GetSpan());
+        throw Exception(GetRootModuleForCurrentThread(), "interface cannot be suppressed", GetSpan());
     }
     if ((specifiers & Specifiers::default_) != Specifiers::none)
     {
-        throw Exception(GetModule(), "interface cannot be default", GetSpan());
+        throw Exception(GetRootModuleForCurrentThread(), "interface cannot be default", GetSpan());
     }
     if ((specifiers & Specifiers::constexpr_) != Specifiers::none)
     {
-        throw Exception(GetModule(), "interface cannot be constexpr", GetSpan());
+        throw Exception(GetRootModuleForCurrentThread(), "interface cannot be constexpr", GetSpan());
     }
     if ((specifiers & Specifiers::cdecl_) != Specifiers::none)
     {
-        throw Exception(GetModule(), "interface cannot be cdecl", GetSpan());
+        throw Exception(GetRootModuleForCurrentThread(), "interface cannot be cdecl", GetSpan());
     }
     if ((specifiers & Specifiers::nothrow_) != Specifiers::none)
     {
-        throw Exception(GetModule(), "interface cannot be nothrow", GetSpan());
+        throw Exception(GetRootModuleForCurrentThread(), "interface cannot be nothrow", GetSpan());
     }
     if ((specifiers & Specifiers::throw_) != Specifiers::none)
     {
-        throw Exception(GetModule(), "interface cannot be throw", GetSpan());
+        throw Exception(GetRootModuleForCurrentThread(), "interface cannot be throw", GetSpan());
     }
     if ((specifiers & Specifiers::new_) != Specifiers::none)
     {
-        throw Exception(GetModule(), "interface cannot be new", GetSpan());
+        throw Exception(GetRootModuleForCurrentThread(), "interface cannot be new", GetSpan());
     }
     if ((specifiers & Specifiers::const_) != Specifiers::none)
     {
-        throw Exception(GetModule(), "interface cannot be const", GetSpan());
+        throw Exception(GetRootModuleForCurrentThread(), "interface cannot be const", GetSpan());
     }
     if ((specifiers & Specifiers::unit_test_) != Specifiers::none)
     {
-        throw Exception(GetModule(), "interface cannot be unit_test", GetSpan());
+        throw Exception(GetRootModuleForCurrentThread(), "interface cannot be unit_test", GetSpan());
     }
 }
 
 llvm::Type* InterfaceTypeSymbol::IrType(Emitter& emitter)
 {
-    if (!irType)
+    llvm::Type* localIrType = emitter.GetIrType(this);
+    if (!localIrType)
     {
         std::vector<llvm::Type*> elemTypes;
         elemTypes.push_back(emitter.Builder().getInt8PtrTy());
         elemTypes.push_back(emitter.Builder().getInt8PtrTy());
-        irType = llvm::StructType::get(emitter.Context(), elemTypes);
+        localIrType = llvm::StructType::get(emitter.Context(), elemTypes);
+        emitter.SetIrType(this, localIrType);
     }
-    return irType;
+    return localIrType;
 }
 
 llvm::Constant* InterfaceTypeSymbol::CreateDefaultIrValue(Emitter& emitter)
@@ -283,6 +286,18 @@ void InterfaceTypeSymbol::GenerateCall(Emitter& emitter, std::vector<GenObject*>
     }
 }
 
+void InterfaceTypeSymbol::Check()
+{
+    TypeSymbol::Check();
+    for (MemberFunctionSymbol* memberFunction : memberFunctions)
+    {
+        if (!memberFunction)
+        {
+            throw SymbolCheckException(GetRootModuleForCurrentThread(), "interface type symbol contains null member function", GetSpan());
+        }
+    }
+}
+
 InterfaceTypeDefaultConstructor::InterfaceTypeDefaultConstructor(InterfaceTypeSymbol* interfaceType_, const Span& span_) : FunctionSymbol(span_, U"@interfaceDefaultCtor")
 {
     SetGroupName(U"@constructor");
@@ -413,7 +428,7 @@ InterfaceTypeCopyAssignment::InterfaceTypeCopyAssignment(InterfaceTypeSymbol* in
     ParameterSymbol* thatParam = new ParameterSymbol(span_, U"that");
     thatParam->SetType(interfaceType_->AddConst(span_)->AddLvalueReference(span_));
     AddMember(thatParam);
-    TypeSymbol* voidType = interfaceType_->GetSymbolTable()->GetTypeByName(U"void");
+    TypeSymbol* voidType = GetRootModuleForCurrentThread()->GetSymbolTable().GetTypeByName(U"void");
     SetReturnType(voidType);
     ComputeName();
 }
@@ -458,7 +473,7 @@ InterfaceTypeMoveAssignment::InterfaceTypeMoveAssignment(InterfaceTypeSymbol* in
     ParameterSymbol* thatParam = new ParameterSymbol(span_, U"that");
     thatParam->SetType(interfaceType_->AddRvalueReference(span_));
     AddMember(thatParam);
-    TypeSymbol* voidType = interfaceType_->GetSymbolTable()->GetTypeByName(U"void");
+    TypeSymbol* voidType = GetRootModuleForCurrentThread()->GetSymbolTable().GetTypeByName(U"void");
     SetReturnType(voidType);
     ComputeName();
 }
@@ -507,7 +522,7 @@ void ClassToInterfaceConversion::GenerateCall(Emitter& emitter, std::vector<GenO
     ArgVector objectIndeces;
     objectIndeces.push_back(emitter.Builder().getInt32(0));
     objectIndeces.push_back(emitter.Builder().getInt32(0));
-    llvm::Value* objectPtr = emitter.Builder().CreateGEP(temporaryInterfaceObjectVar->IrObject(), objectIndeces);
+    llvm::Value* objectPtr = emitter.Builder().CreateGEP(temporaryInterfaceObjectVar->IrObject(emitter), objectIndeces);
     emitter.Builder().CreateStore(classPtrAsVoidPtr, objectPtr);
     llvm::Value* vmtObjectPtr = sourceClassType->VmtObject(emitter, false);
     ArgVector imtsArrayIndeces;
@@ -523,9 +538,26 @@ void ClassToInterfaceConversion::GenerateCall(Emitter& emitter, std::vector<GenO
     ArgVector imtIndeces;
     imtIndeces.push_back(emitter.Builder().getInt32(0));
     imtIndeces.push_back(emitter.Builder().getInt32(1));
-    llvm::Value* imtPtr = emitter.Builder().CreateGEP(temporaryInterfaceObjectVar->IrObject(), imtIndeces);
+    llvm::Value* imtPtr = emitter.Builder().CreateGEP(temporaryInterfaceObjectVar->IrObject(emitter), imtIndeces);
     emitter.Builder().CreateStore(imt, imtPtr);
-    emitter.Stack().Push(temporaryInterfaceObjectVar->IrObject());
+    emitter.Stack().Push(temporaryInterfaceObjectVar->IrObject(emitter));
+}
+
+void ClassToInterfaceConversion::Check()
+{
+    FunctionSymbol::Check();
+    if (!sourceClassType)
+    {
+        throw SymbolCheckException(GetRootModuleForCurrentThread(), "class to interface conversion has no source class type", GetSpan());
+    }
+    if (!targetInterfaceType)
+    {
+        throw SymbolCheckException(GetRootModuleForCurrentThread(), "class to interface conversion has no target interface type", GetSpan());
+    }
+    if (!temporaryInterfaceObjectVar)
+    {
+        throw SymbolCheckException(GetRootModuleForCurrentThread(), "class to interface conversion has no temporary interface object variable", GetSpan());
+    }
 }
 
 } } // namespace cmajor::symbols

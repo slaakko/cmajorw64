@@ -46,7 +46,7 @@ void InlineFunctionRepository::Instantiate(FunctionSymbol* inlineFunction, Conta
     Node* node = symbolTable.GetNodeNoThrow(inlineFunction);
     if (!node)
     {
-        inlineFunction->ReadAstNodes();
+        //inlineFunction->ReadAstNodes();
         node = inlineFunction->GetFunctionNode();
         Assert(node, "function node not read");
     }

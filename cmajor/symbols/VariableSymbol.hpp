@@ -27,6 +27,7 @@ public:
     void SetType(TypeSymbol* typeSymbol) { type = typeSymbol; }
     std::u32string Info() const override { return Name(); }
     const char* ClassName() const override { return "VariableSymbol"; }
+    void Check() override;
 private:
     TypeSymbol* type;
 };
@@ -39,7 +40,6 @@ public:
     void Read(SymbolReader& reader) override;
     SymbolAccess DeclaredAccess() const override { return SymbolAccess::public_; }
     std::string TypeString() const override { return "parameter"; }
-    void ComputeExportClosure() override;
     std::unique_ptr<dom::Element> CreateDomElement(TypeMap& typeMap) override;
     const char* ClassName() const override { return "ParameterSymbol"; }
     bool ArtificialName() const { return artificialName; }
@@ -66,7 +66,6 @@ public:
     void Write(SymbolWriter& writer) override;
     void Read(SymbolReader& reader) override;
     bool IsExportSymbol() const override;
-    void ComputeExportClosure() override;
     void Accept(SymbolCollector* collector) override;
     void Dump(CodeFormatter& formatter) override;
     std::string TypeString() const override { return "variable"; }
@@ -77,10 +76,9 @@ public:
     llvm::DIDerivedType* GetDIMemberType(Emitter& emitter, uint64_t offsetInBits);
     std::unique_ptr<dom::Element> CreateDomElement(TypeMap& typeMap) override;
     const char* ClassName() const override { return "MemberVariableSymbol"; }
+    void Check() override;
 private:
     int32_t layoutIndex;
-    int32_t compileUnitIndex;
-    llvm::DIDerivedType* diMemberType;
 };
 
 } } // namespace cmajor::symbols

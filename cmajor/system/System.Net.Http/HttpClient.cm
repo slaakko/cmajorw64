@@ -103,7 +103,7 @@ namespace System.Net.Http
         {
             return baseAddress;
         }
-        public void SetBaseAddress(UriReference baseAddress_)
+        public void SetBaseAddress(const UriReference& baseAddress_)
         {
             baseAddress = baseAddress_;
         }

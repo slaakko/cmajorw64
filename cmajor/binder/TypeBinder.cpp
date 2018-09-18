@@ -240,7 +240,6 @@ void TypeBinder::BindClassTemplate(ClassTypeSymbol* classTemplate, ClassNode* cl
     }
     ClassTemplateSpecializationSymbol* prototype = symbolTable.MakeClassTemplateSpecialization(classTemplate, templateArgumentTypes, classTemplate->GetSpan());
     prototype->SetPrototype();
-    prototype->MarkExport();
     prototype->SetAccess(SymbolAccess::public_);
     boundCompileUnit.GetClassTemplateRepository().BindClassTemplateSpecialization(prototype, containerScope, classTemplate->GetSpan());
     classTemplate->SetPrototype(prototype);
@@ -330,10 +329,6 @@ void TypeBinder::BindClass(ClassTypeSymbol* classTypeSymbol, ClassNode* classNod
     {
         Node* member = classNode->Members()[i];
         member->Accept(*this);
-    }
-    if (classTypeSymbol->BaseClass())
-    {
-        classTypeSymbol->GetContainerScope()->SetBase(classTypeSymbol->BaseClass()->GetContainerScope());
     }
     boundCompileUnit.GetAttributeBinder()->BindAttributes(classNode->GetAttributes(), classTypeSymbol, boundCompileUnit, containerScope);
     classTypeSymbol->InitVmt();
@@ -746,6 +741,11 @@ void TypeBinder::Visit(MemberVariableNode& memberVariableNode)
     if (memberVariableType->IsClassTypeSymbol() && memberVariableType->IsProject() && !memberVariableType->IsBound() && !GetGlobalFlag(GlobalFlags::info))
     {
         ClassTypeSymbol* memberVariableClassType = static_cast<ClassTypeSymbol*>(memberVariableType);
+        if (memberVariableClassType->GetSymbolType() == SymbolType::classTemplateSpecializationSymbol)
+        {
+            boundCompileUnit.GetClassTemplateRepository().BindClassTemplateSpecialization(static_cast<ClassTemplateSpecializationSymbol*>(memberVariableClassType),
+                containerScope, memberVariableNode.GetSpan());
+        }
         Node* node = symbolTable.GetNode(memberVariableClassType);
         Assert(node->GetNodeType() == NodeType::classNode, "class node expected");
         ClassNode* classNode = static_cast<ClassNode*>(node);
@@ -852,9 +852,7 @@ void TypeBinder::Visit(ClassDelegateNode& classDelegateNode)
     classDelegateTypeSymbol->SetSpecifiers(classDelegateNode.GetSpecifiers());
     classDelegateTypeSymbol->ComputeMangledName();
     DelegateTypeSymbol* memberDelegateType = new DelegateTypeSymbol(classDelegateNode.GetSpan(), U"@dlg_type");
-    memberDelegateType->SetSymbolTable(&symbolTable);
     memberDelegateType->SetModule(module);
-    memberDelegateType->SetOriginalModule(module);
     symbolTable.SetTypeIdFor(memberDelegateType);
     ParameterSymbol* objectParam = new ParameterSymbol(classDelegateNode.GetSpan(), U"@obj");
     TypeSymbol* voidPtrType = symbolTable.GetTypeByName(U"void")->AddPointer(classDelegateNode.GetSpan());
@@ -893,6 +891,7 @@ void TypeBinder::Visit(ClassDelegateNode& classDelegateNode)
     }
     classDelegateTypeSymbol->AddMember(memberDelegateType);
     ClassTypeSymbol* objectDelegatePairType = new ClassTypeSymbol(classDelegateNode.GetSpan(), U"@objectDelegatePairType");
+    objectDelegatePairType->SetGroupName(U"@objectDelegatePairType");
     MemberVariableSymbol* objVar = new MemberVariableSymbol(classDelegateNode.GetSpan(), U"@obj");
     objVar->SetType(voidPtrType);
     MemberVariableSymbol* dlgVar = new MemberVariableSymbol(classDelegateNode.GetSpan(), U"@dlg");
@@ -900,7 +899,10 @@ void TypeBinder::Visit(ClassDelegateNode& classDelegateNode)
     objectDelegatePairType->AddMember(objVar);
     objectDelegatePairType->AddMember(dlgVar);
     symbolTable.SetTypeIdFor(objectDelegatePairType);
+    objectDelegatePairType->InitVmt();
+    objectDelegatePairType->InitImts();
     objectDelegatePairType->CreateLayouts();
+    objectDelegatePairType->SetBound();
     classDelegateTypeSymbol->AddMember(objectDelegatePairType);
     ClassDelegateTypeDefaultConstructor* defaultConstructor = new ClassDelegateTypeDefaultConstructor(classDelegateTypeSymbol);
     symbolTable.SetFunctionIdFor(defaultConstructor);
@@ -1314,10 +1316,12 @@ void TypeBinder::Visit(EnumTypeNode& enumTypeNode)
     enumTypeSymbol->Ns()->AddMember(equality);
     EnumTypeToUnderlyingTypeConversion* enum2underlying = new EnumTypeToUnderlyingTypeConversion(enumTypeNode.GetSpan(), U"enum2underlying", enumTypeSymbol, underlyingType);
     symbolTable.SetFunctionIdFor(enum2underlying);
+    enum2underlying->SetParent(enumTypeSymbol);
     symbolTable.AddConversion(enum2underlying);
     enumTypeSymbol->AddMember(enum2underlying);
     UnderlyingTypeToEnumTypeConversion* underlying2enum = new UnderlyingTypeToEnumTypeConversion(enumTypeNode.GetSpan(), U"underlying2enum", underlyingType, enumTypeSymbol);
     symbolTable.SetFunctionIdFor(underlying2enum);
+    underlying2enum->SetParent(enumTypeSymbol);
     symbolTable.AddConversion(underlying2enum);
     enumTypeSymbol->AddMember(underlying2enum);
     containerScope = prevContainerScope;

@@ -28,6 +28,7 @@
     <ClInclude Include="ConstantSymbol.hpp" />
     <ClInclude Include="ContainerSymbol.hpp" />
     <ClInclude Include="ConversionTable.hpp" />
+    <ClInclude Include="DebugFlags.hpp" />
     <ClInclude Include="DelegateSymbol.hpp" />
     <ClInclude Include="DerivedTypeSymbol.hpp" />
     <ClInclude Include="EnumSymbol.hpp" />
@@ -38,6 +39,7 @@
     <ClInclude Include="InterfaceTypeSymbol.hpp" />
     <ClInclude Include="Meta.hpp" />
     <ClInclude Include="Module.hpp" />
+    <ClInclude Include="ModuleCache.hpp" />
     <ClInclude Include="NamespaceSymbol.hpp" />
     <ClInclude Include="Operation.hpp" />
     <ClInclude Include="Scope.hpp" />
@@ -65,6 +67,7 @@
     <ClCompile Include="ConstantSymbol.cpp" />
     <ClCompile Include="ContainerSymbol.cpp" />
     <ClCompile Include="ConversionTable.cpp" />
+    <ClCompile Include="DebugFlags.cpp" />
     <ClCompile Include="DelegateSymbol.cpp" />
     <ClCompile Include="DerivedTypeSymbol.cpp" />
     <ClCompile Include="EnumSymbol.cpp" />
@@ -75,6 +78,7 @@
     <ClCompile Include="InterfaceTypeSymbol.cpp" />
     <ClCompile Include="Meta.cpp" />
     <ClCompile Include="Module.cpp" />
+    <ClCompile Include="ModuleCache.cpp" />
     <ClCompile Include="NamespaceSymbol.cpp" />
     <ClCompile Include="Operation.cpp" />
     <ClCompile Include="Scope.cpp" />

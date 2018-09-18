@@ -9,8 +9,10 @@
 #include <cmajor/symbols/SymbolTable.hpp>
 #include <cmajor/symbols/SymbolWriter.hpp>
 #include <cmajor/symbols/SymbolReader.hpp>
+#include <cmajor/symbols/Module.hpp>
 #include <cmajor/symbols/Exception.hpp>
 #include <cmajor/symbols/ConceptSymbol.hpp>
+#include <cmajor/symbols/DebugFlags.hpp>
 #include <cmajor/util/Unicode.hpp>
 
 namespace cmajor { namespace symbols {
@@ -54,14 +56,15 @@ void ContainerSymbol::Read(SymbolReader& reader)
 
 void ContainerSymbol::AddMember(Symbol* member)
 {
-    member->SetSymbolTable(GetSymbolTable());
+#ifdef IMMUTABLE_MODULE_CHECK
+    if (GetModule() && GetModule()->IsImmutable())
+    {
+        throw ModuleImmutableException(GetRootModuleForCurrentThread(), GetModule(), GetSpan(), member->GetSpan());
+    }
+#endif
     if (GetModule())
     {
         member->SetModule(GetModule());
-    }
-    if (!member->GetOriginalModule() && GetOriginalModule())
-    {
-        member->SetOriginalModule(GetOriginalModule());
     }
     member->SetParent(this);
     members.push_back(std::unique_ptr<Symbol>(member));
@@ -70,7 +73,6 @@ void ContainerSymbol::AddMember(Symbol* member)
         FunctionSymbol* functionSymbol = static_cast<FunctionSymbol*>(member);
         FunctionGroupSymbol* functionGroupSymbol = MakeFunctionGroupSymbol(functionSymbol->GroupName(), functionSymbol->GetSpan());
         functionGroupSymbol->AddFunction(functionSymbol);
-        functionSymbol->GetContainerScope()->SetParent(GetContainerScope());
         functionIndexMap[functionSymbol->GetIndex()] = functionSymbol;
     }
     else if (member->GetSymbolType() == SymbolType::conceptSymbol)
@@ -78,14 +80,12 @@ void ContainerSymbol::AddMember(Symbol* member)
         ConceptSymbol* conceptSymbol = static_cast<ConceptSymbol*>(member);
         ConceptGroupSymbol* conceptGroupSymbol = MakeConceptGroupSymbol(conceptSymbol->GroupName(), conceptSymbol->GetSpan());
         conceptGroupSymbol->AddConcept(conceptSymbol);
-        conceptSymbol->GetContainerScope()->SetParent(GetContainerScope());
     }
     else if (member->GetSymbolType() == SymbolType::classTypeSymbol || member->GetSymbolType() == SymbolType::classTemplateSpecializationSymbol)
     {
         ClassTypeSymbol* classTypeSymbol = static_cast<ClassTypeSymbol*>(member);
         ClassGroupTypeSymbol* classGroupTypeSymbol = MakeClassGroupTypeSymbol(classTypeSymbol->GroupName(), classTypeSymbol->GetSpan());
         classGroupTypeSymbol->AddClass(classTypeSymbol);
-        classTypeSymbol->GetContainerScope()->SetParent(GetContainerScope());
     }
     else
     {
@@ -93,18 +93,30 @@ void ContainerSymbol::AddMember(Symbol* member)
     }
 }
 
-void ContainerSymbol::ComputeExportClosure()
+void ContainerSymbol::AddOwnedMember(Symbol* ownedMember)
 {
-    if (IsProject())
+    if (ownedMember->IsFunctionSymbol())
     {
-        for (std::unique_ptr<Symbol>& member : members)
-        {
-            if (!member->ExportComputed())
-            {
-                member->SetExportComputed();
-                member->ComputeExportClosure();
-            }
-        }
+        FunctionSymbol* functionSymbol = static_cast<FunctionSymbol*>(ownedMember);
+        FunctionGroupSymbol* functionGroupSymbol = MakeFunctionGroupSymbol(functionSymbol->GroupName(), functionSymbol->GetSpan());
+        functionGroupSymbol->AddFunction(functionSymbol);
+        functionIndexMap[functionSymbol->GetIndex()] = functionSymbol;
+    }
+    else if (ownedMember->GetSymbolType() == SymbolType::conceptSymbol)
+    {
+        ConceptSymbol* conceptSymbol = static_cast<ConceptSymbol*>(ownedMember);
+        ConceptGroupSymbol* conceptGroupSymbol = MakeConceptGroupSymbol(conceptSymbol->GroupName(), conceptSymbol->GetSpan());
+        conceptGroupSymbol->AddConcept(conceptSymbol);
+    }
+    else if (ownedMember->GetSymbolType() == SymbolType::classTypeSymbol || ownedMember->GetSymbolType() == SymbolType::classTemplateSpecializationSymbol)
+    {
+        ClassTypeSymbol* classTypeSymbol = static_cast<ClassTypeSymbol*>(ownedMember);
+        ClassGroupTypeSymbol* classGroupTypeSymbol = MakeClassGroupTypeSymbol(classTypeSymbol->GroupName(), classTypeSymbol->GetSpan());
+        classGroupTypeSymbol->AddClass(classTypeSymbol);
+    }
+    else
+    {
+        containerScope.Install(ownedMember);
     }
 }
 
@@ -131,9 +143,6 @@ FunctionGroupSymbol* ContainerSymbol::MakeFunctionGroupSymbol(const std::u32stri
     if (!symbol)
     {
         FunctionGroupSymbol* functionGroupSymbol = new FunctionGroupSymbol(span, groupName);
-        functionGroupSymbol->SetSymbolTable(GetSymbolTable());
-        functionGroupSymbol->SetModule(GetModule());
-        functionGroupSymbol->SetOriginalModule(GetOriginalModule());
         AddMember(functionGroupSymbol);
         return functionGroupSymbol;
     }
@@ -143,7 +152,7 @@ FunctionGroupSymbol* ContainerSymbol::MakeFunctionGroupSymbol(const std::u32stri
     }
     else
     {
-        throw Exception(GetModule(), "name of symbol '" + ToUtf8(symbol->FullName()) + "' conflicts with a function group '" + ToUtf8(groupName) + "'", symbol->GetSpan(), span);
+        throw Exception(GetRootModuleForCurrentThread(), "name of symbol '" + ToUtf8(symbol->FullName()) + "' conflicts with a function group '" + ToUtf8(groupName) + "'", symbol->GetSpan(), span);
     }
 }
 
@@ -153,9 +162,6 @@ ConceptGroupSymbol* ContainerSymbol::MakeConceptGroupSymbol(const std::u32string
     if (!symbol)
     {
         ConceptGroupSymbol* conceptGroupSymbol = new ConceptGroupSymbol(span, groupName);
-        conceptGroupSymbol->SetSymbolTable(GetSymbolTable());
-        conceptGroupSymbol->SetModule(GetModule());
-        conceptGroupSymbol->SetOriginalModule(GetOriginalModule());
         AddMember(conceptGroupSymbol);
         return conceptGroupSymbol;
     }
@@ -165,7 +171,7 @@ ConceptGroupSymbol* ContainerSymbol::MakeConceptGroupSymbol(const std::u32string
     }
     else
     {
-        throw Exception(GetModule(), "name of symbol '" + ToUtf8(symbol->FullName()) + "' conflicts with a concept group '" + ToUtf8(groupName) + "'", symbol->GetSpan(), span);
+        throw Exception(GetRootModuleForCurrentThread(), "name of symbol '" + ToUtf8(symbol->FullName()) + "' conflicts with a concept group '" + ToUtf8(groupName) + "'", symbol->GetSpan(), span);
     }
 }
 
@@ -175,10 +181,7 @@ ClassGroupTypeSymbol* ContainerSymbol::MakeClassGroupTypeSymbol(const std::u32st
     if (!symbol)
     {
         ClassGroupTypeSymbol* classGroupTypeSymbol = new ClassGroupTypeSymbol(span, groupName);
-        classGroupTypeSymbol->SetSymbolTable(GetSymbolTable());
-        classGroupTypeSymbol->SetModule(GetModule());
-        classGroupTypeSymbol->SetOriginalModule(GetOriginalModule());
-        GetSymbolTable()->SetTypeIdFor(classGroupTypeSymbol);
+        GetRootModuleForCurrentThread()->GetSymbolTable().SetTypeIdFor(classGroupTypeSymbol);
         AddMember(classGroupTypeSymbol);
         return classGroupTypeSymbol;
     }
@@ -188,7 +191,7 @@ ClassGroupTypeSymbol* ContainerSymbol::MakeClassGroupTypeSymbol(const std::u32st
     }
     else
     {
-        throw Exception(GetModule(), "name of symbol '" + ToUtf8(symbol->FullName()) + "' conflicts with a class group '" + ToUtf8(groupName) + "'", symbol->GetSpan(), span);
+        throw Exception(GetRootModuleForCurrentThread(), "name of symbol '" + ToUtf8(symbol->FullName()) + "' conflicts with a class group '" + ToUtf8(groupName) + "'", symbol->GetSpan(), span);
     }
 }
 
@@ -249,6 +252,22 @@ FunctionSymbol* ContainerSymbol::GetFunctionByIndex(int32_t functionIndex) const
     else
     {
         return nullptr;
+    }
+}
+
+void ContainerSymbol::Check()
+{
+    Symbol::Check();
+    for (const auto& p : members)
+    {
+        p->Check();
+    }
+    for (const auto& p : functionIndexMap)
+    {
+        if (!p.second)
+        {
+            throw SymbolCheckException(GetRootModuleForCurrentThread(), "container symbol has no function", GetSpan());
+        }
     }
 }
 

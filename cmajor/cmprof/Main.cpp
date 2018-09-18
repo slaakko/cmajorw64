@@ -1,5 +1,4 @@
 #include <cmajor/binder/AttributeBinder.hpp>
-#include <cmajor/binder/ModuleBinder.hpp>
 #include <cmajor/ast/InitDone.hpp>
 #include <cmajor/ast/Project.hpp>
 #include <cmajor/ast/Solution.hpp>
@@ -720,23 +719,11 @@ void ProfileProject(const std::string& projectFilePath, bool rebuildSys, bool re
     }
     cmajor::ast::Project* mainProject = projects.back();
     std::string moduleFilePath = mainProject->ModuleFilePath();
-    std::vector<ClassTypeSymbol*> classTypes;
-    std::vector<ClassTemplateSpecializationSymbol*> classTemplateSpecializations;
-    rootModule.reset(new Module(moduleFilePath, classTypes, classTemplateSpecializations));
+    rootModule.reset(new Module(moduleFilePath));
+    rootModule->SetRootModule();
+    SetRootModuleForCurrentThread(rootModule.get());
     CompileUnitNode compileUnit(Span(), "foo");
     AttributeBinder attributeBinder(rootModule.get());
-    ModuleBinder moduleBinder(*rootModule, &compileUnit, &attributeBinder);
-    moduleBinder.SetBindingTypes();
-    rootModule->GetSymbolTable().AddClassTemplateSpecializationsToClassTemplateSpecializationMap(classTemplateSpecializations);
-    for (ClassTemplateSpecializationSymbol* classTemplateSpecialization : classTemplateSpecializations)
-    {
-        moduleBinder.BindClassTemplateSpecialization(classTemplateSpecialization);
-    }
-    for (ClassTypeSymbol* classType : classTypes)
-    {
-        classType->SetSpecialMemberFunctions();
-        classType->CreateLayouts();
-    }
     if (GetGlobalFlag(GlobalFlags::verbose))
     {
         std::cout << "Finished reading main module." << std::endl;
@@ -809,7 +796,7 @@ void ProfileProject(const std::string& projectFilePath, bool rebuildSys, bool re
     }
 }
 
-const char* version = "2.3.0";
+const char* version = "2.4.0";
 
 void PrintHelp()
 {

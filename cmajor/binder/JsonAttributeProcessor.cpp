@@ -16,6 +16,7 @@
 #include <cmajor/symbols/SymbolTable.hpp>
 #include <cmajor/symbols/Warning.hpp>
 #include <cmajor/symbols/SymbolCreatorVisitor.hpp>
+#include <cmajor/symbols/Module.hpp>
 #include <cmajor/ast/Expression.hpp>
 #include <cmajor/ast/Identifier.hpp>
 #include <cmajor/ast/Literal.hpp>
@@ -58,6 +59,7 @@ void JsonAttributeProcessor::TypeCheck(Attribute* attribute, Symbol* symbol)
                         {
                             Warning warning(module->GetCurrentProjectName(), "base class '" + ToUtf8(baseClass->FullName()) + "' of json-attributed class '" + 
                                 ToUtf8(classTypeSymbol->FullName()) + "' does not explicitly declare 'json' attribute value to \"true\" or \"false\"");
+                            warning.SetModule(GetRootModuleForCurrentThread());
                             warning.SetDefined(classTypeSymbol->GetSpan());
                             std::vector<Span> references;
                             references.push_back(baseClass->GetSpan());
@@ -176,13 +178,11 @@ void JsonAttributeProcessor::GenerateJsonCreatorFunctionSymbol(Attribute* attrib
 {
     MemberFunctionSymbol* jsonCreatorFunctionSymbol = new MemberFunctionSymbol(attribute->GetSpan(), U"Create");
     jsonCreatorFunctionSymbol->SetGroupName(U"Create");
-    jsonCreatorFunctionSymbol->SetSymbolTable(&module->GetSymbolTable());
     jsonCreatorFunctionSymbol->SetModule(module);
-    jsonCreatorFunctionSymbol->SetOriginalModule(module);
     module->GetSymbolTable().SetFunctionIdFor(jsonCreatorFunctionSymbol);
     jsonCreatorFunctionSymbol->SetAccess(SymbolAccess::public_);
     jsonCreatorFunctionSymbol->SetStatic();
-    Symbol* jsonValue = classTypeSymbol->GetSymbolTable()->GlobalNs().GetContainerScope()->Lookup(U"System.Json.JsonValue");
+    Symbol* jsonValue = classTypeSymbol->GetModule()->GetSymbolTable().GlobalNs().GetContainerScope()->Lookup(U"System.Json.JsonValue");
     if (!jsonValue || jsonValue->GetSymbolType() != SymbolType::classGroupTypeSymbol)
     {
         throw Exception(module, "System.Json.JsonValue class not found from the symbol table", attribute->GetSpan(), classTypeSymbol->GetSpan());
@@ -196,7 +196,7 @@ void JsonAttributeProcessor::GenerateJsonCreatorFunctionSymbol(Attribute* attrib
     ParameterSymbol* jsonValueParam = new ParameterSymbol(attribute->GetSpan(), U"@value");
     jsonValueParam->SetType(jsonValueClass->AddPointer(attribute->GetSpan()));
     jsonCreatorFunctionSymbol->AddMember(jsonValueParam);
-    jsonCreatorFunctionSymbol->SetReturnType(classTypeSymbol->GetSymbolTable()->GetTypeByName(U"void")->AddPointer(attribute->GetSpan()));
+    jsonCreatorFunctionSymbol->SetReturnType(module->GetSymbolTable().GetTypeByName(U"void")->AddPointer(attribute->GetSpan()));
     classTypeSymbol->AddMember(jsonCreatorFunctionSymbol);
     jsonCreatorFunctionSymbol->ComputeName();
     jsonCreatorMap[classTypeSymbol] = jsonCreatorFunctionSymbol;
@@ -205,14 +205,12 @@ void JsonAttributeProcessor::GenerateJsonCreatorFunctionSymbol(Attribute* attrib
 void JsonAttributeProcessor::GenerateJsonConstructorSymbol(Attribute* attribute, ClassTypeSymbol* classTypeSymbol)
 {
     ConstructorSymbol* jsonConstructorSymbol = new ConstructorSymbol(attribute->GetSpan(), U"@constructor");
-    jsonConstructorSymbol->SetSymbolTable(&module->GetSymbolTable());
     jsonConstructorSymbol->SetModule(module);
-    jsonConstructorSymbol->SetOriginalModule(module);
     module->GetSymbolTable().SetFunctionIdFor(jsonConstructorSymbol);
     ParameterSymbol* thisParam = new ParameterSymbol(attribute->GetSpan(), U"this");
     thisParam->SetType(classTypeSymbol->AddPointer(attribute->GetSpan()));
     ParameterSymbol* jsonValueParam = new ParameterSymbol(attribute->GetSpan(), U"@value");
-    Symbol* jsonValue = classTypeSymbol->GetSymbolTable()->GlobalNs().GetContainerScope()->Lookup(U"System.Json.JsonValue");
+    Symbol* jsonValue = classTypeSymbol->GetModule()->GetSymbolTable().GlobalNs().GetContainerScope()->Lookup(U"System.Json.JsonValue");
     if (!jsonValue || jsonValue->GetSymbolType() != SymbolType::classGroupTypeSymbol)
     {
         throw Exception(module, "System.Json.JsonValue class not found from the symbol table", attribute->GetSpan(), classTypeSymbol->GetSpan());
@@ -237,8 +235,6 @@ void JsonAttributeProcessor::GenerateToJsonJsonObjectSymbol(Attribute* attribute
 {
     MemberFunctionSymbol* toJsonJsonObjectMemberFunctionSymbol = new MemberFunctionSymbol(attribute->GetSpan(), U"ToJson");
     toJsonJsonObjectMemberFunctionSymbol->SetModule(module);
-    toJsonJsonObjectMemberFunctionSymbol->SetOriginalModule(module);
-    toJsonJsonObjectMemberFunctionSymbol->SetSymbolTable(&module->GetSymbolTable());
     toJsonJsonObjectMemberFunctionSymbol->SetGroupName(U"ToJson");
     ClassTypeSymbol* baseClass = classTypeSymbol->BaseClass();
     bool jsonBase = false;
@@ -265,11 +261,11 @@ void JsonAttributeProcessor::GenerateToJsonJsonObjectSymbol(Attribute* attribute
     {
         toJsonJsonObjectMemberFunctionSymbol->SetOverride();
     }
-    classTypeSymbol->GetSymbolTable()->SetFunctionIdFor(toJsonJsonObjectMemberFunctionSymbol);
+    GetRootModuleForCurrentThread()->GetSymbolTable().SetFunctionIdFor(toJsonJsonObjectMemberFunctionSymbol);
     ParameterSymbol* thisParam = new ParameterSymbol(attribute->GetSpan(), U"this");
     thisParam->SetType(classTypeSymbol->AddPointer(attribute->GetSpan()));
     ParameterSymbol* jsonObjectParam = new ParameterSymbol(attribute->GetSpan(), U"@object");
-    Symbol* jsonObject = classTypeSymbol->GetSymbolTable()->GlobalNs().GetContainerScope()->Lookup(U"System.Json.JsonObject");
+    Symbol* jsonObject = GetRootModuleForCurrentThread()->GetSymbolTable().GlobalNs().GetContainerScope()->Lookup(U"System.Json.JsonObject");
     if (!jsonObject || jsonObject->GetSymbolType() != SymbolType::classGroupTypeSymbol)
     {
         throw Exception(module, "System.Json.JsonObject class not found from the symbol table", attribute->GetSpan(), classTypeSymbol->GetSpan());
@@ -281,7 +277,7 @@ void JsonAttributeProcessor::GenerateToJsonJsonObjectSymbol(Attribute* attribute
         throw Exception(module, "System.Json.JsonObject class not found from the symbol table", attribute->GetSpan(), classTypeSymbol->GetSpan());
     }
     jsonObjectParam->SetType(jsonObjectClass->AddPointer(attribute->GetSpan()));
-    toJsonJsonObjectMemberFunctionSymbol->SetReturnType(classTypeSymbol->GetSymbolTable()->GetTypeByName(U"void"));
+    toJsonJsonObjectMemberFunctionSymbol->SetReturnType(module->GetSymbolTable().GetTypeByName(U"void"));
     toJsonJsonObjectMemberFunctionSymbol->SetAccess(SymbolAccess::public_);
     toJsonJsonObjectMemberFunctionSymbol->AddMember(thisParam);
     toJsonJsonObjectMemberFunctionSymbol->AddMember(jsonObjectParam);
@@ -294,8 +290,6 @@ void JsonAttributeProcessor::GenerateToJsonSymbol(Attribute* attribute, ClassTyp
 {
     MemberFunctionSymbol* toJsonMemberFunctionSymbol = new MemberFunctionSymbol(attribute->GetSpan(), U"ToJson");
     toJsonMemberFunctionSymbol->SetModule(module);
-    toJsonMemberFunctionSymbol->SetOriginalModule(module);
-    toJsonMemberFunctionSymbol->SetSymbolTable(&module->GetSymbolTable());
     toJsonMemberFunctionSymbol->SetGroupName(U"ToJson");
     ClassTypeSymbol* baseClass = classTypeSymbol->BaseClass();
     bool jsonBase = false;
@@ -322,7 +316,7 @@ void JsonAttributeProcessor::GenerateToJsonSymbol(Attribute* attribute, ClassTyp
     {
         toJsonMemberFunctionSymbol->SetOverride();
     }
-    classTypeSymbol->GetSymbolTable()->SetFunctionIdFor(toJsonMemberFunctionSymbol);
+    GetRootModuleForCurrentThread()->GetSymbolTable().SetFunctionIdFor(toJsonMemberFunctionSymbol);
     ParameterSymbol* thisParam = new ParameterSymbol(attribute->GetSpan(), U"this");
     thisParam->SetType(classTypeSymbol->AddPointer(attribute->GetSpan()));
     TemplateIdNode templateId(attribute->GetSpan(), new IdentifierNode(attribute->GetSpan(), U"System.UniquePtr"));
@@ -385,8 +379,8 @@ void JsonAttributeProcessor::GenerateImplementation(Attribute* attribute, Symbol
         {
             throw Exception(module, "internal error in JSON attribute implementation: member function 'ToJson' symbol for symbol '" + ToUtf8(symbol->FullName()) + "' not found", attribute->GetSpan());
         }
-        SymbolTable* symbolTable = classTypeSymbol->GetSymbolTable();
-        symbolTable->AddJsonClass(classTypeSymbol->FullName());
+        SymbolTable& symbolTable = module->GetSymbolTable();
+        symbolTable.AddJsonClass(classTypeSymbol->FullName());
     }
 }
 
@@ -395,7 +389,7 @@ void JsonAttributeProcessor::GenerateJsonCreatorImplementation(Attribute* attrib
     try
     {
         FileScope* fileScope = new FileScope(&statementBinder->GetBoundCompileUnit().GetModule());
-        Symbol* jsonValue = classTypeSymbol->GetSymbolTable()->GlobalNs().GetContainerScope()->Lookup(U"System.Json.JsonValue");
+        Symbol* jsonValue = classTypeSymbol->GetModule()->GetSymbolTable().GlobalNs().GetContainerScope()->Lookup(U"System.Json.JsonValue");
         if (jsonValue)
         {
             fileScope->AddContainerScope(jsonValue->Ns()->GetContainerScope());
@@ -447,7 +441,7 @@ void JsonAttributeProcessor::GenerateJsonConstructorImplementation(Attribute* at
     try
     {
         FileScope* fileScope = new FileScope(&statementBinder->GetBoundCompileUnit().GetModule());
-        Symbol* jsonValue = classTypeSymbol->GetSymbolTable()->GlobalNs().GetContainerScope()->Lookup(U"System.Json.JsonValue");
+        Symbol* jsonValue = classTypeSymbol->GetModule()->GetSymbolTable().GlobalNs().GetContainerScope()->Lookup(U"System.Json.JsonValue");
         if (jsonValue)
         {
             fileScope->AddContainerScope(jsonValue->Ns()->GetContainerScope());
@@ -545,7 +539,7 @@ void JsonAttributeProcessor::GenerateToJsonJsonObjectImplementation(Attribute* a
     try
     {
         FileScope* fileScope = new FileScope(&statementBinder->GetBoundCompileUnit().GetModule());
-        Symbol* jsonObject = classTypeSymbol->GetSymbolTable()->GlobalNs().GetContainerScope()->Lookup(U"System.Json.JsonObject");
+        Symbol* jsonObject = GetRootModuleForCurrentThread()->GetSymbolTable().GlobalNs().GetContainerScope()->Lookup(U"System.Json.JsonObject");
         if (jsonObject)
         {
             fileScope->AddContainerScope(jsonObject->Ns()->GetContainerScope());
@@ -643,7 +637,7 @@ void JsonAttributeProcessor::GenerateToJsonImplementation(Attribute* attribute, 
     try
     {
         FileScope* fileScope = new FileScope(&statementBinder->GetBoundCompileUnit().GetModule());
-        Symbol* jsonObject = classTypeSymbol->GetSymbolTable()->GlobalNs().GetContainerScope()->Lookup(U"System.Json.JsonObject");
+        Symbol* jsonObject = GetRootModuleForCurrentThread()->GetSymbolTable().GlobalNs().GetContainerScope()->Lookup(U"System.Json.JsonObject");
         if (jsonObject)
         {
             fileScope->AddContainerScope(jsonObject->Ns()->GetContainerScope());

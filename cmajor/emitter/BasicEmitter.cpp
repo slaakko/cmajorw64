@@ -29,7 +29,7 @@ BasicEmitter::BasicEmitter(EmittingContext& emittingContext_, const std::string&
     context(emittingContext.GetEmittingContextImpl()->Context()), compileUnit(nullptr), function(nullptr), trueBlock(nullptr), falseBlock(nullptr), breakTarget(nullptr), continueTarget(nullptr),
     handlerBlock(nullptr), cleanupBlock(nullptr), entryBasicBlock(nullptr), newCleanupNeeded(false), currentPad(nullptr), genJumpingBoolCode(false), currentClass(nullptr), currentFunction(nullptr),
     currentBlock(nullptr), breakTargetBlock(nullptr), continueTargetBlock(nullptr), sequenceSecond(nullptr), currentCaseMap(nullptr), defaultDest(nullptr), prevLineNumber(0), destructorCallGenerated(false),
-    lastInstructionWasRet(false), basicBlockOpen(false), lastAlloca(nullptr), compoundLevel(0)
+    lastInstructionWasRet(false), basicBlockOpen(false), lastAlloca(nullptr), compoundLevel(0), debugInfo(false)
 {
     compileUnitModule->setTargetTriple(emittingContext.GetEmittingContextImpl()->TargetTriple());
     compileUnitModule->setDataLayout(emittingContext.GetEmittingContextImpl()->DataLayout());
@@ -99,6 +99,8 @@ void BasicEmitter::InsertAllocaIntoEntryBlock(llvm::AllocaInst* allocaInst)
 
 void BasicEmitter::Visit(BoundCompileUnit& boundCompileUnit)
 {
+    debugInfo = false;
+    SetDIBuilder(nullptr);
     if (GetGlobalFlag(GlobalFlags::generateDebugInfo) && boundCompileUnit.GetCompileUnitNode() && !boundCompileUnit.GetCompileUnitNode()->IsSynthesizedUnit())
     {
         compileUnitModule->addModuleFlag(llvm::Module::Warning, "Debug Info Version", llvm::DEBUG_METADATA_VERSION);
@@ -107,13 +109,13 @@ void BasicEmitter::Visit(BoundCompileUnit& boundCompileUnit)
 #endif
         diBuilder.reset(new llvm::DIBuilder(*compileUnitModule));
         SetDIBuilder(diBuilder.get());
+        debugInfo = true;
         std::string sourceFilePath = boundCompileUnit.GetCompileUnitNode()->FilePath();
         llvm::DIFile* sourceFile = diBuilder->createFile(Path::GetFileName(sourceFilePath), Path::GetDirectoryName(sourceFilePath));
         SetDIFile(sourceFile);
         llvm::DICompileUnit* diCompileUnit = diBuilder->createCompileUnit(cmajorLanguageTag, sourceFile, "Cmajor compiler version " + GetCompilerVersion(), GetGlobalFlag(GlobalFlags::release), "", 0);
         SetDICompileUnit(diCompileUnit);
         SetCurrentCompileUnitNode(boundCompileUnit.GetCompileUnitNode());
-        SetCompileUnitIndex(boundCompileUnit.CompileUnitIndex());
         PushScope(sourceFile);
     }
     compileUnit = &boundCompileUnit;
@@ -134,7 +136,7 @@ void BasicEmitter::Visit(BoundCompileUnit& boundCompileUnit)
         BoundNode* boundNode = boundCompileUnit.BoundNodes()[i].get();
         boundNode->Accept(*this);
     }
-    if (diBuilder)
+    if (debugInfo)
     {
         ReplaceForwardDeclarations();
         diBuilder->finalize();
@@ -171,7 +173,7 @@ void BasicEmitter::Visit(BoundCompileUnit& boundCompileUnit)
         optCommandLine.append(QuotedPath(boundCompileUnit.OptLLFilePath()));
         System(optCommandLine);
     }
-    if (diBuilder)
+    if (debugInfo)
     {
         PopScope();
         diBuilder.reset();
@@ -181,7 +183,7 @@ void BasicEmitter::Visit(BoundCompileUnit& boundCompileUnit)
 void BasicEmitter::Visit(BoundNamespace& boundNamespace)
 {
     int numComponents = 0;
-    if (diBuilder)
+    if (debugInfo)
     {
         if (!boundNamespace.GetNamespaceNode().Id()->Str().empty())
         {
@@ -204,7 +206,7 @@ void BasicEmitter::Visit(BoundNamespace& boundNamespace)
         BoundNode* member = boundNamespace.Members()[i].get();
         member->Accept(*this);
     }
-    if (diBuilder)
+    if (debugInfo)
     {
         if (!boundNamespace.GetNamespaceNode().Id()->Str().empty())
         {
@@ -224,9 +226,17 @@ void BasicEmitter::Visit(BoundClass& boundClass)
 {
     classStack.push(currentClass);
     currentClass = &boundClass;
-    if (diBuilder)
+    bool prevDebugInfo = debugInfo;
+    llvm::DIBuilder* prevDIBuilder = DIBuilder();
+    if (!boundClass.ContainsSourceFunctions())
     {
-        llvm::DIType* diType = GetDIType(currentClass->GetClassTypeSymbol());
+        debugInfo = false;
+        SetDIBuilder(nullptr);
+    }
+    if (debugInfo)
+    {
+        MapClassPtr(currentClass->GetClassTypeSymbol()->TypeId(), currentClass->GetClassTypeSymbol());
+        llvm::DIType* diType = GetDITypeByTypeId(currentClass->GetClassTypeSymbol()->TypeId());
         if (diType)
         {
             PushScope(diType);
@@ -242,7 +252,7 @@ void BasicEmitter::Visit(BoundClass& boundClass)
             if (currentClass->GetClassTypeSymbol()->IsPolymorphic() && currentClass->GetClassTypeSymbol()->VmtPtrHolderClass())
             {
                 vtableHolderClass = currentClass->GetClassTypeSymbol()->VmtPtrHolderClass()->CreateDIForwardDeclaration(*this);
-                MapFwdDeclaration(vtableHolderClass, currentClass->GetClassTypeSymbol()->VmtPtrHolderClass());
+                MapFwdDeclaration(vtableHolderClass, currentClass->GetClassTypeSymbol()->VmtPtrHolderClass()->TypeId());
             }
             llvm::MDNode* templateParams = nullptr;
             uint64_t sizeInBits = DataLayout()->getStructLayout(llvm::cast<llvm::StructType>(currentClass->GetClassTypeSymbol()->IrType(*this)))->getSizeInBits();
@@ -258,7 +268,7 @@ void BasicEmitter::Visit(BoundClass& boundClass)
             llvm::DIType* forwardDeclaration = diBuilder->createReplaceableCompositeType(llvm::dwarf::DW_TAG_class_type, ToUtf8(currentClass->GetClassTypeSymbol()->Name()), 
                 CurrentScope(), GetFile(classSpan.FileIndex()), classSpan.LineNumber(),
                 0, sizeInBits, alignInBits, llvm::DINode::DIFlags::FlagZero, ToUtf8(currentClass->GetClassTypeSymbol()->MangledName()));
-            SetDIType(currentClass->GetClassTypeSymbol(), forwardDeclaration);
+            SetDITypeByTypeId(currentClass->GetClassTypeSymbol()->TypeId(), forwardDeclaration);
             std::vector<llvm::Metadata*> elements;
             for (MemberVariableSymbol* memberVariable : currentClass->GetClassTypeSymbol()->MemberVariables())
             {
@@ -270,8 +280,8 @@ void BasicEmitter::Visit(BoundClass& boundClass)
                 GetFile(classSpan.FileIndex()),
                 classSpan.LineNumber(), sizeInBits, alignInBits, offsetInBits, flags, baseClass, diBuilder->getOrCreateArray(elements), vtableHolderClass, templateParams, 
                 ToUtf8(currentClass->GetClassTypeSymbol()->MangledName()));
-            MapFwdDeclaration(forwardDeclaration, currentClass->GetClassTypeSymbol());
-            SetDIType(currentClass->GetClassTypeSymbol(), cls);
+            MapFwdDeclaration(forwardDeclaration, currentClass->GetClassTypeSymbol()->TypeId());
+            SetDITypeByTypeId(currentClass->GetClassTypeSymbol()->TypeId(), cls);
             PushScope(cls);
         }
     }
@@ -281,17 +291,19 @@ void BasicEmitter::Visit(BoundClass& boundClass)
         BoundNode* boundNode = boundClass.Members()[i].get();
         boundNode->Accept(*this);
     }
-    if (diBuilder)
+    if (debugInfo)
     {
         PopScope();
     }
     currentClass = classStack.top();
     classStack.pop();
+    debugInfo = prevDebugInfo;
+    SetDIBuilder(prevDIBuilder);
 }
 
 void BasicEmitter::Visit(BoundEnumTypeDefinition& boundEnumTypeDefinition)
 {
-    if (diBuilder)
+    if (debugInfo)
     {
         EnumTypeSymbol* enumTypeSymbol = boundEnumTypeDefinition.GetEnumTypeSymbol();
         uint64_t sizeInBits = enumTypeSymbol->SizeInBits(*this);
@@ -323,7 +335,7 @@ void BasicEmitter::Visit(BoundEnumTypeDefinition& boundEnumTypeDefinition)
         }
         llvm::DIType* enumType = diBuilder->createEnumerationType(CurrentScope(), ToUtf8(enumTypeSymbol->Name()), GetFile(enumTypeSymbol->GetSpan().FileIndex()),
             enumTypeSymbol->GetSpan().LineNumber(), sizeInBits, alignInBits, diBuilder->getOrCreateArray(elements), enumTypeSymbol->UnderlyingType()->GetDIType(*this), ToUtf8(enumTypeSymbol->MangledName()));
-        SetDIType(enumTypeSymbol, enumType);
+        SetDITypeByTypeId(enumTypeSymbol->TypeId(), enumType);
     }
 }
 
@@ -360,7 +372,15 @@ void BasicEmitter::Visit(BoundFunction& boundFunction)
         function->setComdat(comdat);
     }
     SetFunction(function);
-    if (diBuilder)
+    bool hasSource = functionSymbol->HasSource();
+    bool prevDebugInfo = debugInfo;
+    llvm::DIBuilder* prevDIBuilder = DIBuilder();
+    if (!hasSource)
+    {
+        debugInfo = false;
+        SetDIBuilder(nullptr);
+    }
+    if (debugInfo)
     {
         SetInPrologue(true);
         SetCurrentDebugLocation(Span());
@@ -453,9 +473,9 @@ void BasicEmitter::Visit(BoundFunction& boundFunction)
     {
         ParameterSymbol* parameter = functionSymbol->Parameters()[i];
         llvm::AllocaInst* allocaInst = builder.CreateAlloca(parameter->GetType()->IrType(*this));
-        parameter->SetIrObject(allocaInst);
+        SetIrObject(parameter, allocaInst);
         lastAlloca = allocaInst;
-        if (diBuilder)
+        if (debugInfo)
         {
             llvm::SmallVector<int64_t, 13> expr; // todo
             llvm::DILocalVariable* paramVar = diBuilder->createParameterVariable(CurrentScope(), ToUtf8(parameter->Name()), i + 1, GetFile(parameter->GetSpan().FileIndex()), 
@@ -467,7 +487,7 @@ void BasicEmitter::Visit(BoundFunction& boundFunction)
     {
         ParameterSymbol* parameter = functionSymbol->ReturnParam();
         llvm::AllocaInst* allocaInst = builder.CreateAlloca(parameter->GetType()->IrType(*this));
-        parameter->SetIrObject(allocaInst);
+        SetIrObject(parameter, allocaInst);
         lastAlloca = allocaInst;
     }
     int nlv = functionSymbol->LocalVariables().size();
@@ -475,9 +495,9 @@ void BasicEmitter::Visit(BoundFunction& boundFunction)
     {
         LocalVariableSymbol* localVariable = functionSymbol->LocalVariables()[i];
         llvm::AllocaInst* allocaInst = builder.CreateAlloca(localVariable->GetType()->IrType(*this));
-        localVariable->SetIrObject(allocaInst);
+        SetIrObject(localVariable, allocaInst);
         lastAlloca = allocaInst;
-        if (diBuilder)
+        if (debugInfo)
         {
             llvm::SmallVector<int64_t, 13> expr; // todo
             llvm::DILocalVariable* localVar = diBuilder->createAutoVariable(CurrentScope(), ToUtf8(localVariable->Name()), GetFile(localVariable->GetSpan().FileIndex()),
@@ -508,12 +528,17 @@ void BasicEmitter::Visit(BoundFunction& boundFunction)
         if (parameter->GetType()->IsClassTypeSymbol())
         {
             ClassTypeSymbol* classType = static_cast<ClassTypeSymbol*>(parameter->GetType());
-            llvm::FunctionType* copyCtor = classType->CopyConstructor()->IrType(*this);
-            llvm::Function* callee = llvm::cast<llvm::Function>(compileUnitModule->getOrInsertFunction(ToUtf8(classType->CopyConstructor()->MangledName()), copyCtor));
+            FunctionSymbol* copyConstructor = classType->CopyConstructor();
+            if (!copyConstructor)
+            {
+                copyConstructor = compileUnit->GetCopyConstructorFor(classType->TypeId());
+            }
+            llvm::FunctionType* copyCtorType = copyConstructor->IrType(*this);
+            llvm::Function* callee = llvm::cast<llvm::Function>(compileUnitModule->getOrInsertFunction(ToUtf8(copyConstructor->MangledName()), copyCtorType));
             ArgVector args;
-            args.push_back(parameter->IrObject());
+            args.push_back(parameter->IrObject(*this));
             args.push_back(&*it);
-            if (diBuilder)
+            if (debugInfo)
             {
                 SetInPrologue(false);
                 SetCurrentDebugLocation(boundFunction.Body()->GetSpan());
@@ -530,12 +555,16 @@ void BasicEmitter::Visit(BoundFunction& boundFunction)
         {
             ClassDelegateTypeSymbol* classDelegateType = static_cast<ClassDelegateTypeSymbol*>(parameter->GetType());
             FunctionSymbol* copyConstructor = classDelegateType->CopyConstructor();
+            if (!copyConstructor)
+            {
+                throw std::runtime_error("internal error: class delegate type has no copy constructor");
+            }
             std::vector<GenObject*> copyCtorArgs;
-            LlvmValue paramValue(parameter->IrObject());
+            LlvmValue paramValue(parameter->IrObject(*this));
             copyCtorArgs.push_back(&paramValue);
             LlvmValue argumentValue(&*it);
             copyCtorArgs.push_back(&argumentValue);
-            if (diBuilder)
+            if (debugInfo)
             {
                 SetInPrologue(false);
                 SetCurrentDebugLocation(boundFunction.Body()->GetSpan());
@@ -552,14 +581,18 @@ void BasicEmitter::Visit(BoundFunction& boundFunction)
         {
             InterfaceTypeSymbol* interfaceType = static_cast<InterfaceTypeSymbol*>(parameter->GetType());
             FunctionSymbol* copyConstructor = interfaceType->CopyConstructor();
+            if (!copyConstructor)
+            {
+                copyConstructor = compileUnit->GetCopyConstructorFor(interfaceType->TypeId());
+            }
             std::vector<GenObject*> copyCtorArgs;
-            LlvmValue paramValue(parameter->IrObject());
+            LlvmValue paramValue(parameter->IrObject(*this));
             paramValue.SetType(interfaceType->AddPointer(Span()));
             copyCtorArgs.push_back(&paramValue);
             LlvmValue argumentValue(&*it);
             argumentValue.SetType(interfaceType->AddPointer(Span()));
             copyCtorArgs.push_back(&argumentValue);
-            if (diBuilder)
+            if (debugInfo)
             {
                 SetInPrologue(false);
                 SetCurrentDebugLocation(boundFunction.Body()->GetSpan());
@@ -574,13 +607,13 @@ void BasicEmitter::Visit(BoundFunction& boundFunction)
         }
         else
         {
-            builder.CreateStore(&*it, parameter->IrObject());
+            builder.CreateStore(&*it, parameter->IrObject(*this));
         }
         ++it;
     }
     if (functionSymbol->ReturnParam())
     {
-        builder.CreateStore(&*it, functionSymbol->ReturnParam()->IrObject());
+        builder.CreateStore(&*it, functionSymbol->ReturnParam()->IrObject(*this));
     }
     for (BoundStatement* labeledStatement : boundFunction.LabeledStatements())
     {
@@ -588,7 +621,7 @@ void BasicEmitter::Visit(BoundFunction& boundFunction)
         labeledStatementMap[labeledStatement] = target;
     }
     BoundCompoundStatement* body = boundFunction.Body();
-    if (diBuilder)
+    if (debugInfo)
     {
         SetInPrologue(false);
     }
@@ -627,10 +660,12 @@ void BasicEmitter::Visit(BoundFunction& boundFunction)
         function->addFnAttr(llvm::Attribute::UWTable);
     }
     GenerateCodeForCleanups();
-    if (diBuilder)
+    if (debugInfo)
     {
         PopScope();
     }
+    debugInfo = prevDebugInfo;
+    SetDIBuilder(prevDIBuilder);
 }
 
 void BasicEmitter::Visit(BoundSequenceStatement& boundSequenceStatement)
@@ -651,7 +686,7 @@ void BasicEmitter::Visit(BoundSequenceStatement& boundSequenceStatement)
 
 void BasicEmitter::ExitBlocks(BoundCompoundStatement* targetBlock)
 {
-    if (diBuilder)
+    if (debugInfo)
     {
         if (currentBlock->EndSpan().Valid())
         {
@@ -712,8 +747,11 @@ void BasicEmitter::ExitBlocks(BoundCompoundStatement* targetBlock)
 
 void BasicEmitter::Visit(BoundCompoundStatement& boundCompoundStatement)
 {
-    SetCurrentDebugLocation(boundCompoundStatement.GetSpan());
-    if (diBuilder && compoundLevel > 0)
+    if (debugInfo)
+    {
+        SetCurrentDebugLocation(boundCompoundStatement.GetSpan());
+    }
+    if (debugInfo && compoundLevel > 0)
     {
         llvm::DILexicalBlock* block = diBuilder->createLexicalBlock(CurrentScope(), GetFile(boundCompoundStatement.GetSpan().FileIndex()), boundCompoundStatement.GetSpan().LineNumber(), 
             GetColumn(boundCompoundStatement.GetSpan()));
@@ -739,7 +777,7 @@ void BasicEmitter::Visit(BoundCompoundStatement& boundCompoundStatement)
     blocks.pop_back();
     currentBlock = prevBlock;
     --compoundLevel;
-    if (diBuilder && compoundLevel > 0)
+    if (debugInfo && compoundLevel > 0)
     {
         PopScope();
     }
@@ -1103,7 +1141,7 @@ void BasicEmitter::Visit(BoundEmptyStatement& boundEmptyStatement)
     else
     {
         llvm::CallInst* callInst = llvm::CallInst::Create(doNothingFun, args, bundles, "", CurrentBasicBlock());
-        if (diBuilder)
+        if (debugInfo)
         {
             callInst->setDebugLoc(GetDebugLocation(boundEmptyStatement.GetSpan()));
         }
@@ -1426,7 +1464,7 @@ void BasicEmitter::CreateExitFunctionCall()
         inputs.push_back(currentPad->value);
         bundles.push_back(llvm::OperandBundleDef("funclet", inputs));
         llvm::CallInst* callInst = llvm::CallInst::Create(exitFunction, exitFunctionArgs, bundles, "", CurrentBasicBlock());
-        if (diBuilder)
+        if (debugInfo)
         {
             callInst->setDebugLoc(GetCurrentDebugLocation());
         }
@@ -1437,7 +1475,7 @@ void BasicEmitter::SetLineNumber(int32_t lineNumber)
 {
     if (currentFunction->GetFunctionSymbol()->DontThrow()) return;
     if (prevLineNumber == lineNumber) return;
-    if (diBuilder)
+    if (debugInfo)
     {
         SetCurrentDebugLocation(Span());
     }
@@ -1459,17 +1497,17 @@ void BasicEmitter::SetLineNumber(int32_t lineNumber)
         inputs.push_back(currentPad->value);
         bundles.push_back(llvm::OperandBundleDef("funclet", inputs));
         llvm::CallInst* callInst = llvm::CallInst::Create(setLineNumberFunction, setLineNumberFunctionArgs, bundles, "", CurrentBasicBlock());
-        if (diBuilder)
+        if (debugInfo)
         {
             callInst->setDebugLoc(GetCurrentDebugLocation());
         }
     }
 }
 
-llvm::DIType* BasicEmitter::CreateDIType(void* forType) 
+llvm::DIType* BasicEmitter::CreateClassDIType(void* classPtr)
 {
-    TypeSymbol* type = static_cast<TypeSymbol*>(forType);
-    return type->GetDIType(*this);
+    ClassTypeSymbol* cls = static_cast<ClassTypeSymbol*>(classPtr);
+    return cls->CreateDIType(*this);
 }
 
 } } // namespace cmajor::emitter

@@ -48,9 +48,9 @@ public:
     const std::vector<std::unique_ptr<BoundNode>>& BoundNodes() const { return boundNodes; }
     FunctionSymbol* GetConversion(TypeSymbol* sourceType, TypeSymbol* targetType, ContainerScope* containerScope, BoundFunction* currentFunction, const Span& span, ArgumentMatch& argumentMatch);
     void CollectViableFunctions(const std::u32string& groupName, ContainerScope* containerScope, std::vector<std::unique_ptr<BoundExpression>>& arguments, BoundFunction* currentFunction,
-        std::unordered_set<FunctionSymbol*>& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span);
+        ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span);
     FunctionSymbol* InstantiateFunctionTemplate(FunctionSymbol* functionTemplate, const std::unordered_map<TemplateParameterSymbol*, TypeSymbol*>& templateParameterMapping, const Span& span);
-    void InstantiateClassTemplateMemberFunction(FunctionSymbol* memberFunction, ContainerScope* containerScope, BoundFunction* currentFunction, const Span& span);
+    bool InstantiateClassTemplateMemberFunction(FunctionSymbol* memberFunction, ContainerScope* containerScope, BoundFunction* currentFunction, const Span& span);
     void InstantiateInlineFunction(FunctionSymbol* inlineFunction, ContainerScope* containerScope, const Span& span);
     FunctionNode* GetFunctionNodeFor(FunctionSymbol* constExprFunctionSymbol);
     void GenerateCopyConstructorFor(ClassTypeSymbol* classTypeSymbol, ContainerScope* containerScope, BoundFunction* currentFunction, const Span& span);
@@ -81,12 +81,16 @@ public:
     void PushBindingTypes();
     void PopBindingTypes();
     bool BindingTypes() const { return bindingTypes; }
-    void FinalizeBinding(ClassTypeSymbol* classType);
+    bool Finalizing() const { return finalizing; }
+    void SetFinalizing(bool finalizing_) { finalizing = finalizing_; }
+    void FinalizeBinding(ClassTemplateSpecializationSymbol* classTemplateSpecialization);
     AttributeBinder* GetAttributeBinder() const { return attributeBinder; }
     void PushNamespace(BoundNamespace* ns);
     void PopNamespace();
-    void SetCompileUnitIndex(int32_t compileUnitIndex_) { compileUnitIndex = compileUnitIndex_; }
-    int32_t CompileUnitIndex() const { return compileUnitIndex; }
+    bool HasCopyConstructorFor(const boost::uuids::uuid& typeId) const;
+    FunctionSymbol* GetCopyConstructorFor(const boost::uuids::uuid& typeId) const;
+    void AddCopyConstructorFor(const boost::uuids::uuid& typeId, std::unique_ptr<FunctionSymbol>&& copyConstructor);
+    void AddCopyConstructorToMap(const boost::uuids::uuid& typeId, FunctionSymbol* copyConstructor);
 private:
     Module& module;
     SymbolTable& symbolTable;
@@ -114,8 +118,11 @@ private:
     ConceptRepository conceptRepository;
     ConversionTable conversionTable;
     bool bindingTypes;
+    bool finalizing;
     std::stack<bool> bindingTypesStack;
     int32_t compileUnitIndex;
+    std::unordered_map<boost::uuids::uuid, FunctionSymbol*, boost::hash<boost::uuids::uuid>> copyConstructorMap;
+    std::vector<std::unique_ptr<FunctionSymbol>> copyConstructors;
 };
 
 } } // namespace cmajor::binder

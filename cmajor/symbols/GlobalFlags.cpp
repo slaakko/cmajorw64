@@ -8,7 +8,7 @@
 
 namespace cmajor { namespace symbols {
 
-GlobalFlags globalFlags;
+GlobalFlags globalFlags = GlobalFlags::none;
 int optimizationLevel = -1;
 int numBuildThreads = -1;
 
@@ -166,6 +166,18 @@ void AddAssertionLineNumber(int32_t lineNumber)
     {
         assertionLineNumberVector->push_back(lineNumber);
     }
+}
+
+void ResetGlobalFlags()
+{
+    globalFlags = GlobalFlags::none;
+    optimizationLevel = -1;
+    numBuildThreads = -1;
+    commandLineDefines.clear();
+    compilerVersion.clear();
+    inUnitTest = false;
+    unitTestAssertionNumber = 0;
+    assertionLineNumberVector = nullptr;
 }
 
 } } // namespace cmajor::symbols

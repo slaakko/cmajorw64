@@ -23,6 +23,11 @@ namespace cmajor { namespace binder {
 using namespace cmajor::util;
 using namespace cmajor::unicode;
 
+size_t ClassIdMemberFunctionIndexHash::operator()(const std::pair<boost::uuids::uuid, int>& p) const
+{
+    return boost::hash<boost::uuids::uuid>()(p.first) ^ boost::hash<int>()(p.second);
+}
+
 ClassTemplateRepository::ClassTemplateRepository(BoundCompileUnit& boundCompileUnit_) : boundCompileUnit(boundCompileUnit_)
 {
 }
@@ -36,7 +41,6 @@ void ClassTemplateRepository::ResolveDefaultTemplateArguments(std::vector<TypeSy
     Node* node = symbolTable.GetNodeNoThrow(classTemplate);
     if (!node)
     {
-        classTemplate->ReadAstNodes();
         node = classTemplate->GetClassNode();
         Assert(node, "class node not read");
     }
@@ -72,7 +76,7 @@ void ClassTemplateRepository::ResolveDefaultTemplateArguments(std::vector<TypeSy
         ++numFileScopeAdded;
     }
     ContainerScope resolveScope;
-    resolveScope.SetParent(containerScope);
+    resolveScope.SetParentScope(containerScope);
     std::vector<std::unique_ptr<BoundTemplateParameterSymbol>> boundTemplateParameters;
     for (int i = 0; i < n; ++i)
     {
@@ -113,7 +117,6 @@ void ClassTemplateRepository::BindClassTemplateSpecialization(ClassTemplateSpeci
     Node* node = symbolTable.GetNodeNoThrow(classTemplate);
     if (!node)
     {
-        classTemplate->ReadAstNodes();
         node = classTemplate->GetClassNode();
         Assert(node, "class node not read");
     }
@@ -153,14 +156,14 @@ void ClassTemplateRepository::BindClassTemplateSpecialization(ClassTemplateSpeci
     {
         throw Exception(&boundCompileUnit.GetModule(), "wrong number of template arguments", span);
     }
-    bool markedExport = classTemplateSpecialization->MarkedExport();
     bool templateParameterBinding = false;
     ContainerScope resolveScope;
-    resolveScope.SetParent(containerScope);
+    resolveScope.SetParentScope(containerScope);
     for (int i = 0; i < n; ++i)
     {
         TemplateParameterSymbol* templateParameter = classTemplate->TemplateParameters()[i];
         BoundTemplateParameterSymbol* boundTemplateParameter = new BoundTemplateParameterSymbol(span, templateParameter->Name());
+        boundTemplateParameter->SetParent(classTemplateSpecialization);
         TypeSymbol* templateArgumentType = classTemplateSpecialization->TemplateArgumentTypes()[i];
         boundTemplateParameter->SetType(templateArgumentType);
         if (templateArgumentType->GetSymbolType() == SymbolType::templateParameterSymbol)
@@ -224,9 +227,9 @@ void ClassTemplateRepository::BindClassTemplateSpecialization(ClassTemplateSpeci
     }
 }
 
-void ClassTemplateRepository::Instantiate(FunctionSymbol* memberFunction, ContainerScope* containerScope, BoundFunction* currentFunction, const Span& span)
+bool ClassTemplateRepository::Instantiate(FunctionSymbol* memberFunction, ContainerScope* containerScope, BoundFunction* currentFunction, const Span& span)
 {
-    if (instantiatedMemberFunctions.find(memberFunction) != instantiatedMemberFunctions.cend()) return;
+    if (instantiatedMemberFunctions.find(memberFunction) != instantiatedMemberFunctions.cend()) return true;
     instantiatedMemberFunctions.insert(memberFunction);
     try
     {
@@ -234,6 +237,20 @@ void ClassTemplateRepository::Instantiate(FunctionSymbol* memberFunction, Contai
         Symbol* parent = memberFunction->Parent();
         Assert(parent->GetSymbolType() == SymbolType::classTemplateSpecializationSymbol, "class template specialization expected");
         ClassTemplateSpecializationSymbol* classTemplateSpecialization = static_cast<ClassTemplateSpecializationSymbol*>(parent);
+        std::pair<boost::uuids::uuid, int> classIdMemFunIndexPair = std::make_pair(classTemplateSpecialization->TypeId(), memberFunction->GetIndex()); 
+        if (classIdMemberFunctionIndexSet.find(classIdMemFunIndexPair) != classIdMemberFunctionIndexSet.cend())
+        {
+//          If <parent class id, member function index> pair is found from the classIdMemberFunctionIndexSet, the member function is already instantiated 
+//          for this compile unit, so return true.
+            instantiatedMemberFunctions.insert(memberFunction);
+            return true;
+        }
+        Assert(classTemplateSpecialization->IsBound(), "class template specialization not bound");
+        Node* node = symbolTable.GetNodeNoThrow(memberFunction);
+        if (!node)
+        {
+            return false;
+        }
         boundCompileUnit.FinalizeBinding(classTemplateSpecialization);
         ClassTypeSymbol* classTemplate = classTemplateSpecialization->GetClassTemplate();
         std::unordered_map<TemplateParameterSymbol*, TypeSymbol*> templateParameterMap;
@@ -287,7 +304,6 @@ void ClassTemplateRepository::Instantiate(FunctionSymbol* memberFunction, Contai
             fileScope->AddContainerScope(classTemplate->Ns()->GetContainerScope());
         }
         boundCompileUnit.AddFileScope(fileScope);
-        Node* node = symbolTable.GetNode(memberFunction);
         Assert(node->IsFunctionNode(), "function node expected");
         FunctionNode* functionInstanceNode = static_cast<FunctionNode*>(node);
         Assert(functionInstanceNode->BodySource(), "body source expected");
@@ -364,10 +380,12 @@ void ClassTemplateRepository::Instantiate(FunctionSymbol* memberFunction, Contai
         Assert(boundStatement->GetBoundNodeType() == BoundNodeType::boundCompoundStatement, "bound compound statement expected");
         BoundCompoundStatement* compoundStatement = static_cast<BoundCompoundStatement*>(boundStatement);
         boundFunction->SetBody(std::unique_ptr<BoundCompoundStatement>(compoundStatement));
+        std::u32string instantiatedMemberFunctionMangledName = boundFunction->GetFunctionSymbol()->MangledName();
         boundClass->AddMember(std::move(boundFunction));
+        classIdMemberFunctionIndexSet.insert(classIdMemFunIndexPair);
         boundCompileUnit.AddBoundNode(std::move(boundClass));
         boundCompileUnit.RemoveLastFileScope();
-        InstantiateDestructorAndVirtualFunctions(classTemplateSpecialization, containerScope, currentFunction, span);
+        return InstantiateDestructorAndVirtualFunctions(classTemplateSpecialization, containerScope, currentFunction, span);
     }
     catch (const Exception& ex)
     {
@@ -379,22 +397,29 @@ void ClassTemplateRepository::Instantiate(FunctionSymbol* memberFunction, Contai
     }
 }
 
-void ClassTemplateRepository::InstantiateDestructorAndVirtualFunctions(ClassTemplateSpecializationSymbol* classTemplateSpecialization, ContainerScope* containerScope, BoundFunction* currentFunction, const Span& span)
+bool ClassTemplateRepository::InstantiateDestructorAndVirtualFunctions(ClassTemplateSpecializationSymbol* classTemplateSpecialization, ContainerScope* containerScope, BoundFunction* currentFunction, const Span& span)
 {
     for (FunctionSymbol* virtualMemberFunction : classTemplateSpecialization->Vmt())
     {
         if (virtualMemberFunction->Parent() == classTemplateSpecialization && !virtualMemberFunction->IsGeneratedFunction())
         {
-            Instantiate(virtualMemberFunction, containerScope, currentFunction, span);
+            if (!Instantiate(virtualMemberFunction, containerScope, currentFunction, span))
+            {
+                return false;
+            }
         }
     }
     if (classTemplateSpecialization->Destructor())
     {
         if (!classTemplateSpecialization->Destructor()->IsGeneratedFunction())
         {
-            Instantiate(classTemplateSpecialization->Destructor(), containerScope, currentFunction, span);
+            if (!Instantiate(classTemplateSpecialization->Destructor(), containerScope, currentFunction, span))
+            {
+                return false;
+            }
         }
     }
+    return true;
 }
 
 } } // namespace cmajor::binder

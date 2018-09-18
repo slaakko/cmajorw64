@@ -15,6 +15,35 @@ namespace server
 
     public class CompileResult
     {
+        public CompileResult()
+        {
+            diagnostics = new List<Diagnostic>();
+            success = true;
+        }
+        public CompileResult(bool success)
+        {
+            diagnostics = new List<Diagnostic>();
+            this.success = success;
+        }
+        public bool Success
+        {
+            get { return success; }
+        }
+        public void AddDiagnostic(Diagnostic diagnostic)
+        {
+            diagnostics.Add(diagnostic);
+        }
+        public List<Diagnostic> Diagnostics
+        {
+            get { return diagnostics; }
+        }
+        private bool success;
+        private List<Diagnostic> diagnostics;
+    }
+
+/*
+    public class CompileResult
+    {
         public CompileResult(bool success)
         {
             this.success = success;
@@ -663,4 +692,5 @@ namespace server
         private Process compileProcess;
         private bool compileAborted;
     }
+*/
 }

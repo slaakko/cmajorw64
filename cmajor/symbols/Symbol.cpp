@@ -122,8 +122,7 @@ llvm::DINode::DIFlags AccessFlag(SymbolAccess access)
 }
 
 Symbol::Symbol(SymbolType symbolType_, const Span& span_, const std::u32string& name_) : 
-    symbolType(symbolType_), span(span_), name(name_), flags(SymbolFlags::project), parent(nullptr), symbolTable(nullptr), module(nullptr), originalModule(nullptr), 
-    compileUnit(nullptr), irObject(nullptr)
+    symbolType(symbolType_), span(span_), name(name_), flags(SymbolFlags::project), parent(nullptr), module(nullptr), compileUnit(nullptr)
 {
 }
 
@@ -133,7 +132,7 @@ Symbol::~Symbol()
 
 void Symbol::Write(SymbolWriter& writer)
 {
-    SymbolFlags f = flags & ~(SymbolFlags::project | SymbolFlags::bound | SymbolFlags::export_ | SymbolFlags::exportComputed);
+    SymbolFlags f = flags & ~(SymbolFlags::project);
     writer.GetBinaryWriter().Write(static_cast<uint8_t>(f));
     writer.GetBinaryWriter().Write(mangledName);
     bool hasAttributes = attributes != nullptr;
@@ -196,15 +195,16 @@ std::u32string Symbol::FullNameWithSpecifiers() const
     return fullNameWithSpecifiers;
 }
 
+llvm::Value* Symbol::IrObject(Emitter& emitter)
+{
+    return emitter.GetIrObject(this);
+}
+
 void Symbol::ComputeMangledName()
 {
     mangledName = ToUtf32(TypeString());
     mangledName.append(1, U'_').append(SimpleName());
     mangledName.append(1, U'_').append(ToUtf32(GetSha1MessageDigest(ToUtf8(FullNameWithSpecifiers()))));
-}
-
-void Symbol::ComputeExportClosure()
-{
 }
 
 std::string Symbol::GetSpecifierStr() const
@@ -225,6 +225,10 @@ std::string Symbol::Syntax() const
     syntax.append(ToUtf8(DocName()));
     syntax.append(1, ';');
     return syntax;
+}
+
+void Symbol::Check()
+{
 }
 
 void Symbol::SetMangledName(const std::u32string& mangledName_)
@@ -259,7 +263,7 @@ void Symbol::SetAccess(Specifiers accessSpecifiers)
         }
         else
         {
-            throw Exception(GetModule(), "only class members can have protected access", GetSpan());
+            throw Exception(GetRootModuleForCurrentThread(), "only class members can have protected access", GetSpan());
         }
     }
     else if (accessSpecifiers == Specifiers::internal_)
@@ -274,12 +278,12 @@ void Symbol::SetAccess(Specifiers accessSpecifiers)
         }
         else
         {
-            throw Exception(GetModule(), "only class members can have private access", GetSpan());
+            throw Exception(GetRootModuleForCurrentThread(), "only class members can have private access", GetSpan());
         }
     }
     else if (accessSpecifiers != Specifiers::none)
     {
-        throw Exception(GetModule(), "invalid combination of access specifiers: " + SpecifierStr(accessSpecifiers), GetSpan());
+        throw Exception(GetRootModuleForCurrentThread(), "invalid combination of access specifiers: " + SpecifierStr(accessSpecifiers), GetSpan());
     }
     SetAccess(access);
 }
@@ -291,6 +295,10 @@ bool Symbol::IsSameParentOrAncestorOf(const Symbol* that) const
         return false;
     }
     else if (this == that)
+    {
+        return true;
+    }
+    else if (this->IsTypeSymbol() && that->IsTypeSymbol() && TypesEqual(static_cast<const TypeSymbol*>(this), static_cast<const TypeSymbol*>(that)))
     {
         return true;
     }
@@ -308,6 +316,15 @@ const NamespaceSymbol* Symbol::Ns() const
 {
     if (symbolType == SymbolType::namespaceSymbol)
     {
+        if (!GetModule()->IsRootModule())
+        {
+            Module* rootModule = GetRootModuleForCurrentThread();
+            NamespaceSymbol* mappedNs = rootModule->GetSymbolTable().GetMappedNs(const_cast<NamespaceSymbol*>(static_cast<const NamespaceSymbol*>(this)));
+            if (mappedNs)
+            {
+                return mappedNs;
+            }
+        }
         return static_cast<const NamespaceSymbol*>(this);
     }
     else
@@ -318,7 +335,7 @@ const NamespaceSymbol* Symbol::Ns() const
         }
         else
         {
-            throw Exception(GetModule(), "namespace symbol not found", GetSpan());
+            throw Exception(GetRootModuleForCurrentThread(), "namespace symbol not found", GetSpan());
         }
     }
 }
@@ -327,6 +344,15 @@ NamespaceSymbol* Symbol::Ns()
 {
     if (symbolType == SymbolType::namespaceSymbol)
     {
+        if (!GetModule()->IsRootModule())
+        {
+            Module* rootModule = GetRootModuleForCurrentThread();
+            NamespaceSymbol* mappedNs = rootModule->GetSymbolTable().GetMappedNs(static_cast<NamespaceSymbol*>(this));
+            if (mappedNs)
+            {
+                return mappedNs;
+            }
+        }
         return static_cast<NamespaceSymbol*>(this);
     }
     else
@@ -337,7 +363,7 @@ NamespaceSymbol* Symbol::Ns()
         }
         else
         {
-            throw Exception(GetModule(), "namespace symbol not found", GetSpan());
+            throw Exception(GetRootModuleForCurrentThread(), "namespace symbol not found", GetSpan());
         }
     }
 }
@@ -384,6 +410,15 @@ const ContainerSymbol* Symbol::ClassOrNsNoThrow() const
 {
     if (symbolType == SymbolType::namespaceSymbol)
     {
+        if (!GetModule()->IsRootModule())
+        {
+            Module* rootModule = GetRootModuleForCurrentThread();
+            NamespaceSymbol* mappedNs = rootModule->GetSymbolTable().GetMappedNs(const_cast<NamespaceSymbol*>(static_cast<const NamespaceSymbol*>(this)));
+            if (mappedNs)
+            {
+                return mappedNs;
+            }
+        }
         return static_cast<const NamespaceSymbol*>(this);
     }
     else if (IsClassTypeSymbol())
@@ -407,6 +442,15 @@ ContainerSymbol* Symbol::ClassOrNsNoThrow()
 {
     if (symbolType == SymbolType::namespaceSymbol)
     {
+        if (!GetModule()->IsRootModule())
+        {
+            Module* rootModule = GetRootModuleForCurrentThread();
+            NamespaceSymbol* mappedNs = rootModule->GetSymbolTable().GetMappedNs(static_cast<NamespaceSymbol*>(this));
+            if (mappedNs)
+            {
+                return mappedNs;
+            }
+        }
         return static_cast<NamespaceSymbol*>(this);
     }
     else if (IsClassTypeSymbol())
@@ -430,6 +474,15 @@ const ContainerSymbol* Symbol::ClassInterfaceOrNsNoThrow() const
 {
     if (symbolType == SymbolType::namespaceSymbol)
     {
+        if (!GetModule()->IsRootModule())
+        {
+            Module* rootModule = GetRootModuleForCurrentThread();
+            NamespaceSymbol* mappedNs = rootModule->GetSymbolTable().GetMappedNs(const_cast<NamespaceSymbol*>(static_cast<const NamespaceSymbol*>(this)));
+            if (mappedNs)
+            {
+                return mappedNs;
+            }
+        }
         return static_cast<const NamespaceSymbol*>(this);
     }
     else if (symbolType == SymbolType::interfaceTypeSymbol)
@@ -457,6 +510,15 @@ ContainerSymbol* Symbol::ClassInterfaceOrNsNoThrow()
 {
     if (symbolType == SymbolType::namespaceSymbol)
     {
+        if (!GetModule()->IsRootModule())
+        {
+            Module* rootModule = GetRootModuleForCurrentThread();
+            NamespaceSymbol* mappedNs = rootModule->GetSymbolTable().GetMappedNs(static_cast<NamespaceSymbol*>(this));
+            if (mappedNs)
+            {
+                return mappedNs;
+            }
+        }
         return static_cast<NamespaceSymbol*>(this);
     }
     else if (symbolType == SymbolType::interfaceTypeSymbol)
@@ -484,6 +546,15 @@ const ContainerSymbol* Symbol::ClassInterfaceEnumDelegateOrNsNoThrow() const
 {
     if (symbolType == SymbolType::namespaceSymbol)
     {
+        if (!GetModule()->IsRootModule())
+        {
+            Module* rootModule = GetRootModuleForCurrentThread();
+            NamespaceSymbol* mappedNs = rootModule->GetSymbolTable().GetMappedNs(const_cast<NamespaceSymbol*>(static_cast<const NamespaceSymbol*>(this)));
+            if (mappedNs)
+            {
+                return mappedNs;
+            }
+        }
         return static_cast<const NamespaceSymbol*>(this);
     }
     else if (symbolType == SymbolType::interfaceTypeSymbol)
@@ -527,6 +598,15 @@ ContainerSymbol* Symbol::ClassInterfaceEnumDelegateOrNsNoThrow()
 {
     if (symbolType == SymbolType::namespaceSymbol)
     {
+        if (!GetModule()->IsRootModule())
+        {
+            Module* rootModule = GetRootModuleForCurrentThread();
+            NamespaceSymbol* mappedNs = rootModule->GetSymbolTable().GetMappedNs(static_cast<NamespaceSymbol*>(this));
+            if (mappedNs)
+            {
+                return mappedNs;
+            }
+        }
         return static_cast<NamespaceSymbol*>(this);
     }
     else if (symbolType == SymbolType::interfaceTypeSymbol)
@@ -575,7 +655,7 @@ const ClassTypeSymbol* Symbol::Class() const
     }
     else
     {
-        throw Exception(GetModule(), "class type symbol not found", GetSpan());
+        throw Exception(GetRootModuleForCurrentThread(), "class type symbol not found", GetSpan());
     }
 }
 
@@ -588,7 +668,7 @@ ClassTypeSymbol* Symbol::Class()
     }
     else
     {
-        throw Exception(GetModule(), "class type symbol not found", GetSpan());
+        throw Exception(GetRootModuleForCurrentThread(), "class type symbol not found", GetSpan());
     }
 }
 
@@ -725,7 +805,7 @@ const FunctionSymbol* Symbol::Function() const
     }
     else
     {
-        throw Exception(GetModule(), "function symbol not found", GetSpan());
+        throw Exception(GetRootModuleForCurrentThread(), "function symbol not found", GetSpan());
     }
 }
 
@@ -738,7 +818,7 @@ FunctionSymbol* Symbol::Function()
     }
     else
     {
-        throw Exception(GetModule(), "function symbol not found", GetSpan());
+        throw Exception(GetRootModuleForCurrentThread(), "function symbol not found", GetSpan());
     }
 }
 
@@ -775,7 +855,7 @@ const ContainerScope* Symbol::ClassOrNsScope() const
     }
     else
     {
-        throw Exception(GetModule(), "class or namespace scope not found", GetSpan());
+        throw Exception(GetRootModuleForCurrentThread(), "class or namespace scope not found", GetSpan());
     }
 }
 
@@ -788,7 +868,7 @@ ContainerScope* Symbol::ClassOrNsScope()
     }
     else
     {
-        throw Exception(GetModule(), "class or namespace scope not found", GetSpan());
+        throw Exception(GetRootModuleForCurrentThread(), "class or namespace scope not found", GetSpan());
     }
 }
 
@@ -801,7 +881,7 @@ const ContainerScope* Symbol::ClassInterfaceOrNsScope() const
     }
     else
     {
-        throw Exception(GetModule(), "class, interface or namespace scope not found", GetSpan());
+        throw Exception(GetRootModuleForCurrentThread(), "class, interface or namespace scope not found", GetSpan());
     }
 }
 
@@ -814,7 +894,7 @@ ContainerScope* Symbol::ClassInterfaceOrNsScope()
     }
     else
     {
-        throw Exception(GetModule(), "class, interface or namespace scope not found", GetSpan());
+        throw Exception(GetRootModuleForCurrentThread(), "class, interface or namespace scope not found", GetSpan());
     }
 }
 
@@ -827,7 +907,7 @@ const ContainerScope* Symbol::ClassInterfaceEnumDelegateOrNsScope() const
     }
     else
     {
-        throw Exception(GetModule(), "class, interface, enumeration, delegate, class delegate or namespace scope not found", GetSpan());
+        throw Exception(GetRootModuleForCurrentThread(), "class, interface, enumeration, delegate, class delegate or namespace scope not found", GetSpan());
     }
 }
 
@@ -840,7 +920,7 @@ ContainerScope* Symbol::ClassInterfaceEnumDelegateOrNsScope()
     }
     else
     {
-        throw Exception(GetModule(), "class, interface, enumeration, delegate, class delegate or namespace scope not found", GetSpan());
+        throw Exception(GetRootModuleForCurrentThread(), "class, interface, enumeration, delegate, class delegate or namespace scope not found", GetSpan());
     }
 }
 

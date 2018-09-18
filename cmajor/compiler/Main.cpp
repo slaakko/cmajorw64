@@ -10,6 +10,7 @@
 #include <cmajor/symbols/Exception.hpp>
 #include <cmajor/symbols/InitDone.hpp>
 #include <cmajor/symbols/GlobalFlags.hpp>
+#include <cmajor/symbols/ModuleCache.hpp>
 #include <cmajor/symbols/Warning.hpp>
 #include <cmajor/parsing/Exception.hpp>
 #include <cmajor/dom/Document.hpp>
@@ -44,7 +45,7 @@ struct InitDone
     }
 };
 
-const char* version = "2.3.0";
+const char* version = "2.4.0";
 
 void PrintHelp()
 {
@@ -102,6 +103,8 @@ void PrintHelp()
         "   set MSBuild mode: this mode is for Visual Studio and MSBuild.\n" <<
         "--build-threads=N (-bt=N)\n" <<
         "   set number of build threads to N\n" <<
+        "--disable-module-cache (-dm)\n" <<
+        "   do not cache recently built modules\n" <<
         std::endl;
 }
 
@@ -178,6 +181,7 @@ int main(int argc, const char** argv)
             SetCompilerVersion(version);
             bool prevWasDefine = false;
             bool noDebugInfo = false;
+            bool useModuleCache = true;
             for (int i = 1; i < argc; ++i)
             {
                 std::string arg = argv[i];
@@ -260,6 +264,10 @@ int main(int argc, const char** argv)
                     else if (arg == "--no-debug-info" || arg == "-n")
                     {
                         noDebugInfo = true;
+                    }
+                    else if (arg == "--disable-module-cache" || arg == "-dm")
+                    {
+                        useModuleCache = false;
                     }
                     else if (arg.find('=') != std::string::npos)
                     {
@@ -358,6 +366,7 @@ int main(int argc, const char** argv)
                 std::cout << "Cmajor compiler version " << version << std::endl;
 #endif
             }
+            SetUseModuleCache(useModuleCache);
             if (!GetGlobalFlag(GlobalFlags::release) && !noDebugInfo)
             {
                 SetGlobalFlag(GlobalFlags::generateDebugInfo);

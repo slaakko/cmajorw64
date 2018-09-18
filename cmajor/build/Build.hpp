@@ -21,6 +21,7 @@ void BuildMsBuildProject(const std::string& projectName, const std::string& proj
     const std::vector<std::string>& sourceFiles, const std::vector<std::string>& referenceFiles, std::unique_ptr<Module>& rootModule);
 void GenerateLibrary(Module* module, const std::vector<std::string>& objectFilePaths, const std::string& libraryFilePath);
 void Link(const std::string& executableFilePath, const std::string& libraryFilePath, const std::vector<std::string>& libraryFilePaths, cmajor::symbols::Module& module);
+void StopBuild();
 
 } } // namespace cmajor::build
 

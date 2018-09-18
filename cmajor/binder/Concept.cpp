@@ -424,6 +424,7 @@ void ConstraintChecker::Visit(IdentifierNode& identifierNode)
                 {
                     NamespaceSymbol* ns = static_cast<NamespaceSymbol*>(symbol);
                     NamespaceTypeSymbol* namespaceTypeSymbol = new NamespaceTypeSymbol(ns);
+                    boundCompileUnit.GetSymbolTable().SetTypeIdFor(namespaceTypeSymbol);
                     namespaceTypeSymbols.push_back(std::unique_ptr<NamespaceTypeSymbol>(namespaceTypeSymbol));
                     type = namespaceTypeSymbol;
                     FileScope* fileScope = new FileScope(&boundCompileUnit.GetModule());
@@ -502,6 +503,7 @@ void ConstraintChecker::Visit(DotNode& dotNode)
             {
                 NamespaceSymbol* ns = static_cast<NamespaceSymbol*>(symbol);
                 NamespaceTypeSymbol* namespaceTypeSymbol = new NamespaceTypeSymbol(ns);
+                boundCompileUnit.GetSymbolTable().SetTypeIdFor(namespaceTypeSymbol);
                 namespaceTypeSymbols.push_back(std::unique_ptr<NamespaceTypeSymbol>(namespaceTypeSymbol));
                 type = namespaceTypeSymbol;
                 FileScope* fileScope = new FileScope(&boundCompileUnit.GetModule());
@@ -1288,7 +1290,7 @@ std::unique_ptr<BoundConcept> Instantiate(ConceptSymbol* conceptSymbol, const st
         throw Exception(&boundCompileUnit.GetModule(), "number of type arguments does not match number of template parameters of concept symbol", span, conceptSymbol->GetSpan());
     }
     ContainerScope instantiationScope;
-    instantiationScope.SetParent(containerScope);
+    instantiationScope.SetParentScope(containerScope);
     std::vector<std::unique_ptr<BoundTemplateParameterSymbol>> boundTemplateParameters;
     TypeSymbol* firstTypeArgument = nullptr;
     TypeSymbol* secondTypeArgument = nullptr;
@@ -1412,7 +1414,7 @@ bool CheckConstraint(ConstraintNode* constraint, const NodeList<Node>& usingNode
             }
         }
         ContainerScope constraintCheckScope;
-        constraintCheckScope.SetParent(containerScope);
+        constraintCheckScope.SetParentScope(containerScope);
         std::vector<std::unique_ptr<BoundTemplateParameterSymbol>> boundTemplateParameters;
         TypeSymbol* firstTypeArgument = nullptr;
         TypeSymbol* secondTypeArgument = nullptr;

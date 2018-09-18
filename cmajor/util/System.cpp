@@ -9,6 +9,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <string.h>
+#include <memory>
 #ifdef _WIN32
 #include <process.h>
 #include <windows.h>
@@ -24,6 +25,12 @@
 
 namespace cmajor { namespace util {
 
+bool disableConsoleWindow = false;
+
+void DisableConsoleWindow()
+{
+    disableConsoleWindow = true;
+}
 
 ProcessFailure::ProcessFailure(const std::string& errorMessage_, int exitCode_) : std::runtime_error(errorMessage_), exitCode(exitCode_)
 {
@@ -123,7 +130,54 @@ std::vector<std::string> ParseCommand(const std::string& command)
 
 void System(const std::string& command, bool ignoreReturnValue)
 {
-    int retVal = system(command.c_str());
+    int retVal = 0;
+    if (!disableConsoleWindow)
+    {
+        retVal = system(command.c_str());
+    }
+    else
+    {
+#ifdef _WIN32
+        STARTUPINFO si;
+        PROCESS_INFORMATION pi;
+        ZeroMemory(&si, sizeof(si));
+        si.cb = sizeof(si);
+        ZeroMemory(&pi, sizeof(pi));
+        int n = command.length();
+        std::unique_ptr<char> c(new char[n + 1]);
+        for (int i = 0; i < n; ++i)
+        {
+            c.get()[i] = command[i];
+        }
+        c.get()[n] = '\0';
+        if (CreateProcess(NULL, c.get(), NULL, NULL, FALSE, CREATE_NO_WINDOW, NULL, NULL, &si, &pi))
+        {
+            WaitForSingleObject(pi.hProcess, INFINITE);
+            DWORD exitCode;
+            if (GetExitCodeProcess(pi.hProcess, &exitCode))
+            {
+                retVal = exitCode;
+            }
+            else
+            {
+                retVal = 1;
+            }
+            CloseHandle(pi.hProcess);
+            CloseHandle(pi.hThread);
+        }
+        else
+        {
+            retVal = 1;
+        }
+
+#elif defined(__linux) || defined(__unix) || defined(__posix)
+        retVal = system(command.c_str());
+#else
+
+#error unknown platform
+
+#endif
+    }
     if (!ignoreReturnValue)
     {
         if (retVal != 0)

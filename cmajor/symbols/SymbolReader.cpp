@@ -7,10 +7,13 @@
 #include <cmajor/symbols/ArrayTypeSymbol.hpp>
 #include <cmajor/symbols/DerivedTypeSymbol.hpp>
 #include <cmajor/symbols/ClassTemplateSpecializationSymbol.hpp>
+#include <cmajor/symbols/SymbolTable.hpp>
 
 namespace cmajor { namespace symbols {
 
-SymbolReader::SymbolReader(const std::string& fileName_) : astReader(fileName_), symbolTable(nullptr), module(nullptr), setProjectBit(false)
+SymbolReader::SymbolReader(const std::string& fileName_) : 
+    astReader(fileName_), symbolTable(nullptr), module(nullptr), rootModule(nullptr), conversions(nullptr), arrayTypes(nullptr), derivedTypes(nullptr),
+    classTemplateSpecializations(nullptr), typeAndConceptRequests(nullptr), functionRequests(nullptr), setProjectBit(false), symbolsCached(false)
 {
 }
 
@@ -20,9 +23,7 @@ Symbol* SymbolReader::ReadSymbol(Symbol* parent)
     Span span = astReader.ReadSpan();
     std::u32string name = astReader.GetBinaryReader().ReadUtf32String();
     Symbol* symbol = SymbolFactory::Instance().CreateSymbol(symbolType, span, name);
-    symbol->SetSymbolTable(symbolTable);
     symbol->SetModule(module);
-    symbol->SetOriginalModule(module);
     symbol->SetParent(parent);
     symbol->Read(*this);
     return symbol;
@@ -82,17 +83,74 @@ ParameterSymbol* SymbolReader::ReadParameterSymbol(Symbol* parent)
 
 void SymbolReader::AddConversion(FunctionSymbol* conversion)
 {
-    conversions.push_back(conversion);
+    if (conversions)
+    {
+        conversions->push_back(conversion);
+    }
+    else
+    {
+        throw std::runtime_error("reader conversions target not set");
+    }
 }
 
-void SymbolReader::AddClassType(ClassTypeSymbol* classType)
+void SymbolReader::AddArrayType(ArrayTypeSymbol* arrayType)
 {
-    classTypes.push_back(classType);
+    if (arrayTypes)
+    {
+        arrayTypes->push_back(arrayType);
+    }
+    else
+    {
+        throw std::runtime_error("reader array types target not set");
+    }
+}
+
+void SymbolReader::AddDerivedType(DerivedTypeSymbol* derivedType)
+{
+    if (derivedTypes)
+    {
+        derivedTypes->push_back(derivedType);
+    }
+    else
+    {
+        throw std::runtime_error("reader derived types target not set");
+    }
 }
 
 void SymbolReader::AddClassTemplateSpecialization(ClassTemplateSpecializationSymbol* classTemplateSpecialization)
 {
-    classTemplateSpecializations.push_back(classTemplateSpecialization);
+    if (classTemplateSpecializations)
+    {
+        classTemplateSpecializations->push_back(classTemplateSpecialization);
+    }
+    else
+    {
+        throw std::runtime_error("reader class template specialization target not set");
+    }
+}
+
+void SymbolReader::AddTypeOrConceptRequest(TypeOrConceptRequest&& typeOrConceptRequest)
+{
+    if (typeAndConceptRequests)
+    {
+        typeAndConceptRequests->push_back(std::move(typeOrConceptRequest));
+    }
+    else
+    {
+        throw std::runtime_error("reader type and concept request target not set");
+    }
+}
+
+void SymbolReader::AddFunctionRequest(FunctionRequest&& functionRequest)
+{
+    if (functionRequests)
+    {
+        functionRequests->push_back(std::move(functionRequest));
+    }
+    else
+    {
+        throw std::runtime_error("reader function request target not set");
+    }
 }
 
 } } // namespace cmajor::symbols

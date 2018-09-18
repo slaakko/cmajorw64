@@ -5,6 +5,8 @@
 
 #include <cmajor/symbols/TemplateSymbol.hpp>
 #include <cmajor/symbols/SymbolTable.hpp>
+#include <cmajor/symbols/Exception.hpp>
+#include <cmajor/symbols/Module.hpp>
 #include <cmajor/symbols/SymbolWriter.hpp>
 #include <cmajor/symbols/SymbolReader.hpp>
 #include <cmajor/util/Unicode.hpp>
@@ -45,7 +47,7 @@ void TemplateParameterSymbol::Read(SymbolReader& reader)
         reader.GetBinaryReader().ReadUuid(defaultTypeId);
         if (!defaultTypeId.is_nil())
         {
-            GetSymbolTable()->EmplaceTypeRequest(this, defaultTypeId, 0);
+            reader.GetSymbolTable()->EmplaceTypeRequest(reader, this, defaultTypeId, 0);
         }
     }
 }
@@ -54,22 +56,6 @@ void TemplateParameterSymbol::EmplaceType(TypeSymbol* typeSymbol, int index)
 {
     Assert(index == 0, "invalid emplace type index");
     defaultType = typeSymbol;
-}
-
-void TemplateParameterSymbol::ComputeExportClosure()
-{
-    if (IsProject())
-    {
-        TypeSymbol::ComputeExportClosure();
-        if (defaultType)
-        {
-            if (!defaultType->ExportComputed())
-            {
-                defaultType->SetExportComputed();
-                defaultType->ComputeExportClosure();
-            }
-        }
-    }
 }
 
 TypeSymbol* TemplateParameterSymbol::Unify(TypeSymbol* type, const Span& span)
@@ -94,6 +80,20 @@ BoundTemplateParameterSymbol::BoundTemplateParameterSymbol(const Span& span_, co
 {
 }
 
+void BoundTemplateParameterSymbol::Write(SymbolWriter& writer)
+{
+    Symbol::Write(writer);
+    writer.GetBinaryWriter().Write(type->TypeId());
+}
+
+void BoundTemplateParameterSymbol::Read(SymbolReader& reader)
+{
+    Symbol::Read(reader);
+    boost::uuids::uuid typeId;
+    reader.GetBinaryReader().ReadUuid(typeId);
+    reader.GetSymbolTable()->EmplaceTypeRequest(reader, this, typeId, 0);
+}
+
 std::unique_ptr<dom::Element> BoundTemplateParameterSymbol::CreateDomElement(TypeMap& typeMap)
 {
     std::unique_ptr<dom::Element> element(new dom::Element(U"BoundTemplateParameterSymbol"));
@@ -105,6 +105,15 @@ std::unique_ptr<dom::Element> BoundTemplateParameterSymbol::CreateDomElement(Typ
         element->AppendChild(std::unique_ptr<dom::Node>(typeElement.release()));
     }
     return element;
+}
+
+void BoundTemplateParameterSymbol::Check()
+{
+    Symbol::Check();
+    if (!type)
+    {
+        throw SymbolCheckException(GetRootModuleForCurrentThread(), "bound template parameter symbol contains null type pointer", GetSpan());
+    }
 }
 
 } } // namespace cmajor::symbols

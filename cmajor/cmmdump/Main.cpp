@@ -7,7 +7,6 @@
 #include <cmajor/parsing/InitDone.hpp>
 #include <cmajor/util/InitDone.hpp>
 #include <cmajor/binder/AttributeBinder.hpp>
-#include <cmajor/binder/ModuleBinder.hpp>
 #include <cmajor/symbols/InitDone.hpp>
 #include <cmajor/symbols/Exception.hpp>
 #include <cmajor/symbols/Module.hpp>
@@ -34,7 +33,7 @@ struct InitDone
     }
 };
 
-const char* version = "2.3.0";
+const char* version = "2.4.0";
 
 void PrintHelp()
 {
@@ -98,28 +97,15 @@ int main(int argc, const char** argv)
             {
                 throw std::runtime_error("Cmajor module file '" + moduleFilePath + "' not found.");
             }
-            std::vector<ClassTypeSymbol*> classTypes;
-            std::vector<ClassTemplateSpecializationSymbol*> classTemplateSpecializations;
-            rootModule.reset(new Module(moduleFilePath, classTypes, classTemplateSpecializations));
+            rootModule.reset(new Module(moduleFilePath));
+            rootModule->SetRootModule();
+            SetRootModuleForCurrentThread(rootModule.get());
             if (rootModule->Name() == U"System.Base")
             {
                 cmajor::symbols::MetaInit(rootModule->GetSymbolTable());
             }
-            std::unique_ptr<ModuleBinder> moduleBinder;
             CompileUnitNode compileUnit(Span(), "foo");
             AttributeBinder attributeBinder(rootModule.get());
-            moduleBinder.reset(new ModuleBinder(*rootModule, &compileUnit, &attributeBinder));
-            moduleBinder->SetBindingTypes();
-            rootModule->GetSymbolTable().AddClassTemplateSpecializationsToClassTemplateSpecializationMap(classTemplateSpecializations);
-            for (ClassTemplateSpecializationSymbol* classTemplateSpecialization : classTemplateSpecializations)
-            {
-                moduleBinder->BindClassTemplateSpecialization(classTemplateSpecialization);
-            }
-            for (ClassTypeSymbol* classType : classTypes)
-            {
-                classType->SetSpecialMemberFunctions();
-                classType->CreateLayouts();
-            }
             rootModule->Dump();
         }
     }

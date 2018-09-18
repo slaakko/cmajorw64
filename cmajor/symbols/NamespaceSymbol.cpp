@@ -14,19 +14,30 @@ NamespaceSymbol::NamespaceSymbol(const Span& span_, const std::u32string& name_)
 
 void NamespaceSymbol::Import(NamespaceSymbol* that, SymbolTable& symbolTable)
 {
-    symbolTable.BeginNamespace(that->Name(), that->GetSpan(), that->GetOriginalModule());
-    for (std::unique_ptr<Symbol>& symbol : that->Members())
+    NamespaceSymbol* ns = symbolTable.BeginNamespace(that->Name(), that->GetSpan());
+    symbolTable.MapNs(that, ns);
+    for (const std::unique_ptr<Symbol>& symbol : that->Members())
     {
         if (symbol->GetSymbolType() == SymbolType::namespaceSymbol)
         {
             NamespaceSymbol* thatNs = static_cast<NamespaceSymbol*>(symbol.get());
             Import(thatNs, symbolTable);
         }
-        else if (symbol->GetSymbolType() != SymbolType::functionGroupSymbol && 
-            symbol->GetSymbolType() != SymbolType::conceptGroupSymbol && 
-            symbol->GetSymbolType() != SymbolType::classGroupTypeSymbol)
+        else 
         {
-            symbolTable.Container()->AddMember(symbol.release());
+            if (symbol->GetSymbolType() == SymbolType::functionGroupSymbol)
+            {
+                continue;
+            }
+            if (symbol->GetSymbolType() == SymbolType::conceptGroupSymbol)
+            {
+                continue;
+            }
+            if (symbol->GetSymbolType() == SymbolType::classGroupTypeSymbol)
+            {
+                continue;
+            }
+            symbolTable.Container()->AddOwnedMember(symbol.get());
         }
     }
     symbolTable.EndNamespace();

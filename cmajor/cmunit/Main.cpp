@@ -13,7 +13,6 @@
 #include <cmajor/symbols/SymbolCreatorVisitor.hpp>
 #include <cmajor/symbols/Warning.hpp>
 #include <cmajor/binder/BoundStatement.hpp>
-#include <cmajor/binder/ModuleBinder.hpp>
 #include <cmajor/binder/AttributeBinder.hpp>
 #include <cmajor/binder/TypeBinder.hpp>
 #include <cmajor/binder/StatementBinder.hpp>
@@ -72,7 +71,7 @@ using namespace cmajor::emitter;
 using namespace cmajor::dom;
 using namespace cmajor::xpath;
 
-const char* version = "2.3.0";
+const char* version = "2.4.0";
 
 void PrintHelp()
 {
@@ -230,6 +229,8 @@ void TestUnit(FileTable* fileTable, cmajor::ast::Project* project, CompileUnitNo
     {
         std::string config = GetConfig();
         rootModule.reset(new Module(project->Name(), project->ModuleFilePath()));
+        rootModule->SetRootModule();
+        SetRootModuleForCurrentThread(rootModule.get());
         rootModule->SetCurrentToolName(U"cmc");
         rootModule->SetCurrentProjectName(project->Name());
         int16_t numFiles = fileTable->NumFilePaths();
@@ -238,22 +239,9 @@ void TestUnit(FileTable* fileTable, cmajor::ast::Project* project, CompileUnitNo
             rootModule->GetFileTable().RegisterFilePath(fileTable->GetFilePath(i));
         }
         AttributeBinder attributeBinder(rootModule.get());
-        ModuleBinder moduleBinder(*rootModule, testUnit, &attributeBinder);
-        moduleBinder.SetBindingTypes();
-        std::vector<ClassTypeSymbol*> classTypes;
-        std::vector<ClassTemplateSpecializationSymbol*> classTemplateSpecializations;
-        rootModule->PrepareForCompilation(project->References(), classTypes, classTemplateSpecializations);
+        rootModule->PrepareForCompilation(project->References());
         cmajor::symbols::MetaInit(rootModule->GetSymbolTable());
         CreateSymbols(rootModule->GetSymbolTable(), testUnit);
-        for (ClassTemplateSpecializationSymbol* classTemplateSpecialization : classTemplateSpecializations)
-        {
-            moduleBinder.BindClassTemplateSpecialization(classTemplateSpecialization);
-        }
-        for (ClassTypeSymbol* classType : classTypes)
-        {
-            classType->SetSpecialMemberFunctions();
-            classType->CreateLayouts();
-        }
         std::vector<std::string> objectFilePaths;
         EmittingContext emittingContext;
         {

@@ -19,7 +19,6 @@ public:
     void Write(SymbolWriter& writer) override;
     void Read(SymbolReader& reader) override;
     void EmplaceType(TypeSymbol* typeSymbol, int index) override;
-    void ComputeExportClosure() override;
     void AddMember(Symbol* member) override;
     std::string TypeString() const override { return "delegate"; }
     std::string Syntax() const override;
@@ -41,11 +40,11 @@ public:
     void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span);
     std::u32string Info() const override { return Name(); }
     const char* ClassName() const override { return "DelegateTypeSymbol"; }
+    void Check() override;
 private:
     TypeSymbol* returnType;
     std::vector<ParameterSymbol*> parameters;
     std::unique_ptr<ParameterSymbol> returnParam;
-    llvm::Type* irType;
 };
 
 class DelegateTypeDefaultConstructor : public FunctionSymbol
@@ -60,6 +59,7 @@ public:
     void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
     bool IsBasicTypeOperation() const override { return true; }
     const char* ClassName() const override { return "DelegateTypeDefaultConstructor"; }
+    void Check() override;
 private:
     DelegateTypeSymbol* delegateType;
 };
@@ -142,6 +142,7 @@ public:
     void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
     bool IsBasicTypeOperation() const override { return true; }
     const char* ClassName() const override { return "FunctionToDelegateConversion"; }
+    void Check() override;
 private:
     TypeSymbol* sourceType;
     TypeSymbol* targetType;
@@ -155,7 +156,6 @@ public:
     void Write(SymbolWriter& writer) override;
     void Read(SymbolReader& reader) override;
     void EmplaceType(TypeSymbol* typeSymbol, int index) override;
-    void ComputeExportClosure() override;
     void AddMember(Symbol* member) override;
     std::string TypeString() const override { return "class_delegate"; }
     std::string Syntax() const override;
@@ -180,13 +180,13 @@ public:
     void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span);
     std::u32string Info() const override { return Name(); }
     const char* ClassName() const override { return "ClassDelegateTypeSymbol"; }
+    void Check() override;
 private:
     TypeSymbol* returnType;
     std::vector<ParameterSymbol*> parameters;
     std::unique_ptr<ParameterSymbol> returnParam;
     DelegateTypeSymbol* delegateType;
     ClassTypeSymbol* objectDelegatePairType;
-    llvm::Type* irType;
     FunctionSymbol* copyConstructor;
 };
 
@@ -203,6 +203,7 @@ public:
     bool IsBasicTypeOperation() const override { return true; }
     bool IsConstructorDestructorOrNonstaticMemberFunction() const override { return true; }
     const char* ClassName() const override { return "ClassDelegateTypeDefaultConstructor"; }
+    void Check() override;
 private:
     ClassDelegateTypeSymbol* classDelegateType;
 };
@@ -282,6 +283,7 @@ public:
     void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
     bool IsBasicTypeOperation() const override { return true; }
     const char* ClassName() const override { return "MemberFunctionToClassDelegateConversion"; }
+    void Check() override;
 private:
     TypeSymbol* sourceType;
     ClassDelegateTypeSymbol* targetType;

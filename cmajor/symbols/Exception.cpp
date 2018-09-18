@@ -237,6 +237,15 @@ void Exception::AddToDiagnosticsElement(cmajor::dom::Element* diagnosticsElement
 
 }
 
+ModuleImmutableException::ModuleImmutableException(Module* module_, Module* immutableModule, const Span& defined_, const Span& referenced_) :
+    Exception(module_, "attempt to add a symbol to an immutable module' " + ToUtf8(immutableModule->Name()) + "'", defined_, referenced_)
+{
+}
+
+SymbolCheckException::SymbolCheckException(Module* module_, const std::string& message_, const Span& defined_) : Exception(module_, message_, defined_)
+{
+}
+
 CastOverloadException::CastOverloadException(Module* module, const std::string& message_, const Span& defined_) : Exception(module, message_, defined_)
 {
 }

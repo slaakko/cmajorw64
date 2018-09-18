@@ -9,6 +9,7 @@
 #include <cmajor/ir/Emitter.hpp>
 #include <llvm/IR/Type.h>
 #include <boost/uuid/uuid.hpp>
+#include <boost/functional/hash.hpp>
 
 namespace cmajor { namespace symbols {
 
@@ -39,6 +40,7 @@ public:
     virtual const TypeSymbol* BaseType() const { return this; }
     virtual TypeSymbol* BaseType() { return this; }
     virtual TypeSymbol* PlainType(const Span& span) { return this; }
+    virtual TypeSymbol* PlainType(const Span& span, Module* module) { return this; }
     virtual TypeSymbol* RemoveConst(const Span& span) { return this; }
     virtual TypeSymbol* RemoveReference(const Span& span) { return this; }
     virtual TypeSymbol* RemovePointer(const Span& span) { return this; }
@@ -62,6 +64,7 @@ public:
     virtual int PointerCount() const { return 0; }
     virtual bool HasNontrivialDestructor() const { return false; }
     virtual bool ContainsTemplateParameter() const { return false; }
+    virtual bool CompletelyBound() const { return IsBound(); }
     void SetTypeId(const boost::uuids::uuid& typeId_) { typeId = typeId_; }
     const boost::uuids::uuid& TypeId() const { Assert(!typeId.is_nil(), "type id not initialized");  return typeId; }
     bool TypeIdNotSet() const { return typeId.is_nil(); }
@@ -69,7 +72,7 @@ public:
     virtual TypeSymbol* RemoveDerivations(const TypeDerivationRec& sourceDerivationRec, const Span& span);
     virtual TypeSymbol* Unify(TypeSymbol* that, const Span& span) { return nullptr; }
     virtual TypeSymbol* UnifyTemplateArgumentType(SymbolTable& symbolTable, const std::unordered_map<TemplateParameterSymbol*, TypeSymbol*>& templateParameterMap, const Span& span) { return nullptr; }
-    virtual bool IsRecursive(TypeSymbol* type, std::unordered_set<TypeSymbol*>& tested);
+    virtual bool IsRecursive(TypeSymbol* type, std::unordered_set<boost::uuids::uuid, boost::hash<boost::uuids::uuid>>& tested);
     virtual ValueType GetValueType() const;
     virtual Value* MakeValue() const { return nullptr; }
     std::u32string Id() const override;
@@ -77,17 +80,17 @@ public:
     uint64_t SizeInBits(Emitter& emitter);
     uint32_t AlignmentInBits(Emitter& emitter);
     const char* ClassName() const override { return "TypeSymbol"; }
+    void Check() override;
 private:
     boost::uuids::uuid typeId;
     int32_t compileUnitIndex;
-    llvm::DIType* diType;
 };
 
 bool CompareTypesForEquality(const TypeSymbol* left, const TypeSymbol* right);
 
 inline bool TypesEqual(const TypeSymbol* left, const TypeSymbol* right)
 {
-    if (left == right) return true;
+    if (left->TypeId() == right->TypeId()) return true;
     return CompareTypesForEquality(left, right);
 }
 

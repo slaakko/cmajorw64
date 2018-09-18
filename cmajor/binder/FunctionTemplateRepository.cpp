@@ -61,11 +61,11 @@ FunctionSymbol* FunctionTemplateRepository::Instantiate(FunctionSymbol* function
     {
         return it->second;
     }
+
     SymbolTable& symbolTable = boundCompileUnit.GetSymbolTable();
     Node* node = symbolTable.GetNodeNoThrow(functionTemplate);
     if (!node)
     {
-        functionTemplate->ReadAstNodes();
         node = functionTemplate->GetFunctionNode();
         Assert(node, "function node not read");
     }

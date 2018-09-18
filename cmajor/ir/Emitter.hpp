@@ -10,7 +10,10 @@
 #include <cmajor/ir/ValueStack.hpp>
 #include <llvm/IR/IRBuilder.h>
 #include <llvm/IR/DIBuilder.h>
+#include <boost/uuid/uuid.hpp>
+#include <boost/functional/hash.hpp>
 #include <unordered_map>
+#include <unordered_set>
 
 namespace cmajor { namespace ir {
 
@@ -72,13 +75,36 @@ public:
     void SetCurrentDebugLocation(const Span& span);
     llvm::DebugLoc GetCurrentDebugLocation() { return currentDebugLocation; }
     llvm::DIFile* GetFile(int32_t fileIndex);
-    void SetCompileUnitIndex(int32_t compileUnitIndex_) { compileUnitIndex = compileUnitIndex_; }
-    int32_t CompileUnitIndex() const { return compileUnitIndex; }
-    llvm::DIType* GetDIType(void* symbol) const;
-    void SetDIType(void* symbol, llvm::DIType* diType);
-    virtual llvm::DIType* CreateDIType(void* forType) = 0;
-    void MapFwdDeclaration(llvm::DIType* fwdDeclaration, void* type);
+    llvm::DIType* GetDITypeByTypeId(const boost::uuids::uuid& typeId) const;
+    void SetDITypeByTypeId(const boost::uuids::uuid& typeId, llvm::DIType* diType);
+    llvm::DIDerivedType* GetDIMemberType(const std::pair<boost::uuids::uuid, int32_t>& memberVariableId) const;
+    void SetDIMemberType(const std::pair<boost::uuids::uuid, int32_t>& memberVariableId, llvm::DIDerivedType* diType);
+    void MapFwdDeclaration(llvm::DIType* fwdDeclaration, const boost::uuids::uuid& typeId);
+    void MapClassPtr(const boost::uuids::uuid& typeId, void* classPtr);
     void ReplaceForwardDeclarations();
+    virtual llvm::DIType* CreateClassDIType(void* classPtr) = 0;
+    llvm::Value* GetIrObject(void* symbol) const;
+    void SetIrObject(void* symbol, llvm::Value* irObject);
+    llvm::Type* GetIrType(void* type) const;
+    void SetIrType(void*, llvm::Type* irType);
+    llvm::Type* GetIrTypeByTypeId(const boost::uuids::uuid& typeId);
+    void SetIrTypeByTypeId(const boost::uuids::uuid& typeId, llvm::Type* irType);
+    llvm::FunctionType* GetFunctionIrType(void* symbol) const;
+    void SetFunctionIrType(void* symbol, llvm::FunctionType* irType);
+    bool IsVmtObjectCreated(void* symbol) const;
+    void SetVmtObjectCreated(void* symbol);
+    bool IsStaticObjectCreated(void* symbol) const;
+    void SetStaticObjectCreated(void* symbol);
+    llvm::StructType* GetStaticObjectType(void* symbol) const;
+    void SetStaticObjectType(void* symbol, llvm::StructType* type);
+    llvm::ArrayType* GetVmtObjectType(void* symbol) const;
+    void SetVmtObjectType(void* symbol, llvm::ArrayType* vmtObjectType);
+    std::string GetStaticObjectName(void* symbol) const;
+    void SetStaticObjectName(void* symbol, const std::string& staticObjectName);
+    std::string GetVmtObjectName(void* symbol) const;
+    void SetVmtObjectName(void* symbol, const std::string& vmtObjectName);
+    std::string GetImtArrayObjectName(void* symbol) const;
+    void SetImtArrayObjectName(void* symbol, const std::string& imtArrayObjectName);
 private:
     llvm::LLVMContext& context;
     llvm::IRBuilder<> builder;
@@ -97,8 +123,21 @@ private:
     llvm::DebugLoc currentDebugLocation;
     bool inPrologue;
     std::unordered_map<int32_t, llvm::DIFile*> fileMap;
-    std::unordered_map<void*, llvm::DIType*> diTypeMap;
-    std::unordered_map<llvm::DIType*, void*> fwdDeclarationMap;
+    std::unordered_map<boost::uuids::uuid, llvm::DIType*, boost::hash<boost::uuids::uuid>> diTypeTypeIdMap;
+    std::unordered_map<std::pair<boost::uuids::uuid, int32_t>, llvm::DIDerivedType*, boost::hash<std::pair<boost::uuids::uuid, int32_t>>> diMemberTypeMap;
+    std::unordered_map<llvm::DIType*, boost::uuids::uuid> fwdDeclarationMap;
+    std::unordered_map<boost::uuids::uuid, void*, boost::hash<boost::uuids::uuid>> classPtrMap;
+    std::unordered_map<void*, llvm::Value*> irObjectMap;
+    std::unordered_map<void*, llvm::Type*> irTypeMap;
+    std::unordered_map<boost::uuids::uuid, llvm::Type*, boost::hash<boost::uuids::uuid>> irTypeTypeIdMap;
+    std::unordered_map<void*, llvm::FunctionType*> functionIrTypeMap;
+    std::unordered_set<void*> vmtObjectCreatedSet;
+    std::unordered_set<void*> staticObjectCreatedSet;
+    std::unordered_map<void*, llvm::StructType*> staticTypeMap;
+    std::unordered_map<void*, llvm::ArrayType*> vmtObjectTypeMap;
+    std::unordered_map<void*, std::string> staticObjectNameMap;
+    std::unordered_map<void*, std::string> vmtObjectNameMap;
+    std::unordered_map<void*, std::string> imtArrayObjectNameMap;
 };
 
 } } // namespace cmajor::ir

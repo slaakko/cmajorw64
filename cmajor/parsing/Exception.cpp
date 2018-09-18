@@ -108,7 +108,7 @@ void ThrowException(const std::string& message, const Span& span)
 
 ParsingException::ParsingException(const std::string& message_, const std::string& fileName_, const Span& span_, const char32_t* start_, const char32_t* end_):
     std::runtime_error(message_ + " in file " + fileName_ + " at line " + std::to_string(span_.LineNumber()) + ":\n" + ToUtf8(GetErrorLines(start_, end_, span_))), 
-    message(message_), fileName(fileName_), span(span_), start(start_), end(end_)
+    message(message_), fileName(fileName_), span(span_), start(start_), end(end_), module(nullptr)
 {
 }
 

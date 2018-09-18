@@ -5,6 +5,7 @@
 
 #include <cmajor/binder/BoundClass.hpp>
 #include <cmajor/binder/BoundNodeVisitor.hpp>
+#include <cmajor/binder/BoundFunction.hpp>
 #include <cmajor/symbols/Exception.hpp>
 
 namespace cmajor { namespace binder {
@@ -31,6 +32,22 @@ void BoundClass::Store(Emitter& emitter, OperationFlags flags)
 void BoundClass::AddMember(std::unique_ptr<BoundNode>&& member)
 {
     members.push_back(std::move(member));
+}
+
+bool BoundClass::ContainsSourceFunctions() const
+{
+    for (const auto& member : members)
+    {
+        if (member->GetBoundNodeType() == BoundNodeType::boundFunction)
+        {
+            BoundFunction* boundFunction = static_cast<BoundFunction*>(member.get());
+            if (boundFunction->GetFunctionSymbol()->HasSource())
+            {
+                return true;
+            }
+        }
+    }
+    return false;
 }
 
 } } // namespace cmajor::binder

@@ -92,7 +92,7 @@ public:
     llvm::BasicBlock* CleanupBlock() override { return cleanupBlock; }
     bool NewCleanupNeeded() override { return newCleanupNeeded; }
     Pad* CurrentPad() override { return currentPad; }
-    llvm::DIType* CreateDIType(void* forType) override;
+    llvm::DIType* CreateClassDIType(void* classPtr) override;
     virtual llvm::Function* GetPersonalityFunction() const = 0;
     virtual void GenerateCodeForCleanups() = 0;
 protected:
@@ -102,6 +102,7 @@ protected:
     cmajor::symbols::Module& symbolsModule;
     llvm::IRBuilder<>& builder;
     std::unique_ptr<llvm::DIBuilder> diBuilder;
+    bool debugInfo;
     cmajor::ir::ValueStack& stack;
     llvm::LLVMContext& context;
     llvm::Function* function;

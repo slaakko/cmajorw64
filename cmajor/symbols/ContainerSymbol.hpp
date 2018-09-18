@@ -21,7 +21,7 @@ public:
     void Write(SymbolWriter& writer) override;
     void Read(SymbolReader& reader) override;
     virtual void AddMember(Symbol* member);
-    void ComputeExportClosure() override;
+    void AddOwnedMember(Symbol* ownedMember);
     void Accept(SymbolCollector* collector) override;
     void Clear();
     std::string TypeString() const override { return "container"; }
@@ -33,6 +33,7 @@ public:
     void AppendChildElements(dom::Element* element, TypeMap& typeMap) const override;
     bool HasProjectMembers() const override;
     const char* ClassName() const override { return "ContainerSymbol"; }
+    void Check() override;
     FunctionSymbol* GetFunctionByIndex(int32_t functionIndex) const;
 private:
     std::vector<std::unique_ptr<Symbol>> members;

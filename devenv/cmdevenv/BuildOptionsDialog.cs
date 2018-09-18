@@ -14,9 +14,10 @@ namespace cmdevenv
 {
     public partial class BuildOptionsDialog : Form
     {
-        public BuildOptionsDialog()
+        public BuildOptionsDialog(CompilerLib compilerLib)
         {
             InitializeComponent();
+            this.compilerLib = compilerLib;
         }
         public bool StrictNothrow
         {
@@ -43,6 +44,11 @@ namespace cmdevenv
             get { return linkUsingMsLinkCheckBox.Checked; }
             set { linkUsingMsLinkCheckBox.Checked = value; }
         }
+        public bool DoNotUseModuleCache
+        {
+            get { return doNotUseModuleCacheCheckBox.Checked; }
+            set { doNotUseModuleCacheCheckBox.Checked = value; }
+        }
         public int NumBuildThreads
         {
             get { return buildThreadsComboBox.SelectedIndex; }
@@ -52,5 +58,11 @@ namespace cmdevenv
         {
             DialogResult = System.Windows.Forms.DialogResult.OK;
         }
+        private void resetModuleCacheButton_Click(object sender, EventArgs e)
+        {
+            compilerLib.DoResetModuleCache();
+            MessageBox.Show("Module cache reset");
+        }
+        private CompilerLib compilerLib;
     }
 }

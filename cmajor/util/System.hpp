@@ -21,6 +21,7 @@ private:
     int exitCode;
 };
 
+void DisableConsoleWindow();
 void System(const std::string& command);
 void System(const std::string& command, bool ignoreReturnValue);
 void System(const std::string& command, int redirectFd, const std::string& toFile);

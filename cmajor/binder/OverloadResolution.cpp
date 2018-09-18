@@ -703,7 +703,7 @@ std::unique_ptr<BoundFunctionCall> FailWithNoViableFunction(Module* module, cons
     }
 }
 
-std::unique_ptr<BoundFunctionCall> FailWithOverloadNotFound(Module* module, const std::unordered_set<FunctionSymbol*>& viableFunctions, const std::u32string& groupName, 
+std::unique_ptr<BoundFunctionCall> FailWithOverloadNotFound(Module* module, const ViableFunctionSet& viableFunctions, const std::u32string& groupName, 
     const std::vector<std::unique_ptr<BoundExpression>>& arguments, const std::vector<FunctionMatch>& failedFunctionMatches, const Span& span, 
     OverloadResolutionFlags flags, std::unique_ptr<Exception>& exception)
 {
@@ -809,14 +809,14 @@ std::unique_ptr<BoundFunctionCall> FailWithOverloadNotFound(Module* module, cons
         if ((flags & OverloadResolutionFlags::dontThrow) != OverloadResolutionFlags::none)
         {
             exception.reset(new CastOverloadException(module, "overload resolution failed: '" + overloadName + "' not found, or there are no acceptable conversions for all argument types. " +
-                std::to_string(viableFunctions.size()) + " viable functions examined. Note: cannot convert implicitly from '" +
+                std::to_string(viableFunctions.Get().size()) + " viable functions examined. Note: cannot convert implicitly from '" +
                 ToUtf8(sourceType->FullName()) + "' to '" + ToUtf8(targetType->FullName()) + "' but explicit conversion (cast) exists.", span, references));
             return std::unique_ptr<BoundFunctionCall>();
         }
         else
         {
             throw CastOverloadException(module, "overload resolution failed: '" + overloadName + "' not found, or there are no acceptable conversions for all argument types. " +
-                std::to_string(viableFunctions.size()) + " viable functions examined. Note: cannot convert implicitly from '" +
+                std::to_string(viableFunctions.Get().size()) + " viable functions examined. Note: cannot convert implicitly from '" +
                 ToUtf8(sourceType->FullName()) + "' to '" + ToUtf8(targetType->FullName()) + "' but explicit conversion (cast) exists.", span, references);
         }
     }
@@ -828,14 +828,14 @@ std::unique_ptr<BoundFunctionCall> FailWithOverloadNotFound(Module* module, cons
         {
             exception.reset(new CannotBindConstToNonconstOverloadException(module, "overload resolution failed: '" + overloadName +
                 "' not found, or there are no acceptable conversions for all argument types. " +
-                std::to_string(viableFunctions.size()) + " viable functions examined. Note: cannot bind constant '" + ToUtf8(sourceType->FullName()) + "' argument " +
+                std::to_string(viableFunctions.Get().size()) + " viable functions examined. Note: cannot bind constant '" + ToUtf8(sourceType->FullName()) + "' argument " +
                 " to nonconstant '" + ToUtf8(targetType->FullName()) + "' parameter", span, references));
             return std::unique_ptr<BoundFunctionCall>();
         }
         else
         {
             throw CannotBindConstToNonconstOverloadException(module, "overload resolution failed: '" + overloadName + "' not found, or there are no acceptable conversions for all argument types. " +
-                std::to_string(viableFunctions.size()) + " viable functions examined. Note: cannot bind constant '" + ToUtf8(sourceType->FullName()) + "' argument " +
+                std::to_string(viableFunctions.Get().size()) + " viable functions examined. Note: cannot bind constant '" + ToUtf8(sourceType->FullName()) + "' argument " +
                 " to nonconstant '" + ToUtf8(targetType->FullName()) + "' parameter", span, references);
         }
     }
@@ -845,13 +845,13 @@ std::unique_ptr<BoundFunctionCall> FailWithOverloadNotFound(Module* module, cons
         {
             exception.reset(new CannotAssignToConstOverloadException(module, "overload resolution failed: '" + overloadName +
                 "' not found, or there are no acceptable conversions for all argument types. " +
-                std::to_string(viableFunctions.size()) + " viable functions examined. Note: cannot assign to const object.", span, references));
+                std::to_string(viableFunctions.Get().size()) + " viable functions examined. Note: cannot assign to const object.", span, references));
             return std::unique_ptr<BoundFunctionCall>();
         }
         else
         {
             throw CannotAssignToConstOverloadException(module, "overload resolution failed: '" + overloadName + "' not found, or there are no acceptable conversions for all argument types. " +
-                std::to_string(viableFunctions.size()) + " viable functions examined. Note: cannot assign to const object. ", span, references);
+                std::to_string(viableFunctions.Get().size()) + " viable functions examined. Note: cannot assign to const object. ", span, references);
         }
     }
     else
@@ -859,13 +859,13 @@ std::unique_ptr<BoundFunctionCall> FailWithOverloadNotFound(Module* module, cons
         if ((flags & OverloadResolutionFlags::dontThrow) != OverloadResolutionFlags::none)
         {
             exception.reset(new Exception(module, "overload resolution failed: '" + overloadName + "' not found, or there are no acceptable conversions for all argument types. " +
-                std::to_string(viableFunctions.size()) + " viable functions examined." + note, span, references));
+                std::to_string(viableFunctions.Get().size()) + " viable functions examined." + note, span, references));
             return std::unique_ptr<BoundFunctionCall>();
         }
         else
         {
             throw Exception(module, "overload resolution failed: '" + overloadName + "' not found, or there are no acceptable conversions for all argument types. " +
-                std::to_string(viableFunctions.size()) + " viable functions examined." + note, span, references);
+                std::to_string(viableFunctions.Get().size()) + " viable functions examined." + note, span, references);
         }
     }
 }
@@ -1102,7 +1102,7 @@ std::unique_ptr<BoundFunctionCall> CreateBoundFunctionCall(FunctionSymbol* bestF
     return boundFunctionCall;
 }
 
-std::unique_ptr<BoundFunctionCall> SelectViableFunction(const std::unordered_set<FunctionSymbol*>& viableFunctions, const std::u32string& groupName, 
+std::unique_ptr<BoundFunctionCall> SelectViableFunction(const ViableFunctionSet& viableFunctions, const std::u32string& groupName, 
     std::vector<std::unique_ptr<BoundExpression>>& arguments, ContainerScope* containerScope, BoundCompileUnit& boundCompileUnit, BoundFunction* boundFunction, const Span& span,
     OverloadResolutionFlags flags, std::vector<TypeSymbol*>& templateArgumentTypes, std::unique_ptr<Exception>& exception)
 {
@@ -1111,7 +1111,7 @@ std::unique_ptr<BoundFunctionCall> SelectViableFunction(const std::unordered_set
     std::vector<FunctionMatch> failedFunctionMatches;
     std::vector<std::unique_ptr<Exception>> conceptCheckExceptions;
     std::vector<std::unique_ptr<BoundConstraint>> boundConstraints;
-    for (FunctionSymbol* viableFunction : viableFunctions)
+    for (FunctionSymbol* viableFunction : viableFunctions.Get())
     {
         FunctionMatch functionMatch(viableFunction);
         if (viableFunction->IsFunctionTemplate())
@@ -1178,14 +1178,6 @@ std::unique_ptr<BoundFunctionCall> SelectViableFunction(const std::unordered_set
                     {
                         std::unique_ptr<Exception> conceptCheckException;
                         std::unique_ptr<BoundConstraint> boundConstraint;
-                        Node* node = boundCompileUnit.GetSymbolTable().GetNodeNoThrow(viableFunction);
-                        if (!node)
-                        {
-                            if (!viableFunction->GetFunctionNode())
-                            {
-                                viableFunction->ReadAstNodes();
-                            }
-                        }
                         bool candidateFound = CheckConstraint(viableFunction->Constraint(), viableFunction->UsingNodes(), boundCompileUnit, containerScope, boundFunction,
                             viableFunction->TemplateParameters(), functionMatch.templateParameterMap, boundConstraint, span, viableFunction, conceptCheckException);
                         if (candidateFound)
@@ -1269,7 +1261,30 @@ std::unique_ptr<BoundFunctionCall> SelectViableFunction(const std::unordered_set
             {
                 if (instantiate)
                 {
-                    boundCompileUnit.InstantiateClassTemplateMemberFunction(bestFun, containerScope, boundFunction, span);
+                    ClassTemplateSpecializationSymbol* specialization = static_cast<ClassTemplateSpecializationSymbol*>(bestFun->Parent());
+                    if (specialization->GetModule() != module)
+                    {
+                        specialization = boundCompileUnit.GetSymbolTable().GetCurrentClassTemplateSpecialization(specialization);
+                        int index = bestFun->GetIndex();
+                        bestFun = specialization->GetFunctionByIndex(index);
+                    }
+                    bool firstTry = boundCompileUnit.InstantiateClassTemplateMemberFunction(bestFun, containerScope, boundFunction, span);
+                    if (!firstTry)
+                    {
+                        ClassTemplateSpecializationSymbol* specialization = static_cast<ClassTemplateSpecializationSymbol*>(bestFun->Parent());
+                        ClassTemplateSpecializationSymbol* copy = boundCompileUnit.GetSymbolTable().CopyClassTemplateSpecialization(specialization);
+                        boundCompileUnit.GetClassTemplateRepository().BindClassTemplateSpecialization(
+                            copy, boundCompileUnit.GetSymbolTable().GlobalNs().GetContainerScope(), span);
+                        int index = bestFun->GetIndex();
+                        bestFun = copy->GetFunctionByIndex(index);
+                        bool secondTry = boundCompileUnit.InstantiateClassTemplateMemberFunction(bestFun, containerScope, boundFunction, span);
+                        if (!secondTry)
+                        {
+                            throw Exception(GetRootModuleForCurrentThread(), 
+                                "internal error: could not instantiate member function of a class template specialization '" + ToUtf8(specialization->FullName()) + "'",
+                                specialization->GetSpan());
+                        }
+                    }
                 }
             }
             else if (!bestFun->IsGeneratedFunction() && GetGlobalFlag(GlobalFlags::release) && bestFun->IsInline())
@@ -1301,6 +1316,7 @@ std::unique_ptr<BoundFunctionCall> SelectViableFunction(const std::unordered_set
                     Warning warning(module->GetCurrentProjectName(), "a nothrow function calls a function that can throw and does not handle exceptions");
                     warning.SetDefined(span);
                     warning.SetReferences(references);
+                    warning.SetModule(module);
                     module->WarningCollection().AddWarning(warning);
                 }
             }
@@ -1352,7 +1368,28 @@ std::unique_ptr<BoundFunctionCall> SelectViableFunction(const std::unordered_set
         {
             if (instantiate)
             {
-                boundCompileUnit.InstantiateClassTemplateMemberFunction(singleBest, containerScope, boundFunction, span);
+                ClassTemplateSpecializationSymbol* specialization = static_cast<ClassTemplateSpecializationSymbol*>(singleBest->Parent());
+                if (specialization->GetModule() != module)
+                {
+                    specialization = boundCompileUnit.GetSymbolTable().GetCurrentClassTemplateSpecialization(specialization);
+                    int index = singleBest->GetIndex();
+                    singleBest = specialization->GetFunctionByIndex(index);
+                }
+                bool firstTry = boundCompileUnit.InstantiateClassTemplateMemberFunction(singleBest, containerScope, boundFunction, span);
+                if (!firstTry)
+                {
+                    ClassTemplateSpecializationSymbol* copy = boundCompileUnit.GetSymbolTable().CopyClassTemplateSpecialization(specialization);
+                    boundCompileUnit.GetClassTemplateRepository().BindClassTemplateSpecialization(copy, boundCompileUnit.GetSymbolTable().GlobalNs().GetContainerScope(), span);
+                    int index = singleBest->GetIndex();
+                    singleBest = copy->GetFunctionByIndex(index);
+                    bool secondTry = boundCompileUnit.InstantiateClassTemplateMemberFunction(singleBest, containerScope, boundFunction, span);
+                    if (!secondTry)
+                    {
+                        throw Exception(GetRootModuleForCurrentThread(),
+                            "internal error: could not instantiate member function of a class template specialization '" + ToUtf8(specialization->FullName()) + "'",
+                            specialization->GetSpan());
+                    }
+                }
             }
         }
         else if (!singleBest->IsGeneratedFunction() && GetGlobalFlag(GlobalFlags::release) && singleBest->IsInline())
@@ -1392,7 +1429,7 @@ std::unique_ptr<BoundFunctionCall> SelectViableFunction(const std::unordered_set
 }
 
 void CollectViableFunctionsFromSymbolTable(int arity, const std::u32string& groupName, const std::vector<FunctionScopeLookup>& functionScopeLookups, BoundCompileUnit& boundCompileUnit,
-    std::unordered_set<FunctionSymbol*>& viableFunctions)
+    ViableFunctionSet& viableFunctions)
 {
     std::unordered_set<ContainerScope*> scopesLookedUp;
     bool fileScopesLookedUp = false;
@@ -1403,12 +1440,13 @@ void CollectViableFunctionsFromSymbolTable(int arity, const std::u32string& grou
             fileScopesLookedUp = true;
             for (const std::unique_ptr<FileScope>& fileScope : boundCompileUnit.FileScopes())
             {
-                fileScope->CollectViableFunctions(arity, groupName, scopesLookedUp, viableFunctions);
+                fileScope->CollectViableFunctions(arity, groupName, scopesLookedUp, viableFunctions, &boundCompileUnit.GetModule());
             }
         }
         else
         {
-            functionScopeLookup.scope->CollectViableFunctions(arity, groupName, scopesLookedUp, functionScopeLookup.scopeLookup, viableFunctions);
+            ContainerScope* scope = functionScopeLookup.scope;
+            scope->CollectViableFunctions(arity, groupName, scopesLookedUp, functionScopeLookup.scopeLookup, viableFunctions, &boundCompileUnit.GetModule());
         }
     }
 }
@@ -1427,12 +1465,12 @@ std::unique_ptr<BoundFunctionCall> ResolveOverload(const std::u32string& groupNa
 {
     Module* module = &boundCompileUnit.GetModule();
     int arity = arguments.size();
-    std::unordered_set<FunctionSymbol*> viableFunctions;
+    ViableFunctionSet viableFunctions;
     if (currentFunction)
     {
         boundCompileUnit.CollectViableFunctions(groupName, containerScope, arguments, currentFunction, viableFunctions, exception, span);
     }
-    if (viableFunctions.empty())
+    if (viableFunctions.Get().empty())
     {
         if ((flags & OverloadResolutionFlags::dontThrow) == OverloadResolutionFlags::none && exception)
         {
@@ -1440,7 +1478,7 @@ std::unique_ptr<BoundFunctionCall> ResolveOverload(const std::u32string& groupNa
         }
         CollectViableFunctionsFromSymbolTable(arity, groupName, functionScopeLookups, boundCompileUnit, viableFunctions);
     }
-    if (viableFunctions.empty())
+    if (viableFunctions.Get().empty())
     {
         return FailWithNoViableFunction(module, groupName, arguments, span, flags, exception);
     }

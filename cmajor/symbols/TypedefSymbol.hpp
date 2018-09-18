@@ -17,7 +17,6 @@ public:
     void Read(SymbolReader& reader) override;
     void EmplaceType(TypeSymbol* typeSymbol, int index) override;
     bool IsExportSymbol() const override;
-    void ComputeExportClosure() override;
     void Accept(SymbolCollector* collector) override;
     void Dump(CodeFormatter& formatter) override;
     std::string TypeString() const override { return "typedef"; }
@@ -29,6 +28,7 @@ public:
     std::unique_ptr<dom::Element> CreateDomElement(TypeMap& typeMap) override;
     std::u32string Info() const override { return Name(); }
     const char* ClassName() const override { return "TypedefSymbol"; }
+    void Check() override;
 private:
     TypeSymbol* type;
 };

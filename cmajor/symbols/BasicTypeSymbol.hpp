@@ -35,6 +35,7 @@ public:
     FunctionSymbol* EqualityOp() { return equalityOp; }
     void SetEqualityOp(FunctionSymbol* equalityOp_) { equalityOp = equalityOp_; }
     const char* ClassName() const override { return "BasicTypeSymbol"; }
+    void Check() override;
 private:
     FunctionSymbol* defaultConstructor;
     FunctionSymbol* copyConstructor;

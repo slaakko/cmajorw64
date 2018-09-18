@@ -27,10 +27,10 @@ public:
     ValueType GetValueType() const override;
     Value* MakeValue() const override;
     const char* ClassName() const override { return "ArrayTypeSymbol"; }
+    void Check() override;
 private:
     TypeSymbol* elementType;
     int64_t size;
-    llvm::Type* irType;
 };
 
 class ArrayLengthFunction : public FunctionSymbol
@@ -46,6 +46,7 @@ public:
     bool IsBasicTypeOperation() const override { return true; }
     bool IsCompileTimePrimitiveFunction() const override { return true; }
     const char* ClassName() const override { return "ArrayLengthFunction"; }
+    void Check() override;
 private:
     ArrayTypeSymbol* arrayType;
 };
@@ -61,6 +62,7 @@ public:
     void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
     bool IsBasicTypeOperation() const override { return true; }
     const char* ClassName() const override { return "ArrayBeginFunction"; }
+    void Check() override;
 private:
     ArrayTypeSymbol* arrayType;
 };
@@ -76,6 +78,7 @@ public:
     void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
     bool IsBasicTypeOperation() const override { return true; }
     const char* ClassName() const override { return "ArrayEndFunction"; }
+    void Check() override;
 private:
     ArrayTypeSymbol* arrayType;
 };
@@ -91,6 +94,7 @@ public:
     void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
     bool IsBasicTypeOperation() const override { return true; }
     const char* ClassName() const override { return "ArrayCBeginFunction"; }
+    void Check() override;
 private:
     ArrayTypeSymbol* arrayType;
 };
@@ -106,6 +110,7 @@ public:
     void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
     bool IsBasicTypeOperation() const override { return true; }
     const char* ClassName() const override { return "ArrayCEndFunction"; }
+    void Check() override;
 private:
     ArrayTypeSymbol* arrayType;
 };
@@ -117,6 +122,7 @@ public:
     void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flag, const Span& spans) override;
     bool IsBasicTypeOperation() const override { return true; }
     const char* ClassName() const override { return "ArrayTypeDefaultConstructor"; }
+    void Check() override;
 private:
     ArrayTypeSymbol* arrayType;
     LocalVariableSymbol* loopVar;
@@ -130,6 +136,7 @@ public:
     void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
     bool IsBasicTypeOperation() const override { return true; }
     const char* ClassName() const override { return "ArrayTypeCopyConstructor"; }
+    void Check() override;
 private:
     ArrayTypeSymbol* arrayType;
     LocalVariableSymbol* loopVar;
@@ -143,6 +150,7 @@ public:
     void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
     bool IsBasicTypeOperation() const override { return true; }
     const char* ClassName() const override { return "ArrayTypeMoveConstructor"; }
+    void Check() override;
 private:
     ArrayTypeSymbol* arrayType;
     LocalVariableSymbol* loopVar;
@@ -156,6 +164,7 @@ public:
     void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
     bool IsBasicTypeOperation() const override { return true; }
     const char* ClassName() const override { return "ArrayTypeCopyAssignment"; }
+    void Check() override;
 private:
     ArrayTypeSymbol* arrayType;
     LocalVariableSymbol* loopVar;
@@ -169,6 +178,7 @@ public:
     void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
     bool IsBasicTypeOperation() const override { return true; }
     const char* ClassName() const override { return "ArrayTypeMoveAssignment"; }
+    void Check() override;
 private:
     ArrayTypeSymbol* arrayType;
     LocalVariableSymbol* loopVar;
@@ -183,6 +193,7 @@ public:
     bool IsBasicTypeOperation() const override { return true; }
     bool IsArrayElementAccess() const override { return true; }
     const char* ClassName() const override { return "ArrayTypeElementAccess"; }
+    void Check() override;
 private:
     ArrayTypeSymbol* arrayType;
 };

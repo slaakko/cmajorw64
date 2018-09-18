@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <cmdevenv.configuration>
     <cmc>cmc.exe</cmc>
     <tabSize>4</tabSize>
@@ -32,5 +32,6 @@
     <emitOptLlvm>false</emitOptLlvm>
     <linkWithDebugRuntime>false</linkWithDebugRuntime>
     <linkUsingMsLink>false</linkUsingMsLink>
+    <doNotUseModuleCache>false</doNotUseModuleCache>
     <numBuildThreads>0</numBuildThreads>
 </cmdevenv.configuration>

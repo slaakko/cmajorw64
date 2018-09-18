@@ -4,6 +4,8 @@
 // =================================
 
 #include <cmajor/symbols/ClassTemplateSpecializationSymbol.hpp>
+#include <cmajor/symbols/Exception.hpp>
+#include <cmajor/symbols/Module.hpp>
 #include <cmajor/symbols/SymbolWriter.hpp>
 #include <cmajor/symbols/SymbolReader.hpp>
 #include <cmajor/symbols/SymbolTable.hpp>
@@ -74,14 +76,14 @@ void ClassTemplateSpecializationSymbol::Read(SymbolReader& reader)
     ClassTypeSymbol::Read(reader);
     boost::uuids::uuid classTemplateId;
     reader.GetBinaryReader().ReadUuid(classTemplateId);
-    GetSymbolTable()->EmplaceTypeRequest(this, classTemplateId, -1);
+    reader.GetSymbolTable()->EmplaceTypeRequest(reader, this, classTemplateId, -1);
     uint32_t n = reader.GetBinaryReader().ReadULEB128UInt();
     templateArgumentTypes.resize(n);
     for (uint32_t i = 0; i < n; ++i)
     {
         boost::uuids::uuid typeArgumentId;
         reader.GetBinaryReader().ReadUuid(typeArgumentId);
-        GetSymbolTable()->EmplaceTypeRequest(this, typeArgumentId, -2 - i);
+        reader.GetSymbolTable()->EmplaceTypeRequest(reader, this, typeArgumentId, -2 - i);
     }
     flags = ClassTemplateSpecializationFlags(reader.GetBinaryReader().ReadByte());
 }
@@ -111,31 +113,27 @@ void ClassTemplateSpecializationSymbol::EmplaceType(TypeSymbol* typeSymbol, int 
     }
 }
 
-void ClassTemplateSpecializationSymbol::ComputeExportClosure()
-{
-    if (IsProject())
-    {
-        ClassTypeSymbol::ComputeExportClosure();
-        if (!classTemplate->ExportComputed())
-        {
-            classTemplate->SetExportComputed();
-            classTemplate->ComputeExportClosure();
-        }
-        for (TypeSymbol* templateArgumentType : templateArgumentTypes)
-        {
-            if (!templateArgumentType->ExportComputed())
-            {
-                templateArgumentType->SetExportComputed();
-                templateArgumentType->ComputeExportClosure();
-            }
-        }
-        MarkExport();
-    }
-}
-
 bool ClassTemplateSpecializationSymbol::IsPrototypeTemplateSpecialization() const
 {
     return IsPrototype();
+}
+
+llvm::Type* ClassTemplateSpecializationSymbol::IrType(Emitter& emitter)
+{
+    if (IsRecursive())
+    {
+        llvm::Type* localIrType = emitter.GetIrTypeByTypeId(TypeId());
+        if (!localIrType)
+        {
+            localIrType = ClassTypeSymbol::IrType(emitter);
+            emitter.SetIrTypeByTypeId(TypeId(), localIrType);
+        }
+        return localIrType;
+    }
+    else
+    {
+        return ClassTypeSymbol::IrType(emitter);
+    }
 }
 
 void ClassTemplateSpecializationSymbol::SetGlobalNs(std::unique_ptr<Node>&& globalNs_)
@@ -180,6 +178,22 @@ std::u32string ClassTemplateSpecializationSymbol::Id() const
     else
     {
         return TypeSymbol::Id();
+    }
+}
+
+void ClassTemplateSpecializationSymbol::Check()
+{
+    ClassTypeSymbol::Check();
+    if (!classTemplate)
+    {
+        throw SymbolCheckException(GetRootModuleForCurrentThread(), "class template specialization has no class template", GetSpan());
+    }
+    for (TypeSymbol* templateArguementType : templateArgumentTypes)
+    {
+        if (!templateArguementType)
+        {
+            throw SymbolCheckException(GetRootModuleForCurrentThread(), "class template specialization has no template argument type", GetSpan());
+        }
     }
 }
 

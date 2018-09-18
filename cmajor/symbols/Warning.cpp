@@ -12,7 +12,7 @@ namespace cmajor { namespace symbols {
 using namespace cmajor::util;
 using namespace cmajor::unicode;
 
-Warning::Warning(const std::u32string& project_, const std::string& message_) : project(project_), message(message_)
+Warning::Warning(const std::u32string& project_, const std::string& message_) : project(project_), message(message_), module(nullptr)
 {
 }
 

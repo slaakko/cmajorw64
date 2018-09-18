@@ -40,8 +40,9 @@ namespace cmdevenv
             editModuleBuilt = false;
             editorSplitContainer.Panel1.Controls.Add(editorTabControl);
             configComboBox.SelectedIndex = 0;
-            compiler = new Compiler();
-            compiler.CmcPath = Configuration.Instance.CmcPath;
+            //compiler = new Compiler();
+            //compiler.CmcPath = Configuration.Instance.CmcPath;
+            compiler = new CompilerLib();
             compiler.SetWriteMethod(this, WriteOutputLine);
             compiler.SetHandleCompileResultMethod(this, HandleCompileResult);
             profiler = new Profiler();
@@ -65,6 +66,8 @@ namespace cmdevenv
             emitOptLlvm = Configuration.Instance.EmitOptLlvm;
             linkWithDebugRuntime = Configuration.Instance.LinkWithDebugRuntime;
             linkUsingMsLink = Configuration.Instance.LinkUsingMsLink;
+            doNotUseModuleCache = Configuration.Instance.DoNotUseModuleCache;
+            compiler.DoSetUseModuleCache(!doNotUseModuleCache);
             numBuildThreads = Configuration.Instance.NumBuildThreads;
             optimizationLevel = -1;
             errorListView.ContextMenuStrip = errorsListViewContextMenuStrip;
@@ -94,7 +97,6 @@ namespace cmdevenv
             {
                 MessageBox.Show(ex.Message);
             }
-
         }
         public bool PreFilterMessage(ref Message m)
         {
@@ -1099,7 +1101,7 @@ namespace cmdevenv
             if (compileResult != null)
             {
                 hasErrors = !compileResult.Success;
-                hasWarningsOrInfos = compileResult.Warnings.Count > 0;
+                hasWarningsOrInfos = compileResult.Diagnostics.Count > 0;
             }
             if (hasErrors || hasWarningsOrInfos)
             {
@@ -1151,88 +1153,29 @@ namespace cmdevenv
                 }
                 if (compileResult != null)
                 {
-                    Diagnostics diagnostics = compileResult.Diagnostics;
-                    if (diagnostics != null)
+                    foreach (Diagnostic diagnostic in compileResult.Diagnostics)
                     {
-                        string tool = diagnostics.Tool;
-                        string file = "";
-                        string line = "";
-                        string text = "";
-                        Reference mainReference = null;
-                        if (diagnostics.References.Count > 0)
+                        if (diagnostic != null)
                         {
-                            mainReference = diagnostics.References[0];
-                            file = mainReference.File;
-                            if (mainReference.Line != 0)
+                            string tool = diagnostic.Tool;
+                            string category = diagnostic.Category;
+                            string message = diagnostic.Message;
+                            string project = diagnostic.Project;
+                            string file = "";
+                            string line = "";
+                            string text = "";
+                            if (diagnostic.Span != null)
                             {
-                                line = mainReference.Line.ToString();
+                                file = diagnostic.Span.File;
+                                if (diagnostic.Span.Line != 0)
+                                {
+                                    line = diagnostic.Span.Line.ToString();
+                                }
+                                text = diagnostic.Span.Text;
                             }
-                            else
-                            {
-                                line = "";
-                            }
-                            text = mainReference.Text.Trim();
-                        }
-                        ListViewItem item = new ListViewItem(new string[] { tool, diagnostics.Kind, diagnostics.Message, file, line, diagnostics.Project, text });
-                        item.Tag = mainReference;
-                        errorListView.Items.Add(item);
-                        for (int i = 1; i < diagnostics.References.Count; ++i)
-                        {
-                            Reference reference = diagnostics.References[i];
-                            file = reference.File;
-                            if (reference.Line != 0)
-                            {
-                                line = reference.Line.ToString();
-                            }
-                            else
-                            {
-                                line = "";
-                            }
-                            text = reference.Text.Trim();
-                            ListViewItem refItem = new ListViewItem(new string[] { "cmc", "info", "see reference to", file, line, "", text });
-                            refItem.Tag = reference;
-                            errorListView.Items.Add(refItem);
-                        }
-                        showErrorDescriptionInTextWindowToolStripMenuItem.Enabled = true;
-                    }
-                    foreach (Warning warning in compileResult.Warnings)
-                    {
-                        Reference mainWarningReference = null;
-                        string warningFile = "";
-                        string warningLine = "";
-                        string warningText = "";
-                        if (warning.References.Count > 0)
-                        {
-                            mainWarningReference = warning.References[0];
-                            warningFile = mainWarningReference.File;
-                            if (mainWarningReference.Line != 0)
-                            {
-                                warningLine = mainWarningReference.Line.ToString();
-                            }
-                            else
-                            {
-                                warningLine = "";
-                            }
-                        }
-                        ListViewItem item = new ListViewItem(new string[] { "cmc", "warning", warning.Message, warningFile, warningLine, warning.Project, "" });
-                        item.Tag = mainWarningReference;
-                        errorListView.Items.Add(item);
-                        for (int i = 1; i < warning.References.Count; ++i)
-                        {
-                            Reference reference = warning.References[i];
-                            warningFile = reference.File;
-                            if (reference.Line != 0)
-                            {
-                                warningLine = reference.Line.ToString();
-                            }
-                            else
-                            {
-                                warningLine = "";
-                            }
-                            warningText = reference.Text.Trim();
-                            ListViewItem refItem = new ListViewItem(new string[] { "cmc", "info", "see reference to", warningFile, warningLine, "", warningText });
-                            refItem.Tag = reference;
-                            errorListView.Items.Add(refItem);
+                            ListViewItem item = new ListViewItem(new string[] { tool, category, message, file, line, project, text });
+                            item.Tag = diagnostic.Span;
+                            errorListView.Items.Add(item);
                         }
                         showErrorDescriptionInTextWindowToolStripMenuItem.Enabled = true;
                     }
@@ -1475,10 +1418,10 @@ namespace cmdevenv
                 {
                     ListViewItem selectedItem = errorListView.SelectedItems[0];
                     string projectName = selectedItem.SubItems[5].Text;
-                    Reference reference = (Reference)selectedItem.Tag;
-                    if (reference != null)
+                    Span span = (Span)selectedItem.Tag;
+                    if (span != null)
                     {
-                        string filePath = reference.File;
+                        string filePath = span.File;
                         if (!string.IsNullOrEmpty(filePath))
                         {
                             SourceFile sourceFile = solution.GetSourceFileByPath(filePath);
@@ -1487,11 +1430,11 @@ namespace cmdevenv
                                 sourceFile = new SourceFile(Path.GetFileName(filePath), filePath, (filePath.EndsWith(".cm") ? SourceFile.Kind.cm : SourceFile.Kind.text));
                             }
                             Editor editor = EditSourceFile(sourceFile);
-                            int line = reference.Line;
+                            int line = span.Line;
                             if (line != 0)
                             {
-                                int startCol = reference.StartCol;
-                                int endCol = reference.EndCol;
+                                int startCol = span.StartCol;
+                                int endCol = span.EndCol;
                                 if (startCol != 0 && endCol == 0 || startCol == endCol)
                                 {
                                     endCol = startCol + 1;
@@ -1591,18 +1534,20 @@ namespace cmdevenv
         {
             try
             {
-                BuildOptionsDialog dialog = new BuildOptionsDialog();
+                BuildOptionsDialog dialog = new BuildOptionsDialog(compiler);
                 strictNothrow = Configuration.Instance.StrictNothrow;
                 emitLlvm = Configuration.Instance.EmitLlvm;
                 emitOptLlvm = Configuration.Instance.EmitOptLlvm;
                 linkWithDebugRuntime = Configuration.Instance.LinkWithDebugRuntime;
                 linkUsingMsLink = Configuration.Instance.LinkUsingMsLink;
+                doNotUseModuleCache = Configuration.Instance.DoNotUseModuleCache;
                 numBuildThreads = Configuration.Instance.NumBuildThreads;
                 dialog.StrictNothrow = strictNothrow;
                 dialog.EmitLlvm = emitLlvm;
                 dialog.EmitOptLlvm = emitOptLlvm;
                 dialog.LinkWithDebugRuntime = linkWithDebugRuntime;
                 dialog.LinkUsingMsLink = linkUsingMsLink;
+                dialog.DoNotUseModuleCache = doNotUseModuleCache;
                 dialog.NumBuildThreads = numBuildThreads;
                 if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                 {
@@ -1611,12 +1556,15 @@ namespace cmdevenv
                     emitOptLlvm = dialog.EmitOptLlvm;
                     linkWithDebugRuntime = dialog.LinkWithDebugRuntime;
                     linkUsingMsLink = dialog.LinkUsingMsLink;
+                    doNotUseModuleCache = dialog.DoNotUseModuleCache;
+                    compiler.DoSetUseModuleCache(!doNotUseModuleCache);
                     numBuildThreads = dialog.NumBuildThreads;
                     Configuration.Instance.StrictNothrow = strictNothrow;
                     Configuration.Instance.EmitLlvm = emitLlvm;
                     Configuration.Instance.EmitOptLlvm = emitOptLlvm;
                     Configuration.Instance.LinkWithDebugRuntime = linkWithDebugRuntime;
                     Configuration.Instance.LinkUsingMsLink = linkUsingMsLink;
+                    Configuration.Instance.DoNotUseModuleCache = doNotUseModuleCache;
                     Configuration.Instance.NumBuildThreads = numBuildThreads;
                     Configuration.Instance.Save();
                 }
@@ -1700,7 +1648,7 @@ namespace cmdevenv
                 cancelToolStripMenuItem.Enabled = true;
                 buildInProgress = true;
                 SetState(State.compiling);
-                compiler.DoClean(solutionOrProjectFilePath, config);
+                //compiler.DoClean(solutionOrProjectFilePath, config); todo
                 infoTimer.Stop();
                 infoLabel.Text = "Cleaning";
             }
@@ -2552,7 +2500,7 @@ namespace cmdevenv
         private XTabControl editorTabControl;
         private State state;
         private bool alterConfig;
-        private Compiler compiler;
+        private CompilerLib compiler;
         private Profiler profiler;
         private Executor executor;
         private UnitTester unitTester;
@@ -2572,6 +2520,7 @@ namespace cmdevenv
         private bool emitOptLlvm;
         private bool linkWithDebugRuntime;
         private bool linkUsingMsLink;
+        private bool doNotUseModuleCache;
         private int numBuildThreads;
         private int optimizationLevel;
         private DateTime compileStartTime;

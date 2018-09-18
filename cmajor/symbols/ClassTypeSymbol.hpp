@@ -35,11 +35,12 @@ public:
     void AppendChildElements(dom::Element* element, TypeMap& typeMap) const override;
     std::u32string Info() const override { return Name(); }
     const char* ClassName() const override { return "ClassGroupTypeSymbol"; }
+    void Check() override;
 private:
     std::unordered_map<int, ClassTypeSymbol*> arityClassMap;
 };
 
-enum class ClassTypeSymbolFlags : uint8_t
+enum class ClassTypeSymbolFlags : uint16_t
 {
     none = 0,
     abstract_ = 1 << 0,
@@ -49,22 +50,24 @@ enum class ClassTypeSymbolFlags : uint8_t
     layoutsComputed = 1 << 4,
     vmtObjectCreated = 1 << 5,
     staticObjectCreated = 1 << 6,
-    statementsNotBound = 1 << 7
+    statementsNotBound = 1 << 7,
+    recursiveComputed = 1 << 8,
+    recursive = 1 << 9
 };
 
 inline ClassTypeSymbolFlags operator|(ClassTypeSymbolFlags left, ClassTypeSymbolFlags right)
 {
-    return ClassTypeSymbolFlags(uint8_t(left) | uint8_t(right));
+    return ClassTypeSymbolFlags(uint16_t(left) | uint16_t(right));
 }
 
 inline ClassTypeSymbolFlags operator&(ClassTypeSymbolFlags left, ClassTypeSymbolFlags right)
 {
-    return ClassTypeSymbolFlags(uint8_t(left) & uint8_t(right));
+    return ClassTypeSymbolFlags(uint16_t(left) & uint16_t(right));
 }
 
 inline ClassTypeSymbolFlags operator~(ClassTypeSymbolFlags operand)
 {
-    return ClassTypeSymbolFlags(~uint8_t(operand));
+    return ClassTypeSymbolFlags(~uint16_t(operand));
 }
 
 const int32_t classIdVmtIndexOffset = 0;
@@ -79,11 +82,10 @@ public:
     ClassTypeSymbol(SymbolType symbolType_, const Span& span_, const std::u32string& name_);
     void Write(SymbolWriter& writer) override;
     void Read(SymbolReader& reader) override;
-    void ComputeExportClosure() override;
-    void ReadAstNodes();
     const NodeList<Node>& UsingNodes() const { return usingNodes; }
     ClassNode* GetClassNode() { return classNode.get(); }
     void EmplaceType(TypeSymbol* typeSymbol, int index) override;
+    void EmplaceFunction(FunctionSymbol* functionSymbol, int index) override;
     void AddMember(Symbol* member) override;
     bool IsClassTypeSymbol() const override { return true; }
     bool IsParentSymbol() const override { return true; }
@@ -94,8 +96,9 @@ public:
     void Accept(SymbolCollector* collector) override;
     void CollectMembers(SymbolCollector* collector);
     void Dump(CodeFormatter& formatter) override;
-    bool IsRecursive(TypeSymbol* type, std::unordered_set<TypeSymbol*>& tested) override;
+    bool IsRecursive(TypeSymbol* type, std::unordered_set<boost::uuids::uuid, boost::hash<boost::uuids::uuid>>& tested) override;
     virtual bool IsPrototypeTemplateSpecialization() const { return false; }
+    bool CompletelyBound() const override { return IsBound() && !StatementsNotBound(); }
     void CreateDestructorSymbol();
     const std::u32string& GroupName() const { return groupName; }
     void SetGroupName(const std::u32string& groupName_);
@@ -154,6 +157,11 @@ public:
     bool StatementsNotBound() const { return GetFlag(ClassTypeSymbolFlags::statementsNotBound); }
     void SetStatementsNotBound() { SetFlag(ClassTypeSymbolFlags::statementsNotBound); }
     void ResetStatementsNotBound() { ResetFlag(ClassTypeSymbolFlags::statementsNotBound); }
+    bool RecursiveComputed() const { return GetFlag(ClassTypeSymbolFlags::recursiveComputed); }
+    void SetRecursiveComputed() { SetFlag(ClassTypeSymbolFlags::recursiveComputed); }
+    bool IsRecursive();
+    bool Recursive() const { return GetFlag(ClassTypeSymbolFlags::recursive); }
+    void SetRecursive() { SetFlag(ClassTypeSymbolFlags::recursive); }
     ClassTypeSymbolFlags GetClassTypeSymbolFlags() const { return flags; }
     bool GetFlag(ClassTypeSymbolFlags flag) const { return (flags & flag) != ClassTypeSymbolFlags::none; }
     void SetFlag(ClassTypeSymbolFlags flag) { flags = flags | flag; }
@@ -169,14 +177,15 @@ public:
     llvm::DIType* CreateDIForwardDeclaration(Emitter& emitter);
     llvm::Value* VmtObject(Emitter& emitter, bool create);
     llvm::Type* VmtPtrType(Emitter& emitter);
-    const std::string& VmtObjectName();
-    const std::string& ImtArrayObjectName();
+    std::string VmtObjectName(Emitter& emitter);
+    std::string VmtObjectNameStr();
+    std::string ImtArrayObjectName(Emitter& emitter);
     std::string ImtObjectName(int index);
     int32_t VmtPtrIndex() const { return vmtPtrIndex; }
     ClassTypeSymbol* VmtPtrHolderClass();
     llvm::Value* StaticObject(Emitter& emitter, bool create);
     llvm::StructType* StaticObjectType(Emitter& emitter);
-    const std::string& StaticObjectName();
+    std::string StaticObjectName(Emitter& emitter);
     void SetPrototype(ClassTemplateSpecializationSymbol* prototype_) { prototype = prototype_; }
     ClassTemplateSpecializationSymbol* Prototype() const { return prototype; }
     ValueType GetValueType() const override;
@@ -184,6 +193,7 @@ public:
     std::u32string Id() const override;
     std::u32string Info() const override { return groupName; }
     const char* ClassName() const override { return "ClassTypeSymbol"; }
+    void Check() override;
 private:
     std::u32string groupName;
     int minArity;
@@ -207,19 +217,10 @@ private:
     std::vector<std::vector<FunctionSymbol*>> imts;
     std::vector<TypeSymbol*> objectLayout;
     std::vector<TypeSymbol*> staticLayout;
-    llvm::Type* irType;
-    llvm::ArrayType* vmtObjectType;
     int32_t vmtPtrIndex;
     NodeList<Node> usingNodes;
     std::unique_ptr<ClassNode> classNode;
     std::unique_ptr<ConstraintNode> constraint;
-    uint32_t sizeOfAstNodes;
-    uint32_t astNodesPos;
-    std::string filePathReadFrom;
-    std::string vmtObjectName;
-    std::string itabsArrayObjectName;
-    llvm::StructType* staticObjectType;
-    std::string staticObjectName;
     ClassTemplateSpecializationSymbol* prototype;
     void InitVmt(std::vector<FunctionSymbol*>& vmtToInit);
     llvm::Value* CreateImt(Emitter& emitter, int index);

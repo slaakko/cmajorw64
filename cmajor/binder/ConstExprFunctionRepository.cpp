@@ -15,26 +15,20 @@ ConstExprFunctionRepository::ConstExprFunctionRepository(BoundCompileUnit& bound
 
 FunctionNode* ConstExprFunctionRepository::GetFunctionNodeFor(FunctionSymbol* constExprFunctionSymbol)
 {
-    constExprFunctionSymbol->SetSymbolTable(&boundCompileUnit.GetSymbolTable());
     Node* node = boundCompileUnit.GetSymbolTable().GetNodeNoThrow(constExprFunctionSymbol);
     if (!node)
     {
-        constExprFunctionSymbol->ReadAstNodes();
-        node = boundCompileUnit.GetSymbolTable().GetNode(constExprFunctionSymbol);
+        node = constExprFunctionSymbol->GetFunctionNode();
     }
-    if (node->IsFunctionNode())
+    Assert(node->GetNodeType() == NodeType::functionNode, "function node expected");
+    FunctionNode* functionNode = static_cast<FunctionNode*>(node);
+    boundCompileUnit.GetSymbolTable().MapNode(node, constExprFunctionSymbol);
+    if (constExprFunctionSymbol->IsProject() && !constExprFunctionSymbol->IsBound())
     {
-        if (constExprFunctionSymbol->IsProject() && !constExprFunctionSymbol->IsBound())
-        {
-            TypeBinder typeBinder(boundCompileUnit);
-            node->Accept(typeBinder);
-        }
-        return static_cast<FunctionNode*>(node);
+        TypeBinder typeBinder(boundCompileUnit);
+        functionNode->Accept(typeBinder);
     }
-    else
-    {
-        throw Exception(&boundCompileUnit.GetModule(), "internal error: function node expected", constExprFunctionSymbol->GetSpan());
-    }
+    return functionNode;
 }
 
 } } // namespace cmajor::binder

@@ -18,6 +18,25 @@ using namespace cmajor::ir;
 class Value;
 class IntrinsicFunction;
 
+struct FunctionSymbolsEqual
+{
+    bool operator()(FunctionSymbol* left, FunctionSymbol* right) const;
+};
+
+struct FunctionSymbolHash
+{
+    size_t operator()(FunctionSymbol* fun) const;
+};
+
+class ViableFunctionSet
+{
+public:
+    const std::unordered_set<FunctionSymbol*, FunctionSymbolHash, FunctionSymbolsEqual>& Get() const { return set; }
+    void Insert(FunctionSymbol* fun);
+private:
+    std::unordered_set<FunctionSymbol*, FunctionSymbolHash, FunctionSymbolsEqual> set;
+};
+
 class FunctionGroupSymbol : public Symbol
 {
 public:
@@ -27,11 +46,12 @@ public:
     void ComputeMangledName() override;
     void AddFunction(FunctionSymbol* function);
     void RemoveFunction(FunctionSymbol* function);
-    void CollectViableFunctions(int arity, std::unordered_set<FunctionSymbol*>& viableFunctions);
+    void CollectViableFunctions(int arity, ViableFunctionSet& viableFunctions, Module* module);
     bool HasProjectMembers() const override;
     void AppendChildElements(dom::Element* element, TypeMap& typeMap) const override;
     std::u32string Info() const override { return Name(); }
     const char* ClassName() const override { return "FunctionGroupSymbol"; }
+    void Check() override;
 private:
     std::unordered_map<int, std::vector<FunctionSymbol*>> arityFunctionListMap;
 };
@@ -90,9 +110,7 @@ public:
     void Write(SymbolWriter& writer) override;
     void Read(SymbolReader& reader) override;
     void EmplaceFunction(FunctionSymbol* functionSymbol, int index) override;
-    void ComputeExportClosure() override;
     void Accept(SymbolCollector* collector) override;
-    void ReadAstNodes();
     const NodeList<Node>& UsingNodes() const { return usingNodes; }
     FunctionNode* GetFunctionNode() { return functionNode.get(); }
     ConstraintNode* Constraint() { return constraint.get(); }
@@ -214,6 +232,7 @@ public:
     FunctionSymbol* FunctionTemplate() { return functionTemplate; }
     void SetFunctionTemplate(FunctionSymbol* functionTemplate_) { functionTemplate = functionTemplate_; }
     void SetTemplateArgumentTypes(const std::vector<TypeSymbol*>& templateArgumentTypes_);
+    void Check() override;
 private:
     FunctionSymbol* functionTemplate;
     boost::uuids::uuid functionId;
@@ -231,11 +250,7 @@ private:
     NodeList<Node> usingNodes;
     std::unique_ptr<FunctionNode> functionNode;
     std::unique_ptr<ConstraintNode> constraint;
-    llvm::FunctionType* irType;
     int nextTemporaryIndex;
-    uint32_t sizeOfAstNodes;
-    uint32_t astNodesPos;
-    std::string filePathReadFrom;
     std::unique_ptr<Node> globalNs;
     FunctionGroupSymbol* functionGroup;
     std::unique_ptr<IntrinsicFunction> intrinsic;

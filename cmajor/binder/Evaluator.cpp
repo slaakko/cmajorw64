@@ -1076,7 +1076,7 @@ void Evaluator::Visit(FunctionNode& functionNode)
     currentDeclarationBlock = &declarationBlock;
     ContainerScope* prevContainerScope = containerScope;
     containerScope = symbol->GetContainerScope();
-    declarationBlock.GetContainerScope()->SetParent(containerScope);
+    declarationBlock.GetContainerScope()->SetParentScope(containerScope);
     containerScope = declarationBlock.GetContainerScope();
     int nt = functionNode.TemplateParameters().Count();
     if (nt != templateTypeArguments.size())
@@ -1169,7 +1169,7 @@ void Evaluator::Visit(ConstructorNode& constructorNode)
     currentDeclarationBlock = &declarationBlock;
     ContainerScope* prevContainerScope = containerScope;
     containerScope = symbol->GetContainerScope();
-    declarationBlock.GetContainerScope()->SetParent(containerScope);
+    declarationBlock.GetContainerScope()->SetParentScope(containerScope);
     containerScope = declarationBlock.GetContainerScope();
     int n = constructorNode.Parameters().Count();
     if (n != argumentValues.size())
@@ -1437,7 +1437,7 @@ void Evaluator::Visit(MemberFunctionNode& memberFunctionNode)
     currentDeclarationBlock = &declarationBlock;
     ContainerScope* prevContainerScope = containerScope;
     containerScope = symbol->GetContainerScope();
-    declarationBlock.GetContainerScope()->SetParent(containerScope);
+    declarationBlock.GetContainerScope()->SetParentScope(containerScope);
     containerScope = declarationBlock.GetContainerScope();
     int n = memberFunctionNode.Parameters().Count();
     if (n != argumentValues.size())
@@ -1507,9 +1507,7 @@ void Evaluator::Visit(MemberFunctionNode& memberFunctionNode)
             MemberVariableSymbol* memberVariableSymbol = currentClassType->MemberVariables()[i];
             Value* memberValue = structuredValue->Members()[i].get();
             ConstantSymbol* constantSymbol = new ConstantSymbol(span, memberVariableSymbol->Name());
-            constantSymbol->SetSymbolTable(symbolTable);
             constantSymbol->SetModule(module);
-            constantSymbol->SetOriginalModule(module);
             constantSymbol->SetType(memberVariableSymbol->GetType());
             if (memberValue->GetValueType() == ValueType::arrayValue)
             {
@@ -1654,7 +1652,7 @@ void Evaluator::Visit(CompoundStatementNode& compoundStatementNode)
     DeclarationBlock declarationBlock(span, U"block");
     currentDeclarationBlock = &declarationBlock;
     ContainerScope* prevContainerScope = containerScope;
-    declarationBlock.GetContainerScope()->SetParent(containerScope);
+    declarationBlock.GetContainerScope()->SetParentScope(containerScope);
     containerScope = declarationBlock.GetContainerScope();
     int n = compoundStatementNode.Statements().Count();
     for (int i = 0; i < n; ++i)
@@ -1845,7 +1843,7 @@ void Evaluator::Visit(ForStatementNode& forStatementNode)
     DeclarationBlock declarationBlock(span, U"forBlock");
     currentDeclarationBlock = &declarationBlock;
     ContainerScope* prevContainerScope = containerScope;
-    declarationBlock.GetContainerScope()->SetParent(containerScope);
+    declarationBlock.GetContainerScope()->SetParentScope(containerScope);
     containerScope = declarationBlock.GetContainerScope();
     forStatementNode.InitS()->Accept(*this);
     if (error || returned)
@@ -3132,7 +3130,7 @@ void Evaluator::EvaluateEnumConstantSymbol(EnumConstantSymbol* enumConstantSymbo
         Symbol* symbol = enumConstantSymbol->Parent();
         Assert(symbol->GetSymbolType() == SymbolType::enumTypeSymbol, "enum type symbol expected");
         EnumTypeSymbol* enumTypeSymbol = static_cast<EnumTypeSymbol*>(symbol);
-        Node* node = symbolTable->GetNode(enumTypeSymbol);
+        Node* node = boundCompileUnit.GetSymbolTable().GetNode(enumTypeSymbol);
         Assert(node->GetNodeType() == NodeType::enumTypeNode, "enum type node expected");
         EnumTypeNode* enumTypeNode = static_cast<EnumTypeNode*>(node);
         TypeBinder typeBinder(boundCompileUnit);

@@ -12,6 +12,7 @@
 #include <cmajor/dom/Element.hpp>
 #include <cmajor/parsing/Scanner.hpp>
 #include <cmajor/util/CodeFormatter.hpp>
+#include <cmajor/ir/Emitter.hpp>
 #include <llvm/IR/Value.h>
 #include <llvm/IR/DIBuilder.h>
 #include <unordered_set>
@@ -22,6 +23,7 @@ namespace cmajor { namespace symbols {
 using cmajor::parsing::Span;
 using namespace cmajor::ast;
 using namespace cmajor::util;
+using namespace cmajor::ir;
 
 class SymbolWriter;
 class SymbolReader;
@@ -83,8 +85,7 @@ enum class SymbolFlags : uint8_t
     nothrow_ = 1 << 3,
     project = 1 << 4,
     bound = 1 << 5,
-    export_ = 1 << 6,
-    exportComputed = 1 << 7
+    inConversionTable = 1 << 6
 };
 
 inline SymbolFlags operator&(SymbolFlags left, SymbolFlags right)
@@ -133,12 +134,12 @@ public:
     virtual std::u32string Id() const { return mangledName; }
     virtual SymbolAccess DeclaredAccess() const { return Access(); }
     virtual std::string TypeString() const { return "symbol";  }
-    virtual llvm::Value* IrObject() { return irObject; }
+    virtual llvm::Value* IrObject(Emitter& emitter);
     virtual void ComputeMangledName();
-    virtual void ComputeExportClosure();
     virtual void Dump(CodeFormatter& formatter) {}
     virtual std::string GetSpecifierStr() const;
     virtual std::string Syntax() const;
+    virtual void Check();
     void SetMangledName(const std::u32string& mangledName_);
     SymbolAccess Access() const { return SymbolAccess(flags & SymbolFlags::access);  }
     void SetAccess(SymbolAccess access_) { flags = flags | SymbolFlags(access_); }
@@ -158,10 +159,6 @@ public:
     void SetProject() { SetFlag(SymbolFlags::project); }
     bool IsBound() const { return GetFlag(SymbolFlags::bound); }
     void SetBound() { SetFlag(SymbolFlags::bound); }
-    bool MarkedExport() const { return GetFlag(SymbolFlags::export_); }
-    void MarkExport() { SetFlag(SymbolFlags::export_); }
-    bool ExportComputed() const { return GetFlag(SymbolFlags::exportComputed); }
-    void SetExportComputed() { SetFlag(SymbolFlags::exportComputed); }
     bool GetFlag(SymbolFlags flag) const { return (flags & flag) != SymbolFlags::none; }
     void SetFlag(SymbolFlags flag) { flags = flags | flag; }
     void ResetFlag(SymbolFlags flag) { flags = flags & ~flag; }
@@ -198,17 +195,11 @@ public:
     ContainerScope* ClassInterfaceOrNsScope() ;
     const ContainerScope* ClassInterfaceEnumDelegateOrNsScope() const;
     ContainerScope* ClassInterfaceEnumDelegateOrNsScope();
-    const SymbolTable* GetSymbolTable() const { return symbolTable; }
-    SymbolTable* GetSymbolTable() { return symbolTable; }
-    void SetSymbolTable(SymbolTable* symbolTable_) { symbolTable = symbolTable_; }
     Module* GetModule() const { return module; }
     Module* GetModule() { return module; }
     void SetModule(Module* module_) { module = module_; }
-    Module* GetOriginalModule() { return originalModule; }
-    void SetOriginalModule(Module* originalModule_) { originalModule = originalModule_; }
     const CompileUnitNode* GetCompileUnit() const { return compileUnit; }
     void SetCompileUnit(CompileUnitNode* compileUnit_) { compileUnit = compileUnit_; }
-    void SetIrObject(llvm::Value* irObject_) { irObject = irObject_; }
     const std::u32string& MangledName() const { return mangledName; }
     void SetAttributes(std::unique_ptr<Attributes>&& attributes_);
     Attributes* GetAttributes() const { return attributes.get(); }
@@ -225,11 +216,8 @@ private:
     SymbolFlags flags;
     std::u32string mangledName;
     Symbol* parent;
-    SymbolTable* symbolTable;
     Module* module;
-    Module* originalModule;
     CompileUnitNode* compileUnit;
-    llvm::Value* irObject;
     std::unique_ptr<Attributes> attributes;
 };
 

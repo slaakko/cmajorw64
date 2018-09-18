@@ -484,7 +484,7 @@ struct IntegralValueHash
 };
 
 void WriteValue(Value* value, BinaryWriter& writer);
-std::unique_ptr<Value> ReadValue(BinaryReader& reader, const Span& span, Module* module);
+std::unique_ptr<Value> ReadValue(BinaryReader& reader, const Span& span);
 
 } } // namespace cmajor::symbols
 

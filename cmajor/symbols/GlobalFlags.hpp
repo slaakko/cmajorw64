@@ -39,6 +39,7 @@ enum class GlobalFlags : uint32_t
     optimizeCmDoc = 1 << 21
 };
 
+void ResetGlobalFlags();
 void SetGlobalFlag(GlobalFlags flag);
 void ResetGlobalFlag(GlobalFlags flag);
 bool GetGlobalFlag(GlobalFlags flag);

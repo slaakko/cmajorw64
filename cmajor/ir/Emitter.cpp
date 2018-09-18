@@ -60,14 +60,14 @@ int Emitter::GetColumn(const Span& span) const
 
 llvm::DebugLoc Emitter::GetDebugLocation(const Span& span) 
 {
-    if (!diCompileUnit || !span.Valid()) return llvm::DebugLoc();
+    if (!diCompileUnit || !span.Valid() || !diBuilder) return llvm::DebugLoc();
     int column = GetColumn(span);
     return llvm::DebugLoc::get(span.LineNumber(), column, CurrentScope());
 }
 
 void Emitter::SetCurrentDebugLocation(const Span& span)
 {
-    if (!diCompileUnit) return;
+    if (!diCompileUnit || !diBuilder) return;
     if (inPrologue || !span.Valid())
     {
         currentDebugLocation = llvm::DebugLoc();
@@ -106,46 +106,260 @@ llvm::DIFile* Emitter::GetFile(int32_t fileIndex)
     return file;
 }
 
-llvm::DIType* Emitter::GetDIType(void* symbol) const
+llvm::DIType* Emitter::GetDITypeByTypeId(const boost::uuids::uuid& typeId) const
 {
-    auto it = diTypeMap.find(symbol);
-    if (it != diTypeMap.cend())
+    auto it = diTypeTypeIdMap.find(typeId);
+    if (it != diTypeTypeIdMap.cend())
     {
         return it->second;
     }
     return nullptr;
 }
 
-void Emitter::SetDIType(void* symbol, llvm::DIType* diType)
+void Emitter::SetDITypeByTypeId(const boost::uuids::uuid& typeId, llvm::DIType* diType)
 {
-    diTypeMap[symbol] = diType;
+    diTypeTypeIdMap[typeId] = diType;
 }
 
-void Emitter::MapFwdDeclaration(llvm::DIType* fwdDeclaration, void* type)
+llvm::DIDerivedType* Emitter::GetDIMemberType(const std::pair<boost::uuids::uuid, int32_t>& memberVariableId) const
 {
-    fwdDeclarationMap[fwdDeclaration] = type;
+    auto it = diMemberTypeMap.find(memberVariableId);
+    if (it != diMemberTypeMap.cend())
+    {
+        return it->second;
+    }
+    return nullptr;
+}
+
+void Emitter::SetDIMemberType(const std::pair<boost::uuids::uuid, int32_t>& memberVariableId, llvm::DIDerivedType* diType)
+{
+    diMemberTypeMap[memberVariableId] = diType;
+}
+
+void Emitter::MapFwdDeclaration(llvm::DIType* fwdDeclaration, const boost::uuids::uuid& typeId)
+{
+    fwdDeclarationMap[fwdDeclaration] = typeId;
+}
+
+void Emitter::MapClassPtr(const boost::uuids::uuid& typeId, void* classPtr)
+{
+    if (classPtrMap.find(typeId) == classPtrMap.cend())
+    {
+        classPtrMap[typeId] = classPtr;
+    }
 }
 
 void Emitter::ReplaceForwardDeclarations()
 {
-    std::unordered_map<llvm::DIType*, void*> currentFwdDeclarationMap;
+    std::unordered_map<llvm::DIType*, boost::uuids::uuid> currentFwdDeclarationMap;
     std::swap(currentFwdDeclarationMap, fwdDeclarationMap);
     while (!currentFwdDeclarationMap.empty())
     {
         for (const auto& p : currentFwdDeclarationMap)
         {
             llvm::DIType* fwdDeclaration = p.first;
-            void* type = p.second;
-            llvm::DIType* diType = GetDIType(type);
+            const boost::uuids::uuid& typeId = p.second;
+            llvm::DIType* diType = GetDITypeByTypeId(typeId);
             if (!diType)
             {
-                diType = CreateDIType(type);
+                auto it = classPtrMap.find(typeId);
+                if (it != classPtrMap.cend())
+                {
+                    void* classPtr = it->second;
+                    diType = CreateClassDIType(classPtr);
+                }
+                else
+                {
+                    throw std::runtime_error("Emitter::ReplaceForwardDeclarations(): class ptr not mapped");
+                }
             }
             fwdDeclaration->replaceAllUsesWith(diType);
         }
         currentFwdDeclarationMap.clear();
         std::swap(currentFwdDeclarationMap, fwdDeclarationMap);
     }
+}
+
+llvm::Value* Emitter::GetIrObject(void* symbol) const
+{
+    auto it = irObjectMap.find(symbol);
+    if (it != irObjectMap.cend())
+    {
+        return it->second;
+    }
+    else
+    {
+        throw std::runtime_error("emitter: IR object not found");
+    }
+}
+
+void Emitter::SetIrObject(void* symbol, llvm::Value* irObject)
+{
+    irObjectMap[symbol] = irObject;
+}
+
+llvm::Type* Emitter::GetIrType(void* type) const
+{
+    auto it = irTypeMap.find(type);
+    if (it != irTypeMap.cend())
+    {
+        return it->second;
+    }
+    else
+    {
+        return nullptr;
+    }
+}
+
+void Emitter::SetIrType(void* type, llvm::Type* irType)
+{
+    irTypeMap[type] = irType;
+}
+
+llvm::Type* Emitter::GetIrTypeByTypeId(const boost::uuids::uuid& typeId)
+{
+    auto it = irTypeTypeIdMap.find(typeId);
+    if (it != irTypeTypeIdMap.cend())
+    {
+        return it->second;
+    }
+    else
+    {
+        return nullptr;
+    }
+}
+
+void Emitter::SetIrTypeByTypeId(const boost::uuids::uuid& typeId, llvm::Type* irType)
+{
+    irTypeTypeIdMap[typeId] = irType;
+}
+
+llvm::FunctionType* Emitter::GetFunctionIrType(void* symbol) const
+{
+    auto it = functionIrTypeMap.find(symbol);
+    if (it != functionIrTypeMap.cend())
+    {
+        return it->second;
+    }
+    else
+    {
+        return nullptr;
+    }
+}
+
+void Emitter::SetFunctionIrType(void* symbol, llvm::FunctionType* irType)
+{
+    functionIrTypeMap[symbol] = irType;
+}
+
+bool Emitter::IsVmtObjectCreated(void* symbol) const
+{
+    return vmtObjectCreatedSet.find(symbol) != vmtObjectCreatedSet.cend();
+}
+
+void Emitter::SetVmtObjectCreated(void* symbol)
+{
+    vmtObjectCreatedSet.insert(symbol);
+}
+
+bool Emitter::IsStaticObjectCreated(void* symbol) const
+{
+    return staticObjectCreatedSet.find(symbol) != staticObjectCreatedSet.cend();
+}
+
+void Emitter::SetStaticObjectCreated(void* symbol)
+{
+    staticObjectCreatedSet.insert(symbol);
+}
+
+llvm::StructType* Emitter::GetStaticObjectType(void* symbol) const
+{
+    auto it = staticTypeMap.find(symbol);
+    if (it != staticTypeMap.cend())
+    {
+        return it->second;
+    }
+    else
+    {
+        return nullptr;
+    }
+}
+
+void Emitter::SetStaticObjectType(void* symbol, llvm::StructType* type)
+{
+    staticTypeMap[symbol] = type;
+}
+
+llvm::ArrayType* Emitter::GetVmtObjectType(void* symbol) const
+{
+    auto it = vmtObjectTypeMap.find(symbol);
+    if (it != vmtObjectTypeMap.cend())
+    {
+        return it->second;
+    }
+    else
+    {
+        return nullptr;
+    }
+}
+
+void Emitter::SetVmtObjectType(void* symbol, llvm::ArrayType* vmtObjectType)
+{
+    vmtObjectTypeMap[symbol] = vmtObjectType;
+}
+
+std::string Emitter::GetStaticObjectName(void* symbol) const
+{
+    auto it = staticObjectNameMap.find(symbol);
+    if (it != staticObjectNameMap.cend())
+    {
+        return it->second;
+    }
+    else
+    {
+        return std::string();
+    }
+}
+
+void Emitter::SetStaticObjectName(void* symbol, const std::string& staticObjectName)
+{
+    staticObjectNameMap[symbol] = staticObjectName;
+}
+
+std::string Emitter::GetVmtObjectName(void* symbol) const
+{
+    auto it = vmtObjectNameMap.find(symbol);
+    if (it != vmtObjectNameMap.cend())
+    {
+        return it->second;
+    }
+    else
+    {
+        return std::string();
+    }
+}
+
+void Emitter::SetVmtObjectName(void* symbol, const std::string& vmtObjectName)
+{
+    vmtObjectNameMap[symbol] = vmtObjectName;
+}
+
+std::string Emitter::GetImtArrayObjectName(void* symbol) const
+{
+    auto it = imtArrayObjectNameMap.find(symbol);
+    if (it != imtArrayObjectNameMap.cend())
+    {
+        return it->second;
+    }
+    else
+    {
+        return std::string();
+    }
+}
+
+void Emitter::SetImtArrayObjectName(void* symbol, const std::string& imtArrayObjectName)
+{
+    imtArrayObjectNameMap[symbol] = imtArrayObjectName;
 }
 
 } } // namespace cmajor::ir

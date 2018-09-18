@@ -29,9 +29,9 @@ public:
     InterfaceTypeCopyConstructor* CopyConstructor() { return copyConstructor; }
     std::u32string Info() const override { return Name(); }
     const char* ClassName() const override { return "InterfaceTypeSymbol"; }
+    void Check() override;
 private:
     std::vector<MemberFunctionSymbol*> memberFunctions;
-    llvm::Type* irType;
     InterfaceTypeCopyConstructor* copyConstructor;
 };
 
@@ -92,6 +92,7 @@ public:
     bool IsBasicTypeOperation() const override { return true; }
     bool IsClassToInterfaceTypeConversion() const override {return true; }
     const char* ClassName() const override { return "ClassToInterfaceConversion"; }
+    void Check() override;
 private:
     ClassTypeSymbol* sourceClassType;
     InterfaceTypeSymbol* targetInterfaceType;

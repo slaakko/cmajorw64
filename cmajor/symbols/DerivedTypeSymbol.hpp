@@ -12,7 +12,7 @@ namespace cmajor { namespace symbols {
 
 enum class Derivation : uint8_t
 {
-    none = 0, constDerivation = 1, lvalueRefDerivation = 2, rvalueRefDerivation = 3, pointerDerivation = 4
+    none = 0, constDerivation = 1, lvalueRefDerivation = 2, rvalueRefDerivation = 3, pointerDerivation = 4, max
 };
 
 std::u32string DerivationStr(Derivation derivation);
@@ -65,10 +65,11 @@ public:
     void Write(SymbolWriter& writer) override;
     void Read(SymbolReader& reader) override;
     void EmplaceType(TypeSymbol* typeSymbol, int index) override;
-    void ComputeExportClosure() override;
+    void ComputeTypeId();
     const TypeSymbol* BaseType() const override { return baseType; }
     TypeSymbol* BaseType() override { return baseType; }
     TypeSymbol* PlainType(const Span& span) override;
+    TypeSymbol* PlainType(const Span& span, Module* module) override;
     TypeSymbol* RemoveReference(const Span& span) override;
     TypeSymbol* RemovePointer(const Span& span) override;
     TypeSymbol* RemoveConst(const Span& span) override;
@@ -90,14 +91,14 @@ public:
     const TypeDerivationRec& DerivationRec() const override { return derivationRec; }
     TypeSymbol* RemoveDerivations(const TypeDerivationRec& sourceDerivationRec, const Span& span) override;
     TypeSymbol* Unify(TypeSymbol* sourceType, const Span& span) override;
-    bool IsRecursive(TypeSymbol* type, std::unordered_set<TypeSymbol*>& tested) override;
+    bool IsRecursive(TypeSymbol* type, std::unordered_set<boost::uuids::uuid, boost::hash<boost::uuids::uuid>>& tested) override;
     ValueType GetValueType() const override;
     std::u32string Info() const override { return Name(); }
     const char* ClassName() const override { return "DerivedTypeSymbol"; }
+    void Check() override;
 private:
     TypeSymbol* baseType;
     TypeDerivationRec derivationRec;
-    llvm::Type* irType;
 };
 
 class NullPtrType : public TypeSymbol

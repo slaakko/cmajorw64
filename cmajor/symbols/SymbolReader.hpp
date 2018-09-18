@@ -15,6 +15,8 @@ class Symbol;
 class ArrayTypeSymbol;
 class DerivedTypeSymbol;
 class ClassTemplateSpecializationSymbol;
+struct TypeOrConceptRequest;
+struct FunctionRequest;
 class SymbolTable;
 class Module;
 class FunctionSymbol;
@@ -36,22 +38,35 @@ public:
     SymbolTable* GetSymbolTable() const { return symbolTable; }
     void SetModule(Module* module_) { module = module_; }
     Module* GetModule() const { return module; }
+    void SetConversionsTarget(std::vector<FunctionSymbol*>* conversionsTarget) { conversions = conversionsTarget; }
+    void SetArrayTypesTarget(std::vector<ArrayTypeSymbol*>* arrayTypesTarget) { arrayTypes = arrayTypesTarget; }
+    void SetDerivedTypesTarget(std::vector<DerivedTypeSymbol*>* derivedTypesTarget) { derivedTypes = derivedTypesTarget; }
+    void SetClassTemplateSpecializationTarget(std::vector<ClassTemplateSpecializationSymbol*>* classTemplateSpecializationTarget) { classTemplateSpecializations = classTemplateSpecializationTarget;  }
+    void SetTypeAndConceptRequestTarget(std::vector<TypeOrConceptRequest>* typeAndConceptRequestTarget) { typeAndConceptRequests = typeAndConceptRequestTarget; }
+    void SetFunctionRequestTarget(std::vector<FunctionRequest>* functionRequestTarget) { functionRequests = functionRequestTarget; }
     void AddConversion(FunctionSymbol* conversion);
-    const std::vector<FunctionSymbol*>& Conversions() const { return conversions; }
-    void AddClassType(ClassTypeSymbol* classType);
-    const std::vector<ClassTypeSymbol*>& ClassTypes() const { return classTypes; }
+    void AddArrayType(ArrayTypeSymbol* arrayType);
+    void AddDerivedType(DerivedTypeSymbol* derivedType);
     void AddClassTemplateSpecialization(ClassTemplateSpecializationSymbol* classTemplateSpecialization);
-    const std::vector<ClassTemplateSpecializationSymbol*>& ClassTemplateSpecializations() const { return classTemplateSpecializations; }
+    void AddTypeOrConceptRequest(TypeOrConceptRequest&& typeOrConceptRequest);
+    void AddFunctionRequest(FunctionRequest&& functionRequest);
     bool SetProjectBit() const { return setProjectBit; }
     void SetProjectBitForSymbols() { setProjectBit = true; }
+    void SetRootModule(Module* rootModule_) { rootModule = rootModule_; }
+    Module* RootModule() const { return rootModule; }
 private:
     AstReader astReader;
     SymbolTable* symbolTable;
     Module* module;
-    std::vector<FunctionSymbol*> conversions;
-    std::vector<ClassTypeSymbol*> classTypes;
-    std::vector<ClassTemplateSpecializationSymbol*> classTemplateSpecializations;
+    Module* rootModule;
+    std::vector<FunctionSymbol*>* conversions;
+    std::vector<ArrayTypeSymbol*>* arrayTypes;
+    std::vector<DerivedTypeSymbol*>* derivedTypes;
+    std::vector<ClassTemplateSpecializationSymbol*>* classTemplateSpecializations;
+    std::vector<TypeOrConceptRequest>* typeAndConceptRequests;
+    std::vector<FunctionRequest>* functionRequests;
     bool setProjectBit;
+    bool symbolsCached;
 };
 
 } } // namespace cmajor::symbols

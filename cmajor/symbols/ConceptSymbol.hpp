@@ -26,6 +26,7 @@ public:
     void AppendChildElements(dom::Element* element, TypeMap& typeMap) const override;
     std::u32string Info() const override { return Name(); }
     const char* ClassName() const override { return "ConceptGroupSymbol"; }
+    void Check() override;
 private:
     std::unordered_map<int, ConceptSymbol*> arityConceptMap;
 };
@@ -60,6 +61,7 @@ public:
     const char* ClassName() const override { return "ConceptSymbol"; }
     bool HasSource() const { return hasSource; }
     void SetHasSource() { hasSource = true; }
+    void Check() override;
 private:
     boost::uuids::uuid typeId;
     std::u32string groupName;

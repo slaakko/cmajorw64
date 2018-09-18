@@ -22,6 +22,7 @@ public:
     void AddMember(std::unique_ptr<BoundNode>&& member);
     const std::vector<std::unique_ptr<BoundNode>>& Members() const { return members; }
     ClassTypeSymbol* GetClassTypeSymbol() { return classTypeSymbol; }
+    bool ContainsSourceFunctions() const;
 private:
     ClassTypeSymbol* classTypeSymbol;
     std::vector<std::unique_ptr<BoundNode>> members;

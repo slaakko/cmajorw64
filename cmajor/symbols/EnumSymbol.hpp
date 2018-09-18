@@ -41,6 +41,7 @@ public:
     std::u32string Id() const override;
     std::u32string Info() const override { return Name(); }
     const char* ClassName() const override { return "EnumTypeSymbol"; }
+    void Check() override;
 private:
     TypeSymbol* underlyingType;
 };
@@ -84,6 +85,7 @@ public:
     void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
     bool IsBasicTypeOperation() const override { return true; }
     const char* ClassName() const override { return "EnumTypeDefaultConstructor"; }
+    void Check() override;
 private:
     FunctionSymbol* underlyingTypeDefaultConstructor;
 };
@@ -99,6 +101,7 @@ public:
     void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
     bool IsBasicTypeOperation() const override { return true; }
     const char* ClassName() const override { return "EnumTypeCopyConstructor"; }
+    void Check() override;
 private:
     FunctionSymbol* underlyingTypeCopyConstructor;
 };
@@ -114,6 +117,7 @@ public:
     void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
     bool IsBasicTypeOperation() const override { return true; }
     const char* ClassName() const override { return "EnumTypeMoveConstructor"; }
+    void Check() override;
 private:
     FunctionSymbol* underlyingTypeMoveConstructor;
 };
@@ -129,6 +133,7 @@ public:
     void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
     bool IsBasicTypeOperation() const override { return true; }
     const char* ClassName() const override { return "EnumTypeCopyAssignment"; }
+    void Check() override;
 private:
     FunctionSymbol* underlyingTypeCopyAssignment;
 };
@@ -144,6 +149,7 @@ public:
     void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
     bool IsBasicTypeOperation() const override { return true; }
     const char* ClassName() const override { return "EnumTypeMoveAssignment"; }
+    void Check() override;
 private:
     FunctionSymbol* underlyingTypeMoveAssignment;
 };
@@ -159,6 +165,7 @@ public:
     void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
     bool IsBasicTypeOperation() const override { return true; }
     const char* ClassName() const override { return "EnumTypeReturn"; }
+    void Check() override;
 private:
     FunctionSymbol* underlyingTypeReturn;
 };
@@ -174,6 +181,7 @@ public:
     void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
     bool IsBasicTypeOperation() const override { return true; }
     const char* ClassName() const override { return "EnumTypeEqualityOp"; }
+    void Check() override;
 private:
     FunctionSymbol* underlyingTypeEquality;
 };
@@ -194,6 +202,7 @@ public:
     TypeSymbol* ConversionSourceType() const override { return sourceType; }
     TypeSymbol* ConversionTargetType() const override { return targetType; }
     const char* ClassName() const override { return "EnumTypeToUnderlyingTypeConversion"; }
+    void Check() override;
 private:
     TypeSymbol* sourceType;
     TypeSymbol* targetType;
@@ -215,6 +224,7 @@ public:
     TypeSymbol* ConversionSourceType() const override { return sourceType; }
     TypeSymbol* ConversionTargetType() const override { return targetType; }
     const char* ClassName() const override { return "UnderlyingTypeToEnumTypeConversion"; }
+    void Check() override;
 private:
     TypeSymbol* sourceType;
     TypeSymbol* targetType;

@@ -26,6 +26,11 @@ inline ClassTemplateSpecializationFlags operator&(ClassTemplateSpecializationFla
     return ClassTemplateSpecializationFlags(uint8_t(left) & uint8_t(right));
 }
 
+inline ClassTemplateSpecializationFlags operator~(ClassTemplateSpecializationFlags flags)
+{
+    return ClassTemplateSpecializationFlags(~uint8_t(flags));
+}
+
 std::u32string MakeClassTemplateSpecializationName(ClassTypeSymbol* classTemplate, const std::vector<TypeSymbol*>& templateArgumentTypes);
 
 class ClassTemplateSpecializationSymbol : public ClassTypeSymbol
@@ -37,10 +42,11 @@ public:
     void Write(SymbolWriter& writer) override;
     void Read(SymbolReader& reader) override;
     void EmplaceType(TypeSymbol* typeSymbol, int index) override;
-    void ComputeExportClosure() override;
     bool IsPrototypeTemplateSpecialization() const override;
+    llvm::Type* IrType(Emitter& emitter) override;
     ClassTypeSymbol* GetClassTemplate() { return classTemplate; }
     const std::vector<TypeSymbol*>& TemplateArgumentTypes() const { return templateArgumentTypes; }
+    std::vector<TypeSymbol*>& TemplateArgumentTypes() { return templateArgumentTypes; }
     void SetGlobalNs(std::unique_ptr<Node>&& globalNs_);
     Node* GlobalNs() { return globalNs.get(); }
     void SetFileScope(FileScope* fileScope_);
@@ -51,9 +57,11 @@ public:
     bool IsConstraintChecked() { return GetFlag(ClassTemplateSpecializationFlags::constraintChecked); }
     void SetFlag(ClassTemplateSpecializationFlags flag) { flags = flags | flag; }
     bool GetFlag(ClassTemplateSpecializationFlags flag) const { return (flags & flag) != ClassTemplateSpecializationFlags::none;  }
+    void ResetFlag(ClassTemplateSpecializationFlags flag) { flags = flags & ~flag; }
     TypeSymbol* UnifyTemplateArgumentType(SymbolTable& symbolTable, const std::unordered_map<TemplateParameterSymbol*, TypeSymbol*>& templateParameterMap, const Span& span) override;
     std::u32string Id() const override;
     const char* ClassName() const override { return "ClassTemplateSpecializationSymbol"; }
+    void Check() override;
 private:
     ClassTypeSymbol* classTemplate;
     std::vector<TypeSymbol*> templateArgumentTypes;

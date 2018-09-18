@@ -5,6 +5,7 @@
 
 #include <cmajor/binder/Access.hpp>
 #include <cmajor/symbols/ClassTypeSymbol.hpp>
+#include <cmajor/symbols/ClassTemplateSpecializationSymbol.hpp>
 #include <cmajor/symbols/Exception.hpp>
 #include <cmajor/util/Unicode.hpp>
 
@@ -17,7 +18,7 @@ void CheckAccess(FunctionSymbol* fromFunction, Symbol* toSymbol)
     FunctionSymbol* toContainingFunction = toSymbol->ContainingFunctionNoThrow();
     if (toContainingFunction)
     {
-        if (fromFunction == toContainingFunction)
+        if (fromFunction == toContainingFunction || FunctionSymbolsEqual()(fromFunction, toContainingFunction))
         {
             return;
         }

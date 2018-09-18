@@ -1,6 +1,5 @@
 /*
 #include <cmajor/binder/AttributeBinder.hpp>
-#include <cmajor/binder/ModuleBinder.hpp>
 #include <cmajor/ast/InitDone.hpp>
 #include <cmajor/ast/Visitor.hpp>
 #include <cmajor/ast/TypeExpr.hpp>
@@ -9,7 +8,6 @@
 #include <cmajor/symbols/InitDone.hpp>
 #include <cmajor/symbols/GlobalFlags.hpp>
 #include <cmajor/symbols/SymbolCollector.hpp>
-#include <cmajor/binder/ModuleBinder.hpp>
 #include <cmajor/dom/Parser.hpp>
 #include <cmajor/dom/Element.hpp>
 #include <cmajor/dom/CharacterData.hpp>
@@ -4283,7 +4281,7 @@ void Generate(const std::string& projectXmlFile)
     }
 }
 
-const char* version = "2.3.0";
+const char* version = "2.4.0";
 
 void PrintHelp()
 {

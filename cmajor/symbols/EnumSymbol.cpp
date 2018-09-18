@@ -9,6 +9,7 @@
 #include <cmajor/symbols/SymbolReader.hpp>
 #include <cmajor/symbols/Exception.hpp>
 #include <cmajor/symbols/SymbolCollector.hpp>
+#include <cmajor/symbols/Module.hpp>
 #include <cmajor/util/Unicode.hpp>
 #include <boost/uuid/uuid_io.hpp>
 
@@ -31,7 +32,7 @@ void EnumTypeSymbol::Read(SymbolReader& reader)
     TypeSymbol::Read(reader);
     boost::uuids::uuid underlyingTypeId;
     reader.GetBinaryReader().ReadUuid(underlyingTypeId);
-    GetSymbolTable()->EmplaceTypeRequest(this, underlyingTypeId, 0);
+    reader.GetSymbolTable()->EmplaceTypeRequest(reader, this, underlyingTypeId, 0);
 }
 
 void EnumTypeSymbol::EmplaceType(TypeSymbol* typeSymbol, int index)
@@ -90,67 +91,67 @@ void EnumTypeSymbol::SetSpecifiers(Specifiers specifiers)
     SetAccess(accessSpecifiers);
     if ((specifiers & Specifiers::static_) != Specifiers::none)
     {
-        throw Exception(GetModule(), "enumerated type cannot be static", GetSpan());
+        throw Exception(GetRootModuleForCurrentThread(), "enumerated type cannot be static", GetSpan());
     }
     if ((specifiers & Specifiers::virtual_) != Specifiers::none)
     {
-        throw Exception(GetModule(), "enumerated type cannot be virtual", GetSpan());
+        throw Exception(GetRootModuleForCurrentThread(), "enumerated type cannot be virtual", GetSpan());
     }
     if ((specifiers & Specifiers::override_) != Specifiers::none)
     {
-        throw Exception(GetModule(), "enumerated type cannot be override", GetSpan());
+        throw Exception(GetRootModuleForCurrentThread(), "enumerated type cannot be override", GetSpan());
     }
     if ((specifiers & Specifiers::abstract_) != Specifiers::none)
     {
-        throw Exception(GetModule(), "enumerated type cannot be abstract", GetSpan());
+        throw Exception(GetRootModuleForCurrentThread(), "enumerated type cannot be abstract", GetSpan());
     }
     if ((specifiers & Specifiers::inline_) != Specifiers::none)
     {
-        throw Exception(GetModule(), "enumerated type cannot be inline", GetSpan());
+        throw Exception(GetRootModuleForCurrentThread(), "enumerated type cannot be inline", GetSpan());
     }
     if ((specifiers & Specifiers::explicit_) != Specifiers::none)
     {
-        throw Exception(GetModule(), "enumerated type cannot be explicit", GetSpan());
+        throw Exception(GetRootModuleForCurrentThread(), "enumerated type cannot be explicit", GetSpan());
     }
     if ((specifiers & Specifiers::external_) != Specifiers::none)
     {
-        throw Exception(GetModule(), "enumerated type cannot be external", GetSpan());
+        throw Exception(GetRootModuleForCurrentThread(), "enumerated type cannot be external", GetSpan());
     }
     if ((specifiers & Specifiers::suppress_) != Specifiers::none)
     {
-        throw Exception(GetModule(), "enumerated type cannot be suppressed", GetSpan());
+        throw Exception(GetRootModuleForCurrentThread(), "enumerated type cannot be suppressed", GetSpan());
     }
     if ((specifiers & Specifiers::default_) != Specifiers::none)
     {
-        throw Exception(GetModule(), "enumerated type cannot be default", GetSpan());
+        throw Exception(GetRootModuleForCurrentThread(), "enumerated type cannot be default", GetSpan());
     }
     if ((specifiers & Specifiers::constexpr_) != Specifiers::none)
     {
-        throw Exception(GetModule(), "enumerated type cannot be constexpr", GetSpan());
+        throw Exception(GetRootModuleForCurrentThread(), "enumerated type cannot be constexpr", GetSpan());
     }
     if ((specifiers & Specifiers::cdecl_) != Specifiers::none)
     {
-        throw Exception(GetModule(), "enumerated type cannot be cdecl", GetSpan());
+        throw Exception(GetRootModuleForCurrentThread(), "enumerated type cannot be cdecl", GetSpan());
     }
     if ((specifiers & Specifiers::nothrow_) != Specifiers::none)
     {
-        throw Exception(GetModule(), "enumerated type cannot be nothrow", GetSpan());
+        throw Exception(GetRootModuleForCurrentThread(), "enumerated type cannot be nothrow", GetSpan());
     }
     if ((specifiers & Specifiers::throw_) != Specifiers::none)
     {
-        throw Exception(GetModule(), "enumerated type cannot be throw", GetSpan());
+        throw Exception(GetRootModuleForCurrentThread(), "enumerated type cannot be throw", GetSpan());
     }
     if ((specifiers & Specifiers::new_) != Specifiers::none)
     {
-        throw Exception(GetModule(), "enumerated type cannot be new", GetSpan());
+        throw Exception(GetRootModuleForCurrentThread(), "enumerated type cannot be new", GetSpan());
     }
     if ((specifiers & Specifiers::const_) != Specifiers::none)
     {
-        throw Exception(GetModule(), "enumerated type cannot be const", GetSpan());
+        throw Exception(GetRootModuleForCurrentThread(), "enumerated type cannot be const", GetSpan());
     }
     if ((specifiers & Specifiers::unit_test_) != Specifiers::none)
     {
-        throw Exception(GetModule(), "enumerated type cannot be unit_test", GetSpan());
+        throw Exception(GetRootModuleForCurrentThread(), "enumerated type cannot be unit_test", GetSpan());
     }
 }
 
@@ -187,7 +188,7 @@ llvm::DIType* EnumTypeSymbol::CreateDIType(Emitter& emitter)
         int64_t value = 0;
         if (underlyingType->IsUnsignedType())
         {
-            Value* val = enumConstant->GetValue()->As(GetSymbolTable()->GetTypeByName(U"ulong"), false, GetSpan(), true);
+            Value* val = enumConstant->GetValue()->As(GetRootModuleForCurrentThread()->GetSymbolTable().GetTypeByName(U"ulong"), false, GetSpan(), true);
             if (val)
             {
                 ULongValue* ulongValue = static_cast<ULongValue*>(val);
@@ -196,7 +197,7 @@ llvm::DIType* EnumTypeSymbol::CreateDIType(Emitter& emitter)
         }
         else
         {
-            Value* val = enumConstant->GetValue()->As(GetSymbolTable()->GetTypeByName(U"long"), false, GetSpan(), true);
+            Value* val = enumConstant->GetValue()->As(GetRootModuleForCurrentThread()->GetSymbolTable().GetTypeByName(U"long"), false, GetSpan(), true);
             if (val)
             {
                 LongValue* longValue = static_cast<LongValue*>(val);
@@ -207,6 +208,15 @@ llvm::DIType* EnumTypeSymbol::CreateDIType(Emitter& emitter)
     }
     return emitter.DIBuilder()->createEnumerationType(nullptr, ToUtf8(Name()), emitter.GetFile(GetSpan().FileIndex()), GetSpan().LineNumber(), sizeInBits, alignInBits, 
         emitter.DIBuilder()->getOrCreateArray(elements), underlyingType->GetDIType(emitter), ToUtf8(MangledName())); 
+}
+
+void EnumTypeSymbol::Check()
+{
+    TypeSymbol::Check();
+    if (!underlyingType)
+    {
+        throw SymbolCheckException(GetRootModuleForCurrentThread(), "enumerated type symbol has no underlying type", GetSpan());
+    }
 }
 
 EnumConstantSymbol::EnumConstantSymbol(const Span& span_, const std::u32string& name_) : Symbol(SymbolType::enumConstantSymbol, span_, name_), evaluating(false)
@@ -242,7 +252,7 @@ void EnumConstantSymbol::Write(SymbolWriter& writer)
 void EnumConstantSymbol::Read(SymbolReader& reader)
 {
     Symbol::Read(reader);
-    value = ReadValue(reader.GetBinaryReader(), GetSpan(), GetModule());
+    value = ReadValue(reader.GetBinaryReader(), GetSpan());
     strValue = reader.GetBinaryReader().ReadUtf32String();
 }
 
@@ -279,7 +289,7 @@ void EnumTypeDefaultConstructor::Read(SymbolReader& reader)
     FunctionSymbol::Read(reader);
     boost::uuids::uuid defaultConstructorId;
     reader.GetBinaryReader().ReadUuid(defaultConstructorId);
-    GetSymbolTable()->EmplaceFunctionRequest(this, defaultConstructorId, 0);
+    reader.GetSymbolTable()->EmplaceFunctionRequest(reader, this, defaultConstructorId, 0);
 }
 
 void EnumTypeDefaultConstructor::EmplaceFunction(FunctionSymbol* functionSymbol, int index)
@@ -298,6 +308,15 @@ void EnumTypeDefaultConstructor::GenerateCall(Emitter& emitter, std::vector<GenO
 {
     Assert(underlyingTypeDefaultConstructor, "underlying default constructor not set");
     underlyingTypeDefaultConstructor->GenerateCall(emitter, genObjects, flags, span);
+}
+
+void EnumTypeDefaultConstructor::Check()
+{
+    FunctionSymbol::Check();
+    if (!underlyingTypeDefaultConstructor)
+    {
+        throw SymbolCheckException(GetRootModuleForCurrentThread(), "enumerated type default constructor has no underlying type default constructor", GetSpan());
+    }
 }
 
 EnumTypeCopyConstructor::EnumTypeCopyConstructor(const Span& span_, const std::u32string& name_) : 
@@ -336,7 +355,7 @@ void EnumTypeCopyConstructor::Read(SymbolReader& reader)
     FunctionSymbol::Read(reader);
     boost::uuids::uuid copyConstructorId;
     reader.GetBinaryReader().ReadUuid(copyConstructorId);
-    GetSymbolTable()->EmplaceFunctionRequest(this, copyConstructorId, 0);
+    reader.GetSymbolTable()->EmplaceFunctionRequest(reader, this, copyConstructorId, 0);
 }
 
 void EnumTypeCopyConstructor::EmplaceFunction(FunctionSymbol* functionSymbol, int index)
@@ -355,6 +374,15 @@ void EnumTypeCopyConstructor::GenerateCall(Emitter& emitter, std::vector<GenObje
 {
     Assert(underlyingTypeCopyConstructor, "underlying copy constructor not set");
     underlyingTypeCopyConstructor->GenerateCall(emitter, genObjects, flags, span);
+}
+
+void EnumTypeCopyConstructor::Check()
+{
+    FunctionSymbol::Check();
+    if (!underlyingTypeCopyConstructor)
+    {
+        throw SymbolCheckException(GetRootModuleForCurrentThread(), "enumerated type copy constructor has no underlying type copy constructor", GetSpan());
+    }
 }
 
 EnumTypeMoveConstructor::EnumTypeMoveConstructor(const Span& span_, const std::u32string& name_) : 
@@ -393,7 +421,7 @@ void EnumTypeMoveConstructor::Read(SymbolReader& reader)
     FunctionSymbol::Read(reader);
     boost::uuids::uuid moveConstructorId;
     reader.GetBinaryReader().ReadUuid(moveConstructorId);
-    GetSymbolTable()->EmplaceFunctionRequest(this, moveConstructorId, 0);
+    reader.GetSymbolTable()->EmplaceFunctionRequest(reader, this, moveConstructorId, 0);
 }
 
 void EnumTypeMoveConstructor::EmplaceFunction(FunctionSymbol* functionSymbol, int index)
@@ -412,6 +440,15 @@ void EnumTypeMoveConstructor::GenerateCall(Emitter& emitter, std::vector<GenObje
 {
     Assert(underlyingTypeMoveConstructor, "underlying move constructor not set");
     underlyingTypeMoveConstructor->GenerateCall(emitter, genObjects, flags, span);
+}
+
+void EnumTypeMoveConstructor::Check()
+{
+    FunctionSymbol::Check();
+    if (!underlyingTypeMoveConstructor)
+    {
+        throw SymbolCheckException(GetRootModuleForCurrentThread(), "enumerated type move constructor has no underlying type move constructor", GetSpan());
+    }
 }
 
 EnumTypeCopyAssignment::EnumTypeCopyAssignment(const Span& span_, const std::u32string& name_) : 
@@ -451,7 +488,7 @@ void EnumTypeCopyAssignment::Read(SymbolReader& reader)
     FunctionSymbol::Read(reader);
     boost::uuids::uuid copyAssignmentId;
     reader.GetBinaryReader().ReadUuid(copyAssignmentId);
-    GetSymbolTable()->EmplaceFunctionRequest(this, copyAssignmentId, 0);
+    reader.GetSymbolTable()->EmplaceFunctionRequest(reader, this, copyAssignmentId, 0);
 }
 
 void EnumTypeCopyAssignment::EmplaceFunction(FunctionSymbol* functionSymbol, int index)
@@ -470,6 +507,15 @@ void EnumTypeCopyAssignment::GenerateCall(Emitter& emitter, std::vector<GenObjec
 {
     Assert(underlyingTypeCopyAssignment, "underlying copy assignment not set");
     underlyingTypeCopyAssignment->GenerateCall(emitter, genObjects, flags, span);
+}
+
+void EnumTypeCopyAssignment::Check()
+{
+    FunctionSymbol::Check();
+    if (!underlyingTypeCopyAssignment)
+    {
+        throw SymbolCheckException(GetRootModuleForCurrentThread(), "enumerated type copy assignment has no underlying type copy assignment", GetSpan());
+    }
 }
 
 EnumTypeMoveAssignment::EnumTypeMoveAssignment(const Span& span_, const std::u32string& name_) : 
@@ -509,7 +555,7 @@ void EnumTypeMoveAssignment::Read(SymbolReader& reader)
     FunctionSymbol::Read(reader);
     boost::uuids::uuid moveAssignmentId;
     reader.GetBinaryReader().ReadUuid(moveAssignmentId);
-    GetSymbolTable()->EmplaceFunctionRequest(this, moveAssignmentId, 0);
+    reader.GetSymbolTable()->EmplaceFunctionRequest(reader, this, moveAssignmentId, 0);
 }
 
 void EnumTypeMoveAssignment::EmplaceFunction(FunctionSymbol* functionSymbol, int index)
@@ -528,6 +574,15 @@ void EnumTypeMoveAssignment::GenerateCall(Emitter& emitter, std::vector<GenObjec
 {
     Assert(underlyingTypeMoveAssignment, "underlying move assignment not set");
     underlyingTypeMoveAssignment->GenerateCall(emitter, genObjects, flags, span);
+}
+
+void EnumTypeMoveAssignment::Check()
+{
+    FunctionSymbol::Check();
+    if (!underlyingTypeMoveAssignment)
+    {
+        throw SymbolCheckException(GetRootModuleForCurrentThread(), "enumerated type move assignment has no underlying type move assignment", GetSpan());
+    }
 }
 
 EnumTypeReturn::EnumTypeReturn(const Span& span_, const std::u32string& name_) : 
@@ -564,7 +619,7 @@ void EnumTypeReturn::Read(SymbolReader& reader)
     FunctionSymbol::Read(reader);
     boost::uuids::uuid returnId;
     reader.GetBinaryReader().ReadUuid(returnId);
-    GetSymbolTable()->EmplaceFunctionRequest(this, returnId, 0);
+    reader.GetSymbolTable()->EmplaceFunctionRequest(reader, this, returnId, 0);
 }
 
 void EnumTypeReturn::EmplaceFunction(FunctionSymbol* functionSymbol, int index)
@@ -583,6 +638,15 @@ void EnumTypeReturn::GenerateCall(Emitter& emitter, std::vector<GenObject*>& gen
 {
     Assert(underlyingTypeReturn, "underlying return not set");
     underlyingTypeReturn->GenerateCall(emitter, genObjects, flags, span);
+}
+
+void EnumTypeReturn::Check()
+{
+    FunctionSymbol::Check();
+    if (!underlyingTypeReturn)
+    {
+        throw SymbolCheckException(GetRootModuleForCurrentThread(), "enumerated type return has no underlying type return", GetSpan());
+    }
 }
 
 EnumTypeEqualityOp::EnumTypeEqualityOp(const Span& span_, const std::u32string& name_) : 
@@ -622,7 +686,7 @@ void EnumTypeEqualityOp::Read(SymbolReader& reader)
     FunctionSymbol::Read(reader);
     boost::uuids::uuid equalityId;
     reader.GetBinaryReader().ReadUuid(equalityId);
-    GetSymbolTable()->EmplaceFunctionRequest(this, equalityId, 0);
+    reader.GetSymbolTable()->EmplaceFunctionRequest(reader, this, equalityId, 0);
 }
 
 void EnumTypeEqualityOp::EmplaceFunction(FunctionSymbol* functionSymbol, int index)
@@ -643,15 +707,26 @@ void EnumTypeEqualityOp::GenerateCall(Emitter& emitter, std::vector<GenObject*>&
     underlyingTypeEquality->GenerateCall(emitter, genObjects, flags, span);
 }
 
+void EnumTypeEqualityOp::Check()
+{
+    FunctionSymbol::Check();
+    if (!underlyingTypeEquality)
+    {
+        throw SymbolCheckException(GetRootModuleForCurrentThread(), "enumerated type equality operation has no underlying type equality operation", GetSpan());
+    }
+}
+
 EnumTypeToUnderlyingTypeConversion::EnumTypeToUnderlyingTypeConversion(const Span& span_, const std::u32string& name_) :
     FunctionSymbol(SymbolType::enumTypeToUnderlyingType, span_, name_), sourceType(), targetType()
 {
+    SetGroupName(U"@conversion");
 }
 
 EnumTypeToUnderlyingTypeConversion::EnumTypeToUnderlyingTypeConversion(const Span& span_, const std::u32string& name_, TypeSymbol* sourceType_, TypeSymbol* targetType_) : 
     FunctionSymbol(SymbolType::enumTypeToUnderlyingType, span_, name_), sourceType(sourceType_), targetType(targetType_)
 {
     SetConversion();
+    SetGroupName(U"@conversion");
 }
 
 void EnumTypeToUnderlyingTypeConversion::Write(SymbolWriter& writer)
@@ -666,10 +741,10 @@ void EnumTypeToUnderlyingTypeConversion::Read(SymbolReader& reader)
     FunctionSymbol::Read(reader);
     boost::uuids::uuid sourceTypeId;
     reader.GetBinaryReader().ReadUuid(sourceTypeId);
-    GetSymbolTable()->EmplaceTypeRequest(this, sourceTypeId, 1);
+    reader.GetSymbolTable()->EmplaceTypeRequest(reader, this, sourceTypeId, 1);
     boost::uuids::uuid targetTypeId;
     reader.GetBinaryReader().ReadUuid(targetTypeId);
-    GetSymbolTable()->EmplaceTypeRequest(this, targetTypeId, 2);
+    reader.GetSymbolTable()->EmplaceTypeRequest(reader, this, targetTypeId, 2);
 }
 
 void EnumTypeToUnderlyingTypeConversion::EmplaceType(TypeSymbol* typeSymbol, int index)
@@ -692,15 +767,30 @@ void EnumTypeToUnderlyingTypeConversion::GenerateCall(Emitter& emitter, std::vec
 {
 }
 
+void EnumTypeToUnderlyingTypeConversion::Check()
+{
+    FunctionSymbol::Check();
+    if (!sourceType)
+    {
+        throw SymbolCheckException(GetRootModuleForCurrentThread(), "enum type to underlying type conversion has no source type", GetSpan());
+    }
+    if (!targetType)
+    {
+        throw SymbolCheckException(GetRootModuleForCurrentThread(), "enum type to underlying type conversion has no target type", GetSpan());
+    }
+}
+
 UnderlyingTypeToEnumTypeConversion::UnderlyingTypeToEnumTypeConversion(const Span& span_, const std::u32string& name_)
     : FunctionSymbol(SymbolType::underlyingToEnumType, span_, name_), sourceType(), targetType()
 {
+    SetGroupName(U"@conversion");
 }
 
 UnderlyingTypeToEnumTypeConversion::UnderlyingTypeToEnumTypeConversion(const Span& span_, const std::u32string& name_, TypeSymbol* sourceType_, TypeSymbol* targetType_)
     : FunctionSymbol(SymbolType::underlyingToEnumType, span_, name_), sourceType(sourceType_), targetType(targetType_)
 {
     SetConversion();
+    SetGroupName(U"@conversion");
 }
 
 void UnderlyingTypeToEnumTypeConversion::Write(SymbolWriter& writer)
@@ -715,10 +805,10 @@ void UnderlyingTypeToEnumTypeConversion::Read(SymbolReader& reader)
     FunctionSymbol::Read(reader);
     boost::uuids::uuid sourceTypeId;
     reader.GetBinaryReader().ReadUuid(sourceTypeId);
-    GetSymbolTable()->EmplaceTypeRequest(this, sourceTypeId, 1);
+    reader.GetSymbolTable()->EmplaceTypeRequest(reader, this, sourceTypeId, 1);
     boost::uuids::uuid targetTypeId;
     reader.GetBinaryReader().ReadUuid(targetTypeId);
-    GetSymbolTable()->EmplaceTypeRequest(this, targetTypeId, 2);
+    reader.GetSymbolTable()->EmplaceTypeRequest(reader, this, targetTypeId, 2);
 }
 
 void UnderlyingTypeToEnumTypeConversion::EmplaceType(TypeSymbol* typeSymbol, int index)
@@ -739,6 +829,19 @@ void UnderlyingTypeToEnumTypeConversion::EmplaceType(TypeSymbol* typeSymbol, int
 
 void UnderlyingTypeToEnumTypeConversion::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span)
 {
+}
+
+void UnderlyingTypeToEnumTypeConversion::Check()
+{
+    FunctionSymbol::Check();
+    if (!sourceType)
+    {
+        throw SymbolCheckException(GetRootModuleForCurrentThread(), "underlying type to enum type conversion has no source type", GetSpan());
+    }
+    if (!targetType)
+    {
+        throw SymbolCheckException(GetRootModuleForCurrentThread(), "underlying type to enum type conversion has no target type", GetSpan());
+    }
 }
 
 } } // namespace cmajor::symbols

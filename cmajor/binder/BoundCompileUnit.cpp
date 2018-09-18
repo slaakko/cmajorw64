@@ -16,12 +16,15 @@
 #include <cmajor/symbols/GlobalFlags.hpp>
 #include <cmajor/symbols/DelegateSymbol.hpp>
 #include <cmajor/symbols/InterfaceTypeSymbol.hpp>
+#include <cmajor/symbols/Module.hpp>
 #include <cmajor/util/Path.hpp>
+#include <cmajor/util/Unicode.hpp>
 #include <boost/filesystem.hpp>
 
 namespace cmajor { namespace binder {
 
 using namespace cmajor::util;
+using namespace cmajor::unicode;
 
 class ClassTypeConversion : public FunctionSymbol
 {
@@ -90,7 +93,7 @@ void NullPtrToPtrConversion::GenerateCall(Emitter& emitter, std::vector<GenObjec
 
 std::unique_ptr<Value> NullPtrToPtrConversion::ConvertValue(const std::unique_ptr<Value>& value) const
 {
-    TypeSymbol* type = value->GetType(nullPtrType->GetSymbolTable());
+    TypeSymbol* type = value->GetType(&nullPtrType->GetModule()->GetSymbolTable());
     if (type->IsPointerType())
     {
         return std::unique_ptr<Value>(new PointerValue(value->GetSpan(), type, nullptr));
@@ -196,21 +199,24 @@ void PtrToULongConversion::GenerateCall(Emitter& emitter, std::vector<GenObject*
 
 BoundCompileUnit::BoundCompileUnit(Module& module_, CompileUnitNode* compileUnitNode_, AttributeBinder* attributeBinder_) :
     BoundNode(&module_, Span(), BoundNodeType::boundCompileUnit), module(module_), symbolTable(module.GetSymbolTable()), compileUnitNode(compileUnitNode_), attributeBinder(attributeBinder_), currentNamespace(nullptr), 
-    hasGotos(false), operationRepository(*this), functionTemplateRepository(*this), classTemplateRepository(*this), inlineFunctionRepository(*this), constExprFunctionRepository(*this), bindingTypes(false),
-    compileUnitIndex(-2)
+    hasGotos(false), operationRepository(*this), functionTemplateRepository(*this), classTemplateRepository(*this), inlineFunctionRepository(*this), 
+    constExprFunctionRepository(*this), conversionTable(nullptr), bindingTypes(false), finalizing(false), compileUnitIndex(-2)
 {
-    boost::filesystem::path fileName = boost::filesystem::path(compileUnitNode->FilePath()).filename();
-    boost::filesystem::path directory = module.DirectoryPath();
-    boost::filesystem::path llfp = (directory / fileName).replace_extension(".ll");
-    boost::filesystem::path optllfp = (directory / fileName).replace_extension(".opt.ll");
+    if (compileUnitNode)
+    {
+        boost::filesystem::path fileName = boost::filesystem::path(compileUnitNode->FilePath()).filename();
+        boost::filesystem::path directory = module.DirectoryPath();
+        boost::filesystem::path llfp = (directory / fileName).replace_extension(".ll");
+        boost::filesystem::path optllfp = (directory / fileName).replace_extension(".opt.ll");
 #ifdef _WIN32
-    boost::filesystem::path objfp = (directory / fileName).replace_extension(".obj");
+        boost::filesystem::path objfp = (directory / fileName).replace_extension(".obj");
 #else
-    boost::filesystem::path objfp = (directory / fileName).replace_extension(".o");
+        boost::filesystem::path objfp = (directory / fileName).replace_extension(".o");
 #endif
-    llFilePath = GetFullPath(llfp.generic_string());
-    optLLFilePath = GetFullPath(optllfp.generic_string());
-    objectFilePath = GetFullPath(objfp.generic_string());
+        llFilePath = GetFullPath(llfp.generic_string());
+        optLLFilePath = GetFullPath(optllfp.generic_string());
+        objectFilePath = GetFullPath(objfp.generic_string());
+    }
 }
 
 void BoundCompileUnit::Load(Emitter& emitter, OperationFlags flags)
@@ -280,6 +286,7 @@ FunctionSymbol* BoundCompileUnit::GetConversion(TypeSymbol* sourceType, TypeSymb
             if (sourceType->IsNullPtrType() && targetType->IsPointerType() && !targetType->IsReferenceType())
             {
                 std::unique_ptr<FunctionSymbol> nullPtrToPtrConversion(new NullPtrToPtrConversion(symbolTable.GetTypeByName(U"@nullptr_type"), targetType));
+                nullPtrToPtrConversion->SetParent(&symbolTable.GlobalNs());
                 conversion = nullPtrToPtrConversion.get();
                 conversionTable.AddConversion(conversion);
                 conversionTable.AddGeneratedConversion(std::move(nullPtrToPtrConversion));
@@ -288,6 +295,7 @@ FunctionSymbol* BoundCompileUnit::GetConversion(TypeSymbol* sourceType, TypeSymb
             else if (sourceType->IsVoidPtrType() && targetType->IsPointerType() && !targetType->IsReferenceType())
             {
                 std::unique_ptr<FunctionSymbol> voidPtrToPtrConversion(new VoidPtrToPtrConversion(symbolTable.GetTypeByName(U"void")->AddPointer(span), targetType));
+                voidPtrToPtrConversion->SetParent(&symbolTable.GlobalNs());
                 conversion = voidPtrToPtrConversion.get();
                 conversionTable.AddConversion(conversion);
                 conversionTable.AddGeneratedConversion(std::move(voidPtrToPtrConversion));
@@ -296,6 +304,7 @@ FunctionSymbol* BoundCompileUnit::GetConversion(TypeSymbol* sourceType, TypeSymb
             else if (sourceType->PlainType(span)->IsPointerType() && targetType == symbolTable.GetTypeByName(U"ulong"))
             {
                 std::unique_ptr<FunctionSymbol> ptrToULongConversion(new PtrToULongConversion(sourceType->PlainType(span), symbolTable.GetTypeByName(U"ulong")));
+                ptrToULongConversion->SetParent(&symbolTable.GlobalNs());
                 conversion = ptrToULongConversion.get();
                 conversionTable.AddConversion(conversion);
                 conversionTable.AddGeneratedConversion(std::move(ptrToULongConversion));
@@ -304,6 +313,7 @@ FunctionSymbol* BoundCompileUnit::GetConversion(TypeSymbol* sourceType, TypeSymb
             else if (sourceType->PlainType(span)->IsPointerType() && targetType->RemoveConst(span)->IsVoidPtrType())
             {
                 std::unique_ptr<FunctionSymbol> ptrToVoidPtrConversion(new PtrToVoidPtrConversion(sourceType->PlainType(span), symbolTable.GetTypeByName(U"void")->AddPointer(span)));
+                ptrToVoidPtrConversion->SetParent(&symbolTable.GlobalNs());
                 conversion = ptrToVoidPtrConversion.get();
                 conversionTable.AddConversion(conversion);
                 conversionTable.AddGeneratedConversion(std::move(ptrToVoidPtrConversion));
@@ -383,9 +393,9 @@ FunctionSymbol* BoundCompileUnit::GetConversion(TypeSymbol* sourceType, TypeSymb
                 {
                     DelegateTypeSymbol* delegateTypeSymbol = static_cast<DelegateTypeSymbol*>(targetType);
                     int arity = delegateTypeSymbol->Arity();
-                    std::unordered_set<FunctionSymbol*> viableFunctions;
-                    functionGroupSymbol->CollectViableFunctions(arity, viableFunctions);
-                    for (FunctionSymbol* viableFunction : viableFunctions)
+                    ViableFunctionSet viableFunctions;
+                    functionGroupSymbol->CollectViableFunctions(arity, viableFunctions, &GetModule());
+                    for (FunctionSymbol* viableFunction : viableFunctions.Get())
                     {
                         if (viableFunction->GetSymbolType() == SymbolType::memberFunctionSymbol && !viableFunction->IsStatic()) continue;
                         bool found = true;
@@ -438,6 +448,7 @@ FunctionSymbol* BoundCompileUnit::GetConversion(TypeSymbol* sourceType, TypeSymb
                                 }
                             }
                             std::unique_ptr<FunctionSymbol> functionToDelegateConversion(new FunctionToDelegateConversion(sourceType, delegateTypeSymbol, viableFunction));
+                            functionToDelegateConversion->SetParent(&symbolTable.GlobalNs());
                             conversion = functionToDelegateConversion.get();
                             conversionTable.AddConversion(conversion);
                             conversionTable.AddGeneratedConversion(std::move(functionToDelegateConversion));
@@ -470,9 +481,9 @@ FunctionSymbol* BoundCompileUnit::GetConversion(TypeSymbol* sourceType, TypeSymb
                 if (functionGroup)
                 {
                     int arity = classDelegateType->Arity();
-                    std::unordered_set<FunctionSymbol*> viableFunctions;
-                    functionGroup->CollectViableFunctions(arity + 1, viableFunctions);
-                    for (FunctionSymbol* viableFunction : viableFunctions)
+                    ViableFunctionSet viableFunctions;
+                    functionGroup->CollectViableFunctions(arity + 1, viableFunctions, &GetModule());
+                    for (FunctionSymbol* viableFunction : viableFunctions.Get())
                     {
                         bool found = true;
                         for (int i = 1; i < arity + 1; ++i)
@@ -494,6 +505,7 @@ FunctionSymbol* BoundCompileUnit::GetConversion(TypeSymbol* sourceType, TypeSymb
                             LocalVariableSymbol* objectDelegatePairVariable = currentFunction->GetFunctionSymbol()->CreateTemporary(classDelegateType->ObjectDelegatePairType(), span);
                             std::unique_ptr<FunctionSymbol> memberFunctionToClassDelegateConversion(new MemberFunctionToClassDelegateConversion(span, sourceType, classDelegateType, viableFunction,
                                 objectDelegatePairVariable));
+                            memberFunctionToClassDelegateConversion->SetParent(&symbolTable.GlobalNs());
                             conversion = memberFunctionToClassDelegateConversion.get();
                             conversionTable.AddConversion(conversion);
                             conversionTable.AddGeneratedConversion(std::move(memberFunctionToClassDelegateConversion));
@@ -516,9 +528,8 @@ FunctionSymbol* BoundCompileUnit::GetConversion(TypeSymbol* sourceType, TypeSymb
                         {
                             LocalVariableSymbol* temporaryInterfaceObjectVar = currentFunction->GetFunctionSymbol()->CreateTemporary(targetInterfaceType, span);
                             std::unique_ptr<FunctionSymbol> classToInterfaceConversion(new ClassToInterfaceConversion(sourceClassType, targetInterfaceType, temporaryInterfaceObjectVar, i, span));
+                            classToInterfaceConversion->SetParent(&symbolTable.GlobalNs());
                             classToInterfaceConversion->SetModule(&GetModule());
-                            classToInterfaceConversion->SetOriginalModule(&GetModule());
-                            classToInterfaceConversion->SetSymbolTable(&symbolTable);
                             conversion = classToInterfaceConversion.get();
                             conversionTable.AddConversion(conversion);
                             conversionTable.AddGeneratedConversion(std::move(classToInterfaceConversion));
@@ -533,7 +544,29 @@ FunctionSymbol* BoundCompileUnit::GetConversion(TypeSymbol* sourceType, TypeSymb
     {
         if (conversion->Parent() && !conversion->IsGeneratedFunction() && conversion->Parent()->GetSymbolType() == SymbolType::classTemplateSpecializationSymbol)
         {
-            InstantiateClassTemplateMemberFunction(conversion, containerScope, currentFunction, span);
+            ClassTemplateSpecializationSymbol* specialization = static_cast<ClassTemplateSpecializationSymbol*>(conversion->Parent());
+            if (specialization->GetModule() != &GetModule())
+            {
+                specialization = symbolTable.GetCurrentClassTemplateSpecialization(specialization);
+                int index = conversion->GetIndex();
+                conversion = specialization->GetFunctionByIndex(index);
+            }
+            bool firstTry = InstantiateClassTemplateMemberFunction(conversion, containerScope, currentFunction, span);
+            if (!firstTry)
+            {
+                ClassTemplateSpecializationSymbol* specialization = static_cast<ClassTemplateSpecializationSymbol*>(conversion->Parent());
+                ClassTemplateSpecializationSymbol* copy = symbolTable.CopyClassTemplateSpecialization(specialization);
+                classTemplateRepository.BindClassTemplateSpecialization(copy, symbolTable.GlobalNs().GetContainerScope(), span);
+                int index = conversion->GetIndex();
+                conversion = copy->GetFunctionByIndex(index);
+                bool secondTry = InstantiateClassTemplateMemberFunction(conversion, containerScope, currentFunction, span);
+                if (!secondTry)
+                {
+                    throw Exception(GetRootModuleForCurrentThread(),
+                        "internal error: could not instantiate member function of a class template specialization '" + ToUtf8(specialization->FullName()) + "'",
+                        specialization->GetSpan());
+                }
+            }
         }
         else if (GetGlobalFlag(GlobalFlags::release) && conversion->IsInline())
         {
@@ -544,7 +577,7 @@ FunctionSymbol* BoundCompileUnit::GetConversion(TypeSymbol* sourceType, TypeSymb
 }
 
 void BoundCompileUnit::CollectViableFunctions(const std::u32string& groupName, ContainerScope* containerScope, std::vector<std::unique_ptr<BoundExpression>>& arguments, 
-    BoundFunction* currentFunction, std::unordered_set<FunctionSymbol*>& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span)
+    BoundFunction* currentFunction, ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span)
 {
     operationRepository.CollectViableFunctions(groupName, containerScope, arguments, currentFunction, viableFunctions, exception, span);
 }
@@ -555,9 +588,9 @@ FunctionSymbol* BoundCompileUnit::InstantiateFunctionTemplate(FunctionSymbol* fu
     return functionTemplateRepository.Instantiate(functionTemplate, templateParameterMapping, span);
 }
 
-void BoundCompileUnit::InstantiateClassTemplateMemberFunction(FunctionSymbol* memberFunction, ContainerScope* containerScope, BoundFunction* currentFunction, const Span& span)
+bool BoundCompileUnit::InstantiateClassTemplateMemberFunction(FunctionSymbol* memberFunction, ContainerScope* containerScope, BoundFunction* currentFunction, const Span& span)
 {
-    classTemplateRepository.Instantiate(memberFunction, containerScope, currentFunction, span);
+    return classTemplateRepository.Instantiate(memberFunction, containerScope, currentFunction, span);
 }
 
 void BoundCompileUnit::InstantiateInlineFunction(FunctionSymbol* inlineFunction, ContainerScope* containerScope, const Span& span)
@@ -657,13 +690,11 @@ void BoundCompileUnit::PopBindingTypes()
     bindingTypesStack.pop();
 }
 
-void BoundCompileUnit::FinalizeBinding(ClassTypeSymbol* classType)
+void BoundCompileUnit::FinalizeBinding(ClassTemplateSpecializationSymbol* classTemplateSpecialization)
 {
-    if (classType->GetSymbolType() != SymbolType::classTemplateSpecializationSymbol) return;
-    ClassTemplateSpecializationSymbol* classTemplateSpecialization = static_cast<ClassTemplateSpecializationSymbol*>(classType);
-    if (classTemplateSpecialization->StatementsNotBound())
+    if (classTemplateSpecialization->GetModule() == &module && classTemplateSpecialization->StatementsNotBound())
     {
-        classTemplateSpecialization->ResetStatementsNotBound();
+        classTemplateSpecialization->ResetStatementsNotBound(); 
         FileScope* fileScope = classTemplateSpecialization->ReleaseFileScope();
         bool fileScopeAdded = false;
         if (fileScope)
@@ -690,6 +721,35 @@ void BoundCompileUnit::PopNamespace()
 {
     currentNamespace = namespaceStack.top();
     namespaceStack.pop();
+}
+
+bool BoundCompileUnit::HasCopyConstructorFor(const boost::uuids::uuid& typeId) const
+{
+    return copyConstructorMap.find(typeId) != copyConstructorMap.cend();
+}
+
+FunctionSymbol* BoundCompileUnit::GetCopyConstructorFor(const boost::uuids::uuid& typeId) const
+{
+    auto it = copyConstructorMap.find(typeId);
+    if (it != copyConstructorMap.cend())
+    {
+        return it->second;
+    }
+    else
+    {
+        throw std::runtime_error("internal error: copy constructor for type not found from compile unit");
+    }
+}
+ 
+void BoundCompileUnit::AddCopyConstructorFor(const boost::uuids::uuid& typeId, std::unique_ptr<FunctionSymbol>&& copyConstructor)
+{
+    copyConstructorMap[typeId] = copyConstructor.get();
+    copyConstructors.push_back(std::move(copyConstructor));
+}
+
+void BoundCompileUnit::AddCopyConstructorToMap(const boost::uuids::uuid& typeId, FunctionSymbol* copyConstructor)
+{
+    copyConstructorMap[typeId] = copyConstructor;
 }
 
 } } // namespace cmajor::binder

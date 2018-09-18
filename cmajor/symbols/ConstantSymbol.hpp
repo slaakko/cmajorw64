@@ -36,6 +36,7 @@ public:
     const char* ClassName() const override { return "ConstantSymbol"; }
     void SetStrValue(const std::u32string& strValue_) { strValue = strValue_; }
     const std::u32string& StrValue() const { return strValue; }
+    void Check() override;
 private:
     TypeSymbol* type;
     std::unique_ptr<Value> value;

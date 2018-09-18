@@ -15,12 +15,12 @@
 #include <cmajor/binder/OverloadResolution.hpp>
 #include <cmajor/binder/StatementBinder.hpp>
 #include <cmajor/binder/BoundStatement.hpp>
-#include <cmajor/binder/ModuleBinder.hpp>
 #include <cmajor/binder/ControlFlowAnalyzer.hpp>
 #include <cmajor/binder/AttributeBinder.hpp>
 #include <cmajor/symbols/GlobalFlags.hpp>
 #include <cmajor/symbols/Warning.hpp>
 #include <cmajor/symbols/Module.hpp>
+#include <cmajor/symbols/ModuleCache.hpp>
 #include <cmajor/symbols/SymbolWriter.hpp>
 #include <cmajor/symbols/SymbolReader.hpp>
 #include <cmajor/symbols/SymbolCreatorVisitor.hpp>
@@ -67,6 +67,13 @@ using namespace cmajor::util;
 using namespace cmajor::unicode;
 
 namespace cmajor { namespace build {
+
+bool stopBuild = false;
+
+void StopBuild()
+{
+    stopBuild = true;
+}
 
 CompileUnit* compileUnitGrammar = nullptr;
 
@@ -287,7 +294,8 @@ std::vector<std::unique_ptr<CompileUnitNode>> ParseSources(Module* module, const
     catch (ParsingException& ex)
     {
         ex.SetProject(ToUtf8(module->Name()));
-        throw ex;
+        ex.SetModule(module);
+        throw;
     }
     catch (const AttributeNotUniqueException& ex)
     {
@@ -875,6 +883,7 @@ void InstallSystemLibraries(Module* systemInstallModule)
 
 void BuildProject(Project* project, std::unique_ptr<Module>& rootModule, bool& stop, bool resetRootModule)
 {
+    bool systemLibraryInstalled = false;
     if (project->GetTarget() == Target::unitTest)
     {
         throw std::runtime_error("cannot build unit test project '" + ToUtf8(project->Name()) + "' using cmc, use cmunit.");
@@ -900,6 +909,8 @@ void BuildProject(Project* project, std::unique_ptr<Module>& rootModule, bool& s
         }
     }
     rootModule.reset(new Module(project->Name(), project->ModuleFilePath()));
+    rootModule->SetRootModule();
+    SetRootModuleForCurrentThread(rootModule.get());
     {
         rootModule->SetLogStreamId(project->LogStreamId());
         rootModule->SetCurrentProjectName(project->Name());
@@ -910,15 +921,9 @@ void BuildProject(Project* project, std::unique_ptr<Module>& rootModule, bool& s
         SetDefines(rootModule.get(), definesFilePath);
         std::vector<std::unique_ptr<CompileUnitNode>> compileUnits = ParseSources(rootModule.get(), project->SourceFilePaths(), stop);
         AttributeBinder attributeBinder(rootModule.get());
-        std::unique_ptr<ModuleBinder> moduleBinder;
-        if (!compileUnits.empty())
-        {
-            moduleBinder.reset(new ModuleBinder(*rootModule, compileUnits[0].get(), &attributeBinder));
-        }
         std::vector<ClassTypeSymbol*> classTypes;
         std::vector<ClassTemplateSpecializationSymbol*> classTemplateSpecializations;
-        rootModule->PrepareForCompilation(project->References(), classTypes, classTemplateSpecializations);
-        cmajor::symbols::MetaInit(rootModule->GetSymbolTable());
+        PrepareModuleForCompilation(rootModule.get(), project->References()); 
         CreateSymbols(rootModule->GetSymbolTable(), compileUnits, stop);
         if (GetGlobalFlag(GlobalFlags::sym2xml))
         {
@@ -929,25 +934,14 @@ void BuildProject(Project* project, std::unique_ptr<Module>& rootModule, bool& s
             formatter.SetIndentSize(1);
             symbolTableDoc->Write(formatter);
         }
-        if (moduleBinder)
+        CompileUnitNode* compileUnit0 = nullptr;
+        if (!compileUnits.empty())
         {
-            for (ClassTemplateSpecializationSymbol* classTemplateSpecialization : classTemplateSpecializations)
-            {
-                if (stop)
-                {
-                    return;
-                }
-                moduleBinder->BindClassTemplateSpecialization(classTemplateSpecialization);
-            }
-            for (ClassTypeSymbol* classType : classTypes)
-            {
-                if (stop)
-                {
-                    return;
-                }
-                classType->SetSpecialMemberFunctions();
-                classType->CreateLayouts();
-            }
+            compileUnit0 = compileUnits[0].get();
+        }
+        if (GetGlobalFlag(GlobalFlags::verbose))
+        {
+            LogMessage(project->LogStreamId(), "Binding types...");
         }
         std::vector<std::unique_ptr<BoundCompileUnit>> boundCompileUnits = BindTypes(*rootModule, compileUnits, &attributeBinder, stop);
         if (stop)
@@ -977,7 +971,6 @@ void BuildProject(Project* project, std::unique_ptr<Module>& rootModule, bool& s
             {
                 return;
             }
-            boundCompileUnit->SetCompileUnitIndex(compileUnitIndex);
             if (GetGlobalFlag(GlobalFlags::verbose))
             {
                 LogMessage(project->LogStreamId(), "> " + boost::filesystem::path(boundCompileUnit->GetCompileUnitNode()->FilePath()).filename().generic_string());
@@ -1047,6 +1040,7 @@ void BuildProject(Project* project, std::unique_ptr<Module>& rootModule, bool& s
                 LogMessage(project->LogStreamId(), "Writing module file...");
             }
             SymbolWriter writer(project->ModuleFilePath());
+            rootModule->ResetFlag(ModuleFlags::root);
             rootModule->Write(writer);
             if (GetGlobalFlag(GlobalFlags::verbose))
             {
@@ -1054,6 +1048,9 @@ void BuildProject(Project* project, std::unique_ptr<Module>& rootModule, bool& s
             }
             if (GetGlobalFlag(GlobalFlags::verbose))
             {
+                LogMessage(project->LogStreamId(), std::to_string(rootModule->GetSymbolTable().NumSpecializations()) + " class template specializations, " + 
+                    std::to_string(rootModule->GetSymbolTable().NumSpecializationsNew()) + " new, " + 
+                    std::to_string(rootModule->GetSymbolTable().NumSpecializationsCopied()) + " copied.");
                 LogMessage(project->LogStreamId(), "Project '" + ToUtf8(project->Name()) + "' built successfully.");
             }
             project->SetModuleFilePath(rootModule->OriginalFilePath());
@@ -1065,12 +1062,18 @@ void BuildProject(Project* project, std::unique_ptr<Module>& rootModule, bool& s
             if (rootModule->Name() == U"System.Install")
             {
                 InstallSystemLibraries(rootModule.get());
+                systemLibraryInstalled = true;
             }
         }
     }
     if (resetRootModule)
     {
+        PutModuleToModuleCache(std::move(rootModule));
         rootModule.reset();
+    }
+    if (systemLibraryInstalled)
+    {
+        ResetModuleCache();
     }
 }
 
@@ -1093,8 +1096,8 @@ void BuildProject(const std::string& projectFilePath, std::unique_ptr<Module>& r
     }
     else
     {
-        bool stop = false;
-        BuildProject(project.get(), rootModule, stop, false);
+        stopBuild = false;
+        BuildProject(project.get(), rootModule, stopBuild, true);
     }
 }
 
@@ -1329,8 +1332,8 @@ void BuildSolution(const std::string& solutionFilePath, std::vector<std::unique_
             for (int i = 0; i < numProjectsToBuild; ++i)
             {
                 Project* project = projectsToBuild[i];
-                bool stop = false;
-                BuildProject(project, rootModules[i], stop, true);
+                stopBuild = false;
+                BuildProject(project, rootModules[i], stopBuild, true);
             }
         }
         else
@@ -1339,7 +1342,7 @@ void BuildSolution(const std::string& solutionFilePath, std::vector<std::unique_
             {
                 LogMessage(-1, "Building " + std::to_string(numProjectsToBuild) + " projects using " + std::to_string(numThreads) + " threads...");
             }
-            bool stop = false;
+            stopBuild = false;
             const char* buildDebugEnvVarDefined = std::getenv("CMAJOR_BUILD_DEBUG");
             if (buildDebugEnvVarDefined != nullptr && std::string(buildDebugEnvVarDefined) != "")
             {
@@ -1350,16 +1353,16 @@ void BuildSolution(const std::string& solutionFilePath, std::vector<std::unique_
             {
                 buildDebug = false;
             }
-            ProjectQueue buildQueue(stop, "build");
-            ProjectQueue readyQueue(stop, "ready");
-            BuildData buildData(stop, buildQueue, readyQueue, rootModules, isSystemSolution);
+            ProjectQueue buildQueue(stopBuild, "build");
+            ProjectQueue readyQueue(stopBuild, "ready");
+            BuildData buildData(stopBuild, buildQueue, readyQueue, rootModules, isSystemSolution);
             std::vector<std::thread> threads;
             for (int i = 0; i < numThreads; ++i)
             {
                 threads.push_back(std::thread(ProjectBuilder, &buildData));
                 if (buildData.stop) break;
             }
-            while (numProjectsToBuild > 0 && !stop)
+            while (numProjectsToBuild > 0 && !stopBuild)
             {
                 std::vector<Project*> building;
                 for (Project* project : projectsToBuild)
@@ -1380,11 +1383,11 @@ void BuildSolution(const std::string& solutionFilePath, std::vector<std::unique_
                     --numProjectsToBuild;
                 }
             }
-            if (stop)
+            if (stopBuild)
             {
                 LogMessage(-1, "Build stopped.");
             }
-            stop = true;
+            stopBuild = true;
             int numStartedThreads = threads.size();
             for (int i = 0; i < numStartedThreads; ++i)
             {
@@ -1443,8 +1446,8 @@ void BuildMsBuildProject(const std::string& projectName, const std::string& proj
     }
     project->ResolveDeclarations();
     project->SetLogStreamId(-1);
-    bool stop = false;
-    BuildProject(project.get(), rootModule, stop, false);
+    stopBuild = false;
+    BuildProject(project.get(), rootModule, stopBuild, false);
 }
 
 } } // namespace cmajor::build

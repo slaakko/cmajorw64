@@ -63,11 +63,11 @@ void BoundParameter::Load(Emitter& emitter, OperationFlags flags)
     emitter.SetCurrentDebugLocation(GetSpan());
     if ((flags & OperationFlags::addr) != OperationFlags::none)
     {
-        emitter.Stack().Push(parameterSymbol->IrObject());
+        emitter.Stack().Push(parameterSymbol->IrObject(emitter));
     }
     else if ((flags & OperationFlags::deref) != OperationFlags::none)
     {
-        llvm::Value* value = emitter.Builder().CreateLoad(parameterSymbol->IrObject());
+        llvm::Value* value = emitter.Builder().CreateLoad(parameterSymbol->IrObject(emitter));
         uint8_t n = GetDerefCount(flags);
         for (uint8_t i = 0; i < n; ++i)
         {
@@ -77,7 +77,7 @@ void BoundParameter::Load(Emitter& emitter, OperationFlags flags)
     }
     else
     {
-        emitter.Stack().Push(emitter.Builder().CreateLoad(parameterSymbol->IrObject()));
+        emitter.Stack().Push(emitter.Builder().CreateLoad(parameterSymbol->IrObject(emitter)));
     }
     DestroyTemporaries(emitter);
 }
@@ -92,7 +92,7 @@ void BoundParameter::Store(Emitter& emitter, OperationFlags flags)
     }
     else if ((flags & OperationFlags::deref) != OperationFlags::none)
     {
-        llvm::Value* ptr = emitter.Builder().CreateLoad(parameterSymbol->IrObject());
+        llvm::Value* ptr = emitter.Builder().CreateLoad(parameterSymbol->IrObject(emitter));
         uint8_t n = GetDerefCount(flags);
         for (uint8_t i = 1; i < n; ++i)
         {
@@ -102,7 +102,7 @@ void BoundParameter::Store(Emitter& emitter, OperationFlags flags)
     }
     else
     {
-        emitter.Builder().CreateStore(value, parameterSymbol->IrObject());
+        emitter.Builder().CreateStore(value, parameterSymbol->IrObject(emitter));
     }
     DestroyTemporaries(emitter);
 }
@@ -127,11 +127,11 @@ void BoundLocalVariable::Load(Emitter& emitter, OperationFlags flags)
     emitter.SetCurrentDebugLocation(GetSpan());
     if ((flags & OperationFlags::addr) != OperationFlags::none)
     {
-        emitter.Stack().Push(localVariableSymbol->IrObject());
+        emitter.Stack().Push(localVariableSymbol->IrObject(emitter));
     }
     else if ((flags & OperationFlags::deref) != OperationFlags::none)
     {
-        llvm::Value* value = emitter.Builder().CreateLoad(localVariableSymbol->IrObject());
+        llvm::Value* value = emitter.Builder().CreateLoad(localVariableSymbol->IrObject(emitter));
         uint8_t n = GetDerefCount(flags);
         for (uint8_t i = 0; i < n; ++i)
         {
@@ -141,7 +141,7 @@ void BoundLocalVariable::Load(Emitter& emitter, OperationFlags flags)
     }
     else
     {
-        emitter.Stack().Push(emitter.Builder().CreateLoad(localVariableSymbol->IrObject()));
+        emitter.Stack().Push(emitter.Builder().CreateLoad(localVariableSymbol->IrObject(emitter)));
     }
     DestroyTemporaries(emitter);
 }
@@ -156,7 +156,7 @@ void BoundLocalVariable::Store(Emitter& emitter, OperationFlags flags)
     }
     else if ((flags & OperationFlags::deref) != OperationFlags::none)
     {
-        llvm::Value* ptr = emitter.Builder().CreateLoad(localVariableSymbol->IrObject());
+        llvm::Value* ptr = emitter.Builder().CreateLoad(localVariableSymbol->IrObject(emitter));
         uint8_t n = GetDerefCount(flags);
         for (uint8_t i = 1; i < n; ++i)
         {
@@ -166,7 +166,7 @@ void BoundLocalVariable::Store(Emitter& emitter, OperationFlags flags)
     }
     else
     {
-        emitter.Builder().CreateStore(value, localVariableSymbol->IrObject());
+        emitter.Builder().CreateStore(value, localVariableSymbol->IrObject(emitter));
     }
     DestroyTemporaries(emitter);
 }
@@ -1832,8 +1832,7 @@ TypeSymbol* CreateNamespaceTypeSymbol(NamespaceSymbol* ns, Module* module)
 {
     TypeSymbol* nsTypeSymbol = new NamespaceTypeSymbol(ns);
     nsTypeSymbol->SetModule(module);
-    nsTypeSymbol->SetOriginalModule(module);
-    nsTypeSymbol->SetSymbolTable(&module->GetSymbolTable());
+    module->GetSymbolTable().SetTypeIdFor(nsTypeSymbol);
     return nsTypeSymbol;
 }
 
@@ -1867,8 +1866,7 @@ TypeSymbol* CreateFunctionGroupTypeSymbol(FunctionGroupSymbol* functionGroupSymb
 {
     TypeSymbol* functionGroupTypeSymbol = new FunctionGroupTypeSymbol(functionGroupSymbol, boundFunctionGroupExpression);
     functionGroupTypeSymbol->SetModule(module);
-    functionGroupTypeSymbol->SetOriginalModule(module);
-    functionGroupTypeSymbol->SetSymbolTable(&module->GetSymbolTable());
+    module->GetSymbolTable().SetTypeIdFor(functionGroupTypeSymbol);
     return functionGroupTypeSymbol;
 }
 
@@ -1927,8 +1925,7 @@ TypeSymbol* CreateMemberExpressionTypeSymbol(const Span& span, const std::u32str
 {
     TypeSymbol* memberExpressionTypeSymbol = new MemberExpressionTypeSymbol(span, name, boundMemberExpression);
     memberExpressionTypeSymbol->SetModule(module);
-    memberExpressionTypeSymbol->SetOriginalModule(module);
-    memberExpressionTypeSymbol->SetSymbolTable(&module->GetSymbolTable());
+    module->GetSymbolTable().SetTypeIdFor(memberExpressionTypeSymbol);
     return memberExpressionTypeSymbol;
 }
 

@@ -1789,10 +1789,6 @@ dom::Document* GetModuleDocument(Input* input, const std::u32string& moduleName)
 
 void GenerateSymbolTableXml(Module* rootModule, std::unordered_map<int, File>& fileMap)
 {
-    if (rootModule->Name() == U"System.Core")
-    {
-        int x = 0;
-    }
     SymbolTable& symbolTable = rootModule->GetSymbolTable();
     std::string modulePrefix = Path::Combine(Path::Combine("../..", ToUtf8(rootModule->Name())), "doc");
     std::string extModulePrefix = Path::Combine(ToUtf8(rootModule->Name()), "doc");

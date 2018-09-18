@@ -46,7 +46,7 @@ void ClassGroupTypeSymbol::AddClass(ClassTypeSymbol* classTypeSymbol)
     {
         if (arityClassMap.find(arity) != arityClassMap.cend())
         {
-            throw Exception(classTypeSymbol->GetModule(), "already has class with arity " + std::to_string(arity) + " in class group '" + ToUtf8(Name()) + "'", GetSpan(), classTypeSymbol->GetSpan());
+            throw Exception(GetRootModuleForCurrentThread(), "already has class with arity " + std::to_string(arity) + " in class group '" + ToUtf8(Name()) + "'", GetSpan(), classTypeSymbol->GetSpan());
         }
         arityClassMap[arity] = classTypeSymbol;
     }
@@ -89,11 +89,23 @@ void ClassGroupTypeSymbol::AppendChildElements(dom::Element* element, TypeMap& t
     }
 }
 
+void ClassGroupTypeSymbol::Check()
+{
+    TypeSymbol::Check();
+    for (const auto& p : arityClassMap)
+    {
+        if (!p.second)
+        {
+            throw SymbolCheckException(GetRootModuleForCurrentThread(), "class group type symbol has no class type symbol", GetSpan());
+        }
+    }
+}
+
 ClassTypeSymbol::ClassTypeSymbol(const Span& span_, const std::u32string& name_) : 
     TypeSymbol(SymbolType::classTypeSymbol, span_, name_), 
     minArity(0), baseClass(), flags(ClassTypeSymbolFlags::none), implementedInterfaces(), templateParameters(), memberVariables(), staticMemberVariables(),
     staticConstructor(nullptr), defaultConstructor(nullptr), copyConstructor(nullptr), moveConstructor(nullptr), copyAssignment(nullptr), moveAssignment(nullptr), 
-    constructors(), destructor(nullptr), memberFunctions(), vmtPtrIndex(-1), irType(nullptr), vmtObjectType(nullptr), staticObjectType(nullptr), prototype(nullptr)
+    constructors(), destructor(nullptr), memberFunctions(), vmtPtrIndex(-1), prototype(nullptr)
 {
 }
 
@@ -101,7 +113,7 @@ ClassTypeSymbol::ClassTypeSymbol(SymbolType symbolType_, const Span& span_, cons
     TypeSymbol(symbolType_, span_, name_),
     minArity(0), baseClass(), flags(ClassTypeSymbolFlags::none), implementedInterfaces(), templateParameters(), memberVariables(), staticMemberVariables(),
     staticConstructor(nullptr), defaultConstructor(nullptr), copyConstructor(nullptr), moveConstructor(nullptr), copyAssignment(nullptr), moveAssignment(nullptr), 
-    constructors(), destructor(nullptr), memberFunctions(), vmtPtrIndex(-1), irType(nullptr), vmtObjectType(nullptr), staticObjectType(nullptr), prototype(nullptr)
+    constructors(), destructor(nullptr), memberFunctions(), vmtPtrIndex(-1), prototype(nullptr)
 {
 }
 
@@ -109,28 +121,13 @@ void ClassTypeSymbol::Write(SymbolWriter& writer)
 {
     TypeSymbol::Write(writer);
     writer.GetBinaryWriter().Write(groupName);
-    writer.GetBinaryWriter().Write(static_cast<uint8_t>(flags & ~ClassTypeSymbolFlags::layoutsComputed));
+    writer.GetBinaryWriter().Write(static_cast<uint16_t>(flags)); 
     writer.GetBinaryWriter().Write(static_cast<int32_t>(minArity));
     if (IsClassTemplate())
     {
-        uint32_t sizePos = writer.GetBinaryWriter().Pos();
-        uint32_t sizeOfAstNodes = 0;
-        writer.GetBinaryWriter().Write(sizeOfAstNodes);
-        uint32_t startPos = writer.GetBinaryWriter().Pos();
         usingNodes.Write(writer.GetAstWriter());
-        Node* node = GetSymbolTable()->GetNode(this);
+        Node* node = GetRootModuleForCurrentThread()->GetSymbolTable().GetNode(this);
         writer.GetAstWriter().Write(node);
-        uint32_t endPos = writer.GetBinaryWriter().Pos();
-        sizeOfAstNodes = endPos - startPos;
-        writer.GetBinaryWriter().Seek(sizePos);
-        writer.GetBinaryWriter().Write(sizeOfAstNodes);
-        writer.GetBinaryWriter().Seek(endPos);
-        bool hasConstraint = constraint != nullptr;
-        writer.GetBinaryWriter().Write(hasConstraint);
-        if (hasConstraint)
-        {
-            writer.GetAstWriter().Write(constraint.get());
-        }
         bool hasPrototype = prototype != nullptr;
         writer.GetBinaryWriter().Write(hasPrototype);
         if (hasPrototype)
@@ -138,154 +135,202 @@ void ClassTypeSymbol::Write(SymbolWriter& writer)
             writer.GetBinaryWriter().Write(prototype->TypeId());
         }
     }
-    else if (GetSymbolType() == SymbolType::classTypeSymbol)
+    boost::uuids::uuid baseClassId = boost::uuids::nil_generator()();
+    if (baseClass)
     {
-        boost::uuids::uuid baseClassId = boost::uuids::nil_generator()();
-        if (baseClass)
-        {
-            baseClassId = baseClass->TypeId();
-        }
-        writer.GetBinaryWriter().Write(baseClassId);
-        uint32_t n = uint32_t(implementedInterfaces.size());
-        writer.GetBinaryWriter().WriteULEB128UInt(n);
-        for (uint32_t i = 0; i < n; ++i)
-        {
-            InterfaceTypeSymbol* intf = implementedInterfaces[i];
-            const boost::uuids::uuid& intfTypeId = intf->TypeId();
-            writer.GetBinaryWriter().Write(intfTypeId);
-        }
-        uint32_t vmtSize = vmt.size();
-        writer.GetBinaryWriter().WriteULEB128UInt(vmtSize);
-        writer.GetBinaryWriter().Write(vmtPtrIndex);
-        bool hasConstraint = constraint != nullptr;
-        writer.GetBinaryWriter().Write(hasConstraint);
-        if (hasConstraint)
-        {
-            writer.GetAstWriter().Write(constraint.get());
-        }
+        baseClassId = baseClass->TypeId();
     }
-    else if (GetSymbolType() == SymbolType::classTemplateSpecializationSymbol)
+    writer.GetBinaryWriter().Write(baseClassId);
+    uint32_t n = uint32_t(implementedInterfaces.size());
+    writer.GetBinaryWriter().WriteULEB128UInt(n);
+    for (uint32_t i = 0; i < n; ++i)
     {
-        bool hasConstraint = constraint != nullptr;
-        writer.GetBinaryWriter().Write(hasConstraint);
-        if (hasConstraint)
-        {
-            writer.GetAstWriter().Write(constraint.get());
-        }
+        InterfaceTypeSymbol* intf = implementedInterfaces[i];
+        const boost::uuids::uuid& intfTypeId = intf->TypeId();
+        writer.GetBinaryWriter().Write(intfTypeId);
+    }
+    bool hasDefaultConstructor = defaultConstructor != nullptr && !defaultConstructor->IsGeneratedFunction();
+    writer.GetBinaryWriter().Write(hasDefaultConstructor);
+    if (hasDefaultConstructor)
+    {
+        writer.GetBinaryWriter().Write(defaultConstructor->FunctionId());
+    }
+    bool hasCopyConstructor = copyConstructor != nullptr && !copyConstructor->IsGeneratedFunction();
+    writer.GetBinaryWriter().Write(hasCopyConstructor);
+    if (hasCopyConstructor)
+    {
+        writer.GetBinaryWriter().Write(copyConstructor->FunctionId());
+    }
+    bool hasMoveConstructor = moveConstructor != nullptr && !moveConstructor->IsGeneratedFunction();
+    writer.GetBinaryWriter().Write(hasMoveConstructor);
+    if (hasMoveConstructor)
+    {
+        writer.GetBinaryWriter().Write(moveConstructor->FunctionId());
+    }
+    bool hasCopyAssignment = copyAssignment != nullptr && !copyAssignment->IsGeneratedFunction();
+    writer.GetBinaryWriter().Write(hasCopyAssignment);
+    if (hasCopyAssignment)
+    {
+        writer.GetBinaryWriter().Write(copyAssignment->FunctionId());
+    }
+    bool hasMoveAssignment = moveAssignment != nullptr && !moveAssignment->IsGeneratedFunction();
+    writer.GetBinaryWriter().Write(hasMoveAssignment);
+    if (hasMoveAssignment)
+    {
+        writer.GetBinaryWriter().Write(moveAssignment->FunctionId());
+    }
+    uint32_t vmtSize = vmt.size();
+    writer.GetBinaryWriter().WriteULEB128UInt(vmtSize);
+    writer.GetBinaryWriter().Write(vmtPtrIndex);
+    bool hasConstraint = constraint != nullptr;
+    writer.GetBinaryWriter().Write(hasConstraint);
+    if (hasConstraint)
+    {
+        writer.GetAstWriter().Write(constraint.get());
+    }
+    uint32_t oln = objectLayout.size();
+    writer.GetBinaryWriter().WriteULEB128UInt(oln);
+    for (TypeSymbol* type : objectLayout)
+    {
+        writer.GetBinaryWriter().Write(type->TypeId());
+    }
+    uint32_t sln = staticLayout.size();
+    writer.GetBinaryWriter().WriteULEB128UInt(sln);
+    for (TypeSymbol* type : staticLayout)
+    {
+        writer.GetBinaryWriter().Write(type->TypeId());
     }
 }
+
+const int prototypeIndex = 1000000;
+const int defaultConstructorIndex = 1000001;
+const int copyConstructorIndex = 1000002;
+const int moveConstructorIndex = 1000003;
+const int copyAssignmentIndex = 1000004;
+const int moveAssignmentIndex = 1000005;
+const int objectLayoutIndex = 0x10000;
+const int staticLayoutIndex = 0x20000;
+const int maxObjectLayoutSize = staticLayoutIndex - objectLayoutIndex;
+const int maxStaticLayoutSize = maxObjectLayoutSize;
 
 void ClassTypeSymbol::Read(SymbolReader& reader)
 {
     TypeSymbol::Read(reader);
     groupName = reader.GetBinaryReader().ReadUtf32String();
-    flags = static_cast<ClassTypeSymbolFlags>(reader.GetBinaryReader().ReadByte());
+    flags = static_cast<ClassTypeSymbolFlags>(reader.GetBinaryReader().ReadUShort());
     minArity = reader.GetBinaryReader().ReadInt();
     if (IsClassTemplate())
     {
-        sizeOfAstNodes = reader.GetBinaryReader().ReadUInt();
-        astNodesPos = reader.GetBinaryReader().Pos();
-        reader.GetBinaryReader().Skip(sizeOfAstNodes);
-        filePathReadFrom = reader.GetBinaryReader().FileName();
-        bool hasConstraint = reader.GetBinaryReader().ReadBool();
-        if (hasConstraint)
-        {
-            constraint.reset(reader.GetAstReader().ReadConstraintNode());
-        }
+        usingNodes.Read(reader.GetAstReader());
+        Node* node = reader.GetAstReader().ReadNode();
+        Assert(node->GetNodeType() == NodeType::classNode, "class node expected");
+        ClassNode* clsNode = static_cast<ClassNode*>(node);
+        classNode.reset(clsNode);
         bool hasPrototype = reader.GetBinaryReader().ReadBool();
         if (hasPrototype)
         {
             boost::uuids::uuid prototypeId;
             reader.GetBinaryReader().ReadUuid(prototypeId);
-            GetSymbolTable()->EmplaceTypeRequest(this, prototypeId, 1000000);
+            reader.GetSymbolTable()->EmplaceTypeRequest(reader, this, prototypeId, prototypeIndex);
         }
     }
-    else if (GetSymbolType() == SymbolType::classTypeSymbol)
+    boost::uuids::uuid baseClassId;
+    reader.GetBinaryReader().ReadUuid(baseClassId);
+    if (!baseClassId.is_nil())
     {
-        boost::uuids::uuid baseClassId;
-        reader.GetBinaryReader().ReadUuid(baseClassId);
-        if (!baseClassId.is_nil())
-        {
-            GetSymbolTable()->EmplaceTypeRequest(this, baseClassId, 0);
-        }
-        uint32_t n = reader.GetBinaryReader().ReadULEB128UInt();
-        implementedInterfaces.resize(n);
-        for (uint32_t i = 0; i < n; ++i)
-        {
-            boost::uuids::uuid intfTypeId;
-            reader.GetBinaryReader().ReadUuid(intfTypeId);
-            GetSymbolTable()->EmplaceTypeRequest(this, intfTypeId, 1 + i);
-        }
-        uint32_t vmtSize = reader.GetBinaryReader().ReadULEB128UInt();
-        vmt.resize(vmtSize);
-        vmtPtrIndex = reader.GetBinaryReader().ReadInt();
-        bool hasConstraint = reader.GetBinaryReader().ReadBool();
-        if (hasConstraint)
-        {
-            constraint.reset(reader.GetAstReader().ReadConstraintNode());
-        }
-        if (destructor)
-        {
-            if (destructor->VmtIndex() != -1)
-            {
-                Assert(destructor->VmtIndex() < vmt.size(), "invalid destructor vmt index");
-                vmt[destructor->VmtIndex()] = destructor;
-            }
-        }
-        for (FunctionSymbol* memberFunction : memberFunctions)
-        {
-            if (memberFunction->VmtIndex() != -1)
-            {
-                Assert(memberFunction->VmtIndex() < vmt.size(), "invalid member function vmt index");
-                vmt[memberFunction->VmtIndex()] = memberFunction;
-            }
-        }
-        if (IsPolymorphic() && !IsPrototypeTemplateSpecialization())
-        {
-            GetSymbolTable()->AddPolymorphicClass(this);
-        }
-        if (StaticConstructor())
-        {
-            GetSymbolTable()->AddClassHavingStaticConstructor(this);
-        }
-        reader.AddClassType(this);
+        reader.GetSymbolTable()->EmplaceTypeRequest(reader, this, baseClassId, 0);
     }
-    else if (GetSymbolType() == SymbolType::classTemplateSpecializationSymbol)
+    uint32_t n = reader.GetBinaryReader().ReadULEB128UInt();
+    implementedInterfaces.resize(n);
+    for (uint32_t i = 0; i < n; ++i)
     {
-        bool hasConstraint = reader.GetBinaryReader().ReadBool();
-        if (hasConstraint)
-        {
-            constraint.reset(reader.GetAstReader().ReadConstraintNode());
-        }
+        boost::uuids::uuid intfTypeId;
+        reader.GetBinaryReader().ReadUuid(intfTypeId);
+        reader.GetSymbolTable()->EmplaceTypeRequest(reader, this, intfTypeId, 1 + i);
     }
-}
-
-void ClassTypeSymbol::ComputeExportClosure()
-{
-    if (IsProject())
+    bool hasDefaultConstructor = reader.GetBinaryReader().ReadBool();
+    if (hasDefaultConstructor)
     {
-        ContainerSymbol::ComputeExportClosure();
-        if (baseClass)
+        boost::uuids::uuid defaultConstructorId;
+        reader.GetBinaryReader().ReadUuid(defaultConstructorId);
+        reader.GetSymbolTable()->EmplaceFunctionRequest(reader, this, defaultConstructorId, defaultConstructorIndex);
+    }
+    bool hasCopyConstructor = reader.GetBinaryReader().ReadBool();
+    if (hasCopyConstructor)
+    {
+        boost::uuids::uuid copyConstructorId;
+        reader.GetBinaryReader().ReadUuid(copyConstructorId);
+        reader.GetSymbolTable()->EmplaceFunctionRequest(reader, this, copyConstructorId, copyConstructorIndex);
+    }
+    bool hasMoveConstructor = reader.GetBinaryReader().ReadBool();
+    if (hasMoveConstructor)
+    {
+        boost::uuids::uuid moveConstructorId;
+        reader.GetBinaryReader().ReadUuid(moveConstructorId);
+        reader.GetSymbolTable()->EmplaceFunctionRequest(reader, this, moveConstructorId, moveConstructorIndex);
+    }
+    bool hasCopyAssignment = reader.GetBinaryReader().ReadBool();
+    if (hasCopyAssignment)
+    {
+        boost::uuids::uuid copyAssignmentId;
+        reader.GetBinaryReader().ReadUuid(copyAssignmentId);
+        reader.GetSymbolTable()->EmplaceFunctionRequest(reader, this, copyAssignmentId, copyAssignmentIndex);
+    }
+    bool hasMoveAssignment = reader.GetBinaryReader().ReadBool();
+    if (hasMoveAssignment)
+    {
+        boost::uuids::uuid moveAssignmentId;
+        reader.GetBinaryReader().ReadUuid(moveAssignmentId);
+        reader.GetSymbolTable()->EmplaceFunctionRequest(reader, this, moveAssignmentId, moveAssignmentIndex);
+    }
+    uint32_t vmtSize = reader.GetBinaryReader().ReadULEB128UInt();
+    vmt.resize(vmtSize);
+    if (destructor)
+    {
+        if (destructor->VmtIndex() != -1)
         {
-            if (!baseClass->ExportComputed())
-            {
-                baseClass->SetExportComputed();
-                baseClass->ComputeExportClosure();
-            }
+            Assert(destructor->VmtIndex() < vmt.size(), "invalid destructor vmt index");
+            vmt[destructor->VmtIndex()] = destructor;
         }
     }
-}
-
-void ClassTypeSymbol::ReadAstNodes()
-{
-    AstReader reader(filePathReadFrom);
-    reader.GetBinaryReader().Skip(astNodesPos);
-    usingNodes.Read(reader);
-    Node* node = reader.ReadNode();
-    Assert(node->GetNodeType() == NodeType::classNode, "class node expected");
-    ClassNode* clsNode = static_cast<ClassNode*>(node);
-    classNode.reset(clsNode);
-    GetSymbolTable()->MapNode(clsNode, this);
+    for (FunctionSymbol* memberFunction : memberFunctions)
+    {
+        if (memberFunction->VmtIndex() != -1)
+        {
+            Assert(memberFunction->VmtIndex() < vmt.size(), "invalid member function vmt index");
+            vmt[memberFunction->VmtIndex()] = memberFunction;
+        }
+    }
+    vmtPtrIndex = reader.GetBinaryReader().ReadInt();
+    bool hasConstraint = reader.GetBinaryReader().ReadBool();
+    if (hasConstraint)
+    {
+        constraint.reset(reader.GetAstReader().ReadConstraintNode());
+    }
+    uint32_t oln = reader.GetBinaryReader().ReadULEB128UInt();
+    objectLayout.resize(oln);
+    for (uint32_t i = 0; i < oln; ++i)
+    {
+        boost::uuids::uuid typeId;
+        reader.GetBinaryReader().ReadUuid(typeId);
+        reader.GetSymbolTable()->EmplaceTypeRequest(reader, this, typeId, objectLayoutIndex + i);
+    }
+    uint32_t sln = reader.GetBinaryReader().ReadULEB128UInt();
+    staticLayout.resize(sln);
+    for (uint32_t i = 0; i < sln; ++i)
+    {
+        boost::uuids::uuid typeId;
+        reader.GetBinaryReader().ReadUuid(typeId);
+        reader.GetSymbolTable()->EmplaceTypeRequest(reader, this, typeId, staticLayoutIndex + i);
+    }
+    if (IsPolymorphic() && !IsPrototypeTemplateSpecialization())
+    {
+        reader.GetSymbolTable()->AddPolymorphicClass(this);
+    }
+    if (StaticConstructor())
+    {
+        reader.GetSymbolTable()->AddClassHavingStaticConstructor(this);
+    }
 }
 
 void ClassTypeSymbol::EmplaceType(TypeSymbol* typeSymbol, int index)
@@ -294,20 +339,47 @@ void ClassTypeSymbol::EmplaceType(TypeSymbol* typeSymbol, int index)
     {
         Assert(typeSymbol->GetSymbolType() == SymbolType::classTypeSymbol || typeSymbol->GetSymbolType() == SymbolType::classTemplateSpecializationSymbol, "class type symbol expected");
         baseClass = static_cast<ClassTypeSymbol*>(typeSymbol);
-        GetContainerScope()->SetBase(baseClass->GetContainerScope());
     }
     else if (index >= 1)
     {
-        if (index == 1000000)
+        if (index == prototypeIndex)
         {
             Assert(typeSymbol->GetSymbolType() == SymbolType::classTemplateSpecializationSymbol, "class template specialization expected");
             SetPrototype(static_cast<ClassTemplateSpecializationSymbol*>(typeSymbol));
         }
-        else
+        else if (index < objectLayoutIndex)
         {
             Assert(typeSymbol->GetSymbolType() == SymbolType::interfaceTypeSymbol, "interface type symbol expected");
             InterfaceTypeSymbol* interfaceTypeSymbol = static_cast<InterfaceTypeSymbol*>(typeSymbol);
             implementedInterfaces[index - 1] = interfaceTypeSymbol;
+        }
+        else if (index >= objectLayoutIndex && index < objectLayoutIndex + maxObjectLayoutSize)
+        {
+            objectLayout[index - objectLayoutIndex] = typeSymbol;
+        }
+        else if (index >= staticLayoutIndex && index < staticLayoutIndex + maxStaticLayoutSize)
+        {
+            staticLayout[index - staticLayoutIndex] = typeSymbol;
+        }
+        else
+        {
+            throw std::runtime_error("internal error: invalid class type emplace type index");
+        }
+    }
+}
+
+void ClassTypeSymbol::EmplaceFunction(FunctionSymbol* functionSymbol, int index)
+{
+    switch (index)
+    {
+        case defaultConstructorIndex: defaultConstructor = static_cast<ConstructorSymbol*>(functionSymbol); break;
+        case copyConstructorIndex: copyConstructor = static_cast<ConstructorSymbol*>(functionSymbol); break;
+        case moveConstructorIndex: moveConstructor = static_cast<ConstructorSymbol*>(functionSymbol); break;
+        case copyAssignmentIndex: copyAssignment = static_cast<MemberFunctionSymbol*>(functionSymbol); break;
+        case moveAssignmentIndex: moveAssignment = static_cast<MemberFunctionSymbol*>(functionSymbol); break;
+        default:
+        {
+            throw std::runtime_error("internal error: invalid class type emplace function index");        
         }
     }
 }
@@ -338,7 +410,7 @@ void ClassTypeSymbol::AddMember(Symbol* member)
         {
             if (staticConstructor)
             {
-                throw Exception(GetModule(), "already has a static constructor", member->GetSpan(), staticConstructor->GetSpan());
+                throw Exception(GetRootModuleForCurrentThread(), "already has a static constructor", member->GetSpan(), staticConstructor->GetSpan());
             }
             else
             {
@@ -356,7 +428,7 @@ void ClassTypeSymbol::AddMember(Symbol* member)
         {
             if (destructor)
             {
-                throw Exception(GetModule(), "already has a destructor", member->GetSpan(), destructor->GetSpan());
+                throw Exception(GetRootModuleForCurrentThread(), "already has a destructor", member->GetSpan(), destructor->GetSpan());
             }
             else
             {
@@ -457,14 +529,18 @@ void ClassTypeSymbol::Dump(CodeFormatter& formatter)
         formatter.WriteLine("constraint: " + constraint->ToString());
     }
     formatter.WriteLine("typeid: " + boost::uuids::to_string(TypeId()));
+/*
     if (IsPolymorphic())
     {
         formatter.WriteLine("vmt object name: " + VmtObjectName());
     }
+*/
+/*
     if (!staticLayout.empty())
     {
         formatter.WriteLine("static object name: " + StaticObjectName());
     }
+*/
     formatter.IncIndent();
     SymbolCollector collector;
     TypeSymbol::Accept(&collector);
@@ -571,15 +647,28 @@ void ClassTypeSymbol::Dump(CodeFormatter& formatter)
     formatter.DecIndent();
 }
 
-bool ClassTypeSymbol::IsRecursive(TypeSymbol* type, std::unordered_set<TypeSymbol*>& tested) 
+bool ClassTypeSymbol::IsRecursive(TypeSymbol* type, std::unordered_set<boost::uuids::uuid, boost::hash<boost::uuids::uuid>>& tested) 
 {
-    if (tested.find(type) != tested.cend()) return type == this;
-    tested.insert(this);
-    if (TypeSymbol::IsRecursive(type, tested)) return true;
-    if (baseClass && baseClass->IsRecursive(type, tested)) return true;
+    if (tested.find(TypeId()) != tested.cend())
+    {
+        bool equal = TypesEqual(type, this);
+        return equal;
+    }
+    tested.insert(TypeId());
+    if (TypeSymbol::IsRecursive(type, tested))
+    {
+        return true;
+    }
+    if (baseClass && baseClass->IsRecursive(type, tested))
+    {
+        return true;
+    }
     for (MemberVariableSymbol* memberVariable : memberVariables)
     {
-        if (memberVariable->GetType()->IsRecursive(type, tested)) return true;
+        if (memberVariable->GetType()->IsRecursive(type, tested))
+        {
+            return true;
+        }
     }
     return false;
 }
@@ -590,9 +679,7 @@ void ClassTypeSymbol::CreateDestructorSymbol()
     {
         DestructorSymbol* destructorSymbol = new DestructorSymbol(GetSpan(), U"@destructor");
         destructorSymbol->SetModule(GetModule());
-        destructorSymbol->SetOriginalModule(GetOriginalModule());
-        destructorSymbol->SetSymbolTable(GetSymbolTable());
-        GetSymbolTable()->SetFunctionIdFor(destructorSymbol);
+        GetModule()->GetSymbolTable().SetFunctionIdFor(destructorSymbol);
         destructorSymbol->SetGenerated();
         ParameterSymbol* thisParam = new ParameterSymbol(GetSpan(), U"this");
         thisParam->SetType(AddPointer(GetSpan()));
@@ -636,7 +723,7 @@ void ClassTypeSymbol::ComputeMinArity()
 bool ClassTypeSymbol::HasBaseClass(ClassTypeSymbol* cls) const
 {
     if (!baseClass) return false;
-    if (baseClass == cls || baseClass->HasBaseClass(cls)) return true;
+    if (TypesEqual(baseClass, cls) || baseClass->HasBaseClass(cls)) return true;
     return false;
 }
 
@@ -644,7 +731,7 @@ bool ClassTypeSymbol::HasBaseClass(ClassTypeSymbol* cls, uint8_t& distance) cons
 {
     if (!baseClass) return false;
     ++distance;
-    if (baseClass == cls) return true;
+    if (TypesEqual(baseClass, cls)) return true;
     return baseClass->HasBaseClass(cls, distance);
 }
 
@@ -655,7 +742,7 @@ void ClassTypeSymbol::AddImplementedInterface(InterfaceTypeSymbol* interfaceType
     {
         if (implementedInterfaces[i] == interfaceTypeSymbol)
         {
-            throw Exception(GetModule(), "class cannot implement an interface more than once", GetSpan(), interfaceTypeSymbol->GetSpan());
+            throw Exception(GetRootModuleForCurrentThread(), "class cannot implement an interface more than once", GetSpan(), interfaceTypeSymbol->GetSpan());
         }
     }
     implementedInterfaces.push_back(interfaceTypeSymbol);
@@ -680,11 +767,11 @@ void ClassTypeSymbol::SetSpecifiers(Specifiers specifiers)
     }
     if ((specifiers & Specifiers::virtual_) != Specifiers::none)
     {
-        throw Exception(GetModule(), "class type symbol cannot be virtual", GetSpan());
+        throw Exception(GetRootModuleForCurrentThread(), "class type symbol cannot be virtual", GetSpan());
     }
     if ((specifiers & Specifiers::override_) != Specifiers::none)
     {
-        throw Exception(GetModule(), "class type symbol cannot be override", GetSpan());
+        throw Exception(GetRootModuleForCurrentThread(), "class type symbol cannot be override", GetSpan());
     }
     if ((specifiers & Specifiers::abstract_) != Specifiers::none)
     {
@@ -693,51 +780,51 @@ void ClassTypeSymbol::SetSpecifiers(Specifiers specifiers)
     }
     if ((specifiers & Specifiers::inline_) != Specifiers::none)
     {
-        throw Exception(GetModule(), "class type symbol cannot be inline", GetSpan());
+        throw Exception(GetRootModuleForCurrentThread(), "class type symbol cannot be inline", GetSpan());
     }
     if ((specifiers & Specifiers::explicit_) != Specifiers::none)
     {
-        throw Exception(GetModule(), "class type symbol cannot be explicit", GetSpan());
+        throw Exception(GetRootModuleForCurrentThread(), "class type symbol cannot be explicit", GetSpan());
     }
     if ((specifiers & Specifiers::external_) != Specifiers::none)
     {
-        throw Exception(GetModule(), "class type symbol cannot be external", GetSpan());
+        throw Exception(GetRootModuleForCurrentThread(), "class type symbol cannot be external", GetSpan());
     }
     if ((specifiers & Specifiers::suppress_) != Specifiers::none)
     {
-        throw Exception(GetModule(), "class type symbol cannot be suppressed", GetSpan());
+        throw Exception(GetRootModuleForCurrentThread(), "class type symbol cannot be suppressed", GetSpan());
     }
     if ((specifiers & Specifiers::default_) != Specifiers::none)
     {
-        throw Exception(GetModule(), "class type symbol cannot be default", GetSpan());
+        throw Exception(GetRootModuleForCurrentThread(), "class type symbol cannot be default", GetSpan());
     }
     if ((specifiers & Specifiers::constexpr_) != Specifiers::none)
     {
-        throw Exception(GetModule(), "class type symbol cannot be constexpr", GetSpan());
+        throw Exception(GetRootModuleForCurrentThread(), "class type symbol cannot be constexpr", GetSpan());
     }
     if ((specifiers & Specifiers::cdecl_) != Specifiers::none)
     {
-        throw Exception(GetModule(), "class type symbol cannot be cdecl", GetSpan());
+        throw Exception(GetRootModuleForCurrentThread(), "class type symbol cannot be cdecl", GetSpan());
     }
     if ((specifiers & Specifiers::nothrow_) != Specifiers::none)
     {
-        throw Exception(GetModule(), "class type symbol cannot be nothrow", GetSpan());
+        throw Exception(GetRootModuleForCurrentThread(), "class type symbol cannot be nothrow", GetSpan());
     }
     if ((specifiers & Specifiers::throw_) != Specifiers::none)
     {
-        throw Exception(GetModule(), "class type symbol cannot be throw", GetSpan());
+        throw Exception(GetRootModuleForCurrentThread(), "class type symbol cannot be throw", GetSpan());
     }
     if ((specifiers & Specifiers::new_) != Specifiers::none)
     {
-        throw Exception(GetModule(), "class type symbol cannot be new", GetSpan());
+        throw Exception(GetRootModuleForCurrentThread(), "class type symbol cannot be new", GetSpan());
     }
     if ((specifiers & Specifiers::const_) != Specifiers::none)
     {
-        throw Exception(GetModule(), "class type symbol cannot be const", GetSpan());
+        throw Exception(GetRootModuleForCurrentThread(), "class type symbol cannot be const", GetSpan());
     }
     if ((specifiers & Specifiers::unit_test_) != Specifiers::none)
     {
-        throw Exception(GetModule(), "class type symbol cannot be unit_test", GetSpan());
+        throw Exception(GetRootModuleForCurrentThread(), "class type symbol cannot be unit_test", GetSpan());
     }
 }
 
@@ -887,7 +974,7 @@ void ClassTypeSymbol::InitVmt()
             {
                 if (!IsAbstract())
                 {
-                    throw Exception(GetModule(), "class containing abstract member functions must be declared abstract", GetSpan(), virtualFunction->GetSpan());
+                    throw Exception(GetRootModuleForCurrentThread(), "class containing abstract member functions must be declared abstract", GetSpan(), virtualFunction->GetSpan());
                 }
             }
         }
@@ -948,11 +1035,11 @@ void ClassTypeSymbol::InitVmt(std::vector<FunctionSymbol*>& vmtToInit)
             {
                 if (!f->IsOverride())
                 {
-                    throw Exception(GetModule(), "overriding function should be declared with override specifier", f->GetSpan());
+                    throw Exception(GetRootModuleForCurrentThread(), "overriding function should be declared with override specifier", f->GetSpan());
                 }
                 if (f->DontThrow() != v->DontThrow())
                 {
-                    throw Exception(GetModule(), "overriding function has conflicting nothrow specification compared to the base class virtual function", f->GetSpan(), v->GetSpan());
+                    throw Exception(GetRootModuleForCurrentThread(), "overriding function has conflicting nothrow specification compared to the base class virtual function", f->GetSpan(), v->GetSpan());
                 }
                 f->SetVmtIndex(j);
                 vmtToInit[j] = f;
@@ -964,7 +1051,7 @@ void ClassTypeSymbol::InitVmt(std::vector<FunctionSymbol*>& vmtToInit)
         {
             if (f->IsOverride())
             {
-                throw Exception(GetModule(), "no suitable function to override ('" + ToUtf8(f->FullName()) + "')", f->GetSpan());
+                throw Exception(GetRootModuleForCurrentThread(), "no suitable function to override ('" + ToUtf8(f->FullName()) + "')", f->GetSpan());
             }
             f->SetVmtIndex(m);
             vmtToInit.push_back(f);
@@ -1032,7 +1119,7 @@ void ClassTypeSymbol::InitImts()
             if (!imt[j])
             {
                 MemberFunctionSymbol* intfMemFun = intf->MemberFunctions()[j];
-                throw Exception(GetModule(), "class '" + ToUtf8(FullName()) + "' does not implement interface '" + ToUtf8(intf->FullName()) + "' because implementation of interface function '" +
+                throw Exception(GetRootModuleForCurrentThread(), "class '" + ToUtf8(FullName()) + "' does not implement interface '" + ToUtf8(intf->FullName()) + "' because implementation of interface function '" +
                     ToUtf8(intfMemFun->FullName()) + "' is missing", GetSpan(), intfMemFun->GetSpan());
             }
         }
@@ -1052,11 +1139,11 @@ void ClassTypeSymbol::CreateLayouts()
         if (IsPolymorphic())
         {
             vmtPtrIndex = objectLayout.size();
-            objectLayout.push_back(GetSymbolTable()->GetTypeByName(U"void")->AddPointer(GetSpan()));
+            objectLayout.push_back(GetRootModuleForCurrentThread()->GetSymbolTable().GetTypeByName(U"void")->AddPointer(GetSpan()));
         }
         else if (memberVariables.empty())
         {
-            objectLayout.push_back(GetSymbolTable()->GetTypeByName(U"byte"));
+            objectLayout.push_back(GetRootModuleForCurrentThread()->GetSymbolTable().GetTypeByName(U"byte"));
         }
     }
     int n = memberVariables.size();
@@ -1071,10 +1158,10 @@ void ClassTypeSymbol::CreateLayouts()
         MemberVariableSymbol* initVar = new MemberVariableSymbol(GetSpan(), U"@initialized");
         initVar->SetParent(this);
         initVar->SetStatic();
-        initVar->SetType(GetSymbolTable()->GetTypeByName(U"bool"));
+        initVar->SetType(GetRootModuleForCurrentThread()->GetSymbolTable().GetTypeByName(U"bool"));
         initVar->SetLayoutIndex(0);
         SetInitializedVar(initVar);
-        staticLayout.push_back(GetSymbolTable()->GetTypeByName(U"bool"));
+        staticLayout.push_back(GetRootModuleForCurrentThread()->GetSymbolTable().GetTypeByName(U"bool"));
         int ns = staticMemberVariables.size();
         for (int i = 0; i < ns; ++i)
         {
@@ -1085,36 +1172,57 @@ void ClassTypeSymbol::CreateLayouts()
     }
 }
 
-llvm::Type* ClassTypeSymbol::IrType(Emitter& emitter)
+bool ClassTypeSymbol::IsRecursive()
 {
-    bool recursive = false;
-    if (!irType)
+    if (RecursiveComputed())
     {
-        std::vector<llvm::Type*> elementTypes;
+        return Recursive();
+    }
+    else
+    {
         int n = objectLayout.size();
         for (int i = 0; i < n; ++i)
         {
             TypeSymbol* elementType = objectLayout[i];
-            std::unordered_set<TypeSymbol*> tested;
+            std::unordered_set<boost::uuids::uuid, boost::hash<boost::uuids::uuid>> tested;
             if (elementType->IsRecursive(this, tested))
             {
-                recursive = true;
-                break;
+                SetRecursive();
+                SetRecursiveComputed();
+                return true;
             }
         }
-        if (!recursive)
+        SetRecursiveComputed();
+        return false;
+    }
+}
+
+llvm::Type* ClassTypeSymbol::IrType(Emitter& emitter)
+{
+    if (!IsBound())
+    {
+        throw Exception(GetRootModuleForCurrentThread(), "class '" + ToUtf8(Name()) + "' not bound", GetSpan());
+    }
+    llvm::Type* localIrType = emitter.GetIrType(this);
+    if (!localIrType)
+    {
+        std::vector<llvm::Type*> elementTypes;
+        int n = objectLayout.size();
+        if (!IsRecursive())
         {
             for (int i = 0; i < n; ++i)
             {
                 TypeSymbol* elementType = objectLayout[i];
                 elementTypes.push_back(elementType->IrType(emitter));
             }
-            irType = llvm::StructType::get(emitter.Context(), elementTypes);
+            localIrType = llvm::StructType::get(emitter.Context(), elementTypes);
+            emitter.SetIrType(this, localIrType);
         }
         else
         {
             llvm::StructType* forwardDeclaredType = llvm::StructType::create(emitter.Context());
-            irType = forwardDeclaredType;
+            localIrType = forwardDeclaredType;
+            emitter.SetIrType(this, localIrType);
             for (int i = 0; i < n; ++i)
             {
                 TypeSymbol* elementType = objectLayout[i];
@@ -1123,7 +1231,7 @@ llvm::Type* ClassTypeSymbol::IrType(Emitter& emitter)
             forwardDeclaredType->setBody(elementTypes);
         }
     }
-    return irType;
+    return localIrType;
 }
 
 llvm::Constant* ClassTypeSymbol::CreateDefaultIrValue(Emitter& emitter)
@@ -1148,7 +1256,7 @@ llvm::DIType* ClassTypeSymbol::CreateDIType(Emitter& emitter)
     if (IsPolymorphic() && VmtPtrHolderClass())
     {
         vtableHolderClass = VmtPtrHolderClass()->CreateDIForwardDeclaration(emitter);
-        emitter.MapFwdDeclaration(vtableHolderClass, VmtPtrHolderClass());
+        emitter.MapFwdDeclaration(vtableHolderClass, VmtPtrHolderClass()->TypeId());
     }
     std::vector<llvm::Metadata*> elements;
     const llvm::StructLayout* structLayout = emitter.DataLayout()->getStructLayout(llvm::cast<llvm::StructType>(IrType(emitter)));
@@ -1188,22 +1296,31 @@ llvm::DIType* ClassTypeSymbol::CreateDIForwardDeclaration(Emitter& emitter)
         0, sizeInBits, alignInBits, llvm::DINode::DIFlags::FlagZero, ToUtf8(MangledName()));
 }
 
-const std::string& ClassTypeSymbol::VmtObjectName()
+std::string ClassTypeSymbol::VmtObjectNameStr()
 {
-    if (vmtObjectName.empty())
-    {
-        vmtObjectName = "vmt_" + ToUtf8(SimpleName()) + "_" + GetSha1MessageDigest(ToUtf8(FullNameWithSpecifiers()));
-    }
-    return vmtObjectName;
+    return "vmt_" + ToUtf8(SimpleName()) + "_" + GetSha1MessageDigest(ToUtf8(FullNameWithSpecifiers()));;
 }
 
-const std::string& ClassTypeSymbol::ImtArrayObjectName()
+std::string ClassTypeSymbol::VmtObjectName(Emitter& emitter)
 {
-    if (itabsArrayObjectName.empty())
+    std::string localVmtObjectName = emitter.GetVmtObjectName(this);
+    if (localVmtObjectName.empty())
     {
-        itabsArrayObjectName = "imts_" + ToUtf8(SimpleName()) + "_" + GetSha1MessageDigest(ToUtf8(FullNameWithSpecifiers()));
+        localVmtObjectName = VmtObjectNameStr();
+        emitter.SetVmtObjectName(this, localVmtObjectName);
     }
-    return itabsArrayObjectName;
+    return localVmtObjectName;
+}
+
+std::string ClassTypeSymbol::ImtArrayObjectName(Emitter& emitter)
+{
+    std::string localImtArrayObjectName = emitter.GetImtArrayObjectName(this);
+    if (localImtArrayObjectName.empty())
+    {
+        localImtArrayObjectName = "imts_" + ToUtf8(SimpleName()) + "_" + GetSha1MessageDigest(ToUtf8(FullNameWithSpecifiers()));
+        emitter.SetImtArrayObjectName(this, localImtArrayObjectName);
+    }
+    return localImtArrayObjectName;
 }
 
 std::string ClassTypeSymbol::ImtObjectName(int index)
@@ -1215,7 +1332,7 @@ ClassTypeSymbol* ClassTypeSymbol::VmtPtrHolderClass()
 {
     if (!IsPolymorphic())
     {
-        throw Exception(GetModule(), "nonpolymorphic class does not contain a vmt ptr", GetSpan());
+        throw Exception(GetRootModuleForCurrentThread(), "nonpolymorphic class does not contain a vmt ptr", GetSpan());
     }
     if (vmtPtrIndex != -1)
     {
@@ -1229,7 +1346,7 @@ ClassTypeSymbol* ClassTypeSymbol::VmtPtrHolderClass()
         }
         else
         {
-            throw Exception(GetModule(), "vmt ptr holder class not found", GetSpan());
+            throw Exception(GetRootModuleForCurrentThread(), "vmt ptr holder class not found", GetSpan());
         }
     }
 }
@@ -1262,10 +1379,10 @@ llvm::Value* ClassTypeSymbol::CreateImt(Emitter& emitter, int index)
 
 llvm::Value* ClassTypeSymbol::CreateImts(Emitter& emitter)
 {
-    std::string imtArrayObjectName = ImtArrayObjectName();
+    std::string imtArrayObjectName = ImtArrayObjectName(emitter);
     llvm::ArrayType* imtsArrayType = llvm::ArrayType::get(emitter.Builder().getInt8PtrTy(), implementedInterfaces.size());
-    llvm::Constant* imtsArrayObject = emitter.Module()->getOrInsertGlobal(itabsArrayObjectName, imtsArrayType);
-    llvm::Comdat* comdat = emitter.Module()->getOrInsertComdat(itabsArrayObjectName);
+    llvm::Constant* imtsArrayObject = emitter.Module()->getOrInsertGlobal(imtArrayObjectName, imtsArrayType);
+    llvm::Comdat* comdat = emitter.Module()->getOrInsertComdat(imtArrayObjectName);
     llvm::GlobalVariable* imtsArrayObjectGlobal = llvm::cast<llvm::GlobalVariable>(imtsArrayObject);
     imtsArrayObjectGlobal->setComdat(comdat);
     std::vector<llvm::Constant*> imtsArray;
@@ -1282,15 +1399,17 @@ llvm::Value* ClassTypeSymbol::CreateImts(Emitter& emitter)
 llvm::Value* ClassTypeSymbol::VmtObject(Emitter& emitter, bool create)
 {
     if (!IsPolymorphic()) return nullptr;
-    if (!vmtObjectType)
+    llvm::ArrayType* localVmtObjectType = emitter.GetVmtObjectType(this);
+    if (!localVmtObjectType)
     {
-        vmtObjectType = llvm::ArrayType::get(emitter.Builder().getInt8PtrTy(), vmt.size() + functionVmtIndexOffset);
+        localVmtObjectType = llvm::ArrayType::get(emitter.Builder().getInt8PtrTy(), vmt.size() + functionVmtIndexOffset);
+        emitter.SetVmtObjectType(this, localVmtObjectType);
     }
-    llvm::Constant* vmtObject = emitter.Module()->getOrInsertGlobal(VmtObjectName(), vmtObjectType);
-    if (!IsVmtObjectCreated() && create)
+    llvm::Constant* vmtObject = emitter.Module()->getOrInsertGlobal(VmtObjectName(emitter), localVmtObjectType);
+    if (!emitter.IsVmtObjectCreated(this) && create)
     {
-        SetVmtObjectCreated();
-        std::string vmtObjectName = VmtObjectName();
+        emitter.SetVmtObjectCreated(this);
+        std::string vmtObjectName = VmtObjectName(emitter);
         llvm::Comdat* comdat = emitter.Module()->getOrInsertComdat(vmtObjectName);
         GetModule()->AddExportedData(vmtObjectName);
         comdat->setSelectionKind(llvm::Comdat::SelectionKind::Any);
@@ -1323,7 +1442,7 @@ llvm::Value* ClassTypeSymbol::VmtObject(Emitter& emitter, bool create)
                 vmtArray.push_back(llvm::cast<llvm::Constant>(emitter.Builder().CreateBitCast(functionObject, emitter.Builder().getInt8PtrTy())));
             }
         }
-        vmtObjectGlobal->setInitializer(llvm::ConstantArray::get(vmtObjectType, vmtArray));
+        vmtObjectGlobal->setInitializer(llvm::ConstantArray::get(localVmtObjectType, vmtArray));
     }
     return vmtObject;
 }
@@ -1331,10 +1450,10 @@ llvm::Value* ClassTypeSymbol::VmtObject(Emitter& emitter, bool create)
 llvm::Value* ClassTypeSymbol::StaticObject(Emitter& emitter, bool create)
 {
     if (staticLayout.empty()) return nullptr;
-    llvm::Constant* staticObject = emitter.Module()->getOrInsertGlobal(StaticObjectName(), StaticObjectType(emitter));
-    if (!IsStaticObjectCreated() && create)
+    llvm::Constant* staticObject = emitter.Module()->getOrInsertGlobal(StaticObjectName(emitter), StaticObjectType(emitter));
+    if (!emitter.IsStaticObjectCreated(this) && create)
     {
-        SetStaticObjectCreated();
+        emitter.SetStaticObjectCreated(this);
         llvm::GlobalVariable* staticObjectGlobal = llvm::cast<llvm::GlobalVariable>(staticObject);
         std::vector<llvm::Constant*> arrayOfStatics;
         for (TypeSymbol* type : staticLayout)
@@ -1348,7 +1467,8 @@ llvm::Value* ClassTypeSymbol::StaticObject(Emitter& emitter, bool create)
 
 llvm::StructType* ClassTypeSymbol::StaticObjectType(Emitter& emitter)
 {
-    if (!staticObjectType)
+    llvm::StructType* localStaticObjectType = emitter.GetStaticObjectType(this);
+    if (!localStaticObjectType)
     {
         std::vector<llvm::Type*> elementTypes;
         int n = staticLayout.size();
@@ -1357,18 +1477,21 @@ llvm::StructType* ClassTypeSymbol::StaticObjectType(Emitter& emitter)
             llvm::Type* elementType = staticLayout[i]->IrType(emitter);
             elementTypes.push_back(elementType);
         }
-        staticObjectType = llvm::StructType::get(emitter.Context(), elementTypes);
+        localStaticObjectType = llvm::StructType::get(emitter.Context(), elementTypes);
     }
-    return staticObjectType;
+    emitter.SetStaticObjectType(this, localStaticObjectType);
+    return localStaticObjectType;
 }
 
-const std::string& ClassTypeSymbol::StaticObjectName()
+std::string ClassTypeSymbol::StaticObjectName(Emitter& emitter)
 {
-    if (staticObjectName.empty())
+    std::string localStaticObjectName = emitter.GetStaticObjectName(this);
+    if (localStaticObjectName.empty())
     {
-        staticObjectName = "statics_" + ToUtf8(SimpleName()) + "_" + GetSha1MessageDigest(ToUtf8(FullNameWithSpecifiers()));
+        localStaticObjectName = "statics_" + ToUtf8(SimpleName()) + "_" + GetSha1MessageDigest(ToUtf8(FullNameWithSpecifiers()));
+        emitter.SetStaticObjectName(this, localStaticObjectName);
     }
-    return staticObjectName;
+    return localStaticObjectName;
 }
 
 ValueType ClassTypeSymbol::GetValueType() const
@@ -1391,6 +1514,15 @@ std::u32string ClassTypeSymbol::Id() const
     else
     {
         return MangledName();
+    }
+}
+
+void ClassTypeSymbol::Check()
+{
+    TypeSymbol::Check();
+    if (groupName.empty())
+    {
+        throw SymbolCheckException(GetRootModuleForCurrentThread(), "class type symbol has empty group name", GetSpan());
     }
 }
 

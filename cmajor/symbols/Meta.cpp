@@ -38,9 +38,7 @@ std::unique_ptr<Value> IntrinsicFunction::Evaluate(const std::vector<std::unique
 FunctionSymbol* CreateIntrinsic(IntrinsicFunction* intrinsic, SymbolTable& symbolTable, ContainerSymbol* parent)
 {
     FunctionSymbol* fun = new FunctionSymbol(Span(), ToUtf32(intrinsic->GroupName()));
-    fun->SetSymbolTable(&symbolTable);
     fun->SetModule(symbolTable.GetModule());
-    fun->SetOriginalModule(symbolTable.GetModule());
     fun->SetGroupName(ToUtf32(intrinsic->GroupName()));
     fun->SetIntrinsic(intrinsic);
     fun->SetAccess(SymbolAccess::public_);
@@ -57,8 +55,6 @@ FunctionSymbol* CreateIntrinsic(IntrinsicFunction* intrinsic, SymbolTable& symbo
         TemplateParameterSymbol* s = new TemplateParameterSymbol(Span(), p);
         symbolTable.SetTypeIdFor(s);
         s->SetModule(symbolTable.GetModule());
-        s->SetOriginalModule(symbolTable.GetModule());
-        s->SetSymbolTable(&symbolTable);
         fun->AddMember(s);
     }
     fun->ComputeName();
@@ -651,8 +647,8 @@ ArrayLengthIntrinsicFunction::ArrayLengthIntrinsicFunction(Module* module_) : In
 
 void MetaInit(SymbolTable& symbolTable)
 {
-    Module* module = symbolTable.GlobalNs().GetModule();
-    symbolTable.BeginNamespace(U"System.Meta", Span(), symbolTable.GlobalNs().GetOriginalModule());
+    Module* module = symbolTable.GetModule();
+    symbolTable.BeginNamespace(U"System.Meta", Span());
     symbolTable.Container()->AddMember(CreateIntrinsic(new IsIntegralTypePredicate(module), symbolTable, symbolTable.Container()));
     symbolTable.Container()->AddMember(CreateIntrinsic(new IsSignedTypePredicate(module), symbolTable, symbolTable.Container()));
     symbolTable.Container()->AddMember(CreateIntrinsic(new IsUnsignedTypePredicate(module), symbolTable, symbolTable.Container()));

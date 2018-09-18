@@ -28,11 +28,12 @@ const uint8_t moduleFormat_1 = uint8_t('1');
 const uint8_t moduleFormat_2 = uint8_t('2');
 const uint8_t moduleFormat_3 = uint8_t('3');
 const uint8_t moduleFormat_4 = uint8_t('4');
-const uint8_t currentModuleFormat = moduleFormat_4;
+const uint8_t moduleFormat_5 = uint8_t('5');
+const uint8_t currentModuleFormat = moduleFormat_5;
 
 enum class ModuleFlags : uint8_t
 {
-    none = 0, system = 1 << 0
+    none = 0, system = 1 << 0, root = 1 << 1, immutable = 1 << 2
 };
 
 inline ModuleFlags operator|(ModuleFlags left, ModuleFlags right)
@@ -43,6 +44,11 @@ inline ModuleFlags operator|(ModuleFlags left, ModuleFlags right)
 inline ModuleFlags operator&(ModuleFlags left, ModuleFlags right)
 {
     return ModuleFlags(uint8_t(left) & uint8_t(right));
+}
+
+inline ModuleFlags operator~(ModuleFlags flags)
+{
+    return ModuleFlags(~uint8_t(flags));
 }
 
 std::string ModuleFlagStr(ModuleFlags flags);
@@ -80,7 +86,7 @@ class Module
 {
 public:
     Module();
-    Module(const std::string& filePath, std::vector<ClassTypeSymbol*>& classTypes, std::vector<ClassTemplateSpecializationSymbol*>& classTemplateSpecializations);
+    Module(const std::string& filePath);
     Module(const std::u32string& name_, const std::string& filePath_);
     uint8_t Format() const { return format; }
     ModuleFlags Flags() const { return flags; }
@@ -89,11 +95,13 @@ public:
     const std::string& FilePathReadFrom() const { return filePathReadFrom; }
     const std::string& LibraryFilePath() const { return libraryFilePath; }
     const std::vector<Module*> AllReferencedModules() const { return allRefModules; }
-    void PrepareForCompilation(const std::vector<std::string>& references, std::vector<ClassTypeSymbol*>& classTypes, 
-        std::vector<ClassTemplateSpecializationSymbol*>& classTemplateSpecializations);
-    SymbolTable& GetSymbolTable() { return symbolTable; }
+    void PrepareForCompilation(const std::vector<std::string>& references);
+    SymbolTable& GetSymbolTable() { return *symbolTable; }
+    bool HasSymbolTable() const { return symbolTable != nullptr; }
+    void CreateSymbolTable();
+    uint32_t SymbolTablePos() const { return symbolTablePos; }
     FileTable& GetFileTable() { return fileTable; }
-    int16_t RegisterFileTable(FileTable* fileTable);
+    void RegisterFileTable(FileTable* fileTable, Module* module);
     std::string GetFilePath(int32_t fileIndex) const;
     void Write(SymbolWriter& writer);
     void SetDirectoryPath(const std::string& directoryPath_);
@@ -101,8 +109,13 @@ public:
     const std::vector<std::string>& LibraryFilePaths() const { return libraryFilePaths; }
     bool IsSystemModule () const { return GetFlag(ModuleFlags::system); }
     void SetSystemModule() { SetFlag(ModuleFlags::system); }
+    bool IsRootModule() const { return GetFlag(ModuleFlags::root); }
+    void SetRootModule() { SetFlag(ModuleFlags::root); }
+    bool IsImmutable() const { return GetFlag(ModuleFlags::immutable); }
+    void SetImmutable() { SetFlag(ModuleFlags::immutable); }
     bool GetFlag(ModuleFlags flag) const { return (flags & flag) != ModuleFlags::none; }
     void SetFlag(ModuleFlags flag) { flags = flags | flag; }
+    void ResetFlag(ModuleFlags flag) { flags = flags & ~flag; }
     void AddExportedFunction(const std::string& exportedFunction);
     void AddExportedData(const std::string& data);
     const std::vector<std::string>& ExportedFunctions() { return exportedFunctions; }
@@ -111,9 +124,7 @@ public:
     const std::vector<std::string>& AllExportedData() const { return allExportedData; }
     void Dump();
     ModuleDependency& GetModuleDependency() { return moduleDependency; }
-    int16_t GetModuleId() const { return moduleId; }
-    Module* RootModule() const { return rootModule; }
-    void SetRootModule(Module* rootModule_) { rootModule = rootModule_; }
+    int16_t GetModuleId(Module* module);
     void SetCurrentProjectName(const std::u32string& currentProjectName_);
     std::u32string GetCurrentProjectName();
     void SetCurrentToolName(const std::u32string& currentToolName_);
@@ -124,6 +135,18 @@ public:
     bool IsSymbolDefined(const std::u32string& symbol);
     void SetLogStreamId(int logStreamId_) { logStreamId = logStreamId_; }
     int LogStreamId() const { return logStreamId; }
+    Module* GetSystemCoreModule();
+    void SetSystemCoreModule(Module* systemCoreModule_);
+    void Check();
+    std::vector<Module*>& AllRefModules() { return allRefModules; }
+    std::vector<Module*>& ReferencedModules() { return referencedModules; }
+    void AddReferencedModule(Module* referencedModule);
+    const std::vector<std::string>& ReferenceFilePaths() const { return referenceFilePaths; }
+    void ReadHeader(SymbolReader& reader, Module* rootModule, std::unordered_set<std::string>& importSet, std::vector<Module*>& modules,
+        std::unordered_map<std::string, ModuleDependency*>& moduleDependencyMap, std::unordered_map<std::string, Module*>& readMap);
+    int DebugLogIndent() const { return debugLogIndent; }
+    void IncDebugLogIndent() { ++debugLogIndent; }
+    void DecDebugLogIndent() { --debugLogIndent; }
 private:
     uint8_t format;
     ModuleFlags flags;
@@ -134,17 +157,16 @@ private:
     std::vector<std::string> referenceFilePaths;
     FileTable fileTable;
     std::vector<FileTable*> fileTables;
-    Module* rootModule;
-    int16_t moduleId;
+    std::unordered_map<Module*, int16_t> moduleIdMap;
     std::vector<std::string> exportedFunctions;
     std::vector<std::string> exportedData;
     std::vector<std::string> allExportedFunctions;
     std::vector<std::string> allExportedData;
     ModuleDependency moduleDependency;
-    std::vector<std::unique_ptr<Module>> referencedModules;
+    std::vector<Module*> referencedModules;
     std::vector<Module*> allRefModules;
     uint32_t symbolTablePos;
-    SymbolTable symbolTable;
+    std::unique_ptr<SymbolTable> symbolTable;
     std::string directoryPath;
     std::vector<std::string> libraryFilePaths;
     std::u32string currentProjectName;
@@ -152,18 +174,14 @@ private:
     CompileWarningCollection warnings;
     std::set<std::u32string> defines;
     int logStreamId;
-    void ReadHeader(SymbolReader& reader, Module* rootModule, std::unordered_set<std::string>& importSet, std::vector<Module*>& modules,
-        std::unordered_map<std::string, ModuleDependency*>& moduleDependencyMap, std::unordered_map<std::string, Module*>& readMap);
-    void FinishReads(Module* rootModule, std::vector<Module*>& finishReadOrder, int prevModuleIndex,
-        std::vector<ClassTypeSymbol*>& classTypes, std::vector<ClassTemplateSpecializationSymbol*>& classTemplateSpecializations);
-    void ImportModules(Module* rootModule, std::unordered_set<std::string>& importSet, std::vector<Module*>& modules,
-        std::unordered_map<std::string, ModuleDependency*>& dependencyMap, std::unordered_map<std::string, Module*>& readMap);
-    void ImportModules(const std::vector<std::string>& references, std::unordered_set<std::string>& importSet, Module* rootModule, std::vector<Module*>& modules,
-        std::unordered_map<std::string, ModuleDependency*>& moduleDependencyMap, std::unordered_map<std::string, Module*>& readMap);
-    void Import(const std::vector<std::string>& references, std::unordered_set<std::string>& importSet, Module* rootModule, std::vector<Module*>& modules, 
-        std::unordered_map<std::string, ModuleDependency*>& moduleDependencyMap, std::unordered_map<std::string, Module*>& readMap);
+    bool headerRead;
+    int debugLogIndent;
+    Module* systemCoreModule;
     void CheckUpToDate();
 };
+
+Module* GetRootModuleForCurrentThread();
+void SetRootModuleForCurrentThread(Module* rootModule_);
 
 void InitModule();
 void DoneModule();

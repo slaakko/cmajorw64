@@ -9,6 +9,7 @@
 #include <cmajor/symbols/SymbolReader.hpp>
 #include <cmajor/symbols/TypeSymbol.hpp>
 #include <cmajor/symbols/Exception.hpp>
+#include <cmajor/symbols/Module.hpp>
 #include <cmajor/symbols/SymbolCollector.hpp>
 #include <cmajor/util/Unicode.hpp>
 
@@ -31,7 +32,7 @@ void TypedefSymbol::Read(SymbolReader& reader)
     Symbol::Read(reader);
     boost::uuids::uuid typeId;
     reader.GetBinaryReader().ReadUuid(typeId);
-    GetSymbolTable()->EmplaceTypeRequest(this, typeId, 0);
+    reader.GetSymbolTable()->EmplaceTypeRequest(reader, this, typeId, 0);
 }
 
 void TypedefSymbol::EmplaceType(TypeSymbol* typeSymbol, int index)
@@ -42,20 +43,7 @@ void TypedefSymbol::EmplaceType(TypeSymbol* typeSymbol, int index)
 
 bool TypedefSymbol::IsExportSymbol() const
 {
-    if (Parent()->GetSymbolType() == SymbolType::classTemplateSpecializationSymbol) return false;
     return Symbol::IsExportSymbol();
-}
-
-void TypedefSymbol::ComputeExportClosure()
-{
-    if (IsProject())
-    {
-        if (!type->ExportComputed())
-        {
-            type->SetExportComputed();
-            type->ComputeExportClosure();
-        }
-    }
 }
 
 void TypedefSymbol::Accept(SymbolCollector* collector)
@@ -95,67 +83,67 @@ void TypedefSymbol::SetSpecifiers(Specifiers specifiers)
     SetAccess(accessSpecifiers);
     if ((specifiers & Specifiers::static_) != Specifiers::none)
     {
-        throw Exception(GetModule(), "typedef cannot be static", GetSpan());
+        throw Exception(GetRootModuleForCurrentThread(), "typedef cannot be static", GetSpan());
     }
     if ((specifiers & Specifiers::virtual_) != Specifiers::none)
     {
-        throw Exception(GetModule(), "typedef cannot be virtual", GetSpan());
+        throw Exception(GetRootModuleForCurrentThread(), "typedef cannot be virtual", GetSpan());
     }
     if ((specifiers & Specifiers::override_) != Specifiers::none)
     {
-        throw Exception(GetModule(), "typedef cannot be override", GetSpan());
+        throw Exception(GetRootModuleForCurrentThread(), "typedef cannot be override", GetSpan());
     }
     if ((specifiers & Specifiers::abstract_) != Specifiers::none)
     {
-        throw Exception(GetModule(), "typedef cannot be abstract", GetSpan());
+        throw Exception(GetRootModuleForCurrentThread(), "typedef cannot be abstract", GetSpan());
     }
     if ((specifiers & Specifiers::inline_) != Specifiers::none)
     {
-        throw Exception(GetModule(), "typedef cannot be inline", GetSpan());
+        throw Exception(GetRootModuleForCurrentThread(), "typedef cannot be inline", GetSpan());
     }
     if ((specifiers & Specifiers::explicit_) != Specifiers::none)
     {
-        throw Exception(GetModule(), "typedef cannot be explicit", GetSpan());
+        throw Exception(GetRootModuleForCurrentThread(), "typedef cannot be explicit", GetSpan());
     }
     if ((specifiers & Specifiers::external_) != Specifiers::none)
     {
-        throw Exception(GetModule(), "typedef cannot be external", GetSpan());
+        throw Exception(GetRootModuleForCurrentThread(), "typedef cannot be external", GetSpan());
     }
     if ((specifiers & Specifiers::suppress_) != Specifiers::none)
     {
-        throw Exception(GetModule(), "typedef cannot be suppressed", GetSpan());
+        throw Exception(GetRootModuleForCurrentThread(), "typedef cannot be suppressed", GetSpan());
     }
     if ((specifiers & Specifiers::default_) != Specifiers::none)
     {
-        throw Exception(GetModule(), "typedef cannot be default", GetSpan());
+        throw Exception(GetRootModuleForCurrentThread(), "typedef cannot be default", GetSpan());
     }
     if ((specifiers & Specifiers::constexpr_) != Specifiers::none)
     {
-        throw Exception(GetModule(), "typedef cannot be constexpr", GetSpan());
+        throw Exception(GetRootModuleForCurrentThread(), "typedef cannot be constexpr", GetSpan());
     }
     if ((specifiers & Specifiers::cdecl_) != Specifiers::none)
     {
-        throw Exception(GetModule(), "typedef cannot be cdecl", GetSpan());
+        throw Exception(GetRootModuleForCurrentThread(), "typedef cannot be cdecl", GetSpan());
     }
     if ((specifiers & Specifiers::nothrow_) != Specifiers::none)
     {
-        throw Exception(GetModule(), "typedef cannot be nothrow", GetSpan());
+        throw Exception(GetRootModuleForCurrentThread(), "typedef cannot be nothrow", GetSpan());
     }
     if ((specifiers & Specifiers::throw_) != Specifiers::none)
     {
-        throw Exception(GetModule(), "typedef cannot be throw", GetSpan());
+        throw Exception(GetRootModuleForCurrentThread(), "typedef cannot be throw", GetSpan());
     }
     if ((specifiers & Specifiers::new_) != Specifiers::none)
     {
-        throw Exception(GetModule(), "typedef cannot be new", GetSpan());
+        throw Exception(GetRootModuleForCurrentThread(), "typedef cannot be new", GetSpan());
     }
     if ((specifiers & Specifiers::const_) != Specifiers::none)
     {
-        throw Exception(GetModule(), "typedef cannot be const", GetSpan());
+        throw Exception(GetRootModuleForCurrentThread(), "typedef cannot be const", GetSpan());
     }
     if ((specifiers & Specifiers::unit_test_) != Specifiers::none)
     {
-        throw Exception(GetModule(), "typedef cannot be unit_test", GetSpan());
+        throw Exception(GetRootModuleForCurrentThread(), "typedef cannot be unit_test", GetSpan());
     }
 }
 
@@ -170,6 +158,15 @@ std::unique_ptr<dom::Element> TypedefSymbol::CreateDomElement(TypeMap& typeMap)
         element->AppendChild(std::unique_ptr<dom::Node>(typeElement.release()));
     }
     return element;
+}
+
+void TypedefSymbol::Check()
+{
+    Symbol::Check();
+    if (!type)
+    {
+        throw SymbolCheckException(GetRootModuleForCurrentThread(), "typedef symbol contains null type pointer", GetSpan());
+    }
 }
 
 } } // namespace cmajor::symbols

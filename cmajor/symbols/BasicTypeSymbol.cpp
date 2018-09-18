@@ -4,6 +4,8 @@
 // =================================
 
 #include <cmajor/symbols/BasicTypeSymbol.hpp>
+#include <cmajor/symbols/Exception.hpp>
+#include <cmajor/symbols/Module.hpp>
 #include <cmajor/symbols/SymbolWriter.hpp>
 #include <cmajor/symbols/SymbolReader.hpp>
 #include <cmajor/symbols/SymbolTable.hpp>
@@ -76,43 +78,43 @@ void BasicTypeSymbol::Read(SymbolReader& reader)
     reader.GetBinaryReader().ReadUuid(defaultConstructorId);
     if (!defaultConstructorId.is_nil())
     {
-        GetSymbolTable()->EmplaceFunctionRequest(this, defaultConstructorId, 0);
+        reader.GetSymbolTable()->EmplaceFunctionRequest(reader, this, defaultConstructorId, 0);
     }
     boost::uuids::uuid copyConstructorId;
     reader.GetBinaryReader().ReadUuid(copyConstructorId);
     if (!copyConstructorId.is_nil())
     {
-        GetSymbolTable()->EmplaceFunctionRequest(this, copyConstructorId, 1);
+        reader.GetSymbolTable()->EmplaceFunctionRequest(reader, this, copyConstructorId, 1);
     }
     boost::uuids::uuid moveConstructorId;
     reader.GetBinaryReader().ReadUuid(moveConstructorId);
     if (!moveConstructorId.is_nil())
     {
-        GetSymbolTable()->EmplaceFunctionRequest(this, moveConstructorId, 2);
+        reader.GetSymbolTable()->EmplaceFunctionRequest(reader, this, moveConstructorId, 2);
     }
     boost::uuids::uuid copyAssignmentId;
     reader.GetBinaryReader().ReadUuid(copyAssignmentId);
     if (!copyAssignmentId.is_nil())
     {
-        GetSymbolTable()->EmplaceFunctionRequest(this, copyAssignmentId, 3);
+        reader.GetSymbolTable()->EmplaceFunctionRequest(reader, this, copyAssignmentId, 3);
     }
     boost::uuids::uuid moveAssignmentId;
     reader.GetBinaryReader().ReadUuid(moveAssignmentId);
     if (!moveAssignmentId.is_nil())
     {
-        GetSymbolTable()->EmplaceFunctionRequest(this, moveAssignmentId, 4);
+        reader.GetSymbolTable()->EmplaceFunctionRequest(reader, this, moveAssignmentId, 4);
     }
     boost::uuids::uuid returnId;
     reader.GetBinaryReader().ReadUuid(returnId);
     if (!returnId.is_nil())
     {
-        GetSymbolTable()->EmplaceFunctionRequest(this, returnId, 5);
+        reader.GetSymbolTable()->EmplaceFunctionRequest(reader, this, returnId, 5);
     }
     boost::uuids::uuid equalityOpId;
     reader.GetBinaryReader().ReadUuid(equalityOpId);
     if (!equalityOpId.is_nil())
     {
-        GetSymbolTable()->EmplaceFunctionRequest(this, equalityOpId, 6);
+        reader.GetSymbolTable()->EmplaceFunctionRequest(reader, this, equalityOpId, 6);
     }
 }
 
@@ -146,6 +148,39 @@ void BasicTypeSymbol::Dump(CodeFormatter& formatter)
 {
     formatter.WriteLine(ToUtf8(Name()));
     formatter.WriteLine("typeid: " + boost::uuids::to_string(TypeId()));
+}
+
+void BasicTypeSymbol::Check()
+{
+    TypeSymbol::Check();
+    if (!defaultConstructor && !IsVoidType())
+    {
+        throw SymbolCheckException(GetRootModuleForCurrentThread(), "basic type symbol has no default constructor", GetSpan());
+    }
+    if (!copyConstructor && !IsVoidType())
+    {
+        throw SymbolCheckException(GetRootModuleForCurrentThread(), "basic type symbol has no copy constructor", GetSpan());
+    }
+    if (!moveConstructor && !IsVoidType())
+    {
+        throw SymbolCheckException(GetRootModuleForCurrentThread(), "basic type symbol has no move constructor", GetSpan());
+    }
+    if (!copyAssignment && !IsVoidType())
+    {
+        throw SymbolCheckException(GetRootModuleForCurrentThread(), "basic type symbol has no copy assignment", GetSpan());
+    }
+    if (!moveAssignment && !IsVoidType())
+    {
+        throw SymbolCheckException(GetRootModuleForCurrentThread(), "basic type symbol has no move assignment", GetSpan());
+    }
+    if (!returnFun && !IsVoidType())
+    {
+        throw SymbolCheckException(GetRootModuleForCurrentThread(), "basic type symbol has no return function", GetSpan());
+    }
+    if (!equalityOp && !IsVoidType())
+    {
+        throw SymbolCheckException(GetRootModuleForCurrentThread(), "basic type symbol has no equality comparison operation", GetSpan());
+    }
 }
 
 BoolTypeSymbol::BoolTypeSymbol(const Span& span_, const std::u32string& name_) : BasicTypeSymbol(SymbolType::boolTypeSymbol, span_, name_)

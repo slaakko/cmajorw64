@@ -7,6 +7,8 @@
 #include <cmajor/symbols/SymbolTable.hpp>
 #include <cmajor/symbols/SymbolWriter.hpp>
 #include <cmajor/symbols/SymbolReader.hpp>
+#include <cmajor/symbols/Exception.hpp>
+#include <cmajor/symbols/Module.hpp>
 #include <cmajor/util/Unicode.hpp>
 #include <boost/uuid/uuid_generators.hpp>
 #include <boost/uuid/uuid_io.hpp>
@@ -16,7 +18,7 @@ namespace cmajor { namespace symbols {
 using namespace cmajor::unicode;
 
 TypeSymbol::TypeSymbol(SymbolType symbolType_, const Span& span_, const std::u32string& name_) :
-    ContainerSymbol(symbolType_, span_, name_), typeId(boost::uuids::nil_generator()()), compileUnitIndex(-1), diType(nullptr)
+    ContainerSymbol(symbolType_, span_, name_), typeId(boost::uuids::nil_generator()()), compileUnitIndex(-1)
 {
 }
 
@@ -31,35 +33,35 @@ void TypeSymbol::Read(SymbolReader& reader)
 {
     ContainerSymbol::Read(reader);
     reader.GetBinaryReader().ReadUuid(typeId);
-    GetSymbolTable()->AddTypeOrConceptSymbolToTypeIdMap(this);
+    reader.GetSymbolTable()->AddTypeOrConceptSymbolToTypeIdMap(this);
 }
 
 TypeSymbol* TypeSymbol::AddConst(const Span& span)
 {
     TypeDerivationRec typeDerivationRec;
     typeDerivationRec.derivations.push_back(Derivation::constDerivation);
-    return GetSymbolTable()->MakeDerivedType(this, typeDerivationRec, span);
+    return GetRootModuleForCurrentThread()->GetSymbolTable().MakeDerivedType(this, typeDerivationRec, span); 
 }
 
 TypeSymbol* TypeSymbol::AddLvalueReference(const Span& span)
 {
     TypeDerivationRec typeDerivationRec;
     typeDerivationRec.derivations.push_back(Derivation::lvalueRefDerivation);
-    return GetSymbolTable()->MakeDerivedType(this, typeDerivationRec, span);
+    return GetRootModuleForCurrentThread()->GetSymbolTable().MakeDerivedType(this, typeDerivationRec, span);
 }
 
 TypeSymbol* TypeSymbol::AddRvalueReference(const Span& span)
 {
     TypeDerivationRec typeDerivationRec;
     typeDerivationRec.derivations.push_back(Derivation::rvalueRefDerivation);
-    return GetSymbolTable()->MakeDerivedType(this, typeDerivationRec, span);
+    return GetRootModuleForCurrentThread()->GetSymbolTable().MakeDerivedType(this, typeDerivationRec, span);
 }
 
 TypeSymbol* TypeSymbol::AddPointer(const Span& span)
 {
     TypeDerivationRec typeDerivationRec;
     typeDerivationRec.derivations.push_back(Derivation::pointerDerivation);
-    return GetSymbolTable()->MakeDerivedType(this, typeDerivationRec, span);
+    return GetRootModuleForCurrentThread()->GetSymbolTable().MakeDerivedType(this, typeDerivationRec, span);
 }
 
 llvm::DIType* TypeSymbol::CreateDIType(Emitter& emitter)
@@ -79,10 +81,10 @@ TypeSymbol* TypeSymbol::RemoveDerivations(const TypeDerivationRec& sourceDerivat
     return this;
 }
 
-bool TypeSymbol::IsRecursive(TypeSymbol* type, std::unordered_set<TypeSymbol*>& tested) 
+bool TypeSymbol::IsRecursive(TypeSymbol* type, std::unordered_set<boost::uuids::uuid, boost::hash<boost::uuids::uuid>>& tested) 
 { 
-    if (tested.find(this) != tested.cend()) return type == this;
-    tested.insert(this);
+    if (tested.find(TypeId()) != tested.cend()) return TypesEqual(type, this);
+    tested.insert(TypeId());
     return TypesEqual(type, this); 
 }
 
@@ -98,24 +100,21 @@ std::u32string TypeSymbol::Id() const
 
 llvm::DIType* TypeSymbol::GetDIType(Emitter& emitter)
 {
-    if (!diType || compileUnitIndex != emitter.CompileUnitIndex())
+    llvm::DIType* localDiType = emitter.GetDITypeByTypeId(TypeId());
+    if (!localDiType)
     {
-        compileUnitIndex = emitter.CompileUnitIndex();
-        diType = emitter.GetDIType(this);
-        if (!diType)
+        if (IsClassTypeSymbol())
         {
-            if (IsClassTypeSymbol())
-            {
-                ClassTypeSymbol* classTypeSymbol = static_cast<ClassTypeSymbol*>(this);
-                diType = classTypeSymbol->CreateDIForwardDeclaration(emitter);
-                emitter.MapFwdDeclaration(diType, this);
-                emitter.SetDIType(this, diType);
-            }
-            diType = CreateDIType(emitter);
-            emitter.SetDIType(this, diType);
+            ClassTypeSymbol* classTypeSymbol = static_cast<ClassTypeSymbol*>(this);
+            emitter.MapClassPtr(classTypeSymbol->TypeId(), classTypeSymbol);
+            localDiType = classTypeSymbol->CreateDIForwardDeclaration(emitter);
+            emitter.MapFwdDeclaration(localDiType, classTypeSymbol->TypeId());
+            emitter.SetDITypeByTypeId(classTypeSymbol->TypeId(), localDiType);
         }
+        localDiType = CreateDIType(emitter);
+        emitter.SetDITypeByTypeId(TypeId(), localDiType);
     }
-    return diType;
+    return localDiType;
 }
 
 uint64_t TypeSymbol::SizeInBits(Emitter& emitter) 
@@ -126,6 +125,15 @@ uint64_t TypeSymbol::SizeInBits(Emitter& emitter)
 uint32_t TypeSymbol::AlignmentInBits(Emitter& emitter)
 {
     return 8 * emitter.DataLayout()->getABITypeAlignment(IrType(emitter));
+}
+
+void TypeSymbol::Check()
+{
+    ContainerSymbol::Check();
+    if (typeId.is_nil())
+    {
+        throw SymbolCheckException(GetRootModuleForCurrentThread(), "type symbol contains empty type id", GetSpan());
+    }
 }
 
 bool CompareTypesForEquality(const TypeSymbol* left, const TypeSymbol* right)

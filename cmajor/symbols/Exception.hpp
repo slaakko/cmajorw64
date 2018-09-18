@@ -47,6 +47,18 @@ private:
     std::vector<Span> references;
 };
 
+class ModuleImmutableException : public Exception
+{
+public:
+    ModuleImmutableException(Module* module_, Module* immutableModule, const Span& defined_, const Span& referenced_);
+};
+
+class SymbolCheckException : public Exception
+{
+public:
+    SymbolCheckException(Module* module_, const std::string& message_, const Span& defined_);
+};
+
 class CastOverloadException : public Exception
 {
 public:

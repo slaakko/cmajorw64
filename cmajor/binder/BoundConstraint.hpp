@@ -112,11 +112,11 @@ struct BoundConceptKeyHash
 {
     bool operator()(const BoundConceptKey& boundConceptKey) const
     {
-        size_t hashCode = std::hash<ConceptSymbol*>().operator()(boundConceptKey.conceptSymbol);
+        size_t hashCode = boost::hash<boost::uuids::uuid>()(boundConceptKey.conceptSymbol->TypeId());
         int n = boundConceptKey.Arity();
         for (int i = 0; i < n; ++i)
         {
-            hashCode ^= std::hash<TypeSymbol*>().operator()(boundConceptKey.typeArguments[i]);
+            hashCode ^= boost::hash<boost::uuids::uuid>()(boundConceptKey.typeArguments[i]->TypeId());
         }
         return hashCode;
     }

@@ -26,6 +26,8 @@ public:
     const char32_t* Start() const { return start; }
     const char32_t* End() const { return end; }
     void SetProject(const std::string& project_);
+    void* Module() const { return module; }
+    void SetModule(void* module_) { module = module_; }
 private:
     std::string project;
     std::string message;
@@ -33,6 +35,7 @@ private:
     Span span;
     const char32_t* start;
     const char32_t* end;
+    void* module;
 };
 
 class ExpectationFailure : public ParsingException

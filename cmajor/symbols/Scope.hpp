@@ -20,6 +20,7 @@ class ContainerSymbol;
 class NamespaceSymbol;
 class FunctionSymbol;
 class Module;
+class ViableFunctionSet;
 
 enum class ScopeLookup : uint8_t
 {
@@ -55,10 +56,9 @@ class ContainerScope : public Scope
 {
 public:
     ContainerScope();
-    ContainerScope* Base() const { return base; }
-    void SetBase(ContainerScope* base_) { base = base_; }
-    ContainerScope* Parent() const { return parent; }
-    void SetParent(ContainerScope* parent_) { parent = parent_; }
+    ContainerScope* BaseScope() const;
+    ContainerScope* ParentScope() const;
+    void SetParentScope(ContainerScope* parentScope_) { parentScope = parentScope_; }
     ContainerSymbol* Container() { return container; }
     void SetContainer(ContainerSymbol* container_) { container = container_; }
     void Install(Symbol* symbol);
@@ -68,12 +68,12 @@ public:
     const NamespaceSymbol* Ns() const;
     NamespaceSymbol* Ns();
     void Clear();
-    NamespaceSymbol* CreateNamespace(const std::u32string& qualifiedNsName, const Span& span, Module* originalModule);
-    void CollectViableFunctions(int arity, const std::u32string& groupName, std::unordered_set<ContainerScope*>& scopesLookedUp, ScopeLookup scopeLookup, std::unordered_set<FunctionSymbol*>& viableFunctions);
+    NamespaceSymbol* CreateNamespace(const std::u32string& qualifiedNsName, const Span& span);
+    void CollectViableFunctions(int arity, const std::u32string& groupName, std::unordered_set<ContainerScope*>& scopesLookedUp, ScopeLookup scopeLookup, 
+        ViableFunctionSet& viableFunctions, Module* module);
 private:
-    ContainerScope* base;
-    ContainerScope* parent;
     ContainerSymbol* container;
+    ContainerScope* parentScope;
     std::unordered_map<std::u32string, Symbol*> symbolMap;
 };
 
@@ -86,7 +86,8 @@ public:
     void InstallNamespaceImport(ContainerScope* containerScope, NamespaceImportNode* namespaceImportNode);
     Symbol* Lookup(const std::u32string& name) const override;
     Symbol* Lookup(const std::u32string& name, ScopeLookup lookup) const override;
-    void CollectViableFunctions(int arity, const std::u32string&  groupName, std::unordered_set<ContainerScope*>& scopesLookedUp, std::unordered_set<FunctionSymbol*>& viableFunctions);
+    void CollectViableFunctions(int arity, const std::u32string&  groupName, std::unordered_set<ContainerScope*>& scopesLookedUp, ViableFunctionSet& viableFunctions,
+        Module* module);
 private:
     Module* module;
     std::vector<ContainerScope*> containerScopes;

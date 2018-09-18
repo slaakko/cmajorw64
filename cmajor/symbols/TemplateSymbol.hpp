@@ -17,7 +17,6 @@ public:
     void Write(SymbolWriter& writer);
     void Read(SymbolReader& reader);
     void EmplaceType(TypeSymbol* typeSymbol, int index) override;
-    void ComputeExportClosure() override;
     llvm::Type* IrType(Emitter& emitter) override { Assert(false, "tried to get ir type of template parameter"); return nullptr; }
     llvm::Constant* CreateDefaultIrValue(Emitter& emitter) override { Assert(false, "tried to create defualt ir value of template parameter"); return nullptr; }
     TypeSymbol* Unify(TypeSymbol* type, const Span& span) override;
@@ -39,12 +38,14 @@ class BoundTemplateParameterSymbol : public Symbol
 public:
     BoundTemplateParameterSymbol(const Span& span_, const std::u32string& name_);
     std::u32string FullName() const override { return Name(); }
-    bool IsExportSymbol() const override { return false; }
+    void Write(SymbolWriter& writer) override;
+    void Read(SymbolReader& reader) override;
     TypeSymbol* GetType() const { return type; }
     void SetType(TypeSymbol* type_) { type = type_; }
     std::unique_ptr<dom::Element> CreateDomElement(TypeMap& typeMap) override;
     std::u32string Info() const override { return Name(); }
     const char* ClassName() const override { return "BoundTemplateParameterSymbol"; }
+    void Check() override;
 private:
     TypeSymbol* type;
 };

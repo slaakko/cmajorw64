@@ -25,11 +25,14 @@ public:
     const std::vector<Span>& References() const { return references; }
     void SetReferences(const std::vector<Span>& references_);
     std::unique_ptr<JsonValue> ToJson(Module* module) const;
+    Module* GetModule() { return module; }
+    void SetModule(Module* module_) { module = module_; }
 private:
     std::u32string project;
     std::string message;
     Span defined;
     std::vector<Span> references;
+    Module* module;
 };
 
 class CompileWarningCollection

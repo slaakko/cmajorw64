@@ -35,17 +35,19 @@
             this.emitLlvmCheckBox = new System.Windows.Forms.CheckBox();
             this.linkWithDebugRuntimeCheckBox = new System.Windows.Forms.CheckBox();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.doNotUseModuleCacheCheckBox = new System.Windows.Forms.CheckBox();
             this.linkUsingMsLinkCheckBox = new System.Windows.Forms.CheckBox();
             this.strictNothrowCheckBox = new System.Windows.Forms.CheckBox();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.buildThreadsComboBox = new System.Windows.Forms.ComboBox();
             this.label1 = new System.Windows.Forms.Label();
+            this.resetModuleCacheButton = new System.Windows.Forms.Button();
             this.groupBox3.SuspendLayout();
             this.SuspendLayout();
             // 
             // okButton
             // 
-            this.okButton.Location = new System.Drawing.Point(94, 201);
+            this.okButton.Location = new System.Drawing.Point(92, 248);
             this.okButton.Name = "okButton";
             this.okButton.Size = new System.Drawing.Size(75, 23);
             this.okButton.TabIndex = 6;
@@ -56,7 +58,7 @@
             // cancelButton
             // 
             this.cancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.cancelButton.Location = new System.Drawing.Point(175, 201);
+            this.cancelButton.Location = new System.Drawing.Point(173, 248);
             this.cancelButton.Name = "cancelButton";
             this.cancelButton.Size = new System.Drawing.Size(75, 23);
             this.cancelButton.TabIndex = 7;
@@ -98,6 +100,7 @@
             // 
             // groupBox3
             // 
+            this.groupBox3.Controls.Add(this.doNotUseModuleCacheCheckBox);
             this.groupBox3.Controls.Add(this.linkUsingMsLinkCheckBox);
             this.groupBox3.Controls.Add(this.linkWithDebugRuntimeCheckBox);
             this.groupBox3.Controls.Add(this.emitOptLlvmCheckBox);
@@ -105,10 +108,21 @@
             this.groupBox3.Controls.Add(this.emitLlvmCheckBox);
             this.groupBox3.Location = new System.Drawing.Point(14, 13);
             this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(236, 155);
+            this.groupBox3.Size = new System.Drawing.Size(236, 173);
             this.groupBox3.TabIndex = 14;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Compiling options";
+            // 
+            // doNotUseModuleCacheCheckBox
+            // 
+            this.doNotUseModuleCacheCheckBox.AutoSize = true;
+            this.doNotUseModuleCacheCheckBox.Location = new System.Drawing.Point(17, 143);
+            this.doNotUseModuleCacheCheckBox.Name = "doNotUseModuleCacheCheckBox";
+            this.doNotUseModuleCacheCheckBox.Size = new System.Drawing.Size(131, 17);
+            this.doNotUseModuleCacheCheckBox.TabIndex = 3;
+            this.doNotUseModuleCacheCheckBox.Text = "Disable module cache";
+            this.toolTip1.SetToolTip(this.doNotUseModuleCacheCheckBox, "Don\'t cache recently built modules.");
+            this.doNotUseModuleCacheCheckBox.UseVisualStyleBackColor = true;
             // 
             // linkUsingMsLinkCheckBox
             // 
@@ -159,7 +173,7 @@
             "14",
             "15",
             "16"});
-            this.buildThreadsComboBox.Location = new System.Drawing.Point(137, 174);
+            this.buildThreadsComboBox.Location = new System.Drawing.Point(135, 221);
             this.buildThreadsComboBox.Name = "buildThreadsComboBox";
             this.buildThreadsComboBox.Size = new System.Drawing.Size(113, 21);
             this.buildThreadsComboBox.TabIndex = 3;
@@ -168,11 +182,21 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(12, 177);
+            this.label1.Location = new System.Drawing.Point(10, 224);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(122, 13);
             this.label1.TabIndex = 15;
             this.label1.Text = "Number of build threads:";
+            // 
+            // resetModuleCacheButton
+            // 
+            this.resetModuleCacheButton.Location = new System.Drawing.Point(135, 192);
+            this.resetModuleCacheButton.Name = "resetModuleCacheButton";
+            this.resetModuleCacheButton.Size = new System.Drawing.Size(115, 23);
+            this.resetModuleCacheButton.TabIndex = 16;
+            this.resetModuleCacheButton.Text = "Reset module cache";
+            this.resetModuleCacheButton.UseVisualStyleBackColor = true;
+            this.resetModuleCacheButton.Click += new System.EventHandler(this.resetModuleCacheButton_Click);
             // 
             // BuildOptionsDialog
             // 
@@ -180,7 +204,8 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.cancelButton;
-            this.ClientSize = new System.Drawing.Size(260, 233);
+            this.ClientSize = new System.Drawing.Size(260, 284);
+            this.Controls.Add(this.resetModuleCacheButton);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.buildThreadsComboBox);
             this.Controls.Add(this.groupBox3);
@@ -211,5 +236,7 @@
         private System.Windows.Forms.ToolTip toolTip1;
         private System.Windows.Forms.ComboBox buildThreadsComboBox;
         private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.CheckBox doNotUseModuleCacheCheckBox;
+        private System.Windows.Forms.Button resetModuleCacheButton;
     }
 }

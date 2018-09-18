@@ -193,7 +193,7 @@ void WriteGlobals(const std::vector<std::u32string>& moduleNames)
 void AddDerivedClass(ClassTypeSymbol* baseClass, ClassTypeSymbol* derivedClass)
 {
     std::lock_guard<std::mutex> lock(globalMutex);
-    Module* originalModule = baseClass->GetOriginalModule();
+    Module* originalModule = baseClass->GetModule();
     std::u32string moduleName = originalModule->Name();
     Global::Instance().GetDerivedClassMap(moduleName)->AddDerivedClass(baseClass->Id(), derivedClass->Id());
 }
@@ -201,7 +201,7 @@ void AddDerivedClass(ClassTypeSymbol* baseClass, ClassTypeSymbol* derivedClass)
 void AddConceptRefinement(ConceptSymbol* refinedConcept, ConceptSymbol* concept)
 {
     std::lock_guard<std::mutex> lock(globalMutex);
-    Module* originalModule = refinedConcept->GetOriginalModule();
+    Module* originalModule = refinedConcept->GetModule();
     std::u32string moduleName = originalModule->Name();
     Global::Instance().GetDerivedClassMap(moduleName)->AddDerivedClass(refinedConcept->Id(), concept->Id());
 }
