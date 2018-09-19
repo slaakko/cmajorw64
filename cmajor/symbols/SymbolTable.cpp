@@ -1589,14 +1589,14 @@ void SymbolTable::InitUuids()
 
 const boost::uuids::uuid& SymbolTable::GetDerivationId(Derivation derivation) const
 {
-    if (module->Name() != U"System.Core")
+    if (!module->IsCore())
     {
-        throw std::runtime_error("derivation id provided only from System.Core module");
+        throw std::runtime_error("internal error: derivation id provided only from System.Core module");
     }
     int index = static_cast<int>(derivation);
     if (index < 0 || index >= derivationIds.size())
     {
-        throw std::runtime_error("invalid derivation id index");
+        throw std::runtime_error("internal error: invalid derivation id index");
     }
     return derivationIds[index];
 }

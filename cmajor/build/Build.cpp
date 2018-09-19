@@ -1040,7 +1040,6 @@ void BuildProject(Project* project, std::unique_ptr<Module>& rootModule, bool& s
                 LogMessage(project->LogStreamId(), "Writing module file...");
             }
             SymbolWriter writer(project->ModuleFilePath());
-            rootModule->ResetFlag(ModuleFlags::root);
             rootModule->Write(writer);
             if (GetGlobalFlag(GlobalFlags::verbose))
             {

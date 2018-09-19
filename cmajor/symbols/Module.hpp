@@ -33,7 +33,7 @@ const uint8_t currentModuleFormat = moduleFormat_5;
 
 enum class ModuleFlags : uint8_t
 {
-    none = 0, system = 1 << 0, root = 1 << 1, immutable = 1 << 2
+    none = 0, system = 1 << 0, core = 1 << 1, root = 1 << 2, immutable = 1 << 3
 };
 
 inline ModuleFlags operator|(ModuleFlags left, ModuleFlags right)
@@ -113,6 +113,8 @@ public:
     void SetRootModule() { SetFlag(ModuleFlags::root); }
     bool IsImmutable() const { return GetFlag(ModuleFlags::immutable); }
     void SetImmutable() { SetFlag(ModuleFlags::immutable); }
+    bool IsCore() const { return GetFlag(ModuleFlags::core); }
+    void SetCore() { SetFlag(ModuleFlags::core); }
     bool GetFlag(ModuleFlags flag) const { return (flags & flag) != ModuleFlags::none; }
     void SetFlag(ModuleFlags flag) { flags = flags | flag; }
     void ResetFlag(ModuleFlags flag) { flags = flags & ~flag; }
@@ -136,7 +138,6 @@ public:
     void SetLogStreamId(int logStreamId_) { logStreamId = logStreamId_; }
     int LogStreamId() const { return logStreamId; }
     Module* GetSystemCoreModule();
-    void SetSystemCoreModule(Module* systemCoreModule_);
     void Check();
     std::vector<Module*>& AllRefModules() { return allRefModules; }
     std::vector<Module*>& ReferencedModules() { return referencedModules; }
@@ -147,6 +148,8 @@ public:
     int DebugLogIndent() const { return debugLogIndent; }
     void IncDebugLogIndent() { ++debugLogIndent; }
     void DecDebugLogIndent() { --debugLogIndent; }
+    int Index() const { return index; }
+    void SetIndex(int index_) { index = index_; }
 private:
     uint8_t format;
     ModuleFlags flags;
@@ -177,6 +180,7 @@ private:
     bool headerRead;
     int debugLogIndent;
     Module* systemCoreModule;
+    int index;
     void CheckUpToDate();
 };
 

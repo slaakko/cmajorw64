@@ -33,6 +33,8 @@ private:
     static std::unique_ptr<ModuleCache> instance;
     std::unordered_map<std::string, int> moduleMap;
     std::vector<std::unique_ptr<Module>> modules;
+    void CollectModuleIndices(Module* module, std::unordered_set<int>& moduleIndeces);
+    void ResetCacheEntries(Module* module);
 };
 
 std::unique_ptr<ModuleCache> ModuleCache::instance;
@@ -45,6 +47,33 @@ void ModuleCache::Init()
 void ModuleCache::Done()
 {
     instance.reset();
+}
+
+void ModuleCache::CollectModuleIndices(Module* module, std::unordered_set<int>& moduleIndices)
+{
+    for (Module* referencedModule : module->ReferencedModules())
+    {
+        CollectModuleIndices(referencedModule, moduleIndices);
+    }
+    if (!module->IsRootModule())
+    {
+        int moduleIndex = module->Index();
+        if (moduleIndex < 0 || moduleIndex >= modules.size())
+        {
+            throw std::runtime_error("module cache: invalid module index");
+        }
+        moduleIndices.insert(moduleIndex);
+    }
+}
+
+void ModuleCache::ResetCacheEntries(Module* module)
+{
+    std::unordered_set<int> moduleIndices;
+    CollectModuleIndices(module, moduleIndices);
+    for (int moduleIndex : moduleIndices)
+    {
+        modules[moduleIndex].reset();
+    }
 }
 
 Module* ModuleCache::GetModule(const std::string& moduleFilePath)
@@ -63,6 +92,7 @@ Module* ModuleCache::GetModule(const std::string& moduleFilePath)
     {
         std::unique_ptr<Module> module(new Module());
         int moduleIndex = modules.size();
+        module->SetIndex(moduleIndex);
         Module* m = module.get();
         modules.push_back(std::move(module));
         moduleMap[moduleFilePath] = moduleIndex;
@@ -89,25 +119,13 @@ void ModuleCache::PutModule(std::unique_ptr<Module>&& module)
             int moduleIndex = modules.size();
             moduleMap[module->OriginalFilePath()] = moduleIndex;
             std::unique_ptr<Module> m(new Module());
+            m->SetIndex(moduleIndex);
             modules.push_back(std::move(m));
         }
     }
     else
     {
-        for (Module* referencedModule : module->AllReferencedModules())
-        {
-            std::string moduleFilePath = referencedModule->OriginalFilePath();
-            auto it = moduleMap.find(referencedModule->OriginalFilePath());
-            if (it != moduleMap.cend())
-            {
-                int moduleIndex = it->second;
-                if (moduleIndex < 0 || moduleIndex >= modules.size())
-                {
-                    throw std::runtime_error("module cache: invalid module index");
-                }
-                modules[moduleIndex].reset();
-            }
-        }
+        ResetCacheEntries(module.get());
     }
     module.reset();
 }

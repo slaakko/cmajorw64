@@ -122,6 +122,14 @@ std::string ModuleFlagStr(ModuleFlags flags)
         }
         s.append("system");
     }
+    if ((flags & ModuleFlags::core) != ModuleFlags::none)
+    {
+        if (!s.empty())
+        {
+            s.append(1, ' ');
+        }
+        s.append("core");
+    }
     return s;
 }
 
@@ -443,7 +451,10 @@ void Import(Module* rootModule, Module* module, const std::vector<std::string>& 
             if (it != readMap.cend())
             {
                 Module* referencedModule = it->second;
-                module->AddReferencedModule(referencedModule);
+                if (rootModule->IsSystemModule() || referencedModule->Name() != U"System")
+                {
+                    module->AddReferencedModule(referencedModule);
+                }
 #ifdef MODULE_READING_DEBUG
                 LogMessage(rootModule->LogStreamId(), "Import: " + ToUtf8(module->Name()) + " references " + ToUtf8(referencedModule->Name()), rootModule->DebugLogIndent());
 #endif
@@ -495,13 +506,14 @@ void ImportModules(Module* rootModule, Module* module, std::unordered_set<std::s
 
 Module::Module() : 
     format(currentModuleFormat), flags(ModuleFlags::none), name(), originalFilePath(), filePathReadFrom(), referenceFilePaths(), moduleDependency(this), symbolTablePos(0), 
-    symbolTable(nullptr), directoryPath(), libraryFilePaths(), moduleIdMap(), logStreamId(0), headerRead(false), systemCoreModule(nullptr), debugLogIndent(0)
+    symbolTable(nullptr), directoryPath(), libraryFilePaths(), moduleIdMap(), logStreamId(0), headerRead(false), systemCoreModule(nullptr), debugLogIndent(0), index(-1)
 {
 }
 
 Module::Module(const std::string& filePath)  :
     format(currentModuleFormat), flags(ModuleFlags::none), name(), originalFilePath(), filePathReadFrom(), referenceFilePaths(), moduleDependency(this), symbolTablePos(0), 
-    symbolTable(new SymbolTable(this)), directoryPath(), libraryFilePaths(), moduleIdMap(), logStreamId(0), headerRead(false), systemCoreModule(nullptr), debugLogIndent(0)
+    symbolTable(new SymbolTable(this)), directoryPath(), libraryFilePaths(), moduleIdMap(), logStreamId(0), headerRead(false), systemCoreModule(nullptr), debugLogIndent(0),
+    index(-1)
 {
     SymbolReader reader(filePath);
     ModuleTag expectedTag;
@@ -554,13 +566,18 @@ Module::Module(const std::string& filePath)  :
     FinishReads(rootModule, finishReadOrder, true);
 }
 
-Module::Module(const std::u32string& name_, const std::string& filePath_) : 
-    format(currentModuleFormat), flags(ModuleFlags::none), name(name_), originalFilePath(filePath_), filePathReadFrom(), referenceFilePaths(), moduleDependency(this), symbolTablePos(0), 
-    symbolTable(new SymbolTable(this)), directoryPath(), libraryFilePaths(), moduleIdMap(), logStreamId(0), headerRead(false), systemCoreModule(nullptr), debugLogIndent(0)
+Module::Module(const std::u32string& name_, const std::string& filePath_) :
+    format(currentModuleFormat), flags(ModuleFlags::none), name(name_), originalFilePath(filePath_), filePathReadFrom(), referenceFilePaths(), moduleDependency(this), symbolTablePos(0),
+    symbolTable(new SymbolTable(this)), directoryPath(), libraryFilePaths(), moduleIdMap(), logStreamId(0), headerRead(false), systemCoreModule(nullptr), debugLogIndent(0),
+    index(-1)
 {
     if (SystemModuleSet::Instance().IsSystemModule(name))
     {
         SetSystemModule();
+    }
+    if (name == U"System.Core")
+    {
+        SetCore();
     }
 }
 
@@ -639,7 +656,7 @@ void Module::Write(SymbolWriter& writer)
 {
     ModuleTag tag;
     tag.Write(writer);
-    writer.GetBinaryWriter().Write(static_cast<uint8_t>(flags & ~ModuleFlags::immutable));
+    writer.GetBinaryWriter().Write(static_cast<uint8_t>(flags & ~(ModuleFlags::root | ModuleFlags::immutable)));
     writer.GetBinaryWriter().Write(name);
     writer.GetBinaryWriter().Write(originalFilePath);
     uint32_t nr = referencedModules.size();
@@ -683,10 +700,6 @@ void Module::ReadHeader(SymbolReader& reader, Module* rootModule, std::unordered
         LogMessage(rootModule->LogStreamId(), "ReadHeader: cached begin " + ToUtf8(name), rootModule->DebugLogIndent());
         rootModule->IncDebugLogIndent();
 #endif 
-        if (Name() == U"System.Core")
-        {
-            rootModule->SetSystemCoreModule(this);
-        }
         rootModule->RegisterFileTable(&fileTable, this);
         if (dependencyMap.find(originalFilePath) == dependencyMap.cend())
         {
@@ -731,10 +744,6 @@ void Module::ReadHeader(SymbolReader& reader, Module* rootModule, std::unordered
     LogMessage(rootModule->LogStreamId(), "ReadHeader: read begin " + ToUtf8(name), rootModule->DebugLogIndent());
     rootModule->IncDebugLogIndent();
 #endif 
-    if (name == U"System.Core")
-    {
-        rootModule->SetSystemCoreModule(this);
-    }
     originalFilePath = reader.GetBinaryReader().ReadUtf8String();
     if (dependencyMap.find(originalFilePath) == dependencyMap.cend())
     {
@@ -1095,24 +1104,23 @@ bool Module::IsSymbolDefined(const std::u32string& symbol)
 
 Module* Module::GetSystemCoreModule()
 {
-    if (Name() == U"System.Core")
+    if (IsCore())
     {
         return this;
     }
     if (!systemCoreModule)
     {
-        throw std::runtime_error("System.Core module not set");
+        for (Module* referencedModule : referencedModules)
+        {
+            Module* systemCore = referencedModule->GetSystemCoreModule();
+            if (systemCore)
+            {
+                systemCoreModule = systemCore;
+                break;
+            }
+        }
     }
     return systemCoreModule;
-}
-
-void Module::SetSystemCoreModule(Module* systemCoreModule_)
-{
-    if (systemCoreModule)
-    {
-        throw std::runtime_error("System.Core module already set");
-    }
-    systemCoreModule = systemCoreModule_;
 }
 
 void Module::Check()

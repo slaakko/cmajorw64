@@ -377,13 +377,18 @@ void DerivedTypeSymbol::EmplaceType(TypeSymbol* typeSymbol, int index)
     baseType = typeSymbol;
     if (!baseType)
     {
-        throw std::runtime_error("derived type emplace type: base type is nulll");
+        throw std::runtime_error("internal error: derived type emplace type: base type is null");
     }
 }
 
 void DerivedTypeSymbol::ComputeTypeId()
 {
-    SymbolTable& systemCoreSymbolTable = GetRootModuleForCurrentThread()->GetSystemCoreModule()->GetSymbolTable();
+    Module* systemCoreModule = GetModule()->GetSystemCoreModule();
+    if (!systemCoreModule)
+    {
+        throw std::runtime_error("internal error: system core module not found");
+    }
+    SymbolTable& systemCoreSymbolTable = systemCoreModule->GetSymbolTable();
     boost::uuids::uuid typeId = baseType->TypeId();
     int n = derivationRec.derivations.size();
     for (int i = 0; i < n; ++i)
