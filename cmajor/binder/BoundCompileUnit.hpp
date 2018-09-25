@@ -51,7 +51,7 @@ public:
         ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span);
     FunctionSymbol* InstantiateFunctionTemplate(FunctionSymbol* functionTemplate, const std::unordered_map<TemplateParameterSymbol*, TypeSymbol*>& templateParameterMapping, const Span& span);
     bool InstantiateClassTemplateMemberFunction(FunctionSymbol* memberFunction, ContainerScope* containerScope, BoundFunction* currentFunction, const Span& span);
-    void InstantiateInlineFunction(FunctionSymbol* inlineFunction, ContainerScope* containerScope, const Span& span);
+    FunctionSymbol* InstantiateInlineFunction(FunctionSymbol* inlineFunction, ContainerScope* containerScope, const Span& span);
     FunctionNode* GetFunctionNodeFor(FunctionSymbol* constExprFunctionSymbol);
     void GenerateCopyConstructorFor(ClassTypeSymbol* classTypeSymbol, ContainerScope* containerScope, BoundFunction* currentFunction, const Span& span);
     void GenerateCopyConstructorFor(InterfaceTypeSymbol* interfaceTypeSymbol, ContainerScope* containerScope, BoundFunction* currentFunction, const Span& span);
@@ -81,8 +81,6 @@ public:
     void PushBindingTypes();
     void PopBindingTypes();
     bool BindingTypes() const { return bindingTypes; }
-    bool Finalizing() const { return finalizing; }
-    void SetFinalizing(bool finalizing_) { finalizing = finalizing_; }
     void FinalizeBinding(ClassTemplateSpecializationSymbol* classTemplateSpecialization);
     AttributeBinder* GetAttributeBinder() const { return attributeBinder; }
     void PushNamespace(BoundNamespace* ns);
@@ -91,6 +89,10 @@ public:
     FunctionSymbol* GetCopyConstructorFor(const boost::uuids::uuid& typeId) const;
     void AddCopyConstructorFor(const boost::uuids::uuid& typeId, std::unique_ptr<FunctionSymbol>&& copyConstructor);
     void AddCopyConstructorToMap(const boost::uuids::uuid& typeId, FunctionSymbol* copyConstructor);
+    bool Immutable() const { return immutable; }
+    void SetImmutable() { immutable = true; }
+    void AddGlobalNs(std::unique_ptr<NamespaceNode>&& globalNs);
+    void AddFunctionSymbol(std::unique_ptr<FunctionSymbol>&& functionSymbol);
 private:
     Module& module;
     SymbolTable& symbolTable;
@@ -103,6 +105,8 @@ private:
     std::string objectFilePath;
     std::vector<std::unique_ptr<FileScope>> fileScopes;
     std::vector<std::unique_ptr<BoundNode>> boundNodes;
+    std::vector<std::unique_ptr<FunctionSymbol>> functionSymbols;
+    std::vector<std::unique_ptr<NamespaceNode>> globalNamespaceNodes;
     bool hasGotos;
     OperationRepository operationRepository;
     FunctionTemplateRepository functionTemplateRepository;
@@ -118,9 +122,9 @@ private:
     ConceptRepository conceptRepository;
     ConversionTable conversionTable;
     bool bindingTypes;
-    bool finalizing;
     std::stack<bool> bindingTypesStack;
     int32_t compileUnitIndex;
+    bool immutable;
     std::unordered_map<boost::uuids::uuid, FunctionSymbol*, boost::hash<boost::uuids::uuid>> copyConstructorMap;
     std::vector<std::unique_ptr<FunctionSymbol>> copyConstructors;
 };

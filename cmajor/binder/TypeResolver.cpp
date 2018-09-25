@@ -16,7 +16,10 @@
 #include <cmajor/symbols/TemplateSymbol.hpp>
 #include <cmajor/symbols/TypedefSymbol.hpp>
 #include <cmajor/symbols/GlobalFlags.hpp>
+#include <cmajor/symbols/DebugFlags.hpp>
 #include <cmajor/util/Unicode.hpp>
+#include <cmajor/util/Log.hpp>
+#include <cmajor/util/Time.hpp>
 
 namespace cmajor { namespace binder {
 

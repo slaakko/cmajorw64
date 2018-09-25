@@ -20,12 +20,20 @@ ConstantNode::ConstantNode(const Span& span_, Specifiers specifiers_, Node* type
 {
     typeExpr->SetParent(this);
     id->SetParent(this);
-    value->SetParent(this);
+    if (value)
+    {
+        value->SetParent(this);
+    }
 }
 
 Node* ConstantNode::Clone(CloneContext& cloneContext) const
 {
-    return new ConstantNode(GetSpan(), specifiers, typeExpr->Clone(cloneContext), static_cast<IdentifierNode*>(id->Clone(cloneContext)), value->Clone(cloneContext));
+    Node* clonedValue = nullptr; 
+    if (value)
+    {
+        clonedValue = value->Clone(cloneContext);
+    }
+    return new ConstantNode(GetSpan(), specifiers, typeExpr->Clone(cloneContext), static_cast<IdentifierNode*>(id->Clone(cloneContext)), clonedValue);
 }
 
 void ConstantNode::Accept(Visitor& visitor)
@@ -39,7 +47,12 @@ void ConstantNode::Write(AstWriter& writer)
     writer.Write(specifiers);
     writer.Write(typeExpr.get());
     writer.Write(id.get());
-    writer.Write(value.get());
+    bool hasValue = value != nullptr;
+    writer.GetBinaryWriter().Write(hasValue);
+    if (hasValue)
+    {
+        writer.Write(value.get());
+    }
     writer.GetBinaryWriter().Write(strValue);
 }
 
@@ -51,8 +64,12 @@ void ConstantNode::Read(AstReader& reader)
     typeExpr->SetParent(this);
     id.reset(reader.ReadIdentifierNode());
     id->SetParent(this);
-    value.reset(reader.ReadNode());
-    value->SetParent(this);
+    bool hasValue = reader.GetBinaryReader().ReadBool();
+    if (hasValue)
+    {
+        value.reset(reader.ReadNode());
+        value->SetParent(this);
+    }
     strValue = reader.GetBinaryReader().ReadUtf32String();
 }
 

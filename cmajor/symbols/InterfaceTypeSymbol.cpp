@@ -527,7 +527,7 @@ void ClassToInterfaceConversion::GenerateCall(Emitter& emitter, std::vector<GenO
     llvm::Value* vmtObjectPtr = sourceClassType->VmtObject(emitter, false);
     ArgVector imtsArrayIndeces;
     imtsArrayIndeces.push_back(emitter.Builder().getInt32(0));
-    imtsArrayIndeces.push_back(emitter.Builder().getInt32(2));
+    imtsArrayIndeces.push_back(emitter.Builder().getInt32(imtsVmtIndexOffset)); // new layout: 4
     llvm::Value* imtsArrayPtrPtr = emitter.Builder().CreateGEP(vmtObjectPtr, imtsArrayIndeces);
     llvm::Value* imtsArrayPtr = emitter.Builder().CreateBitCast(imtsArrayPtrPtr, llvm::PointerType::get(llvm::PointerType::get(emitter.Builder().getInt8PtrTy(), 0), 0));
     llvm::Value* imtArray = emitter.Builder().CreateLoad(imtsArrayPtr);

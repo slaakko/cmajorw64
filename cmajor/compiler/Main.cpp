@@ -88,7 +88,7 @@ void PrintHelp()
         "--bdt2xml (-bd)\n" <<
         "   output bound tree as xml\n" <<
         "--link-with-debug-runtime (-d)\n" <<
-        "   link with the debug version of the runtime library cmrt230(d).dll\n" <<
+        "   link with the debug version of the runtime library cmrt240(d).dll\n" <<
         "--link-using-ms-link (-m)\n" <<
         "   use Microsoft's link.exe as the linker\n" << 
         "--define SYMBOL (-D SYMBOL)\n" <<
@@ -105,6 +105,10 @@ void PrintHelp()
         "   set number of build threads to N\n" <<
         "--disable-module-cache (-dm)\n" <<
         "   do not cache recently built modules\n" <<
+        "--single-threaded-compile (-st)\n" <<
+        "   compile source files in a project using a single thread\n" <<
+        "--debug-compile (-dc)\n" <<
+        "   show debug messages from multithreaded compilation\n" <<
         std::endl;
 }
 
@@ -219,14 +223,17 @@ int main(int argc, const char** argv)
                     else if (arg == "--ast2xml" || arg == "-x")
                     {
                         SetGlobalFlag(GlobalFlags::ast2xml);
+                        SetGlobalFlag(GlobalFlags::singleThreadedCompile);
                     }
                     else if (arg == "--sym2xml" || arg == "-y")
                     {
                         SetGlobalFlag(GlobalFlags::sym2xml);
+                        SetGlobalFlag(GlobalFlags::singleThreadedCompile);
                     }
                     else if (arg == "--bdt2xml" || arg == "-bd")
                     {
                         SetGlobalFlag(GlobalFlags::bdt2xml);
+                        SetGlobalFlag(GlobalFlags::singleThreadedCompile);
                     }
                     else if (arg == "--strict-nothrow" || arg == "-s")
                     {
@@ -268,6 +275,14 @@ int main(int argc, const char** argv)
                     else if (arg == "--disable-module-cache" || arg == "-dm")
                     {
                         useModuleCache = false;
+                    }
+                    else if (arg == "--single-threaded-compile" || arg == "-st")
+                    {
+                        SetGlobalFlag(GlobalFlags::singleThreadedCompile);
+                    }
+                    else if (arg == "--debug-compile" || arg == "-dc")
+                    {
+                        SetGlobalFlag(GlobalFlags::debugCompile);
                     }
                     else if (arg.find('=') != std::string::npos)
                     {
@@ -371,6 +386,7 @@ int main(int argc, const char** argv)
             {
                 SetGlobalFlag(GlobalFlags::generateDebugInfo);
             }
+            //SetGlobalFlag(GlobalFlags::singleThreadedCompile); // todo
             for (const std::string& file : files)
             {
                 boost::filesystem::path fp(file);

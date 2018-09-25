@@ -78,6 +78,7 @@ int main(int argc, const char** argv)
     {
         InitDone initDone;
         SetGlobalFlag(GlobalFlags::cmdoc);
+        SetGlobalFlag(GlobalFlags::singleThreadedCompile);
         std::vector<std::string> cmdocXmlFilePaths;
         for (int i = 1; i < argc; ++i)
         {

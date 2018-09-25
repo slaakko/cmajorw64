@@ -18,6 +18,7 @@
 #include <cmajor/util/Unicode.hpp>
 #include <cmajor/util/TextUtils.hpp>
 #include <cmajor/util/Log.hpp>
+#include <cmajor/util/Time.hpp>
 #include <boost/filesystem.hpp>
 #include <iostream>
 
@@ -506,14 +507,15 @@ void ImportModules(Module* rootModule, Module* module, std::unordered_set<std::s
 
 Module::Module() : 
     format(currentModuleFormat), flags(ModuleFlags::none), name(), originalFilePath(), filePathReadFrom(), referenceFilePaths(), moduleDependency(this), symbolTablePos(0), 
-    symbolTable(nullptr), directoryPath(), libraryFilePaths(), moduleIdMap(), logStreamId(0), headerRead(false), systemCoreModule(nullptr), debugLogIndent(0), index(-1)
+    symbolTable(nullptr), directoryPath(), libraryFilePaths(), moduleIdMap(), logStreamId(0), headerRead(false), systemCoreModule(nullptr), debugLogIndent(0), index(-1),
+    buildStartMs(0), buildStopMs(0), preparing(false)
 {
 }
 
 Module::Module(const std::string& filePath)  :
     format(currentModuleFormat), flags(ModuleFlags::none), name(), originalFilePath(), filePathReadFrom(), referenceFilePaths(), moduleDependency(this), symbolTablePos(0), 
     symbolTable(new SymbolTable(this)), directoryPath(), libraryFilePaths(), moduleIdMap(), logStreamId(0), headerRead(false), systemCoreModule(nullptr), debugLogIndent(0),
-    index(-1)
+    index(-1), buildStartMs(0), buildStopMs(0), preparing(false)
 {
     SymbolReader reader(filePath);
     ModuleTag expectedTag;
@@ -569,7 +571,7 @@ Module::Module(const std::string& filePath)  :
 Module::Module(const std::u32string& name_, const std::string& filePath_) :
     format(currentModuleFormat), flags(ModuleFlags::none), name(name_), originalFilePath(filePath_), filePathReadFrom(), referenceFilePaths(), moduleDependency(this), symbolTablePos(0),
     symbolTable(new SymbolTable(this)), directoryPath(), libraryFilePaths(), moduleIdMap(), logStreamId(0), headerRead(false), systemCoreModule(nullptr), debugLogIndent(0),
-    index(-1)
+    index(-1), buildStartMs(0), buildStopMs(0), preparing(false)
 {
     if (SystemModuleSet::Instance().IsSystemModule(name))
     {
@@ -1126,6 +1128,21 @@ Module* Module::GetSystemCoreModule()
 void Module::Check()
 {
     symbolTable->Check();
+}
+
+void Module::StartBuild()
+{
+    buildStartMs = CurrentMs();
+}
+
+void Module::StopBuild()
+{
+    buildStopMs = CurrentMs();
+}
+
+int Module::GetBuildTimeMs()
+{
+    return static_cast<int>(buildStopMs - buildStartMs);
 }
 
 #ifdef _WIN32

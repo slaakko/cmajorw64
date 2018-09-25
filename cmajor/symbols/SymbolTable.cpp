@@ -25,6 +25,7 @@
 #include <cmajor/ast/Identifier.hpp>
 #include <cmajor/util/Unicode.hpp>
 #include <cmajor/util/Log.hpp>
+#include <cmajor/util/Time.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/uuid/uuid_generators.hpp>
 
@@ -64,7 +65,7 @@ bool operator!=(const ArrayKey& left, const ArrayKey& right)
 SymbolTable::SymbolTable(Module* module_) : 
     module(module_), globalNs(Span(), std::u32string()), currentCompileUnit(nullptr), container(&globalNs), currentClass(nullptr), currentInterface(nullptr), 
     mainFunctionSymbol(nullptr), currentFunctionSymbol(nullptr), parameterIndex(0), declarationBlockIndex(0), conversionTable(module), latestIdentifierNode(nullptr), 
-    numSpecializationsNew(0), numSpecializationsCopied(0)
+    numSpecializationsNew(0), numSpecializationsCopied(0), createdFunctionSymbol(nullptr)
 {
     globalNs.SetModule(module);
 }
@@ -452,11 +453,18 @@ void SymbolTable::BeginFunction(FunctionNode& functionNode, int32_t functionInde
     ResetDeclarationBlockIndex();
 }
 
-void SymbolTable::EndFunction()
+void SymbolTable::EndFunction(bool addMember)
 {
     FunctionSymbol* functionSymbol = static_cast<FunctionSymbol*>(container);
     EndContainer();
-    container->AddMember(functionSymbol);
+    if (addMember)
+    {
+        container->AddMember(functionSymbol);
+    }
+    else
+    {
+        createdFunctionSymbol = functionSymbol;
+    }
 }
 
 void SymbolTable::AddParameter(ParameterNode& parameterNode)
@@ -587,11 +595,18 @@ void SymbolTable::BeginStaticConstructor(StaticConstructorNode& staticConstructo
     ResetDeclarationBlockIndex();
 }
 
-void SymbolTable::EndStaticConstructor()
+void SymbolTable::EndStaticConstructor(bool addMember)
 {
     StaticConstructorSymbol* staticConstructorSymbol = static_cast<StaticConstructorSymbol*>(container);
     EndContainer();
-    container->AddMember(staticConstructorSymbol);
+    if (addMember)
+    {
+        container->AddMember(staticConstructorSymbol);
+    }
+    else
+    {
+        createdFunctionSymbol = staticConstructorSymbol;
+    }
 }
 
 void SymbolTable::BeginConstructor(ConstructorNode& constructorNode, int32_t functionIndex)
@@ -630,11 +645,18 @@ void SymbolTable::BeginConstructor(ConstructorNode& constructorNode, int32_t fun
     }
 }
 
-void SymbolTable::EndConstructor()
+void SymbolTable::EndConstructor(bool addMember)
 {
     ConstructorSymbol* constructorSymbol = static_cast<ConstructorSymbol*>(container);
     EndContainer();
-    container->AddMember(constructorSymbol);
+    if (addMember)
+    {
+        container->AddMember(constructorSymbol);
+    }
+    else
+    {
+        createdFunctionSymbol = constructorSymbol;
+    }
 }
 
 void SymbolTable::BeginDestructor(DestructorNode& destructorNode, int32_t functionIndex)
@@ -668,11 +690,18 @@ void SymbolTable::BeginDestructor(DestructorNode& destructorNode, int32_t functi
     }
 }
 
-void SymbolTable::EndDestructor()
+void SymbolTable::EndDestructor(bool addMember)
 {
     DestructorSymbol* destructorSymbol = static_cast<DestructorSymbol*>(container);
     EndContainer();
-    container->AddMember(destructorSymbol);
+    if (addMember)
+    {
+        container->AddMember(destructorSymbol);
+    }
+    else
+    {
+        createdFunctionSymbol = destructorSymbol;
+    }
 }
 
 void SymbolTable::BeginMemberFunction(MemberFunctionNode& memberFunctionNode, int32_t functionIndex)
@@ -726,11 +755,18 @@ void SymbolTable::BeginMemberFunction(MemberFunctionNode& memberFunctionNode, in
     }
 }
 
-void SymbolTable::EndMemberFunction()
+void SymbolTable::EndMemberFunction(bool addMember)
 {
     MemberFunctionSymbol* memberFunctionSymbol = static_cast<MemberFunctionSymbol*>(container);
     EndContainer();
-    container->AddMember(memberFunctionSymbol);
+    if (addMember)
+    {
+        container->AddMember(memberFunctionSymbol);
+    }
+    else
+    {
+        createdFunctionSymbol = memberFunctionSymbol;
+    }
 }
 
 void SymbolTable::BeginConversionFunction(ConversionFunctionNode& conversionFunctionNode, int32_t functionIndex)
@@ -769,11 +805,18 @@ void SymbolTable::BeginConversionFunction(ConversionFunctionNode& conversionFunc
     conversionFunctionSymbol->AddMember(thisParam);
 }
 
-void SymbolTable::EndConversionFunction()
+void SymbolTable::EndConversionFunction(bool addMember)
 {
     ConversionFunctionSymbol* conversionFunctionSymbol = static_cast<ConversionFunctionSymbol*>(container);
     EndContainer();
-    container->AddMember(conversionFunctionSymbol);
+    if (addMember)
+    {
+        container->AddMember(conversionFunctionSymbol);
+    }
+    else
+    {
+        createdFunctionSymbol = conversionFunctionSymbol;
+    }
 }
 
 void SymbolTable::AddMemberVariable(MemberVariableNode& memberVariableNode)
@@ -1810,6 +1853,7 @@ void InitCoreSymbolTable(SymbolTable& symbolTable)
     }
 }
 
+/*
 void CreateClassFile(const std::string& executableFilePath, SymbolTable& symbolTable)
 {
     if (GetGlobalFlag(GlobalFlags::verbose) && !GetGlobalFlag(GlobalFlags::unitTest))
@@ -1819,23 +1863,23 @@ void CreateClassFile(const std::string& executableFilePath, SymbolTable& symbolT
     boost::filesystem::path cfp = boost::filesystem::path(executableFilePath).replace_extension(".cls");
     std::string classFilePath = cfp.generic_string();
     const std::unordered_set<ClassTypeSymbol*>& polymorphicClasses = symbolTable.PolymorphicClasses();
-    uint32_t n = 0;
+    std::unordered_map<boost::uuids::uuid, ClassTypeSymbol*, boost::hash<boost::uuids::uuid>> classIdClassMap;
     for (ClassTypeSymbol* polymorphicClass : polymorphicClasses)
     {
-        if (!polymorphicClass->IsVmtObjectCreated()) continue;
-        ++n;
+        classIdClassMap[polymorphicClass->TypeId()] = polymorphicClass;
     }
+    uint32_t n = classIdClassMap.size();
     BinaryWriter writer(classFilePath);
     writer.WriteULEB128UInt(n);
-    for (ClassTypeSymbol* polymorphicClass : polymorphicClasses)
+    for (const auto& p : classIdClassMap)
     {
-        if (!polymorphicClass->IsVmtObjectCreated()) continue;
-        const boost::uuids::uuid& typeId = polymorphicClass->TypeId();
-        std::string vmtObjectName = polymorphicClass->VmtObjectNameStr();
+        const boost::uuids::uuid& typeId = p.first;
+        ClassTypeSymbol* cls = p.second;
+        std::string vmtObjectName = cls->VmtObjectNameStr();
         boost::uuids::uuid baseClassTypeId = boost::uuids::nil_generator()();
-        if (polymorphicClass->BaseClass())
+        if (cls->BaseClass())
         {
-            baseClassTypeId = polymorphicClass->BaseClass()->TypeId();
+            baseClassTypeId = cls->BaseClass()->TypeId();
         }
         writer.Write(typeId);
         writer.Write(vmtObjectName);
@@ -1854,6 +1898,7 @@ void CreateClassFile(const std::string& executableFilePath, SymbolTable& symbolT
         LogMessage(symbolTable.GetModule()->LogStreamId(), "==> " + classFilePath);
     }
 }
+*/
 
 void InitSymbolTable()
 {

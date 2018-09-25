@@ -219,12 +219,12 @@ namespace System
 {
     public class Endl
     {
-        public inline nothrow Endl()
+        public nothrow Endl()
         {
         }
     }
 
-    public inline nothrow Endl endl()
+    public nothrow Endl endl()
     {
         return Endl();
     }

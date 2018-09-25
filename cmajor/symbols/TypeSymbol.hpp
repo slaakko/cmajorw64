@@ -83,7 +83,6 @@ public:
     void Check() override;
 private:
     boost::uuids::uuid typeId;
-    int32_t compileUnitIndex;
 };
 
 bool CompareTypesForEquality(const TypeSymbol* left, const TypeSymbol* right);

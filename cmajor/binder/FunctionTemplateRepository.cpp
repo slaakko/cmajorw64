@@ -10,12 +10,14 @@
 #include <cmajor/binder/BoundStatement.hpp>
 #include <cmajor/symbols/SymbolCreatorVisitor.hpp>
 #include <cmajor/symbols/TemplateSymbol.hpp>
+#include <cmajor/symbols/GlobalFlags.hpp>
 #include <cmajor/ast/Identifier.hpp>
 #include <cmajor/util/Util.hpp>
 
 namespace cmajor { namespace binder {
 
 using namespace cmajor::util;
+using namespace cmajor::symbols;
 
 bool operator==(const FunctionTemplateKey& left, const FunctionTemplateKey& right)
 {
@@ -61,16 +63,15 @@ FunctionSymbol* FunctionTemplateRepository::Instantiate(FunctionSymbol* function
     {
         return it->second;
     }
-
     SymbolTable& symbolTable = boundCompileUnit.GetSymbolTable();
     Node* node = symbolTable.GetNodeNoThrow(functionTemplate);
     if (!node)
     {
         node = functionTemplate->GetFunctionNode();
+        symbolTable.MapNode(node, functionTemplate);
         Assert(node, "function node not read");
     }
     Assert(node->GetNodeType() == NodeType::functionNode, "function node expected");
-    instantiated.insert(functionTemplate);
     FunctionNode* functionNode = static_cast<FunctionNode*>(node);
     std::unique_ptr<NamespaceNode> globalNs(new NamespaceNode(functionTemplate->GetSpan(), new IdentifierNode(functionTemplate->GetSpan(), U"")));
     NamespaceNode* currentNs = globalNs.get();
@@ -134,7 +135,7 @@ FunctionSymbol* FunctionTemplateRepository::Instantiate(FunctionSymbol* function
     {
         boundCompileUnit.RemoveLastFileScope();
     }
-    functionSymbol->SetGlobalNs(std::move(globalNs));
+    boundCompileUnit.AddGlobalNs(std::move(globalNs));
     return functionSymbol;
 }
 

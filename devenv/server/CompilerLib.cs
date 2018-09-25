@@ -120,6 +120,10 @@ namespace server
             Compile(request.FilePath, request.Config, request.StrictNothrow, request.EmitLlvm, request.EmitOptLlvm, request.LinkWithDebugRuntime, request.LinkUsingMsLink,
                 request.OptimizationLevel, request.NumBuildThreads);
         }
+        public override void HandleCleanRequest(CleanRequest request)
+        {
+            Clean(request.FilePath, request.Config);
+        }
         public void SetWriteMethod(Control writer, WriteLineToOutputWindow writeMethod)
         {
             writeControl = writer;
@@ -157,6 +161,15 @@ namespace server
         {
             Request request = new CompileRequest(filePath, config, strictNothrow, emitLlvm, emitOptLlvm, linkWithDebugRuntime, linkUsingMsLink, optimizationLevel,
                 numBuildThreads);
+            lock (requestQueue)
+            {
+                requestQueue.Enqueue(request);
+            }
+            requestWaiting.Set();
+        }
+        public void DoClean(string solutionOrProjectFilePath, string config)
+        {
+            Request request = new CleanRequest(solutionOrProjectFilePath, config);
             lock (requestQueue)
             {
                 requestQueue.Enqueue(request);
@@ -234,6 +247,113 @@ namespace server
                 {
                     compileRequestElement.SetAttribute("build-threads", numBuildThreads.ToString());
                 }
+                compileRequestXmlDoc.AppendChild(compileRequestElement);
+                StringBuilder compileRequest = new StringBuilder();
+                StringWriter stringWriter = new StringWriter(compileRequest);
+                compileRequestXmlDoc.Save(stringWriter);
+                string compileXmlRequest = compileRequest.ToString();
+                compileAborted = false;
+                int compileResultHandle = Compile(compileXmlRequest);
+                if (compileResultHandle < 0)
+                {
+                    throw new Exception("Compile() returned " + compileResultHandle.ToString());
+                }
+                if (compileAborted)
+                {
+                    writeControl.Invoke(writeDelegate, "Compile aborted by the user.");
+                    return;
+                }
+                int compileResultLength = GetCompileResultLength(compileResultHandle);
+                if (compileResultLength < 0)
+                {
+                    throw new Exception("GetCompileResultLength() returned " + compileResultHandle.ToString());
+                }
+                StringBuilder compileResultStrBuilder = new StringBuilder(compileResultLength + 1);
+                int result = GetCompileResult(compileResultHandle, compileResultStrBuilder, compileResultLength + 1);
+                if (result < 0)
+                {
+                    throw new Exception("GetCompileResult() returned " + compileResultHandle.ToString());
+                }
+                string compileXmlResult = compileResultStrBuilder.ToString();
+                XmlDocument compileResultXmlDoc = new XmlDocument();
+                StringReader stringReader = new StringReader(compileXmlResult);
+                compileResultXmlDoc.Load(stringReader);
+                CompileResult compileResult = new CompileResult(compileResultXmlDoc.DocumentElement.GetAttribute("success") == "true");
+                XmlNodeList diagnosticNodes = compileResultXmlDoc.SelectNodes("/compileResult/diagnostics/diagnostic");
+                foreach (XmlNode diagnosticNode in diagnosticNodes)
+                {
+                    XmlElement diagnosticElement = diagnosticNode as XmlElement;
+                    if (diagnosticElement != null)
+                    {
+                        string category = diagnosticElement.GetAttribute("category");
+                        string message = diagnosticElement.GetAttribute("message");
+                        string tool = diagnosticElement.GetAttribute("tool");
+                        string project = diagnosticElement.GetAttribute("project");
+                        Diagnostic diagnostic = new Diagnostic(category, message, tool, project);
+                        XmlNode spanNode = diagnosticElement.SelectSingleNode("span");
+                        if (spanNode != null)
+                        {
+                            XmlElement spanElement = spanNode as XmlElement;
+                            if (spanElement != null)
+                            {
+                                string file = spanElement.GetAttribute("file");
+                                int line;
+                                if (!int.TryParse(spanElement.GetAttribute("line"), out line))
+                                {
+                                    line = 0;
+                                }
+                                int startCol;
+                                if (!int.TryParse(spanElement.GetAttribute("startCol"), out startCol))
+                                {
+                                    startCol = 0;
+                                }
+                                int endCol;
+                                if (!int.TryParse(spanElement.GetAttribute("endCol"), out endCol))
+                                {
+                                    endCol = 0;
+                                }
+                                string text = spanElement.GetAttribute("text");
+                                Span span = new Span(file, line, startCol, endCol, text);
+                                diagnostic.Span = span;
+                            }
+                        }
+                        compileResult.AddDiagnostic(diagnostic);
+                    }
+                }
+                EndLog();
+                if (compileResultHandler != null && compileReady != null)
+                {
+                    compileResultHandler.Invoke(compileReady, compileResult);
+                }
+            }
+            catch (Exception ex)
+            {
+                EndLog();
+                if (writeControl != null && writeDelegate != null)
+                {
+                    writeControl.Invoke(writeDelegate, ex.ToString());
+                }
+                if (compileResultHandler != null && compileReady != null)
+                {
+                    CompileResult compileResult = new CompileResult(false);
+                    compileResult.AddDiagnostic(new Diagnostic("internal error", ex.ToString(), "cmdevenv", ""));
+                    compileResultHandler.Invoke(compileReady, compileResult);
+                }
+            }
+        }
+        private void Clean(string solutionOrProjectFilePath, string config)
+        {
+            try
+            {
+                StartLog();
+                loggerThread = new Thread(LogMessages);
+                loggerThread.Start();
+                XmlDocument compileRequestXmlDoc = new XmlDocument();
+                XmlElement compileRequestElement = compileRequestXmlDoc.CreateElement("compileRequest");
+                compileRequestElement.SetAttribute("filePath", solutionOrProjectFilePath);
+                compileRequestElement.SetAttribute("config", config);
+                compileRequestElement.SetAttribute("verbose", "true");
+                compileRequestElement.SetAttribute("clean", "true");
                 compileRequestXmlDoc.AppendChild(compileRequestElement);
                 StringBuilder compileRequest = new StringBuilder();
                 StringWriter stringWriter = new StringWriter(compileRequest);

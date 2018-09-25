@@ -384,7 +384,8 @@ private:
 class BoundIsExpression : public BoundExpression
 {
 public:
-    BoundIsExpression(Module* module_, std::unique_ptr<BoundExpression>&& expr_, ClassTypeSymbol* rightClassType_, TypeSymbol* boolType_);
+    BoundIsExpression(Module* module_, std::unique_ptr<BoundExpression>&& expr_, ClassTypeSymbol* rightClassType_, TypeSymbol* boolType_,
+        std::unique_ptr<BoundLocalVariable>&& leftClassIdVar_, std::unique_ptr<BoundLocalVariable>&& rightClassIdVar_);
     BoundExpression* Clone() override;
     void Load(Emitter& emitter, OperationFlags flags) override;
     void Store(Emitter& emitter, OperationFlags flags) override;
@@ -397,12 +398,15 @@ public:
 private:
     std::unique_ptr<BoundExpression> expr;
     ClassTypeSymbol* rightClassType;
+    std::unique_ptr<BoundLocalVariable> leftClassIdVar;
+    std::unique_ptr<BoundLocalVariable> rightClassIdVar;
 };
 
 class BoundAsExpression : public BoundExpression
 {
 public:
-    BoundAsExpression(Module* module_, std::unique_ptr<BoundExpression>&& expr_, ClassTypeSymbol* rightClassType_, std::unique_ptr<BoundLocalVariable>&& variable_);
+    BoundAsExpression(Module* module_, std::unique_ptr<BoundExpression>&& expr_, ClassTypeSymbol* rightClassType_, std::unique_ptr<BoundLocalVariable>&& variable_,
+        std::unique_ptr<BoundLocalVariable>&& leftClassIdVar_, std::unique_ptr<BoundLocalVariable>&& rightClassIdVar_);
     BoundExpression* Clone() override;
     void Load(Emitter& emitter, OperationFlags flags) override;
     void Store(Emitter& emitter, OperationFlags flags) override;
@@ -417,6 +421,8 @@ private:
     std::unique_ptr<BoundExpression> expr;
     ClassTypeSymbol* rightClassType;
     std::unique_ptr<BoundLocalVariable> variable;
+    std::unique_ptr<BoundLocalVariable> leftClassIdVar;
+    std::unique_ptr<BoundLocalVariable> rightClassIdVar;
 };
 
 class BoundTypeNameExpression : public BoundExpression

@@ -474,10 +474,10 @@ void Link(const std::string& executableFilePath, const std::string& libraryFileP
     std::string defFilePath = GetFullPath(boost::filesystem::path(libraryFilePath).replace_extension(".def").generic_string());
     CreateDefFile(defFilePath, module);
     args.push_back("/def:" + QuotedPath(defFilePath));
-    std::string cmrtLibName = "cmrt230.lib";
+    std::string cmrtLibName = "cmrt240.lib";
     if (GetGlobalFlag(GlobalFlags::linkWithDebugRuntime))
     {
-        cmrtLibName = "cmrt230d.lib";
+        cmrtLibName = "cmrt240d.lib";
     }
     args.push_back(QuotedPath(Path::Combine(Path::Combine(CmajorRootDir(), "lib"), cmrtLibName)));
     int n = libraryFilePaths.size();
@@ -708,6 +708,8 @@ void CreateMainUnit(std::vector<std::string>& objectFilePaths, Module& module, E
     CompileUnitNode mainCompileUnit(Span(), boost::filesystem::path(module.OriginalFilePath()).parent_path().append("__main__.cm").generic_string());
     mainCompileUnit.SetSynthesizedUnit();
     mainCompileUnit.GlobalNs()->AddMember(new NamespaceImportNode(Span(), new IdentifierNode(Span(), U"System")));
+    mainCompileUnit.GlobalNs()->AddMember(MakePolymorphicClassArray(module.GetSymbolTable().PolymorphicClasses(), U"@polymorphicClassArray"));
+    mainCompileUnit.GlobalNs()->AddMember(MakeStaticClassArray(module.GetSymbolTable().ClassesHavingStaticConstructor(), U"@staticClassArray"));
     FunctionNode* mainFunction(new FunctionNode(Span(), Specifiers::public_, new IntNode(Span()), U"main", nullptr));
 #ifndef _WIN32
     mainFunction->AddParameter(new ParameterNode(Span(), new IntNode(Span()), new IdentifierNode(Span(), U"argc")));
@@ -720,11 +722,29 @@ void CreateMainUnit(std::vector<std::string>& objectFilePaths, Module& module, E
     ExpressionStatementNode* rtInitCall = nullptr;
     if (GetGlobalFlag(GlobalFlags::profile))
     {
-        rtInitCall = new ExpressionStatementNode(Span(), new InvokeNode(Span(), new IdentifierNode(Span(), U"RtStartProfiling")));
+        InvokeNode* invokeRtInit = new InvokeNode(Span(), new IdentifierNode(Span(), U"RtStartProfiling"));
+        invokeRtInit->AddArgument(new DivNode(Span(),
+            new InvokeNode(Span(), new DotNode(Span(), new IdentifierNode(Span(), U"@polymorphicClassArray"), new IdentifierNode(Span(), U"Length"))),
+            new LongLiteralNode(Span(), 3))); // 3 64-bit integers per entry
+        invokeRtInit->AddArgument(new InvokeNode(Span(), new DotNode(Span(), new IdentifierNode(Span(), U"@polymorphicClassArray"), new IdentifierNode(Span(), U"CBegin"))));
+        invokeRtInit->AddArgument(new DivNode(Span(),
+            new InvokeNode(Span(), new DotNode(Span(), new IdentifierNode(Span(), U"@staticClassArray"), new IdentifierNode(Span(), U"Length"))),
+            new LongLiteralNode(Span(), 2))); // 2 64-bit integers per entry
+        invokeRtInit->AddArgument(new InvokeNode(Span(), new DotNode(Span(), new IdentifierNode(Span(), U"@staticClassArray"), new IdentifierNode(Span(), U"CBegin"))));
+        rtInitCall = new ExpressionStatementNode(Span(), invokeRtInit);
     }
     else
     {
-        rtInitCall = new ExpressionStatementNode(Span(), new InvokeNode(Span(), new IdentifierNode(Span(), U"RtInit")));
+        InvokeNode* invokeRtInit = new InvokeNode(Span(), new IdentifierNode(Span(), U"RtInit"));
+        invokeRtInit->AddArgument(new DivNode(Span(), 
+            new InvokeNode(Span(), new DotNode(Span(), new IdentifierNode(Span(), U"@polymorphicClassArray"), new IdentifierNode(Span(), U"Length"))),
+            new LongLiteralNode(Span(), 3))); // 3 64-bit integers per entry
+        invokeRtInit->AddArgument(new InvokeNode(Span(), new DotNode(Span(), new IdentifierNode(Span(), U"@polymorphicClassArray"), new IdentifierNode(Span(), U"CBegin"))));
+        invokeRtInit->AddArgument(new DivNode(Span(),
+            new InvokeNode(Span(), new DotNode(Span(), new IdentifierNode(Span(), U"@staticClassArray"), new IdentifierNode(Span(), U"Length"))),
+            new LongLiteralNode(Span(), 2))); // 2 64-bit integers per entry
+        invokeRtInit->AddArgument(new InvokeNode(Span(), new DotNode(Span(), new IdentifierNode(Span(), U"@staticClassArray"), new IdentifierNode(Span(), U"CBegin"))));
+        rtInitCall = new ExpressionStatementNode(Span(), invokeRtInit);
     }
     mainFunctionBody->AddStatement(rtInitCall);
 #ifdef _WIN32
@@ -881,6 +901,274 @@ void InstallSystemLibraries(Module* systemInstallModule)
     }
 }
 
+void CompileSingleThreaded(Project* project, Module* rootModule, std::vector<std::unique_ptr<BoundCompileUnit>>& boundCompileUnits, EmittingContext& emittingContext,
+    std::vector<std::string>& objectFilePaths, std::unordered_map<int, cmdoclib::File>& docFileMap, bool& stop)
+{
+    if (GetGlobalFlag(GlobalFlags::verbose))
+    {
+        LogMessage(project->LogStreamId(), "Compiling...");
+    }
+    rootModule->StartBuild();
+    for (std::unique_ptr<BoundCompileUnit>& boundCompileUnit : boundCompileUnits)
+    {
+        if (stop)
+        {
+            return;
+        }
+        if (GetGlobalFlag(GlobalFlags::verbose))
+        {
+            LogMessage(project->LogStreamId(), "> " + boost::filesystem::path(boundCompileUnit->GetCompileUnitNode()->FilePath()).filename().generic_string());
+        }
+        BindStatements(*boundCompileUnit);
+        if (boundCompileUnit->HasGotos())
+        {
+            AnalyzeControlFlow(*boundCompileUnit);
+        }
+        if (GetGlobalFlag(GlobalFlags::bdt2xml))
+        {
+            std::unique_ptr<dom::Document> bdtDoc = cmajor::bdt2dom::GenerateBdtDocument(boundCompileUnit.get());
+            std::string bdtXmlFilePath = Path::ChangeExtension(boundCompileUnit->GetCompileUnitNode()->FilePath(), ".bdt.xml");
+            std::ofstream bdtXmlFile(bdtXmlFilePath);
+            CodeFormatter formatter(bdtXmlFile);
+            formatter.SetIndentSize(1);
+            bdtDoc->Write(formatter);
+        }
+        if (GetGlobalFlag(GlobalFlags::cmdoc))
+        {
+            cmdoclib::GenerateSourceCode(project, boundCompileUnit.get(), docFileMap);
+        }
+        else
+        {
+            GenerateCode(emittingContext, *boundCompileUnit);
+            objectFilePaths.push_back(boundCompileUnit->ObjectFilePath());
+        }
+    }
+    rootModule->StopBuild();
+    if (GetGlobalFlag(GlobalFlags::verbose))
+    {
+        LogMessage(rootModule->LogStreamId(), ToUtf8(rootModule->Name()) + " compilation time: " + FormatTimeMs(rootModule->GetBuildTimeMs()));
+    }
+}
+
+int64_t compileDebugStart = 0;
+
+std::string CurrentCompileDebugMsStr()
+{
+    return FormatTimeMs(static_cast<int32_t>(CurrentMs() - compileDebugStart));
+}
+
+int compileGetTimeoutSecs = 3;
+
+class CompileQueue
+{
+public:
+    CompileQueue(const std::string& name_, bool& stop_, bool& ready_, int logStreamId_);
+    void Put(int compileUnitIndex);
+    int Get();
+private:
+    std::string name;
+    std::list<int> queue;
+    std::mutex mtx;
+    std::condition_variable cond;
+    bool& stop;
+    bool& ready;
+    int logStreamId;
+};
+
+CompileQueue::CompileQueue(const std::string& name_, bool& stop_, bool& ready_, int logStreamId_) : name(name_), stop(stop_), ready(ready_), logStreamId(logStreamId_)
+{
+}
+
+void CompileQueue::Put(int compileUnitIndex)
+{
+    std::lock_guard<std::mutex> lock(mtx);
+    queue.push_back(compileUnitIndex);
+    cond.notify_one();
+}
+
+int CompileQueue::Get()
+{
+    while (!stop && !ready)
+    {
+        std::unique_lock<std::mutex> lock(mtx);
+        if (cond.wait_for(lock, std::chrono::duration<std::uint64_t>(std::chrono::seconds(compileGetTimeoutSecs)), [this] { return stop || ready || !queue.empty(); }))
+        {
+            if (stop || ready) return -1;
+            int compileUnitIndex = queue.front();
+            queue.pop_front();
+            return compileUnitIndex;
+        }
+        else
+        {
+            return -1;
+        }
+    }
+    return -1;
+}
+
+struct CompileData
+{
+    CompileData(Module* rootModule_, std::vector<std::unique_ptr<BoundCompileUnit>>& boundCompileUnits_, std::vector<std::string>& objectFilePaths_, bool& stop_, bool& ready_,
+        int numThreads_, CompileQueue& input_, CompileQueue& output_) :
+        rootModule(rootModule_), boundCompileUnits(boundCompileUnits_), objectFilePaths(objectFilePaths_), stop(stop_), ready(ready_), numThreads(numThreads_),
+        input(input_), output(output_)
+    {
+        exceptions.resize(numThreads);
+    }
+    Module* rootModule;
+    std::vector<std::unique_ptr<BoundCompileUnit>>& boundCompileUnits;
+    std::vector<std::string>& objectFilePaths;
+    bool& stop;
+    bool& ready;
+    int numThreads;
+    CompileQueue& input;
+    CompileQueue& output;
+    std::vector<std::exception_ptr> exceptions;
+    std::mutex mtx;
+};
+
+void GenerateCode(CompileData* data, int threadId)
+{
+    try
+    {
+        SetRootModuleForCurrentThread(data->rootModule);
+        EmittingContext emittingContext;
+        while (!data->stop && !data->ready)
+        {
+            int compileUnitIndex = data->input.Get();
+            if (compileUnitIndex >= 0 && compileUnitIndex < data->boundCompileUnits.size())
+            {
+                BoundCompileUnit* compileUnit = data->boundCompileUnits[compileUnitIndex].get();
+                if (GetGlobalFlag(GlobalFlags::debugCompile))
+                {
+                    LogMessage(data->rootModule->LogStreamId(), CurrentCompileDebugMsStr() + " begin generating code for compile unit " + std::to_string(compileUnitIndex) + 
+                        " of " + std::to_string(data->boundCompileUnits.size()));
+                }
+                GenerateCode(emittingContext, *compileUnit);
+                if (GetGlobalFlag(GlobalFlags::debugCompile))
+                {
+                    LogMessage(data->rootModule->LogStreamId(), CurrentCompileDebugMsStr() + " end generating code for compile unit " + std::to_string(compileUnitIndex) + 
+                        " of " + std::to_string(data->boundCompileUnits.size()));
+                }
+                std::lock_guard<std::mutex> lock(data->mtx);
+                data->objectFilePaths.push_back(compileUnit->ObjectFilePath());
+                data->boundCompileUnits[compileUnitIndex].reset();
+                data->output.Put(compileUnitIndex);
+            }
+        }
+    }
+    catch (...)
+    {
+        std::exception_ptr exception = std::current_exception();
+        if (threadId >= 0 && threadId < data->exceptions.size())
+        {
+            data->exceptions[threadId] = exception;
+        }
+        data->stop = true;
+    }
+}
+
+void CompileMultiThreaded(Project* project, Module* rootModule, std::vector<std::unique_ptr<BoundCompileUnit>>& boundCompileUnits, std::vector<std::string>& objectFilePaths, 
+    bool& stop)
+{
+    int numThreads = std::thread::hardware_concurrency();
+    if (numThreads <= 0)
+    {
+        numThreads = 1;
+    }
+    if (GetGlobalFlag(GlobalFlags::verbose))
+    {
+        LogMessage(project->LogStreamId(), "Compiling using " + std::to_string(numThreads) + " threads...");
+    }
+    compileDebugStart = CurrentMs();
+    rootModule->StartBuild();
+    bool ready = false;
+    CompileQueue input("input", stop, ready, rootModule->LogStreamId());
+    CompileQueue output("output", stop, ready, rootModule->LogStreamId());
+    CompileData compileData(rootModule, boundCompileUnits, objectFilePaths, stop, ready, numThreads, input, output);
+    std::vector<std::thread> threads;
+    for (int i = 0; i < numThreads; ++i)
+    {
+        threads.push_back(std::thread{ GenerateCode, &compileData, i });
+    }
+    int n = boundCompileUnits.size();
+    for (int i = 0; i < n; ++i)
+    {
+        BoundCompileUnit* compileUnit = boundCompileUnits[i].get();
+        if (GetGlobalFlag(GlobalFlags::verbose))
+        {
+            LogMessage(rootModule->LogStreamId(), "> " + compileUnit->GetCompileUnitNode()->FilePath());
+        }
+        if (GetGlobalFlag(GlobalFlags::debugCompile))
+        {
+            LogMessage(rootModule->LogStreamId(), CurrentCompileDebugMsStr() + " begin bind statements of compile unit " + std::to_string(i) + " of " + std::to_string(n));
+        }
+        try
+        {
+            BindStatements(*compileUnit);
+            if (compileUnit->HasGotos())
+            {
+                AnalyzeControlFlow(*compileUnit);
+            }
+            compileUnit->SetImmutable();
+        }
+        catch (...)
+        {
+            stop = true;
+            for (int i = 0; i < numThreads; ++i)
+            {
+                input.Put(-1);
+            }
+            for (int i = 0; i < numThreads; ++i)
+            {
+                if (threads[i].joinable())
+                {
+                    threads[i].join();
+                }
+            }
+            throw;
+        }
+        if (GetGlobalFlag(GlobalFlags::debugCompile))
+        {
+            LogMessage(rootModule->LogStreamId(), CurrentCompileDebugMsStr() + " end bind statements of compile unit " + std::to_string(i) + " of " + std::to_string(n));
+        }
+        input.Put(i);
+    }
+    int numOutputsReceived = 0;
+    while (numOutputsReceived < n && !stop)
+    {
+        int compileUnitIndex = output.Get();
+        if (numOutputsReceived != -1)
+        {
+            ++numOutputsReceived;
+        }
+    }
+    ready = true;
+    for (int i = 0; i < numThreads; ++i)
+    {
+        input.Put(-1);
+    }
+    for (int i = 0; i < numThreads; ++i)
+    {
+        if (threads[i].joinable())
+        {
+            threads[i].join();
+        }
+    }
+    for (int i = 0; i < numThreads; ++i)
+    {
+        if (compileData.exceptions[i])
+        {
+            std::rethrow_exception(compileData.exceptions[i]);
+        }
+    }
+    rootModule->StopBuild();
+    if (GetGlobalFlag(GlobalFlags::verbose))
+    {
+        LogMessage(rootModule->LogStreamId(), ToUtf8(rootModule->Name()) + " compilation time: " + FormatTimeMs(rootModule->GetBuildTimeMs()));
+    }
+}
+
 void BuildProject(Project* project, std::unique_ptr<Module>& rootModule, bool& stop, bool resetRootModule)
 {
     bool systemLibraryInstalled = false;
@@ -923,6 +1211,8 @@ void BuildProject(Project* project, std::unique_ptr<Module>& rootModule, bool& s
         AttributeBinder attributeBinder(rootModule.get());
         std::vector<ClassTypeSymbol*> classTypes;
         std::vector<ClassTemplateSpecializationSymbol*> classTemplateSpecializations;
+        bool prevPreparing = rootModule->Preparing();
+        rootModule->SetPreparing(true);
         PrepareModuleForCompilation(rootModule.get(), project->References()); 
         CreateSymbols(rootModule->GetSymbolTable(), compileUnits, stop);
         if (GetGlobalFlag(GlobalFlags::sym2xml))
@@ -948,6 +1238,7 @@ void BuildProject(Project* project, std::unique_ptr<Module>& rootModule, bool& s
         {
             return;
         }
+        rootModule->SetPreparing(prevPreparing);
         if (GetGlobalFlag(GlobalFlags::sym2xml))
         {
             std::unique_ptr<dom::Document> symbolTableDoc = rootModule->GetSymbolTable().ToDomDocument();
@@ -957,49 +1248,16 @@ void BuildProject(Project* project, std::unique_ptr<Module>& rootModule, bool& s
             formatter.SetIndentSize(1);
             symbolTableDoc->Write(formatter);
         }
+        std::unordered_map<int, cmdoclib::File> docFileMap;
         EmittingContext emittingContext;
         std::vector<std::string> objectFilePaths;
-        if (GetGlobalFlag(GlobalFlags::verbose))
+        if (GetGlobalFlag(GlobalFlags::singleThreadedCompile))
         {
-            LogMessage(project->LogStreamId(), "Compiling...");
+            CompileSingleThreaded(project, rootModule.get(), boundCompileUnits, emittingContext, objectFilePaths, docFileMap, stop);
         }
-        std::unordered_map<int, cmdoclib::File> docFileMap;
-        int32_t compileUnitIndex = 0;
-        for (std::unique_ptr<BoundCompileUnit>& boundCompileUnit : boundCompileUnits)
+        else
         {
-            if (stop)
-            {
-                return;
-            }
-            if (GetGlobalFlag(GlobalFlags::verbose))
-            {
-                LogMessage(project->LogStreamId(), "> " + boost::filesystem::path(boundCompileUnit->GetCompileUnitNode()->FilePath()).filename().generic_string());
-            }
-            BindStatements(*boundCompileUnit);
-            if (boundCompileUnit->HasGotos())
-            {
-                AnalyzeControlFlow(*boundCompileUnit);
-            }
-            if (GetGlobalFlag(GlobalFlags::bdt2xml))
-            {
-                std::unique_ptr<dom::Document> bdtDoc = cmajor::bdt2dom::GenerateBdtDocument(boundCompileUnit.get());
-                std::string bdtXmlFilePath = Path::ChangeExtension(boundCompileUnit->GetCompileUnitNode()->FilePath(), ".bdt.xml");
-                std::ofstream bdtXmlFile(bdtXmlFilePath);
-                CodeFormatter formatter(bdtXmlFile);
-                formatter.SetIndentSize(1);
-                bdtDoc->Write(formatter);
-            }
-            if (GetGlobalFlag(GlobalFlags::cmdoc))
-            {
-                cmdoclib::GenerateSourceCode(project, boundCompileUnit.get(), docFileMap);
-            }
-            else
-            {
-                GenerateCode(emittingContext, *boundCompileUnit);
-                objectFilePaths.push_back(boundCompileUnit->ObjectFilePath());
-            }
-            boundCompileUnit.reset();
-            ++compileUnitIndex;
+            CompileMultiThreaded(project, rootModule.get(), boundCompileUnits, objectFilePaths, stop);
         }
         if (GetGlobalFlag(GlobalFlags::cmdoc))
         {
@@ -1033,7 +1291,6 @@ void BuildProject(Project* project, std::unique_ptr<Module>& rootModule, bool& s
             if (project->GetTarget() == Target::program)
             {
                 Link(project->ExecutableFilePath(), project->LibraryFilePath(), rootModule->LibraryFilePaths(), *rootModule);
-                CreateClassFile(project->ExecutableFilePath(), rootModule->GetSymbolTable());
             }
             if (GetGlobalFlag(GlobalFlags::verbose))
             {
@@ -1104,7 +1361,7 @@ bool buildDebug = false;
 const int buildGetTimeoutSecs = 3;
 int64_t buildDebugStart = 0;
 
-std::string CurrentMsStr()
+std::string CurrentProjectDebugMsStr()
 {
     return FormatTimeMs(static_cast<int32_t>(CurrentMs() - buildDebugStart));
 }
@@ -1132,14 +1389,14 @@ void ProjectQueue::Put(Project* project)
     if (buildDebug)
     {
         std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
-        LogMessage(-1, CurrentMsStr() + ">ProjectQueue(" + name + ")::Put: " + CurrentThreadIdStr() + " " + ToUtf8(project->Name())); 
+        LogMessage(-1, CurrentProjectDebugMsStr() + ">ProjectQueue(" + name + ")::Put: " + CurrentThreadIdStr() + " " + ToUtf8(project->Name())); 
     }
     std::lock_guard<std::mutex> lock(mtx);
     queue.push_back(project);
     cond.notify_one();
     if (buildDebug)
     {
-        LogMessage(-1, CurrentMsStr() + "<ProjectQueue(" + name + ")::Put: " + CurrentThreadIdStr() + " " + ToUtf8(project->Name()));
+        LogMessage(-1, CurrentProjectDebugMsStr() + "<ProjectQueue(" + name + ")::Put: " + CurrentThreadIdStr() + " " + ToUtf8(project->Name()));
     }
 }
 
@@ -1149,7 +1406,7 @@ Project* ProjectQueue::Get()
     {
         if (buildDebug)
         {
-            LogMessage(-1, CurrentMsStr() + ">ProjectQueue(" + name + ")::Get: " + CurrentThreadIdStr());
+            LogMessage(-1, CurrentProjectDebugMsStr() + ">ProjectQueue(" + name + ")::Get: " + CurrentThreadIdStr());
         }
         std::unique_lock<std::mutex> lock(mtx);
         if (cond.wait_for(lock, std::chrono::duration<std::uint64_t>(std::chrono::seconds(buildGetTimeoutSecs)), [this]{ return stop || !queue.empty(); }))
@@ -1159,7 +1416,7 @@ Project* ProjectQueue::Get()
             queue.pop_front();
             if (buildDebug)
             {
-                LogMessage(-1, CurrentMsStr() + "<ProjectQueue(" + name + ")::Get: " + CurrentThreadIdStr() + " got project " + ToUtf8(project->Name()));
+                LogMessage(-1, CurrentProjectDebugMsStr() + "<ProjectQueue(" + name + ")::Get: " + CurrentThreadIdStr() + " got project " + ToUtf8(project->Name()));
             }
             return project;
         }
@@ -1167,14 +1424,14 @@ Project* ProjectQueue::Get()
         {
             if (buildDebug)
             {
-                LogMessage(-1, CurrentMsStr() + "<ProjectQueue(" + name + ")::Get: " + CurrentThreadIdStr() + " timeout");
+                LogMessage(-1, CurrentProjectDebugMsStr() + "<ProjectQueue(" + name + ")::Get: " + CurrentThreadIdStr() + " timeout");
             }
             return nullptr;
         }
     }
     if (buildDebug)
     {
-        LogMessage(-1, CurrentMsStr() + "<ProjectQueue(" + name + ")::Get: " + CurrentThreadIdStr() + " stop");
+        LogMessage(-1, CurrentProjectDebugMsStr() + "<ProjectQueue(" + name + ")::Get: " + CurrentThreadIdStr() + " stop");
     }
     return nullptr;
 }
@@ -1218,14 +1475,14 @@ void ProjectBuilder(BuildData* buildData)
     {
         if (buildDebug)
         {
-            LogMessage(-1, CurrentMsStr() + ">ProjectBuilder()::catch " + CurrentThreadIdStr());
+            LogMessage(-1, CurrentProjectDebugMsStr() + ">ProjectBuilder()::catch " + CurrentThreadIdStr());
         }
         std::lock_guard<std::mutex> lock(buildData->exceptionMutex);
         buildData->exceptions.push_back(std::current_exception());
         buildData->stop = true;
         if (buildDebug)
         {
-            LogMessage(-1, CurrentMsStr() + "<ProjectBuilder()::catch " + CurrentThreadIdStr());
+            LogMessage(-1, CurrentProjectDebugMsStr() + "<ProjectBuilder()::catch " + CurrentThreadIdStr());
         }
     }
 }
@@ -1388,6 +1645,10 @@ void BuildSolution(const std::string& solutionFilePath, std::vector<std::unique_
             }
             stopBuild = true;
             int numStartedThreads = threads.size();
+            for (int i = 0; i < numStartedThreads; ++i)
+            {
+                buildQueue.Put(nullptr);
+            }
             for (int i = 0; i < numStartedThreads; ++i)
             {
                 if (threads[i].joinable())

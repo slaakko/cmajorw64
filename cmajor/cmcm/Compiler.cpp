@@ -210,6 +210,11 @@ extern "C" int Compile(const char16_t* compileXmlRequest)
         {
             cmajor::symbols::SetGlobalFlag(cmajor::symbols::GlobalFlags::verbose);
         }
+        bool clean = compileRequestElement->GetAttribute(U"clean") == U"true";
+        if (clean)
+        {
+            cmajor::symbols::SetGlobalFlag(cmajor::symbols::GlobalFlags::clean);
+        }
         bool time = compileRequestElement->GetAttribute(U"time") == U"true";
         bool strictNothrow = compileRequestElement->GetAttribute(U"strict-nothrow") == U"true";
         if (strictNothrow)
@@ -235,6 +240,11 @@ extern "C" int Compile(const char16_t* compileXmlRequest)
         if (linkUsingMsLink)
         {
             cmajor::symbols::SetGlobalFlag(cmajor::symbols::GlobalFlags::linkUsingMsLink);
+        }
+        bool singleThreadedCompile = compileRequestElement->GetAttribute(U"single-threaded-compile") == U"true";
+        if (singleThreadedCompile)
+        {
+            cmajor::symbols::SetGlobalFlag(cmajor::symbols::GlobalFlags::singleThreadedCompile); 
         }
         std::string optimizationLevelStr = ToUtf8(compileRequestElement->GetAttribute(U"optimization-level"));
         if (!optimizationLevelStr.empty())

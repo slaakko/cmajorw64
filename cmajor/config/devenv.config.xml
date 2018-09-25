@@ -3,40 +3,44 @@
     <cmc>cmc.exe</cmc>
     <tabSize>4</tabSize>
     <infoDelaySecs>10</infoDelaySecs>
-    <formSizeX>1858</formSizeX>
+    <formSizeX>1829</formSizeX>
     <formSizeY>1010</formSizeY>
     <formTop>28</formTop>
     <formLeft>27</formLeft>
-    <textVisX>182</textVisX>
-    <textVisY>182</textVisY>
+    <textVisX>234</textVisX>
+    <textVisY>234</textVisY>
     <textVisW>1637</textVisW>
     <textVisH>740</textVisH>
     <toolColWidth>97</toolColWidth>
     <categoryColWidth>80</categoryColWidth>
-    <descriptionColWidth>685</descriptionColWidth>
+    <descriptionColWidth>837</descriptionColWidth>
     <fileColWidth>246</fileColWidth>
     <lineColWidth>60</lineColWidth>
     <projectColWidth>145</projectColWidth>
     <textColWidth>308</textColWidth>
     <findFileColWidth>688</findFileColWidth>
     <findLineColWidth>85</findLineColWidth>
-    <findProjectColWidth>183</findProjectColWidth>
+    <findProjectColWidth>327</findProjectColWidth>
     <findTextColWidth>738</findTextColWidth>
-    <horizontalSplitterPos>1397</horizontalSplitterPos>
+    <horizontalSplitterPos>1374</horizontalSplitterPos>
     <verticalSplitterPos>556</verticalSplitterPos>
     <windowState>Normal</windowState>
     <maxRecentProjects>10</maxRecentProjects>
     <recentProjects>
         <recentProject>
-            <path>C:\Users\Seppo\cmajorw64\cmajor\projects\examples\examples.cms</path>
-            <openFiles />
-        </recentProject>
-        <recentProject>
             <path>C:\Users\Seppo\cmajorw64\cmajor\projects\tools\cmparsergen\cmparsergen.cms</path>
             <openFiles />
         </recentProject>
         <recentProject>
+            <path>C:\Users\Seppo\cmajorw64\cmajor\projects\examples\examples.cms</path>
+            <openFiles />
+        </recentProject>
+        <recentProject>
             <path>C:\Users\Seppo\cmajorw64\cmajor\system\System.cms</path>
+            <openFiles />
+        </recentProject>
+        <recentProject>
+            <path>C:/Users/Seppo/cmajorw64/cmajor/test/is/is.cms</path>
             <openFiles />
         </recentProject>
         <recentProject>
@@ -61,10 +65,6 @@
         </recentProject>
         <recentProject>
             <path>C:\Users\Seppo\cmajorw64\cmajor\doc\code\http\httpClients.cms</path>
-            <openFiles />
-        </recentProject>
-        <recentProject>
-            <path>C:\Users\Seppo\cmajorw64\cmajor\doc\code\compression\compression.cms</path>
             <openFiles />
         </recentProject>
     </recentProjects>

@@ -152,7 +152,7 @@ namespace System
         return resultLen;
     }
 
-    public nothrow inline long MemGrow(long size)
+    public nothrow long MemGrow(long size)
     {
         if (size < 8)
         {

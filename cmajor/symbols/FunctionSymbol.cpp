@@ -43,6 +43,30 @@ bool FunctionSymbolsEqual::operator()(FunctionSymbol* left, FunctionSymbol* righ
             }
         }
     }
+    else if (left->IsTemplateSpecialization() && right->IsTemplateSpecialization())
+    {
+        if (left->FunctionTemplate() == right->FunctionTemplate())
+        {
+            int n = left->TemplateArgumentTypes().size();
+            if (right->TemplateArgumentTypes().size() == n)
+            {
+                bool equal = true;
+                for (int i = 0; i < n; ++i)
+                {
+                    if (!TypesEqual(left->TemplateArgumentTypes()[i], right->TemplateArgumentTypes()[i]))
+                    {
+                        equal = false;
+                        break;
+                    }
+                }
+                return equal;
+            }
+        }
+    }
+    else if (GetGlobalFlag(GlobalFlags::release) && !left->IsGeneratedFunction() && left->IsInline() && !right->IsGeneratedFunction() && right->IsInline())
+    {
+        return left->FunctionId() == right->FunctionId();
+    }
     return left == right;
 }
 
@@ -52,6 +76,20 @@ size_t FunctionSymbolHash::operator()(FunctionSymbol* fun) const
     {
         ClassTemplateSpecializationSymbol* specialization = static_cast<ClassTemplateSpecializationSymbol*>(fun->Parent());
         return boost::hash<boost::uuids::uuid>()(specialization->TypeId()) ^ fun->GetIndex();
+    }
+    else if (fun->IsTemplateSpecialization())
+    {
+        size_t hashValue = boost::hash<boost::uuids::uuid>()(fun->FunctionTemplate()->FunctionId());
+        int n = fun->TemplateArgumentTypes().size();
+        for (int i = 0; i < n; ++i)
+        {
+            hashValue ^= boost::hash<boost::uuids::uuid>()(fun->TemplateArgumentTypes()[i]->TypeId());
+        }
+        return hashValue;
+    }
+    else if (GetGlobalFlag(GlobalFlags::release) && !fun->IsGeneratedFunction() && fun->IsInline())
+    {
+        return boost::hash<boost::uuids::uuid>()(fun->FunctionId());
     }
     return std::hash<FunctionSymbol*>()(fun);
 }
@@ -234,14 +272,6 @@ std::string FunctionSymbolFlagStr(FunctionSymbolFlags flags)
     {
         s.append("inline");
     }
-    if ((flags & FunctionSymbolFlags::external_) != FunctionSymbolFlags::none)
-    {
-        if (!s.empty())
-        {
-            s.append(1, ' ');
-        }
-        s.append("extern");
-    }
     if ((flags & FunctionSymbolFlags::constExpr) != FunctionSymbolFlags::none)
     {
         if (!s.empty())
@@ -310,14 +340,16 @@ std::string FunctionSymbolFlagStr(FunctionSymbolFlags flags)
 }
 
 FunctionSymbol::FunctionSymbol(const Span& span_, const std::u32string& name_) : 
-    ContainerSymbol(SymbolType::functionSymbol, span_, name_), functionTemplate(nullptr), functionId(boost::uuids::nil_generator()()), groupName(), parameters(), localVariables(), 
+    ContainerSymbol(SymbolType::functionSymbol, span_, name_), functionTemplate(nullptr), master(nullptr),
+    functionId(boost::uuids::nil_generator()()), groupName(), parameters(), localVariables(), 
     returnType(), flags(FunctionSymbolFlags::none), index(-1), vmtIndex(-1), imtIndex(-1),
     nextTemporaryIndex(0), functionGroup(nullptr), isProgramMain(false)
 {
 }
 
 FunctionSymbol::FunctionSymbol(SymbolType symbolType_, const Span& span_, const std::u32string& name_) : 
-    ContainerSymbol(symbolType_, span_, name_), functionTemplate(nullptr), functionId(boost::uuids::nil_generator()()), groupName(), parameters(), localVariables(), 
+    ContainerSymbol(symbolType_, span_, name_), functionTemplate(nullptr), master(nullptr),
+    functionId(boost::uuids::nil_generator()()), groupName(), parameters(), localVariables(), 
     returnType(), flags(FunctionSymbolFlags::none), index(-1), vmtIndex(-1), imtIndex(-1),
     nextTemporaryIndex(0), functionGroup(nullptr), isProgramMain(false)
 {
@@ -482,17 +514,13 @@ void FunctionSymbol::AddMember(Symbol* member)
     }
 }
 
-void FunctionSymbol::SetGlobalNs(std::unique_ptr<Node>&& globalNs_)
-{
-    globalNs = std::move(globalNs_);
-}
-
 bool FunctionSymbol::IsExportSymbol() const
 {
     
     if (IsTemplateSpecialization() && Parent()->GetSymbolType() != SymbolType::classTemplateSpecializationSymbol) return false;
     if (IsGeneratedFunction()) return false;
     if (intrinsic) return false;
+    if (IsCopy()) return false;
     return ContainerSymbol::IsExportSymbol();
 }
 

@@ -1,3 +1,3 @@
 @echo off
-cmunit cmajor.cms
-cmunit --config=release cmajor.cms
+cmunit --verbose cmajor.cms
+cmunit --verbose --config=release cmajor.cms

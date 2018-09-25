@@ -36,7 +36,9 @@ enum class GlobalFlags : uint32_t
     sym2xml = 1 << 18,
     bdt2xml = 1 << 19,
     cmdoc = 1 << 20,
-    optimizeCmDoc = 1 << 21
+    optimizeCmDoc = 1 << 21,
+    singleThreadedCompile = 1 << 22,
+    debugCompile = 1 << 23
 };
 
 void ResetGlobalFlags();

@@ -90,6 +90,14 @@ std::string SymbolFlagStr(SymbolFlags symbolFlags, bool noAccess)
         }
         s.append("static");
     }
+    if ((symbolFlags & SymbolFlags::external) != SymbolFlags::none)
+    {
+        if (!s.empty())
+        {
+            s.append(1, ' ');
+        }
+        s.append("extern");
+    }
     if ((symbolFlags & SymbolFlags::nothrow_) != SymbolFlags::none)
     {
         if (!s.empty())

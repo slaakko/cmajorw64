@@ -271,13 +271,9 @@ void StatementBinder::Visit(ClassNode& classNode)
     boundCompileUnit.GetAttributeBinder()->GenerateImplementation(classNode.GetAttributes(), symbol, this);
     boundCompileUnit.AddBoundNode(std::move(boundClass));
     DestructorSymbol* destructorSymbol = classTypeSymbol->Destructor();
-    if (destructorSymbol && !GetGlobalFlag(GlobalFlags::info))
+    if (destructorSymbol && destructorSymbol->IsProject() && destructorSymbol->IsGeneratedFunction() && !GetGlobalFlag(GlobalFlags::info))
     {
-        Node* node = symbolTable.GetNodeNoThrow(destructorSymbol);
-        if (!node)
-        {
-            GenerateDestructorImplementation(currentClass, destructorSymbol, boundCompileUnit, containerScope, currentFunction, classNode.GetSpan());
-        }
+        GenerateDestructorImplementation(currentClass, destructorSymbol, boundCompileUnit, containerScope, currentFunction, classNode.GetSpan());
     }
     currentClass = prevClass;
     containerScope = prevContainerScope;

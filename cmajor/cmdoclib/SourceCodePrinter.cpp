@@ -2441,8 +2441,11 @@ void SourceCodePrinter::Visit(ConstantNode& constantNode)
     Keyword(U"const");
     constantNode.TypeExpr()->Accept(*this);
     constantNode.Id()->Accept(*this);
-    Other(U" = ");
-    constantNode.Value()->Accept(*this);
+    if (constantNode.Value())
+    {
+        Other(U" = ");
+        constantNode.Value()->Accept(*this);
+    }
     Other(U";");
 }
 

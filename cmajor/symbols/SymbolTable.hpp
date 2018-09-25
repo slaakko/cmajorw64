@@ -117,7 +117,7 @@ public:
     NamespaceSymbol* BeginNamespace(const std::u32string& namespaceName, const Span& span);
     void EndNamespace();
     void BeginFunction(FunctionNode& functionNode, int32_t functionIndex);
-    void EndFunction();
+    void EndFunction(bool addMember);
     void AddParameter(ParameterNode& parameterNode);
     void BeginClass(ClassNode& classNode);
     void EndClass();
@@ -128,15 +128,15 @@ public:
     void BeginInterface(InterfaceNode& interfaceNode);
     void EndInterface();
     void BeginStaticConstructor(StaticConstructorNode& staticConstructorNode, int32_t functionIndex);
-    void EndStaticConstructor();
+    void EndStaticConstructor(bool addMember);
     void BeginConstructor(ConstructorNode& constructorNode, int32_t functionIndex);
-    void EndConstructor();
+    void EndConstructor(bool addMember);
     void BeginDestructor(DestructorNode& destructorNode, int32_t functionIndex);
-    void EndDestructor();
+    void EndDestructor(bool addMember);
     void BeginMemberFunction(MemberFunctionNode& memberFunctionNode, int32_t functionIndex);
-    void EndMemberFunction();
+    void EndMemberFunction(bool addMember);
     void BeginConversionFunction(ConversionFunctionNode& conversionFunctionNode, int32_t functionIndex);
-    void EndConversionFunction();
+    void EndConversionFunction(bool addMember);
     void AddMemberVariable(MemberVariableNode& memberVariableNode);
     void BeginDelegate(DelegateNode& delegateNode);
     void EndDelegate();
@@ -193,6 +193,8 @@ public:
     const std::unordered_set<std::u32string>& JsonClasses() const { return jsonClasses; }
     std::vector<TypeSymbol*> Types() const;
     void Copy(const SymbolTable& that);
+    ClassTypeSymbol* CurrentClass() { return currentClass; }
+    void SetCurrentClass(ClassTypeSymbol* currentClass_) { currentClass = currentClass_; }
     void SetCurrentFunctionSymbol(FunctionSymbol* currentFunctionSymbol_) { currentFunctionSymbol = currentFunctionSymbol_; }
     void MapProfiledFunction(const boost::uuids::uuid& functionId, const std::u32string& profiledFunctionName);
     std::u32string GetProfiledFunctionName(const boost::uuids::uuid& functionId) const;
@@ -211,6 +213,7 @@ public:
     int NumSpecializationsNew() const { return numSpecializationsNew; }
     int NumSpecializationsCopied() const { return numSpecializationsCopied; }
     void Check();
+    FunctionSymbol* GetCreatedFunctionSymbol() { return createdFunctionSymbol; }
 private:
     Module* module;
     std::vector<boost::uuids::uuid> derivationIds;
@@ -225,6 +228,7 @@ private:
     std::stack<ContainerSymbol*> containerStack;
     FunctionSymbol* mainFunctionSymbol;
     FunctionSymbol* currentFunctionSymbol;
+    FunctionSymbol* createdFunctionSymbol;
     int parameterIndex;
     int declarationBlockIndex;
     std::unordered_map<NamespaceSymbol*, NamespaceSymbol*> nsMap;
@@ -256,8 +260,6 @@ private:
 };
 
 void InitCoreSymbolTable(SymbolTable& symbolTable);
-
-void CreateClassFile(const std::string& executableFilePath, SymbolTable& symbolTable);
 
 void InitSymbolTable();
 void DoneSymbolTable();

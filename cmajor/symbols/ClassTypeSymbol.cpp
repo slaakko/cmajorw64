@@ -14,8 +14,13 @@
 #include <cmajor/symbols/TemplateSymbol.hpp>
 #include <cmajor/symbols/Module.hpp>
 #include <cmajor/symbols/SymbolCollector.hpp>
+#include <cmajor/ast/Literal.hpp>
+#include <cmajor/ast/TypeExpr.hpp>
+#include <cmajor/ast/BasicType.hpp>
 #include <cmajor/util/Unicode.hpp>
 #include <cmajor/util/Sha1.hpp>
+#include <cmajor/util/Uuid.hpp>
+#include <cmajor/util/Prime.hpp>
 #include <llvm/IR/Module.h>
 #include <boost/uuid/uuid_generators.hpp>
 #include <boost/uuid/uuid_io.hpp>
@@ -121,7 +126,7 @@ void ClassTypeSymbol::Write(SymbolWriter& writer)
 {
     TypeSymbol::Write(writer);
     writer.GetBinaryWriter().Write(groupName);
-    writer.GetBinaryWriter().Write(static_cast<uint16_t>(flags)); 
+    writer.GetBinaryWriter().Write(static_cast<uint8_t>(flags));
     writer.GetBinaryWriter().Write(static_cast<int32_t>(minArity));
     if (IsClassTemplate())
     {
@@ -217,7 +222,7 @@ void ClassTypeSymbol::Read(SymbolReader& reader)
 {
     TypeSymbol::Read(reader);
     groupName = reader.GetBinaryReader().ReadUtf32String();
-    flags = static_cast<ClassTypeSymbolFlags>(reader.GetBinaryReader().ReadUShort());
+    flags = static_cast<ClassTypeSymbolFlags>(reader.GetBinaryReader().ReadByte());
     minArity = reader.GetBinaryReader().ReadInt();
     if (IsClassTemplate())
     {
@@ -692,6 +697,10 @@ void ClassTypeSymbol::CreateDestructorSymbol()
             destructor->SetLinkOnceOdrLinkage();
         }
         destructor->ComputeName();
+        if (destructor->MangledName() == U"destructor_ValueObject_double_E64FAD6BB508658F24C2C96F30904D9DC646E9BB")
+        {
+            int x = 0;
+        }
     }
 }
 
@@ -1411,23 +1420,30 @@ llvm::Value* ClassTypeSymbol::VmtObject(Emitter& emitter, bool create)
         emitter.SetVmtObjectCreated(this);
         std::string vmtObjectName = VmtObjectName(emitter);
         llvm::Comdat* comdat = emitter.Module()->getOrInsertComdat(vmtObjectName);
-        GetModule()->AddExportedData(vmtObjectName);
+        GetRootModuleForCurrentThread()->AddExportedData(vmtObjectName);
         comdat->setSelectionKind(llvm::Comdat::SelectionKind::Any);
         llvm::GlobalVariable* vmtObjectGlobal = llvm::cast<llvm::GlobalVariable>(vmtObject);
         vmtObjectGlobal->setComdat(comdat);
         std::vector<llvm::Constant*> vmtArray;
-        vmtArray.push_back(llvm::Constant::getNullValue(emitter.Builder().getInt8PtrTy()));
-        llvm::Value* className = emitter.Builder().CreateGlobalStringPtr(ToUtf8(FullName()));
-        vmtArray.push_back(llvm::cast<llvm::Constant>(emitter.Builder().CreateBitCast(className, emitter.Builder().getInt8PtrTy())));
+        vmtArray.push_back(llvm::Constant::getNullValue(emitter.Builder().getInt8PtrTy())); // 64-bit class id, initially 0, dynamically initialized
+        uint64_t typeId1 = 0;
+        uint64_t typeId2 = 0;
+        UuidToInts(TypeId(), typeId1, typeId2);
+//      16-byte type id:
+        vmtArray.push_back(llvm::cast<llvm::Constant>(emitter.Builder().CreateIntToPtr(emitter.Builder().getInt64(typeId1), emitter.Builder().getInt8PtrTy())));
+        vmtArray.push_back(llvm::cast<llvm::Constant>(emitter.Builder().CreateIntToPtr(emitter.Builder().getInt64(typeId2), emitter.Builder().getInt8PtrTy())));
+        llvm::Value* className = emitter.Builder().CreateGlobalStringPtr(ToUtf8(FullName())); 
+        vmtArray.push_back(llvm::cast<llvm::Constant>(emitter.Builder().CreateBitCast(className, emitter.Builder().getInt8PtrTy()))); // class name pointer
         if (!implementedInterfaces.empty())
         {
             llvm::Value* itabsArrayObject = CreateImts(emitter);
-            vmtArray.push_back(llvm::cast<llvm::Constant>(emitter.Builder().CreateBitCast(itabsArrayObject, emitter.Builder().getInt8PtrTy())));
+            vmtArray.push_back(llvm::cast<llvm::Constant>(emitter.Builder().CreateBitCast(itabsArrayObject, emitter.Builder().getInt8PtrTy()))); // interface method table pointer
         }
         else
         {
             vmtArray.push_back(llvm::Constant::getNullValue(emitter.Builder().getInt8PtrTy()));
         }
+//      virtual method table:
         int n = vmt.size();
         for (int i = 0; i < n; ++i)
         {
@@ -1454,6 +1470,7 @@ llvm::Value* ClassTypeSymbol::StaticObject(Emitter& emitter, bool create)
     if (!emitter.IsStaticObjectCreated(this) && create)
     {
         emitter.SetStaticObjectCreated(this);
+        //this->SetStaticObjectCreated(); 
         llvm::GlobalVariable* staticObjectGlobal = llvm::cast<llvm::GlobalVariable>(staticObject);
         std::vector<llvm::Constant*> arrayOfStatics;
         for (TypeSymbol* type : staticLayout)
@@ -1524,6 +1541,167 @@ void ClassTypeSymbol::Check()
     {
         throw SymbolCheckException(GetRootModuleForCurrentThread(), "class type symbol has empty group name", GetSpan());
     }
+}
+
+struct ClassInfo
+{
+    ClassInfo() : cls(nullptr), baseClassInfo(nullptr), level(0), key(0), id(0) {}
+    ClassInfo(ClassTypeSymbol* cls_) : cls(cls_), baseClassInfo(nullptr), level(0), key(0), id(0) {}
+    ClassTypeSymbol* cls;
+    ClassInfo* baseClassInfo;
+    int level;
+    uint64_t key;
+    uint64_t id;
+};
+
+void ResolveBaseClasses(std::unordered_map<boost::uuids::uuid, ClassInfo, boost::hash<boost::uuids::uuid>>& classIdMap)
+{
+    for (auto& p : classIdMap)
+    {
+        ClassInfo& info = p.second;
+        ClassTypeSymbol* baseClass = info.cls->BaseClass();
+        if (baseClass)
+        {
+            auto it = classIdMap.find(baseClass->TypeId());
+            if (it != classIdMap.cend())
+            {
+                ClassInfo* baseClassInfo = &it->second;
+                info.baseClassInfo = baseClassInfo;
+            }
+            else
+            {
+                throw Exception(GetRootModuleForCurrentThread(), "internal error: could not resolve base class info for class '" + ToUtf8(info.cls->FullName()) + "'",
+                    info.cls->GetSpan());
+            }
+        }
+    }
+}
+
+int NumberOfAncestors(ClassInfo& cls)
+{
+    int numAncestors = 0;
+    ClassInfo* baseClass = cls.baseClassInfo;
+    while (baseClass)
+    {
+        ++numAncestors;
+        baseClass = baseClass->baseClassInfo;
+    }
+    return numAncestors;
+}
+
+void AssignLevels(std::unordered_map<boost::uuids::uuid, ClassInfo, boost::hash<boost::uuids::uuid>>& classIdMap)
+{
+    for (auto& p : classIdMap)
+    {
+        ClassInfo& cls = p.second;
+        cls.level = NumberOfAncestors(cls);
+    }
+}
+
+struct PriorityGreater
+{
+    bool operator()(ClassInfo* left, ClassInfo* right) const
+    {
+        if (left->level < right->level) return true;
+        return false;
+    }
+};
+
+std::vector<ClassInfo*> GetClassesByPriority(std::unordered_map<boost::uuids::uuid, ClassInfo, boost::hash<boost::uuids::uuid>>& classIdMap)
+{
+    std::vector<ClassInfo*> classesByPriority;
+    for (auto& p : classIdMap)
+    {
+        ClassInfo* cls = &p.second;
+        classesByPriority.push_back(cls);
+    }
+    std::sort(classesByPriority.begin(), classesByPriority.end(), PriorityGreater());
+    return classesByPriority;
+}
+
+void AssignKeys(std::vector<ClassInfo*>& classesByPriority)
+{
+    uint64_t key = 2;
+    for (ClassInfo* cls : classesByPriority)
+    {
+        cls->key = key;
+        key = NextPrime(key + 1);
+    }
+}
+
+uint64_t ComputeClassId(ClassInfo* cls)
+{
+    uint64_t classId = cls->key;
+    ClassInfo* baseClass = cls->baseClassInfo;
+    while (baseClass)
+    {
+        classId *= baseClass->key;
+        baseClass = baseClass->baseClassInfo;
+    }
+    if (classId == 0)
+    {
+        throw std::runtime_error("internal error assigning class id's: invalid resulting class id 0");
+    }
+    return classId;
+}
+
+void AssignClassIds(std::vector<ClassInfo*>& classesByPriority)
+{
+    for (ClassInfo* cls : classesByPriority)
+    {
+        cls->id = ComputeClassId(cls);
+    }
+}
+
+ConstantNode* MakePolymorphicClassArray(const std::unordered_set<ClassTypeSymbol*>& polymorphicClasses, const std::u32string& arrayName)
+{
+    std::unordered_map<boost::uuids::uuid, ClassInfo, boost::hash<boost::uuids::uuid>> classIdMap;
+    for (ClassTypeSymbol* cls : polymorphicClasses)
+    {
+        classIdMap[cls->TypeId()] = ClassInfo(cls);
+    }
+    ResolveBaseClasses(classIdMap);
+    AssignLevels(classIdMap);
+    std::vector<ClassInfo*> classesByPriority = GetClassesByPriority(classIdMap);
+    AssignKeys(classesByPriority);
+    AssignClassIds(classesByPriority);
+    ArrayLiteralNode* polymorphicClassArrayLiteral = new ArrayLiteralNode(Span());
+    for (ClassInfo* info : classesByPriority)
+    {
+        const boost::uuids::uuid& typeId = info->cls->TypeId();
+        uint64_t typeId1 = 0;
+        uint64_t typeId2 = 0;
+        UuidToInts(typeId, typeId1, typeId2);
+        polymorphicClassArrayLiteral->AddValue(new ULongLiteralNode(Span(), typeId1));
+        polymorphicClassArrayLiteral->AddValue(new ULongLiteralNode(Span(), typeId2));
+        polymorphicClassArrayLiteral->AddValue(new ULongLiteralNode(Span(), info->id));
+    }
+    uint64_t arrayLength = polymorphicClassArrayLiteral->Values().Count();
+    ConstantNode* polymorphicClassArray = new ConstantNode(Span(), Specifiers::internal_, new ArrayNode(Span(), new ULongNode(Span()),
+        CreateIntegerLiteralNode(Span(), arrayLength, false)), new IdentifierNode(Span(), arrayName), polymorphicClassArrayLiteral);
+    return polymorphicClassArray;
+}
+
+ConstantNode* MakeStaticClassArray(const std::unordered_set<ClassTypeSymbol*>& classesHavingStaticConstructor, const std::u32string& arrayName)
+{
+    std::unordered_set<boost::uuids::uuid, boost::hash<boost::uuids::uuid>> staticTypeIdSet;
+    for (ClassTypeSymbol* cls : classesHavingStaticConstructor)
+    {
+        staticTypeIdSet.insert(cls->TypeId());
+    }
+    ArrayLiteralNode* staticTypeIdArrayLiteral = new ArrayLiteralNode(Span());
+    for (const boost::uuids::uuid& typeId : staticTypeIdSet)
+    {
+        uint64_t typeId1 = 0;
+        uint64_t typeId2 = 0;
+        UuidToInts(typeId, typeId1, typeId2);
+        staticTypeIdArrayLiteral->AddValue(new ULongLiteralNode(Span(), typeId1));
+        staticTypeIdArrayLiteral->AddValue(new ULongLiteralNode(Span(), typeId2));
+    }
+    uint64_t arrayLength = staticTypeIdArrayLiteral->Values().Count();
+    ConstantNode* staticClassIdArray = new ConstantNode(Span(), Specifiers::internal_, new ArrayNode(Span(), new ULongNode(Span()),
+        CreateIntegerLiteralNode(Span(), arrayLength, false)), new IdentifierNode(Span(), arrayName), staticTypeIdArrayLiteral);
+    return staticClassIdArray;
 }
 
 } } // namespace cmajor::symbols

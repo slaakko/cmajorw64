@@ -34,6 +34,14 @@ FunctionNode::FunctionNode(NodeType nodeType_, const Span& span_, Specifiers spe
     }
 }
 
+FunctionNode::~FunctionNode()
+{
+    if (groupId == U"Rvalue")
+    {
+        int x = 0;
+    }
+}
+
 Node* FunctionNode::Clone(CloneContext& cloneContext) const
 {
     Attributes* clonedAttributes = nullptr;

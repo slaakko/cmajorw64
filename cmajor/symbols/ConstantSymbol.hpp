@@ -22,6 +22,7 @@ public:
     std::string TypeString() const override { return "constant"; }
     std::string Syntax() const override;
     void SetSpecifiers(Specifiers specifiers);
+    void ComputeMangledName() override;
     bool Evaluating() const { return evaluating; }
     void SetEvaluating() { evaluating = true; }
     void ResetEvaluating() { evaluating = false; }

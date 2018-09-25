@@ -22,32 +22,24 @@ InlineFunctionRepository::InlineFunctionRepository(BoundCompileUnit& boundCompil
 {
 }
 
-InlineFunctionRepository::~InlineFunctionRepository()
+FunctionSymbol* InlineFunctionRepository::Instantiate(FunctionSymbol* inlineFunction, ContainerScope* containerScope, const Span& span)
 {
-    for (FunctionSymbol* inlineFunctionSymbol : instantiatedInlineFunctions)
+    if (inlineFunction->GetCompileUnit() == boundCompileUnit.GetCompileUnitNode()) return inlineFunction;
+    while (inlineFunction->Master())
     {
-        if (inlineFunctionSymbol->IsTemplateSpecialization())
-        {
-            FunctionGroupSymbol* functionGroup = inlineFunctionSymbol->FunctionGroup();
-            if (functionGroup)
-            {
-                functionGroup->RemoveFunction(inlineFunctionSymbol);
-            }
-        }
+        inlineFunction = inlineFunction->Master();
     }
-}
-
-void InlineFunctionRepository::Instantiate(FunctionSymbol* inlineFunction, ContainerScope* containerScope, const Span& span)
-{
-    if (inlineFunction->GetCompileUnit() == boundCompileUnit.GetCompileUnitNode()) return;
-    if (instantiatedInlineFunctions.find(inlineFunction) != instantiatedInlineFunctions.cend()) return;
-    instantiatedInlineFunctions.insert(inlineFunction);
+    auto it = inlineFunctionMap.find(inlineFunction);
+    if (it != inlineFunctionMap.cend())
+    {
+        return it->second;
+    }
     SymbolTable& symbolTable = boundCompileUnit.GetSymbolTable();
     Node* node = symbolTable.GetNodeNoThrow(inlineFunction);
     if (!node)
     {
-        //inlineFunction->ReadAstNodes();
         node = inlineFunction->GetFunctionNode();
+        symbolTable.MapNode(node, inlineFunction);
         Assert(node, "function node not read");
     }
     FunctionNode* functionNode = static_cast<FunctionNode*>(node);
@@ -90,57 +82,104 @@ void InlineFunctionRepository::Instantiate(FunctionSymbol* inlineFunction, Conta
     FunctionNode* functionInstanceNode = static_cast<FunctionNode*>(functionNode->Clone(cloneContext));
     currentNs->AddMember(functionInstanceNode);
     symbolTable.SetCurrentCompileUnit(boundCompileUnit.GetCompileUnitNode());
-    SymbolCreatorVisitor symbolCreatorVisitor(symbolTable);
-    symbolTable.BeginContainer(inlineFunction);
-    functionInstanceNode->Body()->Accept(symbolCreatorVisitor);
-    symbolTable.EndContainer();
-    TypeBinder typeBinder(boundCompileUnit);
-    typeBinder.SetContainerScope(inlineFunction->GetContainerScope());
-    functionInstanceNode->Body()->Accept(typeBinder);
-    StatementBinder statementBinder(boundCompileUnit);
-    std::unique_ptr<BoundClass> boundClass;
-    std::unique_ptr<BoundFunction> boundFunction(new BoundFunction(&boundCompileUnit.GetModule(), inlineFunction));
-    statementBinder.SetCurrentFunction(boundFunction.get());
-    if (inlineFunction->GetSymbolType() == SymbolType::constructorSymbol ||
-        inlineFunction->GetSymbolType() == SymbolType::memberFunctionSymbol)
+    if (!inlineFunction->Parent()->IsClassTypeSymbol())
     {
-        boundClass.reset(new BoundClass(&boundCompileUnit.GetModule(), static_cast<ClassTypeSymbol*>(inlineFunction->Parent())));
-        statementBinder.SetCurrentClass(boundClass.get());
-        if (inlineFunction->GetSymbolType() == SymbolType::constructorSymbol)
+        SymbolCreatorVisitor symbolCreatorVisitor(symbolTable);
+        symbolCreatorVisitor.SetLeaveFunction();
+        globalNs->Accept(symbolCreatorVisitor);
+        std::unique_ptr<FunctionSymbol> functionSymbol(symbolTable.GetCreatedFunctionSymbol());
+        functionSymbol->SetParent(inlineFunction->Parent());
+        functionSymbol->SetLinkOnceOdrLinkage();
+        TypeBinder typeBinder(boundCompileUnit);
+        typeBinder.SetContainerScope(functionSymbol->GetContainerScope());
+        functionInstanceNode->Accept(typeBinder);
+        StatementBinder statementBinder(boundCompileUnit);
+        std::unique_ptr<BoundFunction> boundFunction(new BoundFunction(&boundCompileUnit.GetModule(), functionSymbol.get()));
+        statementBinder.SetCurrentFunction(boundFunction.get());
+        statementBinder.SetContainerScope(functionSymbol->GetContainerScope());
+        functionInstanceNode->Body()->Accept(statementBinder);
+        BoundStatement* boundStatement = statementBinder.ReleaseStatement();
+        Assert(boundStatement->GetBoundNodeType() == BoundNodeType::boundCompoundStatement, "bound compound statement expected");
+        BoundCompoundStatement* compoundStatement = static_cast<BoundCompoundStatement*>(boundStatement);
+        boundFunction->SetBody(std::unique_ptr<BoundCompoundStatement>(compoundStatement));
+        boundCompileUnit.AddBoundNode(std::move(boundFunction));
+        if (fileScopeAdded)
         {
-            ConstructorSymbol* constructorSymbol = static_cast<ConstructorSymbol*>(inlineFunction);
+            boundCompileUnit.RemoveLastFileScope();
+        }
+        FunctionSymbol* result = functionSymbol.get();
+        boundCompileUnit.AddFunctionSymbol(std::move(functionSymbol));
+        boundCompileUnit.AddGlobalNs(std::move(globalNs));
+        inlineFunctionMap[inlineFunction] = result;
+        result->SetFunctionId(inlineFunction->FunctionId());
+        result->SetMaster(inlineFunction);
+        result->SetCopy();
+        return result;
+    }
+    else
+    {
+        ClassTypeSymbol* classTypeSymbol = static_cast<ClassTypeSymbol*>(inlineFunction->Parent());
+        symbolTable.SetCurrentClass(classTypeSymbol);
+        SymbolCreatorVisitor symbolCreatorVisitor(symbolTable);
+        symbolCreatorVisitor.SetLeaveFunction();
+        globalNs->Accept(symbolCreatorVisitor);
+        std::unique_ptr<FunctionSymbol> functionSymbol(symbolTable.GetCreatedFunctionSymbol());
+        functionSymbol->SetParent(classTypeSymbol);
+        functionSymbol->SetLinkOnceOdrLinkage();
+        TypeBinder typeBinder(boundCompileUnit);
+        typeBinder.SetContainerScope(functionSymbol->GetContainerScope());
+        functionInstanceNode->Accept(typeBinder);
+        StatementBinder statementBinder(boundCompileUnit);
+        std::unique_ptr<BoundClass> boundClass(new BoundClass(&boundCompileUnit.GetModule(), classTypeSymbol));
+        boundClass->SetInlineFunctionContainer();
+        statementBinder.SetCurrentClass(boundClass.get());
+        std::unique_ptr<BoundFunction> boundFunction(new BoundFunction(&boundCompileUnit.GetModule(), functionSymbol.get()));
+        statementBinder.SetCurrentFunction(boundFunction.get());
+        statementBinder.SetContainerScope(functionSymbol->GetContainerScope());
+        if (functionSymbol->GetSymbolType() == SymbolType::constructorSymbol)
+        {
+            ConstructorSymbol* constructorSymbol = static_cast<ConstructorSymbol*>(functionSymbol.get());
+            Node* node = symbolTable.GetNode(functionSymbol.get());
             Assert(node->GetNodeType() == NodeType::constructorNode, "constructor node expected");
             ConstructorNode* constructorNode = static_cast<ConstructorNode*>(node);
             statementBinder.SetCurrentConstructor(constructorSymbol, constructorNode);
         }
-        else if (inlineFunction->GetSymbolType() == SymbolType::memberFunctionSymbol)
+        else if (functionSymbol->GetSymbolType() == SymbolType::destructorSymbol)
         {
-            MemberFunctionSymbol* memberFunctionSymbol = static_cast<MemberFunctionSymbol*>(inlineFunction);
+            DestructorSymbol* destructorSymbol = static_cast<DestructorSymbol*>(functionSymbol.get());
+            Node* node = symbolTable.GetNode(functionSymbol.get());
+            Assert(node->GetNodeType() == NodeType::destructorNode, "destructor node expected");
+            DestructorNode* destructorNode = static_cast<DestructorNode*>(node);
+            statementBinder.SetCurrentDestructor(destructorSymbol, destructorNode);
+        }
+        else if (functionSymbol->GetSymbolType() == SymbolType::memberFunctionSymbol)
+        {
+            MemberFunctionSymbol* memberFunctionSymbol = static_cast<MemberFunctionSymbol*>(functionSymbol.get());
+            Node* node = symbolTable.GetNode(functionSymbol.get());
             Assert(node->GetNodeType() == NodeType::memberFunctionNode, "member function node expected");
             MemberFunctionNode* memberFunctionNode = static_cast<MemberFunctionNode*>(node);
             statementBinder.SetCurrentMemberFunction(memberFunctionSymbol, memberFunctionNode);
         }
-    }
-    statementBinder.SetContainerScope(inlineFunction->GetContainerScope());
-    functionInstanceNode->Body()->Accept(statementBinder);
-    BoundStatement* boundStatement = statementBinder.ReleaseStatement();
-    Assert(boundStatement->GetBoundNodeType() == BoundNodeType::boundCompoundStatement, "bound compound statement expected");
-    BoundCompoundStatement* compoundStatement = static_cast<BoundCompoundStatement*>(boundStatement);
-    boundFunction->SetBody(std::unique_ptr<BoundCompoundStatement>(compoundStatement));
-    if (boundClass)
-    {
+        functionInstanceNode->Body()->Accept(statementBinder);
+        BoundStatement* boundStatement = statementBinder.ReleaseStatement();
+        Assert(boundStatement->GetBoundNodeType() == BoundNodeType::boundCompoundStatement, "bound compound statement expected");
+        BoundCompoundStatement* compoundStatement = static_cast<BoundCompoundStatement*>(boundStatement);
+        boundFunction->SetBody(std::unique_ptr<BoundCompoundStatement>(compoundStatement));
         boundClass->AddMember(std::move(boundFunction));
         boundCompileUnit.AddBoundNode(std::move(boundClass));
+        FunctionSymbol* result = functionSymbol.get();
+        boundCompileUnit.AddFunctionSymbol(std::move(functionSymbol));
+        boundCompileUnit.AddGlobalNs(std::move(globalNs));
+        if (fileScopeAdded)
+        {
+            boundCompileUnit.RemoveLastFileScope();
+        }
+        inlineFunctionMap[inlineFunction] = result;
+        result->SetFunctionId(inlineFunction->FunctionId());
+        result->SetMaster(inlineFunction);
+        result->SetCopy();
+        return result;
     }
-    else
-    {
-        boundCompileUnit.AddBoundNode(std::move(boundFunction));
-    }
-    if (fileScopeAdded)
-    {
-        boundCompileUnit.RemoveLastFileScope();
-    }
-    inlineFunction->SetGlobalNs(std::move(globalNs));
 }
 
 } } // namespace cmajor::binder

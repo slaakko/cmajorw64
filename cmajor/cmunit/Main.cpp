@@ -128,6 +128,8 @@ void CreateMainUnit(std::vector<std::string>& objectFilePaths, Module& module, E
     CompileUnitNode mainCompileUnit(Span(), boost::filesystem::path(module.OriginalFilePath()).parent_path().append("__main__.cm").generic_string());
     mainCompileUnit.SetSynthesizedUnit();
     mainCompileUnit.GlobalNs()->AddMember(new NamespaceImportNode(Span(), new IdentifierNode(Span(), U"System")));
+    mainCompileUnit.GlobalNs()->AddMember(MakePolymorphicClassArray(module.GetSymbolTable().PolymorphicClasses(), U"@polymorphicClassArray"));
+    mainCompileUnit.GlobalNs()->AddMember(MakeStaticClassArray(module.GetSymbolTable().ClassesHavingStaticConstructor(), U"@staticClassArray"));
     FunctionNode* mainFunction(new FunctionNode(Span(), Specifiers::public_, new IntNode(Span()), U"main", nullptr));
 #ifndef _WIN32
     mainFunction->AddParameter(new ParameterNode(Span(), new IntNode(Span()), new IdentifierNode(Span(), U"argc")));
@@ -137,9 +139,17 @@ void CreateMainUnit(std::vector<std::string>& objectFilePaths, Module& module, E
     CompoundStatementNode* mainFunctionBody = new CompoundStatementNode(Span());
     ConstructionStatementNode* constructExitCode = new ConstructionStatementNode(Span(), new IntNode(Span()), new IdentifierNode(Span(), U"exitCode"));
     mainFunctionBody->AddStatement(constructExitCode);
-    InvokeNode* invokeStartUnitTest = new InvokeNode(Span(), new IdentifierNode(Span(), U"RtStartUnitTest"));
+    InvokeNode* invokeStartUnitTest = new InvokeNode(Span(), new IdentifierNode(Span(), U"RtStartUnitTest")); 
     invokeStartUnitTest->AddArgument(new IntLiteralNode(Span(), numAssertions));
     invokeStartUnitTest->AddArgument(new StringLiteralNode(Span(), unitTestFilePath));
+    invokeStartUnitTest->AddArgument(new DivNode(Span(),
+        new InvokeNode(Span(), new DotNode(Span(), new IdentifierNode(Span(), U"@polymorphicClassArray"), new IdentifierNode(Span(), U"Length"))),
+        new LongLiteralNode(Span(), 3))); // 3 64-bit integers per entry
+    invokeStartUnitTest->AddArgument(new InvokeNode(Span(), new DotNode(Span(), new IdentifierNode(Span(), U"@polymorphicClassArray"), new IdentifierNode(Span(), U"CBegin"))));
+    invokeStartUnitTest->AddArgument(new DivNode(Span(),
+        new InvokeNode(Span(), new DotNode(Span(), new IdentifierNode(Span(), U"@staticClassArray"), new IdentifierNode(Span(), U"Length"))),
+        new LongLiteralNode(Span(), 2))); // 2 64-bit integers per entry
+    invokeStartUnitTest->AddArgument(new InvokeNode(Span(), new DotNode(Span(), new IdentifierNode(Span(), U"@staticClassArray"), new IdentifierNode(Span(), U"CBegin"))));
     ExpressionStatementNode* rtStartUnitTestCall = new ExpressionStatementNode(Span(), invokeStartUnitTest);
     mainFunctionBody->AddStatement(rtStartUnitTestCall);
 #ifdef _WIN32
@@ -259,7 +269,6 @@ void TestUnit(FileTable* fileTable, cmajor::ast::Project* project, CompileUnitNo
         CreateMainUnit(objectFilePaths, *rootModule, emittingContext, &attributeBinder, testName, numUnitTestAssertions, unitTestFilePath);
         GenerateLibrary(rootModule.get(), objectFilePaths, project->LibraryFilePath());
         Link(project->ExecutableFilePath(), project->LibraryFilePath(), rootModule->LibraryFilePaths(), *rootModule);
-        CreateClassFile(project->ExecutableFilePath(), rootModule->GetSymbolTable());
         boost::filesystem::remove(unitTestFilePath);
         if (GetGlobalFlag(GlobalFlags::verbose))
         {

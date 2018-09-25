@@ -17,11 +17,10 @@ class InlineFunctionRepository
 {
 public:
     InlineFunctionRepository(BoundCompileUnit& boundCompileUnit_);
-    ~InlineFunctionRepository();
-    void Instantiate(FunctionSymbol* inlineFunction, ContainerScope* containerScope, const Span& span);
+    FunctionSymbol* Instantiate(FunctionSymbol* inlineFunction, ContainerScope* containerScope, const Span& span);
 private:
     BoundCompileUnit& boundCompileUnit;
-    std::unordered_set<FunctionSymbol*> instantiatedInlineFunctions;
+    std::unordered_map<FunctionSymbol*, FunctionSymbol*> inlineFunctionMap;
 };
 
 } } // namespace cmajor::binder

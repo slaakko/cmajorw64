@@ -13,7 +13,10 @@
 #include <cmajor/symbols/InterfaceTypeSymbol.hpp>
 #include <cmajor/symbols/GlobalFlags.hpp>
 #include <cmajor/symbols/Warning.hpp>
+#include <cmajor/symbols/DebugFlags.hpp>
 #include <cmajor/util/Unicode.hpp>
+#include <cmajor/util/Log.hpp>
+#include <cmajor/util/Time.hpp>
 
 namespace cmajor { namespace binder {
 
@@ -1280,7 +1283,7 @@ std::unique_ptr<BoundFunctionCall> SelectViableFunction(const ViableFunctionSet&
                         bool secondTry = boundCompileUnit.InstantiateClassTemplateMemberFunction(bestFun, containerScope, boundFunction, span);
                         if (!secondTry)
                         {
-                            throw Exception(GetRootModuleForCurrentThread(), 
+                            throw Exception(GetRootModuleForCurrentThread(),
                                 "internal error: could not instantiate member function of a class template specialization '" + ToUtf8(specialization->FullName()) + "'",
                                 specialization->GetSpan());
                         }
@@ -1291,7 +1294,23 @@ std::unique_ptr<BoundFunctionCall> SelectViableFunction(const ViableFunctionSet&
             {
                 if (instantiate)
                 {
-                    boundCompileUnit.InstantiateInlineFunction(bestFun, containerScope, span);
+                    if (bestFun->IsTemplateSpecialization())
+                    {
+                        FunctionSymbol* functionTemplate = bestFun->FunctionTemplate();
+                        std::unordered_map<TemplateParameterSymbol*, TypeSymbol*> templateParameterMap;
+                        int n = functionTemplate->TemplateParameters().size();
+                        for (int i = 0; i < n; ++i)
+                        {
+                            TemplateParameterSymbol* templateParameter = functionTemplate->TemplateParameters()[i];
+                            TypeSymbol* templateArgumentType = bestFun->TemplateArgumentTypes()[i];
+                            templateParameterMap[templateParameter] = templateArgumentType;
+                        }
+                        bestFun = boundCompileUnit.InstantiateFunctionTemplate(functionTemplate, templateParameterMap, span);
+                    }
+                    else
+                    {
+                        bestFun = boundCompileUnit.InstantiateInlineFunction(bestFun, containerScope, span);
+                    }
                 }
             }
             if (boundFunction && boundFunction->GetFunctionSymbol()->DontThrow() && !boundFunction->GetFunctionSymbol()->HasTry() && !bestFun->DontThrow())
@@ -1396,7 +1415,23 @@ std::unique_ptr<BoundFunctionCall> SelectViableFunction(const ViableFunctionSet&
         {
             if (instantiate)
             {
-                boundCompileUnit.InstantiateInlineFunction(singleBest, containerScope, span);
+                if (singleBest->IsTemplateSpecialization())
+                {
+                    FunctionSymbol* functionTemplate = singleBest->FunctionTemplate();
+                    std::unordered_map<TemplateParameterSymbol*, TypeSymbol*> templateParameterMap;
+                    int n = functionTemplate->TemplateParameters().size();
+                    for (int i = 0; i < n; ++i)
+                    {
+                        TemplateParameterSymbol* templateParameter = functionTemplate->TemplateParameters()[i];
+                        TypeSymbol* templateArgumentType = singleBest->TemplateArgumentTypes()[i];
+                        templateParameterMap[templateParameter] = templateArgumentType;
+                    }
+                    singleBest = boundCompileUnit.InstantiateFunctionTemplate(functionTemplate, templateParameterMap, span);
+                }
+                else
+                {
+                    singleBest = boundCompileUnit.InstantiateInlineFunction(singleBest, containerScope, span);
+                }
             }
         }
         if (boundFunction && boundFunction->GetFunctionSymbol()->DontThrow() && !boundFunction->GetFunctionSymbol()->HasTry() && !singleBest->DontThrow())

@@ -58,12 +58,14 @@ public:
     void Visit(ConstantNode& constantNode) override;
     void Visit(EnumTypeNode& enumTypeNode) override;
     void Visit(EnumConstantNode& enumConstantNode) override;
+    void SetLeaveFunction() { leaveFunction = true; }
 private:
     SymbolTable& symbolTable;
     ClassNode* classInstanceNode;
     ClassTemplateSpecializationSymbol* classTemplateSpecialization;
     std::stack<bool> conditionalCompilationStack;
     int32_t functionIndex;
+    bool leaveFunction;
 };
 
 } } // namespace cmajor::symbols

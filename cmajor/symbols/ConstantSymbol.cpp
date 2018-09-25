@@ -183,6 +183,12 @@ void ConstantSymbol::SetSpecifiers(Specifiers specifiers)
     }
 }
 
+void ConstantSymbol::ComputeMangledName()
+{
+    Symbol::ComputeMangledName();
+}
+
+
 std::string ConstantSymbol::Syntax() const
 {
     std::string syntax = GetSpecifierStr();

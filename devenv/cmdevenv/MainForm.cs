@@ -1648,7 +1648,7 @@ namespace cmdevenv
                 cancelToolStripMenuItem.Enabled = true;
                 buildInProgress = true;
                 SetState(State.compiling);
-                //compiler.DoClean(solutionOrProjectFilePath, config); todo
+                compiler.DoClean(solutionOrProjectFilePath, config); 
                 infoTimer.Stop();
                 infoLabel.Text = "Cleaning";
             }

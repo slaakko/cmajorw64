@@ -65,23 +65,23 @@ enum class FunctionSymbolFlags : uint32_t
 {
     none = 0,
     inline_ = 1 << 0,
-    external_ = 1 << 1,
-    constExpr = 1 << 2,
-    cdecl_ = 1 << 3,
-    suppress = 1 << 4,
-    default_ = 1 << 5,
-    explicit_ = 1 << 6,
-    virtual_ = 1 << 7,
-    override_ = 1 << 8,
-    abstract_ = 1 << 9,
-    new_ = 1 << 10,
-    const_ = 1 << 11,
-    conversion = 1 << 12,
-    linkOnceOdrLinkage = 1 << 13,
-    templateSpecialization = 1 << 14,
-    hasTry = 1 << 15,
-    hasSource = 1 << 16,
-    includeConstraint = 1 << 17
+    constExpr = 1 << 1,
+    cdecl_ = 1 << 2,
+    suppress = 1 << 3,
+    default_ = 1 << 4,
+    explicit_ = 1 << 5,
+    virtual_ = 1 << 6,
+    override_ = 1 << 7,
+    abstract_ = 1 << 8,
+    new_ = 1 << 9,
+    const_ = 1 << 10,
+    conversion = 1 << 11,
+    linkOnceOdrLinkage = 1 << 12,
+    templateSpecialization = 1 << 13,
+    hasTry = 1 << 14,
+    hasSource = 1 << 15,
+    includeConstraint = 1 << 16,
+    copy = 1 << 17
 };
 
 inline FunctionSymbolFlags operator|(FunctionSymbolFlags left, FunctionSymbolFlags right)
@@ -161,8 +161,6 @@ public:
     void SetSpecifiers(Specifiers specifiers);
     bool IsInline() const { return GetFlag(FunctionSymbolFlags::inline_); }
     void SetInline() { SetFlag(FunctionSymbolFlags::inline_); }
-    bool IsExternal() const { return GetFlag(FunctionSymbolFlags::external_); }
-    void SetExternal() { SetFlag(FunctionSymbolFlags::external_); }
     bool IsConstExpr() const { return GetFlag(FunctionSymbolFlags::constExpr); }
     void SetConstExpr() { SetFlag(FunctionSymbolFlags::constExpr); }
     bool IsCDecl() const { return GetFlag(FunctionSymbolFlags::cdecl_); }
@@ -192,6 +190,8 @@ public:
     void SetTemplateSpecialization() { SetFlag(FunctionSymbolFlags::templateSpecialization); }
     bool HasTry() const { return GetFlag(FunctionSymbolFlags::hasTry); }
     void SetHasTry() { SetFlag(FunctionSymbolFlags::hasTry); }
+    bool IsCopy() const { return GetFlag(FunctionSymbolFlags::copy); }
+    void SetCopy() { SetFlag(FunctionSymbolFlags::copy); }
     virtual bool DontThrow() const { return IsNothrow() || IsBasicTypeOperation(); }
     FunctionSymbolFlags GetFunctionSymbolFlags() const { return flags; }
     bool GetFlag(FunctionSymbolFlags flag) const { return (flags & flag) != FunctionSymbolFlags::none; }
@@ -199,6 +199,7 @@ public:
     void ComputeMangledName() override;
     int Arity() const { return parameters.size(); }
     const std::vector<ParameterSymbol*>& Parameters() const { return parameters; }
+    void ClearLocalVariables() { localVariables.clear(); }
     void AddLocalVariable(LocalVariableSymbol* localVariable);
     const std::vector<LocalVariableSymbol*>& LocalVariables() const { return localVariables; }
     void SetReturnType(TypeSymbol* returnType_) { returnType = returnType_; }
@@ -214,8 +215,6 @@ public:
     void SetVmtIndex(int32_t vmtIndex_) { vmtIndex = vmtIndex_; }
     int32_t ImtIndex() const { return imtIndex; }
     void SetImtIndex(int32_t imtIndex_) { imtIndex = imtIndex_; }
-    void SetGlobalNs(std::unique_ptr<Node>&& globalNs_);
-    Node* GlobalNs() { return globalNs.get(); }
     FunctionGroupSymbol* FunctionGroup() { return functionGroup; }
     void SetFunctionGroup(FunctionGroupSymbol* functionGroup_) { functionGroup = functionGroup_; }
     IntrinsicFunction* GetIntrinsic() { return intrinsic.get(); }
@@ -232,9 +231,13 @@ public:
     FunctionSymbol* FunctionTemplate() { return functionTemplate; }
     void SetFunctionTemplate(FunctionSymbol* functionTemplate_) { functionTemplate = functionTemplate_; }
     void SetTemplateArgumentTypes(const std::vector<TypeSymbol*>& templateArgumentTypes_);
+    const std::vector<TypeSymbol*>& TemplateArgumentTypes() const { return templateArgumentTypes; }
     void Check() override;
+    FunctionSymbol* Master() const { return master; }
+    void SetMaster(FunctionSymbol* master_) { master = master_; }
 private:
     FunctionSymbol* functionTemplate;
+    FunctionSymbol* master;
     boost::uuids::uuid functionId;
     std::u32string groupName;
     std::vector<TemplateParameterSymbol*> templateParameters;
@@ -251,7 +254,6 @@ private:
     std::unique_ptr<FunctionNode> functionNode;
     std::unique_ptr<ConstraintNode> constraint;
     int nextTemporaryIndex;
-    std::unique_ptr<Node> globalNs;
     FunctionGroupSymbol* functionGroup;
     std::unique_ptr<IntrinsicFunction> intrinsic;
     bool isProgramMain;

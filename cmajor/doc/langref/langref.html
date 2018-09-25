@@ -6009,7 +6009,8 @@
         <p>
             Virtual Method Table. There is one virtual method table per <a href="#polymorphic-class-type">polymorphic</a> class. A virtual method table contains:
             <ul>
-                <li>A 64-bit class identifier. See <a href="../implementation/implementation.html#is-and-as-expressions">implementation of <span class="kw">is</span> and <span class="kw">as</span> expressions</a>.</li>
+                <li>A 64-bit class identifier initially 0 and dynamically initialized. See <a href="../implementation/implementation.html#is-and-as-expressions">implementation of <span class="kw">is</span> and <span class="kw">as</span> expressions</a>.</li>
+                <li>A 16-byte type identifier (UUID).</li>
                 <li>Pointer to the full name of the class.</li>
                 <li>Pointer to the table of <a href="#imt">IMT</a> pointers.</li>
                 <li>Pointers to virtual and overridden member functions for this class.</li>

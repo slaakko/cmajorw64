@@ -23,9 +23,14 @@
 #include <cmajor/rt/Environment.hpp>
 #include <csignal>
 
-extern "C" RT_API void RtInit()
+extern "C" RT_API void RtInit(int64_t numberOfPolymorphicClassIds, const uint64_t* polymorphicClassIdArray, int64_t numberOfStaticClassIds, const uint64_t* staticClassIdArray)
 {
-    cmajor::rt::Init();
+    cmajor::rt::Init(numberOfPolymorphicClassIds, polymorphicClassIdArray, numberOfStaticClassIds, staticClassIdArray);
+}
+
+extern "C" RT_API uint64_t RtDynamicInitVmt(void* vmt)
+{
+    return cmajor::rt::DynamicInitVmt(vmt);
 }
 
 extern "C" RT_API void RtDone()
@@ -40,7 +45,7 @@ extern "C" RT_API void RtExit(int32_t exitCode)
 
 namespace cmajor { namespace rt {
 
-void Init()
+void Init(int64_t numberOfPolymorphicClassIds, const uint64_t* polymorphicClassIdArray, int64_t numberOfStaticClassIds, const uint64_t* staticClassIdArray)
 {
     InitMutex();
     cmajor::parsing::Init();
@@ -54,7 +59,7 @@ void Init()
     InitSocket();
     InitEnvironment();
     InitStatics();
-    InitClasses();
+    InitClasses(numberOfPolymorphicClassIds, polymorphicClassIdArray, numberOfStaticClassIds, staticClassIdArray);
 #ifdef _WIN32
     InitCommandLine();
 #endif

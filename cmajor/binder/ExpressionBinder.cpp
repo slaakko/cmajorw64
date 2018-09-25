@@ -19,12 +19,15 @@
 #include <cmajor/symbols/TypedefSymbol.hpp>
 #include <cmajor/symbols/TemplateSymbol.hpp>
 #include <cmajor/symbols/GlobalFlags.hpp>
+#include <cmajor/symbols/DebugFlags.hpp>
 #include <cmajor/ast/BasicType.hpp>
 #include <cmajor/ast/Literal.hpp>
 #include <cmajor/ast/Expression.hpp>
 #include <cmajor/ast/Identifier.hpp>
 #include <cmajor/ast/Visitor.hpp>
 #include <cmajor/util/Unicode.hpp>
+#include <cmajor/util/Log.hpp>
+#include <cmajor/util/Time.hpp>
 
 namespace cmajor { namespace binder {
 
@@ -1473,7 +1476,12 @@ void ExpressionBinder::Visit(IsNode& isNode)
                         ClassTypeSymbol* leftClassType = static_cast<ClassTypeSymbol*>(leftBaseType);
                         if (leftClassType->IsPolymorphic())
                         {
-                            expression.reset(new BoundIsExpression(module, std::move(boundExpr), rightClassType, symbolTable.GetTypeByName(U"bool")));
+                            std::unique_ptr<BoundLocalVariable> leftClassIdVar(new BoundLocalVariable(module, isNode.GetSpan(),
+                                boundFunction->GetFunctionSymbol()->CreateTemporary(symbolTable.GetTypeByName(U"ulong"), isNode.GetSpan())));
+                            std::unique_ptr<BoundLocalVariable> rightClassIdVar(new BoundLocalVariable(module, isNode.GetSpan(),
+                                boundFunction->GetFunctionSymbol()->CreateTemporary(symbolTable.GetTypeByName(U"ulong"), isNode.GetSpan())));
+                            expression.reset(new BoundIsExpression(module, std::move(boundExpr), rightClassType, symbolTable.GetTypeByName(U"bool"),
+                                std::move(leftClassIdVar), std::move(rightClassIdVar)));
                         }
                         else
                         {
@@ -1527,9 +1535,14 @@ void ExpressionBinder::Visit(AsNode& asNode)
                         ClassTypeSymbol* leftClassType = static_cast<ClassTypeSymbol*>(leftBaseType);
                         if (leftClassType->IsPolymorphic())
                         {
+                            std::unique_ptr<BoundLocalVariable> leftClassIdVar(new BoundLocalVariable(module, asNode.GetSpan(),
+                                boundFunction->GetFunctionSymbol()->CreateTemporary(symbolTable.GetTypeByName(U"ulong"), asNode.GetSpan())));
+                            std::unique_ptr<BoundLocalVariable> rightClassIdVar(new BoundLocalVariable(module, asNode.GetSpan(),
+                                boundFunction->GetFunctionSymbol()->CreateTemporary(symbolTable.GetTypeByName(U"ulong"), asNode.GetSpan())));
                             expression.reset(new BoundAsExpression(module, std::move(boundExpr), rightClassType,
                                 std::unique_ptr<BoundLocalVariable>(new BoundLocalVariable(module, span, boundFunction->GetFunctionSymbol()->CreateTemporary(
-                                    rightClassType->AddPointer(asNode.GetSpan()), asNode.GetSpan())))));
+                                    rightClassType->AddPointer(asNode.GetSpan()), asNode.GetSpan()))),
+                                std::move(leftClassIdVar), std::move(rightClassIdVar)));
                         }
                         else
                         {

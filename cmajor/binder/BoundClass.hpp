@@ -23,9 +23,12 @@ public:
     const std::vector<std::unique_ptr<BoundNode>>& Members() const { return members; }
     ClassTypeSymbol* GetClassTypeSymbol() { return classTypeSymbol; }
     bool ContainsSourceFunctions() const;
+    bool IsInlineFunctionContainer() const { return inlineFunctionContainer; }
+    void SetInlineFunctionContainer() { inlineFunctionContainer = true; }
 private:
     ClassTypeSymbol* classTypeSymbol;
     std::vector<std::unique_ptr<BoundNode>> members;
+    bool inlineFunctionContainer;
 };
 
 } } // namespace cmajor::binder

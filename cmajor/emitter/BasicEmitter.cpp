@@ -455,15 +455,14 @@ void BasicEmitter::Visit(BoundFunction& boundFunction)
     llvm::BasicBlock* entryBlock = llvm::BasicBlock::Create(context, "entry", function);
     entryBasicBlock = entryBlock;
     SetCurrentBasicBlock(entryBlock);
-    if (currentClass)
+    if (currentClass && !currentClass->IsInlineFunctionContainer())
     {
         ClassTypeSymbol* classTypeSymbol = currentClass->GetClassTypeSymbol();
-        classTypeSymbol->SetModule(&symbolsModule);
-        if (!classTypeSymbol->IsVmtObjectCreated())
+        if (!IsVmtObjectCreated(classTypeSymbol))
         {
             classTypeSymbol->VmtObject(*this, true);
         }
-        if (!classTypeSymbol->IsStaticObjectCreated())
+        if (!IsStaticObjectCreated(classTypeSymbol))
         {
             classTypeSymbol->StaticObject(*this, true);
         }

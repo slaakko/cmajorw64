@@ -460,14 +460,11 @@ Process returned exit code 0.
 
     <p>
         The 64-bit identifier of a class is stored to the virtual method table of the class at index 0.
-        The addresses of the virtual method tables are exported from the executable so that the runtime initialization
-        function can find out their memory addresses.
-    </p>
-    <p>
-        When the program starts executing it calls the RtInit function of the Cmajor runtime library cmrt200.dll
-        that reads class hierarchy information of the polymorphic classes from the <em>program.cls</em> file,
-        computes the key and 64-bit class identifier for each class, finds out the virtual method table address of each class
-        and stores the class identifier there.
+        The class identifier is initially zero and dynamically initialized by calling the runtime library.
+        The runtime library looks up the class identifier from a hash table by using a 16-byte type identifier (UUID) of the class as a key
+        and stores the nonzero 64-bit class identifier to the virtual method table index 0.
+        The 16-byte type identifier (UUID) is initialized by the compiler and stored to the virtual method table at index 1 in 64-bit units.
+        The hash table lookup is needed only first time. In the future the class id is found in the VMT at index 0.
     </p>
 </body>
 </html>

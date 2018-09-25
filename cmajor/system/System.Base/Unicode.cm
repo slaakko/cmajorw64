@@ -115,11 +115,6 @@ namespace System.Unicode
         expandsOnNFKD
     }
     
-    public inline nothrow ulong GetHashCode(BinaryPropertyId id)
-    {
-        return cast<ulong>(cast<byte>(id));
-    }
-    
     public class BinaryProperty
     {
         public nothrow BinaryProperty(BinaryPropertyId id_, const string& shortName_, const string& longName_) : id(id_), shortName(shortName_), longName(longName_)
@@ -153,28 +148,28 @@ namespace System.Unicode
         }
         public nothrow const BinaryProperty* GetBinaryProperty(BinaryPropertyId id) const
         {
-            HashMap<BinaryPropertyId, BinaryProperty*>.ConstIterator it = binaryPropertyIdMap.CFind(id);
+            HashMap<uint, void*>.ConstIterator it = binaryPropertyIdMap.CFind(cast<uint>(cast<byte>(id)));
             if (it != binaryPropertyIdMap.CEnd())
             {
-                return it->second;
+                return cast<BinaryProperty*>(it->second);
             }
             return null;
         }
         public const BinaryProperty* GetBinaryPropertyByShortName(const string& shortName) const
         {
-            HashMap<string, BinaryProperty*>.ConstIterator it = shortNameMap.CFind(MakeCanonicalPropertyName(shortName));
+            HashMap<string, void*>.ConstIterator it = shortNameMap.CFind(MakeCanonicalPropertyName(shortName));
             if (it != shortNameMap.CEnd())
             {
-                return it->second;
+                return cast<BinaryProperty*>(it->second);
             }
             return null;
         }
         public const BinaryProperty* GetBinaryPropertyByLongName(const string& longName) const
         {
-            HashMap<string, BinaryProperty*>.ConstIterator it = longNameMap.CFind(MakeCanonicalPropertyName(longName));
+            HashMap<string, void*>.ConstIterator it = longNameMap.CFind(MakeCanonicalPropertyName(longName));
             if (it != longNameMap.CEnd())
             {
-                return it->second;
+                return cast<BinaryProperty*>(it->second);
             }
             return null;
         }
@@ -242,7 +237,7 @@ namespace System.Unicode
             binaryProperties.Add(new BinaryProperty(BinaryPropertyId.expandsOnNFKD, "XO NFKD", "Expands On NFKD"));
             for (BinaryProperty* binaryProperty : binaryProperties)
             {
-                binaryPropertyIdMap[binaryProperty->Id()] = binaryProperty;
+                binaryPropertyIdMap[cast<uint>(cast<byte>(binaryProperty->Id()))] = binaryProperty;
                 shortNameMap[MakeCanonicalPropertyName(binaryProperty->ShortName())] = binaryProperty;
                 longNameMap[MakeCanonicalPropertyName(binaryProperty->LongName())] = binaryProperty;
             }
@@ -255,9 +250,9 @@ namespace System.Unicode
             }
         }
         private List<BinaryProperty*> binaryProperties;
-        private HashMap<BinaryPropertyId, BinaryProperty*> binaryPropertyIdMap;
-        private HashMap<string, BinaryProperty*> shortNameMap;
-        private HashMap<string, BinaryProperty*> longNameMap;
+        private HashMap<uint, void*> binaryPropertyIdMap;
+        private HashMap<string, void*> shortNameMap;
+        private HashMap<string, void*> longNameMap;
         private static UniquePtr<BinaryPropertyTable> instance;
     }    
     
@@ -342,11 +337,6 @@ namespace System.Unicode
         private uchar end;
     }
     
-    public inline nothrow ulong GetHashCode(BlockId blockId)
-    {
-        return cast<ulong>(cast<ushort>(blockId));
-    }
-
     public class BlockTable
     {
         static BlockTable() : instance(new BlockTable())
@@ -358,28 +348,28 @@ namespace System.Unicode
         }
         public inline nothrow const Block* GetBlock(BlockId id) const
         {
-            HashMap<BlockId, Block*>.ConstIterator it = blockIdMap.CFind(id);
+            HashMap<uint, void*>.ConstIterator it = blockIdMap.CFind(cast<uint>(cast<ushort>(id)));
             if (it != blockIdMap.CEnd())
             {
-                return it->second;
+                return cast<Block*>(it->second);
             }
             return null;
         }
         public inline const Block* GetBlockByShortName(const string& shortName) const
         {
-            HashMap<string, Block*>.ConstIterator it = shortNameMap.CFind(MakeCanonicalPropertyName(shortName));
+            HashMap<string, void*>.ConstIterator it = shortNameMap.CFind(MakeCanonicalPropertyName(shortName));
             if (it != shortNameMap.CEnd())
             {
-                return it->second;
+                return cast<Block*>(it->second);
             }
             return null;
         }
         public inline const Block* GetBlockByLongName(const string& longName) const
         {
-            HashMap<string, Block*>.ConstIterator it = longNameMap.CFind(MakeCanonicalPropertyName(longName));
+            HashMap<string, void*>.ConstIterator it = longNameMap.CFind(MakeCanonicalPropertyName(longName));
             if (it != longNameMap.CEnd())
             {
-                return it->second;
+                return cast<Block*>(it->second);
             }
             return null;
         }
@@ -660,7 +650,7 @@ namespace System.Unicode
             blocks.Add(new Block(BlockId.supPuaB, "Sup PUA B", "Supplementary Private Use Area-B", cast<uchar>(0x100000u), cast<uchar>(0x10FFFFu)));
             for (Block* block : blocks)
             {
-                blockIdMap[block->Id()] = block;
+                blockIdMap[cast<uint>(cast<ushort>(block->Id()))] = block;
                 shortNameMap[MakeCanonicalPropertyName(block->ShortName())] = block;
                 longNameMap[MakeCanonicalPropertyName(block->LongName())] = block;
             }
@@ -674,9 +664,9 @@ namespace System.Unicode
         }
         private static UniquePtr<BlockTable> instance;
         private List<Block*> blocks;
-        private HashMap<BlockId, Block*> blockIdMap;
-        private HashMap<string, Block*> shortNameMap;
-        private HashMap<string, Block*> longNameMap;
+        private HashMap<uint, void*> blockIdMap;
+        private HashMap<string, void*> shortNameMap;
+        private HashMap<string, void*> longNameMap;
     }
     
     public const Block* GetBlock(BlockId id)
@@ -738,11 +728,6 @@ namespace System.Unicode
         private string longName;
     }
 
-    public inline nothrow const ulong GetHashCode(GeneralCategoryId id)
-    {
-        return cast<ulong>(cast<uint>(id));
-    }
-
     public class GeneralCategoryTable
     {
         static GeneralCategoryTable() : instance(new GeneralCategoryTable())
@@ -754,28 +739,28 @@ namespace System.Unicode
         }
         public nothrow const GeneralCategory* GetGeneralCategory(GeneralCategoryId id) const
         {
-            HashMap<GeneralCategoryId, GeneralCategory*>.ConstIterator it = generalCategoryIdMap.CFind(id);
+            HashMap<uint, void*>.ConstIterator it = generalCategoryIdMap.CFind(cast<uint>(id));
             if (it != generalCategoryIdMap.CEnd())
             {
-                return it->second;
+                return cast<GeneralCategory*>(it->second);
             }
             return null;
         }
         public const GeneralCategory* GetGeneralCategoryByShortName(const string& shortName) const
         {
-            HashMap<string, GeneralCategory*>.ConstIterator it = shortNameMap.CFind(MakeCanonicalPropertyName(shortName));
+            HashMap<string, void*>.ConstIterator it = shortNameMap.CFind(MakeCanonicalPropertyName(shortName));
             if (it != shortNameMap.CEnd())
             {
-                return it->second;
+                return cast<GeneralCategory*>(it->second);
             }
             return null;
         }
         public const GeneralCategory* GetGeneralCategoryByLongName(const string& longName) const
         {
-            HashMap<string, GeneralCategory*>.ConstIterator it = longNameMap.CFind(MakeCanonicalPropertyName(longName));
+            HashMap<string, void*>.ConstIterator it = longNameMap.CFind(MakeCanonicalPropertyName(longName));
             if (it != longNameMap.CEnd())
             {
-                return it->second;
+                return cast<GeneralCategory*>(it->second);
             }
             return null;
         }
@@ -837,9 +822,9 @@ namespace System.Unicode
         }
         private static UniquePtr<GeneralCategoryTable> instance;
         private List<GeneralCategory*> generalCategories;
-        private HashMap<GeneralCategoryId, GeneralCategory*> generalCategoryIdMap;
-        private HashMap<string, GeneralCategory*> shortNameMap;
-        private HashMap<string, GeneralCategory*> longNameMap;
+        private HashMap<uint, void*> generalCategoryIdMap;
+        private HashMap<string, void*> shortNameMap;
+        private HashMap<string, void*> longNameMap;
     }
 
     public const GeneralCategory* GetGeneralCategory(GeneralCategoryId id)
@@ -871,11 +856,6 @@ namespace System.Unicode
         age_9_0
     }
 
-    public inline nothrow ulong GetHashCode(AgeId id)
-    {
-        return cast<ulong>(cast<byte>(id));
-    }
-
     public class Age
     {
         public nothrow Age(AgeId id_, const string& version_) : id(id_), version(version_)
@@ -904,19 +884,19 @@ namespace System.Unicode
         }
         public const Age* GetAge(AgeId id) const
         {
-            HashMap<AgeId, Age*>.ConstIterator it = ageIdMap.CFind(id);
+            HashMap<uint, void*>.ConstIterator it = ageIdMap.CFind(cast<uint>(cast<byte>(id)));
             if (it != ageIdMap.CEnd())
             {
-                return it->second;
+                return cast<Age*>(it->second);
             }
             return null;
         }
         public const Age* GetAge(const string& version) const
         {
-            HashMap<string, Age*>.ConstIterator it = versionMap.CFind(version);
+            HashMap<string, void*>.ConstIterator it = versionMap.CFind(version);
             if (it != versionMap.CEnd())
             {
-                return it->second;
+                return cast<Age*>(it->second);
             }
             return null;
         }
@@ -942,7 +922,7 @@ namespace System.Unicode
             ages.Add(new Age(AgeId.age_9_0, "9.0"));
             for (Age* age : ages)
             {
-                ageIdMap[age->Id()] = age;
+                ageIdMap[cast<uint>(cast<byte>(age->Id()))] = age;
                 versionMap[age->Version()] = age;
             }
         }
@@ -955,8 +935,8 @@ namespace System.Unicode
         }
         private static UniquePtr<AgeTable> instance;
         private List<Age*> ages;
-        private HashMap<AgeId, Age*> ageIdMap;
-        private HashMap<string, Age*> versionMap;
+        private HashMap<uint, void*> ageIdMap;
+        private HashMap<string, void*> versionMap;
     }
 
     public const Age* GetAge(AgeId id)
@@ -1021,11 +1001,6 @@ namespace System.Unicode
         private string longName;
     }
     
-    public inline nothrow ulong GetHashCode(ScriptId id)
-    {
-        return cast<ulong>(cast<byte>(id));
-    }
-
     public class ScriptTable
     {
         static ScriptTable() : instance(new ScriptTable())
@@ -1037,28 +1012,28 @@ namespace System.Unicode
         }
         public const Script* GetScript(ScriptId id) const
         {
-            HashMap<ScriptId, Script*>.ConstIterator it = scriptIdMap.CFind(id);
+            HashMap<uint, void*>.ConstIterator it = scriptIdMap.CFind(cast<uint>(cast<byte>(id)));
             if (it != scriptIdMap.CEnd())
             {
-                return it->second;
+                return cast<Script*>(it->second);
             }
             return null;
         }
         public const Script* GetScriptByShortName(const string& shortName) const
         {
-            HashMap<string, Script*>.ConstIterator it = shortNameMap.CFind(MakeCanonicalPropertyName(shortName));
+            HashMap<string, void*>.ConstIterator it = shortNameMap.CFind(MakeCanonicalPropertyName(shortName));
             if (it != shortNameMap.CEnd())
             {
-                return it->second;
+                return cast<Script*>(it->second);
             }
             return null;
         }
         public const Script* GetScriptByLongName(const string& longName) const
         {
-            HashMap<string, Script*>.ConstIterator it = longNameMap.CFind(MakeCanonicalPropertyName(longName));
+            HashMap<string, void*>.ConstIterator it = longNameMap.CFind(MakeCanonicalPropertyName(longName));
             if (it != longNameMap.CEnd())
             {
-                return it->second;
+                return cast<Script*>(it->second);
             }
             return null;
         }
@@ -1205,7 +1180,7 @@ namespace System.Unicode
             scripts.Add(new Script(ScriptId.zzzz, "Zzzz", "Unknown"));
             for (Script* script : scripts)
             {
-                scriptIdMap[script->Id()] = script;
+                scriptIdMap[cast<uint>(cast<byte>(script->Id()))] = script;
                 shortNameMap[MakeCanonicalPropertyName(script->ShortName())] = script;
                 longNameMap[MakeCanonicalPropertyName(script->LongName())] = script;
             }
@@ -1219,9 +1194,9 @@ namespace System.Unicode
         }
         private static UniquePtr<ScriptTable> instance;
         private List<Script*> scripts;
-        private HashMap<ScriptId, Script*> scriptIdMap;
-        private HashMap<string, Script*> shortNameMap;
-        private HashMap<string, Script*> longNameMap;
+        private HashMap<uint, void*> scriptIdMap;
+        private HashMap<string, void*> shortNameMap;
+        private HashMap<string, void*> longNameMap;
     }            
 
     public const Script* GetScript(ScriptId id)
@@ -1342,11 +1317,6 @@ namespace System.Unicode
         private string longName;
     }
     
-    public inline nothrow ulong GetHashCode(NumericTypeId id)
-    {
-        return cast<ulong>(cast<byte>(id));
-    }
-
     public class NumericTypeTable
     {
         static NumericTypeTable() : instance(new NumericTypeTable())
@@ -1358,28 +1328,28 @@ namespace System.Unicode
         }
         public const NumericType* GetNumericType(NumericTypeId id) const
         {
-            HashMap<NumericTypeId, NumericType*>.ConstIterator it = numericTypeIdMap.CFind(id);
+            HashMap<uint, void*>.ConstIterator it = numericTypeIdMap.CFind(cast<uint>(cast<byte>(id)));
             if (it != numericTypeIdMap.CEnd())
             {
-                return it->second;
+                return cast<NumericType*>(it->second);
             }
             return null;
         }
         public const NumericType* GetNumericTypeByShortName(const string& shortName) const
         {
-            HashMap<string, NumericType*>.ConstIterator it = shortNameMap.CFind(MakeCanonicalPropertyName(shortName));
+            HashMap<string, void*>.ConstIterator it = shortNameMap.CFind(MakeCanonicalPropertyName(shortName));
             if (it != shortNameMap.CEnd())
             {
-                return it->second;
+                return cast<NumericType*>(it->second);
             }
             return null;
         }
         public const NumericType* GetNumericTypeByLongName(const string& longName) const
         {
-            HashMap<string, NumericType*>.ConstIterator it = longNameMap.CFind(MakeCanonicalPropertyName(longName));
+            HashMap<string, void*>.ConstIterator it = longNameMap.CFind(MakeCanonicalPropertyName(longName));
             if (it != longNameMap.CEnd())
             {
-                return it->second;
+                return cast<NumericType*>(it->second);
             }
             return null;
         }
@@ -1391,7 +1361,7 @@ namespace System.Unicode
             numericTypes.Add(new NumericType(NumericTypeId.nu, "Nu", "Numeric"));
             for (NumericType* numericType : numericTypes)
             {
-                numericTypeIdMap[numericType->Id()] = numericType;
+                numericTypeIdMap[cast<uint>(cast<byte>(numericType->Id()))] = numericType;
                 shortNameMap[MakeCanonicalPropertyName(numericType->ShortName())] = numericType;
                 longNameMap[MakeCanonicalPropertyName(numericType->LongName())] = numericType;
             }
@@ -1404,9 +1374,9 @@ namespace System.Unicode
             }
         }
         private List<NumericType*> numericTypes;
-        private HashMap<NumericTypeId, NumericType*> numericTypeIdMap;
-        private HashMap<string, NumericType*> shortNameMap;
-        private HashMap<string, NumericType*> longNameMap;
+        private HashMap<uint, void*> numericTypeIdMap;
+        private HashMap<string, void*> shortNameMap;
+        private HashMap<string, void*> longNameMap;
         private static UniquePtr<NumericTypeTable> instance;
     }
 
@@ -1453,11 +1423,6 @@ namespace System.Unicode
         private string longName;
     }
     
-    public nothrow inline ulong GetHashCode(BidiClassId id)
-    {
-        return cast<ulong>(cast<byte>(id));
-    }
-    
     public class BidiClassTable
     {
         static BidiClassTable() : instance(new BidiClassTable())
@@ -1469,28 +1434,28 @@ namespace System.Unicode
         }
         public const BidiClass* GetBidiClass(BidiClassId id) const
         {
-            HashMap<BidiClassId, BidiClass*>.ConstIterator it = bidiClassIdMap.CFind(id);
+            HashMap<uint, void*>.ConstIterator it = bidiClassIdMap.CFind(cast<uint>(cast<byte>(id)));
             if (it != bidiClassIdMap.CEnd())
             {
-                return it->second;
+                return cast<BidiClass*>(it->second);
             }
             return null;
         }
         public const BidiClass* GetBidiClassByShortName(const string& shortName) const
         {
-            HashMap<string, BidiClass*>.ConstIterator it = shortNameMap.CFind(MakeCanonicalPropertyName(shortName));
+            HashMap<string, void*>.ConstIterator it = shortNameMap.CFind(MakeCanonicalPropertyName(shortName));
             if (it != shortNameMap.CEnd())
             {
-                return it->second;
+                return cast<BidiClass*>(it->second);
             }
             return null;
         }
         public const BidiClass* GetBidiClassByLongName(const string& longName) const
         {
-            HashMap<string, BidiClass*>.ConstIterator it = longNameMap.CFind(MakeCanonicalPropertyName(longName));
+            HashMap<string, void*>.ConstIterator it = longNameMap.CFind(MakeCanonicalPropertyName(longName));
             if (it != longNameMap.CEnd())
             {
-                return it->second;
+                return cast<BidiClass*>(it->second);
             }
             return null;
         }
@@ -1521,7 +1486,7 @@ namespace System.Unicode
             bidiClasses.Add(new BidiClass(BidiClassId.ws, "WS", "White Space"));
             for (BidiClass* bidiClass : bidiClasses)
             {
-                bidiClassIdMap[bidiClass->Id()] = bidiClass;
+                bidiClassIdMap[cast<uint>(cast<byte>(bidiClass->Id()))] = bidiClass;
                 shortNameMap[MakeCanonicalPropertyName(bidiClass->ShortName())] = bidiClass;
                 longNameMap[MakeCanonicalPropertyName(bidiClass->LongName())] = bidiClass;
             }
@@ -1535,9 +1500,9 @@ namespace System.Unicode
         }
         private static UniquePtr<BidiClassTable> instance;
         private List<BidiClass*> bidiClasses;
-        private HashMap<BidiClassId, BidiClass*> bidiClassIdMap;
-        private HashMap<string, BidiClass*> shortNameMap;
-        private HashMap<string, BidiClass*> longNameMap;
+        private HashMap<uint, void*> bidiClassIdMap;
+        private HashMap<string, void*> shortNameMap;
+        private HashMap<string, void*> longNameMap;
     }
      
     public const BidiClass* GetBidiClass(BidiClassId id)
@@ -1584,11 +1549,6 @@ namespace System.Unicode
         private string longName;
     }
     
-    public inline nothrow ulong GetHashCode(BidiPairedBracketTypeId id)
-    {
-        return cast<ulong>(cast<byte>(id));
-    }
-    
     public class BidiPairedBracketTypeTable
     {
         static BidiPairedBracketTypeTable() : instance(new BidiPairedBracketTypeTable())
@@ -1600,28 +1560,28 @@ namespace System.Unicode
         }
         public const BidiPairedBracketType* GetBidiPairedBracketType(BidiPairedBracketTypeId id) const
         {
-            HashMap<BidiPairedBracketTypeId, BidiPairedBracketType*>.ConstIterator it = bidiPairedBracketTypeIdMap.CFind(id);
+            HashMap<uint, void*>.ConstIterator it = bidiPairedBracketTypeIdMap.CFind(cast<uint>(cast<byte>(id)));
             if (it != bidiPairedBracketTypeIdMap.CEnd())
             {
-                return it->second;
+                return cast<BidiPairedBracketType*>(it->second);
             }
             return null;
         }
         public const BidiPairedBracketType* GetBidiPairedBracketTypeByShortName(const string& shortName) const
         {
-            HashMap<string, BidiPairedBracketType*>.ConstIterator it = shortNameMap.CFind(MakeCanonicalPropertyName(shortName));
+            HashMap<string, void*>.ConstIterator it = shortNameMap.CFind(MakeCanonicalPropertyName(shortName));
             if (it != shortNameMap.CEnd())
             {
-                return it->second;
+                return cast<BidiPairedBracketType*>(it->second);
             }
             return null;
         }
         public const BidiPairedBracketType* GetBidiPairedBracketTypeByLongName(const string& longName) const
         {
-            HashMap<string, BidiPairedBracketType*>.ConstIterator it = longNameMap.CFind(longName);
+            HashMap<string, void*>.ConstIterator it = longNameMap.CFind(longName);
             if (it != longNameMap.CEnd())
             {
-                return it->second;
+                return cast<BidiPairedBracketType*>(it->second);
             }
             return null;
         }
@@ -1632,7 +1592,7 @@ namespace System.Unicode
             bidiPairedBracketTypes.Add(new BidiPairedBracketType(BidiPairedBracketTypeId.none, "N", "None"));
             for (BidiPairedBracketType* bidiPairedBracketType : bidiPairedBracketTypes)
             {
-                bidiPairedBracketTypeIdMap[bidiPairedBracketType->Id()] = bidiPairedBracketType;
+                bidiPairedBracketTypeIdMap[cast<uint>(cast<byte>(bidiPairedBracketType->Id()))] = bidiPairedBracketType;
                 shortNameMap[MakeCanonicalPropertyName(bidiPairedBracketType->ShortName())] = bidiPairedBracketType;
                 longNameMap[MakeCanonicalPropertyName(bidiPairedBracketType->LongName())] = bidiPairedBracketType;
             }
@@ -1646,9 +1606,9 @@ namespace System.Unicode
         }
         private static UniquePtr<BidiPairedBracketTypeTable> instance;
         private List<BidiPairedBracketType*> bidiPairedBracketTypes;
-        private HashMap<BidiPairedBracketTypeId, BidiPairedBracketType*> bidiPairedBracketTypeIdMap;
-        private HashMap<string, BidiPairedBracketType*> shortNameMap;
-        private HashMap<string, BidiPairedBracketType*> longNameMap;
+        private HashMap<uint, void*> bidiPairedBracketTypeIdMap;
+        private HashMap<string, void*> shortNameMap;
+        private HashMap<string, void*> longNameMap;
     }
 
     public const BidiPairedBracketType* GetBidiPairedBracketType(BidiPairedBracketTypeId id)
@@ -1689,11 +1649,6 @@ namespace System.Unicode
         private string name;
     }
     
-    public inline nothrow ulong GetHashCode(AliasTypeId id)
-    {
-        return cast<ulong>(cast<byte>(id));
-    }
-    
     public class AliasTypeTable
     {
         static AliasTypeTable() : instance(new AliasTypeTable())
@@ -1705,19 +1660,19 @@ namespace System.Unicode
         }
         public const AliasType* GetAliasType(AliasTypeId id) const
         {
-            HashMap<AliasTypeId, AliasType*>.ConstIterator it = aliasTypeIdMap.CFind(id);
+            HashMap<uint, void*>.ConstIterator it = aliasTypeIdMap.CFind(cast<uint>(cast<byte>(id)));
             if (it != aliasTypeIdMap.CEnd())
             {
-                return it->second;
+                return cast<AliasType*>(it->second);
             }
             return null;
         }
         public const AliasType* GetAliasType(const string& name) const
         {
-            HashMap<string, AliasType*>.ConstIterator it = nameMap.CFind(name);
+            HashMap<string, void*>.ConstIterator it = nameMap.CFind(name);
             if (it != nameMap.CEnd())
             {
-                return it->second;
+                return cast<AliasType*>(it->second);
             }
             return null;
         }
@@ -1730,7 +1685,7 @@ namespace System.Unicode
             aliasTypes.Add(new AliasType(AliasTypeId.figment, "figment"));
             for (AliasType* aliasType : aliasTypes)
             {
-                aliasTypeIdMap[aliasType->Id()] = aliasType;
+                aliasTypeIdMap[cast<uint>(cast<byte>(aliasType->Id()))] = aliasType;
                 nameMap[aliasType->Name()] = aliasType;
             }
         }
@@ -1743,8 +1698,8 @@ namespace System.Unicode
         }
         private static UniquePtr<AliasTypeTable> instance;
         private List<AliasType*> aliasTypes;
-        private HashMap<AliasTypeId, AliasType*> aliasTypeIdMap;
-        private HashMap<string, AliasType*> nameMap;
+        private HashMap<uint, void*> aliasTypeIdMap;
+        private HashMap<string, void*> nameMap;
     }
 
     public const AliasType* GetAliasType(AliasTypeId id)

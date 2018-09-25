@@ -8,6 +8,7 @@
 #include <cmajor/symbols/SymbolTable.hpp>
 #include <cmajor/symbols/Warning.hpp>
 #include <cmajor/util/CodeFormatter.hpp>
+#include <mutex>
 #include <set>
 
 namespace cmajor { namespace symbols {
@@ -150,6 +151,13 @@ public:
     void DecDebugLogIndent() { --debugLogIndent; }
     int Index() const { return index; }
     void SetIndex(int index_) { index = index_; }
+    std::recursive_mutex& GetLock() { return lock; }
+    void StartBuild();
+    void StopBuild();
+    int64_t GetBuildStartTimeMs() const { return buildStartMs; }
+    int GetBuildTimeMs();
+    bool Preparing() const { return preparing; }
+    void SetPreparing(bool preparing_) { preparing = preparing_; }
 private:
     uint8_t format;
     ModuleFlags flags;
@@ -181,6 +189,10 @@ private:
     int debugLogIndent;
     Module* systemCoreModule;
     int index;
+    bool preparing;
+    std::recursive_mutex lock;
+    int64_t buildStartMs;
+    int64_t buildStopMs;
     void CheckUpToDate();
 };
 

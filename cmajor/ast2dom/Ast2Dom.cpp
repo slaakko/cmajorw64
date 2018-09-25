@@ -1570,7 +1570,10 @@ void Ast2DomVisitor::Visit(ConstantNode& constantNode)
     currentElement = constantElement.get();
     constantNode.Id()->Accept(*this);
     constantNode.TypeExpr()->Accept(*this);
-    constantNode.Value()->Accept(*this);
+    if (constantNode.Value())
+    {
+        constantNode.Value()->Accept(*this);
+    }
     prevElement->AppendChild(std::unique_ptr<dom::Node>(constantElement.release()));
     currentElement = prevElement;
 }

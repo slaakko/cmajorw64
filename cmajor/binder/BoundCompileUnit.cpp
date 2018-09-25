@@ -17,8 +17,11 @@
 #include <cmajor/symbols/DelegateSymbol.hpp>
 #include <cmajor/symbols/InterfaceTypeSymbol.hpp>
 #include <cmajor/symbols/Module.hpp>
+#include <cmajor/symbols/DebugFlags.hpp>
 #include <cmajor/util/Path.hpp>
 #include <cmajor/util/Unicode.hpp>
+#include <cmajor/util/Log.hpp>
+#include <cmajor/util/Time.hpp>
 #include <boost/filesystem.hpp>
 
 namespace cmajor { namespace binder {
@@ -200,7 +203,7 @@ void PtrToULongConversion::GenerateCall(Emitter& emitter, std::vector<GenObject*
 BoundCompileUnit::BoundCompileUnit(Module& module_, CompileUnitNode* compileUnitNode_, AttributeBinder* attributeBinder_) :
     BoundNode(&module_, Span(), BoundNodeType::boundCompileUnit), module(module_), symbolTable(module.GetSymbolTable()), compileUnitNode(compileUnitNode_), attributeBinder(attributeBinder_), currentNamespace(nullptr), 
     hasGotos(false), operationRepository(*this), functionTemplateRepository(*this), classTemplateRepository(*this), inlineFunctionRepository(*this), 
-    constExprFunctionRepository(*this), conversionTable(nullptr), bindingTypes(false), finalizing(false), compileUnitIndex(-2)
+    constExprFunctionRepository(*this), conversionTable(nullptr), bindingTypes(false), compileUnitIndex(-2), immutable(false)
 {
     if (compileUnitNode)
     {
@@ -261,6 +264,10 @@ FileScope* BoundCompileUnit::ReleaseLastFileScope()
 
 void BoundCompileUnit::AddBoundNode(std::unique_ptr<BoundNode>&& boundNode)
 {
+    if (immutable)
+    {
+        throw std::runtime_error("internal error: " + compileUnitNode->FilePath() + " is immutable");
+    }
     if (currentNamespace)
     {
         currentNamespace->AddMember(std::move(boundNode));
@@ -570,7 +577,7 @@ FunctionSymbol* BoundCompileUnit::GetConversion(TypeSymbol* sourceType, TypeSymb
         }
         else if (GetGlobalFlag(GlobalFlags::release) && conversion->IsInline())
         {
-            InstantiateInlineFunction(conversion, containerScope, span);
+            conversion = InstantiateInlineFunction(conversion, containerScope, span);
         }
     }
     return conversion;
@@ -593,9 +600,9 @@ bool BoundCompileUnit::InstantiateClassTemplateMemberFunction(FunctionSymbol* me
     return classTemplateRepository.Instantiate(memberFunction, containerScope, currentFunction, span);
 }
 
-void BoundCompileUnit::InstantiateInlineFunction(FunctionSymbol* inlineFunction, ContainerScope* containerScope, const Span& span)
+FunctionSymbol* BoundCompileUnit::InstantiateInlineFunction(FunctionSymbol* inlineFunction, ContainerScope* containerScope, const Span& span)
 {
-    inlineFunctionRepository.Instantiate(inlineFunction, containerScope, span);
+    return inlineFunctionRepository.Instantiate(inlineFunction, containerScope, span);
 }
 
 FunctionNode* BoundCompileUnit::GetFunctionNodeFor(FunctionSymbol* constExprFunctionSymbol)
@@ -703,7 +710,7 @@ void BoundCompileUnit::FinalizeBinding(ClassTemplateSpecializationSymbol* classT
             fileScopeAdded = true;
         }
         StatementBinder statementBinder(*this);
-        classTemplateSpecialization->GlobalNs()->Accept(statementBinder);
+        classTemplateSpecialization->GlobalNs()->Accept(statementBinder); 
         if (fileScopeAdded)
         {
             RemoveLastFileScope();
@@ -750,6 +757,16 @@ void BoundCompileUnit::AddCopyConstructorFor(const boost::uuids::uuid& typeId, s
 void BoundCompileUnit::AddCopyConstructorToMap(const boost::uuids::uuid& typeId, FunctionSymbol* copyConstructor)
 {
     copyConstructorMap[typeId] = copyConstructor;
+}
+
+void BoundCompileUnit::AddGlobalNs(std::unique_ptr<NamespaceNode>&& globalNs)
+{
+    globalNamespaceNodes.push_back(std::move(globalNs));
+}
+
+void BoundCompileUnit::AddFunctionSymbol(std::unique_ptr<FunctionSymbol>&& functionSymbol)
+{
+    functionSymbols.push_back(std::move(functionSymbol));
 }
 
 } } // namespace cmajor::binder

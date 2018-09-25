@@ -8,6 +8,7 @@
 #include <cmajor/symbols/TypeSymbol.hpp>
 #include <cmajor/symbols/VariableSymbol.hpp>
 #include <cmajor/ast/Class.hpp>
+#include <cmajor/ast/Constant.hpp>
 
 namespace cmajor { namespace symbols {
 
@@ -40,7 +41,7 @@ private:
     std::unordered_map<int, ClassTypeSymbol*> arityClassMap;
 };
 
-enum class ClassTypeSymbolFlags : uint16_t
+enum class ClassTypeSymbolFlags : uint8_t
 {
     none = 0,
     abstract_ = 1 << 0,
@@ -48,32 +49,31 @@ enum class ClassTypeSymbolFlags : uint16_t
     vmtInitialized = 1 << 2,
     imtsInitialized = 1 << 3,
     layoutsComputed = 1 << 4,
-    vmtObjectCreated = 1 << 5,
-    staticObjectCreated = 1 << 6,
-    statementsNotBound = 1 << 7,
-    recursiveComputed = 1 << 8,
-    recursive = 1 << 9
+    statementsNotBound = 1 << 5,
+    recursiveComputed = 1 << 6,
+    recursive = 1 << 7
 };
 
 inline ClassTypeSymbolFlags operator|(ClassTypeSymbolFlags left, ClassTypeSymbolFlags right)
 {
-    return ClassTypeSymbolFlags(uint16_t(left) | uint16_t(right));
+    return ClassTypeSymbolFlags(uint8_t(left) | uint8_t(right));
 }
 
 inline ClassTypeSymbolFlags operator&(ClassTypeSymbolFlags left, ClassTypeSymbolFlags right)
 {
-    return ClassTypeSymbolFlags(uint16_t(left) & uint16_t(right));
+    return ClassTypeSymbolFlags(uint8_t(left) & uint8_t(right));
 }
 
 inline ClassTypeSymbolFlags operator~(ClassTypeSymbolFlags operand)
 {
-    return ClassTypeSymbolFlags(~uint16_t(operand));
+    return ClassTypeSymbolFlags(~uint8_t(operand));
 }
 
-const int32_t classIdVmtIndexOffset = 0;
-const int32_t classNameVmtIndexOffset = 1;
-const int32_t imtsVmtIndexOffset = 2;
-const int32_t functionVmtIndexOffset = 3;
+const int32_t classIdVmtIndexOffset = 0;    // 64-bit class id
+const int32_t typeIdVmtIndexOffset = 1;     // 16-byte type id
+const int32_t classNameVmtIndexOffset = 3;  // class name pointer
+const int32_t imtsVmtIndexOffset = 4;       // interface method table pointer
+const int32_t functionVmtIndexOffset = 5;   // virtual method table
 
 class ClassTypeSymbol : public TypeSymbol
 {
@@ -150,10 +150,6 @@ public:
     void SetImtsInitialized() { SetFlag(ClassTypeSymbolFlags::imtsInitialized); }
     bool IsLayoutsComputed() const { return GetFlag(ClassTypeSymbolFlags::layoutsComputed); }
     void SetLayoutsComputed() { SetFlag(ClassTypeSymbolFlags::layoutsComputed); }
-    bool IsVmtObjectCreated() const { return GetFlag(ClassTypeSymbolFlags::vmtObjectCreated); }
-    void SetVmtObjectCreated() { SetFlag(ClassTypeSymbolFlags::vmtObjectCreated); }
-    bool IsStaticObjectCreated() const { return GetFlag(ClassTypeSymbolFlags::staticObjectCreated); }
-    void SetStaticObjectCreated() { SetFlag(ClassTypeSymbolFlags::staticObjectCreated); }
     bool StatementsNotBound() const { return GetFlag(ClassTypeSymbolFlags::statementsNotBound); }
     void SetStatementsNotBound() { SetFlag(ClassTypeSymbolFlags::statementsNotBound); }
     void ResetStatementsNotBound() { ResetFlag(ClassTypeSymbolFlags::statementsNotBound); }
@@ -226,6 +222,9 @@ private:
     llvm::Value* CreateImt(Emitter& emitter, int index);
     llvm::Value* CreateImts(Emitter& emitter);
 };
+
+ConstantNode* MakePolymorphicClassArray(const std::unordered_set<ClassTypeSymbol*>& polymorphicClasses, const std::u32string& arrayName);
+ConstantNode* MakeStaticClassArray(const std::unordered_set<ClassTypeSymbol*>& classesHavingStaticConstructor, const std::u32string& arrayName);
 
 } } // namespace cmajor::symbols
 

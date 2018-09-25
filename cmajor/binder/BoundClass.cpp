@@ -10,7 +10,8 @@
 
 namespace cmajor { namespace binder {
 
-BoundClass::BoundClass(Module* module_, ClassTypeSymbol* classTypeSymbol_) : BoundNode(module_, classTypeSymbol_->GetSpan(), BoundNodeType::boundClass), classTypeSymbol(classTypeSymbol_)
+BoundClass::BoundClass(Module* module_, ClassTypeSymbol* classTypeSymbol_) : 
+    BoundNode(module_, classTypeSymbol_->GetSpan(), BoundNodeType::boundClass), classTypeSymbol(classTypeSymbol_), inlineFunctionContainer(false)
 {
 }
 

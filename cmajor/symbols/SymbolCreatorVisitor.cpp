@@ -13,7 +13,8 @@
 
 namespace cmajor { namespace symbols {
 
-SymbolCreatorVisitor::SymbolCreatorVisitor(SymbolTable& symbolTable_) : symbolTable(symbolTable_), classInstanceNode(nullptr), classTemplateSpecialization(nullptr), functionIndex(0)
+SymbolCreatorVisitor::SymbolCreatorVisitor(SymbolTable& symbolTable_) : 
+    symbolTable(symbolTable_), classInstanceNode(nullptr), classTemplateSpecialization(nullptr), functionIndex(0), leaveFunction(false)
 {
 }
 
@@ -66,7 +67,7 @@ void SymbolCreatorVisitor::Visit(FunctionNode& functionNode)
             functionNode.Body()->Accept(*this);
         }
     }
-    symbolTable.EndFunction();
+    symbolTable.EndFunction(!leaveFunction);
 }
 
 void SymbolCreatorVisitor::Visit(ParameterNode& parameterNode)
@@ -115,7 +116,7 @@ void SymbolCreatorVisitor::Visit(StaticConstructorNode& staticConstructorNode)
     {
         staticConstructorNode.Body()->Accept(*this);
     }
-    symbolTable.EndStaticConstructor();
+    symbolTable.EndStaticConstructor(!leaveFunction);
 }
 
 void SymbolCreatorVisitor::Visit(ConstructorNode& constructorNode)
@@ -131,7 +132,7 @@ void SymbolCreatorVisitor::Visit(ConstructorNode& constructorNode)
     {
         constructorNode.Body()->Accept(*this);
     }
-    symbolTable.EndConstructor();
+    symbolTable.EndConstructor(!leaveFunction);
 }
 
 void SymbolCreatorVisitor::Visit(DestructorNode& destructorNode)
@@ -141,7 +142,7 @@ void SymbolCreatorVisitor::Visit(DestructorNode& destructorNode)
     {
         destructorNode.Body()->Accept(*this);
     }
-    symbolTable.EndDestructor();
+    symbolTable.EndDestructor(!leaveFunction);
 }
 
 void SymbolCreatorVisitor::Visit(MemberFunctionNode& memberFunctionNode)
@@ -157,7 +158,7 @@ void SymbolCreatorVisitor::Visit(MemberFunctionNode& memberFunctionNode)
     {
         memberFunctionNode.Body()->Accept(*this);
     }
-    symbolTable.EndMemberFunction();
+    symbolTable.EndMemberFunction(!leaveFunction);
 }
 
 void SymbolCreatorVisitor::Visit(ConversionFunctionNode& conversionFunctionNode)
@@ -167,7 +168,7 @@ void SymbolCreatorVisitor::Visit(ConversionFunctionNode& conversionFunctionNode)
     {
         conversionFunctionNode.Body()->Accept(*this);
     }
-    symbolTable.EndConversionFunction();
+    symbolTable.EndConversionFunction(!leaveFunction);
 }
 
 void SymbolCreatorVisitor::Visit(MemberVariableNode& memberVariableNode)

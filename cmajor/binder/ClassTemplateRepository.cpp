@@ -199,7 +199,7 @@ void ClassTemplateRepository::BindClassTemplateSpecialization(ClassTemplateSpeci
     globalNs->Accept(typeBinder);
     if (templateParameterBinding)
     {
-        classTemplateSpecialization->SetGlobalNs(std::move(globalNs));
+        classTemplateSpecialization->SetGlobalNs(std::move(globalNs)); 
         if (fileScopeAdded)
         {
             boundCompileUnit.RemoveLastFileScope();
@@ -207,7 +207,7 @@ void ClassTemplateRepository::BindClassTemplateSpecialization(ClassTemplateSpeci
     }
     else if (boundCompileUnit.BindingTypes())
     {
-        classTemplateSpecialization->SetGlobalNs(std::move(globalNs));
+        classTemplateSpecialization->SetGlobalNs(std::move(globalNs)); 
         classTemplateSpecialization->SetStatementsNotBound();
         if (fileScopeAdded)
         {
@@ -219,7 +219,7 @@ void ClassTemplateRepository::BindClassTemplateSpecialization(ClassTemplateSpeci
     {
         StatementBinder statementBinder(boundCompileUnit);
         globalNs->Accept(statementBinder);
-        classTemplateSpecialization->SetGlobalNs(std::move(globalNs));
+        classTemplateSpecialization->SetGlobalNs(std::move(globalNs)); 
         if (fileScopeAdded)
         {
             boundCompileUnit.RemoveLastFileScope();

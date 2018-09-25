@@ -1246,10 +1246,14 @@ void TypeBinder::Visit(ConstantNode& constantNode)
     TypeSymbol* typeSymbol = ResolveType(constantNode.TypeExpr(), boundCompileUnit, containerScope, typeResolverFlags);
     constantSymbol->SetType(typeSymbol);
     constantSymbol->SetEvaluating();
-    std::unique_ptr<Value> value = Evaluate(constantNode.Value(), typeSymbol, containerScope, boundCompileUnit, false, nullptr, constantNode.GetSpan());
+    std::unique_ptr<Value> value;
+    value = Evaluate(constantNode.Value(), typeSymbol, containerScope, boundCompileUnit, false, nullptr, constantNode.GetSpan());
     Value* val = value.get();
-    constantSymbol->SetType(value->GetType(&symbolTable));
-    constantSymbol->SetValue(value.release());
+    if (val)
+    {
+        constantSymbol->SetType(value->GetType(&symbolTable));
+        constantSymbol->SetValue(value.release());
+    }
     constantSymbol->ResetEvaluating();
     if (val)
     {

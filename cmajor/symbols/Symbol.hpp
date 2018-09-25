@@ -82,10 +82,11 @@ enum class SymbolFlags : uint8_t
     none = 0, 
     access = 1 << 0 | 1 << 1,
     static_ = 1 << 2,
-    nothrow_ = 1 << 3,
-    project = 1 << 4,
-    bound = 1 << 5,
-    inConversionTable = 1 << 6
+    external = 1 << 3,
+    nothrow_ = 1 << 4,
+    project = 1 << 5,
+    bound = 1 << 6,
+    inConversionTable = 1 << 7
 };
 
 inline SymbolFlags operator&(SymbolFlags left, SymbolFlags right)
@@ -153,6 +154,8 @@ public:
     SymbolFlags GetSymbolFlags() const { return flags; }
     bool IsStatic() const { return GetFlag(SymbolFlags::static_); }
     void SetStatic() { SetFlag(SymbolFlags::static_); }
+    bool IsExternal() const { return GetFlag(SymbolFlags::external); }
+    void SetExternal() { SetFlag(SymbolFlags::external); }
     bool IsNothrow() const { return GetFlag(SymbolFlags::nothrow_); }
     void SetNothrow() { SetFlag(SymbolFlags::nothrow_); }
     bool IsProject() const { return GetFlag(SymbolFlags::project); }

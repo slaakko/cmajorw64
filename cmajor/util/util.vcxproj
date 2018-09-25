@@ -36,6 +36,7 @@
     <ClCompile Include="TextUtils.cpp" />
     <ClCompile Include="Time.cpp" />
     <ClCompile Include="Unicode.cpp" />
+    <ClCompile Include="Uuid.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BinaryReader.hpp" />
@@ -60,6 +61,7 @@
     <ClInclude Include="Time.hpp" />
     <ClInclude Include="Unicode.hpp" />
     <ClInclude Include="Util.hpp" />
+    <ClInclude Include="Uuid.hpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>

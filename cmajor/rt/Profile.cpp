@@ -128,10 +128,11 @@ void DoneProfiler()
 
 } }  // namespace cmajor::rt
 
-extern "C" RT_API void RtStartProfiling()
+extern "C" RT_API void RtStartProfiling(int64_t numberOfPolymorphicClassIds, const uint64_t* polymorphicClassIdArray, 
+    int64_t numberOfStaticClassIds, const uint64_t* staticClassIdArray)
 {
     cmajor::rt::InitProfiler();
-    RtInit();
+    RtInit(numberOfPolymorphicClassIds, polymorphicClassIdArray, numberOfStaticClassIds, staticClassIdArray);
 }
 
 extern "C" RT_API void RtEndProfiling()

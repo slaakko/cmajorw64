@@ -3,8 +3,9 @@
 // Distributed under the MIT license
 // =================================
 
-public extern cdecl nothrow void RtInit();
+public extern cdecl nothrow void RtInit(long numberOfPolymorphicClassIds, const ulong* polymorphicClassIdArray, long numberOfStaticClassIds, const ulong* staticClassIdArray);
 public extern cdecl nothrow void RtDone();
+public extern cdecl nothrow ulong RtDynamicInitVmt(void* vmt);
 public extern cdecl nothrow int RtArgc();
 public extern cdecl nothrow const char** RtArgv();
 public extern cdecl nothrow void RtExit(int exitCode);
@@ -158,13 +159,13 @@ public extern cdecl nothrow void RtSetInputBZip2(void* inChunk, uint inAvail, vo
 public extern cdecl nothrow int RtCompressBZip2(void* outChunk, uint outChunkSize, uint* have, uint* outAvail, void* handle, int action);
 public extern cdecl nothrow int RtDecompressBZip2(void* outChunk, uint outChunkSize, uint* have, uint* outAvail, uint* inAvail, void* handle);
 public extern cdecl nothrow const char* RtRetvalStrBZip2(int retVal);
-public extern cdecl nothrow void RtStartUnitTest(int numAssertions, const char* unitTestFilePath);
+public extern cdecl nothrow void RtStartUnitTest(int numAssertions, const char* unitTestFilePath, long numberOfPolymorphicClassIds, const ulong* polymorphicClassIdArray, long numberOfStaticClassIds, const ulong* staticClassIdArray);
 public extern cdecl nothrow void RtEndUnitTest(const char* testName, int exitCode);
 public extern cdecl nothrow void RtSetUnitTestAssertionResult(int assertionIndex, bool assertionResult, int lineNumber);
 public extern cdecl nothrow void RtSetUnitTestException(const char* exceptionStr);
 public extern cdecl nothrow void RtProfileStartFunction(void* functionId);
 public extern cdecl nothrow void RtProfileEndFunction(void* functionId);
-public extern cdecl nothrow void RtStartProfiling();
+public extern cdecl nothrow void RtStartProfiling(long numberOfPolymorphicClassIds, const ulong* polymorphicClassIdArray);
 public extern cdecl nothrow void RtEndProfiling();
 public extern cdecl nothrow int RtExecute(const char* command);
 public extern cdecl nothrow int RtBeginExec(const char* command);
