@@ -1,0 +1,187 @@
+using System;
+using System.IO;
+using System.Collections;
+using System.Dom;
+using System.XPath;
+using System.Text;
+
+namespace cpp2cm
+{   
+    internal class Project
+    {
+        public nothrow Project(const ustring& languageGuid_, const ustring& name_, const string& filePath_, const ustring& guid_) : 
+            languageGuid(languageGuid_), name(name_), filePath(filePath_), guid(guid_)
+        {
+        }
+        public void AddDependency(const ustring& guid)
+        {
+            dependencies.Add(guid);
+        }
+        public void AddSourceFileName(const string& sourceFileName)
+        {
+            sourceFileNames.Add(Path.MakeCanonical(sourceFileName));
+        }
+        public string baseDir;
+        public ustring languageGuid;
+        public ustring name;
+        public string filePath;
+        public ustring guid;
+        public List<string> sourceFileNames;
+        public List<ustring> dependencies;
+    }
+    
+    internal void Visit(List<Project*>& buildOrder, Project* project, HashSet<Project*>& visited, HashSet<Project*>& tempVisit, Solution* solution)
+    {
+        if (tempVisit.CFind(project) == tempVisit.CEnd())
+        {
+            if (visited.CFind(project) == visited.CEnd())
+            {
+                tempVisit.Insert(project);
+                for (const ustring& dependendsOnGuid : project->dependencies)
+                {
+                    Project* dependsOnProject = solution->GetProject(dependendsOnGuid);
+                    Visit(buildOrder, dependsOnProject, visited, tempVisit, solution);
+                }
+                tempVisit.Remove(project);
+                visited.Insert(project);
+                buildOrder.Add(project);
+            }
+        }
+    }
+    
+    internal class Solution
+    {
+        public nothrow Solution(const ustring& formatVersion_, const ustring& visualStudioVersion_, const ustring& minimumVisualStudioVersion_) : 
+            formatVersion(formatVersion_), visualStudioVersion(visualStudioVersion_), minimumVisualStudioVersion(minimumVisualStudioVersion_)
+        {
+        }
+        public nothrow void AddProject(Project* project)
+        {
+            projects.Add(UniquePtr<Project>(project));
+        }
+        public List<Project*> BuildOrder()
+        {
+            for (const UniquePtr<Project>& project : projects)
+            {
+                guidProjectMap[project->guid] = project.Get();
+            }
+            List<Project*> buildOrder;
+            HashSet<Project*> visited;
+            HashSet<Project*> tempVisit;
+            for (const UniquePtr<Project>& project : projects)
+            {
+                if (visited.CFind(project.Get()) == visited.CEnd())
+                {
+                    Visit(buildOrder, project.Get(), visited, tempVisit, this);
+                }
+            }        
+            return buildOrder;
+        }
+        public Project* GetProject(const ustring& projectGuid) const
+        {
+            HashMap<ustring, Project*>.ConstIterator it = guidProjectMap.CFind(projectGuid);
+            if (it != guidProjectMap.CEnd())
+            {
+                return it->second;
+            }
+            else
+            {
+                throw Exception("project id " + ToUtf8(projectGuid) + " not found");
+            }
+        }
+        public string baseDir;
+        public ustring formatVersion;
+        public ustring visualStudioVersion;
+        public ustring minimumVisualStudioVersion;
+        public List<UniquePtr<Project>> projects;
+        public HashMap<ustring, Project*> guidProjectMap;
+    }
+    
+    internal void ConvertSolutionToXml(const Input& input)
+    {
+        if (Flags.Verbose())
+        {
+            Console.Out() << "> " << input.solutionFilePath << endl();
+        }
+        SolutionGrammar* solutionGrammar = new SolutionGrammar();
+        ustring solutionFileContent = ToUtf32(File.ReadAllText(input.solutionFilePath));
+        UniquePtr<Solution> solution(solutionGrammar->Parse(solutionFileContent.Chars(), solutionFileContent.Chars() + solutionFileContent.Length(), 0, input.solutionFilePath));
+        solution->baseDir = Path.GetDirectoryName(input.solutionFilePath);
+        for (const UniquePtr<Project>& project : solution->projects)
+        {
+            if (Flags.Verbose())
+            {
+                Console.Out() << ">> " << project->name << endl();
+            }
+            string projectFilePath = GetFullPath(Path.Combine(solution->baseDir, project->filePath));
+            project->baseDir = Path.GetDirectoryName(projectFilePath);
+            UniquePtr<DomDocument> projectDoc = ParseXmlFileToDomDocument(projectFilePath);
+            UniquePtr<XPathObject> headerFilesObject = Evaluate(u"Project/ItemGroup/ClInclude", projectDoc.Get());
+            XPathNodeSet* headerFilesNodeSet = headerFilesObject.Get() as XPathNodeSet*;
+            if (headerFilesNodeSet != null)
+            {
+                long n = headerFilesNodeSet->Length();
+                for (long i = 0; i < n; ++i)
+                {
+                    DomNode* headerFileNode = (*headerFilesNodeSet)[i];
+                    DomElement* headerFileElement = headerFileNode as DomElement*;
+                    if (headerFileElement != null)
+                    {
+                        string headerFileName = ToUtf8(headerFileElement->GetAttribute(u"Include"));
+                        project->AddSourceFileName(headerFileName);
+                    }
+                }
+            }
+            UniquePtr<XPathObject> sourceFilesObject = Evaluate(u"Project/ItemGroup/ClCompile", projectDoc.Get());
+            XPathNodeSet* sourceFilesNodeSet = sourceFilesObject.Get() as XPathNodeSet*;
+            if (sourceFilesNodeSet != null)
+            {
+                long n = sourceFilesNodeSet->Length();
+                for (long i = 0; i < n; ++i)
+                {
+                    DomNode* sourceFileNode = (*sourceFilesNodeSet)[i];
+                    DomElement* sourceFileElement = sourceFileNode as DomElement*;
+                    if (sourceFileElement != null)
+                    {
+                        string sourceFileName = ToUtf8(sourceFileElement->GetAttribute(u"Include"));
+                        project->AddSourceFileName(sourceFileName);
+                    }
+                }
+            }
+        }
+        string solutionName = Path.GetFileNameWithoutExtension(input.solutionFilePath);
+        string solutionXmlFilePath = GetFullPath(Path.Combine(input.baseDir, solutionName + ".xml"));
+        DomDocument solutionXmlDoc;
+        UniquePtr<DomElement> solutionElement(new DomElement(u"solution"));
+        solutionElement->SetAttribute(u"name", ToUtf32(solutionName));
+        solutionElement->SetAttribute(u"base", ToUtf32(solution->baseDir));
+        UniquePtr<DomElement> projectsElement(new DomElement(u"projects"));
+        List<Project*> buildOrder = solution->BuildOrder();
+        for (Project* project : buildOrder)
+        {
+            UniquePtr<DomElement> projectElement(new DomElement(u"project"));
+            projectElement->SetAttribute(u"name", project->name);
+            projectElement->SetAttribute(u"base", ToUtf32(project->baseDir));
+            projectElement->SetAttribute(u"filePath", ToUtf32(Path.MakeCanonical(project->filePath)));
+            projectElement->SetAttribute(u"guid", project->guid);
+            UniquePtr<DomElement> sourceFilesElement(new DomElement(u"sourceFiles"));
+            for (const string& sourceFileName : project->sourceFileNames)
+            {
+                UniquePtr<DomElement> sourceFileElement(new DomElement(u"sourceFile"));
+                sourceFileElement->SetAttribute(u"name", ToUtf32(sourceFileName));
+                sourceFilesElement->AppendChild(UniquePtr<DomNode>(sourceFileElement.Release()));
+            }
+            projectElement->AppendChild(UniquePtr<DomNode>(sourceFilesElement.Release()));
+            projectsElement->AppendChild(UniquePtr<DomNode>(projectElement.Release()));
+        }
+        solutionElement->AppendChild(UniquePtr<DomNode>(projectsElement.Release()));
+        solutionXmlDoc.AppendChild(UniquePtr<DomNode>(solutionElement.Release()));
+        StreamWriter writer = File.CreateText(solutionXmlFilePath);
+        CodeFormatter formatter(writer);
+        solutionXmlDoc.Write(formatter);
+        if (Flags.Verbose())
+        {
+            Console.Out() << "==> " << solutionXmlFilePath << endl();
+        }
+    }    
+}    

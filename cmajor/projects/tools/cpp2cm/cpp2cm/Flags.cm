@@ -1,0 +1,23 @@
+using System;
+
+public static class Flags
+{
+    public static nothrow bool Verbose() 
+    {
+        return verbose;
+    }
+    public static nothrow void SetVerbose()
+    {
+        verbose = true;
+    }
+    public static nothrow bool Force() 
+    {
+        return force;
+    }
+    public static nothrow void SetForce()
+    {
+        force = true;
+    }
+    static bool verbose;
+    static bool force;
+}

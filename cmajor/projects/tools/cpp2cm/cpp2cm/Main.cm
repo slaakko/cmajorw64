@@ -1,0 +1,71 @@
+using System;
+using System.IO;
+using System.Collections;
+using cpp2cm;
+
+const char* Version() 
+{
+    return "2.5.0";
+}
+
+void PrintHelp()
+{
+    Console.Out() << "C++ to Cmajor converter version " << Version() << endl() <<
+        "Usage: cpp2cm [options] { INPUT.XML }" << endl() <<
+        "Options:" << endl() <<
+        "--help (-h)" << endl() <<
+        "   Print this help" << endl() <<
+        "--verbose (-v)" << endl() <<
+        "   Be verbose" << endl();
+}
+
+int main(int argc, const char** argv)
+{
+    try
+    {
+        if (argc < 2)
+        {
+            PrintHelp();
+            return 0;
+        }
+        List<string> inputXmlFilePaths;
+        for (int i = 1; i < argc; ++i)
+        {
+            string arg = argv[i];
+            if (arg.StartsWith("-"))
+            {
+                if (arg == "--help" || arg == "-h")
+                {
+                    PrintHelp();
+                    return 0;
+                }
+                else if (arg == "--verbose" || arg == "-v")
+                {
+                    Flags.SetVerbose();
+                }
+            }
+            else 
+            {
+                inputXmlFilePaths.Add(GetFullPath(arg));
+            }
+        }
+        for (const string& inputXmlFilePath : inputXmlFilePaths)
+        {
+            if (inputXmlFilePath.EndsWith(".xml"))
+            {
+                Input input = ReadInputXml(inputXmlFilePath);
+                ConvertSolutionToXml(input);
+            }
+            else
+            {
+                throw Exception("error: input file '" + inputXmlFilePath + "' does not have .xml extension");
+            }
+        }
+    }
+    catch (const Exception& ex)
+    {
+        Console.Error() << ex.ToString() << endl();
+        return 1;
+    }
+    return 0;
+}

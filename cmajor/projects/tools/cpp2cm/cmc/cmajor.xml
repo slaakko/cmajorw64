@@ -1,0 +1,724 @@
+<solution base="C:/Users/Seppo/cmajorw64/cmajor" name="cmajor">
+    <projects>
+        <project base="C:/Users/Seppo/cmajorw64/cmajor/util" filePath="util/util.vcxproj" guid="{879B25C9-B0B5-4928-B84B-5D212802BD15}" name="util">
+            <sourceFiles>
+                <sourceFile name="BinaryReader.hpp"/>
+                <sourceFile name="BinaryWriter.hpp"/>
+                <sourceFile name="CodeFormatter.hpp"/>
+                <sourceFile name="Defines.hpp"/>
+                <sourceFile name="Error.hpp"/>
+                <sourceFile name="Handle.hpp"/>
+                <sourceFile name="InitDone.hpp"/>
+                <sourceFile name="Json.hpp"/>
+                <sourceFile name="Log.hpp"/>
+                <sourceFile name="MappedInputFile.hpp"/>
+                <sourceFile name="MemoryReader.hpp"/>
+                <sourceFile name="Mutex.hpp"/>
+                <sourceFile name="Path.hpp"/>
+                <sourceFile name="Prime.hpp"/>
+                <sourceFile name="Random.hpp"/>
+                <sourceFile name="Sha1.hpp"/>
+                <sourceFile name="String.hpp"/>
+                <sourceFile name="System.hpp"/>
+                <sourceFile name="TextUtils.hpp"/>
+                <sourceFile name="Time.hpp"/>
+                <sourceFile name="Unicode.hpp"/>
+                <sourceFile name="Util.hpp"/>
+                <sourceFile name="Uuid.hpp"/>
+                <sourceFile name="BinaryReader.cpp"/>
+                <sourceFile name="BinaryWriter.cpp"/>
+                <sourceFile name="CodeFormatter.cpp"/>
+                <sourceFile name="InitDone.cpp"/>
+                <sourceFile name="Json.cpp"/>
+                <sourceFile name="Log.cpp"/>
+                <sourceFile name="MappedInputFile.cpp"/>
+                <sourceFile name="MemoryReader.cpp"/>
+                <sourceFile name="Mutex.cpp"/>
+                <sourceFile name="Path.cpp"/>
+                <sourceFile name="Prime.cpp"/>
+                <sourceFile name="Random.cpp"/>
+                <sourceFile name="Sha1.cpp"/>
+                <sourceFile name="System.cpp"/>
+                <sourceFile name="TextUtils.cpp"/>
+                <sourceFile name="Time.cpp"/>
+                <sourceFile name="Unicode.cpp"/>
+                <sourceFile name="Uuid.cpp"/>
+            </sourceFiles>
+        </project>
+        <project base="C:/Users/Seppo/cmajorw64/cmajor/codedom" filePath="codedom/codedom.vcxproj" guid="{CE8DE27D-3B13-4E50-A04E-301585F9F731}" name="codedom">
+            <sourceFiles>
+                <sourceFile name="Declaration.hpp"/>
+                <sourceFile name="Expression.hpp"/>
+                <sourceFile name="InitDone.hpp"/>
+                <sourceFile name="Literal.hpp"/>
+                <sourceFile name="Object.hpp"/>
+                <sourceFile name="Operator.hpp"/>
+                <sourceFile name="Statement.hpp"/>
+                <sourceFile name="Type.hpp"/>
+                <sourceFile name="Visitor.hpp"/>
+                <sourceFile name="Declaration.cpp"/>
+                <sourceFile name="Expression.cpp"/>
+                <sourceFile name="InitDone.cpp"/>
+                <sourceFile name="Literal.cpp"/>
+                <sourceFile name="Object.cpp"/>
+                <sourceFile name="Operator.cpp"/>
+                <sourceFile name="Statement.cpp"/>
+                <sourceFile name="Type.cpp"/>
+            </sourceFiles>
+        </project>
+        <project base="C:/Users/Seppo/cmajorw64/cmajor/parsing" filePath="parsing/parsing.vcxproj" guid="{01B04136-057A-4BD1-86A7-6779D1CC8B09}" name="parsing">
+            <sourceFiles>
+                <sourceFile name="Action.hpp"/>
+                <sourceFile name="Composite.hpp"/>
+                <sourceFile name="Exception.hpp"/>
+                <sourceFile name="Grammar.hpp"/>
+                <sourceFile name="InitDone.hpp"/>
+                <sourceFile name="Keyword.hpp"/>
+                <sourceFile name="Linking.hpp"/>
+                <sourceFile name="Match.hpp"/>
+                <sourceFile name="Namespace.hpp"/>
+                <sourceFile name="Nonterminal.hpp"/>
+                <sourceFile name="Parser.hpp"/>
+                <sourceFile name="ParsingData.hpp"/>
+                <sourceFile name="ParsingDomain.hpp"/>
+                <sourceFile name="ParsingObject.hpp"/>
+                <sourceFile name="Primitive.hpp"/>
+                <sourceFile name="Rule.hpp"/>
+                <sourceFile name="Scanner.hpp"/>
+                <sourceFile name="Scope.hpp"/>
+                <sourceFile name="StdLib.hpp"/>
+                <sourceFile name="Utility.hpp"/>
+                <sourceFile name="Visitor.hpp"/>
+                <sourceFile name="XmlLog.hpp"/>
+                <sourceFile name="Action.cpp"/>
+                <sourceFile name="Composite.cpp"/>
+                <sourceFile name="Exception.cpp"/>
+                <sourceFile name="Grammar.cpp"/>
+                <sourceFile name="InitDone.cpp"/>
+                <sourceFile name="Keyword.cpp"/>
+                <sourceFile name="Linking.cpp"/>
+                <sourceFile name="Namespace.cpp"/>
+                <sourceFile name="Nonterminal.cpp"/>
+                <sourceFile name="Parser.cpp"/>
+                <sourceFile name="ParsingData.cpp"/>
+                <sourceFile name="ParsingDomain.cpp"/>
+                <sourceFile name="ParsingObject.cpp"/>
+                <sourceFile name="Primitive.cpp"/>
+                <sourceFile name="Rule.cpp"/>
+                <sourceFile name="Scanner.cpp"/>
+                <sourceFile name="Scope.cpp"/>
+                <sourceFile name="StdLib.cpp"/>
+                <sourceFile name="Utility.cpp"/>
+                <sourceFile name="XmlLog.cpp"/>
+            </sourceFiles>
+        </project>
+        <project base="C:/Users/Seppo/cmajorw64/cmajor/ast" filePath="ast/ast.vcxproj" guid="{CE56C110-CB05-4593-97FA-A664D6B67265}" name="ast">
+            <sourceFiles>
+                <sourceFile name="AstReader.hpp"/>
+                <sourceFile name="AstWriter.hpp"/>
+                <sourceFile name="Attribute.hpp"/>
+                <sourceFile name="BasicType.hpp"/>
+                <sourceFile name="Class.hpp"/>
+                <sourceFile name="Clone.hpp"/>
+                <sourceFile name="CompileUnit.hpp"/>
+                <sourceFile name="Concept.hpp"/>
+                <sourceFile name="Constant.hpp"/>
+                <sourceFile name="Delegate.hpp"/>
+                <sourceFile name="Enumeration.hpp"/>
+                <sourceFile name="Expression.hpp"/>
+                <sourceFile name="Function.hpp"/>
+                <sourceFile name="Identifier.hpp"/>
+                <sourceFile name="InitDone.hpp"/>
+                <sourceFile name="Interface.hpp"/>
+                <sourceFile name="Literal.hpp"/>
+                <sourceFile name="Namespace.hpp"/>
+                <sourceFile name="Node.hpp"/>
+                <sourceFile name="NodeList.hpp"/>
+                <sourceFile name="Parameter.hpp"/>
+                <sourceFile name="Project.hpp"/>
+                <sourceFile name="Solution.hpp"/>
+                <sourceFile name="SourceToken.hpp"/>
+                <sourceFile name="Specifier.hpp"/>
+                <sourceFile name="Statement.hpp"/>
+                <sourceFile name="SystemFileIndex.hpp"/>
+                <sourceFile name="Template.hpp"/>
+                <sourceFile name="Typedef.hpp"/>
+                <sourceFile name="TypeExpr.hpp"/>
+                <sourceFile name="Visitor.hpp"/>
+                <sourceFile name="AstReader.cpp"/>
+                <sourceFile name="AstWriter.cpp"/>
+                <sourceFile name="Attribute.cpp"/>
+                <sourceFile name="BasicType.cpp"/>
+                <sourceFile name="Class.cpp"/>
+                <sourceFile name="Clone.cpp"/>
+                <sourceFile name="CompileUnit.cpp"/>
+                <sourceFile name="Concept.cpp"/>
+                <sourceFile name="Constant.cpp"/>
+                <sourceFile name="Delegate.cpp"/>
+                <sourceFile name="Enumeration.cpp"/>
+                <sourceFile name="Expression.cpp"/>
+                <sourceFile name="Function.cpp"/>
+                <sourceFile name="Identifier.cpp"/>
+                <sourceFile name="InitDone.cpp"/>
+                <sourceFile name="Interface.cpp"/>
+                <sourceFile name="Literal.cpp"/>
+                <sourceFile name="Namespace.cpp"/>
+                <sourceFile name="Node.cpp"/>
+                <sourceFile name="Parameter.cpp"/>
+                <sourceFile name="Project.cpp"/>
+                <sourceFile name="Solution.cpp"/>
+                <sourceFile name="SourceToken.cpp"/>
+                <sourceFile name="Specifier.cpp"/>
+                <sourceFile name="Statement.cpp"/>
+                <sourceFile name="SystemFileIndex.cpp"/>
+                <sourceFile name="Template.cpp"/>
+                <sourceFile name="Typedef.cpp"/>
+                <sourceFile name="TypeExpr.cpp"/>
+                <sourceFile name="Visitor.cpp"/>
+            </sourceFiles>
+        </project>
+        <project base="C:/Users/Seppo/cmajorw64/cmajor/parser" filePath="parser/parser.vcxproj" guid="{A143C01A-CA8F-4A48-BA9A-254B81495FF2}" name="parser">
+            <sourceFiles>
+                <sourceFile name="Attribute.hpp"/>
+                <sourceFile name="BasicType.hpp"/>
+                <sourceFile name="Class.hpp"/>
+                <sourceFile name="CommandLine.hpp"/>
+                <sourceFile name="CompileUnit.hpp"/>
+                <sourceFile name="Concept.hpp"/>
+                <sourceFile name="Constant.hpp"/>
+                <sourceFile name="Delegate.hpp"/>
+                <sourceFile name="Enumeration.hpp"/>
+                <sourceFile name="Expression.hpp"/>
+                <sourceFile name="FileRegistry.hpp"/>
+                <sourceFile name="Function.hpp"/>
+                <sourceFile name="Identifier.hpp"/>
+                <sourceFile name="Interface.hpp"/>
+                <sourceFile name="Json.hpp"/>
+                <sourceFile name="Keyword.hpp"/>
+                <sourceFile name="Literal.hpp"/>
+                <sourceFile name="Operator.hpp"/>
+                <sourceFile name="Parameter.hpp"/>
+                <sourceFile name="ParsingContext.hpp"/>
+                <sourceFile name="Project.hpp"/>
+                <sourceFile name="Solution.hpp"/>
+                <sourceFile name="SourceToken.hpp"/>
+                <sourceFile name="Specifier.hpp"/>
+                <sourceFile name="Statement.hpp"/>
+                <sourceFile name="Template.hpp"/>
+                <sourceFile name="Typedef.hpp"/>
+                <sourceFile name="TypeExpr.hpp"/>
+                <sourceFile name="Attribute.cpp"/>
+                <sourceFile name="BasicType.cpp"/>
+                <sourceFile name="Class.cpp"/>
+                <sourceFile name="CommandLine.cpp"/>
+                <sourceFile name="CompileUnit.cpp"/>
+                <sourceFile name="Concept.cpp"/>
+                <sourceFile name="Constant.cpp"/>
+                <sourceFile name="Delegate.cpp"/>
+                <sourceFile name="Enumeration.cpp"/>
+                <sourceFile name="Expression.cpp"/>
+                <sourceFile name="FileRegistry.cpp"/>
+                <sourceFile name="Function.cpp"/>
+                <sourceFile name="Identifier.cpp"/>
+                <sourceFile name="Interface.cpp"/>
+                <sourceFile name="Json.cpp"/>
+                <sourceFile name="Keyword.cpp"/>
+                <sourceFile name="Literal.cpp"/>
+                <sourceFile name="Parameter.cpp"/>
+                <sourceFile name="ParsingContext.cpp"/>
+                <sourceFile name="Project.cpp"/>
+                <sourceFile name="Solution.cpp"/>
+                <sourceFile name="SourceToken.cpp"/>
+                <sourceFile name="Specifier.cpp"/>
+                <sourceFile name="Statement.cpp"/>
+                <sourceFile name="Template.cpp"/>
+                <sourceFile name="Typedef.cpp"/>
+                <sourceFile name="TypeExpr.cpp"/>
+            </sourceFiles>
+        </project>
+        <project base="C:/Users/Seppo/cmajorw64/cmajor/xml" filePath="xml/xml.vcxproj" guid="{32E61B8C-4433-4969-9E41-A53494A53C1B}" name="xml">
+            <sourceFiles>
+                <sourceFile name="XmlContentHandler.hpp"/>
+                <sourceFile name="XmlGrammar.hpp"/>
+                <sourceFile name="XmlParser.hpp"/>
+                <sourceFile name="XmlProcessor.hpp"/>
+                <sourceFile name="XmlContentHandler.cpp"/>
+                <sourceFile name="XmlGrammar.cpp"/>
+                <sourceFile name="XmlParser.cpp"/>
+                <sourceFile name="XmlProcessor.cpp"/>
+            </sourceFiles>
+        </project>
+        <project base="C:/Users/Seppo/cmajorw64/cmajor/dom" filePath="dom/dom.vcxproj" guid="{77CCE7D1-FA82-4620-9F20-309E671E0609}" name="dom">
+            <sourceFiles>
+                <sourceFile name="Document.hpp"/>
+                <sourceFile name="DocumentFragment.hpp"/>
+                <sourceFile name="Element.hpp"/>
+                <sourceFile name="Exception.hpp"/>
+                <sourceFile name="Node.hpp"/>
+                <sourceFile name="CharacterData.hpp"/>
+                <sourceFile name="Parser.hpp"/>
+                <sourceFile name="Document.cpp"/>
+                <sourceFile name="DocumentFragment.cpp"/>
+                <sourceFile name="Element.cpp"/>
+                <sourceFile name="Exception.cpp"/>
+                <sourceFile name="Node.cpp"/>
+                <sourceFile name="CharacterData.cpp"/>
+                <sourceFile name="Parser.cpp"/>
+            </sourceFiles>
+        </project>
+        <project base="C:/Users/Seppo/cmajorw64/cmajor/xpath" filePath="xpath/xpath.vcxproj" guid="{11EE390E-F284-4F92-867C-C8A38013C349}" name="xpath">
+            <sourceFiles>
+                <sourceFile name="InitDone.hpp"/>
+                <sourceFile name="XPath.hpp"/>
+                <sourceFile name="XPathContext.hpp"/>
+                <sourceFile name="XPathDebug.hpp"/>
+                <sourceFile name="XPathEvaluate.hpp"/>
+                <sourceFile name="XPathExpr.hpp"/>
+                <sourceFile name="XPathFunction.hpp"/>
+                <sourceFile name="XPathObject.hpp"/>
+                <sourceFile name="InitDone.cpp"/>
+                <sourceFile name="XPath.cpp"/>
+                <sourceFile name="XPathContext.cpp"/>
+                <sourceFile name="XPathDebug.cpp"/>
+                <sourceFile name="XPathEvaluate.cpp"/>
+                <sourceFile name="XPathExpr.cpp"/>
+                <sourceFile name="XPathFunction.cpp"/>
+                <sourceFile name="XPathObject.cpp"/>
+            </sourceFiles>
+        </project>
+        <project base="C:/Users/Seppo/cmajorw64/cmajor/ir" filePath="ir/ir.vcxproj" guid="{F5CA3B98-CC3A-4924-BE9A-F5E507305C7B}" name="ir">
+            <sourceFiles>
+                <sourceFile name="Emitter.hpp"/>
+                <sourceFile name="GenObject.hpp"/>
+                <sourceFile name="ValueStack.hpp"/>
+                <sourceFile name="Emitter.cpp"/>
+                <sourceFile name="GenObject.cpp"/>
+            </sourceFiles>
+        </project>
+        <project base="C:/Users/Seppo/cmajorw64/cmajor/symbols" filePath="symbols/symbols.vcxproj" guid="{B49BF2F4-1622-45DA-B497-69329EA37AD0}" name="symbols">
+            <sourceFiles>
+                <sourceFile name="ArrayTypeSymbol.hpp"/>
+                <sourceFile name="BasicTypeOperation.hpp"/>
+                <sourceFile name="BasicTypeSymbol.hpp"/>
+                <sourceFile name="ClassTemplateSpecializationSymbol.hpp"/>
+                <sourceFile name="ClassTypeSymbol.hpp"/>
+                <sourceFile name="ConceptSymbol.hpp"/>
+                <sourceFile name="ConstantSymbol.hpp"/>
+                <sourceFile name="ContainerSymbol.hpp"/>
+                <sourceFile name="ConversionTable.hpp"/>
+                <sourceFile name="DebugFlags.hpp"/>
+                <sourceFile name="DelegateSymbol.hpp"/>
+                <sourceFile name="DerivedTypeSymbol.hpp"/>
+                <sourceFile name="EnumSymbol.hpp"/>
+                <sourceFile name="Exception.hpp"/>
+                <sourceFile name="FunctionSymbol.hpp"/>
+                <sourceFile name="GlobalFlags.hpp"/>
+                <sourceFile name="InitDone.hpp"/>
+                <sourceFile name="InterfaceTypeSymbol.hpp"/>
+                <sourceFile name="Meta.hpp"/>
+                <sourceFile name="Module.hpp"/>
+                <sourceFile name="ModuleCache.hpp"/>
+                <sourceFile name="NamespaceSymbol.hpp"/>
+                <sourceFile name="Operation.hpp"/>
+                <sourceFile name="Scope.hpp"/>
+                <sourceFile name="Symbol.hpp"/>
+                <sourceFile name="SymbolCollector.hpp"/>
+                <sourceFile name="SymbolCreatorVisitor.hpp"/>
+                <sourceFile name="SymbolReader.hpp"/>
+                <sourceFile name="SymbolTable.hpp"/>
+                <sourceFile name="SymbolWriter.hpp"/>
+                <sourceFile name="TemplateSymbol.hpp"/>
+                <sourceFile name="TypedefSymbol.hpp"/>
+                <sourceFile name="TypeMap.hpp"/>
+                <sourceFile name="TypeSymbol.hpp"/>
+                <sourceFile name="Value.hpp"/>
+                <sourceFile name="VariableSymbol.hpp"/>
+                <sourceFile name="Warning.hpp"/>
+                <sourceFile name="ArrayTypeSymbol.cpp"/>
+                <sourceFile name="BasicTypeOperation.cpp"/>
+                <sourceFile name="BasicTypeSymbol.cpp"/>
+                <sourceFile name="ClassTemplateSpecializationSymbol.cpp"/>
+                <sourceFile name="ClassTypeSymbol.cpp"/>
+                <sourceFile name="ConceptSymbol.cpp"/>
+                <sourceFile name="ConstantSymbol.cpp"/>
+                <sourceFile name="ContainerSymbol.cpp"/>
+                <sourceFile name="ConversionTable.cpp"/>
+                <sourceFile name="DebugFlags.cpp"/>
+                <sourceFile name="DelegateSymbol.cpp"/>
+                <sourceFile name="DerivedTypeSymbol.cpp"/>
+                <sourceFile name="EnumSymbol.cpp"/>
+                <sourceFile name="Exception.cpp"/>
+                <sourceFile name="FunctionSymbol.cpp"/>
+                <sourceFile name="GlobalFlags.cpp"/>
+                <sourceFile name="InitDone.cpp"/>
+                <sourceFile name="InterfaceTypeSymbol.cpp"/>
+                <sourceFile name="Meta.cpp"/>
+                <sourceFile name="Module.cpp"/>
+                <sourceFile name="ModuleCache.cpp"/>
+                <sourceFile name="NamespaceSymbol.cpp"/>
+                <sourceFile name="Operation.cpp"/>
+                <sourceFile name="Scope.cpp"/>
+                <sourceFile name="Symbol.cpp"/>
+                <sourceFile name="SymbolCollector.cpp"/>
+                <sourceFile name="SymbolCreatorVisitor.cpp"/>
+                <sourceFile name="SymbolReader.cpp"/>
+                <sourceFile name="SymbolTable.cpp"/>
+                <sourceFile name="SymbolWriter.cpp"/>
+                <sourceFile name="TemplateSymbol.cpp"/>
+                <sourceFile name="TypedefSymbol.cpp"/>
+                <sourceFile name="TypeMap.cpp"/>
+                <sourceFile name="TypeSymbol.cpp"/>
+                <sourceFile name="Value.cpp"/>
+                <sourceFile name="VariableSymbol.cpp"/>
+                <sourceFile name="Warning.cpp"/>
+            </sourceFiles>
+        </project>
+        <project base="C:/Users/Seppo/cmajorw64/cmajor/cmdoclib" filePath="cmdoclib/cmdoclib.vcxproj" guid="{26C18E74-FFB0-4861-8DA9-513FE597B4F9}" name="cmdoclib">
+            <sourceFiles>
+                <sourceFile name="Constraint.hpp"/>
+                <sourceFile name="Diagram.hpp"/>
+                <sourceFile name="Doc.hpp"/>
+                <sourceFile name="File.hpp"/>
+                <sourceFile name="Global.hpp"/>
+                <sourceFile name="InitDone.hpp"/>
+                <sourceFile name="Input.hpp"/>
+                <sourceFile name="ParserDoc.hpp"/>
+                <sourceFile name="SourceCodePrinter.hpp"/>
+                <sourceFile name="Style.hpp"/>
+                <sourceFile name="SymbolTableXml.hpp"/>
+                <sourceFile name="Constraint.cpp"/>
+                <sourceFile name="Diagram.cpp"/>
+                <sourceFile name="Doc.cpp"/>
+                <sourceFile name="File.cpp"/>
+                <sourceFile name="Global.cpp"/>
+                <sourceFile name="InitDone.cpp"/>
+                <sourceFile name="Input.cpp"/>
+                <sourceFile name="ParserDoc.cpp"/>
+                <sourceFile name="SourceCodePrinter.cpp"/>
+                <sourceFile name="Style.cpp"/>
+                <sourceFile name="SymbolTableXml.cpp"/>
+            </sourceFiles>
+        </project>
+        <project base="C:/Users/Seppo/cmajorw64/cmajor/binder" filePath="binder/binder.vcxproj" guid="{F550AFA5-4098-46FE-9E84-0AD9698DD25E}" name="binder">
+            <sourceFiles>
+                <sourceFile name="Access.hpp"/>
+                <sourceFile name="AttributeBinder.hpp"/>
+                <sourceFile name="BoundClass.hpp"/>
+                <sourceFile name="BoundCompileUnit.hpp"/>
+                <sourceFile name="BoundConstraint.hpp"/>
+                <sourceFile name="BoundEnum.hpp"/>
+                <sourceFile name="BoundExpression.hpp"/>
+                <sourceFile name="BoundFunction.hpp"/>
+                <sourceFile name="BoundNamespace.hpp"/>
+                <sourceFile name="BoundNode.hpp"/>
+                <sourceFile name="BoundNodeVisitor.hpp"/>
+                <sourceFile name="BoundStatement.hpp"/>
+                <sourceFile name="ClassTemplateRepository.hpp"/>
+                <sourceFile name="Concept.hpp"/>
+                <sourceFile name="ConceptRepository.hpp"/>
+                <sourceFile name="ConstantArrayRepository.hpp"/>
+                <sourceFile name="ConstantStructureRepository.hpp"/>
+                <sourceFile name="ConstExprFunctionRepository.hpp"/>
+                <sourceFile name="ControlFlowAnalyzer.hpp"/>
+                <sourceFile name="Evaluator.hpp"/>
+                <sourceFile name="ExpressionBinder.hpp"/>
+                <sourceFile name="FunctionTemplateRepository.hpp"/>
+                <sourceFile name="InlineFunctionRepository.hpp"/>
+                <sourceFile name="JsonAttributeProcessor.hpp"/>
+                <sourceFile name="OperationRepository.hpp"/>
+                <sourceFile name="OverloadResolution.hpp"/>
+                <sourceFile name="StatementBinder.hpp"/>
+                <sourceFile name="StringRepository.hpp"/>
+                <sourceFile name="TypeBinder.hpp"/>
+                <sourceFile name="TypeResolver.hpp"/>
+                <sourceFile name="UuidRepository.hpp"/>
+                <sourceFile name="Access.cpp"/>
+                <sourceFile name="AttributeBinder.cpp"/>
+                <sourceFile name="BoundClass.cpp"/>
+                <sourceFile name="BoundCompileUnit.cpp"/>
+                <sourceFile name="BoundConstraint.cpp"/>
+                <sourceFile name="BoundEnum.cpp"/>
+                <sourceFile name="BoundExpression.cpp"/>
+                <sourceFile name="BoundFunction.cpp"/>
+                <sourceFile name="BoundNamespace.cpp"/>
+                <sourceFile name="BoundNode.cpp"/>
+                <sourceFile name="BoundNodeVisitor.cpp"/>
+                <sourceFile name="BoundStatement.cpp"/>
+                <sourceFile name="ClassTemplateRepository.cpp"/>
+                <sourceFile name="Concept.cpp"/>
+                <sourceFile name="ConceptRepository.cpp"/>
+                <sourceFile name="ConstantArrayRepository.cpp"/>
+                <sourceFile name="ConstantStructureRepository.cpp"/>
+                <sourceFile name="ConstExprFunctionRepository.cpp"/>
+                <sourceFile name="ControlFlowAnalyzer.cpp"/>
+                <sourceFile name="Evaluator.cpp"/>
+                <sourceFile name="ExpressionBinder.cpp"/>
+                <sourceFile name="FunctionTemplateRepository.cpp"/>
+                <sourceFile name="InlineFunctionRepository.cpp"/>
+                <sourceFile name="JsonAttributeProcessor.cpp"/>
+                <sourceFile name="OperationRepository.cpp"/>
+                <sourceFile name="OverloadResolution.cpp"/>
+                <sourceFile name="StatementBinder.cpp"/>
+                <sourceFile name="StringRepository.cpp"/>
+                <sourceFile name="TypeBinder.cpp"/>
+                <sourceFile name="TypeResolver.cpp"/>
+                <sourceFile name="UuidRepository.cpp"/>
+            </sourceFiles>
+        </project>
+        <project base="C:/Users/Seppo/cmajorw64/cmajor/bdt2dom" filePath="bdt2dom/bdt2dom.vcxproj" guid="{5EE66DAF-D3E5-42B4-A18F-750A52B01A5B}" name="bdt2dom">
+            <sourceFiles>
+                <sourceFile name="Bdt2Dom.hpp"/>
+                <sourceFile name="Bdt2Dom.cpp"/>
+            </sourceFiles>
+        </project>
+        <project base="C:/Users/Seppo/cmajorw64/cmajor/emitter" filePath="emitter/emitter.vcxproj" guid="{A85FB4BA-5F9C-4EA0-9AD8-C994443610A6}" name="emitter">
+            <sourceFiles>
+                <sourceFile name="BasicEmitter.hpp"/>
+                <sourceFile name="Emitter.hpp"/>
+                <sourceFile name="EmittingContext.hpp"/>
+                <sourceFile name="EmittingContextImpl.hpp"/>
+                <sourceFile name="LinuxEmitter.hpp"/>
+                <sourceFile name="WindowsEmitter.hpp"/>
+                <sourceFile name="BasicEmitter.cpp"/>
+                <sourceFile name="Emitter.cpp"/>
+                <sourceFile name="EmittingContext.cpp"/>
+                <sourceFile name="EmittingContextImpl.cpp"/>
+                <sourceFile name="LinuxEmitter.cpp"/>
+                <sourceFile name="WindowsEmitter.cpp"/>
+            </sourceFiles>
+        </project>
+        <project base="C:/Users/Seppo/cmajorw64/cmajor/ast2dom" filePath="ast2dom/ast2dom.vcxproj" guid="{C28DF8F4-FD08-4257-9CBC-7CDA3A2A7EE5}" name="ast2dom">
+            <sourceFiles>
+                <sourceFile name="Ast2Dom.hpp"/>
+                <sourceFile name="Ast2Dom.cpp"/>
+            </sourceFiles>
+        </project>
+        <project base="C:/Users/Seppo/cmajorw64/cmajor/build" filePath="build/build.vcxproj" guid="{D78ECD1A-788D-4CE0-9ADB-830902A20840}" name="build">
+            <sourceFiles>
+                <sourceFile name="Build.hpp"/>
+                <sourceFile name="Build.cpp"/>
+            </sourceFiles>
+        </project>
+        <project base="C:/Users/Seppo/cmajorw64/cmajor/code" filePath="code/code.vcxproj" guid="{7477A03F-BBB8-48D1-9E06-F9F25A579994}" name="code">
+            <sourceFiles>
+                <sourceFile name="Declaration.hpp"/>
+                <sourceFile name="Declarator.hpp"/>
+                <sourceFile name="Expression.hpp"/>
+                <sourceFile name="Identifier.hpp"/>
+                <sourceFile name="Keyword.hpp"/>
+                <sourceFile name="Literal.hpp"/>
+                <sourceFile name="Statement.hpp"/>
+                <sourceFile name="Declaration.cpp"/>
+                <sourceFile name="Declarator.cpp"/>
+                <sourceFile name="Expression.cpp"/>
+                <sourceFile name="Identifier.cpp"/>
+                <sourceFile name="Keyword.cpp"/>
+                <sourceFile name="Literal.cpp"/>
+                <sourceFile name="Statement.cpp"/>
+            </sourceFiles>
+        </project>
+        <project base="C:/Users/Seppo/cmajorw64/cmajor/system/ext/zlib-1.2.11/contrib/vstudio/vc14" filePath="system/ext/zlib-1.2.11/contrib/vstudio/vc14/zlibstat.vcxproj" guid="{745DEC58-EBB3-47A9-A9B8-4C6627C01BF8}" name="zlibstat">
+            <sourceFiles>
+                <sourceFile name="../../../adler32.c"/>
+                <sourceFile name="../../../compress.c"/>
+                <sourceFile name="../../../crc32.c"/>
+                <sourceFile name="../../../deflate.c"/>
+                <sourceFile name="../../../gzclose.c"/>
+                <sourceFile name="../../../gzlib.c"/>
+                <sourceFile name="../../../gzread.c"/>
+                <sourceFile name="../../../gzwrite.c"/>
+                <sourceFile name="../../../infback.c"/>
+                <sourceFile name="../../masmx64/inffas8664.c"/>
+                <sourceFile name="../../../inffast.c"/>
+                <sourceFile name="../../../inflate.c"/>
+                <sourceFile name="../../../inftrees.c"/>
+                <sourceFile name="../../minizip/ioapi.c"/>
+                <sourceFile name="../../../trees.c"/>
+                <sourceFile name="../../../uncompr.c"/>
+                <sourceFile name="../../minizip/unzip.c"/>
+                <sourceFile name="../../minizip/zip.c"/>
+                <sourceFile name="../../../zutil.c"/>
+            </sourceFiles>
+        </project>
+        <project base="C:/Users/Seppo/cmajorw64/cmajor/system/ext/bzip2-1.0.6" filePath="system/ext/bzip2-1.0.6/libbz2.vcxproj" guid="{ABE43DC6-EDC4-410D-9809-F717CF4C7C5A}" name="libbz2">
+            <sourceFiles>
+                <sourceFile name="bzlib.h"/>
+                <sourceFile name="bzlib_private.h"/>
+                <sourceFile name="blocksort.c"/>
+                <sourceFile name="bzlib.c"/>
+                <sourceFile name="compress.c"/>
+                <sourceFile name="crctable.c"/>
+                <sourceFile name="decompress.c"/>
+                <sourceFile name="huffman.c"/>
+                <sourceFile name="randtable.c"/>
+            </sourceFiles>
+        </project>
+        <project base="C:/Users/Seppo/cmajorw64/cmajor/eh" filePath="eh/eh.vcxproj" guid="{1436A3CA-A389-4AA0-894D-EB3261E64F24}" name="eh">
+            <sourceFiles>
+                <sourceFile name="Exception.hpp"/>
+                <sourceFile name="Exception.cpp"/>
+            </sourceFiles>
+        </project>
+        <project base="C:/Users/Seppo/cmajorw64/cmajor/rt" filePath="rt/rt.vcxproj" guid="{CEF6E988-1FFD-4FD3-B188-DF3EE12234EC}" name="rt">
+            <sourceFiles>
+                <sourceFile name="BZ2Interface.h"/>
+                <sourceFile name="CommandLine.hpp"/>
+                <sourceFile name="Compression.hpp"/>
+                <sourceFile name="ConditionVariable.hpp"/>
+                <sourceFile name="Environment.hpp"/>
+                <sourceFile name="Error.hpp"/>
+                <sourceFile name="CallStack.hpp"/>
+                <sourceFile name="Classes.hpp"/>
+                <sourceFile name="InitDone.hpp"/>
+                <sourceFile name="Math.hpp"/>
+                <sourceFile name="Memory.hpp"/>
+                <sourceFile name="Multiprecision.hpp"/>
+                <sourceFile name="Mutex.hpp"/>
+                <sourceFile name="Profile.hpp"/>
+                <sourceFile name="Random.hpp"/>
+                <sourceFile name="RtApi.hpp"/>
+                <sourceFile name="Io.hpp"/>
+                <sourceFile name="Socket.hpp"/>
+                <sourceFile name="Statics.hpp"/>
+                <sourceFile name="String.hpp"/>
+                <sourceFile name="Thread.hpp"/>
+                <sourceFile name="Time.hpp"/>
+                <sourceFile name="UnitTest.hpp"/>
+                <sourceFile name="ZlibInterface.h"/>
+                <sourceFile name="BZ2Interface.c"/>
+                <sourceFile name="CommandLine.cpp"/>
+                <sourceFile name="Compression.cpp"/>
+                <sourceFile name="ConditionVariable.cpp"/>
+                <sourceFile name="Environment.cpp"/>
+                <sourceFile name="Error.cpp"/>
+                <sourceFile name="CallStack.cpp"/>
+                <sourceFile name="Classes.cpp"/>
+                <sourceFile name="DllMain.cpp"/>
+                <sourceFile name="InitDone.cpp"/>
+                <sourceFile name="Io.cpp"/>
+                <sourceFile name="Math.cpp"/>
+                <sourceFile name="Memory.cpp"/>
+                <sourceFile name="Multiprecision.cpp"/>
+                <sourceFile name="Mutex.cpp"/>
+                <sourceFile name="Profile.cpp"/>
+                <sourceFile name="Random.cpp"/>
+                <sourceFile name="Socket.cpp"/>
+                <sourceFile name="Statics.cpp"/>
+                <sourceFile name="String.cpp"/>
+                <sourceFile name="Thread.cpp"/>
+                <sourceFile name="Time.cpp"/>
+                <sourceFile name="UnitTest.cpp"/>
+                <sourceFile name="ZlibInterface.c"/>
+            </sourceFiles>
+        </project>
+        <project base="C:/Users/Seppo/cmajorw64/cmajor/syntax" filePath="syntax/syntax.vcxproj" guid="{372449DC-8422-4052-9F83-5CED3B143466}" name="syntax">
+            <sourceFiles>
+                <sourceFile name="CodeGenerator.hpp"/>
+                <sourceFile name="CodeGeneratorVisitor.hpp"/>
+                <sourceFile name="Composite.hpp"/>
+                <sourceFile name="Element.hpp"/>
+                <sourceFile name="Generator.hpp"/>
+                <sourceFile name="Grammar.hpp"/>
+                <sourceFile name="Library.hpp"/>
+                <sourceFile name="LibraryFile.hpp"/>
+                <sourceFile name="ParserFile.hpp"/>
+                <sourceFile name="ParserFileContent.hpp"/>
+                <sourceFile name="Primary.hpp"/>
+                <sourceFile name="Primitive.hpp"/>
+                <sourceFile name="Project.hpp"/>
+                <sourceFile name="ProjectFile.hpp"/>
+                <sourceFile name="Rule.hpp"/>
+                <sourceFile name="CodeGenerator.cpp"/>
+                <sourceFile name="CodeGeneratorVisitor.cpp"/>
+                <sourceFile name="Composite.cpp"/>
+                <sourceFile name="Element.cpp"/>
+                <sourceFile name="Generator.cpp"/>
+                <sourceFile name="Grammar.cpp"/>
+                <sourceFile name="Library.cpp"/>
+                <sourceFile name="LibraryFile.cpp"/>
+                <sourceFile name="ParserFile.cpp"/>
+                <sourceFile name="ParserFileContent.cpp"/>
+                <sourceFile name="Primary.cpp"/>
+                <sourceFile name="Primitive.cpp"/>
+                <sourceFile name="Project.cpp"/>
+                <sourceFile name="ProjectFile.cpp"/>
+                <sourceFile name="Rule.cpp"/>
+            </sourceFiles>
+        </project>
+        <project base="C:/Users/Seppo/cmajorw64/cmajor/unicode" filePath="unicode/unicode.vcxproj" guid="{A53AF8ED-66DD-4561-9A77-D2D5CE3A5C15}" name="unicode">
+            <sourceFiles>
+                <sourceFile name="MakeUcdBin.cpp"/>
+            </sourceFiles>
+        </project>
+        <project base="C:/Users/Seppo/cmajorw64/cmajor/generator" filePath="generator/generator.vcxproj" guid="{D1DBA7F7-0FA3-407B-8EE5-DE5B44C21C58}" name="generator">
+            <sourceFiles>
+                <sourceFile name="Main.cpp"/>
+            </sourceFiles>
+        </project>
+        <project base="C:/Users/Seppo/cmajorw64/cmajor/compiler" filePath="compiler/compiler.vcxproj" guid="{07F2AA9C-F4D4-4802-A38C-67D6C6316FE2}" name="compiler">
+            <sourceFiles>
+                <sourceFile name="Main.cpp"/>
+            </sourceFiles>
+        </project>
+        <project base="C:/Users/Seppo/cmajorw64/cmajor/cmmdump" filePath="cmmdump/cmmdump.vcxproj" guid="{EB372C96-F12F-4AFB-8A16-1D1ED0764948}" name="cmmdump">
+            <sourceFiles>
+                <sourceFile name="Main.cpp"/>
+            </sourceFiles>
+        </project>
+        <project base="C:/Users/Seppo/cmajorw64/cmajor/cmdoc" filePath="cmdoc/cmdoc.vcxproj" guid="{4A906362-995B-4765-A741-AFF30577FE16}" name="cmdoc">
+            <sourceFiles>
+                <sourceFile name="Main.cpp"/>
+                <sourceFile name="MainClassic.cpp"/>
+            </sourceFiles>
+        </project>
+        <project base="C:/Users/Seppo/cmajorw64/cmajor/cm2html" filePath="cm2html/cm2html.vcxproj" guid="{7D37C773-FCEA-492D-9261-E5509FDF3407}" name="cm2html">
+            <sourceFiles>
+                <sourceFile name="Main.cpp"/>
+            </sourceFiles>
+        </project>
+        <project base="C:/Users/Seppo/cmajorw64/cmajor/xpq" filePath="xpq/xpq.vcxproj" guid="{A46AB8AA-8E15-493F-AE3A-634E92229915}" name="xpq">
+            <sourceFiles>
+                <sourceFile name="main.cpp"/>
+            </sourceFiles>
+        </project>
+        <project base="C:/Users/Seppo/cmajorw64/cmajor/cmunit" filePath="cmunit/cmunit.vcxproj" guid="{F0C01B47-4B68-465A-BEBE-6279A30C44B3}" name="cmunit">
+            <sourceFiles>
+                <sourceFile name="Main.cpp"/>
+            </sourceFiles>
+        </project>
+        <project base="C:/Users/Seppo/cmajorw64/cmajor/cmprof" filePath="cmprof/cmprof.vcxproj" guid="{A554FCD5-6C28-4490-82C7-38C8A7D1FE70}" name="cmprof">
+            <sourceFiles>
+                <sourceFile name="Main.cpp"/>
+            </sourceFiles>
+        </project>
+        <project base="C:/Users/Seppo/cmajorw64/cmajor/cmproj" filePath="cmproj/cmproj.vcxproj" guid="{3FA64A59-F348-42E2-AE66-9E25EA3398F9}" name="cmproj">
+            <sourceFiles>
+                <sourceFile name="Conversion.hpp"/>
+                <sourceFile name="Conversion.cpp"/>
+            </sourceFiles>
+        </project>
+        <project base="C:/Users/Seppo/cmajorw64/cmajor/cmp2cmproj" filePath="cmp2cmproj/cmp2cmproj.vcxproj" guid="{78646DEC-5E42-41A1-BC2D-27B826DE4C96}" name="cmp2cmproj">
+            <sourceFiles>
+                <sourceFile name="Main.cpp"/>
+            </sourceFiles>
+        </project>
+        <project base="C:/Users/Seppo/cmajorw64/cmajor/cms2sln" filePath="cms2sln/cms2sln.vcxproj" guid="{82AB2DCC-CEDB-416A-A610-698F53868B88}" name="cms2sln">
+            <sourceFiles>
+                <sourceFile name="Main.cpp"/>
+            </sourceFiles>
+        </project>
+        <project base="C:/Users/Seppo/cmajorw64/cmajor/cmfileredirector" filePath="cmfileredirector/cmfileredirector.vcxproj" guid="{39E1C76F-5E46-4E2A-BA33-8B94B5503FD9}" name="cmfileredirector">
+            <sourceFiles>
+                <sourceFile name="Main.cpp"/>
+            </sourceFiles>
+        </project>
+        <project base="C:/Users/Seppo/cmajorw64/cmajor/cmcm" filePath="cmcm/cmcm.vcxproj" guid="{811C3D96-50FB-4157-9F38-CB6B1277DFF7}" name="cmcm">
+            <sourceFiles>
+                <sourceFile name="Api.hpp"/>
+                <sourceFile name="Compiler.hpp"/>
+                <sourceFile name="Compiler.cpp"/>
+                <sourceFile name="DllMain.cpp"/>
+            </sourceFiles>
+        </project>
+    </projects>
+</solution>
