@@ -99,6 +99,7 @@ void BasicEmitter::InsertAllocaIntoEntryBlock(llvm::AllocaInst* allocaInst)
 
 void BasicEmitter::Visit(BoundCompileUnit& boundCompileUnit)
 {
+    ResetCurrentDebugLocation();
     debugInfo = false;
     SetDIBuilder(nullptr);
     if (GetGlobalFlag(GlobalFlags::generateDebugInfo) && boundCompileUnit.GetCompileUnitNode() && !boundCompileUnit.GetCompileUnitNode()->IsSynthesizedUnit())
@@ -230,6 +231,7 @@ void BasicEmitter::Visit(BoundClass& boundClass)
     llvm::DIBuilder* prevDIBuilder = DIBuilder();
     if (!boundClass.ContainsSourceFunctions())
     {
+        ResetCurrentDebugLocation();
         debugInfo = false;
         SetDIBuilder(nullptr);
     }
@@ -357,6 +359,10 @@ void BasicEmitter::Visit(BoundFunction& boundFunction)
     pads.clear();
     labeledStatementMap.clear();
     FunctionSymbol* functionSymbol = boundFunction.GetFunctionSymbol();
+    if (functionSymbol->MangledName() == U"move_constructor_ParsingObject_93BBF68D02947B6B85B2033027084B9DF3468F63")
+    {
+        int x = 0;
+    }
     llvm::FunctionType* functionType = functionSymbol->IrType(*this);
     function = llvm::cast<llvm::Function>(compileUnitModule->getOrInsertFunction(ToUtf8(functionSymbol->MangledName()), functionType));
     if (GetGlobalFlag(GlobalFlags::release) && functionSymbol->IsInline())
@@ -377,6 +383,7 @@ void BasicEmitter::Visit(BoundFunction& boundFunction)
     llvm::DIBuilder* prevDIBuilder = DIBuilder();
     if (!hasSource)
     {
+        ResetCurrentDebugLocation();
         debugInfo = false;
         SetDIBuilder(nullptr);
     }
@@ -496,7 +503,7 @@ void BasicEmitter::Visit(BoundFunction& boundFunction)
         llvm::AllocaInst* allocaInst = builder.CreateAlloca(localVariable->GetType()->IrType(*this));
         SetIrObject(localVariable, allocaInst);
         lastAlloca = allocaInst;
-        if (debugInfo)
+        if (debugInfo && localVariable->GetSpan().Valid())
         {
             llvm::SmallVector<int64_t, 13> expr; // todo
             llvm::DILocalVariable* localVar = diBuilder->createAutoVariable(CurrentScope(), ToUtf8(localVariable->Name()), GetFile(localVariable->GetSpan().FileIndex()),

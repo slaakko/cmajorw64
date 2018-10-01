@@ -71,6 +71,7 @@ public:
     void PopScope();
     llvm::DIScope* CurrentScope();
     int GetColumn(const Span& span) const;
+    void ResetCurrentDebugLocation();
     llvm::DebugLoc GetDebugLocation(const Span& span);
     void SetCurrentDebugLocation(const Span& span);
     llvm::DebugLoc GetCurrentDebugLocation() { return currentDebugLocation; }
@@ -85,8 +86,6 @@ public:
     virtual llvm::DIType* CreateClassDIType(void* classPtr) = 0;
     llvm::Value* GetIrObject(void* symbol) const;
     void SetIrObject(void* symbol, llvm::Value* irObject);
-    llvm::Type* GetIrType(void* type) const;
-    void SetIrType(void*, llvm::Type* irType);
     llvm::Type* GetIrTypeByTypeId(const boost::uuids::uuid& typeId);
     void SetIrTypeByTypeId(const boost::uuids::uuid& typeId, llvm::Type* irType);
     llvm::FunctionType* GetFunctionIrType(void* symbol) const;

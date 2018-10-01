@@ -1,0 +1,55 @@
+using System;
+
+namespace cppparser
+{
+    grammar EnumerationGrammar
+    {
+        using IdentifierGrammar.Identifier;
+        using IdentifierGrammar.QualifiedId;
+        using TypeExprGrammar.TypeExpr;
+        using ExpressionGrammar.ConstantExpression;
+        
+        EnumDeclaration(ParsingContext* ctx)
+            ::= EnumSpecifier(ctx) ';'
+            ;
+            
+        OpaqueEnumDeclaration(ParsingContext* ctx)
+            ::= EnumKey EnumName(ctx) EnumBase(ctx)? ';'
+            ;
+            
+        EnumSpecifier(ParsingContext* ctx)
+            ::= EnumHead(ctx) '{' Enumerators(ctx) '}'
+            ;
+            
+        EnumHead(ParsingContext* ctx)
+            ::= EnumKey EnumName(ctx) EnumBase(ctx)?
+            ;
+            
+        EnumKey
+            ::= keyword("enum") keyword("class") 
+            |   keyword("enum") keyword("struct")
+            |   keyword("enum")
+            ;
+        
+        EnumName(ParsingContext* ctx)
+            ::= QualifiedId(ctx)
+            ;
+            
+        EnumBase(ParsingContext* ctx)
+            ::= ':' TypeExpr(ctx)
+            ;
+            
+        Enumerators(ParsingContext* ctx)
+            ::= EnumeratorDefinition(ctx):left
+                (',' EnumeratorDefinition(ctx):right)*
+            ;
+            
+        EnumeratorDefinition(ParsingContext* ctx)
+            ::= Enumerator ('=' ConstantExpression(ctx))?
+            ;
+            
+        Enumerator
+            ::= Identifier
+            ;
+    }
+}

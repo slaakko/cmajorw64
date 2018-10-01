@@ -10,6 +10,14 @@ public static class Flags
     {
         verbose = true;
     }
+    public static nothrow bool Diagnostics() 
+    {
+        return diagnostics;
+    }
+    public static nothrow void SetDiagnostics()
+    {
+        diagnostics = true;
+    }
     public static nothrow bool Force() 
     {
         return force;
@@ -19,5 +27,6 @@ public static class Flags
         force = true;
     }
     static bool verbose;
+    static bool diagnostics;
     static bool force;
 }

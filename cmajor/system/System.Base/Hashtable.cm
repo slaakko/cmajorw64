@@ -88,6 +88,17 @@ namespace System.Collections
         }
         return hashCode;
     }
+    
+    public inline nothrow ulong GetHashCode(const Uuid& uuid)
+    {
+        ulong hashCode = 14695981039346656037u;
+        for (byte b : uuid)
+        {
+            hashCode = hashCode ^ cast<ulong>(b);
+            hashCode = hashCode * 1099511628211u;
+        }
+        return hashCode;
+    }
 
     public class Hasher<T> : UnaryFun<T, ulong>
     {

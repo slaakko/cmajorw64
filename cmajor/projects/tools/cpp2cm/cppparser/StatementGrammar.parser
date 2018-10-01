@@ -1,0 +1,105 @@
+using System;
+
+namespace cppparser
+{
+    grammar StatementGrammar
+    {
+        using IdentifierGrammar.Identifier;
+        using ExpressionGrammar.Expression;
+        using ExpressionGrammar.ConstantExpression;
+        using TypeExprGrammar.TypeExpr;
+        using DeclaratorGrammar.Declarator;
+        using DeclaratorGrammar.InitializerClause;
+        using DeclaratorGrammar.BracedInitializerList;
+        using DeclarationGrammar.SimpleDeclaration;
+        using DeclarationGrammar.BlockDeclaration;
+        
+        Statement(ParsingContext* ctx)
+            ::= LabeledStatement(ctx)
+            |   ExpressionStatement(ctx)
+            |   CompoundStatement(ctx)
+            |   SelectionStatement(ctx)
+            |   IterationStatement(ctx)
+            |   JumpStatement(ctx)
+            |   DeclarationStatement(ctx)
+            |   TryBlock(ctx)
+            ;
+            
+        LabeledStatement(ParsingContext* ctx)
+            ::= Identifier (':' - "::") Statement(ctx):s1
+            |   keyword("case") ConstantExpression(ctx) ':' Statement(ctx):s2
+            |   keyword("default") ':' Statement(ctx):s3
+            ;
+            
+        ExpressionStatement(ParsingContext* ctx)
+            ::= Expression(ctx)? ';'
+            ;
+            
+        CompoundStatement(ParsingContext* ctx)
+            ::= '{' Statement(ctx)* '}'
+            ;
+            
+        SelectionStatement(ParsingContext* ctx)
+            ::= keyword("if") '(' Condition(ctx):c1 ')' Statement(ctx):thenS (keyword("else") Statement(ctx):elseS)?
+            |   keyword("switch") '(' Condition(ctx):c2 ')' Statement(ctx)
+            ;
+            
+        Condition(ParsingContext* ctx)
+            ::= TypeExpr(ctx) Declarator(ctx)
+                (   '=' InitializerClause(ctx)
+                |   BracedInitializerList(ctx)
+                )
+            |   Expression(ctx)
+            ;
+            
+        IterationStatement(ParsingContext* ctx)
+            ::= keyword("while") '(' Condition(ctx):c1 ')' Statement(ctx):s1
+            |   keyword("do") Statement(ctx):s2 keyword("while") '(' Expression(ctx):e1 ')' ';'
+            |   keyword("for") '(' ForRangeDeclaration(ctx) ':' ForRangeInitializer(ctx) ')' Statement(ctx):s3
+            |   keyword("for") '(' ForInitStatement(ctx) Condition(ctx):c2? ';' Expression(ctx):e2? ')' Statement(ctx):s4
+            ;
+            
+        ForInitStatement(ParsingContext* ctx)
+            ::= ExpressionStatement(ctx)
+            |   SimpleDeclaration(ctx)
+            ;
+            
+        ForRangeDeclaration(ParsingContext* ctx)
+            ::= TypeExpr(ctx) Declarator(ctx)
+            ;
+            
+        ForRangeInitializer(ParsingContext* ctx)
+            ::= Expression(ctx)
+            |   BracedInitializerList(ctx)
+            ;
+            
+        JumpStatement(ParsingContext* ctx)
+            ::= keyword("break") ';'
+            |   keyword("continue") ';'
+            |   keyword("return") Expression(ctx)? ';'
+            |   keyword("return") BracedInitializerList(ctx) ';'
+            |   keyword("goto") Identifier ';'
+            ;
+            
+        DeclarationStatement(ParsingContext* ctx)
+            ::= BlockDeclaration(ctx)
+            ;
+            
+        TryBlock(ParsingContext* ctx)
+            ::= keyword("try") CompoundStatement(ctx) HandlerSequence(ctx)
+            ;
+            
+        HandlerSequence(ParsingContext* ctx)
+            ::= Handler(ctx)+
+            ;
+            
+        Handler(ParsingContext* ctx)
+            ::= keyword("catch") '(' ExceptionDeclaration(ctx) ')' CompoundStatement(ctx)
+            ;
+            
+        ExceptionDeclaration(ParsingContext* ctx)
+            ::= TypeExpr(ctx) Declarator(ctx)?
+            |   "..."
+            ;
+    }
+}

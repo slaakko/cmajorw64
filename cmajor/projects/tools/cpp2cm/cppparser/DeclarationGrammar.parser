@@ -1,0 +1,114 @@
+using System;
+
+namespace cppparser
+{
+    grammar DeclarationGrammar
+    {
+        using IdentifierGrammar.Identifier;
+        using IdentifierGrammar.QualifiedId;
+        using FunctionGrammar.FunctionDefinition;
+        using ClassGrammar.SpecialMemberFunctionDefinition;
+        using ClassGrammar.ClassDeclaration;
+        using ClassGrammar.ForwardClassDeclaration;
+        using DeclaratorGrammar.InitDeclarator;
+        using DeclaratorGrammar.Declarator;
+        using TemplateGrammar.TemplateDeclaration;
+        using TemplateGrammar.ExplicitInstantiation;
+        using TemplateGrammar.ExplicitSpecialization;
+        using TypeExprGrammar.TypeExpr;
+        using EnumerationGrammar.EnumDeclaration;
+        using EnumerationGrammar.OpaqueEnumDeclaration;
+        using LiteralGrammar.StringLiteral;
+        
+        Declarations(ParsingContext* ctx)
+            ::= Declaration(ctx)*
+            ;
+            
+        Declaration(ParsingContext* ctx)
+            ::= NamespaceDefinition(ctx)
+            |   FunctionDefinition(ctx)
+            |   SpecialMemberFunctionDefinition(ctx)
+            |   TemplateDeclaration(ctx)
+            |   ExplicitInstantiation(ctx)
+            |   ExplicitSpecialization(ctx)
+            |   ClassDeclaration(ctx)
+            |   EnumDeclaration(ctx)
+            |   LinkageSpecification(ctx)
+            |   BlockDeclaration(ctx)
+            ;
+        
+        NamespaceDefinition(ParsingContext* ctx)
+            ::= NamedNamespaceDefinition(ctx)
+            |   UnnamedNamespaceDefinition(ctx)
+            ;
+            
+        NamedNamespaceDefinition(ParsingContext* ctx)
+            ::= keyword("namespace") Identifier '{' Declarations(ctx) '}'
+            ;
+            
+        UnnamedNamespaceDefinition(ParsingContext* ctx)
+            ::= keyword("namespace") '{' Declarations(ctx) '}'
+            ;
+            
+        BlockDeclaration(ParsingContext* ctx)
+            ::= SimpleDeclaration(ctx)
+            |   AliasDeclaration(ctx)
+            |   UsingDirective(ctx)
+            |   UsingDeclaration(ctx)
+            |   OpaqueEnumDeclaration(ctx)
+            |   TypedefDeclaration(ctx)
+            |   ForwardClassDeclaration(ctx)
+            ;
+            
+        SimpleDeclaration(ParsingContext* ctx)
+            ::= DeclSpecifiers TypeExpr(ctx) InitDeclarator(ctx) ';'
+            ;
+            
+        DeclSpecifiers
+            ::= DeclSpecifier*
+            ;
+            
+        DeclSpecifier
+            ::= StorageClassSpecifier
+            |   FunctionSpecifier
+            |   keyword("friend")
+            |   keyword("constexpr")
+            |   keyword("__declspec")
+            |   keyword("__thread")
+            ;
+            
+        StorageClassSpecifier
+            ::= keyword("register")
+            |   keyword("static")
+            |   keyword("thread_local")
+            |   keyword("extern")
+            |   keyword("mutable")
+            ;
+            
+        FunctionSpecifier
+            ::= keyword("inline")
+            |   keyword("virtual")
+            |   keyword("explicit")
+            ;
+            
+        AliasDeclaration(ParsingContext* ctx)
+            ::= keyword("using") Identifier '=' TypeExpr(ctx) ';'
+            ;
+            
+        UsingDirective(ParsingContext* ctx)
+            ::= keyword("using") keyword("namespace") QualifiedId(ctx) ';'
+            ;
+            
+        UsingDeclaration(ParsingContext* ctx)
+            ::= keyword("using") QualifiedId(ctx) ';'
+            ;
+            
+        TypedefDeclaration(ParsingContext* ctx)
+            ::= keyword("typedef") TypeExpr(ctx) Declarator(ctx) ';'
+            ;
+            
+        LinkageSpecification(ParsingContext* ctx)
+            ::= keyword("extern") StringLiteral '{' Declaration(ctx):d1* '}' | Declaration(ctx):d2
+            ;
+    }        
+}

@@ -3,7 +3,12 @@
     <configurations>
         <configuration>
             <name>debug</name>
-            <commandLineArguments>--verbose ../cmc/cmc.xml</commandLineArguments>
+            <commandLineArguments>--verbose --force  ../projects/cmc/cpp2cm.xml</commandLineArguments>
+            <conditionalCompilationSymbols />
+        </configuration>
+        <configuration>
+            <name>release</name>
+            <commandLineArguments>--verbose --force ../projects/cmc/cpp2cm.xml</commandLineArguments>
             <conditionalCompilationSymbols />
         </configuration>
     </configurations>

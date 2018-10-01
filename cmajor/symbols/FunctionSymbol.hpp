@@ -199,7 +199,6 @@ public:
     void ComputeMangledName() override;
     int Arity() const { return parameters.size(); }
     const std::vector<ParameterSymbol*>& Parameters() const { return parameters; }
-    void ClearLocalVariables() { localVariables.clear(); }
     void AddLocalVariable(LocalVariableSymbol* localVariable);
     const std::vector<LocalVariableSymbol*>& LocalVariables() const { return localVariables; }
     void SetReturnType(TypeSymbol* returnType_) { returnType = returnType_; }
@@ -210,6 +209,7 @@ public:
     bool IsFunctionTemplate() const { return !templateParameters.empty(); }
     void CloneUsingNodes(const std::vector<Node*>& usingNodes_);
     LocalVariableSymbol* CreateTemporary(TypeSymbol* type, const Span& span);
+    virtual std::vector<LocalVariableSymbol*> CreateTemporariesTo(FunctionSymbol* currentFunction);
     llvm::FunctionType* IrType(Emitter& emitter);
     int32_t VmtIndex() const { return vmtIndex; }
     void SetVmtIndex(int32_t vmtIndex_) { vmtIndex = vmtIndex_; }

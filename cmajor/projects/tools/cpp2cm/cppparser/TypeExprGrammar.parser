@@ -1,0 +1,41 @@
+using System;
+
+namespace cppparser
+{
+    grammar TypeExprGrammar
+    {
+        using SimpleTypeGrammar.SimpleType;
+        using ClassGrammar.ClassKey;
+        using IdentifierGrammar.QualifiedId;
+
+        TypeExpr(ParsingContext* ctx)
+            ::= PrefixTypeExpr(ctx)
+            ;
+
+        PrefixTypeExpr(ParsingContext* ctx)
+            ::= CVSpecifierSequence PostfixTypeExpr(ctx)
+            ;
+
+        CVSpecifierSequence
+            ::= CVSpecifier*
+            ;
+
+        CVSpecifier
+            ::= keyword("const")
+            |   keyword("volatile")
+            ;
+
+        PostfixTypeExpr(ParsingContext* ctx)
+            ::= PrimaryTypeExpr(ctx)
+            (   '*'
+            |   "&&"
+            |   '&'
+            )*
+            ;
+
+        PrimaryTypeExpr(ParsingContext* ctx)
+            ::= SimpleType
+            |   (keyword("typename") | ClassKey?) QualifiedId(ctx)
+            ;
+    }
+}

@@ -1,0 +1,59 @@
+using System;
+
+namespace cppparser
+{
+    grammar TemplateGrammar
+    {
+        using DeclarationGrammar.Declaration;
+        using FunctionGrammar.ParameterDeclaration;
+        using IdentifierGrammar.Identifier;
+        using TypeExprGrammar.TypeExpr;
+        using ExpressionGrammar.ConditionalExpression;
+
+        TemplateDeclaration(ParsingContext* ctx)
+            ::= keyword("template") '<' TemplateParameterList(ctx) '>' Declaration(ctx)
+            ;
+
+        TemplateParameterList(ParsingContext* ctx)
+            ::= TemplateParameter(ctx):left (',' TemplateParameter(ctx):right)*
+            ;
+
+        TemplateParameter(ParsingContext* ctx)
+            ::= TypeParameter(ctx)
+            |   ParameterDeclaration(ctx)
+            ;
+
+        TypeParameter(ParsingContext* ctx)
+            ::= (keyword("class") | keyword("typename")) Identifier ('=' TypeExpr(ctx))?
+            ;
+
+        SimpleTemplateId(ParsingContext* ctx)
+            ::= TemplateName '<'{ ctx->BeginParsingTemplateId(); } TemplateArgumentList(ctx)? '>'{ ctx->EndParsingTemplateId(); } / { ctx->EndParsingTemplateId(); }
+            ;
+
+        TemplateId(ParsingContext* ctx)
+            ::= SimpleTemplateId(ctx)
+            ;
+
+        TemplateName
+            ::= Identifier
+            ;
+
+        TemplateArgumentList(ParsingContext* ctx)
+            ::= TemplateArgument(ctx):left (',' TemplateArgument(ctx):right)*
+            ;
+
+        TemplateArgument(ParsingContext* ctx)
+            ::= TypeExpr(ctx)
+            |   ConditionalExpression(ctx)
+            ;
+
+        ExplicitInstantiation(ParsingContext* ctx)
+            ::= keyword("template") Declaration(ctx)
+            ;
+
+        ExplicitSpecialization(ParsingContext* ctx)
+            ::= keyword("template") '<' '>' Declaration(ctx)
+            ;
+    }
+}

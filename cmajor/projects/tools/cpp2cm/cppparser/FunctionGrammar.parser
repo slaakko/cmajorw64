@@ -1,0 +1,34 @@
+using System;
+
+namespace cppparser
+{
+    grammar FunctionGrammar
+    {
+        using DeclarationGrammar.DeclSpecifiers;
+        using DeclaratorGrammar.Declarator;
+        using TypeExprGrammar.TypeExpr;
+        using ClassGrammar.VirtPureSpecifiers;
+        using StatementGrammar.CompoundStatement;
+        
+        FunctionDefinition(ParsingContext* ctx)
+            ::= DeclSpecifiers TypeExpr(ctx) Declarator(ctx):fd{ pass = fd; } 
+                VirtPureSpecifiers(true):pure
+                (   FunctionBody(ctx)
+                |   '=' (keyword("default") | keyword("delete")) ';'
+                |   ';'{ pass = pure; }
+                )
+            ;
+             
+        ParameterList(ParsingContext* ctx)
+            ::= '(' ParameterDeclaration(ctx):left (',' ParameterDeclaration(ctx):right)* ')'
+            ;
+            
+        ParameterDeclaration(ParsingContext* ctx)
+            ::= TypeExpr(ctx) Declarator(ctx)?
+            ;
+            
+        FunctionBody(ParsingContext* ctx)
+            ::= empty{ ctx->BeginFunctionBody(); } CompoundStatement(ctx){ ctx->EndFunctionBody(); } / { ctx->EndFunctionBody(); }
+            ;
+    }
+}

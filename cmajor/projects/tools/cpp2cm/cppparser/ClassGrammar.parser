@@ -1,0 +1,150 @@
+using System;
+
+namespace cppparser
+{
+    grammar ClassGrammar
+    {
+        using DeclarationGrammar.DeclSpecifiers;
+        using DeclarationGrammar.UsingDeclaration;
+        using DeclarationGrammar.TypedefDeclaration;
+        using DeclarationGrammar.AliasDeclaration;
+        using IdentifierGrammar.QualifiedId;
+        using TypeExprGrammar.TypeExpr;
+        using DeclaratorGrammar.Declarator;
+        using DeclaratorGrammar.BraceOrEqualInitializer;
+        using DeclaratorGrammar.BracedInitializerList;
+        using FunctionGrammar.FunctionDefinition;
+        using FunctionGrammar.FunctionBody;
+        using TemplateGrammar.TemplateDeclaration;
+        using EnumerationGrammar.EnumDeclaration;
+        using ExpressionGrammar.PossiblyEmptyArgumentList;
+        
+        ClassDeclaration(ParsingContext* ctx)
+            ::= ClassSpecifier(ctx) ';'
+            ;
+
+        ForwardClassDeclaration(ParsingContext* ctx)
+            ::= ClassKey ClassName(ctx) ';'
+            ;
+
+        ClassSpecifier(ParsingContext* ctx) 
+            ::= ClassHead(ctx) '{' MemberSpecifications(ctx) '}'
+            ;
+
+        MemberSpecifications(ParsingContext* ctx)
+            ::= MemberSpecification(ctx)*
+            ;
+
+        MemberSpecification(ParsingContext* ctx)
+            ::= AccessSpecifier ':' MemberDeclaration(ctx):m1*
+            |   MemberDeclaration(ctx):m2+
+            ;
+
+        MemberDeclaration(ParsingContext* ctx)
+            ::= DeclSpecifiers TypeExpr(ctx) Declarator(ctx):fd VirtPureSpecifiers(fd):pure 
+                BraceOrEqualInitializer(ctx)? ';'
+            |   SpecialMemberFunctionDeclaration(ctx)
+            |   FunctionDefinition(ctx) ';'?
+            |   SpecialMemberFunctionDefinition(ctx)
+            |   UsingDeclaration(ctx)
+            |   TypedefDeclaration(ctx)
+            |   TemplateDeclaration(ctx)
+            |   ClassDeclaration(ctx)
+            |   EnumDeclaration(ctx)
+            |   AliasDeclaration(ctx)
+            |   ForwardClassDeclaration(ctx)
+            ;
+
+        SpecialMemberFunctionDeclaration(ParsingContext* ctx)
+            ::= DeclSpecifiers Declarator(ctx):fd{ pass = fd; } VirtPureSpecifiers(true):pure ';'
+            ;
+
+        ClassHead(ParsingContext* ctx)
+            ::= ClassKey ClassName(ctx) ClassVirtSpecifiers BaseClause(ctx)?
+            ;
+
+        ClassKey
+            ::= keyword("class")
+            |   keyword("struct")
+            |   keyword("union")
+            ;
+
+        ClassName(ParsingContext* ctx)
+            ::= QualifiedId(ctx)
+            ;
+
+        ClassVirtSpecifiers 
+            ::= ClassVirtSpecifier*
+            ;
+
+        ClassVirtSpecifier
+            ::= keyword("final")
+            |   keyword("explicit")
+            ;
+
+        BaseClause(ParsingContext* ctx)
+            ::= ':' BaseClassSpecifierList(ctx)
+            ;
+
+        BaseClassSpecifierList(ParsingContext* ctx)
+            ::= BaseClassSpecifier(ctx):b1 (',' BaseClassSpecifier(ctx):b2)*
+            ;
+
+        BaseClassSpecifier(ParsingContext* ctx)
+            ::= BaseSpecifiers ClassName(ctx)
+            ;
+
+        BaseSpecifiers
+            ::= BaseSpecifier*
+            ;
+
+        BaseSpecifier
+            ::= keyword("virtual")
+            |   AccessSpecifier
+            ;
+
+        AccessSpecifier
+            ::= keyword("public")
+            |   keyword("protected")
+            |   keyword("private")
+            ;
+
+        VirtPureSpecifiers(bool functionMember) : bool
+            ::= VirtSpecifier(functionMember)* (PureSpecifier(functionMember){ value = true; })?
+            ;
+
+        VirtSpecifier(bool functionMember)
+            ::= keyword("override"){ pass = functionMember; }
+            |   keyword("final"){ pass = functionMember; }
+            |   keyword("new"){ pass = functionMember; }
+            ;
+
+        PureSpecifier(bool functionMember)
+            ::= ('=' '0'){ pass = functionMember; }
+            ;
+
+        SpecialMemberFunctionDefinition(ParsingContext* ctx)
+            ::= DeclSpecifiers Declarator(ctx):fd{ pass = fd; } CtorInitializer(ctx)?
+            (   FunctionBody(ctx)
+            |   '=' (keyword("default") | keyword("delete"))
+            )
+            ;
+
+        CtorInitializer(ParsingContext* ctx)
+            ::= ':' MemberInitializerList(ctx)
+            ;
+
+        MemberInitializerList(ParsingContext* ctx)
+            ::= MemberInitializer(ctx):left (',' MemberInitializer(ctx):right)*
+            ;
+
+        MemberInitializer(ParsingContext* ctx)  
+            ::= MemberInitializerId(ctx):m1 '(' PossiblyEmptyArgumentList(ctx):args ')'
+            |   MemberInitializerId(ctx):m2 BracedInitializerList(ctx)
+            ;
+
+        MemberInitializerId(ParsingContext* ctx)
+            ::= QualifiedId(ctx)
+            ;
+    }
+}

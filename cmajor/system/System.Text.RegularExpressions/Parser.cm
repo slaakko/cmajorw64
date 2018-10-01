@@ -8,19 +8,19 @@ using System.Collections;
 
 namespace System.Text.RegularExpressions
 {
-    public PtrNfa MakeNfa(char c)
+    public PtrNfa MakeNfa(PtrNfaStateFactory* factory, char c)
     {
-        PtrNfaState* start = PtrNfaStateFactory.Instance().MakeState();
-        PtrNfaState* end = PtrNfaStateFactory.Instance().MakeState();
+        PtrNfaState* start = factory->MakeState();
+        PtrNfaState* end = factory->MakeState();
         end->SetAccepting();
         start->AddEdge(PtrNfaEdge(CharClass(c), end));
         return PtrNfa(start, end);
     }
 
-    public PtrNfa MakeNfa(const CharClass& cls)
+    public PtrNfa MakeNfa(PtrNfaStateFactory* factory, const CharClass& cls)
     {
-        PtrNfaState* start = PtrNfaStateFactory.Instance().MakeState();
-        PtrNfaState* end = PtrNfaStateFactory.Instance().MakeState();
+        PtrNfaState* start = factory->MakeState();
+        PtrNfaState* end = factory->MakeState();
         end->SetAccepting();
         start->AddEdge(PtrNfaEdge(cls, end));
         return PtrNfa(start, end);
@@ -33,7 +33,6 @@ namespace System.Text.RegularExpressions
         leftEnd->ResetAccepting();
         PtrNfaState* rightStart = right.Start();
         leftEnd->SetEdges(rightStart->Edges());
-        PtrNfaStateFactory.Instance().FreeState(rightStart);
         long n = right.States().Count();
         for (long i = 1; i < n - 1; ++i)
         {
@@ -43,14 +42,14 @@ namespace System.Text.RegularExpressions
         return cat;
     }
     
-    public PtrNfa Alt(const PtrNfa& left, const PtrNfa& right)
+    public PtrNfa Alt(PtrNfaStateFactory* factory, const PtrNfa& left, const PtrNfa& right)
     {
         PtrNfaState* leftStart = left.Start();
         PtrNfaState* leftEnd = left.End();
         PtrNfaState* rightStart = right.Start();
         PtrNfaState* rightEnd = right.End();
-        PtrNfaState* start = PtrNfaStateFactory.Instance().MakeState();
-        PtrNfaState* end = PtrNfaStateFactory.Instance().MakeState();
+        PtrNfaState* start = factory->MakeState();
+        PtrNfaState* end = factory->MakeState();
         end->SetAccepting();
         start->AddEdge(PtrNfaEdge(CharClass(eps), leftStart));
         start->AddEdge(PtrNfaEdge(CharClass(eps), rightStart));
@@ -72,11 +71,11 @@ namespace System.Text.RegularExpressions
         return alt;
     }
     
-    public PtrNfa Kleene(const PtrNfa& subject)
+    public PtrNfa Kleene(PtrNfaStateFactory* factory, const PtrNfa& subject)
     {
         PtrNfa kleene;
-        PtrNfaState* start = PtrNfaStateFactory.Instance().MakeState();
-        PtrNfaState* end = PtrNfaStateFactory.Instance().MakeState();
+        PtrNfaState* start = factory->MakeState();
+        PtrNfaState* end = factory->MakeState();
         end->SetAccepting();
         start->AddEdge(PtrNfaEdge(CharClass(eps), end));
         kleene.SetStart(start);
@@ -94,11 +93,11 @@ namespace System.Text.RegularExpressions
         return kleene;
     }
     
-    public PtrNfa Positive(const PtrNfa& subject)
+    public PtrNfa Positive(PtrNfaStateFactory* factory, const PtrNfa& subject)
     {
         PtrNfa positive;
-        PtrNfaState* start = PtrNfaStateFactory.Instance().MakeState();
-        PtrNfaState* end = PtrNfaStateFactory.Instance().MakeState();
+        PtrNfaState* start = factory->MakeState();
+        PtrNfaState* end = factory->MakeState();
         end->SetAccepting();
         positive.SetStart(start);
         PtrNfaState* subjectStart = subject.Start();
@@ -138,10 +137,10 @@ namespace System.Text.RegularExpressions
         {
             return *instance;
         }
-        public PtrNfa Parse(const string& regEx)
+        public PtrNfa Parse(PtrNfaStateFactory* factory, const string& regEx)
         {
             ustring re = ToUtf32(regEx);
-            PtrNfa ptrNfa = grammar->Parse(re.Chars(), re.Chars() + re.Length(), 0, "");
+            PtrNfa ptrNfa = grammar->Parse(re.Chars(), re.Chars() + re.Length(), 0, "", factory);
             ptrNfa.NumberStates();
             return ptrNfa;
         }
@@ -149,7 +148,7 @@ namespace System.Text.RegularExpressions
         private RegularExpressionGrammar* grammar;
     }
             
-    public PtrNfa ParseRegEx(const string& pattern, RegExFlags flags)
+    public PtrNfa ParseRegEx(PtrNfaStateFactory* factory, const string& pattern, RegExFlags flags)
     {
         if ((flags & RegExFlags.matchLine) != RegExFlags.none)
         {
@@ -173,8 +172,8 @@ namespace System.Text.RegularExpressions
                     linePattern.Append(".*");
                 }
             }
-            return RegExParser.Instance().Parse(linePattern);
+            return RegExParser.Instance().Parse(factory, linePattern);
         }
-        return RegExParser.Instance().Parse(pattern);
+        return RegExParser.Instance().Parse(factory, pattern);
     }            
 }

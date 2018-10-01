@@ -1,0 +1,465 @@
+using System;
+using System.Collections;
+using System.Text.Parsing;
+
+// this source file has been automatically generated from 'EnumerationGrammar.parser' using cmparsergen version 2.0.0.
+
+namespace cppparser
+{
+    public class EnumerationGrammar : System.Text.Parsing.Grammar
+    {
+        public EnumerationGrammar() : this(new ParsingDomain())
+        {
+        }
+        public EnumerationGrammar(ParsingDomain* parsingDomain) : base(ToUtf32("EnumerationGrammar"), parsingDomain->GetNamespaceScope(ToUtf32("cppparser")), parsingDomain)
+        {
+            SetOwner(0);
+            RegisterParsingDomain(parsingDomain);
+            parsingDomain->AddGrammar(this);
+            CreateRules();
+            Link();
+        }
+        public void Parse(const uchar* start, const uchar* end, int fileIndex, const string& fileName, ParsingContext* ctx)
+        {
+            Scanner scanner(start, end, fileName, fileIndex, SkipRule());
+            UniquePtr<XmlLog> xmlLog;
+            if (Log() != null)
+            {
+                xmlLog.Reset(new XmlLog(*Log(), MaxLogLineLength()));
+                scanner.SetLog(xmlLog.Get());
+                xmlLog->WriteBeginRule(u"parse");
+                xmlLog->IncIndent();
+            }
+            Stack<UniquePtr<Object>> stack;
+            UniquePtr<ParsingData> parsingData(new ParsingData(Domain()->NumRules()));
+            scanner.SetParsingData(parsingData.Get());
+            stack.Push(UniquePtr<Object>(new ValueObject<ParsingContext*>(ctx)));
+            Match match = base->Parse(scanner, stack, parsingData.Get());
+            Span stop = scanner.GetSpan();
+            if (Log() != null)
+            {
+                xmlLog->DecIndent();
+                xmlLog->WriteEndRule(u"parse");
+            }
+            if (!match.Hit() || stop.start != cast<int>(end - start))
+            {
+                if (StartRule() != null)
+                {
+                    throw ExpectationFailure(StartRule()->Info(), fileName, stop, start, end);
+                }
+                else
+                {
+                    throw ParsingException("grammar '" + ToUtf8(Name()) + "' has no start rule", fileName, scanner.GetSpan(), start, end);
+                }
+            }
+        }
+
+        public class EnumDeclarationRule : System.Text.Parsing.RuleParser
+        {
+            public EnumDeclarationRule(const ustring& name_, Scope* enclosingScope_, int id_, Parser* definition_) : base(name_, enclosingScope_, id_, definition_)
+            {
+                AddInheritedAttribute(AttrOrVar(ToUtf32("ParsingContext*"), ToUtf32("ctx")));
+            }
+            public override void Enter(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
+            {
+                parsingData->PushContext(Id(), new Context());
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                UniquePtr<Object> ctx_value = stack.Pop();
+                context->ctx = *cast<ValueObject<ParsingContext*>*>(ctx_value.Get());
+            }
+            public override void Leave(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
+            {
+                parsingData->PopContext(Id());
+            }
+            public override void Link()
+            {
+                NonterminalParser* enumSpecifierNonterminalParser = GetNonterminal(ToUtf32("EnumSpecifier"));
+                enumSpecifierNonterminalParser->SetPre(PreEnumSpecifier);
+            }
+            public void PreEnumSpecifier(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                stack.Push(UniquePtr<Object>(new ValueObject<ParsingContext*>(context->ctx)));
+            }
+            public class Context : System.Text.Parsing.Context
+            {
+                public Context() : ctx()
+                {
+                }
+                public ParsingContext* ctx;
+            }
+        }
+
+        public class OpaqueEnumDeclarationRule : System.Text.Parsing.RuleParser
+        {
+            public OpaqueEnumDeclarationRule(const ustring& name_, Scope* enclosingScope_, int id_, Parser* definition_) : base(name_, enclosingScope_, id_, definition_)
+            {
+                AddInheritedAttribute(AttrOrVar(ToUtf32("ParsingContext*"), ToUtf32("ctx")));
+            }
+            public override void Enter(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
+            {
+                parsingData->PushContext(Id(), new Context());
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                UniquePtr<Object> ctx_value = stack.Pop();
+                context->ctx = *cast<ValueObject<ParsingContext*>*>(ctx_value.Get());
+            }
+            public override void Leave(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
+            {
+                parsingData->PopContext(Id());
+            }
+            public override void Link()
+            {
+                NonterminalParser* enumNameNonterminalParser = GetNonterminal(ToUtf32("EnumName"));
+                enumNameNonterminalParser->SetPre(PreEnumName);
+                NonterminalParser* enumBaseNonterminalParser = GetNonterminal(ToUtf32("EnumBase"));
+                enumBaseNonterminalParser->SetPre(PreEnumBase);
+            }
+            public void PreEnumName(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                stack.Push(UniquePtr<Object>(new ValueObject<ParsingContext*>(context->ctx)));
+            }
+            public void PreEnumBase(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                stack.Push(UniquePtr<Object>(new ValueObject<ParsingContext*>(context->ctx)));
+            }
+            public class Context : System.Text.Parsing.Context
+            {
+                public Context() : ctx()
+                {
+                }
+                public ParsingContext* ctx;
+            }
+        }
+
+        public class EnumSpecifierRule : System.Text.Parsing.RuleParser
+        {
+            public EnumSpecifierRule(const ustring& name_, Scope* enclosingScope_, int id_, Parser* definition_) : base(name_, enclosingScope_, id_, definition_)
+            {
+                AddInheritedAttribute(AttrOrVar(ToUtf32("ParsingContext*"), ToUtf32("ctx")));
+            }
+            public override void Enter(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
+            {
+                parsingData->PushContext(Id(), new Context());
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                UniquePtr<Object> ctx_value = stack.Pop();
+                context->ctx = *cast<ValueObject<ParsingContext*>*>(ctx_value.Get());
+            }
+            public override void Leave(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
+            {
+                parsingData->PopContext(Id());
+            }
+            public override void Link()
+            {
+                NonterminalParser* enumHeadNonterminalParser = GetNonterminal(ToUtf32("EnumHead"));
+                enumHeadNonterminalParser->SetPre(PreEnumHead);
+                NonterminalParser* enumeratorsNonterminalParser = GetNonterminal(ToUtf32("Enumerators"));
+                enumeratorsNonterminalParser->SetPre(PreEnumerators);
+            }
+            public void PreEnumHead(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                stack.Push(UniquePtr<Object>(new ValueObject<ParsingContext*>(context->ctx)));
+            }
+            public void PreEnumerators(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                stack.Push(UniquePtr<Object>(new ValueObject<ParsingContext*>(context->ctx)));
+            }
+            public class Context : System.Text.Parsing.Context
+            {
+                public Context() : ctx()
+                {
+                }
+                public ParsingContext* ctx;
+            }
+        }
+
+        public class EnumHeadRule : System.Text.Parsing.RuleParser
+        {
+            public EnumHeadRule(const ustring& name_, Scope* enclosingScope_, int id_, Parser* definition_) : base(name_, enclosingScope_, id_, definition_)
+            {
+                AddInheritedAttribute(AttrOrVar(ToUtf32("ParsingContext*"), ToUtf32("ctx")));
+            }
+            public override void Enter(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
+            {
+                parsingData->PushContext(Id(), new Context());
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                UniquePtr<Object> ctx_value = stack.Pop();
+                context->ctx = *cast<ValueObject<ParsingContext*>*>(ctx_value.Get());
+            }
+            public override void Leave(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
+            {
+                parsingData->PopContext(Id());
+            }
+            public override void Link()
+            {
+                NonterminalParser* enumNameNonterminalParser = GetNonterminal(ToUtf32("EnumName"));
+                enumNameNonterminalParser->SetPre(PreEnumName);
+                NonterminalParser* enumBaseNonterminalParser = GetNonterminal(ToUtf32("EnumBase"));
+                enumBaseNonterminalParser->SetPre(PreEnumBase);
+            }
+            public void PreEnumName(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                stack.Push(UniquePtr<Object>(new ValueObject<ParsingContext*>(context->ctx)));
+            }
+            public void PreEnumBase(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                stack.Push(UniquePtr<Object>(new ValueObject<ParsingContext*>(context->ctx)));
+            }
+            public class Context : System.Text.Parsing.Context
+            {
+                public Context() : ctx()
+                {
+                }
+                public ParsingContext* ctx;
+            }
+        }
+
+        public class EnumNameRule : System.Text.Parsing.RuleParser
+        {
+            public EnumNameRule(const ustring& name_, Scope* enclosingScope_, int id_, Parser* definition_) : base(name_, enclosingScope_, id_, definition_)
+            {
+                AddInheritedAttribute(AttrOrVar(ToUtf32("ParsingContext*"), ToUtf32("ctx")));
+            }
+            public override void Enter(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
+            {
+                parsingData->PushContext(Id(), new Context());
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                UniquePtr<Object> ctx_value = stack.Pop();
+                context->ctx = *cast<ValueObject<ParsingContext*>*>(ctx_value.Get());
+            }
+            public override void Leave(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
+            {
+                parsingData->PopContext(Id());
+            }
+            public override void Link()
+            {
+                NonterminalParser* qualifiedIdNonterminalParser = GetNonterminal(ToUtf32("QualifiedId"));
+                qualifiedIdNonterminalParser->SetPre(PreQualifiedId);
+            }
+            public void PreQualifiedId(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                stack.Push(UniquePtr<Object>(new ValueObject<ParsingContext*>(context->ctx)));
+            }
+            public class Context : System.Text.Parsing.Context
+            {
+                public Context() : ctx()
+                {
+                }
+                public ParsingContext* ctx;
+            }
+        }
+
+        public class EnumBaseRule : System.Text.Parsing.RuleParser
+        {
+            public EnumBaseRule(const ustring& name_, Scope* enclosingScope_, int id_, Parser* definition_) : base(name_, enclosingScope_, id_, definition_)
+            {
+                AddInheritedAttribute(AttrOrVar(ToUtf32("ParsingContext*"), ToUtf32("ctx")));
+            }
+            public override void Enter(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
+            {
+                parsingData->PushContext(Id(), new Context());
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                UniquePtr<Object> ctx_value = stack.Pop();
+                context->ctx = *cast<ValueObject<ParsingContext*>*>(ctx_value.Get());
+            }
+            public override void Leave(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
+            {
+                parsingData->PopContext(Id());
+            }
+            public override void Link()
+            {
+                NonterminalParser* typeExprNonterminalParser = GetNonterminal(ToUtf32("TypeExpr"));
+                typeExprNonterminalParser->SetPre(PreTypeExpr);
+            }
+            public void PreTypeExpr(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                stack.Push(UniquePtr<Object>(new ValueObject<ParsingContext*>(context->ctx)));
+            }
+            public class Context : System.Text.Parsing.Context
+            {
+                public Context() : ctx()
+                {
+                }
+                public ParsingContext* ctx;
+            }
+        }
+
+        public class EnumeratorsRule : System.Text.Parsing.RuleParser
+        {
+            public EnumeratorsRule(const ustring& name_, Scope* enclosingScope_, int id_, Parser* definition_) : base(name_, enclosingScope_, id_, definition_)
+            {
+                AddInheritedAttribute(AttrOrVar(ToUtf32("ParsingContext*"), ToUtf32("ctx")));
+            }
+            public override void Enter(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
+            {
+                parsingData->PushContext(Id(), new Context());
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                UniquePtr<Object> ctx_value = stack.Pop();
+                context->ctx = *cast<ValueObject<ParsingContext*>*>(ctx_value.Get());
+            }
+            public override void Leave(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
+            {
+                parsingData->PopContext(Id());
+            }
+            public override void Link()
+            {
+                NonterminalParser* leftNonterminalParser = GetNonterminal(ToUtf32("left"));
+                leftNonterminalParser->SetPre(Preleft);
+                NonterminalParser* rightNonterminalParser = GetNonterminal(ToUtf32("right"));
+                rightNonterminalParser->SetPre(Preright);
+            }
+            public void Preleft(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                stack.Push(UniquePtr<Object>(new ValueObject<ParsingContext*>(context->ctx)));
+            }
+            public void Preright(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                stack.Push(UniquePtr<Object>(new ValueObject<ParsingContext*>(context->ctx)));
+            }
+            public class Context : System.Text.Parsing.Context
+            {
+                public Context() : ctx()
+                {
+                }
+                public ParsingContext* ctx;
+            }
+        }
+
+        public class EnumeratorDefinitionRule : System.Text.Parsing.RuleParser
+        {
+            public EnumeratorDefinitionRule(const ustring& name_, Scope* enclosingScope_, int id_, Parser* definition_) : base(name_, enclosingScope_, id_, definition_)
+            {
+                AddInheritedAttribute(AttrOrVar(ToUtf32("ParsingContext*"), ToUtf32("ctx")));
+            }
+            public override void Enter(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
+            {
+                parsingData->PushContext(Id(), new Context());
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                UniquePtr<Object> ctx_value = stack.Pop();
+                context->ctx = *cast<ValueObject<ParsingContext*>*>(ctx_value.Get());
+            }
+            public override void Leave(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
+            {
+                parsingData->PopContext(Id());
+            }
+            public override void Link()
+            {
+                NonterminalParser* constantExpressionNonterminalParser = GetNonterminal(ToUtf32("ConstantExpression"));
+                constantExpressionNonterminalParser->SetPre(PreConstantExpression);
+            }
+            public void PreConstantExpression(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                stack.Push(UniquePtr<Object>(new ValueObject<ParsingContext*>(context->ctx)));
+            }
+            public class Context : System.Text.Parsing.Context
+            {
+                public Context() : ctx()
+                {
+                }
+                public ParsingContext* ctx;
+            }
+        }
+
+        public override void GetReferencedGrammars()
+        {
+            ParsingDomain* pd = Domain();
+            Grammar* grammar0 = pd->GetGrammar(ToUtf32("cppparser.TypeExprGrammar"));
+            if (grammar0 == null)
+            {
+                grammar0 = new cppparser.TypeExprGrammar(pd);
+            }
+            AddGrammarReference(grammar0);
+            Grammar* grammar1 = pd->GetGrammar(ToUtf32("cppparser.IdentifierGrammar"));
+            if (grammar1 == null)
+            {
+                grammar1 = new cppparser.IdentifierGrammar(pd);
+            }
+            AddGrammarReference(grammar1);
+            Grammar* grammar2 = pd->GetGrammar(ToUtf32("cppparser.ExpressionGrammar"));
+            if (grammar2 == null)
+            {
+                grammar2 = new cppparser.ExpressionGrammar(pd);
+            }
+            AddGrammarReference(grammar2);
+        }
+        public override void CreateRules()
+        {
+            AddRuleLink(new System.Text.Parsing.RuleLink(ToUtf32("Identifier"), this, ToUtf32("IdentifierGrammar.Identifier")));
+            AddRuleLink(new System.Text.Parsing.RuleLink(ToUtf32("QualifiedId"), this, ToUtf32("IdentifierGrammar.QualifiedId")));
+            AddRuleLink(new System.Text.Parsing.RuleLink(ToUtf32("TypeExpr"), this, ToUtf32("TypeExprGrammar.TypeExpr")));
+            AddRuleLink(new System.Text.Parsing.RuleLink(ToUtf32("ConstantExpression"), this, ToUtf32("ExpressionGrammar.ConstantExpression")));
+            AddRule(new EnumDeclarationRule(ToUtf32("EnumDeclaration"), GetScope(), Domain()->GetNextRuleId(),
+                new System.Text.Parsing.SequenceParser(
+                    new System.Text.Parsing.NonterminalParser(ToUtf32("EnumSpecifier"), ToUtf32("EnumSpecifier"), 1),
+                    new System.Text.Parsing.CharParser(';'))));
+            AddRule(new OpaqueEnumDeclarationRule(ToUtf32("OpaqueEnumDeclaration"), GetScope(), Domain()->GetNextRuleId(),
+                new System.Text.Parsing.SequenceParser(
+                    new System.Text.Parsing.SequenceParser(
+                        new System.Text.Parsing.SequenceParser(
+                            new System.Text.Parsing.NonterminalParser(ToUtf32("EnumKey"), ToUtf32("EnumKey"), 0),
+                            new System.Text.Parsing.NonterminalParser(ToUtf32("EnumName"), ToUtf32("EnumName"), 1)),
+                        new System.Text.Parsing.OptionalParser(
+                            new System.Text.Parsing.NonterminalParser(ToUtf32("EnumBase"), ToUtf32("EnumBase"), 1))),
+                    new System.Text.Parsing.CharParser(';'))));
+            AddRule(new EnumSpecifierRule(ToUtf32("EnumSpecifier"), GetScope(), Domain()->GetNextRuleId(),
+                new System.Text.Parsing.SequenceParser(
+                    new System.Text.Parsing.SequenceParser(
+                        new System.Text.Parsing.SequenceParser(
+                            new System.Text.Parsing.NonterminalParser(ToUtf32("EnumHead"), ToUtf32("EnumHead"), 1),
+                            new System.Text.Parsing.CharParser('{')),
+                        new System.Text.Parsing.NonterminalParser(ToUtf32("Enumerators"), ToUtf32("Enumerators"), 1)),
+                    new System.Text.Parsing.CharParser('}'))));
+            AddRule(new EnumHeadRule(ToUtf32("EnumHead"), GetScope(), Domain()->GetNextRuleId(),
+                new System.Text.Parsing.SequenceParser(
+                    new System.Text.Parsing.SequenceParser(
+                        new System.Text.Parsing.NonterminalParser(ToUtf32("EnumKey"), ToUtf32("EnumKey"), 0),
+                        new System.Text.Parsing.NonterminalParser(ToUtf32("EnumName"), ToUtf32("EnumName"), 1)),
+                    new System.Text.Parsing.OptionalParser(
+                        new System.Text.Parsing.NonterminalParser(ToUtf32("EnumBase"), ToUtf32("EnumBase"), 1)))));
+            AddRule(new System.Text.Parsing.RuleParser(ToUtf32("EnumKey"), GetScope(), Domain()->GetNextRuleId(),
+                new System.Text.Parsing.AlternativeParser(
+                    new System.Text.Parsing.AlternativeParser(
+                        new System.Text.Parsing.SequenceParser(
+                            new System.Text.Parsing.KeywordParser(ToUtf32("enum")),
+                            new System.Text.Parsing.KeywordParser(ToUtf32("class"))),
+                        new System.Text.Parsing.SequenceParser(
+                            new System.Text.Parsing.KeywordParser(ToUtf32("enum")),
+                            new System.Text.Parsing.KeywordParser(ToUtf32("struct")))),
+                    new System.Text.Parsing.KeywordParser(ToUtf32("enum")))));
+            AddRule(new EnumNameRule(ToUtf32("EnumName"), GetScope(), Domain()->GetNextRuleId(),
+                new System.Text.Parsing.NonterminalParser(ToUtf32("QualifiedId"), ToUtf32("QualifiedId"), 1)));
+            AddRule(new EnumBaseRule(ToUtf32("EnumBase"), GetScope(), Domain()->GetNextRuleId(),
+                new System.Text.Parsing.SequenceParser(
+                    new System.Text.Parsing.CharParser(':'),
+                    new System.Text.Parsing.NonterminalParser(ToUtf32("TypeExpr"), ToUtf32("TypeExpr"), 1))));
+            AddRule(new EnumeratorsRule(ToUtf32("Enumerators"), GetScope(), Domain()->GetNextRuleId(),
+                new System.Text.Parsing.SequenceParser(
+                    new System.Text.Parsing.NonterminalParser(ToUtf32("left"), ToUtf32("EnumeratorDefinition"), 1),
+                    new System.Text.Parsing.KleeneStarParser(
+                        new System.Text.Parsing.GroupingParser(
+                            new System.Text.Parsing.SequenceParser(
+                                new System.Text.Parsing.CharParser(','),
+                                new System.Text.Parsing.NonterminalParser(ToUtf32("right"), ToUtf32("EnumeratorDefinition"), 1)))))));
+            AddRule(new EnumeratorDefinitionRule(ToUtf32("EnumeratorDefinition"), GetScope(), Domain()->GetNextRuleId(),
+                new System.Text.Parsing.SequenceParser(
+                    new System.Text.Parsing.NonterminalParser(ToUtf32("Enumerator"), ToUtf32("Enumerator"), 0),
+                    new System.Text.Parsing.OptionalParser(
+                        new System.Text.Parsing.GroupingParser(
+                            new System.Text.Parsing.SequenceParser(
+                                new System.Text.Parsing.CharParser('='),
+                                new System.Text.Parsing.NonterminalParser(ToUtf32("ConstantExpression"), ToUtf32("ConstantExpression"), 1)))))));
+            AddRule(new System.Text.Parsing.RuleParser(ToUtf32("Enumerator"), GetScope(), Domain()->GetNextRuleId(),
+                new System.Text.Parsing.NonterminalParser(ToUtf32("Identifier"), ToUtf32("Identifier"), 0)));
+        }
+    }
+} // cppparser

@@ -167,6 +167,7 @@
     <ClInclude Include="CommandLine.hpp" />
     <ClInclude Include="Compression.hpp" />
     <ClInclude Include="ConditionVariable.hpp" />
+    <ClInclude Include="Directory.hpp" />
     <ClInclude Include="Environment.hpp" />
     <ClInclude Include="Error.hpp" />
     <ClInclude Include="CallStack.hpp" />
@@ -193,6 +194,7 @@
     <ClCompile Include="CommandLine.cpp" />
     <ClCompile Include="Compression.cpp" />
     <ClCompile Include="ConditionVariable.cpp" />
+    <ClCompile Include="Directory.cpp" />
     <ClCompile Include="Environment.cpp" />
     <ClCompile Include="Error.cpp" />
     <ClCompile Include="CallStack.cpp" />

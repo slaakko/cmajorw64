@@ -739,7 +739,7 @@ bool BoundReferenceToPointerExpression::ContainsExceptionCapture() const
     return false;
 }
 
-BoundFunctionCall::BoundFunctionCall(Module* module_, const Span& span_, FunctionSymbol* functionSymbol_) : 
+BoundFunctionCall::BoundFunctionCall(Module* module_, const Span& span_, FunctionSymbol* functionSymbol_) :
     BoundExpression(module_, span_, BoundNodeType::boundFunctionCall, functionSymbol_->ReturnType()), functionSymbol(functionSymbol_)
 {
 }
@@ -750,6 +750,10 @@ BoundExpression* BoundFunctionCall::Clone()
     for (std::unique_ptr<BoundExpression>& argument : arguments)
     {
         clone->AddArgument(std::unique_ptr<BoundExpression>(argument->Clone()));
+    }
+    for (const auto& p : temporaries)
+    {
+        clone->AddTemporary(std::unique_ptr<BoundLocalVariable>(static_cast<BoundLocalVariable*>(p->Clone())));
     }
     return clone;
 }
@@ -763,6 +767,11 @@ void BoundFunctionCall::AddArgument(std::unique_ptr<BoundExpression>&& argument)
 void BoundFunctionCall::SetArguments(std::vector<std::unique_ptr<BoundExpression>>&& arguments_)
 {
     arguments = std::move(arguments_);
+}
+
+void BoundFunctionCall::AddTemporary(std::unique_ptr<BoundLocalVariable>&& temporary)
+{
+    temporaries.push_back(std::move(temporary));
 }
 
 bool BoundFunctionCall::ContainsExceptionCapture() const
@@ -807,6 +816,11 @@ void BoundFunctionCall::Load(Emitter& emitter, OperationFlags flags)
         {
             genObjects.push_back(argument.get());
             genObjects.back()->SetType(argument->GetType());
+        }
+        for (const std::unique_ptr<BoundLocalVariable>& temporary : temporaries)
+        {
+            genObjects.push_back(temporary.get());
+            genObjects.back()->SetType(temporary->GetType());
         }
         OperationFlags callFlags = flags & OperationFlags::functionCallFlags;
         if (GetFlag(BoundExpressionFlags::virtualCall))
@@ -1343,18 +1357,33 @@ BoundConversion::BoundConversion(Module* module_, std::unique_ptr<BoundExpressio
     sourceExpr->MoveTemporaryDestructorCallsTo(*this);
 }
 
+void BoundConversion::AddTemporary(std::unique_ptr<BoundLocalVariable>&& temporary)
+{
+    temporaries.push_back(std::move(temporary));
+}
+
 BoundExpression* BoundConversion::Clone()
 {
     std::unique_ptr<BoundExpression> clonedSourceExpr;
     clonedSourceExpr.reset(sourceExpr->Clone());
-    return new BoundConversion(GetModule(), std::move(clonedSourceExpr), conversionFun);
+    BoundConversion* clone = new BoundConversion(GetModule(), std::move(clonedSourceExpr), conversionFun);
+    for (const auto& p : temporaries)
+    {
+        clone->AddTemporary(std::unique_ptr<BoundLocalVariable>(static_cast<BoundLocalVariable*>(p->Clone())));
+    }
+    return clone;
 }
 
 void BoundConversion::Load(Emitter& emitter, OperationFlags flags)
 {
     sourceExpr->Load(emitter, flags);
-    std::vector<GenObject*> emptyObjects;
-    conversionFun->GenerateCall(emitter, emptyObjects, OperationFlags::none, GetSpan());
+    std::vector<GenObject*> genObjects;
+    for (const std::unique_ptr<BoundLocalVariable>& temporary : temporaries)
+    {
+        genObjects.push_back(temporary.get());
+        genObjects.back()->SetType(temporary->GetType());
+    }
+    conversionFun->GenerateCall(emitter, genObjects, OperationFlags::none, GetSpan());
     DestroyTemporaries(emitter);
 }
 

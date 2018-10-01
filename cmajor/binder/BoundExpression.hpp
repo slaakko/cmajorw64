@@ -261,10 +261,12 @@ public:
     void AddArgument(std::unique_ptr<BoundExpression>&& argument);
     void SetArguments(std::vector<std::unique_ptr<BoundExpression>>&& arguments_);
     const std::vector<std::unique_ptr<BoundExpression>>& Arguments() const { return arguments; }
+    void AddTemporary(std::unique_ptr<BoundLocalVariable>&& temporary);
     bool ContainsExceptionCapture() const override;
 private:
     FunctionSymbol* functionSymbol;
     std::vector<std::unique_ptr<BoundExpression>> arguments;
+    std::vector<std::unique_ptr<BoundLocalVariable>> temporaries;
 };
 
 class BoundDelegateCall : public BoundExpression
@@ -376,9 +378,11 @@ public:
     FunctionSymbol* ConversionFun() { return conversionFun; }
     std::unique_ptr<Value> ToValue(BoundCompileUnit& boundCompileUnit) const override;
     bool ContainsExceptionCapture() const override;
+    void AddTemporary(std::unique_ptr<BoundLocalVariable>&& temporary);
 private:
     std::unique_ptr<BoundExpression> sourceExpr;
     FunctionSymbol* conversionFun;
+    std::vector<std::unique_ptr<BoundLocalVariable>> temporaries;
 };
 
 class BoundIsExpression : public BoundExpression

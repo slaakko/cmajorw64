@@ -1,0 +1,57 @@
+using System;
+using System.IO;
+using System.Collections;
+using cppparser;
+
+int main(int argc, char** argv)
+{
+    try
+    {
+        bool debug = false;
+        bool verbose = false;
+        List<string> files;
+        for (int i = 1; i < argc; ++i)
+        {
+            string arg = argv[i];
+            if (arg.StartsWith("-"))
+            {
+                if (arg == "--debug" || arg == "-d")
+                {
+                    debug = true;
+                }
+                else if (arg == "--verbose" || arg == "-v")
+                {
+                    verbose = true;
+                }
+                else
+                {
+                    throw Exception("unknown option '" + arg + "'");
+                }
+            }
+            else
+            {
+                files.Add(GetFullPath(arg));
+            }
+        }
+        SourceFileGrammar* grammar = new SourceFileGrammar();
+        if (debug)
+        {
+            grammar->SetLog(Console.Out());
+        }
+        for (const string& file : files)
+        {
+            if (verbose)
+            {
+                Console.Out() << "> " << file << endl();
+            }            
+            ustring content = File.ReadAllText(file);
+            grammar->Parse(content.Chars(), content.Chars() + content.Length(), 0, file);
+        }
+    }
+    catch (const Exception& ex)
+    {
+        Console.Error() << ex.ToString() << endl();
+        return 1;
+    }
+    return 0;
+}

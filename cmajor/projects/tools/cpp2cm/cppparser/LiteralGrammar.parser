@@ -1,0 +1,101 @@
+using System;
+
+namespace cppparser
+{
+    grammar LiteralGrammar
+    {
+        using stdlib.digit_sequence;
+        using stdlib.sign;
+        using stdlib.escape;
+
+        Literal
+            ::= FloatingLiteral
+            |   IntegerLiteral
+            |   CharacterLiteral
+            |   StringLiteral
+            |   BooleanLiteral
+            |   PointerLiteral
+            ;
+
+        FloatingLiteral
+            ::= token(FractionalConstant ExponentPart? FloatingSuffix?)
+            |   token(digit_sequence ExponentPart FloatingSuffix?)
+            ;
+
+        FractionalConstant
+            ::= token(digit_sequence? '.' digit_sequence)
+            |   token(digit_sequence '.')
+            ;
+
+        ExponentPart
+            ::= token([eE] sign? digit_sequence)
+            ;
+
+        FloatingSuffix
+            ::= [fF]
+            ;
+
+        IntegerLiteral
+            ::= token(HexadecimalLiteral IntegerSuffix?)
+            |   token(OctalLiteral IntegerSuffix?)
+            |   token(DecimalLiteral IntegerSuffix?)
+            ;
+
+        DecimalLiteral
+            ::= token([1-9] digit*)
+            ;
+
+        OctalLiteral
+            ::= token('0' [0-7]*)
+            ;
+
+        HexadecimalLiteral
+            ::= token(("0x" | "0X") hexdigit+)
+            ;
+
+        IntegerSuffix
+            ::= token([uU] ("ll" | "LL")?)
+            |   token([uU] [lL]?)
+            |   token(("ll" | "LL") [uU]?)
+            |   token([lL] [uU]?)
+            ;
+
+        CharacterLiteral
+            ::= token([uUL]? '\'' CChar+ '\'')
+            ;
+
+        CChar
+            ::= [^\r\n\\] | escape | 'u' HexDigit4 | 'U' HexDigit8
+            ;
+
+        HexDigit4
+            ::= token(hexdigit hexdigit hexdigit hexdigit)
+            ;
+
+        HexDigit8
+            ::= token(hexdigit hexdigit hexdigit hexdigit hexdigit hexdigit hexdigit hexdigit)
+            ;
+
+        StringLiteral
+            ::= token(EncodingPrefix? '"' SChar* '"')
+            |   token(EncodingPrefix? 'R' '"' [^\r\n"]* '"')
+            ;
+
+        EncodingPrefix
+            ::= "u8" | 'u' | 'U' | 'L'
+            ;
+
+        SChar
+            ::= [^\r\n\\"] | escape | 'u' HexDigit4 | 'U' HexDigit8
+            ;
+
+        BooleanLiteral
+            ::= keyword("true")
+            |   keyword("false")
+            ;
+
+        PointerLiteral
+            ::= keyword("nullptr")
+            ;
+    }
+}

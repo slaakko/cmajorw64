@@ -1,0 +1,224 @@
+using System;
+using System.Collections;
+using System.Text.Parsing;
+
+// this source file has been automatically generated from 'IdentifierGrammar.parser' using cmparsergen version 2.0.0.
+
+namespace cppparser
+{
+    public class IdentifierGrammar : System.Text.Parsing.Grammar
+    {
+        public IdentifierGrammar() : this(new ParsingDomain())
+        {
+        }
+        public IdentifierGrammar(ParsingDomain* parsingDomain) : base(ToUtf32("IdentifierGrammar"), parsingDomain->GetNamespaceScope(ToUtf32("cppparser")), parsingDomain)
+        {
+            SetOwner(0);
+            RegisterParsingDomain(parsingDomain);
+            parsingDomain->AddGrammar(this);
+            CreateRules();
+            Link();
+        }
+        public class IdRule : System.Text.Parsing.RuleParser
+        {
+            public IdRule(const ustring& name_, Scope* enclosingScope_, int id_, Parser* definition_) : base(name_, enclosingScope_, id_, definition_)
+            {
+                AddInheritedAttribute(AttrOrVar(ToUtf32("ParsingContext*"), ToUtf32("ctx")));
+            }
+            public override void Enter(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
+            {
+                parsingData->PushContext(Id(), new Context());
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                UniquePtr<Object> ctx_value = stack.Pop();
+                context->ctx = *cast<ValueObject<ParsingContext*>*>(ctx_value.Get());
+            }
+            public override void Leave(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
+            {
+                parsingData->PopContext(Id());
+            }
+            public override void Link()
+            {
+                NonterminalParser* simpleTemplateIdNonterminalParser = GetNonterminal(ToUtf32("SimpleTemplateId"));
+                simpleTemplateIdNonterminalParser->SetPre(PreSimpleTemplateId);
+            }
+            public void PreSimpleTemplateId(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                stack.Push(UniquePtr<Object>(new ValueObject<ParsingContext*>(context->ctx)));
+            }
+            public class Context : System.Text.Parsing.Context
+            {
+                public Context() : ctx()
+                {
+                }
+                public ParsingContext* ctx;
+            }
+        }
+
+        public class NestedNameSpecifierRule : System.Text.Parsing.RuleParser
+        {
+            public NestedNameSpecifierRule(const ustring& name_, Scope* enclosingScope_, int id_, Parser* definition_) : base(name_, enclosingScope_, id_, definition_)
+            {
+                AddInheritedAttribute(AttrOrVar(ToUtf32("ParsingContext*"), ToUtf32("ctx")));
+            }
+            public override void Enter(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
+            {
+                parsingData->PushContext(Id(), new Context());
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                UniquePtr<Object> ctx_value = stack.Pop();
+                context->ctx = *cast<ValueObject<ParsingContext*>*>(ctx_value.Get());
+            }
+            public override void Leave(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
+            {
+                parsingData->PopContext(Id());
+            }
+            public override void Link()
+            {
+                NonterminalParser* i1NonterminalParser = GetNonterminal(ToUtf32("i1"));
+                i1NonterminalParser->SetPre(Prei1);
+                NonterminalParser* i2NonterminalParser = GetNonterminal(ToUtf32("i2"));
+                i2NonterminalParser->SetPre(Prei2);
+            }
+            public void Prei1(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                stack.Push(UniquePtr<Object>(new ValueObject<ParsingContext*>(context->ctx)));
+            }
+            public void Prei2(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                stack.Push(UniquePtr<Object>(new ValueObject<ParsingContext*>(context->ctx)));
+            }
+            public class Context : System.Text.Parsing.Context
+            {
+                public Context() : ctx()
+                {
+                }
+                public ParsingContext* ctx;
+            }
+        }
+
+        public class QualifiedIdRule : System.Text.Parsing.RuleParser
+        {
+            public QualifiedIdRule(const ustring& name_, Scope* enclosingScope_, int id_, Parser* definition_) : base(name_, enclosingScope_, id_, definition_)
+            {
+                AddInheritedAttribute(AttrOrVar(ToUtf32("ParsingContext*"), ToUtf32("ctx")));
+            }
+            public override void Enter(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
+            {
+                parsingData->PushContext(Id(), new Context());
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                UniquePtr<Object> ctx_value = stack.Pop();
+                context->ctx = *cast<ValueObject<ParsingContext*>*>(ctx_value.Get());
+            }
+            public override void Leave(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
+            {
+                parsingData->PopContext(Id());
+            }
+            public override void Link()
+            {
+                NonterminalParser* n1NonterminalParser = GetNonterminal(ToUtf32("n1"));
+                n1NonterminalParser->SetPre(Pren1);
+                NonterminalParser* i1NonterminalParser = GetNonterminal(ToUtf32("i1"));
+                i1NonterminalParser->SetPre(Prei1);
+                NonterminalParser* n2NonterminalParser = GetNonterminal(ToUtf32("n2"));
+                n2NonterminalParser->SetPre(Pren2);
+                NonterminalParser* i2NonterminalParser = GetNonterminal(ToUtf32("i2"));
+                i2NonterminalParser->SetPre(Prei2);
+                NonterminalParser* i3NonterminalParser = GetNonterminal(ToUtf32("i3"));
+                i3NonterminalParser->SetPre(Prei3);
+            }
+            public void Pren1(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                stack.Push(UniquePtr<Object>(new ValueObject<ParsingContext*>(context->ctx)));
+            }
+            public void Prei1(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                stack.Push(UniquePtr<Object>(new ValueObject<ParsingContext*>(context->ctx)));
+            }
+            public void Pren2(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                stack.Push(UniquePtr<Object>(new ValueObject<ParsingContext*>(context->ctx)));
+            }
+            public void Prei2(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                stack.Push(UniquePtr<Object>(new ValueObject<ParsingContext*>(context->ctx)));
+            }
+            public void Prei3(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                stack.Push(UniquePtr<Object>(new ValueObject<ParsingContext*>(context->ctx)));
+            }
+            public class Context : System.Text.Parsing.Context
+            {
+                public Context() : ctx()
+                {
+                }
+                public ParsingContext* ctx;
+            }
+        }
+
+        public override void GetReferencedGrammars()
+        {
+            ParsingDomain* pd = Domain();
+            Grammar* grammar0 = pd->GetGrammar(ToUtf32("cppparser.TemplateGrammar"));
+            if (grammar0 == null)
+            {
+                grammar0 = new cppparser.TemplateGrammar(pd);
+            }
+            AddGrammarReference(grammar0);
+            Grammar* grammar1 = pd->GetGrammar(ToUtf32("System.Text.Parsing.stdlib"));
+            if (grammar1 == null)
+            {
+                grammar1 = new System.Text.Parsing.stdlib(pd);
+            }
+            AddGrammarReference(grammar1);
+            Grammar* grammar2 = pd->GetGrammar(ToUtf32("cppparser.KeywordGrammar"));
+            if (grammar2 == null)
+            {
+                grammar2 = new cppparser.KeywordGrammar(pd);
+            }
+            AddGrammarReference(grammar2);
+        }
+        public override void CreateRules()
+        {
+            AddRuleLink(new System.Text.Parsing.RuleLink(ToUtf32("identifier"), this, ToUtf32("System.Text.Parsing.stdlib.identifier")));
+            AddRuleLink(new System.Text.Parsing.RuleLink(ToUtf32("Keyword"), this, ToUtf32("KeywordGrammar.Keyword")));
+            AddRuleLink(new System.Text.Parsing.RuleLink(ToUtf32("SimpleTemplateId"), this, ToUtf32("TemplateGrammar.SimpleTemplateId")));
+            AddRule(new System.Text.Parsing.RuleParser(ToUtf32("Identifier"), GetScope(), Domain()->GetNextRuleId(),
+                new System.Text.Parsing.DifferenceParser(
+                    new System.Text.Parsing.NonterminalParser(ToUtf32("identifier"), ToUtf32("identifier"), 0),
+                    new System.Text.Parsing.NonterminalParser(ToUtf32("Keyword"), ToUtf32("Keyword"), 0))));
+            AddRule(new IdRule(ToUtf32("Id"), GetScope(), Domain()->GetNextRuleId(),
+                new System.Text.Parsing.AlternativeParser(
+                    new System.Text.Parsing.NonterminalParser(ToUtf32("SimpleTemplateId"), ToUtf32("SimpleTemplateId"), 1),
+                    new System.Text.Parsing.NonterminalParser(ToUtf32("Identifier"), ToUtf32("Identifier"), 0))));
+            AddRule(new NestedNameSpecifierRule(ToUtf32("NestedNameSpecifier"), GetScope(), Domain()->GetNextRuleId(),
+                new System.Text.Parsing.SequenceParser(
+                    new System.Text.Parsing.SequenceParser(
+                        new System.Text.Parsing.NonterminalParser(ToUtf32("i1"), ToUtf32("Id"), 1),
+                        new System.Text.Parsing.StringParser(ToUtf32("::"))),
+                    new System.Text.Parsing.KleeneStarParser(
+                        new System.Text.Parsing.GroupingParser(
+                            new System.Text.Parsing.SequenceParser(
+                                new System.Text.Parsing.NonterminalParser(ToUtf32("i2"), ToUtf32("Id"), 1),
+                                new System.Text.Parsing.StringParser(ToUtf32("::"))))))));
+            AddRule(new QualifiedIdRule(ToUtf32("QualifiedId"), GetScope(), Domain()->GetNextRuleId(),
+                new System.Text.Parsing.AlternativeParser(
+                    new System.Text.Parsing.AlternativeParser(
+                        new System.Text.Parsing.SequenceParser(
+                            new System.Text.Parsing.SequenceParser(
+                                new System.Text.Parsing.StringParser(ToUtf32("::")),
+                                new System.Text.Parsing.NonterminalParser(ToUtf32("n1"), ToUtf32("NestedNameSpecifier"), 1)),
+                            new System.Text.Parsing.NonterminalParser(ToUtf32("i1"), ToUtf32("Id"), 1)),
+                        new System.Text.Parsing.SequenceParser(
+                            new System.Text.Parsing.NonterminalParser(ToUtf32("n2"), ToUtf32("NestedNameSpecifier"), 1),
+                            new System.Text.Parsing.NonterminalParser(ToUtf32("i2"), ToUtf32("Id"), 1))),
+                    new System.Text.Parsing.NonterminalParser(ToUtf32("i3"), ToUtf32("Id"), 1))));
+        }
+    }
+} // cppparser

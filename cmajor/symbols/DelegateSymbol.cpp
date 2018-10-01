@@ -117,7 +117,7 @@ void DelegateTypeSymbol::Dump(CodeFormatter& formatter)
 
 llvm::Type* DelegateTypeSymbol::IrType(Emitter& emitter)
 {
-    llvm::Type* localIrType = emitter.GetIrType(this);
+    llvm::Type* localIrType = emitter.GetIrTypeByTypeId(TypeId());
     if (!localIrType)
     {
         llvm::Type* retType = llvm::Type::getVoidTy(emitter.Context());
@@ -137,8 +137,7 @@ llvm::Type* DelegateTypeSymbol::IrType(Emitter& emitter)
             paramTypes.push_back(returnParam->GetType()->IrType(emitter));
         }
         localIrType = llvm::PointerType::get(llvm::FunctionType::get(retType, paramTypes, false), 0);
-        //emitter.SetIrType(TypeId(), localIrType);
-        emitter.SetIrType(this, localIrType);
+        emitter.SetIrTypeByTypeId(TypeId(), localIrType);
     }
     return localIrType;
 }
@@ -726,14 +725,14 @@ void ClassDelegateTypeSymbol::Dump(CodeFormatter& formatter)
 
 llvm::Type* ClassDelegateTypeSymbol::IrType(Emitter& emitter)
 {
-    llvm::Type* localIrType = emitter.GetIrType(this);
+    llvm::Type* localIrType = emitter.GetIrTypeByTypeId(TypeId());
     if (!localIrType)
     {
         std::vector<llvm::Type*> elementTypes;
         elementTypes.push_back(emitter.Builder().getInt8PtrTy());
         elementTypes.push_back(delegateType->IrType(emitter));
         localIrType = llvm::StructType::get(emitter.Context(), elementTypes);
-        emitter.SetIrType(this, localIrType);
+        emitter.SetIrTypeByTypeId(TypeId(), localIrType);
     }
     return localIrType;
 }
@@ -1167,16 +1166,23 @@ MemberFunctionToClassDelegateConversion::MemberFunctionToClassDelegateConversion
 {
 }
 
-MemberFunctionToClassDelegateConversion::MemberFunctionToClassDelegateConversion(const Span& span_, TypeSymbol* sourceType_, ClassDelegateTypeSymbol* targetType_, FunctionSymbol* function_,
-    LocalVariableSymbol* objectDelegatePairVariable_) :
-    FunctionSymbol(SymbolType::memberFunctionToClassDelegateSymbol, span_, U"@conversion"), sourceType(sourceType_), targetType(targetType_), function(function_), 
-    objectDelegatePairVariable(objectDelegatePairVariable_)
+MemberFunctionToClassDelegateConversion::MemberFunctionToClassDelegateConversion(const Span& span_, TypeSymbol* sourceType_, ClassDelegateTypeSymbol* targetType_, FunctionSymbol* function_) :
+    FunctionSymbol(SymbolType::memberFunctionToClassDelegateSymbol, span_, U"@conversion"), sourceType(sourceType_), targetType(targetType_), function(function_)
 {
     SetConversion();
 }
 
+std::vector<LocalVariableSymbol*> MemberFunctionToClassDelegateConversion::CreateTemporariesTo(FunctionSymbol* currentFunction)
+{
+    std::vector<LocalVariableSymbol*> temporaries;
+    LocalVariableSymbol* objectDelegatePairVariable = currentFunction->CreateTemporary(targetType->ObjectDelegatePairType(), Span());
+    temporaries.push_back(objectDelegatePairVariable);
+    return temporaries;
+}
+
 void MemberFunctionToClassDelegateConversion::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span)
 {
+    Assert(genObjects.size() == 1, "MemberFunctionToClassDelegateConversion needs one temporary object");
     llvm::Value* objectValue = emitter.Stack().Pop();
     if (!objectValue)
     {
@@ -1184,7 +1190,9 @@ void MemberFunctionToClassDelegateConversion::GenerateCall(Emitter& emitter, std
     }
     llvm::Value* objectValueAsVoidPtr = emitter.Builder().CreateBitCast(objectValue, emitter.Builder().getInt8PtrTy());
     llvm::Value* memFunPtrValue = emitter.Module()->getOrInsertFunction(ToUtf8(function->MangledName()), function->IrType(emitter));
-    llvm::Value* ptr = objectDelegatePairVariable->IrObject(emitter);
+    genObjects[0]->Load(emitter, OperationFlags::addr);
+    llvm::Value* ptr = emitter.Stack().Pop();
+    //llvm::Value* ptr = objectDelegatePairVariable->IrObject(emitter);
     ArgVector objectIndeces;
     objectIndeces.push_back(emitter.Builder().getInt32(0));
     objectIndeces.push_back(emitter.Builder().getInt32(0));
@@ -1213,10 +1221,6 @@ void MemberFunctionToClassDelegateConversion::Check()
     if (!function)
     {
         throw SymbolCheckException(GetRootModuleForCurrentThread(), "member function to class delegate conversion has no function", GetSpan());
-    }
-    if (!objectDelegatePairVariable)
-    {
-        throw SymbolCheckException(GetRootModuleForCurrentThread(), "member function to class delegate conversion has no object delegate pair", GetSpan());
     }
 }
 

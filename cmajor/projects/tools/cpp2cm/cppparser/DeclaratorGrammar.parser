@@ -1,0 +1,57 @@
+using System;
+
+namespace cppparser
+{
+    grammar DeclaratorGrammar
+    {
+        using IdentifierGrammar.Identifier;
+        using IdentifierGrammar.NestedNameSpecifier;
+        using ExpressionGrammar.IdExpression;
+        using ExpressionGrammar.ConstantExpression;
+        using ExpressionGrammar.ExpressionList;
+        using ExpressionGrammar.AssignmentExpression;
+        using FunctionGrammar.ParameterList;
+        using TypeExprGrammar.CVSpecifierSequence;
+        
+        InitDeclarator(ParsingContext* ctx)
+            ::= Declarator(ctx)
+            (   Initializer(ctx)
+            |   empty
+            )
+            ;
+            
+        Declarator(ParsingContext* ctx) : bool
+            ::= (   IdExpression(ctx)
+            |   '(' '*' Identifier ')'
+            |   '(' NestedNameSpecifier(ctx) '*' Identifier ')'
+            )
+            (   empty{ pass = !ctx->InFunctionBody(); } ParameterList(ctx) CVSpecifierSequence{ value = true; }
+            |   '[' ConstantExpression(ctx)? ']'
+            )*
+            ;
+            
+        Initializer(ParsingContext* ctx)
+            ::= '=' InitializerClause(ctx)
+            |   '(' ExpressionList(ctx) ')'
+            |   BracedInitializerList(ctx)
+            ;
+            
+        BraceOrEqualInitializer(ParsingContext* ctx)
+            ::= '=' InitializerClause(ctx)
+            |   BracedInitializerList(ctx)
+            ;
+            
+        BracedInitializerList(ParsingContext* ctx)
+            ::= '{' (InitializerClause(ctx):ic1 (',' InitializerClause(ctx):ic2)*)? '}'
+            ;
+            
+        InitializerClause(ParsingContext* ctx)
+            ::= AssignmentExpression(ctx)
+            |   BracedInitializerList(ctx)
+            ;
+            
+        InitializerList(ParsingContext* ctx)
+            ::= InitializerClause(ctx):ic1 (',' InitializerClause(ctx):ic2)*
+            ;
+    }
+}

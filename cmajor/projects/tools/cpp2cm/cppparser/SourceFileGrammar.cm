@@ -1,0 +1,144 @@
+using System;
+using System.Collections;
+using System.Text.Parsing;
+
+// this source file has been automatically generated from 'SourceFileGrammar.parser' using cmparsergen version 2.0.0.
+
+namespace cppparser
+{
+    public class SourceFileGrammar : System.Text.Parsing.Grammar
+    {
+        public SourceFileGrammar() : this(new ParsingDomain())
+        {
+        }
+        public SourceFileGrammar(ParsingDomain* parsingDomain) : base(ToUtf32("SourceFileGrammar"), parsingDomain->GetNamespaceScope(ToUtf32("cppparser")), parsingDomain)
+        {
+            SetOwner(0);
+            RegisterParsingDomain(parsingDomain);
+            parsingDomain->AddGrammar(this);
+            CreateRules();
+            Link();
+        }
+        public void Parse(const uchar* start, const uchar* end, int fileIndex, const string& fileName)
+        {
+            Scanner scanner(start, end, fileName, fileIndex, SkipRule());
+            UniquePtr<XmlLog> xmlLog;
+            if (Log() != null)
+            {
+                xmlLog.Reset(new XmlLog(*Log(), MaxLogLineLength()));
+                scanner.SetLog(xmlLog.Get());
+                xmlLog->WriteBeginRule(u"parse");
+                xmlLog->IncIndent();
+            }
+            Stack<UniquePtr<Object>> stack;
+            UniquePtr<ParsingData> parsingData(new ParsingData(Domain()->NumRules()));
+            scanner.SetParsingData(parsingData.Get());
+            Match match = base->Parse(scanner, stack, parsingData.Get());
+            Span stop = scanner.GetSpan();
+            if (Log() != null)
+            {
+                xmlLog->DecIndent();
+                xmlLog->WriteEndRule(u"parse");
+            }
+            if (!match.Hit() || stop.start != cast<int>(end - start))
+            {
+                if (StartRule() != null)
+                {
+                    throw ExpectationFailure(StartRule()->Info(), fileName, stop, start, end);
+                }
+                else
+                {
+                    throw ParsingException("grammar '" + ToUtf8(Name()) + "' has no start rule", fileName, scanner.GetSpan(), start, end);
+                }
+            }
+        }
+
+        public class SourceFileRule : System.Text.Parsing.RuleParser
+        {
+            public SourceFileRule(const ustring& name_, Scope* enclosingScope_, int id_, Parser* definition_) : base(name_, enclosingScope_, id_, definition_)
+            {
+                AddLocalVariable(AttrOrVar(ToUtf32("ParsingContext"), ToUtf32("ctx")));
+            }
+            public override void Enter(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
+            {
+                parsingData->PushContext(Id(), new Context());
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+            }
+            public override void Leave(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
+            {
+                parsingData->PopContext(Id());
+            }
+            public override void Link()
+            {
+                NonterminalParser* declarationsNonterminalParser = GetNonterminal(ToUtf32("Declarations"));
+                declarationsNonterminalParser->SetPre(PreDeclarations);
+            }
+            public void PreDeclarations(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                stack.Push(UniquePtr<Object>(new ValueObject<ParsingContext*>(&context->ctx)));
+            }
+            public class Context : System.Text.Parsing.Context
+            {
+                public Context() : ctx()
+                {
+                }
+                public ParsingContext ctx;
+            }
+        }
+
+        public override void GetReferencedGrammars()
+        {
+            ParsingDomain* pd = Domain();
+            Grammar* grammar0 = pd->GetGrammar(ToUtf32("cppparser.DeclarationGrammar"));
+            if (grammar0 == null)
+            {
+                grammar0 = new cppparser.DeclarationGrammar(pd);
+            }
+            AddGrammarReference(grammar0);
+            Grammar* grammar1 = pd->GetGrammar(ToUtf32("System.Text.Parsing.stdlib"));
+            if (grammar1 == null)
+            {
+                grammar1 = new System.Text.Parsing.stdlib(pd);
+            }
+            AddGrammarReference(grammar1);
+        }
+        public override void CreateRules()
+        {
+            AddRuleLink(new System.Text.Parsing.RuleLink(ToUtf32("comment"), this, ToUtf32("System.Text.Parsing.stdlib.comment")));
+            AddRuleLink(new System.Text.Parsing.RuleLink(ToUtf32("newline"), this, ToUtf32("System.Text.Parsing.stdlib.newline")));
+            AddRuleLink(new System.Text.Parsing.RuleLink(ToUtf32("Declarations"), this, ToUtf32("DeclarationGrammar.Declarations")));
+            AddRule(new SourceFileRule(ToUtf32("SourceFile"), GetScope(), Domain()->GetNextRuleId(),
+                new System.Text.Parsing.NonterminalParser(ToUtf32("Declarations"), ToUtf32("Declarations"), 1)));
+            AddRule(new System.Text.Parsing.RuleParser(ToUtf32("CommentsAndSpacesAndPPLines"), GetScope(), Domain()->GetNextRuleId(),
+                new System.Text.Parsing.PositiveParser(
+                    new System.Text.Parsing.GroupingParser(
+                        new System.Text.Parsing.AlternativeParser(
+                            new System.Text.Parsing.AlternativeParser(
+                                new System.Text.Parsing.NonterminalParser(ToUtf32("PPLine"), ToUtf32("PPLine"), 0),
+                                new System.Text.Parsing.NonterminalParser(ToUtf32("comment"), ToUtf32("comment"), 0)),
+                            new System.Text.Parsing.SpaceParser())))));
+            AddRule(new System.Text.Parsing.RuleParser(ToUtf32("PPLine"), GetScope(), Domain()->GetNextRuleId(),
+                new System.Text.Parsing.TokenParser(
+                    new System.Text.Parsing.SequenceParser(
+                        new System.Text.Parsing.SequenceParser(
+                            new System.Text.Parsing.SequenceParser(
+                                new System.Text.Parsing.KleeneStarParser(
+                                    new System.Text.Parsing.NonterminalParser(ToUtf32("S"), ToUtf32("S"), 0)),
+                                new System.Text.Parsing.CharParser('#')),
+                            new System.Text.Parsing.KleeneStarParser(
+                                new System.Text.Parsing.GroupingParser(
+                                    new System.Text.Parsing.DifferenceParser(
+                                        new System.Text.Parsing.AnyCharParser(),
+                                        new System.Text.Parsing.NonterminalParser(ToUtf32("newline"), ToUtf32("newline"), 0))))),
+                        new System.Text.Parsing.NonterminalParser(ToUtf32("newline"), ToUtf32("newline"), 0)))));
+            AddRule(new System.Text.Parsing.RuleParser(ToUtf32("S"), GetScope(), Domain()->GetNextRuleId(),
+                new System.Text.Parsing.PositiveParser(
+                    new System.Text.Parsing.GroupingParser(
+                        new System.Text.Parsing.AlternativeParser(
+                            new System.Text.Parsing.CharParser(' '),
+                            new System.Text.Parsing.CharParser('\t'))))));
+            SetSkipRuleName(ToUtf32("CommentsAndSpacesAndPPLines"));
+        }
+    }
+} // cppparser

@@ -509,9 +509,8 @@ FunctionSymbol* BoundCompileUnit::GetConversion(TypeSymbol* sourceType, TypeSymb
                         }
                         if (found)
                         {
-                            LocalVariableSymbol* objectDelegatePairVariable = currentFunction->GetFunctionSymbol()->CreateTemporary(classDelegateType->ObjectDelegatePairType(), span);
-                            std::unique_ptr<FunctionSymbol> memberFunctionToClassDelegateConversion(new MemberFunctionToClassDelegateConversion(span, sourceType, classDelegateType, viableFunction,
-                                objectDelegatePairVariable));
+                            //LocalVariableSymbol* objectDelegatePairVariable = currentFunction->GetFunctionSymbol()->CreateTemporary(classDelegateType->ObjectDelegatePairType(), span);
+                            std::unique_ptr<FunctionSymbol> memberFunctionToClassDelegateConversion(new MemberFunctionToClassDelegateConversion(span, sourceType, classDelegateType, viableFunction));
                             memberFunctionToClassDelegateConversion->SetParent(&symbolTable.GlobalNs());
                             conversion = memberFunctionToClassDelegateConversion.get();
                             conversionTable.AddConversion(conversion);
@@ -533,8 +532,8 @@ FunctionSymbol* BoundCompileUnit::GetConversion(TypeSymbol* sourceType, TypeSymb
                         InterfaceTypeSymbol* sourceInterfaceType = sourceClassType->ImplementedInterfaces()[i];
                         if (TypesEqual(targetInterfaceType, sourceInterfaceType))
                         {
-                            LocalVariableSymbol* temporaryInterfaceObjectVar = currentFunction->GetFunctionSymbol()->CreateTemporary(targetInterfaceType, span);
-                            std::unique_ptr<FunctionSymbol> classToInterfaceConversion(new ClassToInterfaceConversion(sourceClassType, targetInterfaceType, temporaryInterfaceObjectVar, i, span));
+                            //LocalVariableSymbol* temporaryInterfaceObjectVar = currentFunction->GetFunctionSymbol()->CreateTemporary(targetInterfaceType, span);
+                            std::unique_ptr<FunctionSymbol> classToInterfaceConversion(new ClassToInterfaceConversion(sourceClassType, targetInterfaceType, i, span));
                             classToInterfaceConversion->SetParent(&symbolTable.GlobalNs());
                             classToInterfaceConversion->SetModule(&GetModule());
                             conversion = classToInterfaceConversion.get();

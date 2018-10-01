@@ -1,0 +1,28 @@
+using System;
+
+namespace cppparser
+{
+    grammar SimpleTypeGrammar
+    {
+        SimpleType
+            ::= SimpleTypeSpecifier+
+            ;
+            
+        SimpleTypeSpecifier
+            ::= keyword("char")
+            |   keyword("char16_t")
+            |   keyword("char32_t")
+            |   keyword("wchar_t")
+            |   keyword("bool")
+            |   keyword("short")
+            |   keyword("int")
+            |   keyword("long")
+            |   keyword("signed")
+            |   keyword("unsigned")
+            |   keyword("float")
+            |   keyword("double")
+            |   keyword("void")
+            |   keyword("auto")
+            ;
+    }
+}

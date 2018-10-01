@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rules>
+    <type source="bool" target="bool"/>
+    <type source="char" target="char"/>
+    <type source="signed char" target="char"/>
+    <type source="wchar_t" target="wchar"/>
+    <type source="char16_t" target="wchar"/>
+    <type source="char32_t" target="uchar"/>
+    <type source="unsigned char" target="byte"/>
+    <type source="short" target="short"/>
+    <type source="short int" target="short"/>
+    <type source="unsigned short" target="ushort"/>
+    <type source="unsigned short int" target="ushort"/>
+    <type source="int" target="int"/>
+    <type source="unsigned" target="uint"/>
+    <type source="unsigned int" target="uint"/>
+    <type source="long" target="int"/>
+    <type source="unsigned long" target="uint"/>
+    <type source="long long" target="long"/>
+    <type source="unsigned long long" target="ulong"/>
+    <type source="std::int8_t" target="sbyte"/>
+    <type source="std::uint8_t" target="byte"/>
+    <type source="std::int16_t" target="short"/>
+    <type source="std::uint16_t" target="ushort"/>
+    <type source="std::int32_t" target="int"/>
+    <type source="std::uint32_t" target="uint"/>
+    <type source="std::int64_t" target="long"/>
+    <type source="std::uint64_t" target="ulong"/>
+
+    <type source="std::string" target="string" ns="System" members="string_members"/>
+    <type source="std::basic_string&lt;CharT>" target="String&lt;CharT>" members="string_members"/>
+    <type source="std::u16_string" target="wstring" ns="System" members="string_members"/>
+    <type source="std::u32_string" target="ustring" ns="System" members="string_members"/>
+
+    <members id="string_members">
+        <member source="iterator" target="Iterator"/>
+        <member source="const_iterator" target="ConstIterator"/>
+        <member source="begin" target="Begin"/>
+        <member source="cbegin" target="CBegin"/>
+        <member source="end" target="End"/>
+        <member source="cend" target="CEnd"/>
+        <member source="data" target="Chars"/>
+        <member source="c_str" target="Chars"/>
+        <member source="empty" target="IsEmpty"/>
+        <member source="size" target="Length"/>
+        <member source="length" target="Length"/>
+        <member source="append" target="Append"/>
+        <member source="substr" target="Substring"/>
+        <member source="find" target="Find"/>
+    </members>
+
+    <type source="std::vector&lt;T>" target="List&lt;T>" ns="System.Collections" members="vector_members"/>
+
+    <members id="vector_members">
+        <member source="iterator" target="Iterator"/>
+        <member source="const_iterator" target="ConstIterator"/>
+        <member source="begin" target="Begin"/>
+        <member source="cbegin" target="CBegin"/>
+        <member source="end" target="End"/>
+        <member source="cend" target="CEnd"/>
+        <member source="push_back" target="Add"/>
+        <member source="pop_back" target="RemoveLast"/>
+        <member source="push_front" target="InsertFront"/>
+        <member source="pop_front" target="RemoveFront"/>
+        <member source="front" target="Front"/>
+        <member source="back" target="Back"/>
+        <member source="empty" target="IsEmpty"/>
+        <member source="size" target="Count"/>
+        <member source="reserve" target="Reserve"/>
+        <member source="resize" target="Resize"/>
+        <member source="capacity" target="Capacity"/>
+        <member source="clear" target="Clear"/>
+    </members>
+
+    <type source="std::set&lt;T, C=std::less&lt;T>>" target="Set&lt;T, C=Less&lt;T>>" ns="System.Collections" members="set_members"/>
+
+    <members id="set_members">
+        <member source="iterator" target="Iterator"/>
+        <member source="const_iterator" target="ConstIterator"/>
+        <member source="begin" target="Begin"/>
+        <member source="cbegin" target="CBegin"/>
+        <member source="end" target="End"/>
+        <member source="cend" target="CEnd"/>
+        <member source="empty" target="IsEmpty"/>
+        <member source="size" target="Count"/>
+        <member source="clear" target="Clear"/>
+        <member source="insert" target="Insert"/>
+        <member source="find" target="Find"/>
+    </members>
+
+    <type source="std::map&lt;Key, T, C=std::less&lt;Key>>" target="Map&lt;Key, T, C=Less&lt;Key>>" ns="System.Collections" members="map_members"/>
+
+    <members id="map_members">
+        <member source="iterator" target="Iterator"/>
+        <member source="const_iterator" target="ConstIterator"/>
+        <member source="begin" target="Begin"/>
+        <member source="cbegin" target="CBegin"/>
+        <member source="end" target="End"/>
+        <member source="cend" target="CEnd"/>
+        <member source="empty" target="IsEmpty"/>
+        <member source="size" target="Count"/>
+        <member source="clear" target="Clear"/>
+        <member source="insert" target="Insert"/>
+        <member source="find" target="Find"/>
+    </members>
+
+    <type source="std::unordered_set&lt;Key, Hash=std::hash&lt;Key>, KeyEqual=std::equal_to&lt;Key>>" 
+        target="HashSet&lt;Key, Hash=Hasher&lt;Key>, KeyEqual=EqualTo&lt;Key>>"
+        ns="System.Collections" members="unordered_set_members"/>
+
+    <members id="unordered_set_members">
+        <member source="iterator" target="Iterator"/>
+        <member source="const_iterator" target="ConstIterator"/>
+        <member source="begin" target="Begin"/>
+        <member source="cbegin" target="CBegin"/>
+        <member source="end" target="End"/>
+        <member source="cend" target="CEnd"/>
+        <member source="empty" target="IsEmpty"/>
+        <member source="size" target="Count"/>
+        <member source="clear" target="Clear"/>
+        <member source="insert" target="Insert"/>
+        <member source="find" target="Find"/>
+    </members>
+
+    <type source="std::unordered_map&lt;Key>, T, Hash=std::hash&lt;Key>, KeyEqual=std::equal_to&lt;Key>>" 
+          target="HashMap&lt;Key>, T, Hash=Hasher&lt;Key>, KeyEqual=EqualTo&lt;Key>>"
+          ns="System.Collections" members="unordered_map_members"/>
+
+    <members id="unordered_map_members">
+        <member source="iterator" target="Iterator"/>
+        <member source="const_iterator" target="ConstIterator"/>
+        <member source="begin" target="Begin"/>
+        <member source="cbegin" target="CBegin"/>
+        <member source="end" target="End"/>
+        <member source="cend" target="CEnd"/>
+        <member source="empty" target="IsEmpty"/>
+        <member source="size" target="Count"/>
+        <member source="clear" target="Clear"/>
+        <member source="insert" target="Insert"/>
+        <member source="find" target="Find"/>
+    </members>
+</rules>

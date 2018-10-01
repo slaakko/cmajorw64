@@ -962,7 +962,7 @@ void ExpressionBinder::Visit(DotNode& dotNode)
                         bmv->SetClassPtr(std::unique_ptr<BoundExpression>(classPtr.release()));
                     }
                 }
-                else if (expression->GetBoundNodeType() != BoundNodeType::boundTypeExpression)
+                else if (expression->GetBoundNodeType() != BoundNodeType::boundTypeExpression && expression->GetBoundNodeType() != BoundNodeType::boundConstant)
                 {
                     throw Exception(module, "symbol '" + ToUtf8(name) + "' does not denote a function group, member variable, or type", dotNode.MemberId()->GetSpan());
                 }

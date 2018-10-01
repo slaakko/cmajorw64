@@ -110,14 +110,14 @@ void InterfaceTypeSymbol::SetSpecifiers(Specifiers specifiers)
 
 llvm::Type* InterfaceTypeSymbol::IrType(Emitter& emitter)
 {
-    llvm::Type* localIrType = emitter.GetIrType(this);
+    llvm::Type* localIrType = emitter.GetIrTypeByTypeId(TypeId());
     if (!localIrType)
     {
         std::vector<llvm::Type*> elemTypes;
         elemTypes.push_back(emitter.Builder().getInt8PtrTy());
         elemTypes.push_back(emitter.Builder().getInt8PtrTy());
         localIrType = llvm::StructType::get(emitter.Context(), elemTypes);
-        emitter.SetIrType(this, localIrType);
+        emitter.SetIrTypeByTypeId(TypeId(), localIrType);
     }
     return localIrType;
 }
@@ -508,11 +508,17 @@ void InterfaceTypeMoveAssignment::GenerateCall(Emitter& emitter, std::vector<Gen
     emitter.Builder().CreateStore(thatInterfaceObject, interfacePtr);
 }
 
-ClassToInterfaceConversion::ClassToInterfaceConversion(ClassTypeSymbol* sourceClassType_, InterfaceTypeSymbol* targetInterfaceType_, LocalVariableSymbol* temporaryInterfaceObjectVar_,
-    int32_t interfaceIndex_, const Span& span_) : FunctionSymbol(span_, U"@classToInterfaceConversion"), sourceClassType(sourceClassType_), targetInterfaceType(targetInterfaceType_), 
-    temporaryInterfaceObjectVar(temporaryInterfaceObjectVar_), interfaceIndex(interfaceIndex_)
+ClassToInterfaceConversion::ClassToInterfaceConversion(ClassTypeSymbol* sourceClassType_, InterfaceTypeSymbol* targetInterfaceType_, int32_t interfaceIndex_, const Span& span_) : 
+    FunctionSymbol(span_, U"@classToInterfaceConversion"), sourceClassType(sourceClassType_), targetInterfaceType(targetInterfaceType_), interfaceIndex(interfaceIndex_)
 {
     SetConversion();
+}
+
+std::vector<LocalVariableSymbol*> ClassToInterfaceConversion::CreateTemporariesTo(FunctionSymbol* currentFunction)
+{
+    std::vector<LocalVariableSymbol*> temporaries;
+    temporaries.push_back(currentFunction->CreateTemporary(targetInterfaceType, Span()));
+    return temporaries;
 }
 
 void ClassToInterfaceConversion::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span)
@@ -522,7 +528,10 @@ void ClassToInterfaceConversion::GenerateCall(Emitter& emitter, std::vector<GenO
     ArgVector objectIndeces;
     objectIndeces.push_back(emitter.Builder().getInt32(0));
     objectIndeces.push_back(emitter.Builder().getInt32(0));
-    llvm::Value* objectPtr = emitter.Builder().CreateGEP(temporaryInterfaceObjectVar->IrObject(emitter), objectIndeces);
+    //llvm::Value* objectPtr = emitter.Builder().CreateGEP(temporaryInterfaceObjectVar->IrObject(emitter), objectIndeces);
+    genObjects[0]->Load(emitter, OperationFlags::addr);
+    llvm::Value* temporaryInterfaceObjectVar = emitter.Stack().Pop();
+    llvm::Value* objectPtr = emitter.Builder().CreateGEP(temporaryInterfaceObjectVar, objectIndeces);
     emitter.Builder().CreateStore(classPtrAsVoidPtr, objectPtr);
     llvm::Value* vmtObjectPtr = sourceClassType->VmtObject(emitter, false);
     ArgVector imtsArrayIndeces;
@@ -538,9 +547,11 @@ void ClassToInterfaceConversion::GenerateCall(Emitter& emitter, std::vector<GenO
     ArgVector imtIndeces;
     imtIndeces.push_back(emitter.Builder().getInt32(0));
     imtIndeces.push_back(emitter.Builder().getInt32(1));
-    llvm::Value* imtPtr = emitter.Builder().CreateGEP(temporaryInterfaceObjectVar->IrObject(emitter), imtIndeces);
+    //llvm::Value* imtPtr = emitter.Builder().CreateGEP(temporaryInterfaceObjectVar->IrObject(emitter), imtIndeces);
+    llvm::Value* imtPtr = emitter.Builder().CreateGEP(temporaryInterfaceObjectVar, imtIndeces);
     emitter.Builder().CreateStore(imt, imtPtr);
-    emitter.Stack().Push(temporaryInterfaceObjectVar->IrObject(emitter));
+    //emitter.Stack().Push(temporaryInterfaceObjectVar->IrObject(emitter));
+    emitter.Stack().Push(temporaryInterfaceObjectVar);
 }
 
 void ClassToInterfaceConversion::Check()
@@ -553,10 +564,6 @@ void ClassToInterfaceConversion::Check()
     if (!targetInterfaceType)
     {
         throw SymbolCheckException(GetRootModuleForCurrentThread(), "class to interface conversion has no target interface type", GetSpan());
-    }
-    if (!temporaryInterfaceObjectVar)
-    {
-        throw SymbolCheckException(GetRootModuleForCurrentThread(), "class to interface conversion has no temporary interface object variable", GetSpan());
     }
 }
 

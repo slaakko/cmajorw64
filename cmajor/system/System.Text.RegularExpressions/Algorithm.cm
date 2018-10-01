@@ -37,9 +37,9 @@ namespace System.Text.RegularExpressions
     
     public Nfa ToNfa(const string& pattern, RegExFlags flags)
     {
-        PtrNfa ptrNfa = ParseRegEx(pattern, flags);
+        PtrNfaStateFactory factory;
+        PtrNfa ptrNfa = ParseRegEx(&factory, pattern, flags);
         Nfa nfa = ToNfa(ptrNfa);
-        PtrNfaStateFactory.Instance().Clear();
         return nfa;
     }
     

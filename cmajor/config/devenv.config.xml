@@ -28,15 +28,23 @@
     <maxRecentProjects>10</maxRecentProjects>
     <recentProjects>
         <recentProject>
-            <path>C:\Users\Seppo\cmajorw64\cmajor\projects\tools\cmparsergen\cmparsergen.cms</path>
-            <openFiles />
-        </recentProject>
-        <recentProject>
-            <path>C:\Users\Seppo\cmajorw64\cmajor\projects\examples\examples.cms</path>
+            <path>C:\Users\Seppo\cmajorw64\cmajor\projects\tools\cpp2cm\cpp2cm.cms</path>
             <openFiles />
         </recentProject>
         <recentProject>
             <path>C:\Users\Seppo\cmajorw64\cmajor\system\System.cms</path>
+            <openFiles />
+        </recentProject>
+        <recentProject>
+            <path>C:\Users\Seppo\cmajorw64\cmajor\projects\tools\cmparsergen\cmparsergen.cms</path>
+            <openFiles />
+        </recentProject>
+        <recentProject>
+            <path>C:\Users\Seppo\cmajorw64\cmajor\test\Uuid\Uuid.cms</path>
+            <openFiles />
+        </recentProject>
+        <recentProject>
+            <path>C:\Users\Seppo\cmajorw64\cmajor\projects\examples\examples.cms</path>
             <openFiles />
         </recentProject>
         <recentProject>
@@ -59,17 +67,9 @@
             <path>C:\Users\Seppo\cmajorw64\cmajor\doc\code\socket\socketClients.cms</path>
             <openFiles />
         </recentProject>
-        <recentProject>
-            <path>C:\Users\Seppo\cmajorw64\cmajor\doc\code\json\json.cms</path>
-            <openFiles />
-        </recentProject>
-        <recentProject>
-            <path>C:\Users\Seppo\cmajorw64\cmajor\doc\code\http\httpClients.cms</path>
-            <openFiles />
-        </recentProject>
     </recentProjects>
     <strictNothrow>false</strictNothrow>
-    <emitLlvm>false</emitLlvm>
+    <emitLlvm>true</emitLlvm>
     <emitOptLlvm>false</emitOptLlvm>
     <linkWithDebugRuntime>false</linkWithDebugRuntime>
     <linkUsingMsLink>false</linkUsingMsLink>

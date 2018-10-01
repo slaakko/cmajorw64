@@ -1,9 +1,10 @@
 project cpp2cm;
 target=program;
+text <cpp2cm.pl>;
+text <cpp2cm.pp>;
 source <Flags.cm>;
-text <Grammars.pp>;
-source <Input.cm>;
 source <Main.cm>;
 source <Solution.cm>;
 source <SolutionGrammar.cm>;
 text <SolutionGrammar.parser>;
+source <Work.cm>;

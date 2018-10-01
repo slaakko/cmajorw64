@@ -30,10 +30,6 @@ namespace System.Text.RegularExpressions
         {
             edges.Add(edge);
         }
-        public void AddEdge(PtrNfaEdge&& edge)
-        {
-            edges.Add(edge);
-        }
         public nothrow inline const List<PtrNfaEdge>& Edges() const
         {
             return edges;
@@ -111,10 +107,6 @@ namespace System.Text.RegularExpressions
         
     public class PtrNfaStateFactory
     {
-        static nothrow PtrNfaStateFactory() : instance(new PtrNfaStateFactory())
-        {
-        }
-        private default nothrow PtrNfaStateFactory(); 
         public ~PtrNfaStateFactory()
         {
             try
@@ -133,28 +125,13 @@ namespace System.Text.RegularExpressions
             }
             states.Clear();
         }
-        public static PtrNfaStateFactory& Instance()
-        {
-            return *instance;
-        }
         public PtrNfaState* MakeState()
         {
-            if (!unused.IsEmpty())
-            {
-                return unused.Pop();
-            }
             PtrNfaState* state = new PtrNfaState();
             states.Add(state);
             return state;
         }
-        public void FreeState(PtrNfaState* state)
-        {
-            state->Clear();
-            unused.Push(state);
-        }
-        private static UniquePtr<PtrNfaStateFactory> instance;
         private List<PtrNfaState*> states;
-        private Stack<PtrNfaState*> unused;
     }
     
     public class PtrNfa

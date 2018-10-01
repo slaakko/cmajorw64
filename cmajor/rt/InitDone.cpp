@@ -8,6 +8,7 @@
 #include <cmajor/parsing/InitDone.hpp>
 #include <cmajor/util/InitDone.hpp>
 #include <cmajor/rt/Io.hpp>
+#include <cmajor/rt/Directory.hpp>
 #include <cmajor/rt/CallStack.hpp>
 #include <cmajor/rt/Classes.hpp>
 #include <cmajor/rt/Statics.hpp>
@@ -51,6 +52,7 @@ void Init(int64_t numberOfPolymorphicClassIds, const uint64_t* polymorphicClassI
     cmajor::parsing::Init();
     cmajor::util::Init();
     InitIo();
+    InitDirectory();
     InitError();
     InitString();
     InitMemory();
@@ -79,6 +81,7 @@ void Done()
     DoneMemory();
     DoneString();
     DoneError();
+    DoneDirectory();
     DoneIo();
     cmajor::util::Done();
     cmajor::parsing::Done();

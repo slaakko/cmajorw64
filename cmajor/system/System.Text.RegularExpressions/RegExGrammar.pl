@@ -2,11 +2,11 @@ namespace System.Text.RegularExpressions
 {
     grammar RegularExpressionGrammar
     {
-        RegularExpression : PtrNfa;
-        AlternativeExpression : PtrNfa;
-        SequenceExpression : PtrNfa;
-        PostfixExpression : PtrNfa;
-        PrimaryExpression : PtrNfa;
+        RegularExpression(PtrNfaStateFactory* factory) : PtrNfa;
+        AlternativeExpression(PtrNfaStateFactory* factory) : PtrNfa;
+        SequenceExpression(PtrNfaStateFactory* factory) : PtrNfa;
+        PostfixExpression(PtrNfaStateFactory* factory) : PtrNfa;
+        PrimaryExpression(PtrNfaStateFactory* factory) : PtrNfa;
         Char : uchar;
         CharClass(var bool inverse, var ustring s) : CharClass;
         Class : Class;

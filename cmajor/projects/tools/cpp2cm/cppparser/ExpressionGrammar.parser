@@ -1,0 +1,267 @@
+using System;
+
+namespace cppparser
+{
+    grammar ExpressionGrammar
+    {
+        using DeclaratorGrammar.InitializerList;
+        using DeclaratorGrammar.InitializerClause;
+        using DeclaratorGrammar.BracedInitializerList;
+        using TypeExprGrammar.TypeExpr;
+        using LiteralGrammar.Literal;
+        using SimpleTypeGrammar.SimpleTypeSpecifier;
+        using TemplateGrammar.TemplateId;
+        using IdentifierGrammar.Identifier;
+        using IdentifierGrammar.NestedNameSpecifier;
+        
+        ExpressionList(ParsingContext* ctx)
+            ::= InitializerList(ctx)
+            ;
+        
+        PossiblyEmptyArgumentList(ParsingContext* ctx)
+            ::= ExpressionList(ctx)
+            |   empty
+            ;
+            
+        Expression(ParsingContext* ctx)
+            ::= AssignmentExpression(ctx):left (',' AssignmentExpression(ctx):right)*
+            ;
+            
+        ConstantExpression(ParsingContext* ctx)
+            ::= ConditionalExpression(ctx)
+            ;
+            
+        AssignmentExpression(ParsingContext* ctx)
+            ::= ConcreteAssignmentExpression(ctx)
+            |   ConditionalExpression(ctx)
+            |   ThrowExpression(ctx)
+            ;
+            
+        ConcreteAssignmentExpression(ParsingContext* ctx)
+            ::= empty{ ctx->BeginParsingLvalue(); } LogicalOrExpression(ctx){ ctx->EndParsingLvalue(); } / { ctx->EndParsingLvalue(); }
+                AssignmentOperator InitializerClause(ctx)
+            ;
+            
+        AssignmentOperator
+            ::= ("=" - "==")
+            |   "*="
+            |   "/="
+            |   "%="
+            |   "+="
+            |   "-="
+            |   ">>="
+            |   "<<="
+            |   "&="
+            |   "^="
+            |   "|="
+            ;
+            
+        ConditionalExpression(ParsingContext* ctx)
+            ::= LogicalOrExpression(ctx) ('?' Expression(ctx) ':' AssignmentExpression(ctx))?
+            ;
+            
+        ThrowExpression(ParsingContext* ctx)
+            ::= keyword("throw") AssignmentExpression(ctx)?
+            ;
+            
+        LogicalOrExpression(ParsingContext* ctx)
+            ::= LogicalAndExpression(ctx):left ("||"{ if (ctx->ParsingTemplateIdOrLvalueAndNotArguments()) pass = false; } LogicalAndExpression(ctx):right)*
+            ;
+            
+        LogicalAndExpression(ParsingContext* ctx)
+            ::= InclusiveOrExpression(ctx):left ("&&"{ if (ctx->ParsingTemplateIdOrLvalueAndNotArguments()) pass = false; } InclusiveOrExpression(ctx):right)*
+            ;
+            
+        InclusiveOrExpression(ParsingContext* ctx)
+            ::= ExclusiveOrExpression(ctx):left 
+                (('|' - ("|=" | "||")){ if (ctx->ParsingLvalueAndNotArguments()) pass = false; } ExclusiveOrExpression(ctx):right)*
+            ;
+            
+        ExclusiveOrExpression(ParsingContext* ctx)
+            ::= AndExpression(ctx):left 
+                (('^' - "^="){ if (ctx->ParsingLvalueAndNotArguments()) pass = false; } AndExpression(ctx):right)*
+            ;
+            
+        AndExpression(ParsingContext* ctx)
+            ::= EqualityExpression(ctx):left 
+                (('&' - ("&=" | "&&")){ if (ctx->ParsingLvalueAndNotArguments()) pass = false; } EqualityExpression(ctx):right)*
+            ;
+            
+        EqualityExpression(ParsingContext* ctx)
+            ::= RelationalExpression(ctx):left 
+                (("==" | "!="){ if (ctx->ParsingLvalueAndNotArguments()) pass = false; } RelationalExpression(ctx):right)*
+            ;
+
+        RelationalExpression(ParsingContext* ctx)
+            ::= ShiftExpression(ctx):left
+                (("<=" | ">=" | ('<' - ("<<" | "<<=")) | ('>' - (">>" | ">>="))){ if (ctx->ParsingTemplateIdOrLvalueAndNotArguments()) pass = false; } 
+                ShiftExpression(ctx):right)*
+            ;
+            
+        ShiftExpression(ParsingContext* ctx)
+            ::= AdditiveExpression(ctx):left
+                ((("<<" - "<<=") | (">>" - ">>=")){ if (ctx->ParsingTemplateIdOrLvalueAndNotArguments()) pass = false; }
+                AdditiveExpression(ctx):right)*
+            ;
+            
+        AdditiveExpression(ParsingContext* ctx)
+            ::= MultiplicativeExpression(ctx):left
+                ((('+' - "+=") | ('-' - "-=")){ if (ctx->ParsingLvalueAndNotArguments()) pass = false; }
+                MultiplicativeExpression(ctx):right)*
+            ;
+            
+        MultiplicativeExpression(ParsingContext* ctx)
+            ::= PMExpression(ctx):left
+                ((('*' - "*=") | ('/' - "/=") | ('%' - "%=")){ if (ctx->ParsingLvalueAndNotArguments()) pass = false; }
+                PMExpression(ctx):right)*
+            ;
+            
+        PMExpression(ParsingContext* ctx)
+            ::= CastExpression(ctx):left
+                ((".*" | "->*")
+                CastExpression(ctx):right)*
+            ;
+            
+        CastExpression(ParsingContext* ctx)
+            ::= '(' TypeExpr(ctx) ')' CastExpression(ctx)
+            |   UnaryExpression(ctx)
+            ;
+            
+        UnaryExpression(ParsingContext* ctx)
+            ::= "++" CastExpression(ctx):c1
+            |   "--" CastExpression(ctx):c2
+            |   UnaryOperator CastExpression(ctx):c3
+            |   (keyword("sizeof") UnaryExpression(ctx):u4)
+            |   (keyword("alignof") '(' TypeExpr(ctx):t5 ')')
+            |   NewExpression(ctx)
+            |   DeleteExpression(ctx)
+            |   PostfixExpression(ctx)
+            ;
+            
+        UnaryOperator
+            ::= ('*' - "*=")
+            |   ('&' - "&=")
+            |   ('+' - "+=")
+            |   ('-' - "-=")
+            |   '!'
+            |   '~'
+            ;
+            
+        NewExpression(ParsingContext* ctx)
+            ::= keyword("new") NewPlacement(ctx)? TypeExpr(ctx) NewInitializer(ctx)?
+            ;
+            
+        NewPlacement(ParsingContext* ctx)
+            ::= '(' ExpressionList(ctx) ')'
+            ;
+            
+        NewInitializer(ParsingContext* ctx)
+            ::= '(' PossiblyEmptyArgumentList(ctx):args ')'
+            ;
+            
+        DeleteExpression(ParsingContext* ctx)
+            ::= keyword("delete") ('[' ']')? CastExpression(ctx)
+            ;
+            
+        PostfixExpression(ParsingContext* ctx)
+            ::= PrimaryExpression(ctx)
+                (   '['{ ctx->BeginParsingArguments(); } Expression(ctx):index ']'{ ctx->EndParsingArguments(); } / { ctx->EndParsingArguments(); }
+                |   '('{ ctx->BeginParsingArguments(); } PossiblyEmptyArgumentList(ctx):arguments ')'{ ctx->EndParsingArguments(); } / { ctx->EndParsingArguments(); }
+                |   ('.' - ".*") IdExpression(ctx):id1
+                |   ("->" - "->*") IdExpression(ctx):id2
+                |   "++"
+                |   "--"
+                )*
+            ;
+            
+        PrimaryExpression(ParsingContext* ctx)
+            ::= Literal
+            |   keyword("this")
+            |   '(' Expression(ctx) ')'
+            |   CppCastExpression(ctx)
+            |   TypeIdExpression(ctx)
+            |   IdExpression(ctx)
+            |   SimpleTypeSpecifier:s1 '(' PossiblyEmptyArgumentList(ctx):args ')'
+            |   SimpleTypeSpecifier:s2 BracedInitializerList(ctx)
+            ;
+            
+        CppCastExpression(ParsingContext* ctx)
+            ::= (   keyword("dynamic_cast")
+                |   keyword("static_cast")
+                |   keyword("reinterpret_cast")
+                |   keyword("const_cast")
+                )
+                '<' TypeExpr(ctx):t1 '>' '(' Expression(ctx):e1 ')'
+            ;
+            
+        TypeIdExpression(ParsingContext* ctx)
+            ::= keyword("typeid") '(' TypeExpr(ctx):t1 ')'
+            |   keyword("typeid") '(' Expression(ctx):e1 ')'
+            ;
+            
+        IdExpression(ParsingContext* ctx)
+            ::= QualifiedIdExpr(ctx)
+            |   UnqualifiedIdExpr(ctx)
+            ;
+            
+        UnqualifiedIdExpr(ParsingContext* ctx)
+            ::= TemplateId(ctx)
+            |   Identifier:id1
+            |   OperatorFunctionId
+            |   ConversionFunctionId(ctx)
+            |   ('~' Identifier:id2)
+            ;
+            
+        QualifiedIdExpr(ParsingContext* ctx)
+            ::= "::" TemplateId(ctx)
+            |   "::" NestedNameSpecifier(ctx):ns UnqualifiedIdExpr(ctx):ud1
+            |   "::" Identifier
+            |   "::" OperatorFunctionId
+            |   NestedNameSpecifier(ctx):ns2 UnqualifiedIdExpr(ctx):uid2
+            ;
+            
+        OperatorFunctionId
+            ::= keyword("operator") Operator
+            ;
+            
+        Operator
+            ::= keyword("new") "[]"
+            |   keyword("delete") "[]"
+            |   keyword("new")
+            |   keyword("delete")
+            |   AssignmentOperator
+            |   "++"
+            |   "--"
+            |   "<<"
+            |   ">>"
+            |   "&&"
+            |   "||"
+            |   "=="
+            |   "!="
+            |   "<="
+            |   ">="
+            |   ".*"
+            |   "->*"
+            |   "->"
+            |   "()"
+            |   "[]"
+            |   '<'
+            |   '>'
+            |   '+'
+            |   '-'
+            |   '*'
+            |   '/'
+            |   '%'
+            |   '^'
+            |   '&'
+            |   '|'
+            |   '~'
+            |   '!'
+            |   ','
+            ;
+        
+        ConversionFunctionId(ParsingContext* ctx)
+            ::= keyword("operator") TypeExpr(ctx)
+            ;
+    }
+}

@@ -273,13 +273,13 @@ class MemberFunctionToClassDelegateConversion : public FunctionSymbol
 {
 public:
     MemberFunctionToClassDelegateConversion(const Span& span_, const std::u32string& name_);
-    MemberFunctionToClassDelegateConversion(const Span& span_, TypeSymbol* sourceType_, ClassDelegateTypeSymbol* targetType_, FunctionSymbol* function_, 
-        LocalVariableSymbol* objectDelegatePairVariable_);
+    MemberFunctionToClassDelegateConversion(const Span& span_, TypeSymbol* sourceType_, ClassDelegateTypeSymbol* targetType_, FunctionSymbol* function_);
     ConversionType GetConversionType() const override { return ConversionType::implicit_; }
     uint8_t ConversionDistance() const override { return 1; }
     TypeSymbol* ConversionSourceType() const override { return sourceType; }
     TypeSymbol* ConversionTargetType() const override { return targetType; }
     bool IsMemberFunctionToClassDelegateConversion() const override { return true; }
+    std::vector<LocalVariableSymbol*> CreateTemporariesTo(FunctionSymbol* currentFunction) override;
     void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
     bool IsBasicTypeOperation() const override { return true; }
     const char* ClassName() const override { return "MemberFunctionToClassDelegateConversion"; }
@@ -288,7 +288,7 @@ private:
     TypeSymbol* sourceType;
     ClassDelegateTypeSymbol* targetType;
     FunctionSymbol* function;
-    LocalVariableSymbol* objectDelegatePairVariable;
+    //LocalVariableSymbol* objectDelegatePairVariable;
 };
 
 } } // namespace cmajor::symbols

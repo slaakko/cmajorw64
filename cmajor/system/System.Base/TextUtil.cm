@@ -267,7 +267,7 @@ namespace System
         return result;
     }
     
-    public nothrow ustring StringStr(const ustring& s)
+    public ustring StringStr(const ustring& s)
     {
         ustring result;
         for (uchar c : s)
@@ -292,7 +292,7 @@ namespace System
         return result;
     }
     
-    public nothrow ustring MakeStringLiteral(const ustring& s)
+    public ustring MakeStringLiteral(const ustring& s)
     {
         ustring result = u"\"";
         result.Append(StringStr(s));

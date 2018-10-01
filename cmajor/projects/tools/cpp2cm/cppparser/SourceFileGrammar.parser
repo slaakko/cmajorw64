@@ -1,0 +1,27 @@
+using System;
+
+namespace cppparser
+{
+    grammar SourceFileGrammar
+    {
+        using stdlib.comment;
+        using stdlib.newline;
+        using DeclarationGrammar.Declarations;
+        skip CommentsAndSpacesAndPPLines;
+
+        SourceFile(var ParsingContext ctx)
+            ::= Declarations(&ctx)
+            ;
+
+        CommentsAndSpacesAndPPLines
+            ::= (PPLine | comment | space)+
+            ;
+
+        PPLine
+            ::= token(S* '#' (anychar - newline)* newline)
+            ;
+
+        S   ::= (' ' | '\t')+
+            ;
+    }
+}

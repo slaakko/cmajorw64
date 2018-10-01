@@ -1212,7 +1212,7 @@ llvm::Type* ClassTypeSymbol::IrType(Emitter& emitter)
     {
         throw Exception(GetRootModuleForCurrentThread(), "class '" + ToUtf8(Name()) + "' not bound", GetSpan());
     }
-    llvm::Type* localIrType = emitter.GetIrType(this);
+    llvm::Type* localIrType = emitter.GetIrTypeByTypeId(TypeId());
     if (!localIrType)
     {
         std::vector<llvm::Type*> elementTypes;
@@ -1225,13 +1225,13 @@ llvm::Type* ClassTypeSymbol::IrType(Emitter& emitter)
                 elementTypes.push_back(elementType->IrType(emitter));
             }
             localIrType = llvm::StructType::get(emitter.Context(), elementTypes);
-            emitter.SetIrType(this, localIrType);
+            emitter.SetIrTypeByTypeId(TypeId(), localIrType);
         }
         else
         {
             llvm::StructType* forwardDeclaredType = llvm::StructType::create(emitter.Context());
             localIrType = forwardDeclaredType;
-            emitter.SetIrType(this, localIrType);
+            emitter.SetIrTypeByTypeId(TypeId(), localIrType);
             for (int i = 0; i < n; ++i)
             {
                 TypeSymbol* elementType = objectLayout[i];

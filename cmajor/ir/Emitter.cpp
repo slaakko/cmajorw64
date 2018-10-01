@@ -65,6 +65,12 @@ llvm::DebugLoc Emitter::GetDebugLocation(const Span& span)
     return llvm::DebugLoc::get(span.LineNumber(), column, CurrentScope());
 }
 
+void Emitter::ResetCurrentDebugLocation()
+{
+    currentDebugLocation = llvm::DebugLoc();
+    builder.SetCurrentDebugLocation(currentDebugLocation);
+}
+
 void Emitter::SetCurrentDebugLocation(const Span& span)
 {
     if (!diCompileUnit || !diBuilder) return;
@@ -196,24 +202,6 @@ llvm::Value* Emitter::GetIrObject(void* symbol) const
 void Emitter::SetIrObject(void* symbol, llvm::Value* irObject)
 {
     irObjectMap[symbol] = irObject;
-}
-
-llvm::Type* Emitter::GetIrType(void* type) const
-{
-    auto it = irTypeMap.find(type);
-    if (it != irTypeMap.cend())
-    {
-        return it->second;
-    }
-    else
-    {
-        return nullptr;
-    }
-}
-
-void Emitter::SetIrType(void* type, llvm::Type* irType)
-{
-    irTypeMap[type] = irType;
 }
 
 llvm::Type* Emitter::GetIrTypeByTypeId(const boost::uuids::uuid& typeId)

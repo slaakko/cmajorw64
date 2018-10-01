@@ -1,0 +1,60 @@
+using System;
+using System.Collections;
+using System.Text.Parsing;
+
+// this source file has been automatically generated from 'SimpleTypeGrammar.parser' using cmparsergen version 2.0.0.
+
+namespace cppparser
+{
+    public class SimpleTypeGrammar : System.Text.Parsing.Grammar
+    {
+        public SimpleTypeGrammar() : this(new ParsingDomain())
+        {
+        }
+        public SimpleTypeGrammar(ParsingDomain* parsingDomain) : base(ToUtf32("SimpleTypeGrammar"), parsingDomain->GetNamespaceScope(ToUtf32("cppparser")), parsingDomain)
+        {
+            SetOwner(0);
+            RegisterParsingDomain(parsingDomain);
+            parsingDomain->AddGrammar(this);
+            CreateRules();
+            Link();
+        }
+        public override void GetReferencedGrammars()
+        {
+        }
+        public override void CreateRules()
+        {
+            AddRule(new System.Text.Parsing.RuleParser(ToUtf32("SimpleType"), GetScope(), Domain()->GetNextRuleId(),
+                new System.Text.Parsing.PositiveParser(
+                    new System.Text.Parsing.NonterminalParser(ToUtf32("SimpleTypeSpecifier"), ToUtf32("SimpleTypeSpecifier"), 0))));
+            AddRule(new System.Text.Parsing.RuleParser(ToUtf32("SimpleTypeSpecifier"), GetScope(), Domain()->GetNextRuleId(),
+                new System.Text.Parsing.AlternativeParser(
+                    new System.Text.Parsing.AlternativeParser(
+                        new System.Text.Parsing.AlternativeParser(
+                            new System.Text.Parsing.AlternativeParser(
+                                new System.Text.Parsing.AlternativeParser(
+                                    new System.Text.Parsing.AlternativeParser(
+                                        new System.Text.Parsing.AlternativeParser(
+                                            new System.Text.Parsing.AlternativeParser(
+                                                new System.Text.Parsing.AlternativeParser(
+                                                    new System.Text.Parsing.AlternativeParser(
+                                                        new System.Text.Parsing.AlternativeParser(
+                                                            new System.Text.Parsing.AlternativeParser(
+                                                                new System.Text.Parsing.AlternativeParser(
+                                                                    new System.Text.Parsing.KeywordParser(ToUtf32("char")),
+                                                                    new System.Text.Parsing.KeywordParser(ToUtf32("char16_t"))),
+                                                                new System.Text.Parsing.KeywordParser(ToUtf32("char32_t"))),
+                                                            new System.Text.Parsing.KeywordParser(ToUtf32("wchar_t"))),
+                                                        new System.Text.Parsing.KeywordParser(ToUtf32("bool"))),
+                                                    new System.Text.Parsing.KeywordParser(ToUtf32("short"))),
+                                                new System.Text.Parsing.KeywordParser(ToUtf32("int"))),
+                                            new System.Text.Parsing.KeywordParser(ToUtf32("long"))),
+                                        new System.Text.Parsing.KeywordParser(ToUtf32("signed"))),
+                                    new System.Text.Parsing.KeywordParser(ToUtf32("unsigned"))),
+                                new System.Text.Parsing.KeywordParser(ToUtf32("float"))),
+                            new System.Text.Parsing.KeywordParser(ToUtf32("double"))),
+                        new System.Text.Parsing.KeywordParser(ToUtf32("void"))),
+                    new System.Text.Parsing.KeywordParser(ToUtf32("auto")))));
+        }
+    }
+} // cppparser

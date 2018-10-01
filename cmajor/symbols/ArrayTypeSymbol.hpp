@@ -118,70 +118,70 @@ private:
 class ArrayTypeDefaultConstructor : public FunctionSymbol
 {
 public:
-    ArrayTypeDefaultConstructor(ArrayTypeSymbol* arrayType_, LocalVariableSymbol* loopVar_, FunctionSymbol* elementTypeDefaultConstructor_, const Span& span_);
+    ArrayTypeDefaultConstructor(ArrayTypeSymbol* arrayType_, FunctionSymbol* elementTypeDefaultConstructor_, const Span& span_);
+    std::vector<LocalVariableSymbol*> CreateTemporariesTo(FunctionSymbol* currentFunction);
     void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flag, const Span& spans) override;
     bool IsBasicTypeOperation() const override { return true; }
     const char* ClassName() const override { return "ArrayTypeDefaultConstructor"; }
     void Check() override;
 private:
     ArrayTypeSymbol* arrayType;
-    LocalVariableSymbol* loopVar;
     FunctionSymbol* elementTypeDefaultConstructor;
 };
 
 class ArrayTypeCopyConstructor : public FunctionSymbol
 {
 public:
-    ArrayTypeCopyConstructor(ArrayTypeSymbol* arrayType_, LocalVariableSymbol* loopVar_, FunctionSymbol* elementTypeCopyConstructor_, const Span& span_);
+    ArrayTypeCopyConstructor(ArrayTypeSymbol* arrayType_, FunctionSymbol* elementTypeCopyConstructor_, const Span& span_);
+    std::vector<LocalVariableSymbol*> CreateTemporariesTo(FunctionSymbol* currentFunction);
     void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
     bool IsBasicTypeOperation() const override { return true; }
     const char* ClassName() const override { return "ArrayTypeCopyConstructor"; }
     void Check() override;
 private:
     ArrayTypeSymbol* arrayType;
-    LocalVariableSymbol* loopVar;
     FunctionSymbol* elementTypeCopyConstructor;
 };
 
 class ArrayTypeMoveConstructor : public FunctionSymbol
 {
 public:
-    ArrayTypeMoveConstructor(ArrayTypeSymbol* arrayType_, LocalVariableSymbol* loopVar_, FunctionSymbol* elementTypeMoveConstructor_, const Span& span_);
+    ArrayTypeMoveConstructor(ArrayTypeSymbol* arrayType_, FunctionSymbol* elementTypeMoveConstructor_, const Span& span_);
+    std::vector<LocalVariableSymbol*> CreateTemporariesTo(FunctionSymbol* currentFunction);
     void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
     bool IsBasicTypeOperation() const override { return true; }
     const char* ClassName() const override { return "ArrayTypeMoveConstructor"; }
     void Check() override;
 private:
     ArrayTypeSymbol* arrayType;
-    LocalVariableSymbol* loopVar;
     FunctionSymbol* elementTypeMoveConstructor;
 };
 
 class ArrayTypeCopyAssignment : public FunctionSymbol
 {
 public:
-    ArrayTypeCopyAssignment(ArrayTypeSymbol* arrayType_, LocalVariableSymbol* loopVar_, FunctionSymbol* elementTypeCopyAssignment_, const Span& span_);
+    ArrayTypeCopyAssignment(ArrayTypeSymbol* arrayType_, FunctionSymbol* elementTypeCopyAssignment_, const Span& span_);
+    std::vector<LocalVariableSymbol*> CreateTemporariesTo(FunctionSymbol* currentFunction);
     void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
     bool IsBasicTypeOperation() const override { return true; }
     const char* ClassName() const override { return "ArrayTypeCopyAssignment"; }
     void Check() override;
 private:
     ArrayTypeSymbol* arrayType;
-    LocalVariableSymbol* loopVar;
     FunctionSymbol* elementTypeCopyAssignment;
 };
 
 class ArrayTypeMoveAssignment : public FunctionSymbol
 {
 public:
-    ArrayTypeMoveAssignment(ArrayTypeSymbol* arrayType_, LocalVariableSymbol* loopVar_, FunctionSymbol* elementTypeMoveAssignment_, const Span& span_);
+    ArrayTypeMoveAssignment(ArrayTypeSymbol* arrayType_, FunctionSymbol* elementTypeMoveAssignment_, const Span& span_);
+    std::vector<LocalVariableSymbol*> CreateTemporariesTo(FunctionSymbol* currentFunction);
     void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
     bool IsBasicTypeOperation() const override { return true; }
     const char* ClassName() const override { return "ArrayTypeMoveAssignment"; }
     void Check() override;
 private:
     ArrayTypeSymbol* arrayType;
-    LocalVariableSymbol* loopVar;
     FunctionSymbol* elementTypeMoveAssignment;
 };
 

@@ -1210,6 +1210,11 @@ LocalVariableSymbol* FunctionSymbol::CreateTemporary(TypeSymbol* type, const Spa
     return temporary;
 }
 
+std::vector<LocalVariableSymbol*> FunctionSymbol::CreateTemporariesTo(FunctionSymbol* currentFunction)
+{
+    return std::vector<LocalVariableSymbol*>();
+}
+
 llvm::FunctionType* FunctionSymbol::IrType(Emitter& emitter)
 {
     llvm::FunctionType* localIrType = emitter.GetFunctionIrType(this);

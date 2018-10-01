@@ -992,6 +992,11 @@ std::unique_ptr<BoundFunctionCall> CreateBoundFunctionCall(FunctionSymbol* bestF
                     }
                 }
                 constructorCall->AddArgument(std::move(argument));
+                std::vector<LocalVariableSymbol*> temporaryLocalVariables = conversionFun->CreateTemporariesTo(boundFunction->GetFunctionSymbol());
+                for (LocalVariableSymbol* temporaryLocalVariable : temporaryLocalVariables)
+                {
+                    constructorCall->AddTemporary(std::unique_ptr<BoundLocalVariable>(new BoundLocalVariable(module, span, temporaryLocalVariable)));
+                }
                 BoundConstructAndReturnTemporaryExpression* conversion = new BoundConstructAndReturnTemporaryExpression(module, std::unique_ptr<BoundExpression>(constructorCall),
                     std::unique_ptr<BoundExpression>(new BoundLocalVariable(module, span, temporary)));
                 argument.reset(conversion);
@@ -1008,6 +1013,11 @@ std::unique_ptr<BoundFunctionCall> CreateBoundFunctionCall(FunctionSymbol* bestF
                 LocalVariableSymbol* temporary = boundFunction->GetFunctionSymbol()->CreateTemporary(conversionTargetType, span);
                 conversionFunctionCall->AddArgument(std::unique_ptr<BoundExpression>(new BoundAddressOfExpression(module, std::unique_ptr<BoundExpression>(new BoundLocalVariable(module, span, temporary)),
                     conversionTargetType->AddPointer(span))));
+                std::vector<LocalVariableSymbol*> temporaryLocalVariables = conversionFun->CreateTemporariesTo(boundFunction->GetFunctionSymbol());
+                for (LocalVariableSymbol* temporaryLocalVariable : temporaryLocalVariables)
+                {
+                    conversionFunctionCall->AddTemporary(std::unique_ptr<BoundLocalVariable>(new BoundLocalVariable(module, span, temporaryLocalVariable)));
+                }
                 BoundLocalVariable* conversionResult = new BoundLocalVariable(module, span, temporary);
                 if (conversionTargetType->IsClassTypeSymbol())
                 {
@@ -1027,6 +1037,11 @@ std::unique_ptr<BoundFunctionCall> CreateBoundFunctionCall(FunctionSymbol* bestF
             else
             {
                 BoundConversion* conversion = new BoundConversion(module, std::move(argument), conversionFun);
+                std::vector<LocalVariableSymbol*> temporaryLocalVariables = conversionFun->CreateTemporariesTo(boundFunction->GetFunctionSymbol());
+                for (LocalVariableSymbol* temporaryLocalVariable : temporaryLocalVariables)
+                {
+                    conversion->AddTemporary(std::unique_ptr<BoundLocalVariable>(new BoundLocalVariable(module, span, temporaryLocalVariable)));
+                }
                 argument.reset(conversion);
             }
         }
@@ -1101,6 +1116,14 @@ std::unique_ptr<BoundFunctionCall> CreateBoundFunctionCall(FunctionSymbol* bestF
             }
         }
         boundFunctionCall->AddArgument(std::move(argument));
+    }
+    if (boundFunction)
+    {
+        std::vector<LocalVariableSymbol*> temporaryLocalVariables = bestFun->CreateTemporariesTo(boundFunction->GetFunctionSymbol());
+        for (LocalVariableSymbol* temporaryLocalVariable : temporaryLocalVariables)
+        {
+            boundFunctionCall->AddTemporary(std::unique_ptr<BoundLocalVariable>(new BoundLocalVariable(module, span, temporaryLocalVariable)));
+        }
     }
     return boundFunctionCall;
 }

@@ -113,6 +113,13 @@ namespace System.IO
         {
             Write(ToUtf8(x));
         }
+        public void Write(const Uuid& uuid)
+        {
+            for (byte b : uuid)
+            {
+                Write(b);
+            }
+        }
         public void Seek(long pos, Origin origin)
         {
             stream->Seek(pos, origin);

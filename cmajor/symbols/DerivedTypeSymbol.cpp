@@ -550,7 +550,7 @@ bool DerivedTypeSymbol::IsRecursive(TypeSymbol* type, std::unordered_set<boost::
 
 llvm::Type* DerivedTypeSymbol::IrType(Emitter& emitter) 
 {
-    llvm::Type* localIrType = emitter.GetIrType(this);
+    llvm::Type* localIrType = emitter.GetIrTypeByTypeId(TypeId());
     if (!localIrType)
     {
         if (baseType->IsVoidType())
@@ -579,7 +579,7 @@ llvm::Type* DerivedTypeSymbol::IrType(Emitter& emitter)
                 }
             }
         }
-        emitter.SetIrType(this, localIrType);
+        emitter.SetIrTypeByTypeId(TypeId(), localIrType);
     }
     return localIrType;
 }

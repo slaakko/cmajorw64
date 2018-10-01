@@ -11,23 +11,22 @@ const char* Version()
 void PrintHelp()
 {
     Console.Out() << "C++ to Cmajor converter version " << Version() << endl() <<
-        "Usage: cpp2cm [options] { INPUT.XML }" << endl() <<
+        "Usage: cpp2cm [options] [ INPUT.XML ]" << endl() <<
         "Options:" << endl() <<
         "--help (-h)" << endl() <<
         "   Print this help" << endl() <<
         "--verbose (-v)" << endl() <<
-        "   Be verbose" << endl();
+        "   Be verbose" << endl() <<
+        "--diagnostics (-d)" << endl() <<
+        "   Diagnostic output" << endl() <<
+        "--force (-f)" << endl() <<
+        "   Force all conversion phases" << endl();
 }
 
 int main(int argc, const char** argv)
 {
     try
     {
-        if (argc < 2)
-        {
-            PrintHelp();
-            return 0;
-        }
         List<string> inputXmlFilePaths;
         for (int i = 1; i < argc; ++i)
         {
@@ -43,18 +42,42 @@ int main(int argc, const char** argv)
                 {
                     Flags.SetVerbose();
                 }
+                else if (arg == "--diagnostics" || arg == "-d")
+                {
+                    Flags.SetDiagnostics();
+                }
+                else if (arg == "--force" || arg == "-f")
+                {
+                    Flags.SetForce();
+                }
+                else
+                {
+                    throw Exception("unknown option '" + arg + "'");
+                }
             }
             else 
             {
                 inputXmlFilePaths.Add(GetFullPath(arg));
             }
         }
+        if (inputXmlFilePaths.IsEmpty())
+        {
+            string defaultInputXml = GetFullPath("cpp2cm.xml");
+            if (File.Exists(defaultInputXml))
+            {
+                inputXmlFilePaths.Add(defaultInputXml);
+            }
+            else
+            {
+                PrintHelp();
+                throw Exception("no INPUT.XML given and no cpp2cm.xml in the current directory exists");
+            }
+        }
         for (const string& inputXmlFilePath : inputXmlFilePaths)
         {
             if (inputXmlFilePath.EndsWith(".xml"))
             {
-                Input input = ReadInputXml(inputXmlFilePath);
-                ConvertSolutionToXml(input);
+                string workXmlFilePath = MakeWorkXml(inputXmlFilePath);
             }
             else
             {

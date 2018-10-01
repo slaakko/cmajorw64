@@ -19,7 +19,7 @@ namespace System.Text.RegularExpressions
             CreateRules();
             Link();
         }
-        public PtrNfa Parse(const uchar* start, const uchar* end, int fileIndex, const string& fileName)
+        public PtrNfa Parse(const uchar* start, const uchar* end, int fileIndex, const string& fileName, PtrNfaStateFactory* factory)
         {
             Scanner scanner(start, end, fileName, fileIndex, SkipRule());
             UniquePtr<XmlLog> xmlLog;
@@ -33,6 +33,7 @@ namespace System.Text.RegularExpressions
             Stack<UniquePtr<Object>> stack;
             UniquePtr<ParsingData> parsingData(new ParsingData(Domain()->NumRules()));
             scanner.SetParsingData(parsingData.Get());
+            stack.Push(UniquePtr<Object>(new ValueObject<PtrNfaStateFactory*>(factory)));
             Match match = base->Parse(scanner, stack, parsingData.Get());
             Span stop = scanner.GetSpan();
             if (Log() != null)
@@ -60,12 +61,15 @@ namespace System.Text.RegularExpressions
         {
             public RegularExpressionRule(const ustring& name_, Scope* enclosingScope_, int id_, Parser* definition_) : base(name_, enclosingScope_, id_, definition_)
             {
+                AddInheritedAttribute(AttrOrVar(ToUtf32("PtrNfaStateFactory*"), ToUtf32("factory")));
                 SetValueTypeName(ToUtf32("PtrNfa"));
             }
             public override void Enter(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
             {
                 parsingData->PushContext(Id(), new Context());
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                UniquePtr<Object> factory_value = stack.Pop();
+                context->factory = *cast<ValueObject<PtrNfaStateFactory*>*>(factory_value.Get());
             }
             public override void Leave(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
             {
@@ -81,12 +85,18 @@ namespace System.Text.RegularExpressions
                 ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
                 a0ActionParser->SetAction(A0Action);
                 NonterminalParser* altNonterminalParser = GetNonterminal(ToUtf32("alt"));
+                altNonterminalParser->SetPre(Prealt);
                 altNonterminalParser->SetPost(Postalt);
             }
             public void A0Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
                 context->value = context->fromalt;
+            }
+            public void Prealt(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                stack.Push(UniquePtr<Object>(new ValueObject<PtrNfaStateFactory*>(context->factory)));
             }
             public void Postalt(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
             {
@@ -99,9 +109,10 @@ namespace System.Text.RegularExpressions
             }
             public class Context : System.Text.Parsing.Context
             {
-                public Context() : value(), fromalt()
+                public Context() : factory(), value(), fromalt()
                 {
                 }
+                public PtrNfaStateFactory* factory;
                 public PtrNfa value;
                 public PtrNfa fromalt;
             }
@@ -111,12 +122,15 @@ namespace System.Text.RegularExpressions
         {
             public AlternativeExpressionRule(const ustring& name_, Scope* enclosingScope_, int id_, Parser* definition_) : base(name_, enclosingScope_, id_, definition_)
             {
+                AddInheritedAttribute(AttrOrVar(ToUtf32("PtrNfaStateFactory*"), ToUtf32("factory")));
                 SetValueTypeName(ToUtf32("PtrNfa"));
             }
             public override void Enter(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
             {
                 parsingData->PushContext(Id(), new Context());
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                UniquePtr<Object> factory_value = stack.Pop();
+                context->factory = *cast<ValueObject<PtrNfaStateFactory*>*>(factory_value.Get());
             }
             public override void Leave(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
             {
@@ -134,8 +148,10 @@ namespace System.Text.RegularExpressions
                 ActionParser* a1ActionParser = GetAction(ToUtf32("A1"));
                 a1ActionParser->SetAction(A1Action);
                 NonterminalParser* leftNonterminalParser = GetNonterminal(ToUtf32("left"));
+                leftNonterminalParser->SetPre(Preleft);
                 leftNonterminalParser->SetPost(Postleft);
                 NonterminalParser* rightNonterminalParser = GetNonterminal(ToUtf32("right"));
+                rightNonterminalParser->SetPre(Preright);
                 rightNonterminalParser->SetPost(Postright);
             }
             public void A0Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
@@ -146,7 +162,12 @@ namespace System.Text.RegularExpressions
             public void A1Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->value = Alt(context->value, context->fromright);
+                context->value = Alt(context->factory, context->value, context->fromright);
+            }
+            public void Preleft(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                stack.Push(UniquePtr<Object>(new ValueObject<PtrNfaStateFactory*>(context->factory)));
             }
             public void Postleft(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
             {
@@ -156,6 +177,11 @@ namespace System.Text.RegularExpressions
                     UniquePtr<Object> fromleft_value = stack.Pop();
                     context->fromleft = *cast<ValueObject<PtrNfa>*>(fromleft_value.Get());
                 }
+            }
+            public void Preright(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                stack.Push(UniquePtr<Object>(new ValueObject<PtrNfaStateFactory*>(context->factory)));
             }
             public void Postright(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
             {
@@ -168,9 +194,10 @@ namespace System.Text.RegularExpressions
             }
             public class Context : System.Text.Parsing.Context
             {
-                public Context() : value(), fromleft(), fromright()
+                public Context() : factory(), value(), fromleft(), fromright()
                 {
                 }
+                public PtrNfaStateFactory* factory;
                 public PtrNfa value;
                 public PtrNfa fromleft;
                 public PtrNfa fromright;
@@ -181,12 +208,15 @@ namespace System.Text.RegularExpressions
         {
             public SequenceExpressionRule(const ustring& name_, Scope* enclosingScope_, int id_, Parser* definition_) : base(name_, enclosingScope_, id_, definition_)
             {
+                AddInheritedAttribute(AttrOrVar(ToUtf32("PtrNfaStateFactory*"), ToUtf32("factory")));
                 SetValueTypeName(ToUtf32("PtrNfa"));
             }
             public override void Enter(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
             {
                 parsingData->PushContext(Id(), new Context());
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                UniquePtr<Object> factory_value = stack.Pop();
+                context->factory = *cast<ValueObject<PtrNfaStateFactory*>*>(factory_value.Get());
             }
             public override void Leave(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
             {
@@ -204,8 +234,10 @@ namespace System.Text.RegularExpressions
                 ActionParser* a1ActionParser = GetAction(ToUtf32("A1"));
                 a1ActionParser->SetAction(A1Action);
                 NonterminalParser* leftNonterminalParser = GetNonterminal(ToUtf32("left"));
+                leftNonterminalParser->SetPre(Preleft);
                 leftNonterminalParser->SetPost(Postleft);
                 NonterminalParser* rightNonterminalParser = GetNonterminal(ToUtf32("right"));
+                rightNonterminalParser->SetPre(Preright);
                 rightNonterminalParser->SetPost(Postright);
             }
             public void A0Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
@@ -218,6 +250,11 @@ namespace System.Text.RegularExpressions
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
                 context->value = Cat(context->value, context->fromright);
             }
+            public void Preleft(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                stack.Push(UniquePtr<Object>(new ValueObject<PtrNfaStateFactory*>(context->factory)));
+            }
             public void Postleft(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
@@ -226,6 +263,11 @@ namespace System.Text.RegularExpressions
                     UniquePtr<Object> fromleft_value = stack.Pop();
                     context->fromleft = *cast<ValueObject<PtrNfa>*>(fromleft_value.Get());
                 }
+            }
+            public void Preright(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                stack.Push(UniquePtr<Object>(new ValueObject<PtrNfaStateFactory*>(context->factory)));
             }
             public void Postright(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
             {
@@ -238,9 +280,10 @@ namespace System.Text.RegularExpressions
             }
             public class Context : System.Text.Parsing.Context
             {
-                public Context() : value(), fromleft(), fromright()
+                public Context() : factory(), value(), fromleft(), fromright()
                 {
                 }
+                public PtrNfaStateFactory* factory;
                 public PtrNfa value;
                 public PtrNfa fromleft;
                 public PtrNfa fromright;
@@ -251,12 +294,15 @@ namespace System.Text.RegularExpressions
         {
             public PostfixExpressionRule(const ustring& name_, Scope* enclosingScope_, int id_, Parser* definition_) : base(name_, enclosingScope_, id_, definition_)
             {
+                AddInheritedAttribute(AttrOrVar(ToUtf32("PtrNfaStateFactory*"), ToUtf32("factory")));
                 SetValueTypeName(ToUtf32("PtrNfa"));
             }
             public override void Enter(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
             {
                 parsingData->PushContext(Id(), new Context());
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                UniquePtr<Object> factory_value = stack.Pop();
+                context->factory = *cast<ValueObject<PtrNfaStateFactory*>*>(factory_value.Get());
             }
             public override void Leave(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
             {
@@ -278,6 +324,7 @@ namespace System.Text.RegularExpressions
                 ActionParser* a3ActionParser = GetAction(ToUtf32("A3"));
                 a3ActionParser->SetAction(A3Action);
                 NonterminalParser* primaryNonterminalParser = GetNonterminal(ToUtf32("primary"));
+                primaryNonterminalParser->SetPre(Preprimary);
                 primaryNonterminalParser->SetPost(Postprimary);
             }
             public void A0Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
@@ -288,17 +335,22 @@ namespace System.Text.RegularExpressions
             public void A1Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->value = Kleene(context->value);
+                context->value = Kleene(context->factory, context->value);
             }
             public void A2Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->value = Positive(context->value);
+                context->value = Positive(context->factory, context->value);
             }
             public void A3Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
                 context->value = Optional(context->value);
+            }
+            public void Preprimary(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                stack.Push(UniquePtr<Object>(new ValueObject<PtrNfaStateFactory*>(context->factory)));
             }
             public void Postprimary(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
             {
@@ -311,9 +363,10 @@ namespace System.Text.RegularExpressions
             }
             public class Context : System.Text.Parsing.Context
             {
-                public Context() : value(), fromprimary()
+                public Context() : factory(), value(), fromprimary()
                 {
                 }
+                public PtrNfaStateFactory* factory;
                 public PtrNfa value;
                 public PtrNfa fromprimary;
             }
@@ -323,12 +376,15 @@ namespace System.Text.RegularExpressions
         {
             public PrimaryExpressionRule(const ustring& name_, Scope* enclosingScope_, int id_, Parser* definition_) : base(name_, enclosingScope_, id_, definition_)
             {
+                AddInheritedAttribute(AttrOrVar(ToUtf32("PtrNfaStateFactory*"), ToUtf32("factory")));
                 SetValueTypeName(ToUtf32("PtrNfa"));
             }
             public override void Enter(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
             {
                 parsingData->PushContext(Id(), new Context());
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                UniquePtr<Object> factory_value = stack.Pop();
+                context->factory = *cast<ValueObject<PtrNfaStateFactory*>*>(factory_value.Get());
             }
             public override void Leave(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
             {
@@ -376,6 +432,7 @@ namespace System.Text.RegularExpressions
                 NonterminalParser* clsNonterminalParser = GetNonterminal(ToUtf32("cls"));
                 clsNonterminalParser->SetPost(Postcls);
                 NonterminalParser* altNonterminalParser = GetNonterminal(ToUtf32("alt"));
+                altNonterminalParser->SetPre(Prealt);
                 altNonterminalParser->SetPost(Postalt);
                 NonterminalParser* escapeNonterminalParser = GetNonterminal(ToUtf32("escape"));
                 escapeNonterminalParser->SetPost(Postescape);
@@ -383,17 +440,17 @@ namespace System.Text.RegularExpressions
             public void A0Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->value = MakeNfa(cast<char>(context->fromchr));
+                context->value = MakeNfa(context->factory, cast<char>(context->fromchr));
             }
             public void A1Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->value = MakeNfa(CharClass(string(eps), true));
+                context->value = MakeNfa(context->factory, CharClass(string(eps), true));
             }
             public void A2Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->value = MakeNfa(context->fromcls);
+                context->value = MakeNfa(context->factory, context->fromcls);
             }
             public void A3Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
@@ -403,57 +460,57 @@ namespace System.Text.RegularExpressions
             public void A4Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->value = MakeNfa(CharClass(ToRanges(Class.digit), false));
+                context->value = MakeNfa(context->factory, CharClass(ToRanges(Class.digit), false));
             }
             public void A5Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->value = MakeNfa(CharClass(ToRanges(Class.digit), true));
+                context->value = MakeNfa(context->factory, CharClass(ToRanges(Class.digit), true));
             }
             public void A6Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->value = MakeNfa(CharClass(ToRanges(Class.space), false));
+                context->value = MakeNfa(context->factory, CharClass(ToRanges(Class.space), false));
             }
             public void A7Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->value = MakeNfa(CharClass(ToRanges(Class.space), true));
+                context->value = MakeNfa(context->factory, CharClass(ToRanges(Class.space), true));
             }
             public void A8Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->value = MakeNfa(CharClass(ToRanges(Class.word), false));
+                context->value = MakeNfa(context->factory, CharClass(ToRanges(Class.word), false));
             }
             public void A9Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->value = MakeNfa(CharClass(ToRanges(Class.word), true));
+                context->value = MakeNfa(context->factory, CharClass(ToRanges(Class.word), true));
             }
             public void A10Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->value = MakeNfa(CharClass(ToRanges(Class.lower), false));
+                context->value = MakeNfa(context->factory, CharClass(ToRanges(Class.lower), false));
             }
             public void A11Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->value = MakeNfa(CharClass(ToRanges(Class.lower), true));
+                context->value = MakeNfa(context->factory, CharClass(ToRanges(Class.lower), true));
             }
             public void A12Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->value = MakeNfa(CharClass(ToRanges(Class.upper), false));
+                context->value = MakeNfa(context->factory, CharClass(ToRanges(Class.upper), false));
             }
             public void A13Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->value = MakeNfa(CharClass(ToRanges(Class.upper), true));
+                context->value = MakeNfa(context->factory, CharClass(ToRanges(Class.upper), true));
             }
             public void A14Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->value = MakeNfa(cast<char>(context->fromescape));
+                context->value = MakeNfa(context->factory, cast<char>(context->fromescape));
             }
             public void Postchr(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
             {
@@ -472,6 +529,11 @@ namespace System.Text.RegularExpressions
                     UniquePtr<Object> fromcls_value = stack.Pop();
                     context->fromcls = *cast<ValueObject<CharClass>*>(fromcls_value.Get());
                 }
+            }
+            public void Prealt(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                stack.Push(UniquePtr<Object>(new ValueObject<PtrNfaStateFactory*>(context->factory)));
             }
             public void Postalt(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
             {
@@ -493,9 +555,10 @@ namespace System.Text.RegularExpressions
             }
             public class Context : System.Text.Parsing.Context
             {
-                public Context() : value(), fromchr(), fromcls(), fromalt(), fromescape()
+                public Context() : factory(), value(), fromchr(), fromcls(), fromalt(), fromescape()
                 {
                 }
+                public PtrNfaStateFactory* factory;
                 public PtrNfa value;
                 public uchar fromchr;
                 public CharClass fromcls;
@@ -906,29 +969,29 @@ namespace System.Text.RegularExpressions
             AddRuleLink(new System.Text.Parsing.RuleLink(ToUtf32("escape"), this, ToUtf32("System.Text.Parsing.stdlib.escape")));
             AddRule(new RegularExpressionRule(ToUtf32("RegularExpression"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.ActionParser(ToUtf32("A0"),
-                    new System.Text.Parsing.NonterminalParser(ToUtf32("alt"), ToUtf32("AlternativeExpression"), 0))));
+                    new System.Text.Parsing.NonterminalParser(ToUtf32("alt"), ToUtf32("AlternativeExpression"), 1))));
             AddRule(new AlternativeExpressionRule(ToUtf32("AlternativeExpression"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.SequenceParser(
                     new System.Text.Parsing.ActionParser(ToUtf32("A0"),
-                        new System.Text.Parsing.NonterminalParser(ToUtf32("left"), ToUtf32("SequenceExpression"), 0)),
+                        new System.Text.Parsing.NonterminalParser(ToUtf32("left"), ToUtf32("SequenceExpression"), 1)),
                     new System.Text.Parsing.KleeneStarParser(
                         new System.Text.Parsing.GroupingParser(
                             new System.Text.Parsing.SequenceParser(
                                 new System.Text.Parsing.CharParser('|'),
                                 new System.Text.Parsing.ActionParser(ToUtf32("A1"),
-                                    new System.Text.Parsing.NonterminalParser(ToUtf32("right"), ToUtf32("SequenceExpression"), 0))))))));
+                                    new System.Text.Parsing.NonterminalParser(ToUtf32("right"), ToUtf32("SequenceExpression"), 1))))))));
             AddRule(new SequenceExpressionRule(ToUtf32("SequenceExpression"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.SequenceParser(
                     new System.Text.Parsing.ActionParser(ToUtf32("A0"),
-                        new System.Text.Parsing.NonterminalParser(ToUtf32("left"), ToUtf32("PostfixExpression"), 0)),
+                        new System.Text.Parsing.NonterminalParser(ToUtf32("left"), ToUtf32("PostfixExpression"), 1)),
                     new System.Text.Parsing.KleeneStarParser(
                         new System.Text.Parsing.GroupingParser(
                             new System.Text.Parsing.ActionParser(ToUtf32("A1"),
-                                new System.Text.Parsing.NonterminalParser(ToUtf32("right"), ToUtf32("PostfixExpression"), 0)))))));
+                                new System.Text.Parsing.NonterminalParser(ToUtf32("right"), ToUtf32("PostfixExpression"), 1)))))));
             AddRule(new PostfixExpressionRule(ToUtf32("PostfixExpression"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.SequenceParser(
                     new System.Text.Parsing.ActionParser(ToUtf32("A0"),
-                        new System.Text.Parsing.NonterminalParser(ToUtf32("primary"), ToUtf32("PrimaryExpression"), 0)),
+                        new System.Text.Parsing.NonterminalParser(ToUtf32("primary"), ToUtf32("PrimaryExpression"), 1)),
                     new System.Text.Parsing.OptionalParser(
                         new System.Text.Parsing.GroupingParser(
                             new System.Text.Parsing.AlternativeParser(
@@ -965,7 +1028,7 @@ namespace System.Text.RegularExpressions
                                                                         new System.Text.Parsing.SequenceParser(
                                                                             new System.Text.Parsing.SequenceParser(
                                                                                 new System.Text.Parsing.CharParser('('),
-                                                                                new System.Text.Parsing.NonterminalParser(ToUtf32("alt"), ToUtf32("AlternativeExpression"), 0)),
+                                                                                new System.Text.Parsing.NonterminalParser(ToUtf32("alt"), ToUtf32("AlternativeExpression"), 1)),
                                                                             new System.Text.Parsing.CharParser(')'))))),
                                                             new System.Text.Parsing.ActionParser(ToUtf32("A4"),
                                                                 new System.Text.Parsing.StringParser(ToUtf32("\\d")))),

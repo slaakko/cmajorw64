@@ -1,0 +1,30 @@
+using System;
+
+namespace cppparser
+{
+    grammar IdentifierGrammar
+    {
+        using stdlib.identifier;
+        using KeywordGrammar.Keyword;
+        using TemplateGrammar.SimpleTemplateId;
+        
+        Identifier
+            ::= identifier - Keyword
+            ;
+            
+        Id(ParsingContext* ctx)
+            ::= SimpleTemplateId(ctx)
+            |   Identifier
+            ;
+            
+        NestedNameSpecifier(ParsingContext* ctx)
+            ::= Id(ctx):i1 "::" (Id(ctx):i2 "::")*
+            ;
+            
+        QualifiedId(ParsingContext* ctx)
+            ::= "::" NestedNameSpecifier(ctx):n1 Id(ctx):i1
+            |   NestedNameSpecifier(ctx):n2 Id(ctx):i2
+            |   Id(ctx):i3
+            ;
+    }
+}

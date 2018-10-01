@@ -6,38 +6,39 @@ namespace System.Text.RegularExpressions
     {
         using stdlib.escape;
 
-        RegularExpression : PtrNfa
-            ::= AlternativeExpression:alt{ value = alt; }
+        RegularExpression(PtrNfaStateFactory* factory) : PtrNfa
+            ::= AlternativeExpression(factory):alt{ value = alt; }
             ;
 
-        AlternativeExpression : PtrNfa
-            ::= SequenceExpression:left{ value = left; } ('|' SequenceExpression:right{ value = Alt(value, right); })*
+        AlternativeExpression(PtrNfaStateFactory* factory) : PtrNfa
+            ::= SequenceExpression(factory):left{ value = left; } ('|' SequenceExpression(factory):right{ value = Alt(factory, value, right); })*
             ;
 
-        SequenceExpression : PtrNfa
-            ::= PostfixExpression:left{ value = left; } (PostfixExpression:right{ value = Cat(value, right); })*
+        SequenceExpression(PtrNfaStateFactory* factory) : PtrNfa
+            ::= PostfixExpression(factory):left{ value = left; } (PostfixExpression(factory):right{ value = Cat(value, right); })*
             ;
 
-        PostfixExpression : PtrNfa
-            ::= PrimaryExpression:primary{ value = primary; } ('*'{ value = Kleene(value); } | '+'{ value = Positive(value); } | '?'{ value = Optional(value); })?
+        PostfixExpression(PtrNfaStateFactory* factory) : PtrNfa
+            ::= PrimaryExpression(factory):primary{ value = primary; } 
+                ('*'{ value = Kleene(factory, value); } | '+'{ value = Positive(factory, value); } | '?'{ value = Optional(value); })?
             ;
 
-        PrimaryExpression : PtrNfa
-            ::= Char:chr{ value = MakeNfa(cast<char>(chr)); }
-            |   '.'{ value = MakeNfa(CharClass(string(eps), true)); }
-            |   CharClass:cls{ value = MakeNfa(cls); }
-            |   ('(' AlternativeExpression:alt ')'){ value = alt; }
-            |   "\\d"{ value = MakeNfa(CharClass(ToRanges(Class.digit), false)); }
-            |   "\\D"{ value = MakeNfa(CharClass(ToRanges(Class.digit), true)); }
-            |   "\\s"{ value = MakeNfa(CharClass(ToRanges(Class.space), false)); }
-            |   "\\S"{ value = MakeNfa(CharClass(ToRanges(Class.space), true)); }
-            |   "\\w"{ value = MakeNfa(CharClass(ToRanges(Class.word), false)); }
-            |   "\\W"{ value = MakeNfa(CharClass(ToRanges(Class.word), true)); }
-            |   "\\l"{ value = MakeNfa(CharClass(ToRanges(Class.lower), false)); }
-            |   "\\L"{ value = MakeNfa(CharClass(ToRanges(Class.lower), true)); }
-            |   "\\u"{ value = MakeNfa(CharClass(ToRanges(Class.upper), false)); }
-            |   "\\U"{ value = MakeNfa(CharClass(ToRanges(Class.upper), true)); }
-            |   escape{ value = MakeNfa(cast<char>(escape)); }
+        PrimaryExpression(PtrNfaStateFactory* factory) : PtrNfa
+            ::= Char:chr{ value = MakeNfa(factory, cast<char>(chr)); }
+            |   '.'{ value = MakeNfa(factory, CharClass(string(eps), true)); }
+            |   CharClass:cls{ value = MakeNfa(factory, cls); }
+            |   ('(' AlternativeExpression(factory):alt ')'){ value = alt; }
+            |   "\\d"{ value = MakeNfa(factory, CharClass(ToRanges(Class.digit), false)); }
+            |   "\\D"{ value = MakeNfa(factory, CharClass(ToRanges(Class.digit), true)); }
+            |   "\\s"{ value = MakeNfa(factory, CharClass(ToRanges(Class.space), false)); }
+            |   "\\S"{ value = MakeNfa(factory, CharClass(ToRanges(Class.space), true)); }
+            |   "\\w"{ value = MakeNfa(factory, CharClass(ToRanges(Class.word), false)); }
+            |   "\\W"{ value = MakeNfa(factory, CharClass(ToRanges(Class.word), true)); }
+            |   "\\l"{ value = MakeNfa(factory, CharClass(ToRanges(Class.lower), false)); }
+            |   "\\L"{ value = MakeNfa(factory, CharClass(ToRanges(Class.lower), true)); }
+            |   "\\u"{ value = MakeNfa(factory, CharClass(ToRanges(Class.upper), false)); }
+            |   "\\U"{ value = MakeNfa(factory, CharClass(ToRanges(Class.upper), true)); }
+            |   escape{ value = MakeNfa(factory, cast<char>(escape)); }
             ;
 
         Char : uchar

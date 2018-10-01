@@ -83,11 +83,12 @@ public:
 class ClassToInterfaceConversion : public FunctionSymbol
 {
 public:
-    ClassToInterfaceConversion(ClassTypeSymbol* sourceClassType_, InterfaceTypeSymbol* targetInterfaceType_, LocalVariableSymbol* temporaryInterfaceObjectVar_, int32_t interfaceIndex_, const Span& span_);
+    ClassToInterfaceConversion(ClassTypeSymbol* sourceClassType_, InterfaceTypeSymbol* targetInterfaceType_, int32_t interfaceIndex_, const Span& span_);
     ConversionType GetConversionType() const override { return ConversionType::implicit_; }
     uint8_t ConversionDistance() const override { return 1; }
     TypeSymbol* ConversionSourceType() const override { return sourceClassType->AddLvalueReference(Span()); }
     TypeSymbol* ConversionTargetType() const override { return targetInterfaceType; }
+    std::vector<LocalVariableSymbol*> CreateTemporariesTo(FunctionSymbol* currentFunction) override;
     void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
     bool IsBasicTypeOperation() const override { return true; }
     bool IsClassToInterfaceTypeConversion() const override {return true; }
@@ -96,7 +97,7 @@ public:
 private:
     ClassTypeSymbol* sourceClassType;
     InterfaceTypeSymbol* targetInterfaceType;
-    LocalVariableSymbol* temporaryInterfaceObjectVar;
+    //LocalVariableSymbol* temporaryInterfaceObjectVar;
     int32_t interfaceIndex;
 };
 

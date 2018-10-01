@@ -124,6 +124,15 @@ namespace System.IO
             string s = ReadString();
             return ToUtf32(s);
         }
+        public Uuid ReadUuid()
+        {
+            Uuid uuid;
+            for (byte& b : uuid)
+            {
+                b = ReadByte();
+            }
+            return uuid;
+        }
         public void Seek(long pos, Origin origin)
         {
             stream->Seek(pos, origin);
