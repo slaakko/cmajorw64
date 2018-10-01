@@ -27,4 +27,6 @@ text <SourceFileGrammar.parser>;
 source <StatementGrammar.cm>;
 text <StatementGrammar.parser>;
 source <TemplateGrammar.cm>;
+text <TemplateGrammar.parser>;
 source <TypeExprGrammar.cm>;
+text <TypeExprGrammar.parser>;

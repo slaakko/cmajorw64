@@ -5,8 +5,8 @@
     <infoDelaySecs>10</infoDelaySecs>
     <formSizeX>1829</formSizeX>
     <formSizeY>1010</formSizeY>
-    <formTop>28</formTop>
-    <formLeft>27</formLeft>
+    <formTop>0</formTop>
+    <formLeft>0</formLeft>
     <textVisX>234</textVisX>
     <textVisY>234</textVisY>
     <textVisW>1637</textVisW>
@@ -32,19 +32,19 @@
             <openFiles />
         </recentProject>
         <recentProject>
-            <path>C:\Users\Seppo\cmajorw64\cmajor\system\System.cms</path>
-            <openFiles />
-        </recentProject>
-        <recentProject>
             <path>C:\Users\Seppo\cmajorw64\cmajor\projects\tools\cmparsergen\cmparsergen.cms</path>
             <openFiles />
         </recentProject>
         <recentProject>
-            <path>C:\Users\Seppo\cmajorw64\cmajor\test\Uuid\Uuid.cms</path>
+            <path>C:\Users\Seppo\cmajorw64\cmajor\projects\examples\examples.cms</path>
             <openFiles />
         </recentProject>
         <recentProject>
-            <path>C:\Users\Seppo\cmajorw64\cmajor\projects\examples\examples.cms</path>
+            <path>C:\Users\Seppo\cmajorw64\cmajor\system\System.cms</path>
+            <openFiles />
+        </recentProject>
+        <recentProject>
+            <path>C:\Users\Seppo\cmajorw64\cmajor\test\Uuid\Uuid.cms</path>
             <openFiles />
         </recentProject>
         <recentProject>

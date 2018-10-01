@@ -3,7 +3,27 @@ using System.IO;
 using System.Collections;
 using cppparser;
 
-int main(int argc, char** argv)
+const char* Version()
+{
+    return "2.5.0";
+}
+
+void PrintHelp()
+{
+    Console.Out() <<
+        "C++ parser version " << Version() << endl() <<
+        "Usage: cppp [options] { file.hpp | file.cpp }" << endl() <<
+        "Parses given C++ source files." << endl() <<
+        "Options:" << endl() <<
+        "--help (-h)" << endl() <<
+        "   Print help" << endl() <<
+        "--verbose (-v)" << endl() <<
+        "   Be verbose" << endl() <<
+        "--debug (-d)" << endl() <<
+        "   Debug parsing and generate XML debug output" << endl();
+}
+
+int main(int argc, const char** argv)
 {
     try
     {
@@ -23,6 +43,11 @@ int main(int argc, char** argv)
                 {
                     verbose = true;
                 }
+                else if (arg == "--help" || arg == "-h")
+                {
+                    PrintHelp();
+                    return 0;
+                }
                 else
                 {
                     throw Exception("unknown option '" + arg + "'");
@@ -33,10 +58,15 @@ int main(int argc, char** argv)
                 files.Add(GetFullPath(arg));
             }
         }
+        if (files.IsEmpty())
+        {
+            PrintHelp();
+            throw Exception("no input files given");
+        }
         SourceFileGrammar* grammar = new SourceFileGrammar();
         if (debug)
         {
-            grammar->SetLog(Console.Out());
+            grammar->SetLog(&Console.Out());
         }
         for (const string& file : files)
         {
@@ -44,7 +74,7 @@ int main(int argc, char** argv)
             {
                 Console.Out() << "> " << file << endl();
             }            
-            ustring content = File.ReadAllText(file);
+            ustring content = ToUtf32(File.ReadAllText(file));
             grammar->Parse(content.Chars(), content.Chars() + content.Length(), 0, file);
         }
     }
