@@ -1,0 +1,12 @@
+using System;
+
+namespace ast
+{
+    public enum Operator
+    {
+        arrayNew, arrayDelete, new_, delete_,
+        assign, mulAssign, divAssign, remAssign, addAssign, subAssign, shiftRightAssign, shiftLeftAssign, andAssign, xorAssign, orAssign,
+        inc, dec, shiftLeft, shiftRight, logicalAnd, logicalOr, equal, notEqual, lessOrEqual, greaterOrEqual, dotStar, arrowStar, arrow, apply, subscript, less, greater, 
+        add, sub, mul, div, rem, xor, and_, or_, neg, not_, comma, deref, addrOf, unaryPlus, unaryMinus
+    }
+}

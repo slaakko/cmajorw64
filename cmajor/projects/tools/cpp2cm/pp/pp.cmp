@@ -1,0 +1,9 @@
+project pp;
+target=library;
+reference <../cppparser/cppparser.cmp>;
+reference <../ast/ast.cmp>;
+source <Flags.cm>;
+source <PP.cm>;
+source <PPFileGrammar.cm>;
+text <PPFileGrammar.parser>;
+text <PPGrammars.pp>;

@@ -1463,7 +1463,10 @@ namespace System.Text.Parsing
                 new System.Text.Parsing.ActionParser(ToUtf32("A0"),
                     new System.Text.Parsing.TokenParser(
                         new System.Text.Parsing.SequenceParser(
-                            new System.Text.Parsing.IdStartParser(),
+                            new System.Text.Parsing.GroupingParser(
+                                new System.Text.Parsing.AlternativeParser(
+                                    new System.Text.Parsing.IdStartParser(),
+                                    new System.Text.Parsing.CharParser('_'))),
                             new System.Text.Parsing.KleeneStarParser(
                                 new System.Text.Parsing.IdContParser()))))));
             AddRule(new qualified_idRule(ToUtf32("qualified_id"), GetScope(), Domain()->GetNextRuleId(),

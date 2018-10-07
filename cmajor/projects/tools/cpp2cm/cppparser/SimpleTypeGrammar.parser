@@ -1,28 +1,33 @@
 using System;
+using ast;
 
 namespace cppparser
 {
     grammar SimpleTypeGrammar
     {
-        SimpleType
-            ::= SimpleTypeSpecifier+
+        SimpleType(var UniquePtr<SimpleTypeNode> simpleTypeNode) : SimpleTypeNode*
+            ::= empty{ simpleTypeNode.Reset(new SimpleTypeNode(span)); } 
+                ((SimpleTypeSpecifier:st1 '?'{ simpleTypeNode->AddNode(new OptionalNode(span, st1)); } | SimpleTypeSpecifier:st2{ simpleTypeNode->AddNode(st2); })+)
+            {
+                value = simpleTypeNode.Release();
+            }
             ;
             
-        SimpleTypeSpecifier
-            ::= keyword("char")
-            |   keyword("char16_t")
-            |   keyword("char32_t")
-            |   keyword("wchar_t")
-            |   keyword("bool")
-            |   keyword("short")
-            |   keyword("int")
-            |   keyword("long")
-            |   keyword("signed")
-            |   keyword("unsigned")
-            |   keyword("float")
-            |   keyword("double")
-            |   keyword("void")
-            |   keyword("auto")
+        SimpleTypeSpecifier : Node*
+            ::= keyword("char"){ value = new CharNode(span); }
+            |   keyword("char16_t"){ value = new Char16Node(span); }
+            |   keyword("char32_t"){ value = new Char32Node(span); }
+            |   keyword("wchar_t"){ value = new WCharNode(span); }
+            |   keyword("bool"){ value = new BoolNode(span); }
+            |   keyword("short"){ value = new ShortNode(span); }
+            |   keyword("int"){ value = new IntNode(span); }
+            |   keyword("long"){ value = new LongNode(span); }
+            |   keyword("signed"){ value = new SignedNode(span); }
+            |   keyword("unsigned"){ value = new UnsignedNode(span); }
+            |   keyword("float"){ value = new FloatNode(span); }
+            |   keyword("double"){ value = new DoubleNode(span); }
+            |   keyword("void"){ value = new VoidNode(span); }
+            |   keyword("auto"){ value = new AutoNode(span); }
             ;
     }
 }

@@ -119,7 +119,7 @@ namespace cmajor.parsing
         bool: bool                          ::= keyword("true"){ value = true; } | keyword("false"){ value = false; }
                                             ;
 
-        identifier: std::u32string          ::= token(idstart idcont*)
+        identifier: std::u32string          ::= token((idstart | '_') idcont*)
                                             {
                                                 value = std::u32string(matchBegin, matchEnd);
                                             }

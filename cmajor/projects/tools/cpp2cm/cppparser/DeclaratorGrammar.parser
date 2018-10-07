@@ -1,4 +1,5 @@
 using System;
+using ast;
 
 namespace cppparser
 {
@@ -13,45 +14,56 @@ namespace cppparser
         using FunctionGrammar.ParameterList;
         using TypeExprGrammar.CVSpecifierSequence;
         
-        InitDeclarator(ParsingContext* ctx)
-            ::= Declarator(ctx)
-            (   Initializer(ctx)
+        InitDeclarator(ParsingContext* ctx) : Node*
+            ::= Declarator(ctx){ value = Declarator; }
+            (   Initializer(ctx){ value = new InitDeclaratorNode(span, value, Initializer); }
             |   empty
             )
             ;
             
-        Declarator(ParsingContext* ctx) : bool
-            ::= (   IdExpression(ctx)
-            |   '(' '*' Identifier ')'
-            |   '(' NestedNameSpecifier(ctx) '*' Identifier ')'
+        Declarator(ParsingContext* ctx, var UniquePtr<Node> node) : Node*
+            ::= ((   IdExpression(ctx){ node.Reset(IdExpression); }
+            |   ('(' '*' Identifier:i1 ')'){ node.Reset(new FunctionPtrIdNode(span, i1)); }
+            |   ('(' NestedNameSpecifier(ctx):nns '*' Identifier:i2 ')'){ node.Reset(new MemberFunctionPtrIdNode(span, nns, i2)); }
             )
-            (   empty{ pass = !ctx->InFunctionBody(); } ParameterList(ctx) CVSpecifierSequence{ value = true; }
-            |   '[' ConstantExpression(ctx)? ']'
+            (   empty{ pass = !ctx->InFunctionBody(); } ParameterList(ctx) CVSpecifierSequence
+                { node.Reset(new FunctionDeclaratorNode(span, node.Release(), ParameterList, CVSpecifierSequence)); }
+            |   ('[' ConstantExpression(ctx):size? ']'!){ node.Reset(new ArrayDeclaratorNode(span, node.Release(), size)); }
             )*
+            )
+            {
+                value = node.Release();
+            }
             ;
             
-        Initializer(ParsingContext* ctx)
-            ::= '=' InitializerClause(ctx)
-            |   '(' ExpressionList(ctx) ')'
-            |   BracedInitializerList(ctx)
+        Initializer(ParsingContext* ctx) : Node*
+            ::= ('=' InitializerClause(ctx)){ value = new AssignmentInitializerNode(span, InitializerClause); }
+            |   '(' ExpressionList(ctx) ')'{ value = ExpressionList; }
+            |   BracedInitializerList(ctx){ value = BracedInitializerList; }
             ;
             
-        BraceOrEqualInitializer(ParsingContext* ctx)
-            ::= '=' InitializerClause(ctx)
-            |   BracedInitializerList(ctx)
+        BraceOrEqualInitializer(ParsingContext* ctx) : Node*
+            ::= ('=' InitializerClause(ctx)){ value = new AssignmentInitializerNode(span, InitializerClause); }
+            |   BracedInitializerList(ctx){ value = BracedInitializerList; }
             ;
             
-        BracedInitializerList(ParsingContext* ctx)
-            ::= '{' (InitializerClause(ctx):ic1 (',' InitializerClause(ctx):ic2)*)? '}'
+        BracedInitializerList(ParsingContext* ctx, var UniquePtr<BracedInitializerListNode> node) : BracedInitializerListNode*
+            ::= ('{'{ node.Reset(new BracedInitializerListNode(span)); } (InitializerClause(ctx):ic1{ node->AddNode(ic1); } (',' InitializerClause(ctx):ic2{ node->AddNode(ic2); })*)? '}')
+            {
+                value = node.Release();
+            }
             ;
             
-        InitializerClause(ParsingContext* ctx)
-            ::= AssignmentExpression(ctx)
-            |   BracedInitializerList(ctx)
+        InitializerClause(ParsingContext* ctx) : Node*
+            ::= AssignmentExpression(ctx){ value = AssignmentExpression; }
+            |   BracedInitializerList(ctx){ value = BracedInitializerList; }
             ;
             
-        InitializerList(ParsingContext* ctx)
-            ::= InitializerClause(ctx):ic1 (',' InitializerClause(ctx):ic2)*
+        InitializerList(ParsingContext* ctx, var UniquePtr<InitializerListNode> node) : InitializerListNode*
+            ::= empty{ node.Reset(new InitializerListNode(span)); } (InitializerClause(ctx):ic1{ node->AddNode(ic1); } (',' InitializerClause(ctx):ic2{ node->AddNode(ic2); })*)
+            {
+                value = node.Release();
+            }
             ;
     }
 }

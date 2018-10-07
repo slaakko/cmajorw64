@@ -1029,7 +1029,10 @@ void stdlib::CreateRules()
         new cmajor::parsing::ActionParser(ToUtf32("A0"),
             new cmajor::parsing::TokenParser(
                 new cmajor::parsing::SequenceParser(
-                    new cmajor::parsing::IdStartParser(),
+                    new cmajor::parsing::GroupingParser(
+                        new cmajor::parsing::AlternativeParser(
+                            new cmajor::parsing::IdStartParser(),
+                            new cmajor::parsing::CharParser('_'))),
                     new cmajor::parsing::KleeneStarParser(
                         new cmajor::parsing::IdContParser()))))));
     AddRule(new qualified_idRule(ToUtf32("qualified_id"), GetScope(), GetParsingDomain()->GetNextRuleId(),

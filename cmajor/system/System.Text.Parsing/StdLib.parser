@@ -1,4 +1,4 @@
-﻿// =================================
+// =================================
 // Copyright (c) 2018 Seppo Laakko
 // Distributed under the MIT license
 // =================================
@@ -190,7 +190,7 @@ namespace System.Text.Parsing
             ;
 
         identifier : ustring
-            ::= token(idstart idcont*)
+            ::= token((idstart | '_') idcont*)
             {
                 value = ustring(matchBegin, matchEnd);
             }

@@ -1,4 +1,5 @@
 using System;
+using ast;
 
 namespace cppparser
 {
@@ -10,50 +11,57 @@ namespace cppparser
         using TypeExprGrammar.TypeExpr;
         using ExpressionGrammar.ConditionalExpression;
 
-        TemplateDeclaration(ParsingContext* ctx)
-            ::= keyword("template") '<' TemplateParameterList(ctx) '>' Declaration(ctx)
+        TemplateDeclaration(ParsingContext* ctx) : TemplateDeclarationNode*
+            ::= keyword("template"){ value = new TemplateDeclarationNode(span); } '<' TemplateParameterList(ctx, value)! '>'! (Declaration(ctx){ value->SetDeclaration(Declaration); })!
             ;
 
-        TemplateParameterList(ParsingContext* ctx)
-            ::= TemplateParameter(ctx):left (',' TemplateParameter(ctx):right)*
+        TemplateParameterList(ParsingContext* ctx, TemplateDeclarationNode* templateDeclaration)
+            ::= TemplateParameter(ctx):left{ templateDeclaration->AddTemplateParameter(left); } (',' TemplateParameter(ctx):right{ templateDeclaration->AddTemplateParameter(right); })*
             ;
 
-        TemplateParameter(ParsingContext* ctx)
-            ::= TypeParameter(ctx)
-            |   ParameterDeclaration(ctx)
+        TemplateParameter(ParsingContext* ctx) : Node*
+            ::= TypeParameter(ctx){ value = TypeParameter; }
+            |   ParameterDeclaration(ctx){ value = ParameterDeclaration; }
             ;
 
-        TypeParameter(ParsingContext* ctx)
-            ::= (keyword("class") | keyword("typename")) Identifier ('=' TypeExpr(ctx))?
+        TypeParameter(ParsingContext* ctx) : TemplateParameterNode*
+            ::= ((keyword("class") | keyword("typename")) Identifier ('=' TypeExpr(ctx))?){ value = new TemplateParameterNode(span, Identifier, TypeExpr); }
             ;
 
-        SimpleTemplateId(ParsingContext* ctx)
-            ::= TemplateName '<'{ ctx->BeginParsingTemplateId(); } TemplateArgumentList(ctx)? '>'{ ctx->EndParsingTemplateId(); } / { ctx->EndParsingTemplateId(); }
+        SimpleTemplateId(ParsingContext* ctx, var UniquePtr<TemplateIdNode> templateIdNode) : TemplateIdNode*
+            ::= (TemplateName 
+                '<'{ templateIdNode.Reset(new TemplateIdNode(span, TemplateName)); ctx->BeginParsingTemplateId(); } 
+                TemplateArgumentList(ctx, templateIdNode.Get())? 
+                '>'{ ctx->EndParsingTemplateId(); } / { ctx->EndParsingTemplateId(); }
+            )
+            {
+                value = templateIdNode.Release();
+            }
             ;
 
-        TemplateId(ParsingContext* ctx)
-            ::= SimpleTemplateId(ctx)
+        TemplateId(ParsingContext* ctx) : TemplateIdNode*
+            ::= SimpleTemplateId(ctx){ value = SimpleTemplateId; }
             ;
 
-        TemplateName
-            ::= Identifier
+        TemplateName : IdentifierNode*
+            ::= Identifier{ value = Identifier; }
             ;
 
-        TemplateArgumentList(ParsingContext* ctx)
-            ::= TemplateArgument(ctx):left (',' TemplateArgument(ctx):right)*
+        TemplateArgumentList(ParsingContext* ctx, TemplateIdNode* templateIdNode)
+            ::= TemplateArgument(ctx):left{ templateIdNode->AddNode(left); } (',' TemplateArgument(ctx):right{ templateIdNode->AddNode(right); })*
             ;
 
-        TemplateArgument(ParsingContext* ctx)
-            ::= TypeExpr(ctx)
-            |   ConditionalExpression(ctx)
+        TemplateArgument(ParsingContext* ctx) : Node*
+            ::= TypeExpr(ctx){ value = TypeExpr; }
+            |   ConditionalExpression(ctx){ value = ConditionalExpression; }
             ;
 
-        ExplicitInstantiation(ParsingContext* ctx)
-            ::= keyword("template") Declaration(ctx)
+        ExplicitInstantiation(ParsingContext* ctx) : ExplicitInstantiationNode*
+            ::= (keyword("template") Declaration(ctx)){ value = new ExplicitInstantiationNode(span, Declaration); }
             ;
 
-        ExplicitSpecialization(ParsingContext* ctx)
-            ::= keyword("template") '<' '>' Declaration(ctx)
+        ExplicitSpecialization(ParsingContext* ctx) : ExplicitSpecializationNode*
+            ::= (keyword("template") '<' '>' Declaration(ctx)){ value = new ExplicitSpecializationNode(span, Declaration); }
             ;
     }
 }

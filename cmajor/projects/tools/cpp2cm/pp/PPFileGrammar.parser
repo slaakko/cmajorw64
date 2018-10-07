@@ -1,0 +1,184 @@
+using System;
+using cppparser;
+using ast;
+
+namespace pp
+{
+    grammar PPFileGrammar
+    {
+        using stdlib.newline;
+        using stdlib.identifier;
+        using stdlib.sign;
+        using cppparser.LiteralGrammar.CharacterLiteral;
+        using cppparser.LiteralGrammar.StringLiteral;
+        skip Spaces;
+        
+        PPFile(PP* pp, ustring* result)
+            ::= Group(pp, true, result)?
+            ;
+            
+        Group(PP* pp, bool process, ustring* result)
+            ::= 
+            (   IfSection(pp, process, result)
+            |   ControlLine(pp, process, result)
+            |   TextLine(pp, process, result)
+            )+
+            ;
+            
+        IfSection(PP* pp, bool parentProcess, var bool processed, ustring* result)
+            ::= IfGroup(pp, parentProcess, result){ processed = IfGroup; } ElifGroups(pp, parentProcess, &processed, result)? ElseGroup(pp, parentProcess, &processed, result)? EndIfLine(pp, result)
+            ;
+            
+        IfGroup(PP* pp, bool parentProcess, ustring* result, var bool process) : bool
+            ::= ('#' keyword("if") ConstantExpression(parentProcess, pp){ process = parentProcess && ConstantExpression; } newline{ result->Append('\n'); } Group(pp, process, result):g1?){ value = process; }
+            |   ('#' keyword("ifdef") identifier:i1{ process = parentProcess && pp->Defined(i1); } newline{ result->Append('\n'); } Group(pp, process, result):g2?){ value = process; }
+            |   ('#' keyword("ifndef") identifier:i2{ process = parentProcess && !pp->Defined(i2); } newline{ result->Append('\n'); } Group(pp, process, result):g3?){ value = process; }
+            ;
+            
+        ElifGroups(PP* pp, bool parentProcess, bool* processed, ustring* result)
+            ::= ElifGroup(pp, parentProcess, processed, result)+
+            ;
+            
+        ElifGroup(PP* pp, bool parentProcess, bool* processed, ustring* result, var bool process)
+            ::= ('#' keyword("elif") ConstantExpression(parentProcess && !*processed, pp){ process = ConstantExpression; } newline{ result->Append('\n'); } Group(pp, process, result)?){ if (process) *processed = true; }
+            ;
+
+        ElseGroup(PP* pp, bool parentProcess, bool* processed, ustring* result)
+            ::= '#' keyword("else") newline{ result->Append('\n'); } Group(pp,  parentProcess && !*processed, result)?
+            ;
+                                    
+        EndIfLine(PP* pp, ustring* result)
+            ::= '#' keyword("endif") newline{ result->Append('\n'); }
+            ;
+            
+        ControlLine(PP* pp, bool process, ustring* result)
+            ::= IncludeDirective(pp, process, result)
+            |   DefineFunctionMacro(pp, process, result)
+            |   DefineObjectMacro(pp, process, result)
+            |   UndefineMacro(pp, process, result)
+            ;
+            
+        IncludeDirective(PP* pp, bool process, ustring* result, var ustring headerNameText)
+            ::= ('#' keyword("include") NonemptyTokenLine(process, &headerNameText, pp, PPTokenFlags.acceptHeaderName) newline{ result->Append('\n'); })
+            { 
+                if (process) Preprocess(*pp, pp->ResolveHeaderFilePath(ToUtf8(headerNameText))); 
+            }
+            ;
+            
+        DefineFunctionMacro(PP* pp, bool process, ustring* result, var ustring replacementList)
+            ::= ('#' keyword("define") token(identifier '(') MacroParams ')' PossiblyEmptyTokenLine(process, &replacementList, pp, PPTokenFlags.acceptHeaderName) newline{ result->Append('\n'); })
+            {
+                if (process) pp->Define(identifier, MacroParams, replacementList); 
+            }
+            ;
+            
+        MacroParams : List<ustring>
+            ::= (identifier:left{ value.Add(left); } (',' identifier:right{ value.Add(right); })*)?
+            ;
+            
+        DefineObjectMacro(PP* pp, bool process, ustring* result, var ustring replacementList)
+            ::= ('#' keyword("define") identifier PossiblyEmptyTokenLine(process, &replacementList, pp, PPTokenFlags.acceptHeaderName) newline{ result->Append('\n'); })
+            { 
+                if (process) pp->Define(identifier, replacementList); 
+            }
+            ;
+            
+        UndefineMacro(PP* pp, bool process, ustring* result)
+            ::= ('#' keyword("undef") identifier:macroName newline{ result->Append('\n'); }){ if (process) pp->Undefine(macroName); }
+            ;
+            
+        ConstantExpression(bool process, PP* pp, var ustring constantExpressionText) : bool
+            ::= NonemptyTokenLine(process, &constantExpressionText, pp, PPTokenFlags.none){ if (process) value = EvaluateConstantExpression(constantExpressionText, pp); else value = false; }
+            ;
+            
+        TextLine(PP* pp, bool process, ustring* result, var ustring replacementText)
+            ::= (PossiblyEmptyTokenLine(process, &replacementText, pp, PPTokenFlags.none) newline)
+            { 
+                if (process) result->Append(replacementText); 
+                result->Append('\n');
+            }
+            ;
+            
+        PossiblyEmptyTokenLine(bool process, ustring* result, PP* pp, PPTokenFlags flags, var bool substituted)
+            ::= empty{ substituted = false; } (token(PPToken(process, result, pp, cast<PPTokenFlags>(flags | PPTokenFlags.acceptFunctionMacroInvocaction), &substituted)*))
+                {
+                    if (substituted) 
+                    {
+                        *result = ParsePossiblyEmptyTokenLine(process, *result, pp, flags); 
+                    }
+                }
+            ;
+            
+        NonemptyTokenLine(bool process, ustring* result, PP* pp, PPTokenFlags flags, var bool substituted) 
+            ::= empty{ substituted = false; } (token(PPToken(process, result, pp, cast<PPTokenFlags>(flags | PPTokenFlags.acceptFunctionMacroInvocaction), &substituted)+))
+                { 
+                    if (substituted) 
+                    {
+                        *result = ParseNonemptyTokenLine(process, *result, pp, flags); 
+                    }
+                }
+            ;
+            
+        PPToken(bool process, ustring* result, PP* pp, PPTokenFlags flags, bool* substituted)
+            ::= empty{ pass = (flags & PPTokenFlags.acceptHeaderName) != PPTokenFlags.none; } HeaderName{ if (process) result->Append(HeaderName); }
+            |   empty{ pass = (flags & PPTokenFlags.acceptFunctionMacroInvocaction) != PPTokenFlags.none; } FunctionMacroInvocation(process, pp, flags, result)
+            |   empty{ pass = (flags & PPTokenFlags.macroArgumentReplacement) != PPTokenFlags.none; } identifier:id1{ if (process) result->Append(pp->SubstituteMacroArgument(id1)); }
+            |   empty{ pass = (flags & PPTokenFlags.macroArgumentReplacement) == PPTokenFlags.none; } identifier:id2{ if (process) result->Append(pp->SubstituteObjectMacro(id2, *substituted)); }
+            |   PPNumber{ if (process) result->Append(PPNumber); }
+            |   CharacterLiteral{ if (process) result->Append(ustring(matchBegin, matchEnd)); }
+            |   StringLiteral{ if (process) result->Append(ustring(matchBegin, matchEnd)); }
+            |   empty{ pass = (flags & PPTokenFlags.dontAcceptCommaOrRightParen) != PPTokenFlags.none; } (anychar - (',' | ')' | newline)){ if (process) result->Append(*matchBegin); }
+            |   empty{ pass = (flags & PPTokenFlags.dontAcceptCommaOrRightParen) == PPTokenFlags.none; } (anychar - newline){ if (process) result->Append(*matchBegin); }
+            ;
+            
+        FunctionMacroInvocation(bool process, PP* pp, PPTokenFlags flags, ustring* result, var FunctionMacro* macro)
+            ::= (token(identifier{ macro = pp->GetFunctionMacro(identifier); pass = macro != null; } '(') MacroArgumentList(process, pp, flags):args ')')
+            {
+                if (process) result->Append(DoFunctionMacroReplacement(macro, &args, pp, flags)); 
+            }
+            ;
+            
+        MacroArgumentList(bool process, PP* pp, PPTokenFlags flags) : List<ustring>
+            ::= (MacroArgument(process, pp, flags):left{ value.Add(left); } (',' MacroArgument(process, pp, flags):right{ value.Add(right); })*)?
+            ;
+            
+        MacroArgument(bool process, PP* pp, PPTokenFlags flags, var bool substituted) : ustring
+            ::= token((PPToken(process, &value, pp, cast<PPTokenFlags>(flags | PPTokenFlags.dontAcceptCommaOrRightParen), &substituted))+)
+            ;
+            
+        MacroReplacement(FunctionMacro* macro, List<ustring>* args, PP* pp, PPTokenFlags flags, var bool substituted) : ustring
+            ::= empty{ pp->PushFunctionMacro(macro, args); } (PPToken(true, &value, pp, cast<PPTokenFlags>(flags | PPTokenFlags.macroArgumentReplacement), &substituted)*){ pp->PopFunctionMacro(); }
+            ;
+            
+        PPNumber : ustring
+            ::= token((digit | ('.' digit)) (digit | '.' | [eE] sign | [a-zA-Z_])*){ value = ustring(matchBegin, matchEnd); }
+            ;
+            
+        HeaderName : ustring
+            ::= token('<' ([^>]+){ value = ustring(matchBegin, matchEnd); } '>')
+            |   token('"' ([^"]+){ value = ustring(matchBegin, matchEnd); } '"')
+            ;
+            
+        Spaces
+            ::= [ \t]+
+            ;
+    }
+    
+    grammar PPNonemptyTokenLineGrammar
+    {
+        using PPFileGrammar.NonemptyTokenLine;
+        start NonemptyTokenLine;
+    }
+    
+    grammar PPPossiblyEmptyTokenLineGrammar
+    {
+        using PPFileGrammar.PossiblyEmptyTokenLine;
+        start PossiblyEmptyTokenLine;
+    }
+    
+    grammar PPMacroReplacementGrammar
+    {
+        using PPFileGrammar.MacroReplacement;
+        start MacroReplacement;
+    }
+}

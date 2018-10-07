@@ -3,7 +3,7 @@ using System.Collections;
 
 namespace cppparser
 {
-    internal class ParsingContext
+    public class ParsingContext
     {
         public nothrow ParsingContext()
         {

@@ -1,4 +1,5 @@
 using System;
+using ast;
 
 namespace cppparser
 {
@@ -19,96 +20,104 @@ namespace cppparser
         using EnumerationGrammar.EnumDeclaration;
         using EnumerationGrammar.OpaqueEnumDeclaration;
         using LiteralGrammar.StringLiteral;
+        using ExpressionGrammar.ConstantExpression;
         
-        Declarations(ParsingContext* ctx)
-            ::= Declaration(ctx)*
+        Declarations(ParsingContext* ctx, CompositeNode<Node>* parent)
+            ::= (Declaration(ctx){ parent->AddNode(Declaration); })*
             ;
             
-        Declaration(ParsingContext* ctx)
-            ::= NamespaceDefinition(ctx)
-            |   FunctionDefinition(ctx)
-            |   SpecialMemberFunctionDefinition(ctx)
-            |   TemplateDeclaration(ctx)
-            |   ExplicitInstantiation(ctx)
-            |   ExplicitSpecialization(ctx)
-            |   ClassDeclaration(ctx)
-            |   EnumDeclaration(ctx)
-            |   LinkageSpecification(ctx)
-            |   BlockDeclaration(ctx)
+        Declaration(ParsingContext* ctx) : Node*
+            ::= NamespaceDefinition(ctx){ value = NamespaceDefinition; }
+            |   FunctionDefinition(ctx){ value = FunctionDefinition; }
+            |   SpecialMemberFunctionDefinition(ctx){ value = SpecialMemberFunctionDefinition; }
+            |   TemplateDeclaration(ctx){ value = TemplateDeclaration; }
+            |   ExplicitInstantiation(ctx){ value = ExplicitInstantiation; }
+            |   ExplicitSpecialization(ctx){ value = ExplicitSpecialization; }
+            |   ClassDeclaration(ctx){ value = ClassDeclaration; }
+            |   EnumDeclaration(ctx){ value = EnumDeclaration; }
+            |   LinkageSpecification(ctx){ value = LinkageSpecification; }
+            |   BlockDeclaration(ctx){ value = BlockDeclaration; }
             ;
         
-        NamespaceDefinition(ParsingContext* ctx)
-            ::= NamedNamespaceDefinition(ctx)
-            |   UnnamedNamespaceDefinition(ctx)
+        NamespaceDefinition(ParsingContext* ctx) : NamespaceNode*
+            ::= NamedNamespaceDefinition(ctx){ value = NamedNamespaceDefinition; }
+            |   UnnamedNamespaceDefinition(ctx){ value = UnnamedNamespaceDefinition; }
             ;
             
-        NamedNamespaceDefinition(ParsingContext* ctx)
-            ::= keyword("namespace") Identifier '{' Declarations(ctx) '}'
+        NamedNamespaceDefinition(ParsingContext* ctx) : NamespaceNode*
+            ::= keyword("namespace") Identifier{ value = new NamespaceNode(span, Identifier); } '{' Declarations(ctx, value) '}'!
             ;
             
-        UnnamedNamespaceDefinition(ParsingContext* ctx)
-            ::= keyword("namespace") '{' Declarations(ctx) '}'
+        UnnamedNamespaceDefinition(ParsingContext* ctx) : NamespaceNode*
+            ::= keyword("namespace") '{'{ value = new NamespaceNode(span, null); } Declarations(ctx, value) '}'!
             ;
             
-        BlockDeclaration(ParsingContext* ctx)
-            ::= SimpleDeclaration(ctx)
-            |   AliasDeclaration(ctx)
-            |   UsingDirective(ctx)
-            |   UsingDeclaration(ctx)
-            |   OpaqueEnumDeclaration(ctx)
-            |   TypedefDeclaration(ctx)
-            |   ForwardClassDeclaration(ctx)
+        BlockDeclaration(ParsingContext* ctx) : Node*
+            ::= SimpleDeclaration(ctx){ value = SimpleDeclaration; }
+            |   AliasDeclaration(ctx){ value = AliasDeclaration; }
+            |   UsingDirective(ctx){ value = UsingDirective; }
+            |   UsingDeclaration(ctx){ value = UsingDeclaration; }
+            |   StaticAssertDeclaration(ctx){ value = StaticAssertDeclaration; }
+            |   OpaqueEnumDeclaration(ctx){ value = OpaqueEnumDeclaration; }
+            |   TypedefDeclaration(ctx){ value = TypedefDeclaration; }
+            |   ForwardClassDeclaration(ctx){ value = ForwardClassDeclaration; }
             ;
             
-        SimpleDeclaration(ParsingContext* ctx)
-            ::= DeclSpecifiers TypeExpr(ctx) InitDeclarator(ctx) ';'
+        SimpleDeclaration(ParsingContext* ctx) : SimpleDeclarationNode*
+            ::= (DeclSpecifiers TypeExpr(ctx) InitDeclarator(ctx) ';'){ value = new SimpleDeclarationNode(span, DeclSpecifiers, TypeExpr, InitDeclarator); }
             ;
             
-        DeclSpecifiers
-            ::= DeclSpecifier*
+        DeclSpecifiers : Specifiers
+            ::= (DeclSpecifier{ value = cast<Specifiers>(value | DeclSpecifier); })*
             ;
             
-        DeclSpecifier
-            ::= StorageClassSpecifier
-            |   FunctionSpecifier
-            |   keyword("friend")
-            |   keyword("constexpr")
-            |   keyword("__declspec")
-            |   keyword("__thread")
+        DeclSpecifier : Specifiers
+            ::= StorageClassSpecifier{ value = StorageClassSpecifier; }
+            |   FunctionSpecifier{ value = FunctionSpecifier; }
+            |   keyword("friend"){ value = Specifiers.friend; }
+            |   keyword("constexpr"){ value = Specifiers.constexpr_; }
+            |   keyword("__declspec") 
+                ('(' keyword("thread"){ value = Specifiers.thread_local; } ')' | '(' keyword("dllimport"){ value = Specifiers.dllimport; } ')' | '(' keyword("dllexport"){ value = Specifiers.dllexport; } ')')
+            |   keyword("__thread"){ value = Specifiers.thread_local; }
             ;
             
-        StorageClassSpecifier
-            ::= keyword("register")
-            |   keyword("static")
-            |   keyword("thread_local")
-            |   keyword("extern")
-            |   keyword("mutable")
+        StorageClassSpecifier : Specifiers
+            ::= keyword("register"){ value = Specifiers.register; }
+            |   keyword("static"){ value = Specifiers.static_; }
+            |   keyword("thread_local"){ value = Specifiers.thread_local; }
+            |   keyword("extern"){ value = Specifiers.extern_; }
+            |   keyword("mutable"){ value = Specifiers.mutable; }
             ;
             
-        FunctionSpecifier
-            ::= keyword("inline")
-            |   keyword("virtual")
-            |   keyword("explicit")
+        FunctionSpecifier : Specifiers
+            ::= keyword("inline"){ value = Specifiers.inline_; }
+            |   keyword("virtual"){ value = Specifiers.virtual_; }
+            |   keyword("explicit"){ value = Specifiers.explicit_; }
             ;
             
-        AliasDeclaration(ParsingContext* ctx)
-            ::= keyword("using") Identifier '=' TypeExpr(ctx) ';'
+        AliasDeclaration(ParsingContext* ctx) : UsingTypeDeclarationNode*
+            ::= (keyword("using") Identifier '=' TypeExpr(ctx)! ';'!){ value = new UsingTypeDeclarationNode(span, Identifier, TypeExpr); }
             ;
             
-        UsingDirective(ParsingContext* ctx)
-            ::= keyword("using") keyword("namespace") QualifiedId(ctx) ';'
+        UsingDirective(ParsingContext* ctx) : UsingDirectiveNode*
+            ::= (keyword("using") keyword("namespace") QualifiedId(ctx)! ';'!){ value = new UsingDirectiveNode(span, QualifiedId); }
             ;
             
-        UsingDeclaration(ParsingContext* ctx)
-            ::= keyword("using") QualifiedId(ctx) ';'
+        UsingDeclaration(ParsingContext* ctx) : UsingDeclarationNode*
+            ::= (keyword("using") QualifiedId(ctx) ';'){ value = new UsingDeclarationNode(span, QualifiedId); }
             ;
             
-        TypedefDeclaration(ParsingContext* ctx)
-            ::= keyword("typedef") TypeExpr(ctx) Declarator(ctx) ';'
+        StaticAssertDeclaration(ParsingContext* ctx) : StaticAssertDeclarationNode*
+            ::= (keyword("static_assert") '(' ConstantExpression(ctx):expr ',' StringLiteral:message ')' ';'){ value = new StaticAssertDeclarationNode(span, expr, message); }
             ;
             
-        LinkageSpecification(ParsingContext* ctx)
-            ::= keyword("extern") StringLiteral '{' Declaration(ctx):d1* '}' | Declaration(ctx):d2
+        TypedefDeclaration(ParsingContext* ctx) : TypedefDeclarationNode*
+            ::= (keyword("typedef") TypeExpr(ctx)! Declarator(ctx)! ';'!){ value = new TypedefDeclarationNode(span, TypeExpr, Declarator); }
+            ;
+            
+        LinkageSpecification(ParsingContext* ctx) : LinkageSpecificationNode*
+            ::= keyword("extern") StringLiteral:linkage{ value = new LinkageSpecificationNode(span, linkage); } 
+                ('{' (Declaration(ctx):d1{ value->AddNode(d1); })* '}'! | Declaration(ctx):d2{ value->AddNode(d2); })
             ;
     }        
 }

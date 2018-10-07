@@ -1,0 +1,166 @@
+using System;
+using Span = System.Text.Parsing.Span;
+
+namespace ast
+{
+    public class CharNode : Node
+    {
+        public nothrow CharNode(const Span& span_) : base(span_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+    }
+    
+    public class Char16Node : Node
+    {
+        public nothrow Char16Node(const Span& span_) : base(span_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+    }
+
+    public class Char32Node : Node
+    {
+        public nothrow Char32Node(const Span& span_) : base(span_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+    }
+    
+    public class WCharNode : Node
+    {
+        public nothrow WCharNode(const Span& span_) : base(span_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+    }
+    
+    public class BoolNode : Node
+    {
+        public nothrow BoolNode(const Span& span_) : base(span_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+    }
+    
+    public class ShortNode : Node
+    {
+        public nothrow ShortNode(const Span& span_) : base(span_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+    }
+    
+    public class IntNode : Node
+    {
+        public nothrow IntNode(const Span& span_) : base(span_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+    }
+
+    public class LongNode : Node
+    {
+        public nothrow LongNode(const Span& span_) : base(span_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+    }
+    
+    public class SignedNode : Node
+    {
+        public nothrow SignedNode(const Span& span_) : base(span_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+    }
+        
+    public class UnsignedNode : Node
+    {
+        public nothrow UnsignedNode(const Span& span_) : base(span_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+    }
+    
+    public class FloatNode : Node
+    {
+        public nothrow FloatNode(const Span& span_) : base(span_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+        }
+    }
+
+    public class DoubleNode : Node
+    {
+        public nothrow DoubleNode(const Span& span_) : base(span_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+        }
+    }
+
+    public class VoidNode : Node
+    {
+        public nothrow VoidNode(const Span& span_) : base(span_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+        }
+    }
+
+    public class AutoNode : Node
+    {
+        public nothrow AutoNode(const Span& span_) : base(span_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+        }
+    }
+                
+    public class SimpleTypeNode : CompositeNode<Node>
+    {
+        public nothrow SimpleTypeNode(const Span& span_) : base(span_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+    }
+}

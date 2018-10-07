@@ -1,36 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <rules>
-    <type source="bool" target="bool"/>
-    <type source="char" target="char"/>
-    <type source="signed char" target="char"/>
-    <type source="wchar_t" target="wchar"/>
-    <type source="char16_t" target="wchar"/>
-    <type source="char32_t" target="uchar"/>
-    <type source="unsigned char" target="byte"/>
-    <type source="short" target="short"/>
-    <type source="short int" target="short"/>
-    <type source="unsigned short" target="ushort"/>
-    <type source="unsigned short int" target="ushort"/>
-    <type source="int" target="int"/>
-    <type source="unsigned" target="uint"/>
-    <type source="unsigned int" target="uint"/>
-    <type source="long" target="int"/>
-    <type source="unsigned long" target="uint"/>
-    <type source="long long" target="long"/>
-    <type source="unsigned long long" target="ulong"/>
-    <type source="std::int8_t" target="sbyte"/>
-    <type source="std::uint8_t" target="byte"/>
-    <type source="std::int16_t" target="short"/>
-    <type source="std::uint16_t" target="ushort"/>
-    <type source="std::int32_t" target="int"/>
-    <type source="std::uint32_t" target="uint"/>
-    <type source="std::int64_t" target="long"/>
-    <type source="std::uint64_t" target="ulong"/>
-
-    <type source="std::string" target="string" ns="System" members="string_members"/>
-    <type source="std::basic_string&lt;CharT>" target="String&lt;CharT>" members="string_members"/>
-    <type source="std::u16_string" target="wstring" ns="System" members="string_members"/>
-    <type source="std::u32_string" target="ustring" ns="System" members="string_members"/>
+    <type source="string" sns="std" target="string" tns="System" members="string_members"/>
+    <type source="basic_string&lt;CharT>" sns="std" target="String&lt;CharT>" tns="System" members="string_members"/>
+    <type source="u16_string" sns="std" target="wstring" tns="System" members="string_members"/>
+    <type source="u32_string" sns="std" target="ustring" tns="System" members="string_members"/>
 
     <members id="string_members">
         <member source="iterator" target="Iterator"/>
@@ -49,7 +22,7 @@
         <member source="find" target="Find"/>
     </members>
 
-    <type source="std::vector&lt;T>" target="List&lt;T>" ns="System.Collections" members="vector_members"/>
+    <type source="vector&lt;T>" sns="std" target="List&lt;T>" tns="System.Collections" members="vector_members"/>
 
     <members id="vector_members">
         <member source="iterator" target="Iterator"/>
@@ -72,7 +45,7 @@
         <member source="clear" target="Clear"/>
     </members>
 
-    <type source="std::set&lt;T, C=std::less&lt;T>>" target="Set&lt;T, C=Less&lt;T>>" ns="System.Collections" members="set_members"/>
+    <type source="set&lt;T, C=std::less&lt;T>>" sns="std" target="Set&lt;T, C=Less&lt;T>>" tns="System.Collections" members="set_members"/>
 
     <members id="set_members">
         <member source="iterator" target="Iterator"/>
@@ -88,7 +61,7 @@
         <member source="find" target="Find"/>
     </members>
 
-    <type source="std::map&lt;Key, T, C=std::less&lt;Key>>" target="Map&lt;Key, T, C=Less&lt;Key>>" ns="System.Collections" members="map_members"/>
+    <type source="map&lt;Key, T, C=std::less&lt;Key>>" sns="std" target="Map&lt;Key, T, C=Less&lt;Key>>" tns="System.Collections" members="map_members"/>
 
     <members id="map_members">
         <member source="iterator" target="Iterator"/>
@@ -104,9 +77,9 @@
         <member source="find" target="Find"/>
     </members>
 
-    <type source="std::unordered_set&lt;Key, Hash=std::hash&lt;Key>, KeyEqual=std::equal_to&lt;Key>>" 
-        target="HashSet&lt;Key, Hash=Hasher&lt;Key>, KeyEqual=EqualTo&lt;Key>>"
-        ns="System.Collections" members="unordered_set_members"/>
+    <type source="unordered_set&lt;Key, Hash=std::hash&lt;Key>, KeyEqual=std::equal_to&lt;Key>>"
+        sns="std" target="HashSet&lt;Key, Hash=Hasher&lt;Key>, KeyEqual=EqualTo&lt;Key>>"
+        tns="System.Collections" members="unordered_set_members"/>
 
     <members id="unordered_set_members">
         <member source="iterator" target="Iterator"/>
@@ -122,9 +95,9 @@
         <member source="find" target="Find"/>
     </members>
 
-    <type source="std::unordered_map&lt;Key>, T, Hash=std::hash&lt;Key>, KeyEqual=std::equal_to&lt;Key>>" 
-          target="HashMap&lt;Key>, T, Hash=Hasher&lt;Key>, KeyEqual=EqualTo&lt;Key>>"
-          ns="System.Collections" members="unordered_map_members"/>
+    <type source="unordered_map&lt;Key>, T, Hash=std::hash&lt;Key>, KeyEqual=std::equal_to&lt;Key>>"
+          sns="std" target="HashMap&lt;Key>, T, Hash=Hasher&lt;Key>, KeyEqual=EqualTo&lt;Key>>"
+          tns="System.Collections" members="unordered_map_members"/>
 
     <members id="unordered_map_members">
         <member source="iterator" target="Iterator"/>

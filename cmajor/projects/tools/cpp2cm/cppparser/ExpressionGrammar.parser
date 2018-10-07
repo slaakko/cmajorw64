@@ -1,4 +1,5 @@
 using System;
+using ast;
 
 namespace cppparser
 {
@@ -13,176 +14,260 @@ namespace cppparser
         using TemplateGrammar.TemplateId;
         using IdentifierGrammar.Identifier;
         using IdentifierGrammar.NestedNameSpecifier;
+        using FunctionGrammar.ParameterList;
+        using StatementGrammar.CompoundStatement;
         
-        ExpressionList(ParsingContext* ctx)
-            ::= InitializerList(ctx)
+        ExpressionList(ParsingContext* ctx, var UniquePtr<ExpressionListNode> node) : ExpressionListNode*
+            ::= (empty{ node.Reset(new ExpressionListNode(span)); } InitializerClause(ctx):ic1{ node->AddNode(ic1); } (',' InitializerClause(ctx):ic2{ node->AddNode(ic2); })*)
+            {
+                value = node.Release();
+            }
             ;
         
-        PossiblyEmptyArgumentList(ParsingContext* ctx)
-            ::= ExpressionList(ctx)
-            |   empty
+        PossiblyEmptyArgumentList(ParsingContext* ctx) : ExpressionListNode*
+            ::= ExpressionList(ctx){ value = ExpressionList; }
+            |   empty{ value = null; }
             ;
             
-        Expression(ParsingContext* ctx)
-            ::= AssignmentExpression(ctx):left (',' AssignmentExpression(ctx):right)*
+        Expression(ParsingContext* ctx, var UniquePtr<Node> node) : Node*
+            ::= (AssignmentExpression(ctx):left{ node.Reset(left); } (',' AssignmentExpression(ctx):right{ node.Reset(new BinaryExpressionNode(span, node.Release(), right, Operator.comma)); })*)
+            {
+                value = node.Release();
+            }
             ;
             
-        ConstantExpression(ParsingContext* ctx)
-            ::= ConditionalExpression(ctx)
+        ConstantExpression(ParsingContext* ctx) : Node*
+            ::= ConditionalExpression(ctx){ value = ConditionalExpression; }
             ;
             
-        AssignmentExpression(ParsingContext* ctx)
-            ::= ConcreteAssignmentExpression(ctx)
-            |   ConditionalExpression(ctx)
-            |   ThrowExpression(ctx)
+        AssignmentExpression(ParsingContext* ctx) : Node*
+            ::= ConcreteAssignmentExpression(ctx){ value = ConcreteAssignmentExpression; }
+            |   ConditionalExpression(ctx){ value = ConditionalExpression; }
+            |   ThrowExpression(ctx){ value = ThrowExpression; }
             ;
             
-        ConcreteAssignmentExpression(ParsingContext* ctx)
-            ::= empty{ ctx->BeginParsingLvalue(); } LogicalOrExpression(ctx){ ctx->EndParsingLvalue(); } / { ctx->EndParsingLvalue(); }
-                AssignmentOperator InitializerClause(ctx)
+        ConcreteAssignmentExpression(ParsingContext* ctx, var UniquePtr<Node> node) : Node*
+            ::= empty{ ctx->BeginParsingLvalue(); } (LogicalOrExpression(ctx){ node.Reset(LogicalOrExpression); ctx->EndParsingLvalue(); } / { ctx->EndParsingLvalue(); } 
+                AssignmentOperator InitializerClause(ctx){ node.Reset(new BinaryExpressionNode(span, node.Release(), InitializerClause, AssignmentOperator)); })
+            {
+                value = node.Release();
+            }
             ;
             
-        AssignmentOperator
-            ::= ("=" - "==")
-            |   "*="
-            |   "/="
-            |   "%="
-            |   "+="
-            |   "-="
-            |   ">>="
-            |   "<<="
-            |   "&="
-            |   "^="
-            |   "|="
+        AssignmentOperator : Operator
+            ::= ("=" - "=="){ value = Operator.assign; }
+            |   "*="{ value = Operator.mulAssign; }
+            |   "/="{ value = Operator.divAssign; }
+            |   "%="{ value = Operator.remAssign; }
+            |   "+="{ value = Operator.addAssign; }
+            |   "-="{ value = Operator.subAssign; }
+            |   ">>="{ value = Operator.shiftRightAssign; }
+            |   "<<="{ value = Operator.shiftLeftAssign; }
+            |   "&="{ value = Operator.andAssign; }
+            |   "^="{ value = Operator.xorAssign; }
+            |   "|="{ value = Operator.orAssign; }
             ;
             
-        ConditionalExpression(ParsingContext* ctx)
-            ::= LogicalOrExpression(ctx) ('?' Expression(ctx) ':' AssignmentExpression(ctx))?
+        ConditionalExpression(ParsingContext* ctx, var UniquePtr<Node> node) : Node*
+            ::= (LogicalOrExpression(ctx){ node.Reset(LogicalOrExpression); } 
+                ('?' Expression(ctx) ':' AssignmentExpression(ctx){ node.Reset(new ConditionalExpressionNode(span, node.Release(), Expression, AssignmentExpression)); })?)
+            {
+                value = node.Release();
+            }
             ;
             
-        ThrowExpression(ParsingContext* ctx)
-            ::= keyword("throw") AssignmentExpression(ctx)?
+        ThrowExpression(ParsingContext* ctx) : Node*
+            ::= (keyword("throw") AssignmentExpression(ctx)?){ value = new ThrowExpressionNode(span, AssignmentExpression); }
             ;
             
-        LogicalOrExpression(ParsingContext* ctx)
-            ::= LogicalAndExpression(ctx):left ("||"{ if (ctx->ParsingTemplateIdOrLvalueAndNotArguments()) pass = false; } LogicalAndExpression(ctx):right)*
+        LogicalOrExpression(ParsingContext* ctx, var UniquePtr<Node> node) : Node*
+            ::= (LogicalAndExpression(ctx):left{ node.Reset(left); } 
+                ("||"{ if (ctx->ParsingTemplateIdOrLvalueAndNotArguments()) pass = false; } 
+                LogicalAndExpression(ctx):right{ node.Reset(new BinaryExpressionNode(span, node.Release(), right, Operator.logicalOr)); })*)
+            {
+                value = node.Release();
+            }
             ;
             
-        LogicalAndExpression(ParsingContext* ctx)
-            ::= InclusiveOrExpression(ctx):left ("&&"{ if (ctx->ParsingTemplateIdOrLvalueAndNotArguments()) pass = false; } InclusiveOrExpression(ctx):right)*
+        LogicalAndExpression(ParsingContext* ctx, var UniquePtr<Node> node) : Node*
+            ::= (InclusiveOrExpression(ctx):left{ node.Reset(left); } 
+                ("&&"{ if (ctx->ParsingTemplateIdOrLvalueAndNotArguments()) pass = false; } 
+                InclusiveOrExpression(ctx):right{ node.Reset(new BinaryExpressionNode(span, node.Release(), right, Operator.logicalAnd)); })*)
+            {
+                value = node.Release();
+            }
             ;
             
-        InclusiveOrExpression(ParsingContext* ctx)
-            ::= ExclusiveOrExpression(ctx):left 
-                (('|' - ("|=" | "||")){ if (ctx->ParsingLvalueAndNotArguments()) pass = false; } ExclusiveOrExpression(ctx):right)*
+        InclusiveOrExpression(ParsingContext* ctx, var UniquePtr<Node> node) : Node*
+            ::= (ExclusiveOrExpression(ctx):left{ node.Reset(left); } 
+                (('|' - ("|=" | "||")){ if (ctx->ParsingLvalueAndNotArguments()) pass = false; } 
+                ExclusiveOrExpression(ctx):right{ node.Reset(new BinaryExpressionNode(span, node.Release(), right, Operator.or_)); })*)
+            {
+                value = node.Release(); 
+            }
             ;
             
-        ExclusiveOrExpression(ParsingContext* ctx)
-            ::= AndExpression(ctx):left 
-                (('^' - "^="){ if (ctx->ParsingLvalueAndNotArguments()) pass = false; } AndExpression(ctx):right)*
+        ExclusiveOrExpression(ParsingContext* ctx, var UniquePtr<Node> node) : Node*
+            ::= (AndExpression(ctx):left{ node.Reset(left); }
+                (('^' - "^="){ if (ctx->ParsingLvalueAndNotArguments()) pass = false; } 
+                AndExpression(ctx):right{ node.Reset(new BinaryExpressionNode(span, node.Release(), right, Operator.xor)); })*)
+            {
+                value = node.Release();
+            }
             ;
             
-        AndExpression(ParsingContext* ctx)
-            ::= EqualityExpression(ctx):left 
-                (('&' - ("&=" | "&&")){ if (ctx->ParsingLvalueAndNotArguments()) pass = false; } EqualityExpression(ctx):right)*
+        AndExpression(ParsingContext* ctx, var UniquePtr<Node> node) : Node*
+            ::= (EqualityExpression(ctx):left{ node.Reset(left); } 
+                (('&' - ("&=" | "&&")){ if (ctx->ParsingLvalueAndNotArguments()) pass = false; } 
+                EqualityExpression(ctx):right{ node.Reset(new BinaryExpressionNode(span, node.Release(), right, Operator.and_)); })*)
+            {
+                value = node.Release();
+            }
             ;
             
-        EqualityExpression(ParsingContext* ctx)
-            ::= RelationalExpression(ctx):left 
-                (("==" | "!="){ if (ctx->ParsingLvalueAndNotArguments()) pass = false; } RelationalExpression(ctx):right)*
+        EqualityExpression(ParsingContext* ctx, var UniquePtr<Node> node, var Operator op) : Node*
+            ::= (RelationalExpression(ctx):left{ node.Reset(left); } 
+                (("=="{ op = Operator.equal; } | "!="{ op = Operator.notEqual; }){ if (ctx->ParsingLvalueAndNotArguments()) pass = false; } 
+                RelationalExpression(ctx):right{ value = new BinaryExpressionNode(span, node.Release(), right, op); })*)
+            {
+                value = node.Release();
+            }
             ;
 
-        RelationalExpression(ParsingContext* ctx)
-            ::= ShiftExpression(ctx):left
-                (("<=" | ">=" | ('<' - ("<<" | "<<=")) | ('>' - (">>" | ">>="))){ if (ctx->ParsingTemplateIdOrLvalueAndNotArguments()) pass = false; } 
-                ShiftExpression(ctx):right)*
+        RelationalExpression(ParsingContext* ctx, var UniquePtr<Node> node, var Operator op) : Node*
+            ::= (ShiftExpression(ctx):left{ node.Reset(left); }
+                (("<="{ op = Operator.lessOrEqual; } 
+                | ">="{ op = Operator.greaterOrEqual; } 
+                | ('<' - ("<<" | "<<=")){ op = Operator.less; } 
+                | ('>' - (">>" | ">>=")){ op = Operator.greater; }){ if (ctx->ParsingTemplateIdOrLvalueAndNotArguments()) pass = false; } 
+                ShiftExpression(ctx):right{ node.Reset(new BinaryExpressionNode(span, node.Release(), right, op)); })*)
+            {
+                value = node.Release();
+            }
             ;
             
-        ShiftExpression(ParsingContext* ctx)
-            ::= AdditiveExpression(ctx):left
-                ((("<<" - "<<=") | (">>" - ">>=")){ if (ctx->ParsingTemplateIdOrLvalueAndNotArguments()) pass = false; }
-                AdditiveExpression(ctx):right)*
+        ShiftExpression(ParsingContext* ctx, var UniquePtr<Node> node, var Operator op) : Node*
+            ::= (AdditiveExpression(ctx):left{ node.Reset(left); }
+                ((("<<" - "<<="){ op = Operator.shiftLeft; } 
+                | (">>" - ">>="){ op = Operator.shiftRight; }){ ctx->BeginParsingArguments(); } 
+                (AdditiveExpression(ctx):right){ ctx->EndParsingArguments(); node.Reset(new BinaryExpressionNode(span, node.Release(), right, op)); } / { ctx->EndParsingArguments(); })*)
+            {
+                value = node.Release();
+            }
             ;
             
-        AdditiveExpression(ParsingContext* ctx)
-            ::= MultiplicativeExpression(ctx):left
-                ((('+' - "+=") | ('-' - "-=")){ if (ctx->ParsingLvalueAndNotArguments()) pass = false; }
-                MultiplicativeExpression(ctx):right)*
+        AdditiveExpression(ParsingContext* ctx, var UniquePtr<Node> node, var Operator op) : Node*
+            ::= (MultiplicativeExpression(ctx):left{ node.Reset(left); }
+                ((('+' - "+="){ op = Operator.add; } 
+                | ('-' - "-="){ op = Operator.sub; }){ if (ctx->ParsingLvalueAndNotArguments()) pass = false; }
+                MultiplicativeExpression(ctx):right{ node.Reset(new BinaryExpressionNode(span, node.Release(), right, op)); })*)
+            {
+                value = node.Release();
+            }
             ;
             
-        MultiplicativeExpression(ParsingContext* ctx)
-            ::= PMExpression(ctx):left
-                ((('*' - "*=") | ('/' - "/=") | ('%' - "%=")){ if (ctx->ParsingLvalueAndNotArguments()) pass = false; }
-                PMExpression(ctx):right)*
+        MultiplicativeExpression(ParsingContext* ctx, var UniquePtr<Node> node, var Operator op) : Node*
+            ::= (PMExpression(ctx):left{ node.Reset(left); }
+                ((('*' - "*="){ op = Operator.mul; } 
+                | ('/' - "/="){ op = Operator.div; } 
+                | ('%' - "%="){ op = Operator.rem; }){ if (ctx->ParsingLvalueAndNotArguments()) pass = false; }
+                PMExpression(ctx):right{ node.Reset(new BinaryExpressionNode(span, node.Release(), right, op)); })*)
+            {
+                value = node.Release();
+            }
             ;
             
-        PMExpression(ParsingContext* ctx)
-            ::= CastExpression(ctx):left
-                ((".*" | "->*")
-                CastExpression(ctx):right)*
+        PMExpression(ParsingContext* ctx, var UniquePtr<Node> node, var Operator op) : Node*
+            ::= (CastExpression(ctx):left{ node.Reset(left); }
+                ((".*"{ op = Operator.dotStar; } | "->*"{ op = Operator.arrowStar; })
+                CastExpression(ctx):right{ node.Reset(new BinaryExpressionNode(span, node.Release(), right, op)); })*)
+            {
+                value = node.Release();
+            }
             ;
             
-        CastExpression(ParsingContext* ctx)
-            ::= '(' TypeExpr(ctx) ')' CastExpression(ctx)
-            |   UnaryExpression(ctx)
+        CastExpression(ParsingContext* ctx, var UniquePtr<Node> node) : Node*
+            ::= (('(' TypeExpr(ctx) ')' CastExpression(ctx)){ node.Reset(new CastExpressionNode(span, TypeExpr, CastExpression)); }
+            |   UnaryExpression(ctx){ node.Reset(UnaryExpression); }
+            )
+            {
+                value = node.Release();
+            }
             ;
             
-        UnaryExpression(ParsingContext* ctx)
-            ::= "++" CastExpression(ctx):c1
-            |   "--" CastExpression(ctx):c2
-            |   UnaryOperator CastExpression(ctx):c3
-            |   (keyword("sizeof") UnaryExpression(ctx):u4)
-            |   (keyword("alignof") '(' TypeExpr(ctx):t5 ')')
-            |   NewExpression(ctx)
-            |   DeleteExpression(ctx)
-            |   PostfixExpression(ctx)
+        UnaryExpression(ParsingContext* ctx) : Node*
+            ::= ("++" CastExpression(ctx):c1){ value = new PrefixIncrementNode(span, c1); }
+            |   "--" CastExpression(ctx):c2{ value = new PrefixDecrementNode(span, c2); }
+            |   UnaryOperator:op CastExpression(ctx):c3{ value = new UnaryExpressionNode(span, c3, op); }
+            |   (keyword("sizeof") UnaryExpression(ctx):u4){ value = new SizeOfExpressionNode(span, u4); }
+            |   (keyword("alignof") '(' TypeExpr(ctx):t5 ')'){ value = new AlignOfExpressionNode(span, t5); }
+            |   NewExpression(ctx){ value = NewExpression; }
+            |   DeleteExpression(ctx){ value = DeleteExpression; }
+            |   PostfixExpression(ctx){ value = PostfixExpression; }
             ;
             
-        UnaryOperator
-            ::= ('*' - "*=")
-            |   ('&' - "&=")
-            |   ('+' - "+=")
-            |   ('-' - "-=")
-            |   '!'
-            |   '~'
+        UnaryOperator : Operator
+            ::= ('*' - "*="){ value = Operator.deref; }
+            |   ('&' - "&="){ value = Operator.addrOf; }
+            |   ('+' - "+="){ value = Operator.unaryPlus; }
+            |   ('-' - "-="){ value = Operator.unaryMinus; }
+            |   '!'{ value = Operator.not_; }
+            |   '~'{ value = Operator.neg; }
             ;
             
-        NewExpression(ParsingContext* ctx)
-            ::= keyword("new") NewPlacement(ctx)? TypeExpr(ctx) NewInitializer(ctx)?
+        NewExpression(ParsingContext* ctx) : NewExpressionNode*
+            ::= (keyword("new") NewPlacement(ctx)? NewTypeId(ctx) NewInitializer(ctx)?){ value = new NewExpressionNode(span, NewPlacement, NewTypeId, NewInitializer); }
             ;
             
-        NewPlacement(ParsingContext* ctx)
-            ::= '(' ExpressionList(ctx) ')'
+        NewPlacement(ParsingContext* ctx) : ExpressionListNode*
+            ::= ('(' ExpressionList(ctx) ')'){ value = ExpressionList; }
             ;
             
-        NewInitializer(ParsingContext* ctx)
-            ::= '(' PossiblyEmptyArgumentList(ctx):args ')'
+        NewTypeId(ParsingContext* ctx) : Node*
+            ::= TypeExpr(ctx):type{ value = type; } (NewDeclarator(ctx):size{ value = new ArrayTypeNode(span, type, size); })?
             ;
             
-        DeleteExpression(ParsingContext* ctx)
-            ::= keyword("delete") ('[' ']')? CastExpression(ctx)
+        NewDeclarator(ParsingContext* ctx) : Node* 
+            ::= '['{ ctx->BeginParsingArguments(); } Expression(ctx):size{ value = size; } ']'{ ctx->EndParsingArguments(); } / { ctx->EndParsingArguments(); }
             ;
             
-        PostfixExpression(ParsingContext* ctx)
-            ::= PrimaryExpression(ctx)
-                (   '['{ ctx->BeginParsingArguments(); } Expression(ctx):index ']'{ ctx->EndParsingArguments(); } / { ctx->EndParsingArguments(); }
-                |   '('{ ctx->BeginParsingArguments(); } PossiblyEmptyArgumentList(ctx):arguments ')'{ ctx->EndParsingArguments(); } / { ctx->EndParsingArguments(); }
-                |   ('.' - ".*") IdExpression(ctx):id1
-                |   ("->" - "->*") IdExpression(ctx):id2
-                |   "++"
-                |   "--"
+        NewInitializer(ParsingContext* ctx) : ExpressionListNode*
+            ::= ('(' PossiblyEmptyArgumentList(ctx):args ')'){ value = args; }
+            ;
+            
+        DeleteExpression(ParsingContext* ctx, var bool arrayDelete) : DeleteExpressionNode*
+            ::= (keyword("delete") ('[' ']'{ arrayDelete = true; })? CastExpression(ctx)){ value = new DeleteExpressionNode(span, CastExpression, arrayDelete); }
+            ;
+            
+        PostfixExpression(ParsingContext* ctx, var UniquePtr<Node> node) : Node*
+            ::= (PrimaryExpression(ctx){ node.Reset(PrimaryExpression); }
+                (   '['{ ctx->BeginParsingArguments(); } 
+                    Expression(ctx):subscript ']'{ node.Reset(new SubscriptExpressionNode(span, node.Release(), subscript)); ctx->EndParsingArguments(); } / { ctx->EndParsingArguments(); }
+                |   '('{ ctx->BeginParsingArguments(); } 
+                    PossiblyEmptyArgumentList(ctx):arguments ')'{ node.Reset(new InvokeExpressionNode(span, node.Release(), arguments)); ctx->EndParsingArguments(); } / { ctx->EndParsingArguments(); }
+                |   (('.' - ".*") IdExpression(ctx):id1){ node.Reset(new DotNode(span, node.Release(), id1)); }
+                |   (("->" - "->*") IdExpression(ctx):id2){ node.Reset(new ArrowNode(span, node.Release(), id2)); }
+                |   "++"{ node.Reset(new PostfixIncrementNode(span, node.Release())); }
+                |   "--"{ node.Reset(new PostfixDecrementNode(span, node.Release())); }
                 )*
+            )
+            {
+                value = node.Release();
+            }
             ;
             
-        PrimaryExpression(ParsingContext* ctx)
+        PrimaryExpression(ParsingContext* ctx) : Node*
             ::= Literal
             |   keyword("this")
             |   '(' Expression(ctx) ')'
             |   CppCastExpression(ctx)
             |   TypeIdExpression(ctx)
-            |   IdExpression(ctx)
             |   SimpleTypeSpecifier:s1 '(' PossiblyEmptyArgumentList(ctx):args ')'
-            |   SimpleTypeSpecifier:s2 BracedInitializerList(ctx)
+            |   SimpleTypeSpecifier:s2 BracedInitializerList(ctx):b1
+            |   TypeExpr(ctx):t1 '(' PossiblyEmptyArgumentList(ctx):typeExprArgs ')'
+            |   TypeExpr(ctx):t2 BracedInitializerList(ctx):b2
+            |   IdExpression(ctx)
+            |   LambdaExpression(ctx)
             ;
             
         CppCastExpression(ParsingContext* ctx)
@@ -199,69 +284,98 @@ namespace cppparser
             |   keyword("typeid") '(' Expression(ctx):e1 ')'
             ;
             
-        IdExpression(ParsingContext* ctx)
-            ::= QualifiedIdExpr(ctx)
-            |   UnqualifiedIdExpr(ctx)
+        IdExpression(ParsingContext* ctx) : Node*
+            ::= QualifiedIdExpr(ctx){ value = QualifiedIdExpr; }
+            |   UnqualifiedIdExpr(ctx){ value = UnqualifiedIdExpr; }
             ;
             
-        UnqualifiedIdExpr(ParsingContext* ctx)
-            ::= TemplateId(ctx)
-            |   Identifier:id1
-            |   OperatorFunctionId
-            |   ConversionFunctionId(ctx)
-            |   ('~' Identifier:id2)
+        UnqualifiedIdExpr(ParsingContext* ctx) : Node*
+            ::= TemplateId(ctx){ value = TemplateId; }
+            |   Identifier:id1{ value = id1; }
+            |   OperatorFunctionId{ value = OperatorFunctionId; }
+            |   ConversionFunctionId(ctx){ value = ConversionFunctionId; }
+            |   ('~' Identifier:id2){ value = new DestructorIdNode(span, id2); }
             ;
             
-        QualifiedIdExpr(ParsingContext* ctx)
-            ::= "::" TemplateId(ctx)
-            |   "::" NestedNameSpecifier(ctx):ns UnqualifiedIdExpr(ctx):ud1
-            |   "::" Identifier
-            |   "::" OperatorFunctionId
-            |   NestedNameSpecifier(ctx):ns2 UnqualifiedIdExpr(ctx):uid2
+        QualifiedIdExpr(ParsingContext* ctx) : Node*
+            ::= ("::" TemplateId(ctx)){ value = new ColonColonNode(span, null, TemplateId); }
+            |   ("::" NestedNameSpecifier(ctx):ns UnqualifiedIdExpr(ctx):ud1){ value = new ColonColonNode(span, null, new ColonColonNode(span, ns, ud1)); }
+            |   ("::" Identifier){ value = new ColonColonNode(span, null, Identifier); }
+            |   ("::" OperatorFunctionId){ value = new ColonColonNode(span, null, OperatorFunctionId); }
+            |   (NestedNameSpecifier(ctx):ns2 UnqualifiedIdExpr(ctx):uid2){ value = new ColonColonNode(span, ns2, uid2); }
             ;
             
-        OperatorFunctionId
-            ::= keyword("operator") Operator
+        OperatorFunctionId : OperatorFunctionIdNode*
+            ::= (keyword("operator") Operator){ value = new OperatorFunctionIdNode(span, Operator); }
             ;
             
-        Operator
-            ::= keyword("new") "[]"
-            |   keyword("delete") "[]"
-            |   keyword("new")
-            |   keyword("delete")
-            |   AssignmentOperator
-            |   "++"
-            |   "--"
-            |   "<<"
-            |   ">>"
-            |   "&&"
-            |   "||"
-            |   "=="
-            |   "!="
-            |   "<="
-            |   ">="
-            |   ".*"
-            |   "->*"
-            |   "->"
-            |   "()"
-            |   "[]"
-            |   '<'
-            |   '>'
-            |   '+'
-            |   '-'
-            |   '*'
-            |   '/'
-            |   '%'
-            |   '^'
-            |   '&'
-            |   '|'
-            |   '~'
-            |   '!'
-            |   ','
+        Operator : Operator
+            ::= (keyword("new") "[]"){ value = Operator.arrayNew; }
+            |   (keyword("delete") "[]"){ value = Operator.arrayDelete; }
+            |   keyword("new"){ value = Operator.new_; }
+            |   keyword("delete"){ value = Operator.delete_; }
+            |   AssignmentOperator{ value = AssignmentOperator; }
+            |   "++"{ value = Operator.inc; }
+            |   "--"{ value = Operator.dec; }
+            |   "<<"{ value = Operator.shiftLeft; }
+            |   ">>"{ value = Operator.shiftRight; }
+            |   "&&"{ value = Operator.logicalAnd; }
+            |   "||"{ value = Operator.logicalOr; }
+            |   "=="{ value = Operator.equal; }
+            |   "!="{ value = Operator.notEqual; }
+            |   "<="{ value = Operator.lessOrEqual; }
+            |   ">="{ value = Operator.greaterOrEqual; }
+            |   ".*"{ value = Operator.dotStar; }
+            |   "->*"{ value = Operator.arrowStar; }
+            |   "->"{ value = Operator.arrow; }
+            |   "()"{ value = Operator.apply; }
+            |   "[]"{ value = Operator.subscript; }
+            |   '<'{ value = Operator.less; }
+            |   '>'{ value = Operator.greater; }
+            |   '+'{ value = Operator.add; }
+            |   '-'{ value = Operator.sub; }
+            |   '*'{ value = Operator.mul; }
+            |   '/'{ value = Operator.div; }
+            |   '%'{ value = Operator.rem; }
+            |   '^'{ value = Operator.xor; }
+            |   '&'{ value = Operator.and_; }
+            |   '|'{ value = Operator.or_; }
+            |   '~'{ value = Operator.neg; }
+            |   '!'{ value = Operator.not_; }
+            |   ','{ value = Operator.comma; }
             ;
         
-        ConversionFunctionId(ParsingContext* ctx)
-            ::= keyword("operator") TypeExpr(ctx)
+        ConversionFunctionId(ParsingContext* ctx) : ConversionFunctionIdNode*
+            ::= (keyword("operator") TypeExpr(ctx)){ value = new ConversionFunctionIdNode(span, TypeExpr); }
             ;
+            
+        LambdaExpression(ParsingContext* ctx) : LambdaExpressionNode*
+            ::= '['{ value = new LambdaExpressionNode(span); } LambdaCaptures(value) ']'! (ParameterList(ctx){ value->SetParameters(ParameterList); })? 
+                (CompoundStatement(ctx){ value->SetBody(CompoundStatement); })!
+            ;
+            
+        LambdaCaptures(LambdaExpressionNode* lambdaExpression)
+            ::= (CaptureDefault{ lambdaExpression->AddCapture(CaptureDefault); })? Captures(lambdaExpression)?
+            ;
+            
+        CaptureDefault : Node*
+            ::= '='{ value = new AssignCapture(span); }
+            |   '&'{ value = new RefCapture(span); }
+            ;
+            
+        Captures(LambdaExpressionNode* lambdaExpression)
+            ::= Capture:left{ lambdaExpression->AddCapture(left); } (',' Capture:right{ lambdaExpression->AddCapture(right); })*
+            ;
+            
+        Capture : Node*
+            ::= Identifier{ value = new IdentifierCapture(span, Identifier); }
+            |   keyword("this"){ value = new ThisCapture(span); }
+            ;
+    }
+    
+    grammar ConstantExpressionGrammar
+    {
+        using ExpressionGrammar.ConstantExpression;
+        start ConstantExpression;
     }
 }

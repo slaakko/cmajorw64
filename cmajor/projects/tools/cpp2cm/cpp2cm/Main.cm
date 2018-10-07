@@ -78,6 +78,7 @@ int main(int argc, const char** argv)
             if (inputXmlFilePath.EndsWith(".xml"))
             {
                 string workXmlFilePath = MakeWorkXml(inputXmlFilePath);
+                Process(workXmlFilePath);
             }
             else
             {

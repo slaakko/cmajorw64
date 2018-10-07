@@ -1,4 +1,5 @@
 using System;
+using ast;
 
 namespace cppparser
 {
@@ -9,47 +10,47 @@ namespace cppparser
         using TypeExprGrammar.TypeExpr;
         using ExpressionGrammar.ConstantExpression;
         
-        EnumDeclaration(ParsingContext* ctx)
-            ::= EnumSpecifier(ctx) ';'
+        EnumDeclaration(ParsingContext* ctx) : EnumTypeNode*
+            ::= (EnumSpecifier(ctx) ';'){ value = EnumSpecifier; }
             ;
             
-        OpaqueEnumDeclaration(ParsingContext* ctx)
-            ::= EnumKey EnumName(ctx) EnumBase(ctx)? ';'
+        OpaqueEnumDeclaration(ParsingContext* ctx) : EnumTypeNode*
+            ::= (EnumKey EnumName(ctx) EnumBase(ctx)? ';'){ value = new EnumTypeNode(span, EnumKey, EnumName, EnumBase); }
             ;
             
-        EnumSpecifier(ParsingContext* ctx)
-            ::= EnumHead(ctx) '{' Enumerators(ctx) '}'
+        EnumSpecifier(ParsingContext* ctx) : EnumTypeNode*
+            ::= EnumHead(ctx){ value = EnumHead; } '{' Enumerators(ctx, value) '}'!
             ;
             
-        EnumHead(ParsingContext* ctx)
-            ::= EnumKey EnumName(ctx) EnumBase(ctx)?
+        EnumHead(ParsingContext* ctx) : EnumTypeNode*
+            ::= (EnumKey EnumName(ctx) EnumBase(ctx)?){ value = new EnumTypeNode(span, EnumKey, EnumName, EnumBase); }
             ;
             
-        EnumKey
-            ::= keyword("enum") keyword("class") 
-            |   keyword("enum") keyword("struct")
-            |   keyword("enum")
+        EnumKey : EnumKey
+            ::= (keyword("enum") keyword("class")){ value = EnumKey.enumClass; }
+            |   (keyword("enum") keyword("struct")){ value = EnumKey.enumStruct; }
+            |   keyword("enum"){ value = EnumKey.enum_; }
             ;
         
-        EnumName(ParsingContext* ctx)
-            ::= QualifiedId(ctx)
+        EnumName(ParsingContext* ctx) : Node*
+            ::= QualifiedId(ctx){ value = QualifiedId; }
             ;
             
-        EnumBase(ParsingContext* ctx)
-            ::= ':' TypeExpr(ctx)
+        EnumBase(ParsingContext* ctx) : Node*
+            ::= (':' TypeExpr(ctx)){ value = TypeExpr; }
             ;
             
-        Enumerators(ParsingContext* ctx)
-            ::= EnumeratorDefinition(ctx):left
-                (',' EnumeratorDefinition(ctx):right)*
+        Enumerators(ParsingContext* ctx, EnumTypeNode* enumType)
+            ::= EnumeratorDefinition(ctx):left{ enumType->AddNode(left); }
+                (',' EnumeratorDefinition(ctx):right{ enumType->AddNode(right); })*
             ;
             
-        EnumeratorDefinition(ParsingContext* ctx)
-            ::= Enumerator ('=' ConstantExpression(ctx))?
+        EnumeratorDefinition(ParsingContext* ctx) : EnumeratorNode*
+            ::= (Enumerator ('=' ConstantExpression(ctx))?){ value = new EnumeratorNode(span, Enumerator, ConstantExpression); }
             ;
             
-        Enumerator
-            ::= Identifier
+        Enumerator : IdentifierNode*
+            ::= Identifier{ value = Identifier; }
             ;
     }
 }

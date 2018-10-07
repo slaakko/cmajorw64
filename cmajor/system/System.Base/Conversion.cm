@@ -763,6 +763,37 @@ namespace System
         return 0u;
     }
     
+    public nothrow bool ParseOctal(const string& s, ulong& x)
+    {
+        x = 0u;
+        for (char c : s)
+        {
+            if (c >= '0' && c <= '7')
+            {
+                x = 8u * x + cast<ulong>(cast<int>(c) - cast<int>('0'));
+            }
+            else
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+    
+    public nothrow ulong ParseOctal(const string& s)
+    {
+        ulong x = 0u;
+        if (ParseOctal(s, x))
+        {
+            return x;
+        }
+        else
+        {
+            ThrowConversionException("cannot parse octal from string '" + s + "'");
+        }
+        return 0u;
+    }
+    
     public nothrow bool ParseDate(const string& dateStr, Date& date)
     {
         int dateEnd = 0;

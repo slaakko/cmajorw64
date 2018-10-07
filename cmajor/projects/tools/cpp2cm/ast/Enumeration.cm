@@ -1,0 +1,39 @@
+using System;
+using System.Collections;
+using Span = System.Text.Parsing.Span;
+
+namespace ast
+{
+    public enum EnumKey
+    {
+        enum_, enumClass, enumStruct
+    }
+    
+    public class EnumTypeNode : CompositeNode<EnumeratorNode>
+    {
+        public nothrow EnumTypeNode(const Span& span_, EnumKey enumKey_, Node* enumName_, Node* enumBase_) :
+            base(span_), enumKey(enumKey_), enumName(enumName_), enumBase(enumBase_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public EnumKey enumKey;
+        public UniquePtr<Node> enumName;
+        public UniquePtr<Node> enumBase;
+    }
+    
+    public class EnumeratorNode : Node
+    {
+        public nothrow EnumeratorNode(const Span& span_, IdentifierNode* id_, Node* value_) : base(span_), id(id_), value(value_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public UniquePtr<IdentifierNode> id;
+        public UniquePtr<Node> value;
+    }
+}

@@ -809,6 +809,7 @@ void Module::AddExportedFunction(const std::string& exportedFunction)
 
 void Module::AddExportedData(const std::string& data)
 {
+    std::lock_guard<std::recursive_mutex> lck(lock);
     exportedData.push_back(data);
 }
 
@@ -1146,7 +1147,7 @@ int Module::GetBuildTimeMs()
 }
 
 #ifdef _WIN32
-    _declspec(thread) Module* rootModule = nullptr;
+    __declspec(thread) Module* rootModule = nullptr;
 #else
     __thread Module* rootModule = nullptr;
 #endif

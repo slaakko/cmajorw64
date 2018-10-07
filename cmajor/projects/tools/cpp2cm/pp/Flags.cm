@@ -1,0 +1,35 @@
+using System;
+
+namespace pp
+{
+    public static class Flags
+    {
+        public static nothrow bool Debug()
+        {
+            return debug;
+        }
+        public nothrow static void SetDebug()
+        {
+            debug = true;
+        }
+        public static nothrow bool Diagnostics() 
+        {
+            return diagnostics;
+        }
+        public static nothrow void SetDiagnostics()
+        {
+            diagnostics = true;
+        }
+        public static nothrow bool Verbose() 
+        {
+            return verbose;
+        }
+        public static nothrow void SetVerbose()
+        {
+            verbose = true;
+        }
+        private static bool debug;
+        private static bool diagnostics;
+        private static bool verbose;
+    }
+}

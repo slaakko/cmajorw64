@@ -1,5 +1,8 @@
 solution cpp2cm;
+project <ast/ast.cmp>;
+project <cpp/cpp.cmp>;
 project <cpp2cm/cpp2cm.cmp>;
 project <cppp/cppp.cmp>;
 project <cppparser/cppparser.cmp>;
-activeProject cppp;
+project <pp/pp.cmp>;
+activeProject cpp;

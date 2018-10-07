@@ -1,0 +1,89 @@
+using System;
+using System.IO;
+using System.Collections;
+using System.Dom;
+using pp;
+
+int main(int argc, const char** argv)
+{
+    try
+    {
+        string xmlFilePath = "pp.xml";
+        List<string> sourceFilePaths;
+        for (int i = 1; i < argc; ++i)
+        {
+            string arg = argv[i];
+            if (arg.StartsWith("-"))
+            {
+                if (arg == "--debug" || arg == "-d")
+                {
+                    Flags.SetDebug();
+                }
+                if (arg == "--diagnostics" || arg == "-i")
+                {
+                    Flags.SetDiagnostics();
+                }
+                else if (arg == "--verbose" || arg == "-v")
+                {
+                    Flags.SetVerbose();
+                }
+                else if (arg.Find('=') != -1)
+                {
+                    List<string> components = arg.Split('=');
+                    if (components.Count() == 2)
+                    {
+                        if (components[0] == "--defs" || components[0] == "-e")
+                        {
+                            xmlFilePath = components[1];
+                        }
+                        else
+                        {
+                            throw Exception("unknown argument '" + arg + "'");
+                        }
+                    }
+                    else
+                    {
+                        throw Exception("unknown argument '" + arg + "'");
+                    }
+                }
+            }
+            else
+            {
+                sourceFilePaths.Add(arg);
+            }
+        }
+        if (sourceFilePaths.IsEmpty())
+        {
+            throw Exception("no source files given");
+        }
+        if (File.Exists(xmlFilePath))
+        {
+            UniquePtr<DomDocument> ppDoc = ParseXmlFileToDomDocument(xmlFilePath);
+            for (const string& sourceFilePath : sourceFilePaths)
+            {
+                if (Flags.Verbose())
+                {
+                    Console.Out() << "> " << sourceFilePath << endl();
+                }
+                List<PPFile> ppFiles = Preprocess(sourceFilePath, ppDoc->DocumentElement());
+                for (const PPFile& ppFile : ppFiles)
+                {
+                    if (Flags.Verbose())
+                    {
+                        Console.Out() << "=> " << ppFile.filePath << endl();
+                    }
+                    Console.Out() << ppFile.content << endl();
+                }
+            }            
+        }
+        else
+        {
+            throw Exception("preprocessing definition file path '" + xmlFilePath + "' not found");
+        }
+    }
+    catch (const Exception& ex)
+    {
+        Console.Error() << ex.ToString() << endl();
+    }
+    return 0; 
+}

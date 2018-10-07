@@ -96,5 +96,32 @@ namespace System.IO
             }
             return lines;
         }
+        public static void Remove(const string& filePath)
+        {
+            if (Exists(filePath))
+            {
+                int result = RtRemoveFile(filePath.Chars());
+                if ( result < 0)
+                {
+                    string errorMessage = RtGetError(result);
+                    RtDisposeError(result);
+                    throw FileSystemException("could not remove file '" + filePath + "': " + errorMessage);
+                }
+            }            
+            else
+            {
+                throw FileSystemException("could not remove file '" + filePath + "': file not found");
+            }
+        }
+        public static void Copy(const string& sourceFilePath, const string& targetFilePath)
+        {
+            int result = RtCopyFile(sourceFilePath.Chars(), targetFilePath.Chars());
+            if ( result < 0)
+            {
+                string errorMessage = RtGetError(result);
+                RtDisposeError(result);
+                throw FileSystemException("could not copy file '" + sourceFilePath + "' to file '" + targetFilePath + "': " + errorMessage);
+            }
+        }
     }
 }

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rules>
+    <type source="bool" target="bool"/>
+    <type source="char" target="char"/>
+    <type source="signed char" target="char"/>
+    <type source="wchar_t" target="wchar"/>
+    <type source="char16_t" target="wchar"/>
+    <type source="char32_t" target="uchar"/>
+    <type source="unsigned char" target="byte"/>
+    <type source="short int?" target="short"/>
+    <type source="unsigned short int?" target="ushort"/>
+    <type source="int" target="int"/>
+    <type source="unsigned int?" target="uint"/>
+    <type source="long" target="int"/>
+    <type source="unsigned long int?" target="uint"/>
+    <type source="long long" target="long"/>
+    <type source="unsigned long long" target="ulong"/>
+    <type source="int8_t" sns="std" target="sbyte"/>
+    <type source="uint8_t" sns="std" target="byte"/>
+    <type source="int16_t" sns="std" target="short"/>
+    <type source="uint16_t" sns="std" target="ushort"/>
+    <type source="int32_t" sns="std" target="int"/>
+    <type source="uint32_t" sns="std" target="uint"/>
+    <type source="int64_t" sns="std" target="long"/>
+    <type source="uint64_t" sns="std" target="ulong"/>
+</rules>

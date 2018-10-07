@@ -1,5 +1,5 @@
-#ifndef StdLib_hpp_5529
-#define StdLib_hpp_5529
+#ifndef StdLib_hpp_5649
+#define StdLib_hpp_5649
 
 #include <cmajor/parsing/Grammar.hpp>
 #include <cmajor/parsing/Keyword.hpp>
@@ -36,4 +36,4 @@ private:
 
 } } // namespace cmajor.parsing
 
-#endif // StdLib_hpp_5529
+#endif // StdLib_hpp_5649

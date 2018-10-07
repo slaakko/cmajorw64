@@ -1,0 +1,482 @@
+using System;
+using System.IO;
+using System.Collections;
+using System.Dom;
+using System.XPath;
+
+namespace pp
+{
+    public static class PPFileParser
+    {
+        static PPFileParser() : 
+            ppFileGrammar(new PPFileGrammar()), 
+            nonemptyTokenLineGrammar(new PPNonemptyTokenLineGrammar(ppFileGrammar->Domain())), 
+            possiblyEmptyTokenLineGrammar(new PPPossiblyEmptyTokenLineGrammar(ppFileGrammar->Domain())),
+            constantExpressionGrammar(new cppparser.ConstantExpressionGrammar()),
+            macroReplacementGrammar(new PPMacroReplacementGrammar(ppFileGrammar->Domain()))
+        {
+            if (Flags.Debug())
+            {
+                ppFileGrammar->SetLog(&Console.Out());
+                nonemptyTokenLineGrammar->SetLog(&Console.Out());
+                possiblyEmptyTokenLineGrammar->SetLog(&Console.Out());
+                constantExpressionGrammar->SetLog(&Console.Out());
+                macroReplacementGrammar->SetLog(&Console.Out());
+            }
+        }
+        public nothrow static PPFileGrammar* GetPPFileGrammar()
+        {
+            return ppFileGrammar;
+        }
+        public nothrow static PPNonemptyTokenLineGrammar* GetNonemptyTokenLineGrammar()
+        {
+            return nonemptyTokenLineGrammar;
+        }
+        public nothrow static PPPossiblyEmptyTokenLineGrammar* GetPossiblyEmptyTokenLineGrammar()
+        {
+            return possiblyEmptyTokenLineGrammar;
+        }
+        public nothrow static cppparser.ConstantExpressionGrammar* GetConstantExpressionGrammar()
+        {
+            return constantExpressionGrammar;
+        }
+        public nothrow static PPMacroReplacementGrammar* GetMacroReplacementGrammar()
+        {
+            return macroReplacementGrammar;
+        }
+        private static PPFileGrammar* ppFileGrammar;
+        private static PPNonemptyTokenLineGrammar* nonemptyTokenLineGrammar;
+        private static PPPossiblyEmptyTokenLineGrammar* possiblyEmptyTokenLineGrammar;
+        private static cppparser.ConstantExpressionGrammar* constantExpressionGrammar;
+        private static PPMacroReplacementGrammar* macroReplacementGrammar;
+    }
+    
+    public enum PPTokenFlags
+    {
+        none = 0, acceptHeaderName = 1 << 0, acceptFunctionMacroInvocaction = 1 << 1, dontAcceptCommaOrRightParen = 1 << 2, macroArgumentReplacement = 1 << 3
+    }
+    
+    public class Macro
+    {
+        public nothrow Macro(const ustring& name_) : name(name_)
+        {
+        }
+        public default virtual ~Macro();
+        public ustring name;
+    }
+    
+    public class ObjectMacro : Macro
+    {
+        public nothrow ObjectMacro(const ustring& name_, const ustring& replacementList_) : base(name_), replacementList(replacementList_)
+        {
+        }
+        public ustring replacementList;
+    }
+    
+    public class FunctionMacro : Macro
+    {
+        public nothrow FunctionMacro(const ustring& name_, const List<ustring>& params_, const ustring& replacementList_) : base(name_), params(params_), replacementList(replacementList_)
+        {
+        }
+        public List<ustring> params;
+        public ustring replacementList;
+    }
+        
+    public class PPFile
+    {
+        public nothrow PPFile(const string& filePath_) : filePath(filePath_)
+        {
+        }
+        public string filePath;
+        public ustring content;
+    }
+    
+    public class PP
+    {
+        public nothrow PP()
+        {
+        }
+        public void Define(const ustring& macroName, const ustring& replacementList)
+        {
+            if (Flags.Diagnostics())
+            {
+                Console.Out() << "> define object macro: [" << macroName << "]=[" << replacementList << "]" << endl();
+            }
+            ObjectMacro* macro = new ObjectMacro(macroName, replacementList);
+            macros.Add(UniquePtr<Macro>(macro));
+            macroMap[macroName] = macro;
+        }
+        public void Define(const ustring& macroName, const List<ustring>& macroParams, const ustring& replacementList)
+        {
+            if (Flags.Diagnostics())
+            {
+                ustring params;
+                bool first = true;
+                for (const ustring& param : macroParams)
+                {
+                    if (first)
+                    {
+                        first = false;
+                    }
+                    else
+                    {
+                        params.Append(u", ");
+                    }
+                    params.Append(param);
+                }
+                Console.Out() << "> define function macro: [" << macroName << "(" << params << ")]=[" << replacementList << "]" << endl();
+            }
+            FunctionMacro* macro = new FunctionMacro(macroName, macroParams, replacementList);
+            macros.Add(UniquePtr<Macro>(macro));
+            macroMap[macroName] = macro;
+        }
+        public void Undefine(const ustring& macroName)
+        {
+            if (Flags.Diagnostics())
+            {
+                Console.Out() << "> undefine macro: [" << macroName << "]" << endl();
+            }
+            macroMap.Remove(macroName);
+        }
+        public nothrow bool Defined(const ustring& macroName)
+        {
+            HashMap<ustring, Macro*>.ConstIterator it = macroMap.CFind(macroName);
+            if (Flags.Diagnostics())
+            {
+                Console.Out() << "> macro defined: [" << macroName << "]=" << ToString(it != macroMap.CEnd()) << endl();
+            }
+            return it != macroMap.CEnd();
+        }
+        public string ResolveHeaderFilePath(const string& headerName)
+        {
+            for (const string& includeDirectory : includeDirectories)
+            {
+                string headerFilePath = Path.Combine(includeDirectory, headerName);
+                if (File.Exists(headerFilePath))
+                {
+                    if (Flags.Diagnostics())
+                    {
+                        Console.Out() << "> header: [" << headerName << "] resolved to " << headerFilePath << endl();
+                    }
+                    return headerFilePath;
+                }
+            }
+            if (Flags.Diagnostics())
+            {
+                Console.Out() << "> header: [" << headerName << "] not resolved" << endl();
+            }
+            return string();
+        }
+        public ustring SubstituteObjectMacro(const ustring& identifier, bool& substituted)
+        {
+            ustring replacement;
+            HashMap<ustring, Macro*>.ConstIterator it = macroMap.CFind(identifier);
+            if (it != macroMap.CEnd())
+            {
+                Macro* macro = it->second;
+                if (macro is ObjectMacro*)
+                {
+                    ObjectMacro* objetMacro = cast<ObjectMacro*>(macro);
+                    replacement = objetMacro->replacementList;
+                    if (Flags.Diagnostics())
+                    {
+                        Console.Out() << "> object macro: [" << identifier << "] substituted with [" << replacement << "]" << endl();
+                    }
+                }
+                substituted = true;
+                return replacement;
+            }
+            else
+            {
+                return identifier;
+            }
+        }
+        public FunctionMacro* GetFunctionMacro(const ustring& identifier)
+        {
+            HashMap<ustring, Macro*>.ConstIterator it = macroMap.CFind(identifier);
+            if (it != macroMap.CEnd())
+            {
+                Macro* macro = it->second;
+                if (macro is FunctionMacro*)
+                {
+                    if (Flags.Diagnostics())
+                    {
+                        Console.Out() << "> get function macro: [" << identifier << "]" << endl();
+                    }
+                    return cast<FunctionMacro*>(it->second);
+                }
+            }
+            return null;
+        }
+        public void PushFunctionMacro(FunctionMacro* macro, List<ustring>* args)
+        {
+            if (Flags.Diagnostics())
+            {
+                Console.Out() << "> push function macro: [" << macro->name << "]" << endl();
+            }
+            if (macro->params.Count() != args->Count())
+            {
+                throw Exception("function macro '" + ToUtf8(macro->name) + "' takes " + ToString(macro->params.Count()) + " parameters, " + ToString(args->Count()) + " argument supplied");
+            }
+            functionMacroStack.Push(currentFunctionMacro);
+            argsStack.Push(currentArgs);
+            currentFunctionMacro = macro;
+            currentArgs = args;
+        }
+        public void PopFunctionMacro()
+        {
+            if (Flags.Diagnostics())
+            {
+                Console.Out() << "> pop function macro: [" << currentFunctionMacro->name << "]" << endl();
+            }
+            currentFunctionMacro = functionMacroStack.Pop();
+            currentArgs = argsStack.Pop();
+        }
+        public ustring SubstituteMacroArgument(const ustring& identifier)
+        {
+            for (int i = 0; i < currentFunctionMacro->params.Count(); ++i)
+            {
+                if (identifier == currentFunctionMacro->params[i])
+                {
+                    if (Flags.Diagnostics())
+                    {
+                        Console.Out() << "> substituting macro argument: [" << identifier << "] with [" << (*currentArgs)[i] << "]" << endl();
+                    }
+                    return (*currentArgs)[i];
+                }
+            }
+            return identifier;
+        }
+        public List<UniquePtr<Macro>> macros;
+        public HashMap<ustring, Macro*> macroMap;
+        public FunctionMacro* currentFunctionMacro;
+        public Stack<FunctionMacro*> functionMacroStack;
+        public List<ustring>* currentArgs;
+        public Stack<List<ustring>*> argsStack;
+        public List<string> includeDirectories;
+        public List<PPFile> files;
+    }
+    
+    public ustring CombineLines(const ustring& sourceFileContent)
+    {
+        if (Flags.Diagnostics())
+        {
+            Console.Out() << "> combine lines: [" << sourceFileContent << "]" << endl();
+        }
+        ustring result;
+        int state = 0;
+        int numLinesCombined = 0;
+        for (uchar c : sourceFileContent)
+        {
+            switch (state)
+            {
+                case 0:
+                {
+                    if (c == '\\')
+                    {
+                        state = 1;
+                    }
+                    else if (c == '\n')
+                    {
+                        for (int i = 0; i < numLinesCombined; ++i)
+                        {
+                            result.Append('\n');
+                        }
+                        result.Append('\n');
+                        numLinesCombined = 0;
+                    }
+                    else if (c != '\r')
+                    {
+                        result.Append(c);
+                    }
+                    break;
+                }
+                case 1:
+                {
+                    if (c == '\n')
+                    {
+                        ++numLinesCombined;
+                        state = 0;
+                    }
+                    else if (c != '\r')
+                    {
+                        result.Append('\\').Append(c);
+                        state = 0;
+                    }
+                    break;
+                }
+            }
+        }
+        if (Flags.Diagnostics())
+        {
+            Console.Out() << "< combine lines: [" << result << "]" << endl();
+        }
+        return result;
+    }
+    
+    public ustring StripComments(const ustring& sourceFileContent)
+    {
+        if (Flags.Diagnostics())
+        {
+            Console.Out() << "> strip comments: [" << sourceFileContent << "]" << endl();
+        }
+        ustring result;
+        int state = 0;
+        for (uchar c : sourceFileContent)
+        {
+            switch (state)
+            {
+                case 0:
+                {
+                    if (c == '/')
+                    {
+                        state = 1;
+                    }
+                    else
+                    {
+                        result.Append(c);
+                    }
+                    break;
+                }
+                case 1:
+                {
+                    if (c == '/')
+                    {
+                        state = 2;
+                    }
+                    else if (c == '*')
+                    {
+                        state = 3;
+                    }
+                    else
+                    {
+                        result.Append('/').Append(c);
+                        state = 0;
+                    }
+                    break;
+                }
+                case 2:
+                {
+                    if (c == '\n')
+                    {
+                        result.Append('\n');
+                        state = 0;
+                    }
+                    break;
+                }
+                case 3:
+                {
+                    if (c == '*')
+                    {
+                        state = 4;
+                    }
+                    else if (c == '\n')
+                    {
+                        result.Append('\n');
+                    }
+                    break;
+                }
+                case 4:
+                {
+                    if (c == '/')
+                    {
+                        result.Append(' ');
+                        state = 0;
+                    }
+                    else if (c == '\n')
+                    {
+                        result.Append('\n');
+                        state = 3;
+                    }
+                    else if (c != '*')
+                    {
+                        state = 3;
+                    }
+                    break;
+                }
+            }
+        }
+        if (Flags.Diagnostics())
+        {
+            Console.Out() << "< strip comments: [" << result << "]" << endl();
+        }
+        return result;
+    }
+
+    public void Preprocess(PP& pp, const string& filePath)
+    { 
+        PPFile ppFile(filePath);
+        ustring content = ToUtf32(File.ReadAllText(filePath));
+        content = CombineLines(content);
+        content = StripComments(content);
+        PPFileParser.GetPPFileGrammar()->Parse(content.Chars(), content.Chars() + content.Length(), 0, "", &pp, &ppFile.content);
+        pp.files.Add(Rvalue(ppFile));
+    }
+    
+    public bool Evaluate(PP& pp, ast.Node* expr)
+    {
+        return true;
+    }
+    
+    public bool EvaluateConstantExpression(const ustring& constantExpressionText, PP* pp)
+    {
+        cppparser.ParsingContext ctx;
+        cppparser.ConstantExpressionGrammar* constantExpressionGrammar = PPFileParser.GetConstantExpressionGrammar();
+        UniquePtr<ast.Node> node(constantExpressionGrammar->Parse(constantExpressionText.Chars(), constantExpressionText.Chars() + constantExpressionText.Length(), 0, "", &ctx));
+        return true;
+    }
+    
+    public List<PPFile> Preprocess(const string& sourceFilePath, DomElement* ppDefs)
+    {
+        PP pp;
+        UniquePtr<XPathObject> includes = Evaluate(u"include", ppDefs);
+        XPathNodeSet* includeNodeSet = includes.Get() as XPathNodeSet*;
+        if (includeNodeSet != null)
+        {
+            long n = includeNodeSet->Length();
+            for (long i = 0; i < n; ++i)
+            {
+                DomNode* includeNode = (*includeNodeSet)[i];
+                DomElement* includeElement = includeNode as DomElement*;
+                ustring includeDir = includeElement->GetAttribute(u"dir");
+                pp.includeDirectories.Add(ToUtf8(includeDir));
+            }
+        }
+        UniquePtr<XPathObject> defines = Evaluate(u"define", ppDefs);
+        XPathNodeSet* defineNodeSet = defines.Get() as XPathNodeSet*;
+        if (defineNodeSet != null)
+        {
+            long n = defineNodeSet->Length();
+            for (long i = 0; i < n; ++i)
+            {
+                DomNode* defineNode = (*defineNodeSet)[i];
+                DomElement* defineElement = defineNode as DomElement*;
+                ustring macroName = defineElement->GetAttribute(u"name");
+                ustring replacement = defineElement->GetAttribute(u"replacement");
+                pp.Define(macroName, replacement);
+            }
+        }
+        Preprocess(pp, sourceFilePath);
+        return Rvalue(pp.files);
+    }
+    
+    public ustring ParseNonemptyTokenLine(bool process, const ustring& text, PP* pp, PPTokenFlags flags)
+    {
+        ustring result;
+        PPFileParser.GetNonemptyTokenLineGrammar()->Parse(text.Chars(), text.Chars() + text.Length(), 0, "", process, &result, pp, flags);
+        return result;
+    }
+    
+    public ustring ParsePossiblyEmptyTokenLine(bool process, const ustring& text, PP* pp, PPTokenFlags flags)
+    {
+        ustring result;
+        PPFileParser.GetPossiblyEmptyTokenLineGrammar()->Parse(text.Chars(), text.Chars() + text.Length(), 0, "", process, &result, pp, flags);
+        return result;
+    }
+    
+    public ustring DoFunctionMacroReplacement(FunctionMacro* macro, List<ustring>* args, PP* pp, PPTokenFlags flags)
+    {
+        const ustring& macroText = macro->replacementList;
+        return PPFileParser.GetMacroReplacementGrammar()->Parse(macroText.Chars(), macroText.Chars() + macroText.Length(), 0, "", macro, args, pp, flags); 
+    }
+}

@@ -1,4 +1,5 @@
 using System;
+using ast;
 
 namespace cppparser
 {
@@ -8,33 +9,37 @@ namespace cppparser
         using ClassGrammar.ClassKey;
         using IdentifierGrammar.QualifiedId;
 
-        TypeExpr(ParsingContext* ctx)
-            ::= PrefixTypeExpr(ctx)
+        TypeExpr(ParsingContext* ctx) : Node*
+            ::= PrefixTypeExpr(ctx){ value = PrefixTypeExpr; }
+            ;
+            
+        CVSpecifierSequence : CVSpecifiers
+            ::= keyword("const"){ value = value | CVSpecifiers.const_; }
+            |   keyword("volatile"){ value = value | CVSpecifiers.volatile; }
             ;
 
-        PrefixTypeExpr(ParsingContext* ctx)
-            ::= CVSpecifierSequence PostfixTypeExpr(ctx)
+        PrefixTypeExpr(ParsingContext* ctx) : Node*
+            ::= keyword("const") keyword("volatile") PostfixTypeExpr(ctx):pf1{ value = new ConstNode(span, new VolatileNode(span, pf1)); }
+            |   keyword("volatile") keyword("const") PostfixTypeExpr(ctx):pf2{ value = new VolatileNode(span, new ConstNode(span, pf2)); }
+            |   keyword("const") PostfixTypeExpr(ctx):pf3{ value = new ConstNode(span, pf3); }
+            |   keyword("volatile") PostfixTypeExpr(ctx):pf4{ value = new VolatileNode(span, pf4); }
+            |   PostfixTypeExpr(ctx):pf5{ value = pf5; }
             ;
 
-        CVSpecifierSequence
-            ::= CVSpecifier*
+        PostfixTypeExpr(ParsingContext* ctx, var UniquePtr<Node> node) : Node*
+            ::= (PrimaryTypeExpr(ctx){ node.Reset(PrimaryTypeExpr); }
+                (   '*'{ node.Reset(new PointerNode(span, node.Release())); }
+                |   "&&"{ node.Reset(new RvalueRefNode(span, node.Release())); }
+                |   '&'{ node.Reset(new LvalueRefNode(span, node.Release())); }
+                )*
+            )
+            {
+                value = node.Release();
+            }
             ;
 
-        CVSpecifier
-            ::= keyword("const")
-            |   keyword("volatile")
-            ;
-
-        PostfixTypeExpr(ParsingContext* ctx)
-            ::= PrimaryTypeExpr(ctx)
-            (   '*'
-            |   "&&"
-            |   '&'
-            )*
-            ;
-
-        PrimaryTypeExpr(ParsingContext* ctx)
-            ::= SimpleType
+        PrimaryTypeExpr(ParsingContext* ctx) : Node*
+            ::= SimpleType{ value = SimpleType; }
             |   (keyword("typename") | ClassKey?) QualifiedId(ctx)
             ;
     }

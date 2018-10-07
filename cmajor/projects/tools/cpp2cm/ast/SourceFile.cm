@@ -1,0 +1,18 @@
+using System;
+using System.Collections;
+using Span = System.Text.Parsing.Span;
+
+namespace ast
+{
+    public class SourceFileNode : CompositeNode<Node>
+    {
+        public nothrow SourceFileNode(const Span& span_) : base(span_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+    }
+}
+

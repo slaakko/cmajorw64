@@ -1,0 +1,66 @@
+using System;
+using System.Collections;
+using Span = System.Text.Parsing.Span;
+
+namespace ast
+{
+    public concept NodeType<T>
+    {
+        where Same<T, Node> or Derived<T, Node>;
+    }
+    
+    public abstract class Node
+    {
+        public nothrow Node(const Span& span_) : span(span_)
+        {
+        }
+        public virtual default ~Node();
+        public abstract void Accept(Visitor& visitor);
+        public Span span;
+        public Node* parent;
+    }
+    
+    public abstract class UnaryNode : Node
+    {
+        public nothrow UnaryNode(const Span& span_, Node* child_) : base(span_), child(child_)
+        {
+            child->parent = this;
+        }
+        public UniquePtr<Node> child;
+    }
+    
+    public abstract class BinaryNode : Node
+    {
+        public nothrow BinaryNode(const Span& span_, Node* left_, Node* right_) : base(span_), left(left_), right(right_)
+        {
+            left->parent = this;
+            right->parent = this;
+        }
+        public UniquePtr<Node> left;
+        public UniquePtr<Node> right;
+    }
+    
+    public abstract class CompositeNode<NodeT> : Node where NodeT is NodeType 
+    {
+        public nothrow CompositeNode(const Span& span_) : base(span_)
+        {
+        }
+        public void AddNode(NodeT* node)
+        {
+            node->parent = this;
+            nodes.Add(UniquePtr<NodeT>(node));
+        }
+        public List<UniquePtr<NodeT>> nodes;
+    }
+    
+    public class OptionalNode : UnaryNode
+    {
+        public nothrow OptionalNode(const Span& span_, Node* child_) : base(span_, child_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+    }
+}

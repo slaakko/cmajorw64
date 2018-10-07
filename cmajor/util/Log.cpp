@@ -81,7 +81,7 @@ std::string logMessage;
 int WaitForLogMessage()
 {
     std::unique_lock<std::mutex> lock(logMutex);
-    messageEnqueuedOrEndLog.wait(lock, [] { return !log.empty() || endLog; });
+    messageEnqueuedOrEndLog.wait(lock, []{ return !log.empty() || endLog; });
     if (!log.empty())
     {
         logMessage = log.front();
