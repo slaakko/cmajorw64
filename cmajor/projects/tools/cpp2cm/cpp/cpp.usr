@@ -3,7 +3,7 @@
     <configurations>
         <configuration>
             <name>debug</name>
-            <commandLineArguments>--debug --diagnostics file.cpp</commandLineArguments>
+            <commandLineArguments>--verbose file.cpp</commandLineArguments>
             <conditionalCompilationSymbols />
         </configuration>
         <configuration>

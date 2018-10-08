@@ -16,11 +16,11 @@ void PrintHelp()
         "Parses given C++ source files." << endl() <<
         "Options:" << endl() <<
         "--help (-h)" << endl() <<
-        "   Print help" << endl() <<
+        "   Print help." << endl() <<
         "--verbose (-v)" << endl() <<
-        "   Be verbose" << endl() <<
+        "   Be verbose." << endl() <<
         "--debug (-d)" << endl() <<
-        "   Debug parsing and generate XML debug output" << endl();
+        "   Debug parsing and generate XML debug output." << endl();
 }
 
 int main(int argc, const char** argv)

@@ -511,16 +511,16 @@ namespace cppparser
                 grammar0 = new cppparser.ClassGrammar(pd);
             }
             AddGrammarReference(grammar0);
-            Grammar* grammar1 = pd->GetGrammar(ToUtf32("cppparser.IdentifierGrammar"));
+            Grammar* grammar1 = pd->GetGrammar(ToUtf32("cppparser.SimpleTypeGrammar"));
             if (grammar1 == null)
             {
-                grammar1 = new cppparser.IdentifierGrammar(pd);
+                grammar1 = new cppparser.SimpleTypeGrammar(pd);
             }
             AddGrammarReference(grammar1);
-            Grammar* grammar2 = pd->GetGrammar(ToUtf32("cppparser.SimpleTypeGrammar"));
+            Grammar* grammar2 = pd->GetGrammar(ToUtf32("cppparser.IdentifierGrammar"));
             if (grammar2 == null)
             {
-                grammar2 = new cppparser.SimpleTypeGrammar(pd);
+                grammar2 = new cppparser.IdentifierGrammar(pd);
             }
             AddGrammarReference(grammar2);
         }

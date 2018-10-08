@@ -3,24 +3,31 @@ using System.IO;
 using System.Collections;
 using System.Dom;
 using System.XPath;
+using Span = System.Text.Parsing.Span;
 
 namespace pp
 {
+    public class PreprocessingException : Exception
+    {
+        public nothrow PreprocessingException(const string& message_) : base(message_)
+        {
+        }
+    }
+    
     public static class PPFileParser
     {
         static PPFileParser() : 
             ppFileGrammar(new PPFileGrammar()), 
             nonemptyTokenLineGrammar(new PPNonemptyTokenLineGrammar(ppFileGrammar->Domain())), 
             possiblyEmptyTokenLineGrammar(new PPPossiblyEmptyTokenLineGrammar(ppFileGrammar->Domain())),
-            constantExpressionGrammar(new cppparser.ConstantExpressionGrammar()),
-            macroReplacementGrammar(new PPMacroReplacementGrammar(ppFileGrammar->Domain()))
+            macroReplacementGrammar(new PPMacroReplacementGrammar(ppFileGrammar->Domain())),
+            constantExpressionGrammar(new cppparser.ConstantExpressionGrammar())
         {
             if (Flags.Debug())
             {
                 ppFileGrammar->SetLog(&Console.Out());
                 nonemptyTokenLineGrammar->SetLog(&Console.Out());
                 possiblyEmptyTokenLineGrammar->SetLog(&Console.Out());
-                constantExpressionGrammar->SetLog(&Console.Out());
                 macroReplacementGrammar->SetLog(&Console.Out());
             }
         }
@@ -36,19 +43,19 @@ namespace pp
         {
             return possiblyEmptyTokenLineGrammar;
         }
-        public nothrow static cppparser.ConstantExpressionGrammar* GetConstantExpressionGrammar()
-        {
-            return constantExpressionGrammar;
-        }
         public nothrow static PPMacroReplacementGrammar* GetMacroReplacementGrammar()
         {
             return macroReplacementGrammar;
         }
+        public nothrow static cppparser.ConstantExpressionGrammar* GetConstantExpressionGrammar()
+        {
+            return constantExpressionGrammar;
+        }
         private static PPFileGrammar* ppFileGrammar;
         private static PPNonemptyTokenLineGrammar* nonemptyTokenLineGrammar;
         private static PPPossiblyEmptyTokenLineGrammar* possiblyEmptyTokenLineGrammar;
-        private static cppparser.ConstantExpressionGrammar* constantExpressionGrammar;
         private static PPMacroReplacementGrammar* macroReplacementGrammar;
+        private static cppparser.ConstantExpressionGrammar* constantExpressionGrammar;
     }
     
     public enum PPTokenFlags
@@ -58,16 +65,17 @@ namespace pp
     
     public class Macro
     {
-        public nothrow Macro(const ustring& name_) : name(name_)
+        public nothrow Macro(const ustring& name_, bool predefined_) : name(name_), predefined(predefined_)
         {
         }
         public default virtual ~Macro();
+        public bool predefined;
         public ustring name;
     }
     
     public class ObjectMacro : Macro
     {
-        public nothrow ObjectMacro(const ustring& name_, const ustring& replacementList_) : base(name_), replacementList(replacementList_)
+        public nothrow ObjectMacro(const ustring& name_, const ustring& replacementList_, bool predefined_) : base(name_, predefined_), replacementList(replacementList_)
         {
         }
         public ustring replacementList;
@@ -75,7 +83,7 @@ namespace pp
     
     public class FunctionMacro : Macro
     {
-        public nothrow FunctionMacro(const ustring& name_, const List<ustring>& params_, const ustring& replacementList_) : base(name_), params(params_), replacementList(replacementList_)
+        public nothrow FunctionMacro(const ustring& name_, const List<ustring>& params_, const ustring& replacementList_) : base(name_, false), params(params_), replacementList(replacementList_)
         {
         }
         public List<ustring> params;
@@ -96,18 +104,31 @@ namespace pp
         public nothrow PP()
         {
         }
-        public void Define(const ustring& macroName, const ustring& replacementList)
+        public void Define(const ustring& macroName, const ustring& replacementList, bool predefined)
         {
+            HashMap<ustring, Macro*>.ConstIterator it = macroMap.CFind(macroName);
+            if (it != macroMap.CEnd())
+            {
+                Macro* macro = it->second;
+                if (macro->predefined)
+                {
+                    throw PreprocessingException("macro '" + ToUtf8(macroName) + "' is predefined");
+                }
+            }
             if (Flags.Diagnostics())
             {
                 Console.Out() << "> define object macro: [" << macroName << "]=[" << replacementList << "]" << endl();
             }
-            ObjectMacro* macro = new ObjectMacro(macroName, replacementList);
+            ObjectMacro* macro = new ObjectMacro(macroName, replacementList, predefined);
             macros.Add(UniquePtr<Macro>(macro));
             macroMap[macroName] = macro;
         }
-        public void Define(const ustring& macroName, const List<ustring>& macroParams, const ustring& replacementList)
+        public void Define(const ustring& macroName, const List<ustring>& macroParams, const ustring& replacementList, const Span& span)
         {
+            if (replacementList.Find('#') != -1)
+            {
+                throw PreprocessingException("# and ## in funcion macros not supported (macro name='" + ToUtf8(macroName) + "' at line " + ToString(span.lineNumber) + ")");
+            }
             if (Flags.Diagnostics())
             {
                 ustring params;
@@ -158,7 +179,7 @@ namespace pp
                     {
                         Console.Out() << "> header: [" << headerName << "] resolved to " << headerFilePath << endl();
                     }
-                    return headerFilePath;
+                    return GetFullPath(headerFilePath);
                 }
             }
             if (Flags.Diagnostics())
@@ -167,7 +188,7 @@ namespace pp
             }
             return string();
         }
-        public ustring SubstituteObjectMacro(const ustring& identifier, bool& substituted)
+        public ustring SubstituteObjectMacro(const ustring& identifier, bool& substituted, const string& fileName, int lineNumber)
         {
             ustring replacement;
             HashMap<ustring, Macro*>.ConstIterator it = macroMap.CFind(identifier);
@@ -178,6 +199,22 @@ namespace pp
                 {
                     ObjectMacro* objetMacro = cast<ObjectMacro*>(macro);
                     replacement = objetMacro->replacementList;
+                    if (replacement == u"@FILE")
+                    {
+                        replacement = ToUtf32(fileName);
+                    }
+                    else if (replacement == u"@LINE")
+                    {
+                        replacement = ToUtf32(ToString(lineNumber));
+                    }
+                    else if (replacement == u"@DATE")
+                    {
+                        replacement = ToUtf32(GetCurrentDate().ToString());
+                    }
+                    else if (replacement == u"@TIME")
+                    {
+                        replacement = ToUtf32(GetCurrentDateTime().TimeString());
+                    }
                     if (Flags.Diagnostics())
                     {
                         Console.Out() << "> object macro: [" << identifier << "] substituted with [" << replacement << "]" << endl();
@@ -247,6 +284,15 @@ namespace pp
             }
             return identifier;
         }
+        public void PushCurrentFilePath(const string& currentFilePath_)
+        {
+            filePathStack.Push(currentFilePath);
+            currentFilePath = currentFilePath_;
+        }
+        public void PopCurrentFilePath()
+        {
+            currentFilePath = filePathStack.Pop();
+        }
         public List<UniquePtr<Macro>> macros;
         public HashMap<ustring, Macro*> macroMap;
         public FunctionMacro* currentFunctionMacro;
@@ -255,6 +301,8 @@ namespace pp
         public Stack<List<ustring>*> argsStack;
         public List<string> includeDirectories;
         public List<PPFile> files;
+        public Stack<string> filePathStack;
+        public string currentFilePath;
     }
     
     public ustring CombineLines(const ustring& sourceFileContent)
@@ -405,30 +453,42 @@ namespace pp
 
     public void Preprocess(PP& pp, const string& filePath)
     { 
-        PPFile ppFile(filePath);
-        ustring content = ToUtf32(File.ReadAllText(filePath));
-        content = CombineLines(content);
-        content = StripComments(content);
-        PPFileParser.GetPPFileGrammar()->Parse(content.Chars(), content.Chars() + content.Length(), 0, "", &pp, &ppFile.content);
-        pp.files.Add(Rvalue(ppFile));
+        try
+        {
+            PPFile ppFile(filePath);
+            pp.PushCurrentFilePath(filePath);
+            ustring content = ToUtf32(File.ReadAllText(filePath));
+            content = CombineLines(content);
+            content = StripComments(content);
+            PPFileParser.GetPPFileGrammar()->Parse(content.Chars(), content.Chars() + content.Length(), 0, filePath, &pp, &ppFile.content);
+            pp.files.Add(Rvalue(ppFile));
+            pp.PopCurrentFilePath();
+        }        
+        catch (const PreprocessingException& ex)
+        {
+            throw PreprocessingException("error preprocessing '" + filePath + "': " + ex.Message());
+        }
     }
     
-    public bool Evaluate(PP& pp, ast.Node* expr)
-    {
-        return true;
-    }
-    
-    public bool EvaluateConstantExpression(const ustring& constantExpressionText, PP* pp)
+    public bool EvaluateConstantExpression(const ustring& constantExpressionText, PP* pp, int line)
     {
         cppparser.ParsingContext ctx;
+        ctx.SetAcceptDefined();
         cppparser.ConstantExpressionGrammar* constantExpressionGrammar = PPFileParser.GetConstantExpressionGrammar();
-        UniquePtr<ast.Node> node(constantExpressionGrammar->Parse(constantExpressionText.Chars(), constantExpressionText.Chars() + constantExpressionText.Length(), 0, "", &ctx));
-        return true;
+        UniquePtr<ast.Node> exprNode(constantExpressionGrammar->Parse(constantExpressionText.Chars(), constantExpressionText.Chars() + constantExpressionText.Length(), 0, pp->currentFilePath, &ctx));
+        UniquePtr<Value> value = Evaluate(*pp, exprNode.Get(), line);
+        int result = value->ToInteger();
+        return result != 0;
     }
     
     public List<PPFile> Preprocess(const string& sourceFilePath, DomElement* ppDefs)
     {
         PP pp;
+        pp.Define(u"__DATE__", u"@DATE", true);
+        pp.Define(u"__TIME__", u"@TIME", true);
+        pp.Define(u"__FILE__", u"@FILE", true);
+        pp.Define(u"__LINE__", u"@LINE", true);
+        pp.Define(u"__cplusplus", u"201103L", true);
         UniquePtr<XPathObject> includes = Evaluate(u"include", ppDefs);
         XPathNodeSet* includeNodeSet = includes.Get() as XPathNodeSet*;
         if (includeNodeSet != null)
@@ -453,30 +513,30 @@ namespace pp
                 DomElement* defineElement = defineNode as DomElement*;
                 ustring macroName = defineElement->GetAttribute(u"name");
                 ustring replacement = defineElement->GetAttribute(u"replacement");
-                pp.Define(macroName, replacement);
+                pp.Define(macroName, replacement, false);
             }
         }
-        Preprocess(pp, sourceFilePath);
+        Preprocess(pp, GetFullPath(sourceFilePath));
         return Rvalue(pp.files);
     }
     
     public ustring ParseNonemptyTokenLine(bool process, const ustring& text, PP* pp, PPTokenFlags flags)
     {
         ustring result;
-        PPFileParser.GetNonemptyTokenLineGrammar()->Parse(text.Chars(), text.Chars() + text.Length(), 0, "", process, &result, pp, flags);
+        PPFileParser.GetNonemptyTokenLineGrammar()->Parse(text.Chars(), text.Chars() + text.Length(), 0, pp->currentFilePath, process, &result, pp, flags);
         return result;
     }
     
     public ustring ParsePossiblyEmptyTokenLine(bool process, const ustring& text, PP* pp, PPTokenFlags flags)
     {
         ustring result;
-        PPFileParser.GetPossiblyEmptyTokenLineGrammar()->Parse(text.Chars(), text.Chars() + text.Length(), 0, "", process, &result, pp, flags);
+        PPFileParser.GetPossiblyEmptyTokenLineGrammar()->Parse(text.Chars(), text.Chars() + text.Length(), 0, pp->currentFilePath, process, &result, pp, flags);
         return result;
     }
     
     public ustring DoFunctionMacroReplacement(FunctionMacro* macro, List<ustring>* args, PP* pp, PPTokenFlags flags)
     {
         const ustring& macroText = macro->replacementList;
-        return PPFileParser.GetMacroReplacementGrammar()->Parse(macroText.Chars(), macroText.Chars() + macroText.Length(), 0, "", macro, args, pp, flags); 
+        return PPFileParser.GetMacroReplacementGrammar()->Parse(macroText.Chars(), macroText.Chars() + macroText.Length(), 0, pp->currentFilePath, macro, args, pp, flags); 
     }
 }

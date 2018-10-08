@@ -4,18 +4,13 @@ namespace cppparser
 {
     public static class Parser
     {
-        static Parser() : sourceFileGrammar(new SourceFileGrammar()), constantExpressionGrammar(new ConstantExpressionGrammar(sourceFileGrammar->Domain()))
+        static Parser() : sourceFileGrammar(new SourceFileGrammar())
         {
         }
         public static SourceFileGrammar* GetSourceFileGrammar()
         {
             return sourceFileGrammar;
         }
-        public static ConstantExpressionGrammar* GetConstantExpressionGrammar()
-        {
-            return constantExpressionGrammar;
-        }
         private static SourceFileGrammar* sourceFileGrammar;
-        private static ConstantExpressionGrammar* constantExpressionGrammar;
     }
 }

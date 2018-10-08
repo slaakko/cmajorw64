@@ -72,6 +72,14 @@ namespace cppparser
         { 
             return parsingLvalue && !parsingArguments; 
         }
+        public nothrow inline bool AcceptDefined() const
+        {
+            return acceptDefined;
+        }
+        public nothrow inline void SetAcceptDefined()
+        {
+            acceptDefined = true;
+        }
         private bool parsingTemplateId;
         private Stack<bool> parsingTemplateIdStack;
         private bool inFunctionBody;
@@ -80,5 +88,6 @@ namespace cppparser
         private Stack<bool> parsingLvalueStack;
         private bool parsingArguments;
         private Stack<bool> parsingArgumentsStack;
+        private bool acceptDefined;
     }
 }

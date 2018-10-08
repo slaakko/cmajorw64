@@ -384,6 +384,7 @@ namespace pp
                 AddInheritedAttribute(AttrOrVar(ToUtf32("bool"), ToUtf32("parentProcess")));
                 AddInheritedAttribute(AttrOrVar(ToUtf32("ustring*"), ToUtf32("result")));
                 AddLocalVariable(AttrOrVar(ToUtf32("bool"), ToUtf32("processed")));
+                AddLocalVariable(AttrOrVar(ToUtf32("bool"), ToUtf32("processGroup")));
             }
             public override void Enter(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
             {
@@ -404,11 +405,14 @@ namespace pp
             {
                 ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
                 a0ActionParser->SetAction(A0Action);
+                ActionParser* a1ActionParser = GetAction(ToUtf32("A1"));
+                a1ActionParser->SetAction(A1Action);
                 NonterminalParser* ifGroupNonterminalParser = GetNonterminal(ToUtf32("IfGroup"));
                 ifGroupNonterminalParser->SetPre(PreIfGroup);
                 ifGroupNonterminalParser->SetPost(PostIfGroup);
-                NonterminalParser* elifGroupsNonterminalParser = GetNonterminal(ToUtf32("ElifGroups"));
-                elifGroupsNonterminalParser->SetPre(PreElifGroups);
+                NonterminalParser* elifGroupNonterminalParser = GetNonterminal(ToUtf32("ElifGroup"));
+                elifGroupNonterminalParser->SetPre(PreElifGroup);
+                elifGroupNonterminalParser->SetPost(PostElifGroup);
                 NonterminalParser* elseGroupNonterminalParser = GetNonterminal(ToUtf32("ElseGroup"));
                 elseGroupNonterminalParser->SetPre(PreElseGroup);
                 NonterminalParser* endIfLineNonterminalParser = GetNonterminal(ToUtf32("EndIfLine"));
@@ -418,6 +422,13 @@ namespace pp
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
                 context->processed = context->fromIfGroup;
+                if (context->parentProcess && !context->processed) context->processGroup = true; else context->processGroup = false;
+            }
+            public void A1Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                if (context->fromElifGroup) context->processed = true;
+                if (context->parentProcess && !context->processed) context->processGroup = true; else context->processGroup = false;
             }
             public void PreIfGroup(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
             {
@@ -435,20 +446,27 @@ namespace pp
                     context->fromIfGroup = *cast<ValueObject<bool>*>(fromIfGroup_value.Get());
                 }
             }
-            public void PreElifGroups(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
+            public void PreElifGroup(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
                 stack.Push(UniquePtr<Object>(new ValueObject<PP*>(context->pp)));
-                stack.Push(UniquePtr<Object>(new ValueObject<bool>(context->parentProcess)));
-                stack.Push(UniquePtr<Object>(new ValueObject<bool*>(&context->processed)));
+                stack.Push(UniquePtr<Object>(new ValueObject<bool>(context->processGroup)));
                 stack.Push(UniquePtr<Object>(new ValueObject<ustring*>(context->result)));
+            }
+            public void PostElifGroup(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                if (matched)
+                {
+                    UniquePtr<Object> fromElifGroup_value = stack.Pop();
+                    context->fromElifGroup = *cast<ValueObject<bool>*>(fromElifGroup_value.Get());
+                }
             }
             public void PreElseGroup(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
                 stack.Push(UniquePtr<Object>(new ValueObject<PP*>(context->pp)));
-                stack.Push(UniquePtr<Object>(new ValueObject<bool>(context->parentProcess)));
-                stack.Push(UniquePtr<Object>(new ValueObject<bool*>(&context->processed)));
+                stack.Push(UniquePtr<Object>(new ValueObject<bool>(context->processGroup)));
                 stack.Push(UniquePtr<Object>(new ValueObject<ustring*>(context->result)));
             }
             public void PreEndIfLine(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
@@ -459,14 +477,16 @@ namespace pp
             }
             public class Context : System.Text.Parsing.Context
             {
-                public Context() : pp(), parentProcess(), result(), processed(), fromIfGroup()
+                public Context() : pp(), parentProcess(), result(), processed(), processGroup(), fromIfGroup(), fromElifGroup()
                 {
                 }
                 public PP* pp;
                 public bool parentProcess;
                 public ustring* result;
                 public bool processed;
+                public bool processGroup;
                 public bool fromIfGroup;
+                public bool fromElifGroup;
             }
         }
 
@@ -649,66 +669,14 @@ namespace pp
             }
         }
 
-        public class ElifGroupsRule : System.Text.Parsing.RuleParser
-        {
-            public ElifGroupsRule(const ustring& name_, Scope* enclosingScope_, int id_, Parser* definition_) : base(name_, enclosingScope_, id_, definition_)
-            {
-                AddInheritedAttribute(AttrOrVar(ToUtf32("PP*"), ToUtf32("pp")));
-                AddInheritedAttribute(AttrOrVar(ToUtf32("bool"), ToUtf32("parentProcess")));
-                AddInheritedAttribute(AttrOrVar(ToUtf32("bool*"), ToUtf32("processed")));
-                AddInheritedAttribute(AttrOrVar(ToUtf32("ustring*"), ToUtf32("result")));
-            }
-            public override void Enter(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
-            {
-                parsingData->PushContext(Id(), new Context());
-                Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                UniquePtr<Object> result_value = stack.Pop();
-                context->result = *cast<ValueObject<ustring*>*>(result_value.Get());
-                UniquePtr<Object> processed_value = stack.Pop();
-                context->processed = *cast<ValueObject<bool*>*>(processed_value.Get());
-                UniquePtr<Object> parentProcess_value = stack.Pop();
-                context->parentProcess = *cast<ValueObject<bool>*>(parentProcess_value.Get());
-                UniquePtr<Object> pp_value = stack.Pop();
-                context->pp = *cast<ValueObject<PP*>*>(pp_value.Get());
-            }
-            public override void Leave(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
-            {
-                parsingData->PopContext(Id());
-            }
-            public override void Link()
-            {
-                NonterminalParser* elifGroupNonterminalParser = GetNonterminal(ToUtf32("ElifGroup"));
-                elifGroupNonterminalParser->SetPre(PreElifGroup);
-            }
-            public void PreElifGroup(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
-            {
-                Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                stack.Push(UniquePtr<Object>(new ValueObject<PP*>(context->pp)));
-                stack.Push(UniquePtr<Object>(new ValueObject<bool>(context->parentProcess)));
-                stack.Push(UniquePtr<Object>(new ValueObject<bool*>(context->processed)));
-                stack.Push(UniquePtr<Object>(new ValueObject<ustring*>(context->result)));
-            }
-            public class Context : System.Text.Parsing.Context
-            {
-                public Context() : pp(), parentProcess(), processed(), result()
-                {
-                }
-                public PP* pp;
-                public bool parentProcess;
-                public bool* processed;
-                public ustring* result;
-            }
-        }
-
         public class ElifGroupRule : System.Text.Parsing.RuleParser
         {
             public ElifGroupRule(const ustring& name_, Scope* enclosingScope_, int id_, Parser* definition_) : base(name_, enclosingScope_, id_, definition_)
             {
                 AddInheritedAttribute(AttrOrVar(ToUtf32("PP*"), ToUtf32("pp")));
-                AddInheritedAttribute(AttrOrVar(ToUtf32("bool"), ToUtf32("parentProcess")));
-                AddInheritedAttribute(AttrOrVar(ToUtf32("bool*"), ToUtf32("processed")));
+                AddInheritedAttribute(AttrOrVar(ToUtf32("bool"), ToUtf32("process")));
                 AddInheritedAttribute(AttrOrVar(ToUtf32("ustring*"), ToUtf32("result")));
-                AddLocalVariable(AttrOrVar(ToUtf32("bool"), ToUtf32("process")));
+                SetValueTypeName(ToUtf32("bool"));
             }
             public override void Enter(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
             {
@@ -716,15 +684,18 @@ namespace pp
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
                 UniquePtr<Object> result_value = stack.Pop();
                 context->result = *cast<ValueObject<ustring*>*>(result_value.Get());
-                UniquePtr<Object> processed_value = stack.Pop();
-                context->processed = *cast<ValueObject<bool*>*>(processed_value.Get());
-                UniquePtr<Object> parentProcess_value = stack.Pop();
-                context->parentProcess = *cast<ValueObject<bool>*>(parentProcess_value.Get());
+                UniquePtr<Object> process_value = stack.Pop();
+                context->process = *cast<ValueObject<bool>*>(process_value.Get());
                 UniquePtr<Object> pp_value = stack.Pop();
                 context->pp = *cast<ValueObject<PP*>*>(pp_value.Get());
             }
             public override void Leave(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
             {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                if (matched)
+                {
+                    stack.Push(UniquePtr<Object>(new ValueObject<bool>(context->value)));
+                }
                 parsingData->PopContext(Id());
             }
             public override void Link()
@@ -744,7 +715,7 @@ namespace pp
             public void A0Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                if (context->process) *context->processed = true;
+                context->value = context->process;
             }
             public void A1Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
@@ -759,7 +730,7 @@ namespace pp
             public void PreConstantExpression(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                stack.Push(UniquePtr<Object>(new ValueObject<bool>(context->parentProcess && !*context->processed)));
+                stack.Push(UniquePtr<Object>(new ValueObject<bool>(context->process)));
                 stack.Push(UniquePtr<Object>(new ValueObject<PP*>(context->pp)));
             }
             public void PostConstantExpression(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
@@ -780,14 +751,13 @@ namespace pp
             }
             public class Context : System.Text.Parsing.Context
             {
-                public Context() : pp(), parentProcess(), processed(), result(), process(), fromConstantExpression()
+                public Context() : pp(), process(), result(), value(), fromConstantExpression()
                 {
                 }
                 public PP* pp;
-                public bool parentProcess;
-                public bool* processed;
-                public ustring* result;
                 public bool process;
+                public ustring* result;
+                public bool value;
                 public bool fromConstantExpression;
             }
         }
@@ -797,8 +767,7 @@ namespace pp
             public ElseGroupRule(const ustring& name_, Scope* enclosingScope_, int id_, Parser* definition_) : base(name_, enclosingScope_, id_, definition_)
             {
                 AddInheritedAttribute(AttrOrVar(ToUtf32("PP*"), ToUtf32("pp")));
-                AddInheritedAttribute(AttrOrVar(ToUtf32("bool"), ToUtf32("parentProcess")));
-                AddInheritedAttribute(AttrOrVar(ToUtf32("bool*"), ToUtf32("processed")));
+                AddInheritedAttribute(AttrOrVar(ToUtf32("bool"), ToUtf32("process")));
                 AddInheritedAttribute(AttrOrVar(ToUtf32("ustring*"), ToUtf32("result")));
             }
             public override void Enter(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
@@ -807,10 +776,8 @@ namespace pp
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
                 UniquePtr<Object> result_value = stack.Pop();
                 context->result = *cast<ValueObject<ustring*>*>(result_value.Get());
-                UniquePtr<Object> processed_value = stack.Pop();
-                context->processed = *cast<ValueObject<bool*>*>(processed_value.Get());
-                UniquePtr<Object> parentProcess_value = stack.Pop();
-                context->parentProcess = *cast<ValueObject<bool>*>(parentProcess_value.Get());
+                UniquePtr<Object> process_value = stack.Pop();
+                context->process = *cast<ValueObject<bool>*>(process_value.Get());
                 UniquePtr<Object> pp_value = stack.Pop();
                 context->pp = *cast<ValueObject<PP*>*>(pp_value.Get());
             }
@@ -834,17 +801,16 @@ namespace pp
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
                 stack.Push(UniquePtr<Object>(new ValueObject<PP*>(context->pp)));
-                stack.Push(UniquePtr<Object>(new ValueObject<bool>(context->parentProcess && !*context->processed)));
+                stack.Push(UniquePtr<Object>(new ValueObject<bool>(context->process)));
                 stack.Push(UniquePtr<Object>(new ValueObject<ustring*>(context->result)));
             }
             public class Context : System.Text.Parsing.Context
             {
-                public Context() : pp(), parentProcess(), processed(), result()
+                public Context() : pp(), process(), result()
                 {
                 }
                 public PP* pp;
-                public bool parentProcess;
-                public bool* processed;
+                public bool process;
                 public ustring* result;
             }
         }
@@ -922,6 +888,10 @@ namespace pp
                 defineObjectMacroNonterminalParser->SetPre(PreDefineObjectMacro);
                 NonterminalParser* undefineMacroNonterminalParser = GetNonterminal(ToUtf32("UndefineMacro"));
                 undefineMacroNonterminalParser->SetPre(PreUndefineMacro);
+                NonterminalParser* pragmaNonterminalParser = GetNonterminal(ToUtf32("Pragma"));
+                pragmaNonterminalParser->SetPre(PrePragma);
+                NonterminalParser* emptyNonterminalParser = GetNonterminal(ToUtf32("Empty"));
+                emptyNonterminalParser->SetPre(PreEmpty);
             }
             public void PreIncludeDirective(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
             {
@@ -949,6 +919,16 @@ namespace pp
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
                 stack.Push(UniquePtr<Object>(new ValueObject<PP*>(context->pp)));
                 stack.Push(UniquePtr<Object>(new ValueObject<bool>(context->process)));
+                stack.Push(UniquePtr<Object>(new ValueObject<ustring*>(context->result)));
+            }
+            public void PrePragma(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                stack.Push(UniquePtr<Object>(new ValueObject<ustring*>(context->result)));
+            }
+            public void PreEmpty(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
                 stack.Push(UniquePtr<Object>(new ValueObject<ustring*>(context->result)));
             }
             public class Context : System.Text.Parsing.Context
@@ -1065,7 +1045,7 @@ namespace pp
             public void A0Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                if (context->process) context->pp->Define(context->fromidentifier, context->fromMacroParams, context->replacementList);
+                if (context->process) context->pp->Define(context->fromidentifier, context->fromMacroParams, context->replacementList, span);
             }
             public void A1Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
@@ -1220,7 +1200,7 @@ namespace pp
             public void A0Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                if (context->process) context->pp->Define(context->fromidentifier, context->replacementList);
+                if (context->process) context->pp->Define(context->fromidentifier, context->replacementList, false);
             }
             public void A1Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
@@ -1320,6 +1300,78 @@ namespace pp
             }
         }
 
+        public class PragmaRule : System.Text.Parsing.RuleParser
+        {
+            public PragmaRule(const ustring& name_, Scope* enclosingScope_, int id_, Parser* definition_) : base(name_, enclosingScope_, id_, definition_)
+            {
+                AddInheritedAttribute(AttrOrVar(ToUtf32("ustring*"), ToUtf32("result")));
+            }
+            public override void Enter(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
+            {
+                parsingData->PushContext(Id(), new Context());
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                UniquePtr<Object> result_value = stack.Pop();
+                context->result = *cast<ValueObject<ustring*>*>(result_value.Get());
+            }
+            public override void Leave(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
+            {
+                parsingData->PopContext(Id());
+            }
+            public override void Link()
+            {
+                ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
+                a0ActionParser->SetAction(A0Action);
+            }
+            public void A0Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                context->result->Append('\n');
+            }
+            public class Context : System.Text.Parsing.Context
+            {
+                public Context() : result()
+                {
+                }
+                public ustring* result;
+            }
+        }
+
+        public class EmptyRule : System.Text.Parsing.RuleParser
+        {
+            public EmptyRule(const ustring& name_, Scope* enclosingScope_, int id_, Parser* definition_) : base(name_, enclosingScope_, id_, definition_)
+            {
+                AddInheritedAttribute(AttrOrVar(ToUtf32("ustring*"), ToUtf32("result")));
+            }
+            public override void Enter(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
+            {
+                parsingData->PushContext(Id(), new Context());
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                UniquePtr<Object> result_value = stack.Pop();
+                context->result = *cast<ValueObject<ustring*>*>(result_value.Get());
+            }
+            public override void Leave(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
+            {
+                parsingData->PopContext(Id());
+            }
+            public override void Link()
+            {
+                ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
+                a0ActionParser->SetAction(A0Action);
+            }
+            public void A0Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                context->result->Append('\n');
+            }
+            public class Context : System.Text.Parsing.Context
+            {
+                public Context() : result()
+                {
+                }
+                public ustring* result;
+            }
+        }
+
         public class ConstantExpressionRule : System.Text.Parsing.RuleParser
         {
             public ConstantExpressionRule(const ustring& name_, Scope* enclosingScope_, int id_, Parser* definition_) : base(name_, enclosingScope_, id_, definition_)
@@ -1357,7 +1409,7 @@ namespace pp
             public void A0Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                if (context->process) context->value = EvaluateConstantExpression(context->constantExpressionText, context->pp); else context->value = false;
+                if (context->process) context->value = EvaluateConstantExpression(context->constantExpressionText, context->pp, span.lineNumber); else context->value = false;
             }
             public void PreNonemptyTokenLine(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
             {
@@ -1685,7 +1737,7 @@ namespace pp
             public void A6Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                if (context->process) context->result->Append(context->pp->SubstituteObjectMacro(context->fromid2, *context->substituted));
+                if (context->process) context->result->Append(context->pp->SubstituteObjectMacro(context->fromid2, *context->substituted, fileName, span.lineNumber));
             }
             public void A7Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
@@ -2211,16 +2263,16 @@ namespace pp
         public override void GetReferencedGrammars()
         {
             ParsingDomain* pd = Domain();
-            Grammar* grammar0 = pd->GetGrammar(ToUtf32("cppparser.LiteralGrammar"));
+            Grammar* grammar0 = pd->GetGrammar(ToUtf32("System.Text.Parsing.stdlib"));
             if (grammar0 == null)
             {
-                grammar0 = new cppparser.LiteralGrammar(pd);
+                grammar0 = new System.Text.Parsing.stdlib(pd);
             }
             AddGrammarReference(grammar0);
-            Grammar* grammar1 = pd->GetGrammar(ToUtf32("System.Text.Parsing.stdlib"));
+            Grammar* grammar1 = pd->GetGrammar(ToUtf32("cppparser.LiteralGrammar"));
             if (grammar1 == null)
             {
-                grammar1 = new System.Text.Parsing.stdlib(pd);
+                grammar1 = new cppparser.LiteralGrammar(pd);
             }
             AddGrammarReference(grammar1);
         }
@@ -2248,10 +2300,12 @@ namespace pp
                         new System.Text.Parsing.SequenceParser(
                             new System.Text.Parsing.ActionParser(ToUtf32("A0"),
                                 new System.Text.Parsing.NonterminalParser(ToUtf32("IfGroup"), ToUtf32("IfGroup"), 3)),
-                            new System.Text.Parsing.OptionalParser(
-                                new System.Text.Parsing.NonterminalParser(ToUtf32("ElifGroups"), ToUtf32("ElifGroups"), 4))),
+                            new System.Text.Parsing.KleeneStarParser(
+                                new System.Text.Parsing.GroupingParser(
+                                    new System.Text.Parsing.ActionParser(ToUtf32("A1"),
+                                        new System.Text.Parsing.NonterminalParser(ToUtf32("ElifGroup"), ToUtf32("ElifGroup"), 3))))),
                         new System.Text.Parsing.OptionalParser(
-                            new System.Text.Parsing.NonterminalParser(ToUtf32("ElseGroup"), ToUtf32("ElseGroup"), 4))),
+                            new System.Text.Parsing.NonterminalParser(ToUtf32("ElseGroup"), ToUtf32("ElseGroup"), 3))),
                     new System.Text.Parsing.NonterminalParser(ToUtf32("EndIfLine"), ToUtf32("EndIfLine"), 2))));
             AddRule(new IfGroupRule(ToUtf32("IfGroup"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.AlternativeParser(
@@ -2298,9 +2352,6 @@ namespace pp
                                         new System.Text.Parsing.NonterminalParser(ToUtf32("newline"), ToUtf32("newline"), 0))),
                                 new System.Text.Parsing.OptionalParser(
                                     new System.Text.Parsing.NonterminalParser(ToUtf32("g3"), ToUtf32("Group"), 3))))))));
-            AddRule(new ElifGroupsRule(ToUtf32("ElifGroups"), GetScope(), Domain()->GetNextRuleId(),
-                new System.Text.Parsing.PositiveParser(
-                    new System.Text.Parsing.NonterminalParser(ToUtf32("ElifGroup"), ToUtf32("ElifGroup"), 4))));
             AddRule(new ElifGroupRule(ToUtf32("ElifGroup"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.ActionParser(ToUtf32("A0"),
                     new System.Text.Parsing.GroupingParser(
@@ -2337,10 +2388,14 @@ namespace pp
                 new System.Text.Parsing.AlternativeParser(
                     new System.Text.Parsing.AlternativeParser(
                         new System.Text.Parsing.AlternativeParser(
-                            new System.Text.Parsing.NonterminalParser(ToUtf32("IncludeDirective"), ToUtf32("IncludeDirective"), 3),
-                            new System.Text.Parsing.NonterminalParser(ToUtf32("DefineFunctionMacro"), ToUtf32("DefineFunctionMacro"), 3)),
-                        new System.Text.Parsing.NonterminalParser(ToUtf32("DefineObjectMacro"), ToUtf32("DefineObjectMacro"), 3)),
-                    new System.Text.Parsing.NonterminalParser(ToUtf32("UndefineMacro"), ToUtf32("UndefineMacro"), 3))));
+                            new System.Text.Parsing.AlternativeParser(
+                                new System.Text.Parsing.AlternativeParser(
+                                    new System.Text.Parsing.NonterminalParser(ToUtf32("IncludeDirective"), ToUtf32("IncludeDirective"), 3),
+                                    new System.Text.Parsing.NonterminalParser(ToUtf32("DefineFunctionMacro"), ToUtf32("DefineFunctionMacro"), 3)),
+                                new System.Text.Parsing.NonterminalParser(ToUtf32("DefineObjectMacro"), ToUtf32("DefineObjectMacro"), 3)),
+                            new System.Text.Parsing.NonterminalParser(ToUtf32("UndefineMacro"), ToUtf32("UndefineMacro"), 3)),
+                        new System.Text.Parsing.NonterminalParser(ToUtf32("Pragma"), ToUtf32("Pragma"), 1)),
+                    new System.Text.Parsing.NonterminalParser(ToUtf32("Empty"), ToUtf32("Empty"), 1))));
             AddRule(new IncludeDirectiveRule(ToUtf32("IncludeDirective"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.ActionParser(ToUtf32("A0"),
                     new System.Text.Parsing.GroupingParser(
@@ -2408,6 +2463,26 @@ namespace pp
                                 new System.Text.Parsing.NonterminalParser(ToUtf32("macroName"), ToUtf32("identifier"), 0)),
                             new System.Text.Parsing.ActionParser(ToUtf32("A1"),
                                 new System.Text.Parsing.NonterminalParser(ToUtf32("newline"), ToUtf32("newline"), 0)))))));
+            AddRule(new PragmaRule(ToUtf32("Pragma"), GetScope(), Domain()->GetNextRuleId(),
+                new System.Text.Parsing.SequenceParser(
+                    new System.Text.Parsing.SequenceParser(
+                        new System.Text.Parsing.CharParser('#'),
+                        new System.Text.Parsing.KeywordParser(ToUtf32("pragma"))),
+                    new System.Text.Parsing.ActionParser(ToUtf32("A0"),
+                        new System.Text.Parsing.TokenParser(
+                            new System.Text.Parsing.SequenceParser(
+                                new System.Text.Parsing.KleeneStarParser(
+                                    new System.Text.Parsing.GroupingParser(
+                                        new System.Text.Parsing.DifferenceParser(
+                                            new System.Text.Parsing.AnyCharParser(),
+                                            new System.Text.Parsing.NonterminalParser(ToUtf32("newline"), ToUtf32("newline"), 0)))),
+                                new System.Text.Parsing.NonterminalParser(ToUtf32("newline"), ToUtf32("newline"), 0)))))));
+            AddRule(new EmptyRule(ToUtf32("Empty"), GetScope(), Domain()->GetNextRuleId(),
+                new System.Text.Parsing.ActionParser(ToUtf32("A0"),
+                    new System.Text.Parsing.GroupingParser(
+                        new System.Text.Parsing.SequenceParser(
+                            new System.Text.Parsing.CharParser('#'),
+                            new System.Text.Parsing.NonterminalParser(ToUtf32("newline"), ToUtf32("newline"), 0))))));
             AddRule(new ConstantExpressionRule(ToUtf32("ConstantExpression"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.ActionParser(ToUtf32("A0"),
                     new System.Text.Parsing.NonterminalParser(ToUtf32("NonemptyTokenLine"), ToUtf32("NonemptyTokenLine"), 4))));
@@ -2479,7 +2554,9 @@ namespace pp
                                         new System.Text.Parsing.GroupingParser(
                                             new System.Text.Parsing.AlternativeParser(
                                                 new System.Text.Parsing.AlternativeParser(
-                                                    new System.Text.Parsing.CharParser(','),
+                                                    new System.Text.Parsing.AlternativeParser(
+                                                        new System.Text.Parsing.CharParser('#'),
+                                                        new System.Text.Parsing.CharParser(',')),
                                                     new System.Text.Parsing.CharParser(')')),
                                                 new System.Text.Parsing.NonterminalParser(ToUtf32("newline"), ToUtf32("newline"), 0)))))))),
                     new System.Text.Parsing.SequenceParser(
@@ -2489,7 +2566,10 @@ namespace pp
                             new System.Text.Parsing.GroupingParser(
                                 new System.Text.Parsing.DifferenceParser(
                                     new System.Text.Parsing.AnyCharParser(),
-                                    new System.Text.Parsing.NonterminalParser(ToUtf32("newline"), ToUtf32("newline"), 0))))))));
+                                    new System.Text.Parsing.GroupingParser(
+                                        new System.Text.Parsing.AlternativeParser(
+                                            new System.Text.Parsing.CharParser('#'),
+                                            new System.Text.Parsing.NonterminalParser(ToUtf32("newline"), ToUtf32("newline"), 0))))))))));
             AddRule(new FunctionMacroInvocationRule(ToUtf32("FunctionMacroInvocation"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.ActionParser(ToUtf32("A0"),
                     new System.Text.Parsing.GroupingParser(

@@ -24,7 +24,7 @@
     <findTextColWidth>738</findTextColWidth>
     <horizontalSplitterPos>1455</horizontalSplitterPos>
     <verticalSplitterPos>556</verticalSplitterPos>
-    <windowState>Normal</windowState>
+    <windowState>Maximized</windowState>
     <maxRecentProjects>10</maxRecentProjects>
     <recentProjects>
         <recentProject>
@@ -71,7 +71,7 @@
     <strictNothrow>false</strictNothrow>
     <emitLlvm>true</emitLlvm>
     <emitOptLlvm>false</emitOptLlvm>
-    <linkWithDebugRuntime>false</linkWithDebugRuntime>
+    <linkWithDebugRuntime>true</linkWithDebugRuntime>
     <linkUsingMsLink>false</linkUsingMsLink>
     <doNotUseModuleCache>false</doNotUseModuleCache>
     <numBuildThreads>0</numBuildThreads>

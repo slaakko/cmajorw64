@@ -178,8 +178,8 @@ namespace cppparser
         DeleteExpression(ParsingContext* ctx, var bool arrayDelete) : DeleteExpressionNode*;
         PostfixExpression(ParsingContext* ctx, var UniquePtr<Node> node) : Node*;
         PrimaryExpression(ParsingContext* ctx) : Node*;
-        CppCastExpression(ParsingContext* ctx);
-        TypeIdExpression(ParsingContext* ctx);
+        CppCastExpression(ParsingContext* ctx, var CppCast cast_) : Node*;
+        TypeIdExpression(ParsingContext* ctx) : Node*;
         IdExpression(ParsingContext* ctx) : Node*;
         UnqualifiedIdExpr(ParsingContext* ctx) : Node*;
         QualifiedIdExpr(ParsingContext* ctx) : Node*;

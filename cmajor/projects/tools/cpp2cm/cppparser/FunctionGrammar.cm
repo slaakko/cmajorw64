@@ -509,10 +509,10 @@ namespace cppparser
         public override void GetReferencedGrammars()
         {
             ParsingDomain* pd = Domain();
-            Grammar* grammar0 = pd->GetGrammar(ToUtf32("cppparser.DeclarationGrammar"));
+            Grammar* grammar0 = pd->GetGrammar(ToUtf32("cppparser.DeclaratorGrammar"));
             if (grammar0 == null)
             {
-                grammar0 = new cppparser.DeclarationGrammar(pd);
+                grammar0 = new cppparser.DeclaratorGrammar(pd);
             }
             AddGrammarReference(grammar0);
             Grammar* grammar1 = pd->GetGrammar(ToUtf32("cppparser.TypeExprGrammar"));
@@ -521,22 +521,22 @@ namespace cppparser
                 grammar1 = new cppparser.TypeExprGrammar(pd);
             }
             AddGrammarReference(grammar1);
-            Grammar* grammar2 = pd->GetGrammar(ToUtf32("cppparser.StatementGrammar"));
+            Grammar* grammar2 = pd->GetGrammar(ToUtf32("cppparser.ClassGrammar"));
             if (grammar2 == null)
             {
-                grammar2 = new cppparser.StatementGrammar(pd);
+                grammar2 = new cppparser.ClassGrammar(pd);
             }
             AddGrammarReference(grammar2);
-            Grammar* grammar3 = pd->GetGrammar(ToUtf32("cppparser.ClassGrammar"));
+            Grammar* grammar3 = pd->GetGrammar(ToUtf32("cppparser.StatementGrammar"));
             if (grammar3 == null)
             {
-                grammar3 = new cppparser.ClassGrammar(pd);
+                grammar3 = new cppparser.StatementGrammar(pd);
             }
             AddGrammarReference(grammar3);
-            Grammar* grammar4 = pd->GetGrammar(ToUtf32("cppparser.DeclaratorGrammar"));
+            Grammar* grammar4 = pd->GetGrammar(ToUtf32("cppparser.DeclarationGrammar"));
             if (grammar4 == null)
             {
-                grammar4 = new cppparser.DeclaratorGrammar(pd);
+                grammar4 = new cppparser.DeclarationGrammar(pd);
             }
             AddGrammarReference(grammar4);
         }

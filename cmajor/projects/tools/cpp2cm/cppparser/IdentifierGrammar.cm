@@ -449,22 +449,22 @@ namespace cppparser
         public override void GetReferencedGrammars()
         {
             ParsingDomain* pd = Domain();
-            Grammar* grammar0 = pd->GetGrammar(ToUtf32("cppparser.TemplateGrammar"));
+            Grammar* grammar0 = pd->GetGrammar(ToUtf32("cppparser.KeywordGrammar"));
             if (grammar0 == null)
             {
-                grammar0 = new cppparser.TemplateGrammar(pd);
+                grammar0 = new cppparser.KeywordGrammar(pd);
             }
             AddGrammarReference(grammar0);
-            Grammar* grammar1 = pd->GetGrammar(ToUtf32("System.Text.Parsing.stdlib"));
+            Grammar* grammar1 = pd->GetGrammar(ToUtf32("cppparser.TemplateGrammar"));
             if (grammar1 == null)
             {
-                grammar1 = new System.Text.Parsing.stdlib(pd);
+                grammar1 = new cppparser.TemplateGrammar(pd);
             }
             AddGrammarReference(grammar1);
-            Grammar* grammar2 = pd->GetGrammar(ToUtf32("cppparser.KeywordGrammar"));
+            Grammar* grammar2 = pd->GetGrammar(ToUtf32("System.Text.Parsing.stdlib"));
             if (grammar2 == null)
             {
-                grammar2 = new cppparser.KeywordGrammar(pd);
+                grammar2 = new System.Text.Parsing.stdlib(pd);
             }
             AddGrammarReference(grammar2);
         }

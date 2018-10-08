@@ -109,16 +109,16 @@ namespace cppparser
         public override void GetReferencedGrammars()
         {
             ParsingDomain* pd = Domain();
-            Grammar* grammar0 = pd->GetGrammar(ToUtf32("cppparser.DeclarationGrammar"));
+            Grammar* grammar0 = pd->GetGrammar(ToUtf32("System.Text.Parsing.stdlib"));
             if (grammar0 == null)
             {
-                grammar0 = new cppparser.DeclarationGrammar(pd);
+                grammar0 = new System.Text.Parsing.stdlib(pd);
             }
             AddGrammarReference(grammar0);
-            Grammar* grammar1 = pd->GetGrammar(ToUtf32("System.Text.Parsing.stdlib"));
+            Grammar* grammar1 = pd->GetGrammar(ToUtf32("cppparser.DeclarationGrammar"));
             if (grammar1 == null)
             {
-                grammar1 = new System.Text.Parsing.stdlib(pd);
+                grammar1 = new cppparser.DeclarationGrammar(pd);
             }
             AddGrammarReference(grammar1);
         }

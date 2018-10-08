@@ -69,6 +69,12 @@ namespace ast
         public virtual void Visit(IdentifierCapture& identifierCapture) {}
         public virtual void Visit(ThisCapture& thisCapture) {}
         public virtual void Visit(LambdaExpressionNode& lambdaExpressionNode) {}
+        public virtual void Visit(ParenthesizedExpressionNode& parenthesizedExpressionNode) {}
+        public virtual void Visit(ThisNode& thisNode) {}
+        public virtual void Visit(CppCastNode& cppCastNode) {}
+        public virtual void Visit(TypeIdNode& typeIdNode) {}
+        public virtual void Visit(DefinedNode& definedNode) {}
+        public virtual void Visit(TodoNode& todoNode) {}
         public virtual void Visit(InitDeclaratorNode& initDeclaratorNode) {}
         public virtual void Visit(ArrayDeclaratorNode& arrayDeclaratorNode) {}
         public virtual void Visit(InitializerListNode& initializerListNode) {}

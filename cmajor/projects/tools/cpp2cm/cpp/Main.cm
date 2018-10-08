@@ -4,11 +4,37 @@ using System.Collections;
 using System.Dom;
 using pp;
 
+const char* Version()
+{
+    return "2.5.0";
+}
+
+void PrintHelp()
+{
+    Console.Out() <<
+        "C/C++ preprocessor version " << Version() << endl() <<
+        "Usage: cpp [options] { filename }" << endl() <<
+        "Preprocesses given C or C++ source or header files and print preprocessed content to stdout." << endl() <<
+        "Options:" << endl() <<
+        "--cpp=CPP.XML (-c=CPP.XML)" << endl() <<
+        "   Read preprocessing defitions from CPP.XML." << endl() <<
+        "   By default read them from file 'cpp.xml' that resides in the current directory." << endl() <<
+        "--help (-h)" << endl() <<
+        "   Print help." << endl() <<
+        "--verbose (-v)" << endl() <<
+        "   Be verbose." << endl() <<
+        "--debug (-d)" << endl() <<
+        "   Debug parsing and generate XML debug output." << endl() <<
+        "--diagnostics (-i)" << endl() <<
+        "   Print diagnostic output." << endl();
+        ;
+}
+
 int main(int argc, const char** argv)
 {
     try
     {
-        string xmlFilePath = "pp.xml";
+        string xmlFilePath = "cpp.xml";
         List<string> sourceFilePaths;
         for (int i = 1; i < argc; ++i)
         {
@@ -27,24 +53,33 @@ int main(int argc, const char** argv)
                 {
                     Flags.SetVerbose();
                 }
+                else if (arg == "--help" || arg == "-h")
+                {
+                    PrintHelp();
+                    return 0;
+                }
                 else if (arg.Find('=') != -1)
                 {
                     List<string> components = arg.Split('=');
                     if (components.Count() == 2)
                     {
-                        if (components[0] == "--defs" || components[0] == "-e")
+                        if (components[0] == "--cpp" || components[0] == "-c")
                         {
                             xmlFilePath = components[1];
                         }
                         else
                         {
-                            throw Exception("unknown argument '" + arg + "'");
+                            throw Exception("unknown option '" + arg + "'");
                         }
                     }
                     else
                     {
-                        throw Exception("unknown argument '" + arg + "'");
+                        throw Exception("unknown option '" + arg + "'");
                     }
+                }
+                else
+                {
+                    throw Exception("unknown option '" + arg + "'");
                 }
             }
             else
@@ -83,7 +118,7 @@ int main(int argc, const char** argv)
     }
     catch (const Exception& ex)
     {
-        Console.Error() << ex.ToString() << endl();
+        Console.Error() << ex.Message() << endl();
     }
     return 0; 
 }

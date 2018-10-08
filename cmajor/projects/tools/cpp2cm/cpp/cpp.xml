@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<pp>
-    <include dir="."/>
+<cpp>
+    <include dir="foo"/>
     <define name="FOO" replacement="1"/>
-</pp>
+</cpp>

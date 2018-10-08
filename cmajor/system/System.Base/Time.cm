@@ -264,6 +264,22 @@ namespace System
         {
             return secs;
         }
+        public nothrow string TimeString() const
+        {
+            string timeString;
+            int hh = Hours() % 24;
+            int mm = Minutes() % 60;
+            int ss = Seconds() % 60;
+            timeString.Append(cast<char>(cast<int>('0') + ((hh / 10) % 10)));
+            timeString.Append(cast<char>(cast<int>('0') + (hh % 10)));
+            timeString.Append(':');
+            timeString.Append(cast<char>(cast<int>('0') + ((mm / 10) % 10)));
+            timeString.Append(cast<char>(cast<int>('0') + (mm % 10)));
+            timeString.Append(':');
+            timeString.Append(cast<char>(cast<int>('0') + ((ss / 10) % 10)));
+            timeString.Append(cast<char>(cast<int>('0') + (ss % 10)));
+            return timeString;
+        }
         public nothrow string ToString()
         {
             return this->ToString(false, false, false, false);

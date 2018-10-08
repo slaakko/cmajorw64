@@ -16,6 +16,7 @@ namespace cppparser
         using IdentifierGrammar.NestedNameSpecifier;
         using FunctionGrammar.ParameterList;
         using StatementGrammar.CompoundStatement;
+        using stdlib.identifier;
         
         ExpressionList(ParsingContext* ctx, var UniquePtr<ExpressionListNode> node) : ExpressionListNode*
             ::= (empty{ node.Reset(new ExpressionListNode(span)); } InitializerClause(ctx):ic1{ node->AddNode(ic1); } (',' InitializerClause(ctx):ic2{ node->AddNode(ic2); })*)
@@ -257,31 +258,36 @@ namespace cppparser
             ;
             
         PrimaryExpression(ParsingContext* ctx) : Node*
-            ::= Literal
-            |   keyword("this")
-            |   '(' Expression(ctx) ')'
-            |   CppCastExpression(ctx)
-            |   TypeIdExpression(ctx)
-            |   SimpleTypeSpecifier:s1 '(' PossiblyEmptyArgumentList(ctx):args ')'
-            |   SimpleTypeSpecifier:s2 BracedInitializerList(ctx):b1
-            |   TypeExpr(ctx):t1 '(' PossiblyEmptyArgumentList(ctx):typeExprArgs ')'
-            |   TypeExpr(ctx):t2 BracedInitializerList(ctx):b2
-            |   IdExpression(ctx)
-            |   LambdaExpression(ctx)
+            ::= Literal{ value = Literal; }
+            |   keyword("this"){ value = new ThisNode(span); }
+            |   empty{ pass = ctx->AcceptDefined(); } keyword("defined") ('(' identifier:id1 ')'{ value = new DefinedNode(span, id1); } | identifier:id2{ value = new DefinedNode(span, id2); })
+            |   ('(' Expression(ctx):expr ')'){ value = new ParenthesizedExpressionNode(span, expr); }
+            |   CppCastExpression(ctx){ value = CppCastExpression; }
+            |   TypeIdExpression(ctx){ value = TypeIdExpression; }
+            |   (SimpleTypeSpecifier:s1 '(' PossiblyEmptyArgumentList(ctx):args ')'){ value = new TodoNode(span); }
+            |   (SimpleTypeSpecifier:s2 BracedInitializerList(ctx):b1){ value = new TodoNode(span); }
+            |   (TypeExpr(ctx):t1 '(' PossiblyEmptyArgumentList(ctx):typeExprArgs ')'){ value = new TodoNode(span); }
+            |   (TypeExpr(ctx):t2 BracedInitializerList(ctx):b2){ value = new TodoNode(span); }
+            |   IdExpression(ctx){ value = IdExpression; }
+            |   LambdaExpression(ctx){ value = LambdaExpression; }
             ;
             
-        CppCastExpression(ParsingContext* ctx)
-            ::= (   keyword("dynamic_cast")
-                |   keyword("static_cast")
-                |   keyword("reinterpret_cast")
-                |   keyword("const_cast")
+        CppCastExpression(ParsingContext* ctx, var CppCast cast_) : Node*
+            ::= ((  keyword("dynamic_cast"){ cast_ = CppCast.dynamicCast; }
+                |   keyword("static_cast"){ cast_ = CppCast.staticCast; }
+                |   keyword("reinterpret_cast"){ cast_ = CppCast.reinterpretCast; }
+                |   keyword("const_cast"){ cast_ = CppCast.constCast; }
                 )
                 '<' TypeExpr(ctx):t1 '>' '(' Expression(ctx):e1 ')'
+            )
+            {
+                value = new CppCastNode(span, cast_, t1, e1); 
+            }
             ;
             
-        TypeIdExpression(ParsingContext* ctx)
-            ::= keyword("typeid") '(' TypeExpr(ctx):t1 ')'
-            |   keyword("typeid") '(' Expression(ctx):e1 ')'
+        TypeIdExpression(ParsingContext* ctx) : Node*
+            ::= (keyword("typeid") '(' TypeExpr(ctx):t1 ')'){ value = new TypeIdNode(span, t1); }
+            |   (keyword("typeid") '(' Expression(ctx):e1 ')'){ value = new TypeIdNode(span, e1); }
             ;
             
         IdExpression(ParsingContext* ctx) : Node*
@@ -376,6 +382,8 @@ namespace cppparser
     grammar ConstantExpressionGrammar
     {
         using ExpressionGrammar.ConstantExpression;
+        using stdlib.spaces;
+        skip spaces;
         start ConstantExpression;
     }
 }

@@ -260,4 +260,79 @@ namespace ast
         public UniquePtr<ParameterListNode> parameters;
         public UniquePtr<CompoundStatementNode> body;
     }
+    
+    public class ParenthesizedExpressionNode : UnaryNode
+    {
+        public nothrow ParenthesizedExpressionNode(const Span& span_, Node* child_) : base(span_, child_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+    }
+    
+    public class ThisNode : Node
+    {
+        public nothrow ThisNode(const Span& span_) : base(span_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+    }
+    
+    public enum CppCast
+    {
+        dynamicCast, staticCast, reinterpretCast, constCast
+    }
+    
+    public class CppCastNode : Node
+    {
+        public nothrow CppCastNode(const Span& span_, CppCast cast__, Node* typeExpr_, Node* expr_) : base(span_), cast_(cast__), typeExpr(typeExpr_), expr(expr_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public CppCast cast_;
+        public UniquePtr<Node> typeExpr;
+        public UniquePtr<Node> expr;
+    }
+    
+    public class TypeIdNode : UnaryNode
+    {
+        public nothrow TypeIdNode(const Span& span_, Node* child_) : base(span_, child_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+    }
+    
+    public class DefinedNode : Node
+    {
+        public nothrow DefinedNode(const Span& span_, const ustring& identifier_) : base(span_), identifier(identifier_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public ustring identifier;
+    }
+    
+    public class TodoNode : Node
+    {
+        public nothrow TodoNode(const Span& span_) : base(span_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+    }
 }
