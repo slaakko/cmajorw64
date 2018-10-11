@@ -1,0 +1,20 @@
+using System;
+using System.Collections;
+
+namespace symbols
+{
+    public abstract class ContainerSymbol : Symbol
+    {
+        public nothrow ContainerSymbol(const Span& span_, const ustring& name_) : base(span_, name_), scope(this)
+        {
+        }
+        public void AddSymbol(Symbol* symbol)
+        {
+            symbol->SetParent(this);
+            symbols.Add(UniquePtr<Symbol>(symbol));
+            scope.Install(symbol);
+        }
+        public List<UniquePtr<Symbol>> symbols;
+        public ContainerScope scope;
+    }
+}

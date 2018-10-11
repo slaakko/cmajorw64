@@ -62,7 +62,7 @@ namespace cppparser
             public SimpleTypeRule(const ustring& name_, Scope* enclosingScope_, int id_, Parser* definition_) : base(name_, enclosingScope_, id_, definition_)
             {
                 SetValueTypeName(ToUtf32("SimpleTypeNode*"));
-                AddLocalVariable(AttrOrVar(ToUtf32("UniquePtr<SimpleTypeNode>"), ToUtf32("simpleTypeNode")));
+                AddLocalVariable(AttrOrVar(ToUtf32("SimpleTypeSpecifiers"), ToUtf32("simpleTypeSpecifiers")));
             }
             public override void Enter(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
             {
@@ -84,62 +84,36 @@ namespace cppparser
                 a0ActionParser->SetAction(A0Action);
                 ActionParser* a1ActionParser = GetAction(ToUtf32("A1"));
                 a1ActionParser->SetAction(A1Action);
-                ActionParser* a2ActionParser = GetAction(ToUtf32("A2"));
-                a2ActionParser->SetAction(A2Action);
-                ActionParser* a3ActionParser = GetAction(ToUtf32("A3"));
-                a3ActionParser->SetAction(A3Action);
-                NonterminalParser* st1NonterminalParser = GetNonterminal(ToUtf32("st1"));
-                st1NonterminalParser->SetPost(Postst1);
-                NonterminalParser* st2NonterminalParser = GetNonterminal(ToUtf32("st2"));
-                st2NonterminalParser->SetPost(Postst2);
+                NonterminalParser* simpleTypeSpecifierNonterminalParser = GetNonterminal(ToUtf32("SimpleTypeSpecifier"));
+                simpleTypeSpecifierNonterminalParser->SetPost(PostSimpleTypeSpecifier);
             }
             public void A0Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->simpleTypeNode.Reset(new SimpleTypeNode(span));
+                context->value = new SimpleTypeNode(span, context->simpleTypeSpecifiers);
             }
             public void A1Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->value = context->simpleTypeNode.Release();
+                context->simpleTypeSpecifiers = cast<SimpleTypeSpecifiers>(context->simpleTypeSpecifiers | context->fromSimpleTypeSpecifier);
             }
-            public void A2Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
-            {
-                Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->simpleTypeNode->AddNode(new OptionalNode(span, context->fromst1));
-            }
-            public void A3Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
-            {
-                Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->simpleTypeNode->AddNode(context->fromst2);
-            }
-            public void Postst1(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
+            public void PostSimpleTypeSpecifier(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
                 if (matched)
                 {
-                    UniquePtr<Object> fromst1_value = stack.Pop();
-                    context->fromst1 = *cast<ValueObject<Node*>*>(fromst1_value.Get());
-                }
-            }
-            public void Postst2(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
-            {
-                Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                if (matched)
-                {
-                    UniquePtr<Object> fromst2_value = stack.Pop();
-                    context->fromst2 = *cast<ValueObject<Node*>*>(fromst2_value.Get());
+                    UniquePtr<Object> fromSimpleTypeSpecifier_value = stack.Pop();
+                    context->fromSimpleTypeSpecifier = *cast<ValueObject<SimpleTypeSpecifiers>*>(fromSimpleTypeSpecifier_value.Get());
                 }
             }
             public class Context : System.Text.Parsing.Context
             {
-                public Context() : value(), simpleTypeNode(), fromst1(), fromst2()
+                public Context() : value(), simpleTypeSpecifiers(), fromSimpleTypeSpecifier()
                 {
                 }
                 public SimpleTypeNode* value;
-                public UniquePtr<SimpleTypeNode> simpleTypeNode;
-                public Node* fromst1;
-                public Node* fromst2;
+                public SimpleTypeSpecifiers simpleTypeSpecifiers;
+                public SimpleTypeSpecifiers fromSimpleTypeSpecifier;
             }
         }
 
@@ -147,7 +121,7 @@ namespace cppparser
         {
             public SimpleTypeSpecifierRule(const ustring& name_, Scope* enclosingScope_, int id_, Parser* definition_) : base(name_, enclosingScope_, id_, definition_)
             {
-                SetValueTypeName(ToUtf32("Node*"));
+                SetValueTypeName(ToUtf32("SimpleTypeSpecifiers"));
             }
             public override void Enter(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
             {
@@ -159,7 +133,7 @@ namespace cppparser
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
                 if (matched)
                 {
-                    stack.Push(UniquePtr<Object>(new ValueObject<Node*>(context->value)));
+                    stack.Push(UniquePtr<Object>(new ValueObject<SimpleTypeSpecifiers>(context->value)));
                 }
                 parsingData->PopContext(Id());
             }
@@ -193,106 +167,113 @@ namespace cppparser
                 a12ActionParser->SetAction(A12Action);
                 ActionParser* a13ActionParser = GetAction(ToUtf32("A13"));
                 a13ActionParser->SetAction(A13Action);
+                ActionParser* a14ActionParser = GetAction(ToUtf32("A14"));
+                a14ActionParser->SetAction(A14Action);
             }
             public void A0Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->value = new CharNode(span);
+                context->value = SimpleTypeSpecifiers.char_;
             }
             public void A1Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->value = new Char16Node(span);
+                context->value = SimpleTypeSpecifiers.char16_t;
             }
             public void A2Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->value = new Char32Node(span);
+                context->value = SimpleTypeSpecifiers.char32_t;
             }
             public void A3Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->value = new WCharNode(span);
+                context->value = SimpleTypeSpecifiers.wchar_t;
             }
             public void A4Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->value = new BoolNode(span);
+                context->value = SimpleTypeSpecifiers.bool_;
             }
             public void A5Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->value = new ShortNode(span);
+                context->value = SimpleTypeSpecifiers.short_;
             }
             public void A6Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->value = new IntNode(span);
+                context->value = SimpleTypeSpecifiers.int_;
             }
             public void A7Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->value = new LongNode(span);
+                context->value = SimpleTypeSpecifiers.long_long;
             }
             public void A8Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->value = new SignedNode(span);
+                context->value = SimpleTypeSpecifiers.long_;
             }
             public void A9Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->value = new UnsignedNode(span);
+                context->value = SimpleTypeSpecifiers.signed;
             }
             public void A10Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->value = new FloatNode(span);
+                context->value = SimpleTypeSpecifiers.unsigned;
             }
             public void A11Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->value = new DoubleNode(span);
+                context->value = SimpleTypeSpecifiers.float_;
             }
             public void A12Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->value = new VoidNode(span);
+                context->value = SimpleTypeSpecifiers.double_;
             }
             public void A13Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->value = new AutoNode(span);
+                context->value = SimpleTypeSpecifiers.void_;
+            }
+            public void A14Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                context->value = SimpleTypeSpecifiers.auto;
             }
             public class Context : System.Text.Parsing.Context
             {
                 public Context() : value()
                 {
                 }
-                public Node* value;
+                public SimpleTypeSpecifiers value;
             }
         }
 
         public override void GetReferencedGrammars()
         {
+            ParsingDomain* pd = Domain();
+            Grammar* grammar0 = pd->GetGrammar(ToUtf32("System.Text.Parsing.stdlib"));
+            if (grammar0 == null)
+            {
+                grammar0 = new System.Text.Parsing.stdlib(pd);
+            }
+            AddGrammarReference(grammar0);
         }
         public override void CreateRules()
         {
+            AddRuleLink(new System.Text.Parsing.RuleLink(ToUtf32("spaces"), this, ToUtf32("System.Text.Parsing.stdlib.spaces")));
             AddRule(new SimpleTypeRule(ToUtf32("SimpleType"), GetScope(), Domain()->GetNextRuleId(),
-                new System.Text.Parsing.SequenceParser(
-                    new System.Text.Parsing.ActionParser(ToUtf32("A0"),
-                        new System.Text.Parsing.EmptyParser()),
-                    new System.Text.Parsing.ActionParser(ToUtf32("A1"),
-                        new System.Text.Parsing.GroupingParser(
-                            new System.Text.Parsing.PositiveParser(
-                                new System.Text.Parsing.GroupingParser(
-                                    new System.Text.Parsing.AlternativeParser(
-                                        new System.Text.Parsing.SequenceParser(
-                                            new System.Text.Parsing.NonterminalParser(ToUtf32("st1"), ToUtf32("SimpleTypeSpecifier"), 0),
-                                            new System.Text.Parsing.ActionParser(ToUtf32("A2"),
-                                                new System.Text.Parsing.CharParser('?'))),
-                                        new System.Text.Parsing.ActionParser(ToUtf32("A3"),
-                                            new System.Text.Parsing.NonterminalParser(ToUtf32("st2"), ToUtf32("SimpleTypeSpecifier"), 0))))))))));
+                new System.Text.Parsing.ActionParser(ToUtf32("A0"),
+                    new System.Text.Parsing.GroupingParser(
+                        new System.Text.Parsing.PositiveParser(
+                            new System.Text.Parsing.GroupingParser(
+                                new System.Text.Parsing.ActionParser(ToUtf32("A1"),
+                                    new System.Text.Parsing.NonterminalParser(ToUtf32("SimpleTypeSpecifier"), ToUtf32("SimpleTypeSpecifier"), 0))))))));
             AddRule(new SimpleTypeSpecifierRule(ToUtf32("SimpleTypeSpecifier"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.AlternativeParser(
                     new System.Text.Parsing.AlternativeParser(
@@ -307,34 +288,40 @@ namespace cppparser
                                                         new System.Text.Parsing.AlternativeParser(
                                                             new System.Text.Parsing.AlternativeParser(
                                                                 new System.Text.Parsing.AlternativeParser(
-                                                                    new System.Text.Parsing.ActionParser(ToUtf32("A0"),
-                                                                        new System.Text.Parsing.KeywordParser(ToUtf32("char"))),
-                                                                    new System.Text.Parsing.ActionParser(ToUtf32("A1"),
-                                                                        new System.Text.Parsing.KeywordParser(ToUtf32("char16_t")))),
-                                                                new System.Text.Parsing.ActionParser(ToUtf32("A2"),
-                                                                    new System.Text.Parsing.KeywordParser(ToUtf32("char32_t")))),
-                                                            new System.Text.Parsing.ActionParser(ToUtf32("A3"),
-                                                                new System.Text.Parsing.KeywordParser(ToUtf32("wchar_t")))),
-                                                        new System.Text.Parsing.ActionParser(ToUtf32("A4"),
-                                                            new System.Text.Parsing.KeywordParser(ToUtf32("bool")))),
-                                                    new System.Text.Parsing.ActionParser(ToUtf32("A5"),
-                                                        new System.Text.Parsing.KeywordParser(ToUtf32("short")))),
-                                                new System.Text.Parsing.ActionParser(ToUtf32("A6"),
-                                                    new System.Text.Parsing.KeywordParser(ToUtf32("int")))),
-                                            new System.Text.Parsing.ActionParser(ToUtf32("A7"),
+                                                                    new System.Text.Parsing.AlternativeParser(
+                                                                        new System.Text.Parsing.ActionParser(ToUtf32("A0"),
+                                                                            new System.Text.Parsing.KeywordParser(ToUtf32("char"))),
+                                                                        new System.Text.Parsing.ActionParser(ToUtf32("A1"),
+                                                                            new System.Text.Parsing.KeywordParser(ToUtf32("char16_t")))),
+                                                                    new System.Text.Parsing.ActionParser(ToUtf32("A2"),
+                                                                        new System.Text.Parsing.KeywordParser(ToUtf32("char32_t")))),
+                                                                new System.Text.Parsing.ActionParser(ToUtf32("A3"),
+                                                                    new System.Text.Parsing.KeywordParser(ToUtf32("wchar_t")))),
+                                                            new System.Text.Parsing.ActionParser(ToUtf32("A4"),
+                                                                new System.Text.Parsing.KeywordParser(ToUtf32("bool")))),
+                                                        new System.Text.Parsing.ActionParser(ToUtf32("A5"),
+                                                            new System.Text.Parsing.KeywordParser(ToUtf32("short")))),
+                                                    new System.Text.Parsing.ActionParser(ToUtf32("A6"),
+                                                        new System.Text.Parsing.KeywordParser(ToUtf32("int")))),
+                                                new System.Text.Parsing.SequenceParser(
+                                                    new System.Text.Parsing.KeywordParser(ToUtf32("long")),
+                                                    new System.Text.Parsing.ActionParser(ToUtf32("A7"),
+                                                        new System.Text.Parsing.KeywordParser(ToUtf32("long"))))),
+                                            new System.Text.Parsing.ActionParser(ToUtf32("A8"),
                                                 new System.Text.Parsing.KeywordParser(ToUtf32("long")))),
-                                        new System.Text.Parsing.ActionParser(ToUtf32("A8"),
+                                        new System.Text.Parsing.ActionParser(ToUtf32("A9"),
                                             new System.Text.Parsing.KeywordParser(ToUtf32("signed")))),
-                                    new System.Text.Parsing.ActionParser(ToUtf32("A9"),
+                                    new System.Text.Parsing.ActionParser(ToUtf32("A10"),
                                         new System.Text.Parsing.KeywordParser(ToUtf32("unsigned")))),
-                                new System.Text.Parsing.ActionParser(ToUtf32("A10"),
+                                new System.Text.Parsing.ActionParser(ToUtf32("A11"),
                                     new System.Text.Parsing.KeywordParser(ToUtf32("float")))),
-                            new System.Text.Parsing.ActionParser(ToUtf32("A11"),
+                            new System.Text.Parsing.ActionParser(ToUtf32("A12"),
                                 new System.Text.Parsing.KeywordParser(ToUtf32("double")))),
-                        new System.Text.Parsing.ActionParser(ToUtf32("A12"),
+                        new System.Text.Parsing.ActionParser(ToUtf32("A13"),
                             new System.Text.Parsing.KeywordParser(ToUtf32("void")))),
-                    new System.Text.Parsing.ActionParser(ToUtf32("A13"),
+                    new System.Text.Parsing.ActionParser(ToUtf32("A14"),
                         new System.Text.Parsing.KeywordParser(ToUtf32("auto"))))));
+            SetSkipRuleName(ToUtf32("spaces"));
         }
     }
 } // cppparser

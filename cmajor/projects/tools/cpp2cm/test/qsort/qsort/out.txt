@@ -1,0 +1,618 @@
+> C:/Users/Seppo/cmajorw64/cmajor/projects/tools/cpp2cm/test/qsort/qsort/qsort.cpp
+Preprocessing C:/Users/Seppo/cmajorw64/cmajor/projects/tools/cpp2cm/test/qsort/qsort/qsort.cpp succeeded.
+>> C:/Users/Seppo/cmajorw64/cmajor/projects/tools/cpp2cm/test/qsort/qsort/qsort.cpp
+Parsing C:/Users/Seppo/cmajorw64/cmajor/projects/tools/cpp2cm/test/qsort/qsort/qsort.cpp succeeded.
+<ast>
+    <compileUnit fileName="C:/Users/Seppo/cmajorw64/cmajor/projects/tools/cpp2cm/test/qsort/qsort/qsort.cpp">
+        <sourceFile fileName="C:/Users/Seppo/cmajorw64/cmajor/projects/tools/cpp2cm/test/qsort/qsort/qsort.cpp">
+            <function specifiers="">
+                <returnType>
+                    <simpleType>
+                        <int line="4"/>
+                    </simpleType>
+                </returnType>
+                <functionDeclarator cv="">
+                    <identifier line="4" name="Partition"/>
+                    <parameters>
+                        <parameter>
+                            <lvalueRef>
+                                <colonColon>
+                                    <identifier line="4" name="std"/>
+                                    <templateId>
+                                        <identifier line="4" name="vector"/>
+                                        <templateArguments>
+                                            <simpleType>
+                                                <int line="4"/>
+                                            </simpleType>
+                                        </templateArguments>
+                                    </templateId>
+                                </colonColon>
+                            </lvalueRef>
+                            <identifier line="4" name="intList"/>
+                        </parameter>
+                        <parameter>
+                            <simpleType>
+                                <int line="4"/>
+                            </simpleType>
+                            <identifier line="4" name="left"/>
+                        </parameter>
+                        <parameter>
+                            <simpleType>
+                                <int line="4"/>
+                            </simpleType>
+                            <identifier line="4" name="right"/>
+                        </parameter>
+                    </parameters>
+                </functionDeclarator>
+                <compoundStatement>
+                    <declarationStatement>
+                        <simpleDeclaration specifiers="">
+                            <simpleType>
+                                <int line="6"/>
+                            </simpleType>
+                            <initDeclarator>
+                                <identifier line="6" name="i"/>
+                                <assignmentInitializer>
+                                    <identifier line="6" name="left"/>
+                                </assignmentInitializer>
+                            </initDeclarator>
+                        </simpleDeclaration>
+                    </declarationStatement>
+                    <declarationStatement>
+                        <simpleDeclaration specifiers="">
+                            <simpleType>
+                                <int line="7"/>
+                            </simpleType>
+                            <initDeclarator>
+                                <identifier line="7" name="j"/>
+                                <assignmentInitializer>
+                                    <identifier line="7" name="right"/>
+                                </assignmentInitializer>
+                            </initDeclarator>
+                        </simpleDeclaration>
+                    </declarationStatement>
+                    <declarationStatement>
+                        <simpleDeclaration specifiers="">
+                            <simpleType>
+                                <int line="8"/>
+                            </simpleType>
+                            <initDeclarator>
+                                <identifier line="8" name="pivot"/>
+                                <assignmentInitializer>
+                                    <subscriptExpression>
+                                        <identifier line="8" name="intList"/>
+                                        <binaryExpression op="div">
+                                            <parenthesizedExpression>
+                                                <binaryExpression op="add">
+                                                    <identifier line="8" name="left"/>
+                                                    <identifier line="8" name="right"/>
+                                                </binaryExpression>
+                                            </parenthesizedExpression>
+                                            <integerLiteral line="8" rep="2" value="2"/>
+                                        </binaryExpression>
+                                    </subscriptExpression>
+                                </assignmentInitializer>
+                            </initDeclarator>
+                        </simpleDeclaration>
+                    </declarationStatement>
+                    <whileStatement>
+                        <binaryExpression op="lessOrEqual">
+                            <identifier line="9" name="i"/>
+                            <identifier line="9" name="j"/>
+                        </binaryExpression>
+                        <compoundStatement>
+                            <whileStatement>
+                                <binaryExpression op="less">
+                                    <subscriptExpression>
+                                        <identifier line="11" name="intList"/>
+                                        <identifier line="11" name="i"/>
+                                    </subscriptExpression>
+                                    <identifier line="11" name="pivot"/>
+                                </binaryExpression>
+                                <expressionStatement>
+                                    <prefixIncrementExpression>
+                                        <identifier line="11" name="i"/>
+                                    </prefixIncrementExpression>
+                                </expressionStatement>
+                            </whileStatement>
+                            <whileStatement>
+                                <binaryExpression op="greater">
+                                    <subscriptExpression>
+                                        <identifier line="12" name="intList"/>
+                                        <identifier line="12" name="j"/>
+                                    </subscriptExpression>
+                                    <identifier line="12" name="pivot"/>
+                                </binaryExpression>
+                                <expressionStatement>
+                                    <prefixDecrementExpression>
+                                        <identifier line="12" name="j"/>
+                                    </prefixDecrementExpression>
+                                </expressionStatement>
+                            </whileStatement>
+                            <ifStatement>
+                                <binaryExpression op="lessOrEqual">
+                                    <identifier line="13" name="i"/>
+                                    <identifier line="13" name="j"/>
+                                </binaryExpression>
+                                <compoundStatement>
+                                    <expressionStatement>
+                                        <invokeExpression>
+                                            <colonColon>
+                                                <identifier line="15" name="std"/>
+                                                <identifier line="15" name="swap"/>
+                                            </colonColon>
+                                            <arguments>
+                                                <expressionList>
+                                                    <subscriptExpression>
+                                                        <identifier line="15" name="intList"/>
+                                                        <identifier line="15" name="i"/>
+                                                    </subscriptExpression>
+                                                    <subscriptExpression>
+                                                        <identifier line="15" name="intList"/>
+                                                        <identifier line="15" name="j"/>
+                                                    </subscriptExpression>
+                                                </expressionList>
+                                            </arguments>
+                                        </invokeExpression>
+                                    </expressionStatement>
+                                    <expressionStatement>
+                                        <prefixIncrementExpression>
+                                            <identifier line="16" name="i"/>
+                                        </prefixIncrementExpression>
+                                    </expressionStatement>
+                                    <expressionStatement>
+                                        <prefixDecrementExpression>
+                                            <identifier line="17" name="j"/>
+                                        </prefixDecrementExpression>
+                                    </expressionStatement>
+                                </compoundStatement>
+                            </ifStatement>
+                        </compoundStatement>
+                    </whileStatement>
+                    <returnStatement>
+                        <identifier line="20" name="i"/>
+                    </returnStatement>
+                </compoundStatement>
+            </function>
+            <function specifiers="">
+                <returnType>
+                    <simpleType>
+                        <void line="23"/>
+                    </simpleType>
+                </returnType>
+                <functionDeclarator cv="">
+                    <identifier line="23" name="QuickSort"/>
+                    <parameters>
+                        <parameter>
+                            <lvalueRef>
+                                <colonColon>
+                                    <identifier line="23" name="std"/>
+                                    <templateId>
+                                        <identifier line="23" name="vector"/>
+                                        <templateArguments>
+                                            <simpleType>
+                                                <int line="23"/>
+                                            </simpleType>
+                                        </templateArguments>
+                                    </templateId>
+                                </colonColon>
+                            </lvalueRef>
+                            <identifier line="23" name="intList"/>
+                        </parameter>
+                        <parameter>
+                            <simpleType>
+                                <int line="23"/>
+                            </simpleType>
+                            <identifier line="23" name="left"/>
+                        </parameter>
+                        <parameter>
+                            <simpleType>
+                                <int line="23"/>
+                            </simpleType>
+                            <identifier line="23" name="right"/>
+                        </parameter>
+                    </parameters>
+                </functionDeclarator>
+                <compoundStatement>
+                    <declarationStatement>
+                        <simpleDeclaration specifiers="">
+                            <simpleType>
+                                <int line="25"/>
+                            </simpleType>
+                            <initDeclarator>
+                                <identifier line="25" name="index"/>
+                                <assignmentInitializer>
+                                    <invokeExpression>
+                                        <identifier line="25" name="Partition"/>
+                                        <arguments>
+                                            <expressionList>
+                                                <identifier line="25" name="intList"/>
+                                                <identifier line="25" name="left"/>
+                                                <identifier line="25" name="right"/>
+                                            </expressionList>
+                                        </arguments>
+                                    </invokeExpression>
+                                </assignmentInitializer>
+                            </initDeclarator>
+                        </simpleDeclaration>
+                    </declarationStatement>
+                    <ifStatement>
+                        <binaryExpression op="less">
+                            <identifier line="26" name="left"/>
+                            <binaryExpression op="sub">
+                                <identifier line="26" name="index"/>
+                                <integerLiteral line="26" rep="1" value="1"/>
+                            </binaryExpression>
+                        </binaryExpression>
+                        <compoundStatement>
+                            <expressionStatement>
+                                <invokeExpression>
+                                    <identifier line="28" name="QuickSort"/>
+                                    <arguments>
+                                        <expressionList>
+                                            <identifier line="28" name="intList"/>
+                                            <identifier line="28" name="left"/>
+                                            <binaryExpression op="sub">
+                                                <identifier line="28" name="index"/>
+                                                <integerLiteral line="28" rep="1" value="1"/>
+                                            </binaryExpression>
+                                        </expressionList>
+                                    </arguments>
+                                </invokeExpression>
+                            </expressionStatement>
+                        </compoundStatement>
+                    </ifStatement>
+                    <ifStatement>
+                        <binaryExpression op="less">
+                            <identifier line="30" name="index"/>
+                            <identifier line="30" name="right"/>
+                        </binaryExpression>
+                        <compoundStatement>
+                            <expressionStatement>
+                                <invokeExpression>
+                                    <identifier line="32" name="QuickSort"/>
+                                    <arguments>
+                                        <expressionList>
+                                            <identifier line="32" name="intList"/>
+                                            <identifier line="32" name="index"/>
+                                            <identifier line="32" name="right"/>
+                                        </expressionList>
+                                    </arguments>
+                                </invokeExpression>
+                            </expressionStatement>
+                        </compoundStatement>
+                    </ifStatement>
+                </compoundStatement>
+            </function>
+            <function specifiers="">
+                <returnType>
+                    <simpleType>
+                        <void line="36"/>
+                    </simpleType>
+                </returnType>
+                <functionDeclarator cv="">
+                    <identifier line="36" name="QuickSort"/>
+                    <parameters>
+                        <parameter>
+                            <lvalueRef>
+                                <colonColon>
+                                    <identifier line="36" name="std"/>
+                                    <templateId>
+                                        <identifier line="36" name="vector"/>
+                                        <templateArguments>
+                                            <simpleType>
+                                                <int line="36"/>
+                                            </simpleType>
+                                        </templateArguments>
+                                    </templateId>
+                                </colonColon>
+                            </lvalueRef>
+                            <identifier line="36" name="intList"/>
+                        </parameter>
+                    </parameters>
+                </functionDeclarator>
+                <compoundStatement>
+                    <ifStatement>
+                        <unaryExpression op="not">
+                            <invokeExpression>
+                                <dot>
+                                    <identifier line="38" name="intList"/>
+                                    <identifier line="38" name="empty"/>
+                                </dot>
+                                <arguments>
+                                    <expressionList/>
+                                </arguments>
+                            </invokeExpression>
+                        </unaryExpression>
+                        <compoundStatement>
+                            <expressionStatement>
+                                <invokeExpression>
+                                    <identifier line="40" name="QuickSort"/>
+                                    <arguments>
+                                        <expressionList>
+                                            <identifier line="40" name="intList"/>
+                                            <integerLiteral line="40" rep="0" value="0"/>
+                                            <binaryExpression op="sub">
+                                                <invokeExpression>
+                                                    <dot>
+                                                        <identifier line="40" name="intList"/>
+                                                        <identifier line="40" name="size"/>
+                                                    </dot>
+                                                    <arguments>
+                                                        <expressionList/>
+                                                    </arguments>
+                                                </invokeExpression>
+                                                <integerLiteral line="40" rep="1" value="1"/>
+                                            </binaryExpression>
+                                        </expressionList>
+                                    </arguments>
+                                </invokeExpression>
+                            </expressionStatement>
+                        </compoundStatement>
+                    </ifStatement>
+                </compoundStatement>
+            </function>
+            <function specifiers="">
+                <returnType>
+                    <simpleType>
+                        <void line="44"/>
+                    </simpleType>
+                </returnType>
+                <functionDeclarator cv="">
+                    <identifier line="44" name="Print"/>
+                    <parameters>
+                        <parameter>
+                            <const>
+                                <lvalueRef>
+                                    <colonColon>
+                                        <identifier line="44" name="std"/>
+                                        <templateId>
+                                            <identifier line="44" name="vector"/>
+                                            <templateArguments>
+                                                <simpleType>
+                                                    <int line="44"/>
+                                                </simpleType>
+                                            </templateArguments>
+                                        </templateId>
+                                    </colonColon>
+                                </lvalueRef>
+                            </const>
+                            <identifier line="44" name="intList"/>
+                        </parameter>
+                    </parameters>
+                </functionDeclarator>
+                <compoundStatement>
+                    <declarationStatement>
+                        <simpleDeclaration specifiers="">
+                            <simpleType>
+                                <bool line="46"/>
+                            </simpleType>
+                            <initDeclarator>
+                                <identifier line="46" name="first"/>
+                                <assignmentInitializer>
+                                    <booleanLiteral line="46" rep="true" value="true"/>
+                                </assignmentInitializer>
+                            </initDeclarator>
+                        </simpleDeclaration>
+                    </declarationStatement>
+                    <expressionStatement>
+                        <binaryExpression op="shiftLeft">
+                            <colonColon>
+                                <identifier line="47" name="std"/>
+                                <identifier line="47" name="cout"/>
+                            </colonColon>
+                            <characterLiteral line="47" rep="'['" value="["/>
+                        </binaryExpression>
+                    </expressionStatement>
+                    <rangeForStatement>
+                        <simpleDeclaration specifiers="">
+                            <simpleType>
+                                <int line="48"/>
+                            </simpleType>
+                            <identifier line="48" name="x"/>
+                        </simpleDeclaration>
+                        <identifier line="48" name="intList"/>
+                        <compoundStatement>
+                            <ifStatement>
+                                <identifier line="50" name="first"/>
+                                <compoundStatement>
+                                    <expressionStatement>
+                                        <binaryExpression op="assign">
+                                            <identifier line="52" name="first"/>
+                                            <booleanLiteral line="52" rep="false" value="false"/>
+                                        </binaryExpression>
+                                    </expressionStatement>
+                                </compoundStatement>
+                                <compoundStatement>
+                                    <expressionStatement>
+                                        <binaryExpression op="shiftLeft">
+                                            <colonColon>
+                                                <identifier line="56" name="std"/>
+                                                <identifier line="56" name="cout"/>
+                                            </colonColon>
+                                            <stringLiteral line="56" rep='", "' value=", "/>
+                                        </binaryExpression>
+                                    </expressionStatement>
+                                </compoundStatement>
+                            </ifStatement>
+                            <expressionStatement>
+                                <binaryExpression op="shiftLeft">
+                                    <colonColon>
+                                        <identifier line="58" name="std"/>
+                                        <identifier line="58" name="cout"/>
+                                    </colonColon>
+                                    <identifier line="58" name="x"/>
+                                </binaryExpression>
+                            </expressionStatement>
+                        </compoundStatement>
+                    </rangeForStatement>
+                    <expressionStatement>
+                        <binaryExpression op="shiftLeft">
+                            <binaryExpression op="shiftLeft">
+                                <colonColon>
+                                    <identifier line="60" name="std"/>
+                                    <identifier line="60" name="cout"/>
+                                </colonColon>
+                                <characterLiteral line="60" rep="']'" value="]"/>
+                            </binaryExpression>
+                            <colonColon>
+                                <identifier line="60" name="std"/>
+                                <identifier line="60" name="endl"/>
+                            </colonColon>
+                        </binaryExpression>
+                    </expressionStatement>
+                </compoundStatement>
+            </function>
+            <function specifiers="">
+                <returnType>
+                    <simpleType>
+                        <int line="63"/>
+                    </simpleType>
+                </returnType>
+                <functionDeclarator cv="">
+                    <identifier line="63" name="main"/>
+                    <parameters/>
+                </functionDeclarator>
+                <compoundStatement>
+                    <declarationStatement>
+                        <simpleDeclaration specifiers="">
+                            <colonColon>
+                                <identifier line="65" name="std"/>
+                                <identifier line="65" name="default_random_engine"/>
+                            </colonColon>
+                            <identifier line="65" name="re"/>
+                        </simpleDeclaration>
+                    </declarationStatement>
+                    <declarationStatement>
+                        <simpleDeclaration specifiers="">
+                            <colonColon>
+                                <identifier line="66" name="std"/>
+                                <templateId>
+                                    <identifier line="66" name="uniform_int_distribution"/>
+                                    <templateArguments/>
+                                </templateId>
+                            </colonColon>
+                            <initDeclarator>
+                                <identifier line="66" name="d"/>
+                                <bracedInitializerList>
+                                    <integerLiteral line="66" rep="0" value="0"/>
+                                    <integerLiteral line="66" rep="100" value="100"/>
+                                </bracedInitializerList>
+                            </initDeclarator>
+                        </simpleDeclaration>
+                    </declarationStatement>
+                    <declarationStatement>
+                        <simpleDeclaration specifiers="">
+                            <colonColon>
+                                <identifier line="67" name="std"/>
+                                <templateId>
+                                    <identifier line="67" name="vector"/>
+                                    <templateArguments>
+                                        <simpleType>
+                                            <int line="67"/>
+                                        </simpleType>
+                                    </templateArguments>
+                                </templateId>
+                            </colonColon>
+                            <identifier line="67" name="intList"/>
+                        </simpleDeclaration>
+                    </declarationStatement>
+                    <declarationStatement>
+                        <simpleDeclaration specifiers="">
+                            <simpleType>
+                                <int line="68"/>
+                            </simpleType>
+                            <initDeclarator>
+                                <identifier line="68" name="n"/>
+                                <assignmentInitializer>
+                                    <integerLiteral line="68" rep="10" value="10"/>
+                                </assignmentInitializer>
+                            </initDeclarator>
+                        </simpleDeclaration>
+                    </declarationStatement>
+                    <forStatement>
+                        <init>
+                            <simpleDeclaration specifiers="">
+                                <simpleType>
+                                    <int line="69"/>
+                                </simpleType>
+                                <initDeclarator>
+                                    <identifier line="69" name="i"/>
+                                    <assignmentInitializer>
+                                        <integerLiteral line="69" rep="0" value="0"/>
+                                    </assignmentInitializer>
+                                </initDeclarator>
+                            </simpleDeclaration>
+                        </init>
+                        <condition>
+                            <binaryExpression op="less">
+                                <identifier line="69" name="i"/>
+                                <identifier line="69" name="n"/>
+                            </binaryExpression>
+                        </condition>
+                        <loopExpr>
+                            <prefixIncrementExpression>
+                                <identifier line="69" name="i"/>
+                            </prefixIncrementExpression>
+                        </loopExpr>
+                        <compoundStatement>
+                            <expressionStatement>
+                                <invokeExpression>
+                                    <dot>
+                                        <identifier line="71" name="intList"/>
+                                        <identifier line="71" name="push_back"/>
+                                    </dot>
+                                    <arguments>
+                                        <expressionList>
+                                            <invokeExpression>
+                                                <identifier line="71" name="d"/>
+                                                <arguments>
+                                                    <expressionList>
+                                                        <identifier line="71" name="re"/>
+                                                    </expressionList>
+                                                </arguments>
+                                            </invokeExpression>
+                                        </expressionList>
+                                    </arguments>
+                                </invokeExpression>
+                            </expressionStatement>
+                        </compoundStatement>
+                    </forStatement>
+                    <expressionStatement>
+                        <invokeExpression>
+                            <identifier line="73" name="Print"/>
+                            <arguments>
+                                <expressionList>
+                                    <identifier line="73" name="intList"/>
+                                </expressionList>
+                            </arguments>
+                        </invokeExpression>
+                    </expressionStatement>
+                    <expressionStatement>
+                        <invokeExpression>
+                            <identifier line="74" name="QuickSort"/>
+                            <arguments>
+                                <expressionList>
+                                    <identifier line="74" name="intList"/>
+                                </expressionList>
+                            </arguments>
+                        </invokeExpression>
+                    </expressionStatement>
+                    <expressionStatement>
+                        <invokeExpression>
+                            <identifier line="75" name="Print"/>
+                            <arguments>
+                                <expressionList>
+                                    <identifier line="75" name="intList"/>
+                                </expressionList>
+                            </arguments>
+                        </invokeExpression>
+                    </expressionStatement>
+                    <returnStatement>
+                        <integerLiteral line="76" rep="0" value="0"/>
+                    </returnStatement>
+                </compoundStatement>
+            </function>
+        </sourceFile>
+    </compileUnit>
+</ast>

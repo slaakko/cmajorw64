@@ -888,10 +888,14 @@ namespace pp
                 defineObjectMacroNonterminalParser->SetPre(PreDefineObjectMacro);
                 NonterminalParser* undefineMacroNonterminalParser = GetNonterminal(ToUtf32("UndefineMacro"));
                 undefineMacroNonterminalParser->SetPre(PreUndefineMacro);
-                NonterminalParser* pragmaNonterminalParser = GetNonterminal(ToUtf32("Pragma"));
-                pragmaNonterminalParser->SetPre(PrePragma);
-                NonterminalParser* emptyNonterminalParser = GetNonterminal(ToUtf32("Empty"));
-                emptyNonterminalParser->SetPre(PreEmpty);
+                NonterminalParser* pragmaDirectiveNonterminalParser = GetNonterminal(ToUtf32("PragmaDirective"));
+                pragmaDirectiveNonterminalParser->SetPre(PrePragmaDirective);
+                NonterminalParser* errorDirectiveNonterminalParser = GetNonterminal(ToUtf32("ErrorDirective"));
+                errorDirectiveNonterminalParser->SetPre(PreErrorDirective);
+                NonterminalParser* lineDirectiveNonterminalParser = GetNonterminal(ToUtf32("LineDirective"));
+                lineDirectiveNonterminalParser->SetPre(PreLineDirective);
+                NonterminalParser* nullDirectiveNonterminalParser = GetNonterminal(ToUtf32("NullDirective"));
+                nullDirectiveNonterminalParser->SetPre(PreNullDirective);
             }
             public void PreIncludeDirective(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
             {
@@ -921,12 +925,23 @@ namespace pp
                 stack.Push(UniquePtr<Object>(new ValueObject<bool>(context->process)));
                 stack.Push(UniquePtr<Object>(new ValueObject<ustring*>(context->result)));
             }
-            public void PrePragma(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
+            public void PrePragmaDirective(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
                 stack.Push(UniquePtr<Object>(new ValueObject<ustring*>(context->result)));
             }
-            public void PreEmpty(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
+            public void PreErrorDirective(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                stack.Push(UniquePtr<Object>(new ValueObject<bool>(context->process)));
+                stack.Push(UniquePtr<Object>(new ValueObject<ustring*>(context->result)));
+            }
+            public void PreLineDirective(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                stack.Push(UniquePtr<Object>(new ValueObject<ustring*>(context->result)));
+            }
+            public void PreNullDirective(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
                 stack.Push(UniquePtr<Object>(new ValueObject<ustring*>(context->result)));
@@ -1076,7 +1091,7 @@ namespace pp
                 stack.Push(UniquePtr<Object>(new ValueObject<bool>(context->process)));
                 stack.Push(UniquePtr<Object>(new ValueObject<ustring*>(&context->replacementList)));
                 stack.Push(UniquePtr<Object>(new ValueObject<PP*>(context->pp)));
-                stack.Push(UniquePtr<Object>(new ValueObject<PPTokenFlags>(PPTokenFlags.acceptHeaderName)));
+                stack.Push(UniquePtr<Object>(new ValueObject<PPTokenFlags>(cast<PPTokenFlags>(PPTokenFlags.acceptHeaderName | PPTokenFlags.acceptHash))));
             }
             public class Context : System.Text.Parsing.Context
             {
@@ -1300,9 +1315,9 @@ namespace pp
             }
         }
 
-        public class PragmaRule : System.Text.Parsing.RuleParser
+        public class PragmaDirectiveRule : System.Text.Parsing.RuleParser
         {
-            public PragmaRule(const ustring& name_, Scope* enclosingScope_, int id_, Parser* definition_) : base(name_, enclosingScope_, id_, definition_)
+            public PragmaDirectiveRule(const ustring& name_, Scope* enclosingScope_, int id_, Parser* definition_) : base(name_, enclosingScope_, id_, definition_)
             {
                 AddInheritedAttribute(AttrOrVar(ToUtf32("ustring*"), ToUtf32("result")));
             }
@@ -1336,9 +1351,93 @@ namespace pp
             }
         }
 
-        public class EmptyRule : System.Text.Parsing.RuleParser
+        public class ErrorDirectiveRule : System.Text.Parsing.RuleParser
         {
-            public EmptyRule(const ustring& name_, Scope* enclosingScope_, int id_, Parser* definition_) : base(name_, enclosingScope_, id_, definition_)
+            public ErrorDirectiveRule(const ustring& name_, Scope* enclosingScope_, int id_, Parser* definition_) : base(name_, enclosingScope_, id_, definition_)
+            {
+                AddInheritedAttribute(AttrOrVar(ToUtf32("bool"), ToUtf32("process")));
+                AddInheritedAttribute(AttrOrVar(ToUtf32("ustring*"), ToUtf32("result")));
+            }
+            public override void Enter(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
+            {
+                parsingData->PushContext(Id(), new Context());
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                UniquePtr<Object> result_value = stack.Pop();
+                context->result = *cast<ValueObject<ustring*>*>(result_value.Get());
+                UniquePtr<Object> process_value = stack.Pop();
+                context->process = *cast<ValueObject<bool>*>(process_value.Get());
+            }
+            public override void Leave(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
+            {
+                parsingData->PopContext(Id());
+            }
+            public override void Link()
+            {
+                ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
+                a0ActionParser->SetAction(A0Action);
+            }
+            public void A0Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                if (context->process)
+                {
+                    context->result->Append(ustring(matchBegin, matchEnd));
+                    ThrowPreprocessingException(ToUtf8(ustring(matchBegin, matchEnd)));
+                }
+                else
+                {
+                    context->result->Append('\n');
+                }
+            }
+            public class Context : System.Text.Parsing.Context
+            {
+                public Context() : process(), result()
+                {
+                }
+                public bool process;
+                public ustring* result;
+            }
+        }
+
+        public class LineDirectiveRule : System.Text.Parsing.RuleParser
+        {
+            public LineDirectiveRule(const ustring& name_, Scope* enclosingScope_, int id_, Parser* definition_) : base(name_, enclosingScope_, id_, definition_)
+            {
+                AddInheritedAttribute(AttrOrVar(ToUtf32("ustring*"), ToUtf32("result")));
+            }
+            public override void Enter(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
+            {
+                parsingData->PushContext(Id(), new Context());
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                UniquePtr<Object> result_value = stack.Pop();
+                context->result = *cast<ValueObject<ustring*>*>(result_value.Get());
+            }
+            public override void Leave(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
+            {
+                parsingData->PopContext(Id());
+            }
+            public override void Link()
+            {
+                ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
+                a0ActionParser->SetAction(A0Action);
+            }
+            public void A0Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                context->result->Append('\n');
+            }
+            public class Context : System.Text.Parsing.Context
+            {
+                public Context() : result()
+                {
+                }
+                public ustring* result;
+            }
+        }
+
+        public class NullDirectiveRule : System.Text.Parsing.RuleParser
+        {
+            public NullDirectiveRule(const ustring& name_, Scope* enclosingScope_, int id_, Parser* definition_) : base(name_, enclosingScope_, id_, definition_)
             {
                 AddInheritedAttribute(AttrOrVar(ToUtf32("ustring*"), ToUtf32("result")));
             }
@@ -1497,6 +1596,7 @@ namespace pp
                 AddInheritedAttribute(AttrOrVar(ToUtf32("PP*"), ToUtf32("pp")));
                 AddInheritedAttribute(AttrOrVar(ToUtf32("PPTokenFlags"), ToUtf32("flags")));
                 AddLocalVariable(AttrOrVar(ToUtf32("bool"), ToUtf32("substituted")));
+                AddLocalVariable(AttrOrVar(ToUtf32("int"), ToUtf32("parenCount")));
             }
             public override void Enter(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
             {
@@ -1545,10 +1645,11 @@ namespace pp
                 stack.Push(UniquePtr<Object>(new ValueObject<PP*>(context->pp)));
                 stack.Push(UniquePtr<Object>(new ValueObject<PPTokenFlags>(cast<PPTokenFlags>(context->flags | PPTokenFlags.acceptFunctionMacroInvocaction))));
                 stack.Push(UniquePtr<Object>(new ValueObject<bool*>(&context->substituted)));
+                stack.Push(UniquePtr<Object>(new ValueObject<int*>(&context->parenCount)));
             }
             public class Context : System.Text.Parsing.Context
             {
-                public Context() : process(), result(), pp(), flags(), substituted()
+                public Context() : process(), result(), pp(), flags(), substituted(), parenCount()
                 {
                 }
                 public bool process;
@@ -1556,6 +1657,7 @@ namespace pp
                 public PP* pp;
                 public PPTokenFlags flags;
                 public bool substituted;
+                public int parenCount;
             }
         }
 
@@ -1568,6 +1670,7 @@ namespace pp
                 AddInheritedAttribute(AttrOrVar(ToUtf32("PP*"), ToUtf32("pp")));
                 AddInheritedAttribute(AttrOrVar(ToUtf32("PPTokenFlags"), ToUtf32("flags")));
                 AddLocalVariable(AttrOrVar(ToUtf32("bool"), ToUtf32("substituted")));
+                AddLocalVariable(AttrOrVar(ToUtf32("int"), ToUtf32("parenCount")));
             }
             public override void Enter(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
             {
@@ -1616,10 +1719,11 @@ namespace pp
                 stack.Push(UniquePtr<Object>(new ValueObject<PP*>(context->pp)));
                 stack.Push(UniquePtr<Object>(new ValueObject<PPTokenFlags>(cast<PPTokenFlags>(context->flags | PPTokenFlags.acceptFunctionMacroInvocaction))));
                 stack.Push(UniquePtr<Object>(new ValueObject<bool*>(&context->substituted)));
+                stack.Push(UniquePtr<Object>(new ValueObject<int*>(&context->parenCount)));
             }
             public class Context : System.Text.Parsing.Context
             {
-                public Context() : process(), result(), pp(), flags(), substituted()
+                public Context() : process(), result(), pp(), flags(), substituted(), parenCount()
                 {
                 }
                 public bool process;
@@ -1627,6 +1731,7 @@ namespace pp
                 public PP* pp;
                 public PPTokenFlags flags;
                 public bool substituted;
+                public int parenCount;
             }
         }
 
@@ -1639,11 +1744,15 @@ namespace pp
                 AddInheritedAttribute(AttrOrVar(ToUtf32("PP*"), ToUtf32("pp")));
                 AddInheritedAttribute(AttrOrVar(ToUtf32("PPTokenFlags"), ToUtf32("flags")));
                 AddInheritedAttribute(AttrOrVar(ToUtf32("bool*"), ToUtf32("substituted")));
+                AddInheritedAttribute(AttrOrVar(ToUtf32("int*"), ToUtf32("parenCount")));
+                AddLocalVariable(AttrOrVar(ToUtf32("bool"), ToUtf32("stringisize")));
             }
             public override void Enter(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
             {
                 parsingData->PushContext(Id(), new Context());
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                UniquePtr<Object> parenCount_value = stack.Pop();
+                context->parenCount = *cast<ValueObject<int*>*>(parenCount_value.Get());
                 UniquePtr<Object> substituted_value = stack.Pop();
                 context->substituted = *cast<ValueObject<bool*>*>(substituted_value.Get());
                 UniquePtr<Object> flags_value = stack.Pop();
@@ -1689,6 +1798,20 @@ namespace pp
                 a12ActionParser->SetAction(A12Action);
                 ActionParser* a13ActionParser = GetAction(ToUtf32("A13"));
                 a13ActionParser->SetAction(A13Action);
+                ActionParser* a14ActionParser = GetAction(ToUtf32("A14"));
+                a14ActionParser->SetAction(A14Action);
+                ActionParser* a15ActionParser = GetAction(ToUtf32("A15"));
+                a15ActionParser->SetAction(A15Action);
+                ActionParser* a16ActionParser = GetAction(ToUtf32("A16"));
+                a16ActionParser->SetAction(A16Action);
+                ActionParser* a17ActionParser = GetAction(ToUtf32("A17"));
+                a17ActionParser->SetAction(A17Action);
+                ActionParser* a18ActionParser = GetAction(ToUtf32("A18"));
+                a18ActionParser->SetAction(A18Action);
+                ActionParser* a19ActionParser = GetAction(ToUtf32("A19"));
+                a19ActionParser->SetAction(A19Action);
+                ActionParser* a20ActionParser = GetAction(ToUtf32("A20"));
+                a20ActionParser->SetAction(A20Action);
                 NonterminalParser* headerNameNonterminalParser = GetNonterminal(ToUtf32("HeaderName"));
                 headerNameNonterminalParser->SetPost(PostHeaderName);
                 NonterminalParser* functionMacroInvocationNonterminalParser = GetNonterminal(ToUtf32("FunctionMacroInvocation"));
@@ -1707,69 +1830,110 @@ namespace pp
             public void A0Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                pass = (context->flags & PPTokenFlags.acceptHeaderName) != PPTokenFlags.none;
+                pass = (context->flags & PPTokenFlags.acceptHash) != PPTokenFlags.none;
             }
             public void A1Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                if (context->process) context->result->Append(context->fromHeaderName);
+                if (context->process) context->result->Append('$');
             }
             public void A2Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                pass = (context->flags & PPTokenFlags.acceptFunctionMacroInvocaction) != PPTokenFlags.none;
+                if (context->process) context->result->Append('@');
             }
             public void A3Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                pass = (context->flags & PPTokenFlags.macroArgumentReplacement) != PPTokenFlags.none;
+                pass = (context->flags & PPTokenFlags.acceptHeaderName) != PPTokenFlags.none;
             }
             public void A4Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                if (context->process) context->result->Append(context->pp->SubstituteMacroArgument(context->fromid1));
+                if (context->process) context->result->Append(context->fromHeaderName);
             }
             public void A5Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                pass = (context->flags & PPTokenFlags.macroArgumentReplacement) == PPTokenFlags.none;
+                pass = (context->flags & PPTokenFlags.acceptFunctionMacroInvocaction) != PPTokenFlags.none;
             }
             public void A6Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                if (context->process) context->result->Append(context->pp->SubstituteObjectMacro(context->fromid2, *context->substituted, fileName, span.lineNumber));
+                pass = (context->flags & PPTokenFlags.macroArgumentReplacement) != PPTokenFlags.none;
             }
             public void A7Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                if (context->process) context->result->Append(context->fromPPNumber);
+                context->stringisize = true;
             }
             public void A8Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                if (context->process) context->result->Append(ustring(matchBegin, matchEnd));
+                if (context->process) context->result->Append(context->pp->SubstituteMacroArgument(context->fromid1, context->stringisize));
             }
             public void A9Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                if (context->process) context->result->Append(ustring(matchBegin, matchEnd));
+                pass = (context->flags & PPTokenFlags.macroArgumentReplacement) == PPTokenFlags.none;
             }
             public void A10Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                pass = (context->flags & PPTokenFlags.dontAcceptCommaOrRightParen) != PPTokenFlags.none;
+                if (context->process) context->result->Append(context->pp->SubstituteObjectMacro(context->fromid2, *context->substituted, fileName, span.lineNumber));
             }
             public void A11Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                if (context->process) context->result->Append(*matchBegin);
+                if (context->process) context->result->Append(context->fromPPNumber);
             }
             public void A12Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                pass = (context->flags & PPTokenFlags.dontAcceptCommaOrRightParen) == PPTokenFlags.none;
+                if (context->process) context->result->Append(ustring(matchBegin, matchEnd));
             }
             public void A13Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                if (context->process) context->result->Append(ustring(matchBegin, matchEnd));
+            }
+            public void A14Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                pass = (context->flags & PPTokenFlags.dontAcceptCommaOrRightParen) != PPTokenFlags.none;
+            }
+            public void A15Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                *context->parenCount = *context->parenCount + 1;
+                if (context->process) context->result->Append('(');
+            }
+            public void A16Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                if (*context->parenCount == 0) pass = false;
+                else
+                {
+                    *context->parenCount = *context->parenCount - 1;
+                    if (context->process) context->result->Append(')');
+                }
+            }
+            public void A17Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                if (*context->parenCount == 0) pass = false; else if (context->process) context->result->Append(',');
+            }
+            public void A18Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                if (context->process) context->result->Append(*matchBegin);
+            }
+            public void A19Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                pass = (context->flags & PPTokenFlags.dontAcceptCommaOrRightParen) == PPTokenFlags.none;
+            }
+            public void A20Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
                 if (context->process) context->result->Append(*matchBegin);
@@ -1838,7 +2002,7 @@ namespace pp
             }
             public class Context : System.Text.Parsing.Context
             {
-                public Context() : process(), result(), pp(), flags(), substituted(), fromHeaderName(), fromid1(), fromid2(), fromPPNumber(), fromCharacterLiteral(), fromStringLiteral()
+                public Context() : process(), result(), pp(), flags(), substituted(), parenCount(), stringisize(), fromHeaderName(), fromid1(), fromid2(), fromPPNumber(), fromCharacterLiteral(), fromStringLiteral()
                 {
                 }
                 public bool process;
@@ -1846,6 +2010,8 @@ namespace pp
                 public PP* pp;
                 public PPTokenFlags flags;
                 public bool* substituted;
+                public int* parenCount;
+                public bool stringisize;
                 public ustring fromHeaderName;
                 public ustring fromid1;
                 public ustring fromid2;
@@ -2052,6 +2218,7 @@ namespace pp
                 AddInheritedAttribute(AttrOrVar(ToUtf32("PPTokenFlags"), ToUtf32("flags")));
                 SetValueTypeName(ToUtf32("ustring"));
                 AddLocalVariable(AttrOrVar(ToUtf32("bool"), ToUtf32("substituted")));
+                AddLocalVariable(AttrOrVar(ToUtf32("int"), ToUtf32("parenCount")));
             }
             public override void Enter(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
             {
@@ -2086,10 +2253,11 @@ namespace pp
                 stack.Push(UniquePtr<Object>(new ValueObject<PP*>(context->pp)));
                 stack.Push(UniquePtr<Object>(new ValueObject<PPTokenFlags>(cast<PPTokenFlags>(context->flags | PPTokenFlags.dontAcceptCommaOrRightParen))));
                 stack.Push(UniquePtr<Object>(new ValueObject<bool*>(&context->substituted)));
+                stack.Push(UniquePtr<Object>(new ValueObject<int*>(&context->parenCount)));
             }
             public class Context : System.Text.Parsing.Context
             {
-                public Context() : process(), pp(), flags(), value(), substituted()
+                public Context() : process(), pp(), flags(), value(), substituted(), parenCount()
                 {
                 }
                 public bool process;
@@ -2097,6 +2265,186 @@ namespace pp
                 public PPTokenFlags flags;
                 public ustring value;
                 public bool substituted;
+                public int parenCount;
+            }
+        }
+
+        public class PPTokenCatenationRule : System.Text.Parsing.RuleParser
+        {
+            public PPTokenCatenationRule(const ustring& name_, Scope* enclosingScope_, int id_, Parser* definition_) : base(name_, enclosingScope_, id_, definition_)
+            {
+                AddInheritedAttribute(AttrOrVar(ToUtf32("PP*"), ToUtf32("pp")));
+                AddInheritedAttribute(AttrOrVar(ToUtf32("PPTokenFlags"), ToUtf32("flags")));
+                SetValueTypeName(ToUtf32("ustring"));
+                AddLocalVariable(AttrOrVar(ToUtf32("ustring"), ToUtf32("left")));
+                AddLocalVariable(AttrOrVar(ToUtf32("ustring"), ToUtf32("right")));
+                AddLocalVariable(AttrOrVar(ToUtf32("bool"), ToUtf32("substituted")));
+                AddLocalVariable(AttrOrVar(ToUtf32("int"), ToUtf32("parenCount")));
+            }
+            public override void Enter(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
+            {
+                parsingData->PushContext(Id(), new Context());
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                UniquePtr<Object> flags_value = stack.Pop();
+                context->flags = *cast<ValueObject<PPTokenFlags>*>(flags_value.Get());
+                UniquePtr<Object> pp_value = stack.Pop();
+                context->pp = *cast<ValueObject<PP*>*>(pp_value.Get());
+            }
+            public override void Leave(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                if (matched)
+                {
+                    stack.Push(UniquePtr<Object>(new ValueObject<ustring>(context->value)));
+                }
+                parsingData->PopContext(Id());
+            }
+            public override void Link()
+            {
+                ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
+                a0ActionParser->SetAction(A0Action);
+                ActionParser* a1ActionParser = GetAction(ToUtf32("A1"));
+                a1ActionParser->SetAction(A1Action);
+                NonterminalParser* firstNonterminalParser = GetNonterminal(ToUtf32("first"));
+                firstNonterminalParser->SetPre(Prefirst);
+                NonterminalParser* nextNonterminalParser = GetNonterminal(ToUtf32("next"));
+                nextNonterminalParser->SetPre(Prenext);
+            }
+            public void A0Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                context->value = context->left;
+            }
+            public void A1Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                context->left.Append(context->right);
+                context->right.Clear();
+            }
+            public void Prefirst(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                stack.Push(UniquePtr<Object>(new ValueObject<bool>(true)));
+                stack.Push(UniquePtr<Object>(new ValueObject<ustring*>(&context->left)));
+                stack.Push(UniquePtr<Object>(new ValueObject<PP*>(context->pp)));
+                stack.Push(UniquePtr<Object>(new ValueObject<PPTokenFlags>(cast<PPTokenFlags>(context->flags | PPTokenFlags.macroArgumentReplacement))));
+                stack.Push(UniquePtr<Object>(new ValueObject<bool*>(&context->substituted)));
+                stack.Push(UniquePtr<Object>(new ValueObject<int*>(&context->parenCount)));
+            }
+            public void Prenext(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                stack.Push(UniquePtr<Object>(new ValueObject<bool>(true)));
+                stack.Push(UniquePtr<Object>(new ValueObject<ustring*>(&context->right)));
+                stack.Push(UniquePtr<Object>(new ValueObject<PP*>(context->pp)));
+                stack.Push(UniquePtr<Object>(new ValueObject<PPTokenFlags>(cast<PPTokenFlags>(context->flags | PPTokenFlags.macroArgumentReplacement))));
+                stack.Push(UniquePtr<Object>(new ValueObject<bool*>(&context->substituted)));
+                stack.Push(UniquePtr<Object>(new ValueObject<int*>(&context->parenCount)));
+            }
+            public class Context : System.Text.Parsing.Context
+            {
+                public Context() : pp(), flags(), value(), left(), right(), substituted(), parenCount()
+                {
+                }
+                public PP* pp;
+                public PPTokenFlags flags;
+                public ustring value;
+                public ustring left;
+                public ustring right;
+                public bool substituted;
+                public int parenCount;
+            }
+        }
+
+        public class PPTokenSequenceRule : System.Text.Parsing.RuleParser
+        {
+            public PPTokenSequenceRule(const ustring& name_, Scope* enclosingScope_, int id_, Parser* definition_) : base(name_, enclosingScope_, id_, definition_)
+            {
+                AddInheritedAttribute(AttrOrVar(ToUtf32("PP*"), ToUtf32("pp")));
+                AddInheritedAttribute(AttrOrVar(ToUtf32("PPTokenFlags"), ToUtf32("flags")));
+                SetValueTypeName(ToUtf32("ustring"));
+            }
+            public override void Enter(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
+            {
+                parsingData->PushContext(Id(), new Context());
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                UniquePtr<Object> flags_value = stack.Pop();
+                context->flags = *cast<ValueObject<PPTokenFlags>*>(flags_value.Get());
+                UniquePtr<Object> pp_value = stack.Pop();
+                context->pp = *cast<ValueObject<PP*>*>(pp_value.Get());
+            }
+            public override void Leave(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                if (matched)
+                {
+                    stack.Push(UniquePtr<Object>(new ValueObject<ustring>(context->value)));
+                }
+                parsingData->PopContext(Id());
+            }
+            public override void Link()
+            {
+                ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
+                a0ActionParser->SetAction(A0Action);
+                ActionParser* a1ActionParser = GetAction(ToUtf32("A1"));
+                a1ActionParser->SetAction(A1Action);
+                NonterminalParser* leftNonterminalParser = GetNonterminal(ToUtf32("left"));
+                leftNonterminalParser->SetPre(Preleft);
+                leftNonterminalParser->SetPost(Postleft);
+                NonterminalParser* rightNonterminalParser = GetNonterminal(ToUtf32("right"));
+                rightNonterminalParser->SetPre(Preright);
+                rightNonterminalParser->SetPost(Postright);
+            }
+            public void A0Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                context->value = context->fromleft;
+            }
+            public void A1Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                context->value.Append(context->fromright);
+            }
+            public void Preleft(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                stack.Push(UniquePtr<Object>(new ValueObject<PP*>(context->pp)));
+                stack.Push(UniquePtr<Object>(new ValueObject<PPTokenFlags>(context->flags)));
+            }
+            public void Postleft(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                if (matched)
+                {
+                    UniquePtr<Object> fromleft_value = stack.Pop();
+                    context->fromleft = *cast<ValueObject<ustring>*>(fromleft_value.Get());
+                }
+            }
+            public void Preright(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                stack.Push(UniquePtr<Object>(new ValueObject<PP*>(context->pp)));
+                stack.Push(UniquePtr<Object>(new ValueObject<PPTokenFlags>(context->flags)));
+            }
+            public void Postright(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                if (matched)
+                {
+                    UniquePtr<Object> fromright_value = stack.Pop();
+                    context->fromright = *cast<ValueObject<ustring>*>(fromright_value.Get());
+                }
+            }
+            public class Context : System.Text.Parsing.Context
+            {
+                public Context() : pp(), flags(), value(), fromleft(), fromright()
+                {
+                }
+                public PP* pp;
+                public PPTokenFlags flags;
+                public ustring value;
+                public ustring fromleft;
+                public ustring fromright;
             }
         }
 
@@ -2109,7 +2457,6 @@ namespace pp
                 AddInheritedAttribute(AttrOrVar(ToUtf32("PP*"), ToUtf32("pp")));
                 AddInheritedAttribute(AttrOrVar(ToUtf32("PPTokenFlags"), ToUtf32("flags")));
                 SetValueTypeName(ToUtf32("ustring"));
-                AddLocalVariable(AttrOrVar(ToUtf32("bool"), ToUtf32("substituted")));
             }
             public override void Enter(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
             {
@@ -2139,8 +2486,11 @@ namespace pp
                 a0ActionParser->SetAction(A0Action);
                 ActionParser* a1ActionParser = GetAction(ToUtf32("A1"));
                 a1ActionParser->SetAction(A1Action);
-                NonterminalParser* pPTokenNonterminalParser = GetNonterminal(ToUtf32("PPToken"));
-                pPTokenNonterminalParser->SetPre(PrePPToken);
+                ActionParser* a2ActionParser = GetAction(ToUtf32("A2"));
+                a2ActionParser->SetAction(A2Action);
+                NonterminalParser* pPTokenSequenceNonterminalParser = GetNonterminal(ToUtf32("PPTokenSequence"));
+                pPTokenSequenceNonterminalParser->SetPre(PrePPTokenSequence);
+                pPTokenSequenceNonterminalParser->SetPost(PostPPTokenSequence);
             }
             public void A0Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
@@ -2152,18 +2502,29 @@ namespace pp
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
                 context->pp->PopFunctionMacro();
             }
-            public void PrePPToken(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
+            public void A2Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                stack.Push(UniquePtr<Object>(new ValueObject<bool>(true)));
-                stack.Push(UniquePtr<Object>(new ValueObject<ustring*>(&context->value)));
+                context->value = context->fromPPTokenSequence;
+            }
+            public void PrePPTokenSequence(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
                 stack.Push(UniquePtr<Object>(new ValueObject<PP*>(context->pp)));
-                stack.Push(UniquePtr<Object>(new ValueObject<PPTokenFlags>(cast<PPTokenFlags>(context->flags | PPTokenFlags.macroArgumentReplacement))));
-                stack.Push(UniquePtr<Object>(new ValueObject<bool*>(&context->substituted)));
+                stack.Push(UniquePtr<Object>(new ValueObject<PPTokenFlags>(context->flags)));
+            }
+            public void PostPPTokenSequence(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                if (matched)
+                {
+                    UniquePtr<Object> fromPPTokenSequence_value = stack.Pop();
+                    context->fromPPTokenSequence = *cast<ValueObject<ustring>*>(fromPPTokenSequence_value.Get());
+                }
             }
             public class Context : System.Text.Parsing.Context
             {
-                public Context() : macro(), args(), pp(), flags(), value(), substituted()
+                public Context() : macro(), args(), pp(), flags(), value(), fromPPTokenSequence()
                 {
                 }
                 public FunctionMacro* macro;
@@ -2171,7 +2532,7 @@ namespace pp
                 public PP* pp;
                 public PPTokenFlags flags;
                 public ustring value;
-                public bool substituted;
+                public ustring fromPPTokenSequence;
             }
         }
 
@@ -2263,16 +2624,16 @@ namespace pp
         public override void GetReferencedGrammars()
         {
             ParsingDomain* pd = Domain();
-            Grammar* grammar0 = pd->GetGrammar(ToUtf32("System.Text.Parsing.stdlib"));
+            Grammar* grammar0 = pd->GetGrammar(ToUtf32("cppparser.LiteralGrammar"));
             if (grammar0 == null)
             {
-                grammar0 = new System.Text.Parsing.stdlib(pd);
+                grammar0 = new cppparser.LiteralGrammar(pd);
             }
             AddGrammarReference(grammar0);
-            Grammar* grammar1 = pd->GetGrammar(ToUtf32("cppparser.LiteralGrammar"));
+            Grammar* grammar1 = pd->GetGrammar(ToUtf32("System.Text.Parsing.stdlib"));
             if (grammar1 == null)
             {
-                grammar1 = new cppparser.LiteralGrammar(pd);
+                grammar1 = new System.Text.Parsing.stdlib(pd);
             }
             AddGrammarReference(grammar1);
         }
@@ -2316,10 +2677,22 @@ namespace pp
                                     new System.Text.Parsing.SequenceParser(
                                         new System.Text.Parsing.SequenceParser(
                                             new System.Text.Parsing.SequenceParser(
-                                                new System.Text.Parsing.CharParser('#'),
-                                                new System.Text.Parsing.KeywordParser(ToUtf32("if"))),
-                                            new System.Text.Parsing.ActionParser(ToUtf32("A1"),
-                                                new System.Text.Parsing.NonterminalParser(ToUtf32("ConstantExpression"), ToUtf32("ConstantExpression"), 2))),
+                                                new System.Text.Parsing.SequenceParser(
+                                                    new System.Text.Parsing.SequenceParser(
+                                                        new System.Text.Parsing.SequenceParser(
+                                                            new System.Text.Parsing.SequenceParser(
+                                                                new System.Text.Parsing.OptionalParser(
+                                                                    new System.Text.Parsing.NonterminalParser(ToUtf32("S"), ToUtf32("S"), 0)),
+                                                                new System.Text.Parsing.CharParser('#')),
+                                                            new System.Text.Parsing.OptionalParser(
+                                                                new System.Text.Parsing.NonterminalParser(ToUtf32("S"), ToUtf32("S"), 0))),
+                                                        new System.Text.Parsing.KeywordParser(ToUtf32("if"))),
+                                                    new System.Text.Parsing.OptionalParser(
+                                                        new System.Text.Parsing.NonterminalParser(ToUtf32("S"), ToUtf32("S"), 0))),
+                                                new System.Text.Parsing.ActionParser(ToUtf32("A1"),
+                                                    new System.Text.Parsing.NonterminalParser(ToUtf32("ConstantExpression"), ToUtf32("ConstantExpression"), 2))),
+                                            new System.Text.Parsing.OptionalParser(
+                                                new System.Text.Parsing.NonterminalParser(ToUtf32("S"), ToUtf32("S"), 0))),
                                         new System.Text.Parsing.ActionParser(ToUtf32("A2"),
                                             new System.Text.Parsing.NonterminalParser(ToUtf32("newline"), ToUtf32("newline"), 0))),
                                     new System.Text.Parsing.OptionalParser(
@@ -2330,10 +2703,22 @@ namespace pp
                                     new System.Text.Parsing.SequenceParser(
                                         new System.Text.Parsing.SequenceParser(
                                             new System.Text.Parsing.SequenceParser(
-                                                new System.Text.Parsing.CharParser('#'),
-                                                new System.Text.Parsing.KeywordParser(ToUtf32("ifdef"))),
-                                            new System.Text.Parsing.ActionParser(ToUtf32("A4"),
-                                                new System.Text.Parsing.NonterminalParser(ToUtf32("i1"), ToUtf32("identifier"), 0))),
+                                                new System.Text.Parsing.SequenceParser(
+                                                    new System.Text.Parsing.SequenceParser(
+                                                        new System.Text.Parsing.SequenceParser(
+                                                            new System.Text.Parsing.SequenceParser(
+                                                                new System.Text.Parsing.OptionalParser(
+                                                                    new System.Text.Parsing.NonterminalParser(ToUtf32("S"), ToUtf32("S"), 0)),
+                                                                new System.Text.Parsing.CharParser('#')),
+                                                            new System.Text.Parsing.OptionalParser(
+                                                                new System.Text.Parsing.NonterminalParser(ToUtf32("S"), ToUtf32("S"), 0))),
+                                                        new System.Text.Parsing.KeywordParser(ToUtf32("ifdef"))),
+                                                    new System.Text.Parsing.OptionalParser(
+                                                        new System.Text.Parsing.NonterminalParser(ToUtf32("S"), ToUtf32("S"), 0))),
+                                                new System.Text.Parsing.ActionParser(ToUtf32("A4"),
+                                                    new System.Text.Parsing.NonterminalParser(ToUtf32("i1"), ToUtf32("identifier"), 0))),
+                                            new System.Text.Parsing.OptionalParser(
+                                                new System.Text.Parsing.NonterminalParser(ToUtf32("S"), ToUtf32("S"), 0))),
                                         new System.Text.Parsing.ActionParser(ToUtf32("A5"),
                                             new System.Text.Parsing.NonterminalParser(ToUtf32("newline"), ToUtf32("newline"), 0))),
                                     new System.Text.Parsing.OptionalParser(
@@ -2344,10 +2729,22 @@ namespace pp
                                 new System.Text.Parsing.SequenceParser(
                                     new System.Text.Parsing.SequenceParser(
                                         new System.Text.Parsing.SequenceParser(
-                                            new System.Text.Parsing.CharParser('#'),
-                                            new System.Text.Parsing.KeywordParser(ToUtf32("ifndef"))),
-                                        new System.Text.Parsing.ActionParser(ToUtf32("A7"),
-                                            new System.Text.Parsing.NonterminalParser(ToUtf32("i2"), ToUtf32("identifier"), 0))),
+                                            new System.Text.Parsing.SequenceParser(
+                                                new System.Text.Parsing.SequenceParser(
+                                                    new System.Text.Parsing.SequenceParser(
+                                                        new System.Text.Parsing.SequenceParser(
+                                                            new System.Text.Parsing.OptionalParser(
+                                                                new System.Text.Parsing.NonterminalParser(ToUtf32("S"), ToUtf32("S"), 0)),
+                                                            new System.Text.Parsing.CharParser('#')),
+                                                        new System.Text.Parsing.OptionalParser(
+                                                            new System.Text.Parsing.NonterminalParser(ToUtf32("S"), ToUtf32("S"), 0))),
+                                                    new System.Text.Parsing.KeywordParser(ToUtf32("ifndef"))),
+                                                new System.Text.Parsing.OptionalParser(
+                                                    new System.Text.Parsing.NonterminalParser(ToUtf32("S"), ToUtf32("S"), 0))),
+                                            new System.Text.Parsing.ActionParser(ToUtf32("A7"),
+                                                new System.Text.Parsing.NonterminalParser(ToUtf32("i2"), ToUtf32("identifier"), 0))),
+                                        new System.Text.Parsing.OptionalParser(
+                                            new System.Text.Parsing.NonterminalParser(ToUtf32("S"), ToUtf32("S"), 0))),
                                     new System.Text.Parsing.ActionParser(ToUtf32("A8"),
                                         new System.Text.Parsing.NonterminalParser(ToUtf32("newline"), ToUtf32("newline"), 0))),
                                 new System.Text.Parsing.OptionalParser(
@@ -2359,10 +2756,22 @@ namespace pp
                             new System.Text.Parsing.SequenceParser(
                                 new System.Text.Parsing.SequenceParser(
                                     new System.Text.Parsing.SequenceParser(
-                                        new System.Text.Parsing.CharParser('#'),
-                                        new System.Text.Parsing.KeywordParser(ToUtf32("elif"))),
-                                    new System.Text.Parsing.ActionParser(ToUtf32("A1"),
-                                        new System.Text.Parsing.NonterminalParser(ToUtf32("ConstantExpression"), ToUtf32("ConstantExpression"), 2))),
+                                        new System.Text.Parsing.SequenceParser(
+                                            new System.Text.Parsing.SequenceParser(
+                                                new System.Text.Parsing.SequenceParser(
+                                                    new System.Text.Parsing.SequenceParser(
+                                                        new System.Text.Parsing.OptionalParser(
+                                                            new System.Text.Parsing.NonterminalParser(ToUtf32("S"), ToUtf32("S"), 0)),
+                                                        new System.Text.Parsing.CharParser('#')),
+                                                    new System.Text.Parsing.OptionalParser(
+                                                        new System.Text.Parsing.NonterminalParser(ToUtf32("S"), ToUtf32("S"), 0))),
+                                                new System.Text.Parsing.KeywordParser(ToUtf32("elif"))),
+                                            new System.Text.Parsing.OptionalParser(
+                                                new System.Text.Parsing.NonterminalParser(ToUtf32("S"), ToUtf32("S"), 0))),
+                                        new System.Text.Parsing.ActionParser(ToUtf32("A1"),
+                                            new System.Text.Parsing.NonterminalParser(ToUtf32("ConstantExpression"), ToUtf32("ConstantExpression"), 2))),
+                                    new System.Text.Parsing.OptionalParser(
+                                        new System.Text.Parsing.NonterminalParser(ToUtf32("S"), ToUtf32("S"), 0))),
                                 new System.Text.Parsing.ActionParser(ToUtf32("A2"),
                                     new System.Text.Parsing.NonterminalParser(ToUtf32("newline"), ToUtf32("newline"), 0))),
                             new System.Text.Parsing.OptionalParser(
@@ -2371,8 +2780,17 @@ namespace pp
                 new System.Text.Parsing.SequenceParser(
                     new System.Text.Parsing.SequenceParser(
                         new System.Text.Parsing.SequenceParser(
-                            new System.Text.Parsing.CharParser('#'),
-                            new System.Text.Parsing.KeywordParser(ToUtf32("else"))),
+                            new System.Text.Parsing.SequenceParser(
+                                new System.Text.Parsing.SequenceParser(
+                                    new System.Text.Parsing.SequenceParser(
+                                        new System.Text.Parsing.OptionalParser(
+                                            new System.Text.Parsing.NonterminalParser(ToUtf32("S"), ToUtf32("S"), 0)),
+                                        new System.Text.Parsing.CharParser('#')),
+                                    new System.Text.Parsing.OptionalParser(
+                                        new System.Text.Parsing.NonterminalParser(ToUtf32("S"), ToUtf32("S"), 0))),
+                                new System.Text.Parsing.KeywordParser(ToUtf32("else"))),
+                            new System.Text.Parsing.OptionalParser(
+                                new System.Text.Parsing.NonterminalParser(ToUtf32("S"), ToUtf32("S"), 0))),
                         new System.Text.Parsing.ActionParser(ToUtf32("A0"),
                             new System.Text.Parsing.NonterminalParser(ToUtf32("newline"), ToUtf32("newline"), 0))),
                     new System.Text.Parsing.OptionalParser(
@@ -2380,8 +2798,17 @@ namespace pp
             AddRule(new EndIfLineRule(ToUtf32("EndIfLine"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.SequenceParser(
                     new System.Text.Parsing.SequenceParser(
-                        new System.Text.Parsing.CharParser('#'),
-                        new System.Text.Parsing.KeywordParser(ToUtf32("endif"))),
+                        new System.Text.Parsing.SequenceParser(
+                            new System.Text.Parsing.SequenceParser(
+                                new System.Text.Parsing.SequenceParser(
+                                    new System.Text.Parsing.OptionalParser(
+                                        new System.Text.Parsing.NonterminalParser(ToUtf32("S"), ToUtf32("S"), 0)),
+                                    new System.Text.Parsing.CharParser('#')),
+                                new System.Text.Parsing.OptionalParser(
+                                    new System.Text.Parsing.NonterminalParser(ToUtf32("S"), ToUtf32("S"), 0))),
+                            new System.Text.Parsing.KeywordParser(ToUtf32("endif"))),
+                        new System.Text.Parsing.OptionalParser(
+                            new System.Text.Parsing.NonterminalParser(ToUtf32("S"), ToUtf32("S"), 0))),
                     new System.Text.Parsing.ActionParser(ToUtf32("A0"),
                         new System.Text.Parsing.NonterminalParser(ToUtf32("newline"), ToUtf32("newline"), 0)))));
             AddRule(new ControlLineRule(ToUtf32("ControlLine"), GetScope(), Domain()->GetNextRuleId(),
@@ -2390,20 +2817,33 @@ namespace pp
                         new System.Text.Parsing.AlternativeParser(
                             new System.Text.Parsing.AlternativeParser(
                                 new System.Text.Parsing.AlternativeParser(
-                                    new System.Text.Parsing.NonterminalParser(ToUtf32("IncludeDirective"), ToUtf32("IncludeDirective"), 3),
-                                    new System.Text.Parsing.NonterminalParser(ToUtf32("DefineFunctionMacro"), ToUtf32("DefineFunctionMacro"), 3)),
-                                new System.Text.Parsing.NonterminalParser(ToUtf32("DefineObjectMacro"), ToUtf32("DefineObjectMacro"), 3)),
-                            new System.Text.Parsing.NonterminalParser(ToUtf32("UndefineMacro"), ToUtf32("UndefineMacro"), 3)),
-                        new System.Text.Parsing.NonterminalParser(ToUtf32("Pragma"), ToUtf32("Pragma"), 1)),
-                    new System.Text.Parsing.NonterminalParser(ToUtf32("Empty"), ToUtf32("Empty"), 1))));
+                                    new System.Text.Parsing.AlternativeParser(
+                                        new System.Text.Parsing.AlternativeParser(
+                                            new System.Text.Parsing.NonterminalParser(ToUtf32("IncludeDirective"), ToUtf32("IncludeDirective"), 3),
+                                            new System.Text.Parsing.NonterminalParser(ToUtf32("DefineFunctionMacro"), ToUtf32("DefineFunctionMacro"), 3)),
+                                        new System.Text.Parsing.NonterminalParser(ToUtf32("DefineObjectMacro"), ToUtf32("DefineObjectMacro"), 3)),
+                                    new System.Text.Parsing.NonterminalParser(ToUtf32("UndefineMacro"), ToUtf32("UndefineMacro"), 3)),
+                                new System.Text.Parsing.NonterminalParser(ToUtf32("PragmaDirective"), ToUtf32("PragmaDirective"), 1)),
+                            new System.Text.Parsing.NonterminalParser(ToUtf32("ErrorDirective"), ToUtf32("ErrorDirective"), 2)),
+                        new System.Text.Parsing.NonterminalParser(ToUtf32("LineDirective"), ToUtf32("LineDirective"), 1)),
+                    new System.Text.Parsing.NonterminalParser(ToUtf32("NullDirective"), ToUtf32("NullDirective"), 1))));
             AddRule(new IncludeDirectiveRule(ToUtf32("IncludeDirective"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.ActionParser(ToUtf32("A0"),
                     new System.Text.Parsing.GroupingParser(
                         new System.Text.Parsing.SequenceParser(
                             new System.Text.Parsing.SequenceParser(
                                 new System.Text.Parsing.SequenceParser(
-                                    new System.Text.Parsing.CharParser('#'),
-                                    new System.Text.Parsing.KeywordParser(ToUtf32("include"))),
+                                    new System.Text.Parsing.SequenceParser(
+                                        new System.Text.Parsing.SequenceParser(
+                                            new System.Text.Parsing.SequenceParser(
+                                                new System.Text.Parsing.OptionalParser(
+                                                    new System.Text.Parsing.NonterminalParser(ToUtf32("S"), ToUtf32("S"), 0)),
+                                                new System.Text.Parsing.CharParser('#')),
+                                            new System.Text.Parsing.OptionalParser(
+                                                new System.Text.Parsing.NonterminalParser(ToUtf32("S"), ToUtf32("S"), 0))),
+                                        new System.Text.Parsing.KeywordParser(ToUtf32("include"))),
+                                    new System.Text.Parsing.OptionalParser(
+                                        new System.Text.Parsing.NonterminalParser(ToUtf32("S"), ToUtf32("S"), 0))),
                                 new System.Text.Parsing.NonterminalParser(ToUtf32("NonemptyTokenLine"), ToUtf32("NonemptyTokenLine"), 4)),
                             new System.Text.Parsing.ActionParser(ToUtf32("A1"),
                                 new System.Text.Parsing.NonterminalParser(ToUtf32("newline"), ToUtf32("newline"), 0)))))));
@@ -2416,14 +2856,26 @@ namespace pp
                                     new System.Text.Parsing.SequenceParser(
                                         new System.Text.Parsing.SequenceParser(
                                             new System.Text.Parsing.SequenceParser(
-                                                new System.Text.Parsing.CharParser('#'),
-                                                new System.Text.Parsing.KeywordParser(ToUtf32("define"))),
-                                            new System.Text.Parsing.TokenParser(
                                                 new System.Text.Parsing.SequenceParser(
-                                                    new System.Text.Parsing.NonterminalParser(ToUtf32("identifier"), ToUtf32("identifier"), 0),
-                                                    new System.Text.Parsing.CharParser('(')))),
-                                        new System.Text.Parsing.NonterminalParser(ToUtf32("MacroParams"), ToUtf32("MacroParams"), 0)),
-                                    new System.Text.Parsing.CharParser(')')),
+                                                    new System.Text.Parsing.SequenceParser(
+                                                        new System.Text.Parsing.SequenceParser(
+                                                            new System.Text.Parsing.SequenceParser(
+                                                                new System.Text.Parsing.OptionalParser(
+                                                                    new System.Text.Parsing.NonterminalParser(ToUtf32("S"), ToUtf32("S"), 0)),
+                                                                new System.Text.Parsing.CharParser('#')),
+                                                            new System.Text.Parsing.OptionalParser(
+                                                                new System.Text.Parsing.NonterminalParser(ToUtf32("S"), ToUtf32("S"), 0))),
+                                                        new System.Text.Parsing.KeywordParser(ToUtf32("define"))),
+                                                    new System.Text.Parsing.OptionalParser(
+                                                        new System.Text.Parsing.NonterminalParser(ToUtf32("S"), ToUtf32("S"), 0))),
+                                                new System.Text.Parsing.TokenParser(
+                                                    new System.Text.Parsing.SequenceParser(
+                                                        new System.Text.Parsing.NonterminalParser(ToUtf32("identifier"), ToUtf32("identifier"), 0),
+                                                        new System.Text.Parsing.CharParser('(')))),
+                                            new System.Text.Parsing.NonterminalParser(ToUtf32("MacroParams"), ToUtf32("MacroParams"), 0)),
+                                        new System.Text.Parsing.CharParser(')')),
+                                    new System.Text.Parsing.OptionalParser(
+                                        new System.Text.Parsing.NonterminalParser(ToUtf32("S"), ToUtf32("S"), 0))),
                                 new System.Text.Parsing.NonterminalParser(ToUtf32("PossiblyEmptyTokenLine"), ToUtf32("PossiblyEmptyTokenLine"), 4)),
                             new System.Text.Parsing.ActionParser(ToUtf32("A1"),
                                 new System.Text.Parsing.NonterminalParser(ToUtf32("newline"), ToUtf32("newline"), 0)))))));
@@ -2431,14 +2883,26 @@ namespace pp
                 new System.Text.Parsing.OptionalParser(
                     new System.Text.Parsing.GroupingParser(
                         new System.Text.Parsing.SequenceParser(
-                            new System.Text.Parsing.ActionParser(ToUtf32("A0"),
-                                new System.Text.Parsing.NonterminalParser(ToUtf32("left"), ToUtf32("identifier"), 0)),
-                            new System.Text.Parsing.KleeneStarParser(
-                                new System.Text.Parsing.GroupingParser(
-                                    new System.Text.Parsing.SequenceParser(
-                                        new System.Text.Parsing.CharParser(','),
-                                        new System.Text.Parsing.ActionParser(ToUtf32("A1"),
-                                            new System.Text.Parsing.NonterminalParser(ToUtf32("right"), ToUtf32("identifier"), 0))))))))));
+                            new System.Text.Parsing.SequenceParser(
+                                new System.Text.Parsing.SequenceParser(
+                                    new System.Text.Parsing.OptionalParser(
+                                        new System.Text.Parsing.NonterminalParser(ToUtf32("S"), ToUtf32("S"), 0)),
+                                    new System.Text.Parsing.ActionParser(ToUtf32("A0"),
+                                        new System.Text.Parsing.NonterminalParser(ToUtf32("left"), ToUtf32("identifier"), 0))),
+                                new System.Text.Parsing.KleeneStarParser(
+                                    new System.Text.Parsing.GroupingParser(
+                                        new System.Text.Parsing.SequenceParser(
+                                            new System.Text.Parsing.SequenceParser(
+                                                new System.Text.Parsing.SequenceParser(
+                                                    new System.Text.Parsing.OptionalParser(
+                                                        new System.Text.Parsing.NonterminalParser(ToUtf32("S"), ToUtf32("S"), 0)),
+                                                    new System.Text.Parsing.CharParser(',')),
+                                                new System.Text.Parsing.OptionalParser(
+                                                    new System.Text.Parsing.NonterminalParser(ToUtf32("S"), ToUtf32("S"), 0))),
+                                            new System.Text.Parsing.ActionParser(ToUtf32("A1"),
+                                                new System.Text.Parsing.NonterminalParser(ToUtf32("right"), ToUtf32("identifier"), 0)))))),
+                            new System.Text.Parsing.OptionalParser(
+                                new System.Text.Parsing.NonterminalParser(ToUtf32("S"), ToUtf32("S"), 0)))))));
             AddRule(new DefineObjectMacroRule(ToUtf32("DefineObjectMacro"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.ActionParser(ToUtf32("A0"),
                     new System.Text.Parsing.GroupingParser(
@@ -2446,9 +2910,21 @@ namespace pp
                             new System.Text.Parsing.SequenceParser(
                                 new System.Text.Parsing.SequenceParser(
                                     new System.Text.Parsing.SequenceParser(
-                                        new System.Text.Parsing.CharParser('#'),
-                                        new System.Text.Parsing.KeywordParser(ToUtf32("define"))),
-                                    new System.Text.Parsing.NonterminalParser(ToUtf32("identifier"), ToUtf32("identifier"), 0)),
+                                        new System.Text.Parsing.SequenceParser(
+                                            new System.Text.Parsing.SequenceParser(
+                                                new System.Text.Parsing.SequenceParser(
+                                                    new System.Text.Parsing.SequenceParser(
+                                                        new System.Text.Parsing.OptionalParser(
+                                                            new System.Text.Parsing.NonterminalParser(ToUtf32("S"), ToUtf32("S"), 0)),
+                                                        new System.Text.Parsing.CharParser('#')),
+                                                    new System.Text.Parsing.OptionalParser(
+                                                        new System.Text.Parsing.NonterminalParser(ToUtf32("S"), ToUtf32("S"), 0))),
+                                                new System.Text.Parsing.KeywordParser(ToUtf32("define"))),
+                                            new System.Text.Parsing.OptionalParser(
+                                                new System.Text.Parsing.NonterminalParser(ToUtf32("S"), ToUtf32("S"), 0))),
+                                        new System.Text.Parsing.NonterminalParser(ToUtf32("identifier"), ToUtf32("identifier"), 0)),
+                                    new System.Text.Parsing.OptionalParser(
+                                        new System.Text.Parsing.NonterminalParser(ToUtf32("S"), ToUtf32("S"), 0))),
                                 new System.Text.Parsing.NonterminalParser(ToUtf32("PossiblyEmptyTokenLine"), ToUtf32("PossiblyEmptyTokenLine"), 4)),
                             new System.Text.Parsing.ActionParser(ToUtf32("A1"),
                                 new System.Text.Parsing.NonterminalParser(ToUtf32("newline"), ToUtf32("newline"), 0)))))));
@@ -2458,16 +2934,37 @@ namespace pp
                         new System.Text.Parsing.SequenceParser(
                             new System.Text.Parsing.SequenceParser(
                                 new System.Text.Parsing.SequenceParser(
-                                    new System.Text.Parsing.CharParser('#'),
-                                    new System.Text.Parsing.KeywordParser(ToUtf32("undef"))),
-                                new System.Text.Parsing.NonterminalParser(ToUtf32("macroName"), ToUtf32("identifier"), 0)),
+                                    new System.Text.Parsing.SequenceParser(
+                                        new System.Text.Parsing.SequenceParser(
+                                            new System.Text.Parsing.SequenceParser(
+                                                new System.Text.Parsing.SequenceParser(
+                                                    new System.Text.Parsing.OptionalParser(
+                                                        new System.Text.Parsing.NonterminalParser(ToUtf32("S"), ToUtf32("S"), 0)),
+                                                    new System.Text.Parsing.CharParser('#')),
+                                                new System.Text.Parsing.OptionalParser(
+                                                    new System.Text.Parsing.NonterminalParser(ToUtf32("S"), ToUtf32("S"), 0))),
+                                            new System.Text.Parsing.KeywordParser(ToUtf32("undef"))),
+                                        new System.Text.Parsing.OptionalParser(
+                                            new System.Text.Parsing.NonterminalParser(ToUtf32("S"), ToUtf32("S"), 0))),
+                                    new System.Text.Parsing.NonterminalParser(ToUtf32("macroName"), ToUtf32("identifier"), 0)),
+                                new System.Text.Parsing.OptionalParser(
+                                    new System.Text.Parsing.NonterminalParser(ToUtf32("S"), ToUtf32("S"), 0))),
                             new System.Text.Parsing.ActionParser(ToUtf32("A1"),
                                 new System.Text.Parsing.NonterminalParser(ToUtf32("newline"), ToUtf32("newline"), 0)))))));
-            AddRule(new PragmaRule(ToUtf32("Pragma"), GetScope(), Domain()->GetNextRuleId(),
+            AddRule(new PragmaDirectiveRule(ToUtf32("PragmaDirective"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.SequenceParser(
                     new System.Text.Parsing.SequenceParser(
-                        new System.Text.Parsing.CharParser('#'),
-                        new System.Text.Parsing.KeywordParser(ToUtf32("pragma"))),
+                        new System.Text.Parsing.SequenceParser(
+                            new System.Text.Parsing.SequenceParser(
+                                new System.Text.Parsing.SequenceParser(
+                                    new System.Text.Parsing.OptionalParser(
+                                        new System.Text.Parsing.NonterminalParser(ToUtf32("S"), ToUtf32("S"), 0)),
+                                    new System.Text.Parsing.CharParser('#')),
+                                new System.Text.Parsing.OptionalParser(
+                                    new System.Text.Parsing.NonterminalParser(ToUtf32("S"), ToUtf32("S"), 0))),
+                            new System.Text.Parsing.KeywordParser(ToUtf32("pragma"))),
+                        new System.Text.Parsing.OptionalParser(
+                            new System.Text.Parsing.NonterminalParser(ToUtf32("S"), ToUtf32("S"), 0))),
                     new System.Text.Parsing.ActionParser(ToUtf32("A0"),
                         new System.Text.Parsing.TokenParser(
                             new System.Text.Parsing.SequenceParser(
@@ -2477,11 +2974,63 @@ namespace pp
                                             new System.Text.Parsing.AnyCharParser(),
                                             new System.Text.Parsing.NonterminalParser(ToUtf32("newline"), ToUtf32("newline"), 0)))),
                                 new System.Text.Parsing.NonterminalParser(ToUtf32("newline"), ToUtf32("newline"), 0)))))));
-            AddRule(new EmptyRule(ToUtf32("Empty"), GetScope(), Domain()->GetNextRuleId(),
+            AddRule(new ErrorDirectiveRule(ToUtf32("ErrorDirective"), GetScope(), Domain()->GetNextRuleId(),
+                new System.Text.Parsing.SequenceParser(
+                    new System.Text.Parsing.SequenceParser(
+                        new System.Text.Parsing.SequenceParser(
+                            new System.Text.Parsing.SequenceParser(
+                                new System.Text.Parsing.SequenceParser(
+                                    new System.Text.Parsing.OptionalParser(
+                                        new System.Text.Parsing.NonterminalParser(ToUtf32("S"), ToUtf32("S"), 0)),
+                                    new System.Text.Parsing.CharParser('#')),
+                                new System.Text.Parsing.OptionalParser(
+                                    new System.Text.Parsing.NonterminalParser(ToUtf32("S"), ToUtf32("S"), 0))),
+                            new System.Text.Parsing.KeywordParser(ToUtf32("error"))),
+                        new System.Text.Parsing.OptionalParser(
+                            new System.Text.Parsing.NonterminalParser(ToUtf32("S"), ToUtf32("S"), 0))),
+                    new System.Text.Parsing.ActionParser(ToUtf32("A0"),
+                        new System.Text.Parsing.TokenParser(
+                            new System.Text.Parsing.SequenceParser(
+                                new System.Text.Parsing.KleeneStarParser(
+                                    new System.Text.Parsing.GroupingParser(
+                                        new System.Text.Parsing.DifferenceParser(
+                                            new System.Text.Parsing.AnyCharParser(),
+                                            new System.Text.Parsing.NonterminalParser(ToUtf32("newline"), ToUtf32("newline"), 0)))),
+                                new System.Text.Parsing.NonterminalParser(ToUtf32("newline"), ToUtf32("newline"), 0)))))));
+            AddRule(new LineDirectiveRule(ToUtf32("LineDirective"), GetScope(), Domain()->GetNextRuleId(),
+                new System.Text.Parsing.SequenceParser(
+                    new System.Text.Parsing.SequenceParser(
+                        new System.Text.Parsing.SequenceParser(
+                            new System.Text.Parsing.SequenceParser(
+                                new System.Text.Parsing.SequenceParser(
+                                    new System.Text.Parsing.OptionalParser(
+                                        new System.Text.Parsing.NonterminalParser(ToUtf32("S"), ToUtf32("S"), 0)),
+                                    new System.Text.Parsing.CharParser('#')),
+                                new System.Text.Parsing.OptionalParser(
+                                    new System.Text.Parsing.NonterminalParser(ToUtf32("S"), ToUtf32("S"), 0))),
+                            new System.Text.Parsing.KeywordParser(ToUtf32("line"))),
+                        new System.Text.Parsing.OptionalParser(
+                            new System.Text.Parsing.NonterminalParser(ToUtf32("S"), ToUtf32("S"), 0))),
+                    new System.Text.Parsing.ActionParser(ToUtf32("A0"),
+                        new System.Text.Parsing.TokenParser(
+                            new System.Text.Parsing.SequenceParser(
+                                new System.Text.Parsing.KleeneStarParser(
+                                    new System.Text.Parsing.GroupingParser(
+                                        new System.Text.Parsing.DifferenceParser(
+                                            new System.Text.Parsing.AnyCharParser(),
+                                            new System.Text.Parsing.NonterminalParser(ToUtf32("newline"), ToUtf32("newline"), 0)))),
+                                new System.Text.Parsing.NonterminalParser(ToUtf32("newline"), ToUtf32("newline"), 0)))))));
+            AddRule(new NullDirectiveRule(ToUtf32("NullDirective"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.ActionParser(ToUtf32("A0"),
                     new System.Text.Parsing.GroupingParser(
                         new System.Text.Parsing.SequenceParser(
-                            new System.Text.Parsing.CharParser('#'),
+                            new System.Text.Parsing.SequenceParser(
+                                new System.Text.Parsing.SequenceParser(
+                                    new System.Text.Parsing.OptionalParser(
+                                        new System.Text.Parsing.NonterminalParser(ToUtf32("S"), ToUtf32("S"), 0)),
+                                    new System.Text.Parsing.CharParser('#')),
+                                new System.Text.Parsing.OptionalParser(
+                                    new System.Text.Parsing.NonterminalParser(ToUtf32("S"), ToUtf32("S"), 0))),
                             new System.Text.Parsing.NonterminalParser(ToUtf32("newline"), ToUtf32("newline"), 0))))));
             AddRule(new ConstantExpressionRule(ToUtf32("ConstantExpression"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.ActionParser(ToUtf32("A0"),
@@ -2500,7 +3049,7 @@ namespace pp
                         new System.Text.Parsing.GroupingParser(
                             new System.Text.Parsing.TokenParser(
                                 new System.Text.Parsing.KleeneStarParser(
-                                    new System.Text.Parsing.NonterminalParser(ToUtf32("PPToken"), ToUtf32("PPToken"), 5))))))));
+                                    new System.Text.Parsing.NonterminalParser(ToUtf32("PPToken"), ToUtf32("PPToken"), 6))))))));
             AddRule(new NonemptyTokenLineRule(ToUtf32("NonemptyTokenLine"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.SequenceParser(
                     new System.Text.Parsing.ActionParser(ToUtf32("A0"),
@@ -2509,7 +3058,7 @@ namespace pp
                         new System.Text.Parsing.GroupingParser(
                             new System.Text.Parsing.TokenParser(
                                 new System.Text.Parsing.PositiveParser(
-                                    new System.Text.Parsing.NonterminalParser(ToUtf32("PPToken"), ToUtf32("PPToken"), 5))))))));
+                                    new System.Text.Parsing.NonterminalParser(ToUtf32("PPToken"), ToUtf32("PPToken"), 6))))))));
             AddRule(new PPTokenRule(ToUtf32("PPToken"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.AlternativeParser(
                     new System.Text.Parsing.AlternativeParser(
@@ -2519,50 +3068,80 @@ namespace pp
                                     new System.Text.Parsing.AlternativeParser(
                                         new System.Text.Parsing.AlternativeParser(
                                             new System.Text.Parsing.AlternativeParser(
+                                                new System.Text.Parsing.AlternativeParser(
+                                                    new System.Text.Parsing.SequenceParser(
+                                                        new System.Text.Parsing.ActionParser(ToUtf32("A0"),
+                                                            new System.Text.Parsing.EmptyParser()),
+                                                        new System.Text.Parsing.GroupingParser(
+                                                            new System.Text.Parsing.AlternativeParser(
+                                                                new System.Text.Parsing.ActionParser(ToUtf32("A1"),
+                                                                    new System.Text.Parsing.StringParser(ToUtf32("##"))),
+                                                                new System.Text.Parsing.ActionParser(ToUtf32("A2"),
+                                                                    new System.Text.Parsing.CharParser('#'))))),
+                                                    new System.Text.Parsing.SequenceParser(
+                                                        new System.Text.Parsing.ActionParser(ToUtf32("A3"),
+                                                            new System.Text.Parsing.EmptyParser()),
+                                                        new System.Text.Parsing.ActionParser(ToUtf32("A4"),
+                                                            new System.Text.Parsing.NonterminalParser(ToUtf32("HeaderName"), ToUtf32("HeaderName"), 0)))),
                                                 new System.Text.Parsing.SequenceParser(
-                                                    new System.Text.Parsing.ActionParser(ToUtf32("A0"),
-                                                        new System.Text.Parsing.EmptyParser()),
-                                                    new System.Text.Parsing.ActionParser(ToUtf32("A1"),
-                                                        new System.Text.Parsing.NonterminalParser(ToUtf32("HeaderName"), ToUtf32("HeaderName"), 0))),
-                                                new System.Text.Parsing.SequenceParser(
-                                                    new System.Text.Parsing.ActionParser(ToUtf32("A2"),
+                                                    new System.Text.Parsing.ActionParser(ToUtf32("A5"),
                                                         new System.Text.Parsing.EmptyParser()),
                                                     new System.Text.Parsing.NonterminalParser(ToUtf32("FunctionMacroInvocation"), ToUtf32("FunctionMacroInvocation"), 4))),
                                             new System.Text.Parsing.SequenceParser(
-                                                new System.Text.Parsing.ActionParser(ToUtf32("A3"),
-                                                    new System.Text.Parsing.EmptyParser()),
-                                                new System.Text.Parsing.ActionParser(ToUtf32("A4"),
+                                                new System.Text.Parsing.SequenceParser(
+                                                    new System.Text.Parsing.ActionParser(ToUtf32("A6"),
+                                                        new System.Text.Parsing.EmptyParser()),
+                                                    new System.Text.Parsing.OptionalParser(
+                                                        new System.Text.Parsing.GroupingParser(
+                                                            new System.Text.Parsing.SequenceParser(
+                                                                new System.Text.Parsing.ActionParser(ToUtf32("A7"),
+                                                                    new System.Text.Parsing.CharParser('@')),
+                                                                new System.Text.Parsing.OptionalParser(
+                                                                    new System.Text.Parsing.NonterminalParser(ToUtf32("S"), ToUtf32("S"), 0)))))),
+                                                new System.Text.Parsing.ActionParser(ToUtf32("A8"),
                                                     new System.Text.Parsing.NonterminalParser(ToUtf32("id1"), ToUtf32("identifier"), 0)))),
                                         new System.Text.Parsing.SequenceParser(
-                                            new System.Text.Parsing.ActionParser(ToUtf32("A5"),
+                                            new System.Text.Parsing.ActionParser(ToUtf32("A9"),
                                                 new System.Text.Parsing.EmptyParser()),
-                                            new System.Text.Parsing.ActionParser(ToUtf32("A6"),
+                                            new System.Text.Parsing.ActionParser(ToUtf32("A10"),
                                                 new System.Text.Parsing.NonterminalParser(ToUtf32("id2"), ToUtf32("identifier"), 0)))),
-                                    new System.Text.Parsing.ActionParser(ToUtf32("A7"),
+                                    new System.Text.Parsing.ActionParser(ToUtf32("A11"),
                                         new System.Text.Parsing.NonterminalParser(ToUtf32("PPNumber"), ToUtf32("PPNumber"), 0))),
-                                new System.Text.Parsing.ActionParser(ToUtf32("A8"),
+                                new System.Text.Parsing.ActionParser(ToUtf32("A12"),
                                     new System.Text.Parsing.NonterminalParser(ToUtf32("CharacterLiteral"), ToUtf32("CharacterLiteral"), 0))),
-                            new System.Text.Parsing.ActionParser(ToUtf32("A9"),
+                            new System.Text.Parsing.ActionParser(ToUtf32("A13"),
                                 new System.Text.Parsing.NonterminalParser(ToUtf32("StringLiteral"), ToUtf32("StringLiteral"), 0))),
                         new System.Text.Parsing.SequenceParser(
-                            new System.Text.Parsing.ActionParser(ToUtf32("A10"),
+                            new System.Text.Parsing.ActionParser(ToUtf32("A14"),
                                 new System.Text.Parsing.EmptyParser()),
-                            new System.Text.Parsing.ActionParser(ToUtf32("A11"),
-                                new System.Text.Parsing.GroupingParser(
-                                    new System.Text.Parsing.DifferenceParser(
-                                        new System.Text.Parsing.AnyCharParser(),
+                            new System.Text.Parsing.GroupingParser(
+                                new System.Text.Parsing.AlternativeParser(
+                                    new System.Text.Parsing.AlternativeParser(
+                                        new System.Text.Parsing.AlternativeParser(
+                                            new System.Text.Parsing.ActionParser(ToUtf32("A15"),
+                                                new System.Text.Parsing.CharParser('(')),
+                                            new System.Text.Parsing.ActionParser(ToUtf32("A16"),
+                                                new System.Text.Parsing.CharParser(')'))),
+                                        new System.Text.Parsing.ActionParser(ToUtf32("A17"),
+                                            new System.Text.Parsing.CharParser(','))),
+                                    new System.Text.Parsing.ActionParser(ToUtf32("A18"),
                                         new System.Text.Parsing.GroupingParser(
-                                            new System.Text.Parsing.AlternativeParser(
-                                                new System.Text.Parsing.AlternativeParser(
+                                            new System.Text.Parsing.DifferenceParser(
+                                                new System.Text.Parsing.AnyCharParser(),
+                                                new System.Text.Parsing.GroupingParser(
                                                     new System.Text.Parsing.AlternativeParser(
-                                                        new System.Text.Parsing.CharParser('#'),
-                                                        new System.Text.Parsing.CharParser(',')),
-                                                    new System.Text.Parsing.CharParser(')')),
-                                                new System.Text.Parsing.NonterminalParser(ToUtf32("newline"), ToUtf32("newline"), 0)))))))),
+                                                        new System.Text.Parsing.AlternativeParser(
+                                                            new System.Text.Parsing.AlternativeParser(
+                                                                new System.Text.Parsing.AlternativeParser(
+                                                                    new System.Text.Parsing.CharParser('#'),
+                                                                    new System.Text.Parsing.CharParser('(')),
+                                                                new System.Text.Parsing.CharParser(')')),
+                                                            new System.Text.Parsing.CharParser(',')),
+                                                        new System.Text.Parsing.NonterminalParser(ToUtf32("newline"), ToUtf32("newline"), 0)))))))))),
                     new System.Text.Parsing.SequenceParser(
-                        new System.Text.Parsing.ActionParser(ToUtf32("A12"),
+                        new System.Text.Parsing.ActionParser(ToUtf32("A19"),
                             new System.Text.Parsing.EmptyParser()),
-                        new System.Text.Parsing.ActionParser(ToUtf32("A13"),
+                        new System.Text.Parsing.ActionParser(ToUtf32("A20"),
                             new System.Text.Parsing.GroupingParser(
                                 new System.Text.Parsing.DifferenceParser(
                                     new System.Text.Parsing.AnyCharParser(),
@@ -2598,15 +3177,42 @@ namespace pp
                 new System.Text.Parsing.TokenParser(
                     new System.Text.Parsing.PositiveParser(
                         new System.Text.Parsing.GroupingParser(
-                            new System.Text.Parsing.NonterminalParser(ToUtf32("PPToken"), ToUtf32("PPToken"), 5))))));
+                            new System.Text.Parsing.NonterminalParser(ToUtf32("PPToken"), ToUtf32("PPToken"), 6))))));
+            AddRule(new PPTokenCatenationRule(ToUtf32("PPTokenCatenation"), GetScope(), Domain()->GetNextRuleId(),
+                new System.Text.Parsing.ActionParser(ToUtf32("A0"),
+                    new System.Text.Parsing.GroupingParser(
+                        new System.Text.Parsing.SequenceParser(
+                            new System.Text.Parsing.NonterminalParser(ToUtf32("first"), ToUtf32("PPToken"), 6),
+                            new System.Text.Parsing.KleeneStarParser(
+                                new System.Text.Parsing.GroupingParser(
+                                    new System.Text.Parsing.SequenceParser(
+                                        new System.Text.Parsing.SequenceParser(
+                                            new System.Text.Parsing.SequenceParser(
+                                                new System.Text.Parsing.OptionalParser(
+                                                    new System.Text.Parsing.NonterminalParser(ToUtf32("S"), ToUtf32("S"), 0)),
+                                                new System.Text.Parsing.CharParser('$')),
+                                            new System.Text.Parsing.OptionalParser(
+                                                new System.Text.Parsing.NonterminalParser(ToUtf32("S"), ToUtf32("S"), 0))),
+                                        new System.Text.Parsing.ActionParser(ToUtf32("A1"),
+                                            new System.Text.Parsing.NonterminalParser(ToUtf32("next"), ToUtf32("PPToken"), 6))))))))));
+            AddRule(new PPTokenSequenceRule(ToUtf32("PPTokenSequence"), GetScope(), Domain()->GetNextRuleId(),
+                new System.Text.Parsing.SequenceParser(
+                    new System.Text.Parsing.ActionParser(ToUtf32("A0"),
+                        new System.Text.Parsing.NonterminalParser(ToUtf32("left"), ToUtf32("PPTokenCatenation"), 2)),
+                    new System.Text.Parsing.KleeneStarParser(
+                        new System.Text.Parsing.GroupingParser(
+                            new System.Text.Parsing.ActionParser(ToUtf32("A1"),
+                                new System.Text.Parsing.NonterminalParser(ToUtf32("right"), ToUtf32("PPTokenCatenation"), 2)))))));
             AddRule(new MacroReplacementRule(ToUtf32("MacroReplacement"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.SequenceParser(
                     new System.Text.Parsing.ActionParser(ToUtf32("A0"),
                         new System.Text.Parsing.EmptyParser()),
                     new System.Text.Parsing.ActionParser(ToUtf32("A1"),
                         new System.Text.Parsing.GroupingParser(
-                            new System.Text.Parsing.KleeneStarParser(
-                                new System.Text.Parsing.NonterminalParser(ToUtf32("PPToken"), ToUtf32("PPToken"), 5)))))));
+                            new System.Text.Parsing.OptionalParser(
+                                new System.Text.Parsing.GroupingParser(
+                                    new System.Text.Parsing.ActionParser(ToUtf32("A2"),
+                                        new System.Text.Parsing.NonterminalParser(ToUtf32("PPTokenSequence"), ToUtf32("PPTokenSequence"), 2)))))))));
             AddRule(new PPNumberRule(ToUtf32("PPNumber"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.ActionParser(ToUtf32("A0"),
                     new System.Text.Parsing.TokenParser(
@@ -2631,28 +3237,25 @@ namespace pp
                                         new System.Text.Parsing.CharSetParser(ToUtf32("a-zA-Z_"))))))))));
             AddRule(new HeaderNameRule(ToUtf32("HeaderName"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.AlternativeParser(
-                    new System.Text.Parsing.TokenParser(
-                        new System.Text.Parsing.SequenceParser(
+                    new System.Text.Parsing.ActionParser(ToUtf32("A0"),
+                        new System.Text.Parsing.TokenParser(
                             new System.Text.Parsing.SequenceParser(
-                                new System.Text.Parsing.CharParser('<'),
-                                new System.Text.Parsing.ActionParser(ToUtf32("A0"),
-                                    new System.Text.Parsing.GroupingParser(
-                                        new System.Text.Parsing.PositiveParser(
-                                            new System.Text.Parsing.CharSetParser(ToUtf32(">"), true))))),
-                            new System.Text.Parsing.CharParser('>'))),
-                    new System.Text.Parsing.TokenParser(
-                        new System.Text.Parsing.SequenceParser(
+                                new System.Text.Parsing.SequenceParser(
+                                    new System.Text.Parsing.CharParser('<'),
+                                    new System.Text.Parsing.PositiveParser(
+                                        new System.Text.Parsing.CharSetParser(ToUtf32(">"), true))),
+                                new System.Text.Parsing.CharParser('>')))),
+                    new System.Text.Parsing.ActionParser(ToUtf32("A1"),
+                        new System.Text.Parsing.TokenParser(
                             new System.Text.Parsing.SequenceParser(
-                                new System.Text.Parsing.CharParser('\"'),
-                                new System.Text.Parsing.ActionParser(ToUtf32("A1"),
-                                    new System.Text.Parsing.GroupingParser(
-                                        new System.Text.Parsing.PositiveParser(
-                                            new System.Text.Parsing.CharSetParser(ToUtf32("\""), true))))),
-                            new System.Text.Parsing.CharParser('\"'))))));
-            AddRule(new System.Text.Parsing.RuleParser(ToUtf32("Spaces"), GetScope(), Domain()->GetNextRuleId(),
+                                new System.Text.Parsing.SequenceParser(
+                                    new System.Text.Parsing.CharParser('\"'),
+                                    new System.Text.Parsing.PositiveParser(
+                                        new System.Text.Parsing.CharSetParser(ToUtf32("\""), true))),
+                                new System.Text.Parsing.CharParser('\"')))))));
+            AddRule(new System.Text.Parsing.RuleParser(ToUtf32("S"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.PositiveParser(
                     new System.Text.Parsing.CharSetParser(ToUtf32(" \t")))));
-            SetSkipRuleName(ToUtf32("Spaces"));
         }
     }
 } // pp

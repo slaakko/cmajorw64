@@ -159,14 +159,14 @@ namespace ast
     
     public class InvokeExpressionNode : UnaryNode
     {
-        public nothrow InvokeExpressionNode(const Span& span_, Node* subject_, ExpressionListNode* args_) : base(span_, subject_), args(args_)
+        public nothrow InvokeExpressionNode(const Span& span_, Node* subject_, Node* args_) : base(span_, subject_), args(args_)
         {
         }
         public override void Accept(Visitor& visitor)
         {
             visitor.Visit(*this);
         }
-        public UniquePtr<ExpressionListNode> args;
+        public UniquePtr<Node> args;
     }
     
     public class PostfixIncrementNode : UnaryNode
@@ -288,6 +288,18 @@ namespace ast
         dynamicCast, staticCast, reinterpretCast, constCast
     }
     
+    public nothrow ustring CppCastStr(CppCast cast_)
+    {
+        switch (cast_)
+        {
+            case CppCast.dynamicCast: return u"dynamic_cast";
+            case CppCast.staticCast: return u"static_cast";
+            case CppCast.reinterpretCast: return u"reinterpret_cast";
+            case CppCast.constCast: return u"const_cast";
+        }
+        return u"CAST";
+    }
+    
     public class CppCastNode : Node
     {
         public nothrow CppCastNode(const Span& span_, CppCast cast__, Node* typeExpr_, Node* expr_) : base(span_), cast_(cast__), typeExpr(typeExpr_), expr(expr_)
@@ -323,16 +335,5 @@ namespace ast
             visitor.Visit(*this);
         }
         public ustring identifier;
-    }
-    
-    public class TodoNode : Node
-    {
-        public nothrow TodoNode(const Span& span_) : base(span_)
-        {
-        }
-        public override void Accept(Visitor& visitor)
-        {
-            visitor.Visit(*this);
-        }
     }
 }

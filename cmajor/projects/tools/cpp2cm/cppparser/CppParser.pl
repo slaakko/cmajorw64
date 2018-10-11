@@ -25,8 +25,8 @@ namespace cppparser
     }
     grammar SimpleTypeGrammar
     {
-        SimpleType(var UniquePtr<SimpleTypeNode> simpleTypeNode) : SimpleTypeNode*;
-        SimpleTypeSpecifier : Node*;
+        SimpleType(var SimpleTypeSpecifiers simpleTypeSpecifiers) : SimpleTypeNode*;
+        SimpleTypeSpecifier : SimpleTypeSpecifiers;
     }
     grammar EnumerationGrammar
     {
@@ -51,9 +51,6 @@ namespace cppparser
     grammar SourceFileGrammar
     {
         SourceFile(var ParsingContext ctx) : SourceFileNode*;
-        CommentsAndSpacesAndPPLines;
-        PPLine;
-        S;
     }
     grammar IdentifierGrammar
     {
@@ -66,6 +63,7 @@ namespace cppparser
     {
         TypeExpr(ParsingContext* ctx) : Node*;
         CVSpecifierSequence : CVSpecifiers;
+        CVSpecifier : CVSpecifiers;
         PrefixTypeExpr(ParsingContext* ctx) : Node*;
         PostfixTypeExpr(ParsingContext* ctx, var UniquePtr<Node> node) : Node*;
         PrimaryTypeExpr(ParsingContext* ctx) : Node*;
@@ -179,6 +177,7 @@ namespace cppparser
         PostfixExpression(ParsingContext* ctx, var UniquePtr<Node> node) : Node*;
         PrimaryExpression(ParsingContext* ctx) : Node*;
         CppCastExpression(ParsingContext* ctx, var CppCast cast_) : Node*;
+        DefinedExpr : Node*;
         TypeIdExpression(ParsingContext* ctx) : Node*;
         IdExpression(ParsingContext* ctx) : Node*;
         UnqualifiedIdExpr(ParsingContext* ctx) : Node*;

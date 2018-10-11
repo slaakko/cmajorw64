@@ -88,7 +88,7 @@ namespace cppparser
             public void A0Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->value = new SourceFileNode(span);
+                context->value = new SourceFileNode(span, fileName);
             }
             public void PreDeclarations(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
             {
@@ -109,16 +109,16 @@ namespace cppparser
         public override void GetReferencedGrammars()
         {
             ParsingDomain* pd = Domain();
-            Grammar* grammar0 = pd->GetGrammar(ToUtf32("System.Text.Parsing.stdlib"));
+            Grammar* grammar0 = pd->GetGrammar(ToUtf32("cppparser.DeclarationGrammar"));
             if (grammar0 == null)
             {
-                grammar0 = new System.Text.Parsing.stdlib(pd);
+                grammar0 = new cppparser.DeclarationGrammar(pd);
             }
             AddGrammarReference(grammar0);
-            Grammar* grammar1 = pd->GetGrammar(ToUtf32("cppparser.DeclarationGrammar"));
+            Grammar* grammar1 = pd->GetGrammar(ToUtf32("System.Text.Parsing.stdlib"));
             if (grammar1 == null)
             {
-                grammar1 = new cppparser.DeclarationGrammar(pd);
+                grammar1 = new System.Text.Parsing.stdlib(pd);
             }
             AddGrammarReference(grammar1);
         }
@@ -126,41 +126,14 @@ namespace cppparser
         {
             AddRuleLink(new System.Text.Parsing.RuleLink(ToUtf32("comment"), this, ToUtf32("System.Text.Parsing.stdlib.comment")));
             AddRuleLink(new System.Text.Parsing.RuleLink(ToUtf32("newline"), this, ToUtf32("System.Text.Parsing.stdlib.newline")));
+            AddRuleLink(new System.Text.Parsing.RuleLink(ToUtf32("spaces"), this, ToUtf32("System.Text.Parsing.stdlib.spaces")));
             AddRuleLink(new System.Text.Parsing.RuleLink(ToUtf32("Declarations"), this, ToUtf32("DeclarationGrammar.Declarations")));
             AddRule(new SourceFileRule(ToUtf32("SourceFile"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.SequenceParser(
                     new System.Text.Parsing.ActionParser(ToUtf32("A0"),
                         new System.Text.Parsing.EmptyParser()),
                     new System.Text.Parsing.NonterminalParser(ToUtf32("Declarations"), ToUtf32("Declarations"), 2))));
-            AddRule(new System.Text.Parsing.RuleParser(ToUtf32("CommentsAndSpacesAndPPLines"), GetScope(), Domain()->GetNextRuleId(),
-                new System.Text.Parsing.PositiveParser(
-                    new System.Text.Parsing.GroupingParser(
-                        new System.Text.Parsing.AlternativeParser(
-                            new System.Text.Parsing.AlternativeParser(
-                                new System.Text.Parsing.NonterminalParser(ToUtf32("PPLine"), ToUtf32("PPLine"), 0),
-                                new System.Text.Parsing.NonterminalParser(ToUtf32("comment"), ToUtf32("comment"), 0)),
-                            new System.Text.Parsing.SpaceParser())))));
-            AddRule(new System.Text.Parsing.RuleParser(ToUtf32("PPLine"), GetScope(), Domain()->GetNextRuleId(),
-                new System.Text.Parsing.TokenParser(
-                    new System.Text.Parsing.SequenceParser(
-                        new System.Text.Parsing.SequenceParser(
-                            new System.Text.Parsing.SequenceParser(
-                                new System.Text.Parsing.KleeneStarParser(
-                                    new System.Text.Parsing.NonterminalParser(ToUtf32("S"), ToUtf32("S"), 0)),
-                                new System.Text.Parsing.CharParser('#')),
-                            new System.Text.Parsing.KleeneStarParser(
-                                new System.Text.Parsing.GroupingParser(
-                                    new System.Text.Parsing.DifferenceParser(
-                                        new System.Text.Parsing.AnyCharParser(),
-                                        new System.Text.Parsing.NonterminalParser(ToUtf32("newline"), ToUtf32("newline"), 0))))),
-                        new System.Text.Parsing.NonterminalParser(ToUtf32("newline"), ToUtf32("newline"), 0)))));
-            AddRule(new System.Text.Parsing.RuleParser(ToUtf32("S"), GetScope(), Domain()->GetNextRuleId(),
-                new System.Text.Parsing.PositiveParser(
-                    new System.Text.Parsing.GroupingParser(
-                        new System.Text.Parsing.AlternativeParser(
-                            new System.Text.Parsing.CharParser(' '),
-                            new System.Text.Parsing.CharParser('\t'))))));
-            SetSkipRuleName(ToUtf32("CommentsAndSpacesAndPPLines"));
+            SetSkipRuleName(ToUtf32("spaces"));
         }
     }
 } // cppparser

@@ -1,0 +1,33 @@
+using System;
+using ast;
+using symbols;
+
+namespace binder
+{
+    public class TypeResolver : Visitor
+    {
+        public nothrow TypeResolver(SymbolTable& symbolTable_) : symbolTable(symbolTable_)
+        {
+        }
+        public override void Visit(SimpleTypeNode& simpleTypeNode) 
+        {
+            type = symbolTable.MakeSimpleTypeSymbol(simpleTypeNode, simpleTypeNode.span);
+        }
+        private SymbolTable& symbolTable;
+        public TypeSymbol* type;
+    }
+    
+    public TypeSymbol* ResolveType(Node* typeExprNode, SymbolTable& symbolTable)
+    {
+        TypeResolver resolver(symbolTable);
+        typeExprNode->Accept(resolver);
+        if (resolver.type != null)
+        {
+            return resolver.type;
+        }
+        else
+        {
+            throw SymbolException("type not resolved", typeExprNode->span);
+        }
+    }
+}

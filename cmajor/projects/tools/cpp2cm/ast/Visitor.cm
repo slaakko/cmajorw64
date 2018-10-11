@@ -5,26 +5,12 @@ namespace ast
     public class Visitor
     {
         public default virtual ~Visitor();
+        public virtual void Visit(CompileUnitNode& compileUnitNode) {}
         public virtual void Visit(SourceFileNode& sourceFileNode) {}
         public virtual void Visit(TemplateDeclarationNode& templateDeclarationNode) {}
         public virtual void Visit(TemplateParameterNode& templateParameterNode) {}
         public virtual void Visit(ExplicitInstantiationNode& explicitInstantiationNode) {}
         public virtual void Visit(ExplicitSpecializationNode& explicitSpecializationNode) {}
-        public virtual void Visit(OptionalNode& optionalNode) {}
-        public virtual void Visit(CharNode& charNode) {}
-        public virtual void Visit(Char16Node& char16Node) {}
-        public virtual void Visit(Char32Node& char32Node) {}
-        public virtual void Visit(WCharNode& wcharNode) {}
-        public virtual void Visit(BoolNode& boolNode) {}
-        public virtual void Visit(ShortNode& shortNode) {}
-        public virtual void Visit(IntNode& intNode) {}
-        public virtual void Visit(LongNode& longNode) {}
-        public virtual void Visit(SignedNode& signedNode) {}
-        public virtual void Visit(UnsignedNode& unsignedNode) {}
-        public virtual void Visit(FloatNode& floatNode) {}
-        public virtual void Visit(DoubleNode& doubleNode) {}
-        public virtual void Visit(VoidNode& voidNode) {}
-        public virtual void Visit(AutoNode& autoNode) {}
         public virtual void Visit(FloatingLiteralNode& floatingLiteralNode) {}
         public virtual void Visit(IntegerLiteralNode& integerLiteralNode) {}
         public virtual void Visit(CharacterLiteralNode& characterLiteralNode) {}
@@ -74,7 +60,6 @@ namespace ast
         public virtual void Visit(CppCastNode& cppCastNode) {}
         public virtual void Visit(TypeIdNode& typeIdNode) {}
         public virtual void Visit(DefinedNode& definedNode) {}
-        public virtual void Visit(TodoNode& todoNode) {}
         public virtual void Visit(InitDeclaratorNode& initDeclaratorNode) {}
         public virtual void Visit(ArrayDeclaratorNode& arrayDeclaratorNode) {}
         public virtual void Visit(InitializerListNode& initializerListNode) {}

@@ -143,18 +143,69 @@ namespace cppparser
             {
                 ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
                 a0ActionParser->SetAction(A0Action);
+                NonterminalParser* cvNonterminalParser = GetNonterminal(ToUtf32("cv"));
+                cvNonterminalParser->SetPost(Postcv);
+            }
+            public void A0Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                context->value = cast<CVSpecifiers>(context->value | context->fromcv);
+            }
+            public void Postcv(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                if (matched)
+                {
+                    UniquePtr<Object> fromcv_value = stack.Pop();
+                    context->fromcv = *cast<ValueObject<CVSpecifiers>*>(fromcv_value.Get());
+                }
+            }
+            public class Context : System.Text.Parsing.Context
+            {
+                public Context() : value(), fromcv()
+                {
+                }
+                public CVSpecifiers value;
+                public CVSpecifiers fromcv;
+            }
+        }
+
+        public class CVSpecifierRule : System.Text.Parsing.RuleParser
+        {
+            public CVSpecifierRule(const ustring& name_, Scope* enclosingScope_, int id_, Parser* definition_) : base(name_, enclosingScope_, id_, definition_)
+            {
+                SetValueTypeName(ToUtf32("CVSpecifiers"));
+            }
+            public override void Enter(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
+            {
+                parsingData->PushContext(Id(), new Context());
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+            }
+            public override void Leave(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                if (matched)
+                {
+                    stack.Push(UniquePtr<Object>(new ValueObject<CVSpecifiers>(context->value)));
+                }
+                parsingData->PopContext(Id());
+            }
+            public override void Link()
+            {
+                ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
+                a0ActionParser->SetAction(A0Action);
                 ActionParser* a1ActionParser = GetAction(ToUtf32("A1"));
                 a1ActionParser->SetAction(A1Action);
             }
             public void A0Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->value = context->value | CVSpecifiers.const_;
+                context->value = CVSpecifiers.const_;
             }
             public void A1Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->value = context->value | CVSpecifiers.volatile;
+                context->value = CVSpecifiers.volatile;
             }
             public class Context : System.Text.Parsing.Context
             {
@@ -444,6 +495,8 @@ namespace cppparser
             {
                 ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
                 a0ActionParser->SetAction(A0Action);
+                ActionParser* a1ActionParser = GetAction(ToUtf32("A1"));
+                a1ActionParser->SetAction(A1Action);
                 NonterminalParser* simpleTypeNonterminalParser = GetNonterminal(ToUtf32("SimpleType"));
                 simpleTypeNonterminalParser->SetPost(PostSimpleType);
                 NonterminalParser* classKeyNonterminalParser = GetNonterminal(ToUtf32("ClassKey"));
@@ -456,6 +509,11 @@ namespace cppparser
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
                 context->value = context->fromSimpleType;
+            }
+            public void A1Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                context->value = context->fromQualifiedId;
             }
             public void PostSimpleType(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
             {
@@ -505,34 +563,46 @@ namespace cppparser
         public override void GetReferencedGrammars()
         {
             ParsingDomain* pd = Domain();
-            Grammar* grammar0 = pd->GetGrammar(ToUtf32("cppparser.ClassGrammar"));
+            Grammar* grammar0 = pd->GetGrammar(ToUtf32("cppparser.IdentifierGrammar"));
             if (grammar0 == null)
             {
-                grammar0 = new cppparser.ClassGrammar(pd);
+                grammar0 = new cppparser.IdentifierGrammar(pd);
             }
             AddGrammarReference(grammar0);
-            Grammar* grammar1 = pd->GetGrammar(ToUtf32("cppparser.SimpleTypeGrammar"));
+            Grammar* grammar1 = pd->GetGrammar(ToUtf32("cppparser.ClassGrammar"));
             if (grammar1 == null)
             {
-                grammar1 = new cppparser.SimpleTypeGrammar(pd);
+                grammar1 = new cppparser.ClassGrammar(pd);
             }
             AddGrammarReference(grammar1);
-            Grammar* grammar2 = pd->GetGrammar(ToUtf32("cppparser.IdentifierGrammar"));
+            Grammar* grammar2 = pd->GetGrammar(ToUtf32("cppparser.TemplateGrammar"));
             if (grammar2 == null)
             {
-                grammar2 = new cppparser.IdentifierGrammar(pd);
+                grammar2 = new cppparser.TemplateGrammar(pd);
             }
             AddGrammarReference(grammar2);
+            Grammar* grammar3 = pd->GetGrammar(ToUtf32("cppparser.SimpleTypeGrammar"));
+            if (grammar3 == null)
+            {
+                grammar3 = new cppparser.SimpleTypeGrammar(pd);
+            }
+            AddGrammarReference(grammar3);
         }
         public override void CreateRules()
         {
             AddRuleLink(new System.Text.Parsing.RuleLink(ToUtf32("SimpleType"), this, ToUtf32("SimpleTypeGrammar.SimpleType")));
+            AddRuleLink(new System.Text.Parsing.RuleLink(ToUtf32("TemplateId"), this, ToUtf32("TemplateGrammar.TemplateId")));
             AddRuleLink(new System.Text.Parsing.RuleLink(ToUtf32("ClassKey"), this, ToUtf32("ClassGrammar.ClassKey")));
             AddRuleLink(new System.Text.Parsing.RuleLink(ToUtf32("QualifiedId"), this, ToUtf32("IdentifierGrammar.QualifiedId")));
             AddRule(new TypeExprRule(ToUtf32("TypeExpr"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.ActionParser(ToUtf32("A0"),
                     new System.Text.Parsing.NonterminalParser(ToUtf32("PrefixTypeExpr"), ToUtf32("PrefixTypeExpr"), 1))));
             AddRule(new CVSpecifierSequenceRule(ToUtf32("CVSpecifierSequence"), GetScope(), Domain()->GetNextRuleId(),
+                new System.Text.Parsing.KleeneStarParser(
+                    new System.Text.Parsing.GroupingParser(
+                        new System.Text.Parsing.ActionParser(ToUtf32("A0"),
+                            new System.Text.Parsing.NonterminalParser(ToUtf32("cv"), ToUtf32("CVSpecifier"), 0))))));
+            AddRule(new CVSpecifierRule(ToUtf32("CVSpecifier"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.AlternativeParser(
                     new System.Text.Parsing.ActionParser(ToUtf32("A0"),
                         new System.Text.Parsing.KeywordParser(ToUtf32("const"))),
@@ -586,12 +656,13 @@ namespace cppparser
                     new System.Text.Parsing.ActionParser(ToUtf32("A0"),
                         new System.Text.Parsing.NonterminalParser(ToUtf32("SimpleType"), ToUtf32("SimpleType"), 0)),
                     new System.Text.Parsing.SequenceParser(
-                        new System.Text.Parsing.GroupingParser(
-                            new System.Text.Parsing.AlternativeParser(
-                                new System.Text.Parsing.KeywordParser(ToUtf32("typename")),
-                                new System.Text.Parsing.OptionalParser(
+                        new System.Text.Parsing.OptionalParser(
+                            new System.Text.Parsing.GroupingParser(
+                                new System.Text.Parsing.AlternativeParser(
+                                    new System.Text.Parsing.KeywordParser(ToUtf32("typename")),
                                     new System.Text.Parsing.NonterminalParser(ToUtf32("ClassKey"), ToUtf32("ClassKey"), 0)))),
-                        new System.Text.Parsing.NonterminalParser(ToUtf32("QualifiedId"), ToUtf32("QualifiedId"), 1)))));
+                        new System.Text.Parsing.ActionParser(ToUtf32("A1"),
+                            new System.Text.Parsing.NonterminalParser(ToUtf32("QualifiedId"), ToUtf32("QualifiedId"), 1))))));
         }
     }
 } // cppparser

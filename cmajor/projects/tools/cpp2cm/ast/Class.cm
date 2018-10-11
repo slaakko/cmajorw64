@@ -7,6 +7,17 @@ namespace ast
         class_, struct_, union_
     }
     
+    public nothrow ustring ClassKeyStr(ClassKey key)
+    {
+        switch (key)
+        {
+            case ClassKey.class_: return u"class";
+            case ClassKey.struct_: return u"struct";
+            case ClassKey.union_: return u"union";
+        }
+        return u"CLASS_KEY";
+    }
+    
     public class ForwardClassDeclarationNode : Node
     {
         public ForwardClassDeclarationNode(const Span& span_, ClassKey classKey_, Node* className_) : base(span_), classKey(classKey_), className(className_)

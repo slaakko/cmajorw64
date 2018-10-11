@@ -829,28 +829,28 @@ namespace cppparser
         public override void GetReferencedGrammars()
         {
             ParsingDomain* pd = Domain();
-            Grammar* grammar0 = pd->GetGrammar(ToUtf32("cppparser.TypeExprGrammar"));
+            Grammar* grammar0 = pd->GetGrammar(ToUtf32("cppparser.ExpressionGrammar"));
             if (grammar0 == null)
             {
-                grammar0 = new cppparser.TypeExprGrammar(pd);
+                grammar0 = new cppparser.ExpressionGrammar(pd);
             }
             AddGrammarReference(grammar0);
-            Grammar* grammar1 = pd->GetGrammar(ToUtf32("cppparser.FunctionGrammar"));
+            Grammar* grammar1 = pd->GetGrammar(ToUtf32("cppparser.TypeExprGrammar"));
             if (grammar1 == null)
             {
-                grammar1 = new cppparser.FunctionGrammar(pd);
+                grammar1 = new cppparser.TypeExprGrammar(pd);
             }
             AddGrammarReference(grammar1);
-            Grammar* grammar2 = pd->GetGrammar(ToUtf32("cppparser.IdentifierGrammar"));
+            Grammar* grammar2 = pd->GetGrammar(ToUtf32("cppparser.FunctionGrammar"));
             if (grammar2 == null)
             {
-                grammar2 = new cppparser.IdentifierGrammar(pd);
+                grammar2 = new cppparser.FunctionGrammar(pd);
             }
             AddGrammarReference(grammar2);
-            Grammar* grammar3 = pd->GetGrammar(ToUtf32("cppparser.ExpressionGrammar"));
+            Grammar* grammar3 = pd->GetGrammar(ToUtf32("cppparser.IdentifierGrammar"));
             if (grammar3 == null)
             {
-                grammar3 = new cppparser.ExpressionGrammar(pd);
+                grammar3 = new cppparser.IdentifierGrammar(pd);
             }
             AddGrammarReference(grammar3);
         }

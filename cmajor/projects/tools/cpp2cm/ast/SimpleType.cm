@@ -3,164 +3,149 @@ using Span = System.Text.Parsing.Span;
 
 namespace ast
 {
-    public class CharNode : Node
+    public enum SimpleTypeSpecifiers
     {
-        public nothrow CharNode(const Span& span_) : base(span_)
-        {
-        }
-        public override void Accept(Visitor& visitor)
-        {
-            visitor.Visit(*this);
-        }
+        none = 0,
+        char_ = 1 << 0,
+        char16_t = 1 << 1,
+        char32_t = 1 << 2,
+        wchar_t = 1 << 3,
+        bool_ = 1 << 4,
+        short_ = 1 << 5,
+        int_ = 1 << 6,
+        long_ = 1 << 7,
+        long_long = 1 << 8,
+        signed  = 1 << 9,
+        unsigned = 1 << 10,
+        float_ = 1 << 11,
+        double_ = 1 << 12,
+        void_ = 1 << 13,
+        auto = 1 << 14
     }
     
-    public class Char16Node : Node
+    public nothrow ustring SimpleTypeSpecifierStr(SimpleTypeSpecifiers specifiers)
     {
-        public nothrow Char16Node(const Span& span_) : base(span_)
+        ustring s;
+        if ((specifiers & SimpleTypeSpecifiers.char_) != SimpleTypeSpecifiers.none) 
         {
-        }
-        public override void Accept(Visitor& visitor)
+            s.Append(u"char");
+        }        
+        if ((specifiers & SimpleTypeSpecifiers.char16_t) != SimpleTypeSpecifiers.none) 
         {
-            visitor.Visit(*this);
+            if (!s.IsEmpty())
+            {
+                s.Append(' ');
+            }
+            s.Append(u"char16_t");
         }
-    }
-
-    public class Char32Node : Node
-    {
-        public nothrow Char32Node(const Span& span_) : base(span_)
+        if ((specifiers & SimpleTypeSpecifiers.char32_t) != SimpleTypeSpecifiers.none) 
         {
+            if (!s.IsEmpty())
+            {
+                s.Append(' ');
+            }
+            s.Append(u"char32_t");
         }
-        public override void Accept(Visitor& visitor)
+        if ((specifiers & SimpleTypeSpecifiers.wchar_t) != SimpleTypeSpecifiers.none) 
         {
-            visitor.Visit(*this);
+            if (!s.IsEmpty())
+            {
+                s.Append(' ');
+            }
+            s.Append(u"wchar_t");
         }
-    }
-    
-    public class WCharNode : Node
-    {
-        public nothrow WCharNode(const Span& span_) : base(span_)
+        if ((specifiers & SimpleTypeSpecifiers.bool_) != SimpleTypeSpecifiers.none) 
         {
+            if (!s.IsEmpty())
+            {
+                s.Append(' ');
+            }
+            s.Append(u"bool");
         }
-        public override void Accept(Visitor& visitor)
+        if ((specifiers & SimpleTypeSpecifiers.short_) != SimpleTypeSpecifiers.none) 
         {
-            visitor.Visit(*this);
+            if (!s.IsEmpty())
+            {
+                s.Append(' ');
+            }
+            s.Append(u"short");
         }
-    }
-    
-    public class BoolNode : Node
-    {
-        public nothrow BoolNode(const Span& span_) : base(span_)
+        if ((specifiers & SimpleTypeSpecifiers.int_) != SimpleTypeSpecifiers.none) 
         {
+            if (!s.IsEmpty())
+            {
+                s.Append(' ');
+            }
+            s.Append(u"int");
         }
-        public override void Accept(Visitor& visitor)
+        if ((specifiers & SimpleTypeSpecifiers.long_) != SimpleTypeSpecifiers.none) 
         {
-            visitor.Visit(*this);
+            if (!s.IsEmpty())
+            {
+                s.Append(' ');
+            }
+            s.Append(u"long");
         }
-    }
-    
-    public class ShortNode : Node
-    {
-        public nothrow ShortNode(const Span& span_) : base(span_)
+        if ((specifiers & SimpleTypeSpecifiers.signed) != SimpleTypeSpecifiers.none) 
         {
+            if (!s.IsEmpty())
+            {
+                s.Append(' ');
+            }
+            s.Append(u"signed");
         }
-        public override void Accept(Visitor& visitor)
+        if ((specifiers & SimpleTypeSpecifiers.unsigned) != SimpleTypeSpecifiers.none) 
         {
-            visitor.Visit(*this);
+            if (!s.IsEmpty())
+            {
+                s.Append(' ');
+            }
+            s.Append(u"unsigned");
         }
-    }
-    
-    public class IntNode : Node
-    {
-        public nothrow IntNode(const Span& span_) : base(span_)
+        if ((specifiers & SimpleTypeSpecifiers.float_) != SimpleTypeSpecifiers.none) 
         {
+            if (!s.IsEmpty())
+            {
+                s.Append(' ');
+            }
+            s.Append(u"float");
         }
-        public override void Accept(Visitor& visitor)
+        if ((specifiers & SimpleTypeSpecifiers.double_) != SimpleTypeSpecifiers.none) 
         {
-            visitor.Visit(*this);
+            if (!s.IsEmpty())
+            {
+                s.Append(' ');
+            }
+            s.Append(u"double");
         }
-    }
-
-    public class LongNode : Node
-    {
-        public nothrow LongNode(const Span& span_) : base(span_)
+        if ((specifiers & SimpleTypeSpecifiers.void_) != SimpleTypeSpecifiers.none) 
         {
+            if (!s.IsEmpty())
+            {
+                s.Append(' ');
+            }
+            s.Append(u"void");
         }
-        public override void Accept(Visitor& visitor)
+        if ((specifiers & SimpleTypeSpecifiers.auto) != SimpleTypeSpecifiers.none) 
         {
-            visitor.Visit(*this);
+            if (!s.IsEmpty())
+            {
+                s.Append(' ');
+            }
+            s.Append(u"auto");
         }
-    }
-    
-    public class SignedNode : Node
-    {
-        public nothrow SignedNode(const Span& span_) : base(span_)
-        {
-        }
-        public override void Accept(Visitor& visitor)
-        {
-            visitor.Visit(*this);
-        }
-    }
-        
-    public class UnsignedNode : Node
-    {
-        public nothrow UnsignedNode(const Span& span_) : base(span_)
-        {
-        }
-        public override void Accept(Visitor& visitor)
-        {
-            visitor.Visit(*this);
-        }
-    }
-    
-    public class FloatNode : Node
-    {
-        public nothrow FloatNode(const Span& span_) : base(span_)
-        {
-        }
-        public override void Accept(Visitor& visitor)
-        {
-        }
-    }
-
-    public class DoubleNode : Node
-    {
-        public nothrow DoubleNode(const Span& span_) : base(span_)
-        {
-        }
-        public override void Accept(Visitor& visitor)
-        {
-        }
-    }
-
-    public class VoidNode : Node
-    {
-        public nothrow VoidNode(const Span& span_) : base(span_)
-        {
-        }
-        public override void Accept(Visitor& visitor)
-        {
-        }
-    }
-
-    public class AutoNode : Node
-    {
-        public nothrow AutoNode(const Span& span_) : base(span_)
-        {
-        }
-        public override void Accept(Visitor& visitor)
-        {
-        }
+        return s;
     }
                 
-    public class SimpleTypeNode : CompositeNode<Node>
+    public class SimpleTypeNode : Node
     {
-        public nothrow SimpleTypeNode(const Span& span_) : base(span_)
+        public nothrow SimpleTypeNode(const Span& span_, SimpleTypeSpecifiers simpleTypeSpecifiers_) : base(span_), simpleTypeSpecifiers(simpleTypeSpecifiers_)
         {
         }
         public override void Accept(Visitor& visitor)
         {
             visitor.Visit(*this);
         }
+        public SimpleTypeSpecifiers simpleTypeSpecifiers;
     }
 }

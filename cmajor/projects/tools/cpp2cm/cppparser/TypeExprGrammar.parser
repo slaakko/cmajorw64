@@ -6,6 +6,7 @@ namespace cppparser
     grammar TypeExprGrammar
     {
         using SimpleTypeGrammar.SimpleType;
+        using TemplateGrammar.TemplateId;
         using ClassGrammar.ClassKey;
         using IdentifierGrammar.QualifiedId;
 
@@ -14,8 +15,12 @@ namespace cppparser
             ;
             
         CVSpecifierSequence : CVSpecifiers
-            ::= keyword("const"){ value = value | CVSpecifiers.const_; }
-            |   keyword("volatile"){ value = value | CVSpecifiers.volatile; }
+            ::= (CVSpecifier:cv{ value = cast<CVSpecifiers>(value | cv); })*
+            ;
+            
+        CVSpecifier : CVSpecifiers
+            ::= keyword("const"){ value = CVSpecifiers.const_; }
+            |   keyword("volatile"){ value = CVSpecifiers.volatile; }
             ;
 
         PrefixTypeExpr(ParsingContext* ctx) : Node*
@@ -40,7 +45,7 @@ namespace cppparser
 
         PrimaryTypeExpr(ParsingContext* ctx) : Node*
             ::= SimpleType{ value = SimpleType; }
-            |   (keyword("typename") | ClassKey?) QualifiedId(ctx)
+            |   (keyword("typename") | ClassKey)? QualifiedId(ctx){ value = QualifiedId; }
             ;
     }
 }

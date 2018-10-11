@@ -67,6 +67,10 @@ namespace pp
         {
             throw PreprocessingException("preprocessing symbol '" + ToUtf8(identifierNode.str) + "' at line " + ToString(line) + " not defined");
         }
+        public override void Visit(ParenthesizedExpressionNode& parenthesizedExpressionNode)
+        {
+            value = Evaluate(pp, parenthesizedExpressionNode.child.Get(), line);
+        }
         public override void Visit(FloatingLiteralNode& floatingLiteralNode) 
         {
             value.Reset(new FloatingValue(floatingLiteralNode.val));
@@ -85,32 +89,43 @@ namespace pp
         }
         public override void Visit(BinaryExpressionNode& binaryExpressionNode) 
         {
+            int result = 0;
             UniquePtr<Value> left = Evaluate(pp, binaryExpressionNode.left.Get(), line);
             int leftInt = left->ToInteger();
-            UniquePtr<Value> right = Evaluate(pp, binaryExpressionNode.right.Get(), line);
-            int rightInt = right->ToInteger();
-            int result = 0;
-            switch (binaryExpressionNode.op)
+            if (binaryExpressionNode.op == Operator.logicalAnd && leftInt == 0)
             {
-                case Operator.shiftLeft: result = leftInt << rightInt; break;
-                case Operator.shiftRight: result = leftInt >> rightInt; break;
-                case Operator.logicalAnd: result = cast<int>(leftInt != 0 && rightInt != 0); break; 
-                case Operator.logicalOr: result  = cast<int>(leftInt != 0 || rightInt != 0); break;
-                case Operator.equal: result = cast<int>(leftInt == rightInt); break;
-                case Operator.notEqual: result = cast<int>(leftInt != rightInt); break;
-                case Operator.lessOrEqual: result = cast<int>(leftInt <= rightInt); break;
-                case Operator.greaterOrEqual: result = cast<int>(leftInt >= rightInt); break;
-                case Operator.less: result = cast<int>(leftInt < rightInt); break;
-                case Operator.greater: result = cast<int>(leftInt > rightInt); break;
-                case Operator.add: result = leftInt + rightInt; break;
-                case Operator.sub: result = leftInt - rightInt; break;
-                case Operator.mul: result = leftInt * rightInt; break;
-                case Operator.div: result = leftInt / rightInt; break;
-                case Operator.rem: result = leftInt % rightInt; break;
-                case Operator.xor: result = leftInt ^ rightInt; break;
-                case Operator.and_: result = leftInt & rightInt; break;
-                case Operator.or_: result = leftInt | rightInt; break;
+                result = 0;
             }
+            else if (binaryExpressionNode.op == Operator.logicalOr && leftInt != 0)
+            {
+                result = 1;
+            }
+            else
+            {
+                UniquePtr<Value> right = Evaluate(pp, binaryExpressionNode.right.Get(), line);
+                int rightInt = right->ToInteger();
+                switch (binaryExpressionNode.op)
+                {
+                    case Operator.shiftLeft: result = leftInt << rightInt; break;
+                    case Operator.shiftRight: result = leftInt >> rightInt; break;
+                    case Operator.logicalAnd: result = cast<int>(leftInt != 0 && rightInt != 0); break; 
+                    case Operator.logicalOr: result  = cast<int>(leftInt != 0 || rightInt != 0); break;
+                    case Operator.equal: result = cast<int>(leftInt == rightInt); break;
+                    case Operator.notEqual: result = cast<int>(leftInt != rightInt); break;
+                    case Operator.lessOrEqual: result = cast<int>(leftInt <= rightInt); break;
+                    case Operator.greaterOrEqual: result = cast<int>(leftInt >= rightInt); break;
+                    case Operator.less: result = cast<int>(leftInt < rightInt); break;
+                    case Operator.greater: result = cast<int>(leftInt > rightInt); break;
+                    case Operator.add: result = leftInt + rightInt; break;
+                    case Operator.sub: result = leftInt - rightInt; break;
+                    case Operator.mul: result = leftInt * rightInt; break;
+                    case Operator.div: result = leftInt / rightInt; break;
+                    case Operator.rem: result = leftInt % rightInt; break;
+                    case Operator.xor: result = leftInt ^ rightInt; break;
+                    case Operator.and_: result = leftInt & rightInt; break;
+                    case Operator.or_: result = leftInt | rightInt; break;
+                }
+            }            
             value.Reset(new IntegerValue(result));
         }
         public override void Visit(UnaryExpressionNode& unaryExpressionNode) 
@@ -159,14 +174,21 @@ namespace pp
     internal UniquePtr<Value> Evaluate(PP& pp, Node* expression, int line)
     {
         Evaluator evaluator(pp, line);
-        expression->Accept(evaluator);
+        if (expression != null)
+        {
+            if (Flags.Diagnostics())
+            {
+                Console.Out() << "> evaluating " << typename(*expression) << " node" << endl();
+            }
+            expression->Accept(evaluator);
+        }
         if (evaluator.value.Get() != null)
         {
             return Rvalue(evaluator.value);
         }        
         else
         {
-            throw PreprocessingException("cannot evaluate expression at line " + ToString(line) + " statically");
+            throw PreprocessingException("cannot evaluate constant expression at line " + ToString(line));
         }
     }
 }

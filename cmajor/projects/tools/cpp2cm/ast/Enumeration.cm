@@ -9,6 +9,17 @@ namespace ast
         enum_, enumClass, enumStruct
     }
     
+    public nothrow ustring EnumKeyStr(EnumKey enumKey)
+    {
+        switch (enumKey)
+        {
+            case EnumKey.enum_: return u"enum";
+            case EnumKey.enumClass: return u"enumClass";
+            case EnumKey.enumStruct: return u"enumStruct";
+        }
+        return u"ENUM_KEY";
+    }
+    
     public class EnumTypeNode : CompositeNode<EnumeratorNode>
     {
         public nothrow EnumTypeNode(const Span& span_, EnumKey enumKey_, Node* enumName_, Node* enumBase_) :

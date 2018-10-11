@@ -1,0 +1,13 @@
+using System;
+using Span = System.Text.Parsing.Span;
+
+namespace symbols
+{
+    public class SymbolException : Exception
+    {
+        public nothrow SymbolException(const string& message_, const Span& span_) : base(message_), span(span_)
+        {
+        }
+        private Span span;
+    }
+}

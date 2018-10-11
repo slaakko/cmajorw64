@@ -162,6 +162,9 @@ namespace cppparser
                 NonterminalParser* namespaceDefinitionNonterminalParser = GetNonterminal(ToUtf32("NamespaceDefinition"));
                 namespaceDefinitionNonterminalParser->SetPre(PreNamespaceDefinition);
                 namespaceDefinitionNonterminalParser->SetPost(PostNamespaceDefinition);
+                NonterminalParser* linkageSpecificationNonterminalParser = GetNonterminal(ToUtf32("LinkageSpecification"));
+                linkageSpecificationNonterminalParser->SetPre(PreLinkageSpecification);
+                linkageSpecificationNonterminalParser->SetPost(PostLinkageSpecification);
                 NonterminalParser* functionDefinitionNonterminalParser = GetNonterminal(ToUtf32("FunctionDefinition"));
                 functionDefinitionNonterminalParser->SetPre(PreFunctionDefinition);
                 functionDefinitionNonterminalParser->SetPost(PostFunctionDefinition);
@@ -183,9 +186,6 @@ namespace cppparser
                 NonterminalParser* enumDeclarationNonterminalParser = GetNonterminal(ToUtf32("EnumDeclaration"));
                 enumDeclarationNonterminalParser->SetPre(PreEnumDeclaration);
                 enumDeclarationNonterminalParser->SetPost(PostEnumDeclaration);
-                NonterminalParser* linkageSpecificationNonterminalParser = GetNonterminal(ToUtf32("LinkageSpecification"));
-                linkageSpecificationNonterminalParser->SetPre(PreLinkageSpecification);
-                linkageSpecificationNonterminalParser->SetPost(PostLinkageSpecification);
                 NonterminalParser* blockDeclarationNonterminalParser = GetNonterminal(ToUtf32("BlockDeclaration"));
                 blockDeclarationNonterminalParser->SetPre(PreBlockDeclaration);
                 blockDeclarationNonterminalParser->SetPost(PostBlockDeclaration);
@@ -198,42 +198,42 @@ namespace cppparser
             public void A1Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->value = context->fromFunctionDefinition;
+                context->value = context->fromLinkageSpecification;
             }
             public void A2Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->value = context->fromSpecialMemberFunctionDefinition;
+                context->value = context->fromFunctionDefinition;
             }
             public void A3Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->value = context->fromTemplateDeclaration;
+                context->value = context->fromSpecialMemberFunctionDefinition;
             }
             public void A4Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->value = context->fromExplicitInstantiation;
+                context->value = context->fromTemplateDeclaration;
             }
             public void A5Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->value = context->fromExplicitSpecialization;
+                context->value = context->fromExplicitInstantiation;
             }
             public void A6Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->value = context->fromClassDeclaration;
+                context->value = context->fromExplicitSpecialization;
             }
             public void A7Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->value = context->fromEnumDeclaration;
+                context->value = context->fromClassDeclaration;
             }
             public void A8Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->value = context->fromLinkageSpecification;
+                context->value = context->fromEnumDeclaration;
             }
             public void A9Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
@@ -252,6 +252,20 @@ namespace cppparser
                 {
                     UniquePtr<Object> fromNamespaceDefinition_value = stack.Pop();
                     context->fromNamespaceDefinition = *cast<ValueObject<NamespaceNode*>*>(fromNamespaceDefinition_value.Get());
+                }
+            }
+            public void PreLinkageSpecification(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                stack.Push(UniquePtr<Object>(new ValueObject<ParsingContext*>(context->ctx)));
+            }
+            public void PostLinkageSpecification(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                if (matched)
+                {
+                    UniquePtr<Object> fromLinkageSpecification_value = stack.Pop();
+                    context->fromLinkageSpecification = *cast<ValueObject<LinkageSpecificationNode*>*>(fromLinkageSpecification_value.Get());
                 }
             }
             public void PreFunctionDefinition(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
@@ -352,20 +366,6 @@ namespace cppparser
                     context->fromEnumDeclaration = *cast<ValueObject<EnumTypeNode*>*>(fromEnumDeclaration_value.Get());
                 }
             }
-            public void PreLinkageSpecification(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
-            {
-                Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                stack.Push(UniquePtr<Object>(new ValueObject<ParsingContext*>(context->ctx)));
-            }
-            public void PostLinkageSpecification(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
-            {
-                Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                if (matched)
-                {
-                    UniquePtr<Object> fromLinkageSpecification_value = stack.Pop();
-                    context->fromLinkageSpecification = *cast<ValueObject<LinkageSpecificationNode*>*>(fromLinkageSpecification_value.Get());
-                }
-            }
             public void PreBlockDeclaration(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
@@ -382,12 +382,13 @@ namespace cppparser
             }
             public class Context : System.Text.Parsing.Context
             {
-                public Context() : ctx(), value(), fromNamespaceDefinition(), fromFunctionDefinition(), fromSpecialMemberFunctionDefinition(), fromTemplateDeclaration(), fromExplicitInstantiation(), fromExplicitSpecialization(), fromClassDeclaration(), fromEnumDeclaration(), fromLinkageSpecification(), fromBlockDeclaration()
+                public Context() : ctx(), value(), fromNamespaceDefinition(), fromLinkageSpecification(), fromFunctionDefinition(), fromSpecialMemberFunctionDefinition(), fromTemplateDeclaration(), fromExplicitInstantiation(), fromExplicitSpecialization(), fromClassDeclaration(), fromEnumDeclaration(), fromBlockDeclaration()
                 {
                 }
                 public ParsingContext* ctx;
                 public Node* value;
                 public NamespaceNode* fromNamespaceDefinition;
+                public LinkageSpecificationNode* fromLinkageSpecification;
                 public FunctionNode* fromFunctionDefinition;
                 public SpecialMemberFunctionNode* fromSpecialMemberFunctionDefinition;
                 public TemplateDeclarationNode* fromTemplateDeclaration;
@@ -395,7 +396,6 @@ namespace cppparser
                 public ExplicitSpecializationNode* fromExplicitSpecialization;
                 public ClassNode* fromClassDeclaration;
                 public EnumTypeNode* fromEnumDeclaration;
-                public LinkageSpecificationNode* fromLinkageSpecification;
                 public Node* fromBlockDeclaration;
             }
         }
@@ -1665,40 +1665,40 @@ namespace cppparser
         public override void GetReferencedGrammars()
         {
             ParsingDomain* pd = Domain();
-            Grammar* grammar0 = pd->GetGrammar(ToUtf32("cppparser.DeclaratorGrammar"));
+            Grammar* grammar0 = pd->GetGrammar(ToUtf32("cppparser.TemplateGrammar"));
             if (grammar0 == null)
             {
-                grammar0 = new cppparser.DeclaratorGrammar(pd);
+                grammar0 = new cppparser.TemplateGrammar(pd);
             }
             AddGrammarReference(grammar0);
-            Grammar* grammar1 = pd->GetGrammar(ToUtf32("cppparser.TypeExprGrammar"));
+            Grammar* grammar1 = pd->GetGrammar(ToUtf32("cppparser.ExpressionGrammar"));
             if (grammar1 == null)
             {
-                grammar1 = new cppparser.TypeExprGrammar(pd);
+                grammar1 = new cppparser.ExpressionGrammar(pd);
             }
             AddGrammarReference(grammar1);
-            Grammar* grammar2 = pd->GetGrammar(ToUtf32("cppparser.EnumerationGrammar"));
+            Grammar* grammar2 = pd->GetGrammar(ToUtf32("cppparser.DeclaratorGrammar"));
             if (grammar2 == null)
             {
-                grammar2 = new cppparser.EnumerationGrammar(pd);
+                grammar2 = new cppparser.DeclaratorGrammar(pd);
             }
             AddGrammarReference(grammar2);
-            Grammar* grammar3 = pd->GetGrammar(ToUtf32("cppparser.TemplateGrammar"));
+            Grammar* grammar3 = pd->GetGrammar(ToUtf32("cppparser.LiteralGrammar"));
             if (grammar3 == null)
             {
-                grammar3 = new cppparser.TemplateGrammar(pd);
+                grammar3 = new cppparser.LiteralGrammar(pd);
             }
             AddGrammarReference(grammar3);
-            Grammar* grammar4 = pd->GetGrammar(ToUtf32("cppparser.FunctionGrammar"));
+            Grammar* grammar4 = pd->GetGrammar(ToUtf32("cppparser.TypeExprGrammar"));
             if (grammar4 == null)
             {
-                grammar4 = new cppparser.FunctionGrammar(pd);
+                grammar4 = new cppparser.TypeExprGrammar(pd);
             }
             AddGrammarReference(grammar4);
-            Grammar* grammar5 = pd->GetGrammar(ToUtf32("cppparser.ClassGrammar"));
+            Grammar* grammar5 = pd->GetGrammar(ToUtf32("cppparser.FunctionGrammar"));
             if (grammar5 == null)
             {
-                grammar5 = new cppparser.ClassGrammar(pd);
+                grammar5 = new cppparser.FunctionGrammar(pd);
             }
             AddGrammarReference(grammar5);
             Grammar* grammar6 = pd->GetGrammar(ToUtf32("cppparser.IdentifierGrammar"));
@@ -1707,16 +1707,16 @@ namespace cppparser
                 grammar6 = new cppparser.IdentifierGrammar(pd);
             }
             AddGrammarReference(grammar6);
-            Grammar* grammar7 = pd->GetGrammar(ToUtf32("cppparser.LiteralGrammar"));
+            Grammar* grammar7 = pd->GetGrammar(ToUtf32("cppparser.EnumerationGrammar"));
             if (grammar7 == null)
             {
-                grammar7 = new cppparser.LiteralGrammar(pd);
+                grammar7 = new cppparser.EnumerationGrammar(pd);
             }
             AddGrammarReference(grammar7);
-            Grammar* grammar8 = pd->GetGrammar(ToUtf32("cppparser.ExpressionGrammar"));
+            Grammar* grammar8 = pd->GetGrammar(ToUtf32("cppparser.ClassGrammar"));
             if (grammar8 == null)
             {
-                grammar8 = new cppparser.ExpressionGrammar(pd);
+                grammar8 = new cppparser.ClassGrammar(pd);
             }
             AddGrammarReference(grammar8);
         }
@@ -1756,21 +1756,21 @@ namespace cppparser
                                                     new System.Text.Parsing.ActionParser(ToUtf32("A0"),
                                                         new System.Text.Parsing.NonterminalParser(ToUtf32("NamespaceDefinition"), ToUtf32("NamespaceDefinition"), 1)),
                                                     new System.Text.Parsing.ActionParser(ToUtf32("A1"),
-                                                        new System.Text.Parsing.NonterminalParser(ToUtf32("FunctionDefinition"), ToUtf32("FunctionDefinition"), 1))),
+                                                        new System.Text.Parsing.NonterminalParser(ToUtf32("LinkageSpecification"), ToUtf32("LinkageSpecification"), 1))),
                                                 new System.Text.Parsing.ActionParser(ToUtf32("A2"),
-                                                    new System.Text.Parsing.NonterminalParser(ToUtf32("SpecialMemberFunctionDefinition"), ToUtf32("SpecialMemberFunctionDefinition"), 1))),
+                                                    new System.Text.Parsing.NonterminalParser(ToUtf32("FunctionDefinition"), ToUtf32("FunctionDefinition"), 1))),
                                             new System.Text.Parsing.ActionParser(ToUtf32("A3"),
-                                                new System.Text.Parsing.NonterminalParser(ToUtf32("TemplateDeclaration"), ToUtf32("TemplateDeclaration"), 1))),
+                                                new System.Text.Parsing.NonterminalParser(ToUtf32("SpecialMemberFunctionDefinition"), ToUtf32("SpecialMemberFunctionDefinition"), 1))),
                                         new System.Text.Parsing.ActionParser(ToUtf32("A4"),
-                                            new System.Text.Parsing.NonterminalParser(ToUtf32("ExplicitInstantiation"), ToUtf32("ExplicitInstantiation"), 1))),
+                                            new System.Text.Parsing.NonterminalParser(ToUtf32("TemplateDeclaration"), ToUtf32("TemplateDeclaration"), 1))),
                                     new System.Text.Parsing.ActionParser(ToUtf32("A5"),
-                                        new System.Text.Parsing.NonterminalParser(ToUtf32("ExplicitSpecialization"), ToUtf32("ExplicitSpecialization"), 1))),
+                                        new System.Text.Parsing.NonterminalParser(ToUtf32("ExplicitInstantiation"), ToUtf32("ExplicitInstantiation"), 1))),
                                 new System.Text.Parsing.ActionParser(ToUtf32("A6"),
-                                    new System.Text.Parsing.NonterminalParser(ToUtf32("ClassDeclaration"), ToUtf32("ClassDeclaration"), 1))),
+                                    new System.Text.Parsing.NonterminalParser(ToUtf32("ExplicitSpecialization"), ToUtf32("ExplicitSpecialization"), 1))),
                             new System.Text.Parsing.ActionParser(ToUtf32("A7"),
-                                new System.Text.Parsing.NonterminalParser(ToUtf32("EnumDeclaration"), ToUtf32("EnumDeclaration"), 1))),
+                                new System.Text.Parsing.NonterminalParser(ToUtf32("ClassDeclaration"), ToUtf32("ClassDeclaration"), 1))),
                         new System.Text.Parsing.ActionParser(ToUtf32("A8"),
-                            new System.Text.Parsing.NonterminalParser(ToUtf32("LinkageSpecification"), ToUtf32("LinkageSpecification"), 1))),
+                            new System.Text.Parsing.NonterminalParser(ToUtf32("EnumDeclaration"), ToUtf32("EnumDeclaration"), 1))),
                     new System.Text.Parsing.ActionParser(ToUtf32("A9"),
                         new System.Text.Parsing.NonterminalParser(ToUtf32("BlockDeclaration"), ToUtf32("BlockDeclaration"), 1)))));
             AddRule(new NamespaceDefinitionRule(ToUtf32("NamespaceDefinition"), GetScope(), Domain()->GetNextRuleId(),

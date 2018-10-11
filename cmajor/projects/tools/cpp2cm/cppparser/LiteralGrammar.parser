@@ -12,10 +12,10 @@ namespace cppparser
         Literal : LiteralNode*
             ::= FloatingLiteral{ value = FloatingLiteral; }
             |   IntegerLiteral{ value = IntegerLiteral; }
-            |   CharacterLiteral
-            |   StringLiteral
-            |   BooleanLiteral
-            |   PointerLiteral
+            |   CharacterLiteral{ value = CharacterLiteral; }
+            |   StringLiteral{ value = StringLiteral; }
+            |   BooleanLiteral{ value = BooleanLiteral; }
+            |   PointerLiteral{ value = PointerLiteral; }
             ;
 
         FloatingLiteral(var double val) : FloatingLiteralNode*

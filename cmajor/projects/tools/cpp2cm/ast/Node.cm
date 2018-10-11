@@ -24,7 +24,10 @@ namespace ast
     {
         public nothrow UnaryNode(const Span& span_, Node* child_) : base(span_), child(child_)
         {
-            child->parent = this;
+            if (!child.IsNull())
+            {
+                child->parent = this;
+            }
         }
         public UniquePtr<Node> child;
     }
@@ -33,8 +36,14 @@ namespace ast
     {
         public nothrow BinaryNode(const Span& span_, Node* left_, Node* right_) : base(span_), left(left_), right(right_)
         {
-            left->parent = this;
-            right->parent = this;
+            if (!left.IsNull())
+            {
+                left->parent = this;
+            }
+            if (!right.IsNull())
+            {
+                right->parent = this;
+            }        
         }
         public UniquePtr<Node> left;
         public UniquePtr<Node> right;
@@ -47,20 +56,12 @@ namespace ast
         }
         public void AddNode(NodeT* node)
         {
-            node->parent = this;
+            if (node != null)
+            {
+                node->parent = this;
+            }
             nodes.Add(UniquePtr<NodeT>(node));
         }
         public List<UniquePtr<NodeT>> nodes;
-    }
-    
-    public class OptionalNode : UnaryNode
-    {
-        public nothrow OptionalNode(const Span& span_, Node* child_) : base(span_, child_)
-        {
-        }
-        public override void Accept(Visitor& visitor)
-        {
-            visitor.Visit(*this);
-        }
     }
 }

@@ -30,6 +30,176 @@ namespace ast
         delete_ = 1 << 20
     }
     
+    public nothrow ustring SpecifierStr(Specifiers specifiers)
+    {
+        ustring s;
+        if ((specifiers & Specifiers.register) != Specifiers.none)
+        {
+            s.Append(u"register");
+        }
+        if ((specifiers & Specifiers.static_) != Specifiers.none)
+        {
+            if (!s.IsEmpty())
+            {
+                s.Append(' ');
+            }
+            s.Append(u"static");
+        }
+        if ((specifiers & Specifiers.thread_local) != Specifiers.none)
+        {
+            if (!s.IsEmpty())
+            {
+                s.Append(' ');
+            }
+            s.Append(u"thread_local");
+        }
+        if ((specifiers & Specifiers.extern_) != Specifiers.none)
+        {
+            if (!s.IsEmpty())
+            {
+                s.Append(' ');
+            }
+            s.Append(u"extern");
+        }
+        if ((specifiers & Specifiers.mutable) != Specifiers.none)
+        {
+            if (!s.IsEmpty())
+            {
+                s.Append(' ');
+            }
+            s.Append(u"mutable");
+        }
+        if ((specifiers & Specifiers.inline_) != Specifiers.none)
+        {
+            if (!s.IsEmpty())
+            {
+                s.Append(' ');
+            }
+            s.Append(u"inline");
+        }
+        if ((specifiers & Specifiers.virtual_) != Specifiers.none)
+        {
+            if (!s.IsEmpty())
+            {
+                s.Append(' ');
+            }
+            s.Append(u"virtual");
+        }
+        if ((specifiers & Specifiers.explicit_) != Specifiers.none)
+        {
+            if (!s.IsEmpty())
+            {
+                s.Append(' ');
+            }
+            s.Append(u"explicit");
+        }
+        if ((specifiers & Specifiers.friend) != Specifiers.none)
+        {
+            if (!s.IsEmpty())
+            {
+                s.Append(' ');
+            }
+            s.Append(u"friend");
+        }
+        if ((specifiers & Specifiers.constexpr_) != Specifiers.none)
+        {
+            if (!s.IsEmpty())
+            {
+                s.Append(' ');
+            }
+            s.Append(u"constexpr");
+        }
+        if ((specifiers & Specifiers.dllimport) != Specifiers.none)
+        {
+            if (!s.IsEmpty())
+            {
+                s.Append(' ');
+            }
+            s.Append(u"dllimport");
+        }
+        if ((specifiers & Specifiers.dllexport) != Specifiers.none)
+        {
+            if (!s.IsEmpty())
+            {
+                s.Append(' ');
+            }
+            s.Append(u"dllexport");
+        }
+        if ((specifiers & Specifiers.override_) != Specifiers.none)
+        {
+            if (!s.IsEmpty())
+            {
+                s.Append(' ');
+            }
+            s.Append(u"override");
+        }
+        if ((specifiers & Specifiers.final) != Specifiers.none)
+        {
+            if (!s.IsEmpty())
+            {
+                s.Append(' ');
+            }
+            s.Append(u"final");
+        }
+        if ((specifiers & Specifiers.new_) != Specifiers.none)
+        {
+            if (!s.IsEmpty())
+            {
+                s.Append(' ');
+            }
+            s.Append(u"new");
+        }
+        if ((specifiers & Specifiers.pure) != Specifiers.none)
+        {
+            if (!s.IsEmpty())
+            {
+                s.Append(' ');
+            }
+            s.Append(u"pure");
+        }
+        if ((specifiers & Specifiers.public_) != Specifiers.none)
+        {
+            if (!s.IsEmpty())
+            {
+                s.Append(' ');
+            }
+            s.Append(u"public");
+        }
+        if ((specifiers & Specifiers.protected_) != Specifiers.none)
+        {
+            if (!s.IsEmpty())
+            {
+                s.Append(' ');
+            }
+            s.Append(u"protected");
+        }
+        if ((specifiers & Specifiers.private_) != Specifiers.none)
+        {
+            if (!s.IsEmpty())
+            {
+                s.Append(' ');
+            }
+            s.Append(u"private");
+        }
+        if ((specifiers & Specifiers.default_) != Specifiers.none)
+        {
+            if (!s.IsEmpty())
+            {
+                s.Append(' ');
+            }
+            s.Append(u"default");
+        }
+        if ((specifiers & Specifiers.delete_) != Specifiers.none)
+        {
+            if (!s.IsEmpty())
+            {
+                s.Append(' ');
+            }
+            s.Append(u"delete");
+        }
+        return s;
+    }
+    
     public class SimpleDeclarationNode : Node
     {
         public nothrow SimpleDeclarationNode(const Span& span_, Specifiers specifiers_, Node* typeExpr_, Node* declarator_) : 

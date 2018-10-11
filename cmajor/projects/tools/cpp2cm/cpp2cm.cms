@@ -1,8 +1,11 @@
 solution cpp2cm;
 project <ast/ast.cmp>;
+project <binder/binder.cmp>;
 project <cpp/cpp.cmp>;
 project <cpp2cm/cpp2cm.cmp>;
-project <cppp/cppp.cmp>;
+project <cpp2xml/cpp2xml.cmp>;
 project <cppparser/cppparser.cmp>;
 project <pp/pp.cmp>;
-activeProject cpp;
+project <symbols/symbols.cmp>;
+project <testSimpleType/testSimpleType.cmp>;
+activeProject testSimpleType;

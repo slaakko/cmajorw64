@@ -28,6 +28,7 @@ namespace cppparser
             
         Declaration(ParsingContext* ctx) : Node*
             ::= NamespaceDefinition(ctx){ value = NamespaceDefinition; }
+            |   LinkageSpecification(ctx){ value = LinkageSpecification; }
             |   FunctionDefinition(ctx){ value = FunctionDefinition; }
             |   SpecialMemberFunctionDefinition(ctx){ value = SpecialMemberFunctionDefinition; }
             |   TemplateDeclaration(ctx){ value = TemplateDeclaration; }
@@ -35,7 +36,6 @@ namespace cppparser
             |   ExplicitSpecialization(ctx){ value = ExplicitSpecialization; }
             |   ClassDeclaration(ctx){ value = ClassDeclaration; }
             |   EnumDeclaration(ctx){ value = EnumDeclaration; }
-            |   LinkageSpecification(ctx){ value = LinkageSpecification; }
             |   BlockDeclaration(ctx){ value = BlockDeclaration; }
             ;
         

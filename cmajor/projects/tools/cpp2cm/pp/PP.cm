@@ -14,6 +14,11 @@ namespace pp
         }
     }
     
+    public void ThrowPreprocessingException(const string& message)
+    {
+        throw PreprocessingException(message);
+    }
+    
     public static class PPFileParser
     {
         static PPFileParser() : 
@@ -60,7 +65,12 @@ namespace pp
     
     public enum PPTokenFlags
     {
-        none = 0, acceptHeaderName = 1 << 0, acceptFunctionMacroInvocaction = 1 << 1, dontAcceptCommaOrRightParen = 1 << 2, macroArgumentReplacement = 1 << 3
+        none = 0, 
+        acceptHeaderName = 1 << 0, 
+        acceptFunctionMacroInvocaction = 1 << 1, 
+        dontAcceptCommaOrRightParen = 1 << 2, 
+        macroArgumentReplacement = 1 << 3,
+        acceptHash = 1 << 4
     }
     
     public class Macro
@@ -170,9 +180,10 @@ namespace pp
         }
         public string ResolveHeaderFilePath(const string& headerName)
         {
+            string headerFileName = headerName.Substring(1, headerName.Length() - 2);
             for (const string& includeDirectory : includeDirectories)
             {
-                string headerFilePath = Path.Combine(includeDirectory, headerName);
+                string headerFilePath = GetFullPath(Path.Combine(Path.Combine(baseDir, includeDirectory), headerFileName));
                 if (File.Exists(headerFilePath))
                 {
                     if (Flags.Diagnostics())
@@ -250,6 +261,12 @@ namespace pp
             if (Flags.Diagnostics())
             {
                 Console.Out() << "> push function macro: [" << macro->name << "]" << endl();
+                long n = args->Count();
+                for (long i = 0; i < n; ++i)
+                {
+                    const ustring& arg = (*args)[i];
+                    Console.Out() << "> macro argument: " << arg << endl();
+                }
             }
             if (macro->params.Count() != args->Count())
             {
@@ -269,17 +286,28 @@ namespace pp
             currentFunctionMacro = functionMacroStack.Pop();
             currentArgs = argsStack.Pop();
         }
-        public ustring SubstituteMacroArgument(const ustring& identifier)
+        public ustring SubstituteMacroArgument(const ustring& identifier, bool stringisize)
         {
             for (int i = 0; i < currentFunctionMacro->params.Count(); ++i)
             {
                 if (identifier == currentFunctionMacro->params[i])
                 {
-                    if (Flags.Diagnostics())
+                    if (stringisize)
                     {
-                        Console.Out() << "> substituting macro argument: [" << identifier << "] with [" << (*currentArgs)[i] << "]" << endl();
+                        if (Flags.Diagnostics())
+                        {
+                            Console.Out() << "> substituting macro argument: [#" << identifier << "] with [\"" << (*currentArgs)[i] << "\"]" << endl();
+                        }
+                        return u"\"" + (*currentArgs)[i] + u"\"";
                     }
-                    return (*currentArgs)[i];
+                    else
+                    {
+                        if (Flags.Diagnostics())
+                        {
+                            Console.Out() << "> substituting macro argument: [" << identifier << "] with [" << (*currentArgs)[i] << "]" << endl();
+                        }
+                        return (*currentArgs)[i];
+                    }
                 }
             }
             return identifier;
@@ -293,6 +321,7 @@ namespace pp
         {
             currentFilePath = filePathStack.Pop();
         }
+        public string baseDir;
         public List<UniquePtr<Macro>> macros;
         public HashMap<ustring, Macro*> macroMap;
         public FunctionMacro* currentFunctionMacro;
@@ -455,14 +484,32 @@ namespace pp
     { 
         try
         {
-            PPFile ppFile(filePath);
-            pp.PushCurrentFilePath(filePath);
-            ustring content = ToUtf32(File.ReadAllText(filePath));
-            content = CombineLines(content);
-            content = StripComments(content);
-            PPFileParser.GetPPFileGrammar()->Parse(content.Chars(), content.Chars() + content.Length(), 0, filePath, &pp, &ppFile.content);
-            pp.files.Add(Rvalue(ppFile));
-            pp.PopCurrentFilePath();
+            if (!filePath.IsEmpty() && File.Exists(filePath))
+            {
+                PPFile ppFile(filePath);
+                pp.PushCurrentFilePath(filePath);
+                if (Flags.Diagnostics())
+                {
+                    Console.Out() << ">> " << filePath << endl();
+                }
+                ustring content = ToUtf32(File.ReadAllText(filePath));
+                content = CombineLines(content);
+                content = StripComments(content);
+                PPFileParser.GetPPFileGrammar()->Parse(content.Chars(), content.Chars() + content.Length(), 0, filePath, &pp, &ppFile.content);
+                pp.files.Add(Rvalue(ppFile));
+                pp.PopCurrentFilePath();
+            }            
+            else if (Flags.Diagnostics())
+            {
+                if (filePath.IsEmpty())
+                {
+                    Console.Out() << "> file skipped" << endl();
+                }
+                else
+                {
+                    Console.Out() << "> nonexisting file '" << filePath << "' skipped" << endl();
+                }            
+            }
         }        
         catch (const PreprocessingException& ex)
         {
@@ -481,41 +528,49 @@ namespace pp
         return result != 0;
     }
     
-    public List<PPFile> Preprocess(const string& sourceFilePath, DomElement* ppDefs)
+    public List<PPFile> Preprocess(const string& sourceFilePath, DomElement* ppDefs, const List<string>& includeDirectories)
     {
         PP pp;
+        pp.baseDir = Path.GetDirectoryName(GetFullPath(sourceFilePath));
         pp.Define(u"__DATE__", u"@DATE", true);
         pp.Define(u"__TIME__", u"@TIME", true);
         pp.Define(u"__FILE__", u"@FILE", true);
         pp.Define(u"__LINE__", u"@LINE", true);
         pp.Define(u"__cplusplus", u"201103L", true);
-        UniquePtr<XPathObject> includes = Evaluate(u"include", ppDefs);
-        XPathNodeSet* includeNodeSet = includes.Get() as XPathNodeSet*;
-        if (includeNodeSet != null)
+        for (const string& includeDir : includeDirectories)
         {
-            long n = includeNodeSet->Length();
-            for (long i = 0; i < n; ++i)
-            {
-                DomNode* includeNode = (*includeNodeSet)[i];
-                DomElement* includeElement = includeNode as DomElement*;
-                ustring includeDir = includeElement->GetAttribute(u"dir");
-                pp.includeDirectories.Add(ToUtf8(includeDir));
-            }
+            pp.includeDirectories.Add(includeDir);
         }
-        UniquePtr<XPathObject> defines = Evaluate(u"define", ppDefs);
-        XPathNodeSet* defineNodeSet = defines.Get() as XPathNodeSet*;
-        if (defineNodeSet != null)
+        if (ppDefs != null)
         {
-            long n = defineNodeSet->Length();
-            for (long i = 0; i < n; ++i)
+            UniquePtr<XPathObject> includes = Evaluate(u"include", ppDefs);
+            XPathNodeSet* includeNodeSet = includes.Get() as XPathNodeSet*;
+            if (includeNodeSet != null)
             {
-                DomNode* defineNode = (*defineNodeSet)[i];
-                DomElement* defineElement = defineNode as DomElement*;
-                ustring macroName = defineElement->GetAttribute(u"name");
-                ustring replacement = defineElement->GetAttribute(u"replacement");
-                pp.Define(macroName, replacement, false);
+                long n = includeNodeSet->Length();
+                for (long i = 0; i < n; ++i)
+                {
+                    DomNode* includeNode = (*includeNodeSet)[i];
+                    DomElement* includeElement = includeNode as DomElement*;
+                    ustring includeDir = includeElement->GetAttribute(u"dir");
+                    pp.includeDirectories.Add(ToUtf8(includeDir));
+                }
             }
-        }
+            UniquePtr<XPathObject> defines = Evaluate(u"define", ppDefs);
+            XPathNodeSet* defineNodeSet = defines.Get() as XPathNodeSet*;
+            if (defineNodeSet != null)
+            {
+                long n = defineNodeSet->Length();
+                for (long i = 0; i < n; ++i)
+                {
+                    DomNode* defineNode = (*defineNodeSet)[i];
+                    DomElement* defineElement = defineNode as DomElement*;
+                    ustring macroName = defineElement->GetAttribute(u"name");
+                    ustring replacement = defineElement->GetAttribute(u"replacement");
+                    pp.Define(macroName, replacement, false);
+                }
+            }
+        }        
         Preprocess(pp, GetFullPath(sourceFilePath));
         return Rvalue(pp.files);
     }

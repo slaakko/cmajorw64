@@ -1,0 +1,26 @@
+using System;
+using cppparser;
+using ast;
+using symbols;
+
+void main()
+{
+    SymbolTable symbolTable;
+    SimpleTypeGrammar* simpleTypeGrammar = new SimpleTypeGrammar();
+    string line = Console.ReadLine();
+    while (!line.IsEmpty())
+    {
+        ustring ln = ToUtf32(line);
+        try
+        {
+            UniquePtr<SimpleTypeNode> simpleTypeNode = simpleTypeGrammar->Parse(ln.Chars(), ln.Chars() + ln.Length(), 0, "");
+            TypeSymbol* typeSymbol = symbolTable.MakeSimpleTypeSymbol(*simpleTypeNode, simpleTypeNode->span);
+            Console.WriteLine(typeSymbol->name);
+        }        
+        catch (const Exception& ex)
+        {
+            Console.Out() << ex.Message() << endl();
+        }
+        line = Console.ReadLine();
+    }    
+}

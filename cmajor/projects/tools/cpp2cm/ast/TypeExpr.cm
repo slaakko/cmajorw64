@@ -8,14 +8,22 @@ namespace ast
         none = 0, const_ = 1, volatile = 2
     }
     
-    public inline constexpr CVSpecifiers operator|(CVSpecifiers left, CVSpecifiers right)
+    public nothrow ustring CVSpecifierStr(CVSpecifiers cv)
     {
-        return cast<CVSpecifiers>(cast<int>(left) | cast<int>(right)); 
-    }
-    
-    public inline constexpr CVSpecifiers operator&(CVSpecifiers left, CVSpecifiers right)
-    {
-        return cast<CVSpecifiers>(cast<int>(left) & cast<int>(right));
+        ustring s;
+        if ((cv & CVSpecifiers.const_) != CVSpecifiers.none)
+        {
+            s.Append(u"const");
+        }
+        if ((cv & CVSpecifiers.volatile) != CVSpecifiers.none)
+        {
+            if (!s.IsEmpty())
+            {
+                s.Append(' ');
+            }
+            s.Append(u"volatile");
+        }
+        return s;
     }
     
     public class ConstNode : UnaryNode

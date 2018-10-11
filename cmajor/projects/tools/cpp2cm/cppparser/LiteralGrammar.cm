@@ -83,6 +83,14 @@ namespace cppparser
                 a0ActionParser->SetAction(A0Action);
                 ActionParser* a1ActionParser = GetAction(ToUtf32("A1"));
                 a1ActionParser->SetAction(A1Action);
+                ActionParser* a2ActionParser = GetAction(ToUtf32("A2"));
+                a2ActionParser->SetAction(A2Action);
+                ActionParser* a3ActionParser = GetAction(ToUtf32("A3"));
+                a3ActionParser->SetAction(A3Action);
+                ActionParser* a4ActionParser = GetAction(ToUtf32("A4"));
+                a4ActionParser->SetAction(A4Action);
+                ActionParser* a5ActionParser = GetAction(ToUtf32("A5"));
+                a5ActionParser->SetAction(A5Action);
                 NonterminalParser* floatingLiteralNonterminalParser = GetNonterminal(ToUtf32("FloatingLiteral"));
                 floatingLiteralNonterminalParser->SetPost(PostFloatingLiteral);
                 NonterminalParser* integerLiteralNonterminalParser = GetNonterminal(ToUtf32("IntegerLiteral"));
@@ -105,6 +113,26 @@ namespace cppparser
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
                 context->value = context->fromIntegerLiteral;
+            }
+            public void A2Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                context->value = context->fromCharacterLiteral;
+            }
+            public void A3Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                context->value = context->fromStringLiteral;
+            }
+            public void A4Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                context->value = context->fromBooleanLiteral;
+            }
+            public void A5Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                context->value = context->fromPointerLiteral;
             }
             public void PostFloatingLiteral(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
             {
@@ -965,10 +993,14 @@ namespace cppparser
                                         new System.Text.Parsing.NonterminalParser(ToUtf32("FloatingLiteral"), ToUtf32("FloatingLiteral"), 0)),
                                     new System.Text.Parsing.ActionParser(ToUtf32("A1"),
                                         new System.Text.Parsing.NonterminalParser(ToUtf32("IntegerLiteral"), ToUtf32("IntegerLiteral"), 0))),
-                                new System.Text.Parsing.NonterminalParser(ToUtf32("CharacterLiteral"), ToUtf32("CharacterLiteral"), 0)),
-                            new System.Text.Parsing.NonterminalParser(ToUtf32("StringLiteral"), ToUtf32("StringLiteral"), 0)),
-                        new System.Text.Parsing.NonterminalParser(ToUtf32("BooleanLiteral"), ToUtf32("BooleanLiteral"), 0)),
-                    new System.Text.Parsing.NonterminalParser(ToUtf32("PointerLiteral"), ToUtf32("PointerLiteral"), 0))));
+                                new System.Text.Parsing.ActionParser(ToUtf32("A2"),
+                                    new System.Text.Parsing.NonterminalParser(ToUtf32("CharacterLiteral"), ToUtf32("CharacterLiteral"), 0))),
+                            new System.Text.Parsing.ActionParser(ToUtf32("A3"),
+                                new System.Text.Parsing.NonterminalParser(ToUtf32("StringLiteral"), ToUtf32("StringLiteral"), 0))),
+                        new System.Text.Parsing.ActionParser(ToUtf32("A4"),
+                            new System.Text.Parsing.NonterminalParser(ToUtf32("BooleanLiteral"), ToUtf32("BooleanLiteral"), 0))),
+                    new System.Text.Parsing.ActionParser(ToUtf32("A5"),
+                        new System.Text.Parsing.NonterminalParser(ToUtf32("PointerLiteral"), ToUtf32("PointerLiteral"), 0)))));
             AddRule(new FloatingLiteralRule(ToUtf32("FloatingLiteral"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.ActionParser(ToUtf32("A0"),
                     new System.Text.Parsing.GroupingParser(

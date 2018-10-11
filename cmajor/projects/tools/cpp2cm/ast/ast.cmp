@@ -16,3 +16,4 @@ source <Statement.cm>;
 source <Template.cm>;
 source <TypeExpr.cm>;
 source <Visitor.cm>;
+source <XmlGeneratorVisitor.cm>;

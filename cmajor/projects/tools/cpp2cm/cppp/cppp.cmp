@@ -1,4 +1,0 @@
-project cppp;
-target=program;
-reference <../cppparser/cppparser.cmp>;
-source <Main.cm>;

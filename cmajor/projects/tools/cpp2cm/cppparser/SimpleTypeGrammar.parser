@@ -5,29 +5,29 @@ namespace cppparser
 {
     grammar SimpleTypeGrammar
     {
-        SimpleType(var UniquePtr<SimpleTypeNode> simpleTypeNode) : SimpleTypeNode*
-            ::= empty{ simpleTypeNode.Reset(new SimpleTypeNode(span)); } 
-                ((SimpleTypeSpecifier:st1 '?'{ simpleTypeNode->AddNode(new OptionalNode(span, st1)); } | SimpleTypeSpecifier:st2{ simpleTypeNode->AddNode(st2); })+)
-            {
-                value = simpleTypeNode.Release();
-            }
+        using stdlib.spaces;
+        skip spaces;
+        
+        SimpleType(var SimpleTypeSpecifiers simpleTypeSpecifiers) : SimpleTypeNode*
+            ::= ((SimpleTypeSpecifier{ simpleTypeSpecifiers = cast<SimpleTypeSpecifiers>(simpleTypeSpecifiers | SimpleTypeSpecifier); })+){ value = new SimpleTypeNode(span, simpleTypeSpecifiers); }
             ;
             
-        SimpleTypeSpecifier : Node*
-            ::= keyword("char"){ value = new CharNode(span); }
-            |   keyword("char16_t"){ value = new Char16Node(span); }
-            |   keyword("char32_t"){ value = new Char32Node(span); }
-            |   keyword("wchar_t"){ value = new WCharNode(span); }
-            |   keyword("bool"){ value = new BoolNode(span); }
-            |   keyword("short"){ value = new ShortNode(span); }
-            |   keyword("int"){ value = new IntNode(span); }
-            |   keyword("long"){ value = new LongNode(span); }
-            |   keyword("signed"){ value = new SignedNode(span); }
-            |   keyword("unsigned"){ value = new UnsignedNode(span); }
-            |   keyword("float"){ value = new FloatNode(span); }
-            |   keyword("double"){ value = new DoubleNode(span); }
-            |   keyword("void"){ value = new VoidNode(span); }
-            |   keyword("auto"){ value = new AutoNode(span); }
+        SimpleTypeSpecifier : SimpleTypeSpecifiers
+            ::= keyword("char"){ value = SimpleTypeSpecifiers.char_; }
+            |   keyword("char16_t"){ value = SimpleTypeSpecifiers.char16_t; }
+            |   keyword("char32_t"){ value = SimpleTypeSpecifiers.char32_t; }
+            |   keyword("wchar_t"){ value = SimpleTypeSpecifiers.wchar_t; }
+            |   keyword("bool"){ value = SimpleTypeSpecifiers.bool_; }
+            |   keyword("short"){ value = SimpleTypeSpecifiers.short_; }
+            |   keyword("int"){ value = SimpleTypeSpecifiers.int_; }
+            |   keyword("long") keyword("long") { value = SimpleTypeSpecifiers.long_long; }
+            |   keyword("long"){ value = SimpleTypeSpecifiers.long_; }
+            |   keyword("signed"){ value = SimpleTypeSpecifiers.signed; }
+            |   keyword("unsigned"){ value = SimpleTypeSpecifiers.unsigned; }
+            |   keyword("float"){ value = SimpleTypeSpecifiers.float_; }
+            |   keyword("double"){ value = SimpleTypeSpecifiers.double_; }
+            |   keyword("void"){ value = SimpleTypeSpecifiers.void_; }
+            |   keyword("auto"){ value = SimpleTypeSpecifiers.auto; }
             ;
     }
 }

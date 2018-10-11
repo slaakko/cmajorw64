@@ -1,0 +1,11 @@
+project symbols;
+target=library;
+reference <../ast/ast.cmp>;
+source <ContainerSymbol.cm>;
+source <NamespaceSymbol.cm>;
+source <Scope.cm>;
+source <SimpleTypeSymbol.cm>;
+source <Symbol.cm>;
+source <SymbolException.cm>;
+source <SymbolTable.cm>;
+source <TypeSymbol.cm>;

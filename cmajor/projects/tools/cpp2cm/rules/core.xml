@@ -15,12 +15,12 @@
     <type source="unsigned long int?" target="uint"/>
     <type source="long long" target="long"/>
     <type source="unsigned long long" target="ulong"/>
-    <type source="int8_t" sns="std" target="sbyte"/>
-    <type source="uint8_t" sns="std" target="byte"/>
-    <type source="int16_t" sns="std" target="short"/>
-    <type source="uint16_t" sns="std" target="ushort"/>
-    <type source="int32_t" sns="std" target="int"/>
-    <type source="uint32_t" sns="std" target="uint"/>
-    <type source="int64_t" sns="std" target="long"/>
-    <type source="uint64_t" sns="std" target="ulong"/>
+    <type source="std::int8_ttarget="sbyte"/>
+    <type source="std::uint8_t" target="byte"/>
+    <type source="std::int16_t" target="short"/>
+    <type source="std::uint16_t" target="ushort"/>
+    <type source="std::int32_t" target="int"/>
+    <type source="std::uint32_t" target="uint"/>
+    <type source="std::int64_t" target="long"/>
+    <type source="std::uint64_t" target="ulong"/>
 </rules>
