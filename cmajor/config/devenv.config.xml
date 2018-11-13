@@ -3,8 +3,8 @@
     <cmc>cmc.exe</cmc>
     <tabSize>4</tabSize>
     <infoDelaySecs>10</infoDelaySecs>
-    <formSizeX>974</formSizeX>
-    <formSizeY>1047</formSizeY>
+    <formSizeX>1884</formSizeX>
+    <formSizeY>1018</formSizeY>
     <formTop>0</formTop>
     <formLeft>0</formLeft>
     <textVisX>208</textVisX>
@@ -13,8 +13,8 @@
     <textVisH>740</textVisH>
     <toolColWidth>97</toolColWidth>
     <categoryColWidth>80</categoryColWidth>
-    <descriptionColWidth>837</descriptionColWidth>
-    <fileColWidth>246</fileColWidth>
+    <descriptionColWidth>1249</descriptionColWidth>
+    <fileColWidth>228</fileColWidth>
     <lineColWidth>60</lineColWidth>
     <projectColWidth>145</projectColWidth>
     <textColWidth>308</textColWidth>
@@ -22,13 +22,17 @@
     <findLineColWidth>85</findLineColWidth>
     <findProjectColWidth>327</findProjectColWidth>
     <findTextColWidth>738</findTextColWidth>
-    <horizontalSplitterPos>1455</horizontalSplitterPos>
+    <horizontalSplitterPos>1536</horizontalSplitterPos>
     <verticalSplitterPos>556</verticalSplitterPos>
     <windowState>Normal</windowState>
     <maxRecentProjects>10</maxRecentProjects>
     <recentProjects>
         <recentProject>
             <path>C:\Users\Seppo\cmajorw64\cmajor\projects\tools\cpp2cm\cpp2cm.cms</path>
+            <openFiles />
+        </recentProject>
+        <recentProject>
+            <path>C:\Users\Seppo\cmajorw64\cmajor\projects\boolTest\boolTest.cms</path>
             <openFiles />
         </recentProject>
         <recentProject>
@@ -61,10 +65,6 @@
         </recentProject>
         <recentProject>
             <path>C:\Users\Seppo\cmajorw64\cmajor\doc\code\solution\solution.cms</path>
-            <openFiles />
-        </recentProject>
-        <recentProject>
-            <path>C:\Users\Seppo\cmajorw64\cmajor\doc\code\socket\socketClients.cms</path>
             <openFiles />
         </recentProject>
     </recentProjects>

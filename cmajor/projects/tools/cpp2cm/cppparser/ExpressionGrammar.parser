@@ -1,5 +1,5 @@
 using System;
-using ast;
+using cppast;
 
 namespace cppparser
 {
@@ -130,7 +130,7 @@ namespace cppparser
         EqualityExpression(ParsingContext* ctx, var UniquePtr<Node> node, var Operator op) : Node*
             ::= (RelationalExpression(ctx):left{ node.Reset(left); } 
                 (("=="{ op = Operator.equal; } | "!="{ op = Operator.notEqual; }){ if (ctx->ParsingLvalueAndNotArguments()) pass = false; } 
-                RelationalExpression(ctx):right{ value = new BinaryExpressionNode(span, node.Release(), right, op); })*)
+                RelationalExpression(ctx):right{ node.Reset(new BinaryExpressionNode(span, node.Release(), right, op)); })*)
             {
                 value = node.Release();
             }
@@ -263,10 +263,10 @@ namespace cppparser
             |   keyword("this"){ value = new ThisNode(span); }
             |   empty{ pass = ctx->AcceptDefined(); } DefinedExpr{ value = DefinedExpr; }
             |   ('(' Expression(ctx):expr ')'){ value = new ParenthesizedExpressionNode(span, expr); }
-            |   CppCastExpression(ctx){ value = CppCastExpression; }
+            |   CppCastExpression(ctx){ value = CppCastExpression; } 
             |   TypeIdExpression(ctx){ value = TypeIdExpression; }
-            |   (SimpleTypeSpecifier:s1 '(' PossiblyEmptyArgumentList(ctx):args1 ')'){ value = new InvokeExpressionNode(span, s1, args1); }
-            |   (SimpleTypeSpecifier:s2 BracedInitializerList(ctx):b1){ value = new InvokeExpressionNode(span, s2, b1); }
+            |   (SimpleTypeSpecifier:s1 '(' PossiblyEmptyArgumentList(ctx):args1 ')'){ value = new InvokeExpressionNode(span, new SimpleTypeNode(span, s1), args1); } 
+            |   (SimpleTypeSpecifier:s2 BracedInitializerList(ctx):b1){ value = new InvokeExpressionNode(span, new SimpleTypeNode(span, s2), b1); } 
             |   (TypeExpr(ctx):t1 '(' PossiblyEmptyArgumentList(ctx):args2 ')'){ value = new InvokeExpressionNode(span, t1, args2); }
             |   (TypeExpr(ctx):t2 BracedInitializerList(ctx):b2){ value = new InvokeExpressionNode(span, t2, b2); }
             |   IdExpression(ctx){ value = IdExpression; }

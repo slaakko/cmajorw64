@@ -359,10 +359,6 @@ void BasicEmitter::Visit(BoundFunction& boundFunction)
     pads.clear();
     labeledStatementMap.clear();
     FunctionSymbol* functionSymbol = boundFunction.GetFunctionSymbol();
-    if (functionSymbol->MangledName() == U"move_constructor_ParsingObject_93BBF68D02947B6B85B2033027084B9DF3468F63")
-    {
-        int x = 0;
-    }
     llvm::FunctionType* functionType = functionSymbol->IrType(*this);
     function = llvm::cast<llvm::Function>(compileUnitModule->getOrInsertFunction(ToUtf8(functionSymbol->MangledName()), functionType));
     if (GetGlobalFlag(GlobalFlags::release) && functionSymbol->IsInline())
@@ -1240,6 +1236,7 @@ void BasicEmitter::Visit(BoundAddressOfExpression& boundAddressOfExpression)
 void BasicEmitter::Visit(BoundDereferenceExpression& boundDereferenceExpression)
 {
     boundDereferenceExpression.Load(*this, OperationFlags::none);
+    GenJumpingBoolCode();
 }
 
 void BasicEmitter::Visit(BoundReferenceToPointerExpression& boundReferenceToPointerExpression)

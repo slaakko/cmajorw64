@@ -784,9 +784,12 @@ std::vector<dom::Element*> GetDerivedClasses(dom::Element* classElement, dom::Do
         }
         if (!derivedClassElement)
         {
-            throw std::runtime_error("derived class id '" + ToUtf8(derivedClassId) + "' not found");
+            std::cerr << "derived class id '" << ToUtf8(derivedClassId) << "' not found" << std::endl;
         }
-        derivedClassElements.push_back(derivedClassElement);
+        else
+        {
+            derivedClassElements.push_back(derivedClassElement);
+        }
     }
     return derivedClassElements;
 }

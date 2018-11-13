@@ -4,7 +4,7 @@ using System.Collections;
 using System.Dom;
 using System.Text;
 using cppparser;
-using ast;
+using cppast;
 using pp;
 
 const char* Version()
@@ -27,6 +27,12 @@ void PrintHelp()
         "   By default writes output to stdout." << endl() <<
         "--include=DIRECTORIES (-I=DIRECTORIES)" << endl() <<
         "   Append DIRECTORIES with each directory separated with ';' to include directories." << endl() <<
+        "--ppcl (-p)" << endl() <<
+        "   Preprocess using Microsoft C++ compiler cl.exe." << endl() <<
+        "   cl.exe must be in PATH." << endl() <<
+        "   By default uses an internal preprocessor." << endl() << 
+        "--ppleave (-l)" << endl() <<
+        "   Do not remove preprocessing output file FILE.i (effective with --ppcl option)." << endl() <<
         "--help (-h)" << endl() <<
         "   Print help." << endl() <<
         "--verbose (-v)" << endl() <<
@@ -66,6 +72,14 @@ int main(int argc, const char** argv)
                 {
                     PrintHelp();
                     return 0;
+                }
+                else if (arg == "--ppcl" || arg == "-p")
+                {
+                    Flags.SetPreprocessUsingCl(); 
+                }
+                else if (arg == "--ppleave" || arg == "-l")
+                {
+                    Flags.SetLeavePPOutput();
                 }
                 else if (arg.Find('=') != -1)
                 {
@@ -155,7 +169,8 @@ int main(int argc, const char** argv)
                     Console.Out() << ">> " << ppFile.filePath << endl();
                 }
                 const ustring& content = ppFile.content;
-                UniquePtr<SourceFileNode> sourceFile = sourceFileGrammar->Parse(content.Chars(), content.Chars() + content.Length(), 0, ppFile.filePath);
+                int fileIndex = FileRegistry.Instance().RegisterFilePath(ppFile.filePath);
+                UniquePtr<SourceFileNode> sourceFile = sourceFileGrammar->Parse(content.Chars(), content.Chars() + content.Length(), fileIndex, ppFile.filePath);
                 compileUnit->nodes.Add(Rvalue(sourceFile));
             }        
             if (Flags.Verbose())

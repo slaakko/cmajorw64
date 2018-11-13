@@ -100,4 +100,30 @@ namespace System
         }
         return true;
     }
+    
+    public nothrow string ToString(const Uuid& uuid)
+    {
+        string s;
+        for (byte x : uuid)
+        {
+            s.Append(ToHexString(x));
+        }
+        return s;
+    }
+    
+    public Uuid ParseUuid(const string& uuidHexString)
+    {
+        if (uuidHexString.Length() != 2 * Uuid.size)
+        {
+            ThrowConversionException("wrong number of hex bytes in uuid string '" + uuidHexString + "'." + ToString(Uuid.size) + " hex bytes expected.");
+        }
+        Uuid uuid;
+        for (long i = 0; i < Uuid.size; ++i)
+        {
+            string hexByteStr = uuidHexString.Substring(2 * i, 2);
+            byte hexByte = ParseHexByte(hexByteStr);
+            uuid.data[i] = hexByte;
+        }
+        return uuid;
+    }
 }

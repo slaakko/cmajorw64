@@ -15,6 +15,7 @@ namespace cmajor
     using System.ComponentModel;
     using System.Runtime.InteropServices;
     using Microsoft.VisualStudio.Shell;
+    using EnvDTE;
 
     /// <summary>
     /// This class implements the package exposed by this assembly.

@@ -1,15 +1,15 @@
 using System;
-using ast;
+using cppast;
 
 namespace pp
 {
-    internal abstract class Value
+    public abstract class Value
     {
         public default virtual ~Value();
         public abstract int ToInteger() const;
     }
     
-    internal class BooleanValue : Value
+    public class BooleanValue : Value
     {
         public nothrow BooleanValue(bool value_) : value(value_)
         {
@@ -22,7 +22,7 @@ namespace pp
         public bool value;
     }
     
-    internal class IntegerValue : Value
+    public class IntegerValue : Value
     {
         public nothrow IntegerValue(int value_) : value(value_)
         {
@@ -34,7 +34,7 @@ namespace pp
         public int value;
     }
     
-    internal class FloatingValue : Value
+    public class FloatingValue : Value
     {
         public nothrow FloatingValue(double value_) : value(value_)
         {
@@ -46,7 +46,7 @@ namespace pp
         public double value;
     }
     
-    internal class CharacterValue : Value
+    public class CharacterValue : Value
     {
         public nothrow CharacterValue(uchar value_) : value(value_)
         {
@@ -58,7 +58,7 @@ namespace pp
         public uchar value;
     }
     
-    internal class Evaluator : Visitor
+    public class Evaluator : Visitor
     {
         public nothrow Evaluator(PP& pp_, int line_) : pp(pp_), line(line_)
         {
@@ -171,7 +171,7 @@ namespace pp
         private int line;
     }
     
-    internal UniquePtr<Value> Evaluate(PP& pp, Node* expression, int line)
+    public UniquePtr<Value> Evaluate(PP& pp, Node* expression, int line)
     {
         Evaluator evaluator(pp, line);
         if (expression != null)

@@ -28,8 +28,26 @@ namespace pp
         {
             verbose = true;
         }
+        public static nothrow void SetPreprocessUsingCl()
+        {
+            preprocessUsingCl = true;
+        }
+        public static nothrow bool PreprocessUsingCl() 
+        {
+            return preprocessUsingCl;
+        }
+        public static nothrow void SetLeavePPOutput()
+        {
+            leavePPOutputFile = true;
+        }
+        public static nothrow bool LeavePPOutput() 
+        {
+            return leavePPOutputFile;
+        }
         private static bool debug;
         private static bool diagnostics;
         private static bool verbose;
+        private static bool preprocessUsingCl;
+        private static bool leavePPOutputFile;
     }
 }

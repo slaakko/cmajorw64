@@ -4,6 +4,7 @@ using System.Collections;
 using System.Dom;
 using System.XPath;
 using Span = System.Text.Parsing.Span;
+using cppparser;
 
 namespace pp
 {
@@ -193,7 +194,7 @@ namespace pp
                     return GetFullPath(headerFilePath);
                 }
             }
-            if (Flags.Diagnostics())
+            if (Flags.Verbose())
             {
                 Console.Out() << "> header: [" << headerName << "] not resolved" << endl();
             }
@@ -479,6 +480,11 @@ namespace pp
         }
         return result;
     }
+    
+    public ustring GetPreprocessingContent(const string& filePath)
+    {
+        return StripComments(CombineLines(ToUtf32(File.ReadAllText(filePath))));
+    }
 
     public void Preprocess(PP& pp, const string& filePath)
     { 
@@ -492,10 +498,9 @@ namespace pp
                 {
                     Console.Out() << ">> " << filePath << endl();
                 }
-                ustring content = ToUtf32(File.ReadAllText(filePath));
-                content = CombineLines(content);
-                content = StripComments(content);
-                PPFileParser.GetPPFileGrammar()->Parse(content.Chars(), content.Chars() + content.Length(), 0, filePath, &pp, &ppFile.content);
+                ustring content = GetPreprocessingContent(filePath);
+                int fileIndex = FileRegistry.Instance().RegisterFilePath(filePath);
+                PPFileParser.GetPPFileGrammar()->Parse(content.Chars(), content.Chars() + content.Length(), fileIndex, filePath, &pp, &ppFile.content);
                 pp.files.Add(Rvalue(ppFile));
                 pp.PopCurrentFilePath();
             }            
@@ -522,7 +527,7 @@ namespace pp
         cppparser.ParsingContext ctx;
         ctx.SetAcceptDefined();
         cppparser.ConstantExpressionGrammar* constantExpressionGrammar = PPFileParser.GetConstantExpressionGrammar();
-        UniquePtr<ast.Node> exprNode(constantExpressionGrammar->Parse(constantExpressionText.Chars(), constantExpressionText.Chars() + constantExpressionText.Length(), 0, pp->currentFilePath, &ctx));
+        UniquePtr<cppast.Node> exprNode(constantExpressionGrammar->Parse(constantExpressionText.Chars(), constantExpressionText.Chars() + constantExpressionText.Length(), 0, pp->currentFilePath, &ctx));
         UniquePtr<Value> value = Evaluate(*pp, exprNode.Get(), line);
         int result = value->ToInteger();
         return result != 0;
@@ -593,5 +598,59 @@ namespace pp
     {
         const ustring& macroText = macro->replacementList;
         return PPFileParser.GetMacroReplacementGrammar()->Parse(macroText.Chars(), macroText.Chars() + macroText.Length(), 0, pp->currentFilePath, macro, args, pp, flags); 
+    }
+    
+    public List<PPFile> PreprocessUsingCl(const string& sourceFilePath, DomElement* ppDefs, const List<string>& includeDirectories)
+    {        
+        List<PPFile> ppFiles;
+        string preprocessFilePath = Path.ChangeExtension(sourceFilePath, ".i");
+        string includeDirOptions;
+        bool first = true;
+        for (const string& includeDir : includeDirectories)
+        {
+            if (first)
+            {
+                first = false;
+            }
+            else 
+            {
+               includeDirOptions.Append(' '); 
+            }
+            includeDirOptions.Append("/I\"").Append(includeDir).Append("\"");
+        }
+        string clCommand = "cl /EP /P /Fi\"" + preprocessFilePath + "\" " + includeDirOptions + " \"" + sourceFilePath + "\"";
+        int retVal = Execute(clCommand);
+        if (retVal != 0)
+        {
+            throw PreprocessingException("cl preprocessing command '" + clCommand + "' failed.");
+        }
+        PPFile ppFile(sourceFilePath);
+        string content = File.ReadAllText(preprocessFilePath);
+        if (!content.IsEmpty())
+        {
+            ppFile.content = ToUtf32(content);
+        }
+        ppFiles.Add(Rvalue(ppFile));
+        if (!Flags.LeavePPOutput())
+        {
+            File.Remove(preprocessFilePath);
+        }
+        else if (Flags.Verbose())
+        {
+            Console.Out() << "==> " << preprocessFilePath << endl();
+        }
+        return ppFiles;
+    }
+    
+    public List<PPFile> DoPreprocess(const string& sourceFilePath, DomElement* ppDefs, const List<string>& includeDirectories)
+    {
+        if (Flags.PreprocessUsingCl())
+        {
+            return PreprocessUsingCl(sourceFilePath, ppDefs, includeDirectories);
+        }
+        else
+        {
+            return Preprocess(sourceFilePath, ppDefs, includeDirectories);
+        }
     }
 }

@@ -697,10 +697,6 @@ void ClassTypeSymbol::CreateDestructorSymbol()
             destructor->SetLinkOnceOdrLinkage();
         }
         destructor->ComputeName();
-        if (destructor->MangledName() == U"destructor_ValueObject_double_E64FAD6BB508658F24C2C96F30904D9DC646E9BB")
-        {
-            int x = 0;
-        }
     }
 }
 

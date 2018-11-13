@@ -1,0 +1,4 @@
+<rules>
+    <rule file="simpleType.xml"/>
+    <ruls file="type.xml"/>
+</rules>

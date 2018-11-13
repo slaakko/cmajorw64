@@ -1,0 +1,52 @@
+using System;
+using System.Collections;
+using System.Dom;
+using System.XPath;
+using Span = System.Text.Parsing.Span;
+
+namespace conversion
+{
+    internal class TypeExprGrammarHolder
+    {
+        static TypeExprGrammarHolder() : typeExprGrammar(new cppparser.TypeExprGrammar())
+        {
+        }
+        public static nothrow cppparser.TypeExprGrammar* GetCppTypeExprGrammar() 
+        {
+            return cppTypeExprGrammar;
+        }
+        private static cppparser.TypeExprGrammar* cppTypeExprGrammar;
+    }
+    
+    public void AddSimpleTypeRule(const ustring& sourceTypeName, const ustring& targetTypeName, cppsymbols.SymbolTable& symbolTable, ConversionTable& conversionTable)
+    {
+        cppparser.ParsingContext ctx;
+        UniquePtr<cppast.Node> cppTypeNode = TypeExprGrammarHolder.GetCppTypeExprGrammar()->Parse(sourceTypeName.Chars(), sourceTypeName.Chars() + sourceTypeName.Length(), 0, "", &ctx);
+        List<UniquePtr<Exception>> errors;
+        cppsymbols.TypeSymbol* sourceType = cppsymbols.ResolveType(cppTypeNode.Get(), symbolTable, &symbolTable.globalNs.scope, Span(), errors);
+        conversionTable.typeConversionTable.AddTypeConversionRule(new TypeConversionRule(sourceType));
+    }
+    
+    public void ReadRules(const string& ruleFilePath, cppsymbols.SymbolTable& symbolTable, ConversionTable& conversionTable)
+    {
+        UniquePtr<DomDocument> ruleDoc = ParseXmlFileToDomDocument(ruleFilePath);
+        UniquePtr<XPathObject> ruleObject = Evaluate(u"/rules/*", ruleDoc.Get());
+        XPathNodeSet* ruleNodeSet = ruleObject.Get() as XPathNodeSet*;
+        if (ruleNodeSet != null)
+        {
+            long n = ruleNodeSet->Length();
+            for (long i = 0; i < n; ++i)
+            {
+                DomNode* ruleNode = (*ruleNodeSet)[i];
+                DomElement* ruleElement = ruleNode as DomElement*;
+                if (ruleElement != null)
+                {
+                    if (ruleElement->Name() == u"simpleType")
+                    {
+                        AddSimpleTypeRule(ruleElement->GetAttribute(u"source"), ruleElement->GetAttribute(u"target"), symbolTable, conversionTable);
+                    }
+                }
+            }
+        }
+    }    
+}

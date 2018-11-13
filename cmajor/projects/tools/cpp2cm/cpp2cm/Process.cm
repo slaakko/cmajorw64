@@ -49,7 +49,8 @@ namespace cpp2cm
             {
                 Console.Out() << "> " << filePath << endl();
             }
-            grammar->Parse(fileContent.Chars(), fileContent.Chars() + fileContent.Length(), 0, filePath);
+            int fileIndex = FileRegistry.Instance().RegisterFilePath(filePath);
+            grammar->Parse(fileContent.Chars(), fileContent.Chars() + fileContent.Length(), fileIndex, filePath);
         }
         catch (const Exception& ex)
         {

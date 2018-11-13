@@ -1,5 +1,0 @@
-project testSimpleType;
-target=program;
-reference <../symbols/symbols.cmp>;
-reference <../cppparser/cppparser.cmp>;
-source <Main.cm>;

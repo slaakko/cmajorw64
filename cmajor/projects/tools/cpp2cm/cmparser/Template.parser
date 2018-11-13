@@ -1,0 +1,21 @@
+using System;
+using cmast;
+
+namespace cmparser
+{
+    grammar TemplateGrammar
+    {
+        using IdentifierGrammar.QualifiedId;
+        using TypeExprGrammar.TypeExpr;
+        
+        TemplateId(var UniquePtr<TemplateIdNode> templateId) : TemplateIdNode*
+            ::= 
+            (   QualifiedId:primary{ templateId.Reset(new TemplateIdNode(primary)); }
+                '<' (TypeExpr:typeArg{ templateId->AddTemplateArgument(typeArg); } % ',') '>'
+            )
+            {
+                value = templateId.Release();
+            }
+            ;
+    }
+}

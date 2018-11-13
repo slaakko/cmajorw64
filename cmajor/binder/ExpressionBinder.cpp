@@ -437,7 +437,7 @@ void ExpressionBinder::BindSymbol(Symbol* symbol, IdentifierNode* idNode)
                 {
                     ClassTypeSymbol* containingClass = memberVariableSymbol->ContainingClassNoThrow();
                     TypeSymbol* containingClassPointerType = containingClass->AddPointer(span);
-                    TypeSymbol* thisPointerType = thisParam->GetType()->AddPointer(span);
+                    TypeSymbol* thisPointerType = thisParam->GetType()->BaseType()->AddPointer(span);
                     if (thisParam->GetType()->IsConstType())
                     {
                         thisPointerType = thisPointerType->AddConst(span);

@@ -214,6 +214,10 @@ void BoundMemberVariable::Load(Emitter& emitter, OperationFlags flags)
     }
     else
     {
+        if (!classPtr)
+        {
+            throw Exception(GetModule(), "class pointer of the member variable not set", GetSpan());
+        }
         classPtr->Load(emitter, OperationFlags::none);
     }
     llvm::Value* ptr = emitter.Stack().Pop();

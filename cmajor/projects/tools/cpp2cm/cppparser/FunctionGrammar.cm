@@ -1,7 +1,7 @@
 using System;
 using System.Collections;
 using System.Text.Parsing;
-using ast;
+using cppast;
 
 // this source file has been automatically generated from 'FunctionGrammar.parser' using cmparsergen version 2.0.0.
 
@@ -509,10 +509,10 @@ namespace cppparser
         public override void GetReferencedGrammars()
         {
             ParsingDomain* pd = Domain();
-            Grammar* grammar0 = pd->GetGrammar(ToUtf32("cppparser.DeclaratorGrammar"));
+            Grammar* grammar0 = pd->GetGrammar(ToUtf32("cppparser.StatementGrammar"));
             if (grammar0 == null)
             {
-                grammar0 = new cppparser.DeclaratorGrammar(pd);
+                grammar0 = new cppparser.StatementGrammar(pd);
             }
             AddGrammarReference(grammar0);
             Grammar* grammar1 = pd->GetGrammar(ToUtf32("cppparser.DeclarationGrammar"));
@@ -527,10 +527,10 @@ namespace cppparser
                 grammar2 = new cppparser.TypeExprGrammar(pd);
             }
             AddGrammarReference(grammar2);
-            Grammar* grammar3 = pd->GetGrammar(ToUtf32("cppparser.StatementGrammar"));
+            Grammar* grammar3 = pd->GetGrammar(ToUtf32("cppparser.DeclaratorGrammar"));
             if (grammar3 == null)
             {
-                grammar3 = new cppparser.StatementGrammar(pd);
+                grammar3 = new cppparser.DeclaratorGrammar(pd);
             }
             AddGrammarReference(grammar3);
             Grammar* grammar4 = pd->GetGrammar(ToUtf32("cppparser.ClassGrammar"));

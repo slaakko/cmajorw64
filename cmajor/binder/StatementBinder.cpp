@@ -782,6 +782,11 @@ void StatementBinder::Visit(IfStatementNode& ifStatementNode)
     {
         throw Exception(module, "condition of an if statement must be a Boolean expression", ifStatementNode.Condition()->GetSpan());
     }
+    if (condition->GetType()->IsReferenceType())
+    {
+        TypeSymbol* baseType = condition->GetType()->BaseType();
+        condition.reset(new BoundDereferenceExpression(module, std::move(condition), baseType));
+    }
     std::unique_ptr<BoundStatement> s;
     if (statement)
     {
@@ -822,6 +827,11 @@ void StatementBinder::Visit(WhileStatementNode& whileStatementNode)
     {
         throw Exception(module, "condition of a while statement must be a Boolean expression", whileStatementNode.Condition()->GetSpan());
     }
+    if (condition->GetType()->IsReferenceType())
+    {
+        TypeSymbol* baseType = condition->GetType()->BaseType();
+        condition.reset(new BoundDereferenceExpression(module, std::move(condition), baseType));
+    }
     std::unique_ptr<BoundStatement> s;
     if (statement)
     {
@@ -855,6 +865,11 @@ void StatementBinder::Visit(DoStatementNode& doStatementNode)
     if (!TypesEqual(symbolTable.GetTypeByName(U"bool"), condition->GetType()->PlainType(doStatementNode.GetSpan())))
     {
         throw Exception(module, "condition of a do statement must be a Boolean expression", doStatementNode.Condition()->GetSpan());
+    }
+    if (condition->GetType()->IsReferenceType())
+    {
+        TypeSymbol* baseType = condition->GetType()->BaseType();
+        condition.reset(new BoundDereferenceExpression(module, std::move(condition), baseType));
     }
     std::unique_ptr<BoundStatement> s;
     if (statement)
@@ -903,6 +918,11 @@ void StatementBinder::Visit(ForStatementNode& forStatementNode)
     if (!TypesEqual(symbolTable.GetTypeByName(U"bool"), condition->GetType()->PlainType(forStatementNode.GetSpan())))
     {
         throw Exception(module, "condition of a for statement must be a Boolean expression", forStatementNode.Condition()->GetSpan());
+    }
+    if (condition->GetType()->IsReferenceType())
+    {
+        TypeSymbol* baseType = condition->GetType()->BaseType();
+        condition.reset(new BoundDereferenceExpression(module, std::move(condition), baseType));
     }
     std::unique_ptr<BoundStatement> s;
     if (statement)

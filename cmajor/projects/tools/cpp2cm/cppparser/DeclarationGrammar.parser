@@ -1,5 +1,5 @@
 using System;
-using ast;
+using cppast;
 
 namespace cppparser
 {
@@ -45,7 +45,8 @@ namespace cppparser
             ;
             
         NamedNamespaceDefinition(ParsingContext* ctx) : NamespaceNode*
-            ::= keyword("namespace") Identifier{ value = new NamespaceNode(span, Identifier); } '{' Declarations(ctx, value) '}'!
+            ::= keyword("namespace") (Identifier:left{ value = new NamespaceNode(span, left); } 
+                ("::" Identifier:right{ value->id.Reset(new ColonColonNode(span, value->id.Release(), right)); })*) '{' Declarations(ctx, value) '}'!
             ;
             
         UnnamedNamespaceDefinition(ParsingContext* ctx) : NamespaceNode*

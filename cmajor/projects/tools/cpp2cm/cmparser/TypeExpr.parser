@@ -1,0 +1,43 @@
+using System;
+using cmast;
+
+namespace cmparser
+{
+    grammar TypeExprGrammar
+    {
+        using BasicTypeGrammar.BasicType;
+        using IdentifierGrammar.Identifier;
+        using TemplateGrammar.TemplateId;
+        using stdlib.spaces;
+        skip spaces;
+        
+        TypeExpr : Node*
+            ::= PrefixTypeExpr{ value = PrefixTypeExpr; }
+            ;
+            
+        PrefixTypeExpr : Node*
+            ::= keyword("const") PostfixTypeExpr:pf1{ value = new ConstNode(pf1); }
+            |   PostfixTypeExpr:pf2{ value = pf2; }
+            ;
+            
+        PostfixTypeExpr(var UniquePtr<Node> node) : Node*
+            ::= 
+            (   PrimaryTypeExpr{ node.Reset(PrimaryTypeExpr); }
+                (   '.' Identifier{ node.Reset(new DotNode(node.Release(), Identifier)); }
+                |   '*'{ node.Reset(new PointerNode(node.Release())); }
+                |   "&&"{ node.Reset(new RvalueRefNode(node.Release())); }
+                |   '&'{ node.Reset(new LvalueRefNode(node.Release())); }
+                )*
+            )
+            {
+                value = node.Release();
+            }
+            ;
+            
+        PrimaryTypeExpr : Node*
+            ::= BasicType{ value = BasicType; }
+            |   TemplateId{ value = TemplateId; }
+            |   Identifier{ value = Identifier; }
+            ;
+    }
+}

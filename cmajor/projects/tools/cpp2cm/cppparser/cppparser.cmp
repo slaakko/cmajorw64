@@ -1,6 +1,6 @@
 project cppparser;
 target=library;
-reference <../ast/ast.cmp>;
+reference <../cppast/cppast.cmp>;
 source <ClassGrammar.cm>;
 text <ClassGrammar.parser>;
 text <CppParser.pl>;
@@ -13,6 +13,7 @@ source <EnumerationGrammar.cm>;
 text <EnumerationGrammar.parser>;
 source <ExpressionGrammar.cm>;
 text <ExpressionGrammar.parser>;
+source <FileRegistry.cm>;
 source <FunctionGrammar.cm>;
 text <FunctionGrammar.parser>;
 source <IdentifierGrammar.cm>;

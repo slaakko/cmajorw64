@@ -1,5 +1,0 @@
-project binder;
-target=library;
-reference <../ast/ast.cmp>;
-reference <../symbols/symbols.cmp>;
-source <TypeResolver.cm>;
