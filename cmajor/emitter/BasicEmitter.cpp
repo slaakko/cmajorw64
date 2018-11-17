@@ -157,7 +157,7 @@ void BasicEmitter::Visit(BoundCompileUnit& boundCompileUnit)
     llvm::legacy::PassManager passManager;
     std::error_code errorCode;
     llvm::raw_fd_ostream objectFile(boundCompileUnit.ObjectFilePath(), errorCode, llvm::sys::fs::F_None);
-    if (emittingContext.GetEmittingContextImpl()->TargetMachine().addPassesToEmitFile(passManager, objectFile, llvm::TargetMachine::CGFT_ObjectFile))
+    if (emittingContext.GetEmittingContextImpl()->TargetMachine().addPassesToEmitFile(passManager, objectFile, nullptr, llvm::TargetMachine::CodeGenFileType::CGFT_ObjectFile))
     {
         throw std::runtime_error("Emitter: cannot emit object code file '" + boundCompileUnit.ObjectFilePath() + "': addPassesToEmitFile failed");
     }

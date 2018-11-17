@@ -16,7 +16,8 @@ namespace cmajor
     using System.Runtime.InteropServices;
     using Microsoft.VisualStudio.Shell;
     using EnvDTE;
-
+    using EnvDTE80;
+    
     /// <summary>
     /// This class implements the package exposed by this assembly.
     /// </summary>
@@ -51,5 +52,29 @@ namespace cmajor
         /// resource names can be calculated for embedded resources.
         /// </summary>
         internal const string DefaultNamespace = "cmajor";
+
+        protected override void Initialize()
+        {
+            base.Initialize();
+            try
+            {
+                ThreadHelper.ThrowIfNotOnUIThread();
+                dte = GetService(typeof(DTE)) as DTE2;
+                Events events = (Events2)dte.Events;
+                buildEvents = events.BuildEvents;
+                buildEvents.OnBuildBegin += BuildEvents_OnBuildBegin;
+            }
+            catch 
+            {
+            }
+        }
+
+        private void BuildEvents_OnBuildBegin(vsBuildScope Scope, vsBuildAction Action)
+        {
+            dte.ExecuteCommand("File.SaveAll");
+        }
+
+        private static DTE2 dte;
+        private BuildEvents buildEvents;
     }
 }

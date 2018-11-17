@@ -737,6 +737,7 @@ BlockTable::BlockTable()
     blocks.push_back(Block(BlockId::nko, "Nko", "Nko", 0x07C0, 0x07FF));
     blocks.push_back(Block(BlockId::samaritan, "Samaritan", "Samaritan", 0x0800, 0x083F));
     blocks.push_back(Block(BlockId::mandaic, "Mandaic", "Mandaic", 0x0840, 0x085F));
+    blocks.push_back(Block(BlockId::syriacSup, "Syriac Sup", "Syriac Supplement", 0x0860, 0x086F));
     blocks.push_back(Block(BlockId::arabicExtA, "Arabic Ext A", "Arabic Extended-A", 0x08A0, 0x08FF));
     blocks.push_back(Block(BlockId::devanagari, "Devanagari", "Devanagari", 0x0900, 0x097F));
     blocks.push_back(Block(BlockId::bengali, "Bengali", "Bengali", 0x0980, 0x09FF));
@@ -780,6 +781,7 @@ BlockTable::BlockTable()
     blocks.push_back(Block(BlockId::lepcha, "Lepcha", "Lepcha", 0x1C00, 0x1C4F));
     blocks.push_back(Block(BlockId::olChiki, "Ol Chiki", "Ol Chiki", 0x1C50, 0x1C7F));
     blocks.push_back(Block(BlockId::cyrillicExtC, "Cyrillic Ext C", "Cyrillic Extended-C", 0x1C80, 0x1C8F));
+    blocks.push_back(Block(BlockId::georgianExt, "Georgian Ext", "Georgian Extended", 0x1C90, 0x1CBF));
     blocks.push_back(Block(BlockId::sundaneseSup, "Sundanese Sup", "Sundanese Supplement", 0x1CC0, 0x1CCF));
     blocks.push_back(Block(BlockId::vedicExt, "Vedic Ext", "Vedic Extensions", 0x1CD0, 0x1CFF));
     blocks.push_back(Block(BlockId::phoneticExt, "Phonetic Ext", "Phonetic Extensions", 0x1D00, 0x1D7F));
@@ -919,7 +921,10 @@ BlockTable::BlockTable()
     blocks.push_back(Block(BlockId::psalterPahlavi, "Psalter Pahlavi", "Psalter Pahlavi", 0x10B80, 0x10BAF));
     blocks.push_back(Block(BlockId::oldTurkic, "Old Turkic", "Old Turkic", 0x10C00, 0x10C4F));
     blocks.push_back(Block(BlockId::oldHungarian, "Old Hungarian", "Old Hungarian", 0x10C80, 0x10CFF));
+    blocks.push_back(Block(BlockId::hanifiRohingya, "Hanifi Rohingya", "Hanifi Rohingya", 0x10D00, 0x10D3F));
     blocks.push_back(Block(BlockId::rumi, "Rumi", "Rumi Numeral Symbols", 0x10E60, 0x10E7F));
+    blocks.push_back(Block(BlockId::oldSogdian, "Old Sogdian", "Old Sogdian", 0x10F00, 0x10F2F));
+    blocks.push_back(Block(BlockId::sogdian, "Sogdian", "Sogdian", 0x10F30, 0x10F6F));
     blocks.push_back(Block(BlockId::brahmi, "Brahmi", "Brahmi", 0x11000, 0x1107F));
     blocks.push_back(Block(BlockId::kaithi, "Kaithi", "Kaithi", 0x11080, 0x110CF));
     blocks.push_back(Block(BlockId::soraSompeng, "Sora Sompeng", "Sora Sompeng", 0x110D0, 0x110FF));
@@ -938,10 +943,16 @@ BlockTable::BlockTable()
     blocks.push_back(Block(BlockId::mongolianSup, "Mongolian Sup", "Mongolian Supplement", 0x11660, 0x1167F));
     blocks.push_back(Block(BlockId::takri, "Takri", "Takri", 0x11680, 0x116CF));
     blocks.push_back(Block(BlockId::ahom, "Ahom", "Ahom", 0x11700, 0x1173F));
+    blocks.push_back(Block(BlockId::dogra, "Dogra", "Dogra", 0x11800, 0x1184F));
     blocks.push_back(Block(BlockId::warangCiti, "Warang Citi", "Warang Citi", 0x118A0, 0x118FF));
+    blocks.push_back(Block(BlockId::zanabazarSquare, "Zanabazar Square", "Zanabazar Square", 0x11A00, 0x11A4FF));
+    blocks.push_back(Block(BlockId::soyombo, "Soyombo", "Soyombo", 0x11A50, 0x11AAF));
     blocks.push_back(Block(BlockId::pauCinHau, "Pau Cin Hau", "Pau Cin Hau", 0x11AC0, 0x11AFF));
     blocks.push_back(Block(BlockId::bhaisuki, "Bhaiksuki", "Bhaiksuki", 0x11C00, 0x11C6F));
     blocks.push_back(Block(BlockId::marchen, "Marchen", "Marchen", 0x11C70, 0x11CBF));
+    blocks.push_back(Block(BlockId::masaramGondi, "Masaram Gondi", "Masaram Gondi", 0x11D00, 0x11D5F));
+    blocks.push_back(Block(BlockId::gunjalaGondi, "Gunjala Gondi", "Gunjala Gondi", 0x11D60, 0x11DAF));
+    blocks.push_back(Block(BlockId::makasar, "Makasar", "Makasar", 0x11EE0, 0x11EFF));
     blocks.push_back(Block(BlockId::cuneiform, "Cuneiform", "Cuneiform", 0x12000, 0x123FF));
     blocks.push_back(Block(BlockId::cuneiformNumbers, "Cuneiform Numbers", "Cuneiform Numbers and Punctuation", 0x12400, 0x1247F));
     blocks.push_back(Block(BlockId::earlyDynasticCuneiform, "Early Dynastic Cuneiform", "Early Dynastic Cuneiform", 0x12480, 0x1254F));
@@ -951,16 +962,20 @@ BlockTable::BlockTable()
     blocks.push_back(Block(BlockId::mro, "Mro", "Mro", 0x16A40, 0x16A6F));
     blocks.push_back(Block(BlockId::bassaVah, "Bassa Vah", "Bassa Vah", 0x16AD0, 0x16AFF));
     blocks.push_back(Block(BlockId::pahawhHmong, "Pahawh Hmong", "Pahawh Hmong", 0x16B00, 0x16B8F));
+    blocks.push_back(Block(BlockId::medefaidrin, "Medefaidrin", "Medefaidrin", 0x16E40, 0x16E9F));
     blocks.push_back(Block(BlockId::miao, "Miao", "Miao", 0x16F00, 0x16F9F));
     blocks.push_back(Block(BlockId::ideographicSymbols, "Ideographic Symbols", "Ideographic Symbols and Punctuation", 0x16FE0, 0x16FFF));
     blocks.push_back(Block(BlockId::tangut, "Tangut", "Tangut", 0x17000, 0x187FF));
     blocks.push_back(Block(BlockId::tangutComponents, "Tangut Components", "Tangut Components", 0x18800, 0x18AFF));
     blocks.push_back(Block(BlockId::kanaSup, "Kana Sup", "Kana Supplement", 0x1B000, 0x1B0FF));
+    blocks.push_back(Block(BlockId::kanaExtA, "Kana Ext A", "Kana Extended-A", 0x1B100, 0x1B12F));
+    blocks.push_back(Block(BlockId::nushu, "Nushu", "Nushu", 0x1B170, 0x1B2FF));
     blocks.push_back(Block(BlockId::duployan, "Duployan", "Duployan", 0x1BC00, 0x1BC9F));
     blocks.push_back(Block(BlockId::shorthandFormatControls, "Shorthand Format Controls", "Shorthand Format Controls", 0x1BCA0, 0x1BCAF));
     blocks.push_back(Block(BlockId::byzantineMusic, "Byzantine Music", "Byzantine Musical Symbols", 0x1D000, 0x1D0FF));
     blocks.push_back(Block(BlockId::music, "Music", "Musical Symbols", 0x1D100, 0x1D1FF));
     blocks.push_back(Block(BlockId::ancientGreekMusic, "Ancient Greek Music", "Ancient Greek Musical Notation", 0x1D200, 0x1D24F));
+    blocks.push_back(Block(BlockId::mayanNumerals, "Mayan Numerals", "Mayan Numerals", 0x1D2E0, 0x1D2FF));
     blocks.push_back(Block(BlockId::taiXuanJing, "Tai Xuan Jing", "Tai Xuan Jing Symbols", 0x1D300, 0x1D35F));
     blocks.push_back(Block(BlockId::countingRod, "Counting Rod", "Counting Rod Numerals", 0x1D360, 0x1D37F));
     blocks.push_back(Block(BlockId::mathAlphanum, "Math Alphanum", "Mathematical Alphanumeric Symbols", 0x1D400, 0x1D7FF));
@@ -968,6 +983,7 @@ BlockTable::BlockTable()
     blocks.push_back(Block(BlockId::glagoliticSup, "Glagolitic Sup", "Glagolitic Supplement", 0x1E000, 0x1E02F));
     blocks.push_back(Block(BlockId::mendeKikakui, "Mende Kikakui", "Mende Kikakui", 0x1E800, 0x1E8DF));
     blocks.push_back(Block(BlockId::adlam, "Adlam", "Adlam", 0x1E900, 0x1E95F));
+    blocks.push_back(Block(BlockId::indicSiyaqNumbers, "Indic Siyaq Numbers", "Indic Siyaq Numbers", 0x1EC70, 0x1ECBF));
     blocks.push_back(Block(BlockId::arabicMath, "Arabic Math", "Arabic Mathematical Alphabetic Symbols", 0x1EE00, 0x1EEFF));
     blocks.push_back(Block(BlockId::mahjong, "Mahjong", "Mahjong Tiles", 0x1F000, 0x1F02F));
     blocks.push_back(Block(BlockId::domino, "Domino", "Domino Tiles", 0x1F030, 0x1F09F));
@@ -982,10 +998,12 @@ BlockTable::BlockTable()
     blocks.push_back(Block(BlockId::geometricShapesExt, "Geometric Shapes Ext", "Geometric Shapes Extended", 0x1F780, 0x1F7FF));
     blocks.push_back(Block(BlockId::supArrowsC, "Sup Arrows C", "Supplemental Arrows-C", 0x1F800, 0x1F8FF));
     blocks.push_back(Block(BlockId::supSymbolsAndPictographs, "Sup Symbols And Pictographs", "Supplemental Symbols and Pictographs", 0x1F900, 0x1F9FF));
+    blocks.push_back(Block(BlockId::chessSymbols, "Chess Symbols", "Chess Symbols", 0x1FA00, 0x1FA6F));
     blocks.push_back(Block(BlockId::cjkExtB, "CJK Ext B", "CJK Unified Ideographs Extension B", 0x20000, 0x2A6DF));
     blocks.push_back(Block(BlockId::cjkExtC, "CJK Ext C", "CJK Unified Ideographs Extension C", 0x2A700, 0x2B73F));
     blocks.push_back(Block(BlockId::cjkExtD, "CJK Ext D", "CJK Unified Ideographs Extension D", 0x2B740, 0x2B81F));
     blocks.push_back(Block(BlockId::cjkExtE, "CJK Ext E", "CJK Unified Ideographs Extension E", 0x2B820, 0x2CEAF));
+    blocks.push_back(Block(BlockId::cjkExtF, "CJK Ext F", "CJK Unified Ideographs Extension F", 0x2CEB0, 0x2EBEF));
     blocks.push_back(Block(BlockId::cjkCompatIdeographsSup, "CJK Compat Ideographs Sup", "CJK Compatibility Ideographs Supplement", 0x2F800, 0x2FA1F));
     blocks.push_back(Block(BlockId::tags, "Tags", "Tags", 0xE0000, 0xE007F));
     blocks.push_back(Block(BlockId::vsSup, "VS Sup", "Variation Selectors Supplement", 0xE0100, 0xE01EF));
@@ -1180,6 +1198,8 @@ AgeTable::AgeTable()
     ages.push_back(Age(AgeId::age_7_0, "7.0"));
     ages.push_back(Age(AgeId::age_8_0, "8.0"));
     ages.push_back(Age(AgeId::age_9_0, "9.0"));
+    ages.push_back(Age(AgeId::age_10_0, "10.0"));
+    ages.push_back(Age(AgeId::age_11_0, "11.0"));
     for (const Age& age : ages)
     {
         ageIdMap[age.Id()] = &age;
@@ -1258,6 +1278,7 @@ ScriptTable::ScriptTable()
     scripts.push_back(Script(ScriptId::cprt, "Cprt", "Cypriot"));
     scripts.push_back(Script(ScriptId::cyrl, "Cyrl", "Cyrillic"));
     scripts.push_back(Script(ScriptId::deva, "Deva", "Devanagari"));
+    scripts.push_back(Script(ScriptId::dogr, "Dogr", "Dogra"));
     scripts.push_back(Script(ScriptId::dsrt, "Dsrt", "Deseret"));
     scripts.push_back(Script(ScriptId::dupl, "Dupl", "Duployan"));
     scripts.push_back(Script(ScriptId::egyp, "Egyp", "Egyptian Hieroglyphs"));
@@ -1265,6 +1286,8 @@ ScriptTable::ScriptTable()
     scripts.push_back(Script(ScriptId::ethi, "Ethi", "Ethiopian"));
     scripts.push_back(Script(ScriptId::geor, "Geor", "Georgian"));
     scripts.push_back(Script(ScriptId::glag, "Glag", "Glagolitic"));
+    scripts.push_back(Script(ScriptId::gong, "Gong", "Gunjala Gondi"));
+    scripts.push_back(Script(ScriptId::gonm, "Gonm", "Masaram Gondi"));
     scripts.push_back(Script(ScriptId::goth, "Goth", "Gothic"));
     scripts.push_back(Script(ScriptId::gran, "Gran", "Grantha"));
     scripts.push_back(Script(ScriptId::grek, "Grek", "Greek"));
@@ -1300,9 +1323,11 @@ ScriptTable::ScriptTable()
     scripts.push_back(Script(ScriptId::lyci, "Lyci", "Lycian"));
     scripts.push_back(Script(ScriptId::lydi, "Lydi", "Lydian"));
     scripts.push_back(Script(ScriptId::mahj, "Mahj", "Mahajani"));
+    scripts.push_back(Script(ScriptId::maka, "Maka", "Makasar"));
     scripts.push_back(Script(ScriptId::mand, "Mand", "Mandaic"));
     scripts.push_back(Script(ScriptId::mani, "Mani", "Manichaean"));
     scripts.push_back(Script(ScriptId::marc, "Marc", "Marchen"));
+    scripts.push_back(Script(ScriptId::medf, "Medf", "Medefaidrin"));
     scripts.push_back(Script(ScriptId::mend, "Mend", "Mende Kikakui"));
     scripts.push_back(Script(ScriptId::merc, "Merc", "Meroitic Cursive"));
     scripts.push_back(Script(ScriptId::mero, "Mero", "Meroitic Hieroglyphs"));
@@ -1317,6 +1342,7 @@ ScriptTable::ScriptTable()
     scripts.push_back(Script(ScriptId::nbat, "Nbat", "Nabataean"));
     scripts.push_back(Script(ScriptId::newa, "Newa", "Newa"));
     scripts.push_back(Script(ScriptId::nkoo, "Nkoo", "Nko"));
+    scripts.push_back(Script(ScriptId::nshu, "Nshu", "Nushu"));
     scripts.push_back(Script(ScriptId::ogam, "Ogam", "Ogham"));
     scripts.push_back(Script(ScriptId::olck, "Olck", "Ol Chiki"));
     scripts.push_back(Script(ScriptId::orkh, "Orkh", "Old Turkic"));
@@ -1333,6 +1359,7 @@ ScriptTable::ScriptTable()
     scripts.push_back(Script(ScriptId::plrd, "Plrd", "Miao"));
     scripts.push_back(Script(ScriptId::prti, "Prti", "Inscriptional Parthian"));
     scripts.push_back(Script(ScriptId::rjng, "Rjng", "Rejang"));
+    scripts.push_back(Script(ScriptId::rohg, "Rohg", "Hanifi Rohingya"));
     scripts.push_back(Script(ScriptId::runr, "Runr", "Runic"));
     scripts.push_back(Script(ScriptId::samr, "Samr", "Samaritan"));
     scripts.push_back(Script(ScriptId::sarb, "Sarb", "Old South Arabian"));
@@ -1343,7 +1370,10 @@ ScriptTable::ScriptTable()
     scripts.push_back(Script(ScriptId::sidd, "Sidd", "Shiddham"));
     scripts.push_back(Script(ScriptId::sind, "Sind", "Khudawadi"));
     scripts.push_back(Script(ScriptId::sinh, "Sinh", "Sinhala"));
+    scripts.push_back(Script(ScriptId::sogd, "Sogd", "Sogdian"));
+    scripts.push_back(Script(ScriptId::sogo, "Sogo", "Old Sogdian"));
     scripts.push_back(Script(ScriptId::sora, "Sora", "Sora Sompeng"));
+    scripts.push_back(Script(ScriptId::soyo, "Soyo", "Soyombo"));
     scripts.push_back(Script(ScriptId::sund, "Sund", "Sundanese"));
     scripts.push_back(Script(ScriptId::sylo, "Sylo", "Syloti Nagri"));
     scripts.push_back(Script(ScriptId::syrc, "Syrc", "Syriac"));
@@ -1367,6 +1397,7 @@ ScriptTable::ScriptTable()
     scripts.push_back(Script(ScriptId::xpeo, "Xpeo", "Old Persian"));
     scripts.push_back(Script(ScriptId::xsux, "Xsux", "Cuneiform"));
     scripts.push_back(Script(ScriptId::yiii, "Yiii", "Yi"));
+    scripts.push_back(Script(ScriptId::zanb, "Zanb", "Zanabazar Square"));
     scripts.push_back(Script(ScriptId::zinh, "Zinh", "Inherited"));
     scripts.push_back(Script(ScriptId::zyyy, "Zyyy", "Common"));
     scripts.push_back(Script(ScriptId::zzzz, "Zzzz", "Unknown"));

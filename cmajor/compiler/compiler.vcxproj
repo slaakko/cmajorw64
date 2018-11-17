@@ -23,7 +23,7 @@
     <ProjectGuid>{07F2AA9C-F4D4-4802-A38C-67D6C6316FE2}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>compiler</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.14393.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.17134.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -110,12 +110,12 @@ LLVMMCParser.lib;LLVMObject.lib;LLVMAsmParser.lib;LLVMIRReader.lib;LLVMLinker.li
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <AdditionalIncludeDirectories>../..;C:\Programming\boost_1_64_0;C:\Programming\llvm-6.0.0.src\include;C:\Programming\llvm-6.0.0.src\build\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../..;C:\Program Files\boost\include\boost-1_68;D:\work\llvm-7.0.0.src\include;D:\work\llvm-7.0.0.src\build\include</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4267;4146;4996;4141;4244;4291;4624;4996</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
-      <AdditionalLibraryDirectories>$(OutDir);C:\Programming\boost64;C:\Programming\llvm-6.0.0.src\build\Debug\lib</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(OutDir);C:\Program Files\boost\lib;D:\work\llvm-7.0.0.src\build\Debug\lib</AdditionalLibraryDirectories>
       <AdditionalDependencies>xpath.lib;cmdoclib.lib;ast2dom.lib;bdt2dom.lib;dom.lib;xml.lib;eh.lib;build.lib;emitter.lib;binder.lib;parser.lib;symbols.lib;ir.lib;ast.lib;syntax.lib;code.lib;parsing.lib;codedom.lib;util.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;
 LLVMMIRParser.lib;LLVMInterpreter.lib;LLVMLibDriver.lib;LLVMDlltoolDriver.lib;LLVMOption.lib;LLVMCoverage.lib;LLVMSymbolize.lib;LLVMDebugInfoPDB.lib;LLVMDebugInfoDWARF.lib;
 LLVMMCJIT.lib;LLVMWindowsManifest.lib;LLVMLineEditor.lib;LLVMLTO.lib;LLVMPasses.lib;LLVMObjCARCOpts.lib;LLVMCoroutines.lib;LLVMipo.lib;LLVMInstrumentation.lib;LLVMVectorize.lib;
@@ -156,14 +156,14 @@ LLVMMCParser.lib;LLVMObject.lib;LLVMAsmParser.lib;LLVMIRReader.lib;LLVMLinker.li
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>../..;C:\Programming\boost_1_64_0;C:\Programming\llvm-6.0.0.src\include;C:\Programming\llvm-6.0.0.src\build\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../..;C:\Program Files\boost\include\boost-1_68;D:\work\llvm-7.0.0.src\include;D:\work\llvm-7.0.0.src\build\include</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4267;4146;4996;4141;4244;4291;4624;4996</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>$(OutDir);C:\Programming\boost64;C:\Programming\llvm-6.0.0.src\build\Release\lib</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(OutDir);C:\Program Files\boost\lib;D:\work\llvm-7.0.0.src\build\Release\lib</AdditionalLibraryDirectories>
       <AdditionalDependencies>xpath.lib;cmdoclib.lib;ast2dom.lib;bdt2dom.lib;dom.lib;xml.lib;eh.lib;build.lib;emitter.lib;binder.lib;parser.lib;symbols.lib;ir.lib;ast.lib;syntax.lib;code.lib;parsing.lib;codedom.lib;util.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;
 LLVMMIRParser.lib;LLVMInterpreter.lib;LLVMLibDriver.lib;LLVMDlltoolDriver.lib;LLVMOption.lib;LLVMCoverage.lib;LLVMSymbolize.lib;LLVMDebugInfoPDB.lib;LLVMDebugInfoDWARF.lib;
 LLVMMCJIT.lib;LLVMWindowsManifest.lib;LLVMLineEditor.lib;LLVMLTO.lib;LLVMPasses.lib;LLVMObjCARCOpts.lib;LLVMCoroutines.lib;LLVMipo.lib;LLVMInstrumentation.lib;LLVMVectorize.lib;

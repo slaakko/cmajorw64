@@ -28,7 +28,11 @@ EmittingContextImpl::EmittingContextImpl() : targetTriple(), optimizationLevel(0
     llvm::initializeInstrumentation(*passRegistry);
     llvm::initializeTarget(*passRegistry);
     llvm::initializeCodeGen(*passRegistry);
+#ifdef _WIN32
+    targetTriple = "x86_64-pc-windows-msvc";
+#else
     targetTriple = llvm::sys::getDefaultTargetTriple();
+#endif
     std::string error;
     const llvm::Target* target = llvm::TargetRegistry::lookupTarget(targetTriple, error);
     if (!target)

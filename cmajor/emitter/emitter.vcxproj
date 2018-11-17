@@ -39,7 +39,7 @@
     <ProjectGuid>{A85FB4BA-5F9C-4EA0-9AD8-C994443610A6}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>emitter</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.14393.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.17134.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -94,7 +94,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>../..;C:\Programming\boost_1_64_0;C:\Programming\llvm-6.0.0.src\include;C:\Programming\llvm-6.0.0.src\build\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../..;C:\Program Files\boost\include\boost-1_68;D:\work\llvm-7.0.0.src\include;D:\work\llvm-7.0.0.src\build\include</AdditionalIncludeDirectories>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <DisableSpecificWarnings>4141;4146;4244;4267;4291;4624;4996</DisableSpecificWarnings>
     </ClCompile>
@@ -144,7 +144,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>../..;C:\Programming\boost_1_64_0;C:\Programming\llvm-6.0.0.src\include;C:\Programming\llvm-6.0.0.src\build\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../..;C:\Program Files\boost\include\boost-1_68;D:\work\llvm-7.0.0.src\include;D:\work\llvm-7.0.0.src\build\include</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4141;4146;4244;4267;4291;4624;4996</DisableSpecificWarnings>
     </ClCompile>
     <Link>

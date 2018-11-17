@@ -23,7 +23,7 @@
     <ProjectGuid>{CEF6E988-1FFD-4FD3-B188-DF3EE12234EC}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>rt</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.14393.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.17134.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -91,7 +91,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;_USRDLL;RT_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>../..;C:\Programming\boost_1_64_0;C:\Users\Seppo\cmajorw64\cmajor\system\ext\gnutls\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../..;C:\Program Files\boost\include\boost-1_68;D:\work\cmajorw64\cmajor\system\ext\gnutls\include</AdditionalIncludeDirectories>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <DisableSpecificWarnings>4141;4146;4244;4267;4291;4624;4996</DisableSpecificWarnings>
       <ExceptionHandling>SyncCThrow</ExceptionHandling>
@@ -99,7 +99,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <AdditionalDependencies>eh.lib;dom.lib;xml.lib;libbz2.lib;zlibstat.lib;cmrt240gmp.lib;libgnutls-30.lib;ws2_32.lib;parser.lib;parsing.lib;codedom.lib;util.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(OutDir);C:\Programming\boost64;C:\Programming\llvm-4.0.0.src\build\Debug\lib;C:\Users\Seppo\cmajorw64\cmajor\lib</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(OutDir);C:\Program Files\boost\lib;D:\work\cmajorw64\cmajor\lib</AdditionalLibraryDirectories>
       <AdditionalOptions>/EXPORT:__CxxFrameHandler3 /EXPORT:_CxxThrowException /EXPORT:__chkstk %(AdditionalOptions)</AdditionalOptions>
       <ModuleDefinitionFile>
       </ModuleDefinitionFile>
@@ -149,7 +149,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>NDEBUG;_WINDOWS;_USRDLL;RT_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>../..;C:\Programming\boost_1_64_0;C:\Users\Seppo\cmajorw64\cmajor\system\ext\gnutls\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../..;C:\Program Files\boost\include\boost-1_68;D:\work\cmajorw64\cmajor\system\ext\gnutls\include</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4141;4146;4244;4267;4291;4624;4996</DisableSpecificWarnings>
       <ExceptionHandling>SyncCThrow</ExceptionHandling>
     </ClCompile>
@@ -158,7 +158,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalDependencies>eh.lib;dom.lib;xml.lib;libbz2.lib;zlibstat.lib;cmrt240gmp.lib;libgnutls-30.lib;ws2_32.lib;parser.lib;parsing.lib;codedom.lib;util.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(OutDir);C:\Programming\boost64;C:\Programming\llvm-4.0.0.src\build\Release\lib;C:\Users\Seppo\cmajorw64\cmajor\lib</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(OutDir);C:\Program Files\boost\lib;D:\work\cmajorw64\cmajor\lib</AdditionalLibraryDirectories>
       <AdditionalOptions>/EXPORT:__CxxFrameHandler3 /EXPORT:_CxxThrowException /EXPORT:__chkstk %(AdditionalOptions)</AdditionalOptions>
     </Link>
   </ItemDefinitionGroup>
