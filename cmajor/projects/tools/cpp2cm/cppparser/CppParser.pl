@@ -72,6 +72,7 @@ namespace cppparser
     {
         TemplateDeclaration(ParsingContext* ctx) : TemplateDeclarationNode*;
         TemplateParameterList(ParsingContext* ctx, TemplateDeclarationNode* templateDeclaration);
+        RuleTemplateParameter(ParsingContext* ctx) : Node*;
         TemplateParameter(ParsingContext* ctx) : Node*;
         TypeParameter(ParsingContext* ctx) : TemplateParameterNode*;
         SimpleTemplateId(ParsingContext* ctx, var UniquePtr<TemplateIdNode> templateIdNode) : TemplateIdNode*;

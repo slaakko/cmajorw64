@@ -1,21 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <rules>
-    <simpleType source="bool" target="bool"/>
-    <simpleType source="char" target="char"/>
-    <simpleType source="wchar_t" target="wchar"/>
-    <simpleType source="char16_t" target="wchar"/>
-    <simpleType source="char32_t" target="uchar"/>
-    <simpleType source="signed char" target="sbyte"/>
-    <simpleType source="unsigned char" target="byte"/>
-    <simpleType source="short int" target="short"/>
-    <simpleType source="unsigned short int" target="ushort"/>
-    <simpleType source="int" target="int"/>
-    <simpleType source="unsigned int" target="uint"/>
-    <simpleType source="long" target="int"/>
-    <simpleType source="unsigned long int" target="uint"/>
-    <simpleType source="long long int" target="long"/>
-    <simpleType source="unsigned long long int" target="ulong"/>
-    <simpleType source="float" target="float"/>
-    <simpleType source="double" target="double"/>
-    <simpleType source="void" target="void"/>
+    <type source="bool" target="bool"/>
+    <type source="char" target="char"/>
+    <type source="wchar_t" target="wchar"/>
+    <type source="char16_t" target="wchar"/>
+    <type source="char32_t" target="uchar"/>
+    <type source="signed char" target="sbyte"/>
+    <type source="unsigned char" target="byte"/>
+    <type source="short int" target="short"/>
+    <type source="unsigned short int" target="ushort"/>
+    <type source="int" target="int"/>
+    <type source="unsigned int" target="uint"/>
+    <type source="long" target="int"/>
+    <type source="unsigned long int" target="uint"/>
+    <type source="long long int" target="long"/>
+    <type source="unsigned long long int" target="ulong"/>
+    <type source="float" target="float"/>
+    <type source="double" target="double"/>
+    <type source="void" target="void"/>
 </rules>

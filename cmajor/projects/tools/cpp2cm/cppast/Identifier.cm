@@ -242,4 +242,21 @@ namespace cppast
         NodeStringComputer computer(node);
         return Rvalue(computer.nodeString);
     }
+    
+    public nothrow bool HasTemplateIdNodeParent(Node* node)
+    {
+        if (node->parent != null)
+        {
+            if (node->parent is TemplateIdNode*)
+            {
+                return true;
+            }
+            else if (HasTemplateIdNodeParent(node->parent))
+            {
+                return true;
+            }
+        }
+        return false;
+    }    
+    
 }

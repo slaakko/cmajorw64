@@ -17,6 +17,7 @@ source <SymbolException.cm>;
 source <SymbolTable.cm>;
 source <SymbolTableXmlGenerator.cm>;
 source <SymbolVisitor.cm>;
+source <TypeCreator.cm>;
 source <TypeResolver.cm>;
 source <TypeSymbol.cm>;
 source <VariableSymbol.cm>;

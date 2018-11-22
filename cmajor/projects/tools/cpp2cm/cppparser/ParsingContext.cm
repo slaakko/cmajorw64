@@ -8,6 +8,14 @@ namespace cppparser
         public nothrow ParsingContext()
         {
         }
+        public nothrow inline bool TypeRule() const
+        {
+            return typeRule;
+        }
+        public nothrow inline void SetTypeRule()
+        {
+            typeRule = true;
+        }
         public nothrow inline bool ParsingTemplateId() const
         {
             return parsingTemplateId;
@@ -89,5 +97,6 @@ namespace cppparser
         private bool parsingArguments;
         private Stack<bool> parsingArgumentsStack;
         private bool acceptDefined;
+        private bool typeRule;
     }
 }

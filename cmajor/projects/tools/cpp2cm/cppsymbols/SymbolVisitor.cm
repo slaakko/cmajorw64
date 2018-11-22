@@ -9,6 +9,7 @@ namespace cppsymbols
         public virtual void Visit(ClassTypeSymbol& symbol) {}
         public virtual void Visit(ClassTemplateSymbol& symbol) {}
         public virtual void Visit(NamespaceSymbol& symbol) {}
+        public virtual void Visit(TypeSymbol& typeSymbol) {}
         public virtual void Visit(CharTypeSymbol& symbol) {}
         public virtual void Visit(SignedCharTypeSymbol& symbol) {}
         public virtual void Visit(UnsignedCharTypeSymbol& symbol) {}

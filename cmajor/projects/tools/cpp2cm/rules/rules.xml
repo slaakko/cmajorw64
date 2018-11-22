@@ -1,4 +1,4 @@
 <rules>
     <rule file="simpleType.xml"/>
-    <ruls file="type.xml"/>
+    <ruls file="std.xml"/>
 </rules>

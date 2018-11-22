@@ -4,10 +4,14 @@ using cppast;
 
 namespace cppsymbols
 {
-    public abstract class TypeSymbol : ContainerSymbol
+    public class TypeSymbol : ContainerSymbol
     {
         public nothrow TypeSymbol(const Span& span_, const ustring& name_) : base(span_, name_)
         {
+        }
+        public override void Accept(SymbolVisitor& visitor)
+        {
+            visitor.Visit(*this);
         }
         public nothrow virtual bool IsUnsignedType() const 
         { 

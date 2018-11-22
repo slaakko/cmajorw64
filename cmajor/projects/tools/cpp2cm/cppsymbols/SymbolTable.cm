@@ -358,6 +358,10 @@ namespace cppsymbols
         {
             container = containerStack.Pop();
         }
+        public void AddTypeSymbol(TypeSymbol* typeSymbol, List<UniquePtr<Exception>>& errors)
+        {
+            container->AddSymbol(typeSymbol, errors);
+        }
         public void AddTypeSymbolToGlobalNs(TypeSymbol* typeSymbol)
         {
             typeSymbol->parent = &globalNs;

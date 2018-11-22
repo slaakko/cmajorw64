@@ -5,9 +5,10 @@ namespace conversion
 {
     public class TypeConversionRule
     {
-        public nothrow TypeConversionRule(cppsymbols.TypeSymbol* sourceType_) : sourceType(sourceType_)
+        public nothrow TypeConversionRule(cppast.Node* sourceNode_, cppsymbols.TypeSymbol* sourceType_) : sourceNode(sourceNode_), sourceType(sourceType_)
         {
         }
+        public UniquePtr<cppast.Node> sourceNode;
         public cppsymbols.TypeSymbol* sourceType;
     }
     

@@ -3,6 +3,7 @@ using System.IO;
 using System.Collections;
 using System.Dom;
 using System.Text;
+using conversion;
 using cppparser;
 using cppsymbols;
 using cppast;
@@ -182,6 +183,8 @@ int main(int argc, const char** argv)
             }
             SymbolTableXmlGenerator symbolTableXmlGenerator;
             SymbolTable symbolTable;
+            ConversionTable conversionTable;
+            ReadRules(symbolTable, conversionTable);
             SymbolCreator symbolCreator(symbolTable, errors);
             compileUnit->Accept(symbolCreator);
             symbolTableXmlGenerator.ToXml(symbolTable);
