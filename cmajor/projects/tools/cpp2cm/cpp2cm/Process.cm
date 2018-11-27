@@ -43,7 +43,7 @@ namespace cpp2cm
         string errorMessage;
         try
         {
-            SourceFileGrammar* grammar = Parser.GetSourceFileGrammar();
+            SourceFileGrammar* grammar = Parser.Instance().GetSourceFileGrammar();
             ustring fileContent = ToUtf32(File.ReadAllText(filePath));
             if (Flags.Verbose())
             {

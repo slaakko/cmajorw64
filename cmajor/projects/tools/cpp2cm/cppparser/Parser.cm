@@ -2,15 +2,23 @@ using System;
 
 namespace cppparser
 {
-    public static class Parser
+    public class Parser
     {
-        static Parser() : sourceFileGrammar(new SourceFileGrammar())
+        static Parser() : instance(new Parser())
         {
         }
-        public static SourceFileGrammar* GetSourceFileGrammar()
+        public static Parser& Instance()
+        {
+            return *instance;
+        }
+        public SourceFileGrammar* GetSourceFileGrammar()
         {
             return sourceFileGrammar;
         }
-        private static SourceFileGrammar* sourceFileGrammar;
+        private Parser() : sourceFileGrammar(new SourceFileGrammar())
+        {
+        }
+        private static UniquePtr<Parser> instance;
+        private SourceFileGrammar* sourceFileGrammar;
     }
 }

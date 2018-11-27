@@ -9,6 +9,7 @@ source <Identifier.cm>;
 text <Identifier.parser>;
 source <Keyword.cm>;
 text <Keyword.parser>;
+source <ParsingContext.cm>;
 source <Template.cm>;
 text <Template.parser>;
 source <TypeExpr.cm>;

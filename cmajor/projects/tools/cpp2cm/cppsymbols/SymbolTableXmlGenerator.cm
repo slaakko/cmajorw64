@@ -126,6 +126,12 @@ namespace cppsymbols
             currentElement = prevElement;
             currentElement->AppendChild(UniquePtr<DomNode>(namespaceElement.Release()));
         }
+        public override void Visit(TypeSymbol& symbol)
+        {
+            UniquePtr<DomElement> typeElement(new DomElement(u"type"));
+            typeElement->SetAttribute(u"name", symbol.name);
+            currentElement->AppendChild(UniquePtr<DomNode>(typeElement.Release()));
+        }
         public override void Visit(CharTypeSymbol& symbol) 
         {
             UniquePtr<DomElement> simpleTypeElement(new DomElement(u"simpleType"));

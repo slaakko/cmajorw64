@@ -2,7 +2,7 @@
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
  <PropertyGroup Label="Globals">
   <CustomProjectExtensionsPath>$(LocalAppData)\CustomProjectSystems\Cmajor\</CustomProjectExtensionsPath>
-  <ProjectGuid>eb5fdef2-8864-466e-b8f5-5002c8b87cbc</ProjectGuid>
+  <ProjectGuid>dff153a5-6137-458e-875e-f82a1d9397af</ProjectGuid>
  </PropertyGroup>
  <PropertyGroup>
   <TargetType>library</TargetType>
@@ -22,6 +22,7 @@
   <CmCompile Include="ConditionVariable.cm"/>
   <CmCompile Include="Console.cm"/>
   <CmCompile Include="Conversion.cm"/>
+  <CmCompile Include="Directory.cm"/>
   <CmCompile Include="Exception.cm"/>
   <CmCompile Include="Execute.cm"/>
   <CmCompile Include="File.cm"/>
@@ -47,6 +48,7 @@
   <CmCompile Include="RedBlackTree.cm"/>
   <CmCompile Include="Rvalue.cm"/>
   <CmCompile Include="Set.cm"/>
+  <CmCompile Include="Sha1.cm"/>
   <CmCompile Include="SharedPtr.cm"/>
   <CmCompile Include="Stack.cm"/>
   <CmCompile Include="Stream.cm"/>
@@ -61,6 +63,7 @@
   <CmCompile Include="UnicodeChar.cm"/>
   <CmCompile Include="UniquePtr.cm"/>
   <CmCompile Include="Utility.cm"/>
+  <CmCompile Include="Uuid.cm"/>
  </ItemGroup>
  <ItemGroup/>
  <ItemGroup>

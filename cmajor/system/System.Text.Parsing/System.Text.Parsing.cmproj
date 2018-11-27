@@ -2,7 +2,7 @@
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
  <PropertyGroup Label="Globals">
   <CustomProjectExtensionsPath>$(LocalAppData)\CustomProjectSystems\Cmajor\</CustomProjectExtensionsPath>
-  <ProjectGuid>79a59d44-8802-42bd-9c65-0c7b3f46624c</ProjectGuid>
+  <ProjectGuid>f84afc3f-8e60-4117-85cd-5efe3d07722e</ProjectGuid>
  </PropertyGroup>
  <PropertyGroup>
   <TargetType>library</TargetType>

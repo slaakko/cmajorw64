@@ -1,5 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <rules>
+    <type source="bool" target="bool"/>
+    <type source="char" target="char"/>
+    <type source="wchar_t" target="wchar"/>
+    <type source="char16_t" target="wchar"/>
+    <type source="char32_t" target="uchar"/>
+    <type source="signed char" target="sbyte"/>
+    <type source="unsigned char" target="byte"/>
+    <type source="short int" target="short"/>
+    <type source="unsigned short int" target="ushort"/>
+    <type source="int" target="int"/>
+    <type source="unsigned int" target="uint"/>
+    <type source="long" target="int"/>
+    <type source="unsigned long int" target="uint"/>
+    <type source="long long int" target="long"/>
+    <type source="unsigned long long int" target="ulong"/>
+    <type source="float" target="float"/>
+    <type source="double" target="double"/>
+    <type source="void" target="void"/>
+
     <type source="std::int8_t" target="sbyte"/>
     <type source="std::uint8_t" target="byte"/>
     <type source="std::int16_t" target="short"/>
@@ -8,6 +27,23 @@
     <type source="std::uint32_t" target="uint"/>
     <type source="std::int64_t" target="long"/>
     <type source="std::uint64_t" target="ulong"/>
+	
+	<type source="std::unique_ptr&lt;T>" target="System.UniquePtr&lt;T>" members="unique_ptr_members"/>
+	
+	<members id="unique_ptr_members">
+		<member source="get" target="Get"/>
+		<member source="release" target="Release"/>
+		<member source="reset" target="Reset"/>
+		<member source="swap" target="Swap"/>
+	</members>
+	
+	<type source="std::shared_ptr&lt;T>" target="System.SharedPtr&lt;T>" members="shared_ptr_members"/>
+	
+	<members id="shared_ptr_members">
+		<member source="get" target="Get"/>
+		<member source="reset" target="Reset"/>
+		<member source="swap" target="Swap"/>
+	</members>
 	
     <type source="std::string" target="System.string" members="string_members"/>
     <type source="std::basic_string&lt;CharT>" target="System.String&lt;CharT>" members="string_members"/>
@@ -119,7 +155,7 @@
         <member source="find" target="Find"/>
     </members>
 
-    <type source="std::unordered_map&lt;Key>, T, Hash=std::hash&lt;Key>, KeyEqual=std::equal_to&lt;Key>>"
+    <type source="std::unordered_map&lt;Key, T, Hash=std::hash&lt;Key>, KeyEqual=std::equal_to&lt;Key>>"
           target="System.Collections.HashMap&lt;Key>, T, Hash=System.Collections.Hasher&lt;Key>, KeyEqual=System.EqualTo&lt;Key>>" members="unordered_map_members"/>
 
     <members id="unordered_map_members">

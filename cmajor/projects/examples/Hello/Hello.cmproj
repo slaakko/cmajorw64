@@ -2,7 +2,7 @@
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
  <PropertyGroup Label="Globals">
   <CustomProjectExtensionsPath>$(LocalAppData)\CustomProjectSystems\Cmajor\</CustomProjectExtensionsPath>
-  <ProjectGuid>d5dd05c3-dd00-42eb-a21b-613610fdc530</ProjectGuid>
+  <ProjectGuid>90b82370-ef13-48f0-9007-33ae0f3c275b</ProjectGuid>
  </PropertyGroup>
  <PropertyGroup>
   <TargetType>program</TargetType>

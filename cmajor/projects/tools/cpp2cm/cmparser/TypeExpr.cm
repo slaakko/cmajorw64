@@ -20,7 +20,7 @@ namespace cmparser
             CreateRules();
             Link();
         }
-        public Node* Parse(const uchar* start, const uchar* end, int fileIndex, const string& fileName)
+        public Node* Parse(const uchar* start, const uchar* end, int fileIndex, const string& fileName, ParsingContext* ctx)
         {
             Scanner scanner(start, end, fileName, fileIndex, SkipRule());
             UniquePtr<XmlLog> xmlLog;
@@ -34,6 +34,7 @@ namespace cmparser
             Stack<UniquePtr<Object>> stack;
             UniquePtr<ParsingData> parsingData(new ParsingData(Domain()->NumRules()));
             scanner.SetParsingData(parsingData.Get());
+            stack.Push(UniquePtr<Object>(new ValueObject<ParsingContext*>(ctx)));
             Match match = base->Parse(scanner, stack, parsingData.Get());
             Span stop = scanner.GetSpan();
             if (Log() != null)
@@ -61,12 +62,15 @@ namespace cmparser
         {
             public TypeExprRule(const ustring& name_, Scope* enclosingScope_, int id_, Parser* definition_) : base(name_, enclosingScope_, id_, definition_)
             {
+                AddInheritedAttribute(AttrOrVar(ToUtf32("ParsingContext*"), ToUtf32("ctx")));
                 SetValueTypeName(ToUtf32("Node*"));
             }
             public override void Enter(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
             {
                 parsingData->PushContext(Id(), new Context());
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                UniquePtr<Object> ctx_value = stack.Pop();
+                context->ctx = *cast<ValueObject<ParsingContext*>*>(ctx_value.Get());
             }
             public override void Leave(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
             {
@@ -82,12 +86,18 @@ namespace cmparser
                 ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
                 a0ActionParser->SetAction(A0Action);
                 NonterminalParser* prefixTypeExprNonterminalParser = GetNonterminal(ToUtf32("PrefixTypeExpr"));
+                prefixTypeExprNonterminalParser->SetPre(PrePrefixTypeExpr);
                 prefixTypeExprNonterminalParser->SetPost(PostPrefixTypeExpr);
             }
             public void A0Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
                 context->value = context->fromPrefixTypeExpr;
+            }
+            public void PrePrefixTypeExpr(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                stack.Push(UniquePtr<Object>(new ValueObject<ParsingContext*>(context->ctx)));
             }
             public void PostPrefixTypeExpr(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
             {
@@ -100,9 +110,10 @@ namespace cmparser
             }
             public class Context : System.Text.Parsing.Context
             {
-                public Context() : value(), fromPrefixTypeExpr()
+                public Context() : ctx(), value(), fromPrefixTypeExpr()
                 {
                 }
+                public ParsingContext* ctx;
                 public Node* value;
                 public Node* fromPrefixTypeExpr;
             }
@@ -112,12 +123,15 @@ namespace cmparser
         {
             public PrefixTypeExprRule(const ustring& name_, Scope* enclosingScope_, int id_, Parser* definition_) : base(name_, enclosingScope_, id_, definition_)
             {
+                AddInheritedAttribute(AttrOrVar(ToUtf32("ParsingContext*"), ToUtf32("ctx")));
                 SetValueTypeName(ToUtf32("Node*"));
             }
             public override void Enter(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
             {
                 parsingData->PushContext(Id(), new Context());
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                UniquePtr<Object> ctx_value = stack.Pop();
+                context->ctx = *cast<ValueObject<ParsingContext*>*>(ctx_value.Get());
             }
             public override void Leave(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
             {
@@ -135,8 +149,10 @@ namespace cmparser
                 ActionParser* a1ActionParser = GetAction(ToUtf32("A1"));
                 a1ActionParser->SetAction(A1Action);
                 NonterminalParser* pf1NonterminalParser = GetNonterminal(ToUtf32("pf1"));
+                pf1NonterminalParser->SetPre(Prepf1);
                 pf1NonterminalParser->SetPost(Postpf1);
                 NonterminalParser* pf2NonterminalParser = GetNonterminal(ToUtf32("pf2"));
+                pf2NonterminalParser->SetPre(Prepf2);
                 pf2NonterminalParser->SetPost(Postpf2);
             }
             public void A0Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
@@ -149,6 +165,11 @@ namespace cmparser
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
                 context->value = context->frompf2;
             }
+            public void Prepf1(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                stack.Push(UniquePtr<Object>(new ValueObject<ParsingContext*>(context->ctx)));
+            }
             public void Postpf1(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
@@ -157,6 +178,11 @@ namespace cmparser
                     UniquePtr<Object> frompf1_value = stack.Pop();
                     context->frompf1 = *cast<ValueObject<Node*>*>(frompf1_value.Get());
                 }
+            }
+            public void Prepf2(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                stack.Push(UniquePtr<Object>(new ValueObject<ParsingContext*>(context->ctx)));
             }
             public void Postpf2(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
             {
@@ -169,9 +195,10 @@ namespace cmparser
             }
             public class Context : System.Text.Parsing.Context
             {
-                public Context() : value(), frompf1(), frompf2()
+                public Context() : ctx(), value(), frompf1(), frompf2()
                 {
                 }
+                public ParsingContext* ctx;
                 public Node* value;
                 public Node* frompf1;
                 public Node* frompf2;
@@ -182,6 +209,7 @@ namespace cmparser
         {
             public PostfixTypeExprRule(const ustring& name_, Scope* enclosingScope_, int id_, Parser* definition_) : base(name_, enclosingScope_, id_, definition_)
             {
+                AddInheritedAttribute(AttrOrVar(ToUtf32("ParsingContext*"), ToUtf32("ctx")));
                 SetValueTypeName(ToUtf32("Node*"));
                 AddLocalVariable(AttrOrVar(ToUtf32("UniquePtr<Node>"), ToUtf32("node")));
             }
@@ -189,6 +217,8 @@ namespace cmparser
             {
                 parsingData->PushContext(Id(), new Context());
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                UniquePtr<Object> ctx_value = stack.Pop();
+                context->ctx = *cast<ValueObject<ParsingContext*>*>(ctx_value.Get());
             }
             public override void Leave(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
             {
@@ -214,6 +244,7 @@ namespace cmparser
                 ActionParser* a5ActionParser = GetAction(ToUtf32("A5"));
                 a5ActionParser->SetAction(A5Action);
                 NonterminalParser* primaryTypeExprNonterminalParser = GetNonterminal(ToUtf32("PrimaryTypeExpr"));
+                primaryTypeExprNonterminalParser->SetPre(PrePrimaryTypeExpr);
                 primaryTypeExprNonterminalParser->SetPost(PostPrimaryTypeExpr);
                 NonterminalParser* identifierNonterminalParser = GetNonterminal(ToUtf32("Identifier"));
                 identifierNonterminalParser->SetPost(PostIdentifier);
@@ -248,6 +279,11 @@ namespace cmparser
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
                 context->node.Reset(new LvalueRefNode(context->node.Release()));
             }
+            public void PrePrimaryTypeExpr(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                stack.Push(UniquePtr<Object>(new ValueObject<ParsingContext*>(context->ctx)));
+            }
             public void PostPrimaryTypeExpr(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
@@ -268,9 +304,10 @@ namespace cmparser
             }
             public class Context : System.Text.Parsing.Context
             {
-                public Context() : value(), node(), fromPrimaryTypeExpr(), fromIdentifier()
+                public Context() : ctx(), value(), node(), fromPrimaryTypeExpr(), fromIdentifier()
                 {
                 }
+                public ParsingContext* ctx;
                 public Node* value;
                 public UniquePtr<Node> node;
                 public Node* fromPrimaryTypeExpr;
@@ -282,12 +319,15 @@ namespace cmparser
         {
             public PrimaryTypeExprRule(const ustring& name_, Scope* enclosingScope_, int id_, Parser* definition_) : base(name_, enclosingScope_, id_, definition_)
             {
+                AddInheritedAttribute(AttrOrVar(ToUtf32("ParsingContext*"), ToUtf32("ctx")));
                 SetValueTypeName(ToUtf32("Node*"));
             }
             public override void Enter(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
             {
                 parsingData->PushContext(Id(), new Context());
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                UniquePtr<Object> ctx_value = stack.Pop();
+                context->ctx = *cast<ValueObject<ParsingContext*>*>(ctx_value.Get());
             }
             public override void Leave(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
             {
@@ -309,6 +349,7 @@ namespace cmparser
                 NonterminalParser* basicTypeNonterminalParser = GetNonterminal(ToUtf32("BasicType"));
                 basicTypeNonterminalParser->SetPost(PostBasicType);
                 NonterminalParser* templateIdNonterminalParser = GetNonterminal(ToUtf32("TemplateId"));
+                templateIdNonterminalParser->SetPre(PreTemplateId);
                 templateIdNonterminalParser->SetPost(PostTemplateId);
                 NonterminalParser* identifierNonterminalParser = GetNonterminal(ToUtf32("Identifier"));
                 identifierNonterminalParser->SetPost(PostIdentifier);
@@ -337,13 +378,18 @@ namespace cmparser
                     context->fromBasicType = *cast<ValueObject<Node*>*>(fromBasicType_value.Get());
                 }
             }
+            public void PreTemplateId(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                stack.Push(UniquePtr<Object>(new ValueObject<ParsingContext*>(context->ctx)));
+            }
             public void PostTemplateId(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
                 if (matched)
                 {
                     UniquePtr<Object> fromTemplateId_value = stack.Pop();
-                    context->fromTemplateId = *cast<ValueObject<Node*>*>(fromTemplateId_value.Get());
+                    context->fromTemplateId = *cast<ValueObject<TemplateIdNode*>*>(fromTemplateId_value.Get());
                 }
             }
             public void PostIdentifier(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
@@ -357,12 +403,13 @@ namespace cmparser
             }
             public class Context : System.Text.Parsing.Context
             {
-                public Context() : value(), fromBasicType(), fromTemplateId(), fromIdentifier()
+                public Context() : ctx(), value(), fromBasicType(), fromTemplateId(), fromIdentifier()
                 {
                 }
+                public ParsingContext* ctx;
                 public Node* value;
                 public Node* fromBasicType;
-                public Node* fromTemplateId;
+                public TemplateIdNode* fromTemplateId;
                 public IdentifierNode* fromIdentifier;
             }
         }
@@ -370,16 +417,16 @@ namespace cmparser
         public override void GetReferencedGrammars()
         {
             ParsingDomain* pd = Domain();
-            Grammar* grammar0 = pd->GetGrammar(ToUtf32("cmparser.TemplateGrammar"));
+            Grammar* grammar0 = pd->GetGrammar(ToUtf32("cmparser.BasicTypeGrammar"));
             if (grammar0 == null)
             {
-                grammar0 = new cmparser.TemplateGrammar(pd);
+                grammar0 = new cmparser.BasicTypeGrammar(pd);
             }
             AddGrammarReference(grammar0);
-            Grammar* grammar1 = pd->GetGrammar(ToUtf32("cmparser.BasicTypeGrammar"));
+            Grammar* grammar1 = pd->GetGrammar(ToUtf32("cmparser.TemplateGrammar"));
             if (grammar1 == null)
             {
-                grammar1 = new cmparser.BasicTypeGrammar(pd);
+                grammar1 = new cmparser.TemplateGrammar(pd);
             }
             AddGrammarReference(grammar1);
             Grammar* grammar2 = pd->GetGrammar(ToUtf32("System.Text.Parsing.stdlib"));
@@ -403,21 +450,21 @@ namespace cmparser
             AddRuleLink(new System.Text.Parsing.RuleLink(ToUtf32("spaces"), this, ToUtf32("System.Text.Parsing.stdlib.spaces")));
             AddRule(new TypeExprRule(ToUtf32("TypeExpr"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.ActionParser(ToUtf32("A0"),
-                    new System.Text.Parsing.NonterminalParser(ToUtf32("PrefixTypeExpr"), ToUtf32("PrefixTypeExpr"), 0))));
+                    new System.Text.Parsing.NonterminalParser(ToUtf32("PrefixTypeExpr"), ToUtf32("PrefixTypeExpr"), 1))));
             AddRule(new PrefixTypeExprRule(ToUtf32("PrefixTypeExpr"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.AlternativeParser(
                     new System.Text.Parsing.SequenceParser(
                         new System.Text.Parsing.KeywordParser(ToUtf32("const")),
                         new System.Text.Parsing.ActionParser(ToUtf32("A0"),
-                            new System.Text.Parsing.NonterminalParser(ToUtf32("pf1"), ToUtf32("PostfixTypeExpr"), 0))),
+                            new System.Text.Parsing.NonterminalParser(ToUtf32("pf1"), ToUtf32("PostfixTypeExpr"), 1))),
                     new System.Text.Parsing.ActionParser(ToUtf32("A1"),
-                        new System.Text.Parsing.NonterminalParser(ToUtf32("pf2"), ToUtf32("PostfixTypeExpr"), 0)))));
+                        new System.Text.Parsing.NonterminalParser(ToUtf32("pf2"), ToUtf32("PostfixTypeExpr"), 1)))));
             AddRule(new PostfixTypeExprRule(ToUtf32("PostfixTypeExpr"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.ActionParser(ToUtf32("A0"),
                     new System.Text.Parsing.GroupingParser(
                         new System.Text.Parsing.SequenceParser(
                             new System.Text.Parsing.ActionParser(ToUtf32("A1"),
-                                new System.Text.Parsing.NonterminalParser(ToUtf32("PrimaryTypeExpr"), ToUtf32("PrimaryTypeExpr"), 0)),
+                                new System.Text.Parsing.NonterminalParser(ToUtf32("PrimaryTypeExpr"), ToUtf32("PrimaryTypeExpr"), 1)),
                             new System.Text.Parsing.KleeneStarParser(
                                 new System.Text.Parsing.GroupingParser(
                                     new System.Text.Parsing.AlternativeParser(
@@ -439,7 +486,7 @@ namespace cmparser
                         new System.Text.Parsing.ActionParser(ToUtf32("A0"),
                             new System.Text.Parsing.NonterminalParser(ToUtf32("BasicType"), ToUtf32("BasicType"), 0)),
                         new System.Text.Parsing.ActionParser(ToUtf32("A1"),
-                            new System.Text.Parsing.NonterminalParser(ToUtf32("TemplateId"), ToUtf32("TemplateId"), 0))),
+                            new System.Text.Parsing.NonterminalParser(ToUtf32("TemplateId"), ToUtf32("TemplateId"), 1))),
                     new System.Text.Parsing.ActionParser(ToUtf32("A2"),
                         new System.Text.Parsing.NonterminalParser(ToUtf32("Identifier"), ToUtf32("Identifier"), 0)))));
             SetSkipRuleName(ToUtf32("spaces"));

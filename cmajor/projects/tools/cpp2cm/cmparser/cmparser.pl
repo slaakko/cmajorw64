@@ -2,14 +2,15 @@ namespace cmparser
 {
     grammar TypeExprGrammar
     {
-        TypeExpr : Node*;
-        PrefixTypeExpr : Node*;
-        PostfixTypeExpr(var UniquePtr<Node> node) : Node*;
-        PrimaryTypeExpr : Node*;
+        TypeExpr(ParsingContext* ctx) : Node*;
+        PrefixTypeExpr(ParsingContext* ctx) : Node*;
+        PostfixTypeExpr(ParsingContext* ctx, var UniquePtr<Node> node) : Node*;
+        PrimaryTypeExpr(ParsingContext* ctx) : Node*;
     }
     grammar TemplateGrammar
     {
-        TemplateId(var UniquePtr<TemplateIdNode> templateId) : TemplateIdNode*;
+        RuleTemplateParameter(ParsingContext* ctx) : Node*;
+        TemplateId(ParsingContext* ctx, var UniquePtr<TemplateIdNode> templateId) : TemplateIdNode*;
     }
     grammar IdentifierGrammar
     {

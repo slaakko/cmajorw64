@@ -11,18 +11,18 @@ namespace cmparser
         using stdlib.spaces;
         skip spaces;
         
-        TypeExpr : Node*
-            ::= PrefixTypeExpr{ value = PrefixTypeExpr; }
+        TypeExpr(ParsingContext* ctx) : Node*
+            ::= PrefixTypeExpr(ctx){ value = PrefixTypeExpr; }
             ;
             
-        PrefixTypeExpr : Node*
-            ::= keyword("const") PostfixTypeExpr:pf1{ value = new ConstNode(pf1); }
-            |   PostfixTypeExpr:pf2{ value = pf2; }
+        PrefixTypeExpr(ParsingContext* ctx) : Node*
+            ::= keyword("const") PostfixTypeExpr(ctx):pf1{ value = new ConstNode(pf1); }
+            |   PostfixTypeExpr(ctx):pf2{ value = pf2; }
             ;
             
-        PostfixTypeExpr(var UniquePtr<Node> node) : Node*
+        PostfixTypeExpr(ParsingContext* ctx, var UniquePtr<Node> node) : Node*
             ::= 
-            (   PrimaryTypeExpr{ node.Reset(PrimaryTypeExpr); }
+            (   PrimaryTypeExpr(ctx){ node.Reset(PrimaryTypeExpr); }
                 (   '.' Identifier{ node.Reset(new DotNode(node.Release(), Identifier)); }
                 |   '*'{ node.Reset(new PointerNode(node.Release())); }
                 |   "&&"{ node.Reset(new RvalueRefNode(node.Release())); }
@@ -34,9 +34,9 @@ namespace cmparser
             }
             ;
             
-        PrimaryTypeExpr : Node*
+        PrimaryTypeExpr(ParsingContext* ctx) : Node*
             ::= BasicType{ value = BasicType; }
-            |   TemplateId{ value = TemplateId; }
+            |   TemplateId(ctx){ value = TemplateId; }
             |   Identifier{ value = Identifier; }
             ;
     }

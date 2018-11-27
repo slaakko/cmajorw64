@@ -139,7 +139,7 @@ int main(int argc, const char** argv)
         {
             cppElement = cppDoc->DocumentElement();
         }
-        SourceFileGrammar* sourceFileGrammar = Parser.GetSourceFileGrammar();
+        SourceFileGrammar* sourceFileGrammar = Parser.Instance().GetSourceFileGrammar();
         if (Flags.Debug())
         {
             sourceFileGrammar->SetLog(&Console.Out());
@@ -184,7 +184,7 @@ int main(int argc, const char** argv)
             SymbolTableXmlGenerator symbolTableXmlGenerator;
             SymbolTable symbolTable;
             ConversionTable conversionTable;
-            ReadRules(symbolTable, conversionTable);
+            ReadRules(symbolTable, conversionTable, Flags.Verbose());
             SymbolCreator symbolCreator(symbolTable, errors);
             compileUnit->Accept(symbolCreator);
             symbolTableXmlGenerator.ToXml(symbolTable);

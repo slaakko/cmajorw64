@@ -9,6 +9,8 @@ namespace cppparser
         using TemplateGrammar.TemplateId;
         using ClassGrammar.ClassKey;
         using IdentifierGrammar.QualifiedId;
+        using stdlib.spaces;
+        skip spaces;
 
         TypeExpr(ParsingContext* ctx) : Node*
             ::= PrefixTypeExpr(ctx){ value = PrefixTypeExpr; }
