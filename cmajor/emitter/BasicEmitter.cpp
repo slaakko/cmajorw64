@@ -156,11 +156,20 @@ void BasicEmitter::Visit(BoundCompileUnit& boundCompileUnit)
     }
     llvm::legacy::PassManager passManager;
     std::error_code errorCode;
+#ifdef _WIN32
     llvm::raw_fd_ostream objectFile(boundCompileUnit.ObjectFilePath(), errorCode, llvm::sys::fs::F_None);
     if (emittingContext.GetEmittingContextImpl()->TargetMachine().addPassesToEmitFile(passManager, objectFile, nullptr, llvm::TargetMachine::CodeGenFileType::CGFT_ObjectFile))
     {
         throw std::runtime_error("Emitter: cannot emit object code file '" + boundCompileUnit.ObjectFilePath() + "': addPassesToEmitFile failed");
     }
+#else
+    llvm::raw_fd_ostream objectFile(boundCompileUnit.ObjectFilePath(), errorCode, llvm::sys::fs::F_None);
+    llvm::raw_fd_ostream dwarfFile(boundCompileUnit.ObjectFilePath() + ".dwo", errorCode, llvm::sys::fs::F_None);
+    if (emittingContext.GetEmittingContextImpl()->TargetMachine().addPassesToEmitFile(passManager, objectFile, dwarfFile, llvm::TargetMachine::CodeGenFileType::CGFT_ObjectFile))
+    {
+        throw std::runtime_error("Emitter: cannot emit object code file '" + boundCompileUnit.ObjectFilePath() + "': addPassesToEmitFile failed");
+    }
+#endif
     passManager.run(*compileUnitModule);
     objectFile.flush();
     if (objectFile.has_error())
