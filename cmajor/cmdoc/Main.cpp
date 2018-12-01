@@ -127,6 +127,10 @@ int main(int argc, const char** argv)
                 cmdocXmlFilePaths.push_back(arg);
             }
         }
+#ifndef _WIN32
+        SetNumBuildThreads(1);
+        SetGlobalFlag(GlobalFlags::singleThreadedCompile);
+#endif
         for (const std::string& cmDocFilePath : cmdocXmlFilePaths)
         {
             Input input = ReadInputXml(cmDocFilePath); 

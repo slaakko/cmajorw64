@@ -952,6 +952,9 @@ int main(int argc, const char** argv)
                 projectsAndSolutions.push_back(arg);
             }
         }
+#ifndef _WIN32
+        noDebugInfo = true;
+#endif
         if (!GetGlobalFlag(GlobalFlags::release) && !noDebugInfo)
         {
             SetGlobalFlag(GlobalFlags::generateDebugInfo);

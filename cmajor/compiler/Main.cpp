@@ -381,12 +381,18 @@ int main(int argc, const char** argv)
                 std::cout << "Cmajor compiler version " << version << std::endl;
 #endif
             }
+#ifndef _WIN32
+            noDebugInfo = true;
+#endif
             SetUseModuleCache(useModuleCache);
             if (!GetGlobalFlag(GlobalFlags::release) && !noDebugInfo)
             {
                 SetGlobalFlag(GlobalFlags::generateDebugInfo);
             }
-            //SetGlobalFlag(GlobalFlags::singleThreadedCompile); // todo
+#ifndef _WIN32
+            SetNumBuildThreads(1);
+            SetGlobalFlag(GlobalFlags::singleThreadedCompile); 
+#endif
             for (const std::string& file : files)
             {
                 boost::filesystem::path fp(file);

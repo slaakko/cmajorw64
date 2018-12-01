@@ -57,8 +57,8 @@ install:
 	ln -f $(prefix)/lib/$(cmrtsoname).so.3.0.0 $(prefix)/lib/$(cmrtsoname).so
 
 sys:
-	cmc --verbose -bt=1 -st system/System.cms
-	cmc --verbose -bt=1 -st --config=release system/System.cms
+	cmc --verbose system/System.cms
+	cmc --verbose --config=release system/System.cms
 
 clean:
 	$(MAKE) -C util clean
