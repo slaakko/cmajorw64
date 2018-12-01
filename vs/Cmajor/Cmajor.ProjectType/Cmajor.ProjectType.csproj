@@ -122,6 +122,12 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Cmajor.MenuCommands\Cmajor.MenuCommands.csproj">
+      <Project>{756CC65C-8B00-4E7C-B79B-9534BA9E74CB}</Project>
+      <Name>Cmajor.MenuCommands</Name>
+      <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup%3bBuiltProjectOutputGroupDependencies%3bGetCopyToOutputDirectoryItems%3bSatelliteDllsProjectOutputGroup%3bPkgdefProjectOutputGroup%3b</IncludeOutputGroupsInVSIX>
+      <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup%3b</IncludeOutputGroupsInVSIXLocalOnly>
+    </ProjectReference>
     <ProjectReference Include="..\Cmajor.Editor\Cmajor.Editor.csproj">
       <Project>{5941F963-11E2-40AC-AEFD-2BC9EDE5E477}</Project>
       <Name>Cmajor.Editor</Name>
