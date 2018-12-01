@@ -474,10 +474,10 @@ void Link(const std::string& executableFilePath, const std::string& libraryFileP
     std::string defFilePath = GetFullPath(boost::filesystem::path(libraryFilePath).replace_extension(".def").generic_string());
     CreateDefFile(defFilePath, module);
     args.push_back("/def:" + QuotedPath(defFilePath));
-    std::string cmrtLibName = "cmrt240.lib";
+    std::string cmrtLibName = "cmrt300.lib";
     if (GetGlobalFlag(GlobalFlags::linkWithDebugRuntime))
     {
-        cmrtLibName = "cmrt240d.lib";
+        cmrtLibName = "cmrt300d.lib";
     }
     args.push_back(QuotedPath(Path::Combine(Path::Combine(CmajorRootDir(), "lib"), cmrtLibName)));
     int n = libraryFilePaths.size();

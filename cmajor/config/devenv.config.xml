@@ -28,11 +28,7 @@
     <maxRecentProjects>10</maxRecentProjects>
     <recentProjects>
         <recentProject>
-            <path>D:\work\cmajorw64\cmajor\projects\tools\cpp2cm\cpp2cm.cms</path>
-            <openFiles />
-        </recentProject>
-        <recentProject>
-            <path>D:\work\cmajorw64\cmajor\system\System.cms</path>
+            <path>D:\work\cmajorw64\cmajor\projects\examples\examples.cms</path>
             <openFiles />
         </recentProject>
         <recentProject>
@@ -40,7 +36,11 @@
             <openFiles />
         </recentProject>
         <recentProject>
-            <path>D:\work\cmajorw64\cmajor\projects\examples\examples.cms</path>
+            <path>D:\work\cmajorw64\cmajor\system\System.cms</path>
+            <openFiles />
+        </recentProject>
+        <recentProject>
+            <path>D:\work\cmajorw64\cmajor\projects\tools\cpp2cm\cpp2cm.cms</path>
             <openFiles />
         </recentProject>
         <recentProject>
@@ -71,7 +71,7 @@
     <strictNothrow>false</strictNothrow>
     <emitLlvm>true</emitLlvm>
     <emitOptLlvm>false</emitOptLlvm>
-    <linkWithDebugRuntime>true</linkWithDebugRuntime>
+    <linkWithDebugRuntime>false</linkWithDebugRuntime>
     <linkUsingMsLink>false</linkUsingMsLink>
     <doNotUseModuleCache>false</doNotUseModuleCache>
     <numBuildThreads>0</numBuildThreads>
