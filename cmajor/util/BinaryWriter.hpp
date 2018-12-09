@@ -53,6 +53,8 @@ public:
     void Write(const std::u32string& s);
     void WriteULEB128UInt(uint32_t x);
     void WriteULEB128ULong(uint64_t x);
+    void WriteSLEB128Int(int32_t x);
+    void WriteSLEB128Long(int64_t x);
     void Write(const boost::uuids::uuid& uuid);
     uint32_t Pos() const { return pos; }
     void Seek(uint32_t pos_);

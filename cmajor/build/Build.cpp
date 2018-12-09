@@ -471,9 +471,10 @@ void Link(const std::string& executableFilePath, const std::string& libraryFileP
     args.push_back("/debug");
     args.push_back("/out:" + QuotedPath(executableFilePath));
     args.push_back("/stack:16777216");
-    std::string defFilePath = GetFullPath(boost::filesystem::path(libraryFilePath).replace_extension(".def").generic_string());
-    CreateDefFile(defFilePath, module);
-    args.push_back("/def:" + QuotedPath(defFilePath));
+    // We don't need these any more...
+    // std::string defFilePath = GetFullPath(boost::filesystem::path(libraryFilePath).replace_extension(".def").generic_string());
+    // CreateDefFile(defFilePath, module);
+    // args.push_back("/def:" + QuotedPath(defFilePath));
     std::string cmrtLibName = "cmrt300.lib";
     if (GetGlobalFlag(GlobalFlags::linkWithDebugRuntime))
     {
@@ -562,9 +563,10 @@ void Link(const std::string& executableFilePath, const std::string& libraryFileP
     {
         args.push_back("-L" + std::string(cmajorLibDir));
     }
-    std::string dynamicListFilePath = GetFullPath(boost::filesystem::path(libraryFilePath).replace_extension(".export").generic_string());
-    CreateDynamicListFile(dynamicListFilePath, module);
-    args.push_back("-Wl,--dynamic-list=" + dynamicListFilePath);
+    // We don't need these any more...
+    // std::string dynamicListFilePath = GetFullPath(boost::filesystem::path(libraryFilePath).replace_extension(".export").generic_string());
+    // CreateDynamicListFile(dynamicListFilePath, module);
+    // args.push_back("-Wl,--dynamic-list=" + dynamicListFilePath);
     args.push_back("-Xlinker --start-group");
     int n = libraryFilePaths.size();
     args.push_back(QuotedPath(libraryFilePaths.back()));

@@ -17,6 +17,7 @@
 #include <cmajor/rt/ConditionVariable.hpp>
 #include <cmajor/rt/Thread.hpp>
 #include <cmajor/rt/Memory.hpp>
+#include <cmajor/rt/Screen.hpp>
 #ifdef _WIN32
 #include <cmajor/rt/CommandLine.hpp>
 #endif
@@ -52,6 +53,7 @@ void Init(int64_t numberOfPolymorphicClassIds, const uint64_t* polymorphicClassI
     cmajor::parsing::Init();
     cmajor::util::Init();
     InitIo();
+    InitScreen();
     InitDirectory();
     InitError();
     InitString();
@@ -82,6 +84,7 @@ void Done()
     DoneString();
     DoneError();
     DoneDirectory();
+    DoneScreen();
     DoneIo();
     cmajor::util::Done();
     cmajor::parsing::Done();

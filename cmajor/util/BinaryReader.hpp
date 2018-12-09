@@ -35,6 +35,8 @@ public:
     std::u32string ReadUtf32String();
     uint32_t ReadULEB128UInt();
     uint64_t ReadULEB128ULong();
+    int32_t ReadSLEB128Int();
+    int64_t ReadSLEB128Long();
     void ReadUuid(boost::uuids::uuid& uuid);
     uint32_t Pos() const { return pos; }
     void Skip(uint32_t size);

@@ -178,6 +178,54 @@ void BinaryWriter::WriteULEB128ULong(uint64_t x)
     while (x != 0);
 }
 
+void BinaryWriter::WriteSLEB128Int(int32_t x)
+{
+    bool more = true;
+    bool negative = x < 0;
+    while (more)
+    {
+        uint8_t b = x & 0x7F;
+        x >>= 7;
+        if (negative)
+        {
+            x |= ~int32_t(0) << (32 - 7);
+        }
+        if (x == 0 && (b & 0x40) == 0 || x == -1 && (b & 0x40) != 0)
+        {
+            more = false;
+        }
+        else
+        {
+            b |= 0x80;
+        }
+        Write(b);
+    }
+}
+
+void BinaryWriter::WriteSLEB128Long(int64_t x)
+{
+    bool more = true;
+    bool negative = x < 0;
+    while (more)
+    {
+        uint8_t b = x & 0x7F;
+        x >>= 7;
+        if (negative)
+        {
+            x |= ~int64_t(0) << (64 - 7);
+        }
+        if (x == 0 && (b & 0x40) == 0 || x == -1 && (b & 0x40) != 0)
+        {
+            more = false;
+        }
+        else
+        {
+            b |= 0x80;
+        }
+        Write(b);
+    }
+}
+
 void BinaryWriter::Write(const boost::uuids::uuid& uuid)
 {
     for (boost::uuids::uuid::value_type x : uuid)

@@ -124,6 +124,68 @@ namespace System.IO
             string s = ReadString();
             return ToUtf32(s);
         }
+        public uint ReadULEB128UInt()
+        {
+            uint result = 0u;
+            uint shift = 0u;
+            while (true)
+            {
+                byte b = ReadByte();
+                result = result | ((b & 0x7Fu) << shift);
+                if ((b & 0x80u) == 0u) break;
+                shift = shift + 7u;
+            }
+            return result;
+        }
+        public ulong ReadULEB128ULong()
+        {
+            ulong result = 0u;
+            ulong shift = 0u;
+            while (true)
+            {
+                byte b = ReadByte();
+                result = result | ((b & 0x7Fu) << shift);
+                if ((b & 0x80u) == 0u) break;
+                shift = shift + 7u;
+            }
+            return result;
+        }
+        public int ReadSLEB128Int()
+        {
+            int result = 0;
+            int shift = 0;
+            byte b = 0u;
+            do
+            {
+                b = ReadByte();
+                result = result | ((b & 0x7Fu) << shift);
+                shift = shift + 7;
+            }
+            while ((b & 0x80u) != 0u);
+            if ((shift < 32) && (b & 0x40u) != 0u)
+            {
+                result = result | ~cast<int>(0) << shift;
+            }
+            return result;
+        }
+        public long ReadSLEB128Long()
+        {
+            long result = 0;
+            long shift = 0;
+            byte b = 0u;
+            do
+            {
+                b = ReadByte();
+                result = result | ((b & 0x7Fu) << shift);
+                shift = shift + 7;
+            }
+            while ((b & 0x80u) != 0u);
+            if ((shift < 64) && (b & 0x40u) != 0u)
+            {
+                result = result | ~cast<long>(0) << shift;
+            }
+            return result;
+        }
         public Uuid ReadUuid()
         {
             Uuid uuid;

@@ -13,6 +13,7 @@
 #include <memory>
 #include <malloc.h>
 #include <fstream>
+#include <vector>
 
 namespace cmajor { namespace rt {
 

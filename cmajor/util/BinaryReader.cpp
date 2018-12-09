@@ -171,6 +171,44 @@ uint64_t BinaryReader::ReadULEB128ULong()
     return result;
 }
 
+int32_t BinaryReader::ReadSLEB128Int()
+{
+    int32_t result = 0;
+    int32_t shift = 0;
+    uint8_t b = 0;
+    do
+    {
+        b = ReadByte();
+        result |= (b & 0x7F) << shift;
+        shift += 7;
+    } 
+    while ((b & 0x80) != 0);
+    if ((shift < 32) && (b & 0x40) != 0)
+    {
+        result |= ~int32_t(0) << shift;
+    }
+    return result;
+}
+
+int64_t BinaryReader::ReadSLEB128Long()
+{
+    int64_t result = 0;
+    int64_t shift = 0;
+    uint8_t b = 0;
+    do 
+    {
+        b = ReadByte();
+        result |= (b & 0x7F) << shift;
+        shift += 7;
+    }
+    while ((b & 0x80) != 0);
+    if ((shift < 64) && (b & 0x40) != 0)
+    {
+        result |= ~int64_t(0) << shift;
+    }
+    return result;
+}
+
 void BinaryReader::ReadUuid(boost::uuids::uuid& uuid)
 {
     for (boost::uuids::uuid::value_type& x : uuid)

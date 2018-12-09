@@ -113,6 +113,80 @@ namespace System.IO
         {
             Write(ToUtf8(x));
         }
+        public void WriteULEB128UInt(uint x)
+        {
+            do
+            {
+                byte b = cast<byte>(x & 0x7Fu);
+                x = x >> 7u;
+                if (x != 0u)
+                {
+                    b = b | 0x80u;
+                }
+                Write(b);
+            }
+            while (x != 0u);
+        }
+        public void WriteULEB128ULong(ulong x)
+        {
+            do
+            {
+                byte b = cast<byte>(x & 0x7Fu);
+                x = x >> 7u;
+                if (x != 0u)
+                {
+                    b = b | 0x80u;
+                }
+                Write(b);
+            }
+            while (x != 0u);
+        }
+        public void WriteSLEB128Int(int x)
+        {
+            bool more = true;
+            bool negative = x < 0;
+            while (more)
+            {
+                byte b = cast<byte>(x & 0x7F);
+                x = x >> 7;
+                if (negative)
+                {
+                    x = x | (~int(0) << (32 - 7));
+                }
+                if (x == 0 && (b & 0x40u) == 0u || x == -1 && (b & 0x40u) != 0u)
+                {
+                    more = false;
+                }
+                else
+                {
+                    b = b | 0x80u;
+                }
+                Write(b);
+            }
+        }
+        public void WriteSLEB128Long(long x)
+        {
+            bool more = true;
+            bool negative = x < 0;
+            while (more)
+            {
+                byte b = cast<byte>(x & 0x7F);
+                x = x >> 7;
+                if (negative)
+                {
+                    x = x | (~long(0) << (64 - 7));
+                }
+                if (x == 0 && (b & 0x40u) == 0u || x == -1 && (b & 0x40u) != 0u)
+                {
+                    more = false;
+                }
+                else
+                {
+                    b = b | 0x80u;
+                }
+                Write(b);
+            }
+        }
         public void Write(const Uuid& uuid)
         {
             for (byte b : uuid)
