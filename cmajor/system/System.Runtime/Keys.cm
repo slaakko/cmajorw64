@@ -1,0 +1,85 @@
+// =================================
+// Copyright (c) 2018 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+// Key codes returned by RtGetCh function:
+
+public const int keyControlA = 0x001;
+public const int keyControlB = 0x002;
+public const int keyControlC = 0x003;
+public const int keyControlD = 0x004;
+public const int keyControlE = 0x005;
+public const int keyControlF = 0x006;
+public const int keyControlG = 0x007;
+public const int keyBackspace = 0x008;
+public const int keyTab = 0x009;
+public const int keyControlJ = 0x00A;
+public const int keyControlK = 0x00B;
+public const int keyControlL = 0x00C;
+public const int keyEnter = 0x00D;
+public const int keyControlN = 0x00E;
+public const int keyControlO = 0x00F;
+public const int keyControlP = 0x010;
+public const int keyControlQ = 0x011;
+public const int keyControlR = 0x012;
+public const int keyControlS = 0x013;
+public const int keyControlT = 0x014;
+public const int keyControlU = 0x015;
+public const int keyControlV = 0x016;
+public const int keyControlW = 0x017;
+public const int keyControlX = 0x018;
+public const int keyControlY = 0x019;
+public const int keyControlZ = 0x01A;
+public const int keyEscape = 0x01B;
+public const int keyFS = 0x01C;
+public const int keyGS = 0x01D;
+public const int keyRS = 0x01E;
+public const int keyUS = 0x01F;
+
+public const int unicodePrivateStart = 0xE000;
+
+public const int keyDown = unicodePrivateStart + 0x102;
+public const int keyUp = unicodePrivateStart + 0x103;
+public const int keyLeft = unicodePrivateStart + 0x104;
+public const int keyRight = unicodePrivateStart + 0x105;
+public const int keyHome = unicodePrivateStart + 0x106;
+public const int keyF0 = unicodePrivateStart + 0x108;
+public const int keyF1 = unicodePrivateStart + 0x109;
+public const int keyF2 = unicodePrivateStart + 0x10a;
+public const int keyF3 = unicodePrivateStart + 0x10b;
+public const int keyF4 = unicodePrivateStart + 0x10c;
+public const int keyF5 = unicodePrivateStart + 0x10d;
+public const int keyF6 = unicodePrivateStart + 0x10e;
+public const int keyF7 = unicodePrivateStart + 0x10f;
+public const int keyF8 = unicodePrivateStart + 0x110;
+public const int keyF9 = unicodePrivateStart + 0x111;
+public const int keyF10 = unicodePrivateStart + 0x112;
+public const int keyF11 = unicodePrivateStart + 0x113;
+public const int keyF12 = unicodePrivateStart + 0x114;
+public const int keyDel = unicodePrivateStart + 0x14a;
+public const int keyIns = unicodePrivateStart + 0x14b;
+public const int keyPgDown = unicodePrivateStart + 0x152;
+public const int keyPgUp = unicodePrivateStart + 0x153;
+public const int keyPrint = unicodePrivateStart + 0x15a;
+public const int keyCancel = unicodePrivateStart + 0x161;
+public const int keyEnd = unicodePrivateStart + 0x166;
+public const int keyShiftDel = unicodePrivateStart + 0x17d;
+public const int keyShiftEnd = unicodePrivateStart + 0x180;
+public const int keyShiftHome = unicodePrivateStart + 0x184;
+public const int keyShiftLeft = unicodePrivateStart + 0x187;
+public const int keyShiftRight = unicodePrivateStart + 0x190;
+public const int keyResize = unicodePrivateStart + 0x222;
+public const int keyShiftUp = unicodePrivateStart + 0x223;
+public const int keyShiftDown = unicodePrivateStart + 0x224;
+
+// PC only:
+
+public const int keyControlUp = unicodePrivateStart + 0x1e0;
+public const int keyControlDown = unicodePrivateStart + 0x1e1;
+public const int keyControlLeft = unicodePrivateStart + 0x1bb;
+public const int keyControlRight = unicodePrivateStart + 0x1bc;
+public const int keyControlPgUp = unicodePrivateStart + 0x1bd;
+public const int keyControlPgDown = unicodePrivateStart + 0x1be;
+public const int keyControlHome = unicodePrivateStart + 0x1bf;
+public const int keyControlEnd = unicodePrivateStart + 0x1c0;
