@@ -50,6 +50,7 @@ void InitScreen()
     keyMap[KEY_SLEFT] = keyShiftLeft;
     keyMap[KEY_SRIGHT] = keyShiftRight;
     keyMap[KEY_RESIZE] = keyResize;
+#ifdef _WIN32
     keyMap[KEY_SUP] = keyShiftUp;
     keyMap[KEY_SDOWN] = keyShiftDown;
     keyMap[CTL_LEFT] = keyControlLeft;
@@ -60,6 +61,7 @@ void InitScreen()
     keyMap[CTL_PGDN] = keyControlPgDown;
     keyMap[CTL_HOME] = keyControlHome;
     keyMap[CTL_END] = keyControlEnd;
+#endif
 
     keyNameMap[keyDown] = "DOWN";
     keyNameMap[keyUp] = "UP";
