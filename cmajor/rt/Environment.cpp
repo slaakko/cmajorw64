@@ -20,10 +20,12 @@
 #include <io.h>
 #include <process.h>
 #else
+#include <cstring>
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <stdio.h>
 #endif
 
 namespace cmajor { namespace rt {
@@ -281,4 +283,29 @@ extern "C" RT_API const char* RtGetPathToExecutable(int32_t pathHandle)
 extern "C" RT_API void RtEndGetPathToExecutable(int32_t pathHandle)
 {
     cmajor::rt::DisposeString(pathHandle);
+}
+
+extern "C" RT_API const char* RtGetOsInfo()
+{
+#ifdef _WIN32
+    return "windows";
+#else
+    static char buf[1024];
+    std::memset(buf, 0, 1024);
+    FILE* fp = fopen("/proc/version", "r");
+    if (fp != NULL)
+    {
+        const char* s = fgets(buf, 1023, fp);
+        fclose(fp);
+        if (s == NULL)
+        {
+            return "ERROR";
+        }
+    }
+    else
+    {
+        return "ERROR";
+    }
+    return buf;
+#endif
 }

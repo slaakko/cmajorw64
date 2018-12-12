@@ -31,7 +31,11 @@ extern "C" RT_API void RtGetNStr(char* str, int size);
 extern "C" RT_API void RtAttrOn(int attrs);
 extern "C" RT_API void RtAttrOff(int attrs);
 extern "C" RT_API void RtAttrSet(int attrs);
-extern "C" RT_API const char* RtGetKeyName(int key);
+
+// Key codes returned by RtGetCh function:
+
+const int keyBackspace = '\b';
+const int keyTab = '\t';
 
 const int keyControlA = 0x001;
 const int keyControlB = 0x002;
@@ -40,12 +44,12 @@ const int keyControlD = 0x004;
 const int keyControlE = 0x005;
 const int keyControlF = 0x006;
 const int keyControlG = 0x007;
-const int keyBackspace = 0x008;
-const int keyTab = 0x009;
+const int keyControlH = 0x008;
+const int keyControlI = 0x009;
 const int keyControlJ = 0x00A;
 const int keyControlK = 0x00B;
 const int keyControlL = 0x00C;
-const int keyEnter = 0x00D;
+const int keyControlM = 0x00D;
 const int keyControlN = 0x00E;
 const int keyControlO = 0x00F;
 const int keyControlP = 0x010;
@@ -65,52 +69,53 @@ const int keyGS = 0x01D;
 const int keyRS = 0x01E;
 const int keyUS = 0x01F;
 
-const int unicodePrivateStart = 0xE000;
+// special keys are mapped to Unicode Private Use Area
 
-const int keyDown = unicodePrivateStart + 0x102;
-const int keyUp = unicodePrivateStart + 0x103;
-const int keyLeft = unicodePrivateStart + 0x104;
-const int keyRight = unicodePrivateStart + 0x105;
-const int keyHome = unicodePrivateStart + 0x106;
-const int keyF0 = unicodePrivateStart + 0x108;
-const int keyF1 = unicodePrivateStart + 0x109;
-const int keyF2 = unicodePrivateStart + 0x10a;
-const int keyF3 = unicodePrivateStart + 0x10b;
-const int keyF4 = unicodePrivateStart + 0x10c;
-const int keyF5 = unicodePrivateStart + 0x10d;
-const int keyF6 = unicodePrivateStart + 0x10e;
-const int keyF7 = unicodePrivateStart + 0x10f;
-const int keyF8 = unicodePrivateStart + 0x110;
-const int keyF9 = unicodePrivateStart + 0x111;
-const int keyF10 = unicodePrivateStart + 0x112;
-const int keyF11 = unicodePrivateStart + 0x113;
-const int keyF12 = unicodePrivateStart + 0x114;
-const int keyDel = unicodePrivateStart + 0x14a;
-const int keyIns = unicodePrivateStart + 0x14b;
-const int keyPgDown = unicodePrivateStart + 0x152;
-const int keyPgUp = unicodePrivateStart + 0x153;
-const int keyPrint = unicodePrivateStart + 0x15a;
-const int keyCancel = unicodePrivateStart + 0x161;
-const int keyEnd = unicodePrivateStart + 0x166;
-const int keyShiftDel = unicodePrivateStart + 0x17d;
-const int keyShiftEnd = unicodePrivateStart + 0x180;
-const int keyShiftHome = unicodePrivateStart + 0x184;
-const int keyShiftLeft = unicodePrivateStart + 0x187;
-const int keyShiftRight = unicodePrivateStart + 0x190;
-const int keyResize = unicodePrivateStart + 0x222;
-const int keyShiftUp = unicodePrivateStart + 0x223;
-const int keyShiftDown = unicodePrivateStart + 0x224;
+const int specialKeyStart = 0xE000;
 
-// PC only:
+const int keyEnter = specialKeyStart + 0;
+const int keyDown = specialKeyStart + 1;
+const int keyUp = specialKeyStart + 2;
+const int keyLeft = specialKeyStart + 3;
+const int keyRight = specialKeyStart + 4;
+const int keyHome = specialKeyStart + 5;
+const int keyF0 = specialKeyStart + 6;
+const int keyF1 = specialKeyStart + 7;
+const int keyF2 = specialKeyStart + 8;
+const int keyF3 = specialKeyStart + 9;
+const int keyF4 = specialKeyStart + 10;
+const int keyF5 = specialKeyStart + 11;
+const int keyF6 = specialKeyStart + 12;
+const int keyF7 = specialKeyStart + 13;
+const int keyF8 = specialKeyStart + 14;
+const int keyF9 = specialKeyStart + 15;
+const int keyF10 = specialKeyStart + 16;
+const int keyF11 = specialKeyStart + 17;
+const int keyF12 = specialKeyStart + 18;
+const int keyDel = specialKeyStart + 19;
+const int keyIns = specialKeyStart + 20;
+const int keyPgDown = specialKeyStart + 21;
+const int keyPgUp = specialKeyStart + 22;
+const int keyPrint = specialKeyStart + 23;
+const int keyEnd = specialKeyStart + 24;
+const int keyShiftDel = specialKeyStart + 25;
+const int keyShiftEnd = specialKeyStart + 26;
+const int keyShiftHome = specialKeyStart + 27;
+const int keyShiftLeft = specialKeyStart + 28;
+const int keyShiftRight = specialKeyStart + 29;
+const int keyResize = specialKeyStart + 30;
+const int keyShiftUp = specialKeyStart + 31;
+const int keyShiftDown = specialKeyStart + 32;
+const int keyControlUp = specialKeyStart + 33;
+const int keyControlDown = specialKeyStart + 34;
+const int keyControlLeft = specialKeyStart + 35;
+const int keyControlRight = specialKeyStart + 36;
+const int keyControlPgUp = specialKeyStart + 37;
+const int keyControlPgDown = specialKeyStart + 38;
+const int keyControlHome = specialKeyStart + 39;
+const int keyControlEnd = specialKeyStart + 40;
 
-const int keyControlUp = unicodePrivateStart + 0x1e0;
-const int keyControlDown = unicodePrivateStart + 0x1e1;
-const int keyControlLeft = unicodePrivateStart + 0x1bb;
-const int keyControlRight = unicodePrivateStart + 0x1bc;
-const int keyControlPgUp = unicodePrivateStart + 0x1bd;
-const int keyControlPgDown = unicodePrivateStart + 0x1be;
-const int keyControlHome = unicodePrivateStart + 0x1bf;
-const int keyControlEnd = unicodePrivateStart + 0x1c0;
+const int specialKeyEnd = specialKeyStart + 40;
 
 namespace cmajor { namespace rt {
 

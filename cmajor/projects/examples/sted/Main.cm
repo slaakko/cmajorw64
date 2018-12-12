@@ -43,6 +43,11 @@ class Position
     public int charIndex;
 }
 
+public bool operator==(const Position& left, const Position& right)
+{
+    return left.lineNumber == right.lineNumber && left.charIndex == right.charIndex;
+}
+
 public bool operator<(const Position& left, const Position& right)
 {
     if (left.lineNumber < right.lineNumber) return true;
@@ -71,7 +76,7 @@ class Editor
         while (true)
         {
             int ch = RtGetCh();
-            if (ch >= 0 && ch < 32 || ch >= unicodePrivateStart) 
+            if (ch >= 0 && ch < 32 || ch >= specialKeyStart && ch <= specialKeyEnd) 
             {
                 if (ch == keyEnter)
                 {
@@ -134,29 +139,37 @@ class Editor
                     break;
                 }
             }
-            else if (ch >= 32 && ch < unicodePrivateStart) 
+            else if (ch >= 32 && ch < specialKeyStart) 
             {
                 
             }
         }
     }
-    private void PrintLine(int lineNumber)
+    private void PrintLine(int row, int lineNumber)
     {
-        string utf8Line;
-        if (lineNumber < lines.Count())
+        screen.MoveCursorTo(row, 0);
+        for (int col = 0; col < screen.cols; ++col)
         {
-            utf8Line = ToUtf8(lines[lineNumber].Substring(colOffset, screen.cols));
-        }        
-        RtAddStr(utf8Line.Chars());
-        RtClearToEol();
+            int ch = cast<int>(' ');
+            if (lineNumber < lines.Count())
+            {
+                const ustring& line = lines[lineNumber];
+                int charIndex = col + colOffset;
+                if (charIndex < line.Length())
+                {
+                    ch = cast<int>(line[charIndex]);
+                }
+            }            
+            RtAddCh(ch);
+        }
     }
     private void Print()
     {
+        RtClear();
         for (int r = 0; r < screen.textRows; ++r)
         {
-            screen.MoveCursorTo(r, 0);
             int lineNumber = r + rowOffset;
-            PrintLine(lineNumber);
+            PrintLine(r, lineNumber);
         }
         PrintStatus();
         screen.Refresh();

@@ -26,5 +26,6 @@ extern "C" RT_API int32_t RtEndExec(int32_t execHandle);
 extern "C" RT_API int32_t RtBeginGetPathToExecutable();
 extern "C" RT_API const char* RtGetPathToExecutable(int32_t pathHandle);
 extern "C" RT_API void RtEndGetPathToExecutable(int32_t pathHandle);
+extern "C" RT_API const char* RtGetOsInfo();
 
 #endif // CMAJOR_RT_ENVIRONMENT_INCLUDED

@@ -28,19 +28,37 @@ namespace System.IO
         {
             string result;
             int x = Read();
+            bool prevWasCR = false;
             while (x != -1)
             {
-                if (cast<char>(x) == '\n')
+                if (cast<char>(x) == '\r')
+                {
+                    if (prevWasCR)
+                    {
+                        result.Append('\r');
+                    }
+                    prevWasCR = true;
+                }
+                else if (cast<char>(x) == '\n')
                 {
                     return result;
                 }
                 else
                 {
+                    if (prevWasCR)
+                    {
+                        result.Append('\r');
+                        prevWasCR = false;
+                    }
                     result.Append(cast<char>(x));
                 }
                 x = Read();
             }
             eos = true;
+            if (prevWasCR)
+            {
+                result.Append('\r');
+            }
             return result;
         }
         public string ReadToEnd()

@@ -172,10 +172,27 @@ namespace System.IO
         {
             string line;
             int x = RtReadByte(fileHandle);
+            bool prevWasCR = false;
             while (x != -1 && cast<char>(x) != '\n')
             {
                 char c = cast<char>(x);
-                line.Append(c);
+                if (c == '\r')
+                {
+                    if (prevWasCR)
+                    {
+                        line.Append(c);
+                    }
+                    prevWasCR = true;
+                }
+                else
+                {
+                    if (prevWasCR)
+                    {
+                        line.Append('\r');
+                        prevWasCR = false;
+                    }
+                    line.Append(c);
+                }                
                 x = RtReadByte(fileHandle);
             }
             endOfStream = x == -1;

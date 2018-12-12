@@ -21,7 +21,7 @@ else
 endif
 
 ../lib/$(config)/$(soname): $(OBJECTS) $(LIBRARIES)
-	$(CXX) $(CXXFLAGS) -Wl,--dynamic-list=export.txt -shared -o $@ $(OBJECTS) -lsymbols -lparser -last -leh -lxpath -ldom -lxml -lparsing -lcodedom -lutil -ldl -ltinfo -lgnutls
+	$(CXX) $(CXXFLAGS) -Wl,--dynamic-list=export.txt -shared -o $@ $(OBJECTS) -lsymbols -lparser -last -leh -lxpath -ldom -lxml -lparsing -lcodedom -lutil -ldl -ltinfo -lgnutls -lncurses
 	ln -f ../lib/$(soname) ../lib/$(sobasename).so.3
 	ln -f ../lib/$(soname) ../lib/$(sobasename).so
 

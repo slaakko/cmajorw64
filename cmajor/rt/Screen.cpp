@@ -6,43 +6,55 @@
 #include <cmajor/rt/Screen.hpp>
 #include <memory>
 #include <unordered_map>
+#include <fstream>
 #ifdef _WIN32
 #include <cmajor/system/ext/pdcurs36/curses.h>
 #else
 #include <ncurses.h>
+// extension on Windows Subsystem for Linux:
+#define KEY_SUP 337
+#define KEY_SDOWN 336
+#define CTL_LEFT 545
+#define CTL_RIGHT 560
+#define CTL_UP 566
+#define CTL_DOWN 525
+#define CTL_PGUP 555
+#define CTL_PGDN 550
+#define CTL_HOME 535
+#define CTL_END 530
 #endif
 
 namespace cmajor { namespace rt {
 
 std::unordered_map<int, int> keyMap;
-std::unordered_map<int, const char*> keyNameMap;
 
 void InitScreen()
 {
+    keyMap['\r'] = keyEnter;
+    keyMap['\n'] = keyEnter;
     keyMap[KEY_DOWN] = keyDown;
     keyMap[KEY_UP] = keyUp;
     keyMap[KEY_LEFT] = keyLeft;
     keyMap[KEY_RIGHT] = keyRight;
     keyMap[KEY_HOME] = keyHome;
-    keyMap[KEY_F0] = keyF0;
-    keyMap[KEY_F0 + 1] = keyF1;
-    keyMap[KEY_F0 + 2] = keyF2;
-    keyMap[KEY_F0 + 3] = keyF3;
-    keyMap[KEY_F0 + 4] = keyF4;
-    keyMap[KEY_F0 + 5] = keyF5;
-    keyMap[KEY_F0 + 6] = keyF6;
-    keyMap[KEY_F0 + 7] = keyF7;
-    keyMap[KEY_F0 + 8] = keyF8;
-    keyMap[KEY_F0 + 9] = keyF9;
-    keyMap[KEY_F0 + 10] = keyF10;
-    keyMap[KEY_F0 + 11] = keyF11;
-    keyMap[KEY_F0 + 12] = keyF12;
+    keyMap[KEY_F(0)] = keyF0;
+    keyMap[KEY_F(1)] = keyF1;
+    keyMap[KEY_F(2)] = keyF2;
+    keyMap[KEY_F(3)] = keyF3;
+    keyMap[KEY_F(4)] = keyF4;
+    keyMap[KEY_F(5)] = keyF5;
+    keyMap[KEY_F(6)] = keyF6;
+    keyMap[KEY_F(7)] = keyF7;
+    keyMap[KEY_F(8)] = keyF8;
+    keyMap[KEY_F(9)] = keyF9;
+    keyMap[KEY_F(10)] = keyF10;
+    keyMap[KEY_F(11)] = keyF11;
+    keyMap[KEY_F(12)] = keyF12;
     keyMap[KEY_DC] = keyDel;
     keyMap[KEY_IC] = keyIns;
     keyMap[KEY_NPAGE] = keyPgDown;
     keyMap[KEY_PPAGE] = keyPgUp;
     keyMap[KEY_PRINT] = keyPrint;
-    keyMap[KEY_CANCEL] = keyCancel;
     keyMap[KEY_END] = keyEnd;
     keyMap[KEY_SDC] = keyShiftDel;
     keyMap[KEY_SEND] = keyShiftEnd;
@@ -50,60 +62,16 @@ void InitScreen()
     keyMap[KEY_SLEFT] = keyShiftLeft;
     keyMap[KEY_SRIGHT] = keyShiftRight;
     keyMap[KEY_RESIZE] = keyResize;
-#ifdef _WIN32
     keyMap[KEY_SUP] = keyShiftUp;
     keyMap[KEY_SDOWN] = keyShiftDown;
-    keyMap[CTL_LEFT] = keyControlLeft;
-    keyMap[CTL_RIGHT] = keyControlRight;
     keyMap[CTL_UP] = keyControlUp;
     keyMap[CTL_DOWN] = keyControlDown;
+    keyMap[CTL_LEFT] = keyControlLeft;
+    keyMap[CTL_RIGHT] = keyControlRight;
     keyMap[CTL_PGUP] = keyControlPgUp;
     keyMap[CTL_PGDN] = keyControlPgDown;
     keyMap[CTL_HOME] = keyControlHome;
     keyMap[CTL_END] = keyControlEnd;
-#endif
-
-    keyNameMap[keyDown] = "DOWN";
-    keyNameMap[keyUp] = "UP";
-    keyNameMap[keyLeft] = "LEFT";
-    keyNameMap[keyRight] = "RIGHT";
-    keyNameMap[keyHome] = "HOME";
-    keyNameMap[keyF0] = "F0";
-    keyNameMap[keyF1] = "F1";
-    keyNameMap[keyF2] = "F2";
-    keyNameMap[keyF3] = "F3";
-    keyNameMap[keyF4] = "F4";
-    keyNameMap[keyF5] = "F5";
-    keyNameMap[keyF6] = "F6";
-    keyNameMap[keyF7] = "F7";
-    keyNameMap[keyF8] = "F8";
-    keyNameMap[keyF9] = "F9";
-    keyNameMap[keyF10] = "F10";
-    keyNameMap[keyF11] = "F11";
-    keyNameMap[keyF12] = "F12";
-    keyNameMap[keyDel] = "DEL";
-    keyNameMap[keyIns] = "INS";
-    keyNameMap[keyPgDown] = "PAGE DOWN";
-    keyNameMap[keyPgUp] = "PAGE UP";
-    keyNameMap[keyPrint] = "PRINT";
-    keyNameMap[keyCancel] = "CANCEL";
-    keyNameMap[keyEnd] = "END";
-    keyNameMap[keyShiftDel] = "SHIFT DEL";
-    keyNameMap[keyShiftEnd] = "SHIFT END";
-    keyNameMap[keyShiftHome] = "SHIFT HOME";
-    keyNameMap[keyShiftLeft] = "SHIFT LEFT";
-    keyNameMap[keyShiftRight] = "SHIFT RIGHT";
-    keyNameMap[keyResize] = "RESIZE";
-    keyNameMap[keyShiftUp] = "SHIFT UP";
-    keyNameMap[keyShiftDown] = "SHIFT DOWN";
-    keyNameMap[keyControlLeft] = "CONTROL LEFT";
-    keyNameMap[keyControlRight] = "CONTROL RIGHT";
-    keyNameMap[keyControlUp] = "CONTROL UP";
-    keyNameMap[keyControlDown] = "CONTROL DOWN";
-    keyNameMap[keyControlPgUp] = "CONTROL PAGE UP";
-    keyNameMap[keyControlPgDown] = "CONTROL PAGE DOWN";
-    keyNameMap[keyControlHome] = "CONTROL HOME";
-    keyNameMap[keyControlEnd] = "CONTROL END";
 }
 
 void DoneScreen()
@@ -217,11 +185,12 @@ extern "C" RT_API void RtAddStr(const char* str)
 
 extern "C" RT_API int RtGetCh()
 {
+    using cmajor::rt::keyMap;
     int ch = getch();
-    auto it = cmajor::rt::keyMap.find(ch);
-    if (it != cmajor::rt::keyMap.cend())
+    auto it = keyMap.find(ch);
+    if (it != keyMap.cend())
     {
-        return it->second;
+        ch = it->second;
     }
     return ch;
 }
@@ -244,14 +213,4 @@ extern "C" RT_API void RtAttrOff(int attrs)
 extern "C" RT_API void RtAttrSet(int attrs)
 {
     attrset(attrs);
-}
-
-extern "C" RT_API const char* RtGetKeyName(int key)
-{
-    auto it = cmajor::rt::keyNameMap.find(key);
-    if (it != cmajor::rt::keyNameMap.cend())
-    {
-        return it->second;
-    }
-    return "UNKNOWN";
 }
